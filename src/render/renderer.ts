@@ -3149,7 +3149,7 @@ export class Renderer {
     const offsetVfxAnchor = createOffsetVfxAnchor(fillVfxPose);
     bd('scene-misc');
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor, this.groundSample, gate);
-    this.scarecrowFx = new ScarecrowFx(this.scene, this.vfx, (x, z) => groundHeight(x, z, this.sim.cfg.seed), () => this.sim.entities, (id) => this.sim.entities.get(id), gate, () => this.audioSink);
+    this.scarecrowFx = new ScarecrowFx(this.scene, this.vfx, (x, z) => groundHeight(x, z, this.sim.cfg.seed), () => this.sim.entities, (id) => this.sim.entities.get(id), gate, () => this.audioSink, (id, color, k) => { const v = this.views.get(id); if (v) this.activeVisual(v)?.setAuraGlow(color, k); }, () => this.sim.cfg.seed);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
     this.farmPatchVisuals = new FarmPatchVisuals(

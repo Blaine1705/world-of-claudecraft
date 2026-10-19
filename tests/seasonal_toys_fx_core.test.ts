@@ -7,10 +7,14 @@ import { drawsSeasonalHead, wearsSeasonalHead } from '../src/render/characters/s
 import {
   BAT_COUNT,
   batFlight,
-  broomEmberTrail,
-  broomPose,
+  brewGlow,
+  CANDLE_SHADOW_FIGURES,
+  CAULDRON_BUBBLES,
   candleGlowColumn,
+  candleLightPool,
   candleMist,
+  candleShadows,
+  cauldronBubble,
   ghostOrbit,
   HALO_PRANK_RESERVE,
   haloSlotFree,
@@ -105,13 +109,60 @@ describe('the toys render plan', () => {
     expect(lookFade(5, 0)).toBe(0);
   });
 
-  it('keeps the play broom by its sweeper, bristles on the ground, swinging with the walk', () => {
-    const still = broomPose(1, 0);
-    expect(still.bristle.y).toBeLessThan(0.2);
-    expect(still.hand.y).toBeGreaterThan(0.9);
-    let swing = 0;
-    for (let t = 0; t < 2; t += 0.05) swing = Math.max(swing, Math.abs(broomPose(t, 1).sweep));
-    expect(swing).toBeGreaterThan(0.9);
+  it('throws a cat, a bat and a witch out from the candle, dancing with its flicker', () => {
+    expect(CANDLE_SHADOW_FIGURES).toEqual(['cat', 'bat', 'witch']);
+    // nothing at the strike: the shadows stand up as the flames catch
+    for (const f of candleShadows(0, 0, 1, 1)) expect(f.alpha).toBe(0);
+    const lit = candleShadows(5, 0.4, 0.92, 1);
+    expect(lit.map((f) => f.figure)).toEqual(['cat', 'bat', 'witch']);
+    for (const f of lit) {
+      // dark enough to read on sunlit grass, cast AWAY from the flame (the foot nearest it)
+      expect(f.alpha, f.figure).toBeGreaterThan(0.6);
+      expect(f.foot, f.figure).toBeGreaterThan(0.3);
+      expect(f.length, f.figure).toBeGreaterThan(1.2);
+    }
+    // spread round the dish, never piled on one side
+    const gap = (a: number, b: number) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
+    expect(gap(lit[0].bearing, lit[1].bearing)).toBeGreaterThan(1);
+    expect(gap(lit[1].bearing, lit[2].bearing)).toBeGreaterThan(1);
+    // a jumping flame throws longer shadows than a guttering one
+    const tall = candleShadows(5, 0.4, 1.15, 1);
+    const low = candleShadows(5, 0.4, 0.7, 1);
+    for (let i = 0; i < 3; i++) expect(tall[i].length).toBeGreaterThan(low[i].length);
+    // and they move: a second later every shadow has turned round the dish
+    const later = candleShadows(6, 0.4, 0.92, 1);
+    for (let i = 0; i < 3; i++) expect(later[i].bearing).not.toBeCloseTo(lit[i].bearing, 2);
+    // the look's fade takes them with it
+    for (const f of candleShadows(5, 0.4, 0.92, 0)) expect(f.alpha).toBe(0);
+    // they dance in a pool of candlelight that follows the mist's grow and fade
+    expect(candleLightPool(0, 30, 1).strength).toBe(0);
+    expect(candleLightPool(5, 25, 0.92).strength).toBeGreaterThan(0.9);
+    expect(candleLightPool(5, 25, 0.92).radius).toBeGreaterThan(3);
+    expect(candleLightPool(30, 0, 1).strength).toBe(0);
+  });
+
+  it('bubbles the cauldron and pulses a drinker green', () => {
+    expect(CAULDRON_BUBBLES).toBeGreaterThanOrEqual(5);
+    let popped = 0;
+    for (let i = 0; i < CAULDRON_BUBBLES; i++) {
+      for (let t = 0; t < 4; t += 0.05) {
+        const b = cauldronBubble(i, t);
+        // always on the brew's surface, inside the rim
+        expect(Math.hypot(b.x, b.z)).toBeLessThanOrEqual(0.8);
+        expect(b.size).toBeGreaterThanOrEqual(0);
+        expect(b.size).toBeLessThanOrEqual(1);
+        if (b.pop > 0) popped++;
+      }
+    }
+    expect(popped).toBeGreaterThan(0);
+    // pure: the same bubble at the same time is the same on every client
+    expect(cauldronBubble(3, 1.7)).toEqual(cauldronBubble(3, 1.7));
+    // the glow floods in, holds and drains with the look
+    expect(brewGlow(0, 10, 0)).toBe(0);
+    expect(brewGlow(5, 5, 1)).toBeGreaterThan(0.1);
+    // never a full flood: the drinker stays readable under the green
+    for (let t = 0; t < 3; t += 0.01) expect(brewGlow(5, 5, t)).toBeLessThan(0.3);
+    expect(brewGlow(10, 0, 1)).toBe(0);
   });
 });
 
@@ -149,16 +200,7 @@ describe('the toys in words', () => {
       expect(seasonalEventPresentation({ type: 'seasonal', what })?.logText, what).toBeTruthy();
   });
 
-  it('keeps the broom trail and the candle readable over tall grass and in daylight', () => {
-    // standing still: no ember trail (only the slow glitter of the sparks)
-    expect(broomEmberTrail(0)).toEqual({ rate: 0, lift: 0 });
-    const walk = broomEmberTrail(3);
-    const amble = broomEmberTrail(1);
-    expect(walk.rate).toBe(40);
-    expect(amble.rate).toBeGreaterThan(0);
-    expect(walk.rate).toBeGreaterThan(amble.rate);
-    // the embers rise clear of the bristles (which brush the ground)
-    expect(walk.lift).toBeGreaterThanOrEqual(0.5);
+  it('keeps the candle readable over tall grass and in daylight', () => {
     // the candle's column follows the mist: dark at the strike, full when spread, gone out
     expect(candleGlowColumn(0, 30).opacity).toBe(0);
     expect(candleGlowColumn(0, 30).wispRate).toBe(0);
@@ -172,7 +214,7 @@ describe('the toys in words', () => {
   it('never lets an accent glow take the halo slots the pumpkin pranks ask for last', () => {
     const size = 24;
     expect(HALO_PRANK_RESERVE).toBe(PRANK_CAP * 2);
-    // a full town square of candles and brooms: accents stop at the reserve...
+    // a full town square of candles and cauldrons: accents stop at the reserve...
     expect(haloSlotFree(size - HALO_PRANK_RESERVE - 1, size, true)).toBe(true);
     expect(haloSlotFree(size - HALO_PRANK_RESERVE, size, true)).toBe(false);
     // ...while every prank flight and splat still finds a slot behind them

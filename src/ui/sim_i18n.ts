@@ -21107,6 +21107,10 @@ const RULES: Rule[] = [
     build: (m) => t('hudChrome.worldBoss.sleep', { name: locMob(m[1]) }),
   },
   {
+    re: /^(.+) sleeps until nightfall\.$/,
+    build: (m) => t('hudChrome.worldBoss.sleepUntilNightfall', { name: locMob(m[1]) }),
+  },
+  {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,
     build: () => tQuestExtra('aldrenYell', { name: locMob('Fallen Captain Aldren') }),
   },

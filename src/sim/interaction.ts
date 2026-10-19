@@ -2,6 +2,7 @@ import { tryStartKitUse } from './mob/trash_kit/encounter_use';
 import { isHoardRewardChestTemplate, openHoardRewardChest } from './rift/hoard_reward_chest';
 import { isRiftEntranceTemplate } from './rift/vault_seed';
 import { discoverHauntedPumpkin } from './seasonal/haunted_pumpkins';
+import { drinkFromToyCauldron } from './seasonal/toy_cauldron';
 import { vehicleStationByEntityId } from './vehicle_stations';
 import { enterVehicle } from './vehicles';
 // Interaction: looting, quest NPCs, ground objects. The three IWorldInteraction
@@ -373,6 +374,7 @@ export function pickUpObject(
   }
   const objectItemId = obj.objectItemId;
   if (obj.templateId === 'ground_haunted_pumpkin') return discoverHauntedPumpkin(ctx, obj, meta);
+  if (drinkFromToyCauldron(ctx, obj, meta)) return true;
   if (!objectItemId) return false;
   if (interactSoulwell(ctx, obj, meta.entityId)) return true;
   const beforeCastingAbility = p.castingAbility;

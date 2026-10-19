@@ -21815,8 +21815,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '사용: {minutes}분 동안 날갯짓하는 박쥐로 변신합니다. 사용 시 소모됩니다. 전투 중에는 사용할 수 없으며 전투에 들어가면 해제됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 외형 전용.',
   'seasonal.itemUse.titleWrit':
     '사용: 이 캐릭터의 칭호 {title}을(를) 획득하며, 업적의 서에서 착용할 수 있습니다. 사용 시 소모됩니다. 고드라이트 축제의 밤 기간에만 사용 가능. 이미 칭호가 있으면 증서가 남습니다.',
-  'seasonal.itemUse.broom':
-    '헤스터 고드윅에게서 잉걸엮음 짚단 {count}개로 구입합니다. 타려면 탈것 기술이 필요합니다. 고드라이트 축제의 밤 동안에만 남아 있으며, 행사가 끝나면 짚으로 부서집니다.',
   'seasonal.itemUse.sheaf':
     '올드 대치그린을 처치하고 전리품을 챙기면 하루에 하나씩 받으며, 잉걸갈기 빗자루를 얻을 때까지 이어집니다. 헤스터 고드윅이 이스트브룩, 펜브리지, 하이워치의 노점에서 {count}개를 빗자루와 교환해 줍니다. 고드라이트 축제의 밤이 끝나면 짚으로 부서집니다.',
   'entities.items.rattlebone_draught.name': '덜그럭뼈 물약',
@@ -21902,25 +21900,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wanderwisp_lantern.name': '떠도는 도깨비불 등불',
   'entities.items.sack_of_startled_bats.name': '놀란 박쥐 자루',
   'entities.items.murmurwick_candle.name': '속삭이는 심지 양초',
-  'entities.items.sparkbristle_play_broom.name': '불꽃솔 장난감 빗자루',
   'seasonal.itemUse.toyPrank':
     '사용: {range}미터 이내의 보이는 다른 플레이어에게 던집니다. 대상의 머리가 {seconds}초 동안 빛나는 잭오랜턴이 되며, 대상은 우클릭으로 벗을 수 있습니다. 둘 다 전투 중이 아니어야 하며, 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 축제의 밤 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
   'seasonal.itemUse.toyLantern':
     '사용: 앞에 등불을 내려놓습니다. 작은 유령이 {seconds}초 동안 당신 주위를 맴돕니다. 전투 중이나 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 축제의 밤 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
   'seasonal.itemUse.toyBats':
     '사용: 자루를 엽니다. 찍찍거리는 박쥐 떼가 튀어나와 {seconds}초 동안 당신 주위로 흩어집니다. 전투 중이나 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 축제의 밤 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
-  'seasonal.itemUse.toyCandle':
-    '사용: 앞에 양초를 밝힙니다. {seconds}초 동안 근처의 모두에게 나지막한 속삭임과 웃음소리가 들리고, 낮은 초록 안개가 주위로 퍼집니다. 전투 중이나 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 축제의 밤 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
-  'seasonal.itemUse.toyBroom':
-    '사용: 빗자루로 쓸며 걸어갑니다. {seconds}초 동안 걸을 때마다 주황빛 불꽃 자국을 남깁니다. 전투 중이나 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 축제의 밤 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
   'seasonal.toy.prank': '호박을 던졌습니다. {name}에게 철퍽 맞았습니다!',
   'seasonal.toy.lantern': '등불을 내려놓자 작은 유령이 둥실 나와 곁을 지킵니다.',
   'seasonal.toy.bats': '자루를 열자 놀란 박쥐 떼가 튀어나옵니다!',
-  'seasonal.toy.candle': '양초에 불을 붙였습니다. 어둠 속의 무언가가 속삭이기 시작합니다.',
-  'seasonal.toy.broom': '쓸기 시작하자 빗자루 끝에서 불꽃이 튑니다.',
   'seasonal.toy.pranked':
     '{name}이(가) 당신 머리에 호박을 던졌습니다! 오른쪽 클릭으로 벗거나, 당당하게 쓰고 다니세요.',
   'seasonal.toy.prankedFlash': '{name}의 장난!',
   'seasonal.toy.prankNeedsPlayer': '호박은 전투 중이 아닌 다른 플레이어에게만 맞습니다.',
   'seasonal.toy.hidden': '먼저 그림자에서 나오세요. 장난감을 쓰면 위치가 드러납니다.',
+  'entities.items.gurglegreen_cauldron.name': '보글초록 가마솥',
+  'seasonal.itemUse.toyCandleShadows':
+    '사용: 앞에 양초를 켭니다. {seconds}초 동안 불꽃이 고양이, 박쥐, 마녀의 춤추는 그림자를 주위 땅에 드리우며, 근처의 모두가 볼 수 있습니다. 전투 중이나 은신 중에는 사용할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 전야 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
+  'seasonal.itemUse.toyCauldron':
+    '사용: 앞에 보글보글 끓는 작은 가마솥을 내려놓습니다. 가마솥은 {standing}초 동안 그 자리에 있으며, 마시는 플레이어는 누구나 {seconds}초 동안 초록빛으로 빛나고 몸에서 거품이 피어오릅니다. 내려놓기와 마시기 모두 전투 중이나 은신 중에는 할 수 없습니다. 소모되지 않음: {cooldown}초 후 다시 사용할 수 있습니다. 고드라이트 전야 동안에만 사용 가능하며, 끝나면 가방에서 사라집니다. 외형 전용.',
+  'seasonal.itemUse.broomSources':
+    '헤스터 고드윅에게서 엠버우븐 짚단 {count}개로 구입합니다. 드물게, 전리품을 챙긴 날 올드 대치그린이 떨어뜨리기도 합니다. 타려면 탈것 기술이 필요합니다. 고드라이트 전야 동안에만 존재하며, 이벤트가 끝나면 짚으로 부스러집니다.',
+  'seasonal.toy.candleShadows': '양초에 불을 붙이자, 불꽃 주위로 그림자들이 춤추기 시작합니다.',
+  'seasonal.toy.cauldron': '가마솥을 내려놓자, 보글보글 끓기 시작합니다.',
+  'seasonal.toy.cauldronDrink': '가마솥의 물약을 마시자, 몸이 보글보글 초록빛으로 빛납니다!',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name}이(가) 해가 질 때까지 잠듭니다.',
+  'hudChrome.auraEffect.slumberNight': '해가 질 때까지 기둥에 생기 없이 매달려 있습니다. 공격할 수 없습니다.',
 };

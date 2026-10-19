@@ -598,6 +598,17 @@
       }
     ]
   },
+  "gurglegreen_bubble_loop": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "gurglegreen_bubble_loop.mp3",
+        "sha256": "468c032afd98d18f19530a53c09dd86e0a9155c3f8d3850c13aebdd191f6fed1",
+        "size": 97846,
+        "peakDb": -7.3
+      }
+    ]
+  },
   "hammer_of_justice": {
     "ceilingDb": 6.3,
     "tracks": [
@@ -4551,17 +4562,6 @@
       }
     ]
   },
-  "murmurwick_whispers_loop": {
-    "ceilingDb": 5.5,
-    "tracks": [
-      {
-        "filename": "murmurwick_whispers_loop.mp3",
-        "sha256": "2b4001796ab81a27a4f9283e064a8c24f7c36ee9f6bd2da40cb2f49af0a64198",
-        "size": 145493,
-        "peakDb": -6.5
-      }
-    ]
-  },
   "piercing_howl": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -5014,14 +5014,36 @@
       }
     ]
   },
+  "spell_gurglegreen_cauldron": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "spell_gurglegreen_cauldron.mp3",
+        "sha256": "db78288acaf691587bd3742dc3ef1ff717963da36bbe83edf2b54728fecb7e63",
+        "size": 40168,
+        "peakDb": -7.3
+      }
+    ]
+  },
+  "spell_gurglegreen_quaff": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "spell_gurglegreen_quaff.mp3",
+        "sha256": "9e6c6f3ea2c366b6237301d58bf61703dc2a46d72af7f10191f5ce621e418973",
+        "size": 37660,
+        "peakDb": -6.5
+      }
+    ]
+  },
   "spell_murmurwick_candle": {
-    "ceilingDb": 6.2,
+    "ceilingDb": 6,
     "tracks": [
       {
         "filename": "spell_murmurwick_candle.mp3",
-        "sha256": "425a2a94f07aaa946c20cded9bce85a45c7931be0f25acf7d5322443b4f33869",
+        "sha256": "2b8e2c3d4bc103af1623409554bc83578f5c04fa6abd5554bd11a1c97f0651ad",
         "size": 47064,
-        "peakDb": -7.2
+        "peakDb": -7
       }
     ]
   },
@@ -5033,17 +5055,6 @@
         "sha256": "a235d6378e504a68ee6607776047017d3d5b31fb900a3d7ac851827bbb576857",
         "size": 43301,
         "peakDb": -7.5
-      }
-    ]
-  },
-  "spell_sparkbristle_sweep": {
-    "ceilingDb": 6,
-    "tracks": [
-      {
-        "filename": "spell_sparkbristle_sweep.mp3",
-        "sha256": "bbd6ecbda442109911320cc64b21811d4ae51568ead3c3e0c6fdd6cebd6898db",
-        "size": 27002,
-        "peakDb": -7
       }
     ]
   },

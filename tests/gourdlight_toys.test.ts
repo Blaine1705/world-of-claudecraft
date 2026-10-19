@@ -1,5 +1,6 @@
 // Hester's toys (content/gourdlight_eve.ts GOURDLIGHT_TOYS, sim: seasonal/seasonal_toys.ts):
-// five reusable cosmetic toys on her shelf. Pinned here: the shelf rows and prices, each
+// five reusable cosmetic toys on her shelf (the cauldron's own rules: gourdlight_cauldron.test.ts).
+// Pinned here: the shelf rows and prices, each
 // toy's look and its duration, the cooldown that stops spamming, never consumed, refused
 // in combat, in stealth and out of season, the prank's targeting rules (another living
 // player, in reach, out of combat), no stat or combat effect, no rng drawn, the cues every
@@ -44,7 +45,8 @@ const toyOf = (effect: GourdlightToy['effect']): GourdlightToy => {
   if (!toy) throw new Error(effect);
   return toy;
 };
-const SELF_TOYS = GOURDLIGHT_TOYS.filter((t) => t.effect !== 'prank');
+/** The toys whose look plays on their own user (the cauldron sets an object down). */
+const SELF_TOYS = GOURDLIGHT_TOYS.filter((t) => t.effect !== 'prank' && t.effect !== 'cauldron');
 const PRANK = toyOf('prank');
 const auraOn = (e: Entity, id: string) => e.auras.find((a) => a.id === id);
 const seasonal = (events: SimEvent[]) =>
@@ -86,7 +88,7 @@ describe("Hester's toy shelf", () => {
       ['wanderwisp_lantern', 5],
       ['sack_of_startled_bats', 3],
       ['murmurwick_candle', 5],
-      ['sparkbristle_play_broom', 4],
+      ['gurglegreen_cauldron', 5],
     ]);
     for (const toy of GOURDLIGHT_TOYS) {
       expect(GOURDLIGHT_KEEPER_NPC.vendorItems).toContain(toy.itemId);
@@ -129,7 +131,7 @@ describe("Hester's toy shelf", () => {
   });
 });
 
-describe('the self toys (lantern, bats, candle, broom)', () => {
+describe('the self toys (lantern, bats, candle)', () => {
   it('each plays its look for its duration, starts its cooldown and is never consumed', () => {
     for (const toy of SELF_TOYS) {
       const sim = world();
@@ -173,7 +175,7 @@ describe('the self toys (lantern, bats, candle, broom)', () => {
     expect(auraOn(sim.player, toy.auraId)).toBeUndefined();
   });
 
-  it('the lantern and the candle carry the spot they were set down; bats and broom do not', () => {
+  it('the lantern and the candle carry the spot they were set down; the bats do not', () => {
     for (const toy of SELF_TOYS) {
       const sim = world();
       open(sim);
@@ -344,14 +346,19 @@ describe('the toys are pure fun', () => {
       expect(rngState(sim), toy.itemId).toBe(before);
     }
     sim.tick();
-    expect(sim.player.auras.filter((a) => a.kind === 'seasonal_cosmetic')).toHaveLength(4);
+    // the lantern, the bats and the candle on their user (the cauldron stands on the ground)
+    expect(sim.player.auras.filter((a) => a.kind === 'seasonal_cosmetic')).toHaveLength(3);
     expect(sheet(sim.player)).toBe(mine);
     expect(sheet(pip)).toBe(theirs);
   });
 
   it('every toy cue names a real, catalogued sound', () => {
     for (const key of Object.values(TOY_SFX)) expect(key in SFX_CLIPS, key).toBe(true);
-    for (const key of ['impact_prank_pumpkin_splat', 'murmurwick_whispers_loop'])
+    for (const key of [
+      'impact_prank_pumpkin_splat',
+      'gurglegreen_bubble_loop',
+      'spell_gurglegreen_quaff',
+    ])
       expect(key in SFX_CLIPS, key).toBe(true);
   });
 });
@@ -373,5 +380,10 @@ describe('when Gourdlight Eve ends', () => {
       expect(sim.countItem(toy.itemId), toy.itemId).toBe(0);
     }
     expect(auraOn(pip, PRANK.auraId)).toBeUndefined();
+    // the cauldron set down while it ran is gone from the world too
+    const potLeft = [...sim.entities.values()].some(
+      (e) => e.objectItemId === 'gurglegreen_cauldron',
+    );
+    expect(potLeft).toBe(false);
   });
 });

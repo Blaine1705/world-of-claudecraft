@@ -1,5 +1,6 @@
 // Hester's toys (content/gourdlight_eve.ts GOURDLIGHT_TOYS): five reusable playthings,
-// each a short `seasonal_cosmetic` aura and nothing else. No sim rule reads that kind (no
+// each a short `seasonal_cosmetic` aura and nothing else (the cauldron sets down a ground
+// object instead, which hands that aura to whoever drinks: toy_cauldron.ts). No sim rule reads that kind (no
 // stat fold, no control, no damage), so a toy can never change a fight; the client draws
 // it (render/seasonal_toys_fx.ts) and its sound rides the spellfxAt sfxKey, so everyone
 // near hears it. Draws no rng and reads no clock.
@@ -21,6 +22,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, dist2d, type Entity } from '../types';
 import { stripSeasonalAura } from './seasonal_cosmetics';
+import { placeToyCauldron } from './toy_cauldron';
 
 /** The spellfxAt ability tag each toy's cue carries (render: seasonal_toys_fx_core.ts). */
 export const TOY_FX_ABILITY_PREFIX = GOURDLIGHT_TOY_FX_PREFIX;
@@ -30,7 +32,7 @@ export const TOY_SFX: Readonly<Record<GourdlightToy['effect'], string>> = Object
   lantern: 'spell_wanderwisp_lantern',
   bats: 'spell_startled_bats',
   candle: 'spell_murmurwick_candle',
-  broom: 'spell_sparkbristle_sweep',
+  cauldron: 'spell_gurglegreen_cauldron',
 });
 
 /** A toy's look on `e`: a cosmetic aura for the toy's duration. The lantern and the
@@ -117,6 +119,13 @@ export function useGourdlightToy(
     p.cooldowns.set(toy.itemId, toy.cooldown);
     ctx.emit({ type: 'seasonal', what: 'toy', trick: toy.itemId, who: target.name, pid: p.id });
     ctx.emit({ type: 'seasonal', what: 'pranked', who: p.name, pid: target.id });
+    return true;
+  }
+  if (toy.effect === 'cauldron') {
+    const pot = placeToyCauldron(ctx, toy, p);
+    toyCue(ctx, toy, p, pot.pos.x, pot.pos.z, pot.id);
+    p.cooldowns.set(toy.itemId, toy.cooldown);
+    ctx.emit({ type: 'seasonal', what: 'toy', trick: toy.itemId, pid: meta.entityId });
     return true;
   }
   // every other toy plays on its user; a fresh use replaces the one still playing

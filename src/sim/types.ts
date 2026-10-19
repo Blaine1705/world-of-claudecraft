@@ -2309,6 +2309,13 @@ export interface MobTemplate {
      *  chase sliding the pose across the ground. Hostile and attackable throughout;
      *  absent means no hold. */
     riseSeconds?: number;
+    /** When he is AWAKE: 'day' (absent, the Mirefen Foreman) sleeps from sunset to
+     *  sunrise; 'night' (Old Thatchgrin) hangs asleep on his pole from sunrise to sunset
+     *  and fights only after dark. A clockless host keeps either one awake. */
+    awakeAt?: 'day' | 'night';
+    /** Lie down EXACTLY on the spawn point, facing `Entity.bedFacing`: a bed that is a
+     *  fixed prop (his pole) rather than open ground. */
+    snapToBed?: boolean;
   };
   /**
    * Seconds of spacing between this mob's boss mechanics, and the opt-in that turns
@@ -8321,6 +8328,9 @@ export interface Entity extends ClientMirroredEntityFields {
   slumberRise?: number;
   /** A /dev wake or sleep holding him against the clock until it agrees (mob/slumber.ts). */
   slumberDevHold?: 'awake' | 'asleep';
+  /** The facing a `slumber.snapToBed` sleeper is laid down with (his spawn's), so a body
+   *  that hangs on a fixed prop (Old Thatchgrin's pole) always lines up with it. */
+  bedFacing?: number;
   /** Where the corpse lay before it began to sink (mob/boss_corpse_sink.ts). */
   corpseSinkBaseY?: number;
   /** Index into the template's destination list. */
@@ -9429,7 +9439,9 @@ export type SimEvent = { pid?: number } & (
         | 'toy'
         | 'pranked'
         | 'prankNeedsPlayer'
-        | 'toyHidden';
+        | 'toyHidden'
+        // this player drank from a Gurglegreen Cauldron (seasonal/toy_cauldron.ts)
+        | 'cauldronDrink';
       /** A player's name (the toys: the prank's target or thrower). */
       who?: string;
       pumpkinId?: string;

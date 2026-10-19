@@ -2026,10 +2026,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Round 9's five toys add 110: five discovered item ids (95 characters, 15 bytes
     // of quotes and commas). The six rotating dailies add 352: their quest ids (165)
     // and nine discovered item ids, the candies, the sheaf and the errand items (187),
-    // so 1,012 in all over the integration's 258,370.
-    expect(baselineBytes).toBe(259382);
+    // so 1,012 in all over the integration's 258,370. Round 10 swaps the play broom's id
+    // (sparkbristle_play_broom, 23 characters) for the cauldron's (gurglegreen_cauldron,
+    // 20): 3 bytes fewer, 1,009 in all.
+    expect(baselineBytes).toBe(259379);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(267666);
+    expect(bytes).toBe(267663);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2302,7 +2304,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'wanderwisp_lantern',
       'sack_of_startled_bats',
       'murmurwick_candle',
-      'sparkbristle_play_broom',
+      'gurglegreen_cauldron',
       'crabapple_chew',
       'gourdseed_brittle',
       'hearthroot_toffee',
@@ -2338,10 +2340,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const gourdlightRestBytes =
       Buffer.byteLength(JSON.stringify(withoutSeasonalBoss), 'utf8') -
       Buffer.byteLength(JSON.stringify(withoutGourdlightEve), 'utf8');
-    expect(gourdlightRestBytes).toBe(143 + 270 + 110 + 352);
-    // Every Gourdlight Eve byte in this fixture: 35 + 102 + 143 + 270 + 110 + 352 = 1,012.
+    // round 10: the cauldron's id is 3 characters shorter than the retired play broom's
+    expect(gourdlightRestBytes).toBe(143 + 270 + 107 + 352);
+    // Every Gourdlight Eve byte in this fixture: 35 + 102 + 143 + 270 + 107 + 352 = 1,009.
     const gourdlightEveBytes = pumpkinHunterBytes + seasonalBossBytes + gourdlightRestBytes;
-    expect(gourdlightEveBytes).toBe(1012);
+    expect(gourdlightEveBytes).toBe(1009);
     // Attribute the stamp-card feature independently from the historical ledger:
     // twenty more bank slots, five discoverable item ids and the Sapling buddy. Mount relics reuse
     // an existing illuminated page and add no character-save key in this fixture.

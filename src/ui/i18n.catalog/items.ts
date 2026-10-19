@@ -3969,7 +3969,7 @@ const ITEM_ENTITY_IDS = [
   'wanderwisp_lantern',
   'sack_of_startled_bats',
   'murmurwick_candle',
-  'sparkbristle_play_broom',
+  'gurglegreen_cauldron',
   // Gourdlight Eve's rotating dailies (content/gourdlight_eve_dailies.ts).
   'thatchgrin_patch_pumpkin',
   'cursed_candle_stub',
@@ -4012,7 +4012,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   wanderwisp_lantern: 'Wanderwisp Lantern',
   sack_of_startled_bats: 'Sack of Startled Bats',
   murmurwick_candle: 'Murmurwick Candle',
-  sparkbristle_play_broom: 'Sparkbristle Play Broom',
+  gurglegreen_cauldron: 'Gurglegreen Cauldron',
   // Gourdlight Eve's rotating dailies (content/gourdlight_eve_dailies.ts).
   thatchgrin_patch_pumpkin: 'Patch Pumpkin',
   cursed_candle_stub: 'Cursed Candle Stub',

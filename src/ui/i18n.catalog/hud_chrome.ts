@@ -5731,6 +5731,8 @@ export const hudChromeStrings = {
     damageReduction: 'Reduces all damage taken by {pct}%',
     // The slumbering world boss (src/sim/mob/slumber.ts): asleep from dusk to dawn.
     slumber: 'Asleep until dawn. Cannot be attacked and will not wake for anyone.',
+    // A NIGHT sleeper (Old Thatchgrin on his pole by day, mob/slumber.ts awakeAt 'night').
+    slumberNight: 'Hangs lifeless on his pole until nightfall. Cannot be attacked.',
     guardianWard: 'The next lethal enemy hit restores you to {pct}% health instead',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
@@ -5838,6 +5840,8 @@ export const hudChromeStrings = {
     // to arms, the dusk line tells the realm he is gone for the night.
     wake: '{name} wakes over {zone}!',
     sleep: '{name} sleeps until dawn.',
+    // A NIGHT boss (Old Thatchgrin) climbing back onto his pole at dawn.
+    sleepUntilNightfall: '{name} sleeps until nightfall.',
   },
   // Password-reset ("forgot password") flow: the login-panel entry link, the
   // request-a-link panel, and the set-a-new-password panel (index.html +

@@ -33,6 +33,9 @@ export interface SeasonalWorldState {
   /** The /dev pick of the day's rotating daily (gourdlight_dailies.ts): null follows
    *  the reset day. Never persisted. */
   devDaily: string | null;
+  /** Each standing Gurglegreen Cauldron by its maker's entity id (toy_cauldron.ts): one
+   *  per maker. Process-local and never persisted, like the cauldrons themselves. */
+  toyCauldrons: Map<number, number>;
 }
 
 export function freshSeasonalWorldState(): SeasonalWorldState {
@@ -44,6 +47,7 @@ export function freshSeasonalWorldState(): SeasonalWorldState {
     boundSwept: new WeakMap(),
     boundTick: 0,
     devDaily: null,
+    toyCauldrons: new Map(),
   };
 }
 

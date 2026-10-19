@@ -1023,8 +1023,8 @@ the major game wikis (Wowhead, warcraft.wiki.gg, RuneScape, UESP, Guild Wars 2).
 | Pranker's Pumpkin | the prank toy | KEEP. No exact-phrase hit in any game; generic English. Nearest neighbours are unnamed Halloween pumpkins (Team Fortress 2, Dead by Daylight, RuneScape), none a match. |
 | Wanderwisp Lantern | the ghost lantern | KEEP. "Wanderwisp" has no hit; the nearest are the itch.io prototypes "The Wandering Wisp" and "Wizard's Wisp", not the coined token. |
 | Sack of Startled Bats | the bat toy | KEEP. No hit on Wowhead or warcraft.wiki.gg (only bat reagents such as Bat Ear); plain English. |
-| Murmurwick Candle | the whispering candle | KEEP. "Murmurwick" has no hit; the nearest is the unrelated title "No Murders in Grimwick" and ESO's "Murkmire Candle" furnishings, different tokens. |
-| Sparkbristle Play Broom | the toy broom | KEEP. "Sparkbristle" has no hit in any game or wiki searched. |
+| Murmurwick Candle | the candle that casts dancing shadows (its whispers retired in round 10) | KEEP. "Murmurwick" has no hit; the nearest is the unrelated title "No Murders in Grimwick" and ESO's "Murkmire Candle" furnishings, different tokens. |
+| Gurglegreen Cauldron | the toy cauldron (round 10, replaces the retired Sparkbristle Play Broom) | KEEP. Quoted exact-phrase searches for "Gurglegreen" and "Gurglegreen Cauldron", plus a coined-token search scoped to Wowhead, warcraft.wiki.gg, the RuneScape and OSRS wikis, the FFXIV wiki, the GW2 wiki, UESP, the PoE wiki and the Diablo wiki, returned no hit in any game; the nearest results were unrelated ("Cuddly Green Grrgle" WoW decor, a different token). "Cauldron" is shared fantasy English. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

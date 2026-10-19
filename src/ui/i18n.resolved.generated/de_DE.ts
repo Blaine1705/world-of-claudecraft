@@ -4417,6 +4417,7 @@ export const de_DE: EnTranslations = {
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Verringert allen erlittenen Schaden um {pct}%",
       "slumber": "Schläft bis zur Dämmerung. Kann nicht angegriffen werden und erwacht für niemanden.",
+      "slumberNight": "Hangs lifeless on his pole until nightfall. Cannot be attacked.",
       "guardianWard": "Der naechste todliche Feindtreffer stellt stattdessen {pct}% deiner Gesundheit wieder her",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -4495,7 +4496,8 @@ export const de_DE: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} erhebt sich über {zone}!",
       "wake": "{name} erwacht über {zone}!",
-      "sleep": "{name} schläft bis zur Dämmerung."
+      "sleep": "{name} schläft bis zur Dämmerung.",
+      "sleepUntilNightfall": "{name} sleeps until nightfall."
     },
     "auth": {
       "appleLoginCta": "Mit Apple fortfahren",
@@ -7770,18 +7772,19 @@ export const de_DE: EnTranslations = {
       "toyPrank": "Use: Throw it at another visible player within {range} yards. Their head becomes a glowing jack-o'-lantern for {seconds} seconds, and they can right-click it off. Neither of you can be in combat, and you cannot be stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
       "toyLantern": "Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
       "toyBats": "Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
-      "toyCandle": "Use: Light the candle in front of you. For {seconds} seconds, everyone nearby hears soft whispers and laughter, and a low green mist spreads around it. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
-      "toyBroom": "Use: Sweep along with it. For {seconds} seconds, you leave a trail of orange sparks as you walk. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+      "toyCandleShadows": "Use: Light the candle in front of you. For {seconds} seconds its flames throw dancing shadows of a cat, a bat and a witch onto the ground around it, for everyone nearby to see. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+      "toyCauldron": "Use: Set a small bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it glows green with bubbles rising off them for {seconds} seconds. Neither setting it down nor drinking works in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
       "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
-      "broom": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves. Riding it requires the riding skill. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.",
+      "broomSources": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves, or, rarely, dropped by Old Thatchgrin on a day you loot him. Riding it requires the riding skill. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.",
       "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Crumbles to straw when Gourdlight Eve ends."
     },
     "toy": {
       "prank": "You throw the pumpkin. It splats onto {name}!",
       "lantern": "You set the lantern down, and a little ghost drifts out to keep you company.",
       "bats": "You open the sack, and a swarm of startled bats bursts out!",
-      "candle": "You light the candle. Something in the dark begins to whisper.",
-      "broom": "You start sweeping, and sparks fly from the bristles.",
+      "candleShadows": "You light the candle, and shadows begin to dance around its flames.",
+      "cauldron": "You set the cauldron down, and it starts to bubble.",
+      "cauldronDrink": "You drink from the cauldron and glow a bubbling green!",
       "pranked": "{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.",
       "prankedFlash": "Pranked by {name}!",
       "prankNeedsPlayer": "The pumpkin only splats on another player who is not in combat.",
@@ -23098,8 +23101,8 @@ export const de_DE: EnTranslations = {
       "murmurwick_candle": {
         "name": "Murmurwick Candle"
       },
-      "sparkbristle_play_broom": {
-        "name": "Sparkbristle Play Broom"
+      "gurglegreen_cauldron": {
+        "name": "Gurglegreen Cauldron"
       },
       "thatchgrin_patch_pumpkin": {
         "name": "Patch Pumpkin"

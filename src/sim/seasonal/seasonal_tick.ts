@@ -34,6 +34,7 @@ import {
   stripTricks,
 } from './seasonal_cosmetics';
 import { activeSeasonalEventOf } from './seasonal_state';
+import { updateToyCauldrons } from './toy_cauldron';
 
 /** Each event's keeper: the NPC who works a stall in each main city while it runs (one
  *  entity per stall, all under the one template). Her spots resolve against the live
@@ -70,6 +71,8 @@ export function updateSeasonal(ctx: SimContext): void {
   const state = ctx.seasonal;
   const active = activeSeasonalEventOf(state);
   const edge = active !== state.lastActive;
+  // Toy cauldrons: forget the ones whose time ran out, and clear every one on a close.
+  updateToyCauldrons(ctx, edge && active !== GOURDLIGHT_EVE_ID);
   if (edge) {
     updateHauntedPumpkins(ctx, active);
     updateGourdlightDailyObjects(ctx, active);

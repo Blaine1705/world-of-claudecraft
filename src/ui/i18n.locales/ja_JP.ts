@@ -21819,8 +21819,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '使用：{minutes}分間、羽ばたくコウモリに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。',
   'seasonal.itemUse.titleWrit':
     '使用：このキャラクターの称号{title}を獲得し、功績の書から付けられる。消費される。ゴードライトの宵の期間のみ。称号をすでに持っている場合は証書が残る。',
-  'seasonal.itemUse.broom':
-    'ヘスター・ゴードウィックからエンバーウーブンの藁束{count}個で購入する。乗るには騎乗スキルが必要。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。',
   'seasonal.itemUse.sheaf':
     'オールド・サッチグリンを倒して戦利品を受け取るたび、1日に1つもらえる。エンバーブリッスルの箒を手に入れるまで続く。ヘスター・ゴードウィックがイーストブルック、フェンブリッジ、ハイウォッチの屋台で{count}個を箒と交換してくれる。ゴードライトの宵が終わると藁になって崩れる。',
   'entities.items.rattlebone_draught.name': 'ガラガラ骨の薬',
@@ -21904,25 +21902,30 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wanderwisp_lantern.name': 'さまよう鬼火のランタン',
   'entities.items.sack_of_startled_bats.name': '驚いたコウモリの袋',
   'entities.items.murmurwick_candle.name': 'ささやき芯のろうそく',
-  'entities.items.sparkbristle_play_broom.name': '火花ぼうきのおもちゃ',
   'seasonal.itemUse.toyPrank':
     '使用：{range}ヤード以内の見えている別のプレイヤーに投げつける。相手の頭が{seconds}秒間、光るジャック・オー・ランタンになり、相手は右クリックで外せる。どちらも戦闘中は使えず、ステルス中も使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
   'seasonal.itemUse.toyLantern':
     '使用：目の前にランタンを置く。小さな幽霊が{seconds}秒間、あなたの周りを回る。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
   'seasonal.itemUse.toyBats':
     '使用：袋を開ける。キーキー鳴くコウモリの群れが飛び出し、{seconds}秒間あなたの周りに散っていく。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
-  'seasonal.itemUse.toyCandle':
-    '使用：目の前でろうそくを灯す。{seconds}秒間、近くにいる全員に小さなささやきと笑い声が聞こえ、周りに低い緑の霧が広がる。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
-  'seasonal.itemUse.toyBroom':
-    '使用：ほうきで掃きながら歩く。{seconds}秒間、歩いた跡にオレンジ色の火花が残る。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
   'seasonal.toy.prank': 'カボチャを投げた。{name}に命中してべちゃっと割れた！',
   'seasonal.toy.lantern': 'ランタンを置くと、小さな幽霊がふわりと出てきて付き添ってくれる。',
   'seasonal.toy.bats': '袋を開けると、驚いたコウモリの群れが飛び出した！',
-  'seasonal.toy.candle': 'ろうそくを灯した。暗がりの何かがささやき始める。',
-  'seasonal.toy.broom': '掃き始めると、穂先から火花が飛び散る。',
   'seasonal.toy.pranked':
     '{name}があなたの頭にカボチャをぶつけた！右クリックで外すか、堂々とかぶっていよう。',
   'seasonal.toy.prankedFlash': '{name}のいたずら！',
   'seasonal.toy.prankNeedsPlayer': 'カボチャは戦闘中でない別のプレイヤーにしか当たらない。',
   'seasonal.toy.hidden': 'まず物陰から出よう。おもちゃを使えば居場所がばれてしまう。',
+  'entities.items.gurglegreen_cauldron.name': 'ぐつぐつ緑の大鍋',
+  'seasonal.itemUse.toyCandleShadows':
+    '使用：目の前でろうそくを灯す。{seconds}秒間、炎が猫、コウモリ、魔女の踊る影を周りの地面に映し、近くにいる全員に見える。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.toyCauldron':
+    '使用：目の前にぐつぐつ煮える小さな大鍋を置く。大鍋は{standing}秒間そこにあり、飲んだプレイヤーは誰でも{seconds}秒間緑色に光り、体から泡が立ちのぼる。置くことも飲むことも、戦闘中とステルス中はできない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.broomSources':
+    'ヘスター・ゴードウィックからエンバーウーブンの藁束{count}個で購入する。まれに、戦利品を受け取った日にオールド・サッチグリンが落とすこともある。乗るには騎乗スキルが必要。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。',
+  'seasonal.toy.candleShadows': 'ろうそくを灯すと、炎の周りで影が踊り始めた。',
+  'seasonal.toy.cauldron': '大鍋を置くと、ぐつぐつと泡立ち始めた。',
+  'seasonal.toy.cauldronDrink': '大鍋の中身を飲むと、体がぶくぶくと緑色に光り出した！',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name}は日が暮れるまで眠っている。',
+  'hudChrome.auraEffect.slumberNight': '日が暮れるまで、生気なく柱に吊るされている。攻撃できない。',
 };

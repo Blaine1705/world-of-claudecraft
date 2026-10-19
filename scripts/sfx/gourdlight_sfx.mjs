@@ -24,10 +24,11 @@
 //   spell_startled_bats           the Sack of Startled Bats opened: cloth, a flurry of
 //                                 wings and a scatter of squeaks
 //   spell_murmurwick_candle       the Murmurwick Candle lit: a match strike, a green
-//                                 whoomp and a faint giggle
-//   murmurwick_whispers_loop       its whispers and soft laughter (a seamless 6 s loop)
-//   spell_sparkbristle_sweep      the Sparkbristle Play Broom: two sweeps and crackling
-//                                 sparks
+//                                 whoomp and the flutter of its shadows springing up
+//   spell_gurglegreen_cauldron    the Gurglegreen Cauldron set down: an iron clank, a
+//                                 slosh of brew, the first bubbles
+//   gurglegreen_bubble_loop       it bubbling where it stands (a seamless 4 s loop)
+//   spell_gurglegreen_quaff       a drink from it: two gulps, a fizz and a sparkle
 //
 // Deterministic: a fixed seed per cue (mulberry32), no clock. Original work, recorded in
 // CREDITS.md.
@@ -377,11 +378,12 @@ const CUES = {
   },
 
   spell_murmurwick_candle: () => {
-    // a match struck, the wick catching in a soft green whoomp, a faint giggle in the dark
+    // a match struck, the wick catching in a soft green whoomp, then a low papery flutter
+    // as the shadows spring up round the dish (round 10: no voice, no giggle)
     const rand = rng(1010);
     const scratch = biquad('bp');
     const flare = biquad('lp');
-    const giggle = biquad('bp');
+    const flutter = biquad('bp');
     const fire = makeFire(rand, 40);
     const dur = 1.9;
     return render(dur, (t) => {
@@ -392,67 +394,78 @@ const CUES = {
         env(t - 0.14, 0.03, 0.25) *
         1.4;
       const flame = fire(t, 900, 0.25 * env(t - 0.2, 0.1, 0.9), 0.15 * env(t - 0.2, 0.1, 0.9));
-      // the giggle: five quick breathy "hee" pulses, falling in pitch
-      let g = 0;
-      for (let k = 0; k < 5; k++) {
-        const dt = t - 0.75 - k * 0.11;
-        if (dt >= 0 && dt < 0.09) {
-          const src = Math.sin(TAU * (620 - k * 40) * dt) * 0.4 + (rand() * 2 - 1) * 0.8;
-          g += src * Math.sin((Math.PI * dt) / 0.09) * (1 - k * 0.12);
-        }
-      }
-      const laugh = giggle(g, 1900, 2.5) * 1.1;
+      // the shadows rising: a soft rush of air beaten by unseen wings (a slow amplitude
+      // flutter on band-passed breath), swelling and settling
+      const rush = env(t - 0.55, 0.35, 0.5);
+      const beat = 0.55 + 0.45 * Math.sin(TAU * 11 * t) * Math.sin(TAU * 2.3 * t);
+      const wings = flutter(rand() * 2 - 1, 700 + 500 * rush, 1.6) * rush * beat * 0.9;
       const fade = Math.min(1, (dur - t) / 0.2);
-      return (strike + whoomp + flame + laugh) * fade;
+      return (strike + whoomp + flame + wings) * fade;
     });
   },
 
-  murmurwick_whispers_loop: () => {
-    // the candle's whispers and soft laughter, a seamless 6 s loop: syllables of shaped,
-    // formant-filtered breath from two voices, a giggle now and then
-    const P = 6;
-    const rand = rng(1111);
-    const N = Math.round(P * SR);
-    const voices = [
-      [biquad('bp'), biquad('bp'), 2400, 1200],
-      [biquad('bp'), biquad('bp'), 3100, 1600],
-    ];
-    const syll = [];
-    for (let i = 0; i < 26; i++)
-      syll.push([
-        rand() * (P + 0.6),
-        0.08 + rand() * 0.16,
-        rand() < 0.5 ? 0 : 1,
-        0.4 + rand() * 0.6,
-      ]);
-    const laughs = [
-      [1.7, 0],
-      [4.4, 1],
-    ];
-    const room = biquad('lp');
-    const raw = render(P + 0.6, (t) => {
-      let out = 0;
-      const n0 = rand() * 2 - 1;
-      for (const [at, len, v, lv] of syll) {
+  spell_gurglegreen_cauldron: () => {
+    // a small iron cauldron set down: a hollow ringing clank, the brew sloshing against
+    // the iron, then it catches and starts to bubble
+    const rand = rng(1313);
+    const slosh = biquad('lp');
+    const pops = biquad('bp');
+    const dur = 1.6;
+    // its bubbles: fixed times and pitches (seeded), each a short rising "bloop"
+    const bubbles = [];
+    for (let k = 0; k < 14; k++) bubbles.push([0.45 + rand() * 1.0, 180 + rand() * 260]);
+    return render(dur, (t) => {
+      // the clank: two inharmonic iron partials, a quick hard attack, a ringing decay
+      const ring =
+        (Math.sin(TAU * 412 * t) * 0.6 +
+          Math.sin(TAU * 1131 * t) * 0.35 +
+          Math.sin(TAU * 2240 * t) * 0.15) *
+        env(t, 0.002, 0.28);
+      const thud = thump(t, 140, 60, 0.04, 0.12) * 0.9;
+      const wash =
+        slosh(rand() * 2 - 1, 380 + 300 * env(t - 0.08, 0.05, 0.3), 0.8) *
+        env(t - 0.08, 0.05, 0.35) *
+        0.9;
+      let b = 0;
+      for (const [at, f] of bubbles) {
         const dt = t - at;
-        if (dt >= 0 && dt < len) {
-          const [f1, f2, c1, c2] = voices[v];
-          const shape = Math.sin((Math.PI * dt) / len) ** 1.5;
-          out += (f1(n0, c1, 4) + f2(n0, c2, 5) * 0.6) * shape * lv;
+        if (dt >= 0 && dt < 0.07) {
+          b += Math.sin(TAU * (f + 900 * dt) * dt) * Math.sin((Math.PI * dt) / 0.07);
         }
       }
-      for (const [at, v] of laughs) {
-        for (let k = 0; k < 4; k++) {
-          const dt = t - at - k * 0.13;
-          if (dt >= 0 && dt < 0.1) {
-            const src = Math.sin(TAU * (540 - 30 * k + 120 * v) * dt) * 0.5 + n0 * 0.7;
-            out += src * Math.sin((Math.PI * dt) / 0.1) * 0.5;
+      const bloop = pops(b, 600, 0.9) * 1.6;
+      const fade = Math.min(1, (dur - t) / 0.15);
+      return (ring * 0.7 + thud + wash + bloop) * fade;
+    });
+  },
+
+  gurglegreen_bubble_loop: () => {
+    // the cauldron left bubbling: a thick, slow simmer of blooping bubbles over a low
+    // seethe, a seamless 4 s loop (every bubble placed inside the period, the noise
+    // bed crossfaded at the seam)
+    const P = 4;
+    const rand = rng(1414);
+    const N = Math.round(P * SR);
+    const seethe = biquad('lp');
+    const pop = biquad('bp');
+    const bubbles = [];
+    for (let k = 0; k < 34; k++) {
+      bubbles.push([rand() * P, 140 + rand() * 300, 0.05 + rand() * 0.07, 0.4 + rand() * 0.6]);
+    }
+    const raw = render(P + 0.5, (t) => {
+      const bed = seethe(rand() * 2 - 1, 260, 0.7) * 0.28;
+      let b = 0;
+      for (const [at, f, len, lv] of bubbles) {
+        for (const base of [at, at + P]) {
+          const dt = t - base;
+          if (dt >= 0 && dt < len) {
+            b += Math.sin(TAU * (f + 700 * dt) * dt) * Math.sin((Math.PI * dt) / len) * lv;
           }
         }
       }
-      return out * 0.9 + room(n0, 300, 0.7) * 0.05;
+      return bed + pop(b, 520, 0.8) * 1.4;
     });
-    const xf = Math.round(0.6 * SR);
+    const xf = Math.round(0.5 * SR);
     return render(P, (_t, i) => {
       if (i >= xf) return raw[i];
       const k = i / xf;
@@ -460,29 +473,35 @@ const CUES = {
     });
   },
 
-  spell_sparkbristle_sweep: () => {
-    // two brisk sweeps of a straw broom across the ground, sparks crackling off the bristles
-    const rand = rng(1212);
-    const bp = biquad('bp');
-    const hp = biquad('hp');
-    const fire = makeFire(rand, 260);
-    const dur = 1.05;
-    const strokes = [
-      [0.0, 0.38],
-      [0.45, 0.42],
-    ];
+  spell_gurglegreen_quaff: () => {
+    // a drink from the cauldron: two big gulps, then a fizzing rush of tiny bubbles and
+    // a little rising sparkle as the green takes hold
+    const rand = rng(1515);
+    const throat = biquad('bp');
+    const fizz = biquad('hp');
+    const shimmer = biquad('bp');
+    const dur = 1.5;
+    const sparks = [];
+    for (let k = 0; k < 40; k++) sparks.push([0.5 + rand() * 0.8, 1800 + rand() * 2600]);
     return render(dur, (t) => {
-      let swish = 0;
-      for (const [at, len] of strokes) {
+      let gulp = 0;
+      for (const at of [0.02, 0.27]) {
         const dt = t - at;
-        if (dt >= 0 && dt < len) swish += Math.sin((Math.PI * dt) / len) ** 1.2;
+        if (dt >= 0 && dt < 0.18) {
+          const f = 220 - 90 * (dt / 0.18);
+          gulp += Math.sin(TAU * f * dt) * Math.sin((Math.PI * dt) / 0.18) ** 2;
+        }
       }
-      const n = rand() * 2 - 1;
-      const brush = bp(n, 900 + 2400 * swish, 0.9) * swish * 1.2;
-      const grain = hp(n, 4500, 0.7) * swish * (0.5 + 0.5 * Math.sin(TAU * 52 * t)) * 0.45;
-      const sparks = fire(t, 2400, 0.0, 0.7 * (0.3 + swish));
-      const fade = Math.min(1, (dur - t) / 0.1);
-      return (brush + grain + sparks) * fade;
+      const glug = throat(gulp + (rand() * 2 - 1) * 0.15 * (t < 0.5 ? 1 : 0), 420, 1.2) * 2.2;
+      const rush = fizz(rand() * 2 - 1, 5200, 0.7) * env(t - 0.48, 0.08, 0.45) * 0.55;
+      let s = 0;
+      for (const [at, f] of sparks) {
+        const dt = t - at;
+        if (dt >= 0 && dt < 0.03) s += Math.sin(TAU * f * dt) * Math.sin((Math.PI * dt) / 0.03);
+      }
+      const twinkle = shimmer(s, 3000, 1.1) * 0.8;
+      const fade = Math.min(1, (dur - t) / 0.15);
+      return (glug + rush + twinkle) * fade;
     });
   },
 };

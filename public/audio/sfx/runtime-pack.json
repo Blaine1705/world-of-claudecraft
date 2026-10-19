@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "0e4ed52302c3ed8fdbaf974dcaf1d2efe60f0396a99ea359199a068ef01be99c",
-  "catalogHash": "abde19597da9e8643cce105ab69e96bbb9f0d5e90487aa2621f3d74fd3b3219f",
+  "bundleId": "7b05f5a65124f3d9a0ef377280a0e2f70910dbce9c2d05c254602377e6592923",
+  "catalogHash": "26db9e6cb1fb2c103f1600e556a8adf590161b573e1f463d86421e5f70e97bc2",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -818,6 +818,18 @@
         }
       ],
       "gain": 1.972423,
+      "playbackRate": 1
+    },
+    "gurglegreen_bubble_loop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/gurglegreen_bubble_loop.mp3?v=468c032afd98",
+          "bytes": 97846,
+          "sha256": "468c032afd98d18f19530a53c09dd86e0a9155c3f8d3850c13aebdd191f6fed1"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "hammer_of_justice": {
@@ -5008,18 +5020,6 @@
       "gain": 2.018366,
       "playbackRate": 1
     },
-    "murmurwick_whispers_loop": {
-      "variants": [
-        {
-          "id": "main",
-          "url": "/audio/sfx/murmurwick_whispers_loop.mp3?v=2b4001796ab8",
-          "bytes": 145493,
-          "sha256": "2b4001796ab81a27a4f9283e064a8c24f7c36ee9f6bd2da40cb2f49af0a64198"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
     "piercing_howl": {
       "variants": [
         {
@@ -5506,13 +5506,37 @@
       "gain": 2.660725,
       "playbackRate": 1
     },
+    "spell_gurglegreen_cauldron": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_gurglegreen_cauldron.mp3?v=db78288acaf6",
+          "bytes": 40168,
+          "sha256": "db78288acaf691587bd3742dc3ef1ff717963da36bbe83edf2b54728fecb7e63"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "spell_gurglegreen_quaff": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/spell_gurglegreen_quaff.mp3?v=9e6c6f3ea2c3",
+          "bytes": 37660,
+          "sha256": "9e6c6f3ea2c366b6237301d58bf61703dc2a46d72af7f10191f5ce621e418973"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "spell_murmurwick_candle": {
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/spell_murmurwick_candle.mp3?v=425a2a94f07a",
+          "url": "/audio/sfx/spell_murmurwick_candle.mp3?v=2b8e2c3d4bc1",
           "bytes": 47064,
-          "sha256": "425a2a94f07aaa946c20cded9bce85a45c7931be0f25acf7d5322443b4f33869"
+          "sha256": "2b8e2c3d4bc103af1623409554bc83578f5c04fa6abd5554bd11a1c97f0651ad"
         }
       ],
       "gain": 1,
@@ -5528,18 +5552,6 @@
         }
       ],
       "gain": 1.678804,
-      "playbackRate": 1
-    },
-    "spell_sparkbristle_sweep": {
-      "variants": [
-        {
-          "id": "main",
-          "url": "/audio/sfx/spell_sparkbristle_sweep.mp3?v=bbd6ecbda442",
-          "bytes": 27002,
-          "sha256": "bbd6ecbda442109911320cc64b21811d4ae51568ead3c3e0c6fdd6cebd6898db"
-        }
-      ],
-      "gain": 1,
       "playbackRate": 1
     },
     "spell_startled_bats": {

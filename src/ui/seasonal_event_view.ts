@@ -23,8 +23,8 @@ const TOY_LOG_KEYS: Readonly<Record<string, TranslationKey>> = {
   prank: 'seasonal.toy.prank',
   lantern: 'seasonal.toy.lantern',
   bats: 'seasonal.toy.bats',
-  candle: 'seasonal.toy.candle',
-  broom: 'seasonal.toy.broom',
+  candle: 'seasonal.toy.candleShadows',
+  cauldron: 'seasonal.toy.cauldron',
 };
 
 /** A trick's display name; an unknown id (a newer server) falls back to the
@@ -133,6 +133,8 @@ export function seasonalEventPresentation(event: SeasonalEvent): SeasonalEventPr
       return { logText: t('seasonal.toy.prankNeedsPlayer') };
     case 'toyHidden':
       return { logText: t('seasonal.toy.hidden') };
+    case 'cauldronDrink':
+      return { logText: t('seasonal.toy.cauldronDrink') };
     default:
       return null;
   }

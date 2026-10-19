@@ -13,10 +13,17 @@
 //  - SACK OF STARTLED BATS: a swarm of bats bursting up out of the sack in a tight spiral,
 //    wings beating, then scattering out and away;
 //  - MURMURWICK CANDLE: a cluster of green-flamed candles on an iron dish where it was lit,
-//    a low green mist spreading over the ground round it and curling up off it, and its
-//    whispers looping at the spot (the spatial audio sink's timed ground loop);
-//  - SPARKBRISTLE PLAY BROOM: a straw broom swept to and fro at its user's side, bristles on
-//    the ground, a trail of orange sparks left behind as they walk, a soft sweep each stride.
+//    a pool of candlelight on the ground round it and, dancing in that light, the shadows
+//    its flames throw: a sitting cat, a bat on the wing and a witch with her broom, each
+//    cast away from the flame, stretching and shrinking with its flicker and circling the
+//    dish (round 10: the whispers are gone). The light pool is what lets a dark shadow read
+//    at night; by day the shadows read dark on the sunlit grass;
+//  - GURGLEGREEN CAULDRON (round 10): a squat iron cauldron on three stubby legs set down
+//    where it was used (a ground object any player may drink from, sim:
+//    seasonal/toy_cauldron.ts), its green brew bubbling and popping, steam and green motes
+//    curling up off it, embers under its belly and its bubbling looped at the spot; a
+//    drinker glows green (the rig's own aura-glow tint, through the renderer's seam) with
+//    bubbles rising off them for the brew's length.
 // Every look is cosmetic: nothing here is actionable, and a stealthed or dead body never
 // draws one (a glowing toy where an unseen rogue walks would hand out what stealth hides).
 //
@@ -31,23 +38,29 @@
 // ride the pooled point cloud (vfx.ts) through the boss layer's particle seam.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { GOURDLIGHT_TOY_FX_PREFIX as TOY_FX_ABILITY_PREFIX } from '../sim/content/gourdlight_eve';
+import {
+  GURGLEGREEN_CAULDRON_ID,
+  gourdlightToy,
+  GOURDLIGHT_TOY_FX_PREFIX as TOY_FX_ABILITY_PREFIX,
+} from '../sim/content/gourdlight_eve';
 import type { SpatialAudioSink } from './audio_sink';
 import { attachSceneGroupGated } from './gated_scene_attach';
+import { pullDecalTowardCamera } from './ground_decal_pull';
 import { gourdlightAssets } from './seasonal_decor_assets';
 import {
   BAT_CAP,
   BAT_COUNT,
-  BROOM_SWEEP_EVERY,
-  BROOM_SWEEP_SFX,
   batFlight,
-  broomEmberTrail,
-  broomPose,
-  broomSparkRate,
-  CANDLE_WHISPER_SFX,
+  brewGlow,
+  CANDLE_SHADOW_FIGURES,
+  CAULDRON_BUBBLE_SFX,
+  CAULDRON_BUBBLES,
   candleFlicker,
   candleGlowColumn,
+  candleLightPool,
   candleMist,
+  candleShadows,
+  cauldronBubble,
   ghostOrbit,
   haloSlotFree,
   lookFade,
@@ -96,8 +109,12 @@ export interface ToyEntityLike {
   stealthed?: boolean;
   ghost?: boolean;
   mountKey?: string | null;
+  objectItemId?: string | null;
   auras?: readonly ToyAuraLike[];
 }
+
+/** The renderer's body-tint seam (CharacterVisual.setAuraGlow): a drinker's green glow. */
+export type ToyBodyTint = (entityId: number, color: number, strength: number) => void;
 
 interface ToyCueLike {
   fx: string;
@@ -117,10 +134,6 @@ interface LookState {
   ax: number;
   ay: number;
   az: number;
-  lastX: number;
-  lastZ: number;
-  speed: number;
-  sweepAt: number;
   looped: boolean;
   phase: number;
 }
@@ -139,9 +152,20 @@ const HALO_CAP = 24;
 /** Below this a halo is invisible: it takes no slot. */
 const HALO_MIN_OPACITY = 0.005;
 const BAT_COLOR = 0x1a1220;
-/** The candle cluster's and the play broom's drawn size against their authored one. */
+/** The candle cluster's drawn size against its authored one. */
 const CANDLE_SCALE = 1.6;
-const BROOM_SCALE = 1.35;
+/** Yards the toys' props are pulled toward the eye through the grass (ground_decal_pull.ts). */
+const TOY_PROP_PULL = 0.7;
+/** The cauldron's drawn size against its authored one (about a player's knee). */
+const CAULDRON_SCALE = 1.25;
+/** The brew's green and a drinker's glow. */
+const BREW_COLOR = 0x5cff6a;
+const BREW_DEEP = 0x1e9e3a;
+/** A drinker's body tint: a deeper green than the brew, so the wash keeps the body's own
+ *  shading instead of flattening it to a lime silhouette. */
+const BREW_TINT = 0x2fbf45;
+/** The shadows' ink: near-black with a cold violet cast, so they read as shadow, not mud. */
+const SHADOW_INK = new THREE.Color(0x0a0612);
 const PULP = [0xff8a1a, 0xffb347, 0xe0761c, 0xfff0b0] as const;
 const m4 = new THREE.Matrix4();
 const q4 = new THREE.Quaternion();
@@ -277,48 +301,291 @@ function batWingGeometry(side: 1 | -1): THREE.BufferGeometry {
   return geo;
 }
 
-/** The play broom: a turned wooden handle, two orange bindings and a flared bundle of
- *  straw whose strands are ridged and frayed at the tip. Bristle tip at y = 0, the handle
- *  running up +Y to its knob. */
-function broomGeometry(): THREE.BufferGeometry {
-  const handle = new THREE.CylinderGeometry(0.02, 0.024, 1.08, 8, 1);
-  handle.translate(0, 0.36 + 0.54, 0);
-  paint(handle, (_x, y) => {
-    const k = 0.75 + 0.25 * Math.sin(y * 22);
-    return [0.42 * k, 0.26 * k, 0.13 * k];
-  });
-  const knob = new THREE.SphereGeometry(0.035, 8, 6);
-  knob.translate(0, 1.45, 0);
-  paint(knob, () => [0.36, 0.21, 0.1]);
-  const bandA = new THREE.CylinderGeometry(0.062, 0.062, 0.035, 12, 1);
-  bandA.translate(0, 0.37, 0);
-  paint(bandA, () => [0.95, 0.42, 0.06]);
-  const bandB = new THREE.CylinderGeometry(0.08, 0.08, 0.03, 12, 1);
-  bandB.translate(0, 0.28, 0);
-  paint(bandB, () => [0.85, 0.32, 0.04]);
-  const straw = new THREE.CylinderGeometry(0.055, 0.17, 0.4, 28, 6, true);
-  straw.translate(0, 0.2, 0);
-  const sp = straw.getAttribute('position') as THREE.BufferAttribute;
-  for (let i = 0; i < sp.count; i++) {
-    const x = sp.getX(i);
-    const y = sp.getY(i);
-    const z = sp.getZ(i);
-    const a = Math.atan2(x, z);
-    const ridge = 1 + 0.12 * Math.sin(a * 14) * (1 - y / 0.4);
-    const fray = y < 0.03 ? 0.02 * Math.sin(a * 23) : 0;
-    sp.setXYZ(i, x * ridge, y + fray, z * ridge);
+/** The candle's three shadow shapes, side by side in one atlas (cells in
+ *  CANDLE_SHADOW_FIGURES order): a sitting cat, a bat on the wing, a witch with her hat and
+ *  broom. White on transparent (the ink is the material's), feet at the cell's BOTTOM edge
+ *  (the end nearest the flame), the edges softened the way a candle's shadow is. Drawn
+ *  from paths, no random: every client paints the same atlas. */
+function shadowAtlasTexture(): THREE.Texture | null {
+  if (typeof document === 'undefined') return null;
+  const S = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = S * 3;
+  canvas.height = S;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    ctx.clearRect(0, 0, S * 3, S);
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#fff';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.filter = 'blur(2.5px)';
+    // the cat: sitting side-on, ears up, tail curled round its paws
+    ctx.beginPath();
+    ctx.ellipse(118, 186, 44, 58, -0.12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(146, 112, 30, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(126, 96);
+    ctx.lineTo(132, 58);
+    ctx.lineTo(150, 88);
+    ctx.closePath();
+    ctx.moveTo(150, 86);
+    ctx.lineTo(170, 56);
+    ctx.lineTo(174, 100);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(122, 242, 58, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(140, 190, 16, 56);
+    ctx.lineWidth = 15;
+    ctx.beginPath();
+    ctx.moveTo(84, 236);
+    ctx.bezierCurveTo(26, 240, 18, 176, 46, 150);
+    ctx.bezierCurveTo(60, 138, 70, 152, 60, 160);
+    ctx.stroke();
+    // the bat: wings spread wide, scalloped trailing edges, pointed ears
+    ctx.save();
+    ctx.translate(S, 0);
+    const wing = (side: number) => {
+      ctx.beginPath();
+      ctx.moveTo(128, 118);
+      ctx.quadraticCurveTo(128 + side * 60, 70, 128 + side * 118, 92);
+      ctx.lineTo(128 + side * 104, 150);
+      ctx.quadraticCurveTo(128 + side * 92, 128, 128 + side * 78, 160);
+      ctx.quadraticCurveTo(128 + side * 66, 138, 128 + side * 50, 168);
+      ctx.quadraticCurveTo(128 + side * 38, 146, 128 + side * 20, 172);
+      ctx.lineTo(128, 172);
+      ctx.closePath();
+      ctx.fill();
+    };
+    wing(1);
+    wing(-1);
+    ctx.beginPath();
+    ctx.ellipse(128, 150, 17, 34, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(128, 110, 15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(116, 104);
+    ctx.lineTo(114, 80);
+    ctx.lineTo(126, 98);
+    ctx.closePath();
+    ctx.moveTo(130, 98);
+    ctx.lineTo(142, 80);
+    ctx.lineTo(140, 104);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    // the witch: side-on in a ragged cloak, hooked nose, tall crooked hat, broom in hand
+    ctx.save();
+    ctx.translate(S * 2, 0);
+    ctx.beginPath();
+    ctx.moveTo(112, 122);
+    ctx.lineTo(150, 122);
+    ctx.quadraticCurveTo(170, 190, 182, 250);
+    ctx.lineTo(166, 240);
+    ctx.lineTo(152, 252);
+    ctx.lineTo(136, 240);
+    ctx.lineTo(118, 252);
+    ctx.lineTo(102, 240);
+    ctx.lineTo(80, 250);
+    ctx.quadraticCurveTo(96, 186, 112, 122);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(132, 104, 19, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(146, 96);
+    ctx.lineTo(170, 112);
+    ctx.lineTo(146, 112);
+    ctx.closePath();
+    ctx.moveTo(140, 118);
+    ctx.lineTo(156, 128);
+    ctx.lineTo(144, 126);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(130, 86, 44, 8, -0.08, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(108, 84);
+    ctx.quadraticCurveTo(122, 46, 132, 22);
+    ctx.quadraticCurveTo(150, 14, 164, 30);
+    ctx.quadraticCurveTo(148, 30, 146, 44);
+    ctx.quadraticCurveTo(148, 64, 154, 84);
+    ctx.closePath();
+    ctx.fill();
+    // the broom: a crooked stave held across her, a flared brush of twigs at its foot
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.moveTo(190, 130);
+    ctx.lineTo(84, 232);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(96, 222);
+    ctx.lineTo(48, 236);
+    ctx.lineTo(56, 252);
+    ctx.lineTo(76, 254);
+    ctx.lineTo(104, 232);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
-  straw.computeVertexNormals();
-  paint(straw, (x, y, z) => {
-    const a = Math.atan2(x, z);
-    const k = 0.78 + 0.22 * Math.sin(a * 14 + 1.3);
-    const tip = 0.7 + 0.3 * Math.min(1, y / 0.25);
-    return [0.92 * k * tip, 0.7 * k * tip, 0.34 * k * tip];
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  return tex;
+}
+
+/** One shadow's quad, laid flat on the ground: foot at the origin, the figure running out
+ *  along local -Z (its length) and across local X (its width), its UVs on atlas `cell`. */
+function shadowGeometry(cell: number): THREE.BufferGeometry {
+  const geo = new THREE.PlaneGeometry(1, 1, 1, 1);
+  geo.translate(0, 0.5, 0);
+  geo.rotateX(-Math.PI / 2);
+  const uv = geo.getAttribute('uv') as THREE.BufferAttribute;
+  for (let i = 0; i < uv.count; i++) uv.setX(i, (cell + uv.getX(i)) / 3);
+  uv.needsUpdate = true;
+  return geo;
+}
+
+/** The shadows' material: the atlas as their shape, the ink as their colour, each
+ *  instance's darkness in its instance colour (red channel: 0 is no shadow, 1 full ink).
+ *  Alpha-blended: a shadow takes light away, which an additive glow never can. */
+function shadowMaterial(map: THREE.Texture | null): THREE.MeshBasicMaterial {
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    map: map ?? undefined,
+    transparent: true,
+    depthWrite: false,
+    fog: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -4,
+    polygonOffsetUnits: -4,
   });
-  const core = new THREE.CylinderGeometry(0.04, 0.12, 0.38, 12, 1);
-  core.translate(0, 0.21, 0);
-  paint(core, () => [0.6, 0.45, 0.2]);
-  return merged([handle, knob, bandA, bandB, straw, core]);
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.shadowInk = { value: SHADOW_INK };
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>\nuniform vec3 shadowInk;`)
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>\n#ifdef USE_COLOR\n  diffuseColor.a *= vColor.r;\n#endif\n  diffuseColor.rgb = shadowInk;`,
+      );
+  };
+  mat.customProgramCacheKey = () => 'seasonal-toys-candle-shadow';
+  // read through tall meadow grass, still hugging the ground on screen
+  pullDecalTowardCamera(mat, 'seasonal-toys-candle-shadow');
+  return mat;
+}
+
+/** The Gurglegreen Cauldron: a squat, round-bellied iron pot on three stubby claw feet,
+ *  a thick rolled rim, two ring handles and a wooden ladle hooked over the lip. Its brew
+ *  and its bubbles are the additive pools' (brewGeometry, bubbleGeometry). Base at y = 0. */
+const CAULDRON_RIM_Y = 0.5;
+const CAULDRON_RIM_R = 0.3;
+function cauldronGeometry(): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+  const profile = [
+    [0.0, 0.1],
+    [0.16, 0.1],
+    [0.3, 0.16],
+    [0.38, 0.27],
+    [0.39, 0.36],
+    [0.35, 0.45],
+    [0.3, 0.49],
+    [0.29, 0.5],
+    [0.27, 0.48],
+    [0.25, 0.44],
+  ].map(([r, y]) => new THREE.Vector2(r, y));
+  const pot = new THREE.LatheGeometry(profile, 40);
+  const pp = pot.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < pp.count; i++) {
+    // hammered iron: shallow dents round the belly
+    const x = pp.getX(i);
+    const z = pp.getZ(i);
+    const y = pp.getY(i);
+    const a = Math.atan2(x, z);
+    const dent = 1 - 0.018 * Math.max(0, Math.sin(a * 7 + y * 9)) * Math.sin(Math.PI * y);
+    pp.setXYZ(i, x * dent, y, z * dent);
+  }
+  pot.computeVertexNormals();
+  paint(pot, (x, y, z) => {
+    const a = Math.atan2(x, z);
+    const soot = 0.55 + 0.45 * Math.min(1, Math.max(0, (y - 0.12) / 0.3));
+    const sheen = 0.9 + 0.1 * Math.sin(a * 3 + y * 6);
+    // a green crust where the brew has boiled over the lip and run down the belly
+    const drip = y > 0.3 && Math.sin(a * 5) > 0.75 ? (y - 0.3) * 3 : 0;
+    return [
+      (0.13 + 0.02 * sheen) * soot,
+      (0.12 + 0.02 * sheen) * soot + 0.25 * drip,
+      (0.13 + 0.03 * sheen) * soot + 0.05 * drip,
+    ];
+  });
+  parts.push(pot);
+  const rim = new THREE.TorusGeometry(CAULDRON_RIM_R, 0.035, 8, 40);
+  rim.rotateX(Math.PI / 2);
+  rim.translate(0, CAULDRON_RIM_Y, 0);
+  paint(rim, () => [0.2, 0.19, 0.2]);
+  parts.push(rim);
+  for (let k = 0; k < 3; k++) {
+    const a = (k / 3) * Math.PI * 2 + Math.PI / 6;
+    const leg = new THREE.CylinderGeometry(0.035, 0.05, 0.16, 6, 1);
+    leg.translate(Math.sin(a) * 0.24, 0.07, Math.cos(a) * 0.24);
+    paint(leg, () => [0.09, 0.085, 0.09]);
+    parts.push(leg);
+    const claw = new THREE.SphereGeometry(0.05, 8, 6);
+    claw.scale(1.2, 0.6, 1.4);
+    claw.translate(Math.sin(a) * 0.27, 0.02, Math.cos(a) * 0.27);
+    paint(claw, () => [0.08, 0.075, 0.08]);
+    parts.push(claw);
+  }
+  for (const side of [1, -1]) {
+    const ring = new THREE.TorusGeometry(0.075, 0.016, 6, 16);
+    ring.rotateY(Math.PI / 2);
+    ring.translate(side * 0.39, 0.4, 0);
+    paint(ring, () => [0.18, 0.17, 0.18]);
+    parts.push(ring);
+  }
+  // a wooden ladle hooked over the lip at the back, its bowl down in the brew
+  const handle = new THREE.CylinderGeometry(0.014, 0.016, 0.62, 6, 1);
+  handle.rotateX(-0.55);
+  handle.translate(0.06, CAULDRON_RIM_Y + 0.18, -0.2);
+  paint(handle, (_x, y) => {
+    const k = 0.8 + 0.2 * Math.sin(y * 40);
+    return [0.42 * k, 0.27 * k, 0.14 * k];
+  });
+  parts.push(handle);
+  return merged(parts);
+}
+
+/** The brew: a disc just under the rim, bright at its heart and deep green at its edge
+ *  (additive: the flame pool's material). Its bubbles are their own pool. */
+function brewGeometry(): THREE.BufferGeometry {
+  const disc = new THREE.CircleGeometry(CAULDRON_RIM_R - 0.02, 32);
+  disc.rotateX(-Math.PI / 2);
+  disc.translate(0, CAULDRON_RIM_Y - 0.035, 0);
+  paint(disc, (x, _y, z) => {
+    const r = Math.hypot(x, z) / (CAULDRON_RIM_R - 0.02);
+    const k = 1 - 0.65 * r * r;
+    return [0.18 * k, 0.9 * k, 0.28 * k];
+  });
+  return disc;
+}
+
+/** One brew bubble: a small round dome, brightest at its rim (additive, tinted per use). */
+function bubbleGeometry(): THREE.BufferGeometry {
+  const g = new THREE.SphereGeometry(1, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2);
+  paint(g, (_x, y) => {
+    const rim = 0.45 + 0.55 * (1 - y);
+    return [0.35 * rim, 1.0 * rim, 0.45 * rim];
+  });
+  return g;
 }
 
 /** The Wanderwisp Lantern's frame: a small square iron lantern on a footed base, four
@@ -578,6 +845,23 @@ class KitPool {
   }
 }
 
+/** The standing cauldron's click volume (its art is this layer's, the ground object is a
+ *  pick volume only: pick_only_objects.ts). Invisible, so it costs no draw and still takes
+ *  the click; sized round the pot at its drawn scale. */
+export function buildToyCauldronPickBody(): { group: THREE.Group; height: number } {
+  const group = new THREE.Group();
+  group.name = 'GurglegreenCauldronPick';
+  const height = 0.75;
+  const proxy = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.62, 0.62, height, 12, 1, true),
+    new THREE.MeshBasicMaterial(),
+  );
+  proxy.position.y = height / 2;
+  proxy.visible = false;
+  group.add(proxy);
+  return { group, height };
+}
+
 export class SeasonalToysFx {
   private root: THREE.Group | null = null;
   private rootBorn = 0;
@@ -589,17 +873,26 @@ export class SeasonalToysFx {
   private readonly owned: { dispose(): void }[] = [];
   private ghosts: THREE.InstancedMesh | null = null;
   private bats: THREE.InstancedMesh[] = [];
-  private brooms: THREE.InstancedMesh | null = null;
   private candles: THREE.InstancedMesh | null = null;
   private flames: THREE.InstancedMesh | null = null;
   private mists: THREE.InstancedMesh | null = null;
+  /** The candle's light pool (additive) and its three shadow pools (one per figure). */
+  private lightPools: THREE.InstancedMesh | null = null;
+  private shadows: THREE.InstancedMesh[] = [];
+  /** The cauldron, its brew and the bubbles on it. */
+  private cauldrons: THREE.InstancedMesh | null = null;
+  private brews: THREE.InstancedMesh | null = null;
+  private bubbles: THREE.InstancedMesh | null = null;
   private halos: THREE.Sprite[] = [];
   private ghostsUsed = 0;
   private batsUsed = 0;
-  private broomsUsed = 0;
   private candlesUsed = 0;
   private flamesUsed = 0;
   private mistsUsed = 0;
+  private lightPoolsUsed = 0;
+  private shadowsUsed = 0;
+  private cauldronsUsed = 0;
+  private bubblesUsed = 0;
   private halosUsed = 0;
   private lanternFrames: THREE.InstancedMesh | null = null;
   private lanternGlows: THREE.InstancedMesh | null = null;
@@ -608,6 +901,8 @@ export class SeasonalToysFx {
   private readonly looks = new Map<string, LookState>();
   private readonly flights: Flight[] = [];
   private readonly at = new THREE.Vector3();
+  /** Drinkers this layer tinted, by entity id, with the frame it last did. */
+  private readonly tinted = new Map<number, number>();
 
   constructor(
     private readonly scene: THREE.Object3D,
@@ -616,6 +911,7 @@ export class SeasonalToysFx {
     private readonly entity: (id: number) => ToyEntityLike | undefined,
     private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>,
     private readonly audio: () => SpatialAudioSink | null = () => null,
+    private readonly tint: ToyBodyTint = () => {},
   ) {
     const gone = () => this.disposed;
     this.pumpkins = new KitPool('pumpkin_small', PRANK_CAP, compileGate, gone);
@@ -655,10 +951,13 @@ export class SeasonalToysFx {
     ];
     for (const m of this.bats) root.add(m);
     const lambert = own(new THREE.MeshLambertMaterial({ vertexColors: true }));
-    this.brooms = pool(own(broomGeometry()), lambert, TOY_CAP, 'seasonal-toys-brooms');
-    root.add(this.brooms);
+    // the toys set down on the ground (the candle's dish, the lantern, the cauldron) stand
+    // in the meadow's tall grass: their depth comes forward through it (ground_decal_pull.ts)
+    pullDecalTowardCamera(lambert, 'seasonal-toys-props', TOY_PROP_PULL);
     this.candles = pool(own(candleGeometry()), lambert, TOY_CAP, 'seasonal-toys-candles');
     root.add(this.candles);
+    this.cauldrons = pool(own(cauldronGeometry()), lambert, TOY_CAP, 'seasonal-toys-cauldrons');
+    root.add(this.cauldrons);
     this.lanternFrames = pool(
       own(lanternFrameGeometry()),
       lambert,
@@ -674,6 +973,7 @@ export class SeasonalToysFx {
         blending: THREE.AdditiveBlending,
       }),
     );
+    pullDecalTowardCamera(flameMat, 'seasonal-toys-flames', TOY_PROP_PULL);
     this.flames = pool(own(flameGeometry()), flameMat, TOY_CAP * 3, 'seasonal-toys-flames');
     root.add(this.flames);
     this.lanternGlows = pool(
@@ -683,6 +983,15 @@ export class SeasonalToysFx {
       'seasonal-toys-lantern-glows',
     );
     root.add(this.lanternGlows);
+    this.brews = pool(own(brewGeometry()), flameMat, TOY_CAP, 'seasonal-toys-brews');
+    root.add(this.brews);
+    this.bubbles = pool(
+      own(bubbleGeometry()),
+      flameMat,
+      TOY_CAP * CAULDRON_BUBBLES,
+      'seasonal-toys-bubbles',
+    );
+    root.add(this.bubbles);
     const mistTex = mistTexture();
     if (mistTex) own(mistTex);
     const mistMat = own(
@@ -696,12 +1005,40 @@ export class SeasonalToysFx {
         polygonOffsetFactor: -2,
       }),
     );
-    const mistGeo = own(new THREE.CircleGeometry(1, 40));
-    mistGeo.rotateX(-Math.PI / 2);
-    this.mists = pool(mistGeo, mistMat, TOY_CAP, 'seasonal-toys-mists');
+    const groundDisc = own(new THREE.CircleGeometry(1, 40));
+    groundDisc.rotateX(-Math.PI / 2);
+    this.mists = pool(groundDisc, mistMat, TOY_CAP, 'seasonal-toys-mists');
     root.add(this.mists);
     const halo = haloTexture();
     if (halo) own(halo);
+    // the candle's pool of light on the ground: the halo's soft falloff, laid flat, warm
+    // gold-green per instance (additive), drawn BEFORE the shadows it holds
+    const poolMat = own(
+      new THREE.MeshBasicMaterial({
+        map: halo ?? undefined,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        polygonOffset: true,
+        polygonOffsetFactor: -3,
+        polygonOffsetUnits: -3,
+      }),
+    );
+    pullDecalTowardCamera(poolMat, 'seasonal-toys-light-pool');
+    pullDecalTowardCamera(mistMat, 'seasonal-toys-mist');
+    this.lightPools = pool(groundDisc, poolMat, TOY_CAP, 'seasonal-toys-light-pools');
+    this.lightPools.renderOrder = 1;
+    root.add(this.lightPools);
+    // the dancing shadows: one pool per figure over one atlas and one material
+    const atlas = shadowAtlasTexture();
+    if (atlas) own(atlas);
+    const inkMat = own(shadowMaterial(atlas));
+    this.shadows = CANDLE_SHADOW_FIGURES.map((figure, cell) => {
+      const m = pool(own(shadowGeometry(cell)), inkMat, TOY_CAP, `seasonal-toys-shadow-${figure}`);
+      m.renderOrder = 2;
+      root.add(m);
+      return m;
+    });
     for (let i = 0; i < HALO_CAP; i++) {
       const sprite = new THREE.Sprite(
         own(
@@ -786,6 +1123,8 @@ export class SeasonalToysFx {
         );
       }
     } else if (effect === 'candle') {
+      // the wick catches: a soft green flare and a ring of motes thrown off the flames,
+      // then the shadows stand up out of the dark round the dish
       for (let i = 0; i < 18; i++) {
         const a = i * 0.35;
         this.particles.toyMote(
@@ -803,23 +1142,69 @@ export class SeasonalToysFx {
         );
       }
       this.particles.groundPuff(this.at.set(ev.x, sy, ev.z), 0.8, 0x2f7a3e);
-    } else if (effect === 'broom') {
-      for (let i = 0; i < 22; i++) {
-        const a = i * 0.29;
+    } else if (effect === 'cauldron') {
+      // set down with a slosh: green brew splashed up over the rim, a puff of steam, the
+      // ground thumped under its feet
+      const cy = y + CAULDRON_RIM_Y * CAULDRON_SCALE;
+      this.particles.groundPuff(this.at.set(ev.x, y, ev.z), 0.9, 0x3c4a34);
+      for (let i = 0; i < 26; i++) {
+        const a = i * 0.24;
+        const up = 1.6 + (i % 5) * 0.45;
         this.particles.toyMote(
           ev.x,
-          sy + 0.2,
+          cy,
           ev.z,
-          Math.cos(a) * 2.2,
-          1.4 + (i % 4) * 0.5,
-          Math.sin(a) * 2.2,
-          i % 3 === 0 ? 0xffd27a : 0xff7a1e,
-          0.16,
-          0.8,
-          4.5,
-          'spark',
+          Math.cos(a) * (0.6 + (i % 3) * 0.35),
+          up,
+          Math.sin(a) * (0.6 + (i % 3) * 0.35),
+          i % 4 === 0 ? 0xd6ffd0 : BREW_COLOR,
+          i % 3 === 0 ? 0.2 : 0.13,
+          0.9,
+          6.5,
+          i % 3 === 0 ? 'glow' : 'debris',
         );
       }
+      for (let i = 0; i < 6; i++) {
+        const a = i * 1.05;
+        this.particles.toyMote(
+          ev.x + Math.cos(a) * 0.2,
+          cy + 0.1,
+          ev.z + Math.sin(a) * 0.2,
+          Math.cos(a) * 0.25,
+          0.9,
+          Math.sin(a) * 0.25,
+          0x9fe8a8,
+          0.9,
+          1.8,
+          -0.05,
+          'smoke',
+        );
+      }
+    } else if (effect === 'cauldron_drink') {
+      // the drinker's first gulp: a burst of green bubbles off them and a flash of the glow
+      const target = ev.targetId !== undefined ? this.entity(ev.targetId) : undefined;
+      if (target && !this.drawable(target)) return true;
+      const tx = target?.pos.x ?? ev.x;
+      const ty = target?.pos.y ?? y;
+      const tz = target?.pos.z ?? ev.z;
+      for (let i = 0; i < 30; i++) {
+        const a = i * 2.39996;
+        const r = 0.25 + (i % 4) * 0.08;
+        this.particles.toyMote(
+          tx + Math.cos(a) * r,
+          ty + 0.6 + (i % 6) * 0.22,
+          tz + Math.sin(a) * r,
+          Math.cos(a) * 0.5,
+          1.2 + (i % 5) * 0.35,
+          Math.sin(a) * 0.5,
+          i % 5 === 0 ? 0xe4ffe0 : BREW_COLOR,
+          0.12 + (i % 3) * 0.05,
+          1.2,
+          -0.6,
+          'glow',
+        );
+      }
+      this.halo(tx, ty + 1.2, tz, 2.6, 0.55, BREW_COLOR);
     }
     return true;
   }
@@ -833,19 +1218,27 @@ export class SeasonalToysFx {
     this.reduced = reducedMotion;
     this.ghostsUsed = 0;
     this.batsUsed = 0;
-    this.broomsUsed = 0;
     this.candlesUsed = 0;
     this.flamesUsed = 0;
     this.mistsUsed = 0;
+    this.lightPoolsUsed = 0;
+    this.shadowsUsed = 0;
+    this.cauldronsUsed = 0;
+    this.bubblesUsed = 0;
     this.halosUsed = 0;
     this.lanternsUsed = 0;
     this.pumpkins.used = 0;
   }
 
-  /** Per entity, per frame (ScarecrowFx's scan): its toy looks, if any. Allocation-free
-   *  for a body wearing none. */
+  /** Per entity, per frame (ScarecrowFx's scan): its toy looks, if any, and a standing
+   *  cauldron. Allocation-free for a body wearing none. */
   watch(e: ToyEntityLike, id: number): void {
-    if (this.disposed || e.kind !== 'player' || !e.auras || e.auras.length === 0) return;
+    if (this.disposed) return;
+    if (e.kind === 'object') {
+      if (e.objectItemId === GURGLEGREEN_CAULDRON_ID && !e.dead) this.drawCauldron(e, id);
+      return;
+    }
+    if (e.kind !== 'player' || !e.auras || e.auras.length === 0) return;
     for (const a of e.auras) {
       if (a.kind !== 'seasonal_cosmetic') continue;
       const effect = toyEffectOf(a.id);
@@ -855,34 +1248,44 @@ export class SeasonalToysFx {
       const key = `${id}:${effect}`;
       const remaining = Math.max(0, a.remaining ?? 0);
       const elapsed = Math.max(0, (a.duration ?? 0) - remaining);
-      let st = this.looks.get(key);
-      if (!st) {
-        const sx = a.value2 ?? e.pos.x;
-        const sz = a.value3 ?? e.pos.z;
-        const near = Math.hypot(sx - e.pos.x, sz - e.pos.z) < 4;
-        st = {
-          born: this.time - elapsed,
-          seen: this.frame,
-          spotY: near ? e.pos.y : this.groundY(sx, sz),
-          ax: e.pos.x,
-          ay: e.pos.y,
-          az: e.pos.z,
-          lastX: e.pos.x,
-          lastZ: e.pos.z,
-          speed: 0,
-          sweepAt: this.time + BROOM_SWEEP_EVERY,
-          looped: false,
-          phase: (id % 97) * 0.37,
-        };
-        this.looks.set(key, st);
-      }
-      st.seen = this.frame;
+      const st = this.lookState(key, e, id, elapsed, a.value2, a.value3);
       const fade = lookFade(elapsed, remaining);
       if (effect === 'lantern') this.drawLantern(e, a, st, fade);
       else if (effect === 'bats') this.drawBats(st, a.duration ?? 6);
-      else if (effect === 'candle') this.drawCandle(id, a, st, fade, remaining);
-      else if (effect === 'broom') this.drawBroom(e, st, fade);
+      else if (effect === 'candle') this.drawCandle(a, st, fade, remaining);
+      else if (effect === 'cauldron') this.drawBrew(e, id, st, elapsed, remaining);
     }
+  }
+
+  /** A look's per-body state, made on its first sight. */
+  private lookState(
+    key: string,
+    e: ToyEntityLike,
+    id: number,
+    elapsed: number,
+    spotX?: number,
+    spotZ?: number,
+  ): LookState {
+    const known = this.looks.get(key);
+    if (known) {
+      known.seen = this.frame;
+      return known;
+    }
+    const sx = spotX ?? e.pos.x;
+    const sz = spotZ ?? e.pos.z;
+    const near = Math.hypot(sx - e.pos.x, sz - e.pos.z) < 4;
+    const st: LookState = {
+      born: this.time - elapsed,
+      seen: this.frame,
+      spotY: near ? e.pos.y : this.groundY(sx, sz),
+      ax: e.pos.x,
+      ay: e.pos.y,
+      az: e.pos.z,
+      looped: false,
+      phase: (id % 97) * 0.37,
+    };
+    this.looks.set(key, st);
+    return st;
   }
 
   /** After the scan: the flights, the stale looks, and every pool's unused tail. */
@@ -891,12 +1294,40 @@ export class SeasonalToysFx {
     this.updateFlights();
     for (const [key, st] of this.looks) {
       if (st.seen === this.frame) continue;
-      // a candle snuffed early (right-click, the event closing): its whispers stop too
-      if (st.looped) {
+      if (key.endsWith(':pot')) {
+        // the cauldron's time ran out (or it was replaced): its bubbling stops, and it
+        // goes in a last hiss of green steam
         const id = key.slice(0, key.indexOf(':'));
-        this.audio()?.timedGroundLoop(`murmurwick-${id}`, CANDLE_WHISPER_SFX, 0, 0, 0, 0.01);
+        if (st.looped) {
+          this.audio()?.timedGroundLoop(`gurglegreen-${id}`, CAULDRON_BUBBLE_SFX, 0, 0, 0, 0.01);
+        }
+        for (let i = 0; i < 8; i++) {
+          const a = i * 0.785;
+          this.particles.toyMote(
+            st.ax + Math.cos(a) * 0.25,
+            st.spotY + 0.5,
+            st.az + Math.sin(a) * 0.25,
+            Math.cos(a) * 0.4,
+            0.8,
+            Math.sin(a) * 0.4,
+            0x8fe39a,
+            0.8,
+            1.4,
+            -0.05,
+            'smoke',
+          );
+        }
       }
       this.looks.delete(key);
+    }
+    // a drinker whose glow ran out (or who left sight) gets their own colours back. The tint
+    // rides the rig's one aura-glow slot (CharacterVisual.setAuraGlow): an ability glow live
+    // on the same body in the same ten seconds shares it, the last writer winning, and this
+    // release clears only bodies this layer tinted
+    for (const [id, frame] of this.tinted) {
+      if (frame === this.frame) continue;
+      this.tint(id, BREW_COLOR, 0);
+      this.tinted.delete(id);
     }
     if (!this.root) return;
     const twins = this.time - this.rootBorn < TWIN_SEC;
@@ -909,10 +1340,14 @@ export class SeasonalToysFx {
     };
     tail(this.ghosts, this.ghostsUsed);
     for (const m of this.bats) tail(m, this.batsUsed);
-    tail(this.brooms, this.broomsUsed);
     tail(this.candles, this.candlesUsed);
     tail(this.flames, this.flamesUsed);
     tail(this.mists, this.mistsUsed);
+    tail(this.lightPools, this.lightPoolsUsed);
+    for (const m of this.shadows) tail(m, this.shadowsUsed);
+    tail(this.cauldrons, this.cauldronsUsed);
+    tail(this.brews, this.cauldronsUsed);
+    tail(this.bubbles, this.bubblesUsed);
     tail(this.lanternFrames, this.lanternsUsed);
     tail(this.lanternGlows, this.lanternsUsed);
     this.pumpkins.finish(twins);
@@ -1036,22 +1471,11 @@ export class SeasonalToysFx {
     }
   }
 
-  private drawCandle(id: number, a: ToyAuraLike, st: LookState, fade: number, remaining: number) {
+  private drawCandle(a: ToyAuraLike, st: LookState, fade: number, remaining: number) {
     const t = this.time - st.born;
     const cx = a.value2 ?? 0;
     const cz = a.value3 ?? 0;
     const cy = st.spotY;
-    if (!st.looped && remaining > 0.5) {
-      st.looped = true;
-      this.audio()?.timedGroundLoop(
-        `murmurwick-${id}`,
-        CANDLE_WHISPER_SFX,
-        cx,
-        cy + 0.4,
-        cz,
-        remaining,
-      );
-    }
     if (this.candles && this.candlesUsed < TOY_CAP) {
       const grow = Math.min(1, t / 0.3);
       m4.compose(
@@ -1061,15 +1485,18 @@ export class SeasonalToysFx {
       );
       this.candles.setMatrixAt(this.candlesUsed++, m4);
     }
-    // the cold green flames, each on its own flicker
-    for (let k = 0; k < 3 && this.flames && this.flamesUsed < TOY_CAP * 3; k++) {
+    // the cold green flames, each on its own flicker; the shadows follow their average
+    let flickSum = 0;
+    for (let k = 0; k < 3; k++) {
+      const fl = candleFlicker(this.time, st.phase + k * 1.7);
+      flickSum += fl;
+      if (!this.flames || this.flamesUsed >= TOY_CAP * 3) continue;
       const [ox, h, oz] = CANDLE_TOPS[k];
       const c = Math.cos(st.phase);
       const s = Math.sin(st.phase);
       const fx = cx + (ox * c + oz * s) * CANDLE_SCALE;
       const fz = cz + (-ox * s + oz * c) * CANDLE_SCALE;
       const fy = cy + (0.04 + h + 0.03) * CANDLE_SCALE;
-      const fl = candleFlicker(this.time, st.phase + k * 1.7);
       e4.set(0.08 * Math.sin(this.time * 5 + k), 0, 0.08 * Math.cos(this.time * 4 + k));
       m4.compose(
         p4.set(fx, fy, fz),
@@ -1081,9 +1508,10 @@ export class SeasonalToysFx {
       this.flames.setColorAt(i, tint.setScalar(1));
       this.halo(fx, fy + 0.08, fz, 0.7 * fl, 0.55 * fade, 0x66ff8a);
     }
+    const flick = flickSum / 3;
     this.halo(cx, cy + 0.3, cz, 3.2, 0.08 * fade, 0x3cff6e);
     // the glow column and the wisps climbing out of the flames: what still reads over
-    // tall grass and in daylight, where the dish and the ground mist sink out of sight
+    // tall grass and in daylight, where the dish sinks out of sight
     const column = candleGlowColumn(t, remaining);
     this.halo(cx, cy + column.height, cz, 1.7, column.opacity * fade, 0x52ff84, true);
     this.particles.toyMote(
@@ -1101,7 +1529,16 @@ export class SeasonalToysFx {
       (this.reduced ? 0.5 : 1) * column.wispRate,
       this.dt,
     );
-    // the low green mist spreading over the ground round it
+    // the pool of candlelight the shadows dance in (what makes a shadow read at night)
+    const light = candleLightPool(t, remaining, flick);
+    if (this.lightPools && this.lightPoolsUsed < TOY_CAP) {
+      m4.compose(p4.set(cx, cy + 0.07, cz), q4.identity(), s4.set(light.radius, 1, light.radius));
+      const i = this.lightPoolsUsed++;
+      this.lightPools.setMatrixAt(i, m4);
+      const k = 0.62 * light.strength * fade;
+      this.lightPools.setColorAt(i, tint.setRGB(0.55 * k, 0.95 * k, 0.42 * k));
+    }
+    // a thin green haze still hangs low round the dish
     const mist = candleMist(t, remaining);
     if (this.mists && this.mistsUsed < TOY_CAP) {
       m4.compose(
@@ -1111,139 +1548,181 @@ export class SeasonalToysFx {
       );
       const i = this.mistsUsed++;
       this.mists.setMatrixAt(i, m4);
-      this.mists.setColorAt(i, tint.setScalar(0.09 * mist.strength));
+      this.mists.setColorAt(i, tint.setScalar(0.045 * mist.strength));
     }
-    // curls of it lifting off the ground, and pale motes drifting up through it
-    const rate = (this.reduced ? 5 : 10) * mist.strength;
-    const ang = this.time * 2.3 + st.phase;
-    const r = mist.radius * (0.3 + 0.6 * ((Math.sin(this.time * 3.7) + 1) / 2));
-    this.particles.toyMote(
-      cx + Math.cos(ang) * r,
-      cy + 0.1,
-      cz + Math.sin(ang) * r,
-      Math.cos(ang) * 0.3,
-      0.12,
-      Math.sin(ang) * 0.3,
-      0x1d6a32,
-      1.5,
-      3.0,
-      -0.02,
-      'smoke',
-      rate,
-      this.dt,
-    );
-    this.particles.toyMote(
-      cx - Math.cos(ang * 1.3) * r * 0.7,
-      cy + 0.2,
-      cz + Math.sin(ang * 1.3) * r * 0.7,
-      0,
-      0.35,
-      0,
-      0x9dffb0,
-      0.12,
-      1.6,
-      -0.1,
-      'glow',
-      rate * 0.4,
-      this.dt,
-    );
+    // the shadows: a cat, a bat and a witch thrown out from the flames, circling the dish,
+    // stretching and shrinking as the flames jump (they never take a step the light did not)
+    if (this.shadows.length === CANDLE_SHADOW_FIGURES.length && this.shadowsUsed < TOY_CAP) {
+      const slot = this.shadowsUsed++;
+      const figures = candleShadows(t, st.phase, flick, fade);
+      for (let k = 0; k < figures.length; k++) {
+        const f = figures[k];
+        const dx = Math.sin(f.bearing);
+        const dz = Math.cos(f.bearing);
+        const mid = f.foot + f.length * 0.5;
+        // seated on the ground under its own middle, never below the dish's floor
+        const gy = Math.max(cy, this.groundY(cx + dx * mid, cz + dz * mid)) + 0.08;
+        m4.compose(
+          p4.set(cx + dx * f.foot, gy, cz + dz * f.foot),
+          q4.setFromAxisAngle(UP, f.bearing + Math.PI),
+          s4.set(f.width, 1, f.length),
+        );
+        const mesh = this.shadows[k];
+        mesh.setMatrixAt(slot, m4);
+        mesh.setColorAt(slot, tint.setRGB(f.alpha, f.alpha, f.alpha));
+      }
+    }
   }
 
-  private drawBroom(e: ToyEntityLike, st: LookState, fade: number): void {
-    const dx = e.pos.x - st.lastX;
-    const dz = e.pos.z - st.lastZ;
-    st.lastX = e.pos.x;
-    st.lastZ = e.pos.z;
-    const inst = Math.hypot(dx, dz) / Math.max(1e-3, this.dt);
-    st.speed += (Math.min(inst, 20) - st.speed) * Math.min(1, this.dt * 8);
-    const stride = Math.min(1, st.speed / 3);
-    const pose = broomPose(this.time - st.born + st.phase, stride);
-    const c = Math.cos(e.facing);
-    const s = Math.sin(e.facing);
-    // local (+x right, +z forward) to world: forward is (sin f, cos f), right is (cos f, -sin f)
-    const wx = (lx: number, lz: number) => e.pos.x + lz * s + lx * c;
-    const wz = (lx: number, lz: number) => e.pos.z + lz * c - lx * s;
-    const bx = wx(pose.bristle.x, pose.bristle.z);
-    const bz = wz(pose.bristle.x, pose.bristle.z);
-    const by = e.pos.y + pose.bristle.y;
-    const mounted = !!e.mountKey;
-    if (!mounted && this.brooms && this.broomsUsed < TOY_CAP) {
-      const hx = wx(pose.hand.x, pose.hand.z);
-      const hz = wz(pose.hand.x, pose.hand.z);
-      v1.set(hx - bx, e.pos.y + pose.hand.y - by, hz - bz).normalize();
-      q4.setFromUnitVectors(UP, v1);
-      m4.compose(
-        p4.set(bx, by - 0.06, bz),
-        q4,
-        s4.setScalar(BROOM_SCALE * Math.min(1, (this.time - st.born) / 0.25)),
+  /** A standing Gurglegreen Cauldron (a ground object): the pot, its brew, its bubbles,
+   *  steam and green motes off the top, embers under its belly, its bubbling looped. */
+  private drawCauldron(e: ToyEntityLike, id: number): void {
+    this.ensureRoot();
+    const st = this.lookState(`${id}:pot`, e, id, 0);
+    st.ax = e.pos.x;
+    st.az = e.pos.z;
+    st.spotY = e.pos.y;
+    const t = this.time - st.born;
+    const x = e.pos.x;
+    const y = e.pos.y;
+    const z = e.pos.z;
+    if (!st.looped) {
+      st.looped = true;
+      const stands = gourdlightToy(GURGLEGREEN_CAULDRON_ID)?.standsFor ?? 60;
+      this.audio()?.timedGroundLoop(
+        `gurglegreen-${id}`,
+        CAULDRON_BUBBLE_SFX,
+        x,
+        y + 0.5,
+        z,
+        stands,
       );
-      this.brooms.setMatrixAt(this.broomsUsed++, m4);
     }
-    // the sparks: thrown off the bristles, falling and fading behind the walker
-    const sx = mounted ? e.pos.x - s * 1.2 : bx;
-    const sz = mounted ? e.pos.z - c * 1.2 : bz;
-    const rate = broomSparkRate(st.speed) * fade * (this.reduced ? 0.5 : 1);
-    const kick = 0.6 + 0.8 * stride;
+    // it lands with a little settle (overshoot, then rest)
+    const k = Math.min(1, t / 0.32);
+    const settle = 1 + 0.12 * Math.sin(k * Math.PI) * (1 - k);
+    const size = CAULDRON_SCALE * (0.6 + 0.4 * k) * settle;
+    if (this.cauldrons && this.brews && this.cauldronsUsed < TOY_CAP) {
+      m4.compose(p4.set(x, y, z), q4.setFromAxisAngle(UP, e.facing), s4.setScalar(size));
+      const i = this.cauldronsUsed++;
+      this.cauldrons.setMatrixAt(i, m4);
+      this.brews.setMatrixAt(i, m4);
+      const throb = 0.82 + 0.12 * Math.sin(t * 3.1 + st.phase) + 0.06 * Math.sin(t * 7.7);
+      this.brews.setColorAt(i, tint.setScalar(throb * k));
+    }
+    // the brew's bubbles: each swells, pops, and comes back somewhere else on the surface
+    const rimY = y + (CAULDRON_RIM_Y - 0.03) * size;
+    const r = (CAULDRON_RIM_R - 0.04) * size;
+    for (let b = 0; b < CAULDRON_BUBBLES; b++) {
+      const bub = cauldronBubble(b, t + st.phase);
+      if (this.bubbles && this.bubblesUsed < TOY_CAP * CAULDRON_BUBBLES && bub.size > 0.02) {
+        const bs = (0.035 + 0.03 * ((b * 5) % 3)) * size * bub.size;
+        m4.compose(p4.set(x + bub.x * r, rimY, z + bub.z * r), q4.identity(), s4.setScalar(bs));
+        const i = this.bubblesUsed++;
+        this.bubbles.setMatrixAt(i, m4);
+        this.bubbles.setColorAt(i, tint.setScalar(0.85));
+      }
+      // a popped bubble flicks a drop of brew up off the surface
+      if (bub.pop > 0 && bub.pop < 0.3 && !this.reduced) {
+        this.particles.toyMote(
+          x + bub.x * r,
+          rimY + 0.04,
+          z + bub.z * r,
+          bub.x * 0.3,
+          1.1,
+          bub.z * 0.3,
+          0xc8ffc0,
+          0.07,
+          0.45,
+          4,
+          'glow',
+          6,
+          this.dt,
+        );
+      }
+    }
+    // steam curling off the top and green motes drifting up out of it
     this.particles.toyMote(
-      sx,
-      by + 0.22,
-      sz,
-      -s * kick * 0.6 + pose.sweep * c * 0.8,
-      1.4 + stride,
-      -c * kick * 0.6 - pose.sweep * s * 0.8,
-      0xff7a1e,
-      0.24,
-      0.95,
-      3.2,
-      'spark',
-      rate,
+      x + 0.1 * Math.sin(this.time * 1.3 + st.phase),
+      rimY + 0.12,
+      z + 0.1 * Math.cos(this.time * 1.7 + st.phase),
+      0.08 * Math.sin(this.time * 0.9),
+      0.55,
+      0.08 * Math.cos(this.time * 1.1),
+      0x9fe8a8,
+      0.7,
+      2.2,
+      -0.04,
+      'smoke',
+      (this.reduced ? 1.5 : 3) * k,
       this.dt,
     );
     this.particles.toyMote(
-      sx,
-      by + 0.1,
-      sz,
+      x + r * 0.6 * Math.sin(this.time * 2.7 + st.phase),
+      rimY + 0.08,
+      z + r * 0.6 * Math.cos(this.time * 2.3 + st.phase),
+      0,
+      0.7,
+      0,
+      BREW_COLOR,
+      0.11,
+      1.6,
+      -0.2,
+      'glow',
+      (this.reduced ? 4 : 9) * k,
+      this.dt,
+    );
+    // embers glowing under its belly: the heat that keeps it bubbling
+    this.particles.toyMote(
+      x + 0.18 * Math.sin(this.time * 4.1 + st.phase),
+      y + 0.06,
+      z + 0.18 * Math.cos(this.time * 3.3 + st.phase),
       0,
       0.5,
       0,
-      0xffd27a,
-      0.16,
-      1.3,
-      0.8,
+      0xff8a2a,
+      0.06,
+      0.6,
+      0.2,
       'spark',
-      rate * 0.4,
+      (this.reduced ? 3 : 7) * k,
       this.dt,
     );
-    // embers floating up out of the grass and lingering behind the walker: the trail that
-    // reads in daylight and over tall meadow grass, where the low sparks are lost
-    const trail = broomEmberTrail(st.speed);
-    if (trail.rate > 0) {
-      // a lazy sideways sway and a flicker in size, so the trail curls like embers off a
-      // fire instead of standing in a row of equal beads
-      const sway = 0.45 * Math.sin(this.time * 7.3 + st.phase);
-      this.particles.toyMote(
-        sx - s * 0.25,
-        by + trail.lift,
-        sz - c * 0.25,
-        -s * 0.35 + c * sway,
-        0.45 + 0.2 * Math.sin(this.time * 5.1 + st.phase),
-        -c * 0.35 - s * sway,
-        0xff8a24,
-        0.17 + 0.07 * Math.abs(Math.sin(this.time * 11.7 + st.phase)),
-        1.5,
-        -0.1,
-        'glow',
-        trail.rate * fade * (this.reduced ? 0.5 : 1),
-        this.dt,
-      );
-    }
-    this.halo(sx, by + 0.15, sz, 0.8, 0.35 * fade * (0.4 + 0.6 * stride), 0xff9a3a);
-    this.halo(sx, by + 0.45, sz, 1.1, 0.22 * fade * stride, 0xffa04a, true);
-    // a soft sweep each stride while walking
-    if (st.speed > 1 && this.time >= st.sweepAt) {
-      st.sweepAt = this.time + BROOM_SWEEP_EVERY;
-      this.audio()?.playAt?.(BROOM_SWEEP_SFX, bx, by, bz, { gain: 0.3, cooldown: 0.5 });
-    }
+    this.halo(x, y + 0.12, z, 1.0, 0.32 * k, 0xff7a24);
+    this.halo(x, rimY + 0.15, z, 1.6, 0.42 * k, BREW_COLOR);
+    this.halo(x, rimY + 0.55, z, 2.4, 0.12 * k, BREW_DEEP, true);
+  }
+
+  /** A drinker: their whole body tinted green (the rig's own aura glow), bubbles rising
+   *  off them, and a green halo round their chest, pulsing as the brew bubbles through. */
+  private drawBrew(
+    e: ToyEntityLike,
+    id: number,
+    st: LookState,
+    elapsed: number,
+    remaining: number,
+  ): void {
+    const glow = brewGlow(elapsed, remaining, this.time + st.phase);
+    this.tint(id, BREW_TINT, glow);
+    this.tinted.set(id, this.frame);
+    const ang = this.time * 7.3 + st.phase;
+    const rise = (this.time * 1.9 + st.phase) % 1;
+    this.particles.toyMote(
+      e.pos.x + Math.cos(ang) * 0.38,
+      e.pos.y + 0.3 + rise * 1.5,
+      e.pos.z + Math.sin(ang) * 0.38,
+      Math.cos(ang) * 0.12,
+      0.85,
+      Math.sin(ang) * 0.12,
+      Math.sin(ang * 3) > 0.6 ? 0xe4ffe0 : BREW_COLOR,
+      0.1 + 0.05 * Math.abs(Math.sin(ang * 1.7)),
+      1.5,
+      -0.35,
+      'glow',
+      (this.reduced ? 8 : 18) * glow,
+      this.dt,
+    );
+    this.halo(e.pos.x, e.pos.y + 1.15, e.pos.z, 2.2, 0.24 * glow, BREW_COLOR, true);
   }
 
   private updateFlights(): void {
@@ -1316,21 +1795,32 @@ export class SeasonalToysFx {
     this.root?.removeFromParent();
     for (const m of [
       this.ghosts,
-      this.brooms,
       this.candles,
       this.flames,
       this.mists,
+      this.lightPools,
+      this.cauldrons,
+      this.brews,
+      this.bubbles,
       this.lanternFrames,
       this.lanternGlows,
       ...this.bats,
+      ...this.shadows,
     ])
       m?.dispose();
+    // a drinker still glowing when the layer goes keeps no tint
+    for (const id of this.tinted.keys()) this.tint(id, BREW_COLOR, 0);
+    this.tinted.clear();
     for (const x of this.owned) x.dispose();
     this.owned.length = 0;
     this.root = null;
     this.ghosts = null;
-    this.brooms = null;
     this.candles = null;
+    this.lightPools = null;
+    this.cauldrons = null;
+    this.brews = null;
+    this.bubbles = null;
+    this.shadows = [];
     this.flames = null;
     this.mists = null;
     this.lanternFrames = null;

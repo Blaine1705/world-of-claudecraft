@@ -5,8 +5,8 @@
 // render reads it off the ordinary aura wire and every client agrees. This core answers:
 // which toy looks a body wears and how far through each it is; where the thrown pumpkin
 // is along its arc; where the ghost circles; where each bat of the swarm flies; how the
-// candle's mist and the lantern's glow breathe; and where the play broom's bristles touch
-// the ground as its user walks.
+// candle's light breathes and where its three dancing shadows fall; and how the
+// Gurglegreen Cauldron's brew bubbles and how a drinker's green glow pulses.
 import { GOURDLIGHT_TOYS, type GourdlightToyEffect } from '../sim/content/gourdlight_eve';
 
 /** The thrown pumpkin's flight (s): the head appears and the splat lands at its end. */
@@ -16,18 +16,14 @@ export const PRANK_ARC_HEIGHT = 2.2;
 /** Bats in one swarm, and the pool's cap (three swarms at once). */
 export const BAT_COUNT = 26;
 export const BAT_CAP = BAT_COUNT * 3;
-/** Ghosts, lanterns, candles and brooms drawn at once (each pool's cap). */
+/** Ghosts, lanterns, candles and cauldrons drawn at once (each pool's cap). */
 export const TOY_CAP = 8;
 /** Thrown pumpkins in the air at once. */
 export const PRANK_CAP = 6;
-/** The candle's whisper loop (scripts/sfx/gourdlight_sfx.mjs), played at its spot. */
-export const CANDLE_WHISPER_SFX = 'murmurwick_whispers_loop';
 /** The prank's splat (played on landing, not on the throw). */
 export const PRANK_SPLAT_SFX = 'impact_prank_pumpkin_splat';
-/** The play broom's sweep, replayed softly every stride while its user walks. */
-export const BROOM_SWEEP_SFX = 'spell_sparkbristle_sweep';
-/** Seconds between the broom's replayed sweeps while walking. */
-export const BROOM_SWEEP_EVERY = 1.6;
+/** The cauldron's bubbling, looped at its spot while it stands. */
+export const CAULDRON_BUBBLE_SFX = 'gurglegreen_bubble_loop';
 /** The mist's radius on the ground round the candle (yd). */
 export const CANDLE_MIST_RADIUS = 3.4;
 
@@ -201,38 +197,7 @@ export function candleFlicker(t: number, phase = 0): number {
   return 0.92 + 0.12 * Math.sin(t * 13 + phase) + 0.08 * Math.sin(t * 29.3 + phase * 2.1);
 }
 
-/** Where the play broom sits by its sweeper: held at the right hip, its bristles brushing
- *  the ground ahead and to the side, swept to and fro with the walk. Local yards, +z
- *  forward, +x right. `sweep` is the swing (-1 to 1); `stride` is 0 still, 1 walking. */
-export function broomPose(
-  t: number,
-  stride: number,
-): { hand: Vec3Like; bristle: Vec3Like; sweep: number } {
-  const sweep = Math.sin(t * 5.2) * stride + Math.sin(t * 1.3) * 0.15 * (1 - stride);
-  return {
-    hand: { x: 0.42, y: 1.02, z: 0.22 },
-    bristle: { x: 0.55 + 0.32 * sweep, y: 0.08, z: 0.95 + 0.08 * Math.abs(sweep) },
-    sweep,
-  };
-}
-
-/** How many sparks the broom throws this frame's worth of motion (yards moved since the
- *  last frame): a trail that thickens with speed and rests at a slow glitter when still. */
-export function broomSparkRate(speed: number): number {
-  return speed > 0.4 ? 40 + Math.min(40, speed * 8) : 6;
-}
-
-/** The broom's ember trail (round of 2026-10-19, read over tall meadow grass and in
- *  daylight): besides the sparks off the bristles, embers float up out of the grass and
- *  linger behind the walker, so the trail reads at any time of day. `rate` is per second
- *  (none while standing still), `lift` how high above the bristles they rise from. */
-export function broomEmberTrail(speed: number): { rate: number; lift: number } {
-  if (speed <= 0.4) return { rate: 0, lift: 0 };
-  const stride = Math.min(1, speed / 3);
-  return { rate: 18 + 22 * stride, lift: 0.3 + 0.25 * stride };
-}
-
-/** The candle's glow column (same round): a soft green light standing over the dish and
+/** The candle's glow column (round of 2026-10-19): a soft green light standing over the dish and
  *  pale wisps climbing out of the flames, so the candle still shows where the grass hides
  *  its dish and its ground mist. Follows the mist's own grow and fade. */
 export function candleGlowColumn(
@@ -247,8 +212,125 @@ export function candleGlowColumn(
 export const HALO_PRANK_RESERVE = PRANK_CAP * 2;
 
 /** Whether the glow pool (`used` of `size` handed out this frame) still has a slot: an
- *  accent (a candle's column, a broom's raised glow) never eats into the slots the
+ *  accent (a candle's column, a cauldron's steam glow) never eats into the slots the
  *  pranks ask for last, so a crowded square keeps every pumpkin's flight and splat. */
 export function haloSlotFree(used: number, size: number, accent: boolean): boolean {
   return used < (accent ? size - HALO_PRANK_RESERVE : size);
+}
+
+/** The three shadow shapes the candle's flames throw on the ground (round 10): a sitting
+ *  cat, a bat on the wing, a witch with her broom. Index = the atlas cell. */
+export const CANDLE_SHADOW_FIGURES = ['cat', 'bat', 'witch'] as const;
+export type CandleShadowFigure = (typeof CANDLE_SHADOW_FIGURES)[number];
+
+/** One dancing shadow, in the candle's ground frame: its bearing from the candle
+ *  (radians, 0 = +z, measured toward +x), where its foot sits from the flame (yd), how
+ *  long it is thrown (yd, along the bearing, away from the flame), how wide, and how dark
+ *  (0 to 1). A shadow is cast AWAY from its light, so the foot is always nearest the
+ *  flame and the head farthest: the tell that a candle is throwing it. */
+export interface CandleShadow {
+  figure: CandleShadowFigure;
+  bearing: number;
+  foot: number;
+  length: number;
+  width: number;
+  alpha: number;
+}
+
+const SHADOW_SHAPE: Readonly<
+  Record<CandleShadowFigure, { foot: number; length: number; width: number; drift: number }>
+> = {
+  // the cat sits close to the flame and is thrown long; it strolls slowly round
+  cat: { foot: 0.8, length: 3.1, width: 1.7, drift: 0.22 },
+  // the bat flits the other way, off the ground (its foot floats out from the flame)
+  bat: { foot: 1.5, length: 2.1, width: 2.6, drift: -0.55 },
+  // the witch is the tallest shadow, swaying as she circles
+  witch: { foot: 0.75, length: 3.9, width: 1.8, drift: 0.16 },
+};
+
+/** The three shadows at `t` (s since the candle was lit). `flick` is the flames' flicker
+ *  (candleFlicker, 0.7 to 1.15): every shadow stretches and shrinks with it, the way a
+ *  shadow does when the flame behind it jumps. `fade` (0 to 1) is the look's own fade.
+ *  Deterministic and pure: the same candle dances the same on every client. */
+export function candleShadows(
+  t: number,
+  phase: number,
+  flick: number,
+  fade: number,
+): CandleShadow[] {
+  const grow = Math.min(1, Math.max(0, (t - 0.25) / 1.2));
+  const out: CandleShadow[] = [];
+  CANDLE_SHADOW_FIGURES.forEach((figure, i) => {
+    const shape = SHADOW_SHAPE[figure];
+    const sway = 0.32 * Math.sin(t * (1.1 + 0.37 * i) + phase + i);
+    const bearing = phase + (i * Math.PI * 2) / 3 + t * shape.drift + sway;
+    let foot = shape.foot;
+    let length = shape.length;
+    let width = shape.width;
+    if (figure === 'cat') {
+      // a little hop now and then: the shadow lurches longer off the ground
+      length *= 1 + 0.12 * Math.max(0, Math.sin(t * 2.6 + phase)) ** 3;
+    } else if (figure === 'bat') {
+      // the wings beat: the shadow's span pumps, and it bobs in and out from the flame
+      width *= 0.72 + 0.28 * Math.abs(Math.sin(t * 8.5 + phase));
+      foot += 0.35 * Math.sin(t * 1.9 + phase);
+    } else {
+      length *= 1 + 0.06 * Math.sin(t * 1.7 + phase);
+    }
+    const stretch = 0.82 + (0.3 * (flick - 0.7)) / 0.45;
+    out.push({
+      figure,
+      bearing,
+      foot: foot * (0.9 + 0.1 * stretch),
+      length: length * stretch * (0.35 + 0.65 * grow),
+      width: width * (0.85 + 0.15 * stretch),
+      alpha: Math.min(1, 0.8 * fade * grow * (0.82 + 0.18 * stretch)),
+    });
+  });
+  return out;
+}
+
+/** The pool of candle light the shadows dance in: its radius (yd) and strength (0 to 1).
+ *  It is what lets a dark shadow read at night (a shadow needs light round it). */
+export function candleLightPool(
+  elapsed: number,
+  remaining: number,
+  flick: number,
+): { radius: number; strength: number } {
+  const { strength } = candleMist(elapsed, remaining);
+  return { radius: 4.6 + 0.4 * (flick - 0.92), strength: strength * (0.85 + 0.15 * flick) };
+}
+
+/** Bubbles a cauldron's brew swells and pops on its surface at once. */
+export const CAULDRON_BUBBLES = 7;
+
+/** Bubble `i` on the brew at `t` (s): where on the surface it rises (unit-disc x, z), how
+ *  big it has swelled (0 to 1; it pops at the top of its life) and whether it just popped
+ *  this cycle's frame band (`pop` near 1 for the last tenth of its life). Pure hash: every
+ *  client bubbles the same cauldron alike. */
+export function cauldronBubble(
+  i: number,
+  t: number,
+): { x: number; z: number; size: number; pop: number } {
+  const life = 0.7 + batHash(i, 7) * 0.9;
+  const cycle = t / life + batHash(i, 8);
+  const k = cycle - Math.floor(cycle);
+  const n = Math.floor(cycle);
+  const a = batHash(i * 13 + n, 9) * Math.PI * 2;
+  const r = Math.sqrt(batHash(i * 7 + n, 10)) * 0.78;
+  return {
+    x: Math.cos(a) * r,
+    z: Math.sin(a) * r,
+    size: Math.sin(Math.min(1, k / 0.9) * Math.PI * 0.5) * (k < 0.9 ? 1 : 1 - (k - 0.9) / 0.1),
+    pop: k > 0.9 ? (k - 0.9) / 0.1 : 0,
+  };
+}
+
+/** A drinker's green glow (the body tint's strength, 0 to 1): it floods in over the first
+ *  half second, pulses as the brew bubbles through them, and drains over the last second. */
+export function brewGlow(elapsed: number, remaining: number, t: number): number {
+  const fade = lookFade(elapsed, remaining, 0.5, 1);
+  // held well under a full emissive flood: the body stays readable (face, armour, its
+  // class) under a green wash rather than turning into a flat lime silhouette
+  return fade * (0.17 + 0.05 * Math.sin(t * 5.2) + 0.02 * Math.sin(t * 12.7));
 }

@@ -376,6 +376,8 @@ export function auraEffectDescriptor(
   // whole job is to tell the raid he is asleep, so it must never fall through to the
   // generic "reduces damage by 0%" line.
   if (a.id === 'slumber' && a.kind === 'buff_dr') {
+    // value2 1: a NIGHT sleeper (Old Thatchgrin hanging on his pole by day)
+    if (a.value2 === 1) return { key: `${KEY}.slumberNight`, nums: {} };
     return { key: `${KEY}.slumber`, nums: {} };
   }
   // The drill yard's effigy (src/sim/muster_effigy.ts): its plank hide, and a player's own

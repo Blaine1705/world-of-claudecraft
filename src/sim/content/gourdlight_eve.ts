@@ -37,6 +37,10 @@ export const GOURDLIGHT_SHEAF_ID = 'emberwoven_sheaf';
 /** Sheaves Hester asks for the broom: five daily kills (owner direction 2026-10-18: the
  *  broom takes five days of a roughly two-week event, not one kill). */
 export const GOURDLIGHT_BROOM_SHEAVES = 5;
+/** DESIGN (owner direction, round 10): besides the five sheaves, a small chance on each
+ *  daily looted kill that Old Thatchgrin drops the broom outright (rolled through the
+ *  world rng like every world-boss spoil, never twice: content/gourdlight_eve_scarecrow.ts). */
+export const GOURDLIGHT_BROOM_DROP_CHANCE = 0.03;
 
 /** The costume draughts: drink one and wear a skeleton's, a ghost's or a bat's body for
  *  ten minutes. A look only (a seasonal_cosmetic aura the client draws as a body swap,
@@ -116,11 +120,15 @@ export type GourdlightCandy = (typeof GOURDLIGHT_CANDIES)[number];
  *            (the Carved Pumpkin Head's look) for `duration`; they can right-click it off
  *    lantern set down at the user's feet: a small ghost circles the user for `duration`
  *    bats    opened: a swarm of bats bursts up and scatters round the user
- *    candle  lit at the user's feet: whispers and laughter and a low green mist there
- *    broom   swept along: a trail of orange sparks behind the user as they walk
+ *    candle  lit at the user's feet: shadow shapes (a cat, a bat, a witch) dance on the
+ *            ground round it, thrown by its flames (round 10: the whispers are gone)
+ *    cauldron set down in front of the user (round 10, in place of the play broom): a
+ *            small bubbling cauldron that stands for `standsFor` seconds as a ground
+ *            object ANY player may drink from; the drinker glows green with bubbles
+ *            rising off them for `duration` (seasonal/toy_cauldron.ts)
  *  The lantern and the candle carry their spot on the aura (value2 = x, value3 = z), so
  *  every client, and a player who walks up later, draws them where they were set down. */
-export type GourdlightToyEffect = 'prank' | 'lantern' | 'bats' | 'candle' | 'broom';
+export type GourdlightToyEffect = 'prank' | 'lantern' | 'bats' | 'candle' | 'cauldron';
 export interface GourdlightToy {
   itemId: string;
   itemName: string;
@@ -134,12 +142,14 @@ export interface GourdlightToy {
   price: number;
   /** Reach in yards to the target (the prank only). */
   range?: number;
+  /** Seconds the placed object stands on the ground (the cauldron only). */
+  standsFor?: number;
 }
 export const PRANKERS_PUMPKIN_ID = 'prankers_pumpkin';
 export const WANDERWISP_LANTERN_ID = 'wanderwisp_lantern';
 export const STARTLED_BATS_ID = 'sack_of_startled_bats';
 export const MURMURWICK_CANDLE_ID = 'murmurwick_candle';
-export const PLAY_BROOM_ID = 'sparkbristle_play_broom';
+export const GURGLEGREEN_CAULDRON_ID = 'gurglegreen_cauldron';
 export const GOURDLIGHT_TOYS: readonly GourdlightToy[] = Object.freeze([
   {
     itemId: PRANKERS_PUMPKIN_ID,
@@ -179,13 +189,17 @@ export const GOURDLIGHT_TOYS: readonly GourdlightToy[] = Object.freeze([
     price: 5,
   },
   {
-    itemId: PLAY_BROOM_ID,
-    itemName: 'Sparkbristle Play Broom',
-    auraId: 'gourdlight_toy_play_broom',
-    effect: 'broom',
-    duration: 30,
-    cooldown: 60,
-    price: 4,
+    // Name checked against the major game wikis before it shipped (round 10, naming
+    // audit): "Gurglegreen" is a coined token with no hit in any game searched.
+    itemId: GURGLEGREEN_CAULDRON_ID,
+    itemName: 'Gurglegreen Cauldron',
+    // the DRINKER's look (the cauldron itself is a ground object, not an aura)
+    auraId: 'gourdlight_toy_gurglegreen',
+    effect: 'cauldron',
+    duration: 10,
+    cooldown: 120,
+    price: 5,
+    standsFor: 60,
   },
 ]);
 /** The spellfxAt ability tag a toy's cue carries (`<prefix><effect>`): the sim's

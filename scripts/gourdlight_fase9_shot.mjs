@@ -93,7 +93,7 @@ try {
   /** Take every toy look off (between shots) and clear the toys' cooldowns. */
   async function resetToys() {
     await ev(
-      `(()=>{const s=window.__game.sim;for(const e of s.entities.values()){if(e.kind!=='player')continue;e.auras=e.auras.filter(a=>!a.id.startsWith('gourdlight_toy_'));}for(const id of ['prankers_pumpkin','wanderwisp_lantern','sack_of_startled_bats','murmurwick_candle','sparkbristle_play_broom'])s.player.cooldowns.delete(id);})()`,
+      `(()=>{const s=window.__game.sim;for(const e of s.entities.values()){if(e.kind!=='player')continue;e.auras=e.auras.filter(a=>!a.id.startsWith('gourdlight_toy_'));}for(const id of ['prankers_pumpkin','wanderwisp_lantern','sack_of_startled_bats','murmurwick_candle','gurglegreen_cauldron'])s.player.cooldowns.delete(id);})()`,
     );
   }
   const use = (id) => ev(`window.__game.sim.useItem(${JSON.stringify(id)})`);
@@ -108,7 +108,7 @@ try {
   await frames(10, 400);
   await curtainDown();
   await ev(
-    `(()=>{const s=window.__game.sim;for(const id of ['prankers_pumpkin','wanderwisp_lantern','sack_of_startled_bats','murmurwick_candle','sparkbristle_play_broom'])s.addItem(id,1);})()`,
+    `(()=>{const s=window.__game.sim;for(const id of ['prankers_pumpkin','wanderwisp_lantern','sack_of_startled_bats','murmurwick_candle','gurglegreen_cauldron'])s.addItem(id,1);})()`,
   );
 
   // Hester's shelf, the five toys after the Jar of Mischief
@@ -192,20 +192,7 @@ try {
     await frames(16, 250);
     await shot('fase9-candle');
   }
-
-  if (want('fase9-broom')) {
-    await resetToys();
-    await chat('/daynight dusk');
-    await stand(SX, SZ - 6, 0, 6.5, 0.22, 0.75);
-    await frames(6, 250);
-    await use('sparkbristle_play_broom');
-    // walk her north at a walking pace for a couple of seconds (the trail is left behind)
-    await ev(
-      `(()=>{const g=window.__game;const p=g.sim.player;let n=0;const t=setInterval(()=>{p.prevPos={...p.pos};p.pos.z+=0.12;p.pos.y=g.sim.groundPos(p.pos.x,p.pos.z).y;if(++n>110)clearInterval(t);},20);})()`,
-    );
-    await sleep(1700);
-    await shot('fase9-broom');
-  }
+  // (the play broom's shot retired with the toy in round 10: scripts/gourdlight_round10_shot.mjs)
 } finally {
   await browser.close();
 }

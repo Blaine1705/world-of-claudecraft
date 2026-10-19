@@ -41,8 +41,8 @@ const TOY_USE_KEYS: Readonly<Record<GourdlightToy['effect'], TranslationKey>> = 
   prank: 'seasonal.itemUse.toyPrank',
   lantern: 'seasonal.itemUse.toyLantern',
   bats: 'seasonal.itemUse.toyBats',
-  candle: 'seasonal.itemUse.toyCandle',
-  broom: 'seasonal.itemUse.toyBroom',
+  candle: 'seasonal.itemUse.toyCandleShadows',
+  cauldron: 'seasonal.itemUse.toyCauldron',
 };
 
 /** The use or purpose line for a seasonal item, or null for any other item. */
@@ -53,6 +53,7 @@ export function seasonalItemTooltipText(item: Pick<ItemDef, 'id'>): string | nul
       seconds: formatNumber(toy.duration),
       cooldown: formatNumber(toy.cooldown),
       range: formatNumber(toy.range ?? 0),
+      standing: formatNumber(toy.standsFor ?? 0),
     });
   }
   const costume = GOURDLIGHT_COSTUMES.find((c) => c.itemId === item.id);
@@ -64,7 +65,9 @@ export function seasonalItemTooltipText(item: Pick<ItemDef, 'id'>): string | nul
   if (writ) return t('seasonal.itemUse.titleWrit', { title: deedTitleText(writ.deedId) });
   switch (item.id) {
     case GOURDLIGHT_BROOM_ID:
-      return t('seasonal.itemUse.broom', { count: formatNumber(GOURDLIGHT_BROOM_SHEAVES) });
+      return t('seasonal.itemUse.broomSources', {
+        count: formatNumber(GOURDLIGHT_BROOM_SHEAVES),
+      });
     case GOURDLIGHT_SHEAF_ID:
       return t('seasonal.itemUse.sheaf', { count: formatNumber(GOURDLIGHT_BROOM_SHEAVES) });
     case CARVED_PUMPKIN_HEAD_ID:

@@ -4417,6 +4417,7 @@ export const zh_TW: EnTranslations = {
       "dodgeReduce": "閃避機率降低 {pct}%",
       "damageReduction": "受到的所有傷害降低 {pct}%",
       "slumber": "沉睡至黎明。無法被攻擊，任何人都無法將其喚醒。",
+      "slumberNight": "毫無生氣地掛在木樁上，直到夜幕降臨。無法被攻擊。",
       "guardianWard": "下一次敵人的致命攻擊會改為將你的生命值恢復至 {pct}%",
       "armorFlat": "護甲降低 {value}",
       "armorFlatStacks": "護甲降低 {value}（{stacks} 層）",
@@ -4495,7 +4496,8 @@ export const zh_TW: EnTranslations = {
     "worldBoss": {
       "spawn": "{name}在{zone}上空崛起！",
       "wake": "{name}在{zone}上空甦醒！",
-      "sleep": "{name}沉睡至黎明。"
+      "sleep": "{name}沉睡至黎明。",
+      "sleepUntilNightfall": "{name}沉睡至夜幕降臨。"
     },
     "auth": {
       "appleLoginCta": "透過 Apple 繼續",
@@ -7770,18 +7772,19 @@ export const zh_TW: EnTranslations = {
       "toyPrank": "使用：丟向{range}碼內另一名可見的玩家。對方的頭會變成發光的南瓜燈，持續{seconds}秒，對方可以右鍵點擊取下。你們雙方都不能處於戰鬥中，你也不能處於潛行狀態。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後會從背包中消失。僅外觀。",
       "toyLantern": "使用：把燈籠放在你面前。一個小幽靈會繞著你飄{seconds}秒。戰鬥中或潛行時無法使用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後會從背包中消失。僅外觀。",
       "toyBats": "使用：打開袋子。一群吱吱叫的蝙蝠衝出來，在你周圍四散飛舞{seconds}秒。戰鬥中或潛行時無法使用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後會從背包中消失。僅外觀。",
-      "toyCandle": "使用：在你面前點燃蠟燭。{seconds}秒內，附近的所有人都會聽到輕聲低語和笑聲，一層低低的綠霧在周圍蔓延。戰鬥中或潛行時無法使用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後會從背包中消失。僅外觀。",
-      "toyBroom": "使用：拿著掃帚邊走邊掃。{seconds}秒內，你走過的地方會留下一串橙色火花。戰鬥中或潛行時無法使用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後會從背包中消失。僅外觀。",
+      "toyCandleShadows": "使用：在你面前點燃蠟燭。{seconds}秒內，燭火會在周圍地面上投下貓、蝙蝠和女巫的舞動影子，附近所有人都能看到。戰鬥中或潛行時無法使用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後從背包中消失。僅外觀。",
+      "toyCauldron": "使用：在你面前放下一口咕嘟冒泡的小坩堝。它會存在{standing}秒，任何喝下的玩家都會在{seconds}秒內發出綠光，身上冒出上升的氣泡。戰鬥中或潛行時無法放置或飲用。不會消耗：{cooldown}秒後可再次使用。僅限南瓜燈之夜期間，活動結束後從背包中消失。僅外觀。",
       "titleWrit": "使用：為這個角色獲得頭銜{title}，可在功績之書中佩戴。使用後消耗。僅限南瓜燈之夜期間。如果你已擁有該頭銜，令狀會保留。",
-      "broom": "從赫絲特·葫蘆芯處用{count}個餘燼編織草束購買。騎乘需要騎術技能。它只在南瓜燈之夜期間存在，活動結束時會化為稻草。",
+      "broomSources": "向赫絲特·葫蘆芯用{count}個草束購買，或在你拾取老稻草獰笑戰利品的當天極少數情況下由其掉落。騎乘需要騎術技能。僅在南瓜燈之夜期間存在，結束時會化為稻草。",
       "sheaf": "每天拾取老稻草獰笑的戰利品時獲得一個，直到你擁有餘燼鬃毛掃帚為止。赫絲特·葫蘆芯在東溪、芬橋和高望的攤位用{count}個交換掃帚。南瓜燈之夜結束時會化為稻草。"
     },
     "toy": {
       "prank": "你扔出南瓜，啪地砸在了{name}身上！",
       "lantern": "你放下提燈，一個小幽靈飄了出來陪著你。",
       "bats": "你打開袋子，一群受驚的蝙蝠衝了出來！",
-      "candle": "你點燃了蠟燭。黑暗中有什麼東西開始低語。",
-      "broom": "你開始掃地，火花從鬃毛間飛濺出來。",
+      "candleShadows": "你點燃了蠟燭，影子開始在燭火周圍起舞。",
+      "cauldron": "你放下坩堝，它開始咕嘟冒泡。",
+      "cauldronDrink": "你喝了一口坩堝裡的東西，渾身冒著泡泛起綠光！",
       "pranked": "{name}把一個南瓜砸在了你頭上！右鍵點擊取下，或者驕傲地戴著吧。",
       "prankedFlash": "被{name}捉弄了！",
       "prankNeedsPlayer": "南瓜只能砸向另一名不在戰鬥中的玩家。",
@@ -23098,8 +23101,8 @@ export const zh_TW: EnTranslations = {
       "murmurwick_candle": {
         "name": "低語燭芯蠟燭"
       },
-      "sparkbristle_play_broom": {
-        "name": "火花鬃玩具掃帚"
+      "gurglegreen_cauldron": {
+        "name": "咕嘟綠坩堝"
       },
       "thatchgrin_patch_pumpkin": {
         "name": "南瓜田的南瓜"
