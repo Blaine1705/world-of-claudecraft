@@ -26,7 +26,7 @@ import {
 import { PAINTED_MODELS, paintedTownBuilding } from './models';
 import type { PaintedTownLayout } from './types';
 
-const LOOK = 'default' as const; // becomes 'pantile' when the pantile bake lands
+const LOOK = 'pantile' as const;
 
 // The models face local -Z (rotation PI turns the door north, +z; PI / 2
 // east, -x; -PI / 2 west, +x: this world's east is -x).
