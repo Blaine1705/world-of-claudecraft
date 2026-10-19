@@ -1,5 +1,7 @@
-// A single immutable vault projection, streamed only as the socket drains.
+// One revision-pinned live vault read, streamed only as the socket drains.
 // No whole-vault JSON string, parallel transfer queue, or storage size limit.
+
+import type { VaultInfoRead } from '../src/sim/materials_vault';
 import {
   VAULT_TRANSFER_FRAME_BYTES,
   VAULT_TRANSFER_SOFT_BACKLOG_BYTES,
@@ -9,6 +11,7 @@ import {
   type VaultTransferChunk,
   type VaultTransferToken,
 } from '../src/vault_transfer_protocol';
+import { VaultTransferTree } from '../src/vault_transfer_tree';
 import type { VaultInfo } from '../src/world_api';
 
 function* textTokens(kind: 4 | 5, text: string): Generator<VaultTransferToken> {
@@ -24,7 +27,7 @@ function* textTokens(kind: 4 | 5, text: string): Generator<VaultTransferToken> {
   }
 }
 
-function* tokens(value: unknown): Generator<VaultTransferToken> {
+function* tokens(value: unknown, omitSlot = false, root = false): Generator<VaultTransferToken> {
   if (typeof value === 'string') yield* textTokens(5, value);
   else if (value === null || typeof value === 'number' || typeof value === 'boolean') {
     yield [6, value];
@@ -35,11 +38,15 @@ function* tokens(value: unknown): Generator<VaultTransferToken> {
   } else if (value && typeof value === 'object') {
     yield [0];
     for (const key in value) {
-      if (!Object.hasOwn(value, key)) continue;
+      if (!Object.hasOwn(value, key) || (omitSlot && key === 'slot')) continue;
       const entry = (value as Record<string, unknown>)[key];
       if (entry === undefined) continue; // JSON's omitted optional fields
       yield* textTokens(4, key);
-      yield* tokens(entry);
+      if (root && key === 'special' && Array.isArray(entry)) {
+        yield [2];
+        for (const row of entry) yield* tokens(row, true);
+        yield [3];
+      } else yield* tokens(entry);
     }
     yield [1];
   } else throw new Error('Invalid vault projection value');
@@ -53,9 +60,9 @@ export class VaultTransferSender {
 
   constructor(
     readonly id: number,
-    readonly info: VaultInfo,
+    readonly info: VaultInfoRead['value'],
   ) {
-    this.iterator = tokens(info);
+    this.iterator = tokens(info, false, true);
   }
 
   peek(): VaultTransferChunk {
@@ -83,6 +90,16 @@ export class VaultTransferSender {
     return this.prepared;
   }
 
+  boundedSmallInfo(): VaultInfo {
+    const chunk = this.peek();
+    if (!chunk.done || chunk.cursor !== 0) throw new Error('Vault is not a bounded single batch');
+    const tree = new VaultTransferTree();
+    for (const token of chunk.tokens)
+      if (!tree.consume(token)) throw new Error('Invalid vault projection grammar');
+    if (!tree.complete) throw new Error('Incomplete vault projection');
+    return tree.value as VaultInfo;
+  }
+
   // Called only after emit accepted the chunk. A throwing emitter retries the
   // same cursor and bytes instead of skipping data or stamping the revision.
   accept(): void {
@@ -105,7 +122,7 @@ export interface VaultTransferSession {
   lastVaultWireRev: number | null;
   vaultTransferSocket?: unknown;
   nextVaultTransferId?: number;
-  vaultTransfer?: { sender: VaultTransferSender; pid: number; rev: number };
+  vaultTransfer?: { sender: VaultTransferSender; read: VaultInfoRead; pid: number; rev: number };
 }
 
 export function emitPacedVaultProjection(
@@ -113,7 +130,7 @@ export function emitPacedVaultProjection(
   session: VaultTransferSession,
   pid: number,
   rev: number | null,
-  project: () => VaultInfo | null,
+  project: () => VaultInfoRead | null,
 ): void {
   if (session.vaultTransferSocket !== session.ws) {
     delete session.vaultTransfer;
@@ -128,27 +145,33 @@ export function emitPacedVaultProjection(
     delete session.vaultTransfer;
   } else {
     let pending = session.vaultTransfer;
-    if (changed || (session.lastSent.vault === undefined && !pending)) {
-      if (!pending || pending.pid !== pid || pending.rev !== rev) {
-        // Cancel an obsolete immutable projection before taking the new one.
-        delete session.vaultTransfer;
-        const info = project();
-        if (info === null) emit('vault', null);
-        else {
-          const id = (session.nextVaultTransferId ?? 0) + 1;
-          if (!Number.isSafeInteger(id)) throw new Error('Vault transfer id overflow');
-          session.nextVaultTransferId = id;
-          pending = { sender: new VaultTransferSender(id, info), pid, rev };
-          session.vaultTransfer = pending;
-        }
+    if (pending && (pending.pid !== pid || pending.rev !== rev || !pending.read.isCurrent())) {
+      delete session.vaultTransfer;
+      session.lastVaultWireRev = null; // Re-arm even if identity changed without a numeric bump.
+      pending = undefined;
+    }
+    // Do not bootstrap, enumerate, clone, tokenize or stamp a pending revision
+    // while the actual socket backlog is above the soft transfer budget.
+    if (!vaultTransferCanSend(session.ws)) return;
+    if (
+      !pending &&
+      (changed || session.lastVaultWireRev === null || session.lastSent.vault === undefined)
+    ) {
+      const read = project();
+      if (read === null || read.revision !== rev || !read.isCurrent()) emit('vault', null);
+      else {
+        const id = (session.nextVaultTransferId ?? 0) + 1;
+        if (!Number.isSafeInteger(id)) throw new Error('Vault transfer id overflow');
+        session.nextVaultTransferId = id;
+        pending = { sender: new VaultTransferSender(id, read.value), read, pid, rev };
+        session.vaultTransfer = pending;
       }
     }
-    pending = session.vaultTransfer;
-    if (pending && vaultTransferCanSend(session.ws)) {
+    if (pending) {
       const chunk = pending.sender.peek();
-      // Preserve ordinary small-vault wire records and their by-reference
-      // decode. A completed first bounded token batch proves this is small.
-      emit('vault', chunk.done && chunk.cursor === 0 ? pending.sender.info : chunk);
+      // Only a completed first bounded batch is materialized as an ordinary
+      // small record. Large reads never construct a detached server tree.
+      emit('vault', chunk.done && chunk.cursor === 0 ? pending.sender.boundedSmallInfo() : chunk);
       pending.sender.accept();
       if (chunk.done) delete session.vaultTransfer;
     }

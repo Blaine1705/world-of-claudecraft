@@ -33,7 +33,7 @@ import {
   VaultTransferReceiver,
 } from '../src/net/vault_transfer_receiver';
 import { materialItemIds } from '../src/sim/material_ids';
-import { sanitizeVaultState, vaultInfoFor } from '../src/sim/materials_vault';
+import { sanitizeVaultState, vaultInfoFor, vaultInfoReadFor } from '../src/sim/materials_vault';
 import type { SimContext } from '../src/sim/sim_context';
 import {
   VAULT_TRANSFER_DEPTH,
@@ -108,7 +108,145 @@ function packet(tokens: VaultTransferToken[], overrides: Partial<VaultTransferCh
 const projection = maximalProjection();
 const original = JSON.stringify({ t: 'snap', self: { vault: projection } });
 
+function liveFixture(info: VaultInfo) {
+  const meta = { vault: sanitizeVaultState(info), vaultWireRev: 4 };
+  const player = { pos: { x: 0, y: 0, z: 0 } };
+  const banker = { kind: 'npc', pos: { x: 0, y: 0, z: 0 } };
+  const ctx = {
+    resolve: () => ({ meta, e: player }),
+    bankerIds: [2],
+    entities: new Map([[2, banker]]),
+    players: new Map([[1, meta]]),
+    storagePrices: { vaultUpgrades: Array(10).fill(0) },
+  } as unknown as SimContext;
+  return { ctx, meta, player, banker };
+}
+
 describe('bounded Materials Vault transport', () => {
+  it.each(['current-cap', 'one-oversized-legacy-row'])(
+    'bounds actual source reads at bootstrap and every eligible pass: %s',
+    (shape) => {
+      const info =
+        shape === 'current-cap'
+          ? projection
+          : {
+              ...SMALL,
+              special: [
+                {
+                  itemId: 'copper_ore',
+                  count: 20000,
+                  materialSources: Array.from({ length: 20000 }, (_, i) => ({
+                    source: {
+                      gatherer: { kind: 'character' as const, id: i + 1, name: 'Legacy' },
+                    },
+                    count: 1,
+                  })),
+                  slot: 9,
+                },
+              ],
+            };
+      const { ctx, meta } = liveFixture(info);
+      const expected = vaultInfoFor(ctx, 1);
+      let sourceReads = 0;
+      for (const row of meta.vault.special)
+        if (row.materialSources) {
+          row.materialSources = new Proxy(row.materialSources, {
+            get(target, key, receiver) {
+              if (typeof key === 'string' && /^\d+$/.test(key)) sourceReads++;
+              return Reflect.get(target, key, receiver);
+            },
+          });
+        }
+      const read = vaultInfoReadFor(ctx, 1);
+      expect(read?.value.special).toBe(meta.vault.special);
+      expect(sourceReads).toBe(0); // Bootstrap never clones even one source row.
+      const owner = session(VAULT_TRANSFER_SOFT_BACKLOG_BYTES + 1);
+      const client = bareClient(1, { vaultInfo: SMALL });
+      let builds = 0,
+        emissions = 0;
+      const sim = {
+        vaultInfoWireRevFor: () => meta.vaultWireRev,
+        vaultWireRevFor: () => meta.vaultWireRev,
+        craftVaultDrawBlockedFor: () => true,
+        craftVaultStockFor: () => null,
+        vaultInfoReadFor: () => {
+          builds++;
+          return vaultInfoReadFor(ctx, 1);
+        },
+      };
+      const emit = (key: 'vault' | 'cvault', value: unknown) => {
+        const encoded = JSON.stringify(value);
+        (owner.lastSent as Record<string, string>)[key] = encoded;
+        if (key === 'vault') {
+          emissions++;
+          applyBankSelfWire(client, { vault: JSON.parse(encoded) });
+        }
+      };
+      emitVaultSelfKeys(emit, sim, owner, 1);
+      expect(builds).toBe(0);
+      expect(sourceReads).toBe(0);
+      expect(emissions).toBe(0);
+      owner.ws.bufferedAmount = 0;
+      do {
+        const before = sourceReads;
+        emitVaultSelfKeys(emit, sim, owner, 1);
+        expect(sourceReads - before).toBeLessThanOrEqual(VAULT_TRANSFER_TOKEN_LIMIT + 1);
+        expect(sourceReads - before).toBeLessThan(shape === 'current-cap' ? 118000 : 20000);
+        if (owner.vaultTransfer) expect(client.vaultInfo).toBe(SMALL);
+      } while (owner.vaultTransfer);
+      expect(builds).toBe(1);
+      expect(emissions).toBeGreaterThan(1);
+      expect(client.vaultInfo).toEqual(expected);
+      const finishedReads = sourceReads;
+      emitVaultSelfKeys(emit, sim, owner, 1);
+      expect(sourceReads).toBe(finishedReads);
+      expect(builds).toBe(1);
+    },
+    30000,
+  );
+
+  it('discards pinned live data before consuming another source when revision, identity or proximity changes', () => {
+    const { ctx, meta, banker } = liveFixture(projection);
+    const owner = session();
+    const emitted: VaultTransferChunk[] = [];
+    const sim = {
+      vaultInfoWireRevFor: () => vaultInfoReadFor(ctx, 1)?.revision ?? null,
+      vaultWireRevFor: () => meta.vaultWireRev,
+      craftVaultDrawBlockedFor: () => true,
+      craftVaultStockFor: () => null,
+      vaultInfoReadFor: () => vaultInfoReadFor(ctx, 1),
+    };
+    const emit = (key: 'vault' | 'cvault', value: unknown) => {
+      (owner.lastSent as Record<string, string>)[key] = JSON.stringify(value);
+      if (key === 'vault' && value) emitted.push(value as VaultTransferChunk);
+    };
+    emitVaultSelfKeys(emit, sim, owner, 1);
+    const old = owner.vaultTransfer?.read;
+    expect(old?.isCurrent()).toBe(true);
+    meta.vaultWireRev++;
+    owner.ws.bufferedAmount = VAULT_TRANSFER_SOFT_BACKLOG_BYTES + 1;
+    emitVaultSelfKeys(emit, sim, owner, 1);
+    expect(old?.isCurrent()).toBe(false);
+    expect(owner.vaultTransfer).toBeUndefined();
+    expect(emitted).toHaveLength(1);
+    owner.ws.bufferedAmount = 0;
+    emitVaultSelfKeys(emit, sim, owner, 1);
+    expect(emitted[1].id).toBeGreaterThan(emitted[0].id);
+    expect(emitted[1].cursor).toBe(0);
+    const replaced = owner.vaultTransfer?.read;
+    meta.vault = sanitizeVaultState(SMALL);
+    expect(replaced?.isCurrent()).toBe(false);
+    owner.ws.bufferedAmount = VAULT_TRANSFER_SOFT_BACKLOG_BYTES + 1;
+    emitVaultSelfKeys(emit, sim, owner, 1);
+    expect(owner.vaultTransfer).toBeUndefined();
+    owner.ws.bufferedAmount = 0;
+    emitVaultSelfKeys(emit, sim, owner, 1);
+    expect(emitted.at(-1)).toEqual(SMALL); // Equal numeric revision still restarts.
+    banker.pos.x = 1000;
+    emitVaultSelfKeys(emit, sim, owner, 1);
+    expect(owner.vaultTransfer).toBeUndefined();
+  });
+
   it('adopts all 118000 source units atomically through actual owner emission and client mirror', () => {
     expect(Buffer.byteLength(original)).toBeGreaterThan(11_000_000);
     expect(decodeVaultInfoWire(projection)).not.toBeNull();
@@ -119,9 +257,9 @@ describe('bounded Materials Vault transport', () => {
       vaultInfoWireRevFor: () => 4,
       vaultWireRevFor: () => 4,
       craftVaultDrawBlockedFor: () => false,
-      vaultInfoFor: () => {
+      vaultInfoReadFor: () => {
         builds++;
-        return projection;
+        return { value: projection, revision: 4, isCurrent: () => true };
       },
       craftVaultStockFor: () => ({}),
     };
@@ -162,9 +300,9 @@ describe('bounded Materials Vault transport', () => {
       vaultInfoWireRevFor: () => 4,
       vaultWireRevFor: () => 4,
       craftVaultDrawBlockedFor: () => false,
-      vaultInfoFor: () => {
+      vaultInfoReadFor: () => {
         builds++;
-        return projection;
+        return { value: projection, revision: 4, isCurrent: () => true };
       },
       craftVaultStockFor: () => ({}),
     };
@@ -203,9 +341,9 @@ describe('bounded Materials Vault transport', () => {
       vaultInfoWireRevFor: () => rev,
       vaultWireRevFor: () => 4,
       craftVaultDrawBlockedFor: () => false,
-      vaultInfoFor: () => {
+      vaultInfoReadFor: () => {
         builds++;
-        return projection;
+        return { value: projection, revision: rev ?? 0, isCurrent: () => true };
       },
       craftVaultStockFor: () => ({}),
     };
@@ -226,6 +364,17 @@ describe('bounded Materials Vault transport', () => {
     emitVaultSelfKeys(emit, sim, owner, 2);
     expect(emitted.at(-1)).toBeNull();
     expect(owner.vaultTransfer).toBeUndefined();
+  });
+
+  it('omits only advisory special-row slot and retains nested instance slot data', () => {
+    const instance = { signer: 'Ana', slot: 42 };
+    const sender = new VaultTransferSender(1, {
+      ...SMALL,
+      special: [{ itemId: 'copper_ore', count: 1, slot: 9, instance }],
+    });
+    expect(sender.boundedSmallInfo().special).toEqual([
+      { itemId: 'copper_ore', count: 1, instance: { signer: 'Ana', slot: 42 } },
+    ]);
   });
 
   it('retries exactly the prepared chunk after an emitter failure', () => {
@@ -417,7 +566,14 @@ describe('vault transfer through real ws and application sendRaw', () => {
       const frame = JSON.parse(data.toString());
       applyVaultTransferWire(mirror, frame.self.vault);
     });
-    const sender = new VaultTransferSender(1, projection);
+    const { ctx, meta } = liveFixture(projection);
+    const sim = {
+      vaultInfoWireRevFor: () => meta.vaultWireRev,
+      vaultWireRevFor: () => meta.vaultWireRev,
+      craftVaultDrawBlockedFor: () => true,
+      craftVaultStockFor: () => null,
+      vaultInfoReadFor: () => vaultInfoReadFor(ctx, 1),
+    };
     // The controlled 50ms pause from the original failure reproduction.
     const receiverSocket = (client as unknown as { _socket: { pause(): void; resume(): void } })
       ._socket;
@@ -425,13 +581,21 @@ describe('vault transfer through real ws and application sendRaw', () => {
     let done = false;
     const sendNext = () => {
       if (done || peer.bufferedAmount > VAULT_TRANSFER_SOFT_BACKLOG_BYTES) return;
-      const chunk = sender.peek();
-      const payload = JSON.stringify({ t: 'snap', self: { vault: chunk } });
-      largestFrame = Math.max(largestFrame, Buffer.byteLength(payload));
-      app.sendRaw(owner, payload);
-      largestBacklog = Math.max(largestBacklog, peer.bufferedAmount);
-      sender.accept();
-      done = chunk.done;
+      emitVaultSelfKeys(
+        (key, value) => {
+          const serialized = JSON.stringify(value);
+          (owner.lastSent as Record<string, string>)[key] = serialized;
+          if (key !== 'vault') return;
+          const payload = `{"t":"snap","self":{"vault":${serialized}}}`;
+          largestFrame = Math.max(largestFrame, Buffer.byteLength(payload));
+          app.sendRaw(owner, payload);
+          largestBacklog = Math.max(largestBacklog, peer.bufferedAmount);
+          done = (value as VaultTransferChunk).done;
+        },
+        sim,
+        owner,
+        1,
+      );
     };
     sendNext();
     await new Promise((resolve) => setTimeout(resolve, 50));

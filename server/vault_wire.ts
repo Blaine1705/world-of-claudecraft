@@ -18,9 +18,9 @@ import { emitPacedVaultProjection, type VaultTransferSession } from './vault_tra
 //   moderator spectate the anchor is re-pointed at the spectated character,
 //   so a spectating moderator sees the SPECTATED player's vault in their own
 //   self block, exactly the posture bank and guildBank have. A cheap proximity
-//   + revision signature runs every snapshot; the full identity-preserving
-//   projection is cloned only when that signature changes or a fresh
-//   connection has no lastSent value.
+//   + revision signature runs every snapshot. A revision-pinned live read
+//   advances in bounded token batches only as its socket drains; no whole
+//   projection clone occurs on the server snapshot path.
 // - `cvault` (the craft-from-vault stock view, Bank Storage Phase 04) has the
 //   SAME owner-only self-block posture, but is gated on the craft-draw
 //   context predicate (src/sim/vault_craft_gate.ts) instead of banker
@@ -90,14 +90,14 @@ export interface VaultSim {
 }
 
 /** Narrow snapshot host: cheap revision/gate probes stay separate from the
- *  two potentially large boundary projections they guard. */
+ *  revision-pinned incremental vault read and the crafting projection. */
 export interface VaultSelfWireSim {
   vaultInfoWireRevFor(pid: number): number | null;
   vaultWireRevFor(pid: number): number | null;
   /** Gate-only probe (no projection clone): the cvault signature's second
    *  half beside the rev, a pure position/membership read. */
   craftVaultDrawBlockedFor(pid: number): boolean;
-  vaultInfoFor(pid: number): VaultInfo | null;
+  vaultInfoReadFor(pid: number): import('../src/sim/materials_vault').VaultInfoRead | null;
   craftVaultStockFor(pid: number): Record<string, number> | null;
 }
 
@@ -110,11 +110,9 @@ export interface VaultSelfWireSession extends VaultTransferSession {
   lastCvaultWireBlocked: boolean | null;
 }
 
-/** Emit the two owner-only vault self keys without rebuilding unchanged
- *  projections. Both signatures are probed every snapshot, so banker
- *  proximity flips (vault) and craft-gate flips (cvault) are immediate; the
- *  projections are cloned only when their signature moved or a fresh
- *  connection has no lastSent value. */
+/** Emit owner-only vault keys. Both cheap signatures are probed each pass;
+ * changed owner state starts a revision-pinned read only after backlog pacing.
+ * No source clone precedes the bounded token/UTF-8 batch. */
 export function emitVaultSelfKeys(
   emit: (key: 'vault' | 'cvault', value: unknown) => void,
   sim: VaultSelfWireSim,
@@ -122,7 +120,9 @@ export function emitVaultSelfKeys(
   anchorPid: number,
 ): void {
   const vaultRev = sim.vaultInfoWireRevFor(anchorPid);
-  emitPacedVaultProjection(emit, session, anchorPid, vaultRev, () => sim.vaultInfoFor(anchorPid));
+  emitPacedVaultProjection(emit, session, anchorPid, vaultRev, () =>
+    sim.vaultInfoReadFor(anchorPid),
+  );
 
   const cvaultRev = sim.vaultWireRevFor(anchorPid);
   const cvaultBlocked = sim.craftVaultDrawBlockedFor(anchorPid);

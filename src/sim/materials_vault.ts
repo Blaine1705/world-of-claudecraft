@@ -395,6 +395,9 @@ function applyVaultDeposit(
  *  spends. A charge-bearing or locked stack moves whole or not at all
  *  (vault_slot_ops.ts vaultRowMovesWhole); any other payload splits the way
  *  the bags already split it. */
+export type VaultDepositArgs =
+  Parameters<typeof vaultDeposit> extends [SimContext, ...infer Args] ? Args : never;
+
 export function vaultDeposit(
   ctx: SimContext,
   slotIndex: number,
@@ -1081,6 +1084,42 @@ export function vaultInfoWireRevFor(ctx: SimContext, pid: number): number | null
 /** Cheap ungated revision for the craft-from-vault wire. */
 export function vaultWireRevFor(ctx: SimContext, pid: number): number | null {
   return ctx.players.get(pid)?.vaultWireRev ?? null;
+}
+
+/** A synchronous read cursor may use these live references only while its pin
+ * remains current. No source/row copying or enumeration occurs at bootstrap. */
+type DeepReadonlyVault<T> = T extends readonly (infer Entry)[]
+  ? readonly DeepReadonlyVault<Entry>[]
+  : T extends object
+    ? { readonly [Key in keyof T]: DeepReadonlyVault<T[Key]> }
+    : T;
+
+export interface VaultInfoRead {
+  readonly value: DeepReadonlyVault<VaultInfo>;
+  readonly revision: number;
+  isCurrent(): boolean;
+}
+
+export function vaultInfoReadFor(ctx: SimContext, pid: number): VaultInfoRead | null {
+  const meta = vaultViewerFor(ctx, pid);
+  if (!meta) return null;
+  const vault = meta.vault;
+  const revision = meta.vaultWireRev;
+  return {
+    revision,
+    value: {
+      stock: vault.stock,
+      special: vault.special,
+      upgrades: vault.upgrades,
+      perMaterialCap: vaultCapacityPerMaterial(vault),
+      nextUpgradeCost:
+        vault.upgrades >= ctx.storagePrices.vaultUpgrades.length
+          ? null
+          : ctx.storagePrices.vaultUpgrades[vault.upgrades],
+    },
+    isCurrent: () =>
+      vaultViewerFor(ctx, pid) === meta && meta.vault === vault && meta.vaultWireRev === revision,
+  };
 }
 
 export function vaultInfoFor(ctx: SimContext, pid: number): VaultInfo | null {

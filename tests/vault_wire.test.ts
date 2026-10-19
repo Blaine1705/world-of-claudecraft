@@ -551,7 +551,8 @@ describe('materials vault wire round-trip', () => {
       count: 1,
       instance: { signer: `row-${index}` },
     }));
-    const build = vi.spyOn(server.sim, 'vaultInfoFor');
+    const build = vi.spyOn(server.sim, 'vaultInfoReadFor');
+    const fullClone = vi.spyOn(server.sim, 'vaultInfoFor');
 
     const client = bareClient(pid);
     const apply = client as unknown as { applySnapshot(snapshot: unknown): void };
@@ -565,6 +566,7 @@ describe('materials vault wire round-trip', () => {
       throw new Error('large vault transfer did not finish');
     };
     receiveCompleteVault();
+    expect(fullClone).not.toHaveBeenCalled();
     expect(client.vaultInfo?.special).toHaveLength(2_000);
     expect(build).toHaveBeenCalledTimes(1);
 
@@ -586,6 +588,7 @@ describe('materials vault wire round-trip', () => {
     banker.pos = { ...player.pos };
     fw.sent.length = 0;
     receiveCompleteVault();
+    expect(fullClone).not.toHaveBeenCalled();
     expect(client.vaultInfo?.special).toHaveLength(2_000);
     expect(build).toHaveBeenCalledTimes(2);
   });
@@ -2000,14 +2003,18 @@ describe('vault_wire module units', () => {
       vaultInfoWireRevFor: () => gatedRev,
       vaultWireRevFor: () => rawRev,
       craftVaultDrawBlockedFor: () => false,
-      vaultInfoFor: () => {
+      vaultInfoReadFor: () => {
         vaultBuilds++;
         return {
-          stock: { copper_ore: rawRev ?? 0 },
-          special: [],
-          upgrades: 1,
-          perMaterialCap: 100,
-          nextUpgradeCost: 40000,
+          revision: gatedRev ?? 0,
+          isCurrent: () => true,
+          value: {
+            stock: { copper_ore: rawRev ?? 0 },
+            special: [],
+            upgrades: 1,
+            perMaterialCap: 100,
+            nextUpgradeCost: 40000,
+          },
         };
       },
       craftVaultStockFor: () => {
@@ -2065,12 +2072,16 @@ describe('vault_wire module units', () => {
       vaultInfoWireRevFor: () => rev,
       vaultWireRevFor: () => rev,
       craftVaultDrawBlockedFor: () => blocked,
-      vaultInfoFor: () => ({
-        stock: {},
-        special: [],
-        upgrades: 1,
-        perMaterialCap: 100,
-        nextUpgradeCost: 40000,
+      vaultInfoReadFor: () => ({
+        revision: rev,
+        isCurrent: () => true,
+        value: {
+          stock: {},
+          special: [],
+          upgrades: 1,
+          perMaterialCap: 100,
+          nextUpgradeCost: 40000,
+        },
       }),
       craftVaultStockFor: () => {
         builds++;
@@ -2132,7 +2143,7 @@ describe('vault_wire module units', () => {
       vaultInfoWireRevFor: () => 8,
       vaultWireRevFor: () => 8,
       craftVaultDrawBlockedFor: () => false,
-      vaultInfoFor: () => null,
+      vaultInfoReadFor: () => null,
       craftVaultStockFor: () => ({ copper_ore: 8 }),
     };
     expect(() =>
