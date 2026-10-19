@@ -326,7 +326,7 @@ async function main() {
       const seenFar = await A.ev(
         `[...window.__game.world.entities.values()].some(e=>e.templateId==='gourdlight_thatchgrin')`,
       );
-      check('nobody is near him (he is out of A’s interest)', seenFar === false);
+      check('nobody is near him (he is out of the interest of A)', seenFar === false);
       await A.chat('/dev servertime day', 6000);
       await A.chat('/daynight day', 1000);
       await A.chat('/dev scarecrow', 600);

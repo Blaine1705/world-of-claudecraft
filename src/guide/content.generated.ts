@@ -6240,21 +6240,24 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Every Doorstep",
     "category": "feat",
     "renown": 0,
-    "feat": true
+    "feat": true,
+    "crest": "/ui/deeds/feat_gourdlight_doorsteps.webp"
   },
   {
     "id": "feat_gourdlight_errands",
     "name": "At Hester's Beck and Call",
     "category": "feat",
     "renown": 0,
-    "feat": true
+    "feat": true,
+    "crest": "/ui/deeds/feat_gourdlight_errands.webp"
   },
   {
     "id": "feat_gourdlight_frights",
     "name": "Three Towns Startled",
     "category": "feat",
     "renown": 0,
-    "feat": true
+    "feat": true,
+    "crest": "/ui/deeds/feat_gourdlight_frights.webp"
   },
   {
     "id": "feat_gourdlight_eve_complete",
@@ -6262,7 +6265,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "feat",
     "renown": 0,
     "feat": true,
-    "rewardTitle": "the Gourdsworn"
+    "rewardTitle": "the Gourdsworn",
+    "crest": "/ui/deeds/feat_gourdlight_eve_complete.webp"
   }
 ];
 
