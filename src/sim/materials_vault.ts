@@ -110,11 +110,9 @@ import {
   sameMaterialComposition,
 } from './vault_material_sources';
 import {
-  appliedVaultRowAdd,
   coalesceVaultRows,
   loadVaultSpecialRow,
-  planVaultDeposit,
-  planVaultRowAdd,
+  planVaultDepositMutation,
   planVaultRowWithdraw,
   vaultRowMovesWhole,
 } from './vault_slot_ops';
@@ -337,7 +335,7 @@ function applyVaultDeposit(
   pooled: number,
   selectedSources?: MaterialComposition,
 ): InvSlot | null {
-  const plan = planVaultDeposit(
+  const mutation = planVaultDepositMutation(
     vault.special,
     inventory[slotIndex],
     moved,
@@ -345,28 +343,9 @@ function applyVaultDeposit(
     vaultMaterialIds(),
     selectedSources,
   );
-  if (plan === null) return null;
+  if (mutation === null) return null;
+  const { plan, rows } = mutation;
   const itemId = inventory[slotIndex].itemId;
-  // Mergeable identity rows are packed at the VAULT's row size
-  // (vault_slot_ops.ts VAULT_ROW_STACK_SIZE), never the bag stack size: one
-  // material identity is one row however many units it holds. Whole-move
-  // payloads keep the item's normal fresh-row cap, so a tolerated over-cap
-  // locked stack splits into capped rows without allowing partial deposit.
-  // Both adds are decided on a copy before anything is written, so a refusal
-  // leaves the live store untouched; the packing core deep-clones every
-  // payload and composition it places, so the vault never aliases the removed
-  // carried row.
-  let rows: readonly InvSlot[] = vault.special;
-  if (plan.foldUnits > 0) {
-    const fold = planVaultRowAdd(rows, { itemId, count: plan.foldUnits }, vaultMaterialIds());
-    if (fold === null) return null;
-    rows = appliedVaultRowAdd(rows, fold);
-  }
-  if (plan.grant !== null) {
-    const grant = planVaultRowAdd(rows, plan.grant, vaultMaterialIds());
-    if (grant === null) return null;
-    rows = appliedVaultRowAdd(rows, grant);
-  }
   // A plain assignment is safe here (unlike the load path's fromEntries)
   // because the id passed the content-derived material set, which contains no
   // '__proto__'.

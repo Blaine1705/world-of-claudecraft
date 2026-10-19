@@ -287,6 +287,10 @@ describe('actual vault command facts equal the old complete-book oracle', () => 
     const touched = new Set(meta.inventory.map((slot) => slot.itemId));
     const sweep = run('vault_deposit_all', {}, touched);
     expect(sweep.rows).toBe(112);
+    // Every affected stored bucket is validated once, without reparsing it for
+    // routing, compatibility or the final merge. No unrelated buckets are read.
+    expect(sweep.reads.size).toBe(112);
+    for (const count of sweep.reads.values()) expect(count).toBe(999);
     expect(meta.inventory).toEqual([]);
   }, 30000);
 
