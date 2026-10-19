@@ -293,16 +293,17 @@ describe('the persisted stamp is the whole gate against a second payout', () => 
   });
 });
 
-describe('heroic credit overflow preserves claim gates', () => {
-  it('refuses every participant payout before any lockout, daily marker or mail changes', () => {
-    const { sim, leader, away, anchor, boss } = heroicRig();
+describe('heroic credit overflow settles claim gates', () => {
+  it('defers a full recipient while settling every participant lockout and daily marker', () => {
+    const { sim, leader, away, anchor, inst, boss } = heroicRig();
     metaOf(sim, leader).heroicMarks = Number.MAX_SAFE_INTEGER;
-    const before = [leader, away, anchor].map((pid) => sim.serializeCharacter(pid));
-    const mail = sim.postOffice.serializeMail();
-    sim.drainEvents();
-    expect(() => awardHeroicMarks(sim.ctx, boss, [metaOf(sim, leader)])).toThrow(/overflow/);
-    expect([leader, away, anchor].map((pid) => sim.serializeCharacter(pid))).toEqual(before);
-    expect(sim.postOffice.serializeMail()).toEqual(mail);
-    expect(sim.drainEvents()).toEqual([]);
+    awardHeroicMarks(sim.ctx, boss, [metaOf(sim, leader)]);
+    expect(metaOf(sim, leader).heroicMarks).toBe(Number.MAX_SAFE_INTEGER);
+    for (const pid of [leader, away, anchor]) {
+      expect(metaOf(sim, pid).raidLockouts.get(LOCK_ID)).toBeGreaterThan(0);
+      expect(metaOf(sim, pid).heroicDaily.marked.has(DUNGEON)).toBe(true);
+      expect(inst.clearedBy.has(pid)).toBe(true);
+      expect(markLetters(sim, metaOf(sim, pid).name)).toHaveLength(1);
+    }
   });
 });

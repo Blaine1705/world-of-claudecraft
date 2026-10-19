@@ -81,12 +81,12 @@ describe('Heroic Marks reject overflowing credits without losing their carriers'
     },
   );
 
-  it('preflights a live hoard parcel before guest allowance, items, copper or receipts', () => {
+  it('defers overflowing earned hoard marks while preserving the rest of the parcel', () => {
     const { sim, pid, meta } = rig();
     meta.heroicMarks = MAX - 1;
-    const before = sim.serializeCharacter(pid);
+    const copper = meta.copper;
     sim.drainEvents();
-    expect(() =>
+    expect(
       grantHoardReward(
         sim.ctx,
         pid,
@@ -101,9 +101,18 @@ describe('Heroic Marks reject overflowing credits without losing their carriers'
         },
         false,
       ),
-    ).toThrow(/overflow/);
-    expect(sim.serializeCharacter(pid)).toEqual(before);
-    expect(sim.drainEvents()).toEqual([]);
+    ).toBe(true);
+    expect(meta.heroicMarks).toBe(MAX - 1);
+    expect(sim.countItem('thorium_ore', pid)).toBe(3);
+    expect(meta.copper).toBe(copper + 42);
+    expect(meta.vaultGuestPayouts).toBe(1);
+    expect(meta.clueCasketsOpened).toBe(1);
+    expect(
+      sim.serializeMail().mail.find((m) => m.letterId === 'heroic_marks_reward')?.items,
+    ).toEqual([{ itemId: MARK, count: 2 }]);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'treasureVaultLooted' }),
+    );
   });
 
   it('preflights the sum of offline claim credits before any state mutation', () => {

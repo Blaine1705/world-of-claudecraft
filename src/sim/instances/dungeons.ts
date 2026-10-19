@@ -1,4 +1,3 @@
-import { assertHeroicMarksGrantsFit } from '../heroic_marks';
 // Dungeons: party-instanced elite content (the Hollow Crypt and friends).
 //
 // Session I1 MOVES this slice verbatim out of the `Sim` monolith behind the
@@ -29,6 +28,7 @@ import {
   MOBS,
   NPCS,
 } from '../data';
+import { grantEarnedHeroicMarks } from '../earned_heroic_marks';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
@@ -1416,7 +1416,8 @@ export function claimedInstanceForMob(ctx: SimContext, mobId: number): InstanceS
 // the reward for anyone who actually ran the dungeon. A recipient already locked
 // for this reset is not paid again. Delivery splits on presence at the corpse: a
 // player in the death-time participation snapshot takes the marks straight to
-// bags (same-claim raid members, including distant back-line players and
+// the balance when they fit, otherwise to reward mail (same-claim raid members,
+// including distant back-line players and
 // released ghosts, are widened into that snapshot), while one locked outside
 // that snapshot who still walked through the door this run has them posted to
 // the Ravenpost so a lockout never outruns the reward. A member who never
@@ -1476,19 +1477,6 @@ export function awardHeroicMarks(
   // the death snapshot and must receive the same lockout as their reward.
   for (const meta of recipients) lockoutRecipients.set(meta.entityId, meta);
 
-  // Validate every direct credit before any participant's claim gate is stamped.
-  for (const meta of lockoutRecipients.values()) {
-    if (
-      !isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId)) &&
-      credited &&
-      presentIds.has(meta.entityId)
-    ) {
-      assertHeroicMarksGrantsFit(meta, [
-        { itemId: HEROIC_MARK_CURRENCY_ID, count: tuning.marksPerParticipant },
-      ]);
-    }
-  }
-
   for (const meta of lockoutRecipients.values()) {
     const alreadyLocked = isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId));
     // THE GATE FIRST, then the pay. The mail arm below is the one DURABLE half
@@ -1508,7 +1496,7 @@ export function awardHeroicMarks(
     if (!alreadyLocked && credited) {
       let paid = false;
       if (presentIds.has(meta.entityId)) {
-        ctx.addItem(HEROIC_MARK_CURRENCY_ID, tuning.marksPerParticipant, meta.entityId);
+        grantEarnedHeroicMarks(ctx, meta.entityId, tuning.marksPerParticipant);
         paid = true;
       } else if (inst.enteredBy.has(meta.entityId)) {
         ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_CURRENCY_ID, tuning.marksPerParticipant);

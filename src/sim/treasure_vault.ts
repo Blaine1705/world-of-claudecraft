@@ -405,7 +405,8 @@ export function payTreasureVault(
   vault: NonNullable<RiftInstance['vault']>,
   participants: readonly number[],
   bossTemplateId: string | undefined,
-): void {
+): boolean {
+  let paid = false;
   for (const pid of participants) {
     const meta = ctx.players.get(pid);
     const player = ctx.entities.get(pid);
@@ -425,8 +426,9 @@ export function payTreasureVault(
         (meta.vaultGuestPayouts ?? 0) >= VAULT_GUEST_PAYOUTS_PER_CYCLE,
       mountOwned: mountOwned(meta, VAULT_MOUNT_KEY),
     });
-    grantHoardReward(ctx, pid, vault.rarity, reward, owner);
+    paid = grantHoardReward(ctx, pid, vault.rarity, reward, owner) || paid;
   }
+  return paid;
 }
 
 // ---------------------------------------------------------------------------

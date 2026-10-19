@@ -29,13 +29,24 @@ export function sanitizeHeroicMarks(raw: unknown): number {
   return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(raw)));
 }
 
+/** A valid earned credit cannot fit the supported scalar balance. */
+export class HeroicMarksCapacityError extends RangeError {
+  constructor() {
+    super('heroic marks credit overflow');
+  }
+}
+
 /** Compute a credit before mutation. A representational limit never burns currency. */
 function creditedHeroicMarks(balance: number | undefined, count: number): number {
   const amount = Math.max(0, Math.floor(count));
   const current = sanitizeHeroicMarks(balance);
   if (!Number.isFinite(count)) throw new RangeError('heroic marks credit overflow');
   const next = current + amount;
-  if (!Number.isSafeInteger(amount) || !Number.isSafeInteger(next)) {
+  if (!Number.isSafeInteger(amount)) throw new RangeError('heroic marks credit overflow');
+  if (!Number.isSafeInteger(next)) {
+    if (balance === undefined || (Number.isSafeInteger(balance) && balance >= 0)) {
+      throw new HeroicMarksCapacityError();
+    }
     throw new RangeError('heroic marks credit overflow');
   }
   return next;
