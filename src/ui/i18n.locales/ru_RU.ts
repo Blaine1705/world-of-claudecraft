@@ -538,8 +538,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Добавьте это заклинание в группу, чтобы показать его кнопку.',
   'hudChrome.cooldownManager.notKnown': '{spell} (ещё не изучено)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Показывать только когда готово',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Показывать только пока активно',
   'hudChrome.cooldownManager.opacity': 'Прозрачность',
   'hudChrome.cooldownManager.orientation': 'Ориентация',
   'hudChrome.cooldownManager.otherSpells': 'Другие заклинания',
@@ -563,12 +561,34 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Перетащите заклинание в группу или выберите его, чтобы задать группу и оповещения. Кнопка следует за своим заклинанием, если оно меняется на другое, и загорается при этом.',
   'hudChrome.cooldownManager.trackedTitle': 'Отслеживаемые заклинания',
   'hudChrome.cooldownManager.vertical': 'Вертикально',
-  'hudChrome.cooldownManager.visAlways': 'Всегда видно',
   'hudChrome.cooldownManager.visCombat': 'В бою',
-  'hudChrome.cooldownManager.visHidden': 'Скрыто',
   'hudChrome.cooldownManager.visHiddenHint':
     'Скрытая группа по-прежнему проигрывает звуки и подсвечивает панель действий.',
-  'hudChrome.cooldownManager.visibility': 'Видимость',
+  'hudChrome.cooldownManager.auraActive': 'Активна',
+  'hudChrome.cooldownManager.auraMissing': 'Отсутствует',
+  'hudChrome.cooldownManager.auraShowWhen': 'Показывать кнопку, пока аура',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Подсвечивать при отсутствии',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Если не отмечено ни одно место, группа никогда не показывается и не воспроизводит звуки.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Если не отмечено ничего, кнопка не показывается, но звук по-прежнему играет.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Не готово значит на перезарядке или сейчас недоступно.',
+  'hudChrome.cooldownManager.placeHint':
+    'Подземелья включают данжи, рейды, вылазки, разломы, поля боя, арену и другие инстансы. Вне отмеченных мест группа скрыта и молчит.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Кнопка ярче, с обводкой и пульсирует, пока ауры нет.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Напоминание о баффе: кнопка светится, пока этой ауры нет, и исчезает, когда она появляется.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Звучит, когда аура спадает.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Показывать кнопку, когда',
+  'hudChrome.cooldownManager.showIn': 'Показывать в',
+  'hudChrome.cooldownManager.showInInstances': 'Подземелья',
+  'hudChrome.cooldownManager.showInWorld': 'Открытый мир',
+  'hudChrome.cooldownManager.showNotReady': 'Не готово',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Вне боя',
+  'hudChrome.cooldownManager.showReady': 'Готово',
+  'hudChrome.cooldownManager.showWhile': 'Показывать',
   'hudChrome.crafting.mobileStationTitle': '{station} {name}',
   'hudChrome.hill.contestNone': 'Чтобы захватить холм, удерживайте большинство внутри {total}.',
   'hudChrome.hill.contestOther': 'Вы теряете холм: {seconds} из {total}',

@@ -483,8 +483,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Coloque este feitiço em um grupo para exibir seu botão.',
   'hudChrome.cooldownManager.notKnown': '{spell} (ainda não conhecido)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Mostrar Apenas Quando Pronto',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Mostrar Apenas Enquanto Ativo',
   'hudChrome.cooldownManager.opacity': 'Opacidade',
   'hudChrome.cooldownManager.orientation': 'Orientação',
   'hudChrome.cooldownManager.otherSpells': 'Outros Feitiços',
@@ -508,12 +506,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Arraste um feitiço até um grupo, ou selecione-o para escolher seu grupo e alertas. Um botão acompanha seu feitiço quando ele se transforma em outro, e se ilumina quando isso acontece.',
   'hudChrome.cooldownManager.trackedTitle': 'Feitiços Rastreados',
   'hudChrome.cooldownManager.vertical': 'Vertical',
-  'hudChrome.cooldownManager.visAlways': 'Sempre Visível',
   'hudChrome.cooldownManager.visCombat': 'Em Combate',
-  'hudChrome.cooldownManager.visHidden': 'Oculto',
   'hudChrome.cooldownManager.visHiddenHint':
     'Um grupo oculto ainda reproduz seus sons e ilumina sua barra de ação.',
-  'hudChrome.cooldownManager.visibility': 'Visibilidade',
   'hudChrome.crafting.mobileStationTitle': '{station} de {name}',
   'hudChrome.currencies.activities': 'Atividades',
   'hudChrome.currencies.delveMark': 'Marca de Incursão',

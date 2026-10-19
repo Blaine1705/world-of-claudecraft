@@ -468,8 +468,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Plaats deze spreuk in een groep om zijn knop weer te geven.',
   'hudChrome.cooldownManager.notKnown': '{spell} (nog niet bekend)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Alleen weergeven wanneer klaar',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Alleen weergeven terwijl actief',
   'hudChrome.cooldownManager.opacity': 'Dekking',
   'hudChrome.cooldownManager.orientation': 'Oriëntatie',
   'hudChrome.cooldownManager.otherSpells': 'Andere spreuken',
@@ -493,12 +491,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Sleep een spreuk naar een groep, of selecteer het om zijn groep en waarschuwingen te kiezen. Een knop volgt zijn spreuk wanneer het verandert in een ander, en verlicht wanneer het doet.',
   'hudChrome.cooldownManager.trackedTitle': 'Gevolgde spreuken',
   'hudChrome.cooldownManager.vertical': 'Verticaal',
-  'hudChrome.cooldownManager.visAlways': 'Altijd zichtbaar',
   'hudChrome.cooldownManager.visCombat': 'In gevecht',
-  'hudChrome.cooldownManager.visHidden': 'Verborgen',
   'hudChrome.cooldownManager.visHiddenHint':
     'Een verborgen groep speelt nog steeds geluiden af en verlicht je actiebalk.',
-  'hudChrome.cooldownManager.visibility': 'Zichtbaarheid',
   'hudChrome.crafting.mobileStationTitle': "{name}'s {station}",
   'hudChrome.currencies.activities': 'Activiteiten',
   'hudChrome.currencies.delveMark': 'Delve-embleem',

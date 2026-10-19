@@ -526,8 +526,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'このスペルをグループに入れるとボタンが表示されます。',
   'hudChrome.cooldownManager.notKnown': '{spell}（未習得）',
-  'hudChrome.cooldownManager.onlyWhenReady': '準備完了時のみ表示',
-  'hudChrome.cooldownManager.onlyWhileActive': '有効時のみ表示',
   'hudChrome.cooldownManager.opacity': '不透明度',
   'hudChrome.cooldownManager.orientation': '向き',
   'hudChrome.cooldownManager.otherSpells': 'その他のスペル',
@@ -551,12 +549,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'スペルをグループへドラッグするか、選択してグループと通知を設定します。ボタンはスペルが別のものに変わるとそれに追従し、変わった際には光ります。',
   'hudChrome.cooldownManager.trackedTitle': '追跡中のスペル',
   'hudChrome.cooldownManager.vertical': '縦',
-  'hudChrome.cooldownManager.visAlways': '常に表示',
   'hudChrome.cooldownManager.visCombat': '戦闘中',
-  'hudChrome.cooldownManager.visHidden': '非表示',
   'hudChrome.cooldownManager.visHiddenHint':
     '非表示のグループでも、音は再生され、アクションバーは光ります。',
-  'hudChrome.cooldownManager.visibility': '表示設定',
+  'hudChrome.cooldownManager.auraActive': '発動中',
+  'hudChrome.cooldownManager.auraMissing': '未発動',
+  'hudChrome.cooldownManager.auraShowWhen': 'オーラがこの状態のときにボタンを表示',
+  'hudChrome.cooldownManager.glowWhileMissing': '未発動時に光らせる',
+  'hudChrome.cooldownManager.groupOffHint':
+    '場所が1つもチェックされていないと、このグループは表示されず、音も鳴りません。',
+  'hudChrome.cooldownManager.neverShownHint':
+    'どちらもチェックしていないとボタンは表示されませんが、音は鳴ります。',
+  'hudChrome.cooldownManager.notReadyHint':
+    '使用不可とは、クールダウン中か、今は使えない状態のことです。',
+  'hudChrome.cooldownManager.placeHint':
+    'インスタンスとはダンジョン、レイド、デルヴ、リフト、戦場、アリーナなど、インスタンス化されたすべての場所のことです。チェックしていない場所では、グループは非表示になり音も鳴りません。',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'オーラがないあいだ、ボタンを明るくし、縁取りして点滅させます。',
+  'hudChrome.cooldownManager.reminderHint':
+    'バフリマインダー: このオーラがないあいだボタンが光り、得ると消えます。',
+  'hudChrome.cooldownManager.reminderSoundHint': 'オーラが切れたときに鳴ります。',
+  'hudChrome.cooldownManager.showButtonWhen': 'ボタンを表示する条件',
+  'hudChrome.cooldownManager.showIn': '表示する場所',
+  'hudChrome.cooldownManager.showInInstances': 'インスタンス',
+  'hudChrome.cooldownManager.showInWorld': 'オープンワールド',
+  'hudChrome.cooldownManager.showNotReady': '使用不可',
+  'hudChrome.cooldownManager.showOutOfCombat': '非戦闘中',
+  'hudChrome.cooldownManager.showReady': '使用可能',
+  'hudChrome.cooldownManager.showWhile': '表示する状況',
   'hudChrome.crafting.mobileStationTitle': '{name}の{station}',
   'hudChrome.hill.contestNone': '{total}の間、内部で過半数を維持すると占拠できます',
   'hudChrome.hill.contestOther': '丘を失いつつあります：{seconds} / {total}',

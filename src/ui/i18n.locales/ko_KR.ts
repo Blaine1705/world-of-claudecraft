@@ -524,8 +524,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notDisplayed': '표시 안 함',
   'hudChrome.cooldownManager.notInGroupHint': '이 주문을 그룹에 넣으면 버튼이 표시됩니다.',
   'hudChrome.cooldownManager.notKnown': '{spell} (아직 배우지 않음)',
-  'hudChrome.cooldownManager.onlyWhenReady': '준비되었을 때만 표시',
-  'hudChrome.cooldownManager.onlyWhileActive': '활성화된 동안만 표시',
   'hudChrome.cooldownManager.opacity': '투명도',
   'hudChrome.cooldownManager.orientation': '방향',
   'hudChrome.cooldownManager.otherSpells': '다른 주문',
@@ -549,12 +547,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주문을 그룹 위로 드래그하거나 선택하여 그룹과 알림을 설정하세요. 주문이 다른 주문으로 바뀌면 버튼도 그 주문을 따라가며, 그럴 때 밝아집니다.',
   'hudChrome.cooldownManager.trackedTitle': '추적 중인 주문',
   'hudChrome.cooldownManager.vertical': '세로',
-  'hudChrome.cooldownManager.visAlways': '항상 표시',
   'hudChrome.cooldownManager.visCombat': '전투 중',
-  'hudChrome.cooldownManager.visHidden': '숨김',
   'hudChrome.cooldownManager.visHiddenHint':
     '숨겨진 그룹도 소리는 재생되고 행동 단축바는 밝아집니다.',
-  'hudChrome.cooldownManager.visibility': '표시 상태',
+  'hudChrome.cooldownManager.auraActive': '활성',
+  'hudChrome.cooldownManager.auraMissing': '없음',
+  'hudChrome.cooldownManager.auraShowWhen': '오라가 이 상태일 때 버튼 표시',
+  'hudChrome.cooldownManager.glowWhileMissing': '없을 때 빛내기',
+  'hudChrome.cooldownManager.groupOffHint':
+    '장소를 하나도 체크하지 않으면 이 그룹은 표시되지 않고 소리도 나지 않습니다.',
+  'hudChrome.cooldownManager.neverShownHint':
+    '둘 다 체크하지 않으면 버튼은 표시되지 않지만 소리는 계속 납니다.',
+  'hudChrome.cooldownManager.notReadyHint':
+    '준비 안 됨은 재사용 대기 중이거나 지금 사용할 수 없는 상태를 뜻합니다.',
+  'hudChrome.cooldownManager.placeHint':
+    '인스턴스는 던전, 공격대, 탐굴, 균열, 전장, 투기장 등 모든 인스턴스 지역을 말합니다. 체크하지 않은 장소에서는 그룹이 숨겨지고 소리도 나지 않습니다.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    '오라가 없는 동안 버튼을 밝게 하고 테두리를 두르며 깜박입니다.',
+  'hudChrome.cooldownManager.reminderHint':
+    '강화 효과 알림: 이 오라가 없는 동안 버튼이 빛나고, 얻으면 사라집니다.',
+  'hudChrome.cooldownManager.reminderSoundHint': '오라가 사라질 때 재생됩니다.',
+  'hudChrome.cooldownManager.showButtonWhen': '버튼 표시 조건',
+  'hudChrome.cooldownManager.showIn': '표시 장소',
+  'hudChrome.cooldownManager.showInInstances': '인스턴스',
+  'hudChrome.cooldownManager.showInWorld': '오픈 월드',
+  'hudChrome.cooldownManager.showNotReady': '준비 안 됨',
+  'hudChrome.cooldownManager.showOutOfCombat': '비전투 중',
+  'hudChrome.cooldownManager.showReady': '준비됨',
+  'hudChrome.cooldownManager.showWhile': '표시 상황',
   'hudChrome.crafting.mobileStationTitle': '{name}의 {station}',
   'hudChrome.hill.contestNone': '{total} 동안 다수를 유지하면 점령할 수 있습니다',
   'hudChrome.hill.contestOther': '언덕을 빼앗기는 중: {total} 중 {seconds}',

@@ -488,8 +488,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Metti questo incantesimo in un gruppo per mostrarne il pulsante.',
   'hudChrome.cooldownManager.notKnown': '{spell} (non ancora appreso)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Mostra solo quando pronto',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Mostra solo quando attivo',
   'hudChrome.cooldownManager.opacity': 'Opacità',
   'hudChrome.cooldownManager.orientation': 'Orientamento',
   'hudChrome.cooldownManager.otherSpells': 'Altri incantesimi',
@@ -513,12 +511,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Trascina un incantesimo su un gruppo, oppure selezionalo per sceglierne il gruppo e gli avvisi. Un pulsante segue il proprio incantesimo quando questo cambia in un altro, e si illumina quando lo fa.',
   'hudChrome.cooldownManager.trackedTitle': 'Incantesimi monitorati',
   'hudChrome.cooldownManager.vertical': 'Verticale',
-  'hudChrome.cooldownManager.visAlways': 'Sempre visibile',
   'hudChrome.cooldownManager.visCombat': 'In combattimento',
-  'hudChrome.cooldownManager.visHidden': 'Nascosta',
   'hudChrome.cooldownManager.visHiddenHint':
     'Un gruppo nascosto continua comunque a riprodurre i suoi suoni e a illuminare la tua barra delle azioni.',
-  'hudChrome.cooldownManager.visibility': 'Visibilità',
   'hudChrome.crafting.mobileStationTitle': '{station} di {name}',
   'hudChrome.currencies.activities': 'Attività',
   'hudChrome.currencies.delveMark': "Marchio dell'Incursione",

@@ -458,8 +458,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Put dette stavekast i en gruppe for at vise dets knap.',
   'hudChrome.cooldownManager.notKnown': '{spell} (ikke kendt endnu)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Kun vis når klart',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Kun vis mens aktiv',
   'hudChrome.cooldownManager.opacity': 'Opacity',
   'hudChrome.cooldownManager.orientation': 'Orientering',
   'hudChrome.cooldownManager.otherSpells': 'Andre stavekast',
@@ -483,12 +481,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Træk et stavekast til en gruppe, eller vælg det for at vælge dets gruppe og advarsler. En knap vises på skærmen når stavekastet har en nedkølingstid.',
   'hudChrome.cooldownManager.trackedTitle': 'Sporede stavekast',
   'hudChrome.cooldownManager.vertical': 'Lodret',
-  'hudChrome.cooldownManager.visAlways': 'Altid synlig',
   'hudChrome.cooldownManager.visCombat': 'I kamp',
-  'hudChrome.cooldownManager.visHidden': 'Skjult',
   'hudChrome.cooldownManager.visHiddenHint':
     'En skjult gruppe afspiller stadig sine lyde og lyser op på din handlingslinje.',
-  'hudChrome.cooldownManager.visibility': 'Synlighed',
   'hudChrome.crafting.mobileStationTitle': '{name}s {station}',
   'hudChrome.currencies.activities': 'Aktiviteter',
   'hudChrome.currencies.delveMark': 'Dykkermærke',
