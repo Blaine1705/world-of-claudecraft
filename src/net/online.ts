@@ -230,7 +230,7 @@ import {
 import { inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
-import { materialStorageTransferPayload } from './material_storage_command';
+import { bankSocketBagPayload, materialStorageTransferPayload } from './material_storage_command';
 import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
@@ -2311,6 +2311,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // Same idea for a corpse-harvest-info query issued just before the drop.
         this.worldInteractionRequests?.resetQuery();
         this.resetQuestWorldWireState();
+        applyBankSelfWire(this, { vault: null });
         this.onReconnected?.();
       }
       this.connected = true;
@@ -4642,8 +4643,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'bank_unlock_socket' });
   }
   bankSocketBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
-    if (target === undefined) this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket });
-    else this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket, slot: target.slotIndex });
+    this.cmd({ cmd: 'bank_socket_bag', ...bankSocketBagPayload(itemId, socket, target) });
   }
   bankUnsocketBag(socket: number): void {
     this.cmd({ cmd: 'bank_unsocket_bag', socket });

@@ -8,7 +8,8 @@ import { MAX_INSTANCE_STRING_LENGTH } from '../sim/item_instance_load';
 import type { BankBonusSource, BankInfo, GuildBankInfo, VaultInfo } from '../world_api';
 // isRecord is the ONE record predicate both snapshot wire decoders share (the
 // strict prototype-checking form; see its comment in vault_snapshot_wire.ts).
-import { decodeVaultInfoWire, isRecord, isWireBankSlot } from './vault_snapshot_wire';
+import { isRecord, isWireBankSlot } from './vault_snapshot_wire';
+import { applyVaultTransferWire, type VaultTransferMirror } from './vault_transfer_receiver';
 import { decodeWeeklyRewardInfo, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
 export { BANK_PURCHASED_SLOTS_MAX };
@@ -226,7 +227,7 @@ export function decodeBankPurchasedSlotsWire(value: unknown): number | null | un
 
 /** The four owner-only bank/vault mirrors ClientWorld keeps; the concrete
  *  ClientWorld satisfies this structurally. */
-export interface BankSelfMirrors {
+export interface BankSelfMirrors extends VaultTransferMirror {
   bankInfo: BankInfo | null;
   vaultInfo: VaultInfo | null;
   craftVaultStock: Record<string, number> | null;
@@ -255,7 +256,7 @@ export function applyBankSelfWire(
   // `vault`: malformed CLEARS to null, dropping the whole unsafe row rather
   // than rendering a partial or internally inconsistent snapshot (the one
   // deliberate divergence from the retain policy; see decodeVaultInfoWire).
-  if (s.vault !== undefined) target.vaultInfo = decodeVaultInfoWire(s.vault);
+  if (s.vault !== undefined) applyVaultTransferWire(target, s.vault);
   // `cvault`: malformed RETAINS the last valid mirror.
   if (s.cvault !== undefined) {
     const decoded = decodeCraftVaultStockWire(s.cvault);

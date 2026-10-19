@@ -1,4 +1,5 @@
 import { readMaterialSourceTransferWire } from './material_source_transfer_wire';
+import { emitPacedVaultProjection, type VaultTransferSession } from './vault_transfer';
 // Materials Vault wire glue: the vault command dispatch bodies and the cvault
 // snapshot cadence rule, extracted from server/game.ts behind narrow host
 // interfaces (the module-first seam: none of this needs GameServer's private
@@ -100,7 +101,7 @@ export interface VaultSelfWireSim {
   craftVaultStockFor(pid: number): Record<string, number> | null;
 }
 
-export interface VaultSelfWireSession {
+export interface VaultSelfWireSession extends VaultTransferSession {
   lastSent: Readonly<Record<string, string>>;
   lastVaultWirePid: number | null;
   lastVaultWireRev: number | null;
@@ -121,15 +122,7 @@ export function emitVaultSelfKeys(
   anchorPid: number,
 ): void {
   const vaultRev = sim.vaultInfoWireRevFor(anchorPid);
-  if (
-    session.lastSent.vault === undefined ||
-    anchorPid !== session.lastVaultWirePid ||
-    vaultRev !== session.lastVaultWireRev
-  ) {
-    emit('vault', vaultRev === null ? null : sim.vaultInfoFor(anchorPid));
-    session.lastVaultWirePid = anchorPid;
-    session.lastVaultWireRev = vaultRev;
-  }
+  emitPacedVaultProjection(emit, session, anchorPid, vaultRev, () => sim.vaultInfoFor(anchorPid));
 
   const cvaultRev = sim.vaultWireRevFor(anchorPid);
   const cvaultBlocked = sim.craftVaultDrawBlockedFor(anchorPid);

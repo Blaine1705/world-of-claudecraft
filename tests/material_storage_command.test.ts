@@ -16,6 +16,24 @@ const selection: MaterialSourceTransferSelection = {
 };
 
 describe('storage command source intent', () => {
+  it('preserves optional exact-copy bank bag socket selectors', () => {
+    const world = bareClient(1);
+    const send = vi.fn();
+    Object.assign(world, { cmd: send });
+    world.bankSocketBag('linen_bag');
+    expect(send).toHaveBeenLastCalledWith({
+      cmd: 'bank_socket_bag',
+      item: 'linen_bag',
+      socket: undefined,
+    });
+    world.bankSocketBag('linen_bag', 2, { slotIndex: 4 });
+    expect(send).toHaveBeenLastCalledWith({
+      cmd: 'bank_socket_bag',
+      item: 'linen_bag',
+      socket: 2,
+      slot: 4,
+    });
+  });
   it.each(routes)('%s preserves ordinary omission and exact selected intent', (method, cmd) => {
     const world = bareClient(1);
     const send = vi.fn();

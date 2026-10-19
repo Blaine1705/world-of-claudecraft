@@ -553,8 +553,19 @@ describe('materials vault wire round-trip', () => {
     }));
     const build = vi.spyOn(server.sim, 'vaultInfoFor');
 
-    broadcast(server);
-    expect(lastSnap(fw.sent).self.vault.special).toHaveLength(2_000);
+    const client = bareClient(pid);
+    const apply = client as unknown as { applySnapshot(snapshot: unknown): void };
+    const receiveCompleteVault = () => {
+      for (let pass = 0; pass < 100; pass++) {
+        broadcast(server);
+        apply.applySnapshot(lastSnap(fw.sent));
+        if (client.vaultInfo?.special.length === 2_000) return;
+        sim.tick();
+      }
+      throw new Error('large vault transfer did not finish');
+    };
+    receiveCompleteVault();
+    expect(client.vaultInfo?.special).toHaveLength(2_000);
     expect(build).toHaveBeenCalledTimes(1);
 
     for (let tick = 0; tick < 12; tick++) {
@@ -568,12 +579,14 @@ describe('materials vault wire round-trip', () => {
     fw.sent.length = 0;
     broadcast(server);
     expect(lastSnap(fw.sent).self.vault).toBeNull();
+    apply.applySnapshot(lastSnap(fw.sent));
+    expect(client.vaultInfo).toBeNull();
     expect(build).toHaveBeenCalledTimes(1); // closing needs no deep clone
 
     banker.pos = { ...player.pos };
     fw.sent.length = 0;
-    broadcast(server);
-    expect(lastSnap(fw.sent).self.vault.special).toHaveLength(2_000);
+    receiveCompleteVault();
+    expect(client.vaultInfo?.special).toHaveLength(2_000);
     expect(build).toHaveBeenCalledTimes(2);
   });
 
