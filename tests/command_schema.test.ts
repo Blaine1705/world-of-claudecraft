@@ -190,8 +190,9 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Weekly loot spec composes with Skull Bag in this release batch: 249/263/14.
 // PvP Resurrect adds pvp_resurrect to both sets (sent by
 // ClientWorld.pvpResurrect, dispatched beside resurrect_healer): 250/264/14.
-const EXPECTED_SEND_COUNT = 250;
-const EXPECTED_DISPATCH_COUNT = 264;
+// Allied Hearthstone adds one send and dispatch through the quest wire family.
+const EXPECTED_SEND_COUNT = 251;
+const EXPECTED_DISPATCH_COUNT = 265;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

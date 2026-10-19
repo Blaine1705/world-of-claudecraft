@@ -10,11 +10,13 @@ import type { FactionId } from './factions';
 import {
   freshFactionCurrencies,
   freshFactionReputation,
+  sanitizeAlliedHearthstoneAttunement,
   sanitizeFactionCurrencies,
   sanitizeFactionReputation,
 } from './factions';
 import { type PersonalGliderRecords, sanitizeGliderRecords } from './glider_personal_records';
 import type { PlayerMeta } from './sim';
+import type { SimContext } from './sim_context';
 import {
   sanitizeTreasureMap,
   sanitizeVaultAttempt,
@@ -27,6 +29,7 @@ import { WORLD_BOSSES } from './world_boss';
 import { sanitizeWorldQuestReplacements } from './world_quest_reroll';
 import {
   activeWorldQuestsForCycle,
+  canRerollWorldQuest,
   restoreWorldQuestClaims,
   sanitizeWorldQuestCycle,
   sanitizeWorldQuestProgress,
@@ -170,6 +173,9 @@ export function restoreWorldQuestState(
   meta.vaultAttemptDurable = true;
   meta.vaultGuestCycle = sanitizeWorldQuestCycle(saved?.vaultGuestCycle);
   meta.vaultGuestPayouts = sanitizeVaultGuestPayouts(saved?.vaultGuestPayouts);
+  // The faction-reward Allied Hearthstone keeps its bind across sessions (an
+  // unknown hub id restores unbound, so the next use in a hub binds afresh).
+  meta.alliedHearthstoneAttunement = sanitizeAlliedHearthstoneAttunement(saved?.alliedHearthstone);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
@@ -215,6 +221,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasVaultAttempt = meta.vaultAttempt !== null && meta.vaultAttempt !== undefined;
   const hasVaultAttemptSeq = meta.vaultAttemptSeq > 0;
   const hasVaultGuest = (meta.vaultGuestPayouts ?? 0) > 0 && !!meta.vaultGuestCycle;
+  const hearth = sanitizeAlliedHearthstoneAttunement(meta.alliedHearthstoneAttunement);
   if (
     !meta.worldQuestCycle &&
     meta.worldQuestLog.size === 0 &&
@@ -228,7 +235,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasTreasureMap &&
     !hasVaultAttempt &&
     !hasVaultAttemptSeq &&
-    !hasVaultGuest
+    !hasVaultGuest &&
+    !hearth
   ) {
     return weeklyPart;
   }
@@ -294,6 +302,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(hasVaultGuest
         ? { vaultGuestCycle: meta.vaultGuestCycle, vaultGuestPayouts: meta.vaultGuestPayouts }
         : {}),
+      ...(hearth ? { alliedHearthstone: hearth } : {}),
     },
     ...(factionsObj ? { factions: factionsObj } : {}),
     ...(currenciesObj ? { factionCurrencies: currenciesObj } : {}),
@@ -311,4 +320,17 @@ export function worldBossActive(
   if (entityId === null) return false;
   const entity = entities.get(entityId);
   return entity !== undefined && !entity.dead;
+}
+
+/** Resolve the coordinator's reroll read without owning player or rotation state. */
+export function canRerollWorldQuestForPlayer(
+  ctx: Pick<SimContext, 'entities' | 'currentWorldQuestRotation'>,
+  meta: PlayerMeta | undefined,
+  questId: string,
+): { canReroll: boolean; reason?: string } {
+  if (!meta) return { canReroll: false, reason: 'Player not found.' };
+  const player = ctx.entities.get(meta.entityId);
+  const level = player?.level ?? 20;
+  const cycle = meta.devWorldQuestCycle ?? ctx.currentWorldQuestRotation().cycle;
+  return canRerollWorldQuest(meta, questId, cycle, level);
 }

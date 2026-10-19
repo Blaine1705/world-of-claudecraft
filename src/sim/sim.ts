@@ -161,6 +161,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { attuneAlliedHearthstoneAtNpc } from './content/faction_rewards';
 import { farmCropTier } from './content/farm_crops';
 import {
   FARM_BED_IDS,
@@ -4650,8 +4651,11 @@ export class Sim {
   get factionCurrencies(): Readonly<Record<FactionId, number>> {
     return this.primary.factionCurrencies;
   }
-  get alliedHearthstoneAttunement(): FactionId | undefined {
-    return this.primary.alliedHearthstoneAttunement;
+  get alliedHearthstoneAttunement(): FactionId | null {
+    return this.primary.alliedHearthstoneAttunement ?? null;
+  }
+  attuneAlliedHearthstone(npcId: number, pid?: number): void {
+    attuneAlliedHearthstoneAtNpc(this.ctx, npcId, pid);
   }
   get worldQuestReplacements(): Readonly<Record<string, string>> {
     return this.primary.worldQuestReplacements;
@@ -4670,11 +4674,7 @@ export class Sim {
   }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
-    if (!meta) return { canReroll: false, reason: 'Player not found.' };
-    const player = this.entities.get(meta.entityId);
-    const level = player?.level ?? 20;
-    const cycle = meta.devWorldQuestCycle ?? this.ctx.currentWorldQuestRotation().cycle;
-    return worldQuestMod.canRerollWorldQuest(meta, questId, cycle, level);
+    return worldQuestState.canRerollWorldQuestForPlayer(this.ctx, meta, questId);
   }
   rerollWorldQuest(questId: string, pid?: number): boolean {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
