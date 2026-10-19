@@ -21928,4 +21928,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.toy.cauldronDrink': '大鍋の中身を飲むと、緑の泡に包まれてゴブリンの姿に変わった！',
   'hudChrome.worldBoss.sleepUntilNightfall': '{name}は日が暮れるまで眠っている。',
   'hudChrome.auraEffect.slumberNight': '日が暮れるまで、生気なく柱に吊るされている。攻撃できない。',
+  'seasonal.thatchgrin.poleBound': '柱縛り',
+  'seasonal.thatchgrin.wakeYell': '夜が畑に降りたぞ！ わしの畑を歩くのは誰だ？',
+  'seasonal.thatchgrin.sleepYell': '日が昇った。柱に戻って、また見張りだ。',
 };

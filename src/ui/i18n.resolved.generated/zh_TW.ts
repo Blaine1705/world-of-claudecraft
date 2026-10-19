@@ -7804,7 +7804,12 @@ export const zh_TW: EnTranslations = {
       "already": "{name}今天已經被嚇夠了。",
       "notOnErrand": "赫絲特今天沒讓你去嚇唬誰。"
     },
-    "tokenPrice": "{count}個{item}"
+    "tokenPrice": "{count}個{item}",
+    "thatchgrin": {
+      "poleBound": "縛於木樁",
+      "wakeYell": "夜幕降臨南瓜田！誰敢踏進我的田地？",
+      "sleepYell": "太陽出來了。回到木樁上，繼續看守。"
+    }
   },
   "dungeonGuide": {
     "drownedTemple": {

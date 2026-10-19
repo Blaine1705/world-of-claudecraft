@@ -7804,7 +7804,12 @@ export const ko_KR: EnTranslations = {
       "already": "{name}은(는) 오늘 이미 충분히 놀랐습니다.",
       "notOnErrand": "헤스터는 오늘 누구를 놀래 주라고 부탁하지 않았습니다."
     },
-    "tokenPrice": "{item} {count}개"
+    "tokenPrice": "{item} {count}개",
+    "thatchgrin": {
+      "poleBound": "기둥에 묶임",
+      "wakeYell": "밭에 밤이 내린다! 누가 내 밭을 걷느냐?",
+      "sleepYell": "해가 떴군. 기둥으로 돌아가 다시 지켜봐야지."
+    }
   },
   "dungeonGuide": {
     "drownedTemple": {

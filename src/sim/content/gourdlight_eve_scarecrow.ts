@@ -67,6 +67,14 @@ import {
 import { CROW_FEATHER_ID, GOURDLIGHT_DAILY_FEATHERS_QUEST_ID } from './gourdlight_eve_dailies';
 
 export const THATCHGRIN_ID = 'gourdlight_thatchgrin';
+/** His night-hours English (the slumber block below): the state's name on his pole by
+ *  day and the yells of his dusk wake and dawn climb. Exported so the client re-localizes
+ *  exactly these strings (src/ui/sim_i18n.ts, keys under seasonal.thatchgrin). */
+export const THATCHGRIN_SLUMBER = Object.freeze({
+  auraName: 'Pole-Bound',
+  wakeYell: 'NIGHT falls on the patch! Who walks in MY field?',
+  sleepYell: 'Sun is up. Back on the post, back to watching.',
+});
 export const GOURDLIGHT_CROW_ID = 'gourdlight_crow';
 export const STRAWLING_ID = 'gourdlight_strawling';
 
@@ -251,9 +259,9 @@ export const GOURDLIGHT_SCARECROW_MOBS: Record<string, MobTemplate> = {
     // back onto it. A fight running at dawn is fought to its end. The Foreman's slumber
     // inverted (awakeAt 'night'), so the sky and his pole agree on when night falls.
     slumber: {
-      auraName: 'Pole-Bound',
-      sleepYell: 'Sun is up. Back on the post, back to watching.',
-      wakeYell: 'NIGHT falls on the patch! Who walks in MY field?',
+      auraName: THATCHGRIN_SLUMBER.auraName,
+      sleepYell: THATCHGRIN_SLUMBER.sleepYell,
+      wakeYell: THATCHGRIN_SLUMBER.wakeYell,
       yellRange: 120,
       // his pole stands on his spawn point: he hangs on it exactly, facing his field
       bedRadius: 1.5,

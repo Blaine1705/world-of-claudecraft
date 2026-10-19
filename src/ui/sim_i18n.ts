@@ -18,7 +18,7 @@ import {
   GOURDLIGHT_TOYS,
   GOURDLIGHT_TRICKS,
 } from '../sim/content/gourdlight_eve';
-import { STRAWLING_GUISE } from '../sim/content/gourdlight_eve_scarecrow';
+import { STRAWLING_GUISE, THATCHGRIN_SLUMBER } from '../sim/content/gourdlight_eve_scarecrow';
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import {
   FACTION_IDS,
@@ -18686,6 +18686,7 @@ export function localizeSimAuraName(name: string): string | null {
   if (name === 'Carved Pumpkin Head') {
     return tEntity({ kind: 'item', id: CARVED_PUMPKIN_HEAD_ID, field: 'name' });
   }
+  if (name === THATCHGRIN_SLUMBER.auraName) return t('seasonal.thatchgrin.poleBound');
   if (name === 'Friendship') return t('referralCards.friendshipAura');
   if (name === 'Protective Charm') return t('referralCards.protectiveCharm');
   const key = AURA_NAME_KEY[name];
@@ -22468,6 +22469,14 @@ export function localizeSimText(text: string): string | null {
   return null;
 }
 
+/** Old Thatchgrin's night-hours yells (content/gourdlight_eve_scarecrow.ts
+ *  THATCHGRIN_SLUMBER), keyed under seasonal.thatchgrin. */
+function localizeSeasonalYell(text: string): string | null {
+  if (text === THATCHGRIN_SLUMBER.wakeYell) return t('seasonal.thatchgrin.wakeYell');
+  if (text === THATCHGRIN_SLUMBER.sleepYell) return t('seasonal.thatchgrin.sleepYell');
+  return null;
+}
+
 export function localizeAuthoredYellText(
   text: string,
   speakerKind?: EntityKind,
@@ -22475,6 +22484,7 @@ export function localizeAuthoredYellText(
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return text;
   return (
+    localizeSeasonalYell(text) ??
     localizeRiftBossYell(text) ??
     localizeWorldQuestFreightYell(text, getLanguage()) ??
     localizeSimText(text) ??

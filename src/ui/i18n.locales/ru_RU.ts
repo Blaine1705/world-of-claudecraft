@@ -22342,4 +22342,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.sleepUntilNightfall': '{name} спит до наступления ночи.',
   'hudChrome.auraEffect.slumberNight':
     'Безжизненно висит на шесте до наступления ночи. Атаковать нельзя.',
+  'seasonal.thatchgrin.poleBound': 'Привязан к шесту',
+  'seasonal.thatchgrin.wakeYell': 'НОЧЬ опускается на поле! Кто бродит по МОЕМУ полю?',
+  'seasonal.thatchgrin.sleepYell': 'Солнце встало. Обратно на шест, снова сторожить.',
 };

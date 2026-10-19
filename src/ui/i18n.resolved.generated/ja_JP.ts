@@ -7804,7 +7804,12 @@ export const ja_JP: EnTranslations = {
       "already": "{name}は今日はもう十分に驚かされた。",
       "notOnErrand": "今日はヘスターから誰かを驚かせる頼みを受けていない。"
     },
-    "tokenPrice": "{item} ×{count}"
+    "tokenPrice": "{item} ×{count}",
+    "thatchgrin": {
+      "poleBound": "柱縛り",
+      "wakeYell": "夜が畑に降りたぞ！ わしの畑を歩くのは誰だ？",
+      "sleepYell": "日が昇った。柱に戻って、また見張りだ。"
+    }
   },
   "dungeonGuide": {
     "drownedTemple": {

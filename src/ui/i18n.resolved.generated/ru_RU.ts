@@ -7804,7 +7804,12 @@ export const ru_RU: EnTranslations = {
       "already": "С {name} на сегодня испугов достаточно.",
       "notOnErrand": "Хестер сегодня не просила вас никого пугать."
     },
-    "tokenPrice": "{item}: {count}"
+    "tokenPrice": "{item}: {count}",
+    "thatchgrin": {
+      "poleBound": "Привязан к шесту",
+      "wakeYell": "НОЧЬ опускается на поле! Кто бродит по МОЕМУ полю?",
+      "sleepYell": "Солнце встало. Обратно на шест, снова сторожить."
+    }
   },
   "dungeonGuide": {
     "drownedTemple": {

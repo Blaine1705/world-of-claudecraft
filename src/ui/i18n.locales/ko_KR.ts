@@ -21927,4 +21927,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.sleepUntilNightfall': '{name}이(가) 해가 질 때까지 잠듭니다.',
   'hudChrome.auraEffect.slumberNight':
     '해가 질 때까지 기둥에 생기 없이 매달려 있습니다. 공격할 수 없습니다.',
+  'seasonal.thatchgrin.poleBound': '기둥에 묶임',
+  'seasonal.thatchgrin.wakeYell': '밭에 밤이 내린다! 누가 내 밭을 걷느냐?',
+  'seasonal.thatchgrin.sleepYell': '해가 떴군. 기둥으로 돌아가 다시 지켜봐야지.',
 };

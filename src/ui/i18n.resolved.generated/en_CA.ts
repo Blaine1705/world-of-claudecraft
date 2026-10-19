@@ -7804,7 +7804,12 @@ export const en_CA: EnTranslations = {
       "already": "{name} has had enough frights for one day.",
       "notOnErrand": "Hester has not asked you to frighten anyone today."
     },
-    "tokenPrice": "{count} {item}"
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Pole-Bound",
+      "wakeYell": "NIGHT falls on the patch! Who walks in MY field?",
+      "sleepYell": "Sun is up. Back on the post, back to watching."
+    }
   },
   "dungeonGuide": {
     "drownedTemple": {

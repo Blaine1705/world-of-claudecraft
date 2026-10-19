@@ -130,4 +130,13 @@ export const seasonalStrings = {
   },
   // The vendor row's token price: "{count} {item}" ({count} pre-formatted).
   tokenPrice: '{count} {item}',
+  // Old Thatchgrin keeps night hours (src/sim/mob/slumber.ts awakeAt 'night'): the name of
+  // the state he wears on his pole by day, and the two yells of his dusk wake and dawn
+  // climb (content/gourdlight_eve_scarecrow.ts THATCHGRIN_SLUMBER; re-localized from the
+  // sim's English by src/ui/sim_i18n.ts).
+  thatchgrin: {
+    poleBound: 'Pole-Bound',
+    wakeYell: 'NIGHT falls on the patch! Who walks in MY field?',
+    sleepYell: 'Sun is up. Back on the post, back to watching.',
+  },
 };

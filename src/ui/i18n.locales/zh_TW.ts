@@ -20879,4 +20879,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'seasonal.toy.cauldronDrink': '你喝了一口坩堝裡的東西，被綠色氣泡包圍，變成了一隻哥布林！',
   'hudChrome.worldBoss.sleepUntilNightfall': '{name}沉睡至夜幕降臨。',
   'hudChrome.auraEffect.slumberNight': '毫無生氣地掛在木樁上，直到夜幕降臨。無法被攻擊。',
+  'seasonal.thatchgrin.poleBound': '縛於木樁',
+  'seasonal.thatchgrin.wakeYell': '夜幕降臨南瓜田！誰敢踏進我的田地？',
+  'seasonal.thatchgrin.sleepYell': '太陽出來了。回到木樁上，繼續看守。',
 };

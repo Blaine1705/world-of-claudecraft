@@ -7804,7 +7804,12 @@ export const en_XA: EnTranslations = {
       "already": "[{name} ĥáš ĥáð éñóúĝĥ ƒŕíĝĥţš ƒóŕ óñé ðáý.]",
       "notOnErrand": "[Ĥéšţéŕ ĥáš ñóţ ášķéð ýóú ţó ƒŕíĝĥţéñ áñýóñé ţóðáý.]"
     },
-    "tokenPrice": "[{count} {item}]"
+    "tokenPrice": "[{count} {item}]",
+    "thatchgrin": {
+      "poleBound": "[Þóļé-Ɓóúñð]",
+      "wakeYell": "[ÑÍĜĤŢ ƒáļļš óñ ţĥé þáţçĥ! Ŵĥó ŵáļķš íñ ⱮÝ ƒíéļð?]",
+      "sleepYell": "[Šúñ íš úþ. Ɓáçķ óñ ţĥé þóšţ, ƀáçķ ţó ŵáţçĥíñĝ.]"
+    }
   },
   "dungeonGuide": {
     "drownedTemple": {

@@ -7804,7 +7804,12 @@ export const zh_CN: EnTranslations = {
       "already": "{name}今天已经被吓够了。",
       "notOnErrand": "赫丝特今天没让你去吓唬谁。"
     },
-    "tokenPrice": "{count}个{item}"
+    "tokenPrice": "{count}个{item}",
+    "thatchgrin": {
+      "poleBound": "缚于木桩",
+      "wakeYell": "夜幕降临南瓜田！谁敢踏进我的田地？",
+      "sleepYell": "太阳出来了。回到木桩上，继续看守。"
+    }
   },
   "dungeonGuide": {
     "drownedTemple": {
