@@ -14,6 +14,7 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
+import { insidePavedGrassExclusion } from '../src/render/foliage_core';
 import { gfxInternalsForTest, sharedUniforms } from '../src/render/gfx';
 import { MIST_GATE_PROGRAM_CACHE_KEY } from '../src/render/ignivar_mist_gate';
 import {
@@ -25,6 +26,7 @@ import {
   type LinearRgb,
   linearLuma,
   type MistPose,
+  onSanctumSealGateFloor,
   rimeFanAlpha,
   rimeFanVertex,
   SANCTUM_GLACIER_ICE,
@@ -460,7 +462,32 @@ describe('the mountain surface materials', () => {
   });
 });
 
-describe('the icefall on the real mountain', () => {
+describe('the frozen flags and the icefall on the real mountain', () => {
+  it('the tunnel floor and the lane between the pylons grow no grass, the plaza keeps its meadow', () => {
+    const door = DUNGEONS.gravewyrm_sanctum.doorPos;
+    expect(onSanctumSealGateFloor(door, door.x, door.z + 10)).toBe(true);
+    expect(onSanctumSealGateFloor(door, door.x + 3.5, door.z + 27)).toBe(true);
+    expect(onSanctumSealGateFloor(door, door.x - 1.8, door.z - 1.5)).toBe(true);
+    expect(onSanctumSealGateFloor(door, door.x, door.z - 6)).toBe(false);
+    expect(onSanctumSealGateFloor(door, door.x + 6, door.z + 10)).toBe(false);
+    expect(onSanctumSealGateFloor(door, door.x, door.z + 30)).toBe(false);
+    // the live consumer the blade carpet and the card tufts both read
+    expect(insidePavedGrassExclusion(door.x, door.z + 12)).toBe(true);
+    expect(insidePavedGrassExclusion(door.x, door.z - 8)).toBe(false);
+    expect(insidePavedGrassExclusion(door.x + 9, door.z + 4)).toBe(false);
+  });
+
+  it('the mouth film veils the tunnel dark instead of glowing white by day', () => {
+    const f = SANCTUM_MIST_FILM;
+    const luma = (hex: number) =>
+      linearLuma([((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255]);
+    expect(f.hazeOpacity).toBeLessThan(0.5);
+    expect(luma(f.hazeColor)).toBeLessThan(0.5);
+    // the additive breath only ever adds a little light
+    expect(f.breathOpacity).toBeLessThan(f.hazeOpacity);
+    expect(SANCTUM_MIST_FLOW.opacity).toBeLessThanOrEqual(0.22);
+  });
+
   it('the icefall grows out of the Thornpeak face and stays under the ridge behind it', async () => {
     await MeshoptDecoder.ready;
     const doc = await new NodeIO()

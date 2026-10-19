@@ -140,14 +140,16 @@ let filmGlow: THREE.MeshBasicMaterial | null = null;
 function mistFilm(): THREE.Group {
   filmGeo ??= markSharedGeometry(new THREE.PlaneGeometry(1, 1));
   // The mist gate family's own drifting sheet (one shared program), in the
-  // Quench's colours: a pale cold haze and a faint rune-blue breath over it.
+  // Quench's colours: a cold slate haze over the dark of the tunnel (it
+  // veils the depths instead of glowing white by day) and a faint rune-blue
+  // breath moving over it.
   filmHaze ??= markSharedMaterial(
     decorateMistMaterial(
       new THREE.MeshBasicMaterial({
-        color: 0x8aa3b4,
+        color: SANCTUM_MIST_FILM.hazeColor,
         map: mistNoiseTexture() ?? undefined,
         transparent: true,
-        opacity: 0.6,
+        opacity: SANCTUM_MIST_FILM.hazeOpacity,
         side: THREE.DoubleSide,
         depthWrite: false,
       }),
@@ -156,10 +158,10 @@ function mistFilm(): THREE.Group {
   );
   if (!filmGlow) {
     const glow = new THREE.MeshBasicMaterial({
-      color: 0x5ab8ff,
+      color: SANCTUM_MIST_FILM.breathColor,
       map: mistNoiseTexture() ?? undefined,
       transparent: true,
-      opacity: 0.32,
+      opacity: SANCTUM_MIST_FILM.breathOpacity,
       side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -222,10 +224,10 @@ gl_Position = projectionMatrix * mvPosition;`;
 function coldMistMaterial(): THREE.MeshBasicMaterial {
   if (mistMat) return mistMat;
   const material = new THREE.MeshBasicMaterial({
-    color: 0xb4c6d3,
+    color: SANCTUM_MIST_FLOW.color,
     map: puffTexture() ?? undefined,
     transparent: true,
-    opacity: 0.22,
+    opacity: SANCTUM_MIST_FLOW.opacity,
     depthWrite: false,
   });
   material.onBeforeCompile = (shader) => {

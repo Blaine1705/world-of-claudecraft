@@ -6,6 +6,24 @@
 // the door's terrain height. Cosmetic only: nothing here is a telegraph, and
 // the effects tier only thins the puffs.
 
+/** The flagged floor of the gate tunnel and the lane between the pylons
+ *  (door-local): the meadow's grass never grows through it (foliage_core.ts
+ *  insidePavedGrassExclusion reads it), so the threshold reads as frozen
+ *  flags going back into the dark. */
+export const SANCTUM_TUNNEL_FLOOR = { halfWidth: 3.7, lz0: -2.2, lz1: 28.5 } as const;
+
+/** Whether a world point lies on the tunnel's flagged floor (plus `pad`). */
+export function onSanctumSealGateFloor(
+  door: { readonly x: number; readonly z: number },
+  x: number,
+  z: number,
+  pad = 0,
+): boolean {
+  const f = SANCTUM_TUNNEL_FLOOR;
+  const lz = z - door.z;
+  return Math.abs(x - door.x) <= f.halfWidth + pad && lz >= f.lz0 - pad && lz <= f.lz1 + pad;
+}
+
 /** The static effects tier (src/game/ui_effects_profile.ts resolves it). */
 export type SealGateEffectsTier = 'low' | 'medium' | 'high' | 'ultra';
 
@@ -20,8 +38,20 @@ export const SANCTUM_RUNE_LIGHT = {
 } as const;
 
 /** The cold mist film across the tunnel mouth, just behind the pylons (the
- *  portal look: the walk-in trigger fires before a player reaches it). */
-export const SANCTUM_MIST_FILM = { lz: 2.6, width: 7.4, height: 9.8, centerY: 4.9 } as const;
+ *  portal look: the walk-in trigger fires before a player reaches it): a cold
+ *  slate haze that veils the tunnel's dark rather than glowing white by day,
+ *  and a faint rune-blue breath (additive, so it only ever adds a little
+ *  light) drifting over it. */
+export const SANCTUM_MIST_FILM = {
+  lz: 2.6,
+  width: 7.4,
+  height: 9.8,
+  centerY: 4.9,
+  hazeColor: 0x5b778c,
+  hazeOpacity: 0.42,
+  breathColor: 0x3f9fff,
+  breathOpacity: 0.2,
+} as const;
 
 /** The rime fan: frost on the ground within about 12 yd of the gate, in a fan
  *  that follows the cold coming out of the mouth. */
@@ -41,6 +71,10 @@ export const SANCTUM_MIST_FLOW = {
   startY: 0.8,
   endY: 0.2,
   spread: 9.0,
+  /** A cold grey-blue breath, thin: it reads against the plaza, never as fog
+   *  a player must see through. */
+  color: 0xa9bccb,
+  opacity: 0.2,
 } as const;
 
 /** Puff count by the static effects tier (never the FPS governor). */
