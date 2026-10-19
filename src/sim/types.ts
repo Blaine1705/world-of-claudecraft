@@ -5998,7 +5998,11 @@ export type DungeonGateKind =
   // taut as a walkway.
   | 'ice_wall'
   | 'chain_gate'
-  | 'chain_bridge';
+  | 'chain_bridge'
+  // The Smith's Heart: a slab of living stone that splits, and a forge seal
+  // of runed bronze that opens.
+  | 'stone_slab'
+  | 'forge_seal';
 
 /**
  * An in-dungeon gate or encounter seal (instances/dungeon_gates.ts): one
@@ -6064,7 +6068,10 @@ export interface DungeonObjectSpawn {
     | 'crypt_lady_lantern_lit'
     // The Gravewyrm Sanctum's story markers (encounters/gravewyrm_sanctum/
     // story.ts): the Calving Face's crack step rides the template id.
-    | 'sanctum_story_0';
+    | 'sanctum_story_0'
+    // The Smith's Heart's seal markers (encounters/smith_heart/seal.ts): the
+    // lit veins ride the template id.
+    | 'smith_heart_seal_0';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -6123,6 +6130,7 @@ export interface DungeonDef {
     | 'sunken_bastion'
     | 'drowned_temple'
     | 'gravewyrm_sanctum'
+    | 'smith_heart'
     | 'lastkeep'
     | 'dawnhold';
   /**

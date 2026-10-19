@@ -34,6 +34,11 @@ import { tickTempleEncounters } from '../encounters/drowned_temple';
 import { tickSanctumEncounters } from '../encounters/gravewyrm_sanctum';
 import { tickCryptEncounters } from '../encounters/hollow_crypt';
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
+import {
+  SMITH_HEART_CLOSED_TEXT,
+  smithHeartEntryOpen,
+  tickSmithHeart,
+} from '../encounters/smith_heart';
 import { tickBastionEncounters } from '../encounters/sunken_bastion';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { tickWildheartEncounters } from '../encounters/wildheart_basin';
@@ -97,6 +102,7 @@ const RAID_ALLOWED_DUNGEON_IDS = new Set([
   'nythraxis_crypt',
   'nythraxis_boss_arena',
   ...IGNIVAR_RAID_ROOM_IDS,
+  'smith_heart',
 ]);
 
 export { RAID_REQUIRED_DUNGEON_IDS };
@@ -388,6 +394,11 @@ export function enterDungeon(
   // resurrect at its arrival point (below). A fresh corpse (dead, spirit not yet released)
   // cannot move, so it never reaches the door.
   if (r.e.dead && !r.e.ghost) return false;
+  // The Smith's Heart is a phase 1 blockout: dev builds only.
+  if (!smithHeartEntryOpen(ctx, dungeonId)) {
+    ctx.error(r.meta.entityId, SMITH_HEART_CLOSED_TEXT);
+    return false;
+  }
   const party = ctx.partyOf(r.meta.entityId);
   const raidAllowed = RAID_ALLOWED_DUNGEON_IDS.has(dungeonId);
   const raidRequired = RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);
@@ -1526,6 +1537,8 @@ export function updateInstances(ctx: SimContext): void {
   // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
   // and the Knellwyrm, same slot.
   tickCryptEncounters(ctx);
+  // The Smith's Heart's seal (encounters/smith_heart), same slot.
+  tickSmithHeart(ctx);
   // The optional lore guides (dungeon_guide): after every encounter, so a boss
   // pulled or killed this tick already reads as such. Draws no shared rng.
   tickDungeonGuides(ctx);

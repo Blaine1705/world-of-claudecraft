@@ -244,6 +244,7 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
+import { SMITH_HEART_DUNGEON_DEFS, SMITH_HEART_MOBS } from './content/smith_heart';
 import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
 import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
@@ -493,6 +494,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...WILDHEART_MOBS,
+  ...SMITH_HEART_MOBS,
   ...HOLLOW_CRYPT_MOBS,
   ...HOLLOW_CRYPT_TRASH_MOBS,
   ...SUNKEN_BASTION_MOBS,
@@ -1493,6 +1495,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
+  ...SMITH_HEART_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
