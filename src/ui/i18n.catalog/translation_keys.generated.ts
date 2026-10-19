@@ -15122,6 +15122,8 @@ export type TranslationKeyFlat =
   | 'questUi.detail.rewards'
   | 'questUi.detail.xpReward'
   | 'questUi.dialog.accept'
+  | 'questUi.dialog.attuneHearthstone'
+  | 'questUi.dialog.attuneHearthstoneAria'
   | 'questUi.dialog.availableQuestAria'
   | 'questUi.dialog.back'
   | 'questUi.dialog.browseGoods'

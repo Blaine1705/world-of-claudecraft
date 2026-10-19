@@ -148,6 +148,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "es_ES": [
@@ -289,6 +291,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "fr_FR": [
@@ -430,6 +434,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "fr_CA": [
@@ -571,6 +577,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "en_CA": [],
@@ -713,6 +721,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "de_DE": [
@@ -854,6 +864,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "zh_CN": [
@@ -1079,6 +1091,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "ru_RU": [
@@ -1241,6 +1255,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "nl_NL": [
@@ -1382,6 +1398,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "pl_PL": [
@@ -1523,6 +1541,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "id_ID": [
@@ -1664,6 +1684,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "tr_TR": [
@@ -1805,6 +1827,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "sv_SE": [
@@ -1946,6 +1970,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "vi_VN": [
@@ -2087,6 +2113,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ],
   "da_DK": [
@@ -2228,6 +2256,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.worldPvp.skullName",
     "hudChrome.worldPvp.spoilsLine",
     "itemUi.vendor.sellJunkNoBuyback",
+    "questUi.dialog.attuneHearthstone",
+    "questUi.dialog.attuneHearthstoneAria",
     "questUi.logs.worldQuestRewardMailed"
   ]
 };

@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4821,
+    "files": 4822,
     "harvestedFiles": 4690,
     "carried": {
       "tests/action_bar_spectate.test.ts": {
@@ -121,6 +121,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           9
+        ]
+      },
+      "tests/delve_pet.test.ts": {
+        "ms": 4410,
+        "method": "local-median",
+        "measured": "2026-10-19",
+        "reason": "New delve pet suite on merged v0.45 candidate; three local reporter measurements pending full CI harvest.",
+        "runs": [
+          4352,
+          4469,
+          4410
         ]
       },
       "tests/druid_sporemender.test.ts": {
@@ -2187,6 +2198,7 @@
   "tests/delve_interior_tracker.test.ts": 12,
   "tests/delve_map.test.ts": 43,
   "tests/delve_map_painter.test.ts": 41,
+  "tests/delve_pet.test.ts": 4410,
   "tests/delve_quest_ui_layout.test.ts": 5,
   "tests/delve_render.test.ts": 98,
   "tests/delve_shop.test.ts": 2011,
@@ -2347,6 +2359,7 @@
   "tests/druid_form_speed_stack.test.ts": 899,
   "tests/druid_rush_window.test.ts": 5,
   "tests/druid_spell_pack.test.ts": 6662,
+  "tests/druid_sporemender.test.ts": 2123,
   "tests/druid_wand.test.ts": 3533,
   "tests/druid_wildfang_kit.test.ts": 3670,
   "tests/dual_purpose_target.test.ts": 738,
@@ -2712,6 +2725,7 @@
   "tests/form_draft.test.ts": 64,
   "tests/form_swing.test.ts": 5170,
   "tests/form_visual_selection_core.test.ts": 12,
+  "tests/form_visual_slots_core.test.ts": 12,
   "tests/frame_cadence.test.ts": 180,
   "tests/frame_cadence_auto_core.test.ts": 38,
   "tests/frame_cadence_auto_memory.test.ts": 5,
@@ -4729,6 +4743,8 @@
   "tests/self_prediction_core.test.ts": 9,
   "tests/self_render_position_core.test.ts": 2581,
   "tests/self_social_wire.test.ts": 640,
+  "tests/self_spirit_prewarm.test.ts": 29,
+  "tests/self_spirit_warm.test.ts": 13,
   "tests/self_wire_phase_breakdown.test.ts": 2670,
   "tests/send_backpressure.test.ts": 6,
   "tests/sentence_renderer.test.ts": 38,
@@ -6043,9 +6059,5 @@
   "tests/zone_streaming.test.ts": 11,
   "tests/zone_transition.test.ts": 5,
   "tests/zone_warm_tracker.test.ts": 26,
-  "tests/zones_command.test.ts": 2999,
-  "tests/druid_sporemender.test.ts": 2123,
-  "tests/form_visual_slots_core.test.ts": 12,
-  "tests/self_spirit_prewarm.test.ts": 29,
-  "tests/self_spirit_warm.test.ts": 13
+  "tests/zones_command.test.ts": 2999
 }

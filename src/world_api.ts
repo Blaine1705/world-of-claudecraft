@@ -947,6 +947,9 @@ export const COMMAND_NAMES = [
   'weekly_loot_spec',
   // World PvP Skull Bag: store or take trophy skulls (IWorldWorldPvp.skullBagAction).
   'skull_bag',
+  // Allied Hearthstone: a faction quartermaster binds the stone to its hub
+  // (IWorldQuests.attuneAlliedHearthstone, the quest dialog's attune row).
+  'allied_hearthstone_attune',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1063,6 +1066,7 @@ export const COMMAND_FACETS = {
   world_quest_start: 'IWorldQuests',
   world_quest_reroll: 'IWorldQuests',
   clue_hunt_abandon: 'IWorldQuests',
+  allied_hearthstone_attune: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',
