@@ -1903,7 +1903,8 @@ function applyMeasuredMaterialCase(sim: Sim, shape: MaterialSourceCase): void {
   const bankSlots = BANK_BASE_SLOTS + BANK_PURCHASED_SLOTS_MAX + BANK_MAX_BONUS_SLOTS;
   meta.bank.inventory = Array.from({ length: bankSlots + BANK_BAG_SOCKETS * 24 }, () => stack(20));
   meta.vault.stock = {};
-  meta.vault.special = materialIds.map((id) => ({ ...stack(200), itemId: id }));
+  const perMaterial = vaultCapacityPerMaterial(meta.vault);
+  meta.vault.special = materialIds.map((id) => ({ ...stack(perMaterial), itemId: id }));
   meta.vendorBuyback = Array.from({ length: 12 }, () => stack(20));
 }
 
@@ -1947,14 +1948,16 @@ describe('whole-character material source composition matrix', () => {
       expect(second.vault?.stock).toEqual({});
       expect(second.inventory.every((slot) => slot.count === 20)).toBe(true);
       expect(second.bank?.inventory.every((slot) => slot.count === 20)).toBe(true);
-      expect(second.vault?.special?.every((slot) => slot.count === 200)).toBe(true);
+      const perMaterial = vaultCapacityPerMaterial({ upgrades: VAULT_UPGRADE_RUNGS });
+      expect(perMaterial).toBe(1000);
+      expect(second.vault?.special?.every((slot) => slot.count === perMaterial)).toBe(true);
 
       const expectedSources =
         shape === 'representative'
           ? 1
           : shape === 'varied'
             ? 5
-            : 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200;
+            : 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * perMaterial;
       expect(sourceCount(second)).toBe(expectedSources);
       process.stdout.write(
         `[professions-blob-material-sources] ${JSON.stringify({
@@ -1964,7 +1967,7 @@ describe('whole-character material source composition matrix', () => {
           warningBytes: CHARACTER_BLOB_WARN_BYTES,
           relationToWarning:
             materialSourceBytes(second) < CHARACTER_BLOB_WARN_BYTES ? 'below' : 'at-or-above',
-          physicalUnits: 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200,
+          physicalUnits: 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * perMaterial,
         })}\n`,
       );
     }
@@ -2156,6 +2159,25 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // pure content-table arithmetic with no shape question in them: `deeds`
     // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
     const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
+
+    // Isolate this retune from all inherited content and identity changes.
+    const priorVault = structuredClone(s2);
+    if (!priorVault.vault) throw new Error('maximal fixture lacks its vault');
+    const stockRows = Object.keys(priorVault.vault.stock).length;
+    priorVault.vault.upgrades = 5;
+    for (const id of Object.keys(priorVault.vault.stock)) priorVault.vault.stock[id] = 200;
+    const vaultRetuneBytes = bytes - Buffer.byteLength(JSON.stringify(priorVault), 'utf8');
+    expect(vaultRetuneBytes).toBe(stockRows + 1);
+    expect(vaultRetuneBytes).toBe(119);
+    process.stdout.write(
+      `[professions-blob-compact-vault] ${JSON.stringify({
+        bytes,
+        stockRows,
+        vaultRetuneBytes,
+        warningBytes: CHARACTER_BLOB_WARN_BYTES,
+      })}\n`,
+    );
+
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
@@ -2489,7 +2511,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Plus 62 for the World PvP Skull Bag (an honor purchase, so a Warfare
         // armory relic): `"pvp_skull_bag",` in deedStats.itemsDiscovered (+16)
         // and its reliquary.firstFind row (+46). MEASURED on this tree.
-        62,
+        62 +
+        // The ten-rung vault raises the compact ceiling from 200 to 1000:
+        // one extra digit in each of 118 stock rows plus upgrades 5 to 10.
+        // This composes with every inherited content delta above.
+        119,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2583,7 +2609,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Five World PvP title dates add +138, also kept here.
       // Groveheart's deed row adds +34, also kept here.
       // +62 for the World PvP Skull Bag (deedStats id and reliquary row), kept.
-    ).toBe(232031);
+      // The ten-rung vault adds 119 bytes, retained by this counterfactual.
+    ).toBe(232150);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2616,7 +2643,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Five World PvP title dates add +138, also kept here.
       // Groveheart's deed row adds +34, also kept here.
       // +62 for the World PvP Skull Bag, which this baseline keeps.
-    ).toBe(233650);
+      // The ten-rung vault adds 119 bytes, retained by this counterfactual.
+    ).toBe(233769);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2730,8 +2758,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // measurement plus one: 233084..233465.
     // Composed together they measure 233,662 bytes. Floor at measurement minus
     // 380, edge at measurement plus one: 233282..233663.
-    expect(bytes, reMint).toBeGreaterThan(233282);
-    expect(bytes, reMint).toBeLessThan(233663);
+    // The ten-rung vault adds 119 bytes to the composed 233,662-byte
+    // fixture: 118 stock rows gain a digit and upgrades changes 5 to 10.
+    // Keep the same 381-byte band and the existing warning threshold.
+    expect(bytes, reMint).toBeGreaterThan(233401);
+    expect(bytes, reMint).toBeLessThan(233782);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
