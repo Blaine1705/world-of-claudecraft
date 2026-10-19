@@ -381,12 +381,9 @@ import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { canFlee } from './mob/flee_rules';
 import { forgetLeavingPlayer } from './mob/forget_leaver';
 import { wanderPause } from './mob/idle_rng';
+import { shouldSkipIdleMobTick } from './mob/idle_tick_skip';
 import * as lifecycle from './mob/lifecycle';
-import {
-  isInertInstanceCorpse,
-  resetEvadingMob as resetEvadingMobFn,
-  updateMob as updateMobFn,
-} from './mob/locomotion';
+import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { moveTowardImpl } from './mob/move_toward';
 import { spawnOpenWorldMob } from './mob/open_world_tuning';
@@ -6051,7 +6048,7 @@ export class Sim {
         } else if (e.guardianState) {
           if (!updateGuardian(this.ctx, e)) continue;
         } else {
-          if (this.shouldSkipIdleMobTick(e)) continue;
+          if (shouldSkipIdleMobTick(this.ctx, e)) continue;
           this.updateMob(e);
         }
         // Tag the mob.update lap with the mob so the host can attribute this slice
@@ -6222,32 +6219,6 @@ export class Sim {
     const out = this.events;
     this.events = [];
     return out;
-  }
-
-  private shouldSkipIdleMobTick(mob: Entity): boolean {
-    const radius = this.cfg.idleMobTickRadius ?? 0;
-    if (radius <= 0) return false;
-    if (mob.dead) {
-      // Instance corpse fields (a cleared rift floor's packs) never decay or
-      // respawn, so once every dead-branch effect is provably spent the corpse
-      // stops paying updateMob. Radius-gated like the live cull: the radius is
-      // the interest-drop radius, so a skipped corpse is outside every
-      // player's replicated view EXCEPT a viewer's own target (targets get
-      // NPC_DROP_RADIUS, slightly wider); that is safe today because the only
-      // frozen fields are two timers nothing serializes, and any change to
-      // that must re-check this exception. Dead mobs draw no rng, so the skip
-      // cannot shift the shared draw order.
-      if (!isInertInstanceCorpse(mob)) return false;
-    } else if (
-      mob.ownerId !== null ||
-      mob.aiState !== 'idle' ||
-      mob.inCombat ||
-      mob.auras.length > 0
-    ) {
-      return false;
-    }
-    if (this.players.size === 0) return true;
-    return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
 
   private updateLootRolls(): void {

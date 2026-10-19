@@ -1302,7 +1302,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11569 -> 11540 by Gourdlight Eve round 5: the right-click cancel command
     // moved whole into combat/aura_cancel_command.ts, paying for the one-line puppet
     // movement hook (seasonal/scarecrow_puppet.ts). Exact count (wc -l after biome).
-    ceiling: 11540,
+    // LOWERED 11540 -> 11511 by Gourdlight Eve round 12: the idle-mob throttle predicate
+    // moved whole into mob/idle_tick_skip.ts, so the night boss's unwatched bedtime
+    // (mob/slumber.ts settleUnwatchedSlumber) asks the same question the mob loop asks.
+    // Exact count (wc -l after biome).
+    ceiling: 11511,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

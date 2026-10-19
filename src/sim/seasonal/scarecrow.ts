@@ -33,7 +33,7 @@ import {
 import { MOBS } from '../data';
 import { createMob } from '../entity';
 import { openWorldMobScale } from '../mob/open_world_tuning';
-import { spawnAsleepIfBedtime } from '../mob/slumber';
+import { settleUnwatchedSlumber, spawnAsleepIfBedtime } from '../mob/slumber';
 import type { SimContext } from '../sim_context';
 import type { Entity, MobTemplate } from '../types';
 import { scaleWorldBossHp, type WorldBossDef } from '../world_boss';
@@ -137,6 +137,10 @@ export function updateScarecrow(ctx: SimContext, active: string | null): void {
       }
       return;
     } else {
+      // By day with nobody near, the idle throttle skips his AI tick, so his bedtime is
+      // handed over here: he is back on his pole before anyone can ride in and catch him
+      // up (mob/slumber.ts settleUnwatchedSlumber; cheap gates first, one boss).
+      settleUnwatchedSlumber(ctx, boss);
       scaleWorldBossHp(ctx, boss, hpDef(st, boss));
       tickScarecrowKit(ctx, boss, st);
       return;
