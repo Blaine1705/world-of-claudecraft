@@ -1366,6 +1366,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     // put crafted copies into inventory, not equipment), so the clamp must
     // bite there too; the review round found an equipment-only first cut.
     if (!s1.inventory?.[0]) throw new Error('ceiling fixture has no inventory row');
+    // Current saves carry canonical source buckets. This arm models historical
+    // sourceless stock, whose legacy instance signer is sanitized on load;
+    // retaining the buckets would create a different, ambiguous source record.
+    expect(s1.inventory[0].materialSources).toBeDefined();
+    delete s1.inventory[0].materialSources;
     s1.inventory[0].instance = { enchant: 'enchant_weapon_might', signer: overSigner };
     // The SURVIVOR half of the bag arm: a legal maximum-length signer on
     // another bag row must come back byte-faithfully, or a clamp that simply
