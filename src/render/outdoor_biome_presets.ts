@@ -34,9 +34,9 @@ export const BIOME_FOG: Record<BiomeId, { color: number; near: number; far: numb
   // aerial perspective on the far third while costing nothing near (and
   // fog-far drives culling, so the trim is a small draw-count win too).
   vale: { color: 0x82b8e8, near: 55, far: 700 },
-  // pale sage matched to the marsh horizon sky: the dome renders fog-free,
-  // so a darker murk left every fully fogged silhouette as a cutout band
-  marsh: { color: 0xc2cbb6, near: 75, far: 165 },
+  // sky-blue haze aligned with the vale horizon sky while keeping the marsh's
+  // shorter sightline envelope
+  marsh: { color: 0x82b8e8, near: 75, far: 165 },
   peaks: { color: 0x8ec2ea, near: 55, far: 700 },
   beach: { color: 0x86c0ec, near: 50, far: 700 },
   desert: { color: 0xd8c9a8, near: 50, far: 700 },
@@ -95,7 +95,7 @@ export const BIOME_LIGHT: Record<
   }
 > = {
   vale: { hemiSky: 0xd8f2ff, hemiGround: 0x689656, sun: 0xfff5dc },
-  marsh: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+  marsh: { hemiSky: 0xd8f2ff, hemiGround: 0x689656, sun: 0xfff5dc },
   peaks: { hemiSky: 0xd8f2ff, hemiGround: 0x5c8e4e, sun: 0xfff5dc },
   dusk: { hemiSky: 0xffc9dd, hemiGround: 0x4d3f63, sun: 0xffb072 },
   ember: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
