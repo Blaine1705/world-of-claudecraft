@@ -1425,6 +1425,7 @@ const RENDER_PURE_CORES = [
   'src/render/authored_map/zone_atmosphere_core.ts',
   'src/render/authored_map/zone_residency_core.ts',
   'src/render/placed_batch_core.ts',
+  'src/render/placed_sprite_pick_core.ts',
   'src/render/placed_texture_tier_core.ts',
   'src/render/city_clutter_core.ts',
   'src/render/terrain_cut_clip_core.ts',

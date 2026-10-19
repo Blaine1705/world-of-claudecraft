@@ -1799,8 +1799,19 @@ export class PlacedAssetsView {
       if (!entry || seen.has(entry.index)) continue;
       seen.add(entry.index);
       direct.push({ index: entry.index, distance: hit.distance, direct: true });
-      if (direct.length >= maxDepth) return direct;
+      // hits arrive nearest first: any later one is behind this many already
+      if (direct.length >= maxDepth) break;
     }
+    // The sprite tiers: three's raycast sees only their base quad, so each live
+    // sprite is tested against the billboard it draws (placed_sprite_pick_core).
+    const meshHits = direct.length;
+    this.pickSprites(this.imposters, raycaster, seen, direct);
+    this.pickSprites(this.buildingImposters, raycaster, seen, direct);
+    if (direct.length > meshHits) {
+      direct.sort((a, b) => a.distance - b.distance);
+      if (direct.length > maxDepth) direct.length = maxDepth;
+    }
+    if (direct.length >= maxDepth) return direct;
 
     const nearby: PlacedAssetPickCandidate[] = [];
     const ray = raycaster.ray;
@@ -1829,6 +1840,40 @@ export class PlacedAssetsView {
     }
     nearby.sort((a, b) => a.distance - b.distance || a.index - b.index);
     return direct.concat(nearby).slice(0, maxDepth);
+  }
+
+  /** Exact hits on one sprite tier's drawn billboards, appended to `out`
+   *  unsorted. The eye is the camera the shader turns the quads toward (the
+   *  editor's orthographic lens starts its ray on the near plane, not at the
+   *  camera), else the ray origin. Only live, drawn entries count, the same
+   *  rule entryFromHit applies to a mesh hit. */
+  private pickSprites(
+    sprites: PlacedImposters,
+    raycaster: THREE.Raycaster,
+    seen: Set<number>,
+    out: PlacedAssetPickCandidate[],
+  ): void {
+    const count = sprites.instanceCount;
+    if (count === 0 || !this.hitVisible(sprites.mesh)) return;
+    const ray = raycaster.ray;
+    let eyeX = ray.origin.x;
+    let eyeZ = ray.origin.z;
+    const camera = raycaster.camera;
+    if (camera) {
+      this.pickCenter.setFromMatrixPosition(camera.matrixWorld);
+      eyeX = this.pickCenter.x;
+      eyeZ = this.pickCenter.z;
+    }
+    for (let slot = 0; slot < count; slot++) {
+      const id = sprites.idAt(slot);
+      if (seen.has(id)) continue;
+      const entry = this.entries.get(id);
+      if (!entry || entry.removed || entry.lodHidden) continue;
+      const distance = sprites.rayDistance(slot, ray, eyeX, eyeZ);
+      if (distance < raycaster.near || distance > raycaster.far) continue;
+      seen.add(id);
+      out.push({ index: id, distance, direct: true });
+    }
   }
 
   /** Cheap hover affordance: bounding-volume math only, never GLB triangle
