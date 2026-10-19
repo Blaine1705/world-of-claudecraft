@@ -278,6 +278,7 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import { gmHiddenFrom } from './gm_presence';
 import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
@@ -362,6 +363,7 @@ import {
   unequipWornMechChroma,
   unlockMechChromaFromItem,
 } from './mech_chroma_ownership';
+import { canStartMobAggro } from './mob/aggro_gate';
 import * as bossMechanics from './mob/boss_mechanics';
 import {
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
@@ -842,7 +844,7 @@ import * as readyCheckMod from './social/ready_check';
 import { SpatialGrid } from './spatial';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
-import { addThreat, isFeigningDeath, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
+import { addThreat, TAUNT_FORCE_SECONDS, topThreatValue } from './threat';
 import {
   type AbilityDef,
   type ArenaCombatant,
@@ -7528,21 +7530,7 @@ export class Sim {
   }
 
   aggroMob(mob: Entity, target: Entity, social: boolean): boolean {
-    if (
-      mob.dead ||
-      mob.aiState === 'evade' ||
-      mob.aiState === 'chase' ||
-      mob.aiState === 'attack' ||
-      mob.aiState === 'flee'
-    )
-      return false;
-    // [dev] /dev noaggro: a designer positioning mobs is invisible to autonomous
-    // pulls, so the pack stays exactly where it spawned. The single aggro choke
-    // point, so this covers proximity, social, and retaliation pulls alike.
-    if (target.kind === 'player' && (target.devNoAggro || isFeigningDeath(target))) return false;
-    // [dev] /dev freezemobs: a frozen world acquires no aggro either (the AI
-    // update skip alone would still let a proximity sweep seed a hate table).
-    if (this.devMobsFrozen) return false;
+    if (!canStartMobAggro(this.entities, mob, target, this.devMobsFrozen)) return false;
     // A quest-gated destructible (e.g. a Broodmother egg) never autonomously pulls a
     // player its own damage gate would refuse: see mob/quest_gated_aggro.ts.
     if (questGateBlocksAggro(this.players, mob, target)) return false;
@@ -9109,6 +9097,7 @@ export class Sim {
   }
 
   isHostileTo(attacker: Entity, target: Entity): boolean {
+    if (gmHiddenFrom(this.entities, attacker, target)) return false; // /visible off
     if (target.kind === 'mob') {
       if (target.templateId.startsWith('vision_')) return false;
       // A Protect Yumi cat is attackable only by the opposing team of its
@@ -9169,6 +9158,7 @@ export class Sim {
   }
 
   private isFriendlyTo(caster: Entity, target: Entity): boolean {
+    if (gmHiddenFrom(this.entities, caster, target)) return false; // /visible off
     if (target.kind === 'player') return !this.isHostileTo(caster, target);
     // A Protect Yumi cat is heal/shield-targetable only by its own team.
     if (target.kind === 'mob' && yumiMod.isYumiCat(target))

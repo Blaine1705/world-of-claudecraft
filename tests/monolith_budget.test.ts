@@ -1302,7 +1302,10 @@ const MONOLITHS: MonolithRow[] = [
     // Up to 11641 with PvP Resurrect composed into the current release batch.
     // Exact merged count, zero slack.
     // Pet owner session inputs moved behind the existing pet command state seam.
-    ceiling: 11636,
+    // LOWERED 11636 -> 11626 while integrating GM tools: the pure mob aggro
+    // admission gate moved to mob/aggro_gate.ts, preserving Feign Death and
+    // dev guards alongside hidden-GM admission. Measured after biome.
+    ceiling: 11626,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1813,7 +1816,10 @@ const MONOLITHS: MonolithRow[] = [
     // current release batch. Exact merged count measured with wc -l.
     // LOWERED 9765 -> 9764 after composing PvP Resurrect with the current
     // release batch. Exact merged count measured with wc -l.
-    ceiling: 9764,
+    // LOWERED 9764 -> 9754 after composing GM tools: the live /who projection,
+    // tick memo and current-viewer block filtering live in who_roster_host.ts.
+    // Measured after biome; no budget raise from the older source pin.
+    ceiling: 9754,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
