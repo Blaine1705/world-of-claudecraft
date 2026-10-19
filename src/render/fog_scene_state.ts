@@ -66,8 +66,10 @@ export function resolveFogScene(
   // The Hollow Crypt is open-air too, but at night under its OWN sky: the
   // world dome hides and the interior group carries the moonlit sky.
   const inHollowCrypt = interior === 'hollow_crypt';
-  // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
-  const inSunkenBastion = interior === 'sunken_bastion';
+  // The Sunken Bastion: open-air at storm-tide dusk under its own sky. The
+  // Smith's Heart's blockout borrows the same storm-dusk fog and light rig
+  // (its interior carries its own storm sky) until it gets a state of its own.
+  const inSunkenBastion = interior === 'sunken_bastion' || interior === 'smith_heart';
   // The Drowned Temple: open-air at night over its lagoon, under its own sky.
   const inDrownedTemple = interior === 'drowned_temple';
   // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.

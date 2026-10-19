@@ -74,6 +74,10 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
     expect(resolveFogScene(true, interiorPx('sunken_bastion'), 5, cam, SEED).desired).toBe(
       'sunkenBastion',
     );
+    // The Smith's Heart's blockout borrows the Bastion's storm-dusk state.
+    expect(resolveFogScene(true, interiorPx('smith_heart'), 5, cam, SEED).desired).toBe(
+      'sunkenBastion',
+    );
     expect(resolveFogScene(true, interiorPx('gravewyrm_sanctum'), 5, cam, SEED).desired).toBe(
       'gravewyrmSanctum',
     );

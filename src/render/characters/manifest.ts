@@ -212,6 +212,7 @@ import { NPC_PROP_SET_IDS, type NpcLook, type NpcPropSet, npcLookFor } from './n
 import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks';
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
 import type { SeatClipSet } from './seat_clips';
+import { SMITH_HEART_PLACEHOLDER_LOOKS } from './smith_heart_placeholder_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
@@ -8142,6 +8143,7 @@ const MOB_KEYS: Record<string, string> = {
   ...WILDHEART_MOB_KEYS,
   ...SANCTUM_MOB_KEYS,
   ...SANCTUM_BOSS_MOB_KEYS,
+  ...SMITH_HEART_PLACEHOLDER_LOOKS,
   ...Object.fromEntries(
     ALL_CLASSES.map((cls) => [`tideglass_reflection_${cls}`, `temple_reflection_${cls}`]),
   ),

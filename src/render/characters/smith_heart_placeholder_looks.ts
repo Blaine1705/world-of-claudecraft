@@ -1,0 +1,45 @@
+// THE single list of borrowed placeholder bodies for the Smith's Heart raid
+// (docs/design/raid/smith_heart.md, phase 1 blockout). Every creature of the
+// raid wears an EXISTING visual from manifest.ts VISUALS here, chosen for its
+// silhouette and element and re-coloured by its template's entity colour, so
+// the blockout is playable and readable from day one. Phase 2 replaces each
+// row with the raid's own original model (a new VISUALS key); nothing else
+// in the renderer names these borrowings, so swapping a body is one row.
+// No Ignivar key is borrowed (the Heat is white-gold smith fire, never the
+// volcanic raid's look).
+//
+// manifest.ts spreads this into MOB_KEYS; tests/smith_heart_render_core.test.ts
+// pins one row per SMITH_HEART_MOBS template, each naming a real VISUALS key.
+
+export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
+  // ---- trash ---------------------------------------------------------------
+  // Final: a squat stone warder with an ochre vein-glow in its cracks.
+  heart_hammer_warder: 'mob_elemental',
+  // Final: a bronze-and-granite forge construct, the Ring's sentinel.
+  heart_ring_warder: 'skel_golem',
+  // Final: a wind-scoured stone warder trailing storm-blue gusts.
+  heart_breath_warder: 'mob_elemental',
+  // Final: a hovering storm caller of slate and lightning.
+  heart_breath_caller: 'mob_hoard_storm_caller',
+  // Final: a rime-crusted warder of blue ice and frost-cracked stone.
+  heart_quench_warder: 'mob_hoard_rime_elemental',
+  // Final: a meltwater caller, ice-pale water held in a stone frame.
+  heart_quench_caller: 'mob_water_elemental',
+  // Final: a smith-fire warder of dark iron with a white-gold core.
+  heart_heat_warder: 'mob_hoard_magma_brute',
+  // Final: a small white-gold ember spirit thrown off the Smith's forge.
+  heart_heat_caller: 'mob_emberkin',
+  // ---- the four guardians -----------------------------------------------------
+  // Final: a stone titan half-fused with the Pit's floor, a great hammer arm.
+  heart_hammer_guardian: 'skel_golem',
+  // Final: a towering storm colossus with a body of wind and slate shards.
+  heart_breath_guardian: 'mob_hoard_storm_caller',
+  // Final: a glacier giant of clear ice with the lake's cold light inside.
+  heart_quench_guardian: 'mob_hoard_rime_elemental',
+  // Final: an anvil-bodied forge giant pouring white-gold metal.
+  heart_heat_guardian: 'mob_hoard_magma_brute',
+  // ---- the final boss -----------------------------------------------------------
+  // Final: the Masterless Strength, the Smith's four strengths fused into one
+  // shifting giant of stone, wind, ice and smith fire.
+  heart_masterless_strength: 'mob_elemental',
+};

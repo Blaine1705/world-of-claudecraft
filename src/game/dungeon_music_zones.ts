@@ -6,6 +6,9 @@ const DUNGEON_MUSIC: Record<string, MusicZone> = {
   hollow_crypt: 'dungeon_hollow_crypt',
   sunken_bastion: 'dungeon_sunken_bastion',
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
+  // The Smith's Heart (blockout) is the heart of the same mountain range as
+  // the Sanctum: it borrows the Sanctum's track until it gets its own.
+  smith_heart: 'dungeon_gravewyrm_sanctum',
   ignivar_forge_approach: 'ignivar_forge_approach',
   ignivar_raid_arena: 'ignivar_raid_arena',
   ignivar_molten_assembly: 'ignivar_forge_approach',
