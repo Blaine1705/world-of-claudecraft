@@ -34,7 +34,7 @@
 // (CRUCIBLE_VENDOR_STOCK).
 //
 // Binding policy (PRs #3788 and #3789): the 15 sigils and the 145 sigil-redeemed
-// tier set pieces are soulbound, matching the tokens that buy them; the 41
+// tier set pieces are soulbound, matching the tokens that buy them; the 42
 // ordinary boss drops (offset, jewelry, held, weapons) carry no `soulbound`
 // flag and trade freely. Pinned by tests/ignivar_loot.test.ts.
 
@@ -3033,7 +3033,7 @@ export const IGNIVAR_JEWELRY_ITEMS: Record<string, ItemDef> = {
   },
 };
 
-// Shields and held offhands (Heroic Varkhul chase pieces).
+// Shields, held offhands, and the hunter quiver (Heroic Varkhul chase pieces).
 export const IGNIVAR_HELD_ITEMS: Record<string, ItemDef> = {
   bulwark_of_the_inner_crucible: {
     id: 'bulwark_of_the_inner_crucible',
@@ -3091,6 +3091,26 @@ export const IGNIVAR_HELD_ITEMS: Record<string, ItemDef> = {
     critRating: 25,
     sellValue: 12000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+  },
+  infernal_quiver: {
+    id: 'infernal_quiver',
+    name: 'Infernal Quiver',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // The hunter counterpart to the two held offhands above, off the same
+    // Heroic Varkhul slot (the direfang_quiver precedent on Nythraxis). Worn,
+    // not held: it costs no two-hander, so it prices on the worn line,
+    // primaryStatBudget(35, epic, offhand, WORN_OFFHAND_STAT_MULT) = 11,
+    // split on the Skirmisher agi/sta ratio. One 25-point rating like every
+    // held offhand of the tier; crit, not Hit, because the plan's Hit program
+    // does not place Hit on an offhand.
+    occupiesHand: false,
+    stats: { agi: 7, sta: 4 },
+    critRating: 25,
+    sellValue: 12000,
+    requiredClass: ['hunter'],
   },
 };
 
@@ -3253,15 +3273,15 @@ export const IGNIVAR_LOOT_ITEMS: Record<string, ItemDef> = {
 // art-pending icon ledger. Order follows the tables above.
 export const IGNIVAR_LOOT_ITEM_IDS: readonly string[] = Object.keys(IGNIVAR_LOOT_ITEMS);
 
-// The art-pending ledger: EMPTY since the Crucible art wave landed
-// (crucible-set-icons-2026-08-29 in public/ui/items/mapping.json painted
-// all 192 non-weapon pieces; the weapons shipped painted from the start).
-// The machinery stays: ITEM_ART_PENDING (src/ui/icons.ts) serves the
-// procedural icon for any id listed here, and the item-art audit CLI
+// The art-pending ledger. The Crucible art wave
+// (crucible-set-icons-2026-08-29 in public/ui/items/mapping.json) painted
+// all 192 original non-weapon pieces, and the weapons shipped painted from
+// the start. ITEM_ART_PENDING (src/ui/icons.ts) serves the procedural icon
+// for any id listed here, and the item-art audit CLI
 // (scripts/item_art_audit.mjs) excludes it from the
-// every-live-item-has-art sweep, so a future content wave can stage
-// unpainted items the same way.
-export const IGNIVAR_ART_PENDING_ITEM_IDS: readonly string[] = [];
+// every-live-item-has-art sweep. Open entry: the hunter quiver, added after
+// that wave; its painted icon is owed by the next item-art pass.
+export const IGNIVAR_ART_PENDING_ITEM_IDS: readonly string[] = ['infernal_quiver'];
 
 // The Crucible Quartermaster's redemption stock: every set piece priced at
 // exactly one sigil of its slot and class group. The buy path additionally

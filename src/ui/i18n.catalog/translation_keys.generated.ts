@@ -3152,6 +3152,7 @@ export type TranslationKeyFlat =
   | 'entities.items.imperial_crimson_armor_plate.name'
   | 'entities.items.imperial_gold_armor_plate.name'
   | 'entities.items.inert_storm_shard.name'
+  | 'entities.items.infernal_quiver.name'
   | 'entities.items.iron_link_choker.name'
   | 'entities.items.iron_mining_pick.name'
   | 'entities.items.iron_ore.name'

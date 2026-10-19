@@ -18451,6 +18451,9 @@ export const en_XA: EnTranslations = {
       "vanguard_warstaff": {
         "name": "[Ʋáñĝúáŕð'š Ŵáŕšţáƒƒ]"
       },
+      "infernal_quiver": {
+        "name": "[Íñƒéŕñáļ Ɋúíʋéŕ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

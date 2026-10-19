@@ -18451,6 +18451,9 @@ export const da_DK: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Fortropsens Krigsdragt"
       },
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },

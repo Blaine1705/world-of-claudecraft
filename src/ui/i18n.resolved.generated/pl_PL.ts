@@ -18451,6 +18451,9 @@ export const pl_PL: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Personel Wojenny Awangardy"
       },
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },

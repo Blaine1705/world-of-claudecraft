@@ -18451,6 +18451,9 @@ export const zh_CN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先锋之战杖"
       },
+      "infernal_quiver": {
+        "name": "炼狱箭袋"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

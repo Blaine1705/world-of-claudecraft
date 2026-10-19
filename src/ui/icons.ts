@@ -5536,9 +5536,10 @@ for (const item of Object.values(ITEMS)) {
 export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 
 // Explicit development-only item-art debt ledger. The Masterwrought completion wave
-// cleared the Ignivar raid's 81 feature entries (content/ignivar_loot.ts), so that spread
-// is currently empty; it stays in the union below as the canonical seam for future parked
-// raid art. Tests reject both unenumerated debt and stale entries after art lands.
+// cleared the Ignivar raid's 81 feature entries (content/ignivar_loot.ts); that spread
+// now parks only the later Crucible hunter quiver, and stays in the union below as the
+// canonical seam for parked raid art. Tests reject both unenumerated debt and stale
+// entries after art lands.
 export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,

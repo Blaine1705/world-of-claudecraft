@@ -254,6 +254,9 @@ describe('held weapon models', () => {
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
+      // The Crucible hunter quiver joins its quiver siblings: worn on the
+      // back by ranger.glb, so no held GLB.
+      'infernal_quiver',
       'legendary_chalice_of_living_tides',
       'legendary_orb_collapsing_void',
       'moggers_hide_quiver',

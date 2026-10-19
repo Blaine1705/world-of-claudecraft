@@ -1070,6 +1070,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_oath_blade.name': 'Клятва Авангарда',
   'entities.items.vanguard_verdict_greatsword.name': 'Приговор Авангарда',
   'entities.items.vanguard_warstaff.name': 'Боевой посох Авангарда',
+  'entities.items.infernal_quiver.name': 'Инфернальный колчан',
   'hudChrome.paperdoll.trinketSlot': 'Аксессуар',
   'questUi.worldQuest.practiceRewards':
     'Тренировка: играйте снова без дополнительных монет, опыта и репутации.',

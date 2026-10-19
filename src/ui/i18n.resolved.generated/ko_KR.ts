@@ -18451,6 +18451,9 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
+      "infernal_quiver": {
+        "name": "업화 화살통"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

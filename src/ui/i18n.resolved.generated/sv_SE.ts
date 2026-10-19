@@ -18451,6 +18451,9 @@ export const sv_SE: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Förtroppen krigsstaff"
       },
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },

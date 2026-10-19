@@ -145,9 +145,10 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
+    // The Crucible hunter quiver (infernal_quiver) parks one more: 136.
     catalogCount: 1464,
     liveItemCount: 1482,
-    pendingArtCount: 135,
+    pendingArtCount: 136,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,

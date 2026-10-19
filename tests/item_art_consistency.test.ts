@@ -853,7 +853,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // The Crucible hunter quiver (infernal_quiver, art-pending in
+    // IGNIVAR_ART_PENDING_ITEM_IDS, so no mapping owner yet): 1,618 live.
+    expect(Object.keys(ITEMS)).toHaveLength(1618);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1019,7 +1021,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
     expect(new Set(currentOwnerIds).size).toBe(1464);
     expect(shippingIds).toHaveLength(1464);
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // +1 live item, no new owner: the art-pending Crucible hunter quiver.
+    expect(Object.keys(ITEMS)).toHaveLength(1618);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);

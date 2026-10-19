@@ -18451,6 +18451,9 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
+      "infernal_quiver": {
+        "name": "業火の矢筒"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
