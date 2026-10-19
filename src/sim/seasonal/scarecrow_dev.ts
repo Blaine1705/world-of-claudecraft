@@ -18,8 +18,13 @@
 //                             wake: its yell, its rise); he stays up until the night comes
 //                             round again, then the normal hours resume
 //   /dev scarecrow sleep      send him back onto his pole now (he must be out of a fight)
-// He is a NIGHT boss (mob/slumber.ts awakeAt 'night'): `/dev servertime night` and
-// `/dev servertime day` move the clock he keeps.
+// He is a NIGHT boss (mob/slumber.ts awakeAt 'night'): he keeps the world's day/night
+// clock. OFFLINE that is the one clock the sky shares, so `/daynight night` (or
+// `/dev servertime night`, which the offline client answers the same way:
+// src/game/daynight_dev_command.ts) wakes him within a tick and `/daynight day` sends him
+// back up his pole once he is out of a fight. ONLINE it is the server's clock:
+// `/dev servertime night|day` moves it (then `/daynight` to match your own sky). A `wake`
+// or `sleep` here is a hold that outlasts the clock until the clock agrees with it.
 import { GOURDLIGHT_EVE_ID } from '../content/gourdlight_eve';
 import { THATCHGRIN_ID } from '../content/gourdlight_eve_scarecrow';
 import { displacePlayerForDev } from '../dev/dev_displace';
@@ -36,7 +41,13 @@ import { raiseSwellingGourd } from './scarecrow_swell';
 import { activeSeasonalEventOf } from './seasonal_state';
 
 const USAGE =
-  '[dev] Usage: /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout|wake|sleep].';
+  '[dev] Usage: /dev scarecrow [rain|call|swell|burst|break|puppet|reset|lockout|wake|sleep]. He keeps night hours: /daynight night|day offline, /dev servertime night|day online.';
+
+/** What the hour does to him, said on arrival (the real behavior, not a guess). */
+const HOURS_DAY =
+  '[dev] It is day: he hangs on his pole until nightfall. Make it night to wake him (/daynight night offline, /dev servertime night online), or /dev scarecrow wake to fight now.';
+const HOURS_NIGHT =
+  '[dev] It is night: he is awake. Make it day (/daynight day offline, /dev servertime day online) and he climbs back onto his pole once out of a fight.';
 
 /** Two sturdy dev bots join his fight beside the caller (so Thatchbound has a crowd). */
 function joinDevFighters(ctx: SimContext, boss: Entity, pid: number): void {
@@ -98,11 +109,7 @@ export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number
     log(
       `[dev] Old Thatchgrin stands in his field at ${field.x.toFixed(1)}, ${field.z.toFixed(1)}.`,
     );
-    if (standing?.asleep) {
-      log(
-        '[dev] It is day: he hangs on his pole until nightfall. /dev scarecrow wake to fight now.',
-      );
-    }
+    if (standing) log(standing.asleep ? HOURS_DAY : HOURS_NIGHT);
     return true;
   }
   const fightVerbs = ['rain', 'gourd', 'call', 'swell', 'burst', 'break', 'puppet'];
@@ -152,7 +159,7 @@ export function handleScarecrowDevChat(ctx: SimContext, raw: string, pid: number
       ok
         ? verb === 'wake'
           ? '[dev] Old Thatchgrin tears himself off his pole.'
-          : '[dev] Old Thatchgrin climbs back onto his pole.'
+          : '[dev] Old Thatchgrin climbs back onto his pole (until the next nightfall).'
         : verb === 'wake'
           ? '[dev] He is already awake.'
           : '[dev] He is already on his pole, or still in a fight.',

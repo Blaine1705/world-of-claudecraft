@@ -193,6 +193,40 @@ describe('Old Thatchgrin at nightfall and dawn', () => {
     expect(b.hostile).toBe(false);
   });
 
+  it('online: /dev servertime night wakes him and /dev servertime day puts him back up', () => {
+    // the server's clock: real time, running (here mid-morning, advanced each tick)
+    let ms = phaseToCycleMs(0.35);
+    const sim = world({ now: () => ms });
+    const b = boss(sim);
+    expect(b.asleep).toBe(true);
+    const run = (s: number) => {
+      for (let i = 0; i < Math.round(s / DT); i++) {
+        ms += DT * 1000;
+        sim.tick();
+      }
+    };
+    sim.chat('/dev servertime night');
+    run(1);
+    expect(b.asleep).toBe(false);
+    expect(b.hostile).toBe(true);
+    run(4);
+    sim.chat('/dev servertime day');
+    run(2);
+    expect(b.asleep).toBe(true);
+    expect(b.hostile).toBe(false);
+  });
+
+  it('/dev scarecrow says how the hours really work, by day and by night', () => {
+    const day = world(clockAt(0.5));
+    day.chat('/dev scarecrow');
+    const dayLogs = logs(day.tick());
+    expect(dayLogs.some((t) => t.includes('/daynight night offline'))).toBe(true);
+    const night = world(clockAt(0.9));
+    night.chat('/dev scarecrow');
+    const nightLogs = logs(night.tick());
+    expect(nightLogs.some((t) => t.includes('/daynight day offline'))).toBe(true);
+  });
+
   it('its notices re-localize through the client matcher', () => {
     expect(localizeSimText('Old Thatchgrin sleeps until nightfall.')).toBeTruthy();
     expect(localizeSimText('Old Thatchgrin sleeps until dawn.')).toBeTruthy();
