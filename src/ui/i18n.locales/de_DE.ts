@@ -1936,7 +1936,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_druid_balance_shoulder.name': 'Sternwächter-Schulterstücke',
   'entities.itemSets.vanguard_druid_feral.name': 'Blutmähnen-Fell',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'Die Abklingzeit von Bruin-Ansturm wird um 3 Sek. verkürzt.',
+    'Die Abklingzeit von Bruin-Ansturm wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Bruin-Ansturm gewährt dir 6 Sek. lang einen Schild in Höhe von 6 Prozent deiner maximalen Gesundheit.',
   'entities.items.vanguard_druid_feral_chest.name': 'Blutmähnen-Tunika',
@@ -1956,7 +1956,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_druid_restoration_shoulder.name': 'Distelblüten-Schultermantel',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Rudelwächter-Geschirr',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'Die Abklingzeit von Rasselnder Schuss wird um 4 Sek. verkürzt.',
+    'Die Abklingzeit von Rasselnder Schuss wird um 4 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Rasselnder Schuss verringert die verbleibende Abklingzeit von Zorn des Wildtiers um 1 Sek.',
   'entities.items.vanguard_hunter_beast_mastery_chest.name': 'Rudelwächter-Wams',
@@ -1966,7 +1966,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_hunter_beast_mastery_shoulder.name': 'Rudelwächter-Schulterstücke',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Weitsicht-Geschirr',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'Die Abklingzeit von Pfadbruch wird um 4 Sek. verkürzt.',
+    'Die Abklingzeit von Pfadbruch wird um 4 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Pfadbruch lässt deinen nächsten Langen Zug innerhalb von 6 Sek. sofort wirken. Kann höchstens einmal alle 15 Sek. auftreten.',
   'entities.items.vanguard_hunter_marksmanship_chest.name': 'Weitsicht-Wams',
@@ -1976,7 +1976,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_hunter_marksmanship_shoulder.name': 'Weitsicht-Schulterstücke',
   'entities.itemSets.vanguard_hunter_survival.name': 'Fallenzahn-Geschirr',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    'Die Abklingzeit von Bluthaken wird um 3 Sek. verkürzt.',
+    'Die Abklingzeit von Bluthaken wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Bluthaken gewährt 1 Jagdschwung.',
   'entities.items.vanguard_hunter_survival_chest.name': 'Fallenzahn-Wams',
   'entities.items.vanguard_hunter_survival_gloves.name': 'Fallenzahn-Stulpen',
@@ -2025,7 +2025,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_paladin_holy_shoulder.name': 'Sonnenwacht-Schultermantel',
   'entities.itemSets.vanguard_paladin_protection.name': 'Schildschwur-Bastion',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'Die Abklingzeit von Eidkette wird um 2 Sek. verkürzt.',
+    'Die Abklingzeit von Eidkette wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Von Eidkette herangezogene Gegner wirken ihre Zauber 4 Sek. lang 30 Prozent langsamer, und Eidkette gewährt dir Sonnenvergeltung, wenn sie einen ziehbaren Gegner bindet.',
   'entities.items.vanguard_paladin_protection_chest.name': 'Schildschwur-Brustplatte',
@@ -2035,7 +2035,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_paladin_protection_shoulder.name': 'Schildschwur-Schulterplatten',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lichtbrand-Kriegsplatte',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'Die Abklingzeit von Ruf der Walküre wird um 15 Sek. verkürzt.',
+    'Die Abklingzeit von Ruf der Walküre wird um 15 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Ruf der Walküre setzt die Abklingzeit von Letztes Edikt zurück, und dein nächstes Letztes Edikt innerhalb von 6 Sek. nach dem Treffer verursacht 15 Prozent mehr Schaden.',
   'entities.items.vanguard_paladin_retribution_chest.name': 'Lichtbrand-Kürass',
@@ -2114,7 +2114,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_elemental_shoulder.name': 'Sturmschrift-Schulterplatten',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Sturmgeboren-Kriegskette',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Ahnenhieb verlangsamt das Lauftempo des Ziels 4 Sek. lang um 30 Prozent.',
+    'Ahnenhieb verlangsamt das Lauftempo des Ziels 4 Sek. lang um 30 Prozent. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Ahnenhieb verringert die verbleibende Abklingzeit von Elemental Trance um 4 Sek.',
   'entities.items.vanguard_shaman_enhancement_chest.name': 'Sturmgeboren-Kettenhemd',
@@ -4796,7 +4796,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'editor.status.campCapReached':
     'Lager-Limit erreicht ({max}). Das neue Lager wurde nicht hinzugefügt.',
   'entities.itemSets.warfare_ashstalker.bonus2':
-    'Erhöht Kriegsführungs-Verteidigungswertung um 40.',
+    'Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4810,7 +4810,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert.',
   'entities.itemSets.warfare_cinderweave.name': 'Gewänder aus Glutgewebe',
   'entities.itemSets.warfare_furyforged.bonus2':
-    'Erhöht Kriegsführungs-Verteidigungswertung um 40.',
+    'Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19738,7 +19738,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Ein gewerteter Sieg zahlt Ehre, die Währung für Spieler gegen Spieler. Eine Niederlage, die du bis zum Ende spielst, zahlt trotzdem einen kleineren Anteil, ebenso ein Unentschieden, daher ist die Wertung der einzige echte Verlust einer Niederlage. Ehre soll echte Matches belohnen: Ein Sieg gegen denselben Gegner oder dasselbe Team am selben Tag zahlt nicht noch einmal, und eine weitere Niederlage gegen sie ebenfalls nicht. Ein langer Siegestag zahlt für den ersten Abschnitt die volle Belohnung, danach halbiert sich der Siegwert und später noch einmal, bevor er auf dieser Stufe bleibt. Ein Match, das der Gegner aufgibt, bewegt deine Wertung, zahlt aber überhaupt keine Ehre. Der Tag gehört zum Reich und wechselt zur nächtlichen Resetstunde, an der auch jede tägliche Sperre gelöscht wird.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster. Eine Ausnahme wirkt überall: Zwei Teile eines Zauberwirker-Sets sorgen außerdem dafür, dass erlittener Schaden dein Zauberwirken nicht mehr verzögert.',
+    'Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster. Eine Ausnahme wirkt überall: Zwei Teile eines dieser Sets sorgen außerdem dafür, dass erlittener Schaden dein Zauberwirken nicht mehr verzögert.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Kriegsführungsausrüstung ist für Spieler gegen Spieler gedacht und überspringt keine Dungeonstufen. Sie trägt nicht die Kampfbewertungen eines Dungeonepics, sondern investiert ihre Bewertungen und Setboni vollständig in Kämpfe gegen Spieler. Für die Arena kaufst du sie, für schnellere heroische Dungeons verdienst du deine Ausrüstung dort.',
   'guide.controls.harvestJournal': 'Erntejournal',

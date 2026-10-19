@@ -1939,7 +1939,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Lancer Racines agrippantes vous permet d'incanter en mouvement et augmente votre vitesse de déplacement de 20 % pendant 4 s. Ne peut se produire plus d'une fois toutes les 20 s.",
   'entities.itemSets.vanguard_druid_balance.name': 'Tenue du Garde-étoiles',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'Le temps de recharge de Ruée de Bruin est réduit de 3 s.',
+    'Le temps de recharge de Ruée de Bruin est réduit de 3 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Ruée de Bruin vous octroie un bouclier égal à 6 % de vos points de vie maximum pendant 6 s.',
   'entities.itemSets.vanguard_druid_feral.name': 'Peau de Crin-sang',
@@ -1949,17 +1949,17 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Prompte guérison augmente aussi votre vitesse de déplacement de 30 % pendant 3 s.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Tenue de Fleur-de-chardon',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'Le temps de recharge de Tir déstabilisant est réduit de 4 s.',
+    'Le temps de recharge de Tir déstabilisant est réduit de 4 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Tir déstabilisant réduit de 1 s le temps de recharge restant de Courroux bestial.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Harnais du Garde-meute',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'Le temps de recharge de Brise-piste est réduit de 4 s.',
+    'Le temps de recharge de Brise-piste est réduit de 4 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     "Brise-piste rend votre prochain Tir tendu instantané dans les 6 s qui suivent. Ne peut se produire plus d'une fois toutes les 15 s.",
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Harnais Longue-vue',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    'Le temps de recharge de Croc sanglant est réduit de 3 s.',
+    'Le temps de recharge de Croc sanglant est réduit de 3 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Croc sanglant accorde 1 Élan de chasse.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Harnais Croc-piège',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
@@ -1983,12 +1983,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Pacte de vie octroie aussi à l'allié un bouclier égal à 8 % de ses points de vie maximum pendant 6 s.",
   'entities.itemSets.vanguard_paladin_holy.name': 'Tenue Veille-soleil',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'Le temps de recharge de Chaîne du serment est réduit de 2 s.',
+    'Le temps de recharge de Chaîne du serment est réduit de 2 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Les ennemis tirés par Chaîne du serment lancent leurs sorts 30 % plus lentement pendant 4 s, et Chaîne du serment vous accorde Représailles solaires quand elle entrave un ennemi qui peut être tiré.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Bastion Vœu-du-bouclier',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    "Le temps de recharge de l'Appel de la valkyrie est réduit de 15 s.",
+    "Le temps de recharge de l'Appel de la valkyrie est réduit de 15 s. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     "L'Appel de la valkyrie réinitialise le temps de recharge d'Édit final, et votre prochain Édit final lancé dans les 6 s qui suivent inflige 15 % de dégâts en plus.",
   'entities.itemSets.vanguard_paladin_retribution.name': 'Armure de guerre Marque-de-lumière',
@@ -2028,7 +2028,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Déchaîner l'arme vous permet d'incanter en mouvement et augmente votre vitesse de déplacement de 20 % pendant 4 s. Ne peut se produire plus d'une fois toutes les 20 s.",
   'entities.itemSets.vanguard_shaman_elemental.name': 'Mailles de guerre Écrit-de-tempête',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Frappe ancestrale ralentit la vitesse de déplacement de la cible de 30 % pendant 4 s.',
+    'Frappe ancestrale ralentit la vitesse de déplacement de la cible de 30 % pendant 4 s. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Frappe ancestrale réduit de 4 s le temps de recharge restant de Transe élémentaire.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Mailles de guerre Né-du-vent',
@@ -4856,7 +4856,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'editor.status.campCapReached':
     "Limite de camps atteinte ({max}). Le nouveau camp n'a pas été ajouté.",
   'entities.itemSets.warfare_ashstalker.bonus2':
-    "Augmente de 40 le score de Défense d'Art de la guerre.",
+    "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.warfare_ashstalker.bonus4':
     "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4870,7 +4870,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Vos sorts ont 15% de chances d'accorder Garde de braise, absorbant 120 points de dégâts pendant 8 s.",
   'entities.itemSets.warfare_cinderweave.name': "Tenue d'apparat tissebraise",
   'entities.itemSets.warfare_furyforged.bonus2':
-    "Augmente de 40 le score de Défense d'Art de la guerre.",
+    "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
   'entities.itemSets.warfare_furyforged.bonus4':
     "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19806,7 +19806,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Une victoire classée rapporte de l’Honneur, la monnaie joueur contre joueur, et une défaite jouée jusqu’au bout en rapporte encore une petite part, comme un match nul. La cote est donc le seul vrai coût d’une défaite. L’Honneur récompense les vrais matchs : battre le même adversaire ou la même équipe une seconde fois le même jour ne rapporte plus rien, pas plus qu’une nouvelle défaite contre eux. Une longue journée de victoires paie entièrement la première série, puis les gains sont divisés par deux, puis encore par deux plus loin, où ils restent. Un match abandonné par l’adversaire modifie quand même votre cote mais ne rapporte aucun Honneur. La journée du royaume se réinitialise à l’heure nocturne habituelle, la même limite qui efface les verrouillages quotidiens.',
   'guide.arenaPage.warfareBodyStatsStay':
-    "Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres. Une exception fonctionne partout : deux pièces d'un ensemble de lanceur de sorts empêchent aussi les dégâts subis de retarder vos incantations.",
+    "Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres. Une exception fonctionne partout : deux pièces de n'importe lequel de ces ensembles empêchent aussi les dégâts subis de retarder vos incantations.",
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'C’est le compromis voulu. L’équipement de guerre sert à combattre les joueurs et ne permet pas de sauter les paliers de donjon : une pièce de guerre ne porte jamais les cotes de combat d’un épique de donjon dans le même emplacement, et les cotes et bonus qu’elle porte sont entièrement consacrés aux autres joueurs. Pour tenir votre rang dans l’arène, achetez-le. Pour terminer les donjons héroïques plus vite, gagnez votre équipement dans les donjons.',
   'guide.controls.harvestJournal': 'Journal des récoltes',

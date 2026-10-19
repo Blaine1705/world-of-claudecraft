@@ -8299,7 +8299,7 @@ export const fr_FR: EnTranslations = {
       "honorFinalNoteSoldBack": "Les achats d’honneur sont définitifs. La liste de rachat ne contient que ce que vous avez vendu : un achat avec des pièces peut généralement être revendu à son prix de vente puis récupéré dans cette liste si vous changez encore d’avis, mais l’équipement de guerre devient lié à l’âme dès son achat. Il ne peut donc jamais être échangé, envoyé ou revendu, et n’atteint jamais cette liste. La boutique vous demande confirmation pour cette raison : examinez la pièce avant de cliquer.",
       "warfareHeading": "Équipement de Guerre",
       "warfareBody": "Chaque pièce de Guerre porte un Score d'attaque de Guerre et un Score de défense de Guerre, et ces deux scores n'ont absolument aucun effet contre les monstres. Ils ne s'appliquent que lorsque vous combattez un autre joueur, en duel, dans l'arène ou sur le champ de bataille, où l'Attaque ajoute aux dégâts que vous infligez et la Défense réduit les dégâts que vous subissez, chacun jusqu'à son propre plafond. Chaque famille d'armure est aussi un ensemble, et ses bonus d'ensemble sont eux aussi des scores de Guerre ou des effets qui ne fonctionnent que contre les joueurs, si bien qu'un équipement d'honneur complet ne vaut rien face au boss d'un donjon.",
-      "warfareBodyStatsStay": "Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres. Une exception fonctionne partout : deux pièces d'un ensemble de lanceur de sorts empêchent aussi les dégâts subis de retarder vos incantations.",
+      "warfareBodyStatsStay": "Chaque pièce de guerre porte une cote d’offensive de guerre et une cote de défense de guerre, et ces cotes n’ont absolument aucun effet contre les monstres. Elles ne s’appliquent que lorsque vous combattez un autre joueur, en duel, dans l’arène ou sur le champ de bataille : l’offensive augmente les dégâts infligés et la défense réduit les dégâts reçus, chacune jusqu’à son propre plafond. Chaque famille d’armure est aussi un ensemble, dont les bonus sont également des cotes ou des effets qui ne fonctionnent que contre les joueurs. Les bonus d’un équipement d’honneur complet ne comptent donc pas contre un boss de donjon. Les pièces gardent leurs statistiques ordinaires, leur armure et leurs dégâts d’arme, qui fonctionnent partout ; seules les cotes et les bonus d’ensemble restent inactifs contre les monstres. Une exception fonctionne partout : deux pièces de n'importe lequel de ces ensembles empêchent aussi les dégâts subis de retarder vos incantations.",
       "warfareTradeBody": "C'est un compromis voulu. L'équipement de Guerre est conçu pour affronter des joueurs, pas comme un raccourci pour contourner les paliers de donjon : une pièce de Guerre ne porte jamais les scores de combat qu'apporte un objet épique de donjon dans le même emplacement, et tout ce qu'elle apporte se dépense sur d'autres joueurs. Si vous voulez tenir votre rang dans l'arène, achetez-la. Si vous voulez nettoyer les héroïques plus vite, gagnez votre équipement dans les donjons.",
       "warfareTradeBodyRatingSpent": "C’est le compromis voulu. L’équipement de guerre sert à combattre les joueurs et ne permet pas de sauter les paliers de donjon : une pièce de guerre ne porte jamais les cotes de combat d’un épique de donjon dans le même emplacement, et les cotes et bonus qu’elle porte sont entièrement consacrés aux autres joueurs. Pour tenir votre rang dans l’arène, achetez-le. Pour terminer les donjons héroïques plus vite, gagnez votre équipement dans les donjons.",
       "vanguardHeading": "Équipement d'Avant-garde : Guerre saison 2",
@@ -24179,7 +24179,7 @@ export const fr_FR: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Peau de Crin-sang",
-        "bonus2": "Le temps de recharge de Ruée de Bruin est réduit de 3 s.",
+        "bonus2": "Le temps de recharge de Ruée de Bruin est réduit de 3 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Ruée de Bruin vous octroie un bouclier égal à 6 % de vos points de vie maximum pendant 6 s."
       },
       "vanguard_druid_restoration": {
@@ -24189,17 +24189,17 @@ export const fr_FR: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Harnais du Garde-meute",
-        "bonus2": "Le temps de recharge de Tir déstabilisant est réduit de 4 s.",
+        "bonus2": "Le temps de recharge de Tir déstabilisant est réduit de 4 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Tir déstabilisant réduit de 1 s le temps de recharge restant de Courroux bestial."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Harnais Longue-vue",
-        "bonus2": "Le temps de recharge de Brise-piste est réduit de 4 s.",
+        "bonus2": "Le temps de recharge de Brise-piste est réduit de 4 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Brise-piste rend votre prochain Tir tendu instantané dans les 6 s qui suivent. Ne peut se produire plus d'une fois toutes les 15 s."
       },
       "vanguard_hunter_survival": {
         "name": "Harnais Croc-piège",
-        "bonus2": "Le temps de recharge de Croc sanglant est réduit de 3 s.",
+        "bonus2": "Le temps de recharge de Croc sanglant est réduit de 3 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Croc sanglant accorde 1 Élan de chasse."
       },
       "vanguard_mage_arcane": {
@@ -24224,12 +24224,12 @@ export const fr_FR: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Bastion Vœu-du-bouclier",
-        "bonus2": "Le temps de recharge de Chaîne du serment est réduit de 2 s.",
+        "bonus2": "Le temps de recharge de Chaîne du serment est réduit de 2 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Les ennemis tirés par Chaîne du serment lancent leurs sorts 30 % plus lentement pendant 4 s, et Chaîne du serment vous accorde Représailles solaires quand elle entrave un ennemi qui peut être tiré."
       },
       "vanguard_paladin_retribution": {
         "name": "Armure de guerre Marque-de-lumière",
-        "bonus2": "Le temps de recharge de l'Appel de la valkyrie est réduit de 15 s.",
+        "bonus2": "Le temps de recharge de l'Appel de la valkyrie est réduit de 15 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "L'Appel de la valkyrie réinitialise le temps de recharge d'Édit final, et votre prochain Édit final lancé dans les 6 s qui suivent inflige 15 % de dégâts en plus."
       },
       "vanguard_priest_discipline": {
@@ -24269,7 +24269,7 @@ export const fr_FR: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Mailles de guerre Né-du-vent",
-        "bonus2": "Frappe ancestrale ralentit la vitesse de déplacement de la cible de 30 % pendant 4 s.",
+        "bonus2": "Frappe ancestrale ralentit la vitesse de déplacement de la cible de 30 % pendant 4 s. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Frappe ancestrale réduit de 4 s le temps de recharge restant de Transe élémentaire."
       },
       "vanguard_shaman_restoration": {
@@ -24314,7 +24314,7 @@ export const fr_FR: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Équipement du traque-cendres",
-        "bonus2": "Augmente de 40 le score de Défense d'Art de la guerre.",
+        "bonus2": "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
         "bonus7": "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Tuer un joueur hostile accorde Pas de cendre, augmentant la vitesse de déplacement de 40% pendant 6 s."
       },
@@ -24326,7 +24326,7 @@ export const fr_FR: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Tenue de guerre forgée par la fureur",
-        "bonus2": "Augmente de 40 le score de Défense d'Art de la guerre.",
+        "bonus2": "Augmente de 40 le score de Défense d'Art de la guerre. Les dégâts subis ne retardent plus vos incantations.",
         "bonus4": "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
         "bonus7": "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Tuer un joueur hostile accorde Serment inbrisé, absorbant 200 points de dégâts pendant 10 s."
       },

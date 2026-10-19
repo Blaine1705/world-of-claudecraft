@@ -8299,7 +8299,7 @@ export const nl_NL: EnTranslations = {
       "honorFinalNoteSoldBack": "Aankopen met Eer zijn definitief. De terugkooplijst bevat alleen wat je hebt verkocht: een aankoop met munten kan meestal voor de verkoopprijs worden teruggekocht en uit die lijst worden teruggehaald als je opnieuw van gedachten verandert, maar Oorlogsuitrusting bindt aan je ziel zodra je haar koopt en kan dus nooit worden verhandeld, verstuurd of voor iets worden terugverkocht, en komt nooit op die lijst. De winkel vraagt je daarom om te bevestigen: bekijk het stuk voordat je erop drukt.",
       "warfareHeading": "Oorlogvoeringsuitrusting",
       "warfareBody": "Elk Oorlogvoeringsstuk draagt Oorlogvoering-Aanvalswaardering en Oorlogvoering-Verdedigingswaardering, en die twee waarderingen doen helemaal niets tegen monsters. Ze werken alleen als je tegen een andere speler vecht, in een duel, in de arena, of op het slagveld, waar Aanval wordt opgeteld bij de schade die je toebrengt en Verdediging de schade vermindert die je oploopt, allebei tot hun eigen plafond. Elke harnasfamilie is ook een set, en de setbonussen ervan zijn eveneens Oorlogvoering-waarderingen of effecten die alleen tegen spelers werken, dus een volledige eer-uitrusting is niets waard tegen een kerkerbaas.",
-      "warfareBodyStatsStay": "Elk Oorlogsstuk draagt een aanvals- en verdedigingsrating voor Oorlogsvoering, en die twee ratings doen helemaal niets tegen monsters. Ze gelden alleen wanneer je tegen een andere speler vecht, in een duel, de arena of het slagveld. Aanval verhoogt daar de schade die je toebrengt en Verdediging verlaagt de schade die je ontvangt, elk tot zijn eigen plafond. Elke pantserfamilie is ook een verzameling en haar setbonussen zijn eveneens ratings of effecten voor Oorlogsvoering die alleen tegen spelers werken, dus de setbonussen van een volledige Eerset tellen niets tegen een kerkerbaas. De stukken zelf dragen nog steeds hun gewone statistieken, pantser en wapenschade, en die werken overal. Het zijn de ratings en setbonussen voor Oorlogsvoering die tegen een monster stilvallen. Eén uitzondering werkt overal: twee delen van een spreukwerkersset zorgen er ook voor dat opgelopen schade je spreuken niet meer vertraagt.",
+      "warfareBodyStatsStay": "Elk Oorlogsstuk draagt een aanvals- en verdedigingsrating voor Oorlogsvoering, en die twee ratings doen helemaal niets tegen monsters. Ze gelden alleen wanneer je tegen een andere speler vecht, in een duel, de arena of het slagveld. Aanval verhoogt daar de schade die je toebrengt en Verdediging verlaagt de schade die je ontvangt, elk tot zijn eigen plafond. Elke pantserfamilie is ook een verzameling en haar setbonussen zijn eveneens ratings of effecten voor Oorlogsvoering die alleen tegen spelers werken, dus de setbonussen van een volledige Eerset tellen niets tegen een kerkerbaas. De stukken zelf dragen nog steeds hun gewone statistieken, pantser en wapenschade, en die werken overal. Het zijn de ratings en setbonussen voor Oorlogsvoering die tegen een monster stilvallen. Eén uitzondering werkt overal: twee delen van elk van deze sets zorgen er ook voor dat opgelopen schade je spreuken niet meer vertraagt.",
       "warfareTradeBody": "Dat is de bewuste ruil. Oorlogvoeringsuitrusting is gebouwd om tegen spelers te vechten, niet als kortere weg langs de kerkerniveaus: een stuk Oorlogvoeringsuitrusting draagt nooit de gevechtswaarderingen die een episch kerkerstuk in dezelfde gleuf wel heeft, en alles wat het wel meebrengt, wordt besteed aan andere spelers. Wil je jezelf staande houden in de arena, koop het dan. Wil je heroïsche kerkers sneller uitspelen, verdien je uitrusting dan in de kerkers.",
       "warfareTradeBodyRatingSpent": "Dat is de bewuste ruil. Oorlogsuitrusting is gemaakt om tegen spelers te vechten, niet als sluiproute langs de kerkerlagen. Een Oorlogsstuk draagt nooit de gevechtsratings die een episch kerkerstuk op dezelfde plek heeft, en de rating en setbonussen voor Oorlogsvoering die het in plaats daarvan draagt, worden volledig tegen andere spelers ingezet. Als je je in de arena wilt weren, koop het dan. Als je heroïsche kerkers sneller wilt voltooien, verdien je uitrusting dan in de kerkers.",
       "vanguardHeading": "Voortocht-uitrusting: Oorlogsseizoen 2",
@@ -24179,7 +24179,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Bloedmaan Huid",
-        "bonus2": "Afkoelingseffect van Bruin-stormloop is 3 sec korter.",
+        "bonus2": "Afkoelingseffect van Bruin-stormloop is 3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Bruin-stormloop beschermt je voor 6% van je maximale gezondheid voor 6 sec."
       },
       "vanguard_druid_restoration": {
@@ -24189,17 +24189,17 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Roedelwacht Harnas",
-        "bonus2": "Afkoelingseffect van Ratelend Schot is 4 sec korter.",
+        "bonus2": "Afkoelingseffect van Ratelend Schot is 4 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Ratelend Schot vermindert het resterende afkoelingseffect van Beestachtige woede 1 sec."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Verreziicht Harnas",
-        "bonus2": "Afkoelingseffect van Sporenbreuk is 4 sec korter.",
+        "bonus2": "Afkoelingseffect van Sporenbreuk is 4 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Sporenbreuk maakt je volgende Lange Trek binnen 6 sec onmiddellijk. Kan niet meer dan eens per 15 sec gebeuren."
       },
       "vanguard_hunter_survival": {
         "name": "Striktetand Harnas",
-        "bonus2": "Afkoelingseffect van Bloedhaak is 3 sec korter.",
+        "bonus2": "Afkoelingseffect van Bloedhaak is 3 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Bloedhaak geeft je 1 Jachtvaart."
       },
       "vanguard_mage_arcane": {
@@ -24224,12 +24224,12 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Schildeed Bolwerk",
-        "bonus2": "Afkoelingseffect van Eedketen is 2 sec korter.",
+        "bonus2": "Afkoelingseffect van Eedketen is 2 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Vijanden getrokken door Eedketen casten spreuken 30% langzamer voor 4 sec, en Eedketen geeft je Zonnereprimande wanneer het een vijand bindt die kan worden getrokken."
       },
       "vanguard_paladin_retribution": {
         "name": "Lichtbrand Krijgsplaat",
-        "bonus2": "Afkoelingseffect van Valkyrs Roeping is 15 sec korter.",
+        "bonus2": "Afkoelingseffect van Valkyrs Roeping is 15 sec korter. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Valkyrs Roeping stelt het afkoelingseffect van Laatste Edict opnieuw in, en je volgende Laatste Edict binnen 6 sec na het landen doet 15% meer schade."
       },
       "vanguard_priest_discipline": {
@@ -24269,7 +24269,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Stormgeborens Strijdpantser",
-        "bonus2": "Voorouderlijke Slag vertraagt beweging van het doel 30% voor 4 sec.",
+        "bonus2": "Voorouderlijke Slag vertraagt beweging van het doel 30% voor 4 sec. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Voorouderlijke Slag vermindert het resterende afkoelingseffect van Elementaire Trance 4 sec."
       },
       "vanguard_shaman_restoration": {
@@ -24314,7 +24314,7 @@ export const nl_NL: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Uitrusting van de Asjager",
-        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40.",
+        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.",
         "bonus7": "Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Een vijandige speler doden verleent Asstap, wat de bewegingssnelheid 6 sec lang met 40% verhoogt."
       },
@@ -24326,7 +24326,7 @@ export const nl_NL: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Woedgesmede Strijduitrusting",
-        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40.",
+        "bonus2": "Verhoogt de Oorlogvoering-Verdedigingswaardering met 40. Opgelopen schade vertraagt je spreuken niet meer.",
         "bonus4": "Verhoogt de Oorlogvoering-Aanvalswaardering met 40, en beheersing die vijandige spelers op u leggen duurt 15% korter.",
         "bonus7": "Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Een vijandige speler doden verleent Ongebroken Eed, wat 10 sec lang 200 schade absorbeert."
       },

@@ -10325,7 +10325,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.name': '계곡 비전술사의 예복',
   'entities.itemSets.vale_arcanist.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.warfare_ashstalker.name': '잿빛추적자의 장비',
-  'entities.itemSets.warfare_ashstalker.bonus2': '워페어 방어 등급이 40 증가합니다.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    '워페어 방어 등급이 40 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     '워페어 공격 등급이 40 증가하고, 적대 플레이어가 당신에게 거는 군중 제어의 지속시간이 15% 짧아집니다.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -10338,7 +10339,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     '워페어 공격 및 방어 등급이 80 증가합니다. 주문에 15% 확률로 잉걸불 수호가 깃들어 8초 동안 120의 피해를 흡수합니다.',
   'entities.itemSets.warfare_furyforged.name': '분노벼림 전투장비',
-  'entities.itemSets.warfare_furyforged.bonus2': '워페어 방어 등급이 40 증가합니다.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    '워페어 방어 등급이 40 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.warfare_furyforged.bonus4':
     '워페어 공격 등급이 40 증가하고, 적대 플레이어가 당신에게 거는 군중 제어의 지속시간이 15% 짧아집니다.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -18245,7 +18247,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     '등급전에서 이기면 플레이어 대 플레이어 화폐인 명예를 받고, 끝까지 치른 시합은 지더라도 그보다 적은 몫을 여전히 받으며 무승부도 그러하니, 패배로 정말 잃는 것은 평점뿐입니다. 명예는 진짜 시합에 보답하도록 만들어졌습니다. 같은 날 같은 상대나 같은 팀을 다시 이겨도 더 주어지지 않고(그 상대에게 다시 져도 마찬가지입니다), 하루 종일 이기는 날이라도 처음 몇 승까지는 온전히 받다가 그 뒤로는 한 승에 절반만 받고, 더 이기면 다시 절반으로 줄어 거기서 멈추며, 상대가 기권한 시합은 평점은 움직여도 명예는 전혀 주지 않습니다. 그 하루는 왕국의 하루여서 왕국의 밤 초기화 시각에 넘어가는데, 이는 모든 하루 잠금이 풀리는 바로 그 경계입니다.',
   'guide.arenaPage.warfareBodyStatsStay':
-    '모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌의 세트 효과는 던전 우두머리 앞에서는 아무 값어치가 없습니다. 장비 자체는 여전히 보통의 능력치와 방어도, 무기 피해를 지니고 있고 그것들은 어디서나 통합니다. 몬스터 앞에서 잠잠해지는 것은 워페어 등급과 세트 효과입니다. 단, 어디서나 적용되는 예외가 하나 있습니다. 시전자 세트를 2부위 착용하면 피해를 입어도 주문 시전이 지연되지 않습니다.',
+    '모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌의 세트 효과는 던전 우두머리 앞에서는 아무 값어치가 없습니다. 장비 자체는 여전히 보통의 능력치와 방어도, 무기 피해를 지니고 있고 그것들은 어디서나 통합니다. 몬스터 앞에서 잠잠해지는 것은 워페어 등급과 세트 효과입니다. 단, 어디서나 적용되는 예외가 하나 있습니다. 이 중 어느 세트든 2부위 착용하면 피해를 입어도 주문 시전이 지연되지 않습니다.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     '이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 등급을 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 워페어 등급과 세트 효과는 온전히 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요.',
   'guide.social.calendarBodyDoubleHonor':
@@ -19491,27 +19493,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Life Covenant가 대상에게 최대 생명력 8%의 보호막을 6초 동안 부여합니다.',
   'entities.itemSets.vanguard_paladin_protection.name': '선봉대: Shieldvow Bastion',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    '2세트: Oath Chain의 재사용 대기시간이 2초 감소합니다.',
+    '2세트: Oath Chain의 재사용 대기시간이 2초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     '4세트: Oath Chain에 끌린 적의 주문 시전이 4초 동안 30% 느려지고 Solar Reprisal을 얻을 수 있습니다.',
   'entities.itemSets.vanguard_paladin_retribution.name': '선봉대: Lightbrand Warplate',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    '2세트: Valkyr Calling의 재사용 대기시간이 15초 감소합니다.',
+    '2세트: Valkyr Calling의 재사용 대기시간이 15초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     '4세트: Valkyr Calling이 Final Edict을 초기화하고 착지 후 6초 안의 다음 Final Edict 피해를 15% 높입니다.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': '선봉대: Packwarden Harness',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    '2세트: Rattling Shot의 재사용 대기시간이 4초 감소합니다.',
+    '2세트: Rattling Shot의 재사용 대기시간이 4초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     '4세트: Rattling Shot이 Howling Rage의 남은 재사용 대기시간을 1초 줄입니다.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': '선봉대: Farsight Harness',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    '2세트: Trailbreak의 재사용 대기시간이 4초 감소합니다.',
+    '2세트: Trailbreak의 재사용 대기시간이 4초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     '4세트: Trailbreak가 6초 안의 다음 Long Draw를 즉시 시전하게 합니다. 15초에 한 번만 발동합니다.',
   'entities.itemSets.vanguard_hunter_survival.name': '선봉대: Snaretooth Harness',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    '2세트: Bloodhook의 재사용 대기시간이 3초 감소합니다.',
+    '2세트: Bloodhook의 재사용 대기시간이 3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_hunter_survival.bonus4':
     '4세트: Bloodhook이 Hunting Momentum 1을 부여합니다.',
   'entities.itemSets.vanguard_rogue_assassination.name': '선봉대: Nightcut Leathers',
@@ -19551,7 +19553,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Unleash Weapon으로 이동 중 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다.',
   'entities.itemSets.vanguard_shaman_enhancement.name': '선봉대: Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    '2세트: Ancestral Strike가 대상의 이동 속도를 4초 동안 30% 감소시킵니다.',
+    '2세트: Ancestral Strike가 대상의 이동 속도를 4초 동안 30% 감소시킵니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     '4세트: Ancestral Strike가 Elemental Trance의 남은 재사용 대기시간을 4초 줄입니다.',
   'entities.itemSets.vanguard_shaman_restoration.name': '선봉대: Brineward Chainmail',
@@ -19591,7 +19593,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: 두 번째 Conflagrate마다 8초 안의 다음 Ruinbolt를 즉시 시전하게 합니다.',
   'entities.itemSets.vanguard_druid_feral.name': '피갈기 가죽',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    '2세트: Bruin Rush의 재사용 대기시간이 3초 감소합니다.',
+    '2세트: Bruin Rush의 재사용 대기시간이 3초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     '4세트: Bruin Rush가 최대 생명력 6%의 보호막을 6초 동안 부여합니다.',
   'entities.itemSets.vanguard_druid_restoration.name': '엉겅꽃 의복',

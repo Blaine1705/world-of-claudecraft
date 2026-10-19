@@ -2112,7 +2112,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Conjurar Raízes Agarradoras permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s.',
   'entities.itemSets.vanguard_druid_feral.name': 'Pelagem da Juba de Sangue',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'O tempo de recarga de Investida de Bruin é reduzido em 3 s.',
+    'O tempo de recarga de Investida de Bruin é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Investida de Bruin te escuda em 6% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Veste da Flor de Cardo',
@@ -2122,17 +2122,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Recuperação Rápida também aumenta sua velocidade de movimento em 30% por 3 s.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Arreios do Guarda da Matilha',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'O tempo de recarga de Tiro Desnorteante é reduzido em 4 s.',
+    'O tempo de recarga de Tiro Desnorteante é reduzido em 4 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Tiro Desnorteante reduz em 1 s o tempo de recarga restante de Ira Bestial.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Arreios da Vista Longínqua',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'O tempo de recarga de Quebra-Trilha é reduzido em 4 s.',
+    'O tempo de recarga de Quebra-Trilha é reduzido em 4 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Quebra-Trilha torna sua próxima Puxada Longa em até 6 s instantânea. Não pode ocorrer mais de uma vez a cada 15 s.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Arreios do Dente de Armadilha',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    'O tempo de recarga de Gancho Sangrento é reduzido em 3 s.',
+    'O tempo de recarga de Gancho Sangrento é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_hunter_survival.bonus4':
     'Gancho Sangrento concede 1 de Ímpeto de Caça.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Vestes do Vínculo das Horas',
@@ -2157,12 +2157,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Pacto da Vida também escuda o aliado em 8% da vida máxima dele por 6 s.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Bastião do Voto do Escudo',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'O tempo de recarga de Corrente do Juramento é reduzido em 2 s.',
+    'O tempo de recarga de Corrente do Juramento é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Inimigos puxados por Corrente do Juramento conjuram magias 30% mais devagar por 4 s, e Corrente do Juramento concede Represália Solar quando prende um inimigo que pode ser puxado.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Placas de Guerra da Marca da Luz',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'O tempo de recarga de Chamado da Valquíria é reduzido em 15 s.',
+    'O tempo de recarga de Chamado da Valquíria é reduzido em 15 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Chamado da Valquíria reinicia o tempo de recarga de Édito Final, e seu próximo Édito Final conjurado em até 6 s causa 15% mais dano.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Vestimenta do Salmo do Véu',
@@ -2202,7 +2202,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Desencadear Arma permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Malha de Guerra do Filho do Vendaval',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Golpe Ancestral reduz a velocidade de movimento do alvo em 30% por 4 s.',
+    'Golpe Ancestral reduz a velocidade de movimento do alvo em 30% por 4 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Golpe Ancestral reduz em 4 s o tempo de recarga restante de Elemental Trance.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cota de Malha do Guarda da Salmoura',
@@ -4756,7 +4756,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Estilo',
   'editor.status.campCapReached':
     'Limite de acampamentos atingido ({max}). O novo acampamento não foi adicionado.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4769,7 +4770,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Vossas magias têm 15% de chance de conceder Guarda de Brasa, absorvendo 120 de dano por 8 s.',
   'entities.itemSets.warfare_cinderweave.name': 'Vestes Cinderweave',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19566,7 +19568,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Uma vitória ranqueada paga Honra, a moeda de jogador contra jogador, e uma derrota jogada até o fim ainda paga uma parte menor, assim como um empate, então a classificação é o único custo real de uma derrota. Honra deve recompensar partidas reais: vencer o mesmo oponente ou a mesma equipe outra vez no mesmo dia não paga nada além, nem perder para eles novamente, uma longa sequência de vitórias paga por inteiro no primeiro trecho e depois reduz pela metade o pagamento de uma vitória, reduzindo-o de novo mais adiante e permanecendo assim, e uma partida abandonada pelo oponente ainda move sua classificação, mas não paga Honra. O dia é do reino: ele reinicia na hora do reset noturno, o mesmo limite em que toda restrição diária é liberada.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros. Há uma exceção que funciona em todo lugar: duas peças de um conjunto de conjurador também fazem com que o dano recebido não atrase mais suas conjurações.',
+    'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros. Há uma exceção que funciona em todo lugar: duas peças de qualquer um desses conjuntos também fazem com que o dano recebido não atrase mais suas conjurações.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras.',
   'guide.controls.harvestJournal': 'Diário de Colheita',

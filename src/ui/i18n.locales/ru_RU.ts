@@ -10555,7 +10555,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
   'entities.itemSets.warfare_ashstalker.name': 'Снаряжение пепельного ловчего',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -10568,7 +10569,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Повышает рейтинги атаки и защиты Боевой мощи на 80. Ваши заклинания с вероятностью 15% дают Угольную стражу, поглощающую 120 урона в течение 8 сек.',
   'entities.itemSets.warfare_furyforged.name': 'Яростнокованый боевой доспех',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Повышает рейтинг защиты Боевой мощи на 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Повышает рейтинг защиты Боевой мощи на 40. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Повышает рейтинг атаки Боевой мощи на 40, а контроль, накладываемый на вас враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -18599,7 +18601,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Победа в рейтинговом матче приносит честь, валюту сражений игрок против игрока, а поражение в бою, который вы доиграли до конца, всё равно приносит меньшую её долю, как и ничья, так что по-настоящему поражение стоит вам одного лишь рейтинга. Честь задумана как награда за настоящие бои: победа над тем же противником или той же командой ещё раз в тот же день не приносит ничего сверх (как и повторное поражение от них), за долгий победный день первые победы платят сполна, дальше победа платит вдвое меньше, а ещё глубже в дне снова вдвое меньше, и на том останавливается, а матч, который противник сдал, всё же двигает ваш рейтинг, но чести не приносит вовсе. Этот день принадлежит самому королевству: он сменяется в его ночной час сброса, на той же границе, где спадает каждая суточная привязка.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'На каждой вещи Боевой мощи есть рейтинг атаки и рейтинг защиты Боевой мощи, и против чудовищ эти два рейтинга не делают ровным счётом ничего. Они работают лишь тогда, когда вы сражаетесь с другим игроком: на дуэли, на арене или на поле боя, где атака добавляет урона вашим ударам, а защита срезает урон по вам, и каждая до своего предела. Каждое семейство брони к тому же и комплект, а его бонусы — снова рейтинг Боевой мощи или эффекты, что работают только против игроков, так что бонусы комплекта у полного набора за честь ничего не стоят против босса подземелья. Сами же вещи по-прежнему несут обычные характеристики, броню и урон оружия, и всё это работает везде; против чудовища замолкают лишь рейтинги Боевой мощи и бонусы комплекта. Одно исключение действует везде: два предмета комплекта заклинателя также делают так, что получаемый урон больше не замедляет чтение ваших заклинаний.',
+    'На каждой вещи Боевой мощи есть рейтинг атаки и рейтинг защиты Боевой мощи, и против чудовищ эти два рейтинга не делают ровным счётом ничего. Они работают лишь тогда, когда вы сражаетесь с другим игроком: на дуэли, на арене или на поле боя, где атака добавляет урона вашим ударам, а защита срезает урон по вам, и каждая до своего предела. Каждое семейство брони к тому же и комплект, а его бонусы — снова рейтинг Боевой мощи или эффекты, что работают только против игроков, так что бонусы комплекта у полного набора за честь ничего не стоят против босса подземелья. Сами же вещи по-прежнему несут обычные характеристики, броню и урон оружия, и всё это работает везде; против чудовища замолкают лишь рейтинги Боевой мощи и бонусы комплекта. Одно исключение действует везде: два предмета любого из этих комплектов также делают так, что получаемый урон больше не замедляет чтение ваших заклинаний.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Такова осознанная плата. Снаряжение Боевой мощи создано для боёв с игроками, а не как обходной путь мимо ступеней подземелий: вещь Боевой мощи никогда не несёт тех боевых характеристик, что несёт эпическая вещь из подземелья в том же слоте, а рейтинг Боевой мощи и бонусы комплекта, которые она несёт взамен, целиком тратятся на других игроков. Хотите держаться на арене — покупайте её. Хотите быстрее проходить героические подземелья — добывайте снаряжение в подземельях.',
   'guide.social.calendarBodyDoubleHonor':
@@ -19868,27 +19870,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Life Covenant также накладывает на союзника щит на 8% его максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Авангард: Shieldvow Bastion',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    '2 предмета: время восстановления Oath Chain сокращается на 2 сек.',
+    '2 предмета: время восстановления Oath Chain сокращается на 2 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     '4 предмета: враги, притянутые Oath Chain, произносят заклинания на 30% медленнее 4 сек.; успешная связка может дать Solar Reprisal.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Авангард: Lightbrand Warplate',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    '2 предмета: время восстановления Valkyr Calling сокращается на 15 сек.',
+    '2 предмета: время восстановления Valkyr Calling сокращается на 15 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     '4 предмета: Valkyr Calling сбрасывает Final Edict и повышает урон следующего Final Edict в течение 6 сек. после приземления на 15%.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Авангард: Packwarden Harness',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    '2 предмета: время восстановления Rattling Shot сокращается на 4 сек.',
+    '2 предмета: время восстановления Rattling Shot сокращается на 4 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     '4 предмета: Rattling Shot сокращает оставшееся время восстановления Howling Rage на 1 сек.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Авангард: Farsight Harness',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    '2 предмета: время восстановления Trailbreak сокращается на 4 сек.',
+    '2 предмета: время восстановления Trailbreak сокращается на 4 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     '4 предмета: Trailbreak делает следующий Long Draw в течение 6 сек. мгновенным. Не чаще раза в 15 сек.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Авангард: Snaretooth Harness',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    '2 предмета: время восстановления Bloodhook сокращается на 3 сек.',
+    '2 предмета: время восстановления Bloodhook сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_hunter_survival.bonus4':
     '4 предмета: Bloodhook дает 1 Hunting Momentum.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Авангард: Nightcut Leathers',
@@ -19928,7 +19930,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Unleash Weapon позволяет произносить заклинания на ходу и повышает скорость на 20% на 4 сек. Не чаще раза в 20 сек.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Авангард: Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    '2 предмета: Ancestral Strike замедляет цель на 30% на 4 сек.',
+    '2 предмета: Ancestral Strike замедляет цель на 30% на 4 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     '4 предмета: Ancestral Strike сокращает оставшееся время восстановления Elemental Trance на 4 сек.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Авангард: Brineward Chainmail',
@@ -19968,7 +19970,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: каждый второй Conflagrate делает следующий Ruinbolt в течение 8 сек. мгновенным.',
   'entities.itemSets.vanguard_druid_feral.name': 'Шкура кровавой гривы',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    '2 предмета: время восстановления Bruin Rush сокращается на 3 сек.',
+    '2 предмета: время восстановления Bruin Rush сокращается на 3 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     '4 предмета: Bruin Rush накладывает щит на 6% максимального здоровья на 6 сек.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Облачение чертополоха',

@@ -8299,7 +8299,7 @@ export const it_IT: EnTranslations = {
       "honorFinalNoteSoldBack": "Gli acquisti con Onore sono definitivi. La lista di ricompra contiene solo ciò che hai venduto: un acquisto in monete di solito può essere rivenduto al suo prezzo e recuperato dalla lista se cambi di nuovo idea, ma l’equipaggiamento da Guerra si vincola all’anima nel momento dell’acquisto, quindi non può essere scambiato, spedito o rivenduto e non raggiunge mai quella lista. Il negozio chiede conferma per questo motivo: leggi il pezzo prima di premere.",
       "warfareHeading": "Equipaggiamento da Guerra",
       "warfareBody": "Ogni pezzo da Guerra porta un Indice di Attacco GUERRA e un Indice di Difesa GUERRA, e questi due indici non hanno alcun effetto contro i mostri. Si applicano solo quando combatti un altro giocatore, in duello, in arena o sul campo di battaglia, dove l'Attacco aumenta il danno che infliggi e la Difesa riduce il danno che subisci, ciascuno fino al proprio tetto massimo. Ogni famiglia di armature è anche un set, e i suoi bonus di set sono a loro volta indici GUERRA o effetti che funzionano solo contro i giocatori, quindi un kit da onore completo non vale nulla contro un boss di dungeon.",
-      "warfareBodyStatsStay": "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra. Un'eccezione funziona ovunque: due pezzi di un set da incantatore fanno anche sì che i danni subiti non ritardino più il lancio degli incantesimi.",
+      "warfareBodyStatsStay": "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra. Un'eccezione funziona ovunque: due pezzi di uno qualsiasi di questi set fanno anche sì che i danni subiti non ritardino più il lancio degli incantesimi.",
       "warfareTradeBody": "Questo è lo scambio voluto. L'equipaggiamento da Guerra è costruito per combattere altri giocatori, non come scorciatoia per saltare i livelli dei dungeon: un pezzo da Guerra non porta mai gli indici di combattimento di un epico da dungeon nello stesso slot, e tutto ciò che offre si spende su altri giocatori. Se vuoi tenere testa in arena, compralo. Se vuoi completare le eroiche più in fretta, guadagnati l'equipaggiamento nei dungeon.",
       "warfareTradeBodyRatingSpent": "È questo lo scambio voluto. L’equipaggiamento da Guerra serve a combattere i giocatori, non a saltare i livelli dei dungeon: un pezzo da Guerra non porta mai le valutazioni di combattimento che avrebbe un epico da dungeon nello stesso slot, e la valutazione da Guerra e i bonus del completo che porta sono spesi interamente contro altri giocatori. Se vuoi reggere nell’arena, compralo. Se vuoi superare più velocemente le modalità eroiche, guadagna l’equipaggiamento nei dungeon.",
       "vanguardHeading": "Equipaggiamento dell'Avanguardia: Guerra Stagione 2",
@@ -24179,7 +24179,7 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Pelle Sanguicriniera",
-        "bonus2": "Il tempo di recupero di Carica di Bruin è ridotto di 3 sec.",
+        "bonus2": "Il tempo di recupero di Carica di Bruin è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Carica di Bruin ti protegge con uno scudo pari al 6 percento della tua salute massima per 6 sec."
       },
       "vanguard_druid_restoration": {
@@ -24189,17 +24189,17 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Finimenti Guardiabranco",
-        "bonus2": "Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec.",
+        "bonus2": "Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Tiro Scuotente riduce di 1 sec il tempo di recupero rimanente di Ira Bestiale."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Finimenti Vistalontana",
-        "bonus2": "Il tempo di recupero di Rompipista è ridotto di 4 sec.",
+        "bonus2": "Il tempo di recupero di Rompipista è ridotto di 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Rompipista rende istantaneo il tuo prossimo Tiro Teso lanciato entro 6 sec. Non può verificarsi più di una volta ogni 15 sec."
       },
       "vanguard_hunter_survival": {
         "name": "Finimenti Dentetrappola",
-        "bonus2": "Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec.",
+        "bonus2": "Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Uncino Sanguinario concede 1 Slancio di Caccia."
       },
       "vanguard_mage_arcane": {
@@ -24224,12 +24224,12 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Baluardo Giuroscudo",
-        "bonus2": "Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec.",
+        "bonus2": "Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "I nemici trascinati da Catena del Giuramento lanciano incantesimi il 30 percento più lentamente per 4 sec, e Catena del Giuramento ti concede Rappresaglia Solare quando vincola un nemico che può essere trascinato."
       },
       "vanguard_paladin_retribution": {
         "name": "Piastre di Guerra Marchioluce",
-        "bonus2": "Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec.",
+        "bonus2": "Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Richiamo della Valchiria azzera il tempo di recupero di Editto Finale, e il tuo prossimo Editto Finale lanciato entro 6 sec dal colpo infligge il 15 percento di danni in più."
       },
       "vanguard_priest_discipline": {
@@ -24269,7 +24269,7 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Maglia di Guerra Ventonato",
-        "bonus2": "Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec.",
+        "bonus2": "Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Colpo Ancestrale riduce di 4 sec il tempo di recupero rimanente di Elemental Trance."
       },
       "vanguard_shaman_restoration": {
@@ -24314,7 +24314,7 @@ export const it_IT: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Kit Braccacenere",
-        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus2": "Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
         "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Passo di Cenere, aumentando la velocità di movimento del 40% per 6 sec."
       },
@@ -24326,7 +24326,7 @@ export const it_IT: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Armatura da Battaglia Forgiafuria",
-        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus2": "Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
         "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Giuramento Infranto, assorbendo 200 danni per 10 sec."
       },

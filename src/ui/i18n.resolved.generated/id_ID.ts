@@ -8299,7 +8299,7 @@ export const id_ID: EnTranslations = {
       "honorFinalNoteSoldBack": "Pembelian Kehormatan bersifat final. Daftar pembelian kembali hanya memuat barang yang kamu jual: pembelian dengan koin biasanya dapat dijual kembali seharga jualnya dan diambil lagi dari daftar itu jika kamu berubah pikiran, tetapi perlengkapan Perang terikat jiwa saat dibeli, jadi tak pernah bisa ditukar, dikirim, atau dijual kembali, dan tak pernah masuk daftar itu. Toko meminta konfirmasi karena alasan tersebut: baca barangnya sebelum menekan tombol.",
       "warfareHeading": "Perlengkapan Perang",
       "warfareBody": "Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tak berguna melawan monster. Keduanya berlaku hanya saat kamu bertarung melawan pemain lain, dalam duel, di arena, atau di Medan Thornhollow, tempat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batas tertingginya sendiri. Setiap keluarga zirah juga merupakan sebuah set, dan bonus setnya pun sama-sama berupa rating Perang atau efek yang hanya bekerja melawan pemain, sehingga satu set perlengkapan kehormatan penuh sama sekali tak berguna melawan bos dungeon.",
-      "warfareBodyStatsStay": "Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tidak berpengaruh melawan monster. Keduanya hanya berlaku saat kamu melawan pemain lain, dalam duel, arena, atau medan pertempuran, saat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batasnya sendiri. Setiap keluarga zirah juga merupakan set, dan bonus setnya juga berupa rating Perang atau efek yang hanya bekerja melawan pemain, jadi bonus set lengkap Kehormatan tidak berarti apa-apa pada bos dungeon. Potongannya sendiri tetap membawa statistik biasa, zirah, dan kerusakan senjata yang bekerja di mana-mana; rating Perang dan bonus setlah yang diam terhadap monster. Satu pengecualian berlaku di mana saja: dua bagian set perapal juga membuat kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+      "warfareBodyStatsStay": "Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tidak berpengaruh melawan monster. Keduanya hanya berlaku saat kamu melawan pemain lain, dalam duel, arena, atau medan pertempuran, saat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batasnya sendiri. Setiap keluarga zirah juga merupakan set, dan bonus setnya juga berupa rating Perang atau efek yang hanya bekerja melawan pemain, jadi bonus set lengkap Kehormatan tidak berarti apa-apa pada bos dungeon. Potongannya sendiri tetap membawa statistik biasa, zirah, dan kerusakan senjata yang bekerja di mana-mana; rating Perang dan bonus setlah yang diam terhadap monster. Satu pengecualian berlaku di mana saja: dua bagian dari set mana pun ini juga membuat kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
       "warfareTradeBody": "Itulah kompromi yang disengaja. Perlengkapan Perang dibuat untuk bertarung melawan pemain, bukan sebagai jalan pintas melewati tingkatan dungeon: satu perlengkapan Perang tak pernah membawa rating pertarungan yang dimiliki perlengkapan Epik dungeon di slot yang sama, dan semua yang ia bawa dihabiskan untuk melawan pemain lain. Jika kamu ingin bertahan sendiri di arena, belilah. Jika kamu ingin menuntaskan heroik lebih cepat, dapatkan perlengkapanmu di dungeon.",
       "warfareTradeBodyRatingSpent": "Itulah pertukaran yang disengaja. Perlengkapan Perang dibuat untuk melawan pemain, bukan jalan pintas melewati tingkatan dungeon: perlengkapan Perang tidak pernah membawa rating pertarungan yang dimiliki epik dungeon pada slot yang sama, dan rating Perang serta bonus set yang dibawanya sepenuhnya digunakan untuk melawan pemain lain. Jika ingin bertahan di arena, belilah. Jika ingin menuntaskan mode heroik lebih cepat, dapatkan perlengkapanmu di dungeon.",
       "vanguardHeading": "Perlengkapan Vanguard: Musim Peperangan 2",
@@ -24179,7 +24179,7 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Kulit Bersurai Darah",
-        "bonus2": "Jeda Terjangan Bruin dikurangi 3 detik.",
+        "bonus2": "Jeda Terjangan Bruin dikurangi 3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Terjangan Bruin melindungimu sebesar 6 persen dari kesehatan maksimal-mu selama 6 detik."
       },
       "vanguard_druid_restoration": {
@@ -24189,17 +24189,17 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Pengaman Penjaga Kawanan",
-        "bonus2": "Jeda Tembakan Pengguncang dikurangi 4 detik.",
+        "bonus2": "Jeda Tembakan Pengguncang dikurangi 4 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Tembakan Pengguncang mengurangi jeda tersisa Murka Buas sebesar 1 detik."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Pengaman Penglihatan Jauh",
-        "bonus2": "Jeda Putus Jejak dikurangi 4 detik.",
+        "bonus2": "Jeda Putus Jejak dikurangi 4 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Putus Jejak membuat Tarikan Panjang berikutnya dalam 6 detik instan. Tidak dapat terjadi lebih dari sekali setiap 15 detik."
       },
       "vanguard_hunter_survival": {
         "name": "Pengaman Gigi Jebakan",
-        "bonus2": "Jeda Kait Darah dikurangi 3 detik.",
+        "bonus2": "Jeda Kait Darah dikurangi 3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Kait Darah memberikan 1 Momentum Berburu."
       },
       "vanguard_mage_arcane": {
@@ -24224,12 +24224,12 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Benteng Janji Perisai",
-        "bonus2": "Jeda Rantai Sumpah dikurangi 2 detik.",
+        "bonus2": "Jeda Rantai Sumpah dikurangi 2 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Musuh ditarik oleh Rantai Sumpah melempar mantra 30 persen lebih lambat selama 4 detik, dan Rantai Sumpah memberikan Penyangkalan Matahari ketika ia mengikat musuh yang dapat ditarik."
       },
       "vanguard_paladin_retribution": {
         "name": "Pelat Perang Merek Cahaya",
-        "bonus2": "Jeda Panggilan Valkyrie dikurangi 15 detik.",
+        "bonus2": "Jeda Panggilan Valkyrie dikurangi 15 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Panggilan Valkyrie mengatur ulang jeda Titah Terakhir, dan Titah Terakhir berikutnya dalam 6 detik pendaratan memberikan 15 persen lebih banyak kerusakan."
       },
       "vanguard_priest_discipline": {
@@ -24269,7 +24269,7 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Perang Berasal Badai",
-        "bonus2": "Serangan Leluhur memperlambat kecepatan gerak target 30 persen selama 4 detik.",
+        "bonus2": "Serangan Leluhur memperlambat kecepatan gerak target 30 persen selama 4 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Serangan Leluhur mengurangi jeda tersisa Elemental Trance sebesar 4 detik."
       },
       "vanguard_shaman_restoration": {
@@ -24314,7 +24314,7 @@ export const id_ID: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Perlengkapan Ashstalker",
-        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40.",
+        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.",
         "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Membunuh pemain lawan memberi Langkah Abu, yang meningkatkan kecepatan gerak sebesar 40% selama 6 dtk."
       },
@@ -24326,7 +24326,7 @@ export const id_ID: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Perlengkapan Tempur Furyforged",
-        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40.",
+        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
         "bonus4": "Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.",
         "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Membunuh pemain lawan memberi Sumpah Tak Terpatahkan, yang menyerap 200 kerusakan selama 10 dtk."
       },

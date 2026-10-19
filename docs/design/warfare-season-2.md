@@ -31,9 +31,12 @@ cheaper entry tier:
 
 Season 2 combines the two. **Every 2-piece bonus is PvP utility, and every 4-piece builds on
 its own 2-piece.** The 2-piece bends a mobility, control or defensive button. The 4-piece
-adds a follow-up that fires off that button. The caster sets (Intellect pieces:
-`VANGUARD_CASTER_SET_IDS` in `content/vanguard_set_bonuses.ts`) also grant immunity to
-damage cast pushback at two pieces, the rider the Season 1 caster families carry.
+adds a follow-up that fires off that button. Every set whose spec has a cast damage can delay
+(`VANGUARD_PUSHBACK_SET_IDS` in `content/vanguard_set_bonuses.ts`) also grants immunity to
+damage cast pushback at two pieces, the rider every Season 1 family carries. That is all 14
+caster sets plus the Protection and Retribution paladin, all three hunter, Enhancement
+shaman and Feral druid sets. Only the six warrior and rogue sets go without: rogues have no
+cast-time ability, and Bladestorm already ignores pushback.
 
 ## The PvE promise: never better than the raid tier in raids
 
@@ -67,8 +70,11 @@ everywhere. These rules hold them together:
   - every **4-piece** is sized below the same spec's raid 4-piece;
   - where a Season 2 bonus touches a number a raid bonus also bends, the two combine as the
     larger value, never added.
-- **No spell-pushback immunity on any honor set.** Every caster raid 2-piece carries it, and
-  it would be the strongest PvP rider of all.
+- **Spell-pushback immunity (reversed 2026-10, owner call):** the original rule kept it off
+  every honor set as the strongest PvP rider of all. It now rides every 2-piece whose spec
+  has a cast damage can delay (see above), so a caster or a Marksmanship hunter can finish a
+  cast under pressure. It is the same knob the caster raid 2-pieces set and max-combines
+  with it, so it never stacks past full immunity.
 - **WARFARE ratings (rebalanced 2026-09-25, owner rule "make Season 2 better than Season
   1"):** a full Season 1 kit reaches every Warfare cap through its 4-piece and 7-piece
   bonuses (+200 rating), and Season 2's ability bonuses carry no rating, so at 1x the slot

@@ -8299,7 +8299,7 @@ export const cs_CZ: EnTranslations = {
       "honorFinalNoteSoldBack": "Nákupy za čest jsou konečné. Seznam zpětného odkupu obsahuje jen to, co jsi prodal(a): nákup za mince lze obvykle prodat zpět za prodejní cenu a znovu získat ze seznamu, když si to rozmyslíš, ale Válečnická výbava se v okamžiku nákupu váže na duši, takže ji nelze obchodovat, posílat poštou ani za cokoli prodat zpět a do seznamu se nikdy nedostane. Obchod proto žádá potvrzení: před stisknutím si kus přečti.",
       "warfareHeading": "Válečnická výbava",
       "warfareBody": "Každý válečnický kus nese hodnocení útoku i obrany ve Válečnictví, a tato dvě hodnocení proti nestvůrám nic neudělají. Uplatní se jen v boji proti jinému hráči, v duelu, v aréně nebo na bojišti, kde Útok přidává k poškození, které způsobíš, a Obrana snižuje poškození, které utrpíš, každé až po svůj vlastní strop. Každá rodina zbroje je zároveň sada a její sadové bonusy jsou stejně tak hodnocení ve Válečnictví nebo efekty, které fungují jen proti hráčům, takže plná válečnická výbava je na dungeonovém bossovi k ničemu.",
-      "warfareBodyStatsStay": "Každý kus Válečnictví nese útočné a obranné hodnocení Válečnictví a tato dvě hodnocení proti nestvůrám nedělají vůbec nic. Platí jen při boji s jiným hráčem, v souboji, aréně nebo na bojišti, kde útok přidává k tvému způsobenému poškození a obrana snižuje poškození, které utržíš, vždy až ke své vlastní hranici. Každá rodina zbroje je také sada a její bonusy jsou rovněž hodnocení Válečnictví nebo účinky fungující jen proti hráčům, takže bonusy celé čestné výbavy se proti bossovi dungeonu nepočítají. Samotné kusy stále nesou běžné statistiky, zbroj a poškození zbraně a ty fungují všude; proti nestvůře mlčí jen hodnocení Válečnictví a bonusy sady. Jedna výjimka platí všude: dva kusy sady pro sesilatele navíc zajistí, že utržené poškození nezpožďuje sesílání kouzel.",
+      "warfareBodyStatsStay": "Každý kus Válečnictví nese útočné a obranné hodnocení Válečnictví a tato dvě hodnocení proti nestvůrám nedělají vůbec nic. Platí jen při boji s jiným hráčem, v souboji, aréně nebo na bojišti, kde útok přidává k tvému způsobenému poškození a obrana snižuje poškození, které utržíš, vždy až ke své vlastní hranici. Každá rodina zbroje je také sada a její bonusy jsou rovněž hodnocení Válečnictví nebo účinky fungující jen proti hráčům, takže bonusy celé čestné výbavy se proti bossovi dungeonu nepočítají. Samotné kusy stále nesou běžné statistiky, zbroj a poškození zbraně a ty fungují všude; proti nestvůře mlčí jen hodnocení Válečnictví a bonusy sady. Jedna výjimka platí všude: dva kusy kterékoli z těchto sad navíc zajistí, že utržené poškození nezpožďuje sesílání kouzel.",
       "warfareTradeBody": "To je záměrný kompromis. Válečnická výbava je stavěná na boj proti hráčům, ne jako zkratka kolem dungeonových stupňů: válečnický kus nikdy nenese bojová hodnocení, jaká má epický dungeonový kus na stejném slotu, a všechno, co přináší, je určeno proti ostatním hráčům. Pokud chceš obstát v aréně, kup si ji. Pokud chceš rychleji čistit hrdinské dungeony, vydobuď si výbavu v dungeonech.",
       "warfareTradeBodyRatingSpent": "To je záměrný obchod. Válečnická výbava je stavěná na boj s hráči, ne jako zkratka přes dungeonové stupně: kus Válečnictví nikdy nenese bojová hodnocení, která má epický dungeonový kus ve stejném slotu, a hodnocení Válečnictví i bonusy sady, které nese místo nich, se utrácejí výhradně proti hráčům. Chceš-li obstát v aréně, kup si ji. Chceš-li rychleji čistit hrdinské dungeony, získávej výbavu v dungeonech.",
       "vanguardHeading": "Výbava Předvoje: Válečnictví, sezóna 2",
@@ -24179,7 +24179,7 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Krvohřívová kůže",
-        "bonus2": "Čas obnovy Medvědího výpadu je kratší o 3 s.",
+        "bonus2": "Čas obnovy Medvědího výpadu je kratší o 3 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Medvědí výpad tě zaštítí a pohltí 6 % tvého maximálního zdraví na 6 s."
       },
       "vanguard_druid_restoration": {
@@ -24189,17 +24189,17 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Postroj Smečkostrážce",
-        "bonus2": "Čas obnovy Otřásajícího výstřelu je kratší o 4 s.",
+        "bonus2": "Čas obnovy Otřásajícího výstřelu je kratší o 4 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Otřásající výstřel sníží zbývající čas obnovy Vyjícího běsu o 1 s."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Postroj Dálnozraku",
-        "bonus2": "Čas obnovy Zlomu stopy je kratší o 4 s.",
+        "bonus2": "Čas obnovy Zlomu stopy je kratší o 4 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Zlom stopy udělá tvůj příští Dlouhý nátah do 6 s okamžitým. Nemůže nastat víc než jednou za 15 s."
       },
       "vanguard_hunter_survival": {
         "name": "Postroj Osidlozubu",
-        "bonus2": "Čas obnovy Krvavého háku je kratší o 3 s.",
+        "bonus2": "Čas obnovy Krvavého háku je kratší o 3 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Krvavý hák udělí 1 Lovecký spád."
       },
       "vanguard_mage_arcane": {
@@ -24224,12 +24224,12 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Bašta Štítopřísahy",
-        "bonus2": "Čas obnovy Řetězu přísahy je kratší o 2 s.",
+        "bonus2": "Čas obnovy Řetězu přísahy je kratší o 2 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Nepřátelé přitažení Řetězem přísahy sesílají kouzla o 30 % pomaleji na 4 s a Řetěz přísahy ti udělí Sluneční odplatu, když spoutá nepřítele, kterého lze přitáhnout."
       },
       "vanguard_paladin_retribution": {
         "name": "Válečná zbroj Světlocejchu",
-        "bonus2": "Čas obnovy Volání valkýry je kratší o 15 s.",
+        "bonus2": "Čas obnovy Volání valkýry je kratší o 15 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Volání valkýry obnoví čas obnovy Posledního ediktu a tvůj příští Poslední edikt seslaný do 6 s od dopadu způsobí o 15 % vyšší poškození."
       },
       "vanguard_priest_discipline": {
@@ -24269,7 +24269,7 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Vichrozrozená bojová košile",
-        "bonus2": "Úder předků zpomalí rychlost pohybu cíle o 30 % na 4 s.",
+        "bonus2": "Úder předků zpomalí rychlost pohybu cíle o 30 % na 4 s. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Úder předků sníží zbývající čas obnovy Elemental Trance o 4 s."
       },
       "vanguard_shaman_restoration": {
@@ -24314,7 +24314,7 @@ export const cs_CZ: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Výbava Popelného stopaře",
-        "bonus2": "Zvyšuje Válečnickou obranu o 40.",
+        "bonus2": "Zvyšuje Válečnickou obranu o 40. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Zvyšuje Válečnický útok o 40 a ovládání seslané na tebe nepřátelskými hráči trvá o 15 % kratší dobu.",
         "bonus7": "Zvyšuje Válečnický útok a obranu o 80. Zabití nepřátelského hráče udělí Popelný krok, který zvýší rychlost pohybu o 40 % na 6 s."
       },
@@ -24326,7 +24326,7 @@ export const cs_CZ: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Bojová výbava kovaná zuřivostí",
-        "bonus2": "Zvyšuje Válečnickou obranu o 40.",
+        "bonus2": "Zvyšuje Válečnickou obranu o 40. Utržené poškození již nezpožďuje sesílání kouzel.",
         "bonus4": "Zvyšuje Válečnický útok o 40 a ovládání seslané na tebe nepřátelskými hráči trvá o 15 % kratší dobu.",
         "bonus7": "Zvyšuje Válečnický útok a obranu o 80. Zabití nepřátelského hráče udělí Nezlomenou přísahu, která po 10 s pohltí 200 poškození."
       },

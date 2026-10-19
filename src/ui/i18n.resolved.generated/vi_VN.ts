@@ -8299,7 +8299,7 @@ export const vi_VN: EnTranslations = {
       "honorFinalNoteSoldBack": "Mua bằng Danh Dự là quyết định cuối cùng. Danh sách mua lại chỉ giữ những món bạn đã bán: món mua bằng tiền thường có thể bán lại theo giá bán của nó rồi mua lại từ danh sách nếu bạn đổi ý lần nữa. Nhưng trang bị Chiến Trận ràng buộc ngay khi mua, nên không thể giao dịch, gửi thư hay bán lại lấy bất cứ thứ gì, và không bao giờ xuất hiện trong danh sách đó. Vì vậy cửa hàng mới yêu cầu xác nhận: hãy đọc kỹ món đồ trước khi bấm.",
       "warfareHeading": "Trang Bị Chiến Tranh",
       "warfareBody": "Mỗi món trang bị Chiến Tranh đều mang Chỉ Số Tấn Công Chiến Tranh và Chỉ Số Phòng Thủ Chiến Tranh, và hai chỉ số này hoàn toàn vô dụng trước quái vật. Chúng chỉ phát huy tác dụng khi bạn chiến đấu với người chơi khác, trong một trận đấu tay đôi, tại đấu trường, hoặc trên chiến trường, nơi Tấn Công cộng thêm vào sát thương bạn gây ra và Phòng Thủ giảm bớt sát thương bạn nhận vào, mỗi chỉ số đều có trần riêng. Mỗi dòng giáp cũng là một bộ trang bị, và các phần thưởng bộ của nó cũng là chỉ số Chiến Tranh hay hiệu ứng chỉ có tác dụng trước người chơi, nên một bộ đồ danh dự đầy đủ chẳng có giá trị gì trước một trùm hầm ngục.",
-      "warfareBodyStatsStay": "Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái. Có một ngoại lệ hoạt động ở mọi nơi: hai món của một bộ dành cho người thi triển phép còn khiến sát thương phải chịu không làm chậm việc thi triển phép nữa.",
+      "warfareBodyStatsStay": "Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái. Có một ngoại lệ hoạt động ở mọi nơi: hai món của bất kỳ bộ nào trong số này còn khiến sát thương phải chịu không làm chậm việc thi triển phép nữa.",
       "warfareTradeBody": "Đó là sự đánh đổi có chủ ý. Trang bị Chiến Tranh được tạo ra để chiến đấu với người chơi, không phải để làm đường tắt vượt qua các bậc hầm ngục: một món trang bị Chiến Tranh không bao giờ mang chỉ số chiến đấu như một món sử thi hầm ngục cùng ô trang bị, và mọi thứ nó mang lại chỉ dùng được trước người chơi khác. Nếu bạn muốn trụ vững ở đấu trường, hãy mua nó. Nếu bạn muốn dọn heroic nhanh hơn, hãy kiếm trang bị của mình trong các hầm ngục.",
       "warfareTradeBodyRatingSpent": "Đó là sự đánh đổi có chủ đích. Trang bị Chiến Trận dành cho việc đấu với người chơi, không phải đường tắt vượt các bậc phó bản: một món Chiến Trận không có những điểm chỉ số chiến đấu mà món sử thi phó bản cùng ô có; thay vào đó, điểm Chiến Trận và thưởng bộ của nó được dành hoàn toàn cho đối thủ là người chơi. Muốn đứng vững trong đấu trường thì hãy mua. Muốn vượt phó bản anh hùng nhanh hơn thì hãy kiếm trang bị trong phó bản.",
       "vanguardHeading": "Áo Vanguard: Mùa Chiến Tranh 2",
@@ -24179,7 +24179,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Bloodmane Hide",
-        "bonus2": "Cooldown Cú Lao Bruin giảm 3 giây.",
+        "bonus2": "Cooldown Cú Lao Bruin giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Cú Lao Bruin bảo vệ bạn với 6 phần trăm sức khỏe tối đa của bạn trong 6 giây."
       },
       "vanguard_druid_restoration": {
@@ -24189,17 +24189,17 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Packwarden Harness",
-        "bonus2": "Cooldown Bắn Rúng Động giảm 4 giây.",
+        "bonus2": "Cooldown Bắn Rúng Động giảm 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Bắn Rúng Động giảm cooldown còn lại của Cơn Thịnh Nộ Dã Thú 1 giây."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Farsight Harness",
-        "bonus2": "Cooldown Trailbreak giảm 4 giây.",
+        "bonus2": "Cooldown Trailbreak giảm 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Trailbreak làm cho Kéo Cung Dài tiếp theo của bạn trong vòng 6 giây tức thời. Không thể xảy ra nhiều hơn một lần mỗi 15 giây."
       },
       "vanguard_hunter_survival": {
         "name": "Snaretooth Harness",
-        "bonus2": "Cooldown Móc Máu giảm 3 giây.",
+        "bonus2": "Cooldown Móc Máu giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Móc Máu cấp 1 Đà Săn."
       },
       "vanguard_mage_arcane": {
@@ -24224,12 +24224,12 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Shieldvow Bastion",
-        "bonus2": "Cooldown Oath Chain giảm 2 giây.",
+        "bonus2": "Cooldown Oath Chain giảm 2 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Kẻ thù được kéo bởi Oath Chain truyền tải phép chậm hơn 30 phần trăm trong 4 giây, và Oath Chain cấp cho bạn Trả Lại Mặt Trời khi nó buộc một kẻ thù có thể được kéo."
       },
       "vanguard_paladin_retribution": {
         "name": "Lightbrand Warplate",
-        "bonus2": "Cooldown Gọi Valkyrie giảm 15 giây.",
+        "bonus2": "Cooldown Gọi Valkyrie giảm 15 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Gọi Valkyrie đặt lại cooldown của Sắc Lệnh Cuối, và Sắc Lệnh Cuối tiếp theo của bạn trong vòng 6 giây gây 15 phần trăm sát thương nhiều hơn."
       },
       "vanguard_priest_discipline": {
@@ -24269,7 +24269,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike làm chậm tốc độ di chuyển của mục tiêu 30 phần trăm trong 4 giây.",
+        "bonus2": "Ancestral Strike làm chậm tốc độ di chuyển của mục tiêu 30 phần trăm trong 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Ancestral Strike giảm cooldown còn lại của Xuất Thần Nguyên Tố 4 giây."
       },
       "vanguard_shaman_restoration": {
@@ -24314,7 +24314,7 @@ export const vi_VN: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Bộ Ashstalker",
-        "bonus2": "Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.",
+        "bonus2": "Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.",
         "bonus7": "Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Hạ một người chơi thù địch ban Bước Tro, tăng tốc độ di chuyển thêm 40% trong 6 giây."
       },
@@ -24326,7 +24326,7 @@ export const vi_VN: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Bộ Chiến Furyforged",
-        "bonus2": "Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.",
+        "bonus2": "Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.",
         "bonus7": "Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Hạ một người chơi thù địch ban Lời Thề Không Vỡ, hấp thụ 200 sát thương trong 10 giây."
       },

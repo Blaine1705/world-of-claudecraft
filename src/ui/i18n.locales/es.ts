@@ -1616,7 +1616,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_druid_feral_shoulder.name': 'Hombreras Crinsangre',
   'entities.itemSets.vanguard_druid_feral.name': 'Piel Crinsangre',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'El tiempo de reutilización de Embestida de Bruin se reduce 3 s.',
+    'El tiempo de reutilización de Embestida de Bruin se reduce 3 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Embestida de Bruin te otorga un escudo por el 6% de tu salud máxima durante 6 s.',
   'entities.items.vanguard_druid_restoration_chest.name': 'Chaleco Florcardo',
@@ -1636,7 +1636,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_hunter_beast_mastery_shoulder.name': 'Hombreras Guardamanada',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Arnés Guardamanada',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'El tiempo de reutilización de Disparo Aturdidor se reduce 4 s.',
+    'El tiempo de reutilización de Disparo Aturdidor se reduce 4 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Disparo Aturdidor reduce 1 s el tiempo de reutilización restante de Cólera de las Bestias.',
   'entities.items.vanguard_hunter_marksmanship_chest.name': 'Jubón Vistalarga',
@@ -1646,7 +1646,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_hunter_marksmanship_shoulder.name': 'Hombreras Vistalarga',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Arnés Vistalarga',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'El tiempo de reutilización de Quiebrasendas se reduce 4 s.',
+    'El tiempo de reutilización de Quiebrasendas se reduce 4 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Quiebrasendas hace que tu próximo Tensado Largo en los siguientes 6 s sea instantáneo. No puede ocurrir más de una vez cada 15 s.',
   'entities.items.vanguard_hunter_survival_chest.name': 'Jubón Colmillotrampa',
@@ -1656,7 +1656,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_hunter_survival_shoulder.name': 'Hombreras Colmillotrampa',
   'entities.itemSets.vanguard_hunter_survival.name': 'Arnés Colmillotrampa',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    'El tiempo de reutilización de Garfio Sangriento se reduce 3 s.',
+    'El tiempo de reutilización de Garfio Sangriento se reduce 3 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_hunter_survival.bonus4':
     'Garfio Sangriento otorga 1 de Ímpetu de Caza.',
   'entities.items.vanguard_mage_arcane_chest.name': 'Vestidura Atahoras',
@@ -1706,7 +1706,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_paladin_protection_shoulder.name': 'Hombreras Votoescudo',
   'entities.itemSets.vanguard_paladin_protection.name': 'Bastión Votoescudo',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'El tiempo de reutilización de Cadena de Juramento se reduce 2 s.',
+    'El tiempo de reutilización de Cadena de Juramento se reduce 2 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Los enemigos arrastrados por Cadena de Juramento lanzan hechizos un 30% más lento durante 4 s, y Cadena de Juramento te otorga Represalia Solar cuando ata a un enemigo que puede ser arrastrado.',
   'entities.items.vanguard_paladin_retribution_chest.name': 'Coraza Marcaluz',
@@ -1716,7 +1716,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_paladin_retribution_shoulder.name': 'Hombreras Marcaluz',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Placas de Guerra Marcaluz',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'El tiempo de reutilización de Llamada de la Valquiria se reduce 15 s.',
+    'El tiempo de reutilización de Llamada de la Valquiria se reduce 15 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Llamada de la Valquiria reinicia el tiempo de reutilización de Edicto Final, y tu próximo Edicto Final en los 6 s siguientes a impactar inflige un 15% más de daño.',
   'entities.items.vanguard_priest_discipline_chest.name': 'Vestidura Salmovelo',
@@ -1795,7 +1795,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_shaman_enhancement_shoulder.name': 'Hombreras Vendavalnato',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Cota de Guerra Vendavalnato',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Golpe Ancestral ralentiza la velocidad de movimiento del objetivo un 30% durante 4 s.',
+    'Golpe Ancestral ralentiza la velocidad de movimiento del objetivo un 30% durante 4 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Golpe Ancestral reduce 4 s el tiempo de reutilización restante de Trance Elemental.',
   'entities.items.vanguard_shaman_restoration_chest.name': 'Cota Guardamar',
@@ -4538,7 +4538,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Estilo',
   'editor.status.campCapReached':
     'Límite de campamentos alcanzado ({max}). El campamento nuevo no se añadió.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Aumenta la Defensa de Pericia bélica en 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4551,7 +4552,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Ascua, absorbiendo 120 de daño durante 8 s.',
   'entities.itemSets.warfare_cinderweave.name': 'Equipo de batalla Cinderweave',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Aumenta la Defensa de Pericia bélica en 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19537,7 +19539,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Una victoria puntuada paga Honor, la moneda de jugador contra jugador, y una derrota que juegas hasta el final también paga una parte menor, igual que un empate, así que la clasificación es lo único que realmente cuesta una derrota. El Honor recompensa partidas reales: vencer al mismo rival o equipo otra vez el mismo día no paga más, ni tampoco volver a perder contra ellos. Un día de victorias largo paga completo durante su primer tramo y luego reduce a la mitad el pago, vuelve a reducirlo más adelante y se queda así. Una partida que el rival abandona aún mueve tu clasificación, pero no paga Honor. El día pertenece al reino y cambia a la hora del reinicio nocturno, el mismo límite en que se reinician los bloqueos diarios.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de un conjunto de lanzador hacen además que el daño recibido ya no retrase tus hechizos.',
+    'Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de cualquiera de estos conjuntos hacen además que el daño recibido ya no retrase tus hechizos.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras.',
   'guide.controls.harvestJournal': 'Diario de cosecha',

@@ -8299,7 +8299,7 @@ export const sv_SE: EnTranslations = {
       "honorFinalNoteSoldBack": "Hedersköp är slutgiltiga. Återköpslistan innehåller bara det du har sålt: ett köp för mynt kan vanligen säljas tillbaka för sitt försäljningspris och hämtas tillbaka från listan om du ändrar dig igen, men krigföringsutrustning binds till själen i samma ögonblick som du köper den. Den kan därför aldrig handlas, skickas med post eller säljas tillbaka för något, och den hamnar aldrig på listan. Butiken ber dig bekräfta av den anledningen: läs föremålet innan du trycker.",
       "warfareHeading": "Krigföringsutrustning",
       "warfareBody": "Varje Krigföringsplagg bär Krigföringsanfallsvärdering och Krigföringsförsvarsvärdering, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare: i en duell, i arenan eller på slagfältet, där Anfallsvärdering lägger till skadan du vållar och Försvarsvärdering minskar skadan du tar, vardera upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså Krigföringsvärdering eller effekter som bara fungerar mot spelare, så en full uppsättning krigföringsutrustning är värdelös mot en fängelsehåleboss.",
-      "warfareBodyStatsStay": "Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster. Ett undantag fungerar överallt: två delar av ett besvärjarset gör också att skada du tar inte längre fördröjer dina besvärjelser.",
+      "warfareBodyStatsStay": "Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster. Ett undantag fungerar överallt: två delar av vilket som helst av dessa set gör också att skada du tar inte längre fördröjer dina besvärjelser.",
       "warfareTradeBody": "Det är den medvetna avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålenivåerna: ett Krigföringsplagg bär aldrig de stridsvärden en episk fängelsehålepjäs i samma plats gör, och allt det faktiskt ger spenderas på andra spelare. Vill du hålla din egen i arenan, köp den. Vill du klara heroiska snabbare, förtjäna din utrustning i fängelsehålorna.",
       "warfareTradeBodyRatingSpent": "Det är den avsiktliga avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålornas nivåer: ett krigföringsföremål har aldrig de stridsvärden som en episk fängelsehåleutrustning på samma plats har, och krigföringsvärdet och setbonusarna det får i stället används helt mot andra spelare. Vill du hävda dig på arenan, köp den. Vill du klara hjältemodiga fängelsehålor snabbare, förtjäna din utrustning där.",
       "vanguardHeading": "Vanguard-utrustning: Warfare säsong 2",
@@ -24179,7 +24179,7 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Bloodmane Hide",
-        "bonus2": "Bruinrusningens nedräkning minskas med 3 sec.",
+        "bonus2": "Bruinrusningens nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Bruinrusning skyddar dig för 6 procent av din maximala hälsa i 6 sec."
       },
       "vanguard_druid_restoration": {
@@ -24189,17 +24189,17 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Packwarden Harness",
-        "bonus2": "Skakande skotts nedräkning minskas med 4 sec.",
+        "bonus2": "Skakande skotts nedräkning minskas med 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Skakande skott minskar Howling Rage återstående nedräkning med 1 sec."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Farsight Harness",
-        "bonus2": "Trailbreaks nedräkning minskas med 4 sec.",
+        "bonus2": "Trailbreaks nedräkning minskas med 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Trailbreak gör din nästa Långt drag inom 6 sec omedelbar. Kan inte inträffa mer än en gång var 15 sec."
       },
       "vanguard_hunter_survival": {
         "name": "Snaretooth Harness",
-        "bonus2": "Blodkroks nedräkning minskas med 3 sec.",
+        "bonus2": "Blodkroks nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Blodkrok ger 1 Jaktfart."
       },
       "vanguard_mage_arcane": {
@@ -24224,12 +24224,12 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chains nedräkning minskas med 2 sec.",
+        "bonus2": "Oath Chains nedräkning minskas med 2 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Fiender dragna av Oath Chain kastar besvärjelser 30 procent långsammare i 4 sec, och Oath Chain ger dig Solar Reprisal när det binder en fiende som kan dras."
       },
       "vanguard_paladin_retribution": {
         "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Callings nedräkning minskas med 15 sec.",
+        "bonus2": "Valkyr's Callings nedräkning minskas med 15 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Valkyr's Calling återställer Final Edicts nedräkning, och din nästa Final Edict inom 6 sec från träff orsakar 15 procent mer skada."
       },
       "vanguard_priest_discipline": {
@@ -24269,7 +24269,7 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec.",
+        "bonus2": "Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ancestral Strike minskar återstående nedräkning för Elemental Trance med 4 sec."
       },
       "vanguard_shaman_restoration": {
@@ -24314,7 +24314,7 @@ export const sv_SE: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Asksmygarens utrustning",
-        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus2": "Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
         "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Att döda en fientlig spelare ger Askesteg, vilket ökar förflyttningshastigheten med 40% i 6 sek."
       },
@@ -24326,7 +24326,7 @@ export const sv_SE: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Raserismidd stridsutrustning",
-        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus2": "Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
         "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Att döda en fientlig spelare ger Obruten ed, vilket absorberar 200 skada i 10 sek."
       },
