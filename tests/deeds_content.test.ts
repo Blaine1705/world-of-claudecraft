@@ -155,7 +155,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // + Old Thatchgrin's zero-Renown Feat (feat_old_thatchgrin): 348, 3810.
     // + Gourdlight Eve's three zero-Renown title-writ Feats (feat_title_*): 351, 3810.
     // + the Haunted Pumpkin hunt's zero-Renown Feat (feat_pumpkin_hunter): 352.
-    expect(DEED_ORDER.length).toBe(352);
+    // + Gourdlight Eve's whole-event checklist (round 12): three zero-Renown section Feats
+    //   and the zero-Renown meta (feat_gourdlight_eve_complete): 356, 3810.
+    expect(DEED_ORDER.length).toBe(356);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3810);
   });
 
@@ -210,7 +212,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 its field boss's Feat (feat_old_thatchgrin).
       // +3 its title writs (feat_title_gourdlit, _trickster, _hollow_grinned),
       // +1 the Haunted Pumpkin hunt (feat_pumpkin_hunter).
-      feat: 9,
+      // +4 the whole-event checklist (three sections and the meta, round 12).
+      feat: 13,
       hidden: 10,
     });
   });
@@ -477,6 +480,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'feat_title_hollow_grinned',
       // ...and the Haunted Pumpkin hunt's completion Feat.
       'feat_pumpkin_hunter',
+      // ...and the whole-event checklist (round 12): three sections, then the meta.
+      'feat_gourdlight_doorsteps',
+      'feat_gourdlight_errands',
+      'feat_gourdlight_frights',
+      'feat_gourdlight_eve_complete',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -876,12 +884,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // one more, and the Drowned Temple lore guide's Witness of the Choir
     // (dgn_drowned_temple_cantor) one more, Gourdlight Eve's three title
     // writs (the Gourdlit, Trickster, the Hollow-Grinned) three more, and the
-    // Haunted Pumpkin hunt (the Hollow) one more.
-    expect(titles.length).toBe(56);
+    // Haunted Pumpkin hunt (the Hollow) one more, and the whole-event meta (the
+    // Gourdsworn) one more.
+    expect(titles.length).toBe(57);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(56);
+    expect(new Set(titleTexts).size).toBe(57);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1127,7 +1136,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // the auditable way: the 7ce9116d... literal rotated down into PRE_APPEND_CATALOG_SHA256.
   // Re-baselined for the Haunted Pumpkin hunt's appended Feat (feat_pumpkin_hunter) at its
   // merge into the Halloween branch; it appends after the title writs.
-  const FROZEN_CATALOG_SHA256 = '74b4b307f276ae2e4b5ee7e1ca55a4f9263f7f5db4ab2bbaa673459395868b4e';
+  // Re-baselined for Gourdlight Eve's whole-event checklist (round 12: three section
+  // Feats and the meta), the auditable way: the 74b4b307... literal rotated down into
+  // PRE_APPEND_CATALOG_SHA256.
+  const FROZEN_CATALOG_SHA256 = 'e9e749469181ac9a5c5465ec8bf4e93439a2f91bbb3e19cd2dac8cacf864cd41';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1214,13 +1226,17 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Haunted Pumpkin hunt's Feat after them (merged from its own branch, which minted
   // it straight on the field boss's catalogue). The previous mint for both is the
   // field boss's 7ce9116d... literal, so stripping all four must reproduce it exactly.
+  //
+  // Round 12's whole-event checklist (three section Feats, then the meta) appends after
+  // the Pumpkin Hunter; the previous mint is the hunt's 74b4b307... literal (rotated
+  // down here), and stripping the four must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '7ce9116dd46fdbca75bb16207144ad5cb0928420f76b989692615e217c2572aa';
+    '74b4b307f276ae2e4b5ee7e1ca55a4f9263f7f5db4ab2bbaa673459395868b4e';
   const APPENDED_SINCE: readonly string[] = [
-    'feat_title_gourdlit',
-    'feat_title_trickster',
-    'feat_title_hollow_grinned',
-    'feat_pumpkin_hunter',
+    'feat_gourdlight_doorsteps',
+    'feat_gourdlight_errands',
+    'feat_gourdlight_frights',
+    'feat_gourdlight_eve_complete',
   ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
@@ -1232,8 +1248,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'feat_gourdlight_guise',
-      'feat_old_thatchgrin',
+      'feat_title_hollow_grinned',
+      'feat_pumpkin_hunter',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1464,15 +1480,17 @@ describe('table shape', () => {
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
     // five-dungeon rework's 24, Morthen's Every Candle Lit last.
     // Gourdlight Eve's Feat appends after Morthen's, then its field boss's Feat, then
-    // its three title writs, then the Haunted Pumpkin hunt's Feat last.
-    expect(DEED_ORDER[DEED_ORDER.length - 34]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 32]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 31]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 7]).toBe('dgn_morthen_candlelight');
-    expect(DEED_ORDER[DEED_ORDER.length - 6]).toBe('feat_gourdlight_guise');
-    expect(DEED_ORDER[DEED_ORDER.length - 5]).toBe('feat_old_thatchgrin');
-    expect(DEED_ORDER[DEED_ORDER.length - 2]).toBe('feat_title_hollow_grinned');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_pumpkin_hunter');
+    // its three title writs, then the Haunted Pumpkin hunt's Feat, then (round 12) the
+    // whole-event checklist's three sections and its meta last.
+    expect(DEED_ORDER[DEED_ORDER.length - 38]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 36]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 35]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 11]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 10]).toBe('feat_gourdlight_guise');
+    expect(DEED_ORDER[DEED_ORDER.length - 9]).toBe('feat_old_thatchgrin');
+    expect(DEED_ORDER[DEED_ORDER.length - 6]).toBe('feat_title_hollow_grinned');
+    expect(DEED_ORDER[DEED_ORDER.length - 5]).toBe('feat_pumpkin_hunter');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_gourdlight_eve_complete');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

@@ -11,6 +11,13 @@
 import { STANDING_THRESHOLDS } from '../factions';
 import type { DeedDef } from '../types';
 import { FARM_CROP_IDS } from './farm_crops';
+import {
+  GOURDLIGHT_BOO_MARKS,
+  GOURDLIGHT_ERRAND_MARKS,
+  GOURDLIGHT_EVE_MARKS,
+  GOURDLIGHT_KNOCK_MARKS,
+  GOURDLIGHT_META_TITLE,
+} from './gourdlight_eve_deeds';
 
 // The current content era. Bumped ONLY by the maintainer at era boundaries;
 // feats gated on an era stay visible afterward as history markers and a
@@ -3934,6 +3941,50 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     feat: true,
     reward: { kind: 'title', text: 'the Hollow' },
+  },
+  // Gourdlight Eve round 12: the whole event. Three section Feats and the meta, every one
+  // a `visits` checklist over the lifetime 'gourdlight' marks (content/gourdlight_eve_deeds.ts,
+  // written where each act really happens by seasonal/gourdlight_deed_marks.ts), so each
+  // card shows its progress, and progress carries across days, sessions and yearly
+  // editions. Feats (zero Renown, outside Book completion) for the Guise's reason: the
+  // event runs only in its window. Cosmetic only; the meta's one reward is a title.
+  // Appended at the END.
+  feat_gourdlight_doorsteps: {
+    id: 'feat_gourdlight_doorsteps',
+    name: 'Every Doorstep',
+    desc: 'Trick-or-treat every townsperson who answers a knock in Eastbrook, Fenbridge and Highwatch during Gourdlight Eve.',
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'visits', markIds: [...GOURDLIGHT_KNOCK_MARKS] },
+    feat: true,
+  },
+  feat_gourdlight_errands: {
+    id: 'feat_gourdlight_errands',
+    name: "At Hester's Beck and Call",
+    desc: "Finish each of Hester Gourdwick's rotating Gourdlight Eve errands at least once.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'visits', markIds: [...GOURDLIGHT_ERRAND_MARKS] },
+    feat: true,
+  },
+  feat_gourdlight_frights: {
+    id: 'feat_gourdlight_frights',
+    name: 'Three Towns Startled',
+    desc: "On Hester's Boo! errand, frighten a townsperson in each of Eastbrook, Fenbridge and Highwatch.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'visits', markIds: [...GOURDLIGHT_BOO_MARKS] },
+    feat: true,
+  },
+  feat_gourdlight_eve_complete: {
+    id: 'feat_gourdlight_eve_complete',
+    name: 'Gourdlight, Start to Finish',
+    desc: "Do the whole of Gourdlight Eve: bring down Old Thatchgrin, find every Haunted Pumpkin, finish each of Hester's errands, knock on every door and frighten a townsperson in each of the three towns.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'visits', markIds: [...GOURDLIGHT_EVE_MARKS] },
+    feat: true,
+    reward: { kind: 'title', text: GOURDLIGHT_META_TITLE },
   },
 };
 

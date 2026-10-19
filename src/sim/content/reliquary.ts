@@ -492,6 +492,8 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The Haunted Pumpkin hunt's completion title (the Hollow) pages here too, per the
   // same locked titles-page rule (docs/design/reliquary.md, Locked decisions).
   'feat_pumpkin_hunter',
+  // Gourdlight Eve's whole-event meta (round 12): the Gourdsworn, same locked rule.
+  'feat_gourdlight_eve_complete',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

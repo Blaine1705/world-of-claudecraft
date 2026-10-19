@@ -709,7 +709,18 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 351 with its three title-writ feats, their crests painted too.
     // 352 with the Haunted Pumpkin hunt's Feat (feat_pumpkin_hunter), its crest
     // painted from the same Blender crest (crest.py --subject pumpkin_hunter).
-    expect(DEED_ORDER).toHaveLength(352);
+    // 356 with round 12's whole-event checklist, four crests painted the same way
+    // (crest.py --subject doorsteps|errands|frights|eve_complete).
+    expect(DEED_ORDER).toHaveLength(356);
+    for (const id of [
+      'feat_gourdlight_doorsteps',
+      'feat_gourdlight_errands',
+      'feat_gourdlight_frights',
+      'feat_gourdlight_eve_complete',
+    ]) {
+      expect(DEED_IMAGE_IDS.has(id), id).toBe(true);
+      expect(DEED_ART_PENDING.has(id), id).toBe(false);
+    }
     expect(DEED_IMAGE_IDS.has('feat_pumpkin_hunter')).toBe(true);
     expect(DEED_ART_PENDING.has('feat_pumpkin_hunter')).toBe(false);
     expect(DEED_IMAGE_IDS.has('feat_title_hollow_grinned')).toBe(true);

@@ -6234,6 +6234,35 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": true,
     "rewardTitle": "the Hollow",
     "crest": "/ui/deeds/feat_pumpkin_hunter.webp"
+  },
+  {
+    "id": "feat_gourdlight_doorsteps",
+    "name": "Every Doorstep",
+    "category": "feat",
+    "renown": 0,
+    "feat": true
+  },
+  {
+    "id": "feat_gourdlight_errands",
+    "name": "At Hester's Beck and Call",
+    "category": "feat",
+    "renown": 0,
+    "feat": true
+  },
+  {
+    "id": "feat_gourdlight_frights",
+    "name": "Three Towns Startled",
+    "category": "feat",
+    "renown": 0,
+    "feat": true
+  },
+  {
+    "id": "feat_gourdlight_eve_complete",
+    "name": "Gourdlight, Start to Finish",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "the Gourdsworn"
   }
 ];
 
@@ -7882,6 +7911,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "the Hollow"
+      },
+      {
+        "kind": "title",
+        "name": "the Gourdsworn"
       }
     ]
   },

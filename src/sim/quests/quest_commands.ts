@@ -33,6 +33,7 @@ import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
 import { emitReferralQuestEvidence } from '../referral_evidence';
+import { markGourdlightErrand } from '../seasonal/gourdlight_deed_marks';
 import { seasonalBlockedQuestIds } from '../seasonal/seasonal_quests';
 import { activeSeasonalEventOf } from '../seasonal/seasonal_state';
 import type { PlayerMeta } from '../sim';
@@ -523,6 +524,8 @@ export function turnInQuestCore(
   if (firstCompletion) meta.counters.questsCompleted++;
   // Quest and chapter deed predicates read questsDone, so re-check this player.
   ctx.markDeedsDirty(meta.entityId);
+  // Gourdlight Eve's whole-event checklist counts each rotating errand once.
+  markGourdlightErrand(ctx, meta, questId);
   if (quest.copperReward > 0) {
     meta.copper += quest.copperReward;
     ctx.emit({

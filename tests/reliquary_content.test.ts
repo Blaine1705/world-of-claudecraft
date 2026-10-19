@@ -487,7 +487,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Two referral reward mounts join Horizons.
     // Gourdlight Eve: the Emberbristle Broom's mount slot and the three writ titles: 564.
     // The Haunted Pumpkin hunt's title (the Hollow) on the titles page: 565.
-    expect(full).toEqual({ owned: 565, total: 565 });
+    // Gourdlight Eve's whole-event meta title (the Gourdsworn, round 12): 566.
+    expect(full).toEqual({ owned: 566, total: 566 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -523,8 +524,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
     // Gourdlight Eve's broom slot and three writ titles: 535. The Haunted Pumpkin
-    // hunt's title slot (character-scoped like every title): 536.
-    expect(character).toEqual({ owned: 536, total: 536 });
+    // hunt's title slot (character-scoped like every title): 536. The whole-event
+    // meta's title slot (round 12): 537.
+    expect(character).toEqual({ owned: 537, total: 537 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -592,7 +594,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
       // + Gourdlight Eve's broom mount slot and its three writ titles: 751.
       // + the Haunted Pumpkin hunt's title: 752.
-    ).toBe(752); // plus two referral reward mounts
+      // + Gourdlight Eve's whole-event meta title (round 12): 753.
+    ).toBe(753); // plus two referral reward mounts
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -3338,8 +3341,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Crucible raid's flawless title + the three faction standing Champion
   // titles + the Clue Scroll Treasure Hunter title + the Drowned Temple lore
   // guide's Witness of the Choir + Gourdlight Eve's three writ titles + the
-  // Haunted Pumpkin hunt's the Hollow.
-  horizons_titles: 54,
+  // Haunted Pumpkin hunt's the Hollow + its whole-event meta's the Gourdsworn.
+  horizons_titles: 55,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

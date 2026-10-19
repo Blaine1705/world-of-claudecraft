@@ -8,6 +8,7 @@ import { createGroundObject } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { markGourdlightPumpkinHunt } from './gourdlight_deed_marks';
 import { activeSeasonalEventOf } from './seasonal_state';
 
 // Reserved IDs never consume the normal entity allocator or world RNG.
@@ -59,7 +60,10 @@ export function discoverHauntedPumpkin(ctx: SimContext, obj: Entity, meta: Playe
     sweets: 1,
     pid: meta.entityId,
   });
-  if (GOURDLIGHT_PUMPKINS.every((p) => meta.hauntedPumpkins.has(p.id)))
+  if (GOURDLIGHT_PUMPKINS.every((p) => meta.hauntedPumpkins.has(p.id))) {
     ctx.grantDeed(meta, 'feat_pumpkin_hunter');
+    // the whole-event checklist's hunt leaf (lifetime, unlike the edition's ledger)
+    markGourdlightPumpkinHunt(ctx, meta);
+  }
   return true;
 }

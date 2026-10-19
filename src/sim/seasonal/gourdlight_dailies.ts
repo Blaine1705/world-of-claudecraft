@@ -37,6 +37,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d } from '../types';
 import { civilDayNumber } from '../world_quest_rotation';
+import { markGourdlightFright } from './gourdlight_deed_marks';
 import { activeSeasonalEventOf, knockedToday } from './seasonal_state';
 
 // Reserved entity ids (the haunted pumpkins' scheme, haunted_pumpkins.ts -910000):
@@ -183,6 +184,8 @@ export function booTownsfolk(ctx: SimContext, npcId: number, pid?: number): BooO
   npc.overheadEmoteSeq += 1;
   ctx.emit({ type: 'seasonal', what: 'boo', npc: npc.templateId, pid: meta.entityId });
   onQuestEventForQuests(ctx, meta, GOURDLIGHT_BOO_QUEST_EVENT);
+  // the whole-event checklist's town (Book of Deeds, gourdlight_deed_marks.ts)
+  markGourdlightFright(ctx, meta, npc.templateId);
   meta.wireRev++;
   return 'frightened';
 }
