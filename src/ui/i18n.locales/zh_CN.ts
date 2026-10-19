@@ -18356,6 +18356,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '三重T的哨子',
   'entities.items.whistle_trollface.name': '巨魔脸的哨子',
   'entities.items.whistle_tuskhorn_boar.name': '獠角野猪的哨子',
+  'hudChrome.buddyMenu.rename': '重命名伙伴',
+  'hudChrome.buddyMenu.nameLabel': '伙伴名字',
   'hudChrome.buddyMenu.autolootEnable': '开启自动拾取',
   'hudChrome.buddyMenu.autolootDisable': '关闭自动拾取',
   'hudChrome.buddyMenu.autolootHint': '你的伙伴会去拾取 30 码内属于你自己的尸体上的战利品。',
@@ -19095,6 +19097,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': '坐骑',
   'hudChrome.cosmetics.tabSkins': '皮肤',
   'hudChrome.cosmetics.tabMech': '机甲',
+  'hudChrome.cosmetics.buddyActive': '已召唤',
+  'hudChrome.cosmetics.buddyDrag': '拖到动作条上',
   'hudChrome.cosmetics.legend': '账号：所有角色共享。角色：仅此角色。',
   'hudChrome.cosmetics.scopeAccount': '账号',
   'hudChrome.cosmetics.scopeCharacter': '角色',
@@ -20480,7 +20484,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.crypt.tolling':
     '他大步走向钟绳并敲响葬钟时免疫伤害。钟声结束时，丧钟对所有人造成{min}到{max}点暗影伤害（英雄难度{heroicMin}到{heroicMax}点），并且每座敞开的坟墓都会爬出一具不安之骨。',
   'hudChrome.auraEffect.crypt.embraced':
-    '被夫人举在半空：无法行动，每秒受到{tick}点冰霜伤害（英雄难度{tickHeroic}点）。如果你的队伍打掉她{share}%的最大生命值，她会把你轻轻放下；如果她在高处抓住你{hold}秒，就会把你扔到冰面上，造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。',
+    '被夫人举在半空：无法行动，每秒受到{tick}点冰霜伤害（英雄难度{tickHeroic}点）。如果你的队伍打掉她{share}%的最大生命值（英雄难度{shareHeroic}%），她会把你轻轻放下；如果她在高处抓住你{hold}秒，就会把你扔到冰面上，造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。',
   'hudChrome.auraEffect.crypt.lament':
     '新娘的哀歌结束时，对所有不在点亮的墓灯{radius}码内的人造成{min}到{max}点冰霜伤害（英雄难度{heroicMin}到{heroicMax}点）。每盏灯只庇护离它最近的{cap}名玩家，然后熄灭并错过下一次哀歌。',
   'hudChrome.auraEffect.crypt.lingering':
