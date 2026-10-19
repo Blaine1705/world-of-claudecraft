@@ -64,7 +64,7 @@ export interface GuildShopItemView {
   id: string;
   offerKind: GuildQuartermasterOffer['kind'];
   art: GuildShopArt;
-  /** The reward itself ("Writ-Runner", "Lantern Hall Destrier", "Squallcrest"). */
+  /** The reward itself ("Writ-Runner", "Lantern Hall Destrier", "Blade of Lantern Hall"). */
   name: string;
   kindLabel: string;
   /** The bare price, for the seal-icon price tag. */

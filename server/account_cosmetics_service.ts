@@ -8,7 +8,11 @@
 // what keeps every test double on one import).
 import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
-import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import {
+  isGrantableWeaponSkin,
+  isWeaponSkinType,
+  WEAPON_SKINS,
+} from '../src/sim/content/weapon_skins';
 import type { GuildAccountPort } from '../src/sim/guild_quartermaster';
 import type { Entity, SkinCatalog, WeaponSkinLoadout, WeaponSkinType } from '../src/sim/types';
 import type { AccountCosmetics } from '../src/world_api';
@@ -148,7 +152,7 @@ export class AccountCosmeticsService {
     return {
       ownsWeaponSkin: (skinId) => session.accountCosmetics.weaponSkinIds.includes(skinId),
       grantWeaponSkin: (skinId) => {
-        if (!WEAPON_SKINS[skinId]) return false;
+        if (!isGrantableWeaponSkin(skinId)) return false;
         this.noteWeaponSkin(session, skinId);
         return true;
       },
@@ -178,7 +182,8 @@ export class AccountCosmeticsService {
   grantWeaponSkins(accountId: number, skinIds: string[]): void {
     this.grantSkins(
       accountId,
-      skinIds.filter((id) => WEAPON_SKINS[id]),
+      // never a skin reserved for a future raid, whatever the economy ledger carries
+      skinIds.filter(isGrantableWeaponSkin),
       'weaponSkinIds',
       grantAccountWeaponSkins,
     );

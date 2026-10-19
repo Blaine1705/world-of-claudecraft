@@ -1,6 +1,6 @@
 // Visual proof of Lantern Hall's quartermaster 3D preview: boots the offline game, walks to
 // Garrick Holt in the Highwatch guild, fills the bags with Lantern Seals, opens his counter,
-// previews and buys the Lantern Hall Destrier and the Squallcrest appearance, rides the
+// previews and buys the Lantern Hall Destrier and the Blade of Lantern Hall, rides the
 // horse and wears the appearance. Desktop and phone-width shots land in
 // docs/screenshots/highwatch-guild/.
 //   node scripts/guild_shop_preview_shot.mjs   (needs a dev server; GAME_URL overrides :5173)

@@ -385,6 +385,13 @@ export const RESERVED_WEAPON_SKIN_IDS: readonly string[] = WEAPON_SKIN_LIST.filt
   (skin) => skin.earnedFrom === 'future_raid',
 ).map((skin) => skin.id);
 
+/** A catalog skin that something may grant today: every skin but the ones reserved for a future
+ *  raid. The server's grant and store-mirror paths gate on this, so a reserved skin can never
+ *  reach an account ledger, whatever an outside catalog says. */
+export function isGrantableWeaponSkin(skinId: string): boolean {
+  return Object.hasOwn(WEAPON_SKINS, skinId) && WEAPON_SKINS[skinId].earnedFrom !== 'future_raid';
+}
+
 /** The skins the Claudium Armory sells: every skin that is not earned in the world. */
 export const STORE_WEAPON_SKIN_LIST: readonly WeaponSkinDef[] = WEAPON_SKIN_LIST.filter(
   (skin) => !skin.earnedFrom,

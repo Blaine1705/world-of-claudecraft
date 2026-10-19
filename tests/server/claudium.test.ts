@@ -251,6 +251,14 @@ describe('Claudium spend entitlement mirroring', () => {
           costClaudium: 10,
           owned: false,
         },
+        // a catalog skin reserved for a future raid is no storefront row, even if listed
+        {
+          itemId: 'squallcrest_sword',
+          name: 'Squallcrest',
+          kind: 'skin',
+          costClaudium: 10,
+          owned: true,
+        },
       ],
     });
     const res = new FakeRes();
@@ -279,6 +287,7 @@ describe('Claudium spend entitlement mirroring', () => {
     { itemId: 'guildmark_arming_sword', kind: 'item' },
     { itemId: 'retired_placeholder_hat', kind: 'skin' },
     { itemId: '__proto__', kind: 'skin' },
+    { itemId: 'rimelight_staff', kind: 'skin' },
   ])('rejects unsupported store spend $itemId/$kind before debiting Claudium', async (body) => {
     const res = new FakeRes();
 
