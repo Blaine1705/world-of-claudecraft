@@ -617,7 +617,8 @@ const MONOLITHS: MonolithRow[] = [
     // sub-view landed: the Auras render method and its placement/teardown lines
     // moved out with them to src/ui/options_overlay_panels.ts. Measured with
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
-    ceiling: 2813,
+    // Note row painting moved alongside the checkbox/subheading painter seam.
+    ceiling: 2809,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1069,7 +1070,13 @@ const MONOLITHS: MonolithRow[] = [
     // renderer extractions: the visual lives in src/render/spore_burst_visual.ts;
     // renderer.ts only constructs it, syncs it in both frame loops, and routes
     // the burst cue. Exact count, zero slack.
-    ceiling: 12636,
+    // LOWERED 12688 -> 12584 at the Style of Enemy Highlight options: the target
+    // selection reticle (build, terrain drape, per-frame sync) moved to
+    // selection_reticle.ts, which also carries the new Heavier Hostile Reticle;
+    // renderer.ts keeps a SelectionReticle field, the flag object and one sync
+    // call. wc -l after biome. Exact count, zero slack.
+    // Current context/program and lifecycle repairs compose with the reticle extraction.
+    ceiling: 12531,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1532,7 +1539,8 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the v0.45.0 release batch after #4420's client-update
     // recovery flow composed with the current entrypoint. Exact merged count
     // after biome, zero slack.
-    ceiling: 10981,
+    // Nameplate and highlight settings moved behind the game settings seam.
+    ceiling: 10972,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -2302,7 +2310,12 @@ const MONOLITHS: MonolithRow[] = [
     // and the name row its blood-red fills, paid for by moving every tag fill
     // rule (the guild colour tiers included) to nameplate_tag_fill_core.ts.
     // Exact count (wc -l < src/render/nameplate_canvas.ts), zero slack.
-    ceiling: 823,
+    // LOWERED 826 -> 792 at the Style of Enemy Highlight options: the text pens
+    // moved to nameplate_text_styles.ts and the new target cues (framed plate,
+    // overhead chevron, screen-edge arrow) draw from nameplate_target_highlight.ts,
+    // leaving only their call sites here. wc -l after biome. Exact count, zero slack.
+    // Keep inherited bounty/tag fills beside the extracted pens and new cues.
+    ceiling: 797,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

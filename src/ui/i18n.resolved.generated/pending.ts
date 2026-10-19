@@ -30,7 +30,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "es_ES": [
     "hud.pet.assist",
@@ -53,7 +59,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "fr_FR": [
     "hud.pet.assist",
@@ -76,7 +88,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "fr_CA": [
     "hud.pet.assist",
@@ -99,7 +117,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "en_CA": [],
   "it_IT": [
@@ -123,7 +147,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "de_DE": [
     "hud.pet.assist",
@@ -146,12 +176,26 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
+  "zh_TW": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
+  "ko_KR": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
+  "ja_JP": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
   "pt_BR": [
     "hud.pet.assist",
     "hud.pet.assistDesc",
@@ -173,9 +217,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.options.enemyHighlightDistance"
+  ],
   "cs_CZ": [
     "hud.pet.assist",
     "hud.pet.assistDesc",
@@ -197,7 +249,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "nl_NL": [
     "hud.pet.assist",
@@ -220,7 +278,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "pl_PL": [
     "hud.pet.assist",
@@ -243,7 +307,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "id_ID": [
     "hud.pet.assist",
@@ -266,7 +336,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "tr_TR": [
     "hud.pet.assist",
@@ -289,7 +365,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "sv_SE": [
     "hud.pet.assist",
@@ -312,7 +394,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "vi_VN": [
     "hud.pet.assist",
@@ -335,7 +423,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ],
   "da_DK": [
     "hud.pet.assist",
@@ -358,6 +452,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cooldownManager.showNotReady",
     "hudChrome.cooldownManager.showOutOfCombat",
     "hudChrome.cooldownManager.showReady",
-    "hudChrome.cooldownManager.showWhile"
+    "hudChrome.cooldownManager.showWhile",
+    "hudChrome.options.enemyHighlightDistance",
+    "hudChrome.options.enemyHighlightEdgeArrow",
+    "hudChrome.options.enemyHighlightNameplate",
+    "hudChrome.options.enemyHighlightOverhead",
+    "hudChrome.options.enemyHighlightReticle",
+    "hudChrome.options.enemyHighlightStyle"
   ]
 };

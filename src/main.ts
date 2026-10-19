@@ -183,6 +183,7 @@ import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mobilePlatform, mobilePreflightCopy } from './game/mobile_preflight';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
+import { applyNameplateSetting } from './game/nameplate_settings';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTargetForWorld } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
@@ -2385,6 +2386,7 @@ async function startGame(
       settings.set('showAttackButton', !!value);
       return;
     }
+    if (applyNameplateSetting(settings, renderer, key, value)) return;
     if (key === 'groundReticle') {
       const v = settings.set('groundReticle', !!value);
       if (!v) hud.cancelGroundAim();
@@ -2508,18 +2510,6 @@ async function startGame(
       return;
     }
     if (applyDesktopShellSetting(key, value, settings, desktopBridge())) return;
-    if (key === 'showDevBadges') {
-      renderer.showDevBadges = settings.set('showDevBadges', !!value);
-      return;
-    }
-    if (key === 'showOwnNameplate') {
-      renderer.showOwnNameplate = settings.set('showOwnNameplate', !!value);
-      return;
-    }
-    if (key === 'showPlayerNameplates') {
-      renderer.showPlayerNameplates = settings.set('showPlayerNameplates', !!value);
-      return;
-    }
     if (key === 'showNameplateDots') {
       settings.set('showNameplateDots', !!value);
       setNameplateDotScale(settings.nameplateDotRenderScale());
@@ -2733,6 +2723,7 @@ async function startGame(
     next.showDevBadges = settings.get('showDevBadges');
     next.showOwnNameplate = settings.get('showOwnNameplate');
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
+    Object.assign(next.targetHighlight, renderer.targetHighlight);
     setNameplateDotScale(settings.nameplateDotRenderScale());
     next.reduceMotionSetting = settings.get('reduceMotion');
     next.setHazardPaletteMode(hazardPaletteModeOf(settings.get('colorblindMode')));

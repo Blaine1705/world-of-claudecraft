@@ -114,6 +114,7 @@ import {
 } from './keyboard_map';
 import type { KeyboardLayer } from './keyboard_map_core';
 import { KeyboardMapWindow } from './keyboard_map_window';
+import { optionsCheckRow, optionsNoteRow, optionsSubheadRow } from './options_check_rows';
 import {
   buildChatTimestampRows,
   buildChatWindowResetRow,
@@ -775,13 +776,21 @@ export class OptionsWindow {
           this.settingToggle(parent, c, hooks);
           break;
         case 'boolToggle':
-          this.settingBoolToggle(parent, c, hooks, c.rerender ? (key) => rerender(key) : undefined);
+          if (c.check) optionsCheckRow(parent, c, hooks);
+          else
+            this.settingBoolToggle(
+              parent,
+              c,
+              hooks,
+              c.rerender ? (key) => rerender(key) : undefined,
+            );
           break;
         case 'choice':
           this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined, choiceBinding);
           break;
         case 'note':
-          this.noteRow(parent, c.textKey, c.valueKeys);
+          if (c.subhead) optionsSubheadRow(parent, t(c.textKey));
+          else optionsNoteRow(parent, c.textKey, c.valueKeys);
           break;
         case 'musicToggle':
           this.musicToggle(parent, c.labelKey);
@@ -1022,19 +1031,6 @@ export class OptionsWindow {
     }
     parent.appendChild(row);
     sync();
-  }
-
-  private noteRow(
-    parent: HTMLElement,
-    textKey: TranslationKey,
-    valueKeys?: Record<string, TranslationKey>,
-  ): void {
-    const note = document.createElement('div');
-    note.className = 'set-note';
-    // The view names its placeholders as keys and this resolves them, so the
-    // whole sentence including the value stays one translatable string.
-    note.textContent = optionsText(textKey, valueKeys);
-    parent.appendChild(note);
   }
 
   // The bespoke music on/off toggle (reads the live MusicDirector, not a setting).

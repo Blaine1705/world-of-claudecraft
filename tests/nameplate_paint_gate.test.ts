@@ -65,6 +65,8 @@ function fields(overrides: Partial<NameplatePaintFields> = {}): NameplatePaintFi
     myPet: false,
     friendlyPet: false,
     threat: false,
+    emphasis: false,
+    overheadMarker: false,
     opacity: 1,
     frame: '',
     comboPips: 0,
