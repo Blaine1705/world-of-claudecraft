@@ -21815,7 +21815,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.cardProgress': '今週 {done}/{total}',
   'hudChrome.guildHall.board.rewardLine': '報酬：{reward}',
   'hudChrome.guildHall.board.stamp': '封印済み',
-  'hudChrome.guildHall.board.sealsTip': '燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。',
+  'hudChrome.guildHall.board.sealsTip':
+    '燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。',
   'hudChrome.guildHall.shop.stockLabel': 'ギャリック・ホルトの品揃え',
   'hudChrome.guildHall.shop.kindTitle': '称号',
   'hudChrome.guildHall.shop.plateHeading': 'あなたのネームプレート',

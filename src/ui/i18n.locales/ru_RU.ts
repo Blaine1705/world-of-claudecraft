@@ -22220,16 +22220,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Контракт выполнен: {contract}. Вы получаете {count} печати Фонаря.',
   'hudChrome.guildHall.signSubtitle': 'Гильдия искателей приключений',
   'hudChrome.guildHall.board.noticesLabel': 'Контракты этой недели',
-  'hudChrome.guildHall.board.weekProgress': 'На этой неделе: выполнено {done} из {total} контрактов',
+  'hudChrome.guildHall.board.weekProgress':
+    'На этой неделе: выполнено {done} из {total} контрактов',
   'hudChrome.guildHall.board.weekProgressAria': 'Контракты, выполненные на этой неделе',
   'hudChrome.guildHall.board.cardProgress': '{done}/{total} на этой неделе',
   'hudChrome.guildHall.board.rewardLine': 'Награда: {reward}',
   'hudChrome.guildHall.board.stamp': 'Скреплено',
-  'hudChrome.guildHall.board.sealsTip': 'Печати Фонаря выдаются за еженедельные контракты Зала Фонаря и тратятся только у интенданта Гаррика Холта. Они привязаны к вам.',
+  'hudChrome.guildHall.board.sealsTip':
+    'Печати Фонаря выдаются за еженедельные контракты Зала Фонаря и тратятся только у интенданта Гаррика Холта. Они привязаны к вам.',
   'hudChrome.guildHall.shop.stockLabel': 'Товары Гаррика Холта',
   'hudChrome.guildHall.shop.kindTitle': 'Звание',
   'hudChrome.guildHall.shop.plateHeading': 'Ваша табличка с именем',
-  'hudChrome.guildHall.shop.howTo': 'После покупки выберите его в Книге Деяний, чтобы оно отображалось рядом с вашим именем.',
+  'hudChrome.guildHall.shop.howTo':
+    'После покупки выберите его в Книге Деяний, чтобы оно отображалось рядом с вашим именем.',
   'hudChrome.guildHall.shop.cosmetic': 'Только внешний вид: характеристики не меняются.',
   'hudChrome.guildHall.shop.price': 'Цена: {price}',
   'hudChrome.guildHall.shop.have': 'У вас: {count}',

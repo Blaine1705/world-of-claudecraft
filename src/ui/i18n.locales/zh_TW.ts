@@ -20766,7 +20766,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.cardProgress': '本週 {done}/{total}',
   'hudChrome.guildHall.board.rewardLine': '獎勵：{reward}',
   'hudChrome.guildHall.board.stamp': '已蓋印',
-  'hudChrome.guildHall.board.sealsTip': '燈火印章由燈火大廳的每週契約發放，只能在軍需官加里克·霍爾特處使用。它們與你綁定。',
+  'hudChrome.guildHall.board.sealsTip':
+    '燈火印章由燈火大廳的每週契約發放，只能在軍需官加里克·霍爾特處使用。它們與你綁定。',
   'hudChrome.guildHall.shop.stockLabel': '加里克·霍爾特的貨品',
   'hudChrome.guildHall.shop.kindTitle': '頭銜',
   'hudChrome.guildHall.shop.plateHeading': '你的名牌',
