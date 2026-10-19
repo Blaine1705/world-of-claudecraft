@@ -151,10 +151,12 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestRerollCycle', kind: 'data' },
   { name: 'clueHunt', kind: 'data' },
   { name: 'treasureMap', kind: 'data' },
+  { name: 'alliedHearthstoneAttunement', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'canRerollWorldQuest', kind: 'method' },
   { name: 'rerollWorldQuest', kind: 'method' },
   { name: 'abandonClueHunt', kind: 'method' },
+  { name: 'attuneAlliedHearthstone', kind: 'method' },
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'groundAimPlacementPreview', kind: 'method' },
@@ -949,9 +951,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // 427/127/300.
     // Plus the World PvP Skull Bag's skullBagAction (+1 method): 428/127/301.
     // Plus PvP Resurrect's pvpResurrect (+1 method): 429/127/302.
-    expect(IWORLD_MEMBERS.length).toBe(429);
-    expect(DATA_MEMBERS.length).toBe(127);
-    expect(METHOD_MEMBERS.length).toBe(302);
+    // Allied Hearthstone adds one data member and one method.
+    expect(IWORLD_MEMBERS.length).toBe(431);
+    expect(DATA_MEMBERS.length).toBe(128);
+    expect(METHOD_MEMBERS.length).toBe(303);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -995,6 +998,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeVarkhulCinderFires',
       'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
+      'alliedHearthstoneAttunement',
       'applyEnchant',
       'applyTalents',
       'archetypeTitle',
@@ -1003,6 +1007,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
+      'attuneAlliedHearthstone',
       'autoLoot',
       'bagCapacity',
       'bags',
@@ -1418,6 +1423,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeVarkhulCinderFires',
       'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
+      'alliedHearthstoneAttunement',
       'archetypeTitle',
       'arenaInfo',
       'bagCapacity',
@@ -1545,6 +1551,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
+      'attuneAlliedHearthstone',
       'autoLoot',
       'bankBuySlots',
       'bankDeposit',
@@ -2079,6 +2086,8 @@ const FACET_QUESTS = [
   'treasureMap',
   'clueHunt',
   'abandonClueHunt',
+  'alliedHearthstoneAttunement',
+  'attuneAlliedHearthstone',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -2648,8 +2657,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(429);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(429);
+    // Allied Hearthstone adds one data member and one method.
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(431);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(431);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

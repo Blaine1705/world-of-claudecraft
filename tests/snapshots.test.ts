@@ -5706,6 +5706,7 @@ const ALL_DELTA_KEYS = [
   'achg',
   'achr',
   'adiff',
+  'ahs',
   'ap',
   'app',
   'arena',
@@ -5857,6 +5858,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   aborder: 'activeBorder',
   achg: 'abilityCharges',
   adiff: 'activeDungeonDifficulty',
+  ahs: 'alliedHearthstoneAttunement',
   ap: 'attackPower',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
@@ -6079,6 +6081,7 @@ function dirtyEveryDeltaField(): {
   meta.clueHunt = { huntId: CLUE_HUNTS[0].id, step: 1 };
   meta.factionCurrencies = { rift_watch: 17, church_order: 29, automatons: 41 };
   meta.treasureMap = { rarity: 'epic', siteId: TREASURE_SITES[0].id, seed: 78123 };
+  meta.alliedHearthstoneAttunement = 'automatons';
   server.sim.worldQuestExpiresAtMs = FAR_FUTURE_MS;
   meta.worldQuestLog.set('wq_eastbrook_bandits', {
     questId: 'wq_eastbrook_bandits',
@@ -6554,6 +6557,7 @@ describe('full self-state snapshot delta fixture', () => {
 
     expect(client.factionCurrencies).toEqual({ rift_watch: 17, church_order: 29, automatons: 41 });
     expect(client.treasureMap).toEqual({ rarity: 'epic', siteId: TREASURE_SITES[0].id });
+    expect(client.alliedHearthstoneAttunement).toBe('automatons');
     expect(lastSnap(fc.sent).self.tmap).not.toHaveProperty('seed');
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
@@ -6669,14 +6673,14 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     // vault -> vaultInfo: the owner-only Materials Vault clone survives whole,
-    // both derived numbers included (rung 2 of the 40-per-rung ladder, priced
+    // both derived numbers included (rung 2 of the 100-per-rung ladder, priced
     // from the rung-2 literal in src/sim/materials_vault.ts).
     expect(client.vaultInfo).toEqual({
       stock: { copper_ore: 7 },
       special: [],
       upgrades: 2,
-      perMaterialCap: 80,
-      nextUpgradeCost: 100000,
+      perMaterialCap: 200,
+      nextUpgradeCost: 70000,
     });
     // cvault -> craftVaultStock: this harness player is inside a delve run
     // (see the seeding comment), so the gated null is all that can arrive
@@ -7252,8 +7256,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // without a note here.) The World PvP Skull Bag's change-gated skb
     // (server/world_pvp_wire.ts) makes 115. PvP Resurrect's pvr and wait pvrw
     // make 117.
-    expect(ALL_DELTA_KEYS).toHaveLength(117);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(117);
+    // Allied Hearthstone's bound-hub key ahs adds one delta field.
+    expect(ALL_DELTA_KEYS).toHaveLength(118);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(118);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7425,7 +7430,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
     // The World PvP Skull Bag's change-gated skb (server/world_pvp_wire.ts) makes 115.
     // PvP Resurrect's pvr and its wait pvrw make 117.
-    expect(scraped.size).toBe(117);
+    // Allied Hearthstone's bound-hub key ahs adds one delta field.
+    expect(scraped.size).toBe(118);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

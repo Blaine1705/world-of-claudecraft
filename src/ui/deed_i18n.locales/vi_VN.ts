@@ -1256,4 +1256,34 @@ export const table: DeedLocaleTable = {
     name: 'Sang hon bong toi',
     desc: 'Thu hoi cac tui tien bi danh cap va thoat khoi me cung Evergarden o do kho Hard.',
   },
+  prog_titan: {
+    name: 'Cự Nhân',
+    desc: 'Tích lũy tổng cộng 10.000.000 kinh nghiệm trọn đời.',
+    title: 'Cự Nhân',
+  },
+  pvp_flag_1h: {
+    name: 'Táo Bạo',
+    desc: 'Duy trì PvP Thế Giới trong 1 giờ thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Táo Bạo',
+  },
+  pvp_flag_3h: {
+    name: 'Bất Phục',
+    desc: 'Duy trì PvP Thế Giới trong 3 giờ thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Bất Phục',
+  },
+  pvp_flag_6h: {
+    name: 'Vô Úy',
+    desc: 'Duy trì PvP Thế Giới trong 6 giờ thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Vô Úy',
+  },
+  pvp_flag_24h: {
+    name: 'Bất Khuất',
+    desc: 'Duy trì PvP Thế Giới trong 24 giờ thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Bất Khuất',
+  },
+  pvp_flag_168h: {
+    name: 'Bất Bại',
+    desc: 'Duy trì PvP Thế Giới trong 7 ngày thời gian chơi khi còn sống ở thế giới mở hoặc một trận PvP. Thánh địa, phụ bản PvE, cái chết và đăng xuất tạm dừng tiến độ; tắt PvP sẽ đặt lại tiến độ. Danh hiệu đã nhận là vĩnh viễn.',
+    title: 'Bất Bại',
+  },
 };

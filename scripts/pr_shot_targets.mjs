@@ -5442,7 +5442,7 @@ export const TARGETS = [
         const sim = game?.sim;
         try {
           const meta = sim.players.get(sim.playerId);
-          // A rung-2 vault (an 80-unit ceiling) so four bag stacks of one herb
+          // A rung-2 vault (a 200-unit ceiling) so four bag stacks of one herb
           // fit, then four SOURCED stacks deposited one after another: the
           // rows shot shows whether they pack as one row or four, and the
           // per-unit gatherers give the picker honest source rows. A
@@ -5543,7 +5543,7 @@ export const TARGETS = [
         const game = window.__game;
         const sim = game?.sim;
         try {
-          // Fund two unlocks (1000000 + 2000000 copper) and carry two bags, so
+          // Fund two unlocks (750000 + 1000000 copper) and carry two bags, so
           // the row shows every cell state at once after the staging below: a
           // filled satchel, an empty unlocked socket, the priced next-unlock,
           // and a later locked cell; the pouch stays in the bags companion as
@@ -5647,7 +5647,7 @@ export const TARGETS = [
               sim.addItem(id, 5);
             } catch {}
           }
-          sim.vaultBuyUpgrade(); // rung 0: the unlock, ceiling 40
+          sim.vaultBuyUpgrade(); // rung 0: the unlock, ceiling 100
           sim.vaultDepositAll(); // the one batched sweep stocks the rows
           rows = Object.keys(meta.vault.stock).length;
         } catch {}
@@ -5781,7 +5781,7 @@ export const TARGETS = [
               sim.addItem('fine_copper_ore', 2);
             }
             if (!isLocked) {
-              sim.vaultBuyUpgrade(); // rung 0: the 2g unlock, ceiling 40
+              sim.vaultBuyUpgrade(); // rung 0: the 2g unlock, ceiling 100
               sim.vaultDepositAll(); // the one batched sweep stocks the rows
               sim.addItem('iron_ore', 4);
               signedSpecial = meta.vault.special.some(
@@ -17378,6 +17378,51 @@ export const TARGETS = [
       if (!rows.quest || !rows.goods || !rows.husks) {
         throw new Error(`gossip rows missing: ${JSON.stringify(rows)}`);
       }
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'allied-hearthstone-attune-row',
+    label: 'Church Order quartermaster gossip menu with the Allied Hearthstone attune row',
+    when: ['hud/quest/hearthstone_attune_row_core', 'content/faction_rewards'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      // Reuses the Eastbrook staging (town loaded, hostiles cleared), then
+      // steps up to Templar Althea, the Church Order quartermaster in the same
+      // square, carrying an unbound Allied Hearthstone. On a base build the
+      // row is absent and the shot shows the menu without it.
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const qm = [...sim.entities.values()].find(
+          (e) => e.templateId === 'npc_church_order_quartermaster',
+        );
+        if (!qm) return { ok: false, reason: 'no npc_church_order_quartermaster entity' };
+        const player = sim.player;
+        player.pos.x = qm.pos.x + 2;
+        player.pos.z = qm.pos.z + 2;
+        player.prevPos = { ...player.pos };
+        if (sim.countItem('allied_hearthstone') <= 0) sim.addItem('allied_hearthstone', 1);
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(qm.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`allied-hearthstone-attune-row setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      // The step over to the quartermaster can bring the loading curtain back
+      // while the square streams in; shoot only once it has lifted again.
+      await page.waitForFunction(
+        () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+        { timeout: 90000, polling: 200 },
+      );
+      await wait(800);
       return { clip: '#quest-dialog' };
     },
   },

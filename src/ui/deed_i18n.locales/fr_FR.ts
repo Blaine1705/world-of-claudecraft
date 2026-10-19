@@ -1254,6 +1254,36 @@ export const table: DeedLocaleTable = {
     name: 'Plus brillante que les ombres',
     desc: "Recupere les bourses de pieces volees et echappe-toi du labyrinthe d'Evergarden en difficulte Hard.",
   },
+  prog_titan: {
+    name: 'Colosse',
+    desc: "Gagner 10 000 000 de points d'expérience au cours de votre vie.",
+    title: 'Colosse',
+  },
+  pvp_flag_1h: {
+    name: 'Audacieux',
+    desc: 'Gardez le JcJ mondial activé pendant 1 heure de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
+    title: 'Audacieux',
+  },
+  pvp_flag_3h: {
+    name: 'Insoumis',
+    desc: 'Gardez le JcJ mondial activé pendant 3 heures de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
+    title: 'Insoumis',
+  },
+  pvp_flag_6h: {
+    name: 'Intrépide',
+    desc: 'Gardez le JcJ mondial activé pendant 6 heures de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
+    title: 'Intrépide',
+  },
+  pvp_flag_24h: {
+    name: 'Inébranlable',
+    desc: 'Gardez le JcJ mondial activé pendant 24 heures de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
+    title: 'Inébranlable',
+  },
+  pvp_flag_168h: {
+    name: 'Indomptable',
+    desc: 'Gardez le JcJ mondial activé pendant 7 jours de jeu en étant vivant dans le monde ouvert ou en match JcJ. Les sanctuaires, les instances JcE, la mort et la déconnexion suspendent la progression ; le désactiver la réinitialise. Les titres gagnés sont permanents.',
+    title: 'Indomptable',
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer
