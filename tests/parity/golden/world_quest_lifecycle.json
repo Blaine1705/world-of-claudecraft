@@ -905,7 +905,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "dae078ba",
+      "state": "d6a0753a",
       "events": "c2e2c32e",
       "rng": {
         "draws": 0,
@@ -1083,7 +1083,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -0.10816,
+          "fallStartY": 2.468919,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -1100,7 +1100,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -325,
-            "y": -0.10816,
+            "y": 2.468919,
             "z": 820
           },
           "potionCooldownUntil": -1,
