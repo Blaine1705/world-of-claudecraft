@@ -5591,9 +5591,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     flex: 0 0 auto;
   }
-  /* Lantern Hall on a phone: the three notices stay side by side, compact (a smaller
-     portrait, a tighter sheet), and the quartermaster's detail keeps beside its stock, so a
-     landscape screen shows the whole board and the whole counter with a short scroll. */
+  /* Lantern Hall on a phone: a compact board (a smaller portrait, a tighter sheet). On a
+     landscape phone the notices stay side by side and the quartermaster's detail keeps
+     beside its stock; only a window under 560px restacks them (components.css container
+     query), so the whole board and counter show with a short scroll. */
   body.mobile-touch #guild-hall-window .gh-intro {
     margin: 4px 0 8px;
   }

@@ -21122,6 +21122,10 @@
     font-size: 14px;
   }
   #guild-hall-window .gh-seals {
+    min-height: 40px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: help;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -21642,7 +21646,7 @@
     font-size: 13px;
     color: var(--gh-short);
   }
-  @container (max-width: 720px) {
+  @container (max-width: 560px) {
     #guild-hall-window .gh-cards {
       grid-template-columns: minmax(0, 1fr);
       gap: 12px;
@@ -21688,7 +21692,8 @@
     #guild-hall-window .gh-item-selected {
       border: 2px solid Highlight;
     }
-    #guild-hall-window .gh-pip-done {
+    #guild-hall-window .gh-pip-done,
+    #guild-hall-window .gh-pips-card .gh-pip-done {
       background: Highlight;
     }
   }

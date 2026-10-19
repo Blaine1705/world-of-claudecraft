@@ -146,7 +146,8 @@ export class GuildHallWindow {
     if (offerId === this.selectedOffer) return;
     this.selectedOffer = offerId;
     this.lastSig = this.sig();
-    this.render(null);
+    // a press rebuilt the sheet: the card's twin takes focus without popping its hover card
+    this.render(null, true);
   }
 
   /** The key of the control holding focus, so a rebuild can hand focus back to its twin. */
@@ -157,11 +158,12 @@ export class GuildHallWindow {
     if (active.dataset.ghTab) return `[data-gh-tab="${active.dataset.ghTab}"]`;
     if (active.dataset.ghBuy) return `[data-gh-buy="${active.dataset.ghBuy}"]`;
     if (active.dataset.ghOffer) return `[data-gh-offer="${active.dataset.ghOffer}"]`;
+    if (active.hasAttribute('data-gh-seals')) return '[data-gh-seals]';
     if (active.hasAttribute('data-close')) return '[data-close]';
     return null;
   }
 
-  private render(focus: 'open' | 'tab' | null): void {
+  private render(focus: 'open' | 'tab' | null, pressed = false): void {
     const root = this.deps.root();
     const world = this.deps.world();
     const keep = focus === null ? this.focusedKey(root) : null;
@@ -182,7 +184,8 @@ export class GuildHallWindow {
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.guildHall.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="gh-tabs" role="tablist" aria-label="${esc(t('hudChrome.guildHall.tabsLabel'))}">${tabs}</div>` +
       `<div class="gh-panel" role="tabpanel" id="${PANEL_ID}" aria-labelledby="guild-hall-tab-${esc(this.tab)}">` +
-      `<div class="gh-sub"><span class="gh-seals" tabindex="0">${this.sealIcon('gh-seal-icon')}<span>${esc(view.sealsText)}</span></span>` +
+      `<div class="gh-sub"><button type="button" class="gh-seals" data-gh-seals aria-describedby="gh-seals-tip">${this.sealIcon('gh-seal-icon')}<span>${esc(view.sealsText)}</span></button>` +
+      `<span class="visually-hidden" id="gh-seals-tip">${esc(view.sealsTip)}</span>` +
       `<span class="gh-reset">${esc(view.resetText)}</span></div>` +
       `<p class="gh-intro">${esc(view.intro)}</p>` +
       body +
@@ -190,12 +193,13 @@ export class GuildHallWindow {
     this.wire(root, world, view);
     const target =
       focus === 'open' ? '[data-close]' : focus === 'tab' ? `[data-gh-tab="${this.tab}"]` : keep;
+    if (!target) return;
+    const twin = root.querySelector<HTMLButtonElement>(target);
+    // attachTooltip's own side channel (Hud): the focus a press hands the rebuilt twin is not
+    // a keyboard arrival, so it shows no hover card
+    if (pressed && twin) twin.dataset.suppressFocusTooltip = 'true';
     // a control the rebuild disabled (a title just bought) hands focus to Close
-    if (target)
-      restoreFirstEnabled([
-        root.querySelector<HTMLButtonElement>(target),
-        root.querySelector<HTMLButtonElement>('[data-close]'),
-      ]);
+    restoreFirstEnabled([twin, root.querySelector<HTMLButtonElement>('[data-close]')]);
   }
 
   private wire(root: HTMLElement, world: IWorld, view: GuildHallView): void {
@@ -276,14 +280,14 @@ export class GuildHallWindow {
       `<span class="gh-pin" aria-hidden="true"></span>` +
       `<div class="gh-ribbon"><span class="gh-kind">${esc(card.kindLabel)}</span></div>` +
       `<div class="gh-portrait"><img src="${esc(card.portraitUrl)}" width="96" height="96" loading="lazy" decoding="async" alt=""></div>` +
-      `<h3 class="gh-boss">${esc(card.boss)}</h3>` +
+      `<h3 class="gh-boss" id="gh-boss-${esc(card.id)}">${esc(card.boss)}</h3>` +
       `<div class="gh-dungeon">${esc(card.dungeon)}</div>` +
       `<div class="gh-rule" aria-hidden="true"></div>` +
       `<p class="gh-goal">${esc(card.goal)}</p>` +
       (card.detail ? `<p class="gh-detail">${esc(card.detail)}</p>` : '') +
       `<div class="gh-progress">` +
       `<div class="gh-progress-row"><span class="gh-state">${esc(card.stateLabel)}</span><span class="gh-count">${esc(card.progressText)}</span></div>` +
-      `<span class="gh-pips gh-pips-card" role="progressbar" aria-label="${esc(t('hudChrome.guildHall.board.cardProgressAria'))}" aria-valuemin="0" aria-valuemax="${card.progressTotal}" aria-valuenow="${card.progressDone}" aria-valuetext="${esc(card.progressText)}">${pips}</span>` +
+      `<span class="gh-pips gh-pips-card" role="progressbar" aria-labelledby="gh-boss-${esc(card.id)}" aria-valuemin="0" aria-valuemax="${card.progressTotal}" aria-valuenow="${card.progressDone}" aria-valuetext="${esc(card.progressText)}">${pips}</span>` +
       `</div>` +
       `<div class="gh-reward">${this.sealIcon('gh-reward-icon')}<span>${esc(card.rewardLine)}</span></div>` +
       `<span class="gh-wax" aria-hidden="true">${svgIcon(card.done ? 'check' : 'crown')}</span>` +
@@ -331,8 +335,8 @@ export class GuildHallWindow {
       `<p class="gh-detail-note">${esc(detail.cosmetic)}</p>` +
       `<div class="gh-buybar"><div class="gh-buy-price"><span class="gh-tag gh-tag-large">${this.sealIcon('gh-tag-icon')}<span aria-hidden="true">${esc(detail.priceValue)}</span></span>` +
       `<span class="visually-hidden">${esc(detail.priceText)}</span><span class="gh-have">${esc(detail.haveText)}</span></div>` +
-      `<button type="button" class="gh-btn gh-buy" data-gh-buy="${esc(detail.id)}"${detail.actionEnabled ? '' : ' disabled'}>${esc(detail.action)}</button></div>` +
-      (detail.shortText ? `<p class="gh-short">${esc(detail.shortText)}</p>` : '') +
+      `<button type="button" class="gh-btn gh-buy" data-gh-buy="${esc(detail.id)}"${detail.shortText ? ' aria-describedby="gh-short"' : ''}${detail.actionEnabled ? '' : ' disabled'}>${esc(detail.action)}</button></div>` +
+      (detail.shortText ? `<p class="gh-short" id="gh-short">${esc(detail.shortText)}</p>` : '') +
       `</section>`
     );
   }

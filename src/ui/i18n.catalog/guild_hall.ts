@@ -57,7 +57,6 @@ export const guildHallStrings = {
     weekProgress: 'This week: {done} of {total} contracts complete',
     weekProgressAria: 'Contracts completed this week',
     cardProgress: '{done}/{total} this week',
-    cardProgressAria: 'Progress this week',
     rewardLine: 'Reward: {reward}',
     stamp: 'Sealed',
     sealsTip:

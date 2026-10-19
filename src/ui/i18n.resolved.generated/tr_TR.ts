@@ -696,7 +696,6 @@ export const tr_TR: EnTranslations = {
         "weekProgress": "This week: {done} of {total} contracts complete",
         "weekProgressAria": "Contracts completed this week",
         "cardProgress": "{done}/{total} this week",
-        "cardProgressAria": "Progress this week",
         "rewardLine": "Reward: {reward}",
         "stamp": "Sealed",
         "sealsTip": "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are bound to you."

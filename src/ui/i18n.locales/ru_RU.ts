@@ -22223,7 +22223,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.weekProgress': 'На этой неделе: выполнено {done} из {total} контрактов',
   'hudChrome.guildHall.board.weekProgressAria': 'Контракты, выполненные на этой неделе',
   'hudChrome.guildHall.board.cardProgress': '{done}/{total} на этой неделе',
-  'hudChrome.guildHall.board.cardProgressAria': 'Прогресс за неделю',
   'hudChrome.guildHall.board.rewardLine': 'Награда: {reward}',
   'hudChrome.guildHall.board.stamp': 'Скреплено',
   'hudChrome.guildHall.board.sealsTip': 'Печати Фонаря выдаются за еженедельные контракты Зала Фонаря и тратятся только у интенданта Гаррика Холта. Они привязаны к вам.',

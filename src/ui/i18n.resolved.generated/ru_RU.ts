@@ -696,7 +696,6 @@ export const ru_RU: EnTranslations = {
         "weekProgress": "На этой неделе: выполнено {done} из {total} контрактов",
         "weekProgressAria": "Контракты, выполненные на этой неделе",
         "cardProgress": "{done}/{total} на этой неделе",
-        "cardProgressAria": "Прогресс за неделю",
         "rewardLine": "Награда: {reward}",
         "stamp": "Скреплено",
         "sealsTip": "Печати Фонаря выдаются за еженедельные контракты Зала Фонаря и тратятся только у интенданта Гаррика Холта. Они привязаны к вам."

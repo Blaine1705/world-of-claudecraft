@@ -696,7 +696,6 @@ export const zh_CN: EnTranslations = {
         "weekProgress": "本周：已完成{done}/{total}份契约",
         "weekProgressAria": "本周已完成的契约",
         "cardProgress": "本周 {done}/{total}",
-        "cardProgressAria": "本周进度",
         "rewardLine": "奖励：{reward}",
         "stamp": "已盖印",
         "sealsTip": "灯火印章由灯火大厅的每周契约发放，只能在军需官加里克·霍尔特处使用。它们与你绑定。"

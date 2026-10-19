@@ -21813,7 +21813,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.board.weekProgress': '今週：契約{total}件中{done}件を達成',
   'hudChrome.guildHall.board.weekProgressAria': '今週達成した契約',
   'hudChrome.guildHall.board.cardProgress': '今週 {done}/{total}',
-  'hudChrome.guildHall.board.cardProgressAria': '今週の進行',
   'hudChrome.guildHall.board.rewardLine': '報酬：{reward}',
   'hudChrome.guildHall.board.stamp': '封印済み',
   'hudChrome.guildHall.board.sealsTip': '燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。',

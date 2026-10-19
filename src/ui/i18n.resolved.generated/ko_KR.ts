@@ -696,7 +696,6 @@ export const ko_KR: EnTranslations = {
         "weekProgress": "이번 주: 계약 {total}건 중 {done}건 완료",
         "weekProgressAria": "이번 주에 완료한 계약",
         "cardProgress": "이번 주 {done}/{total}",
-        "cardProgressAria": "이번 주 진행도",
         "rewardLine": "보상: {reward}",
         "stamp": "봉인됨",
         "sealsTip": "등불 인장은 등불 회관 주간 계약의 보상으로 지급되며, 보급관 개릭 홀트에게서만 사용할 수 있습니다. 귀속 아이템입니다."

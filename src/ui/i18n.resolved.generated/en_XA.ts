@@ -696,7 +696,6 @@ export const en_XA: EnTranslations = {
         "weekProgress": "[Ţĥíš ŵééķ: {done} óƒ {total} çóñţŕáçţš çóɱþļéţé]",
         "weekProgressAria": "[Çóñţŕáçţš çóɱþļéţéð ţĥíš ŵééķ]",
         "cardProgress": "[{done}/{total} ţĥíš ŵééķ]",
-        "cardProgressAria": "[Þŕóĝŕéšš ţĥíš ŵééķ]",
         "rewardLine": "[Ŕéŵáŕð: {reward}]",
         "stamp": "[Šéáļéð]",
         "sealsTip": "[Ļáñţéŕñ Šéáļš áŕé þáíð ƒóŕ Ļáñţéŕñ Ĥáļļ'š ŵééķļý çóñţŕáçţš áñð šþéñţ óñļý áţ Ĝáŕŕíçķ Ĥóļţ, ţĥé ɋúáŕţéŕɱášţéŕ. Ţĥéý áŕé ƀóúñð ţó ýóú.]"

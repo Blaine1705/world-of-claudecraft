@@ -2,9 +2,12 @@
 // the painter over jsdom (guild_hall_window.ts), the event routing
 // (hud/quest/quest_event_router.ts) and the online mirror's decode (net/guild_hall_wire_state.ts).
 // @vitest-environment jsdom
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { decodeGuildContractsWire } from '../src/net/guild_hall_wire_state';
 import {
+  GUILD_CONTRACTS,
   GUILD_QUARTERMASTER_STOCK,
   LANTERN_SEAL_ITEM_ID,
 } from '../src/sim/content/guild_contracts';
@@ -98,6 +101,33 @@ describe('the guild window view core', () => {
     expect(empty.contracts).toEqual([]);
     expect(empty.emptyText).toMatch(/weekly reset/);
     expect([empty.weekDone, empty.weekTotal]).toEqual([0, 0]);
+  });
+
+  it('has a portrait still for every boss any contract is posted against', () => {
+    // the notice shows /ui/dungeons/<mobId>.webp; a contract against a boss without one would
+    // ship a broken image
+    const missing = [...new Set(GUILD_CONTRACTS.map((c) => c.mobId))].filter(
+      (mobId) => !existsSync(path.join(process.cwd(), 'public', 'ui', 'dungeons', `${mobId}.webp`)),
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it('reads the same from the online mirror as from the offline world', () => {
+    // ClientWorld's shape: the board decoded off the wire (gcon), the bags and the Book mirrored
+    const done = [board().offered[0]];
+    const sim = world(7, [GUILD_QUARTERMASTER_STOCK[0].deedId], done);
+    const mirror = {
+      ...sim,
+      guildContracts: decodeGuildContractsWire(JSON.parse(JSON.stringify(sim.guildContracts))),
+      inventory: sim.inventory.map((slot) => ({ ...slot })),
+      deedsEarned: new Map(sim.deedsEarned),
+    };
+    const now = Date.UTC(2026, 9, 16);
+    for (const tab of ['contracts', 'quartermaster'] as const) {
+      expect(buildGuildHallView(mirror, now, tab, null)).toEqual(
+        buildGuildHallView(sim, now, tab, null),
+      );
+    }
   });
 
   it("prices the quartermaster's titles against the seals in the bags, owned ones marked", () => {
@@ -304,6 +334,34 @@ describe('the guild window painter', () => {
     const html = card ? tips.get(card)?.() : '';
     expect(html).toContain('<div class="tt-title">Title: Hallsworn</div>');
     expect(html).toContain('class="tt-red"');
+  });
+
+  it('hands focus back to the pressed card and the seal chip without popping a hover card', () => {
+    const { root, win } = mount(world(3));
+    win.open('quartermaster');
+    const id = GUILD_QUARTERMASTER_STOCK[2].id;
+    root.querySelector<HTMLButtonElement>(`[data-gh-offer="${id}"]`)?.focus();
+    root.querySelector<HTMLButtonElement>(`[data-gh-offer="${id}"]`)?.click();
+    const twin = root.querySelector<HTMLButtonElement>(`[data-gh-offer="${id}"]`);
+    expect(document.activeElement).toBe(twin);
+    // the flag attachTooltip's focusin reads (and clears) before it would show the card
+    expect(twin?.dataset.suppressFocusTooltip).toBe('true');
+    // the seal chip is a named button whose focus survives a rebuild
+    const chip = root.querySelector<HTMLButtonElement>('[data-gh-seals]');
+    expect(chip?.tagName).toBe('BUTTON');
+    expect(
+      document.getElementById(chip?.getAttribute('aria-describedby') ?? '')?.textContent,
+    ).toMatch(/Garrick Holt/);
+    chip?.focus();
+    win.relocalize();
+    expect(document.activeElement).toBe(root.querySelector('[data-gh-seals]'));
+    // a disabled buy names its reason
+    const buy = root.querySelector<HTMLButtonElement>(`[data-gh-buy="${id}"]`);
+    expect(buy?.disabled).toBe(true);
+    expect(document.getElementById(buy?.getAttribute('aria-describedby') ?? '')?.className).toBe(
+      'gh-short',
+    );
+    win.close();
   });
 
   it('repaints only when its signature moves', () => {

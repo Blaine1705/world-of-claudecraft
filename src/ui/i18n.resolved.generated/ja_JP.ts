@@ -696,7 +696,6 @@ export const ja_JP: EnTranslations = {
         "weekProgress": "今週：契約{total}件中{done}件を達成",
         "weekProgressAria": "今週達成した契約",
         "cardProgress": "今週 {done}/{total}",
-        "cardProgressAria": "今週の進行",
         "rewardLine": "報酬：{reward}",
         "stamp": "封印済み",
         "sealsTip": "燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。"

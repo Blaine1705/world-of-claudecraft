@@ -14306,7 +14306,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.gatheringSource.specimenOfBase'
   | 'hudChrome.gatheringSource.title'
   | 'hudChrome.guildHall.board.cardProgress'
-  | 'hudChrome.guildHall.board.cardProgressAria'
   | 'hudChrome.guildHall.board.noticesLabel'
   | 'hudChrome.guildHall.board.rewardLine'
   | 'hudChrome.guildHall.board.sealsTip'
