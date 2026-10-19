@@ -2205,17 +2205,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '홈에 등불의 불길을 담은 넓은 강철 검날, 금박 장식, 코등이에서 타오르는 새장 등불, 푸른 가죽 손잡이.',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '등불 회관의 검',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '화롯불의 검',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look': '양날이 대장간의 열기로 달아오르고 양면에 녹은 균열이 가지를 치며 뻗은, 검게 그을린 강철의 불꽃 물결 검날. 타오르는 돌을 감싼 청동 불꽃 코등이, 검붉은 가죽 손잡이.',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore': '등불 회관에는 회관이 세워진 이래 한 번도 꺼진 적 없는 화로가 있고, 개릭 홀트는 이 검날이 그 숯불에 담금질되었다고 맹세한다. 이 검을 지닌 이들은 가장 추운 불침번에도 손잡이가 따뜻하다고 말한다. 검날을 따라 흐르는 불은 겉모습일 뿐이다.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '양날이 대장간의 열기로 달아오르고 양면에 녹은 균열이 가지를 치며 뻗은, 검게 그을린 강철의 불꽃 물결 검날. 타오르는 돌을 감싼 청동 불꽃 코등이, 검붉은 가죽 손잡이.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '등불 회관에는 회관이 세워진 이래 한 번도 꺼진 적 없는 화로가 있고, 개릭 홀트는 이 검날이 그 숯불에 담금질되었다고 맹세한다. 이 검을 지닌 이들은 가장 추운 불침번에도 손잡이가 따뜻하다고 말한다. 검날을 따라 흐르는 불은 겉모습일 뿐이다.',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '폭풍 물결의 검',
-  'hudChrome.wocStore.skins.squallcrest_sword.look': '부서지는 파도처럼 빛나는 날을 지닌 길고 푸른 바다빛 검날. 갈라진 번개를 품은 폭풍의 홈, 검날 밑동을 넘는 금빛 파도, 한쪽 날을 따라 난 지느러미, 폭풍 진주를 감싼 금빛 파도 코등이.',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore': '길드를 위해 항해하던 한 선장이 돛대를 앗아 가고 배를 종처럼 울리게 한 돌풍 속에서 이 검을 가지고 돌아왔다. 개릭은 인장을 받고서만 이 검을 팔며, 사는 이마다 폭풍 전에는 검이 웅웅거린다고 경고한다. 번개와 바다빛은 겉모습일 뿐이다.',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '부서지는 파도처럼 빛나는 날을 지닌 길고 푸른 바다빛 검날. 갈라진 번개를 품은 폭풍의 홈, 검날 밑동을 넘는 금빛 파도, 한쪽 날을 따라 난 지느러미, 폭풍 진주를 감싼 금빛 파도 코등이.',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '길드를 위해 항해하던 한 선장이 돛대를 앗아 가고 배를 종처럼 울리게 한 돌풍 속에서 이 검을 가지고 돌아왔다. 개릭은 인장을 받고서만 이 검을 팔며, 사는 이마다 폭풍 전에는 검이 웅웅거린다고 경고한다. 번개와 바다빛은 겉모습일 뿐이다.',
   'hudChrome.wocStore.skins.rimelight_staff.name': '서리빛 지팡이',
-  'hudChrome.wocStore.skins.rimelight_staff.look': '은으로 감싸고 빛나는 서리를 휘감은 창백한 자루. 꼭대기에는 얼음 조각 왕관 속에서 차가운 빛의 거대한 수정을 움켜쥔 은 갈고리가 있고, 깃에는 고드름이 매달려 있다.',
-  'hudChrome.wocStore.skins.rimelight_staff.lore': '등불 회관의 겨울 경비대는 이런 지팡이를 들고 높은 길을 걸으며, 눈 속에서 길을 잃은 여행자들을 위해 꼭대기를 밝혔다. 개릭은 인장에 여유가 있는 회원을 위해 하나를 진열대에 두고 있다. 서리와 그 차가운 빛은 겉모습일 뿐이다.',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '은으로 감싸고 빛나는 서리를 휘감은 창백한 자루. 꼭대기에는 얼음 조각 왕관 속에서 차가운 빛의 거대한 수정을 움켜쥔 은 갈고리가 있고, 깃에는 고드름이 매달려 있다.',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '등불 회관의 겨울 경비대는 이런 지팡이를 들고 높은 길을 걸으며, 눈 속에서 길을 잃은 여행자들을 위해 꼭대기를 밝혔다. 개릭은 인장에 여유가 있는 회원을 위해 하나를 진열대에 두고 있다. 서리와 그 차가운 빛은 겉모습일 뿐이다.',
   'hudChrome.wocStore.skins.duskwick_staff.name': '황혼 심지 지팡이',
-  'hudChrome.wocStore.skins.duskwick_staff.look': '쇠로 감싼 두 가닥의 꼬인 검은 나무 자루. 꼭대기에는 휘어 오른 두 뿔 사이에서 보랏빛 황혼의 불꽃을 태우는 열린 쇠 등롱이 있고, 그 바닥에서 사슬이 흔들린다.',
-  'hudChrome.wocStore.skins.duskwick_staff.lore': '회관의 등불은 모두 밝게 타오른다, 단 하나만 빼고. 황혼의 불꽃은 밤의 회관을 지키려고 밝힌 것으로, 다른 등불이 빛을 내는 곳에서 그림자를 낸다. 개릭은 그 심지를 직접 다듬는다. 연기와 보랏빛 광채는 겉모습일 뿐이다.',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '쇠로 감싼 두 가닥의 꼬인 검은 나무 자루. 꼭대기에는 휘어 오른 두 뿔 사이에서 보랏빛 황혼의 불꽃을 태우는 열린 쇠 등롱이 있고, 그 바닥에서 사슬이 흔들린다.',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '회관의 등불은 모두 밝게 타오른다, 단 하나만 빼고. 황혼의 불꽃은 밤의 회관을 지키려고 밝힌 것으로, 다른 등불이 빛을 내는 곳에서 그림자를 낸다. 개릭은 그 심지를 직접 다듬는다. 연기와 보랏빛 광채는 겉모습일 뿐이다.',
   'hudChrome.wocStore.collections.lantern_hall': '등불 회관',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '길드마크 무장검',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
@@ -21691,7 +21699,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.open': '진행 중',
   'hudChrome.guildHall.lifetime': '완료한 계약: {count}',
   'hudChrome.guildHall.emptyBoard': '게시판을 새로 쓰는 중입니다. 주간 초기화 후에 다시 오세요.',
-  'hudChrome.guildHall.quartermasterIntro': '개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호, 길드의 무기 외형, 그리고 길드의 군마입니다. 여기서 전투에서 당신을 더 강하게 만드는 것은 없습니다.',
+  'hudChrome.guildHall.quartermasterIntro':
+    '개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호, 길드의 무기 외형, 그리고 길드의 군마입니다. 여기서 전투에서 당신을 더 강하게 만드는 것은 없습니다.',
   'hudChrome.guildHall.titleOffer': '칭호: {title}',
   'hudChrome.guildHall.titlePreview': '표시: {preview}',
   'hudChrome.guildHall.buy': '구매',
@@ -21708,7 +21717,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '장착한 검의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.',
   'hudChrome.guildHall.skinOffer': '검 외형: {skin}',
   'hudChrome.guildHall.staffSkinOffer': '지팡이 외형: {skin}',
-  'hudChrome.guildHall.staffSkinPreview': '장착한 지팡이의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.',
+  'hudChrome.guildHall.staffSkinPreview':
+    '장착한 지팡이의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.',
   'hudChrome.guildHall.mountPreview':
     '지상 탈것: 탑승 중 이동 속도 +{pct}%. 탈것 훈련이 필요합니다.',
   'hudChrome.guildHall.mountOffer': '탈것: {mount}',

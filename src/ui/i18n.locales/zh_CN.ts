@@ -2208,17 +2208,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '宽阔的钢制剑身，血槽中燃着灯火，镀金的护颊，护手中燃着一盏笼中提灯，蓝色皮革剑柄。',
   'hudChrome.wocStore.skins.lantern_hall_sword.name': '灯火大厅之剑',
   'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火之刃',
-  'hudChrome.wocStore.skins.hearthbrand_sword.look': '焦黑钢铁铸成的火焰波纹剑身，两侧刃口如出炉般炽热，熔融的裂缝在两面分叉蔓延，青铜火焰护手环绕一块燃烧的宝石，牛血色握柄。',
-  'hudChrome.wocStore.skins.hearthbrand_sword.lore': '灯火大厅里有一座自大厅建成以来从未熄灭的炉膛，加里克·霍尔特发誓这把剑就是在它的炭火中淬火的。佩戴它的成员说，即使在最寒冷的守夜里，剑柄也依然温暖。刃口上的火焰只是外观。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '焦黑钢铁铸成的火焰波纹剑身，两侧刃口如出炉般炽热，熔融的裂缝在两面分叉蔓延，青铜火焰护手环绕一块燃烧的宝石，牛血色握柄。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '灯火大厅里有一座自大厅建成以来从未熄灭的炉膛，加里克·霍尔特发誓这把剑就是在它的炭火中淬火的。佩戴它的成员说，即使在最寒冷的守夜里，剑柄也依然温暖。刃口上的火焰只是外观。',
   'hudChrome.wocStore.skins.squallcrest_sword.name': '风暴浪峰',
-  'hudChrome.wocStore.skins.squallcrest_sword.look': '海蓝色的修长剑身，刃口如碎浪般明亮，风暴血槽中封着分叉的闪电，剑根上方是一道镀金的浪，一侧刃口生着鳍，镀金浪涛护手环绕一颗风暴珍珠。',
-  'hudChrome.wocStore.skins.squallcrest_sword.lore': '一位为公会出海的船长从一场狂风中带回了这把剑，那场风暴折断了她的桅杆，让整艘船像钟一样鸣响。加里克只肯用印章出售它，并提醒每位买家，风暴来临前它会嗡嗡作响。闪电与海光只是外观。',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '海蓝色的修长剑身，刃口如碎浪般明亮，风暴血槽中封着分叉的闪电，剑根上方是一道镀金的浪，一侧刃口生着鳍，镀金浪涛护手环绕一颗风暴珍珠。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '一位为公会出海的船长从一场狂风中带回了这把剑，那场风暴折断了她的桅杆，让整艘船像钟一样鸣响。加里克只肯用印章出售它，并提醒每位买家，风暴来临前它会嗡嗡作响。闪电与海光只是外观。',
   'hudChrome.wocStore.skins.rimelight_staff.name': '霜光法杖',
-  'hudChrome.wocStore.skins.rimelight_staff.look': '苍白的杖身以银箍束紧，缠绕着发光的雾凇，杖顶的银爪在冰晶之冠中托着一颗巨大的寒光水晶，杖颈垂着冰柱。',
-  'hudChrome.wocStore.skins.rimelight_staff.lore': '灯火大厅的冬季守望者曾手持这样的法杖行走在高路上，点亮杖顶，为迷失在雪中的旅人引路。加里克在架上留了一根，给印章有余的成员。寒霜与冷光只是外观。',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '苍白的杖身以银箍束紧，缠绕着发光的雾凇，杖顶的银爪在冰晶之冠中托着一颗巨大的寒光水晶，杖颈垂着冰柱。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '灯火大厅的冬季守望者曾手持这样的法杖行走在高路上，点亮杖顶，为迷失在雪中的旅人引路。加里克在架上留了一根，给印章有余的成员。寒霜与冷光只是外观。',
   'hudChrome.wocStore.skins.duskwick_staff.name': '暮芯法杖',
-  'hudChrome.wocStore.skins.duskwick_staff.look': '两股扭结的黑木以铁箍束紧，杖顶是一盏敞开的铁提灯，在两只卷曲的角之间燃着紫色的暮光火焰，灯底垂着晃动的锁链。',
-  'hudChrome.wocStore.skins.duskwick_staff.lore': '大厅里的每一盏灯都明亮地燃烧，只有一盏例外。暮光之焰是为在夜里守护大厅而点燃的，别的灯发出光的地方，它发出影子；加里克亲自修剪它的灯芯。烟雾与紫色光辉只是外观。',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '两股扭结的黑木以铁箍束紧，杖顶是一盏敞开的铁提灯，在两只卷曲的角之间燃着紫色的暮光火焰，灯底垂着晃动的锁链。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '大厅里的每一盏灯都明亮地燃烧，只有一盏例外。暮光之焰是为在夜里守护大厅而点燃的，别的灯发出光的地方，它发出影子；加里克亲自修剪它的灯芯。烟雾与紫色光辉只是外观。',
   'hudChrome.wocStore.collections.lantern_hall': '灯火大厅',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公会印记武装剑',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
@@ -20638,7 +20646,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.open': '进行中',
   'hudChrome.guildHall.lifetime': '已完成契约：{count}',
   'hudChrome.guildHall.emptyBoard': '告示板正在重写。请在每周重置后再来。',
-  'hudChrome.guildHall.quartermasterIntro': '加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔、公会武器的外观和公会的战马。这里没有任何东西能让你在战斗中变得更强。',
+  'hudChrome.guildHall.quartermasterIntro':
+    '加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔、公会武器的外观和公会的战马。这里没有任何东西能让你在战斗中变得更强。',
   'hudChrome.guildHall.titleOffer': '头衔：{title}',
   'hudChrome.guildHall.titlePreview': '显示为{preview}',
   'hudChrome.guildHall.buy': '购买',
@@ -20655,7 +20664,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '改变你所装备的剑的样子，适用于账号中的所有角色。仅为外观：没有属性。',
   'hudChrome.guildHall.skinOffer': '剑的外观：{skin}',
   'hudChrome.guildHall.staffSkinOffer': '法杖的外观：{skin}',
-  'hudChrome.guildHall.staffSkinPreview': '改变你所装备的法杖的样子，适用于账号中的所有角色。仅为外观：没有属性。',
+  'hudChrome.guildHall.staffSkinPreview':
+    '改变你所装备的法杖的样子，适用于账号中的所有角色。仅为外观：没有属性。',
   'hudChrome.guildHall.mountPreview': '地面坐骑：骑乘时移动速度+{pct}%。需要骑术训练。',
   'hudChrome.guildHall.mountOffer': '坐骑：{mount}',
   'hudChrome.guildHall.refused.range': '站到军需官身边才能交易。',
