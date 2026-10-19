@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.enemyHighlightDistance': '{yards}ヤード',
+  'hud.pet.stanceDesc': 'クリックして受動、防御、攻撃、アシストを選びます。',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分',
   'abilityUi.cast.hoard_cast_rime_beam': '霜光線',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount}{currency}',
@@ -4307,7 +4309,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     'クリックしてからバッグ内の食べ物をクリックし、5秒かけてペットに餌を与えて治癒します。',
   'hud.pet.stanceTitle': 'ペットスタンス',
-  'hud.pet.stanceDesc': 'クリックして受動、防御、攻撃を選びます。',
   'hud.pet.passiveDesc': '命令した時だけ攻撃します。',
   'hud.pet.defensiveDesc': 'あなたまたはペットを傷つけた敵を攻撃します。',
   'hud.pet.aggressiveDesc': '近くの敵対的な敵を攻撃します。',

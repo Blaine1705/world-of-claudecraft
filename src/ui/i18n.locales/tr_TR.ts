@@ -2,6 +2,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Yardım',
+  'hud.pet.assistDesc':
+    'Yalnızca mevcut hedefine bir yetenek kullandıktan sonra o hedefe saldırır. Sana saldıran düşmanları görmezden gelir.',
+  'hudChrome.cooldownManager.auraActive': 'Etkin',
+  'hudChrome.cooldownManager.auraMissing': 'Yok',
+  'hudChrome.cooldownManager.auraShowWhen': 'Aura şu durumdayken düğmeyi göster',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Aura yokken aydınlat',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Hiçbir yer işaretlenmezse bu grup asla görünmez ve ses çalmaz.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'İki seçenek de işaretlenmezse düğme asla görünmez, ancak sesi yine de çalar.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Hazır değil, bekleme süresinde veya şu anda kullanılamaz demektir.',
+  'hudChrome.cooldownManager.placeHint':
+    'Örnek alanlar; zindanları, baskınları, mağara seferlerini, yarıkları, savaş alanlarını, arenayı ve diğer tüm örneklenmiş bölgeleri kapsar. İşaretlediğin yerlerin dışında grup gizli ve sessiz kalır.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Aura yokken düğmeyi aydınlatır, çevresini vurgular ve yanıp sönmesini sağlar.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Güçlendirme hatırlatıcısı: Bu aura yokken düğme aydınlanır ve aurayı aldığında gizlenir.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Aura sona erdiğinde çalar.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Düğmeyi şu durumda göster',
+  'hudChrome.cooldownManager.showIn': 'Şurada göster',
+  'hudChrome.cooldownManager.showInInstances': 'Örnek alanlar',
+  'hudChrome.cooldownManager.showInWorld': 'Açık dünya',
+  'hudChrome.cooldownManager.showNotReady': 'Hazır değil',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Çatışma dışında',
+  'hudChrome.cooldownManager.showReady': 'Hazır',
+  'hudChrome.cooldownManager.showWhile': 'Şu sırada göster',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yarda',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Kamera dışındayken ekran kenarı oku',
+  'hudChrome.options.enemyHighlightNameplate': 'Büyük çerçeveli hedef isimliği',
+  'hudChrome.options.enemyHighlightOverhead': 'Baş üstünde yüzen işaret',
+  'hudChrome.options.enemyHighlightReticle': 'Daha kalın düşman nişangâhı',
+  'hudChrome.options.enemyHighlightStyle': 'Düşman vurgulama biçimi',
+  'hudChrome.options.nameplateCooldownScale': 'Saldırı/Savunma Takipçisi Boyutu',
+  'hudChrome.options.showNameplateCooldowns': 'Saldırı/Savunma Takipçisi',
+  'hud.pet.stanceDesc': 'Pasif, Savunmacı, Saldırgan veya Yardım seçmek için tıkla.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}d',
   'abilityUi.cast.hoard_cast_bat_dive': 'Dalış',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Derin Dalış',
@@ -11782,7 +11819,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Yeniden Adlandır',
   'hud.pet.renameLabel': 'Yeni bir evcil adı seç.',
   'hud.pet.revive': 'Yarasını Sar',
-  'hud.pet.stanceDesc': 'Pasif, Savunmacı ya da Saldırgan seçmek için tıkla.',
   'hud.pet.stanceTitle': 'Evcil Duruşu',
   'hud.pet.taunt': 'Kışkırt',
   'hud.prompts.acceptDuel': 'Düelloyu Kabul Et',

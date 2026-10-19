@@ -2,6 +2,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Podpora',
+  'hud.pet.assistDesc':
+    'Útočí pouze na tvůj aktuální cíl poté, co na něj použiješ schopnost. Ignoruje nepřátele, kteří na tebe útočí.',
+  'hudChrome.cooldownManager.auraActive': 'Aktivní',
+  'hudChrome.cooldownManager.auraMissing': 'Chybí',
+  'hudChrome.cooldownManager.auraShowWhen': 'Zobrazit tlačítko, když aura',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Rozsvítit při chybějící auře',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Pokud není zaškrtnuto žádné místo, tato skupina se nikdy nezobrazí ani nepřehraje zvuk.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Pokud není zaškrtnuta ani jedna možnost, tlačítko se nikdy nezobrazí, ale jeho zvuk se stále přehraje.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Nepřipraveno znamená, že běží obnova nebo schopnost právě nelze použít.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instance zahrnují kobky, nájezdy, výpravy, trhliny, bojiště, arénu a všechny další instancované oblasti. Mimo zaškrtnutá místa je skupina skrytá a nevydává zvuky.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Rozsvítí tlačítko, zvýrazní jeho obrys a nechá ho pulzovat, dokud aura chybí.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Připomínka posílení: tlačítko svítí, dokud tato aura chybí, a skryje se, jakmile ji získáš.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Přehraje se při vyprchání aury.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Zobrazit tlačítko, když je',
+  'hudChrome.cooldownManager.showIn': 'Zobrazit v',
+  'hudChrome.cooldownManager.showInInstances': 'Instancované oblasti',
+  'hudChrome.cooldownManager.showInWorld': 'Otevřený svět',
+  'hudChrome.cooldownManager.showNotReady': 'Nepřipraveno',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Mimo boj',
+  'hudChrome.cooldownManager.showReady': 'Připraveno',
+  'hudChrome.cooldownManager.showWhile': 'Zobrazit během',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yardů',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Šipka na okraji obrazovky pro cíl mimo záběr',
+  'hudChrome.options.enemyHighlightNameplate': 'Velká orámovaná jmenovka cíle',
+  'hudChrome.options.enemyHighlightOverhead': 'Plovoucí značka nad hlavou',
+  'hudChrome.options.enemyHighlightReticle': 'Výraznější zaměřovač nepřítele',
+  'hudChrome.options.enemyHighlightStyle': 'Styl zvýraznění nepřítele',
+  'hudChrome.options.nameplateCooldownScale': 'Velikost sledování útočných/obranných schopností',
+  'hudChrome.options.showNameplateCooldowns': 'Sledování útočných/obranných schopností',
+  'hud.pet.stanceDesc': 'Klikni a vyber pasivní, obranný, agresivní postoj nebo podporu.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Potápění',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Pronikavý potop',
@@ -8660,7 +8697,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Přejmenovat',
   'hud.pet.renameLabel': 'Vyber nové jméno mazlíčka.',
   'hud.pet.revive': 'Ošetření',
-  'hud.pet.stanceDesc': 'Klikni a vyber pasivní, obranný nebo agresivní postoj.',
   'hud.pet.stanceTitle': 'Postoj mazlíčka',
   'hud.pet.taunt': 'Provokace',
   'hud.prompts.acceptDuel': 'Přijmout duel',

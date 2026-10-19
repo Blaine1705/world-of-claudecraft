@@ -2,6 +2,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Assistance',
+  'hud.pet.assistDesc':
+    'Angriber kun dit aktuelle mål, når du har brugt en evne på det. Ignorerer fjender, der angriber dig.',
+  'hudChrome.cooldownManager.auraActive': 'Aktiv',
+  'hudChrome.cooldownManager.auraMissing': 'Mangler',
+  'hudChrome.cooldownManager.auraShowWhen': 'Vis knappen, når auraen er',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Lys op, når auraen mangler',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Hvis intet sted er markeret, vises denne gruppe aldrig og afspiller ingen lyde.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Hvis ingen af de to felter er markeret, vises knappen aldrig, men dens lyd afspilles stadig.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Ikke klar betyder på nedkøling eller kan ikke bruges lige nu.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instanser omfatter fangekældre, raids, delves, rifter, slagmarker, arenaen og alle andre instansopdelte områder. Uden for de markerede steder er gruppen skjult og tavs.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Får knappen til at lyse, fremhæver dens kant og får den til at pulsere, mens auraen mangler.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Påmindelse om forstærkning: Knappen lyser, mens denne aura mangler, og skjules, så snart du har den.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Afspilles, når auraen udløber.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Vis knappen, når',
+  'hudChrome.cooldownManager.showIn': 'Vis i',
+  'hudChrome.cooldownManager.showInInstances': 'Instansområder',
+  'hudChrome.cooldownManager.showInWorld': 'Åben verden',
+  'hudChrome.cooldownManager.showNotReady': 'Ikke klar',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Uden for kamp',
+  'hudChrome.cooldownManager.showReady': 'Klar',
+  'hudChrome.cooldownManager.showWhile': 'Vis under',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yards',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Pil ved skærmkanten uden for kamerafeltet',
+  'hudChrome.options.enemyHighlightNameplate': 'Stor indrammet navneplade for målet',
+  'hudChrome.options.enemyHighlightOverhead': 'Svævende markør over hovedet',
+  'hudChrome.options.enemyHighlightReticle': 'Kraftigere fjendtligt sigtekorn',
+  'hudChrome.options.enemyHighlightStyle': 'Stil for fjendefremhævning',
+  'hudChrome.options.nameplateCooldownScale': 'Størrelse på offensiv/defensiv sporing',
+  'hudChrome.options.showNameplateCooldowns': 'Offensiv/defensiv sporing',
+  'hud.pet.stanceDesc': 'Klik for at vælge passiv, defensiv, aggressiv eller assistance.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Dykning',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Dybdyk',
@@ -11026,7 +11063,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Omdøb',
   'hud.pet.renameLabel': 'Vælg et nyt kæledyrsnavn.',
   'hud.pet.revive': 'Lappe sammen',
-  'hud.pet.stanceDesc': 'Klik for at vælge Passiv, Defensiv eller Aggressiv.',
   'hud.pet.stanceTitle': 'Kæledyrsstilling',
   'hud.pet.taunt': 'Hån',
   'hud.prompts.acceptDuel': 'Accepter duel',

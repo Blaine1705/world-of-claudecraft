@@ -2,6 +2,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Assisteren',
+  'hud.pet.assistDesc':
+    'Valt alleen je huidige doelwit aan nadat je er een vaardigheid op hebt gebruikt. Negeert vijanden die jou aanvallen.',
+  'hudChrome.cooldownManager.auraActive': 'Actief',
+  'hudChrome.cooldownManager.auraMissing': 'Ontbreekt',
+  'hudChrome.cooldownManager.auraShowWhen': 'Knop tonen wanneer de aura',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Oplichten als de aura ontbreekt',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Als er geen locatie is aangevinkt, verschijnt deze groep nooit en speelt hij geen geluiden af.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Als geen van beide opties is aangevinkt, verschijnt de knop nooit, maar wordt het geluid nog wel afgespeeld.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Niet gereed betekent dat de afkoeltijd loopt of de vaardigheid nu niet bruikbaar is.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instanties omvatten kerkers, raids, delves, rifts, slagvelden, de arena en alle andere gebieden met een eigen instantie. Buiten de aangevinkte locaties is de groep verborgen en stil.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Laat de knop oplichten, omlijnt hem en laat hem pulseren zolang de aura ontbreekt.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Versterkingsherinnering: de knop licht op zolang deze aura ontbreekt en verdwijnt zodra je hem hebt.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Speelt af wanneer de aura afloopt.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Knop tonen wanneer',
+  'hudChrome.cooldownManager.showIn': 'Tonen in',
+  'hudChrome.cooldownManager.showInInstances': 'Instantiegebieden',
+  'hudChrome.cooldownManager.showInWorld': 'Open wereld',
+  'hudChrome.cooldownManager.showNotReady': 'Niet gereed',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Buiten gevecht',
+  'hudChrome.cooldownManager.showReady': 'Gereed',
+  'hudChrome.cooldownManager.showWhile': 'Tonen tijdens',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yard',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Pijl aan de schermrand buiten beeld',
+  'hudChrome.options.enemyHighlightNameplate': 'Grote omlijste naamplaat voor het doelwit',
+  'hudChrome.options.enemyHighlightOverhead': 'Zwevende markering boven het hoofd',
+  'hudChrome.options.enemyHighlightReticle': 'Dikker vijandelijk richtkruis',
+  'hudChrome.options.enemyHighlightStyle': 'Stijl voor vijandmarkering',
+  'hudChrome.options.nameplateCooldownScale': 'Grootte van offensieve/defensieve tracker',
+  'hudChrome.options.showNameplateCooldowns': 'Offensieve/defensieve tracker',
+  'hud.pet.stanceDesc': 'Klik om Passief, Verdedigend, Agressief of Assisteren te kiezen.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Duiken',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Duik omlaag',
@@ -11308,7 +11345,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Hernoemen',
   'hud.pet.renameLabel': 'Kies een nieuwe naam voor je huisdier.',
   'hud.pet.revive': 'Oplappen',
-  'hud.pet.stanceDesc': 'Klik om Passief, Verdedigend of Agressief te kiezen.',
   'hud.pet.stanceTitle': 'Huisdierhouding',
   'hud.pet.taunt': 'Provoceren',
   'hud.prompts.acceptDuel': 'Duel aanvaarden',

@@ -2,6 +2,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Hỗ trợ',
+  'hud.pet.assistDesc':
+    'Chỉ tấn công mục tiêu hiện tại sau khi bạn dùng kỹ năng lên mục tiêu đó. Bỏ qua kẻ địch tấn công bạn.',
+  'hudChrome.cooldownManager.auraActive': 'Đang có',
+  'hudChrome.cooldownManager.auraMissing': 'Đang thiếu',
+  'hudChrome.cooldownManager.auraShowWhen': 'Hiện nút khi hào quang',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Phát sáng khi thiếu',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Nếu không chọn địa điểm nào, nhóm này sẽ không bao giờ hiện hoặc phát âm thanh.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Nếu không chọn cả hai ô, nút sẽ không bao giờ hiện nhưng vẫn phát âm thanh.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Chưa sẵn sàng nghĩa là đang hồi chiêu hoặc hiện không thể sử dụng.',
+  'hudChrome.cooldownManager.placeHint':
+    'Phụ bản bao gồm ngục tối, đột kích, hang sâu, rạn nứt, chiến trường, đấu trường và mọi khu vực có phiên riêng khác. Ngoài các địa điểm đã chọn, nhóm sẽ bị ẩn và không phát âm thanh.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Làm nút sáng lên, nổi viền và nhấp nháy khi thiếu hào quang.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Nhắc hiệu ứng có lợi: nút sáng lên khi thiếu hào quang này và ẩn đi khi bạn có nó.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Phát khi hào quang kết thúc.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Hiện nút khi',
+  'hudChrome.cooldownManager.showIn': 'Hiện trong',
+  'hudChrome.cooldownManager.showInInstances': 'Khu vực phụ bản',
+  'hudChrome.cooldownManager.showInWorld': 'Thế giới mở',
+  'hudChrome.cooldownManager.showNotReady': 'Chưa sẵn sàng',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Ngoài giao tranh',
+  'hudChrome.cooldownManager.showReady': 'Sẵn sàng',
+  'hudChrome.cooldownManager.showWhile': 'Hiện khi',
+  'hudChrome.options.enemyHighlightDistance': '{yards} thước Anh',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Mũi tên ở rìa màn hình khi ngoài khung hình',
+  'hudChrome.options.enemyHighlightNameplate': 'Bảng tên mục tiêu lớn có khung',
+  'hudChrome.options.enemyHighlightOverhead': 'Dấu nổi trên đầu',
+  'hudChrome.options.enemyHighlightReticle': 'Tâm ngắm địch đậm hơn',
+  'hudChrome.options.enemyHighlightStyle': 'Kiểu làm nổi bật kẻ địch',
+  'hudChrome.options.nameplateCooldownScale': 'Kích thước theo dõi tấn công/phòng thủ',
+  'hudChrome.options.showNameplateCooldowns': 'Theo dõi tấn công/phòng thủ',
+  'hud.pet.stanceDesc': 'Bấm để chọn Thụ Động, Phòng Thủ, Hung Hãn hoặc Hỗ trợ.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}p',
   'abilityUi.cast.hoard_cast_bat_dive': 'Lao Xuống',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Lao Xuống Sâu',
@@ -11903,7 +11940,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Đổi Tên',
   'hud.pet.renameLabel': 'Chọn một tên mới cho thú.',
   'hud.pet.revive': 'Băng Bó',
-  'hud.pet.stanceDesc': 'Bấm để chọn Thụ Động, Phòng Thủ, hoặc Hung Hãn.',
   'hud.pet.stanceTitle': 'Thế Đứng Của Thú',
   'hud.pet.taunt': 'Khiêu Khích',
   'hud.prompts.acceptDuel': 'Chấp Nhận Đấu Tay Đôi',

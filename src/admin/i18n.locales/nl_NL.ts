@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const nl_NL: Record<string, string> = {
+  'moderationHistory.actionAnnounce': 'Realmaankondiging',
+  'moderationHistory.actionGmInvisible': 'Onzichtbaar geworden',
+  'moderationHistory.actionGmVisible': 'Zichtbaar geworden',
+  'moderationHistory.actionUnwatch': 'Van de volglijst verwijderd',
+  'moderationHistory.actionWatch': 'Aan de volglijst toegevoegd',
   'error.flagActiveExists': 'dit account heeft al een openstaande markering van dat type',
   'wealth.largeMovementsUnavailable':
     'grote bankmutaties konden niet worden geladen (het uitlezen van het grootboek gaf een time-out); het goudoverzicht hierboven is volledig',

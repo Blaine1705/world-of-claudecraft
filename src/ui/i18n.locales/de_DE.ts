@@ -13,6 +13,44 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Unterstützen',
+  'hud.pet.assistDesc':
+    'Greift nur dein aktuelles Ziel an, sobald du eine Fähigkeit darauf wirkst. Ignoriert Gegner, die dich angreifen.',
+  'hudChrome.cooldownManager.auraActive': 'Aktiv',
+  'hudChrome.cooldownManager.auraMissing': 'Fehlend',
+  'hudChrome.cooldownManager.auraShowWhen': 'Schaltfläche anzeigen, solange die Aura',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Bei fehlender Aura aufleuchten',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Wenn kein Ort ausgewählt ist, wird diese Gruppe nie angezeigt und spielt keine Töne ab.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Wenn keines der beiden Kästchen ausgewählt ist, wird die Schaltfläche nie angezeigt, ihr Ton wird aber weiterhin abgespielt.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Nicht bereit bedeutet, dass die Abklingzeit läuft oder die Fähigkeit gerade nicht nutzbar ist.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instanzen umfassen Dungeons, Schlachtzüge, Tiefgänge, Risse, Schlachtfelder, die Arena und alle anderen instanzierten Gebiete. Außerhalb der ausgewählten Orte bleibt die Gruppe verborgen und stumm.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Lässt die Schaltfläche bei fehlender Aura aufleuchten, umrandet sie und lässt sie pulsieren.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Stärkungserinnerung: Die Schaltfläche leuchtet auf, solange diese Aura fehlt, und wird ausgeblendet, sobald du sie hast.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Wird abgespielt, wenn die Aura endet.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Schaltfläche anzeigen, wenn',
+  'hudChrome.cooldownManager.showIn': 'Anzeigen in',
+  'hudChrome.cooldownManager.showInInstances': 'Instanzierte Gebiete',
+  'hudChrome.cooldownManager.showInWorld': 'Offene Welt',
+  'hudChrome.cooldownManager.showNotReady': 'Nicht bereit',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Außerhalb des Kampfes',
+  'hudChrome.cooldownManager.showReady': 'Bereit',
+  'hudChrome.cooldownManager.showWhile': 'Anzeigen während',
+  'hudChrome.options.enemyHighlightDistance': '{yards} Yards',
+  'hudChrome.options.enemyHighlightEdgeArrow':
+    'Pfeil am Bildschirmrand bei Ziel außerhalb des Bildes',
+  'hudChrome.options.enemyHighlightNameplate': 'Großes gerahmtes Zielnamensschild',
+  'hudChrome.options.enemyHighlightOverhead': 'Schwebende Markierung über dem Kopf',
+  'hudChrome.options.enemyHighlightReticle': 'Kräftigeres feindliches Fadenkreuz',
+  'hudChrome.options.enemyHighlightStyle': 'Art der Gegnerhervorhebung',
+  'hudChrome.options.nameplateCooldownScale': 'Größe der Offensiv-/Defensivanzeige',
+  'hudChrome.options.showNameplateCooldowns': 'Offensiv-/Defensivanzeige',
+  'hud.pet.stanceDesc': 'Klicken, um Passiv, Defensiv, Aggressiv oder Unterstützen zu wählen.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Tauchen',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Sturzbiss',
@@ -8817,7 +8855,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     'Klicke hier und dann auf Nahrung in deinen Taschen, um deinen Begleiter 5 Sekunden lang zu füttern und zu heilen.',
   'hud.pet.stanceTitle': 'Begleiterhaltung',
-  'hud.pet.stanceDesc': 'Klicken, um Passiv, Defensiv oder Aggressiv zu wählen.',
   'hud.pet.passiveDesc': 'Greift nur an, wenn du es befiehlst.',
   'hud.pet.defensiveDesc': 'Greift Gegner an, die dich oder deinen Begleiter verletzen.',
   'hud.pet.aggressiveDesc': 'Greift nahe feindliche Gegner an.',

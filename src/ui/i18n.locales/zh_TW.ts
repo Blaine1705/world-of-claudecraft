@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.enemyHighlightDistance': '{yards} 碼',
+  'hud.pet.stanceDesc': '點擊選擇被動、防禦、攻擊或協助。',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分鐘',
   'abilityUi.cast.hoard_cast_rime_beam': '白霜射束',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -4121,7 +4123,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healDemonDesc': '消耗法力，在 5 秒內向你的惡魔引導治療。',
   'hud.pet.healPetDesc': '點擊後，再點擊背包中的食物，在 5 秒內餵養並治療你的寵物。',
   'hud.pet.stanceTitle': '寵物姿態',
-  'hud.pet.stanceDesc': '點擊選擇被動、防禦或攻擊。',
   'hud.pet.passiveDesc': '只在你命令時攻擊。',
   'hud.pet.defensiveDesc': '攻擊傷害你或你寵物的敵人。',
   'hud.pet.aggressiveDesc': '攻擊附近的敵對敵人。',

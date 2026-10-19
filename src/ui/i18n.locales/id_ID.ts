@@ -2,6 +2,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Bantu',
+  'hud.pet.assistDesc':
+    'Hanya menyerang targetmu saat ini setelah kamu menggunakan kemampuan padanya. Mengabaikan musuh yang menyerangmu.',
+  'hudChrome.cooldownManager.auraActive': 'Aktif',
+  'hudChrome.cooldownManager.auraMissing': 'Tidak ada',
+  'hudChrome.cooldownManager.auraShowWhen': 'Tampilkan tombol saat aura',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Nyalakan saat aura tidak ada',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Jika tidak ada tempat yang dicentang, grup ini tidak pernah muncul atau memutar suara.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Jika kedua pilihan tidak dicentang, tombol tidak pernah muncul, tetapi suaranya tetap diputar.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Belum siap berarti masih dalam jeda pakai atau belum dapat digunakan saat ini.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instans mencakup ruang bawah tanah, raid, delve, rift, medan tempur, arena, dan semua area berinstans lainnya. Di luar tempat yang dicentang, grup disembunyikan dan tidak bersuara.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Menerangi, memberi garis tepi, dan membuat tombol berdenyut saat aura tidak ada.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Pengingat penguatan: tombol menyala saat aura ini tidak ada dan bersembunyi begitu kamu memilikinya.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Diputar saat aura berakhir.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Tampilkan tombol saat',
+  'hudChrome.cooldownManager.showIn': 'Tampilkan di',
+  'hudChrome.cooldownManager.showInInstances': 'Area instans',
+  'hudChrome.cooldownManager.showInWorld': 'Dunia terbuka',
+  'hudChrome.cooldownManager.showNotReady': 'Belum siap',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Di luar pertempuran',
+  'hudChrome.cooldownManager.showReady': 'Siap',
+  'hudChrome.cooldownManager.showWhile': 'Tampilkan selama',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yar',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Panah tepi layar saat di luar kamera',
+  'hudChrome.options.enemyHighlightNameplate': 'Papan nama target besar berbingkai',
+  'hudChrome.options.enemyHighlightOverhead': 'Penanda melayang di atas kepala',
+  'hudChrome.options.enemyHighlightReticle': 'Bidikan musuh lebih tebal',
+  'hudChrome.options.enemyHighlightStyle': 'Gaya penyorotan musuh',
+  'hudChrome.options.nameplateCooldownScale': 'Ukuran Pelacak Ofensif/Defensif',
+  'hudChrome.options.showNameplateCooldowns': 'Pelacak Ofensif/Defensif',
+  'hud.pet.stanceDesc': 'Klik untuk memilih Pasif, Bertahan, Agresif, atau Bantu.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Menyelam',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Menyelam Dalam',
@@ -11941,7 +11978,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Ganti Nama',
   'hud.pet.renameLabel': 'Pilih nama baru untuk peliharaan.',
   'hud.pet.revive': 'Obati',
-  'hud.pet.stanceDesc': 'Klik untuk memilih Pasif, Bertahan, atau Agresif.',
   'hud.pet.stanceTitle': 'Sikap Peliharaan',
   'hud.pet.taunt': 'Provokasi',
   'hud.prompts.acceptDuel': 'Terima Duel',

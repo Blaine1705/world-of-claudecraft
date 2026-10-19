@@ -2,6 +2,44 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Wsparcie',
+  'hud.pet.assistDesc':
+    'Atakuje tylko twój bieżący cel, gdy użyjesz na nim zdolności. Ignoruje wrogów, którzy cię atakują.',
+  'hudChrome.cooldownManager.auraActive': 'Aktywna',
+  'hudChrome.cooldownManager.auraMissing': 'Brak',
+  'hudChrome.cooldownManager.auraShowWhen': 'Pokaż przycisk, gdy aura jest',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Podświetlaj przy braku aury',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Jeśli nie zaznaczono żadnego miejsca, ta grupa nigdy się nie pojawia i nie odtwarza dźwięków.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Jeśli nie zaznaczono żadnej z dwóch opcji, przycisk nigdy się nie pojawia, ale jego dźwięk nadal jest odtwarzany.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Niegotowe oznacza trwające odnawianie lub brak możliwości użycia w tej chwili.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instancje obejmują lochy, rajdy, wyprawy, szczeliny, pola bitew, arenę i wszystkie inne obszary instancjonowane. Poza zaznaczonymi miejscami grupa pozostaje ukryta i nie wydaje dźwięków.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Podświetla przycisk, obrysowuje go i sprawia, że pulsuje, gdy brakuje aury.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Przypomnienie o wzmocnieniu: przycisk świeci, gdy brakuje tej aury, i znika, gdy ją otrzymasz.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Odtwarza się, gdy aura wygasa.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Pokaż przycisk, gdy',
+  'hudChrome.cooldownManager.showIn': 'Pokaż w',
+  'hudChrome.cooldownManager.showInInstances': 'Obszary instancjonowane',
+  'hudChrome.cooldownManager.showInWorld': 'Otwarty świat',
+  'hudChrome.cooldownManager.showNotReady': 'Niegotowe',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Poza walką',
+  'hudChrome.cooldownManager.showReady': 'Gotowe',
+  'hudChrome.cooldownManager.showWhile': 'Pokaż podczas',
+  'hudChrome.options.enemyHighlightDistance': '{yards} jardów',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Strzałka na krawędzi ekranu dla celu poza kadrem',
+  'hudChrome.options.enemyHighlightNameplate': 'Duża obramowana tabliczka celu',
+  'hudChrome.options.enemyHighlightOverhead': 'Unoszący się znacznik nad głową',
+  'hudChrome.options.enemyHighlightReticle': 'Grubszy celownik wrogiego celu',
+  'hudChrome.options.enemyHighlightStyle': 'Styl wyróżniania wrogów',
+  'hudChrome.options.nameplateCooldownScale':
+    'Rozmiar śledzenia zdolności ofensywnych/defensywnych',
+  'hudChrome.options.showNameplateCooldowns': 'Śledzenie zdolności ofensywnych/defensywnych',
+  'hud.pet.stanceDesc': 'Kliknij, aby wybrać postawę pasywną, obronną, agresywną lub wsparcie.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Nurkowanie',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Głębokie nurkowanie',
@@ -11264,7 +11302,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Zmień imię',
   'hud.pet.renameLabel': 'Wybierz nowe imię zwierzęcia.',
   'hud.pet.revive': 'Opatrzenie',
-  'hud.pet.stanceDesc': 'Kliknij, aby wybrać Pasywny, Obronny lub Agresywny.',
   'hud.pet.stanceTitle': 'Postawa zwierzęcia',
   'hud.pet.taunt': 'Prowokacja',
   'hud.prompts.acceptDuel': 'Przyjmij pojedynek',

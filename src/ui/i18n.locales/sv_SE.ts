@@ -2,6 +2,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Assistans',
+  'hud.pet.assistDesc':
+    'Angriper bara ditt nuvarande mål när du har använt en förmåga på det. Ignorerar fiender som angriper dig.',
+  'hudChrome.cooldownManager.auraActive': 'Aktiv',
+  'hudChrome.cooldownManager.auraMissing': 'Saknas',
+  'hudChrome.cooldownManager.auraShowWhen': 'Visa knappen när auran är',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Lys upp när auran saknas',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Om ingen plats är markerad visas gruppen aldrig och spelar inga ljud.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Om ingen av rutorna är markerad visas knappen aldrig, men dess ljud spelas ändå.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Inte redo betyder på nedkylning eller att förmågan inte kan användas just nu.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instanser omfattar fängelsehålor, räder, delves, revor, slagfält, arenan och alla andra instansindelade områden. Utanför de markerade platserna är gruppen dold och tyst.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Lyser upp knappen, framhäver dess kant och får den att pulsera medan auran saknas.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Förstärkningspåminnelse: knappen lyser när denna aura saknas och döljs så snart du har den.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Spelas när auran upphör.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Visa knappen när',
+  'hudChrome.cooldownManager.showIn': 'Visa i',
+  'hudChrome.cooldownManager.showInInstances': 'Instansområden',
+  'hudChrome.cooldownManager.showInWorld': 'Öppen värld',
+  'hudChrome.cooldownManager.showNotReady': 'Inte redo',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Utanför strid',
+  'hudChrome.cooldownManager.showReady': 'Redo',
+  'hudChrome.cooldownManager.showWhile': 'Visa under',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yard',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Pil vid skärmkanten utanför kameravyn',
+  'hudChrome.options.enemyHighlightNameplate': 'Stor inramad namnskylt för målet',
+  'hudChrome.options.enemyHighlightOverhead': 'Svävande markör ovanför huvudet',
+  'hudChrome.options.enemyHighlightReticle': 'Kraftigare fientligt hårkors',
+  'hudChrome.options.enemyHighlightStyle': 'Stil för fiendemarkering',
+  'hudChrome.options.nameplateCooldownScale': 'Storlek på offensiv/defensiv bevakning',
+  'hudChrome.options.showNameplateCooldowns': 'Offensiv/defensiv bevakning',
+  'hud.pet.stanceDesc': 'Klicka för att välja passiv, defensiv, aggressiv eller assistans.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Dykning',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Störtdykning',
@@ -11085,7 +11122,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Byt namn',
   'hud.pet.renameLabel': 'Välj ett nytt namn på djuret.',
   'hud.pet.revive': 'Lappa ihop',
-  'hud.pet.stanceDesc': 'Klicka för att välja Passiv, Defensiv eller Aggressiv.',
   'hud.pet.stanceTitle': 'Djurets hållning',
   'hud.pet.taunt': 'Håna',
   'hud.prompts.acceptDuel': 'Anta duell',

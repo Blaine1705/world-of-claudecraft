@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.enemyHighlightDistance': '{yards}야드',
+  'hud.pet.stanceDesc': '클릭해 수동, 방어, 공격 또는 지원을 선택하세요.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}분',
   'abilityUi.cast.hoard_cast_rime_beam': '상고대 광선',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -4276,7 +4278,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     '클릭한 뒤 가방의 음식을 클릭해 5초 동안 소환수에게 먹이를 주고 치유합니다.',
   'hud.pet.stanceTitle': '소환수 태세',
-  'hud.pet.stanceDesc': '클릭해 수동, 방어 또는 공격을 선택하세요.',
   'hud.pet.passiveDesc': '명령할 때만 공격합니다.',
   'hud.pet.defensiveDesc': '당신이나 소환수를 해치는 적을 공격합니다.',
   'hud.pet.aggressiveDesc': '근처의 적대적인 적을 공격합니다.',

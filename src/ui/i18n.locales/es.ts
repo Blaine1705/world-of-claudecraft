@@ -13,6 +13,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.assist': 'Asistir',
+  'hud.pet.assistDesc':
+    'Solo ataca a tu objetivo actual después de que uses una habilidad sobre él. Ignora a los enemigos que te atacan.',
+  'hudChrome.cooldownManager.auraActive': 'Activa',
+  'hudChrome.cooldownManager.auraMissing': 'Ausente',
+  'hudChrome.cooldownManager.auraShowWhen': 'Mostrar botón cuando el aura esté',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Iluminar cuando falte',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Si no marcas ningún lugar, este grupo nunca se muestra ni reproduce sonidos.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Si no marcas ninguna de las dos opciones, el botón nunca se muestra, pero su sonido sigue reproduciéndose.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'No disponible significa que está en reutilización o que no se puede usar ahora.',
+  'hudChrome.cooldownManager.placeHint':
+    'Las instancias incluyen mazmorras, bandas, expediciones, brechas, campos de batalla, la arena y cualquier otra zona instanciada. Fuera de los lugares que marques, el grupo queda oculto y en silencio.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Ilumina, perfila y hace pulsar el botón mientras falte el aura.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Recordatorio de beneficio: el botón se ilumina mientras falte esta aura y se oculta cuando la tienes.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Se reproduce cuando desaparece el aura.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Mostrar botón cuando esté',
+  'hudChrome.cooldownManager.showIn': 'Mostrar en',
+  'hudChrome.cooldownManager.showInInstances': 'Zonas instanciadas',
+  'hudChrome.cooldownManager.showInWorld': 'Mundo abierto',
+  'hudChrome.cooldownManager.showNotReady': 'No disponible',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Fuera de combate',
+  'hudChrome.cooldownManager.showReady': 'Disponible',
+  'hudChrome.cooldownManager.showWhile': 'Mostrar durante',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yardas',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Flecha en el borde si está fuera de cámara',
+  'hudChrome.options.enemyHighlightNameplate': 'Placa de objetivo grande con marco',
+  'hudChrome.options.enemyHighlightOverhead': 'Marcador flotante sobre la cabeza',
+  'hudChrome.options.enemyHighlightReticle': 'Retícula hostil más gruesa',
+  'hudChrome.options.enemyHighlightStyle': 'Estilo de resaltado de enemigos',
+  'hudChrome.options.nameplateCooldownScale': 'Tamaño del seguimiento ofensivo/defensivo',
+  'hudChrome.options.showNameplateCooldowns': 'Seguimiento ofensivo/defensivo',
+  'hud.pet.stanceDesc': 'Haz clic para elegir Pasivo, Defensivo, Agresivo o Asistir.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Buceando',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Buceo de Embestida',
@@ -8582,7 +8619,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     'Haz clic y luego haz clic en comida de tus bolsas para alimentar y sanar a tu mascota durante 5 segundos.',
   'hud.pet.stanceTitle': 'Actitud de mascota',
-  'hud.pet.stanceDesc': 'Haz clic para elegir Pasivo, Defensivo o Agresivo.',
   'hud.pet.passiveDesc': 'Solo ataca cuando se lo ordenas.',
   'hud.pet.defensiveDesc': 'Ataca a enemigos que te dañen a ti o a tu mascota.',
   'hud.pet.aggressiveDesc': 'Ataca a enemigos hostiles cercanos.',

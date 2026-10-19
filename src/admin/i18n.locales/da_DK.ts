@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const da_DK: Record<string, string> = {
+  'moderationHistory.actionAnnounce': 'Meddelelse til riget',
+  'moderationHistory.actionGmInvisible': 'Blev usynlig',
+  'moderationHistory.actionGmVisible': 'Blev synlig',
+  'moderationHistory.actionUnwatch': 'Fjernet fra overvågningslisten',
+  'moderationHistory.actionWatch': 'Føjet til overvågningslisten',
   'error.flagActiveExists': 'denne konto har allerede en åben markering af den type',
   'wealth.largeMovementsUnavailable':
     'store bankbevægelser kunne ikke indlæses (læsningen af hovedbogen fik timeout); guldopgørelsen ovenfor er fuldstændig',

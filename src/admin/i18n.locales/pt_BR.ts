@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const pt_BR: Record<string, string> = {
+  'moderationHistory.actionAnnounce': 'Anúncio do reino',
+  'moderationHistory.actionGmInvisible': 'Ficou invisível',
+  'moderationHistory.actionGmVisible': 'Ficou visível',
+  'moderationHistory.actionUnwatch': 'Removido da lista de vigilância',
+  'moderationHistory.actionWatch': 'Adicionado à lista de vigilância',
   'error.flagActiveExists': 'esta conta já possui uma sinalização em aberto desse tipo',
   'wealth.largeMovementsUnavailable':
     'não foi possível carregar as movimentações bancárias de grande valor (a leitura do registro expirou); o detalhamento de ouro acima está completo',

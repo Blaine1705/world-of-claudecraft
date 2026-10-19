@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const es: Record<string, string> = {
+  'moderationHistory.actionAnnounce': 'Anuncio del reino',
+  'moderationHistory.actionGmInvisible': 'Se hizo invisible',
+  'moderationHistory.actionGmVisible': 'Se hizo visible',
+  'moderationHistory.actionUnwatch': 'Eliminado de la lista de vigilancia',
+  'moderationHistory.actionWatch': 'Añadido a la lista de vigilancia',
   'error.flagActiveExists': 'esta cuenta ya tiene una marca abierta de ese tipo',
   'wealth.largeMovementsUnavailable':
     'no se pudieron cargar los grandes movimientos bancarios (se agotó el tiempo de la lectura del registro); el desglose de oro anterior está completo',

@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.options.enemyHighlightDistance': '{yards} ярд.',
+  'hud.pet.stanceDesc': 'Нажмите, чтобы выбрать Пассивный, Защитный, Агрессивный или Помощь.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
   'abilityUi.cast.hoard_cast_rime_beam': 'Луч инея',
   'hudChrome.worldQuestTooltip.currencyAmount': '{amount} {currency}',
@@ -4359,7 +4361,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     'Нажмите, затем выберите пищу в сумках, чтобы кормить и исцелять питомца 5 секунд.',
   'hud.pet.stanceTitle': 'Стойка питомца',
-  'hud.pet.stanceDesc': 'Нажмите, чтобы выбрать Пассивный, Защитный или Агрессивный.',
   'hud.pet.passiveDesc': 'Атакует только по вашей команде.',
   'hud.pet.defensiveDesc': 'Атакует врагов, которые ранят вас или питомца.',
   'hud.pet.aggressiveDesc': 'Атакует ближайших враждебных врагов.',
