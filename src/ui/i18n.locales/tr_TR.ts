@@ -51,7 +51,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kullanım: Göğüs zırhını güçlendirer ve 1 saat boyunca Zırh değerini 12 artırır.',
   'hudChrome.factionRewards.battleStandardUse':
     'Kullanım: Kutsal Şafak Savaş Bayrağını 5 dakika boyunca diktirir, yakındaki tüm müttefikler için savaş dışı sağlık ve mana rejenerasyonunu önemli ölçüde artırır. 10 saniye boyunca yakında kalmak ayrıca Şafağın Kutsamasını (+tüm istatistiklere %5, 30 dk.) verir. (5 dk. bekleme)',
-  'hudChrome.factionRewards.hub_automatons': 'Güney Uzanım (Otomat Demiryolu)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Otomatlar)',
   'hudChrome.factionRewards.hub_church_order': 'Doğudere Vadisi (Kilise Düzeni)',
   'hudChrome.factionRewards.hub_none': 'Hiçbiri (Ayarlamak için faktiyonu merkez alanında kullan)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (Yarık İzleyicileri)',
@@ -7926,7 +7926,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.name': 'Vakur Dua',
   'entities.abilities.healing_touch.description': 'Dost bir hedefi {damage} iyileştirir.',
   'entities.abilities.healing_touch.specNote_restoration':
-    "Tamamlanan her kullanım 1 Yeşillik ekler (en fazla 3). Biriken Yeşillik bu büyünün süresini kısaltır: 1 Yeşillikte 2,2 sn, 2'de 1,9 sn, 3'te 1,5 sn. Dogain Nimetleri onu anında, ücretsiz ve %25 daha güçlü yapar.",
+    "Tamamlanan her kullanım 1 Yeşillik ekler (en fazla 3). Biriken Yeşillik bu büyünün süresini kısaltır: 1 Yeşillikte 2,2 sn, 2'de 1,9 sn, 3'te 1,5 sn. Doğanın Lütfu onu anında, ücretsiz ve %25 daha güçlü yapar.",
   'entities.abilities.healing_touch.name': 'Yaban Şifası',
   'entities.abilities.healing_wave.description':
     "Dost bir hedefi {damage} iyileştirir. İyileştirme Büyü Gücü ile artar. Onarım: tam iyileştirmenin %50'sini aşırı iyileştirmeden önce 12 sn boyunca Onaran Akım olarak saklar, hedefin azami canının %30'una kadar.",
@@ -16121,7 +16121,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla {duration} sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür.',
   'entities.abilities.overbloom.name': 'Taşkın Çiçeklenme',
   'entities.abilities.overbloom.description':
-    '3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Sporemending eker.',
+    '3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Spor Şifası eker.',
   'entities.abilities.redharvest.name': 'Kızıl Hasat',
   'entities.abilities.redharvest.description':
     '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır.',
@@ -16135,7 +16135,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Kadim Kan: aşama {stacks} / {max}. İsabet eden Kedi ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür',
   'hudChrome.auraEffect.verdance':
-    "Yeşillik: aşama {stacks} / {max}. Kullandığın her Sporemending, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
+    "Yeşillik: aşama {stacks} / {max}. Kullandığın her Spor Şifası, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
   'hudChrome.continentMap.levels': 'Seviye {min} ile {max} arası',
   'hudChrome.continentMap.summary': 'Dünya haritası. Haritasını açmak için bir bölge seç.',
   'hudChrome.continentMap.title': 'Dünya Haritası',
@@ -16491,7 +16491,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Alacakaranlık Perdesinden kullandığın her açılış 1 Alacakaranlık ekler (en fazla 3).',
   'entities.abilities.swiftmend.description':
-    "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Sporemending, İkinci Çiçeklenme ve Yaban Şifası'nın her kullanımı 1 Yeşillik ekler; 3 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Groveheart motoru)",
+    "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Spor Şifası, İkinci Çiçeklenme ve Yaban Şifası'nın her kullanımı 1 Yeşillik ekler; 3 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Groveheart motoru)",
   'entities.abilities.swipe.description':
     'Pençelerini yakındaki düşmanların arasından geçirerek {damage} hasar ver. Ekstra tehdit yaratır. Yalnızca Bruin Formu.',
   'entities.abilities.swipe.specNote_feral':
@@ -19789,4 +19789,191 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Harita kenar çubuğunu yeniden boyutlandırmak için sürükle. Sıfırlamak için çift tıkla.',
   'guide.worldPvpPage.hillBodyFlat':
     "Her üç saatte bir, öngörülemeyen bir anda tüm diyara on beş dakika sonra serbest savaş bölgelerinden birinde bir tepenin belireceği duyurulur ve tepenin çemberi açık arazide işaretlenir. Tepe kırk beş dakika kalır, sonra kaybolur. Bu sırada her beş dakikada bir konumu ve en uzun toplam tutma süresine sahip gruplar duyurulur. Çemberin içinde en çok oyuncusu olan grup tepeyi ele geçirmeye çalışır ve toplam otuz saniye boyunca sayıca üstünlük sağladığında tepeyi alır. Rakip bir grubun girmesi sayacı yalnızca grubunuz tekrar üstün gelene kadar duraklatır; sayaç ancak çemberde grubunuzdan hayatta kimse kalmadığında sıfırlanır. Tek başına bir oyuncu tek kişilik grup sayılır ve grup kurduğunda tuttuğu tepeyi korur, ancak baskın üyeleri hiç sayılmaz. Tepeyi tutan grubun çemberde duran her üyesi, tepeyi ne kadar süredir tuttuklarından bağımsız olarak her dakika aynı miktarda Onur kazanır. Tepeyi bütün süresi boyunca rakipsiz tutan tam bir grup, yaklaşık üç savaş alanı zaferi kadar kazanır. Tepe kaybolduğunda, en uzun toplam tutma süresine sahip grup en az on dakika tutmuşsa, o grubun tutma süresi boyunca çemberde en az bir dakika durmuş ve hâlâ aynı grupta olan herkes Haftalık Kasa'nın PvP sırası için bir zafer kazanır. Alanın üzerindeki çubuk tepeyi kimin tuttuğunu, iki tarafın oyuncu sayılarını ve ele geçirme sayacını gösterir; sohbette /hill komutu konumunu söyler.",
+  'questUi.dialog.attuneHearthstone': 'Müttefik Yurt Taşımı buraya bağla.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Müttefik Yurt Taşını {name} aracılığıyla {hub} konumuna bağla',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Müttefik Yurt Taşın bağlı değil. Müttefik bir levazım subayıyla konuş veya müttefik bir merkezde kullan.',
+  'hudChrome.factionRewards.hearthstoneBound': 'Müttefik Yurt Taşın artık {hub} konumuna bağlı.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Yurt taşı seni {hub} konumuna götürür.',
+  'hudChrome.factionRewards.itemCooldown': 'Bu eşya henüz hazır değil ({minutes} dk kaldı).',
+  'errors.noUpdateFound': 'Güncelleme bulunamadı. Biraz sonra tekrar dene.',
+  'errors.searchUpdates': 'Güncelleme ara',
+  'errors.updateSearchFailed': 'Güncellemeler denetlenemedi. Lütfen tekrar dene.',
+  'errors.updateUnavailable': 'Oyun mağazan üzerinden güncelle veya en yeni istemciyi indir.',
+  'hudChrome.auraEffect.formSporemender':
+    'Spor Şifacısı Formu: yapılan iyileştirme %{pct}, zırh %{armorPct} artar ve hareket hızı %{slowPct} azalır',
+  'hudChrome.bags.reorderLocked':
+    'Kilitli eşyalar çantadaki yuvalarında kalır. Taşımak için eşyanın kilidini aç.',
+  'hudChrome.death.pvpResurrect': 'PvP Dirilişi',
+  'hudChrome.death.pvpResurrectReadyNote': 'PvP Dirilişi hazır: en yakın mezarlıkta dirileceksin.',
+  'hudChrome.death.pvpResurrectTitle':
+    'En yakın mezarlıkta tam canla, yeniden Bekçinin Bedeli uygulanmadan diril.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP Dirilişi ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    '{seconds} sonra PvP Dirilişini kullanabilirsin: en yakın mezarlıkta dirileceksin.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Grup veya lider değiştiği için sıraya alınan zorluk değişikliği iptal edildi.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'İçeride hâlâ bir oyuncu veya cesedi bulunduğu için zorluk değişikliği sıraya alındı. Kopyalar boşalınca uygulanacak.',
+  'hudChrome.ferry.arrivesIn': 'Feribotun gelişine {time}',
+  'hudChrome.ferry.boardNow': 'Şimdi bin',
+  'hudChrome.ferry.destination': 'Varış yeri: {dest}',
+  'hudChrome.ferry.portLabel': '{port} limanından {dest} yönüne feribot',
+  'hudChrome.ferry.portTitle': '{port} feribot limanı',
+  'hudChrome.ferry.scheduleUnavailable': 'Feribot tarifesi kullanılamıyor.',
+  'hudChrome.graphicsRestore.note': 'Grafikler geri yükleniyor',
+  'hudChrome.hill.contestOtherPaused': 'Rakibin süresi duraklatıldı: {seconds} / {total}',
+  'hudChrome.hill.contestYouPaused': 'Duraklatıldı: {seconds} / {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × {name} adlı oyuncudan alındı',
+  'hudChrome.keybindLayout.apply': 'Kısayolları dönüştür',
+  'hudChrome.keybindLayout.converted': 'Kısayollar {from} düzeninden {to} düzenine dönüştürüldü.',
+  'hudChrome.keybindLayout.from': 'Kısayolların hazırlandığı düzen',
+  'hudChrome.keybindLayout.help':
+    'Her kısayol, yeni düzende aynı karakteri yazan tuşa taşınır. Sayı sırası yerinde kalır. Bu listedeki tuş adları QWERTY konumlarını belirtir; klavye görünümü kendi düzenini gösterir.',
+  'hudChrome.keybindLayout.keepMovement': 'Hareket tuşlarını yerinde tut',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Hareket tuşları geçen sefer yerinde tutulduğundan yine yerinde kalır. Baştan başlamak için varsayılanlara sıfırla.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (Belçika)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (Fransızca)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Colemak düzeni',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Dvorak düzeni',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (Brezilya ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (Danca)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (İspanyolca)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (İtalyanca)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (Norveççe)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (İsveççe, Fince)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (Portekizce)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (Türkçe)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Birleşik Krallık)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (ABD)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (İsviçre)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (Almanca)',
+  'hudChrome.keybindLayout.moves': 'Taşınacak kısayollar: {count}',
+  'hudChrome.keybindLayout.noChange': 'Bu düzenler arasında hiçbir kısayol değişmez.',
+  'hudChrome.keybindLayout.open': 'Dönüştür',
+  'hudChrome.keybindLayout.title': 'Klavye düzeni',
+  'hudChrome.keybindLayout.to': 'Hedef düzen',
+  'hudChrome.nameplate.bountyTag': 'Baş ödülü',
+  'hudChrome.options.classicCombatText': 'Klasik savaş metni',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Bu kalitenin altındaki eşyalar tek tıkla satılır. İmzasız gri eşyalar dışında, yanlışlıkla satılan bir eşya satıcıdan geri alınabilir.',
+  'hudChrome.options.spellEffects': 'Büyü efektleri',
+  'hudChrome.options.spellTooltipOnHover': 'Üzerine gelince büyü ipuçları',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.realmMotd.cleared': 'Günün mesajı temizlendi.',
+  'hudChrome.realmMotd.line': 'Günün mesajı: {text}',
+  'hudChrome.realmMotd.none': 'Günün mesajı belirlenmemiş.',
+  'hudChrome.realmMotd.saveFailed':
+    'Günün mesajı kaydedilemedi ve yeniden başlatıldığında silinecek.',
+  'hudChrome.realmMotd.tooLong': 'Günün mesajı en fazla {max} karakter olabilir.',
+  'hudChrome.realmMotd.updated': 'Günün mesajı güncellendi.',
+  'hudChrome.realmMotd.usage':
+    'Kullanım: belirlemek için /motd "<mesaj>", kaldırmak için /motd clear.',
+  'hudChrome.skullBag.clickOpen': 'Açmak için tıkla',
+  'hudChrome.skullBag.close': 'Kafatası Çantasını kapat',
+  'hudChrome.skullBag.empty':
+    'Boş. Çantayı taşırken yağmaladığın kafatasları doğrudan içine gider.',
+  'hudChrome.skullBag.notCarried':
+    'Kafatası koymak veya çıkarmak için Kafatası Çantasını çantalarında taşı.',
+  'hudChrome.skullBag.store': 'Taşınan kafataslarını koy ({count})',
+  'hudChrome.skullBag.storeNone': 'Koyulacak kafatası yok',
+  'hudChrome.skullBag.takeAll': 'Hepsini al',
+  'hudChrome.skullBag.takeAllAria': 'Hepsini al: {item}',
+  'hudChrome.skullBag.takeOne': '1 al',
+  'hudChrome.skullBag.takeOneAria': '1 al: {item}',
+  'hudChrome.skullBag.title': 'Kafatası Çantası',
+  'hudChrome.skullBag.tooltip':
+    'Çantanda yer kaplamadan sınırsız sayıda Hatıra Kafatası tutar. Çantalarında olduğu sürece yağmaladığın kafatasları doğrudan içine gider. Kafatası koymak veya çıkarmak için çantalarındaki simgesine tıkla.',
+  'hudChrome.skullBag.total': 'Kafatasları: {count}',
+  'hudChrome.skullBag.unrecorded': 'Hatıra Kafatası',
+  'hudChrome.treasureMap.inkPickerCancel': 'İptal',
+  'hudChrome.treasureMap.inkPickerCost': '{rarity} olarak yeniden çiz: {inks} mürekkep',
+  'hudChrome.treasureMap.inkPickerHeld': '{held} Haritacının Mürekkebi taşıyorsun.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Takip ediliyor: X işareti {zone} bölgesinde. X işareti yer değiştirmez.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Haritacının Mürekkebini hangi haritada kullanacaksın?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Okunmamış ({count} adet taşınıyor)',
+  'hudChrome.warfare.reasons.worldQuest': 'dünya görevi',
+  'hudChrome.warfareShop.goods': 'Mallar',
+  'hudChrome.weeklyRewards.allClassGear': 'Tüm sınıfların teçhizatı',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} PvP galibiyeti',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} PvP galibiyeti',
+  'hudChrome.weeklyRewards.lootFocus': 'Ganimet odağı',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Yalnızca açılmamış kasalar için geçerlidir.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Uygun ganimet yok. Başka bir odak seç.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': '{count} PvP galibiyeti kazan',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': '{count} PvP galibiyeti kazan',
+  'hudChrome.weeklyRewards.rolledFocus': 'Seçim şu odağa göre yapıldı: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused': 'Mevcut PvP serisi: {time} oynandı (sığınakta duraklatıldı)',
+  'hudChrome.worldPvp.rewardPausedDead': 'Mevcut PvP serisi: {time} oynandı (ölüyken duraklatıldı)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Mevcut PvP serisi: {time} oynandı (PvE kopyalarında duraklatıldı)',
+  'hudChrome.worldPvp.rewardProgress': 'Mevcut PvP serisi: {time} oynandı',
+  'hudChrome.worldPvp.rewardTitles':
+    'Açık dünyada veya PvP kopyalarında Dünya PvP açıkken {thresholds} oynama süresine ulaşarak kalıcı unvanlar kazan. Çıkış yapmak, ölüm, PvE kopyaları ve sığınaklar sayacı duraklatır. Kapatmak sayacı sıfırlar.',
+  'hudChrome.worldPvp.skullName': '{name} adlı oyuncunun kafatası',
+  'hudChrome.worldPvp.spoilsLine':
+    'İkinizin de PvP bayrağı açıkken öldürücü darbenin altını, kaybedenin kafatasıyla birlikte cesede düşer.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'İmzasız gri eşyalar geri alım listesine eklenmez, bu yüzden satılmaları geri alınamaz.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Çantaların dolu. Ödülün posta kutuna gönderildi: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Büyülerin Doğanın Lütfunu 10 saniyeliğine etkinleştirebilir: belirtilen büyü ücretsiz olur, %25 güçlenir ve her formda kullanılabilir. Yeni bir tetiklenme süreyi yeniler.',
+  'entities.abilities.natures_boon.name': 'Doğanın Lütfu',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Kullandığın her Yaban Oku veya Gök Düşüşü, en fazla 10 saniyede bir olmak üzere %10 olasılıkla Spor Patlaması için lütfu etkinleştirir.',
+  'entities.abilities.natures_boon.specNote_feral':
+    "İsabet eden her otomatik yakın dövüş saldırısının, Spor Şifası veya Bruin Formundayken Meşe Derisi için lütfu etkinleştirme olasılığı 15'te 1'dir.",
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Zamana yayılan iyileştirme etkilerinin her darbesi, en fazla 10 saniyede bir olmak üzere %10 olasılıkla Spor Patlaması için lütfu etkinleştirir.',
+  'entities.abilities.overbloom.specNote_restoration':
+    '5 Yeşilliğini harcar: zamana yayılan iyileştirme etkilerini taşıyan her müttefik, bu etkilerin kalan iyileştirmesinin %{buff} kadarıyla anında iyileştirilir; etkiler kaldırılır ve hedefe yeni bir Spor Şifası uygulanır.',
+  'entities.abilities.play_dead.description':
+    'Yere düş ve ölü taklidi yap: canın ve Odak değerin herkese boş görünür. Düşmanlar seni unutur ve seni hedefleyen düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak etkiyi sona erdirir. Kalkmak için tekrar kullan.',
+  'entities.abilities.play_dead.name': 'Ölü Taklidi',
+  'entities.abilities.rejuvenation.name': 'Spor Şifası',
+  'entities.abilities.scratch.description':
+    '6 yarda içindeki yakın hedefleri tırmalayarak silah hasarına ek {damage} hasar ver. Vurulan her hedef için 1 kombo puanı kazandırır. Savurma alanındaki gizlenmiş düşmanları açığa çıkarır. Yalnızca Kedi Formunda.',
+  'entities.abilities.scratch.name': 'Tırmalama',
+  'entities.abilities.scratch.specNote_feral':
+    'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
+  'entities.abilities.spore_burst.description':
+    'Hedef bölgede sporlarla dolu bir mantar çağırır. {duration} saniye sonra patlayarak 8 yarda içindeki müttefikleri {healing} iyileştirir ve düşmanlara {damage} Doğa hasarı verir.',
+  'entities.abilities.spore_burst.name': 'Spor Patlaması',
+  'entities.abilities.spore_burst.specNote_balance':
+    '3 Ay Gelgitinde %25 güçlenir ve Ay Gelgitini harcar.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'İyileştirdiği her müttefike ayrıca Spor Şifası uygular. Yeşillik doluyken %25 güçlenir ve Yeşilliğini harcar.',
+  'entities.abilities.sporemender_form.description':
+    'Spor Şifacısına dönüşerek yaptığın iyileştirmeyi %20 ve zırhını %40 artırır, ancak hareket hızını %20 azaltır. Normal büyücü formundaki tüm büyülerin kullanılabilir durumda kalır. Başka bir forma geçene kadar sürer. Herhangi bir forma geçmek kısa süreli bir hareket hızı artışı olan Ağır Aksak Adımı kazandırır. Normal büyücü formuna dönmek için tekrar kullan. (Groveheart özel yeteneği)',
+  'entities.abilities.sporemender_form.name': 'Spor Şifacısı Formu',
+  'entities.abilities.swiftmend.specNote_restoration':
+    "Dost bir hedefteki zamana yayılan bir iyileştirme etkisini tüketerek onu {damage} iyileştirir. Spor Şifası ve İkinci Çiçeklenme uygulamaları Yeşillik ekler; 5 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılan iyileştirme etkilerini taşıyan her müttefiki, bu etkilerin kalan iyileştirmesinin %60'ı kadar anında iyileştirir. (Groveheart özel yeteneği)",
+  'entities.abilities.tactical_camo.description':
+    'Çevrene karış: düşmanlar seni güçlükle fark eder ve %80 hızla hareket edersin. Saldırmak veya hasar almak Taktik Kamuflajı sona erdirir. Ortaya çıkmak için tekrar kullan. (Saha Becerisi)',
+  'entities.abilities.tactical_camo.name': 'Taktik Kamuflaj',
+  'entities.itemSets.grovespring.bonus2':
+    'Hızlı İyileştirme önce kendi Spor Şifası veya İkinci Çiçeklenme etkini tüketir ve yüzde 25 daha fazla iyileştirir. Alınan hasar artık büyü kullanımını geciktirmez.',
+  'entities.items.pvp_skull_bag.name': 'Kafatası Çantası',
+  'entities.items.pvp_trophy_skull.name': 'Hatıra Kafatası',
+  'entities.letters.world_quest_reward.body':
+    'Bu dünya görevi ödülünü kazandığında çantaların doluydu, bu yüzden kuzgunlar ödülü buraya getirdi. Yer açıp herhangi bir kuzgun sütunundan alabilirsin.\n\n- Kuzgun Postası',
+  'entities.letters.world_quest_reward.sender': 'Kuzgun Postası',
+  'entities.letters.world_quest_reward.subject': 'Dünya görevi ödülün',
+  'guide.classPage.formLine.form_sporemender':
+    'Groveheart iyileştirme formu: daha yavaş yürüyüş karşılığında daha dayanıklı bir deri ve daha güçlü iyileştirme sağlar, tüm büyülerini ve mananı korur.',
+  'guide.classPage.formName.form_sporemender': 'Spor Şifacısı Formu',
+  'guide.economy.junkBodyFinal':
+    'İşine yaramayan ganimetleri yine de kendi dükkânı olan her tüccara satabilirsin. Bu yüzden çantalarının dolmasını beklemek yerine kasabadan geçtikçe onları boşalt. Tüccar penceresinde, Düşük kaliteli tüm döküntüleri tek seferde satan bir Çöpleri Sat düğmesi bile bulunur. Tamamen değersiz ufak tefek eşyalar da yer açmak için doğrudan atılabilir. Bu şekilde satılan imzasız gri eşyalar geri alım listesine eklenmez; dolayısıyla basmadan önce saklamak istediğin bir eşya olup olmadığını kontrol et.',
+  'guide.models.formSporemender': 'Spor Şifacısı Formu',
+  'guide.settingsPage.ifClassicCombatText':
+    'Düz yukarı yükselen sade beyaz ve soluk altın rengi hasar sayılarını geri getirir. Yanlara dağılan, kritik ve olağandışı büyük vuruşlarda parlayan daha belirgin sayılar için kapalı bırak (varsayılan).',
+  'guide.settingsPage.rowSpellEffects':
+    'Seninkiler dâhil oyuncuların ve evcil hayvanlarının kullandığı büyülerin parıltıları, kıvılcımları, mermileri ve çarpma patlamaları. Daha sakin bir ekran veya büyük grup dövüşlerinde birkaç ek kare için kapat. Düşmanların kullandığı her büyü, kaçınılması gereken alanları gösteren halkalar, sersemletilmiş, korkutulmuş veya köklenmiş hedeflerin üzerindeki işaretler ve tüm büyü kullanım çubukları görünmeye devam eder.',
 };

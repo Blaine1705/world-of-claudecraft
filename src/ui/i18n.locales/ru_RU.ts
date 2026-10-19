@@ -420,7 +420,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Использование: укрепляет нагрудный доспех, повышая броню на 12 на 1 ч.',
   'hudChrome.factionRewards.battleStandardUse':
     'Использование: устанавливает Боевое знамя Священного Рассвета на 5 мин., значительно ускоряя восполнение здоровья и маны вне боя у всех союзников поблизости. Если оставаться рядом с ним 10 сек., вы также получите Благословение Рассвета (+5% ко всем характеристикам на 30 мин.). (Восстановление 5 мин.)',
-  'hudChrome.factionRewards.hub_automatons': 'Южный Предел (Литейная автоматонов)',
+  'hudChrome.factionRewards.hub_automatons': 'Змеиный дозор (Автоматоны)',
   'hudChrome.factionRewards.hub_church_order': 'Истврукская долина (Церковный орден)',
   'hudChrome.factionRewards.hub_none':
     'Нет (используйте рядом с оплотом фракции, чтобы привязаться)',
@@ -20156,4 +20156,31 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.pvp_skull_bag.name': 'Мешок черепов',
   'guide.worldPvpPage.hillBodyFlat':
     'Раз в три часа, в непредсказуемый момент, всему миру сообщают, что через пятнадцать минут в одной из зон свободного боя появится холм, а его круг заранее отмечают на открытой земле. Холм стоит сорок пять минут, затем исчезает. Пока он стоит, каждые пять минут объявляют его местоположение и группы с наибольшим суммарным временем удержания. Группа с наибольшим числом игроков внутри круга оспаривает холм и захватывает его после тридцати секунд численного превосходства. Появление соперников лишь приостанавливает отсчёт, пока ваша группа снова не выйдет вперёд; отсчёт сбрасывается, только если внутри не останется ни одного живого участника вашей группы. Одиночка считается группой из одного игрока и сохраняет занятый холм при создании группы, но участники рейда не учитываются вовсе. Каждый участник удерживающей холм группы, стоящий внутри круга, каждую минуту получает одинаковое количество Чести независимо от длительности удержания. Полная группа, беспрепятственно удерживающая холм всё время его существования, получает примерно столько же Чести, сколько за три победы на поле боя. Когда холм исчезает, если группа с наибольшим суммарным удержанием продержалась хотя бы десять минут, каждый, кто провёл внутри круга не менее минуты во время удержания этой группой и всё ещё состоит в ней, получает одну победу в PvP-ряд Еженедельного хранилища. Полоса над полем показывает владельца, численность обеих сторон и таймер захвата; команда /hill в чате сообщает, где стоит холм.',
+  'hudChrome.graphicsRestore.note': 'Восстановление графики',
+  'hudChrome.hill.contestOtherPaused': 'Противник на паузе: {seconds} из {total}',
+  'hudChrome.hill.contestYouPaused': 'Пауза: {seconds} из {total}',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Великобритания)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (США)',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.skullBag.takeAll': 'Забрать всё',
+  'hudChrome.skullBag.takeAllAria': 'Забрать всё: {item}',
+  'hudChrome.skullBag.takeOne': 'Забрать 1',
+  'hudChrome.skullBag.takeOneAria': 'Забрать 1: {item}',
+  'hudChrome.warfare.reasons.worldQuest': 'локальное задание',
+  'hudChrome.warfareShop.goods': 'Товары',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} побед в PvP',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} победа в PvP',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Одержать {count} побед в PvP',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Одержать {count} победу в PvP',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'questUi.dialog.attuneHearthstone': 'Привязать мой союзный камень возвращения здесь.',
+  'questUi.dialog.attuneHearthstoneAria': 'Привязать союзный камень возвращения к {hub} у {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Ваш союзный камень возвращения не привязан. Поговорите с союзным интендантом или используйте его в союзном опорном пункте.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Ваш союзный камень возвращения теперь привязан к {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Камень возвращения переносит вас в {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Этот предмет ещё не готов (осталось {minutes} мин).',
 };

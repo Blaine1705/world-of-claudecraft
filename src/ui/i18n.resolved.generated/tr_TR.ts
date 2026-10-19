@@ -418,13 +418,13 @@ export const tr_TR: EnTranslations = {
       "heroicClears": "{count} Kahramanca",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Olası hazineyi görüntüle",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Ganimet odağı",
+      "allClassGear": "Tüm sınıfların teçhizatı",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "Yalnızca açılmamış kasalar için geçerlidir.",
+      "noFocusedLoot": "Uygun ganimet yok. Başka bir odak seç.",
+      "rolledFocus": "Seçim şu odağa göre yapıldı: {focus}",
       "chooseTable": "Hangi tabloyu ayırmak istediğini seç",
       "selectAllTables": "Hepsini seç",
       "selectedTables": "{count} tablo seçildi",
@@ -446,8 +446,8 @@ export const tr_TR: EnTranslations = {
         "worldMany": "{count} Dünya Görevi Tamamlandı",
         "pvpOne": "{count} Derecelendirilmiş Maç Kazanıldı",
         "pvpMany": "{count} Derecelendirilmiş Maç Kazanıldı",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} PvP galibiyeti",
+        "pvpWinMany": "{count} PvP galibiyeti"
       },
       "requiredTask": {
         "raidOne": "{count} Baskın Karşılaşmasını Temizle",
@@ -458,8 +458,8 @@ export const tr_TR: EnTranslations = {
         "worldMany": "{count} Dünya Görevini Tamamla",
         "pvpOne": "{count} Derecelendirilmiş Maçı Kazan",
         "pvpMany": "{count} Derecelendirilmiş Maçı Kazan",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "{count} PvP galibiyeti kazan",
+        "pvpWinMany": "{count} PvP galibiyeti kazan"
       },
       "readyWeeks": "Talep edilmemiş haftalar: {count}. İlk tamamlanan haftayı talep et.",
       "claimLastWeek": "Geçen haftanın ödülünü al",
@@ -522,12 +522,12 @@ export const tr_TR: EnTranslations = {
       "castingOff": "{dest} için feribot yelken açıyor",
       "boardHint": "Yelken açtığında kütüğünün üzerinde dur. Geçiş ücretsizdir.",
       "sailing": "{dest} yolunda yelken açıyor",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "{port} limanından {dest} yönüne feribot",
+      "portTitle": "{port} feribot limanı",
+      "destination": "Varış yeri: {dest}",
+      "boardNow": "Şimdi bin",
+      "arrivesIn": "Feribotun gelişine {time}",
+      "scheduleUnavailable": "Feribot tarifesi kullanılamıyor."
     },
     "materialStackSelectionUnavailable": "Bu malzeme seçimi artık kullanılamıyor.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const tr_TR: EnTranslations = {
       "banner": "{name} izleniyor"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Günün mesajı: {text}",
+      "updated": "Günün mesajı güncellendi.",
+      "cleared": "Günün mesajı temizlendi.",
+      "none": "Günün mesajı belirlenmemiş.",
+      "usage": "Kullanım: belirlemek için /motd \"<mesaj>\", kaldırmak için /motd clear.",
+      "tooLong": "Günün mesajı en fazla {max} karakter olabilir.",
+      "saveFailed": "Günün mesajı kaydedilemedi ve yeniden başlatıldığında silinecek."
     },
     "readyCheck": {
       "title": "Hazır Kontrolü",
@@ -619,11 +619,11 @@ export const tr_TR: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Cesedinin Başında Diril",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "PvP Dirilişi",
+      "pvpResurrectTitle": "En yakın mezarlıkta tam canla, yeniden Bekçinin Bedeli uygulanmadan diril.",
+      "pvpResurrectWaitButton": "PvP Dirilişi ({seconds})",
+      "pvpResurrectWaitNote": "{seconds} sonra PvP Dirilişini kullanabilirsin: en yakın mezarlıkta dirileceksin.",
+      "pvpResurrectReadyNote": "PvP Dirilişi hazır: en yakın mezarlıkta dirileceksin.",
       "resurrectAtHealer": "Solgun Bekçi (Bekçinin Bedeli)",
       "ghostHint": "Ölüm yerine koş veya diriltilmek için Soluk Bekçi ile konuş",
       "spiritHealerAlive": "Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın.",
@@ -641,7 +641,7 @@ export const tr_TR: EnTranslations = {
       "healerConfirmCancel": "İptal etmek"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Grafikler geri yükleniyor"
     },
     "wiki": {
       "confirmTitle": "Wiki Açılsın mı?",
@@ -2155,7 +2155,7 @@ export const tr_TR: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Üzerine gelince büyü ipuçları",
       "clickMoveLeft": "Sol Tık",
       "clickMoveRight": "Sağ Tık",
       "version": "v{version} ({build})",
@@ -2269,7 +2269,7 @@ export const tr_TR: EnTranslations = {
       "confirmVendorSellNote": "Bunu kapatmak eşyaları tek tıkla ve onaysız satar, bu yüzden kayan bir çanta yuvası yanlış eşyayı satıcıya satabilir.",
       "confirmVendorSellMinQuality": "Satışları Kaliteden Onaylayın",
       "confirmVendorSellMinQualityNote": "Bu kalitenin altındaki ürünler tek tıkla satılıyor; Yanlış satılan bir ürün yine de satıcıdan geri alınabilir.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Bu kalitenin altındaki eşyalar tek tıkla satılır. İmzasız gri eşyalar dışında, yanlışlıkla satılan bir eşya satıcıdan geri alınabilir.",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
@@ -2290,9 +2290,9 @@ export const tr_TR: EnTranslations = {
       "showUtilityModes": "Gizlilik ve Seyahat Modlarını Dahil Et",
       "showFriendlyTrack": "Müttefiklerdeki Güçlendirmelerimi Göster",
       "showShieldTrack": "Kalkanlarımı Göster",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Klasik savaş metni",
       "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Büyü efektleri",
       "actionCam": "Aksiyon Kamerası",
       "actionCamShoulder": "Aksiyon Kamerası Omuz",
       "actionCamShoulderLeft": "Sol {pct}",
@@ -2816,7 +2816,7 @@ export const tr_TR: EnTranslations = {
         "worldKill": "dünya öldürme",
         "worldAssist": "dünya öldürme desteklemek",
         "hillHold": "tepenin üstünde durmak",
-        "worldQuest": "world quest"
+        "worldQuest": "dünya görevi"
       },
       "floatReasons": {
         "kill": "Öldürme",
@@ -2826,11 +2826,11 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Açık dünyada veya PvP kopyalarında Dünya PvP açıkken {thresholds} oynama süresine ulaşarak kalıcı unvanlar kazan. Çıkış yapmak, ölüm, PvE kopyaları ve sığınaklar sayacı duraklatır. Kapatmak sayacı sıfırlar.",
+      "rewardPaused": "Mevcut PvP serisi: {time} oynandı (sığınakta duraklatıldı)",
+      "rewardPausedDead": "Mevcut PvP serisi: {time} oynandı (ölüyken duraklatıldı)",
+      "rewardPausedInstance": "Mevcut PvP serisi: {time} oynandı (PvE kopyalarında duraklatıldı)",
+      "rewardProgress": "Mevcut PvP serisi: {time} oynandı",
       "tab": "Dünya PvP",
       "title": "Dünya PvP",
       "blurb": "Bayrağını kaldır ve bayraklı diğer oyuncularla açık dünyada savaş. Birini yene ve hazinesinin bir kısmını al, ayrıca Savaş donanımına karşı Onur kazan. Muharebe Alanları ve Arenalar daha çok ödeme yapar.",
@@ -2849,8 +2849,8 @@ export const tr_TR: EnTranslations = {
       "markLine": "Orada bayraklı olmayan bir oyuncuya saldırmak senin bayrağını kaldırır; bayraklı birine saldırmak hiçbir zaman yapmaz.",
       "aidLine": "Bayraklı bir oyuncuya iyileştirme, kalkan veya buff verme, dünya savaşında senin bayrağını kaldırır.",
       "stakeLine": "Kaybeden {cap} veya hazinesinin {percent}'i öder, hangisi daha az ise.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "İkinizin de PvP bayrağı açıkken öldürücü darbenin altını, kaybedenin kafatasıyla birlikte cesede düşer.",
+      "skullName": "{name} adlı oyuncunun kafatası",
       "noStakeLine": "Serbest oyun alanında öldürülen bayraklı olmayan oyuncu altın kaybetmez.",
       "noTakeLine": "Bayraklı olmayan savaşçı da altın kaybetmez: sadece iki bayraklı oyuncu arasında hareket eder.",
       "honorLine": "Öldürme başına {honor} Onur, yardımcılar arasında bölünür.",
@@ -2880,8 +2880,8 @@ export const tr_TR: EnTranslations = {
       "countsHolding": "İçeride: sen {yours}, rakip {theirs}",
       "contestYou": "Tepeyi alıyorsunuz: {total} den {seconds}",
       "contestOther": "Tepeyi kaybediyorsunuz: {total} den {seconds}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "Duraklatıldı: {seconds} / {total}",
+      "contestOtherPaused": "Rakibin süresi duraklatıldı: {seconds} / {total}",
       "contestNone": "Almak için içeride {total} çoğunluğu tut",
       "inside": "Dairenin içindesiniz",
       "distance": "Daire için {yards} yd",
@@ -2890,27 +2890,27 @@ export const tr_TR: EnTranslations = {
       "standingRaid": "Akın üyeleri sayılmaz: yalnızca partiler tepeyi tutabilir"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Kafatası Çantası",
+      "total": "Kafatasları: {count}",
+      "close": "Kafatası Çantasını kapat",
+      "clickOpen": "Açmak için tıkla",
+      "notCarried": "Kafatası koymak veya çıkarmak için Kafatası Çantasını çantalarında taşı.",
+      "empty": "Boş. Çantayı taşırken yağmaladığın kafatasları doğrudan içine gider.",
+      "unrecorded": "Hatıra Kafatası",
+      "store": "Taşınan kafataslarını koy ({count})",
+      "storeNone": "Koyulacak kafatası yok",
+      "takeOne": "1 al",
+      "takeAll": "Hepsini al",
+      "takeOneAria": "1 al: {item}",
+      "takeAllAria": "Hepsini al: {item}",
+      "tooltip": "Çantanda yer kaplamadan sınırsız sayıda Hatıra Kafatası tutar. Çantalarında olduğu sürece yağmaladığın kafatasları doğrudan içine gider. Kafatası koymak veya çıkarmak için çantalarındaki simgesine tıkla."
     },
     "warfareShop": {
       "gossipOption": "Harp Setlerine Göz At",
       "gossipOptionAria": "{name} tarafından sunulan Harp seti dükkanına göz at",
       "jewelry": "Takılar",
       "weapons": "Silahlar",
-      "goods": "Goods",
+      "goods": "Mallar",
       "groupSeason2": "Savaş Mevsimi 2: Öncü",
       "groupEntry": "Savaş Mevsimi 1",
       "owned": "Sahip",
@@ -2951,12 +2951,12 @@ export const tr_TR: EnTranslations = {
       "hint": "Haritanın gösterdiği yeri bul, X'in üzerinde dur ve haritayı tekrar kullan kazmak için. Bir gizli hazine sende ve takımında açılır.",
       "upgradeNote": "Bir {rarity} harita olarak yeniden çizmek {inks} Haritacı Mürekkebi gerektirir (sahip olduğun: {held}). Faktiyonun ihtiyaç memurları bunu satarlar.",
       "upgradeMaxed": "Hiçbir haritacı bu haritayı daha iyi çizemez.",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Haritacının Mürekkebini hangi haritada kullanacaksın?",
+      "inkPickerHeld": "{held} Haritacının Mürekkebi taşıyorsun.",
+      "inkPickerRead": "Takip ediliyor: X işareti {zone} bölgesinde. X işareti yer değiştirmez.",
+      "inkPickerUnread": "Okunmamış ({count} adet taşınıyor)",
+      "inkPickerCost": "{rarity} olarak yeniden çiz: {inks} mürekkep",
+      "inkPickerCancel": "İptal",
       "rarity": {
         "common": "Yaygın",
         "rare": "Nadir",
@@ -3673,8 +3673,8 @@ export const tr_TR: EnTranslations = {
       "resetDone": "Tüm örnekler sıfırlandı.",
       "resetNone": "Sıfırlanacak örneğin yok.",
       "resetOccupied": "İçeride hâlâ biri varken örnekleri sıfırlayamazsın.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "İçeride hâlâ bir oyuncu veya cesedi bulunduğu için zorluk değişikliği sıraya alındı. Kopyalar boşalınca uygulanacak.",
+      "queuedCancelled": "Grup veya lider değiştiği için sıraya alınan zorluk değişikliği iptal edildi.",
       "resetSameDifficulty": "Bu örnekleri sıfırlamadan önce zindan zorluğunu değiştir. Boş örnekler 5 dakika sonra kendiliğinden sıfırlanır.",
       "resetLoot": "İçeride ganimet kaldığı sürece örnekleri sıfırlayamazsın.",
       "resetConfirmTitle": "Tüm Örnekler Sıfırlansın mı?",
@@ -3691,7 +3691,7 @@ export const tr_TR: EnTranslations = {
       "dragEquipHint": "Kuşanmak için karakterinin üzerine sürükle",
       "dragDestroyHint": "Yok etmek için dünyaya sürükle",
       "reorderNeedsRecent": "Çantalarını yeniden düzenlemek için filtreyi temizle ve Son Eklenen sıralama seçeneğini kullan",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Kilitli eşyalar çantadaki yuvalarında kalır. Taşımak için eşyanın kilidini aç.",
       "itemAriaInstanced": "{item}, adet {count}, ustaişareti kopyası",
       "itemAriaEnchanted": "{item}, adet {count}, büyülü kopya",
       "itemAriaBound": "{item}, adet {count}, bağlı kopya",
@@ -4077,7 +4077,7 @@ export const tr_TR: EnTranslations = {
       "duskEconomy": "Yetenekler {pct}% daha az enerji harcar",
       "moontide": "Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar",
       "oldBlood": "Kadim Kan: aşama {stacks} / {max}. İsabet eden Kedi ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür",
-      "verdance": "Yeşillik: aşama {stacks} / {max}. Kullandığın her Sporemending, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
+      "verdance": "Yeşillik: aşama {stacks} / {max}. Kullandığın her Spor Şifası, İkinci Çiçeklenme veya Yaban Şifası 1 ekler ve her aşama Yaban Şifası'nın kullanım süresini kısaltır. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
       "freeExecute": "Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz",
       "resourceSap": "Her {interval} sn'de mevcut kaynağının {value} kadarını geri kazandırır",
       "nextAttackCrit": "Bir sonraki saldırın garanti kritik vurur",
@@ -4179,7 +4179,7 @@ export const tr_TR: EnTranslations = {
       "formTravel": "Fleet Formu: hareket hızı {pct}% artar",
       "formFireball": "Kor Formu: hareket hızı {pct}% artırıldı; saldırılar ve büyüler devre dışı",
       "formMoonkin": "Aykuşu Formu: büyü hasarı {pct}% ve zırh {armorPct}% artar",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Spor Şifacısı Formu: yapılan iyileştirme %{pct}, zırh %{armorPct} artar ve hareket hızı %{slowPct} azalır",
       "formShadow": "Gölgeperde Formu: Gölge hasarı {pct}% artar",
       "resourceCount": "{value} / {max}",
       "formLich": "Ruh Mızrağı ayrıca yakındaki en fazla {targets} düşmana {pct}% hasarla vurur",
@@ -4266,7 +4266,7 @@ export const tr_TR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "UZAKTA",
       "pvpTag": "PvP",
-      "bountyTag": "Bounty",
+      "bountyTag": "Baş ödülü",
       "cheaterTag": "< Hileci >",
       "pledgeTag": "{guild} Yeminlisi",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const tr_TR: EnTranslations = {
       "wrongKind": "Bu kod bir ayar dışa aktarımı, kısayol düzeni değil."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Klavye düzeni",
+      "open": "Dönüştür",
+      "from": "Kısayolların hazırlandığı düzen",
+      "to": "Hedef düzen",
+      "keepMovement": "Hareket tuşlarını yerinde tut",
+      "keepMovementLocked": "Hareket tuşları geçen sefer yerinde tutulduğundan yine yerinde kalır. Baştan başlamak için varsayılanlara sıfırla.",
+      "help": "Her kısayol, yeni düzende aynı karakteri yazan tuşa taşınır. Sayı sırası yerinde kalır. Bu listedeki tuş adları QWERTY konumlarını belirtir; klavye görünümü kendi düzenini gösterir.",
+      "moves": "Taşınacak kısayollar: {count}",
+      "noChange": "Bu düzenler arasında hiçbir kısayol değişmez.",
+      "apply": "Kısayolları dönüştür",
+      "converted": "Kısayollar {from} düzeninden {to} düzenine dönüştürüldü.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (ABD)",
+        "qwertyUk": "QWERTY (Birleşik Krallık)",
+        "qwertzDe": "QWERTZ (Almanca)",
+        "qwertzCh": "QWERTZ (İsviçre)",
+        "azertyFr": "AZERTY (Fransızca)",
+        "azertyBe": "AZERTY (Belçika)",
+        "qwertyEs": "QWERTY (İspanyolca)",
+        "qwertyIt": "QWERTY (İtalyanca)",
+        "qwertyNordic": "QWERTY (İsveççe, Fince)",
+        "qwertyDa": "QWERTY (Danca)",
+        "qwertyNo": "QWERTY (Norveççe)",
+        "qwertyBr": "QWERTY (Brezilya ABNT2)",
+        "qwertyPt": "QWERTY (Portekizce)",
+        "qwertyTr": "QWERTY (Türkçe)",
+        "dvorak": "Dvorak düzeni",
+        "colemak": "Colemak düzeni"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const tr_TR: EnTranslations = {
       "perfectedBadge": "Kusursuzlaştırılmış",
       "perfectingRank": "Kusursuzlaştırma: {ranks} içinden {rank}. kademe",
       "materialSourceGatherer": "{count} × {name} tarafından toplandı",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × {name} adlı oyuncudan alındı",
       "materialSourceGathererSigned": "{count} × {name} tarafından toplandı, {signer} imzalı",
       "materialSourceUnrecorded": "{count} × Toplayıcı kaydedilmedi",
       "materialSourceUnrecordedSigned": "{count} × Toplayıcı kaydedilmedi, {name} imzalı",
@@ -5457,12 +5457,16 @@ export const tr_TR: EnTranslations = {
       "enchant_weapon_piston_drive": "İki elli bir silahı kalıcı olarak 12 Güç ve 25 Kritik Vuruş Derecelendirmesi ile oyar. Tek elli silaha uygulanamaz. Sabit bonus; ölçeklendirilmez."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Müttefik Yurt Taşın bağlı değil. Müttefik bir levazım subayıyla konuş veya müttefik bir merkezde kullan.",
+      "hearthstoneBound": "Müttefik Yurt Taşın artık {hub} konumuna bağlı.",
+      "hearthstoneTransport": "Yurt taşı seni {hub} konumuna götürür.",
+      "itemCooldown": "Bu eşya henüz hazır değil ({minutes} dk kaldı).",
       "alliedHearthstoneUse": "Kullanım: Seni ayarlanmış faktiyonun merkez alanına ışınlar. (10 sn. dönem, 15 dk. bekleme)",
       "alliedHearthstoneAttuned": "Ayarlanmış: {hub}",
       "hub_none": "Hiçbiri (Ayarlamak için faktiyonu merkez alanında kullan)",
       "hub_rift_watch": "Drifthaven (Yarık İzleyicileri)",
       "hub_church_order": "Doğudere Vadisi (Kilise Düzeni)",
-      "hub_automatons": "Güney Uzanım (Otomat Demiryolu)",
+      "hub_automatons": "Wyrmwatch (Otomatlar)",
       "riftGliderUse": "Kullanım: Planörü açar, 30 sn. boyunca düşüş hızını azaltır. İniş veya hasar alma etkiyi iptal eder. (2 dk. bekleme)",
       "targetDummyUse": "Kullanım: Açık dünyaya 2 dakika boyunca savaş becerilerine pratik yapmak için mekanik bir hedef kukla yerleştirir. (5 dk. bekleme)",
       "battleStandardUse": "Kullanım: Kutsal Şafak Savaş Bayrağını 5 dakika boyunca diktirir, yakındaki tüm müttefikler için savaş dışı sağlık ve mana rejenerasyonunu önemli ölçüde artırır. 10 saniye boyunca yakında kalmak ayrıca Şafağın Kutsamasını (+tüm istatistiklere %5, 30 dk.) verir. (5 dk. bekleme)",
@@ -5827,7 +5831,7 @@ export const tr_TR: EnTranslations = {
       "teaches": "Kullan: {item} üretmeyi öğretir.",
       "teachesEnchant": "Kullan: {enchant} uygulamayı öğretir.",
       "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Bağ Çözme: {name}",
@@ -7428,7 +7432,7 @@ export const tr_TR: EnTranslations = {
       "rowCameraSpeed": "Fareyle etrafa bakıldığında kameranın ne kadar hızlı döndüğü.",
       "rowTouchLookSpeed": "Kaydırarak bakma için de aynı şey geçerlidir; yalnızca dokunmatik bir ekrandaysanız görünür.",
       "rowFullscreen": "Oyunu tüm ekranı kaplayacak şekilde gösterir.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "Seninkiler dâhil oyuncuların ve evcil hayvanlarının kullandığı büyülerin parıltıları, kıvılcımları, mermileri ve çarpma patlamaları. Daha sakin bir ekran veya büyük grup dövüşlerinde birkaç ek kare için kapat. Düşmanların kullandığı her büyü, kaçınılması gereken alanları gösteren halkalar, sersemletilmiş, korkutulmuş veya köklenmiş hedeflerin üzerindeki işaretler ve tüm büyü kullanım çubukları görünmeye devam eder.",
       "rowWaterRipples": "Yüzerken arkanızda yayılan iz ve dalgacıklar. Varsayılan olarak kapalıdır ve gerçek kareye mal olan tek su efektidir; sıçramalar ve kabarcıklar her iki durumda da etkilenmez.",
       "rowOverflowXp": "Maksimum seviyedeyken çubuğunuzun taşan deneyimle dolmaya devam edip etmeyeceği, ya da bunun yerine klasik, sabit maksimum seviye metnini gösterip göstermeyeceği.",
       "rowInterfaceMode": "Masaüstü arayüzünü mü yoksa ekran üstü dokunmatik denetimleri mi kullanacağınız. Otomatik, cihazınızı okur; ikisinden birini de zorlayabilirsiniz: klavyeli bir tablet masaüstü düzenini alabilir, dokunmatik ekranlı bir dizüstü bilgisayar da dokunmatik denetimleri alabilir.",
@@ -7481,7 +7485,7 @@ export const tr_TR: EnTranslations = {
       "ifMouseoverCast": "Hedefinizi değiştirmeden, üzerine geldiğiniz grup çerçevesine bir iyileştirme ya da dostane bir büyünün inmesini sağlar.",
       "ifStickyTarget": "Boş zemine tıkladığınızda hedefinizi temizlemek yerine mevcut hedefinizi korur.",
       "ifFctScale": "Hedefinizden yükselen hasar ve iyileştirme sayılarının boyutu.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Düz yukarı yükselen sade beyaz ve soluk altın rengi hasar sayılarını geri getirir. Yanlara dağılan, kritik ve olağandışı büyük vuruşlarda parlayan daha belirgin sayılar için kapalı bırak (varsayılan).",
       "ifExtraBars": "İkinci bir eylem çubuğu sırası ortaya çıkarır, ikincisi açıldığında ise üçüncüsünü açar. Sıralar gizliyken bile yuvalara kısayol tuşlarıyla erişilebilir.",
       "ifHideUnused": "Boş eylem yuvalarını gizler, böylece yalnızca gerçekten kullanılan düğmeler çizilir.",
       "ifLockBars": "Çubukları kilitler, böylece bir yetenek yanlışlıkla bir yuvadan sürüklenip çıkarılamaz.",
@@ -7912,14 +7916,14 @@ export const tr_TR: EnTranslations = {
         "form_bear": "Tank şekli: ağır bir post, mana yerine öfke ve düşmanların sana vurmaya devam etmesini sağlayan ekstra tehdit.",
         "form_cat": "Yakın dövüş hasarı şekli: bir hırsız gibi enerji ve kombo puanları, ve çok daha az tehdit.",
         "form_travel": "Yolculuk şekli: yerde çok daha hızlı, ama şekilden çıkana kadar başka bir yeteneğin yok.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "Groveheart iyileştirme formu: daha yavaş yürüyüş karşılığında daha dayanıklı bir deri ve daha güçlü iyileştirme sağlar, tüm büyülerini ve mananı korur."
       },
       "mageEleSummon": "Elementali yanına çağıran ve onu hedefine yönlendiren bir Ayaz büyüsü.",
       "formName": {
         "form_bear": "Bruin Formu",
         "form_cat": "Kedi Formu",
         "form_travel": "Fleet Formu",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Spor Şifacısı Formu"
       }
     },
     "classHook": {
@@ -8622,7 +8626,7 @@ export const tr_TR: EnTranslations = {
       "formBear": "Bruin Formu",
       "formCat": "Kedi Formu",
       "formTravel": "Fleet Formu",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Spor Şifacısı Formu",
       "groupCreatures": "Yaratıklar",
       "groupPets": "Karabüyücü İblisleri",
       "pickerLabel": "Görüntülenecek bir model seç",
@@ -9142,7 +9146,7 @@ export const tr_TR: EnTranslations = {
       "buyingBody": "Bir tüccarla konuşun ve mallarına göz atmayı seçin; dükkanları üç sekmeyle açılır: Göz At, Sat ve Geri Al. Göz At sekmesi stokladıkları her şeyi tutar, paranız yeterse sizindir. Sat sekmesi çantalarınızdan para ödeyecekleri şeyleri sıralar; kendi zar atışıyla belirlenmiş bir kaliteye sahip bir parçayı satarken önce onay istenir, böylece değerli bir nüsha yanlışlıkla asla elden kaçmaz. Pişman olduğunuz bir şeyden ayrılırsanız, Geri Al sekmesi son satışlarınızı tutar ve onları size ödenen parayla geri alabilirsiniz.",
       "junkTitle": "Hurdaları temizleme",
       "junkBody": "İşinize yaramayan ganimetler yine de herhangi bir satıcıya satılır, bu yüzden çantalarınızın dolmasına izin vermek yerine kasabadan her geçtiğinizde onları boşaltın. Satıcının Sat sekmesi, her Kötü kaliteli ıvır zıvırı tek seferde satan tek tıklık bir düğme bile tutar. Gerçekten değersiz öteberi yer açmak için doğrudan atılabilir de.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "İşine yaramayan ganimetleri yine de kendi dükkânı olan her tüccara satabilirsin. Bu yüzden çantalarının dolmasını beklemek yerine kasabadan geçtikçe onları boşalt. Tüccar penceresinde, Düşük kaliteli tüm döküntüleri tek seferde satan bir Çöpleri Sat düğmesi bile bulunur. Tamamen değersiz ufak tefek eşyalar da yer açmak için doğrudan atılabilir. Bu şekilde satılan imzasız gri eşyalar geri alım listesine eklenmez; dolayısıyla basmadan önce saklamak istediğin bir eşya olup olmadığını kontrol et.",
       "tradeTitle": "Diğer oyuncularla takas",
       "tradeBody": "Yanınızda duran herkesle yüz yüze takas yapabilirsiniz. İkiniz de eşyaları ve altını ortak bir pencereye koyarsınız ve değiş tokuş yalnızca ikiniz de onayladığınızda gerçekleşir, böylece hiçbir taraf tuzağa düşmez. Bir arkadaşa ganimet vermenin ya da bir anlaşmayı bağlamanın basit yoludur.",
       "mailTitle": "Kuzgun Postası",
@@ -11231,10 +11235,10 @@ export const tr_TR: EnTranslations = {
     "selectClass": "Lütfen bir sınıf seçin.",
     "pickClass": "Bir sınıf seçin.",
     "returnToLogin": "Girişe Dön",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Güncelleme ara",
+    "noUpdateFound": "Güncelleme bulunamadı. Biraz sonra tekrar dene.",
+    "updateUnavailable": "Oyun mağazan üzerinden güncelle veya en yeni istemciyi indir.",
+    "updateSearchFailed": "Güncellemeler denetlenemedi. Lütfen tekrar dene.",
     "api": {
       "tooManyAttempts": "Çok fazla deneme. Bir dakika bekleyip tekrar deneyin.",
       "usernameShape": "Kullanıcı adı 3-24 karakter olmalı ve harf, rakam veya alt çizgi kullanmalıdır.",
@@ -12412,6 +12416,8 @@ export const tr_TR: EnTranslations = {
       "clueTalkAria": "İpucu sorgusu: {name}",
       "clueDeliver": "{count} {item} teslim et.",
       "clueDeliverAria": "{count} {item}'i {name}'ye teslim et",
+      "attuneHearthstone": "Müttefik Yurt Taşımı buraya bağla.",
+      "attuneHearthstoneAria": "Müttefik Yurt Taşını {name} aracılığıyla {hub} konumuna bağla",
       "profIntroHint": "{quest} görevi için {name}'e git.",
       "nythraxisDeathlessKingWarning": "Üç kutsal emanet de aynı hikayeyi anlatıyor: Aldren kralını savunmak için savaştı, Malric ölümün sınırını aştı ve Voss ardından gelene engel olmaya çalıştı. Mühür zayıflıyor ve terk edilmiş mahzen aşağı inen yol.",
       "browseGoods": "Mallarına bir göz atayım.",
@@ -12799,7 +12805,7 @@ export const tr_TR: EnTranslations = {
       "clueCasketOpened": "Sandık {money} ve {items} tutuyor.",
       "treasureMapEarned": "Günün tüm dünya görevleri yapılmıştır: bir {map} buldun.",
       "treasureMapLost": "Günün tüm dünya görevleri tamamlanmıştır, ancak çantanızda hazine haritası için yer yok.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Çantaların dolu. Ödülün posta kutuna gönderildi: {items}.",
       "treasureMapRead": "{map} haritasını inceliyor. X {zone} içinde bir yerde.",
       "treasureMapUpgraded": "Harita daha güzel mürekkeple yeniden çizilmiştir: şimdi bir {map}.",
       "treasureVaultOpened": "Zemin çöküyor. Gizli bir hazine açık halde seni karşılıyor.",
@@ -12978,7 +12984,7 @@ export const tr_TR: EnTranslations = {
       "sellJunk": "Döküntüleri Sat",
       "sellJunkAria": "Tüm döküntüleri {price} karşılığında sat",
       "sellJunkHint": "Görev eşyaları hariç çantalarınızdaki tüm gri eşyaları satar.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "İmzasız gri eşyalar geri alım listesine eklenmez, bu yüzden satılmaları geri alınamaz."
     },
     "market": {
       "title": "Dünya Pazarı",
@@ -13283,12 +13289,12 @@ export const tr_TR: EnTranslations = {
         "description": "Alınan hasarı 8 sn boyunca 60% azaltır, ancak etkinken saldırmayı engeller."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Ölü Taklidi",
+        "description": "Yere düş ve ölü taklidi yap: canın ve Odak değerin herkese boş görünür. Düşmanlar seni unutur ve seni hedefleyen düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak etkiyi sona erdirir. Kalkmak için tekrar kullan."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktik Kamuflaj",
+        "description": "Çevrene karış: düşmanlar seni güçlükle fark eder ve %80 hızla hareket edersin. Saldırmak veya hasar almak Taktik Kamuflajı sona erdirir. Ortaya çıkmak için tekrar kullan. (Saha Becerisi)"
       },
       "frostjaw_trap": {
         "name": "Buzçene Tuzağı",
@@ -14069,7 +14075,7 @@ export const tr_TR: EnTranslations = {
       "healing_touch": {
         "name": "Yaban Şifası",
         "description": "Dost bir hedefi {damage} iyileştirir.",
-        "specNote_restoration": "Tamamlanan her kullanım 1 Yeşillik ekler (en fazla 3). Biriken Yeşillik bu büyünün süresini kısaltır: 1 Yeşillikte 2,2 sn, 2'de 1,9 sn, 3'te 1,5 sn. Dogain Nimetleri onu anında, ücretsiz ve %25 daha güçlü yapar."
+        "specNote_restoration": "Tamamlanan her kullanım 1 Yeşillik ekler (en fazla 3). Biriken Yeşillik bu büyünün süresini kısaltır: 1 Yeşillikte 2,2 sn, 2'de 1,9 sn, 3'te 1,5 sn. Doğanın Lütfu onu anında, ücretsiz ve %25 daha güçlü yapar."
       },
       "mark_of_the_wild": {
         "name": "Yaban Siperi",
@@ -14085,7 +14091,7 @@ export const tr_TR: EnTranslations = {
         "description": "Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla {duration} sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Spor Şifası",
         "description": "Hedefi 12 sn boyunca {damage} iyileştirir.",
         "specNote_restoration": "Her kullanım 1 Yeşillik ekler (en fazla 3); zaten etkide olan bir çiçeği yenilemek de buna dahildir. 3 Yeşillikte, Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür."
       },
@@ -14124,9 +14130,9 @@ export const tr_TR: EnTranslations = {
         "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Tırmalama",
+        "description": "6 yarda içindeki yakın hedefleri tırmalayarak silah hasarına ek {damage} hasar ver. Vurulan her hedef için 1 kombo puanı kazandırır. Savurma alanındaki gizlenmiş düşmanları açığa çıkarır. Yalnızca Kedi Formunda.",
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "ferocious_bite": {
         "name": "Kanlı Isırık",
@@ -14411,8 +14417,8 @@ export const tr_TR: EnTranslations = {
       },
       "swiftmend": {
         "name": "Hızlı İyileştirme",
-        "description": "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Sporemending, İkinci Çiçeklenme ve Yaban Şifası'nın her kullanımı 1 Yeşillik ekler; 3 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Groveheart motoru)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Dost bir hedefteki zamana yayılı bir iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. Spor Şifası, İkinci Çiçeklenme ve Yaban Şifası'nın her kullanımı 1 Yeşillik ekler; 3 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılı iyileştirme etkilerini taşıyan her müttefiki, o etkilerin kalanının %60'ı kadar anında iyileştirir. (Groveheart motoru)",
+        "specNote_restoration": "Dost bir hedefteki zamana yayılan bir iyileştirme etkisini tüketerek onu {damage} iyileştirir. Spor Şifası ve İkinci Çiçeklenme uygulamaları Yeşillik ekler; 5 Yeşillikte bu düğme Taşkın Çiçeklenmeye dönüşür ve zamana yayılan iyileştirme etkilerini taşıyan her müttefiki, bu etkilerin kalan iyileştirmesinin %60'ı kadar anında iyileştirir. (Groveheart özel yeteneği)"
       },
       "moonlash": {
         "name": "Ay Kabarışı",
@@ -14439,26 +14445,26 @@ export const tr_TR: EnTranslations = {
         "description": "Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Koru Yüreği)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Spor Şifacısı Formu",
+        "description": "Spor Şifacısına dönüşerek yaptığın iyileştirmeyi %20 ve zırhını %40 artırır, ancak hareket hızını %20 azaltır. Normal büyücü formundaki tüm büyülerin kullanılabilir durumda kalır. Başka bir forma geçene kadar sürer. Herhangi bir forma geçmek kısa süreli bir hareket hızı artışı olan Ağır Aksak Adımı kazandırır. Normal büyücü formuna dönmek için tekrar kullan. (Groveheart özel yeteneği)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Spor Patlaması",
+        "description": "Hedef bölgede sporlarla dolu bir mantar çağırır. {duration} saniye sonra patlayarak 8 yarda içindeki müttefikleri {healing} iyileştirir ve düşmanlara {damage} Doğa hasarı verir.",
+        "specNote_balance": "3 Ay Gelgitinde %25 güçlenir ve Ay Gelgitini harcar.",
+        "specNote_restoration": "İyileştirdiği her müttefike ayrıca Spor Şifası uygular. Yeşillik doluyken %25 güçlenir ve Yeşilliğini harcar."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Doğanın Lütfu",
+        "description": "Büyülerin Doğanın Lütfunu 10 saniyeliğine etkinleştirebilir: belirtilen büyü ücretsiz olur, %25 güçlenir ve her formda kullanılabilir. Yeni bir tetiklenme süreyi yeniler.",
+        "specNote_feral": "İsabet eden her otomatik yakın dövüş saldırısının, Spor Şifası veya Bruin Formundayken Meşe Derisi için lütfu etkinleştirme olasılığı 15'te 1'dir.",
+        "specNote_balance": "Kullandığın her Yaban Oku veya Gök Düşüşü, en fazla 10 saniyede bir olmak üzere %10 olasılıkla Spor Patlaması için lütfu etkinleştirir.",
+        "specNote_restoration": "Zamana yayılan iyileştirme etkilerinin her darbesi, en fazla 10 saniyede bir olmak üzere %10 olasılıkla Spor Patlaması için lütfu etkinleştirir."
       },
       "overbloom": {
         "name": "Taşkın Çiçeklenme",
-        "description": "3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Sporemending eker.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "3 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Spor Şifası eker.",
+        "specNote_restoration": "5 Yeşilliğini harcar: zamana yayılan iyileştirme etkilerini taşıyan her müttefik, bu etkilerin kalan iyileştirmesinin %{buff} kadarıyla anında iyileştirilir; etkiler kaldırılır ve hedefe yeni bir Spor Şifası uygulanır."
       },
       "summon_imp": {
         "name": "Emberkin Çağırma",
@@ -19098,10 +19104,10 @@ export const tr_TR: EnTranslations = {
         "name": "Elçi'nin Sandığı"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Hatıra Kafatası"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Kafatası Çantası"
       },
       "clue_scroll": {
         "name": "İpucu Tomarı"
@@ -24117,9 +24123,9 @@ export const tr_TR: EnTranslations = {
         "body": "Kasa temizlendi, ama senin payan sandıktan toplanmadı. Kargalar bunu sana buraya getirdiler, kazandığın mallar ve parayla beraber.\n\n- Karga Postahanesi"
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "Kuzgun Postası",
+        "subject": "Dünya görevi ödülün",
+        "body": "Bu dünya görevi ödülünü kazandığında çantaların doluydu, bu yüzden kuzgunlar ödülü buraya getirdi. Yer açıp herhangi bir kuzgun sütunundan alabilirsin.\n\n- Kuzgun Postası"
       }
     },
     "itemSets": {
@@ -24255,7 +24261,7 @@ export const tr_TR: EnTranslations = {
       },
       "grovespring": {
         "name": "Koruluk Pınarı Giysisi",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Hızlı İyileştirme önce kendi Spor Şifası veya İkinci Çiçeklenme etkini tüketir ve yüzde 25 daha fazla iyileştirir. Alınan hasar artık büyü kullanımını geciktirmez.",
         "bonus4": "Aşırı Çiçeklenme kalan etkilerinin %75'ini hasat eder ve ardından 1 Yeşerme depolar."
       },
       "hexthread": {

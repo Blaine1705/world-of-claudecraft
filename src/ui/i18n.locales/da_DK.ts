@@ -50,7 +50,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Brug: Forstærker dit brystharnisk, øger Rustning med 12 i 1 time.',
   'hudChrome.factionRewards.battleStandardUse':
     'Brug: Planter Velsignede Dagsmorgen kampstandard i 5 minutter, øger uden for kamp sundhed og mana regenerering betydeligt for alle nærliggende allierede. At blive i nærheden af det i 10 sekunder giver også Velsignelse af Dagsmorgen (+5% til alle egenskaber i 30 min). (5 min nedetid)',
-  'hudChrome.factionRewards.hub_automatons': 'Sydlig høj (Automaton Smedien)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automatoner)',
   'hudChrome.factionRewards.hub_church_order': 'Østbæk Dal (Kirkeordenen)',
   'hudChrome.factionRewards.hub_none': 'Ingen (Brug nær en fraktionshub for at indstille)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (Rift-vagten)',
@@ -15790,7 +15790,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til {duration} sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge.',
   'entities.abilities.overbloom.name': 'Overblomstring',
   'entities.abilities.overbloom.description':
-    'Forbruger 3 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Sporemending på målet.',
+    'Forbruger 3 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Sporeheling på målet.',
   'entities.abilities.redharvest.name': 'Rød Høst',
   'entities.abilities.redharvest.description':
     'Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint.',
@@ -15804,7 +15804,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Gammelt Blod: trin {stacks} af {max}. Landede Katte- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus',
   'hudChrome.auraEffect.verdance':
-    'Grønske {stacks}/{max}. Hver Sporemending, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring',
+    'Grønske {stacks}/{max}. Hver Sporeheling, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring',
   'sim.rift.allUnstable': 'Alle rifter er ustabile lige nu. Prøv igen senere.',
   'sim.rift.alreadyCleared': 'Denne rift er allerede ryddet af {names}.',
   'sim.rift.deadEntry': 'Du kan ikke gå ind i en rift, mens du er død.',
@@ -16441,7 +16441,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Hver åbner, du bruger fra Skumringsslør, tilføjer 1 Tusmørke (maks. 3).',
   'entities.abilities.swiftmend.description':
-    'Forbruger en helbredelse-over-tid-effekt på et venligt mål for at helbrede det for {damage}. Hver kastning af Sporemending, Anden Blomstring og Vildlægning giver 1 Grønske; ved 3 Grønske bliver denne knap til Overblomstring, som øjeblikkeligt helbreder hver allieret, der bærer dine helbredelse-over-tid-effekter, for 60% af det, de effekter havde tilbage. (Lundhjerte-motoren)',
+    'Forbruger en helbredelse-over-tid-effekt på et venligt mål for at helbrede det for {damage}. Hver kastning af Sporeheling, Anden Blomstring og Vildlægning giver 1 Grønske; ved 3 Grønske bliver denne knap til Overblomstring, som øjeblikkeligt helbreder hver allieret, der bærer dine helbredelse-over-tid-effekter, for 60% af det, de effekter havde tilbage. (Lundhjerte-motoren)',
   'entities.abilities.swipe.description':
     'Fej dine kløer gennem nærliggende fjender for {damage} skade. Forårsager ekstra trussel. Kun i Bruin-form.',
   'entities.abilities.swipe.specNote_feral':
@@ -19781,4 +19781,191 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Træk for at ændre størrelsen på kortets sidebjælke. Dobbeltklik for at nulstille.',
   'guide.worldPvpPage.hillBodyFlat':
     'En gang hver tredje time får hele riget på et uforudsigeligt tidspunkt besked om, at en bakke dukker op i en zone med fri kamp om femten minutter. Dens cirkel markeres på åbent terræn. Bakken bliver stående i femogfyrre minutter og forsvinder så. Imens meddeles dens placering og grupperne med den længste samlede kontroltid hvert femte minut. Gruppen med flest spillere i cirklen kæmper om bakken og erobrer den efter i alt tredive sekunders overtal. En rivaliserende gruppe sætter kun tælleren på pause, indtil din gruppe fører igen; den starter først forfra, når der ikke er nogen levende fra din gruppe tilbage i cirklen. En solospiller tæller som en gruppe på én og beholder sin bakke, når en gruppe dannes, men raidmedlemmer tæller slet ikke. Hvert medlem af gruppen, der holder bakken og står i cirklen, modtager lige meget Ære hvert minut, uanset hvor længe gruppen har holdt den. En fuld gruppe, som holder bakken uforstyrret i hele dens levetid, tjener omtrent det samme som for tre sejre på slagmarker. Når bakken forsvinder, får alle, som stod i cirklen i mindst ét minut under den førende gruppes kontrol og stadig er i gruppen, én sejr til PvP-rækken i den ugentlige hvælving, hvis gruppen med længst samlet kontrol holdt den i mindst ti minutter. En bjælke over området viser indehaveren, antallet af spillere på begge sider og erobringstælleren; /hill i chatten viser placeringen.',
+  'errors.noUpdateFound': 'Ingen opdatering fundet. Prøv igen om lidt.',
+  'errors.searchUpdates': 'Søg efter opdateringer',
+  'errors.updateSearchFailed': 'Kunne ikke søge efter opdateringer. Prøv igen.',
+  'errors.updateUnavailable': 'Opdater via din spilbutik, eller hent den nyeste klient.',
+  'hudChrome.auraEffect.formSporemender':
+    'Sporehelerform: heling øget med {pct}%, rustning øget med {armorPct}% og bevægelseshastighed reduceret med {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Låste genstande bliver på deres plads i tasken. Lås dem op for at flytte dem.',
+  'hudChrome.death.pvpResurrect': 'PvP-genoplivning',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'PvP-genoplivning er klar: du genopstår på den nærmeste kirkegård.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Genopstå på den nærmeste kirkegård med fuldt helbred og uden en ny Vogterens Told.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP-genoplivning ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Du kan bruge PvP-genoplivning om {seconds}: du genopstår på den nærmeste kirkegård.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Den ventende ændring af sværhedsgrad blev annulleret, fordi gruppen eller lederen blev ændret.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Ændringen af sværhedsgrad venter, fordi nogen eller deres lig stadig er indenfor. Den træder i kraft, når instanserne er tomme.',
+  'hudChrome.ferry.arrivesIn': 'Færgen ankommer om {time}',
+  'hudChrome.ferry.boardNow': 'Gå ombord nu',
+  'hudChrome.ferry.destination': 'Rejsemål: {dest}',
+  'hudChrome.ferry.portLabel': 'Færge fra {port} til {dest}',
+  'hudChrome.ferry.portTitle': 'Færgehavn: {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Færgens sejlplan er ikke tilgængelig.',
+  'hudChrome.graphicsRestore.note': 'Gendanner grafik',
+  'hudChrome.hill.contestOtherPaused': 'Rival sat på pause: {seconds} af {total}',
+  'hudChrome.hill.contestYouPaused': 'Sat på pause: {seconds} af {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Taget fra {name}',
+  'hudChrome.keybindLayout.apply': 'Konverter genvejstaster',
+  'hudChrome.keybindLayout.converted': 'Genvejstaster konverteret fra {from} til {to}.',
+  'hudChrome.keybindLayout.from': 'Genvejstaster oprettet til',
+  'hudChrome.keybindLayout.help':
+    'Hver genvej flyttes til den tast, der skriver det samme tegn på det nye layout. Talrækken bliver på sin plads. Tastnavnene i denne liste angiver QWERTY-positioner; tastaturoversigten viser dit eget layout.',
+  'hudChrome.keybindLayout.keepMovement': 'Behold bevægelsestasterne på deres pladser',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Bevægelsestasterne blev på deres pladser sidst, så det gør de igen. Gendan standardindstillingerne for at begynde forfra.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belgisk)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (fransk)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Colemak-layout',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Dvorak-layout',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brasiliansk ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (dansk)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (spansk)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italiensk)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norsk)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (svensk, finsk)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portugisisk)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (tyrkisk)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (britisk)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (amerikansk)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (schweizisk)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (tysk)',
+  'hudChrome.keybindLayout.moves': 'Genvejstaster, der flyttes: {count}',
+  'hudChrome.keybindLayout.noChange': 'Ingen genvejstaster ændres mellem disse layouts.',
+  'hudChrome.keybindLayout.open': 'Konverter',
+  'hudChrome.keybindLayout.title': 'Tastaturlayout',
+  'hudChrome.keybindLayout.to': 'Konverter til',
+  'hudChrome.nameplate.bountyTag': 'Dusør',
+  'hudChrome.options.classicCombatText': 'Klassisk kamptekst',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Genstande under denne kvalitet sælges med et enkelt klik. Fejlagtigt solgte genstande kan købes tilbage fra købmanden, undtagen usignerede grå genstande.',
+  'hudChrome.options.spellEffects': 'Besværgelseseffekter',
+  'hudChrome.options.spellTooltipOnHover': 'Besværgelsestips ved musemarkør',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Dagens besked er ryddet.',
+  'hudChrome.realmMotd.line': 'Dagens besked: {text}',
+  'hudChrome.realmMotd.none': 'Der er ikke angivet nogen dagens besked.',
+  'hudChrome.realmMotd.saveFailed': 'Dagens besked kunne ikke gemmes og går tabt ved genstart.',
+  'hudChrome.realmMotd.tooLong': 'Dagens besked må højst indeholde {max} tegn.',
+  'hudChrome.realmMotd.updated': 'Dagens besked er opdateret.',
+  'hudChrome.realmMotd.usage':
+    'Brug: /motd "<besked>" for at angive den, /motd clear for at fjerne den.',
+  'hudChrome.skullBag.clickOpen': 'Klik for at åbne',
+  'hudChrome.skullBag.close': 'Luk kranieposen',
+  'hudChrome.skullBag.empty': 'Tom. Mens du bærer posen, lægges plyndrede kranier direkte i den.',
+  'hudChrome.skullBag.notCarried':
+    'Hav kranieposen i dine tasker for at opbevare eller tage kranier.',
+  'hudChrome.skullBag.store': 'Opbevar medbragte kranier ({count})',
+  'hudChrome.skullBag.storeNone': 'Ingen kranier at opbevare',
+  'hudChrome.skullBag.takeAll': 'Tag alle',
+  'hudChrome.skullBag.takeAllAria': 'Tag alle: {item}',
+  'hudChrome.skullBag.takeOne': 'Tag 1',
+  'hudChrome.skullBag.takeOneAria': 'Tag 1: {item}',
+  'hudChrome.skullBag.title': 'Kraniepose',
+  'hudChrome.skullBag.tooltip':
+    'Rummer et vilkårligt antal trofækranier uden at optage taskeplads. Mens den er i dine tasker, lægges plyndrede kranier direkte i den. Klik på den i taskerne for at opbevare eller tage kranier.',
+  'hudChrome.skullBag.total': 'Kranier: {count}',
+  'hudChrome.skullBag.unrecorded': 'Trofækranie',
+  'hudChrome.treasureMap.inkPickerCancel': 'Annuller',
+  'hudChrome.treasureMap.inkPickerCost': 'Tegn om til {rarity}: {inks} blæk',
+  'hudChrome.treasureMap.inkPickerHeld': 'Du har {held} kartografblæk.',
+  'hudChrome.treasureMap.inkPickerRead':
+    "Følges: dens X ligger i {zone}. X'et bliver på sin plads.",
+  'hudChrome.treasureMap.inkPickerTitle': 'Hvilket kort vil du bruge kartografblæk på?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Ulæst ({count} i beholdning)',
+  'hudChrome.warfare.reasons.worldQuest': 'verdensopgave',
+  'hudChrome.warfareShop.goods': 'Varer',
+  'hudChrome.weeklyRewards.allClassGear': 'Udstyr til alle klasser',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} PvP-sejre',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} PvP-sejr',
+  'hudChrome.weeklyRewards.lootFocus': 'Byttefokus',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Gælder kun uåbnede hvælvinger.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Intet egnet bytte. Vælg et andet fokus.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Vind {count} PvP-sejre',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Vind {count} PvP-sejr',
+  'hudChrome.weeklyRewards.rolledFocus': 'Udtrukket til: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Nuværende PvP-stime: spillet {time} (sat på pause i en helligdom)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Nuværende PvP-stime: spillet {time} (sat på pause, mens du er død)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Nuværende PvP-stime: spillet {time} (sat på pause i PvE-instanser)',
+  'hudChrome.worldPvp.rewardProgress': 'Nuværende PvP-stime: spillet {time}',
+  'hudChrome.worldPvp.rewardTitles':
+    'Optjen permanente titler efter {thresholds} spilletid med verdens-PvP slået til i den åbne verden eller i PvP-instanser. Udlogning, død, PvE-instanser og helligdomme sætter tiden på pause. Slår du PvP fra, nulstilles den.',
+  'hudChrome.worldPvp.skullName': '{name}s kranie',
+  'hudChrome.worldPvp.spoilsLine':
+    'Når I begge har PvP slået til, ligger guldet fra det dræbende slag på liget sammen med taberens kranie.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Usignerede grå genstande kommer ikke på tilbagekøbslisten, så salget af dem kan ikke fortrydes.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Dine tasker er fulde. Din belønning er sendt til din postkasse: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Dine besværgelser kan klargøre Naturens velsignelse i 10 sek.: den angivne besværgelse bliver gratis, 25% stærkere og kan kastes i enhver form. En ny udløsning genopfrisker varigheden.',
+  'entities.abilities.natures_boon.name': 'Naturens velsignelse',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Hvert Vildlyn eller Himmelfald, du kaster, har 10% chance for at klargøre den til Sporebrist, højst én gang hvert 10. sek.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Hvert nærkampsautoangreb, der rammer, har 1 ud af 15 chance for at klargøre den til Sporeheling, eller til Egehud i Bruin-form.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Hvert tik af dine heling-over-tid-effekter har 10% chance for at klargøre den til Sporebrist, højst én gang hvert 10. sek.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Bruger dine 5 Grønske: hver allieret med dine heling-over-tid-effekter heles straks for {buff}% af den heling, effekterne havde tilbage. Effekterne fjernes, og målet får en ny Sporeheling.',
+  'entities.abilities.play_dead.description':
+    'Fald til jorden og spil død: dit helbred og fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller en anden evne afslutter det. Kast igen for at rejse dig.',
+  'entities.abilities.play_dead.name': 'Spil død',
+  'entities.abilities.rejuvenation.name': 'Sporeheling',
+  'entities.abilities.scratch.description':
+    'Riv gennem nærliggende mål inden for 6 yards for våbenskade plus {damage}. Giver 1 kombopoint pr. ramt mål. Afslører snigende fjender i området. Kun i Katteform.',
+  'entities.abilities.scratch.name': 'Krads',
+  'entities.abilities.scratch.specNote_feral':
+    'Hvert træffende slag giver 1 Gammelt Blod (maks. 3).',
+  'entities.abilities.spore_burst.description':
+    'Fremkalder en sporeknold i målområdet. Efter {duration} sek. brister den, heler allierede for {healing} og giver fjender inden for 8 yards {damage} naturskade.',
+  'entities.abilities.spore_burst.name': 'Sporebrist',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Ved 3 Måneflod er den 25% stærkere og bruger din Måneflod.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Giver også Sporeheling til hver allieret, den heler. Ved fuld Grønske er den 25% stærkere og bruger din Grønske.',
+  'entities.abilities.sporemender_form.description':
+    'Skift form til en sporeheler: din heling øges med 20% og din rustning med 40%, men din bevægelseshastighed sænkes med 20%. Alle dine besværgelser fra din normale kasterform kan stadig bruges. Varer, indtil du skifter ud af formen. Et skift til enhver form giver Luntende Skridt, en kort stigning i bevægelseshastigheden. Kast igen for at vende tilbage til kasterform. (Lundhjertets signaturevne)',
+  'entities.abilities.sporemender_form.name': 'Sporehelerform',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Bruger en heling-over-tid-effekt på et venligt mål for at hele det for {damage}. Sporeheling og plantninger fra Anden Blomstring giver Grønske; ved 5 Grønske bliver denne knap til Overblomstring, som straks heler alle allierede med dine heling-over-tid-effekter for 60% af deres resterende heling. (Lundhjertets signaturevne)',
+  'entities.abilities.tactical_camo.description':
+    'Fald i ét med omgivelserne: fjender bemærker dig knap nok, og du bevæger dig med 80% hastighed. Angreb eller modtaget skade bryder Taktisk Camouflage. Kast igen for at træde frem. (Feltkunst)',
+  'entities.abilities.tactical_camo.name': 'Taktisk Camouflage',
+  'entities.itemSets.grovespring.bonus2':
+    'Hurtig heling bruger først din egen Sporeheling eller Anden Blomstring og heler 25 procent mere. Modtaget skade forsinker ikke længere dine besværgelser.',
+  'entities.items.pvp_skull_bag.name': 'Kraniepose',
+  'entities.items.pvp_trophy_skull.name': 'Trofækranie',
+  'entities.letters.world_quest_reward.body':
+    'Dine tasker var fulde, da du optjente denne verdensopgavebelønning, så ravnene har bragt den hertil i stedet. Gør plads, og hent den ved en hvilken som helst ravnesøjle.\n\n- Ravneposten',
+  'entities.letters.world_quest_reward.sender': 'Ravneposten',
+  'entities.letters.world_quest_reward.subject': 'Din verdensopgavebelønning',
+  'guide.classPage.formLine.form_sporemender':
+    'Lundhjertets helende form: sejere hud og stærkere heling med langsommere gang, og du beholder alle besværgelser og din mana.',
+  'guide.classPage.formName.form_sporemender': 'Sporehelerform',
+  'guide.economy.junkBodyFinal':
+    'Bytte, du ikke kan bruge, kan stadig sælges til enhver købmand med egen butik, så tøm taskerne, hver gang du kommer gennem byen. Købmandsvinduet har endda en Sælg skrammel-knap, der sælger alt af ringe kvalitet med ét klik. Helt værdiløse småting kan også kasseres for at skabe plads. Usignerede grå genstande, der sælges sådan, kommer ikke på tilbagekøbslisten, så kontrollér, om der er noget, du ville beholde, før du trykker.',
+  'guide.models.formSporemender': 'Sporehelerform',
+  'guide.settingsPage.ifClassicCombatText':
+    'Giver de enkle hvide og lysegyldne skadetal tilbage, som stiger lige op. Lad indstillingen være slået fra (standard) for kraftigere tal, der spreder sig til siderne, med glimt ved kritiske og usædvanligt store træffere.',
+  'guide.settingsPage.rowSpellEffects':
+    'Glød, gnister, projektiler og nedslag fra besværgelser, som spillere og deres kæledyr kaster, også dine egne. Slå dem fra for en roligere skærm eller nogle få ekstra billeder i sekundet i store gruppekampe. Alle fjendtlige besværgelser vises stadig, ligesom ringene om farlige områder, markørerne over bedøvede, skræmte eller fastlåste mål og alle kastebjælker.',
+  'questUi.dialog.attuneHearthstone': 'Bind min allierede hjemsten her.',
+  'questUi.dialog.attuneHearthstoneAria': 'Bind din allierede hjemsten til {hub} hos {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Din allierede hjemsten er ikke bundet. Tal med en allieret kvartermester, eller brug den ved et allieret knudepunkt.',
+  'hudChrome.factionRewards.hearthstoneBound': 'Din allierede hjemsten er nu bundet til {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Hjemstenen fører dig til {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Genstanden er ikke klar endnu ({minutes} min tilbage).',
 };

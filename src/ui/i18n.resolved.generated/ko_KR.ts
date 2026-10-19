@@ -446,8 +446,8 @@ export const ko_KR: EnTranslations = {
         "worldMany": "전역 퀘스트 {count}개 완료",
         "pvpOne": "평점전 {count}승",
         "pvpMany": "평점전 {count}승",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "PvP {count}승",
+        "pvpWinMany": "PvP {count}승"
       },
       "requiredTask": {
         "raidOne": "공격대 우두머리 {count}명을 처치하세요",
@@ -458,8 +458,8 @@ export const ko_KR: EnTranslations = {
         "worldMany": "전역 퀘스트를 {count}개 완료하세요",
         "pvpOne": "평점전에서 {count}승을 거두세요",
         "pvpMany": "평점전에서 {count}승을 거두세요",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "PvP {count}승 달성",
+        "pvpWinMany": "PvP {count}승 달성"
       },
       "readyWeeks": "받지 않은 주: {count}. 완료된 가장 오래된 주부터 받으세요.",
       "claimLastWeek": "지난주 보상 받기",
@@ -641,7 +641,7 @@ export const ko_KR: EnTranslations = {
       "healerConfirmCancel": "취소"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "그래픽 복원 중"
     },
     "wiki": {
       "confirmTitle": "위키를 열까요?",
@@ -2816,7 +2816,7 @@ export const ko_KR: EnTranslations = {
         "worldKill": "월드 처치",
         "worldAssist": "월드 처치 도움",
         "hillHold": "언덕 점거",
-        "worldQuest": "world quest"
+        "worldQuest": "전역 퀘스트"
       },
       "floatReasons": {
         "kill": "처치",
@@ -2880,8 +2880,8 @@ export const ko_KR: EnTranslations = {
       "countsHolding": "안쪽 인원: 나 {yours}, 상대 {theirs}",
       "contestYou": "언덕을 점령하는 중: {total} 중 {seconds}",
       "contestOther": "언덕을 빼앗기는 중: {total} 중 {seconds}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "진행 일시 정지: {seconds}/{total}",
+      "contestOtherPaused": "상대 진행 일시 정지: {seconds}/{total}",
       "contestNone": "{total} 동안 다수를 유지하면 점령할 수 있습니다",
       "inside": "원 안에 있습니다",
       "distance": "원까지 {yards}야드",
@@ -2899,10 +2899,10 @@ export const ko_KR: EnTranslations = {
       "unrecorded": "전리품 해골",
       "store": "소지한 해골 보관 ({count})",
       "storeNone": "보관할 해골 없음",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
+      "takeOne": "1개 꺼내기",
+      "takeAll": "모두 꺼내기",
+      "takeOneAria": "1개 꺼내기: {item}",
+      "takeAllAria": "모두 꺼내기: {item}",
       "tooltip": "가방 공간을 쓰지 않고 전리품 해골을 원하는 만큼 보관합니다. 가방에 있으면 주운 해골이 바로 들어갑니다. 가방에서 클릭하면 해골을 보관하거나 꺼낼 수 있습니다."
     },
     "warfareShop": {
@@ -2910,7 +2910,7 @@ export const ko_KR: EnTranslations = {
       "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
       "jewelry": "장신구",
       "weapons": "무기",
-      "goods": "Goods",
+      "goods": "상품",
       "groupSeason2": "워페어 시즌 2: 선봉대",
       "groupEntry": "워페어 시즌 1",
       "owned": "보유 중",
@@ -4439,8 +4439,8 @@ export const ko_KR: EnTranslations = {
       "apply": "단축키 변환",
       "converted": "단축키를 {from}에서 {to}(으)로 변환했습니다.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
+        "qwertyUs": "QWERTY(미국)",
+        "qwertyUk": "QWERTY(영국)",
         "qwertzDe": "QWERTZ (독일어)",
         "qwertzCh": "QWERTZ (스위스)",
         "azertyFr": "AZERTY (프랑스어)",
@@ -5457,12 +5457,16 @@ export const ko_KR: EnTranslations = {
       "enchant_weapon_piston_drive": "양손 무기에 힘 12와 치명타 등급 25를 영구적으로 새깁니다. 한손 무기에는 적용할 수 없습니다. 고정 보너스이며 다른 능력치에 따라 변하지 않습니다."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "동맹 귀환석이 조율되지 않았습니다. 동맹 병참장교와 대화하거나 동맹 거점에서 사용하세요.",
+      "hearthstoneBound": "동맹 귀환석이 {hub}(으)로 조율되었습니다.",
+      "hearthstoneTransport": "귀환석이 당신을 {hub}(으)로 이동시킵니다.",
+      "itemCooldown": "아직 사용할 수 없는 아이템입니다({minutes}분 남음).",
       "alliedHearthstoneUse": "사용: 조율된 진영 거점으로 순간이동합니다. (시전 10초, 재사용 대기시간 15분)",
       "alliedHearthstoneAttuned": "조율된 곳: {hub}",
       "hub_none": "없음 (진영 거점 근처에서 사용하여 조율)",
       "hub_rift_watch": "드리프트헤이븐 (균열 감시단)",
       "hub_church_order": "이스트브룩 골짜기 (교회 수도회)",
-      "hub_automatons": "사우스 리치 (오토마톤 주조소)",
+      "hub_automatons": "와이름 감시탑 (오토마톤)",
       "riftGliderUse": "사용: 글라이더를 펼쳐 30초 동안 낙하 속도를 늦춥니다. 착지하거나 피해를 입으면 효과가 취소됩니다. (재사용 대기시간 2분)",
       "targetDummyUse": "사용: 전투 기술 연습을 위해 필드에 기계 훈련용 허수아비를 2분 동안 배치합니다. (재사용 대기시간 5분)",
       "battleStandardUse": "사용: 신성한 여명의 전투 깃발을 5분 동안 세워 주위 모든 아군의 비전투 생명력 및 마나 회복을 크게 높입니다. 10초 동안 그 근처에 머무르면 여명의 축복(모든 능력치 +5%, 30분)도 얻습니다. (재사용 대기시간 5분)",
@@ -5826,8 +5830,8 @@ export const ko_KR: EnTranslations = {
     "pattern": {
       "teaches": "사용: {item} 제작법을 배웁니다.",
       "teachesEnchant": "사용 효과: {enchant} 부여 방법을 배웁니다.",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}: {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "귀속 해제: {name}",
@@ -12412,6 +12416,8 @@ export const ko_KR: EnTranslations = {
       "clueTalkAria": "단서에 대해 묻는다: {name}",
       "clueDeliver": "{item} {count}개를 건넨다.",
       "clueDeliverAria": "{item} {count}개를 건넨다: {name}",
+      "attuneHearthstone": "동맹 귀환석을 이곳에 조율합니다.",
+      "attuneHearthstoneAria": "{name}에게서 동맹 귀환석을 {hub}(으)로 조율",
       "profIntroHint": "{name}에게 \"{quest}\"을(를) 받으세요.",
       "nythraxisDeathlessKingWarning": "세 유물은 같은 이야기를 전합니다. 알드렌은 왕을 지키기 위해 싸웠고, 말릭은 죽음의 경계를 깨뜨렸으며, 보스는 그 뒤에 일어난 일을 막으려 했습니다. 봉인은 약해지고 있고, 버려진 묘실이 아래로 향하는 길입니다.",
       "browseGoods": "물건을 보여 주세요.",

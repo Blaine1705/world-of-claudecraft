@@ -47,7 +47,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.alliedHearthstoneUse': 'Về Nhà Vùng Lửa Đồng Minh',
   'hudChrome.factionRewards.armorKitUse': 'Sử Dụng Bộ Giáp',
   'hudChrome.factionRewards.battleStandardUse': 'Giương Cờ Chiến Đấu',
-  'hudChrome.factionRewards.hub_automatons': 'Nam Cảnh (Xưởng Đúc Tự Động)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Tự Động)',
   'hudChrome.factionRewards.hub_church_order': 'Thung Lũng Đông Khê (Dòng Nhà Thờ)',
   'hudChrome.factionRewards.hub_none': 'Không có (Dùng gần trung tâm phe để liên kết)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (Kỳ Canh Vết Nứt)',
@@ -16002,7 +16002,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt của bạn 6 giây, tối đa {duration} giây mỗi lần. Khi Triều Nguyệt đầy, Nguyệt Chủng trở thành Nguyệt Trào.',
   'entities.abilities.overbloom.name': 'Mãn Khai',
   'entities.abilities.overbloom.description':
-    'Tiêu 3 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Sporemending mới lên mục tiêu.',
+    'Tiêu 3 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Chữa Lành Bào Tử mới lên mục tiêu.',
   'entities.abilities.redharvest.name': 'Thu Hoạch Đỏ',
   'entities.abilities.redharvest.description':
     'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn.',
@@ -16016,7 +16016,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Huyết Cổ {stacks}/{max}. Đòn trúng từ Vuốt Xé, Lóc Xé, Vết Nứt Máu, Cắn Xé Máu, Vuốt Quét Ngang và Nghiền Xương mỗi lần cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin',
   'hudChrome.auraEffect.verdance':
-    'Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Sporemending, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai',
+    'Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai',
   'hudChrome.continentMap.levels': 'Cấp {min} đến {max}',
   'hudChrome.continentMap.summary': 'Bản đồ thế giới. Chọn một vùng để mở bản đồ của vùng đó.',
   'hudChrome.continentMap.title': 'Bản Đồ Thế Giới',
@@ -16557,7 +16557,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Mỗi đòn mở màn bạn dùng từ Màn Chạng Vạng thêm 1 U Ám (tối đa 3).',
   'entities.abilities.swiftmend.description':
-    'Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Mỗi lần thi triển Sporemending, Nở Hoa Lần Hai và Hàn Gắn Hoang Dã thêm 1 Sắc Xanh; ở 3 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)',
+    'Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai và Hàn Gắn Hoang Dã thêm 1 Sắc Xanh; ở 3 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)',
   'entities.abilities.swipe.description':
     'Quét vuốt qua kẻ địch gần đó gây {damage} sát thương. Gây thêm thù hận. Chỉ dùng được ở Hình Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
@@ -19868,4 +19868,190 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Kéo để đổi kích thước thanh bên bản đồ. Nhấp đúp để đặt lại.',
   'guide.worldPvpPage.hillBodyFlat':
     'Cứ mỗi ba giờ, vào một thời điểm không thể đoán trước, toàn cõi được thông báo rằng một ngọn đồi sẽ xuất hiện tại một vùng tự do giao chiến sau mười lăm phút, và vòng tròn của nó được đánh dấu trên đất trống. Đồi tồn tại bốn mươi lăm phút rồi biến mất. Trong thời gian đó, cứ năm phút lại thông báo vị trí và các nhóm có tổng thời gian chiếm giữ lâu nhất. Nhóm có nhiều người chơi đứng trong vòng tròn nhất tranh giành đồi và chiếm được sau tổng cộng ba mươi giây hơn quân số. Nhóm đối thủ bước vào chỉ tạm dừng bộ đếm cho đến khi nhóm bạn lại dẫn đầu; bộ đếm chỉ bắt đầu lại nếu không còn thành viên nào của nhóm bạn sống trong vòng tròn. Người chơi đơn lẻ được tính là nhóm một người và giữ nguyên quyền kiểm soát đồi khi lập nhóm, nhưng thành viên tổ đội đột kích hoàn toàn không được tính. Mỗi thành viên của nhóm đang giữ đồi đứng trong vòng tròn nhận cùng một lượng Danh Dự mỗi phút, bất kể đã giữ đồi bao lâu. Một nhóm đủ người giữ đồi không bị tranh chấp suốt thời gian tồn tại nhận xấp xỉ ba trận thắng chiến trường. Khi đồi biến mất, nếu nhóm có tổng thời gian giữ lâu nhất đã giữ ít nhất mười phút, mọi người đã đứng trong vòng tròn ít nhất một phút trong thời gian nhóm đó giữ đồi và vẫn thuộc nhóm đó đều nhận một trận thắng cho hàng PvP của Kho Tuần. Thanh phía trên bãi đấu hiển thị bên đang giữ, quân số hai bên và bộ đếm chiếm giữ; nhập /hill trong trò chuyện để biết vị trí.',
+  'errors.noUpdateFound': 'Không tìm thấy bản cập nhật. Hãy thử lại sau ít phút.',
+  'errors.searchUpdates': 'Tìm bản cập nhật',
+  'errors.updateSearchFailed': 'Không thể kiểm tra bản cập nhật. Vui lòng thử lại.',
+  'errors.updateUnavailable': 'Cập nhật qua cửa hàng trò chơi hoặc tải bản ứng dụng mới nhất.',
+  'hudChrome.auraEffect.formSporemender':
+    'Hình Thể Chữa Lành Bào Tử: tăng {pct}% lượng hồi máu, tăng {armorPct}% giáp và giảm {slowPct}% tốc độ di chuyển',
+  'hudChrome.bags.reorderLocked':
+    'Vật phẩm bị khóa giữ nguyên ô trong túi. Mở khóa để di chuyển chúng.',
+  'hudChrome.death.pvpResurrect': 'Hồi sinh PvP',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Hồi sinh PvP đã sẵn sàng: bạn sẽ sống lại tại nghĩa địa gần nhất.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Sống lại tại nghĩa địa gần nhất với đầy máu, không nhận thêm Gánh Nặng Người Giữ.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Hồi sinh PvP ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Bạn có thể hồi sinh PvP sau {seconds}: bạn sẽ sống lại tại nghĩa địa gần nhất.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Đã hủy đổi độ khó đang chờ vì nhóm hoặc trưởng nhóm thay đổi.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Đổi độ khó được xếp hàng vì vẫn còn người hoặc thi thể bên trong. Sẽ áp dụng khi các phụ bản trống.',
+  'hudChrome.ferry.arrivesIn': 'Phà đến sau {time}',
+  'hudChrome.ferry.boardNow': 'Lên phà ngay',
+  'hudChrome.ferry.destination': 'Điểm đến: {dest}',
+  'hudChrome.ferry.portLabel': 'Phà từ {port} đến {dest}',
+  'hudChrome.ferry.portTitle': 'Bến phà {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Không có lịch phà.',
+  'hudChrome.graphicsRestore.note': 'Đang khôi phục đồ họa',
+  'hudChrome.hill.contestOtherPaused': 'Đối thủ tạm dừng: {seconds}/{total}',
+  'hudChrome.hill.contestYouPaused': 'Tạm dừng: {seconds}/{total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Lấy từ {name}',
+  'hudChrome.keybindLayout.apply': 'Chuyển đổi phím tắt',
+  'hudChrome.keybindLayout.converted': 'Đã chuyển phím tắt từ {from} sang {to}.',
+  'hudChrome.keybindLayout.from': 'Phím tắt dành cho',
+  'hudChrome.keybindLayout.help':
+    'Mỗi phím tắt chuyển sang phím gõ cùng ký tự trên bố cục mới. Hàng số giữ nguyên vị trí. Tên phím trong danh sách là vị trí QWERTY; sơ đồ bàn phím hiển thị bố cục của bạn.',
+  'hudChrome.keybindLayout.keepMovement': 'Giữ nguyên vị trí phím di chuyển',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Lần trước phím di chuyển đã được giữ nguyên nên lần này cũng vậy. Khôi phục mặc định để bắt đầu lại.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (Bỉ)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (Pháp)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Bố cục Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Bố cục Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (Brasil ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (Đan Mạch)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (Tây Ban Nha)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (Ý)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (Na Uy)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (Thụy Điển, Phần Lan)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (Bồ Đào Nha)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (Thổ Nhĩ Kỳ)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Vương quốc Anh)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Hoa Kỳ)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (Thụy Sĩ)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (Đức)',
+  'hudChrome.keybindLayout.moves': 'Số phím tắt sẽ di chuyển: {count}',
+  'hudChrome.keybindLayout.noChange': 'Không có phím tắt nào thay đổi giữa hai bố cục này.',
+  'hudChrome.keybindLayout.open': 'Chuyển đổi',
+  'hudChrome.keybindLayout.title': 'Bố cục bàn phím',
+  'hudChrome.keybindLayout.to': 'Chuyển sang',
+  'hudChrome.nameplate.bountyTag': 'Truy nã',
+  'hudChrome.options.classicCombatText': 'Chữ chiến đấu cổ điển',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Vật phẩm dưới phẩm chất này được bán bằng một lần nhấp. Có thể mua lại vật phẩm bán nhầm, trừ vật phẩm xám không có chữ ký.',
+  'hudChrome.options.spellEffects': 'Hiệu ứng phép',
+  'hudChrome.options.spellTooltipOnHover': 'Chú giải phép khi trỏ chuột',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Đã xóa thông điệp trong ngày.',
+  'hudChrome.realmMotd.line': 'Thông điệp trong ngày: {text}',
+  'hudChrome.realmMotd.none': 'Chưa đặt thông điệp trong ngày.',
+  'hudChrome.realmMotd.saveFailed':
+    'Không thể lưu thông điệp trong ngày; thông điệp sẽ mất khi khởi động lại.',
+  'hudChrome.realmMotd.tooLong': 'Thông điệp trong ngày có tối đa {max} ký tự.',
+  'hudChrome.realmMotd.updated': 'Đã cập nhật thông điệp trong ngày.',
+  'hudChrome.realmMotd.usage': 'Cách dùng: /motd "<thông điệp>" để đặt, /motd clear để xóa.',
+  'hudChrome.skullBag.clickOpen': 'Nhấp để mở',
+  'hudChrome.skullBag.close': 'Đóng Túi Đầu Lâu',
+  'hudChrome.skullBag.empty': 'Trống. Khi bạn mang túi, đầu lâu nhặt được sẽ vào thẳng trong túi.',
+  'hudChrome.skullBag.notCarried': 'Mang Túi Đầu Lâu trong hành trang để cất hoặc lấy đầu lâu.',
+  'hudChrome.skullBag.store': 'Cất đầu lâu đang mang ({count})',
+  'hudChrome.skullBag.storeNone': 'Không có đầu lâu để cất',
+  'hudChrome.skullBag.takeAll': 'Lấy tất cả',
+  'hudChrome.skullBag.takeAllAria': 'Lấy tất cả: {item}',
+  'hudChrome.skullBag.takeOne': 'Lấy 1',
+  'hudChrome.skullBag.takeOneAria': 'Lấy 1: {item}',
+  'hudChrome.skullBag.title': 'Túi Đầu Lâu',
+  'hudChrome.skullBag.tooltip':
+    'Chứa không giới hạn Đầu Lâu Chiến Lợi Phẩm mà không tốn ô túi. Khi nằm trong hành trang, đầu lâu nhặt được sẽ vào thẳng túi này. Nhấp vào túi để cất hoặc lấy đầu lâu.',
+  'hudChrome.skullBag.total': 'Đầu lâu: {count}',
+  'hudChrome.skullBag.unrecorded': 'Đầu Lâu Chiến Lợi Phẩm',
+  'hudChrome.treasureMap.inkPickerCancel': 'Hủy',
+  'hudChrome.treasureMap.inkPickerCost': 'Vẽ lại thành {rarity}: {inks} mực',
+  'hudChrome.treasureMap.inkPickerHeld': 'Bạn có {held} Mực Người Vẽ Bản Đồ.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Đang lần theo: dấu X nằm tại {zone}. Dấu X giữ nguyên vị trí.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Dùng Mực Người Vẽ Bản Đồ lên bản đồ nào?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Chưa đọc (đang có {count})',
+  'hudChrome.warfare.reasons.worldQuest': 'nhiệm vụ thế giới',
+  'hudChrome.warfareShop.goods': 'Hàng hóa',
+  'hudChrome.weeklyRewards.allClassGear': 'Trang bị mọi lớp',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} trận thắng PvP',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} trận thắng PvP',
+  'hudChrome.weeklyRewards.lootFocus': 'Ưu tiên chiến lợi phẩm',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Chỉ áp dụng cho rương chưa mở.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    'Không có chiến lợi phẩm phù hợp. Hãy chọn ưu tiên khác.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Giành {count} trận thắng PvP',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Giành {count} trận thắng PvP',
+  'hudChrome.weeklyRewards.rolledFocus': 'Đã quay cho: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong thánh địa)',
+  'hudChrome.worldPvp.rewardPausedDead': 'Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng khi chết)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong phụ bản PvE)',
+  'hudChrome.worldPvp.rewardProgress': 'Chuỗi PvP hiện tại: đã chơi {time}',
+  'hudChrome.worldPvp.rewardTitles':
+    'Nhận danh hiệu vĩnh viễn sau {thresholds} thời gian chơi với PvP Thế Giới bật trong thế giới mở hoặc phụ bản PvP. Đăng xuất, chết, phụ bản PvE và thánh địa tạm dừng bộ đếm. Tắt PvP sẽ đặt lại bộ đếm.',
+  'hudChrome.worldPvp.skullName': 'Đầu lâu của {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Khi cả hai cùng bật cờ, vàng từ đòn kết liễu rơi trên thi thể cùng đầu lâu của người thua.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Vật phẩm xám không có chữ ký không vào danh sách mua lại, nên không thể hoàn tác việc bán.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Túi của bạn đã đầy. Phần thưởng được gửi đến hộp thư: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Phép của bạn có thể kích hoạt Ân Huệ Tự Nhiên trong 10 giây: phép được chỉ định trở nên miễn phí, mạnh hơn 25% và dùng được ở mọi hình thể. Kích hoạt mới làm mới thời gian hiệu lực.',
+  'entities.abilities.natures_boon.name': 'Ân Huệ Tự Nhiên',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Mỗi lần dùng Tia Hoang Dã hoặc Thiên Giáng có 10% cơ hội kích hoạt cho Bùng Nổ Bào Tử, tối đa một lần mỗi 10 giây.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Mỗi đòn đánh thường cận chiến trúng đích có 1/15 cơ hội kích hoạt cho Chữa Lành Bào Tử, hoặc cho Da Sồi khi ở Hình Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Mỗi nhịp hồi máu theo thời gian của bạn có 10% cơ hội kích hoạt cho Bùng Nổ Bào Tử, tối đa một lần mỗi 10 giây.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Tiêu hao 5 Sắc Xanh: mỗi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn được hồi ngay {buff}% lượng hồi máu còn lại, các hiệu ứng bị xóa và mục tiêu nhận Chữa Lành Bào Tử mới.',
+  'entities.abilities.play_dead.description':
+    'Ngã xuống đất giả chết: máu và Tập Trung của bạn hiển thị trống với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang chọn bạn sẽ mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc. Dùng lại để đứng dậy.',
+  'entities.abilities.play_dead.name': 'Giả Chết',
+  'entities.abilities.rejuvenation.name': 'Chữa Lành Bào Tử',
+  'entities.abilities.scratch.description':
+    'Cào qua các mục tiêu gần trong 6 mét, gây sát thương vũ khí cộng {damage}. Nhận 1 điểm liên kích cho mỗi mục tiêu trúng đòn. Làm lộ kẻ địch tàng hình trong vùng quét. Chỉ dùng ở Hình Mèo.',
+  'entities.abilities.scratch.name': 'Cào',
+  'entities.abilities.scratch.specNote_feral': 'Mỗi đòn trúng thêm 1 Huyết Cổ (tối đa 3).',
+  'entities.abilities.spore_burst.description':
+    'Triệu hồi nấm bùng nổ tại vùng mục tiêu. Sau {duration} giây, nấm nổ, hồi {healing} máu cho đồng minh và gây {damage} sát thương Thiên Nhiên lên địch trong 8 mét.',
+  'entities.abilities.spore_burst.name': 'Bùng Nổ Bào Tử',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Khi có 3 Triều Nguyệt, mạnh hơn 25% và tiêu hao Triều Nguyệt.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Cũng áp dụng Chữa Lành Bào Tử cho mỗi đồng minh được hồi máu. Khi Sắc Xanh đầy, mạnh hơn 25% và tiêu hao Sắc Xanh.',
+  'entities.abilities.sporemender_form.description':
+    'Biến thành Thể Chữa Lành Bào Tử, tăng 20% lượng hồi máu và 40% giáp nhưng giảm 20% tốc độ di chuyển. Mọi phép ở hình thể niệm phép vẫn dùng được. Kéo dài đến khi đổi hình thể. Đổi sang bất kỳ hình thể nào cũng cho Sải bước, tăng tốc trong chốc lát. Dùng lại để về hình thể niệm phép. (Đặc trưng của Phục Hồi)',
+  'entities.abilities.sporemender_form.name': 'Hình Thể Chữa Lành Bào Tử',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Tiêu hao một hiệu ứng hồi máu theo thời gian trên đồng minh để hồi {damage} máu. Áp dụng Chữa Lành Bào Tử và Nở Hoa Lần Hai tăng Sắc Xanh; khi có 5 Sắc Xanh, nút này thành Mãn Khai, lập tức hồi cho mọi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn 60% lượng hồi máu còn lại. (Đặc trưng của Phục Hồi)',
+  'entities.abilities.tactical_camo.description':
+    'Hòa vào môi trường: kẻ địch gần như không nhận thấy bạn, và bạn di chuyển với 80% tốc độ. Tấn công hoặc nhận sát thương phá Ngụy Trang Chiến Thuật. Dùng lại để thoát ra. (Sinh Tồn)',
+  'entities.abilities.tactical_camo.name': 'Ngụy Trang Chiến Thuật',
+  'entities.itemSets.grovespring.bonus2':
+    'Hồi Phục Nhanh ưu tiên tiêu hao Chữa Lành Bào Tử hoặc Nở Hoa Lần Hai của bạn và hồi thêm 25 phần trăm. Sát thương nhận vào không còn làm chậm việc niệm phép.',
+  'entities.items.pvp_skull_bag.name': 'Túi Đầu Lâu',
+  'entities.items.pvp_trophy_skull.name': 'Đầu Lâu Chiến Lợi Phẩm',
+  'entities.letters.world_quest_reward.body':
+    'Túi đã đầy khi bạn nhận phần thưởng nhiệm vụ thế giới này, nên đàn quạ mang nó đến đây. Dọn chỗ và nhận phần thưởng tại bất kỳ trụ quạ nào.\n\n- Bưu Điện Quạ',
+  'entities.letters.world_quest_reward.sender': 'Bưu Điện Quạ',
+  'entities.letters.world_quest_reward.subject': 'Phần thưởng nhiệm vụ thế giới của bạn',
+  'guide.classPage.formLine.form_sporemender':
+    'Hình thể chữa lành của Phục Hồi: da bền hơn, hồi máu mạnh hơn và bước đi chậm hơn, vẫn giữ mọi phép cùng năng lượng.',
+  'guide.classPage.formName.form_sporemender': 'Hình Thể Chữa Lành Bào Tử',
+  'guide.economy.junkBodyFinal':
+    'Chiến lợi phẩm không cần đến vẫn có thể bán cho thương nhân có cửa hàng riêng, nên hãy dọn túi mỗi lần qua thành phố. Cửa sổ thương nhân có nút Bán Đồ Rác để bán mọi vật phẩm phẩm chất Kém bằng một lần nhấp. Bạn cũng có thể vứt đồ vô giá trị để lấy chỗ. Vật phẩm xám không có chữ ký bán theo cách này không vào danh sách mua lại, nên hãy kiểm tra xem có món nào muốn giữ trước khi nhấn.',
+  'guide.models.formSporemender': 'Hình Thể Chữa Lành Bào Tử',
+  'guide.settingsPage.ifClassicCombatText':
+    'Khôi phục các số sát thương trắng và vàng nhạt đơn giản bay thẳng lên. Để tắt (mặc định) nếu muốn số nổi bật hơn tỏa sang hai bên, lóe sáng khi chí mạng hoặc gây sát thương rất lớn.',
+  'guide.settingsPage.rowSpellEffects':
+    'Ánh sáng, tia lửa, đạn phép và vụ nổ khi chạm mục tiêu từ phép của người chơi và thú cưng, kể cả của bạn. Tắt để màn hình dịu hơn hoặc tăng vài khung hình trong trận chiến nhóm lớn. Mọi phép của địch vẫn hiển thị, cùng các vòng cảnh báo vùng nguy hiểm, dấu trên mục tiêu bị choáng, sợ hãi hoặc trói chân và mọi thanh niệm phép.',
+  'questUi.dialog.attuneHearthstone': 'Liên kết Đá Hồi Hương Đồng Minh của tôi tại đây.',
+  'questUi.dialog.attuneHearthstoneAria': 'Liên kết Đá Hồi Hương Đồng Minh với {hub} qua {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Đá Hồi Hương Đồng Minh của bạn chưa được liên kết. Hãy nói chuyện với quân nhu đồng minh hoặc dùng đá tại trung tâm đồng minh.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Đá Hồi Hương Đồng Minh của bạn đã liên kết với {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Đá hồi hương đưa bạn đến {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Vật phẩm chưa sẵn sàng (còn {minutes} phút).',
 };

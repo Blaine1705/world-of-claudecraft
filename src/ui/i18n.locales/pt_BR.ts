@@ -62,7 +62,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Usar: Reforça sua armadura de peito, aumentando Armadura em 12 por 1 hora.',
   'hudChrome.factionRewards.battleStandardUse':
     'Usar: Planta o Estandarte de Batalha da Alvorada Consagrada por 5 minutos, aumentando significativamente a regeneração de vida e mana fora de combate para todos os aliados próximos. Permanecer perto dele por 10 segundos também concede Bênção da Alvorada (+5% para todas as estatísticas por 30 min). (5 min de recarga)',
-  'hudChrome.factionRewards.hub_automatons': 'South Reach (A Fundição Autômata)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Autômatos)',
   'hudChrome.factionRewards.hub_church_order': 'Vale de Eastbrook (A Ordem da Igreja)',
   'hudChrome.factionRewards.hub_none': 'Nenhum (Use perto de um centro de facção para sintonizar)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (A Vigília das Fissuras)',
@@ -16366,7 +16366,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até {duration} s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar.',
   'entities.abilities.overbloom.name': 'Superflorescência',
   'entities.abilities.overbloom.description':
-    'Consome 3 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Sporemending novo no alvo.',
+    'Consome 3 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Cura de Esporos novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
     'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura {rage} de energia. Funciona sem pontos de combo.',
@@ -16981,7 +16981,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
     'O destaque da coleção congelada e a primeira peça que todo colecionador procura. Presa de Gelo foi entalhada, não forjada, de uma presa da geleira que coroa Thornpeak acima de Highwatch; seu núcleo ciano arde frio como a luz sobre Glimmermere. Ela congela o próprio ar que corta. Os guardas da muralha juram que um soldado a carregou na noite em que as neves altas seguraram os Juramentados da Ninhada e “compraram um inverno para a muralha”.',
   'hudChrome.auraEffect.verdance':
-    'Verdor {stacks}/{max}. Cada Sporemending, Segundo Florescer ou Cura Selvagem que você lançar adiciona 1, e cada ponto encurta o lançamento de Cura Selvagem. Com {max}, Recuperação Rápida vira Superflorescência',
+    'Verdor {stacks}/{max}. Cada Cura de Esporos, Segundo Florescer ou Cura Selvagem que você lançar adiciona 1, e cada ponto encurta o lançamento de Cura Selvagem. Com {max}, Recuperação Rápida vira Superflorescência',
   'hudChrome.continentMap.levels': 'Níveis {min} a {max}',
   'hudChrome.continentMap.summary': 'Mapa do mundo. Escolha uma zona para abrir seu mapa.',
   'hudChrome.continentMap.title': 'Mapa do Mundo',
@@ -17301,7 +17301,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Cada abertura usada a partir de Duskveil adiciona 1 Gloam (máx. 3).',
   'entities.abilities.swiftmend.description':
-    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Cada lançamento de Sporemending, Segundo Florescer e Cura Selvagem adiciona 1 de Verdor; com 3 de Verdor, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Coração do Bosque)',
+    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Cada lançamento de Cura de Esporos, Segundo Florescer e Cura Selvagem adiciona 1 de Verdor; com 3 de Verdor, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Restauração)',
   'entities.abilities.swipe.description':
     'Varre com suas garras os inimigos próximos causando {damage} de dano. Causa ameaça extra. Apenas Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
@@ -19169,13 +19169,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Pingentes de gelo',
 
   'entities.abilities.grove_awakening.description':
-    'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Coração do Bosque)',
+    'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Restauração)',
   'entities.abilities.grove_awakening.name': 'Despertar do Bosque',
   'entities.abilities.prayer_of_returning.description':
     'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Sagrado e Disciplina)',
   'entities.abilities.prayer_of_returning.name': 'Prece do Retorno',
   'entities.abilities.wildwake.description':
-    'Induz um aliado caído a um florescer repentino, trazendo-o de volta à vida ao seu lado com 35% de vida e mana, mesmo em pleno combate. (Coração do Bosque)',
+    'Induz um aliado caído a um florescer repentino, trazendo-o de volta à vida ao seu lado com 35% de vida e mana, mesmo em pleno combate. (Restauração)',
   'entities.abilities.wildwake.name': 'Despertar Selvagem',
   'devCommand.actions.farmgrow.description':
     'Avança seus canteiros plantados até a hora de ficarem prontos, ou avança um canteiro pelo id. Nada mais muda: o resultado foi definido quando você plantou.',
@@ -20050,4 +20050,195 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Arraste para redimensionar a barra lateral do mapa. Clique duas vezes para redefinir.',
   'guide.worldPvpPage.hillBodyFlat':
     'Uma vez a cada três horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas de combate livre em quinze minutos, e seu círculo é marcado em terreno aberto. Ela permanece por quarenta e cinco minutos e depois desaparece. Enquanto isso, a cada cinco minutos são anunciados sua localização e os grupos com os maiores tempos totais de controle. O grupo com mais jogadores dentro do círculo disputa a colina e a captura após acumular trinta segundos de superioridade numérica. A entrada de um grupo rival apenas pausa a contagem até o seu voltar à liderança; ela só recomeça do zero se não restar nenhum integrante vivo do seu grupo dentro do círculo. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raide não contam. Cada membro do grupo que controla a colina e está dentro recebe a mesma quantidade de Honra por minuto, independentemente do tempo de controle. Um grupo completo que a mantenha sem oposição durante toda a sua existência ganha aproximadamente o mesmo que por três vitórias em campos de batalha. Quando ela desaparece, se o grupo com o maior tempo total de controle acumulou pelo menos dez minutos, todos que ficaram dentro por pelo menos um minuto durante o controle desse grupo e ainda fazem parte dele recebem uma vitória para a linha de PvP do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, a quantidade de jogadores dos dois lados e a contagem de captura; /hill no chat informa onde ela está.',
+  'errors.noUpdateFound': 'Nenhuma atualização encontrada. Tente novamente em breve.',
+  'errors.searchUpdates': 'Buscar atualizações',
+  'errors.updateSearchFailed': 'Não foi possível verificar as atualizações. Tente novamente.',
+  'errors.updateUnavailable': 'Atualize pela sua loja de jogos ou baixe o cliente mais recente.',
+  'hudChrome.auraEffect.formSporemender':
+    'Forma de Curandeiro de Esporos: cura aumentada em {pct}%, armadura aumentada em {armorPct}% e velocidade de movimento reduzida em {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Itens bloqueados ficam no mesmo espaço da bolsa. Desbloqueie para movê-los.',
+  'hudChrome.death.pvpResurrect': 'Ressurreição JxJ',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Ressurreição JxJ pronta: você reviverá no cemitério mais próximo.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Reviva no cemitério mais próximo com a vida cheia, sem um novo Tributo do Guardião.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Ressurreição JxJ ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Você poderá ressuscitar em JxJ em {seconds}: reviverá no cemitério mais próximo.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Mudança de dificuldade pendente cancelada porque o grupo ou o líder mudou.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Mudança de dificuldade na fila porque alguém ou seu cadáver ainda está lá dentro. Será aplicada quando as instâncias estiverem vazias.',
+  'hudChrome.ferry.arrivesIn': 'A balsa chega em {time}',
+  'hudChrome.ferry.boardNow': 'Embarcar agora',
+  'hudChrome.ferry.destination': 'Destino: {dest}',
+  'hudChrome.ferry.portLabel': 'Balsa de {port} para {dest}',
+  'hudChrome.ferry.portTitle': 'Porto de balsas de {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Horários da balsa indisponíveis.',
+  'hudChrome.graphicsRestore.note': 'Restaurando gráficos',
+  'hudChrome.hill.contestOtherPaused': 'Rival em pausa: {seconds} de {total}',
+  'hudChrome.hill.contestYouPaused': 'Em pausa: {seconds} de {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Obtido de {name}',
+  'hudChrome.keybindLayout.apply': 'Converter atalhos',
+  'hudChrome.keybindLayout.converted': 'Atalhos convertidos de {from} para {to}.',
+  'hudChrome.keybindLayout.from': 'Atalhos feitos para',
+  'hudChrome.keybindLayout.help':
+    'Cada atalho vai para a tecla que escreve o mesmo caractere no novo layout. A fileira de números fica no lugar. Os nomes nesta lista são posições QWERTY; o esquema do teclado mostra seu próprio layout.',
+  'hudChrome.keybindLayout.keepMovement': 'Manter teclas de movimento no lugar',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'As teclas de movimento ficaram no lugar da última vez e ficarão novamente. Restaure os padrões para recomeçar.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belga)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (francês)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Layout Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Layout Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brasileiro ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (dinamarquês)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (espanhol)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italiano)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norueguês)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (sueco, finlandês)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (português)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turco)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Reino Unido)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Estados Unidos)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (suíço)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (alemão)',
+  'hudChrome.keybindLayout.moves': 'Atalhos que mudarão de lugar: {count}',
+  'hudChrome.keybindLayout.noChange': 'Nenhum atalho muda entre estes layouts.',
+  'hudChrome.keybindLayout.open': 'Converter',
+  'hudChrome.keybindLayout.title': 'Layout do teclado',
+  'hudChrome.keybindLayout.to': 'Converter para',
+  'hudChrome.nameplate.bountyTag': 'Recompensa pela cabeça',
+  'hudChrome.options.classicCombatText': 'Texto de combate clássico',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Itens abaixo desta qualidade são vendidos com um clique. Você pode recomprar um item vendido por engano, exceto itens cinzentos sem assinatura.',
+  'hudChrome.options.spellEffects': 'Efeitos de feitiços',
+  'hudChrome.options.spellTooltipOnHover': 'Descrições de feitiços ao passar o cursor',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Mensagem do dia removida.',
+  'hudChrome.realmMotd.line': 'Mensagem do dia: {text}',
+  'hudChrome.realmMotd.none': 'Nenhuma mensagem do dia definida.',
+  'hudChrome.realmMotd.saveFailed':
+    'Não foi possível salvar a mensagem do dia; ela será perdida ao reiniciar.',
+  'hudChrome.realmMotd.tooLong': 'A mensagem do dia é limitada a {max} caracteres.',
+  'hudChrome.realmMotd.updated': 'Mensagem do dia atualizada.',
+  'hudChrome.realmMotd.usage': 'Uso: /motd "<mensagem>" para definir, /motd clear para remover.',
+  'hudChrome.skullBag.clickOpen': 'Clique para abrir',
+  'hudChrome.skullBag.close': 'Fechar a Bolsa de Crânios',
+  'hudChrome.skullBag.empty':
+    'Vazia. Enquanto você carregar a bolsa, os crânios saqueados vão direto para ela.',
+  'hudChrome.skullBag.notCarried':
+    'Carregue a Bolsa de Crânios no inventário para guardar ou retirar crânios.',
+  'hudChrome.skullBag.store': 'Guardar crânios carregados ({count})',
+  'hudChrome.skullBag.storeNone': 'Nenhum crânio para guardar',
+  'hudChrome.skullBag.takeAll': 'Retirar todos',
+  'hudChrome.skullBag.takeAllAria': 'Retirar todos: {item}',
+  'hudChrome.skullBag.takeOne': 'Retirar 1',
+  'hudChrome.skullBag.takeOneAria': 'Retirar 1: {item}',
+  'hudChrome.skullBag.title': 'Bolsa de Crânios',
+  'hudChrome.skullBag.tooltip':
+    'Guarda qualquer quantidade de Crânios de Troféu sem ocupar espaço nas bolsas. Enquanto estiver no inventário, os crânios saqueados vão direto para ela. Clique na bolsa para guardar ou retirar crânios.',
+  'hudChrome.skullBag.total': 'Crânios: {count}',
+  'hudChrome.skullBag.unrecorded': 'Crânio de Troféu',
+  'hudChrome.treasureMap.inkPickerCancel': 'Cancelar',
+  'hudChrome.treasureMap.inkPickerCost': 'Redesenhar para {rarity}: {inks} de tinta',
+  'hudChrome.treasureMap.inkPickerHeld': 'Você tem {held} de Tinta de Cartógrafo.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Em acompanhamento: o X fica em {zone}. O X não muda de lugar.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Em qual mapa usar a Tinta de Cartógrafo?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Não lido ({count} em posse)',
+  'hudChrome.warfare.reasons.worldQuest': 'missão mundial',
+  'hudChrome.warfareShop.goods': 'Mercadorias',
+  'hudChrome.weeklyRewards.allClassGear': 'Equipamento de todas as classes',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} vitórias JxJ',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} vitória JxJ',
+  'hudChrome.weeklyRewards.lootFocus': 'Foco de saque',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Aplica-se apenas a cofres ainda não abertos.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Nenhum saque elegível. Escolha outro foco.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Obtenha {count} vitórias JxJ',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Obtenha {count} vitória JxJ',
+  'hudChrome.weeklyRewards.rolledFocus': 'Sorteado para: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Sequência JxJ atual: {time} jogados (em pausa em um santuário)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Sequência JxJ atual: {time} jogados (em pausa enquanto morto)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Sequência JxJ atual: {time} jogados (em pausa em instâncias JxA)',
+  'hudChrome.worldPvp.rewardProgress': 'Sequência JxJ atual: {time} jogados',
+  'hudChrome.worldPvp.rewardTitles':
+    'Ganhe títulos permanentes após {thresholds} de jogo com JxJ mundial ativo no mundo aberto ou em instâncias JxJ. Sair, morrer, instâncias JxA e santuários pausam o contador. Desativar reinicia o contador.',
+  'hudChrome.worldPvp.skullName': 'Crânio de {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Se ambos estiverem marcados, o ouro do golpe fatal cai no corpo junto com o crânio do perdedor.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Itens cinzentos sem assinatura não entram na lista de recompra, portanto a venda não pode ser desfeita.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Suas bolsas estão cheias. Sua recompensa foi enviada à caixa de correio: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Seus feitiços podem ativar Dádiva da Natureza por 10 s: o feitiço indicado fica gratuito, 25% mais forte e utilizável em qualquer forma. Uma nova ativação renova a duração.',
+  'entities.abilities.natures_boon.name': 'Dádiva da Natureza',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Cada Raio Selvagem ou Queda Celeste lançado tem 10% de chance de ativá-la para Explosão de Esporos, no máximo uma vez a cada 10 s.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Cada ataque automático corpo a corpo que acerta tem 1 chance em 15 de ativá-la para Cura de Esporos, ou para Pele de Carvalho na Forma de Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Cada pulso dos seus efeitos de cura ao longo do tempo tem 10% de chance de ativá-la para Explosão de Esporos, no máximo uma vez a cada 10 s.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Consome seus 5 de Verdor: cada aliado com seus efeitos de cura ao longo do tempo recebe instantaneamente {buff}% da cura restante, os efeitos são removidos e o alvo recebe uma nova Cura de Esporos.',
+  'entities.abilities.play_dead.description':
+    'Caia no chão e finja estar morto: sua vida e seu Foco aparecem vazios para todos. Inimigos esquecem você e jogadores inimigos que miram em você perdem o alvo. Mover-se, atacar ou usar outra habilidade encerra o efeito. Use de novo para levantar.',
+  'entities.abilities.play_dead.name': 'Fingir de morto',
+  'entities.abilities.rejuvenation.name': 'Cura de Esporos',
+  'entities.abilities.scratch.description':
+    'Arranha os alvos próximos em até 6 m, causando dano da arma mais {damage}. Concede 1 ponto de combo por alvo atingido. Revela inimigos furtivos na varredura. Apenas na Forma Felina.',
+  'entities.abilities.scratch.name': 'Arranhão',
+  'entities.abilities.scratch.specNote_feral': 'Cada acerto adiciona 1 Sangue Antigo (máximo 3).',
+  'entities.abilities.spore_burst.description':
+    'Invoca um cogumelo explosivo na área alvo. Após {duration} s ele explode, curando aliados em {healing} e causando {damage} de dano de Natureza aos inimigos em até 8 m.',
+  'entities.abilities.spore_burst.name': 'Explosão de Esporos',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Com 3 de Maré Lunar, fica 25% mais forte e consome sua Maré Lunar.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Também aplica Cura de Esporos a cada aliado curado. Com Verdor cheio, fica 25% mais forte e consome seu Verdor.',
+  'entities.abilities.sporemender_form.description':
+    'Transforme-se em um Curandeiro de Esporos, aumentando sua cura em 20% e armadura em 40%, mas reduzindo a velocidade de movimento em 20%. Todos os feitiços da forma de conjurador continuam disponíveis. Dura até você mudar de forma. Toda transformação concede Passo ligeiro, um breve aumento de velocidade. Use de novo para voltar à forma de conjurador. (Assinatura de Restauração)',
+  'entities.abilities.sporemender_form.name': 'Forma de Curandeiro de Esporos',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Consome um efeito de cura ao longo do tempo em um aliado para curá-lo em {damage}. Aplicações de Cura de Esporos e Segundo Florescer adicionam Verdor; com 5 de Verdor este botão vira Superflorescência, que cura instantaneamente cada aliado com seus efeitos de cura ao longo do tempo em 60% da cura restante. (Assinatura de Restauração)',
+  'entities.abilities.tactical_camo.description':
+    'Misture-se ao ambiente: inimigos mal percebem você, e sua velocidade é de 80%. Atacar ou receber dano rompe Camuflagem Tática. Use de novo para sair. (Sobrevivência)',
+  'entities.abilities.tactical_camo.name': 'Camuflagem Tática',
+  'entities.itemSets.grovespring.bonus2':
+    'Recuperação Rápida consome primeiro sua própria Cura de Esporos ou Segundo Florescer e cura 25 por cento a mais. O dano recebido não atrasa mais seus feitiços.',
+  'entities.items.pvp_skull_bag.name': 'Bolsa de Crânios',
+  'entities.items.pvp_trophy_skull.name': 'Crânio de Troféu',
+  'entities.letters.world_quest_reward.body':
+    'Suas bolsas estavam cheias quando você ganhou esta recompensa de missão mundial, então os corvos a trouxeram aqui. Abra espaço e retire-a em qualquer pilar dos corvos.\n\n- O Correio dos Corvos',
+  'entities.letters.world_quest_reward.sender': 'O Correio dos Corvos',
+  'entities.letters.world_quest_reward.subject': 'Sua recompensa de missão mundial',
+  'guide.classPage.formLine.form_sporemender':
+    'A forma curativa de Restauração: pele mais resistente e cura mais forte com passos mais lentos, mantendo todos os feitiços e seu mana.',
+  'guide.classPage.formName.form_sporemender': 'Forma de Curandeiro de Esporos',
+  'guide.economy.junkBodyFinal':
+    'Os itens que você não usa ainda podem ser vendidos a qualquer mercador com loja própria. Esvazie as bolsas sempre que passar pela cidade. A janela do mercador tem até um botão Vender Sucata que vende todos os objetos de qualidade Ruim com um clique. Você também pode descartar itens sem valor para abrir espaço. Itens cinzentos sem assinatura vendidos assim não entram na lista de recompra; confira se queria guardar algo antes de clicar.',
+  'guide.models.formSporemender': 'Forma de Curandeiro de Esporos',
+  'guide.settingsPage.ifClassicCombatText':
+    'Traz de volta os números de dano simples, brancos e dourados claros, que sobem em linha reta. Deixe desativado (padrão) para números mais fortes que se abrem para os lados, com brilhos nos acertos críticos ou excepcionalmente grandes.',
+  'guide.settingsPage.rowSpellEffects':
+    'O brilho, as faíscas, os projéteis e as explosões de impacto dos feitiços de jogadores e seus ajudantes, incluindo os seus. Desative para uma tela mais calma ou alguns quadros extras nas grandes lutas em grupo. Tudo que um inimigo conjura continua visível, assim como os círculos de perigo, as marcas sobre alvos atordoados, amedrontados ou enraizados e todas as barras de conjuração.',
+  'questUi.dialog.attuneHearthstone': 'Sintonizar minha Pedra de Regresso Aliada aqui.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Sintonize sua Pedra de Regresso Aliada com {hub} por meio de {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Sua Pedra de Regresso Aliada não está sintonizada. Fale com um intendente aliado ou use-a em um centro aliado.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Sua Pedra de Regresso Aliada agora está sintonizada com {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport':
+    'A pedra de regresso transporta você para {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    'Esse item ainda não está pronto (faltam {minutes} min).',
 };

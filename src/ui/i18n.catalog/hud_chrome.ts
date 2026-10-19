@@ -7785,13 +7785,18 @@ export const hudChromeStrings = {
       'Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale.',
   },
   factionRewards: {
+    hearthstoneUnattuned:
+      'Your Allied Hearthstone is not attuned. Speak with an allied quartermaster or use it in an allied hub.',
+    hearthstoneBound: 'Your Allied Hearthstone is now attuned to {hub}.',
+    hearthstoneTransport: 'The hearthstone transports you to {hub}.',
+    itemCooldown: 'That item is not ready yet ({minutes} min remaining).',
     alliedHearthstoneUse:
       'Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)',
     alliedHearthstoneAttuned: 'Attuned to: {hub}',
     hub_none: 'None (Use near a faction hub to attune)',
     hub_rift_watch: 'Drifthaven (The Rift Watch)',
     hub_church_order: 'Eastbrook Vale (The Church Order)',
-    hub_automatons: 'South Reach (The Automaton Foundry)',
+    hub_automatons: 'Wyrmwatch (The Automatons)',
     riftGliderUse:
       'Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)',
     targetDummyUse:

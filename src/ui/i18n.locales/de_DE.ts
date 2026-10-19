@@ -62,7 +62,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Einsatz: Verstärkt deine Brustplatte und erhöht Rüstung um 12 für 1 Stunde.',
   'hudChrome.factionRewards.battleStandardUse':
     'Einsatz: Pflanzt die Morgenröte-Kriegsflagge für 5 Minuten, erhöht die Gesundheits- und Manaregeneration außerhalb des Kampfes erheblich für alle nahen Verbündeten. Das Verweilen in ihrer Nähe für 10 Sekunden gewährt auch Segen der Morgenröte (+5% auf alle Attribute für 30 Min.). (5 Min. Abklingzeit)',
-  'hudChrome.factionRewards.hub_automatons': 'South Reach (Die Automatenschmiede)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automaten)',
   'hudChrome.factionRewards.hub_church_order': 'Eastbrook-Tal (Der Kirchenorden)',
   'hudChrome.factionRewards.hub_none':
     'Keine (Nutze es in der Nähe eines Fraktionshubs um es anzustimmen)',
@@ -15039,17 +15039,17 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Bestie entfesseln',
   'entities.abilities.wildheart.name': 'Wildherz',
   'entities.abilities.bloodhook.description':
-    'Stürmt auf einen Gegner zu und wendet die Bluthakenwunde an, die über 12 Sek. in 4 Ticks 34 physischen Grundschaden plus 26% Eurer Distanzangriffskraft verursacht. (Feldkunst-Signatur)',
+    'Stürmt auf einen Gegner zu und wendet die Bluthakenwunde an, die über 12 Sek. in 4 Ticks 34 physischen Grundschaden plus 26% Eurer Distanzangriffskraft verursacht. (Überleben-Signatur)',
   'entities.abilities.bloodtrail_assault.description':
     '12 Sek. lang verbreitet der Bluthaken eine Wunde mit 60% Stärke auf bis zu 2 nahe Gegner, Wundriss befiehlt einen Begleiterangriff mit 18 Schaden, und die Splitterladung gewinnt 2 Meter, verursacht 25% mehr Grundschaden an ihrem Hauptziel und löst 50% mehr Wundschaden aus.',
   'entities.abilities.cold_focus.description':
     '12 Sek. lang stellt der Bedachte Schuss 50% mehr Fokus wieder her, und der Lange Zug kostet 25% weniger und wird 30% schneller gewirkt. (Kaltsicht-Signatur)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Passiv: Pfadbruch erneuert den Jagdschwung und bereitet 12 Sek. lang Euren nächsten Weidschlag oder Bluthaken vor. Der Weidschlag verursacht pro Stapel 15% mehr Schaden. Der Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% pro Stapel und durch Eure Distanzangriffskraft. Bei 3 Stapeln verbraucht einer der beiden Angriffe den Jagdschwung. (Feldkunst)',
+    'Passiv: Pfadbruch erneuert den Jagdschwung und bereitet 12 Sek. lang Euren nächsten Weidschlag oder Bluthaken vor. Der Weidschlag verursacht pro Stapel 15% mehr Schaden. Der Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% pro Stapel und durch Eure Distanzangriffskraft. Bei 3 Stapeln verbraucht einer der beiden Angriffe den Jagdschwung. (Überleben)',
   'entities.abilities.frostjaw_trap.description':
     'Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
   'entities.abilities.hunting_momentum.description':
-    'Passiv: Der Weidschlag gewährt 8 Sek. lang 1 Jagdschwung, bis zu 3. Bei 3 Stapeln verursacht Wundriss 45% mehr Schlagschaden und verbraucht die Stapel. (Feldkunst)',
+    'Passiv: Der Weidschlag gewährt 8 Sek. lang 1 Jagdschwung, bis zu 3. Bei 3 Stapeln verursacht Wundriss 45% mehr Schlagschaden und verbraucht die Stapel. (Überleben)',
   'entities.abilities.measured_shot.description':
     'Beschießt das Ziel für {damage} physischen Schaden. Ein Treffer stellt 20 Fokus wieder her. Der Schaden steigt mit der Distanzangriffskraft.',
   'entities.abilities.pack_command.description':
@@ -15174,7 +15174,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu {duration} Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge.',
   'entities.abilities.overbloom.name': 'Überblüte',
   'entities.abilities.overbloom.description':
-    'Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Sporemending auf das Ziel.',
+    'Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Sporenheilung auf das Ziel.',
   'entities.abilities.redharvest.name': 'Rote Ernte',
   'entities.abilities.redharvest.description':
     'Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und {rage} Energie wiederherstellt. Funktioniert auch ohne Combopunkte.',
@@ -15188,7 +15188,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer',
   'hudChrome.auraEffect.verdance':
-    'Grünkraft: Stufe {stacks} von {max}. Jede Sporemending, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.',
+    'Grünkraft: Stufe {stacks} von {max}. Jede Sporenheilung, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.',
   'abilityUi.cast.rift_arcane_execution': 'Leerenriss',
   'abilityUi.cast.rift_arcane_strike': 'Arkane Auslöschung',
   'abilityUi.cast.rift_brute_execution': 'Erdspalter',
@@ -16958,7 +16958,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Jede Eröffnung, die Ihr aus Duskveil einsetzt, fügt 1 Dämmer hinzu (max. 3).',
   'entities.abilities.swiftmend.description':
-    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Jeder Zauber von Sporemending, Zweite Blüte und Wildheilung fügt 1 Grünkraft hinzu; bei 3 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Hainherz-Signatur)',
+    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Jeder Zauber von Sporenheilung, Zweite Blüte und Wildheilung fügt 1 Grünkraft hinzu; bei 3 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Signatur der Wiederherstellung)',
   'entities.abilities.swipe.description':
     'Fegt mit Euren Klauen durch nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin-Gestalt.',
   'entities.abilities.swipe.specNote_feral':
@@ -20225,4 +20225,199 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ziehen, um die Karten-Seitenleiste zu vergrößern oder zu verkleinern. Doppelklick setzt zurück.',
   'guide.worldPvpPage.hillBodyFlat':
     'Alle drei Stunden wird dem gesamten Reich zu einem unvorhersehbaren Zeitpunkt angekündigt, dass in fünfzehn Minuten in einem Gebiet mit freiem Kampf ein Hügel erscheint. Sein Kreis wird auf offenem Boden markiert. Er bleibt fünfundvierzig Minuten bestehen und verschwindet dann. Währenddessen werden alle fünf Minuten sein Standort und die Gruppen mit den längsten gesamten Haltezeiten bekannt gegeben. Die Gruppe mit den meisten Spielern im Kreis bestreitet den Hügel und erobert ihn nach insgesamt dreißig Sekunden zahlenmäßiger Überlegenheit. Eine gegnerische Gruppe pausiert den Zähler nur, bis eure Gruppe wieder führt; er beginnt erst von vorn, wenn kein lebendes Mitglied eurer Gruppe im Kreis bleibt. Einzelspieler zählen als Gruppe aus einer Person und behalten ihren Hügel, wenn sie eine Gruppe bilden. Schlachtzugsmitglieder zählen überhaupt nicht. Jedes Mitglied der haltenden Gruppe, das im Kreis steht, erhält jede Minute gleich viel Ehre, unabhängig von der bisherigen Haltezeit. Eine volle Gruppe, die den Hügel seine ganze Dauer ungestört hält, erhält ungefähr so viel Ehre wie für drei Schlachtfeldsiege. Wenn der Hügel verschwindet und die Gruppe mit der längsten gesamten Haltezeit mindestens zehn Minuten gehalten hat, erhält jeder Spieler einen Sieg für die PvP-Reihe des Wöchentlichen Tresors, der während ihrer Haltezeit mindestens eine Minute im Kreis stand und noch zu dieser Gruppe gehört. Ein Balken über dem Feld zeigt den Besitzer, eure und ihre Spielerzahl sowie den Eroberungszähler; /hill im Chat nennt den Standort.',
+  'errors.noUpdateFound': 'Keine Aktualisierung gefunden. Versuche es in Kürze erneut.',
+  'errors.searchUpdates': 'Nach Aktualisierungen suchen',
+  'errors.updateSearchFailed':
+    'Aktualisierungen konnten nicht geprüft werden. Bitte versuche es erneut.',
+  'errors.updateUnavailable':
+    'Aktualisiere über deinen Spieleladen oder lade den neuesten Client herunter.',
+  'hudChrome.auraEffect.formSporemender':
+    'Sporenheilerform: Heilung um {pct}% und Rüstung um {armorPct}% erhöht, Bewegungstempo um {slowPct}% verringert',
+  'hudChrome.bags.reorderLocked':
+    'Gesperrte Gegenstände bleiben auf ihrem Taschenplatz. Entsperre sie zum Verschieben.',
+  'hudChrome.death.pvpResurrect': 'PvP-Wiederbelebung',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'PvP-Wiederbelebung bereit: Du wirst am nächsten Friedhof wiederbelebt.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Am nächsten Friedhof mit voller Gesundheit und ohne neue Bürde des Hüters wiederbeleben.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP-Wiederbelebung ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'PvP-Wiederbelebung in {seconds}: Du wirst am nächsten Friedhof wiederbelebt.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Vorgemerkter Schwierigkeitswechsel abgebrochen, da sich Gruppe oder Gruppenleitung geändert hat.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Schwierigkeitswechsel vorgemerkt, da noch jemand oder dessen Leiche darin ist. Er wird angewendet, sobald die Instanzen leer sind.',
+  'hudChrome.ferry.arrivesIn': 'Fähre kommt in {time}',
+  'hudChrome.ferry.boardNow': 'Jetzt einsteigen',
+  'hudChrome.ferry.destination': 'Ziel: {dest}',
+  'hudChrome.ferry.portLabel': 'Fähre von {port} nach {dest}',
+  'hudChrome.ferry.portTitle': 'Fährhafen {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Fährfahrplan nicht verfügbar.',
+  'hudChrome.graphicsRestore.note': 'Grafik wird wiederhergestellt',
+  'hudChrome.hill.contestOtherPaused': 'Gegner pausiert: {seconds} von {total}',
+  'hudChrome.hill.contestYouPaused': 'Pausiert: {seconds} von {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Erbeutet von {name}',
+  'hudChrome.keybindLayout.apply': 'Tastenkürzel umwandeln',
+  'hudChrome.keybindLayout.converted': 'Tastenkürzel von {from} nach {to} umgewandelt.',
+  'hudChrome.keybindLayout.from': 'Tastenkürzel erstellt für',
+  'hudChrome.keybindLayout.help':
+    'Jedes Tastenkürzel wandert auf die Taste, die im neuen Layout dasselbe Zeichen schreibt. Die Zahlenreihe bleibt an ihrem Platz. Tastennamen in dieser Liste bezeichnen QWERTY-Positionen; die Tastaturübersicht zeigt dein eigenes Layout.',
+  'hudChrome.keybindLayout.keepMovement': 'Bewegungstasten an ihrem Platz lassen',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Die Bewegungstasten blieben letztes Mal an ihrem Platz und bleiben es erneut. Setze auf Standardwerte zurück, um neu zu beginnen.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (Belgisch)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (Französisch)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Colemak-Belegung',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Dvorak-Belegung',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (Brasilianisch, ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (Dänisch)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (Spanisch)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (Italienisch)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (Norwegisch)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (Schwedisch, Finnisch)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (Portugiesisch)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (Türkisch)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Großbritannien)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (USA)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (Schweiz)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (Deutsch)',
+  'hudChrome.keybindLayout.moves': 'Tastenkürzel, die verschoben werden: {count}',
+  'hudChrome.keybindLayout.noChange': 'Zwischen diesen Layouts ändern sich keine Tastenkürzel.',
+  'hudChrome.keybindLayout.open': 'Umwandeln',
+  'hudChrome.keybindLayout.title': 'Tastaturbelegung',
+  'hudChrome.keybindLayout.to': 'Umwandeln nach',
+  'hudChrome.nameplate.bountyTag': 'Kopfgeld',
+  'hudChrome.options.classicCombatText': 'Klassischer Kampftext',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Gegenstände unter dieser Qualität werden mit einem Klick verkauft. Versehentlich verkaufte Gegenstände können zurückgekauft werden, ausgenommen unsignierte graue Gegenstände.',
+  'hudChrome.options.spellEffects': 'Zaubereffekte',
+  'hudChrome.options.spellTooltipOnHover': 'Zaubertooltip beim Darüberfahren',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Nachricht des Tages gelöscht.',
+  'hudChrome.realmMotd.line': 'Nachricht des Tages: {text}',
+  'hudChrome.realmMotd.none': 'Keine Nachricht des Tages festgelegt.',
+  'hudChrome.realmMotd.saveFailed':
+    'Die Nachricht des Tages konnte nicht gespeichert werden und geht beim Neustart verloren.',
+  'hudChrome.realmMotd.tooLong': 'Die Nachricht des Tages ist auf {max} Zeichen begrenzt.',
+  'hudChrome.realmMotd.updated': 'Nachricht des Tages aktualisiert.',
+  'hudChrome.realmMotd.usage':
+    'Verwendung: /motd "<Nachricht>" zum Festlegen, /motd clear zum Löschen.',
+  'hudChrome.skullBag.clickOpen': 'Zum Öffnen klicken',
+  'hudChrome.skullBag.close': 'Schädeltasche schließen',
+  'hudChrome.skullBag.empty':
+    'Leer. Solange du die Tasche trägst, landen erbeutete Schädel direkt darin.',
+  'hudChrome.skullBag.notCarried':
+    'Trage die Schädeltasche im Inventar, um Schädel einzulagern oder zu entnehmen.',
+  'hudChrome.skullBag.store': 'Mitgeführte Schädel einlagern ({count})',
+  'hudChrome.skullBag.storeNone': 'Keine Schädel zum Einlagern',
+  'hudChrome.skullBag.takeAll': 'Alle entnehmen',
+  'hudChrome.skullBag.takeAllAria': 'Alle entnehmen: {item}',
+  'hudChrome.skullBag.takeOne': '1 entnehmen',
+  'hudChrome.skullBag.takeOneAria': '1 entnehmen: {item}',
+  'hudChrome.skullBag.title': 'Schädeltasche',
+  'hudChrome.skullBag.tooltip':
+    'Fasst beliebig viele Trophäenschädel ohne Taschenplätze zu belegen. Solange sie in deinem Inventar liegt, landen erbeutete Schädel direkt darin. Klicke sie im Inventar an, um Schädel einzulagern oder zu entnehmen.',
+  'hudChrome.skullBag.total': 'Schädel: {count}',
+  'hudChrome.skullBag.unrecorded': 'Trophäenschädel',
+  'hudChrome.treasureMap.inkPickerCancel': 'Abbrechen',
+  'hudChrome.treasureMap.inkPickerCost': 'Auf {rarity} neu zeichnen: {inks} Tinte',
+  'hudChrome.treasureMap.inkPickerHeld': 'Du hast {held} Kartografentinte.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Wird verfolgt: Das X liegt in {zone}. Das X bleibt an seinem Ort.',
+  'hudChrome.treasureMap.inkPickerTitle':
+    'Auf welche Karte soll Kartografentinte angewendet werden?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Ungelesen ({count} im Besitz)',
+  'hudChrome.warfare.reasons.worldQuest': 'Weltquest',
+  'hudChrome.warfareShop.goods': 'Waren',
+  'hudChrome.weeklyRewards.allClassGear': 'Ausrüstung aller Klassen',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} PvP-Siege',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} PvP-Sieg',
+  'hudChrome.weeklyRewards.lootFocus': 'Beutefokus',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Gilt nur für ungeöffnete Schatzkammern.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Keine geeignete Beute. Wähle einen anderen Fokus.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Erringe {count} PvP-Siege',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Erringe {count} PvP-Sieg',
+  'hudChrome.weeklyRewards.rolledFocus': 'Ausgewürfelt für: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Aktuelle PvP-Serie: {time} gespielt (in einem Heiligtum pausiert)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Aktuelle PvP-Serie: {time} gespielt (während des Todes pausiert)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Aktuelle PvP-Serie: {time} gespielt (in PvE-Instanzen pausiert)',
+  'hudChrome.worldPvp.rewardProgress': 'Aktuelle PvP-Serie: {time} gespielt',
+  'hudChrome.worldPvp.rewardTitles':
+    'Verdiene dauerhafte Titel nach {thresholds} Spielzeit mit aktiviertem Welt-PvP in der offenen Welt oder in PvP-Instanzen. Ausloggen, Tod, PvE-Instanzen und Heiligtümer pausieren den Zähler. Ausschalten setzt ihn zurück.',
+  'hudChrome.worldPvp.skullName': 'Schädel von {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Wenn ihr beide markiert seid, liegt das Gold des Todesstoßes zusammen mit dem Schädel des Verlierers auf der Leiche.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Unsignierte graue Gegenstände erscheinen nicht in der Rückkaufliste. Ihr Verkauf kann daher nicht rückgängig gemacht werden.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Deine Taschen sind voll. Deine Belohnung wurde an dein Postfach geschickt: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Deine Zauber können Segen der Natur für 10 Sek. aktivieren: Der angezeigte Zauber wird kostenlos, 25% stärker und in jeder Gestalt nutzbar. Ein neuer Auslöser erneuert die Dauer.',
+  'entities.abilities.natures_boon.name': 'Segen der Natur',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Jeder gewirkte Wildblitz oder Himmelssturz hat eine Chance von 10%, ihn für Sporenexplosion zu aktivieren, höchstens einmal alle 10 Sek.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Jeder gelandete automatische Nahkampfangriff hat eine Chance von 1 zu 15, ihn für Sporenheilung zu aktivieren, in Bruin-Gestalt für Eichenhaut.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Jeder Tick deiner Heilung-über-Zeit-Effekte hat eine Chance von 10%, ihn für Sporenexplosion zu aktivieren, höchstens einmal alle 10 Sek.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Verbraucht deine 5 Grünkraft: Jeder Verbündete mit deinen Heilung-über-Zeit-Effekten wird sofort um {buff}% ihrer verbleibenden Heilung geheilt, die Effekte werden entfernt und das Ziel erhält eine neue Sporenheilung.',
+  'entities.abilities.play_dead.description':
+    'Lass dich zu Boden fallen und stelle dich tot: Allen werden deine Gesundheit und dein Fokus als leer angezeigt. Gegner vergessen dich, und gegnerische Spieler verlieren dich als Ziel. Bewegung, Angriff oder eine andere Fähigkeit beendet dies. Erneut wirken, um aufzustehen.',
+  'entities.abilities.play_dead.name': 'Totstellen',
+  'entities.abilities.rejuvenation.name': 'Sporenheilung',
+  'entities.abilities.scratch.description':
+    'Kratze durch nahe Ziele innerhalb von 6 Metern und verursache Waffenschaden plus {damage}. Gewährt 1 Combopunkt pro getroffenem Ziel. Deckt schleichende Gegner im Bereich auf. Nur in Katzengestalt.',
+  'entities.abilities.scratch.name': 'Kratzen',
+  'entities.abilities.scratch.specNote_feral':
+    'Jeder gelandete Treffer fügt 1 Altes Blut hinzu (max. 3).',
+  'entities.abilities.spore_burst.description':
+    'Beschwört einen Sporenplatzer im Zielgebiet. Nach {duration} Sek. platzt er, heilt Verbündete um {healing} und fügt Gegnern innerhalb von 8 Metern {damage} Naturschaden zu.',
+  'entities.abilities.spore_burst.name': 'Sporenexplosion',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Bei 3 Mondflut ist sie 25% stärker und verbraucht deine Mondflut.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Belegt außerdem jeden geheilten Verbündeten mit Sporenheilung. Bei voller Grünkraft ist sie 25% stärker und verbraucht deine Grünkraft.',
+  'entities.abilities.sporemender_form.description':
+    'Verwandle dich in einen Sporenheiler: Heilung um 20% und Rüstung um 40% erhöht, Bewegungstempo um 20% verringert. Alle Zauber deiner Zaubergestalt bleiben nutzbar. Hält bis zum Gestaltwechsel. Jeder Gestaltwechsel gewährt für kurze Zeit erhöhtes Bewegungstempo durch Weiter Schritt. Erneut wirken, um zur Zaubergestalt zurückzukehren. (Signatur der Wiederherstellung)',
+  'entities.abilities.sporemender_form.name': 'Sporenheilerform',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem befreundeten Ziel, um es um {damage} zu heilen. Sporenheilung und Pflanzungen von Zweite Blüte gewähren Grünkraft; bei 5 Grünkraft wird diese Taste zu Überblüte, die sofort alle Verbündeten mit deinen Heilung-über-Zeit-Effekten um 60% ihrer verbleibenden Heilung heilt. (Signatur der Wiederherstellung)',
+  'entities.abilities.tactical_camo.description':
+    'Passe dich der Umgebung an: Gegner nehmen dich kaum wahr und du bewegst dich mit 80% Tempo. Angriffe oder erlittener Schaden beenden die taktische Tarnung. Erneut wirken, um hervorzutreten. (Überleben)',
+  'entities.abilities.tactical_camo.name': 'Taktische Tarnung',
+  'entities.itemSets.grovespring.bonus2':
+    'Rasche Heilung verbraucht zuerst deine eigene Sporenheilung oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zaubern nicht mehr.',
+  'entities.items.pvp_skull_bag.name': 'Schädeltasche',
+  'entities.items.pvp_trophy_skull.name': 'Trophäenschädel',
+  'entities.letters.world_quest_reward.body':
+    'Deine Taschen waren voll, als du diese Weltquestbelohnung verdient hast. Deshalb haben die Raben sie dir hierher gebracht. Schaffe Platz und hole sie an einer beliebigen Rabensäule ab.\n\n- Die Rabenpost',
+  'entities.letters.world_quest_reward.sender': 'Die Rabenpost',
+  'entities.letters.world_quest_reward.subject': 'Deine Weltquestbelohnung',
+  'guide.classPage.formLine.form_sporemender':
+    'Die Heilgestalt der Wiederherstellung: robustere Haut und stärkere Heilung bei langsamerem Gang, alle Zauber und dein Mana bleiben erhalten.',
+  'guide.classPage.formName.form_sporemender': 'Sporenheilerform',
+  'guide.economy.junkBodyFinal':
+    'Unbrauchbare Beute lässt sich weiterhin bei jedem Händler mit eigenem Laden verkaufen. Leere deine Taschen bei jedem Stadtbesuch. Das Händlerfenster bietet sogar eine Schaltfläche zum Verkauf sämtlichen Plunders schlechter Qualität mit einem Klick. Völlig wertlose Dinge kannst du auch wegwerfen, um Platz zu schaffen. Unsignierte graue Gegenstände gelangen dabei nicht in die Rückkaufliste. Prüfe also vor dem Verkauf, ob du etwas behalten wolltest.',
+  'guide.models.formSporemender': 'Sporenheilerform',
+  'guide.settingsPage.ifClassicCombatText':
+    'Bringt die schlichten weißen und blassgoldenen Schadenszahlen zurück, die gerade nach oben steigen. Lasse es für kräftigere, seitlich auffächernde Zahlen ausgeschaltet (Standard); kritische und ungewöhnlich große Treffer leuchten auf.',
+  'guide.settingsPage.rowSpellEffects':
+    'Glühen, Funken, Geschosse und Einschläge der Zauber von Spielern und ihren Begleitern, deine eingeschlossen. Schalte sie für ein ruhigeres Bild oder ein paar zusätzliche Bilder pro Sekunde in großen Gruppenkämpfen aus. Gegnerische Zauber bleiben sichtbar, ebenso Gefahrenringe, Markierungen über betäubten, verängstigten oder bewegungsunfähigen Zielen und sämtliche Zauberleisten.',
+  'questUi.dialog.attuneHearthstone': 'Meinen Herdstein des Bündnisses hier binden.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Binde deinen Herdstein des Bündnisses bei {name} an {hub}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Dein Herdstein des Bündnisses ist nicht gebunden. Sprich mit einem verbündeten Quartiermeister oder benutze ihn an einem verbündeten Knotenpunkt.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Dein Herdstein des Bündnisses ist nun an {hub} gebunden.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Der Herdstein bringt dich nach {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    'Dieser Gegenstand ist noch nicht bereit ({minutes} Min. verbleibend).',
 };

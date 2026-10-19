@@ -420,7 +420,7 @@ export const ja_JP: EnTranslations = {
       "viewPossibleLoot": "入手可能な戦利品を見る",
       "lootFocus": "戦利品の専門分野",
       "allClassGear": "クラスの全装備",
-      "specRole": "{name} ({role})",
+      "specRole": "{name}（{role}）",
       "mixedRole": "{first} / {second}",
       "lootFocusHelp": "未開封の宝庫にのみ適用されます。",
       "noFocusedLoot": "対象の戦利品がありません。他の専門分野を選んでください。",
@@ -446,8 +446,8 @@ export const ja_JP: EnTranslations = {
         "worldMany": "ワールドクエスト{count}件完了",
         "pvpOne": "レート戦{count}勝",
         "pvpMany": "レート戦{count}勝",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "PvPで{count}勝",
+        "pvpWinMany": "PvPで{count}勝"
       },
       "requiredTask": {
         "raidOne": "レイドボスを{count}体撃破する",
@@ -458,8 +458,8 @@ export const ja_JP: EnTranslations = {
         "worldMany": "ワールドクエストを{count}件完了する",
         "pvpOne": "レート戦で{count}勝する",
         "pvpMany": "レート戦で{count}勝する",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "PvPで{count}勝する",
+        "pvpWinMany": "PvPで{count}勝する"
       },
       "readyWeeks": "未受領の週：{count}。完了した最も古い週から受け取ってください。",
       "claimLastWeek": "先週の報酬を受け取る",
@@ -641,7 +641,7 @@ export const ja_JP: EnTranslations = {
       "healerConfirmCancel": "キャンセル"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "描画を復元中"
     },
     "wiki": {
       "confirmTitle": "Wikiを開きますか？",
@@ -2816,7 +2816,7 @@ export const ja_JP: EnTranslations = {
         "worldKill": "ワールドPvP撃破",
         "worldAssist": "ワールドPvP撃破のアシスト",
         "hillHold": "丘の保持",
-        "worldQuest": "world quest"
+        "worldQuest": "ワールドクエスト"
       },
       "floatReasons": {
         "kill": "撃破",
@@ -2880,8 +2880,8 @@ export const ja_JP: EnTranslations = {
       "countsHolding": "内部：自分 {yours}、対抗勢力 {theirs}",
       "contestYou": "丘を占拠中：{seconds} / {total}",
       "contestOther": "丘を失いつつあります：{seconds} / {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "進行停止：{seconds}/{total}",
+      "contestOtherPaused": "相手の進行停止：{seconds}/{total}",
       "contestNone": "{total}の間、内部で過半数を維持すると占拠できます",
       "inside": "あなたは円の内側にいます",
       "distance": "円まで{yards}ヤード",
@@ -2899,10 +2899,10 @@ export const ja_JP: EnTranslations = {
       "unrecorded": "戦利品の頭蓋",
       "store": "所持中の頭蓋を保管（{count}）",
       "storeNone": "保管する頭蓋がありません",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
+      "takeOne": "1個取り出す",
+      "takeAll": "すべて取り出す",
+      "takeOneAria": "1個取り出す：{item}",
+      "takeAllAria": "すべて取り出す：{item}",
       "tooltip": "バッグ枠を使わず任意の数の戦利品の頭蓋を保持します。バッグに入れている間、拾った頭蓋は直接ここに入ります。バッグ内でクリックすると保管または取り出せます。"
     },
     "warfareShop": {
@@ -2910,7 +2910,7 @@ export const ja_JP: EnTranslations = {
       "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
       "jewelry": "アクセサリー",
       "weapons": "武器",
-      "goods": "Goods",
+      "goods": "商品",
       "groupSeason2": "ウォーフェア シーズン2：ヴァンガード",
       "groupEntry": "ウォーフェア シーズン1",
       "owned": "所有済み",
@@ -4439,8 +4439,8 @@ export const ja_JP: EnTranslations = {
       "apply": "ホットキーを変換",
       "converted": "ホットキーを{from}から{to}へ変換しました。",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
+        "qwertyUs": "QWERTY（米国）",
+        "qwertyUk": "QWERTY（英国）",
         "qwertzDe": "QWERTZ（ドイツ語）",
         "qwertzCh": "QWERTZ（スイス）",
         "azertyFr": "AZERTY（フランス語）",
@@ -5457,12 +5457,16 @@ export const ja_JP: EnTranslations = {
       "enchant_weapon_piston_drive": "両手武器に筋力12とクリティカルレーティング25を永続的に銘刻する。片手武器には施せない。固定値のボーナスで、他の能力値によって増減しない。"
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "同盟のハースストーンが未設定です。同盟の補給官と話すか、同盟の拠点で使用してください。",
+      "hearthstoneBound": "同盟のハースストーンを{hub}に結び付けました。",
+      "hearthstoneTransport": "ハースストーンがあなたを{hub}に転送します。",
+      "itemCooldown": "そのアイテムはまだ使えません（残り{minutes}分）。",
       "alliedHearthstoneUse": "使用: 同調した勢力の拠点へテレポートします。（詠唱 10 秒、クールダウン 15 分）",
       "alliedHearthstoneAttuned": "同調先：{hub}",
       "hub_none": "なし（勢力の拠点の近くで使用すると同調します）",
       "hub_rift_watch": "ドリフトヘイヴン（リフトの見張り）",
       "hub_church_order": "イーストブルック渓谷（教会修道会）",
-      "hub_automatons": "サウスリーチ（オートマトン鋳造所）",
+      "hub_automatons": "ワームウォッチ（オートマトン）",
       "riftGliderUse": "使用: グライダーを広げ、30 秒間落下速度を下げます。着地するかダメージを受けると効果が解除されます。（クールダウン 2 分）",
       "targetDummyUse": "使用: 戦闘技能の練習用に、機械仕掛けの訓練人形をフィールドに 2 分間設置します。（クールダウン 5 分）",
       "battleStandardUse": "使用: 聖なる夜明けの軍旗を 5 分間設置し、周囲のすべての味方の非戦闘時の体力とマナの回復を大きく高めます。10 秒間その近くにとどまると、夜明けの祝福（全能力値 +5%、30 分）も得られます。（クールダウン 5 分）",
@@ -5826,8 +5830,8 @@ export const ja_JP: EnTranslations = {
     "pattern": {
       "teaches": "使用: {item}の作成法を習得します。",
       "teachesEnchant": "使用：{enchant}の付与方法を習得する。",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}：{list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "バインド解除：{name}",
@@ -12412,6 +12416,8 @@ export const ja_JP: EnTranslations = {
       "clueTalkAria": "手がかりについて尋ねる：{name}",
       "clueDeliver": "{item}を{count}個渡す。",
       "clueDeliverAria": "{name}に{item}を{count}個渡す",
+      "attuneHearthstone": "同盟のハースストーンをここに結び付ける。",
+      "attuneHearthstoneAria": "{name}のもとで同盟のハースストーンを{hub}に結び付ける",
       "profIntroHint": "{name}から「{quest}」を受けましょう。",
       "nythraxisDeathlessKingWarning": "三つの遺物は同じ物語を語っています。オルドレンは王を守るために戦い、マルリックは死の境界を破り、ヴォスはその後に起きたことを止めようとしました。封印は弱まり、廃棄された墓所こそ地下への道です。",
       "browseGoods": "品物を見せてください。",

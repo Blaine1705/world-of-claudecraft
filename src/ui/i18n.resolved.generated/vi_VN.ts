@@ -418,13 +418,13 @@ export const vi_VN: EnTranslations = {
       "heroicClears": "{count} Anh Hùng",
       "normalClears": "{count} Bình Thường",
       "viewPossibleLoot": "Xem chiếm đoạt có thể",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Ưu tiên chiến lợi phẩm",
+      "allClassGear": "Trang bị mọi lớp",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "Chỉ áp dụng cho rương chưa mở.",
+      "noFocusedLoot": "Không có chiến lợi phẩm phù hợp. Hãy chọn ưu tiên khác.",
+      "rolledFocus": "Đã quay cho: {focus}",
       "chooseTable": "Chọn bảng nào để tính",
       "selectAllTables": "Chọn tất cả",
       "selectedTables": "{count} bảng được chọn",
@@ -446,8 +446,8 @@ export const vi_VN: EnTranslations = {
         "worldMany": "{count} Nhiệm Vụ Thế Giới Đã Hoàn Thành",
         "pvpOne": "{count} Trận Đấu Xếp Hạng Đã Thắng",
         "pvpMany": "{count} Trận Đấu Xếp Hạng Đã Thắng",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} trận thắng PvP",
+        "pvpWinMany": "{count} trận thắng PvP"
       },
       "requiredTask": {
         "raidOne": "Xóa {count} Cuộc Gặp Raid",
@@ -458,8 +458,8 @@ export const vi_VN: EnTranslations = {
         "worldMany": "Hoàn Thành {count} Nhiệm Vụ Thế Giới",
         "pvpOne": "Thắng {count} Trận Đấu Xếp Hạng",
         "pvpMany": "Thắng {count} Trận Đấu Xếp Hạng",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Giành {count} trận thắng PvP",
+        "pvpWinMany": "Giành {count} trận thắng PvP"
       },
       "readyWeeks": "Những tuần chưa nhận: {count}. Nhận tuần hoàn thành cũ nhất trước.",
       "claimLastWeek": "Nhận phần thưởng tuần trước",
@@ -522,12 +522,12 @@ export const vi_VN: EnTranslations = {
       "castingOff": "Phà đến {dest} đang rời bến",
       "boardHint": "Đứng trên sàn của nó khi nó chuyển động. Chuyến vượt sông miễn phí.",
       "sailing": "Đang Buồn Đến {dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "Phà từ {port} đến {dest}",
+      "portTitle": "Bến phà {port}",
+      "destination": "Điểm đến: {dest}",
+      "boardNow": "Lên phà ngay",
+      "arrivesIn": "Phà đến sau {time}",
+      "scheduleUnavailable": "Không có lịch phà."
     },
     "materialStackSelectionUnavailable": "Lựa chọn nguyên liệu đó không còn khả dụng.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const vi_VN: EnTranslations = {
       "banner": "Đang xem {name}"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Thông điệp trong ngày: {text}",
+      "updated": "Đã cập nhật thông điệp trong ngày.",
+      "cleared": "Đã xóa thông điệp trong ngày.",
+      "none": "Chưa đặt thông điệp trong ngày.",
+      "usage": "Cách dùng: /motd \"<thông điệp>\" để đặt, /motd clear để xóa.",
+      "tooLong": "Thông điệp trong ngày có tối đa {max} ký tự.",
+      "saveFailed": "Không thể lưu thông điệp trong ngày; thông điệp sẽ mất khi khởi động lại."
     },
     "readyCheck": {
       "title": "Kiểm tra sẵn sàng",
@@ -619,11 +619,11 @@ export const vi_VN: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "Hồi sinh PvP",
+      "pvpResurrectTitle": "Sống lại tại nghĩa địa gần nhất với đầy máu, không nhận thêm Gánh Nặng Người Giữ.",
+      "pvpResurrectWaitButton": "Hồi sinh PvP ({seconds})",
+      "pvpResurrectWaitNote": "Bạn có thể hồi sinh PvP sau {seconds}: bạn sẽ sống lại tại nghĩa địa gần nhất.",
+      "pvpResurrectReadyNote": "Hồi sinh PvP đã sẵn sàng: bạn sẽ sống lại tại nghĩa địa gần nhất.",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
       "ghostHint": "Chạy đến nơi bạn chết hoặc nói chuyện với Người Giữ Xanh Xao để hồi sinh",
       "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống.",
@@ -641,7 +641,7 @@ export const vi_VN: EnTranslations = {
       "healerConfirmCancel": "Hủy bỏ"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Đang khôi phục đồ họa"
     },
     "wiki": {
       "confirmTitle": "Mở Wiki?",
@@ -2155,7 +2155,7 @@ export const vi_VN: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Chú giải phép khi trỏ chuột",
       "clickMoveLeft": "Nhấp Trái",
       "clickMoveRight": "Nhấp Phải",
       "version": "phiên bản {version} ({build})",
@@ -2269,7 +2269,7 @@ export const vi_VN: EnTranslations = {
       "confirmVendorSellNote": "Tắt tùy chọn này sẽ bán vật phẩm chỉ với một cú nhấp và không cần xác nhận, nên một ô túi bị xê dịch có thể khiến bạn bán nhầm vật phẩm.",
       "confirmVendorSellMinQuality": "Xác nhận bán hàng từ chất lượng",
       "confirmVendorSellMinQualityNote": "Các mặt hàng dưới chất lượng này được bán chỉ với một cú nhấp chuột; một mặt hàng bị bán sai vẫn có thể được mua lại từ nhà cung cấp.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Vật phẩm dưới phẩm chất này được bán bằng một lần nhấp. Có thể mua lại vật phẩm bán nhầm, trừ vật phẩm xám không có chữ ký.",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
@@ -2290,9 +2290,9 @@ export const vi_VN: EnTranslations = {
       "showUtilityModes": "Bao gồm chế độ tàng hình và di chuyển",
       "showFriendlyTrack": "Hiện buff của tôi trên đồng minh",
       "showShieldTrack": "Hiện khiên của tôi",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Chữ chiến đấu cổ điển",
       "waterRipples": "Gợn nước (sóng rẽ nước)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Hiệu ứng phép",
       "actionCam": "Camera Hành Động",
       "actionCamShoulder": "Vai Camera Hành Động",
       "actionCamShoulderLeft": "Trái {pct}",
@@ -2816,7 +2816,7 @@ export const vi_VN: EnTranslations = {
         "worldKill": "tiêu diệt thế giới",
         "worldAssist": "hỗ trợ tiêu diệt thế giới",
         "hillHold": "giữ đồi",
-        "worldQuest": "world quest"
+        "worldQuest": "nhiệm vụ thế giới"
       },
       "floatReasons": {
         "kill": "Hạ Gục",
@@ -2826,11 +2826,11 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Nhận danh hiệu vĩnh viễn sau {thresholds} thời gian chơi với PvP Thế Giới bật trong thế giới mở hoặc phụ bản PvP. Đăng xuất, chết, phụ bản PvE và thánh địa tạm dừng bộ đếm. Tắt PvP sẽ đặt lại bộ đếm.",
+      "rewardPaused": "Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong thánh địa)",
+      "rewardPausedDead": "Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng khi chết)",
+      "rewardPausedInstance": "Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong phụ bản PvE)",
+      "rewardProgress": "Chuỗi PvP hiện tại: đã chơi {time}",
       "tab": "World PvP",
       "title": "World PvP",
       "blurb": "Nâng cờ của bạn lên để chiến đấu với những người chơi khác có cờ ở bất kỳ nơi nào trên thế giới mở. Đánh bại một người và lấy một phần số tiền của họ, cộng với Danh Dự dành cho trang bị Chiến Tranh. Chiến Trường và Đấu Trường vẫn trả lương cao hơn.",
@@ -2849,8 +2849,8 @@ export const vi_VN: EnTranslations = {
       "markLine": "Tấn công một người chơi không có cờ ở đó sẽ nâng cao cờ của bạn; tấn công một người có cờ thì không.",
       "aidLine": "Chữa lành, che chắn hoặc buff một người chơi có cờ PvP trong trận chiến thế giới sẽ nâng cao cờ của bạn.",
       "stakeLine": "Người thua trả {cap} hoặc {percent}% số tiền của họ, cái nào ít hơn.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "Khi cả hai cùng bật cờ, vàng từ đòn kết liễu rơi trên thi thể cùng đầu lâu của người thua.",
+      "skullName": "Đầu lâu của {name}",
       "noStakeLine": "Một chiến binh không có cờ bị giết trên đất chiến đấu tự do sẽ mất không vàng.",
       "noTakeLine": "Một chiến binh không có cờ cũng không lấy vàng: nó chỉ chuyển động giữa hai người chơi có cờ.",
       "honorLine": "{honor} Danh Dự trên mỗi lần giết, chia sẻ cho mọi người đã giúp đỡ.",
@@ -2880,8 +2880,8 @@ export const vi_VN: EnTranslations = {
       "countsHolding": "Bên trong: bạn {yours}, đối thủ {theirs}",
       "contestYou": "Chiếm đồi: {seconds} trong {total}",
       "contestOther": "Mất đồi: {seconds} trong {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "Tạm dừng: {seconds}/{total}",
+      "contestOtherPaused": "Đối thủ tạm dừng: {seconds}/{total}",
       "contestNone": "Giữ đa số bên trong {total} để chiếm lấy nó",
       "inside": "Bạn ở trong vòng tròn",
       "distance": "{yards} thước đến vòng tròn",
@@ -2890,27 +2890,27 @@ export const vi_VN: EnTranslations = {
       "standingRaid": "Thành viên cuộc tấn công không tính, chỉ các nhóm mới có thể giữ đồi"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Túi Đầu Lâu",
+      "total": "Đầu lâu: {count}",
+      "close": "Đóng Túi Đầu Lâu",
+      "clickOpen": "Nhấp để mở",
+      "notCarried": "Mang Túi Đầu Lâu trong hành trang để cất hoặc lấy đầu lâu.",
+      "empty": "Trống. Khi bạn mang túi, đầu lâu nhặt được sẽ vào thẳng trong túi.",
+      "unrecorded": "Đầu Lâu Chiến Lợi Phẩm",
+      "store": "Cất đầu lâu đang mang ({count})",
+      "storeNone": "Không có đầu lâu để cất",
+      "takeOne": "Lấy 1",
+      "takeAll": "Lấy tất cả",
+      "takeOneAria": "Lấy 1: {item}",
+      "takeAllAria": "Lấy tất cả: {item}",
+      "tooltip": "Chứa không giới hạn Đầu Lâu Chiến Lợi Phẩm mà không tốn ô túi. Khi nằm trong hành trang, đầu lâu nhặt được sẽ vào thẳng túi này. Nhấp vào túi để cất hoặc lấy đầu lâu."
     },
     "warfareShop": {
       "gossipOption": "Duyệt Bộ Chiến Tranh",
       "gossipOptionAria": "Duyệt cửa hàng bộ Chiến Tranh do {name} cung cấp",
       "jewelry": "Trang Sức",
       "weapons": "Vũ Khí",
-      "goods": "Goods",
+      "goods": "Hàng hóa",
       "groupSeason2": "Mùa Giải Tranh Hùng 2: Đội Tiền Phong",
       "groupEntry": "Mùa Giải Tranh Hùng 1",
       "owned": "Sở Hữu",
@@ -2951,12 +2951,12 @@ export const vi_VN: EnTranslations = {
       "hint": "Gợi Ý",
       "upgradeNote": "Vẽ Lại Thành Bản Đồ {rarity} Cần {inks} Mực Của Nhà Địa Lý (Bạn Có {held}). Những Người Quản Lý Phái Bộ Bán Nó.",
       "upgradeMaxed": "Nâng Cấp Tối Đa",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Dùng Mực Người Vẽ Bản Đồ lên bản đồ nào?",
+      "inkPickerHeld": "Bạn có {held} Mực Người Vẽ Bản Đồ.",
+      "inkPickerRead": "Đang lần theo: dấu X nằm tại {zone}. Dấu X giữ nguyên vị trí.",
+      "inkPickerUnread": "Chưa đọc (đang có {count})",
+      "inkPickerCost": "Vẽ lại thành {rarity}: {inks} mực",
+      "inkPickerCancel": "Hủy",
       "rarity": {
         "common": "Phổ Biến",
         "rare": "Hiếm",
@@ -3673,8 +3673,8 @@ export const vi_VN: EnTranslations = {
       "resetDone": "Tất cả phụ bản đã được đặt lại.",
       "resetNone": "Bạn không có phụ bản nào để đặt lại.",
       "resetOccupied": "Bạn không thể đặt lại phụ bản khi vẫn còn người ở bên trong.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "Đổi độ khó được xếp hàng vì vẫn còn người hoặc thi thể bên trong. Sẽ áp dụng khi các phụ bản trống.",
+      "queuedCancelled": "Đã hủy đổi độ khó đang chờ vì nhóm hoặc trưởng nhóm thay đổi.",
       "resetSameDifficulty": "Hãy đổi độ khó hầm ngục trước khi đặt lại các phụ bản này. Phụ bản trống sẽ tự đặt lại sau 5 phút.",
       "resetLoot": "Bạn không thể đặt lại phụ bản khi vẫn còn chiến lợi phẩm bên trong.",
       "resetConfirmTitle": "Đặt Lại Tất Cả Phụ Bản?",
@@ -3691,7 +3691,7 @@ export const vi_VN: EnTranslations = {
       "dragEquipHint": "Kéo lên nhân vật để trang bị",
       "dragDestroyHint": "Kéo ra ngoài thế giới để hủy bỏ",
       "reorderNeedsRecent": "Xóa bộ lọc và sắp xếp theo Gần Đây để sắp xếp lại túi đồ",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Vật phẩm bị khóa giữ nguyên ô trong túi. Mở khóa để di chuyển chúng.",
       "itemAriaInstanced": "{item}, số lượng {count}, bản có dấu thợ",
       "itemAriaEnchanted": "{item}, số lượng {count}, bản đã pháp khắc",
       "itemAriaBound": "{item}, số lượng {count}, bản sao ràng buộc",
@@ -4077,7 +4077,7 @@ export const vi_VN: EnTranslations = {
       "duskEconomy": "Kỹ năng tốn ít hơn {pct}% năng lượng",
       "moontide": "Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó",
       "oldBlood": "Huyết Cổ {stacks}/{max}. Đòn trúng từ Vuốt Xé, Lóc Xé, Vết Nứt Máu, Cắn Xé Máu, Vuốt Quét Ngang và Nghiền Xương mỗi lần cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin",
-      "verdance": "Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Sporemending, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai",
+      "verdance": "Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai",
       "freeExecute": "Kỹ năng kết liễu hợp lệ tiếp theo của bạn không tốn gì",
       "resourceSap": "Hồi {value} tài nguyên hiện tại của bạn mỗi {interval} giây",
       "nextAttackCrit": "Đòn tấn công tiếp theo của bạn chắc chắn chí mạng",
@@ -4179,7 +4179,7 @@ export const vi_VN: EnTranslations = {
       "formTravel": "Fleet Form: tốc độ di chuyển tăng {pct}%.",
       "formFireball": "Ember Form: tốc độ di chuyển tăng {pct}%; tấn công và thi triển phép bị vô hiệu hóa",
       "formMoonkin": "Dạng Cú Mặt Trăng: sát thương phép tăng {pct}% và giáp tăng {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Hình Thể Chữa Lành Bào Tử: tăng {pct}% lượng hồi máu, tăng {armorPct}% giáp và giảm {slowPct}% tốc độ di chuyển",
       "formShadow": "Hình Gloamveil: sát thương Bóng Tối tăng {pct}%",
       "resourceCount": "{value} trên {max}",
       "formLich": "Thương Linh Hồn cũng đánh trúng thêm tối đa {targets} kẻ địch gần đó với {pct}% sát thương",
@@ -4266,7 +4266,7 @@ export const vi_VN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
       "pvpTag": "PvP",
-      "bountyTag": "Bounty",
+      "bountyTag": "Truy nã",
       "cheaterTag": "< Kẻ Gian Lận >",
       "pledgeTag": "Trung Thành Với {guild}",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const vi_VN: EnTranslations = {
       "wrongKind": "Mã đó là bản xuất cài đặt, không phải thiết lập phím tắt."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Bố cục bàn phím",
+      "open": "Chuyển đổi",
+      "from": "Phím tắt dành cho",
+      "to": "Chuyển sang",
+      "keepMovement": "Giữ nguyên vị trí phím di chuyển",
+      "keepMovementLocked": "Lần trước phím di chuyển đã được giữ nguyên nên lần này cũng vậy. Khôi phục mặc định để bắt đầu lại.",
+      "help": "Mỗi phím tắt chuyển sang phím gõ cùng ký tự trên bố cục mới. Hàng số giữ nguyên vị trí. Tên phím trong danh sách là vị trí QWERTY; sơ đồ bàn phím hiển thị bố cục của bạn.",
+      "moves": "Số phím tắt sẽ di chuyển: {count}",
+      "noChange": "Không có phím tắt nào thay đổi giữa hai bố cục này.",
+      "apply": "Chuyển đổi phím tắt",
+      "converted": "Đã chuyển phím tắt từ {from} sang {to}.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (Hoa Kỳ)",
+        "qwertyUk": "QWERTY (Vương quốc Anh)",
+        "qwertzDe": "QWERTZ (Đức)",
+        "qwertzCh": "QWERTZ (Thụy Sĩ)",
+        "azertyFr": "AZERTY (Pháp)",
+        "azertyBe": "AZERTY (Bỉ)",
+        "qwertyEs": "QWERTY (Tây Ban Nha)",
+        "qwertyIt": "QWERTY (Ý)",
+        "qwertyNordic": "QWERTY (Thụy Điển, Phần Lan)",
+        "qwertyDa": "QWERTY (Đan Mạch)",
+        "qwertyNo": "QWERTY (Na Uy)",
+        "qwertyBr": "QWERTY (Brasil ABNT2)",
+        "qwertyPt": "QWERTY (Bồ Đào Nha)",
+        "qwertyTr": "QWERTY (Thổ Nhĩ Kỳ)",
+        "dvorak": "Bố cục Dvorak",
+        "colemak": "Bố cục Colemak"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const vi_VN: EnTranslations = {
       "perfectedBadge": "Đã hoàn thiện",
       "perfectingRank": "Hoàn thiện: bậc {rank} trên {ranks}",
       "materialSourceGatherer": "{count} × Được {name} thu thập",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × Lấy từ {name}",
       "materialSourceGathererSigned": "{count} × Được {name} thu thập, có chữ ký của {signer}",
       "materialSourceUnrecorded": "{count} × Không ghi nhận người thu thập",
       "materialSourceUnrecordedSigned": "{count} × Không ghi nhận người thu thập, có chữ ký của {name}",
@@ -5457,12 +5457,16 @@ export const vi_VN: EnTranslations = {
       "enchant_weapon_piston_drive": "Khắc vĩnh viễn một vũ khí hai tay với 12 Sức Mạnh và 25 Chỉ Số Đòn Chí Mạng. Không thể áp dụng cho vũ khí một tay. Một tấn công cố định; nó không tăng theo cấp độ."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Đá Hồi Hương Đồng Minh của bạn chưa được liên kết. Hãy nói chuyện với quân nhu đồng minh hoặc dùng đá tại trung tâm đồng minh.",
+      "hearthstoneBound": "Đá Hồi Hương Đồng Minh của bạn đã liên kết với {hub}.",
+      "hearthstoneTransport": "Đá hồi hương đưa bạn đến {hub}.",
+      "itemCooldown": "Vật phẩm chưa sẵn sàng (còn {minutes} phút).",
       "alliedHearthstoneUse": "Về Nhà Vùng Lửa Đồng Minh",
       "alliedHearthstoneAttuned": "Điều Chỉnh Để: {hub}",
       "hub_none": "Không có (Dùng gần trung tâm phe để liên kết)",
       "hub_rift_watch": "Drifthaven (Kỳ Canh Vết Nứt)",
       "hub_church_order": "Thung Lũng Đông Khê (Dòng Nhà Thờ)",
-      "hub_automatons": "Nam Cảnh (Xưởng Đúc Tự Động)",
+      "hub_automatons": "Wyrmwatch (Tự Động)",
       "riftGliderUse": "Sử Dụng Máy Bay Rift",
       "targetDummyUse": "Sử Dụng Vị Trí Bất Động",
       "battleStandardUse": "Giương Cờ Chiến Đấu",
@@ -5826,8 +5830,8 @@ export const vi_VN: EnTranslations = {
     "pattern": {
       "teaches": "Dùng: Dạy bạn cách chế tác {item}.",
       "teachesEnchant": "Dùng: Dạy bạn cách áp dụng {enchant}.",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}: {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Gỡ Ràng Buộc: {name}",
@@ -7428,7 +7432,7 @@ export const vi_VN: EnTranslations = {
       "rowCameraSpeed": "Camera xoay nhanh đến mức nào khi bạn nhìn quanh bằng chuột.",
       "rowTouchLookSpeed": "Tương tự nhưng cho thao tác vuốt để nhìn quanh, và nó chỉ xuất hiện khi bạn dùng màn hình cảm ứng.",
       "rowFullscreen": "Lấp đầy toàn bộ màn hình bằng trò chơi.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "Ánh sáng, tia lửa, đạn phép và vụ nổ khi chạm mục tiêu từ phép của người chơi và thú cưng, kể cả của bạn. Tắt để màn hình dịu hơn hoặc tăng vài khung hình trong trận chiến nhóm lớn. Mọi phép của địch vẫn hiển thị, cùng các vòng cảnh báo vùng nguy hiểm, dấu trên mục tiêu bị choáng, sợ hãi hoặc trói chân và mọi thanh niệm phép.",
       "rowWaterRipples": "Vệt nước và gợn sóng lan ra phía sau bạn khi bơi. Mặc định tắt, và là hiệu ứng nước duy nhất thực sự tốn khung hình; tia nước bắn và bong bóng không bị ảnh hưởng dù bật hay tắt.",
       "rowOverflowXp": "Ở cấp độ tối đa, thanh của bạn có tiếp tục đầy lên với kinh nghiệm dư thừa hay hiển thị dòng chữ tĩnh cổ điển báo đã đạt cấp tối đa.",
       "rowInterfaceMode": "Bạn dùng giao diện máy tính hay các điều khiển cảm ứng trên màn hình. Tự Động đọc theo thiết bị của bạn, và bạn có thể ép buộc dùng một trong hai: một máy tính bảng có bàn phím có thể dùng bố cục Máy Tính, còn một laptop màn hình cảm ứng có thể dùng điều khiển Cảm Ứng.",
@@ -7481,7 +7485,7 @@ export const vi_VN: EnTranslations = {
       "ifMouseoverCast": "Cho phép một phép chữa lành hoặc phép có lợi nhắm vào khung tổ đội bạn đang rê chuột lên, mà không đổi mục tiêu của bạn.",
       "ifStickyTarget": "Giữ nguyên mục tiêu hiện tại khi bạn nhấp vào mặt đất trống, thay vì bỏ chọn mục tiêu.",
       "ifFctScale": "Kích thước của các con số sát thương và hồi máu bay ra từ mục tiêu của bạn.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Khôi phục các số sát thương trắng và vàng nhạt đơn giản bay thẳng lên. Để tắt (mặc định) nếu muốn số nổi bật hơn tỏa sang hai bên, lóe sáng khi chí mạng hoặc gây sát thương rất lớn.",
       "ifExtraBars": "Hiện thêm hàng thanh hành động thứ hai, và hàng thứ ba khi hàng thứ hai đã bật. Các ô vẫn có thể dùng qua phím tắt ngay cả khi các hàng đang ẩn.",
       "ifHideUnused": "Ẩn các ô hành động trống để chỉ vẽ những nút bạn thực sự dùng.",
       "ifLockBars": "Khóa các thanh của bạn để bạn không vô tình kéo một kỹ năng ra khỏi ô.",
@@ -7912,14 +7916,14 @@ export const vi_VN: EnTranslations = {
         "form_bear": "Dạng gánh chịu đòn: một lớp da dày, dùng Nộ Khí thay vì Mana, và tạo thêm đe dọa để kẻ địch luôn nhắm vào bạn.",
         "form_cat": "Dạng sát thương cận chiến: dùng Năng Lượng và điểm tổ hợp giống Đạo Tặc, và tạo ra ít đe dọa hơn nhiều.",
         "form_travel": "Dạng di chuyển: nhanh hơn hẳn trên mặt đất, nhưng không dùng được kỹ năng nào khác cho đến khi bạn thoát dạng.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "Hình thể chữa lành của Phục Hồi: da bền hơn, hồi máu mạnh hơn và bước đi chậm hơn, vẫn giữ mọi phép cùng năng lượng."
       },
       "mageEleSummon": "Một phép Băng Giá triệu gọi nguyên tố về bên bạn và tung nó vào mục tiêu của bạn.",
       "formName": {
         "form_bear": "Hình Bruin",
         "form_cat": "Hình Mèo",
         "form_travel": "Hình Thần Tốc",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Hình Thể Chữa Lành Bào Tử"
       }
     },
     "classHook": {
@@ -8622,7 +8626,7 @@ export const vi_VN: EnTranslations = {
       "formBear": "Bruin Form",
       "formCat": "Hình Mèo",
       "formTravel": "Fleet Form",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Hình Thể Chữa Lành Bào Tử",
       "groupCreatures": "Sinh vật",
       "groupPets": "Quỷ của Thuật Sĩ Hắc Ám",
       "pickerLabel": "Chọn một mô hình để xem",
@@ -9142,7 +9146,7 @@ export const vi_VN: EnTranslations = {
       "buyingBody": "Hãy nói chuyện với một thương nhân và chọn xem hàng của họ, cửa hàng của họ mở ra với ba thẻ: Xem Hàng, Bán, và Mua Lại. Xem Hàng chứa mọi thứ họ có trong kho, là của bạn nếu bạn đủ tiền. Bán liệt kê những gì trong túi bạn mà họ chịu trả tiền, và bán một món mang phẩm chất tự tung riêng của nó sẽ yêu cầu bạn xác nhận trước, để một bản quý giá không bao giờ lỡ tay tuột mất. Nếu bạn trót chia tay thứ gì đó rồi tiếc, thẻ Mua Lại giữ những món bạn vừa bán để bạn mua lại chúng bằng đúng số tiền bạn được trả.",
       "junkTitle": "Dọn dẹp đồ tạp",
       "junkBody": "Những món rơi ra mà bạn không dùng đến vẫn bán được cho bất kỳ người bán nào, nên hãy dọn trống túi mỗi khi đi qua thị trấn thay vì để chúng đầy ứ. Thẻ Bán của người bán thậm chí có một nút bấm một lần bán sạch mọi món phẩm chất Kém cùng lúc. Những thứ vụn vặt thực sự vô giá trị cũng có thể vứt bỏ hẳn để lấy chỗ.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "Chiến lợi phẩm không cần đến vẫn có thể bán cho thương nhân có cửa hàng riêng, nên hãy dọn túi mỗi lần qua thành phố. Cửa sổ thương nhân có nút Bán Đồ Rác để bán mọi vật phẩm phẩm chất Kém bằng một lần nhấp. Bạn cũng có thể vứt đồ vô giá trị để lấy chỗ. Vật phẩm xám không có chữ ký bán theo cách này không vào danh sách mua lại, nên hãy kiểm tra xem có món nào muốn giữ trước khi nhấn.",
       "tradeTitle": "Giao dịch với người chơi khác",
       "tradeBody": "Bạn có thể trao đổi mặt đối mặt với bất kỳ ai đứng gần bạn. Cả hai bên đặt vật phẩm và tiền vào một cửa sổ chung và cuộc đổi chỉ diễn ra một khi cả hai cùng xác nhận, nên không bên nào bị mắc lừa. Đó là cách đơn giản để trao cho bạn bè một món đồ rơi hoặc dàn xếp một thỏa thuận.",
       "mailTitle": "Bưu Quạ",
@@ -11231,10 +11235,10 @@ export const vi_VN: EnTranslations = {
     "selectClass": "Vui lòng chọn một lớp.",
     "pickClass": "Hãy chọn một lớp.",
     "returnToLogin": "Quay Lại Đăng Nhập",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Tìm bản cập nhật",
+    "noUpdateFound": "Không tìm thấy bản cập nhật. Hãy thử lại sau ít phút.",
+    "updateUnavailable": "Cập nhật qua cửa hàng trò chơi hoặc tải bản ứng dụng mới nhất.",
+    "updateSearchFailed": "Không thể kiểm tra bản cập nhật. Vui lòng thử lại.",
     "api": {
       "tooManyAttempts": "Quá nhiều lần thử. Hãy đợi một phút rồi thử lại.",
       "usernameShape": "Tên đăng nhập phải có 3-24 ký tự và chỉ dùng chữ cái, chữ số hoặc dấu gạch dưới.",
@@ -12412,6 +12416,8 @@ export const vi_VN: EnTranslations = {
       "clueTalkAria": "Hỏi về manh mối: {name}",
       "clueDeliver": "Trao {count} {item}.",
       "clueDeliverAria": "Trao {count} {item} cho {name}",
+      "attuneHearthstone": "Liên kết Đá Hồi Hương Đồng Minh của tôi tại đây.",
+      "attuneHearthstoneAria": "Liên kết Đá Hồi Hương Đồng Minh với {hub} qua {name}",
       "profIntroHint": "Gặp {name} để nhận \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Ba di vật cùng kể một câu chuyện: Aldren chiến đấu để bảo vệ vua của mình, Malric phá vỡ ranh giới của cái chết, và Voss cố ngăn chặn những gì xảy đến sau đó. Ấn phong đang suy yếu, và hầm mộ bị bỏ hoang là con đường dẫn xuống dưới.",
       "browseGoods": "Để ta xem qua hàng hóa của ngươi.",
@@ -12799,7 +12805,7 @@ export const vi_VN: EnTranslations = {
       "clueCasketOpened": "Hộp chứa {money} và {items}.",
       "treasureMapEarned": "Mọi nhiệm vụ thế giới hôm nay đã xong: bạn đã tìm thấy một {map}.",
       "treasureMapLost": "Bạn đã mất một bản đồ kho.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Túi của bạn đã đầy. Phần thưởng được gửi đến hộp thư: {items}.",
       "treasureMapRead": "Bạn nghiên cứu {map}. X nằm ở đâu đó trong {zone}.",
       "treasureMapUpgraded": "Bản đồ được vẽ lại bằng mực tốt hơn: nó hiện là một {map}.",
       "treasureVaultOpened": "Bạn đã mở kho.",
@@ -12978,7 +12984,7 @@ export const vi_VN: EnTranslations = {
       "sellJunk": "Bán Đồ Bỏ",
       "sellJunkAria": "Bán tất cả đồ bỏ với giá {price}",
       "sellJunkHint": "Bán mọi vật phẩm màu xám trong túi trừ vật phẩm nhiệm vụ.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "Vật phẩm xám không có chữ ký không vào danh sách mua lại, nên không thể hoàn tác việc bán."
     },
     "market": {
       "title": "Chợ Thế Giới",
@@ -13283,12 +13289,12 @@ export const vi_VN: EnTranslations = {
         "description": "Giảm 60% sát thương phải chịu trong 8 giây, nhưng ngăn bạn tấn công khi còn hiệu lực."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Giả Chết",
+        "description": "Ngã xuống đất giả chết: máu và Tập Trung của bạn hiển thị trống với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang chọn bạn sẽ mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc. Dùng lại để đứng dậy."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Ngụy Trang Chiến Thuật",
+        "description": "Hòa vào môi trường: kẻ địch gần như không nhận thấy bạn, và bạn di chuyển với 80% tốc độ. Tấn công hoặc nhận sát thương phá Ngụy Trang Chiến Thuật. Dùng lại để thoát ra. (Sinh Tồn)"
       },
       "frostjaw_trap": {
         "name": "Bẫy Hàm Băng",
@@ -14085,7 +14091,7 @@ export const vi_VN: EnTranslations = {
         "description": "Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt của bạn 6 giây, tối đa {duration} giây mỗi lần. Khi Triều Nguyệt đầy, Nguyệt Chủng trở thành Nguyệt Trào."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Chữa Lành Bào Tử",
         "description": "Hồi máu cho mục tiêu {damage} trong 12 giây.",
         "specNote_restoration": "Mỗi lần thi triển thêm 1 Sắc Xanh (tối đa 3), kể cả khi làm mới một chồi hoa đang còn hiệu lực. Ở 3 Sắc Xanh, Hồi Phục Nhanh trở thành Mãn Khai."
       },
@@ -14124,9 +14130,9 @@ export const vi_VN: EnTranslations = {
         "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Cào",
+        "description": "Cào qua các mục tiêu gần trong 6 mét, gây sát thương vũ khí cộng {damage}. Nhận 1 điểm liên kích cho mỗi mục tiêu trúng đòn. Làm lộ kẻ địch tàng hình trong vùng quét. Chỉ dùng ở Hình Mèo.",
+        "specNote_feral": "Mỗi đòn trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
@@ -14411,8 +14417,8 @@ export const vi_VN: EnTranslations = {
       },
       "swiftmend": {
         "name": "Hồi Phục Nhanh",
-        "description": "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Mỗi lần thi triển Sporemending, Nở Hoa Lần Hai và Hàn Gắn Hoang Dã thêm 1 Sắc Xanh; ở 3 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai và Hàn Gắn Hoang Dã thêm 1 Sắc Xanh; ở 3 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)",
+        "specNote_restoration": "Tiêu hao một hiệu ứng hồi máu theo thời gian trên đồng minh để hồi {damage} máu. Áp dụng Chữa Lành Bào Tử và Nở Hoa Lần Hai tăng Sắc Xanh; khi có 5 Sắc Xanh, nút này thành Mãn Khai, lập tức hồi cho mọi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn 60% lượng hồi máu còn lại. (Đặc trưng của Phục Hồi)"
       },
       "moonlash": {
         "name": "Nguyệt Trào",
@@ -14439,26 +14445,26 @@ export const vi_VN: EnTranslations = {
         "description": "Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, trở lại sự sống bên cạnh bạn với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Groveheart)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Hình Thể Chữa Lành Bào Tử",
+        "description": "Biến thành Thể Chữa Lành Bào Tử, tăng 20% lượng hồi máu và 40% giáp nhưng giảm 20% tốc độ di chuyển. Mọi phép ở hình thể niệm phép vẫn dùng được. Kéo dài đến khi đổi hình thể. Đổi sang bất kỳ hình thể nào cũng cho Sải bước, tăng tốc trong chốc lát. Dùng lại để về hình thể niệm phép. (Đặc trưng của Phục Hồi)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Bùng Nổ Bào Tử",
+        "description": "Triệu hồi nấm bùng nổ tại vùng mục tiêu. Sau {duration} giây, nấm nổ, hồi {healing} máu cho đồng minh và gây {damage} sát thương Thiên Nhiên lên địch trong 8 mét.",
+        "specNote_balance": "Khi có 3 Triều Nguyệt, mạnh hơn 25% và tiêu hao Triều Nguyệt.",
+        "specNote_restoration": "Cũng áp dụng Chữa Lành Bào Tử cho mỗi đồng minh được hồi máu. Khi Sắc Xanh đầy, mạnh hơn 25% và tiêu hao Sắc Xanh."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Ân Huệ Tự Nhiên",
+        "description": "Phép của bạn có thể kích hoạt Ân Huệ Tự Nhiên trong 10 giây: phép được chỉ định trở nên miễn phí, mạnh hơn 25% và dùng được ở mọi hình thể. Kích hoạt mới làm mới thời gian hiệu lực.",
+        "specNote_feral": "Mỗi đòn đánh thường cận chiến trúng đích có 1/15 cơ hội kích hoạt cho Chữa Lành Bào Tử, hoặc cho Da Sồi khi ở Hình Bruin.",
+        "specNote_balance": "Mỗi lần dùng Tia Hoang Dã hoặc Thiên Giáng có 10% cơ hội kích hoạt cho Bùng Nổ Bào Tử, tối đa một lần mỗi 10 giây.",
+        "specNote_restoration": "Mỗi nhịp hồi máu theo thời gian của bạn có 10% cơ hội kích hoạt cho Bùng Nổ Bào Tử, tối đa một lần mỗi 10 giây."
       },
       "overbloom": {
         "name": "Mãn Khai",
-        "description": "Tiêu 3 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Sporemending mới lên mục tiêu.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "Tiêu 3 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Chữa Lành Bào Tử mới lên mục tiêu.",
+        "specNote_restoration": "Tiêu hao 5 Sắc Xanh: mỗi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn được hồi ngay {buff}% lượng hồi máu còn lại, các hiệu ứng bị xóa và mục tiêu nhận Chữa Lành Bào Tử mới."
       },
       "summon_imp": {
         "name": "Triệu Hồi Emberkin",
@@ -19098,10 +19104,10 @@ export const vi_VN: EnTranslations = {
         "name": "Kho Tàng Của Phái Viên"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Đầu Lâu Chiến Lợi Phẩm"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Túi Đầu Lâu"
       },
       "clue_scroll": {
         "name": "Cuộn Chỉ Gợi Ý"
@@ -24117,9 +24123,9 @@ export const vi_VN: EnTranslations = {
         "body": "Kho báu đã bị phá, nhưng phần của bạn không được lấy ra từ hộp. Những chỉ quạ đã mang nó đến cho bạn ở đây, với hàng hóa và tiền bạc bạn kiếm được.\n\n- Bưu Điện Quạ"
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "Bưu Điện Quạ",
+        "subject": "Phần thưởng nhiệm vụ thế giới của bạn",
+        "body": "Túi đã đầy khi bạn nhận phần thưởng nhiệm vụ thế giới này, nên đàn quạ mang nó đến đây. Dọn chỗ và nhận phần thưởng tại bất kỳ trụ quạ nào.\n\n- Bưu Điện Quạ"
       }
     },
     "itemSets": {
@@ -24255,7 +24261,7 @@ export const vi_VN: EnTranslations = {
       },
       "grovespring": {
         "name": "Phục Trang Suối Rừng",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Hồi Phục Nhanh ưu tiên tiêu hao Chữa Lành Bào Tử hoặc Nở Hoa Lần Hai của bạn và hồi thêm 25 phần trăm. Sát thương nhận vào không còn làm chậm việc niệm phép.",
         "bonus4": "Overbloom thu hoạch 75% các hiệu ứng còn lại của bạn và tích trữ 1 Verdance sau đó."
       },
       "hexthread": {

@@ -64,7 +64,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Utilisation : Renforce votre armure thoracique, augmentant l'Armure de 12 pendant 1 heure.",
   'hudChrome.factionRewards.battleStandardUse':
     "Utilisation : Plante l'Étendard du Combat de l'Aube pendant 5 minutes, augmentant considérablement la régénération de la santé et du mana hors combat pour tous les alliés proches. Rester près pendant 10 secondes accorde aussi la Bénédiction de l'Aube (+5% à toutes les statistiques pendant 30 min). (5 min de délai)",
-  'hudChrome.factionRewards.hub_automatons': 'South Reach (Fonderie Automate)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automates)',
   'hudChrome.factionRewards.hub_church_order': "Val d'Eastbrook (L'Ordre de l'Église)",
   'hudChrome.factionRewards.hub_none':
     "Aucun (Utilisez près d'un refuge de faction pour s'accorder)",
@@ -16809,7 +16809,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à {duration} s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire.",
   'entities.abilities.overbloom.name': 'Surfloraison',
   'entities.abilities.overbloom.description':
-    'Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Sporemending fraîche sur la cible.',
+    'Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Soin de spores fraîche sur la cible.',
   'entities.abilities.redharvest.name': 'Moisson rouge',
   'entities.abilities.redharvest.description':
     "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo.",
@@ -16823,7 +16823,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme',
   'hudChrome.auraEffect.verdance':
-    "Verdoyance : cran {stacks} sur {max}. Chaque Sporemending, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
+    "Verdoyance : cran {stacks} sur {max}. Chaque Soin de spores, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
   'hudChrome.riftTracker.title': 'Faille',
   'hudChrome.riftTracker.floor': 'Étage {current} sur {total}',
   'hudChrome.riftTracker.closesIn': 'Se ferme dans {time}',
@@ -17080,7 +17080,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Chaque ouverture utilisée depuis le Voile du crépuscule ajoute 1 Pénombre (maximum 3).',
   'entities.abilities.swiftmend.description':
-    "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Chaque incantation de Sporemending, de Seconde floraison et de Soin sauvage ajoute 1 Verdoyance ; à 3 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
+    "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Chaque incantation de Soin de spores, de Seconde floraison et de Soin sauvage ajoute 1 Verdoyance ; à 3 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
   'entities.abilities.swipe.description':
     'Balayez vos griffes à travers les ennemis proches pour {damage} points de dégâts. Cause une menace supplémentaire. Forme de Bruin uniquement.',
   'entities.abilities.swipe.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
@@ -18065,7 +18065,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Les frappes à l’unisson de Commandement faucheur infligent 25 % de dégâts supplémentaires.',
   'entities.itemSets.gravebrand.name': 'Régalia de la marque funèbre',
   'entities.itemSets.grovespring.bonus4':
-    'Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdure.',
+    'Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdoyance.',
   'entities.itemSets.grovespring.name': 'Habillement de la Source sylvestre',
   'entities.itemSets.hexthread.bonus2':
     'Aiguille du destin confère 2 Condamnations supplémentaires. Les dégâts subis ne retardent plus vos incantations.',
@@ -20290,4 +20290,198 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Faites glisser pour redimensionner la barre latérale de la carte. Double-cliquez pour réinitialiser.',
   'guide.worldPvpPage.hillBodyFlat':
     "Toutes les trois heures, à un moment imprévisible, le royaume entier apprend qu'une colline apparaîtra quinze minutes plus tard dans une zone de combat libre. Son cercle est marqué sur un terrain dégagé. Elle reste quarante-cinq minutes, puis disparaît. Pendant ce temps, sa position et les groupes ayant cumulé les plus longues durées de contrôle sont annoncés toutes les cinq minutes. Le groupe comptant le plus de joueurs dans le cercle conteste la colline et la capture après trente secondes cumulées de supériorité numérique. L'arrivée d'un groupe adverse ne fait que suspendre le compteur jusqu'à ce que le vôtre reprenne l'avantage ; il ne repart de zéro que si aucun membre vivant de votre groupe ne reste à l'intérieur. Un joueur seul compte comme un groupe d'une personne et conserve sa colline lorsqu'il forme un groupe, mais les membres de raid ne comptent pas du tout. Chaque membre du groupe qui contrôle la colline et se tient dans le cercle reçoit autant d'Honneur chaque minute, quelle que soit la durée du contrôle. Un groupe complet qui la garde sans opposition pendant toute sa durée gagne environ autant que pour trois victoires sur un champ de bataille. À sa disparition, si le groupe au plus long contrôle cumulé a tenu au moins dix minutes, tous ceux qui sont restés dans le cercle au moins une minute pendant son contrôle et font encore partie de ce groupe reçoivent une victoire pour la rangée JcJ du Coffre hebdomadaire. Une barre au-dessus du terrain affiche le détenteur, les effectifs des deux camps et le compteur de capture ; /hill dans le chat indique sa position.",
+  'errors.noUpdateFound': 'Aucune mise à jour trouvée. Réessayez bientôt.',
+  'errors.searchUpdates': 'Rechercher des mises à jour',
+  'errors.updateSearchFailed': 'Impossible de vérifier les mises à jour. Réessayez.',
+  'errors.updateUnavailable':
+    'Mettez le jeu à jour depuis votre boutique ou téléchargez le dernier client.',
+  'hudChrome.auraEffect.formSporemender':
+    'Forme de Soignespores : soins augmentés de {pct}%, armure augmentée de {armorPct}% et vitesse de déplacement réduite de {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Les objets verrouillés restent dans leur emplacement. Déverrouillez-les pour les déplacer.',
+  'hudChrome.death.pvpResurrect': 'Résurrection JcJ',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Résurrection JcJ disponible : vous revivrez au cimetière le plus proche.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Ressusciter au cimetière le plus proche avec toute votre santé, sans nouveau Tribut du Gardien.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Résurrection JcJ ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Résurrection JcJ dans {seconds} : vous revivrez au cimetière le plus proche.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Changement de difficulté en attente annulé car le groupe ou son chef a changé.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    "Changement de difficulté mis en attente car quelqu'un ou son cadavre est encore à l'intérieur. Il sera appliqué quand les instances seront vides.",
+  'hudChrome.ferry.arrivesIn': 'Le bac arrive dans {time}',
+  'hudChrome.ferry.boardNow': 'Embarquer maintenant',
+  'hudChrome.ferry.destination': 'Destination : {dest}',
+  'hudChrome.ferry.portLabel': 'Bac de {port} vers {dest}',
+  'hudChrome.ferry.portTitle': 'Embarcadère de {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Horaires du bac indisponibles.',
+  'hudChrome.graphicsRestore.note': 'Restauration des graphismes',
+  'hudChrome.hill.contestOtherPaused': 'Adversaire en pause : {seconds} sur {total}',
+  'hudChrome.hill.contestYouPaused': 'En pause : {seconds} sur {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Pris à {name}',
+  'hudChrome.keybindLayout.apply': 'Convertir les raccourcis',
+  'hudChrome.keybindLayout.converted': 'Raccourcis convertis de {from} vers {to}.',
+  'hudChrome.keybindLayout.from': 'Raccourcis prévus pour',
+  'hudChrome.keybindLayout.help':
+    'Chaque raccourci passe sur la touche qui produit le même caractère dans la nouvelle disposition. La rangée de chiffres reste en place. Les noms de touches de cette liste indiquent les positions QWERTY ; le schéma du clavier montre votre disposition.',
+  'hudChrome.keybindLayout.keepMovement': 'Conserver les touches de déplacement en place',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Les touches de déplacement sont restées en place la dernière fois et le resteront encore. Rétablissez les valeurs par défaut pour recommencer.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belge)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (français)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Disposition Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Disposition Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brésilien ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (danois)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (espagnol)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italien)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norvégien)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (suédois, finnois)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portugais)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turc)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Royaume-Uni)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (États-Unis)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (suisse)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (allemand)',
+  'hudChrome.keybindLayout.moves': 'Raccourcis qui changeront de place : {count}',
+  'hudChrome.keybindLayout.noChange': 'Aucun raccourci ne change entre ces dispositions.',
+  'hudChrome.keybindLayout.open': 'Convertir',
+  'hudChrome.keybindLayout.title': 'Disposition du clavier',
+  'hudChrome.keybindLayout.to': 'Convertir vers',
+  'hudChrome.nameplate.bountyTag': 'Prime',
+  'hudChrome.options.classicCombatText': 'Texte de combat classique',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Les objets de qualité inférieure se vendent en un clic. Un objet vendu par erreur peut être racheté, sauf les objets gris non signés.',
+  'hudChrome.options.spellEffects': 'Effets des sorts',
+  'hudChrome.options.spellTooltipOnHover': 'Infobulles des sorts au survol',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} : {list}',
+  'hudChrome.realmMotd.cleared': 'Message du jour effacé.',
+  'hudChrome.realmMotd.line': 'Message du jour : {text}',
+  'hudChrome.realmMotd.none': 'Aucun message du jour défini.',
+  'hudChrome.realmMotd.saveFailed':
+    "Le message du jour n'a pas pu être sauvegardé et sera perdu au redémarrage.",
+  'hudChrome.realmMotd.tooLong': 'Le message du jour est limité à {max} caractères.',
+  'hudChrome.realmMotd.updated': 'Message du jour actualisé.',
+  'hudChrome.realmMotd.usage':
+    'Utilisation : /motd "<message>" pour le définir, /motd clear pour l\'effacer.',
+  'hudChrome.skullBag.clickOpen': 'Cliquer pour ouvrir',
+  'hudChrome.skullBag.close': 'Fermer le Sac à crânes',
+  'hudChrome.skullBag.empty':
+    'Vide. Tant que vous portez le sac, les crânes ramassés y vont directement.',
+  'hudChrome.skullBag.notCarried':
+    'Gardez le Sac à crânes dans vos sacs pour ranger ou retirer des crânes.',
+  'hudChrome.skullBag.store': 'Ranger les crânes transportés ({count})',
+  'hudChrome.skullBag.storeNone': 'Aucun crâne à ranger',
+  'hudChrome.skullBag.takeAll': 'Tout retirer',
+  'hudChrome.skullBag.takeAllAria': 'Tout retirer : {item}',
+  'hudChrome.skullBag.takeOne': 'Retirer 1',
+  'hudChrome.skullBag.takeOneAria': 'Retirer 1 : {item}',
+  'hudChrome.skullBag.title': 'Sac à crânes',
+  'hudChrome.skullBag.tooltip':
+    "Contient un nombre illimité de Crânes-trophées sans occuper de place dans les sacs. Tant qu'il est dans vos sacs, les crânes ramassés y vont directement. Cliquez dessus pour ranger ou retirer des crânes.",
+  'hudChrome.skullBag.total': 'Crânes : {count}',
+  'hudChrome.skullBag.unrecorded': 'Crâne-trophée',
+  'hudChrome.treasureMap.inkPickerCancel': 'Annuler',
+  'hudChrome.treasureMap.inkPickerCost': "Redessiner en {rarity} : {inks} d'encre",
+  'hudChrome.treasureMap.inkPickerHeld': "Vous possédez {held} d'Encre de cartographe.",
+  'hudChrome.treasureMap.inkPickerRead':
+    'En cours de suivi : sa croix se trouve en {zone}. La croix ne bouge pas.',
+  'hudChrome.treasureMap.inkPickerTitle': "Sur quelle carte utiliser l'Encre de cartographe ?",
+  'hudChrome.treasureMap.inkPickerUnread': 'Non lue ({count} en votre possession)',
+  'hudChrome.warfare.reasons.worldQuest': 'quête mondiale',
+  'hudChrome.warfareShop.goods': 'Marchandises',
+  'hudChrome.weeklyRewards.allClassGear': 'Équipement de toutes les classes',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} victoires JcJ',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} victoire JcJ',
+  'hudChrome.weeklyRewards.lootFocus': 'Butin privilégié',
+  'hudChrome.weeklyRewards.lootFocusHelp': "S'applique uniquement aux coffres non ouverts.",
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    'Aucun butin admissible. Choisissez une autre préférence.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Remporter {count} victoires JcJ',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Remporter {count} victoire JcJ',
+  'hudChrome.weeklyRewards.rolledFocus': 'Tirage pour : {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Série JcJ actuelle : {time} de jeu (en pause dans un sanctuaire)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Série JcJ actuelle : {time} de jeu (en pause pendant la mort)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Série JcJ actuelle : {time} de jeu (en pause dans les instances JcE)',
+  'hudChrome.worldPvp.rewardProgress': 'Série JcJ actuelle : {time} de jeu',
+  'hudChrome.worldPvp.rewardTitles':
+    'Gagnez des titres permanents après {thresholds} de jeu avec le JcJ mondial activé en monde ouvert ou en instance JcJ. Déconnexion, mort, instances JcE et sanctuaires mettent le compteur en pause. Désactiver le JcJ le remet à zéro.',
+  'hudChrome.worldPvp.skullName': 'Crâne de {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    "Si vous êtes tous deux marqués, l'or du coup fatal tombe sur le corps avec le crâne du perdant.",
+  'itemUi.vendor.sellJunkNoBuyback':
+    "Les objets gris non signés n'apparaissent pas dans la liste de rachat : leur vente est irréversible.",
+  'questUi.logs.worldQuestRewardMailed':
+    'Vos sacs sont pleins. Votre récompense a été envoyée dans votre boîte aux lettres : {items}.',
+  'entities.abilities.natures_boon.description':
+    'Vos sorts peuvent activer Bienfait de la nature pendant 10 s : le sort indiqué devient gratuit, 25% plus puissant et utilisable sous toute forme. Une nouvelle activation renouvelle la durée.',
+  'entities.abilities.natures_boon.name': 'Bienfait de la nature',
+  'entities.abilities.natures_boon.specNote_balance':
+    "Chaque Trait sauvage ou Chute céleste lancé a 10% de chances de l'activer pour Explosion de spores, au plus une fois toutes les 10 s.",
+  'entities.abilities.natures_boon.specNote_feral':
+    "Chaque attaque automatique de mêlée réussie a une chance sur 15 de l'activer pour Soin de spores, ou pour Peau de chêne en Forme de Bruin.",
+  'entities.abilities.natures_boon.specNote_restoration':
+    "Chaque pulsation de vos soins sur la durée a 10% de chances de l'activer pour Explosion de spores, au plus une fois toutes les 10 s.",
+  'entities.abilities.overbloom.specNote_restoration':
+    "Dépense vos 5 points de Verdoyance : chaque allié portant vos soins sur la durée reçoit instantanément {buff}% des soins qu'il leur restait, les effets sont retirés et la cible reçoit un nouveau Soin de spores.",
+  'entities.abilities.play_dead.description':
+    "Tombez au sol en feignant la mort : votre santé et votre Focalisation apparaissent vides à tous. Les ennemis vous oublient et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité met fin à l'effet. Relancez pour vous relever.",
+  'entities.abilities.play_dead.name': 'Feindre la mort',
+  'entities.abilities.rejuvenation.name': 'Soin de spores',
+  'entities.abilities.scratch.description':
+    "Griffe les cibles proches dans un rayon de 6 m pour les dégâts de l'arme plus {damage}. Accorde 1 point de combo par cible touchée. Révèle les ennemis camouflés dans le balayage. Forme féline uniquement.",
+  'entities.abilities.scratch.name': 'Griffure',
+  'entities.abilities.scratch.specNote_feral':
+    'Chaque coup réussi ajoute 1 Sang ancien (3 au maximum).',
+  'entities.abilities.spore_burst.description':
+    'Invoque un champignon explosif dans la zone ciblée. Après {duration} s, il éclate, soigne les alliés de {healing} et inflige {damage} dégâts de Nature aux ennemis dans un rayon de 8 m.',
+  'entities.abilities.spore_burst.name': 'Explosion de spores',
+  'entities.abilities.spore_burst.specNote_balance':
+    'À 3 Marées lunaires, sa puissance augmente de 25% et elle consomme votre Marée lunaire.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Applique aussi Soin de spores à chaque allié soigné. À pleine Verdoyance, sa puissance augmente de 25% et elle consomme votre Verdoyance.',
+  'entities.abilities.sporemender_form.description':
+    "Prenez la forme d'un Soignespores : vos soins augmentent de 20% et votre armure de 40%, mais votre vitesse diminue de 20%. Tous vos sorts de forme de lanceur restent utilisables. Dure jusqu'au prochain changement de forme. Tout changement de forme accorde Foulée bondissante, un bref gain de vitesse. Relancez pour reprendre votre forme de lanceur. (Signature de Restauration)",
+  'entities.abilities.sporemender_form.name': 'Forme de Soignespores',
+  'entities.abilities.swiftmend.specNote_restoration':
+    "Consomme un soin sur la durée d'une cible alliée pour lui rendre {damage} points de vie. Les applications de Soin de spores et Seconde floraison ajoutent de la Verdoyance ; à 5 points, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos soins sur la durée de 60% des soins restants. (Signature de Restauration)",
+  'entities.abilities.tactical_camo.description':
+    'Fondez-vous dans le décor : les ennemis vous remarquent à peine et vous vous déplacez à 80% de votre vitesse. Attaquer ou subir des dégâts rompt Camouflage tactique. Relancez pour en sortir. (Survie)',
+  'entities.abilities.tactical_camo.name': 'Camouflage tactique',
+  'entities.itemSets.grovespring.bonus2':
+    "Prompte guérison consomme d'abord votre propre Soin de spores ou Seconde floraison et soigne 25 pour cent de plus. Les dégâts subis ne retardent plus vos incantations.",
+  'entities.items.pvp_skull_bag.name': 'Sac à crânes',
+  'entities.items.pvp_trophy_skull.name': 'Crâne-trophée',
+  'entities.letters.world_quest_reward.body':
+    "Vos sacs étaient pleins lorsque vous avez gagné cette récompense de quête mondiale. Les corbeaux vous l'ont donc apportée ici. Faites de la place et récupérez-la à n'importe quel pilier aux corbeaux.\n\n- La Poste aux corbeaux",
+  'entities.letters.world_quest_reward.sender': 'La Poste aux corbeaux',
+  'entities.letters.world_quest_reward.subject': 'Votre récompense de quête mondiale',
+  'guide.classPage.formLine.form_sporemender':
+    "La forme de soin de Restauration : une peau plus robuste et des soins plus puissants, au prix d'une marche ralentie, tout en gardant tous vos sorts et votre mana.",
+  'guide.classPage.formName.form_sporemender': 'Forme de Soignespores',
+  'guide.economy.junkBodyFinal':
+    "Le butin inutile se vend toujours chez tout marchand possédant sa propre boutique : videz vos sacs quand vous passez en ville. La fenêtre du marchand propose même un bouton Vendre la camelote pour vendre en un clic tous les objets de mauvaise qualité. Vous pouvez aussi jeter les objets sans valeur pour libérer de la place. Les objets gris non signés vendus ainsi n'apparaissent pas dans la liste de rachat : vérifiez ce que vous souhaitiez garder avant de cliquer.",
+  'guide.models.formSporemender': 'Forme de Soignespores',
+  'guide.settingsPage.ifClassicCombatText':
+    "Rétablit les simples nombres de dégâts blancs et dorés pâles qui montent tout droit. Laissez cette option désactivée (par défaut) pour des nombres plus marqués qui s'écartent sur les côtés, avec des éclats pour les coups critiques ou exceptionnellement puissants.",
+  'guide.settingsPage.rowSpellEffects':
+    "La lueur, les étincelles, les projectiles et les explosions d'impact des sorts des joueurs et de leurs familiers, y compris les vôtres. Désactivez pour un écran plus calme ou quelques images par seconde supplémentaires dans les grands combats. Tous les sorts ennemis restent visibles, ainsi que les cercles de danger, les marques sur les cibles étourdies, apeurées ou immobilisées, et toutes les barres d'incantation.",
+  'questUi.dialog.attuneHearthstone': 'Lier ma pierre de foyer alliée ici.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Lier votre pierre de foyer alliée à {hub} auprès de {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    "Votre pierre de foyer alliée n'est pas liée. Parlez à un intendant allié ou utilisez-la dans un centre allié.",
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Votre pierre de foyer alliée est désormais liée à {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'La pierre de foyer vous transporte à {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    "Cet objet n'est pas encore prêt ({minutes} min restantes).",
 };

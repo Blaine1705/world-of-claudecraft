@@ -418,13 +418,13 @@ export const de_DE: EnTranslations = {
       "heroicClears": "{count} Heroisch",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Mögliche Beute ansehen",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Beutefokus",
+      "allClassGear": "Ausrüstung aller Klassen",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "Gilt nur für ungeöffnete Schatzkammern.",
+      "noFocusedLoot": "Keine geeignete Beute. Wähle einen anderen Fokus.",
+      "rolledFocus": "Ausgewürfelt für: {focus}",
       "chooseTable": "Wähle, von welcher Tabelle gewürfelt wird",
       "selectAllTables": "Alle auswählen",
       "selectedTables": "{count} Tabellen ausgewählt",
@@ -446,8 +446,8 @@ export const de_DE: EnTranslations = {
         "worldMany": "{count} Weltquests abgeschlossen",
         "pvpOne": "{count} gewertetes Match gewonnen",
         "pvpMany": "{count} gewertete Matches gewonnen",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} PvP-Sieg",
+        "pvpWinMany": "{count} PvP-Siege"
       },
       "requiredTask": {
         "raidOne": "Bereinige {count} Schlachtzugsbegegnung",
@@ -458,8 +458,8 @@ export const de_DE: EnTranslations = {
         "worldMany": "Schließe {count} Weltquests ab",
         "pvpOne": "Gewinne {count} gewertetes Match",
         "pvpMany": "Gewinne {count} gewertete Matches",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Erringe {count} PvP-Sieg",
+        "pvpWinMany": "Erringe {count} PvP-Siege"
       },
       "readyWeeks": "Nicht abgeholte Wochen: {count}. Hole zuerst die älteste abgeschlossene Woche ab.",
       "claimLastWeek": "Belohnung der letzten Woche abholen",
@@ -522,12 +522,12 @@ export const de_DE: EnTranslations = {
       "castingOff": "Die Fähre nach {dest} legt ab",
       "boardHint": "Steh an Deck, wenn sie ablegt. Die Überfahrt ist kostenlos.",
       "sailing": "Unterwegs nach {dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "Fähre von {port} nach {dest}",
+      "portTitle": "Fährhafen {port}",
+      "destination": "Ziel: {dest}",
+      "boardNow": "Jetzt einsteigen",
+      "arrivesIn": "Fähre kommt in {time}",
+      "scheduleUnavailable": "Fährfahrplan nicht verfügbar."
     },
     "materialStackSelectionUnavailable": "Diese Materialauswahl ist nicht mehr verfügbar.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const de_DE: EnTranslations = {
       "banner": "{name} wird beobachtet"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Nachricht des Tages: {text}",
+      "updated": "Nachricht des Tages aktualisiert.",
+      "cleared": "Nachricht des Tages gelöscht.",
+      "none": "Keine Nachricht des Tages festgelegt.",
+      "usage": "Verwendung: /motd \"<Nachricht>\" zum Festlegen, /motd clear zum Löschen.",
+      "tooLong": "Die Nachricht des Tages ist auf {max} Zeichen begrenzt.",
+      "saveFailed": "Die Nachricht des Tages konnte nicht gespeichert werden und geht beim Neustart verloren."
     },
     "readyCheck": {
       "title": "Bereitschaftsprüfung",
@@ -619,11 +619,11 @@ export const de_DE: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "PvP-Wiederbelebung",
+      "pvpResurrectTitle": "Am nächsten Friedhof mit voller Gesundheit und ohne neue Bürde des Hüters wiederbeleben.",
+      "pvpResurrectWaitButton": "PvP-Wiederbelebung ({seconds})",
+      "pvpResurrectWaitNote": "PvP-Wiederbelebung in {seconds}: Du wirst am nächsten Friedhof wiederbelebt.",
+      "pvpResurrectReadyNote": "PvP-Wiederbelebung bereit: Du wirst am nächsten Friedhof wiederbelebt.",
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",
       "ghostHint": "Laufe zum Ort deines Todes oder sprich mit dem Bleichen Hüter, um wiederbelebt zu werden",
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden.",
@@ -641,7 +641,7 @@ export const de_DE: EnTranslations = {
       "healerConfirmCancel": "Abbrechen"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Grafik wird wiederhergestellt"
     },
     "wiki": {
       "confirmTitle": "Wiki öffnen?",
@@ -2155,7 +2155,7 @@ export const de_DE: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Zaubertooltip beim Darüberfahren",
       "clickMoveLeft": "Linksklick",
       "clickMoveRight": "Rechtsklick",
       "version": "v{version} ({build})",
@@ -2269,7 +2269,7 @@ export const de_DE: EnTranslations = {
       "confirmVendorSellNote": "Wird dies deaktiviert, verkaufst du Gegenstände mit einem einzigen Klick ohne Bestätigung, sodass ein verschobener Taschenplatz den falschen Gegenstand verkaufen könnte.",
       "confirmVendorSellMinQuality": "Bestätigen Sie Verkäufe durch Qualität",
       "confirmVendorSellMinQualityNote": "Artikel unter dieser Qualität werden mit einem einzigen Klick verkauft; Ein falsch verkaufter Artikel kann immer noch vom Verkäufer zurückgekauft werden.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Gegenstände unter dieser Qualität werden mit einem Klick verkauft. Versehentlich verkaufte Gegenstände können zurückgekauft werden, ausgenommen unsignierte graue Gegenstände.",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
@@ -2290,9 +2290,9 @@ export const de_DE: EnTranslations = {
       "showUtilityModes": "Verstohlenheits- und Reisemodi einbeziehen",
       "showFriendlyTrack": "Meine Stärkungen auf Verbündeten anzeigen",
       "showShieldTrack": "Meine Schilde anzeigen",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Klassischer Kampftext",
       "waterRipples": "Wasserwellen (Kielwasser)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Zaubereffekte",
       "actionCam": "Aktionskamera",
       "actionCamShoulder": "Aktionskamera-Versatz",
       "actionCamShoulderLeft": "Links {pct}",
@@ -2816,7 +2816,7 @@ export const de_DE: EnTranslations = {
         "worldKill": "Welt-Tötung",
         "worldAssist": "Welt-Tötung unterstützt",
         "hillHold": "den Hügel gehalten",
-        "worldQuest": "world quest"
+        "worldQuest": "Weltquest"
       },
       "floatReasons": {
         "kill": "Ausschaltung",
@@ -2826,11 +2826,11 @@ export const de_DE: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Verdiene dauerhafte Titel nach {thresholds} Spielzeit mit aktiviertem Welt-PvP in der offenen Welt oder in PvP-Instanzen. Ausloggen, Tod, PvE-Instanzen und Heiligtümer pausieren den Zähler. Ausschalten setzt ihn zurück.",
+      "rewardPaused": "Aktuelle PvP-Serie: {time} gespielt (in einem Heiligtum pausiert)",
+      "rewardPausedDead": "Aktuelle PvP-Serie: {time} gespielt (während des Todes pausiert)",
+      "rewardPausedInstance": "Aktuelle PvP-Serie: {time} gespielt (in PvE-Instanzen pausiert)",
+      "rewardProgress": "Aktuelle PvP-Serie: {time} gespielt",
       "tab": "Welt-PvP",
       "title": "Welt-PvP",
       "blurb": "Hebt Eure Flagge, um gegen andere markierte Spieler überall in der offenen Welt zu kämpfen. Besiegt einen und nehmt einen Teil seines Beutels, dazu Ehre für Kriegsführungsausrüstung. Schlachtfelder und Arenen zahlen weiterhin mehr.",
@@ -2849,8 +2849,8 @@ export const de_DE: EnTranslations = {
       "markLine": "Einen unmarkierten Spieler dort anzugreifen hebt Eure eigene Flagge; einen markierten anzugreifen tut das nie.",
       "aidLine": "Einen markierten Spieler in einem Weltkampf zu heilen, zu schützen oder zu stärken hebt Eure eigene Flagge.",
       "stakeLine": "Der Verlierer zahlt {cap} oder {percent} seines Beutels, je nachdem, was weniger ist.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "Wenn ihr beide markiert seid, liegt das Gold des Todesstoßes zusammen mit dem Schädel des Verlierers auf der Leiche.",
+      "skullName": "Schädel von {name}",
       "noStakeLine": "Ein unmarkierter Spieler, der auf Jeder-gegen-Jeden-Gebiet getötet wird, verliert kein Gold.",
       "noTakeLine": "Ein unmarkierter Kämpfer nimmt ebenfalls kein Gold: Es wechselt nur zwischen zwei markierten Spielern.",
       "honorLine": "{honor} Ehre pro Tötung, aufgeteilt unter allen, die geholfen haben.",
@@ -2880,8 +2880,8 @@ export const de_DE: EnTranslations = {
       "countsHolding": "Innen: du {yours}, Rivale {theirs}",
       "contestYou": "Nimmt den Hügel ein: {seconds} von {total}",
       "contestOther": "Verliert den Hügel: {seconds} von {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "Pausiert: {seconds} von {total}",
+      "contestOtherPaused": "Gegner pausiert: {seconds} von {total}",
       "contestNone": "Halte für {total} die Mehrheit im Inneren, um es einzunehmen",
       "inside": "Du bist im Kreis",
       "distance": "{yards} yd bis zum Kreis",
@@ -2890,27 +2890,27 @@ export const de_DE: EnTranslations = {
       "standingRaid": "Schlachtzugsmitglieder zählen nicht: Nur Gruppen können den Hügel halten"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Schädeltasche",
+      "total": "Schädel: {count}",
+      "close": "Schädeltasche schließen",
+      "clickOpen": "Zum Öffnen klicken",
+      "notCarried": "Trage die Schädeltasche im Inventar, um Schädel einzulagern oder zu entnehmen.",
+      "empty": "Leer. Solange du die Tasche trägst, landen erbeutete Schädel direkt darin.",
+      "unrecorded": "Trophäenschädel",
+      "store": "Mitgeführte Schädel einlagern ({count})",
+      "storeNone": "Keine Schädel zum Einlagern",
+      "takeOne": "1 entnehmen",
+      "takeAll": "Alle entnehmen",
+      "takeOneAria": "1 entnehmen: {item}",
+      "takeAllAria": "Alle entnehmen: {item}",
+      "tooltip": "Fasst beliebig viele Trophäenschädel ohne Taschenplätze zu belegen. Solange sie in deinem Inventar liegt, landen erbeutete Schädel direkt darin. Klicke sie im Inventar an, um Schädel einzulagern oder zu entnehmen."
     },
     "warfareShop": {
       "gossipOption": "Kriegsführungs-Sets durchsuchen",
       "gossipOptionAria": "Den von {name} angebotenen Kriegsführungs-Set-Laden durchsuchen",
       "jewelry": "Schmuck",
       "weapons": "Waffen",
-      "goods": "Goods",
+      "goods": "Waren",
       "groupSeason2": "Kriegsführung Saison 2: Vorhut",
       "groupEntry": "Kriegsführung Saison 1",
       "owned": "Im Besitz",
@@ -2951,12 +2951,12 @@ export const de_DE: EnTranslations = {
       "hint": "Finde den Boden, den diese Karte zeigt, stelle dich auf das X und nutze die Karte erneut um zu graben. Ein vergrabener Schatz öffnet sich für dich und deine Gruppe.",
       "upgradeNote": "Das Neuzeichnen als {rarity}-Karte kostet {inks} Kartograph-Tinte (du hältst {held}). Die Fraktionsquartiermeister verkaufen sie.",
       "upgradeMaxed": "Kein Kartograph könnte diese Karte verbessern.",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Auf welche Karte soll Kartografentinte angewendet werden?",
+      "inkPickerHeld": "Du hast {held} Kartografentinte.",
+      "inkPickerRead": "Wird verfolgt: Das X liegt in {zone}. Das X bleibt an seinem Ort.",
+      "inkPickerUnread": "Ungelesen ({count} im Besitz)",
+      "inkPickerCost": "Auf {rarity} neu zeichnen: {inks} Tinte",
+      "inkPickerCancel": "Abbrechen",
       "rarity": {
         "common": "Verbreitet",
         "rare": "Selten",
@@ -3673,8 +3673,8 @@ export const de_DE: EnTranslations = {
       "resetDone": "Alle Instanzen wurden zurückgesetzt.",
       "resetNone": "Du hast keine Instanzen zum Zurücksetzen.",
       "resetOccupied": "Du kannst Instanzen nicht zurücksetzen, solange sich noch jemand darin befindet.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "Schwierigkeitswechsel vorgemerkt, da noch jemand oder dessen Leiche darin ist. Er wird angewendet, sobald die Instanzen leer sind.",
+      "queuedCancelled": "Vorgemerkter Schwierigkeitswechsel abgebrochen, da sich Gruppe oder Gruppenleitung geändert hat.",
       "resetSameDifficulty": "Ändere die Dungeon-Schwierigkeit, bevor du diese Instanzen zurücksetzt. Leere Instanzen werden nach 5 Minuten automatisch zurückgesetzt.",
       "resetLoot": "Du kannst Instanzen nicht zurücksetzen, solange sich noch Beute darin befindet.",
       "resetConfirmTitle": "Alle Instanzen zurücksetzen?",
@@ -3691,7 +3691,7 @@ export const de_DE: EnTranslations = {
       "dragEquipHint": "Auf deinen Charakter ziehen, um anzulegen",
       "dragDestroyHint": "In die Welt ziehen, um zu vernichten",
       "reorderNeedsRecent": "Filter aufheben und nach Zuletzt sortieren, um deine Taschen neu anzuordnen",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Gesperrte Gegenstände bleiben auf ihrem Taschenplatz. Entsperre sie zum Verschieben.",
       "itemAriaInstanced": "{item}, Menge {count}, herstellermarkierte Kopie",
       "itemAriaEnchanted": "{item}, Menge {count}, verzauberte Kopie",
       "itemAriaBound": "{item}, Menge {count}, gebundene Kopie",
@@ -4077,7 +4077,7 @@ export const de_DE: EnTranslations = {
       "duskEconomy": "Fähigkeiten kosten {pct}% weniger Energie",
       "moontide": "Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr",
       "oldBlood": "Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer",
-      "verdance": "Grünkraft: Stufe {stacks} von {max}. Jede Sporemending, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.",
+      "verdance": "Grünkraft: Stufe {stacks} von {max}. Jede Sporenheilung, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.",
       "freeExecute": "Eure nächste berechtigte Hinrichtungsfähigkeit kostet nichts",
       "resourceSap": "Stellt alle {interval} Sek. {value} Eurer aktuellen Ressource wieder her",
       "nextAttackCrit": "Euer nächster Angriff trifft garantiert kritisch",
@@ -4179,7 +4179,7 @@ export const de_DE: EnTranslations = {
       "formTravel": "Fleet Form: Bewegungstempo um {pct}% erhöht",
       "formFireball": "Glutgestalt: Bewegungsgeschwindigkeit um {pct}% erhöht; Angriffe und Zauber deaktiviert",
       "formMoonkin": "Mondkingestalt: Zauberschaden um {pct}% und Rüstung um {armorPct}% erhöht",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Sporenheilerform: Heilung um {pct}% und Rüstung um {armorPct}% erhöht, Bewegungstempo um {slowPct}% verringert",
       "formShadow": "Schattenform: Schattenschaden um {pct}% erhöht",
       "resourceCount": "{value} von {max}",
       "formLich": "Soul Lance trifft zusätzlich bis zu {targets} nahe Gegner für {pct}% Schaden",
@@ -4266,7 +4266,7 @@ export const de_DE: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
-      "bountyTag": "Bounty",
+      "bountyTag": "Kopfgeld",
       "cheaterTag": "< Schummler >",
       "pledgeTag": "Gelöbnis: {guild}",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const de_DE: EnTranslations = {
       "wrongKind": "Dieser Code ist ein Einstellungsexport, keine Tastenkürzel-Einrichtung."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Tastaturbelegung",
+      "open": "Umwandeln",
+      "from": "Tastenkürzel erstellt für",
+      "to": "Umwandeln nach",
+      "keepMovement": "Bewegungstasten an ihrem Platz lassen",
+      "keepMovementLocked": "Die Bewegungstasten blieben letztes Mal an ihrem Platz und bleiben es erneut. Setze auf Standardwerte zurück, um neu zu beginnen.",
+      "help": "Jedes Tastenkürzel wandert auf die Taste, die im neuen Layout dasselbe Zeichen schreibt. Die Zahlenreihe bleibt an ihrem Platz. Tastennamen in dieser Liste bezeichnen QWERTY-Positionen; die Tastaturübersicht zeigt dein eigenes Layout.",
+      "moves": "Tastenkürzel, die verschoben werden: {count}",
+      "noChange": "Zwischen diesen Layouts ändern sich keine Tastenkürzel.",
+      "apply": "Tastenkürzel umwandeln",
+      "converted": "Tastenkürzel von {from} nach {to} umgewandelt.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (USA)",
+        "qwertyUk": "QWERTY (Großbritannien)",
+        "qwertzDe": "QWERTZ (Deutsch)",
+        "qwertzCh": "QWERTZ (Schweiz)",
+        "azertyFr": "AZERTY (Französisch)",
+        "azertyBe": "AZERTY (Belgisch)",
+        "qwertyEs": "QWERTY (Spanisch)",
+        "qwertyIt": "QWERTY (Italienisch)",
+        "qwertyNordic": "QWERTY (Schwedisch, Finnisch)",
+        "qwertyDa": "QWERTY (Dänisch)",
+        "qwertyNo": "QWERTY (Norwegisch)",
+        "qwertyBr": "QWERTY (Brasilianisch, ABNT2)",
+        "qwertyPt": "QWERTY (Portugiesisch)",
+        "qwertyTr": "QWERTY (Türkisch)",
+        "dvorak": "Dvorak-Belegung",
+        "colemak": "Colemak-Belegung"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const de_DE: EnTranslations = {
       "perfectedBadge": "Perfektioniert",
       "perfectingRank": "Perfektionierung: Rang {rank} von {ranks}",
       "materialSourceGatherer": "{count} × Gesammelt von {name}",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × Erbeutet von {name}",
       "materialSourceGathererSigned": "{count} × Gesammelt von {name}, signiert von {signer}",
       "materialSourceUnrecorded": "{count} × Kein Sammler verzeichnet",
       "materialSourceUnrecordedSigned": "{count} × Kein Sammler verzeichnet, signiert von {name}",
@@ -5457,12 +5457,16 @@ export const de_DE: EnTranslations = {
       "enchant_weapon_piston_drive": "Ätzt eine zweihändige Waffe dauerhaft mit 12 Stärke und 25 kritischer Trefferwertung. Kann nicht auf eine einhändige Waffe angewendet werden. Ein fester Bonus, der nicht skaliert."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Dein Herdstein des Bündnisses ist nicht gebunden. Sprich mit einem verbündeten Quartiermeister oder benutze ihn an einem verbündeten Knotenpunkt.",
+      "hearthstoneBound": "Dein Herdstein des Bündnisses ist nun an {hub} gebunden.",
+      "hearthstoneTransport": "Der Herdstein bringt dich nach {hub}.",
+      "itemCooldown": "Dieser Gegenstand ist noch nicht bereit ({minutes} Min. verbleibend).",
       "alliedHearthstoneUse": "Einsatz: Teleportiert dich zu deinem angestimmten Fraktionshub. (10 Sek. Zauber, 15 Min. Abklingzeit)",
       "alliedHearthstoneAttuned": "Angestimmt auf: {hub}",
       "hub_none": "Keine (Nutze es in der Nähe eines Fraktionshubs um es anzustimmen)",
       "hub_rift_watch": "Drifthaven (Die Risswacht)",
       "hub_church_order": "Eastbrook-Tal (Der Kirchenorden)",
-      "hub_automatons": "South Reach (Die Automatenschmiede)",
+      "hub_automatons": "Wyrmwatch (Automaten)",
       "riftGliderUse": "Einsatz: Entfaltet den Gleitschirm und verringert die Fallgeschwindigkeit für 30 Sekunden. Das Landen oder Schadensaufnahme bricht den Effekt ab. (2 Min. Abklingzeit)",
       "targetDummyUse": "Einsatz: Stellt in der freien Welt ein mechanisches Zieltrainingspuppe für 2 Minuten auf, um Kampffähigkeiten zu trainieren. (5 Min. Abklingzeit)",
       "battleStandardUse": "Einsatz: Pflanzt die Morgenröte-Kriegsflagge für 5 Minuten, erhöht die Gesundheits- und Manaregeneration außerhalb des Kampfes erheblich für alle nahen Verbündeten. Das Verweilen in ihrer Nähe für 10 Sekunden gewährt auch Segen der Morgenröte (+5% auf alle Attribute für 30 Min.). (5 Min. Abklingzeit)",
@@ -5826,8 +5830,8 @@ export const de_DE: EnTranslations = {
     "pattern": {
       "teaches": "Benutzen: Zeigt dir, wie du {item} herstellst.",
       "teachesEnchant": "Benutzen: Zeigt dir, wie du {enchant} anwendest.",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}: {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Entbindung: {name}",
@@ -7428,7 +7432,7 @@ export const de_DE: EnTranslations = {
       "rowCameraSpeed": "Wie schnell die Kamera schwenkt, wenn Sie sich mit der Maus umsehen.",
       "rowTouchLookSpeed": "Dasselbe für die Wischsicht, und es erscheint nur, wenn Sie einen Touchscreen verwenden.",
       "rowFullscreen": "Füllt den gesamten Bildschirm mit dem Spiel.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "Glühen, Funken, Geschosse und Einschläge der Zauber von Spielern und ihren Begleitern, deine eingeschlossen. Schalte sie für ein ruhigeres Bild oder ein paar zusätzliche Bilder pro Sekunde in großen Gruppenkämpfen aus. Gegnerische Zauber bleiben sichtbar, ebenso Gefahrenringe, Markierungen über betäubten, verängstigten oder bewegungsunfähigen Zielen und sämtliche Zauberleisten.",
       "rowWaterRipples": "Kielwasser und Wellen, die sich beim Schwimmen hinter Ihnen ausbreiten. Standardmäßig aus, und der einzige Wassereffekt, der echte Bildrate kostet, Spritzer und Blasen bleiben davon unberührt.",
       "rowOverflowXp": "Ob Ihr Balken auf Höchststufe weiterhin mit Überschuss-EP gefüllt wird oder stattdessen den klassischen, statischen Text für die Höchststufe zeigt.",
       "rowInterfaceMode": "Ob Sie die Desktop-Oberfläche oder die Touch-Steuerung auf dem Bildschirm erhalten. Auto liest Ihr Gerät aus, und Sie können jeden der beiden Modi erzwingen: Ein Tablet mit Tastatur kann das Desktop-Layout nutzen, und ein Laptop mit Touchscreen kann die Touch-Steuerung nutzen.",
@@ -7481,7 +7485,7 @@ export const de_DE: EnTranslations = {
       "ifMouseoverCast": "Lässt eine Heilung oder einen freundlichen Zauber auf dem Gruppenfenster landen, über dem Ihr Mauszeiger schwebt, ohne Ihr Ziel zu ändern.",
       "ifStickyTarget": "Behält Ihr aktuelles Ziel, wenn Sie auf leeren Boden klicken, statt es aufzuheben.",
       "ifFctScale": "Die Größe der Schadens- und Heilzahlen, die von Ihrem Ziel abschweben.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Bringt die schlichten weißen und blassgoldenen Schadenszahlen zurück, die gerade nach oben steigen. Lasse es für kräftigere, seitlich auffächernde Zahlen ausgeschaltet (Standard); kritische und ungewöhnlich große Treffer leuchten auf.",
       "ifExtraBars": "Blendet eine zweite Aktionsleistenreihe ein, und eine dritte, sobald die zweite aktiv ist. Die Felder bleiben über ihre Tastenbelegung erreichbar, selbst während die Reihen ausgeblendet sind.",
       "ifHideUnused": "Blendet leere Aktionsfelder aus, sodass nur die Schaltflächen gezeichnet werden, die Sie tatsächlich nutzen.",
       "ifLockBars": "Sperrt Ihre Leisten, damit Sie eine Fähigkeit nicht versehentlich aus einem Feld ziehen.",
@@ -7912,14 +7916,14 @@ export const de_DE: EnTranslations = {
         "form_bear": "Die Tank-Gestalt: ein dickes Fell, Wut statt Mana und zusätzliche Bedrohung, damit Gegner weiter auf dich einschlagen.",
         "form_cat": "Die Nahkampf-Schadensgestalt: Energie und Combopunkte wie ein Schurke, dazu deutlich weniger Bedrohung.",
         "form_travel": "Die Reisegestalt: deutlich schneller am Boden unterwegs, aber ohne andere Fähigkeiten, bis du zurückwechselst.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "Die Heilgestalt der Wiederherstellung: robustere Haut und stärkere Heilung bei langsamerem Gang, alle Zauber und dein Mana bleiben erhalten."
       },
       "mageEleSummon": "Ein Frost-Zauber, der den Elementar an deine Seite ruft und auf dein Ziel hetzt.",
       "formName": {
         "form_bear": "Bruin-Gestalt",
         "form_cat": "Katzengestalt",
         "form_travel": "Fleet-Gestalt",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Sporenheilerform"
       }
     },
     "classHook": {
@@ -8622,7 +8626,7 @@ export const de_DE: EnTranslations = {
       "formBear": "Bruin Form",
       "formCat": "Katzengestalt",
       "formTravel": "Fleet Form",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Sporenheilerform",
       "groupCreatures": "Kreaturen",
       "groupPets": "Dämonen des Hexenmeisters",
       "pickerLabel": "Wähle ein Modell zum Ansehen",
@@ -9142,7 +9146,7 @@ export const de_DE: EnTranslations = {
       "buyingBody": "Sprich mit einem Händler und wähle, seine Waren durchzusehen, und sein Laden öffnet sich mit drei Reitern: Kaufen, Verkaufen und Rückkauf. Kaufen enthält alles, was er führt, deins, sofern du es dir leisten kannst. Verkaufen listet auf, was aus deinen Taschen er dir abkauft, und ein Stück mit eigener gewürfelter Güte zu verkaufen verlangt zuerst eine Bestätigung, sodass ein wertvolles Exemplar nie versehentlich verloren geht. Trennst du dich von etwas, das du bereust, hebt der Reiter Rückkauf deine jüngsten Verkäufe auf, sodass du sie für die Münzen zurückkaufen kannst, die du erhalten hast.",
       "junkTitle": "Plunder loswerden",
       "junkBody": "Beute, für die du keine Verwendung hast, lässt sich immer noch an jeden Händler verkaufen, leere deine Taschen also, wann immer du durch eine Stadt kommst, statt sie volllaufen zu lassen. Der Reiter Verkaufen des Händlers hat sogar eine Ein-Klick-Schaltfläche, die jeden Kram von schlechter Güte auf einmal verkauft. Wirklich wertlosen Kleinkram kannst du auch einfach wegwerfen, um Platz zu schaffen.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "Unbrauchbare Beute lässt sich weiterhin bei jedem Händler mit eigenem Laden verkaufen. Leere deine Taschen bei jedem Stadtbesuch. Das Händlerfenster bietet sogar eine Schaltfläche zum Verkauf sämtlichen Plunders schlechter Qualität mit einem Klick. Völlig wertlose Dinge kannst du auch wegwerfen, um Platz zu schaffen. Unsignierte graue Gegenstände gelangen dabei nicht in die Rückkaufliste. Prüfe also vor dem Verkauf, ob du etwas behalten wolltest.",
       "tradeTitle": "Handeln mit anderen Spielern",
       "tradeBody": "Du kannst von Angesicht zu Angesicht mit jedem handeln, der nahe bei dir steht. Ihr beide legt Gegenstände und Münzen in ein gemeinsames Fenster, und der Tausch findet erst statt, sobald ihr ihn beide bestätigt, sodass keine Seite übers Ohr gehauen werden kann. Es ist der einfache Weg, einem Freund eine Beute zu reichen oder ein Geschäft abzuschließen.",
       "mailTitle": "Die Rabenpost",
@@ -11231,10 +11235,10 @@ export const de_DE: EnTranslations = {
     "selectClass": "Bitte wähle eine Klasse.",
     "pickClass": "Wähle eine Klasse.",
     "returnToLogin": "Zurück zur Anmeldung",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Nach Aktualisierungen suchen",
+    "noUpdateFound": "Keine Aktualisierung gefunden. Versuche es in Kürze erneut.",
+    "updateUnavailable": "Aktualisiere über deinen Spieleladen oder lade den neuesten Client herunter.",
+    "updateSearchFailed": "Aktualisierungen konnten nicht geprüft werden. Bitte versuche es erneut.",
     "api": {
       "tooManyAttempts": "Zu viele Versuche. Warte eine Minute und versuche es erneut.",
       "usernameShape": "Der Benutzername muss 3-24 Zeichen lang sein und Buchstaben, Ziffern oder Unterstrich verwenden.",
@@ -12412,6 +12416,8 @@ export const de_DE: EnTranslations = {
       "clueTalkAria": "Nach dem Hinweis fragen: {name}",
       "clueDeliver": "Übergebt {count} {item}.",
       "clueDeliverAria": "{count} {item} an {name} übergeben",
+      "attuneHearthstone": "Meinen Herdstein des Bündnisses hier binden.",
+      "attuneHearthstoneAria": "Binde deinen Herdstein des Bündnisses bei {name} an {hub}",
       "profIntroHint": "Sprich mit {name} wegen \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Die drei Relikte erzählen dieselbe Geschichte: Aldren kämpfte, um seinen König zu verteidigen, Malric durchbrach die Grenze des Todes, und Voss versuchte aufzuhalten, was danach kam. Das Siegel wird schwächer, und die verlassene Krypta ist der Weg hinab.",
       "browseGoods": "Lasst mich Eure Waren ansehen.",
@@ -12799,7 +12805,7 @@ export const de_DE: EnTranslations = {
       "clueCasketOpened": "Die Truhe enthält {money} und {items}.",
       "treasureMapEarned": "Alle Weltquests des Tages sind erledigt: du hast {map} gefunden.",
       "treasureMapLost": "Alle Weltquests des Tages sind erledigt, aber dein Rucksack hat keinen Platz für die Schatzkarte.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Deine Taschen sind voll. Deine Belohnung wurde an dein Postfach geschickt: {items}.",
       "treasureMapRead": "Du studierst {map}. Das X liegt irgendwo in {zone}.",
       "treasureMapUpgraded": "Die Karte wird mit feinerer Tinte neu gezeichnet: sie ist jetzt {map}.",
       "treasureVaultOpened": "Der Boden weicht. Ein vergrabener Schatz liegt offen vor dir.",
@@ -12978,7 +12984,7 @@ export const de_DE: EnTranslations = {
       "sellJunk": "Graues verkaufen",
       "sellJunkAria": "Alle grauen Gegenstände für {price} verkaufen",
       "sellJunkHint": "Verkauft alle grauen Gegenstände in euren Taschen außer Questgegenständen.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "Unsignierte graue Gegenstände erscheinen nicht in der Rückkaufliste. Ihr Verkauf kann daher nicht rückgängig gemacht werden."
     },
     "market": {
       "title": "Weltmarkt",
@@ -13260,7 +13266,7 @@ export const de_DE: EnTranslations = {
       },
       "bloodhook": {
         "name": "Bluthaken",
-        "description": "Stürmt auf einen Gegner zu und wendet die Bluthakenwunde an, die über 12 Sek. in 4 Ticks 34 physischen Grundschaden plus 26% Eurer Distanzangriffskraft verursacht. (Feldkunst-Signatur)"
+        "description": "Stürmt auf einen Gegner zu und wendet die Bluthakenwunde an, die über 12 Sek. in 4 Ticks 34 physischen Grundschaden plus 26% Eurer Distanzangriffskraft verursacht. (Überleben-Signatur)"
       },
       "shrapnel_charge": {
         "name": "Splitterladung",
@@ -13283,12 +13289,12 @@ export const de_DE: EnTranslations = {
         "description": "Verringert erlittenen Schaden 8 Sek. lang um 60%, verhindert aber Angriffe, solange sie aktiv ist."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Totstellen",
+        "description": "Lass dich zu Boden fallen und stelle dich tot: Allen werden deine Gesundheit und dein Fokus als leer angezeigt. Gegner vergessen dich, und gegnerische Spieler verlieren dich als Ziel. Bewegung, Angriff oder eine andere Fähigkeit beendet dies. Erneut wirken, um aufzustehen."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktische Tarnung",
+        "description": "Passe dich der Umgebung an: Gegner nehmen dich kaum wahr und du bewegst dich mit 80% Tempo. Angriffe oder erlittener Schaden beenden die taktische Tarnung. Erneut wirken, um hervorzutreten. (Überleben)"
       },
       "frostjaw_trap": {
         "name": "Frostkieferfalle",
@@ -13831,11 +13837,11 @@ export const de_DE: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Jagdschwung",
-        "description": "Passiv: Der Weidschlag gewährt 8 Sek. lang 1 Jagdschwung, bis zu 3. Bei 3 Stapeln verursacht Wundriss 45% mehr Schlagschaden und verbraucht die Stapel. (Feldkunst)"
+        "description": "Passiv: Der Weidschlag gewährt 8 Sek. lang 1 Jagdschwung, bis zu 3. Bei 3 Stapeln verursacht Wundriss 45% mehr Schlagschaden und verbraucht die Stapel. (Überleben)"
       },
       "fieldcraft_reentry": {
         "name": "Bewaffneter Wiedereintritt",
-        "description": "Passiv: Pfadbruch erneuert den Jagdschwung und bereitet 12 Sek. lang Euren nächsten Weidschlag oder Bluthaken vor. Der Weidschlag verursacht pro Stapel 15% mehr Schaden. Der Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% pro Stapel und durch Eure Distanzangriffskraft. Bei 3 Stapeln verbraucht einer der beiden Angriffe den Jagdschwung. (Feldkunst)"
+        "description": "Passiv: Pfadbruch erneuert den Jagdschwung und bereitet 12 Sek. lang Euren nächsten Weidschlag oder Bluthaken vor. Der Weidschlag verursacht pro Stapel 15% mehr Schaden. Der Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% pro Stapel und durch Eure Distanzangriffskraft. Bei 3 Stapeln verbraucht einer der beiden Angriffe den Jagdschwung. (Überleben)"
       },
       "wing_clip": {
         "name": "Fesselnder Hieb",
@@ -14085,7 +14091,7 @@ export const de_DE: EnTranslations = {
         "description": "Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu {duration} Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Sporenheilung",
         "description": "Heilt das Ziel über 12 Sek. um {damage}.",
         "specNote_restoration": "Jeder Zauber fügt 1 Grünkraft hinzu (max. 3), auch wenn er eine bereits wirkende Blüte erneuert. Bei 3 Grünkraft wird Rasche Heilung zu Überblüte."
       },
@@ -14124,9 +14130,9 @@ export const de_DE: EnTranslations = {
         "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Kratzen",
+        "description": "Kratze durch nahe Ziele innerhalb von 6 Metern und verursache Waffenschaden plus {damage}. Gewährt 1 Combopunkt pro getroffenem Ziel. Deckt schleichende Gegner im Bereich auf. Nur in Katzengestalt.",
+        "specNote_feral": "Jeder gelandete Treffer fügt 1 Altes Blut hinzu (max. 3)."
       },
       "ferocious_bite": {
         "name": "Blutbiss",
@@ -14411,8 +14417,8 @@ export const de_DE: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rasche Heilung",
-        "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Jeder Zauber von Sporemending, Zweite Blüte und Wildheilung fügt 1 Grünkraft hinzu; bei 3 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Hainherz-Signatur)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Jeder Zauber von Sporenheilung, Zweite Blüte und Wildheilung fügt 1 Grünkraft hinzu; bei 3 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Signatur der Wiederherstellung)",
+        "specNote_restoration": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem befreundeten Ziel, um es um {damage} zu heilen. Sporenheilung und Pflanzungen von Zweite Blüte gewähren Grünkraft; bei 5 Grünkraft wird diese Taste zu Überblüte, die sofort alle Verbündeten mit deinen Heilung-über-Zeit-Effekten um 60% ihrer verbleibenden Heilung heilt. (Signatur der Wiederherstellung)"
       },
       "moonlash": {
         "name": "Mondwoge",
@@ -14439,26 +14445,26 @@ export const de_DE: EnTranslations = {
         "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Hainherz)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Sporenheilerform",
+        "description": "Verwandle dich in einen Sporenheiler: Heilung um 20% und Rüstung um 40% erhöht, Bewegungstempo um 20% verringert. Alle Zauber deiner Zaubergestalt bleiben nutzbar. Hält bis zum Gestaltwechsel. Jeder Gestaltwechsel gewährt für kurze Zeit erhöhtes Bewegungstempo durch Weiter Schritt. Erneut wirken, um zur Zaubergestalt zurückzukehren. (Signatur der Wiederherstellung)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Sporenexplosion",
+        "description": "Beschwört einen Sporenplatzer im Zielgebiet. Nach {duration} Sek. platzt er, heilt Verbündete um {healing} und fügt Gegnern innerhalb von 8 Metern {damage} Naturschaden zu.",
+        "specNote_balance": "Bei 3 Mondflut ist sie 25% stärker und verbraucht deine Mondflut.",
+        "specNote_restoration": "Belegt außerdem jeden geheilten Verbündeten mit Sporenheilung. Bei voller Grünkraft ist sie 25% stärker und verbraucht deine Grünkraft."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Segen der Natur",
+        "description": "Deine Zauber können Segen der Natur für 10 Sek. aktivieren: Der angezeigte Zauber wird kostenlos, 25% stärker und in jeder Gestalt nutzbar. Ein neuer Auslöser erneuert die Dauer.",
+        "specNote_feral": "Jeder gelandete automatische Nahkampfangriff hat eine Chance von 1 zu 15, ihn für Sporenheilung zu aktivieren, in Bruin-Gestalt für Eichenhaut.",
+        "specNote_balance": "Jeder gewirkte Wildblitz oder Himmelssturz hat eine Chance von 10%, ihn für Sporenexplosion zu aktivieren, höchstens einmal alle 10 Sek.",
+        "specNote_restoration": "Jeder Tick deiner Heilung-über-Zeit-Effekte hat eine Chance von 10%, ihn für Sporenexplosion zu aktivieren, höchstens einmal alle 10 Sek."
       },
       "overbloom": {
         "name": "Überblüte",
-        "description": "Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Sporemending auf das Ziel.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Sporenheilung auf das Ziel.",
+        "specNote_restoration": "Verbraucht deine 5 Grünkraft: Jeder Verbündete mit deinen Heilung-über-Zeit-Effekten wird sofort um {buff}% ihrer verbleibenden Heilung geheilt, die Effekte werden entfernt und das Ziel erhält eine neue Sporenheilung."
       },
       "summon_imp": {
         "name": "Emberkin beschwören",
@@ -19098,10 +19104,10 @@ export const de_DE: EnTranslations = {
         "name": "Beutekiste des Emissärs"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Trophäenschädel"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Schädeltasche"
       },
       "clue_scroll": {
         "name": "Hinweisschriftrolle"
@@ -24117,9 +24123,9 @@ export const de_DE: EnTranslations = {
         "body": "Der Tresor wurde geleert, aber dein Anteil wurde nicht aus der Kiste eingesammelt. Die Raben haben ihn dir hier gebracht, zusammen mit den Waren und Münzen, die du verdient hast.\n\n- Die Rabenpflicht"
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "Die Rabenpost",
+        "subject": "Deine Weltquestbelohnung",
+        "body": "Deine Taschen waren voll, als du diese Weltquestbelohnung verdient hast. Deshalb haben die Raben sie dir hierher gebracht. Schaffe Platz und hole sie an einer beliebigen Rabensäule ab.\n\n- Die Rabenpost"
       }
     },
     "itemSets": {
@@ -24255,7 +24261,7 @@ export const de_DE: EnTranslations = {
       },
       "grovespring": {
         "name": "Gewand der Hainquelle",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Rasche Heilung verbraucht zuerst deine eigene Sporenheilung oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zaubern nicht mehr.",
         "bonus4": "Überblüte erntet 75 Prozent deiner verbleibenden Effekte und speichert danach 1 Üppigkeit."
       },
       "hexthread": {

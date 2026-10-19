@@ -420,7 +420,7 @@ export const zh_CN: EnTranslations = {
       "viewPossibleLoot": "查看可能的战利品",
       "lootFocus": "战利品专精",
       "allClassGear": "所有本职业装备",
-      "specRole": "{name} ({role})",
+      "specRole": "{name}（{role}）",
       "mixedRole": "{first} / {second}",
       "lootFocusHelp": "仅适用于尚未开启的宝库。",
       "noFocusedLoot": "没有符合条件的战利品。请选择其他专精。",
@@ -446,8 +446,8 @@ export const zh_CN: EnTranslations = {
         "worldMany": "已完成{count}个世界任务",
         "pvpOne": "已赢得{count}场评级比赛",
         "pvpMany": "已赢得{count}场评级比赛",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count}场PvP胜利",
+        "pvpWinMany": "{count}场PvP胜利"
       },
       "requiredTask": {
         "raidOne": "击败{count}个团队副本首领",
@@ -458,8 +458,8 @@ export const zh_CN: EnTranslations = {
         "worldMany": "完成{count}个世界任务",
         "pvpOne": "赢得{count}场评级比赛",
         "pvpMany": "赢得{count}场评级比赛",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "赢得{count}场PvP胜利",
+        "pvpWinMany": "赢得{count}场PvP胜利"
       },
       "readyWeeks": "未领取的周次：{count}。请先领取最早完成的那一周。",
       "claimLastWeek": "领取上周的奖励",
@@ -641,7 +641,7 @@ export const zh_CN: EnTranslations = {
       "healerConfirmCancel": "取消"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "正在恢复画面"
     },
     "wiki": {
       "confirmTitle": "打开维基？",
@@ -2816,7 +2816,7 @@ export const zh_CN: EnTranslations = {
         "worldKill": "世界击杀",
         "worldAssist": "世界击杀助攻",
         "hillHold": "占据山丘",
-        "worldQuest": "world quest"
+        "worldQuest": "世界任务"
       },
       "floatReasons": {
         "kill": "击杀",
@@ -2880,8 +2880,8 @@ export const zh_CN: EnTranslations = {
       "countsHolding": "圈内：你方 {yours}，对手 {theirs}",
       "contestYou": "正在占据山丘：{seconds} / {total}",
       "contestOther": "正在失去山丘：{seconds} / {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "进度暂停：{seconds}/{total}",
+      "contestOtherPaused": "对手进度暂停：{seconds}/{total}",
       "contestNone": "在圈内保持人数优势 {total} 即可占据它",
       "inside": "你在圈内",
       "distance": "距离圆圈 {yards} 码",
@@ -2899,10 +2899,10 @@ export const zh_CN: EnTranslations = {
       "unrecorded": "战利品颅骨",
       "store": "存入携带的颅骨（{count}）",
       "storeNone": "没有可存入的颅骨",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
+      "takeOne": "取出1个",
+      "takeAll": "全部取出",
+      "takeOneAria": "取出1个：{item}",
+      "takeAllAria": "全部取出：{item}",
       "tooltip": "可不占背包空间地保存任意数量的战利品颅骨。它在背包中时，你拾取的颅骨会直接放入其中。点击背包中的它可存入或取出颅骨。"
     },
     "warfareShop": {
@@ -2910,7 +2910,7 @@ export const zh_CN: EnTranslations = {
       "gossipOptionAria": "浏览 {name} 提供的战争套装商店",
       "jewelry": "饰品",
       "weapons": "武器",
-      "goods": "Goods",
+      "goods": "货物",
       "groupSeason2": "战争赛季 2：先锋",
       "groupEntry": "战争赛季 1",
       "owned": "已拥有",
@@ -4439,8 +4439,8 @@ export const zh_CN: EnTranslations = {
       "apply": "转换热键",
       "converted": "热键已从{from}转换为{to}。",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
+        "qwertyUs": "QWERTY（美国）",
+        "qwertyUk": "QWERTY（英国）",
         "qwertzDe": "QWERTZ（德语）",
         "qwertzCh": "QWERTZ（瑞士）",
         "azertyFr": "AZERTY（法语）",
@@ -5457,12 +5457,16 @@ export const zh_CN: EnTranslations = {
       "enchant_weapon_piston_drive": "为一把双手武器永久蚀刻12点力量和25点暴击等级。无法施加于单手武器。固定加成，不会随任何属性缩放。"
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "你的盟约炉石尚未绑定。请与盟友军需官交谈，或在盟友据点使用它。",
+      "hearthstoneBound": "你的盟约炉石现已绑定至{hub}。",
+      "hearthstoneTransport": "炉石将你传送至{hub}。",
+      "itemCooldown": "该物品尚未就绪（还需{minutes}分钟）。",
       "alliedHearthstoneUse": "使用：将你传送至已校准的阵营据点。（施法 10 秒，冷却 15 分钟）",
       "alliedHearthstoneAttuned": "已校准至：{hub}",
       "hub_none": "无（在阵营据点附近使用以校准）",
       "hub_rift_watch": "漂流港（裂隙守望）",
       "hub_church_order": "东溪谷（教会修会）",
-      "hub_automatons": "南境（机械铸造厂）",
+      "hub_automatons": "望龙哨（机械造物）",
       "riftGliderUse": "使用：展开滑翔翼，降低下落速度，持续 30 秒。着陆或受到伤害会取消该效果。（冷却 2 分钟）",
       "targetDummyUse": "使用：在野外部署一个机械训练假人，持续 2 分钟，用于练习战斗技能。（冷却 5 分钟）",
       "battleStandardUse": "使用：插下神圣黎明战旗，持续 5 分钟，大幅提高附近所有盟友的非战斗生命与法力恢复。在其附近停留 10 秒还会获得黎明祝福（所有属性提高 5%，持续 30 分钟）。（冷却 5 分钟）",
@@ -5826,8 +5830,8 @@ export const zh_CN: EnTranslations = {
     "pattern": {
       "teaches": "使用：教你制作{item}。",
       "teachesEnchant": "使用：教你如何施加{enchant}。",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}：{list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "解绑：{name}",
@@ -12412,6 +12416,8 @@ export const zh_CN: EnTranslations = {
       "clueTalkAria": "询问线索：{name}",
       "clueDeliver": "交出{count}个{item}。",
       "clueDeliverAria": "交出{count}个{item}给{name}",
+      "attuneHearthstone": "在此绑定我的盟约炉石。",
+      "attuneHearthstoneAria": "通过{name}将盟约炉石绑定至{hub}",
       "profIntroHint": "请找{name}接取《{quest}》。",
       "nythraxisDeathlessKingWarning": "三件遗物讲述着同一个故事：奥德伦为守护国王而战，马尔里克打破了死亡的界限，沃斯试图阻止随后发生的一切。封印正在减弱，废弃墓穴就是通往地下的道路。",
       "browseGoods": "让我看看你的货物。",

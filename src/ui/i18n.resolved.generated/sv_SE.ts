@@ -418,13 +418,13 @@ export const sv_SE: EnTranslations = {
       "heroicClears": "{count} Heroisk",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Visa möjligt byte",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Bytesinriktning",
+      "allClassGear": "Alla klassers utrustning",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "Gäller endast oöppnade valv.",
+      "noFocusedLoot": "Inget lämpligt byte. Välj en annan inriktning.",
+      "rolledFocus": "Slumpat för: {focus}",
       "chooseTable": "Välj vilken tabell som ska rullas från",
       "selectAllTables": "Välj alla",
       "selectedTables": "{count} tabeller valda",
@@ -446,8 +446,8 @@ export const sv_SE: EnTranslations = {
         "worldMany": "{count} världsuppdrag slutförda",
         "pvpOne": "{count} bedömd match vunnen",
         "pvpMany": "{count} bedömda matcher vunna",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} PvP-seger",
+        "pvpWinMany": "{count} PvP-segrar"
       },
       "requiredTask": {
         "raidOne": "Rensa {count} raid-möte",
@@ -458,8 +458,8 @@ export const sv_SE: EnTranslations = {
         "worldMany": "Slutför {count} världsuppdrag",
         "pvpOne": "Vinna {count} bedömd match",
         "pvpMany": "Vinna {count} bedömda matcher",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Vinn {count} PvP-seger",
+        "pvpWinMany": "Vinn {count} PvP-segrar"
       },
       "readyWeeks": "Oinsamlade veckor: {count}. Hävda den äldsta slutförda veckan först.",
       "claimLastWeek": "Hävda förra veckans belöning",
@@ -522,12 +522,12 @@ export const sv_SE: EnTranslations = {
       "castingOff": "Färjan till {dest} lämnar nu",
       "boardHint": "Stå på däcket när det seglar. Passagen är gratis.",
       "sailing": "Seglande till {dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "Färja från {port} till {dest}",
+      "portTitle": "Färjeläget i {port}",
+      "destination": "Resmål: {dest}",
+      "boardNow": "Gå ombord nu",
+      "arrivesIn": "Färjan anländer om {time}",
+      "scheduleUnavailable": "Färjans tidtabell är inte tillgänglig."
     },
     "materialStackSelectionUnavailable": "Det materialvalet är inte längre tillgängligt.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const sv_SE: EnTranslations = {
       "banner": "Åskådar {name}"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Dagens meddelande: {text}",
+      "updated": "Dagens meddelande har uppdaterats.",
+      "cleared": "Dagens meddelande har rensats.",
+      "none": "Inget meddelande för dagen har angetts.",
+      "usage": "Användning: /motd \"<meddelande>\" för att ange det, /motd clear för att ta bort det.",
+      "tooLong": "Dagens meddelande får innehålla högst {max} tecken.",
+      "saveFailed": "Dagens meddelande kunde inte sparas och försvinner vid en omstart."
     },
     "readyCheck": {
       "title": "Klar kontroll",
@@ -619,11 +619,11 @@ export const sv_SE: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Återuppstå vid liket",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "PvP-återupplivning",
+      "pvpResurrectTitle": "Återuppstå på närmaste kyrkogård med full hälsa, utan en ny Väktartull.",
+      "pvpResurrectWaitButton": "PvP-återupplivning ({seconds})",
+      "pvpResurrectWaitNote": "Du kan använda PvP-återupplivning om {seconds}: du återuppstår på närmaste kyrkogård.",
+      "pvpResurrectReadyNote": "PvP-återupplivning är redo: du återuppstår på närmaste kyrkogård.",
       "resurrectAtHealer": "Den bleka väktaren (Väktartullen)",
       "ghostHint": "Springa till platsen för din död eller tala med Den bleka väktaren för att återupplivas",
       "spiritHealerAlive": "Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande.",
@@ -641,7 +641,7 @@ export const sv_SE: EnTranslations = {
       "healerConfirmCancel": "Avbryt"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Återställer grafik"
     },
     "wiki": {
       "confirmTitle": "Öppna wikin?",
@@ -2155,7 +2155,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Besvärjelsers verktygstips vid hovring",
       "clickMoveLeft": "Vänsterklick",
       "clickMoveRight": "Högerklick",
       "version": "v{version} ({build})",
@@ -2269,7 +2269,7 @@ export const sv_SE: EnTranslations = {
       "confirmVendorSellNote": "Om du stänger av det här säljs föremål med ett enda klick utan bekräftelse, så en förskjuten väskplats skulle kunna sälja fel föremål.",
       "confirmVendorSellMinQuality": "Bekräfta försäljning från kvalitet",
       "confirmVendorSellMinQualityNote": "Artiklar under denna kvalitet säljs med ett enda klick; en felaktigt såld artikel kan fortfarande köpas tillbaka från säljaren.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Föremål under denna kvalitet säljs med ett enda klick. Ett föremål som säljs av misstag kan köpas tillbaka från handlaren, utom osignerade grå föremål.",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
@@ -2290,9 +2290,9 @@ export const sv_SE: EnTranslations = {
       "showUtilityModes": "Inkludera smygande och reseformer",
       "showFriendlyTrack": "Visa mina förstärkningar på allierade",
       "showShieldTrack": "Visa mina sköldar",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Klassisk stridstext",
       "waterRipples": "Vattenkrusningar (kölvatten)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Besvärjelseeffekter",
       "actionCam": "Actionkamera",
       "actionCamShoulder": "Actionkamera Axel",
       "actionCamShoulderLeft": "Vänster {pct}",
@@ -2816,7 +2816,7 @@ export const sv_SE: EnTranslations = {
         "worldKill": "världsdödande",
         "worldAssist": "världsdodade assisterad",
         "hillHold": "håller berget",
-        "worldQuest": "world quest"
+        "worldQuest": "världsuppdrag"
       },
       "floatReasons": {
         "kill": "Dråp",
@@ -2826,11 +2826,11 @@ export const sv_SE: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Få permanenta titlar efter {thresholds} spelad tid med världs-PvP påslaget i den öppna världen eller i PvP-instanser. Utloggning, död, PvE-instanser och fristäder pausar tiden. Stänger du av det nollställs tiden.",
+      "rewardPaused": "Nuvarande PvP-svit: {time} spelad tid (pausad i en fristad)",
+      "rewardPausedDead": "Nuvarande PvP-svit: {time} spelad tid (pausad medan du är död)",
+      "rewardPausedInstance": "Nuvarande PvP-svit: {time} spelad tid (pausad i PvE-instanser)",
+      "rewardProgress": "Nuvarande PvP-svit: {time} spelad tid",
       "tab": "Världskamp",
       "title": "Världskamp",
       "blurb": "Höj din flagga för att slåss med andra flaggade spelare var som helst i den öppna världen. Besegra en och ta del av deras börse, plus Heder mot Krigsförskap. Slagfälten och Arenorna betalar fortfarande mer.",
@@ -2849,8 +2849,8 @@ export const sv_SE: EnTranslations = {
       "markLine": "Att attackera en ej flaggad spelare där höjer din egen flagga; att attackera en flaggad gör det aldrig.",
       "aidLine": "Att läka, skydda eller buffa en flaggad spelare i en världskamp höjer din flagga.",
       "stakeLine": "Förloraren betalar {cap} eller {percent} av sin börse, vilket är minst.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "När ni båda har PvP-flaggan påslagen hamnar guldet från den dödande träffen på kroppen tillsammans med förlorarens skalle.",
+      "skullName": "{name}s skalle",
       "noStakeLine": "En ej flaggad spelare som dödas på free-for-all marken förlorar inget guld.",
       "noTakeLine": "En ej flaggad fighter tar inget guld heller: det flyttas bara mellan två flaggade spelare.",
       "honorLine": "{honor} Heder per seger, delad mellan alla som hjälpte.",
@@ -2880,8 +2880,8 @@ export const sv_SE: EnTranslations = {
       "countsHolding": "Innanför: du {yours}, rival {theirs}",
       "contestYou": "Tar kullen: {seconds} av {total}",
       "contestOther": "Förlorar kullen: {seconds} av {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "Pausad: {seconds} av {total}",
+      "contestOtherPaused": "Rivalens tid pausad: {seconds} av {total}",
       "contestNone": "Håll en majoritet innanför för {total} för att ta den",
       "inside": "Du är inom cirkeln",
       "distance": "{yards} yd till cirkeln",
@@ -2890,27 +2890,27 @@ export const sv_SE: EnTranslations = {
       "standingRaid": "Rajdmedlemmar räknas inte: bara partier kan inneha kullen"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Skallpåse",
+      "total": "Skallar: {count}",
+      "close": "Stäng skallpåsen",
+      "clickOpen": "Klicka för att öppna",
+      "notCarried": "Bär skallpåsen i dina väskor för att lägga in eller ta ut skallar.",
+      "empty": "Tom. När du bär påsen hamnar skallar som du plundrar direkt i den.",
+      "unrecorded": "Troféskalle",
+      "store": "Lägg in burna skallar ({count})",
+      "storeNone": "Inga skallar att lägga in",
+      "takeOne": "Ta 1",
+      "takeAll": "Ta alla",
+      "takeOneAria": "Ta 1: {item}",
+      "takeAllAria": "Ta alla: {item}",
+      "tooltip": "Rymmer obegränsat med troféskallar utan att ta upp väskutrymme. När du har den i dina väskor hamnar skallar som du plundrar direkt i den. Klicka på den i väskan för att lägga in eller ta ut skallar."
     },
     "warfareShop": {
       "gossipOption": "Bläddra bland Krigföringsset",
       "gossipOptionAria": "Bläddra bland Krigföringssetbutiken som erbjuds av {name}",
       "jewelry": "Smycken",
       "weapons": "Vapen",
-      "goods": "Goods",
+      "goods": "Varor",
       "groupSeason2": "Krigsföring Säsong 2: Framfart",
       "groupEntry": "Krigsföring Säsong 1",
       "owned": "Ägd",
@@ -2951,12 +2951,12 @@ export const sv_SE: EnTranslations = {
       "hint": "Hitta marken som denna karta visar, stå på X och använd kartan igen för att gräva. En begravd skatt öppnas för dig och ditt lag.",
       "upgradeNote": "Att omtecka det som en {rarity} karta tar {inks} kartografbläck (du håller {held}). Fraktionens quartermaster säljer det.",
       "upgradeMaxed": "Ingen kartograf kunde göra denna karta bättre.",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Vilken karta vill du använda Kartografens bläck på?",
+      "inkPickerHeld": "Du har {held} Kartografens bläck.",
+      "inkPickerRead": "Följs just nu: dess kryss finns i {zone}. Krysset stannar på samma plats.",
+      "inkPickerUnread": "Oläst ({count} i din ägo)",
+      "inkPickerCost": "Rita om till {rarity}: {inks} bläck",
+      "inkPickerCancel": "Avbryt",
       "rarity": {
         "common": "Vanlig",
         "rare": "Sällsynt",
@@ -3673,8 +3673,8 @@ export const sv_SE: EnTranslations = {
       "resetDone": "Alla instanser har återställts.",
       "resetNone": "Du har inga instanser att återställa.",
       "resetOccupied": "Du kan inte återställa instanser medan någon fortfarande är kvar inuti.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "Svårighetsändringen köades eftersom någon eller någons kropp fortfarande är kvar där inne. Den träder i kraft när instanserna är tomma.",
+      "queuedCancelled": "Den köade svårighetsändringen avbröts eftersom gruppen eller ledaren ändrades.",
       "resetSameDifficulty": "Ändra fängelsehålans svårighetsgrad innan du återställer dessa instanser. Tomma instanser återställs automatiskt efter 5 minuter.",
       "resetLoot": "Du kan inte återställa instanser medan byte finns kvar inuti.",
       "resetConfirmTitle": "Återställ alla instanser?",
@@ -3691,7 +3691,7 @@ export const sv_SE: EnTranslations = {
       "dragEquipHint": "Dra till din karaktär för att utrusta",
       "dragDestroyHint": "Dra ut i världen för att förstöra",
       "reorderNeedsRecent": "Rensa filtret och sortera efter Nyliga för att ordna om dina väskor",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Låsta föremål stannar på sin plats i väskan. Lås upp föremålet för att flytta det.",
       "itemAriaInstanced": "{item}, antal {count}, tillverkarmärkt kopia",
       "itemAriaEnchanted": "{item}, antal {count}, förtrollad kopia",
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
@@ -4179,7 +4179,7 @@ export const sv_SE: EnTranslations = {
       "formTravel": "Fleetform: förflyttningshastighet ökad med {pct}%",
       "formFireball": "Ember Form: rörelsehastigheten ökad med {pct}%; attacker och besvärjelser är inaktiverade",
       "formMoonkin": "Månugglaform: besvärjelseskada ökad med {pct}% och rustning ökad med {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Sporläkarform: utförd läkning ökar med {pct}%, rustningen ökar med {armorPct}% och rörelsehastigheten minskar med {slowPct}%",
       "formShadow": "Dunkelslöja: skuggskada ökad med {pct}%",
       "resourceCount": "{value} av {max}",
       "formLich": "Soul Lance träffar även upp till {targets} närliggande fiender för {pct}% skada",
@@ -4266,7 +4266,7 @@ export const sv_SE: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "BV",
       "pvpTag": "PvP",
-      "bountyTag": "Bounty",
+      "bountyTag": "Skottpengar",
       "cheaterTag": "< Fuskare >",
       "pledgeTag": "Trogen {guild}",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const sv_SE: EnTranslations = {
       "wrongKind": "Den koden är en inställningsexport, inte en snabbtangentsinställning."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Tangentbordslayout",
+      "open": "Konvertera",
+      "from": "Snabbtangenter avsedda för",
+      "to": "Konvertera till",
+      "keepMovement": "Behåll rörelsetangenternas placering",
+      "keepMovementLocked": "Rörelsetangenterna behöll sin placering förra gången och gör därför det igen. Återställ standardinställningarna för att börja om.",
+      "help": "Varje snabbtangent flyttas till den tangent som skriver samma tecken i den nya layouten. Sifferraden stannar på samma plats. Tangentnamnen i listan anger QWERTY-positioner; tangentbordsöversikten visar din egen layout.",
+      "moves": "Snabbtangenter som flyttas: {count}",
+      "noChange": "Inga snabbtangenter ändras mellan dessa layouter.",
+      "apply": "Konvertera snabbtangenter",
+      "converted": "Snabbtangenter konverterades från {from} till {to}.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (amerikansk)",
+        "qwertyUk": "QWERTY (brittisk)",
+        "qwertzDe": "QWERTZ (tysk)",
+        "qwertzCh": "QWERTZ (schweizisk)",
+        "azertyFr": "AZERTY (fransk)",
+        "azertyBe": "AZERTY (belgisk)",
+        "qwertyEs": "QWERTY (spansk)",
+        "qwertyIt": "QWERTY (italiensk)",
+        "qwertyNordic": "QWERTY (svensk, finsk)",
+        "qwertyDa": "QWERTY (dansk)",
+        "qwertyNo": "QWERTY (norsk)",
+        "qwertyBr": "QWERTY (brasiliansk ABNT2)",
+        "qwertyPt": "QWERTY (portugisisk)",
+        "qwertyTr": "QWERTY (turkisk)",
+        "dvorak": "Dvorak-layout",
+        "colemak": "Colemak-layout"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const sv_SE: EnTranslations = {
       "perfectedBadge": "Förfinad",
       "perfectingRank": "Förfining: rang {rank} av {ranks}",
       "materialSourceGatherer": "{count} × samlad av {name}",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × Tagen från {name}",
       "materialSourceGathererSigned": "{count} × samlad av {name}, signerad av {signer}",
       "materialSourceUnrecorded": "{count} × ingen samlare registrerad",
       "materialSourceUnrecordedSigned": "{count} × ingen samlare registrerad, signerad av {name}",
@@ -5457,12 +5457,16 @@ export const sv_SE: EnTranslations = {
       "enchant_weapon_piston_drive": "Märker permanent ett tvåhandsvapen med 12 styrka och 25 kritiska slag. Kan inte tillämpas på ett enhandsväpen. En platt bonus; den skalas inte."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Din allierade hemsten är inte bunden. Tala med en allierad kvartermästare eller använd den vid en allierad knutpunkt.",
+      "hearthstoneBound": "Din allierade hemsten är nu bunden till {hub}.",
+      "hearthstoneTransport": "Hemstenen för dig till {hub}.",
+      "itemCooldown": "Föremålet är inte klart än ({minutes} min återstår).",
       "alliedHearthstoneUse": "Användning: Teleporterar dig till din inställda fraktionsnav. (10 sek kast, 15 min väntetid)",
       "alliedHearthstoneAttuned": "Inställd på: {hub}",
       "hub_none": "Ingen (använd nära en fraktionsnav för att ställa in)",
       "hub_rift_watch": "Driftvik (Riftvakten)",
       "hub_church_order": "Östbäcksdalen (Kyrkoorden)",
-      "hub_automatons": "Sydlig räckvidd (AutomatsmidjaN)",
+      "hub_automatons": "Wyrmwatch (Automater)",
       "riftGliderUse": "Användning: Fäller ut glidaren, saktar fallhastigheten för 30 sek. Landning eller skada avbryter effekten. (2 min väntetid)",
       "targetDummyUse": "Användning: Distribuerar en mekanisk måldumy i den öppna världen för 2 minuter för att träna stridsförmågor. (5 min väntetid)",
       "battleStandardUse": "Användning: Plantera Vigda gryningens stridsfana för 5 minuter, ökar markant hälso- och manaregerering utanför strid för alla närliggande allierade. Att stanna nära den i 10 sekunder ger också Gryningens välsignelse (+5% till alla stats för 30 min). (5 min väntetid)",
@@ -5827,7 +5831,7 @@ export const sv_SE: EnTranslations = {
       "teaches": "Användning: Lär dig tillverka {item}.",
       "teachesEnchant": "Användning: Lär dig använda {enchant}.",
       "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Upplösning: {name}",
@@ -7428,7 +7432,7 @@ export const sv_SE: EnTranslations = {
       "rowCameraSpeed": "Hur snabbt kameran svänger när du ser dig omkring med musen.",
       "rowTouchLookSpeed": "Samma sak för pekblicken, och den visas bara när du är på en pekskärm.",
       "rowFullscreen": "Fyller hela skärmen med spelet.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "Glöd, gnistor, projektiler och träffexplosioner från besvärjelser som spelare och deras husdjur kastar, inklusive dina egna. Stäng av för en lugnare skärm eller några extra bildrutor i stora gruppstrider. Allt som fiender kastar syns fortfarande, liksom ringarna som visar områden du bör lämna, markörerna ovanför bedövade, skrämda eller rotade mål och alla kaststaplar.",
       "rowWaterRipples": "Kölvatten och krusningar som sprider sig bakom dig när du simmar. Avstängt som standard, och den enda vatteneffekten som kostar riktiga bildrutor; stänk och bubblor påverkas inte oavsett.",
       "rowOverflowXp": "Vid maxnivå, om ditt fält fortsätter fyllas med överflödeserfarenhet eller i stället visar den klassiska statiska texten för maxnivå.",
       "rowInterfaceMode": "Om du får skrivbordsgränssnittet eller pekkontrollerna på skärmen. Auto läser av din enhet, och du kan tvinga fram endera: en surfplatta med tangentbord kan ta skrivbordslayouten, och en pekskärmsbärbar kan ta pekkontrollerna.",
@@ -7481,7 +7485,7 @@ export const sv_SE: EnTranslations = {
       "ifMouseoverCast": "Låter en läkning eller en vänlig besvärjelse landa på den gruppram du hovrar över, utan att byta mål.",
       "ifStickyTarget": "Behåller ditt nuvarande mål när du klickar på tom mark, i stället för att rensa det.",
       "ifFctScale": "Storleken på de skade- och läkningssiffror som flyter upp från ditt mål.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Återställer de enkla vita och blekgula skadesiffrorna som stiger rakt uppåt. Låt inställningen vara avstängd (standard) för tydligare siffror som sprids åt sidorna och blossar upp vid kritiska och ovanligt stora träffar.",
       "ifExtraBars": "Visar ett andra handlingsfält, och ett tredje när det andra är på. Platserna går fortfarande att nå med sina tangentbindningar även när fälten är dolda.",
       "ifHideUnused": "Döljer tomma handlingsplatser så att bara knapparna du faktiskt använder ritas ut.",
       "ifLockBars": "Låser dina handlingsfält så att du inte råkar dra ut en förmåga ur en plats av misstag.",
@@ -7912,14 +7916,14 @@ export const sv_SE: EnTranslations = {
         "form_bear": "Tankformen: en tjock hud, Raseri i stället för mana, och extra hot så att fiender fortsätter slå på dig.",
         "form_cat": "Närstridsskadeformen: Energi och kombopoäng, precis som en Skurk, och betydligt mindre hot.",
         "form_travel": "Reseformen: betydligt snabbare över mark, men inga andra förmågor förrän du skiftar ur.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "Grovehearts läkningsskepnad: tåligare hud och starkare läkning med långsammare steg, samtidigt som du behåller alla besvärjelser och din mana."
       },
       "mageEleSummon": "En Frost-besvärjelse som kallar elementaren till din sida och sätter den på ditt mål.",
       "formName": {
         "form_bear": "Bruinform",
         "form_cat": "Kattform",
         "form_travel": "Fleetform",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Sporläkarform"
       }
     },
     "classHook": {
@@ -8622,7 +8626,7 @@ export const sv_SE: EnTranslations = {
       "formBear": "Bruinform",
       "formCat": "Kattform",
       "formTravel": "Fleetform",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Sporläkarform",
       "groupCreatures": "Varelser",
       "groupPets": "Häxmästardemoner",
       "pickerLabel": "Välj en modell att visa",
@@ -9142,7 +9146,7 @@ export const sv_SE: EnTranslations = {
       "buyingBody": "Tala med en köpman och välj att bläddra bland deras varor, så öppnas butiken med tre flikar: Bläddra, Sälj och Återköp. Bläddra rymmer allt de har i lager, ditt om du har råd. Sälj listar det i dina väskor som de betalar för, och att sälja en pjäs som bär sin egen slumpade kvalitet ber dig bekräfta först, så att en dyrbar kopia aldrig glider iväg av misstag. Om du gör dig av med något du ångrar håller fliken Återköp kvar dina senaste försäljningar så att du kan köpa tillbaka dem för myntet du fick.",
       "junkTitle": "Rensa bort skräp",
       "junkBody": "Byten du inte har någon nytta av går fortfarande att sälja till vilken handlare som helst, så töm dina väskor varje gång du passerar genom staden i stället för att låta dem fyllas. Handlarens Sälj-flik har till och med en enklicksknapp som säljer varenda småsak av Undermålig kvalitet på en gång. Helt värdelösa småsaker kan också kastas direkt för att göra plats.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "Byte som du inte behöver kan fortfarande säljas till alla handlare som har en egen butik, så töm väskorna när du passerar en stad i stället för att låta dem bli fulla. I handlarens fönster finns till och med knappen Sälj skräp, som säljer alla föremål av usel kvalitet med ett klick. Helt värdelösa småsaker kan också kastas bort direkt för att skapa plats. Osignerade grå föremål som säljs på detta sätt hamnar inte i återköpslistan, så kontrollera att inget du vill behålla följer med innan du trycker.",
       "tradeTitle": "Handla med andra spelare",
       "tradeBody": "Du kan byta öga mot öga med vem som helst som står nära dig. Ni lägger båda föremål och mynt i ett delat fönster och bytet sker först när ni båda bekräftar det, så ingen sida kan bli lurad. Det är det enkla sättet att räcka en vän ett byte eller göra upp en affär.",
       "mailTitle": "Korpposten",
@@ -11231,10 +11235,10 @@ export const sv_SE: EnTranslations = {
     "selectClass": "Var god välj en klass.",
     "pickClass": "Välj en klass.",
     "returnToLogin": "Återgå till inloggning",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Sök efter uppdateringar",
+    "noUpdateFound": "Ingen uppdatering hittades. Försök igen om en stund.",
+    "updateUnavailable": "Uppdatera via din spelbutik eller hämta den senaste klienten.",
+    "updateSearchFailed": "Det gick inte att söka efter uppdateringar. Försök igen.",
     "api": {
       "tooManyAttempts": "För många försök. Vänta en minut och försök igen.",
       "usernameShape": "Användarnamnet måste vara 3-24 tecken och använda bokstäver, siffror eller understreck.",
@@ -12412,6 +12416,8 @@ export const sv_SE: EnTranslations = {
       "clueTalkAria": "Fråga om ledtråden: {name}",
       "clueDeliver": "Överlämna {count} {item}.",
       "clueDeliverAria": "Överlämna {count} {item} till {name}",
+      "attuneHearthstone": "Bind min allierade hemsten här.",
+      "attuneHearthstoneAria": "Bind din allierade hemsten till {hub} hos {name}",
       "profIntroHint": "Se {name} angående \"{quest}\".",
       "nythraxisDeathlessKingWarning": "De tre relikerna berättar samma historia: Aldren stred för att försvara sin kung, Malric bröt dödens gräns, och Voss försökte hejda det som följde. Sigillet försvagas, och den övergivna kryptan är vägen nedåt.",
       "browseGoods": "Låt mig se dina varor.",
@@ -12799,7 +12805,7 @@ export const sv_SE: EnTranslations = {
       "clueCasketOpened": "Kissan innehåller {money} och {items}.",
       "treasureMapEarned": "Alla världsuppdrag för dagen är klara: du hittade en {map}.",
       "treasureMapLost": "Alla världsuppdrag för dagen är klara, men dina väskor har ingen plats för skattkarta.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Dina väskor är fulla. Din belöning skickades till brevlådan: {items}.",
       "treasureMapRead": "Du studerar {map}. X ligger någonstans i {zone}.",
       "treasureMapUpgraded": "Kartan är omtecknad i finare bläck: det är nu en {map}.",
       "treasureVaultOpened": "Marken ger vika. En begravd skatt ligger öppen framför dig.",
@@ -12978,7 +12984,7 @@ export const sv_SE: EnTranslations = {
       "sellJunk": "Sälj skräp",
       "sellJunkAria": "Sälj allt skräp för {price}",
       "sellJunkHint": "Säljer varje grått föremål i dina väskor utom uppdragsföremål.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "Osignerade grå föremål hamnar inte i återköpslistan, så försäljningen kan inte ångras."
     },
     "market": {
       "title": "Världsmarknaden",
@@ -13283,12 +13289,12 @@ export const sv_SE: EnTranslations = {
         "description": "Minskar skadan du tar med 60% i 8 sek, men hindrar attacker medan den är aktiv."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Spela död",
+        "description": "Fall till marken och spela död: din hälsa och ditt Fokus ser tomma ut för alla. Fiender glömmer dig, och fiendespelare som har dig som mål förlorar sitt mål. Rörelse, attacker eller andra förmågor avslutar effekten. Använd igen för att resa dig."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktiskt kamouflage",
+        "description": "Smält in i omgivningen: fiender lägger knappt märke till dig och du rör dig med 80% hastighet. Attacker eller skada avslutar Taktiskt kamouflage. Använd igen för att träda fram. (Fältkunskap)"
       },
       "frostjaw_trap": {
         "name": "Frostkäftsfälla",
@@ -14085,7 +14091,7 @@ export const sv_SE: EnTranslations = {
         "description": "Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till {duration} sek per användning. Vid full Månflod blir Månfrö Månsvall."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Sporläkning",
         "description": "Läker målet för {damage} under 12 sek.",
         "specNote_restoration": "Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar. Vid 3 Grönska blir Snabb läkning Överblomning."
       },
@@ -14124,9 +14130,9 @@ export const sv_SE: EnTranslations = {
         "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Klös",
+        "description": "Klös igenom närliggande mål inom 6 yards och ge vapenskada plus {damage}. Ger 1 kombopoäng per träffat mål. Avslöjar smygande fiender inom svepet. Endast i Kattform.",
+        "specNote_feral": "Varje träff ger 1 Gammalt Blod (högst 3)."
       },
       "ferocious_bite": {
         "name": "Blodsbett",
@@ -14412,7 +14418,7 @@ export const sv_SE: EnTranslations = {
       "swiftmend": {
         "name": "Snabb läkning",
         "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Varje kastning av Sporemending, Andra blomningen och Vildläkning ger 1 Grönska; vid 3 Grönska blir denna knapp Överblomning, som omedelbart läker varje allierad som bär dina läkning över tid-effekter för 60% av vad de effekterna hade kvar. (Groveheart-motorn)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "specNote_restoration": "Förbrukar en läkningseffekt över tid på ett vänligt mål för att läka det för {damage}. Planteringar av Sporläkning och Andra blomningen ger Grönska; vid 5 Grönska blir knappen Överblomning, som omedelbart läker varje allierad med dina läkningseffekter över tid för 60% av deras återstående läkning. (Groveheart-signatur)"
       },
       "moonlash": {
         "name": "Månsvall",
@@ -14439,26 +14445,26 @@ export const sv_SE: EnTranslations = {
         "description": "Kallar varje fallen medlem i din grupp eller räd, inom 40 meter och inom synhåll, tillbaka till din sida med 30% hälsa och mana. Kan inte kastas i strid. (Lundhjärta)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Sporläkarform",
+        "description": "Byt skepnad till en sporläkare: din utförda läkning ökar med 20% och din rustning med 40%, men din rörelsehastighet minskar med 20%. Alla besvärjelser från din kastarform kan fortfarande användas. Varar tills du byter skepnad igen. Varje skepnadsbyte ger Lunkande steg, en kort ökning av rörelsehastigheten. Använd igen för att återgå till kastarformen. (Groveheart-signatur)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Sporutbrott",
+        "description": "Frammanar en sporfylld svamp i målområdet. Efter {duration} sek brister den och läker allierade för {healing} samt ger fiender inom 8 yards {damage} naturskada.",
+        "specNote_balance": "Vid 3 Månflod blir det 25% starkare och förbrukar din Månflod.",
+        "specNote_restoration": "Ger också Sporläkning till varje allierad som läks. Vid full Grönska blir det 25% starkare och förbrukar din Grönska."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Naturens gåva",
+        "description": "Dina besvärjelser kan aktivera Naturens gåva i 10 sek: den angivna besvärjelsen blir gratis, 25% starkare och kan kastas i alla former. En ny aktivering förnyar varaktigheten.",
+        "specNote_feral": "Varje närstridsautoträff som träffar har 1 chans på 15 att aktivera den för Sporläkning, eller för Ekhud när du är i Bruinform.",
+        "specNote_balance": "Varje Vildbult eller Himlafall du kastar har 10% chans att aktivera den för Sporutbrott, högst en gång var 10:e sekund.",
+        "specNote_restoration": "Varje tick från dina läkningseffekter över tid har 10% chans att aktivera den för Sporutbrott, högst en gång var 10:e sekund."
       },
       "overbloom": {
         "name": "Överblomning",
         "description": "Förbrukar 3 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Sporemending på målet.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "specNote_restoration": "Förbrukar dina 5 Grönska: varje allierad med dina läkningseffekter över tid läks omedelbart med {buff}% av den läkning som återstod i effekterna, effekterna tas bort och målet får en ny Sporläkning."
       },
       "summon_imp": {
         "name": "Frammana Emberkin",
@@ -19098,10 +19104,10 @@ export const sv_SE: EnTranslations = {
         "name": "Sändebudets gömsle"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Troféskalle"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Skallpåse"
       },
       "clue_scroll": {
         "name": "Ledtrådsrull"
@@ -24117,9 +24123,9 @@ export const sv_SE: EnTranslations = {
         "body": "Valvet rensades, men din andel samkades inte från kistan. Korparna har bragt det till dig här, med de varor och mynt du tjänade bifogade.\n\n- Ravenposten"
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "Korpposten",
+        "subject": "Din belöning för världsuppdraget",
+        "body": "Dina väskor var fulla när du fick denna belöning för ett världsuppdrag, så korparna har fört hit den åt dig i stället. Gör plats och hämta den vid valfri korppelare.\n\n- Korpposten"
       }
     },
     "itemSets": {
@@ -24255,7 +24261,7 @@ export const sv_SE: EnTranslations = {
       },
       "grovespring": {
         "name": "Lundkällans dräkt",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Snabb läkning förbrukar din egen Sporläkning eller Andra blomningen först och läker 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Överblomning skördar 75 procent av dina återstående effekter och lagrar därefter 1 Grönska."
       },
       "hexthread": {

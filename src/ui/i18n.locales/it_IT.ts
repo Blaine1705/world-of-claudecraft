@@ -63,7 +63,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Uso: Rinforza la tua armatura al petto, aumentando l'Armatura di 12 per 1 ora.",
   'hudChrome.factionRewards.battleStandardUse':
     "Uso: Pianta lo Stendardo di Battaglia della Consecrated Dawn per 5 minuti, aumentando significativamente la rigenerazione della salute e della mana fuori dal combattimento per tutti gli alleati vicini. Rimanere vicino ad esso per 10 secondi concede anche la Benedizione dell'Alba (+5% a tutte le statistiche per 30 min). (5 min di recupero)",
-  'hudChrome.factionRewards.hub_automatons': 'South Reach (La Fonderia Automa)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automi)',
   'hudChrome.factionRewards.hub_church_order': "Valle di Eastbrook (L'Ordine della Chiesa)",
   'hudChrome.factionRewards.hub_none':
     'Nessuno (Usalo vicino a un fulcro fazione per sintonizzarti)',
@@ -16462,7 +16462,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a {duration} sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare.',
   'entities.abilities.overbloom.name': 'Sovrafioritura',
   'entities.abilities.overbloom.description':
-    'Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Sporemending fresca sul bersaglio.',
+    'Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Cura delle Spore fresca sul bersaglio.',
   'entities.abilities.redharvest.name': 'Mietitura Rossa',
   'entities.abilities.redharvest.description':
     "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo.",
@@ -17080,7 +17080,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
     'Il pezzo simbolo della collezione glaciale, quello che ogni collezionista cerca per primo. Zanna di Ghiaccio è stata scolpita, non forgiata, da una zanna del ghiacciaio che corona Thornpeak sopra Highwatch; il suo nucleo ciano brucia freddo come la luce su Glimmermere. Brina l’aria che taglia. Le guardie delle mura giurano che un soldato la portò la notte in cui le nevi alte tennero a bada i Giurati della Stirpe e “comprarono un inverno per le mura”.',
   'hudChrome.auraEffect.verdance':
-    'Verzura {stacks}/{max}. Ogni Sporemending, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura',
+    'Verzura {stacks}/{max}. Ogni Cura delle Spore, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura',
   'hudChrome.continentMap.levels': 'Livelli da {min} a {max}',
   'hudChrome.continentMap.summary': 'Mappa del mondo. Scegli una zona per aprire la sua mappa.',
   'hudChrome.continentMap.title': 'Mappa del Mondo',
@@ -17400,7 +17400,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3).',
   'entities.abilities.swiftmend.description':
-    'Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Sporemending, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)',
+    'Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Cura delle Spore, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)',
   'entities.abilities.swipe.description':
     'Colpisci con gli artigli i nemici vicini per {damage} danni. Causa minaccia aggiuntiva. Solo Forma di Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -18513,7 +18513,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'I colpi all’unisono del Comando della Mietitura infliggono il 25 percento di danni in più.',
   'entities.itemSets.gravebrand.name': 'Regalia del Marchio Sepolcrale',
   'entities.itemSets.grovespring.bonus4':
-    'Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Rigoglio.',
+    'Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Verzura.',
   'entities.itemSets.grovespring.name': 'Paramento Grovespring',
   'entities.itemSets.hexthread.bonus2':
     'Ago del Destino concede 2 Condanne aggiuntive. I danni subiti non ritardano più il lancio degli incantesimi.',
@@ -20198,4 +20198,195 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Trascina per ridimensionare la barra laterale della mappa. Fai doppio clic per reimpostare.',
   'guide.worldPvpPage.hillBodyFlat':
     "Ogni tre ore, in un momento imprevedibile, tutto il reame viene avvisato che tra quindici minuti apparirà una collina in una delle zone di combattimento libero, e il suo cerchio viene segnato su terreno aperto. Rimane per quarantacinque minuti, poi scompare. Nel frattempo, ogni cinque minuti vengono annunciate la posizione e le classifiche dei gruppi con il maggior tempo totale di controllo. Il gruppo con più giocatori nel cerchio contende la collina e la conquista dopo trenta secondi complessivi di superiorità numerica. L'arrivo di un gruppo rivale mette solo in pausa il conteggio finché il tuo gruppo non torna in vantaggio; il conteggio riparte da zero solo se nel cerchio non resta alcun membro vivo del tuo gruppo. Un giocatore solo conta come un gruppo di una persona e conserva la collina quando forma un gruppo, ma i membri delle incursioni non contano affatto. Ogni membro del gruppo che controlla la collina e si trova nel cerchio riceve la stessa quantità di Onore ogni minuto, indipendentemente dalla durata del controllo. Un gruppo completo che la tiene indisturbato per tutta la sua durata guadagna circa quanto tre vittorie nei campi di battaglia. Quando scompare, se il gruppo con il maggior controllo totale ha accumulato almeno dieci minuti, chiunque sia rimasto nel cerchio almeno un minuto durante il controllo di quel gruppo e ne faccia ancora parte ottiene una vittoria per la riga PvP del Forziere Settimanale. Una barra sopra il campo mostra chi la controlla, i giocatori dei due schieramenti e il conteggio di conquista; /hill in chat indica dove si trova.",
+  'errors.noUpdateFound': 'Nessun aggiornamento trovato. Riprova tra poco.',
+  'errors.searchUpdates': 'Cerca aggiornamenti',
+  'errors.updateSearchFailed': 'Impossibile verificare gli aggiornamenti. Riprova.',
+  'errors.updateUnavailable': 'Aggiorna dal tuo negozio di giochi o scarica il client più recente.',
+  'hudChrome.auraEffect.formSporemender':
+    'Forma di Curatore delle Spore: cure aumentate del {pct}%, armatura aumentata del {armorPct}% e velocità di movimento ridotta del {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Gli oggetti bloccati restano nel loro scomparto. Sbloccali per spostarli.',
+  'hudChrome.death.pvpResurrect': 'Resurrezione PvP',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Resurrezione PvP pronta: risorgerai al cimitero più vicino.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Risorgi al cimitero più vicino con salute piena, senza un nuovo Tributo del Custode.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Resurrezione PvP ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Potrai risorgere in PvP tra {seconds}: risorgerai al cimitero più vicino.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Cambio di difficoltà in attesa annullato perché il gruppo o il capogruppo è cambiato.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Cambio di difficoltà in attesa perché qualcuno o il suo cadavere è ancora dentro. Verrà applicato quando le istanze saranno vuote.',
+  'hudChrome.ferry.arrivesIn': 'Il traghetto arriva tra {time}',
+  'hudChrome.ferry.boardNow': 'Sali ora',
+  'hudChrome.ferry.destination': 'Destinazione: {dest}',
+  'hudChrome.ferry.portLabel': 'Traghetto da {port} a {dest}',
+  'hudChrome.ferry.portTitle': 'Imbarcadero di {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Orari del traghetto non disponibili.',
+  'hudChrome.graphicsRestore.note': 'Ripristino della grafica',
+  'hudChrome.hill.contestOtherPaused': 'Rivale in pausa: {seconds} su {total}',
+  'hudChrome.hill.contestYouPaused': 'In pausa: {seconds} su {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Preso da {name}',
+  'hudChrome.keybindLayout.apply': 'Converti scorciatoie',
+  'hudChrome.keybindLayout.converted': 'Scorciatoie convertite da {from} a {to}.',
+  'hudChrome.keybindLayout.from': 'Scorciatoie create per',
+  'hudChrome.keybindLayout.help':
+    'Ogni scorciatoia passa al tasto che scrive lo stesso carattere nella nuova disposizione. La fila dei numeri resta al suo posto. I nomi in questo elenco indicano posizioni QWERTY; la panoramica della tastiera mostra la tua disposizione.',
+  'hudChrome.keybindLayout.keepMovement': 'Mantieni fermi i tasti di movimento',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    "I tasti di movimento sono rimasti fermi l'ultima volta, quindi resteranno fermi anche stavolta. Ripristina i valori predefiniti per ricominciare.",
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belga)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (francese)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Disposizione Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Disposizione Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brasiliana ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (danese)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (spagnola)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italiana)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norvegese)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (svedese, finlandese)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portoghese)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turca)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Regno Unito)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Stati Uniti)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (svizzera)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (tedesca)',
+  'hudChrome.keybindLayout.moves': 'Scorciatoie che si sposteranno: {count}',
+  'hudChrome.keybindLayout.noChange': 'Nessuna scorciatoia cambia tra queste disposizioni.',
+  'hudChrome.keybindLayout.open': 'Converti',
+  'hudChrome.keybindLayout.title': 'Disposizione della tastiera',
+  'hudChrome.keybindLayout.to': 'Converti in',
+  'hudChrome.nameplate.bountyTag': 'Taglia',
+  'hudChrome.options.classicCombatText': 'Testo di combattimento classico',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Gli oggetti sotto questa qualità si vendono con un clic. Puoi ricomprare quelli venduti per errore, tranne gli oggetti grigi non firmati.',
+  'hudChrome.options.spellEffects': 'Effetti degli incantesimi',
+  'hudChrome.options.spellTooltipOnHover': 'Descrizioni degli incantesimi al passaggio del cursore',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Messaggio del giorno cancellato.',
+  'hudChrome.realmMotd.line': 'Messaggio del giorno: {text}',
+  'hudChrome.realmMotd.none': 'Nessun messaggio del giorno impostato.',
+  'hudChrome.realmMotd.saveFailed':
+    'Impossibile salvare il messaggio del giorno: andrà perso al riavvio.',
+  'hudChrome.realmMotd.tooLong': 'Il messaggio del giorno è limitato a {max} caratteri.',
+  'hudChrome.realmMotd.updated': 'Messaggio del giorno aggiornato.',
+  'hudChrome.realmMotd.usage':
+    'Uso: /motd "<messaggio>" per impostarlo, /motd clear per cancellarlo.',
+  'hudChrome.skullBag.clickOpen': 'Fai clic per aprire',
+  'hudChrome.skullBag.close': 'Chiudi la Sacca dei Teschi',
+  'hudChrome.skullBag.empty':
+    'Vuota. Finché porti la sacca, i teschi raccolti vi entrano direttamente.',
+  'hudChrome.skullBag.notCarried':
+    'Tieni la Sacca dei Teschi nelle borse per depositare o prelevare teschi.',
+  'hudChrome.skullBag.store': 'Deposita i teschi trasportati ({count})',
+  'hudChrome.skullBag.storeNone': 'Nessun teschio da depositare',
+  'hudChrome.skullBag.takeAll': 'Preleva tutti',
+  'hudChrome.skullBag.takeAllAria': 'Preleva tutti: {item}',
+  'hudChrome.skullBag.takeOne': 'Preleva 1',
+  'hudChrome.skullBag.takeOneAria': 'Preleva 1: {item}',
+  'hudChrome.skullBag.title': 'Sacca dei Teschi',
+  'hudChrome.skullBag.tooltip':
+    'Contiene un numero illimitato di Teschi Trofeo senza occupare spazio nelle borse. Finché è nelle borse, i teschi raccolti vi entrano direttamente. Fai clic sulla sacca per depositare o prelevare teschi.',
+  'hudChrome.skullBag.total': 'Teschi: {count}',
+  'hudChrome.skullBag.unrecorded': 'Teschio Trofeo',
+  'hudChrome.treasureMap.inkPickerCancel': 'Annulla',
+  'hudChrome.treasureMap.inkPickerCost': 'Ridisegna in {rarity}: {inks} inchiostro',
+  'hudChrome.treasureMap.inkPickerHeld': 'Possiedi {held} di Inchiostro del Cartografo.',
+  'hudChrome.treasureMap.inkPickerRead': 'In corso: la sua X è in {zone}. La X resta ferma.',
+  'hudChrome.treasureMap.inkPickerTitle': "Su quale mappa vuoi usare l'Inchiostro del Cartografo?",
+  'hudChrome.treasureMap.inkPickerUnread': 'Non letta ({count} possedute)',
+  'hudChrome.warfare.reasons.worldQuest': 'missione mondiale',
+  'hudChrome.warfareShop.goods': 'Merci',
+  'hudChrome.weeklyRewards.allClassGear': 'Equipaggiamento di tutte le classi',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} vittorie PvP',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} vittoria PvP',
+  'hudChrome.weeklyRewards.lootFocus': 'Preferenza del bottino',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Vale solo per i forzieri non ancora aperti.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': "Nessun bottino idoneo. Scegli un'altra preferenza.",
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Ottieni {count} vittorie PvP',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Ottieni {count} vittoria PvP',
+  'hudChrome.weeklyRewards.rolledFocus': 'Estratto per: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Serie PvP attuale: {time} di gioco (in pausa in un santuario)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Serie PvP attuale: {time} di gioco (in pausa durante la morte)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Serie PvP attuale: {time} di gioco (in pausa nelle istanze PvE)',
+  'hudChrome.worldPvp.rewardProgress': 'Serie PvP attuale: {time} di gioco',
+  'hudChrome.worldPvp.rewardTitles':
+    'Ottieni titoli permanenti dopo {thresholds} di gioco con PvP mondiale attivo nel mondo aperto o nelle istanze PvP. Disconnessione, morte, istanze PvE e santuari sospendono il timer. Disattivarlo lo azzera.',
+  'hudChrome.worldPvp.skullName': 'Teschio di {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    "Se siete entrambi contrassegnati, l'oro del colpo mortale cade sul corpo insieme al teschio dello sconfitto.",
+  'itemUi.vendor.sellJunkNoBuyback':
+    "Gli oggetti grigi non firmati non compaiono nell'elenco di riacquisto: venderli è irreversibile.",
+  'questUi.logs.worldQuestRewardMailed':
+    'Le borse sono piene. La ricompensa è stata inviata alla tua casella postale: {items}.',
+  'entities.abilities.natures_boon.description':
+    "I tuoi incantesimi possono attivare Favore della Natura per 10 s: l'incantesimo indicato diventa gratuito, più potente del 25% e utilizzabile in ogni forma. Una nuova attivazione rinnova la durata.",
+  'entities.abilities.natures_boon.name': 'Favore della Natura',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Ogni Dardo Silvano o Caduta Celeste che lanci ha il 10% di probabilità di attivarlo per Esplosione di Spore, al massimo una volta ogni 10 s.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Ogni attacco automatico in mischia riuscito ha 1 probabilità su 15 di attivarlo per Cura delle Spore, o per Scorza di Quercia in Forma di Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Ogni impulso dei tuoi effetti di cura periodica ha il 10% di probabilità di attivarlo per Esplosione di Spore, al massimo una volta ogni 10 s.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Consuma i tuoi 5 punti di Verzura: ogni alleato con i tuoi effetti di cura periodica riceve subito il {buff}% delle cure rimanenti, gli effetti vengono rimossi e il bersaglio riceve una nuova Cura delle Spore.',
+  'entities.abilities.play_dead.description':
+    "Cadi a terra e fingi di essere morto: tutti vedono salute e Concentrazione vuote. I nemici ti dimenticano e i giocatori nemici che ti selezionano perdono il bersaglio. Muoversi, attaccare o usare un'altra abilità termina l'effetto. Usa di nuovo per rialzarti.",
+  'entities.abilities.play_dead.name': 'Fingere la morte',
+  'entities.abilities.rejuvenation.name': 'Cura delle Spore',
+  'entities.abilities.scratch.description':
+    "Graffia i bersagli vicini entro 6 m, infliggendo danni dell'arma più {damage}. Fornisce 1 punto combo per bersaglio colpito. Rivela i nemici furtivi nell'area spazzata. Solo in Forma Felina.",
+  'entities.abilities.scratch.name': 'Graffio',
+  'entities.abilities.scratch.specNote_feral':
+    'Ogni colpo riuscito aggiunge 1 Sangue Antico (massimo 3).',
+  'entities.abilities.spore_burst.description':
+    'Evoca un fungo esplosivo nella zona bersaglio. Dopo {duration} s esplode, curando gli alleati di {healing} e infliggendo {damage} danni da Natura ai nemici entro 8 m.',
+  'entities.abilities.spore_burst.name': 'Esplosione di Spore',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Con 3 di Marea Lunare è più potente del 25% e consuma la tua Marea Lunare.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Applica anche Cura delle Spore a ogni alleato curato. Con Verzura pieno è più potente del 25% e consuma il tuo Verzura.',
+  'entities.abilities.sporemender_form.description':
+    'Assumi la forma di un Curatore delle Spore: cure aumentate del 20% e armatura del 40%, ma velocità di movimento ridotta del 20%. Tutti gli incantesimi della forma da incantatore restano disponibili. Dura finché non cambi forma. Ogni trasformazione fornisce Passo leggero, un breve aumento di velocità. Usa di nuovo per tornare alla forma da incantatore. (Tratto distintivo di Ripristino)',
+  'entities.abilities.sporemender_form.name': 'Forma di Curatore delle Spore',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Consuma una cura periodica su un bersaglio amico per curarlo di {damage}. Le applicazioni di Cura delle Spore e Seconda Fioritura aggiungono Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura subito ogni alleato con le tue cure periodiche del 60% delle cure rimanenti. (Tratto distintivo di Ripristino)',
+  'entities.abilities.tactical_camo.description':
+    "Confonditi con l'ambiente: i nemici ti notano appena e ti muovi all'80% della velocità. Attaccare o subire danni interrompe Mimetismo Tattico. Usa di nuovo per uscire. (Sopravvivenza)",
+  'entities.abilities.tactical_camo.name': 'Mimetismo Tattico',
+  'entities.itemSets.grovespring.bonus2':
+    'Rapidità di Guarigione consuma prima la tua Cura delle Spore o Seconda Fioritura e cura il 25 per cento in più. I danni subiti non ritardano più il lancio degli incantesimi.',
+  'entities.items.pvp_skull_bag.name': 'Sacca dei Teschi',
+  'entities.items.pvp_trophy_skull.name': 'Teschio Trofeo',
+  'entities.letters.world_quest_reward.body':
+    "Le tue borse erano piene quando hai ottenuto questa ricompensa di missione mondiale, perciò i corvi l'hanno portata qui. Fai spazio e ritirala da qualsiasi pilastro dei corvi.\n\n- La Posta dei Corvi",
+  'entities.letters.world_quest_reward.sender': 'La Posta dei Corvi',
+  'entities.letters.world_quest_reward.subject': 'La tua ricompensa di missione mondiale',
+  'guide.classPage.formLine.form_sporemender':
+    'La forma curativa di Ripristino: pelle più resistente e cure più potenti a passo più lento, mantenendo tutti gli incantesimi e il mana.',
+  'guide.classPage.formName.form_sporemender': 'Forma di Curatore delle Spore',
+  'guide.economy.junkBodyFinal':
+    "Il bottino inutile si vende ancora a qualsiasi mercante con un negozio proprio: svuota le borse quando passi in città. La finestra del mercante ha anche un pulsante Vendi cianfrusaglie che vende tutti gli oggetti di qualità Scadente con un clic. Puoi anche gettare gli oggetti senza valore per fare spazio. Gli oggetti grigi non firmati venduti così non compaiono nell'elenco di riacquisto: controlla prima se volevi conservarne qualcuno.",
+  'guide.models.formSporemender': 'Forma di Curatore delle Spore',
+  'guide.settingsPage.ifClassicCombatText':
+    'Ripristina i semplici numeri di danno bianchi e oro pallido che salgono dritti. Lascia disattivato (impostazione predefinita) per numeri più marcati che si aprono sui lati, con bagliori per i colpi critici e insolitamente grandi.',
+  'guide.settingsPage.rowSpellEffects':
+    "Bagliori, scintille, proiettili ed esplosioni d'impatto degli incantesimi dei giocatori e dei loro famigli, inclusi i tuoi. Disattiva per uno schermo più tranquillo o qualche fotogramma in più nei grandi scontri di gruppo. Tutti gli incantesimi nemici restano visibili, come gli anelli di pericolo, i simboli sui bersagli storditi, impauriti o immobilizzati e ogni barra di lancio.",
+  'questUi.dialog.attuneHearthstone': 'Vincola qui la mia Pietra del Ritorno Alleata.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Vincola la tua Pietra del Ritorno Alleata a {hub} con {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'La tua Pietra del Ritorno Alleata non è vincolata. Parla con un quartiermastro alleato o usala in un centro alleato.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'La tua Pietra del Ritorno Alleata è ora vincolata a {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'La pietra del ritorno ti trasporta a {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    "L'oggetto non è ancora pronto ({minutes} min rimanenti).",
 };

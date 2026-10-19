@@ -420,7 +420,7 @@ export const zh_TW: EnTranslations = {
       "viewPossibleLoot": "查看可能的戰利品",
       "lootFocus": "戰利品專精",
       "allClassGear": "所有本職業裝備",
-      "specRole": "{name} ({role})",
+      "specRole": "{name}（{role}）",
       "mixedRole": "{first} / {second}",
       "lootFocusHelp": "僅適用於尚未開啟的寶庫。",
       "noFocusedLoot": "沒有符合條件的戰利品。請選擇其他專精。",
@@ -446,8 +446,8 @@ export const zh_TW: EnTranslations = {
         "worldMany": "已完成{count}個世界任務",
         "pvpOne": "已贏得{count}場積分賽",
         "pvpMany": "已贏得{count}場積分賽",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count}場PvP勝利",
+        "pvpWinMany": "{count}場PvP勝利"
       },
       "requiredTask": {
         "raidOne": "擊敗{count}個團隊副本首領",
@@ -458,8 +458,8 @@ export const zh_TW: EnTranslations = {
         "worldMany": "完成{count}個世界任務",
         "pvpOne": "贏得{count}場積分賽",
         "pvpMany": "贏得{count}場積分賽",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "贏得{count}場PvP勝利",
+        "pvpWinMany": "贏得{count}場PvP勝利"
       },
       "readyWeeks": "未領取的週次：{count}。請先領取最早完成的那一週。",
       "claimLastWeek": "領取上週的獎勵",
@@ -641,7 +641,7 @@ export const zh_TW: EnTranslations = {
       "healerConfirmCancel": "取消"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "正在恢復畫面"
     },
     "wiki": {
       "confirmTitle": "開啟維基？",
@@ -2816,7 +2816,7 @@ export const zh_TW: EnTranslations = {
         "worldKill": "世界擊殺",
         "worldAssist": "世界擊殺助攻",
         "hillHold": "佔據山丘",
-        "worldQuest": "world quest"
+        "worldQuest": "世界任務"
       },
       "floatReasons": {
         "kill": "擊殺",
@@ -2880,8 +2880,8 @@ export const zh_TW: EnTranslations = {
       "countsHolding": "圈內：你方 {yours}，對手 {theirs}",
       "contestYou": "正在奪取山丘：{seconds} / {total}",
       "contestOther": "正在失守山丘：{seconds} / {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "進度暫停：{seconds}/{total}",
+      "contestOtherPaused": "對手進度暫停：{seconds}/{total}",
       "contestNone": "在圈內維持人數優勢 {total} 即可奪取",
       "inside": "你在圓圈內",
       "distance": "距圓圈 {yards} 碼",
@@ -2899,10 +2899,10 @@ export const zh_TW: EnTranslations = {
       "unrecorded": "戰利品顱骨",
       "store": "存入攜帶的顱骨（{count}）",
       "storeNone": "沒有可存入的顱骨",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
+      "takeOne": "取出1個",
+      "takeAll": "全部取出",
+      "takeOneAria": "取出1個：{item}",
+      "takeAllAria": "全部取出：{item}",
       "tooltip": "可不占背包空間地保存任意數量的戰利品顱骨。它在背包中時，你拾取的顱骨會直接放入其中。點擊背包中的它可存入或取出顱骨。"
     },
     "warfareShop": {
@@ -2910,7 +2910,7 @@ export const zh_TW: EnTranslations = {
       "gossipOptionAria": "瀏覽 {name} 提供的戰爭套裝商店",
       "jewelry": "飾品",
       "weapons": "武器",
-      "goods": "Goods",
+      "goods": "貨物",
       "groupSeason2": "戰爭賽季 2：先鋒",
       "groupEntry": "戰爭賽季 1",
       "owned": "已擁有",
@@ -4439,8 +4439,8 @@ export const zh_TW: EnTranslations = {
       "apply": "轉換熱鍵",
       "converted": "熱鍵已從{from}轉換為{to}。",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
+        "qwertyUs": "QWERTY（美國）",
+        "qwertyUk": "QWERTY（英國）",
         "qwertzDe": "QWERTZ（德語）",
         "qwertzCh": "QWERTZ（瑞士）",
         "azertyFr": "AZERTY（法語）",
@@ -5457,12 +5457,16 @@ export const zh_TW: EnTranslations = {
       "enchant_weapon_piston_drive": "為一把雙手武器永久蝕刻12點力量和25點暴擊等級。無法施加於單手武器。固定加成，不會隨任何屬性縮放。"
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "你的盟約爐石尚未綁定。請與盟友軍需官交談，或在盟友據點使用它。",
+      "hearthstoneBound": "你的盟約爐石現已綁定至{hub}。",
+      "hearthstoneTransport": "爐石將你傳送至{hub}。",
+      "itemCooldown": "該物品尚未就緒（還需{minutes}分鐘）。",
       "alliedHearthstoneUse": "使用：將你傳送至已校準的陣營據點。（施法 10 秒，冷卻 15 分鐘）",
       "alliedHearthstoneAttuned": "已校準至：{hub}",
       "hub_none": "無（在陣營據點附近使用以校準）",
       "hub_rift_watch": "漂流港（裂隙守望）",
       "hub_church_order": "東溪谷（教會修會）",
-      "hub_automatons": "南境（機械鑄造廠）",
+      "hub_automatons": "望龍哨（機械造物）",
       "riftGliderUse": "使用：展開滑翔翼，降低下落速度，持續 30 秒。著陸或受到傷害會取消該效果。（冷卻 2 分鐘）",
       "targetDummyUse": "使用：在野外部署一個機械訓練假人，持續 2 分鐘，用於練習戰鬥技能。（冷卻 5 分鐘）",
       "battleStandardUse": "使用：插下神聖黎明戰旗，持續 5 分鐘，大幅提高附近所有盟友的非戰鬥生命與法力恢復。在其附近停留 10 秒還會獲得黎明祝福（所有屬性提高 5%，持續 30 分鐘）。（冷卻 5 分鐘）",
@@ -5826,8 +5830,8 @@ export const zh_TW: EnTranslations = {
     "pattern": {
       "teaches": "使用：教你製作{item}。",
       "teachesEnchant": "使用：教你如何施加{enchant}。",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}：{list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "解綁：{name}",
@@ -12412,6 +12416,8 @@ export const zh_TW: EnTranslations = {
       "clueTalkAria": "詢問線索：{name}",
       "clueDeliver": "交出{count}個{item}。",
       "clueDeliverAria": "交出{count}個{item}給{name}",
+      "attuneHearthstone": "在此綁定我的盟約爐石。",
+      "attuneHearthstoneAria": "透過{name}將盟約爐石綁定至{hub}",
       "profIntroHint": "請找{name}接取《{quest}》。",
       "nythraxisDeathlessKingWarning": "三件遺物講述著同一個故事：阿爾德倫為守護國王而戰，馬爾里克打破了死亡的界限，沃斯試圖阻止隨後發生的一切。封印正在減弱，廢棄墓穴就是通往地下的道路。",
       "browseGoods": "讓我看看你的貨物。",

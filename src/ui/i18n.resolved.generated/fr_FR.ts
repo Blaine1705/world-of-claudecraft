@@ -418,13 +418,13 @@ export const fr_FR: EnTranslations = {
       "heroicClears": "{count} Héroïque",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Voir le butin possible",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Butin privilégié",
+      "allClassGear": "Équipement de toutes les classes",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "S'applique uniquement aux coffres non ouverts.",
+      "noFocusedLoot": "Aucun butin admissible. Choisissez une autre préférence.",
+      "rolledFocus": "Tirage pour : {focus}",
       "chooseTable": "Choisissez la table sur laquelle tirer",
       "selectAllTables": "Tout sélectionner",
       "selectedTables": "{count} tables sélectionnées",
@@ -446,8 +446,8 @@ export const fr_FR: EnTranslations = {
         "worldMany": "{count} quêtes mondiales terminées",
         "pvpOne": "{count} match classé remporté",
         "pvpMany": "{count} matchs classés remportés",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} victoire JcJ",
+        "pvpWinMany": "{count} victoires JcJ"
       },
       "requiredTask": {
         "raidOne": "Vainquez {count} rencontre de raid",
@@ -458,8 +458,8 @@ export const fr_FR: EnTranslations = {
         "worldMany": "Terminez {count} quêtes mondiales",
         "pvpOne": "Remportez {count} match classé",
         "pvpMany": "Remportez {count} matchs classés",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Remporter {count} victoire JcJ",
+        "pvpWinMany": "Remporter {count} victoires JcJ"
       },
       "readyWeeks": "Semaines non réclamées : {count}. Réclamez d'abord la semaine terminée la plus ancienne.",
       "claimLastWeek": "Réclamer la récompense de la semaine dernière",
@@ -522,12 +522,12 @@ export const fr_FR: EnTranslations = {
       "castingOff": "Le bac pour {dest} appareille",
       "boardHint": "Montez sur son pont quand il prend la mer. La traversée est gratuite.",
       "sailing": "En route vers {dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "Bac de {port} vers {dest}",
+      "portTitle": "Embarcadère de {port}",
+      "destination": "Destination : {dest}",
+      "boardNow": "Embarquer maintenant",
+      "arrivesIn": "Le bac arrive dans {time}",
+      "scheduleUnavailable": "Horaires du bac indisponibles."
     },
     "materialStackSelectionUnavailable": "Cette sélection de matériaux n’est plus disponible.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const fr_FR: EnTranslations = {
       "banner": "Vous observez {name}"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Message du jour : {text}",
+      "updated": "Message du jour actualisé.",
+      "cleared": "Message du jour effacé.",
+      "none": "Aucun message du jour défini.",
+      "usage": "Utilisation : /motd \"<message>\" pour le définir, /motd clear pour l'effacer.",
+      "tooLong": "Le message du jour est limité à {max} caractères.",
+      "saveFailed": "Le message du jour n'a pas pu être sauvegardé et sera perdu au redémarrage."
     },
     "readyCheck": {
       "title": "Vérification prête",
@@ -619,11 +619,11 @@ export const fr_FR: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Ressusciter près du cadavre",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "Résurrection JcJ",
+      "pvpResurrectTitle": "Ressusciter au cimetière le plus proche avec toute votre santé, sans nouveau Tribut du Gardien.",
+      "pvpResurrectWaitButton": "Résurrection JcJ ({seconds})",
+      "pvpResurrectWaitNote": "Résurrection JcJ dans {seconds} : vous revivrez au cimetière le plus proche.",
+      "pvpResurrectReadyNote": "Résurrection JcJ disponible : vous revivrez au cimetière le plus proche.",
       "resurrectAtHealer": "Le Veilleur pâle (Glas du Veilleur)",
       "ghostHint": "Courez jusqu'à l'endroit de votre mort ou parlez au Veilleur pâle pour revivre",
       "spiritHealerAlive": "Le Veilleur pâle veille sur les morts. Vous êtes encore parmi les vivants.",
@@ -641,7 +641,7 @@ export const fr_FR: EnTranslations = {
       "healerConfirmCancel": "Annuler"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Restauration des graphismes"
     },
     "wiki": {
       "confirmTitle": "Ouvrir le wiki ?",
@@ -2155,7 +2155,7 @@ export const fr_FR: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Infobulles des sorts au survol",
       "clickMoveLeft": "Clic gauche",
       "clickMoveRight": "Clic droit",
       "version": "v{version} ({build})",
@@ -2269,7 +2269,7 @@ export const fr_FR: EnTranslations = {
       "confirmVendorSellNote": "Désactiver cette option vend les objets en un seul clic sans confirmation ; un emplacement de sac déplacé pourrait donc faire vendre le mauvais objet.",
       "confirmVendorSellMinQuality": "Confirmer les ventes de la qualité",
       "confirmVendorSellMinQualityNote": "Les articles de qualité inférieure se vendent en un seul clic; un article mal vendu peut toujours être racheté auprès du vendeur.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Les objets de qualité inférieure se vendent en un clic. Un objet vendu par erreur peut être racheté, sauf les objets gris non signés.",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
@@ -2290,9 +2290,9 @@ export const fr_FR: EnTranslations = {
       "showUtilityModes": "Inclure les modes furtivité et déplacement",
       "showFriendlyTrack": "Afficher mes buffs sur les alliés",
       "showShieldTrack": "Afficher mes boucliers",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Texte de combat classique",
       "waterRipples": "Ondulations de l'eau (sillages)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Effets des sorts",
       "actionCam": "Caméra d'action",
       "actionCamShoulder": "Décalage d'épaule de la caméra d'action",
       "actionCamShoulderLeft": "Gauche {pct}",
@@ -2816,7 +2816,7 @@ export const fr_FR: EnTranslations = {
         "worldKill": "élimination en monde ouvert",
         "worldAssist": "élimination en monde ouvert assistée",
         "hillHold": "colline tenue",
-        "worldQuest": "world quest"
+        "worldQuest": "quête mondiale"
       },
       "floatReasons": {
         "kill": "Élimination",
@@ -2826,11 +2826,11 @@ export const fr_FR: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Gagnez des titres permanents après {thresholds} de jeu avec le JcJ mondial activé en monde ouvert ou en instance JcJ. Déconnexion, mort, instances JcE et sanctuaires mettent le compteur en pause. Désactiver le JcJ le remet à zéro.",
+      "rewardPaused": "Série JcJ actuelle : {time} de jeu (en pause dans un sanctuaire)",
+      "rewardPausedDead": "Série JcJ actuelle : {time} de jeu (en pause pendant la mort)",
+      "rewardPausedInstance": "Série JcJ actuelle : {time} de jeu (en pause dans les instances JcE)",
+      "rewardProgress": "Série JcJ actuelle : {time} de jeu",
       "tab": "JcJ mondial",
       "title": "JcJ mondial",
       "blurb": "Levez votre drapeau pour combattre d'autres joueurs marqués partout dans le monde ouvert. Vainquez-en un et prenez une part de sa bourse, plus de l'Honneur pour l'équipement de Guerre. Les champs de bataille et les arènes rapportent toujours davantage.",
@@ -2849,8 +2849,8 @@ export const fr_FR: EnTranslations = {
       "markLine": "Attaquer un joueur non marqué là-bas lève votre propre drapeau ; attaquer un joueur marqué ne le fait jamais.",
       "aidLine": "Soigner, protéger ou améliorer un joueur marqué lors d'un combat en monde ouvert lève votre drapeau.",
       "stakeLine": "Le perdant paie {cap} ou {percent} de sa bourse, selon le montant le plus faible.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "Si vous êtes tous deux marqués, l'or du coup fatal tombe sur le corps avec le crâne du perdant.",
+      "skullName": "Crâne de {name}",
       "noStakeLine": "Un joueur non marqué tué en terrain de mêlée générale ne perd pas d'or.",
       "noTakeLine": "Un combattant non marqué ne prend pas d'or non plus : l'or ne circule qu'entre deux joueurs marqués.",
       "honorLine": "{honor} d'Honneur par élimination, partagé entre tous ceux qui ont aidé.",
@@ -2880,8 +2880,8 @@ export const fr_FR: EnTranslations = {
       "countsHolding": "À l'intérieur : vous {yours}, rival {theirs}",
       "contestYou": "Prise de la colline : {seconds} sur {total}",
       "contestOther": "Colline en train d'être perdue : {seconds} sur {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "En pause : {seconds} sur {total}",
+      "contestOtherPaused": "Adversaire en pause : {seconds} sur {total}",
       "contestNone": "Détenez la majorité à l'intérieur pendant {total} pour la prendre",
       "inside": "Vous êtes à l'intérieur du cercle",
       "distance": "{yards} yd jusqu'au cercle",
@@ -2890,27 +2890,27 @@ export const fr_FR: EnTranslations = {
       "standingRaid": "Les membres du raid ne comptent pas : seuls les groupes peuvent détenir la colline"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Sac à crânes",
+      "total": "Crânes : {count}",
+      "close": "Fermer le Sac à crânes",
+      "clickOpen": "Cliquer pour ouvrir",
+      "notCarried": "Gardez le Sac à crânes dans vos sacs pour ranger ou retirer des crânes.",
+      "empty": "Vide. Tant que vous portez le sac, les crânes ramassés y vont directement.",
+      "unrecorded": "Crâne-trophée",
+      "store": "Ranger les crânes transportés ({count})",
+      "storeNone": "Aucun crâne à ranger",
+      "takeOne": "Retirer 1",
+      "takeAll": "Tout retirer",
+      "takeOneAria": "Retirer 1 : {item}",
+      "takeAllAria": "Tout retirer : {item}",
+      "tooltip": "Contient un nombre illimité de Crânes-trophées sans occuper de place dans les sacs. Tant qu'il est dans vos sacs, les crânes ramassés y vont directement. Cliquez dessus pour ranger ou retirer des crânes."
     },
     "warfareShop": {
       "gossipOption": "Parcourir les tenues de Guerre",
       "gossipOptionAria": "Parcourir la boutique de tenues de Guerre proposée par {name}",
       "jewelry": "Bijoux",
       "weapons": "Armes",
-      "goods": "Goods",
+      "goods": "Marchandises",
       "groupSeason2": "Saison de Guerre 2 : Avant-garde",
       "groupEntry": "Saison de Guerre 1",
       "owned": "Possédé",
@@ -2951,12 +2951,12 @@ export const fr_FR: EnTranslations = {
       "hint": "Trouvez le terrain que cette carte montre, tenez-vous sur le X et utilisez la carte à nouveau pour creuser. Un butin enfoui s'ouvre pour vous et votre groupe.",
       "upgradeNote": "La redessiner en tant que carte {rarity} prend {inks} Encres du Cartographe (vous en tenez {held}). Les intendants des factions les vendent.",
       "upgradeMaxed": "Aucun cartographe ne pourrait mieux affiner cette carte.",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Sur quelle carte utiliser l'Encre de cartographe ?",
+      "inkPickerHeld": "Vous possédez {held} d'Encre de cartographe.",
+      "inkPickerRead": "En cours de suivi : sa croix se trouve en {zone}. La croix ne bouge pas.",
+      "inkPickerUnread": "Non lue ({count} en votre possession)",
+      "inkPickerCost": "Redessiner en {rarity} : {inks} d'encre",
+      "inkPickerCancel": "Annuler",
       "rarity": {
         "common": "Commun",
         "rare": "Rare",
@@ -3673,8 +3673,8 @@ export const fr_FR: EnTranslations = {
       "resetDone": "Toutes les instances ont été réinitialisées.",
       "resetNone": "Vous n'avez aucune instance à réinitialiser.",
       "resetOccupied": "Vous ne pouvez pas réinitialiser les instances tant qu'une personne s'y trouve.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "Changement de difficulté mis en attente car quelqu'un ou son cadavre est encore à l'intérieur. Il sera appliqué quand les instances seront vides.",
+      "queuedCancelled": "Changement de difficulté en attente annulé car le groupe ou son chef a changé.",
       "resetSameDifficulty": "Changez la difficulté du donjon avant de réinitialiser ces instances. Les instances vides se réinitialisent d'elles-mêmes après 5 minutes.",
       "resetLoot": "Vous ne pouvez pas réinitialiser les instances tant qu'il reste du butin à l'intérieur.",
       "resetConfirmTitle": "Réinitialiser toutes les instances ?",
@@ -3691,7 +3691,7 @@ export const fr_FR: EnTranslations = {
       "dragEquipHint": "Faites glisser sur votre personnage pour équiper",
       "dragDestroyHint": "Faites glisser dans le monde pour détruire",
       "reorderNeedsRecent": "Effacez le filtre et triez par Récents pour réorganiser vos sacs",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Les objets verrouillés restent dans leur emplacement. Déverrouillez-les pour les déplacer.",
       "itemAriaInstanced": "{item}, quantité {count}, copie marquée par le fabricant",
       "itemAriaEnchanted": "{item}, quantité {count}, copie enchantée",
       "itemAriaBound": "{item}, quantité {count}, copie liée",
@@ -4077,7 +4077,7 @@ export const fr_FR: EnTranslations = {
       "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
       "moontide": "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
       "oldBlood": "Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme",
-      "verdance": "Verdoyance : cran {stacks} sur {max}. Chaque Sporemending, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
+      "verdance": "Verdoyance : cran {stacks} sur {max}. Chaque Soin de spores, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
       "freeExecute": "Votre prochaine capacité d'exécution éligible ne coûte rien",
       "resourceSap": "Restaure {value} de votre ressource actuelle toutes les {interval} s",
       "nextAttackCrit": "Votre prochaine attaque est un coup critique garanti",
@@ -4179,7 +4179,7 @@ export const fr_FR: EnTranslations = {
       "formTravel": "Forme de Fleet : vitesse de déplacement augmentée de {pct}%",
       "formFireball": "Forme de braise : vitesse de déplacement augmentée de {pct} % ; les attaques et sorts sont désactivés",
       "formMoonkin": "Forme de sélénien : dégâts des sorts augmentés de {pct}% et armure augmentée de {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Forme de Soignespores : soins augmentés de {pct}%, armure augmentée de {armorPct}% et vitesse de déplacement réduite de {slowPct}%",
       "formShadow": "Forme d'Ombre : dégâts d'Ombre augmentés de {pct}%",
       "resourceCount": "{value} sur {max}",
       "formLich": "Lance d'âme touche aussi jusqu'à {targets} ennemis proches pour {pct}% de dégâts",
@@ -4266,7 +4266,7 @@ export const fr_FR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "JcJ",
-      "bountyTag": "Bounty",
+      "bountyTag": "Prime",
       "cheaterTag": "< Tricheur >",
       "pledgeTag": "Serment de {guild}",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const fr_FR: EnTranslations = {
       "wrongKind": "Ce code est une exportation de paramètres, pas une configuration de raccourcis."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Disposition du clavier",
+      "open": "Convertir",
+      "from": "Raccourcis prévus pour",
+      "to": "Convertir vers",
+      "keepMovement": "Conserver les touches de déplacement en place",
+      "keepMovementLocked": "Les touches de déplacement sont restées en place la dernière fois et le resteront encore. Rétablissez les valeurs par défaut pour recommencer.",
+      "help": "Chaque raccourci passe sur la touche qui produit le même caractère dans la nouvelle disposition. La rangée de chiffres reste en place. Les noms de touches de cette liste indiquent les positions QWERTY ; le schéma du clavier montre votre disposition.",
+      "moves": "Raccourcis qui changeront de place : {count}",
+      "noChange": "Aucun raccourci ne change entre ces dispositions.",
+      "apply": "Convertir les raccourcis",
+      "converted": "Raccourcis convertis de {from} vers {to}.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (États-Unis)",
+        "qwertyUk": "QWERTY (Royaume-Uni)",
+        "qwertzDe": "QWERTZ (allemand)",
+        "qwertzCh": "QWERTZ (suisse)",
+        "azertyFr": "AZERTY (français)",
+        "azertyBe": "AZERTY (belge)",
+        "qwertyEs": "QWERTY (espagnol)",
+        "qwertyIt": "QWERTY (italien)",
+        "qwertyNordic": "QWERTY (suédois, finnois)",
+        "qwertyDa": "QWERTY (danois)",
+        "qwertyNo": "QWERTY (norvégien)",
+        "qwertyBr": "QWERTY (brésilien ABNT2)",
+        "qwertyPt": "QWERTY (portugais)",
+        "qwertyTr": "QWERTY (turc)",
+        "dvorak": "Disposition Dvorak",
+        "colemak": "Disposition Colemak"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const fr_FR: EnTranslations = {
       "perfectedBadge": "Perfectionné",
       "perfectingRank": "Perfectionnement : rang {rank} sur {ranks}",
       "materialSourceGatherer": "{count} × Récolté par {name}",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × Pris à {name}",
       "materialSourceGathererSigned": "{count} × Récolté par {name}, signé par {signer}",
       "materialSourceUnrecorded": "{count} × Récolteur non enregistré",
       "materialSourceUnrecordedSigned": "{count} × Récolteur non enregistré, signé par {name}",
@@ -5457,12 +5457,16 @@ export const fr_FR: EnTranslations = {
       "enchant_weapon_piston_drive": "Grave une arme à deux mains de façon permanente avec 12 points de Force et 25 de Score de critique. Ne peut pas être appliqué à une arme à une main. Un bonus fixe : il n'évolue pas."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Votre pierre de foyer alliée n'est pas liée. Parlez à un intendant allié ou utilisez-la dans un centre allié.",
+      "hearthstoneBound": "Votre pierre de foyer alliée est désormais liée à {hub}.",
+      "hearthstoneTransport": "La pierre de foyer vous transporte à {hub}.",
+      "itemCooldown": "Cet objet n'est pas encore prêt ({minutes} min restantes).",
       "alliedHearthstoneUse": "Utilisation : Vous téléporte à votre refuge de faction accordé. (10 sec d'incantation, 15 min de délai)",
       "alliedHearthstoneAttuned": "Accordé à : {hub}",
       "hub_none": "Aucun (Utilisez près d'un refuge de faction pour s'accorder)",
       "hub_rift_watch": "Drifthaven (La Vigie des Failles)",
       "hub_church_order": "Val d'Eastbrook (L'Ordre de l'Église)",
-      "hub_automatons": "South Reach (Fonderie Automate)",
+      "hub_automatons": "Wyrmwatch (Automates)",
       "riftGliderUse": "Utilisation : Déplie le planeur, ralentissant la vitesse de chute pendant 30 sec. L'atterrissage ou les dégâts annulent l'effet. (2 min de délai)",
       "targetDummyUse": "Utilisation : Déploie une cible d'entraînement mécanique dans le monde ouvert pendant 2 minutes pour pratiquer les capacités de combat. (5 min de délai)",
       "battleStandardUse": "Utilisation : Plante l'Étendard du Combat de l'Aube pendant 5 minutes, augmentant considérablement la régénération de la santé et du mana hors combat pour tous les alliés proches. Rester près pendant 10 secondes accorde aussi la Bénédiction de l'Aube (+5% à toutes les statistiques pendant 30 min). (5 min de délai)",
@@ -5826,8 +5830,8 @@ export const fr_FR: EnTranslations = {
     "pattern": {
       "teaches": "Utiliser : vous apprend à fabriquer {item}.",
       "teachesEnchant": "Utiliser : vous apprend à appliquer {enchant}.",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label} : {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Déliage : {name}",
@@ -7428,7 +7432,7 @@ export const fr_FR: EnTranslations = {
       "rowCameraSpeed": "À quelle vitesse la caméra pivote quand vous regardez autour de vous à la souris.",
       "rowTouchLookSpeed": "La même chose pour la visée au glissement, et elle n'apparaît que sur un écran tactile.",
       "rowFullscreen": "Remplit tout l'écran avec le jeu.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "La lueur, les étincelles, les projectiles et les explosions d'impact des sorts des joueurs et de leurs familiers, y compris les vôtres. Désactivez pour un écran plus calme ou quelques images par seconde supplémentaires dans les grands combats. Tous les sorts ennemis restent visibles, ainsi que les cercles de danger, les marques sur les cibles étourdies, apeurées ou immobilisées, et toutes les barres d'incantation.",
       "rowWaterRipples": "Les sillages et ondulations qui se propagent derrière vous quand vous nagez. Désactivé par défaut, et le seul effet d'eau qui coûte vraiment des images ; les éclaboussures et les bulles ne sont affectées dans aucun des deux cas.",
       "rowOverflowXp": "Au niveau maximum, si votre barre continue de se remplir avec l'expérience excédentaire ou affiche à la place le texte statique classique de niveau maximum.",
       "rowInterfaceMode": "Si vous obtenez l'interface Desktop ou les commandes tactiles à l'écran. Auto détecte votre appareil, et vous pouvez forcer l'un ou l'autre : une tablette avec clavier peut prendre la disposition Desktop, et un ordinateur portable tactile peut prendre les commandes Touch.",
@@ -7481,7 +7485,7 @@ export const fr_FR: EnTranslations = {
       "ifMouseoverCast": "Permet à un soin ou un sort allié de toucher le cadre de groupe survolé, sans changer votre cible.",
       "ifStickyTarget": "Conserve votre cible actuelle quand vous cliquez sur le sol vide, au lieu de la désélectionner.",
       "ifFctScale": "La taille des nombres de dégâts et de soins qui flottent au-dessus de votre cible.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Rétablit les simples nombres de dégâts blancs et dorés pâles qui montent tout droit. Laissez cette option désactivée (par défaut) pour des nombres plus marqués qui s'écartent sur les côtés, avec des éclats pour les coups critiques ou exceptionnellement puissants.",
       "ifExtraBars": "Révèle une deuxième rangée de barre d'action, puis une troisième une fois la deuxième activée. Les emplacements restent accessibles via leurs raccourcis même quand les rangées sont masquées.",
       "ifHideUnused": "Masque les emplacements d'action vides pour n'afficher que les boutons que vous utilisez réellement.",
       "ifLockBars": "Verrouille vos barres pour éviter de glisser une capacité hors d'un emplacement par accident.",
@@ -7912,14 +7916,14 @@ export const fr_FR: EnTranslations = {
         "form_bear": "La forme de tank : une peau épaisse, de la rage à la place du mana, et davantage de menace pour que les ennemis continuent de vous frapper.",
         "form_cat": "La forme de dégâts au corps à corps : de l'énergie et des points de combo, comme un voleur, et beaucoup moins de menace.",
         "form_travel": "La forme de déplacement : bien plus rapide au sol, mais sans aucune autre capacité tant que vous n'en changez pas.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "La forme de soin de Restauration : une peau plus robuste et des soins plus puissants, au prix d'une marche ralentie, tout en gardant tous vos sorts et votre mana."
       },
       "mageEleSummon": "Un sort de Givre qui appelle l'élémentaire à vos côtés et le lance sur votre cible.",
       "formName": {
         "form_bear": "Forme de Bruin",
         "form_cat": "Forme de chat",
         "form_travel": "Forme de Fleet",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Forme de Soignespores"
       }
     },
     "classHook": {
@@ -8622,7 +8626,7 @@ export const fr_FR: EnTranslations = {
       "formBear": "Forme de Bruin",
       "formCat": "Forme de chat",
       "formTravel": "Forme de Fleet",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Forme de Soignespores",
       "groupCreatures": "Créatures",
       "groupPets": "Démons du Démoniste",
       "pickerLabel": "Choisissez un modèle à afficher",
@@ -9142,7 +9146,7 @@ export const fr_FR: EnTranslations = {
       "buyingBody": "Adressez-vous à un marchand et choisissez de parcourir ses marchandises : sa boutique s'ouvre sur trois onglets, Acheter, Vendre et Rachat. Acheter contient tout ce qu'il tient en stock, à vous si vous en avez les moyens. Vendre liste ce que vos sacs contiennent et qu'il vous paiera, et vendre une pièce qui porte sa propre qualité tirée au sort vous demande d'abord confirmation, pour qu'un exemplaire précieux ne vous échappe jamais par mégarde. Si vous vous séparez d'un objet à regret, l'onglet Rachat conserve vos ventes récentes pour que vous puissiez les racheter au prix qu'on vous en a donné.",
       "junkTitle": "Faire le tri du superflu",
       "junkBody": "Les butins dont vous n'avez aucun usage se vendent quand même à n'importe quel marchand, alors videz vos sacs chaque fois que vous passez en ville plutôt que de les laisser se remplir. L'onglet Vendre du marchand comporte même un bouton qui écoule d'un seul clic toutes les babioles de qualité Médiocre. Les bricoles vraiment sans valeur peuvent aussi être jetées purement et simplement pour faire de la place.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "Le butin inutile se vend toujours chez tout marchand possédant sa propre boutique : videz vos sacs quand vous passez en ville. La fenêtre du marchand propose même un bouton Vendre la camelote pour vendre en un clic tous les objets de mauvaise qualité. Vous pouvez aussi jeter les objets sans valeur pour libérer de la place. Les objets gris non signés vendus ainsi n'apparaissent pas dans la liste de rachat : vérifiez ce que vous souhaitiez garder avant de cliquer.",
       "tradeTitle": "Échanger avec les autres joueurs",
       "tradeBody": "Vous pouvez échanger en face à face avec n'importe qui se tenant près de vous. Chacun place objets et pièces dans une fenêtre partagée, et l'échange ne se fait qu'une fois que vous l'avez tous deux confirmé, de sorte que personne ne peut se faire avoir. C'est la manière simple de remettre un butin à un ami ou de conclure un marché.",
       "mailTitle": "La Poste aux Corbeaux",
@@ -11231,10 +11235,10 @@ export const fr_FR: EnTranslations = {
     "selectClass": "Veuillez choisir une classe.",
     "pickClass": "Choisissez une classe.",
     "returnToLogin": "Retour à la connexion",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Rechercher des mises à jour",
+    "noUpdateFound": "Aucune mise à jour trouvée. Réessayez bientôt.",
+    "updateUnavailable": "Mettez le jeu à jour depuis votre boutique ou téléchargez le dernier client.",
+    "updateSearchFailed": "Impossible de vérifier les mises à jour. Réessayez.",
     "api": {
       "tooManyAttempts": "Trop de tentatives. Attendez une minute puis réessayez.",
       "usernameShape": "Le nom d'utilisateur doit faire 3 à 24 caractères et utiliser lettres, chiffres ou tiret bas.",
@@ -12412,6 +12416,8 @@ export const fr_FR: EnTranslations = {
       "clueTalkAria": "Demander au sujet de l'indice : {name}",
       "clueDeliver": "Remettez {count} {item}.",
       "clueDeliverAria": "Remettre {count} {item} à {name}",
+      "attuneHearthstone": "Lier ma pierre de foyer alliée ici.",
+      "attuneHearthstoneAria": "Lier votre pierre de foyer alliée à {hub} auprès de {name}",
       "profIntroHint": "Voir {name} pour \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Les trois reliques racontent la même histoire : Aldren combattit pour défendre son roi, Malric franchit la frontière de la mort, et Voss tenta d'arrêter ce qui suivit. Le sceau faiblit, et la crypte abandonnée est le chemin vers les profondeurs.",
       "browseGoods": "Laissez-moi voir vos marchandises.",
@@ -12799,7 +12805,7 @@ export const fr_FR: EnTranslations = {
       "clueCasketOpened": "Le coffret contient {money} et {items}.",
       "treasureMapEarned": "Toutes les quêtes mondiales du jour sont complétées : vous avez trouvé une {map}.",
       "treasureMapLost": "Toutes les quêtes mondiales du jour sont complétées, mais votre inventaire n'a pas de place pour la carte au trésor.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Vos sacs sont pleins. Votre récompense a été envoyée dans votre boîte aux lettres : {items}.",
       "treasureMapRead": "Vous étudiez la {map}. Le X se trouve quelque part dans {zone}.",
       "treasureMapUpgraded": "La carte est redessinée avec une encre plus fine : c'est désormais une {map}.",
       "treasureVaultOpened": "Le sol cède. Un butin enfoui s'ouvre devant vous.",
@@ -12978,7 +12984,7 @@ export const fr_FR: EnTranslations = {
       "sellJunk": "Vendre les rebuts",
       "sellJunkAria": "Vendre tous les rebuts pour {price}",
       "sellJunkHint": "Vend tous les objets gris dans vos sacs, sauf les objets de quête.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "Les objets gris non signés n'apparaissent pas dans la liste de rachat : leur vente est irréversible."
     },
     "market": {
       "title": "Marché mondial",
@@ -13283,12 +13289,12 @@ export const fr_FR: EnTranslations = {
         "description": "Réduit les dégâts subis de 60% pendant 8 s, mais empêche d'attaquer tant que l'effet est actif."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Feindre la mort",
+        "description": "Tombez au sol en feignant la mort : votre santé et votre Focalisation apparaissent vides à tous. Les ennemis vous oublient et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité met fin à l'effet. Relancez pour vous relever."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Camouflage tactique",
+        "description": "Fondez-vous dans le décor : les ennemis vous remarquent à peine et vous vous déplacez à 80% de votre vitesse. Attaquer ou subir des dégâts rompt Camouflage tactique. Relancez pour en sortir. (Survie)"
       },
       "frostjaw_trap": {
         "name": "Piège Mâchegivre",
@@ -14085,7 +14091,7 @@ export const fr_FR: EnTranslations = {
         "description": "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à {duration} s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Soin de spores",
         "description": "Soigne la cible de {damage} sur 12 s.",
         "specNote_restoration": "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active. À 3 Verdoyance, Prompte guérison devient Surfloraison."
       },
@@ -14124,9 +14130,9 @@ export const fr_FR: EnTranslations = {
         "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien (maximum 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Griffure",
+        "description": "Griffe les cibles proches dans un rayon de 6 m pour les dégâts de l'arme plus {damage}. Accorde 1 point de combo par cible touchée. Révèle les ennemis camouflés dans le balayage. Forme féline uniquement.",
+        "specNote_feral": "Chaque coup réussi ajoute 1 Sang ancien (3 au maximum)."
       },
       "ferocious_bite": {
         "name": "Morsure sanglante",
@@ -14411,8 +14417,8 @@ export const fr_FR: EnTranslations = {
       },
       "swiftmend": {
         "name": "Prompte guérison",
-        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Chaque incantation de Sporemending, de Seconde floraison et de Soin sauvage ajoute 1 Verdoyance ; à 3 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Chaque incantation de Soin de spores, de Seconde floraison et de Soin sauvage ajoute 1 Verdoyance ; à 3 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
+        "specNote_restoration": "Consomme un soin sur la durée d'une cible alliée pour lui rendre {damage} points de vie. Les applications de Soin de spores et Seconde floraison ajoutent de la Verdoyance ; à 5 points, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos soins sur la durée de 60% des soins restants. (Signature de Restauration)"
       },
       "moonlash": {
         "name": "Déferlante lunaire",
@@ -14439,26 +14445,26 @@ export const fr_FR: EnTranslations = {
         "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Cœur sylvestre)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Forme de Soignespores",
+        "description": "Prenez la forme d'un Soignespores : vos soins augmentent de 20% et votre armure de 40%, mais votre vitesse diminue de 20%. Tous vos sorts de forme de lanceur restent utilisables. Dure jusqu'au prochain changement de forme. Tout changement de forme accorde Foulée bondissante, un bref gain de vitesse. Relancez pour reprendre votre forme de lanceur. (Signature de Restauration)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Explosion de spores",
+        "description": "Invoque un champignon explosif dans la zone ciblée. Après {duration} s, il éclate, soigne les alliés de {healing} et inflige {damage} dégâts de Nature aux ennemis dans un rayon de 8 m.",
+        "specNote_balance": "À 3 Marées lunaires, sa puissance augmente de 25% et elle consomme votre Marée lunaire.",
+        "specNote_restoration": "Applique aussi Soin de spores à chaque allié soigné. À pleine Verdoyance, sa puissance augmente de 25% et elle consomme votre Verdoyance."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Bienfait de la nature",
+        "description": "Vos sorts peuvent activer Bienfait de la nature pendant 10 s : le sort indiqué devient gratuit, 25% plus puissant et utilisable sous toute forme. Une nouvelle activation renouvelle la durée.",
+        "specNote_feral": "Chaque attaque automatique de mêlée réussie a une chance sur 15 de l'activer pour Soin de spores, ou pour Peau de chêne en Forme de Bruin.",
+        "specNote_balance": "Chaque Trait sauvage ou Chute céleste lancé a 10% de chances de l'activer pour Explosion de spores, au plus une fois toutes les 10 s.",
+        "specNote_restoration": "Chaque pulsation de vos soins sur la durée a 10% de chances de l'activer pour Explosion de spores, au plus une fois toutes les 10 s."
       },
       "overbloom": {
         "name": "Surfloraison",
-        "description": "Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Sporemending fraîche sur la cible.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Soin de spores fraîche sur la cible.",
+        "specNote_restoration": "Dépense vos 5 points de Verdoyance : chaque allié portant vos soins sur la durée reçoit instantanément {buff}% des soins qu'il leur restait, les effets sont retirés et la cible reçoit un nouveau Soin de spores."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",
@@ -19098,10 +19104,10 @@ export const fr_FR: EnTranslations = {
         "name": "Cache de l'Émissaire"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Crâne-trophée"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Sac à crânes"
       },
       "clue_scroll": {
         "name": "Parchemin d'indice"
@@ -24117,9 +24123,9 @@ export const fr_FR: EnTranslations = {
         "body": "Le coffre a été vidé, mais votre part n'a pas été collectée du coffre. Les corbeaux l'ont amenée jusqu'à vous ici, avec les biens et les pièces que vous avez gagnés."
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "La Poste aux corbeaux",
+        "subject": "Votre récompense de quête mondiale",
+        "body": "Vos sacs étaient pleins lorsque vous avez gagné cette récompense de quête mondiale. Les corbeaux vous l'ont donc apportée ici. Faites de la place et récupérez-la à n'importe quel pilier aux corbeaux.\n\n- La Poste aux corbeaux"
       }
     },
     "itemSets": {
@@ -24255,8 +24261,8 @@ export const fr_FR: EnTranslations = {
       },
       "grovespring": {
         "name": "Habillement de la Source sylvestre",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdure."
+        "bonus2": "Prompte guérison consomme d'abord votre propre Soin de spores ou Seconde floraison et soigne 25 pour cent de plus. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdoyance."
       },
       "hexthread": {
         "name": "Linceul de fil maudit",

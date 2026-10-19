@@ -51,7 +51,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Gebruik: Versterkt je borstharnas en verhoogt Pantser met 12 voor 1 uur.',
   'hudChrome.factionRewards.battleStandardUse':
     'Gebruik: Plant de Gezegende Dageraad-gevechtsstandaard voor 5 minuten, verhoogt aanzienlijk buiten-gevecht gezondheid en manaherstel voor alle nabije bondgenoten. Dicht ernaast blijven voor 10 seconden geeft ook Zegening van de Dageraad (+5% naar alle stats voor 30 min). (5 min cooldown)',
-  'hudChrome.factionRewards.hub_automatons': 'Zuid Bereik (De Automaton Gieterij)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automatons)',
   'hudChrome.factionRewards.hub_church_order': 'Oostbeekdal (De Kerkorde)',
   'hudChrome.factionRewards.hub_none':
     'Geen (Gebruik in de buurt van een factiehub om af te stemmen)',
@@ -16003,7 +16003,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot {duration} sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf.',
   'entities.abilities.overbloom.name': 'Overbloei',
   'entities.abilities.overbloom.description':
-    'Verbruikt 3 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Sporemending op het doelwit.',
+    'Verbruikt 3 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Sporenheling op het doelwit.',
   'entities.abilities.redharvest.name': 'Rode Oogst',
   'entities.abilities.redharvest.description':
     'Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten.',
@@ -16017,7 +16017,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen',
   'hudChrome.auraEffect.verdance':
-    'Groenkracht: stadium {stacks} van {max}. Elke Sporemending, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei',
+    'Groenkracht: stadium {stacks} van {max}. Elke Sporenheling, Tweede Bloei of Wildheling die je uitspreekt voegt 1 toe, en elk stadium verkort de spreektijd van Wildheling; bij {max} wordt Snelle genezing Overbloei',
   'sim.rift.allUnstable': 'Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.',
   'sim.rift.alreadyCleared': 'Deze rift is al opgeruimd door {names}.',
   'sim.rift.deadEntry': 'Je kunt geen rift betreden terwijl je dood bent.',
@@ -16657,7 +16657,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Elke opener die je vanuit Schemersluier gebruikt, voegt 1 Schemer toe (max 3).',
   'entities.abilities.swiftmend.description':
-    'Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het te genezen voor {damage}. Elke spreuk van Sporemending, Tweede Bloei en Wildheling voegt 1 Groenkracht toe; bij 3 Groenkracht wordt deze knop Overbloei, die onmiddellijk elke bondgenoot met jouw genezing-over-tijd-effecten geneest voor 60% van wat die effecten nog over hadden. (Boshart-kenmerk)',
+    'Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het te genezen voor {damage}. Elke spreuk van Sporenheling, Tweede Bloei en Wildheling voegt 1 Groenkracht toe; bij 3 Groenkracht wordt deze knop Overbloei, die onmiddellijk elke bondgenoot met jouw genezing-over-tijd-effecten geneest voor 60% van wat die effecten nog over hadden. (Boshart-kenmerk)',
   'entities.abilities.swipe.description':
     'Veeg met je klauwen door nabije vijanden voor {damage} schade. Veroorzaakt extra dreiging. Alleen in Bruingedaante.',
   'entities.abilities.swipe.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
@@ -20044,4 +20044,195 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Sleep om de kaartzijbalk te vergroten of te verkleinen. Dubbelklik om te resetten.',
   'guide.worldPvpPage.hillBodyFlat':
     'Eens per drie uur krijgt het hele rijk op een onvoorspelbaar moment te horen dat er over vijftien minuten een heuvel verschijnt in een van de vrije gevechtszones. De cirkel wordt op open terrein gemarkeerd. De heuvel blijft vijfenveertig minuten staan en verdwijnt dan. Ondertussen worden elke vijf minuten de locatie en de groepen met de langste totale bezettingstijd bekendgemaakt. De groep met de meeste spelers in de cirkel betwist de heuvel en verovert hem na in totaal dertig seconden numeriek overwicht. Een rivaliserende groep pauzeert de teller alleen totdat jouw groep weer voorstaat; de teller begint pas opnieuw als er geen levend lid van jouw groep meer binnen staat. Een solospeler telt als een groep van één en behoudt een bezette heuvel bij het vormen van een groep, maar raidleden tellen helemaal niet mee. Elk lid van de bezettende groep dat binnen staat, krijgt elke minuut evenveel Eer, ongeacht hoe lang de groep de heuvel al bezet. Een volle groep die hem de hele duur ongestoord bezet, verdient ongeveer evenveel als met drie slagveldoverwinningen. Als de heuvel verdwijnt en de groep met de langste totale bezettingstijd minstens tien minuten heeft bezet, krijgt iedereen die tijdens die bezetting minstens één minuut binnen stond en nog in die groep zit één overwinning voor de PvP-rij van de Wekelijkse Kluis. Een balk boven het veld toont de bezetter, de aantallen van beide kanten en de veroveringsteller; /hill in de chat geeft de locatie aan.',
+  'errors.noUpdateFound': 'Geen update gevonden. Probeer het binnenkort opnieuw.',
+  'errors.searchUpdates': 'Naar updates zoeken',
+  'errors.updateSearchFailed': 'Kon niet op updates controleren. Probeer het opnieuw.',
+  'errors.updateUnavailable': 'Werk bij via je spelwinkel of download de nieuwste client.',
+  'hudChrome.auraEffect.formSporemender':
+    'Sporenhelergedaante: genezing verhoogd met {pct}%, pantser verhoogd met {armorPct}% en bewegingssnelheid verlaagd met {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Vergrendelde voorwerpen blijven in hun tasvak. Ontgrendel ze om ze te verplaatsen.',
+  'hudChrome.death.pvpResurrect': 'PvP-wederopstanding',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'PvP-wederopstanding is klaar: je herrijst op het dichtstbijzijnde kerkhof.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Herleef op het dichtstbijzijnde kerkhof met volle gezondheid, zonder nieuwe Tol van de Hoeder.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP-wederopstanding ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Je kunt over {seconds} via PvP herrijzen: je herleeft op het dichtstbijzijnde kerkhof.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Wachtende moeilijkheidswijziging geannuleerd omdat de groep of leider veranderde.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Moeilijkheidswijziging wacht omdat er nog iemand of een lijk binnen is. Ze wordt toegepast zodra de instanties leeg zijn.',
+  'hudChrome.ferry.arrivesIn': 'Veerboot komt over {time}',
+  'hudChrome.ferry.boardNow': 'Nu instappen',
+  'hudChrome.ferry.destination': 'Bestemming: {dest}',
+  'hudChrome.ferry.portLabel': 'Veerboot van {port} naar {dest}',
+  'hudChrome.ferry.portTitle': 'Veerhaven {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Dienstregeling van de veerboot niet beschikbaar.',
+  'hudChrome.graphicsRestore.note': 'Grafische weergave herstellen',
+  'hudChrome.hill.contestOtherPaused': 'Rivaal gepauzeerd: {seconds} van {total}',
+  'hudChrome.hill.contestYouPaused': 'Gepauzeerd: {seconds} van {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Afgenomen van {name}',
+  'hudChrome.keybindLayout.apply': 'Sneltoetsen omzetten',
+  'hudChrome.keybindLayout.converted': 'Sneltoetsen omgezet van {from} naar {to}.',
+  'hudChrome.keybindLayout.from': 'Sneltoetsen gemaakt voor',
+  'hudChrome.keybindLayout.help':
+    'Elke sneltoets verschuift naar de toets die hetzelfde teken typt op de nieuwe indeling. De cijferrij blijft op zijn plaats. Toetsnamen in deze lijst zijn QWERTY-posities; het toetsenbordoverzicht toont je eigen indeling.',
+  'hudChrome.keybindLayout.keepMovement': 'Bewegingstoetsen op hun plaats houden',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Bewegingstoetsen bleven vorige keer op hun plaats en blijven dat weer. Herstel de standaardwaarden om opnieuw te beginnen.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (Belgisch)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (Frans)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Colemak-indeling',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Dvorak-indeling',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (Braziliaans ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (Deens)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (Spaans)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (Italiaans)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (Noors)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (Zweeds, Fins)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (Portugees)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (Turks)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Verenigd Koninkrijk)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Verenigde Staten)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (Zwitsers)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (Duits)',
+  'hudChrome.keybindLayout.moves': 'Sneltoetsen die verschuiven: {count}',
+  'hudChrome.keybindLayout.noChange': 'Geen sneltoetsen veranderen tussen deze indelingen.',
+  'hudChrome.keybindLayout.open': 'Omzetten',
+  'hudChrome.keybindLayout.title': 'Toetsenbordindeling',
+  'hudChrome.keybindLayout.to': 'Omzetten naar',
+  'hudChrome.nameplate.bountyTag': 'Premie',
+  'hudChrome.options.classicCombatText': 'Klassieke gevechtstekst',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Voorwerpen onder deze kwaliteit worden met één klik verkocht. Je kunt verkeerd verkochte voorwerpen terugkopen, behalve ongesigneerde grijze voorwerpen.',
+  'hudChrome.options.spellEffects': 'Spreukeffecten',
+  'hudChrome.options.spellTooltipOnHover': 'Spreukinfo bij aanwijzen',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Bericht van de dag gewist.',
+  'hudChrome.realmMotd.line': 'Bericht van de dag: {text}',
+  'hudChrome.realmMotd.none': 'Er is geen bericht van de dag ingesteld.',
+  'hudChrome.realmMotd.saveFailed':
+    'Het bericht van de dag kon niet worden opgeslagen en gaat bij een herstart verloren.',
+  'hudChrome.realmMotd.tooLong': 'Het bericht van de dag mag hoogstens {max} tekens bevatten.',
+  'hudChrome.realmMotd.updated': 'Bericht van de dag bijgewerkt.',
+  'hudChrome.realmMotd.usage':
+    'Gebruik: /motd "<bericht>" om het in te stellen, /motd clear om het te wissen.',
+  'hudChrome.skullBag.clickOpen': 'Klik om te openen',
+  'hudChrome.skullBag.close': 'Schedeltas sluiten',
+  'hudChrome.skullBag.empty':
+    'Leeg. Zolang je de tas draagt, gaan buitgemaakte schedels er direct in.',
+  'hudChrome.skullBag.notCarried':
+    'Draag de Schedeltas in je tassen om schedels op te bergen of te pakken.',
+  'hudChrome.skullBag.store': 'Gedragen schedels opbergen ({count})',
+  'hudChrome.skullBag.storeNone': 'Geen schedels om op te bergen',
+  'hudChrome.skullBag.takeAll': 'Alles pakken',
+  'hudChrome.skullBag.takeAllAria': 'Alles pakken: {item}',
+  'hudChrome.skullBag.takeOne': '1 pakken',
+  'hudChrome.skullBag.takeOneAria': '1 pakken: {item}',
+  'hudChrome.skullBag.title': 'Schedeltas',
+  'hudChrome.skullBag.tooltip':
+    'Bewaart onbeperkt Trofeeschedels zonder tasruimte in te nemen. Zolang hij in je tassen zit, gaan buitgemaakte schedels er direct in. Klik erop in je tassen om schedels op te bergen of te pakken.',
+  'hudChrome.skullBag.total': 'Schedels: {count}',
+  'hudChrome.skullBag.unrecorded': 'Trofeeschedel',
+  'hudChrome.treasureMap.inkPickerCancel': 'Annuleren',
+  'hudChrome.treasureMap.inkPickerCost': 'Opnieuw tekenen als {rarity}: {inks} inkt',
+  'hudChrome.treasureMap.inkPickerHeld': 'Je hebt {held} Cartografeninkt.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Wordt gevolgd: de X ligt in {zone}. De X blijft op zijn plaats.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Op welke kaart wil je Cartografeninkt gebruiken?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Ongelezen ({count} in bezit)',
+  'hudChrome.warfare.reasons.worldQuest': 'wereldmissie',
+  'hudChrome.warfareShop.goods': 'Waren',
+  'hudChrome.weeklyRewards.allClassGear': 'Uitrusting voor alle klassen',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} PvP-overwinningen',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} PvP-overwinning',
+  'hudChrome.weeklyRewards.lootFocus': 'Buitvoorkeur',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Geldt alleen voor ongeopende kluizen.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Geen geschikte buit. Kies een andere voorkeur.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Behaal {count} PvP-overwinningen',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Behaal {count} PvP-overwinning',
+  'hudChrome.weeklyRewards.rolledFocus': 'Geloot voor: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Huidige PvP-reeks: {time} gespeeld (gepauzeerd in een heiligdom)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Huidige PvP-reeks: {time} gespeeld (gepauzeerd tijdens de dood)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Huidige PvP-reeks: {time} gespeeld (gepauzeerd in PvE-instanties)',
+  'hudChrome.worldPvp.rewardProgress': 'Huidige PvP-reeks: {time} gespeeld',
+  'hudChrome.worldPvp.rewardTitles':
+    'Verdien blijvende titels na {thresholds} speeltijd met Wereld-PvP aan in de open wereld of PvP-instanties. Uitloggen, dood, PvE-instanties en heiligdommen pauzeren de teller. Uitschakelen zet hem terug op nul.',
+  'hudChrome.worldPvp.skullName': 'Schedel van {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Als jullie beiden gemarkeerd zijn, valt het goud van de dodelijke slag op het lichaam, samen met de schedel van de verliezer.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Ongesigneerde grijze voorwerpen komen niet op de terugkooplijst, dus hun verkoop is onomkeerbaar.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Je tassen zijn vol. Je beloning is naar je brievenbus gestuurd: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Je spreuken kunnen Zegening der Natuur voor 10 sec activeren: de genoemde spreuk wordt gratis, 25% sterker en bruikbaar in elke gedaante. Een nieuwe activering vernieuwt de duur.',
+  'entities.abilities.natures_boon.name': 'Zegening der Natuur',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Elke Wildbout of Hemelval die je werpt heeft 10% kans om deze voor Sporenexplosie te activeren, hoogstens eenmaal per 10 sec.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Elke geraakte automatische slag van dichtbij heeft 1 op 15 kans om deze voor Sporenheling te activeren, of voor Eikenhuid in Bruingedaante.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Elke tik van je genezing over tijd heeft 10% kans om deze voor Sporenexplosie te activeren, hoogstens eenmaal per 10 sec.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Verbruikt je 5 Groenkracht: elke bondgenoot met jouw genezing over tijd wordt direct genezen voor {buff}% van hun resterende genezing, de effecten verdwijnen en het doel krijgt een nieuwe Sporenheling.',
+  'entities.abilities.play_dead.description':
+    'Val op de grond en doe alsof je dood bent: je gezondheid en Focus lijken voor iedereen leeg. Vijanden vergeten je en vijandelijke spelers die je geselecteerd hebben verliezen hun doel. Bewegen, aanvallen of een andere vaardigheid gebruiken beëindigt dit. Werp opnieuw om op te staan.',
+  'entities.abilities.play_dead.name': 'Dood spelen',
+  'entities.abilities.rejuvenation.name': 'Sporenheling',
+  'entities.abilities.scratch.description':
+    'Krab door nabije doelen binnen 6 meter voor wapenschade plus {damage}. Geeft 1 combopunt per geraakt doel. Onthult sluipende vijanden in de zwaai. Alleen in Katgedaante.',
+  'entities.abilities.scratch.name': 'Krab',
+  'entities.abilities.scratch.specNote_feral':
+    'Elke geraakte slag voegt 1 Oud Bloed toe (maximaal 3).',
+  'entities.abilities.spore_burst.description':
+    'Roept een sporenbarster op in het doelgebied. Na {duration} sec barst hij, geneest bondgenoten voor {healing} en brengt vijanden binnen 8 meter {damage} Natuurschade toe.',
+  'entities.abilities.spore_burst.name': 'Sporenexplosie',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Bij 3 Maanvloed is deze 25% sterker en verbruikt je Maanvloed.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Past ook Sporenheling toe op elke genezen bondgenoot. Bij volle Groenkracht is deze 25% sterker en verbruikt je Groenkracht.',
+  'entities.abilities.sporemender_form.description':
+    'Verander in een Sporenheler: je genezing stijgt met 20% en je pantser met 40%, maar je bewegingssnelheid daalt met 20%. Alle spreuken van je spreukvorm blijven bruikbaar. Duurt tot je weer van gedaante verandert. Elke gedaantewisseling geeft Hobbelende pas, een korte snelheidsverhoging. Werp opnieuw om terug te keren naar je spreukvorm. (Kenmerk van Herstel)',
+  'entities.abilities.sporemender_form.name': 'Sporenhelergedaante',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Verbruikt genezing over tijd op een bevriend doel om het voor {damage} te genezen. Het aanbrengen van Sporenheling en Tweede Bloei geeft Groenkracht; bij 5 Groenkracht verandert deze knop in Overbloei, die elke bondgenoot met jouw genezing over tijd direct geneest voor 60% van hun resterende genezing. (Kenmerk van Herstel)',
+  'entities.abilities.tactical_camo.description':
+    'Ga op in je omgeving: vijanden merken je nauwelijks op en je beweegt op 80% snelheid. Aanvallen of schade oplopen verbreekt Tactische Camouflage. Werp opnieuw om tevoorschijn te komen. (Overleving)',
+  'entities.abilities.tactical_camo.name': 'Tactische Camouflage',
+  'entities.itemSets.grovespring.bonus2':
+    'Snelle genezing verbruikt eerst je eigen Sporenheling of Tweede Bloei en geneest 25 procent meer. Ontvangen schade vertraagt je spreuken niet meer.',
+  'entities.items.pvp_skull_bag.name': 'Schedeltas',
+  'entities.items.pvp_trophy_skull.name': 'Trofeeschedel',
+  'entities.letters.world_quest_reward.body':
+    'Je tassen waren vol toen je deze wereldmissiebeloning verdiende, dus hebben de raven haar hier gebracht. Maak ruimte en haal haar op bij een willekeurige ravenzuil.\n\n- De Ravenpost',
+  'entities.letters.world_quest_reward.sender': 'De Ravenpost',
+  'entities.letters.world_quest_reward.subject': 'Je wereldmissiebeloning',
+  'guide.classPage.formLine.form_sporemender':
+    'De genezingsgedaante van Herstel: stevigere huid en sterkere genezing met een tragere pas, met behoud van alle spreuken en je mana.',
+  'guide.classPage.formName.form_sporemender': 'Sporenhelergedaante',
+  'guide.economy.junkBodyFinal':
+    'Buit die je niet gebruikt kun je nog steeds aan elke handelaar met een eigen winkel verkopen. Leeg je tassen dus als je door de stad komt. Het handelsvenster heeft zelfs een knop Rommel verkopen om alle voorwerpen van Slechte kwaliteit met één klik te verkopen. Waardeloze spullen kun je ook weggooien om ruimte te maken. Ongesigneerde grijze voorwerpen die je zo verkoopt komen niet op de terugkooplijst, dus kijk eerst of je iets wilde bewaren.',
+  'guide.models.formSporemender': 'Sporenhelergedaante',
+  'guide.settingsPage.ifClassicCombatText':
+    'Brengt de eenvoudige witte en bleekgouden schadegetallen terug die recht omhoog stijgen. Laat dit uit (standaard) voor opvallendere getallen die zijwaarts uitwaaieren, met flitsen bij kritieke en ongewoon grote treffers.',
+  'guide.settingsPage.rowSpellEffects':
+    'De gloed, vonken, projectielen en inslagflitsen van spreuken die spelers en hun huisdieren werpen, inclusief die van jou. Zet dit uit voor een rustiger scherm of enkele extra beelden in grote groepsgevechten. Alle vijandelijke spreuken blijven zichtbaar, net als de gevarenringen, markeringen boven verdoofde, bange of vastgezette doelen en elke spreukbalk.',
+  'questUi.dialog.attuneHearthstone': 'Mijn Geallieerde Haardsteen hier binden.',
+  'questUi.dialog.attuneHearthstoneAria': 'Bind je Geallieerde Haardsteen aan {hub} bij {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Je Geallieerde Haardsteen is niet gebonden. Spreek met een geallieerde kwartiermeester of gebruik hem bij een geallieerd knooppunt.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Je Geallieerde Haardsteen is nu gebonden aan {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'De haardsteen brengt je naar {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    'Dat voorwerp is nog niet klaar ({minutes} min resterend).',
 };

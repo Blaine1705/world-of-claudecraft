@@ -50,7 +50,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Användning: Förstärker din bröstrustning, ökar rustning med 12 för 1 timme.',
   'hudChrome.factionRewards.battleStandardUse':
     'Användning: Plantera Vigda gryningens stridsfana för 5 minuter, ökar markant hälso- och manaregerering utanför strid för alla närliggande allierade. Att stanna nära den i 10 sekunder ger också Gryningens välsignelse (+5% till alla stats för 30 min). (5 min väntetid)',
-  'hudChrome.factionRewards.hub_automatons': 'Sydlig räckvidd (AutomatsmidjaN)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automater)',
   'hudChrome.factionRewards.hub_church_order': 'Östbäcksdalen (Kyrkoorden)',
   'hudChrome.factionRewards.hub_none': 'Ingen (använd nära en fraktionsnav för att ställa in)',
   'hudChrome.factionRewards.hub_rift_watch': 'Driftvik (Riftvakten)',
@@ -19799,4 +19799,190 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Dra för att ändra storlek på kartans sidopanel. Dubbelklicka för att återställa.',
   'guide.worldPvpPage.hillBodyFlat':
     'En gång var tredje timme får hela riket vid en oförutsägbar tidpunkt veta att en kulle dyker upp i en zon med fri strid om femton minuter. Dess cirkel markeras på öppen mark. Kullen står kvar i fyrtiofem minuter och försvinner sedan. Under tiden meddelas dess plats och grupperna med längst sammanlagd innehavstid var femte minut. Gruppen med flest spelare i cirkeln utmanar om kullen och tar den efter sammanlagt trettio sekunders numerärt övertag. En rivaliserande grupp pausar bara räknaren tills din grupp leder igen; den börjar om först när ingen levande medlem av din grupp finns kvar där inne. En ensam spelare räknas som en grupp på en person och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Varje medlem i gruppen som håller kullen och står i cirkeln får lika mycket Ära varje minut, oavsett hur länge gruppen hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar ungefär lika mycket som för tre segrar på slagfält. När kullen försvinner får alla som stått i cirkeln minst en minut under den ledande gruppens innehav och fortfarande tillhör gruppen en seger till PvP-raden i det veckovisa valvet, om gruppen med längst sammanlagd innehavstid hållit den i minst tio minuter. En stapel över fältet visar vem som håller den, antalet spelare på båda sidor och erövringsräknaren; /hill i chatten visar platsen.',
+  'questUi.dialog.attuneHearthstone': 'Bind min allierade hemsten här.',
+  'questUi.dialog.attuneHearthstoneAria': 'Bind din allierade hemsten till {hub} hos {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Din allierade hemsten är inte bunden. Tala med en allierad kvartermästare eller använd den vid en allierad knutpunkt.',
+  'hudChrome.factionRewards.hearthstoneBound': 'Din allierade hemsten är nu bunden till {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Hemstenen för dig till {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Föremålet är inte klart än ({minutes} min återstår).',
+  'errors.noUpdateFound': 'Ingen uppdatering hittades. Försök igen om en stund.',
+  'errors.searchUpdates': 'Sök efter uppdateringar',
+  'errors.updateSearchFailed': 'Det gick inte att söka efter uppdateringar. Försök igen.',
+  'errors.updateUnavailable': 'Uppdatera via din spelbutik eller hämta den senaste klienten.',
+  'hudChrome.auraEffect.formSporemender':
+    'Sporläkarform: utförd läkning ökar med {pct}%, rustningen ökar med {armorPct}% och rörelsehastigheten minskar med {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Låsta föremål stannar på sin plats i väskan. Lås upp föremålet för att flytta det.',
+  'hudChrome.death.pvpResurrect': 'PvP-återupplivning',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'PvP-återupplivning är redo: du återuppstår på närmaste kyrkogård.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Återuppstå på närmaste kyrkogård med full hälsa, utan en ny Väktartull.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP-återupplivning ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Du kan använda PvP-återupplivning om {seconds}: du återuppstår på närmaste kyrkogård.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Den köade svårighetsändringen avbröts eftersom gruppen eller ledaren ändrades.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Svårighetsändringen köades eftersom någon eller någons kropp fortfarande är kvar där inne. Den träder i kraft när instanserna är tomma.',
+  'hudChrome.ferry.arrivesIn': 'Färjan anländer om {time}',
+  'hudChrome.ferry.boardNow': 'Gå ombord nu',
+  'hudChrome.ferry.destination': 'Resmål: {dest}',
+  'hudChrome.ferry.portLabel': 'Färja från {port} till {dest}',
+  'hudChrome.ferry.portTitle': 'Färjeläget i {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Färjans tidtabell är inte tillgänglig.',
+  'hudChrome.graphicsRestore.note': 'Återställer grafik',
+  'hudChrome.hill.contestOtherPaused': 'Rivalens tid pausad: {seconds} av {total}',
+  'hudChrome.hill.contestYouPaused': 'Pausad: {seconds} av {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Tagen från {name}',
+  'hudChrome.keybindLayout.apply': 'Konvertera snabbtangenter',
+  'hudChrome.keybindLayout.converted': 'Snabbtangenter konverterades från {from} till {to}.',
+  'hudChrome.keybindLayout.from': 'Snabbtangenter avsedda för',
+  'hudChrome.keybindLayout.help':
+    'Varje snabbtangent flyttas till den tangent som skriver samma tecken i den nya layouten. Sifferraden stannar på samma plats. Tangentnamnen i listan anger QWERTY-positioner; tangentbordsöversikten visar din egen layout.',
+  'hudChrome.keybindLayout.keepMovement': 'Behåll rörelsetangenternas placering',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Rörelsetangenterna behöll sin placering förra gången och gör därför det igen. Återställ standardinställningarna för att börja om.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belgisk)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (fransk)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Colemak-layout',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Dvorak-layout',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brasiliansk ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (dansk)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (spansk)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italiensk)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norsk)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (svensk, finsk)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portugisisk)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turkisk)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (brittisk)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (amerikansk)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (schweizisk)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (tysk)',
+  'hudChrome.keybindLayout.moves': 'Snabbtangenter som flyttas: {count}',
+  'hudChrome.keybindLayout.noChange': 'Inga snabbtangenter ändras mellan dessa layouter.',
+  'hudChrome.keybindLayout.open': 'Konvertera',
+  'hudChrome.keybindLayout.title': 'Tangentbordslayout',
+  'hudChrome.keybindLayout.to': 'Konvertera till',
+  'hudChrome.nameplate.bountyTag': 'Skottpengar',
+  'hudChrome.options.classicCombatText': 'Klassisk stridstext',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Föremål under denna kvalitet säljs med ett enda klick. Ett föremål som säljs av misstag kan köpas tillbaka från handlaren, utom osignerade grå föremål.',
+  'hudChrome.options.spellEffects': 'Besvärjelseeffekter',
+  'hudChrome.options.spellTooltipOnHover': 'Besvärjelsers verktygstips vid hovring',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.realmMotd.cleared': 'Dagens meddelande har rensats.',
+  'hudChrome.realmMotd.line': 'Dagens meddelande: {text}',
+  'hudChrome.realmMotd.none': 'Inget meddelande för dagen har angetts.',
+  'hudChrome.realmMotd.saveFailed':
+    'Dagens meddelande kunde inte sparas och försvinner vid en omstart.',
+  'hudChrome.realmMotd.tooLong': 'Dagens meddelande får innehålla högst {max} tecken.',
+  'hudChrome.realmMotd.updated': 'Dagens meddelande har uppdaterats.',
+  'hudChrome.realmMotd.usage':
+    'Användning: /motd "<meddelande>" för att ange det, /motd clear för att ta bort det.',
+  'hudChrome.skullBag.clickOpen': 'Klicka för att öppna',
+  'hudChrome.skullBag.close': 'Stäng skallpåsen',
+  'hudChrome.skullBag.empty': 'Tom. När du bär påsen hamnar skallar som du plundrar direkt i den.',
+  'hudChrome.skullBag.notCarried':
+    'Bär skallpåsen i dina väskor för att lägga in eller ta ut skallar.',
+  'hudChrome.skullBag.store': 'Lägg in burna skallar ({count})',
+  'hudChrome.skullBag.storeNone': 'Inga skallar att lägga in',
+  'hudChrome.skullBag.takeAll': 'Ta alla',
+  'hudChrome.skullBag.takeAllAria': 'Ta alla: {item}',
+  'hudChrome.skullBag.takeOne': 'Ta 1',
+  'hudChrome.skullBag.takeOneAria': 'Ta 1: {item}',
+  'hudChrome.skullBag.title': 'Skallpåse',
+  'hudChrome.skullBag.tooltip':
+    'Rymmer obegränsat med troféskallar utan att ta upp väskutrymme. När du har den i dina väskor hamnar skallar som du plundrar direkt i den. Klicka på den i väskan för att lägga in eller ta ut skallar.',
+  'hudChrome.skullBag.total': 'Skallar: {count}',
+  'hudChrome.skullBag.unrecorded': 'Troféskalle',
+  'hudChrome.treasureMap.inkPickerCancel': 'Avbryt',
+  'hudChrome.treasureMap.inkPickerCost': 'Rita om till {rarity}: {inks} bläck',
+  'hudChrome.treasureMap.inkPickerHeld': 'Du har {held} Kartografens bläck.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Följs just nu: dess kryss finns i {zone}. Krysset stannar på samma plats.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Vilken karta vill du använda Kartografens bläck på?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Oläst ({count} i din ägo)',
+  'hudChrome.warfare.reasons.worldQuest': 'världsuppdrag',
+  'hudChrome.warfareShop.goods': 'Varor',
+  'hudChrome.weeklyRewards.allClassGear': 'Alla klassers utrustning',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} PvP-segrar',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} PvP-seger',
+  'hudChrome.weeklyRewards.lootFocus': 'Bytesinriktning',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Gäller endast oöppnade valv.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Inget lämpligt byte. Välj en annan inriktning.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Vinn {count} PvP-segrar',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Vinn {count} PvP-seger',
+  'hudChrome.weeklyRewards.rolledFocus': 'Slumpat för: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused': 'Nuvarande PvP-svit: {time} spelad tid (pausad i en fristad)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Nuvarande PvP-svit: {time} spelad tid (pausad medan du är död)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Nuvarande PvP-svit: {time} spelad tid (pausad i PvE-instanser)',
+  'hudChrome.worldPvp.rewardProgress': 'Nuvarande PvP-svit: {time} spelad tid',
+  'hudChrome.worldPvp.rewardTitles':
+    'Få permanenta titlar efter {thresholds} spelad tid med världs-PvP påslaget i den öppna världen eller i PvP-instanser. Utloggning, död, PvE-instanser och fristäder pausar tiden. Stänger du av det nollställs tiden.',
+  'hudChrome.worldPvp.skullName': '{name}s skalle',
+  'hudChrome.worldPvp.spoilsLine':
+    'När ni båda har PvP-flaggan påslagen hamnar guldet från den dödande träffen på kroppen tillsammans med förlorarens skalle.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Osignerade grå föremål hamnar inte i återköpslistan, så försäljningen kan inte ångras.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Dina väskor är fulla. Din belöning skickades till brevlådan: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Dina besvärjelser kan aktivera Naturens gåva i 10 sek: den angivna besvärjelsen blir gratis, 25% starkare och kan kastas i alla former. En ny aktivering förnyar varaktigheten.',
+  'entities.abilities.natures_boon.name': 'Naturens gåva',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Varje Vildbult eller Himlafall du kastar har 10% chans att aktivera den för Sporutbrott, högst en gång var 10:e sekund.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Varje närstridsautoträff som träffar har 1 chans på 15 att aktivera den för Sporläkning, eller för Ekhud när du är i Bruinform.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Varje tick från dina läkningseffekter över tid har 10% chans att aktivera den för Sporutbrott, högst en gång var 10:e sekund.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Förbrukar dina 5 Grönska: varje allierad med dina läkningseffekter över tid läks omedelbart med {buff}% av den läkning som återstod i effekterna, effekterna tas bort och målet får en ny Sporläkning.',
+  'entities.abilities.play_dead.description':
+    'Fall till marken och spela död: din hälsa och ditt Fokus ser tomma ut för alla. Fiender glömmer dig, och fiendespelare som har dig som mål förlorar sitt mål. Rörelse, attacker eller andra förmågor avslutar effekten. Använd igen för att resa dig.',
+  'entities.abilities.play_dead.name': 'Spela död',
+  'entities.abilities.rejuvenation.name': 'Sporläkning',
+  'entities.abilities.scratch.description':
+    'Klös igenom närliggande mål inom 6 yards och ge vapenskada plus {damage}. Ger 1 kombopoäng per träffat mål. Avslöjar smygande fiender inom svepet. Endast i Kattform.',
+  'entities.abilities.scratch.name': 'Klös',
+  'entities.abilities.scratch.specNote_feral': 'Varje träff ger 1 Gammalt Blod (högst 3).',
+  'entities.abilities.spore_burst.description':
+    'Frammanar en sporfylld svamp i målområdet. Efter {duration} sek brister den och läker allierade för {healing} samt ger fiender inom 8 yards {damage} naturskada.',
+  'entities.abilities.spore_burst.name': 'Sporutbrott',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Vid 3 Månflod blir det 25% starkare och förbrukar din Månflod.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Ger också Sporläkning till varje allierad som läks. Vid full Grönska blir det 25% starkare och förbrukar din Grönska.',
+  'entities.abilities.sporemender_form.description':
+    'Byt skepnad till en sporläkare: din utförda läkning ökar med 20% och din rustning med 40%, men din rörelsehastighet minskar med 20%. Alla besvärjelser från din kastarform kan fortfarande användas. Varar tills du byter skepnad igen. Varje skepnadsbyte ger Lunkande steg, en kort ökning av rörelsehastigheten. Använd igen för att återgå till kastarformen. (Groveheart-signatur)',
+  'entities.abilities.sporemender_form.name': 'Sporläkarform',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Förbrukar en läkningseffekt över tid på ett vänligt mål för att läka det för {damage}. Planteringar av Sporläkning och Andra blomningen ger Grönska; vid 5 Grönska blir knappen Överblomning, som omedelbart läker varje allierad med dina läkningseffekter över tid för 60% av deras återstående läkning. (Groveheart-signatur)',
+  'entities.abilities.tactical_camo.description':
+    'Smält in i omgivningen: fiender lägger knappt märke till dig och du rör dig med 80% hastighet. Attacker eller skada avslutar Taktiskt kamouflage. Använd igen för att träda fram. (Fältkunskap)',
+  'entities.abilities.tactical_camo.name': 'Taktiskt kamouflage',
+  'entities.itemSets.grovespring.bonus2':
+    'Snabb läkning förbrukar din egen Sporläkning eller Andra blomningen först och läker 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.',
+  'entities.items.pvp_skull_bag.name': 'Skallpåse',
+  'entities.items.pvp_trophy_skull.name': 'Troféskalle',
+  'entities.letters.world_quest_reward.body':
+    'Dina väskor var fulla när du fick denna belöning för ett världsuppdrag, så korparna har fört hit den åt dig i stället. Gör plats och hämta den vid valfri korppelare.\n\n- Korpposten',
+  'entities.letters.world_quest_reward.sender': 'Korpposten',
+  'entities.letters.world_quest_reward.subject': 'Din belöning för världsuppdraget',
+  'guide.classPage.formLine.form_sporemender':
+    'Grovehearts läkningsskepnad: tåligare hud och starkare läkning med långsammare steg, samtidigt som du behåller alla besvärjelser och din mana.',
+  'guide.classPage.formName.form_sporemender': 'Sporläkarform',
+  'guide.economy.junkBodyFinal':
+    'Byte som du inte behöver kan fortfarande säljas till alla handlare som har en egen butik, så töm väskorna när du passerar en stad i stället för att låta dem bli fulla. I handlarens fönster finns till och med knappen Sälj skräp, som säljer alla föremål av usel kvalitet med ett klick. Helt värdelösa småsaker kan också kastas bort direkt för att skapa plats. Osignerade grå föremål som säljs på detta sätt hamnar inte i återköpslistan, så kontrollera att inget du vill behålla följer med innan du trycker.',
+  'guide.models.formSporemender': 'Sporläkarform',
+  'guide.settingsPage.ifClassicCombatText':
+    'Återställer de enkla vita och blekgula skadesiffrorna som stiger rakt uppåt. Låt inställningen vara avstängd (standard) för tydligare siffror som sprids åt sidorna och blossar upp vid kritiska och ovanligt stora träffar.',
+  'guide.settingsPage.rowSpellEffects':
+    'Glöd, gnistor, projektiler och träffexplosioner från besvärjelser som spelare och deras husdjur kastar, inklusive dina egna. Stäng av för en lugnare skärm eller några extra bildrutor i stora gruppstrider. Allt som fiender kastar syns fortfarande, liksom ringarna som visar områden du bör lämna, markörerna ovanför bedövade, skrämda eller rotade mål och alla kaststaplar.',
 };

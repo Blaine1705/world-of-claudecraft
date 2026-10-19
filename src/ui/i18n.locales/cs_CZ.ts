@@ -50,7 +50,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Použití: Posílí tvou hrudní zbroj, zvýší obranu o 12 na 1 hodinu.',
   'hudChrome.factionRewards.battleStandardUse':
     'Použití: Zasadí prapor prvního úsvitu na 5 minut, značně zvyšuje regeneraci zdraví a many mimo boj pro všechny blízké spojence. Zůstaneš-li u něj 10 sekund, také získáš požehnání úsvitu (+5% všem statistikám na 30 minut). (5 minut cooldown)',
-  'hudChrome.factionRewards.hub_automatons': 'Jižní dosah (Kovárna automatů)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automati)',
   'hudChrome.factionRewards.hub_church_order': 'Eastbrookské údolí (Církevní řád)',
   'hudChrome.factionRewards.hub_none': 'Žádný (Použij blízko domovského města frakce)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (Hlídka trhlin)',
@@ -16031,7 +16031,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o {duration} s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí.',
   'entities.abilities.overbloom.name': 'Překvět',
   'entities.abilities.overbloom.description':
-    'Spotřebuje 3 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Sporemending.',
+    'Spotřebuje 3 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Výtrusové hojení.',
   'entities.abilities.redharvest.name': 'Rudá sklizeň',
   'entities.abilities.redharvest.description':
     'Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví {rage} energie. Funguje i bez combo bodů.',
@@ -19699,4 +19699,192 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tažením změníte šířku postranního panelu mapy. Dvojklikem ji resetujete.',
   'guide.worldPvpPage.hillBodyFlat':
     'Jednou za tři hodiny se v nepředvídatelnou chvíli celé říši oznámí, že za patnáct minut v jedné ze zón volného boje vyroste kopec. Jeho kruh se vyznačí na otevřeném prostranství. Kopec vydrží čtyřicet pět minut a pak zmizí. Během této doby se každých pět minut oznamuje jeho poloha a skupiny s nejdelším celkovým držením. Skupina s nejvíce hráči v kruhu o kopec usiluje a po celkem třiceti sekundách početní převahy jej získá. Příchod soupeřů pouze pozastaví počítadlo, dokud vaše skupina znovu nezíská převahu; od začátku se počítá jen tehdy, když v kruhu nezůstane žádný živý člen vaší skupiny. Samotný hráč se počítá jako jednočlenná skupina a při založení skupiny si držený kopec ponechá, ale členové raidu se nepočítají vůbec. Každý člen držící skupiny stojící v kruhu získává každou minutu stejně Cti bez ohledu na délku držení. Plná skupina, která kopec nerušeně drží po celou jeho dobu, získá přibližně tolik jako za tři vítězství na bojištích. Když kopec zmizí a skupina s nejdelším celkovým držením jej držela alespoň deset minut, každý, kdo během jejího držení stál v kruhu alespoň minutu a stále je členem této skupiny, získá jedno vítězství do PvP řádku Týdenního trezoru. Lišta nad bojištěm ukazuje držitele, počty hráčů na obou stranách a počítadlo obsazování; /hill v chatu sdělí polohu.',
+  'errors.noUpdateFound': 'Nebyla nalezena žádná aktualizace. Zkus to za chvíli znovu.',
+  'errors.searchUpdates': 'Vyhledat aktualizace',
+  'errors.updateSearchFailed': 'Aktualizace se nepodařilo ověřit. Zkus to prosím znovu.',
+  'errors.updateUnavailable':
+    'Aktualizuj hru ve svém herním obchodě nebo si stáhni nejnovějšího klienta.',
+  'hudChrome.auraEffect.formSporemender':
+    'Podoba výtrusového léčitele: léčení zvýšeno o {pct} %, zbroj o {armorPct} % a rychlost pohybu snížena o {slowPct} %',
+  'hudChrome.bags.reorderLocked':
+    'Uzamčené předměty zůstávají na svém místě v brašně. Pro přesunutí je odemkni.',
+  'hudChrome.death.pvpResurrect': 'PvP vzkříšení',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'PvP vzkříšení je připraveno: vstaneš na nejbližším hřbitově.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Ožít na nejbližším hřbitově s plným zdravím, bez nového Strážcova mýta.',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP vzkříšení ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'PvP vzkříšení bude možné za {seconds}: vstaneš na nejbližším hřbitově.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Čekající změna obtížnosti byla zrušena kvůli změně skupiny nebo jejího vůdce.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Změna obtížnosti čeká, protože je někdo nebo jeho tělo stále uvnitř. Provede se po vyprázdnění instancí.',
+  'hudChrome.ferry.arrivesIn': 'Přívoz přijede za {time}',
+  'hudChrome.ferry.boardNow': 'Nastoupit',
+  'hudChrome.ferry.destination': 'Cíl: {dest}',
+  'hudChrome.ferry.portLabel': 'Přívoz z {port} do {dest}',
+  'hudChrome.ferry.portTitle': 'Přístaviště přívozu: {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Jízdní řád přívozu není dostupný.',
+  'hudChrome.graphicsRestore.note': 'Obnovování grafiky',
+  'hudChrome.hill.contestOtherPaused': 'Soupeř pozastaven: {seconds} z {total}',
+  'hudChrome.hill.contestYouPaused': 'Pozastaveno: {seconds} z {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Získáno od {name}',
+  'hudChrome.keybindLayout.apply': 'Převést klávesové zkratky',
+  'hudChrome.keybindLayout.converted': 'Klávesové zkratky byly převedeny z {from} na {to}.',
+  'hudChrome.keybindLayout.from': 'Zkratky vytvořené pro',
+  'hudChrome.keybindLayout.help':
+    'Každá zkratka se přesune na klávesu, která v novém rozložení píše stejný znak. Řada číslic zůstane na místě. Názvy kláves v tomto seznamu označují pozice QWERTY; přehled klávesnice ukazuje tvé vlastní rozložení.',
+  'hudChrome.keybindLayout.keepMovement': 'Ponechat klávesy pohybu na místě',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Klávesy pohybu zůstaly minule na místě, takže tam zůstanou znovu. Pro nový začátek obnov výchozí nastavení.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belgické)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (francouzské)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Rozložení Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Rozložení Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brazilské ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (dánské)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (španělské)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italské)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norské)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (švédské, finské)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portugalské)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turecké)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (britské)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (americké)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (švýcarské)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (německé)',
+  'hudChrome.keybindLayout.moves': 'Zkratky, které se přesunou: {count}',
+  'hudChrome.keybindLayout.noChange': 'Mezi těmito rozloženími se žádné zkratky nemění.',
+  'hudChrome.keybindLayout.open': 'Převést',
+  'hudChrome.keybindLayout.title': 'Rozložení klávesnice',
+  'hudChrome.keybindLayout.to': 'Převést na',
+  'hudChrome.nameplate.bountyTag': 'Odměna za hlavu',
+  'hudChrome.options.classicCombatText': 'Klasický bojový text',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Předměty pod touto kvalitou se prodávají jedním kliknutím. Omylem prodaný předmět lze od obchodníka vykoupit zpět, kromě nepodepsaných šedých předmětů.',
+  'hudChrome.options.spellEffects': 'Efekty kouzel',
+  'hudChrome.options.spellTooltipOnHover': 'Popisy kouzel při najetí myší',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Zpráva dne byla vymazána.',
+  'hudChrome.realmMotd.line': 'Zpráva dne: {text}',
+  'hudChrome.realmMotd.none': 'Žádná zpráva dne není nastavena.',
+  'hudChrome.realmMotd.saveFailed': 'Zprávu dne se nepodařilo uložit a po restartu zmizí.',
+  'hudChrome.realmMotd.tooLong': 'Zpráva dne může mít nejvýše {max} znaků.',
+  'hudChrome.realmMotd.updated': 'Zpráva dne byla aktualizována.',
+  'hudChrome.realmMotd.usage': 'Použití: /motd "<zpráva>" ji nastaví, /motd clear ji odstraní.',
+  'hudChrome.skullBag.clickOpen': 'Kliknutím otevřít',
+  'hudChrome.skullBag.close': 'Zavřít vak na lebky',
+  'hudChrome.skullBag.empty': 'Prázdný. Dokud vak nosíš, ukořistěné lebky putují přímo do něj.',
+  'hudChrome.skullBag.notCarried':
+    'Pro ukládání a vybírání lebek nos vak na lebky ve svých brašnách.',
+  'hudChrome.skullBag.store': 'Uložit nesené lebky ({count})',
+  'hudChrome.skullBag.storeNone': 'Žádné lebky k uložení',
+  'hudChrome.skullBag.takeAll': 'Vzít vše',
+  'hudChrome.skullBag.takeAllAria': 'Vzít vše: {item}',
+  'hudChrome.skullBag.takeOne': 'Vzít 1',
+  'hudChrome.skullBag.takeOneAria': 'Vzít 1: {item}',
+  'hudChrome.skullBag.title': 'Vak na lebky',
+  'hudChrome.skullBag.tooltip':
+    'Pojme libovolné množství trofejních lebek, aniž by zabíraly místo v brašnách. Dokud je ve tvých brašnách, ukořistěné lebky putují přímo do něj. Kliknutím na vak v brašnách můžeš lebky ukládat nebo vybírat.',
+  'hudChrome.skullBag.total': 'Lebky: {count}',
+  'hudChrome.skullBag.unrecorded': 'Trofejní lebka',
+  'hudChrome.treasureMap.inkPickerCancel': 'Zrušit',
+  'hudChrome.treasureMap.inkPickerCost': 'Překreslit na {rarity}: {inks} inkoustu',
+  'hudChrome.treasureMap.inkPickerHeld': 'Máš {held} kartografova inkoustu.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Sledovaná mapa: její X leží v oblasti {zone}. X zůstane na svém místě.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Na kterou mapu chceš použít kartografův inkoust?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Nepřečteno (v držení: {count})',
+  'hudChrome.warfare.reasons.worldQuest': 'světový úkol',
+  'hudChrome.warfareShop.goods': 'Zboží',
+  'hudChrome.weeklyRewards.allClassGear': 'Výbava všech tříd',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': 'PvP vítězství: {count}',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': 'PvP vítězství: {count}',
+  'hudChrome.weeklyRewards.lootFocus': 'Zaměření kořisti',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Platí pouze pro neotevřené trezory.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Žádná vhodná kořist. Zvol jiné zaměření.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Získej PvP vítězství: {count}',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Získej PvP vítězství: {count}',
+  'hudChrome.weeklyRewards.rolledFocus': 'Vylosováno pro: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused': 'Aktuální PvP série: odehráno {time} (pozastaveno v útočišti)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Aktuální PvP série: odehráno {time} (pozastaveno během smrti)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Aktuální PvP série: odehráno {time} (pozastaveno v PvE instancích)',
+  'hudChrome.worldPvp.rewardProgress': 'Aktuální PvP série: odehráno {time}',
+  'hudChrome.worldPvp.rewardTitles':
+    'Získej trvalé tituly po {thresholds} odehraného času se zapnutým světovým PvP v otevřeném světě nebo v PvP instancích. Odhlášení, smrt, PvE instance a útočiště časovač pozastavují. Vypnutí PvP jej vynuluje.',
+  'hudChrome.worldPvp.skullName': 'Lebka hráče {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Když máte oba zapnuté PvP, zlato za smrtící úder leží na těle spolu s lebkou poraženého.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Nepodepsané šedé předměty se neobjeví v seznamu zpětného výkupu, takže jejich prodej nelze vzít zpět.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Tvé brašny jsou plné. Odměna byla odeslána do tvé schránky: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Tvá kouzla mohou na 10 s připravit Dar přírody: označené kouzlo je zdarma, o 25 % silnější a lze ho seslat v jakékoli podobě. Nová aktivace obnoví dobu trvání.',
+  'entities.abilities.natures_boon.name': 'Dar přírody',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Každý seslaný Šíp divočiny nebo Pád nebes má 10% šanci připravit jej pro Výtrusový výbuch, nejvýše jednou za 10 s.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Každý úspěšný automatický útok zblízka má šanci 1 z 15 připravit jej pro Výtrusové hojení, nebo v Medvědí podobě pro Dubovou kůži.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Každý tik tvých průběžných léčivých účinků má 10% šanci připravit jej pro Výtrusový výbuch, nejvýše jednou za 10 s.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Spotřebuje tvých 5 bodů Zeleně: každý spojenec s tvými průběžnými léčivými účinky se okamžitě vyléčí o {buff} % léčení, které jim zbývalo. Účinky se odstraní a cíl získá nové Výtrusové hojení.',
+  'entities.abilities.play_dead.description':
+    'Padni na zem a předstírej smrt: všem se tvé zdraví a soustředění zobrazí jako prázdné. Nepřátelé na tebe zapomenou a nepřátelští hráči, kteří tě mají zaměřeného, ztratí cíl. Pohyb, útok nebo jiná schopnost účinek ukončí. Dalším sesláním vstaneš.',
+  'entities.abilities.play_dead.name': 'Předstírání smrti',
+  'entities.abilities.rejuvenation.name': 'Výtrusové hojení',
+  'entities.abilities.scratch.description':
+    'Proškrábni blízké cíle do 6 yardů a způsob poškození zbraní plus {damage}. Za každý zasažený cíl získáš 1 bod komba. Odhalí skryté nepřátele v oblasti zásahu. Pouze v Kočičí podobě.',
+  'entities.abilities.scratch.name': 'Škrábnutí',
+  'entities.abilities.scratch.specNote_feral':
+    'Každý úspěšný zásah přidá 1 Starou krev (nejvýše 3).',
+  'entities.abilities.spore_burst.description':
+    'Vyvolá v cílové oblasti výtrusovou hlízu. Po {duration} s praskne, vyléčí spojence o {healing} a nepřátelům do 8 yardů způsobí {damage} přírodního poškození.',
+  'entities.abilities.spore_burst.name': 'Výtrusový výbuch',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Při 3 bodech Měsíčního přílivu je o 25 % silnější a spotřebuje tvůj Měsíční příliv.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Každému vyléčenému spojenci navíc udělí Výtrusové hojení. Při plné Zeleni je o 25 % silnější a spotřebuje tvou Zeleň.',
+  'entities.abilities.sporemender_form.description':
+    'Proměň se ve výtrusového léčitele: tvé léčení se zvýší o 20 % a zbroj o 40 %, ale rychlost pohybu klesne o 20 %. Všechna kouzla běžné kouzelnické podoby zůstávají použitelná. Trvá do opuštění podoby. Proměna do jakékoli podoby udělí Pružný krok, krátké zvýšení rychlosti pohybu. Dalším sesláním se vrátíš do kouzelnické podoby. (klíčová schopnost Srdce háje)',
+  'entities.abilities.sporemender_form.name': 'Podoba výtrusového léčitele',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Spotřebuje průběžný léčivý účinek na přátelském cíli a vyléčí jej o {damage}. Výtrusové hojení a výsadby Druhého květu přidávají Zeleň; při 5 bodech Zeleně se toto tlačítko změní na Překvět, který okamžitě vyléčí všechny spojence s tvými průběžnými léčivými účinky o 60 % jejich zbývajícího léčení. (klíčová schopnost Srdce háje)',
+  'entities.abilities.tactical_camo.description':
+    'Splyň s okolím: nepřátelé si tě téměř nevšímají a pohybuješ se 80% rychlostí. Útok nebo utrpěné poškození ukončí Taktické maskování. Dalším sesláním z něj vystoupíš. (Polní umění)',
+  'entities.abilities.tactical_camo.name': 'Taktické maskování',
+  'entities.itemSets.grovespring.bonus2':
+    'Rychlé zhojení nejprve spotřebuje tvé vlastní Výtrusové hojení nebo Druhý květ a léčí o 25 procent více. Utrpěné poškození už nezdržuje sesílání kouzel.',
+  'entities.items.pvp_skull_bag.name': 'Vak na lebky',
+  'entities.items.pvp_trophy_skull.name': 'Trofejní lebka',
+  'entities.letters.world_quest_reward.body':
+    'Když jsi získal(a) tuto odměnu za světový úkol, měl(a) jsi plné brašny, a tak ti ji havrani přinesli sem. Uvolni trochu místa a vyzvedni si ji u libovolného havraního sloupu.\n\n- Havraní pošta',
+  'entities.letters.world_quest_reward.sender': 'Havraní pošta',
+  'entities.letters.world_quest_reward.subject': 'Tvá odměna za světový úkol',
+  'guide.classPage.formLine.form_sporemender':
+    'Léčivá podoba Srdce háje: odolnější kůže a silnější léčení za cenu pomalejší chůze; zachovává všechna kouzla i tvou manu.',
+  'guide.classPage.formName.form_sporemender': 'Podoba výtrusového léčitele',
+  'guide.economy.junkBodyFinal':
+    'Kořist, pro kterou nemáš využití, lze stále prodat každému obchodníkovi s vlastním krámem. Vyprázdni proto brašny při každé návštěvě města. Okno obchodníka má dokonce tlačítko Prodat harampádí, které jedním kliknutím prodá všechny předměty mizerné kvality. Naprosto bezcenné drobnosti můžeš také zahodit, a uvolnit tak místo. Takto prodané nepodepsané šedé předměty se neobjeví v seznamu zpětného výkupu, takže před stisknutím tlačítka zkontroluj, zda si něco nechceš ponechat.',
+  'guide.models.formSporemender': 'Podoba výtrusového léčitele',
+  'guide.settingsPage.ifClassicCombatText':
+    'Vrátí prostá bílá a světle zlatá čísla poškození stoupající přímo vzhůru. Ponech vypnuté (výchozí nastavení), pokud chceš výraznější čísla rozlétávající se do stran a záblesky při kritických a neobvykle velkých zásazích.',
+  'guide.settingsPage.rowSpellEffects':
+    'Záře, jiskry, střely a výbuchy dopadů kouzel hráčů a jejich společníků včetně tvých. Vypni je pro klidnější obraz nebo několik snímků navíc ve velkých skupinových bojích. Kouzla nepřátel zůstanou viditelná, stejně jako kruhy varující před nebezpečnou oblastí, značky nad omráčenými, vyděšenými nebo znehybněnými cíli a všechny ukazatele sesílání.',
+  'questUi.dialog.attuneHearthstone': 'Naladit zde můj spojenecký návratový kámen.',
+  'questUi.dialog.attuneHearthstoneAria': 'Nalaď svůj spojenecký návratový kámen na {hub} u {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Tvůj spojenecký návratový kámen není naladěn. Promluv se spojeneckým zásobovačem nebo jej použij ve spojeneckém středisku.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Tvůj spojenecký návratový kámen je nyní naladěn na {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Návratový kámen tě přenese do {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    'Tento předmět ještě není připraven (zbývá {minutes} min).',
 };

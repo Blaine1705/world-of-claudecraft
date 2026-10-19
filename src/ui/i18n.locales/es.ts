@@ -436,7 +436,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Ninguno (Úsala cerca de un bastión de facción para sintonizarte)',
   'hudChrome.factionRewards.hub_rift_watch': 'Refugio de la Brecha (La Guardia de la Brecha)',
   'hudChrome.factionRewards.hub_church_order': 'Valle de Arroyo Este (La Orden de la Iglesia)',
-  'hudChrome.factionRewards.hub_automatons': 'Confín Sur (La Fundición de Autómatas)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Autómatas)',
   'hudChrome.factionRewards.riftGliderUse':
     'Uso: Despliega el planeador, ralentizando la caída durante 30 s. Aterrizar o recibir daño cancela el efecto. (2 min de reutilización)',
   'hudChrome.factionRewards.targetDummyUse':
@@ -16580,7 +16580,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade una fase de Marea Lunar y extiende tu Tempestad Lunar 6 s, hasta {duration} s por aplicación. Con la Marea Lunar llena, Semilla Lunar se convierte en Oleada Lunar.',
   'entities.abilities.overbloom.name': 'Sobrefloración',
   'entities.abilities.overbloom.description':
-    'Consume 3 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Sporemending nueva en el objetivo.',
+    'Consume 3 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Remiendo de Esporas nueva en el objetivo.',
   'entities.abilities.redharvest.name': 'Cosecha Roja',
   'entities.abilities.redharvest.description':
     'Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura {rage} de energía. Funciona sin puntos de combo.',
@@ -16594,7 +16594,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma',
   'hudChrome.auraEffect.verdance':
-    'Verdor {stacks}/{max}. Cada Sporemending, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración',
+    'Verdor {stacks}/{max}. Cada Remiendo de Esporas, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración',
   'hudChrome.riftTracker.title': 'Brecha',
   'hudChrome.riftTracker.floor': 'Piso {current} de {total}',
   'hudChrome.riftTracker.closesIn': 'Se cierra en {time}',
@@ -16785,7 +16785,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Cada apertura que uses desde el Velo Crepuscular añade 1 de Penumbra (máx. 3).',
   'entities.abilities.swiftmend.description':
-    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Cada lanzamiento de Sporemending, Segundo Florecer y Cura Silvestre añade 1 de Verdor; con 3 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por un 60% de lo que les quedaba por sanar. (habilidad distintiva de Corazón del Bosque)',
+    'Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Cada lanzamiento de Remiendo de Esporas, Segundo Florecer y Cura Silvestre añade 1 de Verdor; con 3 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por un 60% de lo que les quedaba por sanar. (habilidad distintiva de Restauración)',
   'entities.abilities.swipe.description':
     'Barre con tus garras a los enemigos cercanos por {damage} de daño. Genera amenaza adicional. Solo en Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -19153,13 +19153,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Bien alimentado: otorga {aura} durante {minutes} min al terminar de comer. Solo puede haber un efecto Bien alimentado a la vez: una comida nueva lo reemplaza.',
 
   'entities.abilities.grove_awakening.description':
-    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Corazón del Bosque)',
+    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Restauración)',
   'entities.abilities.grove_awakening.name': 'Despertar del Bosque',
   'entities.abilities.prayer_of_returning.description':
     'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Bendición y Doctrina)',
   'entities.abilities.prayer_of_returning.name': 'Plegaria del Retorno',
   'entities.abilities.wildwake.description':
-    'Incita a un aliado caído a florecer de pronto, devolviéndolo a la vida a tu lado con un 35% de su salud y maná, incluso en pleno combate. (Corazón del Bosque)',
+    'Incita a un aliado caído a florecer de pronto, devolviéndolo a la vida a tu lado con un 35% de su salud y maná, incluso en pleno combate. (Restauración)',
   'entities.abilities.wildwake.name': 'Despertar Silvestre',
   'devCommand.actions.farmgrow.description':
     'Lleva tus parcelas plantadas hasta su momento de estar listas, o una parcela concreta por id. No cambia nada más: el resultado se determinó al plantar.',
@@ -20222,4 +20222,193 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer.',
   'guide.worldPvpPage.hillBodyFlat':
     'Una vez cada tres horas, en un momento impredecible, se anuncia a todo el reino que dentro de quince minutos aparecerá una colina en una de las zonas de combate libre, y se marca su círculo en terreno abierto. Permanece cuarenta y cinco minutos y luego desaparece. Mientras permanece, cada cinco minutos se anuncian su ubicación y los grupos que la han controlado durante más tiempo en total. El grupo con más jugadores dentro del círculo disputa la colina y la captura tras acumular treinta segundos de superioridad numérica. La entrada de un grupo rival solo pausa el contador hasta que el tuyo vuelva a liderar; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solo cuenta como un grupo de uno y conserva la colina al formar un grupo, pero los miembros de banda no cuentan. Cada integrante del grupo que controla la colina y está dentro recibe la misma cantidad de Honor por minuto, sin importar cuánto lleve controlándola. Un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que por tres victorias en campos de batalla. Cuando desaparece, si el grupo con el mayor tiempo total de control acumuló al menos diez minutos, todos los que estuvieron dentro durante al menos un minuto mientras ese grupo la controlaba y siguen en él reciben una victoria para la fila de JcJ de la Bóveda Semanal. Una barra sobre el terreno muestra quién la controla, los jugadores de ambos bandos y el contador de captura; /hill en el chat indica dónde está.',
+  'errors.noUpdateFound': 'No hay actualizaciones. Inténtalo de nuevo en breve.',
+  'errors.searchUpdates': 'Buscar actualizaciones',
+  'errors.updateSearchFailed': 'No se pudieron comprobar las actualizaciones. Inténtalo de nuevo.',
+  'errors.updateUnavailable':
+    'Actualiza desde tu tienda de juegos o descarga el cliente más reciente.',
+  'hudChrome.auraEffect.formSporemender':
+    'Forma de Sanador de Esporas: sanación aumentada un {pct}%, armadura aumentada un {armorPct}% y velocidad de movimiento reducida un {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Los objetos bloqueados conservan su hueco en la bolsa. Desbloquéalos para moverlos.',
+  'hudChrome.death.pvpResurrect': 'Resurrección JcJ',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'La resurrección JcJ está lista: revivirás en el cementerio más cercano.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Revive en el cementerio más cercano con toda la salud y sin una nueva Carga del Guardián.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Resurrección JcJ ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Podrás resucitar en JcJ en {seconds}: revivirás en el cementerio más cercano.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Cambio de dificultad pendiente cancelado porque cambió el grupo o su líder.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Cambio de dificultad en espera porque aún queda alguien o su cadáver dentro. Se aplicará cuando las instancias estén vacías.',
+  'hudChrome.ferry.arrivesIn': 'El transbordador llega en {time}',
+  'hudChrome.ferry.boardNow': 'Embarcar ahora',
+  'hudChrome.ferry.destination': 'Destino: {dest}',
+  'hudChrome.ferry.portLabel': 'Transbordador de {port} a {dest}',
+  'hudChrome.ferry.portTitle': 'Puerto de transbordadores de {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Horario del transbordador no disponible.',
+  'hudChrome.graphicsRestore.note': 'Restaurando gráficos',
+  'hudChrome.hill.contestOtherPaused': 'Rival en pausa: {seconds} de {total}',
+  'hudChrome.hill.contestYouPaused': 'En pausa: {seconds} de {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Obtenido de {name}',
+  'hudChrome.keybindLayout.apply': 'Convertir atajos',
+  'hudChrome.keybindLayout.converted': 'Atajos convertidos de {from} a {to}.',
+  'hudChrome.keybindLayout.from': 'Atajos creados para',
+  'hudChrome.keybindLayout.help':
+    'Cada atajo pasa a la tecla que escribe el mismo carácter en la nueva distribución. La fila numérica conserva su posición. Los nombres de esta lista son posiciones QWERTY; el esquema del teclado muestra tu distribución.',
+  'hudChrome.keybindLayout.keepMovement': 'Mantener las teclas de movimiento en su sitio',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Las teclas de movimiento se conservaron la última vez y volverán a conservarse. Restablece los valores predeterminados para empezar de nuevo.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belga)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (francés)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Distribución Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Distribución Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brasileño ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (danés)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (español)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italiano)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (noruego)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (sueco, finés)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portugués)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turco)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Reino Unido)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Estados Unidos)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (suizo)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (alemán)',
+  'hudChrome.keybindLayout.moves': 'Atajos que cambiarán de posición: {count}',
+  'hudChrome.keybindLayout.noChange': 'Ningún atajo cambia entre estas distribuciones.',
+  'hudChrome.keybindLayout.open': 'Convertir',
+  'hudChrome.keybindLayout.title': 'Distribución del teclado',
+  'hudChrome.keybindLayout.to': 'Convertir a',
+  'hudChrome.nameplate.bountyTag': 'Recompensa por captura',
+  'hudChrome.options.classicCombatText': 'Texto de combate clásico',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Los objetos de calidad inferior se venden con un clic. Puedes recomprar un objeto vendido por error, salvo los objetos grises sin firma.',
+  'hudChrome.options.spellEffects': 'Efectos de hechizos',
+  'hudChrome.options.spellTooltipOnHover': 'Descripciones de hechizos al pasar el cursor',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Mensaje del día eliminado.',
+  'hudChrome.realmMotd.line': 'Mensaje del día: {text}',
+  'hudChrome.realmMotd.none': 'No hay mensaje del día.',
+  'hudChrome.realmMotd.saveFailed':
+    'No se pudo guardar el mensaje del día y se perderá al reiniciar.',
+  'hudChrome.realmMotd.tooLong': 'El mensaje del día admite un máximo de {max} caracteres.',
+  'hudChrome.realmMotd.updated': 'Mensaje del día actualizado.',
+  'hudChrome.realmMotd.usage':
+    'Uso: /motd "<mensaje>" para establecerlo, /motd clear para eliminarlo.',
+  'hudChrome.skullBag.clickOpen': 'Haz clic para abrir',
+  'hudChrome.skullBag.close': 'Cerrar la Bolsa de Cráneos',
+  'hudChrome.skullBag.empty':
+    'Vacía. Mientras lleves la bolsa, los cráneos que despojes entran directamente en ella.',
+  'hudChrome.skullBag.notCarried':
+    'Lleva la Bolsa de Cráneos en el inventario para guardar o sacar cráneos.',
+  'hudChrome.skullBag.store': 'Guardar los cráneos que llevas ({count})',
+  'hudChrome.skullBag.storeNone': 'No hay cráneos para guardar',
+  'hudChrome.skullBag.takeAll': 'Sacar todos',
+  'hudChrome.skullBag.takeAllAria': 'Sacar todos: {item}',
+  'hudChrome.skullBag.takeOne': 'Sacar 1',
+  'hudChrome.skullBag.takeOneAria': 'Sacar 1: {item}',
+  'hudChrome.skullBag.title': 'Bolsa de Cráneos',
+  'hudChrome.skullBag.tooltip':
+    'Guarda cualquier cantidad de Cráneos Trofeo sin ocupar espacio de las bolsas. Mientras la lleves en el inventario, los cráneos que despojes entran directamente en ella. Haz clic en ella para guardar o sacar cráneos.',
+  'hudChrome.skullBag.total': 'Cráneos: {count}',
+  'hudChrome.skullBag.unrecorded': 'Cráneo Trofeo',
+  'hudChrome.treasureMap.inkPickerCancel': 'Cancelar',
+  'hudChrome.treasureMap.inkPickerCost': 'Redibujar a {rarity}: {inks} de tinta',
+  'hudChrome.treasureMap.inkPickerHeld': 'Tienes {held} de Tinta de Cartógrafo.',
+  'hudChrome.treasureMap.inkPickerRead': 'En seguimiento: su X está en {zone}. La X no se mueve.',
+  'hudChrome.treasureMap.inkPickerTitle': '¿En qué mapa quieres usar la Tinta de Cartógrafo?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Sin leer ({count} en tu poder)',
+  'hudChrome.warfare.reasons.worldQuest': 'misión del mundo',
+  'hudChrome.warfareShop.goods': 'Mercancías',
+  'hudChrome.weeklyRewards.allClassGear': 'Equipo de todas las clases',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} victorias JcJ',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} victoria JcJ',
+  'hudChrome.weeklyRewards.lootFocus': 'Preferencia de botín',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Solo se aplica a bóvedas sin abrir.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'No hay botín válido. Elige otra preferencia.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Consigue {count} victorias JcJ',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Consigue {count} victoria JcJ',
+  'hudChrome.weeklyRewards.rolledFocus': 'Sorteado para: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused': 'Racha JcJ actual: {time} de juego (en pausa en un santuario)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Racha JcJ actual: {time} de juego (en pausa mientras estás muerto)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Racha JcJ actual: {time} de juego (en pausa en instancias JcE)',
+  'hudChrome.worldPvp.rewardProgress': 'Racha JcJ actual: {time} de juego',
+  'hudChrome.worldPvp.rewardTitles':
+    'Gana títulos permanentes tras {thresholds} de juego con JcJ del mundo activado en el mundo abierto o en instancias JcJ. Desconectarte, morir, las instancias JcE y los santuarios pausan el contador. Desactivarlo lo reinicia.',
+  'hudChrome.worldPvp.skullName': 'Cráneo de {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Si ambos están marcados, el oro del golpe mortal cae en el cadáver junto al cráneo del perdedor.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Los objetos grises sin firma no aparecen en la lista de recompra; venderlos es irreversible.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Tus bolsas están llenas. Tu recompensa se envió al buzón: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Tus hechizos pueden activar Bendición de la Naturaleza durante 10 s: el hechizo que indique será gratuito, un 25% más potente y utilizable en cualquier forma. Una nueva activación renueva la duración.',
+  'entities.abilities.natures_boon.name': 'Bendición de la Naturaleza',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Cada Descarga Silvestre o Caída Celeste que lances tiene un 10% de probabilidad de activarlo para Estallido de Esporas, como máximo una vez cada 10 s.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Cada ataque automático cuerpo a cuerpo que acierte tiene una probabilidad de 1 entre 15 de activarlo para Remiendo de Esporas, o para Piel de Roble en Forma de Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Cada pulso de tus efectos de sanación periódica tiene un 10% de probabilidad de activarlo para Estallido de Esporas, como máximo una vez cada 10 s.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Consume tus 5 de Verdor: cada aliado con tus efectos de sanación periódica recibe al instante un {buff}% de la sanación que les quedaba, se eliminan los efectos y el objetivo recibe un nuevo Remiendo de Esporas.',
+  'entities.abilities.play_dead.description':
+    'Cae al suelo y finge estar muerto: todos ven tu salud y tu Enfoque vacíos. Los enemigos te olvidan y los jugadores enemigos que te seleccionaban pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Vuelve a usarlo para levantarte.',
+  'entities.abilities.play_dead.name': 'Hacerse el muerto',
+  'entities.abilities.rejuvenation.name': 'Remiendo de Esporas',
+  'entities.abilities.scratch.description':
+    'Araña a los objetivos cercanos en un radio de 6 m e inflige daño de arma más {damage}. Otorga 1 punto de combo por objetivo alcanzado. Revela a los enemigos en sigilo dentro del barrido. Solo en Forma Felina.',
+  'entities.abilities.scratch.name': 'Arañazo',
+  'entities.abilities.scratch.specNote_feral':
+    'Cada golpe que acierta añade 1 de Sangre Antigua (máximo 3).',
+  'entities.abilities.spore_burst.description':
+    'Invoca un hongo de esporas en la zona objetivo. Tras {duration} s estalla, sana {healing} a los aliados e inflige {damage} de daño de Naturaleza a los enemigos en un radio de 8 m.',
+  'entities.abilities.spore_burst.name': 'Estallido de Esporas',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Con 3 de Marea Lunar es un 25% más potente y consume tu Marea Lunar.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'También aplica Remiendo de Esporas a cada aliado que sane. Con el Verdor al máximo es un 25% más potente y consume tu Verdor.',
+  'entities.abilities.sporemender_form.description':
+    'Adopta la forma de Sanador de Esporas: aumenta un 20% la sanación y un 40% la armadura, pero reduce un 20% la velocidad de movimiento. Conservas todos los hechizos de tu forma de lanzador. Dura hasta que cambies de forma. Cambiar a cualquier forma otorga Zancada Trotadora, un breve aumento de velocidad. Úsalo de nuevo para volver a la forma de lanzador. (Distintivo de Restauración)',
+  'entities.abilities.sporemender_form.name': 'Forma de Sanador de Esporas',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Consume un efecto de sanación periódica de un objetivo aliado para sanarlo {damage}. Las aplicaciones de Remiendo de Esporas y Segundo Florecer añaden Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a cada aliado con tus efectos de sanación periódica un 60% de la sanación que les quedaba. (Distintivo de Restauración)',
+  'entities.abilities.tactical_camo.description':
+    'Confúndete con el entorno: los enemigos apenas te perciben y te mueves al 80% de velocidad. Atacar o recibir daño rompe Camuflaje Táctico. Úsalo de nuevo para salir. (Supervivencia)',
+  'entities.abilities.tactical_camo.name': 'Camuflaje Táctico',
+  'entities.itemSets.grovespring.bonus2':
+    'Alivio presto consume primero tu Remiendo de Esporas o Segundo Florecer y sana un 25 por ciento más. El daño recibido ya no retrasa tus lanzamientos.',
+  'entities.items.pvp_skull_bag.name': 'Bolsa de Cráneos',
+  'entities.items.pvp_trophy_skull.name': 'Cráneo Trofeo',
+  'entities.letters.world_quest_reward.body':
+    'Tus bolsas estaban llenas cuando ganaste esta recompensa de misión del mundo, así que los cuervos te la han traído aquí. Haz espacio y recógela en cualquier pilar de cuervos.\n\n- El Correo del Cuervo',
+  'entities.letters.world_quest_reward.sender': 'El Correo del Cuervo',
+  'entities.letters.world_quest_reward.subject': 'Tu recompensa de misión del mundo',
+  'guide.classPage.formLine.form_sporemender':
+    'La forma sanadora de Restauración: piel más resistente y sanación más potente a cambio de caminar más despacio; conserva todos tus hechizos y tu maná.',
+  'guide.classPage.formName.form_sporemender': 'Forma de Sanador de Esporas',
+  'guide.economy.junkBodyFinal':
+    'Puedes vender el botín que no necesites a cualquier mercader con tienda propia, así que vacía las bolsas cuando pases por la ciudad. Su ventana incluye un botón Vender chatarra que vende todos los objetos de calidad Pobre con un clic. También puedes destruir los trastos sin valor para hacer espacio. Los objetos grises sin firma vendidos así no aparecen en la lista de recompra: revisa antes si querías conservar alguno.',
+  'guide.models.formSporemender': 'Forma de Sanador de Esporas',
+  'guide.settingsPage.ifClassicCombatText':
+    'Recupera los números de daño sencillos, blancos y dorados pálidos, que suben en vertical. Déjalo desactivado (opción predeterminada) para ver números más llamativos que se abren hacia los lados y destellos en los golpes críticos o inusualmente grandes.',
+  'guide.settingsPage.rowSpellEffects':
+    'El brillo, las chispas, los proyectiles y los estallidos de impacto de los hechizos de jugadores y sus mascotas, incluidos los tuyos. Desactívalo para una pantalla más tranquila o ganar algunos fotogramas en grandes combates de grupo. Los hechizos enemigos siguen visibles, al igual que los círculos de zonas peligrosas, las marcas sobre objetivos aturdidos, asustados o inmovilizados y todas las barras de lanzamiento.',
+  'questUi.dialog.attuneHearthstone': 'Vincular aquí mi piedra de hogar aliada.',
+  'questUi.dialog.attuneHearthstoneAria': 'Vincula tu piedra de hogar aliada a {hub} con {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Tu piedra de hogar aliada no está vinculada. Habla con un intendente aliado o úsala en un centro aliado.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Tu piedra de hogar aliada está ahora vinculada a {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'La piedra de hogar te transporta a {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Ese objeto aún no está listo (quedan {minutes} min).',
 };

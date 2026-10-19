@@ -51,7 +51,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Użycie: Wzmacnia twój pancerz klatki piersiowej, zwiększając Pancerz o 12 na 1 godzinę.',
   'hudChrome.factionRewards.battleStandardUse':
     'Użycie: Sadzi Poświęcony Sztandar Świtu na 5 minut, znacznie zwiększając regenerację zdrowia i many poza walką dla wszystkich pobliskich sojuszników. Pozostanie w pobliżu przez 10 sekund daje również Błogosławieństwo Świtu (+5% do wszystkich atrybutów na 30 min). (5 min odpoczynku)',
-  'hudChrome.factionRewards.hub_automatons': 'Południowy Zasięg (Odlewnia Automata)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automaty)',
   'hudChrome.factionRewards.hub_church_order': 'Dolina Wschodniego Strumienia (Zakon Kościoła)',
   'hudChrome.factionRewards.hub_none': 'Brak (Użyj blisko siedziby frakcji, aby nastroić)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (Straż Szczelin)',
@@ -16241,7 +16241,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do {duration} s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem.',
   'entities.abilities.overbloom.name': 'Nadrozkwit',
   'entities.abilities.overbloom.description':
-    'Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Sporemending na celu.',
+    'Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Zarodnikowe gojenie na celu.',
   'entities.abilities.redharvest.name': 'Czerwone Żniwa',
   'entities.abilities.redharvest.description':
     'Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo.',
@@ -19951,4 +19951,195 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przeciągnij, aby zmienić szerokość panelu bocznego mapy. Kliknij dwukrotnie, aby zresetować.',
   'guide.worldPvpPage.hillBodyFlat':
     'Raz na trzy godziny, w nieprzewidywalnej chwili, cała kraina otrzymuje zapowiedź, że za piętnaście minut w jednej ze stref swobodnej walki pojawi się wzgórze. Jego krąg zostaje oznaczony na otwartym terenie. Wzgórze pozostaje przez czterdzieści pięć minut, po czym znika. W tym czasie co pięć minut ogłaszane są jego położenie oraz grupy z najdłuższym łącznym czasem utrzymania. Grupa z największą liczbą graczy w kręgu walczy o wzgórze i zdobywa je po łącznie trzydziestu sekundach przewagi liczebnej. Wejście rywali tylko wstrzymuje licznik, dopóki twoja grupa znów nie uzyska przewagi; odliczanie zaczyna się od nowa tylko wtedy, gdy w kręgu nie pozostanie żaden żywy członek twojej grupy. Samotny gracz liczy się jako jednoosobowa grupa i zachowuje zajęte wzgórze po utworzeniu grupy, ale członkowie rajdu w ogóle się nie liczą. Każdy członek grupy utrzymującej wzgórze, który stoi w kręgu, otrzymuje co minutę tyle samo Honoru, niezależnie od długości utrzymania. Pełna grupa utrzymująca je bez przeszkód przez cały czas jego istnienia zarabia mniej więcej tyle, co za trzy zwycięstwa na polach bitew. Gdy wzgórze znika, jeśli grupa z najdłuższym łącznym utrzymaniem zgromadziła co najmniej dziesięć minut, każdy, kto stał w kręgu przez przynajmniej minutę podczas utrzymania przez tę grupę i nadal do niej należy, otrzymuje jedno zwycięstwo do rzędu PvP Tygodniowego Skarbca. Pasek nad polem pokazuje właściciela, liczebność obu stron i licznik przejmowania; /hill na czacie podaje położenie.',
+  'errors.noUpdateFound': 'Nie znaleziono aktualizacji. Spróbuj ponownie za chwilę.',
+  'errors.searchUpdates': 'Wyszukaj aktualizacje',
+  'errors.updateSearchFailed': 'Nie udało się sprawdzić aktualizacji. Spróbuj ponownie.',
+  'errors.updateUnavailable':
+    'Zaktualizuj grę w swoim sklepie z grami lub pobierz najnowszego klienta.',
+  'hudChrome.auraEffect.formSporemender':
+    'Postać zarodnikowego uzdrowiciela: leczenie zwiększone o {pct}%, pancerz o {armorPct}%, a prędkość ruchu zmniejszona o {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Zablokowane przedmioty pozostają na swoim miejscu w torbie. Odblokuj je, aby je przenieść.',
+  'hudChrome.death.pvpResurrect': 'Wskrzeszenie PvP',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Wskrzeszenie PvP jest gotowe: odrodzisz się na najbliższym cmentarzu.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Odrodź się na najbliższym cmentarzu z pełnym zdrowiem, bez nowej Daniny Opiekuna.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Wskrzeszenie PvP ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Wskrzeszenie PvP będzie dostępne za {seconds}: odrodzisz się na najbliższym cmentarzu.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Oczekująca zmiana poziomu trudności została anulowana, ponieważ zmieniła się drużyna lub jej przywódca.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Zmiana poziomu trudności oczekuje, ponieważ ktoś lub jego zwłoki wciąż są w środku. Zostanie zastosowana, gdy instancje będą puste.',
+  'hudChrome.ferry.arrivesIn': 'Prom przybędzie za {time}',
+  'hudChrome.ferry.boardNow': 'Wejdź na pokład',
+  'hudChrome.ferry.destination': 'Cel podróży: {dest}',
+  'hudChrome.ferry.portLabel': 'Prom z {port} do {dest}',
+  'hudChrome.ferry.portTitle': 'Przystań promowa: {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Rozkład promu jest niedostępny.',
+  'hudChrome.graphicsRestore.note': 'Przywracanie grafiki',
+  'hudChrome.hill.contestOtherPaused': 'Rywal wstrzymany: {seconds} z {total}',
+  'hudChrome.hill.contestYouPaused': 'Wstrzymano: {seconds} z {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Zdobyto od {name}',
+  'hudChrome.keybindLayout.apply': 'Przekształć skróty klawiszowe',
+  'hudChrome.keybindLayout.converted': 'Skróty klawiszowe przekształcono z {from} na {to}.',
+  'hudChrome.keybindLayout.from': 'Skróty utworzone dla',
+  'hudChrome.keybindLayout.help':
+    'Każdy skrót przechodzi na klawisz wpisujący ten sam znak w nowym układzie. Rząd cyfr pozostaje na miejscu. Nazwy klawiszy na tej liście oznaczają pozycje QWERTY; podgląd klawiatury pokazuje twój własny układ.',
+  'hudChrome.keybindLayout.keepMovement': 'Zachowaj położenie klawiszy ruchu',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Klawisze ruchu pozostały poprzednio na miejscu, więc teraz również pozostaną. Przywróć ustawienia domyślne, aby zacząć od nowa.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belgijski)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (francuski)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Układ Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Układ Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brazylijski ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (duński)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (hiszpański)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (włoski)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norweski)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (szwedzki, fiński)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portugalski)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turecki)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (brytyjski)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (amerykański)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (szwajcarski)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (niemiecki)',
+  'hudChrome.keybindLayout.moves': 'Skróty, które zmienią położenie: {count}',
+  'hudChrome.keybindLayout.noChange': 'Żadne skróty nie zmieniają się między tymi układami.',
+  'hudChrome.keybindLayout.open': 'Przekształć',
+  'hudChrome.keybindLayout.title': 'Układ klawiatury',
+  'hudChrome.keybindLayout.to': 'Przekształć na',
+  'hudChrome.nameplate.bountyTag': 'Nagroda za głowę',
+  'hudChrome.options.classicCombatText': 'Klasyczny tekst walki',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Przedmioty poniżej tej jakości sprzedasz jednym kliknięciem. Przedmiot sprzedany przez pomyłkę można odkupić od kupca, z wyjątkiem niepodpisanych szarych przedmiotów.',
+  'hudChrome.options.spellEffects': 'Efekty zaklęć',
+  'hudChrome.options.spellTooltipOnHover': 'Opisy zaklęć po najechaniu kursorem',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Wiadomość dnia została usunięta.',
+  'hudChrome.realmMotd.line': 'Wiadomość dnia: {text}',
+  'hudChrome.realmMotd.none': 'Nie ustawiono wiadomości dnia.',
+  'hudChrome.realmMotd.saveFailed':
+    'Nie udało się zapisać wiadomości dnia i zniknie ona po ponownym uruchomieniu.',
+  'hudChrome.realmMotd.tooLong': 'Wiadomość dnia może zawierać najwyżej {max} znaków.',
+  'hudChrome.realmMotd.updated': 'Wiadomość dnia została zaktualizowana.',
+  'hudChrome.realmMotd.usage':
+    'Użycie: /motd "<wiadomość>" ustawia wiadomość, /motd clear ją usuwa.',
+  'hudChrome.skullBag.clickOpen': 'Kliknij, aby otworzyć',
+  'hudChrome.skullBag.close': 'Zamknij worek na czaszki',
+  'hudChrome.skullBag.empty': 'Pusty. Gdy nosisz worek, zdobyte czaszki trafiają prosto do niego.',
+  'hudChrome.skullBag.notCarried':
+    'Noś worek na czaszki w torbach, aby wkładać lub wyjmować czaszki.',
+  'hudChrome.skullBag.store': 'Schowaj niesione czaszki ({count})',
+  'hudChrome.skullBag.storeNone': 'Brak czaszek do schowania',
+  'hudChrome.skullBag.takeAll': 'Weź wszystkie',
+  'hudChrome.skullBag.takeAllAria': 'Weź wszystkie: {item}',
+  'hudChrome.skullBag.takeOne': 'Weź 1',
+  'hudChrome.skullBag.takeOneAria': 'Weź 1: {item}',
+  'hudChrome.skullBag.title': 'Worek na czaszki',
+  'hudChrome.skullBag.tooltip':
+    'Mieści dowolną liczbę trofealnych czaszek bez zajmowania miejsca w torbach. Gdy znajduje się w twoich torbach, zdobyte czaszki trafiają prosto do niego. Kliknij go w torbach, aby wkładać lub wyjmować czaszki.',
+  'hudChrome.skullBag.total': 'Czaszki: {count}',
+  'hudChrome.skullBag.unrecorded': 'Trofealna czaszka',
+  'hudChrome.treasureMap.inkPickerCancel': 'Anuluj',
+  'hudChrome.treasureMap.inkPickerCost': 'Przerysuj na {rarity}: {inks} atramentu',
+  'hudChrome.treasureMap.inkPickerHeld': 'Masz {held} atramentu kartografa.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Śledzona mapa: jej X znajduje się w strefie {zone}. X pozostanie na miejscu.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Na której mapie użyć atramentu kartografa?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Nieprzeczytana (w posiadaniu: {count})',
+  'hudChrome.warfare.reasons.worldQuest': 'zadanie światowe',
+  'hudChrome.warfareShop.goods': 'Towary',
+  'hudChrome.weeklyRewards.allClassGear': 'Ekwipunek wszystkich klas',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': 'Zwycięstwa PvP: {count}',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': 'Zwycięstwo PvP: {count}',
+  'hudChrome.weeklyRewards.lootFocus': 'Ukierunkowanie łupów',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Dotyczy tylko nieotwartych skarbców.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Brak odpowiednich łupów. Wybierz inne ukierunkowanie.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Zdobądź zwycięstwa PvP: {count}',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Zdobądź zwycięstwo PvP: {count}',
+  'hudChrome.weeklyRewards.rolledFocus': 'Wylosowano dla: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Obecna seria PvP: rozegrano {time} (wstrzymana w sanktuarium)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Obecna seria PvP: rozegrano {time} (wstrzymana podczas śmierci)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Obecna seria PvP: rozegrano {time} (wstrzymana w instancjach PvE)',
+  'hudChrome.worldPvp.rewardProgress': 'Obecna seria PvP: rozegrano {time}',
+  'hudChrome.worldPvp.rewardTitles':
+    'Zdobywaj stałe tytuły po {thresholds} czasu gry z włączonym światowym PvP w otwartym świecie lub instancjach PvP. Wylogowanie, śmierć, instancje PvE i sanktuaria wstrzymują licznik. Wyłączenie PvP go zeruje.',
+  'hudChrome.worldPvp.skullName': 'Czaszka gracza {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Gdy oboje macie włączone PvP, złoto za śmiertelny cios leży na zwłokach razem z czaszką pokonanego.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Niepodpisane szare przedmioty nie trafiają na listę odkupu, więc ich sprzedaży nie można cofnąć.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Twoje torby są pełne. Nagrodę wysłano do twojej skrzynki: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Twoje zaklęcia mogą przygotować Dar przyrody na 10 s: wskazane zaklęcie staje się darmowe, o 25% silniejsze i dostępne w każdej postaci. Ponowna aktywacja odświeża czas trwania.',
+  'entities.abilities.natures_boon.name': 'Dar przyrody',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Każdy rzucony Dziki pocisk lub Spadające niebo ma 10% szans na przygotowanie go dla Wybuchu zarodników, najwyżej raz na 10 s.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Każdy trafiony automatyczny atak wręcz ma szansę 1 do 15 na przygotowanie go dla Zarodnikowego gojenia, a w Postaci Bruina dla Dębowej skóry.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Każdy impuls twoich efektów leczenia w czasie ma 10% szans na przygotowanie go dla Wybuchu zarodników, najwyżej raz na 10 s.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Zużywa twoje 5 punktów Zieleni: każdy sojusznik z twoimi efektami leczenia w czasie natychmiast odzyskuje {buff}% leczenia, które im pozostało. Efekty są usuwane, a cel otrzymuje nowe Zarodnikowe gojenie.',
+  'entities.abilities.play_dead.description':
+    'Padnij na ziemię i udawaj martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie zapominają o tobie, a wrodzy gracze, którzy cię namierzyli, tracą cel. Ruch, atak lub użycie innej zdolności kończy ten stan. Użyj ponownie, aby wstać.',
+  'entities.abilities.play_dead.name': 'Udawanie martwego',
+  'entities.abilities.rejuvenation.name': 'Zarodnikowe gojenie',
+  'entities.abilities.scratch.description':
+    'Przeciągnij pazurami przez pobliskie cele w promieniu 6 jardów, zadając obrażenia broni plus {damage}. Każdy trafiony cel daje 1 punkt kombinacji. Ujawnia skradających się wrogów w obszarze zamachu. Tylko w Postaci kota.',
+  'entities.abilities.scratch.name': 'Drapnięcie',
+  'entities.abilities.scratch.specNote_feral': 'Każde trafienie dodaje 1 Starą Krew (maks. 3).',
+  'entities.abilities.spore_burst.description':
+    'Przywołuje zarodnikową narośl we wskazanym obszarze. Po {duration} s narośl wybucha, lecząc sojuszników o {healing} i zadając wrogom w promieniu 8 jardów {damage} obrażeń od natury.',
+  'entities.abilities.spore_burst.name': 'Wybuch zarodników',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Przy 3 punktach Księżycowego przypływu jest o 25% silniejszy i zużywa twój Księżycowy przypływ.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Nakłada także Zarodnikowe gojenie na każdego leczonego sojusznika. Przy pełnej Zieleni jest o 25% silniejszy i zużywa twoją Zieleń.',
+  'entities.abilities.sporemender_form.description':
+    'Przemień się w zarodnikowego uzdrowiciela: twoje leczenie wzrasta o 20%, a pancerz o 40%, ale prędkość ruchu spada o 20%. Wszystkie zaklęcia zwykłej postaci pozostają dostępne. Trwa do opuszczenia postaci. Każda zmiana postaci zapewnia Żwawy krok, krótkie zwiększenie prędkości ruchu. Użyj ponownie, aby wrócić do zwykłej postaci. (zdolność charakterystyczna Serca Gaju)',
+  'entities.abilities.sporemender_form.name': 'Postać zarodnikowego uzdrowiciela',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Zużywa efekt leczenia w czasie na przyjaznym celu, lecząc go o {damage}. Zarodnikowe gojenie i nasadzenia Drugiego rozkwitu dodają Zieleń; przy 5 punktach Zieleni ten przycisk staje się Nadrozkwitem, który natychmiast leczy wszystkich sojuszników z twoimi efektami leczenia w czasie o 60% ich pozostałego leczenia. (zdolność charakterystyczna Serca Gaju)',
+  'entities.abilities.tactical_camo.description':
+    'Wtop się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak lub otrzymanie obrażeń przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. (Sztuka przetrwania)',
+  'entities.abilities.tactical_camo.name': 'Kamuflaż taktyczny',
+  'entities.itemSets.grovespring.bonus2':
+    'Szybkie uzdrowienie najpierw zużywa twoje własne Zarodnikowe gojenie lub Drugi rozkwit i leczy o 25 procent więcej. Otrzymane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.items.pvp_skull_bag.name': 'Worek na czaszki',
+  'entities.items.pvp_trophy_skull.name': 'Trofealna czaszka',
+  'entities.letters.world_quest_reward.body':
+    'Twoje torby były pełne, gdy zdobyto tę nagrodę za zadanie światowe, więc kruki przyniosły ją tutaj. Zrób trochę miejsca i odbierz ją przy dowolnym kruczym filarze.\n\n- Krucza Poczta',
+  'entities.letters.world_quest_reward.sender': 'Krucza Poczta',
+  'entities.letters.world_quest_reward.subject': 'Twoja nagroda za zadanie światowe',
+  'guide.classPage.formLine.form_sporemender':
+    'Lecząca postać Serca Gaju: twardsza skóra i silniejsze leczenie za cenę wolniejszego chodu, z zachowaniem wszystkich zaklęć i many.',
+  'guide.classPage.formName.form_sporemender': 'Postać zarodnikowego uzdrowiciela',
+  'guide.economy.junkBodyFinal':
+    'Łupy, których nie potrzebujesz, nadal można sprzedać każdemu kupcowi z własnym sklepem, więc opróżniaj torby podczas każdej wizyty w mieście. Okno kupca ma nawet przycisk Sprzedaj śmieci, który jednym kliknięciem sprzedaje wszystkie przedmioty marnej jakości. Całkowicie bezwartościowe drobiazgi można też po prostu wyrzucić, aby zrobić miejsce. Sprzedane w ten sposób niepodpisane szare przedmioty nie trafiają na listę odkupu, więc przed naciśnięciem przycisku sprawdź, czy nie chcesz czegoś zatrzymać.',
+  'guide.models.formSporemender': 'Postać zarodnikowego uzdrowiciela',
+  'guide.settingsPage.ifClassicCombatText':
+    'Przywraca proste białe i jasnozłote liczby obrażeń unoszące się pionowo. Pozostaw wyłączone (ustawienie domyślne), aby widzieć wyrazistsze liczby rozchodzące się na boki, z rozbłyskami przy trafieniach krytycznych i wyjątkowo silnych ciosach.',
+  'guide.settingsPage.rowSpellEffects':
+    'Blask, iskry, pociski i rozbłyski uderzeń zaklęć rzucanych przez graczy i ich towarzyszy, także twoich. Wyłącz je, aby uspokoić obraz lub zyskać kilka dodatkowych klatek na sekundę w dużych walkach grupowych. Zaklęcia wrogów nadal będą widoczne, podobnie jak kręgi ostrzegające przed niebezpiecznymi obszarami, znaczniki nad ogłuszonymi, przestraszonymi lub unieruchomionymi celami oraz wszystkie paski rzucania zaklęć.',
+  'questUi.dialog.attuneHearthstone': 'Dostrój tutaj mój sojuszniczy kamień powrotu.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Dostrój swój sojuszniczy kamień powrotu do {hub} u {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Twój sojuszniczy kamień powrotu nie jest dostrojony. Porozmawiaj z sojuszniczym kwatermistrzem lub użyj go w sojuszniczej siedzibie.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Twój sojuszniczy kamień powrotu jest teraz dostrojony do {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Kamień powrotu przenosi cię do {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    'Ten przedmiot nie jest jeszcze gotowy (pozostało {minutes} min).',
 };

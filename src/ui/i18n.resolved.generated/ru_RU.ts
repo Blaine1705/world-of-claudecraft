@@ -446,8 +446,8 @@ export const ru_RU: EnTranslations = {
         "worldMany": "Выполнено локальных заданий: {count}",
         "pvpOne": "Выигран {count} рейтинговый матч",
         "pvpMany": "Выиграно рейтинговых матчей: {count}",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} победа в PvP",
+        "pvpWinMany": "{count} побед в PvP"
       },
       "requiredTask": {
         "raidOne": "Победите {count} рейдового босса",
@@ -458,8 +458,8 @@ export const ru_RU: EnTranslations = {
         "worldMany": "Выполните локальных заданий: {count}",
         "pvpOne": "Выиграйте {count} рейтинговый матч",
         "pvpMany": "Выиграйте рейтинговых матчей: {count}",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Одержать {count} победу в PvP",
+        "pvpWinMany": "Одержать {count} побед в PvP"
       },
       "readyWeeks": "Неполученных недель: {count}. Сначала получите награду за самую раннюю завершенную неделю.",
       "claimLastWeek": "Получить награду за прошлую неделю",
@@ -641,7 +641,7 @@ export const ru_RU: EnTranslations = {
       "healerConfirmCancel": "Отмена"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Восстановление графики"
     },
     "wiki": {
       "confirmTitle": "Открыть вики?",
@@ -2816,7 +2816,7 @@ export const ru_RU: EnTranslations = {
         "worldKill": "Мировое убийство",
         "worldAssist": "Помощь в мировом убийстве",
         "hillHold": "Удержание холма",
-        "worldQuest": "world quest"
+        "worldQuest": "локальное задание"
       },
       "floatReasons": {
         "kill": "Убийство",
@@ -2880,8 +2880,8 @@ export const ru_RU: EnTranslations = {
       "countsHolding": "Внутри: вы {yours}, соперник {theirs}",
       "contestYou": "Вы захватываете холм: {seconds} из {total}",
       "contestOther": "Вы теряете холм: {seconds} из {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "Пауза: {seconds} из {total}",
+      "contestOtherPaused": "Противник на паузе: {seconds} из {total}",
       "contestNone": "Чтобы захватить холм, удерживайте большинство внутри {total}.",
       "inside": "Вы внутри круга",
       "distance": "{yards} ярдов до круга",
@@ -2899,10 +2899,10 @@ export const ru_RU: EnTranslations = {
       "unrecorded": "Трофейный череп",
       "store": "Убрать переносимые черепа ({count})",
       "storeNone": "Нет черепов для хранения",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
+      "takeOne": "Забрать 1",
+      "takeAll": "Забрать всё",
+      "takeOneAria": "Забрать 1: {item}",
+      "takeAllAria": "Забрать всё: {item}",
       "tooltip": "Хранит любое число трофейных черепов без места в сумке. Пока он в сумках, подобранные черепа сразу попадают в него. Нажмите на него в сумках, чтобы убрать или достать черепа."
     },
     "warfareShop": {
@@ -2910,7 +2910,7 @@ export const ru_RU: EnTranslations = {
       "gossipOptionAria": "Просмотреть магазин комплектов Боевой мощи у {name}",
       "jewelry": "Украшения",
       "weapons": "Оружие",
-      "goods": "Goods",
+      "goods": "Товары",
       "groupSeason2": "Боевой сезон 2: Авангард",
       "groupEntry": "Боевой сезон 1",
       "owned": "Получено",
@@ -4439,8 +4439,8 @@ export const ru_RU: EnTranslations = {
       "apply": "Преобразовать горячие клавиши",
       "converted": "Горячие клавиши преобразованы из {from} в {to}.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
+        "qwertyUs": "QWERTY (США)",
+        "qwertyUk": "QWERTY (Великобритания)",
         "qwertzDe": "QWERTZ (немецкая)",
         "qwertzCh": "QWERTZ (швейцарская)",
         "azertyFr": "AZERTY (французская)",
@@ -5457,12 +5457,16 @@ export const ru_RU: EnTranslations = {
       "enchant_weapon_piston_drive": "Навсегда наносит на двуручное оружие травление, дающее 12 к силе и 25 к рейтингу критического удара. Нельзя применить к одноручному оружию. Фиксированный бонус, он не масштабируется."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Ваш союзный камень возвращения не привязан. Поговорите с союзным интендантом или используйте его в союзном опорном пункте.",
+      "hearthstoneBound": "Ваш союзный камень возвращения теперь привязан к {hub}.",
+      "hearthstoneTransport": "Камень возвращения переносит вас в {hub}.",
+      "itemCooldown": "Этот предмет ещё не готов (осталось {minutes} мин).",
       "alliedHearthstoneUse": "Использование: переносит вас в оплот фракции, к которому вы привязаны. (Применение 10 сек., восстановление 15 мин.)",
       "alliedHearthstoneAttuned": "Привязан к: {hub}",
       "hub_none": "Нет (используйте рядом с оплотом фракции, чтобы привязаться)",
       "hub_rift_watch": "Дрифтхейвен (Дозор Разлома)",
       "hub_church_order": "Истврукская долина (Церковный орден)",
-      "hub_automatons": "Южный Предел (Литейная автоматонов)",
+      "hub_automatons": "Змеиный дозор (Автоматоны)",
       "riftGliderUse": "Использование: раскрывает планер, замедляя падение на 30 сек. Приземление или получение урона отменяет эффект. (Восстановление 2 мин.)",
       "targetDummyUse": "Использование: устанавливает в открытом мире механический тренировочный манекен на 2 мин. для отработки боевых навыков. (Восстановление 5 мин.)",
       "battleStandardUse": "Использование: устанавливает Боевое знамя Священного Рассвета на 5 мин., значительно ускоряя восполнение здоровья и маны вне боя у всех союзников поблизости. Если оставаться рядом с ним 10 сек., вы также получите Благословение Рассвета (+5% ко всем характеристикам на 30 мин.). (Восстановление 5 мин.)",
@@ -5826,8 +5830,8 @@ export const ru_RU: EnTranslations = {
     "pattern": {
       "teaches": "Использование: обучает изготовлению предмета «{item}».",
       "teachesEnchant": "Использование: обучает наложению чар «{enchant}».",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}: {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Снятие привязки: {name}",
@@ -12412,6 +12416,8 @@ export const ru_RU: EnTranslations = {
       "clueTalkAria": "Спросить о подсказке: {name}",
       "clueDeliver": "Отдать {item} ({count} шт.).",
       "clueDeliverAria": "Отдать {item} ({count} шт.) персонажу {name}",
+      "attuneHearthstone": "Привязать мой союзный камень возвращения здесь.",
+      "attuneHearthstoneAria": "Привязать союзный камень возвращения к {hub} у {name}",
       "profIntroHint": "Обратитесь к {name} за заданием «{quest}».",
       "nythraxisDeathlessKingWarning": "Три реликвии рассказывают одну историю: Алдрен сражался, защищая своего короля, Малрик нарушил границу смерти, а Восс пытался остановить то, что последовало. Печать слабеет, и заброшенная крипта ведет вниз.",
       "browseGoods": "Покажите ваши товары.",

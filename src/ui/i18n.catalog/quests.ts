@@ -64,6 +64,8 @@ const questStringsEn = {
       clueTalkAria: 'Ask about the clue: {name}',
       clueDeliver: 'Hand over {count} {item}.',
       clueDeliverAria: 'Hand over {count} {item} to {name}',
+      attuneHearthstone: 'Attune my Allied Hearthstone here.',
+      attuneHearthstoneAria: 'Attune your Allied Hearthstone to {hub} with {name}',
       // The profession masters' locked-quest hint row. Deliberately terse:
       // both {placeholders} resolve to already
       // localized leaves (the giver NPC's name, the intro quest's title), and

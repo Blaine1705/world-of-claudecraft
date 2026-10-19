@@ -418,13 +418,13 @@ export const pl_PL: EnTranslations = {
       "heroicClears": "{count} Heroiczny",
       "normalClears": "{count} Normalny",
       "viewPossibleLoot": "Wyświetl możliwy łup",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Ukierunkowanie łupów",
+      "allClassGear": "Ekwipunek wszystkich klas",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "Dotyczy tylko nieotwartych skarbców.",
+      "noFocusedLoot": "Brak odpowiednich łupów. Wybierz inne ukierunkowanie.",
+      "rolledFocus": "Wylosowano dla: {focus}",
       "chooseTable": "Wybierz, z której tabeli losować",
       "selectAllTables": "Zaznacz wszystkie",
       "selectedTables": "{count} tabele wybrane",
@@ -446,8 +446,8 @@ export const pl_PL: EnTranslations = {
         "worldMany": "{count} Zadań Światowych Ukończonych",
         "pvpOne": "{count} Wygrane Mecze Rankingowe",
         "pvpMany": "{count} Wygranych Mecze Rankingowe",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "Zwycięstwo PvP: {count}",
+        "pvpWinMany": "Zwycięstwa PvP: {count}"
       },
       "requiredTask": {
         "raidOne": "Oczyszcz {count} Spotkania Rajdu",
@@ -458,8 +458,8 @@ export const pl_PL: EnTranslations = {
         "worldMany": "Ukończ {count} Zadań Światowych",
         "pvpOne": "Wygraj {count} Mecze Rankingowe",
         "pvpMany": "Wygraj {count} Meczów Rankingowych",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Zdobądź zwycięstwo PvP: {count}",
+        "pvpWinMany": "Zdobądź zwycięstwa PvP: {count}"
       },
       "readyWeeks": "Nieodebrane tygodnie: {count}. Najpierw odebrz najstarszy ukończony tydzień.",
       "claimLastWeek": "Odebrz nagrodę z ostatniego tygodnia",
@@ -522,12 +522,12 @@ export const pl_PL: EnTranslations = {
       "castingOff": "Prom do {dest} odpływa",
       "boardHint": "Stań na jego pokładzie gdy odpływa. Przejazd jest darmowy.",
       "sailing": "Płynę do {dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "Prom z {port} do {dest}",
+      "portTitle": "Przystań promowa: {port}",
+      "destination": "Cel podróży: {dest}",
+      "boardNow": "Wejdź na pokład",
+      "arrivesIn": "Prom przybędzie za {time}",
+      "scheduleUnavailable": "Rozkład promu jest niedostępny."
     },
     "materialStackSelectionUnavailable": "Ten wybór materiału nie jest już dostępny.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const pl_PL: EnTranslations = {
       "banner": "Obserwujesz {name}"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Wiadomość dnia: {text}",
+      "updated": "Wiadomość dnia została zaktualizowana.",
+      "cleared": "Wiadomość dnia została usunięta.",
+      "none": "Nie ustawiono wiadomości dnia.",
+      "usage": "Użycie: /motd \"<wiadomość>\" ustawia wiadomość, /motd clear ją usuwa.",
+      "tooLong": "Wiadomość dnia może zawierać najwyżej {max} znaków.",
+      "saveFailed": "Nie udało się zapisać wiadomości dnia i zniknie ona po ponownym uruchomieniu."
     },
     "readyCheck": {
       "title": "Gotowe sprawdzenie",
@@ -619,11 +619,11 @@ export const pl_PL: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Odrodź się przy zwłokach",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "Wskrzeszenie PvP",
+      "pvpResurrectTitle": "Odrodź się na najbliższym cmentarzu z pełnym zdrowiem, bez nowej Daniny Opiekuna.",
+      "pvpResurrectWaitButton": "Wskrzeszenie PvP ({seconds})",
+      "pvpResurrectWaitNote": "Wskrzeszenie PvP będzie dostępne za {seconds}: odrodzisz się na najbliższym cmentarzu.",
+      "pvpResurrectReadyNote": "Wskrzeszenie PvP jest gotowe: odrodzisz się na najbliższym cmentarzu.",
       "resurrectAtHealer": "Blady Strażnik (Myto Strażnika)",
       "ghostHint": "Biegnij do miejsca śmierci lub porozmawiaj z Bladym Strażnikiem, aby się wznowić",
       "spiritHealerAlive": "Blady Strażnik czuwa nad umarłymi. Ty wciąż jesteś wśród żywych.",
@@ -641,7 +641,7 @@ export const pl_PL: EnTranslations = {
       "healerConfirmCancel": "Anulować"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Przywracanie grafiki"
     },
     "wiki": {
       "confirmTitle": "Otworzyć Wiki?",
@@ -2155,7 +2155,7 @@ export const pl_PL: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Opisy zaklęć po najechaniu kursorem",
       "clickMoveLeft": "Lewy przycisk",
       "clickMoveRight": "Prawy przycisk",
       "version": "v{version} ({build})",
@@ -2269,7 +2269,7 @@ export const pl_PL: EnTranslations = {
       "confirmVendorSellNote": "Wyłączenie tego sprawia, że przedmioty sprzedają się jednym kliknięciem bez potwierdzenia, więc przesunięty slot w torbie może sprzedać niewłaściwy przedmiot.",
       "confirmVendorSellMinQuality": "Potwierdź sprzedaż z jakości",
       "confirmVendorSellMinQualityNote": "Przedmioty poniżej tej jakości można sprzedać jednym kliknięciem; błędnie sprzedany przedmiot nadal można odkupić od sprzedawcy.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Przedmioty poniżej tej jakości sprzedasz jednym kliknięciem. Przedmiot sprzedany przez pomyłkę można odkupić od kupca, z wyjątkiem niepodpisanych szarych przedmiotów.",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
@@ -2290,9 +2290,9 @@ export const pl_PL: EnTranslations = {
       "showUtilityModes": "Uwzględnij skradanie i tryby podróży",
       "showFriendlyTrack": "Pokaż moje wzmocnienia na sojusznikach",
       "showShieldTrack": "Pokaż moje tarcze",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Klasyczny tekst walki",
       "waterRipples": "Zmarszczki na wodzie (kilwater)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Efekty zaklęć",
       "actionCam": "Kamera akcji",
       "actionCamShoulder": "Kamera akcji - ramię",
       "actionCamShoulderLeft": "Lewo {pct}",
@@ -2816,7 +2816,7 @@ export const pl_PL: EnTranslations = {
         "worldKill": "zabój światowy",
         "worldAssist": "asystowanie przy zabiciu światowym",
         "hillHold": "utrzymywanie wzgórza",
-        "worldQuest": "world quest"
+        "worldQuest": "zadanie światowe"
       },
       "floatReasons": {
         "kill": "Zabójstwo",
@@ -2826,11 +2826,11 @@ export const pl_PL: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Zdobywaj stałe tytuły po {thresholds} czasu gry z włączonym światowym PvP w otwartym świecie lub instancjach PvP. Wylogowanie, śmierć, instancje PvE i sanktuaria wstrzymują licznik. Wyłączenie PvP go zeruje.",
+      "rewardPaused": "Obecna seria PvP: rozegrano {time} (wstrzymana w sanktuarium)",
+      "rewardPausedDead": "Obecna seria PvP: rozegrano {time} (wstrzymana podczas śmierci)",
+      "rewardPausedInstance": "Obecna seria PvP: rozegrano {time} (wstrzymana w instancjach PvE)",
+      "rewardProgress": "Obecna seria PvP: rozegrano {time}",
       "tab": "PvP Świata",
       "title": "PvP Świata",
       "blurb": "Podnieś swoją flagę, aby walczyć z innymi oznaczonymi graczami w całym otwartym świecie. Pokonaj jednego i zabierz część jego pieniędzy, plus Honor na ekwipunek Wojny. Pola Bitwy i Areny przynoszą więcej.",
@@ -2849,8 +2849,8 @@ export const pl_PL: EnTranslations = {
       "markLine": "Atakowanie nienaczynaczonego gracza tam podnosi twoją flagę; atakowanie oznaczonego tego nigdy nie robi.",
       "aidLine": "Leczenie, osłanianie lub wzmacnianie oznaczonego gracza w walce na świecie podnosi twoją flagę.",
       "stakeLine": "Przegrany płaci {cap} lub {percent} swoich pieniędzy, w zależności od tego, co jest mniejsze.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "Gdy oboje macie włączone PvP, złoto za śmiertelny cios leży na zwłokach razem z czaszką pokonanego.",
+      "skullName": "Czaszka gracza {name}",
       "noStakeLine": "Nienaczynaczony gracz pokonany na wolnej grze dla wszystkich nie traci złota.",
       "noTakeLine": "Nienaczynaczony walczący też nie traci złota: złoto przesuwa się tylko między dwoma oznaczonymi graczami.",
       "honorLine": "{honor} Honoru za każde zabójstwo, podzielony między wszystkich, którzy pomogli.",
@@ -2880,8 +2880,8 @@ export const pl_PL: EnTranslations = {
       "countsHolding": "Wewnątrz: ty {yours}, rival {theirs}",
       "contestYou": "Zdobywamy wzgórze: {seconds} z {total}",
       "contestOther": "Tracimy wzgórze: {seconds} z {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "Wstrzymano: {seconds} z {total}",
+      "contestOtherPaused": "Rywal wstrzymany: {seconds} z {total}",
       "contestNone": "Trzymaj większość wewnątrz przez {total}, aby go zdobyć",
       "inside": "Jesteś wewnątrz okręgu",
       "distance": "{yards} j do okręgu",
@@ -2890,27 +2890,27 @@ export const pl_PL: EnTranslations = {
       "standingRaid": "Członkowie rajdu się nie liczą: tylko drużyny mogą trzymać wzgórze"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Worek na czaszki",
+      "total": "Czaszki: {count}",
+      "close": "Zamknij worek na czaszki",
+      "clickOpen": "Kliknij, aby otworzyć",
+      "notCarried": "Noś worek na czaszki w torbach, aby wkładać lub wyjmować czaszki.",
+      "empty": "Pusty. Gdy nosisz worek, zdobyte czaszki trafiają prosto do niego.",
+      "unrecorded": "Trofealna czaszka",
+      "store": "Schowaj niesione czaszki ({count})",
+      "storeNone": "Brak czaszek do schowania",
+      "takeOne": "Weź 1",
+      "takeAll": "Weź wszystkie",
+      "takeOneAria": "Weź 1: {item}",
+      "takeAllAria": "Weź wszystkie: {item}",
+      "tooltip": "Mieści dowolną liczbę trofealnych czaszek bez zajmowania miejsca w torbach. Gdy znajduje się w twoich torbach, zdobyte czaszki trafiają prosto do niego. Kliknij go w torbach, aby wkładać lub wyjmować czaszki."
     },
     "warfareShop": {
       "gossipOption": "Przeglądaj Zestawy Działań Wojennych",
       "gossipOptionAria": "Przeglądaj sklep zestawów Działań Wojennych oferowany przez {name}",
       "jewelry": "Biżuteria",
       "weapons": "Broń",
-      "goods": "Goods",
+      "goods": "Towary",
       "groupSeason2": "Sezon Wojen 2: Awangarda",
       "groupEntry": "Sezon Wojen 1",
       "owned": "Posiadane",
@@ -2951,12 +2951,12 @@ export const pl_PL: EnTranslations = {
       "hint": "Znajdź grunt pokazywany na mapie, stań na X i użyj mapy ponownie, aby kopać. Zakopane skarby otwierają się dla ciebie i twojej drużyny.",
       "upgradeNote": "Przerysowanie go jako mapę {rarity} wymaga {inks} Kartogarfa Atrament (posiadasz {held}). Kwatermistrzowie frakcji to sprzedają.",
       "upgradeMaxed": "Żaden kartograf nie mógł tego ulepszyć.",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Na której mapie użyć atramentu kartografa?",
+      "inkPickerHeld": "Masz {held} atramentu kartografa.",
+      "inkPickerRead": "Śledzona mapa: jej X znajduje się w strefie {zone}. X pozostanie na miejscu.",
+      "inkPickerUnread": "Nieprzeczytana (w posiadaniu: {count})",
+      "inkPickerCost": "Przerysuj na {rarity}: {inks} atramentu",
+      "inkPickerCancel": "Anuluj",
       "rarity": {
         "common": "Zwyczajna",
         "rare": "Rzadka",
@@ -3673,8 +3673,8 @@ export const pl_PL: EnTranslations = {
       "resetDone": "Wszystkie instancje zostały zresetowane.",
       "resetNone": "Nie masz żadnych instancji do zresetowania.",
       "resetOccupied": "Nie możesz zresetować instancji, dopóki ktoś nadal znajduje się w środku.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "Zmiana poziomu trudności oczekuje, ponieważ ktoś lub jego zwłoki wciąż są w środku. Zostanie zastosowana, gdy instancje będą puste.",
+      "queuedCancelled": "Oczekująca zmiana poziomu trudności została anulowana, ponieważ zmieniła się drużyna lub jej przywódca.",
       "resetSameDifficulty": "Zmień trudność podziemia przed zresetowaniem tych instancji. Puste instancje resetują się automatycznie po 5 minutach.",
       "resetLoot": "Nie możesz zresetować instancji, dopóki w środku pozostaje łup.",
       "resetConfirmTitle": "Zresetować wszystkie instancje?",
@@ -3691,7 +3691,7 @@ export const pl_PL: EnTranslations = {
       "dragEquipHint": "Przeciągnij na postać, aby założyć",
       "dragDestroyHint": "Przeciągnij poza okno, aby zniszczyć",
       "reorderNeedsRecent": "Wyczyść filtr i posortuj według Ostatnich, aby zmienić kolejność w torbach",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Zablokowane przedmioty pozostają na swoim miejscu w torbie. Odblokuj je, aby je przenieść.",
       "itemAriaInstanced": "{item}, ilość {count}, oznaczona kopia",
       "itemAriaEnchanted": "{item}, ilość {count}, zaklęta kopia",
       "itemAriaBound": "{item}, ilość {count}, związana kopia",
@@ -4179,7 +4179,7 @@ export const pl_PL: EnTranslations = {
       "formTravel": "Postać Fleet: prędkość ruchu zwiększona o {pct}%",
       "formFireball": "Postać Żaru: prędkość ruchu zwiększona o {pct}%; ataki i czary są wyłączone",
       "formMoonkin": "Postać księżycowej sowy: obrażenia zaklęć zwiększone o {pct}%, a pancerz o {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Postać zarodnikowego uzdrowiciela: leczenie zwiększone o {pct}%, pancerz o {armorPct}%, a prędkość ruchu zmniejszona o {slowPct}%",
       "formShadow": "Postać cienia: obrażenia od Cienia zwiększone o {pct}%",
       "resourceCount": "{value} z {max}",
       "formLich": "Soul Lance trafia też do {targets} pobliskich wrogów, zadając {pct}% obrażeń",
@@ -4266,7 +4266,7 @@ export const pl_PL: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
-      "bountyTag": "Bounty",
+      "bountyTag": "Nagroda za głowę",
       "cheaterTag": "< Oszust >",
       "pledgeTag": "Ślubowanie: {guild}",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const pl_PL: EnTranslations = {
       "wrongKind": "Ten kod jest eksportem ustawień, a nie układem skrótów."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Układ klawiatury",
+      "open": "Przekształć",
+      "from": "Skróty utworzone dla",
+      "to": "Przekształć na",
+      "keepMovement": "Zachowaj położenie klawiszy ruchu",
+      "keepMovementLocked": "Klawisze ruchu pozostały poprzednio na miejscu, więc teraz również pozostaną. Przywróć ustawienia domyślne, aby zacząć od nowa.",
+      "help": "Każdy skrót przechodzi na klawisz wpisujący ten sam znak w nowym układzie. Rząd cyfr pozostaje na miejscu. Nazwy klawiszy na tej liście oznaczają pozycje QWERTY; podgląd klawiatury pokazuje twój własny układ.",
+      "moves": "Skróty, które zmienią położenie: {count}",
+      "noChange": "Żadne skróty nie zmieniają się między tymi układami.",
+      "apply": "Przekształć skróty klawiszowe",
+      "converted": "Skróty klawiszowe przekształcono z {from} na {to}.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (amerykański)",
+        "qwertyUk": "QWERTY (brytyjski)",
+        "qwertzDe": "QWERTZ (niemiecki)",
+        "qwertzCh": "QWERTZ (szwajcarski)",
+        "azertyFr": "AZERTY (francuski)",
+        "azertyBe": "AZERTY (belgijski)",
+        "qwertyEs": "QWERTY (hiszpański)",
+        "qwertyIt": "QWERTY (włoski)",
+        "qwertyNordic": "QWERTY (szwedzki, fiński)",
+        "qwertyDa": "QWERTY (duński)",
+        "qwertyNo": "QWERTY (norweski)",
+        "qwertyBr": "QWERTY (brazylijski ABNT2)",
+        "qwertyPt": "QWERTY (portugalski)",
+        "qwertyTr": "QWERTY (turecki)",
+        "dvorak": "Układ Dvorak",
+        "colemak": "Układ Colemak"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const pl_PL: EnTranslations = {
       "perfectedBadge": "Udoskonalone",
       "perfectingRank": "Doskonalenie: ranga {rank} z {ranks}",
       "materialSourceGatherer": "{count} × zebrane przez {name}",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × Zdobyto od {name}",
       "materialSourceGathererSigned": "{count} × zebrane przez {name}, podpisane przez {signer}",
       "materialSourceUnrecorded": "{count} × bez zapisanego zbierającego",
       "materialSourceUnrecordedSigned": "{count} × bez zapisanego zbierającego, podpisane przez {name}",
@@ -5457,12 +5457,16 @@ export const pl_PL: EnTranslations = {
       "enchant_weapon_piston_drive": "Na stałe graweruje broń dwuręczną z 12 Siłą i 25 Oceną Trafienia Krytycznego. Nie można zastosować na broni jednooręcznej. Stały bonus, nie skaluje się."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Twój sojuszniczy kamień powrotu nie jest dostrojony. Porozmawiaj z sojuszniczym kwatermistrzem lub użyj go w sojuszniczej siedzibie.",
+      "hearthstoneBound": "Twój sojuszniczy kamień powrotu jest teraz dostrojony do {hub}.",
+      "hearthstoneTransport": "Kamień powrotu przenosi cię do {hub}.",
+      "itemCooldown": "Ten przedmiot nie jest jeszcze gotowy (pozostało {minutes} min).",
       "alliedHearthstoneUse": "Użycie: Teleportuje cię do twojego nastrojonego na sieć siedziby frakcji. (10 sek. rzucania, 15 min odpoczynku)",
       "alliedHearthstoneAttuned": "Nastrojone na: {hub}",
       "hub_none": "Brak (Użyj blisko siedziby frakcji, aby nastroić)",
       "hub_rift_watch": "Drifthaven (Straż Szczelin)",
       "hub_church_order": "Dolina Wschodniego Strumienia (Zakon Kościoła)",
-      "hub_automatons": "Południowy Zasięg (Odlewnia Automata)",
+      "hub_automatons": "Wyrmwatch (Automaty)",
       "riftGliderUse": "Użycie: Rozsuwa szybowiec, spowalniając prędkość spadania na 30 sek. Lądowanie lub zadanie obrażeń anuluje efekt. (2 min odpoczynku)",
       "targetDummyUse": "Użycie: Rozmieszcza mechaniczną tarczę treningową na otwartym świecie na 2 minuty do ćwiczenia zdolności bojowych. (5 min odpoczynku)",
       "battleStandardUse": "Użycie: Sadzi Poświęcony Sztandar Świtu na 5 minut, znacznie zwiększając regenerację zdrowia i many poza walką dla wszystkich pobliskich sojuszników. Pozostanie w pobliżu przez 10 sekund daje również Błogosławieństwo Świtu (+5% do wszystkich atrybutów na 30 min). (5 min odpoczynku)",
@@ -5826,8 +5830,8 @@ export const pl_PL: EnTranslations = {
     "pattern": {
       "teaches": "Użycie: Uczy wytwarzania {item}.",
       "teachesEnchant": "Użycie: Uczy nakładania {enchant}.",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}: {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Odwiązywanie: {name}",
@@ -7428,7 +7432,7 @@ export const pl_PL: EnTranslations = {
       "rowCameraSpeed": "Jak szybko obraca się kamera, gdy rozglądasz się myszą.",
       "rowTouchLookSpeed": "To samo, ale dla rozglądania się przeciągnięciem palca, i pojawia się tylko na ekranie dotykowym.",
       "rowFullscreen": "Wypełnia grą cały ekran.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "Blask, iskry, pociski i rozbłyski uderzeń zaklęć rzucanych przez graczy i ich towarzyszy, także twoich. Wyłącz je, aby uspokoić obraz lub zyskać kilka dodatkowych klatek na sekundę w dużych walkach grupowych. Zaklęcia wrogów nadal będą widoczne, podobnie jak kręgi ostrzegające przed niebezpiecznymi obszarami, znaczniki nad ogłuszonymi, przestraszonymi lub unieruchomionymi celami oraz wszystkie paski rzucania zaklęć.",
       "rowWaterRipples": "Kilwater i zmarszczki, które rozchodzą się za tobą, gdy pływasz. Domyślnie wyłączone, i to jedyny efekt wody, który kosztuje realne klatki; plusk i bąbelki pozostają niezmienione niezależnie od tej opcji.",
       "rowOverflowXp": "Na najwyższym poziomie: czy twój pasek wciąż wypełnia się nadmiarowymi PD (punktami doświadczenia), czy zamiast tego pokazuje klasyczny, statyczny napis maksymalnego poziomu.",
       "rowInterfaceMode": "Czy dostajesz interfejs komputerowy, czy ekranowe sterowanie dotykowe. Auto rozpoznaje twoje urządzenie, a możesz wymusić dowolny z trybów: tablet z klawiaturą może przyjąć układ komputerowy, a laptop z ekranem dotykowym może przyjąć sterowanie dotykowe.",
@@ -7481,7 +7485,7 @@ export const pl_PL: EnTranslations = {
       "ifMouseoverCast": "Pozwala, by leczenie lub przyjazne zaklęcie trafiło na ramkę drużyny, nad którą najeżdżasz kursorem, bez zmiany twojego celu.",
       "ifStickyTarget": "Zachowuje twój obecny cel, gdy klikniesz na pustą ziemię, zamiast go czyścić.",
       "ifFctScale": "Rozmiar tekstu walki, czyli liczb obrażeń i leczenia unoszących się znad twojego celu.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Przywraca proste białe i jasnozłote liczby obrażeń unoszące się pionowo. Pozostaw wyłączone (ustawienie domyślne), aby widzieć wyrazistsze liczby rozchodzące się na boki, z rozbłyskami przy trafieniach krytycznych i wyjątkowo silnych ciosach.",
       "ifExtraBars": "Odsłania drugi rząd paska akcji, a trzeci, gdy włączysz drugi. Pola pozostają dostępne pod swoimi skrótami klawiszowymi, nawet gdy rzędy są ukryte.",
       "ifHideUnused": "Ukrywa puste pola akcji, więc rysowane są tylko przyciski, których faktycznie używasz.",
       "ifLockBars": "Blokuje twoje paski, żebyś przypadkiem nie wyciągnął umiejętności z pola.",
@@ -7912,14 +7916,14 @@ export const pl_PL: EnTranslations = {
         "form_bear": "Postać do tankowania: gruba skóra, wściekłość zamiast many i dodatkowe zagrożenie, dzięki któremu wrogowie wciąż atakują ciebie.",
         "form_cat": "Postać do obrażeń w zwarciu: energia i punkty kombinacji, jak u łotrzyka, oraz znacznie mniej zagrożenia.",
         "form_travel": "Postać do podróżowania: znacznie szybsza po lądzie, ale bez innych zdolności, dopóki z niej nie wyjdziesz.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "Lecząca postać Serca Gaju: twardsza skóra i silniejsze leczenie za cenę wolniejszego chodu, z zachowaniem wszystkich zaklęć i many."
       },
       "mageEleSummon": "Zaklęcie Mrozu, które przyzywa żywiołaka do twojego boku i kieruje go na twój cel.",
       "formName": {
         "form_bear": "Postać Bruina",
         "form_cat": "Postać kota",
         "form_travel": "Postać Fleet",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Postać zarodnikowego uzdrowiciela"
       }
     },
     "classHook": {
@@ -8622,7 +8626,7 @@ export const pl_PL: EnTranslations = {
       "formBear": "Postać Bruina",
       "formCat": "Postać kota",
       "formTravel": "Postać Fleet",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Postać zarodnikowego uzdrowiciela",
       "groupCreatures": "Stworzenia",
       "groupPets": "Demony Czarnoksiężnika",
       "pickerLabel": "Wybierz model do obejrzenia",
@@ -9142,7 +9146,7 @@ export const pl_PL: EnTranslations = {
       "buyingBody": "Porozmawiaj z kupcem i wybierz przeglądanie jego towarów, a sklep otworzy się z trzema zakładkami: Przeglądaj, Sprzedaj i Odkup. Przeglądaj mieści wszystko, co ma na składzie, twoje, jeśli cię na to stać. Sprzedaj wypisuje to z twoich toreb, za co zapłaci, a sprzedaż przedmiotu o własnej wylosowanej jakości wymaga najpierw potwierdzenia, więc cenny egzemplarz nigdy nie wymknie się przez pomyłkę. Jeśli rozstaniesz się z czymś, czego żałujesz, zakładka Odkup przechowuje twoje niedawne sprzedaże, byś mógł je odkupić za monety, które ci zapłacono.",
       "junkTitle": "Pozbywanie się rupieci",
       "junkBody": "Łupy, dla których nie masz zastosowania, wciąż można sprzedać dowolnemu sprzedawcy, więc opróżniaj torby za każdym razem, gdy przechodzisz przez miasto, zamiast pozwalać im się zapełniać. Zakładka Sprzedaj u sprzedawcy ma nawet przycisk, który jednym kliknięciem sprzedaje wszystkie drobiazgi kiepskiej jakości naraz. Naprawdę bezwartościowe drobiazgi można też po prostu wyrzucić, by zrobić miejsce.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "Łupy, których nie potrzebujesz, nadal można sprzedać każdemu kupcowi z własnym sklepem, więc opróżniaj torby podczas każdej wizyty w mieście. Okno kupca ma nawet przycisk Sprzedaj śmieci, który jednym kliknięciem sprzedaje wszystkie przedmioty marnej jakości. Całkowicie bezwartościowe drobiazgi można też po prostu wyrzucić, aby zrobić miejsce. Sprzedane w ten sposób niepodpisane szare przedmioty nie trafiają na listę odkupu, więc przed naciśnięciem przycisku sprawdź, czy nie chcesz czegoś zatrzymać.",
       "tradeTitle": "Handel z innymi graczami",
       "tradeBody": "Możesz handlować twarzą w twarz z każdym, kto stoi obok ciebie. Oboje wkładacie przedmioty i monety do wspólnego okna, a wymiana następuje dopiero, gdy oboje ją potwierdzicie, więc żadna ze stron nie może zostać oszukana. To prosty sposób, by przekazać przyjacielowi łup lub dobić targu.",
       "mailTitle": "Krucza Poczta",
@@ -11231,10 +11235,10 @@ export const pl_PL: EnTranslations = {
     "selectClass": "Wybierz klasę.",
     "pickClass": "Wybierz klasę.",
     "returnToLogin": "Wróć do logowania",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Wyszukaj aktualizacje",
+    "noUpdateFound": "Nie znaleziono aktualizacji. Spróbuj ponownie za chwilę.",
+    "updateUnavailable": "Zaktualizuj grę w swoim sklepie z grami lub pobierz najnowszego klienta.",
+    "updateSearchFailed": "Nie udało się sprawdzić aktualizacji. Spróbuj ponownie.",
     "api": {
       "tooManyAttempts": "Zbyt wiele prób. Odczekaj minutę i spróbuj ponownie.",
       "usernameShape": "Nazwa użytkownika musi mieć od 3 do 24 znaków i zawierać litery, cyfry lub podkreślenie.",
@@ -12412,6 +12416,8 @@ export const pl_PL: EnTranslations = {
       "clueTalkAria": "Spytaj o wskazówkę: {name}",
       "clueDeliver": "Wręcz {count} {item}.",
       "clueDeliverAria": "Wręcz {count} {item} dla {name}",
+      "attuneHearthstone": "Dostrój tutaj mój sojuszniczy kamień powrotu.",
+      "attuneHearthstoneAria": "Dostrój swój sojuszniczy kamień powrotu do {hub} u {name}",
       "profIntroHint": "Porozmawiaj z {name} o \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Te trzy relikwie opowiadają tę samą historię: Aldren walczył w obronie swojego króla, Malric przełamał granicę śmierci, a Voss próbował powstrzymać to, co nastąpiło. Pieczęć słabnie, a opuszczona krypta to droga w głąb.",
       "browseGoods": "Pokaż mi swoje towary.",
@@ -12799,7 +12805,7 @@ export const pl_PL: EnTranslations = {
       "clueCasketOpened": "Skrzynia zawiera {money} i {items}.",
       "treasureMapEarned": "Każde zadanie światowe dnia jest ukończone: znalazłeś {map}.",
       "treasureMapLost": "Każde zadanie światowe dnia jest ukończone, ale twoje torby nie mają miejsca na mapę skarbu.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Twoje torby są pełne. Nagrodę wysłano do twojej skrzynki: {items}.",
       "treasureMapRead": "Studiujesz {map}. X leży gdzieś w {zone}.",
       "treasureMapUpgraded": "Mapa jest przerysowana w lepszym atramencie: jest teraz {map}.",
       "treasureVaultOpened": "Grunt się rozchodzi. Zakopane skarby leżą przed tobą.",
@@ -12978,7 +12984,7 @@ export const pl_PL: EnTranslations = {
       "sellJunk": "Sprzedaj śmieci",
       "sellJunkAria": "Sprzedaj wszystkie śmieci za {price}",
       "sellJunkHint": "Sprzedaje każdy szary przedmiot w twoich torbach z wyjątkiem przedmiotów zadań.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "Niepodpisane szare przedmioty nie trafiają na listę odkupu, więc ich sprzedaży nie można cofnąć."
     },
     "market": {
       "title": "Rynek Świata",
@@ -13283,12 +13289,12 @@ export const pl_PL: EnTranslations = {
         "description": "Zmniejsza otrzymywane obrażenia o 60% na 8 s, ale uniemożliwia atakowanie, gdy jest aktywna."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Udawanie martwego",
+        "description": "Padnij na ziemię i udawaj martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie zapominają o tobie, a wrodzy gracze, którzy cię namierzyli, tracą cel. Ruch, atak lub użycie innej zdolności kończy ten stan. Użyj ponownie, aby wstać."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Kamuflaż taktyczny",
+        "description": "Wtop się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak lub otrzymanie obrażeń przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. (Sztuka przetrwania)"
       },
       "frostjaw_trap": {
         "name": "Pułapka Mroźnej Paszczy",
@@ -14085,7 +14091,7 @@ export const pl_PL: EnTranslations = {
         "description": "Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do {duration} s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Zarodnikowe gojenie",
         "description": "Leczy cel za {damage} w ciągu 12 sekund.",
         "specNote_restoration": "Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa. Przy 3 Zieleni Szybkie uzdrowienie zmienia się w Nadrozkwit."
       },
@@ -14124,9 +14130,9 @@ export const pl_PL: EnTranslations = {
         "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew (maks. 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Drapnięcie",
+        "description": "Przeciągnij pazurami przez pobliskie cele w promieniu 6 jardów, zadając obrażenia broni plus {damage}. Każdy trafiony cel daje 1 punkt kombinacji. Ujawnia skradających się wrogów w obszarze zamachu. Tylko w Postaci kota.",
+        "specNote_feral": "Każde trafienie dodaje 1 Starą Krew (maks. 3)."
       },
       "ferocious_bite": {
         "name": "Krwawe ukąszenie",
@@ -14412,7 +14418,7 @@ export const pl_PL: EnTranslations = {
       "swiftmend": {
         "name": "Szybkie uzdrowienie",
         "description": "Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu i Dzikiego ukojenia dodaje 1 Zieleń; przy 3 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "specNote_restoration": "Zużywa efekt leczenia w czasie na przyjaznym celu, lecząc go o {damage}. Zarodnikowe gojenie i nasadzenia Drugiego rozkwitu dodają Zieleń; przy 5 punktach Zieleni ten przycisk staje się Nadrozkwitem, który natychmiast leczy wszystkich sojuszników z twoimi efektami leczenia w czasie o 60% ich pozostałego leczenia. (zdolność charakterystyczna Serca Gaju)"
       },
       "moonlash": {
         "name": "Księżycowy przybór",
@@ -14439,26 +14445,26 @@ export const pl_PL: EnTranslations = {
         "description": "Przywraca do życia u twojego boku każdego poległego członka twojej drużyny lub rajdu w promieniu 40 jardów i w zasięgu wzroku, z 30% zdrowia i many. Nie można rzucić w walce. (Serce Gaju)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Postać zarodnikowego uzdrowiciela",
+        "description": "Przemień się w zarodnikowego uzdrowiciela: twoje leczenie wzrasta o 20%, a pancerz o 40%, ale prędkość ruchu spada o 20%. Wszystkie zaklęcia zwykłej postaci pozostają dostępne. Trwa do opuszczenia postaci. Każda zmiana postaci zapewnia Żwawy krok, krótkie zwiększenie prędkości ruchu. Użyj ponownie, aby wrócić do zwykłej postaci. (zdolność charakterystyczna Serca Gaju)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Wybuch zarodników",
+        "description": "Przywołuje zarodnikową narośl we wskazanym obszarze. Po {duration} s narośl wybucha, lecząc sojuszników o {healing} i zadając wrogom w promieniu 8 jardów {damage} obrażeń od natury.",
+        "specNote_balance": "Przy 3 punktach Księżycowego przypływu jest o 25% silniejszy i zużywa twój Księżycowy przypływ.",
+        "specNote_restoration": "Nakłada także Zarodnikowe gojenie na każdego leczonego sojusznika. Przy pełnej Zieleni jest o 25% silniejszy i zużywa twoją Zieleń."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Dar przyrody",
+        "description": "Twoje zaklęcia mogą przygotować Dar przyrody na 10 s: wskazane zaklęcie staje się darmowe, o 25% silniejsze i dostępne w każdej postaci. Ponowna aktywacja odświeża czas trwania.",
+        "specNote_feral": "Każdy trafiony automatyczny atak wręcz ma szansę 1 do 15 na przygotowanie go dla Zarodnikowego gojenia, a w Postaci Bruina dla Dębowej skóry.",
+        "specNote_balance": "Każdy rzucony Dziki pocisk lub Spadające niebo ma 10% szans na przygotowanie go dla Wybuchu zarodników, najwyżej raz na 10 s.",
+        "specNote_restoration": "Każdy impuls twoich efektów leczenia w czasie ma 10% szans na przygotowanie go dla Wybuchu zarodników, najwyżej raz na 10 s."
       },
       "overbloom": {
         "name": "Nadrozkwit",
-        "description": "Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Sporemending na celu.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "Zużywa 3 punkty Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Zarodnikowe gojenie na celu.",
+        "specNote_restoration": "Zużywa twoje 5 punktów Zieleni: każdy sojusznik z twoimi efektami leczenia w czasie natychmiast odzyskuje {buff}% leczenia, które im pozostało. Efekty są usuwane, a cel otrzymuje nowe Zarodnikowe gojenie."
       },
       "summon_imp": {
         "name": "Przywołanie Emberkina",
@@ -19098,10 +19104,10 @@ export const pl_PL: EnTranslations = {
         "name": "Skarbiec Wysłannika"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Trofealna czaszka"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Worek na czaszki"
       },
       "clue_scroll": {
         "name": "Zwój Wskazówek"
@@ -24117,9 +24123,9 @@ export const pl_PL: EnTranslations = {
         "body": "Skarbiec został czyszczony, ale twój udział nie został zebrany ze skrzyni. Kruki przyniosły go do ciebie tutaj, razem z dobrami i monetami, które zarabiłeś.\n\n- Krucze Poczty"
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "Krucza Poczta",
+        "subject": "Twoja nagroda za zadanie światowe",
+        "body": "Twoje torby były pełne, gdy zdobyto tę nagrodę za zadanie światowe, więc kruki przyniosły ją tutaj. Zrób trochę miejsca i odbierz ją przy dowolnym kruczym filarze.\n\n- Krucza Poczta"
       }
     },
     "itemSets": {
@@ -24255,7 +24261,7 @@ export const pl_PL: EnTranslations = {
       },
       "grovespring": {
         "name": "Strój Gajowego Źródła",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Szybkie uzdrowienie najpierw zużywa twoje własne Zarodnikowe gojenie lub Drugi rozkwit i leczy o 25 procent więcej. Otrzymane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności."
       },
       "hexthread": {

@@ -418,13 +418,13 @@ export const da_DK: EnTranslations = {
       "heroicClears": "{count} Heroisk",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Se muligt bytte",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Byttefokus",
+      "allClassGear": "Udstyr til alle klasser",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "Gælder kun uåbnede hvælvinger.",
+      "noFocusedLoot": "Intet egnet bytte. Vælg et andet fokus.",
+      "rolledFocus": "Udtrukket til: {focus}",
       "chooseTable": "Vælg, hvilken tabel du skal trække fra",
       "selectAllTables": "Vælg alt",
       "selectedTables": "{count} tabeller valgt",
@@ -446,8 +446,8 @@ export const da_DK: EnTranslations = {
         "worldMany": "{count} Verdenquester Gennemført",
         "pvpOne": "{count} Rangeret Kamp Vundet",
         "pvpMany": "{count} Rangerede Kampe Vundet",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} PvP-sejr",
+        "pvpWinMany": "{count} PvP-sejre"
       },
       "requiredTask": {
         "raidOne": "Gennemfør {count} Raid-møde",
@@ -458,8 +458,8 @@ export const da_DK: EnTranslations = {
         "worldMany": "Gennemfør {count} Verdenquester",
         "pvpOne": "Vind {count} Rangeret Kamp",
         "pvpMany": "Vind {count} Rangerede Kampe",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Vind {count} PvP-sejr",
+        "pvpWinMany": "Vind {count} PvP-sejre"
       },
       "readyWeeks": "Uafkrævede uger: {count}. Gør krav på den ældste gennemførte uge først.",
       "claimLastWeek": "Gør krav på sidste uges belønning",
@@ -522,12 +522,12 @@ export const da_DK: EnTranslations = {
       "castingOff": "Færgen til {dest} afgår nu",
       "boardHint": "Stå på dens dæk når den sejler. Overfarten er gratis.",
       "sailing": "Sejer til {dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "Færge fra {port} til {dest}",
+      "portTitle": "Færgehavn: {port}",
+      "destination": "Rejsemål: {dest}",
+      "boardNow": "Gå ombord nu",
+      "arrivesIn": "Færgen ankommer om {time}",
+      "scheduleUnavailable": "Færgens sejlplan er ikke tilgængelig."
     },
     "materialStackSelectionUnavailable": "Det materialevalg er ikke længere tilgængeligt.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const da_DK: EnTranslations = {
       "banner": "Tilskuer til {name}"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Dagens besked: {text}",
+      "updated": "Dagens besked er opdateret.",
+      "cleared": "Dagens besked er ryddet.",
+      "none": "Der er ikke angivet nogen dagens besked.",
+      "usage": "Brug: /motd \"<besked>\" for at angive den, /motd clear for at fjerne den.",
+      "tooLong": "Dagens besked må højst indeholde {max} tegn.",
+      "saveFailed": "Dagens besked kunne ikke gemmes og går tabt ved genstart."
     },
     "readyCheck": {
       "title": "Klar check",
@@ -619,11 +619,11 @@ export const da_DK: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "PvP-genoplivning",
+      "pvpResurrectTitle": "Genopstå på den nærmeste kirkegård med fuldt helbred og uden en ny Vogterens Told.",
+      "pvpResurrectWaitButton": "PvP-genoplivning ({seconds})",
+      "pvpResurrectWaitNote": "Du kan bruge PvP-genoplivning om {seconds}: du genopstår på den nærmeste kirkegård.",
+      "pvpResurrectReadyNote": "PvP-genoplivning er klar: du genopstår på den nærmeste kirkegård.",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
       "ghostHint": "Løb til stedet for din død eller tale med Blegekyperen for at blive genoplivet",
       "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende.",
@@ -641,7 +641,7 @@ export const da_DK: EnTranslations = {
       "healerConfirmCancel": "Annuller"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Gendanner grafik"
     },
     "wiki": {
       "confirmTitle": "Åbn wikien?",
@@ -2155,7 +2155,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Besværgelsestips ved musemarkør",
       "clickMoveLeft": "Venstreklik",
       "clickMoveRight": "Højreklik",
       "version": "v{version} ({build})",
@@ -2269,7 +2269,7 @@ export const da_DK: EnTranslations = {
       "confirmVendorSellNote": "Slår du dette fra, sælges genstande med ét klik uden bekræftelse, så en flyttet taskeplads kan sælge den forkerte genstand til den handlende.",
       "confirmVendorSellMinQuality": "Bekræft salg fra kvalitet",
       "confirmVendorSellMinQualityNote": "Varer under denne kvalitet sælges med et enkelt klik; en fejlsolgt vare kan stadig købes tilbage fra sælgeren.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Genstande under denne kvalitet sælges med et enkelt klik. Fejlagtigt solgte genstande kan købes tilbage fra købmanden, undtagen usignerede grå genstande.",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
@@ -2290,9 +2290,9 @@ export const da_DK: EnTranslations = {
       "showUtilityModes": "Medtag snigen og rejsetilstande",
       "showFriendlyTrack": "Vis mine styrkelser på allierede",
       "showShieldTrack": "Vis mine skjolde",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Klassisk kamptekst",
       "waterRipples": "Vandkrusninger (kølvand)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Besværgelseseffekter",
       "actionCam": "Handlingskamera",
       "actionCamShoulder": "Handlingskamera-skulder",
       "actionCamShoulderLeft": "Venstre {pct}",
@@ -2816,7 +2816,7 @@ export const da_DK: EnTranslations = {
         "worldKill": "verden drab",
         "worldAssist": "verden drab assisteret",
         "hillHold": "holder højen",
-        "worldQuest": "world quest"
+        "worldQuest": "verdensopgave"
       },
       "floatReasons": {
         "kill": "Drab",
@@ -2826,11 +2826,11 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Optjen permanente titler efter {thresholds} spilletid med verdens-PvP slået til i den åbne verden eller i PvP-instanser. Udlogning, død, PvE-instanser og helligdomme sætter tiden på pause. Slår du PvP fra, nulstilles den.",
+      "rewardPaused": "Nuværende PvP-stime: spillet {time} (sat på pause i en helligdom)",
+      "rewardPausedDead": "Nuværende PvP-stime: spillet {time} (sat på pause, mens du er død)",
+      "rewardPausedInstance": "Nuværende PvP-stime: spillet {time} (sat på pause i PvE-instanser)",
+      "rewardProgress": "Nuværende PvP-stime: spillet {time}",
       "tab": "Verden PvP",
       "title": "Verden PvP",
       "blurb": "Sæt din markering op for at kæmpe mod andre markerede spillere hvor som helst i den åbne verden. Besejr en og tag en andel af deres pengepung, plus Ære til Krigsførelsesudstyr. Slagmarker og Arenaer betaler stadig mere.",
@@ -2849,8 +2849,8 @@ export const da_DK: EnTranslations = {
       "markLine": "At angribe en umarkeret spiller der rejser din egen markering; at angribe en markeret gør det aldrig.",
       "aidLine": "Helbredelse, skjold eller buff på en markeret spiller i en verdenskamp rejser din markering.",
       "stakeLine": "Taberen betaler {cap} eller {percent} af deres pengepung, alt efter hvad der er mindre.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "Når I begge har PvP slået til, ligger guldet fra det dræbende slag på liget sammen med taberens kranie.",
+      "skullName": "{name}s kranie",
       "noStakeLine": "En umarkeret spiller drbt på free-for-all-grund mister ingen guld.",
       "noTakeLine": "En umarkeret kæmper tager heller ikke guld: det flytter kun mellem to markerede spillere.",
       "honorLine": "{honor} Ære pr. drab, delt blandt alle der hjalp.",
@@ -2880,8 +2880,8 @@ export const da_DK: EnTranslations = {
       "countsHolding": "Inde: du {yours}, rival {theirs}",
       "contestYou": "Tager bakken: {seconds} af {total}",
       "contestOther": "Mister bakken: {seconds} af {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "Sat på pause: {seconds} af {total}",
+      "contestOtherPaused": "Rival sat på pause: {seconds} af {total}",
       "contestNone": "Hold et flertal indenfor i {total} for at tage det",
       "inside": "Du er indenfor cirklen",
       "distance": "{yards} yd til cirklen",
@@ -2890,27 +2890,27 @@ export const da_DK: EnTranslations = {
       "standingRaid": "Raidmedlemmer tæller ikke: kun partier kan holde bakken"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Kraniepose",
+      "total": "Kranier: {count}",
+      "close": "Luk kranieposen",
+      "clickOpen": "Klik for at åbne",
+      "notCarried": "Hav kranieposen i dine tasker for at opbevare eller tage kranier.",
+      "empty": "Tom. Mens du bærer posen, lægges plyndrede kranier direkte i den.",
+      "unrecorded": "Trofækranie",
+      "store": "Opbevar medbragte kranier ({count})",
+      "storeNone": "Ingen kranier at opbevare",
+      "takeOne": "Tag 1",
+      "takeAll": "Tag alle",
+      "takeOneAria": "Tag 1: {item}",
+      "takeAllAria": "Tag alle: {item}",
+      "tooltip": "Rummer et vilkårligt antal trofækranier uden at optage taskeplads. Mens den er i dine tasker, lægges plyndrede kranier direkte i den. Klik på den i taskerne for at opbevare eller tage kranier."
     },
     "warfareShop": {
       "gossipOption": "Gennemse Krigsførelsessæt",
       "gossipOptionAria": "Gennemse Krigsførelsessæt-butikken tilbudt af {name}",
       "jewelry": "Smykker",
       "weapons": "Våben",
-      "goods": "Goods",
+      "goods": "Varer",
       "groupSeason2": "Krigsudspring Sæson 2: Forsporinger",
       "groupEntry": "Krigsudspring Sæson 1",
       "owned": "Ejet",
@@ -2951,12 +2951,12 @@ export const da_DK: EnTranslations = {
       "hint": "Find jorden som kortet viser, stå på X og brug kortet igen for at grave. Et begravet skattkammer åbner for dig og dit hold.",
       "upgradeNote": "At tegne det som et {rarity} kort tager {inks} Kartografs blæk (du holder {held}). Fraktionernes kvartermestre sælger det.",
       "upgradeMaxed": "Ingen kartograf kunne forbedre dette kort.",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Hvilket kort vil du bruge kartografblæk på?",
+      "inkPickerHeld": "Du har {held} kartografblæk.",
+      "inkPickerRead": "Følges: dens X ligger i {zone}. X'et bliver på sin plads.",
+      "inkPickerUnread": "Ulæst ({count} i beholdning)",
+      "inkPickerCost": "Tegn om til {rarity}: {inks} blæk",
+      "inkPickerCancel": "Annuller",
       "rarity": {
         "common": "Almindelig",
         "rare": "Sjælden",
@@ -3673,8 +3673,8 @@ export const da_DK: EnTranslations = {
       "resetDone": "Alle instanser er blevet nulstillet.",
       "resetNone": "Du har ingen instanser at nulstille.",
       "resetOccupied": "Du kan ikke nulstille instanser, mens nogen stadig er derinde.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "Ændringen af sværhedsgrad venter, fordi nogen eller deres lig stadig er indenfor. Den træder i kraft, når instanserne er tomme.",
+      "queuedCancelled": "Den ventende ændring af sværhedsgrad blev annulleret, fordi gruppen eller lederen blev ændret.",
       "resetSameDifficulty": "Skift fangekældersværhedsgrad, før du nulstiller disse instanser. Tomme instanser nulstilles automatisk efter 5 minutter.",
       "resetLoot": "Du kan ikke nulstille instanser, mens der stadig er bytte derinde.",
       "resetConfirmTitle": "Nulstil alle instanser?",
@@ -3691,7 +3691,7 @@ export const da_DK: EnTranslations = {
       "dragEquipHint": "Træk hen på din karakter for at udruste",
       "dragDestroyHint": "Træk ud i verden for at ødelægge",
       "reorderNeedsRecent": "Ryd filteret og sortér efter Seneste for at omarrangere dine tasker",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Låste genstande bliver på deres plads i tasken. Lås dem op for at flytte dem.",
       "itemAriaInstanced": "{item}, antal {count}, signeret kopi",
       "itemAriaEnchanted": "{item}, antal {count}, fortryllet kopi",
       "itemAriaBound": "{item}, antal {count}, bundet kopi",
@@ -4077,7 +4077,7 @@ export const da_DK: EnTranslations = {
       "duskEconomy": "Evner koster {pct}% mindre energi",
       "moontide": "Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den",
       "oldBlood": "Gammelt Blod: trin {stacks} af {max}. Landede Katte- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus",
-      "verdance": "Grønske {stacks}/{max}. Hver Sporemending, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring",
+      "verdance": "Grønske {stacks}/{max}. Hver Sporeheling, Anden Blomstring eller Vildlægning, du kaster, giver 1, og hver Grønske forkorter Vildlægnings kastetid. Ved {max} bliver Hurtig heling til Overblomstring",
       "freeExecute": "Din næste kvalificerede henrettelsesevne koster ingenting",
       "resourceSap": "Genopretter {value} af din nuværende ressource hvert {interval}. sek",
       "nextAttackCrit": "Dit næste angreb rammer garanteret kritisk",
@@ -4179,7 +4179,7 @@ export const da_DK: EnTranslations = {
       "formTravel": "Fleet-form: bevægelseshastighed øget med {pct}%",
       "formFireball": "Ember Form: bevægelseshastighed øget med {pct}%; angreb og trolddomme er deaktiverede",
       "formMoonkin": "Månekinform: besværgelsesskade øget med {pct}% og rustning øget med {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Sporehelerform: heling øget med {pct}%, rustning øget med {armorPct}% og bevægelseshastighed reduceret med {slowPct}%",
       "formShadow": "Skyggeform: Skyggeskade øget med {pct}%",
       "resourceCount": "{value} af {max}",
       "formLich": "Soul Lance rammer også op til {targets} nærliggende fjender for {pct}% skade",
@@ -4266,7 +4266,7 @@ export const da_DK: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
-      "bountyTag": "Bounty",
+      "bountyTag": "Dusør",
       "cheaterTag": "< Snyder >",
       "pledgeTag": "Løfte til {guild}",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const da_DK: EnTranslations = {
       "wrongKind": "Den kode er en indstillingseksport, ikke en genvejsopsætning."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Tastaturlayout",
+      "open": "Konverter",
+      "from": "Genvejstaster oprettet til",
+      "to": "Konverter til",
+      "keepMovement": "Behold bevægelsestasterne på deres pladser",
+      "keepMovementLocked": "Bevægelsestasterne blev på deres pladser sidst, så det gør de igen. Gendan standardindstillingerne for at begynde forfra.",
+      "help": "Hver genvej flyttes til den tast, der skriver det samme tegn på det nye layout. Talrækken bliver på sin plads. Tastnavnene i denne liste angiver QWERTY-positioner; tastaturoversigten viser dit eget layout.",
+      "moves": "Genvejstaster, der flyttes: {count}",
+      "noChange": "Ingen genvejstaster ændres mellem disse layouts.",
+      "apply": "Konverter genvejstaster",
+      "converted": "Genvejstaster konverteret fra {from} til {to}.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (amerikansk)",
+        "qwertyUk": "QWERTY (britisk)",
+        "qwertzDe": "QWERTZ (tysk)",
+        "qwertzCh": "QWERTZ (schweizisk)",
+        "azertyFr": "AZERTY (fransk)",
+        "azertyBe": "AZERTY (belgisk)",
+        "qwertyEs": "QWERTY (spansk)",
+        "qwertyIt": "QWERTY (italiensk)",
+        "qwertyNordic": "QWERTY (svensk, finsk)",
+        "qwertyDa": "QWERTY (dansk)",
+        "qwertyNo": "QWERTY (norsk)",
+        "qwertyBr": "QWERTY (brasiliansk ABNT2)",
+        "qwertyPt": "QWERTY (portugisisk)",
+        "qwertyTr": "QWERTY (tyrkisk)",
+        "dvorak": "Dvorak-layout",
+        "colemak": "Colemak-layout"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const da_DK: EnTranslations = {
       "perfectedBadge": "Forædlet",
       "perfectingRank": "Forædling: rang {rank} af {ranks}",
       "materialSourceGatherer": "{count} × samlet af {name}",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × Taget fra {name}",
       "materialSourceGathererSigned": "{count} × samlet af {name}, signeret af {signer}",
       "materialSourceUnrecorded": "{count} × ingen samler registreret",
       "materialSourceUnrecordedSigned": "{count} × ingen samler registreret, signeret af {name}",
@@ -5457,12 +5457,16 @@ export const da_DK: EnTranslations = {
       "enchant_weapon_piston_drive": "Ridser permanent et tohånds våben med 12 Styrke og 25 Kritisk Slagchance. Kan ikke påføres et énhånds våben. En fast bonus; den skalerer ikke."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Din allierede hjemsten er ikke bundet. Tal med en allieret kvartermester, eller brug den ved et allieret knudepunkt.",
+      "hearthstoneBound": "Din allierede hjemsten er nu bundet til {hub}.",
+      "hearthstoneTransport": "Hjemstenen fører dig til {hub}.",
+      "itemCooldown": "Genstanden er ikke klar endnu ({minutes} min tilbage).",
       "alliedHearthstoneUse": "Brug: Teleporterer dig til din indstemmede fraktionshub. (10 sek kast, 15 min nedetid)",
       "alliedHearthstoneAttuned": "Indstemt til: {hub}",
       "hub_none": "Ingen (Brug nær en fraktionshub for at indstille)",
       "hub_rift_watch": "Drifthaven (Rift-vagten)",
       "hub_church_order": "Østbæk Dal (Kirkeordenen)",
-      "hub_automatons": "Sydlig høj (Automaton Smedien)",
+      "hub_automatons": "Wyrmwatch (Automatoner)",
       "riftGliderUse": "Brug: Folder glidedragten ud, sænker faldende hastighed i 30 sek. Landing eller skade annullerer effekten. (2 min nedetid)",
       "targetDummyUse": "Brug: Udrulles en mekanisk mål dummy i den åbne verden i 2 minutter for at øve kampeviljer. (5 min nedetid)",
       "battleStandardUse": "Brug: Planter Velsignede Dagsmorgen kampstandard i 5 minutter, øger uden for kamp sundhed og mana regenerering betydeligt for alle nærliggende allierede. At blive i nærheden af det i 10 sekunder giver også Velsignelse af Dagsmorgen (+5% til alle egenskaber i 30 min). (5 min nedetid)",
@@ -5826,8 +5830,8 @@ export const da_DK: EnTranslations = {
     "pattern": {
       "teaches": "Brug: Lærer dig at fremstille {item}.",
       "teachesEnchant": "Brug: Lærer dig at anvende {enchant}.",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}: {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Aflæsning: {name}",
@@ -7428,7 +7432,7 @@ export const da_DK: EnTranslations = {
       "rowCameraSpeed": "Hvor hurtigt kameraet svinger, når du kigger dig omkring med musen.",
       "rowTouchLookSpeed": "Det samme for stryge-kig, og den vises kun, når du er på en touchskærm.",
       "rowFullscreen": "Fylder hele skærmen med spillet.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "Glød, gnister, projektiler og nedslag fra besværgelser, som spillere og deres kæledyr kaster, også dine egne. Slå dem fra for en roligere skærm eller nogle få ekstra billeder i sekundet i store gruppekampe. Alle fjendtlige besværgelser vises stadig, ligesom ringene om farlige områder, markørerne over bedøvede, skræmte eller fastlåste mål og alle kastebjælker.",
       "rowWaterRipples": "Kølvand og krusninger, der breder sig bag dig, mens du svømmer. Fra som standard, og den ene vandeffekt, der reelt koster billeder; plask og bobler er upåvirkede under alle omstændigheder.",
       "rowOverflowXp": "Ved maksniveau, om din bjælke fortsætter med at fyldes med overskuds-XP, eller i stedet viser den klassiske, statiske MAKS NIVEAU-tekst.",
       "rowInterfaceMode": "Hvorvidt du får skrivebordsgrænsefladen eller berøringsstyringen på skærmen. Auto læser din enhed, og du kan tvinge begge dele: en tablet med tastatur kan bruge skrivebordslayoutet, og en bærbar med touchskærm kan bruge berøringsstyringen.",
@@ -7481,7 +7485,7 @@ export const da_DK: EnTranslations = {
       "ifMouseoverCast": "Lader en heling eller en venlig besværgelse ramme den gruppe-ramme, du holder musen over, uden at ændre dit mål.",
       "ifStickyTarget": "Beholder dit nuværende mål, når du klikker på tom jord, i stedet for at rydde det.",
       "ifFctScale": "Størrelsen på de skade- og helingstal, der svæver væk fra dit mål.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Giver de enkle hvide og lysegyldne skadetal tilbage, som stiger lige op. Lad indstillingen være slået fra (standard) for kraftigere tal, der spreder sig til siderne, med glimt ved kritiske og usædvanligt store træffere.",
       "ifExtraBars": "Afslører en anden handlingslinje-række, og en tredje, når den anden er slået til. Felterne forbliver tilgængelige via deres taste-bindinger, selv mens rækkerne er skjulte.",
       "ifHideUnused": "Skjuler tomme handlingsfelter, så kun de knapper, du faktisk bruger, bliver tegnet.",
       "ifLockBars": "Låser dine bjælker, så du ikke ved et uheld kan trække en evne ud af et felt.",
@@ -7912,14 +7916,14 @@ export const da_DK: EnTranslations = {
         "form_bear": "Tank-formen: en tyk hud, raseri i stedet for mana, og ekstra trussel, så fjenderne bliver ved med at svinge efter dig.",
         "form_cat": "Nærkampsskade-formen: energi og kombopoint, som en slyngel, og langt mindre trussel.",
         "form_travel": "Rejseformen: langt hurtigere hen over jorden, men ingen andre evner, før du skifter ud af den.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "Lundhjertets helende form: sejere hud og stærkere heling med langsommere gang, og du beholder alle besværgelser og din mana."
       },
       "mageEleSummon": "En Frost-besværgelse, der kalder elementaren til din side og sætter den på dit mål.",
       "formName": {
         "form_bear": "Bruin-form",
         "form_cat": "Katteform",
         "form_travel": "Fleet-form",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Sporehelerform"
       }
     },
     "classHook": {
@@ -8622,7 +8626,7 @@ export const da_DK: EnTranslations = {
       "formBear": "Bruin-form",
       "formCat": "Katteform",
       "formTravel": "Fleet-form",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Sporehelerform",
       "groupCreatures": "Skabninger",
       "groupPets": "Heksemester-Dæmoner",
       "pickerLabel": "Vælg en model at se",
@@ -9142,7 +9146,7 @@ export const da_DK: EnTranslations = {
       "buyingBody": "Tal med en købmand og vælg at gennemse deres varer, så åbner butikken med tre faneblade: Gennemse, Sælg og Tilbagekøb. Gennemse rummer alt, de har på lager, dit hvis du har råd. Sælg viser, hvad i dine tasker de vil betale for, og at sælge et stykke, der bærer sin egen rullede kvalitet, beder dig bekræfte først, så en værdsat kopi aldrig glider væk ved en fejl. Skiller du dig af med noget, du fortryder, holder Tilbagekøb-fanebladet på dine seneste salg, så du kan købe dem tilbage for de mønter, du fik.",
       "junkTitle": "Rydde ud i skrammel",
       "junkBody": "Drops, du ikke har brug for, kan stadig sælges til enhver handlende, så tøm dine tasker, hver gang du kommer gennem byen, frem for at lade dem fyldes op. Handlendes Sælg-faneblad har endda en etkliksknap, der sælger hver ting af Ringe kvalitet på én gang. Helt værdiløst skrammel kan også kasseres direkte for at gøre plads.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "Bytte, du ikke kan bruge, kan stadig sælges til enhver købmand med egen butik, så tøm taskerne, hver gang du kommer gennem byen. Købmandsvinduet har endda en Sælg skrammel-knap, der sælger alt af ringe kvalitet med ét klik. Helt værdiløse småting kan også kasseres for at skabe plads. Usignerede grå genstande, der sælges sådan, kommer ikke på tilbagekøbslisten, så kontrollér, om der er noget, du ville beholde, før du trykker.",
       "tradeTitle": "Handel med andre spillere",
       "tradeBody": "Du kan handle ansigt til ansigt med enhver, der står nær dig. I lægger begge genstande og mønter i et delt vindue, og byttet sker først, når I begge bekræfter det, så ingen af parterne kan snydes. Det er den enkle måde at give en ven et drop eller afslutte en aftale.",
       "mailTitle": "Ravneposten",
@@ -11231,10 +11235,10 @@ export const da_DK: EnTranslations = {
     "selectClass": "Vælg venligst en klasse.",
     "pickClass": "Vælg en klasse.",
     "returnToLogin": "Tilbage til Login",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Søg efter opdateringer",
+    "noUpdateFound": "Ingen opdatering fundet. Prøv igen om lidt.",
+    "updateUnavailable": "Opdater via din spilbutik, eller hent den nyeste klient.",
+    "updateSearchFailed": "Kunne ikke søge efter opdateringer. Prøv igen.",
     "api": {
       "tooManyAttempts": "For mange forsøg. Vent et minut og prøv igen.",
       "usernameShape": "Brugernavnet skal være på 3-24 tegn og bruge bogstaver, cifre eller understregning.",
@@ -12412,6 +12416,8 @@ export const da_DK: EnTranslations = {
       "clueTalkAria": "Spørg om ledetråden: {name}",
       "clueDeliver": "Aflevér {count} {item}.",
       "clueDeliverAria": "Aflevér {count} {item} til {name}",
+      "attuneHearthstone": "Bind min allierede hjemsten her.",
+      "attuneHearthstoneAria": "Bind din allierede hjemsten til {hub} hos {name}",
       "profIntroHint": "Se {name} for \"{quest}\".",
       "nythraxisDeathlessKingWarning": "De tre relikvier fortæller den samme historie: Aldren kæmpede for at forsvare sin konge, Malric brød dødens grænse, og Voss forsøgte at standse det, der fulgte. Seglet svækkes, og den forladte krypt er vejen ned.",
       "browseGoods": "Lad mig se dine varer.",
@@ -12799,7 +12805,7 @@ export const da_DK: EnTranslations = {
       "clueCasketOpened": "Kisten holder {money} og {items}.",
       "treasureMapEarned": "Hver verdensopgave på dagen er udført: du fandt en {map}.",
       "treasureMapLost": "Hver verdensopgave på dagen er udført, men dine tasker har ingen plads til skattekortet.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Dine tasker er fulde. Din belønning er sendt til din postkasse: {items}.",
       "treasureMapRead": "Du studerer {map}. X'et ligger et eller andet sted i {zone}.",
       "treasureMapUpgraded": "Kortet tegnes på finere blæk: det er nu en {map}.",
       "treasureVaultOpened": "Jorden giver efter. Et begravet skattkammer ligger åbent foran dig.",
@@ -12978,7 +12984,7 @@ export const da_DK: EnTranslations = {
       "sellJunk": "Sælg skrammel",
       "sellJunkAria": "Sælg alt skrammel for {price}",
       "sellJunkHint": "Sælger alle grå genstande i dine tasker undtagen questgenstande.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "Usignerede grå genstande kommer ikke på tilbagekøbslisten, så salget af dem kan ikke fortrydes."
     },
     "market": {
       "title": "Verdensmarkedet",
@@ -13283,12 +13289,12 @@ export const da_DK: EnTranslations = {
         "description": "Reducerer den skade, du tager, med 60% i 8 sek., men forhindrer angreb, mens den er aktiv."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Spil død",
+        "description": "Fald til jorden og spil død: dit helbred og fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller en anden evne afslutter det. Kast igen for at rejse dig."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktisk Camouflage",
+        "description": "Fald i ét med omgivelserne: fjender bemærker dig knap nok, og du bevæger dig med 80% hastighed. Angreb eller modtaget skade bryder Taktisk Camouflage. Kast igen for at træde frem. (Feltkunst)"
       },
       "frostjaw_trap": {
         "name": "Frostkæbefælde",
@@ -14085,7 +14091,7 @@ export const da_DK: EnTranslations = {
         "description": "Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til {duration} sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Sporeheling",
         "description": "Helbreder målet for {damage} over 12 sek.",
         "specNote_restoration": "Hver kastning giver 1 Grønske (maks. 3), også når den fornyer en blomstring, der allerede virker. Ved 3 Grønske bliver Hurtig heling til Overblomstring."
       },
@@ -14124,9 +14130,9 @@ export const da_DK: EnTranslations = {
         "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod (maks. 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Krads",
+        "description": "Riv gennem nærliggende mål inden for 6 yards for våbenskade plus {damage}. Giver 1 kombopoint pr. ramt mål. Afslører snigende fjender i området. Kun i Katteform.",
+        "specNote_feral": "Hvert træffende slag giver 1 Gammelt Blod (maks. 3)."
       },
       "ferocious_bite": {
         "name": "Blodbid",
@@ -14411,8 +14417,8 @@ export const da_DK: EnTranslations = {
       },
       "swiftmend": {
         "name": "Hurtig heling",
-        "description": "Forbruger en helbredelse-over-tid-effekt på et venligt mål for at helbrede det for {damage}. Hver kastning af Sporemending, Anden Blomstring og Vildlægning giver 1 Grønske; ved 3 Grønske bliver denne knap til Overblomstring, som øjeblikkeligt helbreder hver allieret, der bærer dine helbredelse-over-tid-effekter, for 60% af det, de effekter havde tilbage. (Lundhjerte-motoren)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Forbruger en helbredelse-over-tid-effekt på et venligt mål for at helbrede det for {damage}. Hver kastning af Sporeheling, Anden Blomstring og Vildlægning giver 1 Grønske; ved 3 Grønske bliver denne knap til Overblomstring, som øjeblikkeligt helbreder hver allieret, der bærer dine helbredelse-over-tid-effekter, for 60% af det, de effekter havde tilbage. (Lundhjerte-motoren)",
+        "specNote_restoration": "Bruger en heling-over-tid-effekt på et venligt mål for at hele det for {damage}. Sporeheling og plantninger fra Anden Blomstring giver Grønske; ved 5 Grønske bliver denne knap til Overblomstring, som straks heler alle allierede med dine heling-over-tid-effekter for 60% af deres resterende heling. (Lundhjertets signaturevne)"
       },
       "moonlash": {
         "name": "Månebølge",
@@ -14439,26 +14445,26 @@ export const da_DK: EnTranslations = {
         "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Lundhjerte)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Sporehelerform",
+        "description": "Skift form til en sporeheler: din heling øges med 20% og din rustning med 40%, men din bevægelseshastighed sænkes med 20%. Alle dine besværgelser fra din normale kasterform kan stadig bruges. Varer, indtil du skifter ud af formen. Et skift til enhver form giver Luntende Skridt, en kort stigning i bevægelseshastigheden. Kast igen for at vende tilbage til kasterform. (Lundhjertets signaturevne)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Sporebrist",
+        "description": "Fremkalder en sporeknold i målområdet. Efter {duration} sek. brister den, heler allierede for {healing} og giver fjender inden for 8 yards {damage} naturskade.",
+        "specNote_balance": "Ved 3 Måneflod er den 25% stærkere og bruger din Måneflod.",
+        "specNote_restoration": "Giver også Sporeheling til hver allieret, den heler. Ved fuld Grønske er den 25% stærkere og bruger din Grønske."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Naturens velsignelse",
+        "description": "Dine besværgelser kan klargøre Naturens velsignelse i 10 sek.: den angivne besværgelse bliver gratis, 25% stærkere og kan kastes i enhver form. En ny udløsning genopfrisker varigheden.",
+        "specNote_feral": "Hvert nærkampsautoangreb, der rammer, har 1 ud af 15 chance for at klargøre den til Sporeheling, eller til Egehud i Bruin-form.",
+        "specNote_balance": "Hvert Vildlyn eller Himmelfald, du kaster, har 10% chance for at klargøre den til Sporebrist, højst én gang hvert 10. sek.",
+        "specNote_restoration": "Hvert tik af dine heling-over-tid-effekter har 10% chance for at klargøre den til Sporebrist, højst én gang hvert 10. sek."
       },
       "overbloom": {
         "name": "Overblomstring",
-        "description": "Forbruger 3 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Sporemending på målet.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "Forbruger 3 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Sporeheling på målet.",
+        "specNote_restoration": "Bruger dine 5 Grønske: hver allieret med dine heling-over-tid-effekter heles straks for {buff}% af den heling, effekterne havde tilbage. Effekterne fjernes, og målet får en ny Sporeheling."
       },
       "summon_imp": {
         "name": "Tilkald Emberkin",
@@ -19098,10 +19104,10 @@ export const da_DK: EnTranslations = {
         "name": "Sendebudets Gemme"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Trofækranie"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Kraniepose"
       },
       "clue_scroll": {
         "name": "Vejlednings Rulle"
@@ -24117,9 +24123,9 @@ export const da_DK: EnTranslations = {
         "body": "Hvælvingen blev ryddet, men din andel blev ikke samlet fra kisten. Ravnene har bragt det til dig her, med de varer og mønter, du tjente, vedlagt.\n\n- Ravenposten"
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "Ravneposten",
+        "subject": "Din verdensopgavebelønning",
+        "body": "Dine tasker var fulde, da du optjente denne verdensopgavebelønning, så ravnene har bragt den hertil i stedet. Gør plads, og hent den ved en hvilken som helst ravnesøjle.\n\n- Ravneposten"
       }
     },
     "itemSets": {
@@ -24255,7 +24261,7 @@ export const da_DK: EnTranslations = {
       },
       "grovespring": {
         "name": "Grovespring-dragt",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus2": "Hurtig heling bruger først din egen Sporeheling eller Anden Blomstring og heler 25 procent mere. Modtaget skade forsinker ikke længere dine besværgelser.",
         "bonus4": "Overbloom høster 75 procent af dine resterende effekter og oplagrer derefter 1 Verdance."
       },
       "hexthread": {

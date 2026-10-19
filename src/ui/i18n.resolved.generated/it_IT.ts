@@ -418,13 +418,13 @@ export const it_IT: EnTranslations = {
       "heroicClears": "{count} Eroico",
       "normalClears": "{count} Normale",
       "viewPossibleLoot": "Visualizza il bottino possibile",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Preferenza del bottino",
+      "allClassGear": "Equipaggiamento di tutte le classi",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "Vale solo per i forzieri non ancora aperti.",
+      "noFocusedLoot": "Nessun bottino idoneo. Scegli un'altra preferenza.",
+      "rolledFocus": "Estratto per: {focus}",
       "chooseTable": "Seleziona da quale tabella estrarre",
       "selectAllTables": "Seleziona tutto",
       "selectedTables": "{count} tabelle selezionate",
@@ -446,8 +446,8 @@ export const it_IT: EnTranslations = {
         "worldMany": "{count} missioni mondiali completate",
         "pvpOne": "{count} incontro classificato vinto",
         "pvpMany": "{count} incontri classificati vinti",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} vittoria PvP",
+        "pvpWinMany": "{count} vittorie PvP"
       },
       "requiredTask": {
         "raidOne": "Supera {count} scontro d'incursione",
@@ -458,8 +458,8 @@ export const it_IT: EnTranslations = {
         "worldMany": "Completa {count} missioni mondiali",
         "pvpOne": "Vinci {count} incontro classificato",
         "pvpMany": "Vinci {count} incontri classificati",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Ottieni {count} vittoria PvP",
+        "pvpWinMany": "Ottieni {count} vittorie PvP"
       },
       "readyWeeks": "Settimane non ritirate: {count}. Ritira prima la settimana completata più vecchia.",
       "claimLastWeek": "Ritira la ricompensa della settimana scorsa",
@@ -522,12 +522,12 @@ export const it_IT: EnTranslations = {
       "castingOff": "Il traghetto per {dest} sta salpando",
       "boardHint": "Sali sul suo ponte quando salpa. La traversata è gratuita.",
       "sailing": "In navigazione verso {dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "Traghetto da {port} a {dest}",
+      "portTitle": "Imbarcadero di {port}",
+      "destination": "Destinazione: {dest}",
+      "boardNow": "Sali ora",
+      "arrivesIn": "Il traghetto arriva tra {time}",
+      "scheduleUnavailable": "Orari del traghetto non disponibili."
     },
     "materialStackSelectionUnavailable": "Quella selezione di materiali non è più disponibile.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const it_IT: EnTranslations = {
       "banner": "Stai osservando {name}"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Messaggio del giorno: {text}",
+      "updated": "Messaggio del giorno aggiornato.",
+      "cleared": "Messaggio del giorno cancellato.",
+      "none": "Nessun messaggio del giorno impostato.",
+      "usage": "Uso: /motd \"<messaggio>\" per impostarlo, /motd clear per cancellarlo.",
+      "tooLong": "Il messaggio del giorno è limitato a {max} caratteri.",
+      "saveFailed": "Impossibile salvare il messaggio del giorno: andrà perso al riavvio."
     },
     "readyCheck": {
       "title": "Controllo pronto",
@@ -619,11 +619,11 @@ export const it_IT: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "Resurrezione PvP",
+      "pvpResurrectTitle": "Risorgi al cimitero più vicino con salute piena, senza un nuovo Tributo del Custode.",
+      "pvpResurrectWaitButton": "Resurrezione PvP ({seconds})",
+      "pvpResurrectWaitNote": "Potrai risorgere in PvP tra {seconds}: risorgerai al cimitero più vicino.",
+      "pvpResurrectReadyNote": "Resurrezione PvP pronta: risorgerai al cimitero più vicino.",
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",
       "ghostHint": "Corri fino al luogo della tua morte oppure parla con il Custode Pallido per rivivere",
       "spiritHealerAlive": "Il Custode Pallido veglia sui morti. Tu sei ancora tra i vivi.",
@@ -641,7 +641,7 @@ export const it_IT: EnTranslations = {
       "healerConfirmCancel": "Annulla"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Ripristino della grafica"
     },
     "wiki": {
       "confirmTitle": "Aprire la Wiki?",
@@ -2155,7 +2155,7 @@ export const it_IT: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Descrizioni degli incantesimi al passaggio del cursore",
       "clickMoveLeft": "Clic sinistro",
       "clickMoveRight": "Clic destro",
       "version": "v{version} ({build})",
@@ -2269,7 +2269,7 @@ export const it_IT: EnTranslations = {
       "confirmVendorSellNote": "Disattivandolo, gli oggetti vengono venduti con un solo clic e senza conferma, quindi uno slot della borsa spostato potrebbe far vendere l'oggetto sbagliato.",
       "confirmVendorSellMinQuality": "Conferma le vendite dalla qualità",
       "confirmVendorSellMinQualityNote": "Gli articoli di qualità inferiore a questa vengono venduti con un solo clic; un articolo venduto erroneamente può ancora essere riacquistato dal venditore.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Gli oggetti sotto questa qualità si vendono con un clic. Puoi ricomprare quelli venduti per errore, tranne gli oggetti grigi non firmati.",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
@@ -2290,9 +2290,9 @@ export const it_IT: EnTranslations = {
       "showUtilityModes": "Includi modalità furtività e viaggio",
       "showFriendlyTrack": "Mostra i miei benefici sugli alleati",
       "showShieldTrack": "Mostra i miei scudi",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Testo di combattimento classico",
       "waterRipples": "Increspature dell'acqua (scie)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Effetti degli incantesimi",
       "actionCam": "Telecamera d'Azione",
       "actionCamShoulder": "Spalla della Telecamera d'Azione",
       "actionCamShoulderLeft": "Sinistra {pct}",
@@ -2816,7 +2816,7 @@ export const it_IT: EnTranslations = {
         "worldKill": "uccisione in PvP Mondiale",
         "worldAssist": "assistenza a un'uccisione in PvP Mondiale",
         "hillHold": "controllo della collina",
-        "worldQuest": "world quest"
+        "worldQuest": "missione mondiale"
       },
       "floatReasons": {
         "kill": "Uccisione",
@@ -2826,11 +2826,11 @@ export const it_IT: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Ottieni titoli permanenti dopo {thresholds} di gioco con PvP mondiale attivo nel mondo aperto o nelle istanze PvP. Disconnessione, morte, istanze PvE e santuari sospendono il timer. Disattivarlo lo azzera.",
+      "rewardPaused": "Serie PvP attuale: {time} di gioco (in pausa in un santuario)",
+      "rewardPausedDead": "Serie PvP attuale: {time} di gioco (in pausa durante la morte)",
+      "rewardPausedInstance": "Serie PvP attuale: {time} di gioco (in pausa nelle istanze PvE)",
+      "rewardProgress": "Serie PvP attuale: {time} di gioco",
       "tab": "PvP Mondiale",
       "title": "PvP Mondiale",
       "blurb": "Alza la tua bandiera per combattere altri giocatori contrassegnati ovunque nel mondo aperto. Sconfiggine uno e prendi una quota della sua borsa, più Onore per l'equipaggiamento da Guerra. I campi di battaglia e le arene pagano comunque di più.",
@@ -2849,8 +2849,8 @@ export const it_IT: EnTranslations = {
       "markLine": "Attaccare lì un giocatore senza bandiera alza la tua; attaccarne uno contrassegnato non lo fa mai.",
       "aidLine": "Curare, proteggere o potenziare un giocatore contrassegnato in uno scontro nel mondo alza la tua bandiera.",
       "stakeLine": "Il perdente paga {cap} o il {percent} della sua borsa, qualunque sia minore.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "Se siete entrambi contrassegnati, l'oro del colpo mortale cade sul corpo insieme al teschio dello sconfitto.",
+      "skullName": "Teschio di {name}",
       "noStakeLine": "Un giocatore senza bandiera ucciso in terreno a tutti contro tutti non perde oro.",
       "noTakeLine": "Anche un combattente senza bandiera non prende oro: si sposta solo tra due giocatori contrassegnati.",
       "honorLine": "{honor} Onore per uccisione, diviso tra chiunque abbia aiutato.",
@@ -2880,8 +2880,8 @@ export const it_IT: EnTranslations = {
       "countsHolding": "Dentro: tu {yours}, rivale {theirs}",
       "contestYou": "Stai conquistando la collina: {seconds} di {total}",
       "contestOther": "Stai perdendo la collina: {seconds} di {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "In pausa: {seconds} su {total}",
+      "contestOtherPaused": "Rivale in pausa: {seconds} su {total}",
       "contestNone": "Mantieni la maggioranza all'interno per {total} per conquistarla",
       "inside": "Sei dentro il cerchio",
       "distance": "{yards} m al cerchio",
@@ -2890,27 +2890,27 @@ export const it_IT: EnTranslations = {
       "standingRaid": "I membri di un'incursione non contano: solo i gruppi possono detenere la collina"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Sacca dei Teschi",
+      "total": "Teschi: {count}",
+      "close": "Chiudi la Sacca dei Teschi",
+      "clickOpen": "Fai clic per aprire",
+      "notCarried": "Tieni la Sacca dei Teschi nelle borse per depositare o prelevare teschi.",
+      "empty": "Vuota. Finché porti la sacca, i teschi raccolti vi entrano direttamente.",
+      "unrecorded": "Teschio Trofeo",
+      "store": "Deposita i teschi trasportati ({count})",
+      "storeNone": "Nessun teschio da depositare",
+      "takeOne": "Preleva 1",
+      "takeAll": "Preleva tutti",
+      "takeOneAria": "Preleva 1: {item}",
+      "takeAllAria": "Preleva tutti: {item}",
+      "tooltip": "Contiene un numero illimitato di Teschi Trofeo senza occupare spazio nelle borse. Finché è nelle borse, i teschi raccolti vi entrano direttamente. Fai clic sulla sacca per depositare o prelevare teschi."
     },
     "warfareShop": {
       "gossipOption": "Sfoglia i Set da Guerra",
       "gossipOptionAria": "Sfoglia il negozio di set da Guerra offerto da {name}",
       "jewelry": "Gioielli",
       "weapons": "Armi",
-      "goods": "Goods",
+      "goods": "Merci",
       "groupSeason2": "Stagione di Guerra 2: Avanguardia",
       "groupEntry": "Stagione di Guerra 1",
       "owned": "Posseduto",
@@ -2951,12 +2951,12 @@ export const it_IT: EnTranslations = {
       "hint": "Trova il terreno che questa mappa mostra, stai in piedi sulla X, e usa la mappa di nuovo per scavare. Un tesoro sepolto si apre per te e il tuo gruppo.",
       "upgradeNote": "Ridisegnarla come una mappa {rarity} richiede {inks} Inchiostri del Cartografo (ne possiedi {held}). I quartiermaster della fazione li vendono.",
       "upgradeMaxed": "Nessun cartografo potrebbe migliorare questa mappa.",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Su quale mappa vuoi usare l'Inchiostro del Cartografo?",
+      "inkPickerHeld": "Possiedi {held} di Inchiostro del Cartografo.",
+      "inkPickerRead": "In corso: la sua X è in {zone}. La X resta ferma.",
+      "inkPickerUnread": "Non letta ({count} possedute)",
+      "inkPickerCost": "Ridisegna in {rarity}: {inks} inchiostro",
+      "inkPickerCancel": "Annulla",
       "rarity": {
         "common": "Comune",
         "rare": "Raro",
@@ -3673,8 +3673,8 @@ export const it_IT: EnTranslations = {
       "resetDone": "Tutte le istanze sono state reimpostate.",
       "resetNone": "Non hai istanze da reimpostare.",
       "resetOccupied": "Non puoi reimpostare le istanze mentre c'è ancora qualcuno all'interno.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "Cambio di difficoltà in attesa perché qualcuno o il suo cadavere è ancora dentro. Verrà applicato quando le istanze saranno vuote.",
+      "queuedCancelled": "Cambio di difficoltà in attesa annullato perché il gruppo o il capogruppo è cambiato.",
       "resetSameDifficulty": "Cambia la difficoltà del dungeon prima di reimpostare queste istanze. Le istanze vuote si reimpostano automaticamente dopo 5 minuti.",
       "resetLoot": "Non puoi reimpostare le istanze mentre c'è ancora del bottino all'interno.",
       "resetConfirmTitle": "Reimpostare tutte le istanze?",
@@ -3691,7 +3691,7 @@ export const it_IT: EnTranslations = {
       "dragEquipHint": "Trascina sul personaggio per equipaggiare",
       "dragDestroyHint": "Trascina nel mondo per distruggere",
       "reorderNeedsRecent": "Rimuovi il filtro e ordina per Recenti per riorganizzare le borse",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Gli oggetti bloccati restano nel loro scomparto. Sbloccali per spostarli.",
       "itemAriaInstanced": "{item}, quantita {count}, copia con marchio del creatore",
       "itemAriaEnchanted": "{item}, quantita {count}, copia incantata",
       "itemAriaBound": "{item}, quantita {count}, copia vincolata",
@@ -4077,7 +4077,7 @@ export const it_IT: EnTranslations = {
       "duskEconomy": "Le abilità costano il {pct}% di energia in meno",
       "moontide": "Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono",
       "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Gatto e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
-      "verdance": "Verzura {stacks}/{max}. Ogni Sporemending, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
+      "verdance": "Verzura {stacks}/{max}. Ogni Cura delle Spore, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
       "freeExecute": "La tua prossima abilità di esecuzione idonea non costa nulla",
       "resourceSap": "Ripristina {value} della tua risorsa attuale ogni {interval} sec",
       "nextAttackCrit": "Il tuo prossimo attacco è garantito come colpo critico",
@@ -4179,7 +4179,7 @@ export const it_IT: EnTranslations = {
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "formFireball": "Forma Brace: velocità di movimento aumentata del {pct}%; attacchi e incantesimi disabilitati",
       "formMoonkin": "Forma di Lunagufo: danni degli incantesimi aumentati del {pct}% e armatura aumentata del {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Forma di Curatore delle Spore: cure aumentate del {pct}%, armatura aumentata del {armorPct}% e velocità di movimento ridotta del {slowPct}%",
       "formShadow": "Forma d'Ombra: danni da Ombra aumentati del {pct}%",
       "resourceCount": "{value} su {max}",
       "formLich": "Soul Lance colpisce anche fino a {targets} nemici vicini per il {pct}% dei danni",
@@ -4266,7 +4266,7 @@ export const it_IT: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
-      "bountyTag": "Bounty",
+      "bountyTag": "Taglia",
       "cheaterTag": "< Baro >",
       "pledgeTag": "Giuramento a {guild}",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const it_IT: EnTranslations = {
       "wrongKind": "Quel codice è un'esportazione delle impostazioni, non una configurazione dei tasti rapidi."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Disposizione della tastiera",
+      "open": "Converti",
+      "from": "Scorciatoie create per",
+      "to": "Converti in",
+      "keepMovement": "Mantieni fermi i tasti di movimento",
+      "keepMovementLocked": "I tasti di movimento sono rimasti fermi l'ultima volta, quindi resteranno fermi anche stavolta. Ripristina i valori predefiniti per ricominciare.",
+      "help": "Ogni scorciatoia passa al tasto che scrive lo stesso carattere nella nuova disposizione. La fila dei numeri resta al suo posto. I nomi in questo elenco indicano posizioni QWERTY; la panoramica della tastiera mostra la tua disposizione.",
+      "moves": "Scorciatoie che si sposteranno: {count}",
+      "noChange": "Nessuna scorciatoia cambia tra queste disposizioni.",
+      "apply": "Converti scorciatoie",
+      "converted": "Scorciatoie convertite da {from} a {to}.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (Stati Uniti)",
+        "qwertyUk": "QWERTY (Regno Unito)",
+        "qwertzDe": "QWERTZ (tedesca)",
+        "qwertzCh": "QWERTZ (svizzera)",
+        "azertyFr": "AZERTY (francese)",
+        "azertyBe": "AZERTY (belga)",
+        "qwertyEs": "QWERTY (spagnola)",
+        "qwertyIt": "QWERTY (italiana)",
+        "qwertyNordic": "QWERTY (svedese, finlandese)",
+        "qwertyDa": "QWERTY (danese)",
+        "qwertyNo": "QWERTY (norvegese)",
+        "qwertyBr": "QWERTY (brasiliana ABNT2)",
+        "qwertyPt": "QWERTY (portoghese)",
+        "qwertyTr": "QWERTY (turca)",
+        "dvorak": "Disposizione Dvorak",
+        "colemak": "Disposizione Colemak"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const it_IT: EnTranslations = {
       "perfectedBadge": "Perfezionato",
       "perfectingRank": "Perfezionamento: grado {rank} di {ranks}",
       "materialSourceGatherer": "{count} × Raccolto da {name}",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × Preso da {name}",
       "materialSourceGathererSigned": "{count} × Raccolto da {name}, firmato da {signer}",
       "materialSourceUnrecorded": "{count} × Raccoglitore non registrato",
       "materialSourceUnrecordedSigned": "{count} × Raccoglitore non registrato, firmato da {name}",
@@ -5457,12 +5457,16 @@ export const it_IT: EnTranslations = {
       "enchant_weapon_piston_drive": "Incide permanentemente un'arma a due mani con 12 Forza e 25 Indice di Critico. Non può essere applicato a un'arma a una mano. Un bonus fisso: non scala."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "La tua Pietra del Ritorno Alleata non è vincolata. Parla con un quartiermastro alleato o usala in un centro alleato.",
+      "hearthstoneBound": "La tua Pietra del Ritorno Alleata è ora vincolata a {hub}.",
+      "hearthstoneTransport": "La pietra del ritorno ti trasporta a {hub}.",
+      "itemCooldown": "L'oggetto non è ancora pronto ({minutes} min rimanenti).",
       "alliedHearthstoneUse": "Uso: Ti teletrasporta al tuo fulcro fazione sintonizzato. (10 sec di lancio, 15 min di recupero)",
       "alliedHearthstoneAttuned": "Sintonizzato a: {hub}",
       "hub_none": "Nessuno (Usalo vicino a un fulcro fazione per sintonizzarti)",
       "hub_rift_watch": "Drifthaven (La Guardia dei Rifti)",
       "hub_church_order": "Valle di Eastbrook (L'Ordine della Chiesa)",
-      "hub_automatons": "South Reach (La Fonderia Automa)",
+      "hub_automatons": "Wyrmwatch (Automi)",
       "riftGliderUse": "Uso: Dispone il deltaplano, rallentando la caduta per 30 sec. L'atterraggio o il danno cancella l'effetto. (2 min di recupero)",
       "targetDummyUse": "Uso: Dispone un bersaglio meccanico nel mondo aperto per 2 minuti per praticare le abilità di combattimento. (5 min di recupero)",
       "battleStandardUse": "Uso: Pianta lo Stendardo di Battaglia della Consecrated Dawn per 5 minuti, aumentando significativamente la rigenerazione della salute e della mana fuori dal combattimento per tutti gli alleati vicini. Rimanere vicino ad esso per 10 secondi concede anche la Benedizione dell'Alba (+5% a tutte le statistiche per 30 min). (5 min di recupero)",
@@ -5826,8 +5830,8 @@ export const it_IT: EnTranslations = {
     "pattern": {
       "teaches": "Uso: ti insegna a creare {item}.",
       "teachesEnchant": "Uso: ti insegna ad applicare {enchant}.",
-      "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagents": "{label}: {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Scioglimento: {name}",
@@ -7428,7 +7432,7 @@ export const it_IT: EnTranslations = {
       "rowCameraSpeed": "Quanto rapidamente ruota la telecamera quando ti guardi attorno con il mouse.",
       "rowTouchLookSpeed": "La stessa cosa per la visuale a scorrimento, e appare solo quando sei su un touchscreen.",
       "rowFullscreen": "Riempie l'intero schermo con il gioco.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "Bagliori, scintille, proiettili ed esplosioni d'impatto degli incantesimi dei giocatori e dei loro famigli, inclusi i tuoi. Disattiva per uno schermo più tranquillo o qualche fotogramma in più nei grandi scontri di gruppo. Tutti gli incantesimi nemici restano visibili, come gli anelli di pericolo, i simboli sui bersagli storditi, impauriti o immobilizzati e ogni barra di lancio.",
       "rowWaterRipples": "Scie e increspature che si allargano dietro di te mentre nuoti. Disattivate di default, ed è l'unico effetto dell'acqua che costa davvero fotogrammi; spruzzi e bolle non ne risentono in ogni caso.",
       "rowOverflowXp": "Al livello massimo, se la tua barra continua a riempirsi con l'esperienza eccedente oppure mostra invece il classico testo statico di livello massimo.",
       "rowInterfaceMode": "Se ottieni l'interfaccia desktop o i controlli touch a schermo. Auto legge il tuo dispositivo, ma puoi forzare entrambi: un tablet con tastiera può usare il layout desktop, e un laptop touchscreen può usare i controlli touch.",
@@ -7481,7 +7485,7 @@ export const it_IT: EnTranslations = {
       "ifMouseoverCast": "Permette a una cura o a un incantesimo amico di colpire il riquadro del gruppo su cui passi il mouse, senza cambiare il tuo bersaglio.",
       "ifStickyTarget": "Mantiene il tuo bersaglio attuale quando fai clic su terreno vuoto, invece di rimuoverlo.",
       "ifFctScale": "La dimensione dei numeri di danno e cura che fluttuano dal tuo bersaglio.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Ripristina i semplici numeri di danno bianchi e oro pallido che salgono dritti. Lascia disattivato (impostazione predefinita) per numeri più marcati che si aprono sui lati, con bagliori per i colpi critici e insolitamente grandi.",
       "ifExtraBars": "Rivela una seconda fila della barra delle azioni, e una terza una volta attivata la seconda. Gli slot restano raggiungibili tramite i loro tasti assegnati anche quando le file sono nascoste.",
       "ifHideUnused": "Nasconde gli slot azione vuoti così vengono disegnati solo i pulsanti che usi davvero.",
       "ifLockBars": "Blocca le tue barre così non puoi trascinare per sbaglio un'abilità fuori da uno slot.",
@@ -7912,14 +7916,14 @@ export const it_IT: EnTranslations = {
         "form_bear": "La forma da tank: una pelle spessa, rabbia al posto del mana, e minaccia extra così i nemici continuano ad attaccarti.",
         "form_cat": "La forma da danno in mischia: energia e punti combo, come un ladro, e molta meno minaccia.",
         "form_travel": "La forma da viaggio: molto più veloce sul terreno, ma nessun'altra abilità finché non ne esci.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "La forma curativa di Ripristino: pelle più resistente e cure più potenti a passo più lento, mantenendo tutti gli incantesimi e il mana."
       },
       "mageEleSummon": "Un incantesimo di Gelo che richiama l'elementale al tuo fianco e lo indirizza contro il tuo bersaglio.",
       "formName": {
         "form_bear": "Forma di Bruin",
         "form_cat": "Forma del Gatto",
         "form_travel": "Forma di Fleet",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Forma di Curatore delle Spore"
       }
     },
     "classHook": {
@@ -8622,7 +8626,7 @@ export const it_IT: EnTranslations = {
       "formBear": "Forma di Bruin",
       "formCat": "Forma del Gatto",
       "formTravel": "Forma di Fleet",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Forma di Curatore delle Spore",
       "groupCreatures": "Creature",
       "groupPets": "Demoni dello Stregone",
       "pickerLabel": "Scegli un modello da visualizzare",
@@ -9142,7 +9146,7 @@ export const it_IT: EnTranslations = {
       "buyingBody": "Parla con un mercante e scegli di sfogliare la sua merce, e il suo negozio si apre con tre schede: Sfoglia, Vendi e Riacquisto. Sfoglia contiene tutto ciò che tiene in magazzino, tuo se puoi permettertelo. Vendi elenca ciò che nelle tue borse è disposto a pagare, e vendere un pezzo che porta una propria qualità sorteggiata ti chiede prima conferma, così un esemplare pregiato non ti sfugge mai per errore. Se ti separi da qualcosa di cui ti penti, la scheda Riacquisto conserva le tue vendite recenti così puoi ricomprarle per le monete che ti sono state pagate.",
       "junkTitle": "Liberarsi delle cianfrusaglie",
       "junkBody": "Anche gli oggetti che non ti servono si vendono a qualunque venditore, perciò svuota le borse ogni volta che passi per la città invece di lasciarle riempire. La scheda Vendi del venditore tiene persino un pulsante che con un solo clic vende in blocco ogni cianfrusaglia di qualità Scadente. Le cianfrusaglie davvero senza valore possono anche essere scartate del tutto per far spazio.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "Il bottino inutile si vende ancora a qualsiasi mercante con un negozio proprio: svuota le borse quando passi in città. La finestra del mercante ha anche un pulsante Vendi cianfrusaglie che vende tutti gli oggetti di qualità Scadente con un clic. Puoi anche gettare gli oggetti senza valore per fare spazio. Gli oggetti grigi non firmati venduti così non compaiono nell'elenco di riacquisto: controlla prima se volevi conservarne qualcuno.",
       "tradeTitle": "Scambiare con altri giocatori",
       "tradeBody": "Puoi scambiare faccia a faccia con chiunque ti stia vicino. Entrambi mettete oggetti e monete in una finestra condivisa e lo scambio avviene solo dopo che entrambi lo confermate, così nessuno dei due può essere ingannato. È il modo semplice per passare un bottino a un amico o concludere un accordo.",
       "mailTitle": "La Posta del Corvo",
@@ -11231,10 +11235,10 @@ export const it_IT: EnTranslations = {
     "selectClass": "Seleziona una classe.",
     "pickClass": "Scegli una classe.",
     "returnToLogin": "Torna all'accesso",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Cerca aggiornamenti",
+    "noUpdateFound": "Nessun aggiornamento trovato. Riprova tra poco.",
+    "updateUnavailable": "Aggiorna dal tuo negozio di giochi o scarica il client più recente.",
+    "updateSearchFailed": "Impossibile verificare gli aggiornamenti. Riprova.",
     "api": {
       "tooManyAttempts": "Troppi tentativi. Attendi un minuto e riprova.",
       "usernameShape": "Il nome utente deve avere 3-24 caratteri e usare lettere, cifre o trattino basso.",
@@ -12412,6 +12416,8 @@ export const it_IT: EnTranslations = {
       "clueTalkAria": "Chiedi dell'indizio: {name}",
       "clueDeliver": "Consegna {count} {item}.",
       "clueDeliverAria": "Consegna {count} {item} a {name}",
+      "attuneHearthstone": "Vincola qui la mia Pietra del Ritorno Alleata.",
+      "attuneHearthstoneAria": "Vincola la tua Pietra del Ritorno Alleata a {hub} con {name}",
       "profIntroHint": "Vai da {name} per \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Le tre reliquie raccontano la stessa storia: Aldren combatté per difendere il suo re, Malric spezzò il confine della morte e Voss tentò di fermare ciò che seguì. Il sigillo si indebolisce, e la cripta abbandonata è la via verso il basso.",
       "browseGoods": "Fammi vedere la tua merce.",
@@ -12799,7 +12805,7 @@ export const it_IT: EnTranslations = {
       "clueCasketOpened": "Il cofanetto contiene {money} e {items}.",
       "treasureMapEarned": "Tutte le missioni mondiali del giorno sono completate: hai trovato una {map}.",
       "treasureMapLost": "Tutte le missioni mondiali del giorno sono completate, ma la tua borsa non ha spazio per la mappa del tesoro.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Le borse sono piene. La ricompensa è stata inviata alla tua casella postale: {items}.",
       "treasureMapRead": "Studi la {map}. La X si trova da qualche parte in {zone}.",
       "treasureMapUpgraded": "La mappa è ridisegnata con inchiostro più fine: è ora una {map}.",
       "treasureVaultOpened": "Il terreno cede. Un tesoro sepolto si apre davanti a te.",
@@ -12978,7 +12984,7 @@ export const it_IT: EnTranslations = {
       "sellJunk": "Vendi cianfrusaglie",
       "sellJunkAria": "Vendi tutte le cianfrusaglie per {price}",
       "sellJunkHint": "Vende tutti gli oggetti grigi nelle borse tranne gli oggetti di missione.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "Gli oggetti grigi non firmati non compaiono nell'elenco di riacquisto: venderli è irreversibile."
     },
     "market": {
       "title": "Mercato Mondiale",
@@ -13283,12 +13289,12 @@ export const it_IT: EnTranslations = {
         "description": "Riduce i danni subiti del 60% per 8 s, ma impedisce di attaccare mentre è attiva."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Fingere la morte",
+        "description": "Cadi a terra e fingi di essere morto: tutti vedono salute e Concentrazione vuote. I nemici ti dimenticano e i giocatori nemici che ti selezionano perdono il bersaglio. Muoversi, attaccare o usare un'altra abilità termina l'effetto. Usa di nuovo per rialzarti."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Mimetismo Tattico",
+        "description": "Confonditi con l'ambiente: i nemici ti notano appena e ti muovi all'80% della velocità. Attaccare o subire danni interrompe Mimetismo Tattico. Usa di nuovo per uscire. (Sopravvivenza)"
       },
       "frostjaw_trap": {
         "name": "Trappola Fauci di Gelo",
@@ -14085,7 +14091,7 @@ export const it_IT: EnTranslations = {
         "description": "Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a {duration} sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Cura delle Spore",
         "description": "Cura il bersaglio di {damage} in 12 s.",
         "specNote_restoration": "Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva. A 3 Verzura, Rapidità di Guarigione diventa Sovrafioritura."
       },
@@ -14124,9 +14130,9 @@ export const it_IT: EnTranslations = {
         "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Graffio",
+        "description": "Graffia i bersagli vicini entro 6 m, infliggendo danni dell'arma più {damage}. Fornisce 1 punto combo per bersaglio colpito. Rivela i nemici furtivi nell'area spazzata. Solo in Forma Felina.",
+        "specNote_feral": "Ogni colpo riuscito aggiunge 1 Sangue Antico (massimo 3)."
       },
       "ferocious_bite": {
         "name": "Morso Cruento",
@@ -14411,8 +14417,8 @@ export const it_IT: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
-        "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Sporemending, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Cura delle Spore, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)",
+        "specNote_restoration": "Consuma una cura periodica su un bersaglio amico per curarlo di {damage}. Le applicazioni di Cura delle Spore e Seconda Fioritura aggiungono Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura subito ogni alleato con le tue cure periodiche del 60% delle cure rimanenti. (Tratto distintivo di Ripristino)"
       },
       "moonlash": {
         "name": "Ondata Lunare",
@@ -14439,26 +14445,26 @@ export const it_IT: EnTranslations = {
         "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Groveheart)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Forma di Curatore delle Spore",
+        "description": "Assumi la forma di un Curatore delle Spore: cure aumentate del 20% e armatura del 40%, ma velocità di movimento ridotta del 20%. Tutti gli incantesimi della forma da incantatore restano disponibili. Dura finché non cambi forma. Ogni trasformazione fornisce Passo leggero, un breve aumento di velocità. Usa di nuovo per tornare alla forma da incantatore. (Tratto distintivo di Ripristino)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Esplosione di Spore",
+        "description": "Evoca un fungo esplosivo nella zona bersaglio. Dopo {duration} s esplode, curando gli alleati di {healing} e infliggendo {damage} danni da Natura ai nemici entro 8 m.",
+        "specNote_balance": "Con 3 di Marea Lunare è più potente del 25% e consuma la tua Marea Lunare.",
+        "specNote_restoration": "Applica anche Cura delle Spore a ogni alleato curato. Con Verzura pieno è più potente del 25% e consuma il tuo Verzura."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Favore della Natura",
+        "description": "I tuoi incantesimi possono attivare Favore della Natura per 10 s: l'incantesimo indicato diventa gratuito, più potente del 25% e utilizzabile in ogni forma. Una nuova attivazione rinnova la durata.",
+        "specNote_feral": "Ogni attacco automatico in mischia riuscito ha 1 probabilità su 15 di attivarlo per Cura delle Spore, o per Scorza di Quercia in Forma di Bruin.",
+        "specNote_balance": "Ogni Dardo Silvano o Caduta Celeste che lanci ha il 10% di probabilità di attivarlo per Esplosione di Spore, al massimo una volta ogni 10 s.",
+        "specNote_restoration": "Ogni impulso dei tuoi effetti di cura periodica ha il 10% di probabilità di attivarlo per Esplosione di Spore, al massimo una volta ogni 10 s."
       },
       "overbloom": {
         "name": "Sovrafioritura",
-        "description": "Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Sporemending fresca sul bersaglio.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Cura delle Spore fresca sul bersaglio.",
+        "specNote_restoration": "Consuma i tuoi 5 punti di Verzura: ogni alleato con i tuoi effetti di cura periodica riceve subito il {buff}% delle cure rimanenti, gli effetti vengono rimossi e il bersaglio riceve una nuova Cura delle Spore."
       },
       "summon_imp": {
         "name": "Evoca Emberkin",
@@ -19098,10 +19104,10 @@ export const it_IT: EnTranslations = {
         "name": "Riserva dell'Emissario"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Teschio Trofeo"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Sacca dei Teschi"
       },
       "clue_scroll": {
         "name": "Pergamena Indizio"
@@ -24117,9 +24123,9 @@ export const it_IT: EnTranslations = {
         "body": "La volta è stata sgomberata, ma la tua parte non è stata riscossa dal forziere. I corvi te l'hanno portata qui, insieme alle merci e alle monete che hai guadagnato.\n\n- Il Servizio del Corvo"
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "La Posta dei Corvi",
+        "subject": "La tua ricompensa di missione mondiale",
+        "body": "Le tue borse erano piene quando hai ottenuto questa ricompensa di missione mondiale, perciò i corvi l'hanno portata qui. Fai spazio e ritirala da qualsiasi pilastro dei corvi.\n\n- La Posta dei Corvi"
       }
     },
     "itemSets": {
@@ -24255,8 +24261,8 @@ export const it_IT: EnTranslations = {
       },
       "grovespring": {
         "name": "Paramento Grovespring",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Rigoglio."
+        "bonus2": "Rapidità di Guarigione consuma prima la tua Cura delle Spore o Seconda Fioritura e cura il 25 per cento in più. I danni subiti non ritardano più il lancio degli incantesimi.",
+        "bonus4": "Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Verzura."
       },
       "hexthread": {
         "name": "Sudario Hexthread",

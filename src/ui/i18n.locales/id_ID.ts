@@ -50,7 +50,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Gunakan: Memperkuat baju zirah dada Anda, meningkatkan Pertahanan sebesar 50 untuk 1 jam.',
   'hudChrome.factionRewards.battleStandardUse':
     'Gunakan: Menanam Bendera Pertempuran Fajar yang Ditahbiskan selama 10 detik, meningkatkan Kekuatan Serangan untuk semua pemain terdekat sebesar 10% selama 1 menit.',
-  'hudChrome.factionRewards.hub_automatons': 'Jangkauan Selatan (Pendiri Automaton)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automatons)',
   'hudChrome.factionRewards.hub_church_order': 'Lembah Eastbrook (Tatanan Gereja)',
   'hudChrome.factionRewards.hub_none': 'Tidak Ada (Gunakan dekat pusat faksi untuk diselaraskan)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (Pengawas Celah)',
@@ -7851,7 +7851,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Selama 3 detik setelahnya, Wujud Serigala gratis dan menjepit target, memperlambatnya 50% selama 4 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin.',
   'entities.abilities.bear_charge.name': 'Terjangan Bruin',
   'entities.abilities.bear_form.description':
-    'Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Kamu menyerang dua kali lebih cepat dengan setengah kerusakan per ayunan, dan setiap ayunan membangun amarah dua kali lipat. Berubah menjadi wujud apa pun memberikan Langkah Berderap, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal.',
+    'Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Kamu menyerang dua kali lebih cepat dengan setengah kerusakan per ayunan, dan setiap ayunan membangun amarah dua kali lipat. Berubah menjadi wujud apa pun memberikan Langkah Berderap Lambat, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal.',
   'entities.abilities.bear_form.name': 'Wujud Bruin',
   'entities.abilities.berserker_rage.description':
     'Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)',
@@ -8217,7 +8217,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Kucing.',
   'entities.abilities.tigers_fury.name': 'Darah Lynx',
   'entities.abilities.travel_form.description':
-    'Seketika berubah menjadi wujud Fleet yang gesit, meningkatkan kecepatan gerak sebesar 40% dan menghapus efek akar serta perlambatan yang dapat diputus. Kau tidak bisa menggunakan kemampuan lain saat berubah wujud, tetapi bisa berubah masuk atau keluar dari pertempuran, ideal untuk melarikan diri. Berubah menjadi wujud apa pun memberikan Langkah Berderap, ledakan singkat kecepatan gerak.',
+    'Seketika berubah menjadi wujud Fleet yang gesit, meningkatkan kecepatan gerak sebesar 40% dan menghapus efek akar serta perlambatan yang dapat diputus. Kau tidak bisa menggunakan kemampuan lain saat berubah wujud, tetapi bisa berubah masuk atau keluar dari pertempuran, ideal untuk melarikan diri. Berubah menjadi wujud apa pun memberikan Langkah Berderap Lambat, ledakan singkat kecepatan gerak.',
   'entities.abilities.travel_form.name': 'Wujud Fleet',
   'entities.abilities.vanish.description':
     'Menghilang dari pandangan, masuk ke Duskveil bahkan dalam pertempuran. Kau bergerak 50% lebih lambat saat tersembunyi. Bertahan hingga 10 detik.',
@@ -8273,7 +8273,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memajukan satu denyut mendatang dari Pakta Membaramu, lalu membakar sasaran sebesar {damage} kerusakan Api. Menghasilkan 1 Pemusnahan dan 1 Kehancuran. Menampung {charges} muatan. (Ciri khas Penghancuran)',
   'entities.abilities.moonkin_form.name': 'Wujud Burung Bulan',
   'entities.abilities.moonkin_form.description':
-    'Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Berubah menjadi wujud apa pun memberikan Langkah Berderap, ledakan singkat kecepatan gerak. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)',
+    'Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Berubah menjadi wujud apa pun memberikan Langkah Berderap Lambat, ledakan singkat kecepatan gerak. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)',
   'entities.abilities.feral_charge.name': 'Gelora Purba',
   'entities.abilities.feral_charge.description':
     'Lepaskan gelora purba. Dalam Wujud Kucing, regenerasi energi meningkat 100% selama 10 detik. Dalam Wujud Bruin, langsung menghasilkan 50 Amukan. (ciri khas Keganasan)',
@@ -15993,17 +15993,17 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Lepaskan Sang Buas',
   'entities.abilities.wildheart.name': 'Hati Liar',
   'entities.abilities.bloodhook.description':
-    'Menerjang ke arah musuh dan menerapkan Luka Kait Darah, memberi 34 kerusakan Fisik dasar ditambah 26% kekuatan serang jarak jauhmu selama 12 dtk dalam 4 denyut. (Ciri khas Kecakapan Lapangan)',
+    'Menerjang ke arah musuh dan menerapkan Luka Kait Darah, memberi 34 kerusakan Fisik dasar ditambah 26% kekuatan serang jarak jauhmu selama 12 dtk dalam 4 denyut. (Ciri khas Bertahan Hidup)',
   'entities.abilities.bloodtrail_assault.description':
     'Selama 12 dtk, Kait Darah menyebarkan luka berkekuatan 60% ke maksimal 2 musuh di dekatnya, Robek Luka memerintahkan serangan hewan peliharaan sebesar 18 kerusakan, dan Muatan Serpihan bertambah 2 meter, memberi 25% lebih banyak kerusakan dasar ke sasaran utamanya, serta memicu 50% lebih banyak kerusakan luka.',
   'entities.abilities.cold_focus.description':
     'Selama 12 dtk, Tembakan Terukur memulihkan 50% lebih banyak fokus, dan Tarikan Panjang menghabiskan 25% lebih sedikit serta dirapal 30% lebih cepat. (Ciri khas Pandangan Dingin)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Pasif: Putus Jejak menyegarkan Momentum Berburu dan menyiapkan Serangan Pembelah atau Kait Darah berikutnya selama 12 dtk. Serangan Pembelah memberi 15% lebih banyak kerusakan per tumpukan. Kait Darah memberi 18 sampai 24 kerusakan Fisik tambahan, meningkat 15% per tumpukan dan oleh kekuatan serang jarak jauhmu. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Kecakapan Lapangan)',
+    'Pasif: Putus Jejak menyegarkan Momentum Berburu dan menyiapkan Serangan Pembelah atau Kait Darah berikutnya selama 12 dtk. Serangan Pembelah memberi 15% lebih banyak kerusakan per tumpukan. Kait Darah memberi 18 sampai 24 kerusakan Fisik tambahan, meningkat 15% per tumpukan dan oleh kekuatan serang jarak jauhmu. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Bertahan Hidup)',
   'entities.abilities.frostjaw_trap.description':
     'Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
   'entities.abilities.hunting_momentum.description':
-    'Pasif: Serangan Pembelah memberi 1 Momentum Berburu selama 8 dtk, hingga 3. Pada 3 tumpukan, Robek Luka memberi 45% lebih banyak kerusakan serangan dan menghabiskan tumpukan. (Kecakapan Lapangan)',
+    'Pasif: Serangan Pembelah memberi 1 Momentum Berburu selama 8 dtk, hingga 3. Pada 3 tumpukan, Robek Luka memberi 45% lebih banyak kerusakan serangan dan menghabiskan tumpukan. (Bertahan Hidup)',
   'entities.abilities.measured_shot.description':
     'Menembak sasaran sebesar {damage} kerusakan Fisik. Tembakan yang mengenai memulihkan 20 fokus. Kerusakan meningkat dengan kekuatan serang jarak jauh.',
   'entities.abilities.pack_command.description':
@@ -16129,7 +16129,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga {duration} dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan.',
   'entities.abilities.overbloom.name': 'Mekar Raya',
   'entities.abilities.overbloom.description':
-    'Menghabiskan 3 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Sporemending segar pada sasaran.',
+    'Menghabiskan 3 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Pemulihan Spora segar pada sasaran.',
   'entities.abilities.redharvest.name': 'Panen Merah',
   'entities.abilities.redharvest.description':
     'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo.',
@@ -16143,7 +16143,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Darah Tua: tahap {stacks} dari {max}. Serangan Kucing dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi',
   'hudChrome.auraEffect.verdance':
-    'Kehijauan: tahap {stacks} dari {max}. Setiap Sporemending, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya',
+    'Kehijauan: tahap {stacks} dari {max}. Setiap Pemulihan Spora, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya',
   'hudChrome.continentMap.levels': 'Level {min} hingga {max}',
   'hudChrome.continentMap.summary': 'Peta dunia. Pilih zona untuk membuka petanya.',
   'hudChrome.continentMap.title': 'Peta Dunia',
@@ -16687,7 +16687,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Setiap pembuka yang kamu pakai dari Selubung Senja menambah 1 Gloam (maks 3).',
   'entities.abilities.swiftmend.description':
-    'Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Setiap rapalan Sporemending, Mekar Kedua, dan Penyembuhan Liar menambah 1 Kehijauan; pada 3 Kehijauan tombol ini berubah menjadi Mekar Raya, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)',
+    'Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Setiap rapalan Pemulihan Spora, Mekar Kedua, dan Penyembuhan Liar menambah 1 Kehijauan; pada 3 Kehijauan tombol ini berubah menjadi Mekar Raya, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)',
   'entities.abilities.swipe.description':
     'Sapukan cakarmu melalui musuh terdekat sebesar {damage} kerusakan. Menimbulkan ancaman ekstra. Hanya dalam Wujud Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -20027,4 +20027,192 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Seret untuk mengubah ukuran bilah sisi peta. Klik dua kali untuk mengatur ulang.',
   'guide.worldPvpPage.hillBodyFlat':
     'Sekali setiap tiga jam, pada waktu yang tidak dapat diprediksi, seluruh realm diberi tahu bahwa sebuah bukit akan muncul di salah satu zona pertempuran bebas dalam lima belas menit, dan lingkarannya ditandai di tanah terbuka. Bukit bertahan selama empat puluh lima menit, lalu menghilang. Selama itu, setiap lima menit lokasi dan kelompok dengan total waktu penguasaan terlama diumumkan. Kelompok dengan pemain terbanyak di dalam lingkaran memperebutkan bukit dan merebutnya setelah mengumpulkan tiga puluh detik keunggulan jumlah. Kedatangan kelompok lawan hanya menjeda hitungan sampai kelompokmu kembali unggul; hitungan hanya diulang dari awal jika tidak ada anggota kelompokmu yang masih hidup di dalam. Pemain sendirian dihitung sebagai kelompok beranggotakan satu orang dan tetap menguasai bukit saat membentuk kelompok, tetapi anggota raid tidak dihitung sama sekali. Setiap anggota kelompok penguasa yang berdiri di dalam mendapat jumlah Kehormatan yang sama setiap menit, berapa pun lamanya mereka menguasai bukit. Kelompok penuh yang menguasainya tanpa gangguan selama seluruh masa bukit mendapat kira-kira setara tiga kemenangan medan perang. Saat bukit menghilang, jika kelompok dengan total penguasaan terlama telah menguasainya setidaknya sepuluh menit, semua pemain yang berdiri di dalam setidaknya satu menit selama penguasaan kelompok itu dan masih tergabung di dalamnya mendapat satu kemenangan untuk baris PvP Gudang Mingguan. Bilah di atas medan menunjukkan penguasa, jumlah pemain kedua pihak, dan hitungan perebutan; /hill di obrolan menunjukkan lokasinya.',
+  'errors.noUpdateFound': 'Tidak ada pembaruan. Coba lagi sebentar lagi.',
+  'errors.searchUpdates': 'Cari pembaruan',
+  'errors.updateSearchFailed': 'Tidak dapat memeriksa pembaruan. Silakan coba lagi.',
+  'errors.updateUnavailable': 'Perbarui melalui toko gim atau unduh klien terbaru.',
+  'hudChrome.auraEffect.formSporemender':
+    'Wujud Penyembuh Spora: penyembuhan meningkat {pct}%, zirah meningkat {armorPct}%, dan kecepatan gerak berkurang {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Barang terkunci tetap di slot tasnya. Buka kuncinya untuk memindahkannya.',
+  'hudChrome.death.pvpResurrect': 'Bangkit PvP',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Bangkit PvP siap: kamu akan bangkit di pemakaman terdekat.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Bangkit di pemakaman terdekat dengan kesehatan penuh tanpa Beban Penjaga yang baru.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Bangkit PvP ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Kamu dapat Bangkit PvP dalam {seconds}: kamu akan bangkit di pemakaman terdekat.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Perubahan kesulitan tertunda dibatalkan karena kelompok atau pemimpinnya berubah.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Perubahan kesulitan diantrekan karena masih ada seseorang atau jasadnya di dalam. Perubahan berlaku setelah semua instans kosong.',
+  'hudChrome.ferry.arrivesIn': 'Feri tiba dalam {time}',
+  'hudChrome.ferry.boardNow': 'Naik sekarang',
+  'hudChrome.ferry.destination': 'Tujuan: {dest}',
+  'hudChrome.ferry.portLabel': 'Feri {port} menuju {dest}',
+  'hudChrome.ferry.portTitle': 'Pelabuhan feri {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Jadwal feri tidak tersedia.',
+  'hudChrome.graphicsRestore.note': 'Memulihkan grafis',
+  'hudChrome.hill.contestOtherPaused': 'Lawan dijeda: {seconds} dari {total}',
+  'hudChrome.hill.contestYouPaused': 'Dijeda: {seconds} dari {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Diambil dari {name}',
+  'hudChrome.keybindLayout.apply': 'Konversi pintasan',
+  'hudChrome.keybindLayout.converted': 'Pintasan dikonversi dari {from} ke {to}.',
+  'hudChrome.keybindLayout.from': 'Pintasan dibuat untuk',
+  'hudChrome.keybindLayout.help':
+    'Setiap pintasan berpindah ke tombol yang menghasilkan karakter sama pada tata letak baru. Baris angka tetap di tempatnya. Nama tombol dalam daftar ini adalah posisi QWERTY; gambar papan ketik menampilkan tata letakmu.',
+  'hudChrome.keybindLayout.keepMovement': 'Pertahankan posisi tombol gerak',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Tombol gerak dipertahankan sebelumnya, jadi posisinya tetap dipertahankan. Pulihkan ke bawaan untuk memulai ulang.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (Belgia)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (Prancis)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Tata letak Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Tata letak Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (Brasil ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (Denmark)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (Spanyol)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (Italia)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (Norwegia)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (Swedia, Finlandia)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (Portugal)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (Turki)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Britania Raya)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Amerika Serikat)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ versi Swiss',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (Jerman)',
+  'hudChrome.keybindLayout.moves': 'Pintasan yang akan berpindah: {count}',
+  'hudChrome.keybindLayout.noChange': 'Tidak ada pintasan yang berubah di antara tata letak ini.',
+  'hudChrome.keybindLayout.open': 'Konversi',
+  'hudChrome.keybindLayout.title': 'Tata letak papan ketik',
+  'hudChrome.keybindLayout.to': 'Konversi ke',
+  'hudChrome.nameplate.bountyTag': 'Buruan berhadiah',
+  'hudChrome.options.classicCombatText': 'Teks tempur klasik',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Barang di bawah kualitas ini dijual dengan satu klik. Barang yang salah dijual dapat dibeli kembali, kecuali barang abu-abu tanpa tanda tangan.',
+  'hudChrome.options.spellEffects': 'Efek mantra',
+  'hudChrome.options.spellTooltipOnHover': 'Keterangan mantra saat ditunjuk',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.realmMotd.cleared': 'Pesan harian dihapus.',
+  'hudChrome.realmMotd.line': 'Pesan harian: {text}',
+  'hudChrome.realmMotd.none': 'Belum ada pesan harian.',
+  'hudChrome.realmMotd.saveFailed':
+    'Pesan harian tidak dapat disimpan dan akan hilang saat dimulai ulang.',
+  'hudChrome.realmMotd.tooLong': 'Pesan harian dibatasi hingga {max} karakter.',
+  'hudChrome.realmMotd.updated': 'Pesan harian diperbarui.',
+  'hudChrome.realmMotd.usage':
+    'Penggunaan: /motd "<pesan>" untuk menetapkan, /motd clear untuk menghapus.',
+  'hudChrome.skullBag.clickOpen': 'Klik untuk membuka',
+  'hudChrome.skullBag.close': 'Tutup Kantong Tengkorak',
+  'hudChrome.skullBag.empty':
+    'Kosong. Selama kantong dibawa, tengkorak yang dijarah langsung masuk ke dalamnya.',
+  'hudChrome.skullBag.notCarried':
+    'Bawa Kantong Tengkorak di tas untuk menyimpan atau mengambil tengkorak.',
+  'hudChrome.skullBag.store': 'Simpan tengkorak yang dibawa ({count})',
+  'hudChrome.skullBag.storeNone': 'Tidak ada tengkorak untuk disimpan',
+  'hudChrome.skullBag.takeAll': 'Ambil semua',
+  'hudChrome.skullBag.takeAllAria': 'Ambil semua: {item}',
+  'hudChrome.skullBag.takeOne': 'Ambil 1',
+  'hudChrome.skullBag.takeOneAria': 'Ambil 1: {item}',
+  'hudChrome.skullBag.title': 'Kantong Tengkorak',
+  'hudChrome.skullBag.tooltip':
+    'Menyimpan Tengkorak Trofi tanpa batas tanpa memakai ruang tas. Selama berada di tas, tengkorak yang dijarah langsung masuk ke dalamnya. Klik kantong di tas untuk menyimpan atau mengambil tengkorak.',
+  'hudChrome.skullBag.total': 'Tengkorak: {count}',
+  'hudChrome.skullBag.unrecorded': 'Tengkorak Trofi',
+  'hudChrome.treasureMap.inkPickerCancel': 'Batal',
+  'hudChrome.treasureMap.inkPickerCost': 'Gambar ulang menjadi {rarity}: {inks} tinta',
+  'hudChrome.treasureMap.inkPickerHeld': 'Kamu memiliki {held} Tinta Kartografer.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Sedang diikuti: tanda X-nya berada di {zone}. Tanda X tetap di tempatnya.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Gunakan Tinta Kartografer pada peta yang mana?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Belum dibaca ({count} dimiliki)',
+  'hudChrome.warfare.reasons.worldQuest': 'misi dunia',
+  'hudChrome.warfareShop.goods': 'Barang dagangan',
+  'hudChrome.weeklyRewards.allClassGear': 'Perlengkapan semua kelas',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} kemenangan PvP',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} kemenangan PvP',
+  'hudChrome.weeklyRewards.lootFocus': 'Fokus jarahan',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Hanya berlaku untuk peti yang belum dibuka.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    'Tidak ada jarahan yang memenuhi syarat. Pilih fokus lain.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Raih {count} kemenangan PvP',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Raih {count} kemenangan PvP',
+  'hudChrome.weeklyRewards.rolledFocus': 'Diundi untuk: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused': 'Rentetan PvP saat ini: {time} dimainkan (dijeda di suaka)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Rentetan PvP saat ini: {time} dimainkan (dijeda saat mati)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Rentetan PvP saat ini: {time} dimainkan (dijeda dalam instans PvE)',
+  'hudChrome.worldPvp.rewardProgress': 'Rentetan PvP saat ini: {time} dimainkan',
+  'hudChrome.worldPvp.rewardTitles':
+    'Dapatkan gelar permanen setelah {thresholds} waktu bermain dengan PvP Dunia aktif di dunia terbuka atau instans PvP. Keluar, kematian, instans PvE, dan suaka menjeda penghitung. Menonaktifkannya mengatur ulang penghitung.',
+  'hudChrome.worldPvp.skullName': 'Tengkorak {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Saat kalian berdua ditandai, emas dari pukulan mematikan jatuh pada jasad bersama tengkorak yang kalah.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Barang abu-abu tanpa tanda tangan tidak masuk daftar pembelian kembali, jadi penjualannya tidak dapat dibatalkan.',
+  'questUi.logs.worldQuestRewardMailed': 'Tasmu penuh. Hadiah dikirim ke kotak suratmu: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Mantramu dapat mengaktifkan Karunia Alam selama 10 dtk: mantra yang disebut menjadi gratis, 25% lebih kuat, dan dapat digunakan dalam wujud apa pun. Aktivasi baru memperbarui durasinya.',
+  'entities.abilities.natures_boon.name': 'Karunia Alam',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Setiap Panah Liar atau Langit Runtuh yang digunakan memiliki peluang 10% untuk mengaktifkannya bagi Ledakan Spora, paling sering sekali setiap 10 dtk.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Setiap serangan otomatis jarak dekat yang mengenai sasaran memiliki peluang 1 dari 15 untuk mengaktifkannya bagi Pemulihan Spora, atau bagi Kulit Ek dalam Wujud Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Setiap denyut efek penyembuhan berkalamu memiliki peluang 10% untuk mengaktifkannya bagi Ledakan Spora, paling sering sekali setiap 10 dtk.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Menghabiskan 5 Kehijauanmu: setiap sekutu dengan efek penyembuhan berkalamu langsung dipulihkan sebesar {buff}% sisa penyembuhannya, efek tersebut dihapus, dan target mendapat Pemulihan Spora baru.',
+  'entities.abilities.play_dead.description':
+    'Jatuhkan diri dan pura-pura mati: kesehatan dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target. Bergerak, menyerang, atau memakai kemampuan lain mengakhirinya. Gunakan lagi untuk bangkit.',
+  'entities.abilities.play_dead.name': 'Pura-pura Mati',
+  'entities.abilities.rejuvenation.name': 'Pemulihan Spora',
+  'entities.abilities.scratch.description':
+    'Cakar target di sekitar dalam jarak 6 meter, memberikan kerusakan senjata ditambah {damage}. Memberi 1 poin kombo per target yang terkena. Mengungkap musuh tersembunyi dalam sapuan. Hanya Wujud Kucing.',
+  'entities.abilities.scratch.name': 'Cakaran',
+  'entities.abilities.scratch.specNote_feral':
+    'Setiap serangan yang mengenai sasaran menambah 1 Darah Tua (maksimal 3).',
+  'entities.abilities.spore_burst.description':
+    'Memanggil peledak spora di area target. Setelah {duration} dtk ia meledak, menyembuhkan sekutu sebesar {healing} dan memberikan {damage} kerusakan Alam kepada musuh dalam jarak 8 meter.',
+  'entities.abilities.spore_burst.name': 'Ledakan Spora',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Pada 3 Pasang Rembulan, kekuatannya bertambah 25% dan menghabiskan Pasang Rembulanmu.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Juga menerapkan Pemulihan Spora pada setiap sekutu yang disembuhkan. Saat Kehijauan penuh, kekuatannya bertambah 25% dan menghabiskan Kehijauanmu.',
+  'entities.abilities.sporemender_form.description':
+    'Berubah menjadi Penyembuh Spora, meningkatkan penyembuhan sebesar 20% dan zirah sebesar 40%, tetapi mengurangi kecepatan gerak sebesar 20%. Semua mantra wujud perapal tetap dapat dipakai. Bertahan hingga kamu berganti wujud. Berganti ke wujud apa pun memberi Langkah Berderap Lambat, peningkatan kecepatan singkat. Gunakan lagi untuk kembali ke wujud perapal. (Ciri khas Pemulihan)',
+  'entities.abilities.sporemender_form.name': 'Wujud Penyembuh Spora',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Menghabiskan efek penyembuhan berkala pada target sekutu untuk memulihkannya sebesar {damage}. Penerapan Pemulihan Spora dan Mekar Kedua menambah Kehijauan; pada 5 Kehijauan tombol ini menjadi Mekar Raya, yang langsung memulihkan setiap sekutu dengan efek penyembuhan berkalamu sebesar 60% sisa penyembuhannya. (Ciri khas Pemulihan)',
+  'entities.abilities.tactical_camo.description':
+    'Menyatu dengan lingkungan: musuh nyaris tidak menyadari kehadiranmu, dan kamu bergerak dengan kecepatan 80%. Menyerang atau menerima kerusakan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. (Bertahan Hidup)',
+  'entities.abilities.tactical_camo.name': 'Kamuflase Taktis',
+  'entities.itemSets.grovespring.bonus2':
+    'Pemulihan Cepat menghabiskan Pemulihan Spora atau Mekar Kedua milikmu terlebih dahulu dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantramu.',
+  'entities.items.pvp_skull_bag.name': 'Kantong Tengkorak',
+  'entities.items.pvp_trophy_skull.name': 'Tengkorak Trofi',
+  'entities.letters.world_quest_reward.body':
+    'Tasmu penuh saat memperoleh hadiah misi dunia ini, jadi para gagak mengantarkannya ke sini. Kosongkan ruang dan ambil hadiah di pilar gagak mana pun.\n\n- Pos Gagak',
+  'entities.letters.world_quest_reward.sender': 'Pos Gagak',
+  'entities.letters.world_quest_reward.subject': 'Hadiah misi duniamu',
+  'guide.classPage.formLine.form_sporemender':
+    'Wujud penyembuhan Pemulihan: kulit lebih kuat dan penyembuhan lebih besar dengan langkah lebih lambat, tetap mempertahankan semua mantra dan mana.',
+  'guide.classPage.formName.form_sporemender': 'Wujud Penyembuh Spora',
+  'guide.economy.junkBodyFinal':
+    'Jarahan yang tidak terpakai tetap bisa dijual kepada pedagang yang memiliki toko sendiri, jadi kosongkan tas setiap melewati kota. Jendela pedagang memiliki tombol Jual Rongsokan yang menjual semua barang berkualitas Buruk sekaligus. Barang tanpa nilai juga bisa dibuang untuk mengosongkan ruang. Barang abu-abu tanpa tanda tangan yang dijual dengan cara ini tidak masuk daftar pembelian kembali; periksa barang yang ingin disimpan sebelum menekan tombolnya.',
+  'guide.models.formSporemender': 'Wujud Penyembuh Spora',
+  'guide.settingsPage.ifClassicCombatText':
+    'Mengembalikan angka kerusakan sederhana berwarna putih dan emas pucat yang naik lurus. Biarkan nonaktif (bawaan) untuk angka lebih tegas yang menyebar ke samping, dengan kilatan pada serangan kritis dan serangan yang sangat besar.',
+  'guide.settingsPage.rowSpellEffects':
+    'Cahaya, percikan, proyektil, dan ledakan benturan mantra pemain beserta peliharaannya, termasuk milikmu. Nonaktifkan untuk layar lebih tenang atau beberapa bingkai tambahan dalam pertarungan kelompok besar. Semua mantra musuh tetap terlihat, begitu juga lingkaran bahaya, penanda target yang terkena stun, ketakutan, atau tidak bisa bergerak, dan semua bilah perapalan.',
+  'questUi.dialog.attuneHearthstone': 'Selaraskan Batu Pulang Sekutuku di sini.',
+  'questUi.dialog.attuneHearthstoneAria': 'Selaraskan Batu Pulang Sekutumu ke {hub} melalui {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Batu Pulang Sekutumu belum diselaraskan. Bicaralah dengan pengurus perbekalan sekutu atau gunakan di pusat sekutu.',
+  'hudChrome.factionRewards.hearthstoneBound': 'Batu Pulang Sekutumu kini diselaraskan ke {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Batu pulang memindahkanmu ke {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Barang itu belum siap (tersisa {minutes} mnt).',
 };
