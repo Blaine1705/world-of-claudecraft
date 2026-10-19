@@ -846,6 +846,8 @@ const RENDER_PURE_CORES = [
   'src/render/mount_rear_core.ts',
   // the per-skin swing trail lookup (renderer.ts triggerAttack)
   'src/render/weapon_skin_trail_core.ts',
+  // the ambient motes' fade around the local player (motes.ts)
+  'src/render/motes_keepout_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
