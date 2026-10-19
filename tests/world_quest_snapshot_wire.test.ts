@@ -201,6 +201,16 @@ describe('world quest snapshot wire', () => {
       state: 'active',
     });
 
+    // A rollover snapshot without `wqrep` never applies the old cycle's mapping.
+    let nextCycle = '';
+    for (let day = 1; day <= 64 && !nextCycle; day++) {
+      const ids = activeWorldQuestsForCycle(`wq1_${day}`).map((quest) => quest.id);
+      if (`wq1_${day}` !== cycle && !ids.includes(replacementId)) nextCycle = `wq1_${day}`;
+    }
+    applyQuestSelfWire(delta, { wqday: nextCycle, wqlog: [replacement] });
+    expect(delta.worldQuestCycle).toBe(nextCycle);
+    expect(delta.worldQuestLog.has(replacementId)).toBe(false);
+
     // Without a replacement mapping the off-board row is still dropped.
     const plain = mirrors();
     applyQuestSelfWire(plain, { wqday: cycle, wqlog: [replacement] });
