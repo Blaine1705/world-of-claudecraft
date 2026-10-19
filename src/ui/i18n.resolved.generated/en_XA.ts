@@ -15120,6 +15120,17 @@ export const en_XA: EnTranslations = {
       "sanctum_counterweight_lash": "[Çóúñţéŕŵéíĝĥţ Ļášĥ]",
       "sanctum_branding_iron": "[Ɓŕáñðíñĝ Íŕóñ]",
       "sanctum_rime_breath": "[Ŕíɱé Ɓŕéáţĥ]",
+      "heart_mountains_wrath": "[Ɱóúñţáíñ'š Ŵŕáţĥ]",
+      "heart_bellows_gust": "[Ɓéļļóŵš Ĝúšţ]",
+      "heart_storm_lance": "[Šţóŕɱ Ļáñçé]",
+      "heart_quenching_breath": "[Ɋúéñçĥíñĝ Ɓŕéáţĥ]",
+      "heart_molten_pour": "[Ɱóļţéñ Þóúŕ]",
+      "heart_anvil_clang": "[Áñʋíļ Çļáñĝ]",
+      "heart_forge_wrath": "[Ƒóŕĝé Ŵŕáţĥ]",
+      "heart_forge_pour": "[Ƒóŕĝé Þóúŕ]",
+      "heart_gale_bolt": "[Ĝáļé Ɓóļţ]",
+      "heart_rime_bolt": "[Ŕíɱé Ɓóļţ]",
+      "heart_ember_bolt": "[Éɱƀéŕ Ɓóļţ]",
       "kituse_sanctum_topple_brazier": "[Ţóþþļé Ɓŕážíéŕ]",
       "trash_demo_nova": "[Ţéšţ Ñóʋá]",
       "trash_demo_nova_unstoppable": "[Ţéšţ Ñóʋá]",
@@ -24938,6 +24949,45 @@ export const en_XA: EnTranslations = {
       "sanctum_shackle_bellows": {
         "name": "[Ɓéļļóŵš Šĥáçķļé]"
       },
+      "heart_hammer_warder": {
+        "name": "[Ĥáɱɱéŕ Ʋéíñ Ŵáŕðéŕ]"
+      },
+      "heart_ring_warder": {
+        "name": "[Ŕíñĝ Ƒóŕĝé Ŵáŕðéŕ]"
+      },
+      "heart_breath_warder": {
+        "name": "[Ɓŕéáţĥ Ʋéíñ Ŵáŕðéŕ]"
+      },
+      "heart_breath_caller": {
+        "name": "[Ɓŕéáţĥ Ʋéíñ Çáļļéŕ]"
+      },
+      "heart_quench_warder": {
+        "name": "[Ɋúéñçĥ Ʋéíñ Ŵáŕðéŕ]"
+      },
+      "heart_quench_caller": {
+        "name": "[Ɋúéñçĥ Ʋéíñ Çáļļéŕ]"
+      },
+      "heart_heat_warder": {
+        "name": "[Ĥéáţ Ʋéíñ Ŵáŕðéŕ]"
+      },
+      "heart_heat_caller": {
+        "name": "[Ĥéáţ Ʋéíñ Çáļļéŕ]"
+      },
+      "heart_hammer_guardian": {
+        "name": "[Ĝúáŕðíáñ óƒ ţĥé Ĥáɱɱéŕ]"
+      },
+      "heart_breath_guardian": {
+        "name": "[Ĝúáŕðíáñ óƒ ţĥé Ɓŕéáţĥ]"
+      },
+      "heart_quench_guardian": {
+        "name": "[Ĝúáŕðíáñ óƒ ţĥé Ɋúéñçĥ]"
+      },
+      "heart_heat_guardian": {
+        "name": "[Ĝúáŕðíáñ óƒ ţĥé Ĥéáţ]"
+      },
+      "heart_masterless_strength": {
+        "name": "[Ţĥé Ɱášţéŕļéšš Šţŕéñĝţĥ]"
+      },
       "thorn_sprout": {
         "name": "[Ţĥóŕñ Šþŕóúţ]"
       },
@@ -28737,6 +28787,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ĝŕáʋéŵýŕɱ Šáñçţúɱ]",
         "enterText": "[Ţĥé áíŕ ĝóéš çóļð. Šóɱéţĥíñĝ ʋášţ ƀŕéáţĥéš ƀéļóŵ...]",
         "leaveText": "[Ýóú šţáĝĝéŕ ƀáçķ íñţó ţĥé ɱóúñţáíñ ŵíñð.]"
+      },
+      "smith_heart": {
+        "name": "[Ţĥé Šɱíţĥ'š Ĥéáŕţ]",
+        "enterText": "[Ţĥé ɱóúñţáíñ ĥúɱš áŕóúñð ýóú, ļíķé á ƒóŕĝé ƀáñķéð ƒóŕ ţĥé ñíĝĥţ...]",
+        "leaveText": "[Ýóú çļíɱƀ ƀáçķ óúţ íñţó ţĥé Šţóŕɱçŕáĝ ŵíñð.]"
       },
       "nythraxis_crypt": {
         "name": "[Áƀáñðóñéð Çŕýþţ]",

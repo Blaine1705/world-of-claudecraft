@@ -15120,6 +15120,17 @@ export const pt_BR: EnTranslations = {
       "sanctum_counterweight_lash": "Counterweight Lash",
       "sanctum_branding_iron": "Branding Iron",
       "sanctum_rime_breath": "Rime Breath",
+      "heart_mountains_wrath": "Mountain's Wrath",
+      "heart_bellows_gust": "Bellows Gust",
+      "heart_storm_lance": "Storm Lance",
+      "heart_quenching_breath": "Quenching Breath",
+      "heart_molten_pour": "Molten Pour",
+      "heart_anvil_clang": "Anvil Clang",
+      "heart_forge_wrath": "Forge Wrath",
+      "heart_forge_pour": "Forge Pour",
+      "heart_gale_bolt": "Gale Bolt",
+      "heart_rime_bolt": "Rime Bolt",
+      "heart_ember_bolt": "Ember Bolt",
       "kituse_sanctum_topple_brazier": "Topple Brazier",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -24938,6 +24949,45 @@ export const pt_BR: EnTranslations = {
       "sanctum_shackle_bellows": {
         "name": "Bellows Shackle"
       },
+      "heart_hammer_warder": {
+        "name": "Hammer Vein Warder"
+      },
+      "heart_ring_warder": {
+        "name": "Ring Forge Warder"
+      },
+      "heart_breath_warder": {
+        "name": "Breath Vein Warder"
+      },
+      "heart_breath_caller": {
+        "name": "Breath Vein Caller"
+      },
+      "heart_quench_warder": {
+        "name": "Quench Vein Warder"
+      },
+      "heart_quench_caller": {
+        "name": "Quench Vein Caller"
+      },
+      "heart_heat_warder": {
+        "name": "Heat Vein Warder"
+      },
+      "heart_heat_caller": {
+        "name": "Heat Vein Caller"
+      },
+      "heart_hammer_guardian": {
+        "name": "Guardian of the Hammer"
+      },
+      "heart_breath_guardian": {
+        "name": "Guardian of the Breath"
+      },
+      "heart_quench_guardian": {
+        "name": "Guardian of the Quench"
+      },
+      "heart_heat_guardian": {
+        "name": "Guardian of the Heat"
+      },
+      "heart_masterless_strength": {
+        "name": "The Masterless Strength"
+      },
       "thorn_sprout": {
         "name": "Thorn Sprout"
       },
@@ -28737,6 +28787,11 @@ export const pt_BR: EnTranslations = {
         "name": "Santuário do Gravewyrm",
         "enterText": "O ar fica frio. Algo imenso respira abaixo...",
         "leaveText": "Você cambaleia de volta ao vento da montanha."
+      },
+      "smith_heart": {
+        "name": "The Smith's Heart",
+        "enterText": "The mountain hums around you, like a forge banked for the night...",
+        "leaveText": "You climb back out into the Stormcrag wind."
       },
       "nythraxis_crypt": {
         "name": "Cripta abandonada",

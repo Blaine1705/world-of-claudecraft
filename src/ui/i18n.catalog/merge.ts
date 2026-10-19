@@ -757,6 +757,19 @@ const mergeStringsEn = {
       sanctum_counterweight_lash: 'Counterweight Lash',
       sanctum_branding_iron: 'Branding Iron',
       sanctum_rime_breath: 'Rime Breath',
+      // The Smith's Heart raid blockout's sketch kits (content/smith_heart.ts).
+      // None of these bars can be kicked.
+      heart_mountains_wrath: "Mountain's Wrath",
+      heart_bellows_gust: 'Bellows Gust',
+      heart_storm_lance: 'Storm Lance',
+      heart_quenching_breath: 'Quenching Breath',
+      heart_molten_pour: 'Molten Pour',
+      heart_anvil_clang: 'Anvil Clang',
+      heart_forge_wrath: 'Forge Wrath',
+      heart_forge_pour: 'Forge Pour',
+      heart_gale_bolt: 'Gale Bolt',
+      heart_rime_bolt: 'Rime Bolt',
+      heart_ember_bolt: 'Ember Bolt',
       // The player's own bar while kicking a Soul Brazier over (the trash
       // engine's G3 use, trash_kit/encounter_use.ts).
       kituse_sanctum_topple_brazier: 'Topple Brazier',

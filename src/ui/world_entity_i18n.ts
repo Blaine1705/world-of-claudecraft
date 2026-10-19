@@ -402,6 +402,21 @@ const MOB_IDS = [
   'sanctum_shackle_tongs',
   'sanctum_shackle_anvil',
   'sanctum_shackle_bellows',
+  // The Smith's Heart raid blockout (content/smith_heart.ts): provisional
+  // descriptive names for placeholder bodies.
+  'heart_hammer_warder',
+  'heart_ring_warder',
+  'heart_breath_warder',
+  'heart_breath_caller',
+  'heart_quench_warder',
+  'heart_quench_caller',
+  'heart_heat_warder',
+  'heart_heat_caller',
+  'heart_hammer_guardian',
+  'heart_breath_guardian',
+  'heart_quench_guardian',
+  'heart_heat_guardian',
+  'heart_masterless_strength',
   // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
   'thorn_sprout',
   // Cosmetic buddy followers (src/sim/content/buddy_mobs.ts). Their nameplate
@@ -873,6 +888,7 @@ const DUNGEON_IDS = [
   'hollow_crypt',
   'sunken_bastion',
   'gravewyrm_sanctum',
+  'smith_heart',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
   'ignivar_forge_lift',

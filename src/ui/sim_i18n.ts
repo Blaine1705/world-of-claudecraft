@@ -1494,6 +1494,43 @@ const baseEnTable = {
     'With the rite broken, the Tithe Gate shatters. The shore of the held lies open.',
   'log.sanctumHollowWardOpen':
     "The Hollow Ward fails. On the lake, the ice groans under the Wyrm's weight.",
+  // The Smith's Heart raid blockout (content/smith_heart.ts gates,
+  // encounters/smith_heart seal.ts and entry.ts). EXACT matcher.
+  'log.smithHeartSlabOpen':
+    'The living stone splits from end to end. Beyond the Slab, the heart of the mountain lies open.',
+  'log.smithHeartCausewaysOpen':
+    'Four colours burn on the heart seal. It opens, and the causeways fall still.',
+  'log.smithHeartHammerLit':
+    'An ochre light runs down from the Pit toward the heart seal.',
+  'log.smithHeartBreathLit':
+    'A storm-blue light runs down the Breath toward the heart seal.',
+  'log.smithHeartQuenchLit':
+    'An ice-pale light runs up the Quench toward the heart seal.',
+  'log.smithHeartHeatLit':
+    'A white-gold light runs out of the forge toward the heart seal.',
+  'log.smithHeartClosed':
+    'The cleft is choked with fallen rock. It is not open yet.',
+  // The Smith's Heart's sketch kits (content/smith_heart.ts): cast, swing
+  // and cleave names. EXACT matcher through the mechanic reverse map.
+  'mechanic.heartMountainsWrath': "Mountain's Wrath",
+  'mechanic.heartBellowsGust': 'Bellows Gust',
+  'mechanic.heartStormLance': 'Storm Lance',
+  'mechanic.heartQuenchingBreath': 'Quenching Breath',
+  'mechanic.heartMoltenPour': 'Molten Pour',
+  'mechanic.heartAnvilClang': 'Anvil Clang',
+  'mechanic.heartForgeWrath': 'Forge Wrath',
+  'mechanic.heartForgePour': 'Forge Pour',
+  'mechanic.heartGaleBolt': 'Gale Bolt',
+  'mechanic.heartRimeBolt': 'Rime Bolt',
+  'mechanic.heartEmberBolt': 'Ember Bolt',
+  'mechanic.heartStoneSweep': 'Stone Sweep',
+  'mechanic.heartForgeSweep': 'Forge Sweep',
+  'mechanic.heartGaleSweep': 'Gale Sweep',
+  'mechanic.heartRimeSweep': 'Rime Sweep',
+  'mechanic.heartEmberSweep': 'Ember Sweep',
+  'mechanic.heartHammerfall': 'Hammerfall',
+  'mechanic.heartTemperingStrike': 'Tempering Strike',
+  'mechanic.heartForgeFist': 'Forge Fist',
   'log.sanctumTuskerSpill':
     'The sledge tips over! Burning soul braziers spill across the Sledge Road.',
   // The rune wall's lore line (encounters/gravewyrm_sanctum/rune_wall.ts
@@ -18175,6 +18212,26 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Topple Brazier': 'mechanic.sanctumToppleBrazier',
   'Spilled Soulfire': 'mechanic.sanctumSpilledSoulfire',
   'Rime Breath': 'mechanic.sanctumRimeBreath',
+  // The Smith's Heart's sketch kits (content/smith_heart.ts).
+  "Mountain's Wrath": 'mechanic.heartMountainsWrath',
+  'Bellows Gust': 'mechanic.heartBellowsGust',
+  'Storm Lance': 'mechanic.heartStormLance',
+  'Quenching Breath': 'mechanic.heartQuenchingBreath',
+  'Molten Pour': 'mechanic.heartMoltenPour',
+  'Anvil Clang': 'mechanic.heartAnvilClang',
+  'Forge Wrath': 'mechanic.heartForgeWrath',
+  'Forge Pour': 'mechanic.heartForgePour',
+  'Gale Bolt': 'mechanic.heartGaleBolt',
+  'Rime Bolt': 'mechanic.heartRimeBolt',
+  'Ember Bolt': 'mechanic.heartEmberBolt',
+  'Stone Sweep': 'mechanic.heartStoneSweep',
+  'Forge Sweep': 'mechanic.heartForgeSweep',
+  'Gale Sweep': 'mechanic.heartGaleSweep',
+  'Rime Sweep': 'mechanic.heartRimeSweep',
+  'Ember Sweep': 'mechanic.heartEmberSweep',
+  'Hammerfall': 'mechanic.heartHammerfall',
+  'Tempering Strike': 'mechanic.heartTemperingStrike',
+  'Forge Fist': 'mechanic.heartForgeFist',
   'Creeping Rime': 'aura.sanctumCreepingRime',
   'Iced Over': 'aura.sanctumIcedOver',
   'Ice Slab': 'mechanic.sanctumIceSlab',
