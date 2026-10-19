@@ -50,7 +50,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     'Użycie: Wzmacnia twój pancerz klatki piersiowej, zwiększając Pancerz o 12 na 1 godzinę.',
   'hudChrome.factionRewards.battleStandardUse':
-    'Użycie: Sadzi Poświęcony Sztandar Świtu na 5 minut, znacznie zwiększając regenerację zdrowia i many poza walką dla wszystkich pobliskich sojuszników. Pozostanie w pobliżu przez 10 sekund daje również Błogosławieństwo Świtu (+5% do wszystkich atrybutów na 30 min). (5 min odpoczynku)',
+    'Użycie: wbija Sztandar Bojowy Uświęconego Świtu na 5 min. Gracze poza walką w promieniu 15 jardów regenerują o 10% więcej zdrowia, a korzystający z many odzyskują dodatkowo manę równą 5% Ducha co 2 s. Pozostanie w pobliżu przez 10 s zapewnia Błogosławieństwo Świtu, zwiększające Siłę, Zręczność, Wytrzymałość, Intelekt i Ducha o 5% na 30 min. (Odnowienie: 5 min)',
   'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automaty)',
   'hudChrome.factionRewards.hub_church_order': 'Dolina Wschodniego Strumienia (Zakon Kościoła)',
   'hudChrome.factionRewards.hub_none': 'Brak (Użyj blisko siedziby frakcji, aby nastroić)',
@@ -529,7 +529,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     'Na stałe graweruje broń dwuręczną z 12 Siłą i 25 Oceną Trafienia Krytycznego. Nie można zastosować na broni jednooręcznej. Stały bonus, nie skaluje się.',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Twoje lądujące ataki wręcz mogą dać 60 Zwinności i 2% szybszych ataków wręcz na 15 sek. Każde trafienie losuje 1% na 0,6 sek podstawowej szybkości broni. Bez wewnętrznego czasu odnowienia. Obie ręce dzielą jeden bufor; każdy wyzwalacz go odświeża i nigdy się nie kumuluje. Ataki z dystansu nie wyzwalają tego efektu. Postać Kota zamiast tego używa swojej 1 sek podstawowej szybkości swing.',
+    'Twoje celne ataki wręcz mogą zapewnić 60 Zręczności i przyspieszyć ataki wręcz o 2% na 15 s. Każde trafienie ma 1% szansy na każde 0,6 s bazowej szybkości uderzającej broni. Bez wewnętrznego czasu odnowienia. Obie ręce współdzielą jedno wzmocnienie; każde wyzwolenie je odnawia i nigdy się nie kumuluje. Ataki dystansowe nie wyzwalają efektu. W Postaci kota ataki automatyczne używają zamiast tego szybkości łap wynoszącej 1 s. Ciosy i ataki kończące w Postaci kota i Postaci Bruina używają szybkości samej broni; Zamaszyste pazury wykonują jeden rzut na użycie, nie na cel.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Grawer na broni: Światło Świtu',
   'hudChrome.enchantName.enchant_weapon_dawns_benediction':
     'Grawer na broni: Błogosławieństwo Świtu',
@@ -2390,7 +2390,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     'Dodaje wiersz "Rzucone przez" do każdej etykietki buff/debuff, wymieniając, kto ją zastosował. Przydatne do rozróżnienia kilku rzucających tej samej bufki, jak dwóch paladinów Błogosławieństw.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Zawiesza pasek buff i debuff ramki celu poniżej ramki zamiast powyżej, klasyczny układ. Domyślnie wyłączone, ponieważ standardowa ramka celu siedzi bezpośrednio powyżej paska akcji; włącz ją, gdy już przeniosłeś ramkę gdzieś z miejscem poniżej.',
+    'Umieszcza pasek wzmocnień i osłabień celu pod jego ramką, poniżej nazwy i paska zdrowia, zamiast nad nią: układ klasyczny. W domyślnym położeniu ramka celu wraz z twoim paskiem rzucania i licznikami ciosów przesuwa się o jeden wiersz w górę, aby pierwszy wiersz efektów nie zasłaniał paska akcji; przesunięta przez ciebie ramka pozostaje na swoim miejscu.',
   'guide.settingsPage.rowFrameRateCap':
     'Górna granica liczby obrazów, które gra rysuje na sekundę. Komputer, który nie może nadążać za swoim wyświetlaczem, ląduje na nierównym rytmie; gładko 30 wygląda lepiej niż to, zmniejsza pracę o połowę, i utrzymuje komputer chłodniejszym. Brak limitu wyświetlacza.',
   'guide.stats.warfareBodyPets':
@@ -3482,9 +3482,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Postać Fleet',
   'guide.classPage.formsHeading': 'Zmiana kształtu',
   'guide.classPage.formsMoonwing':
-    'Druid o specjalizacji Równowaga zyskuje jeszcze jedną postać, Postać księżycowej sowy, formę rzucającego, w jakiej walczy. To jedyna zwierzęca postać, która zachowuje twoje zaklęcia, a różdżka działa tylko w niej albo w twojej zwykłej postaci rzucającego.',
+    'Druid Równowagi zyskuje kolejną postać, Postać księżycowej sowy, w której ta specjalizacja walczy jako czarujący. Tak jak Postać zarodnikowego uzdrowiciela Odnowienia zachowuje twoje zaklęcia, a różdżka działa tylko w tych dwóch postaciach lub w twojej zwykłej postaci czarującego.',
   'guide.classPage.formsWolfEngage':
-    'Wilk otwiera walkę Szarżą Bruina, od razu zmienia się w postać wilka, by przygwoździć cel, skraca dystans Wypadem, gdy się nie skrada, i zatrzymuje wroga Obaleniem.',
+    'Wilk otwiera walkę Szarżą Bruina, od razu zmienia się w postać kota, by przygwoździć cel, skraca dystans Wypadem, gdy się nie skrada, i zatrzymuje wroga Obaleniem.',
   'guide.classPage.formsNote':
     'Druid walczy, zmieniając kształt. Większość zdolności druida należy do jednej postaci, więc to, w jakiej formie się znajdujesz, decyduje, co możesz rzucić, a przemiana kosztuje odrobinę many. Możesz przemieniać się w walce i poza nią, tak często, jak chcesz.',
   'guide.classPage.mageEleHeading': 'Żywiołak wody',
@@ -6432,7 +6432,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Dziki strzał, który dezorientuje cel na {duration} sek. Każde obrażenia przerywają efekt.',
   'entities.abilities.typhoon.name': 'Tajfun',
   'entities.abilities.typhoon.description':
-    'Podmuch wiatru odrzuca wszystkich wrogów w promieniu 8 m i oszałamia ich, zmniejszając prędkość ruchu o 50% na 4 sek.',
+    'Podmuch wiatru odrzuca wszystkich wrogów w promieniu 8 metrów na 15 metrów od ciebie i oszałamia ich, spowalniając o 50% na 4 s. Wrodzy gracze lecą w powietrzu po prostej: za krawędzią lecą dalej i otrzymują obrażenia od upadku; śmiertelny upadek liczy się jako twoje zabójstwo.',
   'entities.abilities.voidfeast.name': 'Uczta Pustki',
   'entities.abilities.voidfeast.description':
     'Pożera efekt magiczny (korzystny z wroga albo szkodliwy z sojusznika) i leczy cię o 6% maksymalnego zdrowia.',
@@ -7865,7 +7865,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Okrzyk, który zwiększa moc ataku wszystkich członków drużyny o {buff}% na 30 min.',
   'entities.abilities.battle_shout.name': 'Żelazny ryk',
   'entities.abilities.bear_charge.description':
-    'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Przez 3 sek. potem Postać wilka jest darmowa i przygważdża cel, spowalniając go o 50% na 4 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina.',
+    'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Przez 3 sek. potem Postać kota jest darmowa i przygważdża cel, spowalniając go o 50% na 4 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina.',
   'entities.abilities.bear_charge.name': 'Szarża Bruina',
   'entities.abilities.bear_form.description':
     'Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Atakujesz dwa razy szybciej za połowę obrażeń na cios, a każdy cios buduje podwójną wściekłość. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego.',
@@ -7885,7 +7885,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiast atakuj w krwawym szale, zadając 60% obrażeń broni plus {damage}. (Sygnatura furii)',
   'entities.abilities.bloodthirst.name': 'Upust krwi',
   'entities.abilities.cat_form.description':
-    'Zmienia cię w wilka: zręczność rośnie z twoim poziomem, moc ataku +8 plus 2 na poziom, twoje ataki używają energii i punktów kombinacji, a ty generujesz o 29% mniejsze zagrożenie. Zmiana w dowolną postać przyznaje Długi krok: 60% prędkości ruchu na 3 sekundy, raz na 20 sekund. Rzuć ponownie, by wrócić do postaci rzucającego zaklęcia.',
+    'Zmień się w kota: zręczność rośnie z poziomem, moc ataku +8 plus 2 na poziom, ataki używają energii i punktów kombinacji, poruszasz się o 15% szybciej i tworzysz o 29% mniej zagrożenia. Każda zmiana postaci daje Długi krok, krótkie przyspieszenie. Rzuć ponownie, aby wrócić do postaci rzucającej zaklęcia.',
   'entities.abilities.cat_form.name': 'Postać kota',
   'entities.abilities.charge.description':
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów.',
@@ -7917,7 +7917,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przeklina cel agonią: {damage} obrażeń od cienia w ciągu 24 sek.',
   'entities.abilities.curse_of_agony.name': 'Urok udręki',
   'entities.abilities.dash.description':
-    'Rusza naprzód susem, zwiększając prędkość ruchu o 50% na 15 sek. Tylko w postaci kota.',
+    'Przyjmij Postać kota, jeśli jeszcze w niej nie jesteś, i sprintuj o 50% szybciej przez 15 s. Działa w każdej postaci. Natychmiastowe i nie uruchamia globalnego czasu odnowienia.',
   'entities.abilities.dash.name': 'Sus',
   'entities.abilities.deadly_poison.description':
     'Pokrywa twój oręż na 30 min. Każde uderzenie wręcz dodaje celowi warstwę trucizny, do 5, i odnawia czas trwania 12 sek. Każda warstwa zadaje {damage} obrażeń natury co 2 sek.',
@@ -8044,7 +8044,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu.',
   'entities.abilities.heroic_strike.name': 'Cios łupieżcy',
   'entities.abilities.hibernate.description':
-    'Zmusza cel do głębokiego snu na nawet 8 sek. Każde obrażenie go obudzi.',
+    'Usypia cel głębokim snem na maksymalnie 8 s. Każde obrażenie go budzi. Przeciw graczom każde powtórzenie w ciągu 18 s trwa połowę poprzedniego czasu, a czwarte zawodzi.',
   'entities.abilities.hibernate.name': 'Uśpienie',
   'entities.abilities.holy_light.description':
     'Szybko leczy sprzymierzony cel o {damage}. Przywrócenie zdrowia generuje 1 Oddanie, nawet bez specjalizacji. Promienny Rezonans albo Słoneczny Odwet czyni je natychmiastowym.',
@@ -8103,13 +8103,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przemienia wroga w ropuchę na nawet {duration} sek. Ropucha błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy.',
   'entities.abilities.polymorph.name': 'Zauroczenie',
   'entities.abilities.pounce.description':
-    'Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci wilka. Poza skradaniem ten przycisk to Wypad.',
+    'Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci kota. Poza skradaniem ten przycisk to Wypad.',
   'entities.abilities.pounce.name': 'Skradający cios',
   'entities.abilities.lunge.description':
-    'Rzucasz się na wroga oddalonego o maksymalnie 12 jardów, zadając 60% obrażeń broni i przyznając 1 punkt kombinacji. Tylko w postaci wilka.',
+    'Rzucasz się na wroga oddalonego o maksymalnie 12 jardów, zadając 60% obrażeń broni i przyznając 1 punkt kombinacji. Tylko w postaci kota.',
   'entities.abilities.lunge.name': 'Wypad',
   'entities.abilities.hamstring_bite.description':
-    'Umiejętność kończąca, która ogłusza cel na 1 sekundę plus 1 sekundę za punkt combo (5 punktów combo: 6 sekund). Tylko w postaci wilka.',
+    'Umiejętność kończąca, która ogłusza cel na 1 sekundę plus 1 sekundę za punkt combo (5 punktów combo: 6 sekund). Tylko w postaci kota.',
   'entities.abilities.hamstring_bite.name': 'Obalenie',
   'entities.abilities.power_word_fortitude.description':
     'Zwiększa Wytrzymałość każdego członka drużyny o {buff}% na 30 min.',
@@ -8118,7 +8118,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Osłania sprzymierzony cel, pochłaniając {damage} obrażeń przez 30 s. Dyscyplina dodatkowo wiąże cel z twoimi obrażeniami świętymi na 30 s.',
   'entities.abilities.power_word_shield.name': 'Psalm ochrony',
   'entities.abilities.prowl.description':
-    'Wchodzi w skradanie w postaci wilka. Nie można użyć w walce.',
+    'Wchodzi w skradanie w postaci kota. Nie można użyć w walce.',
   'entities.abilities.prowl.name': 'Podchody',
   'entities.abilities.pyroblast.description':
     'Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',
@@ -14341,7 +14341,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Zdolność',
   'guide.search.typeDeed': 'Czyn',
   'guide.settingsPage.audioBody':
-    'Okno opcji to nie tylko piksele. Dźwięk mieści trzy suwaki głośności, dla efektów dźwiękowych, muzyki i głosu, plus przełącznik muzyki i cztery przełączniki dla dźwięków, które najszybciej się przejadają: głosy NPC, kroki, dźwięki interfejsu i odzew kliknięcia. Zakładka Ogólne w panelu Interfejs nosi wybór języka, który na miejscu przelokalizowuje cały interfejs, bez przeładowania, oraz wybór motywu dla oprawy okien.',
+    'Okno opcji obejmuje też dźwięk. Panel Dźwięk ma cztery suwaki głośności: efekty, otoczenie, muzykę i głosy, przełącznik muzyki oraz cztery przełączniki najczęściej nużących dźwięków: głosów NPC, kroków, odgłosów interfejsu i kliknięć. Karta Ogólne w panelu Interfejs zawiera wybór języka, który natychmiast tłumaczy cały interfejs bez przeładowania, oraz wybór motywu okien.',
   'guide.settingsPage.audioTitle': 'Dźwięk i język',
   'guide.settingsPage.autolootBody':
     'Wolisz nie klikać każdego trupa? Automatyczne zbieranie w przejściu, w zakładce Walka w panelu Interfejs i domyślnie wyłączone, zgarnia łup z twoich własnych ofiar, gdy koło nich przechodzisz.',
@@ -14853,7 +14853,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Kanałuje przez 3 s, zadając {damage} obrażeń od cienia co sekundę wrogom w promieniu 8 m od obszaru celu. Obrażenia rosną z mocą zaklęć. (Talent kapłana)',
   'entities.abilities.multi_shot.description':
-    'Wystrzeliwuje salwę w wybrany obszar, zadając wrogom w promieniu 8 m {damage} obrażeń fizycznych. (talent Łowcy)',
+    'Wystrzeliwuje salwę w wybrany obszar, zadając wrogom w promieniu 8 jardów {damage} obrażeń fizycznych. (talent Łowcy)',
   'entities.abilities.prayer_of_healing.description':
     'Leczy sojuszników w promieniu 30 m o {damage}. Leczenie rośnie z mocą zaklęć. (Świętość)',
   'entities.abilities.preparation.description':
@@ -16106,17 +16106,17 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Spuść Bestię',
   'entities.abilities.wildheart.name': 'Dzikie Serce',
   'entities.abilities.bloodhook.description':
-    'Szarżuj na wroga i nałóż Ranę Krwawego Haka, zadającą 34 bazowych obrażeń Fizycznych plus 26% twojej mocy ataku dystansowego przez 12 s w 4 tyknięciach. (Sygnatura Rzemiosła Polowego)',
+    'Szarżujesz na wroga i nakładasz ranę z Krwawy Hak, zadającą 34 bazowych obrażeń fizycznych plus 26% twojej mocy ataku dystansowego w 4 impulsach przez 12 s. Po dotarciu spowalniasz cel o 30% na 3 s. (Przetrwanie)',
   'entities.abilities.bloodtrail_assault.description':
-    'Przez 12 s Krwawy Hak rozprzestrzenia ranę o 60% mocy na maksymalnie 2 pobliskich wrogów, Rozdarcie Rany rozkazuje atak towarzysza za 18 obrażeń, a Ładunek Odłamkowy zyskuje 2 metry, zadaje o 25% więcej bazowych obrażeń głównemu celowi i wyzwala o 50% więcej obrażeń rany.',
+    'Przez 12 s Krwawy Hak rozprzestrzenia ranę o 60% sile na najwyżej 2 wrogów w promieniu 5 metrów, Rozdarcie ran nakazuje atak zwierzaka za 18 obrażeń, a Ładunek Odłamkowy sięga o 2 metry dalej, zadaje głównemu celowi o 25% więcej bazowych obrażeń i wywołuje o 50% więcej obrażeń rany. Bez żywego zwierzaka twoje Skupienie odnawia się też o 100% szybciej.',
   'entities.abilities.cold_focus.description':
     'Przez 12 s Wyważony Strzał odnawia o 50% więcej skupienia, a Długie Naciągnięcie kosztuje o 25% mniej i rzuca się o 30% szybciej. (Sygnatura Zimnego Wzroku)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Pasywna: Zerwanie Tropu odnawia Rozpęd Łowów i przygotowuje twoje następne Patroszące Uderzenie lub Krwawy Hak na 12 s. Patroszące Uderzenie zadaje o 15% więcej obrażeń za ładunek. Krwawy Hak zadaje od 18 do 24 dodatkowych obrażeń Fizycznych, zwiększonych o 15% za ładunek i przez twoją moc ataku dystansowego. Przy 3 ładunkach jeden z ataków zużywa Rozpęd Łowów. (Rzemiosło Polowe)',
+    'Pasywnie: Z Rozpęd Łowów zdolność Zerwanie Tropu przygotowuje twój następny Patroszące uderzenie lub Krwawy Hak na 12 s. Patroszące uderzenie zadaje o 15% więcej obrażeń na ładunek. Krwawy Hak zadaje dodatkowe 18 do 24 obrażeń fizycznych, zwiększone o 15% na ładunek i mocą ataku dystansowego. Przy 3 ładunkach każdy z tych ataków zużywa Rozpęd Łowów. (Przetrwanie)',
   'entities.abilities.frostjaw_trap.description':
     'Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s.',
   'entities.abilities.hunting_momentum.description':
-    'Pasywna: Patroszące Uderzenie przyznaje 1 Rozpęd Łowów na 8 s, do 3. Przy 3 ładunkach Rozdarcie Rany zadaje o 45% więcej obrażeń uderzenia i zużywa ładunki. (Rzemiosło Polowe)',
+    'Pasywnie: Patroszące uderzenie i Ładunek Odłamkowy trafiający wroga dają po 1 Rozpęd Łowów, do 3. Trwa do zużycia lub wyjścia z walki; każdy ładunek zwiększa szybkość ruchu o 15%. Przy 3 ładunkach Rozdarcie ran zadaje o 60% więcej obrażeń uderzenia i zużywa ładunki. (Przetrwanie)',
   'entities.abilities.measured_shot.description':
     'Strzela do celu za {damage} obrażeń Fizycznych. Trafienie odnawia 20 skupienia. Obrażenia rosną wraz z mocą ataku dystansowego.',
   'entities.abilities.pack_command.description':
@@ -16126,7 +16126,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Zmniejsza otrzymywane obrażenia o 60% na 8 s, ale uniemożliwia atakowanie, gdy jest aktywna.',
   'entities.abilities.shrapnel_charge.description':
-    'Trafia cel za 24 do 30 obrażeń Fizycznych i do 4 innych wrogów w promieniu 6 metrów za 13 do 17. Pozostałe cele krwawią też za 12 obrażeń przez 6 s. Jeśli główny cel nosi twoją Ranę Krwawego Haka, zadaje 1 tyknięcie rany natychmiast. Obrażenia bezpośrednie rosną wraz z mocą ataku dystansowego.',
+    'Uderza w stożek o zasięgu 10 metrów przed tobą. Twój cel, albo najbliższy trafiony wróg, jeśli cel jest poza stożkiem, otrzymuje od 24 do 30 obrażeń fizycznych. Pozostali wrogowie w stożku otrzymują od 7 do 9 i krwawią za 12 obrażeń przez 6 s. Jeśli główny cel ma twoją ranę z Krwawy Hak, natychmiast otrzymuje 1 impuls rany. Trafienie wroga daje 1 Rozpęd Łowów. Obrażenia bezpośrednie rosną z mocą ataku dystansowego.',
   'entities.abilities.stampede.description':
     'Przyzywa 3 bestie na 12 s. Każda atakuje co 2 s za {damage} obrażeń Fizycznych. Pokazane obrażenia zawierają 8% twojej mocy ataku dystansowego przed premiami do obrażeń towarzysza. Bestie utrwalają Zaciekłość Sfory przy przyzwaniu, zyskując 10% obrażeń za ładunek. Gdy Tratowanie jest w odnowieniu, udane Rozkazy Sfory mają 20% szans je zresetować, gwarantowane po 5 nieudanych szansach. Nie może się zresetować, gdy bestie są aktywne. (Władca Sfory)',
   'entities.abilities.trailbreak.description':
@@ -16569,7 +16569,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Każde rzucenie dodaje 1 Zieleń (maks. 3), także gdy odnawia rozkwit, który już działa. Przy 3 Zieleni Szybkie uzdrowienie zmienia się w Nadrozkwit.',
   'entities.abilities.rip.description':
-    'Umiejętność kończąca, która sprawia, że cel krwawi co 2 sekundy przez 24 sekundy: 36 obrażeń plus 24 za wydany punkt combo (5 punktów combo: {damage} łącznie). Tylko w Postaci kota.',
+    'Cios kończący wywołujący krwawienie co 2 s przez 24 s: 72 obrażenia plus 48 za wydany punkt kombinacji (5 punktów: łącznie {damage}). Tylko w Postaci kota.',
   'entities.abilities.rip.specNote_feral': 'Trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.ruinous_brand.description':
     'Naznacza wroga na 15 sekund. Twoje następne 3 bezpośrednie zaklęcia odbijają się za 25% obrażeń w naznaczonego wroga, albo kopiują na niego 50% obrażeń, gdy rzucone są na inny cel. Echa Pocisku Ruiny również liczą się jako trafienia krytyczne, bez dodatkowego mnożnika obrażeń krytycznych.',
@@ -16610,7 +16610,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stealth.specNote_subtlety':
     'Każdy otwierający cios użyty z Zasłony zmierzchu dodaje 1 Mrok (maks. 3).',
   'entities.abilities.swiftmend.description':
-    'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu i Dzikiego ukojenia dodaje 1 Zieleń; przy 3 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Serca Gaju)',
+    'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. Każde rzucenie Dzikiego rozkwitu, Drugiego rozkwitu i Dzikiego ukojenia dodaje 1 Zieleń; przy 3 Zieleni ten przycisk zmienia się w Nadrozkwit, który natychmiast leczy każdego sojusznika noszącego twoje efekty leczenia w czasie za 60% tego, co z nich zostało. (Sygnatura Odnowienia)',
   'entities.abilities.swipe.description':
     'Zamaszyście przeczesz pazurami pobliskich wrogów, zadając {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w Postaci Bruina.',
   'entities.abilities.swipe.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
@@ -16685,7 +16685,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     'Wykorzystano {used} z {cap} s skrócenia czasu odnowienia w tym oknie',
   'hudChrome.auraEffect.bruinRushWindow':
-    'Postać wilka nie kosztuje many i przygważdża cel twojej Szarży Bruina, spowalniając go o {pct}% na {sec} sek.',
+    'Postać kota nie kosztuje many i przygważdża cel twojej Szarży Bruina, spowalniając go o {pct}% na {sec} sek.',
   'hudChrome.auraEffect.desolation':
     'Pozostało {charges} ładunków: twój następny Pocisk Ruiny rzuca się o {castPct}% szybciej albo twój następny Deszcz ognia trafia natychmiast',
   'hudChrome.auraEffect.duskfireClaim': 'Śmierć celu przyznaje {value} Ruiny',
@@ -17056,7 +17056,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'To dwie osobne czynności na tym samym ciele. Wszystko, co tusza zawiera, monety i łupy plus wszelkie zbieralne składniki, otwiera się w tym samym oknie, ale klawisz interakcji i Weź łup zabierają wyłącznie zwykły łup, który podąża za normalnymi zasadami łupów. Zbieranie to strona profesji, ściągająca materiały z samej tuszy, i następuje dopiero wtedy, gdy w tym oknie wybierzesz Zbierz.\n\nZbieranie odbywa się na zasadzie kto pierwszy, jednorazowe użycie: każda tusza może być zebrana dokładnie raz, przez tego, kto ją pierwszy zgłosi, także online. Twoje Priorytety Miasta kształtują to, co dostaniesz: stojąc w centrum miasta, możesz rozłożyć 10 punktów priorytetu na typy składników, na których ci zależy, a każdy priorytetowy składnik wylosuje lepszy poziom (co 5 punktów podnosi go o krok, co najwyżej dwa kroki) i da więcej (10 procent za punkt). Niepiorytetowane składniki nigdy nie są pogarszane.',
   'guide.profPages.faq.a4':
-    'Trafiła ci się gratka. Mniej więcej 1 zbiór na 90 wyzwala rzadkie zdarzenie zbierackie (starożytne twarde drewno na drzewie, pierwotna żyła w rudzie, rozkwitły w blasku księżyca kwiat wśród ziół): mnoży plon pięć razy, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Rzut na rzadką lub lepszą jakość przy zwykłym zbiorze również podpisuje plon.\n\nPodpisane materiały warto zachować albo sprzedać drogo: trzymanie przy warsztacie dowolnej podpisanej kopii potrzebnego reagentu dodaje 2 punkty procentowe do szansy na arcydzieło. Pamiętaj tylko, że łączą się w stos wyłącznie z identycznie podpisanymi kopiami, więc zajmują własny slot w torbie.',
+    'Trafił ci się wyjątkowo obfity zbiór. Około 1 na 90 zbiorów wyzwala rzadkie wydarzenie: pradawna twardziel w drzewie, nieskazitelna żyła w rudzie lub skąpany w księżycu kwiat w ziołach. Pięciokrotnie zwiększa plon, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Zwykły zbiór z wylosowaną rzadką lub wyższą jakością też podpisuje plon.\n\nPodpisane materiały warto zachować lub drogo sprzedać: dowolna podpisana sztuka potrzebnego reagenta w torbach lub Skarbcu Materiałów, skąd rzemiosło może ją pobrać, dodaje 2 punkty procentowe do szansy mistrzowskiego wykonania. Mogą współdzielić zgodny stos z niepodpisanym materiałem oraz sztukami innych zbieraczy i podpisujących bez utraty oznaczeń; każde źródło i jego ilość są zachowane oddzielnie.',
   'guide.profPages.faq.a5':
     'Podejdź do dowolnej stacji rzemieślniczej z przedmiotem w torbie i zapłać mistrzowi. Opłata zależy od jakości przedmiotu: 25 srebrnych za niepospolity, 1 złoty za rzadki, 4 złote za epicki; legendarny płaci stawkę epicką, a pospolity wyrób na zamówienie stawkę niepospolitą. Musi to być prawdziwa stacja: ruchoma stacja nigdy tej usługi nie oferuje.\n\nOpłata kupuje czysty zapis, nie lekarstwo: przedmiot pozostaje zamówieniem, więc wiąże się ponownie z tym, kto go otrzyma w następnej wymianie. Jeśli kilka związanych kopii dzieli stos, jedna kopia jest oddzielana i odwiązywana za każdą płatność.',
   'guide.profPages.faq.a8':
@@ -18567,7 +18567,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButton': 'Śledź',
   'hudChrome.crafting.trackGoalButtonAria': 'Śledź {count} wyrobów {name} jako cel zbierania',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Twoje trafione ataki wręcz mogą dać 50 Siły na 15 sek. i uleczyć cię o 200 zdrowia. Stosują się modyfikatory leczenia. Każde trafienie ma 1% szansy na każde 0,6 sek. bazowej szybkości atakującej broni. Brak wewnętrznego czasu odnowienia. Obie ręce dzielą jedno wzmocnienie; każde uruchomienie je odnawia i nigdy się nie kumuluje. Ataki dystansowe nie uruchamiają tego efektu. Forma Wilka używa bazowej szybkości ataku 1 sek.',
+    'Twoje celne ataki wręcz mogą zapewnić 50 Siły na 15 s i przywrócić ci 200 zdrowia. Działają modyfikatory leczenia. Każde trafienie ma 1% szansy na każde 0,6 s bazowej szybkości uderzającej broni. Bez wewnętrznego czasu odnowienia. Obie ręce współdzielą jedno wzmocnienie; każde wyzwolenie je odnawia i nigdy się nie kumuluje. Ataki dystansowe nie wyzwalają efektu. W Postaci kota ataki automatyczne używają zamiast tego szybkości łap wynoszącej 1 s. Ciosy i ataki kończące w Postaci kota i Postaci Bruina używają szybkości samej broni; Zamaszyste pazury wykonują jeden rzut na użycie, nie na cel.',
   'hudChrome.enchantName.enchant_chest_armor': 'Grawerunek na piersi: Wzmocnienie',
   'hudChrome.enchantName.enchant_chest_greater_stamina':
     'Grawerunek na piersi: Większa Wytrzymałość',
@@ -19607,7 +19607,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.doctrineBodyRaidCollections':
     'Gospodarka rzemiosła opiera się na jednym pomyśle: gracze zaopatrują graczy. Zbieracze karmią rzemieślników, rzemieślnicy karmią wykonujących zadania i raiderów, a rozbijający karmią zaklinaczy. Sprzedawcy i mistrzowie stanowisk stoją na obrzeżach, by pochłaniać śmieci i monety, a nie konkurować z tobą. Jeśli chcesz zarabiać na profesji, twoim klientem jest człowiek: dowiedz się, co inni gracze zużywają, wyceniaj względem Światowego rynku i traktuj systemy NPC jako dolną granicę własnych cen, nie jako sam rynek.\n\nZwykły wykonany sprzęt wspiera wspinaczkę do końca gry. Finansowane przez raidy kolekcje Tygla oferują też alternatywę dla obecnych łupów raidowych: materiały pochodzą z raidów, a rzemiosło zmienia je w wybrany profil pancerza i roli. Trzy wybory miejsc i premia za dowolne dwie części pozwalają łączyć je ze sprzętem raidowym. Nadal dzielą globalny limit dwóch mistrzowsko kutych części, więc rzemiosło uzupełnia resztę zestawu raidowego, nie dostarczając całego zastępczego kompletu.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Niektóre przedmioty noszą nazwę. Linie źródła materiału mówią, kto zebrał każdą grupę sztuk, a osobna marka Podpisano przez wskazuje podpisującego wyższej jakości, gdy taki istnieje. Te fakty są niezależne: zwykły zebrany materiał zapisuje zbieracza bez zyskania podpisu, a stary podpisany zapas może podać podpisującego i uczciwie mówić, że nie zapisano zbieracza. Ukończona część podaje zamiast tego twórcę. Zapisy podróżują z przedmiotem przez wymianę, bank, pocztę, Światowy rynek i nawet odkupienie u sprzedawcy, nigdy nie blaknąc.\n\nZbieranie automatycznie podpisuje najlepszą pracę: każdy zbiór, który wylosuje jakość rzadką albo lepszą, przychodzi podpisany, a rzadkie odkrycia podpisują cały pięciokrotny łup. Szczęśliwy zbiór z ciała podpisuje plon, gdy dana rodzina nie ma okazu do oddania, a gdy ma, pozostawia plon zwykły i tworzy obok podpisany doskonały okaz. Rzemiosło działa tak samo: każda kopia rzadkiego albo lepszego wyniku otrzymuje podpis, a mistrzowskie wykonanie zawsze podpisuje wynik, niezależnie od jakości, więc najlepsza wersja zawsze nazywa twórcę. Podpis zwykłego materiału jedzie na samych sztukach i nie ginie tylko dlatego, że zgodny stos ma już innego zbieracza lub podpisującego. Osobny doskonały okaz jest oddzielnym przedmiotem i nadal potrzebuje miejsca; jeśli się nie mieści, zwykły plon z ciała zostaje, lecz okaz przepada.\n\nUkończone przedmioty zachowują jedną ścisłą tożsamość, więc dwie kopie łączą się tylko przy dokładnej zgodności każdej marki: ten sam przedmiot, podpisujący, statystyki mistrzowskie, enchant i związanie. Zgodne materiały dzielą miejsce między zbieraczami i podpisującymi, zachowując liczbę z każdego źródła. Podpowiedź podsumowuje źródła; kliknij stos prawym przyciskiem, aby zobaczyć pełną listę (na urządzeniach dotykowych użyj przycisku Źródła). Rozdzielenie według zbieracza trzyma stosy osobno w torbach, a sortowanie respektuje ten wybór. Przeniesiony materiał może normalnie łączyć się z materiałami odbiorcy.\n\nPodpisy zwracają się rzemieślnikom: trzymanie przy stanowisku dowolnej podpisanej kopii wymaganego reagenta, niezależnie od podpisującego, dodaje 2 punkty procentowe do szansy mistrzowskiego wykonania. Reagent podpisany własną ręką zmniejsza wymaganą ilość tego reagenta o 1, nigdy poniżej 1, chyba że ma oznaczenie bez zniżki; rdzenie raidowe zawsze zachowują pełny koszt. Własna podpisana praca rzadka albo lepsza może nadal cię uczyć, dziś wyłącznie przez wykonane mikstury: wypij rzadką miksturę, którą uwarzyłeś i podpisałeś, a mały strumień umiejętności wróci do profesji, która ją stworzyła, jeśli jest jedną z twoich aktywnych głównych. Naprawdę dotyczy to tylko mikstur, więc eliksir, zwój albo flakon szczytowy nie uczy cię niczego, choćby podpisano je najstaranniej.',
+    'Niektóre przedmioty noszą nazwę. Linie źródła materiału mówią, kto zebrał każdą grupę sztuk, a osobna marka Podpisano przez wskazuje podpisującego wyższej jakości, gdy taki istnieje. Te fakty są niezależne: zwykły zebrany materiał zapisuje zbieracza bez zyskania podpisu, a stary podpisany zapas może podać podpisującego i uczciwie mówić, że nie zapisano zbieracza. Ukończona część podaje zamiast tego twórcę. Zapisy podróżują z przedmiotem przez wymianę, bank, pocztę, Światowy rynek i nawet odkupienie u sprzedawcy, nigdy nie blaknąc.\n\nZbieranie automatycznie podpisuje najlepszą pracę: każdy zbiór, który wylosuje jakość rzadką albo lepszą, przychodzi podpisany, a rzadkie odkrycia podpisują cały pięciokrotny łup. Szczęśliwy zbiór z ciała podpisuje plon, gdy dana rodzina nie ma okazu do oddania, a gdy ma, pozostawia plon zwykły i tworzy obok podpisany doskonały okaz. Rzemiosło działa tak samo: każda kopia rzadkiego albo lepszego wyniku otrzymuje podpis, a mistrzowskie wykonanie zawsze podpisuje wynik, niezależnie od jakości, więc najlepsza wersja zawsze nazywa twórcę. Podpis zwykłego materiału jedzie na samych sztukach i nie ginie tylko dlatego, że zgodny stos ma już innego zbieracza lub podpisującego. Osobny doskonały okaz jest oddzielnym przedmiotem i nadal potrzebuje miejsca; jeśli się nie mieści, zwykły plon z ciała zostaje, lecz okaz przepada.\n\nUkończone przedmioty zachowują jedną ścisłą tożsamość, więc dwie kopie łączą się tylko przy dokładnej zgodności każdej marki: ten sam przedmiot, podpisujący, statystyki mistrzowskie, enchant i związanie. Zgodne materiały dzielą miejsce między zbieraczami i podpisującymi, zachowując liczbę z każdego źródła. Podpowiedź podsumowuje źródła; kliknij stos prawym przyciskiem, aby zobaczyć pełną listę (na urządzeniach dotykowych użyj przycisku Źródła). Rozdzielenie według zbieracza trzyma stosy osobno w torbach, a sortowanie respektuje ten wybór. Przeniesiony materiał może normalnie łączyć się z materiałami odbiorcy.\n\nPodpisy zwracają się rzemieślnikom: posiadanie dowolnej podpisanej sztuki potrzebnego reagenta, niezależnie od podpisującego, w torbach lub Skarbcu Materiałów, skąd rzemiosło może ją pobrać, dodaje 2 punkty procentowe do szansy mistrzowskiego wykonania. Reagent podpisany własną ręką zmniejsza wymaganą ilość tego reagenta o 1, nigdy poniżej 1, chyba że ma oznaczenie bez zniżki; rdzenie raidowe zawsze zachowują pełny koszt. Własna podpisana praca rzadka albo lepsza może nadal cię uczyć, dziś wyłącznie przez wykonane mikstury: wypij rzadką miksturę, którą uwarzyłeś i podpisałeś, a mały strumień umiejętności wróci do profesji, która ją stworzyła, jeśli jest jedną z twoich aktywnych głównych. Naprawdę dotyczy to tylko mikstur, więc eliksir, zwój albo flakon szczytowy nie uczy cię niczego, choćby podpisano je najstaranniej.',
   'guide.profPages.ench.enchantsNoteRaidFormula':
     'Enchanty mają cztery poziomy. Podstawowy korzysta z Pyłu dzwonu, z odrobiną Esencji na wysokim końcu, i obejmuje miejsce broni, broń podręczną oraz każdą część pancerza. Opcji osi statystyk jest dość, aby każda konfiguracja znalazła coś dla każdego miejsca: tarcze i podręczne przedmioty czarujących mają własny enchant Wytrzymałości, więc żadne wyposażone miejsce nie jest martwe dla enchantów. Poziom Większy kosztuje jeden Odłamek dzwonu i Esencję, dając silniejsze premie w najbardziej wpływowych miejscach. Odłamki mają jeszcze trzy wydatki: dwie receptury uroków po jednej sztuce (resztę kosztu uroku stanowią esencja i pył), najwyższy poziom ładowania efektów narzędzi oraz poziom Świetlisty, gdzie enchant broni i pancerza klatki biorą po jednym, a Infuzja dwa. Zachowaj kilka przed wydaniem.\n\nPomiędzy nimi znajduje się pięć enchantów Runicznych, po jednym odbiorcy dla każdego typowanego drugorzędnego statystyk, więc nic z tego, co zmielisz, nie jest ślepą uliczką: Runiczne ostrze, broń, Siła, zużywa Stal rezonującą; Runiczny sygnet, broń, Intelekt, Drewno rezonujące; Runiczny splot, klatka, Duch, Nić rezonująca; Runiczna skóra, nogi, Zręczność, Skóra rezonująca; oraz Runiczne ogniwa, hełm, Wytrzymałość, Ogniwa rezonujące. Każdy bierze też dwie Esencje dzwonu. Gdy miejsce i statystyka mają enchant podstawowy oraz Większy, premia Runiczna leży między nimi, a Runiczny splot jest bezwzględnie najmocniejszym enchantem Ducha klatki, zaś Runiczna skóra jedynym enchantem Zręczności nóg. Dokładne premie są w tabeli poniżej.\n\nNad zwykłymi niższymi poziomami znajduje się Świetlisty, szczytowa zwykła praca profesji: Zaklinanie 100 dla czterech enchantów i 125 dla Infuzji, jak pokazuje kolumna Umiejętność. Każdy wymaga Świetlistego reagenta i dodaje kolejny krok na własnym miejscu: broń z opcją Mocy i Mocy zaklęć, klatka oraz buty. Ostatnia, Świetlista infuzja, działa tylko na części Udoskonalonej: Udoskonalanie jest pracą noszącego, nie zaklinacza, a strona Profesje wyjaśnia, jak część je zdobywa.\n\nZapał Ostatniego Płomienia jest osobną recepturą raidową, nie darmowym zwykłym enchantem. Naucz się jego wymienialnej formuły przy Zaklinaniu 100 przed użyciem. Każde zastosowanie zużywa 3 rdzenie Ostatniego Płomienia i 2 Odłamki dzwonu. Formuła może wypaść w Tyglu albo zostać kupiona u jego kwatermistrza za jeden rdzeń. Zasady wyzwalacza wręcz i szybkości broni są w całości poniżej.',
   'guide.profPages.faq.a6ThreeRods':
@@ -20018,7 +20018,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.spellEffects': 'Efekty zaklęć',
   'hudChrome.options.spellTooltipOnHover': 'Opisy zaklęć po najechaniu kursorem',
   'hudChrome.pattern.reagent': '{name} ×{count}',
-  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.pattern.reagents': '{label} {list}',
   'hudChrome.realmMotd.cleared': 'Wiadomość dnia została usunięta.',
   'hudChrome.realmMotd.line': 'Wiadomość dnia: {text}',
   'hudChrome.realmMotd.none': 'Nie ustawiono wiadomości dnia.',
@@ -20107,10 +20107,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.spore_burst.specNote_restoration':
     'Nakłada także Zarodnikowe gojenie na każdego leczonego sojusznika. Przy pełnej Zieleni jest o 25% silniejszy i zużywa twoją Zieleń.',
   'entities.abilities.sporemender_form.description':
-    'Przemień się w zarodnikowego uzdrowiciela: twoje leczenie wzrasta o 20%, a pancerz o 40%, ale prędkość ruchu spada o 20%. Wszystkie zaklęcia zwykłej postaci pozostają dostępne. Trwa do opuszczenia postaci. Każda zmiana postaci zapewnia Żwawy krok, krótkie zwiększenie prędkości ruchu. Użyj ponownie, aby wrócić do zwykłej postaci. (zdolność charakterystyczna Serca Gaju)',
+    'Przemień się w zarodnikowego uzdrowiciela: twoje leczenie wzrasta o 20%, a pancerz o 40%, ale prędkość ruchu spada o 20%. Wszystkie zaklęcia zwykłej postaci pozostają dostępne. Trwa do opuszczenia postaci. Każda zmiana postaci zapewnia Długi krok, krótkie zwiększenie prędkości ruchu. Użyj ponownie, aby wrócić do zwykłej postaci. (zdolność charakterystyczna Odnowienia)',
   'entities.abilities.sporemender_form.name': 'Postać zarodnikowego uzdrowiciela',
   'entities.abilities.swiftmend.specNote_restoration':
-    'Zużywa efekt leczenia w czasie na przyjaznym celu, lecząc go o {damage}. Zarodnikowe gojenie i nasadzenia Drugiego rozkwitu dodają Zieleń; przy 5 punktach Zieleni ten przycisk staje się Nadrozkwitem, który natychmiast leczy wszystkich sojuszników z twoimi efektami leczenia w czasie o 60% ich pozostałego leczenia. (zdolność charakterystyczna Serca Gaju)',
+    'Zużywa efekt leczenia w czasie na przyjaznym celu, lecząc go o {damage}. Zarodnikowe gojenie i nasadzenia Drugiego rozkwitu dodają Zieleń; przy 5 punktach Zieleni ten przycisk staje się Nadrozkwitem, który natychmiast leczy wszystkich sojuszników z twoimi efektami leczenia w czasie o 60% ich pozostałego leczenia. (zdolność charakterystyczna Odnowienia)',
   'entities.abilities.tactical_camo.description':
     'Wtop się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak lub otrzymanie obrażeń przerywa Kamuflaż taktyczny. Użyj ponownie, aby się ujawnić. (Sztuka przetrwania)',
   'entities.abilities.tactical_camo.name': 'Kamuflaż taktyczny',
@@ -20123,7 +20123,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.world_quest_reward.sender': 'Krucza Poczta',
   'entities.letters.world_quest_reward.subject': 'Twoja nagroda za zadanie światowe',
   'guide.classPage.formLine.form_sporemender':
-    'Lecząca postać Serca Gaju: twardsza skóra i silniejsze leczenie za cenę wolniejszego chodu, z zachowaniem wszystkich zaklęć i many.',
+    'Lecząca postać Odnowienia: twardsza skóra i silniejsze leczenie za cenę wolniejszego chodu, z zachowaniem wszystkich zaklęć i many.',
   'guide.classPage.formName.form_sporemender': 'Postać zarodnikowego uzdrowiciela',
   'guide.economy.junkBodyFinal':
     'Łupy, których nie potrzebujesz, nadal można sprzedać każdemu kupcowi z własnym sklepem, więc opróżniaj torby podczas każdej wizyty w mieście. Okno kupca ma nawet przycisk Sprzedaj śmieci, który jednym kliknięciem sprzedaje wszystkie przedmioty marnej jakości. Całkowicie bezwartościowe drobiazgi można też po prostu wyrzucić, aby zrobić miejsce. Sprzedane w ten sposób niepodpisane szare przedmioty nie trafiają na listę odkupu, więc przed naciśnięciem przycisku sprawdź, czy nie chcesz czegoś zatrzymać.',
@@ -20142,4 +20142,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.hearthstoneTransport': 'Kamień powrotu przenosi cię do {hub}.',
   'hudChrome.factionRewards.itemCooldown':
     'Ten przedmiot nie jest jeszcze gotowy (pozostało {minutes} min).',
+  'hudChrome.weekly.completedLastWeek': 'Ukończone w zeszłym tygodniu',
+  'hudChrome.weekly.claimFirst': 'Najpierw odbierz',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} reputacji z zeszłego tygodnia wciąż czeka na odbiór. Odbierz ją, aby wybrać nowy ładunek.',
 };

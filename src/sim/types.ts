@@ -5013,6 +5013,9 @@ export interface WeeklyQuestProgress {
   /** The faction id that took the week's commendation (standing), once the
    *  finished charge's one choice is made; absent until then. */
   commended?: string;
+  /** Set once a later week has begun while the commendation is still
+   *  unclaimed: the pick is held only for that claim. Absent otherwise. */
+  carried?: true;
 }
 
 export interface WorldQuestProgress {

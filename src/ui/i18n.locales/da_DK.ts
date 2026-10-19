@@ -49,7 +49,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     'Brug: Forstærker dit brystharnisk, øger Rustning med 12 i 1 time.',
   'hudChrome.factionRewards.battleStandardUse':
-    'Brug: Planter Velsignede Dagsmorgen kampstandard i 5 minutter, øger uden for kamp sundhed og mana regenerering betydeligt for alle nærliggende allierede. At blive i nærheden af det i 10 sekunder giver også Velsignelse af Dagsmorgen (+5% til alle egenskaber i 30 min). (5 min nedetid)',
+    'Brug: Planter Velsignede Dagsmorgens kampstandard i 5 min. Spillere uden for kamp inden for 15 yards genvinder 10% mere liv, og manabrugere genvinder også mana svarende til 5% af deres Ånd hvert 2. sek. Efter 10 sek. i nærheden får du Velsignelse af Dagsmorgen, som øger Styrke, Smidighed, Udholdenhed, Intellekt og Ånd med 5% i 30 min. (5 min. nedkøling)',
   'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automatoner)',
   'hudChrome.factionRewards.hub_church_order': 'Østbæk Dal (Kirkeordenen)',
   'hudChrome.factionRewards.hub_none': 'Ingen (Brug nær en fraktionshub for at indstille)',
@@ -526,7 +526,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     'Ridser permanent et tohånds våben med 12 Styrke og 25 Kritisk Slagchance. Kan ikke påføres et énhånds våben. En fast bonus; den skalerer ikke.',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Dine landede nærkampsangreb kan give 60 Smidighed og 2% hurtigere nærkampsangreb i 15 sek. Hvert slag ruller 1% pr. 0,6 sek. af angribervåbnets basisangrebshastighed. Ingen intern nedlukning. Begge hænder deler en buff; enhver trigger fornyer den og den stables aldrig. Rangerangreb udløser ikke denne effekt. Katteform bruger sin 1 sek. basisangrebshastighed i stedet.',
+    'Dine nærkampsangreb, der rammer, kan give 60 Smidighed og 2% hurtigere nærkampsangreb i 15 sek. Hvert træf har 1% chance pr. 0,6 sek. af grundhastigheden på det våben, der rammer. Ingen intern nedkøling. Begge hænder deler én forstærkning; hver udløsning fornyer den, og den kan ikke stables. Afstandsangreb udløser ikke effekten. I Katteform bruger automatiske angreb i stedet poternes hastighed på 1 sek. Slag og afslutninger i Katteform og Bruin-form bruger våbnets egen hastighed; Fejende Kløer foretager ét chancekast pr. brug, ikke pr. mål.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Våbenridning: Daggryild',
   'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Våbenridning: Daggryets Velsignelse',
   'hudChrome.enchantName.enchant_weapon_piston_drive': 'Våbenridning: Stempelkraft',
@@ -2359,7 +2359,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     'Tilføjer en "Kastet af" linje til hver buff/debuff-tooltip, navngivning hvem der påførte det. Praktisk til at skelne ad flere kastere af samme buff, som to paladiner Velsignelse.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Hænger mål-ramme buff og debuff-strip under rammen i stedet for over det, det klassiske layout. Fra som standard, siden stock mål-rammen sidder direkte over handlingslinjen; slå det til når du har flyttet rammen et sted med plads under den.',
+    'Placerer målets række med forstærkninger og svækkelser under målrammen, under navn og livsbjælke, frem for over den: det klassiske layout. I standardpositionen hæves målrammen sammen med din kastebjælke og slagure med én række, så rækkens første linje går fri af handlingsbjælken; en ramme, du selv har flyttet, bliver stående.',
   'guide.settingsPage.rowFrameRateCap':
     'Et loft på hvor mange billeder spillet tegner hver sekund. En computer der ikke kan følge med sin display lander på en ujævn rytme; en stabil 30 ser glattere ud end det, halveres arbejdet, og holder computeren køler. Display betyder ingen grænse.',
   'guide.stats.warfareBodyPets':
@@ -3438,9 +3438,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Fleet-form',
   'guide.classPage.formsHeading': 'Formskifte',
   'guide.classPage.formsMoonwing':
-    'En Månelund-druide får endnu en form, Månekinform, den kasterform en Månelund-druide kæmper i. Det er den ene dyreform, der beholder dine besværgelser, og din tryllestav virker kun i den eller i din normale kasterform.',
+    'En Balance-druide får endnu en form, Månekinform, den kasterform denne specialisering kæmper i. Ligesom Genoprettelses Sporehelerform bevarer den dine besværgelser, og din tryllestav virker kun i disse to former eller i din normale kasterform.',
   'guide.classPage.formsWolfEngage':
-    'En ulv åbner kampen med Bruin-storm, skifter straks til Ulveform for at fastholde målet, lukker afstanden med Spring, når den ikke sniger, og holder en fjende fast med Nedlæggelse.',
+    'En kat åbner kampen med Bruin-storm, skifter straks til Katteform for at fastholde målet, lukker afstanden med Spring, når den ikke sniger, og holder en fjende fast med Nedlæggelse.',
   'guide.classPage.formsNote':
     'En druide kæmper ved at skifte form. De fleste druideevner hører til én form, så den form, du er i, afgør, hvad du kan kaste, og at skifte koster lidt mana. Du kan skifte form både i og uden for kamp, så tit du vil.',
   'guide.classPage.mageEleHeading': 'Vandelementar',
@@ -6272,7 +6272,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et vildt skud, der desorienterer målet i {duration} sek. Enhver skade bryder effekten.',
   'entities.abilities.typhoon.name': 'Tyfon',
   'entities.abilities.typhoon.description':
-    'Et vindstød slår alle fjender inden for 8 m tilbage og omtåger dem, så deres bevægelseshastighed reduceres med 50 % i 4 sek.',
+    'Et vindstød kaster alle fjender inden for 8 meter 15 meter væk fra dig og fortumler dem, så hastigheden falder med 50% i 4 sek. Fjendtlige spillere kastes lige gennem luften: over en kant fortsætter de og tager faldskade; et dødeligt fald tæller som dit drab.',
   'entities.abilities.voidfeast.name': 'Tomhedsfest',
   'entities.abilities.voidfeast.description':
     'Fortærer en magisk effekt (en gavnlig fra en fjende eller en skadelig fra en allieret) og helbreder dig for 6 % af dit maksimale helbred.',
@@ -7651,7 +7651,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et råb, der øger angrebskraften hos alle gruppemedlemmer med {buff}% i 30 min.',
   'entities.abilities.battle_shout.name': 'Jernbrøl',
   'entities.abilities.bear_charge.description':
-    'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. I 3 sek. derefter er Ulveform gratis og fastholder målet, hvilket nedsætter dets hastighed med 50% i 4 sek. 8-25 m rækkevidde. Kun i Bruin-form.',
+    'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. I 3 sek. derefter er Katteform gratis og fastholder målet, hvilket nedsætter dets hastighed med 50% i 4 sek. 8-25 m rækkevidde. Kun i Bruin-form.',
   'entities.abilities.bear_charge.name': 'Bruin-storm',
   'entities.abilities.bear_form.description':
     'Forvandl dig til en bjørn: rustning +110%, maksimalt helbred +30%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Du slår dobbelt så hurtigt for halv skade pr. slag, og hvert slag opbygger dobbelt raseri. Ethvert formskifte giver Fjedrende Skridt, et kort ryk i bevægelseshastighed. Kast igen for at vende tilbage til besværgerform.',
@@ -7671,7 +7671,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Angrib øjeblikkeligt i et blodraseri for 60% våbenskade plus {damage}. (Furie-signatur)',
   'entities.abilities.bloodthirst.name': 'Åreladning',
   'entities.abilities.cat_form.description':
-    'Forvandler jer til en ulv: smidigheden stiger med jeres niveau, angrebsstyrke +8 plus 2 per niveau, jeres angreb bruger energi og kombopoint, og I skaber 29% mindre trussel. Skift til enhver skikkelse giver Langstrakt gang: 60% bevægelseshastighed i 3 sek., én gang hvert 20. sek. Kast den igen for at vende tilbage til besværgerskikkelsen.',
+    'Forvandl dig til en kat: smidigheden stiger med dit niveau, angrebsstyrke +8 plus 2 pr. niveau, angreb bruger energi og kombopoint, du bevæger dig 15% hurtigere og skaber 29% mindre trussel. Ethvert formskift giver Langstrakt gang, et kort hastighedsboost. Kast igen for at vende tilbage til besværgerform.',
   'entities.abilities.cat_form.name': 'Katteform',
   'entities.abilities.charge.description':
     'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde.',
@@ -7703,7 +7703,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forbander målet med kval: {damage} skyggeskade over 24 sek.',
   'entities.abilities.curse_of_agony.name': 'Kvalens Forgørelse',
   'entities.abilities.dash.description':
-    'Spurt fremad og øg bevægelseshastigheden med 50% i 15 sek. Kun i Katteform.',
+    'Skift til Katteform, hvis du ikke allerede er i den, og sprint med 50% ekstra hastighed i 15 sek. Kan bruges i alle former. Øjeblikkelig og udløser ikke global nedkøling.',
   'entities.abilities.dash.name': 'Ræs',
   'entities.abilities.deadly_poison.description':
     'Smører dit våben i 30 min. Hvert af dine nærkampshug lægger et lag gift på målet, op til 5, og fornyer varigheden på 12 sek. Hvert lag volder {damage} naturskade hvert 2. sek.',
@@ -7829,7 +7829,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et stærkt angreb, der øger nærkampsskaden med {damage}. Aktiveres ved dit næste hug.',
   'entities.abilities.heroic_strike.name': 'Plyndrerslag',
   'entities.abilities.hibernate.description':
-    'Tvinger målet ind i en dyb søvn i op til 8 sek. Enhver skade vækker det.',
+    'Tvinger målet i dyb søvn i op til 8 sek. Al skade vækker det. Mod spillere varer hver gentagelse inden for 18 sek. halvt så længe som den forrige, og den fjerde mislykkes.',
   'entities.abilities.hibernate.name': 'Slummer',
   'entities.abilities.holy_light.description':
     'Helbreder hurtigt et venligt mål for {damage}. At genoprette helbred skaber 1 Hengivenhed, selv uden specialisering. Strålende Resonans eller Solhævn gør den øjeblikkelig.',
@@ -7888,13 +7888,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forvandler fjenden til en tudse i op til {duration} sek. Tudsen vandrer omkring og helbredes hurtigt. Enhver skade bryder effekten. Kun bæster og humanoider.',
   'entities.abilities.polymorph.name': 'Forheks',
   'entities.abilities.pounce.description':
-    'En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint. Kun i Ulveform. Uden sneg-tilstand er denne knap Spring.',
+    'En snigeåbner der bedøver målet i 2 sek. Giver 1 kombopoint. Kun i Katteform. Uden sneg-tilstand er denne knap Spring.',
   'entities.abilities.pounce.name': 'Luskeslag',
   'entities.abilities.lunge.description':
-    'Spring mod en fjende op til 12 m væk, påfør 60% våbenskade og giv 1 kombopoint. Kun i Ulveform.',
+    'Spring mod en fjende op til 12 m væk, påfør 60% våbenskade og giv 1 kombopoint. Kun i Katteform.',
   'entities.abilities.lunge.name': 'Spring',
   'entities.abilities.hamstring_bite.description':
-    'Afsluttende manøvre, der bedøver målet i 1 sek. plus 1 sek. pr. combopoint (5 combopoint: 6 sek.). Kun i Ulveform.',
+    'Afsluttende manøvre, der bedøver målet i 1 sek. plus 1 sek. pr. combopoint (5 combopoint: 6 sek.). Kun i Katteform.',
   'entities.abilities.hamstring_bite.name': 'Nedlæggelse',
   'entities.abilities.power_word_fortitude.description':
     'Øger hvert gruppemedlems Udholdenhed med {buff}% i 30 min.',
@@ -7903,7 +7903,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Skjolder et venligt mål og absorberer {damage} skade i 30 sek. Disciplin forbinder desuden målet med jeres Hellige skade i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Værnets Salme',
   'entities.abilities.prowl.description':
-    'Gå i sneg-tilstand mens du er i Ulveform. Kan ikke bruges i kamp.',
+    'Gå i sneg-tilstand mens du er i Katteform. Kan ikke bruges i kamp.',
   'entities.abilities.prowl.name': 'Snig',
   'entities.abilities.pyroblast.description':
     'Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid.',
@@ -14003,7 +14003,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Evne',
   'guide.search.typeDeed': 'Bedrift',
   'guide.settingsPage.audioBody':
-    'Indstillingsvinduet er ikke bare pixels. Lyd rummer tre lydstyrkeskydere, til lydeffekter, musik og stemme, plus en kontakt til musik og fire kontakter til de lyde, der hurtigst bliver trættende: NPC-stemmer, fodtrin, brugerfladelyde og klikrespons. Fanebladet Generelt i Brugerfladepanelet bærer en sprogvælger, der lokaliserer hele brugerfladen på stedet uden genindlæsning, og en temavælger til vinduernes udstyr.',
+    'Indstillinger handler også om lyd. Lyd har fire lydstyrkeskydere til effekter, omgivelser, musik og stemmer samt en kontakt til musik og fire kontakter til lyde, man ofte bliver træt af: NPC-stemmer, fodtrin, grænsefladelyde og klikrespons. Fanen Generelt under Grænseflade har et sprogvalg, der straks oversætter hele grænsefladen uden genindlæsning, og et temavalg til vinduernes udseende.',
   'guide.settingsPage.audioTitle': 'Lyd og sprog',
   'guide.settingsPage.autolootBody':
     'Foretrækker du ikke at klikke på hvert lig? Automatisk plyndring i forbifarten, på fanebladet Kamp i Brugerfladepanelet og slået fra som standard, skovler byttet fra dine egne drab op, mens du går forbi dem.',
@@ -14446,7 +14446,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Kanaliserer i 3 sek. og volder {damage} Skyggeskade hvert sekund på fjender inden for 8 m fra målområdet. Skaden stiger med Besværgelseskraft. (Præstetalent)',
   'entities.abilities.multi_shot.description':
-    'Affyrer en salve mod målområdet og giver {damage} Fysisk skade til fjender inden for en radius af 8 m. (jægertalent)',
+    'Affyrer en salve mod målområdet og giver {damage} Fysisk skade til fjender inden for 8 yards. (jægertalent)',
   'entities.abilities.prayer_of_healing.description':
     'Helbreder allierede inden for 30 m for {damage}. Helbredelsen stiger med Besværgelseskraft. (Hellig)',
   'entities.abilities.preparation.description':
@@ -15658,17 +15658,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Slip Bæstet Løs',
   'entities.abilities.wildheart.name': 'Vildhjerte',
   'entities.abilities.bloodhook.description':
-    'Storm mod en fjende og påfør Blodkrogssår, der gør 34 fysisk grundskade plus 26% af din afstandsangrebskraft over 12 sek. i 4 pulser. (Feltkunstsignatur)',
+    'Storm mod en fjende og påfør et sår med Blodkrog, der gør 34 fysisk grundskade plus 26% af din afstandsangrebsstyrke i 4 tik over 12 sek. Ved ankomst sænkes målets hastighed med 30% i 3 sek. (Overlevelse)',
   'entities.abilities.bloodtrail_assault.description':
-    'I 12 sek. spreder Blodkrogen et sår med 60% styrke til op til 2 nærliggende fjender, Sårflænge befaler et kæledyrsangreb på 18 skade, og Splintladningen får 2 meter, gør 25% mere grundskade på sit hovedmål og udløser 50% mere sårskade.',
+    'I 12 sek. spreder Blodkrog et sår med 60% styrke til op til 2 fjender inden for 5 meter, Sårflænger beordrer et kæledyrsangreb for 18 skade, og Splintladning når 2 meter længere, gør 25% mere grundskade på hovedmålet og udløser 50% mere sårskade. Uden et levende kæledyr gendannes dit Fokus også 100% hurtigere.',
   'entities.abilities.cold_focus.description':
     'I 12 sek. genopretter Afmålt Skud 50% mere fokus, og Langt Træk koster 25% mindre og kastes 30% hurtigere. (Koldsynssignatur)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Passiv: Sporbrud fornyer Jagtfarten og gør dit næste Sprættende Slag eller Blodkrog klar i 12 sek. Sprættende Slag gør 15% mere skade per stak. Blodkrogen gør 18 til 24 ekstra fysisk skade, øget med 15% per stak og af din afstandsangrebskraft. Ved 3 stakke forbruger et af angrebene Jagtfarten. (Feltkunst)',
+    'Passiv: Med Jagtfart gør Sporbrud dit næste Sprættende Slag eller Blodkrog klar i 12 sek. Sprættende Slag gør 15% mere skade pr. stak. Blodkrog gør 18 til 24 ekstra fysisk skade, øget med 15% pr. stak og af afstandsangrebsstyrke. Ved 3 stakke bruger et af angrebene Jagtfart. (Overlevelse)',
   'entities.abilities.frostjaw_trap.description':
     'Placer en fælde ved den valgte fjende eller ved dine fødder. Den armeres efter 0,75 sek. og varer 30 sek. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek.',
   'entities.abilities.hunting_momentum.description':
-    'Passiv: Sprættende Slag giver 1 Jagtfart i 8 sek., op til 3. Ved 3 stakke gør Sårflænge 45% mere slagskade og forbruger stakkene. (Feltkunst)',
+    'Passiv: Sprættende Slag og en Splintladning, der rammer en fjende, giver hver 1 Jagtfart, op til 3. Varer, indtil de bruges eller du forlader kamp, og hver stak øger bevægelseshastigheden med 15%. Ved 3 stakke gør Sårflænger 60% mere slagskade og bruger stakkene. (Overlevelse)',
   'entities.abilities.measured_shot.description':
     'Skyd målet for {damage} fysisk skade. Et træf genopretter 20 fokus. Skaden stiger med afstandsangrebskraft.',
   'entities.abilities.pack_command.description':
@@ -15678,7 +15678,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Reducerer den skade, du tager, med 60% i 8 sek., men forhindrer angreb, mens den er aktiv.',
   'entities.abilities.shrapnel_charge.description':
-    'Rammer målet for 24 til 30 fysisk skade og op til 4 andre fjender inden for 6 meter for 13 til 17. De øvrige mål bløder også for 12 skade over 6 sek. Hvis hovedmålet bærer dit Blodkrogssår, gøres 1 sårpuls straks. Den direkte skade stiger med afstandsangrebskraft.',
+    'Ram en 10 meter lang kegle foran dig. Dit mål, eller den nærmeste ramte fjende hvis målet er udenfor keglen, tager 24 til 30 fysisk skade. Alle andre fjender i keglen tager 7 til 9 og bløder for 12 skade over 6 sek. Har hovedmålet dit sår fra Blodkrog, tager det straks 1 sårtik. At ramme en fjende giver 1 Jagtfart. Direkte skade stiger med afstandsangrebsstyrke.',
   'entities.abilities.stampede.description':
     'Tilkalder 3 bæster i 12 sek. Hvert angriber hvert 2. sek. for {damage} fysisk skade. Den viste skade inkluderer 8% af din afstandsangrebskraft før kæledyrsskadebonusser. Bæsterne fastlåser Flokvildskabet ved tilkaldelsen og får 10% skade per stak. Mens Vildt Spring er under nedkøling, har vellykkede Flokbefalinger 20% chance for at nulstille det, garanteret efter 5 mislykkede chancer. Det kan ikke nulstilles, mens bæsterne er aktive. (Flokherre)',
   'entities.abilities.trailbreak.description':
@@ -16400,7 +16400,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Hver kastning giver 1 Grønske (maks. 3), også når den fornyer en blomstring, der allerede virker. Ved 3 Grønske bliver Hurtig heling til Overblomstring.',
   'entities.abilities.rip.description':
-    'Afsluttende manøvre, der får målet til at bløde hvert 2. sek. i 24 sek.: 36 skade plus 24 pr. brugt combopoint (5 combopoint: {damage} i alt). Kun i Katteform.',
+    'Afsluttende angreb, der får målet til at bløde hvert 2. sek. i 24 sek.: 72 skade plus 48 pr. brugt kombopoint (5 point: {damage} i alt). Kun i Katteform.',
   'entities.abilities.rip.specNote_feral': 'Det ramte slag tilføjer 1 Gammelt Blod (maks. 3).',
   'entities.abilities.ruinous_brand.description':
     'Brænder en fjende i 15 sek. Dine næste 3 direkte besværgelser ekkoer for 25% skade mod den brændemærkede fjende, eller kopierer 50% skade til den, når de kastes mod et andet mål. Undergangslyn-ekkoer tæller også som kritiske træffere, uden endnu en kritisk skademultiplikator.',
@@ -16516,7 +16516,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     '{used} af {cap} sek. nedkølingsreduktion brugt i dette vindue',
   'hudChrome.auraEffect.bruinRushWindow':
-    'Ulveform koster ingen mana og fastholder målet for jeres Bruin-storm, hvilket nedsætter dets hastighed med {pct}% i {sec} sek.',
+    'Katteform koster ingen mana og fastholder målet for jeres Bruin-storm, hvilket nedsætter dets hastighed med {pct}% i {sec} sek.',
   'hudChrome.auraEffect.desolation':
     '{charges} ladninger: dit næste Undergangslyn kastes {castPct}% hurtigere, eller din næste Ildregn lander øjeblikkeligt',
   'hudChrome.auraEffect.duskfireClaim': 'Død giver {value} Wrack',
@@ -16879,7 +16879,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Det er to adskilte handlinger på den samme krop. Alt et kadaver indeholder, mønt og bytte plus eventuelle høstbare komponenter, åbner i det samme vindue, men interaktionstasten og Tag bytte samler kun det almindelige bytte, som følger de normale byteregler. Høst er fagenes side, der stripper materialer af selve kadaveret, og den sker først, når du vælger Høst i det vindue.\n\nHøst er først til mølle, enkeltbrug: hvert kadaver kan høstes præcis én gang, af den der gør krav på det først, online inkluderet. Dit Byfokus former, hvad du får: mens du står i et byhub kan du sprede 10 fokuspoint over de komponenttyper du holder af, og hvert fokuseret komponent ruller et bedre trin (hvert 5 point løfter det et trin, højst to trin) og giver mere (10 procent pr. point). Ufokuserede komponenter gøres aldrig dårligere.',
   'guide.profPages.faq.a4':
-    'Du ramte et vindfald. Cirka 1 høst ud af 90 udløser en sjælden indsamlingsbegivenhed (gammelt kernetræ på et træ, en uberørt åre i malm, en måneskinsblomst blandt urterne): den ganger udbyttet fem gange, signerer hver eneste enhed med dit navn og bekendtgør fundet for hele zonen. Et rul på sjælden eller bedre ved en ordinær høst signerer også udbyttet.\n\nSignerede materialer er værd at beholde eller sælge dyrt: at have et hvilket som helst signeret eksemplar af et nødvendigt råmateriale ved bænken lægger 2 procentpoint til mesterværkschancen. Husk blot, at de kun stables med eksemplarer, der er signeret på præcis samme måde, så de optager deres egen taskeplads.',
+    'Du fandt en usædvanlig rig forekomst. Omtrent 1 ud af 90 indsamlinger udløser en sjælden begivenhed: urgammelt kerneved i træer, en uberørt åre i malm eller en månebelyst blomst i urter. Udbyttet femdobles, hver enhed får dit navn som signatur, og fundet annonceres i hele zonen. Et almindeligt fund med sjælden eller bedre kvalitet får også signeret sit udbytte.\n\nSignerede materialer er værd at gemme eller sælge dyrt: en signeret enhed af en nødvendig ingrediens i taskerne eller Materialehvælvet, hvor håndværket kan hente den, giver 2 procentpoint større chance for et mesterværk. De kan dele en kompatibel stak med usignerede enheder eller andre indsamleres og underskriveres enheder uden at miste mærker; hver kilde og mængde gemmes særskilt.',
   'guide.profPages.faq.a5':
     'Gå til en hvilken som helst håndværksstation med stykket i dine tasker og betal mesteren. Gebyret følger genstandens kvalitet: 25 sølv for et ualmindeligt stykke, 1 guld for et sjældent, 4 guld for et episk; et legendarisk betaler den episke takst, og et kommissioneret almindeligt stykke betaler den ualmindelige takst. Det skal være en rigtig station: en mobil station tilbyder aldrig tjenesten.\n\nGebyret køber en ren tavle, ikke en kur: stykket forbliver en kommission, så det binder sig igen til den, der modtager det i næste handel. Hvis flere bundne eksemplarer deler en stak, skrælles ét eksemplar af og afbindes pr. betaling.',
   'guide.profPages.faq.a8':
@@ -18380,7 +18380,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Spor {count} fremstillinger af {name} som dit samlemål',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Dine træffende nærkampsangreb kan give 50 Styrke i 15 sekunder og helbrede dig for 200 helbred. Helbredelsesmodifikatorer gælder. Hvert træf ruller 1 % pr. 0,6 sekunder af det angribende våbens grundhastighed. Ingen intern nedkøling. Begge hænder deler én styrkelse; enhver udløsning fornyer den, og den stables aldrig. Afstandsangreb udløser ikke effekten. Ulveform bruger sin grundsvinghastighed på 1 sekund.',
+    'Dine nærkampsangreb, der rammer, kan give 50 Styrke i 15 sek. og helbrede dig for 200 liv. Helbredelsesmodifikatorer gælder. Hvert træf har 1% chance pr. 0,6 sek. af grundhastigheden på det våben, der rammer. Ingen intern nedkøling. Begge hænder deler én forstærkning; hver udløsning fornyer den, og den kan ikke stables. Afstandsangreb udløser ikke effekten. I Katteform bruger automatiske angreb i stedet poternes hastighed på 1 sek. Slag og afslutninger i Katteform og Bruin-form bruger våbnets egen hastighed; Fejende Kløer foretager ét chancekast pr. brug, ikke pr. mål.',
   'hudChrome.enchantName.enchant_chest_armor': 'Brystetsning: Forstærkning',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Brystetsning: Større udholdenhed',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Brystetsning: Lysende udholdenhed',
@@ -19387,7 +19387,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Sådan bevæger mønter sig gennem fagene: De nøjagtige gebyrer og pengeslugere, hvad der faktisk sælger, Verdensmarkedets regler, arbejdsordrer, bestillinger og pladsen for raidfinansierede samlinger ved siden af almindeligt håndværk.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Nogle genstande bærer et navn. Et materiales kildelinjer siger, hvem der samlede hver gruppe enheder, mens et separat signeret-af-mærke identificerer den signerede mester, hvis der er en. De fakta er uafhængige: Almindeligt indsamlet materiale registrerer en samler uden at få en signatur, og gammelt signeret lager kan navngive sin underskriver, mens det ærligt siger, at ingen samler blev registreret. En færdig del siger i stedet, hvem der fremstillede den. Disse registreringer følger genstanden gennem handler, banken, posten, Verdensmarkedet og selv et sælgers tilbagekøb og falmer aldrig.\n\nIndsamling signerer automatisk sit bedste arbejde: Enhver høst, der slår sjælden eller bedre, kommer signeret, og sjældne fund signerer hele deres femdobbelte gevinst. Et ligs heldige kast signerer udbyttet, hvor familien ikke har et eksemplar at give, og hvor den har, lader det udbyttet være almindeligt og fremstiller det signerede uberørte eksemplar ved siden af. Håndværk signerer ad samme vej: Hver kopi af et sjældent eller bedre resultat fremstilles signeret, og et mesterværk signerer altid uanset kvalitet, så den fineste version af enhver del altid navngiver sin skaber. Et almindeligt materiales signatur følger selve enhederne og kan ikke gå tabt, blot fordi en kompatibel stak allerede har en anden samler eller underskriver. Et særskilt uberørt eksemplar er en separat genstand og kræver stadig plads. Hvis det ikke kan være der, bliver det almindelige ligudbytte, men eksemplaret går tabt.\n\nFærdige genstande beholder én streng identitet, så to kopier flettes kun, når hvert mærke passer nøjagtigt: samme genstand, samme underskriver, samme mesterværksegenskaber, samme fortryllelse og samme binding. Kompatible materialer deler en plads på tværs af samlere og underskrivere, mens de beholder en optælling for hver kilde. Hover-værktippet opsummerer kilderne; højreklik på stakken for hele listen (brug dens Kilder-knap ved berøring). Adskil efter samler holder de stakke adskilt i dine tasker, og sortering respekterer valget. Overført materiale kan normalt stables med modtagerens materialer.\n\nSignaturer betaler håndværkere tilbage: At holde en signeret kopi af et nødvendigt reagens ved bænken, uanset hvem der signerede den, tilføjer 2 procentpoint til mesterværkschancen, og at holde et reagens signeret af din egen hånd skærer det nødvendige antal af det reagens ned med én, aldrig under én, medmindre reagenset er mærket ikke-rabatberettiget. Raidkerner beholder altid deres fulde pris. Dit eget signerede sjældne eller bedre arbejde bliver endda ved med at lære dig, i dag kun gennem fremstillede drikke: Drik en sjælden drik, du bryggede og signerede, så flyder en lille færdighedsstrøm tilbage til det fag, der fremstillede den, så længe faget er et af dine aktive hovedfag. Det er virkelig kun drikkearmen og intet andet, så en eliksir, rulle eller topflaske lærer dig intet tilbage, uanset hvor fint den er signeret.',
+    'Nogle genstande bærer et navn. Et materiales kildelinjer siger, hvem der samlede hver gruppe enheder, mens et separat signeret-af-mærke identificerer den signerede mester, hvis der er en. De fakta er uafhængige: Almindeligt indsamlet materiale registrerer en samler uden at få en signatur, og gammelt signeret lager kan navngive sin underskriver, mens det ærligt siger, at ingen samler blev registreret. En færdig del siger i stedet, hvem der fremstillede den. Disse registreringer følger genstanden gennem handler, banken, posten, Verdensmarkedet og selv et sælgers tilbagekøb og falmer aldrig.\n\nIndsamling signerer automatisk sit bedste arbejde: Enhver høst, der slår sjælden eller bedre, kommer signeret, og sjældne fund signerer hele deres femdobbelte gevinst. Et ligs heldige kast signerer udbyttet, hvor familien ikke har et eksemplar at give, og hvor den har, lader det udbyttet være almindeligt og fremstiller det signerede uberørte eksemplar ved siden af. Håndværk signerer ad samme vej: Hver kopi af et sjældent eller bedre resultat fremstilles signeret, og et mesterværk signerer altid uanset kvalitet, så den fineste version af enhver del altid navngiver sin skaber. Et almindeligt materiales signatur følger selve enhederne og kan ikke gå tabt, blot fordi en kompatibel stak allerede har en anden samler eller underskriver. Et særskilt uberørt eksemplar er en separat genstand og kræver stadig plads. Hvis det ikke kan være der, bliver det almindelige ligudbytte, men eksemplaret går tabt.\n\nFærdige genstande beholder én streng identitet, så to kopier flettes kun, når hvert mærke passer nøjagtigt: samme genstand, samme underskriver, samme mesterværksegenskaber, samme fortryllelse og samme binding. Kompatible materialer deler en plads på tværs af samlere og underskrivere, mens de beholder en optælling for hver kilde. Hover-værktippet opsummerer kilderne; højreklik på stakken for hele listen (brug dens Kilder-knap ved berøring). Adskil efter samler holder de stakke adskilt i dine tasker, og sortering respekterer valget. Overført materiale kan normalt stables med modtagerens materialer.\n\nSignaturer betaler håndværkere tilbage: At have en signeret kopi af et nødvendigt reagens, uanset underskriveren, i taskerne eller Materialehvælvet, hvor håndværket kan hente den, tilføjer 2 procentpoint til mesterværkschancen, og at holde et reagens signeret af din egen hånd skærer det nødvendige antal af det reagens ned med én, aldrig under én, medmindre reagenset er mærket ikke-rabatberettiget. Raidkerner beholder altid deres fulde pris. Dit eget signerede sjældne eller bedre arbejde bliver endda ved med at lære dig, i dag kun gennem fremstillede drikke: Drik en sjælden drik, du bryggede og signerede, så flyder en lille færdighedsstrøm tilbage til det fag, der fremstillede den, så længe faget er et af dine aktive hovedfag. Det er virkelig kun drikkearmen og intet andet, så en eliksir, rulle eller topflaske lærer dig intet tilbage, uanset hvor fint den er signeret.',
   'guide.profPages.effectFeast':
     'Sætter et festmåltid frem, som andre spiser fra, én portion hver: {servings} portioner, der varer {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -19847,7 +19847,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.spellEffects': 'Besværgelseseffekter',
   'hudChrome.options.spellTooltipOnHover': 'Besværgelsestips ved musemarkør',
   'hudChrome.pattern.reagent': '{name} ×{count}',
-  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.pattern.reagents': '{label} {list}',
   'hudChrome.realmMotd.cleared': 'Dagens besked er ryddet.',
   'hudChrome.realmMotd.line': 'Dagens besked: {text}',
   'hudChrome.realmMotd.none': 'Der er ikke angivet nogen dagens besked.',
@@ -19936,10 +19936,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.spore_burst.specNote_restoration':
     'Giver også Sporeheling til hver allieret, den heler. Ved fuld Grønske er den 25% stærkere og bruger din Grønske.',
   'entities.abilities.sporemender_form.description':
-    'Skift form til en sporeheler: din heling øges med 20% og din rustning med 40%, men din bevægelseshastighed sænkes med 20%. Alle dine besværgelser fra din normale kasterform kan stadig bruges. Varer, indtil du skifter ud af formen. Et skift til enhver form giver Luntende Skridt, en kort stigning i bevægelseshastigheden. Kast igen for at vende tilbage til kasterform. (Lundhjertets signaturevne)',
+    'Skift form til en sporeheler: din heling øges med 20% og din rustning med 40%, men din bevægelseshastighed sænkes med 20%. Alle dine besværgelser fra din normale kasterform kan stadig bruges. Varer, indtil du skifter ud af formen. Et skift til enhver form giver Langstrakt gang, en kort stigning i bevægelseshastigheden. Kast igen for at vende tilbage til kasterform. (signaturevne for Genoprettelse)',
   'entities.abilities.sporemender_form.name': 'Sporehelerform',
   'entities.abilities.swiftmend.specNote_restoration':
-    'Bruger en heling-over-tid-effekt på et venligt mål for at hele det for {damage}. Sporeheling og plantninger fra Anden Blomstring giver Grønske; ved 5 Grønske bliver denne knap til Overblomstring, som straks heler alle allierede med dine heling-over-tid-effekter for 60% af deres resterende heling. (Lundhjertets signaturevne)',
+    'Bruger en heling-over-tid-effekt på et venligt mål for at hele det for {damage}. Sporeheling og plantninger fra Anden Blomstring giver Grønske; ved 5 Grønske bliver denne knap til Overblomstring, som straks heler alle allierede med dine heling-over-tid-effekter for 60% af deres resterende heling. (signaturevne for Genoprettelse)',
   'entities.abilities.tactical_camo.description':
     'Fald i ét med omgivelserne: fjender bemærker dig knap nok, og du bevæger dig med 80% hastighed. Angreb eller modtaget skade bryder Taktisk Camouflage. Kast igen for at træde frem. (Feltkunst)',
   'entities.abilities.tactical_camo.name': 'Taktisk Camouflage',
@@ -19952,7 +19952,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.letters.world_quest_reward.sender': 'Ravneposten',
   'entities.letters.world_quest_reward.subject': 'Din verdensopgavebelønning',
   'guide.classPage.formLine.form_sporemender':
-    'Lundhjertets helende form: sejere hud og stærkere heling med langsommere gang, og du beholder alle besværgelser og din mana.',
+    'Genoprettelses helende form: sejere hud og stærkere heling med langsommere gang, og du beholder alle besværgelser og din mana.',
   'guide.classPage.formName.form_sporemender': 'Sporehelerform',
   'guide.economy.junkBodyFinal':
     'Bytte, du ikke kan bruge, kan stadig sælges til enhver købmand med egen butik, så tøm taskerne, hver gang du kommer gennem byen. Købmandsvinduet har endda en Sælg skrammel-knap, der sælger alt af ringe kvalitet med ét klik. Helt værdiløse småting kan også kasseres for at skabe plads. Usignerede grå genstande, der sælges sådan, kommer ikke på tilbagekøbslisten, så kontrollér, om der er noget, du ville beholde, før du trykker.',
@@ -19968,4 +19968,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.hearthstoneBound': 'Din allierede hjemsten er nu bundet til {hub}.',
   'hudChrome.factionRewards.hearthstoneTransport': 'Hjemstenen fører dig til {hub}.',
   'hudChrome.factionRewards.itemCooldown': 'Genstanden er ikke klar endnu ({minutes} min tilbage).',
+  'hudChrome.weekly.completedLastWeek': 'Fuldført sidste uge',
+  'hudChrome.weekly.claimFirst': 'Hent først',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} omdømme fra sidste uge er endnu ikke hentet. Hent det for at vælge en ny ladning.',
 };

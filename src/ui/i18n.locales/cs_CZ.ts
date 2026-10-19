@@ -49,7 +49,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     'Použití: Posílí tvou hrudní zbroj, zvýší obranu o 12 na 1 hodinu.',
   'hudChrome.factionRewards.battleStandardUse':
-    'Použití: Zasadí prapor prvního úsvitu na 5 minut, značně zvyšuje regeneraci zdraví a many mimo boj pro všechny blízké spojence. Zůstaneš-li u něj 10 sekund, také získáš požehnání úsvitu (+5% všem statistikám na 30 minut). (5 minut cooldown)',
+    'Použití: Na 5 min zasadí prapor prvního úsvitu. Hráči mimo boj do 15 yardů od něj regenerují o 10% více zdraví a uživatelům many se navíc každé 2 s obnoví mana ve výši 5% jejich ducha. Po 10 s v jeho blízkosti získáš požehnání úsvitu, které na 30 min zvýší sílu, obratnost, výdrž, intelekt a ducha o 5%. (Doba obnovy 5 min)',
   'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automati)',
   'hudChrome.factionRewards.hub_church_order': 'Eastbrookské údolí (Církevní řád)',
   'hudChrome.factionRewards.hub_none': 'Žádný (Použij blízko domovského města frakce)',
@@ -524,7 +524,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     'Natrvalo vyryje do obouruční zbraně 12 síly a 25 hodnocení kritického zásahu. Nelze použít na jednoruční zbraň. Pevný bonus, neškáluje se.',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Tvé úspěšné útoky na blízko mohou udělit 60 obratnosti a o 2 % rychlejší útoky na blízko na 15 s. Každý zásah má šanci 1 % za každých 0,6 s základní rychlosti útočící zbraně. Bez vnitřního cooldownu. Obě ruce sdílí jeden buff; jakékoli spuštění ho obnoví a nikdy se nehromadí. Útoky na dálku tento efekt nespouští. Kočičí podoba místo toho používá svou základní rychlost útoku 1 s.',
+    'Tvé úspěšné útoky zblízka mohou na 15 s přidat 60 obratnosti a zrychlit útoky zblízka o 2%. Každý zásah má šanci 1% za každých 0,6 s základní rychlosti útočící zbraně. Bez vnitřní doby obnovy. Obě ruce sdílejí jeden účinek; každé spuštění jej obnoví a účinek se nesčítá. Útoky na dálku jej nespouštějí. V Kočičí podobě se automatické útoky místo toho vyhodnocují s rychlostí tlap 1 s. Údery a zakončovací útoky v Kočičí i Medvědí podobě se vyhodnocují podle rychlosti samotné zbraně; Rozmáchlé drápy mají jeden hod na použití, nikoli na každý cíl.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Rytina na zbrani: Plamen úsvitu',
   'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Rytina na zbrani: Požehnání úsvitu',
   'hudChrome.enchantName.enchant_weapon_piston_drive': 'Rytina na zbrani: Pohon pístu',
@@ -2359,7 +2359,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     'Přidá do každého tooltipu buffu/debuffu řádek "Seslal(a)", který jmenuje, kdo ho přivolal. Užitečné pro rozlišení více sesilatelů stejného buffu, například Požehnání od dvou paladinů.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Pověsí pruh buffů a debuffů cílového rámu pod rám místo nad něj, klasické rozvržení. Ve výchozím stavu vypnuto, protože běžný cílový rám sedí přímo nad akční lištou; zapni to, až rám přesuneš někam, kde je pod ním místo.',
+    'Umístí pás posílení a oslabení cíle pod jeho rámeček, pod jméno a ukazatel zdraví, místo nad něj: klasické uspořádání. Ve výchozí poloze se rámeček cíle spolu s tvým ukazatelem sesílání a časovači úderů posune o jeden řádek pásu nahoru, aby jeho první řádek nepřekrýval lištu akcí; tebou přesunutý rámeček zůstane na svém místě.',
   'guide.settingsPage.rowFrameRateCap':
     'Strop na to, kolik snímků hra vykreslí za sekundu. Počítač, který nestíhá tempu svého displeje, sklouzne k nerovnoměrnému rytmu; stálých 30 vypadá plynuleji než to, práci to sníží na polovinu a udrží počítač chladnější. Displej znamená bez omezení.',
   'guide.stats.warfareBodyPets':
@@ -3436,7 +3436,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Svižná podoba',
   'guide.classPage.formsHeading': 'Změna podoby',
   'guide.classPage.formsMoonwing':
-    'Druid Měsíčního háje získá ještě jednu podobu, Podobu měsíčního křídla, v níž bojuje jako sesilatel. Je to jediná zvířecí podoba, která si ponechá tvá kouzla, a hůlka funguje jen v ní nebo v tvé běžné sesilatelské podobě.',
+    'Druid Měsíčního háje získá další podobu, Podobu měsíčního křídla, v níž bojuje jako sesilatel. Stejně jako Podoba výtrusového léčitele ze Srdce háje zachovává tvá kouzla a hůlka funguje jen v těchto dvou podobách nebo v běžné sesilatelské podobě.',
   'guide.classPage.formsWolfEngage':
     'Vlk zahajuje boj Medvědím výpadem, hned se přemění do Vlčí podoby, aby cíl přišpendlil, mimo plížení se přiblíží Výpadem a nepřítele zastaví Sražením.',
   'guide.classPage.formsNote':
@@ -6244,7 +6244,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Divoký výstřel, který na {duration} s dezorientuje cíl. Jakékoli poškození účinek zruší.',
   'entities.abilities.typhoon.name': 'Tajfun',
   'entities.abilities.typhoon.description':
-    'Poryv větru odhodí všechny nepřátele do 8 m a omráčí je, čímž na 4 s sníží jejich rychlost pohybu o 50 %.',
+    'Poryv větru odmrští všechny nepřátele do 8 metrů o 15 metrů od tebe a omámí je, čímž je zpomalí o 50% na 4 s. Nepřátelští hráči letí vzduchem rovně: za hranou pokračují v letu a utrpí poškození pádem; smrtelný pád se počítá jako tvé zabití.',
   'entities.abilities.voidfeast.name': 'Hostina prázdnoty',
   'entities.abilities.voidfeast.description':
     'Pohltí magický účinek (prospěšný z nepřítele nebo škodlivý ze spojence) a vyléčí vás o 6 % maximálního zdraví.',
@@ -7248,7 +7248,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.charge.description':
     'Vyrazí k nepříteli, vygeneruje 9 vzteku a omráčí ho na 1 s. Dosah 8-25 yardů.',
   'entities.abilities.bear_charge.description':
-    'Vyrazí k nepříteli, vygeneruje 9 vzteku a omráčí ho na 1 s. Po dobu 3 s poté je Vlčí podoba zdarma a přišpendlí cíl, čímž ho zpomalí o 50 % na 4 s. Dosah 8-25 yardů. Pouze v medvědí podobě.',
+    'Vyrazí k nepříteli, vygeneruje 9 vzteku a omráčí ho na 1 s. Po dobu 3 s poté je Kočičí podoba zdarma a přišpendlí cíl, čímž ho zpomalí o 50 % na 4 s. Dosah 8-25 yardů. Pouze v medvědí podobě.',
   'wallet.appConnected': 'Aplikace připojena',
   'wallet.balanceAmount': '{amount} $WOC',
   'wallet.balanceAria': 'Ověřený zůstatek peněženky Solana: {balance}',
@@ -10238,7 +10238,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Okamžitě zaútočíš v krvavém šílenství za 60 % poškození zbraně plus {damage}. (Hlavní schopnost Fury)',
   'entities.abilities.bloodthirst.name': 'Pouštění žilou',
   'entities.abilities.cat_form.description':
-    'Promění tě ve vlka: obratnost roste s tvou úrovní, útočná síla +8 plus 2 za úroveň, tvé útoky používají energii a combo body a vytváříš o 29 % nižší hrozbu. Přeměna do jakékoli podoby udělí Dlouhý krok: 60 % rychlosti pohybu na 3 s, jednou za 20 s. Sešli znovu, aby ses vrátil do sesilatelské podoby.',
+    'Proměň se v kočku: obratnost roste s úrovní, útočná síla +8 plus 2 za úroveň, útoky využívají energii a combo body, pohybuješ se o 15% rychleji a vytváříš o 29% méně hrozby. Přeměna do libovolné podoby udělí Dlouhý krok, krátké zvýšení rychlosti. Sesláním znovu se vrátíš do sesilatelské podoby.',
   'entities.abilities.cat_form.name': 'Kočičí podoba',
   'entities.abilities.charge.name': 'Nápor',
   'entities.abilities.cheap_shot.name': 'Rána do břicha',
@@ -10268,7 +10268,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Prokleje cíl trýzní: {damage} stínového poškození během 24 s.',
   'entities.abilities.curse_of_agony.name': 'Kletba trýzně',
   'entities.abilities.dash.description':
-    'Vyrazíš vpřed a zvýšíš rychlost pohybu o 50 % na 15 s. Pouze v kočičí podobě.',
+    'Přejdi do Kočičí podoby, pokud v ní nejsi, a sprintuj o 50% rychleji po 15 s. Lze použít v každé podobě. Okamžité a nespouští globální obnovu.',
   'entities.abilities.dash.name': 'Úprk',
   'entities.abilities.deadly_poison.description':
     'Potře zbraň na 30 min. Každý tvůj úder na blízko přidá cíli vrstvu jedu, až do 5, a obnoví trvání 12 sekund. Každá vrstva způsobí {damage} poškození přírody každé 2 sekundy.',
@@ -10384,7 +10384,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Silný útok, který zvýší poškození na blízko o {damage}. Aktivuje se při tvém dalším úderu.',
   'entities.abilities.heroic_strike.name': 'Nájezdnický úder',
   'entities.abilities.hibernate.description':
-    'Uvede cíl do hlubokého spánku až na 8 s. Jakékoli poškození ho probudí.',
+    'Uspí cíl hlubokým spánkem až na 8 s. Jakékoli poškození ho probudí. Proti hráčům trvá každé opakování během 18 s polovinu předchozí doby a čtvrté selže.',
   'entities.abilities.hibernate.name': 'Dřímota',
   'entities.abilities.holy_light.description':
     'Rychle vyléčí spřátelený cíl o {damage}. Obnovení zdraví vytvoří 1 Oddanost, i bez specializace. Zářivá rezonance nebo Sluneční odveta z něj udělá okamžité kouzlo.',
@@ -10446,13 +10446,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Promění nepřítele v ropuchu až na {duration} s. Ropucha bloudí a rychle se léčí. Jakékoli poškození efekt přeruší. Jen bestie a humanoidi.',
   'entities.abilities.polymorph.name': 'Očarování',
   'entities.abilities.pounce.description':
-    'Zahajovací útok z plížení, který omráčí cíl na 2 s. Udělí 1 combo bod. Pouze ve vlčí podobě. Bez plížení je toto tlačítko Výpad.',
+    'Zahajovací útok z plížení, který omráčí cíl na 2 s. Udělí 1 combo bod. Pouze ve kočičí podobě. Bez plížení je toto tlačítko Výpad.',
   'entities.abilities.pounce.name': 'Plíživý úder',
   'entities.abilities.lunge.description':
-    'Vrhni se na nepřítele až 12 yardů daleko, způsob 60 % poškození zbraní a získej 1 combo bod. Pouze ve vlčí podobě.',
+    'Vrhni se na nepřítele až 12 yardů daleko, způsob 60 % poškození zbraní a získej 1 combo bod. Pouze ve kočičí podobě.',
   'entities.abilities.lunge.name': 'Výpad',
   'entities.abilities.hamstring_bite.description':
-    'Dokončovací útok, který omráčí cíl na 1 s plus 1 s za combo bod (5 combo bodů: 6 s). Pouze ve vlčí podobě.',
+    'Dokončovací útok, který omráčí cíl na 1 s plus 1 s za combo bod (5 combo bodů: 6 s). Pouze ve kočičí podobě.',
   'entities.abilities.hamstring_bite.name': 'Sražení',
   'entities.abilities.power_word_fortitude.description':
     'Zvyšuje Výdrž každého člena skupiny o {buff} % na 30 min.',
@@ -10461,7 +10461,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zaštítí spřátelený cíl a pohltí {damage} poškození po 30 s. Věrouka navíc spojí cíl s tvým svatým poškozením na 30 s.',
   'entities.abilities.power_word_shield.name': 'Žalm ochrany',
   'entities.abilities.prowl.description':
-    'Vstoupíš do plížení ve vlčí podobě. Nelze použít v boji.',
+    'Vstoupíš do plížení ve kočičí podobě. Nelze použít v boji.',
   'entities.abilities.prowl.name': 'Plížení',
   'entities.abilities.pyroblast.description':
     'Vrhe obrovský ohnivý balvan, který způsobí {damage} ohnivého poškození plus další poškození v čase.',
@@ -11037,7 +11037,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Sesílá 3 s a každou vteřinu působí {damage} stínového poškození nepřátelům do 8 m od cílové oblasti. Poškození roste se silou kouzel. (Talent kněze)',
   'entities.abilities.multi_shot.description':
-    'Vystřelí salvu na cílovou oblast a způsobí nepřátelům v okruhu 8 m {damage} bodů fyzického poškození. (lovecký talent)',
+    'Vystřelí salvu na cílovou oblast a způsobí nepřátelům do 8 yardů {damage} fyzického poškození. (lovecký talent)',
   'entities.abilities.prayer_of_healing.description':
     'Vyléčí spojence do 30 m o {damage}. Léčení roste se silou kouzel. (Požehnání)',
   'entities.abilities.preparation.description':
@@ -14214,7 +14214,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Schopnost',
   'guide.search.typeDeed': 'Skutek',
   'guide.settingsPage.audioBody':
-    'Okno nastavení nejsou jen pixely. Zvuk drží tři posuvníky hlasitosti, pro zvukové efekty, hudbu a hlas, plus vypínač hudby a čtyři vypínače pro zvuky, které nejrychleji omrzí: hlasy NPC, kroky, zvuky rozhraní a odezvu kliknutí. Záložka Obecné v panelu Rozhraní nese výběr jazyka, který na místě přelokalizuje celé rozhraní bez načítání znovu, a výběr motivu pro vzhled oken.',
+    'Okno nastavení není jen o obrazu. Zvuk nabízí čtyři posuvníky hlasitosti: efekty, prostředí, hudbu a hlasy, dále vypínač hudby a čtyři přepínače zvuků, které se nejčastěji omrzí: hlasy NPC, kroky, zvuky rozhraní a odezvu kliknutí. Karta Obecné v panelu Rozhraní obsahuje výběr jazyka, který ihned přeloží celé rozhraní bez opětovného načtení, a výběr vzhledu oken.',
   'guide.settingsPage.audioTitle': 'Zvuk a jazyk',
   'guide.settingsPage.autolootBody':
     'Nechce se ti klikat na každou mrtvolu? Automatický sběr za chůze, v záložce Boj v panelu Rozhraní a ve výchozím stavu vypnutý, sebere kořist z tvých vlastních úlovků, když kolem nich projdeš.',
@@ -15900,17 +15900,17 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Vypusť bestii',
   'entities.abilities.wildheart.name': 'Divoké srdce',
   'entities.abilities.bloodhook.description':
-    'Vyraz na nepřítele a uděl Ránu krvavého háku, která způsobí 34 základního Fyzického poškození plus 26% tvé síly útoku na dálku po dobu 12 s ve 4 ticích. (Signatura Polního umu)',
+    'Vyraz k nepříteli a způsob mu ránu schopností Krvavý hák, která udělí 34 základního fyzického poškození plus 26% tvé útočné síly na dálku ve 4 tiknutích za 12 s. Při dopadu zpomalí cíl o 30% na 3 s. (Znalost terénu)',
   'entities.abilities.bloodtrail_assault.description':
-    'Po dobu 12 s Krvavý hák rozšíří ránu se 60% silou až na 2 blízké nepřátele, Trhání ran přikáže útok společníka za 18 poškození a Střepinová nálož získá 2 metry, způsobí o 25% větší základní poškození svému hlavnímu cíli a spustí o 50% větší poškození z ran.',
+    'Na 12 s šíří Krvavý hák ránu o 60% síle až na 2 nepřátele do 5 metrů, Rvoucí rána nařídí mazlíčkovi útok za 18 poškození a Střepinová nálož dosáhne o 2 metry dál, udělí hlavnímu cíli o 25% vyšší základní poškození a vyvolá o 50% vyšší poškození rány. Bez živého mazlíčka se ti Soustředění také obnovuje o 100% rychleji.',
   'entities.abilities.cold_focus.description':
     'Po dobu 12 s Odměřený výstřel obnoví o 50% více soustředění a Dlouhý nátah stojí o 25% méně a sesílá se o 30% rychleji. (Signatura Chladného zraku)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Pasivní: Zlom stopy obnoví Lovecký spád a připraví tvůj další Kuchající úder nebo Krvavý hák na 12 s. Kuchající úder způsobí o 15% větší poškození za nános. Krvavý hák způsobí 18 až 24 dodatečného Fyzického poškození, zvýšeného o 15% za nános a tvou silou útoku na dálku. Při 3 nánosech jeden z útoků spotřebuje Lovecký spád. (Polní um)',
+    'Pasivně: S Lovecký spád připraví Zlom stopy na 12 s tvůj další Párací úder nebo Krvavý hák. Párací úder udělí o 15% vyšší poškození za navrstvení. Krvavý hák udělí dalších 18 až 24 fyzického poškození, zvýšeného o 15% za navrstvení a útočnou silou na dálku. Při 3 navrstveních kterýkoli z útoků spotřebuje Lovecký spád. (Znalost terénu)',
   'entities.abilities.frostjaw_trap.description':
     'Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s.',
   'entities.abilities.hunting_momentum.description':
-    'Pasivní: Kuchající úder udělí 1 Lovecký spád na 8 s, až do 3. Při 3 nánosech Trhání ran způsobí o 45% větší poškození úderu a spotřebuje nánosy. (Polní um)',
+    'Pasivně: Párací úder a Střepinová nálož, která zasáhne nepřítele, přidají každá 1 Lovecký spád, až do 3. Trvá do spotřebování nebo opuštění boje a každé navrstvení zvýší rychlost pohybu o 15%. Při 3 navrstveních udělí Rvoucí rána o 60% vyšší poškození úderu a spotřebuje je. (Znalost terénu)',
   'entities.abilities.measured_shot.description':
     'Vystřel na cíl za {damage} Fyzického poškození. Zásah obnoví 20 soustředění. Poškození roste se silou útoku na dálku.',
   'entities.abilities.pack_command.description':
@@ -15920,7 +15920,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Snižuje utrpěné poškození o 60% na 8 s, ale zabraňuje útokům, dokud je aktivní.',
   'entities.abilities.shrapnel_charge.description':
-    'Zasáhne cíl za 24 až 30 Fyzického poškození a až 4 další nepřátele do 6 metrů za 13 až 17. Ostatní cíle navíc krvácejí za 12 poškození po dobu 6 s. Pokud hlavní cíl nese tvou Ránu krvavého háku, způsobí 1 tik rány okamžitě. Přímé poškození roste se silou útoku na dálku.',
+    'Zasáhne kužel dlouhý 10 metrů před tebou. Tvůj cíl, nebo nejbližší zasažený nepřítel, pokud je cíl mimo kužel, utrpí 24 až 30 fyzického poškození. Ostatní nepřátelé v kuželu utrpí 7 až 9 a krvácí za 12 poškození během 6 s. Pokud má hlavní cíl tvou ránu od Krvavý hák, ihned utrpí 1 tiknutí rány. Zásah nepřítele přidá 1 Lovecký spád. Přímé poškození roste s útočnou silou na dálku.',
   'entities.abilities.stampede.description':
     'Přivolá 3 bestie na 12 s. Každá útočí každé 2 s za {damage} Fyzického poškození. Zobrazené poškození zahrnuje 8% tvé síly útoku na dálku před bonusy k poškození společníka. Bestie zafixují Zuřivost smečky při přivolání a získají 10% poškození za nános. Zatímco je Úprk v obnově, úspěšné Povely smečky mají 20% šanci jej resetovat, zaručeně po 5 neúspěšných šancích. Nemůže se resetovat, dokud jsou bestie aktivní. (Pán smečky)',
   'entities.abilities.trailbreak.description':
@@ -16356,7 +16356,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Každé seslání přidá 1 Zeleň (max 3), i když jen obnoví květ, který už působí. Při 3 Zeleni se Rychlé zhojení změní na Překvět.',
   'entities.abilities.rip.description':
-    'Dokončovací útok, po kterém cíl krvácí každé 2 s po dobu 24 s: 36 poškození plus 24 za vydaný combo bod (5 combo bodů: {damage} celkem). Pouze v kočičí podobě.',
+    'Zakončení, které nechá cíl krvácet každé 2 s po 24 s: 72 poškození plus 48 za utracený combo bod (5 bodů: celkem {damage}). Pouze v Kočičí podobě.',
   'entities.abilities.rip.specNote_feral': 'Zasažený úder přidá 1 Starou krev (max 3).',
   'entities.abilities.ruinous_brand.description':
     'Na 15 s cejchuje nepřítele. Tvá další 3 přímá kouzla se proti cejchovanému nepříteli ozvou za 25 % poškození, nebo mu při seslání na jiný cíl zkopírují 50 % poškození. Ozvěny Zkázného šípu se také počítají jako kritické zásahy, bez dalšího násobiče kritického poškození.',
@@ -16467,7 +16467,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cauterizeFatigue': 'Vypálení nemůže zabránit dalšímu smrtelnému zásahu',
   'hudChrome.auraEffect.cooldownCap': 'Využito {used} z {cap} s snížení doby obnovy v tomto okně',
   'hudChrome.auraEffect.bruinRushWindow':
-    'Vlčí podoba nestojí manu a přišpendlí cíl tvého Medvědího výpadu, čímž ho zpomalí o {pct} % na {sec} s',
+    'Kočičí podoba nestojí manu a přišpendlí cíl tvého Medvědího výpadu, čímž ho zpomalí o {pct} % na {sec} s',
   'hudChrome.auraEffect.desolation':
     'Zbývá {charges} nabití: tvůj příští Zkázný šíp se sešle o {castPct} % rychleji, nebo tvůj příští Ohnivý déšť dopadne okamžitě',
   'hudChrome.auraEffect.duskfireClaim': 'Smrt uděluje {value} Zkázy',
@@ -16821,7 +16821,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Jsou to dvě samostatné činnosti nad týmž tělem. Vše, co tělo drží, mince a kořist plus jakékoli skliditelné součásti, se otevírá ve stejném okně, ale tlačítko interakce a Sebrat kořist vezmou jen běžnou kořist, která se řídí normálními pravidly kořisti. Sklizení je stranou profese, která strhuje materiály ze samotné mrtvoly, a nastane teprve tehdy, když v tom okně zvolíš Sklidit.\n\nSklizení je první přijde první bere, pro jednoho hráče: každé tělo lze sklidit přesně jednou, tím, kdo si ho nárokuje jako první, online nevyjímaje. Tvoje Střediště zaměření určuje, co dostaneš: zatímco stojíš v uzlovém centru města, můžeš rozložit 10 bodů zaměření na typy složek, o které stojíš, a každá zaměřená složka hází za lepší stupeň (každých 5 bodů ji posune o krok výše, nejvýše o dva) a dává víc (10 procent za bod). Nezaměřené složky se nikdy nezhorší.',
   'guide.profPages.faq.a4':
-    'Narazil jsi na nečekaný nález. Zhruba 1 sklizeň z 90 spustí vzácný sběratelský nález (prastaré jádrové dřevo na stromě, nedotčená žíla v rudě, měsíční květ mezi bylinami): pětinásobí výnos, podepíše každou jednotku tvým jménem a ohlásí nález celé zóně. Podpis přinese i vzácný nebo lepší hod na kvalitu při obyčejné sklizni.\n\nPodepsané materiály stojí za to si nechat nebo draze prodat: držení jakékoli podepsané kopie potřebné suroviny u pracovního stolu přidá 2 procentní body k šanci na mistrovské dílo. Jen pamatuj, že se skládají pouze se shodně podepsanými kopiemi, takže si drží vlastní místo v brašně.',
+    'Narazil jsi na mimořádný nález. Zhruba 1 sběr z 90 spustí vzácnou událost (prastaré jádrové dřevo u stromu, neposkvrněná žíla u rudy, měsíční květ u bylin): výnos se zpětinásobí, každá jednotka získá tvůj podpis a nález se oznámí celé zóně. Také běžný sběr s výslednou vzácnou či vyšší kvalitou podepíše celý výnos.\n\nPodepsané materiály se vyplatí ponechat nebo draze prodat: jakákoli podepsaná jednotka potřebné přísady v brašnách nebo v Trezoru materiálů, odkud ji může daná výroba čerpat, zvyšuje šanci na mistrovské dílo o 2 procentní body. Může sdílet slučitelnou hromádku s nepodepsaným materiálem i jednotkami jiných sběračů a podepisujících, aniž ztratí značku; počty pro každý původ se uchovávají zvlášť.',
   'guide.profPages.faq.a5':
     'Jdi k jakékoli výrobní stanici s kusem v brašnách a zaplať mistrovi. Poplatek se řídí kvalitou předmětu: 25 stříbrných za neobvyklý kus, 1 zlatý za vzácný, 4 zlaté za epický; legendární platí epickou sazbu a zakázkový běžný kus sazbu neobvyklého. Musí to být skutečná stanice: mobilní stanice tuto službu nikdy nenabízí.\n\nPoplatek kupuje čistý začátek, ne trvalé vyléčení: kus zůstává zakázkový, takže se při příští výměně znovu naváže na toho, kdo ho obdrží. Pokud několik vázaných kopií sdílí stack, jedna kopie se odloupne a pouto se zruší za jeden poplatek.',
   'guide.profPages.faq.a8':
@@ -18316,7 +18316,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButton': 'Sledovat',
   'hudChrome.crafting.trackGoalButtonAria': 'Sledovat {count} výrob {name} jako cíl sběru',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Zásahy zblízka, které zasáhnou cíl, ti mohou dát 50 Síly na 15 s a vyléčit 200 zdraví. Platí modifikátory léčení. Každý zásah má šanci 1 % za 0,6 s základní rychlosti úderu použité zbraně. Neexistuje interní cooldown. Obě ruce sdílejí jeden bonus; každé spuštění obnoví jeho trvání a bonus se nikdy nesčítá. Útoky na dálku tento efekt nespouštějí. Vlčí forma místo toho používá základní rychlost úderu 1 s.',
+    'Tvé úspěšné útoky zblízka mohou na 15 s přidat 50 síly a obnovit ti 200 zdraví. Uplatňují se úpravy léčení. Každý zásah má šanci 1% za každých 0,6 s základní rychlosti útočící zbraně. Bez vnitřní doby obnovy. Obě ruce sdílejí jeden účinek; každé spuštění jej obnoví a účinek se nesčítá. Útoky na dálku jej nespouštějí. V Kočičí podobě se automatické útoky místo toho vyhodnocují s rychlostí tlap 1 s. Údery a zakončovací útoky v Kočičí i Medvědí podobě se vyhodnocují podle rychlosti samotné zbraně; Rozmáchlé drápy mají jeden hod na použití, nikoli na každý cíl.',
   'hudChrome.enchantName.enchant_chest_armor': 'Rytina na hrudi: Zpevnění',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Rytina na hrudi: Větší výdrž',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Rytina na hrudi: Zářivá výdrž',
@@ -19307,7 +19307,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Jak mince procházejí řemesly: přesné poplatky a odčerpávání, co se skutečně prodává, pravidla Světového trhu, pracovní zakázky, komise a místo kolekcí financovaných raidy vedle běžné výroby.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Některé předměty nesou jméno. Řádky původu materiálu uvádějí, kdo sebral každou skupinu kusů, zatímco samostatná značka podepsáno určuje prémiového podepisujícího, pokud nějaký je. Tyto skutečnosti jsou nezávislé: běžně nasbíraný materiál zaznamená sběrače, aniž získá podpis, a staré podepsané zásoby mohou uvádět podepisujícího a poctivě zároveň říkat, že sběrač zaznamenán nebyl. Hotový kus místo toho uvádí, kdo ho vyrobil. Tyto záznamy cestují s předmětem při výměnách, v bance, poštou, přes Světový trh i při zpětném odkupu u obchodníka a nikdy nevyblednou.\n\nSběr automaticky podepisuje nejlepší práci: každá sklizeň, která padne vzácná nebo lepší, přijde podepsaná a vzácné nálezy podepíšou celý pětinásobný výnos. Šťastný hod při sběru z mrtvoly podepíše výnos tam, kde rodina nemá exemplář k vydání, a tam, kde ho má, nechá výnos obyčejný a vedle něj vytvoří podepsaný bezvadný exemplář. Výroba podepisuje stejnou cestou: každá kopie vzácného nebo lepšího výstupu vytvoří podepsanou verzi a mistrovské dílo se podepíše vždy bez ohledu na kvalitu, takže nejlepší verze každého kusu vždy uvádí svého tvůrce. Podpis běžného materiálu cestuje se samotnými kusy a nelze ho ztratit jen proto, že kompatibilní hromádka už obsahuje jiného sběrače nebo podepisujícího. Samostatný bezvadný exemplář je jiný předmět a stále potřebuje místo; pokud se nevejde, běžný výnos z mrtvoly zůstane, ale exemplář se ztratí.\n\nHotové předměty mají jednu přísnou identitu, takže dvě kopie splynou jen tehdy, když se přesně shodují všechny značky: stejný předmět, stejný podepisující, stejné statistiky mistrovského díla, stejné očarování a stejné pouto. Kompatibilní materiály sdílejí slot napříč sběrači a podepisujícími, ale udržují počet pro každý zdroj. Náhledový tooltip shrnuje zdroje; klikni pravým tlačítkem na hromádku pro úplný seznam (na dotykové obrazovce použij tlačítko Zdroje). Oddělení podle sběrače udrží tyto hromádky v brašně zvlášť a třídění toto rozhodnutí respektuje. Převedený materiál se může běžně skládat s materiálem příjemce.\n\nPodpisy vracejí řemeslníkům výhodu: držení jakékoli podepsané kopie potřebné reagencie u pracovního stolu, bez ohledu na to, kdo ji podepsal, přidá 2 procentní body k šanci na mistrovské dílo, a držení reagencie podepsané vlastní rukou sníží její požadované množství o jeden kus, nikdy pod jeden, pokud tato reagencie není označena jako neslevitelná; raidová jádra si vždy ponechají plnou cenu. Tvá vlastní podepsaná práce vzácné nebo lepší kvality tě dokonce stále učí, dnes pouze prostřednictvím vyrobených lektvarů: vypij vzácný nápoj, který jsi uvařil(a) a podepsal(a), a malý proud dovednosti se vrátí k řemeslu, které ho vytvořilo, pokud je toto řemeslo jedním z tvých aktivních hlavních oborů. Opravdu to funguje jen pro lektvarovou větev, takže elixír, svitek ani vrcholový flakón tě zpět nic nenaučí, jakkoli jemně byl podepsán.',
+    'Některé předměty nesou jméno. Řádky původu materiálu uvádějí, kdo sebral každou skupinu kusů, zatímco samostatná značka podepsáno určuje prémiového podepisujícího, pokud nějaký je. Tyto skutečnosti jsou nezávislé: běžně nasbíraný materiál zaznamená sběrače, aniž získá podpis, a staré podepsané zásoby mohou uvádět podepisujícího a poctivě zároveň říkat, že sběrač zaznamenán nebyl. Hotový kus místo toho uvádí, kdo ho vyrobil. Tyto záznamy cestují s předmětem při výměnách, v bance, poštou, přes Světový trh i při zpětném odkupu u obchodníka a nikdy nevyblednou.\n\nSběr automaticky podepisuje nejlepší práci: každá sklizeň, která padne vzácná nebo lepší, přijde podepsaná a vzácné nálezy podepíšou celý pětinásobný výnos. Šťastný hod při sběru z mrtvoly podepíše výnos tam, kde rodina nemá exemplář k vydání, a tam, kde ho má, nechá výnos obyčejný a vedle něj vytvoří podepsaný bezvadný exemplář. Výroba podepisuje stejnou cestou: každá kopie vzácného nebo lepšího výstupu vytvoří podepsanou verzi a mistrovské dílo se podepíše vždy bez ohledu na kvalitu, takže nejlepší verze každého kusu vždy uvádí svého tvůrce. Podpis běžného materiálu cestuje se samotnými kusy a nelze ho ztratit jen proto, že kompatibilní hromádka už obsahuje jiného sběrače nebo podepisujícího. Samostatný bezvadný exemplář je jiný předmět a stále potřebuje místo; pokud se nevejde, běžný výnos z mrtvoly zůstane, ale exemplář se ztratí.\n\nHotové předměty mají jednu přísnou identitu, takže dvě kopie splynou jen tehdy, když se přesně shodují všechny značky: stejný předmět, stejný podepisující, stejné statistiky mistrovského díla, stejné očarování a stejné pouto. Kompatibilní materiály sdílejí slot napříč sběrači a podepisujícími, ale udržují počet pro každý zdroj. Náhledový tooltip shrnuje zdroje; klikni pravým tlačítkem na hromádku pro úplný seznam (na dotykové obrazovce použij tlačítko Zdroje). Oddělení podle sběrače udrží tyto hromádky v brašně zvlášť a třídění toto rozhodnutí respektuje. Převedený materiál se může běžně skládat s materiálem příjemce.\n\nPodpisy vracejí řemeslníkům výhodu: držení jakékoli podepsané kopie potřebné reagencie, bez ohledu na podepisujícího, v batozích nebo v Trezoru materiálů všude, kde z něj může výroba čerpat, přidá 2 procentní body k šanci na mistrovské dílo, a držení reagencie podepsané vlastní rukou sníží její požadované množství o jeden kus, nikdy pod jeden, pokud tato reagencie není označena jako neslevitelná; raidová jádra si vždy ponechají plnou cenu. Tvá vlastní podepsaná práce vzácné nebo lepší kvality tě dokonce stále učí, dnes pouze prostřednictvím vyrobených lektvarů: vypij vzácný nápoj, který jsi uvařil(a) a podepsal(a), a malý proud dovednosti se vrátí k řemeslu, které ho vytvořilo, pokud je toto řemeslo jedním z tvých aktivních hlavních oborů. Opravdu to funguje jen pro lektvarovou větev, takže elixír, svitek ani vrcholový flakón tě zpět nic nenaučí, jakkoli jemně byl podepsán.',
   'guide.profPages.effectFeast':
     'Rozloží hostinu, ze které ostatní jedí, každý jednu porci: {servings} porcí na {minutes} min.',
   'guide.profPages.effectFeastServing': 'Každá porce obnoví během {seconds} s {amount} zdraví.',
@@ -19766,7 +19766,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.spellEffects': 'Efekty kouzel',
   'hudChrome.options.spellTooltipOnHover': 'Popisy kouzel při najetí myší',
   'hudChrome.pattern.reagent': '{name} ×{count}',
-  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.pattern.reagents': '{label} {list}',
   'hudChrome.realmMotd.cleared': 'Zpráva dne byla vymazána.',
   'hudChrome.realmMotd.line': 'Zpráva dne: {text}',
   'hudChrome.realmMotd.none': 'Žádná zpráva dne není nastavena.',
@@ -19853,7 +19853,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.spore_burst.specNote_restoration':
     'Každému vyléčenému spojenci navíc udělí Výtrusové hojení. Při plné Zeleni je o 25 % silnější a spotřebuje tvou Zeleň.',
   'entities.abilities.sporemender_form.description':
-    'Proměň se ve výtrusového léčitele: tvé léčení se zvýší o 20 % a zbroj o 40 %, ale rychlost pohybu klesne o 20 %. Všechna kouzla běžné kouzelnické podoby zůstávají použitelná. Trvá do opuštění podoby. Proměna do jakékoli podoby udělí Pružný krok, krátké zvýšení rychlosti pohybu. Dalším sesláním se vrátíš do kouzelnické podoby. (klíčová schopnost Srdce háje)',
+    'Proměň se ve výtrusového léčitele: tvé léčení se zvýší o 20 % a zbroj o 40 %, ale rychlost pohybu klesne o 20 %. Všechna kouzla běžné kouzelnické podoby zůstávají použitelná. Trvá do opuštění podoby. Proměna do jakékoli podoby udělí Dlouhý krok, krátké zvýšení rychlosti pohybu. Dalším sesláním se vrátíš do kouzelnické podoby. (klíčová schopnost Srdce háje)',
   'entities.abilities.sporemender_form.name': 'Podoba výtrusového léčitele',
   'entities.abilities.swiftmend.specNote_restoration':
     'Spotřebuje průběžný léčivý účinek na přátelském cíli a vyléčí jej o {damage}. Výtrusové hojení a výsadby Druhého květu přidávají Zeleň; při 5 bodech Zeleně se toto tlačítko změní na Překvět, který okamžitě vyléčí všechny spojence s tvými průběžnými léčivými účinky o 60 % jejich zbývajícího léčení. (klíčová schopnost Srdce háje)',
@@ -19887,4 +19887,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.hearthstoneTransport': 'Návratový kámen tě přenese do {hub}.',
   'hudChrome.factionRewards.itemCooldown':
     'Tento předmět ještě není připraven (zbývá {minutes} min).',
+  'hudChrome.weekly.completedLastWeek': 'Dokončeno minulý týden',
+  'hudChrome.weekly.claimFirst': 'Nejprve vyzvednout',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} reputace z minulého týdne stále čeká na vyzvednutí. Vyzvedni ji a vyber nové nabití.',
 };

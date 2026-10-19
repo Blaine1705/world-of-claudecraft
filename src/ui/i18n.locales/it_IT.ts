@@ -62,7 +62,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     "Uso: Rinforza la tua armatura al petto, aumentando l'Armatura di 12 per 1 ora.",
   'hudChrome.factionRewards.battleStandardUse':
-    "Uso: Pianta lo Stendardo di Battaglia della Consecrated Dawn per 5 minuti, aumentando significativamente la rigenerazione della salute e della mana fuori dal combattimento per tutti gli alleati vicini. Rimanere vicino ad esso per 10 secondi concede anche la Benedizione dell'Alba (+5% a tutte le statistiche per 30 min). (5 min di recupero)",
+    'Uso: pianta lo Stendardo da Battaglia dell’Alba Consacrata per 5 min. I giocatori fuori dal combattimento entro 15 iarde rigenerano il 10% di salute in più; chi usa mana recupera inoltre mana pari al 5% del proprio Spirito ogni 2 s. Restare vicino per 10 s conferisce Benedizione dell’Alba, aumentando Forza, Agilità, Tempra, Intelletto e Spirito del 5% per 30 min. (Recupero: 5 min)',
   'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automi)',
   'hudChrome.factionRewards.hub_church_order': "Valle di Eastbrook (L'Ordine della Chiesa)",
   'hudChrome.factionRewards.hub_none':
@@ -556,7 +556,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     "Incide permanentemente un'arma a due mani con 12 Forza e 25 Indice di Critico. Non può essere applicato a un'arma a una mano. Un bonus fisso: non scala.",
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    "I tuoi attacchi in mischia che colpiscono possono concedere 60 Agilità e il 2% di velocità d'attacco in mischia in più per 15 s. Ogni colpo ha una probabilità dell'1% per ogni 0,6 s della velocità base dell'arma che colpisce. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano questo effetto. Forma del Gatto usa invece la sua velocità base di attacco di 1 s.",
+    'I tuoi attacchi in mischia andati a segno possono conferire 60 Agilità e attacchi in mischia più rapidi del 2% per 15 s. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma che colpisce. Nessun recupero interno. Le due mani condividono un solo beneficio: ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non lo attivano. In Forma del Gatto, gli attacchi automatici usano invece la velocità delle zampe di 1 s. Colpi e mosse finali in Forma del Gatto e Forma di Bruin usano la velocità propria dell’arma; Artigli Falcianti effettua un tiro per utilizzo, non per bersaglio.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': "Incisione dell'arma: Fuoco dell'Alba",
   'hudChrome.enchantName.enchant_weapon_dawns_benediction':
     "Incisione dell'arma: Benedizione dell'Alba",
@@ -2430,7 +2430,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     'Aggiunge una riga "Lanciato da" a ogni descrizione di potenziamento/indebolimento, indicando chi lo ha applicato. Utile per distinguere più lanciatori dello stesso potenziamento, come le Benedizioni di due paladini.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Colloca la striscia di potenziamenti e indebolimenti del riquadro bersaglio sotto il riquadro invece che sopra, la disposizione classica. Disattivata di default, poiché il riquadro bersaglio predefinito si trova appena sopra la barra delle azioni; attivala una volta spostato il riquadro in un punto con spazio sottostante.',
+    'Colloca la fila di benefici e penalità del bersaglio sotto il suo riquadro, sotto nome e barra della salute, anziché sopra: la disposizione classica. Nella posizione predefinita, il riquadro del bersaglio, insieme alla tua barra di lancio e ai timer degli attacchi, sale di una fila per lasciare la prima riga libera dalla barra delle azioni; un riquadro spostato rimane dove lo hai messo.',
   'guide.settingsPage.rowFrameRateCap':
     'Un tetto massimo a quante immagini il gioco disegna ogni secondo. Un computer che non riesce a stare al passo con il proprio schermo cade in un ritmo irregolare; un valore costante di 30 sembra più fluido, dimezza il lavoro e mantiene il computer più fresco. Schermo indica nessun limite.',
   'guide.stats.warfareBodyPets':
@@ -3537,9 +3537,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Forma di Fleet',
   'guide.classPage.formsHeading': 'Trasformazioni',
   'guide.classPage.formsMoonwing':
-    "Un druido di Equilibrio ottiene una forma in più, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. È l'unica forma animale che conserva i tuoi incantesimi, e la tua bacchetta funziona solo con essa o con la tua normale forma da incantatore.",
+    'Un druido di Equilibrio ottiene un’altra forma, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. Come la Forma di Curatore delle Spore di Ripristino, conserva i tuoi incantesimi; la bacchetta funziona solo in queste due forme o nella tua normale forma da incantatore.',
   'guide.classPage.formsWolfEngage':
-    'Un lupo apre lo scontro con Carica di Bruin, passa subito in Forma del Lupo per bloccare il bersaglio, chiude la distanza con Balzo quando non è in furtività e ferma un nemico con Atterramento.',
+    'Un gatto apre lo scontro con Carica di Bruin, passa subito in Forma del Gatto per bloccare il bersaglio, chiude la distanza con Balzo quando non è in furtività e ferma un nemico con Atterramento.',
   'guide.classPage.formsNote':
     "Un druido combatte cambiando forma. La maggior parte delle abilità del druido appartiene a una forma specifica, quindi la forma in cui ti trovi decide cosa puoi lanciare, e trasformarti costa un po' di mana. Puoi trasformarti dentro o fuori dal combattimento, tutte le volte che vuoi.",
   'guide.classPage.mageEleHeading': "Elementale dell'Acqua",
@@ -6482,7 +6482,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un tiro selvaggio che disorienta il bersaglio per {duration} s. Qualsiasi danno interrompe l’effetto.',
   'entities.abilities.typhoon.name': 'Tifone',
   'entities.abilities.typhoon.description':
-    'Una raffica di vento respinge tutti i nemici entro 8 m e li frastorna, riducendone del 50% la velocità di movimento per 4 s.',
+    'Una raffica scaglia tutti i nemici entro 8 m a 15 m da te e li frastorna, rallentandoli del 50% per 4 s. I giocatori nemici volano in linea retta: oltre un bordo continuano il volo e subiscono danni da caduta; una caduta mortale conta come tua uccisione.',
   'entities.abilities.voidfeast.name': 'Banchetto del Vuoto',
   'entities.abilities.voidfeast.description':
     'Divora un effetto magico (uno benefico da un nemico o uno dannoso da un alleato) e ti cura del 6% della salute massima.',
@@ -9569,7 +9569,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ringhia al bersaglio: la tua minaccia sale fino a eguagliare quella del suo nemico più odiato e lo costringe ad attaccarti per 3 s. Solo in Forma di Bruin.',
   'entities.abilities.cat_form.name': 'Forma del Gatto',
   'entities.abilities.cat_form.description':
-    "Vi trasforma in lupo: l'agilità sale con il vostro livello, potenza d'attacco +8 più 2 per livello, i vostri attacchi usano energia e punti combo, e generate il 29% di minaccia in meno. Passare a qualsiasi forma concede Passo leggero: il 60% di velocità di movimento per 3 sec, una volta ogni 20 sec. Lanciate di nuovo per tornare alla forma da incantatore.",
+    "Trasformati in gatto: l'agilità sale con il livello, la potenza d'attacco aumenta di 8 più 2 per livello, gli attacchi usano energia e punti combo, ti muovi il 15% più velocemente e generi il 29% di minaccia in meno. Ogni cambio di forma concede Passo leggero, un breve aumento di velocità. Usa di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.claw.name': 'Artiglio Lacerante',
   'entities.abilities.ferocious_bite.name': 'Morso Cruento',
   'entities.abilities.swipe.name': 'Artigli Falcianti',
@@ -9590,19 +9590,19 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.name': 'Luce Stregata',
   'entities.abilities.hibernate.name': 'Sopore',
   'entities.abilities.hibernate.description':
-    'Costringe il bersaglio in un sonno profondo per un massimo di 8 sec. Qualsiasi danno lo risveglia.',
+    'Costringe il bersaglio a un sonno profondo per un massimo di 8 s. Qualsiasi danno lo sveglia. Contro i giocatori ogni ripetizione entro 18 s dura la metà della precedente e la quarta fallisce.',
   'entities.abilities.dash.name': 'Scatto',
   'entities.abilities.dash.description':
-    'Scatta in avanti, aumentando la velocità di movimento del 50% per 15 sec. Solo Forma del Gatto.',
+    'Assumi Forma del Gatto se necessario, poi scatta con il 50% di velocità in più per 15 s. Utilizzabile in ogni forma. Istantaneo e non attiva il tempo di recupero globale.',
   'entities.abilities.pounce.name': 'Colpo Strisciante',
   'entities.abilities.lunge.description':
-    "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Lupo.",
+    "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Gatto.",
   'entities.abilities.lunge.name': 'Balzo',
   'entities.abilities.hamstring_bite.description':
-    'Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec). Solo in Forma del Lupo.',
+    'Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec). Solo in Forma del Gatto.',
   'entities.abilities.hamstring_bite.name': 'Atterramento',
   'entities.abilities.pounce.description':
-    'Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Lupo. Fuori dalla furtività questo pulsante è Balzo.',
+    'Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Gatto. Fuori dalla furtività questo pulsante è Balzo.',
   'entities.abilities.insect_swarm.name': 'Sciame Pungente',
   'entities.abilities.insect_swarm.description':
     'Il nemico è assalito da uno sciame di insetti, subendo {damage} danni da Natura in 12 sec.',
@@ -9648,13 +9648,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Vincola un Wraithborn al tuo volere: un demone d'élite che scaglia da lontano ingenti danni d'Ombra. Un lungo tempo di recupero ne limita la potenza devastante. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.",
   'entities.abilities.bear_charge.name': 'Carica di Bruin',
   'entities.abilities.bear_charge.description':
-    'Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Per i 3 sec successivi, la Forma del Lupo è gratuita e blocca il bersaglio, rallentandolo del 50% per 4 sec. Gittata di 7-23 metri. Solo in Forma di Bruin.',
+    'Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Per i 3 sec successivi, la Forma del Gatto è gratuita e blocca il bersaglio, rallentandolo del 50% per 4 sec. Gittata di 7-23 metri. Solo in Forma di Bruin.',
   'entities.abilities.demoralizing_roar.name': 'Ruggito Codardo',
   'entities.abilities.demoralizing_roar.description':
     "Demoralizza i nemici vicini, riducendone la potenza d'attacco di 20 per 20 sec. Solo in Forma di Bruin.",
   'entities.abilities.prowl.name': 'Appostamento',
   'entities.abilities.prowl.description':
-    'Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento.',
+    'Entra in furtività mentre sei in Forma del Gatto. Non utilizzabile in combattimento.',
   'entities.abilities.rake.name': 'Scarnificare',
   'entities.abilities.revive_pet.name': 'Rattoppare',
   'entities.abilities.revive_pet.description':
@@ -14618,7 +14618,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Abilità',
   'guide.search.typeDeed': 'Impresa',
   'guide.settingsPage.audioBody':
-    "La finestra delle opzioni non è fatta solo di pixel. Audio raccoglie tre cursori del volume, per effetti sonori, musica e voce, più un interruttore per la musica e quattro interruttori per i suoni che stancano prima: voci dei PNG, passi, suoni dell'interfaccia e riscontro al clic. La linguetta Generale del pannello Interfaccia porta un selettore di lingua che rilocalizza l'intera interfaccia all'istante, senza ricaricare, e un selettore di tema per l'aspetto delle finestre.",
+    'Le opzioni non riguardano solo la grafica. Audio offre quattro cursori del volume per effetti, ambiente, musica e voci, un interruttore per la musica e quattro per i suoni che più spesso stancano: voci dei PNG, passi, suoni dell’interfaccia e risposta ai clic. La scheda Generale del pannello Interfaccia contiene un selettore della lingua che traduce subito tutta l’interfaccia senza ricaricare e un selettore del tema delle finestre.',
   'guide.settingsPage.audioTitle': 'Suono e lingua',
   'guide.settingsPage.autolootBody':
     'Preferisci non cliccare ogni cadavere? Il saccheggio automatico di passaggio, nella linguetta Combattimento del pannello Interfaccia e disattivato per impostazione predefinita, raccoglie il bottino delle tue uccisioni mentre ci passi accanto.',
@@ -15135,7 +15135,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     "Incanala per 3 sec, infliggendo {damage} danni da Ombra ogni secondo ai nemici entro 8 m dall'area bersaglio. Il danno aumenta con il Potere Magico. (Talento da sacerdote)",
   'entities.abilities.multi_shot.description':
-    'Scaglia una raffica sull’area bersaglio, infliggendo {damage} danni fisici ai nemici entro un raggio di 8 m. (talento del Cacciatore)',
+    'Scaglia una salva sull’area bersaglio, infliggendo {damage} danni fisici ai nemici entro 8 iarde. (talento del Cacciatore)',
   'entities.abilities.prayer_of_healing.description':
     'Cura gli alleati entro 30 m di {damage}. La cura aumenta con il Potere Magico. (Sacro)',
   'entities.abilities.preparation.description':
@@ -16328,17 +16328,17 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Scatena la Bestia',
   'entities.abilities.wildheart.name': 'Cuore Selvaggio',
   'entities.abilities.bloodhook.description':
-    "Carica verso un nemico e applica Ferita da Uncino Sanguinario, infliggendo 34 danni Fisici base più il 26% della tua potenza d'attacco a distanza in 12 s con 4 impulsi. (Distintivo di Arte del Campo)",
+    "Carica un nemico e applica una ferita di Uncino Sanguinario, infliggendo 34 danni fisici base più il 26% della tua potenza d'attacco a distanza in 4 impulsi in 12 s. All'arrivo rallenta il bersaglio del 30% per 3 s. (Tratto distintivo di Sopravvivenza)",
   'entities.abilities.bloodtrail_assault.description':
-    "Per 12 s l'Uncino Sanguinario propaga una ferita al 60% di potenza fino a 2 nemici vicini, Squarciaferite comanda un attacco del famiglio da 18 danni, e la Carica a Frammentazione guadagna 2 metri, infligge il 25% di danni base in più al bersaglio principale e attiva il 50% di danni da ferita in più.",
+    'Per 12 s, Uncino Sanguinario diffonde una ferita al 60% della potenza a un massimo di 2 nemici entro 5 m, Squarciaferite ordina un attacco del famiglio da 18 danni e Carica a Frammentazione arriva 2 m più lontano, infligge il 25% di danni base in più al bersaglio principale e attiva il 50% di danni da ferita in più. Senza un famiglio vivo, la tua Concentrazione si rigenera anche il 100% più rapidamente.',
   'entities.abilities.cold_focus.description':
     'Per 12 s il Tiro Misurato recupera il 50% di concentrazione in più, e la Tesa Lunga costa il 25% in meno e si lancia il 30% più velocemente. (Distintivo di Vista Gelida)',
   'entities.abilities.fieldcraft_reentry.description':
-    "Passiva: Rompipista rinnova lo Slancio di Caccia e prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Il Colpo Sventratore infligge il 15% di danni in più per accumulo. L'Uncino Sanguinario infligge da 18 a 24 danni Fisici aggiuntivi, aumentati del 15% per accumulo e dalla tua potenza d'attacco a distanza. A 3 accumuli, uno dei due attacchi consuma lo Slancio di Caccia. (Arte del Campo)",
+    "Passivo: con Slancio di Caccia, Rompipista prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Colpo Sventratore infligge il 15% di danni in più per accumulo. Uncino Sanguinario infligge da 18 a 24 danni fisici aggiuntivi, aumentati del 15% per accumulo e dalla potenza d'attacco a distanza. Con 3 accumuli, uno qualunque dei due attacchi consuma Slancio di Caccia. (Sopravvivenza)",
   'entities.abilities.frostjaw_trap.description':
     'Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
   'entities.abilities.hunting_momentum.description':
-    'Passiva: il Colpo Sventratore concede 1 Slancio di Caccia per 8 s, fino a 3. A 3 accumuli, Squarciaferite infligge il 45% di danni da colpo in più e consuma gli accumuli. (Arte del Campo)',
+    "Passivo: Colpo Sventratore e una Carica a Frammentazione che colpisce un nemico forniscono ciascuno 1 Slancio di Caccia, fino a 3. Dura fino al consumo o all'uscita dal combattimento; ogni accumulo aumenta del 15% la velocità. Con 3 accumuli, Squarciaferite infligge il 60% di danni da colpo in più e li consuma. (Sopravvivenza)",
   'entities.abilities.measured_shot.description':
     "Colpisci il bersaglio per {damage} danni Fisici. Un colpo a segno recupera 20 concentrazione. I danni aumentano con la potenza d'attacco a distanza.",
   'entities.abilities.pack_command.description':
@@ -16348,7 +16348,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Riduce i danni subiti del 60% per 8 s, ma impedisce di attaccare mentre è attiva.',
   'entities.abilities.shrapnel_charge.description':
-    "Colpisci il bersaglio per 24-30 danni Fisici e fino ad altri 4 nemici entro 6 metri per 13-17. Gli altri bersagli sanguinano anche per 12 danni in 6 s. Se il bersaglio principale ha la tua Ferita da Uncino Sanguinario, infligge subito 1 impulso di ferita. I danni diretti aumentano con la potenza d'attacco a distanza.",
+    "Colpisce un cono di 10 m davanti a te. Il tuo bersaglio, o il nemico colpito più vicino se il bersaglio è fuori dal cono, subisce da 24 a 30 danni fisici. Gli altri nemici nel cono subiscono da 7 a 9 danni e sanguinano per 12 danni in 6 s. Se il bersaglio principale ha la tua ferita di Uncino Sanguinario, subisce subito 1 impulso della ferita. Colpire un nemico fornisce 1 Slancio di Caccia. I danni diretti aumentano con la potenza d'attacco a distanza.",
   'entities.abilities.stampede.description':
     "Evoca 3 bestie per 12 s. Ognuna attacca ogni 2 s per {damage} danni Fisici. I danni mostrati includono l'8% della tua potenza d'attacco a distanza prima dei bonus ai danni del famiglio. Le bestie fissano la Ferocia del Branco all'evocazione, guadagnando il 10% di danni per accumulo. Mentre Fuggifuggi è in recupero, i Comandi del Branco riusciti hanno il 20% di probabilità di azzerarlo, garantito dopo 5 tentativi falliti. Non può azzerarsi mentre le bestie sono attive. (Signore del Branco)",
   'entities.abilities.trailbreak.description':
@@ -16579,7 +16579,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Segui {count} creazioni di {name} come obiettivo di raccolta',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'I tuoi attacchi in mischia che colpiscono possono concedere 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori di cura. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano l’effetto. Forma di Lupo usa invece la sua velocità base di 1 s.',
+    'I tuoi attacchi in mischia andati a segno possono conferire 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori alle cure. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma che colpisce. Nessun recupero interno. Le due mani condividono un solo beneficio: ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non lo attivano. In Forma del Gatto, gli attacchi automatici usano invece la velocità delle zampe di 1 s. Colpi e mosse finali in Forma del Gatto e Forma di Bruin usano la velocità propria dell’arma; Artigli Falcianti effettua un tiro per utilizzo, non per bersaglio.',
   'hudChrome.enchantName.enchant_chest_armor': 'Incisione del petto: Rinforzo',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Incisione del petto: Vigore superiore',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Incisione del petto: Vigore lucente',
@@ -17358,7 +17358,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva. A 3 Verzura, Rapidità di Guarigione diventa Sovrafioritura.',
   'entities.abilities.rip.description':
-    'Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Gatto.',
+    'Mossa finale che fa sanguinare il bersaglio ogni 2 s per 24 s: 72 danni più 48 per punto combo consumato (5 punti: {damage} totali). Solo in Forma del Gatto.',
   'entities.abilities.rip.specNote_feral': 'Il colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
   'entities.abilities.ruinous_brand.description':
     'Marchia un nemico per 15 sec. I tuoi prossimi 3 incantesimi diretti riecheggiano per il 25% dei danni contro il nemico marchiato, oppure copiano il 50% dei danni su di esso quando lanciati contro un altro bersaglio. Gli echi di Dardo della Rovina contano anche come colpi critici, senza un ulteriore moltiplicatore di danno critico.',
@@ -17476,7 +17476,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     '{used} di {cap} sec di riduzione del tempo di recupero usati in questa finestra',
   'hudChrome.auraEffect.bruinRushWindow':
-    'La Forma del Lupo non costa mana e blocca il bersaglio della vostra Carica di Bruin, rallentandolo del {pct}% per {sec} sec',
+    'La Forma del Gatto non costa mana e blocca il bersaglio della vostra Carica di Bruin, rallentandolo del {pct}% per {sec} sec',
   'hudChrome.auraEffect.desolation':
     '{charges} cariche: il tuo prossimo Dardo della Rovina si lancia il {castPct}% più veloce, oppure la tua prossima Pioggia di Fuoco atterra immediatamente',
   'hudChrome.auraEffect.duskfireClaim': 'La morte concede {value} Rovina',
@@ -17854,7 +17854,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Sono due azioni distinte sullo stesso corpo. Tutto cio che una carcassa contiene, monete e drop piu eventuali componenti raccoglibili, si apre nella stessa finestra, ma il tasto interagisci e Prendi il bottino raccolgono solo il bottino ordinario, che segue le normali regole di saccheggio. La raccolta e il lato delle professioni, che strappa i materiali dalla carcassa stessa, e avviene solo quando scegli Raccogli in quella finestra.\n\nLa raccolta e chi prima arriva, uso singolo: ogni carcassa puo essere raccolta esattamente una volta, da chiunque la rivendichi per primo, anche online. Il tuo Focus della Citta determina cosa ottieni: mentre sei in un hub cittadino puoi distribuire 10 punti di focus tra i tipi di componenti che ti interessano, e ogni componente focalizzato tira un livello migliore (ogni 5 punti lo fa avanzare di un gradino, al massimo due gradini) e produce di piu (10 percento per punto). I componenti non focalizzati non vengono mai peggiorati.',
   'guide.profPages.faq.a4':
-    "Hai avuto un colpo di fortuna. Circa 1 raccolto su 90 innesca un evento di raccolta raro (antico cuore di legno su un albero, un filone intatto nel minerale, un fiore lunare tra le erbe): moltiplica per cinque la resa, firma ogni unità con il tuo nome e annuncia il ritrovamento all'intera zona. Anche un tiro di rarità raro o superiore su un raccolto ordinario firma la resa.\n\nI materiali firmati vanno tenuti o venduti cari: avere al banco una qualsiasi copia firmata di un reagente richiesto aggiunge 2 punti percentuali alla probabilità di capolavoro. Ricorda soltanto che si impilano unicamente con copie firmate in modo identico, quindi occupano uno slot della borsa tutto loro.",
+    'Hai trovato una raccolta eccezionale. Circa 1 raccolta su 90 attiva un evento raro: durame antico negli alberi, una vena intatta nei minerali o una fioritura lunare nelle erbe. Moltiplica per cinque la resa, firma ogni unità con il tuo nome e annuncia il ritrovamento all’intera zona. Anche un normale raccolto di qualità rara o superiore riceve la firma su tutta la resa.\n\nConviene conservare i materiali firmati o venderli cari: possedere una copia firmata di un reagente necessario nelle borse o nella Caveau dei Materiali, dove la lavorazione può attingervi, aggiunge 2 punti percentuali alla probabilità di capolavoro. Possono condividere una pila compatibile con materiali non firmati o unità di altri raccoglitori e firmatari senza perdere alcun marchio; ogni origine e quantità rimane registrata separatamente.',
   'guide.profPages.faq.a5':
     "Vai a qualsiasi stazione di lavorazione con il pezzo nelle borse e paga il maestro. La tariffa segue la qualita dell'oggetto: 25 argento per un pezzo non comune, 1 oro per un raro, 4 oro per un epico; un leggendario paga la tariffa dell'epico, e un pezzo comune commissionato paga quella del non comune. Deve essere una vera stazione: una stazione mobile non offre mai il servizio.\n\nLa tariffa compra una lavagna pulita, non una cura: il pezzo rimane una commissione, quindi si vincola di nuovo a chiunque lo riceva nel successivo scambio. Se piu copie vincolate condividono una pila, una copia viene staccata e svincolata per ogni pagamento.",
   'guide.profPages.faq.a8':
@@ -19804,7 +19804,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'L’economia delle collezioni d’incursione ruota attorno a nuclei, essenze e braci. Le ricette richiedono materiali ottenuti da boss, spedizioni e raccolta, con pezzi commerciabili finché non vengono perfezionati.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Alcuni oggetti portano un nome. Le righe della provenienza di un materiale indicano chi ha raccolto ogni gruppo di unità, mentre un marchio separato firmato da identifica l’eventuale firmatario premium. I due fatti sono indipendenti: un materiale raccolto normalmente registra il raccoglitore senza ottenere una firma, mentre una scorta firmata ereditata può indicare il firmatario dichiarando onestamente che non è stato registrato alcun raccoglitore. Un pezzo finito indica invece chi lo ha fabbricato. Questi dati viaggiano con l’oggetto attraverso scambi, banca, posta, Mercato Globale e perfino il riacquisto dal venditore, senza mai svanire.\n\nLa raccolta firma automaticamente il lavoro migliore: ogni raccolto che ottiene raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intero bottino di cinque unità. Un raccolto da cadavere con tiro fortunato firma la resa quando la famiglia non ha un esemplare da offrire; quando ce l’ha, mantiene la resa normale e crea accanto l’esemplare intatto firmato. L’artigianato firma allo stesso modo: ogni copia di un’uscita rara o superiore crea una copia firmata, e un capolavoro firma sempre qualunque sia la sua qualità, così la versione migliore di ogni pezzo indica sempre il suo creatore. La firma di un materiale ordinario viaggia con le unità e non si perde solo perché una pila compatibile contiene già un altro raccoglitore o firmatario. Un esemplare intatto distinto è un oggetto separato e richiede spazio; se non può entrare, la resa ordinaria del cadavere resta ma l’esemplare viene perso.\n\nGli oggetti finiti mantengono un’identità rigida, quindi due copie si fondono solo quando ogni marchio coincide esattamente: stesso oggetto, stesso firmatario, stesse statistiche del capolavoro, stesso incantamento e stesso vincolo. I materiali compatibili condividono uno slot fra raccoglitori e firmatari, mantenendo però un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; fai clic destro sulla pila per l’elenco completo (su touch, usa il suo pulsante Fonti). Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.\n\nLe firme ricompensano gli artigiani: tenere al banco una copia firmata di un reagente necessario, da chiunque sia stata firmata, aggiunge 2 punti percentuali alla probabilità di capolavoro; tenere un reagente firmato da te riduce di uno la quantità richiesta di quel reagente, mai sotto uno, salvo che il reagente sia marcato come non scontabile; i nuclei da incursione mantengono sempre il costo pieno. Il tuo lavoro raro o superiore firmato continua persino a insegnarti, oggi solo tramite le pozioni fabbricate: bevi una bevanda rara che hai preparato e firmato e un piccolo rivolo di competenza torna alla professione che l’ha creata, purché sia una delle tue professioni principali attive. Vale davvero solo per il ramo delle pozioni: un elisir, una pergamena o una fiasca d’apice non ti insegna nulla, per quanto finemente sia stata firmata.',
+    'Alcuni oggetti portano un nome. Le righe della provenienza di un materiale indicano chi ha raccolto ogni gruppo di unità, mentre un marchio separato firmato da identifica l’eventuale firmatario premium. I due fatti sono indipendenti: un materiale raccolto normalmente registra il raccoglitore senza ottenere una firma, mentre una scorta firmata ereditata può indicare il firmatario dichiarando onestamente che non è stato registrato alcun raccoglitore. Un pezzo finito indica invece chi lo ha fabbricato. Questi dati viaggiano con l’oggetto attraverso scambi, banca, posta, Mercato Globale e perfino il riacquisto dal venditore, senza mai svanire.\n\nLa raccolta firma automaticamente il lavoro migliore: ogni raccolto che ottiene raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intero bottino di cinque unità. Un raccolto da cadavere con tiro fortunato firma la resa quando la famiglia non ha un esemplare da offrire; quando ce l’ha, mantiene la resa normale e crea accanto l’esemplare intatto firmato. L’artigianato firma allo stesso modo: ogni copia di un’uscita rara o superiore crea una copia firmata, e un capolavoro firma sempre qualunque sia la sua qualità, così la versione migliore di ogni pezzo indica sempre il suo creatore. La firma di un materiale ordinario viaggia con le unità e non si perde solo perché una pila compatibile contiene già un altro raccoglitore o firmatario. Un esemplare intatto distinto è un oggetto separato e richiede spazio; se non può entrare, la resa ordinaria del cadavere resta ma l’esemplare viene perso.\n\nGli oggetti finiti mantengono un’identità rigida, quindi due copie si fondono solo quando ogni marchio coincide esattamente: stesso oggetto, stesso firmatario, stesse statistiche del capolavoro, stesso incantamento e stesso vincolo. I materiali compatibili condividono uno slot fra raccoglitori e firmatari, mantenendo però un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; fai clic destro sulla pila per l’elenco completo (su touch, usa il suo pulsante Fonti). Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.\n\nLe firme ricompensano gli artigiani: possedere una copia firmata di un reagente necessario, da chiunque sia stata firmata, nelle borse o nel Caveau dei Materiali dove la lavorazione può attingervi, aggiunge 2 punti percentuali alla probabilità di capolavoro; tenere un reagente firmato da te riduce di uno la quantità richiesta di quel reagente, mai sotto uno, salvo che il reagente sia marcato come non scontabile; i nuclei da incursione mantengono sempre il costo pieno. Il tuo lavoro raro o superiore firmato continua persino a insegnarti, oggi solo tramite le pozioni fabbricate: bevi una bevanda rara che hai preparato e firmato e un piccolo rivolo di competenza torna alla professione che l’ha creata, purché sia una delle tue professioni principali attive. Vale davvero solo per il ramo delle pozioni: un elisir, una pergamena o una fiasca d’apice non ti insegna nulla, per quanto finemente sia stata firmata.',
   'guide.profPages.effectFeast':
     'Prepara un banchetto da cui gli altri possono mangiare, una porzione ciascuno: {servings} porzioni, per {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -20264,7 +20264,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.spellEffects': 'Effetti degli incantesimi',
   'hudChrome.options.spellTooltipOnHover': 'Descrizioni degli incantesimi al passaggio del cursore',
   'hudChrome.pattern.reagent': '{name} ×{count}',
-  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.pattern.reagents': '{label} {list}',
   'hudChrome.realmMotd.cleared': 'Messaggio del giorno cancellato.',
   'hudChrome.realmMotd.line': 'Messaggio del giorno: {text}',
   'hudChrome.realmMotd.none': 'Nessun messaggio del giorno impostato.',
@@ -20389,4 +20389,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.hearthstoneTransport': 'La pietra del ritorno ti trasporta a {hub}.',
   'hudChrome.factionRewards.itemCooldown':
     "L'oggetto non è ancora pronto ({minutes} min rimanenti).",
+  'hudChrome.weekly.completedLastWeek': 'Completato la scorsa settimana',
+  'hudChrome.weekly.claimFirst': 'Riscatta prima',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} di reputazione della scorsa settimana ancora da riscuotere. Riscuotila per scegliere una nuova carica.',
 };

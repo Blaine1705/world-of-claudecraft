@@ -50,7 +50,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     'Gebruik: Versterkt je borstharnas en verhoogt Pantser met 12 voor 1 uur.',
   'hudChrome.factionRewards.battleStandardUse':
-    'Gebruik: Plant de Gezegende Dageraad-gevechtsstandaard voor 5 minuten, verhoogt aanzienlijk buiten-gevecht gezondheid en manaherstel voor alle nabije bondgenoten. Dicht ernaast blijven voor 10 seconden geeft ook Zegening van de Dageraad (+5% naar alle stats voor 30 min). (5 min cooldown)',
+    'Gebruik: plant de strijdstandaard van de Gewijde Dageraad voor 5 min. Spelers buiten gevecht binnen 15 yards herstellen 10% meer gezondheid; managebruikers herstellen bovendien elke 2 sec. mana gelijk aan 5% van hun Geest. Blijf 10 sec. in de buurt voor Zegen van de Dageraad, die Kracht, Behendigheid, Uithoudingsvermogen, Intellect en Geest 30 min. lang met 5% verhoogt. (5 min. afkoeltijd)',
   'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automatons)',
   'hudChrome.factionRewards.hub_church_order': 'Oostbeekdal (De Kerkorde)',
   'hudChrome.factionRewards.hub_none':
@@ -537,7 +537,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     'Graveer permanent een tweehandig wapen met 12 Kracht. Vervaar op een tweehandig wapen.',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Je gelandde melee-aanvallen kunnen 60 Behendigheid en 5% haast geven, tot 10 stapels. Vervaar op een wapen.',
+    'Je rake meleeaanvallen kunnen 15 sec. lang 60 Behendigheid en 2% snellere meleeaanvallen geven. Elke treffer heeft 1% kans per 0,6 sec. van de basissnelheid van het treffende wapen. Geen interne afkoeltijd. Beide handen delen één versterking; elke activering vernieuwt die, zonder stapeling. Afstandsaanvallen activeren dit effect niet. In Katgedaante gebruiken automatische aanvallen de pootsnelheid van 1 sec. Slagen en afmakers in Katgedaante en Bruingedaante gebruiken de eigen wapensnelheid; Vegende Klauwen werpt eenmaal per gebruik, niet per doelwit.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Wapengravure: Dageraadvuur',
   'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Wapengravure: Dageraadzegen',
   'hudChrome.enchantName.enchant_weapon_piston_drive': 'Wapengravure: Zuigerstuwing',
@@ -2391,7 +2391,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     'Voegt een regel "Gecast door" toe aan elke buff/debuff tooltip, stellende wie hem toepaste. Handig om verschillende casters van dezelfde buff uit elkaar te houden, zoals twee paladijnen Zegeningen.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Hangt de buff- en debuff-strip van het doelframe eronder in plaats van erboven, de klassieke opmaak. Standaard uit, omdat het standaard doelframe direct boven de actiebalk zit; zet het aan als je het frame ergens met ruimte eronder hebt verplaatst.',
+    'Plaatst de rij versterkingen en verzwakkingen onder het doelwitkader, onder de naam en gezondheidsbalk, in plaats van erboven: de klassieke indeling. Op de standaardpositie schuift het doelwitkader samen met je spreukbalk en slagtimers één rij omhoog, zodat de eerste effectenrij vrij blijft van de actiebalk; een verplaatst kader blijft waar jij het neerzet.',
   'guide.settingsPage.rowFrameRateCap':
     'Een plafond op hoeveel afbeeldingen het spel elke seconde tekent. Een computer die niet kan bijhouden met zijn scherm komt terecht op een onregelmatig ritme; een constante 30 ziet er vlotter uit dan dat, halveert het werk, en houdt de computer koeler. Display betekent geen limiet.',
   'guide.stats.warfareBodyPets':
@@ -3491,9 +3491,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Fleetgedaante',
   'guide.classPage.formsHeading': 'Gedaanteverwisseling',
   'guide.classPage.formsMoonwing':
-    'Een Balans-druïde krijgt er nog één gedaante bij: de Maanuilvorm, de spreukgedaante waarin hij vecht. Het is de enige diergedaante die je spreuken behoudt, en je toverstaf werkt alleen in deze vorm of in je normale spreukgedaante.',
+    'Een Balans-druïde krijgt nog een gedaante: de Maanuilvorm, waarin deze specialisatie als spreukgebruiker vecht. Net als de Sporenhelergedaante van Herstel behoudt die je spreuken; je toverstaf werkt alleen in deze twee gedaanten of je normale spreukgedaante.',
   'guide.classPage.formsWolfEngage':
-    'Een wolf opent het gevecht met Bruin-stormloop, wisselt meteen naar Wolfsgedaante om het doelwit vast te pinnen, dicht de afstand met Uitval wanneer hij niet sluipt, en houdt een vijand stil met Neerhalen.',
+    'Een kat opent het gevecht met Bruin-stormloop, wisselt meteen naar Katsgedaante om het doelwit vast te pinnen, dicht de afstand met Uitval wanneer hij niet sluipt, en houdt een vijand stil met Neerhalen.',
   'guide.classPage.formsNote':
     'Een druïde vecht door van gedaante te veranderen. De meeste druïdenvaardigheden horen bij één gedaante, dus de vorm waarin je verkeert bepaalt wat je kunt gebruiken, en van gedaante wisselen kost een beetje mana. Je kunt in of buiten gevecht van gedaante wisselen, zo vaak je wilt.',
   'guide.classPage.mageEleHeading': 'Waterelementaal',
@@ -6461,7 +6461,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een wild schot dat het doelwit {duration} sec. desoriënteert. Elke vorm van schade verbreekt het effect.',
   'entities.abilities.typhoon.name': 'Tyfoon',
   'entities.abilities.typhoon.description':
-    'Een windvlaag stoot alle vijanden binnen 8 m terug en versuft ze, waardoor hun bewegingssnelheid 4 sec. lang met 50% afneemt.',
+    'Een windstoot slingert alle vijanden binnen 8 meter 15 meter van je weg en versuft ze, waardoor ze 4 sec lang 50% langzamer bewegen. Vijandelijke spelers vliegen in een rechte lijn door de lucht: over een rand blijven ze doorgaan en krijgen valschade; een dodelijke val telt als jouw doding.',
   'entities.abilities.voidfeast.name': 'Leegtefeest',
   'entities.abilities.voidfeast.description':
     'Verslindt een magisch effect (een gunstig effect van een vijand of een schadelijk effect van een bondgenoot) en geneest je voor 6% van je maximale gezondheid.',
@@ -7931,7 +7931,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een kreet die de aanvalskracht van alle groepsleden met {buff}% verhoogt gedurende 30 min.',
   'entities.abilities.battle_shout.name': 'IJzeren Gebrul',
   'entities.abilities.bear_charge.description':
-    'Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Gedurende 3 sec daarna is Wolfsgedaante gratis en pint het doelwit vast, wat het 4 sec lang 50% vertraagt. Bereik 8-25 m. Alleen in Bruingedaante.',
+    'Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Gedurende 3 sec daarna is Katsgedaante gratis en pint het doelwit vast, wat het 4 sec lang 50% vertraagt. Bereik 8-25 m. Alleen in Bruingedaante.',
   'entities.abilities.bear_charge.name': 'Bruin-stormloop',
   'entities.abilities.bear_form.description':
     'Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Je slaat twee keer zo snel voor de helft van de schade per slag, en elke slag bouwt dubbel zoveel woede op. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
@@ -7951,7 +7951,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Val onmiddellijk aan in een bloedrazernij voor 60% wapenschade plus {damage}. (Razernij-kenmerk)',
   'entities.abilities.bloodthirst.name': 'Aderlating',
   'entities.abilities.cat_form.description':
-    'Verandert u in een wolf: behendigheid stijgt met uw niveau, aanvalskracht +8 plus 2 per niveau, uw aanvallen gebruiken energie en combopunten, en u wekt 29% minder dreiging op. Wisselen naar welke gedaante ook verleent Hobbelende pas: 3 sec lang 60% bewegingssnelheid, eenmaal per 20 sec. Werp de spreuk opnieuw om naar de spreukengedaante terug te keren.',
+    'Verander in een kat: behendigheid stijgt met je niveau, aanvalskracht +8 plus 2 per niveau, je aanvallen gebruiken energie en combopunten, je beweegt 15% sneller en wekt 29% minder dreiging op. Elke gedaantewisseling geeft Hobbelende pas, een korte snelheidsverhoging. Werp opnieuw om terug te keren naar je spreukvorm.',
   'entities.abilities.cat_form.name': 'Katgedaante',
   'entities.abilities.charge.description':
     'Stormt op een vijand af, genereert 9 woede en verdooft hem gedurende 1 sec. Bereik 8-25 m.',
@@ -7983,7 +7983,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Vervloekt het doelwit met pijn: {damage} Schaduwschade gedurende 24 sec.',
   'entities.abilities.curse_of_agony.name': 'Ban van Kwelling',
   'entities.abilities.dash.description':
-    'Spurt vooruit en verhoogt de bewegingssnelheid met 50% gedurende 15 sec. Alleen in Katgedaante.',
+    'Neem Katgedaante aan als dat nodig is en sprint met 50% extra snelheid voor 15 sec. In elke gedaante bruikbaar. Direct en activeert geen globale herlaadtijd.',
   'entities.abilities.dash.name': 'Spurt',
   'entities.abilities.deadly_poison.description':
     'Bestrijkt je wapen gedurende 30 min. Elke slag van wapen voegt een gifstapeling toe aan het doelwit, tot 5, en vernieuwt de duur van 12 seconden. Elke stapeling richt elke 2 seconden {damage} natuurschade aan.',
@@ -8113,7 +8113,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag.',
   'entities.abilities.heroic_strike.name': 'Plunderaarsslag',
   'entities.abilities.hibernate.description':
-    'Dwingt het doelwit in een diepe slaap gedurende maximaal 8 sec. Elke schade wekt het.',
+    'Brengt het doel tot 8 sec in een diepe slaap. Elke schade maakt het wakker. Tegen spelers duurt elke herhaling binnen 18 sec half zo lang als de vorige en de vierde mislukt.',
   'entities.abilities.hibernate.name': 'Sluimer',
   'entities.abilities.holy_light.description':
     'Geneest een bevriend doelwit snel voor {damage}. Gezondheid herstellen wekt 1 Toewijding op, zelfs zonder specialisatie. Stralende Resonantie of Zonnevergelding maakt de spreuk onmiddellijk.',
@@ -8172,13 +8172,13 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verandert de vijand in een pad gedurende maximaal {duration} sec. De pad dwaalt rond en geneest snel. Elke schade verbreekt het effect. Alleen beesten en humanoïden.',
   'entities.abilities.polymorph.name': 'Beheksen',
   'entities.abilities.pounce.description':
-    'Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op. Alleen in Wolfsgedaante. Buiten sluiptocht is deze knop Uitval.',
+    'Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op. Alleen in Katsgedaante. Buiten sluiptocht is deze knop Uitval.',
   'entities.abilities.pounce.name': 'Sluipslag',
   'entities.abilities.lunge.description':
-    'Stort je op een vijand tot 12 m ver, wat 60% wapenschade toebrengt en 1 combopunt oplevert. Alleen in Wolfsgedaante.',
+    'Stort je op een vijand tot 12 m ver, wat 60% wapenschade toebrengt en 1 combopunt oplevert. Alleen in Katsgedaante.',
   'entities.abilities.lunge.name': 'Uitval',
   'entities.abilities.hamstring_bite.description':
-    'Afmaakactie die het doelwit verdooft voor 1 sec plus 1 sec per combopunt (5 combopunten: 6 sec). Alleen in Wolfsgedaante.',
+    'Afmaakactie die het doelwit verdooft voor 1 sec plus 1 sec per combopunt (5 combopunten: 6 sec). Alleen in Katsgedaante.',
   'entities.abilities.hamstring_bite.name': 'Neerhalen',
   'entities.abilities.power_word_fortitude.description':
     'Verhoogt het Uithoudingsvermogen van elk groepslid 30 min lang met {buff}%.',
@@ -8187,7 +8187,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Schildt een bevriend doelwit en absorbeert 30 sec lang {damage} schade. Discipline verbindt het doelwit bovendien 30 sec lang met uw Heilige schade.',
   'entities.abilities.power_word_shield.name': 'Psalm van Bescherming',
   'entities.abilities.prowl.description':
-    'Ga in sluiptocht terwijl je in Wolfsgedaante bent. Kan niet in gevecht worden gebruikt.',
+    'Ga in sluiptocht terwijl je in Katsgedaante bent. Kan niet in gevecht worden gebruikt.',
   'entities.abilities.prowl.name': 'Besluipen',
   'entities.abilities.pyroblast.description':
     'Werpt een immense vurige kei die {damage} Vuurschade toebrengt plus extra schade over tijd.',
@@ -14151,7 +14151,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Vaardigheid',
   'guide.search.typeDeed': 'Daad',
   'guide.settingsPage.audioBody':
-    'Het optievenster bestaat niet alleen uit pixels. Audio houdt drie volumeschuiven vast, voor geluidseffecten, muziek en stem, plus een schakelaar voor muziek aan en uit en vier schakelaars voor de geluiden die het snelst gaan vervelen: NPC-stemmen, voetstappen, interfacegeluiden en klikrespons. Het tabblad Algemeen van het paneel Interface draagt een taalkiezer die de hele interface ter plekke opnieuw lokaliseert, zonder herladen, en een themakiezer voor de vensteraankleding.',
+    'Het optievenster regelt ook geluid. Audio heeft vier volumeschuiven voor effecten, omgeving, muziek en stemmen, een muziekschakelaar en vier schakelaars voor geluiden die vaak gaan vervelen: NPC-stemmen, voetstappen, interfacegeluiden en klikfeedback. Het tabblad Algemeen onder Interface heeft een taalkeuze die meteen de hele interface vertaalt zonder herladen, en een themakeuze voor de vensters.',
   'guide.settingsPage.audioTitle': 'Geluid en taal',
   'guide.settingsPage.autolootBody':
     'Liever niet elk lijk aanklikken? Automatisch buitmaken in het voorbijgaan, op het tabblad Gevecht van het paneel Interface en standaard uit, schept de buit van je eigen prooien op terwijl je erlangs loopt.',
@@ -14599,7 +14599,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Kanaliseert 3 sec lang en brengt vijanden binnen 8 m van het doelgebied elke seconde {damage} Schaduwschade toe. De schade stijgt met de Spreukkracht. (Priestertalent)',
   'entities.abilities.multi_shot.description':
-    'Vuurt een salvo af op het doelgebied en brengt vijanden binnen een straal van 8 m {damage} Fysieke schade toe. (jagertalent)',
+    'Vuurt een salvo af op het doelgebied en brengt vijanden binnen 8 yards {damage} fysieke schade toe. (jagertalent)',
   'entities.abilities.prayer_of_healing.description':
     'Geneest bondgenoten binnen 30 m voor {damage}. De genezing stijgt met de Spreukkracht. (Heilig)',
   'entities.abilities.preparation.description':
@@ -15871,17 +15871,17 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Ontketen Beest',
   'entities.abilities.wildheart.name': 'Wildhart',
   'entities.abilities.bloodhook.description':
-    'Stormt op een vijand af en brengt de Bloedhaakwond aan, die over 12 sec. in 4 tikken 34 fysieke basisschade plus 26% van je afstandsaanvalskracht aanricht. (Veldkunst-kenmerk)',
+    'Storm op een vijand af en breng een wond van Bloedhaak aan: 34 fysieke basisschade plus 26% van je afstandsaanvalskracht in 4 tikken over 12 sec. Bij aankomst vertraag je het doel met 30% voor 3 sec. (Kenmerk van Overleving)',
   'entities.abilities.bloodtrail_assault.description':
-    '12 sec. lang verspreidt de Bloedhaak een wond op 60% sterkte naar maximaal 2 nabije vijanden, beveelt Wondscheur een huisdieraanval van 18 schade, en wint de Scherflading 2 meter, richt 25% meer basisschade aan bij het hoofddoel en veroorzaakt 50% meer wondschade.',
+    'Gedurende 12 sec verspreidt Bloedhaak een wond op 60% sterkte naar hoogstens 2 vijanden binnen 5 meter, beveelt Wondscheur een huisdieraanval voor 18 schade en reikt Scherflading 2 meter verder, met 25% meer basisschade op het hoofddoel en 50% meer geactiveerde wondschade. Zonder levend huisdier herstelt je Focus ook 100% sneller.',
   'entities.abilities.cold_focus.description':
     '12 sec. lang herstelt het Beheerst Schot 50% meer focus, en kost de Lange Trek 25% minder en wordt 30% sneller gespreukt. (Koudzicht-kenmerk)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Passief: Spoorbreuk vernieuwt de Jachtvaart en maakt je volgende Weidslag of Bloedhaak 12 sec. gereed. De Weidslag richt per stapel 15% meer schade aan. De Bloedhaak richt 18 tot 24 extra fysieke schade aan, verhoogd met 15% per stapel en door je afstandsaanvalskracht. Bij 3 stapels verbruikt een van beide aanvallen de Jachtvaart. (Veldkunst)',
+    'Passief: met Jachtvaart bereidt Spoorbreuk je volgende Ontweiende Slag of Bloedhaak voor 12 sec voor. Ontweiende Slag doet 15% meer schade per stapel. Bloedhaak doet 18 tot 24 extra fysieke schade, verhoogd met 15% per stapel en door afstandsaanvalskracht. Bij 3 stapels verbruikt elk van deze aanvallen Jachtvaart. (Overleving)',
   'entities.abilities.frostjaw_trap.description':
     'Plaatst een val bij de gekozen vijand of aan je voeten. Hij scherpt na 0,75 sec. en duurt 30 sec. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd.',
   'entities.abilities.hunting_momentum.description':
-    'Passief: de Weidslag verleent 8 sec. lang 1 Jachtvaart, tot 3. Bij 3 stapels richt Wondscheur 45% meer slagschade aan en verbruikt de stapels. (Veldkunst)',
+    'Passief: Ontweiende Slag en een Scherflading die een vijand raakt geven elk 1 Jachtvaart, tot 3. Blijft tot verbruik of tot je het gevecht verlaat; elke stapel verhoogt je snelheid met 15%. Bij 3 stapels brengt Wondscheur 60% meer slagschade toe en verbruikt de stapels. (Overleving)',
   'entities.abilities.measured_shot.description':
     'Schiet op het doelwit voor {damage} fysieke schade. Een treffer herstelt 20 focus. De schade stijgt met de afstandsaanvalskracht.',
   'entities.abilities.pack_command.description':
@@ -15891,7 +15891,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Vermindert de opgelopen schade 8 sec. lang met 60%, maar verhindert aanvallen zolang ze actief is.',
   'entities.abilities.shrapnel_charge.description':
-    'Raakt het doelwit voor 24 tot 30 fysieke schade en tot 4 andere vijanden binnen 6 meter voor 13 tot 17. De andere doelwitten bloeden ook 6 sec. lang voor 12 schade. Als het hoofddoel je Bloedhaakwond draagt, wordt direct 1 wondtik aangericht. De directe schade stijgt met de afstandsaanvalskracht.',
+    'Raakt een kegel van 10 meter voor je. Je doel, of de dichtstbijzijnde geraakte vijand als je doel buiten de kegel staat, krijgt 24 tot 30 fysieke schade. Alle andere vijanden in de kegel krijgen 7 tot 9 schade en bloeden voor 12 schade over 6 sec. Heeft het hoofddoel jouw wond van Bloedhaak, dan krijgt het direct 1 wondtik. Een vijand raken geeft 1 Jachtvaart. Directe schade stijgt met afstandsaanvalskracht.',
   'entities.abilities.stampede.description':
     'Roept 12 sec. lang 3 beesten op. Elk valt elke 2 sec. aan voor {damage} fysieke schade. De getoonde schade bevat 8% van je afstandsaanvalskracht vóór huisdierschadebonussen. De beesten leggen de Roedelfelheid vast bij het oproepen en winnen 10% schade per stapel. Terwijl de Stormloop afkoelt, hebben geslaagde Roedelbevelen 20% kans om hem te herstellen, gegarandeerd na 5 mislukte kansen. Hij kan niet herstellen zolang de beesten actief zijn. (Roedelheer)',
   'entities.abilities.trailbreak.description':
@@ -16616,7 +16616,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Elke spreuk voegt 1 Groenkracht toe (max 3), ook als hij een bloei vernieuwt die al actief is. Bij 3 Groenkracht wordt Snelle genezing Overbloei.',
   'entities.abilities.rip.description':
-    'Afmaakactie die het doelwit elke 2 sec laat bloeden gedurende 24 sec: 36 schade plus 24 per besteed combopunt (5 combopunten: {damage} totaal). Alleen in Katgedaante.',
+    'Afmaker die het doel elke 2 sec gedurende 24 sec laat bloeden: 72 schade plus 48 per verbruikt combopunt (5 punten: {damage} totaal). Alleen in Katgedaante.',
   'entities.abilities.rip.specNote_feral': 'De gelande treffer voegt 1 Oud Bloed toe (max 3).',
   'entities.abilities.ruinous_brand.description':
     "Brandmerkt een vijand gedurende 15 sec. Je volgende 3 directe spreuken weerklinken voor 25% schade tegen de gebrandmerkte vijand, of kopiëren 50% schade naar hem wanneer ze tegen een ander doelwit worden gespreukt. Ruinenschicht-echo's gelden ook als kritieke treffers, zonder een extra kritieke-schademultiplier.",
@@ -16733,7 +16733,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     '{used} van {cap} sec afkoeltijdvermindering gebruikt in dit venster',
   'hudChrome.auraEffect.bruinRushWindow':
-    'Wolfsgedaante kost geen mana en pint het doelwit van uw Bruin-stormloop vast, wat het {sec} sec lang {pct}% vertraagt',
+    'Katsgedaante kost geen mana en pint het doelwit van uw Bruin-stormloop vast, wat het {sec} sec lang {pct}% vertraagt',
   'hudChrome.auraEffect.desolation':
     '{charges} ladingen: je volgende Ruinenschicht wordt {castPct}% sneller gespreukt, of je volgende Vuurregen valt onmiddellijk neer',
   'hudChrome.auraEffect.duskfireClaim': 'Dood kent {value} Ruïne toe',
@@ -17109,7 +17109,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Het zijn twee losse handelingen op hetzelfde lichaam. Alles wat een lijk vasthoudt, munt en buit plus alle oogstbare componenten, opent in hetzelfde venster, maar de interactietoets en Buit Nemen pakken alleen de gewone buit, die de normale lootregels volgt. Oogsten is de ambachtenkant, die materialen van het karkas zelf afstript, en gebeurt pas wanneer je in dat venster Oogsten kiest.\n\nOogsten is wie-het-eerst-komt, eenmalig gebruik: elk lijk kan precies eenmaal worden geoogst, door wie het als eerste claimt, ook online. Je Stadsfocus bepaalt wat je krijgt: terwijl je in een stadshub staat, kun je 10 focuspunten spreiden over de componenttypen die je interesseren, en elk gefocust component rolt een betere rang (elke 5 punten verhoogt het een stap, maximaal twee stappen) en levert meer op (10 procent per punt). Ongefocuste componenten worden nooit slechter.',
   'guide.profPages.faq.a4':
-    'Je hebt een meevaller te pakken. Ruwweg 1 op de 90 oogsten zet een zeldzame verzamelgebeurtenis in gang (oud kernhout bij een boom, een ongerepte ader bij erts, een maanverlichte bloem tussen de kruiden): die vermenigvuldigt de opbrengst vijf keer, signeert elke eenheid met jouw naam, en kondigt de vondst aan de hele zone aan. Een zeldzame of betere kwaliteitsrol bij een gewone oogst signeert de opbrengst ook.\n\nGesigneerde materialen zijn het waard om te bewaren of duur te verkopen: een gesigneerde kopie van een benodigd reagens bij de werkbank in handen hebben voegt 2 procentpunten toe aan de meesterwerkkans. Onthoud alleen dat ze uitsluitend stapelen met identiek gesigneerde kopieën, dus ze houden hun eigen tasslot.',
+    'Je hebt een uitzonderlijk rijke vondst gedaan. Ongeveer 1 op 90 oogsten veroorzaakt een zeldzame verzamelgebeurtenis: oeroud kernhout bij bomen, een ongerepte ader bij erts of een maanverlichte bloem bij kruiden. De opbrengst wordt vervijfvoudigd, elke eenheid krijgt jouw handtekening en de hele zone hoort van de vondst. Ook een gewone oogst met zeldzame of betere kwaliteit ondertekent de opbrengst.\n\nBewaar ondertekende materialen of verkoop ze duur: een ondertekende eenheid van een benodigde grondstof in je tassen of je Materialenkluis, waar het ambacht die kan gebruiken, voegt 2 procentpunten toe aan de Meesterwerkkans. Ze kunnen een passende stapel delen met ongetekend materiaal en eenheden van andere verzamelaars en ondertekenaars zonder merken te verliezen; elke bron en hoeveelheid blijft apart bewaard.',
   'guide.profPages.faq.a5':
     'Loop naar een willekeurig ambachtsstation met het stuk in je tassen en betaal de meester. De vergoeding volgt de kwaliteit van het voorwerp: 25 zilver voor een ongewoon stuk, 1 goud voor een zeldzaam, 4 goud voor een episch; een legendarisch betaalt het epische tarief, en een gewoon opdrachtsstuk betaalt het ongewone tarief. Het moet een echt station zijn: een mobiel station biedt de dienst nooit aan.\n\nDe vergoeding koopt een schone lei, geen genezing: het stuk blijft een opdracht, dus het bindt opnieuw aan wie het in de volgende ruil ontvangt. Als verschillende gebonden kopieën een stapel delen, wordt per betaling één kopie afgeschild en losgemaakt.',
   'guide.profPages.faq.a8':
@@ -18632,7 +18632,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Volg {count} vervaardigingen van {name} als je verzameldoel',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Je rake melee-aanvallen kunnen 50 Kracht geven gedurende 15 sec en je 200 gezondheid genezen. Genezingsmodificatoren gelden. Elke treffer heeft een kans van 1% per 0,6 sec van de basissnelheid van het gebruikte wapen. Geen interne afkoeltijd. Beide handen delen één versterking; elke activering vernieuwt die en ze stapelt nooit. Aanvallen op afstand activeren dit effect niet. Wolfs gedaante gebruikt in plaats daarvan zijn basisslagsnelheid van 1 sec.',
+    'Je rake meleeaanvallen kunnen 15 sec. lang 50 Kracht geven en je voor 200 gezondheid genezen. Genezingsmodificatoren gelden. Elke treffer heeft 1% kans per 0,6 sec. van de basissnelheid van het treffende wapen. Geen interne afkoeltijd. Beide handen delen één versterking; elke activering vernieuwt die, zonder stapeling. Afstandsaanvallen activeren dit effect niet. In Katgedaante gebruiken automatische aanvallen de pootsnelheid van 1 sec. Slagen en afmakers in Katgedaante en Bruingedaante gebruiken de eigen wapensnelheid; Vegende Klauwen werpt eenmaal per gebruik, niet per doelwit.',
   'hudChrome.enchantName.enchant_chest_armor': 'Borstinscriptie: Versterking',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Borstinscriptie: Grotere Uithouding',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Borstinscriptie: Lichtende Uithouding',
@@ -19645,7 +19645,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Hoe munten door de ambachten bewegen: de exacte bijdragen en afvoer, wat werkelijk verkoopt, de regels van de Wereldmarkt, werkopdrachten, commissies en de plaats van door raids gefinancierde collecties naast gewoon ambacht.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Sommige items dragen een naam. De bronregels van een materiaal zeggen wie elke groep eenheden verzamelde, terwijl een aparte handtekeningmarkering de premiumondertekenaar aanwijst als die er is. Die feiten staan los van elkaar: gewoon verzameld materiaal registreert een verzamelaar zonder handtekening, en oude ondertekende voorraad kan de ondertekenaar noemen terwijl eerlijk staat dat geen verzamelaar is geregistreerd. Een voltooid stuk zegt in plaats daarvan wie het maakte. Deze registraties reizen met het item mee door handel, bank, post, de Wereldmarkt en zelfs een terugkoop bij een handelaar, en vervagen nooit.\n\nVerzamelen ondertekent het beste werk automatisch: elke oogst die zeldzaam of beter rolt, komt ondertekend aan en zeldzame vondsten ondertekenen hun volledige vijfvoudige meevaller. Een gelukkige rol bij het oogsten van een lijk ondertekent de opbrengst wanneer de familie geen specimen heeft om te geven. Waar dat wel kan, blijft de opbrengst gewoon en wordt daarnaast het ondertekende zuivere specimen gemaakt. Ambacht ondertekent op dezelfde manier: elke kopie van zeldzame of betere uitvoer maakt een handtekening en een Meesterwerk ondertekent altijd, ongeacht zijn kwaliteit. De beste versie van elk stuk noemt dus altijd zijn maker. De handtekening van gewoon materiaal zit op de eenheden zelf en kan niet verloren gaan alleen omdat een passende stapel al een andere verzamelaar of ondertekenaar bevat. Een afzonderlijk zuiver specimen is een apart item en heeft nog steeds ruimte nodig. Als het niet past, blijft de gewone lijkopbrengst maar gaat het specimen verloren.\n\nVoltooide items houden één strikte identiteit. Twee kopieën voegen alleen samen als elk merkteken exact overeenkomt: hetzelfde item, dezelfde ondertekenaar, dezelfde Meesterwerkstatistieken, dezelfde betovering en dezelfde binding. Compatibele materialen delen een plek tussen verzamelaars en ondertekenaars maar houden per bron een telling bij. De tooltip bij aanwijzen vat de bronnen samen; klik met rechts op de stapel voor de volledige lijst (gebruik op een touchscreen de knop Bronnen). Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.\n\nHandtekeningen betalen makers terug: als je aan de werkbank een ondertekende kopie van een benodigde grondstof vasthoudt, door wie die ook is ondertekend, krijg je 2 procentpunten extra Meesterwerkkans. Een grondstof die door je eigen hand is ondertekend verlaagt de vereiste hoeveelheid van die grondstof met één, nooit onder één, tenzij de grondstof als niet-kortbaar is gemarkeerd. Raidkernen behouden altijd hun volledige kost. Je eigen ondertekende werk van zeldzame of betere kwaliteit blijft je vandaag zelfs onderwijzen via gemaakte drankjes alleen. Drink een zeldzame drank die je zelf hebt gebrouwen en ondertekend en een klein beetje vaardigheid stroomt terug naar het ambacht dat haar maakte, zolang dat ambacht één van je actieve hoofdambachten is. Het geldt echt alleen voor de dranktak. Een elixer, rol of topflacon leert je niets terug, hoe fijn het ook is ondertekend.',
+    'Sommige items dragen een naam. De bronregels van een materiaal zeggen wie elke groep eenheden verzamelde, terwijl een aparte handtekeningmarkering de premiumondertekenaar aanwijst als die er is. Die feiten staan los van elkaar: gewoon verzameld materiaal registreert een verzamelaar zonder handtekening, en oude ondertekende voorraad kan de ondertekenaar noemen terwijl eerlijk staat dat geen verzamelaar is geregistreerd. Een voltooid stuk zegt in plaats daarvan wie het maakte. Deze registraties reizen met het item mee door handel, bank, post, de Wereldmarkt en zelfs een terugkoop bij een handelaar, en vervagen nooit.\n\nVerzamelen ondertekent het beste werk automatisch: elke oogst die zeldzaam of beter rolt, komt ondertekend aan en zeldzame vondsten ondertekenen hun volledige vijfvoudige meevaller. Een gelukkige rol bij het oogsten van een lijk ondertekent de opbrengst wanneer de familie geen specimen heeft om te geven. Waar dat wel kan, blijft de opbrengst gewoon en wordt daarnaast het ondertekende zuivere specimen gemaakt. Ambacht ondertekent op dezelfde manier: elke kopie van zeldzame of betere uitvoer maakt een handtekening en een Meesterwerk ondertekent altijd, ongeacht zijn kwaliteit. De beste versie van elk stuk noemt dus altijd zijn maker. De handtekening van gewoon materiaal zit op de eenheden zelf en kan niet verloren gaan alleen omdat een passende stapel al een andere verzamelaar of ondertekenaar bevat. Een afzonderlijk zuiver specimen is een apart item en heeft nog steeds ruimte nodig. Als het niet past, blijft de gewone lijkopbrengst maar gaat het specimen verloren.\n\nVoltooide items houden één strikte identiteit. Twee kopieën voegen alleen samen als elk merkteken exact overeenkomt: hetzelfde item, dezelfde ondertekenaar, dezelfde Meesterwerkstatistieken, dezelfde betovering en dezelfde binding. Compatibele materialen delen een plek tussen verzamelaars en ondertekenaars maar houden per bron een telling bij. De tooltip bij aanwijzen vat de bronnen samen; klik met rechts op de stapel voor de volledige lijst (gebruik op een touchscreen de knop Bronnen). Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.\n\nHandtekeningen betalen makers terug: als je een ondertekende eenheid van een benodigde grondstof hebt, door wie die ook is ondertekend, in je tassen of je Materialenkluis waar het ambacht die kan gebruiken, krijg je 2 procentpunten extra Meesterwerkkans. Een grondstof die door je eigen hand is ondertekend verlaagt de vereiste hoeveelheid van die grondstof met één, nooit onder één, tenzij de grondstof als niet-kortbaar is gemarkeerd. Raidkernen behouden altijd hun volledige kost. Je eigen ondertekende werk van zeldzame of betere kwaliteit blijft je vandaag zelfs onderwijzen via gemaakte drankjes alleen. Drink een zeldzame drank die je zelf hebt gebrouwen en ondertekend en een klein beetje vaardigheid stroomt terug naar het ambacht dat haar maakte, zolang dat ambacht één van je actieve hoofdambachten is. Het geldt echt alleen voor de dranktak. Een elixer, rol of topflacon leert je niets terug, hoe fijn het ook is ondertekend.',
   'guide.profPages.effectFeast':
     'Zet een feestmaal klaar waar anderen van eten, één portie per persoon: {servings} porties, gedurende {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -20110,7 +20110,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.spellEffects': 'Spreukeffecten',
   'hudChrome.options.spellTooltipOnHover': 'Spreukinfo bij aanwijzen',
   'hudChrome.pattern.reagent': '{name} ×{count}',
-  'hudChrome.pattern.reagents': '{label}: {list}',
+  'hudChrome.pattern.reagents': '{label} {list}',
   'hudChrome.realmMotd.cleared': 'Bericht van de dag gewist.',
   'hudChrome.realmMotd.line': 'Bericht van de dag: {text}',
   'hudChrome.realmMotd.none': 'Er is geen bericht van de dag ingesteld.',
@@ -20235,4 +20235,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.hearthstoneTransport': 'De haardsteen brengt je naar {hub}.',
   'hudChrome.factionRewards.itemCooldown':
     'Dat voorwerp is nog niet klaar ({minutes} min resterend).',
+  'hudChrome.weekly.completedLastWeek': 'Vorige week voltooid',
+  'hudChrome.weekly.claimFirst': 'Eerst ophalen',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} aanzien van vorige week, nog niet opgehaald. Haal het op om een nieuwe lading te kiezen.',
 };

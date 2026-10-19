@@ -4025,7 +4025,7 @@ export const pt_BR: EnTranslations = {
       "elementalConvergencePrimed": "Seu próximo feitiço da outra escola elemental concede Convergência Elemental",
       "hunterFerocity": "{stacks} de Ferocidade da Matilha: seu companheiro causa {pct}% mais dano",
       "cooldownCap": "{used} de {cap} s de redução de recarga usados nesta janela",
-      "bruinRushWindow": "A Forma de Lobo não custa mana e fixa o alvo da vossa Investida de Bruin, reduzindo sua velocidade em {pct}% por {sec} s",
+      "bruinRushWindow": "A Forma de Gato não custa mana e fixa o alvo da vossa Investida de Bruin, reduzindo sua velocidade em {pct}% por {sec} s",
       "funeralHarvestLock": "Funeral Harvest ainda não pode criar outro Fragmento de Alma",
       "leadenHexLock": "Maldição Chúmbea ainda não pode enraizar este alvo novamente",
       "forbiddenReflectionReady": "Sua próxima recarga elegível de Bruxo pode ser conjurada novamente",
@@ -5450,8 +5450,8 @@ export const pt_BR: EnTranslations = {
       "enchant_weapon_piston_drive": "Gravura de arma: Impulso de Pistão"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Seus ataques corpo a corpo que acertarem podem conceder 50 de Força por 15 s e curar 200 de vida. Modificadores de cura se aplicam. Cada golpe tem 1% de chance por 0,6 s da velocidade-base da arma. Não há recarga interna. As duas mãos compartilham um único benefício; qualquer acionamento o renova e ele nunca acumula. Ataques à distância não acionam este efeito. Forma de Lobo usa sua velocidade-base de ataque de 1 s.",
-      "enchant_weapon_riftwalkers_grace": "Seus ataques corpo a corpo bem-sucedidos podem conceder 60 de Agilidade e 2% de velocidade de ataque corpo a corpo por 15 s. Cada acerto tem 1% de chance a cada 0.6 s da velocidade base da arma usada. Sem recarga interna. As duas mãos compartilham um único benefício; qualquer ativação o renova, e ele nunca se acumula. Ataques à distância não ativam este efeito. A Forma de Gato usa sua velocidade base de golpe de 1 s no lugar disso.",
+      "enchant_weapon_lastflame_zeal": "Seus ataques corpo a corpo que acertam podem conceder 50 de Força por 15 s e curar você em 200 de vida. Aplicam-se modificadores de cura. Cada acerto tem 1% de chance por 0,6 s da velocidade básica da arma que golpeia. Sem recarga interna. As duas mãos compartilham um único benefício: cada ativação o renova, sem acumular. Ataques à distância não ativam o efeito. Na Forma de Gato, ataques automáticos usam a velocidade das patas de 1 s. Golpes e finalizações na Forma de Gato e na Forma de Bruin usam a velocidade da própria arma; Garras Varredoras faz uma rolagem por uso, não por alvo.",
+      "enchant_weapon_riftwalkers_grace": "Seus ataques corpo a corpo que acertam podem conceder 60 de Agilidade e ataques corpo a corpo 2% mais rápidos por 15 s. Cada acerto tem 1% de chance por 0,6 s da velocidade básica da arma que golpeia. Sem recarga interna. As duas mãos compartilham um único benefício: cada ativação o renova, sem acumular. Ataques à distância não ativam o efeito. Na Forma de Gato, ataques automáticos usam a velocidade das patas de 1 s. Golpes e finalizações na Forma de Gato e na Forma de Bruin usam a velocidade da própria arma; Garras Varredoras faz uma rolagem por uso, não por alvo.",
       "enchant_weapon_dawnfire_etching": "Grava permanentemente uma arma com 18 de poder de feitiço. O poder de feitiço também conta para o poder de cura. Um bônus fixo, que não escala.",
       "enchant_weapon_dawns_benediction": "Grava permanentemente uma arma com 34 de poder de cura. O poder de cura aumenta apenas curas, nunca dano de feitiço. Um bônus fixo, que não escala.",
       "enchant_weapon_piston_drive": "Grava permanentemente uma arma de duas mãos com 12 de Força e 25 de índice de crítico. Não pode ser aplicado a uma arma de uma mão. Um bônus fixo, que não escala."
@@ -5469,7 +5469,7 @@ export const pt_BR: EnTranslations = {
       "hub_automatons": "Wyrmwatch (Autômatos)",
       "riftGliderUse": "Usar: Desdobra o planador, diminuindo a velocidade de queda por 30 s. Pousar ou tomar dano cancela o efeito. (2 min de recarga)",
       "targetDummyUse": "Usar: Implanta um boneco de treinamento mecânico no mundo aberto por 2 minutos para praticar habilidades de combate. (5 min de recarga)",
-      "battleStandardUse": "Usar: Planta o Estandarte de Batalha da Alvorada Consagrada por 5 minutos, aumentando significativamente a regeneração de vida e mana fora de combate para todos os aliados próximos. Permanecer perto dele por 10 segundos também concede Bênção da Alvorada (+5% para todas as estatísticas por 30 min). (5 min de recarga)",
+      "battleStandardUse": "Usar: finca o Estandarte de Batalha da Alvorada Consagrada por 5 min. Jogadores fora de combate a até 15 jardas regeneram 10% mais vida; usuários de mana também recuperam mana igual a 5% do Espírito a cada 2 s. Permanecer perto por 10 s concede Bênção da Alvorada, aumentando Força, Agilidade, Vigor, Intelecto e Espírito em 5% por 30 min. (Recarga de 5 min)",
       "shockBombUse": "Usar: Lança uma bomba de choque até 30 metros de distância, causando 120 a 160 de dano de Natureza para todos os inimigos dentro de 5 metros. (1 min de recarga)",
       "invisibilityUse": "Usar: Envolve você em furtividade por 6 s. (2 min de recarga)",
       "armorKitUse": "Usar: Reforça sua armadura de peito, aumentando Armadura em 12 por 1 hora.",
@@ -5830,7 +5830,7 @@ export const pt_BR: EnTranslations = {
     "pattern": {
       "teaches": "Uso: ensina você a criar {item}.",
       "teachesEnchant": "Uso: ensina você a aplicar {enchant}.",
-      "reagents": "{label}: {list}",
+      "reagents": "{label} {list}",
       "reagent": "{name} ×{count}"
     },
     "unbind": {
@@ -6720,6 +6720,8 @@ export const pt_BR: EnTranslations = {
       "choose": "Escolher missão",
       "inProgress": "Em andamento ({count}/{required})",
       "completed": "Concluída esta semana",
+      "completedLastWeek": "Concluído na semana passada",
+      "claimFirst": "Resgatar primeiro",
       "lockedThisWeek": "Bloqueada esta semana",
       "footerPick": "Você pode manter um encargo semanal por vez. Escolha uma carta para ler seus termos.",
       "footerHeld": "Seu encargo da semana está definido. Os outros três desbloqueiam na redefinição.",
@@ -6760,6 +6762,7 @@ export const pt_BR: EnTranslations = {
       },
       "commendHeading": "Recomendação do Emissário",
       "commendNote": "{amount} de reputação com uma facção à sua escolha, uma vez por semana.",
+      "commendCarriedNote": "{amount} de reputação da semana passada ainda não resgatada. Resgate para escolher uma nova carga.",
       "commendClaimed": "A recomendação desta semana foi para {faction}.",
       "commendRewardLine": "{amount} de reputação com uma facção à sua escolha",
       "chosen": "Missão semanal aceita: {category}",
@@ -7415,7 +7418,7 @@ export const pt_BR: EnTranslations = {
       "mobileBody": "Num celular ou tablet o jogo começa você em Low. Todo aparelho de toque cai ali no primeiro início, de propósito, para que você entre no mundo e jogue; suba você mesmo pelo painel Gráficos quando quiser. Num navegador Android a escala inteira está aberta e sua escolha permanece. No iPhone e no iPad você ainda pode escolher os ajustes mais altos e eles valem assim que você pressiona Aplicar, mas o jogo devolve você a High no próximo início, porque o iOS pode encerrar a aba enquanto uma cena tão grande é construída. O aplicativo baixado é mais restrito ainda: sua lista de ajustes para em High e os controles de sistema individuais ficam ocultos, porque o aplicativo cuida deles sozinho.",
       "touchBody": "Numa tela sensível ao toque o painel Gráficos ganha um cartão Controles por toque só dele: tamanho e zona morta do direcional, tamanho dos botões na tela, opacidade dos controles, um direcional de câmera opcional, um layout espelhado para canhotos e visão por toque invertida, para que a tela se ajuste às suas mãos e não o contrário.",
       "audioTitle": "Som e idioma",
-      "audioBody": "A janela de opções não é só pixels. Áudio reúne três controles de volume, para efeitos sonoros, música e voz, mais um interruptor de música e quatro interruptores para os sons que mais cansam: vozes de NPC, passos, sons da interface e retorno de clique. A aba Geral do painel Interface traz um seletor de idioma que relocaliza a interface inteira na hora, sem recarregar, e um seletor de tema para o acabamento das janelas.",
+      "audioBody": "As opções vão além da imagem. Áudio tem quatro controles de volume: efeitos, ambiente, música e vozes, além de um botão para ligar a música e quatro para os sons que mais costumam cansar: vozes de PNJs, passos, sons da interface e resposta de clique. A aba Geral do painel Interface oferece um seletor de idioma que traduz toda a interface imediatamente, sem recarregar, e um seletor de tema para as janelas.",
       "autolootBody": "Prefere não clicar em cada cadáver? O saque automático de passagem, na aba Combate do painel Interface e desligado por padrão, recolhe o espólio das suas próprias vítimas enquanto você passa por elas.",
       "panelsMoreBody": "Os dois painéis que esta página não lista valem a pena conferir de qualquer jeito. Auras é onde você molda os grandes alertas na tela que disparam quando um proc da sua classe aparece: quais aparecem, seu tamanho, cor, opacidade e onde ficam na tela. Sobreposição de Desempenho é a leitura que você ativa enquanto ajusta esta página, e depois oculta de novo.",
       "valueUltraOrInsane": "Ultra, ou Extrema se você quiser tudo",
@@ -7467,7 +7470,7 @@ export const pt_BR: EnTranslations = {
       "ifPartyShowAuras": "Se benefícios e penalidades aparecem nos quadros do grupo. Interruptores equivalentes cobrem barras de recurso, absorções, mascotes e se você aparece na sua própria lista de grupo.",
       "ifAurasOnPlayerFrame": "Coloca seus benefícios e penalidades também no seu Quadro do Jogador, além da barra de auras.",
       "ifAuraBarBelowFrame": "Move a fileira de benefícios para baixo do quadro da sua unidade em vez de acima dele. Só faz diferença enquanto os benefícios aparecem no quadro do jogador.",
-      "ifTargetAurasBelowFrame": "Posiciona a fileira de benefícios e penalidades do quadro de alvo abaixo do quadro, em vez de acima, o layout clássico. Desativado por padrão, já que o quadro de alvo padrão fica bem acima da barra de ação; ative depois de mover o quadro para algum lugar com espaço abaixo dele.",
+      "ifTargetAurasBelowFrame": "Coloca a faixa de benefícios e penalidades abaixo do quadro do alvo, sob o nome e a barra de vida, em vez de acima: a disposição clássica. Na posição padrão, o quadro do alvo, junto da sua barra de lançamento e dos temporizadores de golpes, sobe uma linha para que a primeira linha de efeitos não invada a barra de ações; um quadro movido permanece onde você o colocou.",
       "ifAlwaysShowAllBuffs": "Mostra todos os benefícios ativos mesmo na predefinição gráfica Baixa, ignorando o limite normal de ícones de benefícios.",
       "ifShowAuraCaster": "Adiciona uma linha \"Conjurado por\" a toda dica de benefício ou penalidade, nomeando quem o aplicou. Útil para diferenciar vários conjuradores do mesmo benefício, como as Bênçãos de dois paladinos.",
       "ifTargetOfTarget": "Mostra quem o seu alvo está mirando: a forma clássica de saber se o tanque ainda está com a aggro.",
@@ -7910,8 +7913,8 @@ export const pt_BR: EnTranslations = {
       "formsHeading": "Mudança de Forma",
       "formsNote": "Um druida luta mudando de forma. A maioria das habilidades de druida pertence a uma forma específica, então a forma em que você está decide o que pode conjurar, e mudar de forma custa um pouco de mana. Você pode mudar de forma dentro ou fora de combate, quantas vezes quiser.",
       "formsAutoUnshift": "Uma cura ou um feitiço de dano conjurado em forma tira você dela sozinho. Sair de uma forma assim é de graça e não gasta sua recarga global, então um feitiço instantâneo dispara no momento em que você aperta. Voltar para a forma é uma habilidade comum e ainda custa mana e sua recarga global.",
-      "formsMoonwing": "Um druida Equilíbrio ganha mais uma forma, a Forma de Luniscante, a forma de conjurador em que um druida Equilíbrio luta. É a única forma animal que mantém suas magias, e sua varinha só funciona nela ou na sua forma normal de conjurador.",
-      "formsWolfEngage": "Um lobo abre a luta com Investida de Bruin, muda logo para a Forma de Lobo para fixar o alvo, fecha a distância com Bote quando não está furtivo e prende um inimigo com Derrubada.",
+      "formsMoonwing": "Um druida Equilíbrio recebe mais uma forma, a Forma de Luniscante, a forma de conjurador usada em combate por essa especialização. Como a Forma de Curandeiro de Esporos de Restauração, ela mantém suas magias, e sua varinha só funciona nessas duas formas ou na forma normal de conjurador.",
+      "formsWolfEngage": "Um gato abre a luta com Investida de Bruin, muda logo para a Forma de Gato para fixar o alvo, fecha a distância com Bote quando não está furtivo e prende um inimigo com Derrubada.",
       "formLine": {
         "form_bear": "A forma de tanque: uma pele grossa, raiva em vez de mana, e ameaça extra para que os inimigos continuem batendo em você.",
         "form_cat": "A forma de dano corpo a corpo: energia e pontos de combo, como um ladino, e muito menos ameaça.",
@@ -9061,7 +9064,7 @@ export const pt_BR: EnTranslations = {
         "commissionsBody": "Uma encomenda é uma criação feita para alguém. Ao criar uma arma, uma peça de armadura ou um item secundário sustentado (uma poção não pode carregar um vínculo), o artesão pode marcar a criação como encomenda: a peça acabada se comporta normalmente nas mãos de quem a fez, mas no momento em que troca de mãos em uma negociação ela se vincula à pessoa que a recebeu. É o Vínculo do Artesão: o comprador recebe sua peça, e a peça não pode ser repassada nem revendida.\n\nOs vínculos não são eternos, apenas caros. Qualquer mestre de posto desvincular uma peça vinculada enquanto você estiver na estação (uma estação móvel nunca oferece o serviço), por uma taxa definida pela qualidade do item: 25 pratas para incomum, 1 ouro para raro, 4 ouros para épico, com um lendário pagando a taxa épica e uma peça comum encomendada a taxa de incomum.\n\nA taxa compra uma lousa limpa, não uma cura: a peça ainda é uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação, e todo o resto, assinatura, obra-prima e encantamentos, permanece intacto.",
         "provenanceHeading": "Trabalho assinado",
         "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Alguns itens carregam um nome. As linhas de origem de um material dizem quem coletou cada grupo de unidades, enquanto uma marca separada de assinatura identifica o artesão premium quando existe um. Esses fatos são independentes: um material comum coletado registra o coletor sem ganhar assinatura, e um estoque antigo assinado pode nomear seu assinante dizendo honestamente que nenhum coletor foi registrado. Uma peça pronta, por sua vez, informa quem a criou. Esses registros viajam com o item por trocas, banco, correio, Mercado Mundial e até recompra de vendedor, e nunca desaparecem.\n\nA coleta assina automaticamente seu melhor trabalho: qualquer colheita que role rara ou superior chega assinada, e achados raros assinam todo o ganho de cinco unidades. A rolagem de sorte de uma coleta de cadáver assina seu rendimento quando a família não tem um espécime, e, quando tem, mantém o rendimento comum e cria ao lado dele o espécime imaculado assinado. A criação assina do mesmo modo: toda cópia de uma saída rara ou superior cria uma versão assinada, e uma obra-prima sempre assina qualquer qualidade, então a melhor versão de qualquer peça sempre nomeia seu criador. A assinatura de um material comum acompanha as próprias unidades e não pode ser perdida só porque uma pilha compatível já contém outro coletor ou assinante. Um espécime imaculado distinto é um item separado e ainda precisa de espaço; se não couber, o rendimento comum do cadáver fica, mas o espécime se perde.\n\nItens prontos mantêm uma identidade estrita, então duas cópias só se juntam quando todas as marcas coincidem exatamente: mesmo item, mesmo assinante, mesmos atributos de obra-prima, mesmo encantamento e mesmo vínculo. Materiais compatíveis compartilham um espaço entre coletores e assinantes, mantendo uma contagem para cada origem. O tooltip ao passar o mouse resume as origens; clique com o botão direito na pilha para a lista completa (no toque, use o botão Origens). Separar por coletor mantém essas pilhas distintas nas bolsas, e a ordenação respeita essa escolha. Material transferido pode formar pilha normalmente com os materiais do destinatário.\n\nAssinaturas retribuem artesãos: manter na bancada qualquer cópia assinada de um reagente necessário, independentemente de quem a assinou, adiciona 2 pontos percentuais à chance de obra-prima, e manter um reagente assinado por você reduz em um a quantidade necessária daquele reagente, nunca abaixo de um, a menos que ele esteja marcado sem desconto; núcleos de raide sempre mantêm o custo completo. Seu próprio trabalho raro ou superior assinado também continua ensinando, hoje apenas por meio de poções criadas: beba uma poção rara que você preparou e assinou e um pequeno fluxo de habilidade volta à profissão que a criou, desde que ela seja uma das suas principais ativas. É realmente apenas o braço das poções: um elixir, um pergaminho ou um frasco de ápice não ensina nada de volta, por mais fina que seja sua assinatura.",
+        "provenanceBodyUndiscounted": "Alguns itens carregam um nome. As linhas de origem de um material dizem quem coletou cada grupo de unidades, enquanto uma marca separada de assinatura identifica o artesão premium quando existe um. Esses fatos são independentes: um material comum coletado registra o coletor sem ganhar assinatura, e um estoque antigo assinado pode nomear seu assinante dizendo honestamente que nenhum coletor foi registrado. Uma peça pronta, por sua vez, informa quem a criou. Esses registros viajam com o item por trocas, banco, correio, Mercado Mundial e até recompra de vendedor, e nunca desaparecem.\n\nA coleta assina automaticamente seu melhor trabalho: qualquer colheita que role rara ou superior chega assinada, e achados raros assinam todo o ganho de cinco unidades. A rolagem de sorte de uma coleta de cadáver assina seu rendimento quando a família não tem um espécime, e, quando tem, mantém o rendimento comum e cria ao lado dele o espécime imaculado assinado. A criação assina do mesmo modo: toda cópia de uma saída rara ou superior cria uma versão assinada, e uma obra-prima sempre assina qualquer qualidade, então a melhor versão de qualquer peça sempre nomeia seu criador. A assinatura de um material comum acompanha as próprias unidades e não pode ser perdida só porque uma pilha compatível já contém outro coletor ou assinante. Um espécime imaculado distinto é um item separado e ainda precisa de espaço; se não couber, o rendimento comum do cadáver fica, mas o espécime se perde.\n\nItens prontos mantêm uma identidade estrita, então duas cópias só se juntam quando todas as marcas coincidem exatamente: mesmo item, mesmo assinante, mesmos atributos de obra-prima, mesmo encantamento e mesmo vínculo. Materiais compatíveis compartilham um espaço entre coletores e assinantes, mantendo uma contagem para cada origem. O tooltip ao passar o mouse resume as origens; clique com o botão direito na pilha para a lista completa (no toque, use o botão Origens). Separar por coletor mantém essas pilhas distintas nas bolsas, e a ordenação respeita essa escolha. Material transferido pode formar pilha normalmente com os materiais do destinatário.\n\nAssinaturas retribuem artesãos: ter qualquer unidade assinada de um reagente necessário, independentemente de quem a assinou, nas bolsas ou no Depósito de Materiais, onde a fabricação possa utilizá-la, adiciona 2 pontos percentuais à chance de obra-prima, e manter um reagente assinado por você reduz em um a quantidade necessária daquele reagente, nunca abaixo de um, a menos que ele esteja marcado sem desconto; núcleos de raide sempre mantêm o custo completo. Seu próprio trabalho raro ou superior assinado também continua ensinando, hoje apenas por meio de poções criadas: beba uma poção rara que você preparou e assinou e um pequeno fluxo de habilidade volta à profissão que a criou, desde que ela seja uma das suas principais ativas. É realmente apenas o braço das poções: um elixir, um pergaminho ou um frasco de ápice não ensina nada de volta, por mais fina que seja sua assinatura.",
         "collectorsHeading": "Colecionadores, troféus e o preço de uma história",
         "collectorsBody": "Os vendedores são cegos à proveniência: um item assinado é vendido a um PNJ exatamente pelo seu preço comum. O prêmio de uma assinatura existe apenas entre jogadores, o que é precisamente o que o torna interessante: uma pilha de minério inesperado assinada por um coletor famoso, um Corte Principal de uma colheita sortuda, uma lâmina obra-prima com o nome de um artesão aposentado, todos custam o que a memória de alguém diz que valem.\n\nO Livro dos Feitos apoia o mesmo instinto: Veia Imaculada, Cerne Ancião, Flor ao Luar, Um Espécime Perfeito e Lampejo de Esperança são marcas de colecionador com zero de Renome que existem apenas para provar que um momento aconteceu com você. Guarde o item que conquistou o feito e você tem o recibo. Nada disso é poder; a proveniência não compra atributos nem vence batalhas, é o rastro de papel do jogo para dias felizes.",
         "castPaceHeading": "Tempo de conjuração e o dreno de ouro",
@@ -9110,7 +9113,7 @@ export const pt_BR: EnTranslations = {
         "q3": "Qual é a diferença entre saquear e colher um cadáver?",
         "a3": "São duas ações separadas no mesmo corpo. Tudo que um cadáver contém, moedas e drops mais quaisquer componentes coletáveis, abre na mesma janela, mas a tecla de interação e Pegar Saque recolhem apenas o saque comum, que segue as regras normais de saque. A colheita é o lado das profissões, extraindo materiais do próprio cadáver, e só acontece quando você escolhe Coletar nessa janela.\n\nA colheita é por ordem de chegada e de uso único: cada cadáver pode ser colhido exatamente uma vez, por quem o reivindicar primeiro, inclusive online. O Foco do Vilarejo molda o que você obtém: enquanto estiver em um centro de vilarejo, você pode distribuir 10 pontos de foco pelos tipos de componente que lhe interessam, e cada componente focado rola um nível melhor (a cada 5 pontos sobe um degrau, no máximo dois degraus) e rende mais (10 por cento por ponto). Componentes sem foco nunca são piorados.",
         "q4": "Por que meu Tronco de Ironbark está assinado?",
-        "a4": "Você teve um golpe de sorte. Aproximadamente 1 coleta em 90 dispara um evento de coleta raro (cerne antigo em uma árvore, uma veia imaculada no minério, uma flor ao luar entre as ervas): ele multiplica o rendimento por cinco, assina cada unidade com o seu nome e anuncia o achado para a zona inteira. Uma rolagem de raridade rara ou melhor em uma coleta comum também assina o rendimento.\n\nMateriais assinados valem a pena guardar ou vender caro: ter na bancada qualquer cópia assinada de um reagente exigido soma 2 pontos percentuais à chance de obra-prima. Só lembre que eles se empilham apenas com cópias assinadas de forma idêntica, então ficam em um encaixe de bolsa só deles.",
+        "a4": "Você encontrou uma colheita excepcional. Cerca de 1 a cada 90 coletas ativa um evento raro: cerne ancestral em árvores, veio intacto em minério ou flor enluarada em ervas. Ele multiplica a produção por cinco, assina cada unidade com seu nome e anuncia a descoberta para toda a zona. Uma coleta comum que resulte em qualidade rara ou superior também assina toda a produção.\n\nVale guardar os materiais assinados ou vendê-los caro: ter qualquer unidade assinada de um reagente necessário nas bolsas ou no Depósito de Materiais, onde a fabricação possa utilizá-la, adiciona 2 pontos percentuais à chance de obra-prima. Eles podem compartilhar uma pilha compatível com material sem assinatura ou unidades de outros coletores e signatários sem perder marcas; cada origem e quantidade fica registrada separadamente.",
         "q5": "Como desvincular uma peça encomendada e quanto custa?",
         "a5": "Vá a qualquer posto de criação com a peça nas bolsas e pague o mestre. A taxa segue a qualidade do item: 25 pratas para uma peça incomum, 1 ouro para uma rara, 4 ouros para uma épica; uma lendária paga a taxa épica, e uma peça comum encomendada paga a taxa de incomum. Deve ser um posto real: uma estação móvel nunca oferece o serviço.\n\nA taxa compra uma lousa limpa, não uma cura: a peça continua sendo uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação. Se várias cópias vinculadas compartilharem uma pilha, uma cópia é separada e desvinculada por pagamento.",
         "q6": "Onde aprender receitas e quanto custam?",
@@ -13266,15 +13269,15 @@ export const pt_BR: EnTranslations = {
       },
       "bloodhook": {
         "name": "Gancho Sangrento",
-        "description": "Avança contra um inimigo e aplica Ferida de Gancho Sangrento, causando 34 de dano Físico base mais 26% do seu poder de ataque à distância ao longo de 12 s em 4 pulsos. (Distintivo de Perícia de Campo)"
+        "description": "Avança contra um inimigo e aplica uma ferida de Gancho Sangrento, causando 34 de dano físico base mais 26% do seu Poder de Ataque à Distância em 4 pulsos ao longo de 12 s. Ao chegar, reduz a velocidade do alvo em 30% por 3 s. (Assinatura de Sobrevivência)"
       },
       "shrapnel_charge": {
         "name": "Carga de Estilhaços",
-        "description": "Atinge o alvo causando de 24 a 30 de dano Físico e até 4 outros inimigos a até 6 metros causando de 13 a 17. Os demais alvos também sangram por 12 de dano ao longo de 6 s. Se o alvo principal tiver sua Ferida de Gancho Sangrento, causa 1 pulso de ferida imediatamente. O dano direto aumenta com o poder de ataque à distância."
+        "description": "Atinge um cone de 10 m à sua frente. Seu alvo, ou o inimigo atingido mais próximo se o alvo estiver fora do cone, recebe de 24 a 30 de dano físico. Os outros inimigos no cone recebem de 7 a 9 e sangram por 12 de dano ao longo de 6 s. Se o alvo principal tiver sua ferida de Gancho Sangrento, recebe imediatamente 1 pulso da ferida. Atingir um inimigo concede 1 de Ímpeto de Caça. O dano direto aumenta com Poder de Ataque à Distância."
       },
       "bloodtrail_assault": {
         "name": "Assalto da Trilha de Sangue",
-        "description": "Por 12 s, o Gancho Sangrento espalha uma ferida com 60% de força para até 2 inimigos próximos, o Rasga-Feridas comanda um ataque do companheiro de 18 de dano, e a Carga de Estilhaços ganha 2 metros, causa 25% mais dano base ao alvo principal e aciona 50% mais dano de ferida."
+        "description": "Por 12 s, Gancho Sangrento espalha uma ferida com 60% da força a até 2 inimigos em 5 m, Rasga-Feridas ordena um ataque do ajudante de 18 de dano e Carga de Estilhaços alcança 2 m mais longe, causa 25% mais dano base ao alvo principal e ativa 50% mais dano de ferida. Sem ajudante vivo, seu Foco também regenera 100% mais rápido."
       },
       "trailbreak": {
         "name": "Quebra-Trilha",
@@ -13837,11 +13840,11 @@ export const pt_BR: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Ímpeto de Caça",
-        "description": "Passiva: o Golpe Estripador concede 1 de Ímpeto de Caça por 8 s, até 3. Com 3 acúmulos, o Rasga-Feridas causa 45% mais dano de golpe e consome os acúmulos. (Perícia de Campo)"
+        "description": "Passivo: Golpe Estripador e uma Carga de Estilhaços que acerte um inimigo concedem 1 de Ímpeto de Caça cada, até 3. Dura até ser gasto ou você sair de combate; cada acúmulo aumenta sua velocidade em 15%. Com 3 acúmulos, Rasga-Feridas causa 60% mais dano de golpe e os consome. (Sobrevivência)"
       },
       "fieldcraft_reentry": {
         "name": "Reentrada Armada",
-        "description": "Passiva: Quebra-Trilha renova o Ímpeto de Caça e prepara seu próximo Golpe Estripador ou Gancho Sangrento por 12 s. O Golpe Estripador causa 15% mais dano por acúmulo. O Gancho Sangrento causa de 18 a 24 de dano Físico adicional, aumentado em 15% por acúmulo e pelo seu poder de ataque à distância. Com 3 acúmulos, qualquer um dos ataques consome o Ímpeto de Caça. (Perícia de Campo)"
+        "description": "Passivo: com Ímpeto de Caça, Quebra-Trilha prepara seu próximo Golpe Estripador ou Gancho Sangrento por 12 s. Golpe Estripador causa 15% mais dano por acúmulo. Gancho Sangrento causa de 18 a 24 de dano físico adicional, aumentado em 15% por acúmulo e por Poder de Ataque à Distância. Com 3 acúmulos, qualquer um dos ataques consome Ímpeto de Caça. (Sobrevivência)"
       },
       "wing_clip": {
         "name": "Talho Aprisionador",
@@ -14122,7 +14125,7 @@ export const pt_BR: EnTranslations = {
       },
       "cat_form": {
         "name": "Forma de Gato",
-        "description": "Transforma-vos em lobo: a agilidade sobe com vosso nível, poder de ataque +8 mais 2 por nível, vossos ataques usam energia e pontos de combo, e gerais 29% menos ameaça. Mudar para qualquer forma concede Passo ligeiro: 60% de velocidade de movimento por 3 s, uma vez a cada 20 s. Conjurai novamente para voltar à forma de conjurador."
+        "description": "Transforme-se em gato: a agilidade sobe com o nível, o poder de ataque aumenta em 8 mais 2 por nível, seus ataques usam energia e pontos de combo, você se move 15% mais rápido e gera 29% menos ameaça. Toda mudança de forma concede Passo ligeiro, um breve aumento de velocidade. Use de novo para voltar à forma de conjurador."
       },
       "claw": {
         "name": "Garra Dilacerante",
@@ -14184,23 +14187,23 @@ export const pt_BR: EnTranslations = {
       },
       "hibernate": {
         "name": "Sono Profundo",
-        "description": "Força o alvo a um sono profundo por até 8 s. Qualquer dano o desperta."
+        "description": "Faz o alvo dormir profundamente por até 8 s. Qualquer dano o desperta. Contra jogadores, cada repetição em 18 s dura metade da anterior, e a quarta falha."
       },
       "dash": {
         "name": "Corrida",
-        "description": "Dispara para a frente, aumentando a velocidade de movimento em 50% por 15 s. Apenas Forma de Gato."
+        "description": "Assuma a Forma de Gato se necessário, depois corra com 50% mais velocidade por 15 s. Utilizável em qualquer forma. Instantâneo e não ativa a recarga global."
       },
       "pounce": {
         "name": "Bote Furtivo",
-        "description": "Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo. Apenas Forma de Lobo. Fora da furtividade, este botão é Bote."
+        "description": "Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo. Apenas Forma de Gato. Fora da furtividade, este botão é Bote."
       },
       "lunge": {
         "name": "Bote",
-        "description": "Dá um bote em um inimigo a até 12 m, causando 60% do dano da arma e concedendo 1 ponto de combo. Apenas Forma de Lobo."
+        "description": "Dá um bote em um inimigo a até 12 m, causando 60% do dano da arma e concedendo 1 ponto de combo. Apenas Forma de Gato."
       },
       "hamstring_bite": {
         "name": "Derrubada",
-        "description": "Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s). Apenas Forma de Lobo."
+        "description": "Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s). Apenas Forma de Gato."
       },
       "insect_swarm": {
         "name": "Enxame Ferroante",
@@ -14212,7 +14215,7 @@ export const pt_BR: EnTranslations = {
       },
       "rip": {
         "name": "Fenda Sangrenta",
-        "description": "Movimento finalizador que faz o alvo sangrar a cada 2 s por 24 s: 36 de dano mais 24 por ponto de combo gasto (5 pontos de combo: {damage} no total). Apenas Forma de Gato.",
+        "description": "Golpe final que faz o alvo sangrar a cada 2 s por 24 s: 72 de dano mais 48 por ponto de combo gasto (5 pontos: {damage} no total). Apenas na Forma de Gato.",
         "specNote_feral": "O acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "mortal_strike": {
@@ -14808,7 +14811,7 @@ export const pt_BR: EnTranslations = {
       },
       "multi_shot": {
         "name": "Disparo Dividido",
-        "description": "Dispara uma saraivada na área-alvo, causando {damage} de dano Físico aos inimigos num raio de 8 m. (talento de Caçador)"
+        "description": "Dispara uma saraivada na área-alvo, causando {damage} de dano Físico aos inimigos a até 8 jardas. (talento de Caçador)"
       },
       "prayer_of_healing": {
         "name": "Cura do Coro",
@@ -14897,7 +14900,7 @@ export const pt_BR: EnTranslations = {
       },
       "typhoon": {
         "name": "Tufão",
-        "description": "Uma rajada de vento repele todos os inimigos num raio de 8 m e os atordoa, reduzindo a velocidade de movimento em 50% por 4 s."
+        "description": "Uma rajada de vento arremessa todos os inimigos em até 8 m para 15 m de distância e os atordoa levemente, reduzindo sua velocidade em 50% por 4 s. Jogadores inimigos são lançados pelo ar em linha reta: ao passar de uma borda, continuam avançando e recebem dano de queda; uma queda fatal conta como sua eliminação."
       },
       "voidfeast": {
         "name": "Banquete do Vazio",
@@ -14933,7 +14936,7 @@ export const pt_BR: EnTranslations = {
       },
       "bear_charge": {
         "name": "Investida de Bruin",
-        "description": "Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Durante os 3 s seguintes, a Forma de Lobo é gratuita e fixa o alvo, reduzindo sua velocidade em 50% por 4 s. Alcance de 8 a 25 m. Apenas Forma de Bruin."
+        "description": "Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Durante os 3 s seguintes, a Forma de Gato é gratuita e fixa o alvo, reduzindo sua velocidade em 50% por 4 s. Alcance de 8 a 25 m. Apenas Forma de Bruin."
       },
       "demoralizing_roar": {
         "name": "Rugido Covarde",
@@ -14941,7 +14944,7 @@ export const pt_BR: EnTranslations = {
       },
       "prowl": {
         "name": "Espreitar",
-        "description": "Entra em furtividade enquanto na Forma de Lobo. Não pode ser usado em combate."
+        "description": "Entra em furtividade enquanto na Forma de Gato. Não pode ser usado em combate."
       },
       "rake": {
         "name": "Esfolar",
