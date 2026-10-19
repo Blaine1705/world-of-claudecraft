@@ -29,10 +29,20 @@ const raidMobs = new Set(
 // The generator's eligibility (scripts/quest_leveling_gear_gen.ts): tutorial
 // island, retired and repeatable quests, raid quests and quests above the level
 // cap are left out.
+// The Balgath world-boss encounter steps (the Mirefen muster, PR 4259): the
+// summons, the pike drill and the Foreman's put-out eye pay out in the
+// encounter's own spoils, not leveling gear (owner call, 2026-10-20).
+const WORLD_BOSS_ENCOUNTER_QUESTS = new Set([
+  'q_muster_summons',
+  'q_muster_pike_drill',
+  'q_socketwrights_due',
+]);
+
 function levelingQuest(q: QuestDef): boolean {
   if (q.retired || q.repeatable) return false;
   // The tutorial island keeps its own rewards (owner call, 2026-10-07).
   if (PROVING_SHORE_QUESTS[q.id]) return false;
+  if (WORLD_BOSS_ENCOUNTER_QUESTS.has(q.id)) return false;
   const raid = q.objectives.some(
     (o) =>
       (o.type === 'kill' && raidMobs.has(o.targetMobId)) ||
@@ -115,6 +125,13 @@ describe('choose-one leveling gear', () => {
     expect(gaps).toEqual([]);
   });
 
+  // The five-dungeon rework (PR 4352) prices these bosses' own blues off the
+  // boss drop, one to two item levels above the quest's kill level that its
+  // generated rares are priced from (Olen 16 vs 15, Sexton 12 vs 11, Selthe's
+  // choir 21 vs 19), so the rares sit just under the authored blue by design
+  // (owner call, 2026-10-20).
+  const BOSS_DROP_ABOVE_QUEST = new Set(['q_olen', 'q_sexton', 'q_silence_the_choir']);
+
   it('preselects a blue with the main stat for every spec on a quest that rewards one', () => {
     // Fairness on dungeon-boss and elite quests: a holy paladin or a feral druid
     // handed their archetype's off-role blue still gets a rare at the quest's
@@ -130,6 +147,7 @@ describe('choose-one leveling gear', () => {
       const floor = Math.min(...authoredBlues(quest).map((i) => itemLevel(i) ?? 0));
       for (const id of QUEST_CHOICE_REWARDS[questId]) {
         expect(ITEMS[id].quality, id).toBe('rare');
+        if (BOSS_DROP_ABOVE_QUEST.has(questId)) continue;
         expect(itemLevel(ITEMS[id]) ?? 0, id).toBeGreaterThanOrEqual(floor);
       }
       for (const [cls, specs] of Object.entries(QUEST_REWARD_SPEC_WEIGHTS) as [
