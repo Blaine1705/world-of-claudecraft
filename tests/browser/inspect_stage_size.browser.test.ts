@@ -60,36 +60,43 @@ function syncBuffer(stage: HTMLElement, canvas: HTMLCanvasElement, dpr: number):
 
 describe('inspect model stage sizing', () => {
   it.each([
-    { uiScale: 1, dpr: 1 },
-    { uiScale: 1.25, dpr: 1 },
-    { uiScale: 1.1, dpr: 2 },
-    { uiScale: 0.8, dpr: 1.25 },
-  ])('keeps the stage size fixed at ui scale $uiScale, dpr $dpr', async ({ uiScale, dpr }) => {
-    await page.viewport(1022, 1100);
-    let stage: HTMLElement | null = null;
-    const canvas = document.createElement('canvas');
-    mountInspect((el) => {
-      stage = el;
-      el.appendChild(canvas);
-    }, uiScale);
-    const container = stage as HTMLElement | null;
-    if (!container) throw new Error('inspect stage was not mounted');
-    const initial = { w: container.clientWidth, h: container.clientHeight };
-    expect(initial.h).toBeGreaterThan(0);
+    { uiScale: 1, dpr: 1, mobile: false, width: 1022, height: 1100 },
+    { uiScale: 1.25, dpr: 1, mobile: false, width: 1022, height: 1100 },
+    { uiScale: 1.1, dpr: 2, mobile: false, width: 1022, height: 1100 },
+    { uiScale: 0.8, dpr: 1.25, mobile: false, width: 1022, height: 1100 },
+    // Touch: the floored landscape stage and the fixed-height narrow stage.
+    { uiScale: 1.25, dpr: 2, mobile: true, width: 844, height: 390 },
+    { uiScale: 1.25, dpr: 2, mobile: true, width: 390, height: 844 },
+  ])(
+    'keeps the stage size fixed at ui scale $uiScale, dpr $dpr, $width x $height',
+    async ({ uiScale, dpr, mobile, width, height }) => {
+      await page.viewport(width, height);
+      if (mobile) document.body.className = 'mobile-touch game-active';
+      let stage: HTMLElement | null = null;
+      const canvas = document.createElement('canvas');
+      mountInspect((el) => {
+        stage = el;
+        el.appendChild(canvas);
+      }, uiScale);
+      const container = stage as HTMLElement | null;
+      if (!container) throw new Error('inspect stage was not mounted');
+      const initial = { w: container.clientWidth, h: container.clientHeight };
+      expect(initial.h).toBeGreaterThan(0);
 
-    // Many sync rounds, as the ResizeObserver would drive them.
-    for (let i = 0; i < 40; i++) syncBuffer(container, canvas, dpr);
-    expect({ w: container.clientWidth, h: container.clientHeight }).toEqual(initial);
+      // Many sync rounds, as the ResizeObserver would drive them.
+      for (let i = 0; i < 40; i++) syncBuffer(container, canvas, dpr);
+      expect({ w: container.clientWidth, h: container.clientHeight }).toEqual(initial);
 
-    // A buffer far larger than the stage still never moves it.
-    canvas.width = 4000;
-    canvas.height = 4000;
-    expect({ w: container.clientWidth, h: container.clientHeight }).toEqual(initial);
+      // A buffer far larger than the stage still never moves it.
+      canvas.width = 4000;
+      canvas.height = 4000;
+      expect({ w: container.clientWidth, h: container.clientHeight }).toEqual(initial);
 
-    // The canvas paints the stage box exactly, whatever its buffer size.
-    const stageRect = container.getBoundingClientRect();
-    const canvasRect = canvas.getBoundingClientRect();
-    expect(canvasRect.width).toBeCloseTo(stageRect.width, 0);
-    expect(canvasRect.height).toBeCloseTo(stageRect.height, 0);
-  });
+      // The canvas paints the stage box exactly, whatever its buffer size.
+      const stageRect = container.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      expect(canvasRect.width).toBeCloseTo(stageRect.width, 0);
+      expect(canvasRect.height).toBeCloseTo(stageRect.height, 0);
+    },
+  );
 });
