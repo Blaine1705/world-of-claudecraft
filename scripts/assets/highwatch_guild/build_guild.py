@@ -44,8 +44,8 @@ sys.path.insert(0, os.path.join(HERE, '..', 'highwatch_manor'))
 sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
-import manor_lib  # noqa: E402
-from manor_lib import EMISSIVE, SLATE, encode_for_export, make_materials  # noqa: E402
+from guild_materials import PlainPainter, make_materials  # noqa: E402
+from manor_lib import EMISSIVE, SLATE, encode_for_export  # noqa: E402
 from manor_weather import bake_weather  # noqa: E402
 from shiplib import Piece, empty, triangles  # noqa: E402
 
@@ -53,9 +53,6 @@ import guild_furnish as U  # noqa: E402
 import guild_plan as PL  # noqa: E402
 import guild_shell as S  # noqa: E402
 import guild_yard as Y  # noqa: E402
-
-# the guild's materials: the manor's specs (same slots, same tones) under the guild's names
-manor_lib.MATERIAL_SPECS = tuple((name.replace('Manor', 'Guild'), *rest) for (name, *rest) in manor_lib.MATERIAL_SPECS)
 
 TROPHY_PARTS = tuple(f'G_INT_Trophy_{d}' for d in PL.TROPHY_SLOTS)
 GILT_PARTS = tuple(f'G_INT_TrophyGilt_{d}' for d in PL.TROPHY_SLOTS)
@@ -143,7 +140,7 @@ def build_scene():
     U.build(parts)
     Y.build(parts)
     bake_warm_light(parts)
-    bake_weather(parts, _inside, roof_name='GuildRoof')
+    bake_weather(parts, _inside, PlainPainter(), roof_name='GuildRoof')
     encode_for_export(parts)
     pieces = {}
     for name in PARTS:

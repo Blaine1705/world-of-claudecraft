@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  type CameraInterior,
   cameraInterior,
   chooseInteriorFraming,
   frameBoomInto,
@@ -16,12 +17,15 @@ import {
   interiorCameraPadding,
   interiorContains,
   interiorEntryCap,
+  interiorEntryHold,
   interiorEntrySettle,
   interiorEntryWeight,
   interiorExit,
   interiorHoldsEye,
+  interiorOpeningDepth,
   interiorSeesOut,
   interiorSegmentFraction,
+  interiorSegmentTouches,
   stepInteriorBoom,
   stepInteriorFraming,
   stepInteriorLift,
@@ -33,7 +37,8 @@ import {
 // nameplate sight line out through an opening only, the pad, the boom's glide both ways, the
 // threshold blend and the framings (a lift, a flattening under a ceiling, a swing), the walk on
 // out through an opening, the least flattening under a lintel and the entry cap that keeps the
-// lens threading a front door on the way in.
+// lens threading a front door on the way in; and all of it again for air in a building's own
+// frame (a building stood at any turn).
 
 // Two rooms joined by a doorway, and a front door out of room A onto the world:
 //   room A x 0..10, room B x 12..22 (both z 0..10, y 0..4), the doorway between them
@@ -481,5 +486,355 @@ describe('through the front door', () => {
     // is wide and soft, so its rise changes by about as much, never a drop of yards (the
     // driver walks the cap's weight in and out on top of that)
     expect(most).toBeLessThan(0.6);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// A building at any turn: the air in its own frame
+// ---------------------------------------------------------------------------
+
+/** Where the turned twins stand, and the turns pinned: the Eastbrook smithy's 20 degrees and
+ *  the bank's 225 (neither a quarter turn, so no box square to the world holds either). */
+const ORIGIN = { x: 31.5, z: -48.25 };
+const FREE_TURNS = [(20 * Math.PI) / 180, (225 * Math.PI) / 180];
+
+/** The same air as `of` (its boxes, doors and rounds as they are), stood at ORIGIN in its own
+ *  frame and turned `yaw` about the vertical. */
+function turnedTwin(of: CameraInterior, yaw: number): CameraInterior {
+  const rounds = new Map<number, readonly [number, number, number]>();
+  of.rounds.forEach((round, index) => {
+    if (round) rounds.set(index, round);
+  });
+  return cameraInterior(of.id, of.boxes, of.openings, rounds, of.framing, {
+    x: ORIGIN.x,
+    z: ORIGIN.z,
+    yaw,
+  });
+}
+
+/** Where the twin turned `yaw` stands the point (x, z) of the unturned air. */
+function turnedPoint(yaw: number, x: number, z: number): [number, number] {
+  const c = Math.cos(yaw);
+  const s = Math.sin(yaw);
+  return [ORIGIN.x + x * c + z * s, ORIGIN.z - x * s + z * c];
+}
+
+/** The direction (dx, dz) of the unturned air, turned `yaw`. */
+function turnedDirection(yaw: number, dx: number, dz: number): [number, number] {
+  const c = Math.cos(yaw);
+  const s = Math.sin(yaw);
+  return [dx * c + dz * s, -dx * s + dz * c];
+}
+
+/** A lattice over the air and a margin round it, at two heights, every point off every face
+ *  and every padded face (so the answers are never a tie the turn could tip). */
+function lattice(of: CameraInterior): [number, number, number][] {
+  const u = of.bounds;
+  const out: [number, number, number][] = [];
+  for (let x = u[0] - 2.13; x <= u[1] + 2; x += 1.7) {
+    for (let z = u[4] - 2.71; z <= u[5] + 2; z += 1.3) {
+      for (const y of [u[2] + 1.37, u[2] + 3.41]) out.push([x, y, z]);
+    }
+  }
+  return out;
+}
+
+/** Sight lines out of the rooms in every direction: through the walls, the ceiling, the floor,
+ *  out of the front door, on through the doorway between the rooms. */
+const FAR: readonly (readonly [number, number, number])[] = [
+  [-15, 2.2, 5.3],
+  [37, 2.2, 4.9],
+  [5.1, 2.2, -14],
+  [5.3, 2.2, 23],
+  [5.2, 1.6, -11.5],
+  [30, 9.5, -9],
+  [-9, 0.5, 18.3],
+  [11, 1.9, 5.05],
+  [19.3, 1.4, 4.7],
+];
+
+describe('the air in its own frame (a building at any turn)', () => {
+  it('carries no frame for air in the world axes, and its turn for air in its own', () => {
+    // an interior built as every one was before turned buildings: the very same object
+    expect(vol).not.toHaveProperty('frame');
+    expect(Object.keys(vol)).toEqual([
+      'id',
+      'framing',
+      'boxes',
+      'rounds',
+      'openings',
+      'thresholds',
+      'bounds',
+    ]);
+    for (const yaw of FREE_TURNS) {
+      const twin = turnedTwin(vol, yaw);
+      expect(twin.frame).toEqual({
+        x: ORIGIN.x,
+        z: ORIGIN.z,
+        yaw,
+        cos: Math.cos(yaw),
+        sin: Math.sin(yaw),
+      });
+      // its air, doors, thresholds and bounds are read in that frame, so they are the
+      // unturned air's own
+      expect(twin.boxes).toEqual(vol.boxes);
+      expect(twin.openings).toEqual(vol.openings);
+      expect(twin.thresholds).toEqual(vol.thresholds);
+      expect(twin.bounds).toEqual(vol.bounds);
+    }
+  });
+
+  it('holds the eye in the turned rooms, never in the corners a world box round them adds', () => {
+    for (const yaw of FREE_TURNS) {
+      const twin = turnedTwin(vol, yaw);
+      const at = (x: number, y: number, z: number) => {
+        const [wx, wz] = turnedPoint(yaw, x, z);
+        return [wx, y, wz] as const;
+      };
+      // in room A, and in room B through the doorway between them
+      expect(interiorContains(twin, ...at(5, 2, 5))).toBe(true);
+      expect(interiorHoldsEye(twin, ...at(5, 2, 5))).toBe(true);
+      expect(interiorHoldsEye(twin, ...at(18, 2, 5))).toBe(true);
+      expect(interiorContains(twin, ...at(11, 2, 5))).toBe(true);
+      // outside room A's -x wall: at 225 degrees inside the world box round the turned room
+      // (its corner stands out past that wall), and never in the air at any turn
+      const [ox, oz] = turnedPoint(yaw, -3, 5);
+      const corners = [
+        turnedPoint(yaw, 0, 0),
+        turnedPoint(yaw, 10, 0),
+        turnedPoint(yaw, 0, 10),
+        turnedPoint(yaw, 10, 10),
+      ];
+      const xs = corners.map((c) => c[0]);
+      const zs = corners.map((c) => c[1]);
+      const inWorldBox =
+        ox > Math.min(...xs) &&
+        ox < Math.max(...xs) &&
+        oz > Math.min(...zs) &&
+        oz < Math.max(...zs);
+      if (yaw > Math.PI) expect(inWorldBox).toBe(true);
+      expect(interiorContains(twin, ox, 2, oz)).toBe(false);
+      expect(interiorHoldsEye(twin, ox, 2, oz)).toBe(false);
+      // a hand inside and a hand outside the turned +x wall, along its own normal
+      expect(interiorContains(twin, ...at(9.8, 2, 2))).toBe(true);
+      expect(interiorContains(twin, ...at(10.2, 2, 2))).toBe(false);
+      expect(interiorContains(twin, ...at(9.8, 2, 2), 0.3)).toBe(false);
+      // the front door: its thickness is the threshold, a step past it is indoors
+      expect(interiorContains(twin, ...at(5, 2, -0.5))).toBe(true);
+      expect(interiorHoldsEye(twin, ...at(5, 2, -0.5))).toBe(false);
+      expect(interiorHoldsEye(twin, ...at(5, 2, 0.5))).toBe(true);
+      expect(interiorEntryWeight(twin, ...at(5, 2, -1))).toBe(0);
+      expect(interiorEntryWeight(twin, ...at(5, 2, 0))).toBe(0);
+      expect(interiorEntryWeight(twin, ...at(5, 2, INTERIOR_ENTRY_BLEND + 0.01))).toBe(1);
+      expect(interiorOpeningDepth(twin, ...at(5, 2, 2.5))).toBeCloseTo(2.5, 9);
+      // room A's far corner read off the frame's origin with its turn forgotten: outside the
+      // turned air at either turn (a frame that moved the air without turning it holds it)
+      expect(interiorContains(twin, ORIGIN.x + 9.5, 2, ORIGIN.z + 9.5)).toBe(false);
+    }
+  });
+
+  it('reads every point as the unturned air reads the point it came from', () => {
+    const points = lattice(vol);
+    for (const yaw of FREE_TURNS) {
+      const twin = turnedTwin(vol, yaw);
+      let held = 0;
+      let out = 0;
+      for (const [x, y, z] of points) {
+        const [wx, wz] = turnedPoint(yaw, x, z);
+        const at = `${yaw}: ${x}, ${y}, ${z}`;
+        const inside = interiorContains(vol, x, y, z);
+        expect(interiorContains(twin, wx, y, wz), at).toBe(inside);
+        expect(interiorContains(twin, wx, y, wz, 0.3), at).toBe(
+          interiorContains(vol, x, y, z, 0.3),
+        );
+        expect(interiorHoldsEye(twin, wx, y, wz), at).toBe(interiorHoldsEye(vol, x, y, z));
+        expect(interiorEntryWeight(twin, wx, y, wz), at).toBeCloseTo(
+          interiorEntryWeight(vol, x, y, z),
+          9,
+        );
+        expect(interiorOpeningDepth(twin, wx, y, wz), at).toBeCloseTo(
+          interiorOpeningDepth(vol, x, y, z),
+          9,
+        );
+        if (inside) held++;
+        else out++;
+      }
+      // the lattice stands both in the air and out of it
+      expect(held).toBeGreaterThan(80);
+      expect(out).toBeGreaterThan(80);
+    }
+  });
+
+  it('walks every sight line in its own frame: the same fraction, the same exit', () => {
+    const points = lattice(vol).filter(([x, y, z]) => interiorContains(vol, x, y, z));
+    for (const yaw of FREE_TURNS) {
+      const twin = turnedTwin(vol, yaw);
+      let stopped = 0;
+      let open = 0;
+      for (const [x, y, z] of points) {
+        const [wx, wz] = turnedPoint(yaw, x, z);
+        for (const [fx, fy, fz] of FAR) {
+          const [wfx, wfz] = turnedPoint(yaw, fx, fz);
+          const at = `${yaw}: ${x}, ${y}, ${z} to ${fx}, ${fy}, ${fz}`;
+          for (const [pad, through] of [
+            [0, 0],
+            [0.3, 0],
+            [0.3, 1],
+            [0.3, 0.5],
+          ]) {
+            const flat = interiorSegmentFraction(vol, x, y, z, fx, fy, fz, pad, through);
+            const exit = { ...interiorExit };
+            const turned = interiorSegmentFraction(twin, wx, y, wz, wfx, fy, wfz, pad, through);
+            expect(turned, `${at} pad ${pad} through ${through}`).toBeCloseTo(flat, 9);
+            expect({ ...interiorExit }, `${at} pad ${pad} through ${through}`).toEqual(exit);
+            if (flat < 1) stopped++;
+            if (exit.open) open++;
+          }
+          expect(interiorSeesOut(twin, wx, y, wz, wfx, fy, wfz), at).toBe(
+            interiorSeesOut(vol, x, y, z, fx, fy, fz),
+          );
+          expect(interiorSegmentTouches(twin, wfx, fy, wfz, wx, y, wz), at).toBe(
+            interiorSegmentTouches(vol, fx, fy, fz, x, y, z),
+          );
+        }
+      }
+      // walls stop the walk, and the front door lets it out
+      expect(stopped).toBeGreaterThan(100);
+      expect(open).toBeGreaterThan(5);
+    }
+  });
+
+  it('keeps a turned round tower round', () => {
+    const tower = cameraInterior(
+      'tower',
+      [[-5, 5, 0, 10, -5, 3]],
+      [],
+      new Map([[0, [0, 0, 5] as const]]),
+    );
+    for (const yaw of FREE_TURNS) {
+      const twin = turnedTwin(tower, yaw);
+      const [cx, cz] = turnedPoint(yaw, 0, 0);
+      // a ray out from the shaft's axis stops where the unturned one does, whichever way it
+      // runs: at the ring less the pad, or at the flat wall
+      for (let deg = 0; deg < 360; deg += 15) {
+        const bearing = (deg * Math.PI) / 180;
+        const lx = Math.sin(bearing) * 20;
+        const lz = Math.cos(bearing) * 20;
+        const [dx, dz] = turnedDirection(yaw, lx, lz);
+        const flat = interiorSegmentFraction(tower, 0, 5, 0, lx, 5, lz, 0.5);
+        const turned = interiorSegmentFraction(twin, cx, 5, cz, cx + dx, 5, cz + dz, 0.5);
+        expect(turned, `${yaw} at ${deg}`).toBeCloseTo(flat, 9);
+        if (lz < 0) expect(20 * turned, `${yaw} at ${deg}`).toBeCloseTo(4.5, 6);
+      }
+      expect(interiorContains(twin, cx, 5, cz)).toBe(true);
+      // the box's corner the ring cuts away stays outside the air
+      const [kx, kz] = turnedPoint(yaw, 4.5, -4.5);
+      expect(interiorContains(twin, kx, 5, kz)).toBe(false);
+      const [rx, rz] = turnedPoint(yaw, 4.8, 0);
+      expect(interiorContains(twin, rx, 5, rz, 0.3)).toBe(false);
+    }
+  });
+
+  it('caps the lens at a turned door head exactly as at the unturned one, on either axis', () => {
+    // a front door through the -z wall (its own axis z) and a side door through the +x wall
+    // (its own axis x, the Eastbrook smithy's arch onto its forge shelter), each walked in
+    // along its axis from outside
+    const doors: readonly (readonly [CameraInterior, (depth: number) => [number, number]])[] = [
+      [
+        cameraInterior(
+          'front',
+          [
+            [0, 20, 0, 12, 0, 40],
+            [8, 12, 0, 4, -1, 1.5],
+          ],
+          [{ box: 1, axis: 2, side: -1 }],
+        ),
+        (depth) => [10.3, depth],
+      ],
+      [
+        cameraInterior(
+          'side',
+          [
+            [0, 20, 0, 12, 0, 40],
+            [18.5, 21, 0, 4, 18, 22],
+          ],
+          [{ box: 1, axis: 0, side: 1 }],
+        ),
+        (depth) => [20 - depth, 20.3],
+      ],
+    ];
+    const dist = 18;
+    const pitch = 0.75;
+    for (const [hall, eye] of doors) {
+      for (const yaw of FREE_TURNS) {
+        const twin = turnedTwin(hall, yaw);
+        let capped = 0;
+        // walking in along the door's axis, the camera at every bearing round the player
+        for (let depth = -3; depth < 18; depth += 0.37) {
+          const [x, z] = eye(depth);
+          for (let deg = 0; deg < 360; deg += 30) {
+            const bearing = (deg * Math.PI) / 180;
+            const dx = Math.sin(bearing) * Math.cos(pitch) * dist;
+            const dz = -Math.cos(bearing) * Math.cos(pitch) * dist;
+            const dy = Math.sin(pitch) * dist;
+            const flat = interiorEntryCap(hall, x, 2, z, dx, dy, dz, 0.3);
+            const hold = { ...interiorEntryHold };
+            const [wx, wz] = turnedPoint(yaw, x, z);
+            const [wdx, wdz] = turnedDirection(yaw, dx, dz);
+            const turned = interiorEntryCap(twin, wx, 2, wz, wdx, dy, wdz, 0.3);
+            const at = `${hall.id} turned ${yaw}: depth ${depth}, bearing ${deg}`;
+            expect(turned, at).toBeCloseTo(flat, 9);
+            expect(interiorEntryHold.value, at).toBeCloseTo(hold.value, 9);
+            expect(interiorEntryHold.weight, at).toBeCloseTo(hold.weight, 9);
+            expect(interiorEntryHold.rise, at).toBeCloseTo(hold.rise, 9);
+            if (flat < dy - 0.5) capped++;
+          }
+        }
+        // walking in with the camera behind, the turned door caps the lens too
+        expect(capped, `${hall.id} turned ${yaw}`).toBeGreaterThan(20);
+      }
+    }
+  });
+
+  it('frames a cramped boom and threads a lintel in a turned room as in the unturned one', () => {
+    const low = cameraInterior('low', [[0, 12, 0, 3.2, 0, 12]]);
+    const gallery = cameraInterior('gallery', [[0, 40, 0, 3.4, 0, 40]]);
+    const shaft = cameraInterior('shaft', [[0, 3, 0, 30, 0, 3]]);
+    const pitch = 0.32;
+    type Case = readonly [CameraInterior, readonly number[], readonly number[], number, number];
+    const cases: readonly Case[] = [
+      // backed against a low room's wall: a swing along it, on either side
+      [low, [6, 2, 1], [0, 1, -6], 0, 0],
+      [low, [6, 2, 1], [0, 1, -6], -1, 0],
+      // backed into its corner: the longest boom there is
+      [low, [1, 2, 1], [-6, 1, -6], 0, 0],
+      // under a gallery's low ceiling: a flattening that keeps the whole distance
+      [gallery, [20, 2, 20], [11.4, 3.8, 0], 0, 0],
+      [gallery, [20, 2, 20], [11.4, 1.15, 0], 0, 0],
+      // up a tall shaft: the lift alone
+      [shaft, [1.5, 2, 1.5], [8, 1, 0], 0, 0],
+      // walking in under the front door's lintel, the ray let out through the door
+      ...[0.5, 1.7, 3.1, 5.3, 8.9].map(
+        (z): Case => [vol, [5, 2, z], [0, Math.sin(pitch) * 12, -Math.cos(pitch) * 12], 0, 1],
+      ),
+    ];
+    let framed = 0;
+    for (const yaw of FREE_TURNS) {
+      for (const [of, [sx, sy, sz], [dx, dy, dz], side, through] of cases) {
+        const twin = turnedTwin(of, yaw);
+        const flat = { ...chooseInteriorFraming(of, sx, sy, sz, dx, dy, dz, 0.3, side, through) };
+        const [wx, wz] = turnedPoint(yaw, sx, sz);
+        const [wdx, wdz] = turnedDirection(yaw, dx, dz);
+        const turned = chooseInteriorFraming(twin, wx, sy, wz, wdx, dy, wdz, 0.3, side, through);
+        const at = `${yaw}: ${of.id} from ${sx}, ${sy}, ${sz}`;
+        expect(turned.lift, at).toBeCloseTo(flat.lift, 9);
+        expect(turned.swing, at).toBeCloseTo(flat.swing, 9);
+        expect(turned.boom, at).toBeCloseTo(flat.boom, 9);
+        expect(turned.flatten, at).toBe(flat.flatten);
+        if (flat.lift !== 0 || flat.swing !== 0) framed++;
+      }
+    }
+    // the cases do frame: a swing, a lift, a flattening, not just the requested boom
+    expect(framed).toBeGreaterThan(10);
   });
 });

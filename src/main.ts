@@ -128,6 +128,7 @@ import {
   stampGraphicsRebuildProbe,
   updateGraphicsRebuildProbePhase,
 } from './game/graphics_rebuild_crash_guard';
+import { createHoverCursorUpdate } from './game/hover_cursor';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { createGatherEffectConfirm, interactKeyGatherOptions } from './game/interact_key_gather';
@@ -135,9 +136,7 @@ import { stopAutorunForInteraction } from './game/interaction_autorun';
 import { createBgFlagKey } from './game/interaction_input';
 import {
   activePvpOpponentIds,
-  HoverPickGate,
   handlePickedEntity,
-  hoverCursorKind,
   isAttackableEntity,
   shouldApproachPickedEntity,
   shouldDeferPickedCorpseToGatherNode,
@@ -203,11 +202,12 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { runPetCommand } from './game/pet_commands';
-import { clickPlacedMover, pickPlacedMoverAt } from './game/placed_mover_input';
+import { clickPlacedMover } from './game/placed_mover_input';
 import { mountPlaytestDevPanel } from './game/playtest_dev_panel';
 import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { startRealmBuilderRollLoad } from './game/realm_builder_boot';
+import { wireSeatInteraction } from './game/seat_interact_wiring';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -1529,6 +1529,16 @@ async function startGame(
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
     renderer.showPetNames = settings.get('showPetNames');
     setNameplateDotScale(settings.nameplateDotRenderScale());
+    if (GFX.standardMaterials) {
+      try {
+        if (!localStorage.getItem('woc_water_ripples_v2')) {
+          localStorage.setItem('woc_water_ripples_v2', '1');
+          settings.set('waterRipples', true);
+        }
+      } catch {
+        /* storage unavailable */
+      }
+    }
     renderer.setWaterRipples(settings.get('waterRipples'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
@@ -3406,6 +3416,16 @@ async function startGame(
     setReticle: (reticle) => renderer.setGroundAimReticle(reticle),
   });
 
+  const seatInteraction = wireSeatInteraction({
+    world,
+    camera: renderer.camera,
+    canvas,
+    input,
+    showError: (text) => hud.showError(text),
+    resolveTarget: resolvedClickMoveTarget,
+    pathTo: clickMovePathTo,
+  });
+
   function handlePick(x: number, y: number, button: number): void {
     if (hud.isGroundAimActive()) {
       if (button === 2) {
@@ -3425,6 +3445,7 @@ async function startGame(
     // ground-click/click-to-move fallback. A click that lands on a node
     // harvests it; it does not also walk you there or deselect your target.
     let id = renderer.picking.pickDirect(x, y);
+    if (id === null && seatInteraction.click(x, y)) return; // sit on a seat (seat_interact.ts)
     const directEntity = id !== null ? world.entities.get(id) : undefined;
     const deferDirectCorpseToNode = shouldDeferPickedCorpseToGatherNode(
       directEntity,
@@ -3937,6 +3958,7 @@ async function startGame(
     const flight = glider.resolveGliderMove(world, input);
     if (flight) return flight;
     attackMoveTick();
+    seatInteraction.tick();
     const mi = input.readMoveInput();
     let facing: number | null = mouselook ? input.camYaw : null;
     // A teleport (door, portal, spirit release) invalidates any pending
@@ -3953,7 +3975,8 @@ async function startGame(
         mouselook,
         movementSuspended: input.suspendMovement,
         playerDead: movementFrozen(),
-        enabled: settings.get('clickToMove') > 0 || settings.get('attackMove'),
+        enabled:
+          settings.get('clickToMove') > 0 || settings.get('attackMove') || input.clickMoveForced,
       });
       if (action === 'cancel') {
         input.clearClickMove();
@@ -4048,61 +4071,13 @@ async function startGame(
     return { mi, facing };
   }
 
-  function partyMemberIds(ids: Set<number>): Set<number> {
-    ids.clear();
-    for (const m of world.partyInfo?.members ?? []) {
-      if (m.pid !== world.playerId) ids.add(m.pid);
-    }
-    return ids;
-  }
-
-  // The scene raycast is the expensive half of the hover cursor; the gate re-picks
-  // on pointer movement (instantly) or every HOVER_REPICK_MS while stationary. The
-  // cursor KIND below still re-resolves every frame from live entity state, so a
-  // hovered mob dying or turning hostile updates without waiting for a re-pick.
-  const hoverPickGate = new HoverPickGate();
-  let hoverPickedId: number | null = null;
-  let hoverOnMover = false;
-  const hoverPartyMemberIds = new Set<number>();
-  const hoverPvpOpponentIds = new Set<number>();
-
-  function updateHoverCursor(): void {
-    if (!input.hoverActive || input.isDragging() || hud.isModalOpen()) {
-      input.setHoverCursor('default');
-      hud.clearHoverTooltip();
-      return;
-    }
-    if (hoverPickGate.shouldPick(input.hoverX, input.hoverY, performance.now())) {
-      hoverPickedId = renderer.picking.pick(input.hoverX, input.hoverY);
-      // a vault door under the cursor wears the hand, like a friendly NPC
-      hoverOnMover =
-        hoverPickedId === null &&
-        pickPlacedMoverAt(renderer.picking, input.hoverX, input.hoverY) !== null;
-    }
-    const entity = hoverPickedId !== null ? world.entities.get(hoverPickedId) : undefined;
-    const pvpOpponents = activePvpOpponentIds(world, hoverPvpOpponentIds);
-    input.setHoverCursor(
-      hoverOnMover
-        ? 'friendly'
-        : hoverCursorKind(
-            entity,
-            world.playerId,
-            partyMemberIds(hoverPartyMemberIds),
-            pvpOpponents,
-          ),
-    );
-    // WoW-style mouseover tooltip (name / level / creature type) for a mob under
-    // the cursor, reusing the same (gated) pick this function already does for
-    // the hover-cursor kind above; the tooltip content still re-resolves every
-    // frame from live entity state, so counts and death update without a re-pick.
-    if (entity && entity.kind === 'mob' && !entity.dead) {
-      hud.showMobHoverTooltip(entity, pvpOpponents);
-    } else if (entity && entity.kind === 'player' && entity.id !== world.playerId && !entity.dead) {
-      hud.showPlayerHoverTooltip(entity);
-    } else {
-      hud.clearHoverTooltip();
-    }
-  }
+  const updateHoverCursor = createHoverCursorUpdate({
+    world,
+    input,
+    hud,
+    picking: renderer.picking,
+    seatHover: (x, y) => seatInteraction.hover(x, y),
+  });
 
   // WoW-style breath mirror bar. Display-only: the HUD steps its own copy of
   // the sim's breath clock (sim/breath.ts constants) from the DISPLAYED self
@@ -4167,6 +4142,7 @@ async function startGame(
 
   function renderFacingOverride(): number | null {
     if (glider.gliderControlsActive(world)) return glider.gliderCameraFacing(input);
+    if (world.player.sitting) return null; // a seated body keeps its seat's facing
     // A ghost (dead && ghost) is not movement-frozen and keeps camera-driven
     // facing; only a corpse-bound dead player loses it, so pass movementFrozen().
     return isCameraDrivenFacingActive(

@@ -19,7 +19,7 @@ import {
   HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID,
   hollowCryptEntranceColliders,
 } from './hollow_crypt_entrance';
-import { dungeonDoorPos } from './moved_objects';
+import { dungeonDoorPos, objectRemoved } from './moved_objects';
 import {
   DOOR_ARCH_HEIGHT,
   DOOR_ARCH_JAMB_HD,
@@ -48,6 +48,8 @@ export function dungeonDoorJambColliders(
   for (const dungeon of DUNGEON_LIST) {
     if (dungeon.overworldDoor === false) continue;
     if (dungeon.id === 'nythraxis_crypt') continue;
+    // A deleted door takes its jambs and set-piece walls with it.
+    if (objectRemoved(moves, 'dungeonDoor', dungeon.id)) continue;
     const doorPos = dungeonDoorPos(moves, dungeon);
     const key = `${doorPos.x},${doorPos.z}`;
     if (doorSpots.has(key)) continue;

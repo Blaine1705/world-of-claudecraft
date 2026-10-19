@@ -211,6 +211,7 @@ import type { GlowPulseSet } from './glow_pulse_core';
 import { NPC_PROP_SET_IDS, type NpcLook, type NpcPropSet, npcLookFor } from './npc_looks';
 import { SANCTUM_BOSS_LOOKS, SANCTUM_BOSS_MOB_KEYS } from './sanctum_boss_looks';
 import { SANCTUM_MOB_KEYS, sanctumCreatureLooks } from './sanctum_creature_looks';
+import type { SeatClipSet } from './seat_clips';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
@@ -368,6 +369,9 @@ export interface ClipMap {
   castSnapIn?: readonly string[];
   sitDown?: string;
   sitIdle?: string;
+  /** Sitting on furniture (render/seated_pose.ts): the chair clip set. Absent = the rig
+   *  sits on its floor clips, drawn at the seat. */
+  seat?: SeatClipSet;
   /** swim base. On the authored player lane this is the SUBMERGED stroke and
    *  carries the whole prone posture; on rigs without one it is a lie-down pose
    *  the renderer pitches procedurally (see visual.ts SWIM_PITCH_*). */
@@ -2324,6 +2328,39 @@ function swims(def: VisualDef): VisualDef {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Sitting on furniture (render/seated_pose.ts, the seats in src/sim/seat_anchor.ts)
+//
+// One clip-only GLB for every body on the shared Rig_Medium (the swim lane's pattern):
+// authored in Blender (scripts/anim/blender_sit_clips.py) and re-seated onto the shipped
+// rest pose by scripts/build_sit_anims.mjs. Every clip is in SEAT-ANCHOR space: the rig's
+// root is the point on the seat surface under the hips, facing away from any back, and the
+// renderer draws a seated body with its root there. The mech keeps its own rig and sits
+// on its floor clips, and so does every WOC body: a KayKit donor never layers onto that
+// rig (the WOC rig block above), and no chair clips are authored for it yet.
+// ---------------------------------------------------------------------------
+const SIT_ANIMS_URL = `${PLAYERS}/sit_anims.glb`;
+export const SEAT_CLIPS: SeatClipSet = {
+  chairDown: 'Sit_Chair_Down',
+  chairIdle: 'Sit_Chair_Idle',
+  chairUp: 'Sit_Chair_StandUp',
+  relaxedIdle: 'Sit_Chair_Relaxed_Idle',
+  talkIdle: 'Sit_Chair_Talk',
+  drinkIdle: 'Sit_Chair_Drink',
+  highDown: 'Sit_High_Down',
+  highIdle: 'Sit_High_Idle',
+  highUp: 'Sit_High_StandUp',
+};
+
+/** Layer the chair clips onto a Rig_Medium body. */
+function seats(def: VisualDef): VisualDef {
+  return {
+    ...def,
+    animUrls: [...(def.animUrls ?? []), SIT_ANIMS_URL],
+    clips: { ...def.clips, seat: SEAT_CLIPS },
+  };
+}
+
 export const SKINS_DIR = 'textures/skins';
 
 // ---------------------------------------------------------------------------
@@ -3309,6 +3346,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_RIGGED,
     walkRef: 5.6,
     runRef: 12.6,
+    authoredAtlas: true,
     lazyPreload: true,
   },
   // The Chimeglass Tortoise. Low and broad: 3.6 puts the crown of his shell
@@ -7750,6 +7788,16 @@ export const KAYKIT_BASELINES: Partial<Record<PlayerClass, VisualDef>> = {
   warlock: KAYKIT_WARLOCK,
   druid: KAYKIT_DRUID,
 };
+
+// Every class body on the shared Rig_Medium sits on the chair clips (before the modular
+// pass copies the defs). A WOC body never takes them: sit_anims.glb is a KayKit donor,
+// whose clips would bind onto the WOC skeleton by name against the wrong bind pose (the
+// WOC rig block above), so a class on a WOC body sits on its own floor clips, drawn at
+// the seat (seated_pose.ts).
+for (const cls of ALL_CLASSES) {
+  const classDef = VISUALS[`player_${cls}`];
+  if (!classDef.wocCharacter) VISUALS[`player_${cls}`] = seats(classDef);
+}
 
 // Driven by ALL_CLASSES rather than a local copy: a tenth class would otherwise
 // get no modular def at all and fall back to the warrior's clips through

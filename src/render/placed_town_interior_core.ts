@@ -2,15 +2,20 @@
 // layout, sim/placed_town_kit.ts), for the indoor chase camera (interior_camera.ts): the
 // rooms a camera may stand in and the doorways that open them onto the world, read off each
 // model's baked collision (data/asset_collision_overrides.json) at AUTHORED size, then
-// carried to the building's placement: its scale, its quarter turn and its ground.
+// carried to the building's placement: its scale, its turn and its ground.
 //
 // Each piece is a box in the model's own axes, in yards over its ground line (y 0), against
 // the inner wall faces (a quarter yard in from them, clear of the beams, sills and trims the
 // collision lines do not carry), the floor deck and the ceiling over it:
-//  - tavern_b (an inn): the taproom under the upper floor's slab, the front door, the stair
-//    well at its +x end, and the upper floor under the roof's tie beams;
+//  - tavern_b (Highwatch's inn): the taproom under the upper floor's slab, the front door,
+//    the stair well at its +x end, and the upper floor under the roof's tie beams;
+//  - tavern (the inn of Eastbrook and Fenbridge, tavern_b's smaller sister): the same rooms,
+//    the taproom cut round its hearth and its back-bar shelves;
+//  - bank: the banking hall under its beams, cut round its two pillars, and the front door
+//    (the strongroom behind the vault door is shut, so it has none);
 //  - hall (a chapel): the nave to the wall plates (the roof is open above them), the portal;
-//  - shop_a (a counting house): the counting room under its ceiling, the front door;
+//  - shop_a (a counting house) and shop_b (a potion shop): the shop room under its beams,
+//    in front of its back shelves, and the front door;
 //  - smithy: the forge room under its ceiling, the front door, and the side arch onto the
 //    forge shelter (an opening too: the shelter is open to the weather);
 //  - manor (the Highwatch manor, built in this repo): the great hall under its hood, the
@@ -19,10 +24,16 @@
 //  - guild (the Highwatch adventurers' guild, built in this repo): the great hall clear of
 //    the guildmaster's hearth and the quartermaster's shelves, the front door, the arch
 //    and the trophy hall behind it, short of its hearth.
-// A model with no entry here (a sealed one) has no air: the camera stays the open-world one.
+// A model with no entry here (a sealed one: the cottages, the watch house, the vault) has no
+// air: the camera stays the open-world one. Every town that stands these models (Highwatch,
+// Eastbrook, Fenbridge) registers the air through placed_town_interiors.ts.
 //
-// Interiors are world axis-aligned, so a building turned by anything but a quarter turn
-// gets none. Three-, DOM- and i18n-free; built once per town view, never per frame.
+// A building at a quarter turn gets its air in the world's axes, each piece turned into a
+// world box. One at any other angle (Eastbrook stands its buildings at the Studio map's own
+// turns) gets the model's pieces as they are, carried to its scale and ground, in the
+// building's own frame (its anchor and its turn, interior_camera_core.ts InteriorFrame), so
+// its rooms stay square to its walls and every door keeps the model's own axis and side.
+// Three-, DOM- and i18n-free; built once per town view, never per frame.
 
 import { localToWorld } from '../sim/placed_town_kit';
 import {
@@ -42,6 +53,19 @@ export interface ModelAir {
   readonly openings: readonly { box: number; axis: 0 | 2; side: 1 | -1 }[];
 }
 
+/**
+ * How far (yards at authored size) a strip of air cut round a hearth or shelves runs on into
+ * the room beside it. The camera walks its ray through the air with every piece shrunk by its
+ * near-plane pad (interiorCameraPadding: about 0.4 yd at the default field of view, past 0.7
+ * at the widest the settings allow), so two pieces that only meet at a face leave a gap of
+ * twice that between them: the ray of a player standing in the strip stopped short of the
+ * room, and the camera fell back to a cramped framing beside the hearth. Overlapping by more
+ * than both pads keeps the air one piece at any scale and nearly any field of view. (A strip
+ * is only worth cutting where it is wider than both pads too: the smithy's corners either
+ * side of its hearth, about a yard across, are left out for that.)
+ */
+const JOIN_REACH = 1.5;
+
 /** The authored air per painted model (the geometry name, shared by every look). */
 const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
   tavern_b: {
@@ -56,9 +80,49 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
       [10.28, 12.15, 0.45, 9.65, -5.9, 3.5],
       // the upper floor: over the slab (5.68) to the tie beams (9.65)
       [-12.3, 12.3, 5.68, 9.65, -7.5, 7.5],
-      // the taproom's -x strip either side of the chimney breast
-      [-12.15, -11.0, 0.45, 5.0, -6.65, -2.95],
-      [-12.15, -11.0, 0.45, 5.0, 0.95, 6.65],
+      // the taproom's -x strip either side of the chimney breast (JOIN_REACH into the
+      // taproom: see there)
+      [-12.15, -11.0 + JOIN_REACH, 0.45, 5.0, -6.65, -2.95],
+      [-12.15, -11.0 + JOIN_REACH, 0.45, 5.0, 0.95, 6.65],
+    ],
+    openings: [{ box: 1, axis: 2, side: -1 }],
+  },
+  tavern: {
+    boxes: [
+      // the taproom: inner walls x +-9.4, z +-5.9, the deck at 0.45, under the beams that
+      // carry the upper floor's slab (4.95 to 5.36); the hearth's chimney breast (x -9.5 to
+      // -8.1, z -1.8 to 1.8) stands in its -x end and the back-bar shelves (x 1.2 to 3.6
+      // either side, z 4.98 on) against its back wall, so it stops short of both
+      [-8.0, 9.15, 0.45, 5.0, -5.65, 4.88],
+      // the front door through the front wall (z -6.5 to -5.9), its head at 4.85
+      [-1.5, 1.5, 0.45, 4.85, -6.6, -5.4],
+      // the stair well at the +x end, open from the taproom to the upper floor
+      [7.28, 9.15, 0.45, 9.65, -4.9, 2.9],
+      // the upper floor: over the slab (5.68) to the tie beams (9.65)
+      [-9.3, 9.3, 5.68, 9.65, -6.5, 6.5],
+      // the taproom's -x strips either side of the chimney breast, and its back wall either
+      // side of the shelves and between them (JOIN_REACH into the taproom: see there)
+      [-9.15, -8.0 + JOIN_REACH, 0.45, 5.0, -5.65, -1.95],
+      [-9.15, -8.0 + JOIN_REACH, 0.45, 5.0, 1.95, 5.65],
+      [-8.0, -3.7, 0.45, 5.0, 4.88 - JOIN_REACH, 5.65],
+      [-1.1, 1.1, 0.45, 5.0, 4.88 - JOIN_REACH, 5.65],
+      [3.7, 9.15, 0.45, 5.0, 4.88 - JOIN_REACH, 5.65],
+    ],
+    openings: [{ box: 1, axis: 2, side: -1 }],
+  },
+  bank: {
+    boxes: [
+      // the banking hall between its two pillars: inner walls x +-8.55, z +-5.8, the deck at
+      // 0.45, under the ceiling beams (5.43 to 5.83)
+      [-3.95, 3.95, 0.45, 5.45, -5.55, 5.55],
+      // the front door through the front wall (z -6.25 to -5.8), its head at 4.85
+      [-1.3, 1.3, 0.45, 4.85, -6.35, -5.3],
+      // the hall round its two pillars (x 4.05 to 5.15 either side, z -2.7 to -1.7, floor to
+      // ceiling): both sides past them, and the whole width before and behind them
+      [-8.3, -5.25, 0.45, 5.45, -5.55, 5.55],
+      [5.25, 8.3, 0.45, 5.45, -5.55, 5.55],
+      [-8.3, 8.3, 0.45, 5.45, -5.55, -2.8],
+      [-8.3, 8.3, 0.45, 5.45, -1.6, 5.55],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
@@ -73,11 +137,23 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
   },
   shop_a: {
     boxes: [
-      // the counting room: inner walls x +-5.05, z +-3.75, the deck at 0.45, the ceiling 4.65
-      // (its back shelves, z 3.33 to 3.75, stand in front of the back wall)
-      [-4.8, 4.8, 0.45, 4.65, -3.5, 3.25],
+      // the counting room: inner walls x +-5.05, z +-3.75, the deck at 0.45, under the beams
+      // that carry the ceiling (4.23 to 4.63); its back shelves, z 3.33 to 3.75, stand in
+      // front of the back wall
+      [-4.8, 4.8, 0.45, 4.25, -3.5, 3.25],
       // the front door through the shop front (z -4.2 to -3.75), its head at 3.7
       [-2.5, -0.7, 0.45, 3.7, -4.3, -3.2],
+    ],
+    openings: [{ box: 1, axis: 2, side: -1 }],
+  },
+  shop_b: {
+    boxes: [
+      // the shop: inner walls x +-4.25, z +-4.05, the deck at 0.45, under the beams that
+      // carry the ceiling (4.23 to 4.63); its back shelves, z 3.56 to 4.05, stand in front of
+      // the back wall
+      [-4.0, 4.0, 0.45, 4.25, -3.8, 3.46],
+      // the front door through the shop front (z -4.5 to -4.05), its head at 3.7
+      [-1.6, 0.2, 0.45, 3.7, -4.6, -3.5],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },
@@ -128,8 +204,10 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
     boxes: [
       // the great hall: inner walls x +-14, z +-10, clear of the hearth's breast and the
       // shelves on the right wall (x -12.7), under the chandeliers; the open roof's trusses
-      // all stand above 11.6
-      [-12.45, 13.75, 0.6, 9.6, -9.75, 9.75],
+      // all stand above 11.6. Its front face sits a hair past the quarter yard (-9.74) so a
+      // walk in at a free turn never lands on it exactly, where float rounding alone would
+      // decide whether the eye is in
+      [-12.45, 13.75, 0.6, 9.6, -9.74, 9.75],
       // the front door through the front wall (z -10.9 to -10), its head at 6.2
       [-1.6, 1.6, 0.6, 6.2, -11.0, -9.7],
       // the round arch into the trophy hall, inside its curve, and the trophy hall under its
@@ -160,12 +238,8 @@ export function placedTownModelName(assetId: string): string {
   return assetId.replace(/^.*\//, '').replace(/\.glb$/, '');
 }
 
-/** One model's authored air (test-only reading: tests pin it against the baked collision). */
-export function placedTownModelAir(name: string): ModelAir | undefined {
-  return MODEL_AIR[name];
-}
-
-/** The models that carry authored air. */
+/** The models that carry authored air (tests stand each one and pin its air against the
+ *  model's baked collision). */
 export function placedTownInteriorModels(): readonly string[] {
   return Object.keys(MODEL_AIR);
 }
@@ -175,8 +249,9 @@ const QUARTER = Math.PI / 2;
 /**
  * The camera interior of one walk-in placed building whose anchor stands on ground at
  * `groundY` (the terrain under the anchor, the height the town view stands the model on),
- * or null for a sealed record, a model with no authored air, or a turn that is not a quarter.
- * The model's ground line stands at groundY + scale (the footing) + lift.
+ * or null for a sealed record or a model with no authored air. The model's ground line
+ * stands at groundY + scale (the footing) + lift. A quarter turn gives world boxes; any other
+ * turn gives the model's own boxes in the building's frame (its anchor and its turn).
  */
 export function placedTownCameraInterior(
   building: PlacedTownInteriorBuilding,
@@ -186,10 +261,32 @@ export function placedTownCameraInterior(
   const air = MODEL_AIR[placedTownModelName(building.assetId)];
   if (!air) return null;
   const p = building.placement;
-  const quarters = Math.round(p.rotation / QUARTER);
-  if (Math.abs(p.rotation - quarters * QUARTER) > 1e-6) return null;
   const s = p.scale;
   const lineY = groundY + s + p.lift;
+  const id = `placed_town:${building.id}`;
+  const quarters = Math.round(p.rotation / QUARTER);
+  if (Math.abs(p.rotation - quarters * QUARTER) > 1e-6) {
+    // any other turn: the pieces stay square to the building's own walls, in its frame (the
+    // model's axes at the placed scale, the anchor its origin), and so do its doors
+    const local: InteriorBox[] = air.boxes.map(([x0, x1, y0, y1, z0, z1]) => [
+      x0 * s,
+      x1 * s,
+      lineY + y0 * s,
+      lineY + y1 * s,
+      z0 * s,
+      z1 * s,
+    ]);
+    const doors: InteriorOpening[] = air.openings.map((o) => ({
+      box: o.box,
+      axis: o.axis,
+      side: o.side,
+    }));
+    return cameraInterior(id, local, doors, new Map(), 'preserve-angle', {
+      x: p.x,
+      z: p.z,
+      yaw: p.rotation,
+    });
+  }
   const boxes: InteriorBox[] = air.boxes.map(([x0, x1, y0, y1, z0, z1]) => {
     const a = localToWorld(p, p.rotation, x0 * s, z0 * s);
     const b = localToWorld(p, p.rotation, x1 * s, z1 * s);
@@ -214,5 +311,5 @@ export function placedTownCameraInterior(
     const value = alongX ? local.x : local.z;
     return { box: o.box, axis: alongX ? 0 : 2, side: value > 0 ? 1 : -1 };
   });
-  return cameraInterior(`placed_town:${building.id}`, boxes, openings, new Map(), 'preserve-angle');
+  return cameraInterior(id, boxes, openings, new Map(), 'preserve-angle');
 }

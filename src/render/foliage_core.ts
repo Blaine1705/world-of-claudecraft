@@ -1,8 +1,17 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
+import {
+  TAVERN_HALL,
+  TAVERN_PORCH,
+  TAVERN_STEPS_MAX_RUN,
+  TAVERN_TOWER,
+  TAVERN_WING,
+  tavernToWorld,
+} from '../sim/content/mirefen_tavern';
 import { activeDungeonDoorPos, DUNGEONS, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
+import { tavernGroundsRects } from '../sim/mirefen_tavern_grounds';
 import { distancePointToObb } from '../sim/placed_town_kit';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 import {
@@ -328,6 +337,7 @@ export function eastbrookGrassExclusions(
       });
     }
   }
+  if (builtInWorld) exclusions.push(...mirefenTavernGrassExclusions());
 
   for (const board of noticeboards) {
     exclusions.push({
@@ -350,6 +360,46 @@ export function eastbrookGrassExclusions(
   return exclusions;
 }
 
+/** The Mirefen tavern's floor keeps its grass out (sim/content/mirefen_tavern.ts): the hall,
+ *  the wing, the round tower, the porch and the run of its steps, and its grounds
+ *  (sim/mirefen_tavern_grounds.ts: the cobbled forecourt, the stable's floor and the pieces on
+ *  the terrain). The tavern's local axes run along the world's (its door faces +x), so each
+ *  rectangle is a plain one. */
+export function mirefenTavernGrassExclusions(): EastbrookGrassExclusion[] {
+  const rect = (id: string, x0: number, x1: number, z0: number, z1: number) => {
+    const a = tavernToWorld(x0, z0);
+    const b = tavernToWorld(x1, z1);
+    return {
+      kind: 'obb' as const,
+      id,
+      x: (a.x + b.x) / 2,
+      z: (a.z + b.z) / 2,
+      halfWidth: Math.abs(b.x - a.x) / 2,
+      halfDepth: Math.abs(b.z - a.z) / 2,
+      rotation: 0,
+    };
+  };
+  const tower = tavernToWorld(TAVERN_TOWER.x, TAVERN_TOWER.z);
+  const H = TAVERN_HALL;
+  const W = TAVERN_WING;
+  const P = TAVERN_PORCH;
+  return [
+    rect('mirefen_tavern:hall', H.x0, H.x1, H.z0, H.z1),
+    rect('mirefen_tavern:wing', W.x0, W.x1, W.z0, W.z1),
+    {
+      kind: 'circle',
+      id: 'mirefen_tavern:tower',
+      x: tower.x,
+      z: tower.z,
+      radius: TAVERN_TOWER.rOut,
+    },
+    rect('mirefen_tavern:porch', P.x0, P.x1, P.z0, P.z1 + TAVERN_STEPS_MAX_RUN),
+    ...tavernGroundsRects().map((r, i) =>
+      rect(`mirefen_tavern:grounds:${i}`, r[0], r[1], r[2], r[3]),
+    ),
+  ];
+}
+
 /** Pure candidate check used by streamed chunks after the one-time snapshot. */
 export function insideEastbrookGrassExclusion(
   exclusions: readonly EastbrookGrassExclusion[],
@@ -359,15 +409,15 @@ export function insideEastbrookGrassExclusion(
 ): boolean {
   for (let index = 0; index < exclusions.length; index++) {
     const exclusion = exclusions[index];
+    const dx = x - exclusion.x;
+    const dz = z - exclusion.z;
     if (exclusion.kind === 'circle') {
-      const dx = x - exclusion.x;
-      const dz = z - exclusion.z;
       const radius = exclusion.radius + padding;
       if (dx * dx + dz * dz < radius * radius) return true;
       continue;
     }
-    const dx = x - exclusion.x;
-    const dz = z - exclusion.z;
+    const maxSpan = exclusion.halfWidth + exclusion.halfDepth + padding;
+    if (Math.abs(dx) > maxSpan || Math.abs(dz) > maxSpan) continue;
     const cosine = Math.cos(exclusion.rotation);
     const sine = Math.sin(exclusion.rotation);
     const localX = dx * cosine - dz * sine;
@@ -376,6 +426,30 @@ export function insideEastbrookGrassExclusion(
       Math.abs(localX) < exclusion.halfWidth + padding &&
       Math.abs(localZ) < exclusion.halfDepth + padding
     ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** True when a grass candidate falls inside any placed building's footprint. */
+export function insideAnyBuildingFootprint(
+  buildings: readonly BuildingDef[],
+  x: number,
+  z: number,
+  padding: number,
+): boolean {
+  for (let i = 0; i < buildings.length; i++) {
+    const b = buildings[i];
+    const dx = x - b.x;
+    const dz = z - b.z;
+    const maxSpan = (b.w + b.d) * 0.5 + padding;
+    if (Math.abs(dx) > maxSpan || Math.abs(dz) > maxSpan) continue;
+    const cos = Math.cos(b.rot);
+    const sin = Math.sin(b.rot);
+    const localX = dx * cos - dz * sin;
+    const localZ = dx * sin + dz * cos;
+    if (Math.abs(localX) < b.w * 0.5 + padding && Math.abs(localZ) < b.d * 0.5 + padding) {
       return true;
     }
   }

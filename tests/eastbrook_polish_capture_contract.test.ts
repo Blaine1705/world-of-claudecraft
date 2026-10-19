@@ -721,9 +721,14 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // integration (town dressing + gameplay objects over #4507). No capture was retaken.
   // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
   // the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4258 (the Mirefen tavern) over #4516 (grand Highwatch):
+  // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
+  // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
+  // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for Lantern Hall (the Highwatch adventurers' guild): the renderer leaf moved
-  // (buildHighwatchTownView takes the world for the trophy room). No capture was retaken.
-  'f9f2260c78c41a9e4efc09a8956412b5ff3492aecf46bdd2343ff077ff7bcee5';
+  // (buildHighwatchTownView takes the world for the trophy room). Re-minted again for
+  // merging the v0.45.0 integration into Lantern Hall. No capture was retaken.
+  '1b68741b9f5881f3cf2f43877c92c7c91ff6454bc38559c53835862da4f8eea9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -1138,22 +1143,26 @@ describe('Eastbrook polish capture contract', () => {
     // targets moved onto the placed buildings' front standing points with
     // door-side cameras; chapel-and-weaving's camera stepped off the placed
     // bank; the toolworks row is unchanged (its station did not move).
+    // Re-aimed for the World of ClaudeCraft Studio map's arrangement: the
+    // bank, smithy and inn targets follow their buildings' new front standing
+    // points with door-side cameras (the inn's down the lane past its kitchen
+    // yard); chapel-and-weaving and the toolworks rows are unchanged.
     expect(EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES).toEqual({
       'armoury-relation': {
         camera: { x: 34, y: 15, z: 25 },
         target: { x: 12.5, y: 4, z: -5.5 },
       },
       'bank-and-chest': {
-        camera: { x: 9, y: 7, z: -121.5 },
-        target: { x: 20.46, y: 3.2, z: -115 },
+        camera: { x: -49.32, y: 7, z: -101.42 },
+        target: { x: -54.98, y: 3.2, z: -111.32 },
       },
       'smithy-and-forge': {
-        camera: { x: -28, y: 7, z: -92 },
-        target: { x: -32.5, y: 3, z: -105.83 },
+        camera: { x: -12, y: 7, z: -93.65 },
+        target: { x: -8.28, y: 3, z: -81.86 },
       },
       'inn-and-kitchens': {
-        camera: { x: -68, y: 9, z: -79 },
-        target: { x: -50.76, y: 3, z: -72.3 },
+        camera: { x: -46, y: 9, z: -93 },
+        target: { x: -34.51, y: 3, z: -69.99 },
       },
       'chapel-and-weaving': {
         camera: { x: 16, y: 12, z: -100.5 },
@@ -1513,11 +1522,16 @@ describe('Eastbrook polish capture contract', () => {
     // shop door at (-9.5, -93.2) facing the square, so her row follows her
     // (camera 5 yd out on her public side, west of the Ravenpost pillar).
     // Saul and FURY did not move.
+    // Re-aimed for the World of ClaudeCraft Studio map's arrangement: Lin
+    // stands between the square and her shop down on the strand, and FURY
+    // stepped off the north road's new swing round the smithy, so both rows
+    // follow them (Lin's camera still 5 yd out on her public side, FURY's
+    // still 4.47). Saul did not move.
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
-        camera: { x: -13, y: 6, z: -96.5 },
-        target: { x: -9.5, y: 2.5, z: -93.2 },
+        camera: { x: -20.96, y: 6, z: -108.96 },
+        target: { x: -24.5, y: 2.5, z: -112.5 },
       },
       'ravenpost-chronicler': {
         subject: 'chronicler_saul',
@@ -1526,8 +1540,8 @@ describe('Eastbrook polish capture contract', () => {
       },
       'west-wall-quartermaster': {
         subject: 'fury',
-        camera: { x: 12, y: 6, z: -80 },
-        target: { x: 16, y: 2.5, z: -78 },
+        camera: { x: 17.05, y: 6, z: -85.59 },
+        target: { x: 21, y: 2.5, z: -83.5 },
       },
     };
     for (const [name, expected] of Object.entries(expectedViews)) {

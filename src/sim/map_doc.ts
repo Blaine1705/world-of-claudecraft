@@ -39,6 +39,7 @@ import { type ClutterStamp, MAX_CLUTTER_STAMPS, sanitizeClutterStamp } from './c
 import { sanitizeAssetFireEmitters } from './fire_effects';
 import { type FoliageParams, sanitizeFoliageParams } from './foliage_params';
 import type { GrassClearCircle } from './grass_clear';
+import { type MaterialFinishes, sanitizeMaterialFinishes } from './material_finishes';
 import { type ObjectMoves, sanitizeObjectMoves } from './moved_objects';
 import {
   CUT_MAX_BLEND,
@@ -400,6 +401,9 @@ export interface MapPlacement {
   building?: BuildingMembership;
   /** Independently painted placement-local front and back surfaces. */
   wallFinishes?: WallFinishes;
+  /** Per-material texture overrides, keyed by material slot
+   *  (sim/material_finishes.ts). */
+  materialFinishes?: MaterialFinishes;
   assetId: string; // catalogue id, e.g. "props/well"
   x: number;
   z: number;
@@ -977,6 +981,7 @@ function sanitizeStamp(v: unknown): HeightStamp | null {
     delta: clamp(num(s.delta, 0), -200, 200),
     falloff: s.falloff === 'flat' ? 'flat' : 'smooth',
   };
+  if (s.shape === 'circle' || s.shape === 'square') stamp.shape = s.shape;
   if (s.mode === 'level') stamp.mode = 'level';
   // Level-target slope (Smooth's local trend plane). Clamped to a sane grade so
   // a corrupt document cannot tilt a stamp into the sky.
@@ -1198,6 +1203,8 @@ function sanitizePlacement(v: unknown): MapPlacement | null {
   if (building) out.building = building;
   const wallFinishes = sanitizeWallFinishes(p.wallFinishes);
   if (wallFinishes) out.wallFinishes = wallFinishes;
+  const materialFinishes = sanitizeMaterialFinishes(p.materialFinishes);
+  if (materialFinishes) out.materialFinishes = materialFinishes;
   // Optional radius override: accepted only finite, always clamped. Kept even
   // while collide is false (cheap, and it survives a collide re-toggle).
   if (finiteNum(p.collideRadius)) {

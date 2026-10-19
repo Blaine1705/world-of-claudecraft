@@ -133,6 +133,8 @@ export interface PlacedBuildingBuild {
   group: THREE.Group;
   /** One fade record per (material, mesh shape) of the building. */
   mats: OccluderFadeMat[];
+  /** Indoor furniture meshes (G_INT / *_INT_*) that only need to draw close up. */
+  interiors: THREE.Object3D[];
   /** World height of the model's top, for the camera-fade box. */
   topY: number;
   /** From the record's own centre out to the farthest corner the model
@@ -161,9 +163,12 @@ export function buildPlacedTownBuilding(
   for (const extra of extras) clone.add(extra);
 
   const mats: OccluderFadeMat[] = [];
+  const interiors: THREE.Object3D[] = [];
   clone.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
-    child.castShadow = !isPlacedBuildingInterior(child);
+    const isInterior = isPlacedBuildingInterior(child) || /_INT(?:_|$)/.test(child.name);
+    if (isInterior) interiors.push(child);
+    child.castShadow = !isInterior;
     child.receiveShadow = true;
     const list = Array.isArray(child.material) ? child.material : [child.material];
     const cloned = list.map((material) => placedBuildingMaterial(material));
@@ -199,6 +204,7 @@ export function buildPlacedTownBuilding(
   return {
     group,
     mats,
+    interiors,
     topY: ground + building.nativeDimensions.height,
     cullRadius: placedBuildingCullRadius(building),
   };

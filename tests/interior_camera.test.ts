@@ -14,6 +14,7 @@ import {
   restoreInteriorCameraDraw,
 } from '../src/render/interior_camera';
 import {
+  type CameraInterior,
   cameraInterior,
   INTERIOR_BOOM_MAX_LAG,
   interiorContains,
@@ -25,7 +26,7 @@ import {
 // blended in over the threshold; walking in, the lens following through the door, threading
 // it, then coming in; outdoors untouched), the look point brought back to the eye across a
 // wall, the draw-time re-check of a shaken camera and its exact restore, and the nameplate
-// gate for bodies outside.
+// gate for bodies outside; and the same clamp in a room turned to any angle.
 
 // one room x 0..10, z 0..10, y 0..5, its front door out of the -z wall (x 4..6, z -1..1.5)
 const ROOM = cameraInterior(
@@ -480,5 +481,286 @@ describe('indoor nameplates', () => {
     // low, looking in through the doorway: the body inside keeps its plate
     frame(cam, new THREE.Vector3(5, 0, -20), [5, 2, -30]);
     expect(interiorHidesNameplate(cam, 5, 0, 5, 2.8)).toBe(false);
+  });
+});
+
+describe('a room turned to any angle', () => {
+  // The room above and a deep hall, each stood in its own frame at Eastbrook's bank anchor and
+  // turned the smithy's 20 degrees and the bank's 225: every pose below is written in the
+  // unturned room's axes and turned into the world, and every answer is read back in them.
+  const ORIGIN = { x: -61.99, z: -118.33 };
+  const TURNS = [(20 * Math.PI) / 180, (225 * Math.PI) / 180];
+  const HALL = cameraInterior(
+    'hall',
+    [
+      [0, 20, 0, 8, 0, 30],
+      [8, 12, 0, 4, -1, 1.5],
+    ],
+    [{ box: 1, axis: 2, side: -1 }],
+    new Map(),
+    'preserve-angle',
+  );
+
+  function turned(of: CameraInterior, yaw: number): CameraInterior {
+    return cameraInterior(of.id, of.boxes, of.openings, new Map(), of.framing, {
+      x: ORIGIN.x,
+      z: ORIGIN.z,
+      yaw,
+    });
+  }
+
+  /** A point of the unturned room's axes in the world, turned `yaw`. */
+  function world(yaw: number, x: number, y: number, z: number): THREE.Vector3 {
+    const c = Math.cos(yaw);
+    const s = Math.sin(yaw);
+    return new THREE.Vector3(ORIGIN.x + x * c + z * s, y, ORIGIN.z - x * s + z * c);
+  }
+
+  /** A world point back in the unturned room's axes. */
+  function local(yaw: number, p: THREE.Vector3): THREE.Vector3 {
+    const c = Math.cos(yaw);
+    const s = Math.sin(yaw);
+    const dx = p.x - ORIGIN.x;
+    const dz = p.z - ORIGIN.z;
+    return new THREE.Vector3(dx * c - dz * s, p.y, dx * s + dz * c);
+  }
+
+  type Pose = readonly [number, number, number];
+  /** The feet and the desired camera, in the room's own axes, one frame each. */
+  type Step = readonly [Pose, Pose];
+
+  /** One scripted run of the real clamp over `vol` (turned `yaw`, or as it is for null): per
+   *  frame, the drawn camera and look point in the room's own axes, and its verdicts. */
+  function run(vol: CameraInterior, yaw: number | null, steps: readonly Step[]) {
+    interiorCameraInternalsForTest.reset();
+    registerCameraInterior(vol);
+    const cam = camera();
+    const into = (p: Pose) => (yaw === null ? new THREE.Vector3(...p) : world(yaw, ...p));
+    const back = (p: THREE.Vector3) => (yaw === null ? p.clone() : local(yaw, p));
+    return steps.map(([feet, want]) => {
+      const c = into(want);
+      const look = frame(cam, into(feet), [c.x, c.y, c.z]);
+      return {
+        pos: back(cam.position),
+        look: back(look),
+        indoors: activeCameraInterior() !== null,
+        inAir: interiorLensInAir(),
+        firstPerson: interiorCameraInternalsForTest.state().firstPerson,
+        contained: interiorContains(vol, cam.position.x, cam.position.y, cam.position.z),
+      };
+    });
+  }
+
+  /** Walk in through the front door (x 4 to 6 at the -z wall) from the road with the camera
+   *  behind, stand by the walls and under the ceiling with the camera wanted out through them,
+   *  back into a cramped spot, orbit, then walk out through the door again. */
+  function script(door: number, depth: number): Step[] {
+    const steps: Step[] = [];
+    for (let z = -6; z < depth; z += 7 / 60) {
+      steps.push([
+        [door, 0, z],
+        [door, 5, z - Math.sqrt(91)],
+      ]);
+    }
+    for (let i = 0; i < 30; i++)
+      steps.push([
+        [8, 0, 5],
+        [20, 2, 5],
+      ]);
+    for (let i = 0; i < 30; i++)
+      steps.push([
+        [8, 0, 5],
+        [8, 20, 5],
+      ]);
+    for (let i = 0; i < 60; i++)
+      steps.push([
+        [9, 0, 5],
+        [20, 2, 5],
+      ]);
+    for (let i = 0; i < 120; i++) {
+      const yaw = (3 * i) / 60;
+      steps.push([
+        [7, 0, 5],
+        [7 - Math.sin(yaw) * 7.6, 2 + 2.5, 5 - Math.cos(yaw) * 7.6],
+      ]);
+    }
+    // (never on the threshold's face at z 0, 0.03 off it at the nearest: a pose exactly on a
+    // face is a tie the turn's rounding may tip either way)
+    for (let z = 5.03; z > -4; z -= 0.1) {
+      steps.push([
+        [door, 0, z],
+        [door, 2, z - 21],
+      ]);
+    }
+    for (let i = 0; i < 90; i++)
+      steps.push([
+        [door, 0, -4],
+        [door, 2, -25],
+      ]);
+    return steps;
+  }
+
+  it('draws the camera in a turned room exactly where it draws it in the unturned one', () => {
+    for (const [of, door, depth] of [
+      [ROOM, 5, 8],
+      [HALL, 10, 16],
+    ] as const) {
+      const steps = script(door, depth);
+      const flat = run(of, null, steps);
+      // the script does what it says: in and out, pulled in, out through the door and back
+      expect(flat.filter((f) => f.indoors).length, of.id).toBeGreaterThan(300);
+      expect(flat.filter((f) => f.indoors && !f.inAir).length, of.id).toBeGreaterThan(0);
+      expect(flat.at(-1)?.indoors, of.id).toBe(false);
+      for (const yaw of TURNS) {
+        const twin = run(turned(of, yaw), yaw, steps);
+        for (const [i, f] of flat.entries()) {
+          const t = twin[i];
+          const at = `${of.id} turned ${yaw}, frame ${i}`;
+          expect(t.pos.distanceTo(f.pos), at).toBeLessThan(1e-6);
+          expect(t.look.distanceTo(f.look), at).toBeLessThan(1e-6);
+          expect([t.indoors, t.inAir, t.firstPerson, t.contained], at).toEqual([
+            f.indoors,
+            f.inAir,
+            f.firstPerson,
+            f.contained,
+          ]);
+        }
+      }
+    }
+  });
+
+  it('keeps the lens inside the turned room, short of the wall it would pass', () => {
+    for (const yaw of TURNS) {
+      const room = turned(ROOM, yaw);
+      registerCameraInterior(room);
+      const cam = camera();
+      const self = world(yaw, 5, 0, 5);
+      const out = world(yaw, 20, 2, 5);
+      // the desired camera out past the turned +x wall: pulled in along the ray, inside it
+      settle(cam, self, [out.x, out.y, out.z], 30);
+      expect(activeCameraInterior()?.id).toBe('room');
+      expect(interiorLensInAir()).toBe(true);
+      const c = local(yaw, cam.position);
+      expect(c.x, `${yaw}`).toBeLessThan(10);
+      expect(c.x, `${yaw}`).toBeGreaterThan(8);
+      expect(c.z, `${yaw}`).toBeCloseTo(5, 6);
+      expect(interiorContains(room, cam.position.x, cam.position.y, cam.position.z)).toBe(true);
+      // the desired camera stood ten yards and more out past that wall: the clamp brought it
+      // in nearly all the way
+      expect(cam.position.distanceTo(out)).toBeGreaterThan(9);
+      interiorCameraInternalsForTest.reset();
+    }
+  });
+
+  it('follows through a turned front door walking in: no snap, never into the back of the head', () => {
+    for (const yaw of TURNS) {
+      interiorCameraInternalsForTest.reset();
+      const hall = turned(HALL, yaw);
+      registerCameraInterior(hall);
+      const cam = camera();
+      const dt = 1 / 60;
+      let prev: THREE.Vector3 | null = null;
+      let least = Infinity;
+      let wasIndoors = false;
+      let firstIn = Infinity;
+      for (let z = -6; z < 16; z += 7 * dt) {
+        const want = world(yaw, 10, 5, z - Math.sqrt(91));
+        const look = frame(cam, world(yaw, 10, 0, z), [want.x, want.y, want.z], dt);
+        const indoors = activeCameraInterior() !== null;
+        if (indoors) {
+          least = Math.min(least, cam.position.distanceTo(look));
+          if (prev !== null)
+            expect(cam.position.distanceTo(prev), `${yaw} at ${z}`).toBeLessThan(0.6);
+          if (!wasIndoors) firstIn = z;
+          // following through the turned door its sight line threads the doorway
+          if (!interiorLensInAir()) {
+            const c = cam.position;
+            expect(
+              interiorSegmentFraction(hall, look.x, look.y, look.z, c.x, c.y, c.z, 0, 1),
+              `${yaw} at ${z}`,
+            ).toBe(1);
+          }
+        }
+        wasIndoors = indoors;
+        prev = cam.position.clone();
+      }
+      // indoors only past the threshold (the door's thickness runs to z 0), and the whole
+      // distance kept all the way in, the lens in the hall at the end
+      expect(firstIn, `${yaw}`).toBeGreaterThan(0);
+      expect(firstIn, `${yaw}`).toBeLessThan(0.3);
+      expect(least, `${yaw}`).toBeGreaterThan(9);
+      expect(interiorLensInAir(), `${yaw}`).toBe(true);
+    }
+  });
+
+  it('gates the nameplates through a turned door, never through its walls', () => {
+    for (const yaw of TURNS) {
+      interiorCameraInternalsForTest.reset();
+      registerCameraInterior(turned(ROOM, yaw));
+      const cam = camera();
+      const want = world(yaw, 5, 2.5, 8);
+      settle(cam, world(yaw, 5, 0, 5), [want.x, want.y, want.z]);
+      const plate = (x: number, z: number, y: number) => {
+        const p = world(yaw, x, 0, z);
+        return interiorHidesNameplate(cam, p.x, 0, p.z, y);
+      };
+      // a troll behind the turned -x wall: hidden; one on the road out of the turned front
+      // door: seen through it; the innkeeper inside: kept
+      expect(plate(-10, 5, 2.8), `${yaw}`).toBe(true);
+      expect(plate(5, -12, 1.5), `${yaw}`).toBe(false);
+      expect(plate(2, 2, 2.8), `${yaw}`).toBe(false);
+    }
+  });
+
+  it('leaves the camera to the bit for a player outside a turned hall', () => {
+    for (const yaw of TURNS) {
+      interiorCameraInternalsForTest.reset();
+      registerCameraInterior(turned(HALL, yaw));
+      const cam = camera();
+      // on the road, on the porch, in the doorway's thickness, and behind the hall's side
+      // wall with the boom straight through it
+      const outside: readonly Step[] = [
+        [
+          [10, 0, -12],
+          [10, 9, 6],
+        ],
+        [
+          [10, 0, -2.5],
+          [10, 5, 8],
+        ],
+        [
+          [10, 0, -0.5],
+          [10, 6, 12],
+        ],
+        [
+          [-6, 0, 15],
+          [12, 8, 15],
+        ],
+      ];
+      for (const [feet, want] of outside) {
+        const c = world(yaw, ...want);
+        cam.position.copy(c);
+        const self = world(yaw, ...feet);
+        const look = new THREE.Vector3(self.x, self.y + 2, self.z);
+        clampChaseCameraToInterior(cam, look, self, 1 / 60, true);
+        expect(cam.position.toArray(), `${yaw}: ${feet}`).toEqual(c.toArray());
+        expect(look.toArray()).toEqual([self.x, self.y + 2, self.z]);
+        expect(activeCameraInterior()).toBe(null);
+      }
+      // ...while a player a stride inside it, the same boom out through the side wall, is
+      // held in the turned hall (the hall is live in its frame, not merely missed)
+      const want = world(yaw, -8, 6, 15);
+      cam.position.copy(want);
+      const self = world(yaw, 2, 0, 15);
+      clampChaseCameraToInterior(
+        cam,
+        new THREE.Vector3(self.x, self.y + 2, self.z),
+        self,
+        1 / 60,
+        true,
+      );
+      expect(activeCameraInterior()?.id, `${yaw}`).toBe('hall');
+      expect(local(yaw, cam.position).x, `${yaw}`).toBeGreaterThan(0);
+    }
   });
 });

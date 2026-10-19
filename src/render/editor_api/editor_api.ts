@@ -48,7 +48,11 @@ import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from '../static_mat
 import { buildTerrain, type TerrainView } from '../terrain';
 import { buildWater, type WaterView } from '../water';
 import { MIN_OUTDOOR_FOG_FAR } from '../zone_streaming';
-import { type MovedObjectPreview, shiftMovedObjectInScene } from './moved_object_preview';
+import {
+  type MovedObjectPreview,
+  type PreviewPose,
+  shiftMovedObjectInScene,
+} from './moved_object_preview';
 
 /** Editor visibility can extend beyond the shipped fog ceiling, but the
  *  prepared-zone guard still prevents unloaded terrain from being exposed. */
@@ -305,15 +309,11 @@ export class RendererEditorApi {
     this.host.replaceFireLights(stale, layers.fluidSurfaces.lights);
   }
 
-  /** Live preview of a moved built-in gameplay object (a farm bed or its
-   *  compost bin, a gather node, a dungeon entrance set piece): shift what was
-   *  drawn by the move's offset. The next renderer build draws the moved
-   *  tables exactly (moved_object_preview.ts). Returns how many moved. */
-  previewObjectMove(
-    target: MovedObjectPreview,
-    from: { readonly x: number; readonly z: number },
-    to: { readonly x: number; readonly z: number },
-  ): number {
+  /** Live preview of an edited built-in gameplay object (a farm bed or its
+   *  compost bin, a gather node, a dungeon entrance set piece): move, turn,
+   *  resize or hide what was drawn. The next renderer build draws the edited
+   *  tables exactly (moved_object_preview.ts). Returns how many changed. */
+  previewObjectMove(target: MovedObjectPreview, from: PreviewPose, to: PreviewPose): number {
     const seed = this.host.seed();
     const moved = shiftMovedObjectInScene(this.host.scene(), target, from, to, (x, z) =>
       terrainHeight(x, z, seed),
@@ -503,6 +503,52 @@ export class RendererEditorApi {
   }
 
   /**
+   * Palette lab (src/render/palette_lab/): re-bake the GROUND colours over a
+   * region after its zone palette changed. The near chunks swap only their
+   * vertex-colour buffers, nearest to (cx, cz) first and off the main thread
+   * where the zone build worker runs; the far tiles rebuild idle-paced (the
+   * old tile draws until its replacement lands); the card tufts in the region
+   * drop and re-grow lazily. Nothing here moves a vertex, so no shadow redraw.
+   */
+  recolorGround(
+    region: TerrainRegion,
+    cx: number,
+    cz: number,
+    cancelled?: () => boolean,
+  ): Promise<number> {
+    const h = this.host;
+    h.farTerrain.rebuildRegion(region.minX, region.minZ, region.maxX, region.maxZ);
+    h.foliage().rebuildGrassRegion(region.minX, region.minZ, region.maxX, region.maxZ);
+    return h.terrain.recolorRegion(
+      region.minX,
+      region.minZ,
+      region.maxX,
+      region.maxZ,
+      cx,
+      cz,
+      cancelled,
+    );
+  }
+
+  /**
+   * Palette lab: re-bake every built near chunk whose colours predate the live
+   * ground override table (a chunk whose build was queued before the change
+   * lands with the old palette), nearest to (cx, cz) first. Chunks already
+   * current are skipped, so a sweep with nothing stale costs a filter.
+   */
+  recolorStaleGround(cx: number, cz: number, cancelled?: () => boolean): Promise<number> {
+    return this.host.terrain.recolorRegion(
+      Number.NEGATIVE_INFINITY,
+      Number.NEGATIVE_INFINITY,
+      Number.POSITIVE_INFINITY,
+      Number.POSITIVE_INFINITY,
+      cx,
+      cz,
+      cancelled,
+    );
+  }
+
+  /**
    * Rebake the macro normal DataTexture over the edited region (the per-pixel
    * relief that goes stale after a sculpt). Debounce to stroke END in the
    * editor: it re-uploads the texture, so never call it per drag sample.
@@ -563,8 +609,8 @@ export class RendererEditorApi {
 
   /** Project the editor brush ring onto the terrain at world (x, z). Uniform
    *  writes only; call per pointer-move. */
-  setEditorBrush(x: number, z: number, radius: number, color?: THREE.ColorRepresentation): void {
-    this.host.terrain.setBrush(x, z, radius, color);
+  setEditorBrush(...args: Parameters<TerrainView['setBrush']>): void {
+    this.host.terrain.setBrush(...args);
   }
 
   /** Hide the editor brush ring. */

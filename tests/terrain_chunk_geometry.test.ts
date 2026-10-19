@@ -410,7 +410,11 @@ describe('generated chunk geometry is stable', () => {
     // NPCs' calm pads. The quay and the coastline are pinned unchanged by
     // tests/eastbrook_placed_buildings.test.ts (the quay to the bit, no ground
     // crossing the sea surface). Computed twice in separate processes.
-    expect(digestOf(inRect)).toBe('5fa04f7251019490cf387e8d6a6dfd7d');
+    // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
+    // same town plus the Genshin Impact terrain palette, meadow splat, beach
+    // sand strand, road verge, non-directional cliff stone mottling, and Low-tier
+    // baked canopy and building contact shadows.
+    expect(digestOf(inRect)).toBe('ae70fd63f5dd1113739c93f883d2f05b');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

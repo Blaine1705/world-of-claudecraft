@@ -4522,6 +4522,9 @@ export interface NpcDef {
   // A banker: talking to this NPC opens the player's bank (deposit box). The bank
   // deposit/withdraw/buy-slots commands gate on standing near one of these.
   banker?: true;
+  // An innkeeper (the Mirefen tavern's): the nameplate's role line reads Innkeeper whatever
+  // food and drink she also sells (src/sim/npc_role.ts).
+  innkeeper?: true;
   // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
   // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
   heroicVendor?: boolean;
@@ -4687,6 +4690,10 @@ export interface GatherNodeDef {
   zoneId: string;
   type: GatherNodeType;
   pos: { x: number; z: number };
+  // A Studio map's turn (radians) and size multiplier for this node
+  // (sim/moved_objects.ts). Built-in rows never carry them.
+  rotY?: number;
+  scale?: number;
   // Effective content level for the profession-XP green/gray curve
   // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
   // time as the CEIL of the node's zone levelRange midpoint rather than
@@ -11098,6 +11105,9 @@ export interface HeightStamp {
    *  Smooth carries its brush strength here so the TARGET can stay the honest
    *  local surface: a planar slope then cancels exactly, at any strength. */
   strength?: number;
+  /** Footprint: 'square' reaches max(|dx|, |dz|) < radius (radius is half
+   *  the side). Absent or 'circle' = the original round brush. */
+  shape?: 'circle' | 'square';
   /** Solid inner-radius ratio. Absent preserves the original fully soft brush. */
   hardness?: number;
   /** Optional deterministic built-in mask. Imported paint masks stay editor-local. */
@@ -11161,6 +11171,7 @@ export interface AssetFireEmitter {
 
 export interface PlacedAsset {
   wallFinishes?: import('./wall_finishes').WallFinishes;
+  materialFinishes?: import('./material_finishes').MaterialFinishes;
   building?: import('./building').BuildingMembership;
   path: string; // public GLB url, e.g. "/models/props/well.glb"
   x: number;
@@ -11831,7 +11842,7 @@ export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // and reserved 1_000_000_x singleton ids (the Vale Cup groundskeeper, FURY in
 // Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, the
 // Wyrmwatch harbormaster, the Eastbrook vault keeper, the Highwatch manor
-// steward, practice dummies; each id
+// steward, practice dummies, the Mirefen innkeeper; each id
 // is taken ONCE, tests/reserved_singleton_entity_ids.test.ts pins the band). A singleton NPC takes a reserved id AND
 // `dynamic: true` so the generic world-init loop skips it: that loop allocates
 // ids by iterating the merged NPC table in insertion order, so a plain

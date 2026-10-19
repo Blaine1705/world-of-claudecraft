@@ -1484,7 +1484,8 @@ export const ko_KR: EnTranslations = {
       "drowning": "익사 중!"
     },
     "rest": {
-      "resting": "휴식 중"
+      "resting": "휴식 중",
+      "restArea": "휴식 중: 이곳은 휴식 장소이며, 여기서 휴식 경험치를 얻습니다."
     },
     "paladin": {
       "devotion": "헌신",
@@ -4605,7 +4606,8 @@ export const ko_KR: EnTranslations = {
         "foodVendor": "음식 및 음료 상인",
         "potionVendor": "물약 상인",
         "stableMaster": "마구간지기",
-        "generalGoods": "잡화 상인"
+        "generalGoods": "잡화 상인",
+        "innkeeper": "여관 주인"
       }
     },
     "mobTooltip": {
@@ -10078,6 +10080,33 @@ export const ko_KR: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "대상: {name}",
+      "choose": "겹친 에셋 선택 ({count})",
+      "chooser": "포인터 아래의 에셋 선택",
+      "front": "맨 앞",
+      "behind": "다른 에셋 뒤",
+      "close": "닫기",
+      "keyboard": "이전/다음 또는 화살표 키로 비교하세요. Enter로 선택하고 Escape로 닫습니다.",
+      "hint": "다시 클릭하여 겹친 항목을 전환하거나 이 목록에서 선택하세요.",
+      "asset": "에셋 {number}",
+      "overlapAt": "{name} 위치의 겹친 에셋",
+      "previous": "이전",
+      "next": "다음",
+      "position": "{count}개 중 {current}번째",
+      "details": "항목 {number} · {level}층 · 높이 {height}",
+      "ungroupedDetails": "항목 {number} · 높이 {height}",
+      "hideAbove": "선택한 층 위의 층 숨기기",
+      "allFloors": "모든 층 표시 중",
+      "filteredFloors": "{level}층 위의 층은 숨겨져 있습니다"
+    },
+    "quickActions": {
+      "title": "선택한 에셋",
+      "move": "이동",
+      "frame": "화면에 맞추기",
+      "remove": "제거",
+      "count": "{count}개 선택됨"
+    },
     "buildMode": {
       "materialNames": {
         "WardenStone": "매끄러운 돌",
@@ -10615,6 +10644,8 @@ export const ko_KR: EnTranslations = {
       "lower": "내리기",
       "smooth": "부드럽게",
       "flatten": "평탄화",
+      "slope": "경사",
+      "pond": "연못",
       "tunnel": "Caves",
       "rock": "Rock Gen",
       "build": "Build Model",
@@ -10804,6 +10835,9 @@ export const ko_KR: EnTranslations = {
     },
     "brush": {
       "title": "브러시",
+      "shape": "브러시 모양",
+      "circle": "원형",
+      "square": "정사각형",
       "size": "브러시 크기",
       "strength": "강도",
       "sizeHint": "단축키: [ 와 ] 로 브러시 크기, Shift+[ 와 Shift+] 로 강도 조절.",
@@ -10912,7 +10946,21 @@ export const ko_KR: EnTranslations = {
       "moved": "이 맵에서 이동되었습니다.",
       "original": "원래 위치에 있습니다.",
       "hint": "드래그하거나 화살표 키로 미세 조정하세요. 이동은 이 맵에만 적용되며 오브젝트의 식별자는 그대로이므로 저장된 진행 상황에서도 찾을 수 있습니다.",
-      "reset": "원래 위치로 되돌리기"
+      "reset": "원래 위치로 되돌리기",
+      "edited": "이 맵에서 변경됨.",
+      "rotation": "회전(도)",
+      "size": "크기",
+      "resetAll": "원래대로",
+      "delete": "이 맵에서 삭제",
+      "deleteHint": "이 맵에서만 삭제합니다. 나중에 삭제된 오브젝트 목록에서 복원할 수 있습니다.",
+      "doorDeleteHint": "던전 문을 삭제하면 이 맵에서 지상 입구가 사라집니다.",
+      "dummyDeleteHint": "헤일의 연습 수업은 이 허수아비를 사용합니다. 하나를 삭제하면 이 맵에서 해당 수업을 끝낼 수 없습니다.",
+      "doorFixed": "던전 문은 이동하거나 삭제할 수만 있고, 회전하거나 크기를 바꿀 수는 없습니다.",
+      "deletedTitle": "삭제된 게임플레이 오브젝트",
+      "deletedHint": "이 맵에서 삭제되었습니다. 복원하면 원래 자리로 돌아옵니다.",
+      "deletedRow": "{kind}: {name}",
+      "restore": "복원",
+      "restoredLater": "복원했습니다. 맵을 다시 불러오면 화면에 나타납니다."
     },
     "lightTool": {
       "title": "Point Lights",
@@ -11066,6 +11114,16 @@ export const ko_KR: EnTranslations = {
       "autoTexSteep": "Steep ground texture",
       "autoTexNone": "Leave as is"
     },
+    "materials": {
+      "title": "재질",
+      "hint": "이 모델의 각 부분에 사용할 텍스처를 고르세요. 텍스처는 월드 공간에 타일로 깔리며 모델 UV를 쓰지 않고, 맵과 함께 저장됩니다.",
+      "loading": "모델을 아직 불러오는 중입니다. 잠시 후 다시 선택하면 재질을 편집할 수 있습니다.",
+      "original": "원본",
+      "texture": "텍스처",
+      "tile": "텍스처 배율(타일당 야드)",
+      "color": "Tint",
+      "reset": "원본으로 되돌리기"
+    },
     "flatten": {
       "style": {
         "smooth": "Smooth",
@@ -11085,7 +11143,29 @@ export const ko_KR: EnTranslations = {
       "hint": "평탄화는 드래그를 시작할 때 커서 아래의 높이로 지면을 고릅니다.",
       "hardEdge": "경계 선명하게",
       "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke."
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "목표 높이(야드)",
+      "levelPlaceholder": "드래그 시작점",
+      "levelClear": "지우기",
+      "levelHint": "드래그할 때마다 지면을 이 높이로 평탄하게 만듭니다. 지면을 오른쪽 클릭하면 다른 높이를 고를 수 있습니다.",
+      "levelHintNone": "지면을 오른쪽 클릭해 그 높이를 고정한 뒤, 어디서든 드래그하면 그 높이로 평탄해집니다. 비워 두면 각 드래그가 시작한 지점의 높이로 평탄해집니다.",
+      "levelPicked": "높이를 {height}야드로 고정했습니다."
+    },
+    "slope": {
+      "hint": "경사가 시작될 지면을 오른쪽 클릭하세요. 그다음 끝날 지점을 누른 채 경로를 따라 드래그하면 두 높이 사이가 매끄러운 경사로로 이어집니다.",
+      "start": "시작 높이: {height}야드",
+      "noStart": "아직 시작점이 없습니다. 지면을 오른쪽 클릭해 정하세요.",
+      "clearStart": "시작점 지우기",
+      "needStart": "먼저 지면을 오른쪽 클릭해 경사의 시작점을 정하세요.",
+      "startPicked": "경사 시작점을 {height}야드로 정했습니다."
+    },
+    "pond": {
+      "title": "연못 만들기",
+      "add": "연못 추가",
+      "radius": "연못 반경",
+      "depth": "연못 깊이",
+      "hint": "지면을 클릭하면 둥근 연못을 파고 물을 채웁니다. 원에는 완만한 둑도 포함됩니다. 실행 취소는 물과 웅덩이를 함께 되돌립니다.",
+      "invalid": "이 지면에는 연못을 팔 수 없습니다. 다른 곳을 선택하세요."
     },
     "water": {
       "title": "수면 높이",
@@ -11382,6 +11462,11 @@ export const ko_KR: EnTranslations = {
     },
     "selection": {
       "title": "선택 항목",
+      "heightOffset": "높이 오프셋(야드)",
+      "heightStep": "이동 간격(야드)",
+      "raiseAsset": "올리기",
+      "lowerAsset": "내리기",
+      "heightHint": "음수 값을 사용하면 에셋이 기준 위치 아래로 내려갑니다.",
       "none": "선택된 것이 없습니다. 선택 도구로 배치된 에셋을 클릭하세요.",
       "squareCollision": "Square collision (follows rotation)",
       "asset": "에셋: {name}",
@@ -11392,6 +11477,9 @@ export const ko_KR: EnTranslations = {
       "selectAllOfAsset": "Select all of this asset ({count})",
       "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
       "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "지면에 맞추기",
+      "setGroundTitle": "선택한 에셋을 아래 지형 위로 다시 놓고, 떠 있거나 들어 올린 상태를 없앱니다",
+      "snapGround": "이동할 때 지면에 맞추기",
       "rotation": "회전",
       "scale": "크기",
       "collide": "이동 차단",
@@ -11891,6 +11979,8 @@ export const ko_KR: EnTranslations = {
     },
     "weather": {
       "title": "Weather",
+      "showSnowfall": "눈 내림 표시",
+      "snowfallHint": "스튜디오 미리 보기 설정이며 이 브라우저에 저장됩니다.",
       "zoneTitle": "Weather in this zone",
       "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
       "auto": "Auto",
@@ -11981,6 +12071,8 @@ export const ko_KR: EnTranslations = {
         "lower": "브러시 아래의 지형을 낮춥니다.",
         "smooth": "굴곡을 주변 평균 높이로 부드럽게 만듭니다.",
         "flatten": "드래그를 시작한 지점의 높이로 지면을 평탄하게 만듭니다.",
+        "slope": "오른쪽 클릭으로 시작 높이를 정한 뒤, 다른 높이에서 드래그하면 매끄러운 경사로가 만들어집니다.",
+        "pond": "클릭하면 독립적인 수면을 가진 연못을 팝니다.",
         "paint": "지역 기본값 위에 생태 지표를 칠합니다.",
         "water": "맵 전체의 수면 높이를 설정합니다.",
         "place": "카탈로그 또는 업로드한 애셋을 지면에 배치합니다.",
@@ -12252,6 +12344,7 @@ export const ko_KR: EnTranslations = {
     "newCharacter": "새 캐릭터",
     "appearance": "외형",
     "modelLoading": "캐릭터를 불러오는 중...",
+    "previewPinchHint": "핀치로 확대/축소",
     "customize": "커스터마이즈",
     "body": "체형",
     "genderMale": "남성",
@@ -25480,6 +25573,31 @@ export const ko_KR: EnTranslations = {
         "name": "항만장 탐신",
         "title": "와이름 감시탑 부두지기",
         "greeting": "부두에서 들어와 손 좀 녹이세요. 우리 부두의 배는 긴 동쪽 해안을 따라 윅하버까지 올라갔다가 다시 돌아옵니다. 저 멀리 서쪽에서는 다른 나룻배가 이스트브룩과 밤꽃 평원 사이를 오가지요. 벽에 걸린 지도에 두 항로가 모두 그려져 있습니다. 와이름 감시탑으로 오르기 전에 불가에서 좀 쉬어 가세요."
+      },
+      "innkeeper_maudie": {
+        "name": "모디 탭라이트",
+        "title": "여관 주인",
+        "greeting": "눅눅한 바깥에서 어서 들어오세요, 친구. 불가로 내려가는 계단 조심하시고요. 주전자는 올려져 있고, 벤치는 따뜻하고, 위층 방들도 뽀송하답니다. 펜브리지에서 온 여행자들은 늪지 길이 낮에는 조용하다고 장담하지만, 해가 진 뒤에는 아무도 그 길을 걷지 않아요. 잠시 앉아서 발 좀 쉬어 가세요."
+      },
+      "patron_amos_eelby": {
+        "name": "에이모스 일비",
+        "title": "장어잡이 어부",
+        "greeting": "의자 하나 끌어다 앉게, {className}. 여기 그리셀은 펜브리지 밑의 큰 장어가 헛소문이라고 우기지. 난 그놈을 두 번이나 손으로 잡아 봤다고. 두 번! 세금 징수원처럼 미끌미끌하고, 길이는 이 의자만 했지."
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "그리셀 세지워스",
+        "title": "토탄 채굴꾼",
+        "greeting": "에이모스 말은 신경 쓰지 마. 사십 년 토탄을 캐면서 이 늪에서 건진 이상한 물건이 저 양반이 잡은 장어보다 많아. 장화, 뼈다귀, 안에 든 머리가 아직도 걱정하는 투구까지. 몸 좀 녹이고 가, 불은 공짜니까."
+      },
+      "patron_ned_oxley": {
+        "name": "네드 옥슬리",
+        "title": "가축몰이꾼",
+        "greeting": "둑길로 소 마흔 마리를 몰고 오다가 펜브리지 앞에서 두 마리를 늪에 잃었지. 이 길에서 사람을 배신하지 않는 건 모디의 에일뿐이야. 자네 술값은 자네가 내고."
+      },
+      "patron_hester_quillby": {
+        "name": "헤스터 퀼비",
+        "title": "지도 제작자",
+        "greeting": "이 습지 지도는 사는 족족 한 철도 안 돼서 틀려 버렸어요. 물이 길을 옮기고, 길이 물을 옮기거든요. 그래서 직접 그리고, 잉크가 마르는 동안 여기 마른 자리에 앉아 있는 거예요."
       },
       "reeve_ottoline": {
         "name": "촌장 오톨린",

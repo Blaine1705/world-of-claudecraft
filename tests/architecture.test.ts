@@ -167,7 +167,6 @@ describe('live graphics profile architecture', () => {
 
     const directDeferredProfiles = [
       ['terrain.ts', 'prepareTerrainProfileAssets'],
-      ['water.ts', 'prepareWaterProfileAssets'],
       ['detail_normals.ts', 'prepareStoneDetailProfileAssets'],
       ['worn_stone.ts', 'prepareSurfaceDetailProfileAssets'],
       ['canopy_detail.ts', 'prepareCanopyDetailProfileAssets'],
@@ -411,6 +410,8 @@ const UI_PURE_CORES = [
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/preview_prewarm_core.ts',
+  // The phone creator's one-time pinch hint: its phases and its stored flag.
+  'src/ui/preview_touch_hint_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/guild_ranks_view.ts',
@@ -999,6 +1000,9 @@ const RENDER_PURE_CORES = [
   'src/render/drowned_temple/temple_lure_fx_core.ts',
   // The shared dungeon floor telegraph look (cones, rings, lanes, kick glyphs).
   'src/render/floor_telegraph/telegraph_look_core.ts',
+  // where a body sitting on a seat is drawn, and which seat a screen ray points at
+  'src/render/seated_pose_core.ts',
+  'src/render/seat_pick_core.ts',
   'src/render/ambience_state_core.ts',
   'src/render/ability_vfx/cast_admission_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
@@ -1060,6 +1064,14 @@ const RENDER_PURE_CORES = [
   'src/render/wickharbor_wharf_core.ts',
   'src/render/wickharbor_harbor_core.ts',
   'src/render/wyrmwatch_harbor_house_core.ts',
+  'src/render/mirefen_tavern_core.ts',
+  // the tavern's air for the indoor chase camera (interior_camera_core.ts is registered above)
+  'src/render/mirefen_tavern_interior_core.ts',
+  // the tavern's dog breathing on its porch and its chimney smoke
+  'src/render/mirefen_tavern_dog_core.ts',
+  'src/render/mirefen_tavern_smoke_core.ts',
+  // the tavern's wall fire laid out in its fireplace's mouth
+  'src/render/mirefen_tavern_wall_fire_core.ts',
   'src/render/ship_wake_core.ts',
   'src/render/water_approach_core.ts',
   'src/render/view_candidate_scan_core.ts',
@@ -1146,6 +1158,9 @@ const RENDER_PURE_CORES = [
   'src/render/entry_detail_horizon_core.ts',
   'src/render/gather_batch_reach_core.ts',
   'src/render/zone_feature_cells_core.ts',
+  'src/render/scenery_geometry_lod_core.ts',
+  'src/render/scenery_detail_core.ts',
+  'src/render/scenery_bands/policy_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/quest_beacon_core.ts',
@@ -1202,6 +1217,15 @@ const RENDER_PURE_CORES = [
   'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
+  // Palette lab (?palette=on dev tool): per-zone ground overrides the terrain
+  // caches re-read, and the zone-look model, display solver and export.
+  'src/render/ground_palette_override_core.ts',
+  'src/render/meadow_fullness_core.ts',
+  'src/render/palette_lab/zone_look_core.ts',
+  'src/render/ocean/ocean_spectrum_core.ts',
+  'src/render/ocean/ocean_foam_core.ts',
+  'src/render/ocean/water_character_core.ts',
+  'src/render/ocean/water_liveness_core.ts',
   'src/render/battleground_core.ts',
   'src/render/battleground_fx_core.ts',
   'src/render/battleground_lantern_fx_core.ts',
@@ -1289,6 +1313,9 @@ const RENDER_PURE_CORES = [
   'src/render/point_light_shader_core.ts',
   'src/render/point_light_carriers_core.ts',
   'src/render/final_color_nan_guard_core.ts',
+  // The opt-in cel-shading R&D look (`?cel=on`): URL parse + the toon ramp
+  // patch over three's directional light loop.
+  'src/render/cel_shading_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
@@ -1351,7 +1378,6 @@ const RENDER_PURE_CORES = [
   'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
   'src/render/water_coverage_core.ts',
-  'src/render/water_wave_core.ts',
   'src/render/weather_field_core.ts',
   'src/render/water_flora_core.ts',
   'src/render/water_flora_shader_core.ts',
@@ -3166,6 +3192,9 @@ const UI_DOM_MODULES = [
   // The launcher turntable's loading silhouette: mints its own layer and SVG
   // art (the `= document` default) and moves it between stage containers.
   'src/ui/preview_loading_silhouette.ts',
+  // The phone creator's one-time pinch hint: mints its own tab and glyph (the
+  // `= document` default), remembers the first gesture in localStorage, and times its exit.
+  'src/ui/preview_touch_hint.ts',
   'src/ui/prompt_dialog.ts',
   // The report window body moved whole out of hud.ts (the Phase 9b headroom
   // extraction); it paints #report-window and owns its listeners. Renamed to

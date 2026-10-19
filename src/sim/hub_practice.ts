@@ -29,7 +29,7 @@ import {
 import { MOBS } from './data';
 import { createMob, createNpc } from './entity';
 import { playerDummyRestHp } from './mob/practice_dummies';
-import { practiceDummyPos } from './moved_objects';
+import { objectRemoved, practiceDummyFacing, practiceDummyPos } from './moved_objects';
 import type { SimContext } from './sim_context';
 import type { WorldContent } from './types';
 
@@ -41,40 +41,39 @@ export function hubPracticeEnabled(world: WorldContent): boolean {
 
 export function spawnHubPractice(ctx: SimContext, world: WorldContent): void {
   if (!hubPracticeEnabled(world)) return;
-  // A Studio map may move either dummy (moved_objects.ts); the spawn order and
-  // ids never change, only the mark each one stands on.
-  const dummyPos = practiceDummyPos(
-    world.objectMoves,
-    HUB_TRAINING_DUMMY_ID,
-    HUB_TRAINING_DUMMY_POS,
-  );
-  const dummyTemplate = MOBS[HUB_TRAINING_DUMMY_ID];
-  const dummy = createMob(
-    ctx.nextId++,
-    dummyTemplate,
-    dummyTemplate.maxLevel,
-    ctx.groundPos(dummyPos.x, dummyPos.z),
-  );
-  dummy.facing = 0;
-  dummy.prevFacing = 0;
-  ctx.addEntity(dummy);
+  // A Studio map may move, turn or delete either dummy (moved_objects.ts);
+  // the spawn order and ids never change: a deleted dummy still consumes its
+  // id, so Hale and the healing dummy keep theirs.
+  const moves = world.objectMoves;
+  const dummyId = ctx.nextId++;
+  if (!objectRemoved(moves, 'practiceDummy', HUB_TRAINING_DUMMY_ID)) {
+    const dummyPos = practiceDummyPos(moves, HUB_TRAINING_DUMMY_ID, HUB_TRAINING_DUMMY_POS);
+    const dummyTemplate = MOBS[HUB_TRAINING_DUMMY_ID];
+    const dummy = createMob(
+      dummyId,
+      dummyTemplate,
+      dummyTemplate.maxLevel,
+      ctx.groundPos(dummyPos.x, dummyPos.z),
+    );
+    dummy.facing = practiceDummyFacing(moves, HUB_TRAINING_DUMMY_ID, 0);
+    dummy.prevFacing = dummy.facing;
+    ctx.addEntity(dummy);
+  }
   const def = world.npcs[HUB_SPARRING_MASTER_ID];
   const hale = createNpc(ctx.nextId++, def, ctx.groundPos(def.pos.x, def.pos.z));
   ctx.addEntity(hale);
-  const healingPos = practiceDummyPos(
-    world.objectMoves,
-    HUB_HEALING_DUMMY_ID,
-    HUB_HEALING_DUMMY_POS,
-  );
+  const healingId = ctx.nextId++;
+  if (objectRemoved(moves, 'practiceDummy', HUB_HEALING_DUMMY_ID)) return;
+  const healingPos = practiceDummyPos(moves, HUB_HEALING_DUMMY_ID, HUB_HEALING_DUMMY_POS);
   const healingTemplate = MOBS[HUB_HEALING_DUMMY_ID];
   const healingDummy = createMob(
-    ctx.nextId++,
+    healingId,
     healingTemplate,
     healingTemplate.maxLevel,
     ctx.groundPos(healingPos.x, healingPos.z),
   );
-  healingDummy.facing = 0;
-  healingDummy.prevFacing = 0;
+  healingDummy.facing = practiceDummyFacing(moves, HUB_HEALING_DUMMY_ID, 0);
+  healingDummy.prevFacing = healingDummy.facing;
   // Begins injured, same rest fraction as the Highwatch row's own friendly
   // dummy (mob/practice_dummies.ts): a healer arrives at something worth
   // healing rather than a wall of overheal. No BIS vitals stamp: this

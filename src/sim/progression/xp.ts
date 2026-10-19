@@ -12,6 +12,7 @@ import {
 } from '../building_layout';
 import { getActiveWorldContent, isBuiltinWorldActive } from '../data';
 import { KIT_BUILDINGS } from '../kit_buildings';
+import { tavernRestsAt } from '../mirefen_tavern';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type BuildingDef, canPrestige, DT, type Entity, MAX_LEVEL, xpForLevel } from '../types';
@@ -32,15 +33,17 @@ const RESTED_INN_PADDING = 2; // yards of slack around an editor-placed inn that
 // pipeline and never appears in props.buildings). The kit footprint is the
 // kit collider's own OBB, so it takes the collider-correct point test. The
 // Harbormaster's House at the Wyrmwatch cliff harbor rests a body on its floor
-// the same way (wyrmwatch_harbor_house.ts), on the built-in world only.
+// the same way (wyrmwatch_harbor_house.ts), and so does the whole inside of the
+// Mirefen tavern (mirefen_tavern.ts), on the built-in world only.
 export function isResting(
   p: Entity,
   buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
   kitBuildings: readonly BuildingDef[] = KIT_BUILDINGS,
-  harborHouse: boolean = isBuiltinWorldActive(),
+  builtInRests: boolean = isBuiltinWorldActive(),
 ): boolean {
   if (p.inCombat) return false;
-  if (harborHouse && harborHouseRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
+  if (builtInRests && harborHouseRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
+  if (builtInRests && tavernRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
   for (const b of buildings) {
     if (b.kind !== 'inn') continue;
     if (buildingContainsRestPoint(b, p.pos.x, p.pos.z, buildingRestPadding(b))) return true;

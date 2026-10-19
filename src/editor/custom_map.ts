@@ -1,3 +1,4 @@
+import { cloneMaterialFinishes } from '../sim/material_finishes';
 import { cloneWallFinishes } from '../sim/wall_finishes';
 import { WORLD_SEED } from '../sim/world_seed';
 // The CustomMap document: the editor's canonical, serializable map. The type and
@@ -887,6 +888,7 @@ export function placementsToRenderAssets(
     }
     if (p.modelTexId !== undefined) placed.modelTexId = p.modelTexId;
     if (p.wallFinishes) placed.wallFinishes = cloneWallFinishes(p.wallFinishes);
+    if (p.materialFinishes) placed.materialFinishes = cloneMaterialFinishes(p.materialFinishes);
     if (p.building) placed.building = { ...p.building };
     if (p.modelTexTile !== undefined) placed.modelTexTile = p.modelTexTile;
     if (p.modelHue !== undefined) placed.modelHue = p.modelHue;

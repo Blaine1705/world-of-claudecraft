@@ -184,6 +184,8 @@ const ZERO_LITERAL_SECTIONS = [
   'dungeon objectives tracker',
   // tokenized as authored (the outline reads --gold, the sheen --color-gold-300)
   'character preview loading silhouette',
+  // tokenized as authored (the tab reads --gold, --color-gold-300 and --color-bg-dark)
+  'character preview touch hint',
 ];
 
 // A section counts zero when it is tokenized AND when it is empty, so the zero pin

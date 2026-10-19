@@ -204,8 +204,12 @@ describe('FURY WARFARE stock', () => {
     // chapel step (7 yd from Brother Aldric) for the town's eastern edge. The
     // placement still derives from EASTBROOK_NPC_PLACEMENTS_BY_ID.fury, so his
     // facing moved with him.
-    expect(NPCS.fury.pos).toEqual({ x: 16, z: -78 });
-    expect(NPCS.fury.facing).toBe(-2.2455372690184494);
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: the
+    // smithy's forge shelter took the north road's old line, so the road swings
+    // west round it over his stand and he keeps the town's edge a few strides
+    // on, between that road and the coast track.
+    expect(NPCS.fury.pos).toEqual({ x: 21, z: -83.5 });
+    expect(NPCS.fury.facing).toBe(-2.0570389598824015);
     expect(NPCS.fury.dynamic).toBe(true);
     // The entry tier first, then the two honor trinkets, then Warfare Season 2
     // (pinned as the gear tail in warfare_season2.test.ts), then the buddy.

@@ -43,6 +43,7 @@ export const HIGHWATCH_GUILD_ASSET = {
   inputs: [
     'scripts/assets/highwatch_guild/guild_source.glb',
     'scripts/assets/highwatch_guild/build_guild.py',
+    'scripts/assets/highwatch_guild/guild_materials.py',
     'scripts/assets/highwatch_guild/guild_plan.py',
     'scripts/assets/highwatch_guild/guild_shell.py',
     'scripts/assets/highwatch_guild/guild_furnish.py',

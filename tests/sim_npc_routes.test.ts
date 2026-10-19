@@ -19,9 +19,11 @@ const SEED = 42;
 // the town props, so patrol legs are unobstructed. Moved out here in the v0.31
 // merge: the Eastbrook rebuild dropped the Grand Armoury footprint (17.5, -5.5,
 // 13x9) across the old x 10..22, z -10 leg, so the walker collided mid-route.
-const A = { x: -60, z: -45 };
-const B = { x: -54, z: -45 };
-const C = { x: -48, z: -45 };
+// Moved 15 yd north for the World of ClaudeCraft Studio map's arrangement of
+// the town: the quay cottage stands on the old z -45 leg now.
+const A = { x: -58, z: -30 };
+const B = { x: -52, z: -30 };
+const C = { x: -46, z: -30 };
 
 function npcDef(id: string, route?: NpcRoute): NpcDef {
   return {

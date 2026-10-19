@@ -149,8 +149,10 @@ export function eastbrookRoofVisibilityPlanInto(
   eyeY: number,
   eyeZ: number,
   fogFar: number,
+  cullX = camX,
+  cullZ = camZ,
 ): EastbrookRoofVisibilityPlan {
-  out.visible = eastbrookFogVisible(camX, camZ, target.x, target.z, fogFar, target.cullRadius);
+  out.visible = eastbrookFogVisible(cullX, cullZ, target.x, target.z, fogFar, target.cullRadius);
   if (!out.visible) {
     out.hidden = wasHidden;
     out.hiddenChanged = false;

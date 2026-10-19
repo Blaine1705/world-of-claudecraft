@@ -2,6 +2,7 @@
 // as server map storage, projects through the editor-to-engine adapter, and
 // boots the real deterministic Sim before any bytes are offered to the user.
 
+import { materialFinishTextureRefs } from '../sim/material_finishes';
 import { Sim } from '../sim/sim';
 import type { WorldContent } from '../sim/types';
 import { wallFinishTextureRefs } from '../sim/wall_finishes';
@@ -59,6 +60,7 @@ export function bundleDependencyRefs(map: CustomMap): BundleDependencyRefs {
   const textures = new Set<string>();
   for (const placement of map.placements) {
     for (const sha of wallFinishTextureRefs(placement.wallFinishes)) textures.add(sha);
+    for (const sha of materialFinishTextureRefs(placement.materialFinishes)) textures.add(sha);
   }
   for (const swatch of map.biomePaint?.custom ?? []) {
     if (swatch.textureSha) textures.add(swatch.textureSha);

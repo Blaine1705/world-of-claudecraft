@@ -197,58 +197,16 @@ describe('Eastbrook Grand Armoury retirement (round 4)', () => {
     ]);
   });
 
-  it('pins the KayKit barracks and watch tower garrison on the freed Wolf Run lot', () => {
-    expect(garrisonDecorProp('hexBarracks')).toEqual({
-      key: 'hexBarracks',
-      x: 17.5,
-      z: -5.5,
-      rot: -1.5707963267948966,
-      scale: 6.5,
-      r: 5.2,
-      h: 11,
-      hw: 4.7,
-      hd: 4.5,
-    });
-    expect(garrisonDecorProp('hexWatchtower')).toEqual({
-      key: 'hexWatchtower',
-      x: 27,
-      z: -13,
-      rot: 2.2,
-      scale: 6.5,
-      r: 2.4,
-      h: 12,
-    });
+  it('clears the KayKit barracks and watch tower garrison from the Wolf Run lot', () => {
+    expect(garrisonDecorProp('hexBarracks')).toBeUndefined();
+    expect(garrisonDecorProp('hexWatchtower')).toBeUndefined();
   });
 
-  it('collides the garrison as the authored box and circle with visual-height tops', () => {
-    const colliders = colliderInternalsForTest.staticWorldColliders(SEED);
-    const barracks = colliders.find(
-      (collider) =>
-        collider.type === 'obb' && collider.x === BARRACKS_LOT.x && collider.z === BARRACKS_LOT.z,
-    );
-    expect(barracks).toMatchObject({
-      type: 'obb',
-      hw: 4.7,
-      hd: 4.5,
-      rot: -1.5707963267948966,
-      cameraTopY: terrainHeight(BARRACKS_LOT.x, BARRACKS_LOT.z, SEED) + 11,
-    });
-    const watchtower = colliders.find(
-      (collider) => collider.type === 'circle' && collider.x === 27 && collider.z === -13,
-    );
-    expect(watchtower).toMatchObject({
-      type: 'circle',
-      r: 2.4,
-      cameraTopY: terrainHeight(27, -13, SEED) + 12,
-    });
-
-    // The lot center blocks (the barracks stands there), the approach front
-    // keeps the route body radius clear of the facade, and ground the old
-    // armoury footprint walled off past the barracks box is walkable again.
-    expect(isBlocked(SEED, BARRACKS_LOT.x, BARRACKS_LOT.z, 0)).toBe(true);
+  it('leaves the Wolf Run garrison lot unblocked', () => {
+    expect(isBlocked(SEED, BARRACKS_LOT.x, BARRACKS_LOT.z, 0.5)).toBe(false);
     expect(isBlocked(SEED, BARRACKS_FRONT.x, BARRACKS_FRONT.z, 0.8)).toBe(false);
     expect(isBlocked(SEED, 13.5, -11, 0.5)).toBe(false);
-    expect(isBlocked(SEED, 27, -13, 0.5)).toBe(true);
+    expect(isBlocked(SEED, 27, -13, 0.5)).toBe(false);
   });
 
   it('grants no rest anywhere on the garrison lot', () => {
@@ -340,17 +298,24 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     if (!fenbridgeInn) throw new Error('missing Fenbridge inn fixture');
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
-      // the painted tavern on the main street (fenbridge_layout.ts)
+      // the painted tavern on the main street, stood grand at 1.2 (fenbridge_layout.ts)
       assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
-      x: 12.25,
-      z: 299.9,
-      w: 20,
-      d: 13,
+      x: 13.55,
+      z: 298,
+      w: 24,
+      d: 15.6,
       rot: FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn.rotation,
     });
 
     const restPadding = buildingRestPadding(fenbridgeInn);
-    const restPoint = authoredInn.frontStandingPoint;
+    // on the door's line, a step inside the padded rest area (the grand inn's
+    // visitor stand is 2.16 yd off its wall, just past it)
+    const restPoint = localToWorld(
+      authoredInn.position,
+      authoredInn.rotation,
+      authoredInn.sockets.entrance.localPosition.x,
+      -(authoredInn.nativeDimensions.depth / 2 + restPadding - 0.25),
+    );
     const outsideRestPoint = localToWorld(
       authoredInn.position,
       authoredInn.rotation,

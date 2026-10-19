@@ -44,8 +44,10 @@ import {
 } from '../src/render/fenbridge_town_visibility_core';
 import { GFX, gfxInternalsForTest } from '../src/render/gfx';
 import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
+import { interiorCameraInternalsForTest } from '../src/render/interior_camera';
 import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { isOccluderGhostMaterial } from '../src/render/occluder_ghost_variant_key';
+import { placedTownCameraInterior } from '../src/render/placed_town_interior_core';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
@@ -1241,6 +1243,49 @@ describe('Fenbridge dedicated town renderer', () => {
     );
   });
 
+  it('keeps the indoor camera to every walk-in building it stands, and drops the rooms with it', () => {
+    // each walk-in painted building registers its air (placed_town_interiors.ts), stood on the
+    // ground the view stands its building on (a slope, so a wrong anchor reads differently)
+    const ground = (x: number, z: number) => 1.2 + 0.03 * x - 0.02 * z;
+    const rooms = () => interiorCameraInternalsForTest.interiors();
+    const walkIn = FENBRIDGE_LAYOUT.buildings.filter((building) => building.walkIn);
+    expect(walkIn.length).toBeGreaterThan(1);
+    interiorCameraInternalsForTest.reset();
+    try {
+      fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms().map((room) => room.id)).toEqual(
+        walkIn.map((building) => `placed_town:${building.id}`),
+      );
+      for (const [index, building] of walkIn.entries()) {
+        expect(rooms()[index], building.id).toEqual(
+          placedTownCameraInterior(building, ground(building.placement.x, building.placement.z)),
+        );
+      }
+      // a rebuild replaces them, never doubles them
+      fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms()).toHaveLength(walkIn.length);
+      // a document that owns the buildings as placements keeps no town air
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        placements: [],
+        promotedScenery: { authoredTowns: true },
+      });
+      try {
+        fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+        expect(rooms()).toEqual([]);
+      } finally {
+        setActiveWorldContent(null);
+      }
+      // ...nor does a world without the town
+      fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), ground, true);
+      expect(rooms()).toHaveLength(walkIn.length);
+      fenbridgeTownInternalsForTest.buildFromSources(new Map(), () => 0, false);
+      expect(rooms()).toEqual([]);
+    } finally {
+      interiorCameraInternalsForTest.reset();
+    }
+  });
+
   it('omits muster-board overlay evidence when the active-world service is absent', () => {
     setActiveWorldContent({
       ...BUILTIN_WORLD,
@@ -1281,12 +1326,13 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(view.staticRevealRoots()).toContain(micro);
 
     // Camera outside the town cull radius, town and buildings inside the fog.
-    // The radius is the hub ring plus a fixed margin, and it stayed where the
-    // walled town had it (the 34-yard hub plus half a twelve-yard wing) when
-    // the palisade came down, so opening the town moved no cull or reveal.
+    // The radius is the hub ring plus a fixed margin, where the walled town
+    // had it (the 34-yard hub plus half a twelve-yard wing, 40 yards), or
+    // further, so it holds every building's own cull circle whole: stood
+    // grand, the apothecary's reaches about 44.8 yards out.
     const hub = FENBRIDGE_LAYOUT.hub.center;
     const cullRadius = fenbridgeTownInternalsForTest.townCullRadius;
-    expect(cullRadius).toBe(40);
+    expect(cullRadius).toBeCloseTo(44.76, 2);
     const approachX = hub.x + cullRadius + 20;
     view.update(approachX, 2, hub.z, approachX - 5, 2, hub.z, 400, 0.05);
     expect(requested).toEqual(['fenbridge-town-static']);
@@ -1664,6 +1710,51 @@ describe('Fenbridge dedicated town renderer', () => {
       standAt(fogFar + farCorner - 0.01);
       expect(group.visible, `${building.id} back inside the fog`).toBe(true);
     }
+  });
+
+  it('keeps a grand building drawn from beyond its back wall: the town circle holds its cull', () => {
+    // Stood grand, the north street's shops reach past the hub ring and its
+    // six-yard margin. The town-wide fog answer hides every building with the
+    // batches, so a camera backing away OUT past a building's back wall (the
+    // town at its farthest) lost the building while the fog still reached it,
+    // unless the town circle holds that building's own cull circle whole.
+    setGfx({ standardMaterials: false, dynamicShadows: false, surfaceDetail: false });
+    const fogFar = 100;
+    const view = fenbridgeTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    const hub = FENBRIDGE_LAYOUT.hub.center;
+    const cullRadius = fenbridgeTownInternalsForTest.townCullRadius;
+    const pastTheMargin: string[] = [];
+    for (const building of FENBRIDGE_LAYOUT.buildings) {
+      const group = buildingGroup(view.group, building.id);
+      const { footprint, reach } = building;
+      const center = footprint.center;
+      const farCorner = Math.max(
+        ...reachCorners(building).map((corner) =>
+          Math.hypot(corner.x - center.x, corner.z - center.z),
+        ),
+      );
+      const widest =
+        Math.hypot(reach.center.x - center.x, reach.center.z - center.z) +
+        Math.hypot(reach.halfWidth, reach.halfDepth);
+      const dx = center.x - hub.x;
+      const dz = center.z - hub.z;
+      const length = Math.hypot(dx, dz);
+      if (length + widest > FENBRIDGE_LAYOUT.hub.radius + 6) pastTheMargin.push(building.id);
+      expect(length + widest, `${building.id} cull circle inside the town's`).toBeLessThanOrEqual(
+        cullRadius + 1e-9,
+      );
+      const standAt = (distance: number): void => {
+        const x = center.x + (dx / length) * distance;
+        const z = center.z + (dz / length) * distance;
+        view.update(x, 5, z, x, 5, z, fogFar, 0.05);
+      };
+      standAt(fogFar + farCorner - 0.01);
+      expect(group.visible, `${building.id} from beyond its back wall`).toBe(true);
+      standAt(fogFar + widest + 0.01);
+      expect(group.visible, `${building.id} past its own cull radius`).toBe(false);
+    }
+    // the case is live: the grand apothecary and bank reach past the margin
+    expect(pastTheMargin).toEqual(['fenbridge_moonwort_apothecary', 'fenbridge_gilded_strongbox']);
   });
 
   it('returns an empty stable custom-world root without requesting any template', () => {

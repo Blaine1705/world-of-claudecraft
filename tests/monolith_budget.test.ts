@@ -543,9 +543,13 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 18054 minus that removal. Exact merged count (wc -l), zero slack.
-    // LOWERED to 18025 by Lantern Hall's guild window: the tooltip's weapon-proc effect
-    // text moved to weapon_proc_text.ts, paying for the window's wiring. Exact count.
-    ceiling: 18025,
+    // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
+    // wc -l on the merged tree. Exact count.
+    // LOWERED to 18021 by Lantern Hall's guild window, merged over the v0.45.0 integration:
+    // the tooltip's weapon-proc effect text moved to weapon_proc_text.ts, paying for the
+    // window's wiring. wc -l on the merged tree, exact count.
+    ceiling: 18021,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1033,10 +1037,15 @@ const MONOLITHS: MonolithRow[] = [
     // Highwatch, placed_town_buildings.ts): Eastbrook's and Fenbridge's mount,
     // reveal-gate and two per-frame update blocks folded into loops over
     // townViews, which paid for the third town and 31 lines more. wc -l.
-    // LOWERED 12395 -> 12392 when the chase camera's floor (ground, rift tier, maze
+    // LOWERED 12395 -> 12393 when the chase camera's floor (ground, rift tier, maze
     // hedges) moved into chase_camera_floor_core.ts, net of the indoor camera clamp's
-    // wiring (interior_camera.ts). wc -l. Exact count.
-    ceiling: 12392,
+    // wiring (interior_camera.ts) and the turned-room camera fix. wc -l at the
+    // integration merge of #4525. Exact count.
+    // LOWERED 12688 -> 12686 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
+    // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
+    // merged tree. Exact count.
+    ceiling: 12405,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1273,9 +1282,13 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 11594 by the Studio movable gameplay objects change: the
     // dev-only healer practice dummy spawn moved to hub_practice.ts, paying for
     // the moved-objects ctx view and farm-bed resolver. Exact count, zero slack.
-    // LOWERED to 11585 by Lantern Hall: the quest half of a plain NPC talk moved to
-    // quests/npc_quest_talk.ts, paying for the guild's talk route and two IWorld members.
-    ceiling: 11585,
+    // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
+    // (bound straight into the context and the motion deps), paying for the sitOnSeat and
+    // resting delegates. Exact count.
+    // LOWERED to 11582 by Lantern Hall, merged over the v0.45.0 integration: the quest half
+    // of a plain NPC talk moved to quests/npc_quest_talk.ts, paying for the guild's talk
+    // route and two IWorld members. wc -l on the merged tree, exact count.
+    ceiling: 11582,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1525,7 +1538,13 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 10958 when the launcher's 3D stage build (and its panel-to-container
     // map) moved into src/game/launcher_preview_stage.ts, which builds it at once
     // instead of behind charactersReady(). Exact count (wc -l), zero slack.
-    ceiling: 10958,
+    // LOWERED 10958 -> 10924 at the integration merge of #4525 (grand painted towns +
+    // the Mirefen tavern): the world hover cursor and its tooltip moved whole into
+    // src/game/hover_cursor.ts, paying for the tavern's seat wiring. wc -l. Exact count.
+    // Re-pinned at the merge of origin/feature/v045-integration (tip 43f0cfd0c04) into
+    // feature/genshin-artstyle: both parents' non-overlapping additions compose to 10934
+    // (wc -l < src/main.ts). Exact merged count, zero slack.
+    ceiling: 10934,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1796,6 +1815,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 9758 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 9764 minus that removal. Exact merged count (wc -l), zero slack.
+    // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
+    // on the merged tree. Exact count.
     ceiling: 9758,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
@@ -1992,7 +2014,13 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 5338 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 5341 minus that removal. Exact merged count (wc -l), zero slack.
-    ceiling: 5338,
+    // LOWERED 5356 -> 5355 at the release/v0.45.0 merge into feature/mirefen-tavern:
+    // the tavern's input_signature.ts extraction pays for the tavern's wiring. wc -l on the
+    // merged tree. Exact count.
+    // LOWERED 5338 -> 5330 at the integration merge of #4525: the reconnect backoff
+    // schedule moved into reconnect_policy.ts beside its predicates, paying for the
+    // tavern's resting getter and sitOnSeat send. wc -l. Exact count.
+    ceiling: 5330,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2256,7 +2284,10 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the paved causeway import), exact merged count, within the
     // release/v0.45.0 ceiling the branch was held to.
-    ceiling: 3864,
+    // v0.45 integration sync at 78c350c8d55 into cel-shading-rnd:
+    // parent pins 3996 and 3864; combined existing wiring,
+    // exact merged count with no new coordinator behavior or slack.
+    ceiling: 3867,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

@@ -65,6 +65,14 @@ import {
   splitKitSurfacesByUv,
 } from './kit_uv_surface_core';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
+import {
+  buildMirefenTavern,
+  clearMirefenTavernShell,
+  mirefenTavernFlameSpots,
+  mirefenTavernLights,
+  mirefenTavernPrewarmParts,
+  updateMirefenTavernShell,
+} from './mirefen_tavern';
 import { MUSTER_KIT_PROP_DEFS, MUSTER_LOW_TIER_KIT_KEYS, renderDecorProps } from './muster_camps';
 import {
   advanceOccluderFade,
@@ -84,6 +92,12 @@ import {
   updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryClutterFar,
+  sceneryStructureFar,
+} from './scenery_detail';
 import { shipWakePrewarmParts } from './ship_wake';
 import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
 import { buildScheduledShips, type FerryViewSource } from './transport_ferry_ships';
@@ -1060,14 +1074,16 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   // moored transport ships draw their own merged, vertex-coloured meshes
   // (transport_ship.ts), and so do the berths' route markers
   // (harbor_route_markers.ts), the Wyrmwatch cliff harbor (wyrmwatch_harbor.ts), the
-  // Wickharbor ferry wharf (wickharbor_wharf.ts) and the rest of Wickharbor's harbor
-  // (wickharbor_harbor.ts): one twin per distinct program, shadow variant included
+  // Wickharbor ferry wharf (wickharbor_wharf.ts), the rest of Wickharbor's harbor
+  // (wickharbor_harbor.ts) and the Mirefen tavern (mirefen_tavern.ts): one twin per
+  // distinct program, shadow variant included
   for (const part of [
     ...transportShipPrewarmParts(),
     ...harborRouteMarkerPrewarmParts(),
     ...wyrmwatchHarborPrewarmParts(),
     ...wickharborWharfPrewarmParts(),
     ...wickharborHarborPrewarmParts(),
+    ...mirefenTavernPrewarmParts(),
     highwatchManorSmokePrewarmPart(),
     highwatchManorLanePrewarmPart(),
   ]) {
@@ -1795,6 +1811,25 @@ export function buildProps(
     group.add(buildWickharborWharf());
     group.add(buildWickharborHarbor());
   }
+  // ...and the Mirefen tavern on the Fenbridge road (render/mirefen_tavern.ts): its walls,
+  // roofs, gallery and partitions fade one by one for the camera, its fires, chandelier and lanterns lit like a campfire (root-level,
+  // world-positioned, in the fire-light budget)
+  if (builtInWorld) {
+    // the whole tavern stays out of the band merge: it is already one mesh per material (the
+    // shell parts one per part), so a re-bake would only hold a second copy of its geometry
+    // beside the one the prewarm and the live draw share
+    const tavern = buildMirefenTavern();
+    group.add(tavern);
+    tavern.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) keepFromMerge.add(o as THREE.Mesh);
+    });
+    for (const light of mirefenTavernLights()) {
+      group.add(light);
+      fireLights.push(light);
+    }
+  } else {
+    clearMirefenTavernShell();
+  }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
   activeContent.props.stalls.forEach((s, i) => {
@@ -1977,6 +2012,26 @@ export function buildProps(
     g.position.set(x, y, z);
     group.add(shadowed(g));
     registerHideable(g, circleFootprint(x, z, 0.85, y + 1.45, 2.4));
+  }
+  // the Mirefen tavern's round hearth and wall fire burn with the built-in campfires' live
+  // flame (the legacy lathe, built-in world only), each in a sized holder (the flicker writes
+  // the flame's own scale; render/mirefen_tavern.ts)
+  if (legacyFlameGeo) {
+    for (const spot of mirefenTavernFlameSpots()) {
+      const flame = buildLegacyCampfireFlame(legacyFlameGeo, {
+        color: 0xffaa33,
+        emissive: 0xff6600,
+        emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
+      });
+      const holder = new THREE.Group();
+      holder.position.set(spot.x, spot.y, spot.z);
+      holder.scale.set(spot.scale, spot.scale, spot.scale * (spot.depthZ ?? 1));
+      holder.add(flame);
+      group.add(holder);
+      flames.push(flame);
+      keepLiveMeshes.add(flame);
+      noShadow.add(flame);
+    }
   }
 
   // ---- bandit/war tents: Kenney ridge tents, opening on +z, hideable -------
@@ -2678,6 +2733,7 @@ export function buildProps(
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
   const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
+  prepareSceneryDetailRoot(group);
   const cullPass = newPropCullPass();
   let revealGate: RevealGateCore | null = null;
   let bandRevealGate: RevealGateCore | null = null;
@@ -2707,25 +2763,49 @@ export function buildProps(
       dt: number,
       reducedMotion = false,
     ): void {
-      const fogFarSq = fogFar * fogFar;
+      const lowCull = isLowSceneryCullActive(fogFar);
+      const clutterFar = sceneryClutterFar(fogFar);
+      const clutterFarSq = clutterFar * clutterFar;
+      const structureFar = sceneryStructureFar(fogFar);
+      const cullX = lowCull ? eyeX : camX;
+      const cullZ = lowCull ? eyeZ : camZ;
       scheduledShips?.sync(dt);
       manorSmoke?.update(camX, camZ, dt);
       for (let i = 0; i < transportShips.length; i++) {
-        transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
+        transportShips[i].update(
+          camX,
+          camY,
+          camZ,
+          eyeX,
+          eyeY,
+          eyeZ,
+          structureFar,
+          dt,
+          reducedMotion,
+        );
       }
-      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
+      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, structureFar);
+      updateMirefenTavernShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, structureFar);
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent
       // priority and, on a frame where several bands escape at once, nearest
       // to the camera first.
-      updatePropCullables(cullables, camX, camZ, fogFar, fogFarSq, bandRevealGate, cullPass);
+      updatePropCullables(
+        cullables,
+        cullX,
+        cullZ,
+        clutterFar,
+        clutterFarSq,
+        bandRevealGate,
+        cullPass,
+      );
       // Far-cell swap first (prop_cell_core): distant cells draw their merged
       // bake and suppress the members' individual baked meshes; near cells
       // (where the ghost fade can fire) draw the individuals while the bake
       // stays as the shadow-only caster. Pixel-identical both ways.
       for (const cell of farCells) {
-        updatePropCell(cell, camX, camZ, fogFar, undefined, revealGate);
+        updatePropCell(cell, cullX, cullZ, structureFar, undefined, revealGate);
       }
       // Deliberately NO first-sight reveal gate here (unlike the bands): tried
       // and reverted. Gating each hideable's first fog reveal put 116 keys and
@@ -2737,9 +2817,9 @@ export function buildProps(
       // a handful of keys with the proven bake as the stand-in).
       for (let i = 0; i < hideables.length; i++) {
         const h = hideables[i];
-        const dx = camX - h.x,
-          dz = camZ - h.z;
-        const reach = fogFar + h.cull;
+        const dx = cullX - h.x,
+          dz = cullZ - h.z;
+        const reach = structureFar + h.cull;
         if (dx * dx + dz * dz >= reach * reach) {
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;

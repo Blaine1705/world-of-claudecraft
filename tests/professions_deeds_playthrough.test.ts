@@ -484,8 +484,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // world-layout re-hunt yields 2; the release/v0.43.0 merge into
     // feature/world-quests yields 9 (the moved hedge_knight camp, c43178a68c);
     // the four built dungeon entrances (named at the koi hunt above) yield 1;
-    // the Fenbridge rebuild (named at the koi hunt above) yields 3.
-    expect(hitAt).toBe(3);
+    // the Fenbridge rebuild (named at the koi hunt above) yields 3; the grand
+    // painted towns and the Mirefen tavern (#4525) yield 5.
+    expect(hitAt).toBe(5);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     // The signature rides materialSources, not instance.signer (the two are
     // mutually exclusive; corpse_harvest_grant.test.ts / corpse_harvest_sim.test.ts

@@ -10,7 +10,7 @@
 
 import { DUNGEONS } from './data';
 import { MAX_AGGRO_RADIUS } from './mob/locomotion';
-import { dungeonDoorPos, movesKind, type ObjectMoves } from './moved_objects';
+import { dungeonDoorPos, movesKind, type ObjectMoves, objectRemoved } from './moved_objects';
 
 // The clear radius around a door is exactly the aggro-radius clamp (imported, not a
 // re-typed literal), so a mob spawned strictly outside this ring can never aggro a
@@ -53,6 +53,7 @@ function doorsFor(moves: ObjectMoves | undefined): ReadonlyArray<{ x: number; z:
   const doors: { x: number; z: number }[] = [];
   for (const d of Object.values(DUNGEONS)) {
     if (d.overworldDoor === false || !d.doorPos) continue;
+    if (objectRemoved(moves, 'dungeonDoor', d.id)) continue;
     const door = dungeonDoorPos(moves, d);
     const key = `${door.x},${door.z}`;
     if (seen.has(key)) continue;

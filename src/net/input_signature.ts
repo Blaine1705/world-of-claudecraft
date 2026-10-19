@@ -1,5 +1,13 @@
 import type { MoveInput } from '../sim/types';
 
+/** The one-frame inputs (a jump, a turn edge) held until the next send (moved from
+ *  online.ts). */
+export interface PendingTransientInput {
+  jump: boolean;
+  turnLeft: boolean;
+  turnRight: boolean;
+}
+
 export function inputSignature(mi: MoveInput, mouselookFacing: number | null): string {
   const facing = mouselookFacing === null ? '' : Math.round(mouselookFacing * 10000).toString();
   return [

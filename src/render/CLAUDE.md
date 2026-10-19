@@ -19,7 +19,8 @@ Everything else is a sibling module in one of these families:
   owns: `terrain.ts` (chunked LOD + PBR splat), `props.ts`/`foliage.ts`/
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
   shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
-  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`.
+  facing-aligned character volume wakes in `water_simulation.ts`; the surface
+  itself is the FFT ocean in `ocean/`, see its `CLAUDE.md`), `sky.ts`.
   Event/minigame scenes follow the same pattern: `jail_scene.ts`,
   `yumi_*.ts`, `battleground*.ts` (Thornhollow Fields:
   kit-module field from the pure `battleground_core.ts` manifest, entity props
@@ -142,6 +143,15 @@ Everything else is a sibling module in one of these families:
   reference view, so a one-off giant keeps its whole group to the horizon with nothing
   to write anywhere. Never on a collider-backed family (the distance rule alone), never
   a per-family distance table.
+- **Low coconut batches:** `jungle_features.ts` builds coconut parts through
+  `static_instance_cells.ts` before zone attach, preparation and shadow registration.
+  `GFX.coconutCellSize` controls the build-time grid (`?gfxo=coconutCellSize:0`
+  restores one batch per part). Cells share the original geometry/material and keep
+  every placement; only ordinary full-bounds frustum rejection changes. They do not
+  register separate distance or apparent-size culls. The jungle view disposes its
+  cell buffers and rebaked coconut geometry through `renderer_resource_lifecycle.ts`,
+  never borrowed GLB materials. Tests: `static_instance_cells.test.ts` and
+  `jungle_feature_cells.test.ts`.
 - **Zone streaming + residency:** `zone_streaming.ts` (pure policy: WHICH
   zones to materialize and in what order, feeding the renderer's background
   prepare queue), `chunk_residency_core.ts` (chunk-level "how far can the
@@ -189,18 +199,30 @@ Everything else is a sibling module in one of these families:
 - `interior_camera.ts` over `interior_camera_core.ts`: the indoor camera clamp, the ONE
   scoped exception on the built-in world to the pinned rule that scene geometry never shortens
   the chase boom (`tests/graphics_overhaul_integration.test.ts`). A walk-in building registers
-  its AIR (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world)
-  with `registerCameraInterior` when it is built and drops it on teardown; while the player's
-  eye stands in it, the drawn camera stays in that air (pull-in at once, eased release, a
-  `preserve-angle` interior only shortens the boom along the requested ray); walking in, the
-  lens is held under the door's head and follows through the doorway from outside
-  (`interiorEntryCap`); bodies outside lose their nameplates and chat bubbles unless seen
-  through an opening. Outdoors it touches nothing. Reference registrant: the placed-town
-  view (`placed_town_buildings.ts`) registers each walk-in painted building's air from
-  `placed_town_interior_core.ts` (rooms and doors per model, at the building's scale and
-  turn), and hands the same doors to the town's camera fade, so a walk-in building stays
+  its AIR (boxes, optionally rounded by a vertical cylinder, plus its openings onto the world;
+  square to the world's axes, or to the building's own `InteriorFrame`, an origin and a turn,
+  for one stood at any other angle: every query still takes world points) with
+  `registerCameraInterior` when it is built and drops it on teardown; while the player's
+  eye stands in it, the drawn camera stays in that air (pull-in at once, eased release, the
+  least flattening under a lintel or a ceiling, a lift or swing over a cramped spot, a cut to
+  the eyes in a corner nothing escapes; a `preserve-angle` interior instead keeps the
+  requested ray and only shortens the boom along it); walking in, the lens is held under the
+  door's head and follows through the doorway from outside (`interiorEntryCap`, a ray out
+  through an opening runs on past it), so nothing is cut away round the player; bodies
+  outside lose their nameplates and chat bubbles unless seen through an opening. Outdoors it
+  touches nothing. Reference registrants: every town view that stands painted buildings (the
+  placed-town view `placed_town_buildings.ts` behind Highwatch, `eastbrook_town.ts`,
+  `fenbridge_town.ts`) registers each walk-in building's air through its own registrar
+  (`placed_town_interiors.ts`: cleared as the view builds, one `add` per building it stands)
+  from `placed_town_interior_core.ts` (rooms and doors per model at authored size, carried to
+  the record's scale, turn and seat; a new walk-in model needs its entry there, pinned against
+  its baked collision by `tests/placed_town_interior_core.test.ts`). The Highwatch and
+  Fenbridge views also hand the same doors to their camera fade, so a walk-in building stays
   solid while the player steps in with the lens still outside looking through the door
-  (`fenbridge_town_visibility_core.ts` `doorways`). The Highwatch manor's fires and lamps
+  (`fenbridge_town_visibility_core.ts` `doorways`, read in `doorwayFrame` for a turned
+  building); Eastbrook's roof fade takes no doors, so there a walk-in building fades while the
+  lens is outside it. The Mirefen tavern (`mirefen_tavern.ts`) registers its own air from
+  `mirefen_tavern_interior_core.ts`. The Highwatch manor's fires and lamps
   (`highwatch_manor_lights.ts`) join the props' fire-light budget and the scenery flame pass,
   the campfire's rule. The chase camera's floor (ground, rift tier, maze hedges) is
   `chase_camera_floor_core.ts`.
@@ -219,6 +241,16 @@ Everything else is a sibling module in one of these families:
   (`target_cone_overlay.ts`), god-ray shafts (`god_ray_shafts.ts`), and the
   per-biome fog/light/god-ray tables (`outdoor_biome_presets.ts`). A new
   public picking method lands on its facade, not on `Renderer`.
+- **Sitting on furniture** (the seats are `src/sim/seat_anchor.ts`): the sim keeps a seated
+  body on its seat's STAND spot; `seated_pose.ts` over the pure `seated_pose_core.ts` draws it
+  in the seat (the root at the seat anchor, turned to the seat, the rig ROOT lifted onto the
+  seat surface so the group's step smoothing never eases over a seat) and walks it in and out.
+  Two hooks and nothing else: `entityRenderPose` (`deck_frame.ts`) calls `applySeatedPose`,
+  the animation fill calls `applySeatAnim`. The chair clips (`sit_anims.glb`, wired by
+  `manifest.ts` `seats()` onto every Rig_Medium body, chosen by `characters/seat_clips.ts`)
+  are authored in the seat's anchor space, so the visual SNAPS (never crossfades) into and
+  out of the seated states. The pointer's seat pick is `seat_pick.ts` over
+  `seat_pick_core.ts`, driven by `src/game/seat_interact.ts`.
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,
@@ -844,6 +876,32 @@ GPU work signs. Each rule names its seam and its guard.
   `src/dev/outfit_audit.ts`): a call sited inside `initGfxTier` alone reaches only the
   world renderer, and a per-site call is easy to miss on one of the others. Guard:
   `tests/final_color_nan_guard.test.ts`.
+- **Cel-shading R&D look (`?cel=on`, opt-in, reload to flip).** `cel_shading_core.ts`
+  reads the URL knobs (`cellight=off`, `celbands=2|3`, `celedge`, `cellit`, `celmid`,
+  `celink`, `celinkwidth`, `celsat`) and builds the toon ramp, a patch over the
+  DIRECTIONAL loop of `lights_fragment_begin` only (point lights and the hemisphere
+  fill stay smooth); `cel_shading.ts` installs it at module scope (the template above).
+  Exactly one outline path draws per chain. With an output grade (Medium and up), the
+  depth-based ink is the grade's `CEL_INK` arm (`post_cel_ink_glsl.ts`, wired like the
+  FXAA arm: no pass, no target, taps clamped to the region); it reads N8AO's beauty
+  depth, or on any RenderPass chain (including AO-off High and up) the current
+  composer read buffer's own depth texture. The look
+  turns the grade on for Low (`celNeedsGradePass`, applied in `settingsFor` before the
+  `?gfxo=` overrides), so Low draws the same ink as Medium. iOS keeps its memory-driven
+  no-grade profile; there `syncCelMaterialInk` (driven from `activateGfxProfile`)
+  inserts a material ink block into `opaque_fragment` instead: a rim on the geometric
+  normal gated on curvature per yard and on distance, plus the saturation. It reads
+  weakly on hard-edged low-poly models, which is why Low takes the grade instead. No flag means the stock chunks byte
+  for byte and no ink define. Guards: `tests/cel_shading_core.test.ts`,
+  `tests/post_output_grade.test.ts` and the real-WebGL
+  `tests/browser/cel_shading.browser.test.ts`.
+- **Palette lab (`?palette=on`, dev tool).** `palette_lab/` swaps a zone's whole colour
+  look live (ground palette, fog/light rows, sky gradient, water, bloom, display grade);
+  its own `CLAUDE.md` has the model. Every shader arm it adds is compile-time behind the
+  flag (the grade's `PALETTE_GRADE` define, the dome's gradient block), so a normal session
+  builds the stock shaders byte for byte. The ground re-bake rides
+  `ground_palette_override_core.ts` (main thread, the zone build worker and the far vista
+  re-read it by version) and `renderer.editor.recolorGround` (colour buffers only).
 - **No new queue, no new lane, no fourth gate.** New work rides
   `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
   `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),

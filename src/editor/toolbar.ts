@@ -14,6 +14,7 @@ export type EditorTool =
   | 'lower'
   | 'smooth'
   | 'flatten'
+  | 'slope'
   | 'tunnel'
   | 'rock'
   | 'build'
@@ -21,6 +22,7 @@ export type EditorTool =
   | 'eyedropper'
   | 'decal'
   | 'water'
+  | 'pond'
   | 'fluid'
   | 'place'
   | 'foliage'
@@ -60,6 +62,7 @@ export interface ToolDef {
     | 'editor.tool.lower'
     | 'editor.tool.smooth'
     | 'editor.tool.flatten'
+    | 'editor.tool.slope'
     | 'editor.tool.tunnel'
     | 'editor.tool.rock'
     | 'editor.tool.build'
@@ -67,6 +70,7 @@ export interface ToolDef {
     | 'editor.tool.eyedropper'
     | 'editor.tool.decal'
     | 'editor.tool.water'
+    | 'editor.tool.pond'
     | 'editor.tool.fluid'
     | 'editor.tool.place'
     | 'editor.tool.foliage'
@@ -123,6 +127,11 @@ export const TOOL_DEFS: readonly ToolDef[] = [
     icon: 'M4 16h16M8 8v5M8 13l-2-2M8 13l2-2M16 8v5M16 13l-2-2M16 13l2-2',
   },
   {
+    tool: 'slope',
+    labelKey: 'editor.tool.slope',
+    icon: 'M3 19h18M3 19L21 7M5 9a2 2 0 1 0 0.01 0M19 17v-4',
+  },
+  {
     tool: 'tunnel',
     labelKey: 'editor.tool.tunnel',
     icon: 'M4 20h16M6 20v-7a6 6 0 0 1 12 0v7M10 20v-4a2 2 0 0 1 4 0v4',
@@ -147,6 +156,11 @@ export const TOOL_DEFS: readonly ToolDef[] = [
     tool: 'water',
     labelKey: 'editor.tool.water',
     icon: 'M3 9c3-3 6-3 9 0s6 3 9 0M3 15c3-3 6-3 9 0s6 3 9 0',
+  },
+  {
+    tool: 'pond',
+    labelKey: 'editor.tool.pond',
+    icon: 'M3 12a9 6 0 1 0 18 0a9 6 0 1 0-18 0M6 12c2-2 4-2 6 0s4 2 6 0',
   },
   {
     tool: 'fluid',
@@ -311,12 +325,14 @@ export class Toolbar {
         tools: [
           'raise',
           'flatten',
+          'slope',
           'tunnel',
           'rock',
           'paint',
           'eyedropper',
           'decal',
           'water',
+          'pond',
           'fluid',
           'grassclear',
           'meshfix',

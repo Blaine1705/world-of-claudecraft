@@ -7,7 +7,7 @@
 // rule fenbridge_town_visibility_core.ts owns), and its FIRST reveal rides the
 // town's reveal key piecewise, nearest first (town_reveal_core.ts), exactly as
 // the Fenbridge view's buildings do. Each walk-in building registers its air
-// with the indoor camera (interior_camera.ts, the air in
+// with the indoor camera (placed_town_interiors.ts, the air in
 // placed_town_interior_core.ts), so the camera keeps to its rooms while the
 // player is inside. The town view of Fenbridge or Eastbrook
 // owns the same building loop beside its own batches; this module is that
@@ -32,16 +32,20 @@ import {
   newFenbridgeBuildingVisibilityPlan,
 } from './fenbridge_town_visibility_core';
 import { GFX, type GfxSettings } from './gfx';
-import { registerCameraInterior, unregisterCameraInterior } from './interior_camera';
 import {
   advanceOccluderFade,
   type OccluderFadeMat,
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
-import { placedTownCameraInterior } from './placed_town_interior_core';
+import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
+import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryStructureFar,
+} from './scenery_detail';
 import {
   newTownPiecewiseReveal,
   orderTownRootsNearestFirst,
@@ -112,6 +116,8 @@ export interface PlacedTownDrawStats {
 interface BuildingHideTarget extends FenbridgeBuildingVisibilityTarget {
   group: THREE.Group;
   materials: OccluderFadeMat[];
+  interiors: THREE.Object3D[];
+  interiorsVisible: boolean;
   hidden: boolean;
   alpha: number;
 }
@@ -128,10 +134,14 @@ const TOWN_CULL_MARGIN_YD = 12;
  * holds every building's own cull circle whole. A building standing past it
  * would be hidden by the town's fog answer, or revealed without the imminent
  * priority, while its own cull still wants it drawn (Highwatch's smithy stands
- * on a terrace about 44 yards out).
+ * on a terrace about 44 yards out). A town keeping its own margin past the
+ * hub ring passes it (Fenbridge's six yards, render/fenbridge_town.ts).
  */
-export function placedTownCullRadius(spec: Pick<PlacedTownSpec, 'hub' | 'buildings'>): number {
-  let radius = spec.hub.radius + TOWN_CULL_MARGIN_YD;
+export function placedTownCullRadius(
+  spec: Pick<PlacedTownSpec, 'hub' | 'buildings'>,
+  margin = TOWN_CULL_MARGIN_YD,
+): number {
+  let radius = spec.hub.radius + margin;
   for (const building of spec.buildings) {
     const out =
       Math.hypot(building.position.x - spec.hub.center.x, building.position.z - spec.hub.center.z) +
@@ -178,7 +188,7 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
   const loadedSourceFiles = new Map<string, string>();
   const sourceLoadTasks = new Map<string, Promise<void>>();
   /** The camera interiors the live view registered (dropped when the next view builds). */
-  const registeredInteriors: string[] = [];
+  const interiors = createPlacedTownInteriors();
 
   function prepareSource(url: string, tier: PlacedTextureTier = GFX.placedTextureTier) {
     const file = placedTextureTierPath(url, tier, mediaAssetExists);
@@ -253,8 +263,7 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
     group.userData.buildingIds = [];
     group.userData.buildingFadeTargetCount = 0;
     // the previous view's rooms go with it: a world without the town keeps no air
-    for (const id of registeredInteriors) unregisterCameraInterior(id);
-    registeredInteriors.length = 0;
+    interiors.clear();
     if (!builtInWorld) return emptyView(group);
 
     const hideTargets: BuildingHideTarget[] = [];
@@ -273,20 +282,16 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         spec.decorate?.(building.id),
       );
       built.group.userData.placementId = building.id;
-      const interior = placedTownCameraInterior(
-        building,
-        groundAt(building.placement.x, building.placement.z),
-      );
-      if (interior) {
-        registerCameraInterior(interior);
-        registeredInteriors.push(interior.id);
-      }
-      // its doors: a player stepping in sees in through one (fenbridge_town_visibility_core.ts)
+      // its rooms go to the indoor camera (placed_town_interiors.ts), and its doors to the
+      // fade: a player stepping in sees in through one (fenbridge_town_visibility_core.ts)
+      const interior = interiors.add(building, groundAt);
       const doorways = interior?.openings.map((opening) => interior.boxes[opening.box]);
       group.add(built.group);
       hideTargets.push({
         group: built.group,
         materials: built.mats,
+        interiors: built.interiors,
+        interiorsVisible: true,
         hidden: false,
         alpha: 1,
         x: building.position.x,
@@ -299,12 +304,14 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         cullRadius: built.cullRadius,
         walkIn: building.walkIn,
         doorways,
+        doorwayFrame: interior?.frame,
       });
       roots.push(built.group);
     }
     group.userData.buildingIds = buildings.map((building) => building.id);
     group.userData.buildingFadeTargetCount = hideTargets.length;
     group.userData.drawStats = placedTownDrawStats(group);
+    for (const root of roots) prepareSceneryDetailRoot(root);
 
     // Every root is a building, anchored at its own footprint, so each can
     // take the reach floor (town_reveal_core.ts).
@@ -352,10 +359,21 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         if (hideTargets.length === 0) return;
         lastCamX = camX;
         lastCamZ = camZ;
-        const hubDx = camX - spec.hub.center.x;
-        const hubDz = camZ - spec.hub.center.z;
+        const lowCull = isLowSceneryCullActive(fogFar);
+        const structureFar = sceneryStructureFar(fogFar);
+        const cullX = lowCull ? eyeX : camX;
+        const cullZ = lowCull ? eyeZ : camZ;
+        const hubDx = cullX - spec.hub.center.x;
+        const hubDz = cullZ - spec.hub.center.z;
         const reveal = townStaticReveal(
-          fenbridgeFogVisible(camX, camZ, spec.hub.center.x, spec.hub.center.z, fogFar, cullRadius),
+          fenbridgeFogVisible(
+            cullX,
+            cullZ,
+            spec.hub.center.x,
+            spec.hub.center.z,
+            structureFar,
+            cullRadius,
+          ),
           revealed,
           hubDx * hubDx + hubDz * hubDz,
           cullRadius,
@@ -378,11 +396,26 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
             eyeX,
             eyeY,
             eyeZ,
-            fogFar,
+            structureFar,
+            cullX,
+            cullZ,
           );
           target.group.visible =
             visibilityPlan.visible && townRootVisible(reveal, piecewise, index);
           if (!visibilityPlan.visible) continue;
+          const bDx = cullX - target.x;
+          const bDz = cullZ - target.z;
+          const interiorReach = target.cullRadius + 6;
+          const showInteriors =
+            !lowCull ||
+            visibilityPlan.hidden ||
+            bDx * bDx + bDz * bDz <= interiorReach * interiorReach;
+          if (target.interiorsVisible !== showInteriors) {
+            target.interiorsVisible = showInteriors;
+            for (let i = 0; i < target.interiors.length; i++) {
+              target.interiors[i].visible = showInteriors;
+            }
+          }
           prefetchOccluderFadeWithin(target.materials, target.x, target.z, camX, camZ);
           target.hidden = visibilityPlan.hidden;
           target.alpha = advanceOccluderFade(

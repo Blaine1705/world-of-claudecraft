@@ -12,6 +12,7 @@ import { generateDressing } from '../src/render/foliage_dressing_spots';
 import { BUILTIN_WORLD, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
+import { tavernGroundsRects } from '../src/sim/mirefen_tavern_grounds';
 import {
   EASTBROOK_NOTICEBOARD_ASSET_ID,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
@@ -76,13 +77,29 @@ describe('Eastbrook town grass exclusion', () => {
     // old kit houses had none): 85 to 95.
     // Re-pinned 2026-10 for the Highwatch manor on the north hill: one more
     // placed building, its reach and its door apron: 95 to 97.
-    // Re-pinned 2026-10 for the Highwatch adventurers' guild at the old stable yard: one
-    // more placed building, its reach and its door apron: 97 to 99.
-    expect(exclusions).toHaveLength(99);
+    // The Mirefen tavern keeps grass off its floor: the hall, the wing, the tower and the
+    // porch with its steps (mirefenTavernGrassExclusions): 4 more, and one per rectangle of
+    // its grounds (sim/mirefen_tavern_grounds.ts tavernGroundsRects: the forecourt, the stable
+    // and each piece outside). On its own branch that was 129 plus the grounds (the release's
+    // 125 plus 4); merged with the rebuilt towns and the manor above: 97 plus 4, plus the
+    // grounds. Re-pinned 2026-10 for the Highwatch adventurers' guild at the old stable yard:
+    // one more placed building, its reach and its door apron: 2 more, 103 plus the grounds.
+    expect(exclusions).toHaveLength(103 + tavernGroundsRects().length);
+    expect(tavernGroundsRects().length).toBe(27);
     for (const building of HIGHWATCH_LAYOUT.buildings) {
       expect(exclusions.some((item) => item.id === building.id)).toBe(true);
       expect(exclusions.some((item) => item.id === `${building.id}:serviceApron`)).toBe(true);
     }
+    for (const id of [
+      'mirefen_tavern:hall',
+      'mirefen_tavern:wing',
+      'mirefen_tavern:tower',
+      'mirefen_tavern:porch',
+    ]) {
+      expect(exclusions.some((item) => item.id === id)).toBe(true);
+    }
+    // the hearth in the middle of the hall has no grass
+    expect(insideEastbrookGrassExclusion(exclusions, -14.6, 408, PADDING)).toBe(true);
     expect(exclusions.some((item) => item.id.startsWith('eastbrook_grand_armoury'))).toBe(false);
     expect(EASTBROOK_LAYOUT.buildings).toHaveLength(6);
     for (const building of [
@@ -206,13 +223,17 @@ describe('Eastbrook town grass exclusion', () => {
     // (the whole model at the placed size, measured off the shipped file by
     // tests/eastbrook_placed_buildings.test.ts), no longer its wall box: the
     // bank's 23.4 by 16.24 walls sit under a 29.39 by 25.79 clearing.
+    // Re-pinned for the World of ClaudeCraft Studio map's arrangement: each
+    // reach is the model's own authored bounds carried to the size the
+    // building stands at, so the half extents are exact rather than rounded
+    // at the placed size, and the apothecary's shop stands grand at 1.5.
     const expectedObbDimensions = {
-      eastbrook_bank: [14.695, 12.895],
-      eastbrook_smithy: [12.87, 7.6],
-      eastbrook_inn: [14.72, 10.92],
-      eastbrook_chapel: [12.255, 15.74],
-      eastbrook_apothecary: [8.455, 7.93],
-      eastbrook_quay_cottage: [9.76, 7.605],
+      eastbrook_bank: [14.694355, 12.895155],
+      eastbrook_smithy: [12.86805, 7.598565],
+      eastbrook_inn: [14.721395, 10.919805000000002],
+      eastbrook_chapel: [12.253475000000002, 15.7378],
+      eastbrook_apothecary: [9.753, 9.150075000000001],
+      eastbrook_quay_cottage: [9.757995, 7.604805],
     } as const;
     expect(Object.keys(expectedObbDimensions)).toEqual(
       EASTBROOK_LAYOUT.buildings.map((building) => building.id),

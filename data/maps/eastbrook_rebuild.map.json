@@ -5,7 +5,7 @@
     "name": "Eastbrook Rebuild",
     "description": "The shipped world with the towns of Eastbrook Vale, Fenbridge and Highwatch rebuilt from the Tidehold buildings. Every building is an ordinary placement: select it and move it.",
     "createdAt": 1791882000000,
-    "updatedAt": 1792054800000,
+    "updatedAt": 1792108800001,
     "seed": 20061,
     "parentId": ""
   },
@@ -26,8 +26,8 @@
           "name": "Eastbrook"
         },
         "graveyard": {
-          "x": 0,
-          "z": -70
+          "x": 39.5,
+          "z": -99.3
         },
         "lakes": [
           {
@@ -3452,9 +3452,9 @@
         "title": "Town Marshal",
         "pos": {
           "x": 1.5,
-          "z": -95.5
+          "z": -95.3
         },
-        "facing": -2.1763409903998667,
+        "facing": -1.9787985229559204,
         "color": 12031243,
         "questIds": [
           "q_wolves",
@@ -3500,10 +3500,10 @@
         "name": "Apothecary Lin",
         "title": "Herbalist",
         "pos": {
-          "x": -12.8,
-          "z": -92.6
+          "x": -24.5,
+          "z": -112.5
         },
-        "facing": 3.1416,
+        "facing": 0.7853981633974483,
         "color": 8207512,
         "questIds": ["q_spiders"],
         "greeting": "Careful where you step in the northeastern woods, friend."
@@ -3513,10 +3513,10 @@
         "name": "Brother Aldric",
         "title": "Priest of the Vale",
         "pos": {
-          "x": -68.5,
-          "z": -97.7
+          "x": 15.011652086947231,
+          "z": -110.38541937474815
         },
-        "facing": 0,
+        "facing": -0.9599310885968813,
         "color": 16251385,
         "questIds": [
           "q_bones",
@@ -3537,10 +3537,10 @@
         "name": "Smith Haldren",
         "title": "Armorer & Weaponsmith",
         "pos": {
-          "x": -28,
-          "z": -103.7
+          "x": -8.282374584867384,
+          "z": -81.85509712542417
         },
-        "facing": 0,
+        "facing": -2.7925268031909276,
         "color": 7371644,
         "questIds": ["q_prof_hobby_switch"],
         "greeting": "Mind the sparks, $C. Good steel is the difference between a scar and a grave.",
@@ -3562,7 +3562,7 @@
           "x": -22.3,
           "z": -104.6
         },
-        "facing": 1.3909428270024184,
+        "facing": 1.2672255874712333,
         "color": 2388387,
         "questIds": ["q_murlocs"],
         "greeting": "Blrb-glub... sorry, been listening to those fish-men too long.",
@@ -3573,10 +3573,10 @@
         "name": "Foreman Odell",
         "title": "Mine Foreman",
         "pos": {
-          "x": -16,
-          "z": -111
+          "x": -3.5,
+          "z": -104.5
         },
-        "facing": 0.21866894587394195,
+        "facing": -1.3370531459259951,
         "color": 10502144,
         "questIds": ["q_prof_intro", "q_mine"],
         "greeting": "Whole dig's crawling with those dirt-caked vermin!"
@@ -3586,10 +3586,10 @@
         "name": "Vault Keeper",
         "title": "Weekly Rewards",
         "pos": {
-          "x": 4.6,
-          "z": -101.3
+          "x": -64.46690116645624,
+          "z": -99.93517677218593
         },
-        "facing": 0,
+        "facing": 0.7853981633974483,
         "color": 13214247,
         "questIds": [],
         "greeting": "Your weekly rewards await. Choose one item from your earned choices after the Crucible reset.",
@@ -3600,10 +3600,10 @@
         "name": "Bursar Fernando",
         "title": "The Gilded Strongbox",
         "pos": {
-          "x": 16.3,
-          "z": -119.5
+          "x": -55.21592057176678,
+          "z": -105.19195954108784
         },
-        "facing": -1.5708,
+        "facing": 0.7853981633974481,
         "color": 13214247,
         "questIds": [],
         "greeting": "Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.",
@@ -3614,10 +3614,10 @@
         "name": "Card Master",
         "title": "Dealer of Chance",
         "pos": {
-          "x": 16.3,
-          "z": -109.5
+          "x": -48.85195954108786,
+          "z": -111.55592057176676
         },
-        "facing": -1.5708,
+        "facing": 0.7853981633974481,
         "color": 8007567,
         "questIds": [],
         "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
@@ -3685,10 +3685,10 @@
         "name": "Weaver Ottilie",
         "title": "Master of the Loom",
         "pos": {
-          "x": -27.278889744907204,
-          "z": -126.68721665810318
+          "x": -20.5,
+          "z": -117.5
         },
-        "facing": 2.5535900500422257,
+        "facing": 1.1071487177940904,
         "color": 7430568,
         "questIds": [
           "q_prof_attune_outfitter",
@@ -3733,8 +3733,8 @@
         "name": "Farmer Jessica",
         "title": "Allotment Keeper",
         "pos": {
-          "x": -17,
-          "z": -82
+          "x": -15.5,
+          "z": -81.5
         },
         "facing": -1.5707963267948966,
         "color": 11043898,
@@ -3754,8 +3754,8 @@
         "name": "Warden Fenwick",
         "title": "Warden of Fenbridge",
         "pos": {
-          "x": 1.62,
-          "z": 283.09999999999997
+          "x": 3.507999999999999,
+          "z": 276.56
         },
         "facing": -1.5707963267948966,
         "color": 8278281,
@@ -3855,8 +3855,8 @@
         "name": "Herbalist Yara",
         "title": "Herbalist",
         "pos": {
-          "x": 2.8999999999999995,
-          "z": 323.5
+          "x": 3.3000000000000007,
+          "z": 327.45
         },
         "facing": -1.5707963267948966,
         "color": 8207512,
@@ -3868,10 +3868,10 @@
         "name": "Scout Maren",
         "title": "Marshal's Scout",
         "pos": {
-          "x": -3.2,
+          "x": -1.4,
           "z": 330
         },
-        "facing": 2.950031333260667,
+        "facing": 3.0569469092959145,
         "color": 8218120,
         "questIds": ["q_troll_fetishes", "q_cult_camp", "q_olen"],
         "greeting": "Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds."
@@ -3881,8 +3881,8 @@
         "name": "Bursar Petra Vell",
         "title": "The Gilded Strongbox",
         "pos": {
-          "x": -2.9000000000000004,
-          "z": 320.4
+          "x": -3.3000000000000007,
+          "z": 322.90000000000003
         },
         "facing": 1.5707963267948966,
         "color": 13214247,
@@ -3908,10 +3908,10 @@
         "name": "Tanner Hesk",
         "title": "Master of the Tannery",
         "pos": {
-          "x": -18,
-          "z": 322
+          "x": -24,
+          "z": 328.5
         },
-        "facing": 2.0119758072098772,
+        "facing": 2.1293956421384594,
         "color": 9067050,
         "questIds": ["q_prof_workorder_tannery"],
         "greeting": "A hide is only as good as its tanning, $C. The vats are ready when you are.",
@@ -4398,10 +4398,10 @@
         "name": "FURY",
         "title": "Honor Quartermaster",
         "pos": {
-          "x": 16,
-          "z": -78
+          "x": 21,
+          "z": -83.5
         },
-        "facing": -2.2455372690184494,
+        "facing": -2.0570389598824015,
         "color": 11872810,
         "questIds": [],
         "greeting": "The sands remember every victory. Spend your honor well.",
@@ -5589,10 +5589,10 @@
         "name": "Cham Pete",
         "title": "Emissary",
         "pos": {
-          "x": -4,
-          "z": -102.2
+          "x": -72.28,
+          "z": -95.59
         },
-        "facing": 0,
+        "facing": 1.68,
         "color": 7032744,
         "questIds": [],
         "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours.",
@@ -5860,10 +5860,10 @@
         "name": "Templar Althea",
         "title": "Church Order Quartermaster",
         "pos": {
-          "x": -72,
-          "z": -97
+          "x": 13.29,
+          "z": -112.84
         },
-        "facing": 0,
+        "facing": -0.96,
         "color": 15521146,
         "questIds": [],
         "greeting": "Walk in the Light of the Dawn. The Church Order supplies those who stand with us in service.",
@@ -6814,8 +6814,8 @@
             "z": -89
           },
           {
-            "x": -76,
-            "z": -95
+            "x": -77,
+            "z": -94
           },
           {
             "x": -86,
@@ -6948,16 +6948,20 @@
           "z": -88.6
         },
         {
-          "x": 12,
-          "z": -85
+          "x": 15.8,
+          "z": -83
         },
         {
-          "x": 10,
-          "z": -80
+          "x": 17,
+          "z": -76
         },
         {
-          "x": 6,
-          "z": -72
+          "x": 12.5,
+          "z": -71
+        },
+        {
+          "x": 4,
+          "z": -67
         },
         {
           "x": 0,
@@ -7052,12 +7056,12 @@
           "z": -123
         },
         {
-          "x": -22,
-          "z": -120.5
+          "x": -18.5,
+          "z": -121.5
         },
         {
-          "x": -24,
-          "z": -128.5
+          "x": -18,
+          "z": -128
         },
         {
           "x": -16,
@@ -7072,24 +7076,20 @@
           "z": -123.5
         },
         {
-          "x": 4,
-          "z": -123
+          "x": 2,
+          "z": -119
         },
         {
-          "x": 12,
-          "z": -126
-        },
-        {
-          "x": 10,
-          "z": -122
-        },
-        {
-          "x": 11,
+          "x": 6,
           "z": -113
         },
         {
+          "x": 9,
+          "z": -106
+        },
+        {
           "x": 14,
-          "z": -108
+          "z": -99
         },
         {
           "x": 30,
@@ -7176,12 +7176,20 @@
       ],
       [
         {
-          "x": -40.8,
-          "z": -92.2
+          "x": -35.75,
+          "z": -72.77
         },
         {
-          "x": -42,
-          "z": -95
+          "x": -37,
+          "z": -82
+        },
+        {
+          "x": -38.5,
+          "z": -90
+        },
+        {
+          "x": -40.5,
+          "z": -96
         },
         {
           "x": -44,
@@ -9022,6 +9030,438 @@
       "delta": 0,
       "falloff": "flat",
       "mode": "level"
+    },
+    {
+      "x": 8.17,
+      "z": 278.41675000000004,
+      "radius": 15.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34890059710123783
+    },
+    {
+      "x": 15.030000000000001,
+      "z": 278.41675000000004,
+      "radius": 15.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34890059710123783
+    },
+    {
+      "x": 8.17,
+      "z": 270.18265,
+      "radius": 15.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34890059710123783
+    },
+    {
+      "x": 15.030000000000001,
+      "z": 270.18265,
+      "radius": 15.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.34890059710123783
+    },
+    {
+      "x": 8.45,
+      "z": 306.7328,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 18.53,
+      "z": 306.7328,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 8.45,
+      "z": 297.6736,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 18.53,
+      "z": 297.6736,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 8.45,
+      "z": 288.61440000000005,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": 18.53,
+      "z": 288.61440000000005,
+      "radius": 16.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4039226709992691
+    },
+    {
+      "x": -7.875333333333332,
+      "z": 296.81275000000005,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -15.945999999999998,
+      "z": 296.81275000000005,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -24.016666666666666,
+      "z": 296.81275000000005,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -7.875333333333332,
+      "z": 306.23825,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -15.945999999999998,
+      "z": 306.23825,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": -24.016666666666666,
+      "z": 306.23825,
+      "radius": 16.20434748169468,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.3828816611531844
+    },
+    {
+      "x": 6.7132499999999995,
+      "z": 330.806625,
+      "radius": 16.99187479887369,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.411483422614269
+    },
+    {
+      "x": 16.23975,
+      "z": 330.806625,
+      "radius": 16.99187479887369,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.411483422614269
+    },
+    {
+      "x": 6.7132499999999995,
+      "z": 320.56987499999997,
+      "radius": 16.99187479887369,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.411483422614269
+    },
+    {
+      "x": 16.23975,
+      "z": 320.56987499999997,
+      "radius": 16.99187479887369,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.411483422614269
+    },
+    {
+      "x": -6.525000000000002,
+      "z": 320.4235,
+      "radius": 16.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4007174348063826
+    },
+    {
+      "x": -15.675,
+      "z": 320.4235,
+      "radius": 16.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4007174348063826
+    },
+    {
+      "x": -6.525000000000002,
+      "z": 330.17650000000003,
+      "radius": 16.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4007174348063826
+    },
+    {
+      "x": -15.675,
+      "z": 330.17650000000003,
+      "radius": 16.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4007174348063826
+    },
+    {
+      "x": 8.17,
+      "z": 278.41675000000004,
+      "radius": 9.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.57258737644937
+    },
+    {
+      "x": 15.030000000000001,
+      "z": 278.41675000000004,
+      "radius": 9.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.57258737644937
+    },
+    {
+      "x": 8.17,
+      "z": 270.18265,
+      "radius": 9.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.57258737644937
+    },
+    {
+      "x": 15.030000000000001,
+      "z": 270.18265,
+      "radius": 9.358637952175908,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.57258737644937
+    },
+    {
+      "x": 8.45,
+      "z": 306.7328,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 18.53,
+      "z": 306.7328,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 8.45,
+      "z": 297.6736,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 18.53,
+      "z": 297.6736,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 8.45,
+      "z": 288.61440000000005,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": 18.53,
+      "z": 288.61440000000005,
+      "radius": 10.776346815209504,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6288166974772484
+    },
+    {
+      "x": -7.875333333333332,
+      "z": 296.81275000000005,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -15.945999999999998,
+      "z": 296.81275000000005,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -24.016666666666666,
+      "z": 296.81275000000005,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -7.875333333333332,
+      "z": 306.23825,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -15.945999999999998,
+      "z": 306.23825,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": -24.016666666666666,
+      "z": 306.23825,
+      "radius": 10.204347481694679,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6080102125907121
+    },
+    {
+      "x": 6.7132499999999995,
+      "z": 330.806625,
+      "radius": 10.991874798873688,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6360948361229634
+    },
+    {
+      "x": 16.23975,
+      "z": 330.806625,
+      "radius": 10.991874798873688,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6360948361229634
+    },
+    {
+      "x": 6.7132499999999995,
+      "z": 320.56987499999997,
+      "radius": 10.991874798873688,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6360948361229634
+    },
+    {
+      "x": 16.23975,
+      "z": 320.56987499999997,
+      "radius": 10.991874798873688,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.6360948361229634
+    },
+    {
+      "x": -6.525000000000002,
+      "z": 320.4235,
+      "radius": 10.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.625700149011292
+    },
+    {
+      "x": -15.675,
+      "z": 320.4235,
+      "radius": 10.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.625700149011292
+    },
+    {
+      "x": -6.525000000000002,
+      "z": 330.17650000000003,
+      "radius": 10.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.625700149011292
+    },
+    {
+      "x": -15.675,
+      "z": 330.17650000000003,
+      "radius": 10.68661926910752,
+      "delta": 1.2,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.625700149011292
     },
     {
       "x": -32,
@@ -11464,58 +11904,688 @@
       "mode": "level"
     },
     {
-      "x": -66.5,
-      "z": -115.24,
-      "radius": 28.41,
-      "delta": -0.6,
+      "x": -46.457106960041486,
+      "z": -120.71119622778133,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.75
+      "hardness": 0.49431315414758054
     },
     {
-      "x": -38.52,
-      "z": -113.1,
-      "radius": 22.95,
-      "delta": -0.6,
+      "x": -50.104407578022126,
+      "z": -124.35849684576198,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.69
+      "hardness": 0.49431315414758054
     },
     {
-      "x": -40.58,
-      "z": -72.65,
-      "radius": 26.33,
-      "delta": -0.45,
+      "x": -53.751708196002774,
+      "z": -128.00579746374262,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.73
+      "hardness": 0.49431315414758054
     },
     {
-      "x": -7.02,
-      "z": -83.07,
-      "radius": 20.63,
-      "delta": -0.45,
+      "x": -57.39900881398342,
+      "z": -131.65309808172327,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.66
+      "hardness": 0.49431315414758054
     },
     {
-      "x": 31.39,
-      "z": -114.08,
-      "radius": 27.55,
+      "x": -61.04630943196406,
+      "z": -135.30039869970392,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -50.613298186306466,
+      "z": -116.55500500151634,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -54.260598804287106,
+      "z": -120.20230561949698,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -57.907899422267754,
+      "z": -123.84960623747763,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -61.5552000402484,
+      "z": -127.49690685545828,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -65.20250065822904,
+      "z": -131.1442074734389,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -54.769489412571446,
+      "z": -112.39881377525136,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -58.416790030552086,
+      "z": -116.046114393232,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -62.06409064853273,
+      "z": -119.69341501121265,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -65.71139126651337,
+      "z": -123.3407156291933,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -69.35869188449402,
+      "z": -126.98801624717395,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -58.92568063883643,
+      "z": -108.24262254898638,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -62.57298125681707,
+      "z": -111.88992316696702,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -66.22028187479772,
+      "z": -115.53722378494767,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -69.86758249277837,
+      "z": -119.18452440292832,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -73.51488311075902,
+      "z": -122.83182502090897,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -63.0818718651014,
+      "z": -104.0864313227214,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -66.72917248308204,
+      "z": -107.73373194070204,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -70.37647310106269,
+      "z": -111.38103255868269,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -74.02377371904333,
+      "z": -115.02833317666334,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -77.67107433702398,
+      "z": -118.67563379464399,
+      "radius": 7.910033715149014,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.49431315414758054
+    },
+    {
+      "x": -77.70747564417434,
+      "z": -102.4277281758685,
+      "radius": 9.221649643551356,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5662381293354409
+    },
+    {
+      "x": -72.2273980899786,
+      "z": -96.94765062167276,
+      "radius": 9.221649643551356,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5662381293354409
+    },
+    {
+      "x": -72.7577281758685,
+      "z": -107.37747564417434,
+      "radius": 9.221649643551356,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5662381293354409
+    },
+    {
+      "x": -67.27765062167276,
+      "z": -101.89739808997861,
+      "radius": 9.221649643551356,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5662381293354409
+    },
+    {
+      "x": -9.503679960612338,
+      "z": -77.72084252586419,
+      "radius": 10.730014915975895,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5340174231672771
+    },
+    {
+      "x": -6.904817670242928,
+      "z": -70.58052706680212,
+      "radius": 10.730014915975895,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5340174231672771
+    },
+    {
+      "x": -1.442338874676265,
+      "z": -80.6549307294121,
+      "radius": 10.730014915975895,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5340174231672771
+    },
+    {
+      "x": 1.1565234156931445,
+      "z": -73.51461527035003,
+      "radius": 10.730014915975895,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5340174231672771
+    },
+    {
+      "x": 6.619002211259806,
+      "z": -83.58901893296002,
+      "radius": 10.730014915975895,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5340174231672771
+    },
+    {
+      "x": 9.217864501629217,
+      "z": -76.44870347389795,
+      "radius": 10.730014915975895,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.5340174231672771
+    },
+    {
+      "x": -41.970160772698435,
+      "z": -63.49216457758769,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": -39.00917088687021,
+      "z": -56.84167240685905,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": -36.04818100104198,
+      "z": -50.19118023613041,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": -33.00438508442343,
+      "z": -67.48398510004961,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": -30.04339519859521,
+      "z": -60.83349292932096,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": -27.082405312766983,
+      "z": -54.18300075859232,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": -24.03860939614844,
+      "z": -71.47580562251152,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": -21.077619510320215,
+      "z": -64.82531345178288,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": -18.11662962449199,
+      "z": -58.174821281054236,
+      "radius": 15.109751876977311,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4043581871312344
+    },
+    {
+      "x": 21.51056620530961,
+      "z": -108.01930267311205,
+      "radius": 9.671240514875864,
       "delta": -0.9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.75
+      "hardness": 0.586402592940649
     },
     {
-      "x": -75.4,
-      "z": -49.89,
-      "radius": 20.37,
-      "delta": -1,
+      "x": 27.95639172661525,
+      "z": -112.5327182931148,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
       "falloff": "smooth",
       "mode": "level",
-      "hardness": 0.66
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 34.4022172479209,
+      "z": -117.04613391311754,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 40.84804276922655,
+      "z": -121.55954953312029,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 16.825029856365184,
+      "z": -114.71094207037476,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 23.270855377670827,
+      "z": -119.2243576903775,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 29.716680898976474,
+      "z": -123.73777331038025,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 36.16250642028213,
+      "z": -128.251188930383,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 12.139493507420758,
+      "z": -121.40258146763746,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 18.585319028726403,
+      "z": -125.9159970876402,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 25.03114455003205,
+      "z": -130.42941270764294,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": 31.4769700713377,
+      "z": -134.9428283276457,
+      "radius": 9.671240514875864,
+      "delta": -0.9,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.586402592940649
+    },
+    {
+      "x": -24.00579598390834,
+      "z": -118.96045231221538,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -23.607055192497448,
+      "z": -123.5180804132863,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -23.20831440108656,
+      "z": -128.07570851435722,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -22.80957360967567,
+      "z": -132.63333661542814,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -28.863739429152737,
+      "z": -119.38546729172434,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -28.464998637741846,
+      "z": -123.94309539279526,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -28.06625784633096,
+      "z": -128.50072349386616,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -27.66751705492007,
+      "z": -133.05835159493708,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -33.72168287439713,
+      "z": -119.81048227123328,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -33.322942082986245,
+      "z": -124.3681103723042,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -32.92420129157536,
+      "z": -128.9257384733751,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -32.52546050016447,
+      "z": -133.48336657444602,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -38.57962631964153,
+      "z": -120.23549725074224,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -38.18088552823064,
+      "z": -124.79312535181316,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -37.78214473681975,
+      "z": -129.35075345288408,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -37.383403945408865,
+      "z": -133.908381553955,
+      "radius": 7.343322463374055,
+      "delta": -0.7,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.45528743699454677
+    },
+    {
+      "x": -65.50907520157426,
+      "z": -50.19733703370856,
+      "radius": 14.185699748372247,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4360517886389096
+    },
+    {
+      "x": -60.038636291259884,
+      "z": -44.914595584750124,
+      "radius": 14.185699748372247,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4360517886389096
+    },
+    {
+      "x": -58.73060229592722,
+      "z": -57.21665120871411,
+      "radius": 14.185699748372247,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4360517886389096
+    },
+    {
+      "x": -53.26016338561285,
+      "z": -51.93390975975568,
+      "radius": 14.185699748372247,
+      "delta": 0.5,
+      "falloff": "smooth",
+      "mode": "level",
+      "hardness": 0.4360517886389096
     },
     {
       "x": 19.792,
@@ -13061,14 +14131,14 @@
     },
     {
       "assetId": "tidehold/highwatch/manor",
-      "name": "Highwatch manor",
       "x": 31.5,
       "z": 746,
-      "y": -1.05,
       "rotY": 0,
       "scale": 23.294545454545453,
       "collide": true,
-      "collisionMode": "baked"
+      "collisionMode": "baked",
+      "y": -1.05,
+      "name": "Highwatch manor"
     },
     {
       "assetId": "tidehold/highwatch/guild",
@@ -22742,92 +23812,98 @@
     },
     {
       "assetId": "props/gravestone_round",
-      "x": -2,
-      "z": -70,
-      "rotY": 0.19094241585116833,
-      "scale": 1.1593687131770398,
+      "x": 37.5,
+      "z": -99.3,
+      "rotY": 0.09231336251832545,
+      "scale": 0.2613636363636363,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": 0.045482819108292466,
-      "rotZ": 0.05957250344567001,
-      "scaleX": 0.9126320120696753,
-      "scaleZ": 1.1042150680385003,
-      "y": -0.06,
+      "rotX": 0.036549743358045825,
+      "rotZ": 0.06113528567831963,
+      "scaleX": 2.103997574420646,
+      "scaleY": 2.103997574420646,
+      "scaleZ": 2.103997574420646,
+      "y": -0.06000000000000005,
       "name": "Graveyard 1 headstone 1"
     },
     {
       "assetId": "props/gravestone_cross",
-      "x": 0.20000000000000018,
-      "z": -70,
-      "rotY": 0.40347106461413207,
-      "scale": 1.1720788567934115,
+      "x": 39.7,
+      "z": -99.3,
+      "rotY": 0.38490344267338517,
+      "scale": 0.4159090909090909,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": -0.02538145217113197,
-      "rotZ": 0.08476181360892951,
-      "scaleX": 1.7568438003220612,
-      "scaleZ": 2.072393414943014,
-      "y": -0.06,
+      "rotX": -0.030352893425151704,
+      "rotZ": -0.07231245967093854,
+      "scaleX": 2.1487781362375244,
+      "scaleY": 2.1487781362375244,
+      "scaleZ": 2.1487781362375244,
+      "y": -0.05999999999999983,
       "name": "Graveyard 1 headstone 2"
     },
     {
       "assetId": "props/gravestone_bevel",
-      "x": 2.4000000000000004,
-      "z": -70,
-      "rotY": 0.9664077773457393,
-      "scale": 1.2776361459778094,
+      "x": 41.9,
+      "z": -99.3,
+      "rotY": 0.5593915446195751,
+      "scale": 0.24059090909090908,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": 0.07984238779172302,
-      "rotZ": -0.07676381195895374,
-      "scaleX": 0.8996655518394651,
-      "scaleZ": 1.2758893280632415,
-      "y": -0.06,
+      "rotX": -0.0013385850004851835,
+      "rotZ": 0.051816828954033556,
+      "scaleX": 2.20909888332244,
+      "scaleY": 2.20909888332244,
+      "scaleZ": 2.2090988833224396,
+      "y": -0.06000000000000005,
       "name": "Graveyard 1 headstone 3"
     },
     {
       "assetId": "props/gravestone_decorative",
-      "x": -2,
-      "z": -67.4,
-      "rotY": 1.4444493051152678,
-      "scale": 1.0727560557612195,
+      "x": 37.5,
+      "z": -96.7,
+      "rotY": 1.1266125863650815,
+      "scale": 0.27009090909090905,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": 0.004922345280647278,
-      "rotZ": 0.021682829521596433,
-      "scaleX": 0.9953746530989825,
-      "scaleZ": 1.651150895140665,
-      "y": -0.06,
+      "rotX": 0.01630915561690928,
+      "rotZ": -0.10650536815170199,
+      "scaleX": 2.0946280484786257,
+      "scaleY": 2.0946280484786257,
+      "scaleZ": 2.0946280484786257,
+      "y": -0.06000000000000005,
       "name": "Graveyard 1 headstone 4"
     },
     {
       "assetId": "props/gravestone_round",
-      "x": 0.20000000000000018,
-      "z": -67.4,
-      "rotY": 1.4442117866361515,
-      "scale": 1.184407688676366,
+      "x": 39.7,
+      "z": -96.7,
+      "rotY": 1.4139806171697613,
+      "scale": 0.2613636363636363,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": -0.03684599460102618,
-      "rotZ": 0.024571538339369,
-      "scaleX": 0.9126320120696751,
-      "scaleZ": 1.1042150680385001,
-      "y": -0.06,
+      "rotX": -3.1372685947739565,
+      "rotZ": 3.091892963247844,
+      "scaleX": 2.340342755196616,
+      "scaleY": 2.340342755196616,
+      "scaleZ": 2.340342755196616,
+      "y": -0.06000000000000005,
       "name": "Graveyard 1 headstone 5"
     },
     {
       "assetId": "props/gravestone_cross",
-      "x": 2.4000000000000004,
-      "z": -67.4,
-      "rotY": 1.8970605380600318,
-      "scale": 1.0578967119825535,
+      "x": 41.9,
+      "z": -96.7,
+      "rotY": 1.0774092520638412,
+      "scale": 0.4159090909090909,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": 0.05266906186006964,
-      "rotZ": -0.03215608292724937,
-      "scaleX": 1.7568438003220612,
-      "scaleZ": 2.072393414943014,
-      "y": -0.06,
+      "rotX": -3.0887117727012416,
+      "rotZ": 3.045386083764494,
+      "scaleX": 2.020572362816893,
+      "scaleY": 2.0205723628168926,
+      "scaleZ": 2.020572362816893,
+      "y": -0.06000000000000005,
       "name": "Graveyard 1 headstone 6"
     },
     {
@@ -22922,92 +23998,98 @@
     },
     {
       "assetId": "props/gravestone_round",
-      "x": -9,
-      "z": -70,
-      "rotY": 0.00199252855964005,
-      "scale": 1.1031388037760779,
+      "x": 28.5,
+      "z": -107.8,
+      "rotY": -0.006529186852276328,
+      "scale": 0.2613636363636363,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": -0.09245589771308005,
-      "rotZ": 0.10673517042770982,
-      "scaleX": 0.9126320120696751,
-      "scaleZ": 1.1042150680385003,
-      "y": -0.06,
+      "rotX": -0.04279661504551769,
+      "rotZ": 0.10385785933583976,
+      "scaleX": 2.2172955211717635,
+      "scaleY": 2.2172955211717635,
+      "scaleZ": 2.2172955211717635,
+      "y": -0.05999999999999994,
       "name": "Graveyard 3 headstone 1"
     },
     {
       "assetId": "props/gravestone_cross",
-      "x": -6.8,
-      "z": -70,
-      "rotY": 0.5332738097989932,
-      "scale": 1.0706601937535782,
+      "x": 30.7,
+      "z": -107.8,
+      "rotY": 0.16474369713105264,
+      "scale": 0.4159090909090909,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": -0.0032662032172083855,
-      "rotZ": -0.08435797720216215,
-      "scaleX": 1.756843800322061,
-      "scaleZ": 2.072393414943014,
-      "y": -0.06,
+      "rotX": 0.03322478882037103,
+      "rotZ": -0.014563893713057042,
+      "scaleX": 2.462393695488572,
+      "scaleY": 2.462393695488572,
+      "scaleZ": 2.462393695488572,
+      "y": -0.05999999999999994,
       "name": "Graveyard 3 headstone 2"
     },
     {
       "assetId": "props/gravestone_bevel",
-      "x": -4.6,
-      "z": -70,
-      "rotY": 0.5904513388639316,
-      "scale": 1.3172743904838626,
+      "x": 32.9,
+      "z": -107.8,
+      "rotY": 0.9324877479346472,
+      "scale": 0.24059090909090908,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": 0.005559590412303805,
-      "rotZ": -0.10893445771653205,
-      "scaleX": 0.8996655518394648,
-      "scaleZ": 1.2758893280632413,
-      "y": -0.06,
+      "rotX": 0.061650839168578435,
+      "rotZ": -0.07845539889764044,
+      "scaleX": 2.306442227447405,
+      "scaleY": 2.3064422274474055,
+      "scaleZ": 2.306442227447405,
+      "y": -0.05999999999999994,
       "name": "Graveyard 3 headstone 3"
     },
     {
       "assetId": "props/gravestone_decorative",
-      "x": -9,
-      "z": -67.4,
-      "rotY": 1.280198973650113,
-      "scale": 1.1312216520093061,
+      "x": 28.5,
+      "z": -105.2,
+      "rotY": 1.341735770972445,
+      "scale": 0.27009090909090905,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": -0.09788061860017479,
-      "rotZ": 0.010451160883530975,
-      "scaleX": 0.9953746530989827,
-      "scaleZ": 1.6511508951406653,
-      "y": -0.06,
+      "rotX": -0.011819068528711804,
+      "rotZ": -0.015774975274689462,
+      "scaleX": 2.452656463719905,
+      "scaleY": 2.4526564637199044,
+      "scaleZ": 2.452656463719905,
+      "y": -0.05999999999999994,
       "name": "Graveyard 3 headstone 4"
     },
     {
       "assetId": "props/gravestone_round",
-      "x": -6.8,
-      "z": -67.4,
-      "rotY": 1.3838665157323704,
-      "scale": 1.2538731650754176,
+      "x": 30.7,
+      "z": -105.2,
+      "rotY": 1.3765699842711914,
+      "scale": 0.2613636363636363,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": -0.01744810463860631,
-      "rotZ": 0.007274749958887696,
-      "scaleX": 0.9126320120696751,
-      "scaleZ": 1.1042150680385001,
-      "y": -0.06,
+      "rotX": -0.014034754782915073,
+      "rotZ": -0.05778725541662428,
+      "scaleX": 2.273147435160353,
+      "scaleY": 2.273147435160354,
+      "scaleZ": 2.2731474351603533,
+      "y": -0.06000000000000005,
       "name": "Graveyard 3 headstone 5"
     },
     {
       "assetId": "props/gravestone_cross",
-      "x": -4.6,
-      "z": -67.4,
-      "rotY": 2.2353771233465523,
-      "scale": 1.2604779499927816,
+      "x": 32.9,
+      "z": -105.2,
+      "rotY": 0.9542010200726841,
+      "scale": 0.4159090909090909,
       "collide": true,
       "collisionMode": "baked",
-      "rotX": -0.01582435895688832,
-      "rotZ": -0.05410112970508635,
-      "scaleX": 1.7568438003220612,
-      "scaleZ": 2.0723934149430145,
-      "y": -0.06,
+      "rotX": -3.1301051209033512,
+      "rotZ": 3.126768499534116,
+      "scaleX": 2.140553561155685,
+      "scaleY": 2.1405535611556843,
+      "scaleZ": 2.140553561155685,
+      "y": -0.06000000000000005,
       "name": "Graveyard 3 headstone 6"
     },
     {
@@ -24570,15 +25652,18 @@
     },
     {
       "assetId": "props/bonfire",
-      "x": -93.5,
-      "z": -76.5,
-      "rotY": 3.821293985124223,
-      "scale": 2.2537562604340566,
+      "x": -101.52800615374274,
+      "z": -78.71207713799436,
+      "rotY": 0.8300511366987336,
+      "scale": 0.1848181818181818,
       "collide": true,
       "collisionMode": "baked",
-      "scaleX": 0.35330037297250416,
-      "scaleZ": 0.5209228565582157,
-      "y": -0.05,
+      "rotX": 0,
+      "rotZ": 0,
+      "scaleX": 4.3,
+      "scaleY": 4.3,
+      "scaleZ": 4.3,
+      "y": -0.050988802868088295,
       "name": "Campfire 3",
       "fire": true
     },
@@ -25340,6 +26425,22 @@
       "name": "Camp tent 1"
     },
     {
+      "assetId": "props/tent_open",
+      "x": -104.44827057479147,
+      "z": -81.90549863181622,
+      "rotY": 1.4835926535897954,
+      "scale": 0.39768181818181814,
+      "collide": true,
+      "collisionMode": "baked",
+      "rotX": -0.019311870178207888,
+      "rotZ": -0.02488399234134699,
+      "scaleX": 3.428963310092582,
+      "scaleY": 4.526231569322209,
+      "scaleZ": 3.4289633100925827,
+      "y": -0.05652335232337122,
+      "name": "Camp tent 5"
+    },
+    {
       "assetId": "props/tent_small",
       "x": 68,
       "z": 16,
@@ -25383,21 +26484,6 @@
       "scaleZ": 0.7434247737556562,
       "y": -0.06,
       "name": "Camp tent 4"
-    },
-    {
-      "assetId": "props/tent_small",
-      "x": -90.5,
-      "z": -78.5,
-      "rotY": -0.9,
-      "scale": 1.8358531317494597,
-      "collide": true,
-      "collisionMode": "baked",
-      "rotX": -0.02926768505014479,
-      "rotZ": -0.011513570174574852,
-      "scaleX": 1,
-      "scaleZ": 0.7607624055208678,
-      "y": -0.06,
-      "name": "Camp tent 5"
     },
     {
       "assetId": "props/tent_open",
@@ -27228,130 +28314,6 @@
       "scaleZ": 1.7209677419354839,
       "y": 0.62,
       "name": "Ruin 1 fallen column"
-    },
-    {
-      "assetId": "props/column_broken",
-      "x": -5,
-      "z": -52,
-      "rotY": 0.9953885266132435,
-      "scale": 0.7899628252788103,
-      "collide": true,
-      "collisionMode": "baked",
-      "rotZ": -0.13,
-      "scaleX": 1.850254352654582,
-      "scaleZ": 1.9301891023245386,
-      "y": -0.1,
-      "name": "Ruin 2 column 1"
-    },
-    {
-      "assetId": "props/column",
-      "x": 1.9282032302755088,
-      "z": -56,
-      "rotY": 1.7918962852042102,
-      "scale": 1.8744142455482662,
-      "collide": true,
-      "collisionMode": "baked",
-      "rotZ": 0.03,
-      "scaleX": 1.7209677419354839,
-      "scaleZ": 1.7209677419354839,
-      "y": -0.1,
-      "name": "Ruin 2 column 2"
-    },
-    {
-      "assetId": "props/column_broken",
-      "x": 1.9282032302755097,
-      "z": -64,
-      "rotY": 0.9925980367095668,
-      "scale": 1.5799256505576207,
-      "collide": true,
-      "collisionMode": "baked",
-      "rotZ": -0.03,
-      "scaleX": 0.925127176327291,
-      "scaleZ": 0.9650945511622693,
-      "y": -0.1,
-      "name": "Ruin 2 column 3"
-    },
-    {
-      "assetId": "props/column_broken",
-      "x": -4.999999999999999,
-      "z": -68,
-      "rotY": 1.9002422590946275,
-      "scale": 0.7899628252788103,
-      "collide": true,
-      "collisionMode": "baked",
-      "rotZ": 0.13,
-      "scaleX": 1.850254352654582,
-      "scaleZ": 1.9301891023245386,
-      "y": -0.1,
-      "name": "Ruin 2 column 4"
-    },
-    {
-      "assetId": "props/column_broken",
-      "x": -11.928203230275507,
-      "z": -64,
-      "rotY": 0.31094082832215825,
-      "scale": 1.1849442379182153,
-      "collide": true,
-      "collisionMode": "baked",
-      "rotZ": -0.03,
-      "scaleX": 1.2335029017697217,
-      "scaleZ": 1.286792734883026,
-      "y": -0.1,
-      "name": "Ruin 2 column 5"
-    },
-    {
-      "assetId": "props/column",
-      "x": -11.928203230275509,
-      "z": -56,
-      "rotY": 2.6802776091208016,
-      "scale": 1.8744142455482662,
-      "collide": true,
-      "collisionMode": "baked",
-      "rotZ": 0.03,
-      "scaleX": 1.7209677419354839,
-      "scaleZ": 1.7209677419354839,
-      "y": -0.1,
-      "name": "Ruin 2 column 6"
-    },
-    {
-      "assetId": "props/statue_head",
-      "x": -7.4,
-      "z": -62.7,
-      "rotY": 1.1539395448881349,
-      "scale": 0.9372071227741331,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 1.891539081385979,
-      "scaleZ": 2.655429864253394,
-      "y": -0.55,
-      "name": "Ruin 2 statue head"
-    },
-    {
-      "assetId": "props/statue_block",
-      "x": -4.9,
-      "z": -64.3,
-      "rotY": 0.2900077096994583,
-      "scale": 0.6762849413886384,
-      "collide": true,
-      "collisionMode": "baked",
-      "scaleX": 1.3845193508114857,
-      "scaleZ": 1.3845193508114857,
-      "y": -0.2,
-      "name": "Ruin 2 statue block"
-    },
-    {
-      "assetId": "props/column",
-      "x": -8.2,
-      "z": -65.2,
-      "rotY": 0.6,
-      "scale": 1.8744142455482662,
-      "collide": true,
-      "collisionMode": "baked",
-      "rotX": 1.5107963267948965,
-      "scaleX": 1.7209677419354839,
-      "scaleZ": 1.7209677419354839,
-      "y": 0.62,
-      "name": "Ruin 2 fallen column"
     },
     {
       "assetId": "props/column_broken",
@@ -36256,30 +37218,6 @@
     },
     {
       "assetId": "props/rowboat",
-      "x": -98.5,
-      "z": -74.5,
-      "rotY": 1.2,
-      "scale": 1.2429618768328445,
-      "collide": true,
-      "collideRadius": 1.4,
-      "collisionMode": "basic",
-      "y": 0,
-      "name": "Rowboat"
-    },
-    {
-      "assetId": "props/rowboat",
-      "x": -95,
-      "z": -78,
-      "rotY": -0.5,
-      "scale": 1.2429618768328445,
-      "collide": true,
-      "collideRadius": 1.4,
-      "collisionMode": "basic",
-      "y": 0,
-      "name": "Rowboat"
-    },
-    {
-      "assetId": "props/rowboat",
       "x": -100,
       "z": -33,
       "rotY": 2.4,
@@ -36360,19 +37298,9 @@
     },
     {
       "assetId": "props/shrub_flowering",
-      "x": -19,
-      "z": -95.5,
-      "rotY": 1.8,
-      "scale": 0.48025613660619,
-      "collide": false,
-      "y": 0,
-      "name": "Shrub Flowering"
-    },
-    {
-      "assetId": "props/shrub_flowering",
-      "x": 8.6,
-      "z": -82.6,
-      "rotY": -1.2,
+      "x": -15.7,
+      "z": -118.82,
+      "rotY": 2.7,
       "scale": 0.4562433297758805,
       "collide": false,
       "y": 0,
@@ -36380,19 +37308,9 @@
     },
     {
       "assetId": "props/shrub_flowering",
-      "x": -30,
-      "z": -96.4,
-      "rotY": 0.2,
-      "scale": 0.5042689434364995,
-      "collide": false,
-      "y": 0,
-      "name": "Shrub Flowering"
-    },
-    {
-      "assetId": "props/shrub_flowering",
-      "x": -7.2,
-      "z": -124,
-      "rotY": 2.7,
+      "x": 47.97,
+      "z": -96.06,
+      "rotY": 0.39,
       "scale": 0.4562433297758805,
       "collide": false,
       "y": 0,
@@ -36422,50 +37340,10 @@
       "name": "Hex Watchtower"
     },
     {
-      "assetId": "props/garden_iron_pillar",
-      "x": -13,
-      "z": -73.5,
-      "rotY": 0,
-      "scale": 1.0223048327137547,
-      "collide": false,
-      "y": 0,
-      "name": "Garden Iron Pillar"
-    },
-    {
-      "assetId": "props/garden_iron_pillar",
-      "x": 3.2,
-      "z": -73.5,
-      "rotY": 0,
-      "scale": 1.0223048327137547,
-      "collide": false,
-      "y": 0,
-      "name": "Garden Iron Pillar"
-    },
-    {
-      "assetId": "props/garden_iron_pillar",
-      "x": -13,
-      "z": -66,
-      "rotY": 0,
-      "scale": 1.0223048327137547,
-      "collide": false,
-      "y": 0,
-      "name": "Garden Iron Pillar"
-    },
-    {
-      "assetId": "props/garden_iron_pillar",
-      "x": 3.2,
-      "z": -66,
-      "rotY": 0,
-      "scale": 1.0223048327137547,
-      "collide": false,
-      "y": 0,
-      "name": "Garden Iron Pillar"
-    },
-    {
       "assetId": "props/garden_iron_fence",
-      "x": -11,
-      "z": -73.5,
-      "rotY": 0,
+      "x": 25.52,
+      "z": -99.66,
+      "rotY": 2.1816615649929116,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36473,9 +37351,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -7.5,
-      "z": -73.5,
-      "rotY": 0,
+      "x": 27.46,
+      "z": -96.91,
+      "rotY": 2.1816615649929116,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36483,9 +37361,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -4,
-      "z": -73.5,
-      "rotY": 0,
+      "x": 29.45,
+      "z": -94.16,
+      "rotY": 2.1816615649929116,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36493,9 +37371,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -0.5,
-      "z": -73.5,
-      "rotY": 0,
+      "x": 23.67,
+      "z": -102.49,
+      "rotY": 2.1816615649929116,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36503,9 +37381,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": 2.2,
-      "z": -73.5,
-      "rotY": 0,
+      "x": 38.11,
+      "z": -89.76,
+      "rotY": 0.6108652381980153,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36513,9 +37391,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -11,
-      "z": -66,
-      "rotY": 0,
+      "x": 40.9,
+      "z": -91.68,
+      "rotY": 0.6108652381980153,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36523,9 +37401,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -7.5,
-      "z": -66,
-      "rotY": 0,
+      "x": 43.66,
+      "z": -93.58,
+      "rotY": 0.6108652381980153,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36533,9 +37411,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -4,
-      "z": -66,
-      "rotY": 0,
+      "x": 46.45,
+      "z": -95.49,
+      "rotY": 0.6108652381980153,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36543,9 +37421,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -0.5,
-      "z": -66,
-      "rotY": 0,
+      "x": 49.25,
+      "z": -97.4,
+      "rotY": 0.6108652381980153,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36553,9 +37431,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": 2.2,
-      "z": -66,
-      "rotY": 0,
+      "x": 49.67,
+      "z": -99.77,
+      "rotY": 2.1816615649929116,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36563,9 +37441,9 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -13,
-      "z": -71.5,
-      "rotY": 1.5707963267948966,
+      "x": 47.72,
+      "z": -102.56,
+      "rotY": 2.1816615649929116,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36573,9 +37451,39 @@
     },
     {
       "assetId": "props/garden_iron_fence",
-      "x": -13,
-      "z": -68,
-      "rotY": 1.5707963267948966,
+      "x": 41.93,
+      "z": -110.88,
+      "rotY": 2.1816615649929116,
+      "scale": 1.7571884984025556,
+      "collide": false,
+      "y": 0,
+      "name": "Garden Iron Fence"
+    },
+    {
+      "assetId": "props/garden_iron_fence",
+      "x": 40,
+      "z": -113.65,
+      "rotY": 2.1816615649929116,
+      "scale": 1.7571884984025556,
+      "collide": false,
+      "y": 0,
+      "name": "Garden Iron Fence"
+    },
+    {
+      "assetId": "props/garden_iron_fence",
+      "x": 43.87,
+      "z": -108.1,
+      "rotY": 2.1816615649929116,
+      "scale": 1.7571884984025556,
+      "collide": false,
+      "y": 0,
+      "name": "Garden Iron Fence"
+    },
+    {
+      "assetId": "props/garden_iron_fence",
+      "x": 45.79,
+      "z": -105.31,
+      "rotY": 2.1816615649929116,
       "scale": 1.7571884984025556,
       "collide": false,
       "y": 0,
@@ -36583,9 +37491,9 @@
     },
     {
       "assetId": "foliage/oak_4",
-      "x": -11.5,
-      "z": -71.8,
-      "rotY": 0.6,
+      "x": -9.39,
+      "z": -57.36,
+      "rotY": -0.366,
       "scale": 3.9516650563607087,
       "collide": true,
       "collideRadius": 0.8,
@@ -36595,8 +37503,8 @@
     },
     {
       "assetId": "foliage/oak_4",
-      "x": -11.5,
-      "z": -67.6,
+      "x": -41.59,
+      "z": -43.6,
       "rotY": -1.1,
       "scale": 3.6476908212560386,
       "collide": true,
@@ -39501,9 +40409,24 @@
     },
     {
       "assetId": "props/streetlamp_eastbrook_civic",
-      "x": 3.3717879576019167,
-      "z": -52.703396091812266,
-      "rotY": -1.8699963681582306,
+      "x": 13.726767987444198,
+      "z": -78.71617578605613,
+      "rotY": 1.7541993093800534,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 0.45,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 297"
+    },
+    {
+      "assetId": "props/streetlamp_eastbrook_civic",
+      "x": 4.2186321250148096,
+      "z": -57.44680854031045,
+      "rotY": -1.8829630133485253,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 0.45,
@@ -39516,9 +40439,9 @@
     },
     {
       "assetId": "props/streetlamp_eastbrook_civic",
-      "x": -9.729545553186503,
-      "z": 22.41322056936541,
-      "rotY": 1.2192065927493798,
+      "x": -8.37589377191475,
+      "z": 17.810804513041454,
+      "rotY": 1.2939967651095052,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 0.45,
@@ -39561,9 +40484,54 @@
     },
     {
       "assetId": "props/streetlamp_eastbrook_civic",
-      "x": 23.842306637899572,
-      "z": -34.389742497094325,
-      "rotY": 1.8804422271294579,
+      "x": -5.329768054889458,
+      "z": -117.82156593068498,
+      "rotY": -1.6068704064264627,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 0.45,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 298"
+    },
+    {
+      "assetId": "props/streetlamp_eastbrook_civic",
+      "x": 31.66401349116544,
+      "z": -37.65413727543204,
+      "rotY": -1.1910446170059643,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 0.45,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 300"
+    },
+    {
+      "assetId": "props/streetlamp_eastbrook_civic",
+      "x": -33.44783716157823,
+      "z": -103.6111100755925,
+      "rotY": 0.11256901565091763,
+      "scale": 2.5,
+      "collide": true,
+      "collideRadius": 0.45,
+      "collisionMode": "basic",
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "y": 0,
+      "name": "Streetlamp 299"
+    },
+    {
+      "assetId": "props/streetlamp_eastbrook_civic",
+      "x": -5.932828447867121,
+      "z": -31.3391282143576,
+      "rotY": 1.6670949235275694,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 0.45,
@@ -39576,9 +40544,9 @@
     },
     {
       "assetId": "props/streetlamp_eastbrook_civic",
-      "x": 43.054919331843585,
-      "z": -45.88334645658977,
-      "rotY": 1.0669679308203242,
+      "x": -33.820916080381565,
+      "z": 134.03337147028196,
+      "rotY": 1.1924962483872728,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 0.45,
@@ -39621,9 +40589,9 @@
     },
     {
       "assetId": "props/streetlamp_eastbrook_civic",
-      "x": -3.8,
-      "z": 93,
-      "rotY": 1.772125545816801,
+      "x": 2.9159546608125764,
+      "z": 80.6822283638205,
+      "rotY": -1.5601999578053343,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 0.45,
@@ -39876,9 +40844,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 6.817507519750961,
-      "z": 687.2477036265213,
-      "rotY": 2.4530709859435027,
+      "x": 6.054015117322601,
+      "z": 687.3873455881968,
+      "rotY": 2.1420738871721445,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
@@ -39891,9 +40859,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 36.83989732691958,
-      "z": 687.2714509483782,
-      "rotY": -0.2646676562806689,
+      "x": 34.66199042907467,
+      "z": 688.0690968290764,
+      "rotY": -0.16486655365574793,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
@@ -39906,9 +40874,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 52.96752833158015,
-      "z": 709.3959065511816,
-      "rotY": 2.470050173488176,
+      "x": 52.14941528033816,
+      "z": 708.6800576313449,
+      "rotY": 2.46208372763697,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
@@ -39921,9 +40889,9 @@
     },
     {
       "assetId": "props/streetlamp_thornpeak_beacon",
-      "x": 77.06440320629967,
-      "z": 721.6903916692819,
-      "rotY": -0.698018383476948,
+      "x": 76.2957197081537,
+      "z": 720.9217081711358,
+      "rotY": -0.7422080797594113,
       "scale": 2.5,
       "collide": true,
       "collideRadius": 1.08,
@@ -58296,27 +59264,27 @@
     },
     {
       "assetId": "tidehold/fenrire/house_a",
-      "x": 7.4,
-      "z": 281.7,
+      "x": 11.6,
+      "z": 274.6,
       "rotY": 1.5707963267948966,
-      "scale": 5.559090909090909,
+      "scale": 7.782727272727272,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.45,
       "name": "Fenbridge warden gatehouse"
     },
     {
       "assetId": "tidehold/fenrire/tavern",
-      "x": 12.25,
-      "z": 299.9,
+      "x": 13.55,
+      "z": 298,
       "rotY": 1.5707963267948966,
-      "scale": 10.294681818181816,
+      "scale": 12.353618181818181,
       "collide": true,
       "worldPropKind": "inn",
       "worldPropWidth": 1.9428,
       "worldPropDepth": 1.2628,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.25,
       "name": "Fenbridge crooked reed inn"
     },
     {
@@ -58332,32 +59300,32 @@
     },
     {
       "assetId": "tidehold/fenrire/shop_b",
-      "x": 9.2,
-      "z": 322.8,
+      "x": 12.75,
+      "z": 326.4,
       "rotY": 1.5707963267948966,
-      "scale": 8.499999999999998,
+      "scale": 12.749999999999998,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.55,
       "name": "Fenbridge moonwort apothecary"
     },
     {
       "assetId": "tidehold/fenrire/shop_a",
-      "x": -8.9,
-      "z": 322,
+      "x": -12.3,
+      "z": 325.3,
       "rotY": -1.5707963267948966,
-      "scale": 7.399863636363635,
+      "scale": 11.099795454545452,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.05,
+      "y": -1.55,
       "name": "Fenbridge gilded strongbox"
     },
     {
       "assetId": "tidehold/smithy",
-      "x": -34.06,
-      "z": -113.48,
-      "rotY": 3.1416,
-      "scale": 11.6982,
+      "x": -4.2,
+      "z": -75.2,
+      "rotY": 0.3490658503988659,
+      "scale": 11.698227272727271,
       "collide": true,
       "collisionMode": "baked",
       "y": -1.35,
@@ -58448,10 +59416,10 @@
     },
     {
       "assetId": "tidehold/tavern",
-      "x": -40.51,
-      "z": -72.3,
-      "rotY": 1.5708,
-      "scale": 13.3831,
+      "x": -30.34,
+      "z": -60.63,
+      "rotY": 0.4188790204786391,
+      "scale": 13.383086363636362,
       "collide": true,
       "worldPropKind": "inn",
       "worldPropWidth": 2.1998,
@@ -58626,10 +59594,10 @@
     },
     {
       "assetId": "tidehold/hall",
-      "x": -64,
-      "z": -115.57,
-      "rotY": 3.1416,
-      "scale": 18.0226,
+      "x": 28.2,
+      "z": -119.62,
+      "rotY": 2.181661564992912,
+      "scale": 18.02260909090909,
       "collide": true,
       "collisionMode": "baked",
       "y": -1.35,
@@ -58855,10 +59823,10 @@
     },
     {
       "assetId": "tidehold/bank",
-      "x": 30.38,
-      "z": -115,
-      "rotY": 1.5708,
-      "scale": 13.3585,
+      "x": -61.99,
+      "z": -118.33,
+      "rotY": 3.9269908169872414,
+      "scale": 13.358504545454544,
       "collide": true,
       "collisionMode": "baked",
       "y": -1.35,
@@ -58949,13 +59917,13 @@
     },
     {
       "assetId": "tidehold/shop_a",
-      "x": -7.02,
-      "z": -82.03,
-      "rotY": 0,
-      "scale": 9.6198,
+      "x": -30.59,
+      "z": -127.63,
+      "rotY": 3.0543261909900767,
+      "scale": 11.099795454545452,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.35,
+      "y": -1.55,
       "name": "Eastbrook apothecary",
       "fireEffects": [
         {
@@ -58964,9 +59932,9 @@
           "anchor": "base",
           "style": "torch",
           "blend": "additive",
-          "x": -0.52,
-          "y": 5.694,
-          "z": -1.69,
+          "x": -0.6,
+          "y": 6.57,
+          "z": -1.95,
           "scale": 0.31,
           "width": 0.6,
           "height": 0.55,
@@ -58989,10 +59957,10 @@
     },
     {
       "assetId": "tidehold/house_b",
-      "x": -75,
-      "z": -49.9,
-      "rotY": 0,
-      "scale": 9.4426,
+      "x": -59.11,
+      "z": -51.35,
+      "rotY": 0.8028514559173916,
+      "scale": 9.442668181818181,
       "collide": true,
       "collisionMode": "baked",
       "y": -1.35,
@@ -59000,13 +59968,13 @@
     },
     {
       "assetId": "tidehold/vault",
-      "x": 0.5,
-      "z": -108.75,
-      "rotY": 0,
-      "scale": 6.4205,
+      "x": -73.73,
+      "z": -103.4,
+      "rotY": 0.7853981633974483,
+      "scale": 6.420454545454545,
       "collide": true,
       "collisionMode": "baked",
-      "y": -1.37,
+      "y": -1.45,
       "name": "Eastbrook weekly vault"
     },
     {
@@ -59037,94 +60005,99 @@
   },
   "propsMode": "editable-all",
   "decorationExclusions": [
-    "rock:-52.853:-116.816",
-    "tree:-46.382:-120.497",
-    "tree:-35.756:-58.377",
-    "tree:-30.413:-59.072",
+    "tree2:-83.872:-103.628",
     "tree:-72.872:-101.956",
     "tree:-62.186:-102.367",
-    "tree:-64.218:-97.913",
+    "rock:-52.853:-116.816",
     "tree2:-58.645:-107.878",
+    "tree:-46.382:-120.497",
+    "tree:-55.705:-58.456",
+    "tree2:-32.145:-128.660",
+    "tree:-35.756:-58.377",
+    "tree:-30.413:-59.072",
+    "tree:13.491:-126.800",
+    "tree2:12.424:-119.697",
     "tree:23.486:-127.802",
     "tree:26.947:-110.899",
+    "tree2:29.999:-136.908",
     "tree:35.861:-127.765",
     "tree:34.664:-111.777",
-    "tree:43.681:-111.512"
+    "tree2:40.058:-95.043"
   ],
   "grassClear": [
     {
-      "x": -33.25,
-      "z": -113.1,
-      "r": 8.2
-    },
-    {
-      "x": -38.52,
-      "z": -113.1,
-      "r": 8.2
-    },
-    {
-      "x": -43.79,
-      "z": -113.1,
-      "r": 8.2
-    },
-    {
-      "x": -40.58,
-      "z": -68.85,
-      "r": 11.52
-    },
-    {
-      "x": -40.58,
-      "z": -76.46,
-      "r": 11.52
-    },
-    {
-      "x": -66.5,
-      "z": -111.76,
-      "r": 12.86
-    },
-    {
-      "x": -66.5,
-      "z": -118.72,
-      "r": 12.86
-    },
-    {
-      "x": 31.39,
-      "z": -112.29,
+      "x": -60.79,
+      "z": -120.97,
       "r": 13.5
     },
     {
-      "x": 31.39,
-      "z": -115.88,
+      "x": -63.34,
+      "z": -118.42,
       "r": 13.5
     },
     {
-      "x": -7.54,
-      "z": -83.07,
-      "r": 8.53
+      "x": -5.09,
+      "z": -75.28,
+      "r": 8.2
     },
     {
-      "x": -6.5,
-      "z": -83.07,
-      "r": 8.53
+      "x": -0.14,
+      "z": -77.08,
+      "r": 8.2
     },
     {
-      "x": -77.55,
-      "z": -49.89,
-      "r": 8.21
+      "x": 4.81,
+      "z": -78.89,
+      "r": 8.2
     },
     {
-      "x": -73.24,
-      "z": -49.89,
-      "r": 8.21
+      "x": -33.52,
+      "z": -59.29,
+      "r": 11.52
     },
     {
-      "x": -0.3,
-      "z": -108.75,
+      "x": -26.57,
+      "z": -62.38,
+      "r": 11.52
+    },
+    {
+      "x": 23.64,
+      "z": -119.48,
+      "r": 12.85
+    },
+    {
+      "x": 29.35,
+      "z": -123.48,
+      "r": 12.85
+    },
+    {
+      "x": -30.09,
+      "z": -126.38,
+      "r": 9.75
+    },
+    {
+      "x": -31.3,
+      "z": -126.49,
+      "r": 9.75
+    },
+    {
+      "x": -60.88,
+      "z": -49.52,
+      "r": 8.2
+    },
+    {
+      "x": -57.89,
+      "z": -52.61,
+      "r": 8.2
+    },
+    {
+      "x": -74.3,
+      "z": -102.83,
       "r": 6.9
     },
     {
-      "x": 1.3,
-      "z": -108.75,
+      "x": -73.16,
+      "z": -103.97,
       "r": 6.9
     }
   ]

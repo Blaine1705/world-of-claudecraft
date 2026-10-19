@@ -46,12 +46,20 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { type PlacedTextureTier, placedTextureTierPath } from './placed_texture_tier_core';
+import { placedTownCullRadius } from './placed_town_buildings';
+import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import {
   buildRealmBuilderMonumentBody,
   buildRealmBuilderMonumentFx,
 } from './realm_builder_monument_fx';
 import type { RevealGateCore } from './reveal_gate_core';
+import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryClutterFar,
+  sceneryStructureFar,
+} from './scenery_detail';
 import {
   newTownPiecewiseReveal,
   orderTownRootsNearestFirst,
@@ -72,8 +80,17 @@ const FOUNDATION_COLOR = 0x46505e;
 // authored windows. Panes derived from the real window frames sit exactly in
 // the models' openings; the earlier bounding-box guesses floated off walls.
 const KIT_WINDOW_AMBER = 0xffb45a;
-const TOWN_CULL_RADIUS =
-  EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
+const TOWN_CULL_RADIUS = Math.max(
+  placedTownCullRadius(
+    {
+      hub: { center: { x: 0, z: 0 }, radius: EASTBROOK_LAYOUT.wall.radius },
+      buildings: EASTBROOK_LAYOUT.buildings,
+    },
+    EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2,
+  ),
+  Math.hypot(EASTBROOK_LAYOUT.weeklyVault.x, EASTBROOK_LAYOUT.weeklyVault.z) +
+    Math.hypot(EASTBROOK_LAYOUT.weeklyVault.w / 2, EASTBROOK_LAYOUT.weeklyVault.d / 2),
+);
 /** The one reveal-gate key of the town's static content. */
 const STATIC_REVEAL_KEY = 'eastbrook-town-static';
 
@@ -111,6 +128,9 @@ const ASSET_INSTANCE_COUNTS = (() => {
 const loadedSources = new Map<string, THREE.Group>();
 const preparedTemplates = new Map<string, TownAssetTemplate>();
 const sourceLoadTasks = new Map<string, Promise<void>>();
+/** The indoor camera's rooms of the live view's walk-in buildings (dropped when the next
+ *  view builds). */
+const cameraInteriors = createPlacedTownInteriors();
 /** The FILE each resident source was read from. A placed building's URL names
  *  the model; the file follows the profile's texture tier (same geometry, see
  *  placed_texture_tier_core.ts), so everything else here stays keyed on the
@@ -182,6 +202,8 @@ interface TownAssetTemplate {
 interface RoofHideTarget extends EastbrookRoofVisibilityTarget {
   group: THREE.Group;
   mats: OccluderFadeMat[];
+  interiors?: readonly THREE.Object3D[];
+  interiorsVisible?: boolean;
   hidden: boolean;
   alpha: number;
 }
@@ -1164,6 +1186,8 @@ function buildFromTemplates(
     textureUuid: null,
     materialBindings: 0,
   };
+  // the previous view's rooms go with it: a world without the town keeps no air
+  cameraInteriors.clear();
   if (!builtInWorld) {
     group.userData.drawStats = eastbrookTownDrawStats(group);
     return {
@@ -1189,10 +1213,14 @@ function buildFromTemplates(
       // (eastbrook_placed_building.ts). A reveal root and a roof-hide target
       // like every other building, so the two lists stay index-aligned.
       const placed = buildEastbrookPlacedBuilding(building, kitTemplate.raw, groundAt);
+      // a walk-in one keeps the indoor camera to its rooms (placed_town_interiors.ts)
+      cameraInteriors.add(building, groundAt);
       group.add(placed.group);
       roofHideTargets.push({
         group: placed.group,
         mats: placed.mats,
+        interiors: placed.interiors,
+        interiorsVisible: true,
         hidden: false,
         alpha: 1,
         x: building.position.x,
@@ -1231,6 +1259,7 @@ function buildFromTemplates(
   buildingGroups.push(weeklyVault.group);
   const microBuild = buildMicroBatches(templates, groundAt, atlas);
   const microBatches = microBuild.batches;
+  const microBatchCount = microBatches.length;
   for (const batch of microBatches) group.add(batch);
   // The monument's living half: the honouree's name projected off both honour
   // plates, and the lantern halos and embers. Additive and text, which a merged
@@ -1335,6 +1364,8 @@ function buildFromTemplates(
   let lastCamX = 0;
   let lastCamZ = 0;
   const orderedRevealRoots: THREE.Object3D[] = [];
+  for (const root of [...staticCullTargets, ...buildingGroups, monumentBody.group])
+    prepareSceneryDetailRoot(root);
   return {
     group,
     setRealmBuilderHonouree(name: string): void {
@@ -1375,12 +1406,18 @@ function buildFromTemplates(
       monumentFx.update(reducedMotion, monumentDistance);
       lastCamX = camX;
       lastCamZ = camZ;
+      const lowCull = isLowSceneryCullActive(fogFar);
+      const clutterFar = sceneryClutterFar(fogFar);
+      const structureFar = sceneryStructureFar(fogFar);
+      const cullX = lowCull ? eyeX : camX;
+      const cullZ = lowCull ? eyeZ : camZ;
+      const microVisible = eastbrookFogVisible(cullX, cullZ, 0, 0, clutterFar, TOWN_CULL_RADIUS);
       // Eastbrook is centred on the world origin, so the camera's distance
       // squared to the town centre is camX^2 + camZ^2.
       const reveal = townStaticReveal(
-        eastbrookFogVisible(camX, camZ, 0, 0, fogFar, TOWN_CULL_RADIUS),
+        eastbrookFogVisible(cullX, cullZ, 0, 0, structureFar, TOWN_CULL_RADIUS),
         staticRevealed,
-        camX * camX + camZ * camZ,
+        cullX * cullX + cullZ * cullZ,
         TOWN_CULL_RADIUS,
         revealGate,
         STATIC_REVEAL_KEY,
@@ -1390,7 +1427,9 @@ function buildFromTemplates(
       // nearest first: the whole town no longer waits for its slowest program.
       townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);
       for (let index = 0; index < staticCullTargets.length; index++) {
-        staticCullTargets[index].visible = townRootVisible(reveal, staticPiecewise, index);
+        staticCullTargets[index].visible =
+          (index >= microBatchCount || microVisible) &&
+          townRootVisible(reveal, staticPiecewise, index);
       }
       // Buildings keep their own fog cull and roof fade, but their FIRST
       // reveal rides the same hold as the batches: while the gate compiles
@@ -1410,12 +1449,29 @@ function buildFromTemplates(
           eyeX,
           eyeY,
           eyeZ,
-          fogFar,
+          structureFar,
+          cullX,
+          cullZ,
         );
         target.group.visible =
           roofVisibilityPlan.visible &&
           townRootVisible(reveal, staticPiecewise, buildingRootBase + index);
         if (!roofVisibilityPlan.visible) continue;
+        if (target.interiors && target.interiors.length > 0) {
+          const bDx = cullX - target.x;
+          const bDz = cullZ - target.z;
+          const interiorReach = target.cullRadius + 6;
+          const showInteriors =
+            !lowCull ||
+            roofVisibilityPlan.hidden ||
+            bDx * bDx + bDz * bDz <= interiorReach * interiorReach;
+          if (target.interiorsVisible !== showInteriors) {
+            target.interiorsVisible = showInteriors;
+            for (let i = 0; i < target.interiors.length; i++) {
+              target.interiors[i].visible = showInteriors;
+            }
+          }
+        }
         prefetchOccluderFadeWithin(target.mats, target.x, target.z, camX, camZ);
         target.hidden = roofVisibilityPlan.hidden;
         target.alpha = advanceOccluderFade(
@@ -1632,6 +1688,7 @@ export function eastbrookStyledPlacedObject(
 /** Test-only access to the tier-independent preload and deterministic build contract. */
 export const eastbrookTownInternalsForTest = {
   rootName: ROOT_NAME,
+  townCullRadius: TOWN_CULL_RADIUS,
   newAssetUrls: NEW_ASSET_URLS,
   supportAssetUrls: SUPPORT_ASSET_URLS,
   allAssetUrls: ALL_ASSET_URLS,

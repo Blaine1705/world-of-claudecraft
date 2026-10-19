@@ -16,7 +16,6 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, '..', 'eastbrook_ferry'))
 
-import bpy  # noqa: E402
 from shiplib import EDGE, FLAT, P, PLAIN, scale_color  # noqa: E402,F401
 
 WOOD, METAL, STONE, PLASTER, GLOW, SLATE, GLASS = 0, 1, 2, 3, 4, 5, 6
@@ -32,30 +31,8 @@ EMISSIVE = (GLOW, GLASS, GLASS_BLUE, GLASS_RED, GLASS_GOLD, GLOW_SOFT, GLOW_LANT
 # depth buffer and flicker (pinned by tests/highwatch_manor_asset.test.ts over the shipped GLB).
 LAYER = 0.04
 
-# A glTF material's emission cannot read the vertex colours, so each glowing material carries
-# its own emission colour: the warm amber of lamplight behind glass and of candle flames, and
-# a faint warm light through the coloured glass (whose colours are its vertex colours, lit by
-# the room). The runtime lifts a weak emission to its bloom floor
-# (render/eastbrook_placed_building.ts), so the colours here set the hue and the balance.
-MATERIAL_SPECS = (
-    # name, roughness, metallic, emission strength, emission colour
-    ('ManorWood', 0.82, 0.0, 0.0, None),
-    ('ManorMetal', 0.42, 0.6, 0.0, None),
-    ('ManorStone', 0.92, 0.0, 0.0, None),
-    ('ManorPlaster', 0.95, 0.0, 0.0, None),
-    ('ManorGlow', 0.5, 0.0, 1.0, (0.62, 0.34, 0.1)),
-    ('ManorSlate', 0.7, 0.05, 0.0, None),
-    ('ManorGlass', 0.3, 0.0, 1.0, (0.2, 0.15, 0.09)),
-    # the stained glass's colours, lit from the room behind them at night
-    ('ManorGlassBlue', 0.3, 0.0, 1.0, (0.08, 0.14, 0.42)),
-    ('ManorGlassRed', 0.3, 0.0, 1.0, (0.42, 0.06, 0.07)),
-    ('ManorGlassGold', 0.3, 0.0, 1.0, (0.6, 0.4, 0.1)),
-    # honey lamplight (alternate windows), the brighter lanterns, the soft candle flames
-    ('ManorGlowSoft', 0.5, 0.0, 1.0, (0.66, 0.46, 0.18)),
-    ('ManorGlowLantern', 0.5, 0.0, 1.0, (0.86, 0.5, 0.14)),
-    ('ManorGlowCandle', 0.5, 0.0, 1.0, (0.78, 0.6, 0.24)),
-)
-
+# The palette the builders paint with. The materials (the painted maps the wood, stone, plaster
+# and slate wear, the metal, the glass and the glows) are manor_texture.py's.
 PAL = dict(
     # the ashlar plinth and the dressed stone: cool blue-grey granite
     ashlar=[(0.42, 0.47, 0.55), (0.38, 0.43, 0.51), (0.46, 0.5, 0.57), (0.4, 0.45, 0.53),
@@ -131,25 +108,6 @@ def hashf(*k):
 def tone(color, *k, spread=0.12):
     """A colour nudged up or down by a stable hash of where it stands."""
     return scale_color(color, 1 - spread / 2 + spread * hashf(*k))
-
-
-def make_materials():
-    mats = []
-    for name, rough, metal, emission, glow in MATERIAL_SPECS:
-        mat = bpy.data.materials.new(name)
-        mat.use_nodes = True
-        bsdf = mat.node_tree.nodes.get('Principled BSDF')
-        bsdf.inputs['Roughness'].default_value = rough
-        bsdf.inputs['Metallic'].default_value = metal
-        attr = mat.node_tree.nodes.new('ShaderNodeVertexColor')
-        attr.layer_name = 'Col'
-        mat.node_tree.links.new(attr.outputs['Color'], bsdf.inputs['Base Color'])
-        if emission:
-            bsdf.inputs['Emission Color'].default_value = (*glow, 1.0)
-            bsdf.inputs['Emission Strength'].default_value = emission
-        mat.use_backface_culling = True
-        mats.append(mat)
-    return mats
 
 
 # ---------------------------------------------------------------------------

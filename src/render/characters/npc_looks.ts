@@ -2127,6 +2127,112 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     },
     props: 'none',
   },
+  // Maudie Tapwright, innkeeper of the Mirefen tavern: round and rosy from the fire, a
+  // grey-streaked bun and laugh lines; nothing in her hands but a welcome.
+  innkeeper_maudie: {
+    cls: 'mage',
+    app: {
+      gender: 'female',
+      ...head('curls', 'none', 'soft_arch', 'default', 'button', 'relaxed'),
+      ...skin(18, 0.41, 0.57),
+      ...hair(24, 0.38, 0.36),
+      ...eyes(30, 0.45, 0.35),
+      headShape: shape({
+        eyeSpacing: 0.18,
+        eyeSize: 0.4,
+        eyeTilt: -0.14,
+        browHeight: 0.3,
+        chinWidth: 0.4,
+      }),
+      bodyScale: 1.02,
+    },
+    props: 'none',
+  },
+  // The tavern's regulars (src/sim/content/mirefen_tavern_patrons.ts), all seated.
+  // Amos Eelby, eel fisher: an old marshman gone bald on top and white in the beard,
+  // brows like thatch, skin weathered brown by forty summers on the water.
+  patron_amos_eelby: {
+    cls: 'hunter',
+    app: {
+      gender: 'male',
+      ...head('bald', 'boxed', 'default', 'almond', 'broad', 'smirk'),
+      ...skin(25, 0.47, 0.41),
+      ...hair(36, 0.04, 0.6),
+      ...eyes(96, 0.3, 0.38),
+      headShape: shape({
+        eyeSpacing: -0.21,
+        eyeSize: -0.8,
+        eyeTilt: -0.12,
+        browHeight: -0.5,
+        chinWidth: 0.5,
+      }),
+      bodyScale: 1.01,
+    },
+    props: 'none',
+  },
+  // Grissel Sedgeworth, peat cutter: a broad, wind-reddened woman with a grey-streaked
+  // brown bun, shrewd eyes and a dry mouth.
+  patron_grissel_sedgeworth: {
+    cls: 'rogue',
+    app: {
+      gender: 'female',
+      ...head('crown', 'none', 'straight', 'almond', 'default', 'full'),
+      ...skin(16, 0.41, 0.5),
+      ...hair(26, 0.25, 0.31),
+      ...eyes(32, 0.4, 0.33),
+      headShape: shape({
+        eyeSpacing: 0.12,
+        eyeSize: -0.8,
+        eyeTilt: 0.2,
+        browHeight: -0.12,
+        chinWidth: 0.44,
+      }),
+      bodyScale: 1.03,
+    },
+    props: 'none',
+  },
+  // Ned Oxley, drover: a road-worn man of middle years, unkempt brown hair, a week of
+  // stubble and a sunburnt nose.
+  patron_ned_oxley: {
+    cls: 'hunter',
+    app: {
+      gender: 'male',
+      ...head('swept', 'chinstrap', 'relaxed', 'almond', 'broad', 'default'),
+      ...skin(23, 0.55, 0.48),
+      ...hair(25, 0.52, 0.2),
+      ...eyes(205, 0.35, 0.42),
+      headShape: shape({
+        eyeSpacing: -0.16,
+        eyeSize: 0.12,
+        eyeTilt: -0.08,
+        browHeight: -0.18,
+        chinWidth: 0.42,
+      }),
+      bodyScale: 1.02,
+    },
+    props: 'none',
+  },
+  // Hester Quillby, mapmaker: a neat blue-black bob and a scholar's patience; pale from
+  // indoor winters over her charts.
+  patron_hester_quillby: {
+    cls: 'mage',
+    app: {
+      gender: 'female',
+      ...head('bob', 'none', 'soft_arch', 'default', 'soft', 'full'),
+      ...skin(25, 0.25, 0.65),
+      ...hair(220, 0.35, 0.08),
+      ...eyes(160, 0.35, 0.45),
+      headShape: shape({
+        eyeSpacing: -0.26,
+        eyeSize: 0.25,
+        eyeTilt: 0.08,
+        browHeight: 0.3,
+        chinWidth: 0.66,
+      }),
+      bodyScale: 0.98,
+    },
+    props: 'none',
+  },
   // Ansel Hale, the steward of the Highwatch manor: a greying household man, keys at
   // his belt and a ledger's patience in his face.
   steward_ansel_hale: {

@@ -582,8 +582,8 @@ import {
 } from './outdoor_biome_presets';
 import {
   hemiOutdoorIntensity as hemiOutdoorIntensityFor,
-  LAMBERT_RIG_HEMI_INTENSITY,
-  LAMBERT_RIG_SUN_INTENSITY,
+  lowHemiIntensity,
+  lowSunIntensity,
   terrainFillBoostTarget,
 } from './outdoor_light_rig_core';
 import {
@@ -626,6 +626,7 @@ import { type RankedPointLight, reconcileViewPointLights } from './point_light_b
 import { attachPointLightCarriers, NO_POINT_LIGHTS } from './point_light_carriers';
 import { markPointLightSource } from './point_light_carriers_core';
 import { buildComposer, type PostPipeline } from './post';
+import { precipBiomeAt } from './precip_shelter';
 import { withSceneHiddenForPresentationPrewarm } from './presentation_prewarm';
 import { createPreviewPrewarmLane } from './preview_prewarm_lane';
 import {
@@ -772,8 +773,10 @@ import {
   sceneCensusChild,
 } from './scene_census_core';
 import { sceneKeyLightUniform } from './scene_sampling';
+import * as sceneryDetail from './scenery_detail';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
+import { applySeatAnim } from './seated_pose';
 import { drapeRingLocalY, reticleShownUnder, selectionRingScale } from './selection_ring';
 import {
   createSelfRenderPositionState,
@@ -832,6 +835,7 @@ import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
 import { bastionShadeGhosted } from './sunken_bastion/bastion_shade_ghost_core';
+import { stepSwimKickSplash } from './swim_wake_vfx';
 import {
   buildTargetConeOverlay,
   drapeTargetConeOverlay,
@@ -1098,11 +1102,6 @@ const SFX_MOVE_RANGE_SQ = 42 * 42;
 const FOOT_STRIDE_WALK = 0.95;
 const FOOT_STRIDE_RUN = 1.55;
 const SWIM_STRIDE = 2.4;
-// Surface kick: beats per second at a standstill, quickening with swim speed,
-// and how far behind the pivot the prone body's feet trail (as a fraction of
-// stand height, the authored stroke lays the legs out behind the hips).
-const SWIM_KICK_HZ = 2.6;
-const SWIM_FOOT_TRAIL = 0.19;
 // fire/torch point lights beyond this never shine (their falloff range is
 // shorter anyway); the nearest GFX.maxPointLights within it win the budget
 const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
@@ -1159,8 +1158,8 @@ const WARM_SUN_COLOR = 0xff7a28;
 // call site, so none of this warmth reaches the moonlit night.
 const WARM_HEMI_SKY_COLOR = 0xffdfbd;
 const WARM_HEMI_GROUND_COLOR = 0x725038;
-const DAY_HEMI_SKY_WARMTH = 0.3;
-const DAY_HEMI_GROUND_WARMTH = 0.22;
+const DAY_HEMI_SKY_WARMTH = 0.12;
+const DAY_HEMI_GROUND_WARMTH = 0.1;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
@@ -1691,11 +1690,11 @@ export class Renderer {
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
   private waterView: WaterView;
   private lastWaterSimulationPasses = 0;
-  // The waterRipples setting (default off), threaded in via setWaterRipples
+  // The waterRipples setting (default on), threaded in via setWaterRipples
   // because render modules never read the settings store directly. Held here
   // so an editor water rebuild re-applies the player's choice to the fresh
   // WaterView.
-  private waterRipplesEnabled = false;
+  private waterRipplesEnabled = true;
   private terrainView: TerrainView;
   // Map-editor placed GLB assets; null when the world has none and the editor
   // never asked for the view (the shipped game with the built-in world).
@@ -2220,6 +2219,7 @@ export class Renderer {
     if (options.initializeGfx !== false) {
       initGfxTier(this.webgl); // software-GL autodetect needs the live context
     }
+    sceneryDetail.installSceneryDetail(this.backgroundGpuWork, this, this.compileGate.bind(this));
     refreshTextureAnisotropy(this.webgl); // resolved budget before any upload
     if (GFX.composer || GFX.gradePass) {
       // three's render() resets info per pass (since r185 at the top of the
@@ -2450,7 +2450,7 @@ export class Renderer {
     const hemi = new THREE.HemisphereLight(
       0xdcefff,
       0x465f39,
-      LOW_GFX ? LAMBERT_RIG_HEMI_INTENSITY : hemiOutdoorIntensity(),
+      LOW_GFX ? lowHemiIntensity(GFX) : hemiOutdoorIntensity(),
     );
     this.scene.add(hemi);
     this.hemi = hemi;
@@ -2458,7 +2458,7 @@ export class Renderer {
     // as soft sun, not white glare; the hemisphere stays cool for contrast.
     const sun = new THREE.DirectionalLight(
       LOW_GFX ? 0xffdfaa : 0xffd99a,
-      LOW_GFX ? LAMBERT_RIG_SUN_INTENSITY : SUN_INTENSITY,
+      LOW_GFX ? lowSunIntensity(GFX) : SUN_INTENSITY,
     );
     sun.position.copy(SUN_ANCHOR);
     sun.castShadow = GFX.dynamicShadows;
@@ -2638,19 +2638,12 @@ export class Renderer {
     setRenderCategory(this.motes.group, 'ambient');
     this.scene.add(this.motes.group);
     // near-field solid-blade carpet; the card tufts own the mid/far field
-    this.bladeGrass = buildBladeGrass(
-      this.sim.cfg.seed,
-      this.sim.player.pos.x,
-      this.sim.player.pos.z,
-    );
+    const editorCarpet = options.editorClutter === true;
+    this.bladeGrass = buildBladeGrass(this.sim.cfg.seed, this.sim.player.pos.x, this.sim.player.pos.z, editorCarpet);
     this.scene.add(this.bladeGrass.group);
     // the meadow-continuum blade band: the same clusters carried out to the
     // band radius over the painted ground (blade_grass_band.ts)
-    this.bladeGrassBand = buildBladeGrassBand(
-      this.sim.cfg.seed,
-      this.sim.player.pos.x,
-      this.sim.player.pos.z,
-    );
+    this.bladeGrassBand = buildBladeGrassBand(this.sim.cfg.seed, this.sim.player.pos.x, this.sim.player.pos.z, editorCarpet);
     this.scene.add(this.bladeGrassBand.group);
     // boulders on the steep-slope band; cliffs stop being bare wedges
     this.cliffScree = buildCliffScree(this.sim.cfg.seed);
@@ -4182,6 +4175,7 @@ export class Renderer {
     freeze = true,
   ): void {
     setRenderCategory(view.group, 'props');
+    if (freeze) sceneryDetail.prepareSceneryDetailRoot(view.group, true);
     // Attach hidden until the live gate links the group's programs (the same
     // contract as dungeon interiors): a lazily built biome feature otherwise
     // links its freshly minted materials synchronously on its first visible
@@ -4244,7 +4238,7 @@ export class Renderer {
       this.zoneFeatureGroups,
       this.camera.position.x,
       this.camera.position.z,
-      fogFar,
+      (group) => sceneryDetail.sceneryCullFar(fogFar, group),
       this.sun.shadow.camera.top,
       // Zone isolate (editor): only the isolated zone's features draw.
       this.editor.zoneResidencyFilter,
@@ -5011,14 +5005,17 @@ export class Renderer {
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
     // the paint-free carpet ring the terrain splat reads (see terrain.ts)
-    sharedUniforms.uCarpetRing.value.set(p.pos.x, p.pos.z, GFX.bladeCarpetRadius);
+    const focusX = this.editorCam ? this.editorCam.target.x : p.pos.x;
+    const focusZ = this.editorCam ? this.editorCam.target.z : p.pos.z;
+    sharedUniforms.uCarpetRing.value.set(
+      focusX,
+      focusZ,
+      GFX.bladeCarpetRadius || (this.editorCam ? 34 : 0),
+    );
     // The sway/wind/rock gate ranks from the free-cam LOOK-AT in the editor
     // (the applyZoneAtmosphere rule): the dummy player rides the camera, and a
     // maker inspecting a ship from 120 yards out would see it frozen.
-    updateTreeSwayPlayer(
-      this.editorCam ? this.cameraLookAt.x : p.pos.x,
-      this.editorCam ? this.cameraLookAt.z : p.pos.z,
-    ); // the placed sway/wind gate (tree_sway.ts)
+    updateTreeSwayPlayer(focusX, focusZ); // the placed sway/wind gate (tree_sway.ts)
     this.tmpV.set(p.pos.x, p.pos.y, p.pos.z);
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
@@ -5060,7 +5057,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      this.entryDetailHorizon.sceneryCullFar(fogFar),
+      sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -5072,7 +5069,7 @@ export class Renderer {
         this.cameraLookAt.x,
         this.cameraLookAt.y,
         this.cameraLookAt.z,
-        this.entryDetailHorizon.sceneryCullFar(fogFar),
+        sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
         dt,
         this.reducedMotion(),
       );
@@ -5087,7 +5084,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogNear,
-      this.entryDetailHorizon.sceneryCullFar(fogFar),
+      sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar),
       this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar * 0.9
         : this.lastRequestedFogNear,
@@ -5098,6 +5095,7 @@ export class Renderer {
       dt,
       this.reducedMotion(),
     );
+    sceneryDetail.updateSceneryDetail(this.camera.position.x, this.camera.position.z);
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.abilityVfx.update(dt, this.reducedMotion());
     this.vfx.update(dt);
@@ -8821,7 +8819,8 @@ export class Renderer {
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
-  private fogState: FogSceneState = 'outdoor';
+  /** Read by scenery eligibility; atmosphere updates remain owned here. */
+  fogState: FogSceneState = 'outdoor';
 
   /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
@@ -9385,14 +9384,14 @@ export class Renderer {
       // lowness ramp runs the warm all the way to 1 at the horizon so sunrise
       // and sunset go genuinely orange, and the gate takes the whole warm off
       // below it so the moonlight never picks up a sunset tint.
-      // The base sits at 0.58 rather than the first cut's 0.52: standing
-      // daylight read clinical, and this is a couple hundred kelvin of golden
-      // bias (a vale noon key lands near rgb 255,182,144 instead of
-      // 255,189,152), not an orange midday. The lowness ramp reaches full at
+      // The base sits at 0.18 (was 0.58): the painted look wants a clean,
+      // near-white noon key so sand reads khaki and grass yellow-green, not
+      // peach (0.58 landed a vale noon key near rgb 255,182,144); dawn and
+      // dusk keep their full orange through the lowness ramp, which reaches full at
       // y 0.12 rather than 0.08 so the key light is already at its sunset
       // orange while the gate still passes it at full strength, which is what
       // makes the golden hour read as a band rather than an instant.
-      const warmAmt = sunsetWarmGate(sunElev) * (0.58 + lowness * 0.42);
+      const warmAmt = sunsetWarmGate(sunElev) * (0.18 + lowness * 0.82);
       // The realm's own night hue, as a luminance-neutral multiplier. Applied
       // to the key light and both hemisphere halves AFTER they cool toward the
       // moon, so a realm keeps tinting the world it lights after dark: the
@@ -9779,15 +9778,14 @@ export class Renderer {
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
     // the paint-free carpet ring the terrain splat reads (see terrain.ts)
+    const focusX = this.editorCam ? this.editorCam.target.x : this.sim.player.pos.x;
+    const focusZ = this.editorCam ? this.editorCam.target.z : this.sim.player.pos.z;
     sharedUniforms.uCarpetRing.value.set(
-      this.sim.player.pos.x,
-      this.sim.player.pos.z,
-      GFX.bladeCarpetRadius,
+      focusX,
+      focusZ,
+      GFX.bladeCarpetRadius || (this.editorCam ? 34 : 0),
     );
-    updateTreeSwayPlayer(
-      this.editorCam ? this.cameraLookAt.x : this.sim.player.pos.x,
-      this.editorCam ? this.cameraLookAt.z : this.sim.player.pos.z,
-    );
+    updateTreeSwayPlayer(focusX, focusZ);
     for (const [id, remaining] of this.waterJetVisualChannels) {
       const next = remaining - dt;
       if (next <= 0) this.waterJetVisualChannels.delete(id);
@@ -10808,9 +10806,7 @@ export class Renderer {
       // A mounted rider holds the seated pose (the sit loop reads as riding);
       // swim/cast still outrank it in desiredBaseState, so mounted casting
       // and swimming animate normally.
-      st.sitting =
-        e.kind === 'player' &&
-        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
+      applySeatAnim(st, v, e, riderMounted, active.root); // a seat's clips + lift, or the sit
       // Facts about the ENTITY that override what its displayed motion implies
       // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
       applyEntityAnimOverrides(st, e, visuallyDead, characterEffects, hasStealth);
@@ -11017,11 +11013,11 @@ export class Renderer {
             v.waterContactX = ax;
             v.waterContactZ = az;
             v.waterContactAccum = 0;
-          } else if (waterDistanceSq > 0.0016 && v.waterContactAccum >= 1 / 24) {
+          } else if (!swimming && waterDistanceSq > 0.0225 && v.waterContactAccum >= 0.24) {
             const contactSpeed = Math.sqrt(waterDistanceSq) / Math.max(v.waterContactAccum, 0.001);
             const wakeStrength = Math.min(
-              1.6,
-              Math.max(0.28, (0.34 + contactSpeed * 0.095) * (0.45 + contactImmersion * 0.75)),
+              0.85,
+              Math.max(0.2, (0.22 + contactSpeed * 0.06) * (0.4 + contactImmersion * 0.5)),
             );
             this.waterView.moveContact(
               v.waterContactX,
@@ -11051,7 +11047,7 @@ export class Renderer {
             releaseHalfLength,
             contactAxisX,
             contactAxisZ,
-            0.68,
+            0.85,
           );
         }
         v.waterContactActive = false;
@@ -11059,23 +11055,26 @@ export class Renderer {
         v.waterContactX = ax;
         v.waterContactZ = az;
       }
-      // Surface swimmers churn the water where their feet kick. A SUBMERGED
-      // swimmer emits nothing at all: there is no surface up there to break,
-      // and the quiet is the point of going under.
-      if (swimming && !submerged && !visuallyDead && charOnScreen && Number.isFinite(wl)) {
-        v.swimKickPhase += dt * SWIM_KICK_HZ * (0.55 + Math.min(1.1, loco.speed / 3.2));
-        if (v.swimKickPhase >= 1) {
-          v.swimKickPhase -= 1;
-          const trail = active.height * e.scale * SWIM_FOOT_TRAIL;
-          const footX = ax - contactAxisX * trail;
-          const footZ = az - contactAxisZ * trail;
-          const kick = Math.min(1.3, 0.5 + loco.speed * 0.09);
-          this.vfx.swimKickSplash(footX, wl, footZ, contactAxisX, contactAxisZ, kick);
-          this.waterView.addSplash(footX, footZ, contactRadius * 0.8, kick * 0.5);
-        }
-      } else {
-        v.swimKickPhase = 0;
-      }
+      stepSwimKickSplash(
+        v,
+        dt,
+        loco.speed,
+        swimming,
+        touchesWater,
+        moving,
+        submerged,
+        airborne,
+        visuallyDead,
+        charOnScreen,
+        wl,
+        ax,
+        az,
+        contactAxisX,
+        contactAxisZ,
+        contactRadius,
+        this.vfx,
+        this.waterView,
+      );
       v.wasAirborne = airborne;
       v.wasSwimming = swimming;
       v.wasSubmerged = submerged;
@@ -11659,7 +11658,7 @@ export class Renderer {
     const eyeX = this.cameraLookAt.x;
     const eyeY = this.cameraLookAt.y;
     const eyeZ = this.cameraLookAt.z;
-    const sceneryFar = this.entryDetailHorizon.sceneryCullFar(fogFar);
+    const sceneryFar = sceneryDetail.sceneryFar(this.entryDetailHorizon, fogFar);
     this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, sceneryFar, dt, this.reducedMotion());
     for (const town of this.townViews) {
       town.update(camX, camY, camZ, eyeX, eyeY, eyeZ, sceneryFar, dt, this.reducedMotion());
@@ -11689,6 +11688,7 @@ export class Renderer {
       dt,
       this.reducedMotion(),
     );
+    sceneryDetail.updateSceneryDetail(camX, camZ);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart);
@@ -11708,10 +11708,10 @@ export class Renderer {
       p.pos.x,
       p.pos.z,
     );
-    this.bladeGrass.update(p.pos.x, p.pos.z);
+    this.bladeGrass.update(focusX, focusZ);
     // fogFar here is subsystemCullFar(): the residency-clamped detail
     // horizon, so band blades never stand past unbuilt ground
-    this.bladeGrassBand.update(p.pos.x, p.pos.z, fogFar, this.fogState === 'outdoor');
+    this.bladeGrassBand.update(focusX, focusZ, fogFar, this.fogState === 'outdoor');
     this.cliffScree.update(p.pos.x, p.pos.z);
     this.cityClutter.update(this.camera.position.x, this.camera.position.z);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'ambientScenery', worldStart);
@@ -11775,7 +11775,7 @@ export class Renderer {
         this.updateEnvBiome(dt);
       }
     }
-    // precipitation only falls outdoors; indoors/underwater pass null to clear.
+    // precipitation only falls outdoors and in the open (precip_shelter.ts); indoors pass null.
     // The sampler lets a neighbouring zone's weather fall inside the box while
     // the player stands outside it (weather_field_core.ts).
     // Precipitation is unlit, so it takes the grade explicitly or snow stays
@@ -11784,7 +11784,7 @@ export class Renderer {
     this.weather.update(
       this.camera.position,
       dt,
-      this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.x, p.pos.z) : null,
+      precipBiomeAt(this.fogState === 'outdoor', p.pos.x, p.pos.y, p.pos.z),
       zoneBiomeAt,
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'sky', worldStart);
@@ -12261,9 +12261,10 @@ export class Renderer {
     );
     // The camera orbits the lagged/led pivot at the player's requested
     // distance. Scene geometry never changes that distance on the built-in
-    // world; registered obstructors fade through their subsystem's
-    // occluder-fade pass. An authored map also lets rock and a placed asset's
-    // collider stop the boom (authored_map/chase_boom_core.ts).
+    // world outdoors; registered obstructors fade through their subsystem's
+    // occluder-fade pass, and an authored interior clamps it (interior_camera.ts).
+    // An authored map also lets rock and a placed asset's collider stop the boom
+    // (authored_map/chase_boom_core.ts).
     const pose = stepRendererVehicleCamera(this, directedPose, dt, reduce);
     // The opt-in Action Cam shoulder shift rides on top of the vehicle-aware
     // pose: the vehicle camera decides the boom, the shoulder offsets it.
@@ -12336,7 +12337,7 @@ export class Renderer {
         for (const p of this.riftAmbienceScratch) this.ambientPointsMergedScratch.push(p);
         points = this.ambientPointsMergedScratch;
       }
-      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points);
+      sink.ambience(amb.biome, amb.inDungeon, amb.precip, amb.nearWater, 0, points, eye);
     }
   }
 

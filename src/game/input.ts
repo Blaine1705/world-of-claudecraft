@@ -243,6 +243,9 @@ export class Input {
   // True while the current click-to-move was issued as an attack-move (walk to
   // the point and auto-attack enemies). Set by setClickMoveTarget, cleared on stop.
   clickMoveAttack = false;
+  // A walk the game itself asked for (to a seat, src/game/seat_interact.ts): it runs
+  // whether or not the player turned click-to-move on.
+  clickMoveForced = false;
   // When on (the Attack Move setting), only the attack-move key itself is
   // reserved. Other movement keys still work so enabling Attack Move cannot
   // make WASD appear dead.
@@ -878,8 +881,10 @@ export class Input {
     entityId: number | null = null,
     path: { x: number; z: number }[] = [target],
     attack = false,
+    forced = false,
   ): void {
     this.applyClickMovePath(target, path);
+    this.clickMoveForced = forced;
     this.clickMoveStop = stopDistance;
     this.clickMoveEntityId = entityId;
     this.clickMoveAttack = attack;
@@ -919,6 +924,7 @@ export class Input {
     this.clickMoveEntityId = null;
     this.clickMoveFacing = null;
     this.clickMoveAttack = false;
+    this.clickMoveForced = false;
     this.noteIntent('move');
   }
 
