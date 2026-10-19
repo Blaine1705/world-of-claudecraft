@@ -221,3 +221,34 @@ export function broomPose(
 export function broomSparkRate(speed: number): number {
   return speed > 0.4 ? 40 + Math.min(40, speed * 8) : 6;
 }
+
+/** The broom's ember trail (round of 2026-10-19, read over tall meadow grass and in
+ *  daylight): besides the sparks off the bristles, embers float up out of the grass and
+ *  linger behind the walker, so the trail reads at any time of day. `rate` is per second
+ *  (none while standing still), `lift` how high above the bristles they rise from. */
+export function broomEmberTrail(speed: number): { rate: number; lift: number } {
+  if (speed <= 0.4) return { rate: 0, lift: 0 };
+  const stride = Math.min(1, speed / 3);
+  return { rate: 18 + 22 * stride, lift: 0.3 + 0.25 * stride };
+}
+
+/** The candle's glow column (same round): a soft green light standing over the dish and
+ *  pale wisps climbing out of the flames, so the candle still shows where the grass hides
+ *  its dish and its ground mist. Follows the mist's own grow and fade. */
+export function candleGlowColumn(
+  elapsed: number,
+  remaining: number,
+): { opacity: number; height: number; wispRate: number } {
+  const { strength } = candleMist(elapsed, remaining);
+  return { opacity: 0.16 * strength, height: 0.55 + 0.25 * strength, wispRate: 6 * strength };
+}
+
+/** Halo slots an accent glow leaves free for the pumpkin flights and their splats. */
+export const HALO_PRANK_RESERVE = PRANK_CAP * 2;
+
+/** Whether the glow pool (`used` of `size` handed out this frame) still has a slot: an
+ *  accent (a candle's column, a broom's raised glow) never eats into the slots the
+ *  pranks ask for last, so a crowded square keeps every pumpkin's flight and splat. */
+export function haloSlotFree(used: number, size: number, accent: boolean): boolean {
+  return used < (accent ? size - HALO_PRANK_RESERVE : size);
+}

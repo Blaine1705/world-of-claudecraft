@@ -7,11 +7,16 @@ import { drawsSeasonalHead, wearsSeasonalHead } from '../src/render/characters/s
 import {
   BAT_COUNT,
   batFlight,
+  broomEmberTrail,
   broomPose,
+  candleGlowColumn,
   candleMist,
   ghostOrbit,
+  HALO_PRANK_RESERVE,
+  haloSlotFree,
   lookFade,
   PRANK_AURA_ID,
+  PRANK_CAP,
   PRANK_FLIGHT_SEC,
   prankArc,
   toyEffectOf,
@@ -142,5 +147,37 @@ describe('the toys in words', () => {
     expect(hit?.flashText).toContain('Ada');
     for (const what of ['prankNeedsPlayer', 'toyHidden'] as const)
       expect(seasonalEventPresentation({ type: 'seasonal', what })?.logText, what).toBeTruthy();
+  });
+
+  it('keeps the broom trail and the candle readable over tall grass and in daylight', () => {
+    // standing still: no ember trail (only the slow glitter of the sparks)
+    expect(broomEmberTrail(0)).toEqual({ rate: 0, lift: 0 });
+    const walk = broomEmberTrail(3);
+    const amble = broomEmberTrail(1);
+    expect(walk.rate).toBe(40);
+    expect(amble.rate).toBeGreaterThan(0);
+    expect(walk.rate).toBeGreaterThan(amble.rate);
+    // the embers rise clear of the bristles (which brush the ground)
+    expect(walk.lift).toBeGreaterThanOrEqual(0.5);
+    // the candle's column follows the mist: dark at the strike, full when spread, gone out
+    expect(candleGlowColumn(0, 30).opacity).toBe(0);
+    expect(candleGlowColumn(0, 30).wispRate).toBe(0);
+    const lit = candleGlowColumn(5, 25);
+    expect(lit.opacity).toBeCloseTo(0.16);
+    expect(lit.wispRate).toBe(6);
+    expect(lit.height).toBeCloseTo(0.8);
+    expect(candleGlowColumn(30, 0).opacity).toBe(0);
+  });
+
+  it('never lets an accent glow take the halo slots the pumpkin pranks ask for last', () => {
+    const size = 24;
+    expect(HALO_PRANK_RESERVE).toBe(PRANK_CAP * 2);
+    // a full town square of candles and brooms: accents stop at the reserve...
+    expect(haloSlotFree(size - HALO_PRANK_RESERVE - 1, size, true)).toBe(true);
+    expect(haloSlotFree(size - HALO_PRANK_RESERVE, size, true)).toBe(false);
+    // ...while every prank flight and splat still finds a slot behind them
+    expect(haloSlotFree(size - HALO_PRANK_RESERVE, size, false)).toBe(true);
+    expect(haloSlotFree(size - 1, size, false)).toBe(true);
+    expect(haloSlotFree(size, size, false)).toBe(false);
   });
 });

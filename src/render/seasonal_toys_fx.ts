@@ -41,12 +41,15 @@ import {
   BROOM_SWEEP_EVERY,
   BROOM_SWEEP_SFX,
   batFlight,
+  broomEmberTrail,
   broomPose,
   broomSparkRate,
   CANDLE_WHISPER_SFX,
   candleFlicker,
+  candleGlowColumn,
   candleMist,
   ghostOrbit,
+  haloSlotFree,
   lookFade,
   PRANK_CAP,
   PRANK_FLIGHT_SEC,
@@ -133,6 +136,8 @@ interface Flight {
 const HIDDEN = new THREE.Matrix4().makeScale(0, 0, 0);
 const TWIN_SEC = 3;
 const HALO_CAP = 24;
+/** Below this a halo is invisible: it takes no slot. */
+const HALO_MIN_OPACITY = 0.005;
 const BAT_COLOR = 0x1a1220;
 /** The candle cluster's and the play broom's drawn size against their authored one. */
 const CANDLE_SCALE = 1.6;
@@ -924,8 +929,21 @@ export class SeasonalToysFx {
     return !e.dead && !e.ghost && !e.stealthed;
   }
 
-  private halo(x: number, y: number, z: number, size: number, opacity: number, color: number) {
-    if (this.halosUsed >= this.halos.length) return;
+  /** One pooled glow sprite. An `accent` (the candle's column, the broom's raised glow)
+   *  is the first to go in a crowd: it never takes the slots kept for the pumpkin
+   *  flights and splats, which ask last (updateFlights runs after every body's look).
+   *  A glow too faint to see takes no slot and no draw. */
+  private halo(
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    opacity: number,
+    color: number,
+    accent = false,
+  ) {
+    if (opacity <= HALO_MIN_OPACITY) return;
+    if (!haloSlotFree(this.halosUsed, this.halos.length, accent)) return;
     const s = this.halos[this.halosUsed++];
     s.visible = true;
     s.position.set(x, y, z);
@@ -1064,6 +1082,25 @@ export class SeasonalToysFx {
       this.halo(fx, fy + 0.08, fz, 0.7 * fl, 0.55 * fade, 0x66ff8a);
     }
     this.halo(cx, cy + 0.3, cz, 3.2, 0.08 * fade, 0x3cff6e);
+    // the glow column and the wisps climbing out of the flames: what still reads over
+    // tall grass and in daylight, where the dish and the ground mist sink out of sight
+    const column = candleGlowColumn(t, remaining);
+    this.halo(cx, cy + column.height, cz, 1.7, column.opacity * fade, 0x52ff84, true);
+    this.particles.toyMote(
+      cx,
+      cy + 0.35,
+      cz,
+      0.12 * Math.sin(this.time * 1.9 + st.phase),
+      0.55,
+      0.12 * Math.cos(this.time * 2.3 + st.phase),
+      0x7dffa2,
+      0.2,
+      2.4,
+      -0.04,
+      'wisp',
+      (this.reduced ? 0.5 : 1) * column.wispRate,
+      this.dt,
+    );
     // the low green mist spreading over the ground round it
     const mist = candleMist(t, remaining);
     if (this.mists && this.mistsUsed < TOY_CAP) {
@@ -1149,15 +1186,15 @@ export class SeasonalToysFx {
     const kick = 0.6 + 0.8 * stride;
     this.particles.toyMote(
       sx,
-      by + 0.12,
+      by + 0.22,
       sz,
       -s * kick * 0.6 + pose.sweep * c * 0.8,
-      1.1 + stride,
+      1.4 + stride,
       -c * kick * 0.6 - pose.sweep * s * 0.8,
       0xff7a1e,
-      0.22,
-      0.8,
-      4.2,
+      0.24,
+      0.95,
+      3.2,
       'spark',
       rate,
       this.dt,
@@ -1177,7 +1214,31 @@ export class SeasonalToysFx {
       rate * 0.4,
       this.dt,
     );
+    // embers floating up out of the grass and lingering behind the walker: the trail that
+    // reads in daylight and over tall meadow grass, where the low sparks are lost
+    const trail = broomEmberTrail(st.speed);
+    if (trail.rate > 0) {
+      // a lazy sideways sway and a flicker in size, so the trail curls like embers off a
+      // fire instead of standing in a row of equal beads
+      const sway = 0.45 * Math.sin(this.time * 7.3 + st.phase);
+      this.particles.toyMote(
+        sx - s * 0.25,
+        by + trail.lift,
+        sz - c * 0.25,
+        -s * 0.35 + c * sway,
+        0.45 + 0.2 * Math.sin(this.time * 5.1 + st.phase),
+        -c * 0.35 - s * sway,
+        0xff8a24,
+        0.17 + 0.07 * Math.abs(Math.sin(this.time * 11.7 + st.phase)),
+        1.5,
+        -0.1,
+        'glow',
+        trail.rate * fade * (this.reduced ? 0.5 : 1),
+        this.dt,
+      );
+    }
     this.halo(sx, by + 0.15, sz, 0.8, 0.35 * fade * (0.4 + 0.6 * stride), 0xff9a3a);
+    this.halo(sx, by + 0.45, sz, 1.1, 0.22 * fade * stride, 0xffa04a, true);
     // a soft sweep each stride while walking
     if (st.speed > 1 && this.time >= st.sweepAt) {
       st.sweepAt = this.time + BROOM_SWEEP_EVERY;
