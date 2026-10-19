@@ -133,8 +133,10 @@ describe('LookDeltaGuard', () => {
   it('drops an isolated spike out of a frame-coalesced 60 Hz stream', () => {
     const guard = new LookDeltaGuard();
     let t = stream(guard, 30, 16, 8, 0);
-    expect(guard.filter(-1200, 0, (t += 16))).toBeNull();
-    expect(guard.filter(30, 0, (t += 16))).toEqual({ dx: 30, dy: 0 });
+    t += 16;
+    expect(guard.filter(-1200, 0, t)).toBeNull();
+    t += 16;
+    expect(guard.filter(30, 0, t)).toEqual({ dx: 30, dy: 0 });
     expect(guard.dropped).toBe(1);
   });
 
@@ -152,10 +154,13 @@ describe('LookDeltaGuard', () => {
     // with only jitter before it, so it is held, then the next frame confirms.
     const guard = new LookDeltaGuard();
     let t = stream(guard, 1, 16, 4, 0);
-    expect(guard.filter(400, 0, (t += 16))).toBeNull();
-    expect(guard.filter(1000, 20, (t += 16))).toEqual({ dx: 1400, dy: 20 });
+    t += 16;
+    expect(guard.filter(400, 0, t)).toBeNull();
+    t += 16;
+    expect(guard.filter(1000, 20, t)).toEqual({ dx: 1400, dy: 20 });
     // The flick is now the recent motion, so it keeps flowing.
-    expect(guard.filter(1200, 0, (t += 16))).toEqual({ dx: 1200, dy: 0 });
+    t += 16;
+    expect(guard.filter(1200, 0, t)).toEqual({ dx: 1200, dy: 0 });
     expect(guard.dropped).toBe(0);
   });
 

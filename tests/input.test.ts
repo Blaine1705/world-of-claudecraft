@@ -2532,10 +2532,11 @@ describe('Input mouse-look jump defenses', () => {
     startDrag(ctx);
     let t = 1000;
     for (let i = 0; i < 8; i++) {
+      t += 16;
       ctx.windowListeners.get('mousemove')!({
         movementX: 30,
         movementY: 0,
-        timeStamp: (t += 16),
+        timeStamp: t,
         ...CENTER,
       });
     }
