@@ -73,7 +73,7 @@ import {
   newNameplatePlan,
 } from './nameplate_view';
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
-import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
+import { FRIENDLY, isFriendlyPet, isMobHostileToViewer, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 import {
   edgeArrowInto,
@@ -527,7 +527,9 @@ export class NameplatePainter {
 
   /** Hostile the way the plate reads it: a hostile mob, or an enemy player. */
   private isHostileEntity(entity: Entity): boolean {
-    return entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity));
+    return entity.kind === 'mob'
+      ? isMobHostileToViewer(entity, this.world.entities, this.isHostilePlayer)
+      : entity.kind === 'player' && this.isHostilePlayer(entity);
   }
 
   /** Surface repaint accounting for `Renderer.perfStats()`: how many passes
@@ -618,7 +620,7 @@ export class NameplatePainter {
       entity.dead && (entity.hostile || (entity.kind === 'player' && this.isHostilePlayer(entity)));
     state.myPet = entity.ownerId === player.id;
     state.threat = plan.threat;
-    const highlighted = state.currentTarget && state.hostile && !entity.dead;
+    const highlighted = state.currentTarget && this.isHostileEntity(entity) && !entity.dead;
     state.emphasis = highlighted && this.targetHighlight.nameplate;
     state.overheadMarker = highlighted && this.targetHighlight.overhead;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));

@@ -719,7 +719,7 @@ import {
 import { sceneKeyLightUniform } from './scene_sampling';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { captureRendererScreenshot } from './screenshot_capture';
-import { SelectionReticle } from './selection_reticle';
+import { createSelectionReticle, type SelectionReticle } from './selection_reticle';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
@@ -2768,14 +2768,14 @@ export class Renderer {
       );
     }
 
-    // selection ring: the target reticle (selection_reticle.ts owns the build,
-    // the terrain drape and the Heavier Hostile Reticle variant).
-    this.selectionReticle = new SelectionReticle(this.scene, {
-      terrain: (x, z) => groundHeight(x, z, this.sim.cfg.seed),
-      support: (x, z, unitY) => supportHeightAt(this.sim.cfg.seed, x, z, 0.5, unitY + 0.01),
-      sample: this.groundSample,
-    });
-
+    this.selectionReticle = createSelectionReticle(
+      this.scene,
+      this.sim.cfg.seed,
+      this.groundSample,
+      (root) => this.compileGate(root, true, 'selection-reticle-heavy'),
+      this.webgl.properties,
+      () => this.contextRestoredCount,
+    );
     this.playerAuraRings = new PlayerAuraRings(GFX.effectsTier, GFX.composer);
     setRenderCategory(this.playerAuraRings.group, 'ui3d');
     this.scene.add(this.playerAuraRings.group);

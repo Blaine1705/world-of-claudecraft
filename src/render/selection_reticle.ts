@@ -14,8 +14,12 @@
 // the classic gold ring.
 
 import * as THREE from 'three';
+import { supportHeightAt } from '../sim/colliders';
+import { groundHeight } from '../sim/world';
+import { compileTargetPrepared } from './compile_target_readiness';
 import { setRenderCategory } from './renderer_diagnostics';
 import { drapeRingLocalY, type HeightSampler } from './selection_ring';
+import type { TexturePropertiesLike } from './texture_prep_core';
 
 const SELECTION_RING_SPIN = 0.6; // rad/s, slow classic target-reticle rotation
 const HOSTILE_COLOR = 0xcc2222;
@@ -101,6 +105,7 @@ function dashedRing(
 
 export class SelectionReticle {
   readonly group = new THREE.Group();
+  private readonly heavyGroup = new THREE.Group();
   private readonly ringMat: THREE.MeshBasicMaterial;
   private readonly discMat: THREE.MeshBasicMaterial;
   private readonly dashMat: THREE.MeshBasicMaterial;
@@ -117,10 +122,17 @@ export class SelectionReticle {
   private lastHeavy = false;
   private supportY = 0;
   private readonly sampleOnSupport: HeightSampler;
+  private disposed = false;
+  private preparationAttempt = 0;
+  private attemptedGeneration = -1;
+  private readyGeneration = -1;
+  private preparing = false;
 
   constructor(
     scene: THREE.Scene,
     private readonly ground: SelectionReticleGround,
+    private readonly prepare: (root: THREE.Object3D) => Promise<boolean>,
+    private readonly generation: () => number,
   ) {
     this.sampleOnSupport = (x, z) => Math.max(ground.sample(x, z), this.supportY);
     const translucent = (opacity: number) =>
@@ -146,7 +158,10 @@ export class SelectionReticle {
       dashedRing(HEAVY_DASH_INNER, HEAVY_DASH_OUTER, HEAVY_DASH_COUNT, HEAVY_DASH_FILL),
       this.dashMat,
     );
-    for (const part of [this.disc, this.base, this.band, this.dashes]) this.group.add(part.mesh);
+    this.group.add(this.base.mesh, this.heavyGroup);
+    this.heavyGroup.name = 'selection-reticle-heavy';
+    this.heavyGroup.add(this.band.mesh, this.disc.mesh, this.dashes.mesh);
+    this.heavyGroup.visible = false;
     // four cardinal ticks on a spinning pivot, sharing the ring material so the
     // per-frame hostile/friendly recolour carries over for free.
     const tickGeo = new THREE.BufferGeometry();
@@ -179,7 +194,65 @@ export class SelectionReticle {
   }
 
   hide(): void {
+    if (this.disposed) return;
     this.group.visible = false;
+  }
+
+  /** Only optional heavy pieces wait for their own exact programs. A failed or
+   * timed-out gate leaves the classic actionable ring available. */
+  private heavyReady(): boolean {
+    const generation = this.generation();
+    if (this.readyGeneration === generation) return true;
+    if (this.attemptedGeneration !== generation) {
+      this.attemptedGeneration = generation;
+      const attempt = ++this.preparationAttempt;
+      this.preparing = true;
+      void Promise.resolve()
+        .then(() =>
+          this.disposed || attempt !== this.preparationAttempt
+            ? false
+            : this.prepare(this.heavyGroup),
+        )
+        .then(
+          (ready) => {
+            if (this.disposed || attempt !== this.preparationAttempt) return;
+            this.preparing = false;
+            if (ready && generation === this.generation()) this.readyGeneration = generation;
+          },
+          () => {
+            // The existing compile lane owns diagnostics. Never reveal on failure.
+            if (attempt === this.preparationAttempt) this.preparing = false;
+          },
+        );
+    }
+    return false;
+  }
+
+  /** Renderer-owned resources, never a module cache or borrowed material. */
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.preparationAttempt++;
+    this.group.visible = false;
+    this.group.removeFromParent();
+    const geometries = new Set<THREE.BufferGeometry>();
+    const materials = new Set<THREE.Material>();
+    this.group.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      geometries.add(object.geometry);
+      for (const material of Array.isArray(object.material) ? object.material : [object.material])
+        materials.add(material);
+    });
+    const errors: unknown[] = [];
+    for (const resource of [...geometries, ...materials]) {
+      try {
+        resource.dispose();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+    this.group.clear();
+    if (errors.length) throw new AggregateError(errors, 'Selection reticle disposal failed');
   }
 
   /**
@@ -199,11 +272,11 @@ export class SelectionReticle {
     time: number,
     boost: number,
   ): void {
-    const heavy = heavyOption && hostile;
+    if (this.disposed) return;
+    if (!heavyOption && !this.preparing) this.attemptedGeneration = -1;
+    const heavy = heavyOption && hostile && this.heavyReady();
     this.base.mesh.visible = !heavy;
-    this.band.mesh.visible = heavy;
-    this.disc.mesh.visible = heavy;
-    this.dashes.mesh.visible = heavy;
+    this.heavyGroup.visible = heavy;
     this.ticks.scale.setScalar(heavy ? HEAVY_TICK_SCALE : 1);
     // anchor the reticle to the ground under the unit (a classic decal: it
     // stays grounded even if the target jumps) and drape it over the slope.
@@ -261,4 +334,29 @@ export class SelectionReticle {
     for (let i = 0; i < y.length; i++) pos.setY(i, y[i]);
     pos.needsUpdate = true;
   }
+}
+
+/** Renderer glue: ground sampling and exact reveal proof stay with the owned
+ * producer; linking, variant settlement and touch still ride the shared lane. */
+export function createSelectionReticle(
+  scene: THREE.Scene,
+  seed: number,
+  sample: HeightSampler,
+  compile: (root: THREE.Object3D) => Promise<unknown>,
+  properties: TexturePropertiesLike,
+  generation: () => number,
+): SelectionReticle {
+  return new SelectionReticle(
+    scene,
+    {
+      terrain: (x, z) => groundHeight(x, z, seed),
+      support: (x, z, unitY) => supportHeightAt(seed, x, z, 0.5, unitY + 0.01),
+      sample,
+    },
+    async (root) => {
+      await compile(root);
+      return compileTargetPrepared(properties, root);
+    },
+    generation,
+  );
 }
