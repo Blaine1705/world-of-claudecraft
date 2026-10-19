@@ -353,7 +353,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "81d6082a",
+      "state": "f31c5d04",
       "events": "796c4679",
       "rng": {
         "draws": 0,
@@ -415,7 +415,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -554,7 +560,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "e8e6a1ad",
+      "state": "7ec89ad7",
       "events": "620a6523",
       "rng": {
         "draws": 0,
@@ -565,7 +571,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "f57b6477",
+      "state": "09b2740d",
       "events": "2678504f",
       "rng": {
         "draws": 0,
@@ -576,7 +582,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "f89f51b2",
+      "state": "1dd590a0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -655,7 +661,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -857,7 +869,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1014,
-      "state": "a60bbfc7",
+      "state": "08dcbabd",
       "events": "73ea6f18",
       "rng": {
         "draws": 0,
@@ -936,7 +948,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -1075,7 +1093,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "1e2f78d7",
+      "state": "ebd70e2d",
       "events": "3029cb04",
       "rng": {
         "draws": 0,
@@ -1154,7 +1172,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -1336,7 +1360,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "56417ca4",
+      "state": "f92c1e9e",
       "events": "efdefed8",
       "rng": {
         "draws": 0,
@@ -1415,7 +1439,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -1597,7 +1627,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "a60bbfc7",
+      "state": "08dcbabd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1676,7 +1706,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -1815,7 +1851,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1017,
-      "state": "a60bbfc7",
+      "state": "08dcbabd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1894,7 +1930,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -2033,7 +2075,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1019,
-      "state": "fbf76116",
+      "state": "f7932404",
       "events": "4257800d",
       "rng": {
         "draws": 0,
@@ -2112,7 +2154,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -2430,7 +2478,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1019,
-      "state": "7d729523",
+      "state": "eb33dd31",
       "events": "b60efd74",
       "rng": {
         "draws": 151,
@@ -2441,7 +2489,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1019,
-      "state": "97d9d730",
+      "state": "f7828c72",
       "events": "c52d757a",
       "rng": {
         "draws": 286,
@@ -2452,7 +2500,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1019,
-      "state": "97d9d730",
+      "state": "f7828c72",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -2531,7 +2579,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -2869,7 +2923,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1021,
-      "state": "fe9e58d2",
+      "state": "337ecc90",
       "events": "e84e0151",
       "rng": {
         "draws": 286,
@@ -2948,7 +3002,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -3287,7 +3347,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1023,
-      "state": "eba0e1ef",
+      "state": "dcc4967d",
       "events": "77a1fbfc",
       "rng": {
         "draws": 286,
@@ -3366,7 +3426,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
@@ -3712,7 +3778,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1023,
-      "state": "eba0e1ef",
+      "state": "dcc4967d",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -3791,7 +3857,13 @@
           "inventory": [
             {
               "count": 5,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 44000,
