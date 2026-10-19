@@ -6,7 +6,7 @@
 // which toy looks a body wears and how far through each it is; where the thrown pumpkin
 // is along its arc; where the ghost circles; where each bat of the swarm flies; how the
 // candle's light breathes and where its three dancing shadows fall; and how the
-// Gurglegreen Cauldron's brew bubbles and how a drinker's green glow pulses.
+// Gurglegreen Cauldron's brew bubbles and how the drink's green fizz boils off a drinker.
 import { GOURDLIGHT_TOYS, type GourdlightToyEffect } from '../sim/content/gourdlight_eve';
 
 /** The thrown pumpkin's flight (s): the head appears and the splat lands at its end. */
@@ -24,6 +24,19 @@ export const PRANK_CAP = 6;
 export const PRANK_SPLAT_SFX = 'impact_prank_pumpkin_splat';
 /** The cauldron's bubbling, looped at its spot while it stands. */
 export const CAULDRON_BUBBLE_SFX = 'gurglegreen_bubble_loop';
+/** The Gurglegreen Cauldron as drawn: its scale against the authored pot (whose rim sits at
+ *  CAULDRON_RIM_Y and whose belly bulges to CAULDRON_BELLY_R), and the drawn rim height and
+ *  belly radius in yards that its click volume must wrap (pick_only_objects.ts). Round 11
+ *  (owner playtest): a proper witch's cauldron, its rim about a player's waist, where round
+ *  10's knee-high pot (1.25) was easy to lose in the grass and fiddly to click. */
+export const CAULDRON_SCALE = 2.3;
+export const CAULDRON_RIM_Y = 0.5;
+export const CAULDRON_RIM_R = 0.3;
+export const CAULDRON_BELLY_R = 0.39;
+export const CAULDRON_DRAWN = Object.freeze({
+  rimHeight: CAULDRON_RIM_Y * CAULDRON_SCALE,
+  bellyRadius: CAULDRON_BELLY_R * CAULDRON_SCALE,
+});
 /** The mist's radius on the ground round the candle (yd). */
 export const CANDLE_MIST_RADIUS = 3.4;
 
@@ -326,11 +339,18 @@ export function cauldronBubble(
   };
 }
 
-/** A drinker's green glow (the body tint's strength, 0 to 1): it floods in over the first
- *  half second, pulses as the brew bubbles through them, and drains over the last second. */
-export function brewGlow(elapsed: number, remaining: number, t: number): number {
-  const fade = lookFade(elapsed, remaining, 0.5, 1);
-  // held well under a full emissive flood: the body stays readable (face, armour, its
-  // class) under a green wash rather than turning into a flat lime silhouette
-  return fade * (0.17 + 0.05 * Math.sin(t * 5.2) + 0.02 * Math.sin(t * 12.7));
+/** How long the drink's green fizz plays over the drinker (s): the bubbles boil off them
+ *  while the goblin body takes over, then the goblin is just a goblin (round 11; before, the
+ *  green glow lasted the whole look). */
+export const BREW_FIZZ_SEC = 2.6;
+
+/** The drink's green fizz on the drinker (its strength, 0 to 1): it floods in at once (the
+ *  gulp), holds while the body changes, and drains to nothing by BREW_FIZZ_SEC, so the
+ *  goblin's own colours read for the rest of the look. */
+export function brewGlow(elapsed: number, t: number): number {
+  if (elapsed < 0 || elapsed >= BREW_FIZZ_SEC) return 0;
+  const flood = Math.min(1, elapsed / 0.12);
+  const drain = elapsed < 1.2 ? 1 : 1 - (elapsed - 1.2) / (BREW_FIZZ_SEC - 1.2);
+  // held well under a full emissive flood: the body stays readable under the green wash
+  return flood * drain * (0.22 + 0.05 * Math.sin(t * 5.2) + 0.02 * Math.sin(t * 12.7));
 }

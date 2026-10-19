@@ -135,6 +135,8 @@ const AUTHORED_ATLAS_DEFS = [
   // swarmling bat and the skeleton minion, carrying their authored atlas with them.
   'form_trick_bat',
   'form_trick_skeleton',
+  // ...and the Gurglegreen Cauldron's goblin: the Coinsack Scurrier, resized the same way.
+  'form_costume_goblin',
   // The one authored PLAYER body: the WOC warrior (woc_warrior.glb, its own
   // baked Tripo atlases on the artist's rig, never a KayKit palette), which the
   // loop below exempts from the "never a player body" rule by its wocCharacter

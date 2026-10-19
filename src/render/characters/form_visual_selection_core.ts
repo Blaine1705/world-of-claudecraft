@@ -78,6 +78,7 @@ export type CharacterFormAssetKey =
   | 'form_trick_bat'
   | 'form_trick_skeleton'
   | 'form_costume_ghost'
+  | 'form_costume_goblin'
   | 'form_puppet_strawling'
   | 'form_puppet_crow';
 
@@ -91,6 +92,9 @@ const TRICK_FORM_ASSETS: Readonly<Record<string, CharacterFormAssetKey>> = {
   gourdlight_costume_skeleton: 'form_trick_skeleton',
   gourdlight_costume_ghost: 'form_costume_ghost',
   gourdlight_costume_bat: 'form_trick_bat',
+  // the Gurglegreen Cauldron's drinker (round 11, seasonal/toy_cauldron.ts): the Coinsack
+  // Scurrier's goblin body, worn the same way as a costume
+  gourdlight_toy_gurglegreen: 'form_costume_goblin',
 };
 
 /** Thatchbound's puppet bodies (Old Thatchgrin's mind control): kind 'incapacitate', a

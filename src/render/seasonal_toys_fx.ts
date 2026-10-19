@@ -53,8 +53,13 @@ import {
   batFlight,
   brewGlow,
   CANDLE_SHADOW_FIGURES,
+  CAULDRON_BELLY_R,
   CAULDRON_BUBBLE_SFX,
   CAULDRON_BUBBLES,
+  CAULDRON_DRAWN,
+  CAULDRON_RIM_R,
+  CAULDRON_RIM_Y,
+  CAULDRON_SCALE,
   candleFlicker,
   candleGlowColumn,
   candleLightPool,
@@ -156,8 +161,6 @@ const BAT_COLOR = 0x1a1220;
 const CANDLE_SCALE = 1.6;
 /** Yards the toys' props are pulled toward the eye through the grass (ground_decal_pull.ts). */
 const TOY_PROP_PULL = 0.7;
-/** The cauldron's drawn size against its authored one (about a player's knee). */
-const CAULDRON_SCALE = 1.25;
 /** The brew's green and a drinker's glow. */
 const BREW_COLOR = 0x5cff6a;
 const BREW_DEEP = 0x1e9e3a;
@@ -487,8 +490,6 @@ function shadowMaterial(map: THREE.Texture | null): THREE.MeshBasicMaterial {
 /** The Gurglegreen Cauldron: a squat, round-bellied iron pot on three stubby claw feet,
  *  a thick rolled rim, two ring handles and a wooden ladle hooked over the lip. Its brew
  *  and its bubbles are the additive pools' (brewGeometry, bubbleGeometry). Base at y = 0. */
-const CAULDRON_RIM_Y = 0.5;
-const CAULDRON_RIM_R = 0.3;
 function cauldronGeometry(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
   const profile = [
@@ -496,7 +497,7 @@ function cauldronGeometry(): THREE.BufferGeometry {
     [0.16, 0.1],
     [0.3, 0.16],
     [0.38, 0.27],
-    [0.39, 0.36],
+    [CAULDRON_BELLY_R, 0.36],
     [0.35, 0.45],
     [0.3, 0.49],
     [0.29, 0.5],
@@ -847,14 +848,18 @@ class KitPool {
 
 /** The standing cauldron's click volume (its art is this layer's, the ground object is a
  *  pick volume only: pick_only_objects.ts). Invisible, so it costs no draw and still takes
- *  the click; sized round the pot at its drawn scale. */
+ *  the click. A CLOSED cylinder, both caps on and both sides raycastable, wrapping the drawn
+ *  pot (CAULDRON_DRAWN) with a little grace: round 10's was open-ended and front-sided, so a
+ *  click on the brew from the usual camera (down through the open top, onto culled inner
+ *  faces) missed, and only a click on the pot's outer side landed. */
 export function buildToyCauldronPickBody(): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
   group.name = 'GurglegreenCauldronPick';
-  const height = 0.75;
+  const height = CAULDRON_DRAWN.rimHeight + 0.15;
+  const radius = CAULDRON_DRAWN.bellyRadius + 0.12;
   const proxy = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.62, 0.62, height, 12, 1, true),
-    new THREE.MeshBasicMaterial(),
+    new THREE.CylinderGeometry(radius, radius, height, 16, 1, false),
+    new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }),
   );
   proxy.position.y = height / 2;
   proxy.visible = false;
@@ -1146,7 +1151,7 @@ export class SeasonalToysFx {
       // set down with a slosh: green brew splashed up over the rim, a puff of steam, the
       // ground thumped under its feet
       const cy = y + CAULDRON_RIM_Y * CAULDRON_SCALE;
-      this.particles.groundPuff(this.at.set(ev.x, y, ev.z), 0.9, 0x3c4a34);
+      this.particles.groundPuff(this.at.set(ev.x, y, ev.z), 1.7, 0x3c4a34);
       for (let i = 0; i < 26; i++) {
         const a = i * 0.24;
         const up = 1.6 + (i % 5) * 0.45;
@@ -1167,9 +1172,9 @@ export class SeasonalToysFx {
       for (let i = 0; i < 6; i++) {
         const a = i * 1.05;
         this.particles.toyMote(
-          ev.x + Math.cos(a) * 0.2,
-          cy + 0.1,
-          ev.z + Math.sin(a) * 0.2,
+          ev.x + Math.cos(a) * 0.4,
+          cy + 0.15,
+          ev.z + Math.sin(a) * 0.4,
           Math.cos(a) * 0.25,
           0.9,
           Math.sin(a) * 0.25,
@@ -1181,7 +1186,8 @@ export class SeasonalToysFx {
         );
       }
     } else if (effect === 'cauldron_drink') {
-      // the drinker's first gulp: a burst of green bubbles off them and a flash of the glow
+      // the drinker's gulp: a burst of green bubbles off them, a flash of the glow and a
+      // puff of green smoke the goblin body steps out of (round 11)
       const target = ev.targetId !== undefined ? this.entity(ev.targetId) : undefined;
       if (target && !this.drawable(target)) return true;
       const tx = target?.pos.x ?? ev.x;
@@ -1204,7 +1210,24 @@ export class SeasonalToysFx {
           'glow',
         );
       }
-      this.halo(tx, ty + 1.2, tz, 2.6, 0.55, BREW_COLOR);
+      this.particles.groundPuff(this.at.set(tx, ty, tz), 1.3, 0x3f9a4c);
+      for (let i = 0; i < (this.reduced ? 5 : 10); i++) {
+        const a = i * 0.628;
+        this.particles.toyMote(
+          tx + Math.cos(a) * 0.35,
+          ty + 0.4 + (i % 3) * 0.45,
+          tz + Math.sin(a) * 0.35,
+          Math.cos(a) * 0.55,
+          0.7,
+          Math.sin(a) * 0.55,
+          i % 2 === 0 ? 0x9fe8a8 : 0x5fc56c,
+          1.0,
+          1.3,
+          -0.05,
+          'smoke',
+        );
+      }
+      this.halo(tx, ty + 1.2, tz, 3.2, 0.75, BREW_COLOR);
     }
     return true;
   }
@@ -1253,7 +1276,7 @@ export class SeasonalToysFx {
       if (effect === 'lantern') this.drawLantern(e, a, st, fade);
       else if (effect === 'bats') this.drawBats(st, a.duration ?? 6);
       else if (effect === 'candle') this.drawCandle(a, st, fade, remaining);
-      else if (effect === 'cauldron') this.drawBrew(e, id, st, elapsed, remaining);
+      else if (effect === 'cauldron') this.drawBrew(e, id, st, elapsed);
     }
   }
 
@@ -1304,9 +1327,9 @@ export class SeasonalToysFx {
         for (let i = 0; i < 8; i++) {
           const a = i * 0.785;
           this.particles.toyMote(
-            st.ax + Math.cos(a) * 0.25,
-            st.spotY + 0.5,
-            st.az + Math.sin(a) * 0.25,
+            st.ax + Math.cos(a) * 0.45,
+            st.spotY + CAULDRON_DRAWN.rimHeight,
+            st.az + Math.sin(a) * 0.45,
             Math.cos(a) * 0.4,
             0.8,
             Math.sin(a) * 0.4,
@@ -1317,12 +1340,20 @@ export class SeasonalToysFx {
             'smoke',
           );
         }
+      } else if (key.endsWith(':cauldron')) {
+        // the goblin's time ran out (or a fight or a costume took it off) while its body is
+        // still in sight: it turns back in a green puff. A body that left sight (out of
+        // range, stealthed, dead) is not a turn back, so nothing plays.
+        const body = this.entity(Number(key.slice(0, key.indexOf(':'))));
+        if (body && body.kind === 'player' && this.drawable(body)) {
+          this.goblinPoof(body.pos.x, body.pos.y, body.pos.z);
+        }
       }
       this.looks.delete(key);
     }
-    // a drinker whose glow ran out (or who left sight) gets their own colours back. The tint
+    // a drinker whose fizz ran out (or who left sight) gets their own colours back. The tint
     // rides the rig's one aura-glow slot (CharacterVisual.setAuraGlow): an ability glow live
-    // on the same body in the same ten seconds shares it, the last writer winning, and this
+    // on the same body in the same few seconds shares it, the last writer winning, and this
     // release clears only bodies this layer tinted
     for (const [id, frame] of this.tinted) {
       if (frame === this.frame) continue;
@@ -1610,6 +1641,9 @@ export class SeasonalToysFx {
       const throb = 0.82 + 0.12 * Math.sin(t * 3.1 + st.phase) + 0.06 * Math.sin(t * 7.7);
       this.brews.setColorAt(i, tint.setScalar(throb * k));
     }
+    // the effects round it were tuned on round 10's knee-high pot: g is 1 at that size and
+    // grows with the pot, so the steam, the embers and the glow stay in proportion
+    const g = size / 1.25;
     // the brew's bubbles: each swells, pops, and comes back somewhere else on the surface
     const rimY = y + (CAULDRON_RIM_Y - 0.03) * size;
     const r = (CAULDRON_RIM_R - 0.04) * size;
@@ -1626,13 +1660,13 @@ export class SeasonalToysFx {
       if (bub.pop > 0 && bub.pop < 0.3 && !this.reduced) {
         this.particles.toyMote(
           x + bub.x * r,
-          rimY + 0.04,
+          rimY + 0.04 * g,
           z + bub.z * r,
-          bub.x * 0.3,
-          1.1,
-          bub.z * 0.3,
+          bub.x * 0.3 * g,
+          1.1 * g,
+          bub.z * 0.3 * g,
           0xc8ffc0,
-          0.07,
+          0.07 * g,
           0.45,
           4,
           'glow',
@@ -1643,86 +1677,113 @@ export class SeasonalToysFx {
     }
     // steam curling off the top and green motes drifting up out of it
     this.particles.toyMote(
-      x + 0.1 * Math.sin(this.time * 1.3 + st.phase),
-      rimY + 0.12,
-      z + 0.1 * Math.cos(this.time * 1.7 + st.phase),
-      0.08 * Math.sin(this.time * 0.9),
-      0.55,
-      0.08 * Math.cos(this.time * 1.1),
+      x + 0.1 * g * Math.sin(this.time * 1.3 + st.phase),
+      rimY + 0.12 * g,
+      z + 0.1 * g * Math.cos(this.time * 1.7 + st.phase),
+      0.08 * g * Math.sin(this.time * 0.9),
+      0.55 * g,
+      0.08 * g * Math.cos(this.time * 1.1),
       0x9fe8a8,
-      0.7,
+      0.7 * g,
       2.2,
       -0.04,
       'smoke',
-      (this.reduced ? 1.5 : 3) * k,
+      (this.reduced ? 2 : 4) * k,
       this.dt,
     );
     this.particles.toyMote(
       x + r * 0.6 * Math.sin(this.time * 2.7 + st.phase),
-      rimY + 0.08,
+      rimY + 0.08 * g,
       z + r * 0.6 * Math.cos(this.time * 2.3 + st.phase),
       0,
-      0.7,
+      0.7 * g,
       0,
       BREW_COLOR,
-      0.11,
+      0.11 * g,
       1.6,
       -0.2,
       'glow',
-      (this.reduced ? 4 : 9) * k,
+      (this.reduced ? 5 : 12) * k,
       this.dt,
     );
     // embers glowing under its belly: the heat that keeps it bubbling
     this.particles.toyMote(
-      x + 0.18 * Math.sin(this.time * 4.1 + st.phase),
-      y + 0.06,
-      z + 0.18 * Math.cos(this.time * 3.3 + st.phase),
+      x + 0.18 * g * Math.sin(this.time * 4.1 + st.phase),
+      y + 0.06 * g,
+      z + 0.18 * g * Math.cos(this.time * 3.3 + st.phase),
       0,
-      0.5,
+      0.5 * g,
       0,
       0xff8a2a,
-      0.06,
+      0.06 * g,
       0.6,
       0.2,
       'spark',
       (this.reduced ? 3 : 7) * k,
       this.dt,
     );
-    this.halo(x, y + 0.12, z, 1.0, 0.32 * k, 0xff7a24);
-    this.halo(x, rimY + 0.15, z, 1.6, 0.42 * k, BREW_COLOR);
-    this.halo(x, rimY + 0.55, z, 2.4, 0.12 * k, BREW_DEEP, true);
+    this.halo(x, y + 0.12 * g, z, 1.0 * g, 0.32 * k, 0xff7a24);
+    this.halo(x, rimY + 0.15 * g, z, 1.6 * g, 0.42 * k, BREW_COLOR);
+    this.halo(x, rimY + 0.55 * g, z, 2.4 * g, 0.12 * k, BREW_DEEP, true);
   }
 
-  /** A drinker: their whole body tinted green (the rig's own aura glow), bubbles rising
-   *  off them, and a green halo round their chest, pulsing as the brew bubbles through. */
-  private drawBrew(
-    e: ToyEntityLike,
-    id: number,
-    st: LookState,
-    elapsed: number,
-    remaining: number,
-  ): void {
-    const glow = brewGlow(elapsed, remaining, this.time + st.phase);
+  /** A drinker, while the goblin body takes over (BREW_FIZZ_SEC): the body flushed green,
+   *  bubbles boiling up off them and a green halo round their chest, all draining away so
+   *  the goblin reads in its own colours for the rest of the look. The goblin itself is the
+   *  polymorph slot's look (form_visual_selection_core.ts, the costumes' seam). */
+  private drawBrew(e: ToyEntityLike, id: number, st: LookState, elapsed: number): void {
+    // where the goblin last stood: its turn back to a body plays there (end())
+    st.ax = e.pos.x;
+    st.ay = e.pos.y;
+    st.az = e.pos.z;
+    const glow = brewGlow(elapsed, this.time + st.phase);
+    if (glow <= 0) return;
     this.tint(id, BREW_TINT, glow);
     this.tinted.set(id, this.frame);
     const ang = this.time * 7.3 + st.phase;
     const rise = (this.time * 1.9 + st.phase) % 1;
-    this.particles.toyMote(
-      e.pos.x + Math.cos(ang) * 0.38,
-      e.pos.y + 0.3 + rise * 1.5,
-      e.pos.z + Math.sin(ang) * 0.38,
-      Math.cos(ang) * 0.12,
-      0.85,
-      Math.sin(ang) * 0.12,
-      Math.sin(ang * 3) > 0.6 ? 0xe4ffe0 : BREW_COLOR,
-      0.1 + 0.05 * Math.abs(Math.sin(ang * 1.7)),
-      1.5,
-      -0.35,
-      'glow',
-      (this.reduced ? 8 : 18) * glow,
-      this.dt,
-    );
-    this.halo(e.pos.x, e.pos.y + 1.15, e.pos.z, 2.2, 0.24 * glow, BREW_COLOR, true);
+    for (let k = 0; k < 2; k++) {
+      const a = ang + k * Math.PI;
+      this.particles.toyMote(
+        e.pos.x + Math.cos(a) * 0.42,
+        e.pos.y + 0.25 + rise * 1.6,
+        e.pos.z + Math.sin(a) * 0.42,
+        Math.cos(a) * 0.18,
+        1.1,
+        Math.sin(a) * 0.18,
+        Math.sin(a * 3) > 0.6 ? 0xe4ffe0 : BREW_COLOR,
+        0.12 + 0.06 * Math.abs(Math.sin(a * 1.7)),
+        1.3,
+        -0.35,
+        'glow',
+        (this.reduced ? 14 : 34) * glow,
+        this.dt,
+      );
+    }
+    this.halo(e.pos.x, e.pos.y + 1.0, e.pos.z, 2.6, 0.9 * glow, BREW_COLOR, true);
+  }
+
+  /** The goblin turns back: a green puff and a pop of bubbles where it stood. */
+  private goblinPoof(x: number, y: number, z: number): void {
+    this.particles.groundPuff(this.at.set(x, y, z), 1.1, 0x3f9a4c);
+    const n = this.reduced ? 8 : 18;
+    for (let i = 0; i < n; i++) {
+      const a = i * 2.39996;
+      this.particles.toyMote(
+        x + Math.cos(a) * 0.3,
+        y + 0.5 + (i % 5) * 0.2,
+        z + Math.sin(a) * 0.3,
+        Math.cos(a) * 0.7,
+        0.9 + (i % 4) * 0.3,
+        Math.sin(a) * 0.7,
+        i % 3 === 0 ? 0xbfffc4 : 0x7fe08a,
+        i % 3 === 0 ? 0.9 : 0.12,
+        i % 3 === 0 ? 1.4 : 0.9,
+        i % 3 === 0 ? -0.05 : -0.5,
+        i % 3 === 0 ? 'smoke' : 'glow',
+      );
+    }
+    this.halo(x, y + 1.0, z, 2.2, 0.5, BREW_COLOR);
   }
 
   private updateFlights(): void {

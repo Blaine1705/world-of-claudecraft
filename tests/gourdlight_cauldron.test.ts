@@ -1,11 +1,14 @@
 // The Gurglegreen Cauldron (Hester's toy, round 10; sim: seasonal/toy_cauldron.ts). Pinned
 // here: its user sets a ground object down in front of them for `standsFor` seconds; ANY
 // player in reach may drink from it (the ordinary object interaction, the same command
-// online and off) and glows green for the toy's duration (a cosmetic aura and nothing
-// else); a fresh cauldron replaces its maker's last; refused in combat, in stealth and out
-// of season; it leaves the world when its time runs out and when the event closes; no rng.
+// online and off) and turns into a goblin for the toy's duration (round 11: a cosmetic
+// aura and nothing else, a body swap on the costumes' seam: one body at a time, combat
+// ends it); a fresh cauldron replaces its maker's last; refused in combat, in stealth and
+// out of season; it leaves the world when its time runs out and when the event closes; no
+// rng.
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  GOURDLIGHT_COSTUMES,
   GOURDLIGHT_TOYS,
   type GourdlightToy,
   GURGLEGREEN_CAULDRON_ID,
@@ -14,6 +17,7 @@ import {
   isToyCauldron,
   TOY_CAULDRON_DRINK_FX,
   TOY_CAULDRON_DRINK_SFX,
+  TOY_CAULDRON_PLACE_REACH,
   TOY_FX_ABILITY_PREFIX,
   TOY_SFX,
 } from '../src/sim/seasonal';
@@ -63,7 +67,8 @@ describe('the Gurglegreen Cauldron', () => {
     expect(CAULDRON.itemId).toBe(GURGLEGREEN_CAULDRON_ID);
     expect(CAULDRON.itemName).toBe('Gurglegreen Cauldron');
     expect(CAULDRON.standsFor).toBe(60);
-    expect(CAULDRON.duration).toBe(10);
+    // the goblin lasts 45 s (owner direction: 30 to 60)
+    expect(CAULDRON.duration).toBe(45);
     expect(CAULDRON.cooldown).toBeGreaterThan(CAULDRON.standsFor ?? 0);
     expect(TOY_SFX.cauldron).toBe('spell_gurglegreen_cauldron');
     expect(TOY_CAULDRON_DRINK_SFX).toBe('spell_gurglegreen_quaff');
@@ -76,7 +81,9 @@ describe('the Gurglegreen Cauldron', () => {
     expect(rngState(sim)).toBe(before);
     expect(pot?.kind).toBe('object');
     expect(pot.templateId).toBe(`ground_${GURGLEGREEN_CAULDRON_ID}`);
-    expect(dist2d(pot.pos, sim.player.pos)).toBeCloseTo(1.6, 1);
+    // clear of its user's feet now that it is drawn waist-high and a yard round
+    expect(TOY_CAULDRON_PLACE_REACH).toBeGreaterThanOrEqual(2);
+    expect(dist2d(pot.pos, sim.player.pos)).toBeCloseTo(TOY_CAULDRON_PLACE_REACH, 1);
     expect(pot.despawnTimer).toBe(CAULDRON.standsFor);
     expect(sim.countItem(GURGLEGREEN_CAULDRON_ID)).toBe(1);
     expect(sim.player.cooldowns.get(GURGLEGREEN_CAULDRON_ID)).toBe(CAULDRON.cooldown);
@@ -92,7 +99,7 @@ describe('the Gurglegreen Cauldron', () => {
     expect(cue?.sfxKey).toBe(TOY_SFX.cauldron);
   });
 
-  it('anyone in reach drinks: a green glow for the toy duration, and nothing else', () => {
+  it('anyone in reach drinks: a goblin for the toy duration, and nothing else', () => {
     const sim = world();
     const pot = place(sim);
     const pip = friend(sim, 2.5);
@@ -167,5 +174,47 @@ describe('the Gurglegreen Cauldron', () => {
     sim.tick();
     expect(pots(sim)).toHaveLength(0);
     expect(sim.seasonal.toyCauldrons.size).toBe(0);
+  });
+
+  it('the goblin is a costume: it takes a costume off, a costume takes it off, combat ends it', () => {
+    const sim = world();
+    const pot = place(sim);
+    const pip = friend(sim, 2.5);
+    const skeleton = GOURDLIGHT_COSTUMES[0];
+    pip.auras.push({
+      id: skeleton.auraId,
+      name: skeleton.name,
+      kind: 'seasonal_cosmetic',
+      value: 0,
+      remaining: 600,
+      duration: 600,
+      undispellable: true,
+      sourceId: pip.id,
+      school: 'physical',
+    });
+    expect(sim.pickUpObject(pot.id, pip.id)).toBe(true);
+    // one body at a time: the goblin replaced the skeleton
+    expect(brewOn(pip)).toBeDefined();
+    expect(pip.auras.some((a) => a.id === skeleton.auraId)).toBe(false);
+    // a fresh sip starts the goblin's time over, never stacks a second one
+    ticks(sim, 5);
+    expect(sim.pickUpObject(pot.id, pip.id)).toBe(true);
+    expect(pip.auras.filter((a) => a.id === CAULDRON.auraId)).toHaveLength(1);
+    expect(brewOn(pip)?.remaining).toBeCloseTo(CAULDRON.duration, 0);
+    // a fight starting ends it (the trick bodies' rule, seasonal_tick.ts)
+    pip.inCombat = true;
+    pip.combatTimer = 0;
+    sim.tick();
+    expect(brewOn(pip)).toBeUndefined();
+  });
+
+  it('the goblin lasts its full time, then the drinker is themselves again', () => {
+    const sim = world();
+    const pot = place(sim);
+    expect(sim.pickUpObject(pot.id)).toBe(true);
+    ticks(sim, CAULDRON.duration - 1);
+    expect(brewOn(sim.player)).toBeDefined();
+    ticks(sim, 1.2);
+    expect(brewOn(sim.player)).toBeUndefined();
   });
 });

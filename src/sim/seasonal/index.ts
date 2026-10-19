@@ -53,6 +53,7 @@ export {
   TOY_CAULDRON_DRINK_FX,
   TOY_CAULDRON_DRINK_SFX,
   TOY_CAULDRON_OBJECT_ID,
+  TOY_CAULDRON_PLACE_REACH,
   TOY_CAULDRON_TEMPLATE,
 } from './toy_cauldron';
 export { isTrickOrTreatNpc, type TrickOrTreatOutcome, trickOrTreat } from './trick_or_treat';

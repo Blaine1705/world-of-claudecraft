@@ -21920,12 +21920,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.itemUse.toyCandleShadows':
     '使用：目の前でろうそくを灯す。{seconds}秒間、炎が猫、コウモリ、魔女の踊る影を周りの地面に映し、近くにいる全員に見える。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
   'seasonal.itemUse.toyCauldron':
-    '使用：目の前にぐつぐつ煮える小さな大鍋を置く。大鍋は{standing}秒間そこにあり、飲んだプレイヤーは誰でも{seconds}秒間緑色に光り、体から泡が立ちのぼる。置くことも飲むことも、戦闘中とステルス中はできない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+    '使用：目の前にぐつぐつ煮える大きな大鍋を置く。大鍋は{standing}秒間そこにあり、飲んだプレイヤーは誰でも緑の泡に包まれ、{seconds}秒間ゴブリンの姿になる（着ている仮装は解ける）。置くことも飲むことも、戦闘中とステルス中はできず、戦闘に入るとゴブリンの姿は解ける。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
   'seasonal.itemUse.broomSources':
     'ヘスター・ゴードウィックからエンバーウーブンの藁束{count}個で購入する。まれに、戦利品を受け取った日にオールド・サッチグリンが落とすこともある。乗るには騎乗スキルが必要。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。',
   'seasonal.toy.candleShadows': 'ろうそくを灯すと、炎の周りで影が踊り始めた。',
   'seasonal.toy.cauldron': '大鍋を置くと、ぐつぐつと泡立ち始めた。',
-  'seasonal.toy.cauldronDrink': '大鍋の中身を飲むと、体がぶくぶくと緑色に光り出した！',
+  'seasonal.toy.cauldronDrink': '大鍋の中身を飲むと、緑の泡に包まれてゴブリンの姿に変わった！',
   'hudChrome.worldBoss.sleepUntilNightfall': '{name}は日が暮れるまで眠っている。',
   'hudChrome.auraEffect.slumberNight': '日が暮れるまで、生気なく柱に吊るされている。攻撃できない。',
 };

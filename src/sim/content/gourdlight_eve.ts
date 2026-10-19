@@ -123,9 +123,10 @@ export type GourdlightCandy = (typeof GOURDLIGHT_CANDIES)[number];
  *    candle  lit at the user's feet: shadow shapes (a cat, a bat, a witch) dance on the
  *            ground round it, thrown by its flames (round 10: the whispers are gone)
  *    cauldron set down in front of the user (round 10, in place of the play broom): a
- *            small bubbling cauldron that stands for `standsFor` seconds as a ground
- *            object ANY player may drink from; the drinker glows green with bubbles
- *            rising off them for `duration` (seasonal/toy_cauldron.ts)
+ *            big bubbling cauldron that stands for `standsFor` seconds as a ground
+ *            object ANY player may drink from; the drinker bursts in green bubbles and
+ *            turns into a goblin for `duration` (round 11: the Coinsack Scurrier's body,
+ *            a costume like the draughts' that combat ends; seasonal/toy_cauldron.ts)
  *  The lantern and the candle carry their spot on the aura (value2 = x, value3 = z), so
  *  every client, and a player who walks up later, draws them where they were set down. */
 export type GourdlightToyEffect = 'prank' | 'lantern' | 'bats' | 'candle' | 'cauldron';
@@ -193,10 +194,12 @@ export const GOURDLIGHT_TOYS: readonly GourdlightToy[] = Object.freeze([
     // audit): "Gurglegreen" is a coined token with no hit in any game searched.
     itemId: GURGLEGREEN_CAULDRON_ID,
     itemName: 'Gurglegreen Cauldron',
-    // the DRINKER's look (the cauldron itself is a ground object, not an aura)
+    // the DRINKER's look (the cauldron itself is a ground object, not an aura): a goblin's
+    // body for 45 s (round 11, owner direction 30 to 60 s: long enough to run about and
+    // be seen, short enough to stay a joke; the costume draughts are the ten-minute look)
     auraId: 'gourdlight_toy_gurglegreen',
     effect: 'cauldron',
-    duration: 10,
+    duration: 45,
     cooldown: 120,
     price: 5,
     standsFor: 60,

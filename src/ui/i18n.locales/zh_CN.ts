@@ -20853,12 +20853,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'seasonal.itemUse.toyCandleShadows':
     '使用：在你面前点燃蜡烛。{seconds}秒内，烛火会在周围地面上投下猫、蝙蝠和女巫的舞动影子，附近所有人都能看到。战斗中或潜行时无法使用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后从背包中消失。仅外观。',
   'seasonal.itemUse.toyCauldron':
-    '使用：在你面前放下一口咕嘟冒泡的小坩埚。它会存在{standing}秒，任何喝下的玩家都会在{seconds}秒内发出绿光，身上冒出上升的气泡。战斗中或潜行时无法放置或饮用。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后从背包中消失。仅外观。',
+    '使用：在你面前放下一口咕嘟冒泡的大坩埚。它会存在{standing}秒，任何喝下的玩家都会被绿色气泡包围，并在{seconds}秒内变成哥布林（身上的装扮会被替换）。战斗中或潜行时无法放置或饮用，进入战斗会结束哥布林形态。不会消耗：{cooldown}秒后可再次使用。仅限南瓜灯之夜期间，活动结束后从背包中消失。仅外观。',
   'seasonal.itemUse.broomSources':
     '向赫丝特·葫芦芯用{count}个草束购买，或在你拾取老稻草狞笑战利品的当天极少数情况下由其掉落。骑乘需要骑术技能。仅在南瓜灯之夜期间存在，结束时会化为稻草。',
   'seasonal.toy.candleShadows': '你点燃了蜡烛，影子开始在烛火周围起舞。',
   'seasonal.toy.cauldron': '你放下坩埚，它开始咕嘟冒泡。',
-  'seasonal.toy.cauldronDrink': '你喝了一口坩埚里的东西，浑身冒着泡泛起绿光！',
+  'seasonal.toy.cauldronDrink': '你喝了一口坩埚里的东西，被绿色气泡包围，变成了一只哥布林！',
   'hudChrome.worldBoss.sleepUntilNightfall': '{name}沉睡至夜幕降临。',
   'hudChrome.auraEffect.slumberNight': '毫无生气地挂在木桩上，直到夜幕降临。无法被攻击。',
 };

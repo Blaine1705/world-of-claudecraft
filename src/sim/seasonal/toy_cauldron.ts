@@ -1,8 +1,12 @@
 // The Gurglegreen Cauldron (Hester's toy, content/gourdlight_eve.ts GOURDLIGHT_TOYS, the
 // 'cauldron' effect): its user sets a small bubbling cauldron down in front of them, and
 // for `standsFor` seconds it is a ground object ANY player may drink from. A drink turns
-// the drinker green, bubbles rising off them, for the toy's `duration`: one more
-// `seasonal_cosmetic` aura, which no sim rule reads (no stat, no control, no damage).
+// the drinker into a goblin (the Coinsack Scurrier's body, round 11) for the toy's
+// `duration`, after a green burst of bubbles: one more `seasonal_cosmetic` aura, which no
+// sim rule reads (no stat, no control, no damage). It is a body swap exactly like the
+// costume draughts' (seasonal_cosmetics.ts TRICK_AURA_IDS): one body at a time, so a
+// drink takes off a costume or a trick and a costume or a trick takes off the goblin, and
+// combat starting ends it (seasonal_tick.ts).
 //
 // Server authoritative: the cauldron is an ordinary ground-object entity (the wire and
 // the interest scope carry it to every client near it), and the drink is the ordinary
@@ -24,7 +28,7 @@ import { createGroundObject } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
-import { stripSeasonalAura } from './seasonal_cosmetics';
+import { stripTricks } from './seasonal_cosmetics';
 import { activeSeasonalEventOf } from './seasonal_state';
 
 /** The ground object's item id (its template is `ground_<id>`): the toy's own item id, so
@@ -36,10 +40,11 @@ export const TOY_CAULDRON_TEMPLATE = `ground_${GURGLEGREEN_CAULDRON_ID}`;
 export const TOY_CAULDRON_DRINK_FX = `${GOURDLIGHT_TOY_FX_PREFIX}cauldron_drink`;
 /** The drink's sound (scripts/sfx/gourdlight_sfx.mjs). */
 export const TOY_CAULDRON_DRINK_SFX = 'spell_gurglegreen_quaff';
-/** How far in front of its user the cauldron is set down (yards). */
-const PLACE_REACH = 1.6;
+/** How far in front of its user the cauldron is set down (yards): clear of their feet,
+ *  now that it is drawn waist-high and a yard round (round 11; seasonal_toys_fx_core.ts). */
+export const TOY_CAULDRON_PLACE_REACH = 2.2;
 /** Its footprint on the collider grid (a placement inside a wall is refused). */
-const FOOTPRINT = 0.45;
+const FOOTPRINT = 0.9;
 
 /** True for a standing toy cauldron. */
 export function isToyCauldron(e: Pick<Entity, 'kind' | 'objectItemId'>): boolean {
@@ -55,8 +60,8 @@ function cauldronToy(): GourdlightToy | undefined {
  *  their feet. Rounded to the centimetre (the spot survives the wire unchanged). */
 function placeSpot(ctx: SimContext, p: Entity): { x: number; z: number } {
   for (const turn of [0, Math.PI / 2, -Math.PI / 2]) {
-    const x = p.pos.x + Math.sin(p.facing + turn) * PLACE_REACH;
-    const z = p.pos.z + Math.cos(p.facing + turn) * PLACE_REACH;
+    const x = p.pos.x + Math.sin(p.facing + turn) * TOY_CAULDRON_PLACE_REACH;
+    const z = p.pos.z + Math.cos(p.facing + turn) * TOY_CAULDRON_PLACE_REACH;
     if (!isBlocked(ctx.cfg.seed, x, z, FOOTPRINT)) {
       return { x: Math.round(x * 100) / 100, z: Math.round(z * 100) / 100 };
     }
@@ -88,7 +93,8 @@ export function placeToyCauldron(ctx: SimContext, toy: GourdlightToy, owner: Ent
   return pot;
 }
 
-/** The drinker's look: the toy's aura for its duration, sourced from the cauldron's maker. */
+/** The drinker's goblin body: the toy's aura for its duration, sourced from the cauldron's
+ *  maker. */
 function brewAura(toy: GourdlightToy, sourceId: number): Aura {
   return {
     id: toy.auraId,
@@ -128,8 +134,9 @@ export function drinkFromToyCauldron(ctx: SimContext, obj: Entity, meta: PlayerM
     ctx.emit({ type: 'seasonal', what: 'toyHidden', pid: meta.entityId });
     return true;
   }
-  // a fresh sip starts the glow over
-  stripSeasonalAura(ctx, drinker, toy.auraId);
+  // one body at a time: the goblin takes off any costume, trick or guise (and a fresh sip
+  // starts the goblin's time over)
+  stripTricks(ctx, drinker);
   // sourced from its maker; a cauldron whose maker is no longer tracked credits the drinker
   // (never the cauldron itself, whose id dangles once it despawns)
   ctx.applyAura(drinker, brewAura(toy, makerOf(ctx, obj.id) || drinker.id));

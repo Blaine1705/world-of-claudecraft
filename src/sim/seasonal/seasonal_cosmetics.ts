@@ -31,6 +31,8 @@ const TRICK_AURA_IDS: readonly string[] = [
   ...GOURDLIGHT_TRICKS.map((trick) => trick.id),
   STRAWLING_GUISE.id,
   ...GOURDLIGHT_COSTUMES.map((costume) => costume.auraId),
+  // the Gurglegreen Cauldron's drinker becomes a goblin (round 11, toy_cauldron.ts)
+  ...GOURDLIGHT_TOYS.filter((toy) => toy.effect === 'cauldron').map((toy) => toy.auraId),
 ];
 
 export function pumpkinHeadAura(sourceId: number): Aura {

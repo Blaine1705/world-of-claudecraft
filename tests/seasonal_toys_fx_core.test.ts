@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { drawsSeasonalHead, wearsSeasonalHead } from '../src/render/characters/seasonal_head_core';
 import {
   BAT_COUNT,
+  BREW_FIZZ_SEC,
   batFlight,
   brewGlow,
   CANDLE_SHADOW_FIGURES,
@@ -157,12 +158,16 @@ describe('the toys render plan', () => {
     expect(popped).toBeGreaterThan(0);
     // pure: the same bubble at the same time is the same on every client
     expect(cauldronBubble(3, 1.7)).toEqual(cauldronBubble(3, 1.7));
-    // the glow floods in, holds and drains with the look
-    expect(brewGlow(0, 10, 0)).toBe(0);
-    expect(brewGlow(5, 5, 1)).toBeGreaterThan(0.1);
+    // the drink's fizz floods in at the gulp, holds while the body changes, and is gone by
+    // BREW_FIZZ_SEC: the goblin keeps its own colours for the rest of the look (round 11)
+    expect(brewGlow(0, 0)).toBe(0);
+    expect(brewGlow(0.5, 1)).toBeGreaterThan(0.1);
+    expect(brewGlow(BREW_FIZZ_SEC - 0.6, 1)).toBeLessThan(brewGlow(0.5, 1));
     // never a full flood: the drinker stays readable under the green
-    for (let t = 0; t < 3; t += 0.01) expect(brewGlow(5, 5, t)).toBeLessThan(0.3);
-    expect(brewGlow(10, 0, 1)).toBe(0);
+    for (let t = 0; t < 3; t += 0.01) expect(brewGlow(0.6, t)).toBeLessThan(0.3);
+    expect(brewGlow(BREW_FIZZ_SEC, 1)).toBe(0);
+    expect(brewGlow(30, 1)).toBe(0);
+    expect(BREW_FIZZ_SEC).toBeLessThan(5);
   });
 });
 

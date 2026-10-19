@@ -10,6 +10,7 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from '../src/render/characters/form_visual_selection_core';
+import { VISUALS } from '../src/render/characters/manifest';
 
 function maskFor(auras: ReadonlyArray<{ kind: string; id?: string }>): number {
   return auras.reduce((mask, aura) => mask | characterFormMaskForAura(aura), 0);
@@ -333,5 +334,30 @@ describe("Thatchbound's puppet bodies", () => {
   });
   it('an ordinary incapacitate (a gouge, a fear) wears no body', () => {
     expect(maskFor([{ kind: 'incapacitate', id: 'fear_incap' }])).toBe(0);
+  });
+});
+
+describe('the Gurglegreen Cauldron goblin (round 11)', () => {
+  const goblin = { kind: 'seasonal_cosmetic', id: 'gourdlight_toy_gurglegreen' };
+  it("rides the polymorph slot as the treasure goblin's body, the costumes' seam", () => {
+    expect(requestedCharacterForm(maskFor([goblin]))).toBe('sheep');
+    expect(characterFormAssetKey('form_sheep', [goblin])).toBe('form_costume_goblin');
+    // a real polymorph and a puppet still outrank a cosmetic body
+    expect(
+      characterFormAssetKey('form_sheep', [goblin, { kind: 'polymorph', id: 'polymorph' }]),
+    ).toBe('form_sheep');
+    expect(
+      characterFormAssetKey('form_sheep', [
+        goblin,
+        { kind: 'incapacitate', id: 'thatchbound_crow' },
+      ]),
+    ).toBe('form_puppet_crow');
+  });
+  it("is the Coinsack Scurrier's own rig and clips, a head shorter than a player", () => {
+    const def = VISUALS.form_costume_goblin;
+    const scurrier = VISUALS.mob_hoard_coinsack_scurrier;
+    expect(def?.url).toBe(scurrier?.url);
+    expect(def?.clips).toBe(scurrier?.clips);
+    expect(def?.height).toBeLessThan(VISUALS.form_trick_skeleton?.height ?? 0);
   });
 });

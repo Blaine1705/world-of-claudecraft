@@ -7773,7 +7773,7 @@ export const sv_SE: EnTranslations = {
       "toyLantern": "Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
       "toyBats": "Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
       "toyCandleShadows": "Use: Light the candle in front of you. For {seconds} seconds its flames throw dancing shadows of a cat, a bat and a witch onto the ground around it, for everyone nearby to see. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
-      "toyCauldron": "Use: Set a small bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it glows green with bubbles rising off them for {seconds} seconds. Neither setting it down nor drinking works in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
+      "toyCauldron": "Use: Set a big bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it bursts in green bubbles and turns into a goblin for {seconds} seconds, replacing any costume they wear. Neither setting it down nor drinking works in combat or while stealthed, and entering combat ends the goblin form. Never consumed: usable again after {cooldown} seconds. Only during Gourdlight Eve, and gone from your bags when it ends. Cosmetic.",
       "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Only during Gourdlight Eve. Kept if you already hold the title.",
       "broomSources": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves, or, rarely, dropped by Old Thatchgrin on a day you loot him. Riding it requires the riding skill. It lasts only while Gourdlight Eve runs and crumbles to straw when the event ends.",
       "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Crumbles to straw when Gourdlight Eve ends."
@@ -7784,7 +7784,7 @@ export const sv_SE: EnTranslations = {
       "bats": "You open the sack, and a swarm of startled bats bursts out!",
       "candleShadows": "You light the candle, and shadows begin to dance around its flames.",
       "cauldron": "You set the cauldron down, and it starts to bubble.",
-      "cauldronDrink": "You drink from the cauldron and glow a bubbling green!",
+      "cauldronDrink": "You drink from the cauldron, burst in green bubbles and turn into a goblin!",
       "pranked": "{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.",
       "prankedFlash": "Pranked by {name}!",
       "prankNeedsPlayer": "The pumpkin only splats on another player who is not in combat.",
