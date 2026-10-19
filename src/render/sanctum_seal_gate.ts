@@ -1,6 +1,7 @@
 // The Smith's Seal Gate, the Gravewyrm Sanctum's world entrance (door (0, 858),
-// Thornpeak Heights): the three Blender GLBs (the gate and its tunnel, the plaza
-// props, the far ice tongue on the ridge) seated on the door's terrain height,
+// Thornpeak Heights): the three Blender GLBs (the carved gate, its crown and the
+// spur's tunnel, the plaza props, the far icefall in the ridge notch) seated on
+// the door's terrain height,
 // plus its cosmetic layer: the faint blue rune light (the one point light, a
 // fire-light sink source), the cold mist film across the tunnel mouth (the
 // door's portal look; the door body itself is only the invisible click box,
@@ -65,7 +66,8 @@ export interface SanctumSealGateView {
 let runeMat: THREE.MeshBasicMaterial | null = null;
 
 /** The Blender nodes whose KitStone is the MOUNTAIN's rock (the spur the
- *  tunnel is cut into, the ice tongue's cheeks), not the Smith's masonry. */
+ *  tunnel is cut into, and any rock the icefall node carries), not the
+ *  Smith's masonry. */
 const MOUNTAIN_ROCK_NODES = new Set(['Entrance_Tunnel', 'Entrance_IceTongue']);
 
 /** The lit slots go through surfaceMat every time (it caches per graphics
@@ -358,8 +360,8 @@ export function buildSanctumSealGate(seed: number): SanctumSealGateView {
   });
   gate.add(coldMist(fx.tier));
   group.add(gate);
-  // The ice tongue hangs 50 yd up the ridge: its own cull group, so it stays on
-  // the skyline while the gate itself is still beyond the fog.
+  // The icefall breaks down the ridge notch 20 to 75 yd up: its own cull group,
+  // so it stays on the skyline while the gate itself is still beyond the fog.
   const ice = new THREE.Group();
   ice.name = 'sanctumIceTongue';
   ice.position.copy(gate.position);

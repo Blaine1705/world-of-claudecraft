@@ -1,6 +1,6 @@
 // The Seal Gate's mountain surfaces: the rock spur the tunnel is cut into (and
-// the ice tongue's two rock cheeks) shaded as the Thornpeak's own snow-crusted
-// granite, and the ice tongue (and the lintel's icicles) as weathered glacier
+// any rock the icefall node carries) shaded as the Thornpeak's own snow-crusted
+// granite, and the icefall (and the gate's icicles) as weathered glacier
 // ice. Both are ordinary LIT materials (Standard on the PBR tiers, Lambert where
 // the tier sheds it), so the scene's sun, sky fill, IBL, fog and zone haze grade
 // them exactly as they grade the terrain beside them: day, dusk and night.
@@ -11,11 +11,12 @@
 //   strata ledges, snow on every upward face and rime plastered in patches on
 //   the steep ones, plus the shared Rock026 surface-detail layer (worn_stone.ts,
 //   the very set the terrain's cliffs sample) on the tiers that run it;
-// - ice: annual layers (clear blue against bubbly white), transverse crevasses
-//   going deep blue, a hairline fracture network, frost and old snow on top
-//   (the build's baked snow mask), and a cheap view-dependent thin-edge
-//   scatter at the margins. No transmission pass, no emissive: the ice never
-//   glows at night.
+// - ice: the sculpt's paint picks the part (the deep core in the crevasses
+//   and under the lips, the clear body, pale thin arrises, the snow crust on
+//   top) and the zone's glacier values colour it, with annual layers, a
+//   hairline fracture network and a cheap view-dependent thin-edge scatter
+//   at the margins. No transmission pass, no emissive: the ice never glows
+//   at night.
 // Inside the tunnel the build's own dark slate stays (sealGateRockInside).
 //
 // Two programs, built with the gate (a static zone feature attached through
@@ -34,7 +35,7 @@ import { markSharedMaterial } from './shared_resource';
 import { applySurfaceDetail } from './worn_stone';
 
 export const SANCTUM_ROCK_PROGRAM_KEY = 'sanctum-thornpeak-rock-v1';
-export const SANCTUM_ICE_PROGRAM_KEY = 'sanctum-glacier-ice-v1';
+export const SANCTUM_ICE_PROGRAM_KEY = 'sanctum-glacier-ice-v2';
 
 /** 'full' on the PBR tiers; 'lite' (fewer noise octaves, no bump) on Lambert. */
 export type SealSurfaceQuality = 'full' | 'lite';
@@ -196,31 +197,17 @@ function iceAlbedoGlsl(quality: SealSurfaceQuality): string {
   vec3 sealP = vSealWPos - uSealOrigin;
   vec3 sealN = normalize( vSealWN );
   float sealMacro = sealFbm( sealP * vec3( 0.16, 0.28, 0.16 ) );
-  // The icefall's steps: the tongue breaks over the face into a stack of
-  // serac bands, each a blue ice face with a snow cap on its top and a dark
-  // transverse crevasse above that. The band lines wander with the macro and
-  // across the width, and every band's crevasse opens and closes along x.
-  // (bowed: the faster middle of the flow drags each band line down, so the
-  // crevasses arc between the margins)
-  float sealAcross = sealP.x - ${f(i.tongueLx)};
-  float sealStepT = ( sealP.y + sealMacro * ${f(i.stepWander)}
-    + sealAcross * sealAcross * ${f(i.stepBow)}
-    + ( sealNoise( vec3( sealP.x * 0.28, sealP.y * 0.05, sealP.z * 0.28 ) ) - 0.5 ) * 2.4 ) / ${f(i.stepHeight)};
-  float sealStep = fract( sealStepT );
-  float sealBand = floor( sealStepT );
-  float sealOpen = smoothstep( 0.32, 0.6,
-    sealNoise( vec3( sealP.x * 0.22, sealBand * 1.73, sealP.z * 0.22 ) ) );
-  float sealCrev = smoothstep( ${f(1 - i.crevasseWidth)}, ${f(1 - i.crevasseWidth * 0.45)}, sealStep ) * sealOpen;
-  float sealCap = smoothstep( ${f(1 - i.crevasseWidth - i.capDepth)}, ${f(1 - i.crevasseWidth - 0.02)}, sealStep )
-    * ( 1.0 - sealCrev );
-  // the crevasse lip just under the gap catches the light through thin ice
-  float sealLip = smoothstep( ${f(1 - i.crevasseWidth - 0.05)}, ${f(1 - i.crevasseWidth)}, sealStep )
-    * ( 1.0 - smoothstep( ${f(1 - i.crevasseWidth)}, ${f(1 - i.crevasseWidth * 0.6)}, sealStep ) ) * sealOpen;
-  // longitudinal splits down a band's face, here and there
-  float sealSplit = smoothstep( 0.955, 0.99,
-    1.0 - abs( 2.0 * sealNoise( vec3( sealP.x * 0.3 + sealP.y * 0.12, sealBand * 2.9, sealP.z * 0.3 ) ) - 1.0 ) )
-    * ( 1.0 - sealCap ) * sealOpen;
-  // annual layers on the faces: clear blue against bubbly white winter ice
+  // The sculpt's paint (the vertex colour) says what each part of the ice
+  // is: the deep core down every crevasse and under every lip, the clear
+  // body on the faces, thin pale ice at the arrises, the old snow crust on
+  // whatever faces up. Its luminance picks the part; the colours are the
+  // zone's glacier values below, so day, dusk and night grade them as lit.
+  float sealLum = dot( diffuseColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) );
+  float sealDeep = 1.0 - smoothstep( ${f(i.deepLo)}, ${f(i.deepHi)}, sealLum );
+  float sealPale = smoothstep( ${f(i.paleLo)}, ${f(i.paleHi)}, sealLum );
+  float sealFrost = smoothstep( ${f(i.snowLo)}, ${f(i.snowHi)}, sealLum + ( sealMacro - 0.5 ) * 0.08 );
+  // annual layers on the faces: clear blue against bubbly white winter ice,
+  // and a hairline fracture network
   float sealLayerT = ( sealP.y + sealP.z * 0.18 ) / ${f(i.layerPeriod)} + sealMacro * 1.4;
   float sealLayer = 0.5 + 0.5 * sin( sealLayerT * 6.2831853 );
   float sealThin = smoothstep( 0.82, 0.98, abs( sin( sealLayerT * 18.849556 + sealMacro * 3.0 ) ) );
@@ -229,33 +216,27 @@ function iceAlbedoGlsl(quality: SealSurfaceQuality): string {
       ? 'smoothstep( 0.95, 0.995, 1.0 - abs( 2.0 * sealNoise( sealP * vec3( 1.1, 2.4, 1.1 ) ) - 1.0 ) )'
       : '0.0'
   };
-  vec3 sealIce = mix( ${v3(i.clear)}, ${v3(i.bubbly)}, sealLayer * 0.45 + sealThin * 0.25 + sealMacro * 0.2 );
+  vec3 sealIce = mix( ${v3(i.clear)}, ${v3(i.bubbly)}, sealLayer * 0.35 + sealThin * 0.2 + sealMacro * 0.25 );
   sealIce = mix( sealIce, ${v3(i.bubbly)} * 1.12, sealHair * 0.3 );
-  sealIce = mix( sealIce, ${v3(i.edge)}, sealLip * 0.7 );
-  // snow: the caps, the build's baked old snow on the upper reach, patches of
-  // firn, and anything facing up; never down a crevasse
-  float sealOld = smoothstep( ${f(i.snowLo)}, ${f(i.snowHi)}, vColor.r );
-  float sealFirn = smoothstep( 0.35, 0.75,
-    ${f(i.firnBase)} + ( sealMacro - 0.5 ) * ${f(i.firnSwing)} + max( sealN.y, 0.0 ) * ${f(i.firnUp)} );
-  float sealFrost = clamp( max( max( sealOld * 0.9, sealFirn ), sealCap ), 0.0, 1.0 ) * ( 1.0 - sealCrev );
-  vec3 sealAlb = mix( sealIce, ${v3(i.frost)} * ( 0.94 + 0.06 * sealMacro ), sealFrost );
-  sealAlb = mix( sealAlb, ${v3(i.deep)}, max( sealCrev * 0.92, sealSplit * 0.4 ) );
+  sealIce = mix( sealIce, ${v3(i.edge)}, sealPale * 0.6 );
+  vec3 sealAlb = mix( sealIce, ${v3(i.deep)}, sealDeep * 0.92 );
+  sealAlb = mix( sealAlb, ${v3(i.frost)} * ( 0.94 + 0.06 * sealMacro ), sealFrost );
   // thin-edge scatter: the margins and the icicles read translucent blue
   float sealEdge = pow( 1.0 - clamp( abs( dot( normalize( vNormal ), normalize( vViewPosition ) ) ), 0.0, 1.0 ), 3.0 );
-  sealAlb = mix( sealAlb, ${v3(i.edge)}, sealEdge * ${f(i.edgeAmount)} * ( 1.0 - 0.5 * sealFrost ) );
+  sealAlb = mix( sealAlb, ${v3(i.edge)},
+    sealEdge * ${f(i.edgeAmount)} * ( 1.0 - 0.6 * sealFrost ) * ( 1.0 - 0.5 * sealDeep ) );
   diffuseColor.rgb = sealAlb;`;
 }
 
 const ICE_ROUGHNESS = `
   roughnessFactor = mix( ${f(SANCTUM_GLACIER_ICE.roughClear)}, ${f(SANCTUM_GLACIER_ICE.roughFrost)}, sealFrost );`;
 
-/** Step relief (the cap rounds over, the face drops into the crevasse), the
- *  layers and the macro swell, from derivatives. */
+/** The layers, the macro swell and the fracture network as relief (the
+ *  sculpt carries the seracs and crevasses), from derivatives. */
 const ICE_NORMAL = `
   {
-    float sealH = sealCap * 0.35 - sealCrev * 0.9 - sealSplit * 0.3 + sealLayer * 0.12
-      + sealMacro * 0.5 - sealHair * 0.05;
-    vec2 sealDh = vec2( dFdx( sealH ), dFdy( sealH ) );
+    float sealH = sealLayer * 0.12 + sealMacro * 0.5 - sealHair * 0.05 - sealDeep * 0.2;
+    vec2 sealDh = vec2( dFdx( sealH ), dFdy( sealH ) ) * ( 1.0 - 0.5 * sealFrost );
     normal = sealPerturb( - vViewPosition, normal, sealDh, faceDirection );
   }`;
 

@@ -138,10 +138,10 @@ export function rimeFanAlpha(row: number, col: number): number {
 
 // ---- the spur's Thornpeak rock and the glacier ice --------------------------------
 //
-// The rock spur the tunnel is cut into and the two rock cheeks of the ice tongue
+// The rock spur the tunnel is cut into (and any rock the icefall node carries)
 // are the MOUNTAIN, not the Smith's masonry: they are shaded to the Thornpeak
 // terrain's own snow-crusted rock (src/render/sanctum_seal_gate_surface.ts), and
-// the ice tongue to weathered glacier ice. Colours are LINEAR albedo (the
+// the icefall to weathered glacier ice. Colours are LINEAR albedo (the
 // painter feeds them to a lit material, the scene's lights grade them), so the
 // set piece answers day, dusk and night exactly as the ground around it does.
 
@@ -160,11 +160,11 @@ export const SANCTUM_THORNPEAK_ROCK = {
   rockDark: [0.12, 0.12, 0.123] as LinearRgb,
   /** Old snow and rime, the same cold white the terrain's snow cover reads. */
   snow: [0.58, 0.59, 0.6] as LinearRgb,
-  /** The Blender build's baked outer-rock luminance (its MOUNTAIN tone after
-   *  the band, tone and crack tints, measured over the shipped GLB): the
-   *  vertex colour divided by it keeps the carved cracks and ledges as relief
-   *  in the new tone. */
-  bakedLuma: 0.26,
+  /** The Blender build's baked outer-rock luminance (the sculpted spur's
+   *  paint, its baked occlusion and snow, measured over the shipped GLB): the
+   *  vertex colour divided by it keeps the carved cleaves, ledges and joints
+   *  as relief in the new tone. */
+  bakedLuma: 0.29,
   /** Snow lies where the surface faces up: the world-normal y (plus a little
    *  noise) where it starts and where it is full. */
   snowLo: 0.45,
@@ -206,33 +206,20 @@ export const SANCTUM_GLACIER_ICE = {
   deep: [0.05, 0.16, 0.3] as LinearRgb,
   frost: [0.58, 0.62, 0.67] as LinearRgb,
   edge: [0.46, 0.68, 0.8] as LinearRgb,
-  /** The icefall's serac steps: one band every stepHeight yards up the
-   *  face (the band line wanders by up to stepWander yards), each topped by a
-   *  snow cap capDepth of a band deep and split from the next by a crevasse
-   *  crevasseWidth of a band wide. */
-  stepHeight: 3.6,
-  stepWander: 2.6,
-  /** The bow of each band line, yards of drop per square yard off the
-   *  tongue's centre line (the builder's ICE_CX, lx -18). */
-  stepBow: 0.035,
-  tongueLx: -18,
-  capDepth: 0.26,
-  crevasseWidth: 0.09,
   /** Annual layers: one band every this many yards up the face. */
   layerPeriod: 1.2,
-  /** Firn and old snow veil most of the tongue: the cover's base share, how
-   *  much the macro patches swing it, and how much an upward face adds. Blue
-   *  ice shows on the steep snout faces, in the bare patches and down every
-   *  crevasse. */
-  firnBase: 0.22,
-  firnSwing: 1.1,
-  firnUp: 0.8,
   /** How far the thin-edge scatter pulls the albedo toward `edge`. */
   edgeAmount: 0.55,
-  /** The builder's baked old snow: vertex red above lo starts it, hi is full
-   *  (its ICE_WHITE red is 0.64 linear, its glacier blue 0.21). */
-  snowLo: 0.3,
-  snowHi: 0.58,
+  /** The sculpt's paint, read by its LINEAR luminance (the builder's deep
+   *  core 0.05, clear body 0.31, pale arrises 0.62, snow crust 0.86): the
+   *  core fades out between deepLo and deepHi, the pale ice comes in between
+   *  paleLo and paleHi, the crust between snowLo and snowHi. */
+  deepLo: 0.07,
+  deepHi: 0.24,
+  paleLo: 0.42,
+  paleHi: 0.64,
+  snowLo: 0.68,
+  snowHi: 0.82,
   roughClear: 0.32,
   roughFrost: 0.82,
 } as const;
