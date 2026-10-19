@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { TOWN_BUILDING_NATURAL } from '../src/editor/feature_prop_placements';
 import {
   placedTownInteriorModels,
   placedTownModelName,
@@ -18,6 +19,7 @@ import {
   PAINTED_LOOK_SETS,
   PAINTED_MODELS,
   PAINTED_TOWNS,
+  type PaintedLook,
   type PaintedModel,
   type PaintedTownLayout,
   paintedTownBuilding,
@@ -138,6 +140,29 @@ describe('the painted towns recipe', () => {
         for (const tier of ['', '.half', '.quarter']) {
           expect(publicFile(`${dir}/${model}${tier}.glb`), `${look} ${model}${tier}`).toBe(true);
         }
+      }
+    }
+  });
+
+  it('gives every look model a Studio natural size, its default model size', () => {
+    // a town building whose asset has no natural-size row is silently left out
+    // of the Studio conversion (editor/feature_prop_placements.ts); a look is
+    // the default model re-textured, so it stands at the default model's size
+    for (const [look, models] of Object.entries(PAINTED_LOOK_MODELS)) {
+      for (const model of models) {
+        const building = paintedTownBuilding({
+          id: 't',
+          kind: 'house',
+          model,
+          look: look as PaintedLook,
+          anchor: { x: 0, z: 0 },
+          rotation: 0,
+          scale: 1,
+          walkIn: false,
+        });
+        const id = building.assetId.replace(/^\/models\//, '').replace(/\.glb$/i, '');
+        expect(TOWN_BUILDING_NATURAL[id], id).toBeDefined();
+        expect(TOWN_BUILDING_NATURAL[id], id).toEqual(TOWN_BUILDING_NATURAL[`tidehold/${model}`]);
       }
     }
   });
