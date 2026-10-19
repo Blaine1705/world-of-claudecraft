@@ -20754,7 +20754,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.lifetime': '已完成契约：{count}',
   'hudChrome.guildHall.emptyBoard': '告示板正在重写。请在每周重置后再来。',
   'hudChrome.guildHall.quartermasterIntro':
-    '加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔、公会武器的外观和公会的战马。这里没有任何东西能让你在战斗中变得更强。',
+    '加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔、公会之剑的外观和公会的战马。这里没有任何东西能让你在战斗中变得更强。',
   'hudChrome.guildHall.titleOffer': '头衔：{title}',
   'hudChrome.guildHall.titlePreview': '显示为{preview}',
   'hudChrome.guildHall.buy': '购买',
@@ -20770,9 +20770,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.skinPreview':
     '改变你所装备的剑的样子，适用于账号中的所有角色。仅为外观：没有属性。',
   'hudChrome.guildHall.skinOffer': '剑的外观：{skin}',
-  'hudChrome.guildHall.staffSkinOffer': '法杖的外观：{skin}',
-  'hudChrome.guildHall.staffSkinPreview':
-    '改变你所装备的法杖的样子，适用于账号中的所有角色。仅为外观：没有属性。',
   'hudChrome.guildHall.mountPreview': '地面坐骑：骑乘时移动速度+{pct}%。需要骑术训练。',
   'hudChrome.guildHall.mountOffer': '坐骑：{mount}',
   'hudChrome.guildHall.refused.range': '站到军需官身边才能交易。',
@@ -20796,7 +20793,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.shop.stockLabel': '加里克·霍尔特的货品',
   'hudChrome.guildHall.shop.kindMount': '坐骑',
   'hudChrome.guildHall.shop.kindSword': '剑的外观',
-  'hudChrome.guildHall.shop.kindStaff': '法杖的外观',
   'hudChrome.guildHall.shop.mountHeading': '你骑在马鞍上',
   'hudChrome.guildHall.shop.skinHeading': '握在你手中',
   'hudChrome.guildHall.shop.stageLabel': '{name}的3D预览',

@@ -69,7 +69,7 @@ export function guildQuartermasterInRange(ctx: SimContext, player: Entity): bool
 }
 
 /** The offer can be granted at all (its title, reins or skin exists in the catalogs). */
-function offerResolves(offer: GuildQuartermasterOffer): boolean {
+export function guildOfferResolves(offer: GuildQuartermasterOffer): boolean {
   switch (offer.kind) {
     case 'title':
       return Object.hasOwn(DEEDS, offer.deedId);
@@ -78,7 +78,11 @@ function offerResolves(offer: GuildQuartermasterOffer): boolean {
       return def?.kind === 'mount';
     }
     case 'weaponSkin':
-      return Object.hasOwn(WEAPON_SKINS, offer.skinId);
+      // only the guild's own arms: a skin reserved elsewhere (a future raid's) never sells here
+      return (
+        Object.hasOwn(WEAPON_SKINS, offer.skinId) &&
+        WEAPON_SKINS[offer.skinId].earnedFrom === 'lantern_hall'
+      );
   }
 }
 
@@ -112,7 +116,7 @@ export function buyGuildCosmetic(
   if (!Object.hasOwn(GUILD_QUARTERMASTER_STOCK_BY_ID, offerId)) return;
   const offer = GUILD_QUARTERMASTER_STOCK_BY_ID[offerId];
   // never take the seals for something the catalogs cannot grant
-  if (!offerResolves(offer)) return;
+  if (!guildOfferResolves(offer)) return;
   if (player.dead) return;
   const refuse = (reason: GuildCosmeticRefusal): void => {
     ctx.emit({ type: 'guildCosmeticRefused', offerId, reason, pid: meta.entityId });

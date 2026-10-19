@@ -43,8 +43,10 @@ export interface WeaponSkinDef {
   handling?: 'crossbow';
   /** Earned in the world instead of sold in the Claudium Armory: the skin has no economy SKU
    *  and stays out of the store (STORE_WEAPON_SKIN_LIST). 'lantern_hall': Lantern Hall's
-   *  quartermaster sells it for Lantern Seals (content/guild_contracts.ts). */
-  earnedFrom?: 'lantern_hall';
+   *  quartermaster sells it for Lantern Seals (content/guild_contracts.ts). 'future_raid':
+   *  RESERVED as loot for a raid that does not exist yet, so nothing grants it today: no
+   *  store, vendor, drop or Reliquary page (RESERVED_WEAPON_SKIN_IDS). */
+  earnedFrom?: 'lantern_hall' | 'future_raid';
 }
 
 export const WEAPON_SKIN_TYPES: readonly WeaponSkinType[] = [
@@ -331,10 +333,12 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     season: 1,
     earnedFrom: 'lantern_hall',
   },
-  // The guild's four elemental arms, sold beside the blade. Epic, so each carries the epic
-  // tier's stronger glow, rim and cast light under its own element's VFX row
-  // (src/render/weapon_vfx.ts): fire and a sea storm for sword users, frost and a dusk-flame
-  // for staff users. Built by scripts/assets/lantern_hall_arms/.
+  // Four elemental arms RESERVED for a future raid's loot table: built and kept (models,
+  // art, VFX rows) but not obtainable anywhere yet, so they are no longer sold at Lantern
+  // Hall. Their collection stays 'lantern_hall' (where they were made) until the raid lands.
+  // Epic, so each carries the epic tier's stronger glow, rim and cast light under its own
+  // element's VFX row (src/render/weapon_vfx.ts): fire and a sea storm for sword users, frost
+  // and a dusk-flame for staff users. Built by scripts/assets/lantern_hall_arms/.
   hearthbrand_sword: {
     id: 'hearthbrand_sword',
     collection: 'lantern_hall',
@@ -342,7 +346,7 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     weaponType: 'sword',
     model: 'hearthbrand',
     season: 1,
-    earnedFrom: 'lantern_hall',
+    earnedFrom: 'future_raid',
   },
   squallcrest_sword: {
     id: 'squallcrest_sword',
@@ -351,7 +355,7 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     weaponType: 'sword',
     model: 'squallcrest',
     season: 1,
-    earnedFrom: 'lantern_hall',
+    earnedFrom: 'future_raid',
   },
   rimelight_staff: {
     id: 'rimelight_staff',
@@ -360,7 +364,7 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     weaponType: 'staff',
     model: 'rimelight_staff',
     season: 1,
-    earnedFrom: 'lantern_hall',
+    earnedFrom: 'future_raid',
   },
   duskwick_staff: {
     id: 'duskwick_staff',
@@ -369,11 +373,17 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     weaponType: 'staff',
     model: 'duskwick_staff',
     season: 1,
-    earnedFrom: 'lantern_hall',
+    earnedFrom: 'future_raid',
   },
 };
 
 export const WEAPON_SKIN_LIST: readonly WeaponSkinDef[] = Object.values(WEAPON_SKINS);
+
+/** The skins reserved for a future raid: in the catalog (so the renderer, previews and VFX
+ *  keep them) but obtainable nowhere yet. Every player-facing list leaves them out. */
+export const RESERVED_WEAPON_SKIN_IDS: readonly string[] = WEAPON_SKIN_LIST.filter(
+  (skin) => skin.earnedFrom === 'future_raid',
+).map((skin) => skin.id);
 
 /** The skins the Claudium Armory sells: every skin that is not earned in the world. */
 export const STORE_WEAPON_SKIN_LIST: readonly WeaponSkinDef[] = WEAPON_SKIN_LIST.filter(

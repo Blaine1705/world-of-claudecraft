@@ -22228,7 +22228,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.lifetime': 'Выполнено контрактов: {count}',
   'hudChrome.guildHall.emptyBoard': 'Доску переписывают. Возвращайтесь после еженедельного сброса.',
   'hudChrome.guildHall.quartermasterIntro':
-    'Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний, облики оружия гильдии и её боевого коня. Ничто здесь не сделает вас сильнее в бою.',
+    'Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний, облик меча гильдии и её боевого коня. Ничто здесь не сделает вас сильнее в бою.',
   'hudChrome.guildHall.titleOffer': 'Звание: {title}',
   'hudChrome.guildHall.titlePreview': 'Отображается как {preview}',
   'hudChrome.guildHall.buy': 'Купить',
@@ -22244,9 +22244,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.skinPreview':
     'Меняет облик надетого меча у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.',
   'hudChrome.guildHall.skinOffer': 'Облик меча: {skin}',
-  'hudChrome.guildHall.staffSkinOffer': 'Облик посоха: {skin}',
-  'hudChrome.guildHall.staffSkinPreview':
-    'Меняет облик надетого посоха у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.',
   'hudChrome.guildHall.mountPreview':
     'Наземный скакун: +{pct}% к скорости передвижения верхом. Требуется навык верховой езды.',
   'hudChrome.guildHall.mountOffer': 'Скакун: {mount}',
@@ -22276,7 +22273,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.shop.stockLabel': 'Товары Гаррика Холта',
   'hudChrome.guildHall.shop.kindMount': 'Скакун',
   'hudChrome.guildHall.shop.kindSword': 'Облик меча',
-  'hudChrome.guildHall.shop.kindStaff': 'Облик посоха',
   'hudChrome.guildHall.shop.mountHeading': 'Вы в седле',
   'hudChrome.guildHall.shop.skinHeading': 'В вашей руке',
   'hudChrome.guildHall.shop.stageLabel': '3D-просмотр: {name}',

@@ -1691,7 +1691,8 @@ export const WEAPON_VFX: Record<string, WeaponVfxSpec> = {
     ],
   },
 
-  // Lantern Hall's four elemental arms (scripts/assets/lantern_hall_arms/): the guild's epic
+  // The four elemental arms built for Lantern Hall (scripts/assets/lantern_hall_arms/), now
+  // RESERVED as loot for a future raid (content/weapon_skins.ts earnedFrom 'future_raid'): epic
   // showpieces, each window narrowed to the element its build paints, so the metal stays metal.
   // Hearthbrand: a forge-hot flame-waved blade. Its edges and the seam up its heart burn, embers
   // pour off it and the air above it shimmers with heat; the light gutters like a fire.

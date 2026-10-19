@@ -21819,7 +21819,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.lifetime': '達成した契約：{count}',
   'hudChrome.guildHall.emptyBoard': '掲示板は書き換え中だ。週次リセットの後にまた来てほしい。',
   'hudChrome.guildHall.quartermasterIntro':
-    'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの武器の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。',
+    'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの剣の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。',
   'hudChrome.guildHall.titleOffer': '称号：{title}',
   'hudChrome.guildHall.titlePreview': '表示：{preview}',
   'hudChrome.guildHall.buy': '購入',
@@ -21836,9 +21836,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.skinPreview':
     '装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
   'hudChrome.guildHall.skinOffer': '剣の外見：{skin}',
-  'hudChrome.guildHall.staffSkinOffer': '杖の外見：{skin}',
-  'hudChrome.guildHall.staffSkinPreview':
-    '装備中の杖の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
   'hudChrome.guildHall.mountPreview': '地上マウント：騎乗中の移動速度+{pct}%。騎乗訓練が必要。',
   'hudChrome.guildHall.mountOffer': 'マウント：{mount}',
   'hudChrome.guildHall.refused.range': '取引するには補給係のそばに立つこと。',
@@ -21864,7 +21861,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.shop.stockLabel': 'ギャリック・ホルトの品揃え',
   'hudChrome.guildHall.shop.kindMount': 'マウント',
   'hudChrome.guildHall.shop.kindSword': '剣の外見',
-  'hudChrome.guildHall.shop.kindStaff': '杖の外見',
   'hudChrome.guildHall.shop.mountHeading': '鞍にまたがるあなた',
   'hudChrome.guildHall.shop.skinHeading': 'あなたの手に',
   'hudChrome.guildHall.shop.stageLabel': '{name}の3Dプレビュー',

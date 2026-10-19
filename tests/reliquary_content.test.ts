@@ -74,7 +74,11 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
-import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import {
+  RESERVED_WEAPON_SKIN_IDS,
+  WEAPON_SKIN_LIST,
+  WEAPON_SKINS,
+} from '../src/sim/content/weapon_skins';
 import {
   ALL_RECIPES,
   CAMPS,
@@ -487,8 +491,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Two referral reward mounts join Horizons.
     // Lantern Hall's three quartermaster titles join the titles page (+3).
     // Lantern Hall's quartermaster adds the guild's horse (Horizons mounts) and sword (skins).
-    // Its four elemental weapon appearances join the skins page (+4).
-    expect(full).toEqual({ owned: 569, total: 569 });
+    // (Its four elemental weapon appearances joined and then left the skins page: they are
+    // reserved for a future raid, so no Reliquary row until it ships them.)
+    expect(full).toEqual({ owned: 565, total: 565 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -591,7 +596,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(756); // plus Lantern Hall's horse and sword, plus two referral reward mounts, plus Lantern Hall's three titles, plus its four elemental arms
+    ).toBe(752); // plus Lantern Hall's horse and sword, plus two referral reward mounts, plus Lantern Hall's three titles
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2672,11 +2677,15 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('weapon skin page lists every live Armory skin exactly once', () => {
+  it('weapon skin page lists every obtainable Armory skin exactly once', () => {
     const page = RELIQUARY_PAGES_BY_ID.horizons_weapon_skins;
     const ids = page.relics.filter((r) => r.kind === 'weapon_skin').map((r) => r.skinId);
     expect(ids).toEqual([...RELIQUARY_HORIZON_WEAPON_SKINS]);
-    const live = WEAPON_SKIN_LIST.map((s) => s.id).sort();
+    // every skin but the ones reserved for a future raid (obtainable nowhere yet, so no row)
+    expect(RESERVED_WEAPON_SKIN_IDS.length).toBeGreaterThan(0);
+    const live = WEAPON_SKIN_LIST.filter((s) => !RESERVED_WEAPON_SKIN_IDS.includes(s.id))
+      .map((s) => s.id)
+      .sort();
     expect([...ids].sort()).toEqual(live);
     for (const id of ids) {
       expect(WEAPON_SKINS[id], id).toBeDefined();
@@ -4313,9 +4322,9 @@ describe('Reliquary source hint coverage', () => {
     expect(RELIQUARY_PROFESSION_MARKS.masterworkByCraft).toContain('masterwork:engineering');
     // And the skins page really is fully answered now, which is the half of the
     // executed ruling this row can no longer show.
-    // 29 store skins plus Lantern Hall's earned blade and four elemental arms, each row naming
-    // its own door
-    expect(RELIQUARY_HORIZON_WEAPON_SKINS.length).toBe(34);
+    // 29 store skins plus Lantern Hall's earned blade, each row naming its own door (the four
+    // elemental arms are reserved for a future raid and have no row)
+    expect(RELIQUARY_HORIZON_WEAPON_SKINS.length).toBe(30);
     // two doors now, so no page default: every row names its own
     expect(RELIQUARY_PAGES_BY_ID.horizons_weapon_skins.sourceDefault).toBeUndefined();
     const skins = RELIQUARY_PAGES_BY_ID.horizons_weapon_skins;
@@ -4327,17 +4336,11 @@ describe('Reliquary source hint coverage', () => {
     expect(row('cinderbrand_sword')).toEqual([
       { sourceKind: 'store', sourceId: RELIQUARY_STORE_SOURCE_ID },
     ]);
-    for (const id of [
-      'lantern_hall_sword',
-      'hearthbrand_sword',
-      'squallcrest_sword',
-      'rimelight_staff',
-      'duskwick_staff',
-    ]) {
-      expect(row(id), id).toEqual([
-        { sourceKind: 'activity', sourceId: 'lantern_hall_quartermaster' },
-      ]);
-    }
+    expect(row('lantern_hall_sword')).toEqual([
+      { sourceKind: 'activity', sourceId: 'lantern_hall_quartermaster' },
+    ]);
+    // the reserved elemental arms have no row, so no door to name
+    for (const id of RESERVED_WEAPON_SKIN_IDS) expect(() => row(id), id).toThrow(/no .* row/);
   });
 
   it('multi-source pages give every relic its OWN hint (no inherited stragglers)', () => {

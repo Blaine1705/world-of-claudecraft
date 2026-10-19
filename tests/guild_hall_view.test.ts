@@ -171,7 +171,13 @@ describe('the guild window view core', () => {
   it('reads the same from the online mirror as from the offline world', () => {
     // ClientWorld's shape: the board decoded off the wire (gcon), the bags and the Book mirrored
     const done = [board().offered[0]];
-    const sim = world(7, [TITLES[0].deedId], done, ['lantern_hall_destrier'], ['rimelight_staff']);
+    const sim = world(
+      7,
+      [TITLES[0].deedId],
+      done,
+      ['lantern_hall_destrier'],
+      ['lantern_hall_sword'],
+    );
     const mirror = {
       ...sim,
       guildContracts: decodeGuildContractsWire(JSON.parse(JSON.stringify(sim.guildContracts))),
@@ -287,12 +293,12 @@ describe('the guild window view core', () => {
       action: 'Needs 37 more',
     });
     expect(horse.detail?.howTo).toMatch(/reins go to your bags/);
-    const sword = buildGuildShopView(input({ seals: 20 }), 'weapon_skin_squallcrest_sword');
+    const sword = buildGuildShopView(input({ seals: 20 }), 'weapon_skin_lantern_hall_sword');
     expect(sword.detail).toMatchObject({
       offerKind: 'weaponSkin',
-      art: { kind: 'skin', skinId: 'squallcrest_sword' },
+      art: { kind: 'skin', skinId: 'lantern_hall_sword' },
       kindLabel: 'Sword appearance',
-      stage: { kind: 'weapon', heading: 'In your hand', skinId: 'squallcrest_sword' },
+      stage: { kind: 'weapon', heading: 'In your hand', skinId: 'lantern_hall_sword' },
       cosmetic: null,
       state: 'ready',
       action: 'Buy',
@@ -300,15 +306,11 @@ describe('the guild window view core', () => {
     });
     expect(sword.detail?.summary).toMatch(/equipped sword .* Appearance only: no stats\.$/);
     expect(sword.detail?.howTo).toMatch(/Cosmetics window/);
-    // a staff look says staff, never sword
-    const staff = buildGuildShopView(input(), 'weapon_skin_duskwick_staff').detail;
-    expect(staff).toMatchObject({ kindLabel: 'Staff appearance', name: 'Duskwick Staff' });
-    expect(staff?.summary).toMatch(/equipped staff/);
     // owned reads the held mount and the account's skin ledger, not the Book of Deeds
     const rich = input({
       seals: 99,
       ownedMounts: ['lantern_hall_destrier'],
-      weaponSkinIds: ['squallcrest_sword'],
+      weaponSkinIds: ['lantern_hall_sword'],
     });
     expect(buildGuildShopView(rich, 'mount_lantern_hall_destrier').detail).toMatchObject({
       state: 'owned',
@@ -316,11 +318,14 @@ describe('the guild window view core', () => {
       actionEnabled: false,
       howTo: 'You own this mount. Its reins are in your bags.',
     });
-    expect(buildGuildShopView(rich, 'weapon_skin_squallcrest_sword').detail).toMatchObject({
+    expect(buildGuildShopView(rich, 'weapon_skin_lantern_hall_sword').detail).toMatchObject({
       state: 'owned',
       howTo: 'You own this appearance. Apply it from the Cosmetics window.',
     });
-    expect(buildGuildShopView(rich, 'weapon_skin_rimelight_staff').detail?.state).toBe('ready');
+    // a skin reserved elsewhere (a future raid's) is no card at this counter
+    expect(buildGuildShopView(rich, 'weapon_skin_rimelight_staff').detail?.id).not.toBe(
+      'weapon_skin_rimelight_staff',
+    );
   });
 
   it('keeps the horse from a rider who has not learned to ride, and says why', () => {
@@ -349,33 +354,30 @@ describe('the guild window view core', () => {
     expect(owned.detail).toMatchObject({ state: 'owned', shortText: null });
   });
 
-  it('names the weapon each appearance dresses: the guild blade and two swords, two staves', () => {
-    const shop = buildGuildShopView(input({ seals: 20, weaponSkinIds: ['rimelight_staff'] }), null);
+  it("sells the guild's sword as its one weapon appearance, named for the weapon it dresses", () => {
+    const shop = buildGuildShopView(input({ seals: 20 }), null);
     const card = (id: string) => {
       const found = shop.items.find((o) => o.id === id);
       if (!found) throw new Error(`no card ${id}`);
       return found;
     };
-    // the counter's copy knows swords and staves only: a new weapon type in the stock must
-    // bring its own kind label first
+    // the counter's copy knows swords only: a new weapon type in the stock must bring its own
+    // kind label first. The four elemental arms (two of them staves) are reserved for a future
+    // raid and are not stocked here.
     expect(new Set(SKINS.map((o) => WEAPON_SKINS[o.skinId]?.weaponType))).toEqual(
-      new Set(['sword', 'staff']),
+      new Set(['sword']),
     );
-    expect(SKINS.map((o) => card(o.id).kindLabel)).toEqual([
-      'Sword appearance',
-      'Sword appearance',
-      'Sword appearance',
-      'Staff appearance',
-      'Staff appearance',
-    ]);
-    expect(card('weapon_skin_rimelight_staff')).toMatchObject({
-      state: 'owned',
-      stateLabel: 'Owned',
-    });
-    expect(card('weapon_skin_hearthbrand_sword')).toMatchObject({
+    expect(SKINS.map((o) => o.skinId)).toEqual(['lantern_hall_sword']);
+    expect(SKINS.map((o) => card(o.id).kindLabel)).toEqual(['Sword appearance']);
+    expect(card('weapon_skin_lantern_hall_sword')).toMatchObject({
       state: 'ready',
       priceValue: '20',
     });
+    const owned = buildGuildShopView(
+      input({ seals: 20, weaponSkinIds: ['lantern_hall_sword'] }),
+      null,
+    ).items.find((o) => o.id === 'weapon_skin_lantern_hall_sword');
+    expect(owned).toMatchObject({ state: 'owned', stateLabel: 'Owned' });
     expect(card('weapon_skin_lantern_hall_sword').art).toEqual({
       kind: 'skin',
       skinId: 'lantern_hall_sword',
@@ -404,9 +406,11 @@ describe('the guild window view core', () => {
     expect(horse?.title).toBe('Mount: Lantern Hall Destrier');
     expect(horse?.lines.map((line) => line.tone)).toEqual(['sub', 'desc', 'sub']);
     expect(horse?.lines[0].text).toMatch(/\+70% movement speed/);
-    const staff = guildShopTooltip('weapon_skin_rimelight_staff', input());
-    expect(staff?.title).toMatch(/^Staff appearance: /);
-    expect(staff?.lines.at(-1)?.tone).toBe('red');
+    const sword = guildShopTooltip('weapon_skin_lantern_hall_sword', input());
+    expect(sword?.title).toMatch(/^Sword appearance: /);
+    expect(sword?.lines.at(-1)?.tone).toBe('red');
+    // a reserved skin's old offer id has no hover card
+    expect(guildShopTooltip('weapon_skin_rimelight_staff', input())).toBeNull();
     expect(guildShopTooltip('phantom', input())).toBeNull();
   });
 
@@ -450,8 +454,8 @@ describe('the guild window painter', () => {
     const { root, win } = mount(w);
     win.open('quartermaster');
     expect(win.isOpen).toBe(true);
-    // the horse draws its reins, the five weapon appearances their Armory cards, a title its crest
-    expect(root.querySelectorAll('.gh-slot-skin img').length).toBe(5);
+    // the horse draws its reins, the guild's sword appearance its Armory card, a title its crest
+    expect(root.querySelectorAll('.gh-slot-skin img').length).toBe(1);
     expect(
       root
         .querySelector('[data-gh-offer="mount_lantern_hall_destrier"] .gh-slot-item img')
@@ -459,9 +463,9 @@ describe('the guild window painter', () => {
     ).toBe('/ui/items/reins_lantern_hall_destrier.webp');
     expect(
       root
-        .querySelector('[data-gh-offer="weapon_skin_squallcrest_sword"] .gh-slot-skin img')
+        .querySelector('[data-gh-offer="weapon_skin_lantern_hall_sword"] .gh-slot-skin img')
         ?.getAttribute('src'),
-    ).toBe('/ui/store/armory/squallcrest_sword.webp');
+    ).toBe('/ui/store/armory/lantern_hall_sword.webp');
     expect(root.style.display).toBe('flex');
     expect(root.querySelectorAll('[data-gh-offer]').length).toBe(GUILD_QUARTERMASTER_STOCK.length);
     // the counter opens on the first title, the one buy button under its detail
@@ -635,17 +639,14 @@ describe('the guild window painter', () => {
     expect(root.querySelector('.gh-stage-mount')).toBe(stage);
     expect(stageLog.built).toBe(1);
     // an appearance: the horse's context is disposed first, then the shared turntable holds it
-    pick('weapon_skin_squallcrest_sword');
+    pick('weapon_skin_lantern_hall_sword');
     expect(stageLog.calls.slice(-2)).toEqual(['active:false', 'dispose']);
     expect(stage?.isConnected).toBe(false);
     expect(tryOn).toHaveBeenCalledTimes(1);
     const weapon = root.querySelector<HTMLElement>('.gh-stage-weapon');
-    expect(tryOn.mock.calls[0]).toEqual([weapon, 'squallcrest_sword']);
+    expect(tryOn.mock.calls[0]).toEqual([weapon, 'lantern_hall_sword']);
     expect(weapon?.closest('.gh-model-stage')?.textContent).toContain('In your hand');
-    // another appearance re-stages the same host; a title leaves the stage entirely
-    pick('weapon_skin_rimelight_staff');
-    expect(tryOn.mock.calls[1]).toEqual([weapon, 'rimelight_staff']);
-    expect(root.querySelector('.gh-stage-weapon')).toBe(weapon);
+    // a title leaves the stage entirely
     pick(TITLES[0].id);
     expect(weapon?.isConnected).toBe(false);
     expect(root.querySelector('.gh-stage')).toBeNull();

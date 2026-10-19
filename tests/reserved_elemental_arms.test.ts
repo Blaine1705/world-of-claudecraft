@@ -1,9 +1,10 @@
-// Lantern Hall's four elemental weapon appearances, sold by the guild quartermaster for Lantern
-// Seals beside the guild's blade (content/guild_contracts.ts, content/weapon_skins.ts): the
-// catalog records and their stock rows, the purchase rules for a staff look as well as a sword
-// look (grant before spend, owned refusal, the server's per-session ledger), and the render and
-// art each one needs to be worn: a grip family, a VFX row with its element, a swing trail, the
-// GLB in the skin texture shape, the Armory card and the bag preview.
+// The four elemental weapon appearances (Hearthbrand, Squallcrest, the Rimelight Staff and the
+// Duskwick Staff) are RESERVED as loot for a future raid: once sold at Lantern Hall's
+// quartermaster, they are now obtainable nowhere (content/weapon_skins.ts earnedFrom
+// 'future_raid'). This pins both halves of that: no player-visible source offers them (the
+// guild stock, the Claudium Armory list, the Reliquary, the wiki content), a forged buy is
+// refused, and the assets the raid will hand out stay whole (records, grip family, VFX row,
+// swing trail, GLB, Armory card and bag preview) so the raid only has to add a drop.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -13,24 +14,26 @@ import { weaponSkinSwingTrail } from '../src/render/weapon_skin_trail_core';
 import { WEAPON_VFX } from '../src/render/weapon_vfx';
 import {
   GUILD_QUARTERMASTER_STOCK,
-  GUILD_QUARTERMASTER_STOCK_BY_ID,
-  LANTERN_HALL_ELEMENTAL_SEALS,
-  LANTERN_HALL_ELEMENTAL_SKIN_IDS,
   LANTERN_SEAL_ITEM_ID,
 } from '../src/sim/content/guild_contracts';
 import {
   GUILD_QUARTERMASTER_NPC_ID,
   HIGHWATCH_GUILD_ENTITY_IDS,
 } from '../src/sim/content/highwatch_guild';
-import { STORE_WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
-import type { GuildAccountPort } from '../src/sim/guild_quartermaster';
+import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
+import {
+  RESERVED_WEAPON_SKIN_IDS,
+  STORE_WEAPON_SKIN_LIST,
+  WEAPON_SKINS,
+} from '../src/sim/content/weapon_skins';
+import { type GuildAccountPort, guildOfferResolves } from '../src/sim/guild_quartermaster';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { armorySkinStrings } from '../src/ui/i18n.catalog/armory';
 
 const ROOT = join(__dirname, '..');
 
-/** Skin id, its held model, its weapon type and its element's VFX window hue. */
+/** Skin id, its held model, its weapon type and its display name. */
 const ARMS = [
   { skin: 'hearthbrand_sword', model: 'hearthbrand', type: 'sword', name: 'Hearthbrand' },
   { skin: 'squallcrest_sword', model: 'squallcrest', type: 'sword', name: 'Squallcrest' },
@@ -53,27 +56,8 @@ function atGarrick(seals: number) {
 }
 
 describe('the catalog records', () => {
-  it('lists the four arms in shop order, at the provisional 20 seals each', () => {
-    expect([...LANTERN_HALL_ELEMENTAL_SKIN_IDS]).toEqual(ARMS.map((a) => a.skin));
-    expect(LANTERN_HALL_ELEMENTAL_SEALS).toBe(20);
-    // after the guild's blade, before the horse; the offer ids ride the wire, so literals
-    expect(GUILD_QUARTERMASTER_STOCK.map((o) => o.id).slice(4, 8)).toEqual([
-      'weapon_skin_hearthbrand_sword',
-      'weapon_skin_squallcrest_sword',
-      'weapon_skin_rimelight_staff',
-      'weapon_skin_duskwick_staff',
-    ]);
-    for (const arm of ARMS) {
-      expect(GUILD_QUARTERMASTER_STOCK_BY_ID[`weapon_skin_${arm.skin}`]).toEqual({
-        id: `weapon_skin_${arm.skin}`,
-        kind: 'weaponSkin',
-        skinId: arm.skin,
-        seals: 20,
-      });
-    }
-  });
-
-  it('each is an earned epic skin of its weapon type the Claudium store never lists', () => {
+  it('keeps the four as epic skins reserved for a future raid', () => {
+    expect([...RESERVED_WEAPON_SKIN_IDS]).toEqual(ARMS.map((a) => a.skin));
     for (const arm of ARMS) {
       expect(WEAPON_SKINS[arm.skin]).toEqual({
         id: arm.skin,
@@ -82,12 +66,8 @@ describe('the catalog records', () => {
         weaponType: arm.type,
         model: arm.model,
         season: 1,
-        earnedFrom: 'lantern_hall',
+        earnedFrom: 'future_raid',
       });
-      expect(
-        STORE_WEAPON_SKIN_LIST.some((s) => s.id === arm.skin),
-        arm.skin,
-      ).toBe(false);
       expect(armorySkinStrings[arm.skin].name).toBe(arm.name);
       // the look is a look: every lore line says so
       expect(armorySkinStrings[arm.skin].lore, arm.skin).toMatch(/only a look\.$/);
@@ -95,36 +75,83 @@ describe('the catalog records', () => {
   });
 });
 
-describe('buying an elemental arm', () => {
-  it('grants a staff look to the offline account mirror, takes 20, then refuses it as owned', () => {
+describe('no player-visible source offers them', () => {
+  it("is not on Garrick's stock, which sells only titles, the guild's sword and its horse", () => {
+    // the offer ids ride the wire, so literals
+    expect(GUILD_QUARTERMASTER_STOCK.map((o) => o.id)).toEqual([
+      'title_writ_runner',
+      'title_hallsworn',
+      'title_of_lantern_hall',
+      'weapon_skin_lantern_hall_sword',
+      'mount_lantern_hall_destrier',
+    ]);
+    for (const offer of GUILD_QUARTERMASTER_STOCK) {
+      if (offer.kind !== 'weaponSkin') continue;
+      expect(WEAPON_SKINS[offer.skinId]?.earnedFrom, offer.id).toBe('lantern_hall');
+    }
+  });
+
+  it('is not in the Claudium Armory list', () => {
+    for (const arm of ARMS) {
+      expect(
+        STORE_WEAPON_SKIN_LIST.some((s) => s.id === arm.skin),
+        arm.skin,
+      ).toBe(false);
+    }
+  });
+
+  it('has no Reliquary row on any page', () => {
+    const reserved = new Set<string>(RESERVED_WEAPON_SKIN_IDS);
+    for (const page of RELIQUARY_PAGES) {
+      for (const relic of page.relics) {
+        if (relic.kind !== 'weapon_skin') continue;
+        expect(reserved.has(relic.skinId), `${page.id}: ${relic.skinId}`).toBe(false);
+      }
+    }
+  });
+
+  it('is absent from the generated wiki content', () => {
+    const wiki = readFileSync(join(ROOT, 'src', 'guide', 'content.generated.ts'), 'utf8');
+    for (const arm of ARMS) expect(wiki, arm.name).not.toContain(`"${arm.name}"`);
+  });
+});
+
+describe('a forged buy', () => {
+  it('never resolves a weapon-skin offer for a reserved skin, even if one were stocked', () => {
+    for (const arm of ARMS) {
+      expect(
+        guildOfferResolves({
+          id: `weapon_skin_${arm.skin}`,
+          kind: 'weaponSkin',
+          skinId: arm.skin,
+          seals: 20,
+        }),
+        arm.skin,
+      ).toBe(false);
+    }
+    // the guild's own blade still resolves
+    expect(
+      guildOfferResolves({
+        id: 'weapon_skin_lantern_hall_sword',
+        kind: 'weaponSkin',
+        skinId: 'lantern_hall_sword',
+        seals: 20,
+      }),
+    ).toBe(true);
+  });
+
+  it('refuses an old elemental offer id offline and keeps every seal', () => {
     const { s, guildEvents, sealsLeft } = atGarrick(30);
-    const offer = 'weapon_skin_duskwick_staff';
-    s.buyGuildCosmetic(offer);
-    expect(guildEvents()).toEqual([
-      expect.objectContaining({ type: 'guildCosmeticBought', offerId: offer }),
-    ]);
-    expect(s.accountCosmetics.weaponSkinIds).toContain('duskwick_staff');
-    expect(sealsLeft()).toBe(10);
-    s.buyGuildCosmetic(offer);
-    expect(guildEvents()).toEqual([
-      expect.objectContaining({ type: 'guildCosmeticRefused', offerId: offer, reason: 'owned' }),
-    ]);
-    expect(sealsLeft()).toBe(10);
+    // an id off the stock is dropped silently, like any unknown offer
+    s.buyGuildCosmetic('weapon_skin_duskwick_staff');
+    expect(guildEvents()).toEqual([]);
+    expect(sealsLeft()).toBe(30);
+    expect(s.accountCosmetics.weaponSkinIds).not.toContain('duskwick_staff');
   });
 
-  it('refuses short of seals and keeps every one', () => {
-    const { s, guildEvents, sealsLeft } = atGarrick(19);
-    s.buyGuildCosmetic('weapon_skin_hearthbrand_sword');
-    expect(guildEvents()).toEqual([
-      expect.objectContaining({ type: 'guildCosmeticRefused', reason: 'seals' }),
-    ]);
-    expect(sealsLeft()).toBe(19);
-    expect(s.accountCosmetics.weaponSkinIds).not.toContain('hearthbrand_sword');
-  });
-
-  it("owns one arm without owning the others, through the server session's port", () => {
+  it("refuses one through the server session's port and grants nothing", () => {
     const { s, pid, guildEvents, sealsLeft } = atGarrick(40);
-    const granted: string[] = ['squallcrest_sword'];
+    const granted: string[] = [];
     const port: GuildAccountPort = {
       ownsWeaponSkin: (id) => granted.includes(id),
       grantWeaponSkin: (id) => {
@@ -132,23 +159,19 @@ describe('buying an elemental arm', () => {
         return true;
       },
     };
-    const send = (offer: string) =>
-      buyGuildCosmeticWire(s, { cmd: 'guild_buy_cosmetic', offer } as never, pid, port);
-    send('weapon_skin_squallcrest_sword');
-    expect(guildEvents()).toEqual([expect.objectContaining({ reason: 'owned' })]);
-    send('weapon_skin_rimelight_staff');
-    expect(guildEvents()).toEqual([
-      expect.objectContaining({
-        type: 'guildCosmeticBought',
-        offerId: 'weapon_skin_rimelight_staff',
-      }),
-    ]);
-    expect(granted).toEqual(['squallcrest_sword', 'rimelight_staff']);
-    expect(sealsLeft()).toBe(20);
+    buyGuildCosmeticWire(
+      s,
+      { cmd: 'guild_buy_cosmetic', offer: 'weapon_skin_rimelight_staff' } as never,
+      pid,
+      port,
+    );
+    expect(guildEvents()).toEqual([]);
+    expect(granted).toEqual([]);
+    expect(sealsLeft()).toBe(40);
   });
 });
 
-describe('what it takes to wear one', () => {
+describe('the kept assets the raid will hand out', () => {
   it('holds each in its own grip family and carries an epic VFX row and a swing trail', () => {
     for (const arm of ARMS) {
       expect(KAYKIT_WEAPON_ACCESSORY[arm.model], arm.model).toBe(

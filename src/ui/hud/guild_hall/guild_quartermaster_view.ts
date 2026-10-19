@@ -168,11 +168,6 @@ function actionLabel(state: GuildShopItemState, missing: number): string {
   return t('hudChrome.guildHall.needSeals', { count: whole(missing) });
 }
 
-/** A weapon appearance is a staff's or a sword's: the copy names the weapon it dresses. */
-function isStaffSkin(skinId: string): boolean {
-  return WEAPON_SKINS[skinId]?.weaponType === 'staff';
-}
-
 /** The art, name and kind label every surface (card, detail, hover card) shares. */
 function offerIdentity(offer: GuildQuartermasterOffer): {
   art: GuildShopArt;
@@ -200,9 +195,7 @@ function offerIdentity(offer: GuildQuartermasterOffer): {
       return {
         art: { kind: 'skin', skinId: offer.skinId },
         name: skin ? localizeWeaponSkin(skin).name : '',
-        kindLabel: isStaffSkin(offer.skinId)
-          ? t('hudChrome.guildHall.shop.kindStaff')
-          : t('hudChrome.guildHall.shop.kindSword'),
+        kindLabel: t('hudChrome.guildHall.shop.kindSword'),
       };
     }
   }
@@ -218,9 +211,7 @@ function offerSummary(offer: GuildQuartermasterOffer): string {
       return t('hudChrome.guildHall.mountPreview', { pct: whole(pct) });
     }
     case 'weaponSkin':
-      return isStaffSkin(offer.skinId)
-        ? t('hudChrome.guildHall.staffSkinPreview')
-        : t('hudChrome.guildHall.skinPreview');
+      return t('hudChrome.guildHall.skinPreview');
   }
 }
 
@@ -337,9 +328,7 @@ function offerTipTitle(offer: GuildQuartermasterOffer, name: string): string {
     case 'mount':
       return t('hudChrome.guildHall.mountOffer', { mount: name });
     case 'weaponSkin':
-      return isStaffSkin(offer.skinId)
-        ? t('hudChrome.guildHall.staffSkinOffer', { skin: name })
-        : t('hudChrome.guildHall.skinOffer', { skin: name });
+      return t('hudChrome.guildHall.skinOffer', { skin: name });
   }
 }
 

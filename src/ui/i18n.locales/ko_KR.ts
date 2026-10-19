@@ -21814,7 +21814,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.lifetime': '완료한 계약: {count}',
   'hudChrome.guildHall.emptyBoard': '게시판을 새로 쓰는 중입니다. 주간 초기화 후에 다시 오세요.',
   'hudChrome.guildHall.quartermasterIntro':
-    '개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호, 길드의 무기 외형, 그리고 길드의 군마입니다. 여기서 전투에서 당신을 더 강하게 만드는 것은 없습니다.',
+    '개릭은 등불 인장을 명예와만 바꿔 줍니다. 위업의 책에서 착용하는 칭호, 길드의 검 외형, 그리고 길드의 군마입니다. 여기서 전투에서 당신을 더 강하게 만드는 것은 없습니다.',
   'hudChrome.guildHall.titleOffer': '칭호: {title}',
   'hudChrome.guildHall.titlePreview': '표시: {preview}',
   'hudChrome.guildHall.buy': '구매',
@@ -21830,9 +21830,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.skinPreview':
     '장착한 검의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.',
   'hudChrome.guildHall.skinOffer': '검 외형: {skin}',
-  'hudChrome.guildHall.staffSkinOffer': '지팡이 외형: {skin}',
-  'hudChrome.guildHall.staffSkinPreview':
-    '장착한 지팡이의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.',
   'hudChrome.guildHall.mountPreview':
     '지상 탈것: 탑승 중 이동 속도 +{pct}%. 탈것 훈련이 필요합니다.',
   'hudChrome.guildHall.mountOffer': '탈것: {mount}',
@@ -21861,7 +21858,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.guildHall.shop.stockLabel': '개릭 홀트의 판매 목록',
   'hudChrome.guildHall.shop.kindMount': '탈것',
   'hudChrome.guildHall.shop.kindSword': '검 외형',
-  'hudChrome.guildHall.shop.kindStaff': '지팡이 외형',
   'hudChrome.guildHall.shop.mountHeading': '안장에 오른 당신',
   'hudChrome.guildHall.shop.skinHeading': '당신의 손에',
   'hudChrome.guildHall.shop.stageLabel': '{name} 3D 미리보기',

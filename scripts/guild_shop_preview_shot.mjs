@@ -144,15 +144,15 @@ if (PHONE) {
   };
   await pick('mount_lantern_hall_destrier');
   await phoneShot('after_shop_3d_destrier_phone');
-  await pick('weapon_skin_squallcrest_sword');
-  await phoneShot('after_shop_3d_squallcrest_phone');
+  await pick('weapon_skin_lantern_hall_sword');
+  await phoneShot('after_shop_3d_lantern_sword_phone');
   await browser.close();
   process.exit(0);
 }
 await pick('mount_lantern_hall_destrier');
 await shot('after_shop_3d_destrier_desktop');
-await pick('weapon_skin_squallcrest_sword');
-await shot('after_shop_3d_squallcrest_desktop');
+await pick('weapon_skin_lantern_hall_sword');
+await shot('after_shop_3d_lantern_sword_desktop');
 const stages = await page.evaluate(() => ({
   canvases: document.querySelectorAll('#guild-hall-window .gh-stage canvas').length,
   label: document.querySelector('#guild-hall-window .gh-stage')?.getAttribute('aria-label'),
@@ -160,7 +160,7 @@ const stages = await page.evaluate(() => ({
 console.log('stage', JSON.stringify(stages));
 
 // buy both
-await jsClick('[data-gh-buy="weapon_skin_squallcrest_sword"]');
+await jsClick('[data-gh-buy="weapon_skin_lantern_hall_sword"]');
 await sleep(800);
 await pick('mount_lantern_hall_destrier');
 await jsClick('[data-gh-buy="mount_lantern_hall_destrier"]');
@@ -169,7 +169,7 @@ const owned = await page.evaluate(() => {
   const sim = window.__game.sim;
   return {
     mounts: sim.ownedMounts().includes('lantern_hall_destrier'),
-    skin: sim.accountCosmetics.weaponSkinIds.includes('squallcrest_sword'),
+    skin: sim.accountCosmetics.weaponSkinIds.includes('lantern_hall_sword'),
     seals: sim.inventory
       .filter((s) => s?.itemId === 'lantern_seal')
       .reduce((n, s) => n + s.count, 0),
@@ -186,7 +186,7 @@ await page.evaluate(() => {
   sim.player.pos.x = spot.x;
   sim.player.pos.y = spot.y;
   sim.player.pos.z = spot.z;
-  sim.changeWeaponSkin('squallcrest_sword', 'sword');
+  sim.changeWeaponSkin('lantern_hall_sword', 'sword');
   sim.useItem('reins_lantern_hall_destrier');
 });
 await sleep(6000);
@@ -195,5 +195,5 @@ const rid = await page.evaluate(() => ({
   loadout: JSON.stringify(window.__game.sim.accountCosmetics.weaponSkinLoadout),
 }));
 console.log('ride', JSON.stringify(rid));
-await shot('after_destrier_ridden_squallcrest');
+await shot('after_destrier_ridden_lantern_sword');
 await browser.close();

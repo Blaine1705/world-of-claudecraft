@@ -23,10 +23,6 @@ describe('the quartermaster purchase on the wire', () => {
       'title_hallsworn',
       'title_of_lantern_hall',
       'weapon_skin_lantern_hall_sword',
-      'weapon_skin_hearthbrand_sword',
-      'weapon_skin_squallcrest_sword',
-      'weapon_skin_rimelight_staff',
-      'weapon_skin_duskwick_staff',
       'mount_lantern_hall_destrier',
     ]);
     const client = bareClient(7);
