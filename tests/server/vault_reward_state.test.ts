@@ -51,6 +51,26 @@ describe('direct vault reward character snapshot', () => {
     expect(state.worldQuests?.clueCasketsOpened).toBe(1);
   });
 
+  it('keeps the permanent quality of a gear line on the saved copy', () => {
+    const state = saved();
+    const lootQuality = { version: 1 as const, tier: 2 as const, weights: [9, 8, 7, 6, 5] };
+    addVaultRewardToCharacterState(
+      state,
+      {
+        characterId: 7,
+        recipientName: 'Owner',
+        items: [{ itemId: 'slagbreaker_helmet', count: 1, lootQuality: { ...lootQuality } }],
+        copper: 0,
+        mailDueAt: '2026-09-23T00:00:00.000Z',
+      },
+      '7:1',
+      true,
+    );
+    expect(state.inventory.find((s) => s.itemId === 'slagbreaker_helmet')?.instance).toEqual({
+      lootQuality,
+    });
+  });
+
   it('does not count a capped guest as paid', () => {
     const state = saved();
     addVaultRewardToCharacterState(

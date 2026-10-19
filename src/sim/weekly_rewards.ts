@@ -493,7 +493,7 @@ export function claimWeeklyReward(
   state.vaults.shift();
   state.claimSequence++;
   state.overflowed = false;
-  ctx.addItem(choice.itemId, 1, r.e.id);
+  grantFreshLoot(ctx, choice.itemId, 1, r.e.id);
 }
 
 export function spawnWeeklyKeeper(ctx: SimContext, def: NpcDef | undefined): void {
@@ -509,3 +509,5 @@ export {
   prepareWeeklyRewardOpen,
   type WeeklyRewardOpening,
 } from './weekly_reward_open';
+
+import { grantFreshLoot } from './loot/fresh_quality_grant';

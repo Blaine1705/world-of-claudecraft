@@ -2,6 +2,7 @@
 // The online path never draws RNG here, so a retry cannot change its parcel.
 
 import { type TreasureMapRarity, VAULT_GUEST_PAYOUTS_PER_CYCLE } from '../content/treasure_maps';
+import { cloneLootQuality } from '../loot_quality';
 import type { SimContext } from '../sim_context';
 import type { HoardReward } from './hoard_reward_roll';
 
@@ -35,7 +36,12 @@ export function grantHoardReward(
       (meta.vaultGuestPayouts ?? 0) + 1,
     );
   }
-  for (const item of reward.items) ctx.addItem(item.itemId, item.count, pid);
+  for (const item of reward.items) {
+    // A stored descriptor is re-validated: a malformed one grants the plain copy.
+    const lootQuality = cloneLootQuality(item.lootQuality);
+    if (lootQuality) ctx.addItemInstance(item.itemId, { lootQuality }, pid, item.count);
+    else ctx.addItem(item.itemId, item.count, pid);
+  }
   meta.copper += reward.copper;
   meta.clueCasketsOpened = (meta.clueCasketsOpened ?? 0) + 1;
   ctx.markDeedsDirty(pid);

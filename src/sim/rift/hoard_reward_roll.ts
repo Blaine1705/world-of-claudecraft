@@ -13,6 +13,8 @@ import {
   VAULT_OWNER_COPPER_BONUS,
   VAULT_PAYOUTS,
 } from '../content/treasure_maps';
+import { rollFreshLootQualities } from '../loot/fresh_quality_grant';
+import type { LootQualityDescriptor } from '../loot_quality';
 import type { Rng } from '../rng';
 import type { PlayerClass } from '../types';
 
@@ -29,8 +31,15 @@ export interface HoardRewardInput {
   mountOwned: boolean;
 }
 
+/** One parcel line. `lootQuality` is set only on an enhanced one-copy gear line. */
+export interface HoardRewardItem {
+  itemId: string;
+  count: number;
+  lootQuality?: LootQualityDescriptor;
+}
+
 export interface HoardReward {
-  readonly items: readonly Readonly<{ itemId: string; count: number }>[];
+  readonly items: readonly Readonly<HoardRewardItem>[];
   readonly copper: number;
   readonly capped: boolean;
 }
@@ -45,14 +54,16 @@ export function rollHoardReward(
     return Object.freeze({ items: Object.freeze([]), copper: 0, capped: true });
 
   const def = VAULT_PAYOUTS[input.rarity];
-  const items: Array<{ itemId: string; count: number }> = [];
+  const items: HoardRewardItem[] = [];
   const material = CASKET_MATERIAL_POOL[rng.int(0, CASKET_MATERIAL_POOL.length - 1)];
   items.push({ itemId: material, count: def.materials });
+  let gear: HoardRewardItem | undefined;
   if (rng.chance(input.owner ? def.gearChance : VAULT_GUEST_GEAR_CHANCE[input.rarity])) {
-    items.push({
+    gear = {
       itemId: rollHoardBossDrop(rng, input.bossTemplateId, input.rarity, input.cls),
       count: 1,
-    });
+    };
+    items.push(gear);
   }
   if (rng.chance(def.markChance)) items.push({ itemId: HEROIC_MARK_ITEM_ID, count: def.marks });
   if (rng.chance(def.mountChance) && !input.mountOwned)
@@ -60,6 +71,11 @@ export function rollHoardReward(
   const next = nextTreasureMapRarity(input.rarity);
   if (rng.chance(def.nextMapChance) && next)
     items.push({ itemId: TREASURE_MAP_ITEM_IDS[next], count: 1 });
+
+  // The gear piece's permanent quality draws LAST, so every earlier draw keeps
+  // its old position; it is frozen into the parcel like the rest of the roll.
+  const [lootQuality] = gear ? rollFreshLootQualities(rng, gear.itemId, 1) : [];
+  if (gear && lootQuality) gear.lootQuality = lootQuality;
 
   const base = treasureCasketCopper(input.level) * def.copperMult;
   const copper = Math.round(input.owner ? base * (1 + VAULT_OWNER_COPPER_BONUS) : base);

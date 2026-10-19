@@ -4,6 +4,7 @@
 
 import { addStacked } from '../src/sim/bags';
 import type { CharacterState } from '../src/sim/character_state';
+import { cloneLootQuality } from '../src/sim/loot_quality/types';
 import { projectHoardRewardCollections } from '../src/sim/rift/hoard_reward_save';
 import type { VaultRewardClaim } from './vault_rewards_db';
 
@@ -15,7 +16,15 @@ export function addVaultRewardToCharacterState(
 ): CharacterState {
   const capped = claim.items.length === 0 && claim.copper === 0;
   if (!capped) {
-    for (const item of claim.items) addStacked(state.inventory, item.itemId, item.count);
+    for (const item of claim.items) {
+      const lootQuality = cloneLootQuality(item.lootQuality);
+      addStacked(
+        state.inventory,
+        item.itemId,
+        item.count,
+        lootQuality ? { lootQuality } : undefined,
+      );
+    }
     projectHoardRewardCollections(state, claim.items);
     const copper = state.copper + claim.copper;
     if (!Number.isSafeInteger(copper)) throw new Error('vault reward copper overflow');

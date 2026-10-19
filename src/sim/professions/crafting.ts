@@ -76,6 +76,7 @@ import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import { slotStatMultForItem } from '../item_budget';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
+import { grantFreshLoot } from '../loot/fresh_quality_grant';
 import { holdsMaterialSignature } from '../material_signatures';
 import {
   consumePlayerVaultStock,
@@ -1138,28 +1139,46 @@ export function resolveCraftForRecipe(
   // mails as its own single-copy entry, so signing no longer takes these
   // outputs out of commerce; it only moves them off the fungible paths.
   // Player-to-player trade of the signed instance is unchanged.
+  // Every grant below goes through grantFreshLoot, so an eligible equipment
+  // output rolls its permanent loot quality once per copy
+  // (docs/design/loot-quality.md); the roll composes with the signer,
+  // masterwork and commission payloads and never writes rolled.quality.
   if (meta && masterwork && bonusStats) {
     const payload: ItemInstancePayload = {
       signer: meta.name,
       rolled: { masterwork: true, stats: bonusStats },
     };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
-      silent: true,
-      callerLogs: true,
-      craftedRecipeId,
-    });
+    grantFreshLoot(
+      ctx,
+      recipe.resultItemId,
+      1,
+      pid,
+      {
+        silent: true,
+        callerLogs: true,
+        craftedRecipeId,
+      },
+      payload,
+    );
     if (recipe.resultCount > 1) {
       if (commissioned) {
         for (let i = 1; i < recipe.resultCount; i++) {
-          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
-            silent: true,
-            callerLogs: true,
-            craftedRecipeId,
-          });
+          grantFreshLoot(
+            ctx,
+            recipe.resultItemId,
+            1,
+            pid,
+            {
+              silent: true,
+              callerLogs: true,
+              craftedRecipeId,
+            },
+            { bindOnTrade: true },
+          );
         }
       } else {
-        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, {
+        grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount - 1, pid, {
           silent: true,
           callerLogs: true,
           craftedRecipeId,
@@ -1179,22 +1198,36 @@ export function resolveCraftForRecipe(
       perfecting: PERFECTING_HEADSTART_RANK,
     });
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
-      silent: true,
-      callerLogs: true,
-      craftedRecipeId,
-    });
+    grantFreshLoot(
+      ctx,
+      recipe.resultItemId,
+      1,
+      pid,
+      {
+        silent: true,
+        callerLogs: true,
+        craftedRecipeId,
+      },
+      payload,
+    );
     if (recipe.resultCount > 1) {
       if (commissioned) {
         for (let i = 1; i < recipe.resultCount; i++) {
-          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
-            silent: true,
-            callerLogs: true,
-            craftedRecipeId,
-          });
+          grantFreshLoot(
+            ctx,
+            recipe.resultItemId,
+            1,
+            pid,
+            {
+              silent: true,
+              callerLogs: true,
+              craftedRecipeId,
+            },
+            { bindOnTrade: true },
+          );
         }
       } else {
-        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, {
+        grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount - 1, pid, {
           silent: true,
           callerLogs: true,
           craftedRecipeId,
@@ -1204,21 +1237,35 @@ export function resolveCraftForRecipe(
   } else if (meta && mintsSignedCraftOutput(def)) {
     const payload: ItemInstancePayload = withPerfectingBonus(def, recipe, { signer: meta.name });
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, recipe.resultCount, {
-      silent: true,
-      callerLogs: true,
-      craftedRecipeId,
-    });
-  } else if (commissioned) {
-    for (let i = 0; i < recipe.resultCount; i++) {
-      ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
+    grantFreshLoot(
+      ctx,
+      recipe.resultItemId,
+      recipe.resultCount,
+      pid,
+      {
         silent: true,
         callerLogs: true,
         craftedRecipeId,
-      });
+      },
+      payload,
+    );
+  } else if (commissioned) {
+    for (let i = 0; i < recipe.resultCount; i++) {
+      grantFreshLoot(
+        ctx,
+        recipe.resultItemId,
+        1,
+        pid,
+        {
+          silent: true,
+          callerLogs: true,
+          craftedRecipeId,
+        },
+        { bindOnTrade: true },
+      );
     }
   } else {
-    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid, {
+    grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount, pid, {
       silent: true,
       callerLogs: true,
       craftedRecipeId,

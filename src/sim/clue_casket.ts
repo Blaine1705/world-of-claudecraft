@@ -9,6 +9,7 @@ import { delveChestItemsForTier } from './content/delves/lockpick_tiers';
 import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
 import type { MountKey } from './content/mounts';
 import type { LootTier } from './lockpick';
+import { grantFreshLoot } from './loot/fresh_quality_grant';
 import { mountOwned } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -78,7 +79,7 @@ export function openTreasureCasket(
   itemIds.push(material);
   if (ctx.rng.chance(CASKET_GEAR_CHANCE)) {
     const piece = rollCasketPiece(ctx, meta);
-    ctx.addItem(piece.itemId, piece.count, pid);
+    grantFreshLoot(ctx, piece.itemId, piece.count, pid);
     itemIds.push(piece.itemId);
   }
   if (ctx.rng.chance(CASKET_HEROIC_MARK_CHANCE)) {

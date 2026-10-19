@@ -24,6 +24,8 @@ import {
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import type { LootTier } from '../lockpick';
+import { grantFreshLoot } from '../loot/fresh_quality_grant';
+import { cloneLootQuality } from '../loot_quality/types';
 import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import {
   awardRiftFirstClearMaterials,
@@ -1433,7 +1435,7 @@ export function riftOpenTreasure(ctx: SimContext, objectId: number, pid?: number
     inst?.tier === 'S' ? 'premium' : inst?.tier === 'A' || inst?.tier === 'B' ? 'medium' : 'low';
   const cls = ctx.players.get(r.meta.entityId)?.cls ?? 'warrior';
   const items = delveChestItemsForTier(tier, cls, ctx.rng, false);
-  for (const it of items) ctx.addItem(it.itemId, it.count, r.meta.entityId);
+  for (const it of items) grantFreshLoot(ctx, it.itemId, it.count, r.meta.entityId);
   chest.templateId = 'rift_treasure_open';
   chest.name = 'Opened Cache';
   chest.lootable = false;
@@ -1616,7 +1618,10 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
       return {
         characterId: entrant.characterId,
         recipientName: entrant.name,
-        items: reward.items.map((item) => ({ ...item })),
+        items: reward.items.map(({ lootQuality, ...item }) => {
+          const quality = cloneLootQuality(lootQuality);
+          return quality ? { ...item, lootQuality: quality } : item;
+        }),
         copper: reward.copper,
         ...(entrant.characterId === inst.vault!.ownerCharacterId
           ? {}

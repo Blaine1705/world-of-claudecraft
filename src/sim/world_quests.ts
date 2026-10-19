@@ -160,6 +160,8 @@ export {
   worldQuestCycleForResetDay,
 } from './world_quest_rotation';
 
+import { grantFreshLoot } from './loot/fresh_quality_grant';
+
 export const WORLD_QUEST_LEY_TIMER_SECONDS = 90;
 const WORLD_QUEST_CLAIM_PREFIX = '__wq_claim__:';
 
@@ -601,14 +603,14 @@ export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQ
     });
   }
   const extra = quest.reward?.extraItem;
-  if (extra) ctx.addItem(extra.itemId, extra.count, meta.entityId);
+  if (extra) grantFreshLoot(ctx, extra.itemId, extra.count, meta.entityId);
   const dailyItemId = worldQuestItemRewardForQuest(meta.worldQuestCycle, quest, meta.cls, level);
   if (dailyItemId) {
     // Capacity is a caller pre-check for addItem (bags.ts addStacked). A full
     // bag loses the day's piece and says so, the Clue Scroll's rule: the quest
     // completes once per cycle, so there is no second turn-in to defer to.
     if (canAddItem(meta.inventory, bagPools(meta.bags), dailyItemId, 1))
-      ctx.addItem(dailyItemId, 1, meta.entityId);
+      grantFreshLoot(ctx, dailyItemId, 1, meta.entityId);
     else bagsFullError(ctx, meta.entityId, dailyItemId);
   }
 

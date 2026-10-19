@@ -6984,7 +6984,7 @@ export type SimEvent = { pid?: number } & (
       claims: {
         characterId: number;
         recipientName: string;
-        items: { itemId: string; count: number }[];
+        items: { itemId: string; count: number; lootQuality?: LootQualityDescriptor }[];
         copper: number;
         guestCycle?: string;
       }[];
