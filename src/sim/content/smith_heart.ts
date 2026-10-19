@@ -561,8 +561,9 @@ export const SMITH_HEART_SEAL_OBJECTS: DungeonObjectSpawn[] = SMITH_HEART_SEAL_M
 
 // ---- the dungeon -------------------------------------------------------------------
 
-/** The world entrance: a cleft in the Stormcrag cliffs, east of Highwatch. */
-export const SMITH_HEART_DOOR_POS = { x: 132, z: 772 } as const;
+/** The world entrance: a cleft at the foot of the Stormcrag cliffs, past the
+ *  Stormcrag road's end north-east of Highwatch (placeholder door visual). */
+export const SMITH_HEART_DOOR_POS = { x: 138, z: 756 } as const;
 
 export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
   [SMITH_HEART_DUNGEON]: {
@@ -571,6 +572,9 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     // Overflow band, the first free index after the Last Keep's family.
     index: 15,
     doorPos: SMITH_HEART_DOOR_POS,
+    // The cliff rises east of the door: leaving sets the raid down on the
+    // slope to the west, facing Highwatch.
+    leaveOffset: { x: -4.5, z: 0 },
     // Phase 1 blockout: dev builds only (encounters/smith_heart/entry.ts) and
     // out of the public Guide until the raid ships.
     guideVisible: false,
