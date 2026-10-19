@@ -93,6 +93,14 @@ describe('Settings', () => {
     expect(settings.set('gamepadGlyphStyle', 99)).toBe(3);
   });
 
+  it('defaults Raw Mouse Input on and persists turning it off', () => {
+    const settings = new Settings();
+
+    expect(settings.get('rawMouseInput')).toBe(true);
+    expect(settings.set('rawMouseInput', false)).toBe(false);
+    expect(new Settings().get('rawMouseInput')).toBe(false);
+  });
+
   it('defaults and clamps controller reticle speed to its slider range', () => {
     const settings = new Settings();
 

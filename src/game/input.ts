@@ -586,6 +586,11 @@ export class Input {
     }
   }
 
+  /** The "Raw Mouse Input" setting; takes effect on the next lock request. */
+  setRawMouseInput(on: boolean): void {
+    this.pointerLockRequester.setRawEnabled(on);
+  }
+
   setMouseCameraEnabled(on: boolean): void {
     this.mouseCameraEnabled = on;
     if (on && document.pointerLockElement === this.canvas) {

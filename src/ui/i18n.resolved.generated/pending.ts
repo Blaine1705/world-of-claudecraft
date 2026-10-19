@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "es_ES": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "fr_FR": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "fr_CA": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "de_DE": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "nl_NL": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "pl_PL": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "id_ID": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "tr_TR": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "sv_SE": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "vi_VN": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ],
+  "da_DK": [
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
+  ]
 };

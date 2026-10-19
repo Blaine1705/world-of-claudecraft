@@ -2418,6 +2418,14 @@ describe('Input mouse-look jump defenses', () => {
     expect(ctx.canvas.requestPointerLock).toHaveBeenCalledWith({ unadjustedMovement: true });
   });
 
+  it('with Raw Mouse Input off, requests a plain lock on Chromium', () => {
+    const ctx = makeInput();
+    ctx.input.setRawMouseInput(false);
+    startDrag(ctx);
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledWith();
+  });
+
   it('keeps the synchronous Firefox mousedown request plain', () => {
     const ctx = makeInput(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',

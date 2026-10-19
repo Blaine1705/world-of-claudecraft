@@ -576,7 +576,10 @@ const MONOLITHS: MonolithRow[] = [
     // sub-view landed: the Auras render method and its placement/teardown lines
     // moved out with them to src/ui/options_overlay_panels.ts. Measured with
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
-    ceiling: 2813,
+    // LOWERED 2813 -> 2799 when the Key Bindings panel's reset-scope list moved
+    // to src/ui/keybind_panel_settings.ts, which also made room for the Raw
+    // Mouse Input row. Exact count, zero slack.
+    ceiling: 2799,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {

@@ -2336,6 +2336,10 @@ async function startGame(
       input.setLockCursorOnRotate(v);
       return;
     }
+    if (key === 'rawMouseInput') {
+      input.setRawMouseInput(settings.set('rawMouseInput', !!value));
+      return;
+    }
     if (key === 'leftHandedTouch') {
       const v = settings.set('leftHandedTouch', !!value);
       document.body.classList.toggle('mobile-left-handed', v);

@@ -2959,6 +2959,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.lockCursorOnRotate': '旋轉時鎖定游標',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     '拖曳旋轉鏡頭時將滑鼠游標保持在視窗內，使其無法到達螢幕邊緣或移動到另一台顯示器。若你偏好自由游標，請關閉此選項。',
+  'hudChrome.options.rawMouseInput': '原始滑鼠輸入',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    '拖曳旋轉鏡頭時直接讀取滑鼠裝置的移動，略過系統的指標速度與加速設定，使轉動更穩定。關閉後將改用系統滑鼠設定。僅在開啟「旋轉時鎖定游標」時生效，且並非所有瀏覽器都支援。',
   'hudChrome.options.showWalletOnCharacterScreen': '在角色畫面顯示錢包',
   'hudChrome.options.showPlaytime': '在角色畫面顯示遊戲時長',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片顯示錢包',

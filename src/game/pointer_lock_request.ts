@@ -31,13 +31,19 @@ function isNotSupported(err: unknown): boolean {
 
 export class RawPointerLockRequester {
   private rawUnsupported = false;
+  private rawEnabled = true;
 
   /** @param allowRaw false keeps every request plain (the Gecko path). */
   constructor(private readonly allowRaw: boolean) {}
 
   /** Whether the next request will ask for raw input. */
   get requestsRaw(): boolean {
-    return this.allowRaw && !this.rawUnsupported;
+    return this.allowRaw && this.rawEnabled && !this.rawUnsupported;
+  }
+
+  /** The player setting: false keeps every request plain (OS-adjusted movement). */
+  setRawEnabled(on: boolean): void {
+    this.rawEnabled = on;
   }
 
   /**

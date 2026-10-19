@@ -122,6 +122,30 @@ describe('RawPointerLockRequester', () => {
     expect(onRawUnsupported).not.toHaveBeenCalled();
   });
 
+  it('the Raw Mouse Input setting switches requests between raw and plain', () => {
+    const requestPointerLock = vi.fn(() => Promise.resolve());
+    const requester = new RawPointerLockRequester(true);
+
+    requester.setRawEnabled(false);
+    expect(requester.requestsRaw).toBe(false);
+    requester.request({ requestPointerLock }, vi.fn());
+    expect(requestPointerLock).toHaveBeenLastCalledWith();
+
+    requester.setRawEnabled(true);
+    expect(requester.requestsRaw).toBe(true);
+    requester.request({ requestPointerLock }, vi.fn());
+    expect(requestPointerLock).toHaveBeenLastCalledWith({ unadjustedMovement: true });
+  });
+
+  it('turning the setting on never brings raw input to the Gecko path', () => {
+    const requestPointerLock = vi.fn(() => Promise.resolve());
+    const requester = new RawPointerLockRequester(false);
+
+    requester.setRawEnabled(true);
+    requester.request({ requestPointerLock }, vi.fn());
+    expect(requestPointerLock).toHaveBeenLastCalledWith();
+  });
+
   it('does nothing when the target has no pointer lock at all', () => {
     const requester = new RawPointerLockRequester(true);
     expect(() => requester.request({}, vi.fn())).not.toThrow();
