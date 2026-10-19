@@ -11,6 +11,11 @@ import { cleanup, host, stubDeps } from './_harness';
 // buffer feed back into the stage: under the #ui zoom (the UI Scale setting)
 // Firefox grew the stage a little on every sync, without bound, until the
 // paperdoll sockets sat hundreds of pixels apart around a giant model.
+//
+// This suite runs Chromium only (vitest.browser.config.ts), which reproduces the
+// sync-loop growth at one fractional scale; every floored case also fails on the
+// tall-buffer and fill checks with the canvas in flow. The unbounded Firefox
+// growth itself is evidenced by docs/screenshots/inspect-stage-firefox/.
 
 afterEach(() => {
   cleanup();
@@ -64,7 +69,8 @@ describe('inspect model stage sizing', () => {
     { uiScale: 1.25, dpr: 1, mobile: false, width: 1022, height: 1100 },
     { uiScale: 1.1, dpr: 2, mobile: false, width: 1022, height: 1100 },
     { uiScale: 0.8, dpr: 1.25, mobile: false, width: 1022, height: 1100 },
-    // Touch: the floored landscape stage and the fixed-height narrow stage.
+    // Touch: the floored landscape stage, and the fixed-height narrow stage
+    // (never grew; kept to pin that the canvas still fills a fixed stage).
     { uiScale: 1.25, dpr: 2, mobile: true, width: 844, height: 390 },
     { uiScale: 1.25, dpr: 2, mobile: true, width: 390, height: 844 },
   ])(
@@ -87,9 +93,10 @@ describe('inspect model stage sizing', () => {
       for (let i = 0; i < 40; i++) syncBuffer(container, canvas, dpr);
       expect({ w: container.clientWidth, h: container.clientHeight }).toEqual(initial);
 
-      // A buffer far larger than the stage still never moves it.
-      canvas.width = 4000;
-      canvas.height = 4000;
+      // A buffer far taller than the stage still never moves it (a square one
+      // would sit under the desktop min-height floor and prove nothing).
+      canvas.width = Math.floor(initial.w * dpr);
+      canvas.height = Math.floor(initial.h * dpr) * 20;
       expect({ w: container.clientWidth, h: container.clientHeight }).toEqual(initial);
 
       // The canvas paints the stage box exactly, whatever its buffer size.
@@ -99,4 +106,26 @@ describe('inspect model stage sizing', () => {
       expect(canvasRect.height).toBeCloseTo(stageRect.height, 0);
     },
   );
+
+  it('keeps the cold-open stand-in over the canvas whatever the mount order', async () => {
+    await page.viewport(1022, 1100);
+    let stage: HTMLElement | null = null;
+    mountInspect((el) => {
+      stage = el;
+    }, 1);
+    const container = stage as HTMLElement | null;
+    if (!container) throw new Error('inspect stage was not mounted');
+    // setContainer re-appends the canvas on a remount, so it can land AFTER a
+    // live stand-in. pointer-events is re-enabled only so elementFromPoint can
+    // see the stand-in; the stylesheet keeps it click-through in the game.
+    const standIn = document.createElement('div');
+    standIn.className = 'preview-stand-in';
+    standIn.style.pointerEvents = 'auto';
+    container.appendChild(standIn);
+    const canvas = document.createElement('canvas');
+    container.appendChild(canvas);
+    const rect = container.getBoundingClientRect();
+    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    expect(hit).toBe(standIn);
+  });
 });
