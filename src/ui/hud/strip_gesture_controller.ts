@@ -141,7 +141,9 @@ export interface StripGestureDeps {
   count(): number;
   /** Travel between adjacent items as the finger sees it. */
   pitch: number;
-  /** Which way the row grows, resolved against the measured metrics. */
+  /** Which way the row grows, resolved against the measured metrics. Those are
+   *  in the safe-area clamp frame (anchorX less the left inset), not the
+   *  viewport frame the open state reports, so compare them only to each other. */
   direction(metrics: StripMetrics): StripDirection;
   /** What a release means. */
   release(input: StripReleaseInput): StripGestureOutcome;

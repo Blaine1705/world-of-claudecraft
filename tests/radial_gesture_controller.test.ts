@@ -76,6 +76,8 @@ function makeRig(
     appVw?: string;
     appVh?: string;
     safeAreaPx?: string;
+    /** Per-side insets, for the one-sided notch a real landscape phone has. */
+    sides?: Partial<Record<'top' | 'right' | 'bottom' | 'left', string>>;
     tapMenus?: boolean;
     anchorRole?: TapMenuAnchorRole;
   } = {},
@@ -85,8 +87,8 @@ function makeRig(
   host.style.setProperty('--radial-margin', '6px');
   host.style.setProperty('--app-vw', options.appVw ?? '400px');
   host.style.setProperty('--app-vh', options.appVh ?? '300px');
-  for (const side of ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']) {
-    host.style.setProperty(side, options.safeAreaPx ?? '0px');
+  for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+    host.style.setProperty(`padding-${side}`, options.sides?.[side] ?? options.safeAreaPx ?? '0px');
   }
   document.body.append(host);
 
@@ -364,6 +366,29 @@ describe('RadialGesture: the clamp box', () => {
     // (176, 156), which rendered a whole inset up and left of the button.
     expect(rig.gesture.placement()?.originX).toBe(220);
     expect(rig.gesture.placement()?.originY).toBe(200);
+  });
+
+  // One-sided insets tell the axes and the sides apart, which the symmetric
+  // cases cannot: a left/right or top/bottom swap would pass them.
+  it('clamps against the one side that carries an inset', () => {
+    const right = makeRig({
+      appVw: '400px',
+      appVh: '300px',
+      sides: { right: '30px', bottom: '20px' },
+    });
+    down(right, 0, 1, 380, 200);
+    move(right, 0, 1, 380 + FLICK_PX, 200);
+    // Box 0..370 by 0..280 with a reach of 80: the origin clamps to 290 by 200.
+    expect(right.gesture.placement()?.originX).toBe(290);
+    expect(right.gesture.placement()?.originY).toBe(200);
+
+    const left = makeRig({ appVw: '400px', appVh: '300px', sides: { left: '30px', top: '20px' } });
+    down(left, 0, 1, 380, 200);
+    move(left, 0, 1, 380 + FLICK_PX, 200);
+    // Box 30..400 by 20..300: the origin clamps to 400 - 80 = 320, and the
+    // button's own centre (200) is already inside 20 + 80..300 - 80.
+    expect(left.gesture.placement()?.originX).toBe(320);
+    expect(left.gesture.placement()?.originY).toBe(200);
   });
 
   it('reserves the safe-area inset ONCE, never twice', () => {

@@ -67,6 +67,8 @@ function makeRig(
   options: {
     appVw?: string;
     safeAreaPx?: string;
+    /** Per-side insets, for the one-sided notch a real landscape phone has. */
+    sides?: Partial<Record<'top' | 'right' | 'bottom' | 'left', string>>;
     tapMenus?: boolean;
     leftHanded?: boolean;
     anchorX?: number;
@@ -76,8 +78,8 @@ function makeRig(
   host.style.setProperty('--strip-gap', '8px');
   host.style.setProperty('--strip-margin', '6px');
   host.style.setProperty('--app-vw', options.appVw ?? '520px');
-  for (const side of ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']) {
-    host.style.setProperty(side, options.safeAreaPx ?? '0px');
+  for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+    host.style.setProperty(`padding-${side}`, options.sides?.[side] ?? options.safeAreaPx ?? '0px');
   }
   document.body.append(host);
 
@@ -314,6 +316,50 @@ describe('MenuStripGesture: the clamp box', () => {
     // left by that: its right edge lands at 464 + 20 = 484, exactly 6px inside
     // the safe area.
     expect(open?.placement.centers[MENU_STRIP_COUNT - 1]).toBe(464);
+  });
+
+  // A real landscape notch is ONE-sided, so these tell the left inset from the
+  // right one: a swap would pass every symmetric case above.
+  it('keeps a left-only inset out of the right edge clamp', () => {
+    const rig = makeRig({ appVw: '520px', sides: { left: '30px' } });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    const open = rig.gesture.openState();
+    expect(open?.anchorX).toBe(80);
+    expect(open?.clampLeft).toBe(30);
+    expect(open?.viewportWidth).toBe(490);
+    // The far edge lands 6px inside the RIGHT screen edge: 494 + 20 = 520 - 6.
+    expect(open?.placement.centers[MENU_STRIP_COUNT - 1]).toBe(494);
+  });
+
+  it('spends a right-only inset on the right edge clamp alone', () => {
+    const rig = makeRig({ appVw: '520px', sides: { right: '30px' } });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
+    const open = rig.gesture.openState();
+    expect(open?.anchorX).toBe(80);
+    expect(open?.clampLeft).toBe(0);
+    expect(open?.viewportWidth).toBe(490);
+    // 464 + 20 = 484 = 520 - 30 - 6.
+    expect(open?.placement.centers[MENU_STRIP_COUNT - 1]).toBe(464);
+  });
+
+  it('clamps the mirrored row 6px inside a left-only inset', () => {
+    // The left-handed HUD grows the row LEFT, so the left inset is the one it
+    // clamps against.
+    const rig = makeRig({
+      appVw: '520px',
+      sides: { left: '30px' },
+      leftHanded: true,
+      anchorX: 420,
+    });
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 - SWIPE_PX));
+    const open = rig.gesture.openState();
+    expect(open?.anchorX).toBe(440);
+    expect(open?.placement.clamped).toBe(true);
+    // The far item's LEFT edge lands at 30 + 6: its centre is one half-item in.
+    expect(open?.placement.centers[MENU_STRIP_COUNT - 1]).toBe(30 + 6 + ANCHOR_SIZE_PX / 2);
   });
 
   it('leaves an unclamped row exactly where it sits with no inset', () => {
