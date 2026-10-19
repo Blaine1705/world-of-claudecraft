@@ -464,6 +464,13 @@
     select {
       font-size: 16px !important;
     }
+    /* #ui carries zoom: var(--ui-scale), and the iOS threshold is RENDERED
+       size, so an author 16px under a UI Scale below 1 renders small enough to
+       trigger the zoom (the Book of Deeds search trap, mobile_zoom_guard.ts).
+       Divide the floor back out so the rendered size never drops under 16px. */
+    #ui :is(input, textarea, select) {
+      font-size: max(16px, calc(16px / var(--ui-scale, 1))) !important;
+    }
   }
 
   #nameplates {

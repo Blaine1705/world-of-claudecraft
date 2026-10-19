@@ -1431,7 +1431,9 @@ const MONOLITHS: MonolithRow[] = [
     // Colorblind Mode's interface body-class extraction also composes with
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
-    ceiling: 11140,
+    // LOWERED 11140 -> 10938 after the mobile page-zoom guard moved out to
+    // src/game/mobile_zoom_guard.ts (wc -l on the branch tree).
+    ceiling: 10938,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

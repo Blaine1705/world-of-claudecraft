@@ -176,6 +176,7 @@ import {
 import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mobilePlatform, mobilePreflightCopy } from './game/mobile_preflight';
+import { installMobileZoomGuard } from './game/mobile_zoom_guard';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
@@ -782,34 +783,6 @@ function syncAppViewport(): void {
   applyMobileKeyboardViewport();
 }
 
-function preventMobileZoom(): void {
-  let lastTouchEnd = 0;
-  const prevent = (e: Event) => e.preventDefault();
-  document.addEventListener('gesturestart', prevent, { passive: false });
-  document.addEventListener('gesturechange', prevent, { passive: false });
-  document.addEventListener('gestureend', prevent, { passive: false });
-  document.addEventListener(
-    'touchend',
-    (e) => {
-      const target = e.target instanceof Element ? e.target : null;
-      // client_shell.test guards this interactive-target allowlist:
-      // target?.closest('button, a, input, textarea, select, [role="button"], [role="option"], [tabindex]')
-      if (
-        target?.closest(
-          'button, a, input, textarea, select, [role="button"], [role="option"], [tabindex]',
-        )
-      ) {
-        lastTouchEnd = Date.now();
-        return;
-      }
-      const now = Date.now();
-      if (now - lastTouchEnd <= 320) e.preventDefault();
-      lastTouchEnd = now;
-    },
-    { passive: false },
-  );
-}
-
 function syncPhoneTouchClass(): void {
   document.body.classList.toggle('mobile-touch', NATIVE_APP || useTouchInterface());
   syncCommunityMenuMode();
@@ -841,7 +814,7 @@ const otaUpdateGate = installOtaUpdateGate({
   isInWorld: () => document.body.classList.contains('game-active'),
   onFatalRecoveryFailed: () => fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE)),
 });
-preventMobileZoom();
+installMobileZoomGuard();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
 window.addEventListener('resize', syncAppViewport);

@@ -94,6 +94,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const mobileZoomGuardTs = readFileSync(
+  new URL('../src/game/mobile_zoom_guard.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const padTargetPickTs = readFileSync(
   new URL('../src/game/pad_target_pick.ts', import.meta.url),
   'utf8',
@@ -2204,9 +2208,10 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain(
       'touch-action: manipulation;\n    -webkit-tap-highlight-color: transparent;',
     );
-    expect(mainTs).toContain(
+    expect(mobileZoomGuardTs).toContain(
       'target?.closest(\'button, a, input, textarea, select, [role="button"], [role="option"], [tabindex]\')',
     );
+    expect(mainTs).toContain('installMobileZoomGuard();');
     expect(mainTs).toContain(
       "document.addEventListener('pointerup', handleNativeMenuToggle, true);",
     );
