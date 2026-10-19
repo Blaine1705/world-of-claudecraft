@@ -330,6 +330,9 @@ export const TOWN_BUILDING_NATURAL: Readonly<Record<string, NaturalSize>> = {
   'tidehold/pantile/house_a': { x: 11.7628, y: 12.23, z: 9.8009 },
   'tidehold/pantile/shop_a': { x: 13.004, y: 16.2797, z: 12.2001 },
   'tidehold/pantile/tavern': { x: 22.6483, y: 18.7798, z: 16.7997 },
+  'tidehold/shakes/hall': { x: 18.8515, y: 30.4998, z: 24.212 },
+  'tidehold/shakes/house_a': { x: 11.7628, y: 12.23, z: 9.8009 },
+  'tidehold/shakes/tavern': { x: 22.6483, y: 18.7798, z: 16.7997 },
 };
 
 /**
