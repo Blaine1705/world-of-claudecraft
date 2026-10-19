@@ -14,8 +14,8 @@ export function materialStorageTransferPayload(
   };
 }
 
-/** Exact-copy bag socket selector, shared storage command shape. */
-export function bankSocketBagPayload(
+/** Exact-copy bag selector shared by carried and bank socket commands. */
+export function bagSocketPayload(
   itemId: string,
   socket?: number,
   target?: { slotIndex: number },

@@ -274,6 +274,74 @@ describe('bounded Materials Vault transport', () => {
     expect(target.vaultInfo).toBeNull();
   });
 
+  it('clears previous-owner vault and partial receiver on actual spectate enter, switch and exit', () => {
+    const world = bareClient(1, { vaultInfo: SMALL });
+    const wire = world as unknown as { onMessage(raw: string): void };
+    const future = (copper: number): VaultInfo => ({
+      ...SMALL,
+      stock: { copper_ore: copper },
+      special: Array.from({ length: 4000 }, (_, i) => ({
+        itemId: 'copper_ore',
+        count: 1,
+        craftedRecipeId: `legacy_${i}`,
+      })),
+    });
+    const send = (pid: number, chunk: VaultTransferChunk) =>
+      wire.onMessage(
+        JSON.stringify({
+          t: 'snap',
+          ents: [],
+          self: {
+            id: pid,
+            k: 'player',
+            tid: 'warrior',
+            nm: `Owner${pid}`,
+            lv: 20,
+            x: 0,
+            y: 0,
+            z: 0,
+            f: 0,
+            hp: 100,
+            mhp: 100,
+            vault: chunk,
+          },
+        }),
+      );
+    const stream = (pid: number, info: VaultInfo, id: number, firstMirror: VaultInfo | null) => {
+      const frames = chunks(info, id);
+      expect(frames[0].done).toBe(false);
+      send(pid, frames[0]);
+      expect(world.vaultInfo).toBe(firstMirror);
+      for (const frame of frames.slice(1)) send(pid, frame);
+      expect(world.vaultInfo).toEqual(info);
+      expect(world.playerId).toBe(pid);
+    };
+    // Enter cancels a partial transfer belonging to the moderator's own vault.
+    send(1, chunks(future(8), 1)[0]);
+    wire.onMessage(JSON.stringify({ t: 'spectate', name: 'Owner2' }));
+    expect(world.vaultInfo).toBeNull();
+    expect('vaultTransferReceiver' in world).toBe(false);
+    const firstOwner = future(123);
+    stream(2, firstOwner, 2, null);
+    expect(world.spectating).toBe('Owner2');
+    // A new revision for the same owner still retains its validated mirror.
+    const sameOwnerMirror = world.vaultInfo;
+    stream(2, future(124), 3, sameOwnerMirror);
+    send(2, chunks(future(125), 4)[0]);
+    wire.onMessage(JSON.stringify({ t: 'spectate', name: 'Owner3' }));
+    expect(world.vaultInfo).toBeNull();
+    expect('vaultTransferReceiver' in world).toBe(false);
+    stream(3, future(234), 5, null);
+    expect(world.spectating).toBe('Owner3');
+    send(3, chunks(future(235), 6)[0]);
+    wire.onMessage(JSON.stringify({ t: 'spectate', name: null }));
+    expect(world.vaultInfo).toBeNull();
+    expect('vaultTransferReceiver' in world).toBe(false);
+    expect(world.playerId).toBe(1);
+    stream(1, future(456), 7, null);
+    expect(world.spectating).toBeNull();
+  });
+
   it('discards a partial transfer on actual reconnect hello before adopting the new socket revision', () => {
     const world = bareClient(1, { vaultInfo: SMALL, reconnectAttempts: 1 });
     applyBankSelfWire(world, { vault: chunks(projection)[0] });
