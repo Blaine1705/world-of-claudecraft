@@ -860,8 +860,9 @@ describe('stock rows: the phase 11n pulls', () => {
       // Jar of Mischief, both priced in sweets, then (phase 3) the three costume
       // draughts and the three title writs, then (phase 5) the five candies, then
       // (round 7) the Emberbristle Broom, priced in Emberwoven Sheaves; (round 8) the
-      // pumpkin head left the shelf (Old Thatchgrin's first-kill drop is its one source).
-      gourdlight_keeper: 13,
+      // pumpkin head left the shelf (Old Thatchgrin's first-kill drop is its one source);
+      // (round 9) Hester's five Gourdlight Eve toys joined it, 13 to 18.
+      gourdlight_keeper: 18,
     });
   });
 });

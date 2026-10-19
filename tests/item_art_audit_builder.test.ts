@@ -852,6 +852,9 @@ describe('item-art audit builder', () => {
     // the sha/bytes straight from `--verify-only` on this tree.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
     // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306 on the release.
+    // 2066 / 2095 at the feature/v045-integration merge into feature/halloween-event:
+    // the integration's catalogue plus the 27 Gourdlight Eve event items, sha and bytes
+    // re-measured with `--verify-only` on the merged tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
@@ -880,11 +883,11 @@ describe('item-art audit builder', () => {
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
       // 2043 / 2072 with Gourdlight Eve's four event items, re-measured the same way.
       // 2045 / 2074 with Old Thatchgrin's two spoils, re-measured the same way.
-      catalogSha256: '2953c889770fa1e28eef92381bb8829687fd3502c5f7629ddf53645c2f349567',
-      catalogBytes: 1115331,
+      catalogSha256: '2c6cdb73dbc9f807cc13c92727842baa6964b1e77b5bc253e212fe0d0a9862ff',
+      catalogBytes: 1126236,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2045,
-      liveItemCount: 2074,
+      catalogCount: 2066,
+      liveItemCount: 2095,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -902,7 +905,7 @@ describe('item-art audit builder', () => {
         identity: 44,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '5353e345958309d7a7e37d23ad7d63b05e8a28dc44b3ae1f91a86cba66a5e096',
+      shippingCatalogSha256: 'dafcd2dde2bb3f1e322dcc817d0acae5626bcfe739f8c2870cd021dc14323fe5',
       machineChecksPassed: true,
       verdict: null,
     });
