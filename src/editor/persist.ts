@@ -55,6 +55,36 @@ export function serializeMapCompact(map: CustomMap): string {
   return JSON.stringify(map);
 }
 
+/** Document arrays the repo file writes one item per line: the long lists a
+ *  change touches item by item (map_merge_core.ts). */
+const REPO_LINE_ARRAYS: ReadonlySet<string> = new Set(['placements', 'terrainEdits', 'grassClear']);
+
+/**
+ * The repo file form of a map (data/maps/<slug>.map.json): the compact form
+ * (RLE paint) laid out with each top-level field on its own line and each
+ * placement, terrain stamp and grass clearing on its own line, so git can
+ * merge two branches that changed different items and a PR diff shows which
+ * items changed. The link back to a base (meta.basedOn) belongs to an editing
+ * copy, never to the repo file. Still a plain parseMap input.
+ */
+export function serializeMapForRepo(map: CustomMap): string {
+  // Normalize through the loader first, so a freshly minted id lands where a
+  // reload puts it and the file is byte-stable from its first write.
+  const normalized = parseMap(serializeMapCompact(map)) ?? map;
+  const compact = JSON.parse(serializeMapCompact(normalized)) as Record<string, unknown>;
+  const meta = compact.meta as Record<string, unknown> | undefined;
+  if (meta) delete meta.basedOn;
+  const lines = Object.entries(compact).map(([key, value]) => {
+    const head = `${JSON.stringify(key)}: `;
+    if (REPO_LINE_ARRAYS.has(key) && Array.isArray(value) && value.length > 0) {
+      const items = value.map((item) => JSON.stringify(item)).join(',\n');
+      return `${head}[\n${items}\n]`;
+    }
+    return head + JSON.stringify(value);
+  });
+  return `{\n${lines.join(',\n')}\n}\n`;
+}
+
 // Parse anything into a CustomMap, or null if it cannot be salvaged (no usable
 // zones). Accepts a JSON string or an already-parsed object; expands the
 // store's RLE ids (if present) before the shared sanitizer runs.

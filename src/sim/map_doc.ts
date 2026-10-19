@@ -629,7 +629,19 @@ export interface MapDocMeta {
   seed: number;
   // Fork lineage (set by the server on fork; empty string = original work).
   parentId: string;
+  /** The repo map this document was opened from, for a change-only push:
+   *  its slug and the git blob id of the file as it was opened (the base the
+   *  push compares against). Absent on a map not opened from the repo. */
+  basedOn?: MapDocBase;
 }
+
+export interface MapDocBase {
+  slug: string;
+  base: string;
+}
+
+const BASE_SLUG_RE = /^[a-z0-9][a-z0-9_]{0,63}$/;
+const BASE_ID_RE = /^[0-9a-f]{40}$/;
 
 // City Build: a wall or fence run. The mapper draws a polyline; the editor
 // generates fitted segment placements (plus corner posts) tagged with this
@@ -1009,6 +1021,8 @@ function sanitizeStamp(v: unknown): HeightStamp | null {
     stamp.noiseSeed = finiteNum(s.noiseSeed) ? Math.trunc(clamp(s.noiseSeed, 0, 0x7fffffff)) : 0;
     if (finiteNum(s.noiseRough)) stamp.noiseRough = clamp(s.noiseRough, 0, 1);
   }
+  const id = idStr(s.id);
+  if (id) stamp.id = id;
   return stamp;
 }
 
@@ -1551,7 +1565,16 @@ function sanitizeMeta(v: unknown): MapDocMeta {
     updatedAt: num(m.updatedAt, created),
     seed: Math.floor(num(m.seed, DEFAULT_SEED)),
     parentId: str(m.parentId, '').slice(0, 64),
+    ...sanitizeMapBase(m.basedOn),
   };
+}
+
+function sanitizeMapBase(v: unknown): { basedOn?: MapDocBase } {
+  if (!v || typeof v !== 'object') return {};
+  const b = v as Record<string, unknown>;
+  if (typeof b.slug !== 'string' || !BASE_SLUG_RE.test(b.slug)) return {};
+  if (typeof b.base !== 'string' || !BASE_ID_RE.test(b.base)) return {};
+  return { basedOn: { slug: b.slug, base: b.base } };
 }
 
 // The Sim spawns camp.count mobs inside camp.radius, so every field is
@@ -2148,7 +2171,10 @@ export function sanitizeMapDoc(raw: unknown): MapDoc | null {
       if (!v || typeof v !== 'object') return null;
       const c = v as Record<string, unknown>;
       if (!finiteNum(c.x) || !finiteNum(c.z) || !finiteNum(c.r) || c.r <= 0) return null;
-      return { x: coord(c.x), z: coord(c.z), r: clamp(c.r, 0.1, 400) };
+      const circle: GrassClearCircle = { x: coord(c.x), z: coord(c.z), r: clamp(c.r, 0.1, 400) };
+      const id = idStr(c.id);
+      if (id) circle.id = id;
+      return circle;
     })
     .filter((c): c is GrassClearCircle => c !== null)
     .slice(0, MAX_GRASS_CLEAR);

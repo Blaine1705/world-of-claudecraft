@@ -55,7 +55,14 @@ interface MapPlacement {
 }
 interface MapDoc {
   placements: MapPlacement[];
-  terrainEdits: { x: number; z: number; radius: number; delta: number; hardness?: number }[];
+  terrainEdits: {
+    id?: string;
+    x: number;
+    z: number;
+    radius: number;
+    delta: number;
+    hardness?: number;
+  }[];
   decorationExclusions: string[];
 }
 const REBUILD_MAP = JSON.parse(
@@ -727,8 +734,11 @@ describe('the ground under the placed buildings', () => {
         );
       }
     }
-    expect(REBUILD_MAP.terrainEdits.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
-    const mapPads = REBUILD_MAP.terrainEdits.slice(-pads.length - highwatchPads, -highwatchPads);
+    // Each stamp in the repo file carries the editor's permanent id
+    // (src/editor/map_item_ids.ts); the game never sees it, so compare without.
+    const mapStamps = REBUILD_MAP.terrainEdits.map(({ id: _id, ...stamp }) => stamp);
+    expect(mapStamps.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
+    const mapPads = mapStamps.slice(-pads.length - highwatchPads, -highwatchPads);
     // a grid of level stamps under every building (and the vault on the bank's
     // shelf), copied plain from the layout, and the map carries the same list
     expect(pads).toEqual(EASTBROOK_LAYOUT.pads.map((pad) => ({ ...pad })));

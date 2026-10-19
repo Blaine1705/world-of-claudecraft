@@ -214,6 +214,11 @@ export class SlotTable {
     return this.slotById.has(id);
   }
 
+  /** The id at a live slot (0..count-1), for an allocation-free walk. */
+  idAt(slot: number): number {
+    return this.ids[slot];
+  }
+
   /** Live ids in slot order (a copy; callers iterate while mutating). */
   liveIds(): number[] {
     return [...this.ids];

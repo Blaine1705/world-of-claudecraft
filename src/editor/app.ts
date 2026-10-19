@@ -475,11 +475,15 @@ import { loadStoredLocalAssets, storeLocalAssetBytes } from './local_assets_db';
 import { repairMissingTreeCollision, repairPlacedAssetShapes } from './map_asset_migration';
 import { MapDrawer, type PublishedMapMeta } from './map_drawer';
 import { MapIO } from './map_io';
+import { ensureMapItemIds } from './map_item_ids';
+import { upgradeLoadedMap } from './map_load_upgrades';
 import {
   emitPublishedMapModule,
   mapPublishSlug,
   vendorPublishedAssetCollision,
 } from './map_publish_core';
+import { fetchRepoMap, pushMapChanges } from './map_push';
+import { showPushConflicts } from './map_push_report';
 import {
   addKnockout,
   eraseKnockouts,
@@ -498,7 +502,7 @@ import { EditorApiError, forkMap, type MapFullWire, signedIn, uploadAsset } from
 import { newMapSizeDialog } from './new_map_dialog';
 import { ObjectMoveController } from './object_move_controller';
 import { buildObjectMovePanel, buildRemovedObjectsPanel } from './object_move_panel';
-import { parseMap, serializeMapCompact } from './persist';
+import { parseMap, serializeMapForRepo } from './persist';
 import { applyScaleEqualize, type EqualizePlan, planScaleEqualize } from './placement_scale_core';
 import {
   CommitCoalescer,
@@ -1218,6 +1222,8 @@ export class EditorApp {
       this.inspector.refresh();
     },
   });
+  // A Push changes to repo map is in flight (one at a time).
+  private pushing = false;
   // A 3D drag-move is in flight: single-key tool shortcuts stay suppressed.
   private placementDragging = false;
   // Preview mode (topbar toggle): in-game look, editor overlays hidden.
@@ -1637,7 +1643,11 @@ export class EditorApp {
       onDungeonMode: AUTHORED_DUNGEONS.length > 0 ? () => this.enterDungeonMode() : undefined,
       onBattlegroundMode: () => this.enterBattlegroundMode(),
       onRegionExport: () => void this.exportRegionMap(),
-      onPublishMap: () => void this.publishMapToRepo(),
+      // Not while a push is between its read of the file and its write.
+      onPublishMap: () => {
+        if (!this.pushing) void this.publishMapToRepo();
+      },
+      onPushMapChanges: () => void this.pushMapChangesToRepo(),
       onUnpublishMap: () => void this.unpublishMapFromRepo(),
       onViewMode: (mode) => this.setViewMode(mode),
       onProjectionToggle: () => this.setOrthographic(!this.orthographicOn),
@@ -11530,19 +11540,42 @@ export class EditorApp {
    * Gated on prepareMapForEngine (canonical sanitize + a real Sim boot) so
    * nothing that cannot run ever reaches the repo. Dev-server only.
    */
-  private async publishMapToRepo(): Promise<void> {
+  /** Publish To Game: write `map` (the open map unless a push hands over a
+   *  merged one) into the repo under its name's slug, or `slugOverride`.
+   *  Resolves whether the files were written. */
+  private async publishMapToRepo(
+    map: CustomMap = this.map,
+    slugOverride?: string,
+  ): Promise<boolean> {
+    // Every published item carries its permanent id, so the repo file can
+    // take change-only pushes later (map_item_ids.ts).
+    ensureMapItemIds(map);
     let prepared: PreparedMapExport;
     try {
-      prepared = prepareMapForEngine(this.map);
+      prepared = prepareMapForEngine(map);
     } catch (error) {
       this.toasts.error(
         t('editor.publish.failed', {
           error: error instanceof Error ? error.message : String(error),
         }),
       );
-      return;
+      return false;
     }
-    const slug = mapPublishSlug(prepared.map.meta.name);
+    const slug = slugOverride ?? mapPublishSlug(prepared.map.meta.name);
+    // A whole-map Publish over a repo map someone pushed to since this copy
+    // was opened would throw their changes away: ask first.
+    const link = map.meta.basedOn;
+    if (map === this.map && link && link.slug === slug) {
+      const now = await fetchRepoMap(slug);
+      if (now?.base && now.base !== link.base) {
+        const ok = await confirmDialog(this.root, {
+          title: t('editor.push.overwriteTitle'),
+          body: t('editor.push.overwriteBody'),
+          danger: true,
+        });
+        if (!ok) return false;
+      }
+    }
     const world = vendorPublishedAssetCollision(prepared.world);
     const moduleSource = emitPublishedMapModule(
       slug,
@@ -11550,11 +11583,10 @@ export class EditorApp {
       prepared.map.meta.seed,
       JSON.stringify(world),
     );
-    // Compact serialization for the repo artifact: a full-world doc's PRETTY
-    // json is tens of MB (every biome-paint cell on its own line) and blew the
-    // endpoint cap. Compact RLEs the paint grid and is still a plain parseMap
-    // input, so the file remains the editable source of truth.
-    const mapJson = serializeMapCompact(prepared.map);
+    // The repo layout: compact (the paint grid RLE'd; a PRETTY full-world doc
+    // is tens of MB and blew the endpoint cap) with one placement, stamp and
+    // grass clearing per line, so git merges and diffs it item by item.
+    const mapJson = serializeMapForRepo(prepared.map);
     let res: Response;
     try {
       res = await fetch('/__studio_map/publish', {
@@ -11569,13 +11601,70 @@ export class EditorApp {
       // data/maps/ and src/sim/maps/ by hand publishes the map just the same.
       downloadPublishedMap(slug, mapJson, moduleSource);
       this.toasts.error(t('editor.publish.noDevServer'));
-      return;
+      return false;
     }
     if (!res.ok) {
       this.toasts.error(t('editor.publish.rejected', { error: await res.text() }));
-      return;
+      return false;
     }
-    this.toasts.success(t('editor.publish.done', { slug }));
+    if (map === this.map) {
+      // This copy now matches the repo file: it becomes the new base.
+      const now = await fetchRepoMap(slug);
+      if (now?.base) this.map.meta.basedOn = { slug, base: now.base };
+      this.toasts.success(t('editor.publish.done', { slug }));
+    }
+    return true;
+  }
+
+  /** Push only this copy's changes into the repo map it was opened from
+   *  (map_push.ts), then show the merged map, which is the new base. */
+  private async pushMapChangesToRepo(): Promise<void> {
+    if (this.pushing) return;
+    this.pushing = true;
+    try {
+      this.flushTransformCommit();
+      const outcome = await pushMapChanges(this.map, (merged, slug) =>
+        this.publishMapToRepo(merged, slug),
+      );
+      switch (outcome.status) {
+        case 'notLinked':
+          this.toasts.error(t('editor.push.notLinked'));
+          return;
+        case 'baseMissing':
+          this.toasts.error(t('editor.push.baseMissing'));
+          return;
+        case 'repoMissing':
+          this.toasts.error(t('editor.push.repoMissing'));
+          return;
+        case 'missingIds':
+          this.toasts.error(t('editor.push.missingIds'));
+          return;
+        case 'nothing':
+          this.toasts.info(t('editor.push.nothing'));
+          return;
+        case 'conflicts':
+          showPushConflicts(this.root, outcome.conflicts);
+          return;
+        case 'publishFailed':
+          return;
+        case 'pushed': {
+          const slug = this.map.meta.basedOn?.slug ?? '';
+          const merged = outcome.merged;
+          if (outcome.newBase) merged.meta.basedOn = { slug, base: outcome.newBase };
+          this.loadMap(merged);
+          this.inspector.refresh();
+          let count = 0;
+          for (const row of Object.values(outcome.applied)) {
+            count += row.added + row.changed + row.removed;
+          }
+          this.toasts.success(t('editor.push.done', { count: formatNumber(count), slug }));
+          if (outcome.withUpgrades) this.toasts.info(t('editor.push.withUpgrades'));
+          return;
+        }
+      }
+    } finally {
+      this.pushing = false;
+    }
   }
 
   /**
@@ -13950,13 +14039,11 @@ export class EditorApp {
    *  null when it is not published or there is no dev server. */
   private async fetchPublishedMap(slug: string): Promise<CustomMap | null> {
     if (!import.meta.env.DEV) return null;
-    try {
-      const res = await fetch(`/__studio_map/doc?slug=${encodeURIComponent(slug)}`);
-      if (!res.ok) return null;
-      return parseMap(JSON.parse(await res.text()));
-    } catch {
-      return null;
-    }
+    const repo = await fetchRepoMap(slug);
+    if (!repo) return null;
+    // Remember which version this copy started from, for Push changes.
+    if (repo.base) repo.map.meta.basedOn = { slug, base: repo.base };
+    return repo.map;
   }
 
   /** The active placement's prefab-pieces definition, when it is a
@@ -16429,29 +16516,7 @@ export class EditorApp {
       this.streamZoneIds = [];
       this.viewport3d?.clearZoneIsolateQuiet();
     }
-    promoteMajorWorldProps(map as CustomMap);
-    promoteEditablePalms(map as CustomMap);
-    promoteStreetlamps(map as CustomMap);
-    promoteWillows(map as CustomMap);
-    promoteFarshorePalms(map as CustomMap);
-    promoteFeatureDressing(map as CustomMap);
-    repairDecorBuildingCollision(map);
-    repairLegacyWorldPropFit(map as CustomMap);
-    repairStretchedWorldProps(map);
-    repairPlacedAssetShapes(map);
-    repairMissingTreeCollision(map, applyDefaultCollision);
-    if (map.meta.id === 'woc-v041-world') {
-      map.placements = map.placements.filter(
-        (p) =>
-          !(
-            (p.assetId === 'biome/hexb_barracks' && p.x === 17.5 && p.z === -5.5) ||
-            (p.assetId === 'biome/hexb_watchtower' && p.x === 27 && p.z === -13)
-          ),
-      );
-      if (map.content.npcs.proving_shore_guide) {
-        map.content.npcs.proving_shore_guide.dynamic = true;
-      }
-    }
+    upgradeLoadedMap(map);
     this.map = map;
     this.flattenLock = null;
     this.slopeStart = null;

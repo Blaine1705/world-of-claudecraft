@@ -11372,6 +11372,40 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.biome.clearConfirm': 'このマップの塗られたバイオームのマスをすべて削除しますか？',
   'editor.flatten.hint': '平坦化は、ドラッグ開始時のカーソル下の高さに地面をならします。',
   'editor.flatten.hardEdge': 'ハードエッジ',
+  'editor.topbar.pushMapChanges': 'リポジトリのマップに変更をプッシュ',
+  'editor.topbar.pushMapChangesTitle':
+    'このリポジトリのマップを開いてから行った変更だけを現在のリポジトリのファイルに適用し、他の人のプッシュは残します。',
+  'editor.push.notLinked':
+    'このマップはリポジトリのマップから開かれていないため、プッシュ先がありません。先に「開く」の収録マップから開いてください。',
+  'editor.push.baseMissing':
+    '編集を始めたときのバージョンが見つかりません。リポジトリのマップを開き直して、変更をやり直してください。',
+  'editor.push.repoMissing': 'このコピーの元になったリポジトリのマップがありません。',
+  'editor.push.missingIds':
+    'リポジトリのマップに、IDのないアイテムやIDが重複したアイテムがあるため、変更を照合できません。',
+  'editor.push.nothing': 'プッシュするものがありません。開いてからこのコピーに変更はありません。',
+  'editor.push.done':
+    '{slug} に {count} 件の変更をプッシュしました。エディターには統合後のマップが表示されています。',
+  'editor.push.withUpgrades':
+    '編集の一部が、マップを開いたときにエディターが追加した項目に対するものだったため、その更新も保存しました。',
+  'editor.push.overwriteTitle': '新しいリポジトリの変更を上書きしますか？',
+  'editor.push.overwriteBody':
+    'このリポジトリのマップを開いた後に、誰かが変更をプッシュしました。公開するとファイル全体が置き換わり、その変更は失われます。残すには「リポジトリのマップに変更をプッシュ」を使ってください。',
+  'editor.push.conflictsTitle': 'プッシュ不可：変更の衝突',
+  'editor.push.conflictsBody':
+    'あなたの変更のうち {count} 件が、このマップを開いた後にプッシュされた変更と衝突しています。何も書き込まれていません。「開く」からリポジトリのマップを開き直し、次の変更をやり直してください：',
+  'editor.push.conflictRow': '{kind} {id}：{reason}',
+  'editor.push.conflictsMore': 'ほか {count} 件。',
+  'editor.push.reasonBoth': 'あなたと他の人の両方が変更しました',
+  'editor.push.reasonDeleted': '一方が削除し、もう一方が変更しました',
+  'editor.push.reasonOverlap': '地形のストロークが新しいストロークと重なっています',
+  'editor.push.kindPlacement': 'アセット',
+  'editor.push.kindTerrain': '地形のストローク',
+  'editor.push.kindGrassClear': '草の除去範囲',
+  'editor.push.kindNpc': 'NPC',
+  'editor.push.kindObjectMove': 'ゲームプレイオブジェクト',
+  'editor.push.kindPaint': '塗ったセル',
+  'editor.push.kindField': 'マップ設定',
+  'editor.push.close': '閉じる',
   'editor.objectMove.edited': 'このマップで変更済みです。',
   'editor.objectMove.rotation': '回転（度）',
   'editor.objectMove.size': 'サイズ',
