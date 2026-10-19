@@ -489,8 +489,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Placez ce sort dans un groupe pour afficher son bouton.',
   'hudChrome.cooldownManager.notKnown': '{spell} (pas encore appris)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Afficher seulement si prêt',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Afficher seulement si actif',
   'hudChrome.cooldownManager.opacity': 'Opacité',
   'hudChrome.cooldownManager.orientation': 'Orientation',
   'hudChrome.cooldownManager.otherSpells': 'Autres sorts',
@@ -514,12 +512,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Faites glisser un sort sur un groupe, ou sélectionnez-le pour choisir son groupe et ses alertes. Un bouton suit son sort quand celui-ci se change en un autre, et s'illumine quand cela arrive.",
   'hudChrome.cooldownManager.trackedTitle': 'Sorts suivis',
   'hudChrome.cooldownManager.vertical': 'Vertical',
-  'hudChrome.cooldownManager.visAlways': 'Toujours visible',
   'hudChrome.cooldownManager.visCombat': 'En combat',
-  'hudChrome.cooldownManager.visHidden': 'Masqué',
   'hudChrome.cooldownManager.visHiddenHint':
     "Un groupe masqué joue quand même ses sons et illumine votre barre d'action.",
-  'hudChrome.cooldownManager.visibility': 'Visibilité',
   'hudChrome.crafting.mobileStationTitle': '{station} de {name}',
   'hudChrome.currencies.activities': 'Activités',
   'hudChrome.currencies.delveMark': 'Marque de plongée',

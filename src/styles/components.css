@@ -19097,17 +19097,46 @@
     margin: 0;
     align-self: center;
   }
-  /* Touch: the selects, the name boxes and the search box meet the 40px target floor. */
+  /* Checkmark rows (Show While, Show In, Show Button When): each box combines
+     with its neighbour, so a row is a fieldset of label chips, not a select. */
+  .cdm-check-row {
+    display: grid;
+    gap: 4px;
+    margin: 6px 0 2px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  .cdm-check-legend {
+    padding: 0;
+  }
+  .cdm-check-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+  .cdm-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+  }
+  /* Touch: the selects, the name boxes, the search box and the checkmark chips
+     meet the 40px target floor. */
   @media (pointer: coarse) {
     .cdm-select,
     .cdm-name,
-    .cdm-search {
+    .cdm-search,
+    .cdm-check {
       min-height: 40px;
     }
   }
   body.mobile-touch .cdm-select,
   body.mobile-touch .cdm-name,
-  body.mobile-touch .cdm-search {
+  body.mobile-touch .cdm-search,
+  body.mobile-touch .cdm-check {
     min-height: 40px;
   }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */

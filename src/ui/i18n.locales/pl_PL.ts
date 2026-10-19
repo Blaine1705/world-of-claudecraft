@@ -461,8 +461,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Umieść to zaklęcie w grupie, aby pokazać jego przycisk.',
   'hudChrome.cooldownManager.notKnown': '{spell} (nie znane jeszcze)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Pokazuj tylko, gdy gotowe',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Pokazuj tylko, gdy aktywne',
   'hudChrome.cooldownManager.opacity': 'Przezroczystość',
   'hudChrome.cooldownManager.orientation': 'Orientacja',
   'hudChrome.cooldownManager.otherSpells': 'Inne zaklęcia',
@@ -486,12 +484,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przeciągnij zaklęcie na grupę lub wybierz je, aby wybrać jego grupę i ostrzeżenia. Przycisk podąża za swoim zaklęciem, gdy zmieni się na inne i świeci się, gdy to robi.',
   'hudChrome.cooldownManager.trackedTitle': 'Śledzone zaklęcia',
   'hudChrome.cooldownManager.vertical': 'Pionowa',
-  'hudChrome.cooldownManager.visAlways': 'Zawsze widoczna',
   'hudChrome.cooldownManager.visCombat': 'W walce',
-  'hudChrome.cooldownManager.visHidden': 'Ukryty',
   'hudChrome.cooldownManager.visHiddenHint':
     'Ukryta grupa nadal odtwarza dźwięki i oświetla pasek akcji.',
-  'hudChrome.cooldownManager.visibility': 'Widoczność',
   'hudChrome.crafting.mobileStationTitle': 'Stacja {name} - {station}',
   'hudChrome.currencies.activities': 'Zajęcia',
   'hudChrome.currencies.delveMark': 'Znak Wyprawy',

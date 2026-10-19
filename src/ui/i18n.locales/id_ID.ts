@@ -464,8 +464,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Letakkan sihir ini di grup untuk menampilkan tombolnya.',
   'hudChrome.cooldownManager.notKnown': '{spell} (belum diketahui)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Hanya Tampilkan Saat Siap',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Hanya Tampilkan Saat Aktif',
   'hudChrome.cooldownManager.opacity': 'Opasitas',
   'hudChrome.cooldownManager.orientation': 'Orientasi',
   'hudChrome.cooldownManager.otherSpells': 'Sihir Lain',
@@ -489,12 +487,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Seret sihir ke grup, atau pilih untuk memilih grup dan peringatannya. Tombol mengikuti sikirnya saat berubah menjadi yang lain, dan bersinar saat melakukannya.',
   'hudChrome.cooldownManager.trackedTitle': 'Sihir Terlacak',
   'hudChrome.cooldownManager.vertical': 'Vertikal',
-  'hudChrome.cooldownManager.visAlways': 'Selalu Terlihat',
   'hudChrome.cooldownManager.visCombat': 'Di Pertempuran',
-  'hudChrome.cooldownManager.visHidden': 'Tersembunyi',
   'hudChrome.cooldownManager.visHiddenHint':
     'Grup tersembunyi masih memutar suaranya dan menerangi bilah acsimu.',
-  'hudChrome.cooldownManager.visibility': 'Visibilitas',
   'hudChrome.crafting.mobileStationTitle': "{name}'s {station}",
   'hudChrome.currencies.activities': 'Aktivitas',
   'hudChrome.currencies.delveMark': 'Merek Galian',

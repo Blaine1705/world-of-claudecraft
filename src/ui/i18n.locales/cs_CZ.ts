@@ -456,8 +456,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Vlož toto kouzlo do skupiny, aby se zobrazilo jeho tlačítko.',
   'hudChrome.cooldownManager.notKnown': '{spell} (zatím neznámé)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Zobrazit jen, když je připraveno',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Zobrazit jen, když je aktivní',
   'hudChrome.cooldownManager.opacity': 'Průhlednost',
   'hudChrome.cooldownManager.orientation': 'Orientace',
   'hudChrome.cooldownManager.otherSpells': 'Ostatní kouzla',
@@ -481,12 +479,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přetáhni kouzlo na skupinu, nebo ho vyber a nastav jeho skupinu a upozornění. Tlačítko sleduje své kouzlo, když se změní na jiné, a při té změně se rozsvítí.',
   'hudChrome.cooldownManager.trackedTitle': 'Sledovaná kouzla',
   'hudChrome.cooldownManager.vertical': 'Svisle',
-  'hudChrome.cooldownManager.visAlways': 'Vždy viditelné',
   'hudChrome.cooldownManager.visCombat': 'V boji',
-  'hudChrome.cooldownManager.visHidden': 'Skryté',
   'hudChrome.cooldownManager.visHiddenHint':
     'Skrytá skupina pořád přehrává své zvuky a rozsvěcí tvou akční lištu.',
-  'hudChrome.cooldownManager.visibility': 'Viditelnost',
   'hudChrome.crafting.mobileStationTitle': '{station} ({name})',
   'hudChrome.currencies.activities': 'Aktivity',
   'hudChrome.currencies.delveMark': 'Výpravní žeton',

@@ -484,8 +484,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Füge diesen Zauber einer Gruppe hinzu, um seine Schaltfläche anzuzeigen.',
   'hudChrome.cooldownManager.notKnown': '{spell} (noch nicht bekannt)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Nur anzeigen, wenn bereit',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Nur anzeigen, solange aktiv',
   'hudChrome.cooldownManager.opacity': 'Deckkraft',
   'hudChrome.cooldownManager.orientation': 'Ausrichtung',
   'hudChrome.cooldownManager.otherSpells': 'Andere Zauber',
@@ -509,12 +507,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ziehe einen Zauber auf eine Gruppe, oder wähle ihn aus, um seine Gruppe und Warnungen festzulegen. Eine Schaltfläche folgt ihrem Zauber, wenn er sich in einen anderen verwandelt, und leuchtet dabei auf.',
   'hudChrome.cooldownManager.trackedTitle': 'Verfolgte Zauber',
   'hudChrome.cooldownManager.vertical': 'Vertikal',
-  'hudChrome.cooldownManager.visAlways': 'Immer sichtbar',
   'hudChrome.cooldownManager.visCombat': 'Im Kampf',
-  'hudChrome.cooldownManager.visHidden': 'Ausgeblendet',
   'hudChrome.cooldownManager.visHiddenHint':
     'Eine ausgeblendete Gruppe spielt weiterhin ihre Töne ab und lässt deine Aktionsleiste leuchten.',
-  'hudChrome.cooldownManager.visibility': 'Sichtbarkeit',
   'hudChrome.crafting.mobileStationTitle': '{station} von {name}',
   'hudChrome.currencies.activities': 'Aktivitäten',
   'hudChrome.currencies.delveMark': 'Tiefgang-Marke',

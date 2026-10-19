@@ -457,8 +457,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Lägg denna trollformel i en grupp för att visa dess knapp.',
   'hudChrome.cooldownManager.notKnown': '{spell} (inte känd än)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Visa endast när klar',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Visa endast medan aktiv',
   'hudChrome.cooldownManager.opacity': 'Opacitet',
   'hudChrome.cooldownManager.orientation': 'Orientering',
   'hudChrome.cooldownManager.otherSpells': 'Andra trollformler',
@@ -482,12 +480,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Dra en trollformel på en grupp, eller välj den för att välja dess grupp och varningar. En knapp följer sin trollformel även om du byter specialisering eller nivå.',
   'hudChrome.cooldownManager.trackedTitle': 'Spårade trollformler',
   'hudChrome.cooldownManager.vertical': 'Vertikal',
-  'hudChrome.cooldownManager.visAlways': 'Alltid synlig',
   'hudChrome.cooldownManager.visCombat': 'I strid',
-  'hudChrome.cooldownManager.visHidden': 'Dold',
   'hudChrome.cooldownManager.visHiddenHint':
     'En dold grupp spelar fortfarande ljud och tänder upp på ditt handlingsfält.',
-  'hudChrome.cooldownManager.visibility': 'Synlighet',
   'hudChrome.crafting.mobileStationTitle': '{name}:s {station}',
   'hudChrome.currencies.activities': 'Aktiviteter',
   'hudChrome.currencies.delveMark': 'Delve-märke',
