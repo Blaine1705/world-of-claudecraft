@@ -16,6 +16,18 @@ import {
 } from '../src/ui/boot_splash_core';
 
 const read = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
+
+/** Pixel size from a PNG header or an extended (VP8X) WebP header, the two
+ *  formats the boot splash logo has shipped in. */
+function imageSize(file: Buffer): { width: number; height: number } {
+  if (file.toString('ascii', 1, 4) === 'PNG') {
+    return { width: file.readUInt32BE(16), height: file.readUInt32BE(20) };
+  }
+  expect(file.toString('ascii', 0, 4)).toBe('RIFF');
+  expect(file.toString('ascii', 8, 16)).toBe('WEBPVP8X');
+  return { width: file.readUIntLE(24, 3) + 1, height: file.readUIntLE(27, 3) + 1 };
+}
+
 const ENTRIES = ['index.html', 'play.html'] as const;
 
 function deferred() {
@@ -417,9 +429,10 @@ describe('entry markup', () => {
       it('reserves the logo box before the image arrives, at its real size', () => {
         const logo = splash?.querySelector<HTMLImageElement>('img.boot-splash-logo');
         const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-        const png = readFileSync(join(repoRoot, 'public', logo?.getAttribute('src') ?? ''));
-        expect(logo?.getAttribute('width')).toBe(String(png.readUInt32BE(16)));
-        expect(logo?.getAttribute('height')).toBe(String(png.readUInt32BE(20)));
+        const file = readFileSync(join(repoRoot, 'public', logo?.getAttribute('src') ?? ''));
+        const { width, height } = imageSize(file);
+        expect(logo?.getAttribute('width')).toBe(String(width));
+        expect(logo?.getAttribute('height')).toBe(String(height));
       });
 
       it('paints with the landing palette tokens', () => {
