@@ -1151,7 +1151,7 @@ export class SeasonalToysFx {
       // set down with a slosh: green brew splashed up over the rim, a puff of steam, the
       // ground thumped under its feet
       const cy = y + CAULDRON_RIM_Y * CAULDRON_SCALE;
-      this.particles.groundPuff(this.at.set(ev.x, y, ev.z), 1.7, 0x3c4a34);
+      this.particles.groundPuff(this.at.set(ev.x, y, ev.z), 1, 0x3c4a34);
       for (let i = 0; i < 26; i++) {
         const a = i * 0.24;
         const up = 1.6 + (i % 5) * 0.45;
@@ -1210,7 +1210,7 @@ export class SeasonalToysFx {
           'glow',
         );
       }
-      this.particles.groundPuff(this.at.set(tx, ty, tz), 1.3, 0x3f9a4c);
+      this.particles.groundPuff(this.at.set(tx, ty, tz), 1, 0x3f9a4c);
       for (let i = 0; i < (this.reduced ? 5 : 10); i++) {
         const a = i * 0.628;
         this.particles.toyMote(
@@ -1354,7 +1354,9 @@ export class SeasonalToysFx {
     // a drinker whose fizz ran out (or who left sight) gets their own colours back. The tint
     // rides the rig's one aura-glow slot (CharacterVisual.setAuraGlow): an ability glow live
     // on the same body in the same few seconds shares it, the last writer winning, and this
-    // release clears only bodies this layer tinted
+    // release clears only bodies this layer tinted. The release reaches EVERY body of the
+    // view (renderer.ts: the own rig and the form slot), since the goblin can take over
+    // mid-fizz and leave the green on the body it replaced
     for (const [id, frame] of this.tinted) {
       if (frame === this.frame) continue;
       this.tint(id, BREW_COLOR, 0);
@@ -1765,7 +1767,7 @@ export class SeasonalToysFx {
 
   /** The goblin turns back: a green puff and a pop of bubbles where it stood. */
   private goblinPoof(x: number, y: number, z: number): void {
-    this.particles.groundPuff(this.at.set(x, y, z), 1.1, 0x3f9a4c);
+    this.particles.groundPuff(this.at.set(x, y, z), 1, 0x3f9a4c);
     const n = this.reduced ? 8 : 18;
     for (let i = 0; i < n; i++) {
       const a = i * 2.39996;

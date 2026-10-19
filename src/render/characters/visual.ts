@@ -2635,6 +2635,8 @@ export class CharacterVisual {
     this.rideBlend += (target - this.rideBlend) * Math.min(1, dt * RIDE_BLEND_RATE);
     if (this.rideBlend < 1e-3) {
       this.rideBlend = 0;
+      // the next ride's grip starts where its own solve puts it, never eased from this one
+      this.rideGripState.primed = false;
       return;
     }
     if (!spec) return;

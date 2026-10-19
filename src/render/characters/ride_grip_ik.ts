@@ -22,8 +22,9 @@
 // function of the shoulders, the handle and the rig alone, so it cannot drift with the clip
 // and the two hands mirror each other.
 //
-// Per frame, per rider ON such a mount only; no allocation (module scratch), and only the
-// arm chains' world matrices are recomputed. Blended by `k` (the ride pose's own fade).
+// Per frame, per rider ON such a mount only; no allocation (module scratch). The arm chains
+// are brought current once (their ancestors and the arms below), then read straight off
+// their cached world matrices; each write re-derives only the written bone's subtree. Blended by `k` (the ride pose's own fade).
 import * as THREE from 'three';
 
 export interface RideGrip {
@@ -43,6 +44,8 @@ export interface RideArm {
   wrist: THREE.Object3D;
   /** The weapon grip under the fist (`handslot`), or null on a rig without one. */
   slot: THREE.Object3D | null;
+  /** Whether the upper arm hangs off a clavicle the shoulder roll may turn (WOC bodies). */
+  clavicle: boolean;
   /** Each bone's limb direction in its own frame (towards its child joint). */
   limbUpper: THREE.Vector3;
   limbFore: THREE.Vector3;
@@ -120,7 +123,8 @@ function calibrateArm(
   const hinge = new THREE.Vector3(rest.x, rest.y, rest.z);
   if (hinge.lengthSq() < 1e-8) hinge.set(1, 0, 0);
   hinge.normalize();
-  return { upper, fore, wrist, slot, limbUpper, limbFore, hinge };
+  const clavicle = !!upper.parent && /clavicle/i.test(upper.parent.name);
+  return { upper, fore, wrist, slot, clavicle, limbUpper, limbFore, hinge };
 }
 
 /** Both arms (upper arm and forearm bone names, left then right), calibrated once per
@@ -210,6 +214,19 @@ const rootQ = new THREE.Quaternion();
 const rootS = new THREE.Vector3();
 const UP_Y = new THREE.Vector3(0, 1, 0);
 
+const decP = new THREE.Vector3();
+const decS = new THREE.Vector3();
+/** World position / orientation off the bone's CURRENT matrixWorld, with no climb to the
+ *  scene root: applyRideGrip brings both arm chains current once, and every write below
+ *  re-derives the written bone's subtree, so the cached matrices are always fresh. */
+function posOf(o: THREE.Object3D, out: THREE.Vector3): THREE.Vector3 {
+  return out.setFromMatrixPosition(o.matrixWorld);
+}
+function quatOf(o: THREE.Object3D, out: THREE.Quaternion): THREE.Quaternion {
+  o.matrixWorld.decompose(decP, out, decS);
+  return out;
+}
+
 /** The rotation taking local axis `la` to world `wa` and local `lb` (made square to `la`)
  *  as near as it can go to world `wb` (made square to `wa`). Written into `out`. */
 function frameRotation(
@@ -234,7 +251,7 @@ function frameRotation(
 /** Give `bone` the world orientation `world` (blend k), recomputing its subtree. */
 function setWorldQuat(bone: THREE.Object3D, world: THREE.Quaternion, k: number): void {
   if (bone.parent) {
-    bone.parent.getWorldQuaternion(qParent);
+    quatOf(bone.parent, qParent);
     qLocal.copy(qParent).invert().multiply(world);
   } else {
     qLocal.copy(world);
@@ -259,9 +276,9 @@ const shQ = new THREE.Quaternion();
  */
 function shrugToward(arm: RideArm, target: THREE.Vector3, want: number, k: number): boolean {
   const clav = arm.upper.parent;
-  if (!clav || !/clavicle/i.test(clav.name)) return false;
-  clav.getWorldPosition(shC);
-  arm.upper.getWorldPosition(shS);
+  if (!clav || !arm.clavicle) return false;
+  posOf(clav, shC);
+  posOf(arm.upper, shS);
   const now = shS.distanceTo(target);
   if (now <= want) return false;
   const rc = shC.distanceTo(shS);
@@ -278,7 +295,7 @@ function shrugToward(arm: RideArm, target: THREE.Vector3, want: number, k: numbe
   shAxis.crossVectors(tmpA, tmpB);
   if (shAxis.lengthSq() < 1e-10) return false;
   shAxis.normalize();
-  clav.getWorldQuaternion(qWorld);
+  quatOf(clav, qWorld);
   qWorld.premultiply(shQ.setFromAxisAngle(shAxis, turn * k));
   setWorldQuat(clav, qWorld, 1);
   return true;
@@ -295,9 +312,9 @@ function solveArm(
   k: number,
 ): void {
   const { upper, fore, wrist, slot } = arm;
-  upper.getWorldPosition(tmpS);
-  fore.getWorldPosition(tmpE);
-  wrist.getWorldPosition(tmpW);
+  posOf(upper, tmpS);
+  posOf(fore, tmpE);
+  posOf(wrist, tmpW);
   const l1 = tmpS.distanceTo(tmpE);
   const l2 = tmpE.distanceTo(tmpW);
   if (l1 < 1e-4 || l2 < 1e-4) return;
@@ -306,9 +323,9 @@ function solveArm(
   let wristWant: THREE.Quaternion | null = null;
   tmpWristAt.copy(grip);
   if (slot) {
-    wrist.getWorldQuaternion(qWrist);
-    slot.getWorldQuaternion(qSlot);
-    slot.getWorldPosition(tmpA);
+    quatOf(wrist, qWrist);
+    quatOf(slot, qSlot);
+    posOf(slot, tmpA);
     // the slot in the wrist's frame (rotation and offset): rigid through any wrist turn
     qRel.copy(qWrist).invert().multiply(qSlot);
     slotOffset.subVectors(tmpA, tmpW).applyQuaternion(qInv.copy(qWrist).invert());
@@ -326,8 +343,8 @@ function solveArm(
   // reaches down a shaft: without it a short arm stretched straight and its fist hung in
   // the air above the handle, rising and falling with every breath of the seated loop.
   if (shrugToward(arm, tmpWristAt, (l1 + l2) * SHOULDER_ASSIST_FROM, k)) {
-    upper.getWorldPosition(tmpS);
-    fore.getWorldPosition(tmpE);
+    posOf(upper, tmpS);
+    posOf(fore, tmpE);
   }
   tmpDir.subVectors(tmpWristAt, tmpS);
   const reach = Math.min(tmpDir.length(), (l1 + l2) * 0.999);
@@ -350,7 +367,7 @@ function solveArm(
     setWorldQuat(upper, qWorld, k);
   }
   // forearm: limb from the elbow to the wrist's place, the same hinge
-  fore.getWorldPosition(tmpE);
+  posOf(fore, tmpE);
   tmpB.copy(tmpS).addScaledVector(tmpDir, reach).sub(tmpE).normalize();
   if (frameRotation(arm.limbFore, arm.hinge, tmpB, tmpHinge, qWorld)) {
     setWorldQuat(fore, qWorld, k);
@@ -385,9 +402,9 @@ export function applyRideGrip(
     const arm = i === 0 ? arms.left : arms.right;
     const side = i === 0 ? 0.04 : -0.04;
     const forward = grip.forward + (i === 0 ? -0.5 : 0.5) * grip.stagger;
-    arm.upper.getWorldPosition(tmpS);
-    arm.fore.getWorldPosition(tmpE);
-    arm.wrist.getWorldPosition(tmpW);
+    posOf(arm.upper, tmpS);
+    posOf(arm.fore, tmpE);
+    posOf(arm.wrist, tmpW);
     const armReach = (tmpS.distanceTo(tmpE) + tmpE.distanceTo(tmpW)) * GRIP_REACH;
     root.localToWorld(handleOrigin.set(side, grip.up, 0));
     let t = gripParamAlongHandle(tmpS, handleOrigin, handleDir, forward * scale, armReach);
