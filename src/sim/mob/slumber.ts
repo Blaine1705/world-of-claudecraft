@@ -122,6 +122,10 @@ function inAFight(mob: Entity): boolean {
  * same lie-down a watched dusk runs. Watched, or in a fight, this does nothing and the
  * ordinary per-tick driver keeps the walk home. Asleep he carries the slumber aura, so
  * the throttle never holds back a wake. Zero rng. True when he was put to bed.
+ * One recorded consequence: the throttle radius is a host knob, so with it off (tests,
+ * parity) a far boss still walks home at dawn, and with it on he is set on his bed at
+ * once; deterministic per host config, and his lie-down yell and realm notice come that
+ * many ticks sooner. The watched test reads his current spot, not his bed's.
  */
 export function settleUnwatchedSlumber(ctx: SimContext, mob: Entity): boolean {
   const def = MOBS[mob.templateId]?.slumber;

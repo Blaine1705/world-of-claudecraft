@@ -12,7 +12,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { THATCHGRIN_ID } from '../src/sim/content/gourdlight_eve_scarecrow';
 import { DAWN_PHASE, DUSK_PHASE, phaseToCycleMs } from '../src/sim/day_night';
 import { shouldSkipIdleMobTick } from '../src/sim/mob/idle_tick_skip';
-import { SLUMBER_AURA_ID } from '../src/sim/mob/slumber';
+import { SLUMBER_AURA_ID, settleUnwatchedSlumber } from '../src/sim/mob/slumber';
 import { resolveScarecrowField } from '../src/sim/seasonal/scarecrow_field';
 import { syncSeasonalDecorColliders } from '../src/sim/seasonal_decor_colliders';
 import { Sim } from '../src/sim/sim';
@@ -121,5 +121,31 @@ describe('Old Thatchgrin with nobody near', () => {
     clock.set(DAWN_PHASE + 0.05);
     sim.tick();
     expect(b.asleep).toBeFalsy();
+  });
+
+  it('watched, it does nothing: the visible walk home at dawn is unchanged', () => {
+    const clock = clockAt(DUSK_PHASE + 0.05);
+    const sim = world(clock);
+    const b = boss(sim);
+    farAway(sim, b);
+    ticks(sim, 8);
+    expect(b.asleep).toBeFalsy();
+    // he strays, and a player stands in view of him (inside the interest radius)
+    b.pos = sim.groundPos(b.spawnPos.x + 12, b.spawnPos.z);
+    b.prevPos = { ...b.pos };
+    sim.ctx.rebucket(b);
+    const p = sim.player;
+    p.pos = sim.groundPos(b.pos.x + 40, b.pos.z);
+    p.prevPos = { ...p.pos };
+    sim.tick();
+    clock.set(DAWN_PHASE + 0.05);
+    const before = { ...b.pos };
+    expect(settleUnwatchedSlumber(sim.ctx, b)).toBe(false);
+    expect(b.pos).toEqual(before);
+    expect(b.asleep).toBeFalsy();
+    // the ordinary driver walks him home and only then puts him on the pole
+    sim.tick();
+    expect(b.asleep).toBeFalsy();
+    expect(dist2d(b.pos, b.spawnPos)).toBeLessThan(12);
   });
 });
