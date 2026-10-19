@@ -486,6 +486,7 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'activeDungeonDifficulty', kind: 'method' }, // active claim read, null outside
   { name: 'setDungeonDifficulty', kind: 'method' },
+  { name: 'heroicMarks', kind: 'data' }, // Heroic Marks currency balance
   { name: 'buyHeroicVendorItem', kind: 'method' },
   { name: 'buyCrucibleVendorItem', kind: 'method' },
   { name: 'leaderboard', kind: 'method' }, // async
@@ -952,8 +953,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Plus the World PvP Skull Bag's skullBagAction (+1 method): 428/127/301.
     // Plus PvP Resurrect's pvpResurrect (+1 method): 429/127/302.
     // Allied Hearthstone adds one data member and one method.
-    expect(IWORLD_MEMBERS.length).toBe(431);
-    expect(DATA_MEMBERS.length).toBe(128);
+    expect(IWORLD_MEMBERS.length).toBe(432);
+    expect(DATA_MEMBERS.length).toBe(129);
     expect(METHOD_MEMBERS.length).toBe(303);
   });
   it('has no duplicate member names', () => {
@@ -1162,6 +1163,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestNode',
       'harvestPreference',
       'healPet',
+      'heroicMarks',
       'hillInfo',
       'hoardBossCues',
       'hobbyCraft',
@@ -1461,6 +1463,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'gatheringProficiency',
       'guildBankInfo',
       'harvestPreference',
+      'heroicMarks',
       'hillInfo',
       'hobbyCraft',
       'honor',
@@ -2331,6 +2334,7 @@ const FACET_DUNGEONS = [
   'dungeonDifficulty',
   'activeDungeonDifficulty',
   'setDungeonDifficulty',
+  'heroicMarks',
   'buyHeroicVendorItem',
   'buyCrucibleVendorItem',
 ] as const satisfies readonly (keyof IWorldDungeons)[];
@@ -2658,8 +2662,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
     // Allied Hearthstone adds one data member and one method.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(431);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(431);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(432);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(432);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -29,7 +29,6 @@ import { auraSaveFragment, restorePersistedAuras } from './aura_persist';
 import { maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
-  addStacked,
   BAG_SOCKETS,
   bagCapacity,
   bagPools,
@@ -43,7 +42,11 @@ import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
-import { restoreCharacterStorage, savedCharacterStorage } from './character_storage';
+import {
+  type CharacterVaultStorageState,
+  restoreCharacterStorage,
+  savedCharacterStorage,
+} from './character_storage';
 import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
 import {
@@ -288,7 +291,11 @@ import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import * as inventoryConsumption from './inventory_consumption';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
-import { grantInventoryInstances, type InventoryGrantOptions } from './inventory_grant';
+import {
+  grantInventoryInstances,
+  grantPlainStack,
+  type InventoryGrantOptions,
+} from './inventory_grant';
 import { emitInventoryReceipt } from './inventory_receipt';
 import { foldNamedSlotTarget, type NamedSlotTarget } from './item_copy_ref';
 import {
@@ -356,7 +363,6 @@ import type { MaterialSourceTransferSelection } from './material_source_transfer
 import type { MaterialComposition } from './material_sources';
 import { changeMaterialStackGrouping } from './material_stack_commands';
 import type { MaterialStackSelection } from './material_stack_selection';
-import type { MaterialsVaultState } from './materials_vault';
 import * as vaultMod from './materials_vault';
 import {
   accountCosmeticsWithWornMechChroma,
@@ -1315,7 +1321,8 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 // everything that belongs to the character sheet.
 export interface PlayerMeta
   extends worldQuestState.WorldQuestPlayerState,
-    petCommands.PetOwnerRuntimeState {
+    petCommands.PetOwnerRuntimeState,
+    CharacterVaultStorageState {
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -1414,15 +1421,6 @@ export interface PlayerMeta
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
   // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
   bankBonusSources: BankBonusSource[];
-  // The per-character Materials Vault: a count per material id with a gold-bought
-  // per-material ceiling. Capacity and move math live in materials_vault.ts.
-  // Persisted (inside the character save, exactly like inventory/bags/bank).
-  weeklyRewards?: weeklyMod.WeeklyRewardState;
-  vault: MaterialsVaultState;
-  // Runtime-only change signals for the owner-only bank/vault wires (bumped by
-  // every write to meta.bank state / vault state respectively); never persisted.
-  bankWireRev: number;
-  vaultWireRev: number;
   // Server-stamped guild membership (guild id + rank), the authorization input
   // the Guild Bank's officer-plus gate reads; written only through
   // setPlayerGuildMembership (guild_bank.ts). Session-only exactly like
@@ -1773,6 +1771,7 @@ export interface PlayerMeta
   // is gated only by raidLockouts; this persisted field records which distinct
   // heroic clears contributed to one authoritative reset window without gating rewards.
   heroicDaily: { date: string; marked: Set<string> };
+  heroicMarks: number; // the Heroic Marks currency balance (heroic_marks.ts)
   // Masterwrought materials (phase 04). wyrmfallDaily is the Wyrmfall Core
   // income gate: which faucet sources (dungeonId:difficulty, or 'rift') paid
   // this character inside the current reset-day window. emberWeekAnchor is
@@ -2924,6 +2923,7 @@ export class Sim {
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
       townFocus: {},
       heroicDaily: { date: '', marked: new Set() },
+      heroicMarks: 0,
       wyrmfallDaily: { date: '', sources: new Set() },
       emberWeekAnchor: '',
       craftDaily: { date: '', crafted: new Set() },
@@ -8000,8 +8000,9 @@ export class Sim {
     return inventoryConsumption.countFungibleItem(this.ctx, itemId, pid);
   }
 
-  // Grants are stack-aware (bags.ts addStacked, which never merges into an
-  // instanced slot, #1165) but NEVER capacity-capped here: a grant that reaches
+  // Grants are stack-aware (inventory_grant.ts grantPlainStack: bags.ts addStacked,
+  // never merging into an instanced slot, #1165, or the Heroic Marks counter) but
+  // NEVER capacity-capped here: a grant that reaches
   // this hub always lands, so an async award (loot roll, master loot, delve
   // rewards) can't destroy items. Capacity is enforced by canAddItem pre-checks
   // at the command boundaries instead.
@@ -8052,14 +8053,8 @@ export class Sim {
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    addStacked(
-      meta.inventory,
-      itemId,
-      count,
-      undefined,
-      opts?.craftedRecipeId,
-      opts?.materialSources,
-    );
+    // Stacks into the bags, or credits a currency counter (Heroic Marks).
+    grantPlainStack(meta, itemId, count, opts);
     // Every grant that reaches the hub is an acquisition for the Book of
     // Deeds discovery ledger (loot, craft, quest reward, vendor, mail, trade).
     // `movement` rides along but never gates discovery: it only tells the
@@ -11284,6 +11279,10 @@ export class Sim {
 
   get delveMarks(): number {
     return this.delveMarksFor(this.primaryId);
+  }
+
+  get heroicMarks(): number {
+    return this.players.get(this.primaryId)?.heroicMarks ?? 0;
   }
 
   get companionUpgrades(): Record<string, number> {

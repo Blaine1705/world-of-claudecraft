@@ -577,7 +577,8 @@ const MONOLITHS: MonolithRow[] = [
     // hand-written rows, so adding the fourth stance shrank the file. Exact count.
     // Release integration preserves the inherited tooltip-hover settings and
     // prior extractions beside the pet-button extraction. Measured after formatting.
-    ceiling: 17925,
+    // Heroic currency balance reads remove the old bag sum. Exact merged size.
+    ceiling: 17922,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1305,7 +1306,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11636 -> 11626 while integrating GM tools: the pure mob aggro
     // admission gate moved to mob/aggro_gate.ts, preserving Feign Death and
     // dev guards alongside hidden-GM admission. Measured after biome.
-    ceiling: 11626,
+    // Vault storage declarations and revisions now live behind character_storage.
+    // Both extractions compose at 11625 lines after the currency reconciliation.
+    // Measured on the combined tree; neither parent's ceiling is raised.
+    ceiling: 11625,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
