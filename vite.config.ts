@@ -28,6 +28,7 @@ import {
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
 import { studioDevGuardMiddleware } from './scripts/lib/studio_dev_guard.mjs';
+import { readBase, snapshotBase } from './scripts/lib/studio_map_base.mjs';
 import { vitestBoundedRelatedPlugin } from './scripts/lib/vitest_bounded_related.mjs';
 import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
@@ -740,6 +741,7 @@ function studioMapPublishPlugin() {
   const SLUG_RE = /^[a-z0-9][a-z0-9_]{0,63}$/;
   const mapsDir = path.resolve(root, 'src/sim/maps');
   const dataDir = path.resolve(root, 'data/maps');
+  const baseCacheDir = path.resolve(root, 'node_modules/.cache/studio-map-bases');
   // Registry regeneration mirrors src/editor/map_publish_core.ts
   // emitPublishedMapRegistry byte-for-byte: entries sorted by slug, metadata
   // re-read from each module on disk so the registry is always a pure
@@ -998,8 +1000,30 @@ export function publishedMapBySlug(slug: string): PublishedMapEntry | undefined 
           res.end('not published');
           return;
         }
+        // Name this exact version as the base a later change-only push
+        // compares against (scripts/lib/studio_map_base.mjs).
+        const bytes = readFileSync(full);
+        res.setHeader('x-studio-map-base', snapshotBase(baseCacheDir, bytes));
         res.statusCode = 200;
-        res.end(readFileSync(full, 'utf8'));
+        res.end(bytes.toString('utf8'));
+      });
+      // One base version of a repo map by its blob id (a change-only push's
+      // "where I started"): the cached copy, else git's own object.
+      server.middlewares.use('/__studio_map/base', (req, res) => {
+        if (req.method !== 'GET') {
+          res.statusCode = 405;
+          res.end('GET only');
+          return;
+        }
+        const url = new URL(req.url ?? '', 'http://localhost');
+        const text = readBase(baseCacheDir, root, url.searchParams.get('id') ?? '');
+        if (text === null) {
+          res.statusCode = 404;
+          res.end('base not found');
+          return;
+        }
+        res.statusCode = 200;
+        res.end(text);
       });
     },
   };
