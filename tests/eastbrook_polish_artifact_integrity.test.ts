@@ -1425,7 +1425,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
   // Re-minted for the v0.45 release batch after the merged Eastbrook runtime
   // inputs settled. No capture was retaken.
-  '6585e2fc783ae2b6294b47872ae3114e867f0aa930693508311907478a69c5c5';
+  '4460d4f53ce79e6fb8dab21efb6cced00f0b00df7fa09c2ce8eee1cb278775ef';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1478,7 +1478,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
   // Re-minted for the v0.45 release batch after the merged Eastbrook runtime
   // inputs settled. No capture was retaken.
-  '0a7e2a340fc97a3a490c0ff6bee30ad3a95482c389b53eeb07d9de83a433bb58';
+  'f617305c56804f5164e6cdc33260dc9b87335373ce22bb2a096b40f7df313ada';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2896,7 +2896,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // v0.45 release batch settle: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('f56a39d9e0770f0aa477a304f9f58ef743593cff5dfcc510f41ef4c536c3bab1');
+    ).toBe('2316c998863312c89bd9ec35fe799e9dcf9343c70bf47d75d90700df01468b1d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
