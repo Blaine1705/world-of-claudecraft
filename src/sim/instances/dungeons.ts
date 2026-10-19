@@ -1,3 +1,4 @@
+import { assertHeroicMarksGrantsFit } from '../heroic_marks';
 // Dungeons: party-instanced elite content (the Hollow Crypt and friends).
 //
 // Session I1 MOVES this slice verbatim out of the `Sim` monolith behind the
@@ -16,7 +17,7 @@
 // the N1/quest/delve code that reaches them through `ctx`.
 
 import { supportHeightAt } from '../colliders';
-import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
+import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_CURRENCY_ID } from '../content/dungeon_difficulty';
 import {
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
@@ -1475,6 +1476,19 @@ export function awardHeroicMarks(
   // the death snapshot and must receive the same lockout as their reward.
   for (const meta of recipients) lockoutRecipients.set(meta.entityId, meta);
 
+  // Validate every direct credit before any participant's claim gate is stamped.
+  for (const meta of lockoutRecipients.values()) {
+    if (
+      !isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId)) &&
+      credited &&
+      presentIds.has(meta.entityId)
+    ) {
+      assertHeroicMarksGrantsFit(meta, [
+        { itemId: HEROIC_MARK_CURRENCY_ID, count: tuning.marksPerParticipant },
+      ]);
+    }
+  }
+
   for (const meta of lockoutRecipients.values()) {
     const alreadyLocked = isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId));
     // THE GATE FIRST, then the pay. The mail arm below is the one DURABLE half
@@ -1494,10 +1508,10 @@ export function awardHeroicMarks(
     if (!alreadyLocked && credited) {
       let paid = false;
       if (presentIds.has(meta.entityId)) {
-        ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
+        ctx.addItem(HEROIC_MARK_CURRENCY_ID, tuning.marksPerParticipant, meta.entityId);
         paid = true;
       } else if (inst.enteredBy.has(meta.entityId)) {
-        ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant);
+        ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_CURRENCY_ID, tuning.marksPerParticipant);
         paid = true;
       }
       // The Book of Deeds daily circuit observes successful rewards, but it is

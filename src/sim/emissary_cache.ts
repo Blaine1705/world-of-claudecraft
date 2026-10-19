@@ -5,11 +5,12 @@
 // stack of Heroic Marks. Server-authoritative:
 // the pick draws ctx.rng once, and the item leaves the bag only when the
 // contents have landed.
-import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from './content/dungeon_difficulty';
 import { DUNGEON_MOBS } from './content/dungeons';
 import { NYTHRAXIS_RAID_BOSS_ID } from './content/heroic_loot';
 import { IGNIVAR_LOOT_ITEM_IDS } from './content/ignivar_loot';
 import { ITEMS } from './data';
+import { assertHeroicMarksGrantsFit } from './heroic_marks';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { ItemDef, ItemInstancePayload, PlayerClass } from './types';
@@ -58,9 +59,12 @@ export function openEmissaryCache(
 ): boolean {
   const pool = emissaryCachePoolForClass(meta.cls);
   if (pool.length === 0 || ctx.countItem(EMISSARY_CACHE_ITEM_ID, meta.entityId) <= 0) return false;
+  assertHeroicMarksGrantsFit(meta, [
+    { itemId: HEROIC_MARK_CURRENCY_ID, count: EMISSARY_CACHE_MARKS },
+  ]);
   const piece = ctx.rng.pick([...pool]);
   consumeOneUnit();
   ctx.addItem(piece, 1, meta.entityId);
-  ctx.addItem(HEROIC_MARK_ITEM_ID, EMISSARY_CACHE_MARKS, meta.entityId);
+  ctx.addItem(HEROIC_MARK_CURRENCY_ID, EMISSARY_CACHE_MARKS, meta.entityId);
   return true;
 }

@@ -577,7 +577,8 @@ const MONOLITHS: MonolithRow[] = [
     // hand-written rows, so adding the fourth stance shrank the file. Exact count.
     // Release integration preserves the inherited tooltip-hover settings and
     // prior extractions beside the pet-button extraction. Measured after formatting.
-    ceiling: 17925,
+    // Heroic currency balance reads remove the old bag sum. Exact merged size.
+    ceiling: 17922,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1302,7 +1303,8 @@ const MONOLITHS: MonolithRow[] = [
     // Up to 11641 with PvP Resurrect composed into the current release batch.
     // Exact merged count, zero slack.
     // Pet owner session inputs moved behind the existing pet command state seam.
-    ceiling: 11636,
+    // Vault storage declarations and revisions now live behind character_storage.
+    ceiling: 11635,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

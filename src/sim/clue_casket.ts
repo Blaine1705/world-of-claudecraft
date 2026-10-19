@@ -6,8 +6,9 @@
 // full deeds pass. Every roll draws from ctx.rng, so the three hosts agree.
 
 import { delveChestItemsForTier } from './content/delves/lockpick_tiers';
-import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from './content/dungeon_difficulty';
 import type { MountKey } from './content/mounts';
+import { assertHeroicMarksGrantsFit } from './heroic_marks';
 import type { LootTier } from './lockpick';
 import { mountOwned } from './mounts';
 import type { PlayerMeta } from './sim';
@@ -70,6 +71,10 @@ export function openTreasureCasket(
   consumeOneUnit: () => void,
 ): void {
   const pid = meta.entityId;
+  // Reserve the possible marks before consuming the casket or drawing rewards.
+  assertHeroicMarksGrantsFit(meta, [
+    { itemId: HEROIC_MARK_CURRENCY_ID, count: CASKET_HEROIC_MARKS },
+  ]);
   consumeOneUnit();
   const copper = treasureCasketCopper(player.level);
   const itemIds: string[] = [];
@@ -82,8 +87,8 @@ export function openTreasureCasket(
     itemIds.push(piece.itemId);
   }
   if (ctx.rng.chance(CASKET_HEROIC_MARK_CHANCE)) {
-    ctx.addItem(HEROIC_MARK_ITEM_ID, CASKET_HEROIC_MARKS, pid);
-    itemIds.push(HEROIC_MARK_ITEM_ID);
+    ctx.addItem(HEROIC_MARK_CURRENCY_ID, CASKET_HEROIC_MARKS, pid);
+    itemIds.push(HEROIC_MARK_CURRENCY_ID);
   }
   // The mount roll is always drawn (the rng sequence never depends on what
   // the character owns); an owner simply receives nothing from it.
