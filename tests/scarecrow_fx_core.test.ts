@@ -1,10 +1,9 @@
 // The pure cores behind Old Thatchgrin's phase-3 visuals: the rain of pumpkins
 // (fallWindow, fallPoint, fallOrigin), the Swelling Gourd's growth and throb
-// (swellScale, swellThrob, swellGlow), and the broom rider's two-bone hand reach
-// (ride_grip_ik.ts reachArm / applyRideGrip).
+// (swellScale, swellThrob, swellGlow). The broom rider's hands on the handle
+// (ride_grip_ik.ts) are pinned in tests/ride_grip_ik.test.ts.
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { applyRideGrip, reachArm } from '../src/render/characters/ride_grip_ik';
 import {
   AWAKEN_HEAD_SEC,
   AWAKEN_LAND_SEC,
@@ -132,63 +131,5 @@ describe('the Swelling Gourd', () => {
       expect(g).toBeGreaterThanOrEqual(0);
       expect(g).toBeLessThanOrEqual(1);
     }
-  });
-});
-
-/** A two-bone arm: shoulder at the origin, an upper arm and a forearm of 1 each,
- *  pointing straight down +Y-negative, under a root. */
-function arm(root: THREE.Object3D, x: number): [THREE.Bone, THREE.Bone, THREE.Bone] {
-  const upper = new THREE.Bone();
-  upper.position.set(x, 2, 0);
-  const fore = new THREE.Bone();
-  fore.position.set(0, -1, 0);
-  const hand = new THREE.Bone();
-  hand.position.set(0, -1, 0);
-  root.add(upper);
-  upper.add(fore);
-  fore.add(hand);
-  return [upper, fore, hand];
-}
-
-describe('hands on the handle (ride_grip_ik)', () => {
-  it('puts the hand on a reachable grip, the limb lengths unchanged', () => {
-    const root = new THREE.Object3D();
-    const [u, f, h] = arm(root, 0);
-    root.updateMatrixWorld(true);
-    const target = new THREE.Vector3(0.6, 1.2, 1.1);
-    reachArm(u, f, h, target, new THREE.Quaternion(), 1, 1);
-    root.updateMatrixWorld(true);
-    const at = h.getWorldPosition(new THREE.Vector3());
-    expect(at.distanceTo(target)).toBeLessThan(1e-3);
-    const s = u.getWorldPosition(new THREE.Vector3());
-    const e = f.getWorldPosition(new THREE.Vector3());
-    expect(s.distanceTo(e)).toBeCloseTo(1, 5);
-    expect(e.distanceTo(at)).toBeCloseTo(1, 5);
-  });
-
-  it('reaches as far as it can toward a grip out of reach, never stretching', () => {
-    const root = new THREE.Object3D();
-    const [u, f, h] = arm(root, 0);
-    root.updateMatrixWorld(true);
-    reachArm(u, f, h, new THREE.Vector3(0, 2, 5), new THREE.Quaternion(), 1, 1);
-    root.updateMatrixWorld(true);
-    const at = h.getWorldPosition(new THREE.Vector3());
-    expect(at.z).toBeGreaterThan(1.9);
-    expect(at.distanceTo(new THREE.Vector3(0, 2, 0))).toBeLessThanOrEqual(2);
-  });
-
-  it('a zero blend moves nothing, and a frozen rig is left alone', () => {
-    const root = new THREE.Object3D();
-    const left = arm(root, 0.3);
-    const right = arm(root, -0.3);
-    root.updateMatrixWorld(true);
-    const before = left[2].getWorldPosition(new THREE.Vector3());
-    const grip = { forward: 1, up: 1.2, stagger: 0.2 };
-    applyRideGrip(root, [...left, ...right], grip, 0);
-    root.updateMatrixWorld(true);
-    expect(left[2].getWorldPosition(new THREE.Vector3()).distanceTo(before)).toBeLessThan(1e-9);
-    root.matrixWorldAutoUpdate = false;
-    applyRideGrip(root, [...left, ...right], grip, 1);
-    expect(left[0].quaternion.equals(new THREE.Quaternion())).toBe(true);
   });
 });
