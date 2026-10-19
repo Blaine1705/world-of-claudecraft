@@ -35,9 +35,14 @@ NPC stands it moved), then in the zone content file replace the kit records with
 
 `tests/painted_towns.test.ts` validates every town that stands buildings (zone, files,
 walk-in air, spacing, NPCs, camps, services, water, level ground, doors, lamps, roads, and
-that the zone file carries exactly the layout's records). A pad moves terrain, so a town
-change re-records the parity goldens, the terrain height fixture and the default world
-bundle (`tmp/TOWN_REBUILD_GUIDE.md` in the main checkout lists them).
+that the zone file carries exactly the layout's records); `tests/painted_towns_renderer.test.ts`
+pins each town view and `tests/painted_towns_studio.test.ts` the Studio family (no building
+skipped, every replaced record lifted). A pad or a building moves terrain and colliders, so a
+town change re-records, each in its own commit: the parity goldens
+(`UPDATE_PARITY=1 npx vitest run tests/parity`, read `tests/parity/CLAUDE.md` first), the
+ground height fixture (`UPDATE_TERRAIN_HEIGHT_PARITY=1 npx vitest run
+tests/terrain_height_parity.test.ts`) and the default world bundle (`UPDATE_DEFAULT_WORLD=1
+npx vitest run tests/default_world_bundle.test.ts`).
 
 ## Rules
 - Only shipped painted files: a look carries only the models baked in it, and
