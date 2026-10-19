@@ -16,7 +16,11 @@
 // map `cds` now owns.
 
 import { MEDALLION_USE_COOLDOWN_KEY } from '../sim/content/trinkets';
-import { majorCooldownBaseSec, PVP_MEDALLION_COOLDOWN_KEY } from '../sim/major_cooldowns';
+import {
+  majorCooldownBaseSec,
+  majorCooldownGroup,
+  PVP_MEDALLION_COOLDOWN_KEY,
+} from '../sim/major_cooldowns';
 import type { Entity } from '../sim/types';
 
 const held = new WeakMap<Entity, Map<string, number>>();
@@ -41,7 +45,7 @@ function setRemaining(e: Entity, deadlines: Map<string, number>, now: number): v
 }
 
 /** Apply one record's `mcd` field (a record that carries the aura channel). An
- *  absent or null field clears every deadline the entity held. `isSelf` drops
+ *  absent or null field clears every tracked key and held deadline. `isSelf` drops
  *  the held deadlines without touching the map the self channel owns. */
 export function applyPeerMajorCooldownWire(
   e: Entity,
@@ -54,10 +58,13 @@ export function applyPeerMajorCooldownWire(
     held.delete(e);
     return;
   }
-  // A peer can previously have been self/spectated: the new whole channel owns
-  // this fact even when no peer deadlines were held for the old self map.
-  e.cooldowns.delete(MEDALLION_USE_COOLDOWN_KEY);
-  if (prior) for (const key of prior.keys()) e.cooldowns.delete(key);
+  // A previous self/spectated map has no held peer deadlines. This whole
+  // channel owns every tracked key in that map, while unrelated timers stay.
+  for (const key of e.cooldowns.keys()) {
+    if (key === MEDALLION_USE_COOLDOWN_KEY || majorCooldownGroup(key) !== null || prior?.has(key)) {
+      e.cooldowns.delete(key);
+    }
+  }
   if (raw === null || typeof raw !== 'object' || !Number.isFinite(now)) {
     held.delete(e);
     return;
