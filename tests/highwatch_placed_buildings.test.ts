@@ -33,19 +33,14 @@ import { generateDecorationsInBounds, groundHeight, terrainHeight } from '../src
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The built-in Highwatch stands five painted Tidehold buildings (in the
-// Highwatch look) round its square, and the lord's manor on the north hill,
-// built for Highwatch alone (scripts/assets/highwatch_manor/). This suite
-// measures each layout record off the things it was copied from: the model's
-// shipped geometry (a look re-bakes only the textures of the default model,
-// tests/tidehold_texture_tiers.test.ts) and the model's baked collision rows;
-// then walks into the open ones.
+// Highwatch look) round its square. This suite measures each layout record off
+// the things it was copied from: the model's shipped geometry (a look re-bakes
+// only the textures of the default model, tests/tidehold_texture_tiers.test.ts)
+// and the model's baked collision rows; then walks into the open ones.
 
 const ROOT = path.join(__dirname, '..');
 const BUILDINGS = HIGHWATCH_LAYOUT.buildings;
 type Building = (typeof BUILDINGS)[number];
-/** The manor ships only in the Highwatch look, at its own grand size, so it has no default
- *  model of the painted set and stands at scale 1. */
-const MANOR_ID = 'highwatch_manor';
 
 interface BakedBox {
   x: number;
@@ -64,7 +59,7 @@ const BAKED = JSON.parse(
  *  `tidehold/x` on the same geometry, so it shares its rows. */
 function modelIdOf(building: Building): string {
   const name = building.assetId.replace(/^.*\//, '').replace(/\.glb$/, '');
-  return building.id === MANOR_ID ? `tidehold/highwatch/${name}` : `tidehold/${name}`;
+  return `tidehold/${name}`;
 }
 
 function recordOf(building: Building): BuildingDef {
@@ -170,7 +165,7 @@ function boundsOf(building: Building): NaturalBounds {
  *  of the model's largest dimension over it. */
 const PLACED_TARGET_HEIGHT = 2.2;
 
-describe('the six placed Highwatch buildings', () => {
+describe('the five placed Highwatch buildings', () => {
   it('are the painted Tidehold set in the Highwatch look', () => {
     expect(BUILDINGS.map((building) => [building.id, modelIdOf(building), building.kind])).toEqual([
       ['highwatch_summit_inn', 'tidehold/tavern_b', 'inn'],
@@ -178,7 +173,6 @@ describe('the six placed Highwatch buildings', () => {
       ['highwatch_counting_house', 'tidehold/shop_a', 'house'],
       ['highwatch_watch_house', 'tidehold/house_c', 'house'],
       ['highwatch_smithy', 'tidehold/smithy', 'house'],
-      ['highwatch_manor', 'tidehold/highwatch/manor', 'house'],
     ]);
     for (const building of BUILDINGS) {
       expect(isPlacedBuildingAsset(building.assetId), building.id).toBe(true);
@@ -188,8 +182,7 @@ describe('the six placed Highwatch buildings', () => {
 
   it('stand grand, each at its own size, with their footing buried', () => {
     for (const building of BUILDINGS) {
-      if (building.id === MANOR_ID) expect(building.placement.scale).toBe(1);
-      else expect(building.placement.scale, building.id).toBeGreaterThanOrEqual(1.2);
+      expect(building.placement.scale, building.id).toBeGreaterThanOrEqual(1.2);
       expect(building.placement.lift, building.id).toBeCloseTo(
         -(building.placement.scale + 0.05),
         9,
@@ -233,12 +226,10 @@ describe('the six placed Highwatch buildings', () => {
     for (const building of BUILDINGS) {
       const baked = BAKED[modelIdOf(building)];
       expect(baked, modelIdOf(building)).toBeDefined();
-      // the look carries its default model's rows (the manor IS the look's own model)
-      if (building.id !== MANOR_ID) {
-        expect(
-          BAKED[`tidehold/highwatch/${modelIdOf(building).slice('tidehold/'.length)}`],
-        ).toEqual(baked);
-      }
+      // the look carries its default model's rows
+      expect(BAKED[`tidehold/highwatch/${modelIdOf(building).slice('tidehold/'.length)}`]).toEqual(
+        baked,
+      );
       const unit =
         (Math.max(...boundsOf(building).size) / PLACED_TARGET_HEIGHT) * building.placement.scale;
       const footing = -boundsOf(building).min[1] * building.placement.scale;
@@ -334,24 +325,17 @@ describe('the six placed Highwatch buildings', () => {
       ],
       highwatch_watch_house: ['highwatch_watch_house:tower'],
       highwatch_smithy: ['highwatch_smithy:forge_shelter', 'highwatch_smithy:chimney'],
-      highwatch_manor: [
-        'highwatch_manor:west_wing',
-        'highwatch_manor:east_wing',
-        'highwatch_manor:dais_bay',
-        'highwatch_manor:kitchen_chimney',
-      ],
     });
   });
 });
 
 describe('placed Highwatch building collision in the built-in world', () => {
-  it('makes the five open buildings walk-in, and keeps the watch house shut', () => {
+  it('makes the four open buildings walk-in, and keeps the watch house shut', () => {
     expect(BUILDINGS.filter((building) => building.walkIn).map((building) => building.id)).toEqual([
       'highwatch_summit_inn',
       'highwatch_gate_chapel',
       'highwatch_counting_house',
       'highwatch_smithy',
-      'highwatch_manor',
     ]);
   });
 
@@ -410,9 +394,7 @@ describe('placed Highwatch building collision in the built-in world', () => {
       ).toBe(!building.walkIn);
       const front = building.frontStandingPoint;
       expect(isBlocked(WORLD_SEED, front.x, front.z, 0.5), `${building.id} front`).toBe(false);
-      // (the manor's back wall opens in its middle onto the dais bay: its probe stands off it)
-      const backX = building.id === MANOR_ID ? door.x + 9 : door.x;
-      const back = localToWorld(anchor, building.placement.rotation, backX, walls.z1 - 0.1);
+      const back = localToWorld(anchor, building.placement.rotation, door.x, walls.z1 - 0.1);
       expect(isBlocked(WORLD_SEED, back.x, back.z), `${building.id} back wall`).toBe(true);
     }
   });
@@ -446,9 +428,7 @@ describe('placed Highwatch building collision in the built-in world', () => {
       setActiveWorldContent(world);
       try {
         const scatter = generateDecorationsInBounds(seed, bounds);
-        // not vacuous: the town's ring still carries its scatter (the manor's clearing
-        // took some 19 trees and rocks off the rise west of the Sanctum road)
-        expect(scatter.length, name).toBeGreaterThan(20);
+        expect(scatter.length, name).toBeGreaterThan(30);
         for (const decoration of scatter) {
           // a pine's crown spreads about 3 yd, a boulder's shoulder 1.5
           const clearance = decoration.kind === 'rock' ? 1.5 : 3;
@@ -472,21 +452,19 @@ describe('placed Highwatch building collision in the built-in world', () => {
       expect(promotedTownBuildingStandsDown({ authoredTowns: true }, record)).toBe(false);
       expect(promotedTownBuildingStandsDown({ highwatchTown: true }, record)).toBe(true);
     }
-    // ...and the Highwatch family never reaches the other towns' buildings
-    const otherIds = new Set(
-      AUTHORED_TOWNS.filter((town) => town.id !== 'highwatch').flatMap((town) =>
-        town.buildings.map((building) => building.id),
-      ),
-    );
-    const others = BUILTIN_WORLD.props.buildings.filter(
-      (record) => record.id !== undefined && otherIds.has(record.id),
+    // ...and the Highwatch family never reaches the other towns' buildings, each of
+    // which stands down under its own town's family (authoredTowns, paintedTowns)
+    const others = AUTHORED_TOWNS.filter((town) => town.id !== 'highwatch').flatMap((town) =>
+      BUILTIN_WORLD.props.buildings
+        .filter((record) => town.buildings.some((building) => building.id === record.id))
+        .map((record) => ({ record, family: town.promotedBy })),
     );
     expect(others.length).toBeGreaterThanOrEqual(10);
-    for (const record of others) {
+    for (const { record, family } of others) {
       expect(promotedTownBuildingStandsDown({ highwatchTown: true }, record), record.id).toBe(
         false,
       );
-      expect(promotedTownBuildingStandsDown({ authoredTowns: true }, record), record.id).toBe(true);
+      expect(promotedTownBuildingStandsDown({ [family]: true }, record), record.id).toBe(true);
     }
   });
 });
@@ -515,8 +493,7 @@ describe('walking into the walk-in Highwatch buildings', () => {
       } else {
         expect(rise, `${building.id} floor`).toBe(0);
       }
-      // (the manor's street is past its porch and steps)
-      const street = insideBy(building, building.id === MANOR_ID ? -10 : -4);
+      const street = insideBy(building, -4);
       expect(groundHeight(street.x, street.z, WORLD_SEED), `${building.id} street`).toBe(
         terrainHeight(street.x, street.z, WORLD_SEED),
       );
@@ -619,7 +596,7 @@ describe('Highwatch in WoC Studio', () => {
     }
   });
 
-  it('promotes the six buildings as their own family, placed exactly as the game stands them', () => {
+  it('promotes the five buildings as their own family, placed exactly as the game stands them', () => {
     expect(FEATURE_PROMOTIONS.map((family) => family.flag)).toContain('highwatchTown');
     const placements = highwatchTownBuildingPlacements(WORLD_SEED);
     expect(placements.map((placement) => placement.assetId)).toEqual(
@@ -688,18 +665,17 @@ describe('Highwatch in WoC Studio', () => {
     const painted = doc.placements.filter((placement) =>
       placement.assetId.startsWith('tidehold/highwatch/'),
     );
-    // the five painted buildings and the manor
-    expect(painted).toHaveLength(BUILDINGS.length);
+    expect(painted).toHaveLength(5);
     for (const old of oldKit.slice(1)) {
       expect(doc.placements, old.assetId).not.toContainEqual(old);
     }
     // what the maker moved, and everything else, stays
     expect(doc.placements).toContainEqual(moved);
     expect(doc.placements).toContainEqual(keeper);
-    expect(doc.placements).toHaveLength(2 + BUILDINGS.length);
+    expect(doc.placements).toHaveLength(2 + 5);
     // and loading it again changes nothing
     expect(promoteFeatureDressing(doc)).toBe(0);
-    expect(doc.placements).toHaveLength(2 + BUILDINGS.length);
+    expect(doc.placements).toHaveLength(2 + 5);
   });
 
   it('ships the rebuilt town in the published Eastbrook Rebuild map', () => {
@@ -741,7 +717,7 @@ describe('Highwatch in WoC Studio', () => {
     for (const pad of HIGHWATCH_LAYOUT.pads) {
       expect(map.terrainEdits ?? []).toContainEqual(pad);
     }
-    // the painted buildings are what stands where the kit houses stood
+    // the five painted buildings are what stands where the kit houses stood
     // (kit placements carry these paths: the regex is live)
     expect(
       (map.placements ?? []).some((placement) =>

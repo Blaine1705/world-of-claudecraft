@@ -868,7 +868,9 @@ describe('Eastbrook authored gameplay data integration', () => {
       { x: 397, z: 1905 },
       { x: -23, z: 1555 },
       { x: -353, z: 2067 },
-      { x: -354, z: 356 },
+      // Bridgemere's moved to the island inn's forecourt (the painted inn
+      // stands over the old square, sim/painted_towns/bridgemere.ts)
+      { x: -366.5, z: 351.5 },
       { x: -364, z: 1415 },
       { x: 354, z: 1436 },
       { x: -294, z: 815 },

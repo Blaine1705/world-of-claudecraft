@@ -8,6 +8,7 @@
 // the palms, banyans, and vines live in render/jungle_features.ts (the
 // greatTrees records below give the sim its solid trunk colliders).
 
+import { DRIFTHAVEN_LAYOUT, paintedTownBuildingDefs } from '../painted_towns';
 import type {
   CampDef,
   EscortDef,
@@ -606,19 +607,19 @@ export const PALMREACH_ESCORTS: Record<string, EscortDef> = {
 
 export const PALMREACH_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Drifthaven: a driftwood village on the strand
+  // Drifthaven: a driftwood village on the strand, its inn, provisioner's
+  // shop and strand house round the square (the painted rebuild,
+  // sim/painted_towns/drifthaven.ts)
   buildings: [
-    { kind: 'inn', x: -308, z: 824, w: 6, d: 7, rot: 0.9 },
-    { kind: 'house', x: -292, z: 814, w: 5, d: 5, rot: -0.7 },
+    ...paintedTownBuildingDefs(DRIFTHAVEN_LAYOUT),
     // the outlying hamlets, one house anchoring each mud-hut cluster: the
     // back-beach, the Vinefall approach, and the idol road (probed level)
     { kind: 'house', x: -380, z: 795, w: 5, d: 5, rot: 0.2 },
     { kind: 'house', x: -370, z: 1045, w: 5, d: 5, rot: 2.9 },
     { kind: 'house', x: -280, z: 1055, w: 5, d: 5, rot: 1.4 },
     // the second wave: lone homesteads spread wide (every site probed level
-    // and dry, 18-plus yards clear of every other structure)
-    { kind: 'house', x: -320, z: 780, w: 5, d: 5, rot: 1.8 },
-    { kind: 'house', x: -270, z: 820, w: 5, d: 5, rot: -1.1 },
+    // and dry, 18-plus yards clear of every other structure; the two inside
+    // the town's ground gave way to the painted rebuild)
     { kind: 'house', x: -440, z: 900, w: 5, d: 5, rot: 0.6 },
     { kind: 'house', x: -410, z: 1130, w: 5, d: 5, rot: 2.2 },
   ],
@@ -662,7 +663,9 @@ export const PALMREACH_PROPS: ZonePropsDef = {
   docks: [{ x: -286, z: 838, rot: 0.6, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
   mudHuts: [
     [-316, 826],
-    [-290, 808],
+    // (this hut stood at (-290, 808), in front of where the painted strand
+    // house's door opens now; it moved up beside the mailbox)
+    [-289.5, 816.5],
     // the hamlet huts, two flanking each anchor house
     [-387, 803],
     [-373, 802],

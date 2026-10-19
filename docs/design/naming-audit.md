@@ -1004,13 +1004,19 @@ candidates collided and were replaced before shipping; the ids never shipped und
 
 ### The Highwatch manor's steward (web-checked 2026-10-15)
 
-The manor's resident (`src/sim/content/highwatch_manor.ts`). The manor itself carries no new
-proper noun ("Highwatch" is the existing town).
+The manor's resident (`src/sim/content/highwatch_manor.ts`, deleted with the manor). The manor
+itself carries no new proper noun ("Highwatch" is the existing town).
+
+**RETIRED 2026-10-19.** The manor came out of the game whole, its steward with it
+(`steward_ansel_hale` was cut outright: integration-branch only, never in a release), so
+neither name below ships anywhere. The verdicts are KEPT rather than deleted, because a
+retired audit row is what stops a later change re-coining the same name and re-doing the
+same search.
 
 | Name | Where | Verdict |
 |---|---|---|
-| Ansel Hale | the manor steward NPC | KEEP. No full-name hit on the web or any game wiki searched (warcraft.wiki.gg, Wowhead, Fallout and RuneScape wikis). "Ansel" alone is a real given name: RuneScape Dragonwilds has a knight called Ansel and WoW has a High Executor Anselm, neither a match. "Hale" is a common English surname (Fallout 76 has an Emerson Hale). Shared English, no coined token. "Odric" was considered and dropped: Sir Odric is a named Magic: The Gathering character. |
-| Steward of the Manor | his NPC title | KEEP. Plain English job title, no distinctive match. |
+| Ansel Hale | the manor steward NPC (retired) | KEEP. No full-name hit on the web or any game wiki searched (warcraft.wiki.gg, Wowhead, Fallout and RuneScape wikis). "Ansel" alone is a real given name: RuneScape Dragonwilds has a knight called Ansel and WoW has a High Executor Anselm, neither a match. "Hale" is a common English surname (Fallout 76 has an Emerson Hale). Shared English, no coined token. "Odric" was considered and dropped: Sir Odric is a named Magic: The Gathering character. |
+| Steward of the Manor | his NPC title (retired) | KEEP. Plain English job title, no distinctive match. |
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 

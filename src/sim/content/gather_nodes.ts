@@ -1204,8 +1204,10 @@ const GATHER_NODE_ROWS: GatherNodeDef[] = [
     // swim depth where harvestNode's swim deny always refuses. The headland
     // west of the cove keeps the whole harvest disc standable and a full
     // yard above the sea plane (its sea-plane exemption retired with the
-    // move).
-    pos: { x: 430, z: 379 },
+    // move). It stood at (430, 379) until the painted market hall took that
+    // ground (sim/painted_towns/wickharbor.ts); it lies up the headland
+    // behind the hall now.
+    pos: { x: 431, z: 388 },
     level: 20,
     tier: 1,
   },

@@ -15,8 +15,8 @@ import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import type { WorldContent } from '../src/sim/types';
 
 // Highwatch's view is the shared placed-town view (render/placed_town_buildings.ts)
-// over HIGHWATCH_LAYOUT: five painted buildings and the manor, each its own fade
-// target and reveal root, gated like the other towns' buildings.
+// over HIGHWATCH_LAYOUT: five painted buildings, each its own fade target and
+// reveal root, gated like the other towns' buildings.
 
 const KIT = highwatchTownInternalsForTest.kit;
 const REVEAL_KEY = 'highwatch-town-static';
@@ -62,13 +62,13 @@ function buildingGroup(root: THREE.Object3D, id: string): THREE.Object3D {
 }
 
 describe('the Highwatch town view', () => {
-  it('stands the painted buildings and the manor as individual fade targets and reveal roots', () => {
+  it('stands the five painted buildings as individual fade targets and reveal roots', () => {
     gfxInternalsForTest.overrideSettings({ standardMaterials: false, dynamicShadows: false });
     const view = KIT.buildFromSources(fixtureSources(), () => 9, true);
     expect(view.group.name).toBe(HIGHWATCH_TOWN_ROOT_NAME);
     expect(view.group.userData.layoutId).toBe(HIGHWATCH_LAYOUT.id);
     expect(view.group.userData.buildingIds).toEqual(HIGHWATCH_LAYOUT.buildings.map((b) => b.id));
-    expect(view.group.userData.buildingFadeTargetCount).toBe(6);
+    expect(view.group.userData.buildingFadeTargetCount).toBe(5);
     expect(KIT.urls).toEqual(HIGHWATCH_LAYOUT.buildings.map((b) => b.assetId));
     for (const building of HIGHWATCH_LAYOUT.buildings) {
       const group = buildingGroup(view.group, building.id);
@@ -78,7 +78,7 @@ describe('the Highwatch town view', () => {
       expect(group.position.z).toBeCloseTo(building.placement.z, 9);
       expect(group.rotation.y).toBeCloseTo(building.placement.rotation, 9);
     }
-    expect(view.staticRevealRoots()).toHaveLength(6);
+    expect(view.staticRevealRoots()).toHaveLength(5);
   });
 
   it('holds the buildings on a cold approach and reveals each as its own compile lands', () => {
@@ -132,7 +132,7 @@ describe('the Highwatch town view', () => {
       promotedScenery: { authoredTowns: true },
     } as WorldContent);
     const kept = KIT.buildFromSources(fixtureSources(), () => 9, true);
-    expect(kept.group.userData.buildingIds).toHaveLength(6);
+    expect(kept.group.userData.buildingIds).toHaveLength(5);
   });
 
   it('holds every building in the town circle: the smithy past its far corner in thick fog', () => {

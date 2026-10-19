@@ -455,7 +455,6 @@ import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
-import { buildHighwatchTownView, type HighwatchTownView } from './highwatch_town';
 import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { HOARD_BODY_IDS, hoardEntrance } from './hoard_entrance';
@@ -586,6 +585,7 @@ import {
   lowSunIntensity,
   terrainFillBoostTarget,
 } from './outdoor_light_rig_core';
+import { buildPlacedTownViews, type PlacedTownView } from './painted_towns';
 import {
   PALADIN_AEGIS_DOME_RADIUS,
   type PaladinAegisVisual,
@@ -1813,8 +1813,8 @@ export class Renderer {
     this.eastbrookTownView?.setRealmBuilderHonouree(name);
   }
   private fenbridgeTownView!: FenbridgeTownView;
-  /** Every rebuilt town's view (Eastbrook, Fenbridge, Highwatch), one loop. */
-  private townViews: readonly (EastbrookTownView | FenbridgeTownView | HighwatchTownView)[] = [];
+  /** Every rebuilt town's view (Eastbrook, Fenbridge, the placed towns), one loop. */
+  private townViews: readonly (EastbrookTownView | FenbridgeTownView | PlacedTownView)[] = [];
   private hollowGates!: HollowGatesView;
   private lightRank: RankedPointLight[] = [];
   private doomedIds: number[] = [];
@@ -2717,11 +2717,11 @@ export class Renderer {
     // The rebuilt towns are distinct, stable, built-in-only scene subtrees:
     // every building stays an individual camera-fade target, and Eastbrook's
     // and Fenbridge's civic and repeated geometry is initialization-batched
-    // (Highwatch is painted buildings only, placed_town_buildings.ts).
+    // (Highwatch and the painted towns are painted buildings only, painted_towns.ts).
     this.eastbrookTownView = buildEastbrookTownView(this.sim.cfg.seed);
     this.fenbridgeTownView = buildFenbridgeTownView(this.sim.cfg.seed);
-    const highwatch = buildHighwatchTownView(this.sim.cfg.seed);
-    this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, highwatch];
+    const placed = buildPlacedTownViews(this.sim.cfg.seed);
+    this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, ...placed];
     for (const town of this.townViews) {
       setRenderCategory(town.group, 'props');
       this.scene.add(town.group);

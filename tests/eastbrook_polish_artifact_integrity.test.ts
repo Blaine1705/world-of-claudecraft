@@ -1422,7 +1422,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  '40513e6c48fc7d01cfc146a9bdfd5736baf1cd0afd935e6146b894317eae9310';
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  '128772011a087e72efebcb9036b3af0349e6321c87eee86ee598940ac2893a6f';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1466,7 +1468,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  '0b41d509e319b55d9626a4730bb1d57a7db02bbcb430509750bad08b81c949f9';
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  'c77bf1ec90017237bb6fe88f581fe1521aff2f6613d46a5586ed74d20e18b82e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2865,7 +2869,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
-    ).toBe('20ba24191fe4c7168cd66ccb95ab9636cb05664aebd8635647cc854e3bc947ce');
+    ).toBe('e3f6265dacb9bbbb3a826427b247aa2209649a7b83078f7135fdef6c01b697ca');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

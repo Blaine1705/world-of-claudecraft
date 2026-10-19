@@ -14,7 +14,7 @@ import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
 import { PRACTICE_ROW_X } from '../src/sim/content/practice_dummies';
 import { STATIONS } from '../src/sim/content/professions';
 import { ZONE3_NPCS, ZONE3_PROPS, ZONE3_ROADS, ZONE3_ZONE } from '../src/sim/content/zone3';
-import { BUILTIN_WORLD, CAMPS } from '../src/sim/data';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import {
   HIGHWATCH_BUILDINGS_BY_ID,
@@ -22,6 +22,7 @@ import {
   HIGHWATCH_NPC_PLACEMENTS_BY_ID,
   REMOVED_HIGHWATCH_BUILDINGS,
 } from '../src/sim/highwatch_layout';
+import { PAINTED_TOWNS } from '../src/sim/painted_towns';
 import { findPath, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld } from '../src/sim/placed_town_kit';
 import { Sim } from '../src/sim/sim';
@@ -29,11 +30,10 @@ import { roadDistance, terrainHeight, terrainSteepnessAt, waterLevelAt } from '.
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Highwatch, the hold of Thornpeak Heights, rebuilt with five painted
-// Tidehold buildings round the square it always had and the lord's manor on
-// the rise west of the Sanctum road (sim/highwatch_layout.ts). Everything else in the
-// town stays where it stood; this suite pins that the buildings stand clear of
-// all of it, on level ground, off the roads, and that every door, NPC and
-// service is still reachable.
+// Tidehold buildings round the square it always had (sim/highwatch_layout.ts).
+// Everything else in the town stays where it stood; this suite pins that the
+// buildings stand clear of all of it, on level ground, off the roads, and that
+// every door, NPC and service is still reachable.
 
 const SEED = WORLD_SEED;
 const BUILDINGS = HIGHWATCH_LAYOUT.buildings;
@@ -108,7 +108,7 @@ describe('the Highwatch layout', () => {
     });
   });
 
-  it('stands five painted buildings in the Highwatch look, one per role, and the manor', () => {
+  it('stands five painted buildings in the Highwatch look, one per role', () => {
     expect(
       BUILDINGS.map((building) => [building.id, building.assetId, building.kind, building.walkIn]),
     ).toEqual([
@@ -117,7 +117,6 @@ describe('the Highwatch layout', () => {
       ['highwatch_counting_house', '/models/tidehold/highwatch/shop_a.glb', 'house', true],
       ['highwatch_watch_house', '/models/tidehold/highwatch/house_c.glb', 'house', false],
       ['highwatch_smithy', '/models/tidehold/highwatch/smithy.glb', 'house', true],
-      ['highwatch_manor', '/models/tidehold/highwatch/manor.glb', 'house', true],
     ]);
     // stood GRAND: each at the scale that clears a door of about five yards
     // (highwatch_layout.ts), the footing buried and the ground line sunk 0.05
@@ -127,8 +126,6 @@ describe('the Highwatch layout', () => {
       ['highwatch_counting_house', 1.5],
       ['highwatch_watch_house', 1.4],
       ['highwatch_smithy', 1.3],
-      // built at its own grand size (scripts/assets/highwatch_manor/)
-      ['highwatch_manor', 1],
     ]);
     for (const building of BUILDINGS) {
       expect(building.placement.lift, building.id).toBeCloseTo(
@@ -302,30 +299,21 @@ describe('the Highwatch layout', () => {
   it('levels each building on its own pad across its whole reach', () => {
     const edits = BUILTIN_WORLD.terrainEdits ?? [];
     const pads = HIGHWATCH_LAYOUT.pads;
-    // applied last, after every other stamp of the built-in world
-    expect(edits.slice(-pads.length)).toEqual([...pads]);
+    // applied after every other stamp of the built-in world but the painted
+    // towns' (sim/painted_towns/), which follow it on their own ground
+    const after = PAINTED_TOWNS.reduce((count, town) => count + town.pads.length, 0);
+    expect(edits.slice(edits.length - after - pads.length, edits.length - after)).toEqual([
+      ...pads,
+    ]);
     const expected: Record<string, number> = {
       highwatch_summit_inn: 9,
       highwatch_gate_chapel: 8.8,
       highwatch_counting_house: 8.8,
       highwatch_watch_house: 7.6,
       highwatch_smithy: 10.6,
-      highwatch_manor: 12.5,
     };
-    // the crystal cave portal's bench goes back at its own height after the pads, its bank
-    // taking the open corner of the manor's reach behind the chapel (no wall stands there)
-    const bench = pads.find((pad) => pad.x === 10 && pad.z === 770);
-    if (!bench) throw new Error('no portal bench');
-    expect(bench).toMatchObject({ delta: 17.3 });
-    expect(pads.indexOf(bench)).toBe(pads.length - 1);
-    const chapelBack = 746 + 13.2;
     for (const building of BUILDINGS) {
       for (const point of samplesOf(building.reach, 1)) {
-        if (Math.hypot(point.x - bench.x, point.z - bench.z) < bench.radius) {
-          expect(building.id).toBe('highwatch_manor');
-          expect(point.z).toBeGreaterThan(chapelBack);
-          continue;
-        }
         expect(terrainHeight(point.x, point.z, SEED), building.id).toBeCloseTo(
           expected[building.id],
           2,
@@ -460,59 +448,6 @@ describe('Highwatch NPCs, services and traversal', () => {
     for (const destination of destinations) {
       expectPath(`${destination.id}:out`, square, destination.point, 0.6);
       expectPath(`${destination.id}:back`, destination.point, square, 0.6);
-    }
-  });
-});
-
-describe('the Highwatch manor west of the Sanctum road', () => {
-  const manor = HIGHWATCH_BUILDINGS_BY_ID.highwatch_manor;
-  const gate = { x: 31.5, z: 716.2 };
-
-  it('stands clear of the Sanctum road, its lamps, the smithy and the Stormcrag road', () => {
-    const reach = manor.reach;
-    // the Sanctum road's two lamps on this side keep their places
-    for (const [x, z] of [
-      [3.8, 715],
-      [3.8, 767],
-    ]) {
-      expect(distancePointToObb({ x, z }, reach), `lamp ${x}, ${z}`).toBeGreaterThan(1.5);
-      expect(
-        streetlampPlacements(SEED).some((l) => Math.hypot(l.x - x, l.z - z) < 0.01),
-        `lamp ${x}, ${z}`,
-      ).toBe(true);
-    }
-    // the door looks south, over the smithy's terrace at the square
-    expect(manor.rotation).toBe(0);
-    expect(manor.frontStandingPoint.z).toBeLessThan(manor.position.z);
-    const smithy = HIGHWATCH_BUILDINGS_BY_ID.highwatch_smithy;
-    expect(manor.reach.center.z - manor.reach.halfDepth).toBeGreaterThan(
-      smithy.reach.center.z + smithy.reach.halfDepth + 3,
-    );
-  });
-
-  it('walks round the manor on its pad, gate to road side to back to far side and home', () => {
-    const east = { x: 3.2, z: 741 };
-    const north = { x: 31.5, z: 768.5 };
-    const west = { x: 59.5, z: 741 };
-    expectPath('square to the manor gate', { x: 2, z: 664 }, gate, 0.6);
-    expectPath('manor gate to road side', gate, east, 0.6);
-    expectPath('manor road side to back', east, north, 0.6);
-    expectPath('manor back to far side', north, west, 0.6);
-    expectPath('manor far side to gate', west, gate, 0.6);
-  });
-
-  it("leaves every camp's ground as it was: no camp walks within reach of its pad", () => {
-    // A camp's mobs wander up to 9 yd past its radius, and each arrival draws the shared
-    // rng: a pad or an apron under them would change when they arrive, and with it every
-    // seeded roll in the world. The aprons ease the ground out to 14 yd past the reach.
-    const apron = 14;
-    const wander = 9;
-    for (const camp of CAMPS) {
-      if (camp.count === 0) continue;
-      expect(
-        distancePointToObb(camp.center, manor.reach) - camp.radius - wander,
-        `${camp.mobId} at ${camp.center.x}, ${camp.center.z}`,
-      ).toBeGreaterThan(apron + 2);
     }
   });
 });

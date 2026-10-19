@@ -22,6 +22,7 @@ import { BUILTIN_WORLD, PLAYER_START, setActiveWorldContent } from '../src/sim/d
 import { isExcludedDecoration, isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import { EASTBROOK_LAYOUT, localToWorld, type Obb2 } from '../src/sim/eastbrook_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
+import { PAINTED_TOWNS } from '../src/sim/painted_towns';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import {
@@ -752,7 +753,11 @@ describe('the ground under the placed buildings', () => {
     expect([...new Set(pads.map((pad) => pad.delta))].sort((a, b) => a - b)).toEqual([
       -0.9, -0.7, 0.5,
     ]);
-    const edits = BUILTIN_WORLD.terrainEdits ?? [];
+    // the built-in world stands the painted towns' pads after Highwatch's
+    // (sim/painted_towns/); the rebuild map carries none of them
+    const paintedPads = PAINTED_TOWNS.flatMap((town) => town.pads).length;
+    const builtin = BUILTIN_WORLD.terrainEdits ?? [];
+    const edits = builtin.slice(0, builtin.length - paintedPads);
     expect(edits.slice(-pads.length - highwatchPads, -highwatchPads)).toEqual(pads);
     expect(edits.slice(-highwatchPads)).toEqual(HIGHWATCH_LAYOUT.pads);
   });

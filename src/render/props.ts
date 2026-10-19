@@ -50,13 +50,6 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
-import { buildHighwatchManorLane, highwatchManorLanePrewarmPart } from './highwatch_manor_lane';
-import { highwatchManorFlames, highwatchManorLights } from './highwatch_manor_lights';
-import {
-  buildHighwatchManorSmoke,
-  highwatchManorSmokePrewarmPart,
-  type ManorSmokeView,
-} from './highwatch_manor_smoke';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
 import {
   type KitSurfaceFamily,
@@ -81,6 +74,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { occluderFadesDisabled } from './occluder_fade_core';
+import { isPaintedTownRebuildBuilding } from './painted_towns';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
   newPropCullPass,
@@ -1083,8 +1077,6 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     ...wickharborWharfPrewarmParts(),
     ...wickharborHarborPrewarmParts(),
     ...mirefenTavernPrewarmParts(),
-    highwatchManorSmokePrewarmPart(),
-    highwatchManorLanePrewarmPart(),
   ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
@@ -1424,7 +1416,6 @@ export function buildProps(
   // moored transport ships (render/transport_ship.ts): live, idle-animated,
   // their own LODs; ticked from update() below, never merged or ghosted
   const transportShips: TransportShipView[] = [];
-  let manorSmoke: ManorSmokeView | null = null;
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
   const builtInShaped = isBuiltinShapedWorld(activeContent);
@@ -1435,6 +1426,7 @@ export function buildProps(
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
   const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
+  const paintedTowns = activeWorldHasAuthoredTown(isPaintedTownRebuildBuilding);
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
@@ -1594,6 +1586,7 @@ export function buildProps(
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
     if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
+    if (paintedTowns && isPaintedTownRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts, through the
     // same shared helper, so an authored per-building height override cannot
     // leave the hideable top and the camera top disagreeing.
@@ -1770,33 +1763,6 @@ export function buildProps(
     }
   } else {
     clearHarborHouseShell();
-  }
-  // ...and the Highwatch manor's hearth, range and lamps (render/highwatch_manor_lights.ts),
-  // lit like a campfire: root-level, world-positioned, in the fire-light budget
-  if (highwatchTown) {
-    for (const light of highwatchManorLights(seed)) {
-      group.add(light);
-      fireLights.push(light);
-    }
-    // ...its lane from the Sanctum road to the garden gate (paving, not a road record)
-    const lane = buildHighwatchManorLane(seed);
-    group.add(lane);
-    keepFromMerge.add(lane);
-    // ...and its kitchen chimney's smoke (cosmetic: the painter draws none on the low tier)
-    manorSmoke = buildHighwatchManorSmoke(seed);
-    group.add(manorSmoke.mesh);
-    keepFromMerge.add(manorSmoke.mesh);
-    noShadow.add(manorSmoke.mesh);
-    for (const fire of highwatchManorFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
-      group.add(fire.holder);
-      flames.push(fire.flame);
-      keepLiveMeshes.add(fire.flame);
-      noShadow.add(fire.flame);
-      if (fire.core) {
-        keepLiveMeshes.add(fire.core);
-        noShadow.add(fire.core);
-      }
-    }
   }
   // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
   // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
@@ -2763,7 +2729,6 @@ export function buildProps(
       const cullX = lowCull ? eyeX : camX;
       const cullZ = lowCull ? eyeZ : camZ;
       scheduledShips?.sync(dt);
-      manorSmoke?.update(camX, camZ, dt);
       for (let i = 0; i < transportShips.length; i++) {
         transportShips[i].update(
           camX,
@@ -3259,6 +3224,7 @@ export function collectBuildingImpostors(seed: number): {
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
   const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
+  const paintedTowns = activeWorldHasAuthoredTown(isPaintedTownRebuildBuilding);
   const used = new Map<string, PropAsset>();
   const instances: BuildingImpostorInstance[] = [];
   const use = (key: PropKey): PropAsset => {
@@ -3272,6 +3238,7 @@ export function collectBuildingImpostors(seed: number): {
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
     if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
+    if (paintedTowns && isPaintedTownRebuildBuilding(b)) continue;
     const y = terrainHeight(b.x, b.z, seed);
     if (b.kind === 'chapel') {
       const tower = use('bellTower');
