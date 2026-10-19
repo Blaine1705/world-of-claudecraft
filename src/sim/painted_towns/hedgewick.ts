@@ -21,7 +21,7 @@ import { deepFreeze, indexById, levelTownPads, type TownGround } from '../placed
 import { paintedTownBuilding } from './models';
 import type { PaintedTownLayout } from './types';
 
-const LOOK = 'default' as const; // becomes 'thatch' when the thatch bake lands
+const LOOK = 'thatch' as const;
 
 // The models face local -Z (rotation 0 turns the door south, -z; PI north,
 // +z; PI / 2 east, -x: this world's east is -x). The buildings stand at free

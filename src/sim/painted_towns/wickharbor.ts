@@ -23,7 +23,7 @@ import { deepFreeze, indexById, levelTownPads, type TownGround } from '../placed
 import { paintedTownBuilding } from './models';
 import type { PaintedTownLayout } from './types';
 
-const LOOK = 'default' as const; // becomes 'brick' when the brick bake lands
+const LOOK = 'brick' as const;
 
 // The models face local -Z (rotation 0 turns the door south, -z; PI north,
 // +z; PI / 2 east, -x; -PI / 2 west, +x: this world's east is -x).

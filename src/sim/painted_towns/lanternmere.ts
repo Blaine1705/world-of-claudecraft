@@ -14,7 +14,7 @@ import type { PaintedTownLayout } from './types';
 // The thatch look (oldtown colours, thatch roof, rubble walls, hewn beams) is
 // being baked; until it lands the town stands on the default files (same
 // geometry).
-const LOOK = 'default' as const; // becomes 'thatch' when the thatch bake lands
+const LOOK = 'thatch' as const;
 const SOUTH_FACING = 0; // the door looks south (-z)
 const EAST_FACING = Math.PI / 2; // the door looks east (-x)
 const WEST_FACING = -Math.PI / 2; // the door looks west (+x)
