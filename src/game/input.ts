@@ -27,7 +27,8 @@ import {
   shouldEngagePointerLockOnMouseDown,
   shouldReleasePointerLock,
 } from './pointer_lock';
-import { normalizePointerLookDelta } from './pointer_look_delta';
+import { RawPointerLockRequester } from './pointer_lock_request';
+import { LookDeltaGuard, normalizePointerLookDelta } from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
 import { isStaleChromeButton } from './stale_chrome_focus';
 import { wheelCodeForDelta, zoomStepForAction } from './wheel_binds';
@@ -261,6 +262,15 @@ export class Input {
   // Firefox rejects requestPointerLock() when it is deferred to a later
   // mousemove; computed once since the browser cannot change mid-session.
   private readonly needsSyncPointerLockGesture = detectPointerLockNeedsSyncGesture();
+  // Asks for raw (unadjusted) mouse input where the engine can give it, the
+  // main defense against sudden camera jumps on high polling-rate mice; Gecko
+  // stays on the plain synchronous request (see pointer_lock_request.ts).
+  private readonly pointerLockRequester = new RawPointerLockRequester(
+    !this.needsSyncPointerLockGesture,
+  );
+  // Discards the bogus single-event deltas a locked pointer can report: the
+  // first one after the lock engages or releases, and isolated spikes.
+  private readonly lookDeltaGuard = new LookDeltaGuard();
   private downX = 0;
   private downY = 0;
   private downAt = 0;
@@ -371,6 +381,11 @@ export class Input {
         this.releaseCapture('pointerlock');
         return;
       }
+      // The lock just engaged. The browser warps the OS cursor as it lands and
+      // that can surface as one large movement delta; never let it turn the
+      // camera. (Unlock needs no skip: releaseCapture above clears the drag
+      // buttons, so no move reaches the camera until the next fresh press.)
+      this.lookDeltaGuard.skipNextDelta();
       // A fast click can beat the async requestPointerLock() grant: the
       // mousedown-synchronous request above (Firefox) or the drag-threshold
       // request (Chromium) can resolve AFTER mouseup already ran, so nothing
@@ -994,7 +1009,15 @@ export class Input {
     )
       return;
     this.pointerLockRequestedForDrag = true;
-    this.canvas.requestPointerLock?.();
+    this.requestDragPointerLock();
+  }
+
+  private requestDragPointerLock(): void {
+    // When raw input turns out to be unsupported, re-arm the one-request-per-
+    // drag flag so the next move of this same drag asks for a plain lock.
+    this.pointerLockRequester.request(this.canvas, () => {
+      this.pointerLockRequestedForDrag = false;
+    });
   }
 
   private activateCameraDrag(): void {
@@ -1373,6 +1396,9 @@ export class Input {
     // click-pick may start under it (a grab that misses a frame would otherwise
     // spin the camera or retarget). Presses already in flight are unaffected.
     if (this.cb.isCameraLocked?.()) return;
+    // A second button joining a drag already in flight (left+right run-and-steer)
+    // keeps the look guard's recent motion and any pending post-lock skip.
+    if (!this.leftDown && !this.rightDown) this.lookDeltaGuard.reset();
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
     if (e.button === 0 || e.button === 2) e.preventDefault?.();
@@ -1409,7 +1435,7 @@ export class Input {
       })
     ) {
       this.pointerLockRequestedForDrag = true;
-      void this.canvas.requestPointerLock?.()?.catch?.(() => {});
+      this.requestDragPointerLock();
     }
     this.updateCursor();
   }
@@ -1619,16 +1645,21 @@ export class Input {
     // Normalize the raw movement delta to Chromium's physical-pixel unit so
     // mouselook keeps the same speed and drag-start feel on Firefox, where the
     // deltas arrive in CSS pixels (#1834). A no-op on Chromium/WebKit.
-    const { dx: mx, dy: my } = normalizePointerLookDelta({
+    const raw = normalizePointerLookDelta({
       movementX: e.movementX ?? 0,
       movementY: e.movementY ?? 0,
       isGecko: this.isGeckoEngine,
       devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
     });
-    if (mx === 0 && my === 0) {
+    if (raw.dx === 0 && raw.dy === 0) {
       if (this.cameraDragActive) this.maybeEngageDragPointerLock();
       return;
     }
+    // Drops the cursor-warp delta right after the lock lands and isolated
+    // spikes; a suspect it held and the next event confirmed comes back summed.
+    const look = this.lookDeltaGuard.filter(raw.dx, raw.dy, e.timeStamp);
+    if (!look) return;
+    const { dx: mx, dy: my } = look;
     const heldMs = this.pressDurationMs();
     if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)
       return;

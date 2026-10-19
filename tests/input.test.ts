@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
+import { LookDeltaGuard } from '../src/game/pointer_look_delta';
 
 // Pointer-lock tests keep explicit coordinates so the held-lock behavior stays
 // independent from the old edge-only path.
@@ -2398,5 +2399,177 @@ describe('Input camera lock (interface unlock arrange mode)', () => {
     setCameraLocked(true);
     canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault: vi.fn() });
     expect(input.camDist).toBeCloseTo(13.4);
+  });
+});
+
+describe('Input mouse-look jump defenses', () => {
+  // A right-drag past the drag threshold, so the next move rotates the camera.
+  function startDrag(ctx: ReturnType<typeof makeInput>): void {
+    ctx.canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    ctx.windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    ctx.windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(ctx.input.isCameraDragActive()).toBe(true);
+  }
+
+  it('requests the drag lock with raw (unadjusted) movement on Chromium', () => {
+    const ctx = makeInput();
+    startDrag(ctx);
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledWith({ unadjustedMovement: true });
+  });
+
+  it('keeps the synchronous Firefox mousedown request plain', () => {
+    const ctx = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    ctx.canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledWith();
+  });
+
+  it('ignores the first movement after the lock engages, then turns normally', () => {
+    const ctx = makeInput();
+    startDrag(ctx);
+    (globalThis as any).document.pointerLockElement = ctx.canvas;
+    ctx.documentListeners.get('pointerlockchange')!({});
+    const yaw = ctx.input.camYaw;
+
+    // The cursor warp as the lock lands: must not turn the camera.
+    ctx.windowListeners.get('mousemove')!({ movementX: 180, movementY: 0, ...CENTER });
+    expect(ctx.input.camYaw).toBe(yaw);
+
+    ctx.windowListeners.get('mousemove')!({ movementX: 20, movementY: 0, ...CENTER });
+    expect(ctx.input.camYaw).toBeCloseTo(yaw - 20 * 0.0045);
+  });
+
+  it('drops an isolated spike mid-drag instead of snapping the camera', () => {
+    const ctx = makeInput();
+    startDrag(ctx);
+    for (let i = 0; i < 8; i++) {
+      ctx.windowListeners.get('mousemove')!({ movementX: 3, movementY: 0, ...CENTER });
+    }
+    const yaw = ctx.input.camYaw;
+    const pitch = ctx.input.camPitch;
+
+    ctx.windowListeners.get('mousemove')!({ movementX: -1400, movementY: 600, ...CENTER });
+    expect(ctx.input.camYaw).toBe(yaw);
+    expect(ctx.input.camPitch).toBe(pitch);
+
+    ctx.windowListeners.get('mousemove')!({ movementX: 3, movementY: 0, ...CENTER });
+    expect(ctx.input.camYaw).toBeCloseTo(yaw - 3 * 0.0045);
+  });
+
+  it('falls back to a plain lock on the next move when raw input is unsupported', async () => {
+    const ctx = makeInput();
+    ctx.canvas.requestPointerLock.mockImplementation(
+      (options?: { unadjustedMovement?: boolean }) => {
+        if (!options?.unadjustedMovement) return Promise.resolve();
+        const err = new Error('raw input unavailable');
+        err.name = 'NotSupportedError';
+        return Promise.reject(err);
+      },
+    );
+    startDrag(ctx);
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledWith({ unadjustedMovement: true });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    ctx.windowListeners.get('mousemove')!({ movementX: 4, movementY: 0, ...CENTER });
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledTimes(2);
+    expect(ctx.canvas.requestPointerLock).toHaveBeenLastCalledWith();
+  });
+
+  it('a second button joining a drag keeps the look guard state; a fresh press resets it', () => {
+    const reset = vi.spyOn(LookDeltaGuard.prototype, 'reset');
+    const ctx = makeInput();
+    startDrag(ctx);
+    expect(reset).toHaveBeenCalledTimes(1);
+
+    // Left joins the right-drag (run and steer): not a fresh press.
+    ctx.canvasListeners.get('mousedown')!({ button: 0, ...CENTER, preventDefault: vi.fn() });
+    expect(reset).toHaveBeenCalledTimes(1);
+
+    ctx.windowListeners.get('mouseup')!({ button: 0, ...CENTER, target: ctx.canvas });
+    ctx.windowListeners.get('mouseup')!({ button: 2, ...CENTER, target: ctx.canvas });
+    ctx.canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    expect(reset).toHaveBeenCalledTimes(2);
+  });
+
+  it('settles on a plain lock when the raw rejection also fires pointerlockerror', async () => {
+    // Chromium both rejects the promise and dispatches pointerlockerror, and a
+    // mouse move can land between the two.
+    const ctx = makeInput();
+    ctx.canvas.requestPointerLock.mockImplementation(
+      (options?: { unadjustedMovement?: boolean }) => {
+        if (!options?.unadjustedMovement) return Promise.resolve();
+        const err = new Error('raw input unavailable');
+        err.name = 'NotSupportedError';
+        return Promise.reject(err);
+      },
+    );
+    startDrag(ctx);
+    ctx.documentListeners.get('pointerlockerror')!({});
+    ctx.windowListeners.get('mousemove')!({ movementX: 4, movementY: 0, ...CENTER });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    ctx.windowListeners.get('mousemove')!({ movementX: 4, movementY: 0, ...CENTER });
+    expect(ctx.canvas.requestPointerLock).toHaveBeenLastCalledWith();
+    expect(ctx.canvas.requestPointerLock.mock.calls[0]).toEqual([{ unadjustedMovement: true }]);
+    // Raw at the drag start, raw again on the move before the rejection
+    // settled, then the one plain fallback.
+    const calls = ctx.canvas.requestPointerLock.mock.calls.length;
+    expect(calls).toBe(3);
+
+    // Once the plain lock is granted, no further requests go out.
+    (globalThis as any).document.pointerLockElement = ctx.canvas;
+    ctx.documentListeners.get('pointerlockchange')!({});
+    ctx.windowListeners.get('mousemove')!({ movementX: 4, movementY: 0, ...CENTER });
+    ctx.windowListeners.get('mousemove')!({ movementX: 4, movementY: 0, ...CENTER });
+    expect(ctx.canvas.requestPointerLock).toHaveBeenCalledTimes(calls);
+  });
+
+  it('times the guard by the event timestamps, so a hitch-merged move still turns', () => {
+    const ctx = makeInput();
+    startDrag(ctx);
+    let t = 1000;
+    for (let i = 0; i < 8; i++) {
+      ctx.windowListeners.get('mousemove')!({
+        movementX: 30,
+        movementY: 0,
+        timeStamp: (t += 16),
+        ...CENTER,
+      });
+    }
+    const yaw = ctx.input.camYaw;
+    // ~280 px after a 150 ms stall is the usual speed; judged by size alone it
+    // would be over RATIO times the 30 px moves and be dropped.
+    ctx.windowListeners.get('mousemove')!({
+      movementX: 280,
+      movementY: 0,
+      timeStamp: t + 150,
+      ...CENTER,
+    });
+    expect(ctx.input.camYaw).toBeCloseTo(yaw - 280 * 0.0045);
+  });
+
+  it('applies a fast flick from rest one event late, summed, through Input', () => {
+    const ctx = makeInput();
+    startDrag(ctx);
+    for (let i = 0; i < 8; i++) {
+      ctx.windowListeners.get('mousemove')!({ movementX: 3, movementY: 0, ...CENTER });
+    }
+    const yaw = ctx.input.camYaw;
+    ctx.windowListeners.get('mousemove')!({ movementX: 400, movementY: 0, ...CENTER });
+    expect(ctx.input.camYaw).toBe(yaw);
+    ctx.windowListeners.get('mousemove')!({ movementX: 1000, movementY: 0, ...CENTER });
+    expect(ctx.input.camYaw).toBeCloseTo(yaw - 1400 * 0.0045);
+  });
+
+  it('a right press joining a left-drag also keeps the look guard state', () => {
+    const reset = vi.spyOn(LookDeltaGuard.prototype, 'reset');
+    const ctx = makeInput();
+    ctx.canvasListeners.get('mousedown')!({ button: 0, ...CENTER, preventDefault: vi.fn() });
+    expect(reset).toHaveBeenCalledTimes(1);
+    ctx.canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    expect(reset).toHaveBeenCalledTimes(1);
   });
 });
