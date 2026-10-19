@@ -1637,6 +1637,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Sladké vítězství',
   'questUi.worldQuest.matchConfections': 'Spojuj okouzlené cukrovinky',
   'questUi.worldQuest.mineOre': 'Těž měděnou rudu',
+  'questUi.worldQuest.mineMaterial': 'Těž {name}',
   'questUi.worldQuest.practiceRewards':
     'Trénink: hraj znovu bez zisku dalších mincí, zkušeností nebo pověsti.',
   'questUi.worldQuest.puzzleBeamReach': 'Dosažené krystaly: {count}',
@@ -6124,7 +6125,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Děsivý pokřik, který až 5 nepřátel do 8 m obrátí na útěk ve strachu na 4 s. Poškození může efekt zlomit.',
   'entities.abilities.intimidating_shout.name': 'Zastrašující pokřik',
   'entities.abilities.iron_resolve.description':
-    'Zatneš zuby a ignoruješ bolest: spotřebuješ až 40 vzteku (nejméně 20) a za každý spotřebovaný bod vzteku absorbuješ {absorbPerRage} poškození po dobu až 10 s. (Ochrana)',
+    'Zatneš zuby a ignoruješ bolest: štít pohltí poškození ve výši {damage} % tvého maximálního zdraví v okamžiku seslání, po dobu až {duration} s. (Ochrana)',
   'entities.abilities.iron_resolve.name': 'Železné odhodlání',
   'entities.abilities.measured_fury.description':
     'Tvá odměřená zuřivost zostřuje tvé hospodaření: schopnosti tě stojí o 10 % méně vzteku. (Arms)',
@@ -17442,7 +17443,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Po úplném spotřebování tvého Žalmu ochrany je další Očistný hymnus během 10 s okamžitý. Nemůže nastat častěji než jednou za 15 s.',
   'entities.itemSets.emberscreed.name': 'Roucha Vyznání uhlíků',
   'entities.itemSets.forgewall.bonus2':
-    'Železné odhodlání převádí zuřivost na 5 pohlcení za bod místo 4.',
+    'Štít Železného odhodlání pohltí 25 % tvého maximálního zdraví místo 20 %.',
   'entities.itemSets.forgewall.bonus4':
     'Seslání Rozlomení štítu zkrátí zbývající dobu obnovy Železného odhodlání o 2 s.',
   'entities.itemSets.forgewall.name': 'Égida Kovové hradby',
@@ -19696,4 +19697,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Šířka postranního panelu mapy',
   'hudChrome.mapAtlas.resizeRailHint':
     'Tažením změníte šířku postranního panelu mapy. Dvojklikem ji resetujete.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Jednou za tři hodiny se v nepředvídatelnou chvíli celé říši oznámí, že za patnáct minut v jedné ze zón volného boje vyroste kopec. Jeho kruh se vyznačí na otevřeném prostranství. Kopec vydrží čtyřicet pět minut a pak zmizí. Během této doby se každých pět minut oznamuje jeho poloha a skupiny s nejdelším celkovým držením. Skupina s nejvíce hráči v kruhu o kopec usiluje a po celkem třiceti sekundách početní převahy jej získá. Příchod soupeřů pouze pozastaví počítadlo, dokud vaše skupina znovu nezíská převahu; od začátku se počítá jen tehdy, když v kruhu nezůstane žádný živý člen vaší skupiny. Samotný hráč se počítá jako jednočlenná skupina a při založení skupiny si držený kopec ponechá, ale členové raidu se nepočítají vůbec. Každý člen držící skupiny stojící v kruhu získává každou minutu stejně Cti bez ohledu na délku držení. Plná skupina, která kopec nerušeně drží po celou jeho dobu, získá přibližně tolik jako za tři vítězství na bojištích. Když kopec zmizí a skupina s nejdelším celkovým držením jej držela alespoň deset minut, každý, kdo během jejího držení stál v kruhu alespoň minutu a stále je členem této skupiny, získá jedno vítězství do PvP řádku Týdenního trezoru. Lišta nad bojištěm ukazuje držitele, počty hráčů na obou stranách a počítadlo obsazování; /hill v chatu sdělí polohu.',
 };

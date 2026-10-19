@@ -1476,7 +1476,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一聲駭人的怒吼，使 8 公尺內至多 5 名敵人在恐懼中逃竄 4 秒。傷害可能打斷該效果。',
   'entities.abilities.intimidating_shout.name': '破膽怒吼',
   'entities.abilities.iron_resolve.description':
-    '咬緊牙關、無視疼痛：消耗最多 40 點怒氣（至少 20 點），每消耗 1 點怒氣可吸收 {absorbPerRage} 點傷害，持續最多 10 秒。（防護）',
+    '咬緊牙關、無視疼痛：獲得一個護盾，吸收相當於施放時最大生命值 {damage}% 的傷害，持續最多 {duration} 秒。（防護）',
   'entities.abilities.iron_resolve.name': '鋼鐵意志',
   'entities.abilities.measured_fury.description':
     '你節制的怒火磨利了你的資源運用：你的技能消耗的怒氣降低 10%。（武器）',
@@ -4329,6 +4329,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': '進行中的世界任務',
   'questUi.worldQuest.expiresIn': '{time}後結束',
   'questUi.worldQuest.mineOre': '開採銅礦石',
+  'questUi.worldQuest.mineMaterial': '開採{name}',
   'questUi.worldQuest.recoverObject': '回收{name}',
   'questUi.worldQuest.redirectLeyBeam': '引導魔網光束',
   'questUi.worldQuest.puzzleTitle': '魔網光束校準',
@@ -9932,7 +9933,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.emberfury.bonus2': '你的激怒持續 6 秒（原為 4 秒）。',
   'entities.itemSets.emberfury.bonus4': '放血必定使你激怒，其治療量提高至你最大生命值的 8%。',
   'entities.itemSets.forgewall.name': '鍛牆聖盾',
-  'entities.itemSets.forgewall.bonus2': '鋼鐵意志的怒氣轉化提高至每點 5 點吸收（原為 4 點）。',
+  'entities.itemSets.forgewall.bonus2': '鋼鐵意志的護盾吸收量由最大生命值的 20% 提高至 25%。',
   'entities.itemSets.forgewall.bonus4': '每次施放碎盾擊，鋼鐵意志的剩餘冷卻時間縮短 2 秒。',
   'entities.itemSets.dawnforged.name': '曉鑄聖裝',
   'entities.itemSets.dawnforged.bonus2':
@@ -18829,4 +18830,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.natures_boon.specNote_restoration':
     '你的持續治療效果每次跳動有10%機率為孢子爆裂準備它，最多每10秒一次。',
   'entities.items.pvp_skull_bag.name': '顱骨袋',
+  'guide.worldPvpPage.hillBodyFlat':
+    '每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。期間每五分鐘，全伺服器都會收到它的位置以及各隊伍佔據總時長的排名。圈內站著玩家最多的隊伍爭奪山丘，累計保持人數優勢三十秒後便能佔據它。敵方隊伍進入只會暫停計時，直到你方再次領先；只有你方在圈內沒有任何存活成員時，計時才會重置。單獨一人算作一支一人隊伍，組建隊伍時仍能保有已佔據的山丘，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得同樣數量的榮譽，無論已經佔據了多久；滿員隊伍在山丘屹立全程不受爭奪地佔據它，所獲榮譽約相當於三場戰場勝利。山丘消失時，若佔據總時長最長的隊伍累計佔據至少十分鐘，該隊伍中在佔據期間曾在圈內站滿至少一分鐘、且結束時仍留在隊伍的每名玩家，都會為每週寶庫的 PvP 進度獲得一場勝利。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。',
 };

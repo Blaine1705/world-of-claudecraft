@@ -6178,7 +6178,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un grito aterrador que hace huir de miedo a hasta 5 enemigos en 8 m durante 4 s. El daño puede romper el efecto.',
   'entities.abilities.intimidating_shout.name': 'Grito Intimidante',
   'entities.abilities.iron_resolve.description':
-    'Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber {absorbPerRage} de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)',
+    'Aprietas los dientes e ignoras el dolor: un escudo absorbe daño equivalente al {damage}% de tu salud máxima al lanzarlo, durante un máximo de {duration} s. (Protección)',
   'entities.abilities.iron_resolve.name': 'Temple de Hierro',
   'entities.abilities.measured_fury.description':
     'Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)',
@@ -8810,6 +8810,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': 'Misión de mundo activa',
   'questUi.worldQuest.expiresIn': 'Caduca en {time}',
   'questUi.worldQuest.mineOre': 'Extrae mineral de cobre',
+  'questUi.worldQuest.mineMaterial': 'Extrae {name}',
   'questUi.worldQuest.recoverObject': 'Recupera {name}',
   'questUi.worldQuest.redirectLeyBeam': 'Redirige el rayo ley',
   'questUi.worldQuest.puzzleTitle': 'Alineación del rayo ley',
@@ -17756,7 +17757,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cuando tu Salmo de Protección se consume por completo, tu próximo Himno de Purga en 10 s es instantáneo. No puede ocurrir más de una vez cada 15 s.',
   'entities.itemSets.emberscreed.name': 'Vestimentas del Credo de Brasas',
   'entities.itemSets.forgewall.bonus2':
-    'Determinación de Hierro convierte la furia en 5 de absorción por punto en lugar de 4.',
+    'El escudo de Determinación de Hierro absorbe el 25% de tu salud máxima en lugar del 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Lanzar Rompeescudos reduce 2 s el tiempo de reutilización restante de Determinación de Hierro.',
   'entities.itemSets.forgewall.name': 'Égida de la Muralla de la Forja',
@@ -20219,4 +20220,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.mapAtlas.resizeRailAria': 'Ancho de la barra lateral del mapa',
   'hudChrome.mapAtlas.resizeRailHint':
     'Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Una vez cada tres horas, en un momento impredecible, se anuncia a todo el reino que dentro de quince minutos aparecerá una colina en una de las zonas de combate libre, y se marca su círculo en terreno abierto. Permanece cuarenta y cinco minutos y luego desaparece. Mientras permanece, cada cinco minutos se anuncian su ubicación y los grupos que la han controlado durante más tiempo en total. El grupo con más jugadores dentro del círculo disputa la colina y la captura tras acumular treinta segundos de superioridad numérica. La entrada de un grupo rival solo pausa el contador hasta que el tuyo vuelva a liderar; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solo cuenta como un grupo de uno y conserva la colina al formar un grupo, pero los miembros de banda no cuentan. Cada integrante del grupo que controla la colina y está dentro recibe la misma cantidad de Honor por minuto, sin importar cuánto lleve controlándola. Un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que por tres victorias en campos de batalla. Cuando desaparece, si el grupo con el mayor tiempo total de control acumuló al menos diez minutos, todos los que estuvieron dentro durante al menos un minuto mientras ese grupo la controlaba y siguen en él reciben una victoria para la fila de JcJ de la Bóveda Semanal. Una barra sobre el terreno muestra quién la controla, los jugadores de ambos bandos y el contador de captura; /hill en el chat indica dónde está.',
 };

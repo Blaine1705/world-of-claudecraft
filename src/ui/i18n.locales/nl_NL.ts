@@ -1661,6 +1661,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Zoete overwinning',
   'questUi.worldQuest.matchConfections': 'Combineer betoverde snoepjes',
   'questUi.worldQuest.mineOre': 'Mijnen koperhout',
+  'questUi.worldQuest.mineMaterial': 'Delf {name}',
   'questUi.worldQuest.practiceRewards':
     'Oefening: speel opnieuw zonder meer munten, ervaring of reputatie te verdienen.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristallen bereikt: {count}',
@@ -6341,7 +6342,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een angstaanjagende schreeuw die tot 5 vijanden binnen 8 m 4 sec lang in angst doet vluchten. Schade kan het effect breken.',
   'entities.abilities.intimidating_shout.name': 'Intimiderende Schreeuw',
   'entities.abilities.iron_resolve.description':
-    'Bijt op je tanden en negeer de pijn: verbruikt maximaal 40 woede (minimaal 20) om {absorbPerRage} schade per verbruikt woedepunt te absorberen, tot 10 sec. lang. (Protectie)',
+    'Bijt op je tanden en negeer de pijn: een schild absorbeert schade gelijk aan {damage}% van je maximale gezondheid bij gebruik, tot {duration} sec. lang. (Protectie)',
   'entities.abilities.iron_resolve.name': 'IJzeren Vastberadenheid',
   'entities.abilities.measured_fury.description':
     'Je beheerste woede scherpt je zuinigheid aan: je vaardigheden kosten 10% minder woede. (Wapens)',
@@ -17749,7 +17750,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Wanneer je Psalm of Warding volledig is verbruikt, is je volgende Scouring Hymn binnen 10 sec. onmiddellijk. Kan niet vaker dan eens per 15 sec. optreden.',
   'entities.itemSets.emberscreed.name': 'Gewaden van de Beloofde Sintels',
   'entities.itemSets.forgewall.bonus2':
-    'Iron Resolve zet woede om in 5 absorptie per punt in plaats van 4.',
+    'Het schild van Iron Resolve absorbeert 25% van je maximale gezondheid in plaats van 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Het uitspreken van Schildbreuk verkort de resterende afkoelperiode van IJzeren Vastberadenheid met 2 sec.',
   'entities.itemSets.forgewall.name': 'Smederijmuur-Aegis',
@@ -20041,4 +20042,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Breedte van kaartzijbalk',
   'hudChrome.mapAtlas.resizeRailHint':
     'Sleep om de kaartzijbalk te vergroten of te verkleinen. Dubbelklik om te resetten.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Eens per drie uur krijgt het hele rijk op een onvoorspelbaar moment te horen dat er over vijftien minuten een heuvel verschijnt in een van de vrije gevechtszones. De cirkel wordt op open terrein gemarkeerd. De heuvel blijft vijfenveertig minuten staan en verdwijnt dan. Ondertussen worden elke vijf minuten de locatie en de groepen met de langste totale bezettingstijd bekendgemaakt. De groep met de meeste spelers in de cirkel betwist de heuvel en verovert hem na in totaal dertig seconden numeriek overwicht. Een rivaliserende groep pauzeert de teller alleen totdat jouw groep weer voorstaat; de teller begint pas opnieuw als er geen levend lid van jouw groep meer binnen staat. Een solospeler telt als een groep van één en behoudt een bezette heuvel bij het vormen van een groep, maar raidleden tellen helemaal niet mee. Elk lid van de bezettende groep dat binnen staat, krijgt elke minuut evenveel Eer, ongeacht hoe lang de groep de heuvel al bezet. Een volle groep die hem de hele duur ongestoord bezet, verdient ongeveer evenveel als met drie slagveldoverwinningen. Als de heuvel verdwijnt en de groep met de langste totale bezettingstijd minstens tien minuten heeft bezet, krijgt iedereen die tijdens die bezetting minstens één minuut binnen stond en nog in die groep zit één overwinning voor de PvP-rij van de Wekelijkse Kluis. Een balk boven het veld toont de bezetter, de aantallen van beide kanten en de veroveringsteller; /hill in de chat geeft de locatie aan.',
 };

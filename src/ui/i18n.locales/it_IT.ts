@@ -1695,6 +1695,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Dolce vittoria',
   'questUi.worldQuest.matchConfections': 'Abbina i dolciumi incantati',
   'questUi.worldQuest.mineOre': 'Estrai minerale di rame',
+  'questUi.worldQuest.mineMaterial': 'Estrai {name}',
   'questUi.worldQuest.practiceRewards':
     'Prova: gioca di nuovo senza guadagnare altre monete, esperienza o reputazione.',
   'questUi.worldQuest.puzzleBeamReach': 'Cristalli raggiunti: {count}',
@@ -6362,7 +6363,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Un urlo terrificante che fa fuggire per la paura fino a 5 nemici entro 8 m per 4 sec. Il danno può spezzare l'effetto.",
   'entities.abilities.intimidating_shout.name': 'Urlo Intimidatorio',
   'entities.abilities.iron_resolve.description':
-    'Stringi i denti e ignora il dolore: consuma fino a 40 rabbia (minimo 20) per assorbire {absorbPerRage} danni per ogni punto di rabbia speso, per un massimo di 10 s. (Protezione)',
+    'Stringi i denti e ignora il dolore: uno scudo assorbe danni pari al {damage}% della tua salute massima al momento del lancio, per un massimo di {duration} s. (Protezione)',
   'entities.abilities.iron_resolve.name': 'Fermezza di Ferro',
   'entities.abilities.measured_fury.description':
     'La tua furia misurata affina la tua economia: le tue abilità costano il 10% di rabbia in meno. (Armi)',
@@ -18497,7 +18498,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Quando il tuo Salmo della Protezione è consumato del tutto, il prossimo Inno Purificatore entro 10 s è istantaneo. Non può accadere più di una volta ogni 15 s.',
   'entities.itemSets.emberscreed.name': 'Vesti del Credo delle Braci',
   'entities.itemSets.forgewall.bonus2':
-    'Risolutezza Ferrea converte la rabbia in 5 assorbimento per punto invece di 4.',
+    'Lo scudo di Risolutezza Ferrea assorbe il 25% della tua salute massima invece del 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Lanciare Spacca-scudo riduce di 2 s il tempo di recupero rimanente di Risolutezza Ferrea.',
   'entities.itemSets.forgewall.name': 'Egida della Muraglia della Forgia',
@@ -20195,4 +20196,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Larghezza della barra laterale della mappa',
   'hudChrome.mapAtlas.resizeRailHint':
     'Trascina per ridimensionare la barra laterale della mappa. Fai doppio clic per reimpostare.',
+  'guide.worldPvpPage.hillBodyFlat':
+    "Ogni tre ore, in un momento imprevedibile, tutto il reame viene avvisato che tra quindici minuti apparirà una collina in una delle zone di combattimento libero, e il suo cerchio viene segnato su terreno aperto. Rimane per quarantacinque minuti, poi scompare. Nel frattempo, ogni cinque minuti vengono annunciate la posizione e le classifiche dei gruppi con il maggior tempo totale di controllo. Il gruppo con più giocatori nel cerchio contende la collina e la conquista dopo trenta secondi complessivi di superiorità numerica. L'arrivo di un gruppo rivale mette solo in pausa il conteggio finché il tuo gruppo non torna in vantaggio; il conteggio riparte da zero solo se nel cerchio non resta alcun membro vivo del tuo gruppo. Un giocatore solo conta come un gruppo di una persona e conserva la collina quando forma un gruppo, ma i membri delle incursioni non contano affatto. Ogni membro del gruppo che controlla la collina e si trova nel cerchio riceve la stessa quantità di Onore ogni minuto, indipendentemente dalla durata del controllo. Un gruppo completo che la tiene indisturbato per tutta la sua durata guadagna circa quanto tre vittorie nei campi di battaglia. Quando scompare, se il gruppo con il maggior controllo totale ha accumulato almeno dieci minuti, chiunque sia rimasto nel cerchio almeno un minuto durante il controllo di quel gruppo e ne faccia ancora parte ottiene una vittoria per la riga PvP del Forziere Settimanale. Una barra sopra il campo mostra chi la controlla, i giocatori dei due schieramenti e il conteggio di conquista; /hill in chat indica dove si trova.",
 };

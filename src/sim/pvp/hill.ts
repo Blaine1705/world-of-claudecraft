@@ -28,9 +28,8 @@
 // disbands around its last member: reconcileHolder, carryProgress), so
 // grouping up never costs the hill. Every holder standing inside
 // banks a second of presence per pass, and each HILL_ACCRUAL_SECONDS pays
-// hillHonorPerPayout Honor, which ramps with how long the holding party has
-// held (hill_rules.ts). A holder who steps out keeps what they banked; a
-// capture clears the books and restarts the ramp.
+// a flat HILL_HONOR_PER_PAYOUT Honor (hill_rules.ts). A holder who steps out
+// keeps what they banked; a capture clears the books.
 //
 // State lives on the Sim as ONE live view (`ctx.hillState`), never in this
 // module: the modules hold functions, the Sim holds state (src/sim/CLAUDE.md).
@@ -63,6 +62,7 @@ import {
   HILL_CAPTURE_SECONDS,
   HILL_DURATION_SECONDS,
   HILL_EDGE_MARGIN,
+  HILL_HONOR_PER_PAYOUT,
   HILL_HUB_MARGIN,
   HILL_LATEST_WARN_OFFSET_SECONDS,
   HILL_NOTICE_SECONDS,
@@ -76,7 +76,6 @@ import {
   hillChallengeStands,
   hillContains,
   hillGroupKey,
-  hillHonorPerPayout,
   hillLeader,
   hillMinutesUntil,
   hillProgressStep,
@@ -120,9 +119,6 @@ export interface ActiveHill extends HillTimes {
   insideKeys: Map<number, string>;
   /** pid -> seconds of paid presence banked toward the next payout. */
   accrual: Map<number, number>;
-  /** Seconds the current holder has held the hill: the ramp's clock. Reset to
-   *  zero whenever the hill changes hands. */
-  heldSeconds: number;
   /** Honor paid out by this hill so far (the readout and the tests). */
   honorPaid: number;
   /** group key -> that group's total hold this stand (hill_ranking.ts),
@@ -316,7 +312,6 @@ export function spawnHill(
     counts: new Map(),
     insideKeys: new Map(),
     accrual: new Map(),
-    heldSeconds: 0,
     honorPaid: 0,
     holds: new Map(),
     nextNoticeAt: times.risesAt + HILL_NOTICE_SECONDS,
@@ -551,7 +546,7 @@ function standingGroups(previous: ReadonlyMap<number, string>): Set<string> {
  *  friend lost it to their own new party). While any roster member still
  *  counts under the holder key nothing moves; once none does, the hold moves
  *  to hillSuccessorKey's pick among the groups that did not already stand
- *  inside (standingGroups), keeping the ramp and every bank (the members now
+ *  inside (standingGroups), keeping every bank (the members now
  *  match the holder key, so payHolders keeps their accrual). A holder who
  *  joins a rival party inside leaves the hold behind, held by nobody present,
  *  so any group beats it. Then the
@@ -638,7 +633,6 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
     if (key === challenger) hill.holderRoster.add(pid);
   }
   hill.accrual.clear();
-  hill.heldSeconds = 0;
   if (!hill.holds.has(challenger)) {
     hill.holds.set(challenger, {
       key: challenger,
@@ -655,16 +649,14 @@ function updateContest(ctx: SimContext, hill: ActiveHill, dt: number): void {
 }
 
 /** The trickle: every holder inside banks this pass, and a full minute pays
- *  one Honor. Only counted players are inside the books, so the raid rule
+ *  HILL_HONOR_PER_PAYOUT. Only counted players are inside the books, so the raid rule
  *  holds here too, and a party's size is the payee cap. A
  *  holder who steps out keeps their bank; one who leaves the party, or the
  *  realm, loses it. */
 function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
   const holder = hill.holder;
   if (holder === null) return;
-  hill.heldSeconds += dt;
   recordHold(ctx, hill, holder, dt);
-  const amount = hillHonorPerPayout(hill.heldSeconds);
   for (const pid of hill.accrual.keys()) {
     if (!ctx.players.has(pid) || hillGroupKey(pid, ctx.partyOf(pid)) !== holder) {
       hill.accrual.delete(pid);
@@ -680,7 +672,7 @@ function payHolders(ctx: SimContext, hill: ActiveHill, dt: number): void {
       continue;
     }
     hill.accrual.set(pid, banked - HILL_ACCRUAL_SECONDS);
-    hill.honorPaid += grantHonor(ctx, meta, amount, 'hill_hold');
+    hill.honorPaid += grantHonor(ctx, meta, HILL_HONOR_PER_PAYOUT, 'hill_hold');
   }
 }
 

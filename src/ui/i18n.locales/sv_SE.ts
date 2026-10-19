@@ -1640,6 +1640,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Söt seger',
   'questUi.worldQuest.matchConfections': 'Matcha förtrollad godis',
   'questUi.worldQuest.mineOre': 'Bryta kopparmalm',
+  'questUi.worldQuest.mineMaterial': 'Bryt {name}',
   'questUi.worldQuest.practiceRewards':
     'Träning: spela igen utan att tjäna mer mynt, erfarenhet eller rykte.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristaller nådd: {count}',
@@ -6160,7 +6161,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett skräckinjagande rop som får upp till 5 fiender inom 8 m att fly i skräck i 4 sek. Skada kan bryta effekten.',
   'entities.abilities.intimidating_shout.name': 'Skräckinjagande rop',
   'entities.abilities.iron_resolve.description':
-    'Bit ihop och ignorera smärtan: förbrukar upp till 40 raseri (minst 20) för att absorbera {absorbPerRage} skada per förbrukad raseripoäng i upp till 10 sek. (Beskydd)',
+    'Bit ihop och ignorera smärtan: en sköld absorberar skada motsvarande {damage}% av din maximala hälsa vid användning, i upp till {duration} sek. (Beskydd)',
   'entities.abilities.iron_resolve.name': 'Järnvilja',
   'entities.abilities.measured_fury.description':
     'Ditt avmätta raseri skärper din hushållning: dina förmågor kostar 10 % mindre raseri. (Vapen)',
@@ -17593,7 +17594,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'När din skyddande psalm är helt förbrukad blir din nästa Skurgärningshymn inom 10 sek omedelbar. Kan inte inträffa mer än en gång var 15:e sek.',
   'entities.itemSets.emberscreed.name': 'Glödernas trosklädnad',
   'entities.itemSets.forgewall.bonus2':
-    'Järnvilja omvandlar vrede till 5 absorption per poäng i stället för 4.',
+    'Järnviljas sköld absorberar 25% av din maximala hälsa i stället för 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Att kasta Sköldspricka minskar Järnviljas återstående väntetid med 2 sek.',
   'entities.itemSets.forgewall.name': 'Smedjemurens aegis',
@@ -19796,4 +19797,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Kartans sidopanelsbredd',
   'hudChrome.mapAtlas.resizeRailHint':
     'Dra för att ändra storlek på kartans sidopanel. Dubbelklicka för att återställa.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'En gång var tredje timme får hela riket vid en oförutsägbar tidpunkt veta att en kulle dyker upp i en zon med fri strid om femton minuter. Dess cirkel markeras på öppen mark. Kullen står kvar i fyrtiofem minuter och försvinner sedan. Under tiden meddelas dess plats och grupperna med längst sammanlagd innehavstid var femte minut. Gruppen med flest spelare i cirkeln utmanar om kullen och tar den efter sammanlagt trettio sekunders numerärt övertag. En rivaliserande grupp pausar bara räknaren tills din grupp leder igen; den börjar om först när ingen levande medlem av din grupp finns kvar där inne. En ensam spelare räknas som en grupp på en person och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Varje medlem i gruppen som håller kullen och står i cirkeln får lika mycket Ära varje minut, oavsett hur länge gruppen hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar ungefär lika mycket som för tre segrar på slagfält. När kullen försvinner får alla som stått i cirkeln minst en minut under den ledande gruppens innehav och fortfarande tillhör gruppen en seger till PvP-raden i det veckovisa valvet, om gruppen med längst sammanlagd innehavstid hållit den i minst tio minuter. En stapel över fältet visar vem som håller den, antalet spelare på båda sidor och erövringsräknaren; /hill i chatten visar platsen.',
 };

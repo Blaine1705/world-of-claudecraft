@@ -1476,7 +1476,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一声骇人的怒吼，使 8 米内至多 5 名敌人在恐惧中逃窜 4 秒。伤害可能打断该效果。',
   'entities.abilities.intimidating_shout.name': '破胆怒吼',
   'entities.abilities.iron_resolve.description':
-    '咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 {absorbPerRage} 点伤害，持续最多 10 秒。（防护）',
+    '咬紧牙关、无视疼痛：获得一个护盾，吸收相当于施放时最大生命值 {damage}% 的伤害，持续最多 {duration} 秒。（防护）',
   'entities.abilities.iron_resolve.name': '钢铁意志',
   'entities.abilities.measured_fury.description':
     '你收放自如的怒火让消耗更精打细算：你的技能怒气消耗降低 10%。（武器）',
@@ -4327,6 +4327,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': '进行中的世界任务',
   'questUi.worldQuest.expiresIn': '{time}后结束',
   'questUi.worldQuest.mineOre': '开采铜矿石',
+  'questUi.worldQuest.mineMaterial': '开采{name}',
   'questUi.worldQuest.recoverObject': '回收{name}',
   'questUi.worldQuest.redirectLeyBeam': '引导魔网光束',
   'questUi.worldQuest.puzzleTitle': '魔网光束校准',
@@ -9931,7 +9932,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.emberfury.bonus2': '你的激怒持续 6 秒（原为 4 秒）。',
   'entities.itemSets.emberfury.bonus4': '放血必定使你激怒，其治疗量提高至你最大生命值的 8%。',
   'entities.itemSets.forgewall.name': '锻墙圣盾',
-  'entities.itemSets.forgewall.bonus2': '钢铁意志的怒气转化提高至每点 5 点吸收（原为 4 点）。',
+  'entities.itemSets.forgewall.bonus2': '钢铁意志的护盾吸收量由最大生命值的 20% 提高至 25%。',
   'entities.itemSets.forgewall.bonus4': '每次施放碎盾击，钢铁意志的剩余冷却时间缩短 2 秒。',
   'entities.itemSets.dawnforged.name': '晓铸圣装',
   'entities.itemSets.dawnforged.bonus2':
@@ -18812,4 +18813,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.natures_boon.specNote_restoration':
     '你的持续治疗效果每次跳动有10%几率为孢子爆裂准备它，最多每10秒一次。',
   'entities.items.pvp_skull_bag.name': '颅骨袋',
+  'guide.worldPvpPage.hillBodyFlat':
+    '每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。期间每五分钟，全领域都会收到它的位置以及各队伍占据总时长的排名。圈内站着玩家最多的小队争夺山丘，累计保持人数优势三十秒后便能占据它。敌方小队进入只会暂停计时，直到你方再次领先；只有你方在圈内没有任何存活成员时，计时才会重置。单独一人算作一支一人小队，组建小队时仍能保有已占据的山丘，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得同样数量的荣誉，无论已经占据了多久；满员小队在山丘屹立全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘消失时，若占据总时长最长的小队累计占据至少十分钟，该小队中在占据期间曾在圈内站满至少一分钟、且结束时仍留在小队的每名玩家，都会为每周宝库的 PvP 进度获得一场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。',
 };

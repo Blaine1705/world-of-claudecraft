@@ -1526,7 +1526,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '8ヤード以内の敵最大5体を4秒間、恐怖で逃げ惑わせる恐ろしい叫び。ダメージで効果が解けることがあります。',
   'entities.abilities.intimidating_shout.name': '威圧の雄叫び',
   'entities.abilities.iron_resolve.description':
-    '歯を食いしばって痛みを堪え、最大40の怒り（最低20）を消費し、消費した怒り1につき{absorbPerRage}のダメージを吸収します。最大10秒間持続します。（防御）',
+    '歯を食いしばって痛みを堪え、発動時の最大体力の{damage}%に相当するダメージを吸収するシールドを得ます。最大{duration}秒間持続します。（防御）',
   'entities.abilities.iron_resolve.name': '鉄の決意',
   'entities.abilities.measured_fury.description':
     '制御された怒りが効率を高め、アビリティの怒りコストが10%減少します。（武器）',
@@ -4515,6 +4515,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': '進行中のワールドクエスト',
   'questUi.worldQuest.expiresIn': '終了まで{time}',
   'questUi.worldQuest.mineOre': '銅鉱石を採掘',
+  'questUi.worldQuest.mineMaterial': '{name}を採掘',
   'questUi.worldQuest.recoverObject': '{name}を回収',
   'questUi.worldQuest.redirectLeyBeam': 'レイビームを目的地へ導く',
   'questUi.worldQuest.puzzleTitle': 'レイビームの調整',
@@ -10346,7 +10347,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '瀉血が必ずあなたを激昂させ、その回復量が最大体力の8%に上昇します。',
   'entities.itemSets.forgewall.name': 'フォージウォールの守り',
   'entities.itemSets.forgewall.bonus2':
-    '鉄の決意の怒りの変換が、1ポイントにつき4から5の吸収に上昇します。',
+    '鉄の決意のシールドが吸収する量が、最大体力の20%から25%に上昇します。',
   'entities.itemSets.forgewall.bonus4':
     '盾砕きを発動するたびに、鉄の決意の残りクールダウンが2秒短縮されます。',
   'entities.itemSets.dawnforged.name': 'ドーンフォージの祭服',
@@ -19793,4 +19794,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.natures_boon.specNote_restoration':
     'あなたの継続回復効果の各ティックが10%の確率で胞子バーストに準備します。10秒に1回まで。',
   'entities.items.pvp_skull_bag.name': '頭蓋袋',
+  'guide.worldPvpPage.hillBodyFlat':
+    '三時間ごとに、予測できないタイミングでレルム全体に告知が届きます。十五分後、無差別戦闘地帯のどこかに丘が出現し、その範囲となる円が開けた地面に示されます。丘は出現から四十五分間続いて消え、その間は五分ごとに場所と各グループの累計占領時間の順位が告知されます。円内に立つ人数が最も多いパーティーが丘を争い、人数優勢の状態を合計三十秒保つと占領できます。敵のパーティーが入っても、自分たちが再び優勢になるまで計時が一時停止するだけです。円内に味方の生存者が一人もいなくなったときだけ、計時が最初からになります。一人でも一人パーティーとして数えられ、占領中にパーティーを組んでも丘を失いませんが、レイドのメンバーは一切数えられません。占領しているパーティーの各メンバーは、円内に立っていると毎分同じ量の名誉を得られます。占領時間が長くなっても報酬は変わらず、満員のパーティーが妨害されずに最初から最後まで占領すれば、戦場で三勝するのとほぼ同じ名誉を得られます。丘が消えるとき、累計占領時間が最も長いグループが合計十分以上占領していれば、そのグループの占領中に円内で合計一分以上過ごし、終了時にも同じグループにいる全員に、週間宝物庫の PvP 枠への一勝が与えられます。戦場上部のバーに占領者、両陣営の人数、争奪の計時が表示され、チャットで /hill と入力すると丘の場所がわかります。',
 };

@@ -1662,6 +1662,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Kemenangan manis',
   'questUi.worldQuest.matchConfections': 'Cocokkan permen yang dipesona',
   'questUi.worldQuest.mineOre': 'Tambang bijih tembaga',
+  'questUi.worldQuest.mineMaterial': 'Tambang {name}',
   'questUi.worldQuest.practiceRewards':
     'Praktik: mainkan lagi tanpa menghasilkan lebih banyak koin, pengalaman atau reputasi.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristal tercapai: {count}',
@@ -6178,7 +6179,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Teriakan menakutkan yang membuat hingga 5 musuh dalam 8 m lari ketakutan selama 4 dtk. Kerusakan bisa mematahkan efeknya.',
   'entities.abilities.intimidating_shout.name': 'Teriakan Menggentarkan',
   'entities.abilities.iron_resolve.description':
-    'Kertakkan gigi dan abaikan rasa sakit: menghabiskan hingga 40 amarah (minimal 20) untuk menyerap {absorbPerRage} kerusakan per amarah yang dihabiskan, bertahan hingga 10 detik. (Perlindungan)',
+    'Kertakkan gigi dan abaikan rasa sakit: sebuah perisai menyerap kerusakan sebesar {damage}% dari nyawa maksimummu saat digunakan, bertahan hingga {duration} detik. (Perlindungan)',
   'entities.abilities.iron_resolve.name': 'Tekad Besi',
   'entities.abilities.measured_fury.description':
     'Amarah terukurmu mempertajam penghematanmu: kemampuanmu membutuhkan 10% lebih sedikit amarah. (Arms)',
@@ -17813,7 +17814,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Saat Mazmur Penjagaan Anda habis sepenuhnya, Nyanyian Pengikisan berikutnya dalam 10 detik bersifat instan. Tidak dapat terjadi lebih dari sekali tiap 15 detik.',
   'entities.itemSets.emberscreed.name': 'Busana Kredo Bara',
   'entities.itemSets.forgewall.bonus2':
-    'Tekad Besi mengubah amarah menjadi 5 serapan per poin, bukan 4.',
+    'Perisai Tekad Besi menyerap 25% dari nyawa maksimummu, bukan 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Merapal Retak Perisai mengurangi waktu pulih Tekad Besi yang tersisa sebesar 2 detik.',
   'entities.itemSets.forgewall.name': 'Aegis Tembok Tungku',
@@ -20024,4 +20025,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Lebar bilah sisi peta',
   'hudChrome.mapAtlas.resizeRailHint':
     'Seret untuk mengubah ukuran bilah sisi peta. Klik dua kali untuk mengatur ulang.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Sekali setiap tiga jam, pada waktu yang tidak dapat diprediksi, seluruh realm diberi tahu bahwa sebuah bukit akan muncul di salah satu zona pertempuran bebas dalam lima belas menit, dan lingkarannya ditandai di tanah terbuka. Bukit bertahan selama empat puluh lima menit, lalu menghilang. Selama itu, setiap lima menit lokasi dan kelompok dengan total waktu penguasaan terlama diumumkan. Kelompok dengan pemain terbanyak di dalam lingkaran memperebutkan bukit dan merebutnya setelah mengumpulkan tiga puluh detik keunggulan jumlah. Kedatangan kelompok lawan hanya menjeda hitungan sampai kelompokmu kembali unggul; hitungan hanya diulang dari awal jika tidak ada anggota kelompokmu yang masih hidup di dalam. Pemain sendirian dihitung sebagai kelompok beranggotakan satu orang dan tetap menguasai bukit saat membentuk kelompok, tetapi anggota raid tidak dihitung sama sekali. Setiap anggota kelompok penguasa yang berdiri di dalam mendapat jumlah Kehormatan yang sama setiap menit, berapa pun lamanya mereka menguasai bukit. Kelompok penuh yang menguasainya tanpa gangguan selama seluruh masa bukit mendapat kira-kira setara tiga kemenangan medan perang. Saat bukit menghilang, jika kelompok dengan total penguasaan terlama telah menguasainya setidaknya sepuluh menit, semua pemain yang berdiri di dalam setidaknya satu menit selama penguasaan kelompok itu dan masih tergabung di dalamnya mendapat satu kemenangan untuk baris PvP Gudang Mingguan. Bilah di atas medan menunjukkan penguasa, jumlah pemain kedua pihak, dan hitungan perebutan; /hill di obrolan menunjukkan lokasinya.',
 };

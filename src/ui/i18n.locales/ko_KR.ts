@@ -1520,7 +1520,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '8미터 안의 적 최대 5명을 4초 동안 공포에 질려 달아나게 하는 무시무시한 외침. 피해를 입으면 효과가 풀릴 수 있습니다.',
   'entities.abilities.intimidating_shout.name': '위협의 외침',
   'entities.abilities.iron_resolve.description':
-    '이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 {absorbPerRage}의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)',
+    '이를 악물고 고통을 무시합니다. 시전 시 최대 생명력의 {damage}%에 해당하는 피해를 흡수하는 보호막을 얻으며, 최대 {duration}초 동안 지속됩니다. (방어 특성)',
   'entities.abilities.iron_resolve.name': '강철 의지',
   'entities.abilities.measured_fury.description':
     '절제된 분노가 자원 운용을 다듬어 기술의 분노 소모가 10% 감소합니다. (무기 특성)',
@@ -4482,6 +4482,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': '진행 중인 전역 퀘스트',
   'questUi.worldQuest.expiresIn': '{time} 후 종료',
   'questUi.worldQuest.mineOre': '구리 광석 채굴',
+  'questUi.worldQuest.mineMaterial': '{name} 채굴',
   'questUi.worldQuest.recoverObject': '{name} 회수',
   'questUi.worldQuest.redirectLeyBeam': '지맥 광선의 방향을 바꾸기',
   'questUi.worldQuest.puzzleTitle': '지맥 광선 정렬',
@@ -10333,7 +10334,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.emberfury.bonus4':
     '사혈이 항상 당신을 격노시키며, 회복량이 최대 생명력의 8%로 증가합니다.',
   'entities.itemSets.forgewall.name': '벼림벽 아이기스',
-  'entities.itemSets.forgewall.bonus2': '강철 의지가 분노 1점당 4 대신 5의 흡수로 전환합니다.',
+  'entities.itemSets.forgewall.bonus2':
+    '강철 의지의 보호막이 최대 생명력의 20% 대신 25%를 흡수합니다.',
   'entities.itemSets.forgewall.bonus4':
     '방패 강타를 시전할 때마다 강철 의지의 남은 재사용 대기시간이 2초 감소합니다.',
   'entities.itemSets.dawnforged.name': '새벽벼림 예복',
@@ -19769,4 +19771,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.natures_boon.specNote_restoration':
     '당신의 지속 치유 효과가 틱마다 10% 확률로 포자 폭발을 준비합니다. 10초에 한 번까지.',
   'entities.items.pvp_skull_bag.name': '해골 가방',
+  'guide.worldPvpPage.hillBodyFlat':
+    '세 시간마다 예측할 수 없는 시점에 전 지역에 알림이 전해집니다. 십오 분 뒤 자유 전투 지역 중 한 곳에 언덕이 나타나며, 그 범위를 나타내는 원이 탁 트인 지면에 표시됩니다. 언덕은 사십오 분 동안 유지된 뒤 사라지고, 그동안 오 분마다 위치와 각 무리의 누적 점령 시간 순위가 공지됩니다. 원 안에 서 있는 인원이 가장 많은 파티가 언덕을 다투며, 인원 우세를 누적 삼십 초 동안 유지하면 점령합니다. 적 파티가 들어와도 아군이 다시 우세해질 때까지 타이머가 일시 정지할 뿐입니다. 원 안에 살아 있는 아군 파티원이 한 명도 남지 않을 때만 처음부터 다시 셉니다. 혼자 있는 플레이어는 일인 파티로 계산되며, 점령한 상태에서 파티를 만들어도 언덕을 잃지 않지만 공격대원은 전혀 계산되지 않습니다. 점령 중인 파티의 각 구성원은 원 안에 서 있으면 점령 시간과 관계없이 매분 같은 양의 명예를 얻습니다. 정원이 찬 파티가 언덕이 유지되는 내내 방해 없이 점령하면 전장에서 세 번 승리하는 것과 비슷한 명예를 얻습니다. 언덕이 사라질 때 누적 점령 시간이 가장 긴 무리가 총 십 분 이상 점령했다면, 해당 무리의 점령 중 원 안에서 적어도 일 분을 보냈고 종료 시에도 그 무리에 속한 모든 플레이어에게 주간 금고의 PvP 항목에 승리 일 회가 주어집니다. 전장 위의 막대에는 점령자와 양측 인원, 점령 타이머가 표시되며 채팅에 /hill을 입력하면 위치를 확인할 수 있습니다.',
 };

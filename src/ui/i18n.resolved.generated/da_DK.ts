@@ -8444,6 +8444,7 @@ export const da_DK: EnTranslations = {
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Hver tredje time, på et tidspunkt ingen kan forudsige, hele riget fortalt at en bakke vil stige i en af fri-for-alt-zonerne på femten minutter, og cirklen hvor det vil stå markeres på åbent land. Når det stiger står det i 45 minutter, derefter falder. Partiet med de fleste spillere stående indenfor strides bakken, og efter et minuts ubrudt majoritet bakken er deres; en ensom spiller tæller som et parti på en, men raid-medlemmer tæller slet ikke. Mens en parti holder bakken, hver af dets medlemmer stående indenfor tjener Ære hver minut, og jo længere det samme parti holder det, jo mere hver minut betaler: et fuldt parti holder en omstridt bakke for hele sit stå tjener omkring så meget som tre battleground sejre. Når bakken skifter hænder, start de nye indehavere tællingen fra begyndelsen. En bar over marken viser hvem der holder det, dine numre mod deres, og konkurrenceuret; /hill i chat siger hvor det står.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyFlat": "En gang hver tredje time får hele riget på et uforudsigeligt tidspunkt besked om, at en bakke dukker op i en zone med fri kamp om femten minutter. Dens cirkel markeres på åbent terræn. Bakken bliver stående i femogfyrre minutter og forsvinder så. Imens meddeles dens placering og grupperne med den længste samlede kontroltid hvert femte minut. Gruppen med flest spillere i cirklen kæmper om bakken og erobrer den efter i alt tredive sekunders overtal. En rivaliserende gruppe sætter kun tælleren på pause, indtil din gruppe fører igen; den starter først forfra, når der ikke er nogen levende fra din gruppe tilbage i cirklen. En solospiller tæller som en gruppe på én og beholder sin bakke, når en gruppe dannes, men raidmedlemmer tæller slet ikke. Hvert medlem af gruppen, der holder bakken og står i cirklen, modtager lige meget Ære hvert minut, uanset hvor længe gruppen har holdt den. En fuld gruppe, som holder bakken uforstyrret i hele dens levetid, tjener omtrent det samme som for tre sejre på slagmarker. Når bakken forsvinder, får alle, som stod i cirklen i mindst ét minut under den førende gruppes kontrol og stadig er i gruppen, én sejr til PvP-rækken i den ugentlige hvælving, hvis gruppen med længst samlet kontrol holdt den i mindst ti minutter. En bjælke over området viser indehaveren, antallet af spillere på begge sider og erobringstælleren; /hill i chatten viser placeringen.",
       "limitsBodyRaids": "Besejring det samme spiller igen og igen betaler mindre hver gang og snart ingenting, og din tælling mod det spiller kun starter over omkring en time efter først af disse drab, så lejring en offer er aldrig værd ventetid. Et mål langt under dit niveau betaler ingenting overhovedet. Battlegrounds og Arenaer køre deres egne regler mens du er inden i dem, og de betaler mere Ære end åben verden, så verden PvP er den langsommere vej til samme forhandler. Raids tjener ingenting fra verden drab: et raid medlem tager ingen Ære eller guld og gør ikke skrumpe nogen anden aktie, så kæmp som en parti til at blive betalt."
     },
     "thornhollowPage": {
@@ -12450,6 +12451,7 @@ export const da_DK: EnTranslations = {
       "activeStatus": "Aktiv verden quest",
       "expiresIn": "Udløber om {time}",
       "mineOre": "Miner kobber ore",
+      "mineMaterial": "Udvind {name}",
       "recoverObject": "Genindvind {name}",
       "redirectLeyBeam": "Omdiriger leysstrålen",
       "matchConfections": "Matchende tryllebetut konfekturer",
@@ -14528,7 +14530,7 @@ export const da_DK: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Jernvilje",
-        "description": "Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere {absorbPerRage} skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)"
+        "description": "Bid tænderne sammen og ignorér smerten: et skjold absorberer skade svarende til {damage}% af dit maksimale helbred ved brug, i op til {duration} sek. (Beskyttelse)"
       },
       "faultline": {
         "name": "Jordspalte",
@@ -24234,7 +24236,7 @@ export const da_DK: EnTranslations = {
       },
       "forgewall": {
         "name": "Forgewall-aegis",
-        "bonus2": "Iron Resolve omdanner raseri til 5 absorption pr. point i stedet for 4.",
+        "bonus2": "Iron Resolves skjold absorberer 25% af dit maksimale helbred i stedet for 20%.",
         "bonus4": "At kaste Shieldcrack reducerer Iron Resolves resterende nedkøling med 2 sek."
       },
       "frostquench": {

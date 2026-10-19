@@ -1701,6 +1701,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Süßer Sieg',
   'questUi.worldQuest.matchConfections': 'Verzauberte Konfekte kombinieren',
   'questUi.worldQuest.mineOre': 'Baut Kupfererz ab',
+  'questUi.worldQuest.mineMaterial': 'Baut {name} ab',
   'questUi.worldQuest.practiceRewards':
     'Übung: Spielt erneut, ohne weitere Münzen, Erfahrung oder Ruf zu verdienen.',
   'questUi.worldQuest.puzzleBeamReach': 'Erreichte Kristalle: {count}',
@@ -6348,7 +6349,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein furchteinflößender Schrei, der bis zu 5 Gegner im Umkreis von 8 m 4 Sek. lang in Furcht davonlaufen lässt. Schaden kann den Effekt brechen.',
   'entities.abilities.intimidating_shout.name': 'Drohruf',
   'entities.abilities.iron_resolve.description':
-    'Beißt die Zähne zusammen und ignoriert den Schmerz: Verbraucht bis zu 40 Wut (mindestens 20), um pro verbrauchtem Wutpunkt {absorbPerRage} Schaden zu absorbieren. Hält bis zu 10 Sek. an. (Schutz)',
+    'Beißt die Zähne zusammen und ignoriert den Schmerz: Ein Schild absorbiert Schaden in Höhe von {damage}% Eurer maximalen Gesundheit beim Wirken. Hält bis zu {duration} Sek. an. (Schutz)',
   'entities.abilities.iron_resolve.name': 'Eiserne Entschlossenheit',
   'entities.abilities.measured_fury.description':
     'Euer maßvoller Zorn lehrt Euch Sparsamkeit: Eure Fähigkeiten kosten 10% weniger Wut. (Waffen)',
@@ -17925,7 +17926,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Wenn dein Psalm der Abwehr vollständig verbraucht ist, wirkt dein nächster Läuterungshymnus innerhalb von 10 Sek. sofort. Höchstens einmal alle 15 Sek.',
   'entities.itemSets.emberscreed.name': 'Gewänder des Glutbekenntnisses',
   'entities.itemSets.forgewall.bonus2':
-    'Eiserne Entschlossenheit wandelt Wut mit 5 Absorption pro Punkt statt 4 um.',
+    'Der Schild von Eiserne Entschlossenheit absorbiert 25% Eurer maximalen Gesundheit statt 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Das Wirken von Schildbruch verringert die verbleibende Abklingzeit von Eiserne Entschlossenheit um 2 Sek.',
   'entities.itemSets.forgewall.name': 'Ägide der Schmiedemauer',
@@ -20222,4 +20223,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Breite der Karten-Seitenleiste',
   'hudChrome.mapAtlas.resizeRailHint':
     'Ziehen, um die Karten-Seitenleiste zu vergrößern oder zu verkleinern. Doppelklick setzt zurück.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Alle drei Stunden wird dem gesamten Reich zu einem unvorhersehbaren Zeitpunkt angekündigt, dass in fünfzehn Minuten in einem Gebiet mit freiem Kampf ein Hügel erscheint. Sein Kreis wird auf offenem Boden markiert. Er bleibt fünfundvierzig Minuten bestehen und verschwindet dann. Währenddessen werden alle fünf Minuten sein Standort und die Gruppen mit den längsten gesamten Haltezeiten bekannt gegeben. Die Gruppe mit den meisten Spielern im Kreis bestreitet den Hügel und erobert ihn nach insgesamt dreißig Sekunden zahlenmäßiger Überlegenheit. Eine gegnerische Gruppe pausiert den Zähler nur, bis eure Gruppe wieder führt; er beginnt erst von vorn, wenn kein lebendes Mitglied eurer Gruppe im Kreis bleibt. Einzelspieler zählen als Gruppe aus einer Person und behalten ihren Hügel, wenn sie eine Gruppe bilden. Schlachtzugsmitglieder zählen überhaupt nicht. Jedes Mitglied der haltenden Gruppe, das im Kreis steht, erhält jede Minute gleich viel Ehre, unabhängig von der bisherigen Haltezeit. Eine volle Gruppe, die den Hügel seine ganze Dauer ungestört hält, erhält ungefähr so viel Ehre wie für drei Schlachtfeldsiege. Wenn der Hügel verschwindet und die Gruppe mit der längsten gesamten Haltezeit mindestens zehn Minuten gehalten hat, erhält jeder Spieler einen Sieg für die PvP-Reihe des Wöchentlichen Tresors, der während ihrer Haltezeit mindestens eine Minute im Kreis stand und noch zu dieser Gruppe gehört. Ein Balken über dem Feld zeigt den Besitzer, eure und ihre Spielerzahl sowie den Eroberungszähler; /hill im Chat nennt den Standort.',
 };

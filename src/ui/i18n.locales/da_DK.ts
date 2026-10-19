@@ -1640,6 +1640,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Sød sejr',
   'questUi.worldQuest.matchConfections': 'Matchende tryllebetut konfekturer',
   'questUi.worldQuest.mineOre': 'Miner kobber ore',
+  'questUi.worldQuest.mineMaterial': 'Udvind {name}',
   'questUi.worldQuest.practiceRewards':
     'Øvelse: spil igen uden at tjene flere mønter, erfaring eller rygte.',
   'questUi.worldQuest.puzzleBeamReach': 'Krystaller nået: {count}',
@@ -6152,7 +6153,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et skrækindjagende råb, der får op til 5 fjender inden for 8 m til at flygte i rædsel i 4 sek. Skade kan bryde effekten.',
   'entities.abilities.intimidating_shout.name': 'Frygtindgydende Råb',
   'entities.abilities.iron_resolve.description':
-    'Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere {absorbPerRage} skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)',
+    'Bid tænderne sammen og ignorér smerten: et skjold absorberer skade svarende til {damage}% af dit maksimale helbred ved brug, i op til {duration} sek. (Beskyttelse)',
   'entities.abilities.iron_resolve.name': 'Jernvilje',
   'entities.abilities.measured_fury.description':
     'Dit afmålte raseri skærper din økonomi: dine evner koster 10% mindre raseri. (Arms)',
@@ -17505,7 +17506,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Når din Psalm of Warding er fuldt opbrugt, er din næste Scouring Hymn inden for 10 sek. øjeblikkelig. Kan ikke ske mere end én gang hvert 15. sek.',
   'entities.itemSets.emberscreed.name': 'Glødernes trosgevandter',
   'entities.itemSets.forgewall.bonus2':
-    'Iron Resolve omdanner raseri til 5 absorption pr. point i stedet for 4.',
+    'Iron Resolves skjold absorberer 25% af dit maksimale helbred i stedet for 20%.',
   'entities.itemSets.forgewall.bonus4':
     'At kaste Shieldcrack reducerer Iron Resolves resterende nedkøling med 2 sek.',
   'entities.itemSets.forgewall.name': 'Forgewall-aegis',
@@ -19778,4 +19779,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Kortets sidebjælkebredde',
   'hudChrome.mapAtlas.resizeRailHint':
     'Træk for at ændre størrelsen på kortets sidebjælke. Dobbeltklik for at nulstille.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'En gang hver tredje time får hele riget på et uforudsigeligt tidspunkt besked om, at en bakke dukker op i en zone med fri kamp om femten minutter. Dens cirkel markeres på åbent terræn. Bakken bliver stående i femogfyrre minutter og forsvinder så. Imens meddeles dens placering og grupperne med den længste samlede kontroltid hvert femte minut. Gruppen med flest spillere i cirklen kæmper om bakken og erobrer den efter i alt tredive sekunders overtal. En rivaliserende gruppe sætter kun tælleren på pause, indtil din gruppe fører igen; den starter først forfra, når der ikke er nogen levende fra din gruppe tilbage i cirklen. En solospiller tæller som en gruppe på én og beholder sin bakke, når en gruppe dannes, men raidmedlemmer tæller slet ikke. Hvert medlem af gruppen, der holder bakken og står i cirklen, modtager lige meget Ære hvert minut, uanset hvor længe gruppen har holdt den. En fuld gruppe, som holder bakken uforstyrret i hele dens levetid, tjener omtrent det samme som for tre sejre på slagmarker. Når bakken forsvinder, får alle, som stod i cirklen i mindst ét minut under den førende gruppes kontrol og stadig er i gruppen, én sejr til PvP-rækken i den ugentlige hvælving, hvis gruppen med længst samlet kontrol holdt den i mindst ti minutter. En bjælke over området viser indehaveren, antallet af spillere på begge sider og erobringstælleren; /hill i chatten viser placeringen.',
 };

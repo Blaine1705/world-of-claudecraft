@@ -1638,6 +1638,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Chiến thắng ngọt',
   'questUi.worldQuest.matchConfections': 'Xếp bánh ngọt được mê hoặc',
   'questUi.worldQuest.mineOre': 'Khai thác đồng',
+  'questUi.worldQuest.mineMaterial': 'Khai thác {name}',
   'questUi.worldQuest.practiceRewards':
     'Tập luyện: chơi lại mà không kiếm thêm tiền xu, kinh nghiệm, hoặc phần thưởng.',
   'questUi.worldQuest.puzzleBeamReach': 'Tinh thể đạt được: {count}',
@@ -6165,7 +6166,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một tiếng thét kinh hoàng khiến tối đa 5 kẻ địch trong 8 m bỏ chạy vì sợ hãi trong 4 giây. Sát thương có thể phá vỡ hiệu ứng.',
   'entities.abilities.intimidating_shout.name': 'Tiếng Hét Uy Hiếp',
   'entities.abilities.iron_resolve.description':
-    'Nghiến răng chịu đau: tiêu hao tối đa 40 nộ khí (tối thiểu 20) để hấp thụ {absorbPerRage} sát thương cho mỗi điểm nộ khí đã dùng, kéo dài tối đa 10 giây. (Hộ Vệ)',
+    'Nghiến răng chịu đau: một lá chắn hấp thụ sát thương bằng {damage}% máu tối đa của bạn khi thi triển, kéo dài tối đa {duration} giây. (Hộ Vệ)',
   'entities.abilities.iron_resolve.name': 'Ý Chí Sắt Đá',
   'entities.abilities.measured_fury.description':
     'Cơn thịnh nộ chừng mực giúp bạn chi tiêu khôn ngoan hơn: các kỹ năng của bạn tốn ít hơn 10% nộ khí. (nhánh Vũ Khí)',
@@ -17711,7 +17712,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Khi Psalm of Warding được tiêu thụ hoàn toàn, Scouring Hymn tiếp theo trong 10 giây sẽ được thi triển ngay lập tức. Không thể xảy ra thường xuyên hơn một lần mỗi 15 giây.',
   'entities.itemSets.emberscreed.name': 'Lễ Phục Tín Điều Tàn Than',
   'entities.itemSets.forgewall.bonus2':
-    'Iron Resolve chuyển hóa cơn giận với 5 điểm hấp thụ mỗi điểm thay vì 4.',
+    'Lá chắn của Iron Resolve hấp thụ 25% máu tối đa của bạn thay vì 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Thi triển Shieldcrack giảm 2 giây thời gian hồi còn lại của Iron Resolve.',
   'entities.itemSets.forgewall.name': 'Khiên Aegis Thành Rèn',
@@ -19865,4 +19866,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Chiều rộng thanh bên bản đồ',
   'hudChrome.mapAtlas.resizeRailHint':
     'Kéo để đổi kích thước thanh bên bản đồ. Nhấp đúp để đặt lại.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Cứ mỗi ba giờ, vào một thời điểm không thể đoán trước, toàn cõi được thông báo rằng một ngọn đồi sẽ xuất hiện tại một vùng tự do giao chiến sau mười lăm phút, và vòng tròn của nó được đánh dấu trên đất trống. Đồi tồn tại bốn mươi lăm phút rồi biến mất. Trong thời gian đó, cứ năm phút lại thông báo vị trí và các nhóm có tổng thời gian chiếm giữ lâu nhất. Nhóm có nhiều người chơi đứng trong vòng tròn nhất tranh giành đồi và chiếm được sau tổng cộng ba mươi giây hơn quân số. Nhóm đối thủ bước vào chỉ tạm dừng bộ đếm cho đến khi nhóm bạn lại dẫn đầu; bộ đếm chỉ bắt đầu lại nếu không còn thành viên nào của nhóm bạn sống trong vòng tròn. Người chơi đơn lẻ được tính là nhóm một người và giữ nguyên quyền kiểm soát đồi khi lập nhóm, nhưng thành viên tổ đội đột kích hoàn toàn không được tính. Mỗi thành viên của nhóm đang giữ đồi đứng trong vòng tròn nhận cùng một lượng Danh Dự mỗi phút, bất kể đã giữ đồi bao lâu. Một nhóm đủ người giữ đồi không bị tranh chấp suốt thời gian tồn tại nhận xấp xỉ ba trận thắng chiến trường. Khi đồi biến mất, nếu nhóm có tổng thời gian giữ lâu nhất đã giữ ít nhất mười phút, mọi người đã đứng trong vòng tròn ít nhất một phút trong thời gian nhóm đó giữ đồi và vẫn thuộc nhóm đó đều nhận một trận thắng cho hàng PvP của Kho Tuần. Thanh phía trên bãi đấu hiển thị bên đang giữ, quân số hai bên và bộ đếm chiếm giữ; nhập /hill trong trò chuyện để biết vị trí.',
 };

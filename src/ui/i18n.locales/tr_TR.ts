@@ -1626,6 +1626,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Tatlı zafer',
   'questUi.worldQuest.matchConfections': 'Büyülü şekerleme eşleştir',
   'questUi.worldQuest.mineOre': 'Bakır cevheri kaz',
+  'questUi.worldQuest.mineMaterial': '{name} çıkar',
   'questUi.worldQuest.practiceRewards':
     'Pratik: daha fazla para, deneyim veya ün kazanmadan tekrar oyna.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristallere ulaşıldı: {count}',
@@ -6093,7 +6094,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '8 m içindeki en fazla 5 düşmanı 4 sn boyunca korkuyla kaçırtan dehşet verici bir haykırış. Hasar etkiyi bozabilir.',
   'entities.abilities.intimidating_shout.name': 'Gözdağı Narası',
   'entities.abilities.iron_resolve.description':
-    'Dişini sıkıp acıyı yok say: 40’a kadar öfke harcar (en az 20) ve harcanan her öfke başına {absorbPerRage} hasarı en fazla 10 sn boyunca soğurur. (Koruma)',
+    'Dişini sıkıp acıyı yok say: bir kalkan, kullanıldığı andaki azami canının {damage}% kadarı hasarı en fazla {duration} sn boyunca soğurur. (Koruma)',
   'entities.abilities.iron_resolve.name': 'Demir Azim',
   'entities.abilities.measured_fury.description':
     'Ölçülü gazabın tutumunu keskinleştirir: yeteneklerin %10 daha az öfkeye mal olur. (Silahşor)',
@@ -17596,7 +17597,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Koruma İlahin tamamen tüketildiğinde, 10 saniye içinde kullandığın sonraki Arındırma İlahisi anında gerçekleşir. 15 saniyede birden fazla tetiklenemez.',
   'entities.itemSets.emberscreed.name': 'Korlar İnancının Giysileri',
   'entities.itemSets.forgewall.bonus2':
-    'Demir Kararlılık, öfkeyi puan başına 4 yerine 5 emmeye dönüştürür.',
+    'Demir Kararlılık kalkanı, azami canının 20% yerine 25% kadarını soğurur.',
   'entities.itemSets.forgewall.bonus4':
     'Kalkan Çatlağı kullanmak Demir Kararlılığın kalan bekleme süresini 2 saniye azaltır.',
   'entities.itemSets.forgewall.name': 'Dövme Duvarı Aegis',
@@ -19786,4 +19787,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Harita kenar çubuğu genişliği',
   'hudChrome.mapAtlas.resizeRailHint':
     'Harita kenar çubuğunu yeniden boyutlandırmak için sürükle. Sıfırlamak için çift tıkla.',
+  'guide.worldPvpPage.hillBodyFlat':
+    "Her üç saatte bir, öngörülemeyen bir anda tüm diyara on beş dakika sonra serbest savaş bölgelerinden birinde bir tepenin belireceği duyurulur ve tepenin çemberi açık arazide işaretlenir. Tepe kırk beş dakika kalır, sonra kaybolur. Bu sırada her beş dakikada bir konumu ve en uzun toplam tutma süresine sahip gruplar duyurulur. Çemberin içinde en çok oyuncusu olan grup tepeyi ele geçirmeye çalışır ve toplam otuz saniye boyunca sayıca üstünlük sağladığında tepeyi alır. Rakip bir grubun girmesi sayacı yalnızca grubunuz tekrar üstün gelene kadar duraklatır; sayaç ancak çemberde grubunuzdan hayatta kimse kalmadığında sıfırlanır. Tek başına bir oyuncu tek kişilik grup sayılır ve grup kurduğunda tuttuğu tepeyi korur, ancak baskın üyeleri hiç sayılmaz. Tepeyi tutan grubun çemberde duran her üyesi, tepeyi ne kadar süredir tuttuklarından bağımsız olarak her dakika aynı miktarda Onur kazanır. Tepeyi bütün süresi boyunca rakipsiz tutan tam bir grup, yaklaşık üç savaş alanı zaferi kadar kazanır. Tepe kaybolduğunda, en uzun toplam tutma süresine sahip grup en az on dakika tutmuşsa, o grubun tutma süresi boyunca çemberde en az bir dakika durmuş ve hâlâ aynı grupta olan herkes Haftalık Kasa'nın PvP sırası için bir zafer kazanır. Alanın üzerindeki çubuk tepeyi kimin tuttuğunu, iki tarafın oyuncu sayılarını ve ele geçirme sayacını gösterir; sohbette /hill komutu konumunu söyler.",
 };

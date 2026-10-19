@@ -1656,6 +1656,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Słodkie zwycięstwo',
   'questUi.worldQuest.matchConfections': 'Dopasuj czarowane słodycze',
   'questUi.worldQuest.mineOre': 'Kopanie rudy miedzi',
+  'questUi.worldQuest.mineMaterial': 'Wydobądź: {name}',
   'questUi.worldQuest.practiceRewards':
     'Trening: graj ponownie bez zdobywania więcej monet, doświadczenia ani reputacji.',
   'questUi.worldQuest.puzzleBeamReach': 'Kryształy osiągnięte: {count}',
@@ -6312,7 +6313,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przerażający okrzyk, który zmusza do 5 wrogów w promieniu 8 m do ucieczki w strachu na 4 s. Obrażenia mogą przerwać efekt.',
   'entities.abilities.intimidating_shout.name': 'Zastraszający okrzyk',
   'entities.abilities.iron_resolve.description':
-    'Zaciśnij zęby i zignoruj ból: zużywa do 40 pkt. wściekłości (minimum 20), aby pochłonąć {absorbPerRage} pkt. obrażeń za każdy wydany punkt wściekłości przez maksymalnie 10 sek. (Ochrona)',
+    'Zaciśnij zęby i zignoruj ból: tarcza pochłania obrażenia równe {damage}% twojego maksymalnego zdrowia w chwili użycia, przez maksymalnie {duration} sek. (Ochrona)',
   'entities.abilities.iron_resolve.name': 'Żelazny hart',
   'entities.abilities.measured_fury.description':
     'Wyważona furia uczy cię oszczędności: twoje umiejętności kosztują o 10% mniej wściekłości. (specjalizacja Broń)',
@@ -17741,7 +17742,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Gdy Psalm Ochrony zostanie w pełni zużyty, twój następny Hymn Oczyszczenia w ciągu 10 sek. jest natychmiastowy. Efekt może wystąpić nie częściej niż raz na 15 sek.',
   'entities.itemSets.emberscreed.name': 'Szaty Credo Żaru',
   'entities.itemSets.forgewall.bonus2':
-    'Żelazna Determinacja zamienia furię w 5 punktów absorpcji za punkt zamiast 4.',
+    'Tarcza Żelaznej Determinacji pochłania 25% twojego maksymalnego zdrowia zamiast 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Rzucenie Pęknięcia Tarczy skraca pozostały czas odnowienia Żelaznej Determinacji o 2 sek.',
   'entities.itemSets.forgewall.name': 'Egida Kuźnomuru',
@@ -19948,4 +19949,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Szerokość panelu bocznego mapy',
   'hudChrome.mapAtlas.resizeRailHint':
     'Przeciągnij, aby zmienić szerokość panelu bocznego mapy. Kliknij dwukrotnie, aby zresetować.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Raz na trzy godziny, w nieprzewidywalnej chwili, cała kraina otrzymuje zapowiedź, że za piętnaście minut w jednej ze stref swobodnej walki pojawi się wzgórze. Jego krąg zostaje oznaczony na otwartym terenie. Wzgórze pozostaje przez czterdzieści pięć minut, po czym znika. W tym czasie co pięć minut ogłaszane są jego położenie oraz grupy z najdłuższym łącznym czasem utrzymania. Grupa z największą liczbą graczy w kręgu walczy o wzgórze i zdobywa je po łącznie trzydziestu sekundach przewagi liczebnej. Wejście rywali tylko wstrzymuje licznik, dopóki twoja grupa znów nie uzyska przewagi; odliczanie zaczyna się od nowa tylko wtedy, gdy w kręgu nie pozostanie żaden żywy członek twojej grupy. Samotny gracz liczy się jako jednoosobowa grupa i zachowuje zajęte wzgórze po utworzeniu grupy, ale członkowie rajdu w ogóle się nie liczą. Każdy członek grupy utrzymującej wzgórze, który stoi w kręgu, otrzymuje co minutę tyle samo Honoru, niezależnie od długości utrzymania. Pełna grupa utrzymująca je bez przeszkód przez cały czas jego istnienia zarabia mniej więcej tyle, co za trzy zwycięstwa na polach bitew. Gdy wzgórze znika, jeśli grupa z najdłuższym łącznym utrzymaniem zgromadziła co najmniej dziesięć minut, każdy, kto stał w kręgu przez przynajmniej minutę podczas utrzymania przez tę grupę i nadal do niej należy, otrzymuje jedno zwycięstwo do rzędu PvP Tygodniowego Skarbca. Pasek nad polem pokazuje właściciela, liczebność obu stron i licznik przejmowania; /hill na czacie podaje położenie.',
 };

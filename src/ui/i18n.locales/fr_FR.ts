@@ -1709,6 +1709,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Douce victoire',
   'questUi.worldQuest.matchConfections': 'Assemblez des confiseries enchantées',
   'questUi.worldQuest.mineOre': 'Minez du minerai de cuivre',
+  'questUi.worldQuest.mineMaterial': 'Extrayez {name}',
   'questUi.worldQuest.practiceRewards':
     "Entraînement : rejouez sans gagner davantage de pièces, d'expérience ou de réputation.",
   'questUi.worldQuest.puzzleBeamReach': 'Cristaux atteints : {count}',
@@ -6496,7 +6497,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un cri terrifiant qui fait fuir de peur jusqu'à 5 ennemis dans un rayon de 8 m pendant 4 s. Les dégâts peuvent briser l'effet.",
   'entities.abilities.intimidating_shout.name': 'Cri intimidant',
   'entities.abilities.iron_resolve.description':
-    'Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber {absorbPerRage} points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)',
+    'Serrez les dents et ignorez la douleur : un bouclier absorbe des dégâts équivalant à {damage}% de vos points de vie maximum au moment du lancement, pendant un maximum de {duration} s. (Protection)',
   'entities.abilities.iron_resolve.name': 'Résolution de fer',
   'entities.abilities.measured_fury.description':
     'Votre fureur mesurée affine votre économie : vos techniques coûtent 10% de rage en moins. (Armes)',
@@ -18049,7 +18050,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Quand votre Psaume de protection est entièrement consommé, votre prochain Hymne de purification sous 10 s est instantané. Ne peut se produire plus d’une fois toutes les 15 s.',
   'entities.itemSets.emberscreed.name': 'Vêtements du Credo des braises',
   'entities.itemSets.forgewall.bonus2':
-    'Résolution de fer convertit la rage à raison de 5 points d’absorption par point au lieu de 4.',
+    'Le bouclier de Résolution de fer absorbe 25% de vos points de vie maximum au lieu de 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Lancer Brise-bouclier réduit le temps de recharge restant de Résolution de fer de 2 s.',
   'entities.itemSets.forgewall.name': 'Égide du Mur de forge',
@@ -20287,4 +20288,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailAria': 'Largeur de la barre latérale de la carte',
   'hudChrome.mapAtlas.resizeRailHint':
     'Faites glisser pour redimensionner la barre latérale de la carte. Double-cliquez pour réinitialiser.',
+  'guide.worldPvpPage.hillBodyFlat':
+    "Toutes les trois heures, à un moment imprévisible, le royaume entier apprend qu'une colline apparaîtra quinze minutes plus tard dans une zone de combat libre. Son cercle est marqué sur un terrain dégagé. Elle reste quarante-cinq minutes, puis disparaît. Pendant ce temps, sa position et les groupes ayant cumulé les plus longues durées de contrôle sont annoncés toutes les cinq minutes. Le groupe comptant le plus de joueurs dans le cercle conteste la colline et la capture après trente secondes cumulées de supériorité numérique. L'arrivée d'un groupe adverse ne fait que suspendre le compteur jusqu'à ce que le vôtre reprenne l'avantage ; il ne repart de zéro que si aucun membre vivant de votre groupe ne reste à l'intérieur. Un joueur seul compte comme un groupe d'une personne et conserve sa colline lorsqu'il forme un groupe, mais les membres de raid ne comptent pas du tout. Chaque membre du groupe qui contrôle la colline et se tient dans le cercle reçoit autant d'Honneur chaque minute, quelle que soit la durée du contrôle. Un groupe complet qui la garde sans opposition pendant toute sa durée gagne environ autant que pour trois victoires sur un champ de bataille. À sa disparition, si le groupe au plus long contrôle cumulé a tenu au moins dix minutes, tous ceux qui sont restés dans le cercle au moins une minute pendant son contrôle et font encore partie de ce groupe reçoivent une victoire pour la rangée JcJ du Coffre hebdomadaire. Une barre au-dessus du terrain affiche le détenteur, les effectifs des deux camps et le compteur de capture ; /hill dans le chat indique sa position.",
 };

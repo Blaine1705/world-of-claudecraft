@@ -40,20 +40,15 @@ export const HILL_LATEST_WARN_OFFSET_SECONDS =
  *  pauses a group's clock while it is not the leader. */
 export const HILL_CAPTURE_SECONDS = 30;
 /** Each holder standing inside accrues this many seconds of presence before a
- *  payout, and each payout RAMPS with how long the holding party has held the
- *  hill (hillHonorPerPayout): HILL_RAMP_STEP_HONOR a minute for the first five
- *  minutes, that much more each further five minutes, capped at
- *  HILL_RAMP_MAX_HONOR a minute. A full uncontested stand pays about 380 each
- *  (owner tuning 2026-09-25: King of the Hill is a real road to Warfare gear,
- *  doubled alongside the Thornhollow Fields awards). The streak belongs to the party and resets when the
- *  hill changes hands, so a long hold is the thing worth taking. Only a party
- *  can hold, so a party's size is the payee cap. */
+ *  payout of HILL_HONOR_PER_PAYOUT. The rate is FLAT: every paid minute is
+ *  worth the same, however long the holding party has held the hill (owner
+ *  tuning 2026-10-14, replacing the 2026-09-25 ramp of 2 a minute climbing to
+ *  12). A full uncontested stand still pays about 390 each, the ramp's total,
+ *  so King of the Hill stays a real road to Warfare gear. Only a party can
+ *  hold, so a party's size is the payee cap. */
 export const HILL_ACCRUAL_SECONDS = 60;
-/** Held seconds per step of the ramp, the Honor each step adds to a minute's
- *  payout, and the per-minute cap it climbs to. */
-export const HILL_RAMP_STEP_SECONDS = 300;
-export const HILL_RAMP_STEP_HONOR = 2;
-export const HILL_RAMP_MAX_HONOR = 12;
+/** The flat Honor paid for one held minute. */
+export const HILL_HONOR_PER_PAYOUT = 9;
 /** The Weekly Vault point for the longest hold (hill_ranking.ts) pays only a
  *  player who stood inside for at least this long while their group held the
  *  hill, and who is still in that group when it falls: a one-second visit, or
@@ -65,13 +60,6 @@ export const HILL_VAULT_MIN_INSIDE_SECONDS = 60;
  *  standings, but five such visits must not fill the PvP row. */
 export const HILL_VAULT_MIN_HOLD_SECONDS = 10 * 60;
 
-/** The Honor one payout is worth after the holding party has held the hill
- *  for `heldSeconds`: HILL_RAMP_STEP_HONOR, then that much more every
- *  HILL_RAMP_STEP_SECONDS, capped at HILL_RAMP_MAX_HONOR. */
-export function hillHonorPerPayout(heldSeconds: number): number {
-  const steps = Math.floor(Math.max(0, heldSeconds) / HILL_RAMP_STEP_SECONDS);
-  return Math.min(HILL_RAMP_MAX_HONOR, HILL_RAMP_STEP_HONOR * (1 + steps));
-}
 /** The circle keeps this much clear of the zone's edges beyond its own radius,
  *  and this much clear of the hub settlement's radius. */
 export const HILL_EDGE_MARGIN = 25;
