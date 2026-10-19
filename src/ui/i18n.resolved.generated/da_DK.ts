@@ -8447,7 +8447,7 @@ export const da_DK: EnTranslations = {
       "honorFinalNoteSoldBack": "Æreskøb er endelige. Tilbagekøbslisten indeholder kun det, du solgte: Et møntkøb kan som regel sælges tilbage til sin salgspris og hentes fra listen, hvis du ombestemmer dig igen, men krigsudstyr bliver sjælebundet i det øjeblik, du køber det, så det kan aldrig handles, sendes med post eller sælges tilbage for noget, og det når aldrig den liste. Butikken beder dig bekræfte af den grund: læs genstanden, før du trykker på den.",
       "warfareHeading": "Krigsførelsesudstyr",
       "warfareBody": "Hvert stykke Krigsførelsesudstyr bærer Krigsførelses-angrebsvurdering og Krigsførelses-forsvarsvurdering, og de to vurderinger gør slet ingenting mod monstre. De virker kun, når du kæmper mod en anden spiller, i en duel, i arenaen eller på slagmarken, hvor Angreb lægger til den skade, du gør, og Forsvar skærer den skade, du tager, hver med sit eget loft. Hver rustningsfamilie er også et sæt, og dets sætbonusser er ligeledes Krigsførelses-rating eller effekter, der kun virker mod spillere, så et fuldt æresudstyr er intet værd mod en fangekælderboss.",
-      "warfareBodyStatsStay": "Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster. Én undtagelse virker overalt: to dele af et besværgersæt gør også, at skade ikke længere forsinker dine besværgelser.",
+      "warfareBodyStatsStay": "Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster. Én undtagelse virker overalt: to dele af ethvert af disse sæt gør også, at skade ikke længere forsinker dine besværgelser.",
       "warfareTradeBody": "Det er den bevidste handel. Krigsførelsesudstyr er bygget til at kæmpe mod spillere, ikke som en genvej forbi fangekælderniveauerne: et stykke Krigsførelsesudstyr bærer aldrig de kampvurderinger, en fangekælderepisk i samme plads gør, og alt, det bringer, er brugt på andre spillere. Vil du klare dig i arenaen, så køb det. Vil du rydde heroiske fangekældre hurtigere, så optjen dit udstyr i fangekældrene.",
       "warfareTradeBodyRatingSpent": "Det er den tilsigtede handel. Krigsudstyr er bygget til at kæmpe mod spillere, ikke som en genvej forbi dungeon-niveauerne: Et krigsstykke har aldrig de kampratings, som en dungeon-episk genstand i samme plads har, og de krigsvurderinger og sætbonusser, det i stedet har, bruges fuldstændigt på andre spillere. Hvis du vil kunne klare dig i arenaen, så køb det. Hvis du vil rydde heroiske dungeons hurtigere, så tjen dit udstyr i dungeons.",
       "vanguardHeading": "Vanguard-udstyr: Krigsførelse Sæson 2",
@@ -24386,7 +24386,7 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Blodhane Hud",
-        "bonus2": "Bruin-storm nedtælling reduceres med 3 sek.",
+        "bonus2": "Bruin-storm nedtælling reduceres med 3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Bruin-storm skjolder dig for 6 procent af din maksimale sundhed i 6 sek."
       },
       "vanguard_druid_restoration": {
@@ -24396,17 +24396,17 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Flok-vægter Seletøj",
-        "bonus2": "Rystende Skud nedtælling reduceres med 4 sek.",
+        "bonus2": "Rystende Skud nedtælling reduceres med 4 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Rystende Skud reducerer Bestialsk vredes resterende nedtælling med 1 sek."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Fjernblik Seletøj",
-        "bonus2": "Stibryder nedtælling reduceres med 4 sek.",
+        "bonus2": "Stibryder nedtælling reduceres med 4 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Stibryder gør din næste Langt Optræk inden 6 sek øjeblikkelig. Kan ikke forekomme mere end én gang hver 15 sek."
       },
       "vanguard_hunter_survival": {
         "name": "Fælde-tand Seletøj",
-        "bonus2": "Blodkrog nedtælling reduceres med 3 sek.",
+        "bonus2": "Blodkrog nedtælling reduceres med 3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Blodkrog tildeler 1 Jagtfart."
       },
       "vanguard_mage_arcane": {
@@ -24431,12 +24431,12 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Skovlpagt Bastion",
-        "bonus2": "Edskæde nedtælling reduceres med 2 sek.",
+        "bonus2": "Edskæde nedtælling reduceres med 2 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Fjender trukket af Edskæde kaster zauber 30 procent langsommere i 4 sek, og Edskæde tildeler dig Solargengeldelse når den binder en fjende som kan trækkes."
       },
       "vanguard_paladin_retribution": {
         "name": "Lysmærke Krigs-pladeudstyr",
-        "bonus2": "Valkyriens Kald nedtælling reduceres med 15 sek.",
+        "bonus2": "Valkyriens Kald nedtælling reduceres med 15 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Valkyriens Kald nulstiller Sidste Påbuds nedtælling, og din næste Sidste Påbud inden 6 sek efter landing påfører 15 procent mere skade."
       },
       "vanguard_priest_discipline": {
@@ -24476,7 +24476,7 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Stormfødt Krigsmail",
-        "bonus2": "Forfædrenes Slag bremser målets bevægelseshastighed med 30 procent i 4 sek.",
+        "bonus2": "Forfædrenes Slag bremser målets bevægelseshastighed med 30 procent i 4 sek. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Forfædrenes Slag reducerer Elementær Trance resterende nedtælling med 4 sek."
       },
       "vanguard_shaman_restoration": {
@@ -24521,7 +24521,7 @@ export const da_DK: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Askejæger-udstyr",
-        "bonus2": "Øger Krigsførelsesforsvar med 40.",
+        "bonus2": "Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.",
         "bonus7": "Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. At dræbe en fjendtlig spiller giver Askeskridt, hvilket øger bevægelseshastigheden med 40% i 6 sek."
       },
@@ -24533,7 +24533,7 @@ export const da_DK: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Raseresmedet kampudstyr",
-        "bonus2": "Øger Krigsførelsesforsvar med 40.",
+        "bonus2": "Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.",
         "bonus4": "Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.",
         "bonus7": "Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. At dræbe en fjendtlig spiller giver Ubrudt Ed, hvilket absorberer 200 skade i 10 sek."
       },

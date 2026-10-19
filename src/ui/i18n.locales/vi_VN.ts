@@ -1892,7 +1892,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Truyền tải Rễ Siết Chặt cho phép bạn truyền tải khi đang di chuyển và tăng tốc độ di chuyển của bạn 20 phần trăm trong 4 giây. Không thể xảy ra nhiều hơn một lần mỗi 20 giây.',
   'entities.itemSets.vanguard_druid_balance.name': 'Starwarden Raiment',
-  'entities.itemSets.vanguard_druid_feral.bonus2': 'Cooldown Cú Lao Bruin giảm 3 giây.',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    'Cooldown Cú Lao Bruin giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Cú Lao Bruin bảo vệ bạn với 6 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_druid_feral.name': 'Bloodmane Hide',
@@ -1901,15 +1902,18 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Fleetmend cũng tăng tốc độ di chuyển của bạn 30 phần trăm trong 3 giây.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Thistlebloom Vestment',
-  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2': 'Cooldown Bắn Rúng Động giảm 4 giây.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    'Cooldown Bắn Rúng Động giảm 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Bắn Rúng Động giảm cooldown còn lại của Cơn Thịnh Nộ Dã Thú 1 giây.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Packwarden Harness',
-  'entities.itemSets.vanguard_hunter_marksmanship.bonus2': 'Cooldown Trailbreak giảm 4 giây.',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    'Cooldown Trailbreak giảm 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Trailbreak làm cho Kéo Cung Dài tiếp theo của bạn trong vòng 6 giây tức thời. Không thể xảy ra nhiều hơn một lần mỗi 15 giây.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Farsight Harness',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': 'Cooldown Móc Máu giảm 3 giây.',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    'Cooldown Móc Máu giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Móc Máu cấp 1 Đà Săn.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Snaretooth Harness',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
@@ -1932,11 +1936,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Giao Ước Sinh Mệnh cũng bảo vệ đồng minh với 8 phần trăm sức khỏe tối đa của họ trong 6 giây.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Sunvigil Regalia',
-  'entities.itemSets.vanguard_paladin_protection.bonus2': 'Cooldown Oath Chain giảm 2 giây.',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    'Cooldown Oath Chain giảm 2 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Kẻ thù được kéo bởi Oath Chain truyền tải phép chậm hơn 30 phần trăm trong 4 giây, và Oath Chain cấp cho bạn Trả Lại Mặt Trời khi nó buộc một kẻ thù có thể được kéo.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Shieldvow Bastion',
-  'entities.itemSets.vanguard_paladin_retribution.bonus2': 'Cooldown Gọi Valkyrie giảm 15 giây.',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    'Cooldown Gọi Valkyrie giảm 15 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Gọi Valkyrie đặt lại cooldown của Sắc Lệnh Cuối, và Sắc Lệnh Cuối tiếp theo của bạn trong vòng 6 giây gây 15 phần trăm sát thương nhiều hơn.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lightbrand Warplate',
@@ -1974,7 +1980,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Unleash Weapon cho phép bạn truyền tải khi đang di chuyển và tăng tốc độ di chuyển của bạn 20 phần trăm trong 4 giây. Không thể xảy ra nhiều hơn một lần mỗi 20 giây.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Ancestral Strike làm chậm tốc độ di chuyển của mục tiêu 30 phần trăm trong 4 giây.',
+    'Ancestral Strike làm chậm tốc độ di chuyển của mục tiêu 30 phần trăm trong 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Ancestral Strike giảm cooldown còn lại của Xuất Thần Nguyên Tố 4 giây.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Galeborn Warmail',
@@ -4715,7 +4721,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Kiểu Dáng',
   'editor.status.campCapReached':
     'Đã đạt giới hạn Trại Quái ({max}). Trại mới không được thêm vào.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4728,7 +4735,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Phép của bạn có 15% cơ hội ban Hộ Vệ Than Hồng, hấp thụ 120 sát thương trong 8 giây.',
   'entities.itemSets.warfare_cinderweave.name': 'Lễ Phục Cinderweave',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19421,7 +19429,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Thắng trận xếp hạng nhận Danh Dự, tiền tệ PvP. Một trận thua chơi đến hết vẫn nhận phần nhỏ hơn, hòa cũng vậy, nên thứ thực sự mất khi thua chỉ là điểm xếp hạng. Danh Dự thưởng cho những trận đấu thực sự: đánh bại cùng một đối thủ hoặc đội lần nữa trong cùng ngày không nhận thêm gì, thua họ lần nữa cũng vậy. Trong ngày thắng nhiều, giai đoạn đầu nhận đủ thưởng, sau đó thưởng mỗi trận thắng giảm một nửa, rồi giảm thêm một nửa khi thắng nhiều hơn nữa và giữ ở mức đó. Đối thủ bỏ cuộc vẫn làm thay đổi điểm xếp hạng nhưng không cho Danh Dự. Ngày được tính theo máy chủ: chuyển ngày vào giờ đặt lại mỗi đêm, cùng mốc xóa mọi giới hạn hằng ngày.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái. Có một ngoại lệ hoạt động ở mọi nơi: hai món của một bộ dành cho người thi triển phép còn khiến sát thương phải chịu không làm chậm việc thi triển phép nữa.',
+    'Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái. Có một ngoại lệ hoạt động ở mọi nơi: hai món của bất kỳ bộ nào trong số này còn khiến sát thương phải chịu không làm chậm việc thi triển phép nữa.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Đó là sự đánh đổi có chủ đích. Trang bị Chiến Trận dành cho việc đấu với người chơi, không phải đường tắt vượt các bậc phó bản: một món Chiến Trận không có những điểm chỉ số chiến đấu mà món sử thi phó bản cùng ô có; thay vào đó, điểm Chiến Trận và thưởng bộ của nó được dành hoàn toàn cho đối thủ là người chơi. Muốn đứng vững trong đấu trường thì hãy mua. Muốn vượt phó bản anh hùng nhanh hơn thì hãy kiếm trang bị trong phó bản.',
   'guide.controls.harvestJournal': 'Nhật Ký Thu Hoạch',

@@ -10427,7 +10427,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.name': '谷の秘術師の装束',
   'entities.itemSets.vale_arcanist.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.warfare_ashstalker.name': 'アッシュストーカーの装備',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -10440,7 +10441,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で燠火の守りが宿り、8秒間120のダメージを吸収します。',
   'entities.itemSets.warfare_furyforged.name': 'フューリーフォージの戦装束',
-  'entities.itemSets.warfare_furyforged.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_furyforged.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -18398,7 +18400,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'ランクマッチに勝てば、プレイヤー対プレイヤーの通貨である名誉が支払われ、最後まで戦い抜いた負け試合にもそれより少ない額の名誉が支払われます。引き分けも同様です。ですから、負けて本当に失うものはレーティングだけです。名誉は本物の試合に報いるためのものです。同じ日に同じ相手や同じチームをもう一度倒しても追加の支払いはなく（もう一度負けても同じです）、勝ち続けた長い一日でも最初の何勝かまでは満額が支払われ、その後は一勝あたりが半分になり、さらに勝ち進むともう一度半分になってそこで下げ止まり、相手が棄権した試合はレーティングこそ動きますが名誉はまったく支払われません。この「一日」はワールド自身の一日で、ワールドの夜間リセット時刻に切り替わります。日次のロックアウトがすべて解けるのと同じ境目です。',
   'guide.arenaPage.warfareBodyStatsStay':
-    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。ただし例外が一つあり、どこでも有効です。術者用セットを2つ装備すると、被ダメージで詠唱が遅れなくなります。',
+    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。ただし例外が一つあり、どこでも有効です。これらのどのセットでも2つ装備すると、被ダメージで詠唱が遅れなくなります。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。',
   'guide.social.calendarBodyDoubleHonor':
@@ -19642,26 +19644,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。',
   'entities.itemSets.vanguard_paladin_protection.name': 'ヴァンガード：Shieldvow Bastion',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    '2点：Oath Chainのクールダウンが2秒短縮。',
+    '2点：Oath Chainのクールダウンが2秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     '4点：Oath Chainで引き寄せた敵は4秒間30%遅く詠唱し、条件を満たすとSolar Reprisalを得る。',
   'entities.itemSets.vanguard_paladin_retribution.name': 'ヴァンガード：Lightbrand Warplate',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    '2点：Valkyr Callingのクールダウンが15秒短縮。',
+    '2点：Valkyr Callingのクールダウンが15秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     '4点：Valkyr CallingがFinal Edictをリセットし、着地後6秒以内の次のFinal Edictのダメージを15%上げる。',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'ヴァンガード：Packwarden Harness',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    '2点：Rattling Shotのクールダウンが4秒短縮。',
+    '2点：Rattling Shotのクールダウンが4秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     '4点：Rattling ShotでHowling Rageの残りクールダウンが1秒短縮。',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'ヴァンガード：Farsight Harness',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    '2点：Trailbreakのクールダウンが4秒短縮。',
+    '2点：Trailbreakのクールダウンが4秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     '4点：Trailbreakで6秒以内の次のLong Drawが即時発動。15秒に1回まで。',
   'entities.itemSets.vanguard_hunter_survival.name': 'ヴァンガード：Snaretooth Harness',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': '2点：Bloodhookのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    '2点：Bloodhookのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_hunter_survival.bonus4': '4点：BloodhookでHunting Momentumを1得る。',
   'entities.itemSets.vanguard_rogue_assassination.name': 'ヴァンガード：Nightcut Leathers',
   'entities.itemSets.vanguard_rogue_assassination.bonus2':
@@ -19697,7 +19700,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'ヴァンガード：Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    '2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。',
+    '2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     '4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。',
   'entities.itemSets.vanguard_shaman_restoration.name': 'ヴァンガード：Brineward Chainmail',
@@ -19736,7 +19739,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。',
   'entities.itemSets.vanguard_druid_feral.name': '血たてがみの皮装',
-  'entities.itemSets.vanguard_druid_feral.bonus2': '2点：Bruin Rushのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    '2点：Bruin Rushのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     '4点：Bruin Rushが最大体力6%のシールドを6秒付与。',
   'entities.itemSets.vanguard_druid_restoration.name': 'アザミ花の祭服',

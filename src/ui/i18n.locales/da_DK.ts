@@ -1894,7 +1894,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Kasting af Gribende Rødder lader dig kaste mens du bevæger dig og øger din bevægelseshastighed med 20 procent i 4 sek. Kan ikke forekomme mere end én gang hver 20 sek.',
   'entities.itemSets.vanguard_druid_balance.name': 'Stjernevogter Gevandter',
-  'entities.itemSets.vanguard_druid_feral.bonus2': 'Bruin-storm nedtælling reduceres med 3 sek.',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    'Bruin-storm nedtælling reduceres med 3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Bruin-storm skjolder dig for 6 procent af din maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_druid_feral.name': 'Blodhane Hud',
@@ -1904,16 +1905,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Flugtlægning øger også din bevægelseshastighed med 30 procent i 3 sek.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Tidstel Blomst Gevandter',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'Rystende Skud nedtælling reduceres med 4 sek.',
+    'Rystende Skud nedtælling reduceres med 4 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Rystende Skud reducerer Bestialsk vredes resterende nedtælling med 1 sek.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Flok-vægter Seletøj',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'Stibryder nedtælling reduceres med 4 sek.',
+    'Stibryder nedtælling reduceres med 4 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Stibryder gør din næste Langt Optræk inden 6 sek øjeblikkelig. Kan ikke forekomme mere end én gang hver 15 sek.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Fjernblik Seletøj',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': 'Blodkrog nedtælling reduceres med 3 sek.',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    'Blodkrog nedtælling reduceres med 3 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Blodkrog tildeler 1 Jagtfart.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Fælde-tand Seletøj',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
@@ -1936,12 +1938,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Livets Pagt skjolder også allierede for 8 procent af deres maksimale sundhed i 6 sek.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Solbevagt Regalia',
-  'entities.itemSets.vanguard_paladin_protection.bonus2': 'Edskæde nedtælling reduceres med 2 sek.',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    'Edskæde nedtælling reduceres med 2 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Fjender trukket af Edskæde kaster zauber 30 procent langsommere i 4 sek, og Edskæde tildeler dig Solargengeldelse når den binder en fjende som kan trækkes.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Skovlpagt Bastion',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'Valkyriens Kald nedtælling reduceres med 15 sek.',
+    'Valkyriens Kald nedtælling reduceres med 15 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Valkyriens Kald nulstiller Sidste Påbuds nedtælling, og din næste Sidste Påbud inden 6 sek efter landing påfører 15 procent mere skade.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lysmærke Krigs-pladeudstyr',
@@ -1978,7 +1981,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Løsriv Våben lader dig kaste mens du bevæger dig og øger din bevægelseshastighed med 20 procent i 4 sek. Kan ikke forekomme mere end én gang hver 20 sek.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Stormskrift Kampmail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Forfædrenes Slag bremser målets bevægelseshastighed med 30 procent i 4 sek.',
+    'Forfædrenes Slag bremser målets bevægelseshastighed med 30 procent i 4 sek. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Forfædrenes Slag reducerer Elementær Trance resterende nedtælling med 4 sek.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Stormfødt Krigsmail',
@@ -4691,7 +4694,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Stil',
   'editor.status.campCapReached':
     'Grænsen for lejre er nået ({max}). Den nye lejr blev ikke tilføjet.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4704,7 +4708,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Øger Krigsførelsesangreb og Krigsførelsesforsvar med 80. Jeres besværgelser har 15% chance for at give Gløderværn, hvilket absorberer 120 skade i 8 sek.',
   'entities.itemSets.warfare_cinderweave.name': 'Glødvæv-regalier',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Øger Krigsførelsesforsvar med 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Øger Krigsførelsesforsvar med 40. Skade, du tager, forsinker ikke længere dine besværgelser.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Øger Krigsførelsesangreb med 40, og kontrol, som fjendtlige spillere lægger på jer, varer 15% kortere.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19317,7 +19322,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'En sejr i ranglisten giver Ære, spiller-mod-spiller-valutaen, og et nederlag, du spiller til ende, giver stadig en mindre andel, ligesom uafgjort gør, så rang er det eneste, et nederlag virkelig koster dig. Ære skal belønne rigtige kampe: at besejre den samme modstander eller det samme hold igen samme dag giver ikke mere (og det gør et nyt nederlag mod dem heller ikke), en lang sejrsdag giver fuld betaling for dagens første række sejre og halverer derefter sejrsbetalingen, halverer den igen længere inde og bliver der, og en kamp, som modstanderen opgiver, flytter stadig din rang, men giver slet ingen Ære. Dagen følger rigets egen tid: Den skifter ved rigets natlige nulstilling, den samme grænse hvor alle daglige lockouts ryddes.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster. Én undtagelse virker overalt: to dele af et besværgersæt gør også, at skade ikke længere forsinker dine besværgelser.',
+    'Hvert krigsstykke har Krigsoffensiv og Krigsforsvarsvurdering, og de to vurderinger gør slet intet mod monstre. De gælder kun, når du kæmper mod en anden spiller, i en duel, arenaen eller slagmarken, hvor Offensiv øger den skade, du gør, og Forsvar mindsker den skade, du tager, hver op til sin egen grænse. Hver rustningsfamilie er også et sæt, og sættets bonusser er ligeledes krigsvurderinger eller effekter, der kun virker mod spillere, så et komplet æressætets sætbonusser tæller intet mod en dungeonboss. Selve delene har stadig deres almindelige egenskaber, rustning og våbenskade, og de virker overalt. Det er krigsvurderingerne og sætbonusserne, der bliver tavse mod et monster. Én undtagelse virker overalt: to dele af ethvert af disse sæt gør også, at skade ikke længere forsinker dine besværgelser.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Det er den tilsigtede handel. Krigsudstyr er bygget til at kæmpe mod spillere, ikke som en genvej forbi dungeon-niveauerne: Et krigsstykke har aldrig de kampratings, som en dungeon-episk genstand i samme plads har, og de krigsvurderinger og sætbonusser, det i stedet har, bruges fuldstændigt på andre spillere. Hvis du vil kunne klare dig i arenaen, så køb det. Hvis du vil rydde heroiske dungeons hurtigere, så tjen dit udstyr i dungeons.',
   'guide.controls.harvestJournal': 'Høstjournal',

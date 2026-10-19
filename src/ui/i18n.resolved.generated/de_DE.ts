@@ -8447,7 +8447,7 @@ export const de_DE: EnTranslations = {
       "honorFinalNoteSoldBack": "Ehrenkäufe sind endgültig. Die Rückkaufliste enthält nur Dinge, die du verkauft hast. Ein Münzkauf kann normalerweise zum Verkaufspreis zurückverkauft und aus dieser Liste zurückgeholt werden, falls du es dir anders überlegst. Kriegsführungsausrüstung bindet sich jedoch im Augenblick des Kaufs an die Seele. Sie kann daher nie gehandelt, verschickt oder für irgendetwas zurückverkauft werden und erreicht die Liste nie. Genau deshalb verlangt der Laden eine Bestätigung: Prüfe das Stück, bevor du drückst.",
       "warfareHeading": "Kriegsführungsausrüstung",
       "warfareBody": "Jedes Kriegsführungs-Ausrüstungsteil trägt Kriegsführungs-Angriffswertung und Kriegsführungs-Verteidigungswertung, und diese beiden Wertungen bewirken gegen Monster überhaupt nichts. Sie wirken nur, wenn du gegen einen anderen Spieler kämpfst, in einem Duell, in der Arena oder auf dem Schlachtfeld, wo Angriff dem von dir verursachten Schaden hinzufügt und Verteidigung den an dir erlittenen Schaden verringert, jeweils bis zu einer eigenen Obergrenze. Jede Rüstungsfamilie ist zugleich ein Set, und seine Set-Boni sind ebenso Kriegsführungswertung oder Effekte, die nur gegen Spieler wirken, sodass eine komplette Ehrenausrüstung auf einem Dungeon-Boss nichts wert ist.",
-      "warfareBodyStatsStay": "Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster. Eine Ausnahme wirkt überall: Zwei Teile eines Zauberwirker-Sets sorgen außerdem dafür, dass erlittener Schaden dein Zauberwirken nicht mehr verzögert.",
+      "warfareBodyStatsStay": "Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster. Eine Ausnahme wirkt überall: Zwei Teile eines dieser Sets sorgen außerdem dafür, dass erlittener Schaden dein Zauberwirken nicht mehr verzögert.",
       "warfareTradeBody": "Das ist der bewusste Kompromiss. Kriegsführungsausrüstung ist für den Kampf gegen Spieler gebaut, nicht als Abkürzung an den Dungeon-Stufen vorbei: Ein Kriegsführungsteil trägt niemals die Kampfwertungen, die ein Dungeon-Epic im selben Slot bietet, und alles, was es mitbringt, ist für andere Spieler bestimmt. Willst du dich in der Arena behaupten, kauf sie dir. Willst du heroische Dungeons schneller schaffen, verdiene dir deine Ausrüstung in den Dungeons.",
       "warfareTradeBodyRatingSpent": "Kriegsführungsausrüstung ist für Spieler gegen Spieler gedacht und überspringt keine Dungeonstufen. Sie trägt nicht die Kampfbewertungen eines Dungeonepics, sondern investiert ihre Bewertungen und Setboni vollständig in Kämpfe gegen Spieler. Für die Arena kaufst du sie, für schnellere heroische Dungeons verdienst du deine Ausrüstung dort.",
       "vanguardHeading": "Vorhut-Ausrüstung: Kriegsführung Saison 2",
@@ -24386,7 +24386,7 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Blutmähnen-Fell",
-        "bonus2": "Die Abklingzeit von Bruin-Ansturm wird um 3 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Bruin-Ansturm wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Bruin-Ansturm gewährt dir 6 Sek. lang einen Schild in Höhe von 6 Prozent deiner maximalen Gesundheit."
       },
       "vanguard_druid_restoration": {
@@ -24396,17 +24396,17 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Rudelwächter-Geschirr",
-        "bonus2": "Die Abklingzeit von Rasselnder Schuss wird um 4 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Rasselnder Schuss wird um 4 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Rasselnder Schuss verringert die verbleibende Abklingzeit von Zorn des Wildtiers um 1 Sek."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Weitsicht-Geschirr",
-        "bonus2": "Die Abklingzeit von Pfadbruch wird um 4 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Pfadbruch wird um 4 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Pfadbruch lässt deinen nächsten Langen Zug innerhalb von 6 Sek. sofort wirken. Kann höchstens einmal alle 15 Sek. auftreten."
       },
       "vanguard_hunter_survival": {
         "name": "Fallenzahn-Geschirr",
-        "bonus2": "Die Abklingzeit von Bluthaken wird um 3 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Bluthaken wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Bluthaken gewährt 1 Jagdschwung."
       },
       "vanguard_mage_arcane": {
@@ -24431,12 +24431,12 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Schildschwur-Bastion",
-        "bonus2": "Die Abklingzeit von Eidkette wird um 2 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Eidkette wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Von Eidkette herangezogene Gegner wirken ihre Zauber 4 Sek. lang 30 Prozent langsamer, und Eidkette gewährt dir Sonnenvergeltung, wenn sie einen ziehbaren Gegner bindet."
       },
       "vanguard_paladin_retribution": {
         "name": "Lichtbrand-Kriegsplatte",
-        "bonus2": "Die Abklingzeit von Ruf der Walküre wird um 15 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Ruf der Walküre wird um 15 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Ruf der Walküre setzt die Abklingzeit von Letztes Edikt zurück, und dein nächstes Letztes Edikt innerhalb von 6 Sek. nach dem Treffer verursacht 15 Prozent mehr Schaden."
       },
       "vanguard_priest_discipline": {
@@ -24476,7 +24476,7 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Sturmgeboren-Kriegskette",
-        "bonus2": "Ahnenhieb verlangsamt das Lauftempo des Ziels 4 Sek. lang um 30 Prozent.",
+        "bonus2": "Ahnenhieb verlangsamt das Lauftempo des Ziels 4 Sek. lang um 30 Prozent. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Ahnenhieb verringert die verbleibende Abklingzeit von Elemental Trance um 4 Sek."
       },
       "vanguard_shaman_restoration": {
@@ -24521,7 +24521,7 @@ export const de_DE: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Aschenpirscher-Ausrüstung",
-        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40.",
+        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
         "bonus7": "Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ascheschritt, was das Bewegungstempo 6 Sek. lang um 40% erhöht."
       },
@@ -24533,7 +24533,7 @@ export const de_DE: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Zorngeschmiedete Kriegstracht",
-        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40.",
+        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
         "bonus7": "Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ungebrochenen Eid, was 10 Sek. lang 200 Schaden absorbiert."
       },

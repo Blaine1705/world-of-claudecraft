@@ -10006,7 +10006,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.name': '谷地秘法師法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.warfare_ashstalker.name': '灰燼追獵者裝備',
-  'entities.itemSets.warfare_ashstalker.bonus2': '戰爭防禦等級提高 40。',
+  'entities.itemSets.warfare_ashstalker.bonus2': '戰爭防禦等級提高 40。受到傷害不再延遲你的施法。',
   'entities.itemSets.warfare_ashstalker.bonus4':
     '戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -10018,7 +10018,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     '戰爭攻擊與防禦等級提高 80。你的法術有 15% 的機率給予餘燼守護，在 8 秒內吸收 120 點傷害。',
   'entities.itemSets.warfare_furyforged.name': '怒鑄戰裝',
-  'entities.itemSets.warfare_furyforged.bonus2': '戰爭防禦等級提高 40。',
+  'entities.itemSets.warfare_furyforged.bonus2': '戰爭防禦等級提高 40。受到傷害不再延遲你的施法。',
   'entities.itemSets.warfare_furyforged.bonus4':
     '戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -17496,7 +17496,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     '一場排名勝利會發放榮譽這種玩家對戰貨幣，而一場你打到最後的落敗仍會發放其中較小的一份，平手亦然，因此落敗真正讓你付出的代價只有評分。榮譽的用意是獎勵真正的對戰：同一天內再次擊敗同一位對手或同一支隊伍不會再發放（再次敗給他們也一樣），連勝的一天裡開頭的若干場勝利照舊足額發放，此後每場勝利只給一半，打得更久之後再減半，並就此穩住，而對手棄賽的比賽雖然仍會牽動你的評分，卻完全不發榮譽。這個「一天」是國度自己的一天：它在國度自己的夜間重置時刻換日，而那正是所有每日鎖定一併解除的同一道界線。',
   'guide.arenaPage.warfareBodyStatsStay':
-    '每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備的套裝效果打起地城首領來一文不值。裝備本身仍帶有一般的屬性、護甲值與武器傷害，而這些在任何地方都有效；面對怪物時沉寂下來的，是戰爭等級與套裝效果。但有一個例外在任何地方都有效：穿戴施法者套裝的兩件後，受到傷害不再延遲你的施法。',
+    '每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備的套裝效果打起地城首領來一文不值。裝備本身仍帶有一般的屬性、護甲值與武器傷害，而這些在任何地方都有效；面對怪物時沉寂下來的，是戰爭等級與套裝效果。但有一個例外在任何地方都有效：穿戴其中任一套的兩件後，受到傷害不再延遲你的施法。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     '這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它轉而帶有的戰爭等級與套裝效果，則全都花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。',
   'guide.social.calendarBodyDoubleHonor':
@@ -18680,23 +18680,28 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '4件：Life Covenant還會為盟友提供相當於最大生命值8%的護盾，持續6秒。',
   'entities.itemSets.vanguard_paladin_protection.name': '先鋒套裝：Shieldvow Bastion',
-  'entities.itemSets.vanguard_paladin_protection.bonus2': '2件：Oath Chain冷卻縮短2秒。',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    '2件：Oath Chain冷卻縮短2秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     '4件：被Oath Chain拉拽的敵人施法速度降低30%，持續4秒，並可賦予Solar Reprisal。',
   'entities.itemSets.vanguard_paladin_retribution.name': '先鋒套裝：Lightbrand Warplate',
-  'entities.itemSets.vanguard_paladin_retribution.bonus2': '2件：Valkyr Calling冷卻縮短15秒。',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    '2件：Valkyr Calling冷卻縮短15秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     '4件：Valkyr Calling重置Final Edict冷卻，並使落地後6秒內的下一次Final Edict傷害提高15%。',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': '先鋒套裝：Packwarden Harness',
-  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2': '2件：Rattling Shot冷卻縮短4秒。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    '2件：Rattling Shot冷卻縮短4秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     '4件：Rattling Shot使Howling Rage剩餘冷卻縮短1秒。',
   'entities.itemSets.vanguard_hunter_marksmanship.name': '先鋒套裝：Farsight Harness',
-  'entities.itemSets.vanguard_hunter_marksmanship.bonus2': '2件：Trailbreak冷卻縮短4秒。',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    '2件：Trailbreak冷卻縮短4秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     '4件：Trailbreak使6秒內下一次Long Draw瞬發。每15秒最多一次。',
   'entities.itemSets.vanguard_hunter_survival.name': '先鋒套裝：Snaretooth Harness',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': '2件：Bloodhook冷卻縮短3秒。',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    '2件：Bloodhook冷卻縮短3秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vanguard_hunter_survival.bonus4': '4件：Bloodhook獲得1點Hunting Momentum。',
   'entities.itemSets.vanguard_rogue_assassination.name': '先鋒套裝：Nightcut Leathers',
   'entities.itemSets.vanguard_rogue_assassination.bonus2': '2件：Low Blow能量消耗降低10點。',
@@ -18732,7 +18737,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '4件：Unleash Weapon可移動施法並使移動速度提高20%，持續4秒。每20秒最多一次。',
   'entities.itemSets.vanguard_shaman_enhancement.name': '先鋒套裝：Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    '2件：Ancestral Strike使目標移動速度降低30%，持續4秒。',
+    '2件：Ancestral Strike使目標移動速度降低30%，持續4秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     '4件：Ancestral Strike使Elemental Trance剩餘冷卻縮短4秒。',
   'entities.itemSets.vanguard_shaman_restoration.name': '先鋒套裝：Brineward Chainmail',
@@ -18770,7 +18775,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '4件：每第二次Conflagrate使8秒內下一次Ruinbolt瞬發。',
   'entities.itemSets.vanguard_druid_feral.name': '血鬃獸皮',
-  'entities.itemSets.vanguard_druid_feral.bonus2': '2件：Bruin Rush冷卻縮短3秒。',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    '2件：Bruin Rush冷卻縮短3秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     '4件：Bruin Rush提供相當於最大生命值6%的護盾，持續6秒。',
   'entities.itemSets.vanguard_druid_restoration.name': '薊花法衣',

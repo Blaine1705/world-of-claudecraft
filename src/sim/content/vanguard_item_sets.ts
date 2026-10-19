@@ -64,7 +64,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_paladin_protection',
     name: 'Shieldvow Bastion',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Oath Chain's cooldown is reduced by 2 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Oath Chain's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -76,7 +80,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_paladin_retribution',
     name: 'Lightbrand Warplate',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Valkyr's Calling's cooldown is reduced by 15 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Valkyr's Calling's cooldown is reduced by 15 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -88,7 +96,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_hunter_beast_mastery',
     name: 'Packwarden Harness',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Rattling Shot's cooldown is reduced by 4 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Rattling Shot's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -100,7 +112,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_hunter_marksmanship',
     name: 'Farsight Harness',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Trailbreak's cooldown is reduced by 4 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Trailbreak's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},
@@ -112,7 +128,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_hunter_survival',
     name: 'Snaretooth Harness',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Bloodhook's cooldown is reduced by 3 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Bloodhook's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
+      },
       { pieces: 4, effect: {}, text: 'Bloodhook grants 1 Hunting Momentum.' },
     ],
   },
@@ -223,7 +243,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
+        text: "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec. Damage taken no longer delays your spellcasting.",
       },
       {
         pieces: 4,
@@ -364,7 +384,11 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_druid_feral',
     name: 'Bloodmane Hide',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Bruin Rush's cooldown is reduced by 3 sec." },
+      {
+        pieces: 2,
+        effect: {},
+        text: "Bruin Rush's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
+      },
       {
         pieces: 4,
         effect: {},

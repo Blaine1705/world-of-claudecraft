@@ -1862,7 +1862,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Lanciare Radici Avvinghianti ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec.',
   'entities.itemSets.vanguard_druid_balance.name': 'Paramenti Guardiastelle',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'Il tempo di recupero di Carica di Bruin è ridotto di 3 sec.',
+    'Il tempo di recupero di Carica di Bruin è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Carica di Bruin ti protegge con uno scudo pari al 6 percento della tua salute massima per 6 sec.',
   'entities.itemSets.vanguard_druid_feral.name': 'Pelle Sanguicriniera',
@@ -1872,17 +1872,17 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Rapidità di Guarigione aumenta inoltre la tua velocità di movimento del 30 percento per 3 sec.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Veste Cardofiore',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec.',
+    'Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Tiro Scuotente riduce di 1 sec il tempo di recupero rimanente di Ira Bestiale.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Finimenti Guardiabranco',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'Il tempo di recupero di Rompipista è ridotto di 4 sec.',
+    'Il tempo di recupero di Rompipista è ridotto di 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Rompipista rende istantaneo il tuo prossimo Tiro Teso lanciato entro 6 sec. Non può verificarsi più di una volta ogni 15 sec.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Finimenti Vistalontana',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    'Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec.',
+    'Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_hunter_survival.bonus4':
     'Uncino Sanguinario concede 1 Slancio di Caccia.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Finimenti Dentetrappola',
@@ -1907,12 +1907,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Patto della Vita protegge inoltre l'alleato con uno scudo pari all'8 percento della sua salute massima per 6 sec.",
   'entities.itemSets.vanguard_paladin_holy.name': 'Paramenti Vegliasole',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec.',
+    'Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'I nemici trascinati da Catena del Giuramento lanciano incantesimi il 30 percento più lentamente per 4 sec, e Catena del Giuramento ti concede Rappresaglia Solare quando vincola un nemico che può essere trascinato.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Baluardo Giuroscudo',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec.',
+    'Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Richiamo della Valchiria azzera il tempo di recupero di Editto Finale, e il tuo prossimo Editto Finale lanciato entro 6 sec dal colpo infligge il 15 percento di danni in più.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Piastre di Guerra Marchioluce',
@@ -1951,7 +1951,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Scatena l'Arma ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec.",
   'entities.itemSets.vanguard_shaman_elemental.name': 'Maglia da Battaglia Editempesta',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec.',
+    'Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Colpo Ancestrale riduce di 4 sec il tempo di recupero rimanente di Elemental Trance.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Maglia di Guerra Ventonato',
@@ -4828,7 +4828,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Stile',
   'editor.status.campCapReached':
     'Limite di accampamenti raggiunto ({max}). Il nuovo accampamento non è stato aggiunto.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4841,7 +4842,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Brace, assorbendo 120 danni per 8 sec.",
   'entities.itemSets.warfare_cinderweave.name': 'Paramenti Braciotessuti',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_furyforged.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19737,7 +19739,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Una vittoria classificata paga Onore, la valuta giocatore contro giocatore, e anche una sconfitta giocata fino alla fine paga una parte minore, così la valutazione è l’unico vero costo della sconfitta. L’Onore serve a ricompensare partite reali: battere di nuovo lo stesso avversario o la stessa squadra nello stesso giorno non paga altro, e nemmeno perdere di nuovo contro di loro; una lunga giornata di vittorie paga per intero la prima serie, poi dimezza la ricompensa, la dimezza ancora più avanti e resta a quel livello, mentre una partita abbandonata dall’avversario muove comunque la valutazione ma non paga Onore. Il giorno è quello del reame: ricomincia all’ora del reset notturno, lo stesso confine in cui si azzerano tutti i blocchi giornalieri.',
   'guide.arenaPage.warfareBodyStatsStay':
-    "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra. Un'eccezione funziona ovunque: due pezzi di un set da incantatore fanno anche sì che i danni subiti non ritardino più il lancio degli incantesimi.",
+    "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra. Un'eccezione funziona ovunque: due pezzi di uno qualsiasi di questi set fanno anche sì che i danni subiti non ritardino più il lancio degli incantesimi.",
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'È questo lo scambio voluto. L’equipaggiamento da Guerra serve a combattere i giocatori, non a saltare i livelli dei dungeon: un pezzo da Guerra non porta mai le valutazioni di combattimento che avrebbe un epico da dungeon nello stesso slot, e la valutazione da Guerra e i bonus del completo che porta sono spesi interamente contro altri giocatori. Se vuoi reggere nell’arena, compralo. Se vuoi superare più velocemente le modalità eroiche, guadagna l’equipaggiamento nei dungeon.',
   'guide.controls.harvestJournal': 'Diario del Raccolto',

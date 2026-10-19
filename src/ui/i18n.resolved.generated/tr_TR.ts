@@ -8447,7 +8447,7 @@ export const tr_TR: EnTranslations = {
       "honorFinalNoteSoldBack": "Onur satın alımları kesindir. Geri satın alma listesinde yalnızca sattığın şeyler bulunur: para ile alınan bir şey, fikrini yeniden değiştirirsen genellikle satış fiyatına geri satılıp bu listeden alınabilir; ancak Harp teçhizatı satın aldığın anda ruha bağlanır, bu yüzden hiçbir zaman takas edilemez, postalanamaz veya başka bir bedel karşılığında geri satılamaz ve bu listeye asla ulaşmaz. Mağaza bu yüzden onay ister: parçaya basmadan önce onu oku.",
       "warfareHeading": "Harp teçhizatı",
       "warfareBody": "Her Harp parçası Harp Saldırı Puanı ve Harp Savunma Puanı taşır, ve bu iki puan canavarlara karşı hiçbir işe yaramaz. Yalnızca başka bir oyuncuyla dövüştüğünde, bir düelloda, arenada ya da savaş alanında işler; burada Saldırı verdiğin hasara eklenir, Savunma ise aldığın hasarı azaltır, her biri kendi tavanına kadar. Her zırh ailesi aynı zamanda bir takımdır, ve takım bonusları da benzer şekilde Harp puanı ya da yalnızca oyunculara karşı işleyen etkilerdir, bu yüzden tam bir onur kiti bir zindan patronunda hiçbir işe yaramaz.",
-      "warfareBodyStatsStay": "Her Harp parçası Harp Saldırı ve Harp Savunma Derecesi taşır; bu iki derece canavarlara karşı hiçbir şey yapmaz. Yalnızca düelloda, arenada veya savaş alanında başka bir oyuncuyla dövüşürken uygulanır; Saldırı verdiğin hasarı artırır, Savunma aldığın hasarı azaltır ve her biri kendi tavanına ulaşabilir. Her zırh ailesi aynı zamanda bir settir ve set bonusları da yalnızca oyunculara karşı çalışan Harp derecesi veya etkileridir; bu nedenle eksiksiz bir onur setinin set bonusları zindan patronuna karşı hiçbir şey yapmaz. Parçaların sıradan istatistikleri, zırhı ve silah hasarı yine vardır ve her yerde çalışır; canavara karşı sessiz kalan Harp dereceleri ve set bonuslarıdır. Her yerde geçerli tek bir istisna var: büyücü setinin iki parçası, alınan hasarın büyü yapmanı geciktirmesini de engeller.",
+      "warfareBodyStatsStay": "Her Harp parçası Harp Saldırı ve Harp Savunma Derecesi taşır; bu iki derece canavarlara karşı hiçbir şey yapmaz. Yalnızca düelloda, arenada veya savaş alanında başka bir oyuncuyla dövüşürken uygulanır; Saldırı verdiğin hasarı artırır, Savunma aldığın hasarı azaltır ve her biri kendi tavanına ulaşabilir. Her zırh ailesi aynı zamanda bir settir ve set bonusları da yalnızca oyunculara karşı çalışan Harp derecesi veya etkileridir; bu nedenle eksiksiz bir onur setinin set bonusları zindan patronuna karşı hiçbir şey yapmaz. Parçaların sıradan istatistikleri, zırhı ve silah hasarı yine vardır ve her yerde çalışır; canavara karşı sessiz kalan Harp dereceleri ve set bonuslarıdır. Her yerde geçerli tek bir istisna var: bu setlerden herhangi birinin iki parçası, alınan hasarın büyü yapmanı geciktirmesini de engeller.",
       "warfareTradeBody": "Bu bilinçli bir değiş tokuştur. Harp teçhizatı oyuncularla dövüşmek için yapılmıştır, zindan kademelerini atlamanın bir kestirmesi değildir: bir Harp parçası aynı yuvadaki destansı bir zindan parçasının taşıdığı savaş puanlarını asla taşımaz, ve getirdiği her şey diğer oyunculara harcanır. Arenada kendini tutmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlarda kazan.",
       "warfareTradeBodyRatingSpent": "Bu, kasıtlı takastır. Harp teçhizatı zindan kademelerini atlamak için değil, oyuncularla savaşmak için yapılır: bir Harp parçası aynı yuvadaki zindan epik parçasının taşıdığı savaş derecelerini asla taşımaz; onun yerine taşıdığı Harp derecesi ve set bonusları tamamen diğer oyunculara harcanır. Arenada ayakta kalmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlardan kazan.",
       "vanguardHeading": "Vanguard Ekipmesi: Savaş Mevsimi 2",
@@ -24386,7 +24386,7 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Kan Yeleleri Gizliliği",
-        "bonus2": "Bruin Rush'ın bekleme süresi 3 san azalır.",
+        "bonus2": "Bruin Rush'ın bekleme süresi 3 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Bruin Rush seni maksimum sağlığının %6'sı için 6 saniye kalkan ile korur."
       },
       "vanguard_druid_restoration": {
@@ -24396,17 +24396,17 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Sürü Bekçisi Kuşak",
-        "bonus2": "Rattling Shot'ın bekleme süresi 4 san azalır.",
+        "bonus2": "Rattling Shot'ın bekleme süresi 4 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Rattling Shot, Howling Rage'inin kalan bekleme süresini 1 san azaltır."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Uzak Görüş Kuşak",
-        "bonus2": "Trailbreak'ın bekleme süresi 4 san azalır.",
+        "bonus2": "Trailbreak'ın bekleme süresi 4 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Trailbreak, sonraki 6 saniye içindeki Long Draw'ı anlık yapabilir. Saatte 2 kereden fazla olamaz."
       },
       "vanguard_hunter_survival": {
         "name": "Tuzak Dişi Kuşak",
-        "bonus2": "Bloodhook'ın bekleme süresi 3 san azalır.",
+        "bonus2": "Bloodhook'ın bekleme süresi 3 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Bloodhook, 1 Hunting Momentum verir."
       },
       "vanguard_mage_arcane": {
@@ -24431,12 +24431,12 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Kalkan Yemini Burcu",
-        "bonus2": "Oath Chain'ın bekleme süresi 2 san azalır.",
+        "bonus2": "Oath Chain'ın bekleme süresi 2 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Oath Chain ile çekilen düşmanlar 4 saniye boyunca büyü %30 daha yavaş dökerler ve Oath Chain bekleme süresi 2 san azalır."
       },
       "vanguard_paladin_retribution": {
         "name": "Işık Damga Savaş Zırhı",
-        "bonus2": "Valkyr's Calling'ın bekleme süresi 15 san azalır.",
+        "bonus2": "Valkyr's Calling'ın bekleme süresi 15 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Valkyr's Calling, Final Edict'in bekleme süresini sıfırlar ve sonraki 6 saniye içindeki Final Edict hasar %30 artırır."
       },
       "vanguard_priest_discipline": {
@@ -24476,7 +24476,7 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Fırtına Doğan Savaş Zırhı",
-        "bonus2": "Ancestral Strike hedefin hareket hızını 4 saniye boyunca %30 yavaşlatır.",
+        "bonus2": "Ancestral Strike hedefin hareket hızını 4 saniye boyunca %30 yavaşlatır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Ancestral Strike, Elemental Trance'ın kalan bekleme süresini 4 san azaltır."
       },
       "vanguard_shaman_restoration": {
@@ -24521,7 +24521,7 @@ export const tr_TR: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Ashstalker Takımı",
-        "bonus2": "Harp Savunma Derecesini 40 artırır.",
+        "bonus2": "Harp Savunma Derecesini 40 artırır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
         "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Düşman bir oyuncuyu öldürmek Kül Adımı verir, bu da hareket hızını 6 sn boyunca %40 artırır."
       },
@@ -24533,7 +24533,7 @@ export const tr_TR: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Furyforged Savaş Takımı",
-        "bonus2": "Harp Savunma Derecesini 40 artırır.",
+        "bonus2": "Harp Savunma Derecesini 40 artırır. Alınan hasar artık büyü yapmanı geciktirmez.",
         "bonus4": "Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.",
         "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Düşman bir oyuncuyu öldürmek Kırılmamış Yemin verir, bu da 10 sn boyunca 200 hasar emer."
       },

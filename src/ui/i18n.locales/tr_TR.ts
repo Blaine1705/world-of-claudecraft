@@ -1880,7 +1880,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus4':
     "Gripping Roots'u döktüğünde hareket ederken büyü yapabilir ve hareket hızın %20 artar.",
   'entities.itemSets.vanguard_druid_balance.name': 'Yıldız Bekçisi Giysileri',
-  'entities.itemSets.vanguard_druid_feral.bonus2': "Bruin Rush'ın bekleme süresi 3 san azalır.",
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    "Bruin Rush'ın bekleme süresi 3 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
   'entities.itemSets.vanguard_druid_feral.bonus4':
     "Bruin Rush seni maksimum sağlığının %6'sı için 6 saniye kalkan ile korur.",
   'entities.itemSets.vanguard_druid_feral.name': 'Kan Yeleleri Gizliliği',
@@ -1890,16 +1891,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Fleetmend ayrıca hareket hızını 3 saniye boyunca %30 artırır.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Thistle Çiçek Koruma',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    "Rattling Shot'ın bekleme süresi 4 san azalır.",
+    "Rattling Shot'ın bekleme süresi 4 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     "Rattling Shot, Howling Rage'inin kalan bekleme süresini 1 san azaltır.",
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Sürü Bekçisi Kuşak',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    "Trailbreak'ın bekleme süresi 4 san azalır.",
+    "Trailbreak'ın bekleme süresi 4 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     "Trailbreak, sonraki 6 saniye içindeki Long Draw'ı anlık yapabilir. Saatte 2 kereden fazla olamaz.",
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Uzak Görüş Kuşak',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': "Bloodhook'ın bekleme süresi 3 san azalır.",
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    "Bloodhook'ın bekleme süresi 3 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Bloodhook, 1 Hunting Momentum verir.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Tuzak Dişi Kuşak',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
@@ -1923,12 +1925,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Life Covenant ayrıca müttefikin maksimum sağlığının %8'i için 6 saniye kalkan ile korur.",
   'entities.itemSets.vanguard_paladin_holy.name': 'Güneş Nöbeti Saltanatı',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    "Oath Chain'ın bekleme süresi 2 san azalır.",
+    "Oath Chain'ın bekleme süresi 2 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Oath Chain ile çekilen düşmanlar 4 saniye boyunca büyü %30 daha yavaş dökerler ve Oath Chain bekleme süresi 2 san azalır.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Kalkan Yemini Burcu',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    "Valkyr's Calling'ın bekleme süresi 15 san azalır.",
+    "Valkyr's Calling'ın bekleme süresi 15 san azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     "Valkyr's Calling, Final Edict'in bekleme süresini sıfırlar ve sonraki 6 saniye içindeki Final Edict hasar %30 artırır.",
   'entities.itemSets.vanguard_paladin_retribution.name': 'Işık Damga Savaş Zırhı',
@@ -1965,7 +1967,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Unleash Weapon hareket ederken büyü yapabilir ve hareket hızını %20 artırır.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Fırtına Yazısı Savaş Zırhı',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Ancestral Strike hedefin hareket hızını 4 saniye boyunca %30 yavaşlatır.',
+    'Ancestral Strike hedefin hareket hızını 4 saniye boyunca %30 yavaşlatır. Alınan hasar artık büyü yapmanı geciktirmez.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     "Ancestral Strike, Elemental Trance'ın kalan bekleme süresini 4 san azaltır.",
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Fırtına Doğan Savaş Zırhı',
@@ -4677,7 +4679,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'auth.shadeWarm': 'Sıcak',
   'auth.style': 'Stil',
   'editor.status.campCapReached': 'Kamp sınırına ulaşıldı ({max}). Yeni kamp eklenmedi.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Harp Savunma Derecesini 40 artırır.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Harp Savunma Derecesini 40 artırır. Alınan hasar artık büyü yapmanı geciktirmez.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4690,7 +4693,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Harp Saldırı ve Savunma Derecesini 80 artırır. Büyülerinin %15 ihtimalle Köz Muhafızı verme şansı vardır, bu da 8 sn boyunca 120 hasar emer.',
   'entities.itemSets.warfare_cinderweave.name': 'Cinderweave Kıyafetleri',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Harp Savunma Derecesini 40 artırır.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Harp Savunma Derecesini 40 artırır. Alınan hasar artık büyü yapmanı geciktirmez.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Harp Saldırı Derecesini 40 artırır ve düşman oyuncuların sana uyguladığı kalabalık kontrolü %15 daha kısa sürer.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19344,7 +19348,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     "Dereceli bir galibiyet, oyuncuya karşı oyuncu para birimi olan Onur'u öder; sonuna kadar oynadığın bir yenilgi ve beraberlik de onun daha küçük bir payını öder, bu yüzden bir yenilginin gerçekten kaybettirdiği tek şey derecelendirmedir. Onur gerçek maçları ödüllendirmek içindir: aynı rakibi veya aynı takımı aynı gün tekrar yenmek daha fazla ödeme yapmaz, onlara tekrar yenilmek de yapmaz. Uzun bir galibiyet günü ilk galibiyetler dizisinde tam ödeme yapar, sonra galibiyet ödemesini yarıya indirir, ileride bir kez daha yarıya indirir ve orada kalır. Rakibinin hükmen bıraktığı maç dereceni yine değiştirir ama hiç Onur ödemez. Gün, diyarın kendi günüdür: her günlük kilidin açıldığı sınır olan diyarın gece sıfırlanma saatinde yenilenir.",
   'guide.arenaPage.warfareBodyStatsStay':
-    'Her Harp parçası Harp Saldırı ve Harp Savunma Derecesi taşır; bu iki derece canavarlara karşı hiçbir şey yapmaz. Yalnızca düelloda, arenada veya savaş alanında başka bir oyuncuyla dövüşürken uygulanır; Saldırı verdiğin hasarı artırır, Savunma aldığın hasarı azaltır ve her biri kendi tavanına ulaşabilir. Her zırh ailesi aynı zamanda bir settir ve set bonusları da yalnızca oyunculara karşı çalışan Harp derecesi veya etkileridir; bu nedenle eksiksiz bir onur setinin set bonusları zindan patronuna karşı hiçbir şey yapmaz. Parçaların sıradan istatistikleri, zırhı ve silah hasarı yine vardır ve her yerde çalışır; canavara karşı sessiz kalan Harp dereceleri ve set bonuslarıdır. Her yerde geçerli tek bir istisna var: büyücü setinin iki parçası, alınan hasarın büyü yapmanı geciktirmesini de engeller.',
+    'Her Harp parçası Harp Saldırı ve Harp Savunma Derecesi taşır; bu iki derece canavarlara karşı hiçbir şey yapmaz. Yalnızca düelloda, arenada veya savaş alanında başka bir oyuncuyla dövüşürken uygulanır; Saldırı verdiğin hasarı artırır, Savunma aldığın hasarı azaltır ve her biri kendi tavanına ulaşabilir. Her zırh ailesi aynı zamanda bir settir ve set bonusları da yalnızca oyunculara karşı çalışan Harp derecesi veya etkileridir; bu nedenle eksiksiz bir onur setinin set bonusları zindan patronuna karşı hiçbir şey yapmaz. Parçaların sıradan istatistikleri, zırhı ve silah hasarı yine vardır ve her yerde çalışır; canavara karşı sessiz kalan Harp dereceleri ve set bonuslarıdır. Her yerde geçerli tek bir istisna var: bu setlerden herhangi birinin iki parçası, alınan hasarın büyü yapmanı geciktirmesini de engeller.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Bu, kasıtlı takastır. Harp teçhizatı zindan kademelerini atlamak için değil, oyuncularla savaşmak için yapılır: bir Harp parçası aynı yuvadaki zindan epik parçasının taşıdığı savaş derecelerini asla taşımaz; onun yerine taşıdığı Harp derecesi ve set bonusları tamamen diğer oyunculara harcanır. Arenada ayakta kalmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlardan kazan.',
   'guide.controls.harvestJournal': 'Hasat Günlüğü',

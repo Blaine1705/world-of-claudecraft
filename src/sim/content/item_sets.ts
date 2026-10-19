@@ -94,13 +94,15 @@ export const WARFARE_CAST_DODGE = 0.15;
 export const WARFARE_CAST_DODGE_DURATION = 6;
 export const WARFARE_CAST_DODGE_CHANCE = 0.15;
 export const WARFARE_CAST_DODGE_ICD = 20;
-// The caster WARFARE families (Stormbound, Cinderweave, Thornhide) also make
-// the wearer immune to damage cast pushback at two pieces. Unlike the rating
-// tiers this is NOT PvP-gated: castPushbackReduction folds into the wearer's
-// stats in recalcPlayerStats like any stat-set knob. The Season 2 caster sets
-// carry the same rider (content/vanguard_set_bonuses.ts).
-export const PVP_CASTER_SET_2PC_PUSHBACK_REDUCTION = 1;
-export const PVP_CASTER_SET_2PC_PUSHBACK_TEXT = 'Damage taken no longer delays your spellcasting.';
+// Every WARFARE family also makes the wearer immune to damage cast pushback at
+// two pieces: the caster families for their spells, and the Strength and
+// Agility families for the casts their classes carry too (Marksmanship shots,
+// hunter Volley, paladin and shaman self-heals, druid caster-form spells).
+// Unlike the rating tiers this is NOT PvP-gated: castPushbackReduction folds
+// into the wearer's stats in recalcPlayerStats like any stat-set knob. The
+// Season 2 sets carry the same rider (content/vanguard_set_bonuses.ts).
+export const PVP_SET_2PC_PUSHBACK_REDUCTION = 1;
+export const PVP_SET_2PC_PUSHBACK_TEXT = 'Damage taken no longer delays your spellcasting.';
 
 // Set ids. Tier-1 families drop from the Gravewyrm Sanctum; tier-2 from the
 // Nythraxis raid. The string is also the `set` tag on each member item.
@@ -345,22 +347,16 @@ const WARFARE_EMBERWARD: SetProc = {
 // applied by a player's PET is entity kind 'mob' and takes the non-hostile-pair
 // early return in Sim.diminishedCrowdControlDuration, so it is not reduced and
 // the looser wording would be false.
-function warfareBonuses(signature: SetProc, capstoneText: string, caster = false): SetBonusTier[] {
+function warfareBonuses(signature: SetProc, capstoneText: string): SetBonusTier[] {
   return [
-    caster
-      ? {
-          pieces: 2,
-          effect: {
-            pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING,
-            castPushbackReduction: PVP_CASTER_SET_2PC_PUSHBACK_REDUCTION,
-          },
-          text: `Increases Warfare Defense Rating by 40. ${PVP_CASTER_SET_2PC_PUSHBACK_TEXT}`,
-        }
-      : {
-          pieces: 2,
-          effect: { pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING },
-          text: 'Increases Warfare Defense Rating by 40.',
-        },
+    {
+      pieces: 2,
+      effect: {
+        pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING,
+        castPushbackReduction: PVP_SET_2PC_PUSHBACK_REDUCTION,
+      },
+      text: `Increases Warfare Defense Rating by 40. ${PVP_SET_2PC_PUSHBACK_TEXT}`,
+    },
     {
       pieces: 4,
       effect: {
@@ -461,7 +457,6 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     bonuses: warfareBonuses(
       WARFARE_EMBERWARD,
       'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
-      true,
     ),
   },
   [SET_WARFARE_ASHSTALKER]: {
@@ -478,7 +473,6 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     bonuses: warfareBonuses(
       WARFARE_EMBERWARD,
       'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
-      true,
     ),
   },
   [SET_WARFARE_THORNHIDE]: {
@@ -487,7 +481,6 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     bonuses: warfareBonuses(
       WARFARE_THORNGUARD,
       'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec.',
-      true,
     ),
   },
 

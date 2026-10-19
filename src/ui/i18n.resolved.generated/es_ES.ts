@@ -8447,7 +8447,7 @@ export const es_ES: EnTranslations = {
       "honorFinalNoteSoldBack": "Las compras de Honor son definitivas. La lista de recompra solo contiene lo que vendiste: una compra con monedas normalmente puede venderse por su precio de venta y recuperarse de la lista si vuelves a cambiar de idea, pero el equipo de Guerra se liga al alma en cuanto lo compras, así que nunca puede intercambiarse, enviarse por correo ni venderse, y nunca llega a esa lista. La tienda pide confirmación por eso: lee la pieza antes de pulsar.",
       "warfareHeading": "Equipo de guerra",
       "warfareBody": "Toda pieza de equipo de guerra lleva Índice de Ofensiva y de Defensa de Pericia Bélica, y esos dos índices no sirven de nada contra monstruos. Solo se aplican cuando luchas contra otro jugador, en un duelo, en la arena o en el campo de batalla, donde la Ofensiva se suma al daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio tope. Cada familia de armadura es también un conjunto, y sus bonificaciones de conjunto son igualmente índice de Pericia Bélica o efectos que solo funcionan contra jugadores, así que un equipo de honor completo no vale nada contra un jefe de mazmorra.",
-      "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de un conjunto de lanzador hacen además que el daño recibido ya no retrase tus hechizos.",
+      "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de cualquiera de estos conjuntos hacen además que el daño recibido ya no retrase tus hechizos.",
       "warfareTradeBody": "Ese es el intercambio deliberado. El equipo de guerra está pensado para luchar contra jugadores, no como atajo para saltarte los niveles de mazmorra: una pieza de guerra nunca lleva los índices de combate que sí lleva un objeto épico de mazmorra en el mismo hueco, y cuanto aporta se gasta en otros jugadores. Si quieres defenderte bien en la arena, cómpralo. Si quieres superar las heroicas más rápido, gánate tu equipo en las mazmorras.",
       "warfareTradeBodyRatingSpent": "Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras.",
       "vanguardHeading": "Equipo de Vanguardia: Guerra, temporada 2",
@@ -24386,7 +24386,7 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Piel Crinsangre",
-        "bonus2": "El tiempo de reutilización de Embestida de Bruin se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Embestida de Bruin se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Embestida de Bruin te otorga un escudo por el 6% de tu salud máxima durante 6 s."
       },
       "vanguard_druid_restoration": {
@@ -24396,17 +24396,17 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Arnés Guardamanada",
-        "bonus2": "El tiempo de reutilización de Disparo Aturdidor se reduce 4 s.",
+        "bonus2": "El tiempo de reutilización de Disparo Aturdidor se reduce 4 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Disparo Aturdidor reduce 1 s el tiempo de reutilización restante de Cólera de las Bestias."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Arnés Vistalarga",
-        "bonus2": "El tiempo de reutilización de Quiebrasendas se reduce 4 s.",
+        "bonus2": "El tiempo de reutilización de Quiebrasendas se reduce 4 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Quiebrasendas hace que tu próximo Tensado Largo en los siguientes 6 s sea instantáneo. No puede ocurrir más de una vez cada 15 s."
       },
       "vanguard_hunter_survival": {
         "name": "Arnés Colmillotrampa",
-        "bonus2": "El tiempo de reutilización de Garfio Sangriento se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Garfio Sangriento se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Garfio Sangriento otorga 1 de Ímpetu de Caza."
       },
       "vanguard_mage_arcane": {
@@ -24431,12 +24431,12 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Bastión Votoescudo",
-        "bonus2": "El tiempo de reutilización de Cadena de Juramento se reduce 2 s.",
+        "bonus2": "El tiempo de reutilización de Cadena de Juramento se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Los enemigos arrastrados por Cadena de Juramento lanzan hechizos un 30% más lento durante 4 s, y Cadena de Juramento te otorga Represalia Solar cuando ata a un enemigo que puede ser arrastrado."
       },
       "vanguard_paladin_retribution": {
         "name": "Placas de Guerra Marcaluz",
-        "bonus2": "El tiempo de reutilización de Llamada de la Valquiria se reduce 15 s.",
+        "bonus2": "El tiempo de reutilización de Llamada de la Valquiria se reduce 15 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Llamada de la Valquiria reinicia el tiempo de reutilización de Edicto Final, y tu próximo Edicto Final en los 6 s siguientes a impactar inflige un 15% más de daño."
       },
       "vanguard_priest_discipline": {
@@ -24476,7 +24476,7 @@ export const es_ES: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Cota de Guerra Vendavalnato",
-        "bonus2": "Golpe Ancestral ralentiza la velocidad de movimiento del objetivo un 30% durante 4 s.",
+        "bonus2": "Golpe Ancestral ralentiza la velocidad de movimiento del objetivo un 30% durante 4 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Golpe Ancestral reduce 4 s el tiempo de reutilización restante de Trance Elemental."
       },
       "vanguard_shaman_restoration": {
@@ -24521,7 +24521,7 @@ export const es_ES: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Equipo Ashstalker",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Matar a un jugador hostil otorga Paso de Ceniza, aumentando la velocidad de movimiento un 40% durante 6 s."
       },
@@ -24533,7 +24533,7 @@ export const es_ES: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Equipo de batalla Furyforged",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Matar a un jugador hostil otorga Juramento Inquebrantado, absorbiendo 200 de daño durante 10 s."
       },

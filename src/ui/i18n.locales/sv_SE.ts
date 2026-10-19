@@ -1896,7 +1896,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Att kasta Gripande rötter låter dig kasta medan du rör dig och ökar din rörelse med 20 procent i 4 sec. Kan inte inträffa mer än en gång var 20 sec.',
   'entities.itemSets.vanguard_druid_balance.name': 'Starwarden Raiment',
-  'entities.itemSets.vanguard_druid_feral.bonus2': 'Bruinrusningens nedräkning minskas med 3 sec.',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    'Bruinrusningens nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Bruinrusning skyddar dig för 6 procent av din maximala hälsa i 6 sec.',
   'entities.itemSets.vanguard_druid_feral.name': 'Bloodmane Hide',
@@ -1906,16 +1907,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Fleetmend ökar också din rörelse med 30 procent i 3 sec.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Thistlebloom Vestment',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'Skakande skotts nedräkning minskas med 4 sec.',
+    'Skakande skotts nedräkning minskas med 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Skakande skott minskar Howling Rage återstående nedräkning med 1 sec.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Packwarden Harness',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'Trailbreaks nedräkning minskas med 4 sec.',
+    'Trailbreaks nedräkning minskas med 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Trailbreak gör din nästa Långt drag inom 6 sec omedelbar. Kan inte inträffa mer än en gång var 15 sec.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Farsight Harness',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': 'Blodkroks nedräkning minskas med 3 sec.',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    'Blodkroks nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Blodkrok ger 1 Jaktfart.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Snaretooth Harness',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
@@ -1939,12 +1941,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Life Covenant skyddar också alliansen för 8 procent av deras maximala hälsa i 6 sec.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Sunvigil Regalia',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'Oath Chains nedräkning minskas med 2 sec.',
+    'Oath Chains nedräkning minskas med 2 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Fiender dragna av Oath Chain kastar besvärjelser 30 procent långsammare i 4 sec, och Oath Chain ger dig Solar Reprisal när det binder en fiende som kan dras.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Shieldvow Bastion',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    "Valkyr's Callings nedräkning minskas med 15 sec.",
+    "Valkyr's Callings nedräkning minskas med 15 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     "Valkyr's Calling återställer Final Edicts nedräkning, och din nästa Final Edict inom 6 sec från träff orsakar 15 procent mer skada.",
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lightbrand Warplate',
@@ -1981,7 +1983,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Unleash Weapon låter dig kasta medan du rör dig och ökar din rörelse med 20 procent i 4 sec. Kan inte inträffa mer än en gång var 20 sec.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec.',
+    'Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Ancestral Strike minskar återstående nedräkning för Elemental Trance med 4 sec.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Galeborn Warmail',
@@ -4695,7 +4697,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'auth.shadeWarm': 'Varm',
   'auth.style': 'Stil',
   'editor.status.campCapReached': 'Lägergränsen nådd ({max}). Det nya lägret lades inte till.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Ökar Krigföringsförsvar med 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.',
   'entities.itemSets.warfare_ashstalker.bonus7':
@@ -4708,7 +4711,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Glödvakt, vilket absorberar 120 skada i 8 sek.',
   'entities.itemSets.warfare_cinderweave.name': 'Glödvävsregalier',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Ökar Krigföringsförsvar med 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.',
   'entities.itemSets.warfare_furyforged.bonus7':
@@ -19345,7 +19349,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'En rankad vinst ger Heder, valutan för spelare mot spelare, och en förlust som du spelar till slutet ger fortfarande en mindre andel, liksom oavgjort, så rankning är det enda en förlust egentligen kostar dig. Heder ska belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag ger inget mer, och det gör inte heller att förlora mot dem igen. En lång vinstdag betalar fullt för sin första följd av segrar, halverar sedan vad en vinst ger, halverar det igen längre in och stannar där. En match som din motståndare lämnar påverkar fortfarande din rankning men ger ingen Heder alls. Dagen tillhör riket: den rullar över vid rikets nattliga återställningstid, samma gräns där alla dagliga låsningar nollställs.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster. Ett undantag fungerar överallt: två delar av ett besvärjarset gör också att skada du tar inte längre fördröjer dina besvärjelser.',
+    'Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster. Ett undantag fungerar överallt: två delar av vilket som helst av dessa set gör också att skada du tar inte längre fördröjer dina besvärjelser.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Det är den avsiktliga avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålornas nivåer: ett krigföringsföremål har aldrig de stridsvärden som en episk fängelsehåleutrustning på samma plats har, och krigföringsvärdet och setbonusarna det får i stället används helt mot andra spelare. Vill du hävda dig på arenan, köp den. Vill du klara hjältemodiga fängelsehålor snabbare, förtjäna din utrustning där.',
   'guide.controls.harvestJournal': 'Skördedagbok',

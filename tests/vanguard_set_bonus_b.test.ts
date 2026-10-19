@@ -15,7 +15,7 @@ import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { setBonusFlag } from '../src/sim/content/ignivar_set_bonuses';
 import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import type { TalentModifiers } from '../src/sim/content/talents';
-import { VANGUARD_CASTER_SET_IDS } from '../src/sim/content/vanguard_set_bonuses';
+import { VANGUARD_PUSHBACK_SET_IDS } from '../src/sim/content/vanguard_set_bonuses';
 import * as B from '../src/sim/content/vanguard_set_bonuses_b';
 import { ITEM_SETS, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -158,9 +158,9 @@ describe('Vanguard B sets: registration', () => {
       const four = computeCharacterModifiers(cls, { spec, rows: {} }, 20, equipment);
       expect(four.selected[setBonusFlag(setId, 2)]).toBe(true);
       expect(four.selected[setBonusFlag(setId, 4)]).toBe(true);
-      // Only the caster Season 2 sets carry the spell pushback rider (2 pieces).
+      // Every Season 2 set but the warrior and rogue ones carries the pushback rider (2 pieces).
       expect(four.global.castPushbackReduction).toBe(
-        VANGUARD_CASTER_SET_IDS.includes(setId) ? 1 : 0,
+        VANGUARD_PUSHBACK_SET_IDS.includes(setId) ? 1 : 0,
       );
     }
   });

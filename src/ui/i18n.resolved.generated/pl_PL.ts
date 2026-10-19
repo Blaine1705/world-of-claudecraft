@@ -8447,7 +8447,7 @@ export const pl_PL: EnTranslations = {
       "honorFinalNoteSoldBack": "Zakupy za honor są ostateczne. Lista odkupienia zawiera tylko to, co sprzedasz: zakup za monety zwykle można sprzedać po cenie sprzedaży i odzyskać z tej listy, jeśli znów zmienisz zdanie, ale sprzęt Wojny wiąże się z duszą natychmiast po zakupie, więc nie można go wymienić, wysłać pocztą ani odkupić za żadną cenę i nigdy nie trafia na tę listę. Sklep prosi o potwierdzenie z tego powodu: przeczytaj opis przed kliknięciem.",
       "warfareHeading": "Ekwipunek działań wojennych",
       "warfareBody": "Każdy element działań wojennych niesie Ocenę Ataku Działań Wojennych i Ocenę Obrony Działań Wojennych, a te dwie oceny nie robią zupełnie nic przeciwko potworom. Działają wyłącznie wtedy, gdy walczysz z innym graczem: w pojedynku, na arenie lub na polu bitwy, gdzie Atak dodaje do zadawanych przez ciebie obrażeń, a Obrona ścina obrażenia, które otrzymujesz, każda do własnego pułapu. Każda rodzina pancerza jest też zestawem, a jej bonusy zestawu to również ocena działań wojennych albo efekty działające wyłącznie przeciwko graczom, więc pełny komplet honorowy jest wart tyle co nic na bossie w lochu.",
-      "warfareBodyStatsStay": "Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu. Jeden wyjątek działa wszędzie: dwie części zestawu dla rzucających zaklęcia sprawiają też, że otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+      "warfareBodyStatsStay": "Każda część sprzętu Wojny ma Ofensywę wojenną i ocenę Obrony wojennej, a te dwie oceny nie działają w ogóle przeciw potworom. Działają wyłącznie podczas walki z innym graczem, w pojedynku, na arenie albo na polu bitwy, gdzie Ofensywa zwiększa zadawane obrażenia, a Obrona zmniejsza otrzymywane, każda do własnego limitu. Każda rodzina pancerza jest także zestawem, a jej premie zestawu również są ocenami Wojny lub efektami działającymi wyłącznie przeciw graczom, więc pełna premia zestawu za honor nie ma znaczenia przeciw bossowi lochu. Same części nadal mają zwykłe statystyki, pancerz i obrażenia broni, które działają wszędzie; przeciw potworowi wyciszają się tylko oceny Wojny i premie zestawu. Jeden wyjątek działa wszędzie: dwie części dowolnego z tych zestawów sprawiają też, że otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
       "warfareTradeBody": "To celowy kompromis. Ekwipunek działań wojennych jest stworzony do walki z graczami, a nie jako skrót omijający kolejne poziomy lochów: element działań wojennych nigdy nie niesie takich statystyk bojowych, jakie ma epicki przedmiot z lochu w tym samym slocie, a wszystko, co ze sobą przynosi, jest przeznaczone przeciwko innym graczom. Jeśli chcesz poradzić sobie na arenie, kup go. Jeśli chcesz szybciej przechodzić heroiczne lochy, zdobywaj ekwipunek w lochach.",
       "warfareTradeBodyRatingSpent": "To zamierzona wymiana. Sprzęt Wojny służy do walki z graczami, a nie do omijania poziomów lochów: część sprzętu Wojny nigdy nie ma ocen bojowych, które ma epicki przedmiot z lochu w tym samym miejscu, lecz zamiast tego całą swoją ocenę Wojny i premie zestawu przeznacza na innych graczy. Jeśli chcesz utrzymać się na arenie, kup go. Jeśli chcesz szybciej czyścić tryby heroiczne, zdobądź sprzęt w lochach.",
       "vanguardHeading": "Zbroja Awangardy: Sezon Wojenki 2",
@@ -24386,7 +24386,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Skóra Krwawej Grzywy",
-        "bonus2": "Regeneracja umiejętności Szarży Bruina jest zmniejszona o 3 sek.",
+        "bonus2": "Regeneracja umiejętności Szarży Bruina jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Szarża Bruina chroni Ciebie tarczą na 6 procent maksymalnego zdrowia na 6 sek."
       },
       "vanguard_druid_restoration": {
@@ -24396,17 +24396,17 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Zbroja Strażnika Sfory",
-        "bonus2": "Regeneracja umiejętności Wstrząsającego Strzału jest zmniejszona o 4 sek.",
+        "bonus2": "Regeneracja umiejętności Wstrząsającego Strzału jest zmniejszona o 4 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Wstrząsający Strzał zmniejsza pozostałą regenerację umiejętności Bestialskiego Gniewu o 1 sek."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Zbroja Dalekiego Wzroku",
-        "bonus2": "Regeneracja umiejętności Przełamania Ścieżki jest zmniejszona o 4 sek.",
+        "bonus2": "Regeneracja umiejętności Przełamania Ścieżki jest zmniejszona o 4 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Przełamanie Ścieżki sprawia, że Twój następny Długi Łuk w ciągu 6 sek jest natychmiastowy. Nie może się zdarzyć częściej niż raz na 15 sek."
       },
       "vanguard_hunter_survival": {
         "name": "Zbroja Sidełkowatych Zębów",
-        "bonus2": "Regeneracja umiejętności Krwawego Haka jest zmniejszona o 3 sek.",
+        "bonus2": "Regeneracja umiejętności Krwawego Haka jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Krwawy Hak przyznaje 1 Rozpęd Łowów."
       },
       "vanguard_mage_arcane": {
@@ -24431,12 +24431,12 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Bastion Przysięgi Tarczy",
-        "bonus2": "Regeneracja umiejętności Łańcucha Przysięgi jest zmniejszona o 2 sek.",
+        "bonus2": "Regeneracja umiejętności Łańcucha Przysięgi jest zmniejszona o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Wrogowie pociągnięci przez Łańcuch Przysięgi rzucają zaklęcia 30 procent wolniej na 4 sek, a Łańcuch Przysięgi przyznaje Ci Odwet Słoneczny, gdy wiąże wroga, który może być pociągnięty."
       },
       "vanguard_paladin_retribution": {
         "name": "Zbroja Wojenna Znaku Światła",
-        "bonus2": "Regeneracja umiejętności Wezwania Walkir jest zmniejszona o 15 sek.",
+        "bonus2": "Regeneracja umiejętności Wezwania Walkir jest zmniejszona o 15 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Wezwanie Walkir resetuje regenerację umiejętności Ostatniego Edyktu, a Twój następny Ostatni Edykt w ciągu 6 sek od trafienia zadaje 15 procent więcej obrażeń."
       },
       "vanguard_priest_discipline": {
@@ -24476,7 +24476,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Pancerz Bitewny Wytworzony z Wichru",
-        "bonus2": "Atak Przodków spowalnia prędkość ruchu celu o 30 procent na 4 sek.",
+        "bonus2": "Atak Przodków spowalnia prędkość ruchu celu o 30 procent na 4 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Atak Przodków zmniejsza pozostałą regenerację umiejętności Transu Żywiołowego o 4 sek."
       },
       "vanguard_shaman_restoration": {
@@ -24521,7 +24521,7 @@ export const pl_PL: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Zestaw Ashstalker",
-        "bonus2": "Zwiększa Obronę wojenną o 40.",
+        "bonus2": "Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.",
         "bonus7": "Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Popielny Krok, który zwiększa szybkość ruchu o 40% na 6 s."
       },
@@ -24533,7 +24533,7 @@ export const pl_PL: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Rynsztunek bojowy Furyforged",
-        "bonus2": "Zwiększa Obronę wojenną o 40.",
+        "bonus2": "Zwiększa Obronę wojenną o 40. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
         "bonus4": "Zwiększa Atak wojenny o 40, a kontrola rzucana na ciebie przez wrogich graczy trwa o 15% krócej.",
         "bonus7": "Zwiększa Atak i Obronę wojenną o 80. Zabicie wrogiego gracza daje Niezłomną Przysięgę, która pochłania 200 obrażeń przez 10 s."
       },

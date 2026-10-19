@@ -8447,7 +8447,7 @@ export const pt_BR: EnTranslations = {
       "honorFinalNoteSoldBack": "Compras de Honra são definitivas. A lista de recompra só guarda o que você vendeu: uma compra com moedas normalmente pode ser vendida pelo preço de venda e recuperada dessa lista se você mudar de ideia, mas o equipamento de Guerra se vincula no instante da compra, então nunca pode ser trocado, enviado ou vendido de volta por nada, e nunca chega à lista. A loja pede confirmação por esse motivo: leia a peça antes de confirmar.",
       "warfareHeading": "Equipamento de Guerra",
       "warfareBody": "Toda peça de Guerra carrega Índice de Ataque de Guerra e Índice de Defesa de Guerra, e esses dois índices não fazem nada contra monstros. Eles só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde o Ataque soma ao dano que você causa e a Defesa reduz o dano que você sofre, cada um até seu próprio teto. Cada família de armadura também é um conjunto, e seus bônus de conjunto são igualmente índice de Guerra ou efeitos que só funcionam contra jogadores, então um kit de honra completo não vale nada contra um chefe de masmorra.",
-      "warfareBodyStatsStay": "Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros. Há uma exceção que funciona em todo lugar: duas peças de um conjunto de conjurador também fazem com que o dano recebido não atrase mais suas conjurações.",
+      "warfareBodyStatsStay": "Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros. Há uma exceção que funciona em todo lugar: duas peças de qualquer um desses conjuntos também fazem com que o dano recebido não atrase mais suas conjurações.",
       "warfareTradeBody": "Essa é a troca deliberada. O equipamento de Guerra é feito para lutar contra jogadores, não como um atalho para pular os níveis de masmorra: uma peça de Guerra nunca carrega os índices de combate que um Épico de masmorra no mesmo encaixe carrega, e tudo o que ela realmente traz é gasto contra outros jogadores. Se você quer se sair bem na arena, compre-o. Se você quer concluir os heroicos mais rápido, conquiste seu equipamento nas masmorras.",
       "warfareTradeBodyRatingSpent": "Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras.",
       "vanguardHeading": "Equipamento de Guerra da Vanguarda: Temporada 2",
@@ -24386,7 +24386,7 @@ export const pt_BR: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Pelagem da Juba de Sangue",
-        "bonus2": "O tempo de recarga de Investida de Bruin é reduzido em 3 s.",
+        "bonus2": "O tempo de recarga de Investida de Bruin é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Investida de Bruin te escuda em 6% da sua vida máxima por 6 s."
       },
       "vanguard_druid_restoration": {
@@ -24396,17 +24396,17 @@ export const pt_BR: EnTranslations = {
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Arreios do Guarda da Matilha",
-        "bonus2": "O tempo de recarga de Tiro Desnorteante é reduzido em 4 s.",
+        "bonus2": "O tempo de recarga de Tiro Desnorteante é reduzido em 4 s. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Tiro Desnorteante reduz em 1 s o tempo de recarga restante de Ira Bestial."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Arreios da Vista Longínqua",
-        "bonus2": "O tempo de recarga de Quebra-Trilha é reduzido em 4 s.",
+        "bonus2": "O tempo de recarga de Quebra-Trilha é reduzido em 4 s. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Quebra-Trilha torna sua próxima Puxada Longa em até 6 s instantânea. Não pode ocorrer mais de uma vez a cada 15 s."
       },
       "vanguard_hunter_survival": {
         "name": "Arreios do Dente de Armadilha",
-        "bonus2": "O tempo de recarga de Gancho Sangrento é reduzido em 3 s.",
+        "bonus2": "O tempo de recarga de Gancho Sangrento é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Gancho Sangrento concede 1 de Ímpeto de Caça."
       },
       "vanguard_mage_arcane": {
@@ -24431,12 +24431,12 @@ export const pt_BR: EnTranslations = {
       },
       "vanguard_paladin_protection": {
         "name": "Bastião do Voto do Escudo",
-        "bonus2": "O tempo de recarga de Corrente do Juramento é reduzido em 2 s.",
+        "bonus2": "O tempo de recarga de Corrente do Juramento é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Inimigos puxados por Corrente do Juramento conjuram magias 30% mais devagar por 4 s, e Corrente do Juramento concede Represália Solar quando prende um inimigo que pode ser puxado."
       },
       "vanguard_paladin_retribution": {
         "name": "Placas de Guerra da Marca da Luz",
-        "bonus2": "O tempo de recarga de Chamado da Valquíria é reduzido em 15 s.",
+        "bonus2": "O tempo de recarga de Chamado da Valquíria é reduzido em 15 s. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Chamado da Valquíria reinicia o tempo de recarga de Édito Final, e seu próximo Édito Final conjurado em até 6 s causa 15% mais dano."
       },
       "vanguard_priest_discipline": {
@@ -24476,7 +24476,7 @@ export const pt_BR: EnTranslations = {
       },
       "vanguard_shaman_enhancement": {
         "name": "Malha de Guerra do Filho do Vendaval",
-        "bonus2": "Golpe Ancestral reduz a velocidade de movimento do alvo em 30% por 4 s.",
+        "bonus2": "Golpe Ancestral reduz a velocidade de movimento do alvo em 30% por 4 s. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Golpe Ancestral reduz em 4 s o tempo de recarga restante de Elemental Trance."
       },
       "vanguard_shaman_restoration": {
@@ -24521,7 +24521,7 @@ export const pt_BR: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Equipamento Ashstalker",
-        "bonus2": "Aumenta a Defesa de Guerra em 40.",
+        "bonus2": "Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.",
         "bonus7": "Aumenta o Ataque e a Defesa de Guerra em 80. Matar um jogador hostil concede Passo de Cinzas, aumentando a velocidade de movimento em 40% por 6 s."
       },
@@ -24533,7 +24533,7 @@ export const pt_BR: EnTranslations = {
       },
       "warfare_furyforged": {
         "name": "Traje de Batalha Furyforged",
-        "bonus2": "Aumenta a Defesa de Guerra em 40.",
+        "bonus2": "Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.",
         "bonus4": "Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.",
         "bonus7": "Aumenta o Ataque e a Defesa de Guerra em 80. Matar um jogador hostil concede Juramento Inquebrado, absorvendo 200 de dano por 10 s."
       },
