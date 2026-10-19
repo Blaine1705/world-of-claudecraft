@@ -14,8 +14,8 @@
     "daily gate (recipe_quickening_catalyst, oncePerDay): the success stamps craftDaily and draws once",
     "daily_limit denial: returns before any draw (zero draws), stamp unchanged"
   ],
-  "draws": 4,
-  "drawDigest": "c0076677",
+  "draws": 5,
+  "drawDigest": "e601bc88",
   "frames": [
     {
       "tick": 0,
@@ -520,8 +520,8 @@
       "state": "cdce55d2",
       "events": "18a2dff4",
       "rng": {
-        "draws": 2,
-        "digest": "58bf8a9e"
+        "draws": 3,
+        "digest": "7e0fce15"
       },
       "label": "craft-masterwork",
       "players": [
@@ -777,8 +777,8 @@
       "state": "6f03dc0b",
       "events": "eeb84322",
       "rng": {
-        "draws": 3,
-        "digest": "7e0fce15"
+        "draws": 4,
+        "digest": "c0076677"
       },
       "label": "craft-plain-2",
       "players": [
@@ -1032,8 +1032,8 @@
       "state": "f819496e",
       "events": "659364bb",
       "rng": {
-        "draws": 4,
-        "digest": "c0076677"
+        "draws": 5,
+        "digest": "e601bc88"
       },
       "label": "craft-daily-stamped",
       "players": [
@@ -1331,8 +1331,8 @@
       "state": "f1b8611d",
       "events": "4abd7a40",
       "rng": {
-        "draws": 4,
-        "digest": "c0076677"
+        "draws": 5,
+        "digest": "e601bc88"
       },
       "label": "craft-daily-denied",
       "players": [
@@ -1627,8 +1627,8 @@
       "state": "ae8126c5",
       "events": "94e8a079",
       "rng": {
-        "draws": 4,
-        "digest": "c0076677"
+        "draws": 5,
+        "digest": "e601bc88"
       },
       "label": "craft-cast-armed",
       "players": [
@@ -1958,8 +1958,8 @@
       "state": "ae8126c5",
       "events": "741638a5",
       "rng": {
-        "draws": 4,
-        "digest": "c0076677"
+        "draws": 5,
+        "digest": "e601bc88"
       },
       "label": "final",
       "players": [

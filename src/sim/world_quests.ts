@@ -24,6 +24,7 @@ import {
   worldQuestStandingReward,
 } from './factions';
 import { formatMoney } from './format_money';
+import { grantFreshLoot } from './loot/fresh_quality_grant';
 import { sanitizeForgeResult } from './minigames/forge_workshop';
 import { applyGliderBoost } from './minigames/glider_boost';
 import {
@@ -159,8 +160,6 @@ export {
   WORLD_QUESTS_PER_ROTATION,
   worldQuestCycleForResetDay,
 } from './world_quest_rotation';
-
-import { grantFreshLoot } from './loot/fresh_quality_grant';
 
 export const WORLD_QUEST_LEY_TIMER_SECONDS = 90;
 const WORLD_QUEST_CLAIM_PREFIX = '__wq_claim__:';

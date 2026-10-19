@@ -4,6 +4,7 @@ import type { CharacterState } from '../../src/sim/character_state';
 import { HEROIC_MARK_ITEM_ID } from '../../src/sim/content/dungeon_difficulty';
 import { HOARD_BASE_ITEM_IDS, hoardLootVariantId } from '../../src/sim/content/hoard_loot';
 import { TREASURE_MAP_ITEM_IDS } from '../../src/sim/content/treasure_maps';
+import type { LootQualityDescriptor } from '../../src/sim/loot_quality';
 import { grantHoardReward } from '../../src/sim/rift/hoard_reward_grant';
 import { Sim } from '../../src/sim/sim';
 
@@ -53,7 +54,7 @@ describe('direct vault reward character snapshot', () => {
 
   it('keeps the permanent quality of a gear line on the saved copy', () => {
     const state = saved();
-    const lootQuality = { version: 1 as const, tier: 2 as const, weights: [9, 8, 7, 6, 5] };
+    const lootQuality: LootQualityDescriptor = { version: 1, tier: 2, weights: [9, 8, 7, 6, 5] };
     addVaultRewardToCharacterState(
       state,
       {

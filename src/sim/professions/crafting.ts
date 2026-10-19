@@ -2,8 +2,9 @@
 // checks a player has every reagent a recipe requires, consumes them (denying
 // and consuming NOTHING if any reagent is short), grants the recipe's declared
 // output deterministically (Professions 2.0 retired the output quality
-// roll: the only output-side rng is the single masterwork proc draw below, at
-// the same draw position the old roll occupied), and grants a flat point of
+// roll: the output-side rng is the single masterwork proc draw below, at
+// the same draw position the old roll occupied, plus one permanent
+// loot-quality draw per eligible equipment copy at grant time), and grants a flat point of
 // craft skill (see wheel.ts: additive-only, free-floor). A proc mints a
 // masterwork instance whose bonus stats are baked from the item budget
 // (professions/masterwork.ts): add-only, never a downgrade. Input-side rng
@@ -819,8 +820,9 @@ export function evaluateCraftAdmission(
  *  consumption never happens. On success, consumes every reagent (each
  *  discounted per the crafter's #1145 self-signed reduction composed with
  *  their #1134 specialization discount), draws the single masterwork proc
- *  roll (the one and only output-side rng draw; the old quality
- *  roll is retired and outputs are deterministic), grants the recipe's
+ *  roll (the old quality roll is retired and outputs are
+ *  deterministic; an eligible equipment copy adds one loot-quality draw
+ *  at grant, loot/fresh_quality_grant.ts), grants the recipe's
  *  declared output (signing a rare-or-better-DEF single-copy output for
  *  #1149 Battlefield Experience attribution; a masterwork proc mints a
  *  signed instance carrying its baked bonus stats), and grants craft skill
@@ -1001,8 +1003,8 @@ export function resolveCraftForRecipe(
   const jackVariance: CraftVarianceOutcome | null = meta?.archetype.isJackOfAllTrades
     ? rollCraftVariance(ctx.rng.next())
     : null;
-  // Masterwork proc draw: the single output-side rng draw for every
-  // non-Jack crafter, at the exact position the retired quality roll
+  // Masterwork proc draw: the single PROC draw for every non-Jack crafter
+  // (an equipment output's loot-quality draw follows at grant), at the exact position the retired quality roll
   // occupied so the world's draw order and the one-draw-per-successful-craft
   // contract are preserved. The draw is UNCONDITIONAL on the success path:
   // it happens even when the effect is gated off below, so the draw count

@@ -3,6 +3,8 @@
 // parcel roll each new equipment copy through loot/fresh_quality_grant.ts.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { stackSizeOf } from '../src/sim/bags';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { grantFreshLoot, rollFreshLootQualities } from '../src/sim/loot/fresh_quality_grant';
 import { isEligibleLootQualityItem, type LootQualityDescriptor } from '../src/sim/loot_quality';
@@ -219,5 +221,18 @@ describe('Buried Hoard parcel', () => {
     const slot = meta.inventory.find((s) => s.itemId === GEAR);
     expect(slot).toBeDefined();
     expect(slot?.instance?.lootQuality).toBeUndefined();
+  });
+});
+
+describe('craft admission stays exact', () => {
+  // resolveCraftForRecipe admits a craft against ONE output stack of
+  // resultCount; grantFreshLoot may split an eligible output into one slot per
+  // copy. That is only safe while no eligible output is multi-copy or stackable.
+  it('has no multi-copy or stackable equipment recipe output', () => {
+    const offenders = ALL_RECIPES.filter((r) => {
+      const def = ITEMS[r.resultItemId];
+      return def && isEligibleLootQualityItem(def) && (r.resultCount > 1 || stackSizeOf(def) > 1);
+    }).map((r) => r.id);
+    expect(offenders).toEqual([]);
   });
 });
