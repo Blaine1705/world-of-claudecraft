@@ -25,6 +25,10 @@ const GUISE_COURSER_ID = 'hunter_guise_courser';
 const LONG_STATE_DURATION = 86_400;
 
 const FOCUS_SPENDERS = new Set(['arcane_shot', 'aimed_shot', 'mongoose_bite']);
+// Venom Barb is a Focus spender for Efficient Rhythm and Fang Chorus only. It
+// stays out of FOCUS_SPENDERS, which also drives Apex Instinct and the Overdraw
+// counter (Overdraw's text names Fell Shot, Long Draw and Woundrend).
+const VENOM_BARB_ID = 'serpent_sting';
 const FOCUS_GENERATORS = new Set(['pack_command', 'measured_shot', 'raptor_strike']);
 export const PACK_FEROCITY_DAMAGE_PER_STACK = 0.1;
 
@@ -99,6 +103,10 @@ function hunterTalentSelected(talents: TalentAllocation, talentId: string): bool
 
 function isFocusSpender(abilityId: string): boolean {
   return FOCUS_SPENDERS.has(abilityId);
+}
+
+function isRhythmChorusSpender(abilityId: string): boolean {
+  return isFocusSpender(abilityId) || abilityId === VENOM_BARB_ID;
 }
 
 function isFocusGenerator(abilityId: string): boolean {
@@ -256,10 +264,15 @@ export function noteHunterFocusSpend(
   meta: PlayerMeta,
   res: ResolvedAbility,
 ): void {
-  if (meta.cls !== 'hunter' || hunter.resourceType !== 'focus' || !isFocusSpender(res.def.id)) {
+  if (
+    meta.cls !== 'hunter' ||
+    hunter.resourceType !== 'focus' ||
+    !isRhythmChorusSpender(res.def.id)
+  ) {
     return;
   }
-  if (res.hunterApex) {
+  const coreSpender = isFocusSpender(res.def.id);
+  if (coreSpender && res.hunterApex) {
     const apex = hunter.auras.find((aura) => aura.id === APEX_ID);
     if (apex) {
       apex.stacks = Math.max(0, (apex.stacks ?? 1) - 1);
@@ -282,11 +295,12 @@ export function noteHunterFocusSpend(
         'Efficient Rhythm',
         LONG_STATE_DURATION,
         total,
+        total,
       );
     }
   }
 
-  if (hasHunterTalent(meta, 'hun_r20_overdraw')) {
+  if (coreSpender && hasHunterTalent(meta, 'hun_r20_overdraw')) {
     if (res.hunterOverdraw) {
       removeAura(ctx, hunter, OVERDRAW_COUNTER_ID);
     } else {
@@ -336,7 +350,15 @@ function runFangChorus(ctx: SimContext, hunter: Entity, target: Entity): void {
   const clap = current >= 2;
   if (clap) removeAura(ctx, hunter, FANG_COUNTER_ID);
   else {
-    applyStateAura(ctx, hunter, FANG_COUNTER_ID, 'Fang Chorus', LONG_STATE_DURATION, current + 1);
+    applyStateAura(
+      ctx,
+      hunter,
+      FANG_COUNTER_ID,
+      'Fang Chorus',
+      LONG_STATE_DURATION,
+      current + 1,
+      current + 1,
+    );
   }
   let damage =
     (ctx.rng.range(pet.weapon.min, pet.weapon.max) +
@@ -458,6 +480,14 @@ export function onHunterPrimaryDamage(
     uses.value = uses.stacks;
     if ((uses.stacks ?? 0) <= 0) removeAura(ctx, hunter, CHAIN_USES_ID);
   }
+  runFangChorus(ctx, hunter, target);
+}
+
+// Venom Barb deals no direct damage, so onHunterPrimaryDamage never runs for it.
+// The dot application path calls this once the sting takes hold. A resisted or
+// fizzled bolt never reaches it, so a missed spender draws no echo.
+export function onHunterVenomBarbLanded(ctx: SimContext, hunter: Entity, target: Entity): void {
+  if (!ctx.isHostileTo(hunter, target)) return;
   runFangChorus(ctx, hunter, target);
 }
 

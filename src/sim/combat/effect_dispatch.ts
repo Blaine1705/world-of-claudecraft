@@ -170,6 +170,7 @@ import {
   grantHunterFocus,
   onHunterGuiseActivated,
   onHunterPrimaryDamage,
+  onHunterVenomBarbLanded,
   runHunterPackRally,
   runHunterWildheart,
 } from './hunter_shared';
@@ -2129,6 +2130,7 @@ export function runEffects(
         }
         if (ability.id === 'rip') druidEngineOnLandedStrike(ctx, p, ability.id);
         ctx.enterCombat(p, target);
+        if (ability.id === 'serpent_sting') onHunterVenomBarbLanded(ctx, p, target);
         break;
       }
       case 'extendDot': {
