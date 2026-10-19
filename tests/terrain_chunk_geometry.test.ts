@@ -411,13 +411,10 @@ describe('generated chunk geometry is stable', () => {
     // tests/eastbrook_placed_buildings.test.ts (the quay to the bit, no ground
     // crossing the sea surface). Computed twice in separate processes.
     // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
-    // same town: the buildings moved to that map's sites on grids of level
-    // stamps, the churchyard and the strand camp moved with their calm pads,
-    // the chapel-rise ruin and the north road's old line gave way to the
-    // smithy, and the moved NPCs carried their calm pads. The quay and the
-    // coastline are still pinned by tests/eastbrook_placed_buildings.test.ts.
-    // Computed twice in separate processes.
-    expect(digestOf(inRect)).toBe('524a6cac34e20d3be66afb854ef72f50');
+    // same town plus the Genshin Impact terrain palette, meadow splat, beach
+    // sand strand, road verge, non-directional cliff stone mottling, and Low-tier
+    // baked canopy and building contact shadows.
+    expect(digestOf(inRect)).toBe('ae70fd63f5dd1113739c93f883d2f05b');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

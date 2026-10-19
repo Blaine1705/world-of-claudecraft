@@ -616,7 +616,7 @@ describe('Eastbrook town renderer', () => {
     expect(view.staticRevealRoots()).toContain(micro);
 
     // Camera outside the town cull radius, town and buildings inside the fog.
-    const cullRadius = EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
+    const cullRadius = eastbrookTownInternalsForTest.townCullRadius;
     const approachX = cullRadius + 20;
     view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
     expect(requested).toEqual(['eastbrook-town-static']);
@@ -653,7 +653,7 @@ describe('Eastbrook town renderer', () => {
     const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
     if (!bankGroup || !otherGroup || !micro) throw new Error('renderer fixture lost a town node');
 
-    const cullRadius = EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
+    const cullRadius = eastbrookTownInternalsForTest.townCullRadius;
     const approachX = cullRadius + 20;
     view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
     expect(bankGroup.visible).toBe(false);
@@ -986,6 +986,33 @@ describe('Eastbrook town renderer', () => {
       expect(micro.visible, `${building.id} town still in the fog`).toBe(true);
       standAt(fogFar + farCorner - 0.01);
       expect(group.visible, `${building.id} back inside the fog`).toBe(true);
+    }
+  });
+
+  it('keeps all harbor town buildings and civic batches visible across a 360-degree camera orbit on Low (sceneryFar = 60)', () => {
+    const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
+    const vault = view.group.getObjectByName(
+      `eastbrookBuilding:${EASTBROOK_LAYOUT.weeklyVault.id}`,
+    );
+    if (!micro || !vault) throw new Error('renderer fixture lost Eastbrook nodes');
+    const buildingGroups = EASTBROOK_LAYOUT.buildings.map((building) => {
+      const group = view.group.getObjectByName(`eastbrookBuilding:${building.id}`);
+      if (!group) throw new Error(`renderer fixture lost ${building.id}`);
+      return group;
+    });
+    const eyeX = -6;
+    const eyeY = 6;
+    const eyeZ = -98;
+    const orbitRadius = 11.5;
+    for (let step = 0; step < 16; step++) {
+      const angle = (step / 16) * Math.PI * 2;
+      const camX = eyeX + Math.cos(angle) * orbitRadius;
+      const camZ = eyeZ + Math.sin(angle) * orbitRadius;
+      view.update(camX, eyeY + 4, camZ, eyeX, eyeY, eyeZ, 60, 0.05);
+      expect(micro.visible).toBe(true);
+      expect(vault.visible).toBe(true);
+      for (const group of buildingGroups) expect(group.visible).toBe(true);
     }
   });
 

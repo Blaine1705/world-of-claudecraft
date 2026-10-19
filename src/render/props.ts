@@ -85,6 +85,12 @@ import {
   updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryClutterFar,
+  sceneryStructureFar,
+} from './scenery_detail';
 import { shipWakePrewarmParts } from './ship_wake';
 import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
 import { buildScheduledShips, type FerryViewSource } from './transport_ferry_ships';
@@ -2686,6 +2692,7 @@ export function buildProps(
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
   const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
+  prepareSceneryDetailRoot(group);
   const cullPass = newPropCullPass();
   let revealGate: RevealGateCore | null = null;
   let bandRevealGate: RevealGateCore | null = null;
@@ -2715,25 +2722,48 @@ export function buildProps(
       dt: number,
       reducedMotion = false,
     ): void {
-      const fogFarSq = fogFar * fogFar;
+      const lowCull = isLowSceneryCullActive(fogFar);
+      const clutterFar = sceneryClutterFar(fogFar);
+      const clutterFarSq = clutterFar * clutterFar;
+      const structureFar = sceneryStructureFar(fogFar);
+      const cullX = lowCull ? eyeX : camX;
+      const cullZ = lowCull ? eyeZ : camZ;
       scheduledShips?.sync(dt);
       for (let i = 0; i < transportShips.length; i++) {
-        transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
+        transportShips[i].update(
+          camX,
+          camY,
+          camZ,
+          eyeX,
+          eyeY,
+          eyeZ,
+          structureFar,
+          dt,
+          reducedMotion,
+        );
       }
-      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
-      updateMirefenTavernShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
+      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, structureFar);
+      updateMirefenTavernShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, structureFar);
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent
       // priority and, on a frame where several bands escape at once, nearest
       // to the camera first.
-      updatePropCullables(cullables, camX, camZ, fogFar, fogFarSq, bandRevealGate, cullPass);
+      updatePropCullables(
+        cullables,
+        cullX,
+        cullZ,
+        clutterFar,
+        clutterFarSq,
+        bandRevealGate,
+        cullPass,
+      );
       // Far-cell swap first (prop_cell_core): distant cells draw their merged
       // bake and suppress the members' individual baked meshes; near cells
       // (where the ghost fade can fire) draw the individuals while the bake
       // stays as the shadow-only caster. Pixel-identical both ways.
       for (const cell of farCells) {
-        updatePropCell(cell, camX, camZ, fogFar, undefined, revealGate);
+        updatePropCell(cell, cullX, cullZ, structureFar, undefined, revealGate);
       }
       // Deliberately NO first-sight reveal gate here (unlike the bands): tried
       // and reverted. Gating each hideable's first fog reveal put 116 keys and
@@ -2745,9 +2775,9 @@ export function buildProps(
       // a handful of keys with the proven bake as the stand-in).
       for (let i = 0; i < hideables.length; i++) {
         const h = hideables[i];
-        const dx = camX - h.x,
-          dz = camZ - h.z;
-        const reach = fogFar + h.cull;
+        const dx = cullX - h.x,
+          dz = cullZ - h.z;
+        const reach = structureFar + h.cull;
         if (dx * dx + dz * dz >= reach * reach) {
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;

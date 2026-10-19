@@ -276,6 +276,7 @@ export const PROVING_SHORE_NPCS: Record<string, NpcDef> = {
     facing: 0.7,
     color: 0x8a6a9a,
     questIds: [],
+    dynamic: true,
     greeting:
       'Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home.',
   },

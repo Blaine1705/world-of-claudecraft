@@ -9,13 +9,22 @@ import { safeStartupGraphicsPreset } from '../game/startup_graphics_safety';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { attachBiomeHaze } from './biome_haze_field';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+import type { SceneryDetailBands } from './scenery_detail_core';
 // Side-effect import only: installs the final-color NaN guard (see the
 // point-light pruning comment in initGfxTier below for why this is a bare
 // import here, not a direct invocation). This import is also what
 // gives characters/preview.ts, characters/portrait.ts and armory_preview.ts
 // the guard, transitively: they reach it via gfx.ts, never call it directly.
 import './final_color_nan_guard';
+// The palette lab's rim-light arm: a module-scope chunk patch like the two
+// above, inert unless the dev-only `?palette=on` flag is set.
+import './palette_lab/lab_lighting';
 import { CANOPY_TAPS_AO_ONLY, CANOPY_TAPS_FULL, CANOPY_TAPS_OFF } from './canopy_detail_tier_core';
+// The opt-in cel-shading look (`?cel=on`): importing installs its light ramp
+// at module scope, for the same reason as the NaN guard above; the material
+// ink follows the active profile (activateGfxProfile below).
+import { celShadingSettings, syncCelMaterialInk } from './cel_shading';
+import { celNeedsGradePass } from './cel_shading_core';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import { GRASS_CARDS_FULL, GRASS_CARDS_LEAN, GRASS_CARDS_MID } from './grass_tuft_cards_core';
@@ -47,6 +56,17 @@ import { isSoftwareRendererName } from './software_renderer';
 //      medium data-fx-level fallback on the desktop path that still lands there
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra' | 'insane';
+
+// Scenery geometry at 0..60, 60..120, 120..240, 240..480 and beyond.
+// 0 full, 1 light reduction, 2 fuller, 3 strong, 4 very simple, 5 minimum.
+// Visibility, textures and lighting remain owned by their existing policies.
+export const SCENERY_DETAIL_BANDS: Record<GfxTier, SceneryDetailBands> = {
+  low: [0, 3, 4, 5, 5],
+  medium: [0, 2, 3, 4, 5],
+  high: [0, 0, 2, 3, 4],
+  ultra: [0, 0, 1, 2, 3],
+  insane: [0, 0, 0, 1, 2],
+};
 
 // Monotone tier ladder: every tier-gated knob compares RANKS through
 // gfxTierAtLeast instead of scattering string comparisons, so inserting a tier
@@ -84,7 +104,8 @@ export function gfxTierAtLeast(tier: GfxTier, floor: GfxTier): boolean {
 // water / character detail) join the derived profile: vistaTier and waterTier
 // become explicit settings fields and the post-chain per-effect flags follow
 // the dials rather than the effectsQuality bundle alone.
-export const GFX_CONFIG_VERSION = 21;
+// v22: Low uses distant scenery index LOD and the clearer outdoor light pair.
+export const GFX_CONFIG_VERSION = 22;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -193,6 +214,14 @@ export interface GfxSettings {
   readonly shadowMap: number;
   /** PBR MeshStandardMaterial; low keeps Lambert */
   readonly standardMaterials: boolean;
+  /** Static scenery uses authored coarse indices past this footprint distance; 0 disables. */
+  readonly sceneryGeometryLodDistance: number;
+  /** Shared scenery bands; gfxo can disable them for an unchanged baseline. */
+  readonly sceneryDetail: boolean;
+  /** Coconut batch grid in yards; 0 retains the single strand-wide draw. Build-time only. */
+  readonly coconutCellSize: number;
+  /** More ambient fill and a softer key for readable Low surfaces, without extra lights. */
+  readonly lowReadabilityLighting: boolean;
   // -------------------------------------------------------------------------
   // Round-10 granular detail knobs. The graphics-overhaul layers cost real
   // frame budget, so each one keys off its OWN derived knob here (never a
@@ -1252,6 +1281,10 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             ? 4096
             : 2560,
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    sceneryDetail: true,
+    sceneryGeometryLodDistance: gfxTierAtLeast(tier, 'medium') ? 0 : 180,
+    coconutCellSize: gfxTierAtLeast(tier, 'medium') ? 0 : 128,
+    lowReadabilityLighting: !gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn
     // surface, reduced carpet, cavity-only relief). Ultra and Insane request
@@ -1631,6 +1664,12 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bucketBaselines: { ...settings.bucketBaselines, vfx: vfx.baseline },
       };
     }
+  }
+  // Cel-shading R&D look (`?cel=on`): its ink rides the output grade, so Low
+  // takes the grade-only chain instead of the direct path (celNeedsGradePass).
+  // Explicit `?gfxo=` overrides still win: they apply after this.
+  if (celNeedsGradePass(celShadingSettings(), settings.gradePass, hints?.platform)) {
+    settings = { ...settings, gradePass: true };
   }
   return applyGfxOverridesFromSearch(settings, hints?.search ?? '');
 }
@@ -2203,6 +2242,9 @@ export function activateGfxProfile(profile: GfxProfile): GfxProfile {
   softwareGlDetected = activated.softwareRendering;
   activeGfxProfile = activated;
   gfxProfileEpoch = epoch;
+  // Cel look only: a chain with no output grade has nowhere to draw the post
+  // ink, so its materials carry the outline instead (no-op without ?cel=on).
+  syncCelMaterialInk(!settings.gradePass);
   return activated;
 }
 

@@ -23,6 +23,7 @@ import {
   LEGENDARY_REGALIA_RATE_PER_SEC,
 } from './legendary_regalia_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
+import { SwimWakeVfx } from './swim_wake_vfx';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import { bubbleBeamMaterialOptions } from './vfx_basic_materials';
 import {
@@ -394,6 +395,7 @@ export class Vfx {
    *  renderer reports its wearers and closes its frame (gloam_field.ts). */
   readonly gloam: GloamField;
   private paladinSpellFx: PaladinSpellVfxController;
+  private swimWakeVfx: SwimWakeVfx;
   private disposed = false;
   private ignivarJudgmentFireSourceId = -1;
   private ignivarJudgmentFireAccumulator = 0;
@@ -596,6 +598,7 @@ export class Vfx {
       groundY,
       compileGate,
     );
+    this.swimWakeVfx = new SwimWakeVfx(scene);
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
@@ -748,6 +751,7 @@ export class Vfx {
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
     this.gloam.clear();
+    this.swimWakeVfx.clear();
     this.life.fill(0);
     this.size.fill(0);
     this.alphaAttr.fill(0);
@@ -767,6 +771,7 @@ export class Vfx {
     this.disposed = true;
     this.drainLifeVfx.dispose();
     this.gloam.dispose();
+    this.swimWakeVfx.dispose();
     this.points.removeFromParent();
     const material = this.points.material as THREE.ShaderMaterial;
     const atlas = material.uniforms.uAtlas?.value;
@@ -1622,13 +1627,14 @@ export class Vfx {
   waterSplash(x: number, y: number, z: number, radius = 0.45, strength = 1): void {
     const safeRadius = Math.min(1.4, Math.max(0.2, radius));
     const safeStrength = Math.min(1.5, Math.max(0.25, strength));
+    this.swimWakeVfx.spawnSplashRing(x, y, z, safeRadius, safeStrength);
     const requestedDrops = Math.min(8, Math.max(3, Math.round(3 + safeStrength * 3)));
     const dropCount = this.scaledCount(requestedDrops);
     for (let i = 0; i < dropCount; i++) {
       const angle = Math.random() * Math.PI * 2;
       const offset = Math.sqrt(Math.random()) * safeRadius * 0.32;
       const outward = (0.55 + Math.random() * 0.9) * (0.7 + safeStrength * 0.45);
-      const upward = (1.2 + Math.random() * 1.4) * (0.65 + safeStrength * 0.35);
+      const upward = (1.1 + Math.random() * 1.2) * (0.65 + safeStrength * 0.35);
       this.spawn(
         x + Math.cos(angle) * offset,
         y + 0.025,
@@ -1636,29 +1642,13 @@ export class Vfx {
         Math.cos(angle) * outward,
         upward,
         Math.sin(angle) * outward,
-        i % 3 === 0 ? 0xc8e6e8 : 0x78b9c2,
-        0.1 + Math.random() * 0.075,
-        0.34 + Math.random() * 0.2,
+        i % 2 === 0 ? 0xe8fcff : 0x8ae4f2,
+        0.065 + Math.random() * 0.045,
+        0.28 + Math.random() * 0.16,
         7.5,
-        SPR.glowSoft,
+        SPR.glowCore,
       );
     }
-
-    // One tiny foam flash gives the droplets a readable point of impact.
-    this.spawn(
-      x,
-      y + 0.035,
-      z,
-      0,
-      0.12,
-      0,
-      0x68aeb8,
-      0.17 + safeRadius * 0.28,
-      0.12,
-      0,
-      SPR.glowSoft,
-      0,
-    );
   }
 
   /** Directional, low-arc spray for a character crossing the waterline. */
@@ -1676,6 +1666,7 @@ export class Vfx {
     // as they always did, the extra headroom only ever carries impact weight.
     const safeRadius = Math.min(2.2, Math.max(0.25, radius));
     const safeStrength = Math.min(2.6, Math.max(0.35, strength));
+    this.swimWakeVfx.spawnSplashRing(x, y, z, safeRadius, safeStrength);
     const directionLength = Math.max(Math.hypot(dirX, dirZ), 0.0001);
     const forwardX = dirX / directionLength;
     const forwardZ = dirZ / directionLength;
@@ -1685,8 +1676,8 @@ export class Vfx {
     // steeper slope so a plunge reads as a burst, not a slightly-busy wade.
     const dropCount = this.scaledCount(
       Math.min(
-        26,
-        Math.max(7, Math.round(7 + safeStrength * 3 + Math.max(0, safeStrength - 1.5) * 8)),
+        18,
+        Math.max(5, Math.round(5 + safeStrength * 2 + Math.max(0, safeStrength - 1.5) * 6)),
       ),
     );
     for (let i = 0; i < dropCount; i++) {
@@ -1700,60 +1691,48 @@ export class Vfx {
         y + 0.025,
         z + sideZ * spread + forwardZ * forward,
         sideX * lateralSpeed + forwardX * forwardSpeed,
-        (1.35 + Math.random() * 1.55) * (0.75 + safeStrength * 0.25),
+        (1.15 + Math.random() * 1.25) * (0.75 + safeStrength * 0.25),
         sideZ * lateralSpeed + forwardZ * forwardSpeed,
-        i % 4 === 0 ? 0xb9dadd : 0x6faeb7,
-        0.16 + Math.random() * 0.11,
-        0.4 + Math.random() * 0.2,
-        7.2,
-        SPR.glowSoft,
+        i % 2 === 0 ? 0xf0fdff : 0x8ce6f4,
+        0.075 + Math.random() * 0.05,
+        0.32 + Math.random() * 0.16,
+        7.4,
+        SPR.glowCore,
       );
     }
-    this.spawn(
-      x,
-      y + 0.03,
-      z,
-      forwardX * 0.18,
-      0.08,
-      forwardZ * 0.18,
-      0x6aaeb6,
-      0.24 + safeRadius * 0.34,
-      0.15,
-      0,
-      SPR.glowSoft,
-      0,
-    );
   }
 
   /**
-   * One beat of a surface swimmer's kick: a small churn of droplets thrown up
-   * and back off the feet. Deliberately a fraction of characterWaterSplash —
-   * this fires several times a second for as long as somebody is swimming, so
-   * it stays at a handful of particles with no ring flash.
+   * One beat of a surface swimmer's breaststroke: horizontal Genshin V-wake
+   * foam ribbons and concentric broken anime ripple rings on the water plane,
+   * accented by a few tiny water-skimming micro-droplets.
    *
    * Submerged swimmers never call this: under the surface there is no water
    * line to break, and the stroke leaves no VFX at all.
    */
   swimKickSplash(x: number, y: number, z: number, dirX: number, dirZ: number, strength = 1): void {
     const safe = Math.min(1.4, Math.max(0.3, strength));
+    this.swimWakeVfx.spawnStroke(x, y, z, dirX, dirZ, safe);
     const length = Math.max(Math.hypot(dirX, dirZ), 0.0001);
     const backX = -dirX / length;
     const backZ = -dirZ / length;
-    const drops = this.scaledCount(Math.round(3 + safe * 2));
+    const sideX = -backZ;
+    const sideZ = backX;
+    const drops = this.scaledCount(4);
     for (let i = 0; i < drops; i++) {
-      const side = Math.random() * 2 - 1;
+      const side = (i % 2 === 0 ? 1 : -1) * (0.32 + Math.random() * 0.35);
       this.spawn(
-        x + backZ * side * 0.22,
-        y + 0.02,
-        z - backX * side * 0.22,
-        backX * (0.5 + Math.random() * 0.7) * safe + backZ * side * 0.5,
-        (0.9 + Math.random() * 1.1) * safe,
-        backZ * (0.5 + Math.random() * 0.7) * safe - backX * side * 0.5,
-        i % 3 === 0 ? 0xcfe7ea : 0x7fb8c0,
-        0.1 + Math.random() * 0.07,
-        0.26 + Math.random() * 0.14,
-        6.4,
-        SPR.glowSoft,
+        x + sideX * side * 0.45 - backX * 0.08,
+        y + 0.035,
+        z + sideZ * side * 0.45 - backZ * 0.08,
+        backX * (0.55 + Math.random() * 0.5) * safe + sideX * side * 0.65,
+        (0.85 + Math.random() * 0.65) * safe,
+        backZ * (0.55 + Math.random() * 0.5) * safe + sideZ * side * 0.65,
+        i % 2 === 0 ? 0xf2feff : 0x8ee8f6,
+        0.065 + Math.random() * 0.03,
+        0.24 + Math.random() * 0.12,
+        6.8,
+        SPR.glowCore,
       );
     }
   }
@@ -2893,5 +2872,6 @@ export class Vfx {
     }
     this.activeCount = write;
     this.paladinSpellFx.update(dt);
+    this.swimWakeVfx.update(dt);
   }
 }

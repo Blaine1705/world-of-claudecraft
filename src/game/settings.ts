@@ -632,14 +632,9 @@ export const BOOL_SETTINGS = {
   // disturbs the deliberate slot layout the extra rows exist for (arranging buffs
   // and consumables); the slots stay in place and keybind-reachable either way.
   hideUnusedActionSlots: { def: false },
-  // OFF by default: the interactive water wake/ripple height-field
+  // ON by default: the interactive water wake/ripple height-field
   // (render/water_simulation.ts) that swimmers, waders and splashes disturb.
-  // Purely decorative — bubbles, splash particles and the scrolling water
-  // normal maps are all independent of it — and measured-cheap (2 passes over
-  // a <=128x128 field), but it is the one water effect that runs extra GPU
-  // passes per frame, so the player who wants the quietest water gets it as
-  // an opt-in rather than an opt-out.
-  waterRipples: { def: false },
+  waterRipples: { def: true },
   // off by default: the over-the-shoulder Action Cam (render/action_cam_core.ts).
   // A camera framing preference like the FOV slider; it never changes zoom or
   // hides anything, and the side lives in actionCamShoulder.

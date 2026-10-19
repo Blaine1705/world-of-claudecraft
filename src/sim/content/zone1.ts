@@ -2149,26 +2149,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // (-134, -64): tests/transport_lanes.test.ts keeps them clear)
     { key: 'seaBuoy', x: -160, z: -58, rot: 0.4, scale: 3, float: 0.15 },
     { key: 'seaBuoyFlag', x: -160, z: -90, rot: -0.8, scale: 3, float: 0.15 },
-    // round 4: the KayKit barracks takes the armoury's lot as the Wolf Run
-    // garrison. r 5.2 stays the clearance radius scatter and keep-outs read
-    // (the dawnhold_layout.ts pattern); hw/hd collide the model's real wall
-    // box instead of that circle (the ZonePropsDef box rule): hw matches the
-    // measured local-x wall half (4.68), hd is trimmed to the lot's authored
-    // half-depth 4.5 so the barracks-approach route front at (12, -5.5)
-    // keeps its route-body (0.8) clearance off the facade.
-    {
-      key: 'hexBarracks',
-      x: 17.5,
-      z: -5.5,
-      rot: -1.5707963267948966,
-      scale: 6.5,
-      r: 5.2,
-      h: 11,
-      hw: 4.7,
-      hd: 4.5,
-    },
-    // eyes over the runs
-    { key: 'hexWatchtower', x: 27, z: -13, rot: 2.2, scale: 6.5, r: 2.4, h: 12 },
     // The Tidehold rebuild retired Smith Haldren's KayKit blacksmith from the
     // green at (2, -112): he keeps the painted smithy on the square now, and
     // the Weekly Vault stands on the lot.
