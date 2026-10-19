@@ -522,12 +522,22 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // Balgath's five trinkets join the same way (the Barrowstone Heart too: its slot
     // shows the statue's internal cooldown), painted in balgath-loot-icons-2026-09-28: 127.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 133.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(133);
+    // + the referral stamp-card rewards on the same integration (referral_fog_charm,
+    // referral_hollow_charm, reins_referral_raptor, reins_referral_tank): 137 live.
+    // They are parked in ITEM_ART_PENDING and borrow existing paintings through
+    // src/ui/item_art_placeholders.ts until their own art lands, so the
+    // art-subject set stays 133 and the parked hotbar set is exactly those four.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(137);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
     ).toHaveLength(133);
-    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
+    expect([...pendingHotbarItemIds].sort(), 'ITEM_ART_PENDING hotbar items').toEqual([
+      'referral_fog_charm',
+      'referral_hollow_charm',
+      'reins_referral_raptor',
+      'reins_referral_tank',
+    ]);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
       'no pending hotbar item ships committed art (a stale ITEM_ART_PENDING entry)',

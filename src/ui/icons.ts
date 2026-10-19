@@ -3490,6 +3490,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast (the Automatons
   // quartermaster's engineering item): a clockwork gear crackling with shock.
   clockwork_shock_bomb: r('storm', 'sky', ['gear', { p: 'lightning', ...BR }], ['arcs', 'glow']),
+  // Membership Courier: the flying donkey that ferries bag stacks to the bank.
+  courier: r('nature', 'sky', ['sack', { p: 'wing', ...TR }], ['motion']),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
@@ -5010,6 +5012,8 @@ export const ABILITY_ART_PENDING = new Set<string>([
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
   // its skill painting ships (the item itself already ships painted art).
   'clockwork_shock_bomb',
+  // Membership Courier: the summon draws its glyph until its skill painting ships.
+  'courier',
 ]);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
