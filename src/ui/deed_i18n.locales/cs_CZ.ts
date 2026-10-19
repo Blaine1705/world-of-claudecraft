@@ -1203,4 +1203,34 @@ export const table: DeedLocaleTable = {
     name: 'Jasnejsi nez stiny',
     desc: 'Ziskej zpet ukradene mesce s mincemi a unikni z bludiste Evergarden na obtiznost Hard.',
   },
+  prog_titan: {
+    name: 'Titán',
+    desc: 'Získej za život celkem 10 000 000 zkušeností.',
+    title: 'Titán',
+  },
+  pvp_flag_1h: {
+    name: 'Smělý',
+    desc: 'Nech světové PvP zapnuté po 1 hodinu herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
+    title: 'Smělý',
+  },
+  pvp_flag_3h: {
+    name: 'Vzdorovitý',
+    desc: 'Nech světové PvP zapnuté po 3 hodiny herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
+    title: 'Vzdorovitý',
+  },
+  pvp_flag_6h: {
+    name: 'Neohrožený',
+    desc: 'Nech světové PvP zapnuté po 6 hodin herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
+    title: 'Neohrožený',
+  },
+  pvp_flag_24h: {
+    name: 'Neústupný',
+    desc: 'Nech světové PvP zapnuté po 24 hodin herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
+    title: 'Neústupný',
+  },
+  pvp_flag_168h: {
+    name: 'Nezdolný',
+    desc: 'Nech světové PvP zapnuté po 7 dní herního času, když jsi naživu v otevřeném světě nebo v PvP zápase. Útočiště, PvE instance, smrt a odhlášení pozastaví postup; vypnutí ho vynuluje. Získané tituly jsou trvalé.',
+    title: 'Nezdolný',
+  },
 };

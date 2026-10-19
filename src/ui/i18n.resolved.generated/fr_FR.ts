@@ -418,13 +418,13 @@ export const fr_FR: EnTranslations = {
       "heroicClears": "{count} Héroïque",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Voir le butin possible",
-      "lootFocus": "Loot focus",
-      "allClassGear": "All class gear",
+      "lootFocus": "Butin privilégié",
+      "allClassGear": "Équipement de toutes les classes",
       "specRole": "{name} ({role})",
       "mixedRole": "{first} / {second}",
-      "lootFocusHelp": "Applies to unopened vaults only.",
-      "noFocusedLoot": "No eligible loot. Choose another focus.",
-      "rolledFocus": "Rolled for: {focus}",
+      "lootFocusHelp": "S'applique uniquement aux coffres non ouverts.",
+      "noFocusedLoot": "Aucun butin admissible. Choisissez une autre préférence.",
+      "rolledFocus": "Tirage pour : {focus}",
       "chooseTable": "Choisissez la table sur laquelle tirer",
       "selectAllTables": "Tout sélectionner",
       "selectedTables": "{count} tables sélectionnées",
@@ -446,8 +446,8 @@ export const fr_FR: EnTranslations = {
         "worldMany": "{count} quêtes mondiales terminées",
         "pvpOne": "{count} match classé remporté",
         "pvpMany": "{count} matchs classés remportés",
-        "pvpWinOne": "{count} PvP Win",
-        "pvpWinMany": "{count} PvP Wins"
+        "pvpWinOne": "{count} victoire JcJ",
+        "pvpWinMany": "{count} victoires JcJ"
       },
       "requiredTask": {
         "raidOne": "Vainquez {count} rencontre de raid",
@@ -458,8 +458,8 @@ export const fr_FR: EnTranslations = {
         "worldMany": "Terminez {count} quêtes mondiales",
         "pvpOne": "Remportez {count} match classé",
         "pvpMany": "Remportez {count} matchs classés",
-        "pvpWinOne": "Earn {count} PvP Win",
-        "pvpWinMany": "Earn {count} PvP Wins"
+        "pvpWinOne": "Remporter {count} victoire JcJ",
+        "pvpWinMany": "Remporter {count} victoires JcJ"
       },
       "readyWeeks": "Semaines non réclamées : {count}. Réclamez d'abord la semaine terminée la plus ancienne.",
       "claimLastWeek": "Réclamer la récompense de la semaine dernière",
@@ -522,12 +522,12 @@ export const fr_FR: EnTranslations = {
       "castingOff": "Le bac pour {dest} appareille",
       "boardHint": "Montez sur son pont quand il prend la mer. La traversée est gratuite.",
       "sailing": "En route vers {dest}",
-      "portLabel": "{port} ferry to {dest}",
-      "portTitle": "{port} ferry port",
-      "destination": "Destination: {dest}",
-      "boardNow": "Board now",
-      "arrivesIn": "Ferry arrives in {time}",
-      "scheduleUnavailable": "Ferry timetable unavailable."
+      "portLabel": "Bac de {port} vers {dest}",
+      "portTitle": "Embarcadère de {port}",
+      "destination": "Destination : {dest}",
+      "boardNow": "Embarquer maintenant",
+      "arrivesIn": "Le bac arrive dans {time}",
+      "scheduleUnavailable": "Horaires du bac indisponibles."
     },
     "materialStackSelectionUnavailable": "Cette sélection de matériaux n’est plus disponible.",
     "vehicle": {
@@ -588,13 +588,13 @@ export const fr_FR: EnTranslations = {
       "banner": "Vous observez {name}"
     },
     "realmMotd": {
-      "line": "Message of the day: {text}",
-      "updated": "Message of the day updated.",
-      "cleared": "Message of the day cleared.",
-      "none": "No message of the day is set.",
-      "usage": "Usage: /motd \"<message>\" to set it, /motd clear to remove it.",
-      "tooLong": "The message of the day is limited to {max} characters.",
-      "saveFailed": "The message of the day could not be saved and will not survive a restart."
+      "line": "Message du jour : {text}",
+      "updated": "Message du jour actualisé.",
+      "cleared": "Message du jour effacé.",
+      "none": "Aucun message du jour défini.",
+      "usage": "Utilisation : /motd \"<message>\" pour le définir, /motd clear pour l'effacer.",
+      "tooLong": "Le message du jour est limité à {max} caractères.",
+      "saveFailed": "Le message du jour n'a pas pu être sauvegardé et sera perdu au redémarrage."
     },
     "readyCheck": {
       "title": "Vérification prête",
@@ -619,11 +619,11 @@ export const fr_FR: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Ressusciter près du cadavre",
-      "pvpResurrect": "PvP Resurrect",
-      "pvpResurrectTitle": "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
-      "pvpResurrectWaitButton": "PvP Resurrect ({seconds})",
-      "pvpResurrectWaitNote": "You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.",
-      "pvpResurrectReadyNote": "PvP Resurrect is ready: you will rise at the nearest graveyard.",
+      "pvpResurrect": "Résurrection JcJ",
+      "pvpResurrectTitle": "Ressusciter au cimetière le plus proche avec toute votre santé, sans nouveau Tribut du Gardien.",
+      "pvpResurrectWaitButton": "Résurrection JcJ ({seconds})",
+      "pvpResurrectWaitNote": "Résurrection JcJ dans {seconds} : vous revivrez au cimetière le plus proche.",
+      "pvpResurrectReadyNote": "Résurrection JcJ disponible : vous revivrez au cimetière le plus proche.",
       "resurrectAtHealer": "Le Veilleur pâle (Glas du Veilleur)",
       "ghostHint": "Courez jusqu'à l'endroit de votre mort ou parlez au Veilleur pâle pour revivre",
       "spiritHealerAlive": "Le Veilleur pâle veille sur les morts. Vous êtes encore parmi les vivants.",
@@ -641,7 +641,7 @@ export const fr_FR: EnTranslations = {
       "healerConfirmCancel": "Annuler"
     },
     "graphicsRestore": {
-      "note": "Restoring graphics"
+      "note": "Restauration des graphismes"
     },
     "wiki": {
       "confirmTitle": "Ouvrir le wiki ?",
@@ -2155,7 +2155,7 @@ export const fr_FR: EnTranslations = {
       }
     },
     "options": {
-      "spellTooltipOnHover": "Spell Tooltips on Hover",
+      "spellTooltipOnHover": "Infobulles des sorts au survol",
       "clickMoveLeft": "Clic gauche",
       "clickMoveRight": "Clic droit",
       "version": "v{version} ({build})",
@@ -2269,7 +2269,7 @@ export const fr_FR: EnTranslations = {
       "confirmVendorSellNote": "Désactiver cette option vend les objets en un seul clic sans confirmation ; un emplacement de sac déplacé pourrait donc faire vendre le mauvais objet.",
       "confirmVendorSellMinQuality": "Confirmer les ventes de la qualité",
       "confirmVendorSellMinQualityNote": "Les articles de qualité inférieure se vendent en un seul clic; un article mal vendu peut toujours être racheté auprès du vendeur.",
-      "confirmVendorSellMinQualityNoteGray": "Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.",
+      "confirmVendorSellMinQualityNoteGray": "Les objets de qualité inférieure se vendent en un clic. Un objet vendu par erreur peut être racheté, sauf les objets gris non signés.",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
@@ -2290,9 +2290,9 @@ export const fr_FR: EnTranslations = {
       "showUtilityModes": "Inclure les modes furtivité et déplacement",
       "showFriendlyTrack": "Afficher mes buffs sur les alliés",
       "showShieldTrack": "Afficher mes boucliers",
-      "classicCombatText": "Classic Combat Text",
+      "classicCombatText": "Texte de combat classique",
       "waterRipples": "Ondulations de l'eau (sillages)",
-      "spellEffects": "Spell Effects",
+      "spellEffects": "Effets des sorts",
       "actionCam": "Caméra d'action",
       "actionCamShoulder": "Décalage d'épaule de la caméra d'action",
       "actionCamShoulderLeft": "Gauche {pct}",
@@ -2816,7 +2816,7 @@ export const fr_FR: EnTranslations = {
         "worldKill": "élimination en monde ouvert",
         "worldAssist": "élimination en monde ouvert assistée",
         "hillHold": "colline tenue",
-        "worldQuest": "world quest"
+        "worldQuest": "quête mondiale"
       },
       "floatReasons": {
         "kill": "Élimination",
@@ -2826,11 +2826,11 @@ export const fr_FR: EnTranslations = {
       }
     },
     "worldPvp": {
-      "rewardTitles": "Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.",
-      "rewardPaused": "Current PvP streak: {time} played (paused in a sanctuary)",
-      "rewardPausedDead": "Current PvP streak: {time} played (paused while dead)",
-      "rewardPausedInstance": "Current PvP streak: {time} played (paused inside PvE instances)",
-      "rewardProgress": "Current PvP streak: {time} played",
+      "rewardTitles": "Gagnez des titres permanents après {thresholds} de jeu avec le JcJ mondial activé en monde ouvert ou en instance JcJ. Déconnexion, mort, instances JcE et sanctuaires mettent le compteur en pause. Désactiver le JcJ le remet à zéro.",
+      "rewardPaused": "Série JcJ actuelle : {time} de jeu (en pause dans un sanctuaire)",
+      "rewardPausedDead": "Série JcJ actuelle : {time} de jeu (en pause pendant la mort)",
+      "rewardPausedInstance": "Série JcJ actuelle : {time} de jeu (en pause dans les instances JcE)",
+      "rewardProgress": "Série JcJ actuelle : {time} de jeu",
       "tab": "JcJ mondial",
       "title": "JcJ mondial",
       "blurb": "Levez votre drapeau pour combattre d'autres joueurs marqués partout dans le monde ouvert. Vainquez-en un et prenez une part de sa bourse, plus de l'Honneur pour l'équipement de Guerre. Les champs de bataille et les arènes rapportent toujours davantage.",
@@ -2849,8 +2849,8 @@ export const fr_FR: EnTranslations = {
       "markLine": "Attaquer un joueur non marqué là-bas lève votre propre drapeau ; attaquer un joueur marqué ne le fait jamais.",
       "aidLine": "Soigner, protéger ou améliorer un joueur marqué lors d'un combat en monde ouvert lève votre drapeau.",
       "stakeLine": "Le perdant paie {cap} ou {percent} de sa bourse, selon le montant le plus faible.",
-      "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
-      "skullName": "{name}'s Skull",
+      "spoilsLine": "Si vous êtes tous deux marqués, l'or du coup fatal tombe sur le corps avec le crâne du perdant.",
+      "skullName": "Crâne de {name}",
       "noStakeLine": "Un joueur non marqué tué en terrain de mêlée générale ne perd pas d'or.",
       "noTakeLine": "Un combattant non marqué ne prend pas d'or non plus : l'or ne circule qu'entre deux joueurs marqués.",
       "honorLine": "{honor} d'Honneur par élimination, partagé entre tous ceux qui ont aidé.",
@@ -2880,8 +2880,8 @@ export const fr_FR: EnTranslations = {
       "countsHolding": "À l'intérieur : vous {yours}, rival {theirs}",
       "contestYou": "Prise de la colline : {seconds} sur {total}",
       "contestOther": "Colline en train d'être perdue : {seconds} sur {total}",
-      "contestYouPaused": "Paused: {seconds} of {total}",
-      "contestOtherPaused": "Rival paused: {seconds} of {total}",
+      "contestYouPaused": "En pause : {seconds} sur {total}",
+      "contestOtherPaused": "Adversaire en pause : {seconds} sur {total}",
       "contestNone": "Détenez la majorité à l'intérieur pendant {total} pour la prendre",
       "inside": "Vous êtes à l'intérieur du cercle",
       "distance": "{yards} yd jusqu'au cercle",
@@ -2890,27 +2890,27 @@ export const fr_FR: EnTranslations = {
       "standingRaid": "Les membres du raid ne comptent pas : seuls les groupes peuvent détenir la colline"
     },
     "skullBag": {
-      "title": "Skull Bag",
-      "total": "Skulls: {count}",
-      "close": "Close the Skull Bag",
-      "clickOpen": "Click to open",
-      "notCarried": "Carry the Skull Bag in your bags to store or take skulls.",
-      "empty": "Empty. While you carry the bag, skulls you loot go straight in.",
-      "unrecorded": "Trophy Skull",
-      "store": "Store carried skulls ({count})",
-      "storeNone": "No skulls to store",
-      "takeOne": "Take 1",
-      "takeAll": "Take all",
-      "takeOneAria": "Take 1: {item}",
-      "takeAllAria": "Take all: {item}",
-      "tooltip": "Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls."
+      "title": "Sac à crânes",
+      "total": "Crânes : {count}",
+      "close": "Fermer le Sac à crânes",
+      "clickOpen": "Cliquer pour ouvrir",
+      "notCarried": "Gardez le Sac à crânes dans vos sacs pour ranger ou retirer des crânes.",
+      "empty": "Vide. Tant que vous portez le sac, les crânes ramassés y vont directement.",
+      "unrecorded": "Crâne-trophée",
+      "store": "Ranger les crânes transportés ({count})",
+      "storeNone": "Aucun crâne à ranger",
+      "takeOne": "Retirer 1",
+      "takeAll": "Tout retirer",
+      "takeOneAria": "Retirer 1 : {item}",
+      "takeAllAria": "Tout retirer : {item}",
+      "tooltip": "Contient un nombre illimité de Crânes-trophées sans occuper de place dans les sacs. Tant qu'il est dans vos sacs, les crânes ramassés y vont directement. Cliquez dessus pour ranger ou retirer des crânes."
     },
     "warfareShop": {
       "gossipOption": "Parcourir les tenues de Guerre",
       "gossipOptionAria": "Parcourir la boutique de tenues de Guerre proposée par {name}",
       "jewelry": "Bijoux",
       "weapons": "Armes",
-      "goods": "Goods",
+      "goods": "Marchandises",
       "groupSeason2": "Saison de Guerre 2 : Avant-garde",
       "groupEntry": "Saison de Guerre 1",
       "owned": "Possédé",
@@ -2951,12 +2951,12 @@ export const fr_FR: EnTranslations = {
       "hint": "Trouvez le terrain que cette carte montre, tenez-vous sur le X et utilisez la carte à nouveau pour creuser. Un butin enfoui s'ouvre pour vous et votre groupe.",
       "upgradeNote": "La redessiner en tant que carte {rarity} prend {inks} Encres du Cartographe (vous en tenez {held}). Les intendants des factions les vendent.",
       "upgradeMaxed": "Aucun cartographe ne pourrait mieux affiner cette carte.",
-      "inkPickerTitle": "Use Cartographer's Ink on which map?",
-      "inkPickerHeld": "You hold {held} Cartographer's Ink.",
-      "inkPickerRead": "Being followed: its X lies in {zone}. The X stays put.",
-      "inkPickerUnread": "Unread ({count} held)",
-      "inkPickerCost": "Redraw to {rarity}: {inks} ink",
-      "inkPickerCancel": "Cancel",
+      "inkPickerTitle": "Sur quelle carte utiliser l'Encre de cartographe ?",
+      "inkPickerHeld": "Vous possédez {held} d'Encre de cartographe.",
+      "inkPickerRead": "En cours de suivi : sa croix se trouve en {zone}. La croix ne bouge pas.",
+      "inkPickerUnread": "Non lue ({count} en votre possession)",
+      "inkPickerCost": "Redessiner en {rarity} : {inks} d'encre",
+      "inkPickerCancel": "Annuler",
       "rarity": {
         "common": "Commun",
         "rare": "Rare",
@@ -3673,8 +3673,8 @@ export const fr_FR: EnTranslations = {
       "resetDone": "Toutes les instances ont été réinitialisées.",
       "resetNone": "Vous n'avez aucune instance à réinitialiser.",
       "resetOccupied": "Vous ne pouvez pas réinitialiser les instances tant qu'une personne s'y trouve.",
-      "queuedOccupied": "Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.",
-      "queuedCancelled": "Queued difficulty change cancelled because the party or leader changed.",
+      "queuedOccupied": "Changement de difficulté mis en attente car quelqu'un ou son cadavre est encore à l'intérieur. Il sera appliqué quand les instances seront vides.",
+      "queuedCancelled": "Changement de difficulté en attente annulé car le groupe ou son chef a changé.",
       "resetSameDifficulty": "Changez la difficulté du donjon avant de réinitialiser ces instances. Les instances vides se réinitialisent d'elles-mêmes après 5 minutes.",
       "resetLoot": "Vous ne pouvez pas réinitialiser les instances tant qu'il reste du butin à l'intérieur.",
       "resetConfirmTitle": "Réinitialiser toutes les instances ?",
@@ -3691,7 +3691,7 @@ export const fr_FR: EnTranslations = {
       "dragEquipHint": "Faites glisser sur votre personnage pour équiper",
       "dragDestroyHint": "Faites glisser dans le monde pour détruire",
       "reorderNeedsRecent": "Effacez le filtre et triez par Récents pour réorganiser vos sacs",
-      "reorderLocked": "Locked items stay in their bag slot. Unlock it to move it.",
+      "reorderLocked": "Les objets verrouillés restent dans leur emplacement. Déverrouillez-les pour les déplacer.",
       "itemAriaInstanced": "{item}, quantité {count}, copie marquée par le fabricant",
       "itemAriaEnchanted": "{item}, quantité {count}, copie enchantée",
       "itemAriaBound": "{item}, quantité {count}, copie liée",
@@ -4025,7 +4025,7 @@ export const fr_FR: EnTranslations = {
       "elementalConvergencePrimed": "Votre prochain sort de l'autre école élémentaire accorde la Convergence élémentaire",
       "hunterFerocity": "{stacks} Férocité de meute : votre familier inflige {pct}% de dégâts en plus",
       "cooldownCap": "{used} sur {cap} s de réduction de temps de recharge utilisés dans cette fenêtre",
-      "bruinRushWindow": "La Forme de loup ne coûte aucun mana et cloue la cible de votre Ruée de Bruin, la ralentissant de {pct}% pendant {sec} s",
+      "bruinRushWindow": "La Forme de chat ne coûte aucun mana et cloue la cible de votre Ruée de Bruin, la ralentissant de {pct}% pendant {sec} s",
       "funeralHarvestLock": "Moisson funéraire ne peut pas encore créer un autre Fragment d'âme",
       "leadenHexLock": "Hex de plomb ne peut pas encore enraciner cette cible de nouveau",
       "forbiddenReflectionReady": "Votre prochain temps de recharge de Démoniste éligible peut être relancé",
@@ -4077,7 +4077,7 @@ export const fr_FR: EnTranslations = {
       "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
       "moontide": "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
       "oldBlood": "Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme",
-      "verdance": "Verdoyance : cran {stacks} sur {max}. Chaque Sporemending, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
+      "verdance": "Verdoyance : cran {stacks} sur {max}. Chaque Soin de spores, Seconde floraison ou Soin sauvage que vous lancez ajoute 1 cran, et chaque cran raccourcit l'incantation de Soin sauvage ; à {max}, Prompte guérison devient Surfloraison",
       "freeExecute": "Votre prochaine capacité d'exécution éligible ne coûte rien",
       "resourceSap": "Restaure {value} de votre ressource actuelle toutes les {interval} s",
       "nextAttackCrit": "Votre prochaine attaque est un coup critique garanti",
@@ -4179,7 +4179,7 @@ export const fr_FR: EnTranslations = {
       "formTravel": "Forme de Fleet : vitesse de déplacement augmentée de {pct}%",
       "formFireball": "Forme de braise : vitesse de déplacement augmentée de {pct} % ; les attaques et sorts sont désactivés",
       "formMoonkin": "Forme de sélénien : dégâts des sorts augmentés de {pct}% et armure augmentée de {armorPct}%",
-      "formSporemender": "Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%",
+      "formSporemender": "Forme de Soignespores : soins augmentés de {pct}%, armure augmentée de {armorPct}% et vitesse de déplacement réduite de {slowPct}%",
       "formShadow": "Forme d'Ombre : dégâts d'Ombre augmentés de {pct}%",
       "resourceCount": "{value} sur {max}",
       "formLich": "Lance d'âme touche aussi jusqu'à {targets} ennemis proches pour {pct}% de dégâts",
@@ -4266,7 +4266,7 @@ export const fr_FR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "JcJ",
-      "bountyTag": "Bounty",
+      "bountyTag": "Prime",
       "cheaterTag": "< Tricheur >",
       "pledgeTag": "Serment de {guild}",
       "npcRoleTag": "<{role}>",
@@ -4427,34 +4427,34 @@ export const fr_FR: EnTranslations = {
       "wrongKind": "Ce code est une exportation de paramètres, pas une configuration de raccourcis."
     },
     "keybindLayout": {
-      "title": "Keyboard Layout",
-      "open": "Convert",
-      "from": "Hotkeys made for",
-      "to": "Convert to",
-      "keepMovement": "Keep movement keys in place",
-      "keepMovementLocked": "Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.",
-      "help": "Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.",
-      "moves": "Hotkeys that will move: {count}",
-      "noChange": "No hotkeys change between these layouts.",
-      "apply": "Convert Hotkeys",
-      "converted": "Hotkeys converted from {from} to {to}.",
+      "title": "Disposition du clavier",
+      "open": "Convertir",
+      "from": "Raccourcis prévus pour",
+      "to": "Convertir vers",
+      "keepMovement": "Conserver les touches de déplacement en place",
+      "keepMovementLocked": "Les touches de déplacement sont restées en place la dernière fois et le resteront encore. Rétablissez les valeurs par défaut pour recommencer.",
+      "help": "Chaque raccourci passe sur la touche qui produit le même caractère dans la nouvelle disposition. La rangée de chiffres reste en place. Les noms de touches de cette liste indiquent les positions QWERTY ; le schéma du clavier montre votre disposition.",
+      "moves": "Raccourcis qui changeront de place : {count}",
+      "noChange": "Aucun raccourci ne change entre ces dispositions.",
+      "apply": "Convertir les raccourcis",
+      "converted": "Raccourcis convertis de {from} vers {to}.",
       "layouts": {
-        "qwertyUs": "QWERTY (US)",
-        "qwertyUk": "QWERTY (UK)",
-        "qwertzDe": "QWERTZ (German)",
-        "qwertzCh": "QWERTZ (Swiss)",
-        "azertyFr": "AZERTY (French)",
-        "azertyBe": "AZERTY (Belgian)",
-        "qwertyEs": "QWERTY (Spanish)",
-        "qwertyIt": "QWERTY (Italian)",
-        "qwertyNordic": "QWERTY (Swedish, Finnish)",
-        "qwertyDa": "QWERTY (Danish)",
-        "qwertyNo": "QWERTY (Norwegian)",
-        "qwertyBr": "QWERTY (Brazilian ABNT2)",
-        "qwertyPt": "QWERTY (Portuguese)",
-        "qwertyTr": "QWERTY (Turkish)",
-        "dvorak": "Dvorak",
-        "colemak": "Colemak"
+        "qwertyUs": "QWERTY (États-Unis)",
+        "qwertyUk": "QWERTY (Royaume-Uni)",
+        "qwertzDe": "QWERTZ (allemand)",
+        "qwertzCh": "QWERTZ (suisse)",
+        "azertyFr": "AZERTY (français)",
+        "azertyBe": "AZERTY (belge)",
+        "qwertyEs": "QWERTY (espagnol)",
+        "qwertyIt": "QWERTY (italien)",
+        "qwertyNordic": "QWERTY (suédois, finnois)",
+        "qwertyDa": "QWERTY (danois)",
+        "qwertyNo": "QWERTY (norvégien)",
+        "qwertyBr": "QWERTY (brésilien ABNT2)",
+        "qwertyPt": "QWERTY (portugais)",
+        "qwertyTr": "QWERTY (turc)",
+        "dvorak": "Disposition Dvorak",
+        "colemak": "Disposition Colemak"
       }
     },
     "keyboardMap": {
@@ -4546,7 +4546,7 @@ export const fr_FR: EnTranslations = {
       "perfectedBadge": "Perfectionné",
       "perfectingRank": "Perfectionnement : rang {rank} sur {ranks}",
       "materialSourceGatherer": "{count} × Récolté par {name}",
-      "trophySkullSource": "{count} × Taken from {name}",
+      "trophySkullSource": "{count} × Pris à {name}",
       "materialSourceGathererSigned": "{count} × Récolté par {name}, signé par {signer}",
       "materialSourceUnrecorded": "{count} × Récolteur non enregistré",
       "materialSourceUnrecordedSigned": "{count} × Récolteur non enregistré, signé par {name}",
@@ -5450,22 +5450,26 @@ export const fr_FR: EnTranslations = {
       "enchant_weapon_piston_drive": "Gravure d'arme : Propulsion à piston"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Vos attaques de mêlée qui touchent peuvent vous conférer 50 de Force pendant 15 s et vous rendre 200 points de vie. Les modificateurs de soins s’appliquent. Chaque coup a 1 % de chances de se déclencher par tranche de 0,6 s de la vitesse de base de l’arme qui frappe. Aucun temps de recharge interne. Les deux mains partagent un seul effet, chaque déclenchement le renouvelle et il ne se cumule jamais. Les attaques à distance ne déclenchent pas cet effet. La Forme de loup utilise à la place sa vitesse d’attaque de base de 1 s.",
-      "enchant_weapon_riftwalkers_grace": "Vos attaques de mêlée qui touchent peuvent vous conférer 60 d'Agilité et 2 % d'attaques de mêlée plus rapides pendant 15 s. Chaque coup a 1 % de chances de se déclencher par tranche de 0,6 s de la vitesse de base de l'arme qui frappe. Aucun temps de recharge interne. Les deux mains partagent un seul bonus, chaque déclenchement le renouvelle et il ne se cumule jamais. Les attaques à distance ne déclenchent pas cet effet. La Forme de chat utilise à la place sa vitesse d'attaque de base de 1 s.",
+      "enchant_weapon_lastflame_zeal": "Vos attaques de mêlée réussies peuvent conférer 50 Force pendant 15 s et vous rendre 200 points de vie. Les modificateurs de soins s’appliquent. Chaque coup a 1% de chances par tranche de 0,6 s de la vitesse de base de l’arme qui frappe. Aucun temps de recharge interne. Les deux mains partagent un seul bonus : tout déclenchement le renouvelle, sans cumul possible. Les attaques à distance ne le déclenchent pas. En Forme de chat, les attaques automatiques utilisent plutôt la vitesse des pattes de 1 s. Les frappes et coups de grâce en Forme de chat et Forme de Bruin utilisent la vitesse de l’arme ; Griffes balayantes effectue un seul jet par utilisation, pas par cible.",
+      "enchant_weapon_riftwalkers_grace": "Vos attaques de mêlée réussies peuvent conférer 60 Agilité et accélérer vos attaques de mêlée de 2% pendant 15 s. Chaque coup a 1% de chances par tranche de 0,6 s de la vitesse de base de l’arme qui frappe. Aucun temps de recharge interne. Les deux mains partagent un seul bonus : tout déclenchement le renouvelle, sans cumul possible. Les attaques à distance ne le déclenchent pas. En Forme de chat, les attaques automatiques utilisent plutôt la vitesse des pattes de 1 s. Les frappes et coups de grâce en Forme de chat et Forme de Bruin utilisent la vitesse de l’arme ; Griffes balayantes effectue un seul jet par utilisation, pas par cible.",
       "enchant_weapon_dawnfire_etching": "Grave une arme de façon permanente avec 18 points de Puissance des sorts. La Puissance des sorts compte aussi dans la Puissance des soins. Un bonus fixe : il n'évolue pas.",
       "enchant_weapon_dawns_benediction": "Grave une arme de façon permanente avec 34 points de Puissance des soins. La Puissance des soins augmente uniquement les soins, jamais les dégâts des sorts. Un bonus fixe : il n'évolue pas.",
       "enchant_weapon_piston_drive": "Grave une arme à deux mains de façon permanente avec 12 points de Force et 25 de Score de critique. Ne peut pas être appliqué à une arme à une main. Un bonus fixe : il n'évolue pas."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Votre pierre de foyer alliée n'est pas liée. Parlez à un intendant allié ou utilisez-la dans un centre allié.",
+      "hearthstoneBound": "Votre pierre de foyer alliée est désormais liée à {hub}.",
+      "hearthstoneTransport": "La pierre de foyer vous transporte à {hub}.",
+      "itemCooldown": "Cet objet n'est pas encore prêt ({minutes} min restantes).",
       "alliedHearthstoneUse": "Utilisation : Vous téléporte à votre refuge de faction accordé. (10 sec d'incantation, 15 min de délai)",
       "alliedHearthstoneAttuned": "Accordé à : {hub}",
       "hub_none": "Aucun (Utilisez près d'un refuge de faction pour s'accorder)",
       "hub_rift_watch": "Drifthaven (La Vigie des Failles)",
       "hub_church_order": "Val d'Eastbrook (L'Ordre de l'Église)",
-      "hub_automatons": "South Reach (Fonderie Automate)",
+      "hub_automatons": "Wyrmwatch (Automates)",
       "riftGliderUse": "Utilisation : Déplie le planeur, ralentissant la vitesse de chute pendant 30 sec. L'atterrissage ou les dégâts annulent l'effet. (2 min de délai)",
       "targetDummyUse": "Utilisation : Déploie une cible d'entraînement mécanique dans le monde ouvert pendant 2 minutes pour pratiquer les capacités de combat. (5 min de délai)",
-      "battleStandardUse": "Utilisation : Plante l'Étendard du Combat de l'Aube pendant 5 minutes, augmentant considérablement la régénération de la santé et du mana hors combat pour tous les alliés proches. Rester près pendant 10 secondes accorde aussi la Bénédiction de l'Aube (+5% à toutes les statistiques pendant 30 min). (5 min de délai)",
+      "battleStandardUse": "Utilisation : plante l’Étendard du Combat de l’Aube pendant 5 min. Les joueurs hors combat dans un rayon de 15 yards régénèrent 10% de vie supplémentaire ; les utilisateurs de mana récupèrent aussi un montant de mana égal à 5% de leur Esprit toutes les 2 s. Rester à proximité pendant 10 s confère Bénédiction de l’Aube, augmentant Force, Agilité, Endurance, Intelligence et Esprit de 5% pendant 30 min. (Recharge : 5 min)",
       "shockBombUse": "Utilisation : Lance une bombe à choc jusqu'à 30 mètres, infligeant 120 à 160 points de dégâts de Nature à tous les ennemis à 5 mètres. (1 min de délai)",
       "invisibilityUse": "Utilisation : Vous enveloppe dans la furtivité pendant 6 sec. (2 min de délai)",
       "armorKitUse": "Utilisation : Renforce votre armure thoracique, augmentant l'Armure de 12 pendant 1 heure.",
@@ -5827,7 +5831,7 @@ export const fr_FR: EnTranslations = {
       "teaches": "Utiliser : vous apprend à fabriquer {item}.",
       "teachesEnchant": "Utiliser : vous apprend à appliquer {enchant}.",
       "reagents": "{label} {list}",
-      "reagent": "{name} x{count}"
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Déliage : {name}",
@@ -6716,8 +6720,8 @@ export const fr_FR: EnTranslations = {
       "choose": "Choisir la quête",
       "inProgress": "En cours ({count}/{required})",
       "completed": "Terminé cette semaine",
-      "completedLastWeek": "Completed last week",
-      "claimFirst": "Claim first",
+      "completedLastWeek": "Accompli la semaine dernière",
+      "claimFirst": "Récupérer d'abord",
       "lockedThisWeek": "Verrouillé cette semaine",
       "footerPick": "Vous ne pouvez porter qu'une charge hebdomadaire à la fois. Choisissez une carte pour lire ses conditions.",
       "footerHeld": "Votre charge de la semaine est fixée. Les trois autres se débloquent à la réinitialisation.",
@@ -6758,7 +6762,7 @@ export const fr_FR: EnTranslations = {
       },
       "commendHeading": "Recommandation de l'émissaire",
       "commendNote": "{amount} de réputation avec la faction de votre choix, une fois par semaine.",
-      "commendCarriedNote": "{amount} standing from last week, still unclaimed. Claim it to choose a new charge.",
+      "commendCarriedNote": "{amount} de réputation de la semaine dernière encore non récupérée. Récupérez-la pour choisir une nouvelle charge.",
       "commendClaimed": "La recommandation de cette semaine est allée à la {faction}.",
       "commendRewardLine": "{amount} de réputation avec une faction de votre choix",
       "chosen": "Quête hebdomadaire prise : {category}",
@@ -7414,7 +7418,7 @@ export const fr_FR: EnTranslations = {
       "mobileBody": "Sur téléphone ou tablette, le jeu vous démarre sur Low. Tout appareil tactile atterrit là au premier lancement, volontairement, pour que vous entriez dans le monde et jouiez ; montez-le vous-même depuis le panneau Graphismes quand vous voulez. Dans un navigateur Android, toute l'échelle vous est ouverte et votre choix tient. Sur iPhone et iPad, vous pouvez toujours choisir les préréglages les plus élevés et ils prennent effet dès que vous appuyez sur Appliquer, mais le jeu vous remet sur High au lancement suivant, car iOS peut fermer l'onglet pendant qu'une scène de cette taille se construit. L'application téléchargée est plus stricte encore : sa liste de préréglages s'arrête à High et les réglages système individuels sont masqués, car l'application les gère elle-même.",
       "touchBody": "Sur un écran tactile, le panneau Graphismes gagne une carte Commandes tactiles qui lui est propre : taille et zone morte du joystick, taille des boutons à l'écran, opacité des commandes, un stick de caméra facultatif, une disposition inversée pour gaucher et une visée tactile inversée, pour que l'écran s'adapte à vos mains plutôt que l'inverse.",
       "audioTitle": "Son et langue",
-      "audioBody": "La fenêtre d'options n'est pas faite que de pixels. Audio réunit trois curseurs de volume, pour les effets sonores, la musique et la voix, plus un interrupteur de musique et quatre interrupteurs pour les sons qui lassent le plus vite : voix des PNJ, bruits de pas, sons d'interface et retour au clic. L'onglet Général du panneau Interface porte un sélecteur de langue qui relocalise toute l'interface sur-le-champ, sans rechargement, et un sélecteur de thème pour l'habillage des fenêtres.",
+      "audioBody": "Les options ne se limitent pas à l’image. Audio propose quatre réglages de volume : effets, ambiance, musique et voix, ainsi qu’un interrupteur pour la musique et quatre pour les sons qui lassent le plus souvent : voix des PNJ, pas, sons d’interface et retours de clic. L’onglet Général du panneau Interface propose un choix de langue qui traduit immédiatement toute l’interface sans rechargement, et un choix de thème pour l’habillage des fenêtres.",
       "autolootBody": "Vous préférez ne pas cliquer sur chaque cadavre ? Le ramassage automatique au passage, dans l'onglet Combat du panneau Interface et désactivé par défaut, récupère le butin de vos propres victimes quand vous passez à côté.",
       "panelsMoreBody": "Les deux panneaux que cette page ne détaille pas dans un tableau méritent tout de même un coup d'œil. Auras est l'endroit où vous façonnez les grandes alertes à l'écran qui se déclenchent quand un proc de votre classe survient : lesquelles s'affichent, leur taille, leur couleur, leur opacité, et où elles se placent à l'écran. La Superposition de performances est la lecture que vous activez pendant que vous réglez cette page, puis masquez à nouveau.",
       "valueUltraOrInsane": "Ultra, ou Insane si vous voulez tout",
@@ -7431,7 +7435,7 @@ export const fr_FR: EnTranslations = {
       "rowCameraSpeed": "À quelle vitesse la caméra pivote quand vous regardez autour de vous à la souris.",
       "rowTouchLookSpeed": "La même chose pour la visée au glissement, et elle n'apparaît que sur un écran tactile.",
       "rowFullscreen": "Remplit tout l'écran avec le jeu.",
-      "rowSpellEffects": "The glow, sparks, projectiles, and impact bursts of spells that players and their pets cast, yours included. Switch it off for a calmer screen or a few extra frames in big group fights. Everything an enemy casts still shows, and so do the rings that mark an area to step out of, the markers over stunned, feared, or rooted targets, and every cast bar.",
+      "rowSpellEffects": "La lueur, les étincelles, les projectiles et les explosions d'impact des sorts des joueurs et de leurs familiers, y compris les vôtres. Désactivez pour un écran plus calme ou quelques images par seconde supplémentaires dans les grands combats. Tous les sorts ennemis restent visibles, ainsi que les cercles de danger, les marques sur les cibles étourdies, apeurées ou immobilisées, et toutes les barres d'incantation.",
       "rowWaterRipples": "Les sillages et ondulations qui se propagent derrière vous quand vous nagez. Désactivé par défaut, et le seul effet d'eau qui coûte vraiment des images ; les éclaboussures et les bulles ne sont affectées dans aucun des deux cas.",
       "rowOverflowXp": "Au niveau maximum, si votre barre continue de se remplir avec l'expérience excédentaire ou affiche à la place le texte statique classique de niveau maximum.",
       "rowInterfaceMode": "Si vous obtenez l'interface Desktop ou les commandes tactiles à l'écran. Auto détecte votre appareil, et vous pouvez forcer l'un ou l'autre : une tablette avec clavier peut prendre la disposition Desktop, et un ordinateur portable tactile peut prendre les commandes Touch.",
@@ -7466,7 +7470,7 @@ export const fr_FR: EnTranslations = {
       "ifPartyShowAuras": "Si les améliorations et les affaiblissements s'affichent sur les cadres de groupe. Des interrupteurs équivalents couvrent les barres de ressource, les absorptions, les familiers, et si vous apparaissez dans votre propre liste de groupe.",
       "ifAurasOnPlayerFrame": "Affiche vos améliorations et vos affaiblissements sur votre propre cadre, en plus de la barre d'auras.",
       "ifAuraBarBelowFrame": "Déplace la rangée des améliorations sous votre cadre d'unité au lieu de la placer au-dessus. Cela n'a d'effet que lorsque les améliorations sont affichées sur le cadre du joueur.",
-      "ifTargetAurasBelowFrame": "Place la bande d'améliorations et d'affaiblissements du cadre de la cible sous le cadre plutôt qu'au-dessus, la disposition classique. Désactivé par défaut, car le cadre de cible standard se trouve juste au-dessus de la barre d'action ; activez-le une fois le cadre déplacé vers un endroit disposant de place en dessous.",
+      "ifTargetAurasBelowFrame": "Place la rangée d’améliorations et d’affaiblissements sous le cadre de la cible, sous son nom et sa barre de vie, plutôt qu’au-dessus : la disposition classique. À sa position initiale, le cadre de la cible, avec votre barre d’incantation et vos minuteries de frappe, remonte d’une rangée pour que la première ligne d’effets dégage la barre d’action ; un cadre déplacé reste où vous l’avez mis.",
       "ifAlwaysShowAllBuffs": "Affiche tous les buffs actifs, même avec le préréglage graphique Faible, en contournant sa limite habituelle d’icônes de buffs.",
       "ifShowAuraCaster": "Ajoute une ligne « Lancé par » à chaque infobulle d'amélioration ou d'affaiblissement, nommant qui l'a appliqué. Pratique pour distinguer plusieurs lanceurs d'une même amélioration, comme les Bénédictions de deux paladins.",
       "ifTargetOfTarget": "Affiche qui votre cible cible elle-même, la méthode classique pour vérifier si le tank a toujours l'aggro.",
@@ -7484,7 +7488,7 @@ export const fr_FR: EnTranslations = {
       "ifMouseoverCast": "Permet à un soin ou un sort allié de toucher le cadre de groupe survolé, sans changer votre cible.",
       "ifStickyTarget": "Conserve votre cible actuelle quand vous cliquez sur le sol vide, au lieu de la désélectionner.",
       "ifFctScale": "La taille des nombres de dégâts et de soins qui flottent au-dessus de votre cible.",
-      "ifClassicCombatText": "Brings back the plain white and pale gold damage numbers that rise straight up. Leave it off (the default) for bolder numbers that fan out to the sides, with critical and unusually big hits that flare.",
+      "ifClassicCombatText": "Rétablit les simples nombres de dégâts blancs et dorés pâles qui montent tout droit. Laissez cette option désactivée (par défaut) pour des nombres plus marqués qui s'écartent sur les côtés, avec des éclats pour les coups critiques ou exceptionnellement puissants.",
       "ifExtraBars": "Révèle une deuxième rangée de barre d'action, puis une troisième une fois la deuxième activée. Les emplacements restent accessibles via leurs raccourcis même quand les rangées sont masquées.",
       "ifHideUnused": "Masque les emplacements d'action vides pour n'afficher que les boutons que vous utilisez réellement.",
       "ifLockBars": "Verrouille vos barres pour éviter de glisser une capacité hors d'un emplacement par accident.",
@@ -7909,20 +7913,20 @@ export const fr_FR: EnTranslations = {
       "formsHeading": "Changement de forme",
       "formsNote": "Un druide combat en changeant de forme. La plupart des capacités de druide appartiennent à une forme précise, si bien que la forme que vous portez détermine ce que vous pouvez lancer, et changer de forme coûte un peu de mana. Vous pouvez changer de forme en combat ou hors combat, aussi souvent que vous le souhaitez.",
       "formsAutoUnshift": "Un soin ou un sort de dégâts lancé sous forme vous en fait sortir tout seul. Quitter une forme ainsi est gratuit et ne consomme pas votre temps de recharge global, un sort instantané part donc à l'instant où vous appuyez. Reprendre la forme est une capacité ordinaire, qui coûte toujours du mana et votre temps de recharge global.",
-      "formsMoonwing": "Un druide Équilibre gagne une forme supplémentaire, la Forme de sélénien, la forme de lanceur de sorts dans laquelle il combat. C'est la seule forme animale qui conserve vos sorts, et votre baguette ne fonctionne que dans cette forme ou dans votre forme de lanceur de sorts normale.",
-      "formsWolfEngage": "Un loup ouvre le combat avec Ruée de Bruin, passe aussitôt en Forme de loup pour clouer la cible, comble la distance avec Bond quand il n'est pas camouflé et immobilise un ennemi avec Mise à terre.",
+      "formsMoonwing": "Un druide Équilibre obtient une forme supplémentaire, la Forme de sélénien, forme de lanceur de sorts dans laquelle combat cette spécialisation. Comme la Forme de Soignespores de Restauration, elle conserve vos sorts, et votre baguette ne fonctionne que dans ces deux formes ou dans votre forme de lanceur de sorts normale.",
+      "formsWolfEngage": "Un chat ouvre le combat avec Ruée de Bruin, passe aussitôt en Forme de chat pour clouer la cible, comble la distance avec Bond quand il n'est pas camouflé et immobilise un ennemi avec Mise à terre.",
       "formLine": {
         "form_bear": "La forme de tank : une peau épaisse, de la rage à la place du mana, et davantage de menace pour que les ennemis continuent de vous frapper.",
         "form_cat": "La forme de dégâts au corps à corps : de l'énergie et des points de combo, comme un voleur, et beaucoup moins de menace.",
         "form_travel": "La forme de déplacement : bien plus rapide au sol, mais sans aucune autre capacité tant que vous n'en changez pas.",
-        "form_sporemender": "The Groveheart healing shape: a hardier hide and stronger healing at a slower walk, and it keeps every spell and your mana."
+        "form_sporemender": "La forme de soin de Restauration : une peau plus robuste et des soins plus puissants, au prix d'une marche ralentie, tout en gardant tous vos sorts et votre mana."
       },
       "mageEleSummon": "Un sort de Givre qui appelle l'élémentaire à vos côtés et le lance sur votre cible.",
       "formName": {
         "form_bear": "Forme de Bruin",
         "form_cat": "Forme de chat",
         "form_travel": "Forme de Fleet",
-        "form_sporemender": "Sporemender Form"
+        "form_sporemender": "Forme de Soignespores"
       }
     },
     "classHook": {
@@ -8625,7 +8629,7 @@ export const fr_FR: EnTranslations = {
       "formBear": "Forme de Bruin",
       "formCat": "Forme de chat",
       "formTravel": "Forme de Fleet",
-      "formSporemender": "Sporemender Form",
+      "formSporemender": "Forme de Soignespores",
       "groupCreatures": "Créatures",
       "groupPets": "Démons du Démoniste",
       "pickerLabel": "Choisissez un modèle à afficher",
@@ -9060,7 +9064,7 @@ export const fr_FR: EnTranslations = {
         "commissionsBody": "Une pièce de commande est un article fabriqué pour quelqu'un. Lors de la fabrication d'une arme, d'une pièce d'armure ou d'un hors-main (un élixir ne peut pas porter de lien), l'artisan peut marquer la fabrication comme pièce de commande : la pièce terminée se comporte normalement entre les mains de son créateur, mais dès qu'elle change de mains lors d'un échange, elle se lie à la personne qui la reçoit. C'est le Lien du Créateur : l'acheteur obtient sa pièce, et la pièce ne peut pas être transmise ou revendue.\n\nLes liens ne sont pas définitifs, juste coûteux. N'importe quel maître d'atelier peut délier une pièce liée pendant que vous vous trouvez à son atelier (un atelier mobile n'offre jamais ce service), moyennant un tarif fixé par la qualité de l'objet : 25 argent pour un inhabituel, 1 or pour un rare, 4 or pour un épique, un légendaire payant le tarif épique et une pièce de commande commune le tarif inhabituel.\n\nCe tarif achète une ardoise vierge, pas un remède : la pièce reste une pièce de commande, donc elle se lie à nouveau à quiconque la reçoit lors du prochain échange, et tout le reste, signature, caractéristiques de chef-d'oeuvre et enchantements, demeure intact.",
         "provenanceHeading": "Le travail signé",
         "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Certains objets portent un nom. Les lignes de provenance d'un matériau indiquent qui a récolté chaque groupe d'unités, tandis qu'une marque distincte de signature identifie le signataire de qualité lorsqu'il y en a un. Ces faits sont indépendants : un matériau récolté ordinaire enregistre son collecteur sans recevoir de signature, et un stock ancien signé peut nommer son signataire tout en indiquant honnêtement qu'aucun récolteur n'a été enregistré. Une pièce terminée indique plutôt qui l'a fabriquée. Ces données voyagent avec l'objet lors des échanges, au coffre, par courrier, au Marché mondial et même lors d'un rachat chez un vendeur, sans jamais disparaître.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte de qualité rare ou supérieure arrive signée, et les trouvailles rares signent toute leur manne multipliée par cinq. Un butin de cadavre chanceux signe son rendement quand la famille n'a aucun spécimen à fournir ; lorsqu'elle en a un, le rendement reste ordinaire et le spécimen immaculé signé apparaît à côté. L'artisanat suit la même règle : chaque exemplaire d'une sortie rare ou supérieure reçoit une signature, et un chef-d'œuvre est toujours signé quelle que soit sa qualité, si bien que la meilleure version d'une pièce nomme toujours son créateur. La signature d'un matériau ordinaire accompagne les unités elles-mêmes et ne se perd pas simplement parce qu'une pile compatible contient déjà un autre collecteur ou signataire. Un spécimen immaculé distinct est un objet séparé qui demande toujours de la place ; s'il ne peut pas entrer dans le sac, le rendement ordinaire du cadavre reste mais le spécimen est perdu.\n\nLes objets terminés gardent une identité stricte : deux exemplaires ne fusionnent que si chaque marque correspond exactement, avec le même objet, le même signataire, les mêmes statistiques de chef-d'œuvre, le même enchantement et le même lien. Les matériaux compatibles partagent un emplacement entre collecteurs et signataires tout en gardant un compte pour chaque source. L'infobulle résume les sources ; faites un clic droit sur la pile pour la liste complète (sur écran tactile, utilisez son bouton Sources). Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s'empiler normalement avec ceux de son destinataire.\n\nLes signatures remboursent les artisans : tenir à la station un exemplaire signé d'un réactif requis, quel que soit son signataire, ajoute 2 points de pourcentage aux chances de chef-d'œuvre. Tenir un réactif signé de votre propre main réduit de 1 la quantité requise pour ce réactif, jamais sous 1, sauf s'il porte la marque sans remise ; les noyaux de raid gardent toujours leur coût complet. Votre propre travail rare ou supérieur signé peut même continuer à vous enseigner, aujourd'hui uniquement par les potions fabriquées : buvez une potion rare que vous avez brassée et signée, et un petit gain de compétence revient au métier qui l'a produite tant que ce métier est l'un de vos métiers majeurs actifs. C'est uniquement la branche des potions : un élixir, un parchemin ou un flacon d'apogée ne vous enseigne rien, quelle que soit la finesse de sa signature.",
+        "provenanceBodyUndiscounted": "Certains objets portent un nom. Les lignes de provenance d'un matériau indiquent qui a récolté chaque groupe d'unités, tandis qu'une marque distincte de signature identifie le signataire de qualité lorsqu'il y en a un. Ces faits sont indépendants : un matériau récolté ordinaire enregistre son collecteur sans recevoir de signature, et un stock ancien signé peut nommer son signataire tout en indiquant honnêtement qu'aucun récolteur n'a été enregistré. Une pièce terminée indique plutôt qui l'a fabriquée. Ces données voyagent avec l'objet lors des échanges, au coffre, par courrier, au Marché mondial et même lors d'un rachat chez un vendeur, sans jamais disparaître.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte de qualité rare ou supérieure arrive signée, et les trouvailles rares signent toute leur manne multipliée par cinq. Un butin de cadavre chanceux signe son rendement quand la famille n'a aucun spécimen à fournir ; lorsqu'elle en a un, le rendement reste ordinaire et le spécimen immaculé signé apparaît à côté. L'artisanat suit la même règle : chaque exemplaire d'une sortie rare ou supérieure reçoit une signature, et un chef-d'œuvre est toujours signé quelle que soit sa qualité, si bien que la meilleure version d'une pièce nomme toujours son créateur. La signature d'un matériau ordinaire accompagne les unités elles-mêmes et ne se perd pas simplement parce qu'une pile compatible contient déjà un autre collecteur ou signataire. Un spécimen immaculé distinct est un objet séparé qui demande toujours de la place ; s'il ne peut pas entrer dans le sac, le rendement ordinaire du cadavre reste mais le spécimen est perdu.\n\nLes objets terminés gardent une identité stricte : deux exemplaires ne fusionnent que si chaque marque correspond exactement, avec le même objet, le même signataire, les mêmes statistiques de chef-d'œuvre, le même enchantement et le même lien. Les matériaux compatibles partagent un emplacement entre collecteurs et signataires tout en gardant un compte pour chaque source. L'infobulle résume les sources ; faites un clic droit sur la pile pour la liste complète (sur écran tactile, utilisez son bouton Sources). Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s'empiler normalement avec ceux de son destinataire.\n\nLes signatures remboursent les artisans : détenir un exemplaire signé d'un réactif requis, quel que soit son signataire, dans vos sacs ou dans votre Réserve de matériaux, là où la fabrication peut y puiser, ajoute 2 points de pourcentage aux chances de chef-d'œuvre. Tenir un réactif signé de votre propre main réduit de 1 la quantité requise pour ce réactif, jamais sous 1, sauf s'il porte la marque sans remise ; les noyaux de raid gardent toujours leur coût complet. Votre propre travail rare ou supérieur signé peut même continuer à vous enseigner, aujourd'hui uniquement par les potions fabriquées : buvez une potion rare que vous avez brassée et signée, et un petit gain de compétence revient au métier qui l'a produite tant que ce métier est l'un de vos métiers majeurs actifs. C'est uniquement la branche des potions : un élixir, un parchemin ou un flacon d'apogée ne vous enseigne rien, quelle que soit la finesse de sa signature.",
         "collectorsHeading": "Collectionneurs, trophées et le prix d'une histoire",
         "collectorsBody": "Les marchands sont aveugles à la provenance : un objet signé se vend à un PNJ exactement au même prix que sa version ordinaire. La prime sur une signature n'existe qu'entre joueurs, ce qui en fait précisément tout l'intérêt : une pile de minerai d'aubaine signé par un collecteur célèbre, une Coupe privilégiée issue d'une heureuse récolte, une lame chef-d'oeuvre portant le nom d'un artisan depuis retraité, tout cela vaut ce que la mémoire de quelqu'un dit qu'ils valent.\n\nLe Livre des hauts faits puise dans le même instinct : Veine vierge, Bois de cœur ancien, Floraison au clair de lune, Un spécimen parfait et Lueur d'espoir sont des marques de collection à Renom zéro qui existent uniquement pour prouver qu'un moment vous est arrivé. Gardez l'objet qui a valu le haut fait et vous en tenez la preuve. Rien de tout cela n'est de la puissance ; la provenance n'achète aucune caractéristique et ne gagne aucun combat, c'est la trace écrite du jeu sur les belles journées.",
         "castPaceHeading": "Temps d'incantation et puits d'or",
@@ -9109,7 +9113,7 @@ export const fr_FR: EnTranslations = {
         "q3": "Quelle est la différence entre piller et récolter un cadavre ?",
         "a3": "Ce sont deux actions distinctes sur le même corps. Tout ce qu'un cadavre contient, pièces et butins plus tout composant récoltable, s'ouvre dans la même fenêtre, mais la touche d'interaction et Prendre le butin ne ramassent que le butin ordinaire, qui suit les règles normales du butin. La récolte est le côté métiers, en retirant les matériaux du cadavre lui-même, et elle n'a lieu que lorsque vous choisissez Dépecer dans cette fenêtre.\n\nLa récolte est premier arrivé, usage unique : chaque cadavre ne peut être récolté qu'une seule fois, par celui qui le revendique en premier, en ligne compris. Votre Focus de ville détermine ce que vous obtenez : pendant que vous vous trouvez dans un centre de ville, vous pouvez répartir 10 points de Focus sur les types de composants qui vous intéressent, et chaque composant ciblé obtient un meilleur palier (chaque tranche de 5 points le fait monter d'un cran, au maximum deux crans) et un meilleur rendement (10 pour cent par point). Les composants non ciblés ne sont jamais pénalisés.",
         "q4": "Pourquoi mon Rondin de frêne de fer est-il signé ?",
-        "a4": "Vous avez décroché une aubaine. Environ 1 récolte sur 90 déclenche un événement de récolte rare (du bois de cœur ancien sur un arbre, une veine vierge dans le minerai, une floraison au clair de lune parmi les herbes) : il multiplie le rendement par cinq, signe chaque unité à votre nom, et annonce la trouvaille à la zone entière. Un jet de rareté rare ou mieux sur une récolte ordinaire signe lui aussi le rendement.\n\nLes matériaux signés méritent d'être gardés ou vendus cher : détenir à l'établi n'importe quel exemplaire signé d'un réactif requis ajoute 2 points de pourcentage à la chance de chef-d'oeuvre. Rappelez-vous seulement qu'ils ne se pilent qu'avec des exemplaires signés à l'identique, et qu'ils occupent donc leur propre emplacement de sac.",
+        "a4": "Vous avez fait une trouvaille exceptionnelle. Environ 1 récolte sur 90 déclenche un événement rare : du bois de cœur ancestral sur un arbre, un filon intact pour le minerai ou une fleur au clair de lune pour les plantes. Le rendement est multiplié par cinq, chaque unité porte votre signature et la découverte est annoncée dans toute la zone. Un jet de qualité rare ou supérieure lors d’une récolte ordinaire signe aussi le rendement.\n\nGardez les matériaux signés ou vendez-les cher : détenir un exemplaire signé d’un réactif requis dans vos sacs ou dans votre Réserve de matériaux, là où la fabrication peut y puiser, ajoute 2 points de pourcentage aux chances de chef-d’œuvre. Ils peuvent partager une pile compatible avec des matériaux non signés ou issus d’autres récolteurs et signataires sans perdre leurs marques ; chaque provenance et quantité reste conservée séparément.",
         "q5": "Comment délier une pièce de commande, et combien cela coûte-t-il ?",
         "a5": "Rendez-vous à n'importe quel atelier d'artisanat avec la pièce dans vos sacs et payez le maître. Le tarif suit la qualité de l'objet : 25 argent pour une pièce inhabituelle, 1 or pour une rare, 4 or pour une épique ; un légendaire paie le tarif épique, et une pièce de commande commune paie le tarif inhabituel. Ce doit être un véritable atelier : un atelier mobile n'offre jamais ce service.\n\nCe tarif achète une ardoise vierge, pas un remède : la pièce reste une pièce de commande, donc elle se lie à nouveau à quiconque la reçoit lors du prochain échange. Si plusieurs exemplaires liés partagent une pile, un exemplaire est détaché et délié par paiement.",
         "q6": "Où apprendre les recettes, et combien coûtent-elles ?",
@@ -9145,7 +9149,7 @@ export const fr_FR: EnTranslations = {
       "buyingBody": "Adressez-vous à un marchand et choisissez de parcourir ses marchandises : sa boutique s'ouvre sur trois onglets, Acheter, Vendre et Rachat. Acheter contient tout ce qu'il tient en stock, à vous si vous en avez les moyens. Vendre liste ce que vos sacs contiennent et qu'il vous paiera, et vendre une pièce qui porte sa propre qualité tirée au sort vous demande d'abord confirmation, pour qu'un exemplaire précieux ne vous échappe jamais par mégarde. Si vous vous séparez d'un objet à regret, l'onglet Rachat conserve vos ventes récentes pour que vous puissiez les racheter au prix qu'on vous en a donné.",
       "junkTitle": "Faire le tri du superflu",
       "junkBody": "Les butins dont vous n'avez aucun usage se vendent quand même à n'importe quel marchand, alors videz vos sacs chaque fois que vous passez en ville plutôt que de les laisser se remplir. L'onglet Vendre du marchand comporte même un bouton qui écoule d'un seul clic toutes les babioles de qualité Médiocre. Les bricoles vraiment sans valeur peuvent aussi être jetées purement et simplement pour faire de la place.",
-      "junkBodyFinal": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room. Unsigned gray items sold that way skip the buyback list, so check for anything you meant to keep before you press it.",
+      "junkBodyFinal": "Le butin inutile se vend toujours chez tout marchand possédant sa propre boutique : videz vos sacs quand vous passez en ville. La fenêtre du marchand propose même un bouton Vendre la camelote pour vendre en un clic tous les objets de mauvaise qualité. Vous pouvez aussi jeter les objets sans valeur pour libérer de la place. Les objets gris non signés vendus ainsi n'apparaissent pas dans la liste de rachat : vérifiez ce que vous souhaitiez garder avant de cliquer.",
       "tradeTitle": "Échanger avec les autres joueurs",
       "tradeBody": "Vous pouvez échanger en face à face avec n'importe qui se tenant près de vous. Chacun place objets et pièces dans une fenêtre partagée, et l'échange ne se fait qu'une fois que vous l'avez tous deux confirmé, de sorte que personne ne peut se faire avoir. C'est la manière simple de remettre un butin à un ami ou de conclure un marché.",
       "mailTitle": "La Poste aux Corbeaux",
@@ -11234,10 +11238,10 @@ export const fr_FR: EnTranslations = {
     "selectClass": "Veuillez choisir une classe.",
     "pickClass": "Choisissez une classe.",
     "returnToLogin": "Retour à la connexion",
-    "searchUpdates": "Search for updates",
-    "noUpdateFound": "No update found. Try again shortly.",
-    "updateUnavailable": "Update through your game store or download the latest client.",
-    "updateSearchFailed": "Could not check for updates. Please try again.",
+    "searchUpdates": "Rechercher des mises à jour",
+    "noUpdateFound": "Aucune mise à jour trouvée. Réessayez bientôt.",
+    "updateUnavailable": "Mettez le jeu à jour depuis votre boutique ou téléchargez le dernier client.",
+    "updateSearchFailed": "Impossible de vérifier les mises à jour. Réessayez.",
     "api": {
       "tooManyAttempts": "Trop de tentatives. Attendez une minute puis réessayez.",
       "usernameShape": "Le nom d'utilisateur doit faire 3 à 24 caractères et utiliser lettres, chiffres ou tiret bas.",
@@ -12415,8 +12419,8 @@ export const fr_FR: EnTranslations = {
       "clueTalkAria": "Demander au sujet de l'indice : {name}",
       "clueDeliver": "Remettez {count} {item}.",
       "clueDeliverAria": "Remettre {count} {item} à {name}",
-      "attuneHearthstone": "Attune my Allied Hearthstone here.",
-      "attuneHearthstoneAria": "Attune your Allied Hearthstone to {hub} with {name}",
+      "attuneHearthstone": "Lier ma pierre de foyer alliée ici.",
+      "attuneHearthstoneAria": "Lier votre pierre de foyer alliée à {hub} auprès de {name}",
       "profIntroHint": "Voir {name} pour \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Les trois reliques racontent la même histoire : Aldren combattit pour défendre son roi, Malric franchit la frontière de la mort, et Voss tenta d'arrêter ce qui suivit. Le sceau faiblit, et la crypte abandonnée est le chemin vers les profondeurs.",
       "browseGoods": "Laissez-moi voir vos marchandises.",
@@ -12804,7 +12808,7 @@ export const fr_FR: EnTranslations = {
       "clueCasketOpened": "Le coffret contient {money} et {items}.",
       "treasureMapEarned": "Toutes les quêtes mondiales du jour sont complétées : vous avez trouvé une {map}.",
       "treasureMapLost": "Toutes les quêtes mondiales du jour sont complétées, mais votre inventaire n'a pas de place pour la carte au trésor.",
-      "worldQuestRewardMailed": "Your bags are full. Your reward was sent to your mailbox: {items}.",
+      "worldQuestRewardMailed": "Vos sacs sont pleins. Votre récompense a été envoyée dans votre boîte aux lettres : {items}.",
       "treasureMapRead": "Vous étudiez la {map}. Le X se trouve quelque part dans {zone}.",
       "treasureMapUpgraded": "La carte est redessinée avec une encre plus fine : c'est désormais une {map}.",
       "treasureVaultOpened": "Le sol cède. Un butin enfoui s'ouvre devant vous.",
@@ -12983,7 +12987,7 @@ export const fr_FR: EnTranslations = {
       "sellJunk": "Vendre les rebuts",
       "sellJunkAria": "Vendre tous les rebuts pour {price}",
       "sellJunkHint": "Vend tous les objets gris dans vos sacs, sauf les objets de quête.",
-      "sellJunkNoBuyback": "Unsigned gray items skip the buyback list, so selling them cannot be undone."
+      "sellJunkNoBuyback": "Les objets gris non signés n'apparaissent pas dans la liste de rachat : leur vente est irréversible."
     },
     "market": {
       "title": "Marché mondial",
@@ -13265,15 +13269,15 @@ export const fr_FR: EnTranslations = {
       },
       "bloodhook": {
         "name": "Croc sanglant",
-        "description": "Chargez un ennemi et appliquez la Plaie du croc sanglant, infligeant 34 points de dégâts Physiques de base plus 26% de votre puissance d'attaque à distance sur 12 s en 4 impulsions. (Signature de Maîtrise du terrain)"
+        "description": "Charge un ennemi et lui applique une blessure de Croc sanglant, infligeant 34 dégâts physiques de base plus 26% de votre puissance d'attaque à distance en 4 pulsations sur 12 s. À l'arrivée, ralentit la cible de 30% pendant 3 s. (Signature de Survie)"
       },
       "shrapnel_charge": {
         "name": "Charge à fragmentation",
-        "description": "Frappe la cible pour 24 à 30 points de dégâts Physiques et jusqu'à 4 autres ennemis à moins de 6 mètres pour 13 à 17. Les autres cibles saignent aussi pour 12 points de dégâts sur 6 s. Si la cible principale porte votre Plaie du croc sanglant, inflige immédiatement 1 impulsion de plaie. Les dégâts directs augmentent avec la puissance d'attaque à distance."
+        "description": "Frappe dans un cône de 10 m devant vous. Votre cible, ou l'ennemi touché le plus proche si elle est hors du cône, subit 24 à 30 dégâts physiques. Tous les autres ennemis du cône subissent 7 à 9 dégâts et saignent pour 12 dégâts sur 6 s. Si la cible principale porte votre blessure de Croc sanglant, elle subit immédiatement 1 pulsation de blessure. Toucher un ennemi accorde 1 Élan de chasse. Les dégâts directs augmentent avec la puissance d'attaque à distance."
       },
       "bloodtrail_assault": {
         "name": "Assaut de la piste sanglante",
-        "description": "Pendant 12 s, le Croc sanglant propage une plaie à 60% de puissance à un maximum de 2 ennemis proches, le Déchirement commande une attaque de familier de 18 points de dégâts, et la Charge à fragmentation gagne 2 mètres, inflige 25% de dégâts de base en plus à sa cible principale et déclenche 50% de dégâts de plaie en plus."
+        "description": "Pendant 12 s, Croc sanglant propage une blessure à 60% de puissance à 2 ennemis au maximum dans les 5 m, Déchirure commande une attaque de familier de 18 dégâts et Charge à fragmentation porte 2 m plus loin, inflige 25% de dégâts de base supplémentaires à sa cible principale et déclenche 50% de dégâts de blessure supplémentaires. Sans familier vivant, votre Focalisation se régénère aussi 100% plus vite."
       },
       "trailbreak": {
         "name": "Brise-piste",
@@ -13288,12 +13292,12 @@ export const fr_FR: EnTranslations = {
         "description": "Réduit les dégâts subis de 60% pendant 8 s, mais empêche d'attaquer tant que l'effet est actif."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "name": "Feindre la mort",
+        "description": "Tombez au sol en feignant la mort : votre santé et votre Focalisation apparaissent vides à tous. Les ennemis vous oublient et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité met fin à l'effet. Relancez pour vous relever."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Camouflage tactique",
+        "description": "Fondez-vous dans le décor : les ennemis vous remarquent à peine et vous vous déplacez à 80% de votre vitesse. Attaquer ou subir des dégâts rompt Camouflage tactique. Relancez pour en sortir. (Survie)"
       },
       "frostjaw_trap": {
         "name": "Piège Mâchegivre",
@@ -13836,11 +13840,11 @@ export const fr_FR: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Élan de chasse",
-        "description": "Passif : la Frappe éviscérante octroie 1 Élan de chasse pendant 8 s, jusqu'à 3. À 3 cumuls, le Déchirement inflige 45% de dégâts de frappe en plus et consomme les cumuls. (Maîtrise du terrain)"
+        "description": "Passif : Frappe éventrante et une Charge à fragmentation qui touche un ennemi accordent chacun 1 Élan de chasse, jusqu'à 3. Dure jusqu'à consommation ou sortie du combat ; chaque charge augmente votre vitesse de déplacement de 15%. À 3 charges, Déchirure inflige 60% de dégâts de frappe supplémentaires et consomme les charges. (Survie)"
       },
       "fieldcraft_reentry": {
         "name": "Rentrée armée",
-        "description": "Passif : Brise-piste rafraîchit l'Élan de chasse et prépare votre prochaine Frappe éviscérante ou Croc sanglant pendant 12 s. La Frappe éviscérante inflige 15% de dégâts en plus par cumul. Le Croc sanglant inflige 18 à 24 points de dégâts Physiques supplémentaires, augmentés de 15% par cumul et par votre puissance d'attaque à distance. À 3 cumuls, l'une ou l'autre attaque consomme l'Élan de chasse. (Maîtrise du terrain)"
+        "description": "Passif : avec Élan de chasse, Brise-piste prépare votre prochaine Frappe éventrante ou Croc sanglant pendant 12 s. Frappe éventrante inflige 15% de dégâts supplémentaires par charge. Croc sanglant inflige 18 à 24 dégâts physiques supplémentaires, augmentés de 15% par charge et par la puissance d'attaque à distance. À 3 charges, l'une ou l'autre attaque consomme Élan de chasse. (Survie)"
       },
       "wing_clip": {
         "name": "Taillade entravante",
@@ -14090,7 +14094,7 @@ export const fr_FR: EnTranslations = {
         "description": "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à {duration} s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire."
       },
       "rejuvenation": {
-        "name": "Sporemending",
+        "name": "Soin de spores",
         "description": "Soigne la cible de {damage} sur 12 s.",
         "specNote_restoration": "Chaque incantation ajoute 1 Verdoyance (maximum 3), même lorsqu'elle renouvelle une floraison déjà active. À 3 Verdoyance, Prompte guérison devient Surfloraison."
       },
@@ -14121,7 +14125,7 @@ export const fr_FR: EnTranslations = {
       },
       "cat_form": {
         "name": "Forme de chat",
-        "description": "Vous transforme en loup : l'agilité monte avec votre niveau, puissance d'attaque +8 plus 2 par niveau, vos attaques utilisent de l'énergie et des points de combo, et vous générez 29% de menace en moins. Passer sous une forme quelconque octroie Foulée bondissante : 60% de vitesse de déplacement pendant 3 s, une fois toutes les 20 s. Lancez de nouveau pour revenir en forme de lanceur de sorts."
+        "description": "Prenez la forme d'un chat : l'agilité augmente avec votre niveau, la puissance d'attaque de 8 plus 2 par niveau, vos attaques utilisent énergie et points de combo, votre vitesse augmente de 15% et votre menace diminue de 29%. Changer de forme accorde Foulée bondissante, un bref gain de vitesse. Relancez pour reprendre votre forme de lanceur."
       },
       "claw": {
         "name": "Griffe lacérante",
@@ -14129,9 +14133,9 @@ export const fr_FR: EnTranslations = {
         "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien (maximum 3)."
       },
       "scratch": {
-        "name": "Scratch",
-        "description": "Scratch through nearby targets within 6 yards for weapon damage plus {damage}. Awards 1 combo point per target hit. Reveals stealthed enemies in the sweep. Cat Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "name": "Griffure",
+        "description": "Griffe les cibles proches dans un rayon de 6 m pour les dégâts de l'arme plus {damage}. Accorde 1 point de combo par cible touchée. Révèle les ennemis camouflés dans le balayage. Forme féline uniquement.",
+        "specNote_feral": "Chaque coup réussi ajoute 1 Sang ancien (3 au maximum)."
       },
       "ferocious_bite": {
         "name": "Morsure sanglante",
@@ -14183,23 +14187,23 @@ export const fr_FR: EnTranslations = {
       },
       "hibernate": {
         "name": "Sommeil",
-        "description": "Plonge la cible dans un sommeil profond pendant 8 s maximum. Tout dégât la réveille."
+        "description": "Plonge la cible dans un profond sommeil pendant 8 s au maximum. Tout dégât la réveille. Contre les joueurs, chaque répétition dans les 18 s dure moitié moins longtemps que la précédente et la quatrième échoue."
       },
       "dash": {
         "name": "Sprint",
-        "description": "Bondit en avant, augmentant la vitesse de déplacement de 50% pendant 15 s. Forme de chat uniquement."
+        "description": "Prenez la Forme de chat si nécessaire, puis sprintez avec 50% de vitesse supplémentaire pendant 15 s. Utilisable sous toute forme. Instantané et ne déclenche pas le temps de recharge global."
       },
       "pounce": {
         "name": "Frappe furtive",
-        "description": "Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo. Forme de loup uniquement. Hors camouflage, ce bouton devient Bond."
+        "description": "Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo. Forme de chat uniquement. Hors camouflage, ce bouton devient Bond."
       },
       "lunge": {
         "name": "Bond",
-        "description": "Bondit sur un ennemi jusqu'à 12 m, inflige 60% des dégâts de l'arme et octroie 1 point de combo. Forme de loup uniquement."
+        "description": "Bondit sur un ennemi jusqu'à 12 m, inflige 60% des dégâts de l'arme et octroie 1 point de combo. Forme de chat uniquement."
       },
       "hamstring_bite": {
         "name": "Mise à terre",
-        "description": "Technique de finition qui étourdit la cible pendant 1 s plus 1 s par point de combo (5 points de combo : 6 s). Forme de loup uniquement."
+        "description": "Technique de finition qui étourdit la cible pendant 1 s plus 1 s par point de combo (5 points de combo : 6 s). Forme de chat uniquement."
       },
       "insect_swarm": {
         "name": "Nuée cinglante",
@@ -14211,7 +14215,7 @@ export const fr_FR: EnTranslations = {
       },
       "rip": {
         "name": "Faille sanglante",
-        "description": "Technique de finition qui fait saigner la cible toutes les 2 s pendant 24 s : 36 dégâts plus 24 par point de combo dépensé (5 points de combo : {damage} au total). Forme de chat uniquement.",
+        "description": "Coup de grâce qui fait saigner la cible toutes les 2 s pendant 24 s : 72 dégâts plus 48 par point de combo dépensé (5 points : {damage} au total). Forme de chat uniquement.",
         "specNote_feral": "Le coup porté ajoute 1 Sang ancien (maximum 3)."
       },
       "mortal_strike": {
@@ -14416,8 +14420,8 @@ export const fr_FR: EnTranslations = {
       },
       "swiftmend": {
         "name": "Prompte guérison",
-        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Chaque incantation de Sporemending, de Seconde floraison et de Soin sauvage ajoute 1 Verdoyance ; à 3 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
-        "specNote_restoration": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Sporemending and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
+        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Chaque incantation de Soin de spores, de Seconde floraison et de Soin sauvage ajoute 1 Verdoyance ; à 3 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
+        "specNote_restoration": "Consomme un soin sur la durée d'une cible alliée pour lui rendre {damage} points de vie. Les applications de Soin de spores et Seconde floraison ajoutent de la Verdoyance ; à 5 points, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos soins sur la durée de 60% des soins restants. (Signature de Restauration)"
       },
       "moonlash": {
         "name": "Déferlante lunaire",
@@ -14444,26 +14448,26 @@ export const fr_FR: EnTranslations = {
         "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Cœur sylvestre)"
       },
       "sporemender_form": {
-        "name": "Sporemender Form",
-        "description": "Shapeshift into a Sporemender, increasing your healing done by 20% and your armor by 40%, but reducing your movement speed by 20%. All of your caster-form spells stay usable. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Groveheart signature)"
+        "name": "Forme de Soignespores",
+        "description": "Prenez la forme d'un Soignespores : vos soins augmentent de 20% et votre armure de 40%, mais votre vitesse diminue de 20%. Tous vos sorts de forme de lanceur restent utilisables. Dure jusqu'au prochain changement de forme. Tout changement de forme accorde Foulée bondissante, un bref gain de vitesse. Relancez pour reprendre votre forme de lanceur. (Signature de Restauration)"
       },
       "spore_burst": {
-        "name": "Spore Burst",
-        "description": "Summons a spore burster onto the target area. After {duration} sec it bursts, healing allies for {healing} and dealing {damage} Nature damage to enemies within 8 yards.",
-        "specNote_balance": "At 3 Moontide it is 25% stronger and spends your Moontide.",
-        "specNote_restoration": "Also applies Sporemending to each ally it heals. At full Verdance it is 25% stronger and spends your Verdance."
+        "name": "Explosion de spores",
+        "description": "Invoque un champignon explosif dans la zone ciblée. Après {duration} s, il éclate, soigne les alliés de {healing} et inflige {damage} dégâts de Nature aux ennemis dans un rayon de 8 m.",
+        "specNote_balance": "À 3 Marées lunaires, sa puissance augmente de 25% et elle consomme votre Marée lunaire.",
+        "specNote_restoration": "Applique aussi Soin de spores à chaque allié soigné. À pleine Verdoyance, sa puissance augmente de 25% et elle consomme votre Verdoyance."
       },
       "natures_boon": {
-        "name": "Nature's Boon",
-        "description": "Your spells can arm Nature's Boon for 10 sec: the spell it names becomes free, 25% stronger, and castable in any form. A fresh proc refreshes the duration.",
-        "specNote_feral": "Each landed melee auto-attack has a 1 in 15 chance to arm it for Sporemending, or for Oakhide while in Bruin Form.",
-        "specNote_balance": "Each Wildbolt or Skyfall you cast has a 10% chance to arm it for Spore Burst, at most once every 10 sec.",
-        "specNote_restoration": "Each tick of your heal-over-time effects has a 10% chance to arm it for Spore Burst, at most once every 10 sec."
+        "name": "Bienfait de la nature",
+        "description": "Vos sorts peuvent activer Bienfait de la nature pendant 10 s : le sort indiqué devient gratuit, 25% plus puissant et utilisable sous toute forme. Une nouvelle activation renouvelle la durée.",
+        "specNote_feral": "Chaque attaque automatique de mêlée réussie a une chance sur 15 de l'activer pour Soin de spores, ou pour Peau de chêne en Forme de Bruin.",
+        "specNote_balance": "Chaque Trait sauvage ou Chute céleste lancé a 10% de chances de l'activer pour Explosion de spores, au plus une fois toutes les 10 s.",
+        "specNote_restoration": "Chaque pulsation de vos soins sur la durée a 10% de chances de l'activer pour Explosion de spores, au plus une fois toutes les 10 s."
       },
       "overbloom": {
         "name": "Surfloraison",
-        "description": "Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Sporemending fraîche sur la cible.",
-        "specNote_restoration": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Sporemending."
+        "description": "Consomme 3 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Soin de spores fraîche sur la cible.",
+        "specNote_restoration": "Dépense vos 5 points de Verdoyance : chaque allié portant vos soins sur la durée reçoit instantanément {buff}% des soins qu'il leur restait, les effets sont retirés et la cible reçoit un nouveau Soin de spores."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",
@@ -14807,7 +14811,7 @@ export const fr_FR: EnTranslations = {
       },
       "multi_shot": {
         "name": "Tir fendu",
-        "description": "Décoche une volée sur la zone ciblée et inflige {damage} points de dégâts physiques aux ennemis dans un rayon de 8 m. (talent de Chasseur)"
+        "description": "Décoche une volée sur la zone ciblée, infligeant {damage} points de dégâts physiques aux ennemis dans un rayon de 8 yards. (talent de Chasseur)"
       },
       "prayer_of_healing": {
         "name": "Soin du chœur",
@@ -14896,7 +14900,7 @@ export const fr_FR: EnTranslations = {
       },
       "typhoon": {
         "name": "Typhon",
-        "description": "Une rafale de vent repousse tous les ennemis dans un rayon de 8 m et les hébète, réduisant leur vitesse de déplacement de 50 % pendant 4 s."
+        "description": "Une bourrasque projette tous les ennemis dans les 8 m à 15 m de vous et les hébète, réduisant leur vitesse de 50% pendant 4 s. Les joueurs ennemis sont projetés dans les airs en ligne droite : au-delà d'un rebord, ils continuent leur course et subissent des dégâts de chute ; une chute mortelle compte comme votre élimination."
       },
       "voidfeast": {
         "name": "Festin du Vide",
@@ -14932,7 +14936,7 @@ export const fr_FR: EnTranslations = {
       },
       "bear_charge": {
         "name": "Ruée de Bruin",
-        "description": "Charge un ennemi, génère 9 points de rage et l'étourdit pendant 1 s. Pendant les 3 s qui suivent, la Forme de loup est gratuite et cloue la cible, la ralentissant de 50% pendant 4 s. Portée de 8-25 m. Forme de Bruin uniquement."
+        "description": "Charge un ennemi, génère 9 points de rage et l'étourdit pendant 1 s. Pendant les 3 s qui suivent, la Forme de chat est gratuite et cloue la cible, la ralentissant de 50% pendant 4 s. Portée de 8-25 m. Forme de Bruin uniquement."
       },
       "demoralizing_roar": {
         "name": "Rugissement lâche",
@@ -14940,7 +14944,7 @@ export const fr_FR: EnTranslations = {
       },
       "prowl": {
         "name": "Traquer",
-        "description": "Passe en camouflage tant que vous êtes en forme de loup. Inutilisable en combat."
+        "description": "Passe en camouflage tant que vous êtes en forme de chat. Inutilisable en combat."
       },
       "rake": {
         "name": "Écorcher",
@@ -19103,10 +19107,10 @@ export const fr_FR: EnTranslations = {
         "name": "Cache de l'Émissaire"
       },
       "pvp_trophy_skull": {
-        "name": "Trophy Skull"
+        "name": "Crâne-trophée"
       },
       "pvp_skull_bag": {
-        "name": "Skull Bag"
+        "name": "Sac à crânes"
       },
       "clue_scroll": {
         "name": "Parchemin d'indice"
@@ -24122,9 +24126,9 @@ export const fr_FR: EnTranslations = {
         "body": "Le coffre a été vidé, mais votre part n'a pas été collectée du coffre. Les corbeaux l'ont amenée jusqu'à vous ici, avec les biens et les pièces que vous avez gagnés."
       },
       "world_quest_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your world quest reward",
-        "body": "Your bags were full when you earned this world quest reward, so the ravens have brought it to you here instead. Make some room and collect it from any raven pillar.\n\n- The Ravenpost"
+        "sender": "La Poste aux corbeaux",
+        "subject": "Votre récompense de quête mondiale",
+        "body": "Vos sacs étaient pleins lorsque vous avez gagné cette récompense de quête mondiale. Les corbeaux vous l'ont donc apportée ici. Faites de la place et récupérez-la à n'importe quel pilier aux corbeaux.\n\n- La Poste aux corbeaux"
       }
     },
     "itemSets": {
@@ -24260,8 +24264,8 @@ export const fr_FR: EnTranslations = {
       },
       "grovespring": {
         "name": "Habillement de la Source sylvestre",
-        "bonus2": "Fleetmend consumes your own Sporemending or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdure."
+        "bonus2": "Prompte guérison consomme d'abord votre propre Soin de spores ou Seconde floraison et soigne 25 pour cent de plus. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Floraison excessive récolte 75 % de vos effets restants et stocke ensuite 1 Verdoyance."
       },
       "hexthread": {
         "name": "Linceul de fil maudit",

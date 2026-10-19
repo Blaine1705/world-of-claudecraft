@@ -6,9 +6,9 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { tEntity } from '../src/ui/entity_i18n';
-import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
 import { localizeServerText } from '../src/ui/server_i18n';
-import { localizeSimText, tSim } from '../src/ui/sim_i18n';
+import { localizeSimText, simDictProvidedKeys, tSim } from '../src/ui/sim_i18n';
 
 // Boss drop printout (Discord feature request "Make boss drops publicly visible
 // to all raid members under Master Loot"): a party boss kill prints every shared
@@ -260,7 +260,24 @@ describe('boss drop printout localization', () => {
     expect(localizeSimText(text)).toBe(
       tSim('loot.bossDrop', { boss, item: '[[i:bandit_bandana]]' }),
     );
+    expect(localizeSimText(text)).toBe(`${boss}掉落了[[i:bandit_bandana]]。`);
     expect(localizeSimText(text)).toContain(boss);
     expect(localizeSimText(text)).toContain('[[i:bandit_bandana]]');
+  });
+
+  it('provides a translated boss-drop source in every non-English locale', () => {
+    const english = bossDropAnnouncementText('Boss', 'bandit_bandana');
+    for (const lang of supportedLanguages) {
+      if (lang === 'en' || lang === 'en_CA') continue;
+      expect(simDictProvidedKeys(lang).has('loot.bossDrop'), lang).toBe(true);
+      setLanguage(lang);
+      const translated = tSim('loot.bossDrop', {
+        boss: 'Boss',
+        item: '[[i:bandit_bandana]]',
+      });
+      expect(translated, lang).not.toBe(english);
+      expect(translated, lang).toContain('Boss');
+      expect(translated, lang).toContain('[[i:bandit_bandana]]');
+    }
   });
 });

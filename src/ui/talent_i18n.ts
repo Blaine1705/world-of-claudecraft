@@ -1520,6 +1520,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wraith Strike': 'Golpe Espectral',
     'Wrathful Psalm': 'Furia divina',
     Zealwing: 'Ala de Venganza',
+      Sentence: "Sentencia",
   },
   es_ES: {
     'Adrenaline Junkie': 'Adicto a la adrenalina',
@@ -2032,6 +2033,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wraith Strike': 'Golpe Espectral',
     'Wrathful Psalm': 'Furia divina',
     Zealwing: 'Ala de Venganza',
+      Sentence: "Sentencia",
   },
   fr_FR: {
     Sentence: 'Sentence',
@@ -9316,6 +9318,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wraith Strike': 'Hayalet Vuruş',
     'Wrathful Psalm': 'Kutsal Hiddet',
     Zealwing: 'İntikam Kanadı',
+      Sentence: "Hüküm",
   },
   sv_SE: {
     ...TALENT_NEW_TITLE_OVERRIDES.sv_SE,
@@ -10179,6 +10182,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wraith Strike': 'Đòn Ma Ảnh',
     'Wrathful Psalm': 'Phẫn Nộ Thần Thánh',
     Zealwing: 'Cánh Báo Thù',
+      Sentence: "Phán Quyết",
   },
   da_DK: {
     ...TALENT_NEW_TITLE_OVERRIDES.da_DK,

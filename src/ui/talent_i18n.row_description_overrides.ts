@@ -202,6 +202,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La represalia de la Égida de Truenos otorga un 10% de reducción de daño durante 3 s.',
     wlk_r11_demon_armor:
       'La primera vez que cada miembro del grupo toca tu Pozo de Almas, los protege con un escudo equivalente al 15% de su salud máxima durante 30 s. Cada jugador puede obtener este escudo una vez por Pozo de Almas.',
+    dru_r14_empowered_touch:
+      'Sobrefloración aplica un nuevo Remiendo de Esporas a cada aliado cuyos efectos de sanación haya consumido.',
   },
   es_ES: {
     wlk_r17_death_coil:
@@ -326,6 +328,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La represalia de la Égida de Truenos otorga una reducción del daño recibido del 10% durante 3 s.',
     wlk_r11_demon_armor:
       'La primera vez que cada miembro del grupo toca tu Soulwell, los escuda por un 15% de su salud máxima durante 30 s. Cada jugador puede obtener este escudo una vez por Soulwell.',
+    dru_r14_empowered_touch:
+      'Sobrefloración aplica un nuevo Remiendo de Esporas a cada aliado cuyos efectos de sanación haya consumido.',
   },
   fr_FR: {
     mag_r5_blink_cast:
@@ -446,6 +450,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Les représailles de la Garde de tonnerre octroient 10% de réduction des dégâts pendant 3 s.',
     wlk_r11_demon_armor:
       "La première fois que chaque membre du groupe touche votre Puits d'âmes, il le protège d'un bouclier égal à 15% de ses points de vie maximum pendant 30 s. Chaque joueur ne peut obtenir ce bouclier qu'une fois par Puits d'âmes.",
+    dru_r14_empowered_touch:
+      'Surfloraison applique un nouveau Soin de spores à chaque allié dont elle a récolté les soins.',
   },
   fr_CA: {
     mag_r5_blink_cast:
@@ -566,6 +572,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Les représailles de Garde de tonnerre confèrent 10% de réduction des dégâts pendant 3 s.',
     wlk_r11_demon_armor:
       "La première fois que chaque membre du groupe touche votre Puits d'âmes, il le protège d'un bouclier égal à 15% de ses points de vie maximum pendant 30 s. Chaque joueur ne peut gagner ce bouclier qu'une fois par Puits d'âmes.",
+    dru_r14_empowered_touch:
+      'Surfloraison applique un nouveau Soin de spores à chaque allié dont elle a récolté les soins.',
   },
   it_IT: {
     mag_r5_blink_cast: 'Puoi usare Passo Baleno nel mezzo di un incantesimo senza interromperlo.',
@@ -683,6 +691,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'La rappresaglia di Barriera di Tuono concede il 10% di riduzione danni per 3 sec.',
     wlk_r11_demon_armor:
       'La prima volta che ogni membro del gruppo tocca il tuo Soulwell, li protegge con uno scudo pari al 15% della loro salute massima per 30 sec. Ogni giocatore può ottenere questo scudo una sola volta per Soulwell.',
+    dru_r14_empowered_touch:
+      'Sovrafioritura applica una nuova Cura delle Spore a ogni alleato di cui ha raccolto le cure.',
   },
   de_DE: {
     mag_r5_blink_cast:
@@ -802,6 +812,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Eine Vergeltung des Donnerschilds gewährt 3 Sek. lang 10% Schadensreduzierung.',
     wlk_r11_demon_armor:
       'Beim ersten Berühren Eures Soulwell schützt es jedes Gruppenmitglied 30 Sek. lang mit einem Schild von 15% seiner maximalen Gesundheit. Jeder Spieler kann diesen Schild einmal pro Soulwell erhalten.',
+    dru_r14_empowered_touch:
+      'Überblüte belegt jeden Verbündeten, dessen Heilung sie geerntet hat, mit einer neuen Sporenheilung.',
   },
   pt_BR: {
     mag_r5_blink_cast: 'Você pode usar Passo Cintilante durante uma conjuração sem interrompê-la.',
@@ -918,6 +930,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'A retaliação da Salvaguarda do Trovão concede 10% de redução de dano por 3 s.',
     wlk_r11_demon_armor:
       'Na primeira vez que cada membro do grupo toca seu Soulwell, ele os escuda em 15% da vida máxima deles por 30 s. Cada jogador pode obter esse escudo uma vez por Soulwell.',
+    dru_r14_empowered_touch:
+      'Superflorescência aplica uma nova Cura de Esporos a cada aliado cuja cura ela colheu.',
   },
   ru_RU: {
     mag_r5_blink_cast:
@@ -941,7 +955,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_colossal_might:
       'Каждая единица ярости, которую вы тратите, сокращает время восстановления ваших основных атакующих способностей на 0,1 сек., не более 10 сек. каждые 30 сек.',
     dru_r14_empowered_touch:
-      '«Сверхцветение» заново высаживает свежее «Спороисцеление» на каждом союзнике, чье исцеление оно собрало.',
+      'Сверхцветение накладывает новое Спороисцеление на каждого союзника, чьи эффекты лечения оно собрало.',
     dru_r14_moonfury:
       '«Лунный всплеск» и «Пробуждение солнца» также восстанавливают по 15% вашей максимальной маны.',
     dru_r14_savage_fury:
@@ -1153,6 +1167,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Odveta Hromové ochrany udělí 10 % snížení poškození na 3 s.',
     wlk_r11_demon_armor:
       'Poprvé, co se člen skupiny dotkne tvého Soulwellu, získá štít za 15 % svého maximálního zdraví na 30 s. Každý hráč může tento štít získat jednou za Soulwell.',
+    dru_r14_empowered_touch:
+      'Překvět znovu zasadí čerstvé Výtrusové hojení na každého spojence, jehož léčení sklidil.',
   },
   nl_NL: {
     mag_r5_blink_cast:
@@ -1268,6 +1284,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'De vergelding van Donderwering verleent 3 sec lang 10% schadevermindering.',
     wlk_r11_demon_armor:
       'De eerste keer dat een groepslid je Soulwell aanraakt, beschermt het hen 30 sec lang met een schild van 15% van hun maximale gezondheid. Elke speler kan dit schild eenmaal per Soulwell krijgen.',
+    dru_r14_empowered_touch:
+      'Overbloei brengt een nieuwe Sporenheling aan op elke bondgenoot van wie de genezing werd geoogst.',
   },
   pl_PL: {
     mag_r5_blink_cast:
@@ -1385,6 +1403,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Odwet Osłony gromu przyznaje 10% redukcji obrażeń na 3 sekundy.',
     wlk_r11_demon_armor:
       'Za pierwszym razem, gdy członek grupy skorzysta z twojego Soulwell, osłania go tarczą równą 15% jego maksymalnego zdrowia na 30 sekund. Każdy gracz może zyskać tę tarczę raz na Soulwell.',
+    dru_r14_empowered_touch:
+      'Nadrozkwit ponownie nakłada świeże Zarodnikowe gojenie na każdego sojusznika, którego leczenie zebrał.',
   },
   id_ID: {
     mag_r5_blink_cast:
@@ -1501,6 +1521,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Balasan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk.',
     wlk_r11_demon_armor:
       'Saat setiap anggota grup pertama kali menyentuh Soulwell-mu, mereka mendapat perisai sebesar 15% dari nyawa maksimum selama 30 dtk. Setiap pemain hanya dapat memperoleh perisai ini sekali per Soulwell.',
+    dru_r14_empowered_touch:
+      'Mekar Raya menerapkan Pemulihan Spora baru pada setiap sekutu yang penyembuhannya dipanen.',
   },
   tr_TR: {
     mag_r5_blink_cast:
@@ -1613,6 +1635,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Gök Gürültüsü Siperinin misillemesi 3 sn boyunca %10 hasar azaltımı kazandırır.',
     wlk_r11_demon_armor:
       "Her grup üyesi Ruh Kuyuna ilk kez dokunduğunda, 30 sn boyunca azami canının %15'i kadar onu kalkanlar. Her oyuncu bu kalkanı Ruh Kuyusu başına yalnızca bir kez kazanabilir.",
+    dru_r14_empowered_touch:
+      'Taşkın Çiçeklenme, iyileştirmesini topladığı her müttefike yeni bir Spor Şifası uygular.',
   },
   sv_SE: {
     mag_r5_blink_cast: 'Du kan använda Flimmersteg mitt i en besvärjelse utan att avbryta den.',
@@ -1723,6 +1747,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Åskvärns vedergällning ger 10% minskad mottagen skada i 3 sek.',
     wlk_r11_demon_armor:
       'Första gången varje gruppmedlem rör din Soulwell skyddar den dem med en sköld på 15% av deras maximala hälsa i 30 sek. Varje spelare kan få denna sköld en gång per Soulwell.',
+    dru_r14_empowered_touch:
+      'Överblomning lägger en ny Sporläkning på varje allierad vars läkning den skördade.',
   },
   vi_VN: {
     mag_r5_blink_cast:
@@ -1835,6 +1861,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Đòn phản công của Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây.',
     wlk_r11_demon_armor:
       'Lần đầu tiên mỗi thành viên nhóm chạm vào Giếng Linh Hồn của bạn, nó sẽ tạo khiên cho họ bằng 15% máu tối đa trong 30 giây. Mỗi người chơi chỉ có thể nhận khiên này một lần cho mỗi Giếng Linh Hồn.',
+    dru_r14_empowered_touch:
+      'Mãn Khai áp dụng Chữa Lành Bào Tử mới lên mỗi đồng minh có hiệu ứng hồi máu bị thu hoạch.',
   },
   da_DK: {
     mag_r5_blink_cast: 'Du kan bruge Flimmertrin midt i en besværgelse uden at afbryde den.',
@@ -1946,6 +1974,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     sha_r8_frost_bind: 'Tordenværns gengældelse giver 10% reduceret skade i 3 sek.',
     wlk_r11_demon_armor:
       'Første gang hvert gruppemedlem rører ved din Soulwell, skjoldes de for 15% af deres maksimale helbred i 30 sek. Hver spiller kan få dette skjold én gang pr. Soulwell.',
+    dru_r14_empowered_touch:
+      'Overblomstring påfører en ny Sporeheling på hver allieret, hvis heling den høstede.',
   },
   zh_CN: {
     mag_r5_blink_cast: '你可以在施法过程中使用闪烁步，而不会打断当前施法。',
@@ -1962,7 +1992,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: '你每使用第三个技能时，该技能产生的怒气提高20%。',
     war_row_colossal_might:
       '你每消耗1点怒气，主要进攻技能的冷却时间缩短0.1秒，每30秒最多减少10秒。',
-    dru_r14_empowered_touch: '盛放会为每个被其吸收治疗效果的盟友重新种下一个崭新的孢愈术。',
+    dru_r14_empowered_touch: '盛放会为每个被其收取持续治疗效果的盟友重新施加一次孢愈术。',
     dru_r14_moonfury: '月涌和日醒还会各自恢复你最大法力值的 15%。',
     dru_r14_savage_fury: '你的剐削与割裂流血效果的每次跳动都会额外产生 1 点古血。',
     dru_r20_berserk: '月涌、日醒、血收、碎髓和盛放的效果强度提高 25%。',
@@ -2064,7 +2094,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: '你每使用第三個技能時，該技能產生的怒氣提高20%。',
     war_row_colossal_might:
       '你每消耗1點怒氣，主要進攻技能的冷卻時間縮短0.1秒，每30秒最多縮短10秒。',
-    dru_r14_empowered_touch: '盛放會在每位被收割治療效果的盟友身上，重新種下一個新的孢癒術。',
+    dru_r14_empowered_touch: '盛放會為每位被其收取持續治療效果的盟友重新施加一次孢癒術。',
     dru_r14_moonfury: '月湧與日醒都會額外恢復你最大法力值的 15%。',
     dru_r14_savage_fury: '你的剮擊與割裂流血效果每次造成傷害時，都會額外增加 1 層古血。',
     dru_r20_berserk: '月湧、日醒、血收、碎髓與盛放的效果提高 25%。',
@@ -2166,7 +2196,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_colossal_might:
       '消費した怒気1ポイントごとに、主要な攻撃アビリティのクールダウンが0.1秒短縮されます。30秒ごとに最大10秒まで。',
     dru_r14_empowered_touch:
-      '満開は、その回復効果を刈り取ったすべての味方に、新しいスポアメンディングを植え直す。',
+      '満開が回復効果を刈り取った味方全員に、新たなスポアメンディングを付与します。',
     dru_r14_moonfury: 'ムーンサージと陽醒は、それぞれ使用時に最大マナの15%も回復する。',
     dru_r14_savage_fury: '皮剥ぎと血の亀裂の出血ダメージが発生するたびに、古き血を1蓄える。',
     dru_r20_berserk: 'ムーンサージ、陽醒、血の収穫、骨髄砕き、満開の効果が25%強化される。',
@@ -2274,8 +2304,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_battle_rhythm: '세 번째로 사용하는 능력은 분노 생성량이 20% 증가합니다.',
     war_row_colossal_might:
       '소비한 분노 1포인트마다 주요 공격 기술의 재사용 대기시간이 0.1초 단축됩니다. 30초마다 최대 10초까지 줄어듭니다.',
-    dru_r14_empowered_touch:
-      '만개는 치유 효과를 거둬들인 모든 아군에게 새로운 포자치유를 다시 심어 줍니다.',
+    dru_r14_empowered_touch: '만개가 치유 효과를 거둔 모든 아군에게 새로운 포자치유를 적용합니다.',
     dru_r14_moonfury: '달의 격동과 해돋움은 사용할 때마다 최대 마나의 15%도 함께 회복시켜 줍니다.',
     dru_r14_savage_fury: '저미기와 찢기의 출혈 효과가 틱마다 오랜 피를 1단계 추가로 쌓습니다.',
     dru_r20_berserk: '달의 격동, 해돋움, 피의 수확, 골수분쇄, 만개의 효과가 25% 강력해집니다.',

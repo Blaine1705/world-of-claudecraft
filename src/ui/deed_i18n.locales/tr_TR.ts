@@ -1201,4 +1201,30 @@ export const table: DeedLocaleTable = {
     name: 'Golgelerden Daha Parlak',
     desc: 'Calinan para keselerini geri al ve Evergarden labirentinden Hard zorlugunda kac.',
   },
+  prog_titan: { name: 'Dev', desc: 'Ömür boyu toplam 10.000.000 deneyim kazan.', title: 'Dev' },
+  pvp_flag_1h: {
+    name: 'Cesur',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 1 saat oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Cesur',
+  },
+  pvp_flag_3h: {
+    name: 'Meydan Okuyan',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 3 saat oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Meydan Okuyan',
+  },
+  pvp_flag_6h: {
+    name: 'Korkusuz',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 6 saat oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Korkusuz',
+  },
+  pvp_flag_24h: {
+    name: 'Boyun Eğmez',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 24 saat oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Boyun Eğmez',
+  },
+  pvp_flag_168h: {
+    name: 'Yılmaz',
+    desc: "Açık dünyada veya bir PvP karşılaşmasında hayattayken Dünya PvP'sini 7 gün oyun süresi boyunca açık tut. Sığınaklar, PvE örnekleri, ölüm ve çıkış ilerlemeyi duraklatır; kapatmak sıfırlar. Kazanılan unvanlar kalıcıdır.",
+    title: 'Yılmaz',
+  },
 };

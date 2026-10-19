@@ -5457,6 +5457,10 @@ export const en_CA: EnTranslations = {
       "enchant_weapon_piston_drive": "Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Your Allied Hearthstone is not attuned. Speak with an allied quartermaster or use it in an allied hub.",
+      "hearthstoneBound": "Your Allied Hearthstone is now attuned to {hub}.",
+      "hearthstoneTransport": "The hearthstone transports you to {hub}.",
+      "itemCooldown": "That item is not ready yet ({minutes} min remaining).",
       "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
       "alliedHearthstoneAttuned": "Attuned to: {hub}",
       "hub_none": "None (Use near a faction hub to attune)",

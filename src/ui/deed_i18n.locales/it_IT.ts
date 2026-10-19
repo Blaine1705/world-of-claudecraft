@@ -1271,4 +1271,34 @@ export const table: DeedLocaleTable = {
     name: 'Piu luminosa delle ombre',
     desc: 'Recupera i borselli rubati e fuggi dal labirinto di Evergarden in modalita Hard.',
   },
+  prog_titan: {
+    name: 'Titano',
+    desc: 'Ottieni 10.000.000 di esperienza complessiva nella tua vita.',
+    title: 'Titano',
+  },
+  pvp_flag_1h: {
+    name: 'Audace',
+    desc: 'Mantieni il PvP mondiale attivo per 1 ora di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    title: 'Audace',
+  },
+  pvp_flag_3h: {
+    name: 'Ribelle',
+    desc: 'Mantieni il PvP mondiale attivo per 3 ore di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    title: 'Ribelle',
+  },
+  pvp_flag_6h: {
+    name: 'Impavido',
+    desc: 'Mantieni il PvP mondiale attivo per 6 ore di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    title: 'Impavido',
+  },
+  pvp_flag_24h: {
+    name: 'Inflessibile',
+    desc: 'Mantieni il PvP mondiale attivo per 24 ore di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    title: 'Inflessibile',
+  },
+  pvp_flag_168h: {
+    name: 'Indomabile',
+    desc: 'Mantieni il PvP mondiale attivo per 7 giorni di gioco mentre sei vivo nel mondo aperto o in una partita PvP. Santuari, istanze PvE, morte e disconnessione sospendono i progressi; disattivarlo li azzera. I titoli ottenuti sono permanenti.',
+    title: 'Indomabile',
+  },
 };

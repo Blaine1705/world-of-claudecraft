@@ -1225,4 +1225,34 @@ export const table: DeedLocaleTable = {
     name: 'Jasniej niz cienie',
     desc: 'Odzyskaj skradzione sakiewki z monetami i ucieknij z labiryntu Evergarden na poziomie Hard.',
   },
+  prog_titan: {
+    name: 'Tytan',
+    desc: 'Zdobądź łącznie 10 000 000 punktów doświadczenia w ciągu życia.',
+    title: 'Tytan',
+  },
+  pvp_flag_1h: {
+    name: 'Śmiały',
+    desc: 'Utrzymuj światowe PvP włączone przez 1 godzinę czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
+    title: 'Śmiały',
+  },
+  pvp_flag_3h: {
+    name: 'Buntowniczy',
+    desc: 'Utrzymuj światowe PvP włączone przez 3 godziny czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
+    title: 'Buntowniczy',
+  },
+  pvp_flag_6h: {
+    name: 'Nieustraszony',
+    desc: 'Utrzymuj światowe PvP włączone przez 6 godzin czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
+    title: 'Nieustraszony',
+  },
+  pvp_flag_24h: {
+    name: 'Niezłomny',
+    desc: 'Utrzymuj światowe PvP włączone przez 24 godziny czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
+    title: 'Niezłomny',
+  },
+  pvp_flag_168h: {
+    name: 'Nieposkromiony',
+    desc: 'Utrzymuj światowe PvP włączone przez 7 dni czasu gry, będąc żywym w otwartym świecie lub w meczu PvP. Sanktuaria, instancje PvE, śmierć i wylogowanie wstrzymują postęp; wyłączenie go zeruje. Zdobyte tytuły są trwałe.',
+    title: 'Nieposkromiony',
+  },
 };
