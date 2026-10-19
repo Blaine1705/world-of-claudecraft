@@ -27,6 +27,99 @@ function heavyGroup(reticle: SelectionReticle): THREE.Object3D {
 }
 
 describe('selection reticle preparation and lifecycle', () => {
+  it('names each owned material by module and role without changing program signatures', () => {
+    const reticle = new SelectionReticle(
+      new THREE.Scene(),
+      ground,
+      async () => true,
+      () => 0,
+    );
+    const materials = new Set<THREE.Material>();
+    reticle.group.traverse((node) => {
+      if (node instanceof THREE.Mesh) materials.add(node.material);
+    });
+    expect([...materials].map((material) => material.name).sort()).toEqual([
+      'selection-reticle:dashes',
+      'selection-reticle:disc',
+      'selection-reticle:ring',
+    ]);
+    for (const material of materials) {
+      const signature = materialProgramSignature(material);
+      const name = material.name;
+      material.name = '';
+      expect(materialProgramSignature(material)).toBe(signature);
+      material.name = name;
+    }
+    reticle.dispose();
+  });
+
+  it.each(['removed', 'childremoved'] as const)(
+    'continues terminal cleanup after actual %s dispatch throws',
+    async (event) => {
+      const scene = new THREE.Scene();
+      let complete!: (ready: boolean) => void;
+      const prepare = vi.fn(
+        () =>
+          new Promise<boolean>((resolve) => {
+            complete = resolve;
+          }),
+      );
+      const reticle = new SelectionReticle(scene, ground, prepare, () => 0);
+      sync(reticle);
+      await flush();
+      const resources = new Set<THREE.BufferGeometry | THREE.Material>();
+      reticle.group.traverse((node) => {
+        if (!(node instanceof THREE.Mesh)) return;
+        resources.add(node.geometry);
+        resources.add(node.material);
+      });
+      expect(resources.size).toBe(8);
+      const calls = [...resources].map((resource) => vi.spyOn(resource, 'dispose'));
+      calls[0].mockImplementation(() => {
+        throw new Error('resource failure');
+      });
+      const detachFailure = () => {
+        throw new Error('detach failure');
+      };
+      if (event === 'removed') reticle.group.addEventListener('removed', detachFailure);
+      else scene.addEventListener('childremoved', detachFailure);
+      // Clearing one child must not prevent attempts to clear its siblings either.
+      reticle.group.addEventListener('childremoved', () => {
+        throw new Error('clear failure');
+      });
+      const laterCleanup = vi.fn();
+      const errors: unknown[] = [];
+      const owner = {
+        prewarmDepthMaterials: new Map(),
+        selectionReticle: reticle,
+        farmPatchVisuals: { dispose: laterCleanup },
+      };
+      const bestEffort = (cleanup: () => void) => {
+        try {
+          cleanup();
+        } catch (error) {
+          errors.push(error);
+        }
+      };
+      disposeRendererPrewarmAndGroundFx(owner, bestEffort);
+      for (const call of calls) expect(call).toHaveBeenCalledOnce();
+      expect(laterCleanup).toHaveBeenCalledOnce();
+      expect(errors).toHaveLength(1);
+      expect(errors[0]).toBeInstanceOf(AggregateError);
+      expect((errors[0] as AggregateError).errors).toHaveLength(5); // detach, resource, three children
+      expect(reticle.group.parent).toBeNull();
+      expect(reticle.group.children).toHaveLength(0);
+      complete(true);
+      await flush();
+      sync(reticle);
+      reticle.hide();
+      expect(reticle.group.visible).toBe(false);
+      expect(prepare).toHaveBeenCalledOnce();
+      expect(() => reticle.dispose()).not.toThrow();
+      for (const call of calls) expect(call).toHaveBeenCalledOnce();
+    },
+  );
+
   it('keeps the classic ring until exact heavy preparation succeeds, once per context', async () => {
     let complete: (ready: boolean) => void = () => {};
     let generation = 0;

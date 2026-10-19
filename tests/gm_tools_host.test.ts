@@ -15,6 +15,22 @@ function staff(pid: number, permissions: string[], isAdmin = true): ModerationSe
 }
 
 describe('GM tool host watch recipients', () => {
+  it('recognizes roster replacement and terminal teardown by actor identity', () => {
+    const actor = staff(1, ['moderation.spectate']);
+    const sessions = new Map([[actor.pid, actor]]);
+    const sim = new Sim({ seed: 7, playerClass: 'mage', noPlayer: true });
+    const host = gmToolsHost(sim, sessions, () => {});
+    expect(host.isCurrentSession(actor)).toBe(true);
+    const replacement = { ...actor };
+    sessions.set(actor.pid, replacement);
+    expect(host.isCurrentSession(actor)).toBe(false);
+    expect(host.isCurrentSession(replacement)).toBe(true);
+    replacement.left = true;
+    expect(host.isCurrentSession(replacement)).toBe(false);
+    sessions.delete(actor.pid);
+    expect(host.isCurrentSession(actor)).toBe(false);
+  });
+
   it('restricts private watch notices to current authenticated moderation staff', () => {
     const actor = staff(1, ['moderation.act']);
     const spectator = staff(2, ['moderation.spectate']);

@@ -16,7 +16,7 @@ export const ANNOUNCE_COLOR = '#ff7d1a';
 
 export type GmToolsHost<TSession extends ModerationSession> = Pick<
   ModerationHost<TSession>,
-  'isGmHidden' | 'setGmHidden' | 'onlineStaff' | 'announce'
+  'isCurrentSession' | 'isGmHidden' | 'setGmHidden' | 'onlineStaff' | 'announce'
 >;
 
 export function gmToolsHost<TSession extends ModerationSession>(
@@ -25,6 +25,7 @@ export function gmToolsHost<TSession extends ModerationSession>(
   broadcast: (text: string, color: string) => void,
 ): GmToolsHost<TSession> {
   return {
+    isCurrentSession: (session) => sessions.get(session.pid) === session && !session.left,
     isGmHidden: (session) => sim.entities.get(session.pid)?.gmHidden === true,
     setGmHidden: (session, hidden) => {
       const entity = sim.entities.get(session.pid);

@@ -10,6 +10,8 @@ export interface ModerationSession {
   accountId: number;
   characterId: number;
   isAdmin: boolean;
+  /** Terminal teardown can start before the host removes the roster entry. */
+  left?: boolean;
   // Expanded admin permission set, snapshotted at WS join (like isAdmin). The
   // commands this service handles require 'moderation.act',
   // 'moderation.spectate' or 'realm.motd' (see requiredCommandPermission).
@@ -18,6 +20,7 @@ export interface ModerationSession {
 }
 
 export interface ModerationHost<TSession extends ModerationSession> {
+  isCurrentSession(session: TSession): boolean;
   sessionByName(name: string): TSession | null;
   notice(session: TSession, text: string): void;
   systemNotice(session: TSession, text: string): void;
@@ -158,7 +161,17 @@ export class ModerationService<TSession extends ModerationSession> {
 
   // The same stale-completion guard for /visible: a quick "off" then "on" must
   // never land in reverse order because the first audit write was slower.
-  private readonly visibleOpSeq = new Map<number, number>();
+  private readonly visibleOpSeq = new WeakMap<TSession, number>();
+
+  // Resume refreshes this same actor's authority while IO can still be pending.
+  // Check the live roster identity and current permission before each new stage.
+  private canContinue(actor: TSession, kind: ModerationCommandKind): boolean {
+    return (
+      this.host.isCurrentSession(actor) &&
+      actor.isAdmin &&
+      actor.adminPermissions.has(requiredCommandPermission(kind))
+    );
+  }
 
   // True means the text belonged to this command family, including rejected
   // commands. The caller must not continue through ordinary chat routing.
@@ -459,14 +472,15 @@ export class ModerationService<TSession extends ModerationSession> {
   // /visible off hides the GM from every player and mob (src/sim/gm_presence.ts);
   // /visible on returns them. Audited against the GM's own account.
   private visible(actor: TSession, on: boolean | null): void {
+    if (!this.canContinue(actor, 'visible')) return;
     if (on === null) {
       this.host.notice(actor, 'Usage: /visible on|off');
       return;
     }
     // Even a no-op is newer authorized intent: it must cancel an older toggle
     // whose audit is still pending, rather than letting that toggle land later.
-    const op = (this.visibleOpSeq.get(actor.pid) ?? 0) + 1;
-    this.visibleOpSeq.set(actor.pid, op);
+    const op = (this.visibleOpSeq.get(actor) ?? 0) + 1;
+    this.visibleOpSeq.set(actor, op);
     if (this.host.isGmHidden(actor) === !on) {
       this.host.notice(actor, on ? 'You are already visible.' : 'You are already invisible.');
       return;
@@ -479,8 +493,9 @@ export class ModerationService<TSession extends ModerationSession> {
         reason: on ? VISIBLE_REASON : INVISIBLE_REASON,
       })
       .then(() => {
-        if (this.visibleOpSeq.get(actor.pid) !== op) return;
+        if (!this.canContinue(actor, 'visible') || this.visibleOpSeq.get(actor) !== op) return;
         this.host.setGmHidden(actor, !on);
+        if (!this.canContinue(actor, 'visible')) return;
         this.host.systemNotice(
           actor,
           on
@@ -494,6 +509,7 @@ export class ModerationService<TSession extends ModerationSession> {
   // /watch "<name>" [note]. The player is usually offline, so the name resolves
   // through the database (this realm's characters), not the live sessions.
   private watch(actor: TSession, name: string | null, note: string | null): void {
+    if (!this.canContinue(actor, 'watch')) return;
     if (name === null) {
       this.host.notice(actor, 'Usage: /watch ["<name>" [note]]');
       return;
@@ -501,6 +517,7 @@ export class ModerationService<TSession extends ModerationSession> {
     void this.watchlist
       .findCharacter(name)
       .then(async (target) => {
+        if (!this.canContinue(actor, 'watch')) return;
         if (!target) {
           this.host.notice(actor, `No character named '${name}'.`);
           return;
@@ -515,18 +532,21 @@ export class ModerationService<TSession extends ModerationSession> {
           adminAccountId: actor.accountId,
           reason: note ?? WATCH_REASON,
         });
+        if (!this.canContinue(actor, 'watch')) return;
         await this.watchlist.add({
           accountId: target.accountId,
           characterName: target.characterName,
           note,
           addedByAccountId: actor.accountId,
         });
+        if (!this.canContinue(actor, 'watch')) return;
         this.host.systemNotice(actor, `Added ${target.characterName} to the watchlist.`);
       })
       .catch((err) => logger.error({ err }, 'failed to add in-game watch'));
   }
 
   private unwatch(actor: TSession, name: string | null): void {
+    if (!this.canContinue(actor, 'unwatch')) return;
     if (name === null) {
       this.host.notice(actor, 'Usage: /unwatch "<name>"');
       return;
@@ -534,11 +554,14 @@ export class ModerationService<TSession extends ModerationSession> {
     void this.watchlist
       .findCharacter(name)
       .then(async (target) => {
+        if (!this.canContinue(actor, 'unwatch')) return;
         if (!target) {
           this.host.notice(actor, `No character named '${name}'.`);
           return;
         }
-        if (!(await this.watchlist.forAccount(target.accountId))) {
+        const watched = await this.watchlist.forAccount(target.accountId);
+        if (!this.canContinue(actor, 'unwatch')) return;
+        if (!watched) {
           this.host.notice(actor, `${target.characterName} is not on the watchlist.`);
           return;
         }
@@ -548,7 +571,9 @@ export class ModerationService<TSession extends ModerationSession> {
           adminAccountId: actor.accountId,
           reason: UNWATCH_REASON,
         });
+        if (!this.canContinue(actor, 'unwatch')) return;
         await this.watchlist.remove(target.accountId);
+        if (!this.canContinue(actor, 'unwatch')) return;
         this.host.systemNotice(actor, `Removed ${target.characterName} from the watchlist.`);
       })
       .catch((err) => logger.error({ err }, 'failed to remove in-game watch'));
@@ -559,17 +584,20 @@ export class ModerationService<TSession extends ModerationSession> {
   private readonly listingWatches = new WeakSet<TSession>();
 
   private listWatches(actor: TSession): void {
+    if (!this.canContinue(actor, 'watch')) return;
     if (this.listingWatches.has(actor)) return;
     this.listingWatches.add(actor);
     void this.watchlist
       .list()
       .then(({ entries, total }) => {
+        if (!this.canContinue(actor, 'watch')) return;
         if (total === 0) {
           this.host.notice(actor, 'The watchlist is empty.');
           return;
         }
         this.host.systemNotice(actor, `Watchlist (${total}):`);
         for (const entry of entries) {
+          if (!this.canContinue(actor, 'watch')) return;
           this.host.systemNotice(
             actor,
             entry.note
@@ -577,7 +605,7 @@ export class ModerationService<TSession extends ModerationSession> {
               : `Watched: ${entry.characterName}`,
           );
         }
-        if (total > entries.length) {
+        if (total > entries.length && this.canContinue(actor, 'watch')) {
           this.host.systemNotice(actor, `...and ${total - entries.length} more.`);
         }
       })
@@ -621,6 +649,7 @@ export class ModerationService<TSession extends ModerationSession> {
   // name so players can tell a real staff broadcast from a con. The text is the
   // audit reason, recorded against the GM's own account.
   private announce(actor: TSession, text: string | null): void {
+    if (!this.canContinue(actor, 'announce')) return;
     if (text === null) {
       this.host.notice(actor, 'Usage: /announce <message>');
       return;
@@ -632,7 +661,9 @@ export class ModerationService<TSession extends ModerationSession> {
         adminAccountId: actor.accountId,
         reason: text,
       })
-      .then(() => this.host.announce(actor.name, text))
+      .then(() => {
+        if (this.canContinue(actor, 'announce')) this.host.announce(actor.name, text);
+      })
       .catch((err) => logger.error({ err }, 'failed to audit in-game announce'));
   }
 

@@ -81,6 +81,7 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
   };
 
   const host: ModerationHost<Session> = {
+    isCurrentSession: (session) => byPid.get(session.pid) === session && !session.left,
     sessionByName: (name) =>
       [...byPid.values()].find((session) => session.name.toLowerCase() === name.toLowerCase()) ??
       null,
@@ -671,6 +672,131 @@ describe('ModerationService', () => {
 
 // Drains the promise chains the service fires (audit, then watchlist, then notice).
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+const continuationCases = [
+  ['/visible off', 'audit', 'moderation.spectate'],
+  ['/watch "Player2" new private note', 'find', 'moderation.act'],
+  ['/watch "Player2" new private note', 'audit', 'moderation.act'],
+  ['/watch "Player2" new private note', 'add', 'moderation.act'],
+  ['/unwatch "Player2"', 'find', 'moderation.act'],
+  ['/unwatch "Player2"', 'lookup', 'moderation.act'],
+  ['/unwatch "Player2"', 'audit', 'moderation.act'],
+  ['/unwatch "Player2"', 'remove', 'moderation.act'],
+  ['/watch', 'list', 'moderation.act'],
+  ['/announce private announcement', 'audit', 'moderation.act'],
+] as const;
+const actorInvalidations = [
+  'no permissions',
+  'MOTD only',
+  'exact permission removed',
+  'not admin',
+  'replaced',
+  'left',
+] as const;
+
+describe('GM command continuation authorization', () => {
+  it.each(
+    continuationCases.flatMap(([command, phase, permission]) =>
+      actorInvalidations.map((invalidation) => ({ command, phase, permission, invalidation })),
+    ),
+  )(
+    '$command after held $phase refuses $invalidation actor',
+    async ({ command, phase, permission, invalidation }) => {
+      const actor = admin(1, 11);
+      const context = setup({ actor, sessions: [player(2, 22)] });
+      const entry: StaffWatchEntry = {
+        accountId: 22,
+        characterName: 'Player2',
+        note: 'old private note',
+        addedBy: 'Admin1',
+        createdAt: '2026-10-15T00:00:00.000Z',
+      };
+      context.watches.set(22, entry);
+      let release!: () => void;
+      const pending = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const reached = vi.fn(() => pending);
+      const original = { ...context.watchlist };
+      const add = vi.spyOn(context.watchlist, 'add');
+      const remove = vi.spyOn(context.watchlist, 'remove');
+      if (phase === 'find')
+        vi.spyOn(context.watchlist, 'findCharacter').mockImplementation(async (name) => {
+          await reached();
+          return original.findCharacter(name);
+        });
+      if (phase === 'lookup')
+        vi.spyOn(context.watchlist, 'forAccount').mockImplementation(async (id) => {
+          await reached();
+          return original.forAccount(id);
+        });
+      if (phase === 'list')
+        vi.spyOn(context.watchlist, 'list').mockImplementation(async () => {
+          await reached();
+          return original.list();
+        });
+      if (phase === 'audit') context.recordAction.mockImplementationOnce(reached);
+      if (phase === 'add')
+        add.mockImplementationOnce(async (input) => {
+          await reached();
+          return original.add(input);
+        });
+      if (phase === 'remove')
+        remove.mockImplementationOnce(async (id) => {
+          await reached();
+          return original.remove(id);
+        });
+      context.service.handleChatCommand(actor, command);
+      await settle();
+      expect(reached).toHaveBeenCalledOnce();
+      if (invalidation === 'not admin') actor.isAdmin = false;
+      else if (invalidation === 'left') actor.left = true;
+      else if (invalidation === 'replaced') context.byPid.set(actor.pid, { ...actor });
+      else if (invalidation === 'MOTD only') actor.adminPermissions = new Set(['realm.motd']);
+      else if (invalidation === 'exact permission removed') {
+        actor.adminPermissions = new Set(
+          [...actor.adminPermissions].filter((p) => p !== permission),
+        );
+      } else actor.adminPermissions = new Set();
+      release();
+      await settle();
+      expect(context.hiddenPids.has(actor.pid)).toBe(false);
+      expect(context.announcements).toEqual([]);
+      expect(context.notices).toEqual([]);
+      expect(context.systemNotices).toEqual([]);
+      expect(add).toHaveBeenCalledTimes(phase === 'add' ? 1 : 0);
+      expect(remove).toHaveBeenCalledTimes(phase === 'remove' ? 1 : 0);
+      expect(context.recordAction).toHaveBeenCalledTimes(
+        ['audit', 'add', 'remove'].includes(phase) ? 1 : 0,
+      );
+      // SQL already started under valid authority may finish; no later output is allowed.
+      expect(context.watches.get(22)).toEqual(
+        phase === 'add'
+          ? expect.objectContaining({ note: 'new private note' })
+          : phase === 'remove'
+            ? undefined
+            : entry,
+      );
+    },
+  );
+
+  it('preserves a pending authorized toggle across a same-session permission refresh', async () => {
+    const actor = admin(1, 11);
+    const context = setup({ actor });
+    let release!: () => void;
+    context.recordAction.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        release = resolve;
+      }),
+    );
+    context.service.handleChatCommand(actor, '/visible off');
+    actor.adminPermissions = new Set(['moderation.spectate']);
+    release();
+    await settle();
+    expect(context.hiddenPids.has(actor.pid)).toBe(true);
+    expect(context.systemNotices).toHaveLength(1);
+  });
+});
 
 describe('ModerationService GM tools', () => {
   it.each([

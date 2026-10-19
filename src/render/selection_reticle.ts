@@ -136,8 +136,9 @@ export class SelectionReticle {
     private readonly generation: () => number,
   ) {
     this.sampleOnSupport = (x, z) => Math.max(ground.sample(x, z), this.supportY);
-    const translucent = (opacity: number) =>
+    const translucent = (name: string, opacity: number) =>
       new THREE.MeshBasicMaterial({
+        name,
         color: FRIENDLY_COLOR,
         transparent: true,
         opacity,
@@ -145,13 +146,14 @@ export class SelectionReticle {
         side: THREE.DoubleSide,
       });
     this.ringMat = new THREE.MeshBasicMaterial({
+      name: 'selection-reticle:ring',
       color: FRIENDLY_COLOR,
       transparent: true,
       opacity: 0.9,
       depthWrite: false,
     });
-    this.discMat = translucent(0.2);
-    this.dashMat = translucent(0.6);
+    this.discMat = translucent('selection-reticle:disc', 0.2);
+    this.dashMat = translucent('selection-reticle:dashes', 0.6);
     this.base = drapedPart(flatRing(0.9, 1.15, 48), this.ringMat);
     this.band = drapedPart(flatRing(HEAVY_BAND_INNER, HEAVY_BAND_OUTER, 48), this.ringMat);
     this.disc = drapedPart(flatRing(0.04, HEAVY_BAND_INNER, 32, 3), this.discMat);
@@ -235,7 +237,6 @@ export class SelectionReticle {
     this.disposed = true;
     this.preparationAttempt++;
     this.group.visible = false;
-    this.group.removeFromParent();
     const geometries = new Set<THREE.BufferGeometry>();
     const materials = new Set<THREE.Material>();
     this.group.traverse((object) => {
@@ -245,14 +246,22 @@ export class SelectionReticle {
         materials.add(material);
     });
     const errors: unknown[] = [];
-    for (const resource of [...geometries, ...materials]) {
+    const bestEffort = (cleanup: () => void): void => {
       try {
-        resource.dispose();
+        cleanup();
       } catch (error) {
         errors.push(error);
       }
+    };
+    // Collect ownership before dispatching removal events: a listener can throw
+    // or mutate the group, but every owned resource still needs one attempt.
+    bestEffort(() => this.group.removeFromParent());
+    for (const resource of [...geometries, ...materials]) {
+      bestEffort(() => resource.dispose());
     }
-    this.group.clear();
+    // Clear each child independently; one throwing childremoved listener must
+    // not strand the remaining siblings in this terminal owner.
+    for (const child of [...this.group.children]) bestEffort(() => this.group.remove(child));
     if (errors.length) throw new AggregateError(errors, 'Selection reticle disposal failed');
   }
 
