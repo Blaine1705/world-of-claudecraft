@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4840,
-    "harvestedFiles": 3947,
+    "files": 4838,
+    "harvestedFiles": 3946,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
         "ms": 1954,
@@ -12728,7 +12728,6 @@
   "tests/water_swell_gate.test.ts": 5,
   "tests/water_terrain_awareness.test.ts": 2389,
   "tests/water_tile_cull.test.ts": 34,
-  "tests/water_wave_field.test.ts": 23,
   "tests/weakening_hex.test.ts": 2755,
   "tests/weapon_aura_prewarm_parity.test.ts": 101,
   "tests/weapon_icons.test.ts": 492,

@@ -18,7 +18,7 @@ the checkout root:
 pnpm install --frozen-lockfile
 pnpm run i18n:gen
 pnpm run wiki:content
-node --test scripts/scenery_review/checks.test.mjs
+npx vitest run tests/scenery_review_checks.test.mjs
 node scripts/scenery_review/build.mjs
 node scripts/scenery_review/bench.mjs
 ```
