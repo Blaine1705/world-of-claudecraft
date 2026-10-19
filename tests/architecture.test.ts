@@ -284,6 +284,7 @@ const UI_PURE_CORES = [
   'src/ui/leaderboard_board_html.ts',
   'src/ui/weekly_quests_view.ts',
   'src/ui/hud/guild_hall/guild_hall_view.ts',
+  'src/ui/hud/guild_hall/guild_quartermaster_view.ts',
   'src/ui/world_quest_wisp_maze_view.ts',
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',

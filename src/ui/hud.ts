@@ -5569,11 +5569,11 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#weekly-quests-window'),
     ...this.windowFocus('#weekly-quests-window'),
   });
-  // Lantern Hall's guild window (hud/guild_hall/): the contracts and the quartermaster.
   private readonly guildHallWindow = new GuildHallWindow({
     root: () => $('#guild-hall-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#guild-hall-window'),
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
     ...this.windowFocus('#guild-hall-window'),
   });
   // Ashen Coliseum window painter (arena_window_view.ts offline/live model +

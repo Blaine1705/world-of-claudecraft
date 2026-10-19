@@ -691,6 +691,32 @@ export const ja_JP: EnTranslations = {
         "seals": "燈火の印章が足りない。",
         "range": "取引するには補給係のそばに立つこと。"
       },
+      "board": {
+        "noticesLabel": "今週の契約",
+        "weekProgress": "今週：契約{total}件中{done}件を達成",
+        "weekProgressAria": "今週達成した契約",
+        "cardProgress": "今週 {done}/{total}",
+        "cardProgressAria": "今週の進行",
+        "rewardLine": "報酬：{reward}",
+        "stamp": "封印済み",
+        "sealsTip": "燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。"
+      },
+      "shop": {
+        "stockLabel": "ギャリック・ホルトの品揃え",
+        "kindTitle": "称号",
+        "plateHeading": "あなたのネームプレート",
+        "howTo": "購入後、功績の書で選ぶと名前と一緒に表示される。",
+        "cosmetic": "見た目のみ：能力値は変わらない。",
+        "price": "価格：{price}",
+        "have": "所持：{count}",
+        "ownedLong": "この称号は所持済みだ。功績の書で選択できる。",
+        "short": {
+          "one": "燈火の印章があと{count}個必要だ。",
+          "few": "燈火の印章があと{count}個必要だ。",
+          "many": "燈火の印章があと{count}個必要だ。",
+          "other": "燈火の印章があと{count}個必要だ。"
+        }
+      },
       "contractDone": {
         "one": "契約達成：{contract}。燈火の印章を{count}個受け取った。",
         "few": "契約達成：{contract}。燈火の印章を{count}個受け取った。",

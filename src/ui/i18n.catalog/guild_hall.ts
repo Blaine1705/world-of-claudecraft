@@ -51,6 +51,36 @@ export const guildHallStrings = {
     seals: 'You do not have enough Lantern Seals.',
     range: 'Stand at the quartermaster to trade.',
   },
+  // the contract board's notices (the reworked board, guild_hall_window.ts)
+  board: {
+    noticesLabel: "This week's contracts",
+    weekProgress: 'This week: {done} of {total} contracts complete',
+    weekProgressAria: 'Contracts completed this week',
+    cardProgress: '{done}/{total} this week',
+    cardProgressAria: 'Progress this week',
+    rewardLine: 'Reward: {reward}',
+    stamp: 'Sealed',
+    sealsTip:
+      "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are bound to you.",
+  },
+  // the quartermaster's counter (the reworked shop, guild_hall_window.ts)
+  shop: {
+    stockLabel: "Garrick Holt's stock",
+    kindTitle: 'Title',
+    plateHeading: 'Your nameplate',
+    howTo: 'After you buy it, choose it in the Book of Deeds to show it with your name.',
+    cosmetic: 'Cosmetic only: it changes no stats.',
+    price: 'Price: {price}',
+    have: 'You have {count}',
+    ownedLong: 'You own this title. Choose it in the Book of Deeds.',
+    // plural forms (tPlural): a locale with more categories fills its own
+    short: {
+      one: 'You need {count} more Lantern Seal.',
+      few: 'You need {count} more Lantern Seals.',
+      many: 'You need {count} more Lantern Seals.',
+      other: 'You need {count} more Lantern Seals.',
+    },
+  },
   contractDone: {
     one: 'Contract complete: {contract}. You receive {count} Lantern Seal.',
     few: 'Contract complete: {contract}. You receive {count} Lantern Seals.',

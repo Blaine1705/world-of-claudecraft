@@ -11,3 +11,9 @@ export {
   lanternSeals,
 } from './guild_hall_view';
 export { GuildHallWindow, type GuildHallWindowDeps } from './guild_hall_window';
+export {
+  buildGuildShopView,
+  defaultGuildShopSelection,
+  type GuildShopView,
+  guildShopTooltip,
+} from './guild_quartermaster_view';

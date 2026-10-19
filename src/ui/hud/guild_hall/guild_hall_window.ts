@@ -1,29 +1,46 @@
 // Thin DOM painter for Lantern Hall's guild window (#guild-hall-window).
 //
 // The consumer half of the pure-core + thin-painter split: guild_hall_view.ts decides what
-// every card and row says; this module owns the window lifecycle (open on a resident's event,
-// on the tab that resident keeps; close; focus return), the tab switch, the one wall-clock
-// read (the reset countdown), and the click that sends a purchase through IWorld. It holds no
-// Sim reference and reaches Hud only through its deps.
+// every contract notice says and guild_quartermaster_view.ts what the quartermaster's counter
+// says; this module owns the window lifecycle (open on a resident's event, on the tab that
+// resident keeps; close; focus return), the tab switch, the selected stock card, the one
+// wall-clock read (the reset countdown), the hover cards, and the click that sends a purchase
+// through IWorld. It holds no Sim reference and reaches Hud only through its deps.
+//
+// The contracts tab is a notice board: each contract a pinned parchment with its boss's
+// portrait (the dungeon finder's prerendered stills, no live scene), the guild's wax seal, the
+// week's counter and the reward. The quartermaster tab is a vendor counter: item cards on the
+// left, the selected card's detail on the right (the stock is titles, so its preview is the
+// nameplate the title draws; no model, no GL context).
 import { audio } from '../../../game/audio';
+import { LANTERN_SEAL_ITEM_ID } from '../../../sim/content/guild_contracts';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
 import { t } from '../../i18n';
+import { iconDataUrl, itemImageUrl } from '../../icons';
 import { svgIcon } from '../../ui_icons';
 import {
   buildGuildHallView,
   GUILD_OFFER_DEED_IDS,
   type GuildContractCardView,
   type GuildHallTab,
-  type GuildOfferRowView,
+  type GuildHallView,
   guildResetText,
   lanternSeals,
 } from './guild_hall_view';
+import {
+  type GuildShopDetailView,
+  type GuildShopItemView,
+  guildShopTooltip,
+} from './guild_quartermaster_view';
 
 const PANEL_ID = 'guild-hall-panel';
 const TABS: readonly GuildHallTab[] = ['contracts', 'quartermaster'];
+/** Crest art sizes (device px the procedural crest is rasterized at): the card, the detail. */
+const CARD_CREST_PX = 64;
+const DETAIL_CREST_PX = 128;
 
 export interface GuildHallWindowDeps {
   root(): HTMLElement;
@@ -31,11 +48,15 @@ export interface GuildHallWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** The HUD's shared hover card (Hud.attachTooltip); absent in a bare test mount. */
+  attachTooltip?(el: HTMLElement, html: () => string): void;
 }
 
 export class GuildHallWindow {
   private opened = false;
   private tab: GuildHallTab = 'contracts';
+  /** The quartermaster card the detail shows (null: the core's default, the next to buy). */
+  private selectedOffer: string | null = null;
   private lastSig = '';
   private lastMinute = -1;
   private openerFocus: HTMLElement | null = null;
@@ -52,6 +73,7 @@ export class GuildHallWindow {
       this.deps.closeOthers();
       this.openerFocus = this.deps.captureFocus();
       this.opened = true;
+      this.selectedOffer = null;
       audio.bagOpen();
     }
     this.tab = tab;
@@ -68,8 +90,9 @@ export class GuildHallWindow {
     this.openerFocus = null;
   }
 
-  // The repaint signature: the board and progress, the seals, the titles owned, the tab; the
-  // countdown updates its own text on its minute cadence below, so it stays out of it.
+  // The repaint signature: the board and progress, the seals, the titles owned, the tab and
+  // the selected card; the countdown updates its own text on its minute cadence below, so it
+  // stays out of it.
   private sig(): string {
     const world = this.deps.world();
     const owned = GUILD_OFFER_DEED_IDS.map((id) => world.deedsEarned.has(id));
@@ -79,6 +102,7 @@ export class GuildHallWindow {
       owned,
       world.weeklyQuestResetAtMs,
       this.tab,
+      this.selectedOffer,
     ]);
   }
 
@@ -118,6 +142,13 @@ export class GuildHallWindow {
     this.render('tab');
   }
 
+  private select(offerId: string): void {
+    if (offerId === this.selectedOffer) return;
+    this.selectedOffer = offerId;
+    this.lastSig = this.sig();
+    this.render(null);
+  }
+
   /** The key of the control holding focus, so a rebuild can hand focus back to its twin. */
   private focusedKey(root: HTMLElement): string | null {
     // focusedWithin refuses a parked dialog root, so a parked sheet resolves nothing
@@ -125,6 +156,7 @@ export class GuildHallWindow {
     if (!active) return null;
     if (active.dataset.ghTab) return `[data-gh-tab="${active.dataset.ghTab}"]`;
     if (active.dataset.ghBuy) return `[data-gh-buy="${active.dataset.ghBuy}"]`;
+    if (active.dataset.ghOffer) return `[data-gh-offer="${active.dataset.ghOffer}"]`;
     if (active.hasAttribute('data-close')) return '[data-close]';
     return null;
   }
@@ -135,7 +167,7 @@ export class GuildHallWindow {
     const keep = focus === null ? this.focusedKey(root) : null;
     const now = Date.now();
     this.lastMinute = Math.floor(now / 60_000);
-    const view = buildGuildHallView(world, now, this.tab);
+    const view = buildGuildHallView(world, now, this.tab, this.selectedOffer);
     markDialogRoot(root, { labelledBy: 'guild-hall-title' });
     // a WAI-ARIA tablist with roving tabindex, controlling the one tabpanel below
     const tabs = view.tabs
@@ -144,21 +176,29 @@ export class GuildHallWindow {
           `<button type="button" class="gh-tab" role="tab" id="guild-hall-tab-${esc(tab.id)}" aria-selected="${tab.selected}" tabindex="${tab.selected ? '0' : '-1'}" aria-controls="${PANEL_ID}" data-gh-tab="${esc(tab.id)}">${esc(tab.label)}</button>`,
       )
       .join('');
-    const body =
-      this.tab === 'contracts'
-        ? `<div class="gh-cards">${view.contracts.map((card) => this.cardHtml(card)).join('')}</div>` +
-          (view.emptyText ? `<p class="gh-empty">${esc(view.emptyText)}</p>` : '') +
-          `<div class="gh-foot">${esc(view.lifetimeText)}</div>`
-        : `<div class="gh-offers">${view.offers.map((row) => this.offerHtml(row)).join('')}</div>`;
+    const body = this.tab === 'contracts' ? this.boardHtml(view) : this.shopHtml(view);
     root.innerHTML =
       `<div class="panel-title gh-title"><span id="guild-hall-title">${esc(view.title)}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.guildHall.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="gh-tabs" role="tablist" aria-label="${esc(t('hudChrome.guildHall.tabsLabel'))}">${tabs}</div>` +
       `<div class="gh-panel" role="tabpanel" id="${PANEL_ID}" aria-labelledby="guild-hall-tab-${esc(this.tab)}">` +
-      `<div class="gh-sub"><span class="gh-seals">${esc(view.sealsText)}</span><span class="gh-reset">${esc(view.resetText)}</span></div>` +
+      `<div class="gh-sub"><span class="gh-seals" tabindex="0">${this.sealIcon('gh-seal-icon')}<span>${esc(view.sealsText)}</span></span>` +
+      `<span class="gh-reset">${esc(view.resetText)}</span></div>` +
       `<p class="gh-intro">${esc(view.intro)}</p>` +
       body +
       `</div>`;
+    this.wire(root, world, view);
+    const target =
+      focus === 'open' ? '[data-close]' : focus === 'tab' ? `[data-gh-tab="${this.tab}"]` : keep;
+    // a control the rebuild disabled (a title just bought) hands focus to Close
+    if (target)
+      restoreFirstEnabled([
+        root.querySelector<HTMLButtonElement>(target),
+        root.querySelector<HTMLButtonElement>('[data-close]'),
+      ]);
+  }
+
+  private wire(root: HTMLElement, world: IWorld, view: GuildHallView): void {
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     root.querySelectorAll<HTMLButtonElement>('[data-gh-tab]').forEach((button) => {
       const own: GuildHallTab =
@@ -177,44 +217,138 @@ export class GuildHallWindow {
         this.switchTab(TABS[next]);
       });
     });
+    root.querySelectorAll<HTMLButtonElement>('[data-gh-offer]').forEach((card) => {
+      const offerId = card.dataset.ghOffer ?? '';
+      card.addEventListener('click', () => this.select(offerId));
+      this.deps.attachTooltip?.(card, () => this.offerTipHtml(offerId));
+    });
     root.querySelectorAll<HTMLButtonElement>('[data-gh-buy]').forEach((button) => {
       button.addEventListener('click', () => {
         const offerId = button.dataset.ghBuy;
         if (offerId) world.buyGuildCosmetic(offerId);
       });
     });
-    const target =
-      focus === 'open' ? '[data-close]' : focus === 'tab' ? `[data-gh-tab="${this.tab}"]` : keep;
-    // a control the rebuild disabled (a title just bought) hands focus to Close
-    if (target)
-      restoreFirstEnabled([
-        root.querySelector<HTMLButtonElement>(target),
-        root.querySelector<HTMLButtonElement>('[data-close]'),
-      ]);
+    const seals = root.querySelector<HTMLElement>('.gh-seals');
+    if (seals) {
+      const tip = view.sealsTip;
+      this.deps.attachTooltip?.(
+        seals,
+        () =>
+          `<div class="tt-title">${esc(view.sealsText)}</div><div class="tt-desc">${esc(tip)}</div>`,
+      );
+    }
+  }
+
+  /** The Lantern Seal's painted coin (decorative: the text beside it names it). */
+  private sealIcon(cls: string): string {
+    const url = itemImageUrl(LANTERN_SEAL_ITEM_ID);
+    return url ? `<img class="${cls}" src="${esc(url)}" alt="" decoding="async">` : '';
+  }
+
+  // ---- the contract board ----------------------------------------------------------------
+
+  private boardHtml(view: GuildHallView): string {
+    const pips = view.contracts
+      .map((card) => `<span class="gh-pip${card.done ? ' gh-pip-done' : ''}"></span>`)
+      .join('');
+    const tally =
+      view.weekTotal > 0
+        ? `<div class="gh-tally"><span class="gh-tally-text">${esc(view.weekProgressText)}</span>` +
+          `<span class="gh-pips" role="progressbar" aria-label="${esc(view.weekProgressAria)}" aria-valuemin="0" aria-valuemax="${view.weekTotal}" aria-valuenow="${view.weekDone}" aria-valuetext="${esc(view.weekProgressText)}">${pips}</span></div>`
+        : '';
+    return (
+      `<div class="gh-board">` +
+      tally +
+      `<div class="gh-cards" role="list" aria-label="${esc(view.noticesLabel)}">${view.contracts.map((card) => this.cardHtml(card)).join('')}</div>` +
+      (view.emptyText ? `<p class="gh-empty">${esc(view.emptyText)}</p>` : '') +
+      `<div class="gh-foot">${esc(view.lifetimeText)}</div>` +
+      `</div>`
+    );
   }
 
   private cardHtml(card: GuildContractCardView): string {
+    const pips = Array.from(
+      { length: card.progressTotal },
+      (_, i) => `<span class="gh-pip${i < card.progressDone ? ' gh-pip-done' : ''}"></span>`,
+    ).join('');
     return (
-      `<section class="gh-card gh-card-${esc(card.kind)}${card.done ? ' gh-card-done' : ''}" data-gh-card="${esc(card.id)}">` +
-      `<div class="gh-kind">${esc(card.kindLabel)}</div>` +
+      `<article class="gh-card gh-card-${esc(card.kind)}${card.done ? ' gh-card-done' : ''}" role="listitem" data-gh-card="${esc(card.id)}">` +
+      `<span class="gh-pin" aria-hidden="true"></span>` +
+      `<div class="gh-ribbon"><span class="gh-kind">${esc(card.kindLabel)}</span></div>` +
+      `<div class="gh-portrait"><img src="${esc(card.portraitUrl)}" width="96" height="96" loading="lazy" decoding="async" alt=""></div>` +
+      `<h3 class="gh-boss">${esc(card.boss)}</h3>` +
       `<div class="gh-dungeon">${esc(card.dungeon)}</div>` +
+      `<div class="gh-rule" aria-hidden="true"></div>` +
       `<p class="gh-goal">${esc(card.goal)}</p>` +
       (card.detail ? `<p class="gh-detail">${esc(card.detail)}</p>` : '') +
-      `<div class="gh-reward">${esc(card.reward)}</div>` +
-      `<div class="gh-state">${esc(card.stateLabel)}</div>` +
+      `<div class="gh-progress">` +
+      `<div class="gh-progress-row"><span class="gh-state">${esc(card.stateLabel)}</span><span class="gh-count">${esc(card.progressText)}</span></div>` +
+      `<span class="gh-pips gh-pips-card" role="progressbar" aria-label="${esc(t('hudChrome.guildHall.board.cardProgressAria'))}" aria-valuemin="0" aria-valuemax="${card.progressTotal}" aria-valuenow="${card.progressDone}" aria-valuetext="${esc(card.progressText)}">${pips}</span>` +
+      `</div>` +
+      `<div class="gh-reward">${this.sealIcon('gh-reward-icon')}<span>${esc(card.rewardLine)}</span></div>` +
+      `<span class="gh-wax" aria-hidden="true">${svgIcon(card.done ? 'check' : 'crown')}</span>` +
+      (card.done
+        ? `<span class="gh-stamp" aria-hidden="true">${esc(t('hudChrome.guildHall.board.stamp'))}</span>`
+        : '') +
+      `</article>`
+    );
+  }
+
+  // ---- the quartermaster's counter --------------------------------------------------------
+
+  private shopHtml(view: GuildHallView): string {
+    const shop = view.shop;
+    return (
+      `<div class="gh-shop">` +
+      `<div class="gh-stock" role="group" aria-label="${esc(shop.stockLabel)}">${shop.items.map((item) => this.itemHtml(item)).join('')}</div>` +
+      (shop.detail ? this.detailHtml(shop.detail) : '') +
+      `</div>`
+    );
+  }
+
+  private itemHtml(item: GuildShopItemView): string {
+    return (
+      `<button type="button" class="gh-item gh-item-${item.state}${item.selected ? ' gh-item-selected' : ''}" data-gh-offer="${esc(item.id)}" aria-pressed="${item.selected}">` +
+      `<span class="gh-slot"><img src="${esc(iconDataUrl('crest', item.crestId, CARD_CREST_PX))}" alt=""></span>` +
+      `<span class="gh-item-text"><span class="gh-item-kind">${esc(item.kindLabel)}</span>` +
+      `<span class="gh-item-name">${esc(item.name)}</span>` +
+      `<span class="gh-tag">${this.sealIcon('gh-tag-icon')}<span aria-hidden="true">${esc(item.priceValue)}</span><span class="visually-hidden">${esc(item.price)}</span></span></span>` +
+      `<span class="gh-chip gh-chip-${item.state}">${esc(item.stateLabel)}</span>` +
+      `</button>`
+    );
+  }
+
+  private detailHtml(detail: GuildShopDetailView): string {
+    return (
+      `<section class="gh-detail-pane gh-detail-${detail.state}" aria-labelledby="gh-detail-name">` +
+      `<div class="gh-detail-head"><span class="gh-slot gh-slot-large"><img src="${esc(iconDataUrl('crest', detail.crestId, DETAIL_CREST_PX))}" alt=""></span>` +
+      `<div><div class="gh-item-kind">${esc(detail.kindLabel)}</div><h3 class="gh-detail-name" id="gh-detail-name">${esc(detail.name)}</h3></div></div>` +
+      `<div class="gh-plate-stage"><div class="gh-plate-heading">${esc(detail.plateHeading)}</div>` +
+      `<div class="gh-plate">${detail.platePre ? `<span class="gh-plate-title">${esc(detail.platePre)}</span>` : ''}` +
+      `<span class="gh-plate-name">${esc(detail.plateName)}</span>` +
+      `${detail.platePost ? `<span class="gh-plate-title">${esc(detail.platePost)}</span>` : ''}</div></div>` +
+      `<p class="gh-detail-text">${esc(detail.howTo)}</p>` +
+      `<p class="gh-detail-note">${esc(detail.cosmetic)}</p>` +
+      `<div class="gh-buybar"><div class="gh-buy-price"><span class="gh-tag gh-tag-large">${this.sealIcon('gh-tag-icon')}<span aria-hidden="true">${esc(detail.priceValue)}</span></span>` +
+      `<span class="visually-hidden">${esc(detail.priceText)}</span><span class="gh-have">${esc(detail.haveText)}</span></div>` +
+      `<button type="button" class="gh-btn gh-buy" data-gh-buy="${esc(detail.id)}"${detail.actionEnabled ? '' : ' disabled'}>${esc(detail.action)}</button></div>` +
+      (detail.shortText ? `<p class="gh-short">${esc(detail.shortText)}</p>` : '') +
       `</section>`
     );
   }
 
-  private offerHtml(row: GuildOfferRowView): string {
-    const disabled = row.owned || !row.affordable;
+  /** A stock card's hover card, through the shared tooltip's classes. */
+  private offerTipHtml(offerId: string): string {
+    const world = this.deps.world();
+    const tip = guildShopTooltip(offerId, {
+      seals: lanternSeals(world.inventory),
+      playerName: world.player.name,
+      deedsEarned: world.deedsEarned,
+    });
+    if (!tip) return '';
     return (
-      `<section class="gh-offer${row.owned ? ' gh-offer-owned' : ''}" data-gh-offer="${esc(row.id)}">` +
-      `<div class="gh-offer-text"><div class="gh-offer-title">${esc(row.title)}</div>` +
-      `<div class="gh-offer-preview">${esc(row.preview)}</div></div>` +
-      `<div class="gh-offer-price">${esc(row.price)}</div>` +
-      `<button type="button" class="gh-btn" data-gh-buy="${esc(row.id)}"${disabled ? ' disabled' : ''}>${esc(row.action)}</button>` +
-      `</section>`
+      `<div class="tt-title">${esc(tip.title)}</div>` +
+      tip.lines.map((line) => `<div class="tt-${line.tone}">${esc(line.text)}</div>`).join('')
     );
   }
 }

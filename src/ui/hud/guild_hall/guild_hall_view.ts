@@ -1,22 +1,31 @@
-// Pure view core for Lantern Hall's guild window: the week's three contract cards, the
-// quartermaster's rows, the seal count and the reset countdown. DOM-free; the painter
-// (guild_hall_window.ts) renders exactly what this shapes. Reads the world only through the
-// IWorld members it names (guildContracts, inventory, deedsEarned, the weekly reset, the
-// player's name), so a test drives it with a plain object.
+// Pure view core for Lantern Hall's guild window: the week's three contract notices (the boss
+// portrait, the week's counter, the reward), the board's weekly tally, the seal count and the
+// reset countdown; the quartermaster's counter is its sibling core (guild_quartermaster_view.ts).
+// DOM-free; the painter (guild_hall_window.ts) renders exactly what this shapes. Reads the world
+// only through the IWorld members it names (guildContracts, inventory, deedsEarned, the weekly
+// reset, the player's name), so a test drives it with a plain object.
 
 import {
   GUILD_CONTRACTS_BY_ID,
   GUILD_QUARTERMASTER_STOCK,
   type GuildContractDef,
   type GuildContractKind,
-  LANTERN_SEAL_ITEM_ID,
 } from '../../../sim/content/guild_contracts';
 import type { GuildContractsView } from '../../../sim/guild_contracts';
 import type { InvSlot } from '../../../sim/types';
-import { deedDesc, deedName, deedTitleText, titledDisplayName } from '../../deed_i18n';
+import { deedDesc, deedName } from '../../deed_i18n';
+import { FINDER_PORTRAIT_DIR } from '../../dungeon_finder_view';
 import { mobDisplayName } from '../../entity_display_core';
 import { dungeonDisplayName } from '../../entity_i18n';
-import { formatList, formatNumber, t, tPlural } from '../../i18n';
+import { formatList, formatNumber, t } from '../../i18n';
+import {
+  buildGuildShopView,
+  type GuildShopView,
+  lanternSeals,
+  sealCount,
+} from './guild_quartermaster_view';
+
+export { lanternSeals };
 
 export type GuildHallTab = 'contracts' | 'quartermaster';
 
@@ -32,24 +41,23 @@ export interface GuildContractCardView {
   id: string;
   kind: GuildContractKind;
   kindLabel: string;
+  /** The boss the contract is posted against (a heroic clear's: the dungeon's final boss). */
+  boss: string;
+  /** Its prerendered portrait still, the one the dungeon finder shows (FINDER_PORTRAIT_DIR). */
+  portraitUrl: string;
   dungeon: string;
   goal: string;
   /** The task's own Book of Deeds condition, a sentence of its own (empty for the rest). */
   detail: string;
   reward: string;
+  /** "Reward: 3 Lantern Seals". */
+  rewardLine: string;
   done: boolean;
   stateLabel: string;
-}
-
-export interface GuildOfferRowView {
-  id: string;
-  title: string;
-  preview: string;
-  price: string;
-  owned: boolean;
-  affordable: boolean;
-  /** The button's label: buy, owned, or how many seals are still wanted. */
-  action: string;
+  /** This week's completions of the contract, out of the times it pays in a week. */
+  progressDone: number;
+  progressTotal: number;
+  progressText: string;
 }
 
 export interface GuildHallView {
@@ -57,27 +65,23 @@ export interface GuildHallView {
   tabs: { id: GuildHallTab; label: string; selected: boolean }[];
   seals: number;
   sealsText: string;
+  /** The seal chip's hover card: what seals are for. */
+  sealsTip: string;
   resetText: string;
   intro: string;
+  noticesLabel: string;
   contracts: GuildContractCardView[];
   emptyText: string | null;
   lifetimeText: string;
-  offers: GuildOfferRowView[];
+  /** The board's weekly tally: the posted contracts done, out of the posted. */
+  weekDone: number;
+  weekTotal: number;
+  weekProgressText: string;
+  weekProgressAria: string;
+  shop: GuildShopView;
 }
 
 const whole = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
-
-/** The Lantern Seals in the bags. */
-export function lanternSeals(inventory: readonly InvSlot[]): number {
-  let total = 0;
-  for (const slot of inventory) if (slot?.itemId === LANTERN_SEAL_ITEM_ID) total += slot.count;
-  return total;
-}
-
-/** "{count} Lantern Seals", in the locale's own plural form. */
-function sealCount(count: number): string {
-  return tPlural('hudChrome.guildHall.reward', count, { count: whole(count) });
-}
 
 /** Days and hours until the weekly reset, the locale's own unit words. */
 export function guildResetText(resetAtMs: number, nowMs: number): string {
@@ -102,20 +106,34 @@ function contractGoal(contract: GuildContractDef): string {
   });
 }
 
+/** A contract pays once a week (src/sim/guild_contracts.ts): its counter is out of one. */
+const COMPLETIONS_PER_WEEK = 1;
+
 export function buildGuildContractCard(
   contract: GuildContractDef,
   done: boolean,
 ): GuildContractCardView {
+  const reward = sealCount(contract.seals);
+  const progressDone = done ? COMPLETIONS_PER_WEEK : 0;
   return {
     id: contract.id,
     kind: contract.kind,
     kindLabel: t(`hudChrome.guildHall.kinds.${contract.kind}`),
+    boss: mobDisplayName(contract.mobId),
+    portraitUrl: `${FINDER_PORTRAIT_DIR}/${contract.mobId}.webp`,
     dungeon: dungeonDisplayName(contract.dungeonId),
     goal: contractGoal(contract),
     detail: contract.kind === 'task' && contract.taskDeedId ? deedDesc(contract.taskDeedId) : '',
-    reward: sealCount(contract.seals),
+    reward,
+    rewardLine: t('hudChrome.guildHall.board.rewardLine', { reward }),
     done,
     stateLabel: done ? t('hudChrome.guildHall.done') : t('hudChrome.guildHall.open'),
+    progressDone,
+    progressTotal: COMPLETIONS_PER_WEEK,
+    progressText: t('hudChrome.guildHall.board.cardProgress', {
+      done: whole(progressDone),
+      total: whole(COMPLETIONS_PER_WEEK),
+    }),
   };
 }
 
@@ -138,6 +156,7 @@ export function buildGuildHallView(
   world: GuildHallWorld,
   nowMs: number,
   tab: GuildHallTab,
+  selectedOffer: string | null = null,
 ): GuildHallView {
   const board = world.guildContracts;
   const seals = lanternSeals(world.inventory);
@@ -145,26 +164,7 @@ export function buildGuildHallView(
     .map((id) => GUILD_CONTRACTS_BY_ID[id])
     .filter((contract): contract is GuildContractDef => !!contract)
     .map((contract) => buildGuildContractCard(contract, board.done.includes(contract.id)));
-  const offers = GUILD_QUARTERMASTER_STOCK.map((offer): GuildOfferRowView => {
-    const owned = world.deedsEarned.has(offer.deedId);
-    const affordable = seals >= offer.seals;
-    const title = deedTitleText(offer.deedId);
-    return {
-      id: offer.id,
-      title: t('hudChrome.guildHall.titleOffer', { title }),
-      preview: t('hudChrome.guildHall.titlePreview', {
-        preview: titledDisplayName(world.player.name, offer.deedId),
-      }),
-      price: sealCount(offer.seals),
-      owned,
-      affordable,
-      action: owned
-        ? t('hudChrome.guildHall.owned')
-        : affordable
-          ? t('hudChrome.guildHall.buy')
-          : t('hudChrome.guildHall.needSeals', { count: whole(offer.seals - seals) }),
-    };
-  });
+  const weekDone = contracts.filter((card) => card.done).length;
   return {
     title: t('hudChrome.guildHall.title'),
     tabs: (['contracts', 'quartermaster'] as const).map((id) => ({
@@ -174,14 +174,26 @@ export function buildGuildHallView(
     })),
     seals,
     sealsText: t('hudChrome.guildHall.seals', { count: whole(seals) }),
+    sealsTip: t('hudChrome.guildHall.board.sealsTip'),
     resetText: guildResetText(world.weeklyQuestResetAtMs, nowMs),
     intro:
       tab === 'contracts'
         ? t('hudChrome.guildHall.contractsIntro')
         : t('hudChrome.guildHall.quartermasterIntro'),
+    noticesLabel: t('hudChrome.guildHall.board.noticesLabel'),
     contracts,
     emptyText: contracts.length === 0 ? t('hudChrome.guildHall.emptyBoard') : null,
     lifetimeText: t('hudChrome.guildHall.lifetime', { count: whole(board.lifetime) }),
-    offers,
+    weekDone,
+    weekTotal: contracts.length,
+    weekProgressText: t('hudChrome.guildHall.board.weekProgress', {
+      done: whole(weekDone),
+      total: whole(contracts.length),
+    }),
+    weekProgressAria: t('hudChrome.guildHall.board.weekProgressAria'),
+    shop: buildGuildShopView(
+      { seals, playerName: world.player.name, deedsEarned: world.deedsEarned },
+      selectedOffer,
+    ),
   };
 }

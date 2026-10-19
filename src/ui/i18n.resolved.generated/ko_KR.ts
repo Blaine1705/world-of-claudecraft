@@ -691,6 +691,32 @@ export const ko_KR: EnTranslations = {
         "seals": "등불 인장이 부족합니다.",
         "range": "거래하려면 보급관 곁에 서세요."
       },
+      "board": {
+        "noticesLabel": "이번 주 계약",
+        "weekProgress": "이번 주: 계약 {total}건 중 {done}건 완료",
+        "weekProgressAria": "이번 주에 완료한 계약",
+        "cardProgress": "이번 주 {done}/{total}",
+        "cardProgressAria": "이번 주 진행도",
+        "rewardLine": "보상: {reward}",
+        "stamp": "봉인됨",
+        "sealsTip": "등불 인장은 등불 회관 주간 계약의 보상으로 지급되며, 보급관 개릭 홀트에게서만 사용할 수 있습니다. 귀속 아이템입니다."
+      },
+      "shop": {
+        "stockLabel": "개릭 홀트의 판매 목록",
+        "kindTitle": "칭호",
+        "plateHeading": "내 이름표",
+        "howTo": "구매한 뒤 위업의 책에서 선택하면 이름과 함께 표시됩니다.",
+        "cosmetic": "외형 전용: 능력치는 바뀌지 않습니다.",
+        "price": "가격: {price}",
+        "have": "보유: {count}",
+        "ownedLong": "이미 보유한 칭호입니다. 위업의 책에서 선택하세요.",
+        "short": {
+          "one": "등불 인장이 {count}개 더 필요합니다.",
+          "few": "등불 인장이 {count}개 더 필요합니다.",
+          "many": "등불 인장이 {count}개 더 필요합니다.",
+          "other": "등불 인장이 {count}개 더 필요합니다."
+        }
+      },
       "contractDone": {
         "one": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.",
         "few": "계약 완료: {contract}. 등불 인장 {count}개를 받았습니다.",

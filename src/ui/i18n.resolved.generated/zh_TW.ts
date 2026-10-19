@@ -691,6 +691,32 @@ export const zh_TW: EnTranslations = {
         "seals": "你的燈火印章不足。",
         "range": "站到軍需官身邊才能交易。"
       },
+      "board": {
+        "noticesLabel": "本週契約",
+        "weekProgress": "本週：已完成{done}/{total}份契約",
+        "weekProgressAria": "本週已完成的契約",
+        "cardProgress": "本週 {done}/{total}",
+        "cardProgressAria": "本週進度",
+        "rewardLine": "獎勵：{reward}",
+        "stamp": "已蓋印",
+        "sealsTip": "燈火印章由燈火大廳的每週契約發放，只能在軍需官加里克·霍爾特處使用。它們與你綁定。"
+      },
+      "shop": {
+        "stockLabel": "加里克·霍爾特的貨品",
+        "kindTitle": "頭銜",
+        "plateHeading": "你的名牌",
+        "howTo": "購買後，在功績之書中選擇它，即可與你的名字一同顯示。",
+        "cosmetic": "僅限外觀：不改變任何屬性。",
+        "price": "價格：{price}",
+        "have": "你擁有{count}",
+        "ownedLong": "你已擁有此頭銜。可在功績之書中選擇。",
+        "short": {
+          "one": "你還需要{count}枚燈火印章。",
+          "few": "你還需要{count}枚燈火印章。",
+          "many": "你還需要{count}枚燈火印章。",
+          "other": "你還需要{count}枚燈火印章。"
+        }
+      },
       "contractDone": {
         "one": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
         "few": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
