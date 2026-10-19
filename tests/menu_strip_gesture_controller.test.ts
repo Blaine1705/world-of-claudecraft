@@ -291,41 +291,43 @@ describe('MenuStripGesture: the clamp box', () => {
     expect(open?.placement.centers[0]).toBe(62);
   });
 
-  // The overlay carries the device safe area as PADDING, and its items are
-  // absolutely positioned children, so what the painter writes is resolved
-  // against the PADDING box rather than the viewport. The gesture layer
-  // therefore measures in that frame. NOT coverable by the real-browser suite:
-  // env(safe-area-inset-*) resolves to 0 on a headless desktop viewport, so only
-  // a stubbed computed style can drive the nonzero arm at all.
-  it('seats the row in the overlay padding-box frame, counting the safe area once', () => {
+  // The overlay carries the device safe area as PADDING. That padding only
+  // shrinks the box the row is CLAMPED into: its items are absolutely
+  // positioned children, whose left/top resolve from the overlay's padding
+  // EDGE (the viewport origin), so the seated positions come back in viewport
+  // coordinates. Reading the padding as an offset slid the row a whole inset
+  // left, which seated Mount under the finger on an edge-to-edge Android phone
+  // (tests/browser/mobile_menu_control.browser.test.ts pins the real layout).
+  it('clamps the row inside the safe area, counting the inset once', () => {
     const rig = makeRig({ appVw: '520px', safeAreaPx: '30px' });
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
     rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
     const open = rig.gesture.openState();
-    // The anchor's viewport centre is 80, so in the padding box it is 50, and the
-    // clamp box is the app box minus BOTH insets. The margin stays the
-    // stylesheet's own 6px literal rather than absorbing the inset a second time.
-    expect(open?.anchorX).toBe(50);
+    // The anchor stays on its viewport centre, 80. The clamp box is the app box
+    // minus BOTH insets, starting 30px in, and the margin stays the stylesheet's
+    // own 6px literal rather than absorbing the inset a second time.
+    expect(open?.anchorX).toBe(80);
     expect(open?.viewportWidth).toBe(460);
+    expect(open?.clampLeft).toBe(30);
     expect(open?.margin).toBe(6);
-    // The tenth item's right edge overruns 460 - 6 by 96, so the row shifts left
-    // by that. Rendered, that edge lands at 434 + 20 + 30 = 484, exactly 6px
-    // inside the safe area; the old max(6, 30) margin put it on 520, the
-    // physical screen edge, with the inset spent twice.
-    expect(open?.placement.centers[MENU_STRIP_COUNT - 1]).toBe(434);
+    // The tenth item's right edge overruns 520 - 30 - 6 by 96, so the row shifts
+    // left by that: its right edge lands at 464 + 20 = 484, exactly 6px inside
+    // the safe area.
+    expect(open?.placement.centers[MENU_STRIP_COUNT - 1]).toBe(464);
   });
 
-  it('shifts an unclamped row by the inset and not one pixel more', () => {
+  it('leaves an unclamped row exactly where it sits with no inset', () => {
     // Wide enough that nothing clamps, which isolates the frame change itself.
     const rig = makeRig({ appVw: '640px', safeAreaPx: '30px' });
     rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
     rig.anchor.dispatchEvent(pointer('pointermove', 1, 100 + SWIPE_PX));
     const open = rig.gesture.openState();
     expect(open?.placement.clamped).toBe(false);
-    // 98 written into a padding box that starts 30px in renders at 128, which is
-    // exactly where the same unclamped row sits with no inset at all.
-    expect(open?.placement.centers[0]).toBe(98);
-    expect(open?.anchorY).toBe(300 + ANCHOR_SIZE_PX / 2 - 30);
+    // One pitch right of the anchor's centre (80 + 48), exactly where the same
+    // unclamped row sits with no inset at all. The old padding-box frame wrote
+    // 98 here, which rendered 30px left of that, over the anchor itself.
+    expect(open?.placement.centers[0]).toBe(128);
+    expect(open?.anchorY).toBe(300 + ANCHOR_SIZE_PX / 2);
   });
 
   it('anchors the row on the measured centre of the control itself', () => {

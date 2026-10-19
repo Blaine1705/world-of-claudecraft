@@ -346,38 +346,37 @@ describe('RadialGesture: the clamp box', () => {
     expect(rig.gesture.placement()?.originY).toBe(200);
   });
 
-  // The overlay carries the device safe area as PADDING, and its petals are
-  // absolutely positioned children, so what the painter writes is resolved
-  // against the PADDING box rather than the viewport. The gesture layer
-  // therefore measures in that frame. NOT coverable by the real-browser suite:
-  // env(safe-area-inset-*) resolves to 0 on a headless desktop viewport, so only
-  // a stubbed computed style can drive the nonzero arm at all.
-  it('seats the petals in the overlay padding-box frame, so the inset never displaces them', () => {
+  // The overlay carries the device safe area as PADDING. That padding only
+  // shrinks the box the radial is CLAMPED into: its petals are absolutely
+  // positioned children, whose left/top resolve from the overlay's padding
+  // EDGE (the viewport origin), so the origin comes back in viewport
+  // coordinates. Reading the padding as an offset pushed every petal a whole
+  // inset off its button (tests/browser/mobile_menu_control.browser.test.ts pins
+  // the same frame for the strip in real layout).
+  it('seats the petals on the button in viewport coordinates, whatever the inset', () => {
     const rig = makeRig({ appVw: '400px', appVh: '600px', safeAreaPx: '44px' });
     // Button 1 is seated at (200,180)-(240,220), so its centre is (220,200) in
     // VIEWPORT coordinates and nothing about it is near a clamp here.
     down(rig, 1, 1, 220, 200);
     move(rig, 1, 1, 220 + FLICK_PX, 200);
-    // The painter writes these into a padding box that starts 44px in on both
-    // axes, so the cluster lands back on the button's real centre: 176 + 44 =
-    // 220 and 156 + 44 = 200. Written in viewport coordinates it would have been
-    // pushed a whole inset off the control it belongs to.
-    expect(rig.gesture.placement()?.originX).toBe(220 - 44);
-    expect(rig.gesture.placement()?.originY).toBe(200 - 44);
+    // The painter's coordinates resolve from the overlay's padding edge, so the
+    // cluster sits on the button's own centre. The old padding-box frame wrote
+    // (176, 156), which rendered a whole inset up and left of the button.
+    expect(rig.gesture.placement()?.originX).toBe(220);
+    expect(rig.gesture.placement()?.originY).toBe(200);
   });
 
   it('reserves the safe-area inset ONCE, never twice', () => {
     const rig = makeRig({ appVw: '400px', appVh: '300px', safeAreaPx: '30px' });
     down(rig, 0, 1, 380, 200);
     move(rig, 0, 1, 380 + FLICK_PX, 200);
-    // The clamp box is the app box minus both insets (400 - 60 = 340 wide,
-    // 300 - 60 = 240 tall) and the margin stays the stylesheet's own 6px, so the
-    // reach is 54 + 20 + 6 = 80 and the origin clamps to 340 - 80 = 260 by
-    // 240 - 80 = 160. Rendered that is 290 by 190, exactly one reach inside the
-    // safe area. Folding the inset into the margin INSTEAD (the old max(6, 30))
-    // wrote 296 into a box already offset by 30, spending the inset twice.
-    expect(rig.gesture.placement()?.originX).toBe(260);
-    expect(rig.gesture.placement()?.originY).toBe(160);
+    // The clamp box is the app box minus both insets (30..370 wide, 30..270
+    // tall) and the margin stays the stylesheet's own 6px, so the reach is
+    // 54 + 20 + 6 = 80 and the origin clamps to 370 - 80 = 290 by 270 - 80 =
+    // 190: exactly one reach inside the safe area. Folding the inset into the
+    // margin INSTEAD (the old max(6, 30)) would spend it twice.
+    expect(rig.gesture.placement()?.originX).toBe(290);
+    expect(rig.gesture.placement()?.originY).toBe(190);
   });
 });
 
