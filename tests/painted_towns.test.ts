@@ -8,6 +8,7 @@ import {
 import { AUTHORED_TOWN_INN_IDS, AUTHORED_TOWNS } from '../src/sim/authored_town_registry';
 import { buildingContainsRestPoint } from '../src/sim/building_layout';
 import { isBlocked, resolveMovement, streetlampPlacements } from '../src/sim/colliders';
+import { FACTION_HUB_LANDINGS } from '../src/sim/content/faction_vendors';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
@@ -140,6 +141,17 @@ describe('the painted towns recipe', () => {
 
   it('never touches the Drakelands', () => {
     expect(PAINTED_TOWNS.map((town) => town.zoneId)).not.toContain('drakelands');
+  });
+
+  it("holds Drifthaven's faction hearthstone landing to the clearance check", () => {
+    // each town's clearance check takes the landings near it; this pins that the
+    // one landing standing in a painted town is among them, not skipped
+    const checked = Object.entries(FACTION_HUB_LANDINGS)
+      .filter(([, landing]) =>
+        PAINTED_TOWNS.some((town) => nearTown(town, landing.x, landing.z, 80)),
+      )
+      .map(([faction]) => faction);
+    expect(checked).toEqual(['rift_watch']);
   });
 
   it('stands only shipped files: each look carries its models with every texture tier', () => {
@@ -350,6 +362,11 @@ function describePaintedTown(town: PaintedTownLayout): void {
       ]) {
         if (nearTown(town, yard.x, yard.z, 80))
           kept.push({ id: `graveyard ${yard.x},${yard.z}`, x: yard.x, z: yard.z, clearance: 2 });
+      }
+      // a faction hearthstone lands its player here (content/faction_vendors.ts)
+      for (const [faction, landing] of Object.entries(FACTION_HUB_LANDINGS)) {
+        if (nearTown(town, landing.x, landing.z, 80))
+          kept.push({ id: `${faction} landing`, x: landing.x, z: landing.z, clearance: 2 });
       }
       for (const object of BUILTIN_WORLD.groundObjects) {
         for (const p of object.positions) {

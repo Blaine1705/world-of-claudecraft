@@ -11,9 +11,7 @@ import { deepFreeze, indexById, levelTownPads, type TownGround } from '../placed
 import { paintedTownBuilding } from './models';
 import type { PaintedTownLayout } from './types';
 
-// The thatch look (oldtown colours, thatch roof, rubble walls, hewn beams) is
-// being baked; until it lands the town stands on the default files (same
-// geometry).
+// The thatch look: old town colours, thatch roof, rubble walls, hewn beams.
 const LOOK = 'thatch' as const;
 const SOUTH_FACING = 0; // the door looks south (-z)
 const EAST_FACING = Math.PI / 2; // the door looks east (-x)

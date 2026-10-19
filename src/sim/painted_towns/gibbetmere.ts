@@ -10,9 +10,7 @@ import { deepFreeze, indexById, levelTownPads, type TownGround } from '../placed
 import { paintedTownBuilding } from './models';
 import type { PaintedTownLayout } from './types';
 
-// The shakes look (Fenrire moss colours, wooden shake roof, rubble walls) is
-// being baked; until it lands the town stands on the default files (same
-// geometry).
+// The shakes look: Fenrire moss colours, wooden shake roof, rubble walls.
 const LOOK = 'shakes' as const;
 const NORTH_FACING = Math.PI; // the door looks north (+z)
 const EAST_FACING = Math.PI / 2; // the door looks east (-x)
