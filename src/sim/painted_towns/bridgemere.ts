@@ -25,7 +25,7 @@ import type { PaintedTownLayout } from './types';
 
 // The shakes look (Fenrire moss colours, wooden shake roofs) is being baked;
 // until it lands the town stands on the default files (same geometry).
-const LOOK = 'default' as const; // becomes 'shakes' when the shakes bake lands
+const LOOK = 'shakes' as const;
 const SOUTH_FACING = 0; // the door looks south (-z)
 
 // The island inn: its walls on the level plateau (no pad: the plateau is

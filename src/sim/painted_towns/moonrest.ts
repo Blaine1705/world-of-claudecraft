@@ -23,7 +23,7 @@ import type { PaintedTownLayout } from './types';
 
 // The diamond look (default colours, diamond slate roof, ashlar walls) is being
 // baked; until it lands the town stands on the default files (same geometry).
-const LOOK = 'default' as const; // becomes 'diamond' when the diamond bake lands
+const LOOK = 'diamond' as const;
 const HUB: Point2 = { x: -370, z: 1420 };
 const NORTH_FACING = Math.PI; // the door looks north (+z)
 
