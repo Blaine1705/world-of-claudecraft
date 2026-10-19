@@ -1062,6 +1062,7 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_heraldry_core.ts',
   'src/render/nameplate_tag_fill_core.ts',
   'src/render/nameplate_dots_core.ts',
+  'src/render/nameplate_cooldowns_core.ts',
   'src/render/nameplate_friendly_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',

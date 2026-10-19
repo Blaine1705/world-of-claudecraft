@@ -183,7 +183,7 @@ import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mobilePlatform, mobilePreflightCopy } from './game/mobile_preflight';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
-import { applyNameplateSetting } from './game/nameplate_settings';
+import { applyNameplateRowScales, applyNameplateSetting } from './game/nameplate_settings';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTargetForWorld } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
@@ -395,7 +395,6 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
-import { setNameplateDotScale } from './render/nameplate_dot_scale';
 import { hazardPaletteModeOf } from './render/nythraxis_hazard_palette_core';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import type { Renderer } from './render/renderer';
@@ -1512,7 +1511,7 @@ async function startGame(
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
-    setNameplateDotScale(settings.nameplateDotRenderScale());
+    applyNameplateRowScales(settings);
     renderer.setWaterRipples(settings.get('waterRipples'));
     setSpellEffectsEnabled(settings.get('spellEffects'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
@@ -2510,16 +2509,6 @@ async function startGame(
       return;
     }
     if (applyDesktopShellSetting(key, value, settings, desktopBridge())) return;
-    if (key === 'showNameplateDots') {
-      settings.set('showNameplateDots', !!value);
-      setNameplateDotScale(settings.nameplateDotRenderScale());
-      return;
-    }
-    if (key === 'nameplateDotScale') {
-      settings.set('nameplateDotScale', Number(value));
-      setNameplateDotScale(settings.nameplateDotRenderScale());
-      return;
-    }
     if (key === 'invertLookY') {
       input.setInvertLookY(settings.set('invertLookY', !!value));
       return;
@@ -2724,7 +2713,7 @@ async function startGame(
     next.showOwnNameplate = settings.get('showOwnNameplate');
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
     Object.assign(next.targetHighlight, renderer.targetHighlight);
-    setNameplateDotScale(settings.nameplateDotRenderScale());
+    applyNameplateRowScales(settings);
     next.reduceMotionSetting = settings.get('reduceMotion');
     next.setHazardPaletteMode(hazardPaletteModeOf(settings.get('colorblindMode')));
     next.setBrightness(settings.get('brightness'));

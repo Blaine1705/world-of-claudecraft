@@ -2288,6 +2288,8 @@ export const it_IT: EnTranslations = {
       "showPetFrame": "Mostra il tuo famiglio",
       "showNameplateDots": "Mostra i miei punti sulle targhette",
       "nameplateDotScale": "Dimensione punto targhetta",
+      "showNameplateCooldowns": "Offensive/Defensive Tracker",
+      "nameplateCooldownScale": "Offensive/Defensive Tracker Size",
       "showTargetDots": "Mostra punti target",
       "showDefensivesTrack": "Mostra ricariche difensive",
       "showSelfBuffTrack": "Mostra i miei benefici",

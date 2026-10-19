@@ -2288,6 +2288,8 @@ export const ru_RU: EnTranslations = {
       "showPetFrame": "Показывать вашего питомца",
       "showNameplateDots": "Показывать мои эффекты на полосах имён",
       "nameplateDotScale": "Размер эффектов на полосах имён",
+      "showNameplateCooldowns": "Отслеживание атаки/защиты",
+      "nameplateCooldownScale": "Размер отслеживания атаки/защиты",
       "showTargetDots": "Показывать эффекты на целях",
       "showDefensivesTrack": "Показывать защитные умения",
       "showSelfBuffTrack": "Показывать мои эффекты",

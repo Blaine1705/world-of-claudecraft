@@ -1545,7 +1545,8 @@ const MONOLITHS: MonolithRow[] = [
     // recovery flow composed with the current entrypoint. Exact merged count
     // after biome, zero slack.
     // Nameplate and highlight settings moved behind the game settings seam.
-    ceiling: 10972,
+    // Dot and cooldown row apply/boot/rebuild folds share nameplate_settings.ts.
+    ceiling: 10961,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

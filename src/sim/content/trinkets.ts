@@ -194,6 +194,11 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.guardHeat]: 'heart_of_the_crucible',
 });
 
+/** Successful medallion use provenance, aged by the existing cooldown engine.
+ * Equip/inherited lockouts never mint it. Hidden from ability readouts; the
+ * ordinary trinket gate may outlive this actual-use timer after a swap. */
+export const MEDALLION_USE_COOLDOWN_KEY = 'system_medallion_use';
+
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
  *  the client and persisted like an ability's). */
 export function trinketCooldownKey(itemId: string): string {
