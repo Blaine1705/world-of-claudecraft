@@ -268,7 +268,9 @@ export type { VehicleSession } from './world_api/vehicles';
 // 46 = Wildheart's entrance gate collision moves from empty grass onto the
 // visible stone feet. Epoch 45 clients predict the misplaced blockers, so
 // mixed binaries must fail closed instead of restoring invisible walls.
-export const ONLINE_WORLD_LAYOUT_VERSION = 46 as const;
+// 47 = Large Materials Vault snapshots stream in bounded, paced chunks.
+// Earlier clients cannot decode the transfer envelope and must fail closed.
+export const ONLINE_WORLD_LAYOUT_VERSION = 47 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

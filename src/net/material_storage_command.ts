@@ -13,3 +13,14 @@ export function materialStorageTransferPayload(
     ...(selection === undefined ? {} : { selection }),
   };
 }
+
+/** Exact-copy bag socket selector, shared storage command shape. */
+export function bankSocketBagPayload(
+  itemId: string,
+  socket?: number,
+  target?: { slotIndex: number },
+): { item: string; socket: number | undefined; slot?: number } {
+  return target === undefined
+    ? { item: itemId, socket }
+    : { item: itemId, socket, slot: target.slotIndex };
+}
