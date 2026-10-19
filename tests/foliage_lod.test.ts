@@ -405,7 +405,10 @@ describe('foliage LOD: the lean rock/dressing caps measure from the near edge', 
   // out as the camera orbited, while its collider still blocked movement.
   const cap = LOD_LOW.rockFar; // 190
   const leanScale = foliageDistanceScale(1, true); // 1 at a rested budget
-  const radius = 290; // a shipped lean rock slab (see the world-data sweep below)
+  // A halves-era lean rock slab (the out-radius case: its near edge can sit under
+  // the player). The lean tier now buckets on a BUCKET_DEPTH grid, whose widest
+  // shipped rock slab is about 187 yd (see the world-data sweep below).
+  const radius = 290;
   const leanRocks = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
     windowFor({ centerDist, radius, maxDist: cap, distanceScale: leanScale, ...over });
 
@@ -450,26 +453,40 @@ describe('foliage LOD: the lean rock/dressing caps measure from the near edge', 
     expect(bucketVisible({ ...w, centerDist: 300 + radius })).toBe(false); // whole slab past swap
   });
 
-  it('the shipped world really has lean rock slabs wider than the rock cap', () => {
-    // Re-bucket the live decorations the way buildTrees() does (two columns
-    // split on x < 0, one band per BUCKET_DEPTH from WORLD_MIN_Z, radius from
-    // the bucket's bounds plus the canopy margin) and show the gap is real:
-    // a boulder on a slab's near edge can be under the player while the
-    // slab's center is past the cap. Parsed from the renderer so a re-bucketing
-    // that closes the gap by itself retires this pin honestly.
+  it('the shipped world really has lean rock slabs deep enough for the centre rule to hide', () => {
+    // Re-bucket the live decorations the way buildTrees() does on the LEAN tier
+    // (the tier this cap belongs to) and show the gap is real: a boulder on a
+    // slab's near edge sits inside the cap while the slab's centre is past it,
+    // for every camera-to-centre distance in the (cap, cap + radius) band.
+    // Parsed from the renderer so a re-bucketing that closes the gap by itself
+    // retires this pin honestly. Since 28539d3de5c the lean tier buckets on a
+    // BUCKET_DEPTH grid (no longer two half-world columns), so no lean rock slab
+    // out-radiuses the cap any more (widest about 187 yd against 190), but most
+    // still hide a band more than half the cap deep; the bucket bounds moved
+    // into foliageSpotsBounds (foliage_tree_sculpt.ts) with the genshin merge
+    // (e10ecc2aef8).
     const foliageSrc = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
+    const sculptSrc = readFileSync(
+      new URL('../src/render/foliage_tree_sculpt.ts', import.meta.url),
+      'utf8',
+    );
     const depth = Number(/const BUCKET_DEPTH = (\d+)/.exec(foliageSrc)?.[1]);
     const margin = Number(
-      /Math\.hypot\(maxX - minX, maxZ - minZ\) \/ 2 \+ (\d+); \/\/ canopy/.exec(foliageSrc)?.[1],
+      /foliageSpotsBounds\(items, (\d+)\); \/\/ canopy margin/.exec(foliageSrc)?.[1],
     );
     expect(depth).toBeGreaterThan(0);
     expect(margin).toBeGreaterThan(0);
+    // The two rules this sweep re-derives, pinned where they live.
+    expect(foliageSrc).toContain(
+      'const col = GFX.leanFoliage ? Math.floor(d.x / BUCKET_DEPTH) : d.x < 0 ? 0 : 1;',
+    );
+    expect(sculptSrc).toContain('radius: Math.hypot(maxX - minX, maxZ - minZ) / 2 + margin,');
     const bounds = new Map<
       string,
       { minX: number; maxX: number; minZ: number; maxZ: number; rocks: number }
     >();
     for (const d of generateDecorations(WORLD_SEED)) {
-      const key = `${Math.floor((d.z - WORLD_MIN_Z) / depth)}:${d.x < 0 ? 0 : 1}`;
+      const key = `${Math.floor((d.z - WORLD_MIN_Z) / depth)}:${Math.floor(d.x / depth)}`;
       let b = bounds.get(key);
       if (!b) {
         b = { minX: d.x, maxX: d.x, minZ: d.z, maxZ: d.z, rocks: 0 };
@@ -486,12 +503,10 @@ describe('foliage LOD: the lean rock/dressing caps measure from the near edge', 
       .map((b) => Math.hypot(b.maxX - b.minX, b.maxZ - b.minZ) / 2 + margin);
     expect(radii.length).toBeGreaterThan(0);
     const widest = Math.max(...radii);
-    // Most rock slabs out-radius the rested lean cap; the center rule
-    // therefore hides a near-edge boulder from a camera anywhere in the
-    // (cap, radius) annulus of slab-center distances.
-    const wider = radii.filter((r) => r > cap * leanScale).length;
-    expect(wider / radii.length).toBeGreaterThan(0.5);
-    expect(widest).toBeGreaterThan(cap * leanScale);
+    // Most lean rock slabs hide a band more than half the rested cap deep: the
+    // centre rule drops a near-edge boulder from a camera anywhere in it.
+    const deep = radii.filter((r) => r > (cap * leanScale) / 2).length;
+    expect(deep / radii.length).toBeGreaterThan(0.5);
     const camToCenter = cap * leanScale + 1;
     expect(bucketVisible(leanRocks(camToCenter, { radius: widest }))).toBe(false);
     expect(bucketVisible(leanRocks(camToCenter, { radius: widest, maxNearEdge: true }))).toBe(true);

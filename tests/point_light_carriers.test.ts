@@ -671,6 +671,11 @@ describe('every point-light producer is a carrier source', () => {
       // The Drowned Gate Tower's marsh fog: a mesh hook writing the time of
       // day, the reduced-motion switch and the pulse light's base, never a scene.
       'render/sunken_bastion_entrance.ts: mesh',
+      // The FFT ocean (9d5385caac4): every water sheet and its from-below
+      // underside twin mark themselves drawn from a mesh hook, so the per-frame
+      // simulation idles while no water is on screen; never a scene.
+      'render/water.ts: mesh',
+      'render/water.ts: under',
       'render/waterfall.ts: sp',
       // The Wildheart Basin's gates: mesh hooks reading the gate memory (the
       // vine bridges weaving, the thorn walls sinking, the wards failing),
@@ -709,6 +714,11 @@ describe('every point-light producer is a carrier source', () => {
       // Copies a source MESH's mask onto the fused mesh that replaces it.
       'render/mesh_merge.ts',
       'render/point_light_carriers_core.ts',
+      // The scenery distance bands (a0659eb667c, c33418ac348): a detail-band
+      // colour twin, a per-level instanced batch and a fused cell batch each
+      // copy the mask of the source mesh they draw for, never a new layer.
+      'render/scenery_detail.ts',
+      'render/scenery_detail_batches.ts',
     ]);
   });
 });

@@ -44,6 +44,12 @@ const EXPECTED_LOW_OVERRIDES = {
   terrainSplat: 'terrainSplat:0',
   maxPointLights: 'maxPointLights:6',
   farCharacterAnimScale: 'farCharacterAnimScale:1',
+  // the Low scenery levers from the scenery-distance R&D (a0659eb667c,
+  // 8ac3ed28f3d, f4a45631064), merged with the genshin overhaul
+  sceneryDetail: 'sceneryDetail:1',
+  sceneryGeometryLodDistance: 'sceneryGeometryLodDistance:180',
+  coconutCellSize: 'coconutCellSize:128',
+  lowReadabilityLighting: 'lowReadabilityLighting:1',
 };
 
 describe('performance attribution plan', () => {

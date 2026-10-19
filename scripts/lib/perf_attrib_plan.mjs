@@ -37,6 +37,13 @@ export const PERF_ATTRIB_KNOB_CASES = [
   { knob: 'terrainSplat', gfxo: 'terrainSplat:0' },
   { knob: 'maxPointLights', gfxo: 'maxPointLights:6' },
   { knob: 'farCharacterAnimScale', gfxo: 'farCharacterAnimScale:1' },
+  // The Low scenery levers (scenery_detail.ts and static_instance_cells.ts):
+  // the distance bands, the far geometry LOD swap distance, the coconut batch
+  // grid, and the Low readability lift on the hemisphere and sun.
+  { knob: 'sceneryDetail', gfxo: 'sceneryDetail:1' },
+  { knob: 'sceneryGeometryLodDistance', gfxo: 'sceneryGeometryLodDistance:180' },
+  { knob: 'coconutCellSize', gfxo: 'coconutCellSize:128' },
+  { knob: 'lowReadabilityLighting', gfxo: 'lowReadabilityLighting:1' },
 ];
 
 export const PERF_ATTRIB_COMBINED_CASES = [
