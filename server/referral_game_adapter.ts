@@ -204,6 +204,9 @@ export class ReferralGameAdapter {
     const started = performance.now();
     for (const session of this.accounts.get(accountId) ?? []) {
       if (session.left || session.escrowQuarantined) continue;
+      // host.sim is the live realm Sim that server/game.ts builds through
+      // buildRealmSimConfig, which injects the wall clock (lockoutNowMs), so
+      // this blob carries the same absolute deadlines a save would.
       const meta = this.host.sim.meta(session.pid),
         before = this.host.sim.serializeCharacter(session.pid);
       if (!meta || !before) continue;
