@@ -7,6 +7,13 @@
 // out of season; it leaves the world when its time runs out and when the event closes; no
 // rng.
 import { afterEach, describe, expect, it } from 'vitest';
+import { wireEntity } from '../server/game';
+import { applyAuraWire, type ClientWireAura } from '../src/net/aura_wire_decode';
+import {
+  characterFormAssetKey,
+  characterFormMaskForAura,
+  requestedCharacterForm,
+} from '../src/render/characters/form_visual_selection_core';
 import {
   GOURDLIGHT_COSTUMES,
   GOURDLIGHT_TOYS,
@@ -216,5 +223,22 @@ describe('the Gurglegreen Cauldron', () => {
     expect(brewOn(sim.player)).toBeDefined();
     ticks(sim, 1.2);
     expect(brewOn(sim.player)).toBeUndefined();
+  });
+
+  it('online: the drinker goblin rides the snapshot, so every client draws the goblin', () => {
+    // the server's sim: Pip drinks from the maker's cauldron
+    const sim = world();
+    const pot = place(sim);
+    const pip = friend(sim, 2.5);
+    expect(sim.pickUpObject(pot.id, pip.id)).toBe(true);
+    // what the server sends ANOTHER client about Pip (the interest-scoped entity row)
+    const row = wireEntity(pip) as { auras?: ClientWireAura[] };
+    const sent = (row.auras ?? []).find((a) => a.id === CAULDRON.auraId);
+    expect(sent?.kind).toBe('seasonal_cosmetic');
+    // that client decodes the row and picks Pip's body from it: the goblin
+    const held = applyAuraWire([], row.auras ?? [], { mode: 'legacy', time: null });
+    const mask = held.reduce((m, a) => m | characterFormMaskForAura(a), 0);
+    expect(requestedCharacterForm(mask)).toBe('sheep');
+    expect(characterFormAssetKey('form_sheep', held)).toBe('form_costume_goblin');
   });
 });
