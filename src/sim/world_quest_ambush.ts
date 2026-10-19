@@ -70,7 +70,7 @@ export const FARSHORE_SALVAGE_AMBUSH: WorldQuestAmbushDef = {
     { mobId: 'vale_bandit', count: 3, level: 5 },
     { mobId: 'vale_bandit', count: 4, level: 5 },
   ],
-  leader: { mobId: 'vale_bandit', level: 7, healthMultiplier: 4, scale: 1.3 },
+  leader: { mobId: 'vale_bandit', level: 7, healthMultiplier: 2, scale: 1.3 },
   leaderYell: 'You will not have our plunder! Take the beach, lads!',
   purse: { base: 1_200, perLevel: 90 },
   telegraphSeconds: 2,
