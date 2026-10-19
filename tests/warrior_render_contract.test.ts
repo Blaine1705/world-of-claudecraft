@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { KAYKIT_KNIGHT_WARRIOR, KAYKIT_PALADIN, VISUALS } from '../src/render/characters/manifest';
+import { SHARDPIKE_THROW_CLIP } from '../src/render/characters/shardpike_throw_clip';
 import {
   attackAbilityId,
   isSpinAttackAbility,
@@ -395,5 +396,17 @@ describe('Signature_ clip binding is keyed on the warrior rig, not the clip name
     const visual = await buildVisual('player_priest', 'qa_probe_ability');
     expect(VISUALS.player_priest.clips.attackByAbility?.qa_probe_ability).toBeUndefined();
     expect(visual.hasAttackClipOverride('qa_probe_ability')).toBe(false);
+  });
+
+  // The one exception: the Shardpike throw (f91bbc8b04e) is minted for EVERY
+  // player rig by prepareShardpikeThrowClip under the Signature_ name, so any
+  // class carrying the pike plays it; that name, and only that name, binds off
+  // the warrior rig.
+  it('binds the Shardpike throw on a non-warrior rig', async () => {
+    const visual = await buildVisual(
+      'player_priest',
+      SHARDPIKE_THROW_CLIP.slice('Signature_'.length),
+    );
+    expect(visual.hasAttackClipOverride('lance_thrust')).toBe(true);
   });
 });
