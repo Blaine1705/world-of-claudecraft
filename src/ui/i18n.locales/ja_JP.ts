@@ -21890,7 +21890,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.boo.row': 'わっ！',
   'seasonal.boo.rowAria': '{name}の前に飛び出して「わっ！」と叫ぶ',
   'seasonal.boo.needsCostume':
-    'まず仮装をすること：仮装の薬、コウモリかガイコツのいたずら、藁人形のお守り、または彫りカボチャの頭。',
+    'まず仮装をすること：仮装の薬、コウモリかガイコツのいたずら、藁人形のお守り、彫りカボチャの頭、またはぐつぐつ緑の大鍋のゴブリンになるひと口。',
   'seasonal.boo.frightenedHint': '{name}はさっきの驚きでまだびくびくしている。別の人を探そう。',
   'seasonal.boo.landed':
     '{name}の前に飛び出して「わっ！」と叫んだ！悲鳴を上げて、持ち物を落としそうになった。',

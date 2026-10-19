@@ -69,6 +69,8 @@ export const GOURDLIGHT_BOO_COSTUME_AURAS: readonly string[] = Object.freeze([
   'gourdlight_trick_skeleton',
   'gourdlight_trick_strawling',
   'gourdlight_pumpkin_head',
+  // the Gurglegreen Cauldron's goblin body (a costume in all but name)
+  'gourdlight_toy_gurglegreen',
 ]);
 /** The townsperson's start: the gesture they play, and for how long (seconds). */
 export const GOURDLIGHT_BOO_STARTLE = Object.freeze({ gesture: 'cry' as const, seconds: 3 });

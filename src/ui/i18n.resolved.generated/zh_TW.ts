@@ -7796,7 +7796,7 @@ export const zh_TW: EnTranslations = {
     "boo": {
       "row": "哇！",
       "rowAria": "跳到{name}面前大喊一聲哇",
-      "needsCostume": "先穿上裝扮：裝扮藥劑、蝙蝠或骷髏惡作劇、稻草小人護符，或雕刻南瓜頭。",
+      "needsCostume": "先穿上裝扮：裝扮藥劑、蝙蝠或骷髏惡作劇、稻草小人護符，雕刻南瓜頭，或咕嘟綠坩堝裡一口變成地精的湯。",
       "frightenedHint": "{name}還被你上次嚇得心驚膽戰。去找別人吧。",
       "landed": "你跳到{name}面前大喊一聲哇！對方尖叫一聲，差點把東西全掉了。",
       "flash": "哇！{name}被嚇到了！",

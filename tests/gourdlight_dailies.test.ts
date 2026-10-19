@@ -41,7 +41,11 @@ import {
   restoreSeasonalState,
   seasonalSaveFragment,
 } from '../src/sim/seasonal';
-import { booLedgerKey, gourdlightDailyForDay } from '../src/sim/seasonal/gourdlight_dailies';
+import {
+  booLedgerKey,
+  gourdlightDailyForDay,
+  wearsGourdlightCostume,
+} from '../src/sim/seasonal/gourdlight_dailies';
 import { DAILY_SITE_ROAD_CLEARANCE, gourdlightDailySites } from '../src/sim/seasonal_daily_sites';
 import { syncSeasonalDecorColliders } from '../src/sim/seasonal_decor_colliders';
 import { chapelAt } from '../src/sim/seasonal_decor_exclusions';
@@ -234,6 +238,11 @@ describe('Boo!', () => {
     expect(sim.questState(GOURDLIGHT_DAILY_BOO_QUEST_ID)).toBe('ready');
     // a fright is not a knock: the townsfolk still answer trick-or-treat today
     expect(sim.trickOrTreatedToday.filter((id) => !id.startsWith('boo_'))).toEqual([]);
+  });
+
+  it('counts the Gurglegreen goblin as a costume', () => {
+    expect(wearsGourdlightCostume([{ id: 'gourdlight_toy_gurglegreen' }])).toBe(true);
+    expect(wearsGourdlightCostume([{ id: 'gourdlight_toy_murmurwick' }])).toBe(false);
   });
 
   it('is refused to a player not on the errand', () => {

@@ -21887,7 +21887,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'seasonal.boo.row': '워!',
   'seasonal.boo.rowAria': '{name} 앞으로 뛰어나가 워 하고 외치기',
   'seasonal.boo.needsCostume':
-    '먼저 분장을 하세요: 분장 물약, 박쥐나 해골 장난, 짚인형 부적, 또는 조각한 호박 머리.',
+    '먼저 분장을 하세요: 분장 물약, 박쥐나 해골 장난, 짚인형 부적, 조각한 호박 머리, 또는 보글초록 가마솥의 고블린이 되는 한 모금.',
   'seasonal.boo.frightenedHint':
     '{name}은(는) 지난번 놀람에 아직도 움찔거립니다. 다른 사람을 찾아보세요.',
   'seasonal.boo.landed':

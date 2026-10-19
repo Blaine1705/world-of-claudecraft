@@ -7796,7 +7796,7 @@ export const en: EnTranslations = {
     "boo": {
       "row": "Boo!",
       "rowAria": "Leap out at {name} and shout boo",
-      "needsCostume": "Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm or the Carved Pumpkin Head.",
+      "needsCostume": "Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm, the Carved Pumpkin Head or a goblin sip from the Gurglegreen Cauldron.",
       "frightenedHint": "{name} is still jumpy from your last fright. Find someone else.",
       "landed": "You leap out at {name} with a BOO! They shriek and nearly drop everything.",
       "flash": "BOO! {name} is frightened!",

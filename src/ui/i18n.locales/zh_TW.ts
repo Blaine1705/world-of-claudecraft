@@ -20843,7 +20843,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'seasonal.boo.row': '哇！',
   'seasonal.boo.rowAria': '跳到{name}面前大喊一聲哇',
   'seasonal.boo.needsCostume':
-    '先穿上裝扮：裝扮藥劑、蝙蝠或骷髏惡作劇、稻草小人護符，或雕刻南瓜頭。',
+    '先穿上裝扮：裝扮藥劑、蝙蝠或骷髏惡作劇、稻草小人護符，雕刻南瓜頭，或咕嘟綠坩堝裡一口變成地精的湯。',
   'seasonal.boo.frightenedHint': '{name}還被你上次嚇得心驚膽戰。去找別人吧。',
   'seasonal.boo.landed': '你跳到{name}面前大喊一聲哇！對方尖叫一聲，差點把東西全掉了。',
   'seasonal.boo.flash': '哇！{name}被嚇到了！',
