@@ -565,7 +565,9 @@ const MONOLITHS: MonolithRow[] = [
     // current release batch. Exact merged count measured with wc -l.
     // Re-pinned at 18069 after composing PvP Resurrect with the current release
     // batch. Exact merged count measured with wc -l.
-    ceiling: 18069,
+    // Allied Hearthstone uses the typed IWorld read, removing three lines.
+    // Exact merged file count after formatting.
+    ceiling: 18066,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

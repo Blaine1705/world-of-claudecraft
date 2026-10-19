@@ -6554,10 +6554,7 @@ export class Hud {
     // useItem), from the pure sibling view so bags, bank, crafting, vendor,
     // and market all state what the elixir does.
     html += elixirTooltipLines(item);
-    html += factionRewardTooltipLines(
-      item,
-      (this.sim as { alliedHearthstoneAttunement?: FactionId }).alliedHearthstoneAttunement,
-    );
+    html += factionRewardTooltipLines(item, this.sim.alliedHearthstoneAttunement);
     // Recipe patterns: what it teaches, its gates, then each product's card and materials.
     const card = (p: ItemDef, noSet: boolean) => this.itemTooltip(p, noSet ? 'noset' : 'embedded');
     if (item.kind === 'recipe')
