@@ -46,6 +46,7 @@ import {
   ownedDruidFormDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from './owned_class_spec_defaults';
+import { isPetSlotCommand } from './pet_slot_core';
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
@@ -553,6 +554,7 @@ export class ActionBarController {
 
   isAssignableAction(action: Exclude<HotbarAction, null>): boolean {
     if (action.type === 'item') return this.isHotbarItemId(action.id);
+    if (action.type === 'pet') return isPetSlotCommand(action.id);
     return (
       this.deps.knownAbilityIds().includes(action.id) && this.isAbilityPlacementAllowed(action.id)
     );

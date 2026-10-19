@@ -1311,7 +1311,9 @@ export type JoinableChannel = (typeof JOINABLE_CHANNELS)[number];
 
 // Per-player progression and bags. The entity holds combat state; this holds
 // everything that belongs to the character sheet.
-export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
+export interface PlayerMeta
+  extends worldQuestState.WorldQuestPlayerState,
+    petCommands.PetOwnerRuntimeState {
   entityId: number;
   // Stable database character id when running on the server. Offline/sim-only
   // callers fall back to entityId for systems that need a rename-proof owner key.
@@ -1546,11 +1548,6 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // lifetime total; folded into a new persisted baseline by serializeCharacter
   // on save, so it only ever advances while the character is actually in the world.
   totalPlayedSeconds: number;
-  // Tick of the player's last deliberate action (movement, ability cast, or pet
-  // command). Session-only, never persisted. Powers the anti-AFK gate on
-  // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
-  // cannot farm the area alone.
-  lastActiveTick: number;
   // Runtime-only local recovery attempt. The owning system lives in unstuck.ts;
   // only its anti-relog cooldown is persisted through Entity.cooldowns.
   pendingUnstuck: unstuckMod.PendingUnstuck | null;

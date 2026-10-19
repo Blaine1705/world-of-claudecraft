@@ -51,10 +51,11 @@ import { EmpowerHold } from '../src/ui/empower_hold_core';
 import { Hud } from '../src/ui/hud';
 import { ActionBarController } from '../src/ui/hud/action_bar/action_bar_controller';
 import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
+import type { HotbarAction } from '../src/ui/hud/action_bar/hotbar';
 import { tSim } from '../src/ui/sim_i18n';
 import { isStanceBarAbilityGroup } from '../src/ui/stance_bar_view';
 
-type Action = { type: 'ability' | 'item'; id: string } | null;
+type Action = HotbarAction;
 
 interface CastHarness {
   actionBarController: {

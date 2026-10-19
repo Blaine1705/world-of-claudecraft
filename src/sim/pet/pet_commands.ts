@@ -65,6 +65,7 @@ import {
 } from '../types';
 import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyPetOwnerScaling, petRangedAttack, startWaterJet } from './pet_ai';
+import { isPetMode } from './pet_assist';
 import { isTameableFamily } from './pet_scaling';
 import { isPrimaryOwnedPetEntity } from './pet_selection';
 import { petCanForceTaunt } from './pet_taunt_gate';
@@ -905,6 +906,9 @@ export function healPet(ctx: SimContext, pid?: number): void {
 }
 
 export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
+  // The sim owns the stance list: the server hands the raw `pet_mode` wire value
+  // straight through, so an unknown mode stops here.
+  if (!isPetMode(mode)) return;
   const r = ctx.resolve(pid);
   if (!r) return;
   if (!isPetClass(r.meta.cls)) {
@@ -1066,4 +1070,16 @@ export function restorePetFromDelveStash(ctx: SimContext, pid: number): void {
   ctx.delvePetStash.delete(pid);
   if (petOf(ctx, pid, true)) return;
   restorePet(ctx, e, state);
+}
+
+/** Session-only owner inputs shared by pet commands and the pet AI. */
+export interface PetOwnerRuntimeState {
+  // Tick of the player's last deliberate action (movement, ability cast, or pet
+  // command). Session-only, never persisted. Powers the anti-AFK gate on
+  // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
+  // cannot farm the area alone.
+  lastActiveTick: number;
+  // The enemy this player's last committed cast was aimed at (session-only): what
+  // an Assist-stance pet may attack, while it is still the active target.
+  petAssistTargetId?: number | null;
 }

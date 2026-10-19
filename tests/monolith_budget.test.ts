@@ -567,7 +567,17 @@ const MONOLITHS: MonolithRow[] = [
     // batch. Exact merged count measured with wc -l.
     // Allied Hearthstone uses the typed IWorld read, removing three lines.
     // Exact merged file count after formatting.
-    ceiling: 18066,
+    // Lowered from 18093 by the pet-commands-on-the-action-bar change: the pet
+    // bar's inline button builder moved out to src/ui/hud/pet_bar_button.ts
+    // (which now also owns the drag that copies a pet command onto a slot), so
+    // the cast, drop, tooltip and slot wiring the feature added here still nets
+    // the coordinator 127 lines smaller. Exact count, zero slack.
+    // Lowered again from 17966 by the Assist pet stance: the pet bar's stance-menu
+    // table now derives from PET_MODES (sim/pet/pet_assist.ts) instead of three
+    // hand-written rows, so adding the fourth stance shrank the file. Exact count.
+    // Release integration preserves the inherited tooltip-hover settings and
+    // prior extractions beside the pet-button extraction. Measured after formatting.
+    ceiling: 17925,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1291,7 +1301,8 @@ const MONOLITHS: MonolithRow[] = [
     // into the current release batch. Exact merged count, zero slack.
     // Up to 11641 with PvP Resurrect composed into the current release batch.
     // Exact merged count, zero slack.
-    ceiling: 11641,
+    // Pet owner session inputs moved behind the existing pet command state seam.
+    ceiling: 11636,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

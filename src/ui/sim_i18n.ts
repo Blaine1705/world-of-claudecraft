@@ -1369,6 +1369,7 @@ const petEnTable = {
   'petMode.passive': 'passive',
   'petMode.defensive': 'defensive',
   'petMode.aggressive': 'aggressive',
+  'petMode.assist': 'assisting',
   'aura.summoned': 'Summoned',
   'aura.fed': 'Fed',
 } as const;
@@ -16444,6 +16445,7 @@ const PET_DICT_EN: Record<PetSimMessageKey, string> = {
   'petMode.passive': 'passive',
   'petMode.defensive': 'defensive',
   'petMode.aggressive': 'aggressive',
+  'petMode.assist': 'assisting',
   'aura.summoned': 'Summoned',
   'aura.fed': 'Fed',
 };
@@ -16491,6 +16493,7 @@ const PET_DICT_ES: Record<PetSimMessageKey, string> = {
   'petMode.passive': 'pasivo',
   'petMode.defensive': 'defensivo',
   'petMode.aggressive': 'agresivo',
+  'petMode.assist': 'asistencia',
   'aura.summoned': 'Invocado',
   'aura.fed': 'Alimentado',
 };
@@ -16538,6 +16541,7 @@ const PET_DICT_FR: Record<PetSimMessageKey, string> = {
   'petMode.passive': 'passif',
   'petMode.defensive': 'défensif',
   'petMode.aggressive': 'agressif',
+  'petMode.assist': 'assistance',
   'aura.summoned': 'Invoqué',
   'aura.fed': 'Nourri',
 };
@@ -16586,6 +16590,7 @@ const PET_DICT_IT: Record<PetSimMessageKey, string> = {
   'petMode.passive': 'passiva',
   'petMode.defensive': 'difensiva',
   'petMode.aggressive': 'aggressiva',
+  'petMode.assist': 'assistenza',
   'aura.summoned': 'Evocato',
   'aura.fed': 'Nutrito',
 };
@@ -16634,6 +16639,7 @@ const PET_DICT_DE: Record<PetSimMessageKey, string> = {
   'petMode.passive': 'passiv',
   'petMode.defensive': 'defensiv',
   'petMode.aggressive': 'aggressiv',
+  'petMode.assist': 'im Unterstützungsmodus',
   'aura.summoned': 'Beschworen',
   'aura.fed': 'Gefüttert',
 };
@@ -16678,6 +16684,7 @@ const PET_DICT_ZH_CN: Record<PetSimMessageKey, string> = {
   'petMode.passive': '被动',
   'petMode.defensive': '防御',
   'petMode.aggressive': '攻击',
+  'petMode.assist': '协助',
   'aura.summoned': '已召唤',
   'aura.fed': '已喂养',
 };
@@ -16722,6 +16729,7 @@ const PET_DICT_ZH_TW: Record<PetSimMessageKey, string> = {
   'petMode.passive': '被動',
   'petMode.defensive': '防禦',
   'petMode.aggressive': '攻擊',
+  'petMode.assist': '協助',
   'aura.summoned': '已召喚',
   'aura.fed': '已餵養',
 };
@@ -16768,6 +16776,7 @@ const PET_DICT_KO: Record<PetSimMessageKey, string> = {
   'petMode.passive': '수동',
   'petMode.defensive': '방어',
   'petMode.aggressive': '공격',
+  'petMode.assist': '지원',
   'aura.summoned': '소환됨',
   'aura.fed': '먹이를 먹음',
 };
@@ -16813,6 +16822,7 @@ const PET_DICT_JA: Record<PetSimMessageKey, string> = {
   'petMode.passive': '受動',
   'petMode.defensive': '防御',
   'petMode.aggressive': '攻撃',
+  'petMode.assist': 'アシスト',
   'aura.summoned': '召喚済み',
   'aura.fed': '給餌済み',
 };
@@ -16859,6 +16869,7 @@ const PET_DICT_PT: Record<PetSimMessageKey, string> = {
   'petMode.passive': 'passivo',
   'petMode.defensive': 'defensivo',
   'petMode.aggressive': 'agressivo',
+  'petMode.assist': 'assistência',
   'aura.summoned': 'Invocado',
   'aura.fed': 'Alimentado',
 };
@@ -16905,6 +16916,7 @@ const PET_DICT_RU: Record<PetSimMessageKey, string> = {
   'petMode.passive': 'пассивный',
   'petMode.defensive': 'защитный',
   'petMode.aggressive': 'агрессивный',
+  'petMode.assist': 'помощи',
   'aura.summoned': 'Призван',
   'aura.fed': 'Накормлен',
 };
@@ -17834,7 +17846,12 @@ function locItemStack(name: string, stackSuffix?: string): string {
 }
 function locPetMode(mode: string): string {
   const normalized = mode.toLowerCase();
-  if (normalized === 'passive' || normalized === 'defensive' || normalized === 'aggressive') {
+  if (
+    normalized === 'passive' ||
+    normalized === 'defensive' ||
+    normalized === 'aggressive' ||
+    normalized === 'assist'
+  ) {
     return tSim(`petMode.${normalized}` as PetSimMessageKey);
   }
   return mode;
