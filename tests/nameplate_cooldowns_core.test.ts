@@ -188,28 +188,49 @@ describe('nameplate cooldowns resolve (painter side)', () => {
     expect(out.count).toBe(0);
   });
 
-  it('resolves artwork and a localized countdown per unit', () => {
+  it('resolves artwork for every slot and a countdown for active buffs only', () => {
     const out = newNameplateCooldownsPlan();
     resolveNameplateCooldowns(
       out,
-      player({ recklessness: 161, [MEDALLION]: 47 }, [{ id: 'barkskin', remaining: 6.24 }]),
+      player({ recklessness: 161, [MEDALLION]: 47 }, [
+        { id: 'barkskin', remaining: 6.24 },
+        { id: 'icy_veins', remaining: 14.2 },
+      ]),
       true,
       1,
     );
     const byKey = Object.fromEntries(out.slots.slice(0, out.count).map((s) => [s.key, s]));
-    expect(byKey[MEDALLION].timeText).toBe('47');
+    // Active buffs count down their buff time.
     expect(byKey.barkskin.timeText).toBe('6.2');
-    expect(byKey.recklessness.timeText).toMatch(/^3\s?m/);
+    expect(byKey.icy_veins.timeText).toBe('15');
+    // Recharging cooldowns show that they are spent, never their time left.
+    expect(byKey[MEDALLION].active).toBe(false);
+    expect(byKey[MEDALLION].timeText).toBe('');
+    expect(byKey.recklessness.timeText).toBe('');
+    expect(byKey.recklessness.fraction).toBeGreaterThan(0);
     expect(byKey.barkskin.iconUrl).toBe(nameplateCooldownIconUrl('barkskin'));
     expect(byKey.barkskin.iconUrl).toContain('barkskin');
     expect(byKey[MEDALLION].iconUrl).toContain('medallion_of_defiance');
   });
 
-  it('re-formats when a countdown crosses the minute boundary, never reusing the text', () => {
+  it('drops the countdown the moment an active buff falls off into its cooldown', () => {
     const out = newNameplateCooldownsPlan();
-    resolveNameplateCooldowns(out, player({ recklessness: 60.5 }), true, 1);
+    resolveNameplateCooldowns(
+      out,
+      player({ barkskin: 50 }, [{ id: 'barkskin', remaining: 0.4 }]),
+      true,
+      1,
+    );
+    expect(out.slots[0].timeText).toBe('0.4');
+    resolveNameplateCooldowns(out, player({ barkskin: 49.6 }), true, 1);
+    expect(out.slots[0]).toMatchObject({ key: 'barkskin', active: false, timeText: '' });
+  });
+
+  it('re-formats an active countdown that crosses the minute boundary, never reusing the text', () => {
+    const out = newNameplateCooldownsPlan();
+    resolveNameplateCooldowns(out, player({}, [{ id: 'barkskin', remaining: 60.5 }]), true, 1);
     expect(out.slots[0].timeText).toMatch(/^2\s?m/);
-    resolveNameplateCooldowns(out, player({ recklessness: 59.5 }), true, 1);
+    resolveNameplateCooldowns(out, player({}, [{ id: 'barkskin', remaining: 59.5 }]), true, 1);
     expect(out.slots[0].timeText).toBe('60');
   });
 });

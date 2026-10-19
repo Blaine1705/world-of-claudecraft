@@ -87,7 +87,8 @@ export interface NameplateCooldownSlot {
   unit: NameplateCooldownTimeUnit;
   /** PAINTER-WRITTEN: artwork resolved from `key`, '' while unresolved. */
   iconUrl: string;
-  /** PAINTER-WRITTEN: the localized countdown, '' while unresolved. */
+  /** PAINTER-WRITTEN: the localized countdown of an ACTIVE buff; always '' for a
+   *  recharging cooldown, which shows that it is spent but never its time left. */
   timeText: string;
   /** PAINTER-WRITTEN: the quantized value `timeText` was formatted from (with
    *  the unit folded in), NaN while unresolved. */

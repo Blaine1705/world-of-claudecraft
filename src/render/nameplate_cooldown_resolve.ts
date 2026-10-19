@@ -83,6 +83,13 @@ export function resolveNameplateCooldowns(
   for (let i = 0; i < plan.count; i++) {
     const slot = plan.slots[i];
     if (!slot.iconUrl) slot.iconUrl = nameplateCooldownIconUrl(slot.key);
+    // Only an active buff counts down. A recharging cooldown shows that it is
+    // spent (dimmed art, swipe), never how long until it is ready again.
+    if (!slot.active) {
+      slot.timeText = '';
+      slot.timeValue = Number.NaN;
+      continue;
+    }
     const quantized = nameplateCooldownQuantized(slot.remaining, slot.unit);
     const tagged = quantized + UNIT_TAG[slot.unit];
     if (slot.timeText === '' || tagged !== slot.timeValue) {

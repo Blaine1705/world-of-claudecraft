@@ -1632,19 +1632,32 @@ describe('the enemy cooldown row on a plate', () => {
     return calls;
   }
 
-  it('leaves the name row where it was and draws its countdowns above it', () => {
+  it('leaves the name row where it was and draws active buff countdowns above it', () => {
     const surface = new NameplateCanvasSurface(document.createElement('div'));
     const state = plateState();
     const nameY = (calls: { text: unknown; y: number }[]) =>
       calls.find((c) => c.text === 'Gilded One')?.y as number;
 
     const without = nameY(textYs(surface, state));
-    state.cooldowns = cooldownPlanWith(['barkskin', 'recklessness']);
+    const plan = newNameplateCooldownsPlan();
+    nameplateCooldownsInto(plan, new Map(), [
+      { id: 'barkskin', remaining: 11 },
+      { id: 'recklessness', remaining: 8 },
+    ]);
+    for (let i = 0; i < plan.count; i++) plan.slots[i].timeText = '11';
+    state.cooldowns = plan;
     const calls = textYs(surface, state);
     expect(nameY(calls)).toBe(without);
-    const countdowns = calls.filter((c) => c.text === '30');
+    const countdowns = calls.filter((c) => c.text === '11');
     expect(countdowns).toHaveLength(2);
     for (const c of countdowns) expect(c.y).toBeLessThan(without);
+  });
+
+  it('never draws a number on a recharging cooldown, even if one was left on the slot', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = plateState();
+    state.cooldowns = cooldownPlanWith(['barkskin', 'recklessness']); // recharging, text '30'
+    expect(textYs(surface, state).filter((c) => c.text === '30')).toHaveLength(0);
   });
 
   it('lifts the emote bubble by exactly the row height the core reserves', () => {

@@ -49,10 +49,9 @@ const SWIPE_FILL = 'rgba(4, 6, 10, 0.66)';
 // per-icon canvas filter (unsupported on WebKit, and costly per frame).
 const SPENT_WASH = 'rgba(4, 6, 10, 0.22)';
 const TILE_RADIUS = 2;
+// The one countdown the row draws: an active buff's remaining time. A recharging
+// cooldown carries no number (nameplate_cooldown_resolve.ts leaves its text empty).
 const TIME_ACTIVE_FILL = '#ffffff';
-const TIME_SPENT_FILL = '#c4cad3';
-// Back in under ten seconds: the dot row's amber, redundant with the number.
-const TIME_SOON_FILL = '#ffcf40';
 
 function drawBadgeGlyph(
   ctx: CanvasRenderingContext2D,
@@ -190,14 +189,14 @@ export function drawNameplateCooldownRow(
       forced ? 'CanvasText' : BADGE_GLYPH_FILLS[slot.group],
     );
 
-    if (slot.timeText) {
+    if (slot.active && slot.timeText) {
       host.drawText(
         ctx,
         slot.timeText,
         x + size / 2,
         topY + size + (NAMEPLATE_COOLDOWN_TIMER_STEP - 1) * scale,
         nameplateDotTimeFont(scale),
-        slot.active ? TIME_ACTIVE_FILL : slot.unit === 'tenths' ? TIME_SOON_FILL : TIME_SPENT_FILL,
+        TIME_ACTIVE_FILL,
       );
     }
     x += size + gap;
