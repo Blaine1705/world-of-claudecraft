@@ -19,6 +19,7 @@ import { WICKHARBOR_LAYOUT } from './wickharbor';
 
 export {
   BRIDGEMERE_BUILDINGS_BY_ID,
+  BRIDGEMERE_CAUSEWAY_ROAD,
   BRIDGEMERE_LAYOUT,
   BRIDGEMERE_NPC_PLACEMENTS_BY_ID,
 } from './bridgemere';

@@ -4,7 +4,7 @@
 // Driven through the real buildFenFeatures on the shipped WORLD_SEED with the
 // deferred GLBs replaced by one-mesh stand-ins (fenFeaturesInternalsForTest),
 // so every pin below is a fact about the shipping placement set: the census
-// counted 324 instances (191 lean) and drew all of them from Eastbrook on the
+// counted 326 instances (193 lean) and drew all of them from Eastbrook on the
 // low tier, where the whole-zone footprint's edge sits inside the 340 yd fog.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
@@ -170,11 +170,14 @@ describe('fen features per-cell cull groups', () => {
 
   it('draws exactly the shipped instance set, whatever the cell size', () => {
     build();
-    // 324 placements on the shipped seed (willow 54, lilies 47, reeds 69,
-    // mushrooms 127, log 27); the lean thin keeps 191 of them. The thin runs
-    // over the whole family before the split, so both layouts agree.
+    // 326 placements on the shipped seed (willow 56, lilies 47, reeds 69,
+    // mushrooms 127, log 27); the lean thin keeps 193 of them (it never thins
+    // the willows). The thin runs over the whole family before the split, so
+    // both layouts agree. Bridgemere's painted rebuild
+    // (sim/painted_towns/bridgemere.ts) let two willows root on the island's
+    // east bank, where the old kit inn's record kept them off.
     // (the two-part willow counts its instances once per part on both sides)
-    expect(instanceCount(whole.group)).toBe((GFX.leanFoliage ? 191 : 324) + wholeCount('willow'));
+    expect(instanceCount(whole.group)).toBe((GFX.leanFoliage ? 193 : 326) + wholeCount('willow'));
     expect(instanceCount(cells.group)).toBe(instanceCount(whole.group));
     // the live shape draws the same set too (cells everywhere, dressing sized)
     const vista = buildFenFeatures(WORLD_SEED, LIVE_ARM);
@@ -247,7 +250,7 @@ describe('fen features per-cell cull groups', () => {
     // placements, so each cull group counted once whatever its part count
     const keptInstances = kept.reduce((sum, g) => sum + meshesOf(g)[0].count, 0);
     expect(keptInstances).toBeGreaterThan(0);
-    // a small fraction of the 324
+    // a small fraction of the 326
     expect(keptInstances).toBeLessThanOrEqual(100);
     // and the near band is where the placements put it: every kept group's
     // edge sits in the last 40 yd before the fog, so a placement drift that
