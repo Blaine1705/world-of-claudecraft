@@ -13,6 +13,8 @@ import { MAILBOXES } from '../src/sim/content/mailboxes';
 import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
 import { STATIONS } from '../src/sim/content/professions';
 import { BUILTIN_WORLD, CAMPS, MOBS, ZONES, zoneAt } from '../src/sim/data';
+import { PAINTED_TOWN_SCATTER_PAD } from '../src/sim/decoration_exclusions';
+import { fenWillowSpots, hollowWillowSpots } from '../src/sim/fen_willows';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import {
   PAINTED_LOOK_MODELS,
@@ -27,7 +29,14 @@ import {
 } from '../src/sim/painted_towns';
 import { findPath, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld, type Obb2 } from '../src/sim/placed_town_kit';
-import { roadDistance, terrainHeight, terrainSteepnessAt, waterLevelAt } from '../src/sim/world';
+import {
+  farshorePalmSpots,
+  reachPalmSpots,
+  roadDistance,
+  terrainHeight,
+  terrainSteepnessAt,
+  waterLevelAt,
+} from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The painted towns (sim/painted_towns/): every built-in town after Highwatch
@@ -451,6 +460,26 @@ function describePaintedTown(town: PaintedTownLayout): void {
               `${building.id} door approach ${along}, ${side}`,
             ).toBeLessThanOrEqual(PLAYER_MAX_CLIMB_SLOPE);
           }
+        }
+      }
+    });
+
+    it('roots no generated palm or willow in a building', () => {
+      // These feature trees space themselves off building record CENTRES, which held
+      // a kit house's few yards but not a painted building's whole reach.
+      const trees = [
+        ...reachPalmSpots(SEED),
+        ...farshorePalmSpots(SEED),
+        ...fenWillowSpots(SEED),
+        ...hollowWillowSpots(SEED),
+      ];
+      for (const tree of trees) {
+        if (!nearTown(town, tree.x, tree.z, 120)) continue;
+        for (const building of buildings) {
+          expect(
+            distancePointToObb(tree, building.reach),
+            `${building.id} tree at ${tree.x.toFixed(2)}, ${tree.z.toFixed(2)}`,
+          ).toBeGreaterThanOrEqual(PAINTED_TOWN_SCATTER_PAD);
         }
       }
     });
