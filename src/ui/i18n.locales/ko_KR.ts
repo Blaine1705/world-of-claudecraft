@@ -11357,6 +11357,40 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'editor.biome.clearConfirm': '이 맵에서 칠한 생태 칸을 모두 제거할까요?',
   'editor.flatten.hint': '평탄화는 드래그를 시작할 때 커서 아래의 높이로 지면을 고릅니다.',
   'editor.flatten.hardEdge': '경계 선명하게',
+  'editor.topbar.pushMapChanges': '저장소 맵에 변경 사항 푸시',
+  'editor.topbar.pushMapChangesTitle':
+    '이 저장소 맵을 연 뒤 바꾼 내용만 현재 저장소 파일에 적용하고, 다른 사람의 푸시는 그대로 둡니다.',
+  'editor.push.notLinked':
+    '이 맵은 저장소 맵에서 열지 않아 푸시할 대상이 없습니다. 먼저 열기의 기본 맵에서 하나를 여세요.',
+  'editor.push.baseMissing':
+    '편집을 시작한 버전을 더 이상 찾을 수 없습니다. 저장소 맵을 다시 열고 변경 사항을 다시 하세요.',
+  'editor.push.repoMissing': '이 사본의 원본 저장소 맵이 없습니다.',
+  'editor.push.missingIds':
+    '저장소 맵에 ID가 없거나 ID가 겹치는 항목이 있어 변경 사항을 맞출 수 없습니다.',
+  'editor.push.nothing': '푸시할 내용이 없습니다. 연 뒤로 이 사본에 변경 사항이 없습니다.',
+  'editor.push.done':
+    '{slug}에 변경 사항 {count}개를 푸시했습니다. 편집기에 병합된 맵이 표시됩니다.',
+  'editor.push.withUpgrades':
+    '편집 중 일부가 맵을 열 때 편집기가 추가한 항목에 대한 것이어서, 해당 업그레이드도 함께 저장했습니다.',
+  'editor.push.overwriteTitle': '더 새로운 저장소 변경 사항을 덮어쓸까요?',
+  'editor.push.overwriteBody':
+    '이 저장소 맵을 연 뒤 다른 사람이 변경 사항을 푸시했습니다. 게시하면 파일 전체가 바뀌어 그 변경 사항이 사라집니다. 유지하려면 저장소 맵에 변경 사항 푸시를 사용하세요.',
+  'editor.push.conflictsTitle': '푸시 거부: 충돌하는 변경 사항',
+  'editor.push.conflictsBody':
+    '내 변경 사항 {count}개가 이 맵을 연 뒤 푸시된 변경 사항과 충돌합니다. 아무것도 쓰지 않았습니다. 열기에서 저장소 맵을 다시 열고 다음 항목을 다시 하세요:',
+  'editor.push.conflictRow': '{kind} {id}: {reason}',
+  'editor.push.conflictsMore': '외 {count}개.',
+  'editor.push.reasonBoth': '나와 다른 사람이 모두 바꿨습니다',
+  'editor.push.reasonDeleted': '한쪽은 삭제하고 다른 쪽은 바꿨습니다',
+  'editor.push.reasonOverlap': '내 지형 획이 더 새로운 획과 겹칩니다',
+  'editor.push.kindPlacement': '에셋',
+  'editor.push.kindTerrain': '지형 획',
+  'editor.push.kindGrassClear': '풀 제거 영역',
+  'editor.push.kindNpc': 'NPC',
+  'editor.push.kindObjectMove': '게임플레이 오브젝트',
+  'editor.push.kindPaint': '칠한 칸',
+  'editor.push.kindField': '맵 설정',
+  'editor.push.close': '닫기',
   'editor.objectMove.edited': '이 맵에서 변경됨.',
   'editor.objectMove.rotation': '회전(도)',
   'editor.objectMove.size': '크기',

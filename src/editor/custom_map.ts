@@ -507,7 +507,9 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
             : clonePropsKeepingAuthoredTowns(BUILTIN_WORLD.props),
     playerStart: { x: start.x, z: start.z },
     zoneAtmosphere: map.zoneAtmosphere ? deepClone(map.zoneAtmosphere) : undefined,
-    terrainEdits: deepClone(map.terrainEdits),
+    // Stamp ids are the editor's change-tracking handles; the game never
+    // reads them, so the game-ready world leaves them out.
+    terrainEdits: map.terrainEdits.map(({ id: _id, ...stamp }) => deepClone(stamp)),
     placements: placementsToPlayAssets(map.placements, map.assetCollisionMesh),
     biomePaint: map.biomePaint ? deepClone(map.biomePaint) : undefined,
     promotedScenery: promotedSceneryFor(map.propsMode, map.placements, map.promotedScenery),
@@ -572,7 +574,7 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     world.decorationExclusions = [...map.decorationExclusions];
   }
   if (map.grassClear && map.grassClear.length > 0) {
-    world.grassClear = map.grassClear.map((c) => ({ ...c }));
+    world.grassClear = map.grassClear.map(({ id: _id, ...c }) => ({ ...c }));
   }
   if (map.clutter && map.clutter.length > 0) {
     world.clutter = map.clutter.map((s) => ({ ...s }));

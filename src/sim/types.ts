@@ -11110,6 +11110,10 @@ export interface HeightStamp {
   noiseSize?: number;
   noiseSeed?: number;
   noiseRough?: number;
+  /** A Studio map's permanent id for this stamp, so a change-only push can
+   *  tell which stamps an edit added or erased (editor/map_merge_core.ts).
+   *  The terrain ignores it; the game-ready projection drops it. */
+  id?: string;
 }
 
 // A freely placed GLB model the editor drops onto the world. Rendered by the
