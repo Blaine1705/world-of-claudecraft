@@ -61,16 +61,16 @@ const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
 /** Each texture tier's file: its bytes and sha256 (the model first). */
 const SHIPPED: Record<MirefenTavernTier, { bytes: number; sha256: string }> = {
   full: {
-    bytes: 3576888,
-    sha256: 'fd13e5345871a6aea696012e37b2ce8638bc300ae4372fa6a888510ed3816099',
+    bytes: 3576400,
+    sha256: '6843861a5f5dcab076129138e51e69598f3c3b3873a62badc1ff20f41cb5f6e9',
   },
   half: {
-    bytes: 2622988,
-    sha256: '9b3ffb9bd2057451495da080c110dddfefc0715441c08d79d012e5f3d855622d',
+    bytes: 2623124,
+    sha256: 'acd0b689e4c6af69a8a787c48b80d898d35039c0a46f07f6ec984f6be80c8889',
   },
   quarter: {
-    bytes: 2336820,
-    sha256: '68b42389c65cdafdbf6b221552d8a835e665d73e070313d63e8fe94c13bf786e',
+    bytes: 2337004,
+    sha256: '3eb727b349b62d620849852fd7c35189d54f2945ed3f509e104f3326ffaa9428',
   },
 };
 const TIERS = Object.keys(SHIPPED) as MirefenTavernTier[];
@@ -97,7 +97,7 @@ const TRIANGLES: Record<string, number> = {
   TowerRoof: 2000,
   HallPorch: 2228,
   BarPillar: 784,
-  TavernTrim: 8804,
+  TavernTrim: 8808,
   TavernClutter: 12350,
 };
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */
