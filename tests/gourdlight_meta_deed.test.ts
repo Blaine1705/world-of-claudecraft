@@ -303,3 +303,29 @@ describe('the meta and its title', () => {
     }
   });
 });
+
+describe('/dev season eve', () => {
+  it('almost leaves one door for a real knock, and clear forgets the run', () => {
+    const sim = world();
+    const meta = metaOf(sim);
+    sim.chat('/dev season eve almost');
+    sim.tick();
+    expect(meta.deedStats.visited.has(GOURDLIGHT_KNOCK_MARKS[0])).toBe(false);
+    expect(GOURDLIGHT_EVE_MARKS.filter((m) => meta.deedStats.visited.has(m))).toHaveLength(
+      GOURDLIGHT_EVE_MARKS.length - 1,
+    );
+    expect(meta.deedsEarned.has(META)).toBe(false);
+    expect(meta.deedsEarned.has('feat_gourdlight_errands')).toBe(true);
+    const npc = npcEntity(sim, TRICK_OR_TREAT_NPCS.eastbrook_vale[0]);
+    standBeside(sim, npc);
+    sim.trickOrTreat(npc.id);
+    sim.tick();
+    expect(meta.deedsEarned.has(META)).toBe(true);
+    sim.setActiveTitle(META);
+    sim.chat('/dev season eve clear');
+    sim.tick();
+    expect(GOURDLIGHT_EVE_MARKS.some((m) => meta.deedStats.visited.has(m))).toBe(false);
+    for (const id of [...SECTIONS, META]) expect(meta.deedsEarned.has(id)).toBe(false);
+    expect(meta.activeTitle).toBe(null);
+  });
+});

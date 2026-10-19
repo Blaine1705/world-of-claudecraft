@@ -15,8 +15,15 @@
 //                               (the rounds and the dailies) so they can be redone.
 //                               The pick is world state: on a server it changes the
 //                               day's errand for every player on the realm.
+//   /dev season eve [almost|clear]  the whole-event checklist (Book of Deeds, round 12):
+//                               show your progress; `almost` marks every leaf but the
+//                               first Eastbrook door, so one real knock finishes the meta
+//                               and grants its title; `clear` forgets every leaf and the
+//                               four checklist Feats so the run can be redone.
 import { GOURDLIGHT_EVE_ID, GOURDLIGHT_ROUNDS_QUEST_ID } from '../content/gourdlight_eve';
 import { GOURDLIGHT_DAILY_POOL } from '../content/gourdlight_eve_dailies';
+import { GOURDLIGHT_EVE_MARKS, GOURDLIGHT_KNOCK_MARKS } from '../content/gourdlight_eve_deeds';
+import { markVisited, setActiveTitle } from '../deeds';
 import { weeklyQuestLockoutId } from '../quests/weekly_quest_lock';
 import type { SimContext } from '../sim_context';
 import { gourdlightDailyToday } from './gourdlight_dailies';
@@ -24,7 +31,42 @@ import { activeSeasonalEventOf } from './seasonal_state';
 import { KNOWN_SEASONAL_EVENTS } from './seasonal_tick';
 
 const USAGE =
-  '[dev] Usage: /dev season [on [event]|off|auto|knocks|daily [1-6|id|next|auto|reset]].';
+  '[dev] Usage: /dev season [on [event]|off|auto|knocks|daily [1-6|id|next|auto|reset]|eve [almost|clear]].';
+
+/** The four whole-event checklist Feats (content/deeds.ts, round 12). */
+const EVE_CHECKLIST_DEEDS = [
+  'feat_gourdlight_doorsteps',
+  'feat_gourdlight_errands',
+  'feat_gourdlight_frights',
+  'feat_gourdlight_eve_complete',
+];
+
+function handleEveDev(ctx: SimContext, arg: string, pid: number): void {
+  const log = (text: string) => ctx.emit({ type: 'log', text, pid });
+  const meta = ctx.players.get(pid);
+  if (!meta) return;
+  const visited = meta.deedStats.visited;
+  if (arg === 'almost') {
+    const spare = GOURDLIGHT_KNOCK_MARKS[0];
+    for (const mark of GOURDLIGHT_EVE_MARKS) if (mark !== spare) markVisited(ctx, meta, mark);
+  } else if (arg === 'clear') {
+    for (const mark of GOURDLIGHT_EVE_MARKS) visited.delete(mark);
+    for (const id of EVE_CHECKLIST_DEEDS) meta.deedsEarned.delete(id);
+    const e = ctx.entities.get(pid);
+    if (e && meta.activeTitle !== null && EVE_CHECKLIST_DEEDS.includes(meta.activeTitle)) {
+      setActiveTitle(meta, e, null);
+    }
+    ctx.markDeedsDirty(pid);
+    meta.wireRev++;
+  } else if (arg !== '') {
+    ctx.error(pid, USAGE);
+    return;
+  }
+  const have = GOURDLIGHT_EVE_MARKS.filter((m) => visited.has(m)).length;
+  log(
+    `[dev] Gourdlight Eve checklist: ${have}/${GOURDLIGHT_EVE_MARKS.length} (${arg === 'almost' ? `knock on ${GOURDLIGHT_KNOCK_MARKS[0].split(':').pop()} to finish` : arg === 'clear' ? 'cleared' : 'progress'}).`,
+  );
+}
 
 function handleDailyDev(ctx: SimContext, arg: string, pid: number): void {
   const log = (text: string) => ctx.emit({ type: 'log', text, pid });
@@ -96,6 +138,10 @@ export function handleSeasonalDevChat(ctx: SimContext, raw: string, pid: number)
   }
   if (verb === 'daily') {
     handleDailyDev(ctx, (m[2] ?? '').toLowerCase(), pid);
+    return true;
+  }
+  if (verb === 'eve') {
+    handleEveDev(ctx, (m[2] ?? '').toLowerCase(), pid);
     return true;
   }
   if (verb === 'knocks') {
