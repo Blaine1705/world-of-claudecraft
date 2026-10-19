@@ -293,6 +293,8 @@ describe('the Highwatch look', () => {
 // default model's numbers.
 const TOWN_LOOKS: Readonly<Record<string, readonly string[]>> = {
   pantile: ['house_a', 'shop_a', 'tavern'],
+  shakes: ['hall', 'house_a', 'tavern'],
+  diamond: ['hall', 'house_c', 'shop_a', 'smithy', 'tavern'],
 };
 
 describe.each(Object.entries(TOWN_LOOKS))('the %s town look', (look, buildings) => {
