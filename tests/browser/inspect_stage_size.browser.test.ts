@@ -15,7 +15,7 @@ import { cleanup, host, stubDeps } from './_harness';
 // This suite runs Chromium only (vitest.browser.config.ts), which reproduces the
 // sync-loop growth at one fractional scale; every floored case also fails on the
 // tall-buffer and fill checks with the canvas in flow. The unbounded Firefox
-// growth itself is evidenced by docs/screenshots/inspect-stage-firefox/.
+// growth itself is evidenced by the Firefox before/after captures on the PR.
 
 afterEach(() => {
   cleanup();
