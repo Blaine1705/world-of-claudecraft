@@ -231,7 +231,9 @@ const BROOM_RIDE: MountRideSpec = {
   knee: 2.15,
   ankle: -0.55,
   hips: 0.02,
-  lean: 0.06,
+  // a rider leans in over the shaft (round 10: also brings a short-armed body's hands
+  // down onto the handle, ride_grip_ik.ts gripAlongHandle)
+  lean: 0.2,
   // the grip's centre: the wrapped leather 0.82 m of model ahead of the broom's origin
   // (1.0 at the drawn scale), the rider sitting 0.13 behind it; its height the handle's,
   // 0.164 over the rider's root (the handle 0.584 over the broom's root, the seat 0.42)

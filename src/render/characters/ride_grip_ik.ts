@@ -102,6 +102,43 @@ export function reachArm(
 const gripLocal = new THREE.Vector3();
 const gripWorld = new THREE.Vector3();
 const rootQ = new THREE.Quaternion();
+const handleDir = new THREE.Vector3();
+const shoulderAt = new THREE.Vector3();
+const toShoulder = new THREE.Vector3();
+const elbowAt = new THREE.Vector3();
+const wristAt = new THREE.Vector3();
+
+/** How much of a straight arm a grip may take (a hand on a stick never locks the elbow). */
+export const GRIP_REACH = 0.94;
+
+/**
+ * Where along the handle a hand can close (round 10: the hands floated in front of the
+ * chest on the WOC bodies, whose arms are shorter than the old rig's, because the fixed
+ * grip lay out of reach and a two-bone reach toward an unreachable point stops short in
+ * the air). The handle is the line `origin + t * dir` (dir a unit vector, forward along the
+ * broom); `want` is the hand's authored place on it. The answer is `want` when the arm can
+ * reach it; else the farthest point along the handle the arm CAN reach (so the hand stays
+ * ON the handle, only nearer the rider); and when the handle passes wholly out of reach,
+ * the handle point nearest the shoulder. Writes the point into `out` and returns it.
+ */
+export function gripAlongHandle(
+  shoulder: THREE.Vector3,
+  origin: THREE.Vector3,
+  dir: THREE.Vector3,
+  want: number,
+  reach: number,
+  out: THREE.Vector3,
+): THREE.Vector3 {
+  toShoulder.subVectors(shoulder, origin);
+  const t0 = toShoulder.dot(dir);
+  const perp2 = Math.max(0, toShoulder.lengthSq() - t0 * t0);
+  let t = t0;
+  if (perp2 < reach * reach) {
+    const span = Math.sqrt(reach * reach - perp2);
+    t = Math.min(Math.max(want, t0 - span), t0 + span);
+  }
+  return out.copy(origin).addScaledVector(dir, t);
+}
 
 /** Both hands onto the grip: the leading (right) hand ahead, the left behind it. */
 export function applyRideGrip(
@@ -126,14 +163,33 @@ export function applyRideGrip(
   // never the whole rider subtree the scene pass updates anyway
   ul?.updateWorldMatrix(true, true);
   ur?.updateWorldMatrix(true, true);
-  if (ul && fl && hl) {
-    gripLocal.set(0.04, grip.up, grip.forward - grip.stagger * 0.5);
-    root.localToWorld(gripWorld.copy(gripLocal));
-    reachArm(ul, fl, hl, gripWorld, rootQ, 1, k);
-  }
-  if (ur && fr && hr) {
-    gripLocal.set(-0.04, grip.up, grip.forward + grip.stagger * 0.5);
-    root.localToWorld(gripWorld.copy(gripLocal));
-    reachArm(ur, fr, hr, gripWorld, rootQ, -1, k);
-  }
+  // the handle runs forward along the rider's own +Z through the grip height
+  handleDir.set(0, 0, 1).applyQuaternion(rootQ).normalize();
+  const scale = root.getWorldScale(gripLocal).x || 1;
+  if (ul && fl && hl)
+    placeHand(root, ul, fl, hl, 0.04, grip.forward - grip.stagger * 0.5, grip, scale);
+  if (ul && fl && hl) reachArm(ul, fl, hl, gripWorld, rootQ, 1, k);
+  if (ur && fr && hr)
+    placeHand(root, ur, fr, hr, -0.04, grip.forward + grip.stagger * 0.5, grip, scale);
+  if (ur && fr && hr) reachArm(ur, fr, hr, gripWorld, rootQ, -1, k);
+}
+
+/** One hand's grip on the handle, written into `gripWorld`: its authored place, pulled
+ *  back along the handle when this body's arm cannot reach that far (gripAlongHandle). */
+function placeHand(
+  root: THREE.Object3D,
+  upper: THREE.Object3D,
+  fore: THREE.Object3D,
+  hand: THREE.Object3D,
+  side: number,
+  forward: number,
+  grip: RideGrip,
+  scale: number,
+): void {
+  upper.getWorldPosition(shoulderAt);
+  fore.getWorldPosition(elbowAt);
+  hand.getWorldPosition(wristAt);
+  const reach = (shoulderAt.distanceTo(elbowAt) + elbowAt.distanceTo(wristAt)) * GRIP_REACH;
+  root.localToWorld(gripLocal.set(side, grip.up, 0));
+  gripAlongHandle(shoulderAt, gripLocal, handleDir, forward * scale, reach, gripWorld);
 }
