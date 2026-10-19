@@ -1316,7 +1316,9 @@ const MONOLITHS: MonolithRow[] = [
     // Vault storage declarations and revisions now live behind character_storage.
     // Both extractions compose at 11625 lines after the currency reconciliation.
     // Measured on the combined tree; neither parent's ceiling is raised.
-    ceiling: 11625,
+    // Buyback save projection now joins the character_storage boundary.
+    // LOWERED to the measured 11624 lines after canonical source save repair.
+    ceiling: 11624,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

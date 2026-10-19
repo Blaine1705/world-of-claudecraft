@@ -3911,7 +3911,6 @@ export class Sim {
         ]),
       ),
       ...savedCharacterStorage(meta),
-      vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
         counts: [...q.counts],

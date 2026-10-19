@@ -96,6 +96,7 @@ import { isItemLocked } from './item_lock_flag';
 import { normalizePartyTradeSlots } from './loot/bop_trade_cleanup';
 import { materialItemIds } from './material_ids';
 import { applyMaterialInventoryTake } from './material_inventory_take';
+import { savedMaterialSlot } from './material_slot_load';
 import { resolveMaterialSourceTransferSelection } from './material_source_transfer_selection';
 import type { MaterialComposition, MaterialSourceCount } from './material_sources';
 import type { PlayerMeta } from './sim';
@@ -192,7 +193,7 @@ export function savedVaultState(state: MaterialsVaultState): SavedMaterialsVault
     ...(state.special.length > 0
       ? {
           special: state.special.map((slot) => {
-            const clone = cloneInvSlot(slot);
+            const clone = savedMaterialSlot(slot);
             delete clone.slot;
             return clone;
           }),

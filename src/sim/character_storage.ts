@@ -3,9 +3,9 @@
 import { sanitizeBankState, savedBankState } from './bank';
 import type { CharacterState } from './character_state';
 import { absorbLegacyHeroicMarkSlots, sanitizeHeroicMarks } from './heroic_marks';
+import { savedMaterialSlot } from './material_slot_load';
 import * as vaultMod from './materials_vault';
 import type { PlayerMeta } from './sim';
-import { cloneInvSlot } from './types';
 import * as weeklyMod from './weekly_rewards';
 
 export function restoreCharacterStorage(
@@ -32,9 +32,13 @@ export function restoreCharacterStorage(
 
 export function savedCharacterStorage(
   meta: PlayerMeta,
-): Pick<CharacterState, 'inventory' | 'bags' | 'bank' | 'vault' | 'weeklyRewards' | 'heroicMarks'> {
+): Pick<
+  CharacterState,
+  'inventory' | 'bags' | 'bank' | 'vault' | 'weeklyRewards' | 'heroicMarks' | 'vendorBuyback'
+> {
   return {
-    inventory: meta.inventory.map(cloneInvSlot),
+    inventory: meta.inventory.map(savedMaterialSlot),
+    vendorBuyback: meta.vendorBuyback.map(savedMaterialSlot),
     bags: [...meta.bags],
     bank: savedBankState(meta.bank),
     // Hand-enumerated clone: tsc forces a new REQUIRED MaterialsVaultState field

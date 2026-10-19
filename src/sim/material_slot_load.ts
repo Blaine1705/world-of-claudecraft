@@ -53,8 +53,17 @@ export function preservesMaterialCountOnLoad(
 /** Called after the existing instance/recipe sanitizers, on owned row data. */
 export function normalizeLoadedMaterialSlot(slot: InvSlot): InvSlot {
   validateMaterialSlotSourcesOnLoad(slot);
+  return savedMaterialSlot(slot);
+}
+
+/** Canonical, detached save projection. One source validation/projection per
+ * slot; unlike load, saving needs no pre-sanitizer pass over the composition.
+ * Legacy unsigned units are explicit unknown sources, never invented makers. */
+export function savedMaterialSlot(slot: InvSlot): InvSlot {
   const ids = slotMaterialIds(slot);
   if (!ids) return cloneInvSlot(slot);
+  if (slot.instance !== undefined && !record(slot.instance)) throw new Error(LOAD_REFUSED);
+  if (isChargeBearingPayload(slot.instance) && slot.count !== 1) throw new Error(LOAD_REFUSED);
   const normalized = normalizeMaterialStack(slot, ids);
   if (!normalized.ok) throw new Error(LOAD_REFUSED);
   return normalized.value;

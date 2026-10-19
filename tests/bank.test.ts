@@ -1552,6 +1552,9 @@ describe('persistence and back-compat', () => {
       { itemId: 'worn_sword', count: 1, instance: { signer: 'Cyd' } },
     ];
     const s1 = sim.serializeCharacter(sim.playerId)!;
+    // The current serializer emits canonical sources. Construct historical
+    // input explicitly so this remains a test of the legacy LOAD boundary.
+    s1.bank!.inventory = structuredClone(m.bank.inventory);
     // Non-vacuity: the FIRST save really is the legacy shape. Without this the
     // conversion assertion below could be comparing canonical stock to itself.
     expect(s1.bank!.inventory[0].materialSources).toBeUndefined();

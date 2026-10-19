@@ -33,6 +33,7 @@ import { isMaterialItemId } from './material_ids';
 import {
   normalizeLoadedMaterialSlot,
   preservesMaterialCountOnLoad,
+  savedMaterialSlot,
   validateMaterialSlotSourcesOnLoad,
 } from './material_slot_load';
 import {
@@ -975,7 +976,7 @@ export function sanitizeBankState(
  *  pre-phase-11 save and every never-purchased save stays byte-equal. */
 export function savedBankState(bank: BankState): SavedBankState {
   return {
-    inventory: bank.inventory.map(cloneInvSlot),
+    inventory: bank.inventory.map(savedMaterialSlot),
     purchasedSlots: bank.purchasedSlots,
     bonusSlots: bank.bonusSlots,
     ...(bank.unlockedSockets > 0 || bank.socketBags.some((b) => b !== null)
