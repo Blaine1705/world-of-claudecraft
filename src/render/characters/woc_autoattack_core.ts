@@ -39,10 +39,14 @@ export function pickWocAutoAttack(input: {
 }): { clip: string | null; delay: number } | null {
   const { def, abilityId, kind, style, singleSetTwoHander, index, has } = input;
   if (!def.wocCharacter || abilityId || kind === 'wand') return null;
-  const ranged = kind !== 'melee' && def.clips.attack.includes('Ranged_Shoot');
+  const ranged =
+    kind !== 'melee' &&
+    (def.clips.attack.includes('Ranged_Shoot') || def.clips.attack.includes('Woc_Attack_Rifle'));
   const twoHanded =
     !singleSetTwoHander &&
-    (style === 'twohand' || (style === null && def.clips.attack.includes('2H_Chop')));
+    (style === 'twohand' ||
+      (style === null &&
+        (def.clips.attack.includes('2H_Chop') || def.clips.attack.includes('Woc_Attack_2H_0'))));
   let clip = ranged
     ? input.bowSkin
       ? 'Woc_Attack_Bow'

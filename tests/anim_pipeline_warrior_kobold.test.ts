@@ -94,10 +94,14 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     const block = warriorBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_0-9]+)',$/gm)];
     expect(rows.length).toBeGreaterThanOrEqual(18); // the strikes; the instant casts carry no entry
-    const wocClips = new Set(clipNamesOf('public/models/chars/players/woc/anims_male.glb'));
+    const baseClips = new Set(clipNamesOf('public/models/chars/players/woc/anims_male.glb'));
     // the 2026-09-24 set (one-hand and single-weapon clips; its two-hand *_2H set left
     // 2026-09-30) plus the 2026-09-28 dual-wield set
-    expect(wocClips.size).toBe(51);
+    expect(baseClips.size).toBe(51);
+    const wocClips = new Set([
+      ...baseClips,
+      ...clipNamesOf('public/models/chars/players/woc_keyed/woc_male.glb'),
+    ]);
     const map: Record<string, string> = {};
     for (const [, abilityId, clip] of rows) {
       map[abilityId] = clip;
@@ -112,8 +116,8 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     }
     // This batch's additions, re-homed on the WOC vocabulary: every one still
     // reaches playAttack the same way (the build script's header trace).
-    expect(map.heroic_leap).toBe('2H_Chop');
-    expect(map.victory_rush).toBe('1H_Slash');
+    expect(map.heroic_leap).toBe('Woc_Attack_2H_0');
+    expect(map.victory_rush).toBe('Woc_Attack_1H_1');
     // Instant casts play NO gesture on the WOC body (owner call, 2026-09-16):
     // the buff and aura ids deliberately have no entry, so the painter draws
     // nothing and the generic cast arm stays silent (playAttack gestureOnly).

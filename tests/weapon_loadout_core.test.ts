@@ -166,13 +166,25 @@ describe('the dual set on the WOC bodies', () => {
         swappedClip(dual, '2H_Chop', () => true),
         key,
       ).toBe('Dual_Cross');
+      expect(
+        swappedClip(dual, 'Woc_Attack_2H_0', () => true),
+        key,
+      ).toBe('Woc_Attack_Dual');
       // the whole dual set, untouched by the 2026-09-30 two-hand change
       expect(dual, key).toEqual({
         Combat_Idle: 'Combat_Idle_Dual',
+        Woc_Combat_Idle_1H: 'Woc_Combat_Idle_Dual',
         Hit: 'Hit_Dual',
+        Woc_Hit: 'Woc_Hit',
         '1H_Chop': 'Dual_Stab',
         '1H_Slash': 'Dual_Cross',
         '2H_Chop': 'Dual_Cross',
+        Woc_Attack_1H_0: 'Woc_Attack_Offhand_Stab',
+        Woc_Attack_1H_1: 'Woc_Attack_Dual',
+        Woc_Attack_1H_Stab: 'Woc_Attack_Offhand_Stab',
+        Woc_Special_1H: 'Woc_Attack_Dual',
+        Woc_Attack_2H_0: 'Woc_Attack_Dual',
+        Woc_Attack_2H_1: 'Woc_Attack_Dual',
       });
       // while ONE two-hander strikes it as the single set's one-hand chop
       const twohand = VISUALS[key].clips.loadoutSwaps?.twohand ?? null;
@@ -180,6 +192,10 @@ describe('the dual set on the WOC bodies', () => {
         swappedClip(twohand, '2H_Chop', () => true),
         key,
       ).toBe('1H_Chop_Single');
+      expect(
+        swappedClip(twohand, 'Woc_Attack_2H_0', () => true),
+        key,
+      ).toBe('Woc_Attack_1H_0');
     }
   });
 });
@@ -253,8 +269,9 @@ describe('the two-hand loadout on the WOC bodies (2026-09-30: no two-hand stance
       expect(swappedClip(twohand, '1H_Slash', has), key).toBe('1H_Slash_Single');
       // the heavy chop (the auto attack through attackByHand.twohand, Mortal Strike, Execute,
       // Final Edict...): 2H_Chop takes both fists onto the grip, so it is the single chop here
-      expect(VISUALS[key].clips.attackByHand?.twohand, key).toBe('2H_Chop');
+      expect(VISUALS[key].clips.attackByHand?.twohand, key).toBe('Woc_Attack_2H_0');
       expect(swappedClip(twohand, '2H_Chop', has), key).toBe('1H_Chop_Single');
+      expect(swappedClip(twohand, 'Woc_Attack_2H_0', has), key).toBe('Woc_Attack_1H_0');
     }
   });
 
@@ -262,7 +279,12 @@ describe('the two-hand loadout on the WOC bodies (2026-09-30: no two-hand stance
     expect(WOC_KEYS).toHaveLength(18);
     for (const key of WOC_KEYS) {
       const swaps = VISUALS[key].clips.loadoutSwaps;
-      expect(swaps?.twohand, key).toEqual({ ...swaps?.single, '2H_Chop': '1H_Chop_Single' });
+      expect(swaps?.twohand, key).toEqual({
+        ...swaps?.single,
+        '2H_Chop': '1H_Chop_Single',
+        Woc_Attack_2H_0: 'Woc_Attack_1H_0',
+        Woc_Attack_2H_1: 'Woc_Attack_1H_1',
+      });
     }
   });
 
@@ -279,14 +301,15 @@ describe('the two-hand loadout on the WOC bodies (2026-09-30: no two-hand stance
 
   it('keeps a one-hand weapon and a staff on their own heavy chop (the single set maps no 2H_Chop)', () => {
     // a staff is the single loadout, flagged two-hand or not: the staff classes' auto attack and a
-    // staff shaman's two-hand swing stay 2H_Chop, as does a one-hand warrior's Mortal Strike
+    // staff shaman's two-hand swing stay Woc_Attack_2H_0, as does a one-hand warrior's Mortal Strike
     expect(weaponLoadout(body({ mainhandItemId: 'briarroot_staff' }))).toBe('single');
     for (const key of WOC_KEYS) {
       const single = VISUALS[key].clips.loadoutSwaps?.single ?? null;
       expect(swappedClip(single, '2H_Chop', has), key).toBe('2H_Chop');
+      expect(swappedClip(single, 'Woc_Attack_2H_0', has), key).toBe('Woc_Attack_2H_0');
     }
     for (const key of ['player_priest', 'player_mage', 'player_druid'] as const) {
-      expect(VISUALS[key].clips.attack, key).toEqual(['2H_Chop']);
+      expect(VISUALS[key].clips.attack, key).toEqual(['Woc_Attack_2H_0']);
     }
   });
 

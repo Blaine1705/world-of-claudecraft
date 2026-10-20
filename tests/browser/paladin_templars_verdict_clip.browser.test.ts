@@ -87,9 +87,9 @@ describe('Paladin Templar Verdict baked asset', () => {
     'keeps the authored WOC chop and solar effect on %s until the next attack',
     (key) => {
       const prepared = prepareVisual(key);
-      const authored = prepared.clips.get('2H_Chop');
+      const authored = prepared.clips.get('Woc_Attack_2H_0');
       expect(authored).toBeDefined();
-      expect(prepared.def.clips.attackByAbility?.final_edict).toBe('2H_Chop');
+      expect(prepared.def.clips.attackByAbility?.final_edict).toBe('Woc_Attack_2H_0');
       expect(prepared.clips.has(PALADIN_TEMPLARS_VERDICT_CLIP)).toBe(false);
       const visual = new CharacterVisual(key, 0xffffff);
       // The next auto attack (the hand-keyed white swing) must clear the solar effect:
@@ -97,10 +97,10 @@ describe('Paladin Templar Verdict baked asset', () => {
       visual.setWeapon('eastbrook_greatsword');
       visual.update(0, IDLE, true);
       // What the hands hold picks the chop's variant (weapon_loadout_core.ts: a two-hander plays
-      // the two-hand set's chop); the authored ability clip is that variant of 2H_Chop.
+      // the two-hand set's chop); the authored ability clip is that variant of Woc_Attack_2H_0.
       const swap = (visual as unknown as { loadoutSwap: Record<string, string> | null })
         .loadoutSwap;
-      const played = prepared.clips.get(swap?.['2H_Chop'] || '2H_Chop');
+      const played = prepared.clips.get(swap?.['Woc_Attack_2H_0'] || 'Woc_Attack_2H_0');
       expect(played).toBeDefined();
       visual.playAttack('final_edict');
       // half way through the clip that PLAYS (the variant runs at its own length): the

@@ -215,6 +215,7 @@ import type { SeatClipSet } from './seat_clips';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
+import wocAutoAttackContacts from './woc_autoattack_contacts.json';
 import {
   WOC_DRUID_FEMALE_MANIFEST,
   WOC_DRUID_MANIFEST,
@@ -841,6 +842,12 @@ const WOC_SINGLE: Readonly<Record<string, string>> = {
   '1H_Chop': '1H_Chop_Single',
   '1H_Slash': '1H_Slash_Single',
   Hit: 'Hit_Single',
+  Woc_Combat_Idle_1H: 'Woc_Combat_Idle_1H',
+  Woc_Hit: 'Woc_Hit',
+  Woc_Attack_1H_0: 'Woc_Attack_1H_0',
+  Woc_Attack_1H_1: 'Woc_Attack_1H_1',
+  Woc_Attack_1H_Stab: 'Woc_Attack_1H_Stab',
+  Woc_Special_1H: 'Woc_Special_1H',
 };
 
 // Two-hand weapon: no two-hand stance (owner call, 2026-09-30: "just have the same animations as
@@ -854,6 +861,8 @@ const WOC_SINGLE: Readonly<Record<string, string>> = {
 const WOC_TWO_HAND: Readonly<Record<string, string>> = {
   ...WOC_SINGLE,
   '2H_Chop': '1H_Chop_Single',
+  Woc_Attack_2H_0: 'Woc_Attack_1H_0',
+  Woc_Attack_2H_1: 'Woc_Attack_1H_1',
 };
 
 // Dual wield: a blade in each hand (weapon_loadout_core 'dual'). The two blades cross in front
@@ -863,12 +872,20 @@ const WOC_TWO_HAND: Readonly<Record<string, string>> = {
 // fast Dual_Chop halves (attackByHand.dualwield) and its both-hands pairs (dualWieldPair).
 const WOC_DUAL: Readonly<Record<string, string>> = {
   Combat_Idle: 'Combat_Idle_Dual',
+  Woc_Combat_Idle_1H: 'Woc_Combat_Idle_Dual',
   Hit: 'Hit_Dual',
+  Woc_Hit: 'Woc_Hit',
   '1H_Chop': 'Dual_Stab',
   '1H_Slash': 'Dual_Cross',
   // The heavy chop (Execute, Slam, Mortal Strike...) with a weapon in each hand, a Titan's
   // Grip pair of two-handers included (2026-09-29): the X-slash, never both fists on one grip.
   '2H_Chop': 'Dual_Cross',
+  Woc_Attack_1H_0: 'Woc_Attack_Offhand_Stab',
+  Woc_Attack_1H_1: 'Woc_Attack_Dual',
+  Woc_Attack_1H_Stab: 'Woc_Attack_Offhand_Stab',
+  Woc_Special_1H: 'Woc_Attack_Dual',
+  Woc_Attack_2H_0: 'Woc_Attack_Dual',
+  Woc_Attack_2H_1: 'Woc_Attack_Dual',
 };
 
 // Blade contact times (seconds from the first frame, hand order) of the WOC melee clips, per
@@ -887,6 +904,11 @@ export const WOC_CONTACTS: Readonly<Record<string, readonly number[]>> = {
   Dual_Cross: [0.125, 0.092],
   Dual_Stab: [0.108],
   Block: [0.358],
+  ...wocAutoAttackContacts.male,
+  Woc_Attack_1H_Stab: [0.325],
+  Woc_Attack_Offhand_Stab: [0.542],
+  Woc_Shield_Bash: [0.292],
+  Woc_Special_1H: [0.325],
 };
 
 /** The female body's contacts (its own clips: the same keys, its own reach and timing). */
@@ -902,6 +924,11 @@ export const WOC_CONTACTS_FEMALE: Readonly<Record<string, readonly number[]>> = 
   Dual_Cross: [0.125, 0.108],
   Dual_Stab: [0.108],
   Block: [0.358],
+  ...wocAutoAttackContacts.female,
+  Woc_Attack_1H_Stab: [0.375],
+  Woc_Attack_Offhand_Stab: [0.325],
+  Woc_Shield_Bash: [0.292],
+  Woc_Special_1H: [0.325],
 };
 
 /** A WOC body's files (woc_armor_core.ts): its fit's shared base and animation
@@ -964,7 +991,7 @@ const wocRigClips = (attack: string[]): ClipMap => ({
   emote: WOC_EMOTES,
   loadoutSwaps: { twohand: WOC_TWO_HAND, single: WOC_SINGLE, dual: WOC_DUAL },
   // two swings in one frame: the X-slash, then the one-two of the whole Dual_Chop
-  dualWieldPair: ['Dual_Cross', 'Dual_Chop'],
+  dualWieldPair: ['Woc_Attack_Dual', 'Dual_Chop'],
   contacts: WOC_CONTACTS,
 });
 
@@ -2606,48 +2633,46 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['1H_Chop', '1H_Slash']),
+      ...woc(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']),
       // Instant casts play no gesture on this body (owner call): the six
       // shouts keep their ring and wave, the roar animation is off.
       shoutEmote: null,
-      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      attackByHand: { twohand: 'Woc_Attack_2H_0', dualwield: 'Dual_Chop' },
       // Dual_Chop is two self-contained fast strikes from the crossed guard, 24
       // frames at 60 fps each (2026-09-28): the cut at 0.4 s lands exactly on the
       // guard between them, and each blade lands ~0.125 s into its half
       // (WOC_CONTACTS; tests/woc_character.test.ts measures both off the library).
       dualWieldSplit: 0.4,
       // Every warrior ability the KayKit body routed keeps its entry; the clips
-      // are this rig's own vocabulary (verified against the shipped GLB by
+      // are the stock WoW combat vocabulary (verified against the shipped GLB by
       // tests/character_clipmaps.test.ts and tests/warrior_render_contract.test.ts).
       attackByAbility: {
-        mortal_strike: '2H_Chop',
-        execute: '2H_Chop',
-        slam: '2H_Chop',
-        red_harvest: '2H_Chop',
-        breachmaker: '2H_Chop',
-        // Shieldcrack braces behind the offhand shield: the rig's guard (the
-        // KayKit body had a synthesized shield bash; this rig ships none).
-        shield_slam: 'Block',
-        raging_gale: 'Dual_Chop',
-        bloodthirst: 'Dual_Chop',
+        mortal_strike: 'Woc_Attack_2H_0',
+        execute: 'Woc_Attack_2H_0',
+        slam: 'Woc_Attack_2H_0',
+        red_harvest: 'Woc_Attack_2H_1',
+        breachmaker: 'Woc_Attack_2H_1',
+        // Shieldcrack drives the offhand shield forward (stock WoW ShieldBash).
+        shield_slam: 'Woc_Shield_Bash',
+        raging_gale: 'Woc_Attack_Dual',
+        bloodthirst: 'Woc_Attack_Dual',
         // Reaping Arc and Revenge sweep the frontal arc: the sideways slash,
         // never the top-to-bottom chop (owner: "sideways sword sweep").
-        cleave: '1H_Slash',
-        revenge: '1H_Slash',
-        thunder_clap: '1H_Chop',
-        faultline: '1H_Chop',
-        heroic_strike: '1H_Slash',
-        overpower: '1H_Slash',
-        hamstring: '1H_Slash',
-        // Jawcrack is a bare-fist interrupt; this rig has no punch, so the
-        // quick chop stands in.
-        pummel: '1H_Chop',
+        cleave: 'Woc_Special_1H',
+        revenge: 'Woc_Attack_1H_1',
+        thunder_clap: 'Woc_Special_1H',
+        faultline: 'Woc_Attack_2H_1',
+        heroic_strike: 'Woc_Attack_1H_0',
+        overpower: 'Woc_Attack_1H_1',
+        hamstring: 'Woc_Attack_1H_Stab',
+        // Jawcrack is a bare-fist interrupt (stock WoW AttackUnarmed).
+        pummel: 'Woc_Attack_Unarmed_0',
         // Vaulting Charge completes through the renderer's generic 'selfCast'
         // cue, which only draws a body gesture via this exact entry: the
-        // two-hand slam reads as the landing (no bespoke leap on this rig).
-        heroic_leap: '2H_Chop',
+        // two-hand slam reads as the landing.
+        heroic_leap: 'Woc_Attack_2H_0',
         // Victor's Surge is a real weapon strike: the decisive one-hand slash.
-        victory_rush: '1H_Slash',
+        victory_rush: 'Woc_Attack_1H_1',
         // Deliberately absent (owner call: instant casts play no animation on
         // this body): sanguine_aura, raised_guard, die_by_sword, berserker_rage,
         // recklessness, avatar, piercing_howl. With no entry the ability
@@ -2662,7 +2687,7 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0],
     offhandSlot: 1,
   },
-  // The paladin rides the SAME WOC body, appearance parts and 51 clips as the
+  // The paladin rides the SAME WOC body, appearance parts and clips as the
   // warrior (its build takes the warrior pack's base and appearance; only the
   // armor pack differs) and dresses from `armor_paladin.glb`. Same owner rules
   // as the warrior: instant casts play no gesture, only real strikes swing.
@@ -2682,23 +2707,24 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['1H_Chop', '1H_Slash']),
+      ...woc(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']),
       shoutEmote: null,
-      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      attackByHand: { twohand: 'Woc_Attack_2H_0', dualwield: 'Dual_Chop' },
       dualWieldSplit: 0.4,
+      cast: 'Woc_Cast_Omni',
       // Only the weapon strikes: Crusader Strike and Vowkeeper Strike are
-      // one-hand blows, Final Edict the decisive two-hand chop; the two
-      // interrupts stand in with the quick chop like the warrior's Jawcrack.
+      // one-hand blows, Final Edict the decisive two-hand chop; Hushbrand
+      // drives the shield, Rebuke swings the quick chop.
       // Every instant cast (auras, blessings, wards, shocks, hammers, the
       // taunts, Consecration, Bastion Sweep, Sunward Disc) has no entry on
-      // purpose: no gesture, no emote. Timed heals ride the cast loop.
+      // purpose: no gesture, no emote. Timed heals ride the omni cast loop.
       attackByAbility: {
-        crusader_strike: '1H_Chop',
-        vowkeeper_strike: '1H_Slash',
-        final_edict: '2H_Chop',
-        hushbrand: '1H_Chop',
-        rebuke: '1H_Chop',
-        mercy_lance: 'Cast_Shoot',
+        crusader_strike: 'Woc_Attack_1H_0',
+        vowkeeper_strike: 'Woc_Attack_1H_1',
+        final_edict: 'Woc_Attack_2H_0',
+        hushbrand: 'Woc_Shield_Bash',
+        rebuke: 'Woc_Attack_1H_0',
+        mercy_lance: 'Woc_Cast_Shoot',
       },
     },
     attach: [
@@ -2709,13 +2735,10 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The hunter on the WOC body (equipment set of 2026-09-18). The auto shot and
-  // every instant shot play the artist's crossbow clip; a timed shot aims from
-  // its raise and holds the crossbow up until the cast lands, then the release
+  // every instant shot play the stock WoW crossbow/rifle clip; a timed shot aims
+  // from its raise and holds the crossbow up until the cast lands, then the release
   // half (the shot and the lowering) plays at the damage event, so the raise
-  // never replays under the shot (clipSplits). The clip is a snap shot
-  // (2026-09-29): the sim launches the bolt on the attack event, so the
-  // crossbow is up and aimed by 0.13 s and fires straight after the 0.17 s
-  // split, instead of the old 0.62 s raise that fired long after the bolt.
+  // never replays under the shot (clipSplits).
   // Melee strikes swing the blade. Aspects, traps and pet commands play nothing.
   player_hunter: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
@@ -2733,43 +2756,47 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['Ranged_Shoot']),
-      meleeAttack: ['1H_Chop', '1H_Slash'],
+      ...woc(['Woc_Attack_Rifle']),
+      meleeAttack: ['Woc_Attack_1H_0', 'Woc_Attack_1H_1'],
       shoutEmote: null,
       clipSplits: [
-        { clip: 'Ranged_Shoot', at: 0.17, names: ['Ranged_Shoot#aim', 'Ranged_Shoot#release'] },
+        {
+          clip: 'Woc_Attack_Rifle',
+          at: 0.17,
+          names: ['Woc_Attack_Rifle#aim', 'Woc_Attack_Rifle#release'],
+        },
       ],
-      cast: 'Ranged_Shoot#aim',
+      cast: 'Woc_Attack_Rifle#aim',
       castHoldPointSeconds: 0.15,
       castByAbility: {
-        volley: 'Ranged_Shoot',
-        rapid_fire: 'Ranged_Shoot',
-        tame_beast: 'Cast_Loop',
-        revive_pet: 'Cast_Loop',
+        volley: 'Woc_Attack_Rifle',
+        rapid_fire: 'Woc_Attack_Rifle',
+        tame_beast: 'Woc_Channel_Directed',
+        revive_pet: 'Woc_Cast_Omni',
       },
       attackByAbility: {
-        aimed_shot: 'Ranged_Shoot#release',
-        measured_shot: 'Ranged_Shoot#release',
-        arcane_shot: 'Ranged_Shoot',
-        serpent_sting: 'Ranged_Shoot',
-        wyvern_sting: 'Ranged_Shoot',
-        raptor_strike: '1H_Chop',
-        mongoose_bite: '1H_Slash',
-        wing_clip: '1H_Slash',
-        bloodhook: '1H_Slash',
-        counter_shot: 'Ranged_Shoot',
-        startle_shot: 'Ranged_Shoot',
-        concussive_shot: 'Ranged_Shoot',
-        multi_shot: 'Ranged_Shoot',
-        shrapnel_charge: 'Ranged_Shoot',
+        aimed_shot: 'Woc_Attack_Rifle#release',
+        measured_shot: 'Woc_Attack_Rifle#release',
+        arcane_shot: 'Woc_Attack_Rifle',
+        serpent_sting: 'Woc_Attack_Rifle',
+        wyvern_sting: 'Woc_Attack_Rifle',
+        raptor_strike: 'Woc_Attack_1H_0',
+        mongoose_bite: 'Woc_Attack_1H_1',
+        wing_clip: 'Woc_Attack_1H_1',
+        bloodhook: 'Woc_Attack_1H_Stab',
+        counter_shot: 'Woc_Attack_Rifle',
+        startle_shot: 'Woc_Attack_Rifle',
+        concussive_shot: 'Woc_Attack_Rifle',
+        multi_shot: 'Woc_Attack_Rifle',
+        shrapnel_charge: 'Woc_Attack_Rifle',
       },
     },
     attach: [{ url: `${WEAPONS}/crossbow_starter.glb`, bone: 'handslot.r' }],
   },
   // The rogue on the WOC body: every strike, opener and finisher is a weapon
-  // blow, so the physical damage event swings the artist's clips (the dual
+  // blow, so the physical damage event swings the stock WoW clips (the dual
   // halves alternate when two blades are drawn) and needs no per-ability
-  // entry; stealth, sprint, poisons and the cooldowns play nothing.
+  // entry for builders; stealth, sprint, poisons and the cooldowns play nothing.
   player_rogue: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2786,25 +2813,24 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['1H_Chop', '1H_Slash']),
+      ...woc(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']),
       shoutEmote: null,
       attackByHand: { dualwield: 'Dual_Chop' },
       dualWieldSplit: 0.4,
-      // The one-hand names resolve through the loadout: with a blade in each hand the chop
-      // family plays the thrust (Dual_Stab) and the slash family the X-slash (Dual_Cross);
-      // with one blade the free-hand single set. Sinister Strike, Hemorrhage and the rest of
-      // the builders swing the fast Dual_Chop halves like the auto attack.
+      // The one-hand names resolve through the loadout: with a blade in each hand the stab
+      // and chop family plays the offhand thrust (Woc_Attack_Offhand_Stab) and the slash/special
+      // family the dual strike (Woc_Attack_Dual); with one blade the free-hand single set.
       attackByAbility: {
-        venom_dart: 'Cast_Shoot',
-        crippling_poison: '1H_Slash',
-        rupture: '1H_Slash',
-        eviscerate: '1H_Slash',
-        expose_armor: '1H_Slash',
-        backstab: '1H_Chop',
-        ambush: '1H_Chop',
-        gouge: '1H_Chop',
-        cheap_shot: '1H_Chop',
-        kidney_shot: '1H_Chop',
+        venom_dart: 'Woc_Attack_Thrown',
+        crippling_poison: 'Woc_Attack_1H_1',
+        rupture: 'Woc_Attack_1H_1',
+        eviscerate: 'Woc_Special_1H',
+        expose_armor: 'Woc_Attack_1H_1',
+        backstab: 'Woc_Attack_1H_Stab',
+        ambush: 'Woc_Attack_1H_Stab',
+        gouge: 'Woc_Attack_1H_0',
+        cheap_shot: 'Woc_Attack_1H_0',
+        kidney_shot: 'Woc_Attack_1H_0',
       },
     },
     attach: [
@@ -2815,9 +2841,9 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The priest on the WOC body (the Holy Priest set). Smite and Mind Blast
-  // release through the throw; the heals lower the arm; Mind Flay, Mind Sear
-  // and the Choir channel the cast loop. The halo rides the head bone at the
-  // hood's tip, sized to this rig (the KayKit 1.45 cleared the mage hat).
+  // release through the throw; Mind Flay and Mind Sear channel the directed
+  // beam; Choir of Deliverance weaves the omni loop. The halo rides the head
+  // bone at the hood's tip, sized to this rig.
   player_priest: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2834,23 +2860,15 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['2H_Chop']),
+      ...woc(['Woc_Attack_2H_0']),
       shoutEmote: null,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
+      cast: 'Woc_Cast_Directed',
       castByAbility: {
-        mind_flay: 'Cast_Loop',
-        mind_sear: 'Cast_Loop',
-        choir_of_deliverance: 'Cast_Loop',
+        mind_flay: 'Woc_Channel_Directed',
+        mind_sear: 'Woc_Channel_Directed',
+        choir_of_deliverance: 'Woc_Cast_Omni',
       },
-      attackByAbility: { smite: 'Cast_Shoot', mind_blast: 'Cast_Shoot' },
+      attackByAbility: { smite: 'Woc_Cast_Shoot', mind_blast: 'Woc_Cast_Shoot' },
     },
     halo: 0xffd766,
     haloUpOffset: 0.28,
@@ -2863,10 +2881,9 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The shaman on the WOC body: weapon strikes (Stormstrike, the imbued auto
-  // attack, two-hand and dual-wield swings) ride the blade clips; Lightning
-  // Bolt and Chain Lightning release through the throw; the heals, Ghost Wolf
-  // and Ancestor Return lower the arm. Shocks, totems, shields and imbues play
-  // nothing.
+  // attack, two-hand and dual-wield swings) ride the stock WoW blade clips;
+  // Lightning Bolt and Chain Lightning release through the throw. Shocks,
+  // totems, shields and imbues play nothing.
   player_shaman: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2883,20 +2900,16 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['1H_Chop', '1H_Slash']),
+      ...woc(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']),
       shoutEmote: null,
-      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      attackByHand: { twohand: 'Woc_Attack_2H_0', dualwield: 'Dual_Chop' },
       dualWieldSplit: 0.4,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
-      attackByAbility: { lightning_bolt: 'Cast_Shoot', chain_lightning: 'Cast_Shoot' },
+      cast: 'Woc_Cast_Directed',
+      attackByAbility: {
+        lightning_bolt: 'Woc_Cast_Shoot',
+        chain_lightning: 'Woc_Cast_Shoot',
+        stormstrike: 'Woc_Special_1H',
+      },
     },
     attach: [
       { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
@@ -2905,12 +2918,10 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0],
     offhandSlot: 1,
   },
-  // The mage on the WOC body. Bolts, the timed ground spells and the timed
-  // crowd control release through the throw; Arcane Missiles and Evocation
-  // channel the cast loop; barriers, procs, Blink and the instant novas play
-  // nothing. The Hourglass keeps a throw because the ability painter forces a
-  // gesture on hostile crowd control, and a throw beats the staff swing it
-  // would fall back to.
+  // The mage on the WOC body. Bolts and crowd control release through the
+  // directed throw; area and burst spells release through the omni burst;
+  // Arcane Missiles channels the directed beam and Evocation weaves the omni
+  // loop; barriers, procs, Blink and the instant novas play nothing.
   player_mage: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2927,33 +2938,28 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['2H_Chop']),
+      ...woc(['Woc_Attack_2H_0']),
       shoutEmote: null,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
-      castByAbility: { arcane_missiles: 'Cast_Loop', evocation: 'Cast_Loop' },
+      cast: 'Woc_Cast_Directed',
+      castByAbility: {
+        arcane_missiles: 'Woc_Channel_Directed',
+        evocation: 'Woc_Cast_Omni',
+      },
       attackByAbility: {
-        fireball: 'Cast_Shoot',
-        frostbolt: 'Cast_Shoot',
-        flurry: 'Cast_Shoot',
-        glacial_spike: 'Cast_Shoot',
-        pyroblast: 'Cast_Shoot',
-        arcane_surge: 'Cast_Shoot',
-        scorch: 'Cast_Shoot',
-        flamestrike: 'Cast_Shoot',
-        blizzard: 'Cast_Shoot',
-        rings_of_frost: 'Cast_Shoot',
-        polymorph: 'Cast_Shoot',
-        temporal_hourglass: 'Cast_Shoot',
-        glacial_front: 'Cast_Shoot',
-        dragons_breath: 'Cast_Shoot',
+        fireball: 'Woc_Cast_Shoot',
+        frostbolt: 'Woc_Cast_Shoot',
+        flurry: 'Woc_Cast_Shoot',
+        glacial_spike: 'Woc_Cast_Shoot',
+        pyroblast: 'Woc_Cast_Shoot',
+        arcane_surge: 'Woc_Cast_Omni_Release',
+        scorch: 'Woc_Cast_Shoot',
+        flamestrike: 'Woc_Cast_Omni_Release',
+        blizzard: 'Woc_Cast_Omni_Release',
+        rings_of_frost: 'Woc_Cast_Omni_Release',
+        polymorph: 'Woc_Cast_Shoot',
+        temporal_hourglass: 'Woc_Cast_Shoot',
+        glacial_front: 'Woc_Cast_Shoot',
+        dragons_breath: 'Woc_Cast_Omni_Release',
       },
     },
     attach: [
@@ -2964,9 +2970,9 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The warlock on the WOC body: the wand auto attack is the throw itself,
-  // every timed bolt and curse releases through it, Drain Life channels the
-  // cast loop, the summons lower the arm. Life Tap, Demon Skin, the pet
-  // commands and every other instant play nothing.
+  // timed bolts and curses release through it, Soul Harvest releases the omni
+  // burst, and Drain Life channels the directed beam. Life Tap, Demon Skin,
+  // the pet commands and every other instant play nothing.
   player_warlock: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2983,29 +2989,21 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['Cast_Shoot']),
-      meleeAttack: ['1H_Chop', '1H_Slash'],
+      ...woc(['Woc_Cast_Shoot']),
+      meleeAttack: ['Woc_Attack_1H_0', 'Woc_Attack_1H_1'],
       shoutEmote: null,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
-      castByAbility: { drain_life: 'Cast_Loop' },
+      cast: 'Woc_Cast_Directed',
+      castByAbility: { drain_life: 'Woc_Channel_Directed' },
       attackByAbility: {
-        shadow_bolt: 'Cast_Shoot',
-        immolate: 'Cast_Shoot',
-        corruption: 'Cast_Shoot',
-        soul_lance: 'Cast_Shoot',
-        searing_pain: 'Cast_Shoot',
-        soul_harvest: 'Cast_Shoot',
-        chaos_bolt: 'Cast_Shoot',
-        fear: 'Cast_Shoot',
-        needle_of_fate: 'Cast_Shoot',
+        shadow_bolt: 'Woc_Cast_Shoot',
+        immolate: 'Woc_Cast_Shoot',
+        corruption: 'Woc_Cast_Shoot',
+        soul_lance: 'Woc_Cast_Shoot',
+        searing_pain: 'Woc_Cast_Shoot',
+        soul_harvest: 'Woc_Cast_Omni_Release',
+        chaos_bolt: 'Woc_Cast_Shoot',
+        fear: 'Woc_Cast_Shoot',
+        needle_of_fate: 'Woc_Cast_Shoot',
       },
     },
     attach: [
@@ -3024,9 +3022,10 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0],
   },
   // The druid on the WOC body (the caster form; bear, cat and travel forms are
-  // their own visuals). Wrath and Starfire release through the throw, Roots and
-  // Hibernate too, Hurricane channels the cast loop, the heals lower the arm.
-  // Moonfire, Faerie Fire, the buffs and the shapeshifts play nothing.
+  // their own visuals). Wrath, Roots and Hibernate release through the throw,
+  // Starfire releases the omni burst, Hurricane channels the directed storm,
+  // and Tranquility weaves the omni loop. Moonfire, Faerie Fire, the buffs and
+  // the shapeshifts play nothing.
   player_druid: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -3043,23 +3042,18 @@ export const VISUALS: Record<string, VisualDef> = {
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['2H_Chop']),
+      ...woc(['Woc_Attack_2H_0']),
       shoutEmote: null,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
-      castByAbility: { hurricane: 'Cast_Loop', tranquility: 'Cast_Loop' },
+      cast: 'Woc_Cast_Directed',
+      castByAbility: {
+        hurricane: 'Woc_Channel_Directed',
+        tranquility: 'Woc_Cast_Omni',
+      },
       attackByAbility: {
-        wrath: 'Cast_Shoot',
-        starfire: 'Cast_Shoot',
-        entangling_roots: 'Cast_Shoot',
-        hibernate: 'Cast_Shoot',
+        wrath: 'Woc_Cast_Shoot',
+        starfire: 'Woc_Cast_Omni_Release',
+        entangling_roots: 'Woc_Cast_Shoot',
+        hibernate: 'Woc_Cast_Shoot',
       },
     },
     attach: [
