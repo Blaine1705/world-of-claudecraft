@@ -360,6 +360,25 @@ export function planCircleLips(id: string, salt: number): SanctumKitPlacement[] 
   return out;
 }
 
+/** Every piece the interior plan places, known without running the plan (its
+ *  lip and rubble probes walk every cliff run): the dressing registers their
+ *  empty stand-ins from this at module load. Pinned equal to the plan's own
+ *  pieces by `tests/gravewyrm_sanctum_interior_kit.test.ts`. */
+export const SANCTUM_INTERIOR_PLAN_PIECES: readonly string[] = [
+  'Kit_LockSpur',
+  'Kit_LockCurb',
+  'Kit_ThawPyreV2',
+  'Kit_BoneHeap',
+  ...LIP_ROCKS,
+  ...LIP_ICE,
+  'Kit_EdgeRubbleA',
+  'Kit_EdgeRubbleB',
+  'Kit_EdgeRubbleIceA',
+  'Kit_EdgeRubbleIceB',
+  'Kit_DriftA',
+  'Kit_DriftB',
+];
+
 /** The whole interior plan (instance-local frame). */
 export function planSanctumInteriorPlacements(): SanctumKitPlacement[] {
   return [

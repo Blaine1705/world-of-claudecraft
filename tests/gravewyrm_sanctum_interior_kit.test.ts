@@ -22,10 +22,12 @@ import {
   GRAVEWYRM_SANCTUM_INTERIOR_PIECES,
   sourceFingerprint,
 } from '../scripts/assets/gravewyrm_sanctum_interior/build.mjs';
+import { ASSET as FIRST_KIT } from '../scripts/assets/gravewyrm_sanctum_kit/build.mjs';
 import { PILLAR_SCALE } from '../src/render/gravewyrm_sanctum/sanctum_chains_core';
 import {
   planSanctumInteriorPlacements,
   resolveInteriorReplacements,
+  SANCTUM_INTERIOR_PLAN_PIECES,
 } from '../src/render/gravewyrm_sanctum/sanctum_interior_plan_core';
 import { sanctumPlacementMatrix } from '../src/render/gravewyrm_sanctum/sanctum_kit';
 import {
@@ -119,6 +121,11 @@ describe('the interior kit asset', () => {
 
   it('fits the pass budget (the whole interior pass under 2.5 MB) with sane pieces', () => {
     expect(statSync(KIT).size).toBeLessThan(2.5 * 1024 * 1024);
+    // The dungeon's kit budget (docs/design/dungeon-rework/README.md, section 9)
+    // covers both kit GLBs together: the first kit plus this interior pass.
+    expect(statSync(FIRST_KIT.target).size + statSync(KIT).size).toBeLessThanOrEqual(
+      4 * 1024 * 1024,
+    );
     const budget: [RegExp, number][] = [
       [/^Kit_LockSpur$/, 26_000],
       [/^Kit_LockCurb$/, 7_000],
@@ -204,6 +211,51 @@ describe('the interior plan stands clear of every walk', () => {
     expect(pieces).toContain('Kit_LockCurb');
     expect(pieces.filter((p) => p.startsWith('Kit_LipRock')).length).toBeGreaterThanOrEqual(4);
     for (const p of placed) expect(shapes.has(p.piece), p.piece).toBe(true);
+  });
+
+  it('names every piece it places up front (the load-time stand-in list)', () => {
+    expect([...SANCTUM_INTERIOR_PLAN_PIECES].sort()).toEqual(
+      [...new Set(placed.map((p) => p.piece))].sort(),
+    );
+  });
+
+  it('keeps the shed floor dressing knee low: a body steps over it', () => {
+    // Rubble, drifts, lips and bone heaps (the cosmetic pieces) stay under one
+    // step over the floor they sit on, not merely under the waist band.
+    const bad: string[] = [];
+    let worst = 0;
+    for (const k of placed) {
+      if (!k.cosmetic) continue;
+      for (const [x, y, z] of worldPoints(k.piece, k)) {
+        const floor = authoredFieldHeight(FIELD, x, z);
+        if (floor <= VOID + 1) continue;
+        worst = Math.max(worst, y - floor);
+        if (y > floor + MAX_STEP_HEIGHT && bad.length < 20)
+          bad.push(`${k.piece} at (${x.toFixed(1)}, ${z.toFixed(1)}) ${(y - floor).toFixed(2)}`);
+      }
+    }
+    expect(bad, bad.join('\n')).toEqual([]);
+    expect(worst).toBeGreaterThan(0.2);
+  });
+
+  it('keeps the Lock Terrace curb on the rim, ankle low, off the fight floor', () => {
+    // Korgath's lanes and rings lay on the terrace floor (the shared, depth
+    // tested TelegraphKit): the curb's stones stay in the outer rim band and
+    // under shin height, its snow skirt lower still.
+    const curb = placed.find((p) => p.piece === 'Kit_LockCurb');
+    if (!curb) throw new Error('no curb');
+    let stones = 0;
+    for (const [x, y, z] of worldPoints('Kit_LockCurb', curb)) {
+      const r = Math.hypot(x - LOCK_TERRACE.x, z - LOCK_TERRACE.z);
+      const over = y - LOCK_TERRACE.h;
+      expect(r, `curb vertex at r ${r.toFixed(2)}`).toBeGreaterThan(LOCK_TERRACE.r - 4.2);
+      expect(over).toBeLessThan(0.45);
+      if (over > 0.25) {
+        stones++;
+        expect(r, `curb stone at r ${r.toFixed(2)}`).toBeGreaterThan(LOCK_TERRACE.r - 2.2);
+      }
+    }
+    expect(stones).toBeGreaterThan(100);
   });
 
   it('no piece stands through a body over walkable floor', () => {

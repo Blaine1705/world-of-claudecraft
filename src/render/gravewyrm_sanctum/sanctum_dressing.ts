@@ -9,6 +9,7 @@ import type * as THREE from 'three';
 import {
   planSanctumInteriorPlacements,
   resolveInteriorReplacements,
+  SANCTUM_INTERIOR_PLAN_PIECES,
 } from './sanctum_interior_plan_core';
 import {
   instanceSanctumPlacements,
@@ -239,5 +240,5 @@ export function buildSanctumKitDressing(lowGfx: boolean, density = 1): THREE.Gro
 
 // Every piece's stand-in is registered as soon as the module loads, so a
 // painter that adopts a piece before the dressing builds still has one.
-registerInteriorStandIns(interiorPlacements().map((p) => p.piece));
+registerInteriorStandIns(SANCTUM_INTERIOR_PLAN_PIECES);
 registerSanctumStandIns([...Object.keys(SANCTUM_KIT_SIZES), ...EXTRA_STAND_INS]);
