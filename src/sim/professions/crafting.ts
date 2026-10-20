@@ -2,8 +2,9 @@
 // checks a player has every reagent a recipe requires, consumes them (denying
 // and consuming NOTHING if any reagent is short), grants the recipe's declared
 // output deterministically (Professions 2.0 retired the output quality
-// roll: the only output-side rng is the single masterwork proc draw below, at
-// the same draw position the old roll occupied), and grants a flat point of
+// roll: the output-side rng is the single masterwork proc draw below, at
+// the same draw position the old roll occupied, plus one permanent
+// loot-quality draw per eligible equipment copy at grant time), and grants a flat point of
 // craft skill (see wheel.ts: additive-only, free-floor). A proc mints a
 // masterwork instance whose bonus stats are baked from the item budget
 // (professions/masterwork.ts): add-only, never a downgrade. Input-side rng
@@ -76,6 +77,7 @@ import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import { slotStatMultForItem } from '../item_budget';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
+import { grantFreshLoot } from '../loot/fresh_quality_grant';
 import { holdsMaterialSignature } from '../material_signatures';
 import {
   consumePlayerVaultStock,
@@ -240,6 +242,11 @@ export interface CraftResult {
   // this craft's output (a proc hit AND the effect gates passed). Absent
   // otherwise, including on every plain deterministic success.
   masterwork?: boolean;
+  // The crafted copy's whole payload (signer, masterwork, Perfecting and its
+  // permanent loot quality, loot/fresh_quality_grant.ts), present only when it
+  // rolled above Ordinary; projected into the craftResult event and
+  // CraftResultView so the crafted line can link that exact copy.
+  instance?: ItemInstancePayload;
   // #1145: true when at least one consumed reagent had a self-gathered signed
   // instance (signer === the crafting player's own name) counted toward it,
   // reducing that reagent's required quantity by one for this craft.
@@ -829,8 +836,9 @@ export function evaluateCraftAdmission(
  *  consumption never happens. On success, consumes every reagent (each
  *  discounted per the crafter's #1145 self-signed reduction composed with
  *  their #1134 specialization discount), draws the single masterwork proc
- *  roll (the one and only output-side rng draw; the old quality
- *  roll is retired and outputs are deterministic), grants the recipe's
+ *  roll (the old quality roll is retired and outputs are
+ *  deterministic; an eligible equipment copy adds one loot-quality draw
+ *  at grant, loot/fresh_quality_grant.ts), grants the recipe's
  *  declared output (signing a rare-or-better-DEF single-copy output for
  *  #1149 Battlefield Experience attribution; a masterwork proc mints a
  *  signed instance carrying its baked bonus stats), and grants craft skill
@@ -1014,14 +1022,13 @@ export function resolveCraftForRecipe(
   const jackVariance: CraftVarianceOutcome | null = meta?.archetype.isJackOfAllTrades
     ? rollCraftVariance(ctx.rng.next())
     : null;
-  // Masterwork proc draw: the single output-side rng draw for every
-  // non-Jack crafter, at the exact position the retired quality roll
-  // occupied so the world's draw order and the one-draw-per-successful-craft
-  // contract are preserved. The draw is UNCONDITIONAL on the success path:
-  // it happens even when the effect is gated off below, so the draw count
-  // per successful craft is exactly 1 (2 for a Jack, counting the variance
-  // roll above) regardless of archetype state or output type. Every denial
-  // path above draws nothing, unchanged.
+  // Masterwork proc draw: the single PROC draw for every non-Jack crafter, at
+  // the exact position the retired quality roll occupied. The draw is
+  // UNCONDITIONAL on the success path: it happens even when the effect is
+  // gated off below, so every successful craft draws exactly 1 proc roll (2
+  // with a Jack's variance roll above) regardless of archetype state. An
+  // eligible equipment output then adds its loot-quality draws at grant time
+  // (loot/fresh_quality_grant.ts). Every denial path above draws nothing.
   const procRoll = ctx.rng.next();
   const baseProcChance = masterworkProcChance({
     tiersAboveRecipe:
@@ -1152,32 +1159,56 @@ export function resolveCraftForRecipe(
   // mails as its own single-copy entry, so signing no longer takes these
   // outputs out of commerce; it only moves them off the fungible paths.
   // Player-to-player trade of the signed instance is unchanged.
+  // Every grant below goes through grantFreshLoot, so an eligible equipment
+  // output rolls its permanent loot quality once per copy
+  // (docs/design/loot-quality.md); the roll composes with the signer,
+  // masterwork and commission payloads and never writes rolled.quality.
+  // Every grant below always runs (never `??=`, which would skip the call);
+  // the crafted line links the enhanced copy each grant returns.
+  let qualityCopy: ItemInstancePayload | undefined;
   if (meta && masterwork && bonusStats) {
     const payload: ItemInstancePayload = {
       signer: meta.name,
       rolled: { masterwork: true, stats: bonusStats },
     };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
-      silent: true,
-      callerLogs: true,
-      craftedRecipeId,
-    });
-    if (recipe.resultCount > 1) {
-      if (commissioned) {
-        for (let i = 1; i < recipe.resultCount; i++) {
-          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
-            silent: true,
-            callerLogs: true,
-            craftedRecipeId,
-          });
-        }
-      } else {
-        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, {
+    qualityCopy =
+      grantFreshLoot(
+        ctx,
+        recipe.resultItemId,
+        1,
+        pid,
+        {
           silent: true,
           callerLogs: true,
           craftedRecipeId,
-        });
+        },
+        payload,
+      ) ?? qualityCopy;
+    if (recipe.resultCount > 1) {
+      if (commissioned) {
+        for (let i = 1; i < recipe.resultCount; i++) {
+          qualityCopy =
+            grantFreshLoot(
+              ctx,
+              recipe.resultItemId,
+              1,
+              pid,
+              {
+                silent: true,
+                callerLogs: true,
+                craftedRecipeId,
+              },
+              { bindOnTrade: true },
+            ) ?? qualityCopy;
+        }
+      } else {
+        qualityCopy =
+          grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount - 1, pid, {
+            silent: true,
+            callerLogs: true,
+            craftedRecipeId,
+          }) ?? qualityCopy;
       }
     }
   } else if (meta && perfectingHeadStart) {
@@ -1193,50 +1224,84 @@ export function resolveCraftForRecipe(
       perfecting: PERFECTING_HEADSTART_RANK,
     });
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
-      silent: true,
-      callerLogs: true,
-      craftedRecipeId,
-    });
-    if (recipe.resultCount > 1) {
-      if (commissioned) {
-        for (let i = 1; i < recipe.resultCount; i++) {
-          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
-            silent: true,
-            callerLogs: true,
-            craftedRecipeId,
-          });
-        }
-      } else {
-        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid, {
+    qualityCopy =
+      grantFreshLoot(
+        ctx,
+        recipe.resultItemId,
+        1,
+        pid,
+        {
           silent: true,
           callerLogs: true,
           craftedRecipeId,
-        });
+        },
+        payload,
+      ) ?? qualityCopy;
+    if (recipe.resultCount > 1) {
+      if (commissioned) {
+        for (let i = 1; i < recipe.resultCount; i++) {
+          qualityCopy =
+            grantFreshLoot(
+              ctx,
+              recipe.resultItemId,
+              1,
+              pid,
+              {
+                silent: true,
+                callerLogs: true,
+                craftedRecipeId,
+              },
+              { bindOnTrade: true },
+            ) ?? qualityCopy;
+        }
+      } else {
+        qualityCopy =
+          grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount - 1, pid, {
+            silent: true,
+            callerLogs: true,
+            craftedRecipeId,
+          }) ?? qualityCopy;
       }
     }
   } else if (meta && mintsSignedCraftOutput(def)) {
     const payload: ItemInstancePayload = withPerfectingBonus(def, recipe, { signer: meta.name });
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, recipe.resultCount, {
-      silent: true,
-      callerLogs: true,
-      craftedRecipeId,
-    });
+    qualityCopy =
+      grantFreshLoot(
+        ctx,
+        recipe.resultItemId,
+        recipe.resultCount,
+        pid,
+        {
+          silent: true,
+          callerLogs: true,
+          craftedRecipeId,
+        },
+        payload,
+      ) ?? qualityCopy;
   } else if (commissioned) {
     for (let i = 0; i < recipe.resultCount; i++) {
-      ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid, 1, {
+      qualityCopy =
+        grantFreshLoot(
+          ctx,
+          recipe.resultItemId,
+          1,
+          pid,
+          {
+            silent: true,
+            callerLogs: true,
+            craftedRecipeId,
+          },
+          { bindOnTrade: true },
+        ) ?? qualityCopy;
+    }
+  } else {
+    qualityCopy =
+      grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount, pid, {
         silent: true,
         callerLogs: true,
         craftedRecipeId,
-      });
-    }
-  } else {
-    ctx.addItem(recipe.resultItemId, recipe.resultCount, pid, {
-      silent: true,
-      callerLogs: true,
-      craftedRecipeId,
-    });
+      }) ?? qualityCopy;
   }
   if (meta) {
     // The #1129/#1148 gain doctrine (archetype ceiling alone zeroes, ordinary
@@ -1298,6 +1363,7 @@ export function resolveCraftForRecipe(
   if (masterwork || perfectingHeadStart) result.masterwork = true;
   if (commissioned) result.commission = true;
   if (jackVariance !== null) result.variance = jackVariance;
+  if (qualityCopy) result.instance = qualityCopy;
   return result;
 }
 
@@ -1646,6 +1712,7 @@ export function emitCraftResult(
     count: result.count,
     quality: result.quality,
     masterwork: result.masterwork,
+    ...(result.instance ? { instance: result.instance } : {}),
     reason: result.reason,
     ...(result.retryAfterSeconds !== undefined
       ? { retryAfterSeconds: result.retryAfterSeconds }

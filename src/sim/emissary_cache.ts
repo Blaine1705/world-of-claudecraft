@@ -11,6 +11,7 @@ import { NYTHRAXIS_RAID_BOSS_ID } from './content/heroic_loot';
 import { IGNIVAR_LOOT_ITEM_IDS } from './content/ignivar_loot';
 import { ITEMS } from './data';
 import { assertHeroicMarksGrantsFit } from './heroic_marks';
+import { grantFreshLoot } from './loot/fresh_quality_grant';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { ItemDef, ItemInstancePayload, PlayerClass } from './types';
@@ -64,7 +65,7 @@ export function openEmissaryCache(
   ]);
   const piece = ctx.rng.pick([...pool]);
   consumeOneUnit();
-  ctx.addItem(piece, 1, meta.entityId);
+  grantFreshLoot(ctx, piece, 1, meta.entityId);
   ctx.addItem(HEROIC_MARK_CURRENCY_ID, EMISSARY_CACHE_MARKS, meta.entityId);
   return true;
 }

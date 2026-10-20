@@ -28,6 +28,7 @@ import { WISP_MAZE_QUEST_ID } from '../content/world_quest_wisp_maze';
 import { ITEMS, QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { removePreferFungible } from '../items';
+import { grantFreshLoot } from '../loot/fresh_quality_grant';
 import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
@@ -479,7 +480,7 @@ export function turnInQuestCore(
     });
   }
   const rewardItem = questRewardItemId(quest, meta.cls);
-  if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
+  if (rewardItem) grantFreshLoot(ctx, rewardItem, 1, meta.entityId);
   grantQuestRecipeReward(ctx, quest, meta);
   ctx.grantXp(quest.xpReward, meta);
   // Arm the repeat-cadence window (work orders): the quest stays

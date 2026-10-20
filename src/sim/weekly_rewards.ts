@@ -1,5 +1,6 @@
 // Weekly choices. The host supplies the same calendar used by the Crucible.
 // A completed week earns unopened slots; opening fixes an item after host persistence.
+
 import { bagsFullError } from './bags';
 import { HEROIC_DUNGEON_TUNING } from './content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from './content/heroic_loot';
@@ -9,6 +10,7 @@ import { createNpc } from './entity';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
 import { instanceLockoutMetas } from './instances/dungeons';
 import { RAID_MIN_PLAYERS } from './item_level';
+import { grantFreshLoot } from './loot/fresh_quality_grant';
 import { heroicLootItemId } from './loot/heroic_item';
 import type { InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -528,7 +530,7 @@ export function claimWeeklyReward(
   state.vaults.shift();
   state.claimSequence++;
   state.overflowed = false;
-  ctx.addItem(choice.itemId, 1, r.e.id);
+  grantFreshLoot(ctx, choice.itemId, 1, r.e.id);
 }
 
 export function spawnWeeklyKeeper(ctx: SimContext, def: NpcDef | undefined): void {

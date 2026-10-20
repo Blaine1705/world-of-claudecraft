@@ -4,6 +4,7 @@
 import { type TreasureMapRarity, VAULT_GUEST_PAYOUTS_PER_CYCLE } from '../content/treasure_maps';
 import { grantEarnedHeroicMarks } from '../earned_heroic_marks';
 import { assertHeroicMarksGrantsFit, isCurrencyGrantId } from '../heroic_marks';
+import { cloneLootQuality } from '../loot_quality';
 import type { SimContext } from '../sim_context';
 import type { HoardReward } from './hoard_reward_roll';
 
@@ -42,10 +43,14 @@ export function grantHoardReward(
     );
   }
   for (const item of reward.items) {
-    if (!reservedAtClear && isCurrencyGrantId(item.itemId)) {
-      grantEarnedHeroicMarks(ctx, pid, item.count);
+    if (isCurrencyGrantId(item.itemId)) {
+      if (reservedAtClear) ctx.addItem(item.itemId, item.count, pid);
+      else grantEarnedHeroicMarks(ctx, pid, item.count);
     } else {
-      ctx.addItem(item.itemId, item.count, pid);
+      // A stored descriptor is re-validated: a malformed one grants the plain copy.
+      const lootQuality = cloneLootQuality(item.lootQuality);
+      if (lootQuality) ctx.addItemInstance(item.itemId, { lootQuality }, pid, item.count);
+      else ctx.addItem(item.itemId, item.count, pid);
     }
   }
   meta.copper += reward.copper;

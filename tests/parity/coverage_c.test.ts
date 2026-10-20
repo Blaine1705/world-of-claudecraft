@@ -475,7 +475,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(ev.some((e) => e.type === 'damage' && e.ability === 'Bladestorm')).toBe(true);
   });
 
-  it('professions_craft: denial draws nothing, each craft draws once, and the vestments proc mints + surfaces a masterwork', () => {
+  it('professions_craft: denial draws nothing, each craft draws once plus one quality draw per equipment copy, and the vestments proc mints + surfaces a masterwork', () => {
     const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_craft')!);
     const ev = rec.allEvents as Ev[];
     const pid = rec.notes.pid as number;
@@ -515,8 +515,10 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // The phase 07 daily-gate arm (step 4b): the catalyst success stamps
     // craftDaily with real content and draws once like every success; the
     // daily_limit re-attempt returns BEFORE any draw and leaves the stamp
-    // unmutated, so the scenario's total stays at exactly four draws (three
-    // pre-existing crafts + the catalyst; the two denials contribute zero).
+    // unmutated, so the scenario's total is five draws: three pre-existing
+    // crafts + the catalyst (one proc draw each), plus one permanent
+    // loot-quality draw for the one eligible equipment output (the
+    // vestments, loot/fresh_quality_grant.ts); the two denials contribute zero.
     expect(
       crafts.some(
         (e) => e.ok === true && e.itemId === 'quickening_catalyst' && e.masterwork === undefined,
@@ -527,7 +529,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
       date: '2099-06-25',
       crafted: new Set(['recipe_quickening_catalyst']),
     });
-    expect(trace.draws).toBe(4);
+    expect(trace.draws).toBe(5);
   });
 
   it('professions_gather: two draws per harvest, zero-draw denial, zone materials, and the hunted rare event fires', () => {

@@ -14,14 +14,16 @@
 // bag, a world quest reward has no corpse to wait on and is bounded to a few
 // items per character per day.
 //
-// `src/sim`-pure: no DOM/Three, no wall clock, and no rng (the item ids are
-// decided by the caller before this runs, so bag space never shifts a draw).
+// `src/sim`-pure: no DOM/Three or wall clock. Item ids are decided by the
+// caller; permanent quality rolls before delivery, so bag space never shifts a draw.
 
-import { bagPools, canAddItem } from './bags';
+import { bagPools, fitsAll } from './bags';
 import { WORLD_QUEST_REWARD_LETTER } from './content/letters';
+import { grantFreshLoot } from './loot/fresh_quality_grant';
 import { MAIL_MAX_ATTACHMENTS } from './mail/post_office';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import type { InvSlot } from './types';
 
 export interface WorldQuestRewardItem {
   itemId: string;
@@ -38,12 +40,35 @@ export function grantWorldQuestRewardItems(
   items: readonly WorldQuestRewardItem[],
 ): string[] {
   const pid = meta.entityId;
-  const mailed: WorldQuestRewardItem[] = [];
+  const mailed: InvSlot[] = [];
+  const mailedIds: string[] = [];
+  const copies: InvSlot[] = [];
+  // Share the earned-source roller; delivery preserves each rolled descriptor
+  // through either the inventory hub or the authored letter, never a second roll.
+  const freshHost: Pick<SimContext, 'rng' | 'addItem' | 'addItemInstance'> = {
+    rng: ctx.rng,
+    addItem: (itemId, count) => {
+      copies.push({ itemId, count });
+    },
+    addItemInstance: (itemId, instance, _pid, count = 1) => {
+      copies.push({ itemId, count, instance });
+    },
+  };
   for (const item of items) {
     if (item.count <= 0) continue;
-    if (canAddItem(meta.inventory, bagPools(meta.bags), item.itemId, item.count))
-      ctx.addItem(item.itemId, item.count, pid);
-    else mailed.push({ itemId: item.itemId, count: item.count });
+    copies.length = 0;
+    grantFreshLoot(freshHost, item.itemId, item.count, pid);
+    // Preserve the whole-reward capacity rule even when quality splits it into
+    // several payload-bearing lines: all copies bag together or mail together.
+    if (!fitsAll(meta.inventory, bagPools(meta.bags), copies)) {
+      mailed.push(...copies);
+      mailedIds.push(item.itemId);
+      continue;
+    }
+    for (const copy of copies) {
+      if (copy.instance) ctx.addItemInstance(copy.itemId, copy.instance, pid, copy.count);
+      else ctx.addItem(copy.itemId, copy.count, pid);
+    }
   }
   if (mailed.length === 0) return [];
   for (let i = 0; i < mailed.length; i += MAIL_MAX_ATTACHMENTS) {
@@ -52,7 +77,7 @@ export function grantWorldQuestRewardItems(
       items: mailed.slice(i, i + MAIL_MAX_ATTACHMENTS),
     });
   }
-  const itemIds = mailed.map((item) => item.itemId);
+  const itemIds = mailedIds;
   ctx.emit({ type: 'worldQuestRewardMailed', itemIds, pid });
   return itemIds;
 }

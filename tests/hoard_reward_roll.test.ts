@@ -27,7 +27,8 @@ function scriptedRng(ints: number[], chances: boolean[]) {
 
 describe('rollHoardReward', () => {
   it('preserves the owners full payout and exact draw order', () => {
-    const script = scriptedRng([1, 0], [true, true, true, true, true]);
+    // The trailing 0 is the gear piece's loot-quality draw: Ordinary, and last.
+    const script = scriptedRng([1, 0, 0], [true, true, true, true, true]);
     const reward = rollHoardReward(script.rng, {
       rarity: 'rare',
       bossTemplateId: 'rift_boss_arcane',
@@ -56,6 +57,7 @@ describe('rollHoardReward', () => {
       ['chance', VAULT_PAYOUTS.rare.markChance],
       ['chance', VAULT_PAYOUTS.rare.mountChance],
       ['chance', VAULT_PAYOUTS.rare.nextMapChance],
+      ['int', 0, 9999],
     ]);
     expect(script.ints).toEqual([]);
     expect(script.chances).toEqual([]);

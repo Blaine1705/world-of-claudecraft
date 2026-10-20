@@ -48,6 +48,7 @@ import {
 } from '../delve_layout';
 import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
+import { grantFreshLoot } from '../loot/fresh_quality_grant';
 import { restorePetFromDelveStash } from '../pet/pet_commands';
 import { restorePetOnOwnerRevive } from '../pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
@@ -1681,7 +1682,7 @@ export function collectDelveChestLoot(ctx: SimContext, chestId: number, pid?: nu
       return false;
     }
     for (const slot of own) {
-      ctx.addItem(slot.itemId, slot.count, r.meta.entityId);
+      grantFreshLoot(ctx, slot.itemId, slot.count, r.meta.entityId);
     }
     state.partyLoot![r.meta.entityId] = [];
     return true;
@@ -1695,7 +1696,7 @@ export function collectDelveChestLoot(ctx: SimContext, chestId: number, pid?: nu
     return false;
   }
   for (const slot of state.pendingLoot) {
-    ctx.addItem(slot.itemId, slot.count, r.meta.entityId);
+    grantFreshLoot(ctx, slot.itemId, slot.count, r.meta.entityId);
   }
   state.pendingLoot = [];
   return true;
