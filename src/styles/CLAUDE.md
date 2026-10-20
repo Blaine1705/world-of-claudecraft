@@ -44,7 +44,10 @@ unlayered, so every rule is scoped to `#boot-splash`, `.boot-splash-*` or the bo
 requires both blocks to be identical). Game styles never go there. The Vite plugin
 `woc-boot-splash-stylesheets` (`scripts/lib/boot_splash_stylesheets.mjs`) moves every head
 stylesheet `<link>` of an entry carrying the splash to the end of `<body>`, so the splash is
-not stuck behind them; `src/ui/boot_splash.ts` waits for those sheets and lifts it.
+not stuck behind them; `src/ui/boot_splash.ts` waits for those sheets and lifts it. On
+`index.html` a plain first visit lifts it from `src/ui/landing_first.ts` before the game
+client has loaded (see `src/CLAUDE.md`, Entries), so the landing page must look finished
+from this directory's CSS plus the body classes that module stamps.
 
 ## This directory is FLAT, and two guards enforce it
 Every sheet sits at the top level, because that is what ships: the `index.css` barrel, the

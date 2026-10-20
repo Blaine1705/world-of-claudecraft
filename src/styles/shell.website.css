@@ -1942,4 +1942,38 @@
       }
     }
   }
+  /* Landing-first boot (src/ui/landing_first.ts): a control clicked before the game
+     client has started says it is working (aria-busy), and its click replays once the
+     client is ready. Play's arrow nudges forward; any other control pulses. */
+  body.landing-booting {
+    cursor: progress;
+  }
+  [data-landing-booting] {
+    cursor: progress;
+  }
+  [data-landing-booting]:not(#btn-play) {
+    animation: landing-booting-pulse 1.1s ease-in-out infinite;
+  }
+  #btn-play[data-landing-booting] .website-play-arrow {
+    animation: landing-booting-nudge 0.9s ease-in-out infinite;
+  }
+  @keyframes landing-booting-pulse {
+    50% {
+      opacity: 0.6;
+    }
+  }
+  @keyframes landing-booting-nudge {
+    50% {
+      transform: translateX(5px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-landing-booting]:not(#btn-play),
+    #btn-play[data-landing-booting] .website-play-arrow {
+      animation: none;
+    }
+    [data-landing-booting] {
+      opacity: 0.75;
+    }
+  }
 }

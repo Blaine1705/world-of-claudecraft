@@ -1548,7 +1548,9 @@ const MONOLITHS: MonolithRow[] = [
     // after biome, zero slack.
     // Nameplate and highlight settings moved behind the game settings seam.
     // Dot and cooldown row apply/boot/rebuild folds share nameplate_settings.ts.
-    ceiling: 10961,
+    // LOWERED 10961 -> 10888: the characters-created counter moved whole to
+    // src/ui/project_stats.ts so the landing-first boot can fill it pre-client.
+    ceiling: 10888,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

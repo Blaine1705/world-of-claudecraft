@@ -5,10 +5,11 @@ import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_compose
 import { dispatchCollectionAction } from './ui/collection_actions_core';
 import { createInterfaceVisibility } from './ui/interface_visibility';
 import { dispatchInterfaceVisibilityAction } from './ui/interface_visibility_core';
+import { loadProjectStats } from './ui/project_stats';
 import { MOBILE_CHAT_REPLY_CLASS, START_SCREEN_OPEN_CLASS } from './ui/root_state_classes';
 // Game-client style barrel (declares the @layer order, loads tokens + base, etc.).
-// index.html and play.html both bootstrap through this module, so this one import
-// styles both game entries; admin/guide use their own entries and inline CSS.
+// play.html boots through this module; index.html boots through src/boot.ts, which
+// imports the same barrel first. admin/guide use their own entries and inline CSS.
 import './styles/index.css';
 import { captureFirstTouch, registerAttributionPayload } from './attribution';
 import { installClientUpdate, searchClientUpdates } from './client_update_search';
@@ -7173,9 +7174,6 @@ function renderClassDetails(
   }
 }
 
-const STATS_CACHE_KEY = 'woc_cached_stats';
-const STATS_CACHE_TTL_MS = 30000; // 30 seconds
-
 function readTranslationKey(value: string | null): TranslationKey | null {
   return value ? (value as TranslationKey) : null;
 }
@@ -7372,77 +7370,6 @@ async function changeLanguage(
   refreshLocalizedDynamicShell();
   document.dispatchEvent(new CustomEvent('woc:languagechange', { detail: { language: selected } }));
   return true;
-}
-
-async function loadProjectStats(): Promise<void> {
-  // Realm status now lives in the realm dropdown, both in the trigger sub-line
-  // and inside the Online option, so update every instance by class.
-  const characterEls = document.querySelectorAll<HTMLElement>('.js-stat-characters');
-  if (!characterEls.length) return;
-  const setAll = (els: NodeListOf<HTMLElement>, text: string): void => {
-    els.forEach((el) => {
-      el.textContent = text;
-    });
-  };
-
-  // 1. Try to read from localStorage first. characters_created is optional:
-  // an entry written before the accounts-to-characters stat swap lacks it, and
-  // the freshness check below treats such an entry as a miss so we re-fetch
-  // rather than render "undefined".
-  let cached: {
-    realm: string;
-    accounts_created: number;
-    characters_created?: number;
-    players_online: number;
-    timestamp: number;
-  } | null = null;
-  if (typeof localStorage !== 'undefined') {
-    const raw = localStorage.getItem(STATS_CACHE_KEY);
-    if (raw) {
-      try {
-        cached = JSON.parse(raw);
-      } catch {}
-    }
-  }
-
-  // If cache exists, is fresh (within TTL), and carries the character count,
-  // use it and skip the API request
-  if (
-    cached &&
-    cached.characters_created != null &&
-    Date.now() - cached.timestamp < STATS_CACHE_TTL_MS
-  ) {
-    setAll(characterEls, String(cached.characters_created));
-    return;
-  }
-
-  // 2. Fetch fresh stats
-  try {
-    const data = await api.projectStats();
-
-    setAll(characterEls, data.characters_created != null ? String(data.characters_created) : '-');
-
-    // Save to cache with timestamp
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(
-        STATS_CACHE_KEY,
-        JSON.stringify({
-          ...data,
-          timestamp: Date.now(),
-        }),
-      );
-    }
-  } catch {
-    // A marketing counter is not worth an error entry: the API being down or
-    // absent (offline play, a dev client with no server) is an ordinary state
-    // and the cache fallback below already handles it.
-    // If API fails, fall back to cached data (even if expired)
-    if (cached) {
-      setAll(characterEls, String(cached.characters_created ?? '-'));
-    } else {
-      setAll(characterEls, '-');
-    }
-  }
 }
 
 // Home-page global (cross-realm) lifetime-XP leaderboard. Server computes the
@@ -9109,7 +9036,7 @@ function wireStartScreens(): Promise<void> {
   // owns the fallback.
   for (const ensure of CONTENT_LOCALE_CHANNEL_ENSURERS) void ensure(bootLang).catch(() => {});
   hydrateIcons();
-  void loadProjectStats();
+  void loadProjectStats(() => api.projectStats());
   wireHomepageMusicToggle();
   void wireWallet();
   wireGithubLink();

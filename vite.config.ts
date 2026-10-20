@@ -19,6 +19,7 @@ import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
+import { gameModuleFiles, injectGameModules } from './scripts/lib/landing_game_modules.mjs';
 import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
@@ -195,6 +196,40 @@ function bootSplashStylesheetsPlugin() {
           );
         }
       }
+    },
+  };
+}
+
+// The landing-first boot prefetches the game client after the home page has loaded
+// (src/ui/landing_first.ts). The client is a dynamic import of src/boot.ts, so its
+// chunk URLs only exist in the bundle: list them into index.html as JSON. Build-only;
+// in dev the list is absent and the prefetch is skipped.
+function landingGameModulesPlugin() {
+  let base = '/';
+  return {
+    name: 'woc-landing-game-modules',
+    apply: 'build' as const,
+    configResolved(cfg: { base: string }) {
+      base = cfg.base || '/';
+    },
+    transformIndexHtml: {
+      order: 'post' as const,
+      handler(
+        html: string,
+        ctx: { path: string; bundle?: Record<string, never>; chunk?: { fileName: string } },
+      ) {
+        if (!ctx.bundle || !/(^|\/)index\.html$/.test(ctx.path)) return html;
+        const files = gameModuleFiles(ctx.bundle, ctx.chunk?.fileName);
+        if (files.length === 0) {
+          throw new Error(
+            'index.html: found no src/main.ts chunk to list for the landing prefetch',
+          );
+        }
+        return injectGameModules(
+          html,
+          files.map((file) => base + file),
+        );
+      },
     },
   };
 }
@@ -435,6 +470,7 @@ export default defineConfig({
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     bootSplashStylesheetsPlugin(),
+    landingGameModulesPlugin(),
     musicEditorSavePlugin(),
     ...(process.env.WOC_DIAGNOSTICS_CAPTURE === '1' ? [diagnosticsCapturePlugin()] : []),
   ],
