@@ -2,8 +2,7 @@
 // at a rig in Blender. Blender's glTF importer refuses KHR_texture_basisu and cannot
 // read meshopt buffers, so the KTX2 textures are decoded to PNG (ktx extract) and
 // the quantization and meshopt are undone. Any extra GLBs are clip donors (mesh-free
-// animation files such as greyjaw_ability_anims.glb): their clips are bound to this
-// file's nodes by name. Nothing is written back to public/; the copy is a throwaway
+// animation files): their clips are bound to this file's nodes by name. Nothing is written back to public/; the copy is a throwaway
 // under tmp/.
 //
 //   node scripts/assets/wolf_rig/to_blender.mjs <out.glb> <in.glb> [<clip-donor.glb> ...]

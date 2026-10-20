@@ -24,7 +24,6 @@ export function localPose(
   anim: Animation,
   t: number,
 ): { local: WolfPose; unbound: string[] };
-export function poseToLocal(rig: WolfRig, pose: Map<string, number[]>): WolfPose;
 export function worldUpFor(rig: WolfRig, name: string): number[];
 export function lowestByRegion(rig: WolfRig, local: WolfPose): Record<string, number>;
 export function skinnedBoundsY(rig: WolfRig, local: WolfPose): { min: number; max: number };

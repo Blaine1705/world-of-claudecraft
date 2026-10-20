@@ -522,7 +522,6 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/golelingevolved.glb": "/media/models/creatures/golelingevolved.156f4c2dcf93.glb",
   "models/creatures/gravewing.glb": "/media/models/creatures/gravewing.06a6a68e9e92.glb",
   "models/creatures/greyjaw.glb": "/media/models/creatures/greyjaw.21dfd73d6797.glb",
-  "models/creatures/greyjaw_ability_anims.glb": "/media/models/creatures/greyjaw_ability_anims.95b670763d2e.glb",
   "models/creatures/grix.glb": "/media/models/creatures/grix.224bc3592577.glb",
   "models/creatures/grubjaw.glb": "/media/models/creatures/grubjaw.6d109e187a99.glb",
   "models/creatures/hoard_abyssal_maw.glb": "/media/models/creatures/hoard_abyssal_maw.4c7f426c6492.glb",

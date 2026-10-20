@@ -4,7 +4,7 @@
 // tests/wolf_rig.test.ts.
 //
 // A clip binds to the rig by joint NAME, as the game binds a mesh-free donor clip
-// (greyjaw_ability_anims.glb) to greyjaw.glb, so a clip may come from another file.
+// (a VisualDef's animUrls), so a clip may come from another file.
 // A joint the clip leaves out holds its rest value (ship.mjs drops every track that
 // never leaves the rest pose).
 import { NodeIO } from '@gltf-transform/core';
@@ -113,21 +113,6 @@ export function localPose(rig, anim, t) {
     else pose.s = v;
   }
   return { local, unbound };
-}
-
-/** Every node's local TRS from a sampled pose (scripts/anim/pose_blend.mjs keys,
- *  `<node>|<path>`); a joint the pose leaves out holds its rest value. */
-export function poseToLocal(rig, pose) {
-  const local = new Map();
-  for (const n of rig.nodes) {
-    const name = n.getName();
-    local.set(n, {
-      t: pose.get(`${name}|translation`) ?? n.getTranslation(),
-      r: pose.get(`${name}|rotation`) ?? n.getRotation(),
-      s: pose.get(`${name}|scale`) ?? n.getScale(),
-    });
-  }
-  return local;
 }
 
 /** The local translation that moves a node one unit straight up in the world: world

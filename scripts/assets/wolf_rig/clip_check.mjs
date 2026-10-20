@@ -5,7 +5,7 @@
 //   node scripts/assets/wolf_rig/clip_check.mjs <file.glb> <clip> [fps] [--donor <clips.glb>]
 //
 // --donor takes the clip from a mesh-free clip file instead, bound by joint name as
-// the game binds it (greyjaw_ability_anims.glb's Greyjaw_Attack onto greyjaw.glb).
+// the game binds a donor clip (a VisualDef's animUrls).
 //
 // Every frame prints the height above the ground of the lowest point of each region
 // (paw soles, the lower limbs above them, the body, the tail), then the biggest

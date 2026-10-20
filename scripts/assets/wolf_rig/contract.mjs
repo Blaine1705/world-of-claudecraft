@@ -1,10 +1,9 @@
 // The wolf rig contract: what scripts/assets/wolf_rig/ ships and the game relies on.
 //
-// The clip NAMES are the game's contract (WOLF_BAKED and GREYJAW_WOLF in
-// src/render/characters/manifest.ts pick from them), and Greyjaw's attack donor
-// (greyjaw_ability_anims.glb, scripts/build_greyjaw_anims.mjs) binds to the joints
-// by NAME, so both lists are pinned: ship.mjs refuses a build that drifts from them
-// and tests/wolf_rig.test.ts reads the shipped files against them.
+// The clip NAMES are the game's contract (WOLF_BAKED in
+// src/render/characters/manifest.ts picks from them) and a clip binds to the joints by
+// NAME, so both lists are pinned: ship.mjs refuses a build that drifts from them and
+// tests/wolf_rig.test.ts reads the shipped files against them.
 
 /** The rebuilt files, relative to public/. */
 export const WOLF_RIG_FILES = Object.freeze([

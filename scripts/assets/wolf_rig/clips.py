@@ -1,7 +1,7 @@
 """Every clip the wolves ship: what it is built from and how its layers move.
 
 The clip NAMES are the game's contract (src/render/characters/manifest.ts:
-WOLF_BAKED and GREYJAW_WOLF pick Idle, Walk, Gallop, Attack, the two hit reacts,
+WOLF_BAKED picks Idle, Walk, Gallop, Attack, the two hit reacts,
 Death, Sit and Fall), and every old clip is rebuilt, the unused ones included
 (Idle Alert, Sneak, Bark, Howl, Jump), so the set matches what shipped.
 

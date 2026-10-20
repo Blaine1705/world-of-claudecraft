@@ -1353,27 +1353,14 @@ const STATIC_PROP: ClipMap = {
 // the hit reacts are short flinches, where the old ones were copies of the 2.8 s Bark).
 // The animal() core plus Sit/Fall so player wolf forms sit and jump properly, and a
 // Walk swim base (a paddling gait at the gentle clip pitch beats the steep no-clip
-// procedural prone on a quadruped).
+// procedural prone on a quadruped). Greyjaw plays it too: his own attack (a
+// sit-down howl into a lunge) was dropped with the rebuild, since a wolf that sits
+// to howl mid-fight reads wrong, so he bites like the pack.
 const WOLF_BAKED: ClipMap = {
   ...animal(['Attack']),
   sitIdle: 'Sit',
   swim: 'Walk',
   jump: 'Fall',
-};
-
-// Greyjaw's own attack (scripts/build_greyjaw_anims.mjs, issue #2889 round
-// 2): greyjaw.glb (his own file, on the wolf rig fitted to his body) ships bonus
-// donor clips besides the ones the game plays (Bark, Howl, "Idle Alert", Sneak);
-// this blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
-// more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
-// form_ghost_wolf) still plays. The override stays here, off the WOLF_BAKED map both
-// of those read: putting it in the shared map would change the shaman form's combat
-// feel too. greyjaw already ships and wires BOTH
-// Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
-// hit-variety work is needed here: this override is attack-only.
-const GREYJAW_WOLF: ClipMap = {
-  ...WOLF_BAKED,
-  attack: ['Greyjaw_Attack'],
 };
 
 // Druid Bear Form: a purpose-built quadruped rig (29 deform bones; the gaits are
@@ -3568,11 +3555,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/greyjaw.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
     height: 2.05,
-    clips: GREYJAW_WOLF,
-    // Greyjaw_Attack clip donor (scripts/build_greyjaw_anims.mjs): mesh-free,
-    // baked off this same rig's own poses (a howl-then-pounce, distinct from
-    // the plain Attack every other WOLF_BAKED user still plays).
-    animUrls: [`${CREATURES}/greyjaw_ability_anims.glb`],
+    clips: WOLF_BAKED,
   },
   mob_boar: {
     url: `${CREATURES}/wild_boar.glb`,

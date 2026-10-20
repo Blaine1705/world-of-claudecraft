@@ -2,12 +2,12 @@
 // the shaman Shadewolf form) and greyjaw.glb (Old Greyjaw) ship exactly the contract's
 // joints and clips (scripts/assets/wolf_rig/contract.mjs), the hit reacts are real
 // flinches, the loops close, the Idle stands still on its paws, every wolf keeps the
-// on-screen size it has always had, and no clip either file ships, nor Greyjaw's own
-// attack (greyjaw_ability_anims.glb, bound by joint name as the game binds it), puts any
-// skinned point under the ground the game stands the wolf on. The skinning is the
-// game's own glTF math (scripts/assets/wolf_rig/skin_pose.mjs) read off the shipped,
-// compressed files, measured the way prepareVisual measures. ClipMap name resolution
-// and donor binding are tests/character_clipmaps.test.ts's.
+// on-screen size it has always had, and no clip either file ships puts any skinned
+// point under the ground the game stands the wolf on. The skinning is the game's own
+// glTF math (scripts/assets/wolf_rig/skin_pose.mjs) read off the shipped, compressed
+// files, measured the way prepareVisual measures. ClipMap name resolution is
+// tests/character_clipmaps.test.ts's; Greyjaw biting like the pack is
+// tests/anim_pipeline_greyjaw.test.ts's.
 import { join } from 'node:path';
 import type { Animation, Root } from '@gltf-transform/core';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -36,7 +36,6 @@ import {
 import { VISUALS } from '../src/render/characters/manifest';
 
 const PUBLIC = join(__dirname, '..', 'public');
-const GREYJAW_ATTACK = 'models/creatures/greyjaw_ability_anims.glb';
 // Skinning every key of every clip of both files: seconds, not milliseconds.
 const SKINNING_TIMEOUT_MS = 60_000;
 
@@ -80,7 +79,7 @@ function turnDeg(a: number[], b: number[]): number {
 
 const loaded = new Map<string, Root>();
 beforeAll(async () => {
-  for (const file of [...WOLF_RIG_FILES, GREYJAW_ATTACK]) {
+  for (const file of WOLF_RIG_FILES) {
     loaded.set(file, await readWolfGlb(join(PUBLIC, file)));
   }
 });
@@ -168,23 +167,6 @@ describe('wolf rig: on-screen size', () => {
     expect(VISUALS.form_ghost_wolf.url).toBe(VISUALS.mob_wolf.url);
     expect(VISUALS.form_ghost_wolf.height).toBe(VISUALS.mob_wolf.height);
   });
-});
-
-describe('wolf rig: Greyjaw_Attack (greyjaw_ability_anims.glb on greyjaw.glb)', () => {
-  it(
-    'binds every channel to a greyjaw.glb joint and stays out of the ground',
-    () => {
-      const body = loaded.get('models/creatures/greyjaw.glb') as Root;
-      const attack = clip(loaded.get(GREYJAW_ATTACK) as Root, 'Greyjaw_Attack');
-      const rig = rigOf(body);
-      const { dip, at, unbound } = deepestDip(rig, attack, idleGround(rig, body));
-      expect(unbound).toEqual([]);
-      expect(dip, `dips ${dip.toFixed(3)} under the ground at ${at.toFixed(2)} s`).toBeLessThan(
-        WOLF_FLOOR_TOLERANCE,
-      );
-    },
-    SKINNING_TIMEOUT_MS,
-  );
 });
 
 describe('wolf rig: the floor check itself', () => {
