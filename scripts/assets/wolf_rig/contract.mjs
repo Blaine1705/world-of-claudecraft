@@ -81,3 +81,16 @@ export const WOLF_HIT_REACT_MAX_S = 1;
 
 /** How far (GLB units) any skinned point may dip under the Idle's ground in any clip. */
 export const WOLF_FLOOR_TOLERANCE = 0.02;
+
+/** The size each wolf has always been drawn at: its VisualDef height over the raw height
+ *  of its Idle as the game measures it (skin_pose.mjs idleHeight), as both shipped on the
+ *  old dog rig (mob_wolf 1.6 over 1.8838, greyjaw 2.2 over 1.9542). A rebuild that changes
+ *  the raw idle height re-derives the VisualDef height from this, so no wolf, nor the
+ *  beast-family fallback or the Shadewolf drawn from the same file, changes size. */
+export const WOLF_ON_SCREEN_SCALE = Object.freeze({
+  mob_wolf: Object.freeze({ file: 'models/creatures/wolf_basic.glb', scale: 1.6 / 1.8838 }),
+  greyjaw: Object.freeze({ file: 'models/creatures/greyjaw.glb', scale: 2.2 / 1.9542 }),
+});
+
+/** How far (a share of the scale) a VisualDef height may sit off WOLF_ON_SCREEN_SCALE. */
+export const WOLF_ON_SCREEN_TOLERANCE = 0.005;

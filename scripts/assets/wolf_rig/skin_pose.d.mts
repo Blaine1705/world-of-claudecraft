@@ -27,5 +27,8 @@ export function localPose(
 export function poseToLocal(rig: WolfRig, pose: Map<string, number[]>): WolfPose;
 export function worldUpFor(rig: WolfRig, name: string): number[];
 export function lowestByRegion(rig: WolfRig, local: WolfPose): Record<string, number>;
+export function skinnedBoundsY(rig: WolfRig, local: WolfPose): { min: number; max: number };
+export function idleMeasureTime(idle: Animation): number;
 export function idleGround(rig: WolfRig, root: Root): number;
+export function idleHeight(rig: WolfRig, root: Root): number;
 export function biggestTurn(prev: WolfPose, local: WolfPose): { step: number; bone: string };

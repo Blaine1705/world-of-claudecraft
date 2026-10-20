@@ -9,10 +9,11 @@
 //
 // Every frame prints the height above the ground of the lowest point of each region
 // (paw soles, the lower limbs above them, the body, the tail), then the biggest
-// single joint turn since the previous frame. The ground is the lowest point of the
-// Idle clip's first frame. Negative heights go through the floor; a flick shows as
-// one step far above its neighbours. The last lines give each region's lowest point
-// over the clip and the biggest step.
+// single joint turn since the previous frame. The ground is where the game stands the
+// wolf: the Idle's lowest point at the moment prepareVisual measures it (skin_pose.mjs
+// idleGround). Negative heights go through the floor; a flick shows as one step far
+// above its neighbours. The last lines give each region's lowest point over the clip
+// and the biggest step.
 import {
   biggestTurn,
   clipDuration,

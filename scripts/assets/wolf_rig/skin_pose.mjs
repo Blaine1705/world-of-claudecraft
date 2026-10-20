@@ -183,9 +183,9 @@ function compose(t, q, s) {
   ];
 }
 
-/** The lowest skinned point (world y) of each region for one pose. A point belongs to
- *  the region of the joint that weighs on it most. */
-export function lowestByRegion(rig, local) {
+/** Visit the world height of every skinned point for one pose, with the region of the
+ *  joint that weighs on it most. */
+function forEachSkinnedY(rig, local, visit) {
   const world = new Map();
   const worldOf = (n) => {
     if (world.has(n)) return world.get(n);
@@ -196,7 +196,6 @@ export function lowestByRegion(rig, local) {
     world.set(n, w);
     return w;
   };
-  const low = {};
   const v = [0, 0, 0];
   const ji = [0, 0, 0, 0];
   const we = [0, 0, 0, 0];
@@ -228,18 +227,56 @@ export function lowestByRegion(rig, local) {
             region = regions[ji[k]];
           }
         }
-        if (!(region in low) || y < low[region]) low[region] = y;
+        visit(y, region);
       }
     }
   }
+}
+
+/** The lowest skinned point (world y) of each region for one pose. A point belongs to
+ *  the region of the joint that weighs on it most. */
+export function lowestByRegion(rig, local) {
+  const low = {};
+  forEachSkinnedY(rig, local, (y, region) => {
+    if (!(region in low) || y < low[region]) low[region] = y;
+  });
   return low;
 }
 
-/** The ground: the lowest skinned point of the Idle clip's first frame. */
-export function idleGround(rig, root) {
+/** The lowest and highest skinned point (world y) of one pose. */
+export function skinnedBoundsY(rig, local) {
+  let min = Number.POSITIVE_INFINITY;
+  let max = Number.NEGATIVE_INFINITY;
+  forEachSkinnedY(rig, local, (y) => {
+    if (y < min) min = y;
+    if (y > max) max = y;
+  });
+  return { min, max };
+}
+
+/** When the game measures a creature: prepareVisual (src/render/characters/assets.ts)
+ *  plays the Idle this far in, then sizes the model by that pose's skinned height and
+ *  stands its lowest point on the ground. */
+export function idleMeasureTime(idle) {
+  return Math.min(0.5, clipDuration(idle) * 0.5);
+}
+
+function idlePose(rig, root) {
   const idle = root.listAnimations().find((a) => a.getName() === 'Idle');
   if (!idle) throw new Error('no Idle clip to stand the wolf on');
-  return Math.min(...Object.values(lowestByRegion(rig, localPose(rig, idle, 0).local)));
+  return localPose(rig, idle, idleMeasureTime(idle)).local;
+}
+
+/** The ground the game stands the wolf on: the Idle's lowest skinned point at the
+ *  game's measuring time. */
+export function idleGround(rig, root) {
+  return skinnedBoundsY(rig, idlePose(rig, root)).min;
+}
+
+/** The raw height the game divides the VisualDef height by (prepareVisual's rawHeight). */
+export function idleHeight(rig, root) {
+  const { min, max } = skinnedBoundsY(rig, idlePose(rig, root));
+  return max - min;
 }
 
 /** The biggest single joint turn (degrees) between two poses, and its joint. */

@@ -1345,13 +1345,15 @@ const STATIC_PROP: ClipMap = {
   death: 'Idle',
 };
 
-// The wolf rig (wolf_basic/greyjaw): a 36-bone skeleton fitted to each body by
-// scripts/assets/wolf_rig/ (spine, two-segment ears, a six-bone tail along the tail's
-// own curl; no jaw, the mouths stay as modeled), every clip carried from the old
-// dog-rig set and finished there (planted paws, nothing through the floor, a tail
-// that trails the body, ears). The animal() core plus Sit/Fall so player wolf forms
-// sit and jump properly, and a Walk swim base (a paddling gait at the gentle clip
-// pitch beats the steep no-clip procedural prone on a quadruped).
+// The wolf rig (wolf_basic/greyjaw): a skeleton fitted to each body by
+// scripts/assets/wolf_rig/ (spine, two-segment ears, a tail along the tail's own curl;
+// no jaw, the mouths stay as modeled; joints and clips pinned by its contract.mjs and
+// tests/wolf_rig.test.ts), every clip carried from the old dog-rig set and finished
+// there (planted paws, nothing through the floor, a tail that trails the body, ears;
+// the hit reacts are short flinches, where the old ones were copies of the 2.8 s Bark).
+// The animal() core plus Sit/Fall so player wolf forms sit and jump properly, and a
+// Walk swim base (a paddling gait at the gentle clip pitch beats the steep no-clip
+// procedural prone on a quadruped).
 const WOLF_BAKED: ClipMap = {
   ...animal(['Attack']),
   sitIdle: 'Sit',
@@ -1364,9 +1366,9 @@ const WOLF_BAKED: ClipMap = {
 // donor clips besides the ones the game plays (Bark, Howl, "Idle Alert", Sneak);
 // this blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
 // more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
-// form_ghost_wolf) still plays. WOLF_BAKED itself is untouched: both still read it,
-// and changing the shared base would change player shaman form combat
-// feel, out of scope here. greyjaw already ships and wires BOTH
+// form_ghost_wolf) still plays. The override stays here, off the WOLF_BAKED map both
+// of those read: putting it in the shared map would change the shaman form's combat
+// feel too. greyjaw already ships and wires BOTH
 // Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
 // hit-variety work is needed here: this override is attack-only.
 const GREYJAW_WOLF: ClipMap = {
@@ -3524,10 +3526,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // WOLF_BAKED). Baked basecolor texture; keeps a light entity tint so this
     // doubles as the beast-family fallback and each beast keeps its own colour.
     // Height 1.47 draws it exactly as large as the old rig's 1.6 did: the game
-    // sizes a creature by its posed idle (1.730 tall on this rig, 1.884 on the
-    // old one), and the old idle measured taller than the wolf (a sliver of the
-    // left hind heel was weighted to the tail and hung below the paws), which also
-    // stood the old wolves off the ground.
+    // sizes a creature by its posed idle, and the old idle measured taller than the
+    // wolf (a sliver of the left hind heel was weighted to the tail and hung below
+    // the paws), which also stood the old wolves off the ground. tests/wolf_rig.test.ts
+    // pins the size (WOLF_ON_SCREEN_SCALE in scripts/assets/wolf_rig/contract.mjs).
     url: `${CREATURES}/wolf_basic.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
     height: 1.47,
@@ -3560,9 +3562,9 @@ export const VISUALS: Record<string, VisualDef> = {
   greyjaw: {
     // Custom Tripo wolf on the rebuilt wolf rig (scripts/assets/wolf_rig/, his own
     // skeleton fitted to his body, see WOLF_BAKED). Baked texture, no tint. Height
-    // 2.05 draws him exactly as large as the old rig's 2.2 did (his posed idle is
-    // 1.819 tall on this rig, 1.954 on the old one); his template scale 1.25 then
-    // makes the rare stand well over the pack wolf in-world.
+    // 2.05 draws him exactly as large as the old rig's 2.2 did (pinned like
+    // mob_wolf's); his template scale 1.25 then makes the rare stand well over the
+    // pack wolf in-world.
     url: `${CREATURES}/greyjaw.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
     height: 2.05,

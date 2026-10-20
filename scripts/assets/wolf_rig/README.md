@@ -30,7 +30,7 @@ rebuild.
 | `build.py` | the Blender entry point: rig, weights, clips, raw GLB export |
 | `to_blender.mjs` | a Blender-readable copy of a shipped GLB (KTX2 to PNG, meshopt and quantization undone) |
 | `ship.mjs` | raw export to game file: the shipped KTX2 texture back byte for byte, meshopt, and read-back checks (clip set, joints, weights, codec, compression drift) |
-| `contract.mjs` | what the rig ships and the game relies on: the files, the clip names, the loops, the joint names, the hit react cap, the floor tolerance (`ship.mjs` and `tests/wolf_rig.test.ts` both read it) |
+| `contract.mjs` | what the rig ships and the game relies on: the files, the clip names, the loops, the joint names, the hit react cap, the floor tolerance, each wolf's on-screen scale (`ship.mjs` and `tests/wolf_rig.test.ts` both read it) |
 | `skin_pose.mjs` | skins a wolf GLB at any clip time with glTF math, as three.js does, binding a clip by joint name (`clip_check.mjs`, `build_greyjaw_anims.mjs`, the test) |
 | `clip_check.mjs` | frame-by-frame floor and flick report for one clip (`--donor` for a clip from a mesh-free file) |
 
@@ -58,16 +58,22 @@ file. Then, for the game:
 
 1. Greyjaw only: `node scripts/build_greyjaw_anims.mjs`.
 2. `node scripts/build_media_manifest.mjs generate` (the preload hashes).
-3. Sizing. The game scales a creature so its idle pose's skinned height matches the
-   `VisualDef.height` (`prepareVisual` in `src/render/characters/assets.ts`). If a rebuild
-   changes the raw idle height, scale the height by new raw height over old raw height to keep
-   the on-screen size.
-4. Portraits. The mob portrait ledger pins every portrait to its model's bytes. Re-render
+3. Sizing. The game scales a creature so its Idle's skinned height (`prepareVisual` in
+   `src/render/characters/assets.ts`, measured the same way by `idleHeight` in
+   `skin_pose.mjs`) matches the `VisualDef.height`. `tests/wolf_rig.test.ts` pins each
+   wolf's height over that raw height to `WOLF_ON_SCREEN_SCALE` (`contract.mjs`), the size
+   it has always been drawn at; if a rebuild changes the raw idle height, set the height to
+   that scale times the new raw height.
+4. The wiki: `npm run wiki:content` (its model table carries the heights), then
+   `ONLY=mob_wolf,greyjaw npm run wiki:stills` (the guide's pictures of both).
+5. Portraits. The mob portrait ledger pins every portrait to its model's bytes. Re-render
    the wolves with `scripts/render_finder_portraits.mjs` (`ONLY=<mob ids>`,
    `PORTRAIT_RECEIPT=<file>`), then
-   `node scripts/build_mob_portrait_source_manifest.mjs --write --receipt <file>`.
-5. Checks: `tests/wolf_rig.test.ts`, `tests/anim_pipeline_greyjaw.test.ts`,
-   `tests/character_clipmaps.test.ts`, the portrait ledger tests, then a look in game.
+   `node scripts/build_mob_portrait_source_manifest.mjs --write --receipt <file>`, and
+   refresh the ledger's pin in that folder's `accepted-art.json` (`sourceManifests`).
+6. Checks: `tests/wolf_rig.test.ts`, `tests/anim_pipeline_greyjaw.test.ts`,
+   `tests/character_clipmaps.test.ts`, `tests/guide.test.ts`, the portrait ledger tests,
+   then a look in game.
 
 ## Checking a clip
 
@@ -76,8 +82,9 @@ node scripts/assets/wolf_rig/clip_check.mjs public/models/creatures/wolf_basic.g
 ```
 
 prints, every frame, the lowest point of each leg region (paw soles, the lower limbs,
-the body, the tail) and the biggest single joint turn that frame. The ground is the
-idle's lowest point. A flick shows as one step far above its neighbours; anything
+the body, the tail) and the biggest single joint turn that frame. The ground is where
+the game stands the wolf (the Idle's lowest point when `prepareVisual` measures it).
+A flick shows as one step far above its neighbours; anything
 under the ground line is going through the floor. A fast gait legitimately shows big
 single steps (the gallop's wrist snaps up as each forepaw leaves the ground), so read a
 step against its neighbours, not on its own.
