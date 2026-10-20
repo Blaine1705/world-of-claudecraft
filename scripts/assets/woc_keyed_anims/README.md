@@ -1,7 +1,7 @@
 # Hand-keyed WOC body animations
 
-Movement, emote and autoattack clips hand-keyed on the WOC male and female bind
-rigs, separately for each fit. `catalog.mjs` lists every keyed clip; the ones the
+Movement, emote, autoattack, combat and spellcasting clips hand-keyed on the WOC
+male and female bind rigs, separately for each fit. `catalog.mjs` lists every keyed clip; the ones the
 game plays (`SHIPPED_CLIPS`) ship as one meshless library per fit:
 
 - `public/models/chars/players/woc_keyed/woc_male.glb` and `woc_female.glb`, beside
@@ -9,12 +9,15 @@ game plays (`SHIPPED_CLIPS`) ship as one meshless library per fit:
 
 The bodies load them after the rig's own library (`anims_<fit>.glb`), and two
 runtime modules map them: `src/render/characters/woc_keyed_animations.ts` (idle,
-walk, run, backpedal, swim, tread, jump, death, and the wave, laugh, flex and bow
-emotes) and `woc_autoattack_core.ts` (one-hand, two-hand, unarmed, rifle, bow and
-dual-wield white swings, timed by `woc_autoattack_contacts.json`). Combat idles,
-casting, strafes, climbing, sitting and weapon transitions keep the rig's own
-clips. The rest of the catalog (crouch, flying, the remaining emotes and attacks,
-backward run and swim directions) stays buildable for when it is wired.
+combat stance, walk, run, backpedal, swim, tread, jump, death, hit flinch, the
+directed cast and wand shot, the wave, laugh, flex, bow, point, roar and salute
+emotes, and every other shipped clip so the per-class routes in `manifest.ts` can
+name them) and `woc_autoattack_core.ts` (one-hand, two-hand, unarmed, rifle, bow
+and dual-wield white swings, timed by `woc_autoattack_contacts.json`). Ability
+strikes, casts and channels are routed per class in `manifest.ts`
+(`attackByAbility`, `castByAbility`, the loadout swaps). Strafes, climbing,
+sitting and weapon transitions keep the rig's own clips. The rest of the catalog
+(crouch, flying, backward swim directions) stays buildable for when it is wired.
 
 ## Rebuild
 
