@@ -53,6 +53,15 @@ function mix(a: number, b: number, k: number): number {
 
 /** The shared material of a tone in a hue. */
 export function heartToneMaterial(tone: HeartTone, hueColor: number): THREE.Material {
+  if (tone === 'ember') {
+    return surfaceMat({
+      color: scaleColor(hueColor, 0.12),
+      emissive: scaleColor(hueColor, 0.62),
+      emissiveIntensity: 0.9,
+      flatShading: true,
+      roughness: 0.8,
+    });
+  }
   if (tone === 'glow') {
     return surfaceMat({
       color: scaleColor(hueColor, 0.35),
@@ -70,7 +79,31 @@ export function heartToneMaterial(tone: HeartTone, hueColor: number): THREE.Mate
       flatShading: true,
     });
   }
-  const base = tone === 'dark' ? HEART_PALETTE.dark : HEART_PALETTE.stone;
+  if (tone === 'steel') {
+    return surfaceMat({
+      color: mix(HEART_PALETTE.steel, hueColor, 0.06),
+      metalness: 0.7,
+      roughness: 0.42,
+      flatShading: true,
+    });
+  }
+  if (tone === 'ice') {
+    // Old blue ice: pale, a little glossy, lit faintly from within.
+    return surfaceMat({
+      color: HEART_PALETTE.ice,
+      emissive: scaleColor(hueColor, 0.22),
+      emissiveIntensity: 1,
+      roughness: 0.28,
+      metalness: 0.05,
+      flatShading: true,
+    });
+  }
+  const base =
+    tone === 'dark'
+      ? HEART_PALETTE.dark
+      : tone === 'ochre'
+        ? HEART_PALETTE.ochre
+        : HEART_PALETTE.stone;
   return surfaceMat({ color: mix(base, hueColor, 0.14), roughness: 0.92, flatShading: true });
 }
 

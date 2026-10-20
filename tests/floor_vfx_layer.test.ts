@@ -372,6 +372,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // floor's own marks, under every telegraph.
   { file: 'src/render/smith_heart/heart_rivers.ts', layer: 'ground', strict: true },
   { file: 'src/render/smith_heart/heart_seal.ts', layer: 'ground', strict: true },
+  // The seal's portal (its floor vortex and shockwave rings, the hop's floor
+  // ring) and the Heart's rune rings: floor marks under every telegraph.
+  { file: 'src/render/smith_heart/heart_portal.ts', layer: 'ground', strict: true },
+  { file: 'src/render/smith_heart/heart_room.ts', layer: 'ground', strict: true },
   // the player's own ground aim guide (additive: it brightens what lies under it)
   { file: 'src/render/ground_aim_reticle_visual.ts', layer: 'reticle', strict: true },
 ];

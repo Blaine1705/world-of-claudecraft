@@ -60,15 +60,16 @@ export function heartPropSolids(): HeartSolid[] {
     const base = heartPropBase(prop.x, prop.z);
     const c = Math.cos(prop.rot);
     const s = Math.sin(prop.rot);
+    const k = prop.scale ?? 1;
     for (const p of recipe) {
       const { r, hh } = partBound(p);
       out.push({
         kind: 'cyl',
-        x: prop.x + p.x * c + p.z * s,
-        z: prop.z - p.x * s + p.z * c,
-        r,
-        y0: base + p.y - hh,
-        y1: base + p.y + hh,
+        x: prop.x + (p.x * c + p.z * s) * k,
+        z: prop.z + (-p.x * s + p.z * c) * k,
+        r: r * k,
+        y0: base + (p.y - hh) * k,
+        y1: base + (p.y + hh) * k,
         what: prop.kind,
       });
     }

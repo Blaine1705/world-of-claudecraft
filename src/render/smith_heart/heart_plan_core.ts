@@ -1,10 +1,17 @@
-// Pure plan for the Smith's Heart blockout (docs/design/raid/smith_heart.md):
-// the palette, the placeholder recipe of every `sh_*` prop kind the field
-// places (boxes, cylinders, cones and gems in the vein's colour family, until
-// the art phase gives each its own model), where a prop's base stands, and
-// the budgeted point lights (one colour key per vein at its guardian's arena
-// and at its mouth on the Ring, the heart seal, the forge's crucibles and the
-// Frozen Lake's braziers).
+// Pure plan for the Smith's Heart (docs/design/raid/smith_heart.md): the
+// palette, the placeholder recipe of every `sh_*` prop kind the field places
+// (boxes, cylinders, cones and gems composed into each room's hero shapes,
+// until the per-room kits give each its own model), where a prop's base
+// stands, and the budgeted point lights (one colour key per vein at its
+// guardian's arena and at its mouth on the Ring, the seal, the forge's
+// crucibles and hearth, the basin's braziers, and the Heart's core, altars
+// and terrace).
+//
+// Every room reads its theme by SHAPE first: the Quarry's kneeling colossi,
+// cut blocks and derrick; the Cornice's lightning rods and broken bellows; the
+// Basin's colossal sunk blades and heaped ice shelves; the Forge's great
+// hearth, giant anvil, bellows and casting channels; the Seal Dais's crown of
+// bronze tines.
 //
 // Three-free, DOM-free, deterministic: the painters (heart_props.ts,
 // heart_lights.ts) read these tables, and tests/smith_heart_render_core.test.ts
@@ -12,8 +19,11 @@
 
 import {
   BREATH,
+  GREAT_HEARTH,
+  HEART_ALTARS,
+  HEART_RETURN_PORTAL,
+  HEART_ROOM,
   HEART_SEAL,
-  HEAT,
   QUENCH,
   RING,
   ringPoint,
@@ -33,15 +43,22 @@ export const HEART_PALETTE = {
   dark: 0x3e3b39,
   /** The Smith's runed bronze. */
   bronze: 0x9a7038,
+  /** Black forge iron (blades, the anvil, the chains). */
+  steel: 0x34363a,
+  /** Old blue ice. */
+  ice: 0xa8cfe6,
+  /** Quarried ochre sandstone (the Hammer's carved stone). */
+  ochre: 0x9a7a52,
   /** The Ring's forge accent (its light zone's accent). */
   ring: 0xd8c8a0,
   /** A brazier's warm coal (the Quench form's only warmth). */
   coal: 0xffa850,
 } as const;
 
-/** A prop part's material family: plain stone, dark rock, bronze, or a glow
- *  in the vein's colour (an emissive face, never a light). */
-export type HeartTone = 'stone' | 'dark' | 'bronze' | 'glow';
+/** A prop part's material family: plain stone, dark rock, quarried ochre,
+ *  bronze, forge iron, old ice, a glow in the hue's colour (an emissive face,
+ *  never a light), or a banked ember of it (a deep, dimmer glow). */
+export type HeartTone = 'stone' | 'dark' | 'ochre' | 'bronze' | 'steel' | 'ice' | 'glow' | 'ember';
 export type HeartShape = 'box' | 'cyl' | 'cone' | 'gem';
 /** Whose colour a part takes: a vein, the Ring's accent, or a brazier's coal. */
 export type HeartHue = SmithHeartVein | 'ring' | 'coal';
@@ -88,19 +105,43 @@ function part(
   };
 }
 
+/** A forge-altar of the Heart: a stone drum, a bronze bowl burning in the
+ *  vein's colour, its crystal, and the ring its chain hangs from. */
 function altar(vein: SmithHeartVein): HeartPart[] {
   return [
-    part('box', 'stone', vein, [2.4, 2.2, 2.4], [0, 1.1, 0]),
-    part('box', 'bronze', vein, [3, 0.4, 3], [0, 2.4, 0]),
-    part('gem', 'glow', vein, [1.2, 1.6, 1.2], [0, 3.5, 0]),
+    part('cyl', 'dark', vein, [6, 1.2, 5.6], [0, 0.6, 0]),
+    part('cyl', 'stone', vein, [5.4, 2.2, 4.6], [0, 2.3, 0]),
+    part('cyl', 'bronze', vein, [4.4, 1.4, 6.2], [0, 4.1, 0]),
+    part('cyl', 'glow', vein, [5.8, 0.3, 5.8], [0, 4.85, 0]),
+    part('gem', 'glow', vein, [2.2, 4.2, 2.2], [0, 7.4, 0]),
+    part('box', 'bronze', vein, [3.2, 3.4, 0.9], [0, 6.2, -2.6]),
   ];
 }
+
+/** A colossus the Smith left half-carved in the quarry's top step: an uncut
+ *  block, kneeling legs, a stooped torso, a bowed head, both hands on the
+ *  haft of a stone hammer whose head rests before its knees. About eleven
+ *  times a body's height. */
+const COLOSSUS: HeartPart[] = [
+  part('cyl', 'dark', 'hammer', [10.4, 7, 9.6], [0, 3.5, 0]),
+  part('box', 'ochre', 'hammer', [9, 3.4, 7], [0, 8.6, 0.6]),
+  part('box', 'ochre', 'hammer', [7.4, 9, 4.8], [0, 14.6, -0.6], { tiltX: 0.14 }),
+  part('box', 'ochre', 'hammer', [10.4, 2.6, 4.6], [0, 19.4, 0.2], { tiltX: 0.14 }),
+  part('box', 'ochre', 'hammer', [3.2, 3.6, 3.2], [0, 22.2, 1.4], { tiltX: 0.32 }),
+  part('box', 'ochre', 'hammer', [2, 8.4, 2], [-4.6, 15.4, 1.8], { tiltX: 0.42, tiltZ: -0.06 }),
+  part('box', 'ochre', 'hammer', [2, 8.4, 2], [4.6, 15.4, 1.8], { tiltX: 0.42, tiltZ: 0.06 }),
+  part('cyl', 'stone', 'hammer', [1.1, 9.4, 1.1], [0, 11.8, 4.1]),
+  part('box', 'stone', 'hammer', [6.4, 2.8, 2.8], [0, 8.4, 4.1]),
+  part('gem', 'glow', 'hammer', [1.6, 2.4, 1.6], [-3.6, 6.4, 3.2], { tiltZ: 0.4 }),
+  part('gem', 'glow', 'hammer', [1.2, 1.8, 1.2], [3.8, 5.6, 2.8], { tiltZ: -0.5 }),
+];
 
 /**
  * The placeholder of every `sh_*` prop kind (the heart seal is drawn by
  * heart_seal.ts, so its recipe is empty). Sized to the layout's colliders
- * (`r` and `h` in content/smith_heart_layout.ts): a part never reaches more
- * than a body's width past its prop's footprint.
+ * (`r`, `hw`/`hd` and `h` in content/smith_heart_layout.ts): a part a body
+ * can touch never reaches more than a body's width past its prop's
+ * footprint.
  */
 export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> = {
   // The crack in the Stormcrag cliffs behind the Cleft landing: two leaning
@@ -111,28 +152,48 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'dark', 'hammer', [4, 70, 9], [6, -8, -5], { tiltZ: -0.06 }),
     part('gem', 'glow', 'hammer', [1.6, 3, 1.6], [0, 9, -1]),
   ],
-  // A half-carved mountain statue: a rough block body, a head, one arm.
+  // A half-carved mountain statue on the Gallery's rim.
   sh_rough_statue: [
-    part('box', 'stone', 'hammer', [3.6, 6.4, 2.6], [0, 3.2, 0]),
-    part('box', 'stone', 'hammer', [2, 2, 2], [0, 7.6, 0.2]),
-    part('box', 'stone', 'hammer', [1.2, 4, 1.2], [2.4, 5, 0.4], { tiltZ: -0.25 }),
-    part('box', 'dark', 'hammer', [4.4, 0.8, 3.4], [0, 0.4, 0]),
+    part('box', 'dark', 'hammer', [6, 1.2, 4.6], [0, 0.6, 0]),
+    part('box', 'ochre', 'hammer', [5, 8.6, 3.6], [0, 5.5, 0]),
+    part('box', 'ochre', 'hammer', [2.8, 2.8, 2.8], [0, 11.2, 0.3]),
+    part('box', 'ochre', 'hammer', [1.6, 5.4, 1.6], [3.4, 7.4, 0.5], { tiltZ: -0.25 }),
   ],
   sh_geode: [
-    part('gem', 'dark', 'hammer', [2.8, 2.2, 2.8], [0, 1, 0]),
-    part('gem', 'glow', 'hammer', [0.8, 2.2, 0.8], [0.5, 1.9, 0], { tiltZ: -0.4 }),
-    part('gem', 'glow', 'hammer', [0.7, 1.8, 0.7], [-0.6, 1.7, 0.3], { tiltZ: 0.5 }),
-    part('gem', 'glow', 'hammer', [0.6, 1.5, 0.6], [0, 1.6, -0.6], { tiltX: -0.5 }),
+    part('gem', 'dark', 'hammer', [3.6, 2.8, 3.6], [0, 1.2, 0]),
+    part('gem', 'glow', 'hammer', [1, 3.2, 1], [0.6, 2.6, 0], { tiltZ: -0.4 }),
+    part('gem', 'glow', 'hammer', [0.9, 2.6, 0.9], [-0.7, 2.3, 0.4], { tiltZ: 0.5 }),
+    part('gem', 'glow', 'hammer', [0.8, 2.2, 0.8], [0, 2.2, -0.7], { tiltX: -0.5 }),
+    part('gem', 'glow', 'hammer', [0.7, 1.8, 0.7], [0.5, 1.9, 0.8], { tiltX: 0.6 }),
   ],
-  // The Hammer Pit's columns (they rise and fall in phase 2).
+  // The Quarry's columns (they rise and fall in phase 2): Mountain's Wrath's
+  // line-of-sight cover, banded so their height reads from across the pit.
   sh_pit_column: [
-    part('cyl', 'stone', 'hammer', [4.4, 9, 4], [0, 4.5, 0]),
-    part('box', 'dark', 'hammer', [5, 0.8, 5], [0, 9.2, 0]),
-    part('cyl', 'glow', 'hammer', [4.5, 0.3, 4.5], [0, 2.2, 0]),
+    part('cyl', 'dark', 'hammer', [6, 1.2, 5.6], [0, 0.6, 0]),
+    part('cyl', 'stone', 'hammer', [5, 12, 4.4], [0, 7.2, 0]),
+    part('cyl', 'glow', 'hammer', [5.3, 0.3, 5.3], [0, 2.4, 0]),
+    part('cyl', 'bronze', 'hammer', [5, 0.7, 5], [0, 9.6, 0]),
+    part('box', 'dark', 'hammer', [6.4, 1.4, 6.4], [0, 13.8, 0]),
+  ],
+  sh_quarry_colossus: COLOSSUS,
+  // A cut block waiting on the steps, a smaller one set on it.
+  sh_quarry_block: [
+    part('box', 'ochre', 'hammer', [4.8, 4.8, 4.8], [0, 2.4, 0]),
+    part('box', 'ochre', 'hammer', [3.2, 2.6, 3.4], [0.4, 6.1, -0.3], { yaw: 0.5 }),
+  ],
+  // The derrick that lifted them: an A of timbers, a boom over the pit, a
+  // chain and a hoisted block.
+  sh_quarry_derrick: [
+    part('cyl', 'dark', 'hammer', [2.4, 2, 2.4], [0, 1, -1]),
+    part('box', 'dark', 'hammer', [0.8, 18, 0.8], [-0.9, 9, 0], { tiltZ: 0.1 }),
+    part('box', 'dark', 'hammer', [0.8, 18, 0.8], [0.9, 9, 0], { tiltZ: -0.1 }),
+    part('box', 'dark', 'hammer', [0.7, 0.7, 13], [0, 16.6, 4.8], { tiltX: -0.22 }),
+    part('cyl', 'steel', 'hammer', [0.35, 7, 0.35], [0, 14.6, 10.6]),
+    part('box', 'ochre', 'hammer', [2.8, 2.8, 2.8], [0, 9.8, 10.6]),
   ],
   // The Slab's frame: two jambs from the fissure's depth beside the stair and
   // a lintel high over it (the slab itself is a gate, heart_gates.ts). Set
-  // just north of the slab, clear of the Pit's rim on either side.
+  // just north of the slab, clear of the Quarry's rim on either side.
   sh_slab_frame: [
     part('box', 'dark', 'hammer', [2.4, 34, 3], [-9.4, -3, 2]),
     part('box', 'dark', 'hammer', [2.4, 34, 3], [9.4, -3, 2]),
@@ -145,27 +206,76 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('cyl', 'bronze', 'ring', [2.8, 0.8, 2.8], [0, 10.6, 0]),
     part('cone', 'glow', 'ring', [1.6, 1.4, 0], [0, 12.7, 0]),
   ],
+  // One of the four bronze tines crowning the Seal Dais: a shaft rising off
+  // the dais, its head bent in over the seal, a glowing tip the portal's
+  // light runs from.
+  sh_portal_tine: [
+    part('cyl', 'dark', 'ring', [2, 1.2, 1.8], [0, 0.6, 0]),
+    part('cyl', 'bronze', 'ring', [1.3, 11, 0.8], [0, 6.7, 0]),
+    part('cyl', 'glow', 'ring', [1.4, 0.3, 1.4], [0, 4, 0]),
+    part('cyl', 'glow', 'ring', [1.2, 0.3, 1.2], [0, 8.6, 0]),
+    part('box', 'bronze', 'ring', [0.8, 5, 0.8], [0, 13.6, -1.4], { tiltX: -0.6 }),
+    part('gem', 'glow', 'ring', [1.1, 2, 1.1], [0, 16, -3]),
+  ],
+  // The Breath: the bridge's wind shelters, the Cornice's lightning rods and
+  // its broken bellows.
   sh_wind_shelter: [
     part('box', 'stone', 'breath', [4.8, 2, 1.4], [0, 1, 0]),
     part('box', 'glow', 'breath', [4.2, 0.2, 0.2], [0, 1.6, 0.72]),
   ],
+  sh_lightning_rod: [
+    part('cyl', 'stone', 'breath', [2.6, 2, 2.4], [0, 1, 0]),
+    part('cyl', 'bronze', 'breath', [0.9, 20, 0.5], [0, 12, 0]),
+    part('cyl', 'bronze', 'breath', [2, 0.35, 2], [0, 6, 0]),
+    part('cyl', 'bronze', 'breath', [1.8, 0.35, 1.8], [0, 10, 0]),
+    part('cyl', 'bronze', 'breath', [1.5, 0.35, 1.5], [0, 14, 0]),
+    part('cone', 'bronze', 'breath', [0.5, 3, 0], [0.6, 22.6, 0], { tiltZ: -0.35 }),
+    part('cone', 'bronze', 'breath', [0.5, 3, 0], [-0.6, 22.6, 0], { tiltZ: 0.35 }),
+    part('gem', 'glow', 'breath', [1.1, 2.8, 1.1], [0, 23.6, 0]),
+  ],
+  sh_broken_bellows: [
+    part('box', 'dark', 'breath', [8, 0.8, 13], [0, 0.4, 0]),
+    part('box', 'dark', 'breath', [6.8, 2.4, 10], [0, 2, -0.6], { tiltX: 0.14 }),
+    part('box', 'bronze', 'breath', [8, 0.8, 13], [0, 4.6, -1.2], { tiltX: 0.36 }),
+    part('cone', 'bronze', 'breath', [2.4, 3.6, 0], [0, 1.6, 6.6], { tiltX: Math.PI / 2 }),
+    part('box', 'bronze', 'breath', [8.4, 0.5, 0.6], [0, 1.2, 4.4]),
+    part('gem', 'glow', 'breath', [1.2, 1.6, 1.2], [2.6, 1, -4.8]),
+  ],
+  // The Quench: the basin's braziers, vents, colossal blades and ice shelves.
   sh_brazier: [
     part('cyl', 'dark', 'quench', [1.4, 1.2, 1.1], [0, 0.6, 0]),
     part('cyl', 'bronze', 'quench', [2, 0.4, 1.6], [0, 1.4, 0]),
     part('cyl', 'glow', 'coal', [1.5, 0.2, 1.5], [0, 1.65, 0]),
   ],
-  // A half-forged blade set in the ice.
+  sh_steam_vent: [
+    part('cyl', 'dark', 'quench', [3.4, 0.1, 3.4], [0, 0.05, 0]),
+    part('cyl', 'glow', 'quench', [1.8, 0.12, 1.8], [0, 0.07, 0]),
+  ],
+  sh_sunk_blade: [
+    part('box', 'steel', 'quench', [0.6, 12, 3.2], [0, 4.6, 0], { tiltZ: 0.22 }),
+    part('box', 'glow', 'quench', [0.2, 11, 0.4], [0.32, 4.8, 0], { tiltZ: 0.22 }),
+    part('box', 'bronze', 'quench', [0.9, 0.9, 6], [2.4, 10.4, 0], { tiltZ: 0.22 }),
+    part('cyl', 'dark', 'quench', [0.7, 3.4, 0.7], [3, 12.6, 0], { tiltZ: 0.22 }),
+    part('gem', 'ice', 'quench', [2.4, 1, 2.4], [0, 0.4, 0]),
+  ],
+  sh_ice_shelf: [
+    part('box', 'ice', 'quench', [14, 2.6, 6.4], [0, -0.8, 0], { tiltX: 0.28 }),
+    part('box', 'ice', 'quench', [8, 2, 5], [5, 0.6, -2.4], { tiltX: 0.45, yaw: 0.3 }),
+    part('gem', 'ice', 'quench', [2.6, 4, 2.6], [-4.6, 1.4, -1]),
+    part('gem', 'glow', 'quench', [1, 2.6, 1], [-4, 2.4, 0.4], { tiltZ: 0.3 }),
+  ],
+  // A half-forged blade set in the Singing Ice.
   sh_ice_blade: [
     part('box', 'glow', 'quench', [0.4, 4, 1.4], [0, 2, 0], { tiltZ: 0.15 }),
     part('box', 'bronze', 'quench', [1.6, 0.4, 0.5], [0.3, 4, 0], { tiltZ: 0.15 }),
   ],
-  // A house-sized crucible, its melt glowing white-gold.
+  // The Heat: crucibles, the great pour crucible, the great hearth, its
+  // bellows, the giant anvil and the casting channels.
   sh_crucible: [
     part('cyl', 'bronze', 'heat', [4.6, 4.8, 5.2], [0, 2.4, 0]),
     part('cyl', 'glow', 'heat', [4.2, 0.3, 4.2], [0, 4.9, 0]),
     part('cyl', 'dark', 'heat', [5.2, 0.6, 5.2], [0, 0.3, 0]),
   ],
-  // The great pour crucible on its legs, the spout tipped over the channel.
   sh_pour_crucible: [
     part('cyl', 'dark', 'heat', [0.8, 4, 0.8], [-2, 2, -1.2]),
     part('cyl', 'dark', 'heat', [0.8, 4, 0.8], [2, 2, -1.2]),
@@ -174,11 +284,46 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('cyl', 'glow', 'heat', [5.2, 0.3, 5.2], [0, 9.1, 0]),
     part('cone', 'bronze', 'heat', [1.4, 2.6, 0], [0, 8.4, 3.4], { tiltX: 1.2 }),
   ],
-  // The anvil's horn: a glowing inlay along the platform's westward tip
-  // (flush with the floor, never in the way).
-  sh_anvil_horn: [
-    part('box', 'glow', 'heat', [3.6, 0.12, 9], [0, 0.06, 0]),
-    part('box', 'glow', 'heat', [1.6, 0.12, 3], [0, 0.06, 5.5]),
+  // The great hearth in the rock behind the forge's west wall (local +z
+  // faces the arena): two piers, a stepped lintel and hood, the hearth bed
+  // and the white-gold fire inside. Nothing of it stands over the floor.
+  sh_great_hearth: [
+    part('box', 'dark', 'heat', [46, 4, 12], [0, -2, -5]),
+    part('box', 'dark', 'heat', [7, 26, 10], [-17, 11, -5]),
+    part('box', 'dark', 'heat', [7, 26, 10], [17, 11, -5]),
+    part('box', 'bronze', 'heat', [8, 1.2, 11], [-17, 23.6, -5]),
+    part('box', 'bronze', 'heat', [8, 1.2, 11], [17, 23.6, -5]),
+    part('box', 'stone', 'heat', [4.4, 21, 10], [-9.2, 31, -5], { tiltZ: -0.62 }),
+    part('box', 'stone', 'heat', [4.4, 21, 10], [9.2, 31, -5], { tiltZ: 0.62 }),
+    part('box', 'bronze', 'heat', [4.6, 4.6, 11], [0, 39.4, -5]),
+    part('box', 'dark', 'heat', [52, 16, 12], [0, 48, -8]),
+    part('box', 'ember', 'heat', [26, 30, 1], [0, 14, -10]),
+    part('cone', 'glow', 'heat', [5, 15, 0], [-8, 7.5, -7]),
+    part('cone', 'glow', 'heat', [6, 22, 0], [-2.5, 11, -7.5]),
+    part('cone', 'glow', 'heat', [5.4, 18, 0], [3.5, 9, -7.2]),
+    part('cone', 'glow', 'heat', [4.4, 12, 0], [8.5, 6, -6.8]),
+    part('box', 'glow', 'heat', [27, 2, 7], [0, 1, -5]),
+  ],
+  sh_great_bellows: [
+    part('box', 'dark', 'heat', [7, 0.7, 12], [0, 0.35, 0]),
+    part('box', 'dark', 'heat', [6.2, 3.2, 10], [0, 2.2, -0.4], { tiltX: 0.12 }),
+    part('box', 'bronze', 'heat', [7, 0.7, 12], [0, 4.4, -0.8], { tiltX: 0.3 }),
+    part('cone', 'bronze', 'heat', [1.6, 3, 0], [0, 1.6, 6.2], { tiltX: Math.PI / 2 }),
+    part('box', 'bronze', 'heat', [0.6, 0.6, 5], [0, 6.6, -6.4], { tiltX: 0.3 }),
+  ],
+  // The giant anvil, side-on to the arena's door: foot, waist, face, horn
+  // (north, local +z) and heel, a white-hot blank on its face.
+  sh_giant_anvil: [
+    part('box', 'dark', 'heat', [6.2, 2.4, 10], [0, 1.2, 0]),
+    part('box', 'steel', 'heat', [4.2, 3, 7], [0, 3.9, 0]),
+    part('box', 'steel', 'heat', [6.4, 2.6, 13], [0, 6.7, 0]),
+    part('cone', 'steel', 'heat', [3.4, 7, 0], [0, 6.9, 10], { tiltX: Math.PI / 2 }),
+    part('box', 'steel', 'heat', [5.2, 1.8, 3], [0, 7.4, -7.6]),
+    part('box', 'glow', 'heat', [1.1, 0.5, 9], [0.8, 8.25, 0.6]),
+  ],
+  sh_casting_channel: [
+    part('box', 'dark', 'heat', [2.6, 0.06, 64], [0, 0.03, 0]),
+    part('box', 'glow', 'heat', [1.4, 0.1, 64], [0, 0.05, 0]),
   ],
   sh_altar_hammer: altar('hammer'),
   sh_altar_breath: altar('breath'),
@@ -206,8 +351,8 @@ export function scaleColor(color: number, k: number): number {
 /**
  * The floor height a prop stands on: the field's ground under it, or, for a
  * prop set just past a lip into the void (the Cleft's mouth, the Slab's
- * jambs), the highest floor within `reach` yards, so it rises from the
- * terrace beside it rather than from the fissure's depth.
+ * jambs, the great hearth), the highest floor within `reach` yards, so it
+ * rises from the terrace beside it rather than from the fissure's depth.
  */
 export function heartPropBase(x: number, z: number, reach = 10): number {
   if (authoredFieldSurfaceAt(SMITH_HEART_FIELD, x, z)) {
@@ -245,10 +390,10 @@ function veinKey(id: string, vein: SmithHeartVein, at: { x: number; z: number })
     id,
     x: at.x,
     z: at.z,
-    lift: 9,
+    lift: 12,
     color: SMITH_HEART_VEIN_COLORS[vein],
-    intensity: 7,
-    range: 42,
+    intensity: 8,
+    range: 58,
   };
 }
 
@@ -265,6 +410,9 @@ function veinMouth(id: string, vein: SmithHeartVein, deg: number): HeartLightSpo
   };
 }
 
+/** Which of the Cornice's rods (in field order) carry a light. */
+const LIT_RODS: ReadonlySet<number> = new Set([1, 5]);
+
 function warm(id: string, x: number, z: number, lift: number, color: number): HeartLightSpot {
   return { id, x, z, lift, color, intensity: 3, range: 16 };
 }
@@ -272,7 +420,10 @@ function warm(id: string, x: number, z: number, lift: number, color: number): He
 /**
  * Every budgeted light: each vein's key over its guardian's arena and an
  * accent at its mouth (the Hammer's on the Balcony, the others on the Ring),
- * the seal's pale glow, the forge's crucibles and the lake's braziers.
+ * the seal's glow, the forge's crucibles and hearth, the basin's braziers,
+ * two of the Cornice's lightning rods, and the Heart: the core's glow up out
+ * of the chasm, a warm key over the platform, the four altars and the
+ * terrace's return portal.
  */
 export function planHeartLights(): HeartLightSpot[] {
   const spots: HeartLightSpot[] = [
@@ -280,7 +431,7 @@ export function planHeartLights(): HeartLightSpot[] {
     veinKey('key:breath', 'breath', BREATH.cornice),
     veinKey('key:quench', 'quench', QUENCH.lake),
     veinKey('key:heat', 'heat', SMITH_HEART_BOSS_SPOTS.heat),
-    { ...veinMouth('mouth:hammer', 'hammer', 180), x: 0, z: -80 },
+    { ...veinMouth('mouth:hammer', 'hammer', 180), x: 0, z: -86 },
     veinMouth('mouth:breath', 'breath', 0),
     veinMouth('mouth:quench', 'quench', 90),
     veinMouth('mouth:heat', 'heat', 270),
@@ -288,12 +439,60 @@ export function planHeartLights(): HeartLightSpot[] {
       id: 'seal',
       x: HEART_SEAL.x,
       z: HEART_SEAL.z,
-      lift: 7,
+      lift: 8,
       color: HEART_PALETTE.ring,
+      intensity: 6,
+      range: 34,
+    },
+    {
+      id: 'hearth',
+      x: GREAT_HEARTH.x + 9,
+      z: GREAT_HEARTH.z,
+      lift: 8,
+      color: SMITH_HEART_VEIN_COLORS.heat,
+      intensity: 9,
+      range: 44,
+    },
+    {
+      id: 'core',
+      x: HEART_ROOM.x,
+      z: HEART_ROOM.z,
+      lift: -28,
+      color: 0xffd890,
+      intensity: 12,
+      range: 90,
+    },
+    {
+      id: 'key:heart',
+      x: HEART_ROOM.x,
+      z: HEART_ROOM.z,
+      lift: 20,
+      color: 0xffe6c0,
+      intensity: 6,
+      range: 64,
+    },
+    ...HEART_ALTARS.map((a) => ({
+      id: `altar:${a.vein}`,
+      x: a.x,
+      z: a.z,
+      lift: 7,
+      color: SMITH_HEART_VEIN_COLORS[a.vein],
       intensity: 5,
-      range: 30,
+      range: 24,
+    })),
+    {
+      id: 'return_portal',
+      x: HEART_RETURN_PORTAL.x,
+      z: HEART_RETURN_PORTAL.z,
+      lift: 5,
+      color: HEART_PALETTE.ring,
+      intensity: 4,
+      range: 20,
     },
   ];
+  // Two of the Cornice's lightning rods (east and west of the arena) carry
+  // their tip's storm light; the rest only glow.
+  let rod = 0;
   for (const p of SMITH_HEART_FIELD.props) {
     if (p.kind === 'sh_crucible' || p.kind === 'sh_pour_crucible') {
       spots.push(
@@ -307,6 +506,16 @@ export function planHeartLights(): HeartLightSpot[] {
       );
     } else if (p.kind === 'sh_brazier') {
       spots.push(warm(`brazier:${p.x}:${p.z}`, p.x, p.z, 2.4, HEART_PALETTE.coal));
+    } else if (p.kind === 'sh_lightning_rod' && LIT_RODS.has(rod++)) {
+      spots.push({
+        id: `rod:${p.x}:${p.z}`,
+        x: p.x,
+        z: p.z,
+        lift: 23,
+        color: SMITH_HEART_VEIN_COLORS.breath,
+        intensity: 4,
+        range: 30,
+      });
     }
   }
   return spots;
@@ -319,9 +528,6 @@ export function heartLightZoneOf(x: number, z: number): FieldLightZone | null {
   }
   return null;
 }
-
-/** The Heat's forge hall: the walls plan keeps its molten channels open. */
-export const HEART_ANVIL_CHANNEL_X = HEAT.floor.x0 - 6;
 
 /** Deterministic hash in [0, 1) of two integers (no rng in a plan). */
 export function heartHash(a: number, b: number): number {

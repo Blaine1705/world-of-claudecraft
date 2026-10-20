@@ -1,8 +1,9 @@
 // Pure plan for the Smith's Heart's mountain rock: jagged spires, crags and
 // broken slabs rising out of the fissures' depth along the field's OUTER
-// cliff edges, so each vein reads as an open crack inside Stormcrag and the
-// Ring as a gallery round a caldera. Render only (no collider): the field's
-// own cliff colliders already hold every lip.
+// cliff edges, so each vein reads as an open crack inside Stormcrag, the Ring
+// as a gallery round the seal's chasm, and the Heart as a vast chamber inside
+// the mountain, open to the sky. Render only (no collider): the field's own
+// cliff colliders already hold every lip.
 //
 // Rules the plan keeps (pinned by tests/smith_heart_render_core.test.ts):
 //   - every block, its lean included, stands at least HEART_WALL_CLEAR yards
@@ -13,15 +14,29 @@
 //     20 to 25 yd back sees over the near teeth;
 //   - each block is irregular: one of three faceted shapes (heartRockShape),
 //     squashed across, turned, and leaning OUT, away from the floor it faces;
-//   - the caldera stays open: no block enters the disc inside the Ring's inner
-//     edge, so the seal is in sight from every point of the Ring; the Wind
-//     Bridge's chasm and the Anvil's molten channels stay open too.
+//   - the chasm round the Seal Dais stays open: no block enters the disc
+//     inside the Ring's inner edge, so the seal is in sight from every point
+//     of the Ring; the Wind Bridge's gulf, the great hearth's mouth and the
+//     Heart's chasm round the Anvil of the World stay open too;
+//   - each room's rock has its own scale: the Storm Cornice is a summit, so
+//     its crags stay low and the sky stays open round it; the Heart is a
+//     chamber inside the mountain, so its crown is deeper and taller, and
+//     no line of sight crosses from the main map into it.
 //
 // Three-free, DOM-free, deterministic (hashed jitter, no rng).
 
-import { RING, SMITH_HEART_FIELD, WIND_BRIDGE } from '../../sim/content/smith_heart_layout';
+import {
+  BREATH,
+  GREAT_HEARTH,
+  HEART_ROOM,
+  HEART_ROOM_CHASM_R,
+  inSmithHeartRoom,
+  RING,
+  SMITH_HEART_FIELD,
+  WIND_BRIDGE,
+} from '../../sim/content/smith_heart_layout';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../../sim/instances/authored_field';
-import { HEART_ANVIL_CHANNEL_X, heartHash } from './heart_plan_core';
+import { heartHash } from './heart_plan_core';
 
 /** One rock block: shape `variant` (heartRockShape) scaled to `rx` x `rz`
  *  across at its foot (its unit radius), from `base` to `top`, turned by
@@ -45,8 +60,16 @@ export const HEART_WALL_CLEAR = 8;
 export const HEART_WALL_PATH_CLEAR = 10.5;
 /** How far past the clearance the rock reaches (yards of void covered). */
 export const HEART_WALL_BAND = 30;
+/** How far past the clearance the loose crags stand (the mountain beyond). */
+export const HEART_WALL_TEETH = 14;
+/** ... round the Heart, whose crown is deeper (a chamber in the mountain). */
+export const HEART_ROOM_WALL_BAND = 44;
+/** The Heart's crown climbs this much taller than the veins' rock. */
+export const HEART_ROOM_WALL_SCALE = 1.25;
+/** The Storm Cornice's crags stay this low (a summit open to the sky). */
+export const CORNICE_WALL_SCALE = 0.42;
 /** The largest foot radius. */
-export const HEART_WALL_MAX_R = 6;
+export const HEART_WALL_MAX_R = 11;
 /** The number of rock shapes. */
 export const HEART_ROCK_VARIANTS = 3;
 const MIN_R = 1.4;
@@ -54,8 +77,13 @@ const MIN_R = 1.4;
 const CELL = 2;
 /** The Wind Bridge's chasm: no block within this of the arch's span. */
 const BRIDGE_CLEAR = 22;
-/** The Anvil's molten channels: no block this close to the platform. */
-const CHANNEL_CLEAR = 12;
+/** The great hearth's mouth: no block within this box (behind the forge's
+ *  west wall, where the hearth stands in the rock). */
+const HEARTH_BOX = {
+  x0: GREAT_HEARTH.x - 16,
+  x1: GREAT_HEARTH.x + 8,
+  halfZ: GREAT_HEARTH.halfWidth + 6,
+};
 
 interface DistanceField {
   x0: number;
@@ -79,7 +107,7 @@ let cachedField: DistanceField | null = null;
 function distanceField(): DistanceField {
   if (cachedField) return cachedField;
   const def = SMITH_HEART_FIELD;
-  const pad = HEART_WALL_PATH_CLEAR + HEART_WALL_BAND + HEART_WALL_MAX_R + 8;
+  const pad = HEART_WALL_PATH_CLEAR + HEART_ROOM_WALL_BAND + HEART_WALL_MAX_R + 8;
   const x0 = def.bounds.minX - pad;
   const z0 = def.bounds.minZ - pad;
   const nx = Math.ceil((def.bounds.maxX + pad - x0) / CELL) + 1;
@@ -148,8 +176,10 @@ export interface HeartClearance {
 }
 
 /** Distance from (x, z) to the nearest walkable floor, conservative: the
- *  field's cell distance less a cell's half-diagonal and a cell (the floor's
- *  own edge can lie that much nearer than its nearest cell centre). */
+ *  straight distance to the field's nearest walkable cell centre (smooth as
+ *  the point moves, so the mountain's slopes never step) less a cell's
+ *  half-diagonal and a cell (the floor's own edge can lie that much nearer
+ *  than its nearest cell centre). */
 export function heartFloorClearance(x: number, z: number): HeartClearance {
   const f = distanceField();
   const i = Math.round((x - f.x0) / CELL);
@@ -167,14 +197,32 @@ export function heartFloorClearance(x: number, z: number): HeartClearance {
   if (n < 0) return none;
   const fx = f.x0 + (n % f.nx) * CELL;
   const fz = f.z0 + Math.floor(n / f.nx) * CELL;
-  const len = Math.hypot(fx - x, fz - z) || 1;
+  const straight = Math.hypot(fx - x, fz - z);
+  const len = straight || 1;
   return {
-    d: Math.max(0, f.dist[k] - CELL * 1.5),
+    d: Math.max(0, Math.min(f.dist[k], straight) - CELL * 1.5),
     floor: f.height[n],
     path: f.path[n] === 1,
     toX: (fx - x) / len,
     toZ: (fz - z) / len,
   };
+}
+
+/** A slow swell in [0, 1] along the walls (bilinear over a 46 yd lattice of
+ *  hashed heights): the crown's ridge line. */
+export function heartRidgeNoise(x: number, z: number): number {
+  const s = 46;
+  const gx = Math.floor(x / s);
+  const gz = Math.floor(z / s);
+  const fx = x / s - gx;
+  const fz = z / s - gz;
+  const ux = fx * fx * (3 - 2 * fx);
+  const uz = fz * fz * (3 - 2 * fz);
+  const a = heartHash(gx, gz);
+  const b = heartHash(gx + 1, gz);
+  const c = heartHash(gx, gz + 1);
+  const d = heartHash(gx + 1, gz + 1);
+  return a + (b - a) * ux + (c - a) * uz + (a - b - c + d) * ux * uz;
 }
 
 /** Distance from a point to a segment (2D). */
@@ -193,8 +241,8 @@ function segmentDistance(
 }
 
 /** Is the disc at (x, z) of radius r inside an area that stays open air? */
-export function heartOpenAir(x: number, z: number, r: number, clearance: number): boolean {
-  // The caldera: from the Ring's inner edge to the Heart, all open.
+export function heartOpenAir(x: number, z: number, r: number): boolean {
+  // The chasm round the Seal Dais: inside the Ring's inner edge, all open.
   if (Math.hypot(x - RING.x, z - RING.z) - r < RING.innerR) return true;
   // The Wind Bridge's gulf.
   if (
@@ -204,9 +252,29 @@ export function heartOpenAir(x: number, z: number, r: number, clearance: number)
   ) {
     return true;
   }
-  // The Anvil's molten channels (the void hugging the platform).
-  if (x < HEART_ANVIL_CHANNEL_X && clearance - r < CHANNEL_CLEAR) return true;
+  // The great hearth's mouth.
+  if (
+    x + r > HEARTH_BOX.x0 &&
+    x - r < HEARTH_BOX.x1 &&
+    Math.abs(z - GREAT_HEARTH.z) - r < HEARTH_BOX.halfZ
+  ) {
+    return true;
+  }
+  // The Heart's chasm, down to the glowing heart under the platform.
+  if (Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z) - r < HEART_ROOM_CHASM_R) return true;
   return false;
+}
+
+/** The rock's own scale round (x, z): how far it reaches past the clearance
+ *  and how tall it climbs (the Cornice low, the Heart's crown tall). */
+export function heartWallScale(
+  x: number,
+  z: number,
+  floor: number,
+): { band: number; tall: number } {
+  if (inSmithHeartRoom(x, z)) return { band: HEART_ROOM_WALL_BAND, tall: HEART_ROOM_WALL_SCALE };
+  if (floor >= BREATH.cornice.h - 0.5) return { band: HEART_WALL_BAND, tall: CORNICE_WALL_SCALE };
+  return { band: HEART_WALL_BAND, tall: 1 };
 }
 
 /** The horizontal radius that bounds a whole block (its lean included). */
@@ -222,7 +290,7 @@ export function heartWallReach(b: HeartWallBlock): number {
 export function planHeartWalls(spacing = 5): HeartWallBlock[] {
   const def = SMITH_HEART_FIELD;
   const out: HeartWallBlock[] = [];
-  const pad = HEART_WALL_PATH_CLEAR + HEART_WALL_BAND;
+  const pad = HEART_WALL_PATH_CLEAR + HEART_ROOM_WALL_BAND;
   const i0 = Math.floor((def.bounds.minX - pad) / spacing);
   const i1 = Math.ceil((def.bounds.maxX + pad) / spacing);
   const j0 = Math.floor((def.bounds.minZ - pad) / spacing);
@@ -236,31 +304,45 @@ export function planHeartWalls(spacing = 5): HeartWallBlock[] {
       const c = heartFloorClearance(x, z);
       const clear = c.path ? HEART_WALL_PATH_CLEAR : HEART_WALL_CLEAR;
       const back = c.d - clear;
-      if (back < 0 || back > HEART_WALL_BAND) continue;
+      const scale = heartWallScale(x, z, c.floor);
+      if (back < 0 || back > scale.band) continue;
       const h1 = heartHash(i * 31 + 5, j * 17 - 3);
       const h2 = heartHash(i - 11, j + 13);
       const h3 = heartHash(i + 101, j * 7 + 1);
-      // Small teeth by the walks, great crags behind.
-      const want = Math.min(HEART_WALL_MAX_R, 1.6 + back * 0.17 + h1 * 1.4);
+      // The blocks are the teeth and crags at the mountain's foot, by the
+      // walks; the mountain itself (heart_mountain_core.ts) is the mass.
+      if (back > HEART_WALL_TEETH) continue;
+      // Small teeth by the walks, broad crags behind.
+      const want = Math.min(HEART_WALL_MAX_R, 2.2 + back * 0.36 + h1 * 2);
+      // Past the veins' band the climb turns linear (the Heart's deep crown).
+      const b = Math.min(back, HEART_WALL_BAND) + Math.max(0, back - HEART_WALL_BAND) * 0.6;
+      // The ridge line: a slow swell along the walls (so the crown reads as
+      // one mountain, never a skyline of equal spires) and a small jag.
+      const ridge = 0.62 + 0.76 * heartRidgeNoise(x, z);
+      const height = ((2 + 0.04 * b * b + b * 0.6) * ridge + h2 * (2 + b * 0.25)) * scale.tall;
       // Lean: the top lies out, away from the floor it faces.
-      const height = 2 + 0.05 * back * back + back * 0.5 + h2 * (3 + back * 0.6);
-      const lean = Math.min(0.09, 0.03 + h3 * 0.06) * height;
+      const lean = Math.min(0.12, 0.04 + h3 * 0.08) * height;
       // The whole block (lean included) keeps its clearance.
       const r = Math.min(want, back - lean);
       if (r < MIN_R) continue;
       const reach = r + lean;
-      if (heartOpenAir(x, z, reach, c.d)) continue;
+      if (heartOpenAir(x, z, reach)) continue;
       out.push({
         x,
         z,
         base: def.voidHeight - 2,
         top: c.floor + height,
         rx: r,
-        rz: r * (0.55 + h2 * 0.45),
+        rz: r * (0.72 + h2 * 0.28),
         yaw: h3 * Math.PI * 2,
         leanX: -c.toX * lean,
         leanZ: -c.toZ * lean,
-        variant: Math.floor(h1 * HEART_ROCK_VARIANTS) % HEART_ROCK_VARIANTS,
+        // The single-tip spire only as a tooth by the walks; behind, the
+        // crowned crags and the split slabs (a mountain, not a skyline).
+        variant:
+          back < 10
+            ? Math.floor(h1 * HEART_ROCK_VARIANTS) % HEART_ROCK_VARIANTS
+            : 1 + (Math.floor(h1 * 2) % 2),
       });
     }
   }
@@ -284,8 +366,8 @@ export function heartRockShape(variant: number): number[] {
     v === 0
       ? [
           [0, 1],
-          [0.42, 0.68],
-          [0.74, 0.36],
+          [0.48, 0.8],
+          [0.8, 0.5],
         ]
       : v === 1
         ? [

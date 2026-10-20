@@ -982,6 +982,11 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_seal_core.ts',
   'src/render/smith_heart/heart_gates_core.ts',
   'src/render/smith_heart/heart_sightline_core.ts',
+  // The Smith's Heart's portal moments (the opening, the hop, the area blend),
+  // the Heart's chains, keels and core, and the mountain round every floor.
+  'src/render/smith_heart/heart_portal_core.ts',
+  'src/render/smith_heart/heart_room_core.ts',
+  'src/render/smith_heart/heart_mountain_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',
