@@ -57,6 +57,7 @@ export class MembershipGameServices {
   >();
   private refreshing = 0;
   private refreshDrainTimer?: ReturnType<typeof setTimeout>;
+  private stopped = false;
   readonly bank;
 
   constructor(private readonly host: MembershipGameHost) {
@@ -197,6 +198,17 @@ export class MembershipGameServices {
     }
   }
 
+  /** Clears every pending refresh timer and arms no new one. A cohort wakeup
+   *  holds this service, its host and the whole Sim, so a stopped server must
+   *  not leave one behind (GameServer.stop). */
+  stop(): void {
+    this.stopped = true;
+    for (const bucket of this.refreshWakeups.values()) clearTimeout(bucket.timer);
+    this.refreshWakeups.clear();
+    if (this.refreshDrainTimer) clearTimeout(this.refreshDrainTimer);
+    this.refreshDrainTimer = undefined;
+    this.refreshQueue.clear();
+  }
   onJoin(session: ClientSession): void {
     let group = this.accounts.get(session.accountId);
     if (!group) {
@@ -230,6 +242,7 @@ export class MembershipGameServices {
   }
   private scheduleRefresh(accountId: number, group: MembershipAccountSessions): void {
     this.cancelRefresh(accountId, group);
+    if (this.stopped) return;
     // One timer per due cohort, not one timer per player. Rounding adds at most
     // one second, inside the 60-second authority budget.
     const due = Math.ceil((Date.now() + MEMBERSHIP_REFRESH_MS) / 1000) * 1000;
@@ -253,7 +266,7 @@ export class MembershipGameServices {
     group.nextRefreshAt = due;
   }
   private requestRefresh(accountId: number): void {
-    if (!this.accounts.has(accountId)) return;
+    if (this.stopped || !this.accounts.has(accountId)) return;
     this.refreshQueue.add(accountId);
     // Coalesce join/timer cohorts into bounded batches rather than spending one
     // external request on each account at the head of a timer burst.
