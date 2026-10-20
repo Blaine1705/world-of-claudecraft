@@ -213,6 +213,8 @@ const UI_PURE_CORES = [
   'src/ui/graphics_restore_note_view.ts',
   'src/ui/ferry_port_map_core.ts',
   'src/ui/frame_presets_core.ts',
+  // The landing select's and first-login prompt's shared graphics-choice policy.
+  'src/ui/graphics_choice_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
   // A copy's own display name (the World PvP trophy skull's "<name>'s Skull").
@@ -2702,6 +2704,8 @@ const UI_DOM_MODULES = [
   'src/ui/hud/skull_bag/skull_bag_pane_controller.ts',
   'src/ui/error_toast_controller.ts',
   'src/ui/boot_splash.ts',
+  // The first-login graphics prompt: a top-level pre-game modal reading the URL and navigator.
+  'src/ui/graphics_choice_prompt.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',
   'src/ui/frame_presets_controls.ts',

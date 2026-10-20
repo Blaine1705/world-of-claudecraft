@@ -3889,6 +3889,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'mobilePreflight.otherStandaloneDetail': '端末を横向き全画面に保ってください。',
   'mobilePreflight.otherInstallDetail':
     '最高のモバイル全画面体験のため、このページをインストールするかホーム画面に追加してください。',
+  'graphicsPrompt.title': 'グラフィック設定を選択',
+  'graphicsPrompt.intro':
+    'このデバイスのグラフィックプリセットを選んでください。低いプリセットほど動作が滑らかに、高いプリセットほど映像が豊かになります。',
+  'graphicsPrompt.autoDesc': 'このデバイスに合ったプリセットを自動で選びます。検出結果：{preset}。',
+  'graphicsPrompt.lowDesc':
+    '最も滑らかな動作。スマートフォン、タブレット、古いGPUや内蔵GPUに最適です。',
+  'graphicsPrompt.mediumDesc': '映像と動作のバランス型。ほとんどのノートPCに適しています。',
+  'graphicsPrompt.highDesc': 'より細かなディテールと豊かな景観。専用グラフィックカード向けです。',
+  'graphicsPrompt.ultraDesc': '最も豊かな固定プリセット。ハイエンドのグラフィックカード向けです。',
+  'graphicsPrompt.changeLater':
+    'この設定はオプションの「グラフィック品質」でいつでも変更できます。',
+  'graphicsPrompt.confirm': '続ける',
   'serverUnavailable.title': 'World of ClaudeCraft - ワールド利用不可',
   'serverUnavailable.logoAlt': 'World of ClaudeCraft',
   'serverUnavailable.eyebrow': 'ワールドメンテナンス',

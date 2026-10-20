@@ -11492,6 +11492,17 @@ export const ja_JP: EnTranslations = {
     "otherStandaloneDetail": "端末を横向き全画面に保ってください。",
     "otherInstallDetail": "最高のモバイル全画面体験のため、このページをインストールするかホーム画面に追加してください。"
   },
+  "graphicsPrompt": {
+    "title": "グラフィック設定を選択",
+    "intro": "このデバイスのグラフィックプリセットを選んでください。低いプリセットほど動作が滑らかに、高いプリセットほど映像が豊かになります。",
+    "autoDesc": "このデバイスに合ったプリセットを自動で選びます。検出結果：{preset}。",
+    "lowDesc": "最も滑らかな動作。スマートフォン、タブレット、古いGPUや内蔵GPUに最適です。",
+    "mediumDesc": "映像と動作のバランス型。ほとんどのノートPCに適しています。",
+    "highDesc": "より細かなディテールと豊かな景観。専用グラフィックカード向けです。",
+    "ultraDesc": "最も豊かな固定プリセット。ハイエンドのグラフィックカード向けです。",
+    "changeLater": "この設定はオプションの「グラフィック品質」でいつでも変更できます。",
+    "confirm": "続ける"
+  },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - ワールド利用不可",
     "logoAlt": "World of ClaudeCraft",

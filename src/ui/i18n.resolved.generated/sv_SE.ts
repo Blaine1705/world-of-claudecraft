@@ -11492,6 +11492,17 @@ export const sv_SE: EnTranslations = {
     "otherStandaloneDetail": "Håll din enhet i liggande helskärm.",
     "otherInstallDetail": "Installera eller lägg till den här sidan på din Hemskärm för bästa mobila helskärmsupplevelse."
   },
+  "graphicsPrompt": {
+    "title": "Choose Your Graphics",
+    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
+    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
+    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
+    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
+    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
+    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
+    "changeLater": "You can change this any time in Options, under Graphics Quality.",
+    "confirm": "Continue"
+  },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Världen otillgänglig",
     "logoAlt": "World of ClaudeCraft",

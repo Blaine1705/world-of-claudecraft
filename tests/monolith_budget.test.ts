@@ -1548,7 +1548,8 @@ const MONOLITHS: MonolithRow[] = [
     // after biome, zero slack.
     // Nameplate and highlight settings moved behind the game settings seam.
     // Dot and cooldown row apply/boot/rebuild folds share nameplate_settings.ts.
-    ceiling: 10961,
+    ceiling: 10953,
+    // Landing graphics choice now shares the prompt's graphics_choice_core.ts.
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

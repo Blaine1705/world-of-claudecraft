@@ -4947,6 +4947,11 @@
   body.mobile-touch #harvest-preference-window .btn {
     min-height: 40px;
   }
+  /* The first-login graphics prompt's Continue rides the same 32px .ui-btn plate; its option
+     rows already clear the floor (shell.css, first-login graphics prompt). */
+  body.mobile-touch .graphics-prompt-confirm {
+    min-height: 40px;
+  }
   @media (orientation: landscape) {
     body.mobile-touch #harvest-preference-window {
       width: 560px;

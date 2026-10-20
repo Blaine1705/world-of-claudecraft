@@ -11492,6 +11492,17 @@ export const zh_TW: EnTranslations = {
     "otherStandaloneDetail": "請保持裝置為橫向全螢幕。",
     "otherInstallDetail": "安裝此頁面或將其加入主畫面，以獲得最佳行動裝置全螢幕體驗。"
   },
+  "graphicsPrompt": {
+    "title": "選擇圖形設定",
+    "intro": "為此裝置選擇圖形預設。較低的預設執行更流暢，較高的預設畫面更豐富。",
+    "autoDesc": "自動為此裝置選擇合適的預設。偵測結果：{preset}。",
+    "lowDesc": "效能最流暢。最適合手機、平板以及較舊或內建顯示卡。",
+    "mediumDesc": "兼顧畫面與效能。適合大多數筆記型電腦。",
+    "highDesc": "更多細節與更豐富的場景。適合獨立顯示卡。",
+    "ultraDesc": "畫面最豐富的固定預設。適合高階顯示卡。",
+    "changeLater": "你可以隨時在選項的「圖形品質」中變更此設定。",
+    "confirm": "繼續"
+  },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - 世界不可用",
     "logoAlt": "World of ClaudeCraft",
