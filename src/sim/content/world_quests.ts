@@ -313,17 +313,16 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'eastbrook_freight_crate',
     name: 'Eastbrook Freight Crate',
-    // Six separate loads across the dry freight yard, off the road and within
+    // Six separate loads along the town side of the quay road (north-east of
+    // it, toward the quay cottage and the inn), clear of the road and within
     // the world-quest ring. Keep the first stable id for existing sessions.
     positions: [
-      { x: -63, z: -90 },
-      { x: -66, z: -94 },
-      { x: -70, z: -89 },
-      // a stride north of the Weekly Vault's corner (the vault took the
-      // ground beside it in the Tidehold rebuild)
-      { x: -77, z: -94 },
-      { x: -86, z: -90 },
-      { x: -68, z: -78 },
+      { x: -55, z: -75 },
+      { x: -44, z: -79 },
+      { x: -58, z: -70 },
+      { x: -62, z: -65 },
+      { x: -50, z: -78 },
+      { x: -67, z: -62 },
     ],
     entityIds: [
       2_147_100_003, 2_147_100_005, 2_147_100_006, 2_147_100_007, 2_147_100_008, 2_147_100_009,
@@ -332,7 +331,7 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'eastbrook_freight_wagon',
     name: 'Eastbrook Freight Wagon',
-    positions: [{ x: -80, z: -82 }],
+    positions: [{ x: -46, z: -56 }],
     entityIds: [2_147_100_004],
   },
   {
@@ -481,7 +480,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_eastbrook_bandits',
     zoneId: 'eastbrook_vale',
     minLevel: WORLD_QUEST_MIN_LEVEL,
-    area: { x: -74, z: -82, radius: 20 },
+    area: { x: -54, z: -68, radius: 20 },
     objective: {
       type: 'delivery',
       pickupObjectItemId: 'eastbrook_freight_crate',
