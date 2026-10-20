@@ -31,10 +31,13 @@ export interface GraphicsChoiceOption {
 
 /**
  * The first-login prompt's options, Auto first (the default). Only the fixed ladder a new player
- * can judge: the expert Advanced mix and the Insane showcase stay in Options, Graphics. Ultra is
- * dropped in the native mobile shells, matching the options window's capped preset row there.
+ * can judge: the expert Advanced mix and the Insane showcase stay in Options, Graphics. A touch
+ * device (phone, tablet, or the native mobile shell) is offered only Auto, Low, and Medium: device
+ * detection starts every touch device at LOW because a first world-entry scene build at a higher
+ * tier is what gets phone-class WebKit killed (resolveDefaultGraphicsPreset in render/gfx.ts), so
+ * High and Ultra stay an Options choice made once the player is in the world.
  */
-export function graphicsChoiceOptions(env: { nativeShell: boolean }): GraphicsChoiceOption[] {
+export function graphicsChoiceOptions(env: { touchDevice: boolean }): GraphicsChoiceOption[] {
   const options: GraphicsChoiceOption[] = [
     {
       choice: GRAPHICS_CHOICE_AUTO,
@@ -47,14 +50,16 @@ export function graphicsChoiceOptions(env: { nativeShell: boolean }): GraphicsCh
       titleKey: 'hud.options.graphicsPresetMedium',
       descKey: 'graphicsPrompt.mediumDesc',
     },
-    { choice: 3, titleKey: 'hud.options.graphicsPresetHigh', descKey: 'graphicsPrompt.highDesc' },
   ];
-  if (!env.nativeShell) {
-    options.push({
-      choice: 4,
-      titleKey: 'hud.options.graphicsPresetUltra',
-      descKey: 'graphicsPrompt.ultraDesc',
-    });
+  if (!env.touchDevice) {
+    options.push(
+      { choice: 3, titleKey: 'hud.options.graphicsPresetHigh', descKey: 'graphicsPrompt.highDesc' },
+      {
+        choice: 4,
+        titleKey: 'hud.options.graphicsPresetUltra',
+        descKey: 'graphicsPrompt.ultraDesc',
+      },
+    );
   }
   return options;
 }

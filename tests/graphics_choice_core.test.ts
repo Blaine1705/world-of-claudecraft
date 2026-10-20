@@ -16,8 +16,8 @@ const RANGE = SETTING_RANGES.graphicsPreset;
 const AUTO_PRESET = SETTING_RANGES.graphicsPreset.def;
 
 describe('graphicsChoiceOptions', () => {
-  it('offers Auto first, then the fixed Low to Ultra ladder in a browser', () => {
-    expect(graphicsChoiceOptions({ nativeShell: false }).map((o) => o.choice)).toEqual([
+  it('offers Auto first, then the fixed Low to Ultra ladder on a desktop', () => {
+    expect(graphicsChoiceOptions({ touchDevice: false }).map((o) => o.choice)).toEqual([
       GRAPHICS_CHOICE_AUTO,
       1,
       2,
@@ -26,23 +26,22 @@ describe('graphicsChoiceOptions', () => {
     ]);
   });
 
-  it('drops Ultra in the native shell, matching the capped options row', () => {
-    expect(graphicsChoiceOptions({ nativeShell: true }).map((o) => o.choice)).toEqual([
+  it('caps a touch device at Medium (High and Ultra stay an in-world Options choice)', () => {
+    expect(graphicsChoiceOptions({ touchDevice: true }).map((o) => o.choice)).toEqual([
       GRAPHICS_CHOICE_AUTO,
       1,
       2,
-      3,
     ]);
   });
 
   it('never offers the expert Advanced (5) or Insane (6) presets', () => {
-    const choices = graphicsChoiceOptions({ nativeShell: false }).map((o) => o.choice);
+    const choices = graphicsChoiceOptions({ touchDevice: false }).map((o) => o.choice);
     expect(choices).not.toContain(5);
     expect(choices).not.toContain(6);
   });
 
   it('gives every option its own title and description key', () => {
-    const options = graphicsChoiceOptions({ nativeShell: false });
+    const options = graphicsChoiceOptions({ touchDevice: false });
     expect(new Set(options.map((o) => o.titleKey)).size).toBe(options.length);
     expect(new Set(options.map((o) => o.descKey)).size).toBe(options.length);
     expect(options[0].descKey).toBe('graphicsPrompt.autoDesc');

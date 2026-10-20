@@ -10,13 +10,17 @@ const gfxState = vi.hoisted(() => ({
   detected: 3,
   forced: null as string | null,
   webdriver: false,
+  touch: false,
 }));
 
 vi.mock('../src/render/gfx', () => ({
   forcedTierFromSearch: () => gfxState.forced,
   detectedDefaultGraphicsPreset: () => gfxState.detected,
 }));
-vi.mock('../src/game/mobile_controls', () => ({ isNativeAppShell: () => false }));
+vi.mock('../src/game/mobile_controls', () => ({
+  isNativeAppShell: () => false,
+  isPhoneTouchDevice: () => gfxState.touch,
+}));
 
 import { Settings } from '../src/game/settings';
 import { promptGraphicsChoiceOnFirstLogin } from '../src/ui/graphics_choice_prompt';
@@ -49,6 +53,7 @@ beforeEach(() => {
   gfxState.detected = 3;
   gfxState.forced = null;
   gfxState.webdriver = false;
+  gfxState.touch = false;
 });
 
 describe('promptGraphicsChoiceOnFirstLogin', () => {
@@ -131,6 +136,36 @@ describe('promptGraphicsChoiceOnFirstLogin', () => {
     gfxState.forced = 'low';
     await promptGraphicsChoiceOnFirstLogin();
     expect(dialog()).toBeNull();
+  });
+
+  it('offers a touch device only Auto, Low, and Medium', async () => {
+    gfxState.touch = true;
+    const done = promptGraphicsChoiceOnFirstLogin();
+    const values = [...document.querySelectorAll<HTMLInputElement>('.graphics-prompt-radio')].map(
+      (r) => r.value,
+    );
+    expect(values).toEqual(['auto', '1', '2']);
+    confirmButton().click();
+    await done;
+  });
+
+  it('focuses the pre-selected Auto radio on open and names each radio by its title', async () => {
+    const done = promptGraphicsChoiceOnFirstLogin();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(document.activeElement).toBe(radio('auto'));
+    const descId = radio('2').getAttribute('aria-describedby');
+    expect(descId && document.getElementById(descId)?.textContent).toContain('balance');
+    confirmButton().click();
+    await done;
+  });
+
+  it('confirms through the form, so Enter on a selected radio submits', async () => {
+    const done = promptGraphicsChoiceOnFirstLogin();
+    radio('2').checked = true;
+    expect(confirmButton().type).toBe('submit');
+    dialog()?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await done;
+    expect(new Settings().get('graphicsPreset')).toBe(2);
   });
 
   it('skips an automated WebDriver session (the E2E and screenshot scripts)', async () => {
