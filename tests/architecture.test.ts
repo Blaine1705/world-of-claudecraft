@@ -971,6 +971,8 @@ const RENDER_PURE_CORES = [
   'src/render/gravewyrm_sanctum/sanctum_story_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_chains_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_kit_plan_core.ts',
+  // The interior AAA pass's placement plan (the second kit, zone by zone).
+  'src/render/gravewyrm_sanctum/sanctum_interior_plan_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_gates_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_lake_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',

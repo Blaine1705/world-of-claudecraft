@@ -131,9 +131,11 @@ import {
   heartbeatEvery,
   KORGATH_ANCHOR_REST,
   KORGATH_ANCHORS,
+  KORGATH_BOUND_STANCE,
   KORGATH_BROKEN_CHAIN_MESH,
   KORGATH_BROKEN_GESTURE,
   KORGATH_RUNES_GESTURE,
+  KORGATH_STANDING_STANCE,
   KORGATH_WHOLE_GESTURE,
   KORZUL_BODY,
   KORZUL_BURST_AT,
@@ -145,6 +147,7 @@ import {
   KORZUL_MOUTH_REST,
   KORZUL_SHOW_GESTURE,
   KORZUL_TAKEOFF_GESTURE,
+  korgathStance,
   korzulBodyView,
   VELKHAR_FLAME_GESTURE,
   VELKHAR_FLAME_Y,
@@ -326,6 +329,10 @@ export class SanctumBossFx {
   private storyStep = 0;
   /** Korzul views we froze (only those are told to break free). */
   private readonly frozenSent = new Set<number>();
+  /** Korgath's stance last sent per view (kneeling at his seal, or standing),
+   *  and where he stood on the last frame (a body that walks stands). */
+  private readonly korgathStanceSent = new Map<number, 'bound' | 'standing'>();
+  private readonly korgathLastPos = new Map<number, { x: number; z: number }>();
   /** Break Free's cinematic on screen: his id, the clock when the pull came
    *  (from the bar's elapsed time), the last clock its cues were played to. */
   private emerge: { id: number; t0: number; last: number } | null = null;
@@ -1595,6 +1602,7 @@ export class SanctumBossFx {
     const play = this.playGesture;
     if (!play) return;
     const k = this.entity(this.korgathId);
+    if (k) this.syncKorgathStance(k, true);
     if (k)
       for (const c of this.chains) {
         if (c.objectId < 0 || !KORGATH_BROKEN_CHAIN_MESH[c.tool]) continue;
@@ -1815,8 +1823,25 @@ export class SanctumBossFx {
 
   // ---- Korgath ------------------------------------------------------------------------
 
+  /** Korgath kneels at his seal while he waits (BoundKneel, the maul on the
+   *  terrace) and rises with it on the pull (the standing stance enters
+   *  through BoundRise). `resend`: a rebuilt view gets the held stance (a
+   *  view already standing ignores a standing stance, so no rise replays). */
+  private syncKorgathStance(k: Entity, resend: boolean): void {
+    const play = this.playGesture;
+    if (!play) return;
+    const last = this.korgathLastPos.get(k.id);
+    const moving = !!last && Math.hypot(k.pos.x - last.x, k.pos.z - last.z) > 0.02;
+    this.korgathLastPos.set(k.id, { x: k.pos.x, z: k.pos.z });
+    const want = korgathStance(k.inCombat, k.dead, moving);
+    if (!resend && this.korgathStanceSent.get(k.id) === want) return;
+    this.korgathStanceSent.set(k.id, want);
+    play(k.id, want === 'bound' ? KORGATH_BOUND_STANCE : KORGATH_STANDING_STANCE);
+  }
+
   private stepKorgath(): void {
     const k = this.entity(this.korgathId);
+    if (k) this.syncKorgathStance(k, false);
     const straining = !!k && k.castingAbility === KORGATH_STRAIN;
     const strainFill = straining && k ? telegraphFillOf(k.castRemaining, k.castTotal) : 0;
     // Strain's rings at every intact pillar.

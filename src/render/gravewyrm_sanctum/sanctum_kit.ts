@@ -25,6 +25,12 @@ import type { SanctumKitPlacement } from './sanctum_kit_plan_core';
 import { sanctumGround } from './sanctum_plan_core';
 
 export const GRAVEWYRM_SANCTUM_KIT_URL = '/models/props/gravewyrm_sanctum_kit.glb';
+/** The interior pass's second kit (docs/design/dungeon-rework/kit/
+ *  build_gravewyrm_sanctum_interior.py): its Kit_* pieces bake into the same
+ *  slot materials and the same piece map, under the same load (one wait cap,
+ *  one late swap). */
+export const GRAVEWYRM_SANCTUM_INTERIOR_URL = '/models/props/gravewyrm_sanctum_interior.glb';
+const SANCTUM_KIT_URLS = [GRAVEWYRM_SANCTUM_KIT_URL, GRAVEWYRM_SANCTUM_INTERIOR_URL] as const;
 
 export type SanctumSlot = 'stone' | 'glow' | 'glass';
 export type SanctumBakedPiece = Partial<Record<SanctumSlot, THREE.BufferGeometry>>;
@@ -113,19 +119,24 @@ function bakeNode(node: THREE.Object3D): SanctumBakedPiece {
   return out;
 }
 
-function startKitLoad(): Promise<void> {
-  loading ??= loadGltf(GRAVEWYRM_SANCTUM_KIT_URL)
+function loadOneKit(url: string): Promise<void> {
+  return loadGltf(url)
     .then((gltf) => {
       gltf.scene.traverse((node) => {
         if (node.name.startsWith('Kit_') && !baked.has(node.name))
           baked.set(node.name, bakeNode(node));
       });
-      releaseGltf(GRAVEWYRM_SANCTUM_KIT_URL);
+      releaseGltf(url);
     })
-    .catch(() => undefined)
-    .then(() => {
-      loaded = true;
-    });
+    .catch(() => undefined);
+}
+
+function startKitLoad(): Promise<void> {
+  // Both kits land together: a piece of either is never seen without the
+  // other (the interior pass replaces some first-kit pieces outright).
+  loading ??= Promise.all(SANCTUM_KIT_URLS.map(loadOneKit)).then(() => {
+    loaded = true;
+  });
   return loading;
 }
 

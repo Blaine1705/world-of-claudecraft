@@ -44,11 +44,14 @@ import {
   bossModelScale,
   contactRate,
   KORGATH_BODY,
+  KORGATH_BOUND_CLIPS_URL,
+  KORGATH_BOUND_STANCE,
   KORGATH_BROKEN_CHAIN_MESH,
   KORGATH_BROKEN_GESTURE,
   KORGATH_CLIP,
   KORGATH_RUN_REF,
   KORGATH_RUNES_GESTURE,
+  KORGATH_STANDING_STANCE,
   KORGATH_WHOLE_GESTURE,
   KORZUL_BODY,
   KORZUL_CLIP,
@@ -82,6 +85,56 @@ const KORGATH_CHAIN_TOGGLES: MeshToggleDef[] = (['hammer', 'tongs'] as const).ma
   hideNow: KORGATH_WHOLE_GESTURE[tool],
   showNow: KORGATH_BROKEN_GESTURE[tool],
 }));
+
+/** Korgath on his feet: the fighting clips. */
+const KORGATH_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'ThresholdChargeLoop',
+  attack: ['HammerSlam', 'HammerSweep'],
+  // Both blows land on frame 18 of their 1.5 s clips (1x): the coil, the
+  // hang at the top, his whole weight thrown after the maul.
+  contacts: { HammerSlam: [KORGATH_CLIP.slam], HammerSweep: [KORGATH_CLIP.sweep] },
+  attackByAbility: {
+    [KORGATH_CHAIN_BREAK]: 'ChainBreak',
+    [KORGATH_RERIVETED]: 'ChainYank',
+    [KORGATH_ENRAGE]: 'Roar',
+  },
+  attackTimeScaleByAbility: {
+    [KORGATH_CHAIN_BREAK]: 1,
+    [KORGATH_RERIVETED]: 1,
+    [KORGATH_ENRAGE]: 1,
+  },
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Strain',
+  castByAbility: {
+    [KORGATH_STRAIN]: 'Strain',
+    [KORGATH_STOMP]: 'Stomp',
+    [KORGATH_MAUL_ARC]: 'MaulArc',
+    [KORGATH_CHAIN_FLAIL]: 'ChainFlail',
+    [KORGATH_THRESHOLD_CHARGE]: 'ThresholdCharge',
+    [KORGATH_BELLOW]: 'ForemansBellow',
+  },
+  castTimeScaleByAbility: {
+    [KORGATH_STRAIN]: contactRate(KORGATH_CLIP.strain, K.strainCast),
+    [KORGATH_STOMP]: contactRate(KORGATH_CLIP.stomp, K.stompCast),
+    [KORGATH_MAUL_ARC]: contactRate(KORGATH_CLIP.maulArc, K.maulCast),
+    [KORGATH_CHAIN_FLAIL]: contactRate(KORGATH_CLIP.chainFlail, K.flailCast),
+    [KORGATH_THRESHOLD_CHARGE]: contactRate(KORGATH_CLIP.thresholdCharge, K.chargeCast),
+    [KORGATH_BELLOW]: contactRate(KORGATH_CLIP.bellow, K.bellowCast),
+  },
+  castPlayOut: ['Strain', 'Stomp', 'MaulArc', 'ChainFlail', 'ForemansBellow'],
+  flourish: 'Roar',
+};
+
+/** Korgath bound and kneeling (before the pull): BoundKneel loops (he sags,
+ *  heaves against the chains with a roar, is dragged back down); a walk home
+ *  after an evade is never on his knees (korgathStance). */
+const KORGATH_BOUND_CLIPS: ClipMap = {
+  ...KORGATH_CLIPS,
+  idle: 'BoundKneel',
+};
 
 /** Korzul on his feet: the ground kit, the flights (flight: the hover loops
  *  while he is up), the strikes as play-outs. The bite and the claw land on
@@ -156,50 +209,19 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
   // Korgath the Bound: the Smith's foreman in his harness, 10.3 yd at Idle.
   sanctum_korgath: {
     url: KORGATH_BODY.url,
+    animUrls: [KORGATH_BOUND_CLIPS_URL],
     height: bossLookHeight(KORGATH_BODY),
-    clips: {
-      idle: 'Idle',
-      walk: 'Walk',
-      run: 'ThresholdChargeLoop',
-      attack: ['HammerSlam', 'HammerSweep'],
-      // Both blows land on frame 18 of their 1.5 s clips (1x): the coil, the
-      // hang at the top, his whole weight thrown after the maul.
-      contacts: { HammerSlam: [KORGATH_CLIP.slam], HammerSweep: [KORGATH_CLIP.sweep] },
-      attackByAbility: {
-        [KORGATH_CHAIN_BREAK]: 'ChainBreak',
-        [KORGATH_RERIVETED]: 'ChainYank',
-        [KORGATH_ENRAGE]: 'Roar',
-      },
-      attackTimeScaleByAbility: {
-        [KORGATH_CHAIN_BREAK]: 1,
-        [KORGATH_RERIVETED]: 1,
-        [KORGATH_ENRAGE]: 1,
-      },
-      hit: ['Hit'],
-      death: 'Death',
-      cast: 'Strain',
-      castByAbility: {
-        [KORGATH_STRAIN]: 'Strain',
-        [KORGATH_STOMP]: 'Stomp',
-        [KORGATH_MAUL_ARC]: 'MaulArc',
-        [KORGATH_CHAIN_FLAIL]: 'ChainFlail',
-        [KORGATH_THRESHOLD_CHARGE]: 'ThresholdCharge',
-        [KORGATH_BELLOW]: 'ForemansBellow',
-      },
-      castTimeScaleByAbility: {
-        [KORGATH_STRAIN]: contactRate(KORGATH_CLIP.strain, K.strainCast),
-        [KORGATH_STOMP]: contactRate(KORGATH_CLIP.stomp, K.stompCast),
-        [KORGATH_MAUL_ARC]: contactRate(KORGATH_CLIP.maulArc, K.maulCast),
-        [KORGATH_CHAIN_FLAIL]: contactRate(KORGATH_CLIP.chainFlail, K.flailCast),
-        [KORGATH_THRESHOLD_CHARGE]: contactRate(KORGATH_CLIP.thresholdCharge, K.chargeCast),
-        [KORGATH_BELLOW]: contactRate(KORGATH_CLIP.bellow, K.bellowCast),
-      },
-      castPlayOut: ['Strain', 'Stomp', 'MaulArc', 'ChainFlail', 'ForemansBellow'],
-      flourish: 'Roar',
+    clips: KORGATH_CLIPS,
+    // Kneeling at his seal until the pull, the maul on the terrace beside
+    // him; BoundRise takes it up as he stands (the boss effects send the
+    // stances: sanctum_boss_fx.ts).
+    phaseClips: {
+      [KORGATH_BOUND_STANCE]: { clips: KORGATH_BOUND_CLIPS },
+      [KORGATH_STANDING_STANCE]: { clips: KORGATH_CLIPS, enter: 'BoundRise' },
     },
     castClipSync: true,
     castPlayOutHoldsAttacks: true,
-    oneShotsHoldAttacks: ['ChainBreak', 'Roar', 'ChainYank'],
+    oneShotsHoldAttacks: ['ChainBreak', 'Roar', 'ChainYank', 'BoundRise'],
     meshToggles: KORGATH_CHAIN_TOGGLES,
     // His runes and goad brands (the body's emissive map) burn as he Strains
     // and go dark as he kneels.

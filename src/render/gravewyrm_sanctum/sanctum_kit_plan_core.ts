@@ -581,9 +581,8 @@ function stairHalfWidth(id: string): number {
  *  floor): their lip sits a yard and a half under the floor and a yard out. */
 export function planFrozenFalls(): SanctumKitPlacement[] {
   const spots: [number, number, number][] = [
-    // Under the Lock Terrace's east and west rims and the shore's wings.
-    [23.5, -14, Math.PI / 2],
-    [-23.5, -14, -Math.PI / 2],
+    // Under the shore's wings (the Lock Terrace's own seeps are sculpted
+    // into its pedestal: sanctum_interior_plan_core.ts).
     [60, 174, 1.1],
     [-60, 174, -1.1],
   ];
