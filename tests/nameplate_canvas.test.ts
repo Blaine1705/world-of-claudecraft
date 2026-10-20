@@ -1636,19 +1636,32 @@ describe('the enemy cooldown row on a plate', () => {
     return calls;
   }
 
-  it('leaves the name row where it was and draws its countdowns above it', () => {
+  it('leaves the name row where it was and draws active buff countdowns above it', () => {
     const surface = new NameplateCanvasSurface(document.createElement('div'));
     const state = plateState();
     const nameY = (calls: { text: unknown; y: number }[]) =>
       calls.find((c) => c.text === 'Gilded One')?.y as number;
 
     const without = nameY(textYs(surface, state));
-    state.cooldowns = cooldownPlanWith(['barkskin', 'recklessness']);
+    const plan = newNameplateCooldownsPlan();
+    nameplateCooldownsInto(plan, new Map(), [
+      { id: 'barkskin', remaining: 11 },
+      { id: 'recklessness', remaining: 8 },
+    ]);
+    for (let i = 0; i < plan.count; i++) plan.slots[i].timeText = '11';
+    state.cooldowns = plan;
     const calls = textYs(surface, state);
     expect(nameY(calls)).toBe(without);
-    const countdowns = calls.filter((c) => c.text === '30');
+    const countdowns = calls.filter((c) => c.text === '11');
     expect(countdowns).toHaveLength(2);
     for (const c of countdowns) expect(c.y).toBeLessThan(without);
+  });
+
+  it('never draws a number on a recharging cooldown, even if one was left on the slot', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = plateState();
+    state.cooldowns = cooldownPlanWith(['barkskin', 'recklessness']); // recharging, text '30'
+    expect(textYs(surface, state).filter((c) => c.text === '30')).toHaveLength(0);
   });
 
   it('lifts the emote bubble by exactly the row height the core reserves', () => {
@@ -1742,18 +1755,49 @@ describe('the enemy cooldown row on a plate', () => {
     expect(before.emoteY - after.emoteY).toBe(lift);
   });
 
-  it('scales the recharge swipe with the row', () => {
+  it('dims a spent cooldown evenly, with no recharge swipe at any scale', () => {
+    // A swipe would show how much of the cooldown is left: the plate never does.
     const surface = new NameplateCanvasSurface(document.createElement('div'));
     const state = plateState();
-    const radii = (scale: number): number[] => {
+    for (const scale of [1, 3]) {
       traces[0].arc.mockClear();
+      traces[0].fillStyles.length = 0;
       state.cooldowns = cooldownPlanWith(['recklessness'], scale);
       surface.beginFrame(640, 360, 1);
       surface.drawBase(state, 320, 260);
-      return traces[0].arc.mock.calls.map((call) => call[2] as number);
-    };
-    expect(radii(1)).toContain(NAMEPLATE_COOLDOWN_SIZE);
-    expect(radii(3)).toContain(NAMEPLATE_COOLDOWN_SIZE * 3);
+      // The only arcs are the small group badge; nothing the size of the icon.
+      const radii = traces[0].arc.mock.calls.map((call) => call[2] as number);
+      for (const r of radii) expect(r).toBeLessThan(NAMEPLATE_COOLDOWN_SIZE * scale * 0.5);
+      expect(traces[0].fillStyles).toContain('rgba(4, 6, 10, 0.55)');
+    }
+  });
+
+  it('veils a spent cooldown under forced colors, so spent never reads as active', () => {
+    const previousMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn(() => ({ matches: true })),
+    });
+    try {
+      const surface = new NameplateCanvasSurface(document.createElement('div'));
+      const state = plateState();
+      const veils = (active: boolean): number => {
+        traces[0].globalAlphas.length = 0;
+        const plan = cooldownPlanWith(['recklessness']);
+        plan.slots[0].active = active;
+        state.cooldowns = plan;
+        surface.beginFrame(640, 360, 1);
+        surface.drawBase(state, 320, 260);
+        return traces[0].globalAlphas.filter((a) => a === 0.6).length;
+      };
+      expect(veils(false)).toBe(veils(true) + 1);
+    } finally {
+      if (previousMatchMedia) {
+        Object.defineProperty(window, 'matchMedia', previousMatchMedia);
+      } else {
+        Reflect.deleteProperty(window, 'matchMedia');
+      }
+    }
   });
 
   it('draws nothing and reserves nothing for an empty plan', () => {

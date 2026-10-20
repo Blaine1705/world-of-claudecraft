@@ -57,13 +57,14 @@ describe('factual successful medallion cooldown lifecycle', () => {
     expect(row(swapped.player)).toEqual([]);
   });
 
-  it('retains the genuine use deadline through swap out/back and expires without inventing another use', () => {
+  it('retains the genuine use fact through swap out/back and expires without inventing another use', () => {
     const sim = wearing();
     elapse(sim.player, 31);
     sim.useItem(ITEM);
     expect(sim.player.cooldowns.get(FACT)).toBe(120);
     elapse(sim.player, 100);
-    expect(row(sim.player)[0].remaining).toBeCloseTo(20);
+    expect(sim.player.cooldowns.get(FACT)).toBeCloseTo(20);
+    expect(row(sim.player)[0]).toMatchObject({ active: false, remaining: 0, timeText: '' });
     sim.addItem('bastion_sigil', 1);
     sim.equipItem('bastion_sigil');
     // An existing larger gate is defensive input: ordinary serial swapping
@@ -71,7 +72,8 @@ describe('factual successful medallion cooldown lifecycle', () => {
     sim.player.cooldowns.set('trinket:bastion_sigil', 180);
     sim.equipItem(ITEM);
     expect(sim.player.cooldowns.get(GATE)).toBe(180);
-    expect(row(sim.player)[0].remaining).toBeCloseTo(20);
+    expect(sim.player.cooldowns.get(FACT)).toBeCloseTo(20);
+    expect(row(sim.player)[0]).toMatchObject({ active: false, remaining: 0, timeText: '' });
     elapse(sim.player, 21);
     expect(sim.player.cooldowns.get(GATE)).toBeGreaterThan(150);
     expect(sim.player.cooldowns.has(FACT)).toBe(false);
@@ -88,14 +90,16 @@ describe('factual successful medallion cooldown lifecycle', () => {
     const reloaded = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true });
     const pid = reloaded.addPlayer('warrior', 'Reloaded', { state: saved });
     const restored = must(reloaded.entities.get(pid));
-    expect(row(restored)[0].remaining).toBeCloseTo(20);
+    expect(restored.cooldowns.get(FACT)).toBeCloseTo(20);
+    expect(row(restored)[0]).toMatchObject({ active: false, remaining: 0, timeText: '' });
     const pools = snapshotArenaReturnPools(restored);
     const ctx = reloaded.ctx;
     readyArenaFighter(ctx, restored, { clearPrep: true });
     expect(restored.cooldowns.has(FACT)).toBe(false);
     expect(row(restored)).toEqual([]);
     restoreArenaReturnPools(ctx, restored, pools);
-    expect(row(restored)[0].remaining).toBeCloseTo(20);
+    expect(restored.cooldowns.get(FACT)).toBeCloseTo(20);
+    expect(row(restored)[0]).toMatchObject({ active: false, remaining: 0, timeText: '' });
     delete must(must(saved.cooldowns).abilities)[FACT];
     const oldPid = reloaded.addPlayer('warrior', 'Unknown', { state: saved });
     expect(must(reloaded.entities.get(oldPid)).cooldowns.get(GATE)).toBeGreaterThan(0);
@@ -131,7 +135,7 @@ describe('factual successful medallion cooldown lifecycle', () => {
     expect(sim.player.cooldowns.has(FACT)).toBe(false);
     endBgMatch(sim.ctx, match, null, 'forfeit');
     expect(sim.player.cooldowns.get(FACT)).toBeCloseTo(119.9);
-    expect(row(sim.player)[0].remaining).toBeCloseTo(119.9);
+    expect(row(sim.player)[0]).toMatchObject({ active: false, remaining: 0, timeText: '' });
   });
 
   it('rejects malformed facts and tolerates an older writer dropping optional provenance', () => {

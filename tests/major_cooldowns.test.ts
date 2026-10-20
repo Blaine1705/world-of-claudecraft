@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
 import {
   MAJOR_COOLDOWN_MIN_SEC,
-  majorCooldownBaseSec,
+  majorAuraGroup,
+  majorBuffTable,
   majorCooldownGroup,
   majorCooldownKeyForAura,
   majorCooldownTable,
@@ -97,7 +98,6 @@ describe('major cooldown classifier', () => {
   it('tracks the PvP medallion as its own group, keyed by its trinket cooldown', () => {
     expect(PVP_MEDALLION_COOLDOWN_KEY).toBe('trinket:medallion_of_defiance');
     expect(keysIn('medallion')).toEqual([PVP_MEDALLION_COOLDOWN_KEY]);
-    expect(majorCooldownBaseSec(PVP_MEDALLION_COOLDOWN_KEY)).toBe(120);
   });
 
   it('never admits a cooldown under the minimum, whatever it does', () => {
@@ -154,11 +154,74 @@ describe('major cooldown classifier', () => {
     expect(majorCooldownGroup('martyrs_aegis')).toBe('defensive');
     expect(majorCooldownGroup('power_infusion')).toBe('offensive');
   });
+});
 
-  it('reads the base cooldown for the swipe', () => {
-    expect(majorCooldownBaseSec('barkskin')).toBe(60);
-    expect(majorCooldownBaseSec('recklessness')).toBe(180);
-    expect(majorCooldownBaseSec('not_an_ability')).toBe(0);
+// The active-only tier: short offensive or defensive buffs from abilities with
+// no tracked cooldown (rotation riders such as Red Harvest's Enrage). Shown while
+// up, never as spent.
+const BUFF_DEFENSIVE = [
+  'bastion_rite',
+  'ghostly_strike',
+  'holy_shield',
+  'iron_resolve',
+  'power_word_shield',
+  'raised_guard',
+  'temporal_barrier',
+];
+const BUFF_OFFENSIVE = ['enrage_passive', 'veilstrike'];
+
+describe('active-only buffs', () => {
+  const buffKeys = (group: string) =>
+    [...majorBuffTable()]
+      .filter(([, g]) => g === group)
+      .map(([k]) => k)
+      .sort();
+
+  it('admits exactly the agreed short buffs', () => {
+    expect(buffKeys('defensive')).toEqual(BUFF_DEFENSIVE);
+    expect(buffKeys('offensive')).toEqual(BUFF_OFFENSIVE);
+  });
+
+  it('never reaches the cooldown table the wire filters by, so none shows as spent', () => {
+    for (const key of [...BUFF_DEFENSIVE, ...BUFF_OFFENSIVE]) {
+      expect(majorCooldownGroup(key), key).toBeNull();
+      expect(majorAuraGroup(key), key).not.toBeNull();
+    }
+  });
+
+  it('maps the Enrage every source applies (Red Harvest, Bloodletting) to one slot', () => {
+    expect(majorCooldownKeyForAura('fury_enrage')).toBe('enrage_passive');
+    expect(majorAuraGroup('enrage_passive')).toBe('offensive');
+    // Both rotation attacks really do apply it, at a duration the tier admits.
+    for (const id of ['red_harvest', 'bloodthirst']) {
+      expect(
+        ABILITIES[id].effects.some((e) => e.type === 'enrageChance'),
+        id,
+      ).toBe(true);
+    }
+  });
+
+  it('leaves out maintenance buffs, forms, speed and stealth however short the cooldown', () => {
+    for (const key of [
+      'battle_shout',
+      'aspect_of_the_hawk',
+      'aspect_of_the_monkey',
+      'devotion_aura',
+      'cat_form',
+      'stealth',
+      'scorch',
+      'slice_and_dice',
+      'mortal_strike',
+      'overpower',
+    ]) {
+      expect(majorAuraGroup(key), key).toBeNull();
+    }
+  });
+
+  it('maps a short buff aura and its companions back to its ability', () => {
+    expect(majorCooldownKeyForAura('raised_guard')).toBe('raised_guard');
+    expect(majorCooldownKeyForAura('bastion_rite_buff_dr_phys')).toBe('bastion_rite');
+    expect(majorCooldownKeyForAura('power_word_shield')).toBe('power_word_shield');
   });
 });
 

@@ -170,7 +170,6 @@ describe('nameplate paint gate core', () => {
               iconUrl: '/ui/skills/druid/barkskin.webp',
               group: 'defensive',
               active: true,
-              fraction: 0,
               unit: 'seconds',
               timeText: '11',
             },
@@ -203,7 +202,6 @@ describe('nameplate paint gate core', () => {
       iconUrl: '/ui/skills/druid/barkskin.webp',
       group: 'defensive',
       active: true,
-      fraction: 0,
       unit: 'seconds',
       timeText: '2',
     };
@@ -211,8 +209,25 @@ describe('nameplate paint gate core', () => {
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
     slot.active = false;
-    slot.fraction = 0.75;
-    slot.timeText = '45';
+    slot.timeText = '';
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+  });
+
+  it('repaints on the active flag alone, with every other field unchanged', () => {
+    // A spent slot and a buff whose text has not been resolved yet can share
+    // icon, group, unit and (empty) text: only `active` tells them apart.
+    const gate = new NameplatePaintGate();
+    const slot = {
+      iconUrl: '/ui/skills/druid/barkskin.webp',
+      group: 'defensive',
+      active: false,
+      unit: 'seconds',
+      timeText: '',
+    };
+    const f = fields({ cooldowns: { count: 1, scale: 1, slots: [slot] } });
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
+    expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(false);
+    slot.active = true;
     expect(paintedPass(gate, [{ id: 7, sx: 100, sy: 200, f }])).toBe(true);
   });
 

@@ -57,7 +57,6 @@ export interface NameplatePaintCooldownSlot {
   readonly iconUrl: string;
   readonly group: string;
   readonly active: boolean;
-  readonly fraction: number;
   readonly unit: string;
   readonly timeText: string;
 }
@@ -161,7 +160,6 @@ interface PlateRecord {
   cdIconUrls: string[];
   cdGroups: string[];
   cdActive: boolean[];
-  cdFractions: number[];
   cdUnits: string[];
   cdTimeTexts: string[];
   aiLabel: string;
@@ -221,7 +219,6 @@ function cooldownsDiffer(record: PlateRecord, cooldowns: NameplatePaintCooldowns
       record.cdIconUrls[i] !== slot.iconUrl ||
       record.cdGroups[i] !== slot.group ||
       record.cdActive[i] !== slot.active ||
-      record.cdFractions[i] !== slot.fraction ||
       record.cdUnits[i] !== slot.unit ||
       record.cdTimeTexts[i] !== slot.timeText
     ) {
@@ -338,7 +335,6 @@ function writePlate(
     record.cdIconUrls[i] = slot.iconUrl;
     record.cdGroups[i] = slot.group;
     record.cdActive[i] = slot.active;
-    record.cdFractions[i] = slot.fraction;
     record.cdUnits[i] = slot.unit;
     record.cdTimeTexts[i] = slot.timeText;
   }
@@ -406,7 +402,6 @@ function newRecord(): PlateRecord {
     cdIconUrls: [],
     cdGroups: [],
     cdActive: [],
-    cdFractions: [],
     cdUnits: [],
     cdTimeTexts: [],
     aiLabel: '',
