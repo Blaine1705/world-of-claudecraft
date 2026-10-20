@@ -53,7 +53,6 @@ import { isPersistentEngineAura } from '../sim/persistent_aura';
 import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
-import type { MaterialRarity } from '../sim/professions/gathering';
 import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import type { PerfectingSwapRequest } from '../sim/professions/perfecting_swap';
 import type { TownFocusPendingView } from '../sim/professions/town_focus_pending';
@@ -204,6 +203,7 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import { applySelfCombatScalars } from './combat_scalar_wire';
+import { craftResultViewFromEvent } from './craft_result_mirror';
 import { decodeMobileStationCrafts, EMPTY_MST_CRAFTS } from './crafting_wire';
 import {
   type DesktopWalletBrowserAction,
@@ -4985,15 +4985,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
 
   private applyCraftResultEvent(ev: SimEvent): void {
     if (ev.type !== 'craftResult') return;
-    this.lastCraftResult = {
-      ok: ev.ok,
-      recipeId: ev.recipeId,
-      itemId: ev.itemId,
-      count: ev.count,
-      quality: ev.quality as MaterialRarity | undefined,
-      masterwork: ev.masterwork,
-      reason: ev.reason,
-    };
+    this.lastCraftResult = craftResultViewFromEvent(ev);
   }
   // A successful recovery is intentionally shorter than the normal large-delta
   // snapshot snap threshold. Mirror its authoritative event immediately so an

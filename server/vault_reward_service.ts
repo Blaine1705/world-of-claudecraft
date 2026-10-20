@@ -3,6 +3,7 @@
 import type { Pool, PoolClient } from 'pg';
 import { HOARD_REWARD_LETTER } from '../src/sim/content/letters';
 import { ITEMS } from '../src/sim/data';
+import { cloneLootQuality } from '../src/sim/loot_quality/types';
 import { applyDurableVaultGuestPayouts } from '../src/sim/rift/hoard_guest_cap';
 import {
   confirmHoardRewardChest,
@@ -421,7 +422,10 @@ export class VaultRewardService {
       custodyRef: `vault:${REALM}:${claim.attemptId}:${claim.characterId}`,
       recipient: { key: String(claim.characterId), name: claim.recipientName },
       letter: 'vault_reward',
-      items: claim.items.map((item) => ({ ...item })),
+      items: claim.items.map(({ itemId, count, lootQuality }) => {
+        const quality = cloneLootQuality(lootQuality);
+        return quality ? { itemId, count, instance: { lootQuality: quality } } : { itemId, count };
+      }),
       copper: claim.copper,
     };
     const priorPending = this.pendingLiveParcels.has(row.custodyRef);

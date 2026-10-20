@@ -688,7 +688,7 @@ import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
-import { lootQualityReceiptBody } from './loot_quality_receipt';
+import { craftedLineBody, lootQualityReceiptBody } from './loot_quality_receipt';
 import { lootQualityAriaName } from './loot_quality_view';
 import { lootRollWinBanner } from './loot_roll_win_view';
 import { lowHealthVignette } from './low_health';
@@ -11415,20 +11415,16 @@ export class Hud {
           // instead of polling every frame.
           this.craftTierUpDrains = CRAFT_TIER_UP_DRAIN_WINDOW;
           if (ev.ok && ev.itemId) {
-            // The ONLY line for the craft grant: the hub's 'loot' events are
-            // emitted both silent and callerLogs for every craft-output grant
-            // (see crafting.ts), so this line has to carry what they used to,
-            // the output count of a resultCount > 1 recipe included (#2430).
-            // The line keeps its loot-family green; the output's quality now
-            // rides the item link's own color, which is where a player reads
-            // it everywhere else in chat.
-            this.log(
-              t(craftedLineKey(ev.count), {
-                name: grantItemToken(ev.itemId),
-                qty: grantQtyText(ev.count),
-              }),
-              PROF_LOG_GRANT,
-            );
+            // The ONLY line for the craft grant (the hub's 'loot' events are
+            // silent + callerLogs for craft outputs, #2430), so it carries the
+            // count, and a rolled loot quality rides an exact-copy item link.
+            const line = t(craftedLineKey(ev.count), {
+              name: grantItemToken(ev.itemId),
+              qty: grantQtyText(ev.count),
+            });
+            const link = (el: HTMLElement, id: string, copy?: ItemInstancePayload) =>
+              this.appendChatItemLink(el, id, copy);
+            this.log(craftedLineBody(document, line, ev.itemId, ev.instance, link), PROF_LOG_GRANT);
             const recipe = ALL_RECIPES.find((r) => r.id === ev.recipeId);
             audio.craftSuccess(recipe?.professionId ?? '');
             // Masterwork layers alongside the family cue above, never replaces

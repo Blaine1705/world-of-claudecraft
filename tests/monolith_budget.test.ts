@@ -578,7 +578,9 @@ const MONOLITHS: MonolithRow[] = [
     // Release integration preserves the inherited tooltip-hover settings and
     // prior extractions beside the pet-button extraction. Measured after formatting.
     // Heroic currency balance reads remove the old bag sum. Exact merged size.
-    ceiling: 17922,
+    // Loot-quality craft receipt formatting moved to loot_quality_receipt.ts.
+    // Exact merged coordinator size after the source extraction, zero slack.
+    ceiling: 17918,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -2031,7 +2033,9 @@ const MONOLITHS: MonolithRow[] = [
     // skullBagAction send. Exact count, zero slack.
     // Re-pinned after composing both release-batch sides. Exact merged count
     // measured with wc -l, zero slack.
-    ceiling: 5329,
+    // Loot-quality craftResult projection moved to craft_result_mirror.ts.
+    // Exact merged coordinator size after the source extraction, zero slack.
+    ceiling: 5321,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
