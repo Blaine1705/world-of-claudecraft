@@ -609,8 +609,10 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     zoneId: 'evergarden',
     minLevel: 20,
     // Centred between the knights' garden posts and their north camp so the
-    // ring holds every hedge knight in the zone.
+    // ring holds every hedge knight in the zone. That centre sits in the Great
+    // Maze, so the champion keeps its open-lawn spot at the north watch.
     area: { x: 358, z: 995, radius: 151 },
+    championAt: { x: 418, z: 1118 },
     objective: { type: 'kill', targetMobId: 'hedge_knight' },
     count: 3,
   },

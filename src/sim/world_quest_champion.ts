@@ -9,7 +9,8 @@
 // mid-fight is never locked out. An unclaimed champion fades after a few
 // minutes so a site never keeps a permanent elite.
 //
-// Placement is rng-free (a fixed offset from the area centre) and the champion
+// Placement is rng-free (a fixed offset from the area centre, or the quest's
+// authored championAt point) and the champion
 // is a summoned, run-scoped mob (never respawns in place). State is keyed by
 // SimContext in a module WeakMap, transient by design, like the rift ambush.
 
@@ -87,13 +88,24 @@ function championTemplate(ctx: SimContext, quest: WorldQuestDef): MobTemplate | 
   return best?.templateId ? (MOBS[best.templateId] ?? null) : null;
 }
 
+/** The rng-free point the champion rises at. */
+export function worldQuestChampionSite(quest: WorldQuestDef): { x: number; z: number } {
+  return (
+    quest.championAt ?? {
+      x: quest.area.x + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
+      z: quest.area.z + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
+    }
+  );
+}
+
 function tellNear(ctx: SimContext, quest: WorldQuestDef, banner: WorldQuestBannerId): void {
+  // An authored site is the alert's centre; otherwise the area centre, as before.
+  const centre = quest.championAt ?? quest.area;
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead) continue;
     if (
-      Math.hypot(e.pos.x - quest.area.x, e.pos.z - quest.area.z) <=
-      WORLD_QUEST_CHAMPION_TUNING.alertYards
+      Math.hypot(e.pos.x - centre.x, e.pos.z - centre.z) <= WORLD_QUEST_CHAMPION_TUNING.alertYards
     )
       ctx.emit({ type: 'worldQuestBanner', banner, pid: meta.entityId });
   }
@@ -118,10 +130,8 @@ export function summonWorldQuestChampion(
     template.minLevel,
     quest.minLevel + WORLD_QUEST_CHAMPION_TUNING.levelAboveQuest,
   );
-  const pos = ctx.groundPos(
-    quest.area.x + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
-    quest.area.z + WORLD_QUEST_CHAMPION_TUNING.offsetYards,
-  );
+  const site = worldQuestChampionSite(quest);
+  const pos = ctx.groundPos(site.x, site.z);
   const mob = createMob(ctx.nextId++, template, level, pos);
   mob.summonedAdd = true;
   mob.runScoped = true;

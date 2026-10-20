@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
+import { isBlocked } from '../src/sim/colliders';
+import { WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
+import { inGardenMaze } from '../src/sim/world';
 import {
   WORLD_QUEST_CHAMPION_TUNING as TUNING,
+  worldQuestChampionSite,
   worldQuestChampionState,
   worldQuestOffersChampion,
 } from '../src/sim/world_quest_champion';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 const QUEST_ID = 'wq_evergarden_watch';
 
@@ -15,8 +19,10 @@ function armed(): Sim {
   const sim = new Sim({ seed: 31, playerClass: 'warrior', devCommands: true });
   sim.chat('/dev wq evergarden');
   sim.tick();
-  const quest = WORLD_QUESTS_BY_ID[QUEST_ID];
-  sim.player.pos = sim.groundPos(quest.area.x, quest.area.z);
+  // Stand at the champion's site (inside the area) so the purse's credit
+  // range reaches the champion when it falls.
+  const site = worldQuestChampionSite(WORLD_QUESTS_BY_ID[QUEST_ID]);
+  sim.player.pos = sim.groundPos(site.x, site.z);
   sim.player.prevPos = { ...sim.player.pos };
   sim.tick();
   return sim;
@@ -50,6 +56,27 @@ describe('the world quest champion encore', () => {
     expect(worldQuestOffersChampion(WORLD_QUESTS_BY_ID.wq_eastbrook_shadow)).toBe(false);
   });
 
+  it('rises inside every offering quest area, an authored site on open lawn', () => {
+    for (const quest of WORLD_QUESTS) {
+      if (!worldQuestOffersChampion(quest)) continue;
+      const site = worldQuestChampionSite(quest);
+      expect(
+        Math.hypot(site.x - quest.area.x, site.z - quest.area.z),
+        quest.id,
+      ).toBeLessThanOrEqual(quest.area.radius);
+      if (!quest.championAt) {
+        expect(site, quest.id).toEqual({
+          x: quest.area.x + TUNING.offsetYards,
+          z: quest.area.z + TUNING.offsetYards,
+        });
+        continue;
+      }
+      // An authored site exists to dodge an unfit centre, so it must be open.
+      expect(inGardenMaze(site.x, site.z), quest.id).toBe(false);
+      expect(isBlocked(WORLD_SEED, site.x, site.z, 1.5), quest.id).toBe(false);
+    }
+  });
+
   it('raises a promoted champion at completion and pays every participant when it falls', () => {
     const sim = armed();
     const meta = sim.meta(sim.playerId)!;
@@ -64,9 +91,8 @@ describe('the world quest champion encore', () => {
     expect(mob.scale).toBe(TUNING.scale);
     expect(mob.summonedAdd).toBe(true);
     expect(mob.runScoped).toBe(true);
-    expect(Math.hypot(mob.pos.x - quest.area.x, mob.pos.z - quest.area.z)).toBeLessThan(
-      TUNING.offsetYards * 1.5 + 1,
-    );
+    const site = worldQuestChampionSite(quest);
+    expect(Math.hypot(mob.pos.x - site.x, mob.pos.z - site.z)).toBeLessThan(1);
     expect(mob.hostile).toBe(true);
     // A second completion while it lives never stacks a second champion.
     const before = sim.entities.size;
