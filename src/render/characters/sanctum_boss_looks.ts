@@ -48,6 +48,7 @@ import {
   KORGATH_BROKEN_GESTURE,
   KORGATH_CLIP,
   KORGATH_CLIP_FIXES_URL,
+  KORGATH_FIST_DROPS,
   KORGATH_RUN_REF,
   KORGATH_RUNES_GESTURE,
   KORGATH_WHOLE_GESTURE,
@@ -157,8 +158,10 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
   // Korgath the Bound: the Smith's foreman in his harness, 10.3 yd at Idle.
   sanctum_korgath: {
     url: KORGATH_BODY.url,
-    // The two-hand blows with both hands on the haft (replace the body's).
+    // The re-authored maul clips (replace the body's), and the modeled right
+    // fist kept closed on the haft in every other clip.
     animUrls: [KORGATH_CLIP_FIXES_URL],
+    clipTrackDrops: KORGATH_FIST_DROPS,
     height: bossLookHeight(KORGATH_BODY),
     clips: {
       idle: 'Idle',

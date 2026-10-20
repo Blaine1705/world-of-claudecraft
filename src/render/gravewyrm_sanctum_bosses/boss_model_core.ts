@@ -37,11 +37,37 @@ export const KORGATH_BODY: BossBody = {
   idleBoundsHeight: 10.27,
   walkRef: 2.65,
 };
-/** Korgath's two-hand blows (HammerSlam, HammerSweep) with the left hand
- *  re-solved onto the haft (it hung off it, the elbow behind his back): a
- *  clip donor beside the body whose clips replace the body's by name
- *  (docs/design/dungeon-rework/korgath/). */
+/** Korgath's maul clips re-authored on a control rig (docs/design/
+ *  dungeon-rework/korgath/): HammerSlam and HammerSweep with both fists locked
+ *  on the haft (the right one turned end for end for the blow, the left one
+ *  closed on the finger bones the body gained), and Death with the right fist
+ *  closed on the haft until the maul falls from it. A clip donor beside the
+ *  body whose clips replace the body's by name. */
 export const KORGATH_CLIP_FIXES_URL = 'models/creatures/woc_sanctum_korgath_clips.glb';
+/** The donor's clips (they replace the body's of the same names). */
+export const KORGATH_DONOR_CLIPS = ['HammerSlam', 'HammerSweep', 'Death'] as const;
+/** The body is modeled with the right fist closed on the haft; its own clips
+ *  bend that fist's single finger bone 88 degrees (176 in the gaits), folding
+ *  the fingers off the haft. Every body clip he holds the maul in loses that
+ *  rotation, so the modeled grip shows (VisualDef.clipTrackDrops). */
+export const KORGATH_FIST_BONE = 'fingers.r';
+export const KORGATH_FIST_DROPS: Readonly<Record<string, readonly string[]>> = Object.fromEntries(
+  [
+    'Idle',
+    'Walk',
+    'ThresholdChargeLoop',
+    'Hit',
+    'Strain',
+    'Stomp',
+    'MaulArc',
+    'ChainFlail',
+    'ThresholdCharge',
+    'ForemansBellow',
+    'ChainBreak',
+    'ChainYank',
+    'Roar',
+  ].map((clip) => [clip, [KORGATH_FIST_BONE]]),
+);
 /** The planted feet's speed in the charge's run loop (ThresholdChargeLoop), at
  *  model scale 1. */
 export const KORGATH_RUN_REF = 15.84;
