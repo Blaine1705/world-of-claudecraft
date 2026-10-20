@@ -2282,6 +2282,7 @@ export const vi_VN: EnTranslations = {
       "complexityMedium": "Trung bình",
       "complexityHigh": "Cao",
       "exampleAbilities": "Kỹ năng tiêu biểu",
+      "specBonus": "Specialization bonus",
       "viewTalents": "Xem thiên phú",
       "selectSpec": "Chọn chuyên môn",
       "specUnlockBanner": "Chuyên Môn Đã Mở Khóa!",

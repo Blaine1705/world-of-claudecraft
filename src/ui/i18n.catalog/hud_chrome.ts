@@ -2777,6 +2777,9 @@ export const hudChromeStrings = {
     complexityMedium: 'Medium',
     complexityHigh: 'High',
     exampleAbilities: 'Example abilities',
+    // Label for the spec's always-on stat floor (spec_baselines.ts), which
+    // otherwise never surfaces anywhere a player can read it.
+    specBonus: 'Specialization bonus',
     viewTalents: 'View talents',
     selectSpec: 'Select specialization',
     specUnlockBanner: 'Specialization Unlocked!',

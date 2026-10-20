@@ -2282,6 +2282,7 @@ export const da_DK: EnTranslations = {
       "complexityMedium": "Mellem",
       "complexityHigh": "Høj",
       "exampleAbilities": "Eksempler på evner",
+      "specBonus": "Specialization bonus",
       "viewTalents": "Se talenter",
       "selectSpec": "Vælg specialisering",
       "specUnlockBanner": "Specialisering låst op!",

@@ -2282,6 +2282,7 @@ export const en_XA: EnTranslations = {
       "complexityMedium": "[Ɱéðíúɱ]",
       "complexityHigh": "[Ĥíĝĥ]",
       "exampleAbilities": "[Éẋáɱþļé áƀíļíţíéš]",
+      "specBonus": "[Šþéçíáļížáţíóñ ƀóñúš]",
       "viewTalents": "[Ʋíéŵ ţáļéñţš]",
       "selectSpec": "[Šéļéçţ šþéçíáļížáţíóñ]",
       "specUnlockBanner": "[Šþéçíáļížáţíóñ Úñļóçķéð!]",

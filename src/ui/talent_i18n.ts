@@ -1,3 +1,4 @@
+import { specBaselineFor } from '../sim/content/spec_baselines';
 import {
   type ClassTalents,
   type GlobalModEffect,
@@ -11249,6 +11250,17 @@ function effectDescription(
   if (effect.proc) parts.push(procDescription(effect.proc, lang, text));
 
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
+}
+
+// The spec's always-on baseline (spec_baselines.ts), generated from the data in
+// every locale so the card can never drift from the live numbers. Null when the
+// spec has no baseline (paladin, warrior, mage) or nothing in it is describable.
+export function specBaselineDescription(spec: SpecDef): string | null {
+  const lang = getLanguage();
+  const effect = specBaselineFor(spec.class, spec.id);
+  if (!effect) return null;
+  const described = effectDescription(effect, 1, lang);
+  return described === localeText[lang].noEffect ? null : described;
 }
 
 function className(id: PlayerClass): string {

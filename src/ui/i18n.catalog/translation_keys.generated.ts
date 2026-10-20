@@ -13384,6 +13384,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.specPanel.exampleAbilities'
   | 'hudChrome.specPanel.primaryAttr'
   | 'hudChrome.specPanel.selectSpec'
+  | 'hudChrome.specPanel.specBonus'
   | 'hudChrome.specPanel.specUnlockBanner'
   | 'hudChrome.specPanel.specUnlockHint'
   | 'hudChrome.specPanel.viewTalents'

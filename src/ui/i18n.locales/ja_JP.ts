@@ -1547,6 +1547,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.complexityMedium': '中',
   'hudChrome.specPanel.exampleAbilities': '代表的なアビリティ',
   'hudChrome.specPanel.primaryAttr': '主要能力値',
+  'hudChrome.specPanel.specBonus': 'スペシャライゼーションボーナス',
   'hudChrome.specPanel.selectSpec': 'スペシャライゼーションを選択',
   'hudChrome.specPanel.viewTalents': 'タレントを見る',
   'hudChrome.talentRows.comingSoon': '近日公開',
