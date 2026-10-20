@@ -1,8 +1,8 @@
 // The Smith's Heart's blockout dressing: the placeholder of every `sh_*`
 // prop the field places (heart_plan_core.ts HEART_PROP_RECIPES: boxes,
 // cylinders, cones and gems in the vein's colour family) and the mountain's
-// rock walls along the field's outer lips (heart_walls_core.ts, one instanced
-// draw). Static: every matrix is written once at build. The geometries and
+// rock along the field's outer lips (heart_walls_core.ts, one instanced draw
+// per rock shape). Static: every matrix is written once at build. The geometries and
 // materials are shared process-wide (surfaceMat dedupes the materials); the
 // interior group owns only the meshes.
 
@@ -20,7 +20,7 @@ import {
   heartPropBase,
   scaleColor,
 } from './heart_plan_core';
-import { planHeartWalls } from './heart_walls_core';
+import { HEART_ROCK_VARIANTS, heartRockShape, planHeartWalls } from './heart_walls_core';
 
 const geometries = new Map<string, THREE.BufferGeometry>();
 
@@ -105,40 +105,59 @@ export function buildHeartProps(): THREE.Group {
   return group;
 }
 
+/** A weathered rock palette, darker than the props' stone, matching the
+ *  strata cliffs: basalt shadow to lichen-grey granite. */
+const ROCK_DARK = 0x2b2927;
+const ROCK_LIGHT = 0x5a544d;
+
 /**
- * The mountain's walls: one instanced draw of tapered six-sided rock blocks.
- * The low tier spaces them wider (a cosmetic shed; what stays open stays
- * open on every tier).
+ * The mountain's rock: one instanced draw per rock shape (heartRockShape:
+ * spires, crags, split slabs), each block squashed across, turned and leaning
+ * out (a shear of its top). The low tier spaces them wider (a cosmetic shed;
+ * what stays open stays open on every tier).
  */
-export function buildHeartWalls(lowGfx: boolean): THREE.InstancedMesh {
+export function buildHeartWalls(lowGfx: boolean): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'smithHeartWalls';
   const blocks = planHeartWalls(lowGfx ? 7 : 5);
-  const geometry = sharedGeometry('wallBlock', () =>
-    new THREE.CylinderGeometry(0.62, 1, 1, 6).translate(0, 0.5, 0),
-  );
-  const material = surfaceMat({ color: 0xffffff, roughness: 0.95, flatShading: true });
-  const mesh = new THREE.InstancedMesh(geometry, material, Math.max(1, blocks.length));
-  mesh.name = 'smithHeartWalls';
+  const material = surfaceMat({ color: 0xffffff, roughness: 0.96, flatShading: true });
+  const scale = new THREE.Matrix4();
+  const turn = new THREE.Matrix4();
+  const shear = new THREE.Matrix4();
   const m = new THREE.Matrix4();
-  const q = new THREE.Quaternion();
-  const s = new THREE.Vector3();
-  const t = new THREE.Vector3();
-  const up = new THREE.Vector3(0, 1, 0);
   const color = new THREE.Color();
-  blocks.forEach((b, i) => {
-    q.setFromAxisAngle(up, b.yaw);
-    s.set(b.r, b.top - b.base, b.r);
-    t.set(b.x, b.base, b.z);
-    m.compose(t, q, s);
-    mesh.setMatrixAt(i, m);
-    // Granite to basalt: the faces vary so the mass never reads as one tint.
-    const k = heartHash(Math.round(b.x * 3), Math.round(b.z * 3));
-    color.setHex(mix(HEART_PALETTE.dark, HEART_PALETTE.stone, 0.35 + k * 0.55));
-    mesh.setColorAt(i, color);
-  });
-  mesh.count = blocks.length;
-  mesh.instanceMatrix.needsUpdate = true;
-  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  mesh.computeBoundingSphere();
-  mesh.matrixAutoUpdate = false;
-  return mesh;
+  for (let variant = 0; variant < HEART_ROCK_VARIANTS; variant++) {
+    const mine = blocks.filter((b) => b.variant === variant);
+    if (mine.length === 0) continue;
+    const geometry = sharedGeometry(`rock:${variant}`, () => {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(heartRockShape(variant), 3));
+      g.computeVertexNormals();
+      return g;
+    });
+    const mesh = new THREE.InstancedMesh(geometry, material, mine.length);
+    mesh.name = `smithHeartRock:${variant}`;
+    mine.forEach((b, i) => {
+      const h = b.top - b.base;
+      scale.makeScale(b.rx, h, b.rz);
+      turn.makeRotationY(b.yaw);
+      // The lean: x and z slide with height, so the top sits out by
+      // (leanX, leanZ) yards while the foot stays put.
+      shear.set(1, b.leanX / h, 0, b.x, 0, 1, 0, b.base, 0, b.leanZ / h, 1, b.z, 0, 0, 0, 1);
+      m.multiplyMatrices(shear, turn).multiply(scale);
+      mesh.setMatrixAt(i, m);
+      // Basalt to granite, the taller crags a shade paler where the storm
+      // light catches them.
+      const k = heartHash(Math.round(b.x * 3), Math.round(b.z * 3));
+      const tall = Math.min(1, (b.top - SMITH_HEART_FIELD.voidHeight) / 160);
+      color.setHex(mix(ROCK_DARK, ROCK_LIGHT, 0.2 + k * 0.45 + tall * 0.25));
+      mesh.setColorAt(i, color);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    mesh.computeBoundingSphere();
+    mesh.matrixAutoUpdate = false;
+    group.add(mesh);
+  }
+  return group;
 }

@@ -9,6 +9,9 @@ import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { SMITH_HEART_PLACEHOLDER_LOOKS } from '../src/render/characters/smith_heart_placeholder_looks';
 import { gateObjectPlan } from '../src/render/gate_objects';
 import {
+  HEART_SEAL_BARRIER,
+  heartGatePartPose,
+  heartGateParts,
   heartGateRig,
   heartSealGatePose,
   heartSlabPose,
@@ -35,15 +38,31 @@ import {
   isHeartSealMarker,
   observeHeartSealMarker,
 } from '../src/render/smith_heart/heart_seal_core';
-import { planHeartWalls } from '../src/render/smith_heart/heart_walls_core';
+import {
+  heartGateSolids,
+  heartPropSolids,
+  heartSightlineHits,
+  heartWallSolids,
+} from '../src/render/smith_heart/heart_sightline_core';
+import {
+  HEART_ROCK_VARIANTS,
+  heartFloorClearance,
+  heartRockShape,
+  heartWallReach,
+  planHeartWalls,
+} from '../src/render/smith_heart/heart_walls_core';
 import { SMITH_HEART_GATES, SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import {
+  BALCONY,
   BREATH,
   HEART,
+  HEART_SEAL,
   HEAT,
   LIGHT_RIVERS,
   QUENCH,
   RING,
+  RING_ARC,
+  ringPoint,
   SMITH_HEART_FIELD,
   SMITH_HEART_VEIN_COLORS,
   SMITH_HEART_VEINS,
@@ -56,27 +75,36 @@ const F = SMITH_HEART_FIELD;
 const onFloor = (x: number, z: number) => authoredFieldSurfaceAt(F, x, z) !== null;
 const floorAt = (x: number, z: number) => (onFloor(x, z) ? authoredFieldHeight(F, x, z) : null);
 
-describe('heart_walls_core: the mountain walls', () => {
+describe('heart_walls_core: the mountain rock', () => {
   for (const spacing of [5, 7]) {
     const blocks = planHeartWalls(spacing);
-    it(`spacing ${spacing}: plenty of wall, and none over walkable floor`, () => {
-      expect(blocks.length).toBeGreaterThan(spacing === 5 ? 400 : 200);
+    it(`spacing ${spacing}: plenty of rock, every block 7+ yd from any walkable floor`, () => {
+      expect(blocks.length).toBeGreaterThan(spacing === 5 ? 600 : 300);
       const bad: string[] = [];
       for (const b of blocks) {
-        expect(b.top).toBeGreaterThan(b.base + 20);
-        for (let k = 0; k <= 16; k++) {
-          const a = (k / 16) * Math.PI * 2;
-          const r = k === 16 ? 0 : b.r;
-          const x = b.x + Math.sin(a) * r;
-          const z = b.z + Math.cos(a) * r;
-          if (onFloor(x, z)) bad.push(`(${b.x.toFixed(1)}, ${b.z.toFixed(1)}) r ${b.r.toFixed(2)}`);
+        // The whole block, its lean included, then seven more yards.
+        const outer = heartWallReach(b) + 7;
+        const radii: number[] = [];
+        for (let r = 0; r < outer; r += 1.5) radii.push(r);
+        radii.push(outer);
+        let hit = false;
+        for (const r of radii) {
+          for (let k = 0; k < 24 && !hit; k++) {
+            const a = (k / 24) * Math.PI * 2;
+            hit = onFloor(b.x + Math.sin(a) * r, b.z + Math.cos(a) * r);
+          }
+          if (hit) break;
+        }
+        if (hit) {
+          bad.push(`(${b.x.toFixed(1)}, ${b.z.toFixed(1)}) reach ${heartWallReach(b).toFixed(2)}`);
         }
       }
       expect(bad.slice(0, 10)).toEqual([]);
     });
     it(`spacing ${spacing}: the caldera, the Wind Bridge's gulf and the Anvil's channels stay open`, () => {
       for (const b of blocks) {
-        expect(Math.hypot(b.x - RING.x, b.z - RING.z) - b.r).toBeGreaterThanOrEqual(RING.innerR);
+        const reach = heartWallReach(b);
+        expect(Math.hypot(b.x - RING.x, b.z - RING.z) - reach).toBeGreaterThanOrEqual(RING.innerR);
         const mx = (WIND_BRIDGE.fromX + WIND_BRIDGE.toX) / 2;
         const mz = (WIND_BRIDGE.fromZ + WIND_BRIDGE.toZ) / 2;
         expect(Math.hypot(b.x - mx, b.z - mz)).toBeGreaterThan(18);
@@ -86,16 +114,59 @@ describe('heart_walls_core: the mountain walls', () => {
       }
     });
   }
-  it('walls flank every vein (the fissures read as cracks in the mountain)', () => {
+  it('reads as mountain rock, not a skyline: varied shapes, squashed, leaning out, low by the walks', () => {
+    const blocks = planHeartWalls(5);
+    expect(new Set(blocks.map((b) => b.variant)).size).toBe(HEART_ROCK_VARIANTS);
+    // The tops spread widely (no rows of one height).
+    const tops = blocks.map((b) => b.top);
+    const mean = tops.reduce((a, t) => a + t, 0) / tops.length;
+    const sd = Math.sqrt(tops.reduce((a, t) => a + (t - mean) ** 2, 0) / tops.length);
+    expect(sd).toBeGreaterThan(8);
+    let leanOut = 0;
+    let near = 0;
+    let nearLow = 0;
+    for (const b of blocks) {
+      expect(b.rz).toBeLessThanOrEqual(b.rx);
+      const c = heartFloorClearance(b.x, b.z);
+      // The lean points away from the floor the block faces.
+      if (b.leanX * c.toX + b.leanZ * c.toZ < 0) leanOut++;
+      if (c.d < 14) {
+        near++;
+        if (b.top - c.floor < 16) nearLow++;
+      }
+    }
+    expect(leanOut / blocks.length).toBeGreaterThan(0.95);
+    // The first teeth by a walk stay low (a camera behind a player sees over them).
+    expect(near).toBeGreaterThan(50);
+    expect(nearLow / near).toBeGreaterThan(0.9);
+    // ... and the rock behind climbs into real walls.
+    expect(blocks.some((b) => b.top - heartFloorClearance(b.x, b.z).floor > 45)).toBe(true);
+  });
+  it('builds every rock shape within its unit frame, with a jagged top', () => {
+    for (let v = 0; v < HEART_ROCK_VARIANTS; v++) {
+      const tri = heartRockShape(v);
+      expect(tri.length % 9).toBe(0);
+      expect(tri.length / 9).toBeGreaterThan(12);
+      let maxY = 0;
+      for (let i = 0; i < tri.length; i += 3) {
+        expect(Math.hypot(tri[i], tri[i + 2])).toBeLessThanOrEqual(1 + 1e-9);
+        expect(tri[i + 1]).toBeGreaterThanOrEqual(0);
+        expect(tri[i + 1]).toBeLessThanOrEqual(1 + 1e-9);
+        maxY = Math.max(maxY, tri[i + 1]);
+      }
+      expect(maxY).toBeGreaterThan(0.85);
+    }
+  });
+  it('flanks every vein (the fissures read as cracks in the mountain)', () => {
     const blocks = planHeartWalls(5);
     const near = (x: number, z: number, d: number) =>
       blocks.some((b) => Math.hypot(b.x - x, b.z - z) < d);
-    expect(near(BREATH.b1.x, BREATH.b1.z, 30)).toBe(true);
-    expect(near(QUENCH.q1.x, QUENCH.q1.z, 30)).toBe(true);
-    expect(near((HEAT.hall.x0 + HEAT.hall.x1) / 2, HEAT.hall.z1, 20)).toBe(true);
+    expect(near(BREATH.b1.x, BREATH.b1.z, 34)).toBe(true);
+    expect(near(QUENCH.q1.x, QUENCH.q1.z, 34)).toBe(true);
+    expect(near((HEAT.hall.x0 + HEAT.hall.x1) / 2, HEAT.hall.z1, 24)).toBe(true);
     // The Ring's outer gallery wall, between two vein mouths.
     const a = Math.PI / 4;
-    expect(near(Math.sin(a) * (RING.outerR + 8), Math.cos(a) * (RING.outerR + 8), 8)).toBe(true);
+    expect(near(Math.sin(a) * (RING.outerR + 14), Math.cos(a) * (RING.outerR + 14), 8)).toBe(true);
   });
 });
 
@@ -226,6 +297,83 @@ describe('heart_gates_core: the gate poses', () => {
     expect(open.film).toBe(0);
     expect(open.shown).toBe(false);
   });
+  it('the forge seal is a LOW barrier: nothing over 3 yd, nothing solid and wide above the sill', () => {
+    for (const g of SMITH_HEART_GATES.filter((x) => x.kind === 'forge_seal')) {
+      const parts = heartGateParts('seal', g.hw * 2);
+      for (const p of parts) {
+        expect(p.y + p.h / 2, `${g.id} ${p.role}`).toBeLessThanOrEqual(3);
+        // Above the sill only thin light bars (and the end posts, outside
+        // the passage) stand: no sheet, no disc, no wall.
+        if (p.y - p.h / 2 >= HEART_SEAL_BARRIER.sillHeight - 1e-9 && p.role !== 'post') {
+          expect(p.role).toBe('bar');
+          expect(p.w).toBeLessThanOrEqual(0.2);
+        }
+        if (p.role === 'post') expect(Math.abs(p.x) - p.w / 2).toBeGreaterThanOrEqual(g.hw);
+      }
+      // It spans the whole passage (it reads as shut, wall to wall).
+      const sill = parts.find((p) => p.role === 'sill');
+      expect(sill?.w).toBeCloseTo(g.hw * 2);
+      expect(parts.filter((p) => p.role === 'bar').length).toBeGreaterThanOrEqual(6);
+      // Open: the sill and the bars sink out of sight; only the posts stay.
+      for (const p of parts) {
+        expect(heartGatePartPose(p, 'seal', 1).shown, p.role).toBe(p.role === 'post');
+      }
+    }
+  });
+  it('the slab stays a slab, and is gone open', () => {
+    const parts = heartGateParts('slab', 15.2);
+    expect(Math.max(...parts.map((p) => p.y + p.h / 2))).toBeLessThanOrEqual(9);
+    for (const p of parts) expect(heartGatePartPose(p, 'slab', 1).shown).toBe(false);
+  });
+});
+
+describe('heart_sightline_core: the raid sees the seal', () => {
+  const solids = [
+    ...heartWallSolids(5),
+    ...heartWallSolids(7),
+    ...heartPropSolids(),
+    ...heartGateSolids(0),
+    ...heartGateSolids(0.5),
+    ...heartGateSolids(1),
+  ];
+  const seal = { x: HEART_SEAL.x, y: HEART.h + 0.5, z: HEART_SEAL.z };
+  const eye = (x: number, z: number) => ({ x, y: authoredFieldHeight(F, x, z) + 1.7, z });
+  const balconyTip = eye(0, BALCONY.z1);
+
+  it('plans every family of solid (the pin is not vacuous)', () => {
+    expect(heartWallSolids(5).length).toBeGreaterThan(600);
+    expect(heartPropSolids().length).toBeGreaterThan(60);
+    expect(heartGateSolids(0).length).toBeGreaterThan(40);
+    // A ray straight through a shut causeway seal's sill does hit it.
+    const g = SMITH_HEART_GATES.find((x) => x.id === 'causeway_north');
+    if (!g) throw new Error('no north causeway gate');
+    const low = authoredFieldHeight(F, g.x, g.z) + 0.3;
+    expect(
+      heartSightlineHits({ x: g.x, y: low, z: g.z + 3 }, { x: g.x, y: low, z: g.z - 3 }, solids),
+    ).toContain('causeway_north:sill');
+  });
+
+  it('every point of the Ring sees the seal over every gate, prop and rock', () => {
+    const bad: string[] = [];
+    const degs: number[] = [RING_ARC.fromDeg, RING_ARC.toDeg];
+    for (let d = Math.ceil(RING_ARC.fromDeg / 10) * 10; d <= RING_ARC.toDeg; d += 10) degs.push(d);
+    expect(degs.length).toBeGreaterThan(25);
+    for (const deg of degs) {
+      const p = ringPoint(deg, RING.R);
+      const hits = heartSightlineHits(eye(p.x, p.z), seal, solids);
+      if (hits.length) bad.push(`ring ${deg % 360}: ${hits.join(', ')}`);
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('the Balcony tip sees the seal and each causeway mouth', () => {
+    expect(heartSightlineHits(balconyTip, seal, solids)).toEqual([]);
+    for (const deg of [0, 90, 270]) {
+      const m = ringPoint(deg, 66);
+      const mouth = { x: m.x, y: authoredFieldHeight(F, m.x, m.z) + 1, z: m.z };
+      expect(heartSightlineHits(balconyTip, mouth, solids), `mouth ${deg}`).toEqual([]);
+    }
+  });
 });
 
 /** How far a part reaches from the prop's centre across the ground. */
@@ -321,6 +469,8 @@ describe('smith_heart_placeholder_looks: the one list of borrowed bodies', () =>
     for (const [id, key] of Object.entries(SMITH_HEART_PLACEHOLDER_LOOKS)) {
       expect(VISUALS[key], `${id} -> ${key}`).toBeDefined();
       expect(key.includes('ignivar'), key).toBe(false);
+      // Never a lava-cracked or fel body for the white-gold Heat either.
+      expect(['mob_hoard_magma_brute', 'mob_emberkin']).not.toContain(key);
       expect(visualKeyFor({ kind: 'mob', templateId: id } as never)).toBe(key);
     }
   });

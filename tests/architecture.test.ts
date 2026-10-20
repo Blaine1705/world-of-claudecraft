@@ -981,6 +981,7 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_rivers_core.ts',
   'src/render/smith_heart/heart_seal_core.ts',
   'src/render/smith_heart/heart_gates_core.ts',
+  'src/render/smith_heart/heart_sightline_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

@@ -5,8 +5,8 @@
 // the blockout is playable and readable from day one. Phase 2 replaces each
 // row with the raid's own original model (a new VISUALS key); nothing else
 // in the renderer names these borrowings, so swapping a body is one row.
-// No Ignivar key is borrowed (the Heat is white-gold smith fire, never the
-// volcanic raid's look).
+// No Ignivar key is borrowed, and no lava-cracked or volcanic body either
+// (the Heat is white-gold smith fire, never the volcanic raid's look).
 //
 // manifest.ts spreads this into MOB_KEYS; tests/smith_heart_render_core.test.ts
 // pins one row per SMITH_HEART_MOBS template, each naming a real VISUALS key.
@@ -25,10 +25,13 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_quench_warder: 'mob_hoard_rime_elemental',
   // Final: a meltwater caller, ice-pale water held in a stone frame.
   heart_quench_caller: 'mob_water_elemental',
-  // Final: a smith-fire warder of dark iron with a white-gold core.
-  heart_heat_warder: 'mob_hoard_magma_brute',
-  // Final: a small white-gold ember spirit thrown off the Smith's forge.
-  heart_heat_caller: 'mob_emberkin',
+  // Final: a smith-fire warder of dark iron with a white-gold core. (The
+  // stone goleling, tinted gold by its entity colour: the lava-cracked
+  // brute read volcanic, which the Heat must never do.)
+  heart_heat_warder: 'mob_elemental',
+  // Final: a small white-gold ember spirit thrown off the Smith's forge. (A
+  // drifting pale light; the fel-green emberkin read wrong.)
+  heart_heat_caller: 'mob_glimmerwisp',
   // ---- the four guardians -----------------------------------------------------
   // Final: a stone titan half-fused with the Pit's floor, a great hammer arm.
   heart_hammer_guardian: 'skel_golem',
@@ -36,8 +39,9 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   heart_breath_guardian: 'mob_hoard_storm_caller',
   // Final: a glacier giant of clear ice with the lake's cold light inside.
   heart_quench_guardian: 'mob_hoard_rime_elemental',
-  // Final: an anvil-bodied forge giant pouring white-gold metal.
-  heart_heat_guardian: 'mob_hoard_magma_brute',
+  // Final: an anvil-bodied forge giant pouring white-gold metal. (The heavy
+  // construct, tinted white-gold by its entity colour, never a lava golem.)
+  heart_heat_guardian: 'skel_golem',
   // ---- the final boss -----------------------------------------------------------
   // Final: the Masterless Strength, the Smith's four strengths fused into one
   // shifting giant of stone, wind, ice and smith fire.
