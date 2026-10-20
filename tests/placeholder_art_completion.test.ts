@@ -319,6 +319,8 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'vanguard_oath_blade',
       'vanguard_fang_dagger',
       'vanguard_warstaff',
+      // The membership Staff of Changing (membership-weapon-2026-10-14, PR 4281).
+      'membership_staff',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

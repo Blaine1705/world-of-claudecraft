@@ -50,7 +50,8 @@ export function runWeaponProcs(
   // one). All these guards short-circuit BEFORE any rng draw.
   const id = weaponItemId === undefined ? wielder.mainhandItemId : weaponItemId;
   if (!id) return;
-  const meta = ctx.players.get(wielder.id);
+  // Only a player can own the adaptive membership weapon or a weapon enchant.
+  const meta = wielder.kind === 'player' ? ctx.players.get(wielder.id) : undefined;
   const equippedId = meta?.equipment?.[meleeHand ?? 'mainhand'];
   const adaptive = equippedId !== undefined && isMembershipWeapon(equippedId);
   // Held-model ids are cosmetic donors. Proc identity and base cadence belong

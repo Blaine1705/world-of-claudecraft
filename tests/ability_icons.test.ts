@@ -129,11 +129,14 @@ describe('ability icons', () => {
     // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
     // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
     // release/v0.44.0 merge into feature/buried-hoards).
-    expect(ids).toHaveLength(473);
+    // 474: plus the membership Courier glyph (parked in ABILITY_ART_PENDING until
+    // its skill painting ships, PR 4281).
+    expect(ids).toHaveLength(474);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('6fa8b2c16d3459d5f09768545d08e8f6778c00a2ac3973cd0d9361ee3d08971c');
+    // Re-minted over the ABILITY_RECIPES literal with the Courier glyph (PR 4281).
+    expect(hash).toBe('f5c85e74c1852aec645c69bd653819eb6ffde5507e518a25c9050bc8fb2f7ae2');
   });
 });

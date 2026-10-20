@@ -145,8 +145,11 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    catalogCount: 1464,
-    liveItemCount: 1482,
+    // + the membership PR's 16 paintings (eight membership pieces, seven
+    // friendship pieces and the Staff of Changing, PR 4281): 1480 / 1498,
+    // re-measured with `--verify-only`.
+    catalogCount: 1480,
+    liveItemCount: 1498,
     pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

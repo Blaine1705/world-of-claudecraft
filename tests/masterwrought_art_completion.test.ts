@@ -824,7 +824,9 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1479);
+    // The membership Staff of Changing (membership-weapon-2026-10-14, PR 4281)
+    // adds one more owner outside the dated universe: 1,480.
+    expect(currentOwnerIds).toHaveLength(1480);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -994,6 +996,14 @@ describe('Masterwrought art completion evidence', () => {
     ]);
     expect(datedIds.filter((id) => referralIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => referralIds.has(id))).toHaveLength(7);
+    // The Staff of Changing ships in its own later batch (PR 4281), equally additive.
+    const membershipWeaponIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'membership-weapon-2026-10-14')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect([...membershipWeaponIds]).toEqual(['membership_staff']);
+    expect(datedIds.filter((id) => membershipWeaponIds.has(id))).toEqual([]);
 
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
@@ -1023,6 +1033,7 @@ describe('Masterwrought art completion evidence', () => {
         !season2WeaponIds.has(id) &&
         !hoardBranchIds.has(id) &&
         !membershipIds.has(id) &&
+        !membershipWeaponIds.has(id) &&
         !referralIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);

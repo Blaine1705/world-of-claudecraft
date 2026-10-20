@@ -2165,12 +2165,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     };
     expect(referralIds.size).toBe(7);
     const beforeReferralBytes = Buffer.byteLength(JSON.stringify(withoutReferral), 'utf8');
-    expect(beforeReferralBytes).toBe(233515);
+    expect(beforeReferralBytes).toBe(233534);
     expect(bytes - beforeReferralBytes).toBe(122);
     expect(fieldBytes(s2, 'deedStats') - fieldBytes(withoutReferral, 'deedStats')).toBe(122);
-    // Membership adds eight discoverable item ids and no character entitlement
-    // fields. Isolate the measured content-only growth from the settled save:
-    // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered. Removing only
+    // Membership adds nine discoverable item ids (the eight pieces, then the
+    // Staff of Changing's 19 bytes) and no character entitlement fields.
+    // Isolate the measured content-only growth from the settled save:
+    // 233,360 -> 233,534 bytes, all 174 bytes in itemsDiscovered. Removing only
     // those ids must reproduce the preceding measurement exactly.
     const membershipIds = new Set(Object.keys(MEMBERSHIP_ITEMS));
     const withoutMembership: CharacterState = {
@@ -2182,13 +2183,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         ),
       },
     };
-    expect(membershipIds.size).toBe(8);
+    expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     expect(beforeMembershipBytes).toBe(233360);
-    expect(beforeReferralBytes - beforeMembershipBytes).toBe(155);
+    expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
-    ).toBe(155);
+    ).toBe(174);
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
@@ -2486,8 +2487,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
         4711 +
-        // Membership's eight discoverable item ids, isolated from withoutReferral above.
-        155,
+        // Membership's nine discoverable item ids (the eight pieces plus the Staff
+        // of Changing's 19 bytes, PR 4281), isolated from withoutReferral above.
+        174,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2533,8 +2535,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       deeds: 743,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      // Membership item discovery adds exactly 155 bytes, measured above.
-      deedStats: 9582,
+      // Membership item discovery adds exactly 155 bytes, measured above, and
+      // the Staff of Changing's discovery id 19 more (PR 4281).
+      deedStats: 9601,
       reliquary: 11501,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2572,8 +2575,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-      // Membership's eight discovered item ids remain here: +155 bytes.
-    ).toBe(231884);
+      // Membership's eight discovered item ids remain here: +155 bytes, and the
+      // Staff of Changing's id +19 (PR 4281).
+    ).toBe(231903);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2601,8 +2605,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-      // Membership's eight discovered item ids remain here: +155 bytes.
-    ).toBe(233503);
+      // Membership's eight discovered item ids remain here: +155 bytes, and the
+      // Staff of Changing's id +19 (PR 4281).
+    ).toBe(233522);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2702,8 +2707,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // RE-BASED for referral armour: measured 233,637 bytes, exactly +122
     // from the seven discovery ids isolated above. Trusted inviter/account
     // entitlement stays outside CharacterState. Preserve the same 381-byte band.
-    expect(bytes, reMint).toBeGreaterThan(233257);
-    expect(bytes, reMint).toBeLessThan(233638);
+    // RE-BASED for the Staff of Changing (PR 4281): measured 233,656 bytes,
+    // exactly +19 from its one discovery id, isolated above with membership.
+    expect(bytes, reMint).toBeGreaterThan(233276);
+    expect(bytes, reMint).toBeLessThan(233657);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
