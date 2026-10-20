@@ -137,14 +137,28 @@ const FERAL_LOADOUT = {
 // the same eight. The tank probe at 42920 re-rolls the same way: wolf incoming
 // 220 to 262, bear 143 to 157 (40 percent less, inside the 30 to 42 percent
 // bounds); its threat product and Marrowbreak snap stayed in band.
+// RE-MEASURED 2026-10-20 for all three arms and the tank probe's two incoming
+// figures, when the Mirefen mudfin huts became solid walls
+// (src/sim/mudfin_huts.ts). No druid, combat or tuning code moved: the camp
+// murlocs' idle wander now settles on other ticks, so this seed's whole trace
+// re-rolls again. Moongrove 5455/251/5456/7 to 5492/241/5493/7, wildfang
+// 6558/197/7684.697/10 to 6389/213/7486.7135/10, bruin 2891/159/9807.33125/4
+// to 2765/162/9243.19625/4. The neighbouring seeds on this tree: moongrove 5346
+// to 6045 damage and 190 to 277 incoming over 42421 to 42436 (payoffs 7 on
+// every one); wildfang 5868 to 7233 damage, 216 to 262 incoming and 10 or 12
+// payoffs over 42421 to 42428; bruin 2687 to 3082 damage, 112 to 163 incoming
+// and 4 payoffs over the same eight. The tank probe at 42920 re-rolls the same
+// way: wolf incoming 262 to 212, bear 157 to 126 (41 percent less, inside the
+// 30 to 42 percent bounds); its threat product and Marrowbreak snap stayed in
+// band.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 5455, incomingDamage: 251, threat: 5456, payoffs: 7 },
-  wildfang: { damage: 6558, incomingDamage: 197, threat: 7684.697, payoffs: 10 },
-  bruin: { damage: 2891, incomingDamage: 159, threat: 9807.33125, payoffs: 4 },
+  moongrove: { damage: 5492, incomingDamage: 241, threat: 5493, payoffs: 7 },
+  wildfang: { damage: 6389, incomingDamage: 213, threat: 7486.7135, payoffs: 10 },
+  bruin: { damage: 2765, incomingDamage: 162, threat: 9243.19625, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {
-  wolfIncomingDamage: 262,
-  bruinIncomingDamage: 157,
+  wolfIncomingDamage: 212,
+  bruinIncomingDamage: 126,
   bruinMitigationPct: 0.35,
   bruinThreatFrom100Damage: 214.5,
   marrowbreakSnapThreat: 990.99,
@@ -253,7 +267,8 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     expect(result.bruinIncomingDamage).toBeLessThan(result.wolfIncomingDamage);
     // The two incoming figures and the mitigation they imply are banded on
     // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less),
-    // re-measured 2026-10-15 for the Fenbridge rebuild (wolf 262, bear 157):
+    // re-measured 2026-10-15 for the Fenbridge rebuild (wolf 262, bear 157)
+    // and 2026-10-20 for the solid Mirefen mudfin huts (wolf 212, bear 126):
     // the drift the audit read (bear +12 percent) reds on the bear figure.
     const [wolfLo, wolfHi] = within(BRUIN_TANK_MEASURED.wolfIncomingDamage);
     expect(result.wolfIncomingDamage).toBeGreaterThanOrEqual(wolfLo);

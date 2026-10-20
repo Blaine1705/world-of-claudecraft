@@ -129,8 +129,10 @@ describe('Icicles build-up', () => {
     // respacing merged in: world-gen draws 5 rng values per camp mob, so
     // thinning the zone-1 camps shifted every seed's stream and seed 11 now
     // resists cast 3. Seed 12 lands all 10 again, so the loop below is
-    // unchanged.
-    const { sim, p } = makeSim({ seed: 12 });
+    // unchanged. Re-hunted again when the Mirefen mudfin huts became solid
+    // walls: the camp murlocs' wander now settles on other ticks, which shifts
+    // the shared stream, and seed 12 resists cast 5. Seed 13 lands all 10.
+    const { sim, p } = makeSim({ seed: 13 });
     spawnTarget(sim, p);
     expect(frostIcicleCharges(p.auras)).toBe(0);
     for (let n = 1; n <= ICICLE_MAX + 2; n++) {
