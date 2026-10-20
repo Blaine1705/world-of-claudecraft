@@ -441,6 +441,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchNoMatch':
     'Tidak ada bahan di brankas Anda yang cocok dengan pencarian Anda.',
   'hudChrome.charSheet.ratings': 'Peringkat',
+  'hudChrome.charSheet.gearScore': 'Skor perlengkapan',
   'hudChrome.charSheet.spell': 'Sihir',
   'hudChrome.charSidebar.character': 'Karakter',
   'hudChrome.charSidebar.currencies': 'Mata Uang',

@@ -2947,6 +2947,7 @@ export const nl_NL: EnTranslations = {
       "spell": "Spreuk",
       "defense": "Verdediging",
       "ratings": "Beoordelingen",
+      "gearScore": "Gearscore",
       "playtimeLabel": "Speeltijd",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Minder dan een minuut",

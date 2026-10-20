@@ -245,6 +245,7 @@ export class InspectWindow {
       `<div class="equip-col" id="inspect-equip-left"></div>` +
       `<div class="char-model-panel inspect-model-panel" style="--inspect-class-color:${header.classColor}">` +
       `<div id="inspect-model-preview" class="char-model-preview" role="img" aria-label="${esc(t('hudChrome.character.modelPreview'))}"></div>` +
+      this.gearScoreHtml(model.gearScore) +
       `</div>` +
       `<div class="equip-col equip-col-right" id="inspect-equip-right"></div>` +
       `<div class="equip-row-weapons" id="inspect-equip-weapons"></div>` +
@@ -308,6 +309,19 @@ export class InspectWindow {
     hydratePortraits(el);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.style.display = 'block';
+  }
+
+  // The Gearscore readout, painted inside the model stage just under its
+  // class-colored floor line (the stage's ::after). Omitted when nothing worn
+  // has an item level.
+  private gearScoreHtml(score: number | null): string {
+    if (score === null) return '';
+    return (
+      `<div class="inspect-gearscore ui-num">` +
+      `<span class="inspect-gearscore-label">${esc(t('hudChrome.charSheet.gearScore'))}</span>` +
+      `<b>${esc(formatNumber(score, { minimumFractionDigits: 1, maximumFractionDigits: 1 }))}</b>` +
+      `</div>`
+    );
   }
 
   private panelTitleHtml(): string {

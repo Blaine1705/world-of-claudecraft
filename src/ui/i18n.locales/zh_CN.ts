@@ -2812,6 +2812,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.defense': '防御',
   'hudChrome.charSheet.spell': '法术',
   'hudChrome.charSheet.ratings': '评分',
+  'hudChrome.charSheet.gearScore': '装备评分',
   'hudChrome.charSheet.playtimeLabel': '游戏时长',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '不到一分钟',

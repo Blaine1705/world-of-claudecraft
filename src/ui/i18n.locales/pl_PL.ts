@@ -439,6 +439,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchNoMatch':
     'Żaden materiał w twoim sejfie nie pasuje do twojego wyszukiwania.',
   'hudChrome.charSheet.ratings': 'Oceny',
+  'hudChrome.charSheet.gearScore': 'Ocena wyposażenia',
   'hudChrome.charSheet.spell': 'Zaklęcie',
   'hudChrome.charSidebar.character': 'Postać',
   'hudChrome.charSidebar.currencies': 'Waluty',

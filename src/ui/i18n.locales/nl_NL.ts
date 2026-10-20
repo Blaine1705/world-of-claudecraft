@@ -445,6 +445,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Doorzoek kluismaterialen op naam',
   'hudChrome.bank.vaultSearchNoMatch': 'Geen materiaal in je kluis past bij je zoekopdracht.',
   'hudChrome.charSheet.ratings': 'Beoordelingen',
+  'hudChrome.charSheet.gearScore': 'Uitrustingsscore',
   'hudChrome.charSheet.spell': 'Spreuk',
   'hudChrome.charSidebar.character': 'Karakter',
   'hudChrome.charSidebar.currencies': "Valuta's",

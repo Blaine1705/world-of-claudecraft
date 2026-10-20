@@ -435,6 +435,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Søg i hvælv-materialer efter navn',
   'hudChrome.bank.vaultSearchNoMatch': 'Intet materiale i dit hvælv matcher dit søgning.',
   'hudChrome.charSheet.ratings': 'Vurderinger',
+  'hudChrome.charSheet.gearScore': 'Udstyrsscore',
   'hudChrome.charSheet.spell': 'Stavekast',
   'hudChrome.charSidebar.character': 'Karakter',
   'hudChrome.charSidebar.currencies': 'Valutaer',

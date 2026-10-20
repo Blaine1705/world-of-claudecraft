@@ -1956,6 +1956,16 @@
     flex-direction: column;
     gap: var(--spacing-sm);
   }
+  /* Gearscore (average worn item level): a one-row card above Offense, the
+     value in gold so it reads as the rail's headline. */
+  #char-window .char-gearscore .ui-stat-row {
+    font-family: var(--title-font);
+  }
+  #char-window .char-gearscore b {
+    font-size: 15px;
+    font-weight: normal;
+    color: var(--gold);
+  }
   #char-window .char-tab-panel {
     padding-right: var(--spacing-xs);
   }

@@ -2907,6 +2907,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.defense': '방어',
   'hudChrome.charSheet.spell': '주문',
   'hudChrome.charSheet.ratings': '등급',
+  'hudChrome.charSheet.gearScore': '장비 점수',
   'hudChrome.charSheet.playtimeLabel': '플레이 시간',
   'hudChrome.charSheet.playtimeParts': '{major} {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1분 미만',

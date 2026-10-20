@@ -434,6 +434,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Sök efter lagersmaterial efter namn',
   'hudChrome.bank.vaultSearchNoMatch': 'Inget material i ditt lager matchar din sökning.',
   'hudChrome.charSheet.ratings': 'Betyg',
+  'hudChrome.charSheet.gearScore': 'Utrustningspoäng',
   'hudChrome.charSheet.spell': 'Trollformel',
   'hudChrome.charSidebar.character': 'Karaktär',
   'hudChrome.charSidebar.currencies': 'Valutor',

@@ -433,6 +433,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Hledat materiály v trezoru podle jména',
   'hudChrome.bank.vaultSearchNoMatch': 'Žádný materiál ve tvém trezoru neodpovídá hledání.',
   'hudChrome.charSheet.ratings': 'Hodnocení',
+  'hudChrome.charSheet.gearScore': 'Hodnocení výbavy',
   'hudChrome.charSheet.spell': 'Kouzlo',
   'hudChrome.charSidebar.character': 'Postava',
   'hudChrome.charSidebar.currencies': 'Měny',

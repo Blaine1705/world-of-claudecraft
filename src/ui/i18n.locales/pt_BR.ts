@@ -460,6 +460,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Pesquisar materiais do cofre por nome',
   'hudChrome.bank.vaultSearchNoMatch': 'Nenhum material do seu cofre corresponde à sua pesquisa.',
   'hudChrome.charSheet.ratings': 'Índices',
+  'hudChrome.charSheet.gearScore': 'Pontuação de equipamento',
   'hudChrome.charSheet.spell': 'Feitiço',
   'hudChrome.charSidebar.character': 'Personagem',
   'hudChrome.charSidebar.currencies': 'Moedas',

@@ -466,6 +466,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchNoMatch':
     'Nessun materiale nel tuo caveau corrisponde alla tua ricerca.',
   'hudChrome.charSheet.ratings': 'Valutazioni',
+  'hudChrome.charSheet.gearScore': 'Punteggio equipaggiamento',
   'hudChrome.charSheet.spell': 'Magia',
   'hudChrome.charSidebar.character': 'Personaggio',
   'hudChrome.charSidebar.currencies': 'Valute',

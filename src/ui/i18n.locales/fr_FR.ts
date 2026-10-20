@@ -467,6 +467,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchNoMatch':
     'Aucun matériau de votre chambre forte ne correspond à votre recherche.',
   'hudChrome.charSheet.ratings': 'Scores',
+  'hudChrome.charSheet.gearScore': 'Score d’équipement',
   'hudChrome.charSheet.spell': 'Sorts',
   'hudChrome.charSidebar.character': 'Personnage',
   'hudChrome.charSidebar.currencies': 'Monnaies',

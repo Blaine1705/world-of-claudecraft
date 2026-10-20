@@ -426,6 +426,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchNoMatch':
     'Không có vật liệu trong kho của bạn phù hợp với tìm kiếm của bạn.',
   'hudChrome.charSheet.ratings': 'Xếp Hạng',
+  'hudChrome.charSheet.gearScore': 'Điểm trang bị',
   'hudChrome.charSheet.spell': 'Phép',
   'hudChrome.charSidebar.character': 'Nhân Vật',
   'hudChrome.charSidebar.currencies': 'Tiền Tệ',

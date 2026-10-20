@@ -2947,6 +2947,7 @@ export const en_XA: EnTranslations = {
       "spell": "[Šþéļļ]",
       "defense": "[Ðéƒéñšé]",
       "ratings": "[Ŕáţíñĝš]",
+      "gearScore": "[Ĝéáŕšçóŕé]",
       "playtimeLabel": "[Ţíɱé Þļáýéð]",
       "playtimeParts": "[{major}, {minor}]",
       "playtimeUnderMinute": "[Ļéšš ţĥáñ á ɱíñúţé]",

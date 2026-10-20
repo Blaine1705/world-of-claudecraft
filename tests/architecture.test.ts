@@ -627,6 +627,8 @@ const UI_PURE_CORES = [
   'src/ui/mail_parcel_sources_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
+  // Gearscore: the average worn item level (character sheet + inspect).
+  'src/ui/gear_score_view.ts',
   'src/ui/masterwrought_cap_view.ts',
   'src/ui/char_stats_view.ts',
   // The live world -> stat-sheet model bridge (extracted from Hud.statModel).

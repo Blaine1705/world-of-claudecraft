@@ -2924,6 +2924,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.defense': '防御',
   'hudChrome.charSheet.spell': '呪文',
   'hudChrome.charSheet.ratings': 'レーティング',
+  'hudChrome.charSheet.gearScore': '装備スコア',
   'hudChrome.charSheet.playtimeLabel': 'プレイ時間',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1分未満',

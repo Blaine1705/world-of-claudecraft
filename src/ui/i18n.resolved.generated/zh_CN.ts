@@ -2947,6 +2947,7 @@ export const zh_CN: EnTranslations = {
       "spell": "法术",
       "defense": "防御",
       "ratings": "评分",
+      "gearScore": "Gearscore",
       "playtimeLabel": "游戏时长",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "不到一分钟",

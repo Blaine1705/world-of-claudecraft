@@ -2947,6 +2947,7 @@ export const pl_PL: EnTranslations = {
       "spell": "Zaklęcie",
       "defense": "Obrona",
       "ratings": "Oceny",
+      "gearScore": "Gearscore",
       "playtimeLabel": "Czas gry",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Mniej niż minuta",

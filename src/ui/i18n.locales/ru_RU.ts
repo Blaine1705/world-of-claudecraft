@@ -2951,6 +2951,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.defense': 'Защита',
   'hudChrome.charSheet.spell': 'Заклинание',
   'hudChrome.charSheet.ratings': 'Рейтинги',
+  'hudChrome.charSheet.gearScore': 'Рейтинг экипировки',
   'hudChrome.charSheet.playtimeLabel': 'Время в игре',
   'hudChrome.charSheet.playtimeParts': '{major}, {minor}',
   'hudChrome.charSheet.playtimeUnderMinute': 'Меньше минуты',

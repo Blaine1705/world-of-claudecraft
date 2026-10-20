@@ -462,6 +462,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Tresormaterialien nach Namen durchsuchen',
   'hudChrome.bank.vaultSearchNoMatch': 'Kein Material in deinem Tresor entspricht deiner Suche.',
   'hudChrome.charSheet.ratings': 'Wertungen',
+  'hudChrome.charSheet.gearScore': 'Ausrüstungswert',
   'hudChrome.charSheet.spell': 'Zauber',
   'hudChrome.charSidebar.character': 'Charakter',
   'hudChrome.charSidebar.currencies': 'Währungen',

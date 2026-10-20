@@ -434,6 +434,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Depo malzemelerini ada göre ara',
   'hudChrome.bank.vaultSearchNoMatch': 'Aramanla eşleşen depo malzemesi yok.',
   'hudChrome.charSheet.ratings': 'Derecelendir',
+  'hudChrome.charSheet.gearScore': 'Ekipman puanı',
   'hudChrome.charSheet.spell': 'Büyü',
   'hudChrome.charSidebar.character': 'Karakter',
   'hudChrome.charSidebar.currencies': 'Para Birimleri',

@@ -542,6 +542,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Buscar materiales de la bóveda por nombre',
   'hudChrome.bank.vaultSearchNoMatch': 'Ningún material de tu bóveda coincide con tu búsqueda.',
   'hudChrome.charSheet.ratings': 'Índices',
+  'hudChrome.charSheet.gearScore': 'Puntuación de equipo',
   'hudChrome.charSheet.spell': 'Hechizo',
   'hudChrome.charSidebar.character': 'Personaje',
   'hudChrome.charSidebar.currencies': 'Monedas',
