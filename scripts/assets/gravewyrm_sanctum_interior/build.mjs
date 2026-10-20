@@ -32,6 +32,11 @@ export const GRAVEWYRM_SANCTUM_INTERIOR_PIECES = [
   'LipRockA',
   'LipRockB',
   'LipRockC',
+  // The Ritual Vault (Velkhar) and the icy walks round it.
+  'ThawPyreV2',
+  'LipIceA',
+  'LipIceB',
+  'BoneHeap',
 ];
 
 export const ASSET = {
@@ -51,6 +56,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/dungeon-rework/entrance/sanctum_gate_sculpt.py',
     'docs/design/dungeon-rework/entrance/entrance_common.py',
     'docs/design/dungeon-rework/kit/gravewyrm_interior_sculpt.py',
+    'docs/design/dungeon-rework/kit/gravewyrm_vault_sculpt.py',
     'docs/design/dungeon-rework/kit/build_gravewyrm_sanctum_interior.py',
     'scripts/assets/gravewyrm_sanctum_interior/build.mjs',
   ]) {

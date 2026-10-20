@@ -6,11 +6,15 @@
 // a plain box or cylinder), all painted in the Sanctum's palette.
 
 import type * as THREE from 'three';
-import { planSanctumInteriorPlacements } from './sanctum_interior_plan_core';
+import {
+  planSanctumInteriorPlacements,
+  resolveInteriorReplacements,
+} from './sanctum_interior_plan_core';
 import {
   instanceSanctumPlacements,
   registerSanctumFallback,
   type SanctumPart,
+  sanctumKitPiece,
   upgradeWhenSanctumKitLands,
 } from './sanctum_kit';
 import { planSanctumKitPlacements, SANCTUM_KIT_SIZES } from './sanctum_kit_plan_core';
@@ -203,7 +207,12 @@ function registerInteriorStandIns(names: Iterable<string>): void {
 function buildGroup(lowGfx: boolean, density: number): THREE.Group {
   const interior = planSanctumInteriorPlacements();
   registerInteriorStandIns(interior.map((p) => p.piece));
-  const plan = [...planSanctumKitPlacements(), ...interior];
+  // The interior pass's pieces stand in for the first kit's where its kit
+  // has landed (a carved pyre for the boxed one), never both.
+  const plan = resolveInteriorReplacements(
+    [...planSanctumKitPlacements(), ...interior],
+    (piece) => sanctumKitPiece(piece) !== null,
+  );
   registerSanctumStandIns([...new Set(plan.map((p) => p.piece)), ...EXTRA_STAND_INS]);
   return instanceSanctumPlacements(plan, lowGfx, 'gravewyrmSanctumKit', density);
 }

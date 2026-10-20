@@ -40,6 +40,7 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, '..', 'entrance'))
 import entrance_common as ec  # noqa: E402
 import gravewyrm_interior_sculpt as gi  # noqa: E402
+import gravewyrm_vault_sculpt as gv  # noqa: E402
 import sanctum_gate_sculpt as sg  # noqa: E402
 
 argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
@@ -128,6 +129,49 @@ def seal_pillar(tool, cracked):
         sg.add_quads(p, quads, gi.RUNE_DEAD, gi.STONE, facing=facing)
     else:
         sg.add_quads(p, quads, gi.RUNE, gi.GLOW, facing=facing)
+    return p
+
+
+def thaw_pyre_v2():
+    """The Ritual Vault's thaw pyre (origin the pool's centre on the vault
+    floor): the rim, the pyre and its tithe, three standards on the rim."""
+    rng = np.random.default_rng(3001)
+    p = Piece('Kit_ThawPyreV2')
+    rim = gv.pyre_rim_field(rng)
+    sg.add_sculpt(p, rim, 'PyreRim', 3200, gv.vault_paint(rim), mat=gi.STONE)
+    core = gv.pyre_core_field(rng)
+    sg.add_sculpt(p, core, 'PyreCore', 5200, gv.vault_paint(core), mat=gi.STONE)
+    for k in range(3):
+        a = 2 * math.pi * k / 3 + 0.5
+        ban = gv.banner_field(rng, 1 if k % 2 else -1)
+        before = set(p.bm.verts)
+        sg.add_sculpt(p, ban, 'PyreBanner%d' % k, 1300, gv.vault_paint(ban), mat=gi.STONE)
+        # stand the standard on the rim, its banner's face toward the centre
+        x, y = math.cos(a) * 7.7, math.sin(a) * 7.7
+        yaw = math.atan2(-y, -x) - math.pi / 2
+        c, sn = math.cos(yaw), math.sin(yaw)
+        for v in p.bm.verts:
+            if v in before:
+                continue
+            vx, vy = v.co.x, v.co.y
+            v.co.x = x + vx * c - vy * sn
+            v.co.y = y + vx * sn + vy * c
+    return p
+
+
+def lip_ice(variant):
+    rng = np.random.default_rng(2600 + variant * 11)
+    f = gv.lip_ice_field(variant, rng)
+    p = Piece('Kit_LipIce' + 'AB'[variant])
+    sg.add_sculpt(p, f, 'LipIce%d' % variant, 2200, gv.ice_paint(f, 2610 + variant), mat=gi.STONE)
+    return p
+
+
+def bone_heap():
+    rng = np.random.default_rng(2701)
+    f = gv.bone_heap_field(rng)
+    p = Piece('Kit_BoneHeap')
+    sg.add_sculpt(p, f, 'BoneHeap', 2400, gv.vault_paint(f), mat=gi.STONE)
     return p
 
 
@@ -241,6 +285,10 @@ def main():
         builders.append(('Kit_SealPillarCrackedV2_' + tool, lambda t=tool: seal_pillar(t, True)))
     for v in range(3):
         builders.append(('Kit_LipRock' + 'ABC'[v], lambda v=v: lip_rock(v)))
+    builders.append(('Kit_ThawPyreV2', thaw_pyre_v2))
+    for v in range(2):
+        builders.append(('Kit_LipIce' + 'AB'[v], lambda v=v: lip_ice(v)))
+    builders.append(('Kit_BoneHeap', bone_heap))
     objs = []
     for name, build in builders:
         if not wanted(name):

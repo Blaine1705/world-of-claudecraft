@@ -27,7 +27,10 @@ import {
 } from '../scripts/assets/gravewyrm_sanctum_interior/build.mjs';
 import { SANCTUM_BOSS_LOOKS } from '../src/render/characters/sanctum_boss_looks';
 import { PILLAR_SCALE } from '../src/render/gravewyrm_sanctum/sanctum_chains_core';
-import { planSanctumInteriorPlacements } from '../src/render/gravewyrm_sanctum/sanctum_interior_plan_core';
+import {
+  planSanctumInteriorPlacements,
+  resolveInteriorReplacements,
+} from '../src/render/gravewyrm_sanctum/sanctum_interior_plan_core';
 import { sanctumPlacementMatrix } from '../src/render/gravewyrm_sanctum/sanctum_kit';
 import {
   KORGATH_BODY,
@@ -41,6 +44,7 @@ import {
   GRAVEWYRM_SANCTUM_FIELD,
   LOCK_TERRACE,
   SEAL_PILLARS,
+  THAW_POOLS,
 } from '../src/sim/content/gravewyrm_sanctum_layout';
 import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
@@ -131,6 +135,9 @@ describe('the interior kit asset', () => {
       [/^Kit_LockCurb$/, 7_000],
       [/^Kit_SealPillar(Cracked)?V2_/, 7_000],
       [/^Kit_LipRock/, 2_600],
+      [/^Kit_LipIce/, 2_600],
+      [/^Kit_ThawPyreV2$/, 13_000],
+      [/^Kit_BoneHeap$/, 2_600],
     ];
     for (const [name, s] of shapes) {
       const cap = budget.find(([re]) => re.test(name))?.[1] ?? 12_000;
@@ -143,8 +150,8 @@ describe('the interior kit asset', () => {
 describe('the interior pieces keep their frames', () => {
   it('the pedestal and the lips never rise to the floor they hang from', () => {
     expect(shapes.get('Kit_LockSpur')?.max[1]).toBeLessThan(-0.05);
-    for (const v of ['A', 'B', 'C']) {
-      const s = shapes.get(`Kit_LipRock${v}`);
+    for (const v of ['RockA', 'RockB', 'RockC', 'IceA', 'IceB']) {
+      const s = shapes.get(`Kit_Lip${v}`);
       expect(s?.max[1], v).toBeLessThan(-0.05);
       // Nothing behind the lip, under the walkway's own body (glTF -z).
       expect(s?.min[2], v).toBeGreaterThan(-0.5);
@@ -211,6 +218,11 @@ describe('the interior plan stands clear of every walk', () => {
   it('no piece stands through a body over walkable floor', () => {
     const bad: string[] = [];
     for (const k of placed) {
+      // The thaw pyres' standards on their pools' rims are render-only reach
+      // on purpose, as the first kit's (the walls test's RENDER_ONLY_REACH:
+      // the pools stay open to walk in and out, design 6.2); their pyre is
+      // checked against its collider below.
+      if (k.piece === 'Kit_ThawPyreV2') continue;
       for (const [x, y, z] of worldPoints(k.piece, k)) {
         const floor = authoredFieldHeight(FIELD, x, z);
         if (floor <= VOID + 1) continue;
@@ -222,6 +234,38 @@ describe('the interior plan stands clear of every walk', () => {
       }
     }
     expect(bad, bad.join('\n')).toEqual([]);
+  });
+
+  it('the thaw pyres stand in place of the boxed ones, the cairn inside its collider', () => {
+    const pyres = placed.filter((p) => p.piece === 'Kit_ThawPyreV2');
+    expect(pyres).toHaveLength(THAW_POOLS.length);
+    const s = shapes.get('Kit_ThawPyreV2');
+    if (!s) throw new Error('no pyre');
+    // Above knee height, within the standards' ring: the cairn and its
+    // uprights, inside the prop's collider (r 1.6) and a body's skin.
+    for (let i = 0; i < s.points.length; i += 3) {
+      const r = Math.hypot(s.points[i], s.points[i + 2]);
+      if (s.points[i + 1] > BAND_LOW && r < 6) expect(r).toBeLessThan(1.6 + 1.6);
+    }
+    // The rim stays knee low.
+    for (let i = 0; i < s.points.length; i += 3) {
+      const r = Math.hypot(s.points[i], s.points[i + 2]);
+      if (r > 5.5 && r < 7.3) expect(s.points[i + 1]).toBeLessThan(1.0);
+    }
+    // Never both: the interior piece where its kit is there, else the old.
+    const both = [
+      ...pyres,
+      { piece: 'Kit_ThawPyre', x: 0, z: 0, rot: 0, scale: 1 },
+      { piece: 'Kit_SeracS', x: 0, z: 0, rot: 0, scale: 1 },
+    ];
+    const withKit = resolveInteriorReplacements(both, () => true).map((p) => p.piece);
+    expect(withKit).not.toContain('Kit_ThawPyre');
+    expect(withKit).toContain('Kit_ThawPyreV2');
+    expect(withKit).toContain('Kit_SeracS');
+    const without = resolveInteriorReplacements(both, (p) => p !== 'Kit_ThawPyreV2').map(
+      (p) => p.piece,
+    );
+    expect(without).toEqual(['Kit_ThawPyre', 'Kit_SeracS']);
   });
 
   it('the pedestal clears the Chain Bridge deck by a body', () => {
