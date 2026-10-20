@@ -1,10 +1,15 @@
 // Cold, emit-only premade group chrome. Listing authority stays in the view and IWorld.
-import { FINDER_ACTIVITIES, type FinderListingTag } from '../sim/content/dungeon_finder';
+import {
+  FINDER_ACTIVITIES,
+  FINDER_GUILD_TAG,
+  type FinderListingTag,
+} from '../sim/content/dungeon_finder';
 import { type Role, TALENTS } from '../sim/content/talents';
 import { CLASSES } from '../sim/data';
 import type { DungeonDifficulty } from '../sim/types';
 import type { DungeonFinderApplicantView } from '../world_api';
 import { classIconUrl } from './class_icon_art';
+import { BOARD_CONTENT_FILTERS, type BoardContentFilter } from './dungeon_board_filter';
 import type { FinderBoardPanelView, FinderListingRowView } from './dungeon_finder_view';
 import { classDisplayName, dungeonDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -24,6 +29,7 @@ export function boardTagLabel(tag: FinderListingTag): string {
     full_clear: 'hudChrome.finder.tagFullClear',
     learning: 'hudChrome.finder.tagLearning',
     fast_run: 'hudChrome.finder.tagFastRun',
+    guild_only: 'hudChrome.finder.tagGuildOnly',
   };
   return t(keys[tag]);
 }
@@ -46,8 +52,10 @@ function difficultyBadge(difficulty: DungeonDifficulty): string {
   return `<span class="df-badge ui-chip${difficulty === 'heroic' ? ' heroic' : ''}">${esc(t(difficulty === 'heroic' ? 'hudChrome.finder.heroic' : 'hudChrome.finder.normal'))}</span>`;
 }
 
+// Purpose chips only: the Guild Party flag renders as its own badge.
 function tagsHtml(tags: readonly FinderListingTag[]): string {
   return tags
+    .filter((tag) => tag !== FINDER_GUILD_TAG)
     .map(
       (tag) =>
         `<span class="df-chip ui-chip" data-purpose="${tag}">${esc(boardTagLabel(tag))}</span>`,
@@ -78,7 +86,7 @@ export function boardApplicantHtml(applicant: DungeonFinderApplicantView): strin
   return `<article class="df-applicant ui-card ui-card-tile" data-player-class="${esc(applicant.cls)}" style="--class-color:#${classColor}">
     ${portraitHtml(applicant.cls, 'df-app-portrait')}
     <div class="df-app-person"><strong class="df-app-name">${esc(applicant.name)}</strong><span class="df-app-class">${esc(classDisplayName(applicant.cls))}<span class="df-app-meta">${esc(meta)}</span></span><span class="df-app-spec">${esc(specName)}</span></div><div class="df-app-roles">${roles}</div>
-    <div class="df-app-actions"><button type="button" class="btn df-accept df-app-accept ui-btn ui-btn--gold" data-appacc="${applicant.pid}" aria-label="${esc(t('hudChrome.finder.acceptApplicantAria', { name: applicant.name }))}">${svgIcon('social')}${esc(t('hudChrome.finder.accept'))}</button><button type="button" class="btn df-decline df-app-decline ui-btn" data-appdec="${applicant.pid}" aria-label="${esc(t('hudChrome.finder.declineApplicantAria', { name: applicant.name }))}">${esc(t('hudChrome.finder.decline'))}</button></div>
+    <div class="df-app-actions"><button type="button" class="btn df-app-inspect ui-btn" data-appinspect="${applicant.pid}" aria-label="${esc(t('hudChrome.finder.inspectApplicantAria', { name: applicant.name }))}">${svgIcon('character')}${esc(t('hudChrome.finder.inspect'))}</button><button type="button" class="btn df-accept df-app-accept ui-btn ui-btn--gold" data-appacc="${applicant.pid}" aria-label="${esc(t('hudChrome.finder.acceptApplicantAria', { name: applicant.name }))}">${svgIcon('social')}${esc(t('hudChrome.finder.accept'))}</button><button type="button" class="btn df-decline df-app-decline ui-btn" data-appdec="${applicant.pid}" aria-label="${esc(t('hudChrome.finder.declineApplicantAria', { name: applicant.name }))}">${esc(t('hudChrome.finder.decline'))}</button></div>
   </article>`;
 }
 
@@ -128,6 +136,12 @@ function rosterHtml(listing: FinderListingRowView): string {
   return `<div class="df-listing-members">${members.join('')}${empty.join('')}</div>`;
 }
 
+function guildBadgeHtml(guild: string | undefined): string {
+  return !guild
+    ? ''
+    : `<span class="df-chip ui-chip df-guild-chip">${svgIcon('social')}${esc(t('hudChrome.finder.guildPartyBadge', { guild }))}</span>`;
+}
+
 export function boardListingHtml(
   listing: FinderListingRowView,
   maskPlayerText?: (text: string) => string,
@@ -145,38 +159,92 @@ export function boardListingHtml(
     ? `<span class="df-chip ui-chip">${esc(t('hudChrome.finder.yourListing'))}</span>`
     : listing.applied
       ? `<button type="button" class="btn leave df-withdraw ui-btn" data-withdraw="${listing.id}" data-act="withdraw">${esc(t('hudChrome.finder.withdraw'))}</button>`
-      : `<button type="button" class="btn df-apply ui-btn ui-btn--gold" data-apply="${listing.id}"${listing.canApply ? '' : ' disabled'}>${esc(t('hudChrome.finder.apply'))}</button>`;
-  return `<article class="df-listing ui-card ui-card-tile${listing.mine ? ' is-mine' : ''}${listing.applied ? ' is-applied' : ''}">
-    <div class="df-listing-art"><img src="${esc(expeditionImageUrl(listing.dungeonId))}" alt="" loading="lazy" decoding="async" draggable="false"><div class="df-listing-head"><h3 class="df-listing-name">${esc(dungeonDisplayName(listing.dungeonId))}</h3>${difficultyBadge(listing.difficulty)}</div></div>
-    <div class="df-listing-content"><div class="df-listing-meta"><span class="df-listing-leader">${svgIcon('social')}${esc(t('hudChrome.finder.leader', { name: listing.leaderName }))}</span><span class="df-listing-size">${esc(t('hudChrome.finder.slots', { size: num(listing.size), capacity: num(listing.capacity) }))}</span></div>
-    ${rosterHtml(listing)}<div class="df-needed">${needed}</div>${listing.expedition ? `<p class="ui-meta">${esc(t('hudChrome.expeditions.progress', { defeated: num(listing.expedition.bossesDefeated), total: num(listing.expedition.bossesTotal) }))}</p>` : ''}${listing.details?.note ? `<p class="expedition-note">${esc(maskPlayerText?.(listing.details.note) ?? listing.details.note)}</p>` : ''}<div class="df-listing-tags">${tagsHtml(listing.tags)}</div><div class="df-listing-action">${action}</div></div>
+      : listing.guildLocked
+        ? `<button type="button" class="btn df-apply ui-btn" data-apply="${listing.id}" disabled>${esc(t('hudChrome.finder.guildPartyLocked'))}</button>`
+        : `<button type="button" class="btn df-apply ui-btn ui-btn--gold" data-apply="${listing.id}"${listing.canApply ? '' : ' disabled'}>${esc(t('hudChrome.finder.apply'))}</button>`;
+  const note = listing.details?.note
+    ? `<p class="expedition-note">${esc(maskPlayerText?.(listing.details.note) ?? listing.details.note)}</p>`
+    : '';
+  const progress = listing.expedition
+    ? `<p class="ui-meta">${esc(t('hudChrome.expeditions.progress', { defeated: num(listing.expedition.bossesDefeated), total: num(listing.expedition.bossesTotal) }))}</p>`
+    : '';
+  return `<article class="df-listing ui-card ui-card-tile${listing.mine ? ' is-mine' : ''}${listing.applied ? ' is-applied' : ''}${listing.guild !== undefined ? ' is-guild' : ''}">
+    <img class="df-listing-thumb" src="${esc(expeditionImageUrl(listing.dungeonId))}" alt="" width="64" height="64" loading="lazy" decoding="async" draggable="false">
+    <div class="df-listing-content"><div class="df-listing-head"><h3 class="df-listing-name">${esc(dungeonDisplayName(listing.dungeonId))}</h3>${difficultyBadge(listing.difficulty)}${guildBadgeHtml(listing.guild)}<span class="df-listing-size">${esc(t('hudChrome.finder.slots', { size: num(listing.size), capacity: num(listing.capacity) }))}</span></div>
+    <div class="df-listing-meta"><span class="df-listing-leader">${svgIcon('social')}${esc(t('hudChrome.finder.leader', { name: listing.leaderName }))}</span><span class="df-needed">${needed}</span></div>
+    ${rosterHtml(listing)}${progress}${note}<div class="df-listing-tags">${tagsHtml(listing.tags)}</div></div>
+    <div class="df-listing-action">${action}</div>
   </article>`;
+}
+
+// The leader's one-click "LFM" posts: a preview of the exact line, then one
+// button per target, greyed out (with the minutes left) while it cools down.
+function advertHtml(board: FinderBoardPanelView): string {
+  const text = board.myListing?.advertText;
+  const advert = board.advert;
+  if (!text || !advert) return '';
+  const button = (
+    target: 'general' | 'discord',
+    label: string,
+    minutes: number,
+    offline: boolean,
+  ) => {
+    const hint = offline
+      ? t('hudChrome.finder.postDiscordOffline')
+      : minutes > 0
+        ? t('hudChrome.finder.postReadyIn', { minutes: num(minutes) })
+        : '';
+    return `<button type="button" class="btn df-advert-btn ui-btn" data-advert="${target}"${offline || minutes > 0 ? ' disabled' : ''}>${esc(label)}${hint ? `<span class="df-advert-hint">${esc(hint)}</span>` : ''}</button>`;
+  };
+  return `<section class="df-advert" aria-label="${esc(t('hudChrome.finder.postHeading'))}"><h3 class="df-sub">${esc(t('hudChrome.finder.postHeading'))}</h3><p class="df-advert-preview ui-meta">${esc(text)}</p><div class="df-advert-actions">${button('general', t('hudChrome.finder.postGeneral'), advert.general, false)}${button('discord', t('hudChrome.finder.postDiscord'), advert.discord, !advert.discordAvailable)}</div></section>`;
 }
 
 export function boardMyListingHtml(board: FinderBoardPanelView, groupHtml = ''): string {
   const mine = board.myListing;
   if (!mine) return '';
   const activity = FINDER_ACTIVITIES.find((entry) => entry.id === mine.activityId);
+  const guild = mine.tags.includes(FINDER_GUILD_TAG) ? guildBadgeHtml(board.guild) : '';
   const hero = activity
-    ? `<div class="df-board-hero"><img src="${esc(expeditionImageUrl(activity.dungeonId))}" alt="" decoding="async" draggable="false"><div class="df-board-hero-copy"><span class="df-board-eyebrow">${esc(t('hudChrome.finder.yourListing'))}</span><h3>${esc(dungeonDisplayName(activity.dungeonId))}</h3>${difficultyBadge(activity.difficulty)}</div></div>`
+    ? `<div class="df-board-hero"><img src="${esc(expeditionImageUrl(activity.dungeonId))}" alt="" decoding="async" draggable="false"><div class="df-board-hero-copy"><span class="df-board-eyebrow">${esc(t('hudChrome.finder.yourListing'))}</span><h3>${esc(dungeonDisplayName(activity.dungeonId))}</h3>${difficultyBadge(activity.difficulty)}${guild}</div></div>`
     : `<h3 class="df-sub">${esc(t('hudChrome.finder.yourListing'))}</h3>`;
-  return `<section class="df-mine ui-card ui-card-tile">${hero}<div class="df-mine-content">${groupHtml}<div class="df-mine-tags">${tagsHtml(mine.tags)}</div><div class="df-board-heading"><h3>${esc(t('hudChrome.finder.applicants'))}</h3><span class="df-board-count">${esc(num(mine.applicants.length))}</span></div><div class="df-applicants">${mine.applicants.length ? mine.applicants.map(boardApplicantHtml).join('') : `<div class="df-board-empty df-note">${svgIcon('social')}<p>${esc(t('hudChrome.finder.noApplicants'))}</p></div>`}</div><button type="button" class="btn leave df-close-listing ui-btn" data-act="closelisting">${esc(t('hudChrome.finder.closeListing'))}</button></div></section>`;
+  return `<section class="df-mine ui-card ui-card-tile">${hero}<div class="df-mine-content">${groupHtml}<div class="df-mine-tags">${tagsHtml(mine.tags)}</div>${advertHtml(board)}<div class="df-board-heading"><h3>${esc(t('hudChrome.finder.applicants'))}</h3><span class="df-board-count">${esc(num(mine.applicants.length))}</span></div><div class="df-applicants">${mine.applicants.length ? mine.applicants.map(boardApplicantHtml).join('') : `<div class="df-board-empty df-note">${svgIcon('social')}<p>${esc(t('hudChrome.finder.noApplicants'))}</p></div>`}</div><button type="button" class="btn leave df-close-listing ui-btn" data-act="closelisting">${esc(t('hudChrome.finder.closeListing'))}</button></div></section>`;
 }
 
-/** The caller supplies only the staged creation form; all live cards use the view. */
+const FILTER_KEYS: Record<BoardContentFilter, TranslationKey> = {
+  all: 'hudChrome.finder.filterAll',
+  dungeon: 'hudChrome.finder.filterDungeons',
+  raid: 'hudChrome.finder.filterRaids',
+};
+
+function contentFilterHtml(filter: BoardContentFilter): string {
+  const options = BOARD_CONTENT_FILTERS.map(
+    (value) =>
+      `<option value="${value}"${value === filter ? ' selected' : ''}>${esc(t(FILTER_KEYS[value]))}</option>`,
+  ).join('');
+  return `<label class="df-board-filter"><span>${esc(t('hudChrome.finder.filterContent'))}</span><select class="ui-input" data-board-filter>${options}</select></label>`;
+}
+
+/** The caller supplies only the staged creation form; all live cards use the view.
+ *  `listings` is the browse column after the painter's content-type filter. */
 export function premadeBoardHtml(
   board: FinderBoardPanelView,
   creationHtml: string,
   groupHtml = '',
   rolesHtml = '',
   maskPlayerText?: (text: string) => string,
+  filter: BoardContentFilter = 'all',
+  listings: readonly FinderListingRowView[] = board.listings,
 ): string {
   const sidebar = board.myListing
     ? boardMyListingHtml(board, groupHtml)
     : groupHtml || creationHtml;
-  const listings = board.listings.filter((row) => !row.mine);
-  const rows = listings.length
-    ? listings.map((listing) => boardListingHtml(listing, maskPlayerText)).join('')
-    : `<div class="df-board-empty df-note">${svgIcon('social')}<p>${esc(t('hudChrome.finder.boardEmpty'))}</p></div>`;
-  return `<div class="df-board-shell df-board-shell--browse">${sidebar ? `<section class="df-board-own">${sidebar}</section>` : ''}<section class="df-board-listings"><div class="df-board-heading"><h2>${esc(t('hudChrome.finder.openListings'))}</h2><span class="df-board-count">${esc(num(listings.length))}</span></div>${rolesHtml}<div class="df-listings">${rows}</div></section></div>`;
+  const visible = listings.filter((row) => !row.mine);
+  const anyListings = board.listings.some((row) => !row.mine);
+  const rows = visible.length
+    ? visible.map((listing) => boardListingHtml(listing, maskPlayerText)).join('')
+    : `<div class="df-board-empty df-note">${svgIcon('social')}<p>${esc(t(anyListings ? 'hudChrome.finder.filterEmpty' : 'hudChrome.finder.boardEmpty'))}</p></div>`;
+  const guildNote = visible.some((row) => row.guild !== undefined)
+    ? `<p class="df-guild-note ui-meta">${svgIcon('social')}${esc(t('hudChrome.finder.guildPartyNote'))}</p>`
+    : '';
+  return `<div class="df-board-shell df-board-shell--browse">${sidebar ? `<section class="df-board-own">${sidebar}</section>` : ''}<section class="df-board-listings"><div class="df-board-heading"><h2>${esc(t('hudChrome.finder.openListings'))}</h2><span class="df-board-count">${esc(num(visible.length))}</span>${contentFilterHtml(filter)}</div>${rolesHtml}${guildNote}<div class="df-listings">${rows}</div></section></div>`;
 }

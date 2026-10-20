@@ -48,12 +48,25 @@ import { admitQueueHelper, queueRewardsView } from '../instances/queue_participa
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { PlayerClass } from '../types';
+import { chat } from './chat';
 import {
   type ExpeditionDetails,
   ExpeditionSocialState,
   validExpeditionDetails,
 } from './expedition_social';
+import {
+  FinderAdvertCooldowns,
+  type FinderAdvertTarget,
+  finderAdvertText,
+  isFinderAdvertTarget,
+} from './finder_advert';
 import { FINDER_PLAYER_APPLICATION_CAP, FinderApplications } from './finder_applications';
+import {
+  finderGuildOf,
+  guildPartyCreateError,
+  isGuildParty,
+  sharesLeaderGuild,
+} from './finder_guild';
 import {
   finderLevelEligible,
   planFinderListing,
@@ -227,6 +240,9 @@ export class DungeonFinderMachine {
   private readonly cooldownUntil = new Map<number, number>();
   private listings: FinderListing[] = [];
   private readonly applications = new FinderApplications();
+  // Offline advert cooldowns (sim clock, keyed by player); online the server
+  // owns them per account and never forwards an advertise command here.
+  private readonly adverts = new FinderAdvertCooldowns();
   private readonly expeditionApplicationUntil = new Map<number, Map<number, number>>();
   private readonly expeditionMemberships = new Map<
     number,
@@ -339,11 +355,40 @@ export class DungeonFinderMachine {
         settings.enabled,
         FINDER_ROLE_ORDER.filter((role) => settings.roles.includes(role)),
       );
+    } else if (settings.kind === 'advertise') {
+      if (isFinderAdvertTarget(settings.target)) this.advertise(id, settings.target);
     } else if (settings.kind === 'reward') {
       const state = r.meta.queueRewards ?? loadQueueRewards();
       if (typeof settings.buy === 'boolean' && changeQueueReward(state, settings.id, settings.buy))
         r.meta.queueRewards = state;
     }
+  }
+
+  /** The "LFM - ..." line for a leader's listing, or null when it has none. */
+  advertTextFor(leaderPid: number): string | null {
+    const listing = this.listingBy(leaderPid);
+    const activity = listing ? finderActivity(listing.activityId) : undefined;
+    if (!listing || !activity || !this.listingValid(listing)) return null;
+    const view = this.listingViewFor(listing, activity, this.listingMembers(listing));
+    return view ? finderAdvertText({ ...view, guildOnly: isGuildParty(view.tags) }) : null;
+  }
+
+  // Offline host only: General reaches the local chat log; Discord needs the server.
+  private advertise(pid: number, target: FinderAdvertTarget): void {
+    const text = this.advertTextFor(pid);
+    if (!text) {
+      this.ctx.error(pid, 'You do not lead a group listing.');
+      return;
+    }
+    if (target === 'discord') {
+      this.ctx.error(pid, 'Posting to Discord is only available in online play.');
+      return;
+    }
+    if (!this.adverts.use(pid, target, this.ctx.time)) {
+      this.ctx.error(pid, 'You posted your group recently. Please wait before posting again.');
+      return;
+    }
+    chat(this.ctx, `/general ${text}`, pid);
   }
 
   private listingMembers(listing: FinderListing): number[] {
@@ -648,6 +693,14 @@ export class DungeonFinderMachine {
       seen.add(tag);
       return true;
     });
+    if (isGuildParty(cleanedTags)) {
+      const party = this.ctx.partyOf(id);
+      const error = guildPartyCreateError(this.ctx, id, party ? party.members : [id]);
+      if (error) {
+        this.ctx.error(id, error);
+        return;
+      }
+    }
     this.listings.push({
       id: this.nextListingId++,
       activityId,
@@ -794,6 +847,10 @@ export class DungeonFinderMachine {
     const listing = this.listings.find((l) => l.id === listingId) ?? null;
     if (!listing || listing.leaderPid === id || !this.listingValid(listing)) {
       this.ctx.error(id, 'That listing is no longer available.');
+      return;
+    }
+    if (isGuildParty(listing.tags) && !sharesLeaderGuild(this.ctx, listing.leaderPid, id)) {
+      this.ctx.error(id, 'That group is a Guild Party for members of its guild only.');
       return;
     }
     const pending = this.applications.forPlayer(id);
@@ -974,7 +1031,10 @@ export class DungeonFinderMachine {
       this.ctx.error(id, 'That player is no longer available.');
       return;
     }
-    if (!finderLevelEligible(activity, applicant.e.level)) {
+    if (
+      !finderLevelEligible(activity, applicant.e.level) ||
+      (isGuildParty(listing.tags) && !sharesLeaderGuild(this.ctx, id, applicantPid))
+    ) {
       this.ctx.error(id, 'That player is no longer available.');
       return;
     }
@@ -1143,6 +1203,7 @@ export class DungeonFinderMachine {
           viewer.ownListing !== row.id &&
           finderLevelEligible(activity, viewer.level) &&
           row.size < row.capacity &&
+          (row.guild === undefined || finderGuildOf(this.ctx, pid) === row.guild) &&
           selected.some((role) => viewer.roles.includes(role))
         );
       });
@@ -1264,6 +1325,10 @@ export class DungeonFinderMachine {
     if (party && party.leader !== listing.leaderPid) return false;
     const members = this.listingMembers(listing);
     if (members.length >= activity.size) return false;
+    // A Guild Party stays one guild: the leader leaving their guild, or an
+    // outsider joining the party by invite, closes it on the next sweep.
+    if (isGuildParty(listing.tags) && guildPartyCreateError(this.ctx, listing.leaderPid, members))
+      return false;
     if (listing.expeditionExitId !== undefined) {
       const claim = expeditionClaimByExit(this.ctx, listing.expeditionExitId);
       if (
@@ -1420,6 +1485,7 @@ export class DungeonFinderMachine {
     const queueUnit = unit ?? heldUnit;
     const until = this.cooldownUntil.get(pid) ?? 0;
     const listing = this.listingBy(pid);
+    const advertText = listing ? this.advertTextFor(pid) : null;
     // Personal projection is bounded by FINDER_PLAYER_APPLICATION_CAP (5).
     const myApplications = this.applications.forPlayer(pid).map((app) => {
       return {
@@ -1450,6 +1516,7 @@ export class DungeonFinderMachine {
             activityId: listing.activityId,
             tags: [...listing.tags],
             ...(listing.details ? { details: { ...listing.details } } : {}),
+            ...(advertText ? { advertText } : {}),
             applicants: this.applicationsFor(listing)
               .sort((a, b) => a.at - b.at)
               .map((a) => {
@@ -1461,6 +1528,7 @@ export class DungeonFinderMachine {
                   spec: applicant?.talents.spec ?? null,
                   level: this.levelOf(a.pid),
                   roles: [...a.roles],
+                  gear: { ...(this.ctx.entities.get(a.pid)?.equippedItems ?? {}) },
                   ...(a.expiresAt === undefined
                     ? {}
                     : { remaining: Math.max(0, Math.ceil(a.expiresAt - this.ctx.time)) }),
@@ -1473,6 +1541,7 @@ export class DungeonFinderMachine {
       expedition: this.expeditionViewFor(pid),
       availability: this.social.readAvailability(pid),
       applicationFeedback: this.social.readFeedback(pid),
+      advert: this.adverts.view(pid, this.ctx.time, false),
       queueRewards: queueRewardsView(meta?.queueRewards, this.ctx.resetDay),
     };
   }
@@ -1594,6 +1663,7 @@ export class DungeonFinderMachine {
           }
         : {}),
       tags: [...listing.tags],
+      ...(isGuildParty(listing.tags) ? { guild: finderGuildOf(this.ctx, listing.leaderPid) } : {}),
       size: members.length,
       capacity: activity.size,
       needed,

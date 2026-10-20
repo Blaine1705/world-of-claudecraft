@@ -10,12 +10,17 @@ export const DF_WIRE_HZ = 2;
 export const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
 
 import { validExpeditionDetails } from '../src/sim/social/expedition_social';
+import { type FinderAdvertTarget, isFinderAdvertTarget } from '../src/sim/social/finder_advert';
 
+// `advertise` is the server-owned listing advert (per-account cooldowns and the
+// chat/Discord routes live in server/community_relay.ts). Without it, an
+// advertise command is dropped: the Sim's own advert path is the offline host's.
 export function dispatchDungeonFinderCommand(
   sim: Sim,
   pid: number,
   msg: Record<string, unknown>,
   allowNote: (note: string) => boolean = () => true,
+  advertise?: (target: FinderAdvertTarget) => void,
 ): void {
   switch (msg.cmd) {
     case 'df_expedition_configure': {
@@ -67,6 +72,8 @@ export function dispatchDungeonFinderCommand(
           { kind: 'available', enabled: value.enabled, roles: value.roles },
           pid,
         );
+      else if (value.kind === 'advertise' && isFinderAdvertTarget(value.target))
+        advertise?.(value.target);
       else if (
         value.kind === 'reward' &&
         typeof value.buy === 'boolean' &&

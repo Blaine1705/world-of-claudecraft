@@ -15,6 +15,8 @@ export interface GroupDraft {
   activity: string | null;
   role: Role | null;
   tags: ReadonlySet<FinderListingTag>;
+  // Guild Party: only members of my guild may apply (needs a guild).
+  guildOnly: boolean;
 }
 export function createFormState(
   b: FinderBoardPanelView,
@@ -38,6 +40,7 @@ export function createFormState(
     activity,
     role,
     locked,
+    guildOnly: draft.guildOnly && b.guild !== '',
     canPublish: b.canCreate && !!activity && !!role && !locked,
   };
 }
@@ -99,5 +102,6 @@ export function createGroupFormHtml(
         `<button type="button" class="df-create-role ui-card ui-card-tile${r.role === state.role ? ' active' : ''}" data-create-role="${r.role}" aria-pressed="${r.role === state.role}"${!r.eligible || state.locked ? ' disabled' : ''}><span class="df-create-role-icon">${svgIcon(r.role === 'tank' ? 'tank' : r.role === 'healer' ? 'healer' : 'attack')}</span><span>${esc(t(r.role === 'tank' ? 'hudChrome.finder.roleTank' : r.role === 'healer' ? 'hudChrome.finder.roleHealer' : 'hudChrome.finder.roleDps'))}</span></button>`,
     )
     .join('');
-  return `<div class="df-create ui-card"><div class="df-create-heading"><label class="df-create-filter"><span>${esc(t('hudChrome.finder.activity'))}</span><select class="ui-input" data-create-kind><option value="dungeon"${draft.kind === 'dungeon' ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.dungeons'))}</option><option value="raid"${draft.kind === 'raid' ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.raids'))}</option></select></label><div class="df-create-actions"><button type="button" class="df-create-cancel ui-btn" data-cancel-create>${esc(t('hudChrome.finder.cancelCreate'))}</button><button type="button" class="btn df-create-btn ui-btn ui-btn--gold" data-act="create"${state.canPublish ? '' : ' disabled'}>${esc(t('hudChrome.finder.publish'))}</button></div></div><section class="df-create-role-section"><div class="df-sub" id="df-create-role-label">${esc(t('hudChrome.finder.yourRole'))}</div><div class="df-create-roles" role="group" aria-labelledby="df-create-role-label">${roles}</div>${state.locked ? `<p class="df-note">${esc(t('hudChrome.finder.createQueueLocked'))}</p>` : ''}</section><div class="df-options df-activity-options" role="radiogroup" aria-label="${esc(t('hudChrome.finder.activity'))}">${options || `<p class="df-note">${esc(t('hudChrome.finder.noCreateActivities'))}</p>`}</div><div class="df-create-tags">${tags}</div></div>`;
+  const guild = `<section class="df-create-guild"><label class="df-guild-toggle"><input type="checkbox" data-create-guild${state.guildOnly ? ' checked' : ''}${b.guild ? '' : ' disabled'}><span>${esc(t('hudChrome.finder.guildPartyToggle'))}</span></label><p class="df-note">${esc(b.guild ? t('hudChrome.finder.guildPartyHint', { guild: b.guild }) : t('hudChrome.finder.guildPartyNeedsGuild'))}</p></section>`;
+  return `<div class="df-create ui-card"><div class="df-create-heading"><label class="df-create-filter"><span>${esc(t('hudChrome.finder.activity'))}</span><select class="ui-input" data-create-kind><option value="dungeon"${draft.kind === 'dungeon' ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.dungeons'))}</option><option value="raid"${draft.kind === 'raid' ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.raids'))}</option></select></label><div class="df-create-actions"><button type="button" class="df-create-cancel ui-btn" data-cancel-create>${esc(t('hudChrome.finder.cancelCreate'))}</button><button type="button" class="btn df-create-btn ui-btn ui-btn--gold" data-act="create"${state.canPublish ? '' : ' disabled'}>${esc(t('hudChrome.finder.publish'))}</button></div></div><section class="df-create-role-section"><div class="df-sub" id="df-create-role-label">${esc(t('hudChrome.finder.yourRole'))}</div><div class="df-create-roles" role="group" aria-labelledby="df-create-role-label">${roles}</div>${state.locked ? `<p class="df-note">${esc(t('hudChrome.finder.createQueueLocked'))}</p>` : ''}</section>${guild}<div class="df-options df-activity-options" role="radiogroup" aria-label="${esc(t('hudChrome.finder.activity'))}">${options || `<p class="df-note">${esc(t('hudChrome.finder.noCreateActivities'))}</p>`}</div><div class="df-create-tags">${tags}</div></div>`;
 }

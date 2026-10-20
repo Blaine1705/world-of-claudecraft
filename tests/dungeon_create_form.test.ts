@@ -20,7 +20,13 @@ const queue = {
   queued: false,
   proposal: null,
 } as FinderQueuePanelView;
-const draft: GroupDraft = { kind: 'dungeon', activity: null, role: null, tags: new Set() };
+const draft: GroupDraft = {
+  kind: 'dungeon',
+  activity: null,
+  role: null,
+  tags: new Set(),
+  guildOnly: false,
+};
 
 describe('group creation draft', () => {
   it('never publishes a hidden activity after switching category', () => {

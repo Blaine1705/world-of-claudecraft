@@ -14,10 +14,12 @@
 // quality-glow helper as the character sheet; the paperdoll columns come from
 // char_view's arrays via the pure core, so inspect inherits the sheet's 6/6 split.
 
+import { TALENTS } from '../sim/content/talents';
 import { ITEMS } from '../sim/data';
 import type { EquipSlot, ItemInstancePayload, PlayerClass, SkinCatalog } from '../sim/types';
+import type { CharacterProfile } from '../world_api';
 import { attachAvatarFallback } from './avatar_fallback';
-import type { PaperdollSlot } from './char_view';
+import type { PaperdollSlot, PaperdollView } from './char_view';
 import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
 import {
   DEED_HERALDRY_ATTR,
@@ -60,6 +62,7 @@ import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, type ModularLook, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
 import { curatorRankNameKey } from './reliquary_view';
+import { tTalent } from './talent_i18n';
 import { svgIcon } from './ui_icons';
 import { wornItemCellParts } from './worn_item_cell_view';
 
@@ -76,6 +79,8 @@ export interface InspectEntity {
   title?: string | null;
   /** Active Book of Deeds border (a deed id, never a slug), if any. */
   border?: string | null;
+  /** The mirrored talent specialization id (null = none chosen). */
+  specId?: string | null;
   equippedItems: Partial<Record<EquipSlot, string>>;
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
   /** The server-resolved active Armory weapon skin (wire wsk), render-only. */
@@ -104,6 +109,10 @@ export interface InspectRemoteProfile {
   cls: PlayerClass;
   skin: number;
   guild: string | null;
+  /** Specialization id; absent when the source does not know it. */
+  specId?: string | null;
+  /** Worn gear, only from a consented source (a group applicant's snapshot). */
+  gear?: Partial<Record<EquipSlot, string>>;
 }
 
 /** Hud-supplied glue. The presentation bag (icon/tooltip) plus world-free window
@@ -191,6 +200,7 @@ export class InspectWindow {
         name: e.name,
         level: e.level,
         cls,
+        specId: e.specId ?? null,
         skin: e.skin ?? 0,
         skinCatalog: e.skinCatalog ?? 'class',
         deedTitleText: e.title ? deedTitleText(e.title) : '',
@@ -224,7 +234,7 @@ export class InspectWindow {
         level: formatNumber(header.level, { maximumFractionDigits: 0 }),
         className: classDisplayName(cls),
       }),
-    )}</div>${this.curatorLineHtml(model.curator)}`;
+    )}</div>${specChipHtml(cls, header.specId)}${this.curatorLineHtml(model.curator)}`;
     const honorHtml =
       this.holderHtml(model.badges.holder) +
       this.discordHtml(model.badges.discord) +
@@ -259,12 +269,7 @@ export class InspectWindow {
         img.src = discordStatusBadgeDataUrl(e.discordTier ?? 0);
       });
     }
-    const leftCol = el.querySelector('#inspect-equip-left');
-    const rightCol = el.querySelector('#inspect-equip-right');
-    for (const cell of model.gear.left) leftCol?.appendChild(this.buildSlotRow(cell));
-    for (const cell of model.gear.right) rightCol?.appendChild(this.buildSlotRow(cell));
-    const weaponsRow = el.querySelector('#inspect-equip-weapons');
-    for (const cell of model.gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell));
+    this.paintGear(el, model.gear);
     const stage = el.querySelector<HTMLElement>('#inspect-model-preview');
     if (stage) {
       this.deps.mountPreview(stage, {
@@ -287,7 +292,7 @@ export class InspectWindow {
     const el = this.deps.root();
     this.captureOpener();
     this.deps.closeOthers();
-    const model = buildInspectRemoteView(profile);
+    const model = buildInspectRemoteView(profile, ITEMS);
     markDialogRoot(el, { labelledBy: 'inspect-window-title' });
     const guildHtml = model.guild
       ? `<div class="inspect-meta ui-meta ui-muted">${esc(model.guild)}</div>`
@@ -303,11 +308,46 @@ export class InspectWindow {
           className: classDisplayName(model.cls),
         }),
       )}</div>` +
+      (profile.specId === undefined ? '' : specChipHtml(model.cls, model.specId)) +
       guildHtml +
-      `</div>`;
+      `</div>` +
+      (model.gear
+        ? `<div class="inspect-equip inspect-equip--remote">` +
+          `<div class="inspect-equip-title ui-h">${esc(t('classDetails.sections.equipment'))}</div>` +
+          `<div class="paperdoll inspect-paperdoll inspect-paperdoll--remote">` +
+          `<div class="equip-col" id="inspect-equip-left"></div>` +
+          `<div class="equip-col equip-col-right" id="inspect-equip-right"></div>` +
+          `<div class="equip-row-weapons" id="inspect-equip-weapons"></div>` +
+          `</div></div>`
+        : '');
     hydratePortraits(el);
+    if (model.gear) this.paintGear(el, model.gear);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.style.display = 'block';
+  }
+
+  /** Player Info from the public character sheet (a chat-name lookup): no gear.
+   *  The sheet names the spec in English, so it maps back to the spec id. */
+  openProfile(profile: CharacterProfile): void {
+    const cls = profile.cls as PlayerClass;
+    const spec = TALENTS[cls]?.specs.find((entry) => entry.name === profile.spec);
+    this.openRemote({
+      name: profile.name,
+      level: profile.level,
+      cls,
+      skin: profile.skin,
+      guild: profile.guild,
+      specId: spec?.id ?? null,
+    });
+  }
+
+  private paintGear(el: HTMLElement, gear: PaperdollView): void {
+    const leftCol = el.querySelector('#inspect-equip-left');
+    const rightCol = el.querySelector('#inspect-equip-right');
+    for (const cell of gear.left) leftCol?.appendChild(this.buildSlotRow(cell));
+    for (const cell of gear.right) rightCol?.appendChild(this.buildSlotRow(cell));
+    const weaponsRow = el.querySelector('#inspect-equip-weapons');
+    for (const cell of gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell));
   }
 
   private panelTitleHtml(): string {
@@ -497,4 +537,13 @@ export class InspectWindow {
       `</div></div>`
     );
   }
+}
+
+/** The specialization chip: the localized spec name, or "no specialization". */
+function specChipHtml(cls: PlayerClass, specId: string | null): string {
+  const spec = specId ? TALENTS[cls]?.specs.find((entry) => entry.id === specId) : undefined;
+  const label = spec
+    ? tTalent({ kind: 'talentSpec', spec, field: 'name' })
+    : t('game.talents.noSpec');
+  return `<div class="inspect-meta inspect-spec ui-chip">${esc(label)}</div>`;
 }

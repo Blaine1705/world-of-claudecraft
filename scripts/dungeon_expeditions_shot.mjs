@@ -51,7 +51,7 @@ try {
     ];
     const world = {
       partyInfo: null,
-      player: { level: 20 },
+      player: { level: 20, guild: 'Nightwatch' },
       playerId: 1,
       cfg: { playerClass: 'warrior' },
       talentRole: 'tank',
@@ -78,6 +78,17 @@ try {
           needed: { tank: 2, healer: 2, dps: 5 },
           members: [members[3]],
         },
+        {
+          id: 103,
+          activityId: 'sunken_bastion_normal',
+          leaderName: 'Vesper',
+          tags: ['guild_only', 'quest_run'],
+          guild: 'Nightwatch',
+          size: 3,
+          capacity: 5,
+          needed: { tank: 1, healer: 0, dps: 1 },
+          members: members.slice(1, 4),
+        },
       ],
       dungeonFinderInfo: {
         roles: ['tank'],
@@ -87,6 +98,7 @@ try {
         proposal: null,
         myListing: null,
         myApplication: null,
+        advert: { general: 0, discord: 24, discordAvailable: true },
       },
     };
     const panel = new DungeonFinderWindow({
@@ -134,7 +146,8 @@ try {
       id: 1,
       activityId: 'ignivar_raid_arena_heroic',
       tags: [],
-      applicants: [{ ...members[3], pid: 15, name: 'Solara' }],
+      advertText: 'LFM - Ignivar Raid Arena - Heroic - 4/10 - Tank/Healer/DPS needed',
+      applicants: [{ ...members[3], pid: 15, name: 'Solara', gear: {} }],
     };
     panel.render();
   });

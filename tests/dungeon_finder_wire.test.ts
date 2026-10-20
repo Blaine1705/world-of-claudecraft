@@ -20,6 +20,43 @@ const expedition = {
   bossesTotal: 2,
 };
 
+describe('group listing extras decoding (gear, advert, guild)', () => {
+  it('keeps valid applicant gear and advert cooldowns by reference', () => {
+    const info = {
+      myListing: {
+        id: 7,
+        advertText: 'LFM - The Hollow Crypt - Normal - 1/5 - Healer/DPS needed',
+        applicants: [{ pid: 1, spec: 'arms', gear: { chest: 'gear_chest', mainhand: 'sword' } }],
+      },
+      advert: { general: 3, discord: 0, discordAvailable: true },
+    };
+    expect(decodeDungeonFinderInfo(info)).toBe(info);
+  });
+
+  it('drops only the malformed part: a bad gear map, an oversized line, a bad cooldown', () => {
+    const decoded = decodeDungeonFinderInfo({
+      myListing: {
+        id: 7,
+        advertText: 'x'.repeat(161),
+        applicants: [
+          { pid: 1, spec: 'arms', gear: { notASlot: 'gear_chest' } },
+          { pid: 2, spec: 'arms', gear: { chest: 'gear_chest' } },
+        ],
+      },
+      advert: { general: -1, discord: 0, discordAvailable: true },
+    });
+    expect(decoded?.myListing?.advertText).toBeUndefined();
+    expect(decoded?.myListing?.applicants[0]).toEqual({ pid: 1, spec: 'arms' });
+    expect(decoded?.myListing?.applicants[1].gear).toEqual({ chest: 'gear_chest' });
+    expect(decoded?.advert).toBeUndefined();
+  });
+
+  it('drops a board row whose guild is not a bounded string', () => {
+    const ok = { id: 1, guild: 'Nightwatch' };
+    expect(decodeDungeonFinderBoard([ok, { id: 2, guild: 5 }])).toEqual([ok]);
+  });
+});
+
 describe('expedition snapshot decoding', () => {
   it('mirrors actual applicant specs while accepting legacy rows and sanitizing malformed specs', () => {
     const rows = [{ pid: 1, spec: 'shadow' }, { pid: 2, spec: null }, { pid: 3 }];

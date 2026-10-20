@@ -11,14 +11,17 @@ import type {
   ExpeditionDetails,
   ExpeditionFeedback,
 } from '../sim/social/expedition_social';
-import type { PlayerClass } from '../sim/types';
+import type { FinderAdvertCooldownView, FinderAdvertTarget } from '../sim/social/finder_advert';
+import type { EquipSlot, PlayerClass } from '../sim/types';
 
 export type ExpeditionSettings =
   | { kind: 'recruit'; activityId: string; role: Role; details: ExpeditionDetails }
   | { kind: 'details'; details: ExpeditionDetails }
   | { kind: 'available'; enabled: boolean; roles: Role[] }
   | { kind: 'reward'; id: QueueRewardId | null; buy: boolean }
-  | { kind: 'cancel_application'; listingId: number };
+  | { kind: 'cancel_application'; listingId: number }
+  // Post my listing's "LFM" line to General chat or Discord (cooldown-gated).
+  | { kind: 'advertise'; target: FinderAdvertTarget };
 
 export interface DungeonFinderApplicationView {
   listingId: number;
@@ -57,6 +60,10 @@ export interface DungeonFinderApplicantView {
   level: number;
   roles: Role[]; // the applicant's compatible selected roles
   remaining?: number;
+  // Worn item ids by slot, shown to the listing leader only (applying shares
+  // them, like the class and spec above), so the leader can inspect the
+  // applicant from anywhere on the realm. Absent on older snapshots.
+  gear?: Partial<Record<EquipSlot, string>>;
 }
 
 // My own published listing (present only for its leader).
@@ -66,6 +73,8 @@ export interface DungeonFinderMyListingView {
   tags: FinderListingTag[];
   applicants: DungeonFinderApplicantView[];
   details?: ExpeditionDetails;
+  // The "LFM - ..." line the advert buttons post (built by the sim).
+  advertText?: string;
 }
 
 export interface DungeonFinderExpeditionView {
@@ -94,6 +103,8 @@ export interface DungeonFinderInfo {
   expedition?: DungeonFinderExpeditionView | null;
   availability?: ExpeditionAvailability;
   applicationFeedback?: ExpeditionFeedback | null;
+  // Advert cooldowns for my listing's post buttons (server-owned online).
+  advert?: FinderAdvertCooldownView;
   queueRewards?: {
     balance: number;
     earnedToday: number;
@@ -112,6 +123,8 @@ export interface DungeonFinderListingView {
   expedition?: { bossesDefeated: number; bossesTotal: number };
   details?: ExpeditionDetails;
   tags: FinderListingTag[];
+  // The leader's guild, present only on a Guild Party (the guild_only tag).
+  guild?: string;
   size: number; // current member count
   capacity: number; // activity size
   // Open role slots under the activity's composition; null when the activity

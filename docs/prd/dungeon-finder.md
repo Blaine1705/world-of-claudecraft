@@ -81,6 +81,22 @@ boost groups. Existing manually created groups and physical dungeon entry rules 
   party becomes invalid.
 - The solo attunement crypt appears in the catalogue and supports manual listings with up to five
   players, but has no automatic queue.
+- A bare `/lfg` chat command opens the Groups board (`/lfg <message>` still talks in the LFG
+  channel). The board has a content-type filter (all, dungeons, raids) and compact listing rows.
+- A Guild Party is a listing carrying the `guild_only` tag (`FINDER_GUILD_TAG`). Creating one needs
+  a guild and a party whose members all share it; only players in the leader's current guild may
+  apply, and acceptance rechecks it (`src/sim/social/finder_guild.ts`). The board badges Guild
+  Parties, notes that they exist, and locks Apply for outsiders.
+- The leader can advertise a listing with one click: the sim builds the line
+  (`LFM - <content> - <difficulty> - <size>/<capacity> - <roles> needed`, see
+  `src/sim/social/finder_advert.ts`) and the buttons post it to General chat (once per 5 minutes)
+  or Discord as an LFG post (once per 30 minutes). Online, the server owns both cooldowns per
+  account (`server/community_relay.ts`) and General posts keep the typed-chat mute and hard-word
+  gates; a cooling button is greyed out with the minutes left. Offline, General posts locally and
+  Discord is unavailable.
+- Each applicant card has an Inspect action that opens Player Info: the live card when the
+  applicant is in view, otherwise the applicant's finder snapshot (class, spec, worn gear), which
+  only that listing's leader receives. Player Info names the specialization by default.
 
 ### Travel and entry
 

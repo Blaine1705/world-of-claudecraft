@@ -537,7 +537,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    ceiling: 18093,
+    // LOWERED 18093 -> 18082 for the Groups window extras: the remote Player
+    // Info mapping moved into InspectWindow.openProfile. Exact count after biome.
+    ceiling: 18082,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1694,7 +1696,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED for open expeditions: related finder helpers and dungeon
     // mirror projections moved behind sibling module seams. Exact measured size.
     // Jail command policy now lives with the moderation command rules.
-    ceiling: 9788,
+    // LOWERED 9788 -> 9784: the "!" community relay moved to
+    // server/community_relay.ts alongside the Groups listing adverts.
+    ceiling: 9784,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

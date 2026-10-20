@@ -18,7 +18,11 @@
 // decoding; no live Three.js scene ever renders here.
 
 import { audio } from '../game/audio';
-import { type FinderListingTag, finderActivity } from '../sim/content/dungeon_finder';
+import {
+  FINDER_GUILD_TAG,
+  type FinderListingTag,
+  finderActivity,
+} from '../sim/content/dungeon_finder';
 import type { Role } from '../sim/content/talents';
 import { DELVES, ITEMS } from '../sim/data';
 import { ALL_CLASSES, type DungeonDifficulty, type PlayerClass } from '../sim/types';
@@ -27,6 +31,11 @@ import { clockSeconds } from './clock_seconds_core';
 import { markDialogRoot } from './dialog_root';
 import { quickMatchHtml } from './dungeon_activity_chrome';
 import { premadeBoardHtml } from './dungeon_board_chrome';
+import {
+  type BoardContentFilter,
+  filterBoardListings,
+  isBoardContentFilter,
+} from './dungeon_board_filter';
 import {
   adventureName,
   adventureToolbarHtml,
@@ -65,6 +74,7 @@ import { dungeonDisplayName, tEntity, zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, FOCUS_KEY_ATTR, restoreFirstEnabled } from './focus_restore';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
+import type { InspectRemoteProfile } from './inspect_window';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
 
@@ -84,6 +94,9 @@ export interface DungeonFinderWindowDeps extends PainterHostPresentation {
   // Close the finder, open the world map, and ping the given overworld point
   // (the activity entrance). Never teleports.
   showOnMap(x: number, z: number): void;
+  // Open Player Info for a group applicant: the live card when they are in
+  // view, else the applicant snapshot (class, spec, worn gear).
+  inspectPlayer?(pid: number, profile: InspectRemoteProfile): void;
 }
 
 export class DungeonFinderWindow {
@@ -102,6 +115,8 @@ export class DungeonFinderWindow {
   private stagedListingActivity: string | null = null;
   private createKind: 'dungeon' | 'raid' = 'dungeon';
   private stagedCreateRole: Role | null = null;
+  private stagedGuildOnly = false;
+  private boardFilter: BoardContentFilter = 'all';
   // Mobile master-detail: which pane the single column shows.
   private pane: 'list' | 'detail' = 'list';
   private lastSig = '';
@@ -182,6 +197,7 @@ export class DungeonFinderWindow {
         ? (party.members.find((m) => m.pid === party.leader)?.name ?? null)
         : null,
       lockouts: world.raidLockouts(),
+      playerGuild: world.player.guild,
       tab: this.tab,
       selectedActivityId: this.selectedActivityId,
       stagedActivityIds: [...this.stagedActivityIds],
@@ -218,7 +234,7 @@ export class DungeonFinderWindow {
     const preview = this.lootPreview ?? { cls: world.cfg.playerClass, spec: world.talentSpec };
     const selection = { ...preview, spec: validLootPreviewSpec(preview.cls, preview.spec) };
     const groups = this.tab === 'board' ? this.groupControls.sync(world) : null;
-    const sig = `${view.sig}|${groups?.sig ?? ''}|${this.pane}|${JSON.stringify([this.category, this.search, this.eligibleOnly, selection, this.creatingGroup])}`;
+    const sig = `${view.sig}|${groups?.sig ?? ''}|${this.pane}|${JSON.stringify([this.category, this.search, this.eligibleOnly, selection, this.creatingGroup, this.boardFilter, this.stagedGuildOnly])}`;
     if (sig === this.lastSig) {
       this.updateClocks(view.clocks);
       return;
@@ -509,6 +525,47 @@ export class DungeonFinderWindow {
         rerender();
       },
     );
+    el.querySelector<HTMLSelectElement>('[data-board-filter]')?.addEventListener(
+      'change',
+      (event) => {
+        const value = (event.currentTarget as HTMLSelectElement).value;
+        if (!isBoardContentFilter(value)) return;
+        this.boardFilter = value;
+        rerender();
+      },
+    );
+    el.querySelector<HTMLInputElement>('[data-create-guild]')?.addEventListener(
+      'change',
+      (event) => {
+        this.stagedGuildOnly = (event.currentTarget as HTMLInputElement).checked;
+        rerender();
+      },
+    );
+    el.querySelectorAll<HTMLButtonElement>('[data-advert]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.advert;
+        if (btn.disabled || (target !== 'general' && target !== 'discord')) return;
+        world().dungeonFinderExpeditionConfigure({ kind: 'advertise', target });
+        audio.click();
+      });
+    });
+    el.querySelectorAll<HTMLElement>('[data-appinspect]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const pid = Number(btn.dataset.appinspect);
+        const applicant = view.board.myListing?.applicants.find((a) => a.pid === pid);
+        if (!applicant) return;
+        this.deps.inspectPlayer?.(pid, {
+          name: applicant.name,
+          level: applicant.level,
+          cls: applicant.cls,
+          skin: 0,
+          guild: null,
+          specId: applicant.spec ?? null,
+          gear: applicant.gear ?? {},
+        });
+        audio.click();
+      });
+    });
     el.querySelectorAll<HTMLElement>('[data-create-role]:not([disabled])').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.stagedCreateRole = btn.dataset.createRole as Role;
@@ -533,10 +590,9 @@ export class DungeonFinderWindow {
     });
     el.querySelector('[data-act="create"]:not([disabled])')?.addEventListener('click', () => {
       const state = createFormState(view.board, view.queue, this.createDraft());
-      if (
-        !state.canPublish ||
-        !publishGroupDraft(world(), state.activity, state.role, this.stagedTags)
-      ) {
+      const tags = new Set(this.stagedTags);
+      if (state.guildOnly) tags.add(FINDER_GUILD_TAG);
+      if (!state.canPublish || !publishGroupDraft(world(), state.activity, state.role, tags)) {
         rerender();
         return;
       }
@@ -862,7 +918,15 @@ export class DungeonFinderWindow {
         ? `<div class="df-browse-roles" role="group" aria-label="${esc(t('hudChrome.finder.yourRoles'))}"><span>${esc(t('hudChrome.finder.yourRoles'))}</span><div class="df-roles">${q.roles.map((r) => `<button type="button" class="df-role ui-card ui-card-tile${r.selected ? ' active' : ''}" data-role="${r.role}" aria-pressed="${r.selected}"${r.eligible ? '' : ' disabled'}>${this.roleIcon(r.role)}<span>${esc(this.roleLabel(r.role))}</span></button>`).join('')}</div></div>`
         : '';
     return (
-      premadeBoardHtml(b, '', this.groupControls.ownHtml(groups), roles, this.deps.maskPlayerText) +
+      premadeBoardHtml(
+        b,
+        '',
+        this.groupControls.ownHtml(groups),
+        roles,
+        this.deps.maskPlayerText,
+        this.boardFilter,
+        filterBoardListings(b.listings, this.boardFilter),
+      ) +
       this.groupControls.toolsHtml(
         groups,
         b.listings.map((listing) => listing.id),
@@ -876,6 +940,7 @@ export class DungeonFinderWindow {
       activity: this.stagedListingActivity,
       role: this.stagedCreateRole,
       tags: this.stagedTags,
+      guildOnly: this.stagedGuildOnly,
     };
   }
 

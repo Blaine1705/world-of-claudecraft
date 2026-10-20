@@ -130,7 +130,6 @@ import {
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
 import {
-  type CharacterProfile,
   type DailyRewardStatus,
   type IWorld,
   isOverheadEmoteId,
@@ -2613,6 +2612,7 @@ export class Hud {
       hasQuest: (questId) => this.sim.questLog.has(questId),
       showError: (text) => this.showError(text),
       openWhoTab: (filter) => this.socialWindow.openWhoTab(filter),
+      openGroupFinder: () => this.dungeonFinderWindow.open(),
       afterTabShown: (pane) => {
         window.requestAnimationFrame(() => this.chatFollow.scrollToBottomIfPinned(pane));
       },
@@ -5568,6 +5568,11 @@ export class Hud {
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
     openFinder: () => this.toggleDungeonFinder(),
     maskPlayerText: (note) => this.maskChat(note),
+    // An applicant in view gets the live card; anyone else their finder snapshot.
+    inspectPlayer: (pid, profile) =>
+      this.sim.entities.get(pid)?.kind === 'player'
+        ? this.openInspect(pid)
+        : this.inspectWindow.openRemote(profile),
   });
   private readonly dungeonFinderWindow = this.finderSurfaces.window;
 
@@ -17375,23 +17380,6 @@ export class Hud {
 
   /** Inspect another player: a profile window with their portrait, name, level
    *  and class — rendered locally from their entity's class + skin. */
-  /**
-   * The out-of-range Player Info card: the same #inspect-window, painted from the
-   * public character sheet. Deliberately thinner than openInspect: no worn gear,
-   * no wallet balance, no Discord/GitHub identity. Those live on the per-entity
-   * wire and stay proximity-gated, so standing next to someone still shows you
-   * strictly more than looking their name up from chat.
-   */
-  private openRemoteProfile(profile: CharacterProfile): void {
-    this.inspectWindow.openRemote({
-      name: profile.name,
-      level: profile.level,
-      cls: profile.cls as PlayerClass,
-      skin: profile.skin,
-      guild: profile.guild,
-    });
-  }
-
   openInspect(pid: number): void {
     const e = this.sim.entities.get(pid);
     if (e?.kind !== 'player') return;
@@ -17647,7 +17635,8 @@ export class Hud {
         this.showError(t('hudChrome.playerMenu.profileUnavailable', { name }));
         return;
       }
-      this.openRemoteProfile(profile);
+      // Thinner than openInspect: no gear or identity flair, which stay proximity-gated.
+      this.inspectWindow.openProfile(profile);
     });
   }
 

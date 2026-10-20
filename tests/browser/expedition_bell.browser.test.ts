@@ -61,6 +61,7 @@ function setup() {
     showOnMap: () => {},
     openFinder: vi.fn(),
     maskPlayerText: (value) => value,
+    inspectPlayer: vi.fn(),
     presentation: {
       itemIcon: () => '',
       itemTooltip: () => '',

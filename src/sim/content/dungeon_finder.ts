@@ -14,8 +14,19 @@ import type { Role } from './talents';
 
 // Structured listing tags: the only "description" a premade listing carries.
 // Free-form listing text is deliberately unsupported (no moderation surface).
-export type FinderListingTag = 'first_run' | 'quest_run' | 'full_clear' | 'learning' | 'fast_run';
+// `guild_only` is not a purpose chip: it marks a Guild Party, whose every
+// member must share the leader's guild (enforced by the finder machine).
+export type FinderListingTag =
+  | 'first_run'
+  | 'quest_run'
+  | 'full_clear'
+  | 'learning'
+  | 'fast_run'
+  | 'guild_only';
 
+export const FINDER_GUILD_TAG: FinderListingTag = 'guild_only';
+
+// The purpose chips the create form offers (the Guild Party flag has its own toggle).
 export const FINDER_LISTING_TAGS: readonly FinderListingTag[] = [
   'first_run',
   'quest_run',
@@ -25,7 +36,7 @@ export const FINDER_LISTING_TAGS: readonly FinderListingTag[] = [
 ];
 
 export function isFinderListingTag(value: unknown): value is FinderListingTag {
-  return (FINDER_LISTING_TAGS as readonly unknown[]).includes(value);
+  return value === FINDER_GUILD_TAG || (FINDER_LISTING_TAGS as readonly unknown[]).includes(value);
 }
 
 // Stable slot order for deterministic role assignment and display.

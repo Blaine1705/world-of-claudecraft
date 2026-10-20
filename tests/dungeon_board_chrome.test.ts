@@ -30,6 +30,7 @@ const listing: FinderListingRowView = {
   canApply: true,
   applicationRole: 'dps',
   blocked: null,
+  guildLocked: false,
 };
 
 function markup(html: string): HTMLElement {
@@ -142,6 +143,8 @@ describe('premade board chrome', () => {
       createGate: 'exists',
       createOptions: [],
       tags: [],
+      guild: '',
+      advert: null,
     };
     const root = markup(premadeBoardHtml(board, '<button data-act="create"></button>'));
     expect(root.querySelector('.df-board-own .df-applicants')).not.toBeNull();

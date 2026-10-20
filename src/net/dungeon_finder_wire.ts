@@ -8,6 +8,7 @@ import {
 } from '../sim/content/queue_rewards';
 import { validExpeditionDetails } from '../sim/social/expedition_social';
 import { FINDER_PLAYER_APPLICATION_CAP } from '../sim/social/finder_applications';
+import { isEquipSlot } from '../sim/types';
 import type {
   DungeonFinderBoard,
   DungeonFinderExpeditionView,
@@ -60,6 +61,7 @@ export function decodeDungeonFinderInfo(value: unknown): DungeonFinderInfo | nul
     drop('applicationFeedback', null);
   if (value.queueRewards !== undefined && !validQueueRewards(value.queueRewards))
     drop('queueRewards');
+  if (value.advert !== undefined && !validAdvert(value.advert)) drop('advert');
   if (
     record(value.myListing) &&
     ((value.myListing.details !== undefined && !validExpeditionDetails(value.myListing.details)) ||
@@ -71,13 +73,28 @@ export function decodeDungeonFinderInfo(value: unknown): DungeonFinderInfo | nul
     drop('myListing', null);
   if (record(decoded.myListing) && Array.isArray(decoded.myListing.applicants)) {
     const applicants = decoded.myListing.applicants;
-    if (applicants.some((a) => record(a) && a.spec != null && !token(a.spec)))
+    const badSpec = (a: unknown) => record(a) && a.spec != null && !token(a.spec);
+    // A malformed gear map only loses the inspect paperdoll, never the applicant.
+    const badGear = (a: unknown) => record(a) && a.gear !== undefined && !validGear(a.gear);
+    if (applicants.some((a) => badSpec(a) || badGear(a)))
       drop('myListing', {
         ...decoded.myListing,
-        applicants: applicants.map((a) =>
-          record(a) && a.spec != null && !token(a.spec) ? { ...a, spec: null } : a,
-        ),
+        applicants: applicants.map((a) => {
+          if (!record(a)) return a;
+          const { gear, ...rest } = a;
+          return { ...rest, spec: badSpec(a) ? null : a.spec, ...(badGear(a) ? {} : { gear }) };
+        }),
       });
+  }
+  if (
+    record(decoded.myListing) &&
+    decoded.myListing.advertText !== undefined &&
+    !(
+      typeof decoded.myListing.advertText === 'string' && decoded.myListing.advertText.length <= 160
+    )
+  ) {
+    const { advertText: _advertText, ...listing } = decoded.myListing;
+    drop('myListing', listing);
   }
   if (value.myApplication != null && !validApplication(value.myApplication))
     drop('myApplication', null);
@@ -101,6 +118,21 @@ export function decodeDungeonFinderInfo(value: unknown): DungeonFinderInfo | nul
 }
 
 const seconds = (value: unknown): value is number => count(value) && value <= 120;
+function validGear(value: unknown): boolean {
+  return (
+    record(value) && Object.entries(value).every(([slot, item]) => isEquipSlot(slot) && token(item))
+  );
+}
+function validAdvert(value: unknown): boolean {
+  return (
+    record(value) &&
+    count(value.general) &&
+    value.general <= 60 &&
+    count(value.discord) &&
+    value.discord <= 60 &&
+    typeof value.discordAvailable === 'boolean'
+  );
+}
 function validApplication(value: unknown): value is { listingId: number } {
   return (
     record(value) &&
@@ -162,7 +194,8 @@ export function decodeDungeonFinderBoard(value: unknown): DungeonFinderBoard | n
     (row) =>
       record(row) &&
       (row.expedition === undefined || validExpeditionProgress(row.expedition)) &&
-      (row.details === undefined || validExpeditionDetails(row.details)),
+      (row.details === undefined || validExpeditionDetails(row.details)) &&
+      (row.guild === undefined || (typeof row.guild === 'string' && row.guild.length <= 64)),
   );
   return (rows.length === value.length ? value : rows) as DungeonFinderBoard;
 }

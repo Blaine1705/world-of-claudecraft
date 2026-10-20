@@ -59,6 +59,8 @@ export interface InspectHeaderModel {
   deedTitle: string | null;
   level: number;
   cls: PlayerClass;
+  /** Talent specialization id (the painter localizes it); null = no spec chosen. */
+  specId: string | null;
   classColor: string;
   border: InspectBorderModel | null;
 }
@@ -141,6 +143,8 @@ export interface InspectInput {
   name: string;
   level: number;
   cls: PlayerClass;
+  /** The mirrored specialization id (null = none chosen). */
+  specId?: string | null;
   skin: number;
   /** Which catalog `skin` indexes into ('class' or 'mech'), from the entity mirror. */
   skinCatalog: SkinCatalog;
@@ -224,6 +228,7 @@ export function buildInspectView(
     deedTitle: input.deedTitleText !== '' ? input.deedTitleText : null,
     level: input.level,
     cls: input.cls,
+    specId: input.specId ?? null,
     classColor: classColorCss(input.cls),
     border: accent
       ? {
@@ -299,28 +304,39 @@ export function buildInspectView(
 }
 
 /** The out-of-range remote-profile model: the thinner card shown when the named
- *  player is not inside interest scope. No worn gear, no identity flair, no live
- *  turntable, matching the public character sheet the crawlable page already
- *  serves. */
+ *  player is not inside interest scope. No identity flair and no live turntable,
+ *  matching the public character sheet the crawlable page already serves. Worn
+ *  gear appears only when the caller holds it from a consented source (a group
+ *  applicant's finder snapshot, seen by that listing's leader); a chat-name
+ *  lookup has none, so its `gear` is null. */
 export interface InspectRemoteModel {
   name: string;
   level: number;
   cls: PlayerClass;
+  specId: string | null;
   classColor: string;
   guild: string | null;
+  gear: PaperdollView | null;
 }
 
-export function buildInspectRemoteView(input: {
-  name: string;
-  level: number;
-  cls: PlayerClass;
-  guild: string | null;
-}): InspectRemoteModel {
+export function buildInspectRemoteView(
+  input: {
+    name: string;
+    level: number;
+    cls: PlayerClass;
+    guild: string | null;
+    specId?: string | null;
+    gear?: Partial<Record<EquipSlot, string>>;
+  },
+  items: Record<string, ItemDef> = {},
+): InspectRemoteModel {
   return {
     name: input.name,
     level: input.level,
     cls: input.cls,
+    specId: input.specId ?? null,
     classColor: classColorCss(input.cls),
     guild: input.guild,
+    gear: input.gear ? buildPaperdollView(input.gear, items) : null,
   };
 }

@@ -2,6 +2,7 @@ import { audio } from '../../../game/audio';
 import type { IWorld } from '../../../world_api';
 import { DungeonFinderProposalPopup } from '../../dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from '../../dungeon_finder_window';
+import type { InspectRemoteProfile } from '../../inspect_window';
 import type { PainterHostPresentation, PainterHostWriters } from '../../painter_host';
 import type { WindowFocusBridge } from '../../window_focus';
 import { ExpeditionController } from './expedition_controller';
@@ -15,6 +16,7 @@ interface FinderSurfaceHost {
   showOnMap(x: number, z: number): void;
   openFinder(): void;
   maskPlayerText(note: string): string;
+  inspectPlayer(pid: number, profile: InspectRemoteProfile): void;
   presentation: PainterHostPresentation;
   writers: PainterHostWriters;
 }
@@ -29,6 +31,7 @@ export function createFinderSurfaces(host: FinderSurfaceHost) {
     hideTooltip: host.hideTooltip,
     showOnMap: host.showOnMap,
     maskPlayerText: host.maskPlayerText,
+    inspectPlayer: host.inspectPlayer,
     ...host.focus('#dungeon-finder-window'),
   });
   return {

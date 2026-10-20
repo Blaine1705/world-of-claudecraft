@@ -14,6 +14,7 @@
 import { HEROIC_DUNGEON_TUNING } from '../sim/content/dungeon_difficulty';
 import {
   FINDER_ACTIVITIES,
+  FINDER_GUILD_TAG,
   FINDER_LISTING_TAGS,
   type FinderActivity,
   type FinderActivityKind,
@@ -25,6 +26,7 @@ import type { Role } from '../sim/content/talents';
 import { DELVE_LIST, DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
 import { lootEntryRollsOnClaim } from '../sim/loot/loot_difficulty_gate';
 import { compatibleFinderRoles } from '../sim/social/dungeon_finder';
+import type { FinderAdvertCooldownView } from '../sim/social/finder_advert';
 import { FINDER_PLAYER_APPLICATION_CAP } from '../sim/social/finder_applications';
 import type { DungeonDifficulty, PlayerClass } from '../sim/types';
 import { delveCatalogueDetail, delveCatalogueRows } from './dungeon_catalogue_view';
@@ -164,6 +166,8 @@ export interface FinderListingRowView extends DungeonFinderListingView {
   applied: boolean;
   canApply: boolean;
   blocked: FinderBlockReason;
+  // A Guild Party for a guild I am not in: shown, but never appliable.
+  guildLocked: boolean;
 }
 
 export interface FinderBoardPanelView {
@@ -176,6 +180,10 @@ export interface FinderBoardPanelView {
   // to what my current group could lead).
   createOptions: { id: string; dungeonId: string; difficulty: DungeonDifficulty }[];
   tags: readonly FinderListingTag[];
+  // My guild name ('' = none): a Guild Party needs one to be created.
+  guild: string;
+  // My listing's advert buttons (null until a snapshot carries the cooldowns).
+  advert: FinderAdvertCooldownView | null;
 }
 
 // Live text slots the painter refreshes in place (1 Hz max), outside `sig`.
@@ -216,6 +224,8 @@ export interface DungeonFinderViewInput {
   // exact in production). Null when solo.
   partyLeaderName: string | null;
   lockouts: RaidLockout[];
+  // My mirrored guild name ('' = guildless), for Guild Party gating.
+  playerGuild?: string;
   // Painter-local UI state.
   tab: FinderTab;
   selectedActivityId: string | null;
@@ -498,6 +508,9 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     // guard stays as belt and braces should the skip above ever narrow.
     if (!applied && !mine && locked) continue;
     const blocked = blockReasonFor(activity, level);
+    const guildLocked =
+      listing.tags.includes(FINDER_GUILD_TAG) &&
+      (!input.playerGuild || input.playerGuild !== listing.guild);
     const applicationRole = listing.expedition
       ? (info.roles.find((role) => eligibleRoles.includes(role)) ?? eligibleRoles[0] ?? null)
       : null;
@@ -517,8 +530,10 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
       applied,
       applicationRole,
       blocked,
+      guildLocked,
       canApply:
         !mine &&
+        !guildLocked &&
         blocked === null &&
         input.party === null &&
         !applied &&
@@ -538,6 +553,8 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
       (a) => blockReasonFor(a, level) === null && (input.party?.size ?? 1) < a.size,
     ).map((a) => ({ id: a.id, dungeonId: a.dungeonId, difficulty: a.difficulty })),
     tags: FINDER_LISTING_TAGS,
+    guild: input.playerGuild ?? '',
+    advert: info.advert ?? null,
   };
 
   const clocks: FinderClocksView = {
@@ -575,7 +592,11 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
       l.applicationRole,
       l.details,
       l.expedition,
+      l.guild,
+      l.guildLocked,
     ]),
+    boardPanel.guild,
+    boardPanel.advert,
     info.myListing
       ? {
           ...info.myListing,
