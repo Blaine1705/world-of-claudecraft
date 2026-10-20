@@ -87,6 +87,10 @@ interface GameDebugHandle {
   };
 }
 
+// The staged dummy's health floor: enough to soak a whole spec sequence without dying,
+// and below the storage price guard's distinctive-literal range.
+const DUMMY_MIN_HP = 90_000;
+
 export interface SpellLabApi {
   open(): void;
   close(): void;
@@ -358,7 +362,7 @@ class SpellLabRuntime implements SpellLabApi {
     dummy.pos.z = targetZ;
     dummy.pos.y = p.pos.y;
     dummy.facing = yaw + Math.PI;
-    dummy.maxHp = Math.max(dummy.maxHp, 500000);
+    dummy.maxHp = Math.max(dummy.maxHp, DUMMY_MIN_HP);
     dummy.hp = dummy.maxHp;
     dummy.dead = false;
     dummy.inCombat = false;
