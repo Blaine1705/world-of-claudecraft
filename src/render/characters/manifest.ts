@@ -1345,9 +1345,12 @@ const STATIC_PROP: ClipMap = {
   death: 'Idle',
 };
 
-// Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
-// animal() core plus the donor's Sit/Fall clips so player wolf forms sit and
-// jump properly, and a Walk swim base (a paddling gait at the gentle clip
+// The wolf rig (wolf_basic/greyjaw): a 36-bone skeleton fitted to each body by
+// scripts/assets/wolf_rig/ (spine, two-segment ears, a six-bone tail along the tail's
+// own curl; no jaw, the mouths stay as modeled), every clip carried from the old
+// dog-rig set and finished there (planted paws, nothing through the floor, a tail
+// that trails the body, ears). The animal() core plus Sit/Fall so player wolf forms
+// sit and jump properly, and a Walk swim base (a paddling gait at the gentle clip
 // pitch beats the steep no-clip procedural prone on a quadruped).
 const WOLF_BAKED: ClipMap = {
   ...animal(['Attack']),
@@ -1357,10 +1360,9 @@ const WOLF_BAKED: ClipMap = {
 };
 
 // Greyjaw's own attack (scripts/build_greyjaw_anims.mjs, issue #2889 round
-// 2): greyjaw.glb is a much richer, dedicated 48-node rig (not shared with
-// mob_wolf's separate wolf_basic.glb) that ships unused bonus donor clips
-// (Bark, Howl, "Idle Alert", Sneak) specific to this named rare; this
-// blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
+// 2): greyjaw.glb (his own file, on the wolf rig fitted to his body) ships bonus
+// donor clips besides the ones the game plays (Bark, Howl, "Idle Alert", Sneak);
+// this blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
 // more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
 // form_ghost_wolf) still plays. WOLF_BAKED itself is untouched: both still read it,
 // and changing the shared base would change player shaman form combat
@@ -3183,8 +3185,9 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   form_cat: {
     url: `${CREATURES}/druid_cat_form.glb`,
-    // Sized a fifth above the world wolves (mob_wolf / form_ghost_wolf are 1.6)
-    // so the druid's cat reads as the bigger predator on the field.
+    // Sized a fifth above the world wolves as they were drawn when this was set
+    // (mob_wolf / form_ghost_wolf at 1.6 on the old rig, 1.47 on the rebuilt one,
+    // the same on-screen size) so the druid's cat reads as the bigger predator.
     height: 1.92,
     clips: DRUID_CAT_FORM,
     authoredAtlas: true,
@@ -3204,9 +3207,10 @@ export const VISUALS: Record<string, VisualDef> = {
     deathTimeScale: 1,
   },
   // Shaman Shadewolf retains the original wolf, tint and ghost-material overlay.
+  // Height: as mob_wolf (same file, same on-screen size).
   form_ghost_wolf: {
     url: `${CREATURES}/wolf_basic.glb`,
-    height: 1.6,
+    height: 1.47,
     clips: WOLF_BAKED,
     tint: 0xd08b45,
     tintStrength: 0.35,
@@ -3516,13 +3520,17 @@ export const VISUALS: Record<string, VisualDef> = {
 
   // -- mob families --------------------------------------------------------
   mob_wolf: {
-    // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton
-    // (same pipeline as greyjaw), clips renamed to the animal() names at bake
-    // time. Baked basecolor texture; keeps a light entity tint so this doubles
-    // as the beast-family fallback and each beast keeps its own colour.
+    // Custom Tripo wolf on the rebuilt wolf rig (scripts/assets/wolf_rig/, see
+    // WOLF_BAKED). Baked basecolor texture; keeps a light entity tint so this
+    // doubles as the beast-family fallback and each beast keeps its own colour.
+    // Height 1.47 draws it exactly as large as the old rig's 1.6 did: the game
+    // sizes a creature by its posed idle (1.730 tall on this rig, 1.884 on the
+    // old one), and the old idle measured taller than the wolf (a sliver of the
+    // left hind heel was weighted to the tail and hung below the paws), which also
+    // stood the old wolves off the ground.
     url: `${CREATURES}/wolf_basic.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
-    height: 1.6,
+    height: 1.47,
     clips: WOLF_BAKED,
     tint: 'entity',
     tintStrength: 0.35,
@@ -3550,13 +3558,14 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.2,
   },
   greyjaw: {
-    // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton;
-    // clips renamed to the animal() names at bake time. Baked texture, no tint.
-    // Old Greyjaw's model: 2.2 at scale 1 (his template scale 1.25 makes the
-    // rare ~2.75 in-world vs the 1.6 pack wolf).
+    // Custom Tripo wolf on the rebuilt wolf rig (scripts/assets/wolf_rig/, his own
+    // skeleton fitted to his body, see WOLF_BAKED). Baked texture, no tint. Height
+    // 2.05 draws him exactly as large as the old rig's 2.2 did (his posed idle is
+    // 1.819 tall on this rig, 1.954 on the old one); his template scale 1.25 then
+    // makes the rare stand well over the pack wolf in-world.
     url: `${CREATURES}/greyjaw.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
-    height: 2.2,
+    height: 2.05,
     clips: GREYJAW_WOLF,
     // Greyjaw_Attack clip donor (scripts/build_greyjaw_anims.mjs): mesh-free,
     // baked off this same rig's own poses (a howl-then-pounce, distinct from
