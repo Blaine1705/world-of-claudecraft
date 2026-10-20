@@ -353,6 +353,7 @@ import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from './highwatch_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
+import { PAINTED_TOWNS } from './painted_towns';
 import { setStudioOverlay, studioOverlayInstalled } from './studio_content';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -374,7 +375,6 @@ import { FARM_PATTERN_ITEMS } from './content/farm_patterns';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
-import { HIGHWATCH_MANOR_NPCS } from './content/highwatch_manor';
 import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { MIREFEN_TAVERN_NPCS } from './content/mirefen_tavern';
@@ -567,7 +567,6 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
-  ...HIGHWATCH_MANOR_NPCS,
   // The Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
   // dynamic, spawned per Temple claim, appended last so no placed NPC moves.
   ...CANTOR_NPCS,
@@ -1084,6 +1083,9 @@ export const BUILTIN_WORLD: WorldContent = {
     // from the finished ground, so heights move a little further out too.
     // Copied: the layout's records are frozen, and edit lists are plain data.
     ...HIGHWATCH_LAYOUT.pads.map((pad) => ({ ...pad })),
+    // ...and every painted town after it (sim/painted_towns/), town by town in
+    // the list's order, each on its own ground far from every other stamp.
+    ...PAINTED_TOWNS.flatMap((town) => town.pads.map((pad) => ({ ...pad }))),
   ],
 };
 

@@ -1,3 +1,4 @@
+import { AUTHORED_TOWN_BUILDINGS } from './authored_town_registry';
 import { attachPendingBuddy, grantBuddy } from './buddies';
 import { applyCourserDaze } from './combat/hunter_shared';
 import { BUDDY_KEYS } from './content/buddies';
@@ -28,7 +29,7 @@ import { handleGravewyrmSanctumDevChat } from './dev/gravewyrm_sanctum_dev';
 import { handleDevHoardTravel } from './dev/hoard_travel';
 import { handleHollowCryptDevChat } from './dev/hollow_crypt_dev';
 import { handleSunkenBastionDevChat } from './dev/sunken_bastion_dev';
-import { devTownList, resolveDevTown } from './dev/town_teleport';
+import { devTownLanding, devTownList, resolveDevTown } from './dev/town_teleport';
 import { handleTrashEngineDevChat } from './dev/trash_engine_dev';
 import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
 import { handleWildheartBasinDevChat } from './dev/wildheart_basin_dev';
@@ -494,7 +495,13 @@ export function handleDevChat(
     }
     const entity = ctx.entities.get(pid);
     if (entity) {
-      const pos = displacePlayerForDev(ctx, entity, town.x, town.z);
+      // only the rebuilt towns' buildings this world actually stands
+      const standing = new Set(getActiveWorldContent().props.buildings.map((b) => b.id));
+      const landing = devTownLanding(
+        town,
+        AUTHORED_TOWN_BUILDINGS.filter((building) => standing.has(building.id)),
+      );
+      const pos = displacePlayerForDev(ctx, entity, landing.x, landing.z);
       emitDevLog(
         ctx,
         pid,

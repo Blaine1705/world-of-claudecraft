@@ -41,6 +41,7 @@ import {
   isFenbridgeRebuildWell,
 } from '../render/fenbridge_town';
 import { isHighwatchRebuildBuilding } from '../render/highwatch_town';
+import { isPaintedTownRebuildBuilding } from '../render/painted_towns';
 import { PROP_NATURAL_SIZE } from '../render/prop_natural_size.generated';
 import { buildingAssetPick, HOUSE_HEIGHT, PROP_ASSET_DEFS, type PropKey } from '../render/props';
 import { EVERGARDEN_PROPS } from '../sim/content/evergarden';
@@ -287,12 +288,13 @@ export function worldMajorPropPlacements(
   // ---- buildings (props.ts "buildings: village houses / inn / composed chapel")
   props.buildings.forEach((b, index) => {
     // The authored towns draw their own buildings (eastbrook_town.ts,
-    // fenbridge_town.ts, highwatch_town.ts; the authoredTowns and highwatchTown
-    // promotion families own them).
+    // fenbridge_town.ts, highwatch_town.ts, painted_towns.ts; the authoredTowns,
+    // highwatchTown and paintedTowns promotion families own them).
     if (
       isEastbrookRebuildBuilding(b) ||
       isFenbridgeRebuildBuilding(b) ||
-      isHighwatchRebuildBuilding(b)
+      isHighwatchRebuildBuilding(b) ||
+      isPaintedTownRebuildBuilding(b)
     ) {
       return;
     }

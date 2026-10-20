@@ -6174,10 +6174,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.spirit_healer.title': '亡者的守護者',
   'entities.npcs.spirit_healer.greeting':
     '安息吧，靈魂。我可以讓你重返軀體，但歸途會讓你變得虛弱。',
-  'entities.npcs.steward_ansel_hale.greeting':
-    '歡迎來到莊園，{className}。到爐火邊暖暖身子吧，留心腳下的地毯，別碰主桌。燈樓徹夜長明，好讓廣場上的人找得到回家的路。',
-  'entities.npcs.steward_ansel_hale.name': '安塞爾·黑爾',
-  'entities.npcs.steward_ansel_hale.title': '莊園管家',
   'entities.npcs.the_merchant.name': '商人',
   'entities.npcs.the_merchant.title': '世界市場守護者',
   'entities.npcs.the_merchant.greeting':
@@ -18368,6 +18364,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '三重T的哨子',
   'entities.items.whistle_trollface.name': '巨魔臉的哨子',
   'entities.items.whistle_tuskhorn_boar.name': '獠角野豬的哨子',
+  'hudChrome.buddyMenu.rename': '重新命名夥伴',
+  'hudChrome.buddyMenu.nameLabel': '夥伴名稱',
   'hudChrome.buddyMenu.autolootEnable': '開啟自動拾取',
   'hudChrome.buddyMenu.autolootDisable': '關閉自動拾取',
   'hudChrome.buddyMenu.autolootHint': '你的夥伴會去拾取 30 碼內屬於你自己的屍體上的戰利品。',
@@ -19107,6 +19105,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': '坐騎',
   'hudChrome.cosmetics.tabSkins': '造型',
   'hudChrome.cosmetics.tabMech': '機甲',
+  'hudChrome.cosmetics.buddyActive': '已召喚',
+  'hudChrome.cosmetics.buddyDrag': '拖到動作條上',
   'hudChrome.cosmetics.legend': '帳號：所有角色共用。角色：僅此角色。',
   'hudChrome.cosmetics.scopeAccount': '帳號',
   'hudChrome.cosmetics.scopeCharacter': '角色',
@@ -20502,7 +20502,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.crypt.tolling':
     '他大步走向鐘繩並敲響葬鐘時免疫傷害。鐘聲結束時，喪鐘對所有人造成{min}到{max}點暗影傷害（英雄難度{heroicMin}到{heroicMax}點），並且每座敞開的墳墓都會爬出一具不安之骨。',
   'hudChrome.auraEffect.crypt.embraced':
-    '被夫人舉在半空：無法行動，每秒受到{tick}點冰霜傷害（英雄難度{tickHeroic}點）。如果你的隊伍打掉她{share}%的最大生命值，她會把你輕輕放下；如果她在高處抓住你{hold}秒，就會把你扔到冰面上，造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。',
+    '被夫人舉在半空：無法行動，每秒受到{tick}點冰霜傷害（英雄難度{tickHeroic}點）。如果你的隊伍打掉她{share}%的最大生命值（英雄難度{shareHeroic}%），她會把你輕輕放下；如果她在高處抓住你{hold}秒，就會把你扔到冰面上，造成{min}到{max}點傷害（英雄難度{heroicMin}到{heroicMax}點）。',
   'hudChrome.auraEffect.crypt.lament':
     '新娘的哀歌結束時，對所有不在點亮的墓燈{radius}碼內的人造成{min}到{max}點冰霜傷害（英雄難度{heroicMin}到{heroicMax}點）。每盞燈只庇護離它最近的{cap}名玩家，然後熄滅並錯過下一次哀歌。',
   'hudChrome.auraEffect.crypt.lingering':

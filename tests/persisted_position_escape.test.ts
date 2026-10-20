@@ -62,8 +62,17 @@ describe('persisted overworld position escape', () => {
   // (EASTBROOK_LAYOUT.wall.segments is empty by design), so no wall geometry
   // is left to trap a save in; the remaining rows still exercise the escape
   // path against the moved buildings and stalls.
+  // The barracks garrison lot row became the Weekly Vault (still sealed, no
+  // walk-in) when the genshin artstyle merge (8bff2cec638) cleared the Wolf
+  // Run barracks, leaving that lot open ground.
   it.each([
-    ['barracks garrison lot', { x: 17.5, z: -5.5 } as { x: number; z: number }],
+    [
+      'Weekly Vault',
+      { x: EASTBROOK_LAYOUT.weeklyVault.x, z: EASTBROOK_LAYOUT.weeklyVault.z } as {
+        x: number;
+        z: number;
+      },
+    ],
     // the quay cottage, because it is still sealed: the bank this row used to
     // name is a walk-in room now (the case below)
     ['quay cottage', EASTBROOK_BUILDINGS_BY_ID.eastbrook_quay_cottage.position],

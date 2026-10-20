@@ -3839,8 +3839,8 @@ export const ko_KR: EnTranslations = {
       "streamerBadgeTitle": "인증된 스트리머"
     },
     "buddyMenu": {
-      "rename": "Rename Buddy",
-      "nameLabel": "Buddy name",
+      "rename": "버디 이름 변경",
+      "nameLabel": "버디 이름",
       "autolootEnable": "자동 전리품 켜기",
       "autolootDisable": "자동 전리품 끄기",
       "autolootHint": "버디가 30야드 이내에 있는 당신 소유의 시체에서 전리품을 가져옵니다.",
@@ -4200,7 +4200,7 @@ export const ko_KR: EnTranslations = {
         "blow": "받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 현재 {stacks}/{max}중첩. 무덤꾼의 일격마다 중첩이 쌓이고 지속 시간이 {seconds}초로 초기화됩니다.",
         "graveVigor": "열린 무덤 안에 서 있는 동안 공격 속도가 {pct}% 증가합니다. 그를 무덤 밖에 두세요.",
         "tolling": "종 밧줄로 걸어가 장례의 종을 울리는 동안 피해 면역입니다. 종소리가 끝나면 모두에게 {min}~{max} 암흑 피해(영웅 난이도 {heroicMin}~{heroicMax})를 주고, 열린 무덤마다 불안한 뼈무더기가 일어납니다.",
-        "embraced": "귀부인의 품에 안겨 공중에 떠 있음: 행동할 수 없고 매초 {tick} 냉기 피해(영웅 난이도 {tickHeroic})를 받습니다. 파티가 그녀의 최대 생명력 {share}%를 깎으면 부드럽게 내려놓지만, 높은 곳에서 {hold}초 동안 붙잡고 있으면 얼음 위로 떨어뜨려 {min}~{max} 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
+        "embraced": "귀부인의 품에 안겨 공중에 떠 있음: 행동할 수 없고 매초 {tick} 냉기 피해(영웅 난이도 {tickHeroic})를 받습니다. 파티가 그녀의 최대 생명력 {share}%(영웅 난이도 {shareHeroic}%)를 깎으면 부드럽게 내려놓지만, 높은 곳에서 {hold}초 동안 붙잡고 있으면 얼음 위로 떨어뜨려 {min}~{max} 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다.",
         "lament": "신부의 애가가 끝나면 켜진 무덤 등불에서 {radius}미터 안에 없는 모두에게 {min}~{max} 냉기 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 등불은 가장 가까운 {cap}명만 보호한 뒤 꺼져 다음 애가를 놓칩니다.",
         "lingering": "다음 신부의 애가로 받는 피해가 {pct}% 증가합니다: 중첩당 {per}%, 최대 {max}중첩. 다음 애가는 등불 빛 안에서 받으세요.",
         "slippery": "미끄러운 얼음 위: 속도가 매초 최대 {grip}미터/초씩만 바뀌므로 출발이 느리고, 멈추면 계속 미끄러지며, 방향을 틀면 크게 돌아갑니다. 얼음에서 벗어나면 다시 중심을 잡을 수 있습니다.",
@@ -6752,8 +6752,8 @@ export const ko_KR: EnTranslations = {
       "tabMounts": "탈것",
       "tabSkins": "스킨",
       "tabMech": "메카",
-      "buddyActive": "Summoned",
-      "buddyDrag": "Drag to action bar",
+      "buddyActive": "소환됨",
+      "buddyDrag": "행동 단축바로 끌어다 놓기",
       "legend": "계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.",
       "scopeAccount": "계정",
       "scopeCharacter": "캐릭터",
@@ -25795,11 +25795,6 @@ export const ko_KR: EnTranslations = {
         "name": "연금술사 베레인",
         "title": "약방의 주인",
         "greeting": "두 번 재고 한 번에 부어라, {className}. 약방에서는 쏟은 시약을 봐주지 않는다."
-      },
-      "steward_ansel_hale": {
-        "name": "안셀 헤일",
-        "title": "저택의 집사",
-        "greeting": "저택에 온 것을 환영하오, {className}. 화롯가에서 몸을 녹이시오. 양탄자를 조심하고, 상석의 식탁에는 손대지 마시오. 광장 사람들이 집으로 가는 길을 찾도록 등불은 밤새 타오르오."
       },
       "farmer_jessica": {
         "name": "농부 제시카",

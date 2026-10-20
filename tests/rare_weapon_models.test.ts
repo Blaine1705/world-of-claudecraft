@@ -329,9 +329,13 @@ describe('which items draw the rare set', () => {
         DESIGNS[designOf(key) ?? ''].type,
       );
     }
+    // Balgath's two epics keep their own bespoke models, the Foreman's barrowmaul and
+    // the Craterglass Stave (the Mirefen world boss, PR 4259; owner call, 2026-10-20).
+    const BESPOKE_EPIC_WEAPONS = new Set(['foremans_barrowmaul', 'craterglass_stave']);
     const weapons = Object.values(ITEMS).filter((item) => item.kind === 'weapon');
     expect(weapons.filter((item) => item.quality === 'epic').length).toBeGreaterThan(40);
     for (const item of weapons) {
+      if (BESPOKE_EPIC_WEAPONS.has(item.id)) continue;
       const key = keyOf(itemWeaponModelUrl(item.id));
       expect(isRareKey(key), `${item.id} (${item.quality}) draws ${key}`).toBe(
         item.quality === 'epic',

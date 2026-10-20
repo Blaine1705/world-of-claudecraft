@@ -82,7 +82,18 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   // default-bounded rest, measured at 480_000 in all.
   ['tests/mirefen_tavern.test.ts', 480_000],
   ['tests/dragonkin_whelp_litter.test.ts', 420_000],
-  ['tests/druid_balance_probe.test.ts', 540_000],
+  // The claim roster pulls, resets and kills every dungeon boss in three raised
+  // cases, each a full instance run: 3 * 120_000.
+  ['tests/dungeon_run_roster.test.ts', 360_000],
+  // Korzul's wake and pull: one whole-crypt build at 180_000 plus six encounter
+  // cases at 60_000 each, every one over the 20 s default under a loaded run:
+  // 180_000 + 6 * 60_000.
+  ['tests/gravewyrm_korzul.test.ts', 540_000],
+  // The Moon Stair entrance suite builds a whole shipped world (makeSim) in each of its
+  // eight walk and spawn cases, each raised to 180_000 for a cold CI build: 8 * 180_000.
+  // The rest stay default-bounded; the file measured 4.6 s of test time locally.
+  ['tests/drowned_temple_entrance.test.ts', 1_440_000],
+  ['tests/druid_balance_probe.test.ts', 600_000],
   ['tests/emerald_deck_escape.test.ts', 540_000],
   ['tests/guild_bank_pg_integration.test.ts', 840_000],
   ['tests/nythraxis_matrix.test.ts', 1_200_000],

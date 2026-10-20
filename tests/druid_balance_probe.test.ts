@@ -200,7 +200,10 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     // 12 profile x capstone combos over a 123s window: ~90-105s solo. In the
     // long-sims lane (workers=2) two heavy suites share the runner, roughly
     // doubling wall time (run 31288946173 killed this at 150s mid-matrix).
-  }, 420_000);
+    // On the v0.45.0 integration world it measured 362s on a green lane run
+    // (39322453017) and passed 420s on a slower runner (39338836719), so it
+    // takes the single-test cap.
+  }, 480_000);
 
   it('the live-mob and Bruin fixtures wear the pinned reference loadout', () => {
     // Identity first: every band below is conditioned on this gear, and the

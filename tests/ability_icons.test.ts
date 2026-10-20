@@ -131,12 +131,14 @@ describe('ability icons', () => {
     // release/v0.44.0 merge into feature/buried-hoards).
     // 476: plus the Mirefen world boss's Shardpike bar verbs (lance_brace,
     // lance_thrust, lance_release), at the release/v0.45.0 merge.
-    expect(ids).toHaveLength(476);
+    // 477: plus the membership Courier glyph (parked in ABILITY_ART_PENDING until
+    // its skill painting ships), at the v0.45.0 integration.
+    expect(ids).toHaveLength(477);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    // Re-minted over the merged ABILITY_RECIPES literal (release/v0.45.0 merge).
-    expect(hash).toBe('94c1895e54a18a8c965c92e499d148476185ade4dbd5b140e31af16b3f2ff202');
+    // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier).
+    expect(hash).toBe('bf012743f0557b561563508a5de75438c406ebdef90b39853c28b260beb72cd0');
   });
 });

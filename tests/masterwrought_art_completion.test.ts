@@ -835,7 +835,9 @@ describe('Masterwrought art completion evidence', () => {
     // + the Mirefen world-boss branch (nine items: the boss spoils, both Shardpikes and the
     // Wage rares) and Balgath's loot (six items) on the v0.45.0 integration: 1,890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    expect(currentOwnerIds).toHaveLength(2005);
+    // + the account-wide buddies (PR 4240): 32 whistle icons rendered from the buddy
+    // GLBs and the 2 stag charm re-tints of them, on the same integration: 2039.
+    expect(currentOwnerIds).toHaveLength(2039);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1079,6 +1081,22 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => dungeonReworkIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => dungeonReworkIds.has(id))).toHaveLength(115);
 
+    // The account-wide buddies (PR 4240): the whistle icons rendered from the buddy
+    // GLBs and the stag charm re-tints of them, two more additive batches on the
+    // v0.45.0 integration, pinned by identity and size like the waves above.
+    const buddyBatchIds: readonly (string | undefined)[] = [
+      'buddy-whistle-icons-2026-08-28',
+      'buddy-charm-icons-2026-09-09',
+    ];
+    const buddyIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => buddyBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(buddyIds.size).toBe(34);
+    expect(datedIds.filter((id) => buddyIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(34);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
@@ -1111,7 +1129,8 @@ describe('Masterwrought art completion evidence', () => {
         !referralIds.has(id) &&
         !balgathIds.has(id) &&
         !musterIds.has(id) &&
-        !dungeonReworkIds.has(id),
+        !dungeonReworkIds.has(id) &&
+        !buddyIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

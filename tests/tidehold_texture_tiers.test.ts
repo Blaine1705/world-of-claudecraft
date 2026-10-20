@@ -14,6 +14,7 @@ import { ASSET_CATALOG } from '../src/editor/asset_catalog.generated';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { placedTextureTierPath } from '../src/render/placed_texture_tier_core';
 import { ASSET_COLLISION_OVERRIDES } from '../src/sim/asset_collision_overrides.generated';
+import { PAINTED_LOOK_MODELS, type PaintedLook } from '../src/sim/painted_towns/models';
 
 const DIR = path.resolve(__dirname, '..', 'public', 'models', 'tidehold');
 const BUILDINGS = [
@@ -278,6 +279,79 @@ describe('the Highwatch look', () => {
     expect(row).toContain(
       `public/models/tidehold/highwatch/{${HIGHWATCH_BUILDINGS.join(',')}}.glb`,
     );
+    expect(row).toContain('.half.glb');
+    expect(row).toContain('.quarter.glb');
+  });
+});
+
+// The town looks (sim/painted_towns/models.ts): the same models re-baked
+// wearing the town texture library's colour sets and pattern layouts, each
+// building with its own stained glass (the detail atlas's rosettes swapped
+// between cells, the lancets' glass turned to the look's colour). The rule of
+// the looks above: the same model with other pictures and nothing else, since
+// the town's collision boxes, its seat and the Studio's baked rows read the
+// default model's numbers.
+const TOWN_LOOKS: Readonly<Record<string, readonly string[]>> = {
+  pantile: ['house_a', 'shop_a', 'tavern'],
+  shakes: ['hall', 'house_a', 'tavern'],
+  diamond: ['hall', 'house_c', 'shop_a', 'smithy', 'tavern'],
+  brick: ['hall', 'house_a', 'shop_a', 'smithy', 'tavern'],
+  thatch: ['hall', 'house_a', 'house_b', 'smithy', 'tavern'],
+};
+
+describe.each(Object.entries(TOWN_LOOKS))('the %s town look', (look, buildings) => {
+  it('ships exactly the models a painted town may stand in it', () => {
+    expect([...PAINTED_LOOK_MODELS[look as PaintedLook]].sort()).toEqual(buildings);
+  });
+
+  it.each(
+    buildings.flatMap((b) => LOOK_TIERS.map((t) => [`${look}/${b}${t}`, `${b}${t}`] as const)),
+  )('%s is %s with other pictures and nothing else', (lookFile, baseFile) => {
+    const base = read(baseFile);
+    const own = read(lookFile);
+    expect(shape(own)).toBe(shape(base));
+    expect(images(own)).toEqual(images(base).map((img) => ({ ...img, mime: 'image/ktx2' })));
+    // ...and really repainted: the walls and roof atlases are not the default
+    // look's bytes
+    const stem = baseFile.replace(/\..*$/, '');
+    for (const atlas of [`${stem}_walls_color`, `${stem}_roof_color`]) {
+      expect(imageBytes(own, atlas).equals(imageBytes(base, atlas)), atlas).toBe(false);
+    }
+  });
+
+  it('every look file is in the media manifest, and each model is a placeable asset', () => {
+    const exists = (p: string) => MEDIA_ASSETS[p.replace(/^\/+/, '')] !== undefined;
+    for (const b of buildings) {
+      const model = `/models/tidehold/${look}/${b}.glb`;
+      expect(exists(model), model).toBe(true);
+      expect(placedTextureTierPath(model, 'half', exists)).toBe(
+        `/models/tidehold/${look}/${b}.half.glb`,
+      );
+      expect(placedTextureTierPath(model, 'quarter', exists)).toBe(
+        `/models/tidehold/${look}/${b}.quarter.glb`,
+      );
+      expect(
+        ASSET_CATALOG.some((a) => a.id === `tidehold/${look}/${b}`),
+        b,
+      ).toBe(true);
+    }
+  });
+
+  it('collides as the default model: each collision row is the default row', () => {
+    for (const b of buildings) {
+      const own = ASSET_COLLISION_OVERRIDES[`tidehold/${look}/${b}`];
+      expect(own, b).toBeDefined();
+      expect(own, b).toEqual(ASSET_COLLISION_OVERRIDES[`tidehold/${b}`]);
+    }
+  });
+
+  it('is credited, every building and tier', () => {
+    const credits = fs.readFileSync(path.resolve(__dirname, '..', 'CREDITS.md'), 'utf8');
+    const row = credits
+      .split('\n')
+      .find((line) => line.includes(`public/models/tidehold/${look}/`));
+    expect(row, `a CREDITS.md row for the ${look} look`).toBeDefined();
+    expect(row).toContain(`public/models/tidehold/${look}/{${buildings.join(',')}}.glb`);
     expect(row).toContain('.half.glb');
     expect(row).toContain('.quarter.glb');
   });

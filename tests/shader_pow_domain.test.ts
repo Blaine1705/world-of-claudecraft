@@ -124,6 +124,17 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     anchor: /slot\.progress = easeOutQuart\(t\)/,
     why: 'uProgress is written from JS from slot.progress, which is easeOutQuart(min(1, age / dur)), never above 1',
   },
+  {
+    file: 'src/render/drowned_temple_entrance.ts',
+    base: 'smoothstep(0.72, 1.0, fr)',
+    sites: 1,
+    // smoothstep clamps its interpolant to [0, 1] and returns t * t * (3 - 2t),
+    // a product of non-negative factors, so it is never below zero. The bound
+    // only holds while the edges are ordered literals (GLSL leaves a reversed
+    // or equal pair undefined), so the anchor pins the literal pair at the site.
+    anchor: /pow\(smoothstep\(0\.72, 1\.0, fr\), 2\.0\)/,
+    why: 'the moon-ring pool glow: smoothstep with ordered literal edges is clamped to [0, 1]',
+  },
 ];
 
 /** Every file that currently holds at least one pow(), and how many. Pinned as a
@@ -263,6 +274,17 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/temple_water_shader.ts': 1,
   'src/render/triplanar_maps.ts': 1,
   'src/render/wall_finishes.ts': 1,
+  // the three dungeon entrances' shaft, film, fresnel and flame shaders
+  // (41da06f9a7d, a38282db9f6 and their integration merge 7848da76b21) and the
+  // Studio's per-part material finishes (37a8a730640): every base is a clamp,
+  // max(x, 0.0) or abs(), except the moon-ring pool's smoothstep (a
+  // PROVEN_SAFE_BASES row); the Jaguar Maw flame tongue's 1.0 - v took
+  // max(x, 0.0) (sprite key bumped to v3) and the ghost discharge's collar
+  // Gaussian above took abs(), in the change that listed them here
+  'src/render/drowned_temple_entrance.ts': 8,
+  'src/render/sunken_bastion_entrance.ts': 7,
+  'src/render/wildheart_basin_entrance.ts': 6,
+  'src/render/material_finishes.ts': 1,
 };
 
 // Generated locale bundles are megabytes of prose with no shader in them; a

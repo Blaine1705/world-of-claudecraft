@@ -1797,7 +1797,7 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(rendererSource).toContain('buildFenbridgeTownView(this.sim.cfg.seed)');
     // the rebuilt towns ride one list: mounted, frozen and updated in loops
     expect(rendererSource).toContain(
-      'this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, highwatch];',
+      'this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, ...placed];',
     );
     expect(rendererSource).toContain("setRenderCategory(town.group, 'props')");
     expect(rendererSource.match(/\btown\.update\(/g)).toHaveLength(2);

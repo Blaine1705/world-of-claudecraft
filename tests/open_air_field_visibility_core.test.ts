@@ -324,8 +324,16 @@ describe('open-air field visibility wiring', () => {
     const start = renderer.indexOf('  private budgetFireLights(px: number, pz: number');
     expect(start).toBeGreaterThan(-1);
     const body = statements(renderer.slice(start, renderer.indexOf('\n  private ', start + 1)));
-    expect(body[1]).toBe('this.dungeons?.openAirFields.sync(px, pz);');
-    expect(body[2]).toBe('runFireLightBudgetPass({');
+    // The Studio import (6d81eed7e54) ranks from the editor's free-cam look-at
+    // while the map editor drives the camera; in the game the rank position IS
+    // the player position. Two pure locals, then the sync, then the pass, which
+    // ranks from the same position the roster settled at.
+    expect(body[1]).toBe('const rankX = this.editorCam ? this.cameraLookAt.x : px;');
+    expect(body[2]).toBe('const rankZ = this.editorCam ? this.cameraLookAt.z : pz;');
+    expect(body[3]).toBe('this.dungeons?.openAirFields.sync(rankX, rankZ);');
+    expect(body[4]).toBe('runFireLightBudgetPass({');
+    expect(body).toContain('px: rankX,');
+    expect(body).toContain('pz: rankZ,');
     // Exactly one driver, so the roster is never ruled from two positions.
     const drivers = statements(`${renderer}\n${dungeon}`).filter((line) =>
       line.includes('openAirFields.sync('),

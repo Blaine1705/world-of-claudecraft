@@ -11836,8 +11836,8 @@ export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
 // and reserved 1_000_000_x singleton ids (the Vale Cup groundskeeper, FURY in
 // Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, the
-// Wyrmwatch harbormaster, the Eastbrook vault keeper, the Highwatch manor
-// steward, practice dummies, the Mirefen innkeeper; each id
+// Wyrmwatch harbormaster, the Eastbrook vault keeper, practice dummies, the Mirefen
+// innkeeper; each id
 // is taken ONCE, tests/reserved_singleton_entity_ids.test.ts pins the band). A singleton NPC takes a reserved id AND
 // `dynamic: true` so the generic world-init loop skips it: that loop allocates
 // ids by iterating the merged NPC table in insertion order, so a plain
@@ -12198,6 +12198,11 @@ export interface PromotedScenery {
    *  before Highwatch was rebuilt carries authoredTowns and none of these
    *  placements, so it keeps the town-drawn buildings. */
   highwatchTown?: boolean;
+  /** The painted towns' rebuild BUILDINGS (sim/painted_towns/, every town
+   *  after Highwatch): the town views' building loops, the record colliders
+   *  and the walk-in floors stand down. One family for all of them (they
+   *  arrived together), its own for the vault's reason. */
+  paintedTowns?: boolean;
 }
 
 /** The resolved storage price tables every sim price read consumes: bank slot

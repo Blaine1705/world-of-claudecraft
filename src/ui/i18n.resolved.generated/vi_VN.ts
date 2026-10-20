@@ -25796,11 +25796,6 @@ export const vi_VN: EnTranslations = {
         "title": "Bậc thầy của nhà bào chế thuốc",
         "greeting": "Đo hai lần và đổ một lần, {className}. Người bào chế thuốc không có kiên nhẫn với thuốc thử bị đổ."
       },
-      "steward_ansel_hale": {
-        "name": "Ansel Hale",
-        "title": "Steward of the Manor",
-        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
-      },
       "farmer_jessica": {
         "name": "Nông Dân Jessica",
         "title": "Người Trông Khu Vườn",
