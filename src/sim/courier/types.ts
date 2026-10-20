@@ -23,10 +23,14 @@ export interface CourierState {
   bankerId: number | null;
   /** Legacy pose distance, saturated at eight units for older clients. */
   travelDistance: number;
-  /** Elapsed fixed simulation ticks in this ten-second leg; absent on legacy saves. */
+  /** Elapsed fixed simulation ticks in this leg; absent on legacy saves. */
   travelTicks?: number;
   legStartX?: number;
   legStartZ?: number;
+  /** Route length when the leg started; it alone fixes the leg's duration and speeds. */
+  legDistance?: number;
+  /** Owner facing locked when the return leg starts: the side it lands on. */
+  landingYaw?: number;
   cargo: InvSlot[];
   withdrawals: CourierSelection[];
   revision: number;
@@ -39,7 +43,12 @@ export type CourierBankExchange = (
   withdraw: () => void,
 ) => boolean;
 export interface CourierInfo
-  extends Omit<CourierState, 'retryRemaining' | 'legStartX' | 'legStartZ'> {
+  extends Omit<
+    CourierState,
+    'retryRemaining' | 'legStartX' | 'legStartZ' | 'legDistance' | 'landingYaw'
+  > {
+  /** Total ticks of the current leg (at most fifteen seconds); absent while unplanned. */
+  legTicks?: number;
   /** Current authoritative target distance; zero while grounded or paused. */
   remainingDistance: number;
   active: boolean;
@@ -58,4 +67,5 @@ export type CourierPose = Pick<
   | 'travelDistance'
   | 'remainingDistance'
   | 'travelTicks'
+  | 'legTicks'
 >;

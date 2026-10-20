@@ -219,8 +219,9 @@ describe('membership courier custody', () => {
     expect(f.meta.inventory).toEqual([]);
     expect(f.meta.bank.inventory).toEqual([meat(2)]);
     f.tick(10);
+    // Half a second into the ground run on a short route: still well short of the bank.
     expect(f.meta.courier!.x).toBeGreaterThan(0);
-    expect(f.meta.courier!.x).toBeLessThan(1);
+    expect(f.meta.courier!.x).toBeLessThan(2);
     expect(f.meta.courier!.phase).toBe('outbound');
     f.until(() => f.meta.courier!.phase === 'returning');
     expect(f.meta.bank.inventory).toEqual([food(3)]);

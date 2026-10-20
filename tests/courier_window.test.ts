@@ -121,7 +121,7 @@ describe('courier window', () => {
     expect(deps.dispatch.mock.calls[0][0].withdrawals).toEqual([]);
   });
   it('selects both directions, retains focus and sends one custody request', () => {
-    const { root, deps } = rig();
+    const { root, deps, window } = rig();
     expect(document.activeElement).toBe(root.querySelector('.x-btn'));
     const deposit = root.querySelector<HTMLButtonElement>('[data-courier-side="deposits"]')!;
     deposit.focus();
@@ -132,6 +132,11 @@ describe('courier window', () => {
     expect(deps.dispatch).toHaveBeenCalledTimes(1);
     expect(deps.dispatch.mock.calls[0][0].deposits).toHaveLength(1);
     expect(deps.dispatch.mock.calls[0][0].withdrawals).toHaveLength(1);
+    // A successful send closes the window and hands focus back to the opener.
+    expect(window.isOpen()).toBe(false);
+    expect(root.style.display).toBe('none');
+    expect(deps.restoreFocus).toHaveBeenCalledOnce();
+    expect(deps.onClosed).toHaveBeenCalledOnce();
   });
   it('keeps both storage scroll positions when selecting a stack', () => {
     const { root } = rig();
@@ -157,6 +162,8 @@ describe('courier window', () => {
     info.active = false;
     root.querySelector<HTMLButtonElement>('.courier-send')!.click();
     expect(deps.dispatch).not.toHaveBeenCalled();
+    // A refused send keeps the window open so the player sees why.
+    expect(window.isOpen()).toBe(true);
     info.phase = 'waiting';
     info.cargo = [{ itemId: 'linen_cloth', count: 4 }];
     window.refreshIfChanged();

@@ -181,7 +181,9 @@ export class CourierWindow {
         );
         if (canDispatchCourier(live, this.draft)) {
           this.deps.dispatch(this.draft);
-          this.draft = emptyCourierDraft();
+          // The courier is on its way: get the window out of the player's view.
+          this.close();
+          return;
         }
         this.render(true);
       };

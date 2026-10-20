@@ -10,7 +10,7 @@ export const courierStrings = {
   inventory: 'Inventory',
   bankTitle: 'Bank',
   capacity: '{used} / {capacity} slots',
-  travelTime: '10 seconds each way',
+  travelTime: 'Up to 15 seconds each way',
   cargo: 'Courier inventory',
   empty: 'No items',
   send: 'Send courier',

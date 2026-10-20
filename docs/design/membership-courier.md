@@ -6,17 +6,23 @@ The window shows the existing bank and inventory item grids with the courier
 portrait between them. It selects whole stacks from the character's bags and personal bank.
 Quest items cannot travel. A trip accepts at most 24 selected stacks in total.
 
-Dispatch moves deposits out of the bags into persistent courier custody. The
-courier travels in a straight line to the nearest overworld banker. Each leg takes
-200 simulation ticks (10 seconds), including when the owner moves during the return.
-Speed eases up during the first two seconds, cruises, then eases down during the
-last two seconds. The courier runs at takeoff and landing and flies in between.
+Dispatch moves deposits out of the bags into persistent courier custody and closes
+the courier window. The courier travels in a straight line to the nearest overworld
+banker. Every leg follows one profile: a short ground run, three rising hops, a
+smooth takeoff, a cruise, a descent and a touchdown skid that brakes to a stop.
+The cruise flies at three times run speed, but no leg ever takes longer than
+fifteen seconds (`COURIER_MAX_LEG_SECONDS`): a longer route cruises faster instead.
+`courierLegPlan` derives the duration and speeds from the distance at leg start
+alone, so the deadline holds even when the owner moves during the return.
 At arrival it deposits first, then collects the exact bank stacks requested at
-dispatch, then travels to the owner's current position home. Changes to a requested bank stack invalidate that request;
+dispatch, then flies home and skids to a stop just in front of its owner
+(`courierLandingPoint`). Changes to a requested bank stack invalidate that request;
 the courier never substitutes a different item occupying its old index.
 
 Full banks leave undeposited cargo with the courier for the return trip. Returned
-cargo overflows full bags, then the courier vanishes until summoned again. Transfer helpers
+cargo overflows full bags, then the courier vanishes until summoned again. The
+simulation removes it on the landing tick; the renderer alone plays a short happy
+hop-spin and shrinks it away (skipped under reduced motion). Transfer helpers
 preserve item instances and material provenance and move whole requested stacks.
 Existing journeys finish after membership expires; new dispatches require active
 membership. Logout saves custody and freezes travel. Private instances cannot

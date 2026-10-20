@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
-import { COURIER_LEG_SECONDS } from '../src/sim/courier/motion';
+import { COURIER_MAX_LEG_SECONDS } from '../src/sim/courier/motion';
 import { COURIER_CAPACITY } from '../src/sim/courier/types';
 import { membershipAbilities } from '../src/sim/membership_abilities';
 import type { PlayerClass } from '../src/sim/types';
@@ -20,9 +20,9 @@ describe('membership spell grant', () => {
     },
   );
   it('the spell promise pins the live travel duration and selection limit', () => {
-    expect(COURIER_LEG_SECONDS).toBe(10);
+    expect(COURIER_MAX_LEG_SECONDS).toBe(15);
     expect(ABILITIES.courier.description).toContain(
-      `${COURIER_LEG_SECONDS} seconds to the bank and ${COURIER_LEG_SECONDS} seconds back`,
+      `up to ${COURIER_MAX_LEG_SECONDS} seconds to the bank and up to ${COURIER_MAX_LEG_SECONDS} seconds back`,
     );
     expect(ABILITIES.courier.description).toContain('overflow full bags');
     expect(ABILITIES.courier.description).toContain(`${COURIER_CAPACITY} stacks`);

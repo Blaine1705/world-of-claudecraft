@@ -209,7 +209,7 @@ describe('courier wire validation and owner mirror', () => {
   });
   it.each([
     { travelTicks: -1 },
-    { travelTicks: 201 },
+    { travelTicks: 301 },
     { travelTicks: 1.5 },
     { travelTicks: Infinity },
     { travelTicks: NaN },
@@ -245,7 +245,7 @@ describe('courier wire validation and owner mirror', () => {
   });
   it('round-trips elapsed leg ticks without exposing saved leg anchors or rebuilding heavy data', () => {
     const { sim, set } = host();
-    const value = { ...info(), phase: 'outbound' as const, travelTicks: 77 };
+    const value = { ...info(), phase: 'outbound' as const, travelTicks: 77, legTicks: 260 };
     set(value);
     sim.courierPoseFor = () => ({
       phase: value.phase,
@@ -256,6 +256,7 @@ describe('courier wire validation and owner mirror', () => {
       travelDistance: value.travelDistance,
       remainingDistance: value.remainingDistance,
       travelTicks: value.travelTicks,
+      legTicks: value.legTicks,
     });
     const frame: Record<string, unknown> = {};
     emitCourierSelfKeys(
@@ -269,7 +270,9 @@ describe('courier wire validation and owner mirror', () => {
     applyCourierSelfWire(target, frame);
     expect(target.courierInfo).toEqual(value);
     expect(frame.courierTravelTicks).toBe(77);
+    expect(frame.courierLegTicks).toBe(260);
     expect(frame.courier).not.toHaveProperty('travelTicks');
+    expect(frame.courier).not.toHaveProperty('legTicks');
     const legacyPose = legacyCourierPose(frame.courier);
     expect(legacyPose).toEqual(frame.courier);
     expect(legacyPose).toMatchObject({ phase: 'outbound', x: value.x, z: value.z });
@@ -279,10 +282,12 @@ describe('courier wire validation and owner mirror', () => {
     expect(legacyMirror.phase).toBe('outbound');
     expect(legacyMirror).not.toHaveProperty('travelTicks');
     expect(frame.courierData).not.toHaveProperty('travelTicks');
+    expect(frame.courierData).not.toHaveProperty('legTicks');
+    expect(frame.courierData).not.toHaveProperty('legDistance');
     expect(frame.courierData).not.toHaveProperty('legStartX');
     expect(frame.courierData).not.toHaveProperty('legStartZ');
   });
-  it.each([-1, 201, 0.5, Infinity, NaN, '1', true, {}, []])(
+  it.each([-1, 301, 0.5, Infinity, NaN, '1', true, {}, []])(
     'rejects malformed separate timing scalars without replacing the courier: %j',
     (value) => {
       const target = { courierInfo: { ...info(), travelTicks: 77 } as CourierInfo | null };
@@ -290,12 +295,29 @@ describe('courier wire validation and owner mirror', () => {
       expect(decodeCourierTravelTicks(value)).toBeUndefined();
       applyCourierSelfWire(target, { courierTravelTicks: value });
       expect(target.courierInfo).toBe(before);
+      applyCourierSelfWire(target, { courierLegTicks: value });
+      expect(target.courierInfo).toBe(before);
     },
   );
+  it('rejects a zero-length leg and merges, preserves or clears leg ticks', () => {
+    const target = { courierInfo: info() as CourierInfo | null };
+    const before = target.courierInfo;
+    applyCourierSelfWire(target, { courierLegTicks: 0 });
+    expect(target.courierInfo).toBe(before);
+    for (const ticks of [1, 148, 300]) {
+      applyCourierSelfWire(target, { courierLegTicks: ticks, courierTravelTicks: 0 });
+      expect(target.courierInfo!.legTicks).toBe(ticks);
+    }
+    applyCourierSelfWire(target, { courierTravelTicks: 5 });
+    expect(target.courierInfo!.legTicks).toBe(300);
+    applyCourierSelfWire(target, { courierLegTicks: null });
+    expect(target.courierInfo).not.toHaveProperty('legTicks');
+    expect(target.courierInfo!.travelTicks).toBe(5);
+  });
   it('merges timing-only deltas, preserves omissions and clears only timing on null', () => {
     const target = { courierInfo: info() as CourierInfo | null };
     const cargo = target.courierInfo!.cargo;
-    for (const ticks of [0, 1, 77, 200]) {
+    for (const ticks of [0, 1, 77, 200, 300]) {
       expect(decodeCourierTravelTicks(ticks)).toBe(ticks);
       applyCourierSelfWire(target, { courierTravelTicks: ticks });
       expect(target.courierInfo!.travelTicks).toBe(ticks);

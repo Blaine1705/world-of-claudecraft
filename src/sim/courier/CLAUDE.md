@@ -3,12 +3,14 @@
 The courier owns bounded personal-bank transport state on PlayerMeta. The public
 surface is index.ts. Actions select whole stacks by exact canonical identity;
 they never accept item grants from a client. Flight uses fixed simulation time
-and visits one nearest static banker anchor. Each leg takes exactly 200 simulation ticks (ten seconds), accelerating for the
-first two seconds, cruising, then decelerating for the last two seconds. Ground
-runs bracket takeoff and landing. Saved travelTicks and legStartX/Z preserve the
-remaining duration on reconnect; old saves restart from the saved position. The
-return target follows the current owner without extending its deadline. Death
-and private instances pause return travel. Scalar travelTicks drives flight lift;
+and visits one nearest static banker anchor. courierLegPlan(distance) fixes each
+leg: run, hops, takeoff, cruise, descent and skid, at most 300 ticks (fifteen
+seconds); long routes cruise faster rather than run late. Saved travelTicks,
+legDistance and legStartX/Z preserve the remaining duration on reconnect; old saves
+restart from the saved position. The return target is a point just in front of
+the current owner and follows them without extending its deadline. Death and
+private instances pause return travel. travelTicks plus legTicks (derived, wired
+separately) drive the renderer's hop, lift and skid schedule (courierLegSegmentAt);
 travelDistance remains for older pose readers. No RNG, pathfinding or realm scan.
 
 Cargo is owned inventory in CharacterState. Logout freezes it; expiry prevents

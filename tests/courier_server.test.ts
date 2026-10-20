@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { COURIER_MAX_LEG_TICKS, courierLegPlan } from '../src/sim/courier/motion';
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
@@ -83,7 +84,7 @@ describe('live courier server wiring', () => {
     });
     expect(meta.courier?.phase).toBe('outbound');
     const state = meta.courier!;
-    state.travelTicks = 199;
+    state.travelTicks = courierLegPlan(state.legDistance!).ticks - 1;
     updateCourier(sim.ctx, meta, player);
     expect(state.phase).toBe('returning');
     expect(state.cargo).toEqual([selected]);
@@ -134,14 +135,19 @@ describe('live courier server wiring', () => {
     const heavy = vi.spyOn(sim, 'courierInfoFor');
     const bankMap = vi.spyOn(meta.bank.inventory, 'map');
     const inventoryMap = vi.spyOn(meta.inventory, 'map');
-    for (let tick = 1; tick <= 400; tick++) {
+    const courier = meta.courier!;
+    const arrival = courierLegPlan(courier.legDistance!).ticks;
+    let total = Infinity;
+    for (let tick = 1; tick <= total; tick++) {
       updateCourier(sim.ctx, meta, player);
+      if (tick === arrival) total = arrival + courierLegPlan(courier.legDistance!).ticks;
       broadcast(server);
-      if (tick === 200) bankMap.mockClear();
+      if (tick === arrival) bankMap.mockClear();
       else expect(bankMap).not.toHaveBeenCalled();
-      if (tick !== 200)
-        expect(lastSnap(socket.sent).self.courierData).toBe(tick === 400 ? null : undefined);
-      expect(heavy).toHaveBeenCalledTimes(tick >= 200 ? 1 : 0);
+      if (tick !== arrival)
+        expect(lastSnap(socket.sent).self.courierData).toBe(tick === total ? null : undefined);
+      expect(heavy).toHaveBeenCalledTimes(tick >= arrival ? 1 : 0);
+      expect(tick).toBeLessThanOrEqual(2 * COURIER_MAX_LEG_TICKS);
     }
     expect(bankMap).not.toHaveBeenCalled();
     // The ordinary inventory snapshot rebuilds once for the delivery mutation.
@@ -230,7 +236,7 @@ describe('live courier server wiring', () => {
     );
     expect(heavyRead).not.toHaveBeenCalled();
     const state = meta.courier!;
-    state.travelTicks = 199;
+    state.travelTicks = courierLegPlan(state.legDistance!).ticks - 1;
     updateCourier(sim.ctx, meta, player);
     expect(state.phase).toBe('returning');
     expect(state.cargo).toEqual([]);

@@ -79,12 +79,14 @@ export function emitCourierSelfKeys(
   // Older clients strictly validate the original pose keys. Publish timing as
   // a separate self delta, which they ignore, while retaining the legacy pose.
   if (pose) {
-    const { travelTicks, ...legacyPose } = pose;
+    const { travelTicks, legTicks, ...legacyPose } = pose;
     emit('courier', legacyPose);
     emit('courierTravelTicks', travelTicks ?? null);
+    emit('courierLegTicks', legTicks ?? null);
   } else {
     emit('courier', null);
     emit('courierTravelTicks', null);
+    emit('courierLegTicks', null);
   }
   const revision = sim.courierWireRevisionFor(session.pid);
   if (session.lastSent.courierData === undefined || revision !== session.lastCourierWireRevision) {
@@ -99,6 +101,7 @@ export function emitCourierSelfKeys(
         inventoryRevision: _inventoryRevision,
         travelDistance: _travelDistance,
         travelTicks: _travelTicks,
+        legTicks: _legTicks,
         remainingDistance: _remainingDistance,
         ...data
       } = info;

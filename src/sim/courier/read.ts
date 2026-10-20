@@ -4,6 +4,7 @@ import { membershipActive } from '../membership';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot } from '../types';
+import { courierLandingPoint, courierLegTicks } from './motion';
 import type { CourierInfo, CourierPose, CourierState } from './types';
 
 // Derived read cache only. PlayerMeta owns all authoritative state and weak keys
@@ -24,7 +25,11 @@ function remainingDistance(ctx: SimContext, pid: number, state: CourierState): n
     (state.phase === 'outbound' && target.kind !== 'npc')
   )
     return 0;
-  return Math.hypot(target.pos.x - state.x, target.pos.z - state.z);
+  const end =
+    state.phase === 'returning'
+      ? courierLandingPoint(target.pos, state.landingYaw ?? target.facing)
+      : target.pos;
+  return Math.hypot(end.x - state.x, end.z - state.z);
 }
 
 export function courierPoseFor(ctx: SimContext, pid: number): CourierPose | null {
@@ -38,6 +43,7 @@ export function courierPoseFor(ctx: SimContext, pid: number): CourierPose | null
         bankerId: state.bankerId,
         travelDistance: state.travelDistance,
         travelTicks: state.travelTicks,
+        legTicks: courierLegTicks(state),
         remainingDistance: remainingDistance(ctx, pid, state),
         inventoryRevision: meta.wireRev,
       }
@@ -62,6 +68,7 @@ export function courierInfoFor(ctx: SimContext, pid: number): CourierInfo | null
     cached.info.inventoryRevision = meta.wireRev;
     cached.info.travelDistance = state.travelDistance;
     cached.info.travelTicks = state.travelTicks;
+    cached.info.legTicks = courierLegTicks(state);
     cached.info.remainingDistance = remainingDistance(ctx, pid, state);
     return cached.info;
   }

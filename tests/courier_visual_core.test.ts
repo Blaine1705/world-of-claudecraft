@@ -1,9 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { courierFacing, courierVisualPoseInto } from '../src/render/courier_visual_core';
+import {
+  COURIER_FAREWELL_SECONDS,
+  COURIER_FLIGHT_LIFT,
+  COURIER_HOP_HEIGHTS,
+  COURIER_SPIN_SECONDS,
+  type CourierFarewellPose,
+  type CourierVisualPose,
+  courierDelivered,
+  courierFacing,
+  courierFarewellPoseInto,
+  courierVisualPoseInto,
+} from '../src/render/courier_visual_core';
+
+const pose = (): CourierVisualPose => ({ lift: 0, flight: 0, moving: false, pitch: 0, stride: 1 });
 
 describe('courier visual presentation', () => {
-  it('runs before takeoff and after landing on both journey legs', () => {
-    const out = { lift: 0, flight: 0, moving: false };
+  it('runs before takeoff and after landing for a legacy distance-only server', () => {
+    const out = pose();
     for (const phase of ['outbound', 'returning'] as const) {
       for (const [travelDistance, remainingDistance, lift] of [
         [0, 30, 0],
@@ -18,64 +31,97 @@ describe('courier visual presentation', () => {
         expect(out.moving).toBe(true);
       }
     }
-  });
-  it('keeps short trips grounded and has no local elapsed-time flight guess', () => {
-    const out = { lift: 2, flight: 1, moving: true };
-    for (let travelled = 0; travelled <= 6; travelled++) {
-      courierVisualPoseInto(
-        out,
-        {
-          phase: 'outbound',
-          x: 0,
-          z: 0,
-          travelDistance: travelled,
-          remainingDistance: 6 - travelled,
-        },
-        false,
-      );
-      expect(out.lift).toBe(0);
-    }
     courierVisualPoseInto(out, { phase: 'returning', x: 0, z: 0 }, false);
-    expect(out).toEqual({ lift: 0, flight: 0, moving: false });
+    expect(out).toEqual({ lift: 0, flight: 0, moving: false, pitch: 0, stride: 1 });
   });
   it('idles on the ground while ready or waiting, but runs when following its owner', () => {
-    const out = { lift: 2, flight: 1, moving: true };
+    const out = { lift: 2, flight: 1, moving: true, pitch: 1, stride: 0 };
     for (const phase of ['ready', 'waiting'] as const) {
       courierVisualPoseInto(
         out,
-        { phase, x: 0, z: 0, travelDistance: 8, remainingDistance: 50 },
+        { phase, x: 0, z: 0, travelTicks: 100, legTicks: 300, remainingDistance: 50 },
         false,
       );
-      expect(out).toEqual({ lift: 0, flight: 0, moving: false });
+      expect(out).toEqual({ lift: 0, flight: 0, moving: false, pitch: 0, stride: 1 });
       courierVisualPoseInto(out, { phase, x: 0, z: 0 }, true);
-      expect(out).toEqual({ lift: 0, flight: 0, moving: true });
+      expect(out.moving).toBe(true);
     }
   });
-  it('uses authoritative elapsed ticks for takeoff on short and long routes', () => {
-    const out = { lift: 0, flight: 0, moving: false };
-    for (const phase of ['outbound', 'returning'] as const) {
-      for (const remainingDistance of [0.001, 10000]) {
-        for (const [travelTicks, lift] of [
-          [0, 0],
-          [12, 0],
-          [26, 1],
-          [40, 2],
-          [160, 2],
-          [174, 1],
-          [188, 0],
-          [200, 0],
-        ]) {
-          courierVisualPoseInto(out, { phase, x: 0, z: 0, travelTicks, remainingDistance }, false);
-          expect(out.lift).toBeCloseTo(lift);
-        }
-      }
-    }
+  it('runs, hops three rising arcs, takes off, cruises, descends and skids from leg ticks', () => {
+    const out = pose();
+    const at = (travelTicks: number, legTicks = 300) => {
+      courierVisualPoseInto(
+        out,
+        { phase: 'outbound', x: 0, z: 0, travelTicks, legTicks, remainingDistance: 40 },
+        false,
+      );
+      return { ...out };
+    };
+    expect(at(8)).toMatchObject({ lift: 0, flight: 0, moving: true });
+    // Each hop peaks halfway through its 0.4 seconds (8 ticks), each higher than the last.
+    const peaks = [20, 28, 36].map((ticks) => at(ticks).lift);
+    for (const [hop, lift] of peaks.entries())
+      expect(lift).toBeCloseTo(COURIER_HOP_HEIGHTS[hop], 9);
+    expect(peaks[1]).toBeGreaterThan(peaks[0]);
+    expect(peaks[2]).toBeGreaterThan(peaks[1]);
+    for (const ticks of [16, 24, 32]) expect(at(ticks).lift).toBe(0);
+    expect(at(18).pitch).toBeGreaterThan(0);
+    expect(at(40)).toMatchObject({ lift: 0, flight: 0 });
+    expect(at(52).flight).toBeCloseTo(0.5, 9);
+    expect(at(64)).toMatchObject({ lift: COURIER_FLIGHT_LIFT, flight: 1, pitch: 0 });
+    expect(at(200)).toMatchObject({ lift: COURIER_FLIGHT_LIFT, flight: 1 });
+    expect(at(276).flight).toBeCloseTo(0.5, 9);
+    // Skid: grounded, nose up, legs slowing to a stop.
+    const touchdown = at(289);
+    expect(touchdown).toMatchObject({ lift: 0, flight: 0, moving: true });
+    expect(touchdown.pitch).toBeGreaterThan(0.2);
+    expect(touchdown.stride).toBeGreaterThan(at(298).stride);
+    expect(at(298).pitch).toBeLessThan(touchdown.pitch);
+    // The same schedule fits a short five-second leg: the skid always ends it.
+    expect(at(95, 100)).toMatchObject({ lift: 0, flight: 0 });
+    expect(at(64, 100).flight).toBeGreaterThan(0);
+  });
+  it('rests grounded while a leg is paused, and falls back to legacy ten-second legs', () => {
+    const out = pose();
     courierVisualPoseInto(
       out,
-      { phase: 'returning', x: 0, z: 0, travelTicks: 100, remainingDistance: 0 },
+      { phase: 'returning', x: 0, z: 0, travelTicks: 100, legTicks: 300, remainingDistance: 0 },
       false,
     );
-    expect(out.lift).toBe(0);
+    expect(out).toEqual({ lift: 0, flight: 0, moving: false, pitch: 0, stride: 1 });
+    courierVisualPoseInto(
+      out,
+      { phase: 'returning', x: 0, z: 0, travelTicks: 100, remainingDistance: 30 },
+      false,
+    );
+    expect(out.lift).toBe(COURIER_FLIGHT_LIFT);
+  });
+  it('spins once with a hop after delivery, then shrinks away', () => {
+    const out: CourierFarewellPose = { spin: 0, lift: 0, scale: 1, done: false };
+    courierFarewellPoseInto(out, 0);
+    expect(out).toEqual({ spin: 0, lift: 0, scale: 1, done: false });
+    courierFarewellPoseInto(out, COURIER_SPIN_SECONDS / 2);
+    expect(out.spin).toBeCloseTo(Math.PI, 9);
+    expect(out.lift).toBeGreaterThan(0.4);
+    courierFarewellPoseInto(out, COURIER_SPIN_SECONDS);
+    expect(out.spin).toBeCloseTo(2 * Math.PI, 9);
+    expect(out.scale).toBe(1);
+    courierFarewellPoseInto(out, (COURIER_SPIN_SECONDS + COURIER_FAREWELL_SECONDS) / 2);
+    expect(out.scale).toBeGreaterThan(0);
+    expect(out.scale).toBeLessThan(1);
+    expect(out.done).toBe(false);
+    courierFarewellPoseInto(out, COURIER_FAREWELL_SECONDS);
+    expect(out).toMatchObject({ scale: 0, done: true });
+  });
+  it('treats a vanished courier as delivered only after the return skid', () => {
+    const base = { phase: 'returning' as const, x: 0, z: 0, legTicks: 300 };
+    expect(courierDelivered({ ...base, travelTicks: 299 })).toBe(true);
+    expect(courierDelivered({ ...base, travelTicks: 290 })).toBe(true);
+    expect(courierDelivered({ ...base, travelTicks: 200 })).toBe(false);
+    expect(courierDelivered({ ...base, phase: 'outbound', travelTicks: 299 })).toBe(false);
+    expect(courierDelivered({ ...base, phase: 'ready', travelTicks: 299 })).toBe(false);
+    expect(courierDelivered({ phase: 'returning', x: 0, z: 0, travelTicks: 299 })).toBe(false);
+    expect(courierDelivered(null)).toBe(false);
   });
   it('faces observed movement and holds facing when stationary', () => {
     expect(courierFacing(0, 0, 1, 0, 0)).toBe(Math.PI / 2);

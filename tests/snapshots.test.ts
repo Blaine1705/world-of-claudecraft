@@ -5707,6 +5707,7 @@ const ALL_DELTA_KEYS = [
   'cosmetics',
   'courier',
   'courierData',
+  'courierLegTicks',
   'courierTravelTicks',
   'cprof',
   'crat',
@@ -5851,6 +5852,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   cosmetics: 'accountCosmetics',
   courier: 'courierInfo',
   courierData: 'courierInfo',
+  courierLegTicks: 'courierInfo',
   courierTravelTicks: 'courierInfo',
   cprof: 'craftingIdentity',
   crat: 'critRating',
@@ -6012,6 +6014,10 @@ function dirtyEveryDeltaField(): {
   meta.courier = {
     phase: 'returning',
     travelTicks: 77,
+    // A long route caps the leg at fifteen seconds (300 ticks).
+    legDistance: 10000,
+    legStartX: 0,
+    legStartZ: 0,
     travelDistance: 8,
     x: 17,
     z: 29,
@@ -7092,13 +7098,17 @@ describe('full self-state snapshot delta fixture', () => {
       revision: 7,
     });
     expect(initial.self.courierTravelTicks).toBe(77);
+    expect(initial.self.courierLegTicks).toBe(300);
     expect(initial.self.courierData).not.toHaveProperty('x');
     expect(initial.self.courierData).not.toHaveProperty('travelDistance');
     expect(initial.self.courierData).not.toHaveProperty('remainingDistance');
     expect(
       initial.ents.every(
         (entry: Record<string, unknown>) =>
-          !('courier' in entry) && !('courierData' in entry) && !('courierTravelTicks' in entry),
+          !('courier' in entry) &&
+          !('courierData' in entry) &&
+          !('courierTravelTicks' in entry) &&
+          !('courierLegTicks' in entry),
       ),
     ).toBe(true);
     (client as any).applySnapshot(initial);
@@ -7123,6 +7133,7 @@ describe('full self-state snapshot delta fixture', () => {
     (client as any).applySnapshot(moved);
     expect(client.courierInfo!.x).toBe(41);
     expect(client.courierInfo!.travelTicks).toBe(78);
+    expect(client.courierInfo!.legTicks).toBe(300);
     expect(client.courierInfo!.cargo).toBe(cargo);
     meta.courier = undefined;
     fc.sent.length = 0;
@@ -7131,6 +7142,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(ended.self.courier).toBeNull();
     expect(ended.self.courierData).toBeNull();
     expect(ended.self.courierTravelTicks).toBeNull();
+    expect(ended.self.courierLegTicks).toBeNull();
     (client as any).applySnapshot(ended);
     expect(client.courierInfo).toBeNull();
   });
@@ -7246,7 +7258,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 117 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 118 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
@@ -7305,8 +7317,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // shared crit core scb (server/self_scalar_wire.ts), at the third
     // release/v0.44.0 base merge, for 111.
     // Courier adds its small pose and separately revision-gated custody data.
-    expect(ALL_DELTA_KEYS).toHaveLength(117);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(117);
+    expect(ALL_DELTA_KEYS).toHaveLength(118);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(118);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7431,6 +7443,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('courier')).toBe(true);
     expect(scraped.has('courierData')).toBe(true);
     expect(scraped.has('courierTravelTicks')).toBe(true);
+    expect(scraped.has('courierLegTicks')).toBe(true);
     // ...and the narrowing really narrows. A member `emit` is not a delta call,
     // and asserting it on a synthetic source keeps the claim honest even while
     // neither emitter file happens to contain one.
@@ -7479,7 +7492,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(117);
+    expect(scraped.size).toBe(118);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7560,6 +7573,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       fplot: 'myFarmPlots',
       courier: 'courierInfo',
       courierData: 'courierInfo',
+      courierLegTicks: 'courierInfo',
       courierTravelTicks: 'courierInfo',
     };
     for (const [terse, iworld] of Object.entries(required)) {

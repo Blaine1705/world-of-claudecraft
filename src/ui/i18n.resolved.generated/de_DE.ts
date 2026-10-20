@@ -359,7 +359,7 @@ export const de_DE: EnTranslations = {
       "inventory": "Inventory",
       "bankTitle": "Bank",
       "capacity": "{used} / {capacity} slots",
-      "travelTime": "10 seconds each way",
+      "travelTime": "Up to 15 seconds each way",
       "cargo": "Courier inventory",
       "empty": "No items",
       "send": "Send courier",
@@ -13154,7 +13154,7 @@ export const de_DE: EnTranslations = {
     "abilities": {
       "courier": {
         "name": "Courier",
-        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. Each journey takes 10 seconds to the bank and 10 seconds back. Choose up to 24 stacks per trip. Returned items overflow full bags, then the courier vanishes until summoned again. Return travel pauses while you are dead or inside an instance. Membership is required to start a new trip."
+        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. Each journey takes up to 15 seconds to the bank and up to 15 seconds back, flying faster on longer routes. Choose up to 24 stacks per trip. Returned items overflow full bags, then the courier vanishes until summoned again. Return travel pauses while you are dead or inside an instance. Membership is required to start a new trip."
       },
       "sport_kick": {
         "name": "Tritt",

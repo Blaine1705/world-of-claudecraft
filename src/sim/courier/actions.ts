@@ -96,7 +96,9 @@ export function courierDispatch(
   state.x = e.pos.x;
   state.z = e.pos.z;
   state.phase = 'outbound';
-  startCourierLeg(state);
+  const banker = ctx.entities.get(bankerId)!;
+  startCourierLeg(state, banker.pos.x, banker.pos.z);
+  delete state.landingYaw;
   state.retryRemaining = 0;
   state.revision++;
   ctx.onInventoryChangedForQuests(meta);
