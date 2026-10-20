@@ -124,10 +124,13 @@ describe('courier capped-duration flight and grounded endpoints', () => {
     for (const distance of [1000, 5000, 100000]) {
       const plan = courierLegPlan(distance);
       expect(plan.ticks).toBe(COURIER_MAX_LEG_TICKS);
-      expect(plan.cruiseSpeed).toBeGreaterThan(COURIER_CRUISE_SPEED);
+      // Takeoff and descent keep natural speed; only the airborne cruise is boosted.
+      expect(plan.cruiseSpeed).toBe(COURIER_CRUISE_SPEED);
+      expect(plan.boostSpeed).toBeGreaterThan(COURIER_CRUISE_SPEED);
       expect(courierLegProgress(plan, COURIER_MAX_LEG_TICKS)).toBe(1);
     }
-    expect(courierLegPlan(5000).cruiseSpeed).toBeGreaterThan(courierLegPlan(1000).cruiseSpeed);
+    expect(courierLegPlan(5000).boostSpeed).toBeGreaterThan(courierLegPlan(1000).boostSpeed);
+    expect(short.boostSpeed).toBe(short.cruiseSpeed);
     // Durations never shrink as routes grow.
     let previous = 0;
     for (let distance = 0; distance <= 1000; distance += 5) {
@@ -147,8 +150,10 @@ describe('courier capped-duration flight and grounded endpoints', () => {
     for (let i = 1; i < 40; i++) expect(steps[i]).toBeCloseTo(steps[0], 12);
     // Takeoff: 1.2 seconds of acceleration.
     for (let i = 41; i < 64; i++) expect(steps[i]).toBeGreaterThan(steps[i - 1]);
-    // Cruise holds its speed until the descent.
-    for (let i = 65; i < 264; i++) expect(steps[i]).toBeCloseTo(steps[64], 12);
+    // Airborne: one second easing into the boost, a steady boost, one second easing out.
+    for (let i = 65; i < 84; i++) expect(steps[i]).toBeGreaterThan(steps[i - 1]);
+    for (let i = 85; i < 244; i++) expect(steps[i]).toBeCloseTo(steps[84], 12);
+    for (let i = 245; i < 264; i++) expect(steps[i]).toBeLessThan(steps[i - 1]);
     // Descent then skid only ever slow down, ending nearly stationary.
     for (let i = 265; i < 300; i++) expect(steps[i]).toBeLessThan(steps[i - 1]);
     expect(steps[299]).toBeLessThan(steps[0] / 10);
@@ -165,6 +170,23 @@ describe('courier capped-duration flight and grounded endpoints', () => {
     expect(at(288)).toMatchObject({ segment: 'skid', u: 0 });
     expect(at(287).segment).toBe('descent');
     expect(at(300)).toMatchObject({ segment: 'skid', u: 1 });
+  });
+
+  it('applies the fifteen-second boost only while fully airborne', () => {
+    for (const distance of [400, 2000, 100000]) {
+      const plan = courierLegPlan(distance);
+      const total = distance;
+      // Yards per tick at the natural flight speed, with a hair of float slack.
+      const natural = COURIER_CRUISE_SPEED * DT * (1 + 1e-9);
+      for (let i = 0; i < plan.ticks; i++) {
+        const step = (courierLegProgress(plan, i + 1) - courierLegProgress(plan, i)) * total;
+        const { segment } = courierLegSegmentAt(i, plan.ticks);
+        if (segment === 'cruise') continue;
+        expect(step).toBeLessThanOrEqual(natural);
+        if (segment === 'run' || segment === 'hop')
+          expect(step).toBeCloseTo(COURIER_GROUND_SPEED * DT, 9);
+      }
+    }
   });
 
   it('chooses the closest bank once and lands in front of a moving owner on its final tick', () => {

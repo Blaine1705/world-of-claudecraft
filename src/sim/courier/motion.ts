@@ -49,12 +49,19 @@ export interface CourierLegPlan {
   ticks: number;
   cruiseSeconds: number;
   groundSpeed: number;
+  /** Speed the takeoff climbs to and the descent starts from. */
   cruiseSpeed: number;
+  /** Fully airborne top speed; above cruiseSpeed only on routes held to the cap. */
+  boostSpeed: number;
 }
 
+/** Seconds of the cruise spent easing into and out of a capped route's boost. */
+export const COURIER_BOOST_RAMP_SECONDS = 1;
+
 /** Run, hops, takeoff, cruise, descent and skid. The cruise stretches at natural
- * speed until the leg would exceed fifteen seconds, then speeds up instead.
- * Routes too short for a full-speed profile slow every segment uniformly. */
+ * speed until the leg would exceed fifteen seconds; then only the fully airborne
+ * cruise speeds up, so running, hopping, takeoff, descent and skid look the same
+ * on every route. Routes too short for a full-speed profile slow every segment. */
 export function courierLegPlan(distance: number): CourierLegPlan {
   const d = Math.max(0, distance);
   const fixedArea = COURIER_TAKEOFF_SECONDS / 2 + COURIER_DESCENT_SECONDS / 2;
@@ -71,16 +78,50 @@ export function courierLegPlan(distance: number): CourierLegPlan {
   );
   const ticks = Math.min(COURIER_MAX_LEG_TICKS, Math.round((FIXED_SECONDS + natural) / DT));
   const cruiseSeconds = Math.max(0, ticks * DT - FIXED_SECONDS);
+  if (ticks === COURIER_MAX_LEG_TICKS) {
+    // Takeoff and descent keep natural speed; the airborne boost covers the rest.
+    const ramp = Math.min(COURIER_BOOST_RAMP_SECONDS, cruiseSeconds / 2);
+    const extra = d - groundShare - COURIER_CRUISE_SPEED * (fixedArea + cruiseSeconds);
+    return {
+      ticks,
+      cruiseSeconds,
+      groundSpeed: COURIER_GROUND_SPEED,
+      cruiseSpeed: COURIER_CRUISE_SPEED,
+      boostSpeed: COURIER_CRUISE_SPEED + extra / (cruiseSeconds - ramp),
+    };
+  }
+  // Tick rounding nudges the natural speed by a fraction of a percent.
   const cruiseSpeed = (d - groundShare) / (fixedArea + cruiseSeconds);
   if (cruiseSpeed >= COURIER_GROUND_SPEED)
-    return { ticks, cruiseSeconds, groundSpeed: COURIER_GROUND_SPEED, cruiseSpeed };
+    return {
+      ticks,
+      cruiseSeconds,
+      groundSpeed: COURIER_GROUND_SPEED,
+      cruiseSpeed,
+      boostSpeed: cruiseSpeed,
+    };
   const scale = d / (groundShare + COURIER_GROUND_SPEED * fixedArea);
   return {
     ticks,
     cruiseSeconds: 0,
     groundSpeed: COURIER_GROUND_SPEED * scale,
     cruiseSpeed: COURIER_GROUND_SPEED * scale,
+    boostSpeed: COURIER_GROUND_SPEED * scale,
   };
+}
+
+/** Distance covered `t` seconds into the cruise: natural speed plus the eased boost. */
+function cruiseDistance(plan: CourierLegPlan, t: number): number {
+  const total = plan.cruiseSeconds;
+  const ramp = Math.min(COURIER_BOOST_RAMP_SECONDS, total / 2);
+  let boosted = 0;
+  if (ramp > 0) {
+    boosted = ramp * smoothstepArea(Math.min(t, ramp) / ramp);
+    boosted += Math.max(0, Math.min(t, total - ramp) - ramp);
+    const down = t - (total - ramp);
+    if (down > 0) boosted += down - ramp * smoothstepArea(down / ramp);
+  }
+  return plan.cruiseSpeed * t + (plan.boostSpeed - plan.cruiseSpeed) * boosted;
 }
 
 /** Distance covered after `seconds` along a plan (piecewise exact integral). */
@@ -97,7 +138,7 @@ function courierLegDistance(plan: CourierLegPlan, seconds: number): number {
     (vc - vg) * COURIER_TAKEOFF_SECONDS * smoothstepArea(takeoff / COURIER_TAKEOFF_SECONDS);
   t -= COURIER_TAKEOFF_SECONDS;
   if (t <= 0) return s;
-  s += vc * Math.min(t, plan.cruiseSeconds);
+  s += cruiseDistance(plan, Math.min(t, plan.cruiseSeconds));
   t -= plan.cruiseSeconds;
   if (t <= 0) return s;
   const descent = Math.min(t, COURIER_DESCENT_SECONDS);

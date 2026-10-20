@@ -12,6 +12,8 @@ banker. Every leg follows one profile: a short ground run, three rising hops, a
 smooth takeoff, a cruise, a descent and a touchdown skid that brakes to a stop.
 The cruise flies at three times run speed, but no leg ever takes longer than
 fifteen seconds (`COURIER_MAX_LEG_SECONDS`): a longer route cruises faster instead.
+That extra speed applies only while fully airborne, easing in and out over one
+second of the cruise; the run, hops, takeoff, descent and skid keep their normal speeds.
 `courierLegPlan` derives the duration and speeds from the distance at leg start
 alone, so the deadline holds even when the owner moves during the return.
 At arrival it deposits first, then collects the exact bank stacks requested at
