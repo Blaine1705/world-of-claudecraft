@@ -15,8 +15,8 @@
     "cancelCast fishing arm via dealDamage (FISHING_CAST_ID, not pushback)",
     "multi-class casters: mage/priest/warlock"
   ],
-  "draws": 2011,
-  "drawDigest": "8bdcf55c",
+  "draws": 2007,
+  "drawDigest": "4ad70b98",
   "frames": [
     {
       "tick": 0,
@@ -1539,8 +1539,8 @@
       "state": "ddd8d231",
       "events": "f6ede179",
       "rng": {
-        "draws": 1644,
-        "digest": "cbba3ba3"
+        "draws": 1643,
+        "digest": "864822e1"
       }
     },
     {
@@ -2137,8 +2137,8 @@
       "state": "edec7f34",
       "events": "26d29560",
       "rng": {
-        "draws": 1778,
-        "digest": "aaeb039f"
+        "draws": 1775,
+        "digest": "cfb63ba3"
       }
     },
     {
@@ -2148,8 +2148,8 @@
       "state": "3becdcc2",
       "events": "9d27e0d7",
       "rng": {
-        "draws": 1803,
-        "digest": "91ed09c9"
+        "draws": 1802,
+        "digest": "9e1c83ae"
       }
     },
     {
@@ -2159,8 +2159,8 @@
       "state": "639435b4",
       "events": "741638a5",
       "rng": {
-        "draws": 1839,
-        "digest": "4fc44804"
+        "draws": 1840,
+        "digest": "4cdaf135"
       }
     },
     {
@@ -2170,8 +2170,8 @@
       "state": "caf8591a",
       "events": "741638a5",
       "rng": {
-        "draws": 1882,
-        "digest": "d9fa9df3"
+        "draws": 1879,
+        "digest": "51949233"
       }
     },
     {
@@ -2181,8 +2181,8 @@
       "state": "819d116e",
       "events": "aef40fc0",
       "rng": {
-        "draws": 1907,
-        "digest": "63fb5293"
+        "draws": 1905,
+        "digest": "c1fe2546"
       },
       "label": "warlock-channel-pushback",
       "players": [
@@ -2764,8 +2764,8 @@
       "state": "f7818047",
       "events": "741638a5",
       "rng": {
-        "draws": 1928,
-        "digest": "78fcf301"
+        "draws": 1924,
+        "digest": "0a6c074a"
       }
     },
     {
@@ -2775,8 +2775,8 @@
       "state": "ed556d0b",
       "events": "98e65e44",
       "rng": {
-        "draws": 1965,
-        "digest": "6aaa6f51"
+        "draws": 1961,
+        "digest": "0c9db1d5"
       }
     },
     {
@@ -2786,8 +2786,8 @@
       "state": "352dc3a9",
       "events": "032f06ca",
       "rng": {
-        "draws": 1973,
-        "digest": "d228fe5d"
+        "draws": 1968,
+        "digest": "506fa52a"
       },
       "label": "warlock-fishing-cancel",
       "players": [
@@ -3362,8 +3362,8 @@
       "state": "cf2b2d5b",
       "events": "741638a5",
       "rng": {
-        "draws": 2009,
-        "digest": "95bb47ef"
+        "draws": 2004,
+        "digest": "dc78fd5b"
       }
     },
     {
@@ -3373,8 +3373,8 @@
       "state": "a2d8b251",
       "events": "741638a5",
       "rng": {
-        "draws": 2011,
-        "digest": "8bdcf55c"
+        "draws": 2007,
+        "digest": "4ad70b98"
       },
       "label": "final",
       "players": [

@@ -8,8 +8,8 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 1708,
-  "drawDigest": "07737b32",
+  "draws": 1697,
+  "drawDigest": "aee501bc",
   "frames": [
     {
       "tick": 0,
@@ -259,33 +259,33 @@
       "tick": 180,
       "time": 9,
       "nextId": 1013,
-      "state": "f544971d",
-      "events": "56719e10",
+      "state": "e2d98e9e",
+      "events": "3262094d",
       "rng": {
-        "draws": 1437,
-        "digest": "287ba2d4"
+        "draws": 1431,
+        "digest": "9fb6d4ce"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 1013,
-      "state": "c74b5254",
+      "state": "f3fb66f3",
       "events": "741638a5",
       "rng": {
-        "draws": 1704,
-        "digest": "a2917e96"
+        "draws": 1695,
+        "digest": "94059856"
       }
     },
     {
       "tick": 201,
       "time": 10.05,
       "nextId": 1013,
-      "state": "b13328bd",
+      "state": "03e02a92",
       "events": "741638a5",
       "rng": {
-        "draws": 1708,
-        "digest": "07737b32"
+        "draws": 1697,
+        "digest": "aee501bc"
       },
       "label": "final",
       "players": [
@@ -317,7 +317,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 237,
-            "damageTaken": 27
+            "damageTaken": 20
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -422,7 +422,7 @@
           "attackPower": 120,
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "cooldowns": [
             [
@@ -436,7 +436,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 10,
           "healPower": 16,
-          "hp": 49973,
+          "hp": 49980,
           "id": 1004,
           "inCombat": true,
           "kind": "player",
@@ -486,7 +486,7 @@
           "aggroTargetId": 1004,
           "aiState": "attack",
           "autoAttack": true,
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

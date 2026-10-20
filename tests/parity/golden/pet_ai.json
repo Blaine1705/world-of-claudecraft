@@ -10,8 +10,8 @@
     "updatePet melee arm: close + auto-taunt + mobSwing (PET_COMBAT_LINGER owner inCombat)",
     "petFollow heel transition (pets return to a moved owner)"
   ],
-  "draws": 1450,
-  "drawDigest": "1f6fd4ad",
+  "draws": 1453,
+  "drawDigest": "6924ff0e",
   "frames": [
     {
       "tick": 0,
@@ -199,41 +199,41 @@
       "state": "7e892a3e",
       "events": "741638a5",
       "rng": {
-        "draws": 359,
-        "digest": "a84c0c6e"
+        "draws": 358,
+        "digest": "1bd684b9"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 1016,
-      "state": "6a831ee8",
-      "events": "798eb77f",
+      "state": "8e3f7acc",
+      "events": "851d627c",
       "rng": {
-        "draws": 552,
-        "digest": "c15240f7"
+        "draws": 547,
+        "digest": "7011a4eb"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 1016,
-      "state": "0ccd884d",
+      "state": "6e456475",
       "events": "741638a5",
       "rng": {
-        "draws": 744,
-        "digest": "8b6de02b"
+        "draws": 740,
+        "digest": "7919c44f"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 1016,
-      "state": "2a1df90e",
+      "state": "a4d24cbc",
       "events": "741638a5",
       "rng": {
-        "draws": 744,
-        "digest": "8b6de02b"
+        "draws": 740,
+        "digest": "7919c44f"
       },
       "label": "heel",
       "players": [
@@ -450,7 +450,7 @@
           "fallStartY": -9.3,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49943,
+          "hp": 49940,
           "id": 1013,
           "inCombat": true,
           "kind": "mob",
@@ -486,7 +486,7 @@
           "threat": [
             [
               1012,
-              58
+              61
             ]
           ],
           "wanderTarget": {
@@ -512,7 +512,7 @@
           "facing": -1.570796,
           "fallStartY": 13.618492,
           "fiveSecondRule": 99,
-          "hp": 337,
+          "hp": 348,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
@@ -552,7 +552,7 @@
           "aggroTargetId": 1014,
           "aiState": "attack",
           "autoAttack": true,
-          "combatTimer": 1.6,
+          "combatTimer": 1.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -618,44 +618,44 @@
       "tick": 140,
       "time": 7,
       "nextId": 1016,
-      "state": "26048001",
+      "state": "57360755",
       "events": "741638a5",
       "rng": {
-        "draws": 970,
-        "digest": "24f3984a"
+        "draws": 957,
+        "digest": "defa0017"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 1016,
-      "state": "b6f120e2",
+      "state": "3415ca8e",
       "events": "741638a5",
       "rng": {
-        "draws": 1189,
-        "digest": "4153ff28"
+        "draws": 1186,
+        "digest": "74402c2b"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1016,
-      "state": "4df384e1",
+      "state": "2cd0c447",
       "events": "741638a5",
       "rng": {
-        "draws": 1450,
-        "digest": "1f6fd4ad"
+        "draws": 1453,
+        "digest": "6924ff0e"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1016,
-      "state": "4df384e1",
+      "state": "2cd0c447",
       "events": "741638a5",
       "rng": {
-        "draws": 1450,
-        "digest": "1f6fd4ad"
+        "draws": 1453,
+        "digest": "6924ff0e"
       },
       "label": "final",
       "players": [
@@ -867,7 +867,7 @@
           "fallStartY": -9.3,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49943,
+          "hp": 49940,
           "id": 1013,
           "inCombat": true,
           "kind": "mob",
@@ -917,7 +917,7 @@
           "facing": 1.570796,
           "fallStartY": 13.618492,
           "fiveSecondRule": 99,
-          "hp": 345,
+          "hp": 356,
           "id": 1014,
           "kind": "mob",
           "level": 12,
@@ -959,7 +959,7 @@
         },
         {
           "aiState": "evade",
-          "combatTimer": 4.6,
+          "combatTimer": 4.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
