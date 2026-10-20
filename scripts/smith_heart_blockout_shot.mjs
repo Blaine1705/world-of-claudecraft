@@ -36,7 +36,7 @@ const ENTRY = { x: -196, z: -210 };
 // and the phase: 'shut' shots run before the portal opens, 'open' after it.
 const SHOTS = [
   ['01_balcon', [0, -62], [0, 0], 0, 0.5, 30, 'shut'],
-  ['03_martillo_cantera', [6, -142], [8, -232], 0.08, 0.14, 26, 'shut'],
+  ['03_martillo_cantera', [-16, -176], [70, -196], 0.04, 0.12, 14, 'shut'],
   ['04_aliento_cornisa', [-52, 194], [20, 198], 0.15, 0.32, 34, 'shut'],
   ['05_temple_lago', [186, -50], [198, 8], -0.1, 0.5, 30, 'shut'],
   ['06_calor_fragua', [-178, 8], [-252, 0], 0.08, 0.22, 24, 'shut'],
