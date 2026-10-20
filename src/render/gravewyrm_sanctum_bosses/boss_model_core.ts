@@ -178,34 +178,6 @@ export const KORGATH_WHOLE_GESTURE: Readonly<Record<SealTool, string>> = {
   anvil: 'sanctum_korgath_whole_anvil',
   bellows: 'sanctum_korgath_whole_bellows',
 };
-/** Korgath on his knees at his seal before the pull (BoundKneel, the maul on
- *  the terrace beside him), and on his feet once pulled (his fighting clips,
- *  entered through BoundRise: he takes the maul up and stands). */
-export const KORGATH_BOUND_STANCE = 'sanctum_korgath_bound';
-/** The clip donor carrying BoundKneel and BoundRise on his skeleton
- *  (docs/design/dungeon-rework/korgath/merge_korgath_clips.mjs): the body
- *  file itself is never touched. */
-export const KORGATH_BOUND_CLIPS_URL = 'models/creatures/woc_sanctum_korgath_bound.glb';
-export const KORGATH_STANDING_STANCE = 'sanctum_korgath_standing';
-
-/** Which Korgath stance a body shows: kneeling while he waits unpulled and
- *  alive, standing otherwise (in the fight, dead, or walking back home after
- *  an evade: a body that walks is never drawn on its knees). */
-export function korgathStance(
-  engaged: boolean,
-  dead: boolean,
-  moving: boolean,
-): 'bound' | 'standing' {
-  return !engaged && !dead && !moving ? 'bound' : 'standing';
-}
-
-/** Whether a mob is in its fight on BOTH hosts: offline `inCombat` holds from
- *  the pull to the end of the evade, but online it is mirrored for the own
- *  character only; a mob's aggro target is mirrored for every mob. */
-export function mobEngaged(e: { inCombat: boolean; aggroTargetId: number | null }): boolean {
-  return e.inCombat || e.aggroTargetId !== null;
-}
-
 /** Korzul's frozen stance (before his pull) and the takeoff one-shot. */
 export const KORZUL_FROZEN_STANCE = 'sanctum_korzul_frozen';
 export const KORZUL_TAKEOFF_GESTURE = 'sanctum_korzul_takeoff';

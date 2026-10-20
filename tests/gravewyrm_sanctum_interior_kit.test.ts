@@ -2,17 +2,14 @@
 // the paths and the boss rooms wanted an AAA pass): the second Blender kit
 // (scripts/assets/gravewyrm_sanctum_interior/build.mjs, built from
 // docs/design/dungeon-rework/kit/build_gravewyrm_sanctum_interior.py), its
-// placement plan (src/render/gravewyrm_sanctum/sanctum_interior_plan_core.ts)
-// and Korgath's chained clips (docs/design/dungeon-rework/korgath/).
+// placement plan (src/render/gravewyrm_sanctum/sanctum_interior_plan_core.ts).
 //
 // - the shipped GLB is the current sources' (fingerprint, nodes, materials),
 //   inside the pass's budget, every piece with a sane triangle count;
 // - pure dressing: nothing it draws stands in a body's way over walkable
 //   floor (the pedestal and the lips stay under the floor they hang from, the
 //   curb is knee low), the pedestal clears the Chain Bridge's deck, and the
-//   carved pillars stay inside their collider's skin;
-// - Korgath kneels at his seal before the pull (BoundKneel) and rises with
-//   his maul into his fighting clips (BoundRise ends exactly on Idle).
+//   carved pillars stay inside their collider's skin.
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { NodeIO } from '@gltf-transform/core';
@@ -25,21 +22,12 @@ import {
   GRAVEWYRM_SANCTUM_INTERIOR_PIECES,
   sourceFingerprint,
 } from '../scripts/assets/gravewyrm_sanctum_interior/build.mjs';
-import { SANCTUM_BOSS_LOOKS } from '../src/render/characters/sanctum_boss_looks';
 import { PILLAR_SCALE } from '../src/render/gravewyrm_sanctum/sanctum_chains_core';
 import {
   planSanctumInteriorPlacements,
   resolveInteriorReplacements,
 } from '../src/render/gravewyrm_sanctum/sanctum_interior_plan_core';
 import { sanctumPlacementMatrix } from '../src/render/gravewyrm_sanctum/sanctum_kit';
-import {
-  KORGATH_BODY,
-  KORGATH_BOUND_CLIPS_URL,
-  KORGATH_BOUND_STANCE,
-  KORGATH_STANDING_STANCE,
-  korgathStance,
-  mobEngaged,
-} from '../src/render/gravewyrm_sanctum_bosses/boss_model_core';
 import {
   CHAIN_BRIDGE,
   GRAVEWYRM_SANCTUM_FIELD,
@@ -282,96 +270,5 @@ describe('the interior plan stands clear of every walk', () => {
       const deck = CHAIN_BRIDGE.fromH + (CHAIN_BRIDGE.toH - CHAIN_BRIDGE.fromH) * t;
       expect(y, `(${x.toFixed(1)}, ${z.toFixed(1)})`).toBeLessThan(deck - 1.5);
     }
-  });
-});
-
-describe("Korgath's chained clips", () => {
-  it('kneels only while he waits unpulled and alive', () => {
-    expect(korgathStance(false, false, false)).toBe('bound');
-    expect(korgathStance(true, false, false)).toBe('standing');
-    expect(korgathStance(false, true, false)).toBe('standing');
-    // Walking home after an evade: never on his knees.
-    expect(korgathStance(false, false, true)).toBe('standing');
-    // Online a mob's inCombat is never mirrored (only the own character's):
-    // its aggro target is, and it keeps him standing through the fight.
-    expect(mobEngaged({ inCombat: false, aggroTargetId: 42 })).toBe(true);
-    expect(mobEngaged({ inCombat: true, aggroTargetId: null })).toBe(true);
-    expect(mobEngaged({ inCombat: false, aggroTargetId: null })).toBe(false);
-    expect(korgathStance(mobEngaged({ inCombat: false, aggroTargetId: 42 }), false, false)).toBe(
-      'standing',
-    );
-  });
-
-  it('swaps his whole clip map: BoundKneel bound, BoundRise into his fighting clips', () => {
-    const look = SANCTUM_BOSS_LOOKS.sanctum_korgath;
-    const bound = look.phaseClips?.[KORGATH_BOUND_STANCE];
-    const standing = look.phaseClips?.[KORGATH_STANDING_STANCE];
-    expect(bound?.clips.idle).toBe('BoundKneel');
-    // A body walking home stands (korgathStance), so its walk stays his walk.
-    expect(bound?.clips.walk).toBe('Walk');
-    expect(standing?.enter).toBe('BoundRise');
-    // The look's own map IS the standing stance (the swap is by identity: a
-    // view built mid-fight never replays the rise).
-    expect(standing?.clips).toBe(look.clips);
-    expect(look.oneShotsHoldAttacks).toContain('BoundRise');
-  });
-
-  it('ships BoundKneel and BoundRise in a donor beside his body, the rise ending on Idle', async () => {
-    expect(SANCTUM_BOSS_LOOKS.sanctum_korgath.animUrls).toEqual([KORGATH_BOUND_CLIPS_URL]);
-    const read = async (url: string) =>
-      (await io()).readBinary(new Uint8Array(readFileSync(`public/${url}`)));
-    const donor = await read(KORGATH_BOUND_CLIPS_URL);
-    const body = await read(KORGATH_BODY.url);
-    // A clip donor only: no mesh, skin or texture; every joint named as the body's.
-    expect(donor.getRoot().listMeshes()).toHaveLength(0);
-    expect(donor.getRoot().listTextures()).toHaveLength(0);
-    const bodyNodes = new Set(
-      body
-        .getRoot()
-        .listNodes()
-        .map((n) => n.getName()),
-    );
-    const anims = new Map(
-      donor
-        .getRoot()
-        .listAnimations()
-        .map((a) => [a.getName(), a]),
-    );
-    expect([...anims.keys()].sort()).toEqual(['BoundKneel', 'BoundRise']);
-    for (const a of anims.values())
-      for (const ch of a.listChannels())
-        expect(bodyNodes.has(ch.getTargetNode()?.getName() ?? '')).toBe(true);
-    const kneel = anims.get('BoundKneel');
-    const rise = anims.get('BoundRise');
-    const idle = body
-      .getRoot()
-      .listAnimations()
-      .find((a) => a.getName() === 'Idle');
-    if (!kneel || !rise || !idle) throw new Error('missing a clip');
-    const length = (a: typeof kneel) =>
-      Math.max(...a.listSamplers().map((s) => s.getInput()?.getMax([])[0] ?? 0));
-    expect(length(kneel)).toBeCloseTo(6, 1);
-    expect(length(rise)).toBeCloseTo(58 / 24, 1);
-    // The seam: every joint's rise end equals its Idle start.
-    let worst = 0;
-    for (const ch of rise.listChannels()) {
-      const node = ch.getTargetNode();
-      const path = ch.getTargetPath();
-      if (path !== 'rotation') continue;
-      const ich = idle
-        .listChannels()
-        .find(
-          (c) => c.getTargetNode()?.getName() === node?.getName() && c.getTargetPath() === path,
-        );
-      if (!ich) continue;
-      const ro = ch.getSampler()?.getOutput();
-      const io0 = ich.getSampler()?.getOutput();
-      if (!ro || !io0) continue;
-      const a = ro.getElement(ro.getCount() - 1, []);
-      const b = io0.getElement(0, []);
-      const dot = Math.abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]);
-      worst = Math.max(worst, 1 - Math.min(1, dot));
-    }
-    expect(worst).toBeLessThan(2e-3);
   });
 });

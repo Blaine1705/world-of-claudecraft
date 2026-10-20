@@ -110,8 +110,7 @@ describe('the Sanctum bosses draw their own bodies', () => {
 
   it('names only clips the shipped GLBs carry', () => {
     for (const def of Object.values(SANCTUM_BOSS_LOOKS)) {
-      // The body's own clips and its clip donors' (VisualDef.animUrls).
-      const have = new Set([def.url, ...(def.animUrls ?? [])].flatMap((u) => glbAnimations(u)));
+      const have = new Set(glbAnimations(def.url));
       const c = def.clips;
       const named = [
         c.idle,
