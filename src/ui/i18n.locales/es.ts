@@ -1797,7 +1797,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_rogue_combat_shoulder.name': 'Hombreras Marcariña',
   'entities.itemSets.vanguard_rogue_combat.name': 'Cueros Marcariña',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'El tiempo de reutilización de Talones Veloces se reduce 60 s.',
+    'El tiempo de reutilización de Talones Veloces se reduce 15 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Mientras Talones Veloces está activo, Tajo Perverso y Golpe al Cuerpo otorgan 1 punto de combo adicional.',
   'entities.items.vanguard_rogue_subtlety_chest.name': 'Túnica Pasosombra',
@@ -9263,7 +9263,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Brecha en la Armadura',
   'entities.abilities.rupture.name': 'Desangramiento',
   'entities.abilities.vanish.description':
-    'Desaparece de la vista, entrando en Duskveil incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s.',
+    'Desaparece de la vista, entrando en Duskveil incluso en combate. Te mueves a velocidad completa mientras estás oculto. Dura hasta 10 s.',
   'entities.abilities.instant_poison.name': 'Mordisco de Víbora',
   'entities.abilities.instant_poison.description':
     'Recubre tu arma durante 30 min, haciendo que cada uno de tus golpes cuerpo a cuerpo inflija {damage} de daño de Naturaleza adicional.',
@@ -15196,7 +15196,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Aterroriza a los enemigos en 8 m durante hasta 4 s. El daño puede romper el efecto.',
   'entities.abilities.shadowstep.description':
-    'Avanzas entre las sombras hacia tu objetivo, amigo o enemigo, sin romper el Duskveil. (talento de Pícaro)',
+    'Avanzas entre las sombras hacia tu objetivo, amigo o enemigo, sin romper el Duskveil. Almacena hasta 2 cargas. (talento de Pícaro)',
   'entities.abilities.silence.description':
     'Silencia al objetivo durante 4 s. (talento de Sacerdote)',
   'entities.abilities.tranquility.description':
@@ -16721,7 +16721,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Cada golpe añade 1 de Ritual de Veneno (máx. 6) y restaura 15 de energía. Con 6 de Ritual de Veneno, Descanso Eterno se convierte en Desgarro venenoso (inflige al instante todo el daño de sangrado que te quedaba).',
   'entities.abilities.blade_flurry.description':
-    'Desata una ráfaga de cuchillas que aumenta la velocidad de ataque un 20% durante 12 s. (motor de Thuggery)',
+    'Desata una ráfaga de cuchillas que aumenta la velocidad de ataque un 20% durante 30 s. (motor de Thuggery)',
   'entities.abilities.cheap_shot.description':
     'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.',
   'entities.abilities.cheap_shot.specNote_subtlety':
@@ -16731,7 +16731,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.specNote_feral':
     'Cada golpe conectado añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.cold_blood.description':
-    'Concentra tu instinto asesino para que tu siguiente ataque sea un golpe crítico. (motor de Knifework)',
+    'Concentra tu instinto asesino para que tus siguientes 5 ataques sean golpes críticos. (motor de Knifework)',
   'entities.abilities.dark_pact.description':
     'Sacrifica un 10% de tu salud actual para absorber daño equivalente a un 30% de tu salud máxima durante 8 s.',
   'entities.abilities.dark_pact.name': 'Pacto de Sangre',
@@ -16760,7 +16760,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hemorrhage.description':
     'Golpea al enemigo con daño de arma más {damage}, causa daño de sangrado durante 12 s y aumenta el daño de sangrado recibido un 40%. Otorga 1 punto de combo. Cada segundo uso añade 1 de Penumbra (máx. 3). (motor de Skulduggery)',
   'entities.abilities.kidney_shot.description':
-    'Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s).',
+    'Movimiento final que aturde al objetivo durante 2 s más 1 s por punto de combo (5 puntos de combo: 7 s).',
   'entities.abilities.maul.description':
     'Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y genera una amenaza enorme. Se activa en tu siguiente golpe. Solo en Forma de Bruin.',
   'entities.abilities.maul.specNote_feral':
@@ -16814,7 +16814,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'En Forma de lechúcico lunar, cada lanzamiento completado añade 1 de Marea Lunar (máx. 3). Con 3 de Marea Lunar, este botón se convierte en Estela Solar: un golpe instantáneo de 80 a 100 de daño de Naturaleza más una quemadura de 45 a lo largo de 9 s, que restaura 35 de maná y gasta toda la Marea Lunar.',
   'entities.abilities.stealth.description':
-    'Te oculta entre las sombras: los enemigos apenas te notan, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarla para salir.',
+    'Te oculta entre las sombras: los enemigos apenas te notan y te mueves a velocidad completa. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarla para salir.',
   'entities.abilities.stealth.specNote_subtlety':
     'Cada apertura que uses desde el Velo Crepuscular añade 1 de Penumbra (máx. 3).',
   'entities.abilities.swiftmend.description':

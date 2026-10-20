@@ -13591,7 +13591,7 @@ export const fr_CA: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Coup bas",
-        "description": "Technique de finition qui étourdit la cible pendant 1 s plus 1 s par point de combo (5 points de combo : 6 s)."
+        "description": "Technique de finition qui étourdit la cible pendant 2 s plus 1 s par point de combo (5 points de combo : 7 s)."
       },
       "ambush": {
         "name": "Frappe du rôdeur",
@@ -13600,7 +13600,7 @@ export const fr_CA: EnTranslations = {
       },
       "stealth": {
         "name": "Voile du crépuscule",
-        "description": "Vous dissimule dans les ombres : les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts rompt le Voile du crépuscule. Relancez pour en sortir.",
+        "description": "Vous dissimule dans les ombres : les ennemis vous remarquent à peine et vous vous déplacez à pleine vitesse. Attaquer ou subir des dégâts rompt le Voile du crépuscule. Relancez pour en sortir.",
         "specNote_subtlety": "Chaque ouverture utilisée depuis le Voile du crépuscule ajoute 1 Pénombre (maximum 3)."
       },
       "adrenaline_rush": {
@@ -13644,7 +13644,7 @@ export const fr_CA: EnTranslations = {
       },
       "vanish": {
         "name": "Disparition enfumée",
-        "description": "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s."
+        "description": "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez à pleine vitesse tant que vous êtes dissimulé. Dure jusqu'à 10 s."
       },
       "instant_poison": {
         "name": "Morsure de vipère",
@@ -14413,11 +14413,11 @@ export const fr_CA: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sang froid",
-        "description": "Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Art des lames)"
+        "description": "Concentre votre instinct meurtrier pour que vos 5 prochaines attaques soient des coups critiques. (signature Art des lames)"
       },
       "blade_flurry": {
         "name": "Déluge de lames",
-        "description": "Déchaîne une rafale de lames, augmentant la vitesse d'attaque de 20% pendant 12 s. (signature Thuggery)"
+        "description": "Déchaîne une rafale de lames, augmentant la vitesse d'attaque de 20% pendant 30 s. (signature Thuggery)"
       },
       "hemorrhage": {
         "name": "Hémorragie",
@@ -14876,7 +14876,7 @@ export const fr_CA: EnTranslations = {
       },
       "shadowstep": {
         "name": "Glissement d’ombre",
-        "description": "Vous fait traverser les ombres jusqu'à votre cible, alliée ou ennemie, sans rompre le Voile du crépuscule. (talent de Voleur)"
+        "description": "Vous fait traverser les ombres jusqu'à votre cible, alliée ou ennemie, sans rompre le Voile du crépuscule. Cumule jusqu'à 2 charges. (talent de Voleur)"
       },
       "silence": {
         "name": "Silence",
@@ -24477,7 +24477,7 @@ export const fr_CA: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Cuirs Marque-de-rixe",
-        "bonus2": "Le temps de recharge de Talons ailés est réduit de 60 s.",
+        "bonus2": "Le temps de recharge de Talons ailés est réduit de 15 s.",
         "bonus4": "Tant que Talons ailés est actif, Taillade perfide et Coup au corps accordent 1 point de combo supplémentaire."
       },
       "vanguard_rogue_subtlety": {

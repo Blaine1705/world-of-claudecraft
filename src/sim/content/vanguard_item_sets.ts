@@ -152,7 +152,7 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
     id: 'vanguard_rogue_combat',
     name: 'Brawlmark Leathers',
     bonuses: [
-      { pieces: 2, effect: {}, text: "Swift Heels' cooldown is reduced by 60 sec." },
+      { pieces: 2, effect: {}, text: "Swift Heels' cooldown is reduced by 15 sec." },
       {
         pieces: 4,
         effect: {},

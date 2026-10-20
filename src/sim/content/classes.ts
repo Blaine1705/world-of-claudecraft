@@ -3003,7 +3003,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Craven Thrust',
     class: 'rogue',
     learnLevel: 3,
-    cost: 60,
+    cost: 50,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3022,7 +3022,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 2,
         level: 12,
-        cost: 60,
+        cost: 50,
         effects: [
           {
             type: 'weaponStrike',
@@ -3035,7 +3035,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 3,
         level: 18,
-        cost: 60,
+        cost: 50,
         effects: [
           {
             type: 'weaponStrike',
@@ -3091,7 +3091,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 6,
     cost: 0,
     castTime: 0,
-    cooldown: 300,
+    cooldown: 90,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -3104,12 +3104,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Cutthroat Tempo',
     class: 'rogue',
     learnLevel: 10,
-    cost: 25,
+    cost: 0,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: true,
+    offGcd: true,
     spendsCombo: true,
     // Engines feel pass (owner playtest): at real energy cadence a 24 sec max
     // uptime meant the buff was down every build cycle; 12 + 4 per combo
@@ -3126,7 +3127,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 0,
-    cooldown: 300,
+    cooldown: 60,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -3146,16 +3147,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
-    effects: [{ type: 'finisherStun', base: 1, perCombo: 1 }],
+    effects: [{ type: 'finisherStun', base: 2, perCombo: 1 }],
     description:
-      'Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec).',
+      'Finishing move that stuns the target for 2 sec plus 1 sec per combo point (5 combo points: 7 sec).',
   },
   ambush: {
     id: 'ambush',
     name: "Lurker's Strike",
     class: 'rogue',
     learnLevel: 4,
-    cost: 60,
+    cost: 50,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3186,15 +3187,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 2,
     cost: 0,
     castTime: 0,
-    cooldown: 10,
+    cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
     requiresOutOfCombat: true,
-    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 3600 }],
     description:
-      'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.',
+      'Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.',
     specNotes: {
       subtlety: 'Each opener you use from Duskveil adds 1 Gloam (max 3).',
     },
@@ -3206,7 +3207,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 0,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 90,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -3254,7 +3255,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Gut Punch',
     class: 'rogue',
     learnLevel: 8,
-    cost: 60,
+    cost: 50,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3278,10 +3279,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Sap',
     class: 'rogue',
     learnLevel: 10,
-    cost: 65,
+    cost: 0,
     castTime: 0,
     cooldown: 0,
-    range: 0,
+    range: 10,
     school: 'physical',
     requiresTarget: true,
     requiresStealth: true,
@@ -3300,7 +3301,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Leaden Venom',
     class: 'rogue',
     learnLevel: 12,
-    cost: 40,
+    cost: 35,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3362,9 +3363,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 10 }],
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 10 }],
     description:
-      'Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
+      'Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec.',
   },
   instant_poison: {
     id: 'instant_poison',
@@ -3472,7 +3473,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 50,
     castTime: 0,
-    cooldown: 120,
+    cooldown: 60,
     range: 5,
     school: 'physical',
     requiresTarget: true,
@@ -6692,8 +6693,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     usableInForm: true,
     requiresOutOfCombat: true,
     // 1.0: feral stealth moves at full speed (Wildfang kit pass 2; it was a
-    // 0.95 near-full crawl before), the feral scouting identity. The rogue
-    // Duskveil family deliberately keeps its slower 0.5 crawl.
+    // 0.95 near-full crawl before), the feral scouting identity. Rogue Duskveil
+    // now matches it (1.0), with Skulduggery at 1.15.
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 3600 }],
     description:
       'Shift into Cat Form if you are not already, and enter stealth. Usable in any form. Cannot be used in combat.',
@@ -7114,8 +7115,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     requiresForm: 'cat',
-    // The Low Blow shape and numbers (finisherStun): 2 sec at 1 combo point up
-    // to 6 sec at 5, retuned on review from 0.5 + 0.5 per point (a 3 sec cap
+    // Low Blow's former shape and numbers (finisherStun): 2 sec at 1 combo
+    // point up to 6 sec at 5 (Low Blow itself now runs 3 to 7), retuned on
+    // review from 0.5 + 0.5 per point (a 3 sec cap
     // was one GCD of control); the controlled-stun diminishing category
     // beside Concuss (stun_dr.ts).
     effects: [{ type: 'finisherStun', base: 1, perCombo: 1 }],
@@ -7878,9 +7880,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60 }],
+    effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60, charges: 5 }],
     description:
-      'Focuses your killing intent so your next attack is a critical strike. (Knifework signature)',
+      'Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)',
   },
   blade_flurry: {
     id: 'blade_flurry',
@@ -7894,9 +7896,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.2, duration: 12 }],
+    effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.2, duration: 30 }],
     description:
-      'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)',
+      'Unleashes a flurry of blades, increasing attack speed by 20% for 30 sec. (Thuggery signature)',
   },
   hemorrhage: {
     id: 'hemorrhage',

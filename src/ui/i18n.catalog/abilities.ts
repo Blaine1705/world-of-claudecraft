@@ -536,7 +536,7 @@ const classAbilityNamesEn = {
       [
         'kidney_shot',
         'Low Blow',
-        'Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec).',
+        'Finishing move that stuns the target for 2 sec plus 1 sec per combo point (5 combo points: 7 sec).',
       ],
       [
         'ambush',
@@ -550,7 +550,7 @@ const classAbilityNamesEn = {
       [
         'stealth',
         'Duskveil',
-        'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.',
+        'Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.',
         { subtlety: 'Each opener you use from Duskveil adds 1 Gloam (max 3).' },
       ],
       ['adrenaline_rush', 'Quickened Blood', 'Your blood runs hot, instantly restoring 60 energy.'],
@@ -609,7 +609,7 @@ const classAbilityNamesEn = {
       [
         'vanish',
         'Smokefade',
-        'Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
+        'Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec.',
       ],
       [
         'instant_poison',
@@ -1556,12 +1556,12 @@ const classAbilityNamesEn = {
       [
         'cold_blood',
         "Killer's Calm",
-        'Focuses your killing intent so your next attack is a critical strike. (Knifework signature)',
+        'Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)',
       ],
       [
         'blade_flurry',
         'Mirrored Blades',
-        'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)',
+        'Unleashes a flurry of blades, increasing attack speed by 20% for 30 sec. (Thuggery signature)',
       ],
       [
         'hemorrhage',
@@ -2132,7 +2132,7 @@ const classAbilityNamesEn = {
       [
         'shadowstep',
         'Shadeslip',
-        'Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)',
+        'Steps through the shadows to your target, friend or foe, without breaking Duskveil. Stores up to 2 charges. (Rogue talent)',
       ],
       ['silence', 'Hushword', 'Silences the target for 4 sec. (Priest talent)'],
       [

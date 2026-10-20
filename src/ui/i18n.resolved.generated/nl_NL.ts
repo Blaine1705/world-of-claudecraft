@@ -13591,7 +13591,7 @@ export const nl_NL: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Lage Stoot",
-        "description": "Afmaakactie die het doelwit verdooft voor 1 sec plus 1 sec per combopunt (5 combopunten: 6 sec)."
+        "description": "Afmaakactie die het doelwit verdooft voor 2 sec plus 1 sec per combopunt (5 combopunten: 7 sec)."
       },
       "ambush": {
         "name": "Sluiperslag",
@@ -13600,7 +13600,7 @@ export const nl_NL: EnTranslations = {
       },
       "stealth": {
         "name": "Schemersluier",
-        "description": "Verhult je in de schaduwen: vijanden merken je nauwelijks op, maar je beweegt 50% trager. Aanvallen of schade oplopen verbreekt de Schemersluier. Spreuk opnieuw om eruit te stappen.",
+        "description": "Verhult je in de schaduwen: vijanden merken je nauwelijks op en je beweegt op volle snelheid. Aanvallen of schade oplopen verbreekt de Schemersluier. Spreuk opnieuw om eruit te stappen.",
         "specNote_subtlety": "Elke opener die je vanuit Schemersluier gebruikt, voegt 1 Schemer toe (max 3)."
       },
       "adrenaline_rush": {
@@ -13644,7 +13644,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanish": {
         "name": "Rooksluier",
-        "description": "Verdwijn uit het zicht en betreed Duskveil zelfs in gevecht. Je beweegt 50% trager terwijl je verborgen bent. Duurt tot 10 sec."
+        "description": "Verdwijn uit het zicht en betreed Duskveil zelfs in gevecht. Je beweegt op volle snelheid terwijl je verborgen bent. Duurt tot 10 sec."
       },
       "instant_poison": {
         "name": "Adderbeet",
@@ -14413,11 +14413,11 @@ export const nl_NL: EnTranslations = {
       },
       "cold_blood": {
         "name": "Koud bloed",
-        "description": "Focust je moordlust zodat je volgende aanval een kritieke treffer is. (Knifework-motor)"
+        "description": "Focust je moordlust zodat je volgende 5 aanvallen kritieke treffers zijn. (Knifework-motor)"
       },
       "blade_flurry": {
         "name": "Klingenvlaag",
-        "description": "Ontketent een vlaag van klingen, waardoor de aanvalssnelheid 12 sec lang met 20% toeneemt. (Thuggery-motor)"
+        "description": "Ontketent een vlaag van klingen, waardoor de aanvalssnelheid 30 sec lang met 20% toeneemt. (Thuggery-motor)"
       },
       "hemorrhage": {
         "name": "Bloeding",
@@ -14876,7 +14876,7 @@ export const nl_NL: EnTranslations = {
       },
       "shadowstep": {
         "name": "Schaduwglip",
-        "description": "Stapt door de schaduwen naar je doelwit, vriend of vijand, zonder Schemersluier te verbreken. (schurkentalent)"
+        "description": "Stapt door de schaduwen naar je doelwit, vriend of vijand, zonder Schemersluier te verbreken. Slaat maximaal 2 ladingen op. (schurkentalent)"
       },
       "silence": {
         "name": "Stilte",
@@ -24477,7 +24477,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Ruziemerkteken Leder",
-        "bonus2": "Afkoelingseffect van Snelle Voeten is 60 sec korter.",
+        "bonus2": "Afkoelingseffect van Snelle Voeten is 15 sec korter.",
         "bonus4": "Terwijl Snelle Voeten actief zijn, geven Verderfsnede en Lichaamsstoot 1 extra combopunt."
       },
       "vanguard_rogue_subtlety": {

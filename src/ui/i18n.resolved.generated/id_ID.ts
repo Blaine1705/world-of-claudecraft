@@ -13591,7 +13591,7 @@ export const id_ID: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Pukulan Curang",
-        "description": "Jurus penutup yang membuat target terpana selama 1 detik plus 1 detik per poin combo (5 poin combo: 6 detik)."
+        "description": "Jurus penutup yang membuat target terpana selama 2 detik plus 1 detik per poin combo (5 poin combo: 7 detik)."
       },
       "ambush": {
         "name": "Serangan Penyergap",
@@ -13600,7 +13600,7 @@ export const id_ID: EnTranslations = {
       },
       "stealth": {
         "name": "Selubung Senja",
-        "description": "Menyembunyikanmu dalam bayangan: musuh nyaris tidak menyadarimu, tetapi kamu bergerak 50% lebih lambat. Menyerang atau menerima kerusakan membatalkan Selubung Senja. Rapal lagi untuk keluar.",
+        "description": "Menyembunyikanmu dalam bayangan: musuh nyaris tidak menyadarimu, dan kamu bergerak dengan kecepatan penuh. Menyerang atau menerima kerusakan membatalkan Selubung Senja. Rapal lagi untuk keluar.",
         "specNote_subtlety": "Setiap pembuka yang kamu pakai dari Selubung Senja menambah 1 Gloam (maks 3)."
       },
       "adrenaline_rush": {
@@ -13644,7 +13644,7 @@ export const id_ID: EnTranslations = {
       },
       "vanish": {
         "name": "Luruh Asap",
-        "description": "Menghilang dari pandangan, masuk ke Duskveil bahkan dalam pertempuran. Kau bergerak 50% lebih lambat saat tersembunyi. Bertahan hingga 10 detik."
+        "description": "Menghilang dari pandangan, masuk ke Duskveil bahkan dalam pertempuran. Kau bergerak dengan kecepatan penuh saat tersembunyi. Bertahan hingga 10 detik."
       },
       "instant_poison": {
         "name": "Gigitan Beludak",
@@ -14413,11 +14413,11 @@ export const id_ID: EnTranslations = {
       },
       "cold_blood": {
         "name": "Darah Dingin",
-        "description": "Memusatkan niat membunuhmu sehingga seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)"
+        "description": "Memusatkan niat membunuhmu sehingga 5 seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)"
       },
       "blade_flurry": {
         "name": "Tebasan Bertubi",
-        "description": "Melepaskan rentetan bilah, meningkatkan kecepatan serang sebesar 20% selama 12 detik. (mesin Thuggery)"
+        "description": "Melepaskan rentetan bilah, meningkatkan kecepatan serang sebesar 20% selama 30 detik. (mesin Thuggery)"
       },
       "hemorrhage": {
         "name": "Pendarahan",
@@ -14876,7 +14876,7 @@ export const id_ID: EnTranslations = {
       },
       "shadowstep": {
         "name": "Selip Bayang",
-        "description": "Melangkah menembus bayangan menuju targetmu, kawan maupun lawan, tanpa mematahkan Duskveil. (talenta Rogue)"
+        "description": "Melangkah menembus bayangan menuju targetmu, kawan maupun lawan, tanpa mematahkan Duskveil. Menyimpan hingga 2 muatan. (talenta Rogue)"
       },
       "silence": {
         "name": "Senyap",
@@ -24477,7 +24477,7 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Kulit Merek Pertarungan",
-        "bonus2": "Jeda Tumit Gesit dikurangi 60 detik.",
+        "bonus2": "Jeda Tumit Gesit dikurangi 15 detik.",
         "bonus4": "Sementara Tumit Gesit aktif, Tebasan Keji dan Pukulan Tubuh memberikan 1 poin combo tambahan."
       },
       "vanguard_rogue_subtlety": {

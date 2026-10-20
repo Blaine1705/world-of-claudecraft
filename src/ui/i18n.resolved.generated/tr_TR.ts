@@ -13591,7 +13591,7 @@ export const tr_TR: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Aşağılık Darbe",
-        "description": "Hedefi 1 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 6 sn)."
+        "description": "Hedefi 2 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 7 sn)."
       },
       "ambush": {
         "name": "Pusucunun Darbesi",
@@ -13600,7 +13600,7 @@ export const tr_TR: EnTranslations = {
       },
       "stealth": {
         "name": "Alaca Örtüsü",
-        "description": "Seni gölgelerde gizler: düşmanlar seni zar zor fark eder, ama %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Alacakaranlık Perdesini bozar. Çıkmak için tekrar oku.",
+        "description": "Seni gölgelerde gizler: düşmanlar seni zar zor fark eder ve tam hızla hareket edersin. Saldırmak ya da hasar almak Alacakaranlık Perdesini bozar. Çıkmak için tekrar oku.",
         "specNote_subtlety": "Alacakaranlık Perdesinden kullandığın her açılış 1 Alacakaranlık ekler (en fazla 3)."
       },
       "adrenaline_rush": {
@@ -13644,7 +13644,7 @@ export const tr_TR: EnTranslations = {
       },
       "vanish": {
         "name": "Duman Sönüşü",
-        "description": "Gözden kaybolursun, dövüşte bile Duskveil'e geçersin. Gizliyken %50 daha yavaş hareket edersin. 10 saniyeye kadar sürer."
+        "description": "Gözden kaybolursun, dövüşte bile Duskveil'e geçersin. Gizliyken tam hızla hareket edersin. 10 saniyeye kadar sürer."
       },
       "instant_poison": {
         "name": "Engerek Isırığı",
@@ -14413,11 +14413,11 @@ export const tr_TR: EnTranslations = {
       },
       "cold_blood": {
         "name": "Soğukkanlılık",
-        "description": "Öldürme niyetini odaklar, böylece bir sonraki saldırın kritik vuruş olur. (Knifework motoru)"
+        "description": "Öldürme niyetini odaklar, böylece sonraki 5 saldırın kritik vuruş olur. (Knifework motoru)"
       },
       "blade_flurry": {
         "name": "Bıçak Yağmuru",
-        "description": "Bir bıçak fırtınası salar, saldırı hızını 12 sn boyunca %20 artırır. (Thuggery motoru)"
+        "description": "Bir bıçak fırtınası salar, saldırı hızını 30 sn boyunca %20 artırır. (Thuggery motoru)"
       },
       "hemorrhage": {
         "name": "Kanama",
@@ -14876,7 +14876,7 @@ export const tr_TR: EnTranslations = {
       },
       "shadowstep": {
         "name": "Gölge Kayışı",
-        "description": "Gölgelerin içinden, dost ya da düşman, hedefine Alaca Örtüsü'nü bozmadan adım atarsın. (Haydut yeteneği)"
+        "description": "Gölgelerin içinden, dost ya da düşman, hedefine Alaca Örtüsü'nü bozmadan adım atarsın. En fazla 2 kullanım birikir. (Haydut yeteneği)"
       },
       "silence": {
         "name": "Sessizlik",
@@ -24477,7 +24477,7 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Dövüş İşareti Deri",
-        "bonus2": "Swift Heels'in bekleme süresi 60 san azalır.",
+        "bonus2": "Swift Heels'in bekleme süresi 15 san azalır.",
         "bonus4": "Swift Heels etki duruşu boyunca Wicked Slash ve Haymaker, 1 ek combo puanı verir."
       },
       "vanguard_rogue_subtlety": {

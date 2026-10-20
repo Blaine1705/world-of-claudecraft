@@ -1965,7 +1965,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Podpásovka navíc promění tvůj příští útok do 6 s v kritický zásah.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Kůže Nočnořezu',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Čas obnovy Rychlých pat je kratší o 60 s.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Čas obnovy Rychlých pat je kratší o 15 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Dokud jsou aktivní Rychlé paty, Zlý sek a Úder na tělo udělí o 1 combo bod navíc.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Kůže Rvačkocejchu',
@@ -10614,7 +10614,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Okamžitě se proměníš ve svižnou běhavou podobu, zvýšíš rychlost pohybu o 40 % a odstraníš přerušitelné zakořenění a zpomalení. V proměně nemůžeš používat jiné schopnosti, ale můžeš se proměnit v boji i mimo něj, ideální pro únik. Proměna do jakékoli podoby udělí Pružný krok, krátký nával rychlosti pohybu.',
   'entities.abilities.travel_form.name': 'Svižná podoba',
   'entities.abilities.vanish.description':
-    'Zmizíš z dohledu a vstoupíš do Závoje šera i v boji. Když jsi skrytý, pohybuješ se o 50 % pomaleji. Trvá až 10 s.',
+    'Zmizíš z dohledu a vstoupíš do Závoje šera i v boji. Když jsi skrytý, pohybuješ se plnou rychlostí. Trvá až 10 s.',
   'entities.abilities.vanish.name': 'Kouřový krok',
   'entities.abilities.volley.description':
     'Nechá 3 s pršet šípy na oblast 8 m. Nepřátelé uvnitř utrpí každých 0.5 s {damage} fyzického poškození. Poškození roste s útočnou silou na dálku.',
@@ -11088,7 +11088,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rebuke.description':
     'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
   'entities.abilities.shadowstep.description':
-    'Vykročíš stíny ke svému cíli, ať už jde o spojence, nebo nepřítele, aniž by to zrušilo Závoj šera. (lotrovský talent)',
+    'Vykročíš stíny ke svému cíli, ať už jde o spojence, nebo nepřítele, aniž by to zrušilo Závoj šera. Ukládá až 2 nabití. (lotrovský talent)',
   'entities.abilities.silence.description': 'Na 4 s umlčí cíl. (kněžský talent)',
   'entities.abilities.skull_bash.name': 'Úder hlavou',
   'entities.abilities.skull_bash.description':
@@ -16275,7 +16275,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Každý úder přidá 1 Jedový rituál (max 6) a vrátí 15 energie. Při 6 Jedovém rituálu se Do hrobu změní na Jedovou trhlinu (okamžitě způsobí veškeré zbývající poškození tvých krvácení).',
   'entities.abilities.blade_flurry.description':
-    'Rozpoutá spršku čepelí a na 12 s zvýší rychlost útoku o 20 %. (klíčová schopnost Thuggery)',
+    'Rozpoutá spršku čepelí a na 30 s zvýší rychlost útoku o 20 %. (klíčová schopnost Thuggery)',
   'entities.abilities.bone_armor.description':
     'Obalí tě kostmi a pohltí poškození ve výši 20 % tvého maximálního zdraví.',
   'entities.abilities.bone_armor.name': 'Bone Armor',
@@ -16290,7 +16290,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zasáhni nepřítele drápem za poškození zbraně plus {damage}. Udělí 1 combo bod. Pouze v kočičí podobě.',
   'entities.abilities.claw.specNote_feral': 'Každý zásah přidá 1 Starou krev (max 3).',
   'entities.abilities.cold_blood.description':
-    'Soustředí tvůj zabijácký záměr, takže tvůj příští útok bude kritický zásah. (klíčová schopnost Knifework)',
+    'Soustředí tvůj zabijácký záměr, takže tvých příštích 5 útoků bude kritickými zásahy. (klíčová schopnost Knifework)',
   'entities.abilities.corpse_explosion.description':
     'Nejprve obětuje Kostěného mága, poté Kostlivého bojovníka a Hrobové křídlo jen jako poslední možnost. Mezi duplicitami vybere toho s nejkratší zbývající dobou trvání, poté nejslabšího, a způsobí {damage} stínového poškození na zvoleném místě.',
   'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
@@ -16341,7 +16341,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Na 15 s vyvolá soud nad tvým primárním Evil Eye: udělí 40 Odsouzení a 3 Nitě osudu, aktivuje Posednutí, zdvojnásobí Odsouzení generované skrze primární Oko a zvýší poškození Sentence o 20 %. První Sentence vrátí 50 Odsouzení.',
   'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
   'entities.abilities.kidney_shot.description':
-    'Dokončovací útok, který omráčí cíl na 1 s plus 1 s za combo bod (5 combo bodů: 6 s).',
+    'Dokončovací útok, který omráčí cíl na 2 s plus 1 s za combo bod (5 combo bodů: 7 s).',
   'entities.abilities.litany_of_guilt.description':
     'Na 6 s prokleje tvé primární Evil Eye. Zisky Odsouzení uvolní vlnu, která poškodí až 2 další nepřátele v okruhu 8 yardů, nejvýše jednou za sekundu. Stupeň 2 to prodlouží na 8 s a 4 nepřátele.',
   'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
@@ -16428,7 +16428,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'V Podobě měsíčního křídla každé dokončené seslání přidá 1 Měsíční příliv (max 3). Při 3 Měsíčním přílivu se toto tlačítko změní na Sluneční vzedmutí: okamžitý úder za 80 až 100 přírodního poškození plus 45 hoření po dobu 9 s, obnoví 35 many a spotřebuje všechny 3.',
   'entities.abilities.stealth.description':
-    'Ukryje tě ve stínech: nepřátelé si tě sotva všimnou, ale pohybuješ se o 50 % pomaleji. Útok nebo utrpěné poškození zruší Závoj šera. Seslej znovu pro vystoupení ven.',
+    'Ukryje tě ve stínech: nepřátelé si tě sotva všimnou a pohybuješ se plnou rychlostí. Útok nebo utrpěné poškození zruší Závoj šera. Seslej znovu pro vystoupení ven.',
   'entities.abilities.stealth.specNote_subtlety':
     'Každý zahajovací útok použitý ze Závoje šera přidá 1 Šero (max 3).',
   'entities.abilities.swipe.description':

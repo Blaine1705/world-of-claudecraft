@@ -61,6 +61,9 @@ const OFFENSIVE_SPEC_TUNING: Partial<Record<PlayerClass, Record<string, Offensiv
     // so the spec's share of the total arrives through AP and the physical
     // abilities alone.
     assassination: { physical: 0.1 },
+    // Skulduggery: the rogue tweak pass's +25% (0.04 legacy + 0.10 here =
+    // 0.14 total); AP is a stats.apPct edit (0 -> 0.45).
+    subtlety: { physical: 0.1 },
   },
   hunter: {
     // Fieldcraft: survival offensive ability bonus (0.30 legacy + 0.15 here

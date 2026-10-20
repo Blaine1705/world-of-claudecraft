@@ -4848,13 +4848,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sprint.description': '使你的移動速度提高 70%，持續 15 秒。',
   'entities.abilities.kidney_shot.name': '陰狠一擊',
   'entities.abilities.kidney_shot.description':
-    '終結技，昏迷目標 1 秒外加每點連擊點 1 秒（5 點連擊點：6 秒）。',
+    '終結技，昏迷目標 2 秒外加每點連擊點 1 秒（5 點連擊點：7 秒）。',
   'entities.abilities.ambush.name': '潛伏者一擊',
   'entities.abilities.ambush.description':
     '伏擊目標，造成 250% 武器傷害加 {damage}。必須處於潛行並位於目標背後。需要匕首。獎勵 1 個連擊點。',
   'entities.abilities.stealth.name': '暮紗',
   'entities.abilities.stealth.description':
-    '將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破暮紗。再次施放可現身。',
+    '將你隱藏在陰影中：敵人幾乎無法察覺你，且你能以全速移動。攻擊或受到傷害會打破暮紗。再次施放可現身。',
   'entities.abilities.adrenaline_rush.name': '疾血',
   'entities.abilities.adrenaline_rush.description': '熱血沸騰，立即恢復 60 點能量。',
   'entities.abilities.garrote.name': '勒喉鋼絲',
@@ -4879,7 +4879,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '終結技，撕裂目標：其每 2 秒流血一次，持續 6 秒外加每點連擊點 2 秒（5 點連擊點：16 秒，共 {damage} 點傷害）。',
   'entities.abilities.vanish.name': '煙遁步',
   'entities.abilities.vanish.description':
-    '從視野中消失，即使在戰鬥中也能進入暮紗狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。',
+    '從視野中消失，即使在戰鬥中也能進入暮紗狀態。隱身時你能以全速移動。最多持續 10 秒。',
   'entities.abilities.instant_poison.name': '蝰蛇之咬',
   'entities.abilities.instant_poison.description':
     '在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 {damage} 點自然傷害。',
@@ -5230,10 +5230,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
   'entities.abilities.cold_blood.name': '冷血',
   'entities.abilities.cold_blood.description':
-    '凝聚你的殺意，使你的下一次攻擊必定爆擊。（刺殺標誌技能）',
+    '凝聚你的殺意，使你接下來的 5 次攻擊必定爆擊。（刺殺標誌技能）',
   'entities.abilities.blade_flurry.name': '劍刃亂舞',
   'entities.abilities.blade_flurry.description':
-    '掀起一陣刀刃的亂舞，將攻擊速度提高 20%，持續 12 秒。（戰鬥標誌技能）',
+    '掀起一陣刀刃的亂舞，將攻擊速度提高 20%，持續 30 秒。（戰鬥標誌技能）',
   'entities.abilities.hemorrhage.name': '出血',
   'entities.abilities.hemorrhage.description':
     '以武器傷害外加 {damage} 點擊打敵人，造成持續 12 秒的流血傷害，並使其所受的流血傷害提高 40%。給予 1 點連擊點。每第 2 次使用增加 1 層幽暗（最多 3 層）。（敏銳標誌技能）',
@@ -12804,7 +12804,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     '使 8 公尺內的敵人陷入恐懼，最多持續 4 秒。傷害可能打斷該效果。',
   'entities.abilities.shadowstep.description':
-    '穿過暗影，向你的目標邁進，無論敵友，且不會打破暮紗。（潛行者天賦）',
+    '穿過暗影，向你的目標邁進，無論敵友，且不會打破暮紗。最多儲存 2 次充能。（潛行者天賦）',
   'entities.abilities.silence.description': '使目標沉默4秒。（牧師天賦）',
   'entities.abilities.tranquility.description':
     '引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）',
@@ -18721,7 +18721,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '4件：Low Blow使6秒內下一次攻擊成為爆擊。',
   'entities.itemSets.vanguard_rogue_combat.name': '先鋒套裝：Brawlmark Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': '2件：Swift Heels冷卻縮短60秒。',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2件：Swift Heels冷卻縮短15秒。',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4件：Swift Heels期間，Wicked Slash與Haymaker額外給予1個連擊點。',
   'entities.itemSets.vanguard_rogue_subtlety.name': '先鋒套裝：Shadewalk Leathers',

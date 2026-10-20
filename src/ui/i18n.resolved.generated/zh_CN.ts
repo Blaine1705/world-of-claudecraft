@@ -13591,7 +13591,7 @@ export const zh_CN: EnTranslations = {
       },
       "kidney_shot": {
         "name": "下作一击",
-        "description": "终结技，昏迷目标 1 秒外加每点连击点 1 秒（5 点连击点：6 秒）。"
+        "description": "终结技，昏迷目标 2 秒外加每点连击点 1 秒（5 点连击点：7 秒）。"
       },
       "ambush": {
         "name": "潜伏突袭",
@@ -13600,7 +13600,7 @@ export const zh_CN: EnTranslations = {
       },
       "stealth": {
         "name": "暮帷",
-        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破暮帷。再次施放可现身。",
+        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，且你能以全速移动。攻击或受到伤害会打破暮帷。再次施放可现身。",
         "specNote_subtlety": "你从暮帷中使用的每个先制技累积1层幽暝（最多3层）。"
       },
       "adrenaline_rush": {
@@ -13644,7 +13644,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanish": {
         "name": "烟遁",
-        "description": "从视野中消失，即使在战斗中也能进入暮帷状态。隐身时你的移动速度降低 50%。持续最多 10 秒。"
+        "description": "从视野中消失，即使在战斗中也能进入暮帷状态。隐身时你能以全速移动。持续最多 10 秒。"
       },
       "instant_poison": {
         "name": "蝰蛇之咬",
@@ -14413,11 +14413,11 @@ export const zh_CN: EnTranslations = {
       },
       "cold_blood": {
         "name": "冷血",
-        "description": "凝聚你的杀意，使你的下一次攻击必定爆击。（刺杀标志技能）"
+        "description": "凝聚你的杀意，使你接下来的 5 次攻击必定爆击。（刺杀标志技能）"
       },
       "blade_flurry": {
         "name": "剑刃乱舞",
-        "description": "掀起一阵刀刃的乱舞，将攻击速度提高 20%，持续 12 秒。（战斗标志技能）"
+        "description": "掀起一阵刀刃的乱舞，将攻击速度提高 20%，持续 30 秒。（战斗标志技能）"
       },
       "hemorrhage": {
         "name": "出血",
@@ -14876,7 +14876,7 @@ export const zh_CN: EnTranslations = {
       },
       "shadowstep": {
         "name": "影步",
-        "description": "穿过暗影，向你的目标迈进，无论其是敌是友，且不会打破暮帷。（潜行者天赋）"
+        "description": "穿过暗影，向你的目标迈进，无论其是敌是友，且不会打破暮帷。最多储存 2 次充能。（潜行者天赋）"
       },
       "silence": {
         "name": "沉默",
@@ -24477,7 +24477,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "先锋套装：斗痕皮甲",
-        "bonus2": "疾足的冷却时间缩短60秒。",
+        "bonus2": "疾足的冷却时间缩短15秒。",
         "bonus4": "疾足激活时，邪斩和重拳额外奖励1个连击点。"
       },
       "vanguard_rogue_subtlety": {
