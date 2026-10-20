@@ -123435,7 +123435,7 @@ Drive your dagger into the target&apos;s back for 150% weapon damage plus $d. Mu
 | 3
 |-
 ! Cost
-| 60
+| 50
 |-
 ! Cooldown
 | 0s
@@ -123454,10 +123454,10 @@ Drive your dagger into the target&apos;s back for 150% weapon damage plus $d. Mu
 {| class=&quot;wikitable article-facts&quot;
 |-
 ! Rank 2
-| Level 12, cost 60
+| Level 12, cost 50
 |-
 ! Rank 3
-| Level 18, cost 60
+| Level 18, cost 50
 |}
 [[Category:Abilities]]
 [[Category:Rogue]]
@@ -123528,7 +123528,7 @@ Strikes the target for $d damage, incapacitating it for 4 sec, and resets your o
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="315">== Description ==
+      <text xml:space="preserve" bytes="314">== Description ==
 Increases your dodge chance by 50% for 15 sec.
 
 == Facts ==
@@ -123544,7 +123544,7 @@ Increases your dodge chance by 50% for 15 sec.
 | 0
 |-
 ! Cooldown
-| 300s
+| 90s
 |-
 ! Range
 | Melee/self
@@ -123572,7 +123572,7 @@ Increases your dodge chance by 50% for 15 sec.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="393">== Description ==
+      <text xml:space="preserve" bytes="392">== Description ==
 Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec).
 
 == Facts ==
@@ -123585,7 +123585,7 @@ Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec pe
 | 10
 |-
 ! Cost
-| 25
+| 0
 |-
 ! Cooldown
 | 0s
@@ -123616,7 +123616,7 @@ Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec pe
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="318">== Description ==
+      <text xml:space="preserve" bytes="317">== Description ==
 Increases your movement speed by 70% for 15 sec.
 
 == Facts ==
@@ -123632,7 +123632,7 @@ Increases your movement speed by 70% for 15 sec.
 | 0
 |-
 ! Cooldown
-| 300s
+| 60s
 |-
 ! Range
 | Melee/self
@@ -123661,7 +123661,7 @@ Increases your movement speed by 70% for 15 sec.
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="371">== Description ==
-Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec).
+Finishing move that stuns the target for 2 sec plus 1 sec per combo point (5 combo points: 7 sec).
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -123717,7 +123717,7 @@ Strike from the shadows for 250% weapon damage plus $d. Must be stealthed and be
 | 4
 |-
 ! Cost
-| 60
+| 50
 |-
 ! Cooldown
 | 0s
@@ -123748,8 +123748,8 @@ Strike from the shadows for 250% weapon damage plus $d. Must be stealthed and be
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="416">== Description ==
-Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.
+      <text xml:space="preserve" bytes="418">== Description ==
+Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -123764,7 +123764,7 @@ Conceals you in the shadows: enemies barely notice you, but you move 50% slower.
 | 0
 |-
 ! Cooldown
-| 10s
+| 0s
 |-
 ! Range
 | Melee/self
@@ -123792,7 +123792,7 @@ Conceals you in the shadows: enemies barely notice you, but you move 50% slower.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="325">== Description ==
+      <text xml:space="preserve" bytes="324">== Description ==
 Your blood runs hot, instantly restoring 60 energy.
 
 == Facts ==
@@ -123808,7 +123808,7 @@ Your blood runs hot, instantly restoring 60 energy.
 | 0
 |-
 ! Cooldown
-| 180s
+| 90s
 |-
 ! Range
 | Melee/self
@@ -123901,7 +123901,7 @@ Strike the target for $d damage, stunning it for 4 sec. Must be stealthed. Award
 | 8
 |-
 ! Cost
-| 60
+| 50
 |-
 ! Cooldown
 | 0s
@@ -123933,7 +123933,7 @@ Strike the target for $d damage, stunning it for 4 sec. Must be stealthed. Award
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="421">== Description ==
+      <text xml:space="preserve" bytes="415">== Description ==
 Incapacitates the target for 8 sec without breaking Duskveil or starting a fight. Must be stealthed and out of combat. Any damage breaks the effect.
 
 == Facts ==
@@ -123946,13 +123946,13 @@ Incapacitates the target for 8 sec without breaking Duskveil or starting a fight
 | 10
 |-
 ! Cost
-| 65
+| 0
 |-
 ! Cooldown
 | 0s
 |-
 ! Range
-| Melee/self
+| 10 yd
 |-
 ! School
 | physical
@@ -123990,7 +123990,7 @@ Strikes the target with a crippling poison, dealing $d Nature damage and slowing
 | 12
 |-
 ! Cost
-| 40
+| 35
 |-
 ! Cooldown
 | 0s
@@ -124110,8 +124110,8 @@ Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 s
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="374">== Description ==
-Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.
+      <text xml:space="preserve" bytes="377">== Description ==
+Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -124330,7 +124330,7 @@ Coats your weapon for 30 min. Each of your melee swings coats the target in nigh
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="378">== Description ==
+      <text xml:space="preserve" bytes="377">== Description ==
 Tosses dirt into the target&apos;s eyes, causing it to wander disoriented for 8 sec. Any damage breaks the effect.
 
 == Facts ==
@@ -124346,7 +124346,7 @@ Tosses dirt into the target&apos;s eyes, causing it to wander disoriented for 8 
 | 50
 |-
 ! Cooldown
-| 120s
+| 60s
 |-
 ! Range
 | 5 yd
@@ -132666,8 +132666,8 @@ Increases spell haste by 30% and prevents cast interruption and pushback for 10 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="361">== Description ==
-Focuses your killing intent so your next attack is a critical strike. (Knifework signature)
+      <text xml:space="preserve" bytes="364">== Description ==
+Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -132711,7 +132711,7 @@ Focuses your killing intent so your next attack is a critical strike. (Knifework
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="364">== Description ==
-Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)
+Unleashes a flurry of blades, increasing attack speed by 20% for 30 sec. (Thuggery signature)
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -134280,8 +134280,8 @@ Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage ta
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="374">== Description ==
-Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)
+      <text xml:space="preserve" bytes="373">== Description ==
+Shields you and up to 4 nearby allies within 30 yd, each absorbing $d damage for 15 sec. (Mage talent)
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -135397,8 +135397,8 @@ Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="367">== Description ==
-Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)
+      <text xml:space="preserve" bytes="390">== Description ==
+Steps through the shadows to your target, friend or foe, without breaking Duskveil. Stores up to 2 charges. (Rogue talent)
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -135410,7 +135410,7 @@ Steps through the shadows to your target, friend or foe, without breaking Duskve
 | 10
 |-
 ! Cost
-| 20
+| 0
 |-
 ! Cooldown
 | 24s

@@ -2947,7 +2947,7 @@ export const id_ID: EnTranslations = {
       "spell": "Sihir",
       "defense": "Pertahanan",
       "ratings": "Peringkat",
-      "gearScore": "Gearscore",
+      "gearScore": "Skor perlengkapan",
       "playtimeLabel": "Waktu Bermain",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Kurang dari satu menit",

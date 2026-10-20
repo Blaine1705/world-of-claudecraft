@@ -2947,7 +2947,7 @@ export const ko_KR: EnTranslations = {
       "spell": "주문",
       "defense": "방어",
       "ratings": "등급",
-      "gearScore": "Gearscore",
+      "gearScore": "장비 점수",
       "playtimeLabel": "플레이 시간",
       "playtimeParts": "{major} {minor}",
       "playtimeUnderMinute": "1분 미만",

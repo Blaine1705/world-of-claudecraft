@@ -2947,7 +2947,7 @@ export const pt_BR: EnTranslations = {
       "spell": "Feitiço",
       "defense": "Defesa",
       "ratings": "Índices",
-      "gearScore": "Gearscore",
+      "gearScore": "Pontuação de equipamento",
       "playtimeLabel": "Tempo Jogado",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Menos de um minuto",

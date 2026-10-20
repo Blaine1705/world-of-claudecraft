@@ -2947,7 +2947,7 @@ export const vi_VN: EnTranslations = {
       "spell": "Phép",
       "defense": "Phòng Thủ",
       "ratings": "Xếp Hạng",
-      "gearScore": "Gearscore",
+      "gearScore": "Điểm trang bị",
       "playtimeLabel": "Thời Gian Chơi",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Chưa đầy một phút",

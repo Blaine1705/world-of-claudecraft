@@ -2947,7 +2947,7 @@ export const da_DK: EnTranslations = {
       "spell": "Stavekast",
       "defense": "Forsvar",
       "ratings": "Vurderinger",
-      "gearScore": "Gearscore",
+      "gearScore": "Udstyrsscore",
       "playtimeLabel": "Spilletid",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Under et minut",

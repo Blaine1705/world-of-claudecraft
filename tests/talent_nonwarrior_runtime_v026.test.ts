@@ -109,7 +109,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     // already-free cast, so the contract rides Low Blow, the finisher that
     // still bills energy.
     const sim = simWithRows('rogue', {});
-    addTarget(sim);
+    const target = addTarget(sim);
     sim.player.resource = sim.player.maxResource;
     sim.player.comboPoints = 5;
 
@@ -130,19 +130,30 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     const comboBefore = sim.player.comboPoints;
     sim.castAbility('kidney_shot');
 
+    expect(target.auras.find((a) => a.id === 'kidney_shot_stun')).toMatchObject({
+      kind: 'stun',
+      duration: 7,
+    });
     expect(sim.player.resource).toBe(resourceBefore); // the whole cast was free: no energy spent
     expect(sim.player.comboPoints).toBe(comboBefore); // combo points banked, not consumed
     expect(sim.player.auras.some((a) => a.kind === 'next_cast_free')).toBe(false);
   });
 
-  it('a normal Cutthroat Tempo spends its combo points and no energy', () => {
+  it('Cutthroat Tempo works during the GCD, spending combo points but no energy', () => {
     const sim = simWithRows('rogue', {});
     addTarget(sim);
     sim.player.resource = sim.player.maxResource;
     sim.player.comboPoints = 5;
 
+    sim.player.gcdRemaining = 1;
     sim.castAbility('slice_and_dice');
 
+    expect(sim.player.gcdRemaining).toBe(1);
+    expect(sim.player.auras.find((a) => a.id === 'slice_and_dice')).toMatchObject({
+      kind: 'buff_haste',
+      value: 1.3,
+      duration: 32,
+    });
     expect(sim.player.comboPoints).toBe(0);
     expect(sim.player.resource).toBe(sim.player.maxResource);
   });

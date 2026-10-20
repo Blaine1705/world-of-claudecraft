@@ -9,65 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "es_ES": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "fr_FR": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "fr_CA": [
-    "hudChrome.charSheet.gearScore"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "de_DE": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "zh_CN": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "zh_TW": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "ko_KR": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "ja_JP": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "pt_BR": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "ru_RU": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "cs_CZ": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "nl_NL": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "pl_PL": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "id_ID": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "tr_TR": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "sv_SE": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "vi_VN": [
-    "hudChrome.charSheet.gearScore"
-  ],
-  "da_DK": [
-    "hudChrome.charSheet.gearScore"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

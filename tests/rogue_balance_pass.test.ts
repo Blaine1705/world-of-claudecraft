@@ -40,6 +40,46 @@ describe('rogue balance pass', () => {
     expect(stealthed(p)).toBe(true);
   });
 
+  it("Killer's Calm guarantees five critical attacks and is exhausted before the sixth", () => {
+    const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('assassination');
+    const p = sim.player;
+    const mob = createMob(22_000, MOBS.forest_wolf, 5, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 2,
+    });
+    mob.hostile = true;
+    mob.maxHp = mob.hp = 500_000;
+    (sim as unknown as { addEntity(entity: Entity): void }).addEntity(mob);
+    sim.targetEntity(mob.id);
+    p.facing = 0;
+    sim.castAbility('cold_blood');
+    expect(p.auras.find((a) => a.kind === 'next_attack_crit')?.charges).toBe(5);
+    const criticals: boolean[] = [];
+    for (let attack = 0; attack < 6; attack++) {
+      // Aura changes recalculate gear stats; remove natural crit after each recalc.
+      p.critChance = 0;
+      p.gcdRemaining = 0;
+      p.resource = p.maxResource;
+      sim.events.length = 0;
+      sim.castAbility('sinister_strike');
+      p.autoAttack = false;
+      const hits = sim.events.filter((e) => e.type === 'damage' && e.sourceId === p.id);
+      expect(hits).toHaveLength(1);
+      const hit = hits[0];
+      if (hit.type !== 'damage') throw new Error('missing Wicked Slash damage');
+      criticals.push(hit.crit);
+      if (attack < 4) {
+        expect(p.auras.find((a) => a.kind === 'next_attack_crit')?.charges).toBe(4 - attack);
+      } else {
+        expect(p.auras.some((a) => a.kind === 'next_attack_crit')).toBe(false);
+      }
+    }
+    expect(criticals).toEqual([true, true, true, true, true, false]);
+  });
+
   it('Redhanded resolves as +30% Craven Thrust crit and False Face speeds up Duskveil by 15%', () => {
     const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);

@@ -2947,7 +2947,7 @@ export const zh_TW: EnTranslations = {
       "spell": "法術",
       "defense": "防禦",
       "ratings": "評分",
-      "gearScore": "Gearscore",
+      "gearScore": "裝備評分",
       "playtimeLabel": "遊戲時長",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "不到一分鐘",

@@ -2947,7 +2947,7 @@ export const tr_TR: EnTranslations = {
       "spell": "Büyü",
       "defense": "Savunma",
       "ratings": "Derecelendir",
-      "gearScore": "Gearscore",
+      "gearScore": "Ekipman puanı",
       "playtimeLabel": "Oynama Süresi",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Bir dakikadan az",

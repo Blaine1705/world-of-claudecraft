@@ -2947,7 +2947,7 @@ export const ja_JP: EnTranslations = {
       "spell": "呪文",
       "defense": "防御",
       "ratings": "レーティング",
-      "gearScore": "Gearscore",
+      "gearScore": "装備スコア",
       "playtimeLabel": "プレイ時間",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "1分未満",

@@ -2947,7 +2947,7 @@ export const cs_CZ: EnTranslations = {
       "spell": "Kouzlo",
       "defense": "Obrana",
       "ratings": "Hodnocení",
-      "gearScore": "Gearscore",
+      "gearScore": "Hodnocení výbavy",
       "playtimeLabel": "Odehraný čas",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Méně než minuta",

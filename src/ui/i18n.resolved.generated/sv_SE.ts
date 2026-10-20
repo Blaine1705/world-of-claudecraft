@@ -2947,7 +2947,7 @@ export const sv_SE: EnTranslations = {
       "spell": "Trollformel",
       "defense": "Försvar",
       "ratings": "Betyg",
-      "gearScore": "Gearscore",
+      "gearScore": "Utrustningspoäng",
       "playtimeLabel": "Tid spelad",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Mindre än en minut",

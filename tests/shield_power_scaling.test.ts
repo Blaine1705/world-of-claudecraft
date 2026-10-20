@@ -14,7 +14,6 @@ import {
   PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
 } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
-import { refreshKnownAbilities } from '../src/sim/progression/known_abilities';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { abilityEffectText } from '../src/ui/ability_description';
@@ -151,7 +150,7 @@ describe('Mass Barrier is a scaling raid cooldown (cast path)', () => {
     const meta = sim.players.get(casterId);
     if (!meta) throw new Error('missing meta');
     meta.talentMods.global.absorbPct = 0.3;
-    refreshKnownAbilities(sim.ctx, meta, false);
+    sim.ctx.refreshKnownAbilities(meta, false);
     sim.castAbility('mass_barrier', casterId);
     // base round(250 x 1.3) = 325, rider round(282 x 0.25 x 1.3) = round(91.65) = 92.
     expect(shieldOn(caster).value).toBe(417);
@@ -163,7 +162,7 @@ describe('Mass Barrier is a scaling raid cooldown (cast path)', () => {
     const meta = sim.players.get(casterId);
     if (!meta) throw new Error('missing meta');
     meta.talentMods.global.healPct = 0.2;
-    refreshKnownAbilities(sim.ctx, meta, false);
+    sim.ctx.refreshKnownAbilities(meta, false);
     sim.castAbility('mass_barrier', casterId);
     // base round(250 x 1.2) = 300, rider round(282 x 0.25 x 1.2) = round(84.6) = 85.
     expect(shieldOn(caster).value).toBe(385);
@@ -176,7 +175,7 @@ describe('Mass Barrier is a scaling raid cooldown (cast path)', () => {
     if (!meta) throw new Error('missing meta');
     meta.talentMods.global.healPct = 0.2;
     meta.talentMods.global.absorbPct = 0.3;
-    refreshKnownAbilities(sim.ctx, meta, false);
+    sim.ctx.refreshKnownAbilities(meta, false);
     sim.castAbility('mass_barrier', casterId);
     // base round(250 x 1.56) = 390, rider round(282 x 0.25 x 1.56) = round(109.98) = 110.
     expect(shieldOn(caster).value).toBe(500);

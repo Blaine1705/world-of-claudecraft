@@ -2947,7 +2947,7 @@ export const de_DE: EnTranslations = {
       "spell": "Zauber",
       "defense": "Verteidigung",
       "ratings": "Wertungen",
-      "gearScore": "Gearscore",
+      "gearScore": "Ausrüstungswert",
       "playtimeLabel": "Spielzeit",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Weniger als eine Minute",
