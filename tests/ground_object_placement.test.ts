@@ -15,9 +15,10 @@
 // These are the guards for that class of bug, not just the one instance.
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { GROUND_OBJECTS } from '../src/sim/data';
+import { CAMPS, GROUND_OBJECTS, QUESTS } from '../src/sim/data';
 import { DAWNHOLD } from '../src/sim/dawnhold_layout';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
+import { questObjectiveAreas } from '../src/sim/quest_targets';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
@@ -325,5 +326,49 @@ describe('authored ground pickups lie within wading depth of any declared water'
     }
     expect(qp.counts[1], 'all three chests credited').toBe(3);
     expect(qp.counts[0], 'the sprite cull is still owed').toBe(0);
+  });
+});
+
+describe('the Stolen Supply Crates lie in the relocated bandit camps', () => {
+  it('places every supply_crate inside a vale_bandit camp on unobstructed natural ground', () => {
+    const sim = makeSim();
+    const seed = sim.cfg.seed;
+    const def = GROUND_OBJECTS.find((g) => g.itemId === 'supply_crate');
+    expect(def).toBeDefined();
+    expect(def?.positions).toHaveLength(6);
+    const banditCamps = CAMPS.filter((c) => c.mobId === 'vale_bandit');
+    expect(banditCamps).toHaveLength(2);
+    for (const p of def?.positions ?? []) {
+      const inBanditCamp = banditCamps.some(
+        (camp) => Math.hypot(p.x - camp.center.x, p.z - camp.center.z) <= camp.radius,
+      );
+      expect(inBanditCamp, `supply_crate at ${p.x},${p.z} should sit in a vale_bandit camp`).toBe(
+        true,
+      );
+      expect(
+        isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS),
+        `supply_crate at ${p.x},${p.z} is inside a collider`,
+      ).toBe(false);
+      expect(groundHeight(p.x, p.z, seed) - terrainHeight(p.x, p.z, seed)).toBeLessThanOrEqual(
+        LIFT_EPSILON,
+      );
+    }
+  });
+
+  it('centers the Stolen Supplies map objective area on the bandit camps', () => {
+    const quest = QUESTS.q_supplies;
+    expect(quest).toBeDefined();
+    const areas = questObjectiveAreas(
+      new Map([['q_supplies', { questId: 'q_supplies', counts: [0], state: 'active' }]]),
+    );
+    expect(areas).toHaveLength(1);
+    const [area] = areas;
+    expect(area.center.x).toBeGreaterThan(60);
+    expect(area.center.z).toBeGreaterThan(0);
+    const def = GROUND_OBJECTS.find((g) => g.itemId === 'supply_crate');
+    expect(def).toBeDefined();
+    for (const p of def?.positions ?? []) {
+      expect(Math.hypot(p.x - area.center.x, p.z - area.center.z)).toBeLessThanOrEqual(area.radius);
+    }
   });
 });

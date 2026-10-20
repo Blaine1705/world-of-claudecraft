@@ -23,11 +23,11 @@ export const BIOME_PALETTE: Record<
     sand: 0xe4d4a8,
   },
   marsh: {
-    grass: 0x5aa04a,
-    grassDark: 0x2e7448,
-    grassYellow: 0x9cc05a,
-    dirt: 0x7e6a48,
-    sand: 0xbab084,
+    grass: 0x72b444,
+    grassDark: 0x468844,
+    grassYellow: 0xadd058,
+    dirt: 0xb49668,
+    sand: 0xe4d4a8,
   },
   peaks: {
     grass: 0x6aa04e,

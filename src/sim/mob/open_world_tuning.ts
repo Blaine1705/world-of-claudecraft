@@ -78,13 +78,14 @@ export function openWorldMobScale(level: number): OpenWorldMobScale {
   return scaleOf(points[points.length - 1]);
 }
 
-// Templates the curve leaves alone: decoration and practice targets, world
-// bosses (participant-scaled health of their own), and puzzle objects whose
-// health is a hit count, not a fight (the 1 HP egg clutches, quest-gated
-// destructibles, zero-XP props).
+// Templates the curve leaves alone: decoration and practice targets, open-world
+// elites (already carrying createMob's elite multiplier and bespoke health
+// pools), world bosses (participant-scaled health of their own), and puzzle
+// objects whose health is a hit count, not a fight (the 1 HP egg clutches,
+// quest-gated destructibles, zero-XP props).
 export function isOpenWorldTuned(template: MobTemplate): boolean {
   if (template.dummy || template.ambient || template.friendlyPracticeTarget) return false;
-  if (template.worldBoss || template.requiresQuestId) return false;
+  if (template.elite || template.worldBoss || template.requiresQuestId) return false;
   return template.xpMult !== 0;
 }
 
