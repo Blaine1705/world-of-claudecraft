@@ -212,11 +212,15 @@ proves no walked step exceeds `MAX_STEP_HEIGHT` or `cliffStep`.
 
 ### 3.5 World entrance
 
-`SMITH_HEART_DOOR_POS` (132, 772) in Thornpeak Heights (`src/sim/content/zone3.ts`),
-beside the Stormcrag POI (110, 760), north-east of Highwatch (0, 660). The world
-door is a crack in the Stormcrag cliffs from which four threads of coloured light
-escape (phase 2 art; phase 1 uses a placeholder door). While `SMITH_HEART_PLAYABLE`
-is false a production world refuses entry with `SMITH_HEART_CLOSED_TEXT`.
+`SMITH_HEART_DOOR_POS` (138, 756) in Thornpeak Heights (`src/sim/content/zone3.ts`), at
+the foot of the Stormcrag cliffs past the end of the Stormcrag road, north-east of
+Highwatch (0, 660); leaving sets the raid down to the west, away from the rock face.
+The world door is a crack in the cliffs from which four threads of coloured light
+escape (phase 2 art). While `SMITH_HEART_PLAYABLE` (`src/sim/content/smith_heart.ts`)
+is false the door is NOT built (`overworldDoor` follows the flag: no door entity,
+jambs, terrain pad or cleared ring, so the shipped world and its parity traces are
+untouched), the raid is entered only through `/dev heart`, and any other entry is
+refused with `SMITH_HEART_CLOSED_TEXT`.
 
 ### 3.6 Deviations from the approved pages
 
@@ -564,7 +568,7 @@ Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 
 ## 13. Shipping checklist
 
-- [ ] Flip `SMITH_HEART_PLAYABLE` to true (`entry.ts`).
+- [ ] Flip `SMITH_HEART_PLAYABLE` to true (`src/sim/content/smith_heart.ts`): this also builds the overworld door; check the door clearance, terrain calm anchor and parity goldens in the same change.
 - [ ] Set `guideVisible` true and regenerate the wiki (`npm run wiki:content`), plus
       any `guide.*` prose keys.
 - [ ] Book of Deeds records for the raid and its bosses (`src/sim/content/deeds.ts`,
