@@ -556,12 +556,15 @@ describe('draw-order determinism over a real Sim', () => {
     expect(run()).toEqual(run());
   });
 
-  it('draws exactly once per successful craft and zero on the denial, with the hunted procs pinned', () => {
+  it('draws the proc plus one quality draw per successful craft and zero on the denial, with the hunted procs pinned', () => {
     const a = run();
-    // The single output-side draw sits on the success path only: the
+    // The output-side draws sit on the success path only: the single proc
+    // draw, then the vestments copy's one loot-quality draw at grant (no
+    // copy on this seed rolls enhanced, so none spends the five weight
+    // draws; the instance pin below confirms no lootQuality landed). The
     // mid-sequence denial (no bone_fragments held) advances the shared rng
     // stream by exactly nothing.
-    expect(a.drawCounts).toEqual([1, 0, 1, 1]);
+    expect(a.drawCounts).toEqual([2, 0, 2, 2]);
     expect(a.results.map((r) => r.ok)).toEqual([true, false, true, true]);
     expect(a.results[1].reason).toBe('insufficient_materials');
     // Hunted-seed proc pattern: first success misses, second and third proc,
@@ -985,14 +988,15 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
 
   it('the crafting call site passes the consumed materials tier into the proc (hunted seed-21 window)', () => {
     // Same hunted seed-21 window as the signed-reagent cases above: the
-    // single proc draw lands in [0.03, 0.05). A synthetic skillReq-0 recipe
+    // proc draw (the first draw) lands in [0.03, 0.05). A synthetic skillReq-0 recipe
     // (resolveCraftForRecipe's exported-for-tests seam) on a fresh warrior
     // has no other bonus in play, so the ONLY chance input separating the
     // two arms is the reagent's material tier: the tier-2 arm rolls at
     // 0.03 + 0.02 = 0.05 and procs, the tier-0 arm rolls at the bare 0.03
     // base and misses the identical draw (proving a tier-0 recipe's chance
-    // is unchanged by the wiring). Both arms draw exactly once: the lookup
-    // is pure and cannot move the procRoll draw.
+    // is unchanged by the wiring). Both arms draw exactly twice, the proc
+    // first and then the vestments copy's one plain loot-quality draw: the
+    // lookup is pure and cannot move the procRoll draw.
     const SEED = 21;
     const craftSynthetic = (reagentItemId: string) => {
       const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: false });
@@ -1020,11 +1024,11 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     const premium = craftSynthetic('sunpetal_herb');
     expect(premium.result.ok).toBe(true);
     expect(premium.result.masterwork).toBe(true);
-    expect(premium.draws).toBe(1);
+    expect(premium.draws).toBe(2);
     const baseline = craftSynthetic('linen_scrap');
     expect(baseline.result.ok).toBe(true);
     expect(baseline.result.masterwork).toBeUndefined();
-    expect(baseline.draws).toBe(1);
+    expect(baseline.draws).toBe(2);
   });
 });
 
@@ -1053,11 +1057,13 @@ describe('R1: the masterwork proc on an APEX craft grants a head start, never a 
     }
     meta.knownRecipes?.add(recipe.id);
     for (const g of recipe.reagents) sim.addItem(g.itemId, g.count, pid);
-    // Force the single output-side proc draw: 0 is below every reachable
+    // Force the single proc draw (and the quality draw after it): 0 is below every reachable
     // chance (base 0.03 at minimum), so absent the R1 guard the masterwork
     // effect WOULD fire on this craft. The replacement also COUNTS calls,
-    // so the one-draw-per-successful-craft contract stays pinned on the
-    // apex path (the suppression must gate the EFFECT, never the draw).
+    // so the one-proc-draw-per-successful-craft contract stays pinned on the
+    // apex path (the suppression must gate the EFFECT, never the draw); the
+    // equipment output adds its one plain loot-quality draw at grant (a
+    // forced 0 sits under the enhanced threshold, so no weight draws).
     const rng: Rng = (sim as any).ctx.rng;
     let draws = 0;
     (rng as any).next = () => {
@@ -1075,7 +1081,7 @@ describe('R1: the masterwork proc on an APEX craft grants a head start, never a 
     // masterwork:true and the deed/announce arms downstream fire; what the
     // apex path never mints is the quality bump's rolled record.
     expect(apex.result.masterwork).toBe(true);
-    expect(apex.draws(), 'exactly one draw on the apex craft').toBe(1);
+    expect(apex.draws(), 'the proc draw plus one loot-quality draw on the apex craft').toBe(2);
     const slot = apex.meta.inventory.find(
       (s: { itemId: string }) => s.itemId === 'spiritweld_girdle',
     );
@@ -1088,12 +1094,18 @@ describe('R1: the masterwork proc on an APEX craft grants a head start, never a 
     expect(slot.instance?.perfecting).toBe(PERFECTING_HEADSTART_RANK);
     expect(slot.instance?.perfected).toBeUndefined();
     expect(slot.instance?.rolled).toBeUndefined();
+    expect(slot.instance?.lootQuality, 'a forced 0 rolls no enhanced quality').toBeUndefined();
   });
 
   it('the control: the same forced roll still procs a non-apex craft', () => {
     const control = craftForced('recipe_eastbrook_ritual_vestments', null);
     expect(control.result.ok).toBe(true);
     expect(control.result.masterwork).toBe(true);
-    expect(control.draws(), 'exactly one draw on the proccing control').toBe(1);
+    expect(control.draws(), 'the proc draw plus one loot-quality draw on the control').toBe(2);
+    const slot = control.meta.inventory.find(
+      (s: { itemId: string }) => s.itemId === 'eastbrook_ritual_vestments',
+    );
+    expect(slot?.instance?.rolled?.masterwork).toBe(true);
+    expect(slot?.instance?.lootQuality).toBeUndefined();
   });
 });

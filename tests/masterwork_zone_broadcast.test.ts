@@ -5,8 +5,9 @@
 // crafter's zone, the crafter included, next to (never instead of) the
 // personal `masterwork` event. Instanced players never receive the copy, and
 // an instanced CRAFTER emits no zone copies at all (personal toast only,
-// deliberately). The broadcast draws NO rng: the craft path's single-draw
-// contract (tests/professions_masterwork.test.ts) stays intact, re-asserted
+// deliberately). The broadcast draws NO rng: the craft path's draw contract
+// (one proc draw, then one loot-quality draw for this equipment output;
+// tests/professions_masterwork.test.ts) stays intact, re-asserted
 // here with the same observer idiom. Client side, the zone copy must reach
 // the HUD eventQueue and must NOT touch lastMasterwork (that mirror rebuilds
 // from ANY 'masterwork' event, which is exactly why this is a separate type).
@@ -57,8 +58,9 @@ const ITEM_ID = 'eastbrook_ritual_vestments';
 // Hunted proc seed, pinned (the professions_masterwork suite idiom: only the
 // pinned literal is committed), re-recorded after the Eastbrook camp respacing
 // thinned the zone-1 camp counts and shifted the camp-driven world-gen draw
-// sequence. With tailoring as the active archetype and skill 200 the single
-// output-side draw procs at 0.14; at this seed, with this exact setup order
+// sequence. With tailoring as the active archetype and skill 200 the proc
+// draw procs at 0.14 (the loot-quality draw follows it, so it never moved
+// this seed); at this seed, with this exact setup order
 // (three extra players added, then the archetype accept, the skill poke, 3x
 // linen_scrap, 1x spider_leg, then the craft), the first craft procs. Position
 // pokes after setup draw nothing, so both placements below share the identical
@@ -159,8 +161,9 @@ describe('emit side (Sim.craftItem)', () => {
         zoneId: r.zoneId,
       },
     ]);
-    // Single-draw contract intact: the whole craft, fanout included, drew once.
-    expect(r.draws).toBe(1);
+    // Draw contract intact: the whole craft, fanout included, drew the proc once
+    // plus the output's one loot-quality draw (unenhanced at this seed).
+    expect(r.draws).toBe(2);
   });
 
   it('an instanced crafter procs the personal event only: no zone copies at all', () => {
@@ -168,7 +171,7 @@ describe('emit side (Sim.craftItem)', () => {
     // Same seed, same stream position: the proc still lands.
     expect(r.personal).toHaveLength(1);
     expect(r.zone).toEqual([]);
-    expect(r.draws).toBe(1);
+    expect(r.draws).toBe(2);
   });
 });
 
