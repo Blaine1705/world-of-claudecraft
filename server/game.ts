@@ -2752,6 +2752,7 @@ export class GameServer {
   async stop(): Promise<void> {
     const referralDrain = this.referral.stop();
     this.guildBankLazyLoader.stop();
+    this.membership.stop();
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);

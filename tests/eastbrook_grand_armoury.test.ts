@@ -1,13 +1,14 @@
 // Eastbrook Grand Armoury contract, round 4: the armoury is RETIRED from
-// built-in placement. The KayKit barracks and a watch tower garrison its Wolf
-// Run lot at (17.5, -5.5) as zone1 decorProps, while the armoury GLB, its
-// exporter, and the render adapter stay shipped for custom worlds that place
-// the landmark themselves. Provenance note: the authored landmark data lives
+// built-in placement. The KayKit barracks and a watch tower garrisoned its
+// Wolf Run lot at (17.5, -5.5) as zone1 decorProps until the genshin artstyle
+// merge (8bff2cec638) cleared them, so the lot now stands empty, while the
+// armoury GLB, its exporter, and the render adapter stay shipped for custom
+// worlds that place the landmark themselves. Provenance note: the authored landmark data lives
 // on in src/sim/building_layout.ts (EASTBROOK_GRAND_ARMOURY: nativeBounds
 // 13 x 16.35 x 9, lot (17.5, -5.5) rot -PI/2, foundationDepth 1.35, shipped
 // asset /models/props/eastbrook_grand_armoury.glb); the old lot-ratio pins
-// retired with the placement. These tests pin the retirement, the garrison
-// colliders that replaced the lot, and the still-shipping adapter seam.
+// retired with the placement. These tests pin the retirement, the cleared
+// garrison lot, and the still-shipping adapter seam.
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
@@ -28,7 +29,6 @@ import {
 } from '../src/sim/building_layout';
 import {
   bankerChestSpots,
-  colliderInternalsForTest,
   isBlocked,
   pathCrossesFence,
   resolveMovement,
@@ -78,12 +78,12 @@ const BARRACKS_FRONT = { x: 12, z: -5.5 } as const;
 
 afterEach(() => setActiveWorldContent(null));
 
+// The Wolf Run garrison decor prop for `key`, or undefined when the lot holds
+// none (the garrison was cleared, so the retirement case asserts absence).
 function garrisonDecorProp(key: string) {
-  const prop = (ZONE1_PROPS.decorProps ?? []).find(
+  return (ZONE1_PROPS.decorProps ?? []).find(
     (candidate) => candidate.key === key && candidate.x > 0 && candidate.z > -30,
   );
-  if (!prop) throw new Error(`missing Wolf Run garrison decor prop ${key}`);
-  return prop;
 }
 
 // Returns where the follower actually stopped (within 0.2 yd of `to`), so a
@@ -546,10 +546,17 @@ describe('Eastbrook Grand Armoury render seam (custom-world adapter)', () => {
     // pre-round-6 envelope, so the minimum and the skirt depth return to the
     // values they carried before the camp and POI moves. The entrance sample
     // and the placement height never moved through either round.
+    // Re-pinned 2026-10 for the garrison clearance in the genshin artstyle
+    // merge (8bff2cec638, landed via e10ecc2aef8): the hexBarracks and
+    // hexWatchtower decorProps left zone1, and those rows fed the
+    // seed-162 world-gen under this lot (restoring only those two rows on the
+    // same tree restores 5.559724942256701 and 0.977169449218473), so the
+    // envelope minimum fell and the skirt deepened. The entrance sample and the
+    // placement height did not move.
     expect(alternatePlacement.entranceGroundY).toBeCloseTo(7.886894391475175, 8);
-    expect(alternatePlacement.minGroundY).toBeCloseTo(5.559724942256701, 8);
+    expect(alternatePlacement.minGroundY).toBeCloseTo(5.363468776143649, 8);
     expect(alternatePlacement.y).toBeCloseTo(6.536894391475174, 8);
-    expect(alternatePlacement.foundationSkirtDepth).toBeCloseTo(0.977169449218473, 8);
+    expect(alternatePlacement.foundationSkirtDepth).toBeCloseTo(1.1734256153315252, 8);
 
     const group = new THREE.Group();
     const stone = new THREE.MeshStandardMaterial({ vertexColors: true });

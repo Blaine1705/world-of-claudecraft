@@ -19273,6 +19273,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': 'トリプルTの笛',
   'entities.items.whistle_trollface.name': 'トロールフェイスの笛',
   'entities.items.whistle_tuskhorn_boar.name': 'タスクホーン・ボアの笛',
+  'hudChrome.buddyMenu.rename': 'バディの名前を変更',
+  'hudChrome.buddyMenu.nameLabel': 'バディの名前',
   'hudChrome.buddyMenu.autolootEnable': '自動収集を有効化',
   'hudChrome.buddyMenu.autolootDisable': '自動収集を無効化',
   'hudChrome.buddyMenu.autolootHint':
@@ -20045,6 +20047,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': 'マウント',
   'hudChrome.cosmetics.tabSkins': 'スキン',
   'hudChrome.cosmetics.tabMech': 'メカ',
+  'hudChrome.cosmetics.buddyActive': '召喚中',
+  'hudChrome.cosmetics.buddyDrag': 'アクションバーへドラッグ',
   'hudChrome.cosmetics.legend':
     'アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。',
   'hudChrome.cosmetics.scopeAccount': 'アカウント',
@@ -21527,7 +21531,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.crypt.tolling':
     '鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。',
   'hudChrome.auraEffect.crypt.embraced':
-    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
+    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%（ヒロイックでは{shareHeroic}%）を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
   'hudChrome.auraEffect.crypt.lament':
     '花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。',
   'hudChrome.auraEffect.crypt.lingering':

@@ -139,6 +139,7 @@ import { type SeatClipPhase, seatClip } from './seat_clips';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
 import { shardpikeProp } from './shardpike_prop';
+import { SHARDPIKE_THROW_CLIP } from './shardpike_throw_clip';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -1649,8 +1650,14 @@ export class CharacterVisual {
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
+      // Signature_* is the warrior rigs' convention; every other player rig binds
+      // only the Shardpike throw prepareShardpikeThrowClip mints for it, never a
+      // same-named clip some other GLB happens to ship.
+      const warriorRig = key === 'player_warrior' || key === 'player_warrior_modular';
       const signatureClips = key.startsWith('player_')
-        ? Array.from(prep.clips.keys()).filter((n) => n.startsWith('Signature_'))
+        ? Array.from(prep.clips.keys()).filter((n) =>
+            warriorRig ? n.startsWith('Signature_') : n === SHARDPIKE_THROW_CLIP,
+          )
         : [];
       for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES, ...signatureClips]) {
         const clip = prep.clips.get(name);

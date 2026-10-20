@@ -7487,6 +7487,10 @@
     top: max(10px, env(safe-area-inset-top));
     bottom: max(10px, env(safe-area-inset-bottom));
     width: auto;
+    /* Both opposing edges are pinned, so the edge pin IS the height on touch:
+       a desktop height on this window would otherwise over-constrain the box
+       and the browser would drop `bottom`. */
+    height: auto;
     transform: none;
     max-width: none;
     max-height: none;

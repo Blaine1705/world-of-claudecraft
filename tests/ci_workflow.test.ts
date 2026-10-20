@@ -324,6 +324,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/balgath-shardpike/',
       '            /docs/screenshots/bank-storage-charters/',
       '            /docs/screenshots/bank-vault-tab/',
+      '            /docs/screenshots/bastion-ghost-crew/',
       '            /docs/screenshots/buried-hoard-entrance/',
       '            /docs/screenshots/buried-hoard-valley/',
       '            /docs/screenshots/clue-character-panel/',
@@ -361,6 +362,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/ravenrift-battleground/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
+      '            /docs/screenshots/scenery-windows-4070-2026-10-15/',
       '            /docs/screenshots/target-dots/',
       '            /docs/screenshots/touch-ui-rework/',
       '            /docs/screenshots/vault-fine-mark/',
@@ -688,7 +690,19 @@ describe('CI workflow parity', () => {
     // auto-rerunnable setup class.
     expect(browserGate).toContain(PLAYWRIGHT_INSTALL_BLOCK);
     expect(browserGate).not.toContain('--with-deps');
-    expect(browserGate).toContain('run: npm run test:browser');
+    // Two halves in two fresh sessions (a long single session lost its server
+    // connection at the 48th file on the v0.45.0 integration). Pinned whole:
+    // both halves always run and either failing fails the step, so a half can
+    // never drop out or mask the other.
+    expect(browserGate).toContain(
+      [
+        '        run: |',
+        '          status=0',
+        '          npm run test:browser -- --shard=1/2 || status=1',
+        '          npm run test:browser -- --shard=2/2 || status=1',
+        '          exit "$status"',
+      ].join('\n'),
+    );
     const browser = gateSteps.find((s) => s.name === 'browser regressions');
     expect(browser?.cmd).toBe('npm');
     expect(browser?.args).toEqual(['run', 'test:browser']);
@@ -1388,7 +1402,9 @@ describe('CI workflow parity', () => {
       // rebalance without re-sizing.
       ['pr-long-sims-a', 28],
       ['pr-long-sims-b', 28],
-      ['browser-gate', 10],
+      // 12 since the v0.45.0 integration: a 6.2 minute healthy wall (run
+      // 39354039920) plus the second browser session (rationale on ci.yml).
+      ['browser-gate', 12],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
       // single-digit shape check the classifier test keeps.

@@ -170,9 +170,18 @@ describe('mob aura icon art', () => {
     // whose shared blood_frenzy runtime id already resolves to painted art, so
     // the identity count holds. 111 carriers and 91 identities with Balgath's
     // Barrowhide (the Mirefen world-boss branch, release/v0.45.0 merge).
-    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 114, 93.
-    expect(census.carrierCount).toBe(114);
-    expect(census.identities.size).toBe(93);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 112, 92.
+    // Re-counted 2026-10 off the merged MOBS at 106a086b617 (the 114 and 93
+    // first written here were never the merged tree's counts): the rework adds
+    // five carriers (crypt_carrion_crow blind, basin_raptor and
+    // bastion_warhound packFrenzy, rimeweb_spinner stackPoison,
+    // drowned_sergeant warcry) and retires four (charge on
+    // knight_commander_olen and sexton_marrow, warcry and wardAllies on
+    // wildheart_beastmaster), so 111 + 5 - 4. Identities: three new per-template
+    // runtime ids (blind_, stackpoison_, warcry_) minus the beastmaster's two;
+    // pack_frenzy and mob_charge_stun are shared ids that still have carriers.
+    expect(census.carrierCount).toBe(112);
+    expect(census.identities.size).toBe(92);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {

@@ -38,7 +38,7 @@ export interface EffigyPlankRest {
   q: readonly [number, number, number, number];
   /** Its lying-flat orientation on the ground, quaternion (thin axis up, yawed). */
   flat: readonly [number, number, number, number];
-  /** Half its thickness: the height its centre rests at once it lies on the ground. */
+  /** Half its thickness, the height its centre rests at once it lies on the ground. */
   halfThickness: number;
 }
 

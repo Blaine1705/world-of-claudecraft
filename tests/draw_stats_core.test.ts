@@ -249,8 +249,10 @@ describe('draw_stats_core', () => {
 
   it('pins the config version that segments the expanded graphics profiles', () => {
     // v21 separates the staged per-system graphics controls and expanded
-    // profile bytes from v20 fleet comparisons.
-    expect(GFX_CONFIG_VERSION).toBe(21);
+    // profile bytes from v20 fleet comparisons. v22 (8ac3ed28f3d, merged with
+    // the genshin overhaul) segments Low's distant scenery index LOD and its
+    // clearer outdoor light pair from v21 Low frames.
+    expect(GFX_CONFIG_VERSION).toBe(22);
   });
 
   it('clamps a backward counter jump at zero, per field, and recovers', () => {
