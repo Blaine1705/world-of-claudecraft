@@ -1,4 +1,9 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { DISCORD_CHOICE_KEY } from '../src/game/discord_login_choice';
+import { EDITOR_PLAYTEST_KEY } from '../src/game/editor_playtest';
+import { ENTRY_PROBE_KEY } from '../src/game/entry_crash_guard';
+import { GRAPHICS_REBUILD_PROBE_KEY } from '../src/game/graphics_rebuild_crash_guard';
 import {
   interfaceModeFromSetting,
   PHONE_TOUCH_QUERY,
@@ -65,8 +70,19 @@ describe('bootModeFor', () => {
     for (const key of GAME_NOW_SESSION_KEYS) {
       expect(bootModeFor(inputs({ session: (k) => (k === key ? '1' : null) })), key).toBe('game');
     }
-    expect(GAME_NOW_STORED_KEYS).toContain('woc_session');
-    expect(GAME_NOW_SESSION_KEYS).toContain('woc_editor_playtest');
+  });
+
+  it('names the keys their owners write', () => {
+    // Literals here (the boot chunk must not import the client), pinned to the owners.
+    const onlineTs = readFileSync(new URL('../src/net/online.ts', import.meta.url), 'utf8');
+    const sessionKey = /private static readonly SESSION_KEY = '([^']+)'/.exec(onlineTs)?.[1];
+    expect(GAME_NOW_STORED_KEYS).toEqual([
+      sessionKey,
+      DISCORD_CHOICE_KEY,
+      ENTRY_PROBE_KEY,
+      GRAPHICS_REBUILD_PROBE_KEY,
+    ]);
+    expect(GAME_NOW_SESSION_KEYS).toEqual([EDITOR_PLAYTEST_KEY]);
   });
 });
 

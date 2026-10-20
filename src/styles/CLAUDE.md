@@ -7,7 +7,8 @@
 
 All game CSS for the two game entries (`index.html` + `play.html`), extracted from the old
 inline `<style>` blocks into one directory under a single `@layer` order, imported
-once from `src/main.ts` via the `index.css` barrel (admin/guide keep their own entries). No
+from `src/main.ts` (and from `src/boot.ts`, index.html's entry) via the `index.css` barrel
+(admin/guide keep their own entries). No
 CSS framework; hand-authored, Lightning-compiled.
 
 ## Module shape and the @layer order

@@ -170,7 +170,7 @@ import {
   resetLoadProfile,
   summarizeLoadProfile,
 } from './game/load_profiler';
-import { trackMetaPixel } from './game/meta_pixel';
+import { trackCommunityLinkClicks, trackMetaPixel } from './game/meta_pixel';
 import {
   interfaceModeFromSetting,
   isPhoneTouchDevice,
@@ -739,31 +739,6 @@ function saveHomepageMusicMuted(muted: boolean): void {
   } catch {
     // Private browsing or storage failures should not block the control.
   }
-}
-
-function trackCommunityLinkClicks(): void {
-  document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
-    let url: URL;
-    try {
-      url = new URL(link.href);
-    } catch {
-      return;
-    }
-    const host = url.hostname.toLowerCase();
-    const isGitHub = host === 'github.com' || host.endsWith('.github.com');
-    const isDiscord =
-      host === 'discord.gg' ||
-      host.endsWith('.discord.gg') ||
-      host === 'discord.com' ||
-      host.endsWith('.discord.com');
-    if (!isGitHub && !isDiscord) return;
-    link.addEventListener('click', () => {
-      trackMetaPixel(isGitHub ? 'GitHubClick' : 'DiscordClick', {
-        url: url.toString(),
-        path: url.pathname,
-      });
-    });
-  });
 }
 
 function localizedSiteUrl(lang: SupportedLanguage): string {

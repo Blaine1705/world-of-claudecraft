@@ -8,6 +8,7 @@
 export const GAME_MODULES_ELEMENT_ID = 'woc-game-modules';
 
 const MAIN_ENTRY = /(^|\/)src\/main\.ts$/;
+const DEPENDENCY = /(^|\/)node_modules\//;
 
 function staticClosure(start, byName) {
   const seen = new Set();
@@ -23,7 +24,9 @@ function staticClosure(start, byName) {
 
 /**
  * The game client's chunk files: src/main.ts's chunk first, then every chunk it
- * statically imports, minus those the page's own entry chunk already loads.
+ * statically imports, minus those the page's own entry chunk already loads. Throws if
+ * the entry chunk statically reaches the client, which would put it back on the first
+ * paint.
  */
 export function gameModuleFiles(bundle, entryFileName) {
   const chunks = Object.values(bundle).filter((item) => item?.type === 'chunk');
@@ -31,16 +34,21 @@ export function gameModuleFiles(bundle, entryFileName) {
   // play.html also enters src/main.ts, so the bundler can place it in a shared chunk
   // with no facade (Vite 8 does): find the chunk by the modules it holds.
   const holdsMain = (chunk) =>
-    [chunk.facadeModuleId, ...(chunk.moduleIds ?? [])].some((id) =>
-      MAIN_ENTRY.test(String(id ?? '').replaceAll('\\', '/')),
-    );
+    [chunk.facadeModuleId, ...(chunk.moduleIds ?? [])].some((id) => {
+      const path = String(id ?? '').replaceAll('\\', '/');
+      return MAIN_ENTRY.test(path) && !DEPENDENCY.test(path);
+    });
   const main = chunks.find(holdsMain);
   if (!main) return [];
   const loaded = entryFileName ? staticClosure(entryFileName, byName) : new Set();
+  if (loaded.has(main.fileName)) {
+    // The landing entry would download the whole client up front again.
+    throw new Error(`${entryFileName} statically imports the game client (${main.fileName})`);
+  }
   const rest = [...staticClosure(main.fileName, byName)]
     .filter((file) => file !== main.fileName && !loaded.has(file))
     .sort();
-  return loaded.has(main.fileName) ? rest : [main.fileName, ...rest];
+  return [main.fileName, ...rest];
 }
 
 /** index.html with the module list as a JSON block before </body>. */

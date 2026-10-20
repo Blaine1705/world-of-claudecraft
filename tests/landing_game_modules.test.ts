@@ -70,6 +70,28 @@ describe('gameModuleFiles', () => {
     expect(gameModuleFiles(facade, 'assets/boot-1.js')[0]).toBe('assets/main-3.js');
   });
 
+  it('refuses a landing entry that statically reaches the client', () => {
+    const eager = {
+      ...bundle,
+      'assets/boot-1.js': { ...bundle['assets/boot-1.js'], imports: ['assets/main-3.js'] },
+    };
+    expect(() => gameModuleFiles(eager, 'assets/boot-1.js')).toThrow(/statically imports/);
+  });
+
+  it("ignores a dependency's own src/main.ts", () => {
+    const dep = {
+      'assets/vendor-9.js': {
+        type: 'chunk',
+        fileName: 'assets/vendor-9.js',
+        imports: [],
+        facadeModuleId: null,
+        moduleIds: ['/repo/node_modules/some-lib/src/main.ts'],
+      },
+      ...bundle,
+    };
+    expect(gameModuleFiles(dep, 'assets/boot-1.js')[0]).toBe('assets/main-3.js');
+  });
+
   it('lists nothing when the bundle has no client chunk', () => {
     const { 'assets/main-3.js': _main, ...rest } = bundle;
     expect(gameModuleFiles(rest, 'assets/boot-1.js')).toEqual([]);

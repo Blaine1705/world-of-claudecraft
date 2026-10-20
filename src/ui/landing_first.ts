@@ -5,18 +5,26 @@
 // before the landing could show, which held a cold phone's first paint for seconds.
 //
 // What this module owns until the client takes over:
-// - the body classes and viewport size the landing CSS keys on, its icons and its
-//   characters-created counter (main.ts sets the same ones at boot, from the same
-//   inputs, so its later pass changes nothing on screen);
-// - lifting the boot splash once the stylesheets, fonts and backdrop are ready;
-// - prefetching the client's modules once the page has loaded and settled (no compile,
-//   no execution);
-// - holding a button clicked before the client is ready: it shows a busy state, and
-//   the click is replayed once main.ts has wired the start screens. main.ts signals
-//   that by dispatching BOOT_SPLASH_OWNED_EVENT (liftBootSplashWhenReady), which it
-//   does right after wireStartScreens().
-// Links, form fields and the community <details> keep their native behaviour.
+// - painting the text first: index.html holds the landing's artwork back
+//   (#start-screen.art-deferred) and this module fades it in once it has decoded;
+// - what main.ts would otherwise set at boot and the landing needs from the start, from
+//   the same inputs, so the client's later pass changes nothing on screen: the body
+//   classes and viewport size the landing CSS keys on, its icons, the characters-created
+//   counter and the Steam wishlist links;
+// - the page-view bookkeeping main.ts did at load (first-touch attribution, the site
+//   presence heartbeat, community link click events), so a visitor who never interacts
+//   is still counted; each is safe to run again when main.ts boots;
+// - lifting the boot splash once the stylesheets and fonts are ready;
+// - fetching the client's modules into the HTTP cache once the page has settled (no
+//   compile, no execution);
+// - holding a button click or a select change made before the client is ready: the
+//   control shows a busy state, and the action is replayed once main.ts has wired the
+//   start screens. main.ts signals that by dispatching BOOT_SPLASH_OWNED_EVENT
+//   (liftBootSplashWhenReady), which it does right after wireStartScreens().
+// Links and text fields keep their native behaviour.
 
+import { captureFirstTouch } from '../attribution';
+import { apiUrl } from '../client_origin';
 import {
   BROWSER_BODY_CLASSES,
   browserBodyClasses,
@@ -24,20 +32,59 @@ import {
   readBrowserEnv,
 } from '../game/browser_env';
 import { shouldUseStaticBackdrop } from '../game/landing_backdrop';
+import { trackCommunityLinkClicks } from '../game/meta_pixel';
 import { Settings } from '../game/settings';
 import { loadingCurtainFadeMs } from '../game/ui_effects_profile';
+import { startSitePresence } from '../site_presence';
 import { liftBootSplashWhenReady } from './boot_splash';
 import { BOOT_SPLASH_OWNED_EVENT } from './boot_splash_core';
 import { LANDING_PHONE_TOUCH_QUERY, landingTouchInterface } from './landing_first_core';
 import { loadProjectStats, type ProjectStats } from './project_stats';
+import { syncSteamWishlistVisibility } from './steam_wishlist';
 import { hydrateIcons } from './ui_icons';
 
-/** On the control whose click is waiting for the client; drives its busy styling. */
+/** On the control whose action is waiting for the client; drives its busy styling. */
 export const LANDING_BOOTING_ATTR = 'data-landing-booting';
-/** On body while a click waits for the client. */
+/** On body while an action waits for the client. */
 export const LANDING_BOOTING_CLASS = 'landing-booting';
 /** The build's list of the client's module URLs (vite.config.ts, woc-landing-game-modules). */
 export const GAME_MODULES_ELEMENT_ID = 'woc-game-modules';
+/** On #start-screen in index.html: the landing's artwork waits (src/styles/shell.website.css). */
+export const ART_DEFERRED_CLASS = 'art-deferred';
+/**
+ * The artwork that class holds back: the backdrop key art, the panel frame and the panel
+ * logo. Decoded before the class drops so each layer fades in whole; pinned to the
+ * stylesheet by tests/landing_first.test.ts.
+ */
+export const LANDING_ART_URLS: readonly string[] = [
+  '/website-hero-eastbrook-v1.webp',
+  '/website-fractured-portal-v5.webp',
+  '/worldofclaudecraft-logo.webp',
+];
+/** How long the art may take to decode before it is shown anyway. */
+const ART_REVEAL_TIMEOUT_MS = 4000;
+/**
+ * How long after the lift the art waits for the landing's own largest paint before
+ * loading anyway (browsers without largest-contentful-paint entries, or a page whose
+ * largest element painted before the lift).
+ */
+export const LANDING_PAINT_FALLBACK_MS = 600;
+/**
+ * How long after the load event deferred work (the client prefetch, the slideshow's
+ * later scenes) waits before asking for idle time: the landing's own images and fonts
+ * are still decoding and painting around load, and anything competing with them would
+ * delay the largest paint the visitor is waiting for.
+ */
+export const GAME_PREFETCH_DELAY_MS = 1500;
+/**
+ * Mirrors TURNSTILE_SCRIPT_URL in src/game/turnstile_gate.ts (pinned by the test): the
+ * captcha script starts loading when the visitor first interacts, so the login form's
+ * widget is ready sooner than if it waited for the client.
+ */
+export const LANDING_TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+/** sessionStorage mark of a reload after the client failed to load (see runLandingFirst). */
+const RELOAD_MARK_KEY = 'woc_landing_reload';
+const RELOAD_MARK_WINDOW_MS = 60_000;
 
 /** Interactions that start the client. Scrolling with a wheel or trackpad does not. */
 const START_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const;
@@ -103,7 +150,9 @@ export function syncLandingViewport(win: Window = window): void {
 }
 
 async function fetchProjectStats(): Promise<ProjectStats> {
-  const res = await fetch('/api/project-stats', { headers: { accept: 'application/json' } });
+  const res = await fetch(apiUrl('/api/project-stats'), {
+    headers: { accept: 'application/json' },
+  });
   if (!res.ok) throw new Error(`project stats ${res.status}`);
   return (await res.json()) as ProjectStats;
 }
@@ -121,92 +170,205 @@ export function gameModuleUrls(doc: Document = document): string[] {
 }
 
 /**
- * Put the client's modules in the HTTP cache at idle priority. Plain prefetch, not
- * modulepreload: modulepreload also compiles each module, and compiling the client
- * on a phone's main thread is the cost this boot exists to keep off the landing.
+ * Fetch the client's modules into the HTTP cache at low priority. A plain fetch, not a
+ * link: modulepreload would also compile each module on the main thread, Safari ignores
+ * rel=prefetch, and a <link> with the module's URL stops Vite's own preload of it when
+ * the client is imported. The body is read so the whole response reaches the cache.
  */
-function prefetchGameModules(): void {
+export function prefetchGameModules(): void {
   if (saveDataHint()) return;
-  for (const href of gameModuleUrls()) {
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.as = 'script';
-    link.crossOrigin = 'anonymous';
-    link.href = href;
-    document.head.appendChild(link);
+  for (const url of gameModuleUrls()) {
+    const init: RequestInit & { priority?: 'low' } = {
+      credentials: 'same-origin',
+      priority: 'low',
+    };
+    void fetch(url, init)
+      .then((res) => res.blob())
+      .catch(() => undefined);
   }
 }
 
-const onResize = () => syncLandingViewport();
-
 /**
- * How long after the load event deferred work (the client prefetch, the slideshow's
- * later scenes) waits before asking for idle time: the landing's own images and fonts
- * are still decoding and painting around load, and anything competing with them would
- * delay the largest paint the visitor is waiting for.
+ * Run once the page has loaded, settled for GAME_PREFETCH_DELAY_MS and gone idle.
+ * Returns a cancel function.
  */
-export const GAME_PREFETCH_DELAY_MS = 1500;
-
-/** Run once the page has loaded, settled for GAME_PREFETCH_DELAY_MS and gone idle. */
-export function afterLoadSettles(run: () => void): void {
+export function afterLoadSettles(run: () => void): () => void {
+  let cancelled = false;
+  let timer: number | undefined;
+  const fire = () => {
+    if (!cancelled) run();
+  };
   const idle = () => {
     // Safari has no requestIdleCallback.
     if (typeof window.requestIdleCallback === 'function') {
-      window.requestIdleCallback(run, { timeout: 2000 });
+      window.requestIdleCallback(fire, { timeout: 2000 });
     } else {
-      setTimeout(run, 0);
+      timer = window.setTimeout(fire, 0);
     }
   };
-  const later = () => setTimeout(idle, GAME_PREFETCH_DELAY_MS);
+  const later = () => {
+    timer = window.setTimeout(idle, GAME_PREFETCH_DELAY_MS);
+  };
   if (document.readyState === 'complete') later();
   else window.addEventListener('load', later, { once: true });
+  return () => {
+    cancelled = true;
+    window.removeEventListener('load', later);
+    if (timer !== undefined) window.clearTimeout(timer);
+  };
 }
 
-export function runLandingFirst(startGame: () => Promise<unknown>): void {
+/**
+ * Fetch and decode the landing's artwork, then let it fade in. Called once the landing's
+ * text has painted, so the art never competes with it.
+ */
+export function revealLandingArt(): Promise<void> {
+  const start = document.getElementById('start-screen');
+  if (!start?.classList.contains(ART_DEFERRED_CLASS)) return Promise.resolve();
+  const decoded = LANDING_ART_URLS.map((url) => {
+    const img = new Image();
+    img.src = url;
+    return typeof img.decode === 'function' ? img.decode().catch(() => undefined) : undefined;
+  });
+  const timeout = new Promise<void>((resolve) => setTimeout(resolve, ART_REVEAL_TIMEOUT_MS));
+  return Promise.race([Promise.all(decoded).then(() => undefined), timeout]).then(() => {
+    start.classList.remove(ART_DEFERRED_CLASS);
+  });
+}
+
+/**
+ * Run once the landing's largest element has painted after the splash lifted at
+ * `liftedAt`, so whatever `run` fetches cannot delay that paint. Returns a cancel
+ * function.
+ */
+export function afterLandingPainted(liftedAt: number, run: () => void): () => void {
+  let done = false;
+  let observer: PerformanceObserver | undefined;
+  const go = () => {
+    if (done) return;
+    done = true;
+    observer?.disconnect();
+    setTimeout(run, 0);
+  };
+  if (
+    typeof PerformanceObserver === 'function' &&
+    PerformanceObserver.supportedEntryTypes?.includes('largest-contentful-paint')
+  ) {
+    observer = new PerformanceObserver((list) => {
+      if (list.getEntries().some((entry) => entry.startTime >= liftedAt)) go();
+    });
+    observer.observe({ type: 'largest-contentful-paint', buffered: true });
+  }
+  const fallback = setTimeout(go, LANDING_PAINT_FALLBACK_MS);
+  return () => {
+    done = true;
+    observer?.disconnect();
+    clearTimeout(fallback);
+  };
+}
+
+function loadTurnstileEarly(): void {
+  if (!String(import.meta.env.VITE_TURNSTILE_SITEKEY ?? '')) return;
+  if (document.querySelector(`script[src="${LANDING_TURNSTILE_SCRIPT_URL}"]`)) return;
+  const script = document.createElement('script');
+  script.src = LANDING_TURNSTILE_SCRIPT_URL;
+  script.async = true;
+  document.head.appendChild(script);
+}
+
+/**
+ * Whether to reload after the client failed to load. A failed dynamic import stays
+ * failed for the life of the page (the module map keeps the error), and the usual cause
+ * is a deploy that replaced the hashed chunks mid-visit, which a reload fixes. Once a
+ * minute at most, so a client that keeps failing (offline) cannot loop.
+ */
+export function shouldReloadAfterFailure(
+  now = Date.now(),
+  storage: Pick<Storage, 'getItem' | 'setItem'> = sessionStorage,
+): boolean {
+  try {
+    const last = Number(storage.getItem(RELOAD_MARK_KEY) ?? 0);
+    if (now - last < RELOAD_MARK_WINDOW_MS) return false;
+    storage.setItem(RELOAD_MARK_KEY, String(now));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+type HeldAction =
+  | { kind: 'click'; el: HTMLElement }
+  | { kind: 'change'; el: HTMLSelectElement; value: string };
+
+/** Start the landing-first boot. Returns a function that tears it down (for tests). */
+export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
   const settings = new Settings();
   stampLandingBody(settings);
   syncLandingViewport();
+  const onResize = () => syncLandingViewport();
   window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', onResize);
+  window.visualViewport?.addEventListener('resize', onResize);
   // The landing's own icons only: the hidden in-world controls carry painted art the
   // client hydrates later, and fetching it now would compete with the first paint.
   const startScreen = document.getElementById('start-screen');
   if (startScreen) hydrateIcons(startScreen);
   void loadProjectStats(fetchProjectStats);
+  // Landing mode only runs on the website, which has no Steam bridge to ask.
+  void syncSteamWishlistVisibility(false);
+  captureFirstTouch();
+  startSitePresence('home');
+  trackCommunityLinkClicks();
+
+  let disposed = false;
+  let cancelArt: (() => void) | undefined;
   const osReducedMotion = matches('(prefers-reduced-motion: reduce)');
+  // The art stays held back (art-deferred) so the lift waits only for the stylesheets and
+  // fonts; once the landing has painted, the art loads and fades in.
   void liftBootSplashWhenReady({
     landing: true,
     fadeMs: loadingCurtainFadeMs(settings.get('reduceMotion') || osReducedMotion),
+  }).then(() => {
+    if (!disposed) cancelArt = afterLandingPainted(performance.now(), revealLandingArt);
   });
-  afterLoadSettles(prefetchGameModules);
 
   // The lift above dispatched BOOT_SPLASH_OWNED_EVENT synchronously; the next one is
   // main.ts, once its start screens are wired.
   let started = false;
   let ready = false;
-  let pending: HTMLElement | null = null;
+  let held: HeldAction | null = null;
+  const cancelPrefetch = afterLoadSettles(() => {
+    if (!started) prefetchGameModules();
+  });
 
-  const markBusy = (el: HTMLElement | null) => {
-    pending?.removeAttribute(LANDING_BOOTING_ATTR);
-    pending?.removeAttribute('aria-busy');
-    pending = el;
-    pending?.setAttribute(LANDING_BOOTING_ATTR, '');
-    pending?.setAttribute('aria-busy', 'true');
-    document.body.classList.toggle(LANDING_BOOTING_CLASS, pending !== null);
+  const markBusy = (next: HeldAction | null) => {
+    held?.el.removeAttribute(LANDING_BOOTING_ATTR);
+    held?.el.removeAttribute('aria-busy');
+    held = next;
+    held?.el.setAttribute(LANDING_BOOTING_ATTR, '');
+    held?.el.setAttribute('aria-busy', 'true');
+    document.body.classList.toggle(LANDING_BOOTING_CLASS, held !== null);
+  };
+
+  const stopHolding = () => {
+    window.removeEventListener('resize', onResize);
+    window.removeEventListener('orientationchange', onResize);
+    window.visualViewport?.removeEventListener('resize', onResize);
+    document.removeEventListener('click', onClick, true);
+    document.removeEventListener('change', onChange, true);
   };
 
   const start = () => {
     if (started) return;
     started = true;
     for (const type of START_EVENTS) document.removeEventListener(type, start, true);
+    loadTurnstileEarly();
     startGame().catch((err: unknown) => {
-      // The client failed to load (offline, a deploy mid-visit): drop the busy state
-      // and let the next interaction try again.
       console.error('game client failed to load:', err);
-      started = false;
+      ready = true;
+      stopHolding();
       markBusy(null);
-      for (const type of START_EVENTS) {
-        document.addEventListener(type, start, { capture: true, passive: true });
-      }
+      if (shouldReloadAfterFailure()) location.reload();
     });
   };
 
@@ -217,23 +379,45 @@ export function runLandingFirst(startGame: () => Promise<unknown>): void {
     if (!(control instanceof HTMLElement)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    markBusy(control);
+    markBusy({ kind: 'click', el: control });
+  };
+
+  // A select's change (the language and graphics pickers) has no listener until the
+  // client loads, and main.ts resets each picker to the stored value when it wires them,
+  // so the visitor's pick is held and re-applied.
+  const onChange = (event: Event) => {
+    if (ready || !(event.target instanceof HTMLSelectElement)) return;
+    start();
+    markBusy({ kind: 'change', el: event.target, value: event.target.value });
+  };
+
+  const onReady = () => {
+    ready = true;
+    stopHolding();
+    const action = held;
+    markBusy(null);
+    if (!action?.el.isConnected) return;
+    if (action.kind === 'click') {
+      action.el.click();
+    } else {
+      action.el.value = action.value;
+      action.el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   };
 
   for (const type of START_EVENTS) {
     document.addEventListener(type, start, { capture: true, passive: true });
   }
   document.addEventListener('click', onClick, true);
-  document.addEventListener(
-    BOOT_SPLASH_OWNED_EVENT,
-    () => {
-      ready = true;
-      window.removeEventListener('resize', onResize);
-      document.removeEventListener('click', onClick, true);
-      const target = pending;
-      markBusy(null);
-      if (target?.isConnected) target.click();
-    },
-    { once: true },
-  );
+  document.addEventListener('change', onChange, true);
+  document.addEventListener(BOOT_SPLASH_OWNED_EVENT, onReady, { once: true });
+
+  return () => {
+    disposed = true;
+    stopHolding();
+    cancelPrefetch();
+    cancelArt?.();
+    for (const type of START_EVENTS) document.removeEventListener(type, start, true);
+    document.removeEventListener(BOOT_SPLASH_OWNED_EVENT, onReady);
+  };
 }

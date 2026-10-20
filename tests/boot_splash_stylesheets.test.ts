@@ -77,8 +77,9 @@ describe('the real entries', () => {
       expect(headLinks.length).toBeGreaterThanOrEqual(2);
       const out = moveHeadStylesheetsBehindBootSplash(html);
       const head = out.slice(0, out.indexOf('</head>'));
+      // index.html's start screen carries a class (art-deferred), so match the tag's start.
       const bodyTail = out.slice(
-        out.indexOf('<main id="start-screen">'),
+        out.indexOf('<main id="start-screen"'),
         out.lastIndexOf('</body>'),
       );
       expect(head).not.toMatch(/rel=["']?stylesheet/);

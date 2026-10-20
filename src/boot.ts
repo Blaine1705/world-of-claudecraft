@@ -7,7 +7,7 @@
 import './styles/index.css';
 import { DESKTOP_APP, NATIVE_APP } from './client_origin';
 import { BOOT_PENDING_CLASS, BOOT_SPLASH_ID } from './ui/boot_splash_core';
-import { afterLoadSettles, runLandingFirst } from './ui/landing_first';
+import { ART_DEFERRED_CLASS, afterLoadSettles, runLandingFirst } from './ui/landing_first';
 import { bootModeFor } from './ui/landing_first_core';
 
 function storageGetter(storage: () => Storage): (key: string) => string | null {
@@ -21,6 +21,14 @@ function storageGetter(storage: () => Storage): (key: string) => string | null {
 }
 
 const startClient = () => import('./main');
+
+// The backdrop video's poster only shows in the native and desktop shells (the website
+// hides the video), so index.html carries it as data-poster rather than every visit
+// downloading it, and the shells apply it here, before main.ts reads it.
+if (NATIVE_APP || DESKTOP_APP) {
+  const video = document.getElementById('bg-home') as HTMLVideoElement | null;
+  if (video?.dataset.poster) video.poster = video.dataset.poster;
+}
 
 // index.html marks the slideshow's later scenes deferred so their images do not compete
 // with the first paint (src/styles/shell.website.css); release them once it settles.
@@ -38,6 +46,8 @@ const mode = bootModeFor({
 });
 
 if (mode === 'game') {
+  // The client paints behind the boot splash as before, artwork included.
+  document.getElementById('start-screen')?.classList.remove(ART_DEFERRED_CLASS);
   startClient().catch((err: unknown) => {
     // A dynamic import that fails (or throws while evaluating) rejects here rather than
     // firing the script error the inline splash fail-safe listens for, so release the

@@ -6,12 +6,17 @@ import { syncAppViewport } from '../src/game/app_viewport';
 import { Settings } from '../src/game/settings';
 import { BOOT_PENDING_CLASS, BOOT_SPLASH_OWNED_EVENT } from '../src/ui/boot_splash_core';
 import {
+  ART_DEFERRED_CLASS,
   GAME_MODULES_ELEMENT_ID,
   GAME_PREFETCH_DELAY_MS,
   gameModuleUrls,
+  LANDING_ART_URLS,
   LANDING_BOOTING_ATTR,
   LANDING_BOOTING_CLASS,
+  LANDING_TURNSTILE_SCRIPT_URL,
+  revealLandingArt,
   runLandingFirst,
+  shouldReloadAfterFailure,
   stampLandingBody,
   syncLandingViewport,
 } from '../src/ui/landing_first';
@@ -19,7 +24,7 @@ import {
 const source = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
 
 function mountLanding(): void {
-  document.body.className = `${BOOT_PENDING_CLASS} start-screen-open`;
+  document.body.className = `${BOOT_PENDING_CLASS} steam-wishlist-pending start-screen-open`;
   document.body.innerHTML = `
     <div id="boot-splash"><img class="boot-splash-logo" alt=""></div>
     <main id="start-screen">
@@ -27,8 +32,10 @@ function mountLanding(): void {
       <details id="community-menu"></details>
       <span class="js-stat-characters">…</span>
       <a id="wiki-link" href="#wiki">Wiki</a>
+      <a id="discord-link" href="https://discord.com/invite/worldofclaudecraft">Discord</a>
       <button type="button" id="btn-play">Play</button>
       <button type="button" id="nav-btn-login">Log in</button>
+      <select id="lang-select"><option value="en">English</option><option value="fr_FR">Francais</option></select>
     </main>
     <script type="application/json" id="${GAME_MODULES_ELEMENT_ID}">["/assets/main-a.js","/assets/renderer-b.js"]</script>`;
 }
@@ -48,25 +55,41 @@ function clientReady(): void {
   document.dispatchEvent(new Event(BOOT_SPLASH_OWNED_EVENT));
 }
 
+const never = () => new Promise<unknown>(() => undefined);
+let fetchMock: ReturnType<typeof vi.fn>;
+const disposers: (() => void)[] = [];
+
+/** runLandingFirst, torn down after the test so no listener or timer leaks into the next. */
+function run(startGame: () => Promise<unknown>): void {
+  disposers.push(runLandingFirst(startGame));
+}
+
+function fetchedUrls(): string[] {
+  return fetchMock.mock.calls.map((call) => String((call as unknown[])[0]));
+}
+
 beforeEach(() => {
   localStorage.clear();
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(async () => new Response(JSON.stringify({ characters_created: 91190 }), { status: 200 })),
+  sessionStorage.clear();
+  fetchMock = vi.fn(async (url: unknown) =>
+    String(url).includes('/api/project-stats')
+      ? new Response(JSON.stringify({ characters_created: 91190 }), { status: 200 })
+      : new Response('', { status: 200 }),
   );
+  vi.stubGlobal('fetch', fetchMock);
 });
 
 afterEach(() => {
+  for (const dispose of disposers.splice(0)) dispose();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
-  for (const link of document.head.querySelectorAll('link[rel="prefetch"]')) link.remove();
 });
 
 describe('landing-first boot', () => {
   it('lifts the splash and fills the counter without starting the client', async () => {
     mountLanding();
-    const startGame = vi.fn(() => new Promise<unknown>(() => undefined));
-    runLandingFirst(startGame);
+    const startGame = vi.fn(never);
+    run(startGame);
     await vi.waitFor(() =>
       expect(document.body.classList.contains(BOOT_PENDING_CLASS)).toBe(false),
     );
@@ -74,17 +97,29 @@ describe('landing-first boot', () => {
       expect(document.querySelector('.js-stat-characters')?.textContent).toBe('91190'),
     );
     expect(startGame).not.toHaveBeenCalled();
-    clientReady();
+    // The presence heartbeat starts once per page (src/site_presence.ts), so it is
+    // checked here, in the file's first landing run.
+    expect(fetchedUrls().some((url) => url.includes('/api/site-presence'))).toBe(true);
   });
 
-  it('prefetches the listed client modules once the page has settled, without running them', async () => {
+  it('does the page-view bookkeeping the client used to do at load', async () => {
     mountLanding();
-    const startGame = vi.fn(() => new Promise<unknown>(() => undefined));
-    const prefetched = () =>
-      [...document.head.querySelectorAll<HTMLLinkElement>('link[rel="prefetch"]')].map((l) =>
-        l.getAttribute('href'),
-      );
-    runLandingFirst(startGame);
+    run(vi.fn(never));
+    // The Steam wishlist links show (the website has no Steam bridge to wait on).
+    await vi.waitFor(() =>
+      expect(document.body.classList.contains('steam-wishlist-pending')).toBe(false),
+    );
+    // The community links report clicks.
+    expect(document.getElementById('discord-link')?.hasAttribute('data-woc-click-tracked')).toBe(
+      true,
+    );
+  });
+
+  it('fetches the listed client modules once the page has settled, without running them', async () => {
+    mountLanding();
+    const startGame = vi.fn(never);
+    const prefetched = () => fetchedUrls().filter((url) => url.startsWith('/assets/'));
+    run(startGame);
     // Not while the landing's own images are still arriving.
     await new Promise((resolve) => setTimeout(resolve, GAME_PREFETCH_DELAY_MS / 2));
     expect(prefetched()).toEqual([]);
@@ -92,25 +127,35 @@ describe('landing-first boot', () => {
       () => expect(prefetched()).toEqual(['/assets/main-a.js', '/assets/renderer-b.js']),
       { timeout: GAME_PREFETCH_DELAY_MS + 3000 },
     );
+    // A fetch, not a <link>: a link with the module's URL stops Vite's own preload.
+    expect(document.head.querySelector('link[rel="prefetch"], link[rel="modulepreload"]')).toBe(
+      null,
+    );
     expect(startGame).not.toHaveBeenCalled();
-    clientReady();
+  });
+
+  it('skips the prefetch once the client has started', async () => {
+    mountLanding();
+    run(vi.fn(never));
+    document.dispatchEvent(new Event('pointerdown'));
+    await new Promise((resolve) => setTimeout(resolve, GAME_PREFETCH_DELAY_MS + 500));
+    expect(fetchedUrls().filter((url) => url.startsWith('/assets/'))).toEqual([]);
   });
 
   it('starts the client once on the first interaction', () => {
     mountLanding();
-    const startGame = vi.fn(() => new Promise<unknown>(() => undefined));
-    runLandingFirst(startGame);
+    const startGame = vi.fn(never);
+    run(startGame);
     document.dispatchEvent(new Event('pointerdown'));
     document.dispatchEvent(new Event('keydown'));
     document.dispatchEvent(new Event('touchstart'));
     expect(startGame).toHaveBeenCalledTimes(1);
-    clientReady();
   });
 
   it('holds a button clicked before the client is ready, then replays it once', () => {
     mountLanding();
-    const startGame = vi.fn(() => new Promise<unknown>(() => undefined));
-    runLandingFirst(startGame);
+    const startGame = vi.fn(never);
+    run(startGame);
     const play = document.getElementById('btn-play') as HTMLButtonElement;
     const handler = vi.fn();
     play.addEventListener('click', handler);
@@ -133,9 +178,9 @@ describe('landing-first boot', () => {
     expect(handler).toHaveBeenCalledTimes(2);
   });
 
-  it('replays only the last of several held clicks', () => {
+  it('replays only the last of several held actions', () => {
     mountLanding();
-    runLandingFirst(vi.fn(() => new Promise<unknown>(() => undefined)));
+    run(vi.fn(never));
     const play = document.getElementById('btn-play') as HTMLButtonElement;
     const login = document.getElementById('nav-btn-login') as HTMLButtonElement;
     const onPlay = vi.fn();
@@ -151,34 +196,87 @@ describe('landing-first boot', () => {
     expect(onLogin).toHaveBeenCalledTimes(1);
   });
 
+  it('re-applies a picker change made before the client is ready', () => {
+    mountLanding();
+    const startGame = vi.fn(never);
+    run(startGame);
+    const select = document.getElementById('lang-select') as HTMLSelectElement;
+    select.value = 'fr_FR';
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(startGame).toHaveBeenCalledTimes(1);
+    expect(select.getAttribute('aria-busy')).toBe('true');
+
+    // main.ts resets the picker to the stored language as it wires it, then signals.
+    select.value = 'en';
+    const onChange = vi.fn(() => select.value);
+    select.addEventListener('change', onChange);
+    clientReady();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange.mock.results[0]?.value).toBe('fr_FR');
+    expect(select.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('starts loading the captcha script on the first interaction', () => {
+    vi.stubEnv('VITE_TURNSTILE_SITEKEY', 'site-key-under-test');
+    mountLanding();
+    run(vi.fn(never));
+    const tags = () =>
+      document.head.querySelectorAll(`script[src="${LANDING_TURNSTILE_SCRIPT_URL}"]`);
+    expect(tags()).toHaveLength(0);
+    document.dispatchEvent(new Event('pointerdown'));
+    expect(tags()).toHaveLength(1);
+    for (const tag of tags()) tag.remove();
+    vi.unstubAllEnvs();
+  });
+
   it('leaves links to their native behaviour', () => {
     mountLanding();
-    runLandingFirst(vi.fn(() => new Promise<unknown>(() => undefined)));
+    run(vi.fn(never));
     const link = document.getElementById('wiki-link') as HTMLAnchorElement;
     const event = new MouseEvent('click', { bubbles: true, cancelable: true });
     link.dispatchEvent(event);
     expect(event.defaultPrevented).toBe(false);
     expect(link.hasAttribute(LANDING_BOOTING_ATTR)).toBe(false);
-    clientReady();
   });
 
-  it('drops the busy state when the client fails to load, and retries on the next interaction', async () => {
+  it('stops holding clicks when the client fails to load', async () => {
     mountLanding();
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    // A reload already happened this minute, so this failure must not reload again.
+    sessionStorage.setItem('woc_landing_reload', String(Date.now()));
     const first = deferred<unknown>();
-    const startGame = vi
-      .fn<() => Promise<unknown>>()
-      .mockReturnValueOnce(first.promise)
-      .mockReturnValue(new Promise<unknown>(() => undefined));
-    runLandingFirst(startGame);
+    run(vi.fn(() => first.promise));
     const play = document.getElementById('btn-play') as HTMLButtonElement;
     play.click();
     expect(play.hasAttribute(LANDING_BOOTING_ATTR)).toBe(true);
-    first.reject(new Error('offline'));
+    first.reject(new Error('chunk 404'));
     await vi.waitFor(() => expect(play.hasAttribute(LANDING_BOOTING_ATTR)).toBe(false));
-    document.dispatchEvent(new Event('pointerdown'));
-    expect(startGame).toHaveBeenCalledTimes(2);
-    clientReady();
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    play.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+  });
+});
+
+describe('shouldReloadAfterFailure', () => {
+  it('reloads once a minute at most, so a client that keeps failing cannot loop', () => {
+    const store = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => void store.set(key, value),
+    };
+    expect(shouldReloadAfterFailure(1_000_000, storage)).toBe(true);
+    expect(shouldReloadAfterFailure(1_030_000, storage)).toBe(false);
+    expect(shouldReloadAfterFailure(1_061_000, storage)).toBe(true);
+  });
+});
+
+describe('captcha script', () => {
+  it('uses the URL the login form loads', () => {
+    // Read from source: importing src/game/turnstile_gate.ts pulls the online client in.
+    const gate = source('../src/game/turnstile_gate.ts');
+    expect(gate).toContain(
+      `export const TURNSTILE_SCRIPT_URL = '${LANDING_TURNSTILE_SCRIPT_URL}';`,
+    );
   });
 });
 
@@ -279,5 +377,54 @@ describe('boot wiring', () => {
     const lift = main.indexOf('void liftBootSplashWhenReady({ landing: true, localized');
     expect(wired).toBeGreaterThan(0);
     expect(lift).toBeGreaterThan(wired);
+  });
+});
+
+describe('landing artwork', () => {
+  // happy-dom may not implement HTMLImageElement.decode; give the spy something to wrap.
+  beforeEach(() => {
+    if (!('decode' in HTMLImageElement.prototype)) {
+      Object.defineProperty(HTMLImageElement.prototype, 'decode', {
+        configurable: true,
+        writable: true,
+        value: () => Promise.resolve(),
+      });
+    }
+  });
+
+  it('holds the art back in index.html only, and the boot path releases it', () => {
+    expect(source('../index.html')).toContain(
+      `<main id="start-screen" class="${ART_DEFERRED_CLASS}">`,
+    );
+    expect(source('../play.html')).toContain('<main id="start-screen">');
+    expect(source('../src/boot.ts')).toContain('classList.remove(ART_DEFERRED_CLASS)');
+  });
+
+  it('names every image the deferred rules hold back', () => {
+    const css = source('../src/styles/shell.website.css');
+    for (const url of LANDING_ART_URLS) expect(css, url).toContain(`url("${url}")`);
+    expect(css).toContain('#start-screen.art-deferred');
+  });
+
+  it('drops the class once the art has decoded', async () => {
+    document.body.innerHTML = `<main id="start-screen" class="${ART_DEFERRED_CLASS}"></main>`;
+    const decode = vi.fn(() => Promise.resolve());
+    vi.spyOn(HTMLImageElement.prototype, 'decode').mockImplementation(decode);
+    await revealLandingArt();
+    expect(decode).toHaveBeenCalledTimes(LANDING_ART_URLS.length);
+    expect(document.getElementById('start-screen')?.classList.contains(ART_DEFERRED_CLASS)).toBe(
+      false,
+    );
+  });
+
+  it('shows the art anyway if it will not decode', async () => {
+    document.body.innerHTML = `<main id="start-screen" class="${ART_DEFERRED_CLASS}"></main>`;
+    vi.spyOn(HTMLImageElement.prototype, 'decode').mockImplementation(() =>
+      Promise.reject(new Error('broken image')),
+    );
+    await revealLandingArt();
+    expect(document.getElementById('start-screen')?.classList.contains(ART_DEFERRED_CLASS)).toBe(
+      false,
+    );
   });
 });

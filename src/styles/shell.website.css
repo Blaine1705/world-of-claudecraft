@@ -88,6 +88,31 @@
       background-image: url("/website-hero-thornpeak-v1.webp");
       animation-delay: -10s;
     }
+    /* index.html paints the landing's text and panels before its artwork (src/ui/
+       landing_first.ts releases #start-screen.art-deferred once the art has decoded):
+       the art is decorative, and fetching it first held the headline back on slow
+       phones. The art layer (the scenes sit inside it) and the panel logo fade in. */
+    & #start-screen.art-deferred :is(.website-cinematic-art, .website-scene) {
+      background-image: none;
+    }
+    & #start-screen.art-deferred .website-cinematic-art {
+      opacity: 0;
+    }
+    &
+      #start-screen.art-deferred
+      :is(#mode-select, #login-panel, #forgot-panel, #reset-panel)::before {
+      border-image-source: none;
+    }
+    &
+      #start-screen.art-deferred
+      :is(#mode-select, #login-panel, #forgot-panel, #reset-panel)::after {
+      background-image: none;
+      opacity: 0;
+    }
+    & .website-cinematic-art,
+    & :is(#mode-select, #login-panel, #forgot-panel, #reset-panel)::after {
+      transition: opacity 600ms ease;
+    }
     /* index.html holds the other scenes back until the page has settled (src/boot.ts):
        only the first is on screen at load, and the crossfade reaches the next at 8 s. */
     & #start-screen-backdrop.scenes-deferred .website-scene:not(.website-scene-eastbrook) {
@@ -1870,6 +1895,62 @@
       transform: translateY(0);
     }
   }
+  /* Landing-first boot (src/ui/landing_first.ts): a control used before the game client
+     has started says it is working (aria-busy), and its action replays once the client
+     is ready. Play sweeps a gold light and nudges its arrow; any other control pulses a
+     text glow (never its opacity, which would dim its focus ring). */
+  body.landing-booting,
+  [data-landing-booting] {
+    cursor: progress;
+  }
+  [data-landing-booting]:not(#btn-play) {
+    animation: landing-booting-glow 1.1s ease-in-out infinite;
+  }
+  #btn-play[data-landing-booting] .website-play-arrow {
+    animation: landing-booting-nudge 0.9s ease-in-out infinite;
+  }
+  /* The sheen layer is hidden on the website by default; the id outranks that rule.
+     .btn-play clips it to the button. */
+  body #btn-play[data-landing-booting] .btn-play-sheen {
+    display: block;
+    z-index: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 25%,
+      color-mix(in srgb, var(--website-gold-bright) 55%, transparent) 50%,
+      transparent 75%
+    );
+    animation: landing-booting-sheen 1.1s ease-in-out infinite;
+  }
+  @keyframes landing-booting-glow {
+    50% {
+      text-shadow: 0 0 12px color-mix(in srgb, var(--website-gold-bright) 70%, transparent);
+    }
+  }
+  @keyframes landing-booting-nudge {
+    50% {
+      transform: translateX(5px);
+    }
+  }
+  @keyframes landing-booting-sheen {
+    from {
+      transform: translateX(-90%);
+    }
+    to {
+      transform: translateX(90%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-landing-booting]:not(#btn-play),
+    #btn-play[data-landing-booting] .website-play-arrow,
+    body #btn-play[data-landing-booting] .btn-play-sheen {
+      animation: none;
+    }
+    body #start-screen .website-cinematic-art,
+    body #start-screen :is(#mode-select, #login-panel, #forgot-panel, #reset-panel)::after {
+      transition: none;
+    }
+  }
 }
 
 /* Touch web entry needs the final say over the shared HUD's compact two-column
@@ -1944,62 +2025,6 @@
         margin-inline: auto;
         justify-self: auto;
       }
-    }
-  }
-  /* Landing-first boot (src/ui/landing_first.ts): a control clicked before the game
-     client has started says it is working (aria-busy), and its click replays once the
-     client is ready. Play's arrow nudges forward; any other control pulses. */
-  body.landing-booting {
-    cursor: progress;
-  }
-  [data-landing-booting] {
-    cursor: progress;
-  }
-  [data-landing-booting]:not(#btn-play) {
-    animation: landing-booting-pulse 1.1s ease-in-out infinite;
-  }
-  #btn-play[data-landing-booting] .website-play-arrow {
-    animation: landing-booting-nudge 0.9s ease-in-out infinite;
-  }
-  /* A gold light sweeps across Play while it waits (.btn-play clips it). The sheen
-     layer is hidden on the website by default; the id beats that rule's specificity. */
-  body #btn-play[data-landing-booting] .btn-play-sheen {
-    display: block;
-    z-index: 0;
-    background: linear-gradient(
-      105deg,
-      transparent 25%,
-      color-mix(in srgb, var(--website-gold-bright) 55%, transparent) 50%,
-      transparent 75%
-    );
-    animation: landing-booting-sheen 1.1s ease-in-out infinite;
-  }
-  @keyframes landing-booting-pulse {
-    50% {
-      opacity: 0.6;
-    }
-  }
-  @keyframes landing-booting-nudge {
-    50% {
-      transform: translateX(5px);
-    }
-  }
-  @keyframes landing-booting-sheen {
-    from {
-      transform: translateX(-90%);
-    }
-    to {
-      transform: translateX(90%);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    [data-landing-booting]:not(#btn-play),
-    #btn-play[data-landing-booting] .website-play-arrow,
-    body #btn-play[data-landing-booting] .btn-play-sheen {
-      animation: none;
-    }
-    [data-landing-booting] {
-      opacity: 0.75;
     }
   }
 }
