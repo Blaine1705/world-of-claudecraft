@@ -3,13 +3,14 @@
 This feature builds on the subscription checkout foundation from PR #4281.
 Recurring membership remains available. A separate tradable token grants 30 days
 when redeemed, added to any remaining account membership time. Expiry disables
-extra character slots and armour benefits until renewal; it does not delete items
+extra character slots, the extra bag slot and gear benefits until renewal; it does not delete items
 or characters.
 
 Active members can open other characters' banks through bank tabs, use ten extra
-character slots, receive soulbound class and specialization armour, and pay half
-the auction house tax. Armour follows character level through level 19 and
-perfects at level 20 to item level 25. Its full-set experience bonus is 20%.
+character slots, equip an extra bag, receive Rare soulbound class and specialization
+gear, and pay half the auction house tax. Gear always has item level equal to the
+character level plus five, including above level 20. The seven-piece armour set
+grants 20% more experience; the weapon is not required for that bonus.
 The implementation uses existing item stat budgets and class/spec preferences.
 The seven armour slots are helmet, shoulders, chest, waist, legs, gloves and feet.
 The experience bonus applies once with the full set equipped. Existing base
@@ -17,6 +18,26 @@ characters remain playable after expiry; characters created in membership slots
 remain stored but cannot enter the world until renewal. Other-character bank
 transfers require a banker and an offline target character in the same realm.
 Soulbound, quest and locked copies cannot cross character banks.
+
+The Staff of Changing adapts weapon type, stats and held appearance to the current
+class and specialization, using existing weapon models. Grants check equipment,
+bags (including overflow), bank and courier custody before creating each missing
+piece. Membership activation and successful token redemption repair missing pieces;
+full bags never prevent these grants. Mailed membership tokens can also be collected
+into overflow, preserving their original instance and delivery custody. Other mail
+attachments still require normal capacity.
+
+The fifth equipped-bag slot requires active membership. The bag is stored separately
+when membership expires and restored on renewal. Items remain in inventory as
+overflow rather than being discarded. The four normal bag slots are unchanged.
+
+Current browser captures, regression commands and rollout notes are in
+[membership refinements verification](membership-refinements-verification.md).
+
+The new owned `membershipBag` save field requires draining older character writers
+before activating the slot. Rolling back to an older writer that does not preserve
+this field can lose the equipped member bag; this rollout is forward-only until
+bags are safely returned or a compatible rollback writer is deployed.
 
 ## Pricing, trial and yearly bundle
 

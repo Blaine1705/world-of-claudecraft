@@ -837,7 +837,8 @@ describe('Masterwrought art completion evidence', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
     // + the account-wide buddies (PR 4240): 32 whistle icons rendered from the buddy
     // GLBs and the 2 stag charm re-tints of them, on the same integration: 2039.
-    expect(currentOwnerIds).toHaveLength(2039);
+    // + the membership Staff of Changing (membership-weapon-2026-10-14, PR 4281): 2040.
+    expect(currentOwnerIds).toHaveLength(2040);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1059,6 +1060,14 @@ describe('Masterwrought art completion evidence', () => {
     ]);
     expect(datedIds.filter((id) => referralIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => referralIds.has(id))).toHaveLength(7);
+    // The Staff of Changing ships in its own later batch (PR 4281), equally additive.
+    const membershipWeaponIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'membership-weapon-2026-10-14')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect([...membershipWeaponIds]).toEqual(['membership_staff']);
+    expect(datedIds.filter((id) => membershipWeaponIds.has(id))).toEqual([]);
 
     // The five-dungeon rework's five loot batches: 11 + 11 + 11 + 11 + 16
     // (the Hollow Crypt's, its Heroic Hymnal included) = 60 ids, additive the
@@ -1127,6 +1136,7 @@ describe('Masterwrought art completion evidence', () => {
         !questGearIds.has(id) &&
         !membershipIds.has(id) &&
         !referralIds.has(id) &&
+        !membershipWeaponIds.has(id) &&
         !balgathIds.has(id) &&
         !musterIds.has(id) &&
         !dungeonReworkIds.has(id) &&

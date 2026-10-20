@@ -1,5 +1,6 @@
 import type { CoreStats, ItemDef, PlayerClass } from '../types';
 
+export const MEMBERSHIP_WEAPON_ID = 'membership_staff';
 export const MEMBERSHIP_TOKEN_ID = 'membership_token';
 export const MEMBERSHIP_DURATION_SECONDS = 30 * 24 * 60 * 60;
 export const MEMBERSHIP_XP_MULTIPLIER = 1.2;
@@ -69,6 +70,21 @@ export const MEMBERSHIP_ITEMS: Record<string, ItemDef> = Object.fromEntries([
       stackSize: 20,
     } satisfies ItemDef,
   ],
+  [
+    MEMBERSHIP_WEAPON_ID,
+    {
+      id: MEMBERSHIP_WEAPON_ID,
+      name: 'Staff of Changing',
+      kind: 'weapon',
+      slot: 'mainhand',
+      quality: 'rare',
+      requiredLevel: 1,
+      soulbound: true,
+      noSalvage: true,
+      sellValue: 0,
+      weapon: { min: 1, max: 2, speed: 2 },
+    } satisfies ItemDef,
+  ],
   ...MEMBERSHIP_ARMOUR_SLOTS.map((slot, index) => [
     `membership_${slot}`,
     {
@@ -79,7 +95,7 @@ export const MEMBERSHIP_ITEMS: Record<string, ItemDef> = Object.fromEntries([
       // strongest legal armour type, class, specialisation and level.
       armorType: 'cloth',
       slot,
-      quality: 'epic',
+      quality: 'rare',
       requiredLevel: 1,
       soulbound: true,
       noSalvage: true,

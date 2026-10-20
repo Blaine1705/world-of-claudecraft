@@ -354,6 +354,8 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/ley-beam-v1/',
       '            /docs/screenshots/market-house-redesign/',
       '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',
+      '            /docs/screenshots/membership/',
+      '            /docs/screenshots/membership-courier/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
       '            /docs/screenshots/referral-armour/',

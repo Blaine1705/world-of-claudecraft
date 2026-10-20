@@ -476,6 +476,10 @@ export const zh_TW: EnTranslations = {
       "waiting": "等待歸還物品",
       "bags": "存入銀行",
       "bank": "從銀行取出",
+      "inventory": "背包",
+      "bankTitle": "銀行",
+      "capacity": "{used} / {capacity} 欄位",
+      "travelTime": "單程10秒",
       "cargo": "信使背包",
       "empty": "沒有物品",
       "send": "派出信使",
@@ -484,7 +488,7 @@ export const zh_TW: EnTranslations = {
       "selectedItem": "取消選擇{item}，{count}",
       "instructions": "請選擇整組物品。信使會先存入物品，再取出您指定的物品。任務物品無法寄送。",
       "membership": "續訂會員後即可開始新的配送。",
-      "cargoSafe": "背包有空位前，信使會保管所攜帶的物品。",
+      "cargoSafe": "送回的物品會在背包已滿時存為溢出物品。送達後信使會消失，直到再次召喚。",
       "unavailable": "召喚信使以安排配送。"
     },
     "framePresets": {
@@ -1026,9 +1030,10 @@ export const zh_TW: EnTranslations = {
         "benefitsTitle": "有效會員權益",
         "benefitBank": "在任意銀行員處存取您其他角色的銀行。",
         "benefitSlots": "額外解鎖10個角色欄位。",
-        "benefitArmour": "領取屬性適配您職業與專精的靈魂綁定護甲。護甲隨角色等級成長，在20級時達到物品等級25。裝備全套可多獲得20%經驗。",
+        "benefitArmour": "領取稀有品質的靈魂綁定護甲和萬變法杖。屬性配合您的職業與專精，物品等級始終比角色等級高5級。裝備全部7件護甲可多獲得20%經驗。",
+        "benefitBag": "可在會員背包欄位額外裝備一個背包。",
         "benefitTax": "拍賣場稅費減半。",
-        "benefitExpiry": "會員到期後，額外欄位中的角色和護甲加成會鎖定，續訂後恢復。基礎欄位中的角色仍可正常遊玩。",
+        "benefitExpiry": "會員到期後，額外角色欄位、裝備加成和額外背包欄位會鎖定，續訂後恢復。背包和物品會安全保留，超出容量的物品以溢出形式保存。基礎角色欄位仍可正常使用。",
         "tokenTerms": "一次支付{price}，獲得30天會員代幣。代幣將郵寄給此角色，可兌換為會員時長，也可在拍賣場出售。",
         "tokenBuy": "購買會員代幣",
         "tokenClaim": "領取已購買的代幣",
@@ -3875,6 +3880,9 @@ export const zh_TW: EnTranslations = {
       "entryMismatchHeroic": "此地城副本的難度為英雄。使用「重置所有地城副本」以開始全新的普通難度副本。"
     },
     "bags": {
+      "membershipSlot": "會員背包欄位",
+      "membershipSlotLocked": "開通會員以解鎖此背包欄位。",
+      "membershipSlotHint": "會員有效期間可額外裝備一個背包。會員到期後，背包和物品會安全保留。",
       "cannotDestroy": "此物品無法銷毀。",
       "rightClickDestroy": "右鍵單擊以銷毀",
       "dragEquipHint": "拖曳到角色身上以裝備",
@@ -5226,7 +5234,7 @@ export const zh_TW: EnTranslations = {
       "tabsAria": "銀行標籤頁",
       "personalTab": "個人",
       "accountTab": "其他角色",
-      "accountArmour": "領取會員護甲",
+      "accountArmour": "領取會員裝備",
       "referralArmour": "領取友誼護甲",
       "accountMembership": "會員有效期間，可在此存取您其他角色的銀行。",
       "accountCharacters": "角色銀行",
@@ -15662,11 +15670,12 @@ export const zh_TW: EnTranslations = {
       "referralDormant": "未啟用：此帳號尚未透過會員邀請獲得友誼護甲。",
       "membershipToken": "使用：消耗此代幣，為您的帳號增加{days}天會員時長。現有剩餘時長會保留。兌換前可交易此代幣或在拍賣場出售。",
       "membershipAdaptive": "屬性和護甲會隨您的職業與專精調整。",
-      "membershipScaling": "物品等級與您的角色等級一致。達到20級時，此護甲會完善為物品等級25。",
+      "membershipWeaponAdaptive": "裝備時，武器類型、外觀和屬性會配合您的職業與專精。",
+      "membershipScaling": "物品等級{level}。始終比角色等級高5級。",
       "membershipPerfected": "已完善：物品等級{level}。",
       "membershipFullSet": "裝備全部{pieces}件會員護甲，經驗獲取量提高{percent}%。需要有效會員資格。",
-      "membershipRequired": "會員到期後，護甲屬性和套裝加成會停用，續訂後恢復。",
-      "membershipDormant": "未啟用：續訂會員以恢復護甲屬性和套裝加成。",
+      "membershipRequired": "會員到期後，裝備屬性和套裝加成會停用，續訂後恢復。",
+      "membershipDormant": "未啟用：續訂會員以恢復裝備屬性和套裝加成。",
       "qualityKind": "{quality}{kind}",
       "currentlyEquipped": "目前已裝備",
       "ifYouEquip": "裝備後",
@@ -15968,7 +15977,7 @@ export const zh_TW: EnTranslations = {
     "abilities": {
       "courier": {
         "name": "信使",
-        "description": "召喚一頭會飛的驢，在您的背包和最近的銀行之間運送物品。飛行速度為普通跑步速度的250%。每次最多可選擇24組物品。開始新的配送需要會員資格。"
+        "description": "召喚一頭會飛的驢，在您的背包和最近的銀行之間運送物品。去程和回程各需10秒。每次最多選擇24組物品。送回的物品會溢出存入已滿的背包，隨後信使會消失，直到再次召喚。死亡或進入副本時，回程會暫停。開始新的配送需要會員資格。"
       },
       "sport_kick": {
         "name": "踢球",
@@ -22955,6 +22964,9 @@ export const zh_TW: EnTranslations = {
       },
       "moonwrack_stave": {
         "name": "月殤法杖"
+      },
+      "membership_staff": {
+        "name": "萬變法杖"
       },
       "membership_token": {
         "name": "會員代幣（30天）"

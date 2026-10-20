@@ -17,6 +17,7 @@ import {
   primaryStatBudget,
   SLOT_STAT_MULT,
 } from './item_budget';
+import { membershipWeaponItem } from './membership_weapon';
 import type { ArmorItemDef, ItemDef, PlayerClass } from './types';
 
 export function isMembershipArmour(itemId: string): boolean {
@@ -35,7 +36,7 @@ function isArmourDefinition(item: ItemDef, matches: (id: string) => boolean): it
 }
 
 export function membershipItemLevel(level: number): number {
-  return level >= 20 ? 25 : Math.max(1, Math.floor(level));
+  return Math.max(1, Math.floor(level)) + 5;
 }
 
 export function membershipArmourItem(
@@ -45,7 +46,8 @@ export function membershipArmourItem(
   level: number,
   active: boolean,
 ): ItemDef {
-  if (!isArmourDefinition(item, isMembershipArmour)) return item;
+  if (!isArmourDefinition(item, isMembershipArmour))
+    return membershipWeaponItem(item, cls, spec, level, active);
   return scalingArmourItem(item, cls, spec, level, active);
 }
 

@@ -5374,10 +5374,10 @@ export class Hud {
     ...this.windowFocus('#courier-window'),
     info: () => this.sim.courierInfo,
     inventory: () => this.sim.inventory,
+    inventoryCapacity: () => this.sim.bagCapacity,
     dispatch: (request) => this.sim.courierDispatch(request),
     closeOthers: () => this.closeOtherWindows('#courier-window'),
     hideTooltip: () => this.hideTooltip(),
-    onClosed: () => {},
   });
   // Book of Deeds window painter (deeds_view.ts core + deeds_window.ts
   // painter): the deed catalog browser and title picker over the IWorldDeeds
@@ -16261,7 +16261,7 @@ export class Hud {
     skin: number,
     previewKey?: string,
   ): void {
-    const mainhand = this.sim.equipment.mainhand ?? null;
+    const mainhand = this.sim.player.mainhandItemId ?? null;
     // The sheet shows the body the WORLD draws, read through the same look
     // seam the portrait uses: the player's own face, hair and kit, including
     // the helmet-visibility choice. A Combat Mech is a whole replacement body
@@ -16281,14 +16281,14 @@ export class Hud {
       wornEquipment: this.sim.equipment,
       helmHidden: this.sim.player.helmHidden,
       mainhand,
-      offhand: this.sim.equipment.offhand ?? null,
+      offhand: this.sim.player.offhandItemId ?? null,
       // The paperdoll wears the world's Armory skin: one shared rule (class + hands + loadout).
       weaponSkinId: resolveActiveWeaponSkin(
         cls,
         mainhand,
         this.sim.accountCosmetics.weaponSkinLoadout,
         this.sim.player.skinCatalog ?? 'class',
-        this.sim.equipment.offhand ?? null,
+        this.sim.player.offhandItemId ?? null,
       ),
       framing: 'sheet',
     });

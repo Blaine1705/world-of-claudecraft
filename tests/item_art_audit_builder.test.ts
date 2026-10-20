@@ -878,11 +878,13 @@ describe('item-art audit builder', () => {
       // 2005 / 2034 on 42 sheet pages with the five-dungeon rework (PR 4352) on the v0.45.0
       // integration, re-measured.
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
-      catalogSha256: '432503f1b9cd93e304acec6fae601d6eda0b621a3be304351a5c709c0d1a5ee9',
-      catalogBytes: 1112221,
+      // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
+      // `--verify-only` on the merged tree.
+      catalogSha256: '15a9e4c4c955974c6b2b7470fcc796bc0fbd44eb5c5b99a5292a1efe75e26e1d',
+      catalogBytes: 1112742,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2039,
-      liveItemCount: 2068,
+      catalogCount: 2040,
+      liveItemCount: 2069,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -900,7 +902,7 @@ describe('item-art audit builder', () => {
         identity: 44,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '2a34c06963c60cdff8a9ab277ab5b5b8264dfe4146edb7ca23a9220c2b4f6e3b',
+      shippingCatalogSha256: '654cc3b405a6ed997250542de3ff878895f6d539c3502a6acc3d0e02a2ee60c1',
       machineChecksPassed: true,
       verdict: null,
     });

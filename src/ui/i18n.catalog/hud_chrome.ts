@@ -650,10 +650,11 @@ export const hudChromeStrings = {
       benefitBank: "Access your other characters' banks at any banker.",
       benefitSlots: 'Unlock 10 additional character slots.',
       benefitArmour:
-        'Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.',
+        'Claim Rare soulbound armour and the Staff of Changing. Their stats adapt to your class and specialisation, always 5 item levels above your character level. Wear all 7 armour pieces for 20% more XP.',
+      benefitBag: 'Equip an extra bag in your membership bag slot.',
       benefitTax: 'Pay half the normal auction house tax.',
       benefitExpiry:
-        'When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.',
+        'When membership ends, additional character slots, gear benefits and the extra bag slot lock until renewal. Your bag and items stay safe, with excess items kept as overflow. Your base character slots remain playable.',
       tokenTerms:
         '{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.',
       tokenBuy: 'Buy membership token',
@@ -4853,6 +4854,10 @@ export const hudChromeStrings = {
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
   bags: {
+    membershipSlot: 'Membership bag slot',
+    membershipSlotLocked: 'Unlock this bag slot with a membership.',
+    membershipSlotHint:
+      'Equip one extra bag while your membership is active. Your bag and items stay safe when it expires.',
     // Right-click destroy affordance: rejected when the item is flagged noDiscard
     // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
     cannotDestroy: 'This item cannot be destroyed.',
@@ -7109,7 +7114,7 @@ export const hudChromeStrings = {
     tabsAria: 'Bank tabs',
     personalTab: 'Personal',
     accountTab: 'Other characters',
-    accountArmour: 'Claim membership armour',
+    accountArmour: 'Claim membership gear',
     referralArmour: 'Claim friendship armour',
     accountMembership: "An active membership lets you access your other characters' banks here.",
     accountCharacters: 'Character banks',

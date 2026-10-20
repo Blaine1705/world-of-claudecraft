@@ -6,6 +6,7 @@ import {
   courierAnimationClips,
   courierPreloadInternalsForTest,
 } from '../src/render/courier_visual';
+import { COURIER_FAREWELL_SECONDS, COURIER_SPIN_SECONDS } from '../src/render/courier_visual_core';
 
 afterEach(() => courierPreloadInternalsForTest.setSourceForTest(null));
 
@@ -84,6 +85,75 @@ describe('CourierVisual lifecycle', () => {
     expect(materialDispose).not.toHaveBeenCalled();
     view.update({ phase: 'ready', x: 0, z: 0 }, 0.05, false);
     expect(scene.children).toEqual([]);
+  });
+  it('spins in place after a completed delivery, then vanishes', () => {
+    const { view } = setup();
+    const landing = {
+      phase: 'returning' as const,
+      x: 4,
+      z: 6,
+      travelTicks: 297,
+      legTicks: 300,
+      remainingDistance: 0.1,
+    };
+    view.update({ ...landing, x: 4, z: 5 }, 0.05, false);
+    view.update(landing, 0.05, false);
+    const model = view.root.children[0];
+    const yaw = view.root.rotation.y;
+    view.update(null, 0.05, false);
+    expect(model.visible).toBe(true);
+    // Frame time is clamped to 0.1 s, so step to the middle of the spin.
+    for (let t = 0.05; t < COURIER_SPIN_SECONDS / 2 - 1e-9; t += 0.05)
+      view.update(null, 0.05, false);
+    expect(model.visible).toBe(true);
+    expect(view.root.position.x).toBe(4);
+    expect(view.root.position.y).toBeGreaterThan(7);
+    expect(view.root.rotation.y).not.toBeCloseTo(yaw);
+    // Frame time is clamped, so walk the clock to the end of the farewell.
+    for (let t = 0; t < COURIER_FAREWELL_SECONDS; t += 0.1) view.update(null, 0.1, false);
+    expect(model.visible).toBe(false);
+    expect(view.root.scale.x).toBe(1);
+    view.dispose();
+  });
+  it('a re-summon mid-spin starts clean, and reduced motion cuts the spin short', () => {
+    const delivered = {
+      phase: 'returning' as const,
+      x: 4,
+      z: 6,
+      travelTicks: 299,
+      legTicks: 300,
+      remainingDistance: 0.05,
+    };
+    const { view } = setup();
+    view.update(delivered, 0.05, false);
+    view.update(null, 0.05, false);
+    view.update(null, 0.1, false);
+    view.update({ phase: 'ready', x: 20, z: 6 }, 0.05, false);
+    const model = view.root.children[0];
+    expect(model.visible).toBe(true);
+    expect(view.root.scale.x).toBe(1);
+    expect(view.root.position.x).toBe(20);
+    // No false run from the old landing spot to the new summon point.
+    expect(view.root.rotation.y).toBeCloseTo(0);
+    view.update(delivered, 0.05, false);
+    view.update(null, 0.05, false);
+    expect(model.visible).toBe(true);
+    view.update(null, 0.05, true);
+    expect(model.visible).toBe(false);
+    view.dispose();
+  });
+  it('vanishes at once for reduced motion or a journey that did not finish', () => {
+    for (const [info, reduced] of [
+      [{ phase: 'returning', x: 0, z: 0, travelTicks: 299, legTicks: 300 }, true],
+      [{ phase: 'returning', x: 0, z: 0, travelTicks: 100, legTicks: 300 }, false],
+      [{ phase: 'outbound', x: 0, z: 0, travelTicks: 299, legTicks: 300 }, false],
+    ] as const) {
+      const { view } = setup();
+      view.update(info, 0.05, reduced);
+      view.update(null, 0.05, reduced);
+      expect(view.root.children[0].visible).toBe(false);
+      view.dispose();
+    }
   });
   it('adds nothing until the deferred asset is ready', () => {
     const { view, scene, gate } = setup();

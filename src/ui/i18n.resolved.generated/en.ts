@@ -476,6 +476,10 @@ export const en: EnTranslations = {
       "waiting": "Waiting to return your items",
       "bags": "Send to bank",
       "bank": "Bring from bank",
+      "inventory": "Inventory",
+      "bankTitle": "Bank",
+      "capacity": "{used} / {capacity} slots",
+      "travelTime": "Up to 15 seconds each way",
       "cargo": "Courier inventory",
       "empty": "No items",
       "send": "Send courier",
@@ -484,7 +488,7 @@ export const en: EnTranslations = {
       "selectedItem": "Deselect {item}, {count}",
       "instructions": "Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.",
       "membership": "Renew your membership to start another trip.",
-      "cargoSafe": "Carried items stay with the courier until there is room in your bags.",
+      "cargoSafe": "Returned items overflow full bags. The courier vanishes after delivery until summoned again.",
       "unavailable": "Summon your courier to plan a delivery."
     },
     "framePresets": {
@@ -1026,9 +1030,10 @@ export const en: EnTranslations = {
         "benefitsTitle": "Active membership benefits",
         "benefitBank": "Access your other characters' banks at any banker.",
         "benefitSlots": "Unlock 10 additional character slots.",
-        "benefitArmour": "Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.",
+        "benefitArmour": "Claim Rare soulbound armour and the Staff of Changing. Their stats adapt to your class and specialisation, always 5 item levels above your character level. Wear all 7 armour pieces for 20% more XP.",
+        "benefitBag": "Equip an extra bag in your membership bag slot.",
         "benefitTax": "Pay half the normal auction house tax.",
-        "benefitExpiry": "When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.",
+        "benefitExpiry": "When membership ends, additional character slots, gear benefits and the extra bag slot lock until renewal. Your bag and items stay safe, with excess items kept as overflow. Your base character slots remain playable.",
         "tokenTerms": "{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.",
         "tokenBuy": "Buy membership token",
         "tokenClaim": "Collect purchased token",
@@ -3875,6 +3880,9 @@ export const en: EnTranslations = {
       "entryMismatchHeroic": "This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run."
     },
     "bags": {
+      "membershipSlot": "Membership bag slot",
+      "membershipSlotLocked": "Unlock this bag slot with a membership.",
+      "membershipSlotHint": "Equip one extra bag while your membership is active. Your bag and items stay safe when it expires.",
       "cannotDestroy": "This item cannot be destroyed.",
       "rightClickDestroy": "Right-click to destroy",
       "dragEquipHint": "Drag onto your character to equip",
@@ -5226,7 +5234,7 @@ export const en: EnTranslations = {
       "tabsAria": "Bank tabs",
       "personalTab": "Personal",
       "accountTab": "Other characters",
-      "accountArmour": "Claim membership armour",
+      "accountArmour": "Claim membership gear",
       "referralArmour": "Claim friendship armour",
       "accountMembership": "An active membership lets you access your other characters' banks here.",
       "accountCharacters": "Character banks",
@@ -15662,11 +15670,12 @@ export const en: EnTranslations = {
       "referralDormant": "Inactive: this account has not received friendship armor through a member referral.",
       "membershipToken": "Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.",
       "membershipAdaptive": "Stats and armor adapt to your class and specialization.",
-      "membershipScaling": "Item level matches your level. At level 20, this armor perfects at item level 25.",
+      "membershipWeaponAdaptive": "Changes its weapon type, appearance and stats to suit your class and specialization while equipped.",
+      "membershipScaling": "Item level {level}. Always 5 item levels above your character level.",
       "membershipPerfected": "Perfected: item level {level}.",
       "membershipFullSet": "Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.",
-      "membershipRequired": "Armor stats and set benefits stop when membership expires and return when you renew.",
-      "membershipDormant": "Inactive: renew your membership to restore armor stats and set benefits.",
+      "membershipRequired": "Gear stats and set benefits stop when membership expires and return when you renew.",
+      "membershipDormant": "Inactive: renew your membership to restore gear stats and set benefits.",
       "qualityKind": "{quality} {kind}",
       "currentlyEquipped": "Currently equipped",
       "ifYouEquip": "If you equip this",
@@ -15968,7 +15977,7 @@ export const en: EnTranslations = {
     "abilities": {
       "courier": {
         "name": "Courier",
-        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. It flies at 250% of normal running speed. Choose up to 24 stacks per trip. Membership is required to start a new trip."
+        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. Each journey takes up to 15 seconds to the bank and up to 15 seconds back, flying faster on longer routes. Choose up to 24 stacks per trip. Returned items overflow full bags, then the courier vanishes until summoned again. Return travel pauses while you are dead or inside an instance. Membership is required to start a new trip."
       },
       "sport_kick": {
         "name": "Kick",
@@ -22955,6 +22964,9 @@ export const en: EnTranslations = {
       },
       "moonwrack_stave": {
         "name": "Moonwrack Stave"
+      },
+      "membership_staff": {
+        "name": "Staff of Changing"
       },
       "membership_token": {
         "name": "Membership Token (30 Days)"

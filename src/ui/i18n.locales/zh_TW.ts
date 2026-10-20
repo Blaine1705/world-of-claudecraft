@@ -13,6 +13,29 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.courier.inventory': '背包',
+  'hudChrome.courier.bankTitle': '銀行',
+  'hudChrome.courier.capacity': '{used} / {capacity} 欄位',
+  'hudChrome.courier.travelTime': '單程10秒',
+  'hudChrome.courier.cargoSafe':
+    '送回的物品會在背包已滿時存為溢出物品。送達後信使會消失，直到再次召喚。',
+  'entities.abilities.courier.description':
+    '召喚一頭會飛的驢，在您的背包和最近的銀行之間運送物品。去程和回程各需10秒。每次最多選擇24組物品。送回的物品會溢出存入已滿的背包，隨後信使會消失，直到再次召喚。死亡或進入副本時，回程會暫停。開始新的配送需要會員資格。',
+  'itemUi.tooltip.membershipWeaponAdaptive': '裝備時，武器類型、外觀和屬性會配合您的職業與專精。',
+  'itemUi.tooltip.membershipScaling': '物品等級{level}。始終比角色等級高5級。',
+  'itemUi.tooltip.membershipRequired': '會員到期後，裝備屬性和套裝加成會停用，續訂後恢復。',
+  'itemUi.tooltip.membershipDormant': '未啟用：續訂會員以恢復裝備屬性和套裝加成。',
+  'entities.items.membership_staff.name': '萬變法杖',
+  'hudChrome.bags.membershipSlot': '會員背包欄位',
+  'hudChrome.bags.membershipSlotLocked': '開通會員以解鎖此背包欄位。',
+  'hudChrome.bags.membershipSlotHint':
+    '會員有效期間可額外裝備一個背包。會員到期後，背包和物品會安全保留。',
+  'hudChrome.wocStore.subscription.benefitBag': '可在會員背包欄位額外裝備一個背包。',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    '領取稀有品質的靈魂綁定護甲和萬變法杖。屬性配合您的職業與專精，物品等級始終比角色等級高5級。裝備全部7件護甲可多獲得20%經驗。',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    '會員到期後，額外角色欄位、裝備加成和額外背包欄位會鎖定，續訂後恢復。背包和物品會安全保留，超出容量的物品以溢出形式保存。基礎角色欄位仍可正常使用。',
+  'hudChrome.bank.accountArmour': '領取會員裝備',
   'hudChrome.courier.title': '信使',
   'hudChrome.courier.close': '關閉信使',
   'hudChrome.courier.ready': '準備配送',
@@ -30,25 +53,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.instructions':
     '請選擇整組物品。信使會先存入物品，再取出您指定的物品。任務物品無法寄送。',
   'hudChrome.courier.membership': '續訂會員後即可開始新的配送。',
-  'hudChrome.courier.cargoSafe': '背包有空位前，信使會保管所攜帶的物品。',
   'hudChrome.courier.unavailable': '召喚信使以安排配送。',
   'entities.abilities.courier.name': '信使',
-  'entities.abilities.courier.description':
-    '召喚一頭會飛的驢，在您的背包和最近的銀行之間運送物品。飛行速度為普通跑步速度的250%。每次最多可選擇24組物品。開始新的配送需要會員資格。',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '有效會員權益',
   'hudChrome.wocStore.subscription.benefitBank': '在任意銀行員處存取您其他角色的銀行。',
   'hudChrome.wocStore.subscription.benefitSlots': '額外解鎖10個角色欄位。',
-  'hudChrome.wocStore.subscription.benefitArmour':
-    '領取屬性適配您職業與專精的靈魂綁定護甲。護甲隨角色等級成長，在20級時達到物品等級25。裝備全套可多獲得20%經驗。',
   'hudChrome.wocStore.subscription.benefitTax': '拍賣場稅費減半。',
-  'hudChrome.wocStore.subscription.benefitExpiry':
-    '會員到期後，額外欄位中的角色和護甲加成會鎖定，續訂後恢復。基礎欄位中的角色仍可正常遊玩。',
   'character.membershipRequired': '續訂會員後即可使用此角色。',
   'character.membershipSlots': '開通會員以解鎖角色欄位',
   'character.emptySlot': '可用角色欄位',
   'hudChrome.bank.accountTab': '其他角色',
-  'hudChrome.bank.accountArmour': '領取會員護甲',
   'hudChrome.bank.accountMembership': '會員有效期間，可在此存取您其他角色的銀行。',
   'hudChrome.bank.accountCharacters': '角色銀行',
   'hudChrome.bank.accountEmpty': '建立另一個角色後，即可在此使用該角色的銀行。',
@@ -70,13 +85,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipToken':
     '使用：消耗此代幣，為您的帳號增加{days}天會員時長。現有剩餘時長會保留。兌換前可交易此代幣或在拍賣場出售。',
   'itemUi.tooltip.membershipAdaptive': '屬性和護甲會隨您的職業與專精調整。',
-  'itemUi.tooltip.membershipScaling':
-    '物品等級與您的角色等級一致。達到20級時，此護甲會完善為物品等級25。',
   'itemUi.tooltip.membershipPerfected': '已完善：物品等級{level}。',
   'itemUi.tooltip.membershipFullSet':
     '裝備全部{pieces}件會員護甲，經驗獲取量提高{percent}%。需要有效會員資格。',
-  'itemUi.tooltip.membershipRequired': '會員到期後，護甲屬性和套裝加成會停用，續訂後恢復。',
-  'itemUi.tooltip.membershipDormant': '未啟用：續訂會員以恢復護甲屬性和套裝加成。',
   'entities.items.membership_token.name': '會員代幣（30天）',
   'entities.items.membership_helmet.name': '會員頭盔',
   'entities.items.membership_shoulder.name': '會員肩甲',

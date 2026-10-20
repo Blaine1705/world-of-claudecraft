@@ -1,13 +1,12 @@
 // Explicit claims and trusted activation only. No recurring storage traversal.
-import { bagPools, canGrantCopies } from './bags';
-import { MEMBERSHIP_ARMOUR_SLOTS } from './content/membership';
+import { MEMBERSHIP_ARMOUR_SLOTS, MEMBERSHIP_WEAPON_ID } from './content/membership';
 import type { SimContext } from './sim_context';
 
 export function claimScalingArmour(
   ctx: SimContext,
   pid: number,
   prefix: 'membership' | 'referral',
-  quiet: boolean,
+  _quiet: boolean,
 ): boolean {
   const resolved = ctx.resolve(pid);
   if (!resolved || resolved.e.dead) return false;
@@ -18,15 +17,16 @@ export function claimScalingArmour(
     ...meta.bank.inventory.map((slot) => slot.itemId),
     ...(meta.courier?.cargo.map((slot) => slot.itemId) ?? []),
   ]);
-  for (const slot of MEMBERSHIP_ARMOUR_SLOTS) {
-    const itemId = `${prefix}_${slot}`;
+  const rewardIds = MEMBERSHIP_ARMOUR_SLOTS.map((slot) => `${prefix}_${slot}`);
+  if (prefix === 'membership') rewardIds.push(MEMBERSHIP_WEAPON_ID);
+  let granted = false;
+  for (const itemId of rewardIds) {
     if (owned.has(itemId)) continue;
-    if (!canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, 1)) {
-      if (!quiet) ctx.error(meta.entityId, 'Your bags are full.');
-      return false;
-    }
-    if (resolved.e.level >= 20) ctx.addItemInstance(itemId, { perfected: true }, meta.entityId);
+    granted = true;
+    if (resolved.e.level >= 20 && itemId !== MEMBERSHIP_WEAPON_ID)
+      ctx.addItemInstance(itemId, { perfected: true }, meta.entityId);
     else ctx.addItem(itemId, 1, meta.entityId);
   }
+  if (granted) meta.wireRev++;
   return true;
 }

@@ -67,6 +67,7 @@ describe('the positional item-name catalog stays aligned with its ids', () => {
       'membership_helmet',
       'membership_legs',
       'membership_shoulder',
+      'membership_staff',
       'membership_token',
       'membership_waist',
       'referral_chest',
