@@ -20180,4 +20180,24 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Najpierw odbierz',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} reputacji z zeszłego tygodnia wciąż czeka na odbiór. Odbierz ją, aby wybrać nowy ładunek.',
+  'hudChrome.options.rawMouseInput': 'Bezpośredni odczyt myszy',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Odczytuje ruch bezpośrednio z myszy podczas przeciągania w celu obracania kamery, pomijając systemową prędkość i przyspieszenie kursora, aby obrót był bardziej równomierny. Wyłącz, aby używać systemowych ustawień myszy. Wymaga włączenia opcji Blokuj kursor podczas obracania i nie działa w każdej przeglądarce ani w każdym systemie.',
+  'entities.items.infernal_quiver.name': 'Piekielny kołczan',
+  'graphicsPrompt.title': 'Wybierz ustawienia grafiki',
+  'graphicsPrompt.intro':
+    'Wybierz zestaw ustawień grafiki dla tego urządzenia. Niższe ustawienia zapewniają większą płynność, a wyższe bogatszą oprawę wizualną.',
+  'graphicsPrompt.autoDesc':
+    'Wybiera zestaw ustawień odpowiedni dla tego urządzenia. Wykryto: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Największa płynność. Najlepszy wybór dla telefonów, tabletów oraz starszych lub zintegrowanych układów graficznych.',
+  'graphicsPrompt.mediumDesc':
+    'Równowaga między wyglądem a wydajnością. Odpowiedni dla większości laptopów.',
+  'graphicsPrompt.highDesc':
+    'Więcej szczegółów i bogatsze otoczenie. Odpowiedni dla dedykowanej karty graficznej.',
+  'graphicsPrompt.ultraDesc':
+    'Najbogatszy wizualnie stały zestaw ustawień. Odpowiedni dla karty graficznej z najwyższej półki.',
+  'graphicsPrompt.changeLater':
+    'Możesz to zmienić w dowolnej chwili w Opcjach, w sekcji Jakość grafiki.',
+  'graphicsPrompt.confirm': 'Kontynuuj',
 };

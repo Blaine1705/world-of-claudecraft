@@ -20254,4 +20254,23 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Klaim dahulu',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} reputasi dari minggu lalu masih belum diklaim. Klaim untuk memilih muatan baru.',
+  'hudChrome.options.rawMouseInput': 'Input Mouse Mentah',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Membaca gerakan langsung dari mouse saat kamu menyeret untuk memutar kamera, tanpa menerapkan kecepatan dan akselerasi penunjuk sistem agar putaran lebih stabil. Nonaktifkan untuk menggunakan pengaturan mouse sistem. Hanya berfungsi jika Kunci Kursor Saat Memutar aktif, dan tidak didukung semua browser atau sistem.',
+  'entities.items.infernal_quiver.name': 'Tabung Panah Neraka',
+  'graphicsPrompt.title': 'Pilih Pengaturan Grafik',
+  'graphicsPrompt.intro':
+    'Pilih preset grafik untuk perangkat ini. Preset lebih rendah berjalan lebih lancar; preset lebih tinggi memberi tampilan lebih kaya.',
+  'graphicsPrompt.autoDesc':
+    'Memilih preset yang sesuai untuk perangkat ini. Terdeteksi: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Kinerja paling lancar. Terbaik untuk ponsel, tablet, serta grafis lama atau terintegrasi.',
+  'graphicsPrompt.mediumDesc':
+    'Keseimbangan antara tampilan dan kinerja. Cocok untuk sebagian besar laptop.',
+  'graphicsPrompt.highDesc':
+    'Lebih banyak detail dan pemandangan lebih kaya. Cocok untuk kartu grafis khusus.',
+  'graphicsPrompt.ultraDesc':
+    'Preset tetap dengan tampilan paling kaya. Cocok untuk kartu grafis kelas atas.',
+  'graphicsPrompt.changeLater': 'Kamu bisa mengubahnya kapan saja di Opsi, pada Kualitas Grafik.',
+  'graphicsPrompt.confirm': 'Lanjutkan',
 };

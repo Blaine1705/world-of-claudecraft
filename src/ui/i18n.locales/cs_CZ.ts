@@ -19926,4 +19926,22 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Nejprve vyzvednout',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} reputace z minulého týdne stále čeká na vyzvednutí. Vyzvedni ji a vyber nové nabití.',
+  'hudChrome.options.rawMouseInput': 'Přímý vstup myši',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Při tažení pro otáčení kamery čte pohyb přímo z myši a obchází rychlost a zrychlení ukazatele nastavené v systému, aby bylo otáčení plynulejší. Vypnutím použiješ systémové nastavení myši. Funguje jen se zapnutou volbou Zamknout kurzor při otáčení a ne ve všech prohlížečích či systémech.',
+  'entities.items.infernal_quiver.name': 'Pekelný toulec',
+  'graphicsPrompt.title': 'Vyber si nastavení grafiky',
+  'graphicsPrompt.intro':
+    'Vyber grafickou předvolbu pro toto zařízení. Nižší předvolby běží plynuleji, vyšší nabízejí bohatší obraz.',
+  'graphicsPrompt.autoDesc': 'Vybere předvolbu vhodnou pro toto zařízení. Zjištěno: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Nejplynulejší chod. Nejlepší pro telefony, tablety a starší či integrované grafické čipy.',
+  'graphicsPrompt.mediumDesc': 'Rovnováha mezi vzhledem a výkonem. Hodí se pro většinu notebooků.',
+  'graphicsPrompt.highDesc':
+    'Více detailů a bohatší scenérie. Hodí se pro samostatnou grafickou kartu.',
+  'graphicsPrompt.ultraDesc':
+    'Vizuálně nejbohatší pevná předvolba. Hodí se pro špičkovou grafickou kartu.',
+  'graphicsPrompt.changeLater':
+    'Tuto volbu můžeš kdykoli změnit v Nastavení v části Kvalita grafiky.',
+  'graphicsPrompt.confirm': 'Pokračovat',
 };

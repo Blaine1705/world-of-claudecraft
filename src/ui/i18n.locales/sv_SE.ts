@@ -20024,4 +20024,24 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Hämta först',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} anseende från förra veckan är ännu inte hämtat. Hämta det för att välja en ny laddning.',
+  'hudChrome.options.rawMouseInput': 'Obehandlad musinmatning',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Läser musrörelser direkt från enheten när du drar för att vrida kameran, utan systemets pekarhastighet och acceleration, för jämnare rotation. Stäng av för att använda systemets musinställningar. Fungerar bara när Lås pekare under rotation är på och stöds inte av alla webbläsare eller system.',
+  'entities.items.infernal_quiver.name': 'Helveteskoger',
+  'graphicsPrompt.title': 'Välj dina grafikinställningar',
+  'graphicsPrompt.intro':
+    'Välj en grafikförinställning för den här enheten. Lägre förinställningar ger bättre flyt, högre ger rikare grafik.',
+  'graphicsPrompt.autoDesc':
+    'Väljer en förinställning som passar den här enheten. Identifierad: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Bäst flyt. Passar bäst för telefoner, surfplattor och äldre eller integrerade grafikkretsar.',
+  'graphicsPrompt.mediumDesc':
+    'En balans mellan grafik och prestanda. Passar de flesta bärbara datorer.',
+  'graphicsPrompt.highDesc':
+    'Fler detaljer och fylligare landskap. Passar ett dedikerat grafikkort.',
+  'graphicsPrompt.ultraDesc':
+    'Den visuellt rikaste fasta förinställningen. Passar ett avancerat grafikkort.',
+  'graphicsPrompt.changeLater':
+    'Du kan ändra detta när som helst i Alternativ, under Grafikkvalitet.',
+  'graphicsPrompt.confirm': 'Fortsätt',
 };

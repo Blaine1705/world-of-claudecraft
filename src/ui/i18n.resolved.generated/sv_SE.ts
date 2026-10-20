@@ -2207,8 +2207,8 @@ export const sv_SE: EnTranslations = {
       "clickFeedback": "Klickmarkör",
       "lockCursorOnRotate": "Lås pekare under rotation",
       "keybindHelpLockCursorOnRotate": "Håller muspekaren inuti fönstret medan du drar för att rotera kameran, så att den inte kan nå skärmkanten eller flytta till en annan skärm. Stäng av om du föredrar en fri pekare.",
-      "rawMouseInput": "Raw Mouse Input",
-      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
+      "rawMouseInput": "Obehandlad musinmatning",
+      "keybindHelpRawMouseInput": "Läser musrörelser direkt från enheten när du drar för att vrida kameran, utan systemets pekarhastighet och acceleration, för jämnare rotation. Stäng av för att använda systemets musinställningar. Fungerar bara när Lås pekare under rotation är på och stöds inte av alla webbläsare eller system.",
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "showPlaytime": "Visa tid spelad på karaktärsskärmen",
@@ -11495,15 +11495,15 @@ export const sv_SE: EnTranslations = {
     "otherInstallDetail": "Installera eller lägg till den här sidan på din Hemskärm för bästa mobila helskärmsupplevelse."
   },
   "graphicsPrompt": {
-    "title": "Choose Your Graphics",
-    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
-    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
-    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
-    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
-    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
-    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
-    "changeLater": "You can change this any time in Options, under Graphics Quality.",
-    "confirm": "Continue"
+    "title": "Välj dina grafikinställningar",
+    "intro": "Välj en grafikförinställning för den här enheten. Lägre förinställningar ger bättre flyt, högre ger rikare grafik.",
+    "autoDesc": "Väljer en förinställning som passar den här enheten. Identifierad: {preset}.",
+    "lowDesc": "Bäst flyt. Passar bäst för telefoner, surfplattor och äldre eller integrerade grafikkretsar.",
+    "mediumDesc": "En balans mellan grafik och prestanda. Passar de flesta bärbara datorer.",
+    "highDesc": "Fler detaljer och fylligare landskap. Passar ett dedikerat grafikkort.",
+    "ultraDesc": "Den visuellt rikaste fasta förinställningen. Passar ett avancerat grafikkort.",
+    "changeLater": "Du kan ändra detta när som helst i Alternativ, under Grafikkvalitet.",
+    "confirm": "Fortsätt"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Världen otillgänglig",
@@ -18661,7 +18661,7 @@ export const sv_SE: EnTranslations = {
         "name": "Förtroppen krigsstaff"
       },
       "infernal_quiver": {
-        "name": "Infernal Quiver"
+        "name": "Helveteskoger"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

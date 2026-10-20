@@ -20443,4 +20443,22 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.weekly.claimFirst': 'Recoger primero',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} de reputación de la semana pasada sin recoger. Recógela para elegir una nueva carga.',
+  'hudChrome.options.rawMouseInput': 'Entrada directa del ratón',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Lee el movimiento directamente del ratón mientras arrastras para girar la cámara, sin aplicar la velocidad ni la aceleración del puntero del sistema, para que el giro sea más estable. Desactívalo para usar los ajustes del ratón del sistema. Solo funciona con Bloquear cursor al rotar activado y no es compatible con todos los navegadores o sistemas.',
+  'entities.items.infernal_quiver.name': 'Carcaj infernal',
+  'graphicsPrompt.title': 'Elige la calidad gráfica',
+  'graphicsPrompt.intro':
+    'Elige un ajuste gráfico para este dispositivo. Los ajustes más bajos ofrecen mayor fluidez; los más altos, un aspecto más detallado.',
+  'graphicsPrompt.autoDesc': 'Elige un ajuste adecuado para este dispositivo. Detectado: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'El rendimiento más fluido. Ideal para teléfonos, tabletas y equipos con gráficos antiguos o integrados.',
+  'graphicsPrompt.mediumDesc':
+    'Equilibrio entre calidad visual y rendimiento. Adecuado para la mayoría de los portátiles.',
+  'graphicsPrompt.highDesc':
+    'Más detalle y escenarios más completos. Adecuado para una tarjeta gráfica dedicada.',
+  'graphicsPrompt.ultraDesc':
+    'El ajuste fijo con mayor calidad visual. Adecuado para una tarjeta gráfica de gama alta.',
+  'graphicsPrompt.changeLater': 'Puedes cambiarlo cuando quieras en Opciones, en Calidad gráfica.',
+  'graphicsPrompt.confirm': 'Continuar',
 };

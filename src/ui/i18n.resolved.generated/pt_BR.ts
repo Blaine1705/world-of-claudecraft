@@ -2207,8 +2207,8 @@ export const pt_BR: EnTranslations = {
       "clickFeedback": "Marcador de clique",
       "lockCursorOnRotate": "Bloquear cursor ao girar",
       "keybindHelpLockCursorOnRotate": "Mantém o cursor do mouse dentro da janela enquanto você arrasta para girar a câmera, para que ele não alcance a borda da tela nem passe para outro monitor. Desative se preferir um cursor livre.",
-      "rawMouseInput": "Raw Mouse Input",
-      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
+      "rawMouseInput": "Entrada direta do mouse",
+      "keybindHelpRawMouseInput": "Lê o movimento diretamente do mouse enquanto você arrasta para girar a câmera, sem aplicar a velocidade e a aceleração do ponteiro do sistema, para giros mais estáveis. Desative para usar as configurações de mouse do sistema. Só funciona com Bloquear cursor ao girar ativado e não é compatível com todos os navegadores ou sistemas.",
       "showWalletOnCharacterScreen": "Mostrar carteira na tela de personagens",
       "showWalletOnPlayerCard": "Mostrar carteira no cartão de jogador",
       "showPlaytime": "Mostrar Tempo Jogado na Tela de Personagens",
@@ -11495,15 +11495,15 @@ export const pt_BR: EnTranslations = {
     "otherInstallDetail": "Instale ou adicione esta página à tela inicial para a melhor experiência móvel em tela cheia."
   },
   "graphicsPrompt": {
-    "title": "Choose Your Graphics",
-    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
-    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
-    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
-    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
-    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
-    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
-    "changeLater": "You can change this any time in Options, under Graphics Quality.",
-    "confirm": "Continue"
+    "title": "Escolha seus gráficos",
+    "intro": "Escolha uma predefinição gráfica para este dispositivo. As mais baixas oferecem maior fluidez; as mais altas, visuais mais ricos.",
+    "autoDesc": "Escolhe uma predefinição adequada para este dispositivo. Detectada: {preset}.",
+    "lowDesc": "A maior fluidez. Ideal para celulares, tablets e placas gráficas antigas ou integradas.",
+    "mediumDesc": "Um equilíbrio entre visual e desempenho. Adequado para a maioria dos notebooks.",
+    "highDesc": "Mais detalhes e cenários mais completos. Adequado para uma placa gráfica dedicada.",
+    "ultraDesc": "A predefinição fixa mais rica em detalhes. Adequado para uma placa gráfica de alto desempenho.",
+    "changeLater": "Você pode alterar isso a qualquer momento em Opções, em Qualidade gráfica.",
+    "confirm": "Continuar"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Mundo indisponível",
@@ -18661,7 +18661,7 @@ export const pt_BR: EnTranslations = {
         "name": "Cajado de Guerra da Vanguarda"
       },
       "infernal_quiver": {
-        "name": "Infernal Quiver"
+        "name": "Aljava infernal"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

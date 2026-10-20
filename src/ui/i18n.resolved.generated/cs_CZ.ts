@@ -2207,8 +2207,8 @@ export const cs_CZ: EnTranslations = {
       "clickFeedback": "Značka kliknutí",
       "lockCursorOnRotate": "Zamknout kurzor při otáčení",
       "keybindHelpLockCursorOnRotate": "Drží kurzor myši uvnitř okna při tažení pro otáčení kamery, takže nemůže dojet k okraji obrazovky ani na jiný monitor. Vypni, pokud chceš volný kurzor.",
-      "rawMouseInput": "Raw Mouse Input",
-      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
+      "rawMouseInput": "Přímý vstup myši",
+      "keybindHelpRawMouseInput": "Při tažení pro otáčení kamery čte pohyb přímo z myši a obchází rychlost a zrychlení ukazatele nastavené v systému, aby bylo otáčení plynulejší. Vypnutím použiješ systémové nastavení myši. Funguje jen se zapnutou volbou Zamknout kurzor při otáčení a ne ve všech prohlížečích či systémech.",
       "showWalletOnCharacterScreen": "Zobrazit peněženku na obrazovce postavy",
       "showWalletOnPlayerCard": "Zobrazit peněženku na kartě hráče",
       "showPlaytime": "Zobrazit odehraný čas na obrazovce postavy",
@@ -11495,15 +11495,15 @@ export const cs_CZ: EnTranslations = {
     "otherInstallDetail": "Pro nejlepší mobilní zážitek na celou obrazovku si tuto stránku nainstaluj nebo přidej na plochu."
   },
   "graphicsPrompt": {
-    "title": "Choose Your Graphics",
-    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
-    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
-    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
-    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
-    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
-    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
-    "changeLater": "You can change this any time in Options, under Graphics Quality.",
-    "confirm": "Continue"
+    "title": "Vyber si nastavení grafiky",
+    "intro": "Vyber grafickou předvolbu pro toto zařízení. Nižší předvolby běží plynuleji, vyšší nabízejí bohatší obraz.",
+    "autoDesc": "Vybere předvolbu vhodnou pro toto zařízení. Zjištěno: {preset}.",
+    "lowDesc": "Nejplynulejší chod. Nejlepší pro telefony, tablety a starší či integrované grafické čipy.",
+    "mediumDesc": "Rovnováha mezi vzhledem a výkonem. Hodí se pro většinu notebooků.",
+    "highDesc": "Více detailů a bohatší scenérie. Hodí se pro samostatnou grafickou kartu.",
+    "ultraDesc": "Vizuálně nejbohatší pevná předvolba. Hodí se pro špičkovou grafickou kartu.",
+    "changeLater": "Tuto volbu můžeš kdykoli změnit v Nastavení v části Kvalita grafiky.",
+    "confirm": "Pokračovat"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Svět nedostupný",
@@ -18661,7 +18661,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Bojová hůl Předvoje"
       },
       "infernal_quiver": {
-        "name": "Infernal Quiver"
+        "name": "Pekelný toulec"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

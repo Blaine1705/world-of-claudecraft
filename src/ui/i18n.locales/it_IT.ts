@@ -20427,4 +20427,24 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Riscatta prima',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} di reputazione della scorsa settimana ancora da riscuotere. Riscuotila per scegliere una nuova carica.',
+  'hudChrome.options.rawMouseInput': 'Input diretto del mouse',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Legge il movimento direttamente dal mouse mentre trascini per ruotare la visuale, ignorando la velocità e l’accelerazione del puntatore di sistema per una rotazione più stabile. Disattiva questa opzione per usare le impostazioni del mouse di sistema. Funziona solo con Blocca cursore durante la rotazione attivo e non è compatibile con tutti i browser o sistemi.',
+  'entities.items.infernal_quiver.name': 'Faretra infernale',
+  'graphicsPrompt.title': 'Scegli la grafica',
+  'graphicsPrompt.intro':
+    'Scegli una preimpostazione grafica per questo dispositivo. Quelle più basse offrono maggiore fluidità; quelle più alte, una grafica più ricca.',
+  'graphicsPrompt.autoDesc':
+    'Sceglie una preimpostazione adatta a questo dispositivo. Rilevata: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'La massima fluidità. Ideale per telefoni, tablet e sistemi grafici meno recenti o integrati.',
+  'graphicsPrompt.mediumDesc':
+    'Un equilibrio tra qualità visiva e prestazioni. Adatta alla maggior parte dei portatili.',
+  'graphicsPrompt.highDesc':
+    'Più dettagli e scenari più ricchi. Adatta a una scheda grafica dedicata.',
+  'graphicsPrompt.ultraDesc':
+    'La preimpostazione fissa visivamente più ricca. Adatta a una scheda grafica di fascia alta.',
+  'graphicsPrompt.changeLater':
+    'Puoi modificare questa scelta in qualsiasi momento in Opzioni, sotto Qualità grafica.',
+  'graphicsPrompt.confirm': 'Continua',
 };

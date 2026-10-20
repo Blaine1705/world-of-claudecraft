@@ -2207,8 +2207,8 @@ export const tr_TR: EnTranslations = {
       "clickFeedback": "Tıklama İşareti",
       "lockCursorOnRotate": "Döndürürken İmleci Kilitle",
       "keybindHelpLockCursorOnRotate": "Kamerayı döndürmek için sürüklerken fare imlecini pencerenin içinde tutar, böylece ekran kenarına ulaşamaz veya başka bir monitöre geçemez. Serbest imleç tercih ediyorsanız kapatın.",
-      "rawMouseInput": "Raw Mouse Input",
-      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
+      "rawMouseInput": "Ham Fare Girdisi",
+      "keybindHelpRawMouseInput": "Kamerayı döndürmek için sürüklerken fare hareketini doğrudan aygıttan okur. Daha kararlı dönüşler için sistemin işaretçi hızını ve ivmesini atlar. Sistemin fare ayarlarını kullanmak için kapat. Yalnızca Döndürürken İmleci Kilitle açıkken çalışır ve her tarayıcı ya da sistem tarafından desteklenmez.",
       "showWalletOnCharacterScreen": "Cüzdanı Karakter Ekranında Göster",
       "showWalletOnPlayerCard": "Cüzdanı Oyuncu Kartında Göster",
       "showPlaytime": "Karakter Ekranında Oynama Süresini Göster",
@@ -11495,15 +11495,15 @@ export const tr_TR: EnTranslations = {
     "otherInstallDetail": "En iyi tam ekran mobil deneyim için bu sayfayı yükleyin veya Ana ekranınıza ekleyin."
   },
   "graphicsPrompt": {
-    "title": "Choose Your Graphics",
-    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
-    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
-    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
-    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
-    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
-    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
-    "changeLater": "You can change this any time in Options, under Graphics Quality.",
-    "confirm": "Continue"
+    "title": "Grafik Ayarlarını Seç",
+    "intro": "Bu aygıt için bir grafik ön ayarı seç. Düşük ön ayarlar daha akıcı çalışır, yüksek olanlar daha zengin görünür.",
+    "autoDesc": "Bu aygıta uygun bir ön ayar seçer. Algılanan: {preset}.",
+    "lowDesc": "En akıcı performans. Telefonlar, tabletler ve eski ya da tümleşik grafik işlemcileri için en uygunudur.",
+    "mediumDesc": "Görsellik ve performans arasında denge. Çoğu dizüstü bilgisayara uygundur.",
+    "highDesc": "Daha fazla ayrıntı ve daha zengin manzaralar. Ayrı bir ekran kartına uygundur.",
+    "ultraDesc": "Görsel açıdan en zengin sabit ön ayar. Üst düzey bir ekran kartına uygundur.",
+    "changeLater": "Bunu istediğin zaman Seçenekler içindeki Grafik Kalitesi bölümünden değiştirebilirsin.",
+    "confirm": "Devam Et"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Dünya Kullanılamıyor",
@@ -18661,7 +18661,7 @@ export const tr_TR: EnTranslations = {
         "name": "Öncü'nün Savaş Asası"
       },
       "infernal_quiver": {
-        "name": "Infernal Quiver"
+        "name": "Cehennem Sadağı"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

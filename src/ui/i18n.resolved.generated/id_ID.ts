@@ -2207,8 +2207,8 @@ export const id_ID: EnTranslations = {
       "clickFeedback": "Penanda Klik",
       "lockCursorOnRotate": "Kunci Kursor Saat Memutar",
       "keybindHelpLockCursorOnRotate": "Menjaga kursor mouse tetap di dalam jendela saat Anda menyeret untuk memutar kamera, sehingga tidak mencapai tepi layar atau berpindah ke monitor lain. Matikan jika Anda lebih suka kursor bebas.",
-      "rawMouseInput": "Raw Mouse Input",
-      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
+      "rawMouseInput": "Input Mouse Mentah",
+      "keybindHelpRawMouseInput": "Membaca gerakan langsung dari mouse saat kamu menyeret untuk memutar kamera, tanpa menerapkan kecepatan dan akselerasi penunjuk sistem agar putaran lebih stabil. Nonaktifkan untuk menggunakan pengaturan mouse sistem. Hanya berfungsi jika Kunci Kursor Saat Memutar aktif, dan tidak didukung semua browser atau sistem.",
       "showWalletOnCharacterScreen": "Tampilkan Dompet di Layar Karakter",
       "showWalletOnPlayerCard": "Tampilkan Dompet di Kartu Pemain",
       "showPlaytime": "Tampilkan Waktu Bermain di Lembar Karakter",
@@ -11495,15 +11495,15 @@ export const id_ID: EnTranslations = {
     "otherInstallDetail": "Pasang atau tambahkan halaman ini ke layar Beranda untuk pengalaman seluler layar penuh terbaik."
   },
   "graphicsPrompt": {
-    "title": "Choose Your Graphics",
-    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
-    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
-    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
-    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
-    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
-    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
-    "changeLater": "You can change this any time in Options, under Graphics Quality.",
-    "confirm": "Continue"
+    "title": "Pilih Pengaturan Grafik",
+    "intro": "Pilih preset grafik untuk perangkat ini. Preset lebih rendah berjalan lebih lancar; preset lebih tinggi memberi tampilan lebih kaya.",
+    "autoDesc": "Memilih preset yang sesuai untuk perangkat ini. Terdeteksi: {preset}.",
+    "lowDesc": "Kinerja paling lancar. Terbaik untuk ponsel, tablet, serta grafis lama atau terintegrasi.",
+    "mediumDesc": "Keseimbangan antara tampilan dan kinerja. Cocok untuk sebagian besar laptop.",
+    "highDesc": "Lebih banyak detail dan pemandangan lebih kaya. Cocok untuk kartu grafis khusus.",
+    "ultraDesc": "Preset tetap dengan tampilan paling kaya. Cocok untuk kartu grafis kelas atas.",
+    "changeLater": "Kamu bisa mengubahnya kapan saja di Opsi, pada Kualitas Grafik.",
+    "confirm": "Lanjutkan"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Dunia Tidak Tersedia",
@@ -18661,7 +18661,7 @@ export const id_ID: EnTranslations = {
         "name": "Tongkat Perang Vanguard"
       },
       "infernal_quiver": {
-        "name": "Infernal Quiver"
+        "name": "Tabung Panah Neraka"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

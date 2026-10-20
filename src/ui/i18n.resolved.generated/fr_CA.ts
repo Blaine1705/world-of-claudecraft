@@ -2207,8 +2207,8 @@ export const fr_CA: EnTranslations = {
       "clickFeedback": "Repère de clic",
       "lockCursorOnRotate": "Verrouiller le curseur pendant la rotation",
       "keybindHelpLockCursorOnRotate": "Maintient le curseur de la souris dans la fenêtre pendant que vous faites glisser pour faire pivoter la caméra, afin qu'il n'atteigne pas le bord de l'écran et ne passe pas sur un autre moniteur. Désactivez cette option si vous préférez un curseur libre.",
-      "rawMouseInput": "Raw Mouse Input",
-      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
+      "rawMouseInput": "Entrée brute de la souris",
+      "keybindHelpRawMouseInput": "Lit directement les mouvements de la souris lorsque vous faites glisser pour tourner la caméra, sans appliquer la vitesse ni l’accélération du pointeur du système, pour une rotation plus stable. Désactivez cette option pour utiliser les paramètres de souris du système. Nécessite Verrouiller le curseur pendant la rotation et ne fonctionne pas sur tous les navigateurs ou systèmes.",
       "showWalletOnCharacterScreen": "Afficher le portefeuille sur l’écran des personnages",
       "showWalletOnPlayerCard": "Afficher le portefeuille sur la carte de joueur",
       "showPlaytime": "Afficher le temps de jeu sur l'écran des personnages",
@@ -11495,15 +11495,15 @@ export const fr_CA: EnTranslations = {
     "otherInstallDetail": "Installez ou ajoutez cette page à votre écran d'accueil pour la meilleure expérience mobile plein écran."
   },
   "graphicsPrompt": {
-    "title": "Choose Your Graphics",
-    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
-    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
-    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
-    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
-    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
-    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
-    "changeLater": "You can change this any time in Options, under Graphics Quality.",
-    "confirm": "Continue"
+    "title": "Choisissez vos graphismes",
+    "intro": "Choisissez un préréglage graphique pour cet appareil. Les préréglages inférieurs offrent plus de fluidité ; les supérieurs, des visuels plus riches.",
+    "autoDesc": "Choisit un préréglage adapté à cet appareil. Détecté : {preset}.",
+    "lowDesc": "La meilleure fluidité. Idéal pour les téléphones, tablettes et puces graphiques anciennes ou intégrées.",
+    "mediumDesc": "Un équilibre entre qualité visuelle et performances. Convient à la plupart des ordinateurs portables.",
+    "highDesc": "Plus de détails et des décors plus fournis. Convient à une carte graphique dédiée.",
+    "ultraDesc": "Le préréglage fixe le plus riche visuellement. Convient à une carte graphique haut de gamme.",
+    "changeLater": "Vous pouvez modifier ce choix à tout moment dans Options, sous Qualité graphique.",
+    "confirm": "Continuer"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Monde indisponible",
@@ -18661,7 +18661,7 @@ export const fr_CA: EnTranslations = {
         "name": "Bâton de guerre de l'Avant-garde"
       },
       "infernal_quiver": {
-        "name": "Infernal Quiver"
+        "name": "Carquois infernal"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

@@ -2207,8 +2207,8 @@ export const vi_VN: EnTranslations = {
       "clickFeedback": "Dấu Nhấp Chuột",
       "lockCursorOnRotate": "Khóa Con Trỏ Khi Xoay",
       "keybindHelpLockCursorOnRotate": "Giữ con trỏ chuột bên trong cửa sổ khi bạn kéo để xoay camera, để nó không thể chạm tới mép màn hình hoặc di chuyển sang màn hình khác. Hãy tắt nếu bạn thích con trỏ tự do.",
-      "rawMouseInput": "Raw Mouse Input",
-      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
+      "rawMouseInput": "Dữ Liệu Chuột Trực Tiếp",
+      "keybindHelpRawMouseInput": "Đọc chuyển động trực tiếp từ chuột khi bạn kéo để xoay camera, bỏ qua tốc độ và gia tốc con trỏ của hệ thống để xoay ổn định hơn. Tắt để dùng cài đặt chuột của hệ thống. Chỉ hoạt động khi bật Khóa Con Trỏ Khi Xoay và không được hỗ trợ trên mọi trình duyệt hoặc hệ thống.",
       "showWalletOnCharacterScreen": "Hiện Ví Tiền Ở Màn Hình Nhân Vật",
       "showWalletOnPlayerCard": "Hiện Ví Tiền Trên Thẻ Người Chơi",
       "showPlaytime": "Hiện Thời Gian Chơi Ở Màn Hình Nhân Vật",
@@ -11495,15 +11495,15 @@ export const vi_VN: EnTranslations = {
     "otherInstallDetail": "Hãy cài đặt hoặc thêm trang này vào Màn hình chính để có trải nghiệm toàn màn hình tốt nhất trên di động."
   },
   "graphicsPrompt": {
-    "title": "Choose Your Graphics",
-    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
-    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
-    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
-    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
-    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
-    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
-    "changeLater": "You can change this any time in Options, under Graphics Quality.",
-    "confirm": "Continue"
+    "title": "Chọn Cài Đặt Đồ Họa",
+    "intro": "Chọn một cấu hình đồ họa có sẵn cho thiết bị này. Cấu hình thấp hơn chạy mượt hơn; cấu hình cao hơn cho hình ảnh phong phú hơn.",
+    "autoDesc": "Chọn cấu hình phù hợp với thiết bị này. Đã phát hiện: {preset}.",
+    "lowDesc": "Hiệu năng mượt nhất. Phù hợp nhất với điện thoại, máy tính bảng và bộ xử lý đồ họa cũ hoặc tích hợp.",
+    "mediumDesc": "Cân bằng giữa hình ảnh và hiệu năng. Phù hợp với hầu hết máy tính xách tay.",
+    "highDesc": "Nhiều chi tiết và cảnh vật đầy đặn hơn. Phù hợp với card đồ họa rời.",
+    "ultraDesc": "Cấu hình cố định có hình ảnh phong phú nhất. Phù hợp với card đồ họa cao cấp.",
+    "changeLater": "Bạn có thể thay đổi bất cứ lúc nào trong Tùy Chọn, ở mục Chất Lượng Đồ Họa.",
+    "confirm": "Tiếp Tục"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Thế Giới Không Khả Dụng",
@@ -18661,7 +18661,7 @@ export const vi_VN: EnTranslations = {
         "name": "Trượng Chiến Vanguard"
       },
       "infernal_quiver": {
-        "name": "Infernal Quiver"
+        "name": "Ống Tên Địa Ngục"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

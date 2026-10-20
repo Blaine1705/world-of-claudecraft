@@ -20008,4 +20008,23 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Hent først',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} omdømme fra sidste uge er endnu ikke hentet. Hent det for at vælge en ny ladning.',
+  'hudChrome.options.rawMouseInput': 'Ubehandlet museinput',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Læser musebevægelser direkte fra enheden, når du trækker for at dreje kameraet, uden systemets markørhastighed og acceleration, så drejningen bliver mere jævn. Slå fra for at bruge systemets museindstillinger. Virker kun med Lås markør under drejning slået til og understøttes ikke af alle browsere eller systemer.',
+  'entities.items.infernal_quiver.name': 'Helvedeskogger',
+  'graphicsPrompt.title': 'Vælg dine grafikindstillinger',
+  'graphicsPrompt.intro':
+    'Vælg en grafikforudindstilling til denne enhed. Lavere forudindstillinger kører mere flydende, mens højere giver et rigere billede.',
+  'graphicsPrompt.autoDesc':
+    'Vælger en forudindstilling, der passer til denne enhed. Registreret: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Den mest flydende ydelse. Bedst til telefoner, tablets og ældre eller integrerede grafikchips.',
+  'graphicsPrompt.mediumDesc':
+    'En balance mellem grafik og ydelse. Passer til de fleste bærbare computere.',
+  'graphicsPrompt.highDesc':
+    'Flere detaljer og mere fyldige omgivelser. Passer til et dedikeret grafikkort.',
+  'graphicsPrompt.ultraDesc':
+    'Den visuelt rigeste faste forudindstilling. Passer til et grafikkort i topklassen.',
+  'graphicsPrompt.changeLater': 'Du kan altid ændre dette i Indstillinger under Grafikkvalitet.',
+  'graphicsPrompt.confirm': 'Fortsæt',
 };

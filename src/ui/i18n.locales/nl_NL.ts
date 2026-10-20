@@ -20270,4 +20270,24 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Eerst ophalen',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} aanzien van vorige week, nog niet opgehaald. Haal het op om een nieuwe lading te kiezen.',
+  'hudChrome.options.rawMouseInput': 'Ruwe muisinvoer',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Leest muisbewegingen rechtstreeks van het apparaat terwijl je sleept om de camera te draaien. De aanwijzersnelheid en versnelling van het systeem worden overgeslagen voor gelijkmatiger draaien. Schakel dit uit om de muisinstellingen van het systeem te gebruiken. Werkt alleen als Aanwijzer vergrendelen tijdens draaien is ingeschakeld en niet in elke browser of op elk systeem.',
+  'entities.items.infernal_quiver.name': 'Helse pijlkoker',
+  'graphicsPrompt.title': 'Kies je grafische instellingen',
+  'graphicsPrompt.intro':
+    'Kies een grafische voorinstelling voor dit apparaat. Lagere voorinstellingen draaien soepeler; hogere geven een rijker beeld.',
+  'graphicsPrompt.autoDesc':
+    'Kiest een voorinstelling die bij dit apparaat past. Gedetecteerd: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'De soepelste prestaties. Ideaal voor telefoons, tablets en oudere of geïntegreerde grafische chips.',
+  'graphicsPrompt.mediumDesc':
+    'Een balans tussen beeld en prestaties. Geschikt voor de meeste laptops.',
+  'graphicsPrompt.highDesc':
+    'Meer details en rijkere omgevingen. Geschikt voor een aparte grafische kaart.',
+  'graphicsPrompt.ultraDesc':
+    'De visueel rijkste vaste voorinstelling. Geschikt voor een hoogwaardige grafische kaart.',
+  'graphicsPrompt.changeLater':
+    'Je kunt dit op elk moment wijzigen in Opties, onder Beeldkwaliteit.',
+  'graphicsPrompt.confirm': 'Doorgaan',
 };

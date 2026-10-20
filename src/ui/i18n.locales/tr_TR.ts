@@ -20015,4 +20015,23 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Önce al',
   'hudChrome.weekly.commendCarriedNote':
     'Geçen haftadan {amount} itibar hâlâ alınmadı. Yeni bir yük seçmek için bunu al.',
+  'hudChrome.options.rawMouseInput': 'Ham Fare Girdisi',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Kamerayı döndürmek için sürüklerken fare hareketini doğrudan aygıttan okur. Daha kararlı dönüşler için sistemin işaretçi hızını ve ivmesini atlar. Sistemin fare ayarlarını kullanmak için kapat. Yalnızca Döndürürken İmleci Kilitle açıkken çalışır ve her tarayıcı ya da sistem tarafından desteklenmez.',
+  'entities.items.infernal_quiver.name': 'Cehennem Sadağı',
+  'graphicsPrompt.title': 'Grafik Ayarlarını Seç',
+  'graphicsPrompt.intro':
+    'Bu aygıt için bir grafik ön ayarı seç. Düşük ön ayarlar daha akıcı çalışır, yüksek olanlar daha zengin görünür.',
+  'graphicsPrompt.autoDesc': 'Bu aygıta uygun bir ön ayar seçer. Algılanan: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'En akıcı performans. Telefonlar, tabletler ve eski ya da tümleşik grafik işlemcileri için en uygunudur.',
+  'graphicsPrompt.mediumDesc':
+    'Görsellik ve performans arasında denge. Çoğu dizüstü bilgisayara uygundur.',
+  'graphicsPrompt.highDesc':
+    'Daha fazla ayrıntı ve daha zengin manzaralar. Ayrı bir ekran kartına uygundur.',
+  'graphicsPrompt.ultraDesc':
+    'Görsel açıdan en zengin sabit ön ayar. Üst düzey bir ekran kartına uygundur.',
+  'graphicsPrompt.changeLater':
+    'Bunu istediğin zaman Seçenekler içindeki Grafik Kalitesi bölümünden değiştirebilirsin.',
+  'graphicsPrompt.confirm': 'Devam Et',
 };

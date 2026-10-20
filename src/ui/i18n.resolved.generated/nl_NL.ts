@@ -2207,8 +2207,8 @@ export const nl_NL: EnTranslations = {
       "clickFeedback": "Klikmarkering",
       "lockCursorOnRotate": "Aanwijzer vergrendelen tijdens draaien",
       "keybindHelpLockCursorOnRotate": "Houdt de muisaanwijzer binnen het venster terwijl je sleept om de camera te draaien, zodat deze de schermrand niet kan bereiken of naar een ander beeldscherm kan gaan. Schakel uit als je liever een vrije aanwijzer hebt.",
-      "rawMouseInput": "Raw Mouse Input",
-      "keybindHelpRawMouseInput": "Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.",
+      "rawMouseInput": "Ruwe muisinvoer",
+      "keybindHelpRawMouseInput": "Leest muisbewegingen rechtstreeks van het apparaat terwijl je sleept om de camera te draaien. De aanwijzersnelheid en versnelling van het systeem worden overgeslagen voor gelijkmatiger draaien. Schakel dit uit om de muisinstellingen van het systeem te gebruiken. Werkt alleen als Aanwijzer vergrendelen tijdens draaien is ingeschakeld en niet in elke browser of op elk systeem.",
       "showWalletOnCharacterScreen": "Portemonnee tonen op personagescherm",
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
       "showPlaytime": "Speeltijd tonen op personagescherm",
@@ -11495,15 +11495,15 @@ export const nl_NL: EnTranslations = {
     "otherInstallDetail": "Installeer of voeg deze pagina toe aan je beginscherm voor de beste mobiele ervaring met volledig scherm."
   },
   "graphicsPrompt": {
-    "title": "Choose Your Graphics",
-    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
-    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
-    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
-    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
-    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
-    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
-    "changeLater": "You can change this any time in Options, under Graphics Quality.",
-    "confirm": "Continue"
+    "title": "Kies je grafische instellingen",
+    "intro": "Kies een grafische voorinstelling voor dit apparaat. Lagere voorinstellingen draaien soepeler; hogere geven een rijker beeld.",
+    "autoDesc": "Kiest een voorinstelling die bij dit apparaat past. Gedetecteerd: {preset}.",
+    "lowDesc": "De soepelste prestaties. Ideaal voor telefoons, tablets en oudere of geïntegreerde grafische chips.",
+    "mediumDesc": "Een balans tussen beeld en prestaties. Geschikt voor de meeste laptops.",
+    "highDesc": "Meer details en rijkere omgevingen. Geschikt voor een aparte grafische kaart.",
+    "ultraDesc": "De visueel rijkste vaste voorinstelling. Geschikt voor een hoogwaardige grafische kaart.",
+    "changeLater": "Je kunt dit op elk moment wijzigen in Opties, onder Beeldkwaliteit.",
+    "confirm": "Doorgaan"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Wereld niet beschikbaar",
@@ -18661,7 +18661,7 @@ export const nl_NL: EnTranslations = {
         "name": "Voortocht Krijgsstaf"
       },
       "infernal_quiver": {
-        "name": "Infernal Quiver"
+        "name": "Helse pijlkoker"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

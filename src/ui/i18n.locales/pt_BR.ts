@@ -20278,4 +20278,24 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Resgatar primeiro',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} de reputação da semana passada ainda não resgatada. Resgate para escolher uma nova carga.',
+  'hudChrome.options.rawMouseInput': 'Entrada direta do mouse',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Lê o movimento diretamente do mouse enquanto você arrasta para girar a câmera, sem aplicar a velocidade e a aceleração do ponteiro do sistema, para giros mais estáveis. Desative para usar as configurações de mouse do sistema. Só funciona com Bloquear cursor ao girar ativado e não é compatível com todos os navegadores ou sistemas.',
+  'entities.items.infernal_quiver.name': 'Aljava infernal',
+  'graphicsPrompt.title': 'Escolha seus gráficos',
+  'graphicsPrompt.intro':
+    'Escolha uma predefinição gráfica para este dispositivo. As mais baixas oferecem maior fluidez; as mais altas, visuais mais ricos.',
+  'graphicsPrompt.autoDesc':
+    'Escolhe uma predefinição adequada para este dispositivo. Detectada: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'A maior fluidez. Ideal para celulares, tablets e placas gráficas antigas ou integradas.',
+  'graphicsPrompt.mediumDesc':
+    'Um equilíbrio entre visual e desempenho. Adequado para a maioria dos notebooks.',
+  'graphicsPrompt.highDesc':
+    'Mais detalhes e cenários mais completos. Adequado para uma placa gráfica dedicada.',
+  'graphicsPrompt.ultraDesc':
+    'A predefinição fixa mais rica em detalhes. Adequado para uma placa gráfica de alto desempenho.',
+  'graphicsPrompt.changeLater':
+    'Você pode alterar isso a qualquer momento em Opções, em Qualidade gráfica.',
+  'graphicsPrompt.confirm': 'Continuar',
 };

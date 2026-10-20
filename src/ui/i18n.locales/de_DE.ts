@@ -20456,4 +20456,24 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Zuerst abholen',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} Ruf von letzter Woche, noch nicht abgeholt. Hole ihn ab, um eine neue Ladung zu wählen.',
+  'hudChrome.options.rawMouseInput': 'Ungefilterte Mauseingabe',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Liest Mausbewegungen beim Ziehen zum Drehen der Kamera direkt vom Gerät. Die Zeigergeschwindigkeit und Mausbeschleunigung des Systems werden für gleichmäßigere Drehungen umgangen. Deaktiviere dies, um die Mauseinstellungen des Systems zu verwenden. Funktioniert nur mit aktivierter Option Cursor beim Drehen sperren und nicht in jedem Browser oder System.',
+  'entities.items.infernal_quiver.name': 'Höllenköcher',
+  'graphicsPrompt.title': 'Wähle deine Grafikeinstellungen',
+  'graphicsPrompt.intro':
+    'Wähle eine Grafikvoreinstellung für dieses Gerät. Niedrigere Stufen laufen flüssiger, höhere bieten eine aufwendigere Darstellung.',
+  'graphicsPrompt.autoDesc':
+    'Wählt eine passende Voreinstellung für dieses Gerät. Erkannt: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Die flüssigste Darstellung. Ideal für Smartphones, Tablets sowie ältere oder integrierte Grafikchips.',
+  'graphicsPrompt.mediumDesc':
+    'Ein Gleichgewicht zwischen Optik und Leistung. Für die meisten Laptops geeignet.',
+  'graphicsPrompt.highDesc':
+    'Mehr Details und dichtere Landschaften. Für eine dedizierte Grafikkarte geeignet.',
+  'graphicsPrompt.ultraDesc':
+    'Die optisch aufwendigste feste Voreinstellung. Für eine High-End-Grafikkarte geeignet.',
+  'graphicsPrompt.changeLater':
+    'Du kannst dies jederzeit in den Optionen unter Grafikqualität ändern.',
+  'graphicsPrompt.confirm': 'Weiter',
 };

@@ -20098,4 +20098,22 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': 'Nhận trước',
   'hudChrome.weekly.commendCarriedNote':
     '{amount} danh vọng từ tuần trước vẫn chưa nhận. Nhận để chọn lượt nạp mới.',
+  'hudChrome.options.rawMouseInput': 'Dữ Liệu Chuột Trực Tiếp',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Đọc chuyển động trực tiếp từ chuột khi bạn kéo để xoay camera, bỏ qua tốc độ và gia tốc con trỏ của hệ thống để xoay ổn định hơn. Tắt để dùng cài đặt chuột của hệ thống. Chỉ hoạt động khi bật Khóa Con Trỏ Khi Xoay và không được hỗ trợ trên mọi trình duyệt hoặc hệ thống.',
+  'entities.items.infernal_quiver.name': 'Ống Tên Địa Ngục',
+  'graphicsPrompt.title': 'Chọn Cài Đặt Đồ Họa',
+  'graphicsPrompt.intro':
+    'Chọn một cấu hình đồ họa có sẵn cho thiết bị này. Cấu hình thấp hơn chạy mượt hơn; cấu hình cao hơn cho hình ảnh phong phú hơn.',
+  'graphicsPrompt.autoDesc': 'Chọn cấu hình phù hợp với thiết bị này. Đã phát hiện: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Hiệu năng mượt nhất. Phù hợp nhất với điện thoại, máy tính bảng và bộ xử lý đồ họa cũ hoặc tích hợp.',
+  'graphicsPrompt.mediumDesc':
+    'Cân bằng giữa hình ảnh và hiệu năng. Phù hợp với hầu hết máy tính xách tay.',
+  'graphicsPrompt.highDesc': 'Nhiều chi tiết và cảnh vật đầy đặn hơn. Phù hợp với card đồ họa rời.',
+  'graphicsPrompt.ultraDesc':
+    'Cấu hình cố định có hình ảnh phong phú nhất. Phù hợp với card đồ họa cao cấp.',
+  'graphicsPrompt.changeLater':
+    'Bạn có thể thay đổi bất cứ lúc nào trong Tùy Chọn, ở mục Chất Lượng Đồ Họa.',
+  'graphicsPrompt.confirm': 'Tiếp Tục',
 };

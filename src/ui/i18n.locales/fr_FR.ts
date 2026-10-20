@@ -20520,4 +20520,23 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.claimFirst': "Récupérer d'abord",
   'hudChrome.weekly.commendCarriedNote':
     '{amount} de réputation de la semaine dernière encore non récupérée. Récupérez-la pour choisir une nouvelle charge.',
+  'hudChrome.options.rawMouseInput': 'Entrée brute de la souris',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Lit directement les mouvements de la souris lorsque vous faites glisser pour tourner la caméra, sans appliquer la vitesse ni l’accélération du pointeur du système, pour une rotation plus stable. Désactivez cette option pour utiliser les paramètres de souris du système. Nécessite Verrouiller le curseur pendant la rotation et ne fonctionne pas sur tous les navigateurs ou systèmes.',
+  'entities.items.infernal_quiver.name': 'Carquois infernal',
+  'graphicsPrompt.title': 'Choisissez vos graphismes',
+  'graphicsPrompt.intro':
+    'Choisissez un préréglage graphique pour cet appareil. Les préréglages inférieurs offrent plus de fluidité ; les supérieurs, des visuels plus riches.',
+  'graphicsPrompt.autoDesc': 'Choisit un préréglage adapté à cet appareil. Détecté : {preset}.',
+  'graphicsPrompt.lowDesc':
+    'La meilleure fluidité. Idéal pour les téléphones, tablettes et puces graphiques anciennes ou intégrées.',
+  'graphicsPrompt.mediumDesc':
+    'Un équilibre entre qualité visuelle et performances. Convient à la plupart des ordinateurs portables.',
+  'graphicsPrompt.highDesc':
+    'Plus de détails et des décors plus fournis. Convient à une carte graphique dédiée.',
+  'graphicsPrompt.ultraDesc':
+    'Le préréglage fixe le plus riche visuellement. Convient à une carte graphique haut de gamme.',
+  'graphicsPrompt.changeLater':
+    'Vous pouvez modifier ce choix à tout moment dans Options, sous Qualité graphique.',
+  'graphicsPrompt.confirm': 'Continuer',
 };
