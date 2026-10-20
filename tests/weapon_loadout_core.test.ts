@@ -185,6 +185,7 @@ describe('the dual set on the WOC bodies', () => {
         Woc_Special_1H: 'Woc_Attack_Dual',
         Woc_Attack_2H_0: 'Woc_Attack_Dual',
         Woc_Attack_2H_1: 'Woc_Attack_Dual',
+        Woc_Shield_Bash: 'Woc_Attack_Offhand_Stab',
       });
       // while ONE two-hander strikes it as the single set's one-hand chop
       const twohand = VISUALS[key].clips.loadoutSwaps?.twohand ?? null;
@@ -196,6 +197,29 @@ describe('the dual set on the WOC bodies', () => {
         swappedClip(twohand, 'Woc_Attack_2H_0', () => true),
         key,
       ).toBe('Woc_Attack_1H_0');
+    }
+  });
+});
+
+describe('the shield bash on the WOC bodies', () => {
+  const has = () => true;
+  it('drives the shield forward only when a shield is worn, and strikes with the weapon otherwise', () => {
+    // Hushbrand needs no shield, so a Retribution paladin can cast it from any loadout
+    // (src/sim/content/paladin_core_abilities.ts); Shieldcrack requires one.
+    expect(VISUALS.player_paladin.clips.attackByAbility?.hushbrand).toBe('Woc_Shield_Bash');
+    expect(VISUALS.player_warrior.clips.attackByAbility?.shield_slam).toBe('Woc_Shield_Bash');
+    for (const key of ['player_warrior', 'player_paladin'] as const) {
+      const swaps = VISUALS[key].clips.loadoutSwaps;
+      // a shield keeps the default set (weaponLoadout returns null): the bash plays as routed
+      expect(swappedClip(swaps?.single ?? null, 'Woc_Shield_Bash', has), key).toBe(
+        'Woc_Attack_1H_0',
+      );
+      expect(swappedClip(swaps?.twohand ?? null, 'Woc_Shield_Bash', has), key).toBe(
+        'Woc_Attack_1H_0',
+      );
+      expect(swappedClip(swaps?.dual ?? null, 'Woc_Shield_Bash', has), key).toBe(
+        'Woc_Attack_Offhand_Stab',
+      );
     }
   });
 });

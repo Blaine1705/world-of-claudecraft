@@ -36,13 +36,16 @@ const EMOTES: NonNullable<ClipMap['emote']> = {
   bow: { clips: ['Woc_Emote_Bow'] },
   point: { clips: ['Woc_Emote_Point'] },
   roar: { clips: ['Woc_Shout'] },
-  salute: { clips: ['Woc_Emote_Beckon'] },
 };
 
+// Shipped and bound but routed by no slot or emote here: the per-class routes in
+// manifest.ts name most of them, and the rest wait for a route (/salute keeps the rig's
+// own Salute; the keyed beckon is a different gesture).
 const EXTRA_SHIPPED_CLIPS = [
   'Woc_Run_Back',
   'Woc_Emote_Nod',
   'Woc_Emote_Shake_Head',
+  'Woc_Emote_Beckon',
   'Woc_Attack_1H_Stab',
   'Woc_Attack_Offhand',
   'Woc_Attack_Offhand_Stab',

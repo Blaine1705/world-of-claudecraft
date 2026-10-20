@@ -848,6 +848,8 @@ const WOC_SINGLE: Readonly<Record<string, string>> = {
   Woc_Attack_1H_1: 'Woc_Attack_1H_1',
   Woc_Attack_1H_Stab: 'Woc_Attack_1H_Stab',
   Woc_Special_1H: 'Woc_Special_1H',
+  // No shield to drive forward (Hushbrand needs none): the quick one-hand strike instead.
+  Woc_Shield_Bash: 'Woc_Attack_1H_0',
 };
 
 // Two-hand weapon: no two-hand stance (owner call, 2026-09-30: "just have the same animations as
@@ -886,6 +888,7 @@ const WOC_DUAL: Readonly<Record<string, string>> = {
   Woc_Special_1H: 'Woc_Attack_Dual',
   Woc_Attack_2H_0: 'Woc_Attack_Dual',
   Woc_Attack_2H_1: 'Woc_Attack_Dual',
+  Woc_Shield_Bash: 'Woc_Attack_Offhand_Stab',
 };
 
 // Blade contact times (seconds from the first frame, hand order) of the WOC melee clips, per
