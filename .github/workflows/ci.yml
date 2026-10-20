@@ -366,8 +366,11 @@ jobs:
     # contains the slowest observed cold Playwright Chromium install (2.33
     # minutes), so 10 keeps a 2.7x margin over a cold-cache day. Its one
     # stalled run sat 17.5 minutes in checkout inside an 18.4 minute wall
-    # (run 31107474546).
-    timeout-minutes: 10
+    # (run 31107474546). Raised to 12 on the v0.45.0 integration: the suite
+    # grew to a 6.2 minute healthy wall (run 39354039920) and now runs in two
+    # sessions (about a minute more), so 12 keeps room for a cold Chromium
+    # install while still killing a checkout stall well short of 18 minutes.
+    timeout-minutes: 12
     runs-on: ubuntu-latest
 
     steps:
@@ -440,13 +443,20 @@ jobs:
           fi
 
       - name: Run browser regressions
-        # Diagnostic: echo Chromium's own stderr so a browser-process crash
-        # (the v0.45.0 integration lane intermittently loses the browser at
-        # varkhul_assembly_links_visual on CI only) logs its cause. Remove
-        # once that crash is understood.
+        # Two halves in two fresh browser and dev-server sessions, one after the
+        # other. On the v0.45.0 integration one long session intermittently lost
+        # its server connection at the 48th file (varkhul_assembly_links_visual;
+        # Chromium itself stayed healthy and exited cleanly), which skipped the
+        # remaining 29 files. Both halves always run and either failing fails the
+        # step, so no file is ever skipped. DEBUG=pw:browser echoes Chromium's
+        # stderr in case the drop moves; remove it once the cause is understood.
         env:
           DEBUG: pw:browser
-        run: npm run test:browser
+        run: |
+          status=0
+          npm run test:browser -- --shard=1/2 || status=1
+          npm run test:browser -- --shard=2/2 || status=1
+          exit "$status"
 
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
