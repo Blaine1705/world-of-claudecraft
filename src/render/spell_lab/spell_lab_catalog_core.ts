@@ -224,7 +224,12 @@ export function formatSpellLabDescription(def: AbilityDef): string {
   let durationText = '8';
 
   for (const eff of def.effects) {
-    if ('min' in eff && 'max' in eff && typeof eff.min === 'number' && typeof eff.max === 'number') {
+    if (
+      'min' in eff &&
+      'max' in eff &&
+      typeof eff.min === 'number' &&
+      typeof eff.max === 'number'
+    ) {
       damageText = eff.min === eff.max ? `${eff.min}` : `${eff.min} to ${eff.max}`;
       break;
     }

@@ -2644,7 +2644,7 @@ export const VISUALS: Record<string, VisualDef> = {
       // (WOC_CONTACTS; tests/woc_character.test.ts measures both off the library).
       dualWieldSplit: 0.4,
       // Every warrior ability the KayKit body routed keeps its entry; the clips
-      // are the stock WoW combat vocabulary (verified against the shipped GLB by
+      // are the hand-keyed WOC library (verified against the shipped GLB by
       // tests/character_clipmaps.test.ts and tests/warrior_render_contract.test.ts).
       attackByAbility: {
         mortal_strike: 'Woc_Attack_2H_0',
@@ -2652,7 +2652,7 @@ export const VISUALS: Record<string, VisualDef> = {
         slam: 'Woc_Attack_2H_0',
         red_harvest: 'Woc_Attack_2H_1',
         breachmaker: 'Woc_Attack_2H_1',
-        // Shieldcrack drives the offhand shield forward (stock WoW ShieldBash).
+        // Shieldcrack drives the offhand shield forward (the keyed shield bash).
         shield_slam: 'Woc_Shield_Bash',
         raging_gale: 'Woc_Attack_Dual',
         bloodthirst: 'Woc_Attack_Dual',
@@ -2665,7 +2665,7 @@ export const VISUALS: Record<string, VisualDef> = {
         heroic_strike: 'Woc_Attack_1H_0',
         overpower: 'Woc_Attack_1H_1',
         hamstring: 'Woc_Attack_1H_Stab',
-        // Jawcrack is a bare-fist interrupt (stock WoW AttackUnarmed).
+        // Jawcrack is a bare-fist interrupt (the keyed unarmed jab).
         pummel: 'Woc_Attack_Unarmed_0',
         // Vaulting Charge completes through the renderer's generic 'selfCast'
         // cue, which only draws a body gesture via this exact entry: the
@@ -2735,7 +2735,7 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The hunter on the WOC body (equipment set of 2026-09-18). The auto shot and
-  // every instant shot play the stock WoW crossbow/rifle clip; a timed shot aims
+  // every instant shot play the keyed crossbow/rifle clip; a timed shot aims
   // from its raise and holds the crossbow up until the cast lands, then the release
   // half (the shot and the lowering) plays at the damage event, so the raise
   // never replays under the shot (clipSplits).
@@ -2794,7 +2794,7 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/crossbow_starter.glb`, bone: 'handslot.r' }],
   },
   // The rogue on the WOC body: every strike, opener and finisher is a weapon
-  // blow, so the physical damage event swings the stock WoW clips (the dual
+  // blow, so the physical damage event swings the keyed clips (the dual
   // halves alternate when two blades are drawn) and needs no per-ability
   // entry for builders; stealth, sprint, poisons and the cooldowns play nothing.
   player_rogue: {
@@ -2881,7 +2881,7 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The shaman on the WOC body: weapon strikes (Stormstrike, the imbued auto
-  // attack, two-hand and dual-wield swings) ride the stock WoW blade clips;
+  // attack, two-hand and dual-wield swings) ride the keyed blade clips;
   // Lightning Bolt and Chain Lightning release through the throw. Shocks,
   // totems, shields and imbues play nothing.
   player_shaman: {

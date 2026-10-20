@@ -1,11 +1,12 @@
-// Stock WoW combat-ready stances, hit flinch, battle shout, shield bash,
+// Combat-ready stances, hit flinch, battle shout, shield bash,
 // special 1H/2H strikes, and spellcasting loops/releases (Woc_Combat_Idle_1H,
 // Woc_Combat_Idle_2H, Woc_Combat_Idle_Dual, Woc_Hit, Woc_Shout,
 // Woc_Shield_Bash, Woc_Special_1H, Woc_Special_2H, Woc_Cast_Directed,
 // Woc_Cast_Omni, Woc_Cast_Shoot, Woc_Cast_Omni_Release, Woc_Channel_Directed),
 // hand-keyed per fit on the shared combat footing so transitions between idle,
 // auto-attacks, ability strikes, and spell casts keep planted feet and clean
-// weapon/hand alignments.
+// weapon/hand alignments. Beat keys: the README section "How the keys were
+// made" covers how their values were chosen.
 import { SWORD_FEET, SWORD_GUARD } from './attack1h.mjs';
 import { beats } from './beat.mjs';
 

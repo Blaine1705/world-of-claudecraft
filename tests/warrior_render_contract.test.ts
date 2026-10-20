@@ -41,7 +41,7 @@ describe('winning Warrior attack animation routing', () => {
       slam: 'Woc_Attack_2H_0',
       red_harvest: 'Woc_Attack_2H_1',
       breachmaker: 'Woc_Attack_2H_1',
-      // Shieldcrack drives the offhand shield forward (stock WoW ShieldBash),
+      // Shieldcrack drives the offhand shield forward (the keyed shield bash),
       // never a sword chop.
       shield_slam: 'Woc_Shield_Bash',
       raging_gale: 'Woc_Attack_Dual',

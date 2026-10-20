@@ -590,7 +590,8 @@ function playStudioReleaseAnimation(casterVis: CharacterVisual, entry: SpellLabE
       const prevMap = clips.attackByAbility;
       const hadPrev = prevMap && Object.hasOwn(prevMap, entry.id);
       const prevVal = prevMap?.[entry.id];
-      const map = (clips.attackByAbility ??= {});
+      clips.attackByAbility ??= {};
+      const map = clips.attackByAbility;
       map[entry.id] = 'Woc_Cast_Omni_Release';
       casterVis.playAttack(entry.id, true);
       if (hadPrev && prevVal !== undefined) {
@@ -1408,7 +1409,8 @@ function animate(now: number): void {
       const prevMap = clips.castByAbility;
       const hadPrev = prevMap && Object.hasOwn(prevMap, castAbilityId);
       const prevVal = prevMap?.[castAbilityId];
-      const map = (clips.castByAbility ??= {});
+      clips.castByAbility ??= {};
+      const map = clips.castByAbility;
       map[castAbilityId] = castClip;
       casterVis.update(dt, buildCasterAnimState(), true);
       if (hadPrev && prevVal !== undefined) {
