@@ -11,6 +11,7 @@ import {
   EASTBROOK_NOTICEBOARD_TEMPLATE_ID,
   type Entity,
   INTERACT_RANGE,
+  type InvSlot,
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
 } from '../sim/types';
@@ -22,6 +23,7 @@ import type { IWorld } from '../world_api';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import type { HoverCursorKind } from './cursors';
 import { decideEscortPress, handleEscortPress, isEscorteeEntity } from './escort_interact';
+import { carriesFirebottle, isTorchableHut } from './hut_torch';
 import type { InteractionOutcome } from './interaction_autorun';
 
 export interface PickInteractionWorld {
@@ -153,14 +155,20 @@ export function isAttackableEntity(
   return e.kind === 'player' && activePvpOpponentSet.has(e.id);
 }
 
-/** Which game cursor to show when hovering an entity. */
+/** Which game cursor to show when hovering an entity. `carried` is the viewer's
+ *  bags, read only by the quest-item arm (a torchable mudfin hut). */
 export function hoverCursorKind(
   e: Entity | undefined,
   playerId: number,
   partyMemberIds: ReadonlySet<number>,
   activePvpOpponentSet: ReadonlySet<number> = new Set(),
+  carried?: readonly Pick<InvSlot, 'itemId' | 'count'>[],
 ): HoverCursorKind {
   if (!e) return 'default';
+  // A mudfin hut on "Back to the Shallows" wears the gear while the firebottle is in
+  // the bags: a click or the interact key throws it for you (hut_torch.ts), and the
+  // gear is the cue that says so before anyone reads the quest text.
+  if (isTorchableHut(e)) return carriesFirebottle(carried) ? 'gear' : 'default';
   if (isAttackableEntity(e, playerId, activePvpOpponentSet)) return 'attack';
   if (e.kind === 'npc') return 'friendly';
   // An escortee is a quest NPC that happens to be mob-kind; hovering it must
