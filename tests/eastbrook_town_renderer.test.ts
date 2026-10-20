@@ -519,8 +519,18 @@ describe('Eastbrook town renderer', () => {
     const view = eastbrookTownInternalsForTest.buildFromSources(sources, () => ground, true);
     const batch = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
     if (!(batch instanceof THREE.Mesh)) throw new Error('no micro opaque batch');
+    // The repaint is vertex data only: the batch keeps the attribute set the
+    // town material's program was linked for (an alpha lane or a new attribute
+    // would relink the whole batch).
+    expect(Object.keys(batch.geometry.attributes).sort()).toEqual([
+      'color',
+      'normal',
+      'position',
+      'uv',
+    ]);
     const position = batch.geometry.getAttribute('position') as THREE.BufferAttribute;
     const color = batch.geometry.getAttribute('color') as THREE.BufferAttribute;
+    expect(color.itemSize).toBe(3);
     // No flag colour survives anywhere in the batch: blue and red were canopy only.
     for (let index = 0; index < color.count; index++) {
       expect(colorIs(color, index, CLOTH_BLUE), `vertex ${index}`).toBe(false);

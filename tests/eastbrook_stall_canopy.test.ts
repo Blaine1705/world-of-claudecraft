@@ -174,12 +174,16 @@ describe('the town extraction of the shipped stall', () => {
   const cellU = (cell % EASTBROOK_SURFACE_ATLAS_COLUMNS) * cellSize;
   const cellV = 1 - (Math.floor(cell / EASTBROOK_SURFACE_ATLAS_COLUMNS) + 1) * cellSize;
 
-  async function opaqueOf(variant: string | undefined): Promise<THREE.BufferGeometry> {
-    const template = eastbrookTownInternalsForTest.extractTemplate(
+  async function templateOf(variant: string | undefined) {
+    return eastbrookTownInternalsForTest.extractTemplate(
       await loadShippedStall(),
       EASTBROOK_STALL_ASSET_URL,
       variant,
     );
+  }
+
+  async function opaqueOf(variant: string | undefined): Promise<THREE.BufferGeometry> {
+    const template = await templateOf(variant);
     if (!template.opaque) throw new Error('the stall template has no opaque geometry');
     return template.opaque;
   }
@@ -221,6 +225,26 @@ describe('the town extraction of the shipped stall', () => {
       // them now share across a seam.
       expect(canopyVertices, variant).toBeGreaterThanOrEqual(3 * 24);
       expect(sackVertices, variant).toBeGreaterThan(0);
+    }
+  });
+
+  it("leaves the stall's glow (lantern, crystal) alone in every variant", async () => {
+    const gold = (await templateOf('gold')).emissive;
+    const green = (await templateOf('green')).emissive;
+    if (!gold || !green) throw new Error('the stall template has no emissive geometry');
+    for (const name of ['position', 'normal', 'uv', 'color'] as const) {
+      expect(Array.from(green.getAttribute(name).array), name).toEqual(
+        Array.from(gold.getAttribute(name).array),
+      );
+    }
+    const color = gold.getAttribute('color');
+    for (const variant of ['gold', 'green'] as const) {
+      const canopy = new THREE.Color(STALL_CANOPY_COLORS[variant]);
+      for (let index = 0; index < color.count; index++) {
+        expect(isCanopy(color.getX(index), color.getY(index), color.getZ(index), canopy)).toBe(
+          false,
+        );
+      }
     }
   });
 
