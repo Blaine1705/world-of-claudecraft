@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
 import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/net/online', () => ({ DESKTOP_APP: false }));
@@ -58,7 +60,8 @@ describe('ensureTurnstile', () => {
 
   it('is no longer in the entry documents', () => {
     for (const entry of ['index.html', 'play.html']) {
-      const html = readFileSync(new URL(`../${entry}`, import.meta.url), 'utf8');
+      // A plain path: under happy-dom the global URL is the DOM's, which fs does not read.
+      const html = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', entry), 'utf8');
       expect(html, entry).not.toContain('challenges.cloudflare.com/turnstile');
     }
   });

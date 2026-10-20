@@ -97,7 +97,6 @@ describe('CSS extraction: barrel + seam wiring', () => {
     // suite green while that layer never loads at runtime. Pin the seam itself.
     for (const m of [
       'tokens.css',
-      'fonts.css',
       'base.css',
       'layout.css',
       'library.css',
@@ -123,7 +122,12 @@ describe('CSS extraction: barrel + seam wiring', () => {
     expect(game).toEqual(faces(read('src/guide/styles.css')));
     for (const entry of ['index.html', 'play.html']) {
       expect(read(entry), entry).not.toContain('fonts.googleapis.com');
+      expect(read(entry), entry).toContain(
+        '<link rel="stylesheet" href="/src/styles/fonts.css" />',
+      );
     }
+    // Linked per entry, not through the barrel (see the header of fonts.css).
+    expect(barrel).not.toContain('fonts.css');
   });
 
   it('@imports in cascade order, with hud.css BEFORE components.css (same @layer components tie-break)', () => {
@@ -135,7 +139,6 @@ describe('CSS extraction: barrel + seam wiring', () => {
     const at = (m: string) => barrel.indexOf(`@import "./${m}";`);
     const order = [
       'tokens.css',
-      'fonts.css',
       'base.css',
       'layout.css',
       'library.css',

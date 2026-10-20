@@ -1104,7 +1104,9 @@ describe('client HTML shell', () => {
     // tests/meta_pixel.test.ts. What main.ts owes now is only that it reaches the
     // shared sender rather than re-implementing it: while the duplicate stood, its
     // three events were guarded by nothing behavioral at all.
-    expect(mainTs).toContain("import { trackMetaPixel } from './game/meta_pixel';");
+    expect(mainTs).toContain(
+      "import { trackCommunityLinkClicks, trackMetaPixel } from './game/meta_pixel';",
+    );
     expect(mainTs).not.toContain("fbq('trackCustom'");
     expect(mainTs).toContain(
       'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',

@@ -2,7 +2,10 @@
    unicode-range so a page only downloads the scripts it renders. The same set the /wiki
    guide declares (src/guide/styles.css; tests/styles_extraction.test.ts pins the two
    equal), served from this origin instead of the Google Fonts CDN so the landing's text
-   never waits on a third-party stylesheet and a second font host. See CREDITS.md. */
+   never waits on a third-party stylesheet and a second font host. Linked from index.html
+   and play.html like the per-entry .extra sheets, not imported by the index.css barrel,
+   so suites that import the barrel keep the fallback fonts they were measured with.
+   See CREDITS.md. */
 @font-face {
   font-family: "Alegreya";
   font-style: italic;
