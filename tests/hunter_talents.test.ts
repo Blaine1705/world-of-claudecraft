@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { anchorProbeInOpenField } from '../scripts/probe_anchor';
+import { wireAura } from '../server/snapshot_timer_wire';
 import { lineOfSightClear } from '../src/sim/colliders';
 import { dealDamage } from '../src/sim/combat/damage';
 import type { ResolvedAbilityMod } from '../src/sim/content/talents';
@@ -405,6 +406,114 @@ describe('Hunter v0.29 choice-row mechanics', () => {
       .map((event) => event.targetId);
     expect(clapTargets).toContain(primary.id);
     expect(clapTargets).toContain(nearby.id);
+  });
+
+  // The buff bar and the online wire read `stacks` for persistent engine auras,
+  // so each tracker must carry its count there, not only in `value`.
+  it('Efficient Rhythm progress shows the Focus spent as its stack count', () => {
+    const sim = hunter('marksmanship', { 14: 'hun_r14_efficient_rhythm' }, 2930);
+    const target = addMob(sim, 20);
+    sim.targetEntity(target.id);
+
+    for (const spent of [35, 70]) {
+      sim.player.resource = sim.player.maxResource;
+      ready(sim, 'aimed_shot');
+      sim.castAbility('aimed_shot');
+      advance(sim, 3);
+      const progress = sim.player.auras.find(
+        (entry) => entry.id === 'hunter_efficient_rhythm_progress',
+      );
+      expect(progress, `after ${spent} Focus`).toMatchObject({ value: spent, stacks: spent });
+      if (!progress) throw new Error('missing Efficient Rhythm progress');
+      expect(wireAura(progress).stacks).toBe(spent);
+    }
+  });
+
+  it('Fang Chorus counter shows the echo count as its stack count until the clap', () => {
+    const sim = hunter('marksmanship', { 20: 'hun_r20_fang_chorus' }, 2937);
+    anchorProbeInOpenField(sim);
+    addPet(sim);
+    const primary = addMob(sim, 20);
+    addMob(sim, 21);
+    sim.targetEntity(primary.id);
+
+    for (const echoes of [1, 2]) {
+      sim.player.resource = sim.player.maxResource;
+      ready(sim, 'arcane_shot');
+      sim.castAbility('arcane_shot');
+      advance(sim, 2);
+      const counter = sim.player.auras.find((entry) => entry.id === 'hunter_fang_chorus_counter');
+      expect(counter, `after echo ${echoes}`).toMatchObject({ value: echoes, stacks: echoes });
+      if (!counter) throw new Error('missing Fang Chorus counter');
+      expect(wireAura(counter).stacks).toBe(echoes);
+    }
+
+    sim.player.resource = sim.player.maxResource;
+    ready(sim, 'arcane_shot');
+    sim.castAbility('arcane_shot');
+    const clapEvents = advance(sim, 2);
+    expect(
+      clapEvents.some((event) => event.type === 'damage' && event.ability === 'Fang Chorus Clap'),
+    ).toBe(true);
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_fang_chorus_counter')).toBe(false);
+  });
+
+  it('Venom Barb feeds Efficient Rhythm and draws a Fang Chorus echo', () => {
+    const sim = hunter(
+      'marksmanship',
+      { 14: 'hun_r14_efficient_rhythm', 20: 'hun_r20_fang_chorus' },
+      2937,
+    );
+    anchorProbeInOpenField(sim);
+    addPet(sim);
+    const target = addMob(sim, 20);
+    sim.targetEntity(target.id);
+    // The billed cost, not the rank 1 figure of 15: a level 20 hunter knows a
+    // higher rank, and the spec baseline trims it further.
+    const cost = sim.resolvedAbility('serpent_sting')?.cost ?? 0;
+    expect(cost).toBeGreaterThan(0);
+
+    sim.player.resource = sim.player.maxResource;
+    ready(sim, 'serpent_sting');
+    sim.castAbility('serpent_sting');
+    const events = advance(sim, 2);
+
+    expect(target.auras.some((entry) => entry.id === 'serpent_sting')).toBe(true);
+    expect(
+      sim.player.auras.find((entry) => entry.id === 'hunter_efficient_rhythm_progress'),
+    ).toMatchObject({ value: cost, stacks: cost });
+    expect(
+      events.filter((event) => event.type === 'damage' && event.ability === 'Fang Chorus'),
+    ).toHaveLength(1);
+    expect(
+      sim.player.auras.find((entry) => entry.id === 'hunter_fang_chorus_counter'),
+    ).toMatchObject({ value: 1, stacks: 1 });
+  });
+
+  it('Venom Barb neither consumes Apex Instinct nor advances Overdraw', () => {
+    const sim = hunter(
+      'marksmanship',
+      { 17: 'hun_r17_apex_instinct', 20: 'hun_r20_overdraw' },
+      2925,
+    );
+    const target = addMob(sim, 20);
+    sim.targetEntity(target.id);
+    sim.castAbility('cold_focus');
+    const fullCost =
+      sim.players.get(sim.playerId)?.known.find((entry) => entry.def.id === 'serpent_sting')
+        ?.cost ?? 0;
+    expect(sim.resolvedAbility('serpent_sting')?.cost).toBe(fullCost);
+
+    sim.player.resource = sim.player.maxResource;
+    ready(sim, 'serpent_sting');
+    sim.castAbility('serpent_sting');
+    advance(sim, 2);
+
+    expect(target.auras.some((entry) => entry.id === 'serpent_sting')).toBe(true);
+    expect(sim.player.auras.find((entry) => entry.id === 'hunter_apex_instinct')).toMatchObject({
+      stacks: 3,
+    });
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_overdraw_counter')).toBe(false);
   });
 
   it("applies Unleashed Frenzy (+25% pet damage) to Fang Chorus, not only the pet's ordinary damage sites", () => {
