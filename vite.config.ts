@@ -19,7 +19,7 @@ import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
-import { gameModuleFiles, injectGameModules } from './scripts/lib/landing_game_modules.mjs';
+import { gameModuleEntries, injectGameModules } from './scripts/lib/landing_game_modules.mjs';
 import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
@@ -216,19 +216,20 @@ function landingGameModulesPlugin() {
       order: 'post' as const,
       handler(
         html: string,
-        ctx: { path: string; bundle?: Record<string, never>; chunk?: { fileName: string } },
+        ctx: {
+          path: string;
+          bundle?: Record<string, { code?: string } & Record<string, unknown>>;
+          chunk?: { fileName: string };
+        },
       ) {
         if (!ctx.bundle || !/(^|\/)index\.html$/.test(ctx.path)) return html;
-        const files = gameModuleFiles(ctx.bundle, ctx.chunk?.fileName);
-        if (files.length === 0) {
+        const modules = gameModuleEntries(ctx.bundle, ctx.chunk?.fileName, base);
+        if (modules.length === 0) {
           throw new Error(
             'index.html: found no src/main.ts chunk to list for the landing prefetch',
           );
         }
-        return injectGameModules(
-          html,
-          files.map((file) => base + file),
-        );
+        return injectGameModules(html, modules);
       },
     },
   };

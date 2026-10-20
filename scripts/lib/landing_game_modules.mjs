@@ -51,9 +51,21 @@ export function gameModuleFiles(bundle, entryFileName) {
   return [main.fileName, ...rest];
 }
 
+/**
+ * The client's chunks as `{ url, bytes }`, bytes being each chunk's size as served
+ * uncompressed, which is what the landing reads off the response body to drive its
+ * Play progress bar.
+ */
+export function gameModuleEntries(bundle, entryFileName, base = '/') {
+  return gameModuleFiles(bundle, entryFileName).map((file) => ({
+    url: base + file,
+    bytes: Buffer.byteLength(bundle[file]?.code ?? ''),
+  }));
+}
+
 /** index.html with the module list as a JSON block before </body>. */
-export function injectGameModules(html, urls) {
-  const json = JSON.stringify(urls).replaceAll('<', '\\u003c');
+export function injectGameModules(html, modules) {
+  const json = JSON.stringify(modules).replaceAll('<', '\\u003c');
   const tag = `<script type="application/json" id="${GAME_MODULES_ELEMENT_ID}">${json}</script>`;
   return html.replace('</body>', `${tag}\n</body>`);
 }

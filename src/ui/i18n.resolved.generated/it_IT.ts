@@ -9872,6 +9872,8 @@ export const it_IT: EnTranslations = {
     "serverOffline": "Offline",
     "play": "Gioca",
     "playAria": "Gioca a World of ClaudeCraft",
+    "playLoading": "Loading",
+    "playStarting": "Starting",
     "serverLabel": "Scegli il tuo mondo",
     "serverAria": "Seleziona il mondo: Online o Offline",
     "serverOfflineSub": "Mondo locale istantaneo"

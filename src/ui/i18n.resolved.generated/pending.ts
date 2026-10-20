@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "es_ES": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "fr_FR": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "fr_CA": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "de_DE": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "nl_NL": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "pl_PL": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "id_ID": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "tr_TR": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "sv_SE": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "vi_VN": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ],
+  "da_DK": [
+    "mode.playLoading",
+    "mode.playStarting"
+  ]
 };

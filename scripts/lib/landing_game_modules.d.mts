@@ -6,4 +6,9 @@ export function gameModuleFiles(
   >,
   entryFileName?: string,
 ): string[];
-export function injectGameModules(html: string, urls: string[]): string;
+export function gameModuleEntries(
+  bundle: Record<string, { code?: string } & Record<string, unknown>>,
+  entryFileName?: string,
+  base?: string,
+): { url: string; bytes: number }[];
+export function injectGameModules(html: string, modules: { url: string; bytes: number }[]): string;

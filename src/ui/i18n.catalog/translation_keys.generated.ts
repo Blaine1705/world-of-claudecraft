@@ -15075,6 +15075,8 @@ export type TranslationKeyFlat =
   | 'mode.onlineTitle'
   | 'mode.play'
   | 'mode.playAria'
+  | 'mode.playLoading'
+  | 'mode.playStarting'
   | 'mode.serverAria'
   | 'mode.serverLabel'
   | 'mode.serverOffline'

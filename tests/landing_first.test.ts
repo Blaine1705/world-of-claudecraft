@@ -7,12 +7,14 @@ import { Settings } from '../src/game/settings';
 import { BOOT_PENDING_CLASS, BOOT_SPLASH_OWNED_EVENT } from '../src/ui/boot_splash_core';
 import {
   ART_DEFERRED_CLASS,
+  createGameDownload,
   GAME_MODULES_ELEMENT_ID,
-  gameModuleUrls,
+  gameModules,
   LANDING_ART_URLS,
   LANDING_BOOTING_ATTR,
   LANDING_BOOTING_CLASS,
   LANDING_PAINT_FALLBACK_MS,
+  LANDING_PHASE_ATTR,
   LANDING_TURNSTILE_SCRIPT_URL,
   revealLandingArt,
   runLandingFirst,
@@ -33,11 +35,12 @@ function mountLanding(): void {
       <span class="js-stat-characters">…</span>
       <a id="wiki-link" href="#wiki">Wiki</a>
       <a id="discord-link" href="https://discord.com/invite/worldofclaudecraft">Discord</a>
-      <button type="button" id="btn-play">Play</button>
+      <button type="button" id="btn-play"><span class="btn-play-label">Play</span><span class="btn-play-status btn-play-status-loading">Loading</span><span class="btn-play-status btn-play-status-starting">Starting</span></button>
+      <span id="play-status" role="status" aria-live="polite"></span>
       <button type="button" id="nav-btn-login">Log in</button>
       <select id="lang-select"><option value="en">English</option><option value="fr_FR">Francais</option></select>
     </main>
-    <script type="application/json" id="${GAME_MODULES_ELEMENT_ID}">["/assets/main-a.js","/assets/renderer-b.js"]</script>`;
+    <script type="application/json" id="${GAME_MODULES_ELEMENT_ID}">[{"url":"/assets/main-a.js","bytes":300},{"url":"/assets/renderer-b.js","bytes":100}]</script>`;
 }
 
 function deferred<T = void>() {
@@ -135,22 +138,26 @@ describe('landing-first boot', () => {
     expect(startGame).not.toHaveBeenCalled();
   });
 
-  it('skips the prefetch once the client has started', async () => {
+  it('downloads each module once when the visitor starts the client before the prefetch', async () => {
     mountLanding();
     run(vi.fn(never));
     document.dispatchEvent(new Event('pointerdown'));
+    // Past the point where the idle prefetch would have begun: it must join, not repeat.
     await new Promise((resolve) => setTimeout(resolve, LANDING_PAINT_FALLBACK_MS + 500));
-    expect(fetchedUrls().filter((url) => url.startsWith('/assets/'))).toEqual([]);
+    expect(fetchedUrls().filter((url) => url.startsWith('/assets/'))).toEqual([
+      '/assets/main-a.js',
+      '/assets/renderer-b.js',
+    ]);
   });
 
-  it('starts the client once on the first interaction', () => {
+  it('starts the client once on the first interaction', async () => {
     mountLanding();
     const startGame = vi.fn(never);
     run(startGame);
     document.dispatchEvent(new Event('pointerdown'));
     document.dispatchEvent(new Event('keydown'));
     document.dispatchEvent(new Event('touchstart'));
-    expect(startGame).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(startGame).toHaveBeenCalledTimes(1));
   });
 
   it('holds a button clicked before the client is ready, then replays it once', () => {
@@ -162,7 +169,6 @@ describe('landing-first boot', () => {
     play.addEventListener('click', handler);
 
     play.click();
-    expect(startGame).toHaveBeenCalledTimes(1);
     expect(handler).not.toHaveBeenCalled();
     expect(play.hasAttribute(LANDING_BOOTING_ATTR)).toBe(true);
     expect(play.getAttribute('aria-busy')).toBe('true');
@@ -177,6 +183,38 @@ describe('landing-first boot', () => {
     // After the hand-off every click is the client's own.
     play.click();
     expect(handler).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows Play loading with the download, then starting, and imports only after the download', async () => {
+    mountLanding();
+    const startGame = vi.fn(never);
+    // Hold the module responses so the loading phase can be watched.
+    const gate = deferred<void>();
+    fetchMock.mockImplementation(async (url: unknown) => {
+      if (String(url).startsWith('/assets/')) {
+        await gate.promise;
+        return new Response('x'.repeat(String(url).includes('main') ? 300 : 100));
+      }
+      return new Response(JSON.stringify({ characters_created: 1 }), { status: 200 });
+    });
+    run(startGame);
+    const play = document.getElementById('btn-play') as HTMLButtonElement;
+    play.click();
+    expect(play.getAttribute(LANDING_PHASE_ATTR)).toBe('loading');
+    expect(play.style.getPropertyValue('--landing-progress')).toBe('0');
+    expect(document.getElementById('play-status')?.textContent).toBe('Loading');
+    expect(startGame).not.toHaveBeenCalled();
+
+    gate.resolve();
+    await vi.waitFor(() => expect(play.getAttribute(LANDING_PHASE_ATTR)).toBe('starting'));
+    expect(play.style.getPropertyValue('--landing-progress')).toBe('1');
+    expect(document.getElementById('play-status')?.textContent).toBe('Starting');
+    expect(startGame).toHaveBeenCalledTimes(1);
+
+    clientReady();
+    expect(play.hasAttribute(LANDING_PHASE_ATTR)).toBe(false);
+    expect(play.style.getPropertyValue('--landing-progress')).toBe('');
+    expect(document.getElementById('play-status')?.textContent).toBe('');
   });
 
   it('replays only the last of several held actions', () => {
@@ -197,15 +235,15 @@ describe('landing-first boot', () => {
     expect(onLogin).toHaveBeenCalledTimes(1);
   });
 
-  it('re-applies a picker change made before the client is ready', () => {
+  it('re-applies a picker change made before the client is ready', async () => {
     mountLanding();
     const startGame = vi.fn(never);
     run(startGame);
     const select = document.getElementById('lang-select') as HTMLSelectElement;
     select.value = 'fr_FR';
     select.dispatchEvent(new Event('change', { bubbles: true }));
-    expect(startGame).toHaveBeenCalledTimes(1);
     expect(select.getAttribute('aria-busy')).toBe('true');
+    await vi.waitFor(() => expect(startGame).toHaveBeenCalledTimes(1));
 
     // main.ts resets the picker to the stored language as it wires it, then signals.
     select.value = 'en';
@@ -245,12 +283,11 @@ describe('landing-first boot', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     // A reload already happened this minute, so this failure must not reload again.
     sessionStorage.setItem('woc_landing_reload', String(Date.now()));
-    const first = deferred<unknown>();
-    run(vi.fn(() => first.promise));
+    // The import fails when it runs (after the download), as a missing chunk would.
+    run(vi.fn(() => Promise.reject(new Error('chunk 404'))));
     const play = document.getElementById('btn-play') as HTMLButtonElement;
     play.click();
     expect(play.hasAttribute(LANDING_BOOTING_ATTR)).toBe(true);
-    first.reject(new Error('chunk 404'));
     await vi.waitFor(() => expect(play.hasAttribute(LANDING_BOOTING_ATTR)).toBe(false));
     const event = new MouseEvent('click', { bubbles: true, cancelable: true });
     play.dispatchEvent(event);
@@ -345,9 +382,12 @@ describe('syncLandingViewport', () => {
 describe('game module list', () => {
   it('reads the build list and tolerates its absence', () => {
     mountLanding();
-    expect(gameModuleUrls()).toEqual(['/assets/main-a.js', '/assets/renderer-b.js']);
+    expect(gameModules()).toEqual([
+      { url: '/assets/main-a.js', bytes: 300 },
+      { url: '/assets/renderer-b.js', bytes: 100 },
+    ]);
     document.getElementById(GAME_MODULES_ELEMENT_ID)?.remove();
-    expect(gameModuleUrls()).toEqual([]);
+    expect(gameModules()).toEqual([]);
   });
 
   it('uses the element id the build writes', () => {
@@ -427,5 +467,35 @@ describe('landing artwork', () => {
     expect(document.getElementById('start-screen')?.classList.contains(ART_DEFERRED_CLASS)).toBe(
       false,
     );
+  });
+});
+
+describe('createGameDownload', () => {
+  it('reports the share of listed bytes read, and finishes a module that comes up short', async () => {
+    const seen: number[] = [];
+    fetchMock.mockImplementation(async (url: unknown) =>
+      // The second module fails outright; it still counts as done.
+      String(url).includes('b.js')
+        ? Promise.reject(new Error('offline'))
+        : new Response('x'.repeat(30)),
+    );
+    const download = createGameDownload([
+      { url: '/assets/a.js', bytes: 60 },
+      { url: '/assets/b.js', bytes: 40 },
+    ]);
+    download.onProgress((fraction) => seen.push(fraction));
+    expect(download.progress()).toBe(0);
+    const first = download.start('high');
+    expect(download.start('low')).toBe(first);
+    await first;
+    expect(download.progress()).toBe(1);
+    expect(seen.at(-1)).toBe(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('is complete at once when nothing is listed', async () => {
+    const download = createGameDownload([]);
+    await download.start('high');
+    expect(download.progress()).toBe(1);
   });
 });

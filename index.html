@@ -1117,10 +1117,15 @@
             <button type="button" class="btn-play" id="btn-play" data-i18n-aria="mode.playAria" aria-label="Play World of ClaudeCraft">
               <span class="btn-play-sheen" aria-hidden="true"></span>
               <span class="btn-play-label" data-i18n="mode.play">Play</span>
+              <!-- Shown only while a first visit's game client loads (src/ui/landing_first.ts). -->
+              <span class="btn-play-status btn-play-status-loading" data-i18n="mode.playLoading">Loading</span>
+              <span class="btn-play-status btn-play-status-starting" data-i18n="mode.playStarting">Starting</span>
               <span class="website-play-arrow" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
               </span>
+              <span class="btn-play-progress" aria-hidden="true"></span>
             </button>
+            <span id="play-status" class="visually-hidden" role="status" aria-live="polite"></span>
           </div>
 
           <!-- Hidden, non-focusable compatibility triggers. Stable hooks the automated

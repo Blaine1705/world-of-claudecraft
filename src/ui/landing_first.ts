@@ -47,6 +47,10 @@ import { hydrateIcons } from './ui_icons';
 export const LANDING_BOOTING_ATTR = 'data-landing-booting';
 /** On body while an action waits for the client. */
 export const LANDING_BOOTING_CLASS = 'landing-booting';
+/** On the waiting control: 'loading' while the client downloads, 'starting' while it boots. */
+export const LANDING_PHASE_ATTR = 'data-landing-phase';
+/** The visually hidden live region that announces the phase (index.html). */
+export const PLAY_STATUS_ID = 'play-status';
 /** The build's list of the client's module URLs (vite.config.ts, woc-landing-game-modules). */
 export const GAME_MODULES_ELEMENT_ID = 'woc-game-modules';
 /** On #start-screen in index.html: the landing's artwork waits (src/styles/shell.website.css). */
@@ -157,35 +161,92 @@ async function fetchProjectStats(): Promise<ProjectStats> {
   return (await res.json()) as ProjectStats;
 }
 
-/** The client's module URLs the build listed, or none (dev, or a build without the list). */
-export function gameModuleUrls(doc: Document = document): string[] {
+/** One client module the build listed: its URL and its size as served uncompressed. */
+export interface GameModule {
+  url: string;
+  bytes: number;
+}
+
+/** The client's modules the build listed, or none (dev, or a build without the list). */
+export function gameModules(doc: Document = document): GameModule[] {
   const el = doc.getElementById(GAME_MODULES_ELEMENT_ID);
   if (!el?.textContent) return [];
   try {
-    const urls: unknown = JSON.parse(el.textContent);
-    return Array.isArray(urls) ? urls.filter((u): u is string => typeof u === 'string') : [];
+    const listed: unknown = JSON.parse(el.textContent);
+    if (!Array.isArray(listed)) return [];
+    return listed.flatMap((entry): GameModule[] => {
+      const { url, bytes } = (entry ?? {}) as Partial<GameModule>;
+      return typeof url === 'string' ? [{ url, bytes: Number(bytes) > 0 ? Number(bytes) : 0 }] : [];
+    });
   } catch {
     return [];
   }
 }
 
+export interface GameDownload {
+  /** Start, or join, the download; settles once every module is cached or has failed. */
+  start(priority: 'low' | 'high'): Promise<void>;
+  /** The share of the listed bytes read so far, 0 to 1 (1 when nothing is listed). */
+  progress(): number;
+  /** Called with the new share on every change. */
+  onProgress(listener: (fraction: number) => void): void;
+}
+
 /**
- * Fetch the client's modules into the HTTP cache at low priority. A plain fetch, not a
- * link: modulepreload would also compile each module on the main thread, Safari ignores
- * rel=prefetch, and a <link> with the module's URL stops Vite's own preload of it when
- * the client is imported. The body is read so the whole response reaches the cache.
+ * Fetch the client's modules into the HTTP cache, counting the body bytes read against
+ * the sizes the build listed. A plain fetch, not a link: modulepreload would also
+ * compile each module on the main thread, Safari ignores rel=prefetch, and a <link> with
+ * the module's URL stops Vite's own preload of it when the client is imported. Reading
+ * the whole body is also what puts the whole response in the cache.
  */
-export function prefetchGameModules(): void {
-  if (saveDataHint()) return;
-  for (const url of gameModuleUrls()) {
-    const init: RequestInit & { priority?: 'low' } = {
-      credentials: 'same-origin',
-      priority: 'low',
-    };
-    void fetch(url, init)
-      .then((res) => res.blob())
-      .catch(() => undefined);
-  }
+export function createGameDownload(modules: readonly GameModule[]): GameDownload {
+  const total = modules.reduce((sum, module) => sum + module.bytes, 0);
+  const listeners: ((fraction: number) => void)[] = [];
+  let loaded = 0;
+  let running: Promise<void> | null = null;
+  const progress = () => (total > 0 ? Math.min(1, loaded / total) : 1);
+  const add = (bytes: number) => {
+    loaded += bytes;
+    const fraction = progress();
+    for (const listener of listeners) listener(fraction);
+  };
+  const fetchOne = async (module: GameModule, priority: 'low' | 'high') => {
+    let read = 0;
+    try {
+      const init: RequestInit & { priority?: 'low' | 'high' } = {
+        credentials: 'same-origin',
+        priority,
+      };
+      const res = await fetch(module.url, init);
+      const reader = res.body?.getReader();
+      if (reader) {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          read += value.byteLength;
+          add(value.byteLength);
+        }
+      } else {
+        await res.blob();
+      }
+    } catch {
+      // The client's own import fetches it again.
+    }
+    // Count the module as finished either way, so the bar never stalls short of full.
+    if (read < module.bytes) add(module.bytes - read);
+  };
+  return {
+    start(priority) {
+      running ??= Promise.all(modules.map((module) => fetchOne(module, priority))).then(
+        () => undefined,
+      );
+      return running;
+    },
+    progress,
+    onProgress(listener) {
+      listeners.push(listener);
+    },
+  };
 }
 
 /**
@@ -323,6 +384,7 @@ export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
   let disposed = false;
   let started = false;
   let cancelArt: (() => void) | undefined;
+  const download = createGameDownload(gameModules());
   const osReducedMotion = matches('(prefers-reduced-motion: reduce)');
   // The art stays held back (art-deferred) so the lift waits only for the stylesheets and
   // fonts; once the landing has painted, the art loads and fades in.
@@ -335,7 +397,7 @@ export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
     // downloaded; after the art, so it never competes with the landing itself.
     cancelArt = afterLandingPainted(performance.now(), () => {
       void revealLandingArt().then(() => {
-        if (!disposed && !started) prefetchGameModules();
+        if (!disposed && !started && !saveDataHint()) void download.start('low');
       });
     });
   });
@@ -345,13 +407,38 @@ export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
   let ready = false;
   let held: HeldAction | null = null;
 
+  let phase: 'loading' | 'starting' | null = null;
+  const status = document.getElementById(PLAY_STATUS_ID);
+
+  // The held control shows the phase (Play swaps its label for Loading, then Starting,
+  // over a bar that fills with the download), and the live region announces it.
+  const paintPhase = () => {
+    const el = held?.el;
+    if (!el) return;
+    if (phase) el.setAttribute(LANDING_PHASE_ATTR, phase);
+    el.style.setProperty('--landing-progress', String(download.progress()));
+    const label = document.querySelector(`#btn-play .btn-play-status-${phase}`)?.textContent;
+    if (status && label && status.textContent !== label) status.textContent = label;
+  };
+  download.onProgress((fraction) => {
+    held?.el.style.setProperty('--landing-progress', String(fraction));
+  });
+
   const markBusy = (next: HeldAction | null) => {
     held?.el.removeAttribute(LANDING_BOOTING_ATTR);
+    held?.el.removeAttribute(LANDING_PHASE_ATTR);
     held?.el.removeAttribute('aria-busy');
+    held?.el.style.removeProperty('--landing-progress');
     held = next;
     held?.el.setAttribute(LANDING_BOOTING_ATTR, '');
     held?.el.setAttribute('aria-busy', 'true');
     document.body.classList.toggle(LANDING_BOOTING_CLASS, held !== null);
+    if (held) paintPhase();
+    else if (status) status.textContent = '';
+  };
+  const setPhase = (next: 'loading' | 'starting') => {
+    phase = next;
+    paintPhase();
   };
 
   const stopHolding = () => {
@@ -367,13 +454,23 @@ export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
     started = true;
     for (const type of START_EVENTS) document.removeEventListener(type, start, true);
     loadTurnstileEarly();
-    startGame().catch((err: unknown) => {
-      console.error('game client failed to load:', err);
-      ready = true;
-      stopHolding();
-      markBusy(null);
-      if (shouldReloadAfterFailure()) location.reload();
-    });
+    // Download first (joining a prefetch already under way), then import: the import then
+    // reads every module from the cache, and the bar can show the download's real progress.
+    setPhase('loading');
+    download
+      .start('high')
+      .then(() => {
+        if (disposed) return;
+        setPhase('starting');
+        return startGame();
+      })
+      .catch((err: unknown) => {
+        console.error('game client failed to load:', err);
+        ready = true;
+        stopHolding();
+        markBusy(null);
+        if (shouldReloadAfterFailure()) location.reload();
+      });
   };
 
   const onClick = (event: MouseEvent) => {

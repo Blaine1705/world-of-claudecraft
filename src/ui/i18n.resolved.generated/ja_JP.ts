@@ -9872,6 +9872,8 @@ export const ja_JP: EnTranslations = {
     "serverOffline": "オフライン",
     "play": "プレイ",
     "playAria": "World of ClaudeCraftをプレイ",
+    "playLoading": "読み込み中",
+    "playStarting": "起動中",
     "serverLabel": "ワールドを選択",
     "serverAria": "ワールドを選択：オンラインまたはオフライン",
     "serverOfflineSub": "即座にローカルの世界へ"

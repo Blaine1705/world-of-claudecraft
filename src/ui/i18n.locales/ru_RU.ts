@@ -7647,6 +7647,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.petEatsFoodOnly': 'Ваш питомец ест только пищу.',
   'mode.play': 'Играть',
   'mode.playAria': 'Играть в World of ClaudeCraft',
+  'mode.playLoading': 'Загрузка',
+  'mode.playStarting': 'Запуск',
   'mode.serverAria': 'Выберите мир: В сети или Не в сети',
   'mode.serverLabel': 'Выберите свой мир',
   'mode.serverOffline': 'Не в сети',

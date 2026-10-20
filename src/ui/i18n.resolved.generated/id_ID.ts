@@ -9872,6 +9872,8 @@ export const id_ID: EnTranslations = {
     "serverOffline": "Offline",
     "play": "Main",
     "playAria": "Mainkan World of ClaudeCraft",
+    "playLoading": "Loading",
+    "playStarting": "Starting",
     "serverLabel": "Pilih dunia Anda",
     "serverAria": "Pilih dunia: Online atau Offline",
     "serverOfflineSub": "Dunia lokal seketika"

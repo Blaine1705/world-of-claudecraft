@@ -7544,6 +7544,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.petEatsFoodOnly': '소환수는 음식만 먹을 수 있습니다.',
   'mode.play': '플레이',
   'mode.playAria': 'World of ClaudeCraft 플레이',
+  'mode.playLoading': '불러오는 중',
+  'mode.playStarting': '시작하는 중',
   'mode.serverAria': '월드 선택: 온라인 또는 오프라인',
   'mode.serverLabel': '월드를 선택하세요',
   'mode.serverOffline': '오프라인',

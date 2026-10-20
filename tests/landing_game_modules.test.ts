@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   GAME_MODULES_ELEMENT_ID,
+  gameModuleEntries,
   gameModuleFiles,
   injectGameModules,
 } from '../scripts/lib/landing_game_modules.mjs';
@@ -98,16 +99,33 @@ describe('gameModuleFiles', () => {
   });
 });
 
+describe('gameModuleEntries', () => {
+  it('lists each client chunk with its uncompressed size, under the base path', () => {
+    const sized = {
+      ...bundle,
+      'assets/main-3.js': { ...bundle['assets/main-3.js'], code: 'é'.repeat(5) },
+      'assets/renderer-4.js': { ...bundle['assets/renderer-4.js'], code: 'abc' },
+    };
+    expect(gameModuleEntries(sized, 'assets/boot-1.js', '/')).toEqual([
+      { url: '/assets/main-3.js', bytes: 10 },
+      { url: '/assets/renderer-4.js', bytes: 3 },
+      { url: '/assets/three-5.js', bytes: 0 },
+    ]);
+  });
+});
+
 describe('injectGameModules', () => {
   it('writes the list as a JSON block before </body>', () => {
-    const html = injectGameModules('<html><body><p>x</p></body></html>', ['/assets/main-3.js']);
+    const html = injectGameModules('<html><body><p>x</p></body></html>', [
+      { url: '/assets/main-3.js', bytes: 12 },
+    ]);
     expect(html).toBe(
-      `<html><body><p>x</p><script type="application/json" id="${GAME_MODULES_ELEMENT_ID}">["/assets/main-3.js"]</script>\n</body></html>`,
+      `<html><body><p>x</p><script type="application/json" id="${GAME_MODULES_ELEMENT_ID}">[{"url":"/assets/main-3.js","bytes":12}]</script>\n</body></html>`,
     );
   });
 
   it('cannot close its own script element', () => {
-    const html = injectGameModules('<body></body>', ['/a</script><b>.js']);
+    const html = injectGameModules('<body></body>', [{ url: '/a</script><b>.js', bytes: 1 }]);
     expect(html).not.toContain('</script><b>');
     expect(html).toContain('\\u003c/script>');
   });
