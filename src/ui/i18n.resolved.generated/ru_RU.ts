@@ -2855,6 +2855,7 @@ export const ru_RU: EnTranslations = {
       "spell": "Заклинание",
       "defense": "Защита",
       "ratings": "Рейтинги",
+      "gearScore": "Gearscore",
       "playtimeLabel": "Время в игре",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Меньше минуты",

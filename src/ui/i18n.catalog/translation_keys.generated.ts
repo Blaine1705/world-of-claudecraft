@@ -9917,6 +9917,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.castBar.playerAria'
   | 'hudChrome.castBar.targetAria'
   | 'hudChrome.charSheet.defense'
+  | 'hudChrome.charSheet.gearScore'
   | 'hudChrome.charSheet.hidePlaytimeAria'
   | 'hudChrome.charSheet.offense'
   | 'hudChrome.charSheet.playtimeHidden'

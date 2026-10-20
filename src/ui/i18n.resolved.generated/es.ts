@@ -2855,6 +2855,7 @@ export const es: EnTranslations = {
       "spell": "Hechizo",
       "defense": "Defensa",
       "ratings": "Índices",
+      "gearScore": "Gearscore",
       "playtimeLabel": "Tiempo jugado",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Menos de un minuto",

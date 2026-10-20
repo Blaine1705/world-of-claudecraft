@@ -3478,6 +3478,9 @@ export const hudChromeStrings = {
     spell: 'Spell',
     defense: 'Defense',
     ratings: 'Ratings',
+    // The average item level of the worn gear (gear_score_view.ts), shown above
+    // the Offense panel and under the inspect window's model stage.
+    gearScore: 'Gearscore',
     // The lifetime "Time Played" line at the foot of the sheet (the same
     // running total the /playtime chat command reports). The value composes
     // the two coarsest units from the plurals.playtime* fragments through

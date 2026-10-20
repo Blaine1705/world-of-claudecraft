@@ -2855,6 +2855,7 @@ export const en_CA: EnTranslations = {
       "spell": "Spell",
       "defense": "Defense",
       "ratings": "Ratings",
+      "gearScore": "Gearscore",
       "playtimeLabel": "Time Played",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Less than a minute",
