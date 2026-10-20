@@ -173,12 +173,22 @@ describe('target highlight painter hostility', () => {
     painter.updateDynamicState(state, target, player, plan, false);
     expect([state.emphasis, state.overheadMarker]).toEqual([false, false]);
   });
-  it('reformats a stable minute cooldown on the same painter pass as a language switch', async () => {
+  it('reformats a stable minute active buff on the same painter pass as a language switch', async () => {
     const priorLanguage = getLanguage();
     try {
       setLanguage('en');
       const target = entity(2, 'player');
       target.cooldowns.set('recklessness', 161);
+      target.auras.push({
+        id: 'recklessness',
+        name: 'Recklessness',
+        kind: 'buff_reckless',
+        remaining: 161,
+        duration: 180,
+        value: 1,
+        sourceId: target.id,
+        school: 'physical',
+      });
       const { painter, player } = probe(target);
       const state = createNameplateCanvasState();
       const plan = {
@@ -190,12 +200,14 @@ describe('target highlight painter hostility', () => {
         comboPips: 0,
       } satisfies NameplatePlan;
       painter.updateDynamicState(state, target, player, plan, false);
+      expect(state.cooldowns.slots[0].active).toBe(true);
       const before = state.cooldowns.slots[0].timeText;
       expect(before).toMatch(/^3\s?m/);
       await ensureLocaleLoaded('fr_FR');
       setLanguage('fr_FR');
       expect(getLanguage()).toBe('fr_FR');
       painter.updateDynamicState(state, target, player, plan, true);
+      expect(state.cooldowns.slots[0].active).toBe(true);
       expect(state.cooldowns.slots[0].timeText).toBe('3min');
       expect(state.cooldowns.slots[0].timeText).not.toBe(before);
       expect(state.cooldowns.slots[0].remaining).toBe(161);
