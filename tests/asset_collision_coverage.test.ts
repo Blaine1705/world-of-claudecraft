@@ -23,7 +23,17 @@ import { ASSET_COLLISION, ASSET_RAMPS } from '../src/sim/asset_collision.generat
  *  catalogue because they live under public/models. They are clip libraries
  *  retargeted onto a rig, so there is nothing to collide with, the naming
  *  convention ('..._anim' / '..._anims') is the whole tell. */
-const NO_GEOMETRY = (id: string): boolean => /_anims?$/.test(id);
+const NO_GEOMETRY_IDS = new Set([
+  // The WOC body clip libraries and the Laverock's locomotion clips are named
+  // by body, not by the suffix, and the keyed WOC rigs carry only skinned
+  // meshes: the bake reads no static triangles from any of them and skips them.
+  'chars/players/woc/anims_female',
+  'chars/players/woc/anims_male',
+  'chars/players/woc_keyed/woc_female',
+  'chars/players/woc_keyed/woc_male',
+  'creatures/temple_laverock_locomotion',
+]);
+const NO_GEOMETRY = (id: string): boolean => /_anims?$/.test(id) || NO_GEOMETRY_IDS.has(id);
 
 describe('catalogue collision coverage', () => {
   it('leaves no placeable asset without a collision decision', () => {

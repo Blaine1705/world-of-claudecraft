@@ -3543,7 +3543,7 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 107, sta: 4, int: 8, spi: 3 },
     sellValue: 2250,
   },
-  // Stillhymn (the Drowned Temple choir of Choirmother Selthe): item level 21, feet budget 8.
+  // Stillhymn (the Drowned Temple choir of Choirmother Selthe): item level 19, feet budget 7.
   stillhymn_treads: {
     id: 'stillhymn_treads',
     name: 'Stillhymn Treads',
@@ -3551,10 +3551,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'feet',
     quality: 'rare',
-    stats: { armor: 77, str: 4, agi: 1, sta: 3 },
-    sellValue: 1625,
+    stats: { armor: 70, str: 4, agi: 1, sta: 2 },
+    sellValue: 1100,
   },
-  // Stillhymn (the Drowned Temple choir of Choirmother Selthe): item level 21, feet budget 8.
+  // Stillhymn (the Drowned Temple choir of Choirmother Selthe): item level 19, feet budget 7.
   stillhymn_greaves: {
     id: 'stillhymn_greaves',
     name: 'Stillhymn Greaves',
@@ -3562,10 +3562,10 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'feet',
     quality: 'rare',
-    stats: { armor: 116, sta: 3, int: 6, spi: 2 },
-    sellValue: 1625,
+    stats: { armor: 105, sta: 2, int: 5, spi: 2 },
+    sellValue: 1100,
   },
-  // Stillhymn (the Drowned Temple choir of Choirmother Selthe): item level 21, feet budget 8.
+  // Stillhymn (the Drowned Temple choir of Choirmother Selthe): item level 19, feet budget 7.
   stillhymn_moccasins: {
     id: 'stillhymn_moccasins',
     name: 'Stillhymn Moccasins',
@@ -3573,8 +3573,8 @@ export const QUEST_LEVELING_GEAR_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'feet',
     quality: 'rare',
-    stats: { armor: 77, sta: 3, int: 6, spi: 2 },
-    sellValue: 1625,
+    stats: { armor: 70, sta: 2, int: 5, spi: 2 },
+    sellValue: 1100,
   },
   // Pearlglow (the moonlit sanctum of the Drowned Temple): item level 21, helmet budget 10.
   pearlglow_headguard: {

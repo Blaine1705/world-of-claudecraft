@@ -887,6 +887,19 @@
     --color-quality-rare: #0070dd;
     --color-quality-epic: #a335ee;
     --color-quality-legendary: #ff8000;
+    /* Collections window (components.css "Collections (buddies, mounts, item
+       sets)") and the Book of Deeds buddy shelf's icon frame: the values those
+       sections shipped with, homed here so the sections compose tokens. */
+    --color-collections-tab-hi: #2a2418;
+    --color-collections-tab-lo: #1d1811;
+    --color-collections-tab-on-hi: #4a3c1c;
+    --color-collections-tab-on-lo: #302713;
+    --color-collections-row-active: #ffffff0f;
+    --color-collections-art-empty: #ffffff0a;
+    --color-collections-lore: #ded6c2;
+    --color-collections-ilvl: #c9c1a8;
+    --color-collections-owned: #4fdc6a;
+    --color-deed-buddy-icon-border: #4a3d26;
     /* Treasure map parchment and its X (src/ui/hud/treasure/). */
     --color-treasure-parchment: #d8c59a;
     --color-treasure-ink: #a01818;

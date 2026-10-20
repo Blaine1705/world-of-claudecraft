@@ -590,24 +590,13 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(
       verdict.auditScope.heroicDefinitionsWithOwnWebp + verdict.auditScope.heroicWeaponArtAliases,
     ).toBe(verdict.auditScope.generatedHeroicDefinitions);
-    const shippingIds = new Set(
-      readdirSync(path.join(repoRoot, 'public/ui/items'))
-        .filter((name) => name.endsWith('.webp'))
-        .map((name) => name.slice(0, -'.webp'.length)),
-    );
-    // The art-pending ledger (ITEM_ART_PENDING) stages a wave's generated
-    // heroic variants outside the audited catalog until their paintings land,
-    // exactly as the audit CLI accounts them (scripts/lib/item_art_audit.mjs).
-    const generatedHeroics = Object.entries(ITEMS).filter(
-      ([id, item]) =>
-        'heroicOf' in item && typeof item.heroicOf === 'string' && !ITEM_ART_PENDING.has(id),
-    );
-    const heroicWithOwnWebp = generatedHeroics.filter(([id]) => shippingIds.has(id));
-    const heroicArtAliases = generatedHeroics.filter(([id]) => !shippingIds.has(id));
-    expect(generatedHeroics).toHaveLength(verdict.auditScope.generatedHeroicDefinitions);
-    expect(heroicWithOwnWebp).toHaveLength(verdict.auditScope.heroicDefinitionsWithOwnWebp);
-    expect(heroicArtAliases).toHaveLength(verdict.auditScope.heroicWeaponArtAliases);
-    expect(heroicArtAliases.every(([, item]) => item.kind === 'weapon')).toBe(true);
+    // The sealed verdict's heroic scope is the 2026-08-10 historical record, so it
+    // is pinned as that record. The LIVE heroic census grew past it (the
+    // five-dungeon rework's Heroic variants on the v0.45.0 integration) and is
+    // pinned, with every later wave named, in the current-owner case below.
+    expect(verdict.auditScope.generatedHeroicDefinitions).toBe(78);
+    expect(verdict.auditScope.heroicDefinitionsWithOwnWebp).toBe(59);
+    expect(verdict.auditScope.heroicWeaponArtAliases).toBe(19);
     expect(verdict.reviewContract.everyShippingFileReviewedInModes).toEqual([
       '128-color',
       '40-color',

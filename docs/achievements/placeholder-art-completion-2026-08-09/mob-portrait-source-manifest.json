@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c44a91132d9c04f0c46f9e477e01ad68affc8b1e77597105596ded10e94a211c",
+  "rendererFingerprint": "dff1615016118bb0dc061ffcef300ea1e0621bba954d172d88c8cc12f35382f0",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "win32",
-    "arch": "x64",
+    "platform": "darwin",
+    "arch": "arm64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "155",
-    "browserVersion": "Edg/155.0.4283.45",
+    "browserVersion": "Chrome/155.0.8059.84",
     "requestedBackend": "swiftshader",
-    "fingerprint": "9e98302f0df8b738abb95d91c36845ee1f078ce639f22cd177aa8a00341efd0e"
+    "fingerprint": "6e67d503663264cff662556c81a9aa6417a8f960b7c3049c729f1444139419c4"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6341116,
-      "sha256": "5ef7b595b7d54a95c58721ae2a26e8a557b7679325a667cf7e493236be7324bc",
+      "bytes": 6445510,
+      "sha256": "19f3c4982033622ca2f97ef080f5f3b2675c5e0b025c8281da060662abf6aaba",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -607,7 +607,7 @@
           "sha256": "6dfc0be7e5905fe5136dadd311535ae7086b23cb0d2ed2a750172f62bfa65323"
         },
         "idle": "Idle",
-        "height": 4.95,
+        "height": 5.445,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -621,11 +621,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "cca6a5ec1203ea0181ae3d614b1555eaf1b50f457081f6e96f5836024dfb7c98",
+      "sourceFingerprint": "c3a0314ac500b906e38d58c8dbc2ea3d23c74560263b5cb004bcc02676452fea",
       "output": {
         "path": "public/ui/mobs/bastion_revenant.webp",
-        "bytes": 2316,
-        "sha256": "5756df4b0074c95c596eb3262e6ef2af88cfcc82974020f8000e9eb0fb0db8b0"
+        "bytes": 2554,
+        "sha256": "df8750b064ea7d8acc84b35f8b5720808b2b6eddc67557c32dd64b0002ef1d56"
       }
     },
     {
@@ -2878,7 +2878,7 @@
           "sha256": "b1ee9ac1c6cdb42ff712a5b0f8b17ac95488d8a7708bc46103e70e4b59607007"
         },
         "idle": "Idle",
-        "height": 4.9,
+        "height": 5.390000000000001,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -2892,11 +2892,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "07b566e5e14f6040e4a5ec301c912328cb733240a2d2e62fab2dabd33766b4c6",
+      "sourceFingerprint": "8defffdc325a5bd6ab473c201494c372d1a8533c8801b5929ed7b9cd85cf7ca0",
       "output": {
         "path": "public/ui/mobs/drowned_watchman.webp",
-        "bytes": 2028,
-        "sha256": "b6f50c33c528f1ec461e5bee05fe7ea2bd1468353c337613bf3c2a86b4ae33cb"
+        "bytes": 2168,
+        "sha256": "5640bd8b393fef7a2f5cdaa6f550261c648b5902cbbd50c5dd67b133aa39696e"
       }
     },
     {
@@ -3495,7 +3495,7 @@
           "sha256": "c886085b52e4cdf5411647beb87a99c8bfe128541ffb7ce171d08f3301068893"
         },
         "idle": "Idle",
-        "height": 5.1,
+        "height": 5.61,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -3509,11 +3509,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "bae6d1c462c6bfe02fa590eb1842298dd0ab0875656747f99fe9e60c2a11a272",
+      "sourceFingerprint": "7bd23df3a22eb502e85898e74dd582508080cc6d152dda353f1ad373a3bed723",
       "output": {
         "path": "public/ui/mobs/fogbound_arbalest.webp",
-        "bytes": 2080,
-        "sha256": "98824d2abdee3a3982d45915ad2d90f6b0899526ed0a85895225a18f489b57cd"
+        "bytes": 2338,
+        "sha256": "db700eec4259b01244cd1dd44cb25df0fb1071a82df6f6c46f16ab1defb4657a"
       }
     },
     {
@@ -10425,7 +10425,7 @@
           "sha256": "b59ed852323830ce141e572758ec97200b74e4b7564738bac0defb0bc0e633df"
         },
         "idle": "Idle",
-        "height": 4.6,
+        "height": 5.06,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -10439,11 +10439,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ce2d5b06c70f06558248f74027a98359053f8737760f629d0a84178c7202bfa9",
+      "sourceFingerprint": "a27331fc82b7864c139ae8d1c8a63dd36d9e594e597782916b0f9c4adf224913",
       "output": {
         "path": "public/ui/mobs/shackled_prisoner.webp",
-        "bytes": 2304,
-        "sha256": "537fa99a76a4acbebc1136ad12b10c0658cd1485a3cca6f672c030006d930c73"
+        "bytes": 2526,
+        "sha256": "c60b9447f152e7300ae3e87906532fa90f1fc32a501387a3c38ed0edbcb289db"
       }
     },
     {

@@ -288,8 +288,13 @@ describe('which items draw the field weapons', () => {
   // The other direction: no common, uncommon or rare weapon is left behind on another
   // model. A new one takes a field look (or a starter model, for a starting item).
   it('every common, uncommon or rare weapon and shield draws a field or starter model', () => {
+    // The Mirefen world boss's Shardpikes keep their own bespoke spear (the throw
+    // mechanic's model, PR 4259; owner call, 2026-10-20): Skerrit's rare and the
+    // muster's plain one.
+    const BESPOKE_SHARDPIKES = new Set(['skerrits_shardpike', 'muster_shardpike']);
     const rares = Object.values(ITEMS).filter((item) => item.quality === 'rare');
     for (const item of rares.filter((r) => r.kind === 'weapon')) {
+      if (BESPOKE_SHARDPIKES.has(item.id)) continue;
       const key = keyOf(itemWeaponModelUrl(item.id));
       expect(isFieldKey(key), `${item.id} (rare) draws ${key}`).toBe(true);
     }
@@ -308,6 +313,7 @@ describe('which items draw the field weapons', () => {
     const weapons = plain.filter((item) => item.kind === 'weapon');
     expect(weapons.length).toBeGreaterThan(40);
     for (const item of weapons) {
+      if (BESPOKE_SHARDPIKES.has(item.id)) continue;
       const key = keyOf(itemWeaponModelUrl(item.id));
       expect(isFieldKey(key) || key.endsWith('_starter'), `${item.id} draws ${key}`).toBe(true);
     }

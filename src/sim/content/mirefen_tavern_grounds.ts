@@ -172,7 +172,7 @@ export const TAVERN_GROUNDS_PROPS: readonly TavernProp[] = [
     r: 0.42,
     height: 1.25,
     level: 'ground',
-    baseY: -1.207,
+    baseY: -1.166,
     standable: true,
   },
   {

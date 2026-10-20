@@ -506,8 +506,13 @@ describe('bags_window: touch peek + bank-cluster close', () => {
       /this\.deps\.restoreFocus\(this\.openerFocus\);\s*this\.openerFocus = null;\s*this\.deps\.onClosed\(\);/,
     );
     expect(hud).toContain('onClosed: () => this.onBagsClosed(),');
+    // The mobile-touch gate and the bank-open drop moved into
+    // bank_window_lifecycle.ts undockBagCompanions with the membership bank
+    // courier (5769f2a2596), which behavior-pins them in
+    // tests/bank_window_lifecycle.test.ts; the hud half is that onBagsClosed
+    // hands it the live bank-open state first thing.
     expect(hud).toMatch(
-      /private onBagsClosed\(\): void \{\s*if \(document\.body\.classList\.contains\('mobile-touch'\) && this\.bankWindow\.isOpen\) \{\s*document\.body\.classList\.remove\('bank-open'\);/,
+      /private onBagsClosed\(\): void \{\s*undockBagCompanions\(this\.bankWindow\.isOpen, this\.marketWindow\.isOpen\);/,
     );
     expect(hud).toMatch(
       /this\.bagsWindow\.noteOpener\(\);[\s\S]{0,400}?if \(this\.bankWindow\.isOpen\) document\.body\.classList\.add\('bank-open'\);/,

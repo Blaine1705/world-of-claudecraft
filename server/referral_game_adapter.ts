@@ -176,7 +176,10 @@ export class ReferralGameAdapter {
   }
   command(session: ClientSession, action: ReferralCardsAction): void {
     if (action.type === 'page') void this.refresh(session.accountId);
-    void this.cards.command(session, action);
+    // A page that cannot load yet rejects after scheduling its own retry.
+    this.cards
+      .command(session, action)
+      .catch((error) => console.error('referral card operation failed:', error));
   }
   private refresh(accountId: number): Promise<void> {
     const existing = this.refreshes.get(accountId);
@@ -204,6 +207,9 @@ export class ReferralGameAdapter {
     const started = performance.now();
     for (const session of this.accounts.get(accountId) ?? []) {
       if (session.left || session.escrowQuarantined) continue;
+      // host.sim is the live realm Sim that server/game.ts builds through
+      // buildRealmSimConfig, which injects the wall clock (lockoutNowMs), so
+      // this blob carries the same absolute deadlines a save would.
       const meta = this.host.sim.meta(session.pid),
         before = this.host.sim.serializeCharacter(session.pid);
       if (!meta || !before) continue;
