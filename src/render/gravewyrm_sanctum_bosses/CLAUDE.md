@@ -20,6 +20,14 @@ and `scale`/`facing`), so offline and online draw the same. A claimed `spellfx` 
 renderer's own handling, so this layer replays the boss's clip for it through
 `playGesture` (ChainBreak, ChainYank, Roar, Hit, BreakFree).
 
+Korgath's stances (`korgathStance`, `KORGATH_BOUND_STANCE` / `KORGATH_STANDING_STANCE`):
+he kneels in his chains while he waits unpulled (BoundKneel, the maul on the terrace by
+his hand) and rises with the maul on the pull (the standing stance enters through
+BoundRise, which ends exactly on Idle). Both clips ride a clip donor beside his body
+(`KORGATH_BOUND_CLIPS_URL`, built by `docs/design/dungeon-rework/korgath/`), so the body
+file and the portrait pinned on it never change. A view built mid-fight already holds the
+standing map, so no rise replays.
+
 Korzul's Break Free (the sim's `korzul_emerge_plan.ts`): his body stays hidden from his
 pull until the BreakFree clip's burst beat (`KORZUL_BURST_AT`, `korzulBodyView`), the
 same frame the face's frozen wyrm goes (`render/gravewyrm_sanctum/sanctum_face_core.ts`
