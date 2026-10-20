@@ -28,7 +28,7 @@ export const WORLD_QUEST_CHAMPION_TYPES: ReadonlySet<WorldQuestDef['objective'][
   'delivery',
 ]);
 export const WORLD_QUEST_CHAMPION_TUNING = Object.freeze({
-  healthMultiplier: 5,
+  healthMultiplier: 2,
   scale: 1.4,
   levelAboveQuest: 2,
   lifetimeSeconds: 300,
