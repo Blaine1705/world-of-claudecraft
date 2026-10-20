@@ -13407,7 +13407,7 @@ export const zh_TW: EnTranslations = {
       },
       "kidney_shot": {
         "name": "陰狠一擊",
-        "description": "終結技，昏迷目標 1 秒外加每點連擊點 1 秒（5 點連擊點：6 秒）。"
+        "description": "終結技，昏迷目標 2 秒外加每點連擊點 1 秒（5 點連擊點：7 秒）。"
       },
       "ambush": {
         "name": "潛伏者一擊",
@@ -13416,7 +13416,7 @@ export const zh_TW: EnTranslations = {
       },
       "stealth": {
         "name": "暮紗",
-        "description": "將你隱藏在陰影中：敵人幾乎無法察覺你，但你的移動速度降低 50%。攻擊或受到傷害會打破暮紗。再次施放可現身。",
+        "description": "將你隱藏在陰影中：敵人幾乎無法察覺你，且你能以全速移動。攻擊或受到傷害會打破暮紗。再次施放可現身。",
         "specNote_subtlety": "自暮紗中使用的每個先制技累積 1 層幽暝（最多 3 層）。"
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanish": {
         "name": "煙遁步",
-        "description": "從視野中消失，即使在戰鬥中也能進入暮紗狀態。隱身時你的移動速度降低 50%。最多持續 10 秒。"
+        "description": "從視野中消失，即使在戰鬥中也能進入暮紗狀態。隱身時你能以全速移動。最多持續 10 秒。"
       },
       "instant_poison": {
         "name": "蝰蛇之咬",
@@ -14223,11 +14223,11 @@ export const zh_TW: EnTranslations = {
       },
       "cold_blood": {
         "name": "冷血",
-        "description": "凝聚你的殺意，使你的下一次攻擊必定爆擊。（刺殺標誌技能）"
+        "description": "凝聚你的殺意，使你接下來的 5 次攻擊必定爆擊。（刺殺標誌技能）"
       },
       "blade_flurry": {
         "name": "劍刃亂舞",
-        "description": "掀起一陣刀刃的亂舞，將攻擊速度提高 20%，持續 12 秒。（戰鬥標誌技能）"
+        "description": "掀起一陣刀刃的亂舞，將攻擊速度提高 20%，持續 30 秒。（戰鬥標誌技能）"
       },
       "hemorrhage": {
         "name": "出血",
@@ -14667,7 +14667,7 @@ export const zh_TW: EnTranslations = {
       },
       "shadowstep": {
         "name": "影步",
-        "description": "穿過暗影，向你的目標邁進，無論敵友，且不會打破暮紗。（潛行者天賦）"
+        "description": "穿過暗影，向你的目標邁進，無論敵友，且不會打破暮紗。最多儲存 2 次充能。（潛行者天賦）"
       },
       "silence": {
         "name": "沉默",
@@ -24254,7 +24254,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "先鋒套裝：Brawlmark Leathers",
-        "bonus2": "2件：Swift Heels冷卻縮短60秒。",
+        "bonus2": "2件：Swift Heels冷卻縮短12秒。",
         "bonus4": "4件：Swift Heels期間，Wicked Slash與Haymaker額外給予1個連擊點。"
       },
       "vanguard_rogue_subtlety": {

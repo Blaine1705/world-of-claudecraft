@@ -40,7 +40,7 @@ describe('rogue balance pass', () => {
     expect(stealthed(p)).toBe(true);
   });
 
-  it('Redhanded resolves as +30% Craven Thrust crit and False Face removes the Duskveil slow', () => {
+  it('Redhanded resolves as +30% Craven Thrust crit and False Face speeds up Duskveil by 15%', () => {
     const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('assassination');
@@ -55,31 +55,32 @@ describe('rogue balance pass', () => {
     expect(mods.abilities.backstab?.critPct).toBeCloseTo(0.3);
 
     sim.setSpec('subtlety');
-    // Duskveil aura value 0.5 * (1 + 1 mastery buffPct at level 20) = 1.0, and
-    // Smokestep's stealth rides the same mastery row.
+    // Duskveil aura value 1.0 * (1 + 0.15 mastery buffPct at level 20) = 1.15, and
+    // Smokefade's stealth rides the same mastery row.
     expect(sim.resolvedAbility('stealth')?.effects[0]).toMatchObject({
       kind: 'stealth',
-      value: 1,
+      value: 1.15,
     });
     expect(sim.resolvedAbility('vanish')?.effects[0]).toMatchObject({
       kind: 'stealth',
-      value: 1,
+      value: 1.15,
     });
 
     // The value is a MOVEMENT multiplier (player_motion.moveSpeedMult folds a
-    // stealth aura in as a slow), so the mastered rogue really walks at full
-    // speed while hidden. Without the mastery the same cast leaves 0.5.
+    // stealth aura below 1 in as a slow and one above 1 as a speed buff), so the
+    // mastered rogue really runs 15% faster while hidden. Without the mastery the
+    // same cast leaves full speed.
     const p = sim.player;
     sim.castAbility('stealth');
     sim.tick();
     expect(stealthed(p)).toBe(true);
-    expect(moveSpeedMult(p)).toBeCloseTo(1);
+    expect(moveSpeedMult(p)).toBeCloseTo(1.15);
 
     const bare = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
     bare.setPlayerLevel(20);
     bare.castAbility('stealth');
     bare.tick();
-    expect(moveSpeedMult(bare.player)).toBeCloseTo(0.5);
+    expect(moveSpeedMult(bare.player)).toBeCloseTo(1);
   });
 
   it('Redhanded scales the poison coats and Thuggery rolls extra attacks', () => {

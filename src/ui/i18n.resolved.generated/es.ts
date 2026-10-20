@@ -13407,7 +13407,7 @@ export const es: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Golpe Bajo",
-        "description": "Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s)."
+        "description": "Movimiento final que aturde al objetivo durante 2 s más 1 s por punto de combo (5 puntos de combo: 7 s)."
       },
       "ambush": {
         "name": "Golpe del Acechador",
@@ -13416,7 +13416,7 @@ export const es: EnTranslations = {
       },
       "stealth": {
         "name": "Velo Crepuscular",
-        "description": "Te oculta entre las sombras: los enemigos apenas te notan, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarla para salir.",
+        "description": "Te oculta entre las sombras: los enemigos apenas te notan y te mueves a velocidad completa. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarla para salir.",
         "specNote_subtlety": "Cada apertura que uses desde el Velo Crepuscular añade 1 de Penumbra (máx. 3)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const es: EnTranslations = {
       },
       "vanish": {
         "name": "Fuga de humo",
-        "description": "Desaparece de la vista, entrando en Duskveil incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s."
+        "description": "Desaparece de la vista, entrando en Duskveil incluso en combate. Te mueves a velocidad completa mientras estás oculto. Dura hasta 10 s."
       },
       "instant_poison": {
         "name": "Mordisco de Víbora",
@@ -14223,11 +14223,11 @@ export const es: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangre fría",
-        "description": "Concentra tu instinto asesino para que tu siguiente ataque sea un golpe crítico. (motor de Knifework)"
+        "description": "Concentra tu instinto asesino para que tus siguientes 5 ataques sean golpes críticos. (motor de Knifework)"
       },
       "blade_flurry": {
         "name": "Aluvión de acero",
-        "description": "Desata una ráfaga de cuchillas que aumenta la velocidad de ataque un 20% durante 12 s. (motor de Thuggery)"
+        "description": "Desata una ráfaga de cuchillas que aumenta la velocidad de ataque un 20% durante 30 s. (motor de Thuggery)"
       },
       "hemorrhage": {
         "name": "Hemorragia",
@@ -14667,7 +14667,7 @@ export const es: EnTranslations = {
       },
       "shadowstep": {
         "name": "Paso Sombrío",
-        "description": "Avanzas entre las sombras hacia tu objetivo, amigo o enemigo, sin romper el Duskveil. (talento de Pícaro)"
+        "description": "Avanzas entre las sombras hacia tu objetivo, amigo o enemigo, sin romper el Duskveil. Almacena hasta 2 cargas. (talento de Pícaro)"
       },
       "silence": {
         "name": "Silencio",
@@ -24254,7 +24254,7 @@ export const es: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Cueros Marcariña",
-        "bonus2": "El tiempo de reutilización de Talones Veloces se reduce 60 s.",
+        "bonus2": "El tiempo de reutilización de Talones Veloces se reduce 12 s.",
         "bonus4": "Mientras Talones Veloces está activo, Tajo Perverso y Golpe al Cuerpo otorgan 1 punto de combo adicional."
       },
       "vanguard_rogue_subtlety": {

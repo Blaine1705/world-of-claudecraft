@@ -93,10 +93,7 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     subtlety: {
       stats: { agi: 7, crit: 0.1, dodge: 0.05 },
       global: { meleeDmgPct: 0.04 },
-      ability: [
-        { ability: 'stealth', cooldownPct: -0.7 },
-        { ability: 'backstab', dmgPct: 0.16 },
-      ],
+      ability: [{ ability: 'backstab', dmgPct: 0.16 }],
     },
   },
   priest: {

@@ -13407,7 +13407,7 @@ export const vi_VN: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Đòn Chơi Xấu",
-        "description": "Chiêu kết liễu làm choáng mục tiêu trong 1 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 6 giây)."
+        "description": "Chiêu kết liễu làm choáng mục tiêu trong 2 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 7 giây)."
       },
       "ambush": {
         "name": "Đòn Kẻ Rình Rập",
@@ -13416,7 +13416,7 @@ export const vi_VN: EnTranslations = {
       },
       "stealth": {
         "name": "Màn Chạng Vạng",
-        "description": "Ẩn giấu bạn trong bóng tối: kẻ địch hầu như không nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Màn Chạng Vạng. Thi triển lại để bước ra.",
+        "description": "Ẩn giấu bạn trong bóng tối: kẻ địch hầu như không nhận ra bạn và bạn di chuyển với tốc độ tối đa. Tấn công hoặc nhận sát thương sẽ phá vỡ Màn Chạng Vạng. Thi triển lại để bước ra.",
         "specNote_subtlety": "Mỗi đòn mở màn bạn dùng từ Màn Chạng Vạng thêm 1 U Ám (tối đa 3)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanish": {
         "name": "Tan Vào Khói",
-        "description": "Biến mất khỏi tầm nhìn, đi vào Duskveil ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây."
+        "description": "Biến mất khỏi tầm nhìn, đi vào Duskveil ngay cả trong chiến đấu. Bạn di chuyển với tốc độ tối đa khi ẩn nấp. Kéo dài tối đa 10 giây."
       },
       "instant_poison": {
         "name": "Vết Cắn Rắn Độc",
@@ -14223,11 +14223,11 @@ export const vi_VN: EnTranslations = {
       },
       "cold_blood": {
         "name": "Máu Lạnh",
-        "description": "Tập trung sát ý để đòn tấn công tiếp theo của bạn chắc chắn chí mạng. (động cơ Knifework)"
+        "description": "Tập trung sát ý để 5 đòn tấn công tiếp theo của bạn chắc chắn chí mạng. (động cơ Knifework)"
       },
       "blade_flurry": {
         "name": "Loạn Đao",
-        "description": "Tung ra một loạt đao, tăng tốc độ đánh 20% trong 12 giây. (động cơ Thuggery)"
+        "description": "Tung ra một loạt đao, tăng tốc độ đánh 20% trong 30 giây. (động cơ Thuggery)"
       },
       "hemorrhage": {
         "name": "Xuất Huyết",
@@ -14667,7 +14667,7 @@ export const vi_VN: EnTranslations = {
       },
       "shadowstep": {
         "name": "Trượt Bóng",
-        "description": "Bước xuyên bóng tối đến mục tiêu của bạn, dù là đồng minh hay kẻ địch, mà không phá vỡ Duskveil. (thiên phú Đạo tặc)"
+        "description": "Bước xuyên bóng tối đến mục tiêu của bạn, dù là đồng minh hay kẻ địch, mà không phá vỡ Duskveil. Tích trữ tối đa 2 lượt dùng. (thiên phú Đạo tặc)"
       },
       "silence": {
         "name": "Câm Lặng",
@@ -24254,7 +24254,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Brawlmark Leathers",
-        "bonus2": "Cooldown Swift Heels giảm 60 giây.",
+        "bonus2": "Cooldown Swift Heels giảm 12 giây.",
         "bonus4": "Trong khi Swift Heels hoạt động, Wicked Slash và Haymaker cấp 1 điểm combo bổ sung."
       },
       "vanguard_rogue_subtlety": {

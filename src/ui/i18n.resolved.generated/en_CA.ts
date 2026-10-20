@@ -13407,7 +13407,7 @@ export const en_CA: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Low Blow",
-        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
+        "description": "Finishing move that stuns the target for 2 sec plus 1 sec per combo point (5 combo points: 7 sec)."
       },
       "ambush": {
         "name": "Lurker's Strike",
@@ -13416,7 +13416,7 @@ export const en_CA: EnTranslations = {
       },
       "stealth": {
         "name": "Duskveil",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
+        "description": "Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.",
         "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const en_CA: EnTranslations = {
       },
       "vanish": {
         "name": "Smokefade",
-        "description": "Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec."
+        "description": "Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec."
       },
       "instant_poison": {
         "name": "Adder's Bite",
@@ -14223,11 +14223,11 @@ export const en_CA: EnTranslations = {
       },
       "cold_blood": {
         "name": "Killer's Calm",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
+        "description": "Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "Mirrored Blades",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 30 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "Red Ribbon",
@@ -14667,7 +14667,7 @@ export const en_CA: EnTranslations = {
       },
       "shadowstep": {
         "name": "Shadeslip",
-        "description": "Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)"
+        "description": "Steps through the shadows to your target, friend or foe, without breaking Duskveil. Stores up to 2 charges. (Rogue talent)"
       },
       "silence": {
         "name": "Hushword",
@@ -24254,7 +24254,7 @@ export const en_CA: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
+        "bonus2": "Swift Heels' cooldown is reduced by 12 sec.",
         "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
       },
       "vanguard_rogue_subtlety": {

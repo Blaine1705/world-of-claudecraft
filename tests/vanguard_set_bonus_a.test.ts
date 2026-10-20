@@ -612,14 +612,14 @@ describe('Rogue Season 2 sets', () => {
     expect(crit.duration).toBe(V.VANGUARD_ASSASSINATION_4PC_CRIT_WINDOW_SEC);
   });
 
-  it('Brawlmark 2pc: Swift Heels cooldown 300 to 240, only at 2 pieces', () => {
+  it('Brawlmark 2pc: Swift Heels cooldown 60 to 48, only at 2 pieces', () => {
     expectCooldownCut(
       'rogue',
       'combat',
       'vanguard_rogue_combat',
       2,
       'sprint',
-      300,
+      60,
       V.VANGUARD_COMBAT_2PC_SWIFT_HEELS_COOLDOWN_CUT_SEC,
     );
   });
@@ -982,7 +982,7 @@ describe('Season 2 group A tooltips match the engine constants', () => {
       ['hunter', 'beast_mastery', 'vanguard_hunter_beast_mastery', 'concussive_shot', 12],
       ['hunter', 'marksmanship', 'vanguard_hunter_marksmanship', 'trailbreak', 15],
       ['hunter', 'survival', 'vanguard_hunter_survival', 'bloodhook', 15],
-      ['rogue', 'combat', 'vanguard_rogue_combat', 'sprint', 300],
+      ['rogue', 'combat', 'vanguard_rogue_combat', 'sprint', 60],
       ['rogue', 'subtlety', 'vanguard_rogue_subtlety', 'vanish', 300],
       ['priest', 'discipline', 'vanguard_priest_discipline', 'psychic_scream', 30],
       ['priest', 'holy', 'vanguard_priest_holy', 'veilstep', 18],

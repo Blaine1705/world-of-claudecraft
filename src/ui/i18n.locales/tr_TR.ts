@@ -1915,7 +1915,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Low Blow ayrıca sonraki atağını 6 saniye içinde kritik vuruş yapar.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Gece Kesiş Deri',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': "Swift Heels'in bekleme süresi 60 san azalır.",
+  'entities.itemSets.vanguard_rogue_combat.bonus2': "Swift Heels'in bekleme süresi 12 san azalır.",
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Swift Heels etki duruşu boyunca Wicked Slash ve Haymaker, 1 ek combo puanı verir.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Dövüş İşareti Deri',
@@ -8113,7 +8113,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Anında hızlı bir Fleet Formu'na bürünerek hareket hızını %40 artırır ve kırılabilir kök tuzaklarını ve yavaşlatmaları kaldırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır.",
   'entities.abilities.travel_form.name': 'Fleet Formu',
   'entities.abilities.vanish.description':
-    "Gözden kaybolursun, dövüşte bile Duskveil'e geçersin. Gizliyken %50 daha yavaş hareket edersin. 10 saniyeye kadar sürer.",
+    "Gözden kaybolursun, dövüşte bile Duskveil'e geçersin. Gizliyken tam hızla hareket edersin. 10 saniyeye kadar sürer.",
   'entities.abilities.whirlwind.description':
     'Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)',
   'entities.abilities.whirlwind.name': 'Bıçaklı Girdap',
@@ -14620,7 +14620,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     '8 m içindeki düşmanları en fazla 4 sn korkutur. Hasar etkiyi bozabilir.',
   'entities.abilities.shadowstep.description':
-    "Gölgelerin içinden, dost ya da düşman, hedefine Alaca Örtüsü'nü bozmadan adım atarsın. (Haydut yeteneği)",
+    "Gölgelerin içinden, dost ya da düşman, hedefine Alaca Örtüsü'nü bozmadan adım atarsın. En fazla 2 kullanım birikir. (Haydut yeteneği)",
   'entities.abilities.silence.description': 'Hedefi 4 sn. boyunca susturur. (Rahip yeteneği)',
   'entities.abilities.tranquility.description':
     '4 sn. boyunca iyileştirici enerji yönlendirir ve 30 m içindeki müttefikleri her saniye 42 ile 52 iyileştirir. (Druid yeteneği)',
@@ -16324,7 +16324,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Her vuruş 1 Zehir Ayini ekler (en fazla 6) ve 15 enerji geri kazandırır. 6 Zehir Ayininde, Toprak Uykusu Zehir Yarığına dönüşür (kalan tüm kanama hasarını tek seferde verir).',
   'entities.abilities.blade_flurry.description':
-    'Bir bıçak fırtınası salar, saldırı hızını 12 sn boyunca %20 artırır. (Thuggery motoru)',
+    'Bir bıçak fırtınası salar, saldırı hızını 30 sn boyunca %20 artırır. (Thuggery motoru)',
   'entities.abilities.bone_armor.description':
     "Seni kemiklerle sarar, azami canının %20'si kadar hasarı emer.",
   'entities.abilities.bone_armor.name': 'Kemik Zırhı',
@@ -16339,7 +16339,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.',
   'entities.abilities.claw.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3).',
   'entities.abilities.cold_blood.description':
-    'Öldürme niyetini odaklar, böylece bir sonraki saldırın kritik vuruş olur. (Knifework motoru)',
+    'Öldürme niyetini odaklar, böylece sonraki 5 saldırın kritik vuruş olur. (Knifework motoru)',
   'entities.abilities.corpse_explosion.description':
     'Önce bir Kemik Büyücüyü, sonra bir İskelet Savaşçıyı, bir Mezar Kanadını ise yalnızca son çare olarak feda eder. Kopyalar arasında önce en az kalan süreye, sonra en zayıfa sahip olanı seçer ve seçilen konumda {damage} Gölge hasarı verir.',
   'entities.abilities.corpse_explosion.name': 'Ceset Patlaması',
@@ -16391,7 +16391,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Birincil Kem Gözüne 15 sn süreyle yargı çağırır: 40 Mahkûmiyet ve 3 Kader İpliği kazandırır, Ele Geçirmeyi etkinleştirir, birincil Gözden üretilen Mahkûmiyeti ikiye katlar ve Hüküm hasarını %20 artırır. İlk Hüküm 50 Mahkûmiyet geri kazandırır.',
   'entities.abilities.hour_of_judgment.name': 'Yargı Saati',
   'entities.abilities.kidney_shot.description':
-    'Hedefi 1 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 6 sn).',
+    'Hedefi 2 sn artı kombo puanı başına 1 sn sersemleten bitirici hamle (5 kombo puanı: 7 sn).',
   'entities.abilities.litany_of_guilt.description':
     "Birincil Kem Gözünü 6 sn boyunca lanetler. Mahkûmiyet kazançları, 8 yarda içindeki en fazla 2 başka düşmana hasar veren bir dalga salar, en fazla saniyede bir. Kademe 2 bunu 8 sn'ye ve 4 düşmana çıkarır.",
   'entities.abilities.litany_of_guilt.name': 'Suç Yakarışı',
@@ -16478,7 +16478,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     "Aykuşu Formundayken, tamamlanan her okuma 1 Ay Gelgiti ekler (en fazla 3). 3 Ay Gelgitinde, bu düğme Güneş İzine dönüşür: 80 ila 100 Doğa hasarı artı 9 sn boyunca 45 yanık hasarı veren, 35 mana geri kazandıran ve tüm 3'ünü harcayan anlık bir vuruş.",
   'entities.abilities.stealth.description':
-    'Seni gölgelerde gizler: düşmanlar seni zar zor fark eder, ama %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Alacakaranlık Perdesini bozar. Çıkmak için tekrar oku.',
+    'Seni gölgelerde gizler: düşmanlar seni zar zor fark eder ve tam hızla hareket edersin. Saldırmak ya da hasar almak Alacakaranlık Perdesini bozar. Çıkmak için tekrar oku.',
   'entities.abilities.stealth.specNote_subtlety':
     'Alacakaranlık Perdesinden kullandığın her açılış 1 Alacakaranlık ekler (en fazla 3).',
   'entities.abilities.swiftmend.description':

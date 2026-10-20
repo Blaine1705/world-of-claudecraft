@@ -75,7 +75,6 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     stats: { agi: 7, crit: 0.1, dodge: 0.05 },
     global: { meleeDmgPct: 0.04 },
     abilities: {
-      stealth: { cooldownPct: -0.7 },
       backstab: { dmgPct: 0.16 },
     },
   },

@@ -4771,13 +4771,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sprint.description': '使你的移动速度提高 70%，持续 15 秒。',
   'entities.abilities.kidney_shot.name': '下作一击',
   'entities.abilities.kidney_shot.description':
-    '终结技，昏迷目标 1 秒外加每点连击点 1 秒（5 点连击点：6 秒）。',
+    '终结技，昏迷目标 2 秒外加每点连击点 1 秒（5 点连击点：7 秒）。',
   'entities.abilities.ambush.name': '潜伏突袭',
   'entities.abilities.ambush.description':
     '伏击目标，造成 250% 武器伤害加 {damage}。必须处于潜行并位于目标背后。需要匕首。奖励 1 个连击点。',
   'entities.abilities.stealth.name': '暮帷',
   'entities.abilities.stealth.description':
-    '将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破暮帷。再次施放可现身。',
+    '将你隐藏在阴影中：敌人几乎无法察觉你，且你能以全速移动。攻击或受到伤害会打破暮帷。再次施放可现身。',
   'entities.abilities.adrenaline_rush.name': '血脉疾涌',
   'entities.abilities.adrenaline_rush.description': '热血沸腾，立即恢复 60 点能量。',
   'entities.abilities.garrote.name': '绞喉线',
@@ -4802,7 +4802,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '终结技，撕裂目标：其每 2 秒流血一次，持续 6 秒外加每点连击点 2 秒（5 点连击点：16 秒，共 {damage} 点伤害）。',
   'entities.abilities.vanish.name': '烟遁',
   'entities.abilities.vanish.description':
-    '从视野中消失，即使在战斗中也能进入暮帷状态。隐身时你的移动速度降低 50%。持续最多 10 秒。',
+    '从视野中消失，即使在战斗中也能进入暮帷状态。隐身时你能以全速移动。持续最多 10 秒。',
   'entities.abilities.instant_poison.name': '蝰蛇之咬',
   'entities.abilities.instant_poison.description':
     '为你的武器淬毒，持续 30 分钟，使你的每次近战攻击额外造成 {damage} 点自然伤害。',
@@ -5140,10 +5140,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
   'entities.abilities.cold_blood.name': '冷血',
   'entities.abilities.cold_blood.description':
-    '凝聚你的杀意，使你的下一次攻击必定爆击。（刺杀标志技能）',
+    '凝聚你的杀意，使你接下来的 5 次攻击必定爆击。（刺杀标志技能）',
   'entities.abilities.blade_flurry.name': '剑刃乱舞',
   'entities.abilities.blade_flurry.description':
-    '掀起一阵刀刃的乱舞，将攻击速度提高 20%，持续 12 秒。（战斗标志技能）',
+    '掀起一阵刀刃的乱舞，将攻击速度提高 20%，持续 30 秒。（战斗标志技能）',
   'entities.abilities.hemorrhage.name': '出血',
   'entities.abilities.hemorrhage.description':
     '以武器伤害外加 {damage} 点击打敌人，造成持续 12 秒的流血伤害，并使其所受的流血伤害提高 40%。给予 1 点连击点。每第 2 次使用增加 1 层幽暗（最多 3 层）。（敏锐标志技能）',
@@ -12711,7 +12711,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     '使 8 米内的敌人陷入恐惧，最多持续 4 秒。伤害可能打断该效果。',
   'entities.abilities.shadowstep.description':
-    '穿过暗影，向你的目标迈进，无论其是敌是友，且不会打破暮帷。（潜行者天赋）',
+    '穿过暗影，向你的目标迈进，无论其是敌是友，且不会打破暮帷。最多储存 2 次充能。（潜行者天赋）',
   'entities.abilities.silence.description': '使目标沉默4秒。（牧师天赋）',
   'entities.abilities.tranquility.description':
     '引导恢复能量4秒，每秒为30码内的盟友恢复42至52点生命值。（德鲁伊天赋）',
@@ -18581,7 +18581,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '低击还会使你6秒内的下一次攻击必定爆击。',
   'entities.itemSets.vanguard_rogue_combat.name': '先锋套装：斗痕皮甲',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': '疾足的冷却时间缩短60秒。',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '疾足的冷却时间缩短12秒。',
   'entities.itemSets.vanguard_rogue_combat.bonus4': '疾足激活时，邪斩和重拳额外奖励1个连击点。',
   'entities.itemSets.vanguard_rogue_subtlety.name': '先锋套装：影行皮甲',
   'entities.itemSets.vanguard_rogue_subtlety.bonus2': '烟隐的冷却时间缩短60秒。',

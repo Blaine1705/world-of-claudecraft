@@ -5031,13 +5031,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sprint.description': 'Повышает скорость передвижения на 70% на 15 сек.',
   'entities.abilities.kidney_shot.name': 'Подлый удар',
   'entities.abilities.kidney_shot.description':
-    'Завершающий приём, оглушающий цель на 1 сек. плюс 1 сек. за каждую серию приёмов (5 серий приёмов: 6 сек.).',
+    'Завершающий приём, оглушающий цель на 2 сек. плюс 1 сек. за каждую серию приёмов (5 серий приёмов: 7 сек.).',
   'entities.abilities.ambush.name': 'Удар скрытня',
   'entities.abilities.ambush.description':
     'Нападает из засады, нанося 250% урона оружием плюс {damage}. Нужно быть в незаметности и позади цели. Требуется кинжал. Дает 1 прием серии.',
   'entities.abilities.stealth.name': 'Сумеречная завеса',
   'entities.abilities.stealth.description':
-    'Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Сумеречную завесу. Примените снова, чтобы выйти.',
+    'Скрывает вас в тенях: враги почти не замечают вас, а вы двигаетесь с полной скоростью. Атака или получение урона прерывает Сумеречную завесу. Примените снова, чтобы выйти.',
   'entities.abilities.adrenaline_rush.name': 'Ускоренная кровь',
   'entities.abilities.adrenaline_rush.description':
     'Кровь закипает, мгновенно восстанавливая 60 энергии.',
@@ -5063,7 +5063,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Завершающий приём, ранящий цель: она кровоточит каждые 2 сек., в течение 6 сек. плюс 2 сек. за каждую серию приёмов (5 серий приёмов: 16 сек. и {damage} суммарного урона).',
   'entities.abilities.vanish.name': 'Дымный шаг',
   'entities.abilities.vanish.description':
-    'Исчезает из виду, входя в Сумеречную завесу даже в бою. Пока вы скрыты, вы двигаетесь на 50% медленнее. Длится до 10 сек.',
+    'Исчезает из виду, входя в Сумеречную завесу даже в бою. Пока вы скрыты, вы двигаетесь с полной скоростью. Длится до 10 сек.',
   'entities.abilities.instant_poison.name': 'Укус гадюки',
   'entities.abilities.instant_poison.description':
     'Покрывает ваше оружие ядом на 30 мин, заставляя каждый ваш удар в ближнем бою наносить {damage} дополнительных ед. урона от сил природы.',
@@ -5417,10 +5417,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
   'entities.abilities.cold_blood.name': 'Хладнокровие',
   'entities.abilities.cold_blood.description':
-    'Сосредоточивает убийственное намерение, чтобы следующая атака стала критической. (знаковое умение Ликвидации)',
+    'Сосредоточивает убийственное намерение, чтобы следующие 5 атак стали критическими. (знаковое умение Ликвидации)',
   'entities.abilities.blade_flurry.name': 'Шквал клинков',
   'entities.abilities.blade_flurry.description':
-    'Обрушивает шквал клинков, повышая скорость атаки на 20% на 12 сек. (знаковое умение Боя)',
+    'Обрушивает шквал клинков, повышая скорость атаки на 20% на 30 сек. (знаковое умение Боя)',
   'entities.abilities.hemorrhage.name': 'Кровоизлияние',
   'entities.abilities.hemorrhage.description':
     'Бьёт врага на урон оружия плюс {damage}, вызывает кровотечение на 12 сек. и повышает получаемый уроном от кровотечения на 40%. Даёт 1 серию приёмов. Каждое 2-е применение добавляет 1 Сумрак (максимум 3). (знаковое умение Скрытности)',
@@ -13573,7 +13573,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Приводит в ужас врагов в пределах 8 м на срок до 4 сек. Урон может разрушить эффект.',
   'entities.abilities.shadowstep.description':
-    'Вы проходите сквозь тени к своей цели, союзнику или врагу, не прерывая Сумеречную завесу. (талант разбойника)',
+    'Вы проходите сквозь тени к своей цели, союзнику или врагу, не прерывая Сумеречную завесу. Хранит до 2 зарядов. (талант разбойника)',
   'entities.abilities.silence.description':
     'Лишает цель возможности произносить заклинания на 4 сек. (талант жреца)',
   'entities.abilities.tranquility.description':
@@ -19895,7 +19895,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '4 предмета: Low Blow делает следующую атаку в течение 6 сек. критической.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Авангард: Brawlmark Leathers',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    '2 предмета: время восстановления Swift Heels сокращается на 60 сек.',
+    '2 предмета: время восстановления Swift Heels сокращается на 12 сек.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4 предмета: пока действует Swift Heels, Wicked Slash и Haymaker дают на 1 прием серии больше.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Авангард: Shadewalk Leathers',

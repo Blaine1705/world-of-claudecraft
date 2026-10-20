@@ -4979,13 +4979,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sprint.description': '15秒間、移動速度が70%増加します。',
   'entities.abilities.kidney_shot.name': '急所打ち',
   'entities.abilities.kidney_shot.description':
-    '対象を1秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：6秒）。',
+    '対象を2秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：7秒）。',
   'entities.abilities.ambush.name': '潜伏者の一撃',
   'entities.abilities.ambush.description':
     'ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。',
   'entities.abilities.stealth.name': 'ダスクヴェール',
   'entities.abilities.stealth.description':
-    '影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。',
+    '影に身を隠します。敵にほとんど気づかれず、通常の速度で移動できます。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。',
   'entities.abilities.adrenaline_rush.name': '滾る血潮',
   'entities.abilities.adrenaline_rush.description':
     '血が熱くなり、即座にエネルギーを60回復します。',
@@ -5011,7 +5011,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を裂くフィニッシュ技。2秒ごとに出血し、6秒に加えコンボポイント1つにつき2秒続きます（コンボポイント5：16秒、合計{damage}ダメージ）。',
   'entities.abilities.vanish.name': '煙隠れ',
   'entities.abilities.vanish.description':
-    '視界から消え、戦闘中でもダスクヴェール状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。',
+    '視界から消え、戦闘中でもダスクヴェール状態に入ります。隠れている間も通常の速度で移動できます。最大10秒間持続します。',
   'entities.abilities.instant_poison.name': '毒蛇の噛みつき',
   'entities.abilities.instant_poison.description':
     '武器に30分間毒を塗り、近接攻撃ごとに{damage}の追加自然ダメージを与えます。',
@@ -5363,10 +5363,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
   'entities.abilities.cold_blood.name': 'コールドブラッド',
   'entities.abilities.cold_blood.description':
-    '殺意を研ぎ澄まし、次の攻撃を必ずクリティカルにします。（暗殺の象徴）',
+    '殺意を研ぎ澄まし、次の5回の攻撃を必ずクリティカルにします。（暗殺の象徴）',
   'entities.abilities.blade_flurry.name': 'ブレードフラリー',
   'entities.abilities.blade_flurry.description':
-    '刃の乱舞を放ち、攻撃速度を12秒間20%高めます。（コンバットの象徴）',
+    '刃の乱舞を放ち、攻撃速度を30秒間20%高めます。（コンバットの象徴）',
   'entities.abilities.hemorrhage.name': 'ヘモリッジ',
   'entities.abilities.hemorrhage.description':
     '武器ダメージに{damage}を加えて敵を打ち、12秒間の出血ダメージを与え、対象が受ける出血ダメージを40%高めます。コンボポイントを1与えます。2回使うごとに幽冥を1加えます（最大3）。（隠密の象徴）',
@@ -13362,7 +13362,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     '8ヤード以内の敵を最大4秒間おののかせます。ダメージで効果が解けることがあります。',
   'entities.abilities.shadowstep.description':
-    '影を通り抜けて、味方でも敵でも対象へ、ダスクヴェールを解除せずに近づく。（ローグのタレント）',
+    '影を通り抜けて、味方でも敵でも対象へ、ダスクヴェールを解除せずに近づく。最大2チャージまで蓄積します。（ローグのタレント）',
   'entities.abilities.silence.description': '対象を4秒間沈黙させる。（プリーストのタレント）',
   'entities.abilities.tranquility.description':
     '4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）',
@@ -19545,7 +19545,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '4点：Low Blowで6秒以内の次の攻撃がクリティカルになる。',
   'entities.itemSets.vanguard_rogue_combat.name': 'ヴァンガード：Brawlmark Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが60秒短縮。',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが12秒短縮。',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'ヴァンガード：Shadewalk Leathers',

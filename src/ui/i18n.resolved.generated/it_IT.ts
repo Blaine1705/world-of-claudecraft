@@ -13407,7 +13407,7 @@ export const it_IT: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Colpo Basso",
-        "description": "Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec)."
+        "description": "Mossa finale che stordisce il bersaglio per 2 sec più 1 sec per punto combo (5 punti combo: 7 sec)."
       },
       "ambush": {
         "name": "Colpo dell'Agguato",
@@ -13416,7 +13416,7 @@ export const it_IT: EnTranslations = {
       },
       "stealth": {
         "name": "Velo Crepuscolare",
-        "description": "Ti nasconde nell'ombra: i nemici a stento ti notano, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
+        "description": "Ti nasconde nell'ombra: i nemici a stento ti notano e ti muovi a piena velocità. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
         "specNote_subtlety": "Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const it_IT: EnTranslations = {
       },
       "vanish": {
         "name": "Foschia Evanescente",
-        "description": "Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec."
+        "description": "Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi a piena velocità mentre sei nascosto. Dura fino a 10 sec."
       },
       "instant_poison": {
         "name": "Morso della Vipera",
@@ -14223,11 +14223,11 @@ export const it_IT: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangue Freddo",
-        "description": "Concentra il tuo istinto omicida così che il tuo prossimo attacco sia un colpo critico. (firma Knifework)"
+        "description": "Concentra il tuo istinto omicida così che i tuoi prossimi 5 attacchi siano colpi critici. (firma Knifework)"
       },
       "blade_flurry": {
         "name": "Vortice di Lame",
-        "description": "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 12 sec. (firma Thuggery)"
+        "description": "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 30 sec. (firma Thuggery)"
       },
       "hemorrhage": {
         "name": "Emorragia",
@@ -14667,7 +14667,7 @@ export const it_IT: EnTranslations = {
       },
       "shadowstep": {
         "name": "Scivolo d’Ombra",
-        "description": "Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. (talento del Ladro)"
+        "description": "Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. Accumula fino a 2 cariche. (talento del Ladro)"
       },
       "silence": {
         "name": "Silenzio",
@@ -24254,7 +24254,7 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Cuoio Marchiorissa",
-        "bonus2": "Il tempo di recupero di Calcagni Veloci è ridotto di 60 sec.",
+        "bonus2": "Il tempo di recupero di Calcagni Veloci è ridotto di 12 sec.",
         "bonus4": "Mentre Calcagni Veloci è attivo, Fendente Malvagio e Colpo al Corpo concedono 1 punto combo aggiuntivo."
       },
       "vanguard_rogue_subtlety": {

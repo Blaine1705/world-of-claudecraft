@@ -250,6 +250,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
     if ((!slowImmune && a.kind === 'slow') || a.kind === 'stealth') slow = Math.min(slow, a.value);
+    // Skulduggery's Duskveil runs FASTER than normal (1.15): a stealth value
+    // above 1 rides the strongest-speed-buff layer, so Swift Heels still wins.
+    if (a.kind === 'stealth' && a.value > 1) speed = Math.max(speed, a.value);
     // Speed buffs and travel forms carry a 1+fraction multiplier (1.4 = +40%).
     // Temporary speed buffs never stack with each other: the strongest applies
     // (Dash over Loping Stride, never Dash times Loping Stride).

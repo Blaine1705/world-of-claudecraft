@@ -13407,7 +13407,7 @@ export const pl_PL: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Cios poniżej pasa",
-        "description": "Umiejętność kończąca, która ogłusza cel na 1 sekundę plus 1 sekundę za punkt combo (5 punktów combo: 6 sekund)."
+        "description": "Umiejętność kończąca, która ogłusza cel na 2 sekundy plus 1 sekundę za punkt combo (5 punktów combo: 7 sekund)."
       },
       "ambush": {
         "name": "Cios czyhacza",
@@ -13416,7 +13416,7 @@ export const pl_PL: EnTranslations = {
       },
       "stealth": {
         "name": "Zasłona zmierzchu",
-        "description": "Ukrywa cię w cieniach: wrogowie ledwo cię zauważają, ale poruszasz się o 50% wolniej. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.",
+        "description": "Ukrywa cię w cieniach: wrogowie ledwo cię zauważają i poruszasz się z pełną prędkością. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.",
         "specNote_subtlety": "Każdy otwierający cios użyty z Zasłony zmierzchu dodaje 1 Mrok (maks. 3)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanish": {
         "name": "Dymne zniknięcie",
-        "description": "Znikasz z pola widzenia, wchodząc w Duskveil nawet w walce. Ukryty poruszasz się o 50% wolniej. Trwa do 10 sek."
+        "description": "Znikasz z pola widzenia, wchodząc w Duskveil nawet w walce. Ukryty poruszasz się z pełną prędkością. Trwa do 10 sek."
       },
       "instant_poison": {
         "name": "Ukąszenie żmii",
@@ -14223,11 +14223,11 @@ export const pl_PL: EnTranslations = {
       },
       "cold_blood": {
         "name": "Zimna krew",
-        "description": "Skupia twój morderczy zamiar, dzięki czemu twój następny atak jest trafieniem krytycznym. (silnik Knifework)"
+        "description": "Skupia twój morderczy zamiar, dzięki czemu twoje następne 5 ataków to trafienia krytyczne. (silnik Knifework)"
       },
       "blade_flurry": {
         "name": "Nawałnica ostrzy",
-        "description": "Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 12 sekund. (silnik Thuggery)"
+        "description": "Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 30 sekund. (silnik Thuggery)"
       },
       "hemorrhage": {
         "name": "Krwotok",
@@ -14667,7 +14667,7 @@ export const pl_PL: EnTranslations = {
       },
       "shadowstep": {
         "name": "Cieniokrok",
-        "description": "Przechodzisz przez cienie do celu, sprzymierzeńca lub wroga, bez przerywania Zasłony zmierzchu. (talent Łotrzyka)"
+        "description": "Przechodzisz przez cienie do celu, sprzymierzeńca lub wroga, bez przerywania Zasłony zmierzchu. Gromadzi maksymalnie 2 ładunki. (talent Łotrzyka)"
       },
       "silence": {
         "name": "Cisza",
@@ -24254,7 +24254,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Skóry Znaku Bójki",
-        "bonus2": "Regeneracja umiejętności Szybkich Pięt jest zmniejszona o 60 sek.",
+        "bonus2": "Regeneracja umiejętności Szybkich Pięt jest zmniejszona o 12 sek.",
         "bonus4": "Gdy Szybkie Pięty są aktywne, Żbik Okrutny i Cios Młotkowy przyznają 1 dodatkowy punkt kombinacji."
       },
       "vanguard_rogue_subtlety": {

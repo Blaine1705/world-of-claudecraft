@@ -13407,7 +13407,7 @@ export const da_DK: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Lavt Slag",
-        "description": "Afsluttende manøvre, der bedøver målet i 1 sek. plus 1 sek. pr. combopoint (5 combopoint: 6 sek.)."
+        "description": "Afsluttende manøvre, der bedøver målet i 2 sek. plus 1 sek. pr. combopoint (5 combopoint: 7 sek.)."
       },
       "ambush": {
         "name": "Luskerens Slag",
@@ -13416,7 +13416,7 @@ export const da_DK: EnTranslations = {
       },
       "stealth": {
         "name": "Skumringsslør",
-        "description": "Skjuler dig i skyggerne: fjender lægger næsten ikke mærke til dig, men du bevæger dig 50% langsommere. At angribe eller tage skade bryder Skumringsslør. Kast igen for at træde frem.",
+        "description": "Skjuler dig i skyggerne: fjender lægger næsten ikke mærke til dig, og du bevæger dig med fuld fart. At angribe eller tage skade bryder Skumringsslør. Kast igen for at træde frem.",
         "specNote_subtlety": "Hver åbner, du bruger fra Skumringsslør, tilføjer 1 Tusmørke (maks. 3)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const da_DK: EnTranslations = {
       },
       "vanish": {
         "name": "Røgtåge",
-        "description": "Forsvind fra syne og træd ind i Duskveil selv i kamp. Du bevæger dig 50 % langsommere mens du er skjult. Varer op til 10 sek."
+        "description": "Forsvind fra syne og træd ind i Duskveil selv i kamp. Du bevæger dig med fuld fart mens du er skjult. Varer op til 10 sek."
       },
       "instant_poison": {
         "name": "Hugormbid",
@@ -14223,11 +14223,11 @@ export const da_DK: EnTranslations = {
       },
       "cold_blood": {
         "name": "Koldt blod",
-        "description": "Fokuserer din dræberinstinkt, så dit næste angreb rammer kritisk. (Knifework-motoren)"
+        "description": "Fokuserer din dræberinstinkt, så dine næste 5 angreb rammer kritisk. (Knifework-motoren)"
       },
       "blade_flurry": {
         "name": "Klingevirvel",
-        "description": "Slipper en klingebyge løs, der øger angrebshastigheden med 20% i 12 sek. (Thuggery-motoren)"
+        "description": "Slipper en klingebyge løs, der øger angrebshastigheden med 20% i 30 sek. (Thuggery-motoren)"
       },
       "hemorrhage": {
         "name": "Blødning",
@@ -14667,7 +14667,7 @@ export const da_DK: EnTranslations = {
       },
       "shadowstep": {
         "name": "Skyggesmut",
-        "description": "Træder gennem skyggerne til dit mål, ven eller fjende, uden at bryde Skumringsslør. (slyngeltalent)"
+        "description": "Træder gennem skyggerne til dit mål, ven eller fjende, uden at bryde Skumringsslør. Gemmer op til 2 ladninger. (slyngeltalent)"
       },
       "silence": {
         "name": "Tavshed",
@@ -24254,7 +24254,7 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Slagsmål Mærke Læder",
-        "bonus2": "Kvikke Hæle nedtælling reduceres med 60 sek.",
+        "bonus2": "Kvikke Hæle nedtælling reduceres med 12 sek.",
         "bonus4": "Mens Kvikke Hæle er aktiv, Vigtig Skråkryds og Høslår tildeler 1 yderligere kombinationspunkt."
       },
       "vanguard_rogue_subtlety": {

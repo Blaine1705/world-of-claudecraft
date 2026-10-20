@@ -2012,7 +2012,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Coup bas rend aussi votre prochaine attaque critique dans les 6 s qui suivent.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Cuirs Entaille-de-nuit',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Le temps de recharge de Talons ailés est réduit de 60 s.',
+    'Le temps de recharge de Talons ailés est réduit de 12 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Tant que Talons ailés est actif, Taillade perfide et Coup au corps accordent 1 point de combo supplémentaire.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Cuirs Marque-de-rixe',
@@ -9939,7 +9939,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': "Brèche d'armure",
   'entities.abilities.rupture.name': 'Hémorragie',
   'entities.abilities.vanish.description':
-    "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
+    "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez à pleine vitesse tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
   'entities.abilities.instant_poison.name': 'Morsure de vipère',
   'entities.abilities.instant_poison.description':
     'Enduit votre arme pendant 30 min, chacune de vos attaques en mêlée infligeant {damage} dégâts de Nature supplémentaires.',
@@ -15452,7 +15452,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     "Effraie les ennemis dans un rayon de 8 m pendant 4 s au plus. Les dégâts peuvent briser l'effet.",
   'entities.abilities.shadowstep.description':
-    "Vous fait traverser les ombres jusqu'à votre cible, alliée ou ennemie, sans rompre le Voile du crépuscule. (talent de Voleur)",
+    "Vous fait traverser les ombres jusqu'à votre cible, alliée ou ennemie, sans rompre le Voile du crépuscule. Cumule jusqu'à 2 charges. (talent de Voleur)",
   'entities.abilities.silence.description':
     'Réduit la cible au silence pendant 4 s. (talent de Prêtre)',
   'entities.abilities.tranquility.description':
@@ -16917,7 +16917,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     "Chaque frappe ajoute 1 Rituel du venin (maximum 6) et rembourse 15 énergie. À 6 Rituel du venin, Sommeil éternel devient Déchirure venimeuse (elle inflige d'un coup tous les dégâts de saignement restants).",
   'entities.abilities.blade_flurry.description':
-    "Déchaîne une rafale de lames, augmentant la vitesse d'attaque de 20% pendant 12 s. (signature Thuggery)",
+    "Déchaîne une rafale de lames, augmentant la vitesse d'attaque de 20% pendant 30 s. (signature Thuggery)",
   'entities.abilities.bone_armor.description':
     "Vous enveloppe d'os, absorbant des dégâts égaux à 20% de vos points de vie maximum.",
   'entities.abilities.bone_armor.name': "Armure d'os",
@@ -16932,7 +16932,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de chat uniquement.",
   'entities.abilities.claw.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.cold_blood.description':
-    'Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Art des lames)',
+    'Concentre votre instinct meurtrier pour que vos 5 prochaines attaques soient des coups critiques. (signature Art des lames)',
   'entities.abilities.corpse_explosion.description':
     "Sacrifie d'abord un Mage d’os, puis un Guerrier squelette, et une Aile funéraire seulement en dernier recours. Parmi les doublons, choisit celui dont la durée restante est la plus faible, puis le plus faible, pour infliger {damage} points de dégâts d'Ombre à l'endroit choisi.",
   'entities.abilities.corpse_explosion.name': 'Explosion de cadavre',
@@ -16985,7 +16985,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Appelle le jugement sur votre Mauvais œil principal pendant 15 s, accordant 40 Condamnation et 3 Fils du destin, activant la Possession, doublant la Condamnation générée par l'Œil principal, et augmentant les dégâts de Sentence de 20%. La première Sentence rembourse 50 Condamnation.",
   'entities.abilities.hour_of_judgment.name': 'Heure du jugement',
   'entities.abilities.kidney_shot.description':
-    'Technique de finition qui étourdit la cible pendant 1 s plus 1 s par point de combo (5 points de combo : 6 s).',
+    'Technique de finition qui étourdit la cible pendant 2 s plus 1 s par point de combo (5 points de combo : 7 s).',
   'entities.abilities.litany_of_guilt.description':
     "Maudit votre Mauvais œil principal pendant 6 s. Les gains de Condamnation libèrent une onde qui inflige des dégâts à 2 autres ennemis au plus dans un rayon de 8 m, au plus une fois par seconde. Le rang 2 l'étend à 8 s et 4 ennemis.",
   'entities.abilities.litany_of_guilt.name': 'Litanie de la culpabilité',
@@ -17073,7 +17073,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'En Forme de sélénien, chaque incantation achevée ajoute 1 Marée lunaire (maximum 3). À 3 Marée lunaire, ce bouton devient Sillage solaire : une frappe instantanée de 80 à 100 dégâts de Nature plus une brûlure de 45 sur 9 s, restaurant 35 mana et dépensant les 3.',
   'entities.abilities.stealth.description':
-    'Vous dissimule dans les ombres : les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts rompt le Voile du crépuscule. Relancez pour en sortir.',
+    'Vous dissimule dans les ombres : les ennemis vous remarquent à peine et vous vous déplacez à pleine vitesse. Attaquer ou subir des dégâts rompt le Voile du crépuscule. Relancez pour en sortir.',
   'entities.abilities.stealth.specNote_subtlety':
     'Chaque ouverture utilisée depuis le Voile du crépuscule ajoute 1 Pénombre (maximum 3).',
   'entities.abilities.swiftmend.description':

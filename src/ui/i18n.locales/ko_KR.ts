@@ -4944,13 +4944,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sprint.description': '15초 동안 이동 속도가 70%만큼 증가합니다.',
   'entities.abilities.kidney_shot.name': '반칙 가격',
   'entities.abilities.kidney_shot.description':
-    '대상을 1초에 더해 연계 점수 하나당 1초 기절시키는 마무리 기술입니다 (연계 점수 5: 6초).',
+    '대상을 2초에 더해 연계 점수 하나당 1초 기절시키는 마무리 기술입니다 (연계 점수 5: 7초).',
   'entities.abilities.ambush.name': '잠복자의 일격',
   'entities.abilities.ambush.description':
     '은신 상태에서 대상 뒤를 기습해 무기 피해의 250%에 {damage}를 더한 피해를 입힙니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.stealth.name': '황혼장막',
   'entities.abilities.stealth.description':
-    '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
+    '그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하며 최대 속도로 이동합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다.',
   'entities.abilities.adrenaline_rush.name': '들끓는 피',
   'entities.abilities.adrenaline_rush.description': '피가 끓어올라 즉시 기력 60을 회복합니다.',
   'entities.abilities.garrote.name': '철사 목조르기',
@@ -4975,7 +4975,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 찢는 마무리 기술. 2초마다 출혈하며, 6초에 더해 연계 점수 하나당 2초 지속됩니다 (연계 점수 5: 16초, 모두 {damage}의 피해).',
   'entities.abilities.vanish.name': '연막 걸음',
   'entities.abilities.vanish.description':
-    '시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다.',
+    '시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안에도 최대 속도로 이동합니다. 최대 10초 동안 지속됩니다.',
   'entities.abilities.instant_poison.name': '독사의 이빨',
   'entities.abilities.instant_poison.description':
     '30분 동안 무기에 독을 발라 근접 공격마다 {damage}의 추가 자연 피해를 입힙니다.',
@@ -5328,10 +5328,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
   'entities.abilities.cold_blood.name': '냉혈',
   'entities.abilities.cold_blood.description':
-    '살의를 벼려 다음 공격을 반드시 치명타로 만듭니다. (암살 상징 기술)',
+    '살의를 벼려 다음 5회의 공격을 반드시 치명타로 만듭니다. (암살 상징 기술)',
   'entities.abilities.blade_flurry.name': '폭풍의 칼날',
   'entities.abilities.blade_flurry.description':
-    '칼날의 난무를 펼쳐 공격 속도를 12초 동안 20% 높입니다. (전투 상징 기술)',
+    '칼날의 난무를 펼쳐 공격 속도를 30초 동안 20% 높입니다. (전투 상징 기술)',
   'entities.abilities.hemorrhage.name': '과다출혈',
   'entities.abilities.hemorrhage.description':
     '무기 피해에 {damage}를 더해 적을 타격하고 12초 동안 출혈 피해를 입히며, 대상이 받는 출혈 피해를 40% 높입니다. 연계 점수를 1 줍니다. 두 번 쓸 때마다 어스름을 1 더합니다 (최대 3). (잠행 상징 기술)',
@@ -13321,7 +13321,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     '8미터 안의 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다.',
   'entities.abilities.shadowstep.description':
-    '그림자를 가로질러 아군이든 적이든 대상에게 다가가며, 황혼장막을 해제하지 않습니다. (도적 특성)',
+    '그림자를 가로질러 아군이든 적이든 대상에게 다가가며, 황혼장막을 해제하지 않습니다. 최대 2회까지 충전됩니다. (도적 특성)',
   'entities.abilities.tranquility.description':
     '4초 동안 회복 에너지를 집중해 30미터 안의 아군을 매초 42에서 52만큼 치유합니다. (드루이드 특성)',
   'hudChrome.auraEffect.combustionCrit': '화염 주문이 항상 치명타로 적중합니다',
@@ -19518,7 +19518,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Low Blow가 6초 안의 다음 공격을 치명타로 만듭니다.',
   'entities.itemSets.vanguard_rogue_combat.name': '선봉대: Brawlmark Leathers',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    '2세트: Swift Heels의 재사용 대기시간이 60초 감소합니다.',
+    '2세트: Swift Heels의 재사용 대기시간이 12초 감소합니다.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4세트: Swift Heels 중 Wicked Slash와 Haymaker가 연계 점수 1을 추가로 부여합니다.',
   'entities.itemSets.vanguard_rogue_subtlety.name': '선봉대: Shadewalk Leathers',

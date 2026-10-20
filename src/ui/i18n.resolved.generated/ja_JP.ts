@@ -13407,7 +13407,7 @@ export const ja_JP: EnTranslations = {
       },
       "kidney_shot": {
         "name": "急所打ち",
-        "description": "対象を1秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：6秒）。"
+        "description": "対象を2秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：7秒）。"
       },
       "ambush": {
         "name": "潜伏者の一撃",
@@ -13416,7 +13416,7 @@ export const ja_JP: EnTranslations = {
       },
       "stealth": {
         "name": "ダスクヴェール",
-        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。",
+        "description": "影に身を隠します。敵にほとんど気づかれず、通常の速度で移動できます。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。",
         "specNote_subtlety": "ダスクヴェールから使う先制技ごとに薄闇の蓄えが1段階進む（最大3）。"
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanish": {
         "name": "煙隠れ",
-        "description": "視界から消え、戦闘中でもダスクヴェール状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。"
+        "description": "視界から消え、戦闘中でもダスクヴェール状態に入ります。隠れている間も通常の速度で移動できます。最大10秒間持続します。"
       },
       "instant_poison": {
         "name": "毒蛇の噛みつき",
@@ -14223,11 +14223,11 @@ export const ja_JP: EnTranslations = {
       },
       "cold_blood": {
         "name": "コールドブラッド",
-        "description": "殺意を研ぎ澄まし、次の攻撃を必ずクリティカルにします。（暗殺の象徴）"
+        "description": "殺意を研ぎ澄まし、次の5回の攻撃を必ずクリティカルにします。（暗殺の象徴）"
       },
       "blade_flurry": {
         "name": "ブレードフラリー",
-        "description": "刃の乱舞を放ち、攻撃速度を12秒間20%高めます。（コンバットの象徴）"
+        "description": "刃の乱舞を放ち、攻撃速度を30秒間20%高めます。（コンバットの象徴）"
       },
       "hemorrhage": {
         "name": "ヘモリッジ",
@@ -14667,7 +14667,7 @@ export const ja_JP: EnTranslations = {
       },
       "shadowstep": {
         "name": "影すべり",
-        "description": "影を通り抜けて、味方でも敵でも対象へ、ダスクヴェールを解除せずに近づく。（ローグのタレント）"
+        "description": "影を通り抜けて、味方でも敵でも対象へ、ダスクヴェールを解除せずに近づく。最大2チャージまで蓄積します。（ローグのタレント）"
       },
       "silence": {
         "name": "沈黙",
@@ -24254,7 +24254,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "ヴァンガード：Brawlmark Leathers",
-        "bonus2": "2点：Swift Heelsのクールダウンが60秒短縮。",
+        "bonus2": "2点：Swift Heelsのクールダウンが12秒短縮。",
         "bonus4": "4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。"
       },
       "vanguard_rogue_subtlety": {

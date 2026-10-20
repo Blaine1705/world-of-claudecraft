@@ -2187,7 +2187,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Golpe Baixo também torna seu próximo ataque em até 6 s um acerto crítico.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Couros da Marca da Briga',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'O tempo de recarga de Pés Ligeiros é reduzido em 60 s.',
+    'O tempo de recarga de Pés Ligeiros é reduzido em 12 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Enquanto Pés Ligeiros está ativo, Talho Perverso e Golpe no Corpo concedem 1 ponto de combo adicional.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Couros do Passo Sombrio',
@@ -9282,7 +9282,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Brecha na Armadura',
   'entities.abilities.rupture.name': 'Hemorragia',
   'entities.abilities.vanish.description':
-    'Some de vista, entrando em Duskveil mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s.',
+    'Some de vista, entrando em Duskveil mesmo em combate. Você se move em velocidade máxima enquanto escondido. Dura até 10 s.',
   'entities.abilities.instant_poison.name': 'Mordida da Víbora',
   'entities.abilities.instant_poison.description':
     'Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar {damage} de dano adicional da Natureza.',
@@ -14980,7 +14980,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Aterroriza os inimigos a até 8 m por até 4 s. O dano pode quebrar o efeito.',
   'entities.abilities.shadowstep.description':
-    'Avança pelas sombras até seu alvo, amigo ou inimigo, sem quebrar o Duskveil. (talento de Ladino)',
+    'Avança pelas sombras até seu alvo, amigo ou inimigo, sem quebrar o Duskveil. Acumula até 2 cargas. (talento de Ladino)',
   'entities.abilities.silence.description': 'Silencia o alvo por 4 s. (talento de Sacerdote)',
   'entities.abilities.tranquility.description':
     'Canaliza energia restauradora por 4 s, curando os aliados num raio de 30 m em 42 a 52 a cada segundo. (talento de Druida)',
@@ -17137,7 +17137,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Cada acerto adiciona 1 de Ritual de Veneno (máx. 6) e reembolsa 15 de energia. Em 6 de Ritual de Veneno, Sono Eterno se torna Rasgaveneno (causa instantaneamente todo o dano restante dos seus sangramentos de uma vez).',
   'entities.abilities.blade_flurry.description':
-    'Desencadeia uma torrente de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura de Thuggery)',
+    'Desencadeia uma torrente de lâminas, aumentando a velocidade de ataque em 20% por 30 s. (assinatura de Thuggery)',
   'entities.abilities.bone_armor.description':
     'Envolve você em ossos, absorvendo dano igual a 20% da sua vida máxima.',
   'entities.abilities.bone_armor.name': 'Bone Armor',
@@ -17152,7 +17152,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Gato.',
   'entities.abilities.claw.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
   'entities.abilities.cold_blood.description':
-    'Concentra sua intenção mortal para que seu próximo ataque seja um acerto crítico. (assinatura de Knifework)',
+    'Concentra sua intenção mortal para que seus próximos 5 ataques sejam acertos críticos. (assinatura de Knifework)',
   'entities.abilities.corpse_explosion.description':
     'Sacrifica primeiro um Mago de Ossos, depois um Guerreiro Esquelético, e uma Asa Tumular apenas como último recurso. Entre duplicatas, escolhe a que tem menos duração restante e, em seguida, a mais fraca, para causar {damage} de dano das Sombras no local escolhido.',
   'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
@@ -17204,7 +17204,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Invoca o julgamento sobre seu Evil Eye primário por 15 s, concedendo 40 de Condenação e 3 Fios do Destino, ativando a Possessão, dobrando a Condenação gerada pelo Eye primário e aumentando o dano de Sentence em 20%. A primeira Sentence reembolsa 50 de Condenação.',
   'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
   'entities.abilities.kidney_shot.description':
-    'Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s).',
+    'Movimento finalizador que atordoa o alvo por 2 s mais 1 s por ponto de combo (5 pontos de combo: 7 s).',
   'entities.abilities.litany_of_guilt.description':
     'Amaldiçoa seu Evil Eye primário por 6 s. Ganhos de Condenação liberam uma onda que causa dano a até 2 outros inimigos num raio de 8 m, no máximo uma vez por segundo. O Grau 2 estende para 8 s e 4 inimigos.',
   'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
@@ -17292,7 +17292,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'Na Forma de Luniscante, cada conjuração concluída adiciona 1 Moontide (máx. 3). Em 3 Moontide, este botão se torna Despertar Solar: um golpe instantâneo de 80 a 100 de dano de Natureza mais uma queimadura de 45 ao longo de 9 s, restaurando 35 de mana e gastando todos os 3.',
   'entities.abilities.stealth.description':
-    'Oculta você nas sombras: os inimigos mal percebem sua presença, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra o Duskveil. Lance de novo para sair.',
+    'Oculta você nas sombras: os inimigos mal percebem sua presença e você se move em velocidade máxima. Atacar ou sofrer dano quebra o Duskveil. Lance de novo para sair.',
   'entities.abilities.stealth.specNote_subtlety':
     'Cada abertura usada a partir de Duskveil adiciona 1 Gloam (máx. 3).',
   'entities.abilities.swiftmend.description':

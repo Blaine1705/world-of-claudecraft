@@ -13407,7 +13407,7 @@ export const ko_KR: EnTranslations = {
       },
       "kidney_shot": {
         "name": "반칙 가격",
-        "description": "대상을 1초에 더해 연계 점수 하나당 1초 기절시키는 마무리 기술입니다 (연계 점수 5: 6초)."
+        "description": "대상을 2초에 더해 연계 점수 하나당 1초 기절시키는 마무리 기술입니다 (연계 점수 5: 7초)."
       },
       "ambush": {
         "name": "잠복자의 일격",
@@ -13416,7 +13416,7 @@ export const ko_KR: EnTranslations = {
       },
       "stealth": {
         "name": "황혼장막",
-        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다.",
+        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하며 최대 속도로 이동합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다.",
         "specNote_subtlety": "황혼장막 상태에서 사용하는 선제 기술마다 땅거미가 1단계 쌓입니다(최대 3단계)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanish": {
         "name": "연막 걸음",
-        "description": "시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다."
+        "description": "시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안에도 최대 속도로 이동합니다. 최대 10초 동안 지속됩니다."
       },
       "instant_poison": {
         "name": "독사의 이빨",
@@ -14223,11 +14223,11 @@ export const ko_KR: EnTranslations = {
       },
       "cold_blood": {
         "name": "냉혈",
-        "description": "살의를 벼려 다음 공격을 반드시 치명타로 만듭니다. (암살 상징 기술)"
+        "description": "살의를 벼려 다음 5회의 공격을 반드시 치명타로 만듭니다. (암살 상징 기술)"
       },
       "blade_flurry": {
         "name": "폭풍의 칼날",
-        "description": "칼날의 난무를 펼쳐 공격 속도를 12초 동안 20% 높입니다. (전투 상징 기술)"
+        "description": "칼날의 난무를 펼쳐 공격 속도를 30초 동안 20% 높입니다. (전투 상징 기술)"
       },
       "hemorrhage": {
         "name": "과다출혈",
@@ -14667,7 +14667,7 @@ export const ko_KR: EnTranslations = {
       },
       "shadowstep": {
         "name": "그림자걸음",
-        "description": "그림자를 가로질러 아군이든 적이든 대상에게 다가가며, 황혼장막을 해제하지 않습니다. (도적 특성)"
+        "description": "그림자를 가로질러 아군이든 적이든 대상에게 다가가며, 황혼장막을 해제하지 않습니다. 최대 2회까지 충전됩니다. (도적 특성)"
       },
       "silence": {
         "name": "침묵",
@@ -24254,7 +24254,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "선봉대: Brawlmark Leathers",
-        "bonus2": "2세트: Swift Heels의 재사용 대기시간이 60초 감소합니다.",
+        "bonus2": "2세트: Swift Heels의 재사용 대기시간이 12초 감소합니다.",
         "bonus4": "4세트: Swift Heels 중 Wicked Slash와 Haymaker가 연계 점수 1을 추가로 부여합니다."
       },
       "vanguard_rogue_subtlety": {

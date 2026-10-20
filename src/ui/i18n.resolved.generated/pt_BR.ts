@@ -13407,7 +13407,7 @@ export const pt_BR: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Golpe Baixo",
-        "description": "Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s)."
+        "description": "Movimento finalizador que atordoa o alvo por 2 s mais 1 s por ponto de combo (5 pontos de combo: 7 s)."
       },
       "ambush": {
         "name": "Golpe do Espreitador",
@@ -13416,7 +13416,7 @@ export const pt_BR: EnTranslations = {
       },
       "stealth": {
         "name": "Véu Crepuscular",
-        "description": "Oculta você nas sombras: os inimigos mal percebem sua presença, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra o Duskveil. Lance de novo para sair.",
+        "description": "Oculta você nas sombras: os inimigos mal percebem sua presença e você se move em velocidade máxima. Atacar ou sofrer dano quebra o Duskveil. Lance de novo para sair.",
         "specNote_subtlety": "Cada abertura usada a partir de Duskveil adiciona 1 Gloam (máx. 3)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const pt_BR: EnTranslations = {
       },
       "vanish": {
         "name": "Fumaça Dissipante",
-        "description": "Some de vista, entrando em Duskveil mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s."
+        "description": "Some de vista, entrando em Duskveil mesmo em combate. Você se move em velocidade máxima enquanto escondido. Dura até 10 s."
       },
       "instant_poison": {
         "name": "Mordida da Víbora",
@@ -14223,11 +14223,11 @@ export const pt_BR: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangue Frio",
-        "description": "Concentra sua intenção mortal para que seu próximo ataque seja um acerto crítico. (assinatura de Knifework)"
+        "description": "Concentra sua intenção mortal para que seus próximos 5 ataques sejam acertos críticos. (assinatura de Knifework)"
       },
       "blade_flurry": {
         "name": "Torrente de Lâminas",
-        "description": "Desencadeia uma torrente de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura de Thuggery)"
+        "description": "Desencadeia uma torrente de lâminas, aumentando a velocidade de ataque em 20% por 30 s. (assinatura de Thuggery)"
       },
       "hemorrhage": {
         "name": "Hemorragia",
@@ -14667,7 +14667,7 @@ export const pt_BR: EnTranslations = {
       },
       "shadowstep": {
         "name": "Passo Sombrio",
-        "description": "Avança pelas sombras até seu alvo, amigo ou inimigo, sem quebrar o Duskveil. (talento de Ladino)"
+        "description": "Avança pelas sombras até seu alvo, amigo ou inimigo, sem quebrar o Duskveil. Acumula até 2 cargas. (talento de Ladino)"
       },
       "silence": {
         "name": "Silêncio",
@@ -24254,7 +24254,7 @@ export const pt_BR: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Couros da Marca da Briga",
-        "bonus2": "O tempo de recarga de Pés Ligeiros é reduzido em 60 s.",
+        "bonus2": "O tempo de recarga de Pés Ligeiros é reduzido em 12 s.",
         "bonus4": "Enquanto Pés Ligeiros está ativo, Talho Perverso e Golpe no Corpo concedem 1 ponto de combo adicional."
       },
       "vanguard_rogue_subtlety": {

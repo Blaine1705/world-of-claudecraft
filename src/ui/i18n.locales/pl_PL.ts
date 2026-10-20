@@ -1957,7 +1957,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Cios poniżej Pasa sprawia również, że Twój następny atak w ciągu 6 sek jest trafnikiem krytycznym.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Skóry Cięcia Nocy',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Regeneracja umiejętności Szybkich Pięt jest zmniejszona o 60 sek.',
+    'Regeneracja umiejętności Szybkich Pięt jest zmniejszona o 12 sek.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Gdy Szybkie Pięty są aktywne, Żbik Okrutny i Cios Młotkowy przyznają 1 dodatkowy punkt kombinacji.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Skóry Znaku Bójki',
@@ -8226,7 +8226,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiast przemienia cię w szybką, rączą postać, zwiększając szybkość poruszania się o 40% i usuwając zrywalne unieruchomienia i spowolnienia. Po przemianie nie możesz używać innych zdolności, ale możesz się przemieniać w walce i poza nią, co czyni ją idealną do ucieczki. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu.',
   'entities.abilities.travel_form.name': 'Postać Fleet',
   'entities.abilities.vanish.description':
-    'Znikasz z pola widzenia, wchodząc w Duskveil nawet w walce. Ukryty poruszasz się o 50% wolniej. Trwa do 10 sek.',
+    'Znikasz z pola widzenia, wchodząc w Duskveil nawet w walce. Ukryty poruszasz się z pełną prędkością. Trwa do 10 sek.',
   'entities.abilities.whirlwind.description':
     'Wirujesz w śmiercionośnym łuku, uderzając wszystkich pobliskich wrogów za {damage}. (Talent Furii)',
   'entities.abilities.whirlwind.name': 'Wir ostrzy',
@@ -14857,7 +14857,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Przeraża wrogów w promieniu 8 m na maksymalnie 4 s. Obrażenia mogą przerwać efekt.',
   'entities.abilities.shadowstep.description':
-    'Przechodzisz przez cienie do celu, sprzymierzeńca lub wroga, bez przerywania Zasłony zmierzchu. (talent Łotrzyka)',
+    'Przechodzisz przez cienie do celu, sprzymierzeńca lub wroga, bez przerywania Zasłony zmierzchu. Gromadzi maksymalnie 2 ładunki. (talent Łotrzyka)',
   'entities.abilities.silence.description': 'Wycisza cel na 4 sek. (talent Kapłana)',
   'entities.abilities.tranquility.description':
     'Kanalizuje uzdrawiającą energię przez 4 sek., lecząc sojuszników w promieniu 30 m o 42 do 52 co sekundę. (talent Druida)',
@@ -16446,7 +16446,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Każdy trafiony cios dodaje 1 Rytuał Jadu (maks. 6) i zwraca 15 energii. Przy 6 Rytuale Jadu, Wieczny sen zmienia się w Jadowite rozdarcie (zadaje od razu wszystkie pozostałe obrażenia twoich krwawień).',
   'entities.abilities.blade_flurry.description':
-    'Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 12 sekund. (silnik Thuggery)',
+    'Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 30 sekund. (silnik Thuggery)',
   'entities.abilities.bone_armor.description':
     'Owija cię kośćmi, pochłaniając obrażenia równe 20% twojego maksymalnego zdrowia.',
   'entities.abilities.bone_armor.name': 'Bone Armor',
@@ -16461,7 +16461,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rozerwij wroga pazurami za obrażenia broni plus {damage}. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
   'entities.abilities.claw.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.cold_blood.description':
-    'Skupia twój morderczy zamiar, dzięki czemu twój następny atak jest trafieniem krytycznym. (silnik Knifework)',
+    'Skupia twój morderczy zamiar, dzięki czemu twoje następne 5 ataków to trafienia krytyczne. (silnik Knifework)',
   'entities.abilities.corpse_explosion.description':
     'Poświęca najpierw Kościanego Maga, potem Szkieletowego Wojownika, a Grobowe Skrzydło tylko w ostateczności. Spośród duplikatów wybiera tego z najkrótszym pozostałym czasem trwania, a następnie najsłabszego, aby zadać {damage} obrażeń od Cienia w wybranym miejscu.',
   'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
@@ -16513,7 +16513,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przywołuje sąd nad twoim głównym Evil Eye na 15 sekund, przyznając 40 Potępienia i 3 Nici Przeznaczenia, aktywując Opętanie, podwajając Potępienie generowane przez główne oko i zwiększając obrażenia Sentence o 20%. Pierwsze Sentence zwraca 50 Potępienia.',
   'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
   'entities.abilities.kidney_shot.description':
-    'Umiejętność kończąca, która ogłusza cel na 1 sekundę plus 1 sekundę za punkt combo (5 punktów combo: 6 sekund).',
+    'Umiejętność kończąca, która ogłusza cel na 2 sekundy plus 1 sekundę za punkt combo (5 punktów combo: 7 sekund).',
   'entities.abilities.litany_of_guilt.description':
     'Rzuca klątwę na twoje główne Evil Eye na 6 sekund. Zyski Potępienia uwalniają falę, która zadaje obrażenia maksymalnie 2 innym wrogom w promieniu 8 m, najwyżej raz na sekundę. Ranga 2 wydłuża to do 8 sekund i 4 wrogów.',
   'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
@@ -16600,7 +16600,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'W Postaci księżycowej sowy każde ukończone rzucenie dodaje 1 Księżycowy przypływ (maks. 3). Przy 3 Księżycowym przypływie ten przycisk zmienia się w Słoneczny ślad: natychmiastowe uderzenie zadające od 80 do 100 obrażeń od Natury plus podpalenie na 45 obrażeń przez 9 sekund, przywracające 35 many i zużywające wszystkie 3 stopnie Księżycowego przypływu.',
   'entities.abilities.stealth.description':
-    'Ukrywa cię w cieniach: wrogowie ledwo cię zauważają, ale poruszasz się o 50% wolniej. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.',
+    'Ukrywa cię w cieniach: wrogowie ledwo cię zauważają i poruszasz się z pełną prędkością. Atakowanie lub otrzymanie obrażeń przerywa Zasłonę zmierzchu. Rzuć ponownie, aby z niej wyjść.',
   'entities.abilities.stealth.specNote_subtlety':
     'Każdy otwierający cios użyty z Zasłony zmierzchu dodaje 1 Mrok (maks. 3).',
   'entities.abilities.swiftmend.description':

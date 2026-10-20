@@ -13407,7 +13407,7 @@ export const de_DE: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Tiefschlag",
-        "description": "Finishing-Move, der das Ziel 1 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 6 Sek.)."
+        "description": "Finishing-Move, der das Ziel 2 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 7 Sek.)."
       },
       "ambush": {
         "name": "Lauererstoß",
@@ -13416,7 +13416,7 @@ export const de_DE: EnTranslations = {
       },
       "stealth": {
         "name": "Dämmerschleier",
-        "description": "Verbirgt Euch im Schatten: Gegner bemerken Euch kaum, doch Ihr bewegt Euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um herauszutreten.",
+        "description": "Verbirgt Euch im Schatten: Gegner bemerken Euch kaum, und Ihr bewegt Euch mit voller Geschwindigkeit. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um herauszutreten.",
         "specNote_subtlety": "Jede Eröffnung, die Ihr aus Duskveil einsetzt, fügt 1 Dämmer hinzu (max. 3)."
       },
       "adrenaline_rush": {
@@ -13460,7 +13460,7 @@ export const de_DE: EnTranslations = {
       },
       "vanish": {
         "name": "Rauchschwund",
-        "description": "Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an."
+        "description": "Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch mit voller Geschwindigkeit, solange ihr verborgen seid. Hält bis zu 10 Sek. an."
       },
       "instant_poison": {
         "name": "Natternbiss",
@@ -14223,11 +14223,11 @@ export const de_DE: EnTranslations = {
       },
       "cold_blood": {
         "name": "Kaltblütigkeit",
-        "description": "Bündelt Euren Tötungswillen, sodass Euer nächster Angriff kritisch trifft. (Knifework-Engine)"
+        "description": "Bündelt Euren Tötungswillen, sodass Eure nächsten 5 Angriffe kritisch treffen. (Knifework-Engine)"
       },
       "blade_flurry": {
         "name": "Klingenwirbel",
-        "description": "Entfesselt einen Klingenwirbel, der das Angriffstempo 12 Sek. lang um 20% erhöht. (Thuggery-Engine)"
+        "description": "Entfesselt einen Klingenwirbel, der das Angriffstempo 30 Sek. lang um 20% erhöht. (Thuggery-Engine)"
       },
       "hemorrhage": {
         "name": "Blutsturz",
@@ -14667,7 +14667,7 @@ export const de_DE: EnTranslations = {
       },
       "shadowstep": {
         "name": "Schattengleiten",
-        "description": "Tretet durch die Schatten auf Euer Ziel zu, Freund oder Feind, ohne Duskveil zu brechen. (Schurkentalent)"
+        "description": "Tretet durch die Schatten auf Euer Ziel zu, Freund oder Feind, ohne Duskveil zu brechen. Speichert bis zu 2 Aufladungen. (Schurkentalent)"
       },
       "silence": {
         "name": "Stille",
@@ -24254,7 +24254,7 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Kampfmal-Lederrüstung",
-        "bonus2": "Die Abklingzeit von Flinke Fersen wird um 60 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Flinke Fersen wird um 12 Sek. verkürzt.",
         "bonus4": "Während Flinke Fersen aktiv ist, gewähren Boshafter Hieb und Körpertreffer 1 zusätzlichen Kombopunkt."
       },
       "vanguard_rogue_subtlety": {

@@ -78,8 +78,9 @@ export const VANGUARD_ASSASSINATION_2PC_LOW_BLOW_ENERGY_CUT = 10;
 export const VANGUARD_ASSASSINATION_LOW_BLOW_BASE_ENERGY = 25;
 /** Assassination 4pc: the sure-crit window after Low Blow, in seconds. */
 export const VANGUARD_ASSASSINATION_4PC_CRIT_WINDOW_SEC = 6;
-/** Combat 2pc: Swift Heels cooldown cut in seconds (300 to 240). */
-export const VANGUARD_COMBAT_2PC_SWIFT_HEELS_COOLDOWN_CUT_SEC = 60;
+/** Combat 2pc: Swift Heels cooldown cut in seconds (60 to 48: the same 20% the
+ *  set cut from the old 300 sec base, so it can never zero the cooldown). */
+export const VANGUARD_COMBAT_2PC_SWIFT_HEELS_COOLDOWN_CUT_SEC = 12;
 /** Combat 4pc: extra combo points per Wicked Slash or Haymaker while Swift Heels runs. */
 export const VANGUARD_COMBAT_4PC_BONUS_COMBO = 1;
 /** Subtlety 2pc: Smokefade cooldown cut in seconds (300 to 240). */
@@ -450,7 +451,7 @@ export const VANGUARD_BONUSES_A: Record<string, readonly SetEngineBonusTier[]> =
   vanguard_rogue_combat: [
     {
       pieces: 2,
-      // Swift Heels 300 -> 240 sec on the resolved entry.
+      // Swift Heels 60 -> 48 sec on the resolved entry.
       effect: {
         ability: [
           { ability: 'sprint', cooldownFlat: -VANGUARD_COMBAT_2PC_SWIFT_HEELS_COOLDOWN_CUT_SEC },

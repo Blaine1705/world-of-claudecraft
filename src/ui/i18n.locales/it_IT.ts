@@ -1902,7 +1902,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpo Basso rende inoltre critico il tuo prossimo attacco sferrato entro 6 sec.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Cuoio Taglianotte',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Il tempo di recupero di Calcagni Veloci è ridotto di 60 sec.',
+    'Il tempo di recupero di Calcagni Veloci è ridotto di 12 sec.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Mentre Calcagni Veloci è attivo, Fendente Malvagio e Colpo al Corpo concedono 1 punto combo aggiuntivo.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Cuoio Marchiorissa',
@@ -9363,7 +9363,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': "Breccia nell'Armatura",
   'entities.abilities.rupture.name': 'Dissanguamento',
   'entities.abilities.vanish.description':
-    'Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
+    'Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi a piena velocità mentre sei nascosto. Dura fino a 10 sec.',
   'entities.abilities.instant_poison.name': 'Morso della Vipera',
   'entities.abilities.instant_poison.description':
     'Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga {damage} danni della Natura aggiuntivi.',
@@ -15140,7 +15140,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     "Atterrisce i nemici entro 8 m per un massimo di 4 sec. Il danno può spezzare l'effetto.",
   'entities.abilities.shadowstep.description':
-    'Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. (talento del Ladro)',
+    'Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. Accumula fino a 2 cariche. (talento del Ladro)',
   'entities.abilities.silence.description':
     'Silenzia il bersaglio per 4 sec. (talento del Sacerdote)',
   'entities.abilities.tranquility.description':
@@ -17233,7 +17233,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Ogni colpo aggiunge 1 Rituale del Veleno (massimo 6) e rimborsa 15 energia. A 6 Rituale del Veleno, Sonno Eterno diventa Squarcio velenoso (infligge tutti i danni da sanguinamento residui in una volta).',
   'entities.abilities.blade_flurry.description':
-    "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 12 sec. (firma Thuggery)",
+    "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 30 sec. (firma Thuggery)",
   'entities.abilities.bone_armor.description':
     'Ti avvolge nelle ossa, assorbendo danni pari al 20% della tua salute massima.',
   'entities.abilities.bone_armor.name': 'Bone Armor',
@@ -17249,7 +17249,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.specNote_feral':
     'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
   'entities.abilities.cold_blood.description':
-    'Concentra il tuo istinto omicida così che il tuo prossimo attacco sia un colpo critico. (firma Knifework)',
+    'Concentra il tuo istinto omicida così che i tuoi prossimi 5 attacchi siano colpi critici. (firma Knifework)',
   'entities.abilities.corpse_explosion.description':
     "Sacrifica prima un Mago d'Ossa, poi un Guerriero Scheletrico, e un'Ala Sepolcrale solo come ultima risorsa. Tra i duplicati sceglie quello con la durata residua minore, poi il più debole, per infliggere {damage} danni da Ombra nel punto scelto.",
   'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
@@ -17302,7 +17302,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Chiama un giudizio sul tuo Evil Eye primario per 15 sec, concedendo 40 Condanna e 3 Filamenti del Fato, attivando la Possessione, raddoppiando la Condanna generata tramite l'Evil Eye primario e aumentando i danni di Sentence del 20%. La prima Sentence rimborsa 50 Condanna.",
   'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
   'entities.abilities.kidney_shot.description':
-    'Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec).',
+    'Mossa finale che stordisce il bersaglio per 2 sec più 1 sec per punto combo (5 punti combo: 7 sec).',
   'entities.abilities.litany_of_guilt.description':
     "Maledice il tuo Evil Eye primario per 6 sec. I guadagni di Condanna rilasciano un'onda che danneggia fino a 2 altri nemici entro 8 metri, al massimo una volta al secondo. Il Grado 2 lo estende a 8 sec e 4 nemici.",
   'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
@@ -17391,7 +17391,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, questo pulsante diventa Scia Solare: un colpo istantaneo da 80 a 100 danni da Natura più una bruciatura di 45 in 9 sec, che ripristina 35 mana e spende tutte e 3.',
   'entities.abilities.stealth.description':
-    "Ti nasconde nell'ombra: i nemici a stento ti notano, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
+    "Ti nasconde nell'ombra: i nemici a stento ti notano e ti muovi a piena velocità. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
   'entities.abilities.stealth.specNote_subtlety':
     'Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3).',
   'entities.abilities.swiftmend.description':
