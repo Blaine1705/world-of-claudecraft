@@ -440,6 +440,12 @@ jobs:
           fi
 
       - name: Run browser regressions
+        # Diagnostic: echo Chromium's own stderr so a browser-process crash
+        # (the v0.45.0 integration lane intermittently loses the browser at
+        # varkhul_assembly_links_visual on CI only) logs its cause. Remove
+        # once that crash is understood.
+        env:
+          DEBUG: pw:browser
         run: npm run test:browser
 
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
