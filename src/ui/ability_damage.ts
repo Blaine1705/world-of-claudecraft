@@ -141,6 +141,8 @@ export function abilityDamageBonus(
       // reading the same coefficient cast time (Verdance keeps Wildmend's).
       return directHealBonus(scaling.healPower, coefficientCastTime(res), false, out.healing);
     case 'absorb':
+    case 'aoeAllyAbsorb':
+      // Mass Barrier adds the same caster-side rider to each shielded ally.
       return absorbBonus(scaling.healPower, eff.spellPowerCoeff ?? 0, out.absorb);
     case 'hot': {
       // A HoT that rides a direct heal (Regrowth) does NOT scale in combat (the
@@ -293,7 +295,11 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
 export function abilitySecondaryEffect(res: ResolvedAbility): AbilityEffect | undefined {
   return res.effects.find(
     (eff) =>
-      eff.type === 'dot' || eff.type === 'hot' || eff.type === 'absorb' || eff.type === 'imbue',
+      eff.type === 'dot' ||
+      eff.type === 'hot' ||
+      eff.type === 'absorb' ||
+      eff.type === 'aoeAllyAbsorb' ||
+      eff.type === 'imbue',
   );
 }
 

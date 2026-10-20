@@ -3393,6 +3393,16 @@ export function runEffects(
             : ability.id === 'mass_barrier' && spec === 'fire'
               ? 'fire'
               : ability.school;
+        // The healPower rider is computed once per cast from the CASTER, with the
+        // same talent heal and global absorb multipliers as the single-target
+        // 'absorb' arm, then added to every recipient's shield.
+        const shieldValue =
+          eff.amount +
+          absorbBonus(
+            p.healPower,
+            eff.spellPowerCoeff ?? 0,
+            talentHealMult * (1 + mods.global.absorbPct),
+          );
         for (const mE of recipients) {
           ctx.applyAura(mE, {
             id: ability.id,
@@ -3400,7 +3410,7 @@ export function runEffects(
             kind: 'absorb',
             remaining: eff.duration,
             duration: eff.duration,
-            value: eff.amount,
+            value: shieldValue,
             sourceId: p.id,
             school: barrierSchool,
           });
