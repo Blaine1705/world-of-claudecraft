@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "dff1615016118bb0dc061ffcef300ea1e0621bba954d172d88c8cc12f35382f0",
+  "rendererFingerprint": "590d1084fa4d931d43d3a068a6bbf15ead37c5ae195465bbc6140464138a0466",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -14,7 +14,7 @@
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "155",
-    "browserVersion": "Chrome/155.0.8059.84",
+    "browserVersion": "Chrome/155.0.8059.85",
     "requestedBackend": "swiftshader",
     "fingerprint": "6e67d503663264cff662556c81a9aa6417a8f960b7c3049c729f1444139419c4"
   },
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6445510,
-      "sha256": "19f3c4982033622ca2f97ef080f5f3b2675c5e0b025c8281da060662abf6aaba",
+      "bytes": 6445508,
+      "sha256": "73daf80bd7329b416c21a3218921ed3e9357e055829ed1419cf2557e85805d1d",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -108,8 +108,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -127,11 +127,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "95737bab987b0029b7ee0c1adb214e1c3e7eb3943a4c35334f436f0ee4944af2",
+      "sourceFingerprint": "f04fb261871d6cfb832c3ca3199001559ceadbd038823021158c1230379ef53f",
       "output": {
         "path": "public/ui/mobs/acolyte_tessa.webp",
-        "bytes": 2856,
-        "sha256": "52be5d74fdd9ae542217e112458ce97c9efb9802e8b4256a497c7a5613a0751a"
+        "bytes": 3066,
+        "sha256": "af0f4e0aecf985e4ff4574f4aa13185df910cea1b1fff7c8189ac09d59fa207f"
       }
     },
     {
@@ -228,8 +228,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -247,11 +247,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "fa14749bcaba8f78908289df30b788dc57e2c9388e2f5fb803a9aa875860a4e2",
+      "sourceFingerprint": "91cc74871f4ff9f5eda4e1816edc3d1b58136ba1bca97d865fe660de2d71c35d",
       "output": {
         "path": "public/ui/mobs/apprentice_wren.webp",
-        "bytes": 2626,
-        "sha256": "be86ab7f8688fbf7c7afc0cd54c25526f2d74ec034d98e7b759a47748f881f90"
+        "bytes": 2798,
+        "sha256": "b8a71dfb5bdc2b745f3768f2d52fe203961622d3a9436ec904bed01f118f2a63"
       }
     },
     {
@@ -1261,8 +1261,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -1280,11 +1280,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/castaway_navigator.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -1682,8 +1682,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -1701,11 +1701,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/crypt_crow_caller.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -2146,8 +2146,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -2165,11 +2165,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a055280926eef55e5be7d2468be3589fdf3951bf737299d86257f6eecda7ccf8",
+      "sourceFingerprint": "3b01a15d04386125404f682cd0895bbe39abf555b3caf98976acc3061f260ef8",
       "output": {
         "path": "public/ui/mobs/deacon_voss.webp",
-        "bytes": 2834,
-        "sha256": "9e8831e8672d725e9384d1a6456cd8823a2543ba59439a6dd96968cfc129ce62"
+        "bytes": 3118,
+        "sha256": "ae2299177e378acc552bc92f9c44b849c80f7ae91cc5342bb6827e4f368dffee"
       }
     },
     {
@@ -2567,8 +2567,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -2586,11 +2586,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7fae5c18a5b29d3df222bd8e80b4e87dcb7a389b6431e37ccc2327481aa8e242",
+      "sourceFingerprint": "7e787502d6d90ab0f5a45ad1f28a751ec1cc625eb50e4c8268f05545d4aa1bac",
       "output": {
         "path": "public/ui/mobs/drowned_cantor.webp",
-        "bytes": 2882,
-        "sha256": "08662544d5a5654622822479fc78b61251c39451e58788ab88b6f3b0e40b70c8"
+        "bytes": 3148,
+        "sha256": "0c7585c952ee5276ad22a61447574c2cc0a5dd1ecc6e019c3346a770978d22f7"
       }
     },
     {
@@ -3056,8 +3056,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -3075,11 +3075,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/eastbrook_freight_caravan.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -3137,8 +3137,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -3156,11 +3156,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "41dd1cae29c172eb98eeb97cc2ed19add87390f1412d5ffe56d822c6d5c9662f",
+      "sourceFingerprint": "b5df0eddc52c0d245e9bdb50f1234cee8f5bcc2d796daeca2aa2ccd2c364e175",
       "output": {
         "path": "public/ui/mobs/edda_reedhand.webp",
-        "bytes": 2664,
-        "sha256": "00dcd6ba952c7273323d24c70ae683ce7f268c7dbac2f081ce6fdac575cc5dc3"
+        "bytes": 2862,
+        "sha256": "786af252adaa3890ff50cc630f1f2e4e361f99325b6bd190bf289daaf48a39a1"
       }
     },
     {
@@ -3456,8 +3456,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -3475,11 +3475,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/fisher_bram.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -3673,8 +3673,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -3692,11 +3692,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/frostveil_supply_caravan.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -4162,8 +4162,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -4181,11 +4181,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8e52dd85e7e41292bc61053300a42ff5eb55560691d3401d73bf637ff5ea1559",
+      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
       "output": {
         "path": "public/ui/mobs/gorrak.webp",
-        "bytes": 2266,
-        "sha256": "07be76497c6ea3dbc7cfa7936a056ccefec765247a0d2b04a77ce71daa98ff46"
+        "bytes": 2484,
+        "sha256": "5df25394c913644caf5cb42657a7df1d177e0a7050ae624fbdbb3afe077bb76d"
       }
     },
     {
@@ -4311,8 +4311,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -4330,11 +4330,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7a23830ee6a459eb1ac6be04de588afc827bdaa15b7deb71d142aaeac4c200c6",
+      "sourceFingerprint": "681f43a11779c9fc29ff17023574d8f5dfa144c825fdf2d0753f056c856c08cb",
       "output": {
         "path": "public/ui/mobs/gravecaller_cultist.webp",
-        "bytes": 2242,
-        "sha256": "220683f07f35651a8c61ba1e7f2baf9e6049ec4c57ff50098a638f9192d197a4"
+        "bytes": 2424,
+        "sha256": "12edd80f6a07ea21abc015970fbd3d1360efaf2518a4257bcc62679a60cbc255"
       }
     },
     {
@@ -4392,8 +4392,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -4411,11 +4411,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a055280926eef55e5be7d2468be3589fdf3951bf737299d86257f6eecda7ccf8",
+      "sourceFingerprint": "3b01a15d04386125404f682cd0895bbe39abf555b3caf98976acc3061f260ef8",
       "output": {
         "path": "public/ui/mobs/gravecaller_mender.webp",
-        "bytes": 2834,
-        "sha256": "9e8831e8672d725e9384d1a6456cd8823a2543ba59439a6dd96968cfc129ce62"
+        "bytes": 3118,
+        "sha256": "ae2299177e378acc552bc92f9c44b849c80f7ae91cc5342bb6827e4f368dffee"
       }
     },
     {
@@ -4473,8 +4473,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -4492,11 +4492,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7b09917ce50951e65fe6c2833eef9fce6618a06f3c6cadfaf9c5d2a07ff5f4f0",
+      "sourceFingerprint": "4755348f41b3a87df4a4de18947160a172dc15f7286ba2e66be1629fb31e44e6",
       "output": {
         "path": "public/ui/mobs/gravecaller_summoner.webp",
-        "bytes": 2246,
-        "sha256": "36adf9621abd861bd69972b3d9d4f8b129add754641760202ccdc9963928458e"
+        "bytes": 2428,
+        "sha256": "dc0653cae62d347ab30191abd1bfa4ab9da01b51f9875378eeca33e58c1eda3b"
       }
     },
     {
@@ -4554,8 +4554,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -4573,11 +4573,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/gravedigger_mosley.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -5043,8 +5043,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -5062,11 +5062,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f7e90ae13086ab76d0c877f2493485fab1ca22c1ea9f3d8c7ae758948e8d3191",
+      "sourceFingerprint": "fd097fdab731a680287b768f56fbd085a21a9d9fb4986dd192ce2df296479cf0",
       "output": {
         "path": "public/ui/mobs/hedge_knight.webp",
-        "bytes": 3282,
-        "sha256": "041ba0f3f9d0eb50afa80591e5b8a86d9b575d3b62bc5817166848977734d75a"
+        "bytes": 3588,
+        "sha256": "952aaad00353941e8d13150e3bdbb8f0a32e4c3ec5ea3c722860289e195d68fc"
       }
     },
     {
@@ -6876,8 +6876,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -6895,11 +6895,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8e52dd85e7e41292bc61053300a42ff5eb55560691d3401d73bf637ff5ea1559",
+      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
       "output": {
         "path": "public/ui/mobs/mogger.webp",
-        "bytes": 2266,
-        "sha256": "07be76497c6ea3dbc7cfa7936a056ccefec765247a0d2b04a77ce71daa98ff46"
+        "bytes": 2484,
+        "sha256": "5df25394c913644caf5cb42657a7df1d177e0a7050ae624fbdbb3afe077bb76d"
       }
     },
     {
@@ -6957,8 +6957,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -6976,11 +6976,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8e52dd85e7e41292bc61053300a42ff5eb55560691d3401d73bf637ff5ea1559",
+      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
       "output": {
         "path": "public/ui/mobs/mogger_lackey.webp",
-        "bytes": 2266,
-        "sha256": "07be76497c6ea3dbc7cfa7936a056ccefec765247a0d2b04a77ce71daa98ff46"
+        "bytes": 2484,
+        "sha256": "5df25394c913644caf5cb42657a7df1d177e0a7050ae624fbdbb3afe077bb76d"
       }
     },
     {
@@ -7276,8 +7276,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -7295,11 +7295,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "2160cd61098b757600cee55602bfa8178c0c8ad9ba1c83c6b311ab43fb6e4eab",
+      "sourceFingerprint": "c00339f470977c5184c049659b597e49b31dfc2b7adda15c4b96ba5605277510",
       "output": {
         "path": "public/ui/mobs/muster_chaplain.webp",
-        "bytes": 3084,
-        "sha256": "9a8052c4b3137cd429619b641385c69bc55c75db8386fe26ed65e508a791d0d0"
+        "bytes": 3342,
+        "sha256": "950b5d3dfa5ea8a8efc80074ed415db06931e8c0b029476f846093b584f3f8d5"
       }
     },
     {
@@ -7357,8 +7357,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -7376,11 +7376,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8e52dd85e7e41292bc61053300a42ff5eb55560691d3401d73bf637ff5ea1559",
+      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
       "output": {
         "path": "public/ui/mobs/muster_drillmaster.webp",
-        "bytes": 2266,
-        "sha256": "07be76497c6ea3dbc7cfa7936a056ccefec765247a0d2b04a77ce71daa98ff46"
+        "bytes": 2484,
+        "sha256": "5df25394c913644caf5cb42657a7df1d177e0a7050ae624fbdbb3afe077bb76d"
       }
     },
     {
@@ -7472,8 +7472,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -7491,11 +7491,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8e52dd85e7e41292bc61053300a42ff5eb55560691d3401d73bf637ff5ea1559",
+      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
       "output": {
         "path": "public/ui/mobs/muster_footman.webp",
-        "bytes": 2266,
-        "sha256": "07be76497c6ea3dbc7cfa7936a056ccefec765247a0d2b04a77ce71daa98ff46"
+        "bytes": 2484,
+        "sha256": "5df25394c913644caf5cb42657a7df1d177e0a7050ae624fbdbb3afe077bb76d"
       }
     },
     {
@@ -7553,8 +7553,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -7572,11 +7572,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8e52dd85e7e41292bc61053300a42ff5eb55560691d3401d73bf637ff5ea1559",
+      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
       "output": {
         "path": "public/ui/mobs/muster_sergeant.webp",
-        "bytes": 2266,
-        "sha256": "07be76497c6ea3dbc7cfa7936a056ccefec765247a0d2b04a77ce71daa98ff46"
+        "bytes": 2484,
+        "sha256": "5df25394c913644caf5cb42657a7df1d177e0a7050ae624fbdbb3afe077bb76d"
       }
     },
     {
@@ -7749,8 +7749,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -7768,11 +7768,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "95737bab987b0029b7ee0c1adb214e1c3e7eb3943a4c35334f436f0ee4944af2",
+      "sourceFingerprint": "f04fb261871d6cfb832c3ca3199001559ceadbd038823021158c1230379ef53f",
       "output": {
         "path": "public/ui/mobs/nhalia_mourner.webp",
-        "bytes": 2856,
-        "sha256": "52be5d74fdd9ae542217e112458ce97c9efb9802e8b4256a497c7a5613a0751a"
+        "bytes": 3066,
+        "sha256": "af0f4e0aecf985e4ff4574f4aa13185df910cea1b1fff7c8189ac09d59fa207f"
       }
     },
     {
@@ -8630,8 +8630,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -8649,11 +8649,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7a23830ee6a459eb1ac6be04de588afc827bdaa15b7deb71d142aaeac4c200c6",
+      "sourceFingerprint": "681f43a11779c9fc29ff17023574d8f5dfa144c825fdf2d0753f056c856c08cb",
       "output": {
         "path": "public/ui/mobs/reliquary_gravecall_acolyte.webp",
-        "bytes": 2242,
-        "sha256": "220683f07f35651a8c61ba1e7f2baf9e6049ec4c57ff50098a638f9192d197a4"
+        "bytes": 2424,
+        "sha256": "12edd80f6a07ea21abc015970fbd3d1360efaf2518a4257bcc62679a60cbc255"
       }
     },
     {
@@ -9570,8 +9570,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -9589,11 +9589,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "079542ed6d42d99a17fdc5a532c6c663794c45fab66971298d80ca74f58bb178",
+      "sourceFingerprint": "d6b2a6787cee61adfe87825ae7d78112144597d306c94eec42176f052cbf993f",
       "output": {
         "path": "public/ui/mobs/rift_pact_acolyte.webp",
-        "bytes": 2288,
-        "sha256": "13817b1e977cd38dae9735fd7b214067ca62d4b8adf4f7041bb2f8476006fb81"
+        "bytes": 2488,
+        "sha256": "f6c352e49afd8d5e0c4e2a8a2e245109debd63d79da8b33af643adb4c2857cd9"
       }
     },
     {
@@ -10603,8 +10603,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -10622,11 +10622,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "95737bab987b0029b7ee0c1adb214e1c3e7eb3943a4c35334f436f0ee4944af2",
+      "sourceFingerprint": "f04fb261871d6cfb832c3ca3199001559ceadbd038823021158c1230379ef53f",
       "output": {
         "path": "public/ui/mobs/sister_nhalia.webp",
-        "bytes": 2856,
-        "sha256": "52be5d74fdd9ae542217e112458ce97c9efb9802e8b4256a497c7a5613a0751a"
+        "bytes": 3066,
+        "sha256": "af0f4e0aecf985e4ff4574f4aa13185df910cea1b1fff7c8189ac09d59fa207f"
       }
     },
     {
@@ -10684,8 +10684,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 330088,
-            "sha256": "75af3bb4c8bab40cb1533984c74bf54c16a0326ea2b45bc7f7a657421968ff21"
+            "bytes": 658800,
+            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
           }
         ],
         "armor": [
@@ -10703,11 +10703,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "e35add2d89443ae72b903a53aaa4eb995df1d6287004bed8b4e837509dcb394d",
+      "sourceFingerprint": "21e142603511749f4394ae2a2f4e58e26246e99325bb3606b2c5660011c77405",
       "output": {
         "path": "public/ui/mobs/sister_nhalia_drowned_canticle.webp",
-        "bytes": 2910,
-        "sha256": "17029263e84bc5f1cf1faeb287c712104568289402fc653362db374686f2e122"
+        "bytes": 3112,
+        "sha256": "7d168cf2ddfb82936872e3f89721bdc8806d32045fc65cd324e7ea3b8cf3573e"
       }
     },
     {
@@ -11411,8 +11411,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -11430,11 +11430,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9ac683025553561264ec76f95a76b5c947f64a078dbb541bbc01331806742d96",
+      "sourceFingerprint": "550bb93e78c172baae5d3e9d0aaa7f5b3c47ecceac80ce137b5a4d04d53e1595",
       "output": {
         "path": "public/ui/mobs/the_wreck_warden.webp",
-        "bytes": 2262,
-        "sha256": "efb3530eb49d47990b6fb9a4ffab3fc749fe384023461fe2f3cf76e8d056f1b0"
+        "bytes": 2510,
+        "sha256": "d1bded0afd369ba8ce10b6326d74dde877dd3ddb0b02a6ec5df533cc01f937f8"
       }
     },
     {
@@ -11594,8 +11594,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -11613,11 +11613,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7a23830ee6a459eb1ac6be04de588afc827bdaa15b7deb71d142aaeac4c200c6",
+      "sourceFingerprint": "681f43a11779c9fc29ff17023574d8f5dfa144c825fdf2d0753f056c856c08cb",
       "output": {
         "path": "public/ui/mobs/threnos_first_voice.webp",
-        "bytes": 2242,
-        "sha256": "220683f07f35651a8c61ba1e7f2baf9e6049ec4c57ff50098a638f9192d197a4"
+        "bytes": 2424,
+        "sha256": "12edd80f6a07ea21abc015970fbd3d1360efaf2518a4257bcc62679a60cbc255"
       }
     },
     {
@@ -11845,8 +11845,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -11864,11 +11864,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "47b11be099c5f82b45ba580f652ac34262c2dac9da451d9b78634d9e6cf9f5f6",
+      "sourceFingerprint": "f119a098fe244bb58c335faff90775d91d9e44c742bf669de9de9e5fb6c981a7",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection.webp",
-        "bytes": 2214,
-        "sha256": "88588d4f5433063b41aabdb3679b7cf2aa0446d923edbbb603855c20b7e8a084"
+        "bytes": 2400,
+        "sha256": "4e51d8fcc1a5da278cd7c83cacae869447c04663375883f711c03ed8ae93834d"
       }
     },
     {
@@ -11926,8 +11926,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -11945,11 +11945,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "7d37549accf9d31993643d2acc5e846c75a5da384297512855d52e2694571fc5",
+      "sourceFingerprint": "2bbd64643bab1ecebd99aeb5d7c43b8c16edc4d4a1dbed3f57b3b4182b1140e7",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_druid.webp",
-        "bytes": 2640,
-        "sha256": "ba4b48e6f8b589772c06a9155d606879b0af4f31c1b92a7e342943ed570bdfad"
+        "bytes": 2774,
+        "sha256": "2571d43a88be420d518faa7f6d7a062993d3ea002d5da7a23d190abd25330ccf"
       }
     },
     {
@@ -11995,8 +11995,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -12014,11 +12014,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "1a4cfad6793bc2ade612dd4392cf78f91ed1262ad94a1ce576b201ea063422c3",
+      "sourceFingerprint": "f0e23b23b04b046d2a4b3a12f37229a2abae83eb18651a424a8c8e0af755205a",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_hunter.webp",
-        "bytes": 2236,
-        "sha256": "706d827025db3a4033da54021647c002ad7963097cf4de0e1eee3c1a025a8be2"
+        "bytes": 2486,
+        "sha256": "13c31438243ead2c99f6faa0d05d38d56884b4c2660fff49fdecebd05b3c8026"
       }
     },
     {
@@ -12076,8 +12076,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -12095,11 +12095,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "49bbe6d1f39fd6356e99fcd4bbfb7470ebbfbe95d37538659a3c6503ae24490f",
+      "sourceFingerprint": "19b19d5d4f38cb51dfff06fbaa2c7a30cdcb7774540fc6773d32f40e40342e8c",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_mage.webp",
-        "bytes": 2620,
-        "sha256": "5f0301cd38d9e6afa95b911d6da67dfe899ea32a25de86ee4cab734742cc461e"
+        "bytes": 2716,
+        "sha256": "4c99a393dde8b391cc963e2f93db3d6065b978b85038c4573409fc9fe2b8841b"
       }
     },
     {
@@ -12157,8 +12157,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -12176,11 +12176,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "4402e345fbc741888c726a776732fe2ee6d3934fb8cb4a8b633d7713f72906d2",
+      "sourceFingerprint": "9bbfa02056d61570407337bbd51e5e9b3cd9abbb8816d43319acb0933a7fac9a",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_paladin.webp",
-        "bytes": 3032,
-        "sha256": "d2e55b81a053ae1e4e128f7c4df2d9b6a9d57608ae611f2d9332aafe0cb955c8"
+        "bytes": 3340,
+        "sha256": "9df71a375ee28cc1e6661b098d1cfef00987984690c5d448358ca1e610ddef83"
       }
     },
     {
@@ -12238,8 +12238,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -12257,11 +12257,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "84789c614c1eba6afca6605017ca82274af536811b63d5b29b5ce3411fdee8ed",
+      "sourceFingerprint": "a80164feb87d610d7dae76e93576b0544bfba6e7f3b47c9639f5c7e5e5aa0de5",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_priest.webp",
-        "bytes": 2680,
-        "sha256": "cb0ff2cdc59c30d63ae369923346bdb24085687bafc20f599a0678f8ce21db81"
+        "bytes": 2932,
+        "sha256": "6329bba3d53833c8bba14686bda69196f0d7ce1eb2938b5e076ec25e58279c73"
       }
     },
     {
@@ -12319,8 +12319,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -12338,11 +12338,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "31efc5ca3a90d1d340a0886c8eed7962e810fe055ab5af7506cc8f3cf45ea22b",
+      "sourceFingerprint": "a91b3e48ff0c3c08d89160a4bda812914f7dc32c3a1683a79fe43c0cda958f4e",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_rogue.webp",
-        "bytes": 2070,
-        "sha256": "e2bca69464c9be21b0c20fbad1247c782e2b42331cae21beb17b6c18d558b309"
+        "bytes": 2210,
+        "sha256": "a2eb61f551b34a7cced8ed0eec89994c771002e5635eea9256d0a279f8797a17"
       }
     },
     {
@@ -12400,8 +12400,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -12419,11 +12419,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "38643cd23d7d9773a44d5ae2ef79833fd1513899abd5b367cfa2c5cc21fc0ed2",
+      "sourceFingerprint": "20c4a955ab0d3d61431d2ee64ff4239d04fc0912c0ffb7e61b15f04f40ad65ca",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_shaman.webp",
-        "bytes": 2558,
-        "sha256": "90d1a590385def37f7944907829153051df3a27730e2a477f593a68c08c814ee"
+        "bytes": 2786,
+        "sha256": "ba45cf01c8d1d413b7653d85d4116854996f0677f296b69a871d29b18bea88ae"
       }
     },
     {
@@ -12481,8 +12481,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -12500,11 +12500,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "632e634239cdb5dc4d91e0a870be1fcebaec57caca5b8e617e2596bbbfd62e4a",
+      "sourceFingerprint": "d71899ae904cb59711abb5885de03b46de7acd5693255d512eff9914c3a778f4",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_warlock.webp",
-        "bytes": 2132,
-        "sha256": "6957d4c12646b48816357b47ab19c6855a4d13e1a647783205c955f83974cc09"
+        "bytes": 2292,
+        "sha256": "264d78076ace652d862dd0bb93282442b22be12c3dfa9bb4bd7e032916e504a0"
       }
     },
     {
@@ -12562,8 +12562,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -12581,11 +12581,11 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "47b11be099c5f82b45ba580f652ac34262c2dac9da451d9b78634d9e6cf9f5f6",
+      "sourceFingerprint": "f119a098fe244bb58c335faff90775d91d9e44c742bf669de9de9e5fb6c981a7",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_warrior.webp",
-        "bytes": 2214,
-        "sha256": "88588d4f5433063b41aabdb3679b7cf2aa0446d923edbbb603855c20b7e8a084"
+        "bytes": 2400,
+        "sha256": "4e51d8fcc1a5da278cd7c83cacae869447c04663375883f711c03ed8ae93834d"
       }
     },
     {
@@ -13017,8 +13017,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -13036,11 +13036,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/vale_bandit.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -13268,8 +13268,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -13287,11 +13287,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "8e52dd85e7e41292bc61053300a42ff5eb55560691d3401d73bf637ff5ea1559",
+      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
       "output": {
         "path": "public/ui/mobs/vision_aldren_warrior.webp",
-        "bytes": 2266,
-        "sha256": "07be76497c6ea3dbc7cfa7936a056ccefec765247a0d2b04a77ce71daa98ff46"
+        "bytes": 2484,
+        "sha256": "5df25394c913644caf5cb42657a7df1d177e0a7050ae624fbdbb3afe077bb76d"
       }
     },
     {
@@ -13349,8 +13349,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -13368,11 +13368,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/vision_deathstalker_voss.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -13430,8 +13430,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -13449,11 +13449,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b694be50b24b1ed9a6c436ea6461d8dcf819d09992ae3d041bf5fea0892321db",
+      "sourceFingerprint": "9b527fcda55e06c0506974f931d42af048f60fff0d4f7beb9555da021ab493e1",
       "output": {
         "path": "public/ui/mobs/vision_malric_mage.webp",
-        "bytes": 2708,
-        "sha256": "0cf0b329f5626526204beac91d6f89ea2ab7e6492aab0d34c51ee29933407684"
+        "bytes": 2896,
+        "sha256": "d4e801facfa6b5078d70996a0eea1c9f0848d0a9001c995c94ba3788e05fe798"
       }
     },
     {
@@ -14094,8 +14094,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -14113,11 +14113,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/willowfen_remedy_caravan.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
@@ -14277,8 +14277,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -14296,11 +14296,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7a23830ee6a459eb1ac6be04de588afc827bdaa15b7deb71d142aaeac4c200c6",
+      "sourceFingerprint": "681f43a11779c9fc29ff17023574d8f5dfa144c825fdf2d0753f056c856c08cb",
       "output": {
         "path": "public/ui/mobs/wyrmcult_necromancer.webp",
-        "bytes": 2242,
-        "sha256": "220683f07f35651a8c61ba1e7f2baf9e6049ec4c57ff50098a638f9192d197a4"
+        "bytes": 2424,
+        "sha256": "12edd80f6a07ea21abc015970fbd3d1360efaf2518a4257bcc62679a60cbc255"
       }
     },
     {
@@ -14358,8 +14358,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 317800,
-            "sha256": "82b89659528ff2926ccc00968d7ceec21f43287378e17e2882d0fdb2449d459a"
+            "bytes": 655932,
+            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
           }
         ],
         "armor": [
@@ -14377,11 +14377,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "6655842215e1ecbe9c9f9758ba6e91c3eb101e30aaefc9bc659a23b7efc1c86b",
+      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
       "output": {
         "path": "public/ui/mobs/wyrmcult_zealot.webp",
-        "bytes": 2236,
-        "sha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed"
+        "bytes": 2384,
+        "sha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174"
       }
     },
     {
