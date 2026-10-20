@@ -1959,12 +1959,12 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
     itemId: 'supply_crate',
     name: 'Stolen Supply Crate',
     positions: [
-      { x: 58, z: -58 },
-      { x: 73, z: -70 },
-      { x: 86, z: -82 },
-      { x: 95, z: -97 },
-      { x: 64, z: -76 },
-      { x: 81, z: -94 },
+      { x: 65, z: 23 },
+      { x: 72, z: 15 },
+      { x: 82, z: 22 },
+      { x: 106, z: 40 },
+      { x: 110, z: 48 },
+      { x: 116, z: 37 },
     ],
   },
   {

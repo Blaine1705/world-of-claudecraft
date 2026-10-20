@@ -16,10 +16,10 @@ import type { Entity, MobTemplate } from '../src/sim/types';
 
 const ORIGIN = { x: 0, y: 0, z: 0 };
 
-// Expected spawn health for a template at a level, through the curve, with the
-// classic elite multiplier createMob applies on top.
+// Expected spawn health for a template at a level, through the curve when
+// tuned, with the classic elite multiplier createMob applies on top.
 function expectedMaxHp(t: MobTemplate, level: number): number {
-  const scale = openWorldMobScale(level).health;
+  const scale = isOpenWorldTuned(t) ? openWorldMobScale(level).health : 1;
   const elite = t.elite ? 2.3 : 1;
   return Math.round((t.hpBase * scale + t.hpPerLevel * scale * (level - 1)) * elite);
 }
@@ -62,20 +62,25 @@ describe('open-world mob curve', () => {
     expect(untuned.mechanicDamageMult).toBeUndefined();
   });
 
-  it('stacks on top of the elite multiplier for open-world elites', () => {
+  it('leaves open-world elites on their authored elite ladder without double-scaling', () => {
     const mogger = MOBS.mogger;
     expect(mogger.elite).toBe(true);
-    expect(spawnOpenWorldMob(1, mogger, 6, ORIGIN).maxHp).toBe(expectedMaxHp(mogger, 6));
-    expect(expectedMaxHp(mogger, 6)).toBeGreaterThan(createMob(2, mogger, 6, ORIGIN).maxHp);
+    expect(isOpenWorldTuned(mogger)).toBe(false);
+    const spawned = spawnOpenWorldMob(1, mogger, 6, ORIGIN);
+    expect(spawned.maxHp).toBe(createMob(2, mogger, 6, ORIGIN).maxHp);
+    expect(spawned.maxHp).toBe(1357);
+    expect(spawned.maxHp).toBeGreaterThan(spawnOpenWorldMob(3, MOBS.wild_boar, 6, ORIGIN).maxHp);
+    expect(spawned.mechanicDamageMult).toBeUndefined();
   });
 
-  it('leaves decoration, practice targets, world bosses and puzzle objects alone', () => {
+  it('leaves decoration, practice targets, elites, world bosses and puzzle objects alone', () => {
     const exempt = Object.values(MOBS).filter(
-      (t) => t.dummy || t.ambient || t.worldBoss || t.xpMult === 0 || t.requiresQuestId,
+      (t) => t.dummy || t.ambient || t.elite || t.worldBoss || t.xpMult === 0 || t.requiresQuestId,
     );
     // Every exempt class is present, so this cannot pass vacuously.
     expect(exempt.some((t) => t.dummy)).toBe(true);
     expect(exempt.some((t) => t.ambient)).toBe(true);
+    expect(exempt.some((t) => t.elite)).toBe(true);
     expect(exempt.some((t) => t.worldBoss)).toBe(true);
     expect(exempt.some((t) => t.xpMult === 0)).toBe(true);
     for (const t of exempt) {
@@ -126,10 +131,10 @@ describe('open-world curve at the spawn sites', () => {
     );
   });
 
-  it('a summoned quest foe spawns on the curve', () => {
+  it('a summoned quest foe spawns on the curve while elite quest summons keep their elite ladder', () => {
     const sim = new Sim({ seed: 4242, playerClass: 'warrior' });
     const p = sim.player;
-    const template = MOBS.bound_guardian;
+    const template = MOBS.mister_crabs;
     expect(isOpenWorldTuned(template)).toBe(true);
     summonQuestMob(sim.ctx, template.id, { ...p.pos }, p.id);
     const summoned = [...sim.entities.values()].find(
@@ -138,6 +143,15 @@ describe('open-world curve at the spawn sites', () => {
     expect(summoned?.maxHp).toBe(expectedMaxHp(template, template.maxLevel));
     expect(summoned?.maxHp).toBeGreaterThan(
       createMob(0, template, template.maxLevel, ORIGIN).maxHp,
+    );
+    const eliteTemplate = MOBS.bound_guardian;
+    expect(isOpenWorldTuned(eliteTemplate)).toBe(false);
+    summonQuestMob(sim.ctx, eliteTemplate.id, { ...p.pos }, p.id);
+    const summonedElite = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.templateId === eliteTemplate.id && e.tappedById === p.id,
+    );
+    expect(summonedElite?.maxHp).toBe(
+      createMob(0, eliteTemplate, eliteTemplate.maxLevel, ORIGIN).maxHp,
     );
   });
 
