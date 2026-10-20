@@ -21381,4 +21381,152 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'bossJournal.crypt.wyrm.tipDamage': '走出標記的通道，每次恐懼咆哮後交出爆發技能。',
   'bossJournal.crypt.wyrm.tipDamageHeroic': '走出標記的通道，燃燒喪鐘期間每次都跑向安全的一半。',
   'bossJournal.crypt.wyrm.heroicKnell': '燃燒喪鐘：它升空，向半個法環噴吐 {breaths} 次火焰。',
+  'bossJournal.bastion.captain.overview':
+    '一名懸浮的幽靈船長在下層外堡的護城河上巡邏，不殺死他，吊橋就不會放下。他循環施放三種指向非坦克玩家的通道攻擊，每一種都會在發動前畫在地面上。',
+  'bossJournal.bastion.captain.phaseSummary':
+    '開戰 {first} 秒後他發出第一招，隨後依序是幽靈舷炮齊射、詛咒之錨和幻影登船，每招間隔 {recovery} 秒。每次出招時他都站在原地不動。',
+  'bossJournal.bastion.captain.broadsideSummary':
+    '{warn} 秒預警後，{lanes} 條長 {length} 碼的平行通道同時開火：通道內的所有人受到 {min} 至 {max} 傷害。',
+  'bossJournal.bastion.captain.broadsideResponse': '站在通道之間的空隙裡。',
+  'bossJournal.bastion.captain.anchorSummary':
+    '{warn} 秒預警後，一支詛咒之錨沿其通道向後拖拽 {length} 碼，歷時 {seconds} 秒，擊中沿途所有人：{min} 至 {max} 傷害。',
+  'bossJournal.bastion.captain.anchorResponse': '在錨發動前離開通道。',
+  'bossJournal.bastion.captain.boardingSummary':
+    '{warn} 秒預警後，{length} 碼通道內的所有人受到 {min} 至 {max} 傷害，隨後他沿通道衝刺。',
+  'bossJournal.bastion.captain.boardingResponse': '從通道旁讓開。',
+  'bossJournal.bastion.captain.sailorsName': '縛骸水手',
+  'bossJournal.bastion.captain.sailorsSummary':
+    '生命值降到 {first} 和 {second} 時，各有 {count} 名縛骸水手加入戰鬥。水手死亡後不久會迸發靈魂能量。',
+  'bossJournal.bastion.captain.sailorsResponse': '坦克接住牠們。遠離剛死的水手。',
+  'bossJournal.bastion.captain.tipTank':
+    '讓他原地不動，並接住縛骸水手。他的通道瞄準其他人，不會瞄準你。',
+  'bossJournal.bastion.captain.tipHealer': '幽靈舷炮齊射傷害最高：治療站在通道裡的人。',
+  'bossJournal.bastion.captain.tipDamage':
+    '盯緊地面：每個招式發動前都會畫出來。站在舷炮齊射的空隙裡。',
+  'bossJournal.bastion.olen.overview':
+    '一名墮落的聖騎士。他的鹹水池會為他提供護盾，所以坦克要把他拖出水池；團隊保持分散，這樣他的回彈壁盾和宣判光柱只會擊中一名玩家。生命值一半時他會跪下並免疫傷害，直到他的溺亡軍士全部被殺。',
+  'bossJournal.bastion.olen.phaseBreachName': '破口堡壘',
+  'bossJournal.bastion.olen.phaseBreachSummary': '他一次只施放一個技能；施法期間他的計時器暫停。',
+  'bossJournal.bastion.olen.phaseOathName': '不破誓言',
+  'bossJournal.bastion.olen.phaseOathSummary':
+    '生命值降到 {health} 時，他跪下並免疫傷害，由溺亡軍士替他作戰。',
+  'bossJournal.bastion.olen.brineSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後在他腳下生成半徑 {radius} 碼的聖化鹹水池，持續 {seconds} 秒：池中所有人每秒受到 {perSecond} 傷害。他站在任一水池中時，受到的傷害降低 {shield}。',
+  'bossJournal.bastion.olen.brineResponse': '坦克把他拖出水池。其他人也走出水池。',
+  'bossJournal.bastion.olen.bulwarkSummary':
+    '每 {every} 秒對一名非坦克玩家施放 {cast} 秒法術。盾牌對其造成 {min} 至 {max} 傷害，隨後彈向 {reach} 碼內最近的未被擊中的玩家，最多 {hits} 名玩家。',
+  'bossJournal.bastion.olen.bulwarkResponse': '保持分散：與其他所有人相距超過 {reach} 碼。',
+  'bossJournal.bastion.olen.sentenceSummary':
+    '每 {every} 秒施放 {cast} 秒法術，標記一名非坦克玩家。{seconds} 秒後，無論他們身在何處，光柱都會落在其身上：{radius} 碼內所有人受到 {min} 至 {max} 傷害。',
+  'bossJournal.bastion.olen.sentenceResponse': '被標記：在光柱落下前離開隊伍。',
+  'bossJournal.bastion.olen.arcName': '收割之弧',
+  'bossJournal.bastion.olen.arcSummary':
+    '他的每次近戰攻擊，還會以該次揮擊傷害的 {share} 打擊坦克 {radius} 碼內的其他所有玩家。',
+  'bossJournal.bastion.olen.arcResponse': '除了坦克，任何人都不要站在坦克 {radius} 碼內。',
+  'bossJournal.bastion.olen.oathSummary':
+    '僅一次，在生命值 {health} 時：他跪下並引導最多 {max} 秒，免疫所有傷害，同時 {count} 名溺亡軍士現身，攻擊非坦克玩家。全部擊殺後，他會昏迷 {stun} 秒，並在 {vulnSeconds} 秒內多受到 {vuln} 的傷害。',
+  'bossJournal.bastion.olen.oathResponse':
+    '坦克集中軍士；所有人擊殺牠們，然後在奧倫昏迷時爆發輸出。',
+  'bossJournal.bastion.olen.tipTank':
+    '把他拖出每一個鹹水池。讓隊友遠離你周圍 {radius} 碼，他的揮擊會濺射到那裡。',
+  'bossJournal.bastion.olen.tipHealer':
+    '玩家聚在一起時，回彈壁盾和潮汐宣判傷害最高。軍士在低血量時會狂暴。',
+  'bossJournal.bastion.olen.tipDamage':
+    '保持分散，彼此相距超過 {reach} 碼，並遠離坦克。誓言階段先擊殺軍士。',
+  'bossJournal.bastion.olen.choiceName': '集合還是分散？',
+  'bossJournal.bastion.olen.choiceGain':
+    '分散開來，回彈壁盾、潮汐宣判和收割之弧每次都只會擊中一名玩家。',
+  'bossJournal.bastion.olen.choiceRisk':
+    '被擊中玩家 {reach} 碼內的所有人都會受到彈射，坦克 {radius} 碼內的所有人會受到濺射。',
+  'bossJournal.bastion.olen.heroicChanges':
+    '鹹水池半徑為 {radius} 碼，盾牌彈射至 {hits} 名玩家，宣判光柱為 {sentence} 碼，現身的軍士為 {count} 名。',
+  'bossJournal.bastion.turnkey.overview':
+    '牢獄鑰匙官把玩家鎖進鐵籠。被關的玩家連按互動鍵掙脫，隊友攻擊鐵籠可以加快進度。',
+  'bossJournal.bastion.turnkey.phaseName': '牢獄鐵柵',
+  'bossJournal.bastion.turnkey.phaseSummary': '他按固定計時關押玩家，並在生命值一半時放出囚徒。',
+  'bossJournal.bastion.turnkey.cageSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後鐵籠落在一名非坦克玩家身上，使其暈眩。鐵籠有 {hits} 點耐久：被關者每按一次互動鍵破壞 {press}，盟友每次攻擊破壞 {helper}，鐵籠還會緩慢自行修復。{max} 秒後鐵籠會碾壓被關者，造成其最大生命值 {crush} 的傷害。',
+  'bossJournal.bastion.turnkey.cageHeroicSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後鐵籠落在 {cages} 名非坦克玩家身上。每個鐵籠有 {hits} 點耐久：被關者每按一次互動鍵破壞 {press}，盟友每次攻擊破壞 {helper}。籠內不斷上漲的鹽水每秒消耗生命值。{max} 秒後鐵籠會碾壓，造成最大生命值 {crush} 的傷害。',
+  'bossJournal.bastion.turnkey.cageResponse': '被關住：快速連按互動鍵。其他人攻擊鐵籠將其打破。',
+  'bossJournal.bastion.turnkey.cellsName': '打開牢房',
+  'bossJournal.bastion.turnkey.cellsSummary':
+    '生命值降到 {health} 時，他放出 {count} 名戴鐐囚徒。囚徒生命值降到四分之一時鎖鏈崩斷，他們退出戰鬥。',
+  'bossJournal.bastion.turnkey.cellsResponse': '把牠們打到四分之一生命值；不需要擊殺。',
+  'bossJournal.bastion.turnkey.tipTank': '控住他和囚徒；鐵籠永遠不會瞄準你。',
+  'bossJournal.bastion.turnkey.tipHealer': '替被關住的玩家補血：碾壓造成的是其生命值的一定比例。',
+  'bossJournal.bastion.turnkey.tipDamage': '立刻切換到每個鐵籠上，打到它破裂為止。',
+  'bossJournal.bastion.turnkey.heroicCages': '鐵籠一次鎖住 {cages} 名玩家。',
+  'bossJournal.bastion.turnkey.heroicFlood': '鹽水湧入：被關住的玩家每秒損失生命值，直到被救出。',
+  'bossJournal.bastion.ossick.overview':
+    '獄卒用錨鉤住一名玩家，並將其拖向溺亡深坑。被鉤者要跑到點亮的繫泊柱，或由團隊砸斷鎖鏈。與此同時，另外兩名玩家被鎖在一起，必須靠近彼此。',
+  'bossJournal.bastion.ossick.phaseName': '溺亡庭院',
+  'bossJournal.bastion.ossick.phaseSummary':
+    '生命值降到 {first} 和 {second} 時，每次都有 {count} 名戴鐐囚徒從牢房中出來。',
+  'bossJournal.bastion.ossick.anchorSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後一名非坦克玩家被鉤住。{settle} 秒後鎖鏈將其拖向深坑。脫身方法：跑到距被鉤處至少 {run} 碼、點亮的繫泊柱 {reach} 碼以內（該柱熄滅 {dark} 秒），或由團隊對錨造成 {hits} 次攻擊。掉進深坑：損失最大生命值的 {pit} 並暈眩 {stun} 秒。',
+  'bossJournal.bastion.ossick.anchorHeroicSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後一名非坦克玩家被鉤住；錨落地時會擊中 {crashRadius} 碼內的其他所有人，造成 {min} 至 {max} 傷害。{settle} 秒後鎖鏈將其拖向深坑。脫身方法：至少 {run} 碼外點亮的繫泊柱，或對錨造成 {hits} 次攻擊。掉進深坑：損失最大生命值的 {pit} 並暈眩 {stun} 秒。',
+  'bossJournal.bastion.ossick.anchorResponse': '被鉤住：盡早跑向點亮的繫泊柱。其他人攻擊錨。',
+  'bossJournal.bastion.ossick.shackleSummary':
+    '每 {every} 秒施放 {cast} 秒法術，將兩名玩家鎖在一起，持續 {seconds} 秒。他們每相距超過 {range} 碼一秒，雙方都會受到 {min} 至 {max} 傷害。',
+  'bossJournal.bastion.ossick.shackleResponse': '被鎖住：與搭檔保持在 {range} 碼以內。',
+  'bossJournal.bastion.ossick.cudgelSummary':
+    '每 {every} 秒對坦克施放 {cast} 秒法術：造成其近戰攻擊 {mult} 倍的傷害，無視護甲，並使移動速度降低 {slow}，持續 {seconds} 秒。',
+  'bossJournal.bastion.ossick.cudgelResponse': '坦克：使用冷卻技能。治療者預判這一擊。',
+  'bossJournal.bastion.ossick.tipTank': '把他控在場地中央附近並接住囚徒。獄卒短棍無視你的護甲。',
+  'bossJournal.bastion.ossick.tipHealer': '留意被鉤住和被鎖住的玩家；深坑會奪走大量生命值。',
+  'bossJournal.bastion.ossick.tipDamage': '有人被鉤住時立刻攻擊錨。被鎖住時與搭檔保持靠近。',
+  'bossJournal.bastion.ossick.choiceName': '跑向繫泊柱，還是砸斷鎖鏈？',
+  'bossJournal.bastion.ossick.choiceGain': '點亮的繫泊柱只救出被鉤住的玩家一人，團隊可以繼續輸出。',
+  'bossJournal.bastion.ossick.choiceRisk':
+    '繫泊柱必須至少在 {run} 碼外，並會熄滅 {dark} 秒。鎖鏈變短後，就沒有繫泊柱在搆得著的範圍內，只能砸斷鎖鏈。',
+  'bossJournal.bastion.ossick.heroicCrash': '錨墜：錨會擊中被鉤玩家 {crashRadius} 碼內的所有人。',
+  'bossJournal.bastion.ossick.heroicChanges':
+    '錨需要 {hits} 次攻擊才能砸斷，被鎖住的玩家必須保持在 {range} 碼以內。',
+  'bossJournal.bastion.vael.overview':
+    '一個戴兜帽的收割者。他連續三次從某名玩家身後的暗影池中升起，用鐮刀橫掃其後背。生命值降到{first}和{second}時，他會藏身於一模一樣的分身之間，同時聖詠傷害所有人；霧燈塔的光束會顯示哪個身影是真身。',
+  'bossJournal.bastion.vael.phaseCrownName': '信標之冠',
+  'bossJournal.bastion.vael.phaseCrownSummary':
+    '玩家踩上王冠時他會從中升起。生命值降到 {first} 和 {second} 時，各有 {count} 名溺亡奴僕加入戰鬥。',
+  'bossJournal.bastion.vael.phaseVeilSummary':
+    '生命值降到 {first} 和 {second} 時，他會藏身於一模一樣的分身之間。',
+  'bossJournal.bastion.vael.surgeSummary':
+    '施放 {cast} 秒法術，隨後對其 {radius} 碼內的所有人造成 {min} 至 {max} 傷害。一般戰鬥中每 {every} 秒一次；生命值低於 {below} 時每 {lastEvery} 秒一次。',
+  'bossJournal.bastion.vael.surgeResponse': '遠程玩家保持在 {radius} 碼之外。',
+  'bossJournal.bastion.vael.crossingSummary':
+    '每 {every} 秒他穿行暗影，最多連續 {chain} 次，每次都在不同的玩家身後：其身後 {behind} 碼處裂開一個水池，他從中升起，朝其方向橫掃 {range} 碼、{arc} 度的扇形：{min} 至 {max} 傷害。',
+  'bossJournal.bastion.vael.crossingResponse':
+    '被死亡標記：向前走出橫掃範圍，或走到水池後面。其他人絕不要站在被標記玩家的正前方。',
+  'bossJournal.bastion.vael.graveName': '墓影',
+  'bossJournal.bastion.vael.graveSummary':
+    '每個暗影池存在 {seconds} 秒，灼燒 {radius} 碼內的所有人，每秒 {perSecond} 傷害。',
+  'bossJournal.bastion.vael.graveResponse': '遠離舊的水池。',
+  'bossJournal.bastion.vael.veilSummary':
+    '他藏起身形，隨後四個身影在王冠周圍升起：維爾和三個霧影。四者齊唱溺亡聖詠，持續 {seconds} 秒，對所有人的傷害逐秒增加。霧燈塔的光束每 {beam} 秒掃過一次：真正的維爾會亮起。對其造成其生命值 {share} 的傷害即可打破霧幕：他會昏迷 {stun} 秒，並在 {vulnSeconds} 秒內多受到 {vuln} 的傷害。',
+  'bossJournal.bastion.vael.veilHeroicSummary':
+    '他藏起身形，隨後四個身影在王冠周圍升起：維爾和三個霧影，每 {drift} 秒向前挪動一個位置。四者齊唱溺亡聖詠，持續 {seconds} 秒。霧燈塔的光束會顯示真正的維爾。對其造成其生命值 {share} 的傷害即可打破霧幕：昏迷 {stun} 秒，並在 {vulnSeconds} 秒內多受到 {vuln} 的傷害。',
+  'bossJournal.bastion.vael.veilResponse': '留意光束，然後所有人只攻擊真正的維爾。',
+  'bossJournal.bastion.vael.fogburstName': '霧爆',
+  'bossJournal.bastion.vael.fogburstSummary':
+    '任何對霧影的攻擊都會使其爆裂：其 {radius} 碼內的玩家受到 {min} 至 {max} 傷害並暈眩 {stun} 秒。',
+  'bossJournal.bastion.vael.fogburstHeroicSummary':
+    '任何對霧影的攻擊都會使其爆裂：其 {radius} 碼內的玩家受到 {min} 至 {max} 傷害並暈眩 {stun} 秒，且在它原地升起一名溺亡奴僕。',
+  'bossJournal.bastion.vael.fogburstResponse': '不要攻擊分身：等待光束。',
+  'bossJournal.bastion.vael.tipTank': '接住溺亡奴僕。霧幕期間，協助找出真正的維爾。',
+  'bossJournal.bastion.vael.tipHealer':
+    '溺亡聖詠會對所有人逐步加強，直到霧幕被打破。迷霧湧動會擊中其 {radius} 碼內的所有人。',
+  'bossJournal.bastion.vael.tipDamage':
+    '被死亡標記時，向前或走到水池後面。霧幕期間，只攻擊光束照亮的身影。',
+  'bossJournal.bastion.vael.tipDamageHeroic':
+    '被死亡標記時，向前或走到水池後面，並避開舊的水池。霧幕期間，只攻擊光束照亮的身影。',
+  'bossJournal.bastion.vael.choiceName': '等待光束，還是靠猜？',
+  'bossJournal.bastion.vael.choiceGain': '等待光束能讓每次攻擊都落在真正的維爾身上，更快打破霧幕。',
+  'bossJournal.bastion.vael.choiceRisk':
+    '霧幕每持續一秒，聖詠傷害就更高。猜錯會打爆一個分身：其周圍造成傷害並暈眩。',
+  'bossJournal.bastion.vael.choiceRiskHeroic':
+    '霧幕每持續一秒，聖詠傷害就更高。猜錯會打爆一個分身，使其附近的玩家暈眩，並留下一名溺亡奴僕。',
+  'bossJournal.bastion.vael.heroicGrave': '墓影：每個暗影池持續燃燒 {seconds} 秒。',
+  'bossJournal.bastion.vael.heroicVeil':
+    '霧幕期間身影每 {drift} 秒挪動一次，被打爆的分身會留下一名溺亡奴僕。',
 };

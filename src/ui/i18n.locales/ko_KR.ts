@@ -22493,4 +22493,175 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '표시된 줄에서 벗어나고, 불타는 조종 동안에는 매번 안전한 쪽 절반으로 달려가세요.',
   'bossJournal.crypt.wyrm.heroicKnell':
     '불타는 조종: 날아올라 고리의 절반에 불을 {breaths}번 뿜습니다.',
+  'bossJournal.bastion.captain.overview':
+    '떠다니는 유령 선장이 하층 외곽의 해자를 순찰하며, 그를 쓰러뜨리기 전까지 도개교는 닫혀 있습니다. 방어 담당이 아닌 플레이어를 노리는 세 가지 레인 공격을 번갈아 사용하며, 각 공격은 발동 전에 바닥에 표시됩니다.',
+  'bossJournal.bastion.captain.phaseSummary':
+    '첫 번째 기술은 전투 시작 {first}초 후에 나가고, 이어서 유령선 일제 포격, 저주받은 닻, 환영의 승선 순서로 {recovery}초 간격으로 나갑니다. 각 기술 동안 그는 제자리에 서 있습니다.',
+  'bossJournal.bastion.captain.broadsideSummary':
+    '{warn}초 경고 후 길이 {length}야드의 평행 레인 {lanes}개가 동시에 발사됩니다: 레인 안의 모든 대상이 {min}~{max}의 피해를 입습니다.',
+  'bossJournal.bastion.captain.broadsideResponse': '레인 사이의 빈틈에 서세요.',
+  'bossJournal.bastion.captain.anchorSummary':
+    '{warn}초 경고 후 저주받은 닻이 레인을 따라 {length}야드 뒤로 {seconds}초에 걸쳐 끌려 나가며 지나가는 모든 대상에게 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.bastion.captain.anchorResponse': '발동 전에 레인에서 벗어나세요.',
+  'bossJournal.bastion.captain.boardingSummary':
+    '{warn}초 경고 후 길이 {length}야드 레인 안의 모든 대상이 {min}~{max}의 피해를 입고, 그가 레인을 따라 돌진합니다.',
+  'bossJournal.bastion.captain.boardingResponse': '레인 옆으로 비키세요.',
+  'bossJournal.bastion.captain.sailorsName': '난파선에 묶인 선원',
+  'bossJournal.bastion.captain.sailorsSummary':
+    '생명력이 {first}일 때와 {second}일 때 난파선에 묶인 선원이 {count}명씩 전투에 합류합니다. 선원은 죽은 직후 영혼 에너지로 폭발합니다.',
+  'bossJournal.bastion.captain.sailorsResponse':
+    '방어 담당이 붙잡으세요. 방금 죽은 선원에게서 떨어지세요.',
+  'bossJournal.bastion.captain.tipTank':
+    '그를 제자리에 묶어 두고 난파선에 묶인 선원을 붙잡으세요. 그의 레인은 다른 사람을 노리며, 당신은 노리지 않습니다.',
+  'bossJournal.bastion.captain.tipHealer':
+    '유령선 일제 포격이 가장 아픕니다: 레인 안에 있던 대상을 치유하세요.',
+  'bossJournal.bastion.captain.tipDamage':
+    '바닥을 보세요: 모든 기술은 발동 전에 표시됩니다. 일제 포격의 빈틈에 서세요.',
+  'bossJournal.bastion.olen.overview':
+    '타락한 성기사 기사. 소금물 웅덩이가 그를 보호하므로 방어 담당이 그를 웅덩이 밖으로 끌어내고, 파티는 흩어져서 튕겨 나오는 방패와 선고의 기둥이 한 명만 맞게 합니다. 생명력이 절반이 되면 무릎을 꿇고 무적이 되며, 익사한 부사관이 모두 죽을 때까지 유지됩니다.',
+  'bossJournal.bastion.olen.phaseBreachName': '무너진 보루',
+  'bossJournal.bastion.olen.phaseBreachSummary':
+    '한 번에 하나의 기술만 시전하며, 시전 중에는 그의 타이머가 멈춥니다.',
+  'bossJournal.bastion.olen.phaseOathName': '깨지지 않는 맹세',
+  'bossJournal.bastion.olen.phaseOathSummary':
+    '생명력이 {health}에 이르면 무릎을 꿇고 무적이 되며, 익사한 부사관이 대신 싸웁니다.',
+  'bossJournal.bastion.olen.brineSummary':
+    '{every}초마다 {cast}초 시전 후 그의 발밑에 반경 {radius}야드의 성스러운 바닷물 웅덩이를 {seconds}초 동안 만들며, 안에 있는 대상은 초당 {perSecond}의 피해를 입습니다. 그가 어느 웅덩이든 안에 서 있는 동안 받는 피해가 {shield} 줄어듭니다.',
+  'bossJournal.bastion.olen.brineResponse':
+    '방어 담당이 그를 웅덩이 밖으로 끌어내세요. 나머지도 모두 웅덩이에서 나오세요.',
+  'bossJournal.bastion.olen.bulwarkSummary':
+    '{every}초마다 {cast}초 시전으로 방어 담당이 아닌 플레이어를 노립니다. 방패가 {min}~{max}의 피해를 주고, {reach}야드 이내에서 가장 가까운 맞지 않은 플레이어에게 튕겨 최대 {hits}명까지 맞힙니다.',
+  'bossJournal.bastion.olen.bulwarkResponse':
+    '흩어지세요: 다른 모든 사람과 {reach}야드 넘게 떨어지세요.',
+  'bossJournal.bastion.olen.sentenceSummary':
+    '{every}초마다 {cast}초 시전으로 방어 담당이 아닌 플레이어에게 표식을 남깁니다. {seconds}초 뒤 어디에 있든 그 위로 기둥이 떨어져 {radius}야드 이내의 모든 대상에게 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.bastion.olen.sentenceResponse':
+    '표식이 붙으면 기둥이 떨어지기 전에 파티에서 멀리 벗어나세요.',
+  'bossJournal.bastion.olen.arcName': '수확의 궤적',
+  'bossJournal.bastion.olen.arcSummary':
+    '그의 근접 공격은 방어 담당 {radius}야드 이내의 다른 모든 플레이어에게도 휘두른 피해의 {share}만큼 적중합니다.',
+  'bossJournal.bastion.olen.arcResponse':
+    '방어 담당 외에는 아무도 방어 담당 {radius}야드 이내에 서지 마세요.',
+  'bossJournal.bastion.olen.oathSummary':
+    '생명력이 {health}일 때 한 번: 그가 무릎을 꿇고 최대 {max}초 동안 정신을 집중하며 모든 피해에 면역이 되고, 그동안 익사한 부사관 {count}명이 일어나 방어 담당이 아닌 플레이어를 공격합니다. 모두 처치하면 그는 {stun}초 동안 기절하고 {vulnSeconds}초 동안 받는 피해가 {vuln} 늘어납니다.',
+  'bossJournal.bastion.olen.oathResponse':
+    '방어 담당이 부사관을 모으고, 모두가 처치한 뒤 올렌이 기절한 동안 폭발적으로 공격하세요.',
+  'bossJournal.bastion.olen.tipTank':
+    '그를 모든 소금물 웅덩이 밖으로 끌어내세요. 그의 휘두르기가 튀는 당신 주변 {radius}야드에 파티원이 들어오지 않게 하세요.',
+  'bossJournal.bastion.olen.tipHealer':
+    '튕겨 나오는 방패와 조수의 선고는 플레이어가 뭉쳐 있을 때 가장 아픕니다. 부사관은 생명력이 낮아지면 격노합니다.',
+  'bossJournal.bastion.olen.tipDamage':
+    '서로 {reach}야드 넘게 흩어지고 방어 담당에게서도 떨어지세요. 맹세 단계에서는 부사관을 먼저 처치하세요.',
+  'bossJournal.bastion.olen.choiceName': '뭉칠까, 흩어질까?',
+  'bossJournal.bastion.olen.choiceGain':
+    '흩어지면 튕겨 나오는 방패, 조수의 선고, 수확의 궤적이 각각 한 명에게만 적중합니다.',
+  'bossJournal.bastion.olen.choiceRisk':
+    '맞은 플레이어 {reach}야드 이내의 모든 대상이 튕김 피해를 입고, 방어 담당 {radius}야드 이내의 모든 대상이 광역 피해를 입습니다.',
+  'bossJournal.bastion.olen.heroicChanges':
+    '소금물 웅덩이는 {radius}야드, 방패는 {hits}명에게 튕기고, 선고의 기둥은 {sentence}야드이며, 부사관은 {count}명이 일어납니다.',
+  'bossJournal.bastion.turnkey.overview':
+    '감옥 열쇠지기가 플레이어를 강철 우리에 가둡니다. 갇힌 플레이어는 상호작용 키를 계속 눌러 탈출하고, 동료는 우리를 공격해 속도를 높일 수 있습니다.',
+  'bossJournal.bastion.turnkey.phaseName': '감옥 쇠창살',
+  'bossJournal.bastion.turnkey.phaseSummary':
+    '일정한 간격으로 플레이어를 가두고, 생명력이 절반이 되면 죄수들을 풀어 줍니다.',
+  'bossJournal.bastion.turnkey.cageSummary':
+    '{every}초마다 {cast}초 시전 후 방어 담당이 아닌 플레이어 위로 우리가 떨어져 기절시킵니다. 우리의 내구도는 {hits}: 갇힌 플레이어가 상호작용 키를 한 번 누를 때마다 {press}, 아군이 한 번 공격할 때마다 {helper}만큼 깎이며, 우리는 천천히 복구됩니다. {max}초가 지나면 우리가 갇힌 플레이어를 짓눌러 최대 생명력의 {crush}만큼 피해를 줍니다.',
+  'bossJournal.bastion.turnkey.cageHeroicSummary':
+    '{every}초마다 {cast}초 시전 후 방어 담당이 아닌 플레이어 {cages}명 위로 우리가 떨어집니다. 우리마다 내구도는 {hits}: 갇힌 플레이어가 상호작용 키를 한 번 누를 때마다 {press}, 아군이 한 번 공격할 때마다 {helper}만큼 깎입니다. 안에서는 차오르는 소금물이 매초 생명력을 깎습니다. {max}초가 지나면 우리가 짓눌러 최대 생명력의 {crush}만큼 피해를 줍니다.',
+  'bossJournal.bastion.turnkey.cageResponse':
+    '갇혔다면 상호작용 키를 빠르게 연타하세요. 나머지는 우리를 공격해 부수세요.',
+  'bossJournal.bastion.turnkey.cellsName': '감방 열기',
+  'bossJournal.bastion.turnkey.cellsSummary':
+    '생명력이 {health}에 이르면 족쇄 찬 죄수 {count}명을 풀어 줍니다. 생명력이 4분의 1이 되면 사슬이 끊겨 전투에서 이탈합니다.',
+  'bossJournal.bastion.turnkey.cellsResponse':
+    '4분의 1 생명력까지 깎으세요. 처치할 필요는 없습니다.',
+  'bossJournal.bastion.turnkey.tipTank':
+    '그와 죄수들을 붙잡으세요. 우리는 당신을 절대 노리지 않습니다.',
+  'bossJournal.bastion.turnkey.tipHealer':
+    '갇힌 플레이어를 채워 두세요: 짓누르기는 생명력 비율 피해입니다.',
+  'bossJournal.bastion.turnkey.tipDamage': '모든 우리로 즉시 전환해 부서질 때까지 공격하세요.',
+  'bossJournal.bastion.turnkey.heroicCages': '강철 우리가 한 번에 {cages}명을 가둡니다.',
+  'bossJournal.bastion.turnkey.heroicFlood':
+    '소금물 범람: 갇힌 플레이어는 풀려날 때까지 매초 생명력을 잃습니다.',
+  'bossJournal.bastion.ossick.overview':
+    '간수가 닻으로 플레이어를 걸어 익사의 구덩이 쪽으로 끌고 갑니다. 걸린 플레이어는 불 켜진 계류 기둥으로 달리거나 파티가 사슬을 끊어야 합니다. 그동안 다른 두 플레이어가 사슬로 묶여 서로 가까이 있어야 합니다.',
+  'bossJournal.bastion.ossick.phaseName': '익사의 안뜰',
+  'bossJournal.bastion.ossick.phaseSummary':
+    '생명력이 {first}일 때와 {second}일 때마다 족쇄 찬 죄수 {count}명이 감방에서 나옵니다.',
+  'bossJournal.bastion.ossick.anchorSummary':
+    '{every}초마다 {cast}초 시전 후 방어 담당이 아닌 플레이어 한 명이 걸려듭니다. {settle}초 뒤 사슬이 그를 구덩이 쪽으로 끌어당깁니다. 탈출 방법: 걸린 위치에서 {run}야드 이상 떨어진 불 켜진 계류 기둥의 {reach}야드 이내로 도달하거나(그 기둥은 {dark}초 동안 꺼집니다), 파티가 닻을 {hits}번 공격합니다. 구덩이에 도달하면 최대 생명력의 {pit}만큼 피해를 입고 {stun}초 동안 기절합니다.',
+  'bossJournal.bastion.ossick.anchorHeroicSummary':
+    '{every}초마다 {cast}초 시전 후 방어 담당이 아닌 플레이어 한 명이 걸려들고, 닻이 떨어질 때 {crashRadius}야드 이내의 다른 모든 대상이 {min}~{max}의 피해를 입습니다. {settle}초 뒤 사슬이 그를 구덩이 쪽으로 끌어당깁니다. 탈출 방법: {run}야드 이상 떨어진 불 켜진 계류 기둥, 또는 닻 {hits}번 공격. 구덩이에 도달하면 최대 생명력의 {pit}만큼 피해를 입고 {stun}초 동안 기절합니다.',
+  'bossJournal.bastion.ossick.anchorResponse':
+    '걸렸다면 일찍 불 켜진 기둥으로 달리세요. 나머지는 닻을 공격하세요.',
+  'bossJournal.bastion.ossick.shackleSummary':
+    '{every}초마다 {cast}초 시전으로 두 플레이어를 {seconds}초 동안 사슬로 묶습니다. {range}야드 넘게 떨어져 있는 매초마다 둘 모두 {min}~{max}의 피해를 입습니다.',
+  'bossJournal.bastion.ossick.shackleResponse': '묶였다면 짝에게서 {range}야드 이내에 머무르세요.',
+  'bossJournal.bastion.ossick.cudgelSummary':
+    '{every}초마다 {cast}초 시전으로 방어 담당을 노립니다: 근접 공격의 {mult}배 피해, 방어도 무시, {seconds}초 동안 이동 속도 {slow} 감소.',
+  'bossJournal.bastion.ossick.cudgelResponse':
+    '방어 담당은 재사용 대기 기술을 사용하세요. 치유 담당은 타격에 대비하세요.',
+  'bossJournal.bastion.ossick.tipTank':
+    '그를 중앙 근처에서 붙잡고 죄수들을 붙잡으세요. 간수의 곤봉은 당신의 방어도를 무시합니다.',
+  'bossJournal.bastion.ossick.tipHealer':
+    '걸린 플레이어와 묶인 플레이어를 살피세요. 구덩이는 생명력을 크게 빼앗습니다.',
+  'bossJournal.bastion.ossick.tipDamage':
+    '누군가 걸리는 즉시 닻을 공격하세요. 묶였다면 짝 가까이에 머무르세요.',
+  'bossJournal.bastion.ossick.choiceName': '기둥으로 달릴까, 사슬을 끊을까?',
+  'bossJournal.bastion.ossick.choiceGain':
+    '불 켜진 기둥은 걸린 플레이어 혼자만 풀어 주므로 파티는 계속 공격할 수 있습니다.',
+  'bossJournal.bastion.ossick.choiceRisk':
+    '기둥은 {run}야드 이상 떨어져 있어야 하고 {dark}초 동안 꺼집니다. 사슬이 짧아지면 닿는 기둥이 없어 끊는 방법밖에 없습니다.',
+  'bossJournal.bastion.ossick.heroicCrash':
+    '닻 추락: 닻이 걸린 플레이어 {crashRadius}야드 이내의 모든 대상을 강타합니다.',
+  'bossJournal.bastion.ossick.heroicChanges':
+    '닻을 끊으려면 {hits}번의 공격이 필요하고, 묶인 플레이어는 {range}야드 이내에 있어야 합니다.',
+  'bossJournal.bastion.vael.overview':
+    '두건을 쓴 수확자. 세 번 연속으로 플레이어 뒤의 그림자 웅덩이에서 솟아올라 낫으로 등을 크게 베어 냅니다. 생명력 {first}와 {second}에서는 똑같이 생긴 분신 사이에 숨고, 그동안 성가가 모두를 해칩니다. 안개등대의 빛줄기가 어느 형상이 진짜인지 보여 줍니다.',
+  'bossJournal.bastion.vael.phaseCrownName': '등대 왕관',
+  'bossJournal.bastion.vael.phaseCrownSummary':
+    '플레이어가 왕관 위에 올라서면 그가 솟아오릅니다. 생명력이 {first}일 때와 {second}일 때 익사한 노예가 {count}명씩 전투에 합류합니다.',
+  'bossJournal.bastion.vael.phaseVeilSummary':
+    '생명력이 {first}일 때와 {second}일 때 똑같이 생긴 분신 사이에 숨습니다.',
+  'bossJournal.bastion.vael.surgeSummary':
+    '{cast}초 시전 후 그에게서 {radius}야드 이내의 모든 대상에게 {min}~{max}의 피해를 줍니다. 일반 전투 중에는 {every}초마다, 생명력 {below} 미만에서는 {lastEvery}초마다 발동합니다.',
+  'bossJournal.bastion.vael.surgeResponse': '원거리 공격 담당은 {radius}야드 밖에 머무르세요.',
+  'bossJournal.bastion.vael.crossingSummary':
+    '{every}초마다 그림자를 건너 최대 {chain}번 연속으로, 매번 다른 플레이어의 뒤로 나타납니다: 그 뒤 {behind}야드에 웅덩이가 열리고, 그가 솟아올라 그 방향으로 {range}야드, {arc}도 부채꼴을 휩쓸어 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.bastion.vael.crossingResponse':
+    '죽음의 표식이 붙으면 앞으로 움직여 휩쓸기에서 벗어나거나 웅덩이 뒤로 가세요. 다른 사람은 표식 대상의 앞에 서지 마세요.',
+  'bossJournal.bastion.vael.graveName': '무덤 그림자',
+  'bossJournal.bastion.vael.graveSummary':
+    '그림자 웅덩이는 {seconds}초 동안 남아 {radius}야드 이내의 모든 대상을 초당 {perSecond}의 피해로 태웁니다.',
+  'bossJournal.bastion.vael.graveResponse': '오래된 웅덩이에서 떨어지세요.',
+  'bossJournal.bastion.vael.veilSummary':
+    '그가 모습을 숨기고, 왕관 주위에 네 형상이 솟아오릅니다: 바엘과 안개 그림자 셋. 넷 모두 {seconds}초 동안 익사의 성가를 불러 매초 모두에게 더 큰 피해를 줍니다. 안개등대의 빛줄기가 {beam}초마다 훑고 지나가며 진짜 바엘이 빛납니다. 그의 생명력 {share}만큼 피해를 주면 장막이 깨집니다: 그는 {stun}초 동안 기절하고 {vulnSeconds}초 동안 받는 피해가 {vuln} 늘어납니다.',
+  'bossJournal.bastion.vael.veilHeroicSummary':
+    '그가 모습을 숨기고, 왕관 주위에 네 형상이 솟아오릅니다: 바엘과 안개 그림자 셋이 {drift}초마다 한 칸씩 자리를 옮깁니다. 넷 모두 {seconds}초 동안 익사의 성가를 부릅니다. 안개등대의 빛줄기가 진짜 바엘을 보여 줍니다. 그의 생명력 {share}만큼 피해를 주면 장막이 깨집니다: {stun}초 기절, {vulnSeconds}초 동안 받는 피해 {vuln} 증가.',
+  'bossJournal.bastion.vael.veilResponse': '빛줄기를 보고, 모두가 진짜 바엘만 공격하세요.',
+  'bossJournal.bastion.vael.fogburstName': '안개 폭발',
+  'bossJournal.bastion.vael.fogburstSummary':
+    '안개 그림자를 한 번이라도 공격하면 터집니다: 그 주변 {radius}야드 이내의 플레이어는 {min}~{max}의 피해를 입고 {stun}초 동안 기절합니다.',
+  'bossJournal.bastion.vael.fogburstHeroicSummary':
+    '안개 그림자를 한 번이라도 공격하면 터집니다: 그 주변 {radius}야드 이내의 플레이어는 {min}~{max}의 피해를 입고 {stun}초 동안 기절하며, 그 자리에 익사한 노예가 솟아오릅니다.',
+  'bossJournal.bastion.vael.fogburstResponse': '분신을 공격하지 마세요: 빛줄기를 기다리세요.',
+  'bossJournal.bastion.vael.tipTank':
+    '익사한 노예를 붙잡으세요. 장막이 펼쳐진 동안 진짜 바엘을 찾는 것을 도우세요.',
+  'bossJournal.bastion.vael.tipHealer':
+    '익사의 성가는 장막이 깨질 때까지 모두에게 점점 강해집니다. 안개 해일은 그에게서 {radius}야드 이내의 모두를 강타합니다.',
+  'bossJournal.bastion.vael.tipDamage':
+    '죽음의 표식이 붙으면 앞으로 이동하거나 웅덩이 뒤로 가세요. 장막 중에는 빛줄기가 비추는 형상만 공격하세요.',
+  'bossJournal.bastion.vael.tipDamageHeroic':
+    '죽음의 표식이 붙으면 앞으로 이동하거나 웅덩이 뒤로 가고, 오래된 웅덩이는 피하세요. 장막 중에는 빛줄기가 비추는 형상만 공격하세요.',
+  'bossJournal.bastion.vael.choiceName': '빛줄기를 기다릴까, 찍을까?',
+  'bossJournal.bastion.vael.choiceGain':
+    '빛줄기를 기다리면 모든 공격이 진짜 바엘에게 들어가 장막이 더 빨리 깨집니다.',
+  'bossJournal.bastion.vael.choiceRisk':
+    '장막이 이어지는 매초 성가의 피해가 커집니다. 잘못 찍으면 분신이 터져 주변에 피해와 기절을 줍니다.',
+  'bossJournal.bastion.vael.choiceRiskHeroic':
+    '장막이 이어지는 매초 성가의 피해가 커집니다. 잘못 찍으면 분신이 터져 근처 플레이어를 기절시키고 익사한 노예를 남깁니다.',
+  'bossJournal.bastion.vael.heroicGrave':
+    '무덤 그림자: 각 그림자 웅덩이가 {seconds}초 동안 계속 타오릅니다.',
+  'bossJournal.bastion.vael.heroicVeil':
+    '장막 중에는 형상들이 {drift}초마다 자리를 옮기고, 터진 분신은 익사한 노예를 남깁니다.',
 };

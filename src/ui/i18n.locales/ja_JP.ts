@@ -22476,4 +22476,170 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'bossJournal.crypt.wyrm.tipDamageHeroic':
     '示された筋から出て、燃える弔鐘の間は毎回安全な半分へ走る。',
   'bossJournal.crypt.wyrm.heroicKnell': '燃える弔鐘：飛び上がり、環の半分に炎を{breaths}回吐く。',
+  'bossJournal.bastion.captain.overview':
+    '浮遊する幽霊船長が下層外郭の堀を巡回しており、彼を倒すまで跳ね橋は上がったままだ。タンク以外のプレイヤーを狙う3種のレーン攻撃を順に繰り出し、どれも発動前に床へ描かれる。',
+  'bossJournal.bastion.captain.phaseSummary':
+    '最初の技はプル後{first}秒で始まり、幽霊船の一斉砲撃、呪いの錨、幻影の斬り込みの順に{recovery}秒間隔で続く。各技の間、彼は動かない。',
+  'bossJournal.bastion.captain.broadsideSummary':
+    '{warn}秒の予告の後、長さ{length}ヤードの平行レーン{lanes}本が一斉に発射される。レーン内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.captain.broadsideResponse': 'レーンとレーンの間の隙間に立つ。',
+  'bossJournal.bastion.captain.anchorSummary':
+    '{warn}秒の予告の後、呪いの錨がレーンに沿って{length}ヤード後方へ{seconds}秒かけて引き戻され、通り道の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.captain.anchorResponse': '発動前にレーンから出る。',
+  'bossJournal.bastion.captain.boardingSummary':
+    '{warn}秒の予告の後、長さ{length}ヤードのレーン内の全員に{min}〜{max}ダメージを与え、彼がそのレーンに沿って突進する。',
+  'bossJournal.bastion.captain.boardingResponse': 'レーンの横へ避ける。',
+  'bossJournal.bastion.captain.sailorsName': '難破船に縛られた船員',
+  'bossJournal.bastion.captain.sailorsSummary':
+    '体力が{first}と{second}になると、難破船に縛られた船員が{count}体ずつ戦闘に加わる。船員は倒れた直後に魂のエネルギーで爆発する。',
+  'bossJournal.bastion.captain.sailorsResponse':
+    'タンクが引き受ける。倒れたばかりの船員から離れる。',
+  'bossJournal.bastion.captain.tipTank':
+    '彼を動かさず、難破船に縛られた船員を引き受ける。レーンはほかの者を狙い、あなたは狙われない。',
+  'bossJournal.bastion.captain.tipHealer':
+    '幽霊船の一斉砲撃が最も痛い。レーンに立っていた者を回復する。',
+  'bossJournal.bastion.captain.tipDamage':
+    '床を見る。どの技も発動前に描かれる。一斉砲撃の隙間に立つ。',
+  'bossJournal.bastion.olen.overview':
+    '堕ちたパラディンの騎士。聖なる潮水の溜まりが彼を守るので、タンクは彼を溜まりから引き出す。パーティーは散開し、跳ね返る大盾と宣告の柱が1人にしか当たらないようにする。体力が半分になると跪いて無敵になり、溺れた軍曹が全滅するまで続く。',
+  'bossJournal.bastion.olen.phaseBreachName': '破られた砦',
+  'bossJournal.bastion.olen.phaseBreachSummary':
+    '技は一度に一つずつ詠唱し、詠唱中はタイマーが止まる。',
+  'bossJournal.bastion.olen.phaseOathName': '不壊の誓い',
+  'bossJournal.bastion.olen.phaseOathSummary':
+    '体力が{health}になると跪いて無敵になり、溺れた軍曹が代わりに戦う。',
+  'bossJournal.bastion.olen.brineSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、足元に半径{radius}ヤードの聖なる潮水の溜まりを{seconds}秒間作り、中にいる者に毎秒{perSecond}ダメージ。彼がいずれかの溜まりに立っている間は受けるダメージが{shield}減る。',
+  'bossJournal.bastion.olen.brineResponse':
+    'タンクが彼を溜まりから引き出す。ほかの全員も溜まりから出る。',
+  'bossJournal.bastion.olen.bulwarkSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーを狙う。大盾は{min}〜{max}ダメージを与え、{reach}ヤード以内で最も近い未被弾のプレイヤーへ跳ね返り、最大{hits}人に当たる。',
+  'bossJournal.bastion.olen.bulwarkResponse': '散開する：ほかの全員から{reach}ヤード以上離れる。',
+  'bossJournal.bastion.olen.sentenceSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに印を付ける。{seconds}秒後、どこにいても柱が落ち、{radius}ヤード以内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.olen.sentenceResponse': '印を受けたら、柱が落ちる前にパーティーから離れる。',
+  'bossJournal.bastion.olen.arcName': '刈り取りの弧',
+  'bossJournal.bastion.olen.arcSummary':
+    '彼の近接攻撃は、タンクから{radius}ヤード以内にいるほかの全プレイヤーにも、その一撃の{share}で当たる。',
+  'bossJournal.bastion.olen.arcResponse': 'タンクの{radius}ヤード以内にはタンク以外誰も立たない。',
+  'bossJournal.bastion.olen.oathSummary':
+    '体力が{health}になった時に1度だけ：跪いて最大{max}秒詠唱し、ダメージを受けない。その間に溺れた軍曹が{count}体現れ、タンク以外のプレイヤーを攻撃する。全員倒すと彼は{stun}秒気絶し、{vulnSeconds}秒間受けるダメージが{vuln}増える。',
+  'bossJournal.bastion.olen.oathResponse':
+    'タンクが軍曹を集め、全員で倒し、気絶中のオレンに火力を集中する。',
+  'bossJournal.bastion.olen.tipTank':
+    '彼をすべての潮水の溜まりから引き出す。彼の薙ぎ払いが飛び散る、自分の周囲{radius}ヤードにパーティーを入れない。',
+  'bossJournal.bastion.olen.tipHealer':
+    '跳ね返る大盾と潮の宣告は、プレイヤーが固まっているほど痛い。軍曹は低体力で激昂する。',
+  'bossJournal.bastion.olen.tipDamage':
+    '散開して互いに{reach}ヤード以上離れ、タンクからも離れる。誓いの段階では軍曹を先に倒す。',
+  'bossJournal.bastion.olen.choiceName': '固まる？散る？',
+  'bossJournal.bastion.olen.choiceGain':
+    '散開すれば、跳ね返る大盾、潮の宣告、刈り取りの弧はそれぞれ1人にしか当たらない。',
+  'bossJournal.bastion.olen.choiceRisk':
+    '被弾者から{reach}ヤード以内の者は跳ね返りを受け、タンクから{radius}ヤード以内の者は飛び散りを受ける。',
+  'bossJournal.bastion.olen.heroicChanges':
+    '潮水の溜まりは{radius}ヤード、大盾は{hits}人に跳ね返り、宣告の柱は{sentence}ヤード、現れる軍曹は{count}体。',
+  'bossJournal.bastion.turnkey.overview':
+    '牢の鍵番はプレイヤーを鉄の檻に閉じ込める。囚われた者はインタラクトキーを連打して脱出し、仲間は檻を攻撃して後押しできる。',
+  'bossJournal.bastion.turnkey.phaseName': '牢の鉄格子',
+  'bossJournal.bastion.turnkey.phaseSummary':
+    '一定間隔で檻に閉じ込め、体力が半分になると囚人を解き放つ。',
+  'bossJournal.bastion.turnkey.cageSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤーに檻が落ち、気絶させる。檻の耐久は{hits}：囚われた者はインタラクトキーを押すたびに{press}、味方は攻撃のたびに{helper}壊し、檻はゆっくり修復される。{max}秒経つと檻が囚われた者を押し潰し、最大体力の{crush}のダメージ。',
+  'bossJournal.bastion.turnkey.cageHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー{cages}人に檻が落ちる。各檻の耐久は{hits}：囚われた者はインタラクトキーを押すたびに{press}、味方は攻撃のたびに{helper}壊す。檻の中では上昇する塩水が毎秒体力を奪う。{max}秒経つと檻が押し潰し、最大体力の{crush}のダメージ。',
+  'bossJournal.bastion.turnkey.cageResponse':
+    '檻に入ったら：インタラクトキーを素早く連打。ほかの全員は檻を攻撃して壊す。',
+  'bossJournal.bastion.turnkey.cellsName': '房を開け放つ',
+  'bossJournal.bastion.turnkey.cellsSummary':
+    '体力が{health}になると、枷の囚人{count}体を解き放つ。体力が4分の1になると鎖が切れ、戦闘から離脱する。',
+  'bossJournal.bastion.turnkey.cellsResponse': '体力を4分の1まで削る。倒す必要はない。',
+  'bossJournal.bastion.turnkey.tipTank': '彼と囚人を引き受ける。檻があなたを狙うことはない。',
+  'bossJournal.bastion.turnkey.tipHealer':
+    '檻に入った者を回復しておく：押し潰しは体力の割合ダメージ。',
+  'bossJournal.bastion.turnkey.tipDamage': 'すべての檻を即座に狙い、壊れるまで攻撃する。',
+  'bossJournal.bastion.turnkey.heroicCages': '鉄の檻は一度に{cages}人を閉じ込める。',
+  'bossJournal.bastion.turnkey.heroicFlood':
+    '塩水の洪水：檻に入った者は、解放されるまで毎秒体力を失う。',
+  'bossJournal.bastion.ossick.overview':
+    '牢番は錨でプレイヤーを引っ掛け、溺死の穴へ巻き寄せる。引っ掛けられた者は灯った係留柱まで走るか、パーティーで鎖を断つ。その間、別の2人が鎖でつながれ、離れずにいなければならない。',
+  'bossJournal.bastion.ossick.phaseName': '溺れの中庭',
+  'bossJournal.bastion.ossick.phaseSummary':
+    '体力が{first}と{second}になるたびに、枷の囚人{count}体が牢から出てくる。',
+  'bossJournal.bastion.ossick.anchorSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー1人が引っ掛けられる。{settle}秒後、鎖が穴へ巻き寄せる。脱出：引っ掛けられた地点から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入る（その柱は{dark}秒間消える）か、パーティーが錨に{hits}回攻撃を当てる。穴に到達：最大体力の{pit}のダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.ossick.anchorHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー1人が引っ掛けられ、錨の着地で{crashRadius}ヤード以内のほかの全員に{min}〜{max}ダメージ。{settle}秒後、鎖が穴へ巻き寄せる。脱出：{run}ヤード以上離れた灯った係留柱か、錨への{hits}回の攻撃。穴に到達：最大体力の{pit}のダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.ossick.anchorResponse':
+    '引っ掛けられたら：早めに灯った係留柱へ走る。ほかの全員は錨を攻撃。',
+  'bossJournal.bastion.ossick.shackleSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、2人を{seconds}秒間鎖でつなぐ。{range}ヤードより離れて立っている間、毎秒2人とも{min}〜{max}ダメージ。',
+  'bossJournal.bastion.ossick.shackleResponse':
+    '鎖につながれたら：相方から{range}ヤード以内にいる。',
+  'bossJournal.bastion.ossick.cudgelSummary':
+    '{every}秒ごとに{cast}秒の詠唱でタンクを狙う：近接攻撃の{mult}倍のダメージ、防具無視、{seconds}秒間移動速度が{slow}低下。',
+  'bossJournal.bastion.ossick.cudgelResponse':
+    'タンク：クールダウンを使う。ヒーラーは一撃に備える。',
+  'bossJournal.bastion.ossick.tipTank':
+    '彼を中央付近で保持し、囚人を引き受ける。牢番の棍棒はあなたの防具を無視する。',
+  'bossJournal.bastion.ossick.tipHealer':
+    '引っ掛けられた者と鎖でつながれた者に注意。穴は体力の大きな割合を奪う。',
+  'bossJournal.bastion.ossick.tipDamage':
+    '誰かが引っ掛けられた瞬間に錨を攻撃。鎖でつながれたら相方の近くにいる。',
+  'bossJournal.bastion.ossick.choiceName': '柱へ走る？鎖を断つ？',
+  'bossJournal.bastion.ossick.choiceGain':
+    '灯った係留柱なら引っ掛けられた1人だけが解放され、パーティーは攻撃を続けられる。',
+  'bossJournal.bastion.ossick.choiceRisk':
+    '係留柱は{run}ヤード以上離れている必要があり、{dark}秒間消える。鎖が短くなると届く柱がなくなり、断つしかない。',
+  'bossJournal.bastion.ossick.heroicCrash':
+    '錨の墜落：錨は引っ掛けられた者から{crashRadius}ヤード以内の全員に当たる。',
+  'bossJournal.bastion.ossick.heroicChanges':
+    '錨を断つには{hits}回の攻撃が必要で、鎖でつながれた者は{range}ヤード以内にいなければならない。',
+  'bossJournal.bastion.vael.overview':
+    'フードを被った死神。3回連続でプレイヤーの背後の影の溜まりから現れ、鎌でその背中を薙ぐ。体力が{first}と{second}になると、そっくりの分身に紛れ、聖歌が全員を傷つける。霧灯台の光線が本物の姿を示す。',
+  'bossJournal.bastion.vael.phaseCrownName': '灯標の冠',
+  'bossJournal.bastion.vael.phaseCrownSummary':
+    'プレイヤーが冠に踏み込むと彼が現れる。体力が{first}と{second}になると、溺れた下僕が{count}体ずつ戦闘に加わる。',
+  'bossJournal.bastion.vael.phaseVeilSummary':
+    '体力が{first}と{second}になると、そっくりの分身に紛れる。',
+  'bossJournal.bastion.vael.surgeSummary':
+    '{cast}秒の詠唱の後、彼から{radius}ヤード以内の全員に{min}〜{max}ダメージ。通常は{every}秒ごと、体力が{below}を下回ると{lastEvery}秒ごと。',
+  'bossJournal.bastion.vael.surgeResponse': '遠隔は{radius}ヤードより外にいる。',
+  'bossJournal.bastion.vael.crossingSummary':
+    '{every}秒ごとに影を渡り、最大{chain}回連続で、毎回別のプレイヤーの背後に出る：背後{behind}ヤードに溜まりが開き、彼が現れ、その方向へ{range}ヤード、{arc}度の扇形を薙ぐ：{min}〜{max}ダメージ。',
+  'bossJournal.bastion.vael.crossingResponse':
+    '死の刻印を受けたら：前へ動いて薙ぎ払いから出るか、溜まりの後ろへ回る。ほかの者は印を受けた者の前に立たない。',
+  'bossJournal.bastion.vael.graveName': '墓の影',
+  'bossJournal.bastion.vael.graveSummary':
+    '影の溜まりは{seconds}秒間残り、{radius}ヤード以内の全員を毎秒{perSecond}ダメージで焼く。',
+  'bossJournal.bastion.vael.graveResponse': '古い溜まりに入らない。',
+  'bossJournal.bastion.vael.veilSummary':
+    '彼は姿を隠し、冠の周りに四つの姿が現れる：ヴァエルと3体の霧の影。四つとも{seconds}秒間溺れの聖歌を歌い、毎秒ごとに全員への被害が増す。霧灯台の光線が{beam}秒ごとに走査し、本物のヴァエルが光る。彼の体力の{share}を削るとヴェールが破れ、{stun}秒気絶し、{vulnSeconds}秒間受けるダメージが{vuln}増える。',
+  'bossJournal.bastion.vael.veilHeroicSummary':
+    '彼は姿を隠し、冠の周りに四つの姿が現れる：ヴァエルと3体の霧の影が{drift}秒ごとに1つずつ位置をずらす。四つとも{seconds}秒間溺れの聖歌を歌う。霧灯台の光線が本物のヴァエルを示す。彼の体力の{share}を削るとヴェールが破れ、{stun}秒の気絶と{vulnSeconds}秒間の被ダメージ{vuln}増加。',
+  'bossJournal.bastion.vael.veilResponse': '光線を見て、全員が本物のヴァエルだけを攻撃する。',
+  'bossJournal.bastion.vael.fogburstName': '霧の爆裂',
+  'bossJournal.bastion.vael.fogburstSummary':
+    '霧の影への攻撃は何であれそれを破裂させ、{radius}ヤード以内のプレイヤーに{min}〜{max}ダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.vael.fogburstHeroicSummary':
+    '霧の影への攻撃は何であれそれを破裂させ、{radius}ヤード以内のプレイヤーに{min}〜{max}ダメージと{stun}秒の気絶を与え、その場に溺れた下僕が現れる。',
+  'bossJournal.bastion.vael.fogburstResponse': '分身を攻撃しない：光線を待つ。',
+  'bossJournal.bastion.vael.tipTank':
+    '溺れた下僕を引き受ける。ヴェールの間は本物のヴァエル探しを手伝う。',
+  'bossJournal.bastion.vael.tipHealer':
+    '溺れの聖歌はヴェールが破れるまで全員に強まり続ける。霧の奔流は彼から{radius}ヤード以内の全員に当たる。',
+  'bossJournal.bastion.vael.tipDamage':
+    '死の刻印を受けたら、前へ動くか溜まりの後ろへ回る。ヴェールの間は、光線が照らす姿だけを攻撃する。',
+  'bossJournal.bastion.vael.tipDamageHeroic':
+    '死の刻印を受けたら、前へ動くか溜まりの後ろへ回り、古い溜まりも避ける。ヴェールの間は、光線が照らす姿だけを攻撃する。',
+  'bossJournal.bastion.vael.choiceName': '光線を待つ？当てずっぽう？',
+  'bossJournal.bastion.vael.choiceGain':
+    '光線を待てば全ての攻撃が本物のヴァエルに当たり、ヴェールが早く破れる。',
+  'bossJournal.bastion.vael.choiceRisk':
+    'ヴェールの間は毎秒聖歌の被害が増す。外すと分身が破裂し、周囲にダメージと気絶。',
+  'bossJournal.bastion.vael.choiceRiskHeroic':
+    'ヴェールの間は毎秒聖歌の被害が増す。外すと分身が破裂し、近くのプレイヤーを気絶させて溺れた下僕を残す。',
+  'bossJournal.bastion.vael.heroicGrave': '墓の影：影の溜まりはそれぞれ{seconds}秒間燃え続ける。',
+  'bossJournal.bastion.vael.heroicVeil':
+    'ヴェールの間、姿は{drift}秒ごとに位置をずらし、破裂した分身は溺れた下僕を残す。',
 };

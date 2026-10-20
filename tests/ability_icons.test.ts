@@ -137,13 +137,14 @@ describe('ability icons', () => {
     // (dgn_sanctum_*, src/ui/boss_journal/dungeons/gravewyrm_sanctum.ts).
     // 536: plus the Wildheart Basin boss guide recipes (dgn_wildheart_*).
     // 567: plus the Hollow Crypt boss guide recipes (dgn_crypt_*).
-    expect(ids).toHaveLength(567);
+    // 586: plus the Sunken Bastion boss guide recipes (dgn_bastion_*).
+    expect(ids).toHaveLength(586);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
     // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier;
     // then + the five-player dungeon boss guide recipes).
-    expect(hash).toBe('bff7c535b6ff2667096251ba194d8eaba1f27ba8016924eea31ef3fda8905e2d');
+    expect(hash).toBe('b9115d42afb0d98195eb133d8174760cfcf3fe1711567bedfd8b5da29a594b8b');
   });
 });

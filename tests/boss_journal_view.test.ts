@@ -17,6 +17,7 @@ import {
 import { embraceBreakShare, LADY_TUNING } from '../src/sim/encounters/hollow_crypt/lady_ids';
 import { tollDamageRange } from '../src/sim/encounters/hollow_crypt/marrow_ids';
 import { MORTHEN_TUNING } from '../src/sim/encounters/hollow_crypt/morthen_ids';
+import { OLEN_KIT } from '../src/sim/encounters/sunken_bastion/ids';
 import { BEAST_TUNING, ZULGAR_TUNING } from '../src/sim/encounters/wildheart_basin/ids';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import { journalModelFor } from '../src/ui/boss_journal/journal_model_spec';
@@ -407,4 +408,49 @@ describe('Hollow Crypt facts', () => {
   });
 });
 
+describe('Sunken Bastion facts', () => {
+  const def = DUNGEON_JOURNALS.find((d) => d.dungeonId === 'sunken_bastion');
+  if (!def) throw new Error('bastion journal missing');
+  const mechanic = (mobId: string, id: string, tier: JournalDifficulty) => {
+    const boss = def.bosses.find((b) => b.mobId === mobId);
+    if (!boss) throw new Error(mobId);
+    const found = dungeonJournalBossView(boss, tier)
+      .phases.flatMap((p) => p.mechanics)
+      .find((m) => m.id === id);
+    if (!found) throw new Error(`${mobId} ${id} ${tier}`);
+    return found;
+  };
 
+  it('runs the route Captain, Olen, Turnkey, Ossick, Vael', () => {
+    expect(def.bosses.map((b) => [b.mobId, b.rank])).toEqual([
+      ['turretback_hermit', 'miniboss'],
+      ['knight_commander_olen', 'boss'],
+      ['gaol_turnkey', 'miniboss'],
+      ['gaoler_ossick', 'boss'],
+      ['vael_the_mistcaller', 'final'],
+    ]);
+  });
+
+  it('prices heroic Hallowed Brine from its own heroic base and keeps no bar kickable', () => {
+    const factor = mechanicFactor('sunken_bastion', 'knight_commander_olen', 'heroic');
+    expect(mechanic('knight_commander_olen', 'hallowed-brine', 'heroic').values?.perSecond).toBe(
+      Math.round(OLEN_KIT.brinePerSecondHeroic * factor),
+    );
+    expect(mechanic('knight_commander_olen', 'hallowed-brine', 'normal').values?.perSecond).toBe(
+      OLEN_KIT.brinePerSecond,
+    );
+    for (const boss of def.bosses) {
+      for (const tier of ['normal', 'heroic'] as const) {
+        for (const m of dungeonJournalBossView(boss, tier).phases.flatMap((p) => p.mechanics)) {
+          expect(m.flags, `${boss.mobId} ${m.id}`).not.toContain('interruptible');
+        }
+      }
+    }
+  });
+
+  it('describes Reaping Arc as the splash circle round the tank', () => {
+    const arc = mechanic('knight_commander_olen', 'reaping-arc', 'normal');
+    expect(arc.values?.radius).toBe(MOBS.knight_commander_olen?.cleave?.radius);
+    expect(rendered(arc.summaryKey, arc.values, arc.percentValues)).toContain('within');
+  });
+});
