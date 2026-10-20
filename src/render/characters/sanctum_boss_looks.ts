@@ -47,6 +47,7 @@ import {
   KORGATH_BROKEN_CHAIN_MESH,
   KORGATH_BROKEN_GESTURE,
   KORGATH_CLIP,
+  KORGATH_CLIP_FIXES_URL,
   KORGATH_RUN_REF,
   KORGATH_RUNES_GESTURE,
   KORGATH_WHOLE_GESTURE,
@@ -156,6 +157,8 @@ export const SANCTUM_BOSS_LOOKS: Record<string, VisualDef> = {
   // Korgath the Bound: the Smith's foreman in his harness, 10.3 yd at Idle.
   sanctum_korgath: {
     url: KORGATH_BODY.url,
+    // The two-hand blows with both hands on the haft (replace the body's).
+    animUrls: [KORGATH_CLIP_FIXES_URL],
     height: bossLookHeight(KORGATH_BODY),
     clips: {
       idle: 'Idle',

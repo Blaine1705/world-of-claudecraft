@@ -656,6 +656,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/woc_crypt_rime_egg_sac.glb": "/media/models/creatures/woc_crypt_rime_egg_sac.0230798c51b3.glb",
   "models/creatures/woc_crypt_sexton_marrow.glb": "/media/models/creatures/woc_crypt_sexton_marrow.c9a81eefca1f.glb",
   "models/creatures/woc_sanctum_korgath.glb": "/media/models/creatures/woc_sanctum_korgath.d9b981b26620.glb",
+  "models/creatures/woc_sanctum_korgath_clips.glb": "/media/models/creatures/woc_sanctum_korgath_clips.6d63fa6a694f.glb",
   "models/creatures/woc_sanctum_korzul.glb": "/media/models/creatures/woc_sanctum_korzul.4534471d0a2f.glb",
   "models/creatures/woc_sanctum_tusker.glb": "/media/models/creatures/woc_sanctum_tusker.fa2e9548ec35.glb",
   "models/creatures/woc_sanctum_velkhar.glb": "/media/models/creatures/woc_sanctum_velkhar.ba27029c673e.glb",

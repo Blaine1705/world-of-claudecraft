@@ -37,6 +37,11 @@ export const KORGATH_BODY: BossBody = {
   idleBoundsHeight: 10.27,
   walkRef: 2.65,
 };
+/** Korgath's two-hand blows (HammerSlam, HammerSweep) with the left hand
+ *  re-solved onto the haft (it hung off it, the elbow behind his back): a
+ *  clip donor beside the body whose clips replace the body's by name
+ *  (docs/design/dungeon-rework/korgath/). */
+export const KORGATH_CLIP_FIXES_URL = 'models/creatures/woc_sanctum_korgath_clips.glb';
 /** The planted feet's speed in the charge's run loop (ThresholdChargeLoop), at
  *  model scale 1. */
 export const KORGATH_RUN_REF = 15.84;
