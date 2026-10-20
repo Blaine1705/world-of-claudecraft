@@ -24254,7 +24254,7 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "ヴァンガード：Brawlmark Leathers",
-        "bonus2": "2点：Swift Heelsのクールダウンが12秒短縮。",
+        "bonus2": "2点：Swift Heelsのクールダウンが15秒短縮。",
         "bonus4": "4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。"
       },
       "vanguard_rogue_subtlety": {

@@ -24254,7 +24254,7 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Kampfmal-Lederrüstung",
-        "bonus2": "Die Abklingzeit von Flinke Fersen wird um 12 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Flinke Fersen wird um 15 Sek. verkürzt.",
         "bonus4": "Während Flinke Fersen aktiv ist, gewähren Boshafter Hieb und Körpertreffer 1 zusätzlichen Kombopunkt."
       },
       "vanguard_rogue_subtlety": {

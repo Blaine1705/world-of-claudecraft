@@ -24254,7 +24254,7 @@ export const pt_BR: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Couros da Marca da Briga",
-        "bonus2": "O tempo de recarga de Pés Ligeiros é reduzido em 12 s.",
+        "bonus2": "O tempo de recarga de Pés Ligeiros é reduzido em 15 s.",
         "bonus4": "Enquanto Pés Ligeiros está ativo, Talho Perverso e Golpe no Corpo concedem 1 ponto de combo adicional."
       },
       "vanguard_rogue_subtlety": {

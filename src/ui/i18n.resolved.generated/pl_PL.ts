@@ -24254,7 +24254,7 @@ export const pl_PL: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Skóry Znaku Bójki",
-        "bonus2": "Regeneracja umiejętności Szybkich Pięt jest zmniejszona o 12 sek.",
+        "bonus2": "Regeneracja umiejętności Szybkich Pięt jest zmniejszona o 15 sek.",
         "bonus4": "Gdy Szybkie Pięty są aktywne, Żbik Okrutny i Cios Młotkowy przyznają 1 dodatkowy punkt kombinacji."
       },
       "vanguard_rogue_subtlety": {

@@ -126,13 +126,15 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     // Assassination, and 169.5 Subtlety (from 212.8, 191.1 and 156.6). The
     // bands re-center at 8 either side, and on this 60 sec fixture
     // Assassination now leads Combat (the 180 sec raid-BiS Monte Carlo still
-    // has Combat ahead, 218 to 207).
+    // has Combat ahead, 218 to 207). Skulduggery then takes a +25% sustained
+    // buff (apPct 0 -> 0.45 plus a 0.10 offensive physical bonus): MEASURED
+    // here at approximately 214.5, still third.
     expect(first.combat).toBeGreaterThanOrEqual(212);
     expect(first.combat).toBeLessThanOrEqual(228);
     expect(first.assassination).toBeGreaterThanOrEqual(224);
     expect(first.assassination).toBeLessThanOrEqual(240);
-    expect(first.subtlety).toBeGreaterThanOrEqual(161);
-    expect(first.subtlety).toBeLessThanOrEqual(177);
+    expect(first.subtlety).toBeGreaterThanOrEqual(207);
+    expect(first.subtlety).toBeLessThanOrEqual(222);
     expect(first.assassination).toBeGreaterThan(first.combat);
     expect(first.combat).toBeGreaterThan(first.subtlety);
   }, 30_000);

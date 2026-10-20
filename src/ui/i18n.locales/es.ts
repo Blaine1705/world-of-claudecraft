@@ -1764,7 +1764,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_rogue_combat_shoulder.name': 'Hombreras Marcariña',
   'entities.itemSets.vanguard_rogue_combat.name': 'Cueros Marcariña',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'El tiempo de reutilización de Talones Veloces se reduce 12 s.',
+    'El tiempo de reutilización de Talones Veloces se reduce 15 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Mientras Talones Veloces está activo, Tajo Perverso y Golpe al Cuerpo otorgan 1 punto de combo adicional.',
   'entities.items.vanguard_rogue_subtlety_chest.name': 'Túnica Pasosombra',

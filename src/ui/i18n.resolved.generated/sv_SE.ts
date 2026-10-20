@@ -24254,7 +24254,7 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels nedräkning minskas med 12 sec.",
+        "bonus2": "Swift Heels nedräkning minskas med 15 sec.",
         "bonus4": "Medan Swift Heels är aktiv, Wicked Slash och Haymaker ger 1 ytterligare combo-poäng."
       },
       "vanguard_rogue_subtlety": {

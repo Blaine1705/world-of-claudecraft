@@ -1951,7 +1951,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Pukulan Curang juga membuat serangan berikutnya dalam 6 detik serangan kritis.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Kulit Potong Malam',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Jeda Tumit Gesit dikurangi 12 detik.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Jeda Tumit Gesit dikurangi 15 detik.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Sementara Tumit Gesit aktif, Tebasan Keji dan Pukulan Tubuh memberikan 1 poin combo tambahan.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Kulit Merek Pertarungan',

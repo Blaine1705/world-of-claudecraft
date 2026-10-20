@@ -2012,7 +2012,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Coup bas rend aussi votre prochaine attaque critique dans les 6 s qui suivent.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Cuirs Entaille-de-nuit',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Le temps de recharge de Talons ailés est réduit de 12 s.',
+    'Le temps de recharge de Talons ailés est réduit de 15 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Tant que Talons ailés est actif, Taillade perfide et Coup au corps accordent 1 point de combo supplémentaire.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Cuirs Marque-de-rixe',

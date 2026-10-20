@@ -18581,7 +18581,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '低击还会使你6秒内的下一次攻击必定爆击。',
   'entities.itemSets.vanguard_rogue_combat.name': '先锋套装：斗痕皮甲',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': '疾足的冷却时间缩短12秒。',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '疾足的冷却时间缩短15秒。',
   'entities.itemSets.vanguard_rogue_combat.bonus4': '疾足激活时，邪斩和重拳额外奖励1个连击点。',
   'entities.itemSets.vanguard_rogue_subtlety.name': '先锋套装：影行皮甲',
   'entities.itemSets.vanguard_rogue_subtlety.bonus2': '烟隐的冷却时间缩短60秒。',

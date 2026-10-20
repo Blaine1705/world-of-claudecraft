@@ -19545,7 +19545,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '4点：Low Blowで6秒以内の次の攻撃がクリティカルになる。',
   'entities.itemSets.vanguard_rogue_combat.name': 'ヴァンガード：Brawlmark Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが12秒短縮。',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが15秒短縮。',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'ヴァンガード：Shadewalk Leathers',

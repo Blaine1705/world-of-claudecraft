@@ -1915,7 +1915,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Low Blow ayrıca sonraki atağını 6 saniye içinde kritik vuruş yapar.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Gece Kesiş Deri',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': "Swift Heels'in bekleme süresi 12 san azalır.",
+  'entities.itemSets.vanguard_rogue_combat.bonus2': "Swift Heels'in bekleme süresi 15 san azalır.",
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Swift Heels etki duruşu boyunca Wicked Slash ve Haymaker, 1 ek combo puanı verir.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Dövüş İşareti Deri',

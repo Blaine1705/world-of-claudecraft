@@ -24254,7 +24254,7 @@ export const nl_NL: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Ruziemerkteken Leder",
-        "bonus2": "Afkoelingseffect van Snelle Voeten is 12 sec korter.",
+        "bonus2": "Afkoelingseffect van Snelle Voeten is 15 sec korter.",
         "bonus4": "Terwijl Snelle Voeten actief zijn, geven Verderfsnede en Lichaamsstoot 1 extra combopunt."
       },
       "vanguard_rogue_subtlety": {

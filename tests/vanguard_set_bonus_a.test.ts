@@ -612,7 +612,7 @@ describe('Rogue Season 2 sets', () => {
     expect(crit.duration).toBe(V.VANGUARD_ASSASSINATION_4PC_CRIT_WINDOW_SEC);
   });
 
-  it('Brawlmark 2pc: Swift Heels cooldown 60 to 48, only at 2 pieces', () => {
+  it('Brawlmark 2pc: Swift Heels cooldown 60 to 45, only at 2 pieces', () => {
     expectCooldownCut(
       'rogue',
       'combat',

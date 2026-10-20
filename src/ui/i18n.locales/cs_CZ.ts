@@ -1925,7 +1925,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Podpásovka navíc promění tvůj příští útok do 6 s v kritický zásah.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Kůže Nočnořezu',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Čas obnovy Rychlých pat je kratší o 12 s.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Čas obnovy Rychlých pat je kratší o 15 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Dokud jsou aktivní Rychlé paty, Zlý sek a Úder na tělo udělí o 1 combo bod navíc.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Kůže Rvačkocejchu',

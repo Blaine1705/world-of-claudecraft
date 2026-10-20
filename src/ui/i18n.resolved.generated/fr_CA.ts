@@ -24254,7 +24254,7 @@ export const fr_CA: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Cuirs Marque-de-rixe",
-        "bonus2": "Le temps de recharge de Talons ailés est réduit de 12 s.",
+        "bonus2": "Le temps de recharge de Talons ailés est réduit de 15 s.",
         "bonus4": "Tant que Talons ailés est actif, Taillade perfide et Coup au corps accordent 1 point de combo supplémentaire."
       },
       "vanguard_rogue_subtlety": {

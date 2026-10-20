@@ -24254,7 +24254,7 @@ export const es: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Cueros Marcariña",
-        "bonus2": "El tiempo de reutilización de Talones Veloces se reduce 12 s.",
+        "bonus2": "El tiempo de reutilización de Talones Veloces se reduce 15 s.",
         "bonus4": "Mientras Talones Veloces está activo, Tajo Perverso y Golpe al Cuerpo otorgan 1 punto de combo adicional."
       },
       "vanguard_rogue_subtlety": {

@@ -24254,7 +24254,7 @@ export const tr_TR: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Dövüş İşareti Deri",
-        "bonus2": "Swift Heels'in bekleme süresi 12 san azalır.",
+        "bonus2": "Swift Heels'in bekleme süresi 15 san azalır.",
         "bonus4": "Swift Heels etki duruşu boyunca Wicked Slash ve Haymaker, 1 ek combo puanı verir."
       },
       "vanguard_rogue_subtlety": {

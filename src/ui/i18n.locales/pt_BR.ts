@@ -2187,7 +2187,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Golpe Baixo também torna seu próximo ataque em até 6 s um acerto crítico.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Couros da Marca da Briga',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'O tempo de recarga de Pés Ligeiros é reduzido em 12 s.',
+    'O tempo de recarga de Pés Ligeiros é reduzido em 15 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Enquanto Pés Ligeiros está ativo, Talho Perverso e Golpe no Corpo concedem 1 ponto de combo adicional.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Couros do Passo Sombrio',

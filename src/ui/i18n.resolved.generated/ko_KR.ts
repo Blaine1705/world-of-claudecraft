@@ -24254,7 +24254,7 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "선봉대: Brawlmark Leathers",
-        "bonus2": "2세트: Swift Heels의 재사용 대기시간이 12초 감소합니다.",
+        "bonus2": "2세트: Swift Heels의 재사용 대기시간이 15초 감소합니다.",
         "bonus4": "4세트: Swift Heels 중 Wicked Slash와 Haymaker가 연계 점수 1을 추가로 부여합니다."
       },
       "vanguard_rogue_subtlety": {

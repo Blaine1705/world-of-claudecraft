@@ -19518,7 +19518,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '4세트: Low Blow가 6초 안의 다음 공격을 치명타로 만듭니다.',
   'entities.itemSets.vanguard_rogue_combat.name': '선봉대: Brawlmark Leathers',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    '2세트: Swift Heels의 재사용 대기시간이 12초 감소합니다.',
+    '2세트: Swift Heels의 재사용 대기시간이 15초 감소합니다.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4세트: Swift Heels 중 Wicked Slash와 Haymaker가 연계 점수 1을 추가로 부여합니다.',
   'entities.itemSets.vanguard_rogue_subtlety.name': '선봉대: Shadewalk Leathers',

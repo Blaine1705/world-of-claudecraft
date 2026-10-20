@@ -24254,7 +24254,7 @@ export const da_DK: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Slagsmål Mærke Læder",
-        "bonus2": "Kvikke Hæle nedtælling reduceres med 12 sek.",
+        "bonus2": "Kvikke Hæle nedtælling reduceres med 15 sek.",
         "bonus4": "Mens Kvikke Hæle er aktiv, Vigtig Skråkryds og Høslår tildeler 1 yderligere kombinationspunkt."
       },
       "vanguard_rogue_subtlety": {

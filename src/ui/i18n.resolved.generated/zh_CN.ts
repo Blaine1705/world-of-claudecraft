@@ -24254,7 +24254,7 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "先锋套装：斗痕皮甲",
-        "bonus2": "疾足的冷却时间缩短12秒。",
+        "bonus2": "疾足的冷却时间缩短15秒。",
         "bonus4": "疾足激活时，邪斩和重拳额外奖励1个连击点。"
       },
       "vanguard_rogue_subtlety": {

@@ -24254,7 +24254,7 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Cuoio Marchiorissa",
-        "bonus2": "Il tempo di recupero di Calcagni Veloci è ridotto di 12 sec.",
+        "bonus2": "Il tempo di recupero di Calcagni Veloci è ridotto di 15 sec.",
         "bonus4": "Mentre Calcagni Veloci è attivo, Fendente Malvagio e Colpo al Corpo concedono 1 punto combo aggiuntivo."
       },
       "vanguard_rogue_subtlety": {

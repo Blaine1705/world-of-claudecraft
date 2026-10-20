@@ -24254,7 +24254,7 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "先鋒套裝：Brawlmark Leathers",
-        "bonus2": "2件：Swift Heels冷卻縮短12秒。",
+        "bonus2": "2件：Swift Heels冷卻縮短15秒。",
         "bonus4": "4件：Swift Heels期間，Wicked Slash與Haymaker額外給予1個連擊點。"
       },
       "vanguard_rogue_subtlety": {

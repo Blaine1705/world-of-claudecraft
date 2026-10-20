@@ -18593,7 +18593,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '4件：Low Blow使6秒內下一次攻擊成為爆擊。',
   'entities.itemSets.vanguard_rogue_combat.name': '先鋒套裝：Brawlmark Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': '2件：Swift Heels冷卻縮短12秒。',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2件：Swift Heels冷卻縮短15秒。',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4件：Swift Heels期間，Wicked Slash與Haymaker額外給予1個連擊點。',
   'entities.itemSets.vanguard_rogue_subtlety.name': '先鋒套裝：Shadewalk Leathers',

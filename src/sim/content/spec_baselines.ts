@@ -90,8 +90,13 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     // -10%. apPct 0.12 -> 0 (no AP floor left), meleeDmgPct 0.08 -> 0.04,
     // ambush's own dmgPct 0.16 -> 0 (its true-stealth opener reward is a
     // separate gameplay-slice mechanic, out of this numeric package).
+    // Rogue tweak pass: Skulduggery +25% sustained. It had the lowest AP of the
+    // three specs (278 vs 377/424 on raid BiS) and is the most auto-attack
+    // heavy (54% of its damage), so the lift leans on apPct 0 -> 0.45 (autos
+    // and abilities) plus a 0.10 offensive physical bonus in
+    // spec_output_tuning.ts. Raid-BiS Monte Carlo: 137.3 -> 171.5 DPS.
     subtlety: {
-      stats: { agi: 7, crit: 0.1, dodge: 0.05 },
+      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.45 },
       global: { meleeDmgPct: 0.04 },
       ability: [{ ability: 'backstab', dmgPct: 0.16 }],
     },

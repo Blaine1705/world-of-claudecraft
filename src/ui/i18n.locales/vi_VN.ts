@@ -1919,7 +1919,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Đòn Chơi Xấu cũng làm cho cuộc tấn công tiếp theo của bạn trong vòng 6 giây là một cú đánh chí mạng.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Nightcut Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Cooldown Swift Heels giảm 12 giây.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Cooldown Swift Heels giảm 15 giây.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Trong khi Swift Heels hoạt động, Wicked Slash và Haymaker cấp 1 điểm combo bổ sung.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Brawlmark Leathers',

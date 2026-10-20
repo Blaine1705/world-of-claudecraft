@@ -1958,7 +1958,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Lage Stoot maakt je volgende aanval binnen 6 sec een kritische treffer.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Nachtsnede Leder',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Afkoelingseffect van Snelle Voeten is 12 sec korter.',
+    'Afkoelingseffect van Snelle Voeten is 15 sec korter.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Terwijl Snelle Voeten actief zijn, geven Verderfsnede en Lichaamsstoot 1 extra combopunt.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Ruziemerkteken Leder',

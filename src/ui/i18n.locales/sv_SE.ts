@@ -1929,7 +1929,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Lågt slag gör också din nästa attack inom 6 sec en kritisk träff.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Nightcut Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Swift Heels nedräkning minskas med 12 sec.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Swift Heels nedräkning minskas med 15 sec.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Medan Swift Heels är aktiv, Wicked Slash och Haymaker ger 1 ytterligare combo-poäng.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Brawlmark Leathers',

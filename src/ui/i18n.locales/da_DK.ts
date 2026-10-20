@@ -1927,7 +1927,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Lavt Slag gør også din næste angreb inden 6 sek et kritisk slag.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Nat-klinge Læder',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Kvikke Hæle nedtælling reduceres med 12 sek.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Kvikke Hæle nedtælling reduceres med 15 sek.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Mens Kvikke Hæle er aktiv, Vigtig Skråkryds og Høslår tildeler 1 yderligere kombinationspunkt.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Slagsmål Mærke Læder',

@@ -1957,7 +1957,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Cios poniżej Pasa sprawia również, że Twój następny atak w ciągu 6 sek jest trafnikiem krytycznym.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Skóry Cięcia Nocy',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Regeneracja umiejętności Szybkich Pięt jest zmniejszona o 12 sek.',
+    'Regeneracja umiejętności Szybkich Pięt jest zmniejszona o 15 sek.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Gdy Szybkie Pięty są aktywne, Żbik Okrutny i Cios Młotkowy przyznają 1 dodatkowy punkt kombinacji.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Skóry Znaku Bójki',

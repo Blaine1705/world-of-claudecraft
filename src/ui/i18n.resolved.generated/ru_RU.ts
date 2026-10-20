@@ -24254,7 +24254,7 @@ export const ru_RU: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Авангард: Brawlmark Leathers",
-        "bonus2": "2 предмета: время восстановления Swift Heels сокращается на 12 сек.",
+        "bonus2": "2 предмета: время восстановления Swift Heels сокращается на 15 сек.",
         "bonus4": "4 предмета: пока действует Swift Heels, Wicked Slash и Haymaker дают на 1 прием серии больше."
       },
       "vanguard_rogue_subtlety": {

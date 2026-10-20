@@ -1902,7 +1902,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpo Basso rende inoltre critico il tuo prossimo attacco sferrato entro 6 sec.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Cuoio Taglianotte',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Il tempo di recupero di Calcagni Veloci è ridotto di 12 sec.',
+    'Il tempo di recupero di Calcagni Veloci è ridotto di 15 sec.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Mentre Calcagni Veloci è attivo, Fendente Malvagio e Colpo al Corpo concedono 1 punto combo aggiuntivo.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Cuoio Marchiorissa',

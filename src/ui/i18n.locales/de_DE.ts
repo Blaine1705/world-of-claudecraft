@@ -2084,7 +2084,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_rogue_assassination_shoulder.name': 'Nachtschnitt-Schulterpolster',
   'entities.itemSets.vanguard_rogue_combat.name': 'Kampfmal-Lederrüstung',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Die Abklingzeit von Flinke Fersen wird um 12 Sek. verkürzt.',
+    'Die Abklingzeit von Flinke Fersen wird um 15 Sek. verkürzt.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Während Flinke Fersen aktiv ist, gewähren Boshafter Hieb und Körpertreffer 1 zusätzlichen Kombopunkt.',
   'entities.items.vanguard_rogue_combat_chest.name': 'Kampfmal-Tunika',

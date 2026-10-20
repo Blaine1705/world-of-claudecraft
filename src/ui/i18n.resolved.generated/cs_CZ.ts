@@ -24254,7 +24254,7 @@ export const cs_CZ: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Kůže Rvačkocejchu",
-        "bonus2": "Čas obnovy Rychlých pat je kratší o 12 s.",
+        "bonus2": "Čas obnovy Rychlých pat je kratší o 15 s.",
         "bonus4": "Dokud jsou aktivní Rychlé paty, Zlý sek a Úder na tělo udělí o 1 combo bod navíc."
       },
       "vanguard_rogue_subtlety": {

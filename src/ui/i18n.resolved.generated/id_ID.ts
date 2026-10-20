@@ -24254,7 +24254,7 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Kulit Merek Pertarungan",
-        "bonus2": "Jeda Tumit Gesit dikurangi 12 detik.",
+        "bonus2": "Jeda Tumit Gesit dikurangi 15 detik.",
         "bonus4": "Sementara Tumit Gesit aktif, Tebasan Keji dan Pukulan Tubuh memberikan 1 poin combo tambahan."
       },
       "vanguard_rogue_subtlety": {

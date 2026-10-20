@@ -24254,7 +24254,7 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Brawlmark Leathers",
-        "bonus2": "Cooldown Swift Heels giảm 12 giây.",
+        "bonus2": "Cooldown Swift Heels giảm 15 giây.",
         "bonus4": "Trong khi Swift Heels hoạt động, Wicked Slash và Haymaker cấp 1 điểm combo bổ sung."
       },
       "vanguard_rogue_subtlety": {

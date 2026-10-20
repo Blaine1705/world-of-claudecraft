@@ -24254,7 +24254,7 @@ export const en_CA: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels' cooldown is reduced by 12 sec.",
+        "bonus2": "Swift Heels' cooldown is reduced by 15 sec.",
         "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
       },
       "vanguard_rogue_subtlety": {
