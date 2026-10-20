@@ -33,12 +33,21 @@ function quads(view: ReturnType<typeof buildHutSmoke>): number {
 }
 
 describe('hut smoke painter', () => {
-  it('draws with the tavern chimney material: one program, never a new one', () => {
+  it('draws with its own copy of the tavern chimney material: the same program and texture', () => {
     const view = buildHutSmoke();
     const tavern = buildMirefenTavernSmoke();
-    expect(view.mesh.material).toBe(litSmokePuffMaterial());
-    expect(view.mesh.material).toBe(tavern.mesh.material);
     const material = view.mesh.material as THREE.MeshLambertMaterial;
+    const shared = tavern.mesh.material as THREE.MeshLambertMaterial;
+    expect(shared).toBe(litSmokePuffMaterial());
+    // its own instance (the particle cloud disposes it), never the shared one
+    expect(material).not.toBe(shared);
+    // three keys a program on the material's type and parameters, so these must all match
+    expect(material.type).toBe(shared.type);
+    expect(material.map).toBe(shared.map);
+    expect(material.customProgramCacheKey()).toBe(shared.customProgramCacheKey());
+    for (const key of ['transparent', 'depthWrite', 'vertexColors', 'side', 'blending'] as const) {
+      expect(material[key], key).toBe(shared[key]);
+    }
     expect(material.transparent).toBe(true);
     expect(material.depthWrite).toBe(false);
     expect(material.vertexColors).toBe(true);
@@ -108,20 +117,28 @@ describe('hut smoke painter', () => {
     expect(quads(view)).toBe(0);
   });
 
-  it('frees its own buffers on dispose, never the shared material', () => {
+  it('frees its own buffers and material on dispose, never the shared material or texture', () => {
     const view = buildHutSmoke();
     const scene = new THREE.Scene();
     scene.add(view.mesh);
-    let materialDisposed = false;
-    const material = litSmokePuffMaterial();
-    const listener = () => {
-      materialDisposed = true;
+    const own = view.mesh.material as THREE.MeshLambertMaterial;
+    const shared = litSmokePuffMaterial();
+    const disposed: string[] = [];
+    const watch = (target: THREE.EventDispatcher<{ dispose: object }>, name: string) => {
+      const listener = () => disposed.push(name);
+      target.addEventListener('dispose', listener);
+      return () => target.removeEventListener('dispose', listener);
     };
-    material.addEventListener('dispose', listener);
+    const unwatch = [
+      watch(view.mesh.geometry, 'geometry'),
+      watch(own, 'own material'),
+      watch(shared, 'shared material'),
+      watch(shared.map as THREE.Texture, 'shared texture'),
+    ];
     view.dispose();
-    material.removeEventListener('dispose', listener);
+    for (const off of unwatch) off();
     expect(view.mesh.parent).toBeNull();
-    expect(materialDisposed).toBe(false);
+    expect(disposed.sort()).toEqual(['geometry', 'own material']);
   });
 });
 

@@ -6,10 +6,12 @@
 // the sky the way smoke does.
 //
 // GPU work: built once with the particle cloud (vfx.ts) and added to the scene at boot, hidden
-// until a hut smokes. Its (geometry, material) is the tavern chimney's program and joins the
-// props material prewarm (hutSmokePrewarmParts); a frame only rewrites buffer contents and the
-// draw range, never a material, a texture or a geometry's layout. Cosmetic only: the low effects
-// tier builds none (graphics settings never hide what a player acts on; smoke is not that).
+// until a hut smokes. It draws with its OWN copy of the tavern chimney's material (same
+// parameters and the same shared puff texture, so the same linked program, which joins the props
+// material prewarm through hutSmokePrewarmParts), owned and disposed with the particle cloud; a
+// frame only rewrites buffer contents and the draw range, never a material, a texture or a
+// geometry's layout. Cosmetic only: the low effects tier builds none (graphics settings never
+// hide what a player acts on; smoke is not that).
 
 import * as THREE from 'three';
 import { GFX } from './gfx';
@@ -62,7 +64,10 @@ export function buildHutSmoke(): HutSmokeView {
   geometry.setDrawRange(0, 0);
   const sphere = new THREE.Sphere(new THREE.Vector3(), 1);
   geometry.boundingSphere = sphere;
-  const mesh = new THREE.Mesh(geometry, litSmokePuffMaterial());
+  // a copy keeps the program and the texture shared while this view owns what it disposes
+  const material = litSmokePuffMaterial().clone();
+  material.name = 'hut-smoke';
+  const mesh = new THREE.Mesh(geometry, material);
   mesh.name = 'hutSmoke';
   mesh.castShadow = false;
   mesh.receiveShadow = false;
@@ -134,8 +139,9 @@ export function buildHutSmoke(): HutSmokeView {
     },
     dispose() {
       mesh.removeFromParent();
-      // the material and its texture are shared with the tavern chimney: never disposed here
       geometry.dispose();
+      // its own material copy; the puff texture stays, shared with the tavern chimney
+      material.dispose();
     },
   };
 }
