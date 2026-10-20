@@ -189,6 +189,8 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/keyboard_map_window.ts':
     'the keyboard overview pop-out (a .window, window_drag governs it; closeManagedWindow closes it)',
   'src/ui/hud/fiesta/fiesta_controller.ts': 'match-scoped fiesta strips and confetti',
+  'src/ui/hud/expeditions/expedition_controller.ts':
+    'mounts the Groups notification bell (#expedition-hud), a small fixed icon button, not yet a registered movable frame',
   'src/ui/hud/loot/loot_roll_controller.ts': 'transient loot roll stack',
   'src/ui/hud/practice/hub_lesson_controller.ts':
     'world-anchored "target the dummy" coachmark bubble, transient (the bootcamp.ts pattern)',

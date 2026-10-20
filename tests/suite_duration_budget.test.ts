@@ -74,8 +74,9 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   ['tests/chronomancy_balance_targets.test.ts', 420_000],
   // The real-suite shard collection case walks the complete test corpus and
   // needs a 60s allowance on low-worker hosts; the other timeout pins in this
-  // file keep the exact aggregate just above the default.
-  ['tests/ci_shard_plan.test.ts', 310_000],
+  // file keep the exact aggregate just above the default. The fail-closed relay
+  // case adds 65_000 so runEntry's own 60s child deadline governs a full-tree scan.
+  ['tests/ci_shard_plan.test.ts', 375_000],
   ['tests/discord_db_integration.test.ts', 420_000],
   ['tests/dragonkin_whelp_litter.test.ts', 420_000],
   ['tests/druid_balance_probe.test.ts', 540_000],

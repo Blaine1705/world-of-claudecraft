@@ -18051,7 +18051,7 @@ export class Hud {
       this.closeManagedWindow(top);
       return true;
     }
-    if (this.finderSurfaces.expeditions.close()) return true;
+    if (this.finderSurfaces?.expeditions.close()) return true;
     // Nothing else open: Escape leaves the on-bar key-binding mode (a pending
     // capture never reaches here; Input.onKeyDown cancels it first).
     if (this.actionBarBind?.active) {
