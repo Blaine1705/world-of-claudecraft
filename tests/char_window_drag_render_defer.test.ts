@@ -15,6 +15,28 @@
 // deferred rebuild once the drag concludes.
 
 import { describe, expect, it, vi } from 'vitest';
+
+// char_window reaches the 3D character pipeline through portrait_chip (the portrait module and
+// the characters barrel), whose real import starts several hundred background GLB fetches against
+// the happy-dom virtual server. Those can outlive teardown and surface Three FileLoader
+// ProgressEvent rejections after green assertions, which reds a gate run. This suite never
+// resolves a portrait or a look, so both stay inert (the recipe portrait_chip_composed_hydrate,
+// bootcamp_disengage, and inspect_window use).
+vi.mock('../src/render/characters/portrait', () => ({
+  cachedPortraitByKey: () => null,
+  composedPortraitKey: () => '',
+  isComposedPortraitKey: () => false,
+  modularPortraitDataUrl: () => null,
+  onPortraitsReady: () => undefined,
+  onPortraitUpdate: () => undefined,
+  playerPortraitDataUrl: () => null,
+  portraitsReady: () => false,
+  visualPortraitDataUrl: () => null,
+}));
+vi.mock('../src/render/characters', () => ({
+  modularLookFor: () => null,
+}));
+
 import { CharWindow, type CharWindowDeps } from '../src/ui/char_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 
