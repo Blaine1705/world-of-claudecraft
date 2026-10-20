@@ -13,6 +13,7 @@ import { sharedUniforms } from './gfx';
 import { SANCTUM_KEY_DIRECTION } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
+import { SMITH_HEART_CORE_LIGHT } from './smith_heart/heart_environment';
 import { BASIN_SUN_DIRECTION } from './wildheart_basin/basin_plan_core';
 
 /** Every fog scene state the renderer resolves to (single source of truth). */
@@ -34,6 +35,7 @@ export type FogSceneState =
   | 'wildheartBasin'
   | 'hollowCrypt'
   | 'sunkenBastion'
+  | 'smithHeartCore'
   | 'drownedTemple'
   | 'gravewyrmSanctum'
   | 'lastkeep'
@@ -193,6 +195,11 @@ export interface InteriorLightTargets {
   rimColor: { value: { setHex(value: number): unknown } };
 }
 
+/** Where the Smith's Heart's key comes from: high over the Heart's oculus. */
+export const SMITH_HEART_CORE_KEY_DIRECTION = new THREE.Vector3(
+  ...SMITH_HEART_CORE_LIGHT.keyDirection,
+).normalize();
+
 /** The outdoor rig legs, graded per frame by the renderer before the call. */
 export interface OutdoorLightLegs {
   sunIntensity: number;
@@ -209,6 +216,10 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
   }
   if (state === 'sunkenBastion') {
     out.copy(SUNKEN_BASTION_SUN_DIRECTION);
+    return true;
+  }
+  if (state === 'smithHeartCore') {
+    out.copy(SMITH_HEART_CORE_KEY_DIRECTION);
     return true;
   }
   if (state === 'drownedTemple') {
@@ -370,6 +381,18 @@ export function applyInteriorLightRig(
     targets.hemi.groundColor.setHex(DAWNHOLD_HEMI_GROUND_COLOR);
   } else if (ignivarForge) {
     applyIgnivarRaidLighting(state as IgnivarRaidFogState, targets);
+  } else if (state === 'smithHeartCore') {
+    // The Smith's Heart's final room: lit from below by the heart, a pale
+    // key over the oculus, a warm rim (smith_heart/heart_environment.ts).
+    const L = SMITH_HEART_CORE_LIGHT;
+    targets.sun.intensity = L.sun;
+    targets.hemi.intensity = L.hemi;
+    targets.scene.environmentIntensity = L.env;
+    targets.rim.value = L.rim;
+    targets.sun.color.setHex(L.sunColor);
+    targets.hemi.color.setHex(L.hemiSky);
+    targets.hemi.groundColor.setHex(L.hemiGround);
+    targets.rimColor.value.setHex(L.rimColor);
   }
 }
 

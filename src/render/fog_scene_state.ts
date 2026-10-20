@@ -14,6 +14,7 @@ import { waterLevelAt } from '../sim/world';
 import { SANCTUM_FOG_COLOR } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import type { FogSceneState } from './interior_light_rig';
+import { SMITH_HEART_CORE_FOG, smithHeartCameraInHeart } from './smith_heart/heart_environment';
 import { BASIN_FOG_COLOR } from './wildheart_basin/basin_plan_core';
 
 /** The Hollow Crypt's night fog colour (its sky dome fades to it at the horizon). */
@@ -66,10 +67,14 @@ export function resolveFogScene(
   // The Hollow Crypt is open-air too, but at night under its OWN sky: the
   // world dome hides and the interior group carries the moonlit sky.
   const inHollowCrypt = interior === 'hollow_crypt';
-  // The Sunken Bastion: open-air at storm-tide dusk under its own sky. The
-  // Smith's Heart's blockout borrows the same storm-dusk fog and light rig
-  // (its interior carries its own storm sky) until it gets a state of its own.
-  const inSunkenBastion = interior === 'sunken_bastion' || interior === 'smith_heart';
+  // The Smith's Heart: the Heart (its separate final room) has its own
+  // ember-night state; the main map borrows the Sunken Bastion's storm-dusk
+  // fog and light rig (its interior carries its own storm sky) until the
+  // per-room phases give each vein its own.
+  const inSmithHeartCore = interior === 'smith_heart' && smithHeartCameraInHeart(cam.x, cam.z);
+  // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
+  const inSunkenBastion =
+    interior === 'sunken_bastion' || (interior === 'smith_heart' && !inSmithHeartCore);
   // The Drowned Temple: open-air at night over its lagoon, under its own sky.
   const inDrownedTemple = interior === 'drowned_temple';
   // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.
@@ -92,21 +97,23 @@ export function resolveFogScene(
                 ? 'wildheartBasin'
                 : inHollowCrypt
                   ? 'hollowCrypt'
-                  : inSunkenBastion
-                    ? 'sunkenBastion'
-                    : inDrownedTemple
-                      ? 'drownedTemple'
-                      : inGravewyrmSanctum
-                        ? 'gravewyrmSanctum'
-                        : inLastKeep
-                          ? 'lastkeep'
-                          : inDawnhold
-                            ? 'dawnhold'
-                            : inside
-                              ? 'dungeon'
-                              : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                                ? 'underwater'
-                                : 'outdoor';
+                  : inSmithHeartCore
+                    ? 'smithHeartCore'
+                    : inSunkenBastion
+                      ? 'sunkenBastion'
+                      : inDrownedTemple
+                        ? 'drownedTemple'
+                        : inGravewyrmSanctum
+                          ? 'gravewyrmSanctum'
+                          : inLastKeep
+                            ? 'lastkeep'
+                            : inDawnhold
+                              ? 'dawnhold'
+                              : inside
+                                ? 'dungeon'
+                                : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                  ? 'underwater'
+                                  : 'outdoor';
   return { interior, desired };
 }
 
@@ -157,6 +164,12 @@ export function applyFogScenePreset(
     fog.color.setHex(HOLLOW_CRYPT_FOG_COLOR);
     fog.near = 70;
     fog.far = 460;
+  } else if (desired === 'smithHeartCore') {
+    // The Heart: an ember-violet night air inside the mountain, pushed past
+    // the platform and its chasm so the chains read up to the crown.
+    fog.color.setHex(SMITH_HEART_CORE_FOG.color);
+    fog.near = SMITH_HEART_CORE_FOG.near;
+    fog.far = SMITH_HEART_CORE_FOG.far;
   } else if (desired === 'sunkenBastion') {
     // Storm-tide sea fog: grey-green and heavy low over the water, pushed back
     // far enough that the whole headland climbs out of it from the landing and
