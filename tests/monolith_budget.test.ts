@@ -618,7 +618,8 @@ const MONOLITHS: MonolithRow[] = [
     // moved out with them to src/ui/options_overlay_panels.ts. Measured with
     // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
     // Note row painting moved alongside the checkbox/subheading painter seam.
-    ceiling: 2809,
+    ceiling: 2798,
+    // Raw Mouse Input composes with reset-scope extraction in keybind_panel_settings.ts.
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {

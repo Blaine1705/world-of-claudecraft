@@ -106,6 +106,7 @@ import { BIND_CATEGORY_LABEL_KEYS, bindActionDisplayName } from './keybind_actio
 import { keybindConflictPrompt } from './keybind_conflict_prompt_core';
 import { keybindDeviceNoteKeys, keybindRefusalNote } from './keybind_device_notes_core';
 import { buildKeybindLayoutConvertRow } from './keybind_layout_convert_rows';
+import { KEYBIND_PANEL_SETTING_KEYS } from './keybind_panel_settings';
 import { buildKeybindCode, type KeybindSetup, parseKeybindCode } from './keybind_transfer_core';
 import {
   type KeyboardMapHandle,
@@ -187,21 +188,6 @@ interface NumericChoiceBinding {
   set(key: NumericSettingKey, value: number): void;
 }
 
-// The six GameSettings the Key Bindings panel renders alongside the
-// rebindable keys (the settingToggleKeybind + clickMoveMouseButtonRow calls in
-// renderKeybinds below). Its Reset to Defaults must restore these too, not just
-// the key-code map: without this list, a player's custom mouse-camera,
-// click-to-move (and its mouse button), attack-move, or left-handed-touch
-// choice silently survived a "reset everything" click. (The profanity filter
-// is a chat setting: it renders in Interface > Chat, whose own footer resets it.)
-const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
-  'mouseCamera',
-  'lockCursorOnRotate',
-  'clickToMove',
-  'clickToMoveButton',
-  'attackMove',
-  'leftHandedTouch',
-];
 // Every action id the registry knows: a pasted hotkey code naming none of them
 // would import as a full reset, so parseKeybindCode refuses it as hollow.
 const KNOWN_ACTION_IDS: ReadonlySet<string> = new Set(BIND_ACTIONS.map((a) => a.id));
@@ -2586,6 +2572,12 @@ export class OptionsWindow {
       'lockCursorOnRotate',
       t('hudChrome.options.keybindHelpLockCursorOnRotate'),
     );
+    this.settingToggleKeybind(
+      rail,
+      t('hudChrome.options.rawMouseInput'),
+      'rawMouseInput',
+      t('hudChrome.options.keybindHelpRawMouseInput'),
+    );
     this.settingToggleKeybind(rail, t('hud.options.clickToMove'), 'clickToMove');
     this.clickMoveMouseButtonRow(rail);
     this.settingToggleKeybind(rail, t('hud.keybinds.actions.attackMove'), 'attackMove');
@@ -2717,10 +2709,7 @@ export class OptionsWindow {
       audio.click();
       this.deps.keybinds().reset();
       this.keyboardWindow.repaint();
-      // The panel also renders seven GameSettings toggles alongside the
-      // rebindable keys (mouse camera, click-to-move and its mouse button,
-      // attack move, left-handed touch, profanity filter); Reset to Defaults
-      // must restore those too, not just the key-code map.
+      // Reset every setting owned by this panel alongside its key-code map.
       const hooks = this.deps.options();
       hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
       for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));

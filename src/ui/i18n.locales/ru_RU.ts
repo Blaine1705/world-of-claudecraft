@@ -3174,6 +3174,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.lockCursorOnRotate': 'Блокировать курсор при вращении',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.',
+  'hudChrome.options.rawMouseInput': 'Необработанный ввод мыши',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Считывает движение мыши напрямую с устройства, пока вы вращаете камеру перетаскиванием, минуя системные скорость и ускорение указателя, чтобы поворот был ровнее. Отключите, чтобы использовать системные настройки мыши. Работает только при включённой опции «Блокировать курсор при вращении» и поддерживается не во всех браузерах и системах.',
   'hudChrome.options.showWalletOnCharacterScreen': 'Показывать кошелек на экране персонажей',
   'hudChrome.options.showPlaytime': 'Показывать время в игре на экране персонажей',
   'hudChrome.options.showWalletOnPlayerCard': 'Показывать кошелек на карточке игрока',

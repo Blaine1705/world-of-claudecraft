@@ -181,6 +181,7 @@ import {
 import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mobilePlatform, mobilePreflightCopy } from './game/mobile_preflight';
+import { applyMouseCameraSetting } from './game/mouse_camera_settings';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
 import { applyNameplateRowScales, applyNameplateSetting } from './game/nameplate_settings';
@@ -2336,16 +2337,7 @@ async function startGame(
   applyBrowserEffects(settings.get('browserEffects'));
 
   function applySetting(key: keyof GameSettings, value: number | boolean): void {
-    if (key === 'mouseCamera') {
-      const v = settings.set('mouseCamera', !!value);
-      input.setMouseCameraEnabled(v);
-      return;
-    }
-    if (key === 'lockCursorOnRotate') {
-      const v = settings.set('lockCursorOnRotate', !!value);
-      input.setLockCursorOnRotate(v);
-      return;
-    }
+    if (applyMouseCameraSetting(settings, input, key, value)) return;
     if (key === 'leftHandedTouch') {
       const v = settings.set('leftHandedTouch', !!value);
       document.body.classList.toggle('mobile-left-handed', v);

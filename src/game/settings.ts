@@ -315,6 +315,11 @@ export const BOOL_SETTINGS = {
   // OS cursor cannot leave the window during rotation (otherwise it hits the
   // screen edge and the camera freezes, or slips onto a second monitor).
   lockCursorOnRotate: { def: true },
+  // on by default: request that camera-drag lock with raw (unadjusted) mouse
+  // input, skipping the OS pointer speed and acceleration and the cursor
+  // recentering behind sudden jumps on high polling-rate mice. Off uses the
+  // OS-adjusted movement. Only acts while lockCursorOnRotate takes the lock.
+  rawMouseInput: { def: true },
   // on by default: poll a connected controller for input. Off ignores the pad
   // entirely (keyboard/mouse/touch unaffected).
   gamepadEnabled: { def: true },

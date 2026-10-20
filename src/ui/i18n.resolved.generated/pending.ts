@@ -10,54 +10,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "es_ES": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "fr_FR": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "fr_CA": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "de_DE": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "nl_NL": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "pl_PL": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "id_ID": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "tr_TR": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "sv_SE": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "vi_VN": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ],
   "da_DK": [
-    "entities.items.infernal_quiver.name"
+    "entities.items.infernal_quiver.name",
+    "hudChrome.options.keybindHelpRawMouseInput",
+    "hudChrome.options.rawMouseInput"
   ]
 };

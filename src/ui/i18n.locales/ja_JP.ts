@@ -3136,6 +3136,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.lockCursorOnRotate': '回転中はカーソルを固定',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。',
+  'hudChrome.options.rawMouseInput': 'マウスのRAW入力',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'ドラッグでカメラを回転させている間、マウスの移動をデバイスから直接読み取り、システムのポインター速度と加速を無視して、より安定した回転にします。システムのマウス設定を使う場合はオフにしてください。「回転中はカーソルを固定」がオンのときのみ有効で、一部のブラウザーやシステムでは使用できません。',
   'hudChrome.options.showWalletOnCharacterScreen': 'キャラクター画面にウォレットを表示',
   'hudChrome.options.showPlaytime': 'キャラクター画面にプレイ時間を表示',
   'hudChrome.options.showWalletOnPlayerCard': 'プレイヤーカードにウォレットを表示',
