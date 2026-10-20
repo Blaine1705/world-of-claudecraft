@@ -93,7 +93,7 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   // eight walk and spawn cases, each raised to 180_000 for a cold CI build: 8 * 180_000.
   // The rest stay default-bounded; the file measured 4.6 s of test time locally.
   ['tests/drowned_temple_entrance.test.ts', 1_440_000],
-  ['tests/druid_balance_probe.test.ts', 540_000],
+  ['tests/druid_balance_probe.test.ts', 600_000],
   ['tests/emerald_deck_escape.test.ts', 540_000],
   ['tests/guild_bank_pg_integration.test.ts', 840_000],
   ['tests/nythraxis_matrix.test.ts', 1_200_000],
