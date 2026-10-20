@@ -248,7 +248,7 @@ export function planEdgeRubble(): SanctumKitPlacement[] {
     for (const t of slots) {
       k++;
       // Not everywhere: a lip reads natural with gaps.
-      if (sanctumHash(k, 62) < 0.3) continue;
+      if (sanctumHash(k, 62) < 0.42) continue;
       const x = run.ax + (run.bx - run.ax) * t;
       const z = run.az + (run.bz - run.az) * t;
       if (sanctumFloorAt(x + run.nx * 2.5, z + run.nz * 2.5) !== null) continue;
@@ -264,6 +264,10 @@ export function planEdgeRubble(): SanctumKitPlacement[] {
         rot: Math.atan2(run.nx, run.nz),
         scale: 0.9 + sanctumHash(k, 64) * 0.25,
         cosmetic: true,
+        // Knee low on the floor: no shadow of its own, and the middle tier
+        // keeps about half of them.
+        noShadow: true,
+        shed: sanctumHash(k, 65),
       });
     }
   }
@@ -310,6 +314,7 @@ export function planDrifts(): SanctumKitPlacement[] {
         scale: 0.85 + sanctumHash(k, 86) * 0.4,
         cosmetic: true,
         noShadow: true,
+        shed: sanctumHash(k, 87),
       });
     }
   }

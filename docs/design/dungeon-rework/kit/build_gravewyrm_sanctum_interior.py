@@ -164,7 +164,7 @@ def lip_ice(variant):
     rng = np.random.default_rng(2600 + variant * 11)
     f = gv.lip_ice_field(variant, rng)
     p = Piece('Kit_LipIce' + 'AB'[variant])
-    sg.add_sculpt(p, f, 'LipIce%d' % variant, 2200, gv.ice_paint(f, 2610 + variant), mat=gi.STONE)
+    sg.add_sculpt(p, f, 'LipIce%d' % variant, 1500, gv.ice_paint(f, 2610 + variant), mat=gi.STONE)
     return p
 
 
@@ -181,7 +181,7 @@ def edge_rubble(variant, icy):
     f = gp.edge_rubble_field(variant, rng, icy)
     name = ('Kit_EdgeRubbleIce' if icy else 'Kit_EdgeRubble') + 'AB'[variant]
     p = Piece(name)
-    sg.add_sculpt(p, f, name, 1700, gp.path_paint(f, 4050 + variant, icy), mat=gi.STONE)
+    sg.add_sculpt(p, f, name, 1000, gp.path_paint(f, 4050 + variant, icy), mat=gi.STONE)
     return p
 
 
@@ -189,7 +189,7 @@ def drift(variant):
     rng = np.random.default_rng(4300 + variant * 17)
     f = gp.drift_field(variant, rng)
     p = Piece('Kit_Drift' + 'AB'[variant])
-    sg.add_sculpt(p, f, 'Drift%d' % variant, 1100, gp.path_paint(f, 4350 + variant, True), mat=gi.STONE)
+    sg.add_sculpt(p, f, 'Drift%d' % variant, 700, gp.path_paint(f, 4350 + variant, True), mat=gi.STONE)
     return p
 
 
@@ -197,7 +197,7 @@ def lip_rock(variant):
     rng = np.random.default_rng(2500 + variant * 7)
     f = gi.lip_rock_field(variant, rng)
     p = Piece('Kit_LipRock' + 'ABC'[variant])
-    sg.add_sculpt(p, f, 'LipRock%d' % variant, 2200, gi.rock_paint(f, 2510 + variant), mat=gi.STONE)
+    sg.add_sculpt(p, f, 'LipRock%d' % variant, 1500, gi.rock_paint(f, 2510 + variant), mat=gi.STONE)
     return p
 
 

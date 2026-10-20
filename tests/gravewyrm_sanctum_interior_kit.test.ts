@@ -134,10 +134,12 @@ describe('the interior kit asset', () => {
       [/^Kit_LockSpur$/, 26_000],
       [/^Kit_LockCurb$/, 7_000],
       [/^Kit_SealPillar(Cracked)?V2_/, 7_000],
-      [/^Kit_LipRock/, 2_600],
-      [/^Kit_LipIce/, 2_600],
+      [/^Kit_LipRock/, 1_800],
+      [/^Kit_LipIce/, 1_800],
       [/^Kit_ThawPyreV2$/, 13_000],
       [/^Kit_BoneHeap$/, 2_600],
+      [/^Kit_EdgeRubble/, 1_200],
+      [/^Kit_Drift/, 900],
     ];
     for (const [name, s] of shapes) {
       const cap = budget.find(([re]) => re.test(name))?.[1] ?? 12_000;
