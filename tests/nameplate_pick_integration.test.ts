@@ -2,7 +2,6 @@
 
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { nameplateDotRowHeight } from '../src/render/nameplate_dots_core';
 import { NameplatePainter } from '../src/render/nameplate_painter';
 import {
   type NameplatePickCandidate,
@@ -100,7 +99,7 @@ function healthPoint(anchor: NameplatePickCandidate): [number, number] {
   return [anchor.sx, nameplateHealthBarTop(anchor.sy, anchor.castVisible) + 2];
 }
 
-function harness(targets: Entity[], dotScale = 0) {
+function harness(targets: Entity[], dotScale = 0, markerFor: () => number | null = () => null) {
   const player = entity(1, 'player');
   player.pos = { x: 0, y: 0, z: 3 } as Entity['pos'];
   const views = new Map<number, EntityView>();
@@ -117,7 +116,7 @@ function harness(targets: Entity[], dotScale = 0) {
   const world = {
     player,
     entities,
-    markerFor: () => null,
+    markerFor,
     questState: () => 'available',
   } as unknown as IWorld;
   const painter = new NameplatePainter({
@@ -138,16 +137,38 @@ function harness(targets: Entity[], dotScale = 0) {
 }
 
 describe('production nameplate picking path', () => {
-  it('returns each exact add from the post-declutter coordinates used for drawing', () => {
+  it('draws overlapping plates at their own anchors, never stacked apart', () => {
     const { painter } = harness([entity(7), entity(8)]);
     painter.update(true);
     const anchors = liveAnchors(painter);
 
     expect(anchors).toHaveLength(2);
-    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBe(20);
-    for (const anchor of anchors) {
-      expect(painter.pickEntityAt(...healthPoint(anchor))).toBe(anchor.id);
-    }
+    expect(anchors[0].sx).toBe(anchors[1].sx);
+    expect(anchors[0].sy).toBe(anchors[1].sy);
+    expect([7, 8]).toContain(painter.pickEntityAt(...healthPoint(anchors[0])));
+  });
+
+  it('keeps a plate at its projected anchor when a dot row lifts it', () => {
+    const plain = harness([entity(7), entity(8)]);
+    plain.painter.update(true);
+    const dotted = entity(7);
+    dotted.auras = [
+      {
+        id: 'corruption',
+        name: 'Blackrot',
+        kind: 'dot',
+        value: 6,
+        remaining: 12,
+        duration: 18,
+        school: 'shadow',
+        sourceId: 1,
+      },
+    ] as Entity['auras'];
+    const lifted = harness([dotted, entity(8)], 3);
+    lifted.painter.update(true);
+    expect(liveAnchors(lifted.painter).map((a) => a.sy)).toEqual(
+      liveAnchors(plain.painter).map((a) => a.sy),
+    );
   });
 
   it('uses the production boss width and cast-bar lift for Ignivar', () => {
@@ -197,99 +218,43 @@ describe('production nameplate picking path', () => {
   });
 });
 
-describe('the dot row in the declutter anchor', () => {
-  // Every other harness in this file injects a scale of 0, so resolveDots and the
-  // extraLift row-height term are dead in them. This is the one case that turns
-  // the row on: without the term, two dotted plates in a crowd take the
-  // bare-label envelope and overlap without being nudged apart, and deleting it
-  // from the painter leaves the rest of the suite green.
-  const OWNER = 1;
-
-  function dotted(id: number): Entity {
-    const e = entity(id);
-    e.auras = [
-      {
-        id: 'corruption',
-        name: 'Blackrot',
-        kind: 'dot',
-        value: 6,
-        remaining: 12,
-        duration: 18,
-        school: 'shadow',
-        sourceId: OWNER,
-      },
-    ] as Entity['auras'];
+describe('NPC plates', () => {
+  function npc(id: number): Entity {
+    const e = entity(id, 'npc');
+    e.templateId = 'smith_haldren';
+    e.hostile = false;
+    e.castingAbility = 'fireball';
+    e.castTotal = 2;
+    e.castRemaining = 1;
     return e;
   }
 
-  it('adds the row height to extraLift, on top of any heraldry lift', () => {
-    const withoutRow = harness([dotted(7)], 0);
-    withoutRow.painter.update(true);
-    const bare = liveAnchors(withoutRow.painter)[0] as { extraLift?: number };
+  it('draws only the name line: no health bar, cast bar or raid mark', () => {
+    const { painter } = harness([npc(7)], 1, () => 4);
+    painter.update(true);
+    const [anchor] = liveAnchors(painter);
+    const state = (
+      painter as unknown as {
+        states: Map<number, { hpVisible: boolean; castVisible: boolean; raidMarkerUrl: string }>;
+      }
+    ).states.get(7);
 
-    const withRow = harness([dotted(7)], 1);
-    withRow.painter.update(true);
-    const lifted = liveAnchors(withRow.painter)[0] as { extraLift?: number };
-
-    expect(lifted.extraLift ?? 0).toBeCloseTo(
-      (bare.extraLift ?? 0) + nameplateDotRowHeight(1, 1),
-      5,
-    );
-    expect(lifted.extraLift ?? 0).toBeGreaterThan(0);
+    expect(anchor.hpVisible).toBe(false);
+    expect(anchor.castVisible).toBe(false);
+    expect(state?.raidMarkerUrl).toBe('');
   });
 
-  it('grows that term with the size slider', () => {
-    const one = harness([dotted(7)], 1);
-    one.painter.update(true);
-    const atOne = (liveAnchors(one.painter)[0] as { extraLift?: number }).extraLift ?? 0;
-    const three = harness([dotted(7)], 3);
-    three.painter.update(true);
-    const atThree = (liveAnchors(three.painter)[0] as { extraLift?: number }).extraLift ?? 0;
-    expect(atThree).toBeCloseTo(atOne * 3, 5);
-  });
-
-  it.each([
-    ['the 150% default', 1.5, 34.5],
-    ['the 300% maximum', 3, 69],
-  ])('declutters two dotted plates at one anchor by the whole row at %s', (_label, scale, lift) => {
-    // Both enemies stand on the same spot, so they project to one anchor. The
-    // painter hands the row height to the declutter pass through extraLift;
-    // this pins that the pass actually SPENDS it: the pair's pitch is the bare
-    // 20px plus the row, not the 28px heraldry pitch (PR 3853 review).
-    const bare = harness([entity(7), entity(8)]);
-    bare.painter.update(true);
-    const [bareA, bareB] = liveAnchors(bare.painter);
-    expect(Math.abs(bareA.sy - bareB.sy)).toBe(20);
-
-    const dots = harness([dotted(7), dotted(8)], scale);
-    dots.painter.update(true);
-    const anchors = liveAnchors(dots.painter);
-
-    expect(anchors).toHaveLength(2);
-    expect(nameplateDotRowHeight(1, scale)).toBe(lift);
-    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBeCloseTo(20 + lift, 5);
-    // and picking still resolves at the post-declutter coordinates it draws at
-    for (const anchor of anchors) {
-      expect(dots.painter.pickEntityAt(...healthPoint(anchor))).toBe(anchor.id);
-    }
-  });
-
-  it('leaves the anchor unlifted for a plate with no dots of YOURS on it', () => {
-    const foreign = entity(7);
-    foreign.auras = [
-      {
-        id: 'corruption',
-        name: 'Blackrot',
-        kind: 'dot',
-        value: 6,
-        remaining: 12,
-        duration: 18,
-        school: 'shadow',
-        sourceId: 99,
-      },
-    ] as Entity['auras'];
-    const h = harness([foreign], 1);
-    h.painter.update(true);
-    expect((liveAnchors(h.painter)[0] as { extraLift?: number }).extraLift ?? 0).toBe(0);
+  it('still draws a cast bar and raid mark on a mob in the same spot', () => {
+    const mob = entity(7);
+    mob.castingAbility = 'fireball';
+    mob.castTotal = 2;
+    mob.castRemaining = 1;
+    const { painter } = harness([mob], 0, () => 4);
+    painter.update(true);
+    const state = (
+      painter as unknown as { states: Map<number, { castVisible: boolean; raidMarkerUrl: string }> }
+    ).states.get(7);
+    expect(state?.castVisible).toBe(true);
+    expect(state?.raidMarkerUrl).not.toBe('');
   });
 });

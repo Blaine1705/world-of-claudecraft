@@ -7,6 +7,7 @@ import {
   NAMEPLATE_RANGE_SQ,
   NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT,
   NAMEPLATE_URGENT_RANGE,
+  NPC_NAMEPLATE_RANGE,
   nameplatePlanInto,
   newNameplatePlan,
 } from '../src/render/nameplate_view';
@@ -286,6 +287,40 @@ describe('nameplate_view - threat + combo (delegated to the narrow helpers)', ()
       ).hasOverheadEmote,
     ).toBe(false);
     expect(plan(ent({ kind: 'mob', pos: { x: 0, y: 0, z: 5 } })).hasOverheadEmote).toBe(false);
+  });
+});
+
+describe('nameplate_view - NPC plates (close range, name and role only)', () => {
+  const npc = (z: number, overrides: Record<string, unknown> = {}) =>
+    ent({ kind: 'npc', templateId: 'smith_haldren', pos: { x: 0, y: 0, z }, ...overrides });
+
+  it('shows an NPC plate only inside NPC_NAMEPLATE_RANGE', () => {
+    expect(NPC_NAMEPLATE_RANGE).toBeLessThan(NAMEPLATE_RANGE);
+    expect(plan(npc(NPC_NAMEPLATE_RANGE - 0.5)).hidden).toBe(false);
+    expect(plan(npc(NPC_NAMEPLATE_RANGE + 0.5)).hidden).toBe(true);
+    // a mob or player at the same distance keeps the normal range
+    expect(plan(ent({ pos: { x: 0, y: 0, z: NPC_NAMEPLATE_RANGE + 0.5 } })).hidden).toBe(false);
+    expect(
+      plan(ent({ kind: 'player', id: 3, pos: { x: 0, y: 0, z: NPC_NAMEPLATE_RANGE + 0.5 } }))
+        .hidden,
+    ).toBe(false);
+  });
+
+  it('keeps the close range for a targeted NPC too', () => {
+    const p = viewer({ targetId: 2 });
+    expect(plan(npc(NPC_NAMEPLATE_RANGE + 0.5), p).hidden).toBe(true);
+  });
+
+  it('marks an NPC plate name-only, with no threat tint or combo pips', () => {
+    const p = viewer({ comboPoints: 3, targetId: 2 });
+    const out = plan(npc(2, { aggroTargetId: PLAYER_ID, hostile: true }), p);
+    expect(out.nameOnly).toBe(true);
+    expect(out.threat).toBe(false);
+    expect(out.comboPips).toBe(0);
+    // the same targeting on a mob does build pips, so the NPC zero is the rule
+    expect(plan(ent({ pos: { x: 0, y: 0, z: 2 } }), p).comboPips).toBe(3);
+    expect(plan(ent({ pos: { x: 0, y: 0, z: 2 } })).nameOnly).toBe(false);
+    expect(plan(ent({ kind: 'player', id: 3, pos: { x: 0, y: 0, z: 2 } })).nameOnly).toBe(false);
   });
 });
 
