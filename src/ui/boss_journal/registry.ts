@@ -2,10 +2,12 @@
 // new dungeon page is one data module under ./dungeons/ plus its row here.
 
 import { GRAVEWYRM_SANCTUM_JOURNAL } from './dungeons/gravewyrm_sanctum';
+import { HOLLOW_CRYPT_JOURNAL } from './dungeons/hollow_crypt';
 import { WILDHEART_BASIN_JOURNAL } from './dungeons/wildheart_basin';
 import { type DungeonJournalDef, dungeonJournalSource, type JournalSource } from './journal_view';
 
 export const DUNGEON_JOURNALS: readonly DungeonJournalDef[] = [
+  HOLLOW_CRYPT_JOURNAL,
   GRAVEWYRM_SANCTUM_JOURNAL,
   WILDHEART_BASIN_JOURNAL,
 ];

@@ -14,6 +14,9 @@ import {
   KORZUL_TUNING,
   TUSKER_TUNING,
 } from '../src/sim/encounters/gravewyrm_sanctum/ids';
+import { embraceBreakShare, LADY_TUNING } from '../src/sim/encounters/hollow_crypt/lady_ids';
+import { tollDamageRange } from '../src/sim/encounters/hollow_crypt/marrow_ids';
+import { MORTHEN_TUNING } from '../src/sim/encounters/hollow_crypt/morthen_ids';
 import { BEAST_TUNING, ZULGAR_TUNING } from '../src/sim/encounters/wildheart_basin/ids';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import { journalModelFor } from '../src/ui/boss_journal/journal_model_spec';
@@ -345,3 +348,63 @@ describe('Wildheart Basin facts', () => {
     );
   });
 });
+
+describe('Hollow Crypt facts', () => {
+  const def = DUNGEON_JOURNALS.find((d) => d.dungeonId === 'hollow_crypt');
+  if (!def) throw new Error('crypt journal missing');
+  const mechanic = (mobId: string, id: string, tier: JournalDifficulty) => {
+    const boss = def.bosses.find((b) => b.mobId === mobId);
+    if (!boss) throw new Error(mobId);
+    const found = dungeonJournalBossView(boss, tier)
+      .phases.flatMap((p) => p.mechanics)
+      .find((m) => m.id === id);
+    if (!found) throw new Error(`${mobId} ${id} ${tier}`);
+    return found;
+  };
+
+  it('runs the route drake, Marrow, Lady, Ilvane, Morthen, Knellwyrm', () => {
+    expect(def.bosses.map((b) => [b.mobId, b.rank])).toEqual([
+      ['crypt_ossuary_drake', 'miniboss'],
+      ['sexton_marrow', 'boss'],
+      ['rimeweb', 'boss'],
+      ['cantor_ilvane', 'boss'],
+      ['morthen', 'final'],
+      ['crypt_knellwyrm', 'miniboss'],
+    ]);
+  });
+
+  it('gives the Embrace its real window and break share per tier', () => {
+    const normal = mechanic('rimeweb', 'frozen-embrace', 'normal');
+    const heroic = mechanic('rimeweb', 'frozen-embrace', 'heroic');
+    expect(normal.values?.hold).toBe(LADY_TUNING.embraceRise + LADY_TUNING.embraceHold);
+    expect(normal.values?.share).toBe(embraceBreakShare(false));
+    expect(heroic.values?.share).toBe(embraceBreakShare(true));
+    expect(heroic.values?.victims).toBe(LADY_TUNING.embraceVictimsHeroic);
+  });
+
+  it('prices the Burial Toll with its own heroic factor, and the candles by tier', () => {
+    const factor = mechanicFactor('hollow_crypt', 'sexton_marrow', 'heroic');
+    const base = tollDamageRange(true);
+    expect(mechanic('sexton_marrow', 'burial-toll', 'heroic').values?.min).toBe(
+      Math.round(base.min * factor),
+    );
+    expect(mechanic('morthen', 'relight', 'normal').values?.drain).toBeCloseTo(
+      MORTHEN_TUNING.relightDrainPct * MORTHEN_TUNING.relightChannel,
+    );
+    expect(mechanic('morthen', 'relight', 'heroic').values?.drain).toBeCloseTo(
+      MORTHEN_TUNING.relightDrainPctHeroic * MORTHEN_TUNING.relightChannel,
+    );
+  });
+
+  it('marks the Dirge kickable and the Unbroken Verse not, heroic only', () => {
+    expect(mechanic('cantor_ilvane', 'dirge-of-the-hollow', 'normal').flags).toContain(
+      'interruptible',
+    );
+    expect(() => mechanic('cantor_ilvane', 'unbroken-verse', 'normal')).toThrow();
+    expect(mechanic('cantor_ilvane', 'unbroken-verse', 'heroic').flags).not.toContain(
+      'interruptible',
+    );
+  });
+});
+
+

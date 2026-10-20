@@ -22235,4 +22235,262 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '두 사냥감: 플레이어 둘이 사냥당하며, {switchEvery}초마다 대상을 바꿉니다.',
   'bossJournal.wildheart.zulgar.heroicAmbush':
     '매복: 사냥이 끝날 때마다 가장 먼 플레이어의 반경 {radius}야드 원으로 덮칩니다.',
+  'bossJournal.crypt.drake.overview':
+    '뼈드레이크가 장례 행렬로 높은 곳에서 원을 그리며 날고 있습니다. 그 아래로 걸어가면 내려앉아 싸웁니다. 정면에는 불 숨결, 뒤에는 꼬리 채찍, 주위에는 날개 돌풍이 있습니다.',
+  'bossJournal.crypt.drake.phaseName': '장례 행렬로',
+  'bossJournal.crypt.drake.phaseSummary': '끌려온 자리에 내려앉아 지상에서 싸웁니다.',
+  'bossJournal.crypt.drake.breathSummary':
+    '{every}초마다 {cast}초 시전 후, 정면 {arc}도 부채꼴로 {range}야드까지 불을 뿜습니다: {min}~{max}의 피해. 시전 동안 방향이 고정됩니다.',
+  'bossJournal.crypt.drake.breathResponse': '정면에는 방어 담당만 서세요. 나머지는 옆쪽에 계세요.',
+  'bossJournal.crypt.drake.tailSummary':
+    '뒤에 누군가 서 있으면 {every}초마다 {cast}초 시전 후, 뒤쪽 {arc}도 부채꼴로 {range}야드까지 휩쓸어 {min}~{max}의 피해를 줍니다.',
+  'bossJournal.crypt.drake.tailResponse': '절대 뒤에 서지 마세요.',
+  'bossJournal.crypt.drake.gustSummary':
+    '누군가 가까이 있으면 {every}초마다 {cast}초 시전 후, {radius}야드 안의 모두가 {min}~{max}의 피해를 입고 {push}야드 밀려납니다.',
+  'bossJournal.crypt.drake.gustResponse': '밀려날 것에 대비하고, 등 뒤에 낭떠러지가 없게 하세요.',
+  'bossJournal.crypt.drake.embersName': '무덤불꽃 불씨',
+  'bossJournal.crypt.drake.embersSummary':
+    '숨결이 닿은 바닥이 {seconds}초 동안 계속 타오릅니다: 그 위에 있는 대상은 초당 {min}~{max}의 피해를 입습니다.',
+  'bossJournal.crypt.drake.embersResponse':
+    '드레이크를 불타는 바닥에서 옮기고, 자신도 그 밖으로 나오세요.',
+  'bossJournal.crypt.drake.tipTank':
+    '숨결이 일행을 향하지 않게 돌리고, 영웅 난이도에서는 불타는 바닥에서 옮기세요.',
+  'bossJournal.crypt.drake.tipHealer':
+    '숨결과 날개 돌풍이 피해가 크게 들어오는 순간입니다. 옆쪽에 서세요.',
+  'bossJournal.crypt.drake.tipDamage': '옆에서 공격하세요: 정면도 뒤도 안 됩니다.',
+  'bossJournal.crypt.drake.heroicEmbers':
+    '무덤불꽃 불씨: 숨결마다 바닥이 {seconds}초 동안 타오릅니다.',
+  'bossJournal.crypt.marrow.overview':
+    '되살아난 무덤꾼이 플레이어의 무덤 치수를 잽니다. 무덤은 모두 열린 채로 남아 안에 있는 대상을 느리게 하고 태우며, 그가 장례의 종을 울릴 때마다 무덤 하나당 불안한 뼈무더기가 일어납니다. 무덤은 묘지 가장자리에 파게 하고 개수를 줄이세요.',
+  'bossJournal.crypt.marrow.phaseYardSummary':
+    '표식이 붙은 플레이어의 발밑에 무덤을 파고, 방어 담당에게 삽을 휘두릅니다.',
+  'bossJournal.crypt.marrow.phaseTollName': '장례의 종소리',
+  'bossJournal.crypt.marrow.phaseTollSummary':
+    '생명력이 {first}와 {second}가 되면 종 밧줄로 걸어가 장례의 종소리를 울립니다.',
+  'bossJournal.crypt.marrow.shovelSummary':
+    '{every}초마다 {cast}초 시전 후, 정면 {arc}도 부채꼴로 {range}야드까지 삽을 휘둘러 근접 공격의 {mult}배 피해를 줍니다. 맞은 모두에게 눈에 든 흙이 걸립니다: {seconds}초 동안 이동 속도 {slow} 감소.',
+  'bossJournal.crypt.marrow.shovelResponse':
+    '정면에는 방어 담당만 서세요. 방어 담당은 시전 중에 비켜나도 됩니다.',
+  'bossJournal.crypt.marrow.measureSummary':
+    '{every}초마다 {cast}초 시전으로 플레이어 한 명에게 표식을 붙입니다. {mark}초 뒤 그 자리에서 무덤이 무너집니다: {radius}야드 안의 모두가 {min}~{max}의 피해. 무덤은 전투 내내 열려 있으며, 안에서는 이동 속도가 {slow} 감소하고 초당 {dirt}의 피해를 입습니다. 무덤은 최대 {cap}개이며, 새 무덤이 생기면 가장 오래된 것이 메워집니다.',
+  'bossJournal.crypt.marrow.measureResponse':
+    '표식이 붙으면 무덤이 열리기 전에 묘지 가장자리로 걸어가세요. 열린 무덤 안에는 절대 서지 마세요.',
+  'bossJournal.crypt.marrow.blowSummary':
+    '{every}초마다 방어 담당에게 {cast}초 시전: 받는 피해 {vuln} 증가 중첩을 쌓는 근접 공격입니다. 최대 {stacks}중첩({max}), {seconds}초 지속.',
+  'bossJournal.crypt.marrow.blowResponse':
+    '방어 담당: 중첩이 오르면 생존기를 쓰세요. 치유 담당은 방어 담당을 주시하세요.',
+  'bossJournal.crypt.marrow.vigorName': '무덤의 활력',
+  'bossJournal.crypt.marrow.vigorSummary':
+    '열린 무덤 안에 서 있는 동안 공격 속도가 {haste} 증가합니다.',
+  'bossJournal.crypt.marrow.vigorResponse': '방어 담당은 그를 무덤에서 멀리 두세요.',
+  'bossJournal.crypt.marrow.unquietName': '불안한 대지',
+  'bossJournal.crypt.marrow.unquietSummary':
+    '무덤 안에 {linger}초 머무는 플레이어가 있으면 그 무덤에서 불안한 뼈무더기가 일어납니다. 그 무덤은 이후 {rest}초 동안 잠잠해집니다.',
+  'bossJournal.crypt.marrow.unquietResponse': '무덤에서 즉시 나오세요.',
+  'bossJournal.crypt.marrow.tollSummary':
+    '밧줄로 걸어가 {ring}초 동안 종을 울리며, 걷는 동안과 울리는 동안 피해를 받지 않습니다. 이후 모든 플레이어가 {min}~{max}의 피해를 입고, 열린 무덤마다 불안한 뼈무더기가 일어납니다.',
+  'bossJournal.crypt.marrow.tollResponse':
+    '치유 담당은 마지막 종소리 전에 모두를 채우세요. 방어 담당이 불안한 뼈무더기를 붙잡고, 공격 담당이 처치합니다.',
+  'bossJournal.crypt.marrow.tipTank':
+    '그가 일행을 등지게 두세요. 장례의 종소리가 끝나면 불안한 뼈무더기를 모두 붙잡으세요.',
+  'bossJournal.crypt.marrow.tipTankHeroic':
+    '그가 일행을 등지게 하고 모든 무덤에서 멀리 두세요. 무덤꾼의 일격은 중첩됩니다: 중첩이 오르면 생존기를 쓰세요.',
+  'bossJournal.crypt.marrow.tipHealer':
+    '장례의 종소리는 파티 전체를 때립니다. 무덤은 안에 있는 대상을 느리게 하고 태우니, 갇힌 사람을 도우세요.',
+  'bossJournal.crypt.marrow.tipDamage':
+    '표식이 붙으면 무덤을 묘지 가장자리로 옮기세요. 종소리가 끝날 때마다 불안한 뼈무더기를 처치하고 매로우에게 돌아가세요.',
+  'bossJournal.crypt.marrow.choiceName': '무덤을 어디에 만들까?',
+  'bossJournal.crypt.marrow.choiceGain':
+    '묘지 가장자리에 판 무덤은 가운데를 싸우고 피할 공간으로 남겨 둡니다.',
+  'bossJournal.crypt.marrow.choiceRisk':
+    '어디든 열린 무덤마다 다음 종소리에 불안한 뼈무더기가 일어나며, 동시에 최대 {cap}개입니다.',
+  'bossJournal.crypt.marrow.choiceRiskHeroic':
+    '어디든 열린 무덤마다 다음 종소리에 불안한 뼈무더기가 일어나며, 동시에 최대 {cap}개입니다. 영웅 난이도에서는 방어 담당 근처의 무덤이 매로우도 빠르게 만듭니다.',
+  'bossJournal.crypt.marrow.heroicBlow':
+    '무덤꾼의 일격: 방어 담당을 때려 받는 피해 {vuln} 증가를 중첩합니다.',
+  'bossJournal.crypt.marrow.heroicVigor':
+    '무덤의 활력: 무덤 안에서는 공격 속도가 {haste} 증가합니다.',
+  'bossJournal.crypt.marrow.heroicUnquiet':
+    '불안한 대지: 무덤 안에 {linger}초 머물면 불안한 뼈무더기가 일어납니다.',
+  'bossJournal.crypt.lady.overview':
+    '유령 신부입니다. 무덤 등불의 보호를 받지 못하는 모두가 그녀의 통곡에 피해를 입습니다. 등불 하나는 두 명만 보호하고 꺼지므로 파티가 교대로 써야 합니다. 또 플레이어 한 명을 공중에 붙들고, 파티가 충분히 태워야 놓아줍니다.',
+  'bossJournal.crypt.lady.phaseRavineName': '서리 협곡',
+  'bossJournal.crypt.lady.phaseRavineSummary':
+    '협곡 주위에 무덤 등불 세 개가 서 있습니다. 그녀가 지나간 길은 미끄러운 얼음이 됩니다.',
+  'bossJournal.crypt.lady.phaseFreezeName': '신부의 결빙',
+  'bossJournal.crypt.lady.phaseFreezeSummary':
+    '생명력이 {health}가 되면 협곡 바닥 전체가 전투가 끝날 때까지 얼어붙습니다.',
+  'bossJournal.crypt.lady.lamentSummary':
+    '{every}초마다 {cast}초 시전 후, 등불의 보호를 받지 못하는 모든 플레이어가 {min}~{max}의 피해를 입습니다. 맞을 때마다 남은 애가가 한 중첩 쌓입니다: 중첩당 애가 피해 {perStack} 증가, {seconds}초 지속, 최대 {stacks}중첩.',
+  'bossJournal.crypt.lady.lamentResponse': '시전이 끝나기 전에 켜진 등불의 빛 안에 서세요.',
+  'bossJournal.crypt.lady.lanternName': '무덤 등불',
+  'bossJournal.crypt.lady.lanternSummary':
+    '켜진 등불은 {radius}야드 안의 최대 {cap}명을 애가로부터 보호합니다. 누군가를 보호한 등불은 {dark}초 동안 꺼지므로 다음 애가에도 여전히 꺼져 있습니다.',
+  'bossJournal.crypt.lady.lanternHeroicSummary':
+    '켜진 등불은 {radius}야드 안의 최대 {cap}명을 애가로부터 보호합니다. 누군가를 보호한 등불은 {dark}초 동안 꺼집니다. 영웅 난이도에서는 켜진 등불도 {lit}초 뒤에 저절로 꺼지고 {gutter}초 동안 어두워집니다.',
+  'bossJournal.crypt.lady.lanternResponse':
+    '누가 어느 등불을 쓸지 정하고, 애가마다 켜진 등불로 교대하세요.',
+  'bossJournal.crypt.lady.embraceSummary':
+    '{every}초마다 방어 담당이 아닌 플레이어 한 명을 붙잡아 공중에 들어 올리고 놓지 않습니다. {hold}초 안에 그녀의 생명력 {share}를 깎으면 부드럽게 내려놓고, 아니면 떨어뜨립니다: {min}~{max}의 피해.',
+  'bossJournal.crypt.lady.embraceHeroicSummary':
+    '{every}초마다 방어 담당이 아닌 플레이어 {victims}명을 붙잡아 공중에 들어 올리고 놓지 않습니다. {hold}초 안에 그녀의 생명력 {share}를 깎으면 부드럽게 내려놓고, 아니면 떨어뜨립니다: {min}~{max}의 피해.',
+  'bossJournal.crypt.lady.embraceResponse':
+    '누군가 붙잡히면 모두가 즉시 폭딜하세요. 치유 담당은 붙잡힌 플레이어를 채우세요.',
+  'bossJournal.crypt.lady.rimeSummary':
+    '떠다니는 자리에 미끄러운 얼음을 남기며, 하나당 {seconds}초 지속됩니다. 얼음 위에서는 미끄러지고 천천히 방향을 틉니다.',
+  'bossJournal.crypt.lady.rimeResponse': '빠르게 움직여야 할 때는 그녀가 지나간 길을 피하세요.',
+  'bossJournal.crypt.lady.freezeSummary':
+    '생명력이 {health}가 되면 {cast}초 시전 후, 바닥 전체가 전투가 끝날 때까지 미끄러운 얼음이 됩니다. 이미 시전 중인 애가는 취소됩니다.',
+  'bossJournal.crypt.lady.freezeResponse':
+    '일찍 움직이세요: 얼음 위에서는 등불까지 더 오래 걸립니다.',
+  'bossJournal.crypt.lady.tipTank':
+    '그녀를 가운데 근처에 두어 모든 등불이 파티의 손이 닿는 거리에 있게 하세요.',
+  'bossJournal.crypt.lady.tipHealer':
+    '보호받지 못한 플레이어는 애가를 맞고 중첩이 쌓입니다. 붙잡힌 플레이어는 붙들려 있는 동안 피해를 입습니다.',
+  'bossJournal.crypt.lady.tipDamage':
+    '누군가 붙잡히는 즉시 폭딜하세요. 애가마다 켜진 등불 사이를 교대하세요.',
+  'bossJournal.crypt.lady.choiceName': '누가 애가를 맞을까?',
+  'bossJournal.crypt.lady.choiceGain':
+    '등불 세 개를 모두 쓰면 각각 최대 {cap}명을 보호하므로 이번 애가는 아무도 맞지 않습니다.',
+  'bossJournal.crypt.lady.choiceRisk':
+    '쓴 등불은 다음 애가에도 꺼져 있어 그때는 누군가 맞게 되며, 남은 애가는 중첩마다 피해가 {perStack}씩 늘어납니다.',
+  'bossJournal.crypt.lady.heroicEmbrace': '얼어붙은 포옹이 {victims}명을 동시에 붙잡습니다.',
+  'bossJournal.crypt.lady.heroicLanterns':
+    '켜진 등불이 {lit}초 뒤에 저절로 꺼지고 {gutter}초 동안 어두워집니다.',
+  'bossJournal.crypt.ilvane.overview':
+    '공허의 성가대원 두 명이 지키는 성가대장입니다. 성가대원이 살아 있는 동안 그녀가 받는 피해가 줄어듭니다. 그녀의 만가는 모습이 보이는 모두를 다치게 하고 침묵시키니, 차단하거나 기둥 뒤에 숨으세요. 뼈 오르간도 연주해 음표 줄을 성가대석 위로 보냅니다.',
+  'bossJournal.crypt.ilvane.phaseLoftName': '성가대석',
+  'bossJournal.crypt.ilvane.phaseLoftSummary':
+    '공허의 성가대원 두 명을 곁에 두고 성가대석에서 노래합니다.',
+  'bossJournal.crypt.ilvane.phaseCrescendoName': '크레셴도',
+  'bossJournal.crypt.ilvane.phaseCrescendoSummary':
+    '생명력이 {health}가 되면 노래가 빨라지고 오르간이 세 번째 파도를 연주합니다.',
+  'bossJournal.crypt.ilvane.harmonyName': '화음',
+  'bossJournal.crypt.ilvane.harmonySummary':
+    '살아 있는 성가대원 한 명마다 그녀가 받는 피해가 {per} 감소합니다: 둘 다 서 있으면 {both}.',
+  'bossJournal.crypt.ilvane.harmonyResponse': '성가대원을 먼저 처치하세요.',
+  'bossJournal.crypt.ilvane.dirgeSummary':
+    '{every}초마다 {cast}초 시전. 끝까지 부르면 그녀가 보이는 모두가 {min}~{max}의 피해를 입고 {silence}초 동안 침묵합니다. 차단당하면 {quiet}초 동안 만가를 부르지 않습니다.',
+  'bossJournal.crypt.ilvane.dirgeResponse':
+    '차단하거나, 시전이 끝나기 전에 기둥 뒤에서 시선을 끊으세요.',
+  'bossJournal.crypt.ilvane.organSummary':
+    '{every}초마다 오르간으로 걸어가 음표 줄을 {waves}번의 파도로 성가대석에 보냅니다. 각 줄은 {gather}초 동안 표시된 뒤 터집니다: {min}~{max}의 피해.',
+  'bossJournal.crypt.ilvane.organResponse': '첫 줄들 사이에 서고, 이미 터진 줄 안으로 들어가세요.',
+  'bossJournal.crypt.ilvane.encoreName': '앙코르',
+  'bossJournal.crypt.ilvane.encoreSummary':
+    '짝이 서 있는 동안 {seconds}초 쓰러져 있던 성가대원은 생명력이 가득 찬 채 다시 일어납니다.',
+  'bossJournal.crypt.ilvane.encoreResponse': '성가대원 둘을 서로 {seconds}초 이내에 처치하세요.',
+  'bossJournal.crypt.ilvane.unbrokenSummary':
+    '{nth}번째 만가마다 끊기지 않는 구절이 됩니다: 차단할 수 없습니다.',
+  'bossJournal.crypt.ilvane.unbrokenResponse': '그때는 기둥 뒤에 숨으세요.',
+  'bossJournal.crypt.ilvane.crescendoName': '크레셴도',
+  'bossJournal.crypt.ilvane.crescendoSummary':
+    '생명력이 {health} 미만이면 만가는 {cast}초 시전에 {every}초마다 오고, 오르간은 {waves}번의 파도를 연주합니다. 세 번째 파도는 첫 파도의 줄을 다시 씁니다.',
+  'bossJournal.crypt.ilvane.crescendoResponse':
+    '모든 만가를 차단하고, 세 번째 파도에서는 첫 줄에서 물러나세요.',
+  'bossJournal.crypt.ilvane.tipTank':
+    '성가대원들을 한데 모아 빨리 처치할 수 있게 한 뒤 일베인을 맡으세요.',
+  'bossJournal.crypt.ilvane.tipHealer':
+    '완성된 만가는 당신도 침묵시킵니다: 아무도 차단할 수 없으면 기둥 뒤에 숨으세요.',
+  'bossJournal.crypt.ilvane.tipDamage':
+    '성가대원을 먼저 처치하고, 만가를 차단하고, 오르간 줄을 피하세요.',
+  'bossJournal.crypt.ilvane.tipDamageHeroic':
+    '성가대원 둘을 서로 {seconds}초 이내에 처치하고, 만가를 차단하고, 끊기지 않는 구절은 모두 숨어서 피하세요.',
+  'bossJournal.crypt.ilvane.choiceName': '차단할까, 숨을까?',
+  'bossJournal.crypt.ilvane.choiceGain':
+    '차단하면 만가가 멈추고 그녀는 {quiet}초 동안 조용해집니다.',
+  'bossJournal.crypt.ilvane.choiceRisk':
+    '기둥 뒤에 숨으면 공격 시간을 잃습니다. 차단에 실패하면 시야 안의 모두가 침묵하고 피해를 입습니다.',
+  'bossJournal.crypt.ilvane.heroicEncore':
+    '앙코르: 짝이 살아 있는 동안 {seconds}초 쓰러져 있던 성가대원은 다시 일어납니다.',
+  'bossJournal.crypt.ilvane.heroicUnbroken':
+    '끊기지 않는 구절: {nth}번째 만가마다 차단할 수 없습니다.',
+  'bossJournal.crypt.morthen.overview':
+    '삼막의 의식을 치르는 리치 주교입니다. 먼저 영혼을 불러 자신을 강화하고, 생명력이 {rite}가 되면 결계 뒤로 숨어 파티가 생명력을 치르고 양초 네 개를 다시 밝힐 때까지 나오지 않으며, {last}가 되면 거대한 낫을 휘두릅니다.',
+  'bossJournal.crypt.morthen.phaseCallingName': '부름',
+  'bossJournal.crypt.morthen.phaseCallingSummary':
+    '주위에 어둠의 파동을 뿜고 영혼을 불러 자신을 살찌웁니다.',
+  'bossJournal.crypt.morthen.phaseRiteName': '불안한 자들의 의식',
+  'bossJournal.crypt.morthen.phaseRiteSummary':
+    '생명력이 {health}가 되면 제단으로 돌아가 양초 네 개가 모두 다시 탈 때까지 피해를 받지 않습니다.',
+  'bossJournal.crypt.morthen.phaseLastName': '최후의 의식',
+  'bossJournal.crypt.morthen.phaseLastSummary':
+    '생명력이 {health}가 되면 전투의 마지막을 위해 낫을 듭니다.',
+  'bossJournal.crypt.morthen.pulseSummary':
+    '{every}초마다({everyLast}초는 최후의 의식 중) {cast}초 시전 후, {radius}야드 안의 모두가 {min}~{max}의 피해를 입습니다.',
+  'bossJournal.crypt.morthen.pulseResponse':
+    '방어 담당을 포함한 모두가 시전이 끝나기 전에 {radius}야드 밖으로 나가세요.',
+  'bossJournal.crypt.morthen.gravecallName': '무덤부름',
+  'bossJournal.crypt.morthen.gravecallSummary':
+    '{every}초마다 속박된 영혼이 벽감에서 그를 향해 떠갑니다. 그에게 닿으면 중첩마다 주는 피해가 {per} 늘어나고(최대 {stacks}중첩) 생명력 {heal}를 회복합니다. 영혼이 처음 닿는 플레이어가 대신 받아냅니다: {min}~{max}의 피해.',
+  'bossJournal.crypt.morthen.gravecallResponse': '여유 있는 플레이어가 영혼마다 경로에 들어서세요.',
+  'bossJournal.crypt.morthen.graspName': '무덤의 손아귀',
+  'bossJournal.crypt.morthen.graspSummary':
+    '{every}초마다 플레이어 {count}명의 발밑에 {radius}야드 고리가 나타납니다. {fuse}초 뒤 손이 솟아오릅니다: 안에 있는 모두가 {root}초 동안 이동 불가가 되고 {min}~{max}의 피해를 입습니다.',
+  'bossJournal.crypt.morthen.graspResponse': '고리에서 즉시 나오세요.',
+  'bossJournal.crypt.morthen.riteSummary':
+    '피해 면역이 되고 양초 {candles}개가 꺼집니다. 불안한 뼈무더기 {bones}개가 기어 나옵니다. 무덤의 냉기가 매초 모두를 때립니다: {base}의 피해에, {chillEvery}초마다 {step}씩 늘어나며 상한이 없습니다.',
+  'bossJournal.crypt.morthen.riteResponse':
+    '양초 네 개를 빨리 다시 밝히세요: 냉기는 멈추지 않고 오릅니다.',
+  'bossJournal.crypt.morthen.relightName': '추모의 양초 다시 밝히기',
+  'bossJournal.crypt.morthen.relightSummary':
+    '양초 곁({range}야드 안)에서 {channel}초 정신 집중하여 다시 밝힙니다. 밝히는 사람은 최대 생명력의 {drain}를 잃습니다. 네 번째가 켜지면 그는 {stun}초 동안 기절하고 받는 피해가 {vuln} 늘어납니다.',
+  'bossJournal.crypt.morthen.relightResponse':
+    '생명력에 여유가 있는 플레이어에게 양초를 나누고, 기절한 동안 폭딜하세요.',
+  'bossJournal.crypt.morthen.nameDeadSummary':
+    '양초는 명부에서 뻗는 황금빛 광선이 가리키는 순서대로 밝혀야 합니다. 다른 양초를 밝히면 마지막으로 밝힌 양초가 꺼지고, 밝힌 사람이 {min}~{max}의 피해를 입습니다.',
+  'bossJournal.crypt.morthen.nameDeadResponse': '광선이 가리키는 양초만 밝히세요.',
+  'bossJournal.crypt.morthen.reapSummary':
+    '{every}초마다 방어 담당에게 {cast}초 시전 후, 정면 {arc}도 부채꼴로 {range}야드까지 낫을 휩씁니다: {min}~{max}의 피해.',
+  'bossJournal.crypt.morthen.reapResponse':
+    '정면에는 방어 담당만 서세요. 방어 담당은 시전 중에 옆으로 비켜도 됩니다.',
+  'bossJournal.crypt.morthen.tipTank':
+    '그가 일행을 등지게 하고, 모두와 함께 어둠의 파동 밖으로 나가세요.',
+  'bossJournal.crypt.morthen.tipHealer':
+    '양초 하나마다 밝히는 사람의 생명력이 크게 깎이고 무덤의 냉기도 계속 오릅니다: 밝히는 사람을 먼저 치유하세요.',
+  'bossJournal.crypt.morthen.tipDamage':
+    '속박된 영혼을 몸으로 막고, 의식에서는 양초를 다시 밝히고, 그가 기절한 동안 폭딜하세요.',
+  'bossJournal.crypt.morthen.tipDamageHeroic':
+    '속박된 영혼을 몸으로 막고 무덤의 손아귀를 피하세요. 의식에서는 황금빛 광선을 따라 맞는 양초를 밝히세요.',
+  'bossJournal.crypt.morthen.choiceCandleName': '몇 명이 밝힐까?',
+  'bossJournal.crypt.morthen.choiceCandleGain':
+    '여러 명이 동시에 다시 밝히면 무덤의 냉기가 오르기 전에 의식이 더 빨리 끝납니다.',
+  'bossJournal.crypt.morthen.choiceCandleRisk':
+    '밝히는 사람은 양초마다 최대 생명력의 {normal}를 치르며, 그동안 냉기는 계속 오릅니다.',
+  'bossJournal.crypt.morthen.choiceSoulName': '영혼을 막을까?',
+  'bossJournal.crypt.morthen.choiceSoulGain':
+    '막은 영혼은 그에게 닿지 못합니다: 피해 중첩도 회복도 없습니다.',
+  'bossJournal.crypt.morthen.choiceSoulRisk':
+    '막은 사람이 영혼의 피해를 입습니다. 통과한 영혼은 하나마다 그의 피해를 {per} 늘리고 {heal}를 회복시킵니다.',
+  'bossJournal.crypt.morthen.heroicNameDead':
+    '망자의 이름: 양초는 명부가 보여 주는 순서대로 밝혀야 합니다.',
+  'bossJournal.crypt.morthen.heroicGrasp':
+    '무덤의 손아귀: 이동 불가와 피해를 주는 고리가 모든 막에서 나타납니다.',
+  'bossJournal.crypt.morthen.heroicDrain':
+    '양초 하나마다 밝히는 사람의 최대 생명력 {drain}를 소모합니다.',
+  'bossJournal.crypt.wyrm.overview':
+    '모르덴의 마지막 의식이 화장단에 불을 붙이고, 뼈 용이 그 안에 내려앉습니다. 납골당 뼈드레이크처럼 싸우며, 거기에 불타는 강습 줄과 플레이어를 밀쳐내지만 자신은 피해에 무방비해지는 포효가 더해집니다.',
+  'bossJournal.crypt.wyrm.phaseName': '용부름 화장단',
+  'bossJournal.crypt.wyrm.phaseSummary':
+    '손이 닿지 않는 곳에서 활강해 와 불길을 터뜨리며 고리 안에 내려앉습니다.',
+  'bossJournal.crypt.wyrm.strafeSummary':
+    '{every}초마다 플레이어 한 명을 지나는 너비 {width}야드의 줄을 {mark}초 동안 표시한 뒤, 불을 쏟으며 그 위를 날아갑니다: 줄 안의 모두가 {min}~{max}의 피해. 줄은 {seconds}초 동안 계속 타오릅니다: 초당 {burn}의 피해.',
+  'bossJournal.crypt.wyrm.strafeResponse':
+    '표시된 줄에서 옆으로 벗어나고 불타는 바닥에서도 떨어지세요.',
+  'bossJournal.crypt.wyrm.bellowSummary':
+    '{every}초마다 {cast}초 시전 후, {radius}야드 안이 {min}~{max}의 피해를 입고 {push}야드 밀려납니다. 이후 {seconds}초 동안 받는 피해가 {vuln} 늘어납니다.',
+  'bossJournal.crypt.wyrm.bellowResponse':
+    '불타는 줄 안으로 밀려나지 마세요. 그 뒤의 틈에 재사용 대기 기술을 쓰세요.',
+  'bossJournal.crypt.wyrm.knellSummary':
+    '{every}초마다 손이 닿지 않는 곳으로 날아올라 고리의 절반에 불을 {breaths}번 뿜습니다. 각 절반은 불이 떨어지기 {mark}초 전에 표시됩니다: 그 안의 모두가 {min}~{max}의 피해.',
+  'bossJournal.crypt.wyrm.knellResponse': '매번 표시되지 않은 쪽 절반으로 달려가세요.',
+  'bossJournal.crypt.wyrm.tipTank': '일행을 등지게 하고, 불타는 줄에서 벗어나게 돌리세요.',
+  'bossJournal.crypt.wyrm.tipHealer':
+    '화장의 강습과 공포의 포효가 피해가 크게 들어오는 순간입니다. 불타는 줄로 밀려난 사람을 치유하세요.',
+  'bossJournal.crypt.wyrm.tipDamage':
+    '표시된 줄에서 벗어나고, 공포의 포효가 끝날 때마다 재사용 대기 기술을 쓰세요.',
+  'bossJournal.crypt.wyrm.tipDamageHeroic':
+    '표시된 줄에서 벗어나고, 불타는 조종 동안에는 매번 안전한 쪽 절반으로 달려가세요.',
+  'bossJournal.crypt.wyrm.heroicKnell':
+    '불타는 조종: 날아올라 고리의 절반에 불을 {breaths}번 뿜습니다.',
 };

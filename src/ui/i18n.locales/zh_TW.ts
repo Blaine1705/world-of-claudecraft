@@ -21163,4 +21163,222 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '雙重獵物：兩名玩家被追獵；他每{switchEvery}秒切換一次。',
   'bossJournal.wildheart.zulgar.heroicAmbush':
     '伏擊：每次追獵後，他會撲向最遠玩家所在的{radius}碼圓圈。',
+  'bossJournal.crypt.drake.overview':
+    '一頭骨龍在送葬大道上空盤旋。從它下方走過，它就會落地迎戰：正面噴火，身後甩尾，周身掀起翼風。',
+  'bossJournal.crypt.drake.phaseName': '送葬大道',
+  'bossJournal.crypt.drake.phaseSummary': '它在被拉到的地方落地，在地面作戰。',
+  'bossJournal.crypt.drake.breathSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後向正前方 {arc} 度扇形、{range} 碼內噴出烈焰：造成 {min} 至 {max} 傷害。施放期間它的朝向鎖定。',
+  'bossJournal.crypt.drake.breathResponse': '只有坦克站在正面。其他人站在它的兩側。',
+  'bossJournal.crypt.drake.tailSummary':
+    '有人站在它身後時，每 {every} 秒施放 {cast} 秒法術，隨後向身後 {arc} 度、{range} 碼的扇形橫掃：造成 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.drake.tailResponse': '絕不要站在它身後。',
+  'bossJournal.crypt.drake.gustSummary':
+    '有人靠近時，每 {every} 秒施放 {cast} 秒法術，隨後 {radius} 碼內所有人受到 {min} 至 {max} 傷害，並被擊退 {push} 碼。',
+  'bossJournal.crypt.drake.gustResponse': '做好被擊退的準備，背後不要靠近邊緣。',
+  'bossJournal.crypt.drake.embersName': '塚焰餘燼',
+  'bossJournal.crypt.drake.embersSummary':
+    '每次吐息下方的地面會持續燃燒 {seconds} 秒：站在上面的人每秒受到 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.drake.embersResponse': '把骨龍帶離燃燒的地面，並走出火場。',
+  'bossJournal.crypt.drake.tipTank': '讓吐息朝向遠離隊伍的方向；英雄難度下，把它帶離燃燒的地面。',
+  'bossJournal.crypt.drake.tipHealer': '吐息和翼風是傷害高峰。站在它的側面。',
+  'bossJournal.crypt.drake.tipDamage': '從側面攻擊：不要站在正面，也不要站在背後。',
+  'bossJournal.crypt.drake.heroicEmbers': '塚焰餘燼：每次吐息都會讓地面燃燒 {seconds} 秒。',
+  'bossJournal.crypt.marrow.overview':
+    '一個復活的掘墓人，專為玩家量身定墓。每座墳墓都會保持敞開，使其中的人減速並灼燒，他敲響葬鐘時每座墳墓都會爬出一具不寧骸骨。把墳墓挖在墓園邊緣，並控制墳墓的數量。',
+  'bossJournal.crypt.marrow.phaseYardSummary': '他在被標記的玩家腳下挖墳，並向坦克揮舞鐵鏟。',
+  'bossJournal.crypt.marrow.phaseTollName': '葬禮喪鐘',
+  'bossJournal.crypt.marrow.phaseTollSummary':
+    '生命值降到 {first} 和 {second} 時，他走向鐘繩，敲響葬禮喪鐘。',
+  'bossJournal.crypt.marrow.shovelSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後向他正前方 {arc} 度、{range} 碼的扇形揮鏟，造成他近戰攻擊 {mult} 倍的傷害。被擊中的人都會獲得迷眼之土：移動速度降低 {slow}，持續 {seconds} 秒。',
+  'bossJournal.crypt.marrow.shovelResponse': '只有坦克站在正面。坦克可以在施放期間走開。',
+  'bossJournal.crypt.marrow.measureSummary':
+    '每 {every} 秒施放 {cast} 秒法術，標記一名玩家。{mark} 秒後，墳墓在其腳下塌陷：{radius} 碼內所有人受到 {min} 至 {max} 傷害。墳墓在整場戰鬥中保持敞開：在裡面移動速度降低 {slow}，每秒受到 {dirt} 傷害。最多 {cap} 座墳墓；新墳出現時會填平最舊的一座。',
+  'bossJournal.crypt.marrow.measureResponse':
+    '被標記時：在墳墓打開前走到墓園邊緣。絕不要站在敞開的墳墓裡。',
+  'bossJournal.crypt.marrow.blowSummary':
+    '每 {every} 秒對坦克施放 {cast} 秒法術：一次近戰打擊，疊加一層使受到的傷害提高 {vuln} 的效果，最多 {stacks} 層（共 {max}），持續 {seconds} 秒。',
+  'bossJournal.crypt.marrow.blowResponse': '坦克：層數上升時開減傷技能。治療者盯緊坦克。',
+  'bossJournal.crypt.marrow.vigorName': '墳墓之力',
+  'bossJournal.crypt.marrow.vigorSummary': '他站在敞開的墳墓裡時，攻擊速度提高 {haste}。',
+  'bossJournal.crypt.marrow.vigorResponse': '坦克別讓他進墳墓。',
+  'bossJournal.crypt.marrow.unquietName': '不寧之土',
+  'bossJournal.crypt.marrow.unquietSummary':
+    '玩家在墳墓裡停留 {linger} 秒，就會從中喚出一具不寧骸骨。該墳墓隨後休眠 {rest} 秒。',
+  'bossJournal.crypt.marrow.unquietResponse': '立刻離開墳墓。',
+  'bossJournal.crypt.marrow.tollSummary':
+    '他走向鐘繩，敲鐘 {ring} 秒，行走和敲鐘期間免疫傷害。隨後每名玩家受到 {min} 至 {max} 傷害，每座敞開的墳墓都會喚出一具不寧骸骨。',
+  'bossJournal.crypt.marrow.tollResponse':
+    '最後一聲鐘響前，治療者把所有人補滿。坦克接住不寧骸骨；輸出者擊殺它們。',
+  'bossJournal.crypt.marrow.tipTank': '讓他背對隊伍。每次葬禮喪鐘後，接住所有不寧骸骨。',
+  'bossJournal.crypt.marrow.tipTankHeroic':
+    '讓他背對隊伍，並遠離所有墳墓。掘墓人重擊會疊層：層數上升時開減傷技能。',
+  'bossJournal.crypt.marrow.tipHealer':
+    '葬禮喪鐘打擊全隊。墳墓會使其中的人減速並灼燒，所以要幫助被困在裡面的人。',
+  'bossJournal.crypt.marrow.tipDamage':
+    '被標記時，把墳墓帶到墓園邊緣。每次喪鐘後，先擊殺不寧骸骨，再回到馬羅身邊。',
+  'bossJournal.crypt.marrow.choiceName': '墳墓挖在哪裡？',
+  'bossJournal.crypt.marrow.choiceGain': '挖在墓園邊緣的墳墓，讓中間留出戰鬥和閃避的空間。',
+  'bossJournal.crypt.marrow.choiceRisk':
+    '任何位置上的每座敞開的墳墓，都會在下一次喪鐘時喚出一具不寧骸骨，最多同時 {cap} 具。',
+  'bossJournal.crypt.marrow.choiceRiskHeroic':
+    '任何位置上的每座敞開的墳墓，都會在下一次喪鐘時喚出一具不寧骸骨，最多同時 {cap} 具。英雄難度下，坦克附近的墳墓還會讓馬羅加速。',
+  'bossJournal.crypt.marrow.heroicBlow':
+    '掘墓人重擊：打擊坦克，疊加使受到的傷害提高 {vuln} 的效果。',
+  'bossJournal.crypt.marrow.heroicVigor': '墳墓之力：在墳墓裡時攻擊速度提高 {haste}。',
+  'bossJournal.crypt.marrow.heroicUnquiet':
+    '不寧之土：在墳墓裡停留 {linger} 秒會喚出一具不寧骸骨。',
+  'bossJournal.crypt.lady.overview':
+    '一位幽靈新娘，她的哀嚎會傷害每個沒有被墓燈庇護的人。每盞墓燈只能庇護兩名玩家，隨後熄滅，所以隊伍必須輪流使用。她還會把一名玩家舉到空中，直到隊伍對她造成足夠的傷害，她才肯鬆手。',
+  'bossJournal.crypt.lady.phaseRavineName': '霜凍峽谷',
+  'bossJournal.crypt.lady.phaseRavineSummary':
+    '峽谷四周立著三盞墓燈。她經過的路徑會變成光滑的冰面。',
+  'bossJournal.crypt.lady.phaseFreezeName': '新娘冰封',
+  'bossJournal.crypt.lady.phaseFreezeSummary':
+    '生命值降到 {health} 時，整個峽谷地面凍結，持續到戰鬥結束。',
+  'bossJournal.crypt.lady.lamentSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後對每名未被墓燈庇護的玩家造成 {min} 至 {max} 傷害。每次受擊都會疊加一層縈繞哀歌：每層使哀歌傷害提高 {perStack}，持續 {seconds} 秒，最多 {stacks} 層。',
+  'bossJournal.crypt.lady.lamentResponse': '在施放結束前站進點亮的墓燈光芒中。',
+  'bossJournal.crypt.lady.lanternName': '墓燈',
+  'bossJournal.crypt.lady.lanternSummary':
+    '點亮的墓燈可以讓 {radius} 碼內最多 {cap} 名玩家免受哀歌傷害。庇護過任何人的墓燈會熄滅 {dark} 秒，所以下一次哀歌時它仍是暗的。',
+  'bossJournal.crypt.lady.lanternHeroicSummary':
+    '點亮的墓燈可以讓 {radius} 碼內最多 {cap} 名玩家免受哀歌傷害。庇護過任何人的墓燈會熄滅 {dark} 秒。英雄難度下，點亮的墓燈還會在 {lit} 秒後自行燃盡，並保持熄滅 {gutter} 秒。',
+  'bossJournal.crypt.lady.lanternResponse': '事先安排誰用哪盞墓燈，每次哀歌都輪換到一盞點亮的燈。',
+  'bossJournal.crypt.lady.embraceSummary':
+    '每 {every} 秒，她抓住一名非坦克玩家，把對方舉到空中並抓住不放。在 {hold} 秒內對她造成 {share} 的生命值傷害，她就會把人輕輕放下；否則她會把人摔下：造成 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.lady.embraceHeroicSummary':
+    '每 {every} 秒，她抓住 {victims} 名非坦克玩家，把他們舉到空中並抓住不放。在 {hold} 秒內對她造成 {share} 的生命值傷害，她就會把人輕輕放下；否則她會把人摔下：造成 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.lady.embraceResponse':
+    '她一抓人，所有人立刻爆發輸出。治療者為被抓的玩家補血。',
+  'bossJournal.crypt.lady.rimeSummary':
+    '她飄過之處會留下光滑的冰面；每塊持續 {seconds} 秒。在冰上你會滑行，轉向緩慢。',
+  'bossJournal.crypt.lady.rimeResponse': '需要快速移動時，避開她的軌跡。',
+  'bossJournal.crypt.lady.freezeSummary':
+    '生命值降到 {health} 時，她施放 {cast} 秒法術，隨後整個地面變成光滑的冰面，持續到戰鬥結束。這會打斷正在施放的哀歌。',
+  'bossJournal.crypt.lady.freezeResponse': '提早行動：在冰上要花更久才能走到墓燈。',
+  'bossJournal.crypt.lady.tipTank': '讓她留在中間，使每盞墓燈都在隊伍搆得到的範圍內。',
+  'bossJournal.crypt.lady.tipHealer':
+    '未被庇護的玩家承受哀歌並疊層。被抓住的玩家在被她舉起期間持續受傷。',
+  'bossJournal.crypt.lady.tipDamage': '她一抓人就爆發輸出。每次哀歌都在點亮的墓燈之間輪換。',
+  'bossJournal.crypt.lady.choiceName': '誰來承受哀歌？',
+  'bossJournal.crypt.lady.choiceGain':
+    '三盞墓燈全部使用，每盞最多庇護 {cap} 名玩家，這次哀歌就沒有人受傷。',
+  'bossJournal.crypt.lady.choiceRisk':
+    '用過的墓燈在下一次哀歌時仍是暗的，所以到時會有人受傷，而且每層縈繞哀歌會額外提高 {perStack} 傷害。',
+  'bossJournal.crypt.lady.heroicEmbrace': '冰封之擁同時抓住 {victims} 名玩家。',
+  'bossJournal.crypt.lady.heroicLanterns':
+    '點亮的墓燈會在 {lit} 秒後自行燃盡，並保持熄滅 {gutter} 秒。',
+  'bossJournal.crypt.ilvane.overview':
+    '一位唱詩班女指揮，由兩名空洞唱詩者守護，只要它們活著，就會為她減傷。她的輓歌會傷害並沉默所有能看見她的人，所以要打斷它，或躲到柱子後面。她還會彈奏骨管風琴，讓一道道音符通道沿著唱詩樓襲來。',
+  'bossJournal.crypt.ilvane.phaseLoftName': '唱詩樓',
+  'bossJournal.crypt.ilvane.phaseLoftSummary': '她在唱詩樓上歌唱，身邊有兩名空洞唱詩者。',
+  'bossJournal.crypt.ilvane.phaseCrescendoName': '漸強',
+  'bossJournal.crypt.ilvane.phaseCrescendoSummary':
+    '生命值降到 {health} 時，她唱得更快，風琴會奏出第三波。',
+  'bossJournal.crypt.ilvane.harmonyName': '和聲',
+  'bossJournal.crypt.ilvane.harmonySummary':
+    '每名存活的唱詩者使她受到的傷害降低 {per}：兩名都在時降低 {both}。',
+  'bossJournal.crypt.ilvane.harmonyResponse': '先殺唱詩者。',
+  'bossJournal.crypt.ilvane.dirgeSummary':
+    '每 {every} 秒施放 {cast} 秒法術。施放完成時，所有能看見她的人受到 {min} 至 {max} 傷害，並被沉默 {silence} 秒。被打斷後，她 {quiet} 秒內不會再唱輓歌。',
+  'bossJournal.crypt.ilvane.dirgeResponse': '打斷它，或在施放結束前躲到柱子後面脫離視線。',
+  'bossJournal.crypt.ilvane.organSummary':
+    '每 {every} 秒，她走到風琴前，沿唱詩樓奏出 {waves} 波音符通道。每條通道顯示 {gather} 秒後爆發：造成 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.ilvane.organResponse': '先站在前幾條通道之間，再走進已經爆發過的通道。',
+  'bossJournal.crypt.ilvane.encoreName': '安可',
+  'bossJournal.crypt.ilvane.encoreSummary':
+    '一名唱詩者倒下 {seconds} 秒而同伴仍站著時，它會以滿生命值重新站起。',
+  'bossJournal.crypt.ilvane.encoreResponse': '兩名唱詩者的死亡間隔不要超過 {seconds} 秒。',
+  'bossJournal.crypt.ilvane.unbrokenSummary': '每第 {nth} 首輓歌是不斷之詩：無法被打斷。',
+  'bossJournal.crypt.ilvane.unbrokenResponse': '為它躲到柱子後面。',
+  'bossJournal.crypt.ilvane.crescendoName': '漸強',
+  'bossJournal.crypt.ilvane.crescendoSummary':
+    '生命值低於 {health} 時，輓歌施放 {cast} 秒，每 {every} 秒一次，風琴奏出 {waves} 波。第三波會重複第一波的通道。',
+  'bossJournal.crypt.ilvane.crescendoResponse': '打斷每一首輓歌，第三波時從第一波的通道裡退出來。',
+  'bossJournal.crypt.ilvane.tipTank': '把唱詩者聚在一起以便快速擊殺，然後接住伊爾凡。',
+  'bossJournal.crypt.ilvane.tipHealer': '唱完的輓歌也會沉默你：如果沒人能打斷，就躲到柱子後面。',
+  'bossJournal.crypt.ilvane.tipDamage': '先殺唱詩者，打斷輓歌，躲開風琴通道。',
+  'bossJournal.crypt.ilvane.tipDamageHeroic':
+    '在 {seconds} 秒內擊殺兩名唱詩者，打斷輓歌，並躲開每一次不斷之詩。',
+  'bossJournal.crypt.ilvane.choiceName': '打斷還是躲避？',
+  'bossJournal.crypt.ilvane.choiceGain': '打斷會中止輓歌，並讓她 {quiet} 秒內保持安靜。',
+  'bossJournal.crypt.ilvane.choiceRisk':
+    '躲在柱子後面會損失輸出時間。打斷失敗則會沉默並傷害視線內的所有人。',
+  'bossJournal.crypt.ilvane.heroicEncore':
+    '安可：唱詩者倒下 {seconds} 秒而同伴仍活著時會重新站起。',
+  'bossJournal.crypt.ilvane.heroicUnbroken': '不斷之詩：每第 {nth} 首輓歌無法被打斷。',
+  'bossJournal.crypt.morthen.overview':
+    '一位巫妖主教，主持三幕儀式。第一幕他召喚靈魂強化自己；生命值降到 {rite} 時，他躲在結界後，直到隊伍付出生命重燃四根蠟燭；降到 {last} 時，他揮舞巨大的鐮刀。',
+  'bossJournal.crypt.morthen.phaseCallingName': '召喚',
+  'bossJournal.crypt.morthen.phaseCallingSummary': '他在周身釋放暗影脈衝，並召喚靈魂餵養自己。',
+  'bossJournal.crypt.morthen.phaseRiteName': '不寧者儀式',
+  'bossJournal.crypt.morthen.phaseRiteSummary':
+    '生命值降到 {health} 時，他回到祭壇，在四根蠟燭全部重新燃起前免疫傷害。',
+  'bossJournal.crypt.morthen.phaseLastName': '終末儀式',
+  'bossJournal.crypt.morthen.phaseLastSummary':
+    '生命值降到 {health} 時，他提起鐮刀，迎接戰鬥的終章。',
+  'bossJournal.crypt.morthen.pulseSummary':
+    '每 {every} 秒（終末儀式中為 {everyLast} 秒）施放 {cast} 秒法術，隨後對 {radius} 碼內所有人造成 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.morthen.pulseResponse':
+    '包括坦克在內的所有人，都要在施放結束前退到 {radius} 碼外。',
+  'bossJournal.crypt.morthen.gravecallName': '喚墓',
+  'bossJournal.crypt.morthen.gravecallSummary':
+    '每 {every} 秒，一個縛魂從壁龕飄向他。若它抵達，他每層多造成 {per} 傷害（最多 {stacks} 層），並恢復 {heal} 的生命值。它接觸到的第一名玩家會替他承受：造成 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.morthen.gravecallResponse': '讓一名閒置的玩家站到每個靈魂的路徑上。',
+  'bossJournal.crypt.morthen.graspName': '墳墓之握',
+  'bossJournal.crypt.morthen.graspSummary':
+    '每 {every} 秒，{count} 名玩家腳下出現 {radius} 碼的法環。{fuse} 秒後鬼手破土而出：環內所有人被定身 {root} 秒，並受到 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.morthen.graspResponse': '立刻走出法環。',
+  'bossJournal.crypt.morthen.riteSummary':
+    '他變得免疫傷害，{candles} 根蠟燭熄滅。{bones} 具不寧骸骨爬出。墓穴寒意每秒打擊所有人：{base} 點傷害，每 {chillEvery} 秒提高 {step}，沒有上限。',
+  'bossJournal.crypt.morthen.riteResponse': '快速重燃全部四根蠟燭：寒意不會停止上升。',
+  'bossJournal.crypt.morthen.relightName': '重燃追思蠟燭',
+  'bossJournal.crypt.morthen.relightSummary':
+    '在蠟燭旁（{range} 碼內）引導 {channel} 秒來重燃它。點燃者損失 {drain} 的最大生命值。第四根點燃時，他被擊暈 {stun} 秒，並多受到 {vuln} 傷害。',
+  'bossJournal.crypt.morthen.relightResponse': '把蠟燭分給生命值充裕的玩家，並在擊暈期間爆發輸出。',
+  'bossJournal.crypt.morthen.nameDeadSummary':
+    '蠟燭必須按名冊上金色光束指示的順序點燃。點錯蠟燭會熄滅最後點燃的一根，並對點燃者造成 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.morthen.nameDeadResponse': '只點光束指向的蠟燭。',
+  'bossJournal.crypt.morthen.reapSummary':
+    '每 {every} 秒對坦克施放 {cast} 秒法術，隨後向他正前方 {arc} 度、{range} 碼的扇形揮鐮：造成 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.morthen.reapResponse': '只有坦克站在正面。坦克可以在施放期間側移。',
+  'bossJournal.crypt.morthen.tipTank': '讓他背對隊伍，並和其他人一起走出暗影脈衝。',
+  'bossJournal.crypt.morthen.tipHealer':
+    '每根蠟燭都會消耗點燃者大量生命值，而且墓穴寒意持續上升：優先治療點燃者。',
+  'bossJournal.crypt.morthen.tipDamage': '用身體擋住縛魂，儀式中重燃蠟燭，在他昏迷時爆發輸出。',
+  'bossJournal.crypt.morthen.tipDamageHeroic':
+    '用身體擋住縛魂，並躲開墳墓之握。儀式中沿著金色光束找到正確的蠟燭。',
+  'bossJournal.crypt.morthen.choiceCandleName': '派幾個人點蠟燭？',
+  'bossJournal.crypt.morthen.choiceCandleGain':
+    '多名玩家同時重燃，能更快結束儀式，趕在墓穴寒意攀升之前。',
+  'bossJournal.crypt.morthen.choiceCandleRisk':
+    '每名點燃者每根蠟燭要付出 {normal} 的最大生命值，同時寒意持續上升。',
+  'bossJournal.crypt.morthen.choiceSoulName': '要不要擋住靈魂？',
+  'bossJournal.crypt.morthen.choiceSoulGain':
+    '被擋住的靈魂永遠到不了他身邊：沒有傷害疊層，也沒有治療。',
+  'bossJournal.crypt.morthen.choiceSoulRisk':
+    '擋魂者承受靈魂的傷害。每個漏過的靈魂使他多造成 {per} 傷害，並為他恢復 {heal} 的生命值。',
+  'bossJournal.crypt.morthen.heroicNameDead': '點名亡者：蠟燭必須按名冊顯示的順序點燃。',
+  'bossJournal.crypt.morthen.heroicGrasp': '墳墓之握：每一幕都會出現定身並造成傷害的法環。',
+  'bossJournal.crypt.morthen.heroicDrain': '每根蠟燭消耗點燃者 {drain} 的最大生命值。',
+  'bossJournal.crypt.wyrm.overview':
+    '莫森臨終的儀式點燃了一座火葬堆，一條骨龍落入其中。它的戰鬥方式與骨堂骨龍相似，另有燃燒的掃射通道，以及一聲會擊退玩家、卻讓它暴露出來承受更多傷害的咆哮。',
+  'bossJournal.crypt.wyrm.phaseName': '喚龍火葬堆',
+  'bossJournal.crypt.wyrm.phaseSummary': '它從搆不到的高處滑翔而來，伴著一團烈焰落入法環。',
+  'bossJournal.crypt.wyrm.strafeSummary':
+    '每 {every} 秒，它用 {mark} 秒標出一條穿過某名玩家的 {width} 碼寬通道，隨後噴灑火焰飛過：通道內所有人受到 {min} 至 {max} 傷害。通道會持續燃燒 {seconds} 秒：每秒 {burn} 傷害。',
+  'bossJournal.crypt.wyrm.strafeResponse': '向側面走出標記的通道，並遠離燃燒的地面。',
+  'bossJournal.crypt.wyrm.bellowSummary':
+    '每 {every} 秒施放 {cast} 秒法術，隨後 {radius} 碼內的人受到 {min} 至 {max} 傷害，並被擊退 {push} 碼。之後 {seconds} 秒內，它多受到 {vuln} 傷害。',
+  'bossJournal.crypt.wyrm.bellowResponse': '別被擊退到燃燒的通道裡。在隨後的視窗期交出爆發技能。',
+  'bossJournal.crypt.wyrm.knellSummary':
+    '每 {every} 秒，它飛到搆不到的高處，向半個法環噴吐 {breaths} 次火焰。每個半區在著火前 {mark} 秒被標記：其中所有人受到 {min} 至 {max} 傷害。',
+  'bossJournal.crypt.wyrm.knellResponse': '每次都跑向法環中未被標記的一半。',
+  'bossJournal.crypt.wyrm.tipTank': '讓它背對隊伍，並把它從燃燒的通道裡轉開。',
+  'bossJournal.crypt.wyrm.tipHealer': '火葬掃射和恐懼咆哮是傷害高峰；治療被擊退進燃燒通道的人。',
+  'bossJournal.crypt.wyrm.tipDamage': '走出標記的通道，每次恐懼咆哮後交出爆發技能。',
+  'bossJournal.crypt.wyrm.tipDamageHeroic': '走出標記的通道，燃燒喪鐘期間每次都跑向安全的一半。',
+  'bossJournal.crypt.wyrm.heroicKnell': '燃燒喪鐘：它升空，向半個法環噴吐 {breaths} 次火焰。',
 };

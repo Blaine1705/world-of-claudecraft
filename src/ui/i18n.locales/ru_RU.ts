@@ -22649,4 +22649,264 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Двойная добыча: охота идёт на двоих игроков; он переключается каждые {switchEvery} сек.',
   'bossJournal.wildheart.zulgar.heroicAmbush':
     'Засада: после каждой охоты он прыгает в круг радиусом {radius} м на самого дальнего игрока.',
+  'bossJournal.crypt.drake.overview':
+    'Костяной дракон кружит высоко над Процессией. Пройдите под ним, и он приземлится и вступит в бой: огненное дыхание перед собой, удар хвостом позади и порыв крыльев вокруг.',
+  'bossJournal.crypt.drake.phaseName': 'Процессия',
+  'bossJournal.crypt.drake.phaseSummary':
+    'Приземляется там, куда его утащили, и сражается на земле.',
+  'bossJournal.crypt.drake.breathSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем огонь конусом {arc} градусов на {range} м перед ним: от {min} до {max} урона. На время заклинания его направление фиксируется.',
+  'bossJournal.crypt.drake.breathResponse':
+    'Спереди стоит только танк. Все остальные остаются по бокам.',
+  'bossJournal.crypt.drake.tailSummary':
+    'Каждые {every} сек., если кто-то стоит позади него: заклинание {cast} сек., затем размах хвоста на {arc} градусов и {range} м позади него, от {min} до {max} урона.',
+  'bossJournal.crypt.drake.tailResponse': 'Никогда не стойте у него за спиной.',
+  'bossJournal.crypt.drake.gustSummary':
+    'Каждые {every} сек., если кто-то рядом: заклинание {cast} сек., затем все в пределах {radius} м получают от {min} до {max} урона и отбрасываются на {push} м.',
+  'bossJournal.crypt.drake.gustResponse': 'Ждите отбрасывания и не стойте спиной к краю.',
+  'bossJournal.crypt.drake.embersName': 'Курганные угли',
+  'bossJournal.crypt.drake.embersSummary':
+    'Земля под каждым дыханием горит ещё {seconds} сек.: от {min} до {max} урона в секунду всем, кто на ней стоит.',
+  'bossJournal.crypt.drake.embersResponse': 'Уведите дракона с горящей земли и сами сойдите с неё.',
+  'bossJournal.crypt.drake.tipTank':
+    'Разворачивайте его так, чтобы дыхание шло в сторону от группы, а на героической сложности уводите его с горящей земли.',
+  'bossJournal.crypt.drake.tipHealer':
+    'Дыхание и порыв крыльев дают пики урона. Стойте у него сбоку.',
+  'bossJournal.crypt.drake.tipDamage': 'Атакуйте сбоку: не спереди и не сзади.',
+  'bossJournal.crypt.drake.heroicEmbers':
+    'Курганные угли: каждое дыхание оставляет землю гореть {seconds} сек.',
+  'bossJournal.crypt.marrow.overview':
+    'Поднятый могильщик, который снимает с игроков мерку для могилы. Каждая могила остаётся открытой, замедляя и обжигая всех в ней, и из каждой встают Беспокойные кости, когда он звонит в Погребальный колокол. Копайте могилы у края двора и не давайте им множиться.',
+  'bossJournal.crypt.marrow.phaseYardSummary':
+    'Роет могилы под отмеченными игроками и бьёт лопатой по танку.',
+  'bossJournal.crypt.marrow.phaseTollName': 'Погребальный звон',
+  'bossJournal.crypt.marrow.phaseTollSummary':
+    'При здоровье {first} и {second} он идёт к колокольной верёвке и звонит в Погребальный звон.',
+  'bossJournal.crypt.marrow.shovelSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем удар лопатой конусом {arc} градусов на {range} м перед ним: урон, равный его удару в ближнем бою, умноженному на {mult}. Все пострадавшие получают Землю в глазах: замедление на {slow} на {seconds} сек.',
+  'bossJournal.crypt.marrow.shovelResponse':
+    'Спереди стоит только танк. Танк может отойти во время заклинания.',
+  'bossJournal.crypt.marrow.measureSummary':
+    'Каждые {every} сек. заклинание {cast} сек. отмечает игрока. Через {mark} сек. на его месте обрушивается могила: от {min} до {max} урона всем в пределах {radius} м. Могила остаётся открытой до конца боя: внутри вы замедлены на {slow} и получаете {dirt} урона в секунду. Не больше {cap} могил; новая заполняет самую старую.',
+  'bossJournal.crypt.marrow.measureResponse':
+    'Если вас отметили: идите к краю двора, пока не открылась могила. Никогда не стойте в Открытой могиле.',
+  'bossJournal.crypt.marrow.blowSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по танку: удар в ближнем бою, добавляющий заряд, при котором получаемый урон выше на {vuln}. До {stacks} зарядов ({max}), на {seconds} сек.',
+  'bossJournal.crypt.marrow.blowResponse':
+    'Танк: по мере роста зарядов используйте защитные способности. Лекари следят за танком.',
+  'bossJournal.crypt.marrow.vigorName': 'Могильная сила',
+  'bossJournal.crypt.marrow.vigorSummary':
+    'Пока он стоит в Открытой могиле, он бьёт на {haste} быстрее.',
+  'bossJournal.crypt.marrow.vigorResponse': 'Танк не подпускает его к могилам.',
+  'bossJournal.crypt.marrow.unquietName': 'Неспокойная земля',
+  'bossJournal.crypt.marrow.unquietSummary':
+    'Игрок, который пробыл в могиле {linger} сек., поднимает из неё Беспокойные кости. После этого могила затихает на {rest} сек.',
+  'bossJournal.crypt.marrow.unquietResponse': 'Немедленно выходите из могил.',
+  'bossJournal.crypt.marrow.tollSummary':
+    'Он идёт к верёвке и звонит в колокол {ring} сек., оставаясь неуязвимым, пока идёт и звонит. Затем каждый игрок получает от {min} до {max} урона, а из каждой Открытой могилы встают Беспокойные кости.',
+  'bossJournal.crypt.marrow.tollResponse':
+    'Лекари лечат всех до последнего удара колокола. Танк подбирает Беспокойные кости; бойцы их убивают.',
+  'bossJournal.crypt.marrow.tipTank':
+    'Держите его лицом от группы. После каждого Погребального звона подберите все Беспокойные кости.',
+  'bossJournal.crypt.marrow.tipTankHeroic':
+    'Держите его лицом от группы и подальше от всех могил. Удар могильщика накладывается: по мере роста зарядов используйте защитные способности.',
+  'bossJournal.crypt.marrow.tipHealer':
+    'Погребальный звон бьёт по всей группе. Могилы замедляют и обжигают всех в них, так что помогайте тому, кто застрял.',
+  'bossJournal.crypt.marrow.tipDamage':
+    'Если вас отметили, отнесите могилу к краю двора. После каждого Звона убейте Беспокойные кости и возвращайтесь к Марроу.',
+  'bossJournal.crypt.marrow.choiceName': 'Куда копать могилы?',
+  'bossJournal.crypt.marrow.choiceGain':
+    'Могилы у края двора оставляют середину свободной для боя и уклонения.',
+  'bossJournal.crypt.marrow.choiceRisk':
+    'Каждая Открытая могила, где бы она ни была, поднимает Беспокойные кости при следующем Звоне, до {cap} одновременно.',
+  'bossJournal.crypt.marrow.choiceRiskHeroic':
+    'Каждая Открытая могила, где бы она ни была, поднимает Беспокойные кости при следующем Звоне, до {cap} одновременно. На героической сложности могила рядом с танком ещё и ускоряет Марроу.',
+  'bossJournal.crypt.marrow.heroicBlow':
+    'Удар могильщика: удар по танку, накладывающий заряд, при котором получаемый урон выше на {vuln}.',
+  'bossJournal.crypt.marrow.heroicVigor': 'Могильная сила: в могиле он бьёт на {haste} быстрее.',
+  'bossJournal.crypt.marrow.heroicUnquiet':
+    'Неспокойная земля: {linger} сек. в могиле поднимают Беспокойные кости.',
+  'bossJournal.crypt.lady.overview':
+    'Призрачная невеста, чей вопль ранит всех, кого не укрывает могильный фонарь. Каждый фонарь укрывает только двоих, а потом гаснет, так что группе нужно меняться по очереди. Она также поднимает игрока в воздух и не отпускает, пока группа не нанесёт ей достаточно урона.',
+  'bossJournal.crypt.lady.phaseRavineName': 'Морозное ущелье',
+  'bossJournal.crypt.lady.phaseRavineSummary':
+    'Вокруг ущелья стоят три могильных фонаря. Её путь превращается в скользкий лёд.',
+  'bossJournal.crypt.lady.phaseFreezeName': 'Свадебная стужа',
+  'bossJournal.crypt.lady.phaseFreezeSummary':
+    'При здоровье {health} весь пол ущелья замерзает до конца боя.',
+  'bossJournal.crypt.lady.lamentSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона каждому игроку, которого не укрывает фонарь. Каждое попадание добавляет заряд Затяжного плача: на {perStack} больше урона от Плача за заряд, на {seconds} сек., до {stacks} зарядов.',
+  'bossJournal.crypt.lady.lamentResponse': 'Встаньте в свет горящего фонаря до конца заклинания.',
+  'bossJournal.crypt.lady.lanternName': 'Могильные фонари',
+  'bossJournal.crypt.lady.lanternSummary':
+    'Горящий фонарь укрывает от Плача до {cap} игроков в пределах {radius} м. Фонарь, который кого-то укрыл, гаснет на {dark} сек., так что при следующем Плаче он всё ещё тёмный.',
+  'bossJournal.crypt.lady.lanternHeroicSummary':
+    'Горящий фонарь укрывает от Плача до {cap} игроков в пределах {radius} м. Фонарь, который кого-то укрыл, гаснет на {dark} сек. На героической сложности горящий фонарь ещё и сам прогорает через {lit} сек. и остаётся тёмным {gutter} сек.',
+  'bossJournal.crypt.lady.lanternResponse':
+    'Заранее решите, кто какой фонарь занимает, и на каждый Плач переходите к горящему.',
+  'bossJournal.crypt.lady.embraceSummary':
+    'Каждые {every} сек. она хватает игрока, не танка, поднимает его в воздух и держит. Нанесите ей {share} здоровья за {hold} сек., и она аккуратно опустит его. Иначе она его бросит: от {min} до {max} урона.',
+  'bossJournal.crypt.lady.embraceHeroicSummary':
+    'Каждые {every} сек. она хватает {victims} игроков, не танков, поднимает их в воздух и держит. Нанесите ей {share} здоровья за {hold} сек., и она аккуратно опустит их. Иначе она их бросит: от {min} до {max} урона.',
+  'bossJournal.crypt.lady.embraceResponse':
+    'Все сразу бьют по ней изо всех сил, как только она кого-то схватила. Лекари лечат схваченного.',
+  'bossJournal.crypt.lady.rimeSummary':
+    'Там, где она проплывает, остаётся скользкий лёд; каждое пятно держится {seconds} сек. На льду вы скользите и медленно поворачиваете.',
+  'bossJournal.crypt.lady.rimeResponse': 'Обходите её след, когда нужно двигаться быстро.',
+  'bossJournal.crypt.lady.freezeSummary':
+    'При здоровье {health} заклинание {cast} сек., затем весь пол становится скользким льдом до конца боя. Это отменяет уже читаемый Плач.',
+  'bossJournal.crypt.lady.freezeResponse':
+    'Двигайтесь заранее: на льду до фонаря добираться дольше.',
+  'bossJournal.crypt.lady.tipTank':
+    'Держите её ближе к середине, чтобы до каждого фонаря группа могла дотянуться.',
+  'bossJournal.crypt.lady.tipHealer':
+    'Неукрытые игроки получают Плач и копят заряды. Схваченный игрок получает урон, пока она его держит.',
+  'bossJournal.crypt.lady.tipDamage':
+    'Бейте изо всех сил, как только она кого-то схватила. На каждый Плач переходите между горящими фонарями.',
+  'bossJournal.crypt.lady.choiceName': 'Кто примет Плач?',
+  'bossJournal.crypt.lady.choiceGain':
+    'Если использовать все три фонаря, каждый укроет до {cap} игроков, и этот Плач не заденет никого.',
+  'bossJournal.crypt.lady.choiceRisk':
+    'Использованные фонари при следующем Плаче всё ещё тёмные, так что кто-то получит его тогда, а каждый заряд Затяжного плача добавляет {perStack} урона.',
+  'bossJournal.crypt.lady.heroicEmbrace': 'Ледяные объятия хватают сразу {victims} игроков.',
+  'bossJournal.crypt.lady.heroicLanterns':
+    'Горящий фонарь сам прогорает через {lit} сек. и остаётся тёмным {gutter} сек.',
+  'bossJournal.crypt.ilvane.overview':
+    'Регент хора, которую охраняют два Хориста Пустоты: пока они живы, они ослабляют получаемый ею урон. Её Песнь ранит и заставляет замолчать всех, кто её видит, так что прервите её или спрячьтесь за колонной. Она также играет на Костяном органе, пуская полосы нот по хорам.',
+  'bossJournal.crypt.ilvane.phaseLoftName': 'Хоры',
+  'bossJournal.crypt.ilvane.phaseLoftSummary': 'Она поёт с хоров, рядом с ней два Хориста Пустоты.',
+  'bossJournal.crypt.ilvane.phaseCrescendoName': 'Крещендо',
+  'bossJournal.crypt.ilvane.phaseCrescendoSummary':
+    'При здоровье {health} она поёт быстрее, и орган играет третью волну.',
+  'bossJournal.crypt.ilvane.harmonyName': 'Гармония',
+  'bossJournal.crypt.ilvane.harmonySummary':
+    'Каждый живой Хорист снижает получаемый ею урон на {per}: на {both}, пока стоят оба.',
+  'bossJournal.crypt.ilvane.harmonyResponse': 'Сначала убейте Хористов.',
+  'bossJournal.crypt.ilvane.dirgeSummary':
+    'Каждые {every} сек. заклинание {cast} сек. Если она допоёт, все, кто её видит, получают от {min} до {max} урона и замолкают на {silence} сек. После прерывания она не поёт Песнь {quiet} сек.',
+  'bossJournal.crypt.ilvane.dirgeResponse':
+    'Прервите её или разорвите линию обзора за колонной до конца заклинания.',
+  'bossJournal.crypt.ilvane.organSummary':
+    'Каждые {every} сек. она идёт к органу и играет {waves} волн полос нот по хорам. Каждая полоса показывается {gather} сек., затем взрывается: от {min} до {max} урона.',
+  'bossJournal.crypt.ilvane.organResponse':
+    'Встаньте между первыми полосами, затем шагните в полосу, которая уже взорвалась.',
+  'bossJournal.crypt.ilvane.encoreName': 'Бис',
+  'bossJournal.crypt.ilvane.encoreSummary':
+    'Хорист, пролежавший мёртвым {seconds} сек., пока его напарник ещё стоит, встаёт снова с полным здоровьем.',
+  'bossJournal.crypt.ilvane.encoreResponse':
+    'Убейте обоих Хористов с разницей не больше {seconds} сек.',
+  'bossJournal.crypt.ilvane.unbrokenSummary':
+    'Каждая {nth}-я Песнь становится Непрерывным стихом: её нельзя прервать.',
+  'bossJournal.crypt.ilvane.unbrokenResponse': 'На неё прячьтесь за колонной.',
+  'bossJournal.crypt.ilvane.crescendoName': 'Крещендо',
+  'bossJournal.crypt.ilvane.crescendoSummary':
+    'При здоровье ниже {health} Песнь длится {cast} сек. и звучит каждые {every} сек., а орган играет {waves} волн. Третья волна повторяет полосы первой.',
+  'bossJournal.crypt.ilvane.crescendoResponse':
+    'Прерывайте каждую Песнь и на третью волну отходите от первых полос.',
+  'bossJournal.crypt.ilvane.tipTank':
+    'Держите Хористов вместе, чтобы их можно было быстро убить, затем берите Ильвейн.',
+  'bossJournal.crypt.ilvane.tipHealer':
+    'Допетая Песнь заставляет замолчать и вас: спрячьтесь за колонной, если некому её прервать.',
+  'bossJournal.crypt.ilvane.tipDamage':
+    'Сначала убейте Хористов, прервите Песнь и уворачивайтесь от полос органа.',
+  'bossJournal.crypt.ilvane.tipDamageHeroic':
+    'Убейте обоих Хористов с разницей не больше {seconds} сек., прервите Песнь и прячьтесь от каждого Непрерывного стиха.',
+  'bossJournal.crypt.ilvane.choiceName': 'Прервать или спрятаться?',
+  'bossJournal.crypt.ilvane.choiceGain':
+    'Прерывание останавливает Песнь и заставляет её молчать {quiet} сек.',
+  'bossJournal.crypt.ilvane.choiceRisk':
+    'Укрытие за колонной стоит времени атаки. Сорванное прерывание заставляет замолчать и ранит всех в зоне видимости.',
+  'bossJournal.crypt.ilvane.heroicEncore':
+    'Бис: Хорист, пролежавший мёртвым {seconds} сек., пока его напарник жив, встаёт снова.',
+  'bossJournal.crypt.ilvane.heroicUnbroken':
+    'Непрерывный стих: каждую {nth}-ю Песнь нельзя прервать.',
+  'bossJournal.crypt.morthen.overview':
+    'Епископ-лич, ведущий обряд в трёх действиях. Сначала он зовёт души, чтобы усилиться; при здоровье {rite} он прячется за оберегом, пока группа ценой здоровья заново не зажжёт четыре свечи; при {last} он взмахивает огромной косой.',
+  'bossJournal.crypt.morthen.phaseCallingName': 'Призыв',
+  'bossJournal.crypt.morthen.phaseCallingSummary':
+    'Он выпускает вокруг себя импульсы тьмы и зовёт души, которые его питают.',
+  'bossJournal.crypt.morthen.phaseRiteName': 'Обряд неупокоенных',
+  'bossJournal.crypt.morthen.phaseRiteSummary':
+    'При здоровье {health} он возвращается к алтарю и становится неуязвимым, пока не загорятся снова все четыре свечи.',
+  'bossJournal.crypt.morthen.phaseLastName': 'Последний обряд',
+  'bossJournal.crypt.morthen.phaseLastSummary':
+    'При здоровье {health} он берётся за косу для финала боя.',
+  'bossJournal.crypt.morthen.pulseSummary':
+    'Каждые {every} сек. ({everyLast} сек. в Последнем обряде) заклинание {cast} сек., затем от {min} до {max} урона всем в пределах {radius} м.',
+  'bossJournal.crypt.morthen.pulseResponse':
+    'Все, включая танка, отходят на {radius} м до конца заклинания.',
+  'bossJournal.crypt.morthen.gravecallName': 'Могильный зов',
+  'bossJournal.crypt.morthen.gravecallSummary':
+    'Каждые {every} сек. из ниши к нему плывёт Связанная душа. Если она доберётся, он наносит на {per} больше урона за заряд (до {stacks}) и исцеляет {heal} здоровья. Первый игрок, которого она коснётся, принимает её на себя: от {min} до {max} урона.',
+  'bossJournal.crypt.morthen.gravecallResponse': 'Свободный игрок встаёт на путь каждой души.',
+  'bossJournal.crypt.morthen.graspName': 'Хватка могилы',
+  'bossJournal.crypt.morthen.graspSummary':
+    'Каждые {every} сек. под {count} игроками появляется кольцо радиусом {radius} м. Через {fuse} сек. вырываются руки: все внутри обездвиживаются на {root} сек. и получают от {min} до {max} урона.',
+  'bossJournal.crypt.morthen.graspResponse': 'Сразу выйдите из кольца.',
+  'bossJournal.crypt.morthen.riteSummary':
+    'Он становится неуязвимым, и {candles} свечи гаснут. Выбираются Беспокойные кости ({bones}). Могильный холод бьёт всех каждую секунду: {base} урона, растущего на {step} каждые {chillEvery} сек., без предела.',
+  'bossJournal.crypt.morthen.riteResponse':
+    'Быстро зажгите заново все четыре свечи: холод не перестаёт расти.',
+  'bossJournal.crypt.morthen.relightName': 'Зажечь заново Поминальные свечи',
+  'bossJournal.crypt.morthen.relightSummary':
+    'Поддерживайте заклинание {channel} сек. у свечи (в пределах {range} м), чтобы зажечь её заново. Это стоит зажигающему {drain} максимального здоровья. Когда загорается четвёртая, он оглушён на {stun} сек. и получает на {vuln} больше урона.',
+  'bossJournal.crypt.morthen.relightResponse':
+    'Распределите свечи между игроками с запасом здоровья и бейте изо всех сил, пока он оглушён.',
+  'bossJournal.crypt.morthen.nameDeadSummary':
+    'Свечи нужно зажигать в порядке, который показывает золотой луч от Реестра. Неверная свеча гасит последнюю зажжённую и наносит зажигающему от {min} до {max} урона.',
+  'bossJournal.crypt.morthen.nameDeadResponse':
+    'Зажигайте только ту свечу, на которую указывает луч.',
+  'bossJournal.crypt.morthen.reapSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по танку, затем взмах косы конусом {arc} градусов на {range} м перед ним: от {min} до {max} урона.',
+  'bossJournal.crypt.morthen.reapResponse':
+    'Спереди стоит только танк. Танк может сделать шаг в сторону во время заклинания.',
+  'bossJournal.crypt.morthen.tipTank':
+    'Держите его лицом от группы и выходите из Пульса тьмы вместе со всеми.',
+  'bossJournal.crypt.morthen.tipHealer':
+    'Каждая свеча забирает у зажигающего большую долю здоровья, а Могильный холод всё растёт: лечите зажигающих в первую очередь.',
+  'bossJournal.crypt.morthen.tipDamage':
+    'Перекрывайте путь Связанным душам своим телом, зажигайте свечи в Обряде, затем бейте изо всех сил, пока он оглушён.',
+  'bossJournal.crypt.morthen.tipDamageHeroic':
+    'Перекрывайте путь Связанным душам и уворачивайтесь от Хватки могилы. В Обряде идите за золотым лучом к нужной свече.',
+  'bossJournal.crypt.morthen.choiceCandleName': 'Сколько зажигающих?',
+  'bossJournal.crypt.morthen.choiceCandleGain':
+    'Если несколько игроков зажигают одновременно, Обряд кончается раньше, пока Могильный холод не вырос.',
+  'bossJournal.crypt.morthen.choiceCandleRisk':
+    'Каждый зажигающий платит {normal} максимального здоровья за свечу, пока холод продолжает расти.',
+  'bossJournal.crypt.morthen.choiceSoulName': 'Перекрывать путь душам?',
+  'bossJournal.crypt.morthen.choiceSoulGain':
+    'Перехваченная душа не доходит до него: ни стопки урона, ни исцеления.',
+  'bossJournal.crypt.morthen.choiceSoulRisk':
+    'Тот, кто перехватил, получает урон от души. Каждая прошедшая душа добавляет ему {per} урона и исцеляет его на {heal}.',
+  'bossJournal.crypt.morthen.heroicNameDead':
+    'Назови мёртвых: свечи нужно зажигать в порядке, который показывает Реестр.',
+  'bossJournal.crypt.morthen.heroicGrasp':
+    'Хватка могилы: кольца, которые обездвиживают и ранят, в каждом действии.',
+  'bossJournal.crypt.morthen.heroicDrain':
+    'Каждая свеча стоит зажигающему {drain} максимального здоровья.',
+  'bossJournal.crypt.wyrm.overview':
+    'Предсмертный обряд Мортена зажигает костёр, и в него опускается костяной змий. Он сражается как Костяной дракон оссуария, плюс пылающие полосы налёта и рёв, который отбрасывает игроков, но открывает его для урона.',
+  'bossJournal.crypt.wyrm.phaseName': 'Костёр Зова змия',
+  'bossJournal.crypt.wyrm.phaseSummary':
+    'Он планирует из недосягаемой вышины и опускается в кольцо со вспышкой огня.',
+  'bossJournal.crypt.wyrm.strafeSummary':
+    'Каждые {every} сек. он отмечает на {mark} сек. полосу шириной {width} м через игрока, затем пролетает над ней, изливая огонь: от {min} до {max} урона всем в ней. Полоса горит ещё {seconds} сек.: {burn} урона в секунду.',
+  'bossJournal.crypt.wyrm.strafeResponse':
+    'Шагните в сторону из отмеченной полосы и не заходите на горящую землю.',
+  'bossJournal.crypt.wyrm.bellowSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона и отбрасывание на {push} м в пределах {radius} м. После этого {seconds} сек. он получает на {vuln} больше урона.',
+  'bossJournal.crypt.wyrm.bellowResponse':
+    'Не дайте отбросить себя в горящую полосу. Тратьте способности в окно после этого.',
+  'bossJournal.crypt.wyrm.knellSummary':
+    'Каждые {every} сек. он взлетает из зоны досягаемости и дышит огнём на половину кольца {breaths} раза. Каждая половина отмечается за {mark} сек. до огня: от {min} до {max} урона всем в ней.',
+  'bossJournal.crypt.wyrm.knellResponse': 'Каждый раз бегите на неотмеченную половину кольца.',
+  'bossJournal.crypt.wyrm.tipTank': 'Держите его лицом от группы и уводите из горящих полос.',
+  'bossJournal.crypt.wyrm.tipHealer':
+    'Погребальный налёт и Жуткий рёв дают пики урона; лечите тех, кого отбросило в горящую полосу.',
+  'bossJournal.crypt.wyrm.tipDamage':
+    'Выходите из отмеченных полос и тратьте способности после каждого Жуткого рёва.',
+  'bossJournal.crypt.wyrm.tipDamageHeroic':
+    'Выходите из отмеченных полос, а во время Пылающего звона каждый раз бегите на безопасную половину.',
+  'bossJournal.crypt.wyrm.heroicKnell':
+    'Пылающий звон: он взлетает и дышит огнём на половину кольца {breaths} раза.',
 };
