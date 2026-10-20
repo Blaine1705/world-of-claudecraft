@@ -502,6 +502,12 @@ import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
 } from './ui/gather_node_tooltip_controller';
+import {
+  currentGraphicsChoice,
+  graphicsChoicePatch,
+  parseGraphicsChoice,
+} from './ui/graphics_choice_core';
+import { promptGraphicsChoiceOnFirstLogin } from './ui/graphics_choice_prompt';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -607,7 +613,6 @@ const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
 const HOMEPAGE_MUSIC_VOLUME = 0.225;
 const GRAPHICS_PRESET_HIGH = 3;
 const GRAPHICS_PRESET_ULTRA = 4;
-const LANDING_GRAPHICS_AUTO = 'auto';
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 document.body.classList.toggle('native-app', NATIVE_APP);
@@ -1144,6 +1149,7 @@ async function prepareWorldEntry(): Promise<boolean> {
   } else {
     requestPreferredFullscreen();
   }
+  await promptGraphicsChoiceOnFirstLogin();
   syncAppViewport();
   window.setTimeout(syncAppViewport, 250);
   window.setTimeout(syncAppViewport, 800);
@@ -10753,32 +10759,14 @@ function wireStartScreens(): void {
   const graphicsSelect = document.getElementById(
     'landing-graphics-select',
   ) as HTMLSelectElement | null;
-  const normalizedLandingGraphicsChoice = (raw: string | null): string => {
-    if (raw === LANDING_GRAPHICS_AUTO) return raw;
-    const preset = Number(raw);
-    if (
-      Number.isInteger(preset) &&
-      preset >= SETTING_RANGES.graphicsPreset.min &&
-      preset <= SETTING_RANGES.graphicsPreset.max
-    ) {
-      return String(preset);
-    }
-    return LANDING_GRAPHICS_AUTO;
-  };
-  const applyLandingGraphicsChoice = (choice: string): void => {
-    if (choice === LANDING_GRAPHICS_AUTO) {
-      landingSettings.set('graphicsPreset', SETTING_RANGES.graphicsPreset.def);
-      landingSettings.set('graphicsDefaultApplied', false);
-      return;
-    }
-    landingSettings.set('graphicsPreset', Number(choice));
-    landingSettings.set('graphicsDefaultApplied', true);
-  };
   const syncLandingGraphicsSelect = (): void => {
     if (!graphicsSelect) return;
-    graphicsSelect.value = landingSettings.get('graphicsDefaultApplied')
-      ? String(landingSettings.get('graphicsPreset'))
-      : LANDING_GRAPHICS_AUTO;
+    graphicsSelect.value = String(
+      currentGraphicsChoice(
+        landingSettings.get('graphicsDefaultApplied'),
+        landingSettings.get('graphicsPreset'),
+      ),
+    );
   };
   const syncContrastToggle = (on: boolean): void => {
     if (contrastToggle) contrastToggle.setAttribute('aria-pressed', String(on));
@@ -10814,8 +10802,8 @@ function wireStartScreens(): void {
     applyLandingBackdrop(next);
   });
   graphicsSelect?.addEventListener('change', () => {
-    const choice = normalizedLandingGraphicsChoice(graphicsSelect.value);
-    applyLandingGraphicsChoice(choice);
+    const choice = parseGraphicsChoice(graphicsSelect.value, SETTING_RANGES.graphicsPreset);
+    landingSettings.patch(graphicsChoicePatch(choice, SETTING_RANGES.graphicsPreset.def));
     syncLandingGraphicsSelect();
   });
 

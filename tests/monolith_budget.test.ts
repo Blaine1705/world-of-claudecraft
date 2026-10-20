@@ -1431,7 +1431,11 @@ const MONOLITHS: MonolithRow[] = [
     // Colorblind Mode's interface body-class extraction also composes with
     // those release-line extractions. Release reconciliation: measured merged
     // tree at 11140 lines, preserving both extraction sets.
-    ceiling: 11140,
+    // LOWERED 11140 -> 10953 with the first-login graphics prompt: the landing
+    // Graphics select's parse and persist logic moved to src/ui/graphics_choice_core.ts,
+    // which it now shares with the prompt (src/ui/graphics_choice_prompt.ts).
+    // wc -l on the tree. Exact count, zero slack.
+    ceiling: 10953,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

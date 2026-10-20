@@ -210,6 +210,8 @@ describe('live graphics profile architecture', () => {
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
   'src/ui/frame_presets_core.ts',
+  // The landing select's and first-login prompt's shared graphics-choice policy.
+  'src/ui/graphics_choice_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
@@ -2648,6 +2650,8 @@ const UI_PAINTER_HELPERS = [
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
   'src/ui/error_toast_controller.ts',
+  // The first-login graphics prompt: a top-level pre-game modal reading the URL and navigator.
+  'src/ui/graphics_choice_prompt.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',
   'src/ui/frame_presets_controls.ts',

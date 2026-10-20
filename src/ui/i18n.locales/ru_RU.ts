@@ -3867,6 +3867,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'mobilePreflight.otherStandaloneDetail': 'Держите устройство в полноэкранном альбомном режиме.',
   'mobilePreflight.otherInstallDetail':
     'Установите эту страницу или добавьте ее на главный экран для лучшего мобильного полноэкранного опыта.',
+  'graphicsPrompt.title': 'Выберите графику',
+  'graphicsPrompt.intro':
+    'Выберите графический пресет для этого устройства. Низкие пресеты работают плавнее, высокие выглядят богаче.',
+  'graphicsPrompt.autoDesc': 'Подбирает пресет под это устройство. Определено: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Максимальная плавность. Лучше всего для телефонов, планшетов и старой или встроенной графики.',
+  'graphicsPrompt.mediumDesc':
+    'Баланс качества и производительности. Подходит большинству ноутбуков.',
+  'graphicsPrompt.highDesc': 'Больше деталей и насыщеннее окружение. Для дискретной видеокарты.',
+  'graphicsPrompt.ultraDesc': 'Самый насыщенный фиксированный пресет. Для мощной видеокарты.',
+  'graphicsPrompt.changeLater':
+    'Это можно изменить в любой момент в настройках, в разделе «Качество графики».',
+  'graphicsPrompt.confirm': 'Продолжить',
   'serverUnavailable.title': 'World of ClaudeCraft - мир недоступен',
   'serverUnavailable.logoAlt': 'World of ClaudeCraft',
   'serverUnavailable.eyebrow': 'Технические работы',
