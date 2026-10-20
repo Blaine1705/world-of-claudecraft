@@ -788,7 +788,7 @@ Shields are ArmorItemDef with shield: true and blockValue; requiredClass
 covers the shield-capable classes per role. Held offhands take the 0.75 held
 slot budget (18 points). The quiver is worn, not held (occupiesHand false,
 the direfang_quiver precedent): it costs no two-hander, so it takes the
-WORN_OFFHAND_STAT_MULT line (11 points: Agi 8, Sta 3), crit 25 like the
+WORN_OFFHAND_STAT_MULT line (11 points: Agi 7 plus the stamina baseline of 4), crit 25 like the
 other offhands, and Hit 50: the one Hit-carrying offhand of the tier (the
 operator's call, 2026-10-21, keeping the hunter quiver ladder's Hit identity).
 A Heroic-only hunter (one weapon plus the quiver) reaches 80 Hit, still short

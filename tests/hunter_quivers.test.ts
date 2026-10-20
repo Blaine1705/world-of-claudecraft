@@ -135,7 +135,7 @@ describe('hunter quivers', () => {
     // Physical identity, no caster affix, no armor; the exact authored split.
     expect(infernal.spellPower ?? 0).toBe(0);
     expect(infernal.healPower ?? 0).toBe(0);
-    expect(infernal.stats).toEqual({ agi: 8, sta: 3 });
+    expect(infernal.stats).toEqual({ agi: 7, sta: 4 });
   });
 
   it('sources each quiver from a distinct live loot table', () => {
@@ -374,8 +374,8 @@ describe('a worn quiver coexists with a two-hander', () => {
 
     expect(sim.equipment.mainhand).toBe('heart_of_the_end_greatblade');
     expect(sim.equipment.offhand).toBe('infernal_quiver');
-    // The greatblade carries no agility, so the quiver's 8 is the whole gain.
-    expect(sim.player.stats.agi).toBe(baseAgi + 8);
+    // The greatblade carries no agility, so the quiver's 7 is the whole gain.
+    expect(sim.player.stats.agi).toBe(baseAgi + 7);
     expect(sim.player.dualWielding).toBe(false);
   });
 

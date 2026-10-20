@@ -3102,14 +3102,16 @@ export const IGNIVAR_HELD_ITEMS: Record<string, ItemDef> = {
     // The hunter counterpart to the two held offhands above, off the same
     // Heroic Varkhul slot (the direfang_quiver precedent on Nythraxis). Worn,
     // not held: it costs no two-hander, so it prices on the worn line,
-    // primaryStatBudget(35, epic, offhand, WORN_OFFHAND_STAT_MULT) = 11,
-    // weighted to agility. Ratings are the operator's call (2026-10-21): crit 25
-    // like every held offhand of the tier, plus Hit 50, the one Hit-carrying
-    // offhand of the Crucible and a Heroic-only Hit lane beside the marquee
-    // weapons. It keeps the hunter quiver ladder's physical Hit identity (the
+    // primaryStatBudget(35, epic, offhand, WORN_OFFHAND_STAT_MULT) = 11: the
+    // free stamina baseline of round(11 / 3) = 4, and the remaining 7 of the
+    // physical line on agility (the most the stamina model allows; see
+    // tests/item_stamina_baseline.test.ts). Ratings are the operator's call
+    // (2026-10-21): crit 25 like every held offhand of the tier, plus Hit 50,
+    // the one Hit-carrying offhand of the Crucible and a Heroic-only Hit lane
+    // beside the marquee weapons. It keeps the hunter quiver ladder's physical Hit identity (the
     // ilvl-33 heroic_direfang_quiver carries Hit 55 + crit 20).
     occupiesHand: false,
-    stats: { agi: 8, sta: 3 },
+    stats: { agi: 7, sta: 4 },
     critRating: 25,
     hitRating: 50,
     sellValue: 12000,
