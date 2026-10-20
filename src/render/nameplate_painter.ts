@@ -53,12 +53,21 @@ import {
 } from './nameplate_dots_core';
 import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
-import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
+import {
+  type NameplatePickCandidate,
+  pickNameplateHealthBarAt,
+  raiseNameplateCandidate,
+} from './nameplate_pick_core';
 import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
-import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
+import {
+  isNpcPlateEntity,
+  type NameplatePlan,
+  nameplatePlanInto,
+  newNameplatePlan,
+} from './nameplate_view';
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
@@ -373,11 +382,16 @@ export class NameplatePainter {
       this.anchorCount++;
     }
 
+    // Plates are never moved apart, so overlapping ones share a spot: the
+    // current target draws last, on top, and a click there picks it.
+    raiseNameplateCandidate(this.anchorScratch, this.anchorCount, player.targetId);
+
     // The repaint gate compares the anchors that will actually be drawn. A pass
     // whose plates, anchors, viewport, surface ratio and style revision all
     // match the last PAINTED pass would redraw the same pixels, so the whole
-    // clear-and-repaint of this full-viewport surface is skipped. Anything a player reads (a moved plate, HP, cast, selection,
-    // threat, content, opacity) differs and paints on its own frame.
+    // clear-and-repaint of this full-viewport surface is skipped. Anything a
+    // player reads (a moved plate, HP, cast, selection, threat, content,
+    // opacity) differs and paints on its own frame.
     const surfacePixelRatio = this.getSurfacePixelRatio();
     this.paintGate.beginPass(width, height, surfacePixelRatio, this.surface.styleRevision());
     for (let i = 0; i < this.anchorCount; i++) {
@@ -506,14 +520,15 @@ export class NameplatePainter {
     state.threat = plan.threat;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
     state.hpFill = entity.hp / Math.max(1, entity.maxHp);
-    this.resolveDots(state, entity, player);
 
     if (plan.nameOnly) {
+      state.dots.count = 0;
       state.castVisible = false;
       state.castSource = '';
       state.castLabel = '';
       return;
     }
+    this.resolveDots(state, entity, player);
     const cast = castBarState(entity);
     state.castVisible = cast.visible;
     state.castFill = cast.fill;
@@ -679,7 +694,7 @@ export class NameplatePainter {
 
     state.badges.length = 0;
 
-    if (entity.kind === 'npc' || (!entity.hostile && entity.questIds.length > 0)) {
+    if (isNpcPlateEntity(entity)) {
       state.name =
         entity.kind === 'npc'
           ? npcDisplayName(entity.templateId)

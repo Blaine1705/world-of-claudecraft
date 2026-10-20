@@ -54,6 +54,13 @@ export const NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT = 0.2;
 // not a portal billboard).
 const UNLABELED_DOOR_DUNGEON_ID = 'nythraxis_boss_arena';
 
+/** An NPC plate: a town NPC, or a friendly mob that offers quests (the
+ *  painter draws both through its NPC branch). These plates show only up
+ *  close and carry just the name, role line and quest marker. */
+export function isNpcPlateEntity(e: Entity): boolean {
+  return e.kind === 'npc' || (e.kind === 'mob' && !e.hostile && (e.questIds?.length ?? 0) > 0);
+}
+
 /** Per-entity nameplate decisions the painter consumes. Mutated in place by
  *  nameplatePlanInto so the painter can reuse one instance across all entities. */
 export interface NameplatePlan {
@@ -128,9 +135,7 @@ export function nameplatePlanInto(
   const dz = e.pos.z - player.pos.z;
   const d2 = dx * dx + dz * dz;
   const isSelf = e.id === player.id;
-  // A friendly quest-giver mob wears the NPC plate (the painter's NPC branch).
-  const isNpc =
-    e.kind === 'npc' || (e.kind === 'mob' && !e.hostile && (e.questIds?.length ?? 0) > 0);
+  const isNpc = isNpcPlateEntity(e);
   const hasOverheadEmote = !!(e.kind === 'player' && e.overheadEmoteId && !e.dead);
   const isDoor = e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit';
   const isDelveInteract =

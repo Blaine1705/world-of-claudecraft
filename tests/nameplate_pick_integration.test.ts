@@ -99,7 +99,12 @@ function healthPoint(anchor: NameplatePickCandidate): [number, number] {
   return [anchor.sx, nameplateHealthBarTop(anchor.sy, anchor.castVisible) + 2];
 }
 
-function harness(targets: Entity[], dotScale = 0, markerFor: () => number | null = () => null) {
+function harness(
+  targets: Entity[],
+  dotScale = 0,
+  markerFor: () => number | null = () => null,
+  questState = 'available',
+) {
   const player = entity(1, 'player');
   player.pos = { x: 0, y: 0, z: 3 } as Entity['pos'];
   const views = new Map<number, EntityView>();
@@ -117,7 +122,8 @@ function harness(targets: Entity[], dotScale = 0, markerFor: () => number | null
     player,
     entities,
     markerFor,
-    questState: () => 'available',
+    questState: () => questState,
+    questsDone: new Set<string>(),
   } as unknown as IWorld;
   const painter = new NameplatePainter({
     views,
@@ -133,7 +139,7 @@ function harness(targets: Entity[], dotScale = 0, markerFor: () => number | null
     nameplateDotScale: () => dotScale,
     isHostilePlayer: () => false,
   });
-  return { painter, setShowNameplates: (value: boolean) => (showNameplates = value) };
+  return { painter, player, setShowNameplates: (value: boolean) => (showNameplates = value) };
 }
 
 describe('production nameplate picking path', () => {
@@ -145,7 +151,18 @@ describe('production nameplate picking path', () => {
     expect(anchors).toHaveLength(2);
     expect(anchors[0].sx).toBe(anchors[1].sx);
     expect(anchors[0].sy).toBe(anchors[1].sy);
-    expect([7, 8]).toContain(painter.pickEntityAt(...healthPoint(anchors[0])));
+    // the later plate draws on top, so it owns the shared spot
+    expect(painter.pickEntityAt(...healthPoint(anchors[0]))).toBe(8);
+  });
+
+  it('draws the current target on top of a plate it overlaps, so a click picks it', () => {
+    const { painter, player } = harness([entity(7), entity(8)]);
+    player.targetId = 7;
+    painter.update(true);
+    const anchors = liveAnchors(painter);
+
+    expect(anchors.map((a) => a.id)).toEqual([8, 7]);
+    expect(painter.pickEntityAt(...healthPoint(anchors[0]))).toBe(7);
   });
 
   it('keeps a plate at its projected anchor when a dot row lifts it', () => {
@@ -245,6 +262,37 @@ describe('NPC plates', () => {
 
     expect(anchor.hpVisible).toBe(false);
     expect(anchor.castVisible).toBe(false);
+    expect(state?.raidMarkerUrl).toBe('');
+  });
+
+  it('keeps the quest marker on an NPC plate', () => {
+    const giver = npc(7);
+    giver.questIds = ['q_prof_hobby_switch'];
+    const { painter } = harness([giver], 0, () => null, 'ready');
+    painter.update(true);
+    const state = (
+      painter as unknown as { states: Map<number, { marker: string; castVisible: boolean }> }
+    ).states.get(7);
+    expect(state?.marker).toBe('?');
+    expect(state?.castVisible).toBe(false);
+  });
+
+  it('strips a friendly quest-giver mob the same way', () => {
+    const giver = entity(7);
+    giver.hostile = false;
+    giver.questIds = ['q_prof_hobby_switch'];
+    giver.castingAbility = 'fireball';
+    giver.castTotal = 2;
+    giver.castRemaining = 1;
+    const { painter } = harness([giver], 0, () => 4);
+    painter.update(true);
+    const state = (
+      painter as unknown as {
+        states: Map<number, { hpVisible: boolean; castVisible: boolean; raidMarkerUrl: string }>;
+      }
+    ).states.get(7);
+    expect(state?.hpVisible).toBe(false);
+    expect(state?.castVisible).toBe(false);
     expect(state?.raidMarkerUrl).toBe('');
   });
 
