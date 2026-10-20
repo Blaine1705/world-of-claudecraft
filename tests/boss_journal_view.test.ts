@@ -14,6 +14,7 @@ import {
   KORZUL_TUNING,
   TUSKER_TUNING,
 } from '../src/sim/encounters/gravewyrm_sanctum/ids';
+import { BEAST_TUNING, ZULGAR_TUNING } from '../src/sim/encounters/wildheart_basin/ids';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../src/sim/mob/healer_channel';
 import { journalModelFor } from '../src/ui/boss_journal/journal_model_spec';
 import { formattedJournalValues } from '../src/ui/boss_journal/journal_sections';
@@ -296,5 +297,51 @@ describe('Gravewyrm Sanctum facts', () => {
     });
     const water = mechanic('korzul_the_gravewyrm', 'open-water', 'heroic');
     expect(water.values?.perSecond).toBe(KORZUL_TUNING.quenchPerSecondHeroic);
+  });
+});
+
+describe('Wildheart Basin facts', () => {
+  const def = DUNGEON_JOURNALS.find((d) => d.dungeonId === 'wildheart_basin');
+  if (!def) throw new Error('wildheart journal missing');
+  const mechanic = (mobId: string, id: string, tier: JournalDifficulty) => {
+    const boss = def.bosses.find((b) => b.mobId === mobId);
+    if (!boss) throw new Error(mobId);
+    const found = dungeonJournalBossView(boss, tier)
+      .phases.flatMap((p) => p.mechanics)
+      .find((m) => m.id === id);
+    if (!found) throw new Error(`${mobId} ${id} ${tier}`);
+    return found;
+  };
+
+  it('runs the route Saurian, Beastmaster, Gorgebloom, Zulgar', () => {
+    expect(def.bosses.map((b) => [b.mobId, b.rank])).toEqual([
+      ['great_saurian', 'miniboss'],
+      ['wildheart_beastmaster', 'boss'],
+      ['the_gorgebloom', 'boss'],
+      ['wildheart_high_priest', 'final'],
+    ]);
+  });
+
+  it('grows the Pack Bond reach on Heroic and keeps Heel! and Ambush heroic only', () => {
+    expect(mechanic('wildheart_beastmaster', 'pack-bond', 'normal').values?.reach).toBe(
+      BEAST_TUNING.bondReach,
+    );
+    const heroicBond = mechanic('wildheart_beastmaster', 'pack-bond', 'heroic');
+    expect(heroicBond.values?.reach).toBe(BEAST_TUNING.heroicBondReach);
+    expect(heroicBond.marks).toEqual(['heroicChanged']);
+    expect(() => mechanic('wildheart_beastmaster', 'heel', 'normal')).toThrow();
+    expect(mechanic('wildheart_beastmaster', 'heel', 'heroic').marks).toEqual(['heroicOnly']);
+    expect(() => mechanic('wildheart_high_priest', 'ambush', 'normal')).toThrow();
+  });
+
+  it('flags Ancestral Sap as the kickable heal and pins the hunt to the sim', () => {
+    expect(mechanic('great_saurian', 'ancestral-sap', 'normal').flags).toContain('interruptible');
+    const hunt = mechanic('wildheart_high_priest', 'spirit-of-the-hunt', 'heroic');
+    expect([hunt.values?.first, hunt.values?.second]).toEqual(ZULGAR_TUNING.huntAtHpPct);
+    const factor = mechanicFactor('wildheart_basin', 'wildheart_high_priest', 'heroic');
+    expect(hunt.values?.maul).toBe(Math.round(ZULGAR_TUNING.maulDamage * factor));
+    expect(mechanic('wildheart_high_priest', 'spirit-of-the-hunt', 'normal').values?.maul).toBe(
+      ZULGAR_TUNING.maulDamage,
+    );
   });
 });

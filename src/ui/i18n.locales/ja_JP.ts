@@ -22039,4 +22039,198 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'その氷板は永久に失われる。無傷の氷の上に置いたままだと、チャネリングは{brk}回目の脈動まで続き、結局は氷板が砕ける。',
   'bossJournal.sanctum.korzul.heroicDeepQuench': '深き焼き入れ: ひびの入った氷板は二度と凍らない。',
   'bossJournal.sanctum.korzul.heroicTwinEyes': '双つの眼: ワームの眼が同時に2人に付く。',
+  'bossJournal.wildheart.saurian.overview':
+    '輿を背負った家ほどもある戦獣が、川の浅瀬を周回している。避けて通ることはできない：蔓の橋は、こいつを倒して初めて開く。予告付きの攻撃が2種類、体力半分で現れる回復役の騎手、そして終盤の激昂。',
+  'bossJournal.wildheart.saurian.phaseFordName': '川の浅瀬',
+  'bossJournal.wildheart.saurian.phaseFordSummary':
+    '戦闘開始から、背後への尾の薙ぎ払いと周囲への踏みつけを交互に使う。同時に使う攻撃は1つだけ。',
+  'bossJournal.wildheart.saurian.phaseHowdahName': '輿の崩壊',
+  'bossJournal.wildheart.saurian.phaseHowdahSummary':
+    '体力が{health}になると輿が砕け、輿の呪術師が飛び降りてグレート・サウリアンを回復する。',
+  'bossJournal.wildheart.saurian.phaseEnrageName': '激昂',
+  'bossJournal.wildheart.saurian.phaseEnrageSummary':
+    '体力が{health}を下回ると、戦闘終了まで激昂する。',
+  'bossJournal.wildheart.saurian.tailSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、尾で背後{arc}度の扇形を、体の中心から{range}ヤード先まで薙ぎ払う。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.wildheart.saurian.tailResponse': '背後には絶対に立たない。側面から攻撃する。',
+  'bossJournal.wildheart.saurian.stompSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中心から{radius}ヤード以内の全員が{min}〜{max}ダメージを受け、{stun}秒間倒される。',
+  'bossJournal.wildheart.saurian.stompResponse':
+    '動ける者は詠唱が終わる前に円の外へ出る。タンクは耐え、ヒーラーはその後タンクを回復する。',
+  'bossJournal.wildheart.saurian.riderName': '輿の騎手',
+  'bossJournal.wildheart.saurian.riderSummary':
+    '一度だけ、体力が{health}の時：輿の呪術師がグレート・サウリアンの傍に飛び降りて共に戦い、祖霊の樹液で回復する。',
+  'bossJournal.wildheart.saurian.riderResponse':
+    'タンクが騎手を引き受ける。DPSは回復を妨害するか、先に倒す。',
+  'bossJournal.wildheart.saurian.sapSummary':
+    '騎手の回復：{every}秒ごとに{cast}秒の詠唱で、グレート・サウリアンの最大体力の{heal}を回復する。',
+  'bossJournal.wildheart.saurian.sapResponse': '毎回妨害するか、騎手を倒す。',
+  'bossJournal.wildheart.saurian.enrageSummary':
+    '体力が{health}を下回ると、近接攻撃、尾の薙ぎ払い、大地を揺るがす踏みつけのすべてのダメージが{damage}増加する。',
+  'bossJournal.wildheart.saurian.tipTank':
+    '群れに背を向けさせ、誰も尾の後ろに回らないようにする。輿の呪術師は着地した瞬間に引き受ける。',
+  'bossJournal.wildheart.saurian.tipHealer':
+    '大地を揺るがす踏みつけは周囲の全員を倒すので、毎回その後にタンクを回復する。激昂用にクールダウンを残す。',
+  'bossJournal.wildheart.saurian.tipDamage':
+    '側面に立ち、尾の扇形と踏みつけの円から外れる。体力半分で、祖霊の樹液を妨害するか騎手を倒す。',
+  'bossJournal.wildheart.saurian.choiceName': '騎手が先か、グレート・サウリアンが先か？',
+  'bossJournal.wildheart.saurian.choiceGain':
+    '騎手を倒せば回復は完全に止まる：祖霊の樹液は{every}秒ごとにグレート・サウリアンの{heal}を回復する。',
+  'bossJournal.wildheart.saurian.choiceRisk':
+    '騎手を倒している間も、グレート・サウリアンは薙ぎ払いと踏みつけを続ける。騎手を放置するなら、誰かが毎回の回復を妨害しなければならない。',
+  'bossJournal.wildheart.beast.overview':
+    '牙王の獣使いと大ジャガーは体力を共有し、同時に倒れる。近くにいると遥かに頑丈になり、攻撃も重くなる。タンクは獣使いを引き離し、ジャガーは印を付けた者を狩る。',
+  'bossJournal.wildheart.beast.phasePitsName': '獣穴',
+  'bossJournal.wildheart.beast.phasePitsSummary':
+    '1つの戦闘、2つの体。タイマーは戦闘中ずっと動き続ける。体力による局面はない。',
+  'bossJournal.wildheart.beast.bondSummary':
+    '獣使いとジャガーが{reach}ヤード以内にいる間、両者とも被ダメージが{dr}減少し、与ダメージが{damage}増加する。',
+  'bossJournal.wildheart.beast.bondHeroicSummary':
+    '狂乱の絆：獣使いとジャガーが{reach}ヤード以内にいる間、両者とも被ダメージが{dr}減少し、与ダメージが{damage}増加する。',
+  'bossJournal.wildheart.beast.bondResponse':
+    'タンクは獣使いをジャガーから{reach}ヤードより遠くへ引き離し、そこで保持する。',
+  'bossJournal.wildheart.beast.sharedName': '体力共有',
+  'bossJournal.wildheart.beast.sharedSummary':
+    '2体は1つの体力を共有する：どちらへのダメージも同じに数えられ、片方が倒れるともう片方も倒れる。',
+  'bossJournal.wildheart.beast.sharedResponse':
+    '最も安全に届く方を攻撃する。ターゲットを切り替えても損はない。',
+  'bossJournal.wildheart.beast.stalkName': '忍び狩り',
+  'bossJournal.wildheart.beast.stalkSummary':
+    'ジャガーは主人のタンクではない者に印を付け、{seconds}秒間、挑発を無視して狩る。射程内では{biteEvery}秒ごとに噛みつき、{min}〜{max}ダメージ、その後{bleedEvery}秒ごとに{bleed}の出血が{bleedSeconds}秒続く。その後、新たな獲物を選ぶ。',
+  'bossJournal.wildheart.beast.stalkResponse':
+    '印を付けられたら：走って、ジャガーを獣使いから引き離す。他の者は鈍足・拘束・スタンで止める。',
+  'bossJournal.wildheart.beast.warySummary':
+    '各種の行動阻害（スタン、拘束、鈍足）はジャガーに一度だけ効き、その後その種類は{lockout}秒間効かなくなる。行動不能、恐怖、変異はスタン扱い。',
+  'bossJournal.wildheart.beast.waryResponse':
+    '順番に使う：拘束、鈍足、スタンを1回ずつ。同じ種類を3回続けない。',
+  'bossJournal.wildheart.beast.quakeSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、獣使いから{radius}ヤード以内の全員が{min}〜{max}ダメージを受ける。',
+  'bossJournal.wildheart.beast.quakeResponse': 'タンク以外は獣使いから離れる。',
+  'bossJournal.wildheart.beast.huntSummary':
+    '{every}秒ごとに、2体とも{seconds}秒間、攻撃速度が{haste}上昇する。',
+  'bossJournal.wildheart.beast.huntResponse':
+    'タンクとヒーラーはこの間クールダウンを使う。ジャガーの噛みつきも速くなる。',
+  'bossJournal.wildheart.beast.wardName': 'シックハイドウォード',
+  'bossJournal.wildheart.beast.wardSummary':
+    '{every}秒ごとに、ジャガーが{amount}ダメージを吸収するシールドを{seconds}秒間得る。',
+  'bossJournal.wildheart.beast.wardResponse':
+    'シールドがある間は獣使いを攻撃する：体力は共有されている。',
+  'bossJournal.wildheart.beast.heelSummary':
+    '{every}秒ごとに、ジャガーが{cast}秒の詠唱の後、獣使いの元へ跳び戻り、絆が復活する。',
+  'bossJournal.wildheart.beast.heelResponse':
+    '詠唱中にジャガーをスタン、行動不能、変異にすれば中断できる。ジャガーがすでにスタンを警戒している場合は効かない。',
+  'bossJournal.wildheart.beast.tipTank':
+    '獣使いをジャガーから一気に{normal}ヤードより遠くへ引き離して保持し、群れに背を向けさせる。',
+  'bossJournal.wildheart.beast.tipTankHeroic':
+    '獣使いをジャガーから一気に{heroic}ヤードより遠くへ引き離して保持する。戻れ！のたびに再び引き離す。',
+  'bossJournal.wildheart.beast.tipHealer':
+    '忍び狩りの標的に注意：噛みつきと出血は速く入り、コール・オブ・ザ・ハント中はさらに速い。',
+  'bossJournal.wildheart.beast.tipDamage':
+    '最も安全な方を攻撃する。狙われたらジャガーを獣使いから引き離す。それ以外は鈍足・拘束・スタンを順番に使う。',
+  'bossJournal.wildheart.beast.tipDamageHeroic':
+    '最も安全な方を攻撃する。戻れ！の詠唱ごとにスタンを用意し、ジャガーに鈍足と拘束を順番に使う。',
+  'bossJournal.wildheart.beast.choiceName': 'ジャガーを今止めるか、取っておくか？',
+  'bossJournal.wildheart.beast.choiceGain':
+    '鈍足・拘束・スタンで、ジャガーを獲物からも獣使いからも遠ざけておける。',
+  'bossJournal.wildheart.beast.choiceRisk':
+    '各種の阻害は一度だけ効き、その後{lockout}秒間効かなくなる。3つ同時に使い切ると、次の狩りに使えるものが残らない。',
+  'bossJournal.wildheart.beast.choiceRiskHeroic':
+    '各種の阻害は一度だけ効き、その後{lockout}秒間効かなくなる。スタンを早く使うと、次の戻れ！を止められなくなる。',
+  'bossJournal.wildheart.beast.heroicBond': '狂乱の絆：群れの絆の範囲が{reach}ヤードになる。',
+  'bossJournal.wildheart.beast.heroicHeel':
+    '戻れ！：詠唱中にスタンが入らなければ、ジャガーは獣使いの元へ跳び戻る。シックハイドウォードは{amount}を吸収する。',
+  'bossJournal.wildheart.bloom.overview':
+    '根を張った人喰い花が、周囲の腐葉土の花壇に種莢を降らせる。花粉のない者は芽吹く前に莢を踏み潰す。受粉した者は莢に近づいてはならない。触れると莢はすぐに芽吹く。',
+  'bossJournal.wildheart.bloom.phaseTerraceName': '涙の滝',
+  'bossJournal.wildheart.bloom.phaseTerraceSummary':
+    '決して動かない。別の詠唱中はタイマーが止まるため、記載の間隔は最短のものになる。',
+  'bossJournal.wildheart.bloom.seedSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、{count}個の種莢が各腐葉土の花壇に1つずつ落ちる。受粉していない状態で莢を踏むと潰せる。放置された莢は{sprout}秒後に茨の芽になる。',
+  'bossJournal.wildheart.bloom.seedHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、{count}個の種莢が各腐葉土の花壇に1つずつ落ちる。受粉していない状態で莢を踏むと潰せる。潜る種：放置された莢は{burrow}秒後に地中へ潜り、最も近い者の傍に茨の芽が現れる。',
+  'bossJournal.wildheart.bloom.seedResponse':
+    '受粉していない者はすべての莢を素早く踏んで回る。受粉した者は近づかない。',
+  'bossJournal.wildheart.bloom.pollinateName': '受粉',
+  'bossJournal.wildheart.bloom.pollinateSummary':
+    '{every}秒ごとに、{count}人が{seconds}秒間受粉する。受粉した者が莢に触れると、莢はすぐに芽吹く。',
+  'bossJournal.wildheart.bloom.pollinateHeroicSummary':
+    '{every}秒ごとに、{count}人が{seconds}秒間受粉する。受粉した者が莢に触れると、莢はすぐに芽吹く。花粉の雲：受粉した者の{cloudRadius}ヤード以内に{cloudSeconds}秒間立っていると、あなたも受粉する。',
+  'bossJournal.wildheart.bloom.pollinateResponse':
+    '受粉したら：効果が切れるまで莢に近づかない。ヒロイックでは味方からも離れる。',
+  'bossJournal.wildheart.bloom.sproutName': '茨の芽',
+  'bossJournal.wildheart.bloom.sproutSummary':
+    '芽吹いた莢から育つエリートの雑魚で、最も近い者を攻撃する。ゴージブルームが倒れると枯れる。',
+  'bossJournal.wildheart.bloom.sproutResponse': 'タンクが引き受け、DPSが倒す。',
+  'bossJournal.wildheart.bloom.lashSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、長さ{length}ヤード、幅{width}ヤードの帯をプレイヤー（可能ならタンク以外）に向ける：{min}〜{max}ダメージと{root}秒の拘束。',
+  'bossJournal.wildheart.bloom.lashResponse': '詠唱が終わる前に横へ動いて帯から出る。',
+  'bossJournal.wildheart.bloom.gorgeSummary':
+    '{every}秒ごとに標的へ{cast}秒の詠唱の後、近接攻撃の{mult}倍の噛みつきと消化：{seconds}秒間、毎秒{perSecond}ダメージ。移動では避けられない。',
+  'bossJournal.wildheart.bloom.gorgeResponse':
+    'タンク：これには防御クールダウンを使う。ヒーラーは消化ダメージをカバーする。',
+  'bossJournal.wildheart.bloom.spitName': '花の唾吐き',
+  'bossJournal.wildheart.bloom.spitSummary':
+    '標的が{delay}秒間射程外にいると、{every}秒ごとに唾を吐き、{min}〜{max}ダメージを与える。',
+  'bossJournal.wildheart.bloom.spitResponse': 'タンクは近接範囲に留まる。',
+  'bossJournal.wildheart.bloom.tipTank':
+    '近接範囲に留まる：離れると花の唾吐きを受ける。貪り食いのたびにクールダウンを使い、茨の芽はすべて引き受ける。',
+  'bossJournal.wildheart.bloom.tipHealer':
+    '貪り食いはタンクへの大ダメージで、その後に消化が続く。蔓の鞭は帯の中にいる者を拘束して傷つける。',
+  'bossJournal.wildheart.bloom.tipDamage':
+    '受粉していなければ、攻撃の合間に莢を踏み潰す。蔓の鞭から出て、茨の芽は素早く倒す。',
+  'bossJournal.wildheart.bloom.choiceName': '誰が種を踏み潰す？',
+  'bossJournal.wildheart.bloom.choiceGain':
+    '莢を潰すたびにエリートの茨の芽が1体減り、戦闘は花に集中できる。',
+  'bossJournal.wildheart.bloom.choiceRisk':
+    '花壇へ走るとダメージと近接の時間を失う。受粉した者が莢に触れると、すぐに芽吹いてしまう。',
+  'bossJournal.wildheart.bloom.heroicBurrow':
+    '潜る種：触れられなかった莢は{burrow}秒後に地中へ潜り、最も近い者の傍に芽が現れる。',
+  'bossJournal.wildheart.bloom.heroicCloud':
+    '花粉の雲：受粉した者の{cloudRadius}ヤード以内に{cloudSeconds}秒間立っていると、あなたも受粉する。',
+  'bossJournal.wildheart.zulgar.overview':
+    '盆地の大司祭。予告付きの円がある安定した戦いだが、ジャガーの霊に変じて1人を狩り始める。狩られる者は、点灯した太陽紋の上を通って誘導し、彼を鈍足にする。',
+  'bossJournal.wildheart.zulgar.phaseShrineName': '祭壇',
+  'bossJournal.wildheart.zulgar.phaseShrineSummary': '近接で戦い、自身の周囲に円状の脈動を放つ。',
+  'bossJournal.wildheart.zulgar.phaseHuntName': '狩りの魂',
+  'bossJournal.wildheart.zulgar.phaseHuntSummary':
+    '体力が{first}と{second}になると、{seconds}秒間ジャガーの霊となり、印を付けた者を追う。',
+  'bossJournal.wildheart.zulgar.phaseEnrageName': '激昂',
+  'bossJournal.wildheart.zulgar.pulseSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、彼から{radius}ヤード以内の全員に一撃：{min}〜{max}ダメージ。',
+  'bossJournal.wildheart.zulgar.pulseResponse': 'タンク以外は詠唱が終わる前に円から出る。',
+  'bossJournal.wildheart.zulgar.roarName': 'ジャガーロア',
+  'bossJournal.wildheart.zulgar.roarSummary':
+    '近接攻撃が当たるたび、{chance}の確率で相手を{distance}ヤードノックバックさせる。',
+  'bossJournal.wildheart.zulgar.roarResponse': 'タンクは背後に空間を確保する。',
+  'bossJournal.wildheart.zulgar.huntSummary':
+    '体力が{first}と{second}の時：{cast}秒の詠唱の後、{seconds}秒間、印を付けた1人（獲物。他にいる限りタンクにはならない）を狩る。移動速度はプレイヤーより{speed}速く、挑発を無視し、攻撃しない。獲物に追いつくと：{maul}ダメージと{stun}秒のスタン。その後、新たな獲物を選ぶ。引き裂かれた者は{respite}秒間安全。',
+  'bossJournal.wildheart.zulgar.huntHeroicSummary':
+    '体力が{first}と{second}の時：{cast}秒の詠唱の後、{seconds}秒間、獲物を狩る。双つの獲物：2人に印が付き、{switchEvery}秒ごとに標的を切り替える。移動速度はプレイヤーより{speed}速く、挑発を無視し、攻撃しない。獲物に追いつくと：{maul}ダメージと{stun}秒のスタン。',
+  'bossJournal.wildheart.zulgar.huntResponse':
+    '獲物：点灯した太陽紋の上を走って彼を鈍足にする。他の者は狩りの間、鈍足・拘束・スタンで止める。',
+  'bossJournal.wildheart.zulgar.glyphName': '太陽紋',
+  'bossJournal.wildheart.zulgar.glyphSummary':
+    '{count}個の紋が祭壇を囲む。ジャガーの霊が点灯した紋を越えると{seconds}秒間{slow}鈍足になり、その紋は{dark}秒間消灯する。狩りの間、鈍足と拘束は効き、スタンの持続は半分になる。',
+  'bossJournal.wildheart.zulgar.glyphResponse': '紋は分けて使う：最初の狩りで使い切らない。',
+  'bossJournal.wildheart.zulgar.ambushName': '待ち伏せ',
+  'bossJournal.wildheart.zulgar.ambushSummary':
+    '狩りのたびに{seconds}秒間姿を消す。最も遠い者に半径{radius}ヤードの円が示され、{warn}秒の予告の後、彼がそこに降り立つ：円内の全員が{min}〜{max}ダメージ。',
+  'bossJournal.wildheart.zulgar.ambushResponse': '円から出る。',
+  'bossJournal.wildheart.zulgar.tipTank':
+    'ジャガーロアに備えて背後に空間を確保する。狩りが終わると彼はあなたの元へ戻る：引き受ける準備をしておく。',
+  'bossJournal.wildheart.zulgar.tipHealer':
+    'ワイルドハートの脈動は円に残った者に当たる。引き裂きは大きな単発ダメージ：獲物を回復する。',
+  'bossJournal.wildheart.zulgar.tipDamage':
+    '脈動の円から出る。狩りの間は鈍足・拘束・スタンで獲物を守り、自分が獲物なら点灯した紋の上を走る。',
+  'bossJournal.wildheart.zulgar.tipDamageHeroic':
+    '脈動の円から出る。狩りの間は鈍足・拘束・スタンで2人の獲物を守る。狩りのたびに、待ち伏せの円から出る。',
+  'bossJournal.wildheart.zulgar.choiceName': '紋を今使うか、取っておくか？',
+  'bossJournal.wildheart.zulgar.choiceGain':
+    '点灯した紋を通らせるたびに彼は大きく鈍足になり、獲物の時間を稼げる。',
+  'bossJournal.wildheart.zulgar.choiceRisk':
+    '使った紋は{dark}秒間消灯したままで、狩りは{seconds}秒続く：最初に使い切ると、狩りの終盤に使える紋が残らない。',
+  'bossJournal.wildheart.zulgar.heroicTwinPrey':
+    '双つの獲物：2人が狩られる。{switchEvery}秒ごとに標的を切り替える。',
+  'bossJournal.wildheart.zulgar.heroicAmbush':
+    '待ち伏せ：狩りのたびに、最も遠い者の半径{radius}ヤードの円へ飛びかかる。',
 };

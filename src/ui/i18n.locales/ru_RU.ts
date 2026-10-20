@@ -22452,4 +22452,201 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Глубокая закалка: треснувшая плита больше не замерзает.',
   'bossJournal.sanctum.korzul.heroicTwinEyes':
     'Двойное око: Око вирма помечает сразу двух игроков.',
+  'bossJournal.wildheart.saurian.overview':
+    'Боевой зверь размером с дом, несущий паланкин, ходит кругами по речному броду. Обойти его нельзя: лозовые мосты откроются, только когда он умрёт. Два заметных удара, лекарь-наездник на половине здоровья и бешенство в конце.',
+  'bossJournal.wildheart.saurian.phaseFordName': 'Речной брод',
+  'bossJournal.wildheart.saurian.phaseFordSummary':
+    'С начала боя он чередует взмах хвоста позади себя и топот вокруг себя. Одновременно идёт только один удар.',
+  'bossJournal.wildheart.saurian.phaseHowdahName': 'Паланкин разбит',
+  'bossJournal.wildheart.saurian.phaseHowdahSummary':
+    'При здоровье {health} паланкин раскалывается, и Заклинатель с паланкина спрыгивает вниз, чтобы лечить Великого завра.',
+  'bossJournal.wildheart.saurian.phaseEnrageName': 'Бешенство',
+  'bossJournal.wildheart.saurian.phaseEnrageSummary':
+    'При здоровье ниже {health} он впадает в бешенство до конца боя.',
+  'bossJournal.wildheart.saurian.tailSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем хвост сметает конус {arc} градусов позади него на {range} м от центра: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.wildheart.saurian.tailResponse': 'Никогда не стойте позади него. Атакуйте сбоку.',
+  'bossJournal.wildheart.saurian.stompSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем все в радиусе {radius} м от его центра получают от {min} до {max} урона и сбиваются с ног на {stun} сек.',
+  'bossJournal.wildheart.saurian.stompResponse':
+    'Все, кто может, выходят из круга до конца заклинания. Танк принимает удар; лекари потом подлечивают танка.',
+  'bossJournal.wildheart.saurian.riderName': 'Наездник с паланкина',
+  'bossJournal.wildheart.saurian.riderSummary':
+    'Один раз, при здоровье {health}: Заклинатель с паланкина спрыгивает рядом с Великим завром, сражается вместе с ним и лечит его Соком предков.',
+  'bossJournal.wildheart.saurian.riderResponse':
+    'Танк берёт наездника на себя. Бойцы прерывают его лечение или убивают его первым.',
+  'bossJournal.wildheart.saurian.sapSummary':
+    'Лечение наездника: заклинание {cast} сек. каждые {every} сек., восстанавливающее {heal} максимального здоровья Великого завра.',
+  'bossJournal.wildheart.saurian.sapResponse': 'Прерывайте каждый раз или убейте наездника.',
+  'bossJournal.wildheart.saurian.enrageSummary':
+    'При здоровье ниже {health} всё, что он делает, наносит на {damage} больше урона: ближний бой, Удар хвостом и Сотрясающий топот.',
+  'bossJournal.wildheart.saurian.tipTank':
+    'Держите его лицом от группы, чтобы никто не оказался позади хвоста. Берите Заклинателя с паланкина на себя, едва он приземлится.',
+  'bossJournal.wildheart.saurian.tipHealer':
+    'Сотрясающий топот сбивает с ног всех рядом, поэтому лечите танка после каждого. Приберегите способность для бешенства.',
+  'bossJournal.wildheart.saurian.tipDamage':
+    'Стойте сбоку, вне конуса хвоста и круга топота. На половине здоровья прервите Сок предков или убейте наездника.',
+  'bossJournal.wildheart.saurian.choiceName': 'Сначала наездник или сначала завр?',
+  'bossJournal.wildheart.saurian.choiceGain':
+    'Смерть наездника навсегда прекращает лечение: каждый Сок предков восстанавливает {heal} здоровья завра раз в {every} сек.',
+  'bossJournal.wildheart.saurian.choiceRisk':
+    'Пока вы убиваете наездника, завр продолжает мести хвостом и топтать. Если оставить наездника, кому-то придётся прерывать каждое лечение.',
+  'bossJournal.wildheart.beast.overview':
+    'Повелитель клыков и его Великий ягуар делят одну полосу здоровья и умирают вместе. Рядом они гораздо прочнее и бьют сильнее, поэтому танк уводит хозяина прочь, пока ягуар охотится на отмеченного игрока.',
+  'bossJournal.wildheart.beast.phasePitsName': 'Звериные ямы',
+  'bossJournal.wildheart.beast.phasePitsSummary':
+    'Один бой, два тела. Их таймеры идут весь бой; фаз по здоровью нет.',
+  'bossJournal.wildheart.beast.bondSummary':
+    'Пока Повелитель клыков и ягуар находятся в {reach} м друг от друга, оба получают на {dr} меньше урона и наносят на {damage} больше.',
+  'bossJournal.wildheart.beast.bondHeroicSummary':
+    'Неистовые узы: пока Повелитель клыков и ягуар находятся в {reach} м друг от друга, оба получают на {dr} меньше урона и наносят на {damage} больше.',
+  'bossJournal.wildheart.beast.bondResponse':
+    'Танк уводит Повелителя клыков от ягуара дальше чем на {reach} м и удерживает его там.',
+  'bossJournal.wildheart.beast.sharedName': 'Общее здоровье',
+  'bossJournal.wildheart.beast.sharedSummary':
+    'Два тела делят один запас здоровья: урон по любому засчитывается одинаково, а когда умирает одно, умирает и другое.',
+  'bossJournal.wildheart.beast.sharedResponse':
+    'Бейте того, до кого безопаснее добраться. От смены цели вы ничего не теряете.',
+  'bossJournal.wildheart.beast.stalkName': 'Выслеживание',
+  'bossJournal.wildheart.beast.stalkSummary':
+    'Ягуар отмечает игрока, который не танк хозяина, и охотится на него {seconds} сек., игнорируя провокацию. Когда достаёт, кусает каждые {biteEvery} сек.: от {min} до {max} урона, затем кровотечение {bleed} каждые {bleedEvery} сек. в течение {bleedSeconds} сек. Потом выбирает новую добычу.',
+  'bossJournal.wildheart.beast.stalkResponse':
+    'Отмеченный: бегите и уводите ягуара от Повелителя клыков. Остальные замедляют, обездвиживают или оглушают его.',
+  'bossJournal.wildheart.beast.warySummary':
+    'Каждый вид контроля (оглушение, обездвиживание, замедление) срабатывает на ягуаре один раз, затем этот вид не действует на него {lockout} сек. Паралич, страх и превращение считаются оглушением.',
+  'bossJournal.wildheart.beast.waryResponse':
+    'Чередуйте: одно обездвиживание, одно замедление, одно оглушение, а не три одинаковых.',
+  'bossJournal.wildheart.beast.quakeSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем все в радиусе {radius} м от Повелителя клыков получают от {min} до {max} урона.',
+  'bossJournal.wildheart.beast.quakeResponse': 'Все, кроме танка, отходят от Повелителя клыков.',
+  'bossJournal.wildheart.beast.huntSummary':
+    'Каждые {every} сек. оба зверя атакуют на {haste} быстрее в течение {seconds} сек.',
+  'bossJournal.wildheart.beast.huntResponse':
+    'Танк и лекарь используют способности на это время; ягуар тоже кусает быстрее.',
+  'bossJournal.wildheart.beast.wardName': 'Толстокожая защита',
+  'bossJournal.wildheart.beast.wardSummary':
+    'Каждые {every} сек. ягуар получает щит, поглощающий {amount} урона, на {seconds} сек.',
+  'bossJournal.wildheart.beast.wardResponse':
+    'Пока щит активен, бейте Повелителя клыков: запас здоровья общий.',
+  'bossJournal.wildheart.beast.heelSummary':
+    'Каждые {every} сек. ягуар произносит заклинание {cast} сек., затем прыгает обратно к Повелителю клыков, и узы возвращаются.',
+  'bossJournal.wildheart.beast.heelResponse':
+    'Оглушите, парализуйте или превратите ягуара во время заклинания, чтобы отменить его. Это работает, только если ягуар ещё не насторожен к оглушениям.',
+  'bossJournal.wildheart.beast.tipTank':
+    'Сразу уведите Повелителя клыков дальше чем на {normal} м от ягуара и держите его там лицом от группы.',
+  'bossJournal.wildheart.beast.tipTankHeroic':
+    'Сразу уведите Повелителя клыков дальше чем на {heroic} м от ягуара и держите его там. После каждого К ноге! уводите его снова.',
+  'bossJournal.wildheart.beast.tipHealer':
+    'Следите за целью Выслеживания: укусы и кровотечение приходят быстро, а во время Зова охоты ещё быстрее.',
+  'bossJournal.wildheart.beast.tipDamage':
+    'Бейте того, кто безопаснее. Если выслеживают вас, уводите ягуара от хозяина; иначе по очереди замедляйте, обездвиживайте и оглушайте его.',
+  'bossJournal.wildheart.beast.tipDamageHeroic':
+    'Бейте того, кто безопаснее. Держите оглушение наготове для каждого заклинания К ноге! и по очереди замедляйте и обездвиживайте ягуара.',
+  'bossJournal.wildheart.beast.choiceName': 'Контролировать ягуара сейчас или приберечь?',
+  'bossJournal.wildheart.beast.choiceGain':
+    'Замедления, обездвиживания и оглушения не подпускают ягуара к добыче и уводят его от Повелителя клыков.',
+  'bossJournal.wildheart.beast.choiceRisk':
+    'Каждый вид контроля срабатывает один раз, затем не действует {lockout} сек., так что если потратить все три сразу, на следующую охоту ничего не останется.',
+  'bossJournal.wildheart.beast.choiceRiskHeroic':
+    'Каждый вид контроля срабатывает один раз, затем не действует {lockout} сек. Потратите оглушение рано, и следующий К ноге! будет нечем отменить.',
+  'bossJournal.wildheart.beast.heroicBond': 'Неистовые узы: Узы стаи действуют на {reach} м.',
+  'bossJournal.wildheart.beast.heroicHeel':
+    'К ноге!: ягуар прыгает обратно к Повелителю клыков, если во время заклинания его не оглушить. Толстокожая защита поглощает {amount}.',
+  'bossJournal.wildheart.bloom.overview':
+    'Укоренившийся цветок-людоед сыплет семенные стручки на грядки с перегноем вокруг себя. Игроки без пыльцы давят стручки, пока они не проросли; опылённые должны держаться от них подальше, иначе стручки прорастают тут же.',
+  'bossJournal.wildheart.bloom.phaseTerraceName': 'Плачущие водопады',
+  'bossJournal.wildheart.bloom.phaseTerraceSummary':
+    'Он никогда не двигается. Таймеры его заклинаний стоят, пока идёт другое заклинание, поэтому указанные интервалы это кратчайшие паузы.',
+  'bossJournal.wildheart.bloom.seedSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем падают семенные стручки (всего {count}), по одному на каждую грядку. Если наступить на стручок без Опыления, он раздавлен. Нетронутый стручок через {sprout} сек. даёт Терновый росток.',
+  'bossJournal.wildheart.bloom.seedHeroicSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем падают семенные стручки (всего {count}), по одному на каждую грядку. Если наступить на стручок без Опыления, он раздавлен. Зарывающиеся семена: нетронутый стручок через {burrow} сек. уходит под землю, и рядом с ближайшим игроком вырастает Терновый росток.',
+  'bossJournal.wildheart.bloom.seedResponse':
+    'Неопылённые игроки быстро пробегают по каждому стручку. Опылённые держатся от них подальше.',
+  'bossJournal.wildheart.bloom.pollinateName': 'Опыление',
+  'bossJournal.wildheart.bloom.pollinateSummary':
+    'Каждые {every} сек. опыляются игроки (всего {count}) на {seconds} сек. Опылённый игрок, коснувшийся стручка, тут же заставляет его прорасти.',
+  'bossJournal.wildheart.bloom.pollinateHeroicSummary':
+    'Каждые {every} сек. опыляются игроки (всего {count}) на {seconds} сек. Опылённый игрок, коснувшийся стручка, тут же заставляет его прорасти. Пыльцевое облако: если стоять в радиусе {cloudRadius} м от опылённого игрока {cloudSeconds} сек., вы тоже будете опылены.',
+  'bossJournal.wildheart.bloom.pollinateResponse':
+    'Опылены: держитесь подальше от стручков, пока эффект не спадёт, а в героическом режиме ещё и подальше от союзников.',
+  'bossJournal.wildheart.bloom.sproutName': 'Терновый росток',
+  'bossJournal.wildheart.bloom.sproutSummary':
+    'Элитный приспешник, вырастающий из проросшего стручка и атакующий ближайшего игрока. Ростки вянут, когда умирает Цветожор.',
+  'bossJournal.wildheart.bloom.sproutResponse': 'Танк берёт его на себя, а бойцы убивают.',
+  'bossJournal.wildheart.bloom.lashSummary':
+    'Каждые {every} сек. заклинание {cast} сек. нацеливает полосу длиной {length} м и шириной {width} м на игрока (по возможности не танка): от {min} до {max} урона и обездвиживание на {root} сек.',
+  'bossJournal.wildheart.bloom.lashResponse': 'Шагните вбок из полосы до конца заклинания.',
+  'bossJournal.wildheart.bloom.gorgeSummary':
+    'Каждые {every} сек. заклинание {cast} сек. на цель, затем укус с множителем {mult} к урону ближнего боя и Переваривание: {perSecond} урона в секунду в течение {seconds} сек. Движением уклониться нельзя.',
+  'bossJournal.wildheart.bloom.gorgeResponse':
+    'Танк: используйте защитную способность. Лекари покрывают урон от Переваривания.',
+  'bossJournal.wildheart.bloom.spitName': 'Цветочный плевок',
+  'bossJournal.wildheart.bloom.spitSummary':
+    'Если цель держится вне его досягаемости {delay} сек., он плюёт каждые {every} сек., нанося от {min} до {max} урона.',
+  'bossJournal.wildheart.bloom.spitResponse': 'Танк остаётся в зоне ближнего боя.',
+  'bossJournal.wildheart.bloom.tipTank':
+    'Оставайтесь в ближнем бою: стоит отойти, и прилетит Цветочный плевок. Используйте способность на каждое Пожирание и берите на себя каждый Терновый росток.',
+  'bossJournal.wildheart.bloom.tipHealer':
+    'Пожирание это сильный удар по танку, за ним идёт Переваривание. Удар лозы обездвиживает и ранит всех в своей полосе.',
+  'bossJournal.wildheart.bloom.tipDamage':
+    'Если вы не опылены, давите стручки между атаками. Уходите из Удара лозы и быстро убивайте любой Терновый росток.',
+  'bossJournal.wildheart.bloom.choiceName': 'Кто давит семена?',
+  'bossJournal.wildheart.bloom.choiceGain':
+    'Каждый раздавленный стручок это на один элитный Терновый росток меньше, а бой остаётся сосредоточен на цветке.',
+  'bossJournal.wildheart.bloom.choiceRisk':
+    'Бег к грядкам стоит урона и времени в ближнем бою, а опылённый игрок, коснувшийся стручка, тут же его прорастит.',
+  'bossJournal.wildheart.bloom.heroicBurrow':
+    'Зарывающиеся семена: нетронутый стручок через {burrow} сек. уходит под землю, и его росток вырастает рядом с ближайшим игроком.',
+  'bossJournal.wildheart.bloom.heroicCloud':
+    'Пыльцевое облако: если стоять в радиусе {cloudRadius} м от опылённого игрока {cloudSeconds} сек., вы тоже будете опылены.',
+  'bossJournal.wildheart.zulgar.overview':
+    'Верховный жрец котловины. Ровный бой с заметным кольцом, пока он не превратится в дух ягуара и не начнёт охоту на одного игрока. Преследуемый ведёт его через горящие солнечные глифы, которые его замедляют.',
+  'bossJournal.wildheart.zulgar.phaseShrineName': 'Святилище',
+  'bossJournal.wildheart.zulgar.phaseShrineSummary':
+    'Он сражается в ближнем бою и пускает вокруг себя кольцо импульса.',
+  'bossJournal.wildheart.zulgar.phaseHuntName': 'Дух охоты',
+  'bossJournal.wildheart.zulgar.phaseHuntSummary':
+    'При здоровье {first} и {second} он становится духом ягуара на {seconds} сек. и преследует отмеченного игрока.',
+  'bossJournal.wildheart.zulgar.phaseEnrageName': 'Бешенство',
+  'bossJournal.wildheart.zulgar.pulseSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем один взрыв по всем в радиусе {radius} м от него: от {min} до {max} урона.',
+  'bossJournal.wildheart.zulgar.pulseResponse':
+    'Все, кроме танка, выходят из кольца до конца заклинания.',
+  'bossJournal.wildheart.zulgar.roarName': 'Рёв ягуара',
+  'bossJournal.wildheart.zulgar.roarSummary':
+    'Каждый удар в ближнем бою с шансом {chance} отбрасывает цель на {distance} м.',
+  'bossJournal.wildheart.zulgar.roarResponse': 'Танк оставляет позади себя свободное место.',
+  'bossJournal.wildheart.zulgar.huntSummary':
+    'При здоровье {first} и {second}: заклинание {cast} сек., затем {seconds} сек. он охотится на одного отмеченного игрока (Добычу, никогда не на танка, пока есть другие). Он бегает на {speed} быстрее игрока, игнорирует провокацию и не атакует. Если он настигает Добычу: {maul} урона и оглушение на {stun} сек., затем он выбирает новую Добычу. Растерзанный игрок в безопасности {respite} сек.',
+  'bossJournal.wildheart.zulgar.huntHeroicSummary':
+    'При здоровье {first} и {second}: заклинание {cast} сек., затем {seconds} сек. он охотится на Добычу. Двойная добыча: отмечены двое игроков, и он переключается между ними каждые {switchEvery} сек. Он бегает на {speed} быстрее игрока, игнорирует провокацию и не атакует. Если он настигает Добычу: {maul} урона и оглушение на {stun} сек.',
+  'bossJournal.wildheart.zulgar.huntResponse':
+    'Добыча: бегите через горящие солнечные глифы, чтобы замедлить его. Остальные замедляют, обездвиживают и оглушают его, пока он охотится.',
+  'bossJournal.wildheart.zulgar.glyphName': 'Солнечные глифы',
+  'bossJournal.wildheart.zulgar.glyphSummary':
+    'Глифов вокруг святилища: {count}. Когда дух ягуара пересекает горящий глиф, он замедляется на {slow} на {seconds} сек., а этот глиф гаснет на {dark} сек. Во время охоты замедления и обездвиживания действуют, а оглушения длятся вдвое меньше.',
+  'bossJournal.wildheart.zulgar.glyphResponse':
+    'Расходуйте глифы по одному: не сжигайте все на первой охоте.',
+  'bossJournal.wildheart.zulgar.ambushName': 'Засада',
+  'bossJournal.wildheart.zulgar.ambushSummary':
+    'После каждой охоты он исчезает на {seconds} сек. Круг радиусом {radius} м отмечает самого дальнего игрока и даёт {warn} сек. предупреждения, затем он приземляется туда: от {min} до {max} урона всем внутри.',
+  'bossJournal.wildheart.zulgar.ambushResponse': 'Выйдите из круга.',
+  'bossJournal.wildheart.zulgar.tipTank':
+    'Оставляйте позади себя свободное место для Рёва ягуара. Когда охота заканчивается, он возвращается к вам: будьте готовы его принять.',
+  'bossJournal.wildheart.zulgar.tipHealer':
+    'Импульс Дикого Сердца бьёт всех, кто остался в кольце. Растерзание это сильный одиночный удар: подлечивайте Добычу.',
+  'bossJournal.wildheart.zulgar.tipDamage':
+    'Выходите из кольца импульса. Во время охоты замедляйте, обездвиживайте и оглушайте его, защищая Добычу, а если Добыча вы, бегите через горящие глифы.',
+  'bossJournal.wildheart.zulgar.tipDamageHeroic':
+    'Выходите из кольца импульса. Во время охоты замедляйте, обездвиживайте и оглушайте его, защищая обе Добычи. После каждой охоты выходите из круга Засады.',
+  'bossJournal.wildheart.zulgar.choiceName': 'Потратить глиф сейчас или приберечь?',
+  'bossJournal.wildheart.zulgar.choiceGain':
+    'Каждый горящий глиф, через который вы его проведёте, сильно замедляет его и выигрывает время для Добычи.',
+  'bossJournal.wildheart.zulgar.choiceRisk':
+    'Использованный глиф остаётся тёмным {dark} сек., а каждая охота длится {seconds} сек.: сожжёте все в начале, и в конце охоты их не будет.',
+  'bossJournal.wildheart.zulgar.heroicTwinPrey':
+    'Двойная добыча: охота идёт на двоих игроков; он переключается каждые {switchEvery} сек.',
+  'bossJournal.wildheart.zulgar.heroicAmbush':
+    'Засада: после каждой охоты он прыгает в круг радиусом {radius} м на самого дальнего игрока.',
 };

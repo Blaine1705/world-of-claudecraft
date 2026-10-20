@@ -20956,4 +20956,193 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '那块冰板就永远消失了。若他站在完好的冰面上，引导会持续到第{brk}次脉冲，同样会击碎冰板。',
   'bossJournal.sanctum.korzul.heroicDeepQuench': '深度淬火：开裂的冰板不会重新冻结。',
   'bossJournal.sanctum.korzul.heroicTwinEyes': '双子之眼：巨龙之眼同时标记两名玩家。',
+  'bossJournal.wildheart.saurian.overview':
+    '一头房屋般巨大的战兽背着驮轿，在河流浅滩上来回巡行。必须击败它：只有它死后，藤蔓桥才会开启。它有两个带预警的攻击，半血时有一名治疗骑手加入，最后还会狂暴。',
+  'bossJournal.wildheart.saurian.phaseFordName': '河流浅滩',
+  'bossJournal.wildheart.saurian.phaseFordSummary':
+    '开战后，它交替使用身后的甩尾和身周的践踏。同一时间只有一个攻击。',
+  'bossJournal.wildheart.saurian.phaseHowdahName': '驮轿碎裂',
+  'bossJournal.wildheart.saurian.phaseHowdahSummary':
+    '生命值降到{health}时，驮轿碎裂，一名驮轿巫咒师跃下来治疗巨型蜥脚兽。',
+  'bossJournal.wildheart.saurian.phaseEnrageName': '狂暴',
+  'bossJournal.wildheart.saurian.phaseEnrageSummary':
+    '生命值低于{health}时，它在本场战斗剩余时间内狂暴。',
+  'bossJournal.wildheart.saurian.tailSummary':
+    '每{every}秒读条{cast}秒，随后甩尾横扫身后{arc}度的扇形，从身体中心向外{range}码：造成{min}到{max}点伤害，并击退{push}码。',
+  'bossJournal.wildheart.saurian.tailResponse': '绝不要站在它身后。从侧面攻击。',
+  'bossJournal.wildheart.saurian.stompSummary':
+    '每{every}秒读条{cast}秒，随后其中心{radius}码内的所有人受到{min}到{max}点伤害，并被击倒{stun}秒。',
+  'bossJournal.wildheart.saurian.stompResponse':
+    '能移动的人在读条结束前离开圆圈。坦克硬吃这一下；治疗者随后为坦克补血。',
+  'bossJournal.wildheart.saurian.riderName': '驮轿骑手',
+  'bossJournal.wildheart.saurian.riderSummary':
+    '仅一次，在生命值{health}时：一名驮轿巫咒师跳到巨型蜥脚兽身旁并与它并肩作战，用先祖树汁治疗它。',
+  'bossJournal.wildheart.saurian.riderResponse': '坦克接住骑手。输出者打断它的治疗，或先击杀它。',
+  'bossJournal.wildheart.saurian.sapSummary':
+    '骑手的治疗：每{every}秒读条{cast}秒，恢复巨型蜥脚兽最大生命值的{heal}。',
+  'bossJournal.wildheart.saurian.sapResponse': '每次都打断它，或击杀骑手。',
+  'bossJournal.wildheart.saurian.enrageSummary':
+    '生命值低于{health}时，它的一切攻击伤害提高{damage}：近战、甩尾和撼地践踏。',
+  'bossJournal.wildheart.saurian.tipTank':
+    '让它面朝远离队伍的方向，这样没人会站到它的尾巴后面。驮轿巫咒师一落地就接住它。',
+  'bossJournal.wildheart.saurian.tipHealer':
+    '撼地践踏会击倒附近所有人，所以每次之后都要为坦克补血。留一个冷却应对狂暴。',
+  'bossJournal.wildheart.saurian.tipDamage':
+    '站在它的侧面，避开甩尾扇形和践踏圈。半血时，打断先祖树汁或击杀骑手。',
+  'bossJournal.wildheart.saurian.choiceName': '先打骑手，还是先打巨型蜥脚兽？',
+  'bossJournal.wildheart.saurian.choiceGain':
+    '击杀骑手能永久终结它的治疗：每{every}秒一次的先祖树汁会恢复巨型蜥脚兽{heal}的生命值。',
+  'bossJournal.wildheart.saurian.choiceRisk':
+    '你击杀骑手时，巨型蜥脚兽仍会不停甩尾和践踏。若放着骑手不管，就必须有人打断每一次治疗。',
+  'bossJournal.wildheart.beast.overview':
+    '獠牙领主驯兽师和他的巨型美洲豹共用一条生命值，同生共死。两者靠近时坚韧得多，伤害也更高，所以坦克要把驯兽师拖开，而美洲豹会追猎一名被标记的玩家。',
+  'bossJournal.wildheart.beast.phasePitsName': '兽坑',
+  'bossJournal.wildheart.beast.phasePitsSummary':
+    '一场战斗，两具身体。它们的计时贯穿全程；没有生命值阶段。',
+  'bossJournal.wildheart.beast.bondSummary':
+    '驯兽师和美洲豹相距{reach}码以内时，两者受到的伤害降低{dr}，造成的伤害提高{damage}。',
+  'bossJournal.wildheart.beast.bondHeroicSummary':
+    '狂热羁绊：驯兽师和美洲豹相距{reach}码以内时，两者受到的伤害降低{dr}，造成的伤害提高{damage}。',
+  'bossJournal.wildheart.beast.bondResponse':
+    '坦克把驯兽师拖到离美洲豹超过{reach}码的地方并保持住。',
+  'bossJournal.wildheart.beast.sharedName': '共享生命',
+  'bossJournal.wildheart.beast.sharedSummary':
+    '两具身体共用一个生命池：任何一方受到的伤害等同计算，一方死亡时另一方也会死亡。',
+  'bossJournal.wildheart.beast.sharedResponse': '打最容易够到的那一个。切换目标不会有任何损失。',
+  'bossJournal.wildheart.beast.stalkName': '追猎',
+  'bossJournal.wildheart.beast.stalkSummary':
+    '美洲豹标记一名不是驯兽师坦克的玩家，追猎{seconds}秒，无视嘲讽。进入范围后每{biteEvery}秒撕咬一次，造成{min}到{max}点伤害，随后每{bleedEvery}秒流血{bleed}，持续{bleedSeconds}秒。然后它会选择新的猎物。',
+  'bossJournal.wildheart.beast.stalkResponse':
+    '被标记者：跑动，把美洲豹引离驯兽师。其他人对它减速、定身或击晕。',
+  'bossJournal.wildheart.beast.warySummary':
+    '每种控制（击晕、定身、减速）对美洲豹生效一次，随后该类控制在它身上失效{lockout}秒。瘫痪、恐惧和变形都算作击晕。',
+  'bossJournal.wildheart.beast.waryResponse':
+    '轮流使用：先定身，再减速，再击晕，而不是连用三个同类。',
+  'bossJournal.wildheart.beast.quakeSummary':
+    '每{every}秒读条{cast}秒，随后驯兽师{radius}码内的所有人受到{min}到{max}点伤害。',
+  'bossJournal.wildheart.beast.quakeResponse': '除坦克外，所有人远离驯兽师。',
+  'bossJournal.wildheart.beast.huntSummary':
+    '每{every}秒，两只野兽的攻击速度加快{haste}，持续{seconds}秒。',
+  'bossJournal.wildheart.beast.huntResponse':
+    '坦克和治疗者在此期间使用冷却；美洲豹的撕咬也会更快。',
+  'bossJournal.wildheart.beast.wardName': '厚皮护盾',
+  'bossJournal.wildheart.beast.wardSummary':
+    '每{every}秒，美洲豹获得一个能吸收{amount}点伤害的护盾，持续{seconds}秒。',
+  'bossJournal.wildheart.beast.wardResponse': '护盾存在时打驯兽师：生命池是共享的。',
+  'bossJournal.wildheart.beast.heelSummary':
+    '每{every}秒，美洲豹读条{cast}秒，随后跃回驯兽师身边，羁绊恢复。',
+  'bossJournal.wildheart.beast.heelResponse':
+    '在读条期间击晕、瘫痪或变形美洲豹即可打断。若美洲豹已对击晕警觉，则无效。',
+  'bossJournal.wildheart.beast.tipTank':
+    '立刻把驯兽师拉到离美洲豹超过{normal}码的地方并保持，让他背对队伍。',
+  'bossJournal.wildheart.beast.tipTankHeroic':
+    '立刻把驯兽师拉到离美洲豹超过{heroic}码的地方并保持。每次回来！之后再把他拖开。',
+  'bossJournal.wildheart.beast.tipHealer':
+    '盯着被追猎的目标：撕咬和流血来得很快，在狩猎召唤期间更快。',
+  'bossJournal.wildheart.beast.tipDamage':
+    '打最安全的那一个。被追猎时，把美洲豹引离驯兽师；否则轮流对它减速、定身和击晕。',
+  'bossJournal.wildheart.beast.tipDamageHeroic':
+    '打最安全的那一个。为每次回来！读条留好一个击晕，并轮流对美洲豹减速和定身。',
+  'bossJournal.wildheart.beast.choiceName': '现在控制美洲豹，还是留着？',
+  'bossJournal.wildheart.beast.choiceGain': '减速、定身和击晕能让美洲豹追不上猎物，也离开驯兽师。',
+  'bossJournal.wildheart.beast.choiceRisk':
+    '每种控制只生效一次，随后失效{lockout}秒，所以三个一起用光，下一次追猎就没得用了。',
+  'bossJournal.wildheart.beast.choiceRiskHeroic':
+    '每种控制只生效一次，随后失效{lockout}秒。击晕用得太早，就没有东西能打断下一次回来！了。',
+  'bossJournal.wildheart.beast.heroicBond': '狂热羁绊：兽群羁绊范围扩至{reach}码。',
+  'bossJournal.wildheart.beast.heroicHeel':
+    '回来！：除非读条期间被击晕，否则美洲豹会跃回驯兽师身边。厚皮护盾吸收{amount}点伤害。',
+  'bossJournal.wildheart.bloom.overview':
+    '一朵扎根的食人花向周围的沃土花圃撒下种荚。没有花粉的玩家要在种荚发芽前把它们踩平；已授粉的玩家必须远离，否则种荚会立刻发芽。',
+  'bossJournal.wildheart.bloom.phaseTerraceName': '垂泪瀑布',
+  'bossJournal.wildheart.bloom.phaseTerraceSummary':
+    '它从不移动。一个施法进行时，它的其他施法计时会暂停，所以列出的间隔是最短间隔。',
+  'bossJournal.wildheart.bloom.seedSummary':
+    '每{every}秒读条{cast}秒，随后落下{count}个种荚，每个沃土花圃一个。未授粉时踩上种荚会将其踩灭。无人理会的种荚会在{sprout}秒后长出荆棘幼芽。',
+  'bossJournal.wildheart.bloom.seedHeroicSummary':
+    '每{every}秒读条{cast}秒，随后落下{count}个种荚，每个沃土花圃一个。未授粉时踩上种荚会将其踩灭。钻地种子：无人理会的种荚会在{burrow}秒后钻入地下，一株荆棘幼芽在最近的玩家身旁破土而出。',
+  'bossJournal.wildheart.bloom.seedResponse':
+    '未授粉的玩家迅速踩过每个种荚。已授粉的玩家远离它们。',
+  'bossJournal.wildheart.bloom.pollinateName': '授粉',
+  'bossJournal.wildheart.bloom.pollinateSummary':
+    '每{every}秒，{count}名玩家被授粉，持续{seconds}秒。已授粉的玩家碰到种荚，会使其立刻发芽。',
+  'bossJournal.wildheart.bloom.pollinateHeroicSummary':
+    '每{every}秒，{count}名玩家被授粉，持续{seconds}秒。已授粉的玩家碰到种荚，会使其立刻发芽。花粉云：在已授粉玩家{cloudRadius}码内站立{cloudSeconds}秒，你也会被授粉。',
+  'bossJournal.wildheart.bloom.pollinateResponse':
+    '已授粉：效果结束前远离种荚，英雄难度下还要远离队友。',
+  'bossJournal.wildheart.bloom.sproutName': '荆棘幼芽',
+  'bossJournal.wildheart.bloom.sproutSummary':
+    '从发芽的种荚里长出的精英小怪，会攻击最近的玩家。噬花死亡时，幼芽会枯萎。',
+  'bossJournal.wildheart.bloom.sproutResponse': '坦克接住它，输出者击杀它。',
+  'bossJournal.wildheart.bloom.lashSummary':
+    '每{every}秒读条{cast}秒，朝一名玩家（尽量选非坦克）瞄准一条长{length}码、宽{width}码的通道：造成{min}到{max}点伤害，并定身{root}秒。',
+  'bossJournal.wildheart.bloom.lashResponse': '在读条结束前向侧面走出通道。',
+  'bossJournal.wildheart.bloom.gorgeSummary':
+    '每{every}秒对其目标读条{cast}秒，随后撕咬，造成其近战攻击{mult}倍的伤害，并附加消化：持续{seconds}秒，每秒{perSecond}点伤害。移动无法躲避。',
+  'bossJournal.wildheart.bloom.gorgeResponse': '坦克：为它使用防御冷却。治疗者负责应对消化伤害。',
+  'bossJournal.wildheart.bloom.spitName': '绽花喷吐',
+  'bossJournal.wildheart.bloom.spitSummary':
+    '如果目标离开它的攻击范围达{delay}秒，它每{every}秒喷吐一次，造成{min}到{max}点伤害。',
+  'bossJournal.wildheart.bloom.spitResponse': '坦克留在近战范围内。',
+  'bossJournal.wildheart.bloom.tipTank':
+    '留在近战范围：走开会招来绽花喷吐。每次吞噬都用一个冷却，并接住每只荆棘幼芽。',
+  'bossJournal.wildheart.bloom.tipHealer':
+    '吞噬是对坦克的重击，随后是消化。藤鞭会定身并伤害站在通道里的人。',
+  'bossJournal.wildheart.bloom.tipDamage':
+    '如果你没有被授粉，在攻击间隙踩灭种荚。走出藤鞭，并迅速击杀任何荆棘幼芽。',
+  'bossJournal.wildheart.bloom.choiceName': '谁来踩灭种子？',
+  'bossJournal.wildheart.bloom.choiceGain':
+    '每踩灭一个种荚，就少一只精英荆棘幼芽，战斗也能继续集中在花上。',
+  'bossJournal.wildheart.bloom.choiceRisk':
+    '跑向花圃会损失伤害和近战时间，而且已授粉的玩家碰到种荚会让它立刻发芽。',
+  'bossJournal.wildheart.bloom.heroicBurrow':
+    '钻地种子：无人触碰的种荚在{burrow}秒后钻入地下，幼芽在最近的玩家身旁破土而出。',
+  'bossJournal.wildheart.bloom.heroicCloud':
+    '花粉云：在已授粉玩家{cloudRadius}码内站立{cloudSeconds}秒，你也会被授粉。',
+  'bossJournal.wildheart.zulgar.overview':
+    '盆地的大祭司。节奏稳定的战斗，带有预警的圆环，直到他化为美洲豹之魂并追猎一名玩家。被追猎的玩家引他穿过点亮的太阳符文，符文会使他减速。',
+  'bossJournal.wildheart.zulgar.phaseShrineName': '神殿',
+  'bossJournal.wildheart.zulgar.phaseShrineSummary': '他在近战中战斗，并在自身周围释放脉冲圆环。',
+  'bossJournal.wildheart.zulgar.phaseHuntName': '狩猎之魂',
+  'bossJournal.wildheart.zulgar.phaseHuntSummary':
+    '生命值降到{first}和{second}时，他化为美洲豹之魂{seconds}秒，追逐一名被标记的玩家。',
+  'bossJournal.wildheart.zulgar.phaseEnrageName': '狂暴',
+  'bossJournal.wildheart.zulgar.pulseSummary':
+    '每{every}秒读条{cast}秒，随后对他{radius}码内的所有人爆发一次：造成{min}到{max}点伤害。',
+  'bossJournal.wildheart.zulgar.pulseResponse': '除坦克外，所有人在读条结束前离开圆圈。',
+  'bossJournal.wildheart.zulgar.roarName': '美洲豹咆哮',
+  'bossJournal.wildheart.zulgar.roarSummary':
+    '他的每次近战攻击有{chance}的几率将被击中的玩家击退{distance}码。',
+  'bossJournal.wildheart.zulgar.roarResponse': '坦克身后留出空地。',
+  'bossJournal.wildheart.zulgar.huntSummary':
+    '生命值降到{first}和{second}时：读条{cast}秒，随后{seconds}秒内他追猎一名被标记的玩家（猎物，旁人在场时绝不会是坦克）。他比玩家快{speed}，无视嘲讽，且不攻击。若追上猎物：造成{maul}点伤害并击晕{stun}秒，随后他选择新的猎物。被撕咬的玩家有{respite}秒的安全期。',
+  'bossJournal.wildheart.zulgar.huntHeroicSummary':
+    '生命值降到{first}和{second}时：读条{cast}秒，随后{seconds}秒内他追猎猎物。双重猎物：两名玩家被标记，他每{switchEvery}秒在两者之间切换。他比玩家快{speed}，无视嘲讽，且不攻击。若追上猎物：造成{maul}点伤害并击晕{stun}秒。',
+  'bossJournal.wildheart.zulgar.huntResponse':
+    '猎物：跑过点亮的太阳符文使他减速。其他人在他追猎期间对他减速、定身和击晕。',
+  'bossJournal.wildheart.zulgar.glyphName': '太阳符文',
+  'bossJournal.wildheart.zulgar.glyphSummary':
+    '{count}个符文环绕神殿。美洲豹之魂踏过点亮的符文时，会减速{slow}，持续{seconds}秒，该符文随后熄灭{dark}秒。追猎期间，减速和定身对他生效，击晕持续时间减半。',
+  'bossJournal.wildheart.zulgar.glyphResponse': '把符文分散使用：不要在第一次追猎就全部用掉。',
+  'bossJournal.wildheart.zulgar.ambushName': '伏击',
+  'bossJournal.wildheart.zulgar.ambushSummary':
+    '每次追猎后他会隐匿{seconds}秒。一个半径{radius}码的圆圈标出最远的玩家，并给出{warn}秒预警，随后他落在那里：对圈内所有人造成{min}到{max}点伤害。',
+  'bossJournal.wildheart.zulgar.ambushResponse': '离开圆圈。',
+  'bossJournal.wildheart.zulgar.tipTank':
+    '为美洲豹咆哮在身后留出空地。追猎结束时他会回到你身边：做好接住他的准备。',
+  'bossJournal.wildheart.zulgar.tipHealer':
+    '荒野之心脉冲会打中留在圈内的人。撕咬是一次高额单体伤害：为猎物补血。',
+  'bossJournal.wildheart.zulgar.tipDamage':
+    '离开脉冲圈。追猎期间，对他减速、定身和击晕以保护猎物；如果你是猎物，就跑过点亮的符文。',
+  'bossJournal.wildheart.zulgar.tipDamageHeroic':
+    '离开脉冲圈。追猎期间，对他减速、定身和击晕以保护两名猎物。每次追猎后，离开伏击圆圈。',
+  'bossJournal.wildheart.zulgar.choiceName': '现在用掉一个符文，还是留着？',
+  'bossJournal.wildheart.zulgar.choiceGain':
+    '你每引他穿过一个点亮的符文，就会大幅减速他，为猎物争取时间。',
+  'bossJournal.wildheart.zulgar.choiceRisk':
+    '用过的符文会熄灭{dark}秒，而每次追猎持续{seconds}秒：一开始就全用完，追猎的末尾就没有符文可用了。',
+  'bossJournal.wildheart.zulgar.heroicTwinPrey':
+    '双重猎物：两名玩家被追猎；他每{switchEvery}秒切换一次。',
+  'bossJournal.wildheart.zulgar.heroicAmbush':
+    '伏击：每次追猎后，他会扑向最远玩家所在的{radius}码圆圈。',
 };
