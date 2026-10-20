@@ -1242,10 +1242,11 @@
      hands back an unresolved calc() for a custom property, and only a literal
      parses. The safe area cannot ride in that literal for the same reason, so
      the overlay carries the insets as PADDING, which is a real property and does
-     resolve. That padding is NOT inert: an absolutely positioned child resolves
-     against the PADDING box, so it shifts every petal by the inset. The gesture
-     layer seats the radial in that same padding-box frame (see its measure()),
-     which is what makes the inset count exactly once. */
+     resolve. That padding does NOT move the petals: an absolutely positioned
+     child's left/top is measured from the padding EDGE, so the petals sit in
+     viewport coordinates. The gesture layer reads the padding only to shrink the
+     box it clamps the radial into, then hands back viewport coordinates (see its
+     measure()), which is what makes the inset count exactly once. */
   body.mobile-touch #mobile-action-radial {
     --radial-radius-ratio: 1.35;
     --radial-margin: 6px;
