@@ -165,6 +165,21 @@ describe('production nameplate picking path', () => {
     expect(painter.pickEntityAt(...healthPoint(anchors[0]))).toBe(7);
   });
 
+  it('paints the current target last, matching the pick order', () => {
+    const { painter, player } = harness([entity(7), entity(8)]);
+    const access = painter as unknown as {
+      surface: { drawBase: (state: unknown) => void };
+      states: Map<number, unknown>;
+    };
+    const drawn: unknown[] = [];
+    vi.spyOn(access.surface, 'drawBase').mockImplementation((state) => {
+      drawn.push(state);
+    });
+    player.targetId = 7;
+    painter.update(true);
+    expect(drawn).toEqual([access.states.get(8), access.states.get(7)]);
+  });
+
   it('keeps a plate at its projected anchor when a dot row lifts it', () => {
     const plain = harness([entity(7), entity(8)]);
     plain.painter.update(true);
@@ -284,16 +299,38 @@ describe('NPC plates', () => {
     giver.castingAbility = 'fireball';
     giver.castTotal = 2;
     giver.castRemaining = 1;
-    const { painter } = harness([giver], 0, () => 4);
+    // one of the viewer's own debuffs, with the dot row switched on
+    giver.auras = [
+      {
+        id: 'corruption',
+        name: 'Blackrot',
+        kind: 'dot',
+        value: 6,
+        remaining: 12,
+        duration: 18,
+        school: 'shadow',
+        sourceId: 1,
+      },
+    ] as Entity['auras'];
+    const { painter } = harness([giver], 1, () => 4);
     painter.update(true);
     const state = (
       painter as unknown as {
-        states: Map<number, { hpVisible: boolean; castVisible: boolean; raidMarkerUrl: string }>;
+        states: Map<
+          number,
+          {
+            hpVisible: boolean;
+            castVisible: boolean;
+            raidMarkerUrl: string;
+            dots: { count: number };
+          }
+        >;
       }
     ).states.get(7);
     expect(state?.hpVisible).toBe(false);
     expect(state?.castVisible).toBe(false);
     expect(state?.raidMarkerUrl).toBe('');
+    expect(state?.dots.count).toBe(0);
   });
 
   it('still draws a cast bar and raid mark on a mob in the same spot', () => {

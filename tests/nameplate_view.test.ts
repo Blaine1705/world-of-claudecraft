@@ -352,8 +352,9 @@ describe('nameplate_view - NPC plates (close range, name and role only)', () => 
 
   it('marks an NPC plate name-only, with no threat tint or combo pips', () => {
     const p = viewer({ comboPoints: 3, targetId: 2 });
-    const out = plan(npc(2), p);
+    const out = plan(npc(2, { aggroTargetId: PLAYER_ID, hostile: true }), p);
     expect(out.nameOnly).toBe(true);
+    expect(out.threat).toBe(false);
     expect(out.comboPips).toBe(0);
     // the same targeting on a mob does build pips, so the NPC zero is the rule
     expect(plan(ent({ pos: { x: 0, y: 0, z: 2 } }), p).comboPips).toBe(3);
