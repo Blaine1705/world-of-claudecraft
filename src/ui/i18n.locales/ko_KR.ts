@@ -22664,4 +22664,216 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '무덤 그림자: 각 그림자 웅덩이가 {seconds}초 동안 계속 타오릅니다.',
   'bossJournal.bastion.vael.heroicVeil':
     '장막 중에는 형상들이 {drift}초마다 자리를 옮기고, 터진 분신은 익사한 노예를 남깁니다.',
+  'bossJournal.temple.selthe.overview':
+    '성가대모는 자기 웅덩이에서 노래할 뿐 움직이지도 근접 공격을 하지도 않습니다. 플레이어에게 표식을 남겨 함께 나눠 맞는 합창과 홀로 맞는 독창을 일으키고, 한 명에게 점점 거세지는 아리아 광선을 쏘며, 뜰 전체에 파도를 보냅니다. 화살과 아리아는 모두 차단할 수 있습니다.',
+  'bossJournal.temple.selthe.phaseName': '성가대의 뜰',
+  'bossJournal.temple.selthe.phaseSummary':
+    '단계는 하나이며 모두 타이머로 진행됩니다. 시전 중에 발동 시점이 오면 시전이 끝난 뒤에 발동합니다.',
+  'bossJournal.temple.selthe.chorusName': '합창',
+  'bossJournal.temple.selthe.chorusSummary':
+    '{every}초마다 탱커가 아닌 플레이어 한 명이 {mark}초 동안 표식을 받습니다. 끝나면 {total}의 피해가 그 주변 {radius}야드 안의 모두에게 똑같이 나뉩니다.',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    '{every}초마다 탱커가 아닌 플레이어 한 명이 {mark}초 동안 표식을 받습니다. 끝나면 {total}의 피해가 그 주변 {radius}야드 안의 모두에게 똑같이 나뉩니다. 메아리: {echo}초 뒤 같은 자리가 다시 터져, 아직 남아 있는 플레이어 각자에게 {echoDamage}의 피해를 줍니다. 이번에는 나뉘지 않습니다.',
+  'bossJournal.temple.selthe.chorusResponse':
+    '모두 합창 대상에게 뭉쳤다가, 메아리 전에 그 자리를 벗어나세요.',
+  'bossJournal.temple.selthe.soloSummary':
+    '합창이 끝나고 {offset}초 뒤에 다른 플레이어 한 명이 {mark}초 동안 표식을 받습니다. 끝나면 표식을 받은 플레이어와 주변 {radius}야드 안의 모두가 각자 {damage}의 피해를 입습니다.',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    '이중창: 독창이 합창과 동시에 다른 플레이어에게 떨어집니다. 끝나면 표식을 받은 플레이어와 주변 {radius}야드 안의 모두가 각자 {damage}를 입고, {echo}초 뒤 그 자리가 다시 터집니다.',
+  'bossJournal.temple.selthe.soloResponse':
+    '독창 대상은 모두에게서 떨어졌다가 그 자리를 벗어나세요.',
+  'bossJournal.temple.selthe.songSummary':
+    '{every}초마다 {cast}초 시전 후, 뜰 안의 모든 플레이어에게 {min}~{max}의 냉기 피해.',
+  'bossJournal.temple.selthe.songResponse':
+    '피할 수 없습니다. 치유 담당은 모두의 생명력을 가득 채워 두세요.',
+  'bossJournal.temple.selthe.boltSummary':
+    '평소 사용하는 기술입니다. 대상에게 {cast}초 시전으로, 근접 공격의 {mult}배에 해당하는 냉기 피해를 줍니다. 차단당한 뒤에는 {quiet}초 동안 화살도 아리아도 쓰지 않습니다.',
+  'bossJournal.temple.selthe.boltResponse': '아리아가 오지 않을 때 화살을 차단하세요.',
+  'bossJournal.temple.selthe.ariaSummary':
+    '{every}초마다 탱커가 아닌 플레이어 한 명에게 {channel}초 동안 광선을 정신 집중으로 쏩니다. {pulses}번의 파동이 같은 대상에게 {min}에서 {max}까지 커집니다. 광선 안으로 들어서는 플레이어가 대신 파동을 맞고, 증가는 처음부터 다시 시작됩니다.',
+  'bossJournal.temple.selthe.ariaResponse':
+    '차단하거나, 등불 기둥 뒤로 시선을 끊거나, 광선 안으로 들어가 나눠 맞으세요.',
+  'bossJournal.temple.selthe.surgeSummary':
+    '{every}초마다 탱커가 아닌 플레이어를 노려 {cast}초 시전 후, {arc}도, 길이 {range}야드의 파도를 보냅니다. {min}~{max}의 피해와 {push}야드 밀쳐내기.',
+  'bossJournal.temple.selthe.surgeResponse': '옆으로 움직여 부채꼴 밖으로 나가세요.',
+  'bossJournal.temple.selthe.tipTank':
+    '그녀가 볼 수 있는 곳에 서서 화살이 자신에게 오게 하세요. 여기서 탱커가 따로 처리할 기술은 없습니다.',
+  'bossJournal.temple.selthe.tipHealer':
+    '바다의 노래는 {every}초마다 모두를 때립니다. 아리아 대상과 합창에 혼자 걸린 사람을 살피세요.',
+  'bossJournal.temple.selthe.tipDamage':
+    '합창에는 뭉치고, 독창에는 흩어지고, 아리아를 차단하고, 호수의 해일에서 벗어나세요.',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    '합창에는 뭉치고 독창에는 동시에 흩어진 뒤, 메아리 전에 두 자리를 모두 벗어나세요. 아리아를 차단하세요.',
+  'bossJournal.temple.selthe.choiceName': '아리아를 차단할까, 맞아서 나눌까?',
+  'bossJournal.temple.selthe.choiceGain':
+    '차단하거나 기둥을 쓰면 광선이 즉시 끝납니다. 광선 안으로 들어가면 증가가 자신에게서 처음부터 다시 시작됩니다.',
+  'bossJournal.temple.selthe.choiceRisk':
+    '아리아를 차단하면 화살도 잠시 멈추지만, 아무도 나서지 않으면 끝까지 커진 파동이 한 명에게 전부 꽂힙니다.',
+  'bossJournal.temple.selthe.heroicDuet':
+    '이중창: 합창과 독창이 두 플레이어에게 동시에 떨어집니다.',
+  'bossJournal.temple.selthe.heroicEcho':
+    '메아리: 각 표식이 {echo}초 뒤 같은 자리에서 다시 터집니다.',
+  'bossJournal.temple.hydra.overview':
+    '세 개의 머리가 세 가지 원소인 얼음, 독, 물을 나눠 갖고 한 전투를 함께 치릅니다. 쓰러진 머리는 자기 공격을 다음 머리에 넘기며, 다른 머리가 살아 있는 동안 {regrow}초 뒤에 다시 자라납니다. 파도가 타이머에 따라 웅덩이의 절반을 덮치고, 파도 사이에는 두 머리가 숨결을 합칩니다.',
+  'bossJournal.temple.hydra.phaseName': '히드라의 웅덩이',
+  'bossJournal.temple.hydra.phaseSummary':
+    '왼쪽 머리는 얼음을 내뿜고, 가운데 머리는 독을 뱉고, 오른쪽 머리는 물을 보냅니다.',
+  'bossJournal.temple.hydra.phaseComboName': '합동 숨결',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    '파도가 지나고 {after}초 뒤 두 머리가 합쳐집니다. 순서는 항상 얼어붙은 급류, 독의 해류, 맹독 서리입니다.',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    '파도가 지나고 {early}초 뒤와 {after}초 뒤에 두 머리가 합쳐집니다. 순서는 얼어붙은 급류, 독의 해류, 맹독 서리입니다.',
+  'bossJournal.temple.hydra.headsName': '세 개의 머리',
+  'bossJournal.temple.hydra.headsSummary':
+    '쓰러진 머리는 자신의 원소를 다음 머리에 넘기고, 살아 있는 머리는 쓰러진 머리 하나당 {enrage}만큼 피해가 늘어납니다. 쓰러진 머리는 다른 머리가 살아 있는 동안 {regrow}초 뒤 생명력 {share}로 다시 자랍니다.',
+  'bossJournal.temple.hydra.headsResponse': '세 머리를 함께 쓰러뜨리고 {regrow}초 안에 끝내세요.',
+  'bossJournal.temple.hydra.breathSummary':
+    '{every}초마다 탱커가 아닌 플레이어를 노려 {cast}초 시전 후, {arc}도, 길이 {range}야드의 얼음 원뿔을 내뿜습니다. {min}~{max}의 피해와 {seconds}초 동안 {slow} 느려짐.',
+  'bossJournal.temple.hydra.breathResponse': '원뿔 밖으로 나가세요.',
+  'bossJournal.temple.hydra.spitName': '독 침',
+  'bossJournal.temple.hydra.spitSummary':
+    '{every}초마다 서로 다른 플레이어의 발밑에 있는 반경 {radius}야드의 웅덩이 최대 {count}개가 {warn}초 뒤에 터집니다. {min}~{max}의 피해를 준 뒤, 그 자리에서 {seconds}초 동안 초당 {perSecond}의 독이 탑니다.',
+  'bossJournal.temple.hydra.spitResponse': '흩어진 뒤 웅덩이 밖으로 나가세요.',
+  'bossJournal.temple.hydra.torrentSummary':
+    '{every}초마다 {cast}초 시전으로, 탱커가 아닌 플레이어를 향해 길이 {length}야드의 물줄기를 보냅니다. {min}~{max}의 피해와 {push}야드 밀쳐내기.',
+  'bossJournal.temple.hydra.torrentResponse': '옆으로 움직여 물줄기 밖으로 나가세요.',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    '처음은 {first}초, 이후는 이전 파도가 끝나고 {every}초 뒤입니다. {cast}초 시전하는 동안 머리가 받는 피해가 {reduction} 줄고, 이어서 파도가 웅덩이의 절반을 덮칩니다. {min}~{max}의 피해와 {push}야드 밀쳐내기.',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    '처음은 {first}초, 이후는 이전 파도가 끝나고 {every}초 뒤입니다. {cast}초 시전하는 동안 머리가 받는 피해가 {reduction} 줄고, 이어서 파도가 웅덩이의 절반을 덮칩니다. {min}~{max}의 피해와 밀쳐내기. 되밀림: {backwash}초 뒤 파도가 반대쪽 절반을 훑고 지나갑니다.',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    '반대쪽 절반으로 옮기거나, 가장자리 기둥 뒤나 얼음 벽 뒤로 숨으세요. 머리가 물에 잠겨 있는 동안에는 공격하지 마세요.',
+  'bossJournal.temple.hydra.frostlockSummary':
+    '플레이어를 향한 물줄기입니다. {min}~{max}의 피해와 {stun}초 동안 얼어붙음. {wall}초 동안 남는 얼음 벽을 만듭니다. 벽 뒤 {lee}야드 안에 서면 다음 파도를 피할 수 있지만, 파도가 벽을 부숩니다.',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    '플레이어를 향한 물줄기입니다. {min}~{max}의 피해와 {stun}초 동안 얼어붙음. 얼음 벽을 남기며, 벽 뒤에 서면 다음 파도를 피할 수 있습니다. 벽이 부서지면 벽 주변 {reach}야드 안의 모두가 {shardMin}~{shardMax}의 피해를 입습니다.',
+  'bossJournal.temple.hydra.frostlockResponse':
+    '물줄기를 피한 뒤, 얼음 벽을 해일을 막는 엄폐물로 쓰세요.',
+  'bossJournal.temple.hydra.currentSummary':
+    '독 웅덩이가 반경 {radius}야드로 부풀어 오르고, 웅덩이 중심에서 바깥으로 {slide}야드 미끄러지며, 초당 {perSecond}로 탑니다.',
+  'bossJournal.temple.hydra.currentResponse': '미끄러지는 경로에서 비켜서세요.',
+  'bossJournal.temple.hydra.rimeSummary':
+    '독 웅덩이가 결정으로 얼어붙어 {seconds}초 뒤에 터집니다. 반경 {radius}야드 안에 {min}~{max}의 피해.',
+  'bossJournal.temple.hydra.rimeResponse': '터지기 전에 모든 결정에서 멀어지세요.',
+  'bossJournal.temple.hydra.tipTank':
+    '닿는 머리를 붙잡으세요. 머리들의 공격은 다른 사람을 노립니다.',
+  'bossJournal.temple.hydra.tipHealer':
+    '해일과 합동 숨결이 피해의 정점입니다. 머리가 하나 쓰러질 때마다 나머지가 더 아프게 때립니다.',
+  'bossJournal.temple.hydra.tipDamage':
+    '피해를 고르게 나눠 세 머리가 {regrow}초 안에 모두 쓰러지게 하세요. 해일이 오는 동안에는 공격을 멈추세요.',
+  'bossJournal.temple.hydra.choiceName': '어느 머리를 먼저 쓰러뜨릴까?',
+  'bossJournal.temple.hydra.choiceGain':
+    '세 머리를 함께 쓰러뜨리면 전투가 끝납니다. 서로 가까운 시점에 쓰러진다면 순서는 상관없습니다.',
+  'bossJournal.temple.hydra.choiceRisk':
+    '머리가 하나 쓰러질 때마다 나머지가 {enrage}만큼 더 강하게 때리고 {regrow}초 뒤에 다시 자라나며, 마지막 남은 머리는 모든 원소를 씁니다.',
+  'bossJournal.temple.hydra.heroicChanges':
+    '다시 자란 머리는 생명력 {share}로 돌아오고, 파도마다 되밀림이 따라옵니다.',
+  'bossJournal.temple.colossus.overview':
+    '걸어 다니는 유리 거인입니다. 생명력의 세 지점에서 모든 플레이어에게 자신을 쫓는 거울상이 생기며, 자기 거울상은 공격할 수 없고 살아 있는 거울상은 하나하나가 거상을 보호합니다. 그 사이에는 물줄기, 강타, 조각조각 부서지는 바닥이 이어집니다.',
+  'bossJournal.temple.colossus.phaseName': '프리즘 테라스',
+  'bossJournal.temple.colossus.phaseSummary':
+    '시전할 때마다 발을 딛고 서며, 테라스를 떠나지 않습니다.',
+  'bossJournal.temple.colossus.phaseFlareName': '프리즘 섬광',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    '생명력이 {first}, {second}, {third}가 되면 조수유리 투영체를 소환합니다.',
+  'bossJournal.temple.colossus.lanceSummary':
+    '{every}초마다 {cast}초 시전으로, 탱커가 아닌 플레이어를 향해 길이 {length}야드의 물줄기를 보냅니다. {min}~{max}의 피해.',
+  'bossJournal.temple.colossus.lanceResponse': '옆으로 움직여 물줄기 밖으로 나가세요.',
+  'bossJournal.temple.colossus.slamSummary':
+    '{every}초마다 {cast}초 시전 후, 반경 {radius}야드 안에 {min}~{max}의 피해와 {push}야드 밀쳐내기.',
+  'bossJournal.temple.colossus.slamResponse':
+    '근접은 범위 밖으로 나갈 수 있고, 치유 담당은 탱커를 받칩니다.',
+  'bossJournal.temple.colossus.fractureSummary':
+    '처음은 {first}초, 이후 {every}초마다 바닥이 {slices}조각으로 갈라지고 {rounds}라운드 동안 이어집니다. 라운드마다 몇 조각이 붉게 빛나다 {warn}초 뒤에 폭발합니다. {min}~{max}의 피해. 중앙은 매 라운드 폭발합니다.',
+  'bossJournal.temple.colossus.fractureResponse':
+    '매 라운드 안전한 조각으로 옮기고, 중앙에는 들어가지 마세요.',
+  'bossJournal.temple.colossus.flareSummary':
+    '{cast}초 동안 정신 집중한 뒤, 모든 플레이어가 거상 생명력의 {share}를 가진 조수유리 투영체를 하나씩 받고 쫓깁니다. 자기 투영체는 공격할 수 없습니다.',
+  'bossJournal.temple.colossus.flareResponse':
+    '서로의 투영체를 처치하세요. 자기 것은 절대 건드리지 마세요.',
+  'bossJournal.temple.colossus.wardName': '프리즘 보호막',
+  'bossJournal.temple.colossus.wardSummary':
+    '살아 있는 투영체 하나마다 거상이 받는 피해가 {per} 줄어들며, 최대 {cap}까지입니다.',
+  'bossJournal.temple.colossus.wardResponse': '투영체를 정리한 뒤 거상에게 돌아가세요.',
+  'bossJournal.temple.colossus.shatterName': '산산이 부서지는 유리',
+  'bossJournal.temple.colossus.shatterSummary':
+    '투영체가 부서지면 그 주변 {radius}야드 안의 모두가 {damage}의 피해를 입습니다.',
+  'bossJournal.temple.colossus.shatterResponse': '곧 쓰러질 투영체 옆에 서지 마세요.',
+  'bossJournal.temple.colossus.swapName': '뒤바뀐 투영',
+  'bossJournal.temple.colossus.swapSummary':
+    '{every}초마다 투영체의 주인이 서로 바뀌어, 어떤 상을 공격할 수 있는지가 달라집니다.',
+  'bossJournal.temple.colossus.swapResponse': '바뀔 때마다 어떤 상을 칠 수 있는지 다시 확인하세요.',
+  'bossJournal.temple.colossus.tipTank':
+    '섬광이 끝날 때마다 거상을 다시 붙잡으세요. 거상은 대상을 쫓아 걸어옵니다.',
+  'bossJournal.temple.colossus.tipHealer':
+    '투영체는 주인을 공격합니다. 조수유리 균열은 붉은 조각에 남은 사람을 벌합니다.',
+  'bossJournal.temple.colossus.tipDamage':
+    '섬광마다 팀원의 투영체를 처치하고, 균열 단계에서는 조각 단위로 옮겨 다니세요.',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    '섬광마다 팀원의 투영체를 처치하고, 뒤바뀐 뒤에는 다시 확인하세요. 쓰러지려는 상 옆에 서지 마세요.',
+  'bossJournal.temple.colossus.choiceName': '투영체를 처치할까, 거상을 칠까?',
+  'bossJournal.temple.colossus.choiceGain':
+    '상을 처치하면 최대 {cap}의 피해 감소가 사라지고 더는 쫓아오지 않습니다.',
+  'bossJournal.temple.colossus.choiceRisk':
+    '상에 쓴 시간은 거상을 치지 못하는 시간이며, 영웅 난이도에서는 상이 부서질 때마다 폭발합니다.',
+  'bossJournal.temple.colossus.heroicShatter':
+    '산산이 부서지는 유리: 투영체가 부서지면 주변 {radius}야드 안의 모두가 피해를 입습니다.',
+  'bossJournal.temple.colossus.heroicSwap': '뒤바뀐 투영: 투영체의 주인이 {every}초마다 바뀝니다.',
+  'bossJournal.temple.ysolei.overview':
+    '익사한 달의 화신은 모두를 끌어당겨 내리치고, 섬의 절반을 물에 잠기게 하며, 달의 부산물을 부르고, 달빛 눈물을 자신에게 굴립니다. 마지막에는 일행이 제때 보호막을 깨뜨리지 못하면 달이 떨어집니다.',
+  'bossJournal.temple.ysolei.phaseAltarName': '달의 제단',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    '움직이지 않습니다. 사거리가 길어서 근접은 중심에서 멀리 서야 합니다.',
+  'bossJournal.temple.ysolei.phaseTideName': '밀물',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    '생명력이 {health}가 되면 섬의 절반이 물에 잠기고, 이후 잠기는 쪽이 번갈아 바뀝니다.',
+  'bossJournal.temple.ysolei.phaseMoonSummary': '생명력이 {health}가 되면 달을 끌어내립니다.',
+  'bossJournal.temple.ysolei.lunarSummary':
+    '{every}초마다 {cast}초 시전 후, 중심에서 반경 {radius}야드 안의 모두에게 {min}~{max}의 피해.',
+  'bossJournal.temple.ysolei.lunarResponse':
+    '원거리는 범위 밖에 머물고, 근접은 늘 범위 안이므로 치유 담당이 받쳐 주세요.',
+  'bossJournal.temple.ysolei.undertowSummary':
+    '{every}초마다 {seconds}초 동안 정신 집중하여 모두를 초당 {pull}야드로 자신에게 끌어당깁니다. 이어서 조수 충돌: 반경 {radius}야드 안에 {min}~{max}의 피해.',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    '{every}초마다 {seconds}초 동안 정신 집중하여 모두를 자신에게 끌어당깁니다. 이어서 조수 충돌: 반경 {radius}야드 안에 {min}~{max}의 피해. 이안류: 각 플레이어가 서 있던 자리에 웅덩이가 열려 {pool}초 동안 초당 {riptide}로 탑니다.',
+  'bossJournal.temple.ysolei.undertowResponse':
+    '정신 집중하는 동안 근접을 포함한 모두가 마른 땅 쪽으로 달려 나가세요. 물에 잠긴 곳에서는 느려집니다.',
+  'bossJournal.temple.ysolei.tearsSummary':
+    '생명력이 {first}와 {second}가 되면 자신에게 굴러오는 달빛 눈물 {count}개를 부릅니다. 눈물은 플레이어에게 닿으면 멈춥니다. {min}~{max}의 피해에 더해 달 화상 중첩마다 {bonus}가 추가되며, 달 화상은 {sear}초 지속됩니다. 눈물이 그녀에게 닿으면 전투 동안 그녀의 피해가 {swell} 늘고 생명력이 {heal} 회복됩니다.',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    '생명력이 {first}와 {second}가 되면 자신에게 굴러오는 달빛 눈물 {count}개를 부릅니다. 눈물은 플레이어에게 닿으면 멈춥니다. {min}~{max}의 피해에 더해 달 화상 중첩마다 {bonus}가 추가되며, 초당 {glow}로 타는 쏟아진 달빛이 남습니다. 눈물이 그녀에게 닿으면 그녀의 피해가 {swell} 늘고 생명력이 {heal} 회복됩니다.',
+  'bossJournal.temple.ysolei.tearsResponse':
+    '모든 눈물을 몸으로 막되, 번갈아 맡아서 아무도 달 화상이 쌓이지 않게 하세요.',
+  'bossJournal.temple.ysolei.tideName': '밀물',
+  'bossJournal.temple.ysolei.tideSummary':
+    '생명력이 {health}가 되면 섬의 절반이 한꺼번에 물에 잠깁니다. {every}초마다 잠기는 쪽이 바뀌며, 그 전에 {warn}초 동안 물결이 일렁입니다. 물속에서는 초당 {perSecond}의 피해를 입고 {slow} 느려집니다.',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    '생명력이 {health}가 되면 섬의 절반이 한꺼번에 물에 잠깁니다. {every}초마다 잠기는 쪽이 바뀝니다. 물속에서는 초당 {perSecond}의 피해를 입고 {slow} 느려집니다. 익사한 달: {moonEvery}초마다 잠긴 쪽에서 달의 부산물이 기어 나옵니다.',
+  'bossJournal.temple.ysolei.tideResponse': '마른 쪽에 머물다가 반대쪽이 일렁이면 옮겨 가세요.',
+  'bossJournal.temple.ysolei.callSummary':
+    '생명력이 {first}와 {second}가 되면 달의 부산물 {count}마리를 부릅니다.',
+  'bossJournal.temple.ysolei.callResponse': '탱커가 붙잡고 공격 담당이 처치하세요.',
+  'bossJournal.temple.ysolei.moonSummary':
+    '생명력의 {ward}에 해당하는 보호막 뒤에서 {cast}초 시전합니다. 제때 보호막을 깨뜨리면 {stun}초 동안 기절하며 받는 피해가 {vuln} 늘어납니다. 보호막이 버티면 섬에 있는 모두에게 {min}~{max}의 피해를 주고, 남은 전투 동안 그녀의 피해가 {might} 늘어납니다.',
+  'bossJournal.temple.ysolei.moonResponse':
+    '공격 담당은 모두 보호막을 치고, 치유 담당은 충격에 대비하세요.',
+  'bossJournal.temple.ysolei.tipTank':
+    '달의 부산물을 모두 붙잡으세요. 모두와 함께 역류에서 달려 나가세요.',
+  'bossJournal.temple.ysolei.tipHealer':
+    '달의 조수는 시전할 때마다 근접을 때립니다. 눈물은 달 화상을 쌓으니, 눈물을 막은 사람을 치유하세요.',
+  'bossJournal.temple.ysolei.tipDamage':
+    '역류마다 달려 나가고, 번갈아 눈물을 막고, 달의 부산물을 처치하고, 떨어지는 달의 보호막을 깨뜨리세요.',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    '역류와 그 이안류 웅덩이에서 매번 달려 나가고, 번갈아 눈물을 막고, 달의 부산물을 처치하고, 떨어지는 달의 보호막을 빠르게 깨뜨리세요.',
+  'bossJournal.temple.ysolei.choiceName': '눈물을 막을까, 흘려보낼까?',
+  'bossJournal.temple.ysolei.choiceGain':
+    '막은 눈물은 그녀에게 닿지 않습니다. 그녀의 피해 {swell} 증가도, {heal} 회복도 없습니다.',
+  'bossJournal.temple.ysolei.choiceRisk':
+    '막은 사람은 피해와 달 화상 중첩을 입고, 그에게 다음 눈물이 닿으면 {bonus} 더 아픕니다. 번갈아 맡으세요.',
+  'bossJournal.temple.ysolei.heroicRiptide':
+    '이안류: 역류가 끝날 때마다 플레이어가 서 있던 자리에 타오르는 웅덩이가 남습니다.',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    '익사한 달: {moonEvery}초마다 홍수 속에서 달의 부산물이 기어 나옵니다.',
+  'bossJournal.temple.ysolei.heroicTears':
+    '파도마다 눈물 {count}개, 떨어지는 달의 시전은 {cast}초 걸립니다.',
 };

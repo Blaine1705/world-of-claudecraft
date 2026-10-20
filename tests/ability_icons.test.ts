@@ -138,13 +138,14 @@ describe('ability icons', () => {
     // 536: plus the Wildheart Basin boss guide recipes (dgn_wildheart_*).
     // 567: plus the Hollow Crypt boss guide recipes (dgn_crypt_*).
     // 586: plus the Sunken Bastion boss guide recipes (dgn_bastion_*).
-    expect(ids).toHaveLength(586);
+    // 614: plus the Drowned Temple boss guide recipes (dgn_temple_*).
+    expect(ids).toHaveLength(614);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
     // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier;
     // then + the five-player dungeon boss guide recipes).
-    expect(hash).toBe('b9115d42afb0d98195eb133d8174760cfcf3fe1711567bedfd8b5da29a594b8b');
+    expect(hash).toBe('8d0cec74a2b0669120a3657c5b53fb7e8cd33e8e7431950c3b172296177809c1');
   });
 });

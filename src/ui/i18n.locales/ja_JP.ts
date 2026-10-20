@@ -22642,4 +22642,208 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'bossJournal.bastion.vael.heroicGrave': '墓の影：影の溜まりはそれぞれ{seconds}秒間燃え続ける。',
   'bossJournal.bastion.vael.heroicVeil':
     'ヴェールの間、姿は{drift}秒ごとに位置をずらし、破裂した分身は溺れた下僕を残す。',
+  'bossJournal.temple.selthe.overview':
+    '聖歌母は池の中から歌い、動かず、近接攻撃もしない。プレイヤーに印をつけて、全員で分け合う合唱と、1人で受ける独唱を起こし、1人に向けて高まるアリアのビームを放ち、中庭に波を送る。矢もアリアも中断できる。',
+  'bossJournal.temple.selthe.phaseName': '聖歌の中庭',
+  'bossJournal.temple.selthe.phaseSummary':
+    'フェーズは1つで、すべてタイマー式。詠唱中に発動時刻が来た技は、詠唱が終わるまで待つ。',
+  'bossJournal.temple.selthe.chorusName': '合唱',
+  'bossJournal.temple.selthe.chorusSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人が{mark}秒間マークされる。終了時、そのプレイヤーの周囲{radius}ヤード以内の全員で{total}ダメージを等分する。',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人が{mark}秒間マークされる。終了時、そのプレイヤーの周囲{radius}ヤード以内の全員で{total}ダメージを等分する。反響: {echo}秒後に同じ場所がもう一度爆発し、残っている各プレイヤーに{echoDamage}を与える。こちらは分割されない。',
+  'bossJournal.temple.selthe.chorusResponse':
+    '全員で合唱の対象に集まり、反響の前にその場所を離れる。',
+  'bossJournal.temple.selthe.soloSummary':
+    '各合唱の{offset}秒後に、別のプレイヤー1人が{mark}秒間マークされる。終了時、マークされたプレイヤーと周囲{radius}ヤード以内の全員が{damage}ダメージを受ける。',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    '二重唱: 独唱が合唱と同時に、別のプレイヤーに発動する。終了時、マークされたプレイヤーと周囲{radius}ヤード以内の全員が{damage}を受け、{echo}秒後にその場所がもう一度爆発する。',
+  'bossJournal.temple.selthe.soloResponse': '独唱の対象は、全員から離れてから、その場所を離れる。',
+  'bossJournal.temple.selthe.songSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中庭の全プレイヤーに{min}〜{max}の冷気ダメージ。',
+  'bossJournal.temple.selthe.songResponse':
+    '避けられない。ヒーラーは全員の体力を常に満たしておく。',
+  'bossJournal.temple.selthe.boltSummary':
+    '通常攻撃にあたる技。{cast}秒の詠唱で、ターゲットに近接攻撃の{mult}倍の冷気ダメージを与える。中断された後は、{quiet}秒間、矢もアリアも使わない。',
+  'bossJournal.temple.selthe.boltResponse': 'アリアが来ない間に矢を中断する。',
+  'bossJournal.temple.selthe.ariaSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人に向けて{channel}秒間ビームを放つ。{pulses}回の脈動が、同じ相手に{min}から{max}まで増えていく。ビームに踏み込んだプレイヤーが脈動を代わりに受け、増加は最初からやり直しになる。',
+  'bossJournal.temple.selthe.ariaResponse':
+    '中断するか、灯りの柱の陰で射線を切るか、ビームに踏み込んで分け合う。',
+  'bossJournal.temple.selthe.surgeSummary':
+    '{every}秒ごとに、タンク以外のプレイヤーを狙って{cast}秒の詠唱の後、{arc}度、長さ{range}ヤードの波を放つ。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.temple.selthe.surgeResponse': '横へ動いて扇形から出る。',
+  'bossJournal.temple.selthe.tipTank':
+    '彼女から見える位置に立ち、矢を自分に向けさせる。ここでタンクが処理すべき技はほかにない。',
+  'bossJournal.temple.selthe.tipHealer':
+    '海の歌は{every}秒ごとに全員に当たる。アリアの対象と、合唱で孤立した人に注意。',
+  'bossJournal.temple.selthe.tipDamage':
+    '合唱では集まり、独唱では散り、アリアを中断し、湖の大波から出る。',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    '合唱での集合と独唱での散開が同時に来る。反響の前に両方の場所を離れる。アリアを中断する。',
+  'bossJournal.temple.selthe.choiceName': 'アリアを中断するか、受け止めるか?',
+  'bossJournal.temple.selthe.choiceGain':
+    '中断か柱で、ビームはすぐに止まる。ビームに踏み込むと、増加は自分の上で最初からやり直しになる。',
+  'bossJournal.temple.selthe.choiceRisk':
+    'アリアを中断すると矢もしばらく止まるが、誰も動かなければ、増加しきった脈動が1人に集中する。',
+  'bossJournal.temple.selthe.heroicDuet': '二重唱: 合唱と独唱が、2人に同時に発動する。',
+  'bossJournal.temple.selthe.heroicEcho':
+    '反響: 各マークが{echo}秒後に同じ場所でもう一度爆発する。',
+  'bossJournal.temple.hydra.overview':
+    '3つの首が3つの属性、氷、毒、水を持ち、1つの戦闘を共有する。倒れた首は攻撃を次の首に引き継ぎ、ほかの首が生きている間は{regrow}秒後に生え戻る。大波がタイマーで池の半分を洗い、波の合間には2つの首がブレスを合体させる。',
+  'bossJournal.temple.hydra.phaseName': 'ヒュドラの池',
+  'bossJournal.temple.hydra.phaseSummary':
+    '左の首は氷を吐き、中央の首は毒を吐きかけ、右の首は水を放つ。',
+  'bossJournal.temple.hydra.phaseComboName': '合体ブレス',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    '各波の{after}秒後に2つの首が合体する。順番は常に、凍てつく激流、毒の潮流、毒の霧氷。',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    '各波の{early}秒後と{after}秒後に2つの首が合体する。順番は、凍てつく激流、毒の潮流、毒の霧氷。',
+  'bossJournal.temple.hydra.headsName': '三つの首',
+  'bossJournal.temple.hydra.headsSummary':
+    '倒れた首は属性を次の首に渡し、生きている首は倒れた首1本につき与ダメージが{enrage}増える。ほかの首が生きている間、倒れた首は{regrow}秒後に体力{share}で生え戻る。',
+  'bossJournal.temple.hydra.headsResponse': '3本を同時に倒し、{regrow}秒以内に仕留める。',
+  'bossJournal.temple.hydra.breathSummary':
+    '{every}秒ごとに、タンク以外のプレイヤーを狙って{cast}秒の詠唱の後、{arc}度、長さ{range}ヤードの氷の円錐を吐く。{min}〜{max}ダメージと、{seconds}秒間の{slow}の移動速度低下。',
+  'bossJournal.temple.hydra.breathResponse': '円錐から出る。',
+  'bossJournal.temple.hydra.spitName': '毒の吐きかけ',
+  'bossJournal.temple.hydra.spitSummary':
+    '{every}秒ごとに、別々のプレイヤーの足元にある半径{radius}ヤードの毒の池が最大{count}個、{warn}秒後に破裂する。{min}〜{max}ダメージの後、その場で{seconds}秒間、毎秒{perSecond}の毒が燃える。',
+  'bossJournal.temple.hydra.spitResponse': '散開してから、池の外へ出る。',
+  'bossJournal.temple.hydra.torrentSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに向けて長さ{length}ヤードの水流を放つ。{min}〜{max}ダメージと{push}ヤードの押し出し。',
+  'bossJournal.temple.hydra.torrentResponse': '横へ動いて水流から出る。',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    '最初は{first}秒、以降は前の波が終わってから{every}秒後。{cast}秒の詠唱の間、首の被ダメージが{reduction}減り、その後、波が池の半分を襲う。{min}〜{max}ダメージと{push}ヤードの押し出し。',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    '最初は{first}秒、以降は前の波が終わってから{every}秒後。{cast}秒の詠唱の間、首の被ダメージが{reduction}減り、その後、波が池の半分を襲う。{min}〜{max}ダメージと押し出し。返し波: {backwash}秒後に、もう半分を波が洗う。',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    'もう半分へ移るか、縁の柱の陰か、氷の壁の陰に入る。首が水中にいる間は攻撃しない。',
+  'bossJournal.temple.hydra.frostlockSummary':
+    'プレイヤーに向けた水流。{min}〜{max}ダメージと{stun}秒の凍結。{wall}秒間残る氷の壁を作る。壁の後ろ{lee}ヤード以内に立てば次の波を防げるが、波は壁を砕く。',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    'プレイヤーに向けた水流。{min}〜{max}ダメージと{stun}秒の凍結。氷の壁を残し、壁の後ろに立てば次の波を防げる。壁が砕けると、壁の周囲{reach}ヤード以内の全員が{shardMin}〜{shardMax}を受ける。',
+  'bossJournal.temple.hydra.frostlockResponse': '水流をかわし、その後、氷の壁を津波の遮蔽に使う。',
+  'bossJournal.temple.hydra.currentSummary':
+    '毒の池が半径{radius}ヤードに広がり、池の中心から外へ{slide}ヤード滑り、毎秒{perSecond}で燃える。',
+  'bossJournal.temple.hydra.currentResponse': '滑る進路から脇へ避ける。',
+  'bossJournal.temple.hydra.rimeSummary':
+    '毒の池が結晶に凍り、{seconds}秒後に破裂する。半径{radius}ヤード以内に{min}〜{max}ダメージ。',
+  'bossJournal.temple.hydra.rimeResponse': '破裂する前に、すべての結晶から離れる。',
+  'bossJournal.temple.hydra.tipTank': '届く首を押さえる。首の攻撃は、ほかの者を狙う。',
+  'bossJournal.temple.hydra.tipHealer':
+    '津波と合体ブレスがダメージのピーク。倒れた首が増えるほど、ほかの首は痛くなる。',
+  'bossJournal.temple.hydra.tipDamage':
+    'ダメージを均等に分け、3本が{regrow}秒以内に倒れるようにする。津波の間は攻撃を止める。',
+  'bossJournal.temple.hydra.choiceName': 'どの首を先に倒す?',
+  'bossJournal.temple.hydra.choiceGain':
+    '3本を同時に倒せば戦闘は終わる。近いタイミングで倒れるなら、順番は問わない。',
+  'bossJournal.temple.hydra.choiceRisk':
+    '倒れた首1本ごとに、ほかの首の与ダメージが{enrage}増え、{regrow}秒後に生え戻る。最後に残った首はすべての属性を使う。',
+  'bossJournal.temple.hydra.heroicChanges': '生え戻った首は体力{share}で戻り、各波は返し波を伴う。',
+  'bossJournal.temple.colossus.overview':
+    '歩くガラスの巨人。体力の節目3か所で、全プレイヤーに自分を追う鏡像が与えられる。自分の鏡像は攻撃できず、生きている鏡像1体ごとに巨像を守る盾になる。その合間には、水流、叩きつけ、1片ずつ砕ける床が襲う。',
+  'bossJournal.temple.colossus.phaseName': 'プリズムのテラス',
+  'bossJournal.temple.colossus.phaseSummary': '詠唱のたびに足を止め、テラスからは決して離れない。',
+  'bossJournal.temple.colossus.phaseFlareName': 'プリズムの閃光',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    '体力が{first}、{second}、{third}になると、潮硝子の映し身を召喚する。',
+  'bossJournal.temple.colossus.lanceSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに向けて長さ{length}ヤードの水流を放つ。{min}〜{max}ダメージ。',
+  'bossJournal.temple.colossus.lanceResponse': '横へ動いて水流から出る。',
+  'bossJournal.temple.colossus.slamSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、半径{radius}ヤード以内に{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.temple.colossus.slamResponse': '近接は範囲から出られる。ヒーラーはタンクを支える。',
+  'bossJournal.temple.colossus.fractureSummary':
+    '最初は{first}秒、以降は{every}秒ごと。床が{slices}片に割れ、{rounds}ラウンド続く。各ラウンドで数片が赤く光り、{warn}秒後に爆発する。{min}〜{max}ダメージ。中央は毎ラウンド爆発する。',
+  'bossJournal.temple.colossus.fractureResponse':
+    '毎ラウンド、安全な床片へ移り、中央には入らない。',
+  'bossJournal.temple.colossus.flareSummary':
+    '{cast}秒のチャネリングの後、全プレイヤーが、巨像の体力{share}を持つ潮硝子の映し身を1体ずつ受け取り、追われる。自分の映し身は攻撃できない。',
+  'bossJournal.temple.colossus.flareResponse': '互いの映し身を倒す。自分のは決して攻撃しない。',
+  'bossJournal.temple.colossus.wardName': 'プリズムの護り',
+  'bossJournal.temple.colossus.wardSummary':
+    '生きている映し身1体ごとに、巨像の被ダメージが{per}減る。上限は{cap}。',
+  'bossJournal.temple.colossus.wardResponse': '映し身を片づけてから、巨像に戻る。',
+  'bossJournal.temple.colossus.shatterName': '砕けるガラス',
+  'bossJournal.temple.colossus.shatterSummary':
+    '映し身が砕けると、その周囲{radius}ヤード以内の全員が{damage}ダメージを受ける。',
+  'bossJournal.temple.colossus.shatterResponse': 'もうすぐ倒れる映し身のそばに立たない。',
+  'bossJournal.temple.colossus.swapName': '入れ替わる像',
+  'bossJournal.temple.colossus.swapSummary':
+    '{every}秒ごとに映し身の持ち主が入れ替わり、どの像を攻撃できるかが変わる。',
+  'bossJournal.temple.colossus.swapResponse': '入れ替わるたびに、攻撃できる像を確かめ直す。',
+  'bossJournal.temple.colossus.tipTank':
+    '閃光のたびに巨像を取り直す。巨像はターゲットを追って歩く。',
+  'bossJournal.temple.colossus.tipHealer':
+    '映し身は持ち主を攻撃する。潮硝子の亀裂は、赤い床片に残った者を罰する。',
+  'bossJournal.temple.colossus.tipDamage':
+    '閃光のたびに仲間の映し身を倒し、亀裂では1片ずつ移動する。',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    '閃光のたびに仲間の映し身を倒す。入れ替わったら確かめ直す。倒れかけの像のそばに立たない。',
+  'bossJournal.temple.colossus.choiceName': '映し身を倒すか、巨像を倒すか?',
+  'bossJournal.temple.colossus.choiceGain':
+    '像を倒せば、最大{cap}のダメージ軽減がなくなり、追われることもなくなる。',
+  'bossJournal.temple.colossus.choiceRisk':
+    '像に費やした時間は巨像を攻撃できない時間になり、ヒロイックでは像が砕けるたびに爆発する。',
+  'bossJournal.temple.colossus.heroicShatter':
+    '砕けるガラス: 映し身が砕けると、周囲{radius}ヤード以内の全員が傷つく。',
+  'bossJournal.temple.colossus.heroicSwap':
+    '入れ替わる像: 映し身の持ち主が{every}秒ごとに入れ替わる。',
+  'bossJournal.temple.ysolei.overview':
+    '溺月の化身は、全員を引き寄せて叩きつけ、島の半分を水没させ、月の落とし子を呼び、月光の涙を自分に向けて転がす。最後は、グループが間に合って護りを破らない限り、月が落ちる。',
+  'bossJournal.temple.ysolei.phaseAltarName': '月の祭壇',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    '動かない。リーチが長く、近接は中心から離れて立つ。',
+  'bossJournal.temple.ysolei.phaseTideName': '満ち潮',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    '体力が{health}になると島の半分が水没し、以後、水没する側が入れ替わる。',
+  'bossJournal.temple.ysolei.phaseMoonSummary': '体力が{health}になると、月を呼び落とす。',
+  'bossJournal.temple.ysolei.lunarSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中心から半径{radius}ヤード以内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.temple.ysolei.lunarResponse':
+    '遠隔は範囲の外にいる。近接は常に範囲内なので、ヒーラーが支える。',
+  'bossJournal.temple.ysolei.undertowSummary':
+    '{every}秒ごとに{seconds}秒間チャネリングし、全員を毎秒{pull}ヤードで自分へ引き寄せる。その後、潮の激突: 半径{radius}ヤード以内に{min}〜{max}ダメージ。',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    '{every}秒ごとに{seconds}秒間チャネリングし、全員を自分へ引き寄せる。その後、潮の激突: 半径{radius}ヤード以内に{min}〜{max}ダメージ。離岸流: 各プレイヤーが立っていた場所に池が開き、{pool}秒間、毎秒{riptide}で燃える。',
+  'bossJournal.temple.ysolei.undertowResponse':
+    'チャネリング中は、近接も含め全員が乾いた地面へ走って出る。水没した場所では動きが遅くなる。',
+  'bossJournal.temple.ysolei.tearsSummary':
+    '体力が{first}と{second}になると、自分へ転がる月光の涙を{count}個呼ぶ。涙はプレイヤーに触れると止まる。{min}〜{max}ダメージに加え、月焼けのスタックごとに{bonus}が上乗せされる。月焼けは{sear}秒続く。涙が彼女に届くと、戦闘中の与ダメージが{swell}増え、体力が{heal}回復する。',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    '体力が{first}と{second}になると、自分へ転がる月光の涙を{count}個呼ぶ。涙はプレイヤーに触れると止まる。{min}〜{max}ダメージに加え、月焼けのスタックごとに{bonus}が上乗せされ、毎秒{glow}で燃えるこぼれた月光が残る。涙が彼女に届くと、与ダメージが{swell}増え、体力が{heal}回復する。',
+  'bossJournal.temple.ysolei.tearsResponse':
+    'すべての涙を体で受け止め、交代で受けて、誰も月焼けを重ねないようにする。',
+  'bossJournal.temple.ysolei.tideName': '満ち潮',
+  'bossJournal.temple.ysolei.tideSummary':
+    '体力が{health}になると、島の半分が一度に水没する。{every}秒ごとに水没する側が入れ替わり、その前に{warn}秒間水面がきらめく。水中では毎秒{perSecond}のダメージと{slow}の移動速度低下。',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    '体力が{health}になると、島の半分が一度に水没する。{every}秒ごとに水没する側が入れ替わる。水中では毎秒{perSecond}のダメージと{slow}の移動速度低下。溺れた月: {moonEvery}秒ごとに、水没した側から月の落とし子が這い上がる。',
+  'bossJournal.temple.ysolei.tideResponse': '乾いた側に留まり、反対側がきらめいたら移動する。',
+  'bossJournal.temple.ysolei.callSummary':
+    '体力が{first}と{second}になると、月の落とし子を{count}体呼ぶ。',
+  'bossJournal.temple.ysolei.callResponse': 'タンクが引き受け、ダメージ役が倒す。',
+  'bossJournal.temple.ysolei.moonSummary':
+    '体力の{ward}分の護りに守られた{cast}秒の詠唱。間に合って護りを破ると、{stun}秒スタンし、被ダメージが{vuln}増える。護りが残った場合は、島にいる全員に{min}〜{max}ダメージを与え、以後の戦闘中、与ダメージが{might}増える。',
+  'bossJournal.temple.ysolei.moonResponse':
+    'ダメージ役は全員で護りを攻撃し、ヒーラーは衝撃に備える。',
+  'bossJournal.temple.ysolei.tipTank':
+    '月の落とし子をすべて引き受ける。全員と一緒に引き潮から走り出る。',
+  'bossJournal.temple.ysolei.tipHealer':
+    '月の潮は詠唱のたびに近接に当たる。涙は月焼けを重ねる。涙を止めた人を回復する。',
+  'bossJournal.temple.ysolei.tipDamage':
+    '引き潮からは必ず走り出て、交代で涙を止め、月の落とし子を倒し、落ちる月の護りを削りきる。',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    '引き潮とその離岸流の池から必ず走り出て、交代で涙を止め、月の落とし子を倒し、落ちる月の護りを素早く削りきる。',
+  'bossJournal.temple.ysolei.choiceName': '涙を止めるか、通すか?',
+  'bossJournal.temple.ysolei.choiceGain':
+    '止めた涙は彼女に届かない。与ダメージ{swell}の強化も、{heal}の回復もない。',
+  'bossJournal.temple.ysolei.choiceRisk':
+    '止めた人はダメージと月焼け1スタックを受け、次にその人に当たる涙は{bonus}強くなる。交代で止めること。',
+  'bossJournal.temple.ysolei.heroicRiptide':
+    '離岸流: 引き潮のたびに、プレイヤーが立っていた場所に燃える池が残る。',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    '溺れた月: {moonEvery}秒ごとに、洪水の中から月の落とし子が這い上がる。',
+  'bossJournal.temple.ysolei.heroicTears': '1波につき涙{count}個。落ちる月の詠唱は{cast}秒続く。',
 };

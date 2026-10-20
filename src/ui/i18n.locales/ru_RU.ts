@@ -23082,4 +23082,216 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Могильная тень: каждая теневая лужа продолжает гореть {seconds} сек.',
   'bossJournal.bastion.vael.heroicVeil':
     'Во время завесы фигуры смещаются каждые {drift} сек., а взорванная копия оставляет утопшего раба.',
+  'bossJournal.temple.selthe.overview':
+    'Матерь хора поёт из своего бассейна, никогда не двигается и не бьёт в ближнем бою. Она помечает игроков для общего Хора и одинокого Соло, выпускает в одного игрока луч нарастающей арии и посылает волну через весь двор. Её стрелы и ария прерываются.',
+  'bossJournal.temple.selthe.phaseName': 'Двор хора',
+  'bossJournal.temple.selthe.phaseSummary':
+    'Одна фаза, все способности по таймерам. Если время способности наступило во время каста, она ждёт его окончания.',
+  'bossJournal.temple.selthe.chorusName': 'Хор',
+  'bossJournal.temple.selthe.chorusSummary':
+    'Каждые {every} сек. метка на {mark} сек. ложится на игрока, который не танк. По окончании {total} урона делится поровну между всеми в радиусе {radius} м от него.',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    'Каждые {every} сек. метка на {mark} сек. ложится на игрока, который не танк. По окончании {total} урона делится поровну между всеми в радиусе {radius} м от него. Эхо: через {echo} сек. то же место взрывается снова и наносит {echoDamage} каждому, кто там остался, без разделения.',
+  'bossJournal.temple.selthe.chorusResponse':
+    'Все собираются у игрока с Хором, затем покидают место до Эха.',
+  'bossJournal.temple.selthe.soloSummary':
+    'Через {offset} сек. после каждого Хора метка на {mark} сек. ложится на другого игрока. По окончании отмеченный игрок и все в радиусе {radius} м получают по {damage} урона.',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    'Дуэт: Соло приходит одновременно с Хором, на другого игрока. По окончании отмеченный игрок и все в радиусе {radius} м получают по {damage}, а через {echo} сек. то же место взрывается снова.',
+  'bossJournal.temple.selthe.soloResponse': 'Игрок с Соло отходит от всех, затем покидает место.',
+  'bossJournal.temple.selthe.songSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона от холода каждому игроку во дворе.',
+  'bossJournal.temple.selthe.songResponse': 'Избежать нельзя: лекари держат всем здоровье полным.',
+  'bossJournal.temple.selthe.boltSummary':
+    'Её основная атака: заклинание {cast} сек. по цели, урон от холода в {mult} раза больше её удара в ближнем бою. После любого прерывания она не использует ни стрелу, ни арию в течение {quiet} сек.',
+  'bossJournal.temple.selthe.boltResponse': 'Прерывайте стрелы, когда ария не готовится.',
+  'bossJournal.temple.selthe.ariaSummary':
+    'Каждые {every} сек. она {channel} сек. направляет луч в игрока, который не танк: {pulses} импульсов, растущих от {min} до {max} по одной и той же цели. Игрок, шагнувший в луч, принимает импульс на себя, и нарастание начинается заново.',
+  'bossJournal.temple.selthe.ariaResponse':
+    'Прервите её, разорвите линию видимости за колонной с лампой или шагните в луч, чтобы разделить урон.',
+  'bossJournal.temple.selthe.surgeSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по игроку, который не танк, затем волна в секторе {arc} градусов длиной {range} м: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.temple.selthe.surgeResponse': 'Шагните в сторону из сектора.',
+  'bossJournal.temple.selthe.tipTank':
+    'Стойте там, где она вас видит, чтобы стрелы летели в вас. Больше здесь танку делать нечего.',
+  'bossJournal.temple.selthe.tipHealer':
+    'Песнь моря бьёт по всем каждые {every} сек. Следите за целью арии и за теми, кого Хор застал в одиночку.',
+  'bossJournal.temple.selthe.tipDamage':
+    'Собирайтесь на Хор, расходитесь на Соло, прерывайте арию и уходите из Вала из озера.',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    'Собирайтесь на Хор и одновременно расходитесь на Соло, затем покиньте оба места до Эха. Прерывайте арию.',
+  'bossJournal.temple.selthe.choiceName': 'Прервать арию или принять её на себя?',
+  'bossJournal.temple.selthe.choiceGain':
+    'Прерывание или колонна обрывают луч сразу. Шаг в луч заново запускает нарастание уже на вас.',
+  'bossJournal.temple.selthe.choiceRisk':
+    'Прерванная ария на время глушит и её стрелы, но если никто не среагирует, всё нарастание достанется одному игроку.',
+  'bossJournal.temple.selthe.heroicDuet': 'Дуэт: Хор и Соло приходят одновременно на двух игроков.',
+  'bossJournal.temple.selthe.heroicEcho':
+    'Эхо: каждая метка взрывается снова в том же месте через {echo} сек.',
+  'bossJournal.temple.hydra.overview':
+    'Три головы с тремя стихиями делят один бой: лёд, яд и вода. Павшая голова передаёт свою атаку следующей и отрастает через {regrow} сек., пока жива другая. Волны по таймеру накрывают половину бассейна, а между волнами две головы сливают своё дыхание.',
+  'bossJournal.temple.hydra.phaseName': 'Бассейн гидры',
+  'bossJournal.temple.hydra.phaseSummary':
+    'Левая голова дышит льдом, средняя плюётся ядом, правая шлёт воду.',
+  'bossJournal.temple.hydra.phaseComboName': 'Слитое дыхание',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    'Через {after} сек. после каждой волны две головы сливаются, всегда в одном порядке: Скованный льдом поток, Ядовитое течение, Ядовитая изморозь.',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    'Через {early} сек. и {after} сек. после каждой волны две головы сливаются, в порядке: Скованный льдом поток, Ядовитое течение, Ядовитая изморозь.',
+  'bossJournal.temple.hydra.headsName': 'Три головы',
+  'bossJournal.temple.hydra.headsSummary':
+    'Павшая голова передаёт свою стихию следующей, а каждая живая голова наносит на {enrage} больше урона за каждую павшую. Павшая голова отрастает через {regrow} сек. со здоровьем {share}, пока жива другая голова.',
+  'bossJournal.temple.hydra.headsResponse':
+    'Убивайте все три головы вместе и добивайте их в течение {regrow} сек.',
+  'bossJournal.temple.hydra.breathSummary':
+    'Каждые {every} сек. заклинание {cast} сек. по игроку, который не танк, затем ледяной конус {arc} градусов длиной {range} м: от {min} до {max} урона и замедление на {slow} на {seconds} сек.',
+  'bossJournal.temple.hydra.breathResponse': 'Выйдите из конуса.',
+  'bossJournal.temple.hydra.spitName': 'Ядовитый плевок',
+  'bossJournal.temple.hydra.spitSummary':
+    'Каждые {every} сек. до {count} лужиц радиусом {radius} м под разными игроками взрываются через {warn} сек.: от {min} до {max} урона, затем яд горит на этом месте {seconds} сек., нанося {perSecond} в секунду.',
+  'bossJournal.temple.hydra.spitResponse': 'Разойдитесь, затем выйдите из лужиц.',
+  'bossJournal.temple.hydra.torrentSummary':
+    'Каждые {every} сек. заклинание {cast} сек. направляет полосу длиной {length} м на игрока, который не танк: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.temple.hydra.torrentResponse': 'Шагните в сторону из полосы.',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    'Первая волна через {first} сек., затем через {every} сек. после окончания предыдущей: заклинание {cast} сек., пока головы получают на {reduction} меньше урона, затем волна накрывает половину бассейна: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    'Первая волна через {first} сек., затем через {every} сек. после окончания предыдущей: заклинание {cast} сек., пока головы получают на {reduction} меньше урона, затем волна накрывает половину бассейна: от {min} до {max} урона и отбрасывание. Откат волны: через {backwash} сек. она прокатывается по другой половине.',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    'Перейдите на другую половину, встаньте за колонну у края или за Ледяную стену. Не бейте головы, пока они под водой.',
+  'bossJournal.temple.hydra.frostlockSummary':
+    'Полоса, направленная на игрока: от {min} до {max} урона и заморозка на {stun} сек. Оставляет Ледяную стену на {wall} сек.: если стоять за ней не дальше {lee} м, она укроет от следующей волны, но волна её разобьёт.',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    'Полоса, направленная на игрока: от {min} до {max} урона и заморозка на {stun} сек. Оставляет Ледяную стену: если стоять за ней, она укроет от следующей волны. Когда стена разбивается, все в радиусе {reach} м от неё получают от {shardMin} до {shardMax}.',
+  'bossJournal.temple.hydra.frostlockResponse':
+    'Уклонитесь от полосы, затем используйте стену как укрытие от Цунами.',
+  'bossJournal.temple.hydra.currentSummary':
+    'Ядовитые лужи расширяются до {radius} м и скользят на {slide} м от центра бассейна, нанося {perSecond} в секунду.',
+  'bossJournal.temple.hydra.currentResponse': 'Отойдите в сторону с пути скольжения.',
+  'bossJournal.temple.hydra.rimeSummary':
+    'Ядовитые лужи замерзают в кристаллы, которые взрываются через {seconds} сек.: от {min} до {max} урона в радиусе {radius} м.',
+  'bossJournal.temple.hydra.rimeResponse': 'Отойдите от каждого кристалла до взрыва.',
+  'bossJournal.temple.hydra.tipTank':
+    'Держите те головы, до которых достаёте. Их атаки целятся в остальных.',
+  'bossJournal.temple.hydra.tipHealer':
+    'Цунами и слитое дыхание дают пики урона. Каждая павшая голова заставляет остальные бить сильнее.',
+  'bossJournal.temple.hydra.tipDamage':
+    'Распределяйте урон поровну, чтобы все три головы пали в пределах {regrow} сек. друг от друга. Прекращайте бить на время каждого Цунами.',
+  'bossJournal.temple.hydra.choiceName': 'Какую голову убить первой?',
+  'bossJournal.temple.hydra.choiceGain':
+    'Если убить все три вместе, бой заканчивается. Порядок не важен, если они падают почти одновременно.',
+  'bossJournal.temple.hydra.choiceRisk':
+    'Каждая павшая голова заставляет остальные наносить на {enrage} больше урона и отрастает через {regrow} сек., а последняя оставшаяся голова несёт все стихии.',
+  'bossJournal.temple.hydra.heroicChanges':
+    'Отросшая голова возвращается со здоровьем {share}, а каждая волна даёт откат.',
+  'bossJournal.temple.colossus.overview':
+    'Ходячий стеклянный великан. На трёх отметках здоровья каждый игрок получает зеркальную копию, которая его преследует. Свою копию бить нельзя, а каждая живая копия защищает Колосса щитом. Между этим: полосы, удары и пол, раскалывающийся по частям.',
+  'bossJournal.temple.colossus.phaseName': 'Призменная терраса',
+  'bossJournal.temple.colossus.phaseSummary':
+    'Он упирается ногами для каждого заклинания и никогда не покидает террасу.',
+  'bossJournal.temple.colossus.phaseFlareName': 'Вспышка призмы',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    'При здоровье {first}, {second} и {third} он призывает Отражения Приливного стекла.',
+  'bossJournal.temple.colossus.lanceSummary':
+    'Каждые {every} сек. заклинание {cast} сек. направляет полосу длиной {length} м на игрока, который не танк: от {min} до {max} урона.',
+  'bossJournal.temple.colossus.lanceResponse': 'Шагните в сторону из полосы.',
+  'bossJournal.temple.colossus.slamSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона и отбрасывание на {push} м в радиусе {radius} м.',
+  'bossJournal.temple.colossus.slamResponse':
+    'Бойцы ближнего боя могут отойти, лекари прикрывают танка.',
+  'bossJournal.temple.colossus.fractureSummary':
+    'Первый раз через {first} сек., затем каждые {every} сек.: пол раскалывается на {slices} частей на {rounds} раундов. В каждом раунде несколько частей краснеют и взрываются через {warn} сек.: от {min} до {max} урона. Центр взрывается каждый раунд.',
+  'bossJournal.temple.colossus.fractureResponse':
+    'В каждом раунде переходите на чистую часть пола и держитесь подальше от центра.',
+  'bossJournal.temple.colossus.flareSummary':
+    'Заклинание {cast} сек., затем каждый игрок получает Отражение Приливного стекла со здоровьем {share} от здоровья Колосса, которое его преследует. Своё Отражение бить нельзя.',
+  'bossJournal.temple.colossus.flareResponse': 'Убивайте Отражения друг друга, но никогда своё.',
+  'bossJournal.temple.colossus.wardName': 'Призменный оберег',
+  'bossJournal.temple.colossus.wardSummary':
+    'Каждое живое Отражение снижает урон, получаемый Колоссом, на {per}, максимум до {cap}.',
+  'bossJournal.temple.colossus.wardResponse': 'Уберите Отражения, затем вернитесь к Колоссу.',
+  'bossJournal.temple.colossus.shatterName': 'Разбивающееся стекло',
+  'bossJournal.temple.colossus.shatterSummary':
+    'Когда Отражение разбивается, все в радиусе {radius} м от него получают {damage} урона.',
+  'bossJournal.temple.colossus.shatterResponse':
+    'Не стойте рядом с Отражением, которое вот-вот умрёт.',
+  'bossJournal.temple.colossus.swapName': 'Обмен образами',
+  'bossJournal.temple.colossus.swapSummary':
+    'Каждые {every} сек. Отражения меняются владельцами, поэтому меняется и то, какую копию вы можете бить.',
+  'bossJournal.temple.colossus.swapResponse':
+    'После каждого обмена снова проверяйте, какую копию вы можете бить.',
+  'bossJournal.temple.colossus.tipTank':
+    'После каждой вспышки снова берите Колосса на себя: он идёт за своей целью.',
+  'bossJournal.temple.colossus.tipHealer':
+    'Отражения бьют своих владельцев. Трещина Приливного стекла наказывает тех, кто остался на красной части пола.',
+  'bossJournal.temple.colossus.tipDamage':
+    'На каждой вспышке убивайте Отражение товарища, затем переходите с части на часть во время Трещины.',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    'На каждой вспышке убивайте Отражение товарища, после обмена проверяйте снова. Не стойте у умирающей копии.',
+  'bossJournal.temple.colossus.choiceName': 'Убивать Отражения или Колосса?',
+  'bossJournal.temple.colossus.choiceGain':
+    'Убийство копий снимает до {cap} снижения урона и прекращает их преследование.',
+  'bossJournal.temple.colossus.choiceRisk':
+    'Время на копии это время не на Колосса, а в героическом режиме каждая копия взрывается при разрушении.',
+  'bossJournal.temple.colossus.heroicShatter':
+    'Разбивающееся стекло: разрушающееся Отражение ранит всех в радиусе {radius} м.',
+  'bossJournal.temple.colossus.heroicSwap':
+    'Обмен образами: Отражения меняются владельцами каждые {every} сек.',
+  'bossJournal.temple.ysolei.overview':
+    'Воплощение Утонувшей луны затягивает всех к себе и бьёт, затопляет половину своего острова, призывает Лунное отродье и катит на себя Слёзы лунного света. В конце луна падает, если группа не успеет разбить её оберег.',
+  'bossJournal.temple.ysolei.phaseAltarName': 'Лунный алтарь',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    'Она никогда не двигается. Радиус её атак большой: бойцы ближнего боя стоят далеко от её центра.',
+  'bossJournal.temple.ysolei.phaseTideName': 'Прилив',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    'При здоровье {health} половина острова затопляется, а затем затопление переходит на другую сторону.',
+  'bossJournal.temple.ysolei.phaseMoonSummary': 'При здоровье {health} она обрушивает луну.',
+  'bossJournal.temple.ysolei.lunarSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона всем в радиусе {radius} м от её центра.',
+  'bossJournal.temple.ysolei.lunarResponse':
+    'Дальнобойные остаются снаружи. Ближний бой всегда в зоне, поэтому лекари прикрывают его.',
+  'bossJournal.temple.ysolei.undertowSummary':
+    'Каждые {every} сек. она {seconds} сек. притягивает всех к себе со скоростью {pull} м в секунду. Затем Приливный удар: от {min} до {max} урона в радиусе {radius} м.',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    'Каждые {every} сек. она {seconds} сек. притягивает всех к себе. Затем Приливный удар: от {min} до {max} урона в радиусе {radius} м. Разрывное течение: на месте каждого игрока открывается лужа, которая горит {pool} сек., нанося {riptide} в секунду.',
+  'bossJournal.temple.ysolei.undertowResponse':
+    'Все, включая ближний бой, во время канала бегут к сухой земле. Вода затопления замедляет.',
+  'bossJournal.temple.ysolei.tearsSummary':
+    'При здоровье {first} и {second} она призывает {count} Слёз лунного света, катящихся к ней. Слеза, коснувшаяся игрока, останавливается: от {min} до {max} урона плюс {bonus} за каждый заряд Лунного ожога, который длится {sear} сек. Слеза, достигшая её, даёт ей на {swell} больше урона до конца боя и лечит её на {heal}.',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    'При здоровье {first} и {second} она призывает {count} Слёз лунного света, катящихся к ней. Слеза, коснувшаяся игрока, останавливается: от {min} до {max} урона плюс {bonus} за каждый заряд Лунного ожога и оставляет Пролитый лунный свет, горящий с уроном {glow} в секунду. Слеза, достигшая её, даёт ей на {swell} больше урона и лечит её на {heal}.',
+  'bossJournal.temple.ysolei.tearsResponse':
+    'Закрывайте собой каждую слезу, сменяя друг друга, чтобы ни у кого не накопился Лунный ожог.',
+  'bossJournal.temple.ysolei.tideName': 'Прилив',
+  'bossJournal.temple.ysolei.tideSummary':
+    'При здоровье {health} половина острова затопляется сразу. Каждые {every} сек. затопление переходит на другую сторону, а перед этим {warn} сек. мерцает вода. В воде: {perSecond} урона в секунду и замедление на {slow}.',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    'При здоровье {health} половина острова затопляется сразу. Каждые {every} сек. затопление переходит на другую сторону. В воде: {perSecond} урона в секунду и замедление на {slow}. Утонувшая луна: каждые {moonEvery} сек. из затопленной половины выбирается Лунное отродье.',
+  'bossJournal.temple.ysolei.tideResponse':
+    'Оставайтесь на сухой половине и переходите, когда мерцает другая.',
+  'bossJournal.temple.ysolei.callSummary':
+    'При здоровье {first} и {second} она призывает {count} Лунного отродья.',
+  'bossJournal.temple.ysolei.callResponse': 'Танк берёт их на себя, бойцы убивают.',
+  'bossJournal.temple.ysolei.moonSummary':
+    'Заклинание {cast} сек. под оберегом, равным {ward} её здоровья. Успейте разбить оберег: она оглушена на {stun} сек. и получает на {vuln} больше урона. Если оберег выдержит: от {min} до {max} урона всем на острове, и до конца боя она наносит на {might} больше урона.',
+  'bossJournal.temple.ysolei.moonResponse': 'Все бойцы бьют её оберег, лекари готовятся к удару.',
+  'bossJournal.temple.ysolei.tipTank':
+    'Берите на себя всё Лунное отродье. Бегите из Отбойного течения вместе со всеми.',
+  'bossJournal.temple.ysolei.tipHealer':
+    'Лунный прилив бьёт ближний бой при каждом касте. Слёзы накладывают Лунный ожог: лечите того, кто закрыл слезу.',
+  'bossJournal.temple.ysolei.tipDamage':
+    'Бегите из каждого Отбойного течения, по очереди закрывайте слёзы, убивайте Лунное отродье и сбивайте оберег Падающей луны.',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    'Бегите из каждого Отбойного течения и его луж Разрывного течения, по очереди закрывайте слёзы, убивайте Лунное отродье и быстро сбивайте оберег Падающей луны.',
+  'bossJournal.temple.ysolei.choiceName': 'Закрывать слёзы или пропускать?',
+  'bossJournal.temple.ysolei.choiceGain':
+    'Закрытая слеза не достигает её: нет прибавки {swell} к урону и нет лечения на {heal}.',
+  'bossJournal.temple.ysolei.choiceRisk':
+    'Закрывший получает удар и заряд Лунного ожога: следующая слеза, попавшая в него, бьёт на {bonus} сильнее. Сменяйте друг друга.',
+  'bossJournal.temple.ysolei.heroicRiptide':
+    'Разрывное течение: после каждого Отбойного течения на месте игроков остаются горящие лужи.',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    'Утонувшая луна: каждые {moonEvery} сек. из потока выбирается Лунное отродье.',
+  'bossJournal.temple.ysolei.heroicTears':
+    '{count} слёз за волну, а каст Падающей луны длится {cast} сек.',
 };

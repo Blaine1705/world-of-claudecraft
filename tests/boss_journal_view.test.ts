@@ -9,6 +9,7 @@ import { mobVisualKey, VISUALS } from '../src/render/characters/manifest';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { finderActivity } from '../src/sim/content/dungeon_finder';
 import { MOBS } from '../src/sim/data';
+import { hydraRegrowShare, YSOLEI_MOON_TUNING } from '../src/sim/encounters/drowned_temple/ids';
 import {
   KORGATH_TUNING,
   KORZUL_TUNING,
@@ -452,5 +453,54 @@ describe('Sunken Bastion facts', () => {
     const arc = mechanic('knight_commander_olen', 'reaping-arc', 'normal');
     expect(arc.values?.radius).toBe(MOBS.knight_commander_olen?.cleave?.radius);
     expect(rendered(arc.summaryKey, arc.values, arc.percentValues)).toContain('within');
+  });
+});
+
+describe('Drowned Temple facts', () => {
+  const def = DUNGEON_JOURNALS.find((d) => d.dungeonId === 'drowned_temple');
+  if (!def) throw new Error('temple journal missing');
+  const mechanic = (mobId: string, id: string, tier: JournalDifficulty) => {
+    const boss = def.bosses.find((b) => b.mobId === mobId);
+    if (!boss) throw new Error(mobId);
+    const found = dungeonJournalBossView(boss, tier)
+      .phases.flatMap((p) => p.mechanics)
+      .find((m) => m.id === id);
+    if (!found) throw new Error(`${mobId} ${id} ${tier}`);
+    return found;
+  };
+
+  it('runs the route Selthe, Hydra, Colossus, Ysolei', () => {
+    expect(def.bosses.map((b) => [b.mobId, b.rank])).toEqual([
+      ['choirmother_selthe', 'boss'],
+      ['mere_hydra_head_center', 'boss'],
+      ['tideglass_colossus', 'boss'],
+      ['ysolei', 'final'],
+    ]);
+  });
+
+  it('marks the bolt and the aria kickable, and the hydra regrowth per tier', () => {
+    expect(mechanic('choirmother_selthe', 'drowning-aria', 'normal').flags).toContain(
+      'interruptible',
+    );
+    expect(mechanic('choirmother_selthe', 'moonwater-bolt', 'normal').flags).toContain(
+      'interruptible',
+    );
+    expect(mechanic('mere_hydra_head_center', 'three-heads', 'normal').values?.share).toBe(
+      hydraRegrowShare(false),
+    );
+    expect(mechanic('mere_hydra_head_center', 'three-heads', 'heroic').values?.share).toBe(
+      hydraRegrowShare(true),
+    );
+    // The three heads draw as one bodyless model: the page keeps its portrait.
+    expect(journalModelFor('mere_hydra_head_center')).toBeNull();
+  });
+
+  it('sends four tears on Heroic and the Falling Moon faster', () => {
+    expect(mechanic('ysolei', 'beckoning-moon', 'heroic').values?.count).toBe(
+      YSOLEI_MOON_TUNING.tearCountHeroic,
+    );
+    expect(mechanic('ysolei', 'falling-moon', 'heroic').values?.cast).toBe(
+      YSOLEI_MOON_TUNING.fallingCastHeroic,
+    );
   });
 });

@@ -1,6 +1,7 @@
 // Every five-player dungeon that ships a boss guide, keyed by dungeon id. A
 // new dungeon page is one data module under ./dungeons/ plus its row here.
 
+import { DROWNED_TEMPLE_JOURNAL } from './dungeons/drowned_temple';
 import { GRAVEWYRM_SANCTUM_JOURNAL } from './dungeons/gravewyrm_sanctum';
 import { HOLLOW_CRYPT_JOURNAL } from './dungeons/hollow_crypt';
 import { SUNKEN_BASTION_JOURNAL } from './dungeons/sunken_bastion';
@@ -10,6 +11,7 @@ import { type DungeonJournalDef, dungeonJournalSource, type JournalSource } from
 export const DUNGEON_JOURNALS: readonly DungeonJournalDef[] = [
   HOLLOW_CRYPT_JOURNAL,
   SUNKEN_BASTION_JOURNAL,
+  DROWNED_TEMPLE_JOURNAL,
   GRAVEWYRM_SANCTUM_JOURNAL,
   WILDHEART_BASIN_JOURNAL,
 ];

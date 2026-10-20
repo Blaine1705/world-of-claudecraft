@@ -21508,4 +21508,197 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'bossJournal.bastion.vael.heroicGrave': '墓影：每个暗影池持续燃烧{seconds}秒。',
   'bossJournal.bastion.vael.heroicVeil':
     '雾幕期间身影每{drift}秒挪动一次，被打爆的分身会留下一名溺亡奴仆。',
+  'bossJournal.temple.selthe.overview':
+    '唱诗母在她的水池中歌唱，从不移动，也不近战。她会标记玩家，施放需要集合分摊的合唱和需要独自承受的独唱，向一名玩家射出不断增强的咏叹调光束，并向庭院扫出一道波浪。她的箭和咏叹调都可以被打断。',
+  'bossJournal.temple.selthe.phaseName': '唱诗庭院',
+  'bossJournal.temple.selthe.phaseSummary':
+    '只有一个阶段，全靠计时。到期时若她正在读条，该机制会等读条结束后再触发。',
+  'bossJournal.temple.selthe.chorusName': '合唱',
+  'bossJournal.temple.selthe.chorusSummary':
+    '每{every}秒标记一名非坦克玩家，持续{mark}秒。标记结束时，{total}点伤害由其周围{radius}码内的所有人平摊。',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    '每{every}秒标记一名非坦克玩家，持续{mark}秒。标记结束时，{total}点伤害由其周围{radius}码内的所有人平摊。回响：{echo}秒后，同一地点再次爆发，对仍留在原地的每名玩家造成{echoDamage}点伤害，不再平摊。',
+  'bossJournal.temple.selthe.chorusResponse': '所有人集合到合唱目标身边，并在回响之前离开该地点。',
+  'bossJournal.temple.selthe.soloSummary':
+    '每次合唱{offset}秒后，另一名玩家被标记{mark}秒。标记结束时，被标记的玩家及其周围{radius}码内的所有人各受到{damage}点伤害。',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    '二重唱：独唱与合唱同时落在不同的玩家身上。标记结束时，被标记的玩家及其周围{radius}码内的所有人各受到{damage}点伤害，{echo}秒后该地点再次爆发。',
+  'bossJournal.temple.selthe.soloResponse': '独唱目标：远离所有人，然后离开该地点。',
+  'bossJournal.temple.selthe.songSummary':
+    '每{every}秒读条{cast}秒，随后对庭院内的每名玩家造成{min}到{max}点冰霜伤害。',
+  'bossJournal.temple.selthe.songResponse': '无法躲避：治疗者要时刻保持所有人满血。',
+  'bossJournal.temple.selthe.boltSummary':
+    '她的填充技能：向目标读条{cast}秒，造成相当于其近战攻击{mult}倍的冰霜伤害。任何一次打断之后，她在{quiet}秒内不会施放箭或咏叹调。',
+  'bossJournal.temple.selthe.boltResponse': '咏叹调不会来时，打断她的箭。',
+  'bossJournal.temple.selthe.ariaSummary':
+    '每{every}秒，她对一名非坦克玩家引导光束{channel}秒：共{pulses}次脉冲，对同一目标的伤害从{min}逐步增长到{max}。有玩家踏入光束时，由该玩家承受脉冲，增长重新开始。',
+  'bossJournal.temple.selthe.ariaResponse':
+    '打断它，躲到灯柱后面打断她的视线，或踏入光束分担伤害。',
+  'bossJournal.temple.selthe.surgeSummary':
+    '每{every}秒瞄准一名非坦克玩家读条{cast}秒，随后释放一道{arc}度、长{range}码的波浪：造成{min}到{max}点伤害，并击退{push}码。',
+  'bossJournal.temple.selthe.surgeResponse': '向侧面走出扇形范围。',
+  'bossJournal.temple.selthe.tipTank':
+    '站在她能看到你的位置，让她的箭都打向你；这里没有别的需要坦克处理的机制。',
+  'bossJournal.temple.selthe.tipHealer':
+    '海之歌每{every}秒打击所有人。留意咏叹调的目标，以及被合唱孤立的人。',
+  'bossJournal.temple.selthe.tipDamage': '合唱时集合，独唱时分散，打断咏叹调，并走出湖涌。',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    '合唱集合与独唱分散会同时发生，随后在回响之前离开两处地点。打断咏叹调。',
+  'bossJournal.temple.selthe.choiceName': '打断咏叹调，还是分担它？',
+  'bossJournal.temple.selthe.choiceGain':
+    '打断或灯柱能立刻终止光束。踏入光束则会让增长在你身上重新开始。',
+  'bossJournal.temple.selthe.choiceRisk':
+    '被打断的咏叹调也会让她的箭短暂沉默，但如果无人行动，完整的增长伤害会全部落在一名玩家身上。',
+  'bossJournal.temple.selthe.heroicDuet': '二重唱：合唱与独唱同时落在两名玩家身上。',
+  'bossJournal.temple.selthe.heroicEcho': '回响：每个标记在{echo}秒后于同一地点再次爆发。',
+  'bossJournal.temple.hydra.overview':
+    '三个头颅掌握三种元素，共享同一场战斗：冰、毒和水。倒下的头颅会把它的攻击交给下一个头颅，只要还有头颅存活，它就会在{regrow}秒后长回来。巨浪按计时席卷半个水池，两次巨浪之间，两个头颅会融合它们的吐息。',
+  'bossJournal.temple.hydra.phaseName': '九头蛇水池',
+  'bossJournal.temple.hydra.phaseSummary': '左侧头颅喷出冰霜，中间头颅喷吐毒液，右侧头颅释放水流。',
+  'bossJournal.temple.hydra.phaseComboName': '合体吐息',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    '每次巨浪{after}秒后，两个头颅会融合，顺序始终是冰封激流、毒液洋流、剧毒霜晶。',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    '每次巨浪{early}秒后和{after}秒后，两个头颅会融合，顺序是冰封激流、毒液洋流、剧毒霜晶。',
+  'bossJournal.temple.hydra.headsName': '三个头颅',
+  'bossJournal.temple.hydra.headsSummary':
+    '倒下的头颅会把元素传给下一个头颅，每有一个头颅倒下，所有存活的头颅造成的伤害就提高{enrage}。只要还有头颅存活，倒下的头颅会在{regrow}秒后以{share}的生命值长回来。',
+  'bossJournal.temple.hydra.headsResponse': '同时击倒三个头颅，并在{regrow}秒内结束战斗。',
+  'bossJournal.temple.hydra.breathSummary':
+    '每{every}秒瞄准一名非坦克玩家读条{cast}秒，随后喷出一道{arc}度、长{range}码的冰霜锥形吐息：造成{min}到{max}点伤害，并减速{slow}，持续{seconds}秒。',
+  'bossJournal.temple.hydra.breathResponse': '走出锥形范围。',
+  'bossJournal.temple.hydra.spitName': '毒液喷吐',
+  'bossJournal.temple.hydra.spitSummary':
+    '每{every}秒，最多{count}名不同玩家脚下的{radius}码毒池在{warn}秒后爆裂：造成{min}到{max}点伤害，随后毒液在原地灼烧{seconds}秒，每秒{perSecond}点。',
+  'bossJournal.temple.hydra.spitResponse': '先分散，再走出毒池。',
+  'bossJournal.temple.hydra.torrentSummary':
+    '每{every}秒读条{cast}秒，向一名非坦克玩家打出一条{length}码长的水流：造成{min}到{max}点伤害，并推开{push}码。',
+  'bossJournal.temple.hydra.torrentResponse': '向侧面走出水流。',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    '第一次在{first}秒，之后在上一道巨浪结束{every}秒后：读条{cast}秒，期间头颅受到的伤害降低{reduction}，随后一道巨浪席卷半个水池：造成{min}到{max}点伤害，并推开{push}码。',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    '第一次在{first}秒，之后在上一道巨浪结束{every}秒后：读条{cast}秒，期间头颅受到的伤害降低{reduction}，随后一道巨浪席卷半个水池：造成{min}到{max}点伤害并推开。回流：{backwash}秒后巨浪回卷另一半。',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    '移到另一半，躲到池边石柱后面，或躲到冰墙后面。头颅沉入水中时不要输出。',
+  'bossJournal.temple.hydra.frostlockSummary':
+    '向一名玩家打出一条水流：造成{min}到{max}点伤害，并冻结{stun}秒。它会留下一道持续{wall}秒的冰墙：站在墙后{lee}码以内可躲过下一道巨浪，巨浪会将冰墙击碎。',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    '向一名玩家打出一条水流：造成{min}到{max}点伤害，并冻结{stun}秒。它会留下一道冰墙：站在墙后可躲过下一道巨浪。冰墙碎裂时，墙周围{reach}码内的所有人受到{shardMin}到{shardMax}点伤害。',
+  'bossJournal.temple.hydra.frostlockResponse': '躲开水流，再把冰墙当作掩体来躲海啸。',
+  'bossJournal.temple.hydra.currentSummary':
+    '毒池膨胀到{radius}码，并从水池中心向外滑动{slide}码，每秒灼烧{perSecond}点。',
+  'bossJournal.temple.hydra.currentResponse': '让开滑动路径。',
+  'bossJournal.temple.hydra.rimeSummary':
+    '毒池冻结成晶体，{seconds}秒后爆裂：对{radius}码内造成{min}到{max}点伤害。',
+  'bossJournal.temple.hydra.rimeResponse': '在每块晶体爆裂前远离它们。',
+  'bossJournal.temple.hydra.tipTank': '抓住你够得到的头颅；它们的攻击会瞄准其他人。',
+  'bossJournal.temple.hydra.tipHealer':
+    '海啸和合体吐息是伤害高峰。每有一个头颅倒下，其余头颅就打得更痛。',
+  'bossJournal.temple.hydra.tipDamage':
+    '均匀分配伤害，让三个头颅在{regrow}秒内相继倒下。每次海啸期间停手。',
+  'bossJournal.temple.hydra.choiceName': '先杀哪个头颅？',
+  'bossJournal.temple.hydra.choiceGain':
+    '三个头颅同时倒下就结束战斗；只要它们倒下的时间相近，顺序都可以。',
+  'bossJournal.temple.hydra.choiceRisk':
+    '每个倒下的头颅都会让其余头颅多造成{enrage}的伤害，并在{regrow}秒后长回来，而最后剩下的头颅掌握所有元素。',
+  'bossJournal.temple.hydra.heroicChanges':
+    '长回来的头颅以{share}的生命值回归，每道巨浪都会引发回流。',
+  'bossJournal.temple.colossus.overview':
+    '一尊行走的玻璃巨人。在三个生命值节点，每名玩家都会得到一个追击自己的镜像；你无法伤害自己的镜像，而每个存活的镜像都会为巨像提供护盾。在此之间，还有水流、猛击，以及一层层碎裂的地面。',
+  'bossJournal.temple.colossus.phaseName': '棱镜露台',
+  'bossJournal.temple.colossus.phaseSummary': '每次读条它都会站定脚步，也绝不离开露台。',
+  'bossJournal.temple.colossus.phaseFlareName': '棱镜闪耀',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    '生命值降到{first}、{second}和{third}时，它会召唤潮镜倒影。',
+  'bossJournal.temple.colossus.lanceSummary':
+    '每{every}秒读条{cast}秒，向一名非坦克玩家打出一条{length}码长的水流：造成{min}到{max}点伤害。',
+  'bossJournal.temple.colossus.lanceResponse': '向侧面走出水流。',
+  'bossJournal.temple.colossus.slamSummary':
+    '每{every}秒读条{cast}秒，随后对{radius}码内造成{min}到{max}点伤害，并击退{push}码。',
+  'bossJournal.temple.colossus.slamResponse': '近战可以走出范围；治疗者负责保护坦克。',
+  'bossJournal.temple.colossus.fractureSummary':
+    '第一次在{first}秒，之后每{every}秒：地面裂成{slices}块，持续{rounds}轮。每一轮都有几块变红，并在{warn}秒后爆炸：造成{min}到{max}点伤害。中心区域每一轮都会爆炸。',
+  'bossJournal.temple.colossus.fractureResponse': '每一轮都走到一块安全的地面上，并远离中心。',
+  'bossJournal.temple.colossus.flareSummary':
+    '引导{cast}秒，随后每名玩家都会得到一个潮镜倒影，它拥有巨像{share}的生命值，并追击玩家。你无法伤害自己的倒影。',
+  'bossJournal.temple.colossus.flareResponse': '击杀彼此的倒影，绝不要打自己的。',
+  'bossJournal.temple.colossus.wardName': '棱镜护盾',
+  'bossJournal.temple.colossus.wardSummary':
+    '每个存活的倒影使巨像受到的伤害降低{per}，最多降低{cap}。',
+  'bossJournal.temple.colossus.wardResponse': '清掉倒影，再回到巨像身上。',
+  'bossJournal.temple.colossus.shatterName': '破碎之镜',
+  'bossJournal.temple.colossus.shatterSummary':
+    '倒影破碎时，其周围{radius}码内的所有人受到{damage}点伤害。',
+  'bossJournal.temple.colossus.shatterResponse': '不要站在即将死亡的倒影旁边。',
+  'bossJournal.temple.colossus.swapName': '镜像互换',
+  'bossJournal.temple.colossus.swapSummary':
+    '每{every}秒，倒影会互换主人，所以你能攻击哪个镜像会随之改变。',
+  'bossJournal.temple.colossus.swapResponse': '每次互换后，重新确认你能攻击哪个镜像。',
+  'bossJournal.temple.colossus.tipTank': '每次闪耀之后重新抓住巨像；它会一路追着目标走。',
+  'bossJournal.temple.colossus.tipHealer':
+    '倒影会攻击它们的主人。潮镜碎裂会惩罚留在红色地块上的人。',
+  'bossJournal.temple.colossus.tipDamage':
+    '每次闪耀时击杀队友的倒影，然后在碎裂阶段一块一块地移动。',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    '每次闪耀时击杀队友的倒影；互换之后重新确认。不要站在即将死亡的镜像旁边。',
+  'bossJournal.temple.colossus.choiceName': '先杀倒影，还是先打巨像？',
+  'bossJournal.temple.colossus.choiceGain': '击杀镜像可移除最多{cap}的减伤，并让它们不再追击。',
+  'bossJournal.temple.colossus.choiceRisk':
+    '打镜像的时间就是没打巨像的时间，而且在英雄难度下，每个镜像破碎时都会爆发。',
+  'bossJournal.temple.colossus.heroicShatter':
+    '破碎之镜：倒影破碎时，会伤害其周围{radius}码内的所有人。',
+  'bossJournal.temple.colossus.heroicSwap': '镜像互换：倒影每{every}秒互换一次主人。',
+  'bossJournal.temple.ysolei.overview':
+    '溺月化身会把所有人拉近并猛击，淹没半座岛屿，召唤月之孽生，并让月光之泪滚向她自己。最后，除非团队及时打破她的护盾，否则月亮将会坠落。',
+  'bossJournal.temple.ysolei.phaseAltarName': '月亮祭坛',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    '她绝不移动。她的攻击范围很长：近战要站在远离她中心的位置。',
+  'bossJournal.temple.ysolei.phaseTideName': '涨潮',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    '生命值降到{health}时，半座岛屿被淹没，之后洪水会切换到另一侧。',
+  'bossJournal.temple.ysolei.phaseMoonSummary': '生命值降到{health}时，她会召唤月亮坠落。',
+  'bossJournal.temple.ysolei.lunarSummary':
+    '每{every}秒读条{cast}秒，随后对她中心{radius}码内的所有人造成{min}到{max}点伤害。',
+  'bossJournal.temple.ysolei.lunarResponse':
+    '远程玩家待在范围外；近战始终在范围内，所以治疗者要保护他们。',
+  'bossJournal.temple.ysolei.undertowSummary':
+    '每{every}秒引导{seconds}秒，以每秒{pull}码的速度把所有人拉向她。随后是潮汐冲击：对{radius}码内造成{min}到{max}点伤害。',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    '每{every}秒引导{seconds}秒，把所有人拉向她。随后是潮汐冲击：对{radius}码内造成{min}到{max}点伤害。裂流：每名玩家站立的位置都会裂开一个水潭，持续{pool}秒，每秒灼烧{riptide}点。',
+  'bossJournal.temple.ysolei.undertowResponse':
+    '引导期间，所有人（包括近战）都要朝干燥的地面跑出去；洪水会使你减速。',
+  'bossJournal.temple.ysolei.tearsSummary':
+    '生命值降到{first}和{second}时，她会召唤{count}颗滚向她的月光之泪。月光之泪碰到玩家就会停下：造成{min}到{max}点伤害，每层月灼额外造成{bonus}，月灼持续{sear}秒。月光之泪若到达她身边，她在本场战斗中的伤害提高{swell}，并恢复{heal}的生命值。',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    '生命值降到{first}和{second}时，她会召唤{count}颗滚向她的月光之泪。月光之泪碰到玩家就会停下：造成{min}到{max}点伤害，每层月灼额外造成{bonus}，并留下倾泻月光，每秒灼烧{glow}点。月光之泪若到达她身边，她的伤害提高{swell}，并恢复{heal}的生命值。',
+  'bossJournal.temple.ysolei.tearsResponse':
+    '用身体挡住每一颗月光之泪，轮流承受，避免有人叠起月灼。',
+  'bossJournal.temple.ysolei.tideName': '涨潮',
+  'bossJournal.temple.ysolei.tideSummary':
+    '生命值降到{health}时，半座岛屿立刻被淹没。每{every}秒洪水切换一侧，切换前有{warn}秒的波光预警。在水中：每秒受到{perSecond}点伤害，并减速{slow}。',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    '生命值降到{health}时，半座岛屿立刻被淹没。每{every}秒洪水切换一侧。在水中：每秒受到{perSecond}点伤害，并减速{slow}。溺月：每{moonEvery}秒，一只月之孽生会从被淹没的一侧爬出来。',
+  'bossJournal.temple.ysolei.tideResponse': '待在干燥的一侧，另一侧泛起波光时就移动过去。',
+  'bossJournal.temple.ysolei.callSummary':
+    '生命值降到{first}和{second}时，她会召唤{count}只月之孽生。',
+  'bossJournal.temple.ysolei.callResponse': '坦克抓住它们，伤害输出击杀它们。',
+  'bossJournal.temple.ysolei.moonSummary':
+    '在相当于她{ward}生命值的护盾保护下读条{cast}秒。及时打破护盾：她会被眩晕{stun}秒，并多承受{vuln}的伤害。若护盾未破：对岛上所有人造成{min}到{max}点伤害，并且她在本场战斗剩余时间内多造成{might}的伤害。',
+  'bossJournal.temple.ysolei.moonResponse': '每名伤害输出都攻击她的护盾；治疗者为冲击做好准备。',
+  'bossJournal.temple.ysolei.tipTank': '抓住每一只月之孽生。和大家一起跑出暗流。',
+  'bossJournal.temple.ysolei.tipHealer':
+    '月潮每次读条都会打击近战。月光之泪会叠加月灼：治疗挡下月光之泪的人。',
+  'bossJournal.temple.ysolei.tipDamage':
+    '躲开每一次暗流，轮流挡月光之泪，击杀月之孽生，并在坠月时全力打掉护盾。',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    '躲开每一次暗流及其裂流水潭，轮流挡月光之泪，击杀月之孽生，并尽快打掉坠月的护盾。',
+  'bossJournal.temple.ysolei.choiceName': '挡住月光之泪，还是放它们过去？',
+  'bossJournal.temple.ysolei.choiceGain':
+    '被挡下的月光之泪永远到不了她身边：她不会获得{swell}的伤害加成，也不会恢复{heal}的生命值。',
+  'bossJournal.temple.ysolei.choiceRisk':
+    '挡泪的人承受伤害并获得一层月灼：下一颗打在他身上的月光之泪会多造成{bonus}。轮流来挡。',
+  'bossJournal.temple.ysolei.heroicRiptide': '裂流：每次暗流都会在玩家站立的位置留下燃烧的水潭。',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    '溺月：每{moonEvery}秒，一只月之孽生会从洪水中爬出来。',
+  'bossJournal.temple.ysolei.heroicTears': '每波{count}颗月光之泪，坠月的读条时间为{cast}秒。',
 };
