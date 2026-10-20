@@ -12,9 +12,10 @@
 export const INSTANCE_FOOTPRINT_HALF_WIDTH = 120;
 
 /** Authored fields wider than the generic envelope. The Smith's Heart's
- *  field reaches |x| 232 (content/smith_heart_layout.ts bounds). */
+ *  field reaches |x| 258 (content/smith_heart_layout.ts bounds: the Smith's
+ *  Forge in the west, the Quench Basin and the Heart in the east). */
 const WIDE_FIELD_HALF_WIDTH: Readonly<Record<string, number>> = {
-  smith_heart: 240,
+  smith_heart: 270,
 };
 
 /** The claim's half width in x for a dungeon id. */

@@ -1,7 +1,7 @@
 // The per-dungeon claim footprint (src/sim/instances/instance_footprint.ts):
 // every shipped dungeon keeps the generic 120 yd half width, and the Smith's
-// Heart, whose authored field reaches |x| 232, claims 240 so its Quench and
-// Heat wings count as inside the run (occupancy, trash-kit targets, gate
+// Heart, whose authored field reaches |x| 258, claims 270 so its Forge, Basin and
+// Heart wings count as inside the run (occupancy, trash-kit targets, gate
 // lines, deeds, summoned adds).
 
 import { describe, expect, it } from 'vitest';
@@ -53,7 +53,7 @@ describe('the instance claim footprint', () => {
   it("resolves the Smith's Heart claim in its far wings, a generic one only within 120", () => {
     const heart = claim('smith_heart');
     const o = instanceOrigin(DUNGEONS.smith_heart.index, heart.inst.slot);
-    for (const x of [-200, -150, 0, 150, 200]) {
+    for (const x of [-250, -200, -150, 0, 150, 200, 245]) {
       expect(claimedInstanceAt(heart.sim.ctx, { x: o.x + x, y: 0, z: o.z }), `x ${x}`).toBe(
         heart.inst,
       );

@@ -1,10 +1,11 @@
-// The Smith's Heart, phase 1 (docs/design/raid/smith_heart.md): the playable
-// blockout's content. Mob templates with SKETCH kits (one or two readable
-// mechanics each on the shared trash-kit engine, enough to walk the route and
-// pull every fight), the spawn roster in route order, the gates and seals
-// (instances/dungeon_gates.ts derives their states), the seal markers that
-// carry the heart seal's colours (encounters/smith_heart/seal.ts), and the
-// DungeonDef itself.
+// The Smith's Heart (docs/design/raid/smith_heart.md): the raid's content.
+// Mob templates with SKETCH kits (one or two readable mechanics each on the
+// shared trash-kit engine, enough to walk the route and pull every fight), the
+// spawn roster in route order, the gates and seals (instances/dungeon_gates.ts
+// derives their states), the seal markers that carry the heart seal's colours
+// and the portal's state (encounters/smith_heart/seal.ts, portal.ts), and the
+// DungeonDef itself. The final boss fights in the Heart, a separate area of
+// the same slot reached only through the seal's portal.
 //
 // EVERY mob here is a placeholder: its name is descriptive and provisional,
 // its numbers are sketch numbers, and the body it draws is a borrowed model
@@ -20,7 +21,12 @@ import type {
 } from '../types';
 import {
   BREATH,
+  CLEFT,
   GALLERY_LANDINGS,
+  HAMMER_PIT,
+  HEART_BRIDGE_GATE,
+  HEART_ROOM,
+  HEART_TERRACE,
   QUENCH,
   ringPoint,
   SLAB,
@@ -397,11 +403,11 @@ const G = GALLERY_LANDINGS;
 const S = SMITH_HEART_BOSS_SPOTS;
 
 export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
-  // ---- The Hammer Gallery and Pit (always first) ------------------------------------
-  ...pack('h1', G.h1.x, G.h1.z, HAMMER_TRIO, toward(G.h1.x, G.h1.z, -100, -226)),
-  ...pack('h2', G.h2.x, G.h2.z, HAMMER_TRIO, toward(G.h2.x, G.h2.z, -50, -232)),
-  ...pack('h3', G.h3.x, G.h3.z, HAMMER_TRIO, toward(G.h3.x, G.h3.z, 10, -234)),
-  guardian(SMITH_HEART_GUARDIANS.hammer, S.hammer, toward(0, -150, 30, -175)),
+  // ---- The Hammer Gallery and the Quarry (always first) -----------------------------
+  ...pack('h1', G.h1.x, G.h1.z, HAMMER_TRIO, toward(G.h1.x, G.h1.z, CLEFT.x, CLEFT.z)),
+  ...pack('h2', G.h2.x, G.h2.z, HAMMER_TRIO, toward(G.h2.x, G.h2.z, G.h1.x, G.h1.z)),
+  ...pack('h3', G.h3.x, G.h3.z, HAMMER_TRIO, toward(G.h3.x, G.h3.z, G.h2.x, G.h2.z)),
+  guardian(SMITH_HEART_GUARDIANS.hammer, S.hammer, toward(HAMMER_PIT.x, HAMMER_PIT.z, -35, -179)),
   // ---- The Ring: two packs between each pair of vein mouths -------------------------
   ...RING_PACK_DEGREES.flatMap((deg, i) => {
     const p = ringPoint(deg);
@@ -409,21 +415,25 @@ export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
   }),
   // ---- The Breath (north) ------------------------------------------------------------
   ...pack('b1', BREATH.b1.x, BREATH.b1.z, BREATH_TRIO, Math.PI),
-  ...pack('b2', BREATH.b2.x, BREATH.b2.z, BREATH_TRIO, toward(44, 134, 0, 104)),
-  ...pack('b3', BREATH.b3.x, BREATH.b3.z, BREATH_TRIO, toward(-44, 160, 0, 154)),
-  guardian(SMITH_HEART_GUARDIANS.breath, S.breath, toward(S.breath.x, S.breath.z, -22, 196)),
+  ...pack('b2', BREATH.b2.x, BREATH.b2.z, BREATH_TRIO, toward(-64, 112, 0, 104)),
+  ...pack('b3', BREATH.b3.x, BREATH.b3.z, BREATH_TRIO, toward(-112, 170, -84, 140)),
+  guardian(SMITH_HEART_GUARDIANS.breath, S.breath, toward(S.breath.x, S.breath.z, -42, 195)),
   // ---- The Quench (east) -------------------------------------------------------------
   ...pack('q1', QUENCH.q1.x, QUENCH.q1.z, QUENCH_TRIO, -Math.PI / 2),
-  ...pack('q2', QUENCH.q2.x, QUENCH.q2.z, QUENCH_TRIO, toward(130, -40, 110, 0)),
-  ...pack('q3', 172, -49, QUENCH_TRIO, -Math.PI / 2),
-  guardian(SMITH_HEART_GUARDIANS.quench, S.quench, toward(S.quench.x, S.quench.z, 183, -26)),
+  ...pack('q2', QUENCH.q2.x, QUENCH.q2.z, QUENCH_TRIO, toward(122, -48, 110, 0)),
+  ...pack('q3', 160, -86, QUENCH_TRIO, toward(160, -86, 130, -60)),
+  guardian(SMITH_HEART_GUARDIANS.quench, S.quench, toward(S.quench.x, S.quench.z, 190, -44)),
   // ---- The Heat (west) ---------------------------------------------------------------
-  ...pack('f1', -110, 0, HEAT_TRIO, Math.PI / 2),
-  ...pack('f2', -142, 20, HEAT_TRIO, Math.PI / 2),
-  ...pack('f3', -142, -20, HEAT_TRIO, Math.PI / 2),
+  ...pack('f1', -104, 0, HEAT_TRIO, Math.PI / 2),
+  ...pack('f2', -136, 20, HEAT_TRIO, Math.PI / 2),
+  ...pack('f3', -136, -20, HEAT_TRIO, Math.PI / 2),
   guardian(SMITH_HEART_GUARDIANS.heat, S.heat, Math.PI / 2),
-  // ---- The Heart -----------------------------------------------------------------------
-  guardian(SMITH_HEART_FINAL_BOSS, S.final, Math.PI),
+  // ---- The Heart (the separate final room) ---------------------------------------------
+  guardian(
+    SMITH_HEART_FINAL_BOSS,
+    S.final,
+    toward(HEART_ROOM.x, HEART_ROOM.z, HEART_TERRACE.x, HEART_TERRACE.z),
+  ),
 ];
 
 /** Every pack, in route order (the Ring's eight after the Hammer). */
@@ -442,35 +452,15 @@ function across(dx: number, dz: number): number {
   return Math.atan2(-dx, -dz);
 }
 
-const ALL_GUARDIANS = Object.values(SMITH_HEART_GUARDIANS);
-
-/** One of the three causeways into the Heart: shut until all four colours
- *  burn on the seal and the Ring is clear; it seals behind the raid while the
- *  final boss fights. */
-function causewayGate(id: string, name: string, x: number, z: number, dx: number, dz: number) {
-  return {
-    id,
-    name,
-    kind: 'forge_seal' as const,
-    x,
-    z,
-    hw: 7.6,
-    rot: across(dx, dz),
-    packs: [...RING_PACK_IDS],
-    bosses: [...ALL_GUARDIANS],
-    sealWhileEngaged: SMITH_HEART_FINAL_BOSS,
-  };
-}
-
 export const SMITH_HEART_GATES: DungeonGateDef[] = [
   {
     id: 'hammer_pit_mouth',
     name: 'Pit Mouth',
     kind: 'stone_slab',
-    x: 30.5,
-    z: -175.25,
+    x: -50,
+    z: -193.3,
     hw: 7.6,
-    rot: across(-26, 21),
+    rot: across(19, 18),
     packs: [...SMITH_HEART_PACKS.hammer],
     sealWhileEngaged: SMITH_HEART_GUARDIANS.hammer,
   },
@@ -490,10 +480,10 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
     id: 'cornice_mouth',
     name: 'Cornice Mouth',
     kind: 'forge_seal',
-    x: -32,
-    z: 184,
+    x: -70,
+    z: 191,
     hw: 7.6,
-    rot: across(20, 24),
+    rot: across(40, 14),
     packs: [...SMITH_HEART_PACKS.breath],
     sealWhileEngaged: SMITH_HEART_GUARDIANS.breath,
   },
@@ -501,10 +491,10 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
     id: 'lake_mouth',
     name: 'Lake Mouth',
     kind: 'forge_seal',
-    x: 179.2,
-    z: -33.6,
+    x: 181,
+    z: -62,
     hw: 7.6,
-    rot: across(5, 10),
+    rot: across(13, 22),
     packs: [...SMITH_HEART_PACKS.quench],
     sealWhileEngaged: SMITH_HEART_GUARDIANS.quench,
   },
@@ -512,19 +502,25 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
     id: 'anvil_mouth',
     name: 'Anvil Mouth',
     kind: 'forge_seal',
-    x: -165,
+    x: -169,
     z: 0,
     hw: 7.6,
     rot: across(-1, 0),
     packs: [...SMITH_HEART_PACKS.heat],
     sealWhileEngaged: SMITH_HEART_GUARDIANS.heat,
   },
+  // The Heart's own seal: always open (nothing to wait on: the portal is the
+  // way in), sealed behind the raid on the bridge while the final boss fights.
   {
-    ...causewayGate('causeway_north', 'North Causeway', 0, 60, 0, -1),
-    openText: 'Four colours burn on the heart seal. It opens, and the causeways fall still.',
+    id: 'heart_bridge',
+    name: 'Heart Bridge',
+    kind: 'forge_seal',
+    x: HEART_BRIDGE_GATE.x,
+    z: HEART_BRIDGE_GATE.z,
+    hw: 7.6,
+    rot: across(HEART_BRIDGE_GATE.dx, HEART_BRIDGE_GATE.dz),
+    sealWhileEngaged: SMITH_HEART_FINAL_BOSS,
   },
-  causewayGate('causeway_east', 'East Causeway', 60, 0, -1, 0),
-  causewayGate('causeway_west', 'West Causeway', -60, 0, 1, 0),
 ];
 
 /** One inert ground object per gate: its template id carries the state. */
@@ -542,16 +538,27 @@ export const SMITH_HEART_GATE_OBJECTS: DungeonObjectSpawn[] = SMITH_HEART_GATES.
  *  spread so every walkable point stands within the client's interest radius
  *  of at least one, carrying the seal's lit veins in their template id. */
 export const SMITH_HEART_SEAL_MARKERS: readonly { x: number; z: number }[] = [
-  { x: -70, z: -236 },
-  { x: 40, z: -200 },
-  { x: 0, z: -100 },
+  // The Cleft and the Gallery.
+  { x: -190, z: -214 },
+  { x: -110, z: -228 },
+  // The Quarry, the Slab and the Balcony.
+  { x: 8, z: -170 },
+  { x: 0, z: -96 },
+  // The Ring and the Seal Dais.
   { x: 0, z: 0 },
-  { x: 0, z: 150 },
-  { x: -10, z: 210 },
-  { x: 120, z: -20 },
-  { x: 186, z: 10 },
-  { x: -130, z: 0 },
-  { x: -196, z: 0 },
+  // The Breath, its bridge, the Cornice.
+  { x: -40, z: 110 },
+  { x: -100, z: 165 },
+  { x: 0, z: 196 },
+  // The Quench, the Singing Ice, the Basin.
+  { x: 116, z: -26 },
+  { x: 166, z: -76 },
+  { x: 204, z: -2 },
+  // The Heat, the casting floor, the Smith's Forge.
+  { x: -110, z: 0 },
+  { x: -214, z: 0 },
+  // The Heart.
+  { x: 176, z: 160 },
 ];
 
 export const SMITH_HEART_SEAL_PREFIX = 'smith_heart_seal_';
@@ -588,9 +595,9 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     guideVisible: false,
     entry: { x: SMITH_HEART_ANCHORS.entry.x, z: SMITH_HEART_ANCHORS.entry.z },
     exitOffset: { x: SMITH_HEART_ANCHORS.exit.x, z: SMITH_HEART_ANCHORS.exit.z },
-    // The Heart is 300 yd of route from the Cleft: a second exit opens on the
-    // caldera's rim once the final boss falls.
-    bossExitPortal: { x: -20, z: -24 },
+    // The Heart is a separate area reached only through the seal's portal: a
+    // second exit opens on the Anvil of the World once the final boss falls.
+    bossExitPortal: { x: HEART_ROOM.x + 20, z: HEART_ROOM.z + 20 },
     spawns: SMITH_HEART_SPAWNS,
     objects: [...SMITH_HEART_GATE_OBJECTS, ...SMITH_HEART_SEAL_OBJECTS],
     gates: SMITH_HEART_GATES,

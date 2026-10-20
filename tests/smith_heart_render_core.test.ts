@@ -55,7 +55,7 @@ import { SMITH_HEART_GATES, SMITH_HEART_MOBS } from '../src/sim/content/smith_he
 import {
   BALCONY,
   BREATH,
-  HEART,
+  SEAL_DAIS as HEART,
   HEART_SEAL,
   HEAT,
   LIGHT_RIVERS,
@@ -108,8 +108,8 @@ describe('heart_walls_core: the mountain rock', () => {
         const mx = (WIND_BRIDGE.fromX + WIND_BRIDGE.toX) / 2;
         const mz = (WIND_BRIDGE.fromZ + WIND_BRIDGE.toZ) / 2;
         expect(Math.hypot(b.x - mx, b.z - mz)).toBeGreaterThan(18);
-        if (b.x < HEAT.anvil.x + 40 && Math.abs(b.z) < 30) {
-          expect(Math.hypot(b.x - HEAT.anvil.x, b.z - HEAT.anvil.z)).toBeGreaterThan(20);
+        if (b.x < HEAT.forge.x + 40 && Math.abs(b.z) < 30) {
+          expect(Math.hypot(b.x - HEAT.forge.x, b.z - HEAT.forge.z)).toBeGreaterThan(20);
         }
       }
     });

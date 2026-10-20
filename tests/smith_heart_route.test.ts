@@ -1,14 +1,19 @@
 // The Smith's Heart's route contract (docs/design/raid/smith_heart.md): the
-// phase 1 blockout is walkable end to end over the REAL collision seam
-// (colliders.ts isBlocked over the field's cliffs, props and gates), and the
-// gates cut it exactly where the design says:
+// raid walks end to end over the REAL collision seam (colliders.ts isBlocked
+// over the field's cliffs, props and gates), as a main-map walk, a portal hop
+// and a walk in the Heart, and the gates cut it exactly where the design says:
 // - with every gate open, one flood from the Cleft reaches the Gallery's
-//   three landings, the Hammer Pit, the Balcony, the whole Ring, every pack
-//   spot, the four guardian arenas and the Heart;
+//   three landings, the Quarry, the Balcony, the Grand Stair and the Seal
+//   Dais (the portal), the whole Ring, every pack spot and the four guardian
+//   arenas, and NOTHING of the Heart (no floor joins the two areas);
+// - one flood from the Heart's arrival reaches the terrace, the return
+//   portal, the bridge, the platform, its four altars, the final boss and
+//   the exit portal's spot, and nothing of the main map;
 // - with every gate shut (a fresh claim), the Gallery is all there is;
-// - the Pit Mouth alone opens the Pit but not the Balcony (the Slab holds);
-// - the Slab open lets the raid onto the Ring and into all three remaining
-//   veins up to their arena mouths, in any order, but never into the Heart;
+// - the Pit Mouth alone opens the Quarry but not the Balcony (the Slab holds);
+// - the Slab open lets the raid onto the Ring, down the Grand Stair to the
+//   dais, and into all three remaining veins up to their arena mouths, in any
+//   order;
 // - walked floor never steps more than a body's step between neighbours
 //   without a collider between them, and every path is at least 12 yd wide.
 
@@ -17,21 +22,30 @@ import { isBlocked } from '../src/sim/colliders';
 import {
   RING_PACK_DEGREES,
   SMITH_HEART_GATES,
+  SMITH_HEART_SEAL_MARKERS,
   SMITH_HEART_SPAWNS,
 } from '../src/sim/content/smith_heart';
 import {
   BREATH,
   GALLERY_LANDINGS,
   HAMMER_PIT,
+  HEART_ALTARS,
+  HEART_ARRIVAL,
+  HEART_RETURN_PORTAL,
+  HEART_ROOM,
+  inSmithHeartRoom,
   QUENCH,
+  RING_PORTAL,
+  RING_PORTAL_LANDING,
   ringPoint,
   SMITH_HEART_BOSS_SPOTS,
   SMITH_HEART_FIELD,
 } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
-import { authoredFieldHeight } from '../src/sim/instances/authored_field';
+import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 import { setOpenDungeonGates } from '../src/sim/instances/dungeon_gate_state';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
+import { PLAYER_INTEREST_RADIUS } from '../src/sim/types';
 
 const SEED = 7;
 const DUNGEON = DUNGEONS.smith_heart;
@@ -47,11 +61,13 @@ function cell(x: number, z: number): number {
   return (Math.round(z) - minZ) * W + (Math.round(x) - minX);
 }
 
-/** Every one-yard cell a body reaches from the arrival with `open` gates. */
-function flood(open: readonly string[]): Uint8Array {
+/** Every one-yard cell a body reaches from `start` with `open` gates. */
+function flood(
+  open: readonly string[],
+  start: { x: number; z: number } = DUNGEON.entry,
+): Uint8Array {
   setOpenDungeonGates(O.x, O.z, [...open]);
   const seen = new Uint8Array(W * H);
-  const start = DUNGEON.entry;
   const queue: number[] = [Math.round(start.x), Math.round(start.z)];
   seen[cell(start.x, start.z)] = 1;
   for (let q = 0; q < queue.length; q += 2) {
@@ -89,27 +105,44 @@ function reaches(seen: Uint8Array, p: { x: number; z: number }): boolean {
 }
 
 const SPOTS = {
-  cleft: { x: -100, z: -226 },
+  cleft: { x: -198, z: -212 },
   h1: GALLERY_LANDINGS.h1,
   h2: GALLERY_LANDINGS.h2,
   h3: GALLERY_LANDINGS.h3,
-  pit: { x: HAMMER_PIT.x + 10, z: HAMMER_PIT.z },
+  pit: { x: HAMMER_PIT.x - 20, z: HAMMER_PIT.z },
   balconyTip: { x: 0, z: -62 },
+  grandStair: { x: 0, z: -40 },
+  dais: RING_PORTAL_LANDING,
+  portal: RING_PORTAL,
   ring: ringPoint(0),
   b1: BREATH.b1,
   b2: BREATH.b2,
   b3: BREATH.b3,
-  breathMouth: { x: -36, z: 180 },
+  breathMouth: { x: -80, z: 187 },
   cornice: SMITH_HEART_BOSS_SPOTS.breath,
   q1: QUENCH.q1,
   q2: QUENCH.q2,
-  q3: { x: 166, z: -49 },
+  q3: { x: 160, z: -86 },
   lake: SMITH_HEART_BOSS_SPOTS.quench,
   f1: { x: -104, z: 0 },
-  f3: { x: -142, z: -20 },
+  f3: { x: -136, z: -20 },
   anvil: SMITH_HEART_BOSS_SPOTS.heat,
-  heart: { x: 12, z: 12 },
 } as const;
+
+const HEART_SPOTS = {
+  arrival: HEART_ARRIVAL,
+  returnPortal: HEART_RETURN_PORTAL,
+  platform: { x: HEART_ROOM.x - 14, z: HEART_ROOM.z - 14 },
+  final: SMITH_HEART_BOSS_SPOTS.final,
+  exitPortal: DUNGEON.bossExitPortal ?? { x: Number.NaN, z: Number.NaN },
+  // Each altar's foot, the side a raid stands on (the altar is solid).
+  ...Object.fromEntries(
+    HEART_ALTARS.map((a) => [
+      `altar_${a.vein}`,
+      { x: a.x + (HEART_ROOM.x - a.x) * 0.15, z: a.z + (HEART_ROOM.z - a.z) * 0.15 },
+    ]),
+  ),
+} as Record<string, { x: number; z: number }>;
 
 describe("the Smith's Heart route", () => {
   it('is a raid of ten in its own instance band', () => {
@@ -122,7 +155,7 @@ describe("the Smith's Heart route", () => {
     expect(Math.max(-minZ, maxZ)).toBeLessThan(250);
   });
 
-  it('walks from the Cleft through all four arenas to the Heart with every gate open', () => {
+  it('walks from the Cleft through all four arenas to the portal with every gate open', () => {
     const seen = flood(ALL_GATES);
     const missed = Object.entries(SPOTS)
       .filter(([, p]) => !reaches(seen, p))
@@ -135,11 +168,52 @@ describe("the Smith's Heart route", () => {
       if (!reaches(seen, ringPoint(d))) ringMissed.push(d);
     }
     expect(ringMissed).toEqual([]);
-    // Every spawn stands on reached floor.
-    const stranded = SMITH_HEART_SPAWNS.filter((s) => !reaches(seen, s)).map(
-      (s) => `${s.mobId}@${s.x.toFixed(0)},${s.z.toFixed(0)}`,
-    );
+    // Every spawn of the main map stands on reached floor.
+    const stranded = SMITH_HEART_SPAWNS.filter((s) => !inSmithHeartRoom(s.x, s.z))
+      .filter((s) => !reaches(seen, s))
+      .map((s) => `${s.mobId}@${s.x.toFixed(0)},${s.z.toFixed(0)}`);
     expect(stranded).toEqual([]);
+  });
+
+  it('never walks from the main map into the Heart, nor back', () => {
+    const main = flood(ALL_GATES);
+    for (const [k, p] of Object.entries(HEART_SPOTS)) expect(reaches(main, p), k).toBe(false);
+    let mainInHeart = 0;
+    for (let z = minZ; z <= maxZ; z++)
+      for (let x = minX; x <= maxX; x++)
+        if (main[cell(x, z)] && inSmithHeartRoom(x, z)) mainInHeart++;
+    expect(mainInHeart).toBe(0);
+    const heart = flood(ALL_GATES, HEART_ARRIVAL);
+    for (const [k, p] of Object.entries(SPOTS)) expect(reaches(heart, p), k).toBe(false);
+    let heartOutside = 0;
+    for (let z = minZ; z <= maxZ; z++)
+      for (let x = minX; x <= maxX; x++)
+        if (heart[cell(x, z)] && !inSmithHeartRoom(x, z)) heartOutside++;
+    expect(heartOutside).toBe(0);
+  });
+
+  it('walks the Heart from the arrival to the final boss, its altars and its exit', () => {
+    const seen = flood(ALL_GATES, HEART_ARRIVAL);
+    const missed = Object.entries(HEART_SPOTS)
+      .filter(([, p]) => !reaches(seen, p))
+      .map(([k]) => k);
+    expect(missed).toEqual([]);
+    // The final boss stands on reached floor of the Heart.
+    for (const s of SMITH_HEART_SPAWNS.filter((sp) => inSmithHeartRoom(sp.x, sp.z))) {
+      expect(reaches(seen, s), s.mobId).toBe(true);
+    }
+    // The arrival is far outside the final boss's reach.
+    const f = SMITH_HEART_BOSS_SPOTS.final;
+    expect(Math.hypot(HEART_ARRIVAL.x - f.x, HEART_ARRIVAL.z - f.z)).toBeGreaterThan(50);
+  });
+
+  it('the Heart Bridge sealed shuts the platform off from the terrace', () => {
+    const shut = flood(
+      ALL_GATES.filter((g) => g !== 'heart_bridge'),
+      HEART_ARRIVAL,
+    );
+    expect(reaches(shut, HEART_RETURN_PORTAL)).toBe(true);
+    expect(reaches(shut, SMITH_HEART_BOSS_SPOTS.final)).toBe(false);
   });
 
   it('a fresh claim holds the raid in the Hammer Gallery', () => {
@@ -149,19 +223,29 @@ describe("the Smith's Heart route", () => {
     expect(reaches(seen, SPOTS.balconyTip)).toBe(false);
   });
 
-  it('the Pit Mouth opens the Pit, but the Slab holds the Balcony', () => {
+  it('the Pit Mouth opens the Quarry, but the Slab holds the Balcony', () => {
     const seen = flood(['hammer_pit_mouth']);
     expect(reaches(seen, SPOTS.pit)).toBe(true);
     expect(reaches(seen, SPOTS.balconyTip)).toBe(false);
     expect(reaches(seen, SPOTS.ring)).toBe(false);
+    expect(reaches(seen, SPOTS.dais)).toBe(false);
   });
 
-  it('the Slab open: the Ring and all three veins in any order, never the Heart', () => {
+  it('the Slab open: the Ring, the dais and all three veins in any order', () => {
     const seen = flood(['hammer_pit_mouth', 'the_slab']);
-    for (const k of ['balconyTip', 'ring', 'b3', 'breathMouth', 'q3', 'f3'] as const) {
+    for (const k of [
+      'balconyTip',
+      'ring',
+      'dais',
+      'portal',
+      'b3',
+      'breathMouth',
+      'q3',
+      'f3',
+    ] as const) {
       expect(reaches(seen, SPOTS[k]), k).toBe(true);
     }
-    for (const k of ['cornice', 'lake', 'anvil', 'heart'] as const) {
+    for (const k of ['cornice', 'lake', 'anvil'] as const) {
       expect(reaches(seen, SPOTS[k]), k).toBe(false);
     }
     // Each arena mouth is independent of the other two veins.
@@ -173,35 +257,29 @@ describe("the Smith's Heart route", () => {
       const one = flood(['hammer_pit_mouth', 'the_slab', mouth]);
       expect(reaches(one, SPOTS[inside]), inside).toBe(true);
       for (const o of others) expect(reaches(one, SPOTS[o]), o).toBe(false);
-      expect(reaches(one, SPOTS.heart)).toBe(false);
-    }
-  });
-
-  it('every causeway alone leads into the Heart once its seal opens', () => {
-    for (const id of ['causeway_north', 'causeway_east', 'causeway_west']) {
-      const seen = flood(['hammer_pit_mouth', 'the_slab', id]);
-      expect(reaches(seen, SPOTS.heart), id).toBe(true);
     }
   });
 
   it('never steps more than a body can climb between reached neighbours', () => {
-    const seen = flood(ALL_GATES);
     const bad: string[] = [];
-    for (let z = minZ; z < maxZ; z++)
-      for (let x = minX; x < maxX; x++) {
-        if (!seen[cell(x, z)]) continue;
-        const h = authoredFieldHeight(FIELD, x, z);
-        for (const [dx, dz] of [
-          [1, 0],
-          [0, 1],
-        ]) {
-          if (!seen[cell(x + dx, z + dz)]) continue;
-          const step = Math.abs(authoredFieldHeight(FIELD, x + dx, z + dz) - h);
-          if (step > Math.max(MAX_STEP_HEIGHT, FIELD.cliffStep) + 0.05) {
-            bad.push(`(${x},${z}) step ${step.toFixed(2)}`);
+    for (const start of [DUNGEON.entry, HEART_ARRIVAL]) {
+      const seen = flood(ALL_GATES, start);
+      for (let z = minZ; z < maxZ; z++)
+        for (let x = minX; x < maxX; x++) {
+          if (!seen[cell(x, z)]) continue;
+          const h = authoredFieldHeight(FIELD, x, z);
+          for (const [dx, dz] of [
+            [1, 0],
+            [0, 1],
+          ]) {
+            if (!seen[cell(x + dx, z + dz)]) continue;
+            const step = Math.abs(authoredFieldHeight(FIELD, x + dx, z + dz) - h);
+            if (step > Math.max(MAX_STEP_HEIGHT, FIELD.cliffStep) + 0.05) {
+              bad.push(`(${x},${z}) step ${step.toFixed(2)}`);
+            }
           }
         }
-      }
+    }
     expect(bad.slice(0, 10)).toEqual([]);
   });
 
@@ -212,6 +290,17 @@ describe("the Smith's Heart route", () => {
     for (const g of SMITH_HEART_GATES) expect(g.hw * 2, g.id).toBeGreaterThanOrEqual(12);
   });
 
+  it('keeps every floor within interest range of a seal marker (seal and portal mirror)', () => {
+    const far: string[] = [];
+    for (let z = minZ; z <= maxZ; z += 3)
+      for (let x = minX; x <= maxX; x += 3) {
+        if (!authoredFieldSurfaceAt(FIELD, x, z)) continue;
+        const d = Math.min(...SMITH_HEART_SEAL_MARKERS.map((m) => Math.hypot(m.x - x, m.z - z)));
+        if (d > PLAYER_INTEREST_RADIUS - 5) far.push(`(${x}, ${z}) ${d.toFixed(0)}`);
+      }
+    expect(far.slice(0, 10)).toEqual([]);
+  });
+
   it('places the eight Ring packs two between each pair of vein mouths', () => {
     const between = (a: number, b: number) =>
       RING_PACK_DEGREES.filter((d) => d > a && d < b).length;
@@ -219,5 +308,22 @@ describe("the Smith's Heart route", () => {
     expect(between(90, 180)).toBe(2);
     expect(between(180, 270)).toBe(2);
     expect(between(270, 360)).toBe(2);
+  });
+
+  it('grows every guardian arena to between 85 and 105 yd across, the Heart to 84+', () => {
+    const extent = (id: string) => {
+      const s = FIELD.surfaces.find((x) => x.id === id);
+      if (!s || s.kind !== 'poly') throw new Error(id);
+      const xs = s.points.map((p) => p[0]);
+      const zs = s.points.map((p) => p[1]);
+      return { w: Math.max(...xs) - Math.min(...xs), d: Math.max(...zs) - Math.min(...zs) };
+    };
+    for (const id of ['hammer_pit', 'storm_cornice', 'lake_shelf', 'smiths_forge']) {
+      const e = extent(id);
+      expect(Math.max(e.w, e.d), id).toBeGreaterThanOrEqual(85);
+      expect(Math.max(e.w, e.d), id).toBeLessThanOrEqual(105);
+      expect(Math.min(e.w, e.d), id).toBeGreaterThanOrEqual(70);
+    }
+    expect(HEART_ROOM.r * 2).toBeGreaterThanOrEqual(84);
   });
 });

@@ -1,9 +1,10 @@
-// /dev heart (src/sim/dev/smith_heart_dev.ts): the Smith's Heart blockout's
-// playtest helpers over a REAL Sim. Enter lands at the Cleft inside a claim;
-// every tp area lands on walkable floor at the field's height; kills credit
-// so the gates and the heart seal follow on the next tick; reset hands back
-// a fresh, dark claim. Without devCommands neither the command nor the door
-// lets anyone in (the raid is dev-only while it is a blockout).
+// /dev heart (src/sim/dev/smith_heart_dev.ts): the Smith's Heart's playtest
+// helpers over a REAL Sim. Enter lands at the Cleft inside a claim; every tp
+// area (the Heart's terrace included) lands on walkable floor at the field's
+// height; kills credit so the gates, the heart seal and the portal follow on
+// the next tick; `portal` forces the seal's portal open and the hop then
+// works; reset hands back a fresh, dark, shut claim. Without devCommands
+// neither the command nor the door lets anyone in.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -11,14 +12,20 @@ import {
   SMITH_HEART_GATES,
   SMITH_HEART_SEAL_PREFIX,
 } from '../src/sim/content/smith_heart';
-import { SMITH_HEART_ANCHORS, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
+import {
+  HEART_ARRIVAL,
+  inSmithHeartRoom,
+  RING_PORTAL,
+  SMITH_HEART_ANCHORS,
+  SMITH_HEART_FIELD,
+} from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
   handleSmithHeartDevChat,
   SMITH_HEART_DEV_AREAS,
   smithHeartSealReadout,
 } from '../src/sim/dev/smith_heart_dev';
-import { smithHeartProgress } from '../src/sim/encounters/smith_heart';
+import { smithHeartPortalBitSet, smithHeartProgress } from '../src/sim/encounters/smith_heart';
 import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { dungeonGateState } from '../src/sim/instances/dungeon_gates';
 import { enterDungeon } from '../src/sim/instances/dungeons';
@@ -32,7 +39,6 @@ const gate = (id: string) => {
   if (!g) throw new Error(`no gate ${id}`);
   return g;
 };
-const CAUSEWAYS = ['causeway_north', 'causeway_east', 'causeway_west'];
 
 function devSim(devCommands = true) {
   const sim = new Sim({ seed: 17, playerClass: 'warrior', autoEquip: false, devCommands });
@@ -109,7 +115,7 @@ describe('/dev heart', () => {
     expect(sim.player.pos.x - o.x).toBeCloseTo(SMITH_HEART_ANCHORS.forge.x, 3);
   });
 
-  it('kill hammer opens the Slab on the next tick; guardians light the seal; trash opens the Heart', () => {
+  it('kill hammer opens the Slab on the next tick; guardians light the seal; trash opens the portal', () => {
     const { sim, dev, claim } = devSim();
     dev('/dev heart enter');
     const inst = claim();
@@ -133,16 +139,42 @@ describe('/dev heart', () => {
     let p = smithHeartProgress(sim.ctx, inst);
     expect(p.sealLit).toBe(true);
     expect(p.ringClear).toBe(false);
-    expect(p.heartOpen).toBe(false);
-    for (const id of CAUSEWAYS)
-      expect(dungeonGateState(sim.ctx, inst, gate(id)), id).not.toBe('open');
+    expect(p.portalOpen).toBe(false);
 
     dev('/dev heart kill trash');
     sim.tick();
     p = smithHeartProgress(sim.ctx, inst);
     expect(p.ringClear).toBe(true);
-    expect(p.heartOpen).toBe(true);
-    for (const id of CAUSEWAYS) expect(dungeonGateState(sim.ctx, inst, gate(id)), id).toBe('open');
+    expect(p.portalOpen).toBe(true);
+    expect(sealMasks(sim, inst).every((t) => t === 'smith_heart_seal_31')).toBe(true);
+  });
+
+  it('portal forces the seal open for the run, and the hop then works', () => {
+    const { sim, dev, claim } = devSim();
+    dev('/dev heart enter');
+    const inst = claim();
+    expect(inst).not.toBeNull();
+    if (!inst) return;
+    sim.tick();
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    dev('/dev heart portal');
+    sim.tick();
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
+    expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(false);
+    expect(sealMasks(sim, inst).every((t) => smithHeartPortalBitSet(Number(t.slice(17))))).toBe(
+      true,
+    );
+    // Step into the seal: the next tick sets the player down in the Heart.
+    const o = instanceOrigin(DUNGEON.index, inst.slot);
+    dev('/dev heart tp portal');
+    sim.player.pos.x = o.x + RING_PORTAL.x;
+    sim.player.pos.z = o.z + RING_PORTAL.z;
+    sim.tick();
+    const lx = sim.player.pos.x - o.x;
+    const lz = sim.player.pos.z - o.z;
+    expect(inSmithHeartRoom(lx, lz)).toBe(true);
+    expect(Math.hypot(lx - HEART_ARRIVAL.x, lz - HEART_ARRIVAL.z)).toBeLessThan(0.5);
+    expect(claim()).toBe(inst);
   });
 
   it('kill pack <id> fells exactly that pack and an unknown target kills nothing', () => {
@@ -176,12 +208,12 @@ describe('/dev heart', () => {
     dev('/dev heart seal');
     const lines = logs(sim.tick()).filter((t) => t.startsWith('[dev] Heart seal'));
     expect(lines).toEqual([
-      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear false, heartOpen false.',
+      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear false, portalOpen false.',
     ]);
     dev('/dev heart kill all');
     sim.tick();
     expect(smithHeartSealReadout(sim.ctx, inst)).toBe(
-      '[dev] Heart seal: mask 15, slabOpen true, sealLit true, ringClear true, heartOpen true.',
+      '[dev] Heart seal: mask 15, slabOpen true, sealLit true, ringClear true, portalOpen true.',
     );
   });
 
@@ -207,7 +239,7 @@ describe('/dev heart', () => {
     if (!first) return;
     dev('/dev heart kill all');
     sim.tick();
-    expect(smithHeartProgress(sim.ctx, first).heartOpen).toBe(true);
+    expect(smithHeartProgress(sim.ctx, first).portalOpen).toBe(true);
 
     dev('/dev heart reset');
     sim.tick();
@@ -220,11 +252,11 @@ describe('/dev heart', () => {
       slabOpen: false,
       sealLit: false,
       ringClear: false,
-      heartOpen: false,
+      portalOpen: false,
     });
     expect(sealMasks(sim, fresh).every((t) => t === `${SMITH_HEART_SEAL_PREFIX}0`)).toBe(true);
     expect(sealMasks(sim, fresh).length).toBeGreaterThan(0);
-    for (const id of ['the_slab', ...CAUSEWAYS])
+    for (const id of ['the_slab', 'hammer_pit_mouth', 'cornice_mouth'])
       expect(dungeonGateState(sim.ctx, fresh, gate(id)), id).not.toBe('open');
   });
 

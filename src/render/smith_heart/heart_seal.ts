@@ -9,7 +9,7 @@
 
 import * as THREE from 'three';
 import {
-  HEART,
+  SEAL_DAIS as HEART,
   HEART_SEAL,
   SMITH_HEART_VEIN_COLORS,
   SMITH_HEART_VEINS,

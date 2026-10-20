@@ -1,4 +1,4 @@
-// /dev heart: playtest helpers for the Smith's Heart raid blockout
+// /dev heart: playtest helpers for the Smith's Heart raid
 // (ALLOW_DEV_COMMANDS only: handleDevChat is reached through the
 // ctx.devCommands gate like every /dev branch, and the raid's own door is
 // dev-only too, encounters/smith_heart/entry.ts).
@@ -12,15 +12,18 @@
 //                                    to h3, r1 to r8, b1 to b3, q1 to q3, f1
 //                                    to f3), every pack (trash), or all
 //   /dev heart gates                 open every gate of this run
+//   /dev heart portal                force the seal's portal open for this run
 //   /dev heart seal                  print the gating readout (mask, slabOpen,
-//                                    sealLit, ringClear, heartOpen)
+//                                    sealLit, ringClear, portalOpen)
 //   /dev heart reset                 free the run and claim a fresh one
 //
 // Areas: cleft, gallery, pit (or hammer), balcony, ring, ringse, ringsw,
 // breath, bridge, cornice (or breathboss), quench, ice, lake (or quenchboss),
-// heat, forge, anvil (or heatboss), heart (or final). Each boss name lands
-// beside that boss, on its floor. Kills credit through handleDeath, so the
-// gates and the heart seal follow on the next tick.
+// heat, forge, anvil (or heatboss), heart or portal (the Seal Dais, beside
+// the portal), heartroom or final (the Heart's Arrival Terrace, outside the
+// final boss's reach). Each guardian's name lands beside it, on its floor.
+// Kills credit through handleDeath, so the gates, the seal and the portal
+// follow on the next tick.
 
 import {
   SMITH_HEART_DUNGEON,
@@ -29,7 +32,7 @@ import {
 } from '../content/smith_heart';
 import { SMITH_HEART_ANCHORS } from '../content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../data';
-import { smithHeartProgress } from '../encounters/smith_heart';
+import { setSmithHeartPortalDevOpen, smithHeartProgress } from '../encounters/smith_heart';
 import { setDungeonGatesDevOpen } from '../instances/dungeon_gates';
 import { enterDungeon, freeInstance, leaveDungeon } from '../instances/dungeons';
 import { instanceHalfWidthOf } from '../instances/instance_footprint';
@@ -62,8 +65,10 @@ export const SMITH_HEART_DEV_AREAS: Readonly<Record<string, { x: number; z: numb
   forge: A.forge,
   anvil: A.anvil,
   heatboss: A.anvil,
-  heart: A.heart,
-  final: A.heart,
+  heart: A.portal,
+  portal: A.portal,
+  heartroom: A.heartRoom,
+  final: A.heartRoom,
 };
 
 /** `/dev heart kill` boss names to template ids. */
@@ -75,7 +80,7 @@ const BOSS_ALIASES: Readonly<Record<string, string>> = {
 const GUARDIAN_IDS: ReadonlySet<string> = new Set(Object.values(SMITH_HEART_GUARDIANS));
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|final> | kill <hammer|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | seal | reset';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | reset';
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });
@@ -83,7 +88,7 @@ function log(ctx: SimContext, pid: number, text: string): void {
 
 /** The live Smith's Heart claim whose slot holds the player, or null. Reads
  *  the raid's own claim half width (instances/instance_footprint.ts: the
- *  field runs to |x| 232, wider than the generic envelope). */
+ *  field runs past |x| 250, wider than the generic envelope). */
 function claimFor(ctx: SimContext, pid: number): InstanceSlot | null {
   const e = ctx.entities.get(pid);
   if (!e) return null;
@@ -147,7 +152,7 @@ export function killSmithHeartMatching(
 /** The `/dev heart seal` readout line for one claim. */
 export function smithHeartSealReadout(ctx: SimContext, inst: InstanceSlot): string {
   const p = smithHeartProgress(ctx, inst);
-  return `[dev] Heart seal: mask ${p.mask}, slabOpen ${p.slabOpen}, sealLit ${p.sealLit}, ringClear ${p.ringClear}, heartOpen ${p.heartOpen}.`;
+  return `[dev] Heart seal: mask ${p.mask}, slabOpen ${p.slabOpen}, sealLit ${p.sealLit}, ringClear ${p.ringClear}, portalOpen ${p.portalOpen}.`;
 }
 
 /** Handles `/dev heart ...`; returns false for any other line. */
@@ -198,6 +203,13 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     if (!inst) return true;
     setDungeonGatesDevOpen(inst, true);
     log(ctx, pid, "[dev] Every Smith's Heart gate is open for this run.");
+    return true;
+  }
+  if (verb === 'portal') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    setSmithHeartPortalDevOpen(inst, true);
+    log(ctx, pid, "[dev] The heart seal's portal is forced open for this run.");
     return true;
   }
   if (verb === 'seal') {

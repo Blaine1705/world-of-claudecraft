@@ -1,52 +1,63 @@
 // The Smith's Heart (docs/design/raid/smith_heart.md): a ten-player raid in
-// the heart of Stormcrag, phase 1 blockout. Before he lay down to become
-// Thornpeak, the Smith split his strength into four (the Heat, the Breath, the
-// Hammer, the Quench: the four acts of the Sanctum's rune creed); each sleeps
-// in a vein of the mountain that runs down to its heart, and Korzul's stirring
-// woke them. Open air throughout: every vein is a fissure open to the storm
-// sky, never a roofed tunnel, so the camera never meets a vault.
+// the heart of Stormcrag. Before he lay down to become Thornpeak, the Smith
+// split his strength into four (the Heat, the Breath, the Hammer, the Quench:
+// the four acts of the Sanctum's rune creed); each sleeps in a vein of the
+// mountain that runs down to its heart, and Korzul's stirring woke them. Open
+// air throughout: every vein is a fissure open to the storm sky, never a
+// roofed tunnel, so the camera never meets a vault.
 //
-// Route (north +z, east +x, heights in yards; the Ring is 0):
-//   the Cleft (40; the world entrance, a crack in the Stormcrag cliffs) -> the
-//   Hammer Gallery, descending (packs h1, h2, h3) -> the Hammer Pit (14; the
-//   Hammer guardian, ALWAYS FIRST) -> the Slab (a stone gate that breaks when
-//   the guardian dies) -> the Balcony (20; the first view over the whole
-//   heart) -> the two Balcony Stairs, curving down to the Ring (0; the
-//   circular gallery round the heart, packs r1 to r8, two between each pair
-//   of vein mouths) -> in ANY order:
-//     north, the Breath (climbs to the Cornice at 60: packs b1 to b3, the
-//       Wind Bridge, the Breath guardian);
-//     east, the Quench (descends to the Frozen Lake at -30: packs q1 to q3,
-//       the Singing Ice, the Quench guardian);
-//     west, the Heat (level, the Smith's forge: packs f1 to f3, the Pour
-//       Channel, the Heat guardian on the Anvil);
-//   -> four colours lit on the heart seal -> the three Causeways open -> the
-//   Heart (-8; the open-sky caldera, the four altars, the final boss).
+// TWO areas share the one instance slot, never joined by floor:
+//
+// The main map (north +z, east +x, heights in yards; the Ring is 0):
+//   the Cleft (44; the world entrance, a crack in the Stormcrag cliffs) -> the
+//   Hammer Gallery, descending east (packs h1, h2, h3) -> the Smith's Quarry
+//   (14; a deep pit under stepped terraces and half-carved colossi, the Hammer
+//   guardian, ALWAYS FIRST) -> the Slab (a stone gate that breaks when the
+//   guardian dies) -> the Balcony (20; the first view over the whole heart)
+//   -> the two Balcony Stairs, curving down to the Ring (0; packs r1 to r8)
+//   -> in ANY order:
+//     north, the Breath (climbs to the Storm Cornice at 60: packs b1 to b3,
+//       the Wind Bridge, a cracked plateau cut by wind channels);
+//     east, the Quench (descends to the Quench Basin at -30: packs q1 to q3,
+//       the Singing Ice, the frozen lake where the Smith cooled his work);
+//     west, the Heat (level, the Smith's own forge: packs f1 to f3, the Pour
+//       Channel, the great hearth and the giant anvil);
+//   -> four colours lit on the heart seal, on the Seal Dais in the middle of
+//   the Ring, reached by the Grand Stair down from the Balcony's tip -> the
+//   seal opens into a portal.
+//
+// The Heart (a separate area in the slot's north-east corner, walled off by
+// the mountain): the portal lands the raid on the Arrival Terrace, a short
+// bridge (sealed while the final boss fights) crosses onto the Anvil of the
+// World, a vast round platform hung by four colossal chains over the Smith's
+// glowing heart, the four altars at its cardinal points. A return portal on
+// the terrace walks the raid back to the Seal Dais.
 //
 // Engine limit: ONE floor height per point (authored_field/CLAUDE.md), so the
 // Balcony replaces the Ring's south arc and the Ring loops over it by the two
-// stairs. The void between the Ring and the Heart is open air: the seal is in
+// stairs. The void between the Ring and the dais is open air: the seal is in
 // sight from every point of the Ring. The whole field stays inside one slot of
 // the instance band (|x| < 300, |z| < 250).
 //
-// Pure data: the sim (height, collision, spawns, gates) and the renderer
-// (terrain, light rivers, the seal) read this one record.
+// Pure data: the sim (height, collision, spawns, gates, the portal hop) and
+// the renderer (terrain, light rivers, the seal, the portal) read this one
+// record.
 
 import type { AuthoredFieldDef, FieldProp, FieldSurface } from '../instances/authored_field/types';
 
-/** The void under every floor: the fissures' depth (below the Frozen Lake). */
+/** The void under every floor: the fissures' depth (below the Quench Basin). */
 export const SMITH_HEART_VOID_HEIGHT = -70;
 
 /** The floor heights of the route. */
 export const SMITH_HEART_HEIGHTS = {
-  cleft: 40,
-  galleryUpper: 36,
-  galleryMiddle: 31,
-  galleryLower: 26,
+  cleft: 44,
+  galleryUpper: 40,
+  galleryMiddle: 34,
+  galleryLower: 28,
   pit: 14,
   balcony: 20,
   ring: 0,
-  heart: -8,
+  dais: -4,
   breathLow: 0,
   breathMid: 16,
   breathHigh: 40,
@@ -56,6 +67,8 @@ export const SMITH_HEART_HEIGHTS = {
   quenchShelf: -24,
   lake: -30,
   heat: 0,
+  heartRoom: 0,
+  heartTerrace: 4,
 } as const;
 
 const H = SMITH_HEART_HEIGHTS;
@@ -64,8 +77,9 @@ const H = SMITH_HEART_HEIGHTS;
 export type SmithHeartVein = 'hammer' | 'breath' | 'quench' | 'heat';
 export const SMITH_HEART_VEINS: readonly SmithHeartVein[] = ['hammer', 'breath', 'quench', 'heat'];
 
-/** One colour per vein (render: light, light river, seal quarter). The Heat
- *  is white-gold smith fire, never Ignivar's volcanic orange-red. */
+/** One colour per vein (render: light, light river, seal quarter, portal
+ *  arm, pour). The Heat is white-gold smith fire, never Ignivar's volcanic
+ *  orange-red. */
 export const SMITH_HEART_VEIN_COLORS: Readonly<Record<SmithHeartVein, number>> = {
   hammer: 0xc8903c,
   breath: 0x5ab8e8,
@@ -73,16 +87,45 @@ export const SMITH_HEART_VEIN_COLORS: Readonly<Record<SmithHeartVein, number>> =
   heat: 0xffe6a0,
 };
 
-/** The Ring: the circular gallery round the heart. `R` is its centre line. */
+/** Deterministic hash in [0, 1) of two integers (the outlines' jag; no rng
+ *  in a layout). */
+function hash01(a: number, b: number): number {
+  let h = (Math.imul(a | 0, 0x2c1b3c6d) ^ Math.imul(b | 0, 0x297a2d39)) >>> 0;
+  h = Math.imul(h ^ (h >>> 15), 0x85ebca6b) >>> 0;
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+
+/** A point at compass bearing `deg` (clockwise from north) on an ellipse. */
+function bearingPoint(
+  cx: number,
+  cz: number,
+  deg: number,
+  rx: number,
+  rz: number,
+): [number, number] {
+  const a = (deg * Math.PI) / 180;
+  return [cx + Math.sin(a) * rx, cz + Math.cos(a) * rz];
+}
+
+// ---- the main map: the Ring and the Seal Dais ---------------------------------------
+
+/** The Ring: the circular gallery round the heart seal. `R` is its centre line. */
 export const RING = { x: 0, z: 0, R: 70, innerR: 62, outerR: 78, h: H.ring } as const;
 /** The Ring's arc (degrees, clockwise from north): it runs the long way round
  *  from the west stair's foot to the east stair's foot, through the north. */
 export const RING_ARC = { fromDeg: 222, toDeg: 498 } as const;
 
-/** The Heart: the open-sky caldera where the final boss forms. */
-export const HEART = { x: 0, z: 0, r: 38, h: H.heart } as const;
-/** The seal at the Heart's centre (render: the four-colour progress disc). */
+/** The Seal Dais: a round anvil-stone floating over the void in the middle of
+ *  the Ring, a little below it (the whole Ring looks down onto the seal). */
+export const SEAL_DAIS = { x: 0, z: 0, r: 19, h: H.dais } as const;
+/** The seal at the dais's centre (render: the four-colour progress disc). */
 export const HEART_SEAL = { x: 0, z: 0, r: 9 } as const;
+/** The portal the seal opens into (its walk-in trigger radius). */
+export const RING_PORTAL = { x: 0, z: 0, r: 4 } as const;
+/** Where the Heart's return portal sets the raid down: on the dais, facing
+ *  the Grand Stair (sim facing, 0 = +z), clear of the portal's trigger. */
+export const RING_PORTAL_LANDING = { x: 0, z: -12, facing: Math.PI } as const;
 
 /** A point on the Ring's circle at `deg` (clockwise from north) and radius `r`. */
 export function ringPoint(deg: number, r: number = RING.R): { x: number; z: number } {
@@ -90,108 +133,208 @@ export function ringPoint(deg: number, r: number = RING.R): { x: number; z: numb
   return { x: RING.x + Math.sin(a) * r, z: RING.z + Math.cos(a) * r };
 }
 
-/** The four altars at the Heart's rim, one before each vein's mouth. The
- *  raid touches one to choose the final boss's form (phase 2). */
-export const HEART_ALTARS: readonly { vein: SmithHeartVein; x: number; z: number }[] = [
-  { vein: 'breath', ...ringPoint(0, 31) },
-  { vein: 'quench', ...ringPoint(90, 31) },
-  { vein: 'hammer', ...ringPoint(180, 31) },
-  { vein: 'heat', ...ringPoint(270, 31) },
-];
+// ---- the main map: the Hammer (south-west to south) ---------------------------------
 
 /** The Cleft: the world entrance's landing, high in the south-west. */
-export const CLEFT = { x: -100, z: -226, r: 12, h: H.cleft } as const;
+export const CLEFT = { x: -198, z: -212, r: 12, h: H.cleft } as const;
 /** The Hammer Gallery's three landings (packs h1, h2, h3). */
 export const GALLERY_LANDINGS = {
-  h1: { x: -50, z: -232, r: 12, h: H.galleryUpper },
-  h2: { x: 10, z: -234, r: 12, h: H.galleryMiddle },
-  h3: { x: 62, z: -200, r: 12, h: H.galleryLower },
+  h1: { x: -150, z: -226, r: 12, h: H.galleryUpper },
+  h2: { x: -98, z: -232, r: 12, h: H.galleryMiddle },
+  h3: { x: -66, z: -206, r: 12, h: H.galleryLower },
 } as const;
-/** The Hammer Pit, the first guardian's arena (60 yd across). */
-export const HAMMER_PIT = { x: 0, z: -150, r: 30, h: H.pit } as const;
+/** The Smith's Quarry, the first guardian's arena: a deep pit, about 92 by 80
+ *  yd, under stepped terraces on its east and south sides. */
+export const HAMMER_PIT = { x: 8, z: -170, rx: 46, rz: 40, h: H.pit } as const;
+/** The quarry's terraces (unreachable steps cut into the mountain): how far
+ *  each step reaches past the pit's rim and its height. The colossi stand on
+ *  the deep top step. The steps span bearings `fromDeg` to `toDeg` from the
+ *  pit's centre (east and south, clockwise), facing the gallery's descent. */
+export const QUARRY_TERRACES = {
+  fromDeg: 35,
+  toDeg: 215,
+  steps: [
+    { out: 7, h: 21 },
+    { out: 14, h: 28 },
+    { out: 21, h: 35 },
+    { out: 33, h: 42 },
+  ],
+} as const;
 /** The Slab: the living stone that seals the way to the heart. */
-export const SLAB = { x: 0, z: -121 } as const;
+export const SLAB = { x: 0, z: -124 } as const;
 /** The Balcony: the first view, jutting out over the void toward the seal. */
 export const BALCONY = { x0: -12, z0: -114, x1: 12, z1: -58, h: H.balcony } as const;
+/** The Grand Stair: from the Balcony's tip down across the void to the dais. */
+export const GRAND_STAIR = { halfWidth: 8, top: -58, foot: -SEAL_DAIS.r } as const;
 
-/** The Breath (north): three landings and the Cornice arena (60 yd). */
+// ---- the main map: the Breath (north, high) -----------------------------------------
+
+/** The Breath: three landings and the Storm Cornice (about 100 by 80 yd). */
 export const BREATH = {
   b1: { x: 0, z: 104, r: 13, h: H.breathLow },
-  b2: { x: 44, z: 134, r: 11, h: H.breathMid },
-  b3: { x: -44, z: 160, r: 11, h: H.breathHigh },
-  cornice: { x: 0, z: 206, r: 30, h: H.cornice },
+  b2: { x: -64, z: 112, r: 11, h: H.breathMid },
+  b3: { x: -112, z: 170, r: 11, h: H.breathHigh },
+  cornice: { x: 0, z: 196, rx: 50, rz: 40, h: H.cornice },
 } as const;
 /** The Wind Bridge: the natural rock arch between the Breath's second and
  *  third landings (gusts in rhythm, phase 2). */
-export const WIND_BRIDGE = { fromX: 16, fromZ: 150, toX: -20, toZ: 158, halfWidth: 6.5 } as const;
+export const WIND_BRIDGE = {
+  fromX: -67,
+  fromZ: 121,
+  toX: -101,
+  toZ: 159,
+  halfWidth: 6.5,
+} as const;
+/** The cornice's wind channels: notches cut into the plateau from its rim,
+ *  where the updraft howls up out of the mountain (bearing from the cornice's
+ *  centre, depth in yards, half the opening in degrees). */
+export const CORNICE_CHANNELS: readonly { deg: number; depth: number; halfDeg: number }[] = [
+  { deg: 22, depth: 14, halfDeg: 7 },
+  { deg: 78, depth: 16, halfDeg: 6 },
+  { deg: 128, depth: 12, halfDeg: 7 },
+  { deg: 182, depth: 13, halfDeg: 6 },
+  { deg: 332, depth: 15, halfDeg: 6 },
+];
 
-/** The Quench (east): two landings, the Singing Ice sheet, the Frozen Lake. */
+// ---- the main map: the Quench (east, low) -------------------------------------------
+
+/** The Quench: two landings, the Singing Ice sheet, the Quench Basin (its
+ *  rock shelf and the frozen lake on it, about 96 by 92 yd). */
 export const QUENCH = {
   q1: { x: 110, z: 0, r: 12, h: H.quenchUpper },
-  q2: { x: 130, z: -40, r: 12, h: H.quenchMiddle },
-  ice: { x0: 150, z0: -62, x1: 182, z1: -36, h: H.quenchShelf },
-  shelf: { x: 186, z: 10, r: 40, h: H.lake },
-  lake: { x: 186, z: 10, r: 32, h: H.lake },
+  q2: { x: 122, z: -48, r: 12, h: H.quenchMiddle },
+  ice: { x0: 140, z0: -100, x1: 178, z1: -72, h: H.quenchShelf },
+  shelf: { x: 198, z: -2, rx: 48, rz: 46, h: H.lake },
+  lake: { x: 198, z: -2, rx: 37, rz: 35, h: H.lake },
 } as const;
 
-/** The Heat (west): the forge hall, the casting floor, the Anvil arena. */
+// ---- the main map: the Heat (west, level) -------------------------------------------
+
+/** The Heat: the forge hall, the casting floor, the Smith's Forge arena. */
 export const HEAT = {
-  hall: { x0: -122, z0: -14, x1: -74, z1: 14, h: H.heat },
-  floor: { x0: -160, z0: -34, x1: -120, z1: 34, h: H.heat },
-  anvil: { x: -192, z: 0 },
+  hall: { x0: -124, z0: -14, x1: -76, z1: 14, h: H.heat },
+  floor: { x0: -164, z0: -36, x1: -124, z1: 36, h: H.heat },
+  forge: { x: -214, z: 0 },
 } as const;
 /** The Pour Channel: where the great crucible's colada crosses the casting
  *  floor's path (render strip now, a timed hazard in phase 2). */
-export const POUR_CHANNEL = { x: -132, z0: -34, z1: 34, halfWidth: 2.5 } as const;
-
-/** The Anvil: the Heat guardian's platform, shaped like an anvil whose horn
- *  points west, between channels of molten metal (the void). */
-const ANVIL_POINTS: readonly (readonly [number, number])[] = [
-  [-172, -18],
-  [-178, -22],
-  [-204, -22],
-  [-206, -14],
-  [-214, -10],
-  [-226, -3],
-  [-228, 0],
-  [-226, 3],
-  [-214, 10],
-  [-206, 14],
-  [-204, 22],
-  [-178, 22],
-  [-172, 18],
+export const POUR_CHANNEL = { x: -150, z0: -36, z1: 36, halfWidth: 2.5 } as const;
+/** The Smith's Forge: an eight-sided hall of the Smith's own smithy, the
+ *  great hearth in its west wall (render: beyond the floor's edge). */
+const FORGE_POINTS: readonly (readonly [number, number])[] = [
+  [-174, -22],
+  [-182, -38],
+  [-200, -46],
+  [-230, -46],
+  [-248, -36],
+  [-256, -16],
+  [-256, 16],
+  [-248, 36],
+  [-230, 46],
+  [-200, 46],
+  [-182, 38],
+  [-174, 22],
 ];
+/** The great hearth: the forge's mouth in the rock behind the west wall
+ *  (render only; nothing of it stands over the floor). */
+export const GREAT_HEARTH = { x: -263, z: 0, halfWidth: 18 } as const;
+/** The giant anvil, side-on to the arena's door (horn north). */
+export const GIANT_ANVIL = { x: -236, z: 0, hw: 3.2, hd: 8.5, h: 9 } as const;
+
+// ---- the Heart: the separate final room ---------------------------------------------
+
+/** The Anvil of the World: the final boss's platform (84 yd across), hung by
+ *  four chains over the Smith's glowing heart. */
+export const HEART_ROOM = { x: 188, z: 172, r: 42, h: H.heartRoom } as const;
+/** The open air round the platform (its chasm, down to the glowing heart):
+ *  no rock stands within this radius of the room's centre. */
+export const HEART_ROOM_CHASM_R = 70;
+/** The Arrival Terrace, south-west of the platform, outside the boss's reach. */
+export const HEART_TERRACE = { x: 138.5, z: 122.5, r: 13, h: H.heartTerrace } as const;
+/** Where the Ring's portal sets the raid down (facing the platform). */
+export const HEART_ARRIVAL = { x: 141, z: 125, facing: Math.PI / 4 } as const;
+/** The return portal on the terrace's west side, back to the Seal Dais: to
+ *  the side of the arrival, never behind it (a camera behind a player who
+ *  just arrived never stands in it). */
+export const HEART_RETURN_PORTAL = { x: 132.5, z: 128.5, r: 3.5 } as const;
+/** Everything of the Heart lies within this radius of the room's centre; the
+ *  main map lies wholly outside it (the area split for music, fog, sky). */
+export const HEART_ROOM_AREA_R = 125;
+
+/** The four altars round the Anvil of the World, one per vein at its compass
+ *  point; each takes its vein's light down its chain. */
+export const HEART_ALTARS: readonly { vein: SmithHeartVein; x: number; z: number }[] = [
+  { vein: 'breath', x: HEART_ROOM.x, z: HEART_ROOM.z + 36 },
+  { vein: 'quench', x: HEART_ROOM.x + 36, z: HEART_ROOM.z },
+  { vein: 'hammer', x: HEART_ROOM.x, z: HEART_ROOM.z - 36 },
+  { vein: 'heat', x: HEART_ROOM.x - 36, z: HEART_ROOM.z },
+];
+
+/** The unit vector from the terrace toward the platform's centre. */
+const TU = (() => {
+  const dx = HEART_ROOM.x - HEART_TERRACE.x;
+  const dz = HEART_ROOM.z - HEART_TERRACE.z;
+  const l = Math.hypot(dx, dz);
+  return { x: dx / l, z: dz / l };
+})();
+/** A point `s` yards from the terrace's centre toward the platform. */
+function towardHeart(s: number): { x: number; z: number } {
+  return { x: HEART_TERRACE.x + TU.x * s, z: HEART_TERRACE.z + TU.z * s };
+}
+/** The Heart Bridge's gate: sealed behind the raid while the final boss fights. */
+export const HEART_BRIDGE_GATE = { ...towardHeart(22), dx: TU.x, dz: TU.z } as const;
+
+/** Is (x, z) in the Heart (the separate final room)? Instance-local. */
+export function inSmithHeartRoom(x: number, z: number): boolean {
+  return Math.hypot(x - HEART_ROOM.x, z - HEART_ROOM.z) < HEART_ROOM_AREA_R;
+}
+
+/** The named areas (music, fog, sky): the main map's veins and the Heart. */
+export type SmithHeartArea = 'hammer' | 'ring' | 'breath' | 'quench' | 'heat' | 'heart';
+
+/** Which area holds instance-local (x, z). Pure. */
+export function smithHeartAreaAt(x: number, z: number): SmithHeartArea {
+  if (inSmithHeartRoom(x, z)) return 'heart';
+  if (Math.hypot(x, z) <= RING.outerR + 6) return 'ring';
+  if (z > 80 && x < 90) return 'breath';
+  if (x > 80) return 'quench';
+  if (x < -76 && z > -80) return 'heat';
+  return 'hammer';
+}
+
+// ---- bosses and anchors -------------------------------------------------------------
 
 /** Where each boss stands. */
 export const SMITH_HEART_BOSS_SPOTS = {
   hammer: { x: HAMMER_PIT.x, z: HAMMER_PIT.z },
-  breath: { x: BREATH.cornice.x, z: BREATH.cornice.z + 4 },
+  breath: { x: BREATH.cornice.x, z: BREATH.cornice.z + 2 },
   quench: { x: QUENCH.lake.x, z: QUENCH.lake.z },
-  heat: { x: -196, z: 0 },
-  final: { x: 0, z: 0 },
+  heat: { x: -210, z: 0 },
+  final: { x: HEART_ROOM.x, z: HEART_ROOM.z },
 } as const;
 
 /** Named anchors: the entry, dev teleports and the renderer's set pieces. */
 export const SMITH_HEART_ANCHORS = {
-  entry: { x: -100, z: -224 },
-  exit: { x: -104, z: -232 },
-  cleft: { x: -100, z: -226 },
-  gallery: { x: 10, z: -234 },
-  pit: { x: 0, z: -166 },
-  balcony: { x: 0, z: -64 },
+  entry: { x: -196, z: -210 },
+  exit: { x: -204, z: -217 },
+  cleft: { x: -198, z: -212 },
+  gallery: { x: -98, z: -232 },
+  pit: { x: -22, z: -172 },
+  balcony: { x: 0, z: -70 },
   ring: { x: 0, z: 70 },
   ringSouthEast: ringPoint(125),
   ringSouthWest: ringPoint(235),
   breath: { x: 0, z: 100 },
-  bridge: { x: 0, z: 154 },
-  cornice: { x: -10, z: 190 },
-  quench: { x: 104, z: 0 },
-  ice: { x: 158, z: -49 },
-  lake: { x: 174, z: -12 },
+  bridge: { x: -84, z: 140 },
+  cornice: { x: -32, z: 194 },
+  quench: { x: 106, z: 0 },
+  ice: { x: 156, z: -86 },
+  lake: { x: 186, z: -36 },
   heat: { x: -90, z: 0 },
   forge: { x: -140, z: 0 },
-  anvil: { x: -178, z: 0 },
-  heart: { x: 0, z: -30 },
+  anvil: { x: -186, z: 0 },
+  portal: { x: RING_PORTAL_LANDING.x, z: RING_PORTAL_LANDING.z },
+  heartRoom: { x: HEART_ARRIVAL.x, z: HEART_ARRIVAL.z },
 } as const;
 
 /**
@@ -199,44 +342,55 @@ export const SMITH_HEART_ANCHORS = {
  * vein to the heart seal (render; a river lights up when its guardian dies).
  * Each is a polyline of instance-local points; the renderer drapes it on the
  * floor. They run the vein's walking line, so following the light always
- * leads to the guardian.
+ * leads to the guardian; the last leg leaps the void onto the dais.
  */
 export const LIGHT_RIVERS: Readonly<Record<SmithHeartVein, readonly { x: number; z: number }[]>> = {
   hammer: [
-    { x: 0, z: -150 },
-    { x: 0, z: -112 },
+    { x: 8, z: -170 },
+    { x: 2, z: -142 },
+    { x: 0, z: -128 },
+    { x: 0, z: -110 },
     { x: 0, z: -58 },
-    { x: 0, z: -38 },
+    { x: 0, z: -19 },
     { x: 0, z: -9 },
   ],
   breath: [
-    { x: 0, z: 206 },
-    { x: -22, z: 196 },
-    { x: -42, z: 172 },
-    { x: -44, z: 160 },
-    { x: -20, z: 158 },
-    { x: 16, z: 150 },
-    { x: 40, z: 131 },
-    { x: 44, z: 134 },
-    { x: 11, z: 113 },
+    { x: 0, z: 198 },
+    { x: -30, z: 194 },
+    { x: -60, z: 193 },
+    { x: -104, z: 179 },
+    { x: -112, z: 170 },
+    { x: -101, z: 159 },
+    { x: -67, z: 121 },
+    { x: -64, z: 112 },
+    { x: -48, z: 112 },
+    { x: -13, z: 109 },
     { x: 0, z: 104 },
+    { x: 0, z: 78 },
+    { x: 0, z: 62 },
     { x: 0, z: 9 },
   ],
   quench: [
-    { x: 186, z: 10 },
-    { x: 183, z: -26 },
-    { x: 178, z: -36 },
-    { x: 166, z: -49 },
-    { x: 139, z: -47 },
-    { x: 130, z: -40 },
-    { x: 117, z: -13 },
+    { x: 198, z: -2 },
+    { x: 190, z: -44 },
+    { x: 175, z: -72 },
+    { x: 160, z: -86 },
+    { x: 144, z: -79 },
+    { x: 130, z: -60 },
+    { x: 122, z: -48 },
+    { x: 120, z: -32 },
+    { x: 115, z: -13 },
     { x: 110, z: 0 },
+    { x: 78, z: 0 },
+    { x: 62, z: 0 },
     { x: 9, z: 0 },
   ],
   heat: [
-    { x: -192, z: 0 },
-    { x: -132, z: 0 },
-    { x: -74, z: 0 },
+    { x: -210, z: 0 },
+    { x: -174, z: 0 },
+    { x: -104, z: 0 },
+    { x: -78, z: 0 },
+    { x: -62, z: 0 },
     { x: -9, z: 0 },
   ],
 };
@@ -270,6 +424,62 @@ function disc(
   return { kind: 'circle', id, x: c.x, z: c.z, r: c.r, h: c.h, ...extra };
 }
 
+/** A carved ellipse: its outline bites in by up to `jag` yards here and there
+ *  (deterministic), so the rim reads as cut rock, never a lathe. */
+function carvedEllipse(
+  id: string,
+  e: { x: number; z: number; rx: number; rz: number; h: number },
+  jag: number,
+  seed: number,
+  extra: Partial<Pick<FieldSurface, 'edge' | 'ground'>> = {},
+  stepDeg = 8,
+): FieldSurface {
+  const points: [number, number][] = [];
+  for (let d = 0, k = 0; d < 360; d += stepDeg, k++) {
+    const bite = jag * hash01(k, seed);
+    points.push(bearingPoint(e.x, e.z, d, e.rx - bite, e.rz - bite));
+  }
+  return { kind: 'poly', id, points, h: e.h, ...extra };
+}
+
+/** One quarry step: the sector from the pit's centre out to the step's reach,
+ *  over the terraces' bearings (the pit's own floor, drawn later, wins inside
+ *  its rim). */
+function quarryStep(i: number): FieldSurface {
+  const step = QUARRY_TERRACES.steps[i];
+  const P = HAMMER_PIT;
+  const points: [number, number][] = [[P.x, P.z]];
+  for (let d = QUARRY_TERRACES.fromDeg, k = 0; d <= QUARRY_TERRACES.toDeg; d += 6, k++) {
+    const bite = 2.2 * hash01(k, 31 + i);
+    points.push(bearingPoint(P.x, P.z, d, P.rx + step.out - bite, P.rz + step.out - bite));
+  }
+  return {
+    kind: 'poly',
+    id: `quarry_step_${i + 1}`,
+    points,
+    h: step.h,
+    edge: 'rock',
+    ground: 'earth',
+  };
+}
+
+/** The Storm Cornice: a cracked plateau, its rim cut by the wind channels. */
+function cornice(): FieldSurface {
+  const C = BREATH.cornice;
+  const points: [number, number][] = [];
+  for (let d = 0, k = 0; d < 360; d += 3, k++) {
+    let bite = 1.6 * hash01(k, 47);
+    for (const ch of CORNICE_CHANNELS) {
+      let off = Math.abs(d - ch.deg) % 360;
+      if (off > 180) off = 360 - off;
+      // A V cut: deepest on the channel's line, gone at its opening's edge.
+      if (off < ch.halfDeg) bite = Math.max(bite, ch.depth * (1 - off / ch.halfDeg));
+    }
+    points.push(bearingPoint(C.x, C.z, d, C.rx - bite, C.rz - bite));
+  }
+  return { kind: 'poly', id: 'storm_cornice', points, h: C.h, edge: 'rock', ground: 'slate' };
+}
+
 /** The Ring as one flat annulus sector (clockwise from `fromDeg` to `toDeg`). */
 function ringSector(): FieldSurface {
   const pts: [number, number][] = [];
@@ -288,8 +498,7 @@ function ringSector(): FieldSurface {
 /**
  * One Balcony Stair, following the Ring's circle from the Balcony down to the
  * Ring: flat from `topDeg` for 4 degrees, down to the Ring by `footDeg` (+-6
- * degrees of flat run into the Ring). `dir` is +1 for the west stair
- * (clockwise), -1 for the east.
+ * degrees of flat run into the Ring).
  */
 function balconyStair(id: string, topDeg: number, footDeg: number): FieldSurface {
   const dir = Math.sign(footDeg - topDeg);
@@ -318,246 +527,232 @@ function balconyStair(id: string, topDeg: number, footDeg: number): FieldSurface
   };
 }
 
-/** A straight causeway from the Ring down across the void into the Heart. */
-function causeway(id: string, deg: number): FieldSurface {
-  const at = (r: number, h: number): [number, number, number] => {
-    const p = ringPoint(deg, r);
-    return [p.x, p.z, h];
-  };
+function path(
+  id: string,
+  points: readonly (readonly [number, number, number])[],
+  extra: Partial<Pick<FieldSurface, 'edge' | 'ground'>> & { stairs?: boolean; halfWidth?: number },
+): FieldSurface {
   return {
     kind: 'path',
     id,
-    points: [at(66, H.ring), at(61, H.ring), at(40, H.heart), at(34, H.heart)],
-    halfWidth: 7,
-    edge: 'balustrade',
-    ground: 'slate',
+    points,
+    halfWidth: extra.halfWidth ?? 7,
+    ...(extra.stairs ? { stairs: true } : {}),
+    edge: extra.edge ?? 'rock',
+    ground: extra.ground ?? 'slate',
   };
 }
 
+const bridgeA = towardHeart(8);
+const bridgeB = towardHeart(12);
+const bridgeC = towardHeart(27);
+const bridgeD = towardHeart(32);
+
 const AUTHORED_SURFACES: FieldSurface[] = [
-  // --- The Hammer (south): the Cleft, the Gallery, the Pit ---------------------------
+  // --- The Hammer (south): the Cleft, the Gallery, the Quarry ------------------------
   disc('cleft', CLEFT, { edge: 'rock', ground: 'slate' }),
-  {
-    kind: 'path',
-    id: 'gallery_upper',
-    points: [
-      [-96, -227, H.cleft],
-      [-90, -228, H.cleft],
-      [-60, -231, H.galleryUpper],
-      [-54, -232, H.galleryUpper],
+  path(
+    'gallery_upper',
+    [
+      [-192, -214, H.cleft],
+      [-188, -215, H.cleft],
+      [-160, -223, H.galleryUpper],
+      [-155, -224, H.galleryUpper],
     ],
-    halfWidth: 7,
-    edge: 'rock',
-    ground: 'earth',
-  },
+    { ground: 'earth' },
+  ),
   disc('gallery_h1', GALLERY_LANDINGS.h1, { edge: 'rock', ground: 'earth' }),
-  {
-    kind: 'path',
-    id: 'gallery_middle',
-    points: [
-      [-46, -232, H.galleryUpper],
-      [-40, -232, H.galleryUpper],
-      [-2, -234, H.galleryMiddle],
-      [4, -234, H.galleryMiddle],
+  path(
+    'gallery_middle',
+    [
+      [-144, -227, H.galleryUpper],
+      [-139, -228, H.galleryUpper],
+      [-108, -231, H.galleryMiddle],
+      [-103, -232, H.galleryMiddle],
     ],
-    halfWidth: 7,
-    edge: 'rock',
-    ground: 'earth',
-  },
+    { ground: 'earth' },
+  ),
   disc('gallery_h2', GALLERY_LANDINGS.h2, { edge: 'rock', ground: 'earth' }),
-  {
-    kind: 'path',
-    id: 'gallery_lower',
-    points: [
-      [16, -232, H.galleryMiddle],
-      [22, -230, H.galleryMiddle],
-      [54, -208, H.galleryLower],
-      [58, -204, H.galleryLower],
+  path(
+    'gallery_lower',
+    [
+      [-92, -228, H.galleryMiddle],
+      [-88, -225, H.galleryMiddle],
+      [-74, -212, H.galleryLower],
+      [-70, -209, H.galleryLower],
     ],
-    halfWidth: 7,
-    edge: 'rock',
-    ground: 'earth',
-  },
+    { ground: 'earth' },
+  ),
   disc('gallery_h3', GALLERY_LANDINGS.h3, { edge: 'rock', ground: 'earth' }),
-  {
-    kind: 'path',
-    id: 'pit_descent',
-    points: [
-      [56, -196, H.galleryLower],
-      [50, -191, H.galleryLower],
-      [24, -170, H.pit],
-      [20, -166, H.pit],
+  // The quarry's steps, deepest reach first (each later, lower step wins
+  // nearer the pit), then the pit's own floor.
+  quarryStep(3),
+  quarryStep(2),
+  quarryStep(1),
+  quarryStep(0),
+  carvedEllipse('hammer_pit', HAMMER_PIT, 3, 13, { edge: 'rock', ground: 'earth' }),
+  path(
+    'pit_descent',
+    [
+      [-58, -200, H.galleryLower],
+      [-54, -197, H.galleryLower],
+      [-35, -179, H.pit],
+      [-28, -174, H.pit],
     ],
-    halfWidth: 7,
-    stairs: true,
-    edge: 'rock',
-    ground: 'slate',
-  },
-  disc('hammer_pit', HAMMER_PIT, { edge: 'rock', ground: 'earth' }),
-  // --- The Slab and the Balcony -------------------------------------------------------
-  {
-    kind: 'path',
-    id: 'slab_stair',
-    points: [
-      [0, -128, H.pit],
-      [0, -124, H.pit],
-      [0, -114, H.balcony],
+    { stairs: true },
+  ),
+  // --- The Slab, the Balcony and the Grand Stair --------------------------------------
+  path(
+    'slab_stair',
+    [
+      [0, -137, H.pit],
+      [0, -132, H.pit],
+      [0, -118, H.balcony],
       [0, -110, H.balcony],
     ],
-    halfWidth: 7,
-    stairs: true,
-    edge: 'rock',
-    ground: 'slate',
-  },
+    { stairs: true },
+  ),
   rect('balcony', BALCONY, { edge: 'balustrade', ground: 'slate' }),
-  // --- The Ring and its two stairs ----------------------------------------------------
+  path(
+    'grand_stair',
+    [
+      [0, -63, H.balcony],
+      [0, GRAND_STAIR.top, H.balcony],
+      [0, -23, H.dais],
+      [0, -15, H.dais],
+    ],
+    { stairs: true, edge: 'balustrade', halfWidth: GRAND_STAIR.halfWidth },
+  ),
+  // --- The Ring, its two stairs and the Seal Dais -------------------------------------
   ringSector(),
   balconyStair('balcony_stair_east', 172, 142),
   balconyStair('balcony_stair_west', 188, 218),
-  // --- The Breath (north): climbs to the Cornice --------------------------------------
-  {
-    kind: 'path',
-    id: 'breath_mouth',
-    points: [
+  disc('seal_dais', SEAL_DAIS, { edge: 'balustrade', ground: 'ritual' }),
+  // --- The Breath (north): climbs to the Storm Cornice ---------------------------------
+  path(
+    'breath_mouth',
+    [
       [0, 74, H.ring],
       [0, 80, H.ring],
       [0, 92, H.breathLow],
       [0, 96, H.breathLow],
     ],
-    halfWidth: 7,
-    edge: 'rock',
-    ground: 'slate',
-  },
+    {},
+  ),
   disc('breath_b1', BREATH.b1, { edge: 'rock', ground: 'slate' }),
-  {
-    kind: 'path',
-    id: 'breath_chimney',
-    points: [
-      [6, 110, H.breathLow],
-      [11, 113, H.breathLow],
-      [36, 129, H.breathMid],
-      [40, 131, H.breathMid],
+  path(
+    'breath_chimney',
+    [
+      [-8, 108, H.breathLow],
+      [-13, 109, H.breathLow],
+      [-50, 112, H.breathMid],
+      [-57, 112, H.breathMid],
     ],
-    halfWidth: 7,
-    stairs: true,
-    edge: 'rock',
-    ground: 'slate',
-  },
+    { stairs: true },
+  ),
   disc('breath_b2', BREATH.b2, { edge: 'rock', ground: 'slate' }),
-  {
-    kind: 'path',
-    id: 'wind_bridge',
-    points: [
-      [38, 138, H.breathMid],
-      [33, 141, H.breathMid],
-      [WIND_BRIDGE.fromX, WIND_BRIDGE.fromZ, 24],
-      [WIND_BRIDGE.toX, WIND_BRIDGE.toZ, 36],
-      [-33, 160, H.breathHigh],
-      [-38, 160, H.breathHigh],
+  path(
+    'wind_bridge',
+    [
+      [-65, 118, H.breathMid],
+      [WIND_BRIDGE.fromX, WIND_BRIDGE.fromZ, H.breathMid],
+      [WIND_BRIDGE.toX, WIND_BRIDGE.toZ, H.breathHigh],
+      [-106, 165, H.breathHigh],
     ],
-    halfWidth: WIND_BRIDGE.halfWidth,
-    edge: 'balustrade',
-    ground: 'slate',
-  },
+    { edge: 'balustrade', halfWidth: WIND_BRIDGE.halfWidth },
+  ),
   disc('breath_b3', BREATH.b3, { edge: 'rock', ground: 'slate' }),
-  {
-    kind: 'path',
-    id: 'cornice_climb',
-    points: [
-      [-44, 166, H.breathHigh],
-      [-42, 172, H.breathHigh],
-      [-22, 196, H.cornice],
-      [-18, 199, H.cornice],
+  path(
+    'cornice_climb',
+    [
+      [-108, 176, H.breathHigh],
+      [-104, 179, H.breathHigh],
+      [-64, 193, H.cornice],
+      [-42, 195, H.cornice],
     ],
-    halfWidth: 7,
-    stairs: true,
-    edge: 'rock',
-    ground: 'slate',
-  },
-  disc('breath_cornice', BREATH.cornice, { edge: 'balustrade', ground: 'slate' }),
-  // --- The Quench (east): descends to the Frozen Lake ---------------------------------
-  {
-    kind: 'path',
-    id: 'quench_mouth',
-    points: [
+    { stairs: true },
+  ),
+  cornice(),
+  // --- The Quench (east): descends to the Quench Basin --------------------------------
+  path(
+    'quench_mouth',
+    [
       [74, 0, H.ring],
       [80, 0, H.ring],
       [98, 0, H.quenchUpper],
       [102, 0, H.quenchUpper],
     ],
-    halfWidth: 7,
-    stairs: true,
-    edge: 'rock',
-    ground: 'slate',
-  },
+    { stairs: true },
+  ),
   disc('quench_q1', QUENCH.q1, { edge: 'rock', ground: 'snow' }),
-  {
-    kind: 'path',
-    id: 'quench_stair',
-    points: [
-      [114, -8, H.quenchUpper],
-      [117, -13, H.quenchUpper],
-      [127, -29, H.quenchMiddle],
-      [129, -33, H.quenchMiddle],
+  path(
+    'quench_stair',
+    [
+      [113, -9, H.quenchUpper],
+      [115, -13, H.quenchUpper],
+      [120, -32, H.quenchMiddle],
+      [121, -38, H.quenchMiddle],
     ],
-    halfWidth: 7,
-    stairs: true,
-    edge: 'rock',
-    ground: 'snow',
-  },
+    { stairs: true, ground: 'snow' },
+  ),
   disc('quench_q2', QUENCH.q2, { edge: 'rock', ground: 'snow' }),
-  {
-    kind: 'path',
-    id: 'quench_shelf_stair',
-    points: [
-      [135, -45, H.quenchMiddle],
-      [139, -47, H.quenchMiddle],
-      [152, -49, H.quenchShelf],
-      [156, -49, H.quenchShelf],
+  path(
+    'quench_shelf_stair',
+    [
+      [127, -56, H.quenchMiddle],
+      [130, -60, H.quenchMiddle],
+      [141, -75, H.quenchShelf],
+      [144, -79, H.quenchShelf],
     ],
-    halfWidth: 7,
-    stairs: true,
-    edge: 'rock',
-    ground: 'snow',
-  },
+    { stairs: true, ground: 'snow' },
+  ),
   rect('singing_ice', QUENCH.ice, { edge: 'rock', ground: 'ice' }),
-  {
-    kind: 'path',
-    id: 'lake_descent',
-    points: [
-      [176, -40, H.quenchShelf],
-      [178, -36, H.quenchShelf],
-      [183, -26, H.lake],
-      [184, -22, H.lake],
+  path(
+    'lake_descent',
+    [
+      [172, -76, H.quenchShelf],
+      [175, -72, H.quenchShelf],
+      [188, -50, H.lake],
+      [190, -44, H.lake],
     ],
-    halfWidth: 7,
-    edge: 'rock',
-    ground: 'snow',
-  },
-  disc('lake_shelf', QUENCH.shelf, { edge: 'rock', ground: 'slate' }),
-  disc('frozen_lake', QUENCH.lake, { edge: 'rock', ground: 'ice' }),
+    { ground: 'snow' },
+  ),
+  carvedEllipse('lake_shelf', QUENCH.shelf, 3, 71, { edge: 'rock', ground: 'snow' }),
+  carvedEllipse('frozen_lake', QUENCH.lake, 2, 73, { edge: 'rock', ground: 'ice' }, 10),
   // --- The Heat (west): the Smith's forge, level with the Ring ------------------------
   rect('forge_hall', HEAT.hall, { edge: 'masonry', ground: 'soot' }),
   rect('casting_floor', HEAT.floor, { edge: 'masonry', ground: 'soot' }),
-  {
-    kind: 'path',
-    id: 'anvil_bridge',
-    points: [
-      [-156, 0, H.heat],
+  path(
+    'anvil_bridge',
+    [
       [-160, 0, H.heat],
-      [-170, 0, H.heat],
+      [-164, 0, H.heat],
       [-174, 0, H.heat],
+      [-178, 0, H.heat],
     ],
-    halfWidth: 7,
+    { edge: 'masonry', ground: 'plate' },
+  ),
+  {
+    kind: 'poly',
+    id: 'smiths_forge',
+    points: FORGE_POINTS,
+    h: H.heat,
     edge: 'masonry',
     ground: 'plate',
   },
-  { kind: 'poly', id: 'anvil', points: ANVIL_POINTS, h: H.heat, edge: 'masonry', ground: 'plate' },
-  // --- The Heart (the final caldera) and its three causeways --------------------------
-  disc('heart', HEART, { edge: 'balustrade', ground: 'ritual' }),
-  causeway('causeway_north', 0),
-  causeway('causeway_east', 90),
-  causeway('causeway_west', 270),
+  // --- The Heart (the separate final room) --------------------------------------------
+  disc('heart_terrace', HEART_TERRACE, { edge: 'balustrade', ground: 'slate' }),
+  disc('heart_anvil', HEART_ROOM, { edge: 'balustrade', ground: 'ritual' }),
+  path(
+    'heart_bridge',
+    [
+      [bridgeA.x, bridgeA.z, H.heartTerrace],
+      [bridgeB.x, bridgeB.z, H.heartTerrace],
+      [bridgeC.x, bridgeC.z, H.heartRoom],
+      [bridgeD.x, bridgeD.z, H.heartRoom],
+    ],
+    { edge: 'balustrade' },
+  ),
 ];
 
 /** Every path is drawn AFTER the floors it joins (a later surface wins where
@@ -568,55 +763,144 @@ const SURFACES: FieldSurface[] = [
   ...AUTHORED_SURFACES.filter((s) => s.kind === 'path'),
 ];
 
-// ---- props (blockout dressing; `r` or `hw`/`hd` add a collider) ----------------------
-// Kinds are the blockout renderer's keys (render/smith_heart). Nothing solid
-// stands on a walking line, a pack's spot, a gate's span or an arena's middle.
+/** The surfaces that float over open air (render: a shallow face and a keel
+ *  under them instead of a cliff down to the void floor). */
+export const SMITH_HEART_FLOATING_SURFACES: readonly string[] = [
+  'seal_dais',
+  'heart_anvil',
+  'heart_terrace',
+];
+
+// ---- props (kit placeholders; `r` or `hw`/`hd` add a collider) ----------------------
+// Kinds are the renderer's keys (render/smith_heart). Nothing solid stands on
+// a walking line, a pack's spot, a gate's span or an arena's middle.
+
+/** A prop at bearing `deg` and radius scale from an ellipse's centre. */
+function around(
+  c: { x: number; z: number; rx: number; rz: number },
+  deg: number,
+  out: number,
+): { x: number; z: number } {
+  const [x, z] = bearingPoint(c.x, c.z, deg, c.rx + out, c.rz + out);
+  return { x, z };
+}
+
+/** Facing from (x, z) toward (tx, tz) (sim and three yaw: 0 = +z). */
+function face(x: number, z: number, tx: number, tz: number): number {
+  return Math.atan2(tx - x, tz - z);
+}
 
 const ALTAR_PROPS: FieldProp[] = HEART_ALTARS.map((a) => ({
   kind: `sh_altar_${a.vein}`,
   x: a.x,
   z: a.z,
-  rot: Math.atan2(HEART.x - a.x, HEART.z - a.z),
-  r: 1.8,
-  h: 3,
+  rot: face(a.x, a.z, HEART_ROOM.x, HEART_ROOM.z),
+  r: 3,
+  h: 6,
 }));
 
-/** The Hammer Pit's columns (rise and fall in phase 2), on a 22 yd circle. */
-const PIT_COLUMNS: FieldProp[] = [30, 100, 170, 250, 320].map((deg) => {
+/** The quarry's columns (they rise and fall in phase 2), on a 24 yd circle:
+ *  the line-of-sight cover for Mountain's Wrath. */
+const PIT_COLUMNS: FieldProp[] = [20, 92, 164, 236, 308].map((deg) => {
   const a = (deg * Math.PI) / 180;
   return {
     kind: 'sh_pit_column',
-    x: HAMMER_PIT.x + Math.sin(a) * 22,
-    z: HAMMER_PIT.z + Math.cos(a) * 22,
+    x: HAMMER_PIT.x + Math.sin(a) * 24,
+    z: HAMMER_PIT.z + Math.cos(a) * 24,
     rot: a,
-    r: 2.2,
-    h: 9,
+    r: 2.6,
+    h: 13,
   };
 });
 
+/** The colossi: half-carved giants the Smith left in the quarry's top step,
+ *  kneeling over the pit. */
+const QUARRY_COLOSSI: FieldProp[] = [72, 128, 182].map((deg) => {
+  const p = around(HAMMER_PIT, deg, 27);
+  return {
+    kind: 'sh_quarry_colossus',
+    ...p,
+    rot: face(p.x, p.z, HAMMER_PIT.x, HAMMER_PIT.z),
+    scale: 1.35,
+    r: 7,
+    h: 31,
+  };
+});
+
+/** Cut blocks on the lower steps, and the derrick that lifted them. */
+const QUARRY_BLOCKS: FieldProp[] = [
+  { deg: 52, out: 10.5 },
+  { deg: 100, out: 3.6 },
+  { deg: 150, out: 10.5 },
+  { deg: 205, out: 17.5 },
+].map((b, i) => ({
+  kind: 'sh_quarry_block',
+  ...around(HAMMER_PIT, b.deg, b.out),
+  rot: 0.3 + i * 0.7,
+  hw: 2.4,
+  hd: 2.4,
+  h: 7.4,
+}));
+
 /** The Frozen Lake's braziers on its rock shelf (the Quench form's warmth). */
 const LAKE_BRAZIERS: FieldProp[] = [40, 140, 220, 320].map((deg) => {
-  const a = (deg * Math.PI) / 180;
+  const p = around(QUENCH.shelf, deg, -5);
+  return { kind: 'sh_brazier', ...p, rot: 0, r: 1, h: 2 };
+});
+
+/** The Smith's quenched blades, half-sunk in the lake ice (great swords
+ *  three to six times a body's height). */
+const SUNK_BLADES: FieldProp[] = [
+  { deg: 20, out: -12, tilt: 0 },
+  { deg: 95, out: -9, tilt: 1 },
+  { deg: 165, out: -14, tilt: 2 },
+  { deg: 250, out: -10, tilt: 3 },
+  { deg: 300, out: -15, tilt: 4 },
+].map((b) => {
+  const p = around(QUENCH.lake, b.deg, b.out);
+  return { kind: 'sh_sunk_blade', ...p, rot: 0.6 + b.tilt * 1.3, r: 1.6, h: 12 };
+});
+
+/** The basin's steaming vents (flush on the shelf, steam rising). */
+const STEAM_VENTS: FieldProp[] = [70, 190, 290].map((deg) => {
+  const p = around(QUENCH.shelf, deg, -4);
+  return { kind: 'sh_steam_vent', ...p, rot: 0 };
+});
+
+/** The ice shelves: tilted slabs of old ice heaped past the basin's rim. */
+const ICE_SHELVES: FieldProp[] = [10, 60, 110, 300, 345].map((deg, i) => {
+  const p = around(QUENCH.shelf, deg, 9);
   return {
-    kind: 'sh_brazier',
-    x: QUENCH.lake.x + Math.sin(a) * 36,
-    z: QUENCH.lake.z + Math.cos(a) * 36,
-    rot: 0,
-    r: 1,
-    h: 2,
+    kind: 'sh_ice_shelf',
+    ...p,
+    rot: face(p.x, p.z, QUENCH.lake.x, QUENCH.lake.z) + i * 0.2,
   };
+});
+
+/** The Storm Cornice's lightning rods, on the rim between the wind channels. */
+const LIGHTNING_RODS: FieldProp[] = [0, 50, 104, 155, 210, 305].map((deg) => {
+  const p = around(BREATH.cornice, deg, -5);
+  return { kind: 'sh_lightning_rod', ...p, rot: 0, r: 1.3, h: 24 };
 });
 
 const PROPS: FieldProp[] = [
   // The Cleft: the crack's mouth behind the landing (render only).
-  { kind: 'sh_cleft_mouth', x: -112, z: -230, rot: Math.PI / 2 },
+  { kind: 'sh_cleft_mouth', x: -215, z: -226, rot: 0.88 },
   // The Hammer Gallery: the Smith's half-carved mountain statues on the rims.
-  { kind: 'sh_rough_statue', x: -50, z: -244, rot: 0, r: 2.5, h: 10 },
-  { kind: 'sh_rough_statue', x: 10, z: -222, rot: Math.PI, r: 2.5, h: 10 },
-  { kind: 'sh_rough_statue', x: 72, z: -208, rot: -1.2, r: 2.5, h: 10 },
-  { kind: 'sh_geode', x: -42, z: -222, rot: 0.4, r: 1.5, h: 3 },
-  { kind: 'sh_geode', x: 20, z: -244, rot: 1.9, r: 1.5, h: 3 },
+  { kind: 'sh_rough_statue', x: -150, z: -240, rot: 0, r: 3.2, h: 14 },
+  { kind: 'sh_rough_statue', x: -96, z: -218, rot: Math.PI, r: 3.2, h: 14 },
+  { kind: 'sh_rough_statue', x: -78, z: -198, rot: 2.2, r: 3.2, h: 14 },
+  { kind: 'sh_geode', x: -140, z: -216, rot: 0.4, r: 2, h: 4 },
+  { kind: 'sh_geode', x: -90, z: -242, rot: 1.9, r: 2, h: 4 },
+  // The Smith's Quarry: columns, colossi, cut blocks, ochre geodes.
   ...PIT_COLUMNS,
+  ...QUARRY_COLOSSI,
+  ...QUARRY_BLOCKS,
+  { kind: 'sh_quarry_derrick', ...around(HAMMER_PIT, 160, 17.5), rot: 0.4, r: 2.6, h: 18 },
+  { kind: 'sh_geode', ...around(HAMMER_PIT, 75, 3.5), rot: 0.8, r: 2, h: 4 },
+  { kind: 'sh_geode', ...around(HAMMER_PIT, 118, 10.5), rot: 2.4, r: 2, h: 4 },
+  { kind: 'sh_geode', ...around(HAMMER_PIT, 196, 3.5), rot: 4.1, r: 2, h: 4 },
+  { kind: 'sh_geode', ...around(HAMMER_PIT, 300, -4), rot: 5.2, r: 2, h: 4 },
   // The Slab's broken halves lie either side of the stair once it falls.
   { kind: 'sh_slab_frame', x: SLAB.x, z: SLAB.z, rot: 0 },
   // The Ring: forge pillars on the outer rim, between the pack spots.
@@ -624,27 +908,88 @@ const PROPS: FieldProp[] = [
     const p = ringPoint(deg + 22.5, RING.outerR - 1.5);
     return { kind: 'sh_ring_pillar', x: p.x, z: p.z, rot: 0, r: 1.2, h: 12 };
   }),
+  // The Seal Dais: the four bronze tines of the portal's crown, on the
+  // diagonals (clear of the four rivers and the Grand Stair).
+  ...[45, 135, 225, 315].map((deg) => {
+    const p = ringPoint(deg, 15.5);
+    return { kind: 'sh_portal_tine', x: p.x, z: p.z, rot: (deg * Math.PI) / 180, r: 1, h: 16 };
+  }),
+  { kind: 'sh_heart_seal', x: HEART_SEAL.x, z: HEART_SEAL.z, rot: 0 },
   // The Breath: wind shelters on the bridge's windward edge (phase 2 gusts
-  // push the raid against them, never off the arch).
-  { kind: 'sh_wind_shelter', x: 6, z: 156, rot: -0.22, hw: 2.4, hd: 0.7, h: 2 },
-  { kind: 'sh_wind_shelter', x: -10, z: 160, rot: -0.22, hw: 2.4, hd: 0.7, h: 2 },
+  // push the raid against them, never off the arch), the cornice's lightning
+  // rods and its broken bellows.
+  { kind: 'sh_wind_shelter', x: -80, z: 140, rot: -0.75, hw: 2.4, hd: 0.7, h: 2 },
+  { kind: 'sh_wind_shelter', x: -91, z: 152, rot: -0.75, hw: 2.4, hd: 0.7, h: 2 },
+  ...LIGHTNING_RODS,
+  {
+    kind: 'sh_broken_bellows',
+    ...around(BREATH.cornice, 240, -12),
+    rot: 0.5,
+    hw: 4.4,
+    hd: 7.5,
+    h: 7,
+  },
+  {
+    kind: 'sh_broken_bellows',
+    ...around(BREATH.cornice, 108, -13),
+    rot: 2.1,
+    hw: 4.4,
+    hd: 7.5,
+    h: 7,
+  },
+  // The Quench: the basin's braziers, vents, sunk blades and ice shelves.
   ...LAKE_BRAZIERS,
-  // The Quench: half-forged blades set in the ice beside the path.
-  { kind: 'sh_ice_blade', x: 160, z: -40, rot: 0.3, r: 0.8, h: 4 },
-  { kind: 'sh_ice_blade', x: 170, z: -58, rot: 1.2, r: 0.8, h: 4 },
-  // The Heat: house-sized crucibles, the great pour crucible, chains.
+  ...STEAM_VENTS,
+  ...SUNK_BLADES,
+  ...ICE_SHELVES,
+  { kind: 'sh_ice_blade', x: 150, z: -78, rot: 0.3, r: 0.8, h: 4 },
+  { kind: 'sh_ice_blade', x: 170, z: -96, rot: 1.2, r: 0.8, h: 4 },
+  // The Heat: house-sized crucibles, the great pour crucible, the great
+  // hearth, its bellows, the giant anvil, the casting channels.
   { kind: 'sh_crucible', x: -100, z: 11, rot: 0, r: 2.4, h: 6 },
   { kind: 'sh_crucible', x: -100, z: -11, rot: 0, r: 2.4, h: 6 },
-  { kind: 'sh_pour_crucible', x: -132, z: 30, rot: Math.PI, r: 3, h: 10 },
-  { kind: 'sh_anvil_horn', x: -222, z: 0, rot: -Math.PI / 2 },
-  // The Heart: the four altars and the seal.
+  { kind: 'sh_pour_crucible', x: POUR_CHANNEL.x, z: 31, rot: Math.PI, r: 3, h: 10 },
+  { kind: 'sh_great_hearth', x: GREAT_HEARTH.x, z: GREAT_HEARTH.z, rot: Math.PI / 2 },
+  {
+    kind: 'sh_great_bellows',
+    x: -243,
+    z: 30,
+    rot: face(-243, 30, GREAT_HEARTH.x, 8),
+    hw: 4,
+    hd: 6.5,
+    h: 6,
+  },
+  {
+    kind: 'sh_great_bellows',
+    x: -243,
+    z: -30,
+    rot: face(-243, -30, GREAT_HEARTH.x, -8),
+    hw: 4,
+    hd: 6.5,
+    h: 6,
+  },
+  {
+    kind: 'sh_giant_anvil',
+    x: GIANT_ANVIL.x,
+    z: GIANT_ANVIL.z,
+    rot: 0,
+    hw: GIANT_ANVIL.hw,
+    hd: GIANT_ANVIL.hd,
+    h: GIANT_ANVIL.h,
+  },
+  { kind: 'sh_crucible', x: -196, z: 38, rot: 0, r: 2.4, h: 6 },
+  { kind: 'sh_crucible', x: -196, z: -38, rot: 0, r: 2.4, h: 6 },
+  { kind: 'sh_crucible', x: -226, z: 39, rot: 0, r: 2.4, h: 6 },
+  { kind: 'sh_crucible', x: -226, z: -39, rot: 0, r: 2.4, h: 6 },
+  { kind: 'sh_casting_channel', x: -222, z: 16, rot: Math.PI / 2 },
+  { kind: 'sh_casting_channel', x: -222, z: -16, rot: Math.PI / 2 },
+  // The Heart: the four altars, each under its chain.
   ...ALTAR_PROPS,
-  { kind: 'sh_heart_seal', x: HEART_SEAL.x, z: HEART_SEAL.z, rot: 0 },
 ];
 
 export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   key: 'smith_heart',
-  bounds: { minX: -232, maxX: 230, minZ: -246, maxZ: 240 },
+  bounds: { minX: -258, maxX: 248, minZ: -246, maxZ: 238 },
   voidHeight: SMITH_HEART_VOID_HEIGHT,
   cliffStep: 1.1,
   mapVoid: 'mist',
@@ -652,12 +997,16 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   walls: [],
   props: PROPS,
   lightZones: [
-    { id: 'cleft', x: -60, z: -228, r: 60, key: 0xc8c0b0, accent: 0xc8903c, fog: 0x5a5448 },
-    { id: 'pit', x: 0, z: -150, r: 45, key: 0xc8bca8, accent: 0xc8903c, fog: 0x584e40 },
-    { id: 'balcony', x: 0, z: -80, r: 30, key: 0xc4c8d8, accent: 0xc8903c, fog: 0x4c5468 },
+    { id: 'cleft', x: -150, z: -222, r: 62, key: 0xc8c0b0, accent: 0xc8903c, fog: 0x5a5448 },
+    { id: 'pit', x: 8, z: -172, r: 60, key: 0xc8bca8, accent: 0xc8903c, fog: 0x584e40 },
+    { id: 'balcony', x: 0, z: -86, r: 26, key: 0xc4c8d8, accent: 0xc8903c, fog: 0x4c5468 },
     { id: 'ring', x: 0, z: 0, r: 85, key: 0xbcc4d8, accent: 0xd8c8a0, fog: 0x485068 },
-    { id: 'breath', x: 0, z: 160, r: 80, key: 0xbcd0ec, accent: 0x5ab8e8, fog: 0x4a6080 },
-    { id: 'quench', x: 160, z: -10, r: 75, key: 0xc0d8f0, accent: 0x9ad8ff, fog: 0x4c6888 },
-    { id: 'heat', x: -160, z: 0, r: 75, key: 0xe0d4bc, accent: 0xffe6a0, fog: 0x6a6050 },
+    { id: 'breath', x: -60, z: 140, r: 70, key: 0xbcd0ec, accent: 0x5ab8e8, fog: 0x4a6080 },
+    { id: 'cornice', x: 0, z: 196, r: 58, key: 0xbcd0ec, accent: 0x5ab8e8, fog: 0x4a6080 },
+    { id: 'quench', x: 140, z: -50, r: 60, key: 0xc0d8f0, accent: 0x9ad8ff, fog: 0x4c6888 },
+    { id: 'lake', x: 198, z: -2, r: 58, key: 0xc0d8f0, accent: 0x9ad8ff, fog: 0x4c6888 },
+    { id: 'heat', x: -130, z: 0, r: 52, key: 0xe0d4bc, accent: 0xffe6a0, fog: 0x6a6050 },
+    { id: 'forge', x: -214, z: 0, r: 58, key: 0xe0d4bc, accent: 0xffe6a0, fog: 0x6a6050 },
+    { id: 'heart', x: 175, z: 158, r: 95, key: 0xd8c0a8, accent: 0xffd8a0, fog: 0x2a1c24 },
   ],
 };

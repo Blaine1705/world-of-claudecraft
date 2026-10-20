@@ -2,12 +2,21 @@
 
 export { SMITH_HEART_CLOSED_TEXT, SMITH_HEART_PLAYABLE, smithHeartEntryOpen } from './entry';
 export {
+  SMITH_HEART_PORTAL_HOP_TEXT,
+  SMITH_HEART_PORTAL_RETURN_TEXT,
+  tickSmithHeartPortal,
+} from './portal';
+export {
+  SMITH_HEART_PORTAL_BIT,
+  SMITH_HEART_PORTAL_OPEN_LOG,
   SMITH_HEART_SEAL_FULL,
   SMITH_HEART_VEIN_BITS,
   SMITH_HEART_VEIN_LIT_LOG,
   type SmithHeartProgress,
+  setSmithHeartPortalDevOpen,
   smithHeartEarnedMask,
   smithHeartLitCount,
+  smithHeartPortalBitSet,
   smithHeartProgress,
   smithHeartSealMaskOf,
   smithHeartSealTemplate,

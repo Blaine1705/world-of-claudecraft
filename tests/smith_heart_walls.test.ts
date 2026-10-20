@@ -7,8 +7,10 @@
 //   collider;
 // - every ramp and stair runs clear end to end: no step taller than the
 //   cliff step, no generated cliff across its corridor;
-// - the Balcony looks out over open air: nothing walkable stands between its
-//   tip and the Heart, and the Heart's seal is in plain sight of the Ring.
+// - the Balcony looks out over open air: only the Grand Stair runs from its
+//   tip to the Seal Dais, and the seal is in plain sight of the Ring;
+// - the Heart (the separate final room) gets the same sweep from its own
+//   arrival.
 //
 // It asks the REAL seams: the terrain's own mesh plan (planFieldCliffs with
 // the live options) and the collision seam (colliders.ts isBlocked over the
@@ -20,10 +22,14 @@ import { isBlocked } from '../src/sim/colliders';
 import { SMITH_HEART_GATES } from '../src/sim/content/smith_heart';
 import {
   BALCONY,
-  HEART,
+  GRAND_STAIR,
+  HEART_ARRIVAL,
+  HEART_ROOM,
   RING,
   RING_ARC,
   ringPoint,
+  SEAL_DAIS,
+  SMITH_HEART_BOSS_SPOTS,
   SMITH_HEART_FIELD,
 } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -78,8 +84,10 @@ function cell(x: number, z: number): number {
   return (Math.round(z) - minZ) * W + (Math.round(x) - minX);
 }
 
-/** Every one-yard cell a body reaches from the arrival with EVERY gate open
- *  (the whole cleared run), flood-filled over the real collision seam. */
+/** Every one-yard cell a body reaches with EVERY gate open (the whole
+ *  cleared run): from the entry over the main map, and from the Heart's
+ *  arrival over the final room (the portal hop joins the two), flood-filled
+ *  over the real collision seam. */
 let reach: Uint8Array;
 
 function floodReach(): Uint8Array {
@@ -89,9 +97,11 @@ function floodReach(): Uint8Array {
     SMITH_HEART_GATES.map((g) => g.id),
   );
   const seen = new Uint8Array(W * H);
-  const start = DUNGEON.entry;
-  const queue: number[] = [Math.round(start.x), Math.round(start.z)];
-  seen[cell(start.x, start.z)] = 1;
+  const queue: number[] = [];
+  for (const start of [DUNGEON.entry, HEART_ARRIVAL]) {
+    queue.push(Math.round(start.x), Math.round(start.z));
+    seen[cell(start.x, start.z)] = 1;
+  }
   for (let q = 0; q < queue.length; q += 2) {
     const x = queue[q];
     const z = queue[q + 1];
@@ -243,15 +253,14 @@ beforeAll(() => {
 }, 240_000);
 
 describe("the Smith's Heart: the drawn walls and the walked floor agree", () => {
-  it('the cleared run reaches all four arenas and the Heart', () => {
+  it('the cleared run reaches all four arenas, the dais and the Heart', () => {
+    const spots = Object.values(SMITH_HEART_BOSS_SPOTS).map((p) => [p.x + 4, p.z + 4]);
     for (const [x, z] of [
-      [-100, -226],
-      [0, -150],
+      [-198, -212],
       [0, -62],
-      [0, 206],
-      [186, 10],
-      [-196, 0],
-      [0, 0],
+      [0, -8],
+      [HEART_ARRIVAL.x, HEART_ARRIVAL.z],
+      ...spots,
     ]) {
       expect(reach[cell(x, z)], `${x},${z}`).toBe(1);
     }
@@ -285,25 +294,36 @@ describe("the Smith's Heart: the drawn walls and the walked floor agree", () => 
     expect(failures, failures.join(' | ')).toEqual([]);
   });
 
-  it('the Balcony juts out over open air toward the Heart', () => {
-    // From the Balcony's tip to the Heart's rim there is only the void.
-    for (let z = BALCONY.z1 + 1; z < -HEART.r - 1; z++) {
-      expect(authoredFieldHeight(FIELD, 0, z), `z ${z}`).toBe(VOID);
+  it('the Balcony juts out over open air: only the Grand Stair crosses to the dais', () => {
+    // Either side of the Grand Stair, from the Balcony's tip to the dais's
+    // rim, there is only the void.
+    for (let z = BALCONY.z1 + 1; z < -SEAL_DAIS.r - 1; z++) {
+      for (const x of [-GRAND_STAIR.halfWidth - 3, GRAND_STAIR.halfWidth + 3]) {
+        expect(authoredFieldHeight(FIELD, x, z), `${x}, ${z}`).toBe(VOID);
+      }
+      // The stair itself only ever descends toward the dais.
+      expect(authoredFieldHeight(FIELD, 0, z + 1)).toBeLessThanOrEqual(
+        authoredFieldHeight(FIELD, 0, z) + 1e-6,
+      );
     }
     expect(authoredFieldHeight(FIELD, 0, BALCONY.z1 - 1)).toBe(BALCONY.h);
+    expect(authoredFieldHeight(FIELD, 0, -SEAL_DAIS.r + 2)).toBe(SEAL_DAIS.h);
   });
 
-  it('nothing walkable stands between the Ring and the Heart but the causeways', () => {
-    // Off the three causeways, the annulus between the Heart's rim and the
-    // Ring's inner edge is open air at every bearing: the seal is in sight of
-    // every point of the Ring.
+  it('nothing walkable stands between the Ring and the dais but the Grand Stair', () => {
+    // Off the stair, the annulus between the dais's rim and the Ring's inner
+    // edge is open air at every bearing: the seal is in sight of every point
+    // of the Ring, and the Ring looks DOWN onto it.
+    expect(SEAL_DAIS.h).toBeLessThan(RING.h);
     for (let d = 0; d < 360; d += 5) {
-      if (d % 90 <= 12 || d % 90 >= 78) continue; // a causeway's band
-      for (let r = HEART.r + 1; r < RING.innerR - 1; r += 2) {
+      if (d >= 160 && d <= 200) continue; // the Grand Stair's band
+      for (let r = SEAL_DAIS.r + 1; r < RING.innerR - 1; r += 2) {
         const p = ringPoint(d, r);
         expect(authoredFieldHeight(FIELD, p.x, p.z), `${d} deg r ${r}`).toBe(VOID);
       }
     }
+    // The Heart's platform is far away in the slot, past open air.
+    expect(Math.hypot(HEART_ROOM.x, HEART_ROOM.z)).toBeGreaterThan(200);
     // The Ring's walked arc is one flat height all the way round.
     for (let d = RING_ARC.fromDeg + 8; d <= RING_ARC.toDeg - 8; d += 4) {
       const p = ringPoint(d);

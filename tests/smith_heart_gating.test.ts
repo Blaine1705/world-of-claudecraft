@@ -6,9 +6,11 @@
 //   quarter, and nothing else orders the other three;
 // - the Breath, the Quench and the Heat light in any order, each with its own
 //   line to the raid, each once;
-// - the causeways into the Heart open only with all four lit AND the Ring
-//   clear, and seal behind the raid while the final boss fights;
-// - a reset (a fresh claim) starts dark again;
+// - the seal opens into the portal only with all four lit AND the Ring
+//   clear, says so once, and stays open; the portal walks a living player to
+//   the Heart's arrival and the return portal walks them back to the dais;
+// - the Heart Bridge seals behind the raid while the final boss fights;
+// - a reset (a fresh claim) starts dark and shut again;
 // - the raid is dev-only while it is a blockout.
 
 import { afterEach, describe, expect, it } from 'vitest';
@@ -18,14 +20,27 @@ import {
   SMITH_HEART_GUARDIANS,
   SMITH_HEART_PACKS,
 } from '../src/sim/content/smith_heart';
-import { SMITH_HEART_VEINS, type SmithHeartVein } from '../src/sim/content/smith_heart_layout';
-import { BUILTIN_WORLD, DUNGEONS } from '../src/sim/data';
+import {
+  HEART_ARRIVAL,
+  HEART_RETURN_PORTAL,
+  RING_PORTAL,
+  RING_PORTAL_LANDING,
+  SMITH_HEART_VEINS,
+  type SmithHeartVein,
+} from '../src/sim/content/smith_heart_layout';
+import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { displacePlayerForDev } from '../src/sim/dev/dev_displace';
 import {
   SMITH_HEART_CLOSED_TEXT,
+  SMITH_HEART_PORTAL_BIT,
+  SMITH_HEART_PORTAL_HOP_TEXT,
+  SMITH_HEART_PORTAL_OPEN_LOG,
+  SMITH_HEART_PORTAL_RETURN_TEXT,
   SMITH_HEART_SEAL_FULL,
   SMITH_HEART_VEIN_BITS,
   SMITH_HEART_VEIN_LIT_LOG,
   smithHeartLitCount,
+  smithHeartPortalBitSet,
   smithHeartProgress,
   smithHeartSealMaskOf,
   smithHeartSealTemplate,
@@ -97,7 +112,22 @@ function logs(events: unknown[], pid: number): string[] {
     .map((e) => e.text ?? '');
 }
 
-const HEART_GATES = ['causeway_north', 'causeway_east', 'causeway_west'];
+/** Put the player at instance-local (x, z) of the claim. */
+function put(sim: Sim, pid: number, inst: InstanceSlot, x: number, z: number): void {
+  const o = instanceOrigin(DUNGEONS.smith_heart.index, inst.slot);
+  displacePlayerForDev(sim.ctx, sim.ctx.entities.get(pid) as Entity, o.x + x, o.z + z);
+}
+
+/** The player's instance-local position. */
+function local(sim: Sim, pid: number, inst: InstanceSlot): { x: number; z: number } {
+  const o = instanceOrigin(DUNGEONS.smith_heart.index, inst.slot);
+  const e = sim.ctx.entities.get(pid) as Entity;
+  return { x: e.pos.x - o.x, z: e.pos.z - o.z };
+}
+
+function near(a: { x: number; z: number }, b: { x: number; z: number }, d: number): boolean {
+  return Math.hypot(a.x - b.x, a.z - b.z) < d;
+}
 const ARENA_MOUTH: Record<Exclude<SmithHeartVein, 'hammer'>, string> = {
   breath: 'cornice_mouth',
   quench: 'lake_mouth',
@@ -108,11 +138,17 @@ describe("the Smith's Heart gating", () => {
   afterEach(() => clearDungeonGateStateForTest());
 
   it('the seal mask round-trips through the marker template id', () => {
-    for (let m = 0; m <= SMITH_HEART_SEAL_FULL; m++) {
+    for (let m = 0; m <= (SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT); m++) {
       expect(smithHeartSealMaskOf(smithHeartSealTemplate(m))).toBe(m);
     }
     expect(smithHeartSealMaskOf('sanctum_story_3')).toBeNull();
-    expect(smithHeartSealMaskOf('smith_heart_seal_16')).toBeNull();
+    expect(smithHeartSealMaskOf('smith_heart_seal_32')).toBeNull();
+    expect(smithHeartPortalBitSet(SMITH_HEART_SEAL_FULL)).toBe(false);
+    expect(smithHeartPortalBitSet(SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)).toBe(true);
+    // The portal bit never reads as a lit vein.
+    for (const v of SMITH_HEART_VEINS) {
+      expect(smithHeartVeinLit(SMITH_HEART_PORTAL_BIT, v)).toBe(false);
+    }
     expect(smithHeartLitCount(SMITH_HEART_SEAL_FULL)).toBe(4);
     expect(smithHeartVeinLit(SMITH_HEART_VEIN_BITS.quench, 'quench')).toBe(true);
     expect(smithHeartVeinLit(SMITH_HEART_VEIN_BITS.quench, 'heat')).toBe(false);
@@ -120,7 +156,14 @@ describe("the Smith's Heart gating", () => {
 
   it('a fresh claim: every gate with a prerequisite is shut and the seal is dark', () => {
     const { sim, inst } = setup();
-    for (const g of SMITH_HEART_GATES) expect(state(sim, inst, g.id), g.id).toBe('closed');
+    for (const g of SMITH_HEART_GATES) {
+      const waits = (g.packs?.length ?? 0) + (g.bosses?.length ?? 0) > 0;
+      expect(state(sim, inst, g.id), g.id).toBe(waits ? 'closed' : 'open');
+    }
+    // Only the Heart's own bridge waits on nothing (the portal is its door).
+    expect(
+      SMITH_HEART_GATES.filter((g) => !g.packs?.length && !g.bosses?.length).map((g) => g.id),
+    ).toEqual(['heart_bridge']);
     const ms = markers(sim, inst);
     expect(ms.length).toBeGreaterThan(0);
     expect(ms.every((m) => m === 0)).toBe(true);
@@ -129,7 +172,7 @@ describe("the Smith's Heart gating", () => {
       slabOpen: false,
       sealLit: false,
       ringClear: false,
-      heartOpen: false,
+      portalOpen: false,
     });
   });
 
@@ -177,19 +220,28 @@ describe("the Smith's Heart gating", () => {
     }
   });
 
-  it('the Heart opens only with all four lit and the Ring clear', () => {
-    const { sim, inst } = setup();
+  it('the seal opens into the portal only with all four lit and the Ring clear', () => {
+    const { sim, pid, inst } = setup();
     kill(sim, inst, Object.values(SMITH_HEART_GUARDIANS));
     sim.tick();
     expect(smithHeartProgress(sim.ctx, inst).sealLit).toBe(true);
-    for (const id of HEART_GATES) expect(state(sim, inst, id), id).toBe('closed');
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
+    expect(markers(sim, inst).every((m) => m === SMITH_HEART_SEAL_FULL)).toBe(true);
     kill(sim, inst, SMITH_HEART_PACKS.ring.slice(0, 7));
     sim.tick();
-    for (const id of HEART_GATES) expect(state(sim, inst, id), id).toBe('closed');
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(false);
     kill(sim, inst, SMITH_HEART_PACKS.ring);
-    sim.tick();
-    for (const id of HEART_GATES) expect(state(sim, inst, id), id).toBe('open');
-    expect(smithHeartProgress(sim.ctx, inst).heartOpen).toBe(true);
+    const events = sim.tick();
+    expect(smithHeartProgress(sim.ctx, inst).portalOpen).toBe(true);
+    expect(
+      markers(sim, inst).every((m) => m === (SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)),
+    ).toBe(true);
+    expect(logs(events, pid)).toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+    // Said once, and it stays open.
+    for (let i = 0; i < 5; i++) {
+      expect(logs(sim.tick(), pid)).not.toContain(SMITH_HEART_PORTAL_OPEN_LOG);
+      expect(smithHeartPortalBitSet(markers(sim, inst)[0])).toBe(true);
+    }
     // Ring clear but a guardian alive: still shut.
     const fresh = setup(23);
     kill(fresh.sim, fresh.inst, [
@@ -197,11 +249,41 @@ describe("the Smith's Heart gating", () => {
       ...SMITH_HEART_VEINS.slice(0, 3).map((v) => SMITH_HEART_GUARDIANS[v]),
     ]);
     fresh.sim.tick();
-    for (const id of HEART_GATES) expect(state(fresh.sim, fresh.inst, id), id).toBe('closed');
+    expect(smithHeartProgress(fresh.sim.ctx, fresh.inst).portalOpen).toBe(false);
+    expect(markers(fresh.sim, fresh.inst).every((m) => !smithHeartPortalBitSet(m))).toBe(true);
   });
 
-  it('every causeway seals for the final boss, every arena mouth for its guardian', () => {
-    for (const id of HEART_GATES) expect(gate(id).sealWhileEngaged).toBe(SMITH_HEART_FINAL_BOSS);
+  it('the portal walks a living player to the Heart, and the return portal back', () => {
+    const { sim, pid, inst } = setup();
+    // Shut: standing in the seal goes nowhere.
+    put(sim, pid, inst, RING_PORTAL.x + 1, RING_PORTAL.z);
+    sim.tick();
+    expect(near(local(sim, pid, inst), { x: RING_PORTAL.x + 1, z: RING_PORTAL.z }, 1)).toBe(true);
+    kill(sim, inst, [...Object.values(SMITH_HEART_GUARDIANS), ...SMITH_HEART_PACKS.ring]);
+    const events = sim.tick();
+    expect(near(local(sim, pid, inst), HEART_ARRIVAL, 0.5)).toBe(true);
+    expect(logs(events, pid)).toContain(SMITH_HEART_PORTAL_HOP_TEXT);
+    // The landing sits clear of the return portal: no bounce back.
+    sim.tick();
+    expect(near(local(sim, pid, inst), HEART_ARRIVAL, 0.5)).toBe(true);
+    // The return portal sets the player down on the dais, clear of the portal.
+    put(sim, pid, inst, HEART_RETURN_PORTAL.x, HEART_RETURN_PORTAL.z);
+    const back = sim.tick();
+    expect(near(local(sim, pid, inst), RING_PORTAL_LANDING, 0.5)).toBe(true);
+    expect(logs(back, pid)).toContain(SMITH_HEART_PORTAL_RETURN_TEXT);
+    sim.tick();
+    expect(near(local(sim, pid, inst), RING_PORTAL_LANDING, 0.5)).toBe(true);
+    // A corpse never crosses.
+    put(sim, pid, inst, RING_PORTAL.x, RING_PORTAL.z);
+    const e = sim.ctx.entities.get(pid) as Entity;
+    e.dead = true;
+    e.hp = 0;
+    sim.tick();
+    expect(near(local(sim, pid, inst), RING_PORTAL, 1)).toBe(true);
+  });
+
+  it('the Heart Bridge seals for the final boss, every arena mouth for its guardian', () => {
+    expect(gate('heart_bridge').sealWhileEngaged).toBe(SMITH_HEART_FINAL_BOSS);
     expect(gate('hammer_pit_mouth').sealWhileEngaged).toBe(SMITH_HEART_GUARDIANS.hammer);
     for (const [vein, id] of Object.entries(ARENA_MOUTH)) {
       expect(gate(id).sealWhileEngaged).toBe(SMITH_HEART_GUARDIANS[vein as SmithHeartVein]);
@@ -227,6 +309,7 @@ describe("the Smith's Heart gating", () => {
     sim.tick();
     expect(markers(sim, again).every((m) => m === 0)).toBe(true);
     expect(state(sim, again, 'the_slab')).toBe('closed');
+    expect(smithHeartProgress(sim.ctx, again).portalOpen).toBe(false);
   });
 
   it('is dev-only while it is a blockout', () => {
@@ -240,7 +323,13 @@ describe("the Smith's Heart gating", () => {
   });
 
   it('every line it sends the raid is localized', () => {
-    for (const text of [...Object.values(SMITH_HEART_VEIN_LIT_LOG), SMITH_HEART_CLOSED_TEXT]) {
+    for (const text of [
+      ...Object.values(SMITH_HEART_VEIN_LIT_LOG),
+      SMITH_HEART_CLOSED_TEXT,
+      SMITH_HEART_PORTAL_OPEN_LOG,
+      SMITH_HEART_PORTAL_HOP_TEXT,
+      SMITH_HEART_PORTAL_RETURN_TEXT,
+    ]) {
       expect(localizeSimText(text), text).not.toBeNull();
     }
     for (const g of SMITH_HEART_GATES) {

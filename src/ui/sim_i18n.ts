@@ -1494,14 +1494,18 @@ const baseEnTable = {
     'With the rite broken, the Tithe Gate shatters. The shore of the held lies open.',
   'log.sanctumHollowWardOpen':
     "The Hollow Ward fails. On the lake, the ice groans under the Wyrm's weight.",
-  // The Smith's Heart raid blockout (content/smith_heart.ts gates,
-  // encounters/smith_heart seal.ts and entry.ts). EXACT matcher.
+  // The Smith's Heart raid (content/smith_heart.ts gates, encounters/
+  // smith_heart seal.ts, portal.ts and entry.ts). EXACT matcher.
   'log.smithHeartSlabOpen':
     'The living stone splits from end to end. Beyond the Slab, the heart of the mountain lies open.',
-  'log.smithHeartCausewaysOpen':
-    'Four colours burn on the heart seal. It opens, and the causeways fall still.',
+  'log.smithHeartPortalOpen':
+    'Four colours burn on the heart seal. It splits open, and a way down into the heart of the mountain whirls in its place.',
+  'log.smithHeartPortalHop':
+    "The seal's light pulls you down into the heart of the mountain.",
+  'log.smithHeartPortalReturn':
+    'The light carries you back up to the heart seal.',
   'log.smithHeartHammerLit':
-    'An ochre light runs down from the Pit toward the heart seal.',
+    'An ochre light runs down from the Quarry toward the heart seal.',
   'log.smithHeartBreathLit':
     'A storm-blue light runs down the Breath toward the heart seal.',
   'log.smithHeartQuenchLit':

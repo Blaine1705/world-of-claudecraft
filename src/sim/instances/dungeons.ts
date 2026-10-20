@@ -1537,7 +1537,7 @@ export function updateInstances(ctx: SimContext): void {
   // The Hollow Crypt's finale (encounters/hollow_crypt): Morthen's entrance
   // and the Knellwyrm, same slot.
   tickCryptEncounters(ctx);
-  // The Smith's Heart's seal (encounters/smith_heart), same slot.
+  // The Smith's Heart's seal and its portal (encounters/smith_heart), same slot.
   tickSmithHeart(ctx);
   // The optional lore guides (dungeon_guide): after every encounter, so a boss
   // pulled or killed this tick already reads as such. Draws no shared rng.
