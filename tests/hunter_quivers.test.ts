@@ -125,12 +125,12 @@ describe('hunter quivers', () => {
     expect(ITEMS.moggers_hide_quiver.hitRating ?? 0).toBe(0);
     expect(ITEMS.cragmaw_huntquiver.hitRating ?? 0).toBe(0);
     expect(ITEMS.gravewyrm_bone_quiver.hitRating ?? 0).toBe(0);
-    // The Crucible quiver follows its raid's rating ladder instead: one
-    // 25-point rating like every held offhand of that tier, crit, never Hit
-    // (the Crucible Hit program places no Hit on an offhand).
+    // The Crucible quiver: crit 25 like every held offhand of its tier, plus
+    // Hit 50, the operator's call (2026-10-21) that keeps the ladder's Hit
+    // identity on the raid epics.
     const infernal = ITEMS.infernal_quiver;
     expect([infernal.critRating ?? 0, infernal.hasteRating ?? 0, infernal.hitRating ?? 0]).toEqual([
-      25, 0, 0,
+      25, 0, 50,
     ]);
     // Physical identity, no caster affix, no armor; the exact authored split.
     expect(infernal.spellPower ?? 0).toBe(0);
@@ -366,6 +366,7 @@ describe('a worn quiver coexists with a two-hander', () => {
     const pid = sim.player.id;
     sim.setPlayerLevel(20);
     const baseAgi = sim.player.stats.agi;
+    const baseHit = sim.player.hitRating;
 
     sim.addItem('heart_of_the_end_greatblade', 1, pid);
     sim.addItem('infernal_quiver', 1, pid);
@@ -376,6 +377,8 @@ describe('a worn quiver coexists with a two-hander', () => {
     expect(sim.equipment.offhand).toBe('infernal_quiver');
     // The greatblade carries no agility, so the quiver's 7 is the whole gain.
     expect(sim.player.stats.agi).toBe(baseAgi + 7);
+    // The weapon's 30 and the worn quiver's 50 both reach combat ratings.
+    expect(sim.player.hitRating).toBe(baseHit + 80);
     expect(sim.player.dualWielding).toBe(false);
   });
 
