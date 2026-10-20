@@ -1,19 +1,20 @@
-// Ship Korgath the Bound's re-authored maul clips as a clip donor beside his
-// body (VisualDef.animUrls): the body's skeleton (with the left hand's finger
-// bones, patch_korgath_fingers.mjs) and
+// Ship Korgath the Bound's maul clips as a clip donor beside his body
+// (VisualDef.animUrls): the body's skeleton and
 //
-// - HammerSlam and HammerSweep, authored on the control rig
-//   (maul_rig/run_clip.py with spec_slam.py and spec_sweep.py): both hands locked on the haft in real grips, the
-//   right fist turned end for end on the haft for the blow, the left fist
-//   closed round it;
+// - HammerSlam and HammerSweep, his auto attacks re-authored as one-handed
+//   swings on the control rig (maul_rig/run_clip.py with spec_slam.py and
+//   spec_sweep.py): the right fist in its modeled grip, the left arm a free
+//   counterbalance that never touches the haft;
+// - MaulArc, ThresholdCharge and ThresholdChargeLoop, the body's own clips with
+//   only the left arm re-solved off the haft (maul_rig/spec_left.py);
 // - Death, the body's own fall with the right fist kept closed on the haft
-//   until the maul leaves it, then opening (the body's clip bent the finger
-//   block through the haft).
+//   until the maul leaves it, then opening.
 //
-// A donor's clip replaces the body's clip of the same name when the visual is
-// prepared (characters/assets.ts). The body's other clips keep their own keys;
-// their broken finger curl on the right hand is dropped by the look
-// (sanctum_boss_looks.ts clipTrackDrops), so the modeled fist shows.
+// Every one keeps the modeled right fist (the body's clips bent its finger
+// bone off the haft). A donor's clip replaces the body's clip of the same name
+// when the visual is prepared (characters/assets.ts); the body's other clips
+// lose that finger bend through the look (sanctum_boss_looks.ts
+// clipTrackDrops), so the modeled fist shows there too.
 //
 //   node docs/design/dungeon-rework/korgath/ship_korgath_clip_fixes.mjs <authored.glb>
 //     writes public/models/creatures/woc_sanctum_korgath_clips.glb
@@ -30,10 +31,27 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 const BODY = path.join(ROOT, 'public/models/creatures/woc_sanctum_korgath.glb');
 const DONOR = path.join(ROOT, 'public/models/creatures/woc_sanctum_korgath_clips.glb');
 const AUTHORED = process.argv[2];
-const AUTHORED_CLIPS = ['HammerSlam', 'HammerSweep'];
+const AUTHORED_CLIPS = [
+  'HammerSlam',
+  'HammerSweep',
+  'MaulArc',
+  'ThresholdCharge',
+  'ThresholdChargeLoop',
+];
+/** The body clips whose left arm alone is re-solved: every other bone stays the clip's own. */
+const LEFT_ONLY = ['MaulArc', 'ThresholdCharge', 'ThresholdChargeLoop'];
+const LEFT_ARM = new Set([
+  'upperarm.l',
+  'lowerarm.l',
+  'hand.l',
+  'fingers.l',
+  'handslot.l',
+  'Anchor_Tongs',
+  'chain_t.1',
+  'chain_t.2',
+]);
 // The bone the seam check skips: the right fingers (the body's Idle curl is
-// dropped by the look, so the authored rest fist is what Idle shows). The new
-// finger bones are skipped too (no body clip keys them).
+// dropped by the look, so the authored rest fist is what Idle shows).
 const SEAM_FREE = new Set(['fingers.r']);
 /** The right fist opens this far (degrees) once the maul has left it. */
 const DEATH_OPEN_DEG = 25;
@@ -60,8 +78,6 @@ const skin = root
 const joints = new Set(skin.listJoints());
 const byName = new Map(root.listNodes().map((n) => [n.getName(), n]));
 const buffer = root.listBuffers()[0];
-const fingerBones = [...joints].map((j) => j.getName()).filter((n) => /\.\d\.l$/.test(n));
-if (fingerBones.length !== 15) throw new Error('the body has no left-hand finger bones yet');
 const bodyClip = (name) => root.listAnimations().find((a) => a.getName() === name);
 
 // The authored rig's rest transforms are the body's (the same Blender rig).
@@ -98,7 +114,8 @@ function sampleAt(anim, nodeName, pathName, t) {
   return out.getElement(k, []);
 }
 
-// Seam check: each authored clip starts and ends on the body's Idle frame 0.
+// Seam check: each authored blow starts and ends on the body's Idle frame 0;
+// each left-arm clip keeps every other bone its own, every frame.
 const idle = bodyClip('Idle');
 for (const name of AUTHORED_CLIPS) {
   const a = authored
@@ -112,15 +129,21 @@ for (const name of AUTHORED_CLIPS) {
   const T = Math.max(...a.listSamplers().map((s) => s.getInput().getMax([])[0]));
   let worst = 0;
   let where = '';
+  const own = bodyClip(name);
+  const left = LEFT_ONLY.includes(name);
   for (const j of joints) {
     const n = j.getName();
-    if (SEAM_FREE.has(n) || fingerBones.includes(n)) continue;
+    if (SEAM_FREE.has(n)) continue;
     const i0 = sampleAt(idle, n, 'rotation', 0) ?? j.getRotation();
-    for (const t of [0, T]) {
+    if (left && LEFT_ARM.has(n)) continue;
+    const times = left ? Array.from({ length: Math.round(T * 30) + 1 }, (_, k) => k / 30) : [0, T];
+    for (const t of times) {
+      const ref = left ? sampleAt(own, n, 'rotation', t) : i0;
       const r = sampleAt(a, n, 'rotation', t);
+      if (!ref) continue;
       if (!r) continue;
       const d =
-        1 - Math.min(1, Math.abs(i0[0] * r[0] + i0[1] * r[1] + i0[2] * r[2] + i0[3] * r[3]));
+        1 - Math.min(1, Math.abs(ref[0] * r[0] + ref[1] * r[1] + ref[2] * r[2] + ref[3] * r[3]));
       if (d > worst) {
         worst = d;
         where = `${n}@${t}`;
@@ -128,7 +151,10 @@ for (const name of AUTHORED_CLIPS) {
     }
   }
   console.log(name, 'length', T.toFixed(3), 'seam worst', worst.toExponential(2), where);
-  if (worst > 2e-3) throw new Error(`${name} does not start and end on Idle`);
+  if (worst > 2e-3)
+    throw new Error(
+      `${name}: ${left ? 'more than its left arm changed' : 'does not start and end on Idle'}`,
+    );
 }
 
 // The Idle fist curl (its axis opens the fist in Death), read before the strip.

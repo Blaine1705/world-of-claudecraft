@@ -1,20 +1,19 @@
-// Korgath the Bound's grip and his two-handed blows (the owner's 2026-10-20
-// notes: the blows looked wrong and even how he held the maul in his palm).
-// Root causes, each pinned here against the shipped files:
-// - the body is modeled with the right fist closed on the haft, but every one
+// Korgath the Bound's grip and his maul blows (the owner's 2026-10-20 notes:
+// the blows looked wrong, even how he held the maul in his palm; then: one hand
+// only, the hand that holds the maul).
+// - The body is modeled with the right fist closed on the haft, but every one
 //   of its clips bent that fist's single finger bone 88 degrees (176 in the
 //   gaits), folding the fingers off the haft: the look drops that rotation
-//   from every body clip he holds the maul in (VisualDef.clipTrackDrops);
-// - his left hand was modeled open on one finger bone, so it could never
-//   close on the haft: the body gained a three-joint chain per finger and for
-//   the thumb (docs/design/dungeon-rework/korgath/patch_korgath_fingers.mjs),
-//   which leaves every old clip's deformation as it was;
-// - the modeled grip has the maul's head on the little-finger side (right
-//   for carrying it hanging, wrong for a two-handed blow): HammerSlam and
-//   HammerSweep (re-authored on a control rig, a clip donor beside the body)
-//   turn the right fist end for end on the haft at the top of the wind-up,
-//   both fists stay on the haft through the blow, and both clips start and end
-//   on Idle's first frame and land on frame 18 as before.
+//   from every body clip he holds the maul in (VisualDef.clipTrackDrops), and
+//   the donor's clips keep the modeled fist.
+// - HammerSlam and HammerSweep are one-handed swings re-authored on a control
+//   rig (a clip donor beside the body): the right fist in its modeled grip
+//   (sliding along the haft, never turned in it), the left arm a free
+//   counterbalance that never touches the haft; both start and end on Idle's
+//   first frame and land on frame 18 as before.
+// - MaulArc, ThresholdCharge and its run loop brought the left hand to the haft:
+//   the donor carries them with only the left arm re-solved off it.
+// - The body file and its rig are the shipped ones (no bones added).
 
 import { readFileSync } from 'node:fs';
 import type { Animation, Document } from '@gltf-transform/core';
@@ -36,13 +35,22 @@ import {
 import { type PosedNode, posedNodes } from './helpers/posed_glb';
 
 const AUTHORED = ['HammerSlam', 'HammerSweep'];
-const FINGERS = ['index', 'middle', 'ring', 'pinky', 'thumb'].flatMap((f) =>
-  [1, 2, 3].map((i) => `${f}.${i}.l`),
-);
+const LEFT_ONLY = ['MaulArc', 'ThresholdCharge', 'ThresholdChargeLoop'];
+const LEFT_ARM = new Set([
+  'upperarm.l',
+  'lowerarm.l',
+  'hand.l',
+  'fingers.l',
+  'handslot.l',
+  'Anchor_Tongs',
+  'chain_t.1',
+  'chain_t.2',
+]);
 const BODY = `public/${KORGATH_BODY.url}`;
 const DONOR = `public/${KORGATH_CLIP_FIXES_URL}`;
-/** Hammer bone units to yards (the rig's root scale) and the head on the haft. */
+/** The maul head's centre on the haft and the haft's span (hammer bone units). */
 const HEAD_Y = 1.28;
+const HAFT = [-0.2, 1.1];
 
 let body: Document;
 let donor: Document;
@@ -119,6 +127,17 @@ function offHaft(p: number[], hammer: PosedNode): number {
   return Math.hypot(q[0], q[1], q[2]);
 }
 
+/** Distance (yd) from a point to the haft itself (pommel to the head's neck). */
+function toHaft(p: number[], hammer: PosedNode): number {
+  const d = sub(p, hammer.pos);
+  const along = Math.min(HAFT[1] * unit, Math.max(HAFT[0] * unit, dot(d, hammer.up)));
+  const q = sub(
+    d,
+    hammer.up.map((v) => v * along),
+  );
+  return Math.hypot(q[0], q[1], q[2]);
+}
+
 /** The maul's haft direction in the right hand's own frame (wrist to knuckles,
  *  wrist to the hand slot): which end of the haft the fist's thumb side holds. */
 function haftInRightHand(n: Record<string, PosedNode>): number[] {
@@ -134,41 +153,20 @@ function haftInRightHand(n: Record<string, PosedNode>): number[] {
   return [dot(n.hammer.up, x), dot(n.hammer.up, y), dot(n.hammer.up, z)];
 }
 
-const NODES = ['hammer', 'hand.r', 'fingers.r', 'handslot.r', 'hand.l', 'hips'];
+const NODES = ['hammer', 'hand.r', 'fingers.r', 'handslot.r', 'hand.l', 'hips', 'chest'];
+const frames = (T: number, step = 2) =>
+  Array.from({ length: Math.floor((T * 30) / step + 1e-6) + 1 }, (_, k) => (k * step) / 30);
 
 describe("Korgath's grip", () => {
-  it('the body gained a three-joint left hand and the old rig is untouched', () => {
-    const root = body.getRoot();
-    const skin = root
+  it('keeps the shipped body and its rig (no bones added)', () => {
+    const skin = body
+      .getRoot()
       .listNodes()
       .find((n) => n.getName() === 'Korgath')
       ?.getSkin();
-    const joints = new Map((skin?.listJoints() ?? []).map((j) => [j.getName(), j]));
-    for (const name of FINGERS) {
-      const j = joints.get(name);
-      expect(j, name).toBeTruthy();
-      const parent = j?.getParentNode()?.getName();
-      if (name.endsWith('.1.l'))
-        expect(parent, name).toBe(name.startsWith('thumb') ? 'hand.l' : 'fingers.l');
-      else expect(parent, name).toBe(name.replace(/\.(\d)\.l$/, (_, i) => `.${Number(i) - 1}.l`));
-    }
-    // at rest the new bones leave every vertex where it was: each joint's rest
-    // world times its inverse bind is the same bind space as the old joints'
-    const ibm = skin?.getInverseBindMatrices();
-    const all = skin?.listJoints() ?? [];
-    const bind = (i: number) =>
-      new THREE.Matrix4()
-        .fromArray(all[i].getWorldMatrix())
-        .multiply(new THREE.Matrix4().fromArray(ibm?.getElement(i, []) ?? []));
-    const ref = bind(all.findIndex((j) => j.getName() === 'hips'));
-    for (const name of FINGERS) {
-      const m = bind(all.findIndex((j) => j.getName() === name));
-      for (let k = 0; k < 16; k++) expect(m.elements[k], name).toBeCloseTo(ref.elements[k], 3);
-    }
-    // the body's own clips never key the new bones (they stay at rest there)
-    for (const a of root.listAnimations())
-      for (const ch of a.listChannels())
-        expect(FINGERS.includes(ch.getTargetNode()?.getName() ?? '')).toBe(false);
+    const names = (skin?.listJoints() ?? []).map((j) => j.getName());
+    expect(names).toHaveLength(39);
+    expect(names.some((n) => /^(index|middle|ring|pinky|thumb)\./.test(n))).toBe(false);
   });
 
   it('every body clip he holds the maul in drops the fist bone; the donor replaces the rest', () => {
@@ -182,8 +180,6 @@ describe("Korgath's grip", () => {
       .sort();
     const covered = [...Object.keys(KORGATH_FIST_DROPS), ...KORGATH_DONOR_CLIPS].sort();
     expect(covered).toEqual(bodyClips);
-    for (const bones of Object.values(KORGATH_FIST_DROPS))
-      expect(bones).toEqual([KORGATH_FIST_BONE]);
     // on the track names three's loader gives the body's clips, the drop takes
     // the fist bone's rotation and nothing else
     const threeProp = {
@@ -193,6 +189,7 @@ describe("Korgath's grip", () => {
       weights: 'morphTargetInfluences',
     } as const;
     for (const [name, bones] of Object.entries(KORGATH_FIST_DROPS)) {
+      expect(bones).toEqual([KORGATH_FIST_BONE]);
       const tracks = clip(body, name)
         .listChannels()
         .map(
@@ -213,9 +210,18 @@ describe("Korgath's grip", () => {
       ?.getRotation() as number[];
     const idleCurl = rotationAt(clip(body, 'Idle'), KORGATH_FIST_BONE, 0) as number[];
     expect(angle(idleCurl, rest)).toBeGreaterThan(1.2);
+    // and every donor clip but Death keeps the modeled fist the whole clip
+    for (const name of KORGATH_DONOR_CLIPS.filter((c) => c !== 'Death')) {
+      const a = clip(donor, name);
+      for (const t of frames(length(a), 6))
+        expect(
+          angle(rotationAt(a, KORGATH_FIST_BONE, t) as number[], rest),
+          `${name}@${t}`,
+        ).toBeLessThan(0.01);
+    }
   });
 
-  it('the donor carries only clips, onto the body rig', () => {
+  it('the donor carries only clips, onto the body rig, at the body clips lengths', () => {
     const root = donor.getRoot();
     expect(root.listMeshes()).toHaveLength(0);
     expect(root.listTextures()).toHaveLength(0);
@@ -231,9 +237,11 @@ describe("Korgath's grip", () => {
         .listNodes()
         .map((n) => n.getName()),
     );
-    for (const a of root.listAnimations())
+    for (const a of root.listAnimations()) {
+      expect(length(a), a.getName()).toBeCloseTo(length(clip(body, a.getName())), 2);
       for (const ch of a.listChannels())
         expect(names.has(ch.getTargetNode()?.getName() ?? ''), a.getName()).toBe(true);
+    }
   });
 
   it('Death keeps the right fist closed on the haft until the maul falls from it', () => {
@@ -243,7 +251,6 @@ describe("Korgath's grip", () => {
       .find((n) => n.getName() === KORGATH_FIST_BONE)
       ?.getRotation() as number[];
     const d = clip(donor, 'Death');
-    expect(length(d)).toBeCloseTo(length(clip(body, 'Death')), 2);
     expect(angle(rotationAt(d, KORGATH_FIST_BONE, 0) as number[], rest)).toBeLessThan(0.01);
     expect(angle(rotationAt(d, KORGATH_FIST_BONE, length(d)) as number[], rest)).toBeGreaterThan(
       0.3,
@@ -251,17 +258,16 @@ describe("Korgath's grip", () => {
   });
 });
 
-describe("Korgath's two-handed blows", () => {
-  it('keep their length and start and end on Idle (the seams blend)', () => {
+describe("Korgath's one-handed blows", () => {
+  it('keep their 1.5 s and start and end on Idle (the seams blend)', () => {
     const idle = clip(body, 'Idle');
     for (const name of AUTHORED) {
       const a = clip(donor, name);
-      expect(length(a), name).toBeCloseTo(length(clip(body, name)), 2);
       expect(length(a), name).toBeCloseTo(1.5, 2);
       for (const ch of a.listChannels()) {
         if (ch.getTargetPath() !== 'rotation') continue;
         const j = ch.getTargetNode()?.getName() ?? '';
-        if (j === KORGATH_FIST_BONE || FINGERS.includes(j)) continue;
+        if (j === KORGATH_FIST_BONE) continue;
         const i0 = rotationAt(idle, j, 0);
         if (!i0) continue;
         for (const t of [0, length(a)])
@@ -272,35 +278,78 @@ describe("Korgath's two-handed blows", () => {
     }
   });
 
-  it('turn the right fist end for end on the haft for the blow, and back', async () => {
-    const idle = haftInRightHand(await posedNodes(BODY, 'Idle', 0, NODES));
-    for (const name of AUTHORED) {
-      const atContact = haftInRightHand(await posedNodes(DONOR, name, KORGATH_CLIP.slam, NODES));
-      const atEnd = haftInRightHand(await posedNodes(DONOR, name, 1.5, NODES));
-      // the head was on the little-finger side; at the blow it is on the thumb side
-      expect(dot(idle, atContact), name).toBeLessThan(-0.5);
-      expect(dot(idle, atEnd), name).toBeGreaterThan(0.95);
+  it('swing the maul in the right fist alone, in its modeled grip (never turned in the fist)', async () => {
+    const idle = await posedNodes(BODY, 'Idle', 0, NODES);
+    const grip = haftInRightHand(idle);
+    const seat = offHaft(idle['hand.r'].pos, idle.hammer);
+    for (const name of AUTHORED)
+      for (const t of frames(1.5)) {
+        const n = await posedNodes(DONOR, name, t, NODES);
+        expect(dot(grip, haftInRightHand(n)), `${name} grip @${t}`).toBeGreaterThan(0.9);
+        expect(
+          Math.abs(offHaft(n['hand.r'].pos, n.hammer) - seat),
+          `${name} seat @${t}`,
+        ).toBeLessThan(0.1);
+      }
+  });
+
+  it('never bring the left hand to the haft, and keep it on his left side', async () => {
+    for (const name of [...AUTHORED, ...LEFT_ONLY]) {
+      const T = length(clip(donor, name));
+      for (const t of frames(T)) {
+        const n = await posedNodes(DONOR, name, t, NODES);
+        expect(
+          toHaft(n['hand.l'].pos, n.hammer),
+          `${name} left off the haft @${t}`,
+        ).toBeGreaterThan(1.5);
+        if (AUTHORED.includes(name)) {
+          // glTF +X is his left, +Z ahead: the free hand stays out of his chest
+          // (out to his left, or well ahead of it) and never goes behind his back
+          const x = n['hand.l'].pos[0] - n.chest.pos[0];
+          const z = n['hand.l'].pos[2] - n.chest.pos[2];
+          expect(x > 1.0 || z > 1.5, `${name} left out of the chest @${t} (${x}, ${z})`).toBe(true);
+          expect(z, `${name} left not behind the back @${t}`).toBeGreaterThan(-0.8);
+        }
+      }
+    }
+    // what the left-arm clips fix: the body's own clip brought the left hand to the haft
+    for (const name of LEFT_ONLY) {
+      let nearest = 99;
+      for (const t of frames(length(clip(body, name)))) {
+        const n = await posedNodes(BODY, name, t, NODES);
+        nearest = Math.min(nearest, toHaft(n['hand.l'].pos, n.hammer));
+      }
+      expect(nearest, name).toBeLessThan(0.7);
     }
   });
 
-  it('hold the haft in both fists through the blow', async () => {
-    // The modeled grip sits the right wrist this far off the haft's line; the
-    // left fist's grip (the closed finger bones) sits its wrist under half a yard.
-    const idle = await posedNodes(BODY, 'Idle', 0, NODES);
-    const seat = offHaft(idle['hand.r'].pos, idle.hammer);
-    for (const name of AUTHORED) {
-      for (const t of [0.5, KORGATH_CLIP.slam, 0.7, 0.9]) {
-        const n = await posedNodes(DONOR, name, t, NODES);
-        expect(offHaft(n['hand.l'].pos, n.hammer), `${name} left @${t}`).toBeLessThan(0.5);
-        expect(
-          Math.abs(offHaft(n['hand.r'].pos, n.hammer) - seat),
-          `${name} right @${t}`,
-        ).toBeLessThan(0.1);
+  it('the left-arm clips change only the left arm, and the run loop still loops', () => {
+    for (const name of LEFT_ONLY) {
+      const a = clip(donor, name);
+      const own = clip(body, name);
+      for (const ch of a.listChannels()) {
+        if (ch.getTargetPath() !== 'rotation') continue;
+        const j = ch.getTargetNode()?.getName() ?? '';
+        if (j === KORGATH_FIST_BONE || LEFT_ARM.has(j)) continue;
+        for (const t of frames(length(a), 4))
+          expect(
+            angle(rotationAt(own, j, t) as number[], rotationAt(a, j, t) as number[]),
+            `${name} ${j}@${t}`,
+          ).toBeLessThan(0.05);
       }
     }
+    // the run loop's left arm pumps in a closed cycle
+    const loop = clip(donor, 'ThresholdChargeLoop');
+    for (const j of ['upperarm.l', 'lowerarm.l', 'hand.l'])
+      expect(
+        angle(rotationAt(loop, j, 0) as number[], rotationAt(loop, j, length(loop)) as number[]),
+        j,
+      ).toBeLessThan(0.02);
   });
 
   it('land on frame 18: the slam on the terrace in front, the sweep across his front', async () => {
+    expect(KORGATH_CLIP.slam).toBeCloseTo(17 / 30, 3);
+    expect(KORGATH_CLIP.sweep).toBeCloseTo(17 / 30, 3);
     const at = async (name: string, t: number) => {
       const n = await posedNodes(DONOR, name, t, NODES);
       const head = n.hammer.pos.map((v, i) => v + n.hammer.up[i] * HEAD_Y * unit);

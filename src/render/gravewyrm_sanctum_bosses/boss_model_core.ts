@@ -37,15 +37,23 @@ export const KORGATH_BODY: BossBody = {
   idleBoundsHeight: 10.27,
   walkRef: 2.65,
 };
-/** Korgath's maul clips re-authored on a control rig (docs/design/
- *  dungeon-rework/korgath/): HammerSlam and HammerSweep with both fists locked
- *  on the haft (the right one turned end for end for the blow, the left one
- *  closed on the finger bones the body gained), and Death with the right fist
- *  closed on the haft until the maul falls from it. A clip donor beside the
- *  body whose clips replace the body's by name. */
+/** Korgath's maul clips (docs/design/dungeon-rework/korgath/maul_rig/): his
+ *  auto attacks HammerSlam and HammerSweep re-authored as one-handed swings
+ *  (the right fist in its modeled grip, the left arm a free counterbalance);
+ *  MaulArc, ThresholdCharge and ThresholdChargeLoop with only the left arm
+ *  taken off the haft; Death with the right fist closed on the haft until the
+ *  maul falls from it. A clip donor beside the body whose clips replace the
+ *  body's by name. */
 export const KORGATH_CLIP_FIXES_URL = 'models/creatures/woc_sanctum_korgath_clips.glb';
 /** The donor's clips (they replace the body's of the same names). */
-export const KORGATH_DONOR_CLIPS = ['HammerSlam', 'HammerSweep', 'Death'] as const;
+export const KORGATH_DONOR_CLIPS = [
+  'HammerSlam',
+  'HammerSweep',
+  'MaulArc',
+  'ThresholdCharge',
+  'ThresholdChargeLoop',
+  'Death',
+] as const;
 /** The body is modeled with the right fist closed on the haft; its own clips
  *  bend that fist's single finger bone 88 degrees (176 in the gaits), folding
  *  the fingers off the haft. Every body clip he holds the maul in loses that
@@ -55,13 +63,10 @@ export const KORGATH_FIST_DROPS: Readonly<Record<string, readonly string[]>> = O
   [
     'Idle',
     'Walk',
-    'ThresholdChargeLoop',
     'Hit',
     'Strain',
     'Stomp',
-    'MaulArc',
     'ChainFlail',
-    'ThresholdCharge',
     'ForemansBellow',
     'ChainBreak',
     'ChainYank',
