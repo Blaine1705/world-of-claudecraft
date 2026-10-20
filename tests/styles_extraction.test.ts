@@ -97,6 +97,7 @@ describe('CSS extraction: barrel + seam wiring', () => {
     // suite green while that layer never loads at runtime. Pin the seam itself.
     for (const m of [
       'tokens.css',
+      'fonts.css',
       'base.css',
       'layout.css',
       'library.css',
@@ -113,6 +114,18 @@ describe('CSS extraction: barrel + seam wiring', () => {
     }
   });
 
+  it('self-hosts the same webfont set as the /wiki guide', () => {
+    // src/styles/fonts.css replaced the Google Fonts stylesheet on both game entries; the
+    // guide declares the identical set, so the two never drift apart.
+    const faces = (css: string) => css.match(/@font-face \{[\s\S]*?\n\}/g) ?? [];
+    const game = faces(read('src/styles/fonts.css'));
+    expect(game.length).toBeGreaterThanOrEqual(20);
+    expect(game).toEqual(faces(read('src/guide/styles.css')));
+    for (const entry of ['index.html', 'play.html']) {
+      expect(read(entry), entry).not.toContain('fonts.googleapis.com');
+    }
+  });
+
   it('@imports in cascade order, with hud.css BEFORE components.css (same @layer components tie-break)', () => {
     // Import order roughly follows the @layer cascade. The one deliberate exception:
     // hud.css and components.css both target @layer components, so components.css is
@@ -122,6 +135,7 @@ describe('CSS extraction: barrel + seam wiring', () => {
     const at = (m: string) => barrel.indexOf(`@import "./${m}";`);
     const order = [
       'tokens.css',
+      'fonts.css',
       'base.css',
       'layout.css',
       'library.css',

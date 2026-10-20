@@ -74,7 +74,8 @@ describe('the real entries', () => {
       const html = readFileSync(new URL(`../${entry}`, import.meta.url), 'utf8');
       const sourceHead = html.slice(0, html.indexOf('</head>'));
       const headLinks = sourceHead.match(/<link\b[^>]*rel=["']?stylesheet[^>]*>/g) ?? [];
-      expect(headLinks.length).toBeGreaterThanOrEqual(2);
+      // index.extra.css / play.extra.css; the fonts are self-hosted (src/styles/fonts.css).
+      expect(headLinks.length).toBeGreaterThanOrEqual(1);
       const out = moveHeadStylesheetsBehindBootSplash(html);
       const head = out.slice(0, out.indexOf('</head>'));
       // index.html's start screen carries a class (art-deferred), so match the tag's start.
