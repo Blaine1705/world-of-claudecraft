@@ -697,7 +697,9 @@ those constraints:
   friendly plates; health bars stay thin (about 76 x 6) with the one-pixel keyline.
 - Reaction colors, threat tint, quest `!` and `?` markers, raid marks, combo pips, cast
   bars, guild tags, and badges all keep their slots; the current target's plate is always
-  visible and slightly larger, coordinated with the selection ring in the world.
+  visible and slightly larger, coordinated with the selection ring in the world. NPC plates
+  are the exception: name, role line and quest marker only, inside `NPC_NAMEPLATE_RANGE`,
+  targeted or not.
 - The update cadence stays on the static tier knob (`nameplateIntervalSec` in
   `src/game/ui_tier_knobs.ts`), never the FPS governor.
 
@@ -1116,8 +1118,9 @@ rollback clarity:
 5. Mobile HUD surfaces and shared mobile chrome.
 6. Controller HUD and controller cross hotbar.
 
-Echoes remains future work after that coordinated delivery: the guide and editor token mirrors, and the broader mobile layout program. The font
-self-hosting plan in section 5.2 is also future work, outside this delivery.
+Echoes remains future work after that coordinated delivery: the guide and editor token
+mirrors, and the broader mobile layout program. The font self-hosting plan in section 5.2
+is also future work, outside this delivery.
 
 ## 16. Acceptance criteria
 

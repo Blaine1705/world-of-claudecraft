@@ -128,7 +128,9 @@ export function nameplatePlanInto(
   const dz = e.pos.z - player.pos.z;
   const d2 = dx * dx + dz * dz;
   const isSelf = e.id === player.id;
-  const isNpc = e.kind === 'npc';
+  // A friendly quest-giver mob wears the NPC plate (the painter's NPC branch).
+  const isNpc =
+    e.kind === 'npc' || (e.kind === 'mob' && !e.hostile && (e.questIds?.length ?? 0) > 0);
   const hasOverheadEmote = !!(e.kind === 'player' && e.overheadEmoteId && !e.dead);
   const isDoor = e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit';
   const isDelveInteract =

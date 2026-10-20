@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4817,
-    "harvestedFiles": 3948,
+    "files": 4816,
+    "harvestedFiles": 3947,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
         "ms": 1954,
@@ -10462,7 +10462,6 @@
   "tests/nameplate_canvas.test.ts": 636,
   "tests/nameplate_combo.test.ts": 3005,
   "tests/nameplate_corpse_marker.test.ts": 22,
-  "tests/nameplate_declutter.test.ts": 251,
   "tests/nameplate_dev_glow.test.ts": 4,
   "tests/nameplate_dot_scale.test.ts": 8,
   "tests/nameplate_dots_core.test.ts": 18,

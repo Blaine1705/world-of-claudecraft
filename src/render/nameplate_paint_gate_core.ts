@@ -8,7 +8,7 @@
 // often the CONTENT is re-resolved; the surface was repainted regardless.
 //
 // This is the decision half, pure and DOM-free: given the frame's viewport, the
-// surface pixel ratio, a style revision, and the DECLUTTERED anchor plus drawn
+// surface pixel ratio, a style revision, and the projected anchor plus drawn
 // state of every plate about to be drawn, it answers whether that frame differs
 // from the last one actually painted. A frame that does not differ is skipped
 // whole, and a frame that does is painted in full.

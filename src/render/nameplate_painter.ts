@@ -375,8 +375,8 @@ export class NameplatePainter {
 
     // The repaint gate compares the anchors that will actually be drawn. A pass
     // whose plates, anchors, viewport, surface ratio and style revision all
-    // match the last PAINTED pass would redraw the same pixels, so the whole clear-and-repaint of this full-viewport surface is
-    // skipped. Anything a player reads (a moved plate, HP, cast, selection,
+    // match the last PAINTED pass would redraw the same pixels, so the whole
+    // clear-and-repaint of this full-viewport surface is skipped. Anything a player reads (a moved plate, HP, cast, selection,
     // threat, content, opacity) differs and paints on its own frame.
     const surfacePixelRatio = this.getSurfacePixelRatio();
     this.paintGate.beginPass(width, height, surfacePixelRatio, this.surface.styleRevision());

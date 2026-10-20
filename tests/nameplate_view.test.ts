@@ -306,6 +306,17 @@ describe('nameplate_view - NPC plates (close range, name and role only)', () => 
     ).toBe(false);
   });
 
+  it('treats a friendly quest-giver mob as an NPC plate, but not a hostile one', () => {
+    const giver = (z: number) => ent({ hostile: false, questIds: ['q1'], pos: { x: 0, y: 0, z } });
+    expect(plan(giver(2)).nameOnly).toBe(true);
+    expect(plan(giver(NPC_NAMEPLATE_RANGE + 0.5)).hidden).toBe(true);
+    const hostile = ent({ hostile: true, questIds: ['q1'], pos: { x: 0, y: 0, z: 2 } });
+    expect(plan(hostile).nameOnly).toBe(false);
+    expect(plan(ent({ hostile: false, questIds: [], pos: { x: 0, y: 0, z: 2 } })).nameOnly).toBe(
+      false,
+    );
+  });
+
   it('keeps the close range for a targeted NPC too', () => {
     const p = viewer({ targetId: 2 });
     expect(plan(npc(NPC_NAMEPLATE_RANGE + 0.5), p).hidden).toBe(true);

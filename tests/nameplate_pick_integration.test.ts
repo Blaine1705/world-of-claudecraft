@@ -166,6 +166,10 @@ describe('production nameplate picking path', () => {
     ] as Entity['auras'];
     const lifted = harness([dotted, entity(8)], 3);
     lifted.painter.update(true);
+    const dottedState = (
+      lifted.painter as unknown as { states: Map<number, { dots: { count: number } }> }
+    ).states.get(7);
+    expect(dottedState?.dots.count).toBeGreaterThan(0);
     expect(liveAnchors(lifted.painter).map((a) => a.sy)).toEqual(
       liveAnchors(plain.painter).map((a) => a.sy),
     );
