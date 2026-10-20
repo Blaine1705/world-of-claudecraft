@@ -146,7 +146,7 @@ try {
       id: 1,
       activityId: 'ignivar_raid_arena_heroic',
       tags: [],
-      advertText: 'LFM - Ignivar Raid Arena - Heroic - 4/10 - Tank/Healer/DPS needed',
+      advertText: 'LFM - Crucible of the Last Spring - Heroic - 4/10 - Tank/Healer/DPS needed',
       applicants: [{ ...members[3], pid: 15, name: 'Solara', gear: {} }],
     };
     panel.render();
