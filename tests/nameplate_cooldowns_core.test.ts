@@ -61,7 +61,7 @@ describe('nameplate cooldowns core', () => {
   it('shows a buff that is up as ACTIVE, counting the buff, over its own cooldown', () => {
     const p = plan({ barkskin: 55 }, [{ id: 'barkskin', remaining: 11 }]);
     expect(p.count).toBe(1);
-    expect(p.slots[0]).toMatchObject({ key: 'barkskin', active: true, remaining: 11, fraction: 0 });
+    expect(p.slots[0]).toMatchObject({ key: 'barkskin', active: true, remaining: 11 });
   });
 
   it('keeps the slot in place when the buff falls off and the cooldown takes over', () => {
@@ -74,8 +74,8 @@ describe('nameplate cooldowns core', () => {
     const before = keys(out);
     nameplateCooldownsInto(out, cds, []);
     expect(keys(out)).toEqual(before);
-    expect(out.slots[0]).toMatchObject({ key: 'barkskin', active: false, remaining: 45 });
-    expect(out.slots[0].fraction).toBeCloseTo(45 / 60);
+    // Spent: the slot keeps its place but carries no time forward at all.
+    expect(out.slots[0]).toMatchObject({ key: 'barkskin', active: false, remaining: 0 });
   });
 
   it('shows a buff an ally cast on this entity, with no cooldown of its own', () => {
@@ -119,10 +119,16 @@ describe('nameplate cooldowns core', () => {
     expect(p.count).toBe(10);
   });
 
-  it('reads the recharge swipe against the base cooldown, clamped', () => {
-    expect(plan({ recklessness: 90 }).slots[0].fraction).toBeCloseTo(0.5);
-    expect(plan({ recklessness: 999 }).slots[0].fraction).toBe(1);
-    expect(plan({ [MEDALLION]: 30 }).slots[0].fraction).toBeCloseTo(0.25);
+  it('carries no time for a spent cooldown, whatever the host holds', () => {
+    // The offline Sim's bots hold real remaining times; the online mirror holds
+    // Infinity (time withheld). Either way the plan shows only that it is spent.
+    for (const held of [90, 2.5, Number.POSITIVE_INFINITY]) {
+      expect(plan({ recklessness: held }).slots[0]).toMatchObject({
+        key: 'recklessness',
+        active: false,
+        remaining: 0,
+      });
+    }
   });
 
   it('reads whole minutes from a minute up, seconds below, and tenths under ten', () => {
@@ -192,28 +198,67 @@ describe('nameplate cooldowns resolve (painter side)', () => {
     expect(out.count).toBe(0);
   });
 
-  it('resolves artwork and a localized countdown per unit', () => {
+  it('resolves artwork for every slot and a countdown for active buffs only', () => {
     const out = newNameplateCooldownsPlan();
     resolveNameplateCooldowns(
       out,
-      player({ recklessness: 161, [MEDALLION]: 47 }, [{ id: 'barkskin', remaining: 6.24 }]),
+      player({ recklessness: 161, [MEDALLION]: 47 }, [
+        { id: 'barkskin', remaining: 6.24 },
+        { id: 'icy_veins', remaining: 14.2 },
+      ]),
       true,
       1,
     );
     const byKey = Object.fromEntries(out.slots.slice(0, out.count).map((s) => [s.key, s]));
-    expect(byKey[MEDALLION].timeText).toBe('47');
+    // Active buffs count down their buff time.
     expect(byKey.barkskin.timeText).toBe('6.2');
-    expect(byKey.recklessness.timeText).toMatch(/^3\s?m/);
+    expect(byKey.icy_veins.timeText).toBe('15');
+    // Recharging cooldowns show that they are spent, never their time left.
+    expect(byKey[MEDALLION].active).toBe(false);
+    expect(byKey[MEDALLION].timeText).toBe('');
+    expect(byKey.recklessness.timeText).toBe('');
+    expect(byKey.recklessness.remaining).toBe(0);
     expect(byKey.barkskin.iconUrl).toBe(nameplateCooldownIconUrl('barkskin'));
     expect(byKey.barkskin.iconUrl).toContain('barkskin');
     expect(byKey[MEDALLION].iconUrl).toContain('medallion_of_defiance');
   });
 
-  it('re-formats when a countdown crosses the minute boundary, never reusing the text', () => {
+  it('drops the countdown the moment an active buff falls off into its cooldown', () => {
     const out = newNameplateCooldownsPlan();
-    resolveNameplateCooldowns(out, player({ recklessness: 60.5 }), true, 1);
+    resolveNameplateCooldowns(
+      out,
+      player({ barkskin: 50 }, [{ id: 'barkskin', remaining: 0.4 }]),
+      true,
+      1,
+    );
+    expect(out.slots[0].timeText).toBe('0.4');
+    resolveNameplateCooldowns(out, player({ barkskin: 49.6 }), true, 1);
+    expect(out.slots[0]).toMatchObject({ key: 'barkskin', active: false, timeText: '' });
+  });
+
+  it('re-formats an active countdown that crosses the minute boundary, never reusing the text', () => {
+    const out = newNameplateCooldownsPlan();
+    resolveNameplateCooldowns(out, player({}, [{ id: 'barkskin', remaining: 60.5 }]), true, 1);
     expect(out.slots[0].timeText).toMatch(/^2\s?m/);
-    resolveNameplateCooldowns(out, player({ recklessness: 59.5 }), true, 1);
+    resolveNameplateCooldowns(out, player({}, [{ id: 'barkskin', remaining: 59.5 }]), true, 1);
     expect(out.slots[0].timeText).toBe('60');
+  });
+
+  it('shows an active-only buff while up and never as spent', () => {
+    const plan = newNameplateCooldownsPlan();
+    // Red Harvest's Enrage is up; Raised Guard's 12 s cooldown is running.
+    nameplateCooldownsInto(plan, new Map([['raised_guard', 9]]), [
+      { id: 'fury_enrage', remaining: 3.2 },
+    ]);
+    expect(plan.count).toBe(1);
+    expect(plan.slots[0]).toMatchObject({
+      key: 'enrage_passive',
+      group: 'offensive',
+      active: true,
+      remaining: 3.2,
+    });
+    // Once the Enrage falls off, nothing is left: no spent slot for it.
+    nameplateCooldownsInto(plan, new Map([['raised_guard', 8]]), []);
+    expect(plan.count).toBe(0);
   });
 });

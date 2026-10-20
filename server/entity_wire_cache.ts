@@ -23,8 +23,8 @@ export interface EntityWireVariantCache {
   liteJson: string;
   fullAuraJson: string;
   liteAuraJson: string;
-  /** The enemy cooldown deadlines that share the stable aura channel and its
-   *  version (major_cooldown_wire.ts). Unused on the legacy variant. */
+  /** Which enemy cooldowns are spent (keys only, no time), sharing the stable
+   *  aura channel and its version (major_cooldown_wire.ts). Unused on legacy. */
   mcd: MajorCooldownWireCache;
 }
 

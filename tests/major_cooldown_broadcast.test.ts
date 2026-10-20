@@ -3,7 +3,7 @@
 // ClientWorld fed those exact snapshots mirrors them into the peer entity's
 // cooldown map. Pins the wiring the unit pair (tests/major_cooldown_wire.test.ts)
 // cannot: the game.ts splice, the online.ts decode on the aura channel only, the
-// snapshot-clock aging, and the self skip.
+// held set across lite records, the self skip, and the time-free spent-key wire.
 import { describe, expect, it, vi } from 'vitest';
 
 // Keep real join/broadcast/decode behavior while all persistence/social hooks use
@@ -25,6 +25,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
+import { SPENT_COOLDOWN_UNKNOWN_REMAINING } from '../src/net/peer_major_cooldown_wire';
 import { updateTimers } from '../src/sim/combat/auras';
 import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
@@ -59,7 +60,7 @@ describe('enemy cooldowns through the broadcast', () => {
     const { subjectEntity, step, recordOf } = setup();
     subjectEntity.cooldowns.set('recklessness', 150);
     const first = recordOf(step());
-    expect(first.mcd).toEqual({ recklessness: expect.any(Number) });
+    expect(first.mcd).toEqual(['recklessness']);
     expect(first.auras).toBeDefined();
 
     // The subject moves every tick: its lite records go out, without the channel.
@@ -79,10 +80,10 @@ describe('enemy cooldowns through the broadcast', () => {
       const record = recordOf(step());
       if (record?.mcd) carried = record;
     }
-    expect(Object.keys(carried.mcd).sort()).toEqual(['die_by_sword', 'recklessness']);
+    expect(carried.mcd).toEqual(['die_by_sword', 'recklessness']);
   });
 
-  it('mirrors the deadlines into the peer, keeps them across lite records, and leaves self alone', () => {
+  it('mirrors the spent keys into the peer with no time, keeps them across lite records, and leaves self alone', () => {
     const { viewer, subject, subjectEntity, server, step } = setup();
     const viewerEntity = server.sim.entities.get(viewer.pid);
     if (!viewerEntity) throw new Error('viewer missing');
@@ -94,21 +95,24 @@ describe('enemy cooldowns through the broadcast', () => {
 
     apply(step());
     const peer = client.entities.get(subject.pid);
-    const first = peer?.cooldowns.get('recklessness') ?? 0;
-    expect(first).toBeGreaterThan(149);
-    expect(first).toBeLessThanOrEqual(150);
+    expect(peer?.cooldowns.get('recklessness')).toBe(SPENT_COOLDOWN_UNKNOWN_REMAINING);
 
     for (let i = 0; i < 20; i++) {
       subjectEntity.pos.x += 0.5;
       apply(step());
     }
-    // Twenty ticks later the countdown has aged on the snapshot clock, not frozen
-    // and not cleared by the lite records that omitted the channel.
-    const later = client.entities.get(subject.pid)?.cooldowns.get('recklessness') ?? 0;
-    expect(later).toBeLessThan(first - 0.5);
-    expect(later).toBeGreaterThan(first - 2);
+    // Still spent, still timeless: the lite records that omitted the channel
+    // neither cleared it nor taught the client anything about when it returns.
+    expect(client.entities.get(subject.pid)?.cooldowns.get('recklessness')).toBe(
+      SPENT_COOLDOWN_UNKNOWN_REMAINING,
+    );
 
-    // The viewer's own map is the self channel's, never a peer deadline.
+    // Once it comes back on the server, the next channel record clears it.
+    subjectEntity.cooldowns.delete('recklessness');
+    for (let i = 0; i < 6; i++) apply(step());
+    expect(client.entities.get(subject.pid)?.cooldowns.has('recklessness')).toBe(false);
+
+    // The viewer's own map is the self channel's, never a peer key.
     const self = client.entities.get(viewer.pid)?.cooldowns.get('recklessness') ?? 0;
     expect(self).toBeLessThanOrEqual(42);
   });
@@ -138,7 +142,7 @@ describe('enemy cooldowns through the broadcast', () => {
     // No broadcast/cache observation happened during the first 100 seconds.
     expect(subjectEntity.cooldowns.get(MEDALLION)).toBeCloseTo(20);
     const first = step();
-    expect(recordOf(first).mcd[MEDALLION]).toBeCloseTo(server.sim.time + 19.95);
+    expect(recordOf(first).mcd).toEqual([MEDALLION]);
     const peerClient = bareClient(viewer.pid);
     const selfClient = bareClient(subject.pid);
     const apply = (client: typeof peerClient, snap: Snap) =>
@@ -146,8 +150,8 @@ describe('enemy cooldowns through the broadcast', () => {
       (client as any).applySnapshot(structuredClone(snap));
     apply(peerClient, first);
     apply(selfClient, lastSnap(subjectWs.sent));
-    expect(peerClient.entities.get(subject.pid)?.cooldowns.get('system_medallion_use')).toBeCloseTo(
-      19.95,
+    expect(peerClient.entities.get(subject.pid)?.cooldowns.get('system_medallion_use')).toBe(
+      SPENT_COOLDOWN_UNKNOWN_REMAINING,
     );
     expect(selfClient.entities.get(subject.pid)?.cooldowns.get('system_medallion_use')).toBeCloseTo(
       19.95,
@@ -158,17 +162,17 @@ describe('enemy cooldowns through the broadcast', () => {
       expect(recordOf(snap)?.mcd).toBeUndefined();
       apply(peerClient, snap);
     }
-    expect(
-      peerClient.entities.get(subject.pid)?.cooldowns.get('system_medallion_use'),
-    ).toBeLessThan(19.5);
+    expect(peerClient.entities.get(subject.pid)?.cooldowns.get('system_medallion_use')).toBe(
+      SPENT_COOLDOWN_UNKNOWN_REMAINING,
+    );
     // A fresh client gets the fact from a new whole first-sight record too.
     const reconnectWs = fakeWs();
     const reconnect = joinServer(server, reconnectWs, 3, 'Reconnected', 'warrior', STABLE);
     broadcast(server);
     const reconnected = bareClient(reconnect.pid);
     apply(reconnected, lastSnap(reconnectWs.sent));
-    expect(
-      reconnected.entities.get(subject.pid)?.cooldowns.get('system_medallion_use'),
-    ).toBeGreaterThan(19);
+    expect(reconnected.entities.get(subject.pid)?.cooldowns.get('system_medallion_use')).toBe(
+      SPENT_COOLDOWN_UNKNOWN_REMAINING,
+    );
   });
 });

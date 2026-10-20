@@ -8186,8 +8186,8 @@ export class GameServer {
       variant.tick = this.sim.tickCount;
       if (stableTimerWire) {
         const aura = cache.auraCache.encode(e.auras, this.sim.time, e.dead);
-        // Enemy cooldown deadlines share the aura channel and its version (major_cooldown_wire.ts).
-        const mcd = variant.mcd.encode(e, this.sim.time, aura.revision);
+        // Spent enemy cooldowns (keys only) share the aura channel and its version.
+        const mcd = variant.mcd.encode(e, aura.revision, this.sim.time);
         variant.dynJson = cache.baseDynJson;
         variant.dynVer = cache.baseDynVer;
         variant.auraVer = mcd.revision;

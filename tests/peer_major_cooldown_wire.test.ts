@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { SPENT_COOLDOWN_UNKNOWN_REMAINING } from '../src/net/peer_major_cooldown_wire';
 import { STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import { bareClient } from './helpers/bare_client';
 import { expectDefined } from './helpers/defined';
@@ -61,7 +62,7 @@ describe('peer cooldown ownership through ClientWorld snapshots', () => {
       expect(cooldowns(1).get('recklessness')).toBe(120);
 
       spectate('Player2');
-      const incoming = mode === 'missing' ? {} : { mcd: mode === 'null' ? null : { avatar: 1031 } };
+      const incoming = mode === 'missing' ? {} : { mcd: mode === 'null' ? null : ['avatar'] };
       apply(
         1001,
         {
@@ -81,7 +82,9 @@ describe('peer cooldown ownership through ClientWorld snapshots', () => {
       );
       expect(world.playerId).toBe(2);
       expect(cooldowns(1).has('recklessness')).toBe(false);
-      expect(cooldowns(1).get('avatar')).toBe(mode === 'replacement' ? 30 : undefined);
+      expect(cooldowns(1).get('avatar')).toBe(
+        mode === 'replacement' ? SPENT_COOLDOWN_UNKNOWN_REMAINING : undefined,
+      );
       expect(cooldowns(1).has(MEDALLION)).toBe(false);
       expect(cooldowns(1).has(FACT)).toBe(false);
       // Other mirror consumers may still own nontracked ability/system keys.
@@ -92,9 +95,13 @@ describe('peer cooldown ownership through ClientWorld snapshots', () => {
 
       // A lite record, even with an mcd field, does not replace the aura channel.
       apply(1011, { id: 2 }, [{ id: 1, x: 1, mcd: null }]);
-      expect(cooldowns(1).get('avatar')).toBe(mode === 'replacement' ? 20 : undefined);
+      expect(cooldowns(1).get('avatar')).toBe(
+        mode === 'replacement' ? SPENT_COOLDOWN_UNKNOWN_REMAINING : undefined,
+      );
       apply(1021, { id: 2 }, [], [1]);
-      expect(cooldowns(1).get('avatar')).toBe(mode === 'replacement' ? 10 : undefined);
+      expect(cooldowns(1).get('avatar')).toBe(
+        mode === 'replacement' ? SPENT_COOLDOWN_UNKNOWN_REMAINING : undefined,
+      );
       expect(cooldowns(1).has('recklessness')).toBe(false);
       expect(cooldowns(2).get('avatar')).toBe(60);
       expect(cooldowns(2).get('recklessness')).toBe(120);
@@ -117,14 +124,14 @@ describe('peer cooldown ownership through ClientWorld snapshots', () => {
             [FACT]: 1142,
           },
         },
-        [{ ...player(2), auras: [], mcd: { recklessness: 1051 } }],
+        [{ ...player(2), auras: [], mcd: ['recklessness'] }],
       );
       expect(world.spectating).toBeNull();
       expect(cooldowns(1).get('avatar')).toBe(160);
       expect(cooldowns(1).get('recklessness')).toBe(220);
       expect(cooldowns(1).get(FACT)).toBe(120);
       expect(cooldowns(2).has('avatar')).toBe(false);
-      expect(cooldowns(2).get('recklessness')).toBe(29);
+      expect(cooldowns(2).get('recklessness')).toBe(SPENT_COOLDOWN_UNKNOWN_REMAINING);
       expect(cooldowns(2).has(MEDALLION)).toBe(false);
       expect(cooldowns(2).has(FACT)).toBe(false);
       expect(cooldowns(2).get('mortal_strike')).toBe(80);
@@ -133,9 +140,12 @@ describe('peer cooldown ownership through ClientWorld snapshots', () => {
       expect(cooldowns(1).get('avatar')).toBe(150);
       expect(cooldowns(1).get('recklessness')).toBe(210);
       expect(cooldowns(1).get(FACT)).toBe(110);
-      expect(cooldowns(2).get('recklessness')).toBe(19);
+      expect(cooldowns(2).get('recklessness')).toBe(SPENT_COOLDOWN_UNKNOWN_REMAINING);
       expect(cooldowns(2).has('avatar')).toBe(false);
+      // No peer deadline exists: only an explicit whole channel ends a spent state.
       apply(1060, { id: 1 }, [{ id: 2, x: 2 }]);
+      expect(cooldowns(2).get('recklessness')).toBe(SPENT_COOLDOWN_UNKNOWN_REMAINING);
+      apply(1061, { id: 1 }, [{ id: 2, auras: [], mcd: null }]);
       expect(cooldowns(2).has('avatar')).toBe(false);
       expect(cooldowns(2).has('recklessness')).toBe(false);
       expect(cooldowns(2).get('mortal_strike')).toBe(80);
@@ -156,12 +166,12 @@ describe('peer cooldown ownership through ClientWorld snapshots', () => {
     apply(
       1002,
       { ...player(3), auras: [], cds: { avatar: 1072, recklessness: 1092 } },
-      [{ ...player(2), auras: [], mcd: { recklessness: 1032 } }],
+      [{ ...player(2), auras: [], mcd: ['recklessness'] }],
       [1],
     );
     expect(world.playerId).toBe(3);
     expect(cooldowns(2).has('avatar')).toBe(false);
-    expect(cooldowns(2).get('recklessness')).toBe(30);
+    expect(cooldowns(2).get('recklessness')).toBe(SPENT_COOLDOWN_UNKNOWN_REMAINING);
     expect(cooldowns(3).get('avatar')).toBe(70);
     spectate(null);
     apply(
@@ -176,7 +186,7 @@ describe('peer cooldown ownership through ClientWorld snapshots', () => {
     expect(cooldowns(3).has('avatar')).toBe(false);
     expect(cooldowns(3).has('recklessness')).toBe(false);
     apply(1013, { id: 1 }, [], [2, 3]);
-    expect(cooldowns(2).get('recklessness')).toBe(19);
+    expect(cooldowns(2).get('recklessness')).toBe(SPENT_COOLDOWN_UNKNOWN_REMAINING);
     expect(cooldowns(3).size).toBe(0);
     expect(cooldowns(1).get('avatar')).toBe(70);
   });

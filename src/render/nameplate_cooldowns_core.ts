@@ -7,12 +7,17 @@
 //
 // Two inputs, both already on the entity in either world:
 //   - its cooldown map: the offline Sim fills it for its bots, and the online
-//     ClientWorld mirrors a peer's tracked deadlines into it
-//     (src/net/peer_major_cooldown_wire.ts). The medallion additionally needs its successful-use provenance timer.
+//     ClientWorld mirrors which of a peer's tracked cooldowns are spent into it
+//     (src/net/peer_major_cooldown_wire.ts; the server never sends when they come
+//     back). The medallion also requires its successful-use provenance timer.
+//     A running entry is "spent", and the plan keeps no time for it: the
+//     row shows THAT a defensive is burned, never how long until it returns.
 //   - its auras: a tracked buff's aura carries the bare ability id that applied
 //     it, whoever cast it. So a buff an ally cast on this entity (a priest's
 //     Martyr's Aegis) shows HERE while it lasts, and its cooldown shows on the
-//     caster's own plate.
+//     caster's own plate. The active-only buffs (majorBuffTable: Red Harvest's
+//     Enrage, a short shield) come in this way too, and only this way: their
+//     keys are never read from the cooldown map, so they never show as spent.
 //
 // Order: medallion, then defensives, then offensives; inside a group, the key
 // ascending. Never re-sorted by time, and an ability keeps its slot when it goes
@@ -25,7 +30,7 @@
 import {
   MAJOR_COOLDOWN_GROUP_ORDER,
   type MajorCooldownGroup,
-  majorCooldownBaseSec,
+  majorAuraGroup,
   majorCooldownGroup,
   majorCooldownKeyForAura,
   majorCooldownRemaining,
@@ -72,23 +77,22 @@ export type NameplateCooldownTimeUnit = 'minutes' | 'seconds' | 'tenths';
 
 /** One resolved icon slot.
  *
- *  The first six fields are written by nameplateCooldownsInto; the last three
+ *  The first five fields are written by nameplateCooldownsInto; the last three
  *  only by the painter, on its own cadence (the NameplateDotSlot contract). */
 export interface NameplateCooldownSlot {
   /** The cooldown key or aura id: an ability id, or the medallion's trinket key. */
   key: string;
   group: MajorCooldownGroup;
-  /** The buff is up right now: glow, full colour, the number is the buff time. */
+  /** The buff is up right now: glow, full colour, the number is the buff time.
+   *  Otherwise the cooldown is spent: dimmed, with no time of any kind. */
   active: boolean;
-  /** Recharging: the part of the cooldown still to run, 0..1, for the dark
-   *  swipe. 0 while active (no swipe). */
-  fraction: number;
-  /** Seconds the number counts: the buff's while active, the cooldown's after. */
+  /** The active buff's seconds left; always 0 for a spent cooldown. */
   remaining: number;
   unit: NameplateCooldownTimeUnit;
   /** PAINTER-WRITTEN: artwork resolved from `key`, '' while unresolved. */
   iconUrl: string;
-  /** PAINTER-WRITTEN: the localized countdown, '' while unresolved. */
+  /** PAINTER-WRITTEN: the localized countdown of an ACTIVE buff; always '' for a
+   *  recharging cooldown, which shows that it is spent but never its time left. */
   timeText: string;
   /** PAINTER-WRITTEN: the quantized value `timeText` was formatted from (with
    *  the unit folded in), NaN while unresolved. */
@@ -111,7 +115,6 @@ function newSlot(): NameplateCooldownSlot {
     key: '',
     group: 'defensive',
     active: false,
-    fraction: 0,
     remaining: 0,
     unit: 'seconds',
     iconUrl: '',
@@ -180,7 +183,7 @@ export function nameplateCooldownsInto(
     // The aura's id names its ability directly or through a companion form
     // (majorCooldownKeyForAura), so the slot is keyed by the cooldown it belongs to.
     const key = majorCooldownKeyForAura(aura.id);
-    const group = key === null ? null : majorCooldownGroup(key);
+    const group = key === null ? null : majorAuraGroup(key);
     if (key === null || group === null) continue;
     const existing = findSlot(out, key);
     if (existing) {
@@ -194,7 +197,6 @@ export function nameplateCooldownsInto(
     const slot = slotAt(out, out.count++, key);
     slot.group = group;
     slot.active = true;
-    slot.fraction = 0;
     slot.remaining = aura.remaining;
     slot.unit = nameplateCooldownTimeUnit(aura.remaining);
   }
@@ -206,10 +208,10 @@ export function nameplateCooldownsInto(
     const slot = slotAt(out, out.count++, key);
     slot.group = group;
     slot.active = false;
-    const base = majorCooldownBaseSec(key);
-    slot.fraction = base > 0 ? Math.min(1, remaining / base) : 1;
-    slot.remaining = remaining;
-    slot.unit = nameplateCooldownTimeUnit(remaining);
+    // Spent: no time is carried forward, whatever the host knows (the offline
+    // Sim's bots hold real values; the online mirror holds none).
+    slot.remaining = 0;
+    slot.unit = 'seconds';
   }
   // Insertion sort over the filled prefix: a handful of slots, no allocation.
   const slots = out.slots;
