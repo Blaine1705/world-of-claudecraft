@@ -1284,19 +1284,9 @@ export class ArchetypeSequencer {
     }
     // Only morph form transitions pulse the caster's body rim; offensive hits
     // and ordinary buffs leave character materials untinted.
-    if (spec.buff !== undefined || arch === 'buff') {
-      if (spec.buff?.style === 'morph') {
-        const rim = spec.rim ? abilityHexColor(spec.rim) : slot.color;
-        host.glowPulse(
-          slot.casterId,
-          rim,
-          (spec.buff?.shellDur ? 2 : 1.3) * cs,
-          !!spec.buff?.shellDur,
-        );
-      }
-      n++;
-    }
-    if (!gentle && slot.targetId >= 0 && slot.targetId !== slot.casterId) {
+    if (spec.buff?.style === 'morph') {
+      const rim = spec.rim ? abilityHexColor(spec.rim) : slot.color;
+      host.glowPulse(slot.casterId, rim, (spec.buff.shellDur ? 2 : 1.3) * cs, !!spec.buff.shellDur);
       n++;
     }
     // impact light pulse (in a daylight scene the lit ground carries most of
