@@ -157,6 +157,67 @@ describe('Mass Barrier is a scaling raid cooldown (cast path)', () => {
     expect(shieldOn(caster).value).toBe(417);
     expect(shieldOn(ally).value).toBe(417);
   });
+
+  it('applies the talent heal multiplier to both the base and the healPower rider', () => {
+    const { sim, caster, ally, casterId } = mageRig('frost', 282);
+    const meta = sim.players.get(casterId);
+    if (!meta) throw new Error('missing meta');
+    meta.talentMods.global.healPct = 0.2;
+    refreshKnownAbilities(sim.ctx, meta, false);
+    sim.castAbility('mass_barrier', casterId);
+    // base round(250 x 1.2) = 300, rider round(282 x 0.25 x 1.2) = round(84.6) = 85.
+    expect(shieldOn(caster).value).toBe(385);
+    expect(shieldOn(ally).value).toBe(385);
+  });
+
+  it('multiplies heal and absorb modifiers together on base and rider', () => {
+    const { sim, caster, ally, casterId } = mageRig('frost', 282);
+    const meta = sim.players.get(casterId);
+    if (!meta) throw new Error('missing meta');
+    meta.talentMods.global.healPct = 0.2;
+    meta.talentMods.global.absorbPct = 0.3;
+    refreshKnownAbilities(sim.ctx, meta, false);
+    sim.castAbility('mass_barrier', casterId);
+    // base round(250 x 1.56) = 390, rider round(282 x 0.25 x 1.56) = round(109.98) = 110.
+    expect(shieldOn(caster).value).toBe(500);
+    expect(shieldOn(ally).value).toBe(500);
+  });
+
+  it('keeps the Arcane school swap and the shared personal-barrier cooldown', () => {
+    const { sim, caster, ally, casterId } = mageRig('arcane', 282);
+    sim.castAbility('mass_barrier', casterId);
+    // The Arcane spec baseline carries global healPct 0.15, which
+    // reaches both halves: round(250 x 1.15) = 288, round(282 x 0.25 x 1.15) = 81.
+    for (const e of [caster, ally]) {
+      expect(shieldOn(e).school).toBe('arcane');
+      expect(shieldOn(e).value).toBe(369);
+    }
+    // Arcane's personal barrier (Temporal Barrier, 12 sec) is put on cooldown.
+    expect(caster.cooldowns.get('temporal_barrier')).toBe(12);
+  });
+});
+
+describe('Psalm of Warding lower ranks scale through the cast path', () => {
+  it('rank 2 at level 12 (Holy) adds the same 0.10 rider', () => {
+    const at = (healPower: number): number => {
+      const sim = new Sim({ seed: 2801, playerClass: 'priest', autoEquip: true });
+      sim.setPlayerLevel(12);
+      expect(sim.setSpec('holy')).toBe(true);
+      sim.tick();
+      const p = sim.player;
+      p.resource = p.maxResource;
+      p.gcdRemaining = 0;
+      p.healPower = healPower;
+      sim.targetEntity(p.id);
+      sim.castAbility('power_word_shield');
+      const shield = p.auras.find((a) => a.kind === 'absorb' && a.sourceId === p.id);
+      if (!shield) throw new Error('Psalm of Warding did not land');
+      return shield.value ?? 0;
+    };
+    // Rank 2 base round(90 x 1.20) = 108 at level 12; rider round(282 x 0.10 x 1.20) = 34.
+    expect(at(0)).toBe(108);
+    expect(at(282)).toBe(142);
+  });
 });
 
 describe('shield tooltips show the same resolved values as combat', () => {
@@ -170,6 +231,18 @@ describe('shield tooltips show the same resolved values as combat', () => {
     if (!barrier) throw new Error('missing mass_barrier');
     expect(abilityEffectText(barrier, scaling(80))).toBe('250 (+20)');
     expect(abilityEffectText(barrier, scaling(282))).toBe('250 (+71)');
+    // A non-1 absorb multiplier reaches the tooltip exactly as combat (417 above).
+    const boosted = computeTalentModifiers('mage', {
+      ...emptyAllocation(),
+      spec: 'frost',
+      rows: { 17: 'mag_r17_mass_barrier' },
+    } as never);
+    boosted.global.absorbPct = 0.3;
+    const boostedBarrier = abilitiesKnownAt('mage', 20, boosted).find(
+      (k) => k.def.id === 'mass_barrier',
+    );
+    if (!boostedBarrier) throw new Error('missing boosted mass_barrier');
+    expect(abilityEffectText(boostedBarrier, scaling(282))).toBe('325 (+92)');
     expect(barrier.def.description).toBe(
       'Shields you and up to 4 nearby allies within 30 yd, each absorbing $d damage for 15 sec. (Mage talent)',
     );

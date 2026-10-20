@@ -295,7 +295,9 @@ describe('abilityDamageBonus applies resolved outputScaling (v0.42.0 fix)', () =
     expect(psalmEff.spellPowerCoeff).toBe(0.1);
     const psalmRes = { ...psalm, outputScaling: psalmScaling };
     const psalmBonus = abilityDamageBonus(psalmRes, psalmEff, SC);
-    expect(psalmBonus).toBeGreaterThan(0);
+    // Discipline: heal mult 1.18 x absorb mastery 1.30.
+    expect(psalmScaling.absorb).toBeCloseTo(1.534, 6);
+    expect(psalmBonus).toBe(Math.round(200 * 0.1 * 1.534));
     expect(psalmBonus).toBe(absorbBonus(SC.healPower, 0.1, psalmScaling.absorb));
   });
 
