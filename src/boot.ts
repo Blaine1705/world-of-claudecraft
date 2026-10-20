@@ -7,7 +7,7 @@
 import './styles/index.css';
 import { DESKTOP_APP, NATIVE_APP } from './client_origin';
 import { BOOT_PENDING_CLASS, BOOT_SPLASH_ID } from './ui/boot_splash_core';
-import { runLandingFirst } from './ui/landing_first';
+import { afterLoadSettles, runLandingFirst } from './ui/landing_first';
 import { bootModeFor } from './ui/landing_first_core';
 
 function storageGetter(storage: () => Storage): (key: string) => string | null {
@@ -21,6 +21,12 @@ function storageGetter(storage: () => Storage): (key: string) => string | null {
 }
 
 const startClient = () => import('./main');
+
+// index.html marks the slideshow's later scenes deferred so their images do not compete
+// with the first paint (src/styles/shell.website.css); release them once it settles.
+afterLoadSettles(() => {
+  document.getElementById('start-screen-backdrop')?.classList.remove('scenes-deferred');
+});
 
 const mode = bootModeFor({
   pathname: location.pathname,

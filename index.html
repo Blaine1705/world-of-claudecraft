@@ -53,7 +53,6 @@
 
 <!-- Cloudflare Turnstile (bot gate on login/registration). Rendered explicitly
      by src/main.ts only when VITE_TURNSTILE_SITEKEY is configured. -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://worldofclaudecraft.com/" />
@@ -940,7 +939,7 @@
       <button type="button" class="entry-guard-dismiss" data-i18n="entryGuard.dismiss">Dismiss</button>
     </div>
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
-    <div id="start-screen-backdrop" aria-hidden="true">
+    <div id="start-screen-backdrop" class="scenes-deferred" aria-hidden="true">
       <!-- Cinematic website slideshow. The original trailer is reserved for native shells. -->
       <div class="website-cinematic-art">
         <div class="website-scene website-scene-eastbrook"></div>

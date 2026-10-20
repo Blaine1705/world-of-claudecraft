@@ -59,8 +59,7 @@
       inset: -3%;
       display: block;
       pointer-events: none;
-      background-image:
-        url("/website-hero-eastbrook-v1.webp"), url("/textures/loading/eastbrook-square.webp");
+      background-image: url("/website-hero-eastbrook-v1.webp");
       background-position: center 48%;
       background-size: cover;
       transform: scale(1.035);
@@ -88,6 +87,11 @@
     & .website-scene-thornpeak {
       background-image: url("/website-hero-thornpeak-v1.webp");
       animation-delay: -10s;
+    }
+    /* index.html holds the other scenes back until the page has settled (src/boot.ts):
+       only the first is on screen at load, and the crossfade reaches the next at 8 s. */
+    & #start-screen-backdrop.scenes-deferred .website-scene:not(.website-scene-eastbrook) {
+      background-image: none;
     }
     & .website-cinematic-art::after {
       content: "";

@@ -140,14 +140,15 @@ function prefetchGameModules(): void {
 const onResize = () => syncLandingViewport();
 
 /**
- * How long after the load event the client prefetch waits before asking for idle
- * time: the landing's own images and fonts are still decoding and painting around
- * load, and several megabytes of client competing with them would delay the largest
- * paint the visitor is waiting for.
+ * How long after the load event deferred work (the client prefetch, the slideshow's
+ * later scenes) waits before asking for idle time: the landing's own images and fonts
+ * are still decoding and painting around load, and anything competing with them would
+ * delay the largest paint the visitor is waiting for.
  */
 export const GAME_PREFETCH_DELAY_MS = 1500;
 
-function afterLoadSettles(run: () => void): void {
+/** Run once the page has loaded, settled for GAME_PREFETCH_DELAY_MS and gone idle. */
+export function afterLoadSettles(run: () => void): void {
   const idle = () => {
     // Safari has no requestIdleCallback.
     if (typeof window.requestIdleCallback === 'function') {
