@@ -166,7 +166,10 @@ export function runLandingFirst(startGame: () => Promise<unknown>): void {
   stampLandingBody(settings);
   syncLandingViewport();
   window.addEventListener('resize', onResize);
-  hydrateIcons();
+  // The landing's own icons only: the hidden in-world controls carry painted art the
+  // client hydrates later, and fetching it now would compete with the first paint.
+  const startScreen = document.getElementById('start-screen');
+  if (startScreen) hydrateIcons(startScreen);
   void loadProjectStats(fetchProjectStats);
   const osReducedMotion = matches('(prefers-reduced-motion: reduce)');
   void liftBootSplashWhenReady({
