@@ -114,10 +114,14 @@ describe('crafted equipment', () => {
     vi.spyOn(sim.ctx.rng, 'int').mockImplementation((min, max) =>
       min === 0 && max === 9999 ? 9900 : real(min, max),
     );
-    expect(resolveCraftForRecipe(sim.ctx, pid, recipe).ok).toBe(true);
+    const result = resolveCraftForRecipe(sim.ctx, pid, recipe);
+    expect(result.ok).toBe(true);
     const crafted = meta.inventory.filter((s) => s.itemId === GEAR);
     expect(crafted).toHaveLength(1);
     expect(crafted[0].instance?.lootQuality?.tier).toBe(2);
+    // The craft result (and so the craftResult event and the crafted chat
+    // line) carries the same descriptor the bag copy holds.
+    expect(result.lootQuality).toEqual(crafted[0].instance?.lootQuality);
   });
 });
 

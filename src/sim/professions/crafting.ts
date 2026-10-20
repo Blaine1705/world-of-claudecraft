@@ -78,6 +78,7 @@ import { ITEMS } from '../data';
 import { slotStatMultForItem } from '../item_budget';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import { grantFreshLoot } from '../loot/fresh_quality_grant';
+import type { LootQualityDescriptor } from '../loot_quality';
 import { holdsMaterialSignature } from '../material_signatures';
 import {
   consumePlayerVaultStock,
@@ -242,6 +243,10 @@ export interface CraftResult {
   // this craft's output (a proc hit AND the effect gates passed). Absent
   // otherwise, including on every plain deterministic success.
   masterwork?: boolean;
+  // The crafted copy's permanent loot quality (loot/fresh_quality_grant.ts),
+  // present only when it rolled above Ordinary; projected into the
+  // craftResult event and CraftResultView so the craft line can name it.
+  lootQuality?: LootQualityDescriptor;
   // #1145: true when at least one consumed reagent had a self-gathered signed
   // instance (signer === the crafting player's own name) counted toward it,
   // reducing that reagent's required quantity by one for this craft.
@@ -1145,13 +1150,14 @@ export function resolveCraftForRecipe(
   // output rolls its permanent loot quality once per copy
   // (docs/design/loot-quality.md); the roll composes with the signer,
   // masterwork and commission payloads and never writes rolled.quality.
+  let lootQuality: LootQualityDescriptor | undefined;
   if (meta && masterwork && bonusStats) {
     const payload: ItemInstancePayload = {
       signer: meta.name,
       rolled: { masterwork: true, stats: bonusStats },
     };
     if (commissioned) payload.bindOnTrade = true;
-    grantFreshLoot(
+    lootQuality ??= grantFreshLoot(
       ctx,
       recipe.resultItemId,
       1,
@@ -1166,7 +1172,7 @@ export function resolveCraftForRecipe(
     if (recipe.resultCount > 1) {
       if (commissioned) {
         for (let i = 1; i < recipe.resultCount; i++) {
-          grantFreshLoot(
+          lootQuality ??= grantFreshLoot(
             ctx,
             recipe.resultItemId,
             1,
@@ -1180,7 +1186,7 @@ export function resolveCraftForRecipe(
           );
         }
       } else {
-        grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount - 1, pid, {
+        lootQuality ??= grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount - 1, pid, {
           silent: true,
           callerLogs: true,
           craftedRecipeId,
@@ -1200,7 +1206,7 @@ export function resolveCraftForRecipe(
       perfecting: PERFECTING_HEADSTART_RANK,
     });
     if (commissioned) payload.bindOnTrade = true;
-    grantFreshLoot(
+    lootQuality ??= grantFreshLoot(
       ctx,
       recipe.resultItemId,
       1,
@@ -1215,7 +1221,7 @@ export function resolveCraftForRecipe(
     if (recipe.resultCount > 1) {
       if (commissioned) {
         for (let i = 1; i < recipe.resultCount; i++) {
-          grantFreshLoot(
+          lootQuality ??= grantFreshLoot(
             ctx,
             recipe.resultItemId,
             1,
@@ -1229,7 +1235,7 @@ export function resolveCraftForRecipe(
           );
         }
       } else {
-        grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount - 1, pid, {
+        lootQuality ??= grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount - 1, pid, {
           silent: true,
           callerLogs: true,
           craftedRecipeId,
@@ -1239,7 +1245,7 @@ export function resolveCraftForRecipe(
   } else if (meta && mintsSignedCraftOutput(def)) {
     const payload: ItemInstancePayload = withPerfectingBonus(def, recipe, { signer: meta.name });
     if (commissioned) payload.bindOnTrade = true;
-    grantFreshLoot(
+    lootQuality ??= grantFreshLoot(
       ctx,
       recipe.resultItemId,
       recipe.resultCount,
@@ -1253,7 +1259,7 @@ export function resolveCraftForRecipe(
     );
   } else if (commissioned) {
     for (let i = 0; i < recipe.resultCount; i++) {
-      grantFreshLoot(
+      lootQuality ??= grantFreshLoot(
         ctx,
         recipe.resultItemId,
         1,
@@ -1267,7 +1273,7 @@ export function resolveCraftForRecipe(
       );
     }
   } else {
-    grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount, pid, {
+    lootQuality ??= grantFreshLoot(ctx, recipe.resultItemId, recipe.resultCount, pid, {
       silent: true,
       callerLogs: true,
       craftedRecipeId,
@@ -1333,6 +1339,7 @@ export function resolveCraftForRecipe(
   if (masterwork || perfectingHeadStart) result.masterwork = true;
   if (commissioned) result.commission = true;
   if (jackVariance !== null) result.variance = jackVariance;
+  if (lootQuality) result.lootQuality = lootQuality;
   return result;
 }
 
@@ -1681,6 +1688,7 @@ export function emitCraftResult(
     count: result.count,
     quality: result.quality,
     masterwork: result.masterwork,
+    ...(result.lootQuality ? { lootQuality: result.lootQuality } : {}),
     reason: result.reason,
     ...(result.retryAfterSeconds !== undefined
       ? { retryAfterSeconds: result.retryAfterSeconds }

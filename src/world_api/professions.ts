@@ -1,3 +1,4 @@
+import type { LootQualityDescriptor } from '../sim/loot_quality';
 import type {
   CommissionOrderScope,
   CommissionOrderStatus,
@@ -120,6 +121,8 @@ export interface CraftResultView {
   // this craft's output. `quality` now reports the output def's static
   // quality (outputs are deterministic; the quality roll is retired).
   masterwork?: boolean;
+  // The crafted copy's permanent loot quality, only when above Ordinary.
+  lootQuality?: LootQualityDescriptor;
 }
 
 // Masterwork proc surface (Professions 2.0): the local viewer's most

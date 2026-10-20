@@ -9,6 +9,7 @@
 import { ITEMS } from '../data';
 import type { InventoryGrantOptions } from '../inventory_grant';
 import {
+  cloneLootQuality,
   createLootQuality,
   isEligibleLootQualityItem,
   type LootQualityDescriptor,
@@ -28,6 +29,8 @@ export function rollFreshLootQualities(
   return Array.from({ length: Math.floor(count) }, () => createLootQuality(rng));
 }
 
+/** Returns the first enhanced copy's descriptor (undefined when every copy is
+ *  Ordinary), so a caller that owns the player line can name the quality. */
 export function grantFreshLoot(
   ctx: Pick<SimContext, 'rng' | 'addItem' | 'addItemInstance'>,
   itemId: string,
@@ -35,9 +38,10 @@ export function grantFreshLoot(
   pid?: number,
   opts?: InventoryGrantOptions,
   instance?: ItemInstancePayload,
-): void {
+): LootQualityDescriptor | undefined {
   const rolls = instance?.lootQuality ? [] : rollFreshLootQualities(ctx.rng, itemId, count);
   let ordinary = rolls.length ? 0 : count;
+  let first: LootQualityDescriptor | undefined;
   for (const lootQuality of rolls) {
     if (!lootQuality) {
       ordinary++;
@@ -45,8 +49,11 @@ export function grantFreshLoot(
     }
     const base = instance ? cloneItemInstancePayload(instance) : {};
     ctx.addItemInstance(itemId, { ...base, lootQuality }, pid, 1, opts);
+    first ??= lootQuality;
   }
-  if (ordinary < 1) return;
-  if (instance) ctx.addItemInstance(itemId, instance, pid, ordinary, opts);
-  else ctx.addItem(itemId, ordinary, pid, opts);
+  if (ordinary > 0) {
+    if (instance) ctx.addItemInstance(itemId, instance, pid, ordinary, opts);
+    else ctx.addItem(itemId, ordinary, pid, opts);
+  }
+  return first && cloneLootQuality(first);
 }

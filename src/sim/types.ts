@@ -7769,6 +7769,8 @@ export type SimEvent = { pid?: number } & (
       // so the online client's lastCraftResult mirror stays field-complete.
       quality?: ItemDef['quality'];
       masterwork?: boolean;
+      // The crafted copy's permanent loot quality, only when above Ordinary.
+      lootQuality?: LootQualityDescriptor;
       reason?:
         | 'unknown_recipe'
         | 'insufficient_materials'
