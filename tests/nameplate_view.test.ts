@@ -2,11 +2,13 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  isNpcPlateEntity,
   NAMEPLATE_ANCHOR_LIFT,
   NAMEPLATE_RANGE,
   NAMEPLATE_RANGE_SQ,
   NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT,
   NAMEPLATE_URGENT_RANGE,
+  NPC_NAMEPLATE_RANGE,
   nameplatePlanInto,
   newNameplatePlan,
 } from '../src/render/nameplate_view';
@@ -286,6 +288,78 @@ describe('nameplate_view - threat + combo (delegated to the narrow helpers)', ()
       ).hasOverheadEmote,
     ).toBe(false);
     expect(plan(ent({ kind: 'mob', pos: { x: 0, y: 0, z: 5 } })).hasOverheadEmote).toBe(false);
+  });
+});
+
+describe('nameplate_view - NPC plates (close range, name and role only)', () => {
+  const npc = (z: number, overrides: Record<string, unknown> = {}) =>
+    ent({ kind: 'npc', templateId: 'smith_haldren', pos: { x: 0, y: 0, z }, ...overrides });
+
+  it('shows an NPC plate only inside NPC_NAMEPLATE_RANGE', () => {
+    expect(NPC_NAMEPLATE_RANGE).toBe(10);
+    expect(plan(npc(10)).hidden).toBe(false);
+    expect(plan(npc(10.01)).hidden).toBe(true);
+    expect(plan(npc(NPC_NAMEPLATE_RANGE - 0.5)).hidden).toBe(false);
+    expect(plan(npc(NPC_NAMEPLATE_RANGE + 0.5)).hidden).toBe(true);
+    // a mob or player at the same distance keeps the normal range
+    expect(plan(ent({ pos: { x: 0, y: 0, z: NPC_NAMEPLATE_RANGE + 0.5 } })).hidden).toBe(false);
+    expect(
+      plan(ent({ kind: 'player', id: 3, pos: { x: 0, y: 0, z: NPC_NAMEPLATE_RANGE + 0.5 } }))
+        .hidden,
+    ).toBe(false);
+  });
+
+  it('treats a friendly quest-giver mob as an NPC plate, but not a hostile one', () => {
+    const giver = (z: number) => ent({ hostile: false, questIds: ['q1'], pos: { x: 0, y: 0, z } });
+    expect(plan(giver(2)).nameOnly).toBe(true);
+    expect(plan(giver(NPC_NAMEPLATE_RANGE + 0.5)).hidden).toBe(true);
+    const hostile = ent({ hostile: true, questIds: ['q1'], pos: { x: 0, y: 0, z: 2 } });
+    expect(plan(hostile).nameOnly).toBe(false);
+    expect(plan(ent({ hostile: false, questIds: [], pos: { x: 0, y: 0, z: 2 } })).nameOnly).toBe(
+      false,
+    );
+  });
+
+  it('gives a friendly quest-giver mob no threat tint or combo pips', () => {
+    const aggroed = { hostile: false, aggroTargetId: PLAYER_ID, pos: { x: 0, y: 0, z: 2 } };
+    const p = viewer({ comboPoints: 3, targetId: 2 });
+    const giver = plan(ent({ ...aggroed, questIds: ['q1'] }), p);
+    expect(giver.threat).toBe(false);
+    expect(giver.comboPips).toBe(0);
+    // the same mob without quests keeps both
+    const plain = plan(ent({ ...aggroed, questIds: [] }), p);
+    expect(plain.threat).toBe(true);
+    expect(plain.comboPips).toBe(3);
+  });
+
+  it('only promotes a MOB with quests, never a player or object', () => {
+    expect(isNpcPlateEntity(ent({ kind: 'npc' }))).toBe(true);
+    expect(isNpcPlateEntity(ent({ hostile: false, questIds: ['q1'] }))).toBe(true);
+    expect(isNpcPlateEntity(ent({ kind: 'player', hostile: false, questIds: ['q1'] }))).toBe(false);
+    expect(isNpcPlateEntity(ent({ kind: 'object', hostile: false, questIds: ['q1'] }))).toBe(false);
+  });
+
+  it('lets a compile-gate stand-in NPC show past the close range, still name-only', () => {
+    const out = plan(npc(NPC_NAMEPLATE_RANGE + 5), viewer(), 2, true, false, true, true);
+    expect(out.hidden).toBe(false);
+    expect(out.nameOnly).toBe(true);
+  });
+
+  it('keeps the close range for a targeted NPC too', () => {
+    const p = viewer({ targetId: 2 });
+    expect(plan(npc(NPC_NAMEPLATE_RANGE + 0.5), p).hidden).toBe(true);
+  });
+
+  it('marks an NPC plate name-only, with no threat tint or combo pips', () => {
+    const p = viewer({ comboPoints: 3, targetId: 2 });
+    const out = plan(npc(2, { aggroTargetId: PLAYER_ID, hostile: true }), p);
+    expect(out.nameOnly).toBe(true);
+    expect(out.threat).toBe(false);
+    expect(out.comboPips).toBe(0);
+    // the same targeting on a mob does build pips, so the NPC zero is the rule
+    expect(plan(ent({ pos: { x: 0, y: 0, z: 2 } }), p).comboPips).toBe(3);
+    expect(plan(ent({ pos: { x: 0, y: 0, z: 2 } })).nameOnly).toBe(false);
+    expect(plan(ent({ kind: 'player', id: 3, pos: { x: 0, y: 0, z: 2 } })).nameOnly).toBe(false);
   });
 });
 

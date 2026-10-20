@@ -1482,9 +1482,9 @@ describe('nameplate canvas surface', () => {
 
 describe('the player dot row on a plate', () => {
   // The plate half of the dot surfaces had NO pin at all: every nameplate
-  // harness injects nameplateDotScale: () => 0, so resolveDots, the extraLift
-  // row-height term and both draw walks were dead in test and deleting any of
-  // them stayed green. These drive the surface directly, at a filled plan.
+  // harness injects nameplateDotScale: () => 0, so resolveDots and both draw
+  // walks were dead in test and deleting any of them stayed green. These drive
+  // the surface directly, at a filled plan.
 
   function planWith(count: number, scale: number, fraction = 0.25) {
     const plan = newNameplateDotsPlan();

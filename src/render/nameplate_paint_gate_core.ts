@@ -8,7 +8,7 @@
 // often the CONTENT is re-resolved; the surface was repainted regardless.
 //
 // This is the decision half, pure and DOM-free: given the frame's viewport, the
-// surface pixel ratio, a style revision, and the DECLUTTERED anchor plus drawn
+// surface pixel ratio, a style revision, and the projected anchor plus drawn
 // state of every plate about to be drawn, it answers whether that frame differs
 // from the last one actually painted. A frame that does not differ is skipped
 // whole, and a frame that does is painted in full.
@@ -425,7 +425,7 @@ function newRecord(): PlateRecord {
  * and only a plate that appears for the first time mints a record.
  *
  * Usage per pass: `beginPass`, then one `notePlate` per plate in DRAW order
- * (post-declutter, since decluttering is what moves an anchor), then
+ * (at the anchors they will be drawn at), then
  * `needsPaint()`. Call `commit()` only on a pass that actually painted, so the
  * records always describe the pixels currently on screen.
  */
@@ -472,7 +472,7 @@ export class NameplatePaintGate {
     this.styleRevision = styleRevision;
   }
 
-  /** Record one plate about to be drawn, at its final (decluttered) anchor. */
+  /** Record one plate about to be drawn, at its final anchor. */
   notePlate(id: number, sx: number, sy: number, fields: NameplatePaintFields): void {
     const index = this.pendingCount++;
     this.pendingIds[index] = id;

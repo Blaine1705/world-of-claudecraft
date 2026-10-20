@@ -1,6 +1,7 @@
 // One batched Canvas2D compositor for every overhead nameplate. The renderer
 // owns character/object views; this painter owns resolved label state, numeric
-// projection, decluttering, text/image caches, and the single canvas surface.
+// projection, text/image caches, and the single canvas surface. Plates draw at
+// their own projected anchors: overlapping plates are never stacked apart.
 
 import * as THREE from 'three';
 import { friendlyNameplatesShown } from '../game/nameplate_view_prefs';
@@ -47,19 +48,19 @@ import {
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { resolveNameplateCooldowns } from './nameplate_cooldown_resolve';
 import { nameplateCooldownScale as nameplateCooldownScaleSetting } from './nameplate_cooldown_scale';
-import { nameplateCooldownRowHeight } from './nameplate_cooldowns_core';
-import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
 import { nameplateDotScale as nameplateDotScaleSetting } from './nameplate_dot_scale';
 import {
   clampNameplateDotScale,
   type NameplateDotAura,
-  nameplateDotRowHeight,
   nameplateDotsInto,
 } from './nameplate_dots_core';
 import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
-import { nameplateHeraldryLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
-import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
+import {
+  type NameplatePickCandidate,
+  pickNameplateHealthBarAt,
+  raiseNameplateCandidate,
+} from './nameplate_pick_core';
 import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
@@ -72,6 +73,7 @@ import {
   TARGET_OVERLAY_NONE,
 } from './nameplate_target_highlight';
 import {
+  isNpcPlateEntity,
   NAMEPLATE_ANCHOR_LIFT,
   type NameplatePlan,
   nameplatePlanInto,
@@ -244,7 +246,7 @@ export class NameplatePainter {
   // The bound ownership predicate and the id it was bound for (see resolveDots).
   private dotsOwnerId = -1;
   private dotsIsOwn: (aura: NameplateDotAura) => boolean = () => false;
-  private readonly anchorScratch: Array<NameplateAnchor & NameplatePickCandidate> = [];
+  private readonly anchorScratch: NameplatePickCandidate[] = [];
   private anchorCount = 0;
   private i18nRevision = -1;
   private readonly paintGate = new NameplatePaintGate();
@@ -405,22 +407,10 @@ export class NameplatePainter {
       }
 
       const anchor = this.anchorScratch[this.anchorCount];
-      // Every pixel this plate paints ABOVE its name row, which is what decides
-      // the declutter envelope: the deed heraldry's seal and ribbon, plus the
-      // dot row, which sits under the name row and therefore pushes the name row
-      // and everything above it up by its own height. drawEmote already mirrors
-      // that step; without this the anchor did not, so two dotted plates in a
-      // crowd overlapped without being nudged apart. The enemy cooldown row sits
-      // above the name row, so it lifts the envelope by its own height too.
-      const extraLift =
-        nameplateHeraldryLift(state.border) +
-        nameplateDotRowHeight(state.dots.count, state.dots.scale) +
-        nameplateCooldownRowHeight(state.cooldowns);
       if (anchor) {
         anchor.id = id;
         anchor.sx = screenX;
         anchor.sy = screenY;
-        anchor.extraLift = extraLift;
         anchor.hpVisible = state.hpVisible;
         anchor.castVisible = state.castVisible;
         anchor.boss = state.frame === 'boss';
@@ -430,7 +420,6 @@ export class NameplatePainter {
           id,
           sx: screenX,
           sy: screenY,
-          extraLift,
           hpVisible: state.hpVisible,
           castVisible: state.castVisible,
           boss: state.frame === 'boss',
@@ -441,16 +430,17 @@ export class NameplatePainter {
       if (id === player.targetId) targetPlated = true;
     }
 
-    declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
+    // Plates are never moved apart, so overlapping ones share a spot: the
+    // current target draws last, on top, and a click there picks it.
+    raiseNameplateCandidate(this.anchorScratch, this.anchorCount, player.targetId);
     const overlay = this.resolveTargetOverlay(player, width, height, targetPlated, languageChanged);
 
-    // The repaint decision comes AFTER decluttering, because decluttering is
-    // what moves an anchor: the gate must compare the anchors that will
-    // actually be drawn. A pass whose plates, anchors, viewport, surface ratio
-    // and style revision all match the last PAINTED pass would redraw the same
-    // pixels, so the whole clear-and-repaint of this full-viewport surface is
-    // skipped. Anything a player reads (a moved plate, HP, cast, selection,
-    // threat, content, opacity) differs and paints on its own frame.
+    // The repaint gate compares the anchors that will actually be drawn. A pass
+    // whose plates, anchors, viewport, surface ratio and style revision all
+    // match the last PAINTED pass would redraw the same pixels, so the whole
+    // clear-and-repaint of this full-viewport surface is skipped. Anything a
+    // player reads (a moved plate, HP, cast, selection, threat, content,
+    // opacity) differs and paints on its own frame.
     const surfacePixelRatio = this.getSurfacePixelRatio();
     this.paintGate.beginPass(width, height, surfacePixelRatio, this.surface.styleRevision());
     for (let i = 0; i < this.anchorCount; i++) {
@@ -670,8 +660,8 @@ export class NameplatePainter {
     state.overheadMarker = highlighted && this.targetHighlight.overhead;
     state.comboPips = Math.max(0, Math.min(COMBO_PIP_MAX, plan.comboPips));
     state.hpFill = isPlayingDead(entity) ? 0 : entity.hp / Math.max(1, entity.maxHp);
-    this.resolveDots(state, entity, player, languageChanged);
     // A hostile player's tracked cooldowns, on the same per-frame cadence as the dots.
+    // The resolver also clears non-player rows before a name-only NPC returns.
     resolveNameplateCooldowns(
       state.cooldowns,
       entity,
@@ -680,6 +670,14 @@ export class NameplatePainter {
       languageChanged,
     );
 
+    if (plan.nameOnly) {
+      state.dots.count = 0;
+      state.castVisible = false;
+      state.castSource = '';
+      state.castLabel = '';
+      return;
+    }
+    this.resolveDots(state, entity, player, languageChanged);
     const cast = castBarState(entity);
     state.castVisible = cast.visible;
     state.castFill = cast.fill;
@@ -730,7 +728,7 @@ export class NameplatePainter {
     state.emoteLabel = '';
     state.friendlyPet = false;
 
-    const raidMark = this.world.markerFor(entity.id);
+    const raidMark = plan.nameOnly ? null : this.world.markerFor(entity.id);
     if (raidMark !== null) state.raidMarkerUrl = raidMarkerDataUrl(raidMark);
 
     let emote = null;
@@ -857,7 +855,7 @@ export class NameplatePainter {
 
     state.badges.length = 0;
 
-    if (entity.kind === 'npc' || (!entity.hostile && entity.questIds.length > 0)) {
+    if (isNpcPlateEntity(entity)) {
       state.name =
         entity.kind === 'npc'
           ? npcDisplayName(entity.templateId)

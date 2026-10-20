@@ -118,6 +118,7 @@ describe('target highlight painter hostility', () => {
         hasOverheadEmote: false,
         threat: false,
         comboPips: 0,
+        nameOnly: false,
       } satisfies NameplatePlan;
       painter.updateDynamicState(state, target, player, plan, false);
       expect(state.cooldowns.count).toBe(kind === 'player' && expected ? 1 : 0);
@@ -160,6 +161,7 @@ describe('target highlight painter hostility', () => {
       hasOverheadEmote: false,
       threat: false,
       comboPips: 0,
+      nameOnly: false,
     } satisfies NameplatePlan;
     painter.updateDynamicState(state, target, player, plan, false);
     expect([state.emphasis, state.overheadMarker]).toEqual([false, false]);
@@ -173,6 +175,35 @@ describe('target highlight painter hostility', () => {
     painter.updateDynamicState(state, target, player, plan, false);
     expect([state.emphasis, state.overheadMarker]).toEqual([false, false]);
   });
+  it('clears prior combat rows before a reused name-only NPC state returns', () => {
+    const target = entity(2, 'player');
+    const { painter, player } = probe(target);
+    const state = createNameplateCanvasState();
+    const plan: NameplatePlan = {
+      hidden: false,
+      anchorYOffset: 0,
+      urgent: true,
+      hasOverheadEmote: false,
+      threat: false,
+      comboPips: 0,
+      nameOnly: false,
+    };
+    painter.updateDynamicState(state, target, player, plan, false);
+    expect(state.cooldowns.count).toBe(1);
+    state.dots.count = 1;
+    state.castVisible = true;
+    state.castSource = 'fireball';
+    state.castLabel = 'Fireball';
+
+    const npc = entity(4, 'npc');
+    painter.updateDynamicState(state, npc, player, { ...plan, nameOnly: true }, false);
+    expect(state.cooldowns.count).toBe(0);
+    expect(state.dots.count).toBe(0);
+    expect(state.castVisible).toBe(false);
+    expect(state.castSource).toBe('');
+    expect(state.castLabel).toBe('');
+  });
+
   it('reformats a stable minute active buff on the same painter pass as a language switch', async () => {
     const priorLanguage = getLanguage();
     try {
@@ -198,6 +229,7 @@ describe('target highlight painter hostility', () => {
         hasOverheadEmote: false,
         threat: false,
         comboPips: 0,
+        nameOnly: false,
       } satisfies NameplatePlan;
       painter.updateDynamicState(state, target, player, plan, false);
       expect(state.cooldowns.slots[0].active).toBe(true);
