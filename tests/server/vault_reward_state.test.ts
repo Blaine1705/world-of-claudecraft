@@ -72,6 +72,32 @@ describe('direct vault reward character snapshot', () => {
     });
   });
 
+  it('grants the plain copy for a malformed stored descriptor', () => {
+    const state = saved();
+    addVaultRewardToCharacterState(
+      state,
+      {
+        characterId: 7,
+        recipientName: 'Owner',
+        items: [
+          {
+            itemId: 'slagbreaker_helmet',
+            count: 1,
+            lootQuality: { version: 1, tier: 9, weights: [1, 1, 1, 1, 1] } as never,
+          },
+        ],
+        copper: 0,
+        mailDueAt: '2026-09-23T00:00:00.000Z',
+      },
+      '7:1',
+      true,
+    );
+    const slot = state.inventory.find((s) => s.itemId === 'slagbreaker_helmet');
+    expect(slot).toBeDefined();
+    expect(slot?.count).toBe(1);
+    expect(slot?.instance).toBeUndefined();
+  });
+
   it('does not count a capped guest as paid', () => {
     const state = saved();
     addVaultRewardToCharacterState(

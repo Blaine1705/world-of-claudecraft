@@ -3,7 +3,7 @@
 // and opens a private vault portal, the vault scales to the head count, the
 // boss pays every entrant the rarity's table, and a read map can be raised a
 // rarity for faction currency.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { FACTION_VENDOR_GATES } from '../src/sim/content/faction_vendors';
 import {
   CARTOGRAPHERS_INK_CURRENCY_COST,
@@ -15,7 +15,8 @@ import {
   vaultDamageFactor,
   vaultHealthFactor,
 } from '../src/sim/content/treasure_maps';
-import { isRiftPos } from '../src/sim/data';
+import { ITEMS, isRiftPos } from '../src/sim/data';
+import { isEligibleLootQualityItem } from '../src/sim/loot_quality';
 import {
   clearHoardRewardChest,
   confirmHoardRewardChest,
@@ -489,6 +490,48 @@ describe('the vault run', () => {
     expect(ofType(exitEvents, 'log')).toContainEqual(
       expect.objectContaining({ text: 'You climb back out through the hoard entrance.' }),
     );
+  });
+
+  it('freezes the gear line permanent quality into the online pending claims', () => {
+    // A legendary owner parcel always carries a gear piece (gearChance 1), so
+    // under a forced enhanced roll (every rng.int(0, 9999) answers 9999) its
+    // claim line must carry the tier 4 descriptor and the other lines none.
+    const sim = makeSim();
+    sim.cfg.vaultRewardNeedsSave = true;
+    const owner = sim.playerId;
+    sim.meta(owner)!.characterId = 731;
+    readAndDig(sim, 'legendary');
+    const portal = [...sim.entities.values()].find((e) => e.vaultOwnerCharacterId === 731)!;
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, owner, undefined, portal);
+    const inst = sim.riftInstances.find((i) => i.vault?.attemptId === '731:1')!;
+    expect(inst).toBeDefined();
+    for (const id of inst.mobIds) {
+      const mob = sim.entities.get(id);
+      if (mob) {
+        mob.hp = 0;
+        mob.dead = true;
+      }
+    }
+    const rng = sim.ctx.rng;
+    const real = rng.int.bind(rng);
+    vi.spyOn(rng, 'int').mockImplementation((min, max) =>
+      min === 0 && max === 9999 ? 9999 : real(min, max),
+    );
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 45; i++) events.push(...sim.tick());
+    vi.restoreAllMocks();
+    const pending = ofType(events, 'treasureVaultOutcomePending');
+    expect(pending).toHaveLength(1);
+    const [claim] = pending[0].claims;
+    expect(claim.characterId).toBe(731);
+    const gear = claim.items.filter((item) => isEligibleLootQualityItem(ITEMS[item.itemId]));
+    expect(gear).toHaveLength(1);
+    expect(gear[0]).toMatchObject({ count: 1, lootQuality: { version: 1, tier: 4 } });
+    const rest = claim.items.filter((item) => !isEligibleLootQualityItem(ITEMS[item.itemId]));
+    expect(rest.length).toBeGreaterThan(0);
+    expect(rest.every((item) => !('lootQuality' in item))).toBe(true);
+    // The frozen reward the chest pays matches the claim the host persists.
+    expect(inst.vault!.rewardClaims!.get(731)!.items).toEqual(claim.items);
   });
 });
 
