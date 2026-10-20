@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { HOARD_LOOT_CLASS_BIAS } from '../src/sim/content/hoard_loot';
 import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
-import {
-  VAULT_MATERIAL_POOL,
-  VAULT_PAYOUTS,
-  vaultConsumablePool,
-} from '../src/sim/content/treasure_maps';
-import { CLASSES, ITEMS } from '../src/sim/data';
+import { VAULT_MATERIAL_POOL, VAULT_PAYOUTS } from '../src/sim/content/treasure_maps';
+import { ITEMS } from '../src/sim/data';
 import { rollHoardReward } from '../src/sim/rift/hoard_reward_roll';
 import { Rng } from '../src/sim/rng';
-import type { PlayerClass } from '../src/sim/types';
 
 function scriptedRng(ints: number[], chances: boolean[]) {
   const calls: Array<['int' | 'chance', number, number?]> = [];
@@ -32,7 +27,7 @@ function scriptedRng(ints: number[], chances: boolean[]) {
 
 describe('rollHoardReward', () => {
   it('preserves the owners full payout and exact draw order', () => {
-    const script = scriptedRng([1, 2, 0], [true, true, true, true, true]);
+    const script = scriptedRng([1, 0], [true, true, true, true, true]);
     const reward = rollHoardReward(script.rng, {
       rarity: 'rare',
       bossTemplateId: 'rift_boss_arcane',
@@ -47,7 +42,6 @@ describe('rollHoardReward', () => {
       copper: 54_000,
       items: [
         { itemId: 'pristine_silk', count: 6 },
-        { itemId: 'sunpetal_mana_draught', count: 3 },
         { itemId: 'rare_collapsar_band_of_nyxaris', count: 1 },
         { itemId: 'heroic_mark', count: 2 },
         { itemId: 'reins_lanternback_troll', count: 1 },
@@ -56,7 +50,6 @@ describe('rollHoardReward', () => {
     });
     expect(script.calls).toEqual([
       ['int', 0, 4],
-      ['int', 0, 2],
       ['chance', VAULT_PAYOUTS.rare.gearChance],
       ['chance', HOARD_LOOT_CLASS_BIAS],
       ['int', 0, 3],
@@ -72,7 +65,7 @@ describe('rollHoardReward', () => {
   });
 
   it('uses guest odds and does not add the owner copper bonus', () => {
-    const script = scriptedRng([2, 1], [false, false, false, false]);
+    const script = scriptedRng([2], [false, false, false, false]);
     const reward = rollHoardReward(script.rng, {
       rarity: 'epic',
       cls: 'warrior',
@@ -84,14 +77,10 @@ describe('rollHoardReward', () => {
     expect(reward).toEqual({
       capped: false,
       copper: 54_000,
-      items: [
-        { itemId: 'pristine_venom_gland', count: 8 },
-        { itemId: 'elixir_of_the_serpent', count: 4 },
-      ],
+      items: [{ itemId: 'pristine_venom_gland', count: 8 }],
     });
     expect(script.calls).toEqual([
       ['int', 0, 4],
-      ['int', 0, 1],
       ['chance', 0.2],
       ['chance', VAULT_PAYOUTS.epic.markChance],
       ['chance', VAULT_PAYOUTS.epic.mountChance],
@@ -115,7 +104,7 @@ describe('rollHoardReward', () => {
   });
 
   it('draws the mount chance even when already owned', () => {
-    const script = scriptedRng([0, 0], [false, false, true, false]);
+    const script = scriptedRng([0], [false, false, true, false]);
     const reward = rollHoardReward(script.rng, {
       rarity: 'common',
       cls: 'hunter',
@@ -124,14 +113,10 @@ describe('rollHoardReward', () => {
       guestCapped: false,
       mountOwned: true,
     });
-    expect(reward.items).toEqual([
-      { itemId: 'pristine_hide', count: 4 },
-      { itemId: 'sunpetal_healing_draught', count: 2 },
-    ]);
+    expect(reward.items).toEqual([{ itemId: 'pristine_hide', count: 4 }]);
     expect(reward.copper).toBe(18_450);
     expect(script.calls).toEqual([
       ['int', 0, 4],
-      ['int', 0, 1],
       ['chance', VAULT_PAYOUTS.common.gearChance],
       ['chance', VAULT_PAYOUTS.common.markChance],
       ['chance', VAULT_PAYOUTS.common.mountChance],
@@ -168,72 +153,6 @@ describe('vault reward pools', () => {
     for (const id of VAULT_MATERIAL_POOL) {
       expect(ITEMS[id]?.kind, id).toBe('junk');
       expect(ITEMS[id].quality, id).toBe('rare');
-    }
-  });
-
-  it('pays a real consumable, and a mana draught only to a mana class', () => {
-    const consumableKinds = ['potion', 'elixir'];
-    for (const usesMana of [false, true]) {
-      for (const id of vaultConsumablePool(usesMana)) {
-        expect(consumableKinds, id).toContain(ITEMS[id]?.kind);
-      }
-    }
-    expect(vaultConsumablePool(false)).not.toContain('sunpetal_mana_draught');
-    expect(vaultConsumablePool(true)).toContain('sunpetal_mana_draught');
-    expect(vaultConsumablePool(true)).toEqual(
-      expect.arrayContaining([...vaultConsumablePool(false)]),
-    );
-  });
-
-  it('offers the mana draught to exactly the mana classes', () => {
-    // Literal, not the production predicate: the consumable pick is the second
-    // int draw, and its upper bound is the class's pool size minus one.
-    const poolSize: Record<PlayerClass, number> = {
-      warrior: 2,
-      rogue: 2,
-      hunter: 2,
-      mage: 3,
-      paladin: 3,
-      priest: 3,
-      shaman: 3,
-      warlock: 3,
-      druid: 3,
-    };
-    expect(Object.keys(poolSize).sort()).toEqual(Object.keys(CLASSES).sort());
-    for (const cls of Object.keys(poolSize) as PlayerClass[]) {
-      const script = scriptedRng([0, poolSize[cls] - 1], [false, false, false, false]);
-      const reward = rollHoardReward(script.rng, {
-        rarity: 'common',
-        cls,
-        level: 20,
-        owner: true,
-        guestCapped: false,
-        mountOwned: false,
-      });
-      expect(script.calls[1], cls).toEqual(['int', 0, poolSize[cls] - 1]);
-      expect(reward.items[1].itemId === 'sunpetal_mana_draught', cls).toBe(poolSize[cls] === 3);
-    }
-  });
-
-  it('grants every rarity a consumable stack sized by its table', () => {
-    const rarities = ['common', 'rare', 'epic', 'legendary'] as const;
-    expect(rarities.map((r) => VAULT_PAYOUTS[r].consumables)).toEqual([2, 3, 4, 5]);
-    for (const rarity of rarities) {
-      for (const cls of Object.keys(CLASSES) as PlayerClass[]) {
-        const pool = vaultConsumablePool(CLASSES[cls].resourceType === 'mana');
-        const reward = rollHoardReward(new Rng(91), {
-          rarity,
-          cls,
-          level: 25,
-          owner: true,
-          guestCapped: false,
-          mountOwned: true,
-        });
-        expect(VAULT_MATERIAL_POOL).toContain(reward.items[0].itemId);
-        expect(reward.items[0].count).toBe(VAULT_PAYOUTS[rarity].materials);
-        expect(pool, `${rarity} ${cls}`).toContain(reward.items[1].itemId);
-        expect(reward.items[1].count).toBe(VAULT_PAYOUTS[rarity].consumables);
-      }
     }
   });
 });

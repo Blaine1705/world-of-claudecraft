@@ -3,7 +3,6 @@
 // same frozen reward parcel an online entrant would have received at boss death.
 
 import { treasureCasketCopper } from '../clue_casket';
-import { CLASSES } from '../content/classes';
 import { HEROIC_MARK_CURRENCY_ID } from '../content/dungeon_difficulty';
 import { rollHoardBossDrop } from '../content/hoard_loot';
 import {
@@ -14,7 +13,6 @@ import {
   VAULT_MATERIAL_POOL,
   VAULT_OWNER_COPPER_BONUS,
   VAULT_PAYOUTS,
-  vaultConsumablePool,
 } from '../content/treasure_maps';
 import type { Rng } from '../rng';
 import type { PlayerClass } from '../types';
@@ -37,7 +35,7 @@ export interface HoardReward {
   readonly capped: boolean;
 }
 
-/** Fixed draw order: material, consumable, gear, marks, mount, next map. Every
+/** Fixed draw order: material, gear, marks, mount, next map. Every
  * chance is drawn even for an already-owned mount or a top-tier map. A capped
  * guest takes no draws; the owner is exempt from that cap. */
 export function rollHoardReward(
@@ -51,9 +49,6 @@ export function rollHoardReward(
   const items: Array<{ itemId: string; count: number }> = [];
   const material = VAULT_MATERIAL_POOL[rng.int(0, VAULT_MATERIAL_POOL.length - 1)];
   items.push({ itemId: material, count: def.materials });
-  const consumables = vaultConsumablePool(CLASSES[input.cls].resourceType === 'mana');
-  const consumable = consumables[rng.int(0, consumables.length - 1)];
-  items.push({ itemId: consumable, count: def.consumables });
   if (rng.chance(input.owner ? def.gearChance : VAULT_GUEST_GEAR_CHANCE[input.rarity])) {
     items.push({
       itemId: rollHoardBossDrop(rng, input.bossTemplateId, input.rarity, input.cls),
