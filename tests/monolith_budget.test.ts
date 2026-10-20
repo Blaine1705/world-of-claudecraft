@@ -1549,7 +1549,8 @@ const MONOLITHS: MonolithRow[] = [
     // after biome, zero slack.
     // Nameplate and highlight settings moved behind the game settings seam.
     // Dot and cooldown row apply/boot/rebuild folds share nameplate_settings.ts.
-    ceiling: 10961,
+    ceiling: 10938,
+    // The mobile page-zoom guard is now owned by mobile_zoom_guard.ts.
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

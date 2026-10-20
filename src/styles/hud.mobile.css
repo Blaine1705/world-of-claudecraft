@@ -269,7 +269,7 @@
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
      chain, so `none` here would block child scroll containers and a child's
      own `pan-y` could not re-enable it. `pan-x pan-y` still blocks pinch/
-     double-tap zoom (also guarded globally in preventMobileZoom). */
+     double-tap zoom (also guarded globally in installMobileZoomGuard, src/game/mobile_zoom_guard.ts). */
   body.mobile-touch #ui {
     touch-action: pan-x pan-y;
   }
