@@ -38,9 +38,8 @@ function devSim(devCommands = true) {
   const sim = new Sim({ seed: 17, playerClass: 'warrior', autoEquip: false, devCommands });
   // Straight to the handler: the chat seam's rate limit would drop a burst.
   const dev = (line: string) => handleSmithHeartDevChat(sim.ctx, line, sim.player.id);
-  // The claim whose slot band (|x| < 300, |z| < 250, the field's own extent)
-  // holds the player. claimedInstanceAt tests the generic |x| < 120 footprint,
-  // narrower than this field (see the module header).
+  // The claim whose slot band holds the player, read independently of the
+  // claim footprint under test (instances/instance_footprint.ts).
   const claim = () =>
     sim.ctx.instances.find((inst) => {
       if (inst.dungeonId !== SMITH_HEART_DUNGEON || inst.partyKey === null) return false;

@@ -31,6 +31,13 @@ import {
 
 export const SMITH_HEART_DUNGEON = 'smith_heart';
 
+/** False while the raid is a phase 1 blockout: no overworld door is built
+ *  (no door entity, jambs, terrain pad or cleared ring in a live world, so
+ *  the shipped world and its parity goldens stay untouched) and only dev
+ *  builds may enter, through /dev heart (encounters/smith_heart/entry.ts).
+ *  Flip it when the raid ships (design doc, "Shipping checklist"). */
+export const SMITH_HEART_PLAYABLE = false;
+
 /** The four guardians and the final boss (template ids). */
 export const SMITH_HEART_GUARDIANS: Readonly<Record<SmithHeartVein, string>> = {
   hammer: 'heart_hammer_guardian',
@@ -572,6 +579,7 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     // Overflow band, the first free index after the Last Keep's family.
     index: 15,
     doorPos: SMITH_HEART_DOOR_POS,
+    overworldDoor: SMITH_HEART_PLAYABLE,
     // The cliff rises east of the door: leaving sets the raid down on the
     // slope to the west, facing Highwatch.
     leaveOffset: { x: -4.5, z: 0 },

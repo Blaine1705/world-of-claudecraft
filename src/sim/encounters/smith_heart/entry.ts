@@ -4,11 +4,10 @@
 // unfinished raid can never be entered by players. Flip
 // SMITH_HEART_PLAYABLE when the raid ships (design doc, "Shipping checklist").
 
-import { SMITH_HEART_DUNGEON } from '../../content/smith_heart';
+import { SMITH_HEART_DUNGEON, SMITH_HEART_PLAYABLE } from '../../content/smith_heart';
 import type { SimContext } from '../../sim_context';
 
-/** False while the raid is a blockout: only dev builds may enter. */
-export const SMITH_HEART_PLAYABLE = false;
+export { SMITH_HEART_PLAYABLE };
 
 /** The English refusal (re-localized by src/ui/sim_i18n.ts, EXACT matcher). */
 export const SMITH_HEART_CLOSED_TEXT = 'The cleft is choked with fallen rock. It is not open yet.';
