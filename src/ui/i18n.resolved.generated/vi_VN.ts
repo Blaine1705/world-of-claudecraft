@@ -4014,7 +4014,7 @@ export const vi_VN: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul đã rèn ra Ignivar để làm một sứ giả, một con dấu sống, và chiếc chìa khóa đến Lò Luyện Bên Trong. Trận chiến này thử thách khả năng kiểm soát ống dẫn nước, di chuyển chính xác, và ưu tiên sát thương nhanh.",

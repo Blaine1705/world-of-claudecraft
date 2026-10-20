@@ -5064,7 +5064,7 @@ export const hudChromeStrings = {
     markHeroicChanged: 'Changed on Heroic',
     damageCompare: 'Normal {normal} | Heroic {heroic}',
     damageRange: '{min} to {max}',
-    finderOpen: 'Boss guide',
+    finderOpen: 'Boss Guide',
     finderOpenLabel: 'Open the boss guide for {boss}',
     ignivar: {
       overview:

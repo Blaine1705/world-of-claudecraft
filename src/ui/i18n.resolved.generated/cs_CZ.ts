@@ -4014,7 +4014,7 @@ export const cs_CZ: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul vykoval Ignivara jako posla, živou pečeť a klíč k Vnitřnímu tavicímu kelímku. Souboj prověřuje ovládání vodních kanálů, přesný pohyb a rychlé prioritní poškození.",

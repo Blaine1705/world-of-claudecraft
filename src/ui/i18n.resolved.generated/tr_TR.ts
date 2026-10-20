@@ -4014,7 +4014,7 @@ export const tr_TR: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul, Ignivar'ı bir haberci, yaşayan bir mühür ve İç Pota'nın anahtarı olarak dövdü. Bu karşılaşma su kanalı kontrolünü, hassas hareketi ve hızlı öncelik hasarını sınar.",

@@ -4014,7 +4014,7 @@ export const id_ID: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul menempa Ignivar sebagai seorang utusan, segel hidup, dan kunci menuju Tungku Dalam. Pertarungan ini menguji kendali saluran air, pergerakan presisi, dan kerusakan prioritas yang cepat.",

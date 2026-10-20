@@ -4014,7 +4014,7 @@ export const es: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul forjó a Ignivar como heraldo, sello viviente y llave de el Crisol Interior. El encuentro pone a prueba el control de los conductos de agua, el movimiento preciso y el daño prioritario rápido.",

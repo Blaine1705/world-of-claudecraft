@@ -4014,7 +4014,7 @@ export const nl_NL: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul smeedde Ignivar als heraut, een levend zegel, en de sleutel tot de Binnenste Smeltkroes. Het gevecht test controle over waterkanalen, precieze beweging en snelle prioriteitsschade.",

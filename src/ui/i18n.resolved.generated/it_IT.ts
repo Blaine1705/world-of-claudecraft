@@ -4014,7 +4014,7 @@ export const it_IT: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul forgiò Ignivar come araldo, sigillo vivente e chiave del Crogiolo Interiore. Lo scontro mette alla prova il controllo dei condotti d'acqua, il movimento preciso e i danni prioritari rapidi.",

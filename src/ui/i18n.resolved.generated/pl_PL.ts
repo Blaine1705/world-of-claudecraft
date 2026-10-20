@@ -4014,7 +4014,7 @@ export const pl_PL: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul wykuł Ignivara jako herolda, żywą pieczęć i klucz do Wewnętrznego Tygla. To starcie sprawdza kontrolę nad kanałami wodnymi, precyzyjny ruch oraz szybkie, priorytetowe obrażenia.",

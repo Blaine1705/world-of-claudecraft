@@ -4014,7 +4014,7 @@ export const en: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul forged Ignivar as a herald, a living seal, and the key to the Inner Crucible. The encounter tests water-conduit control, precise movement, and fast priority damage.",

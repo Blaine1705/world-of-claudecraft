@@ -4014,7 +4014,7 @@ export const pt_BR: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul forjou Ignivar como um arauto, um selo vivo e a chave para o Cadinho Interior. O encontro testa o controle dos condutos de água, a movimentação precisa e o dano de prioridade rápido.",

@@ -4014,7 +4014,7 @@ export const fr_CA: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul a forgé Ignivar comme un héraut, un sceau vivant, et la clé du Creuset intérieur. Cette rencontre teste le contrôle des conduits d'eau, la précision des déplacements, et la rapidité des dégâts prioritaires.",

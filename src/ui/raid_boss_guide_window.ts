@@ -146,7 +146,9 @@ export class RaidBossGuideWindow {
   private openerFocus: HTMLElement | null = null;
   /** Opened from the room's button (closes when the room loses its guide). */
   private openedFromContext = true;
-  private lastRun: JournalRunInput | null = null;
+  /** The room and run the last sync read: an unchanged tick does nothing. */
+  private seenDungeonId: string | null | undefined = undefined;
+  private seenRun: JournalRunInput | null = null;
 
   constructor(
     private readonly deps: RaidBossGuideWindowDeps,
@@ -180,7 +182,13 @@ export class RaidBossGuideWindow {
   }
 
   syncAvailability(dungeonId: string | null): HTMLButtonElement | null {
-    const run = this.run();
+    // IWorld.dungeonRun is reference-stable until the run changes, so a tick in
+    // the same room with the same run has nothing to repaint.
+    const run = dungeonId ? this.run() : null;
+    if (dungeonId === this.seenDungeonId && run === this.seenRun) {
+      return this.context ? this.button : null;
+    }
+    this.seenDungeonId = dungeonId;
     const next = journalContextFor(dungeonId, run, dungeonJournalSourceFor);
     const browsingElsewhere = this.isOpen && !this.openedFromContext;
     if (!next) {
@@ -194,7 +202,7 @@ export class RaidBossGuideWindow {
         this.selectedBoss = null;
         this.expandedMechanicId = null;
       }
-      this.lastRun = run;
+      this.seenRun = run;
       return null;
     }
 
@@ -218,8 +226,8 @@ export class RaidBossGuideWindow {
       }
     }
     if (contextChanged) this.paintButton();
-    const runChanged = run !== this.lastRun;
-    this.lastRun = run;
+    const runChanged = run !== this.seenRun;
+    this.seenRun = run;
     if (this.isOpen && (selectionChanged || (runChanged && this.source?.kind === 'dungeon'))) {
       this.render();
     }
@@ -264,7 +272,12 @@ export class RaidBossGuideWindow {
 
   private show(): void {
     this.deps.closeOthers();
-    this.openerFocus = this.deps.captureFocus();
+    // A page opened from the Dungeon Finder has no opener left to return to
+    // (closing the other windows hid the finder): it returns to the stable
+    // launcher instead.
+    this.openerFocus = this.openedFromContext
+      ? this.deps.captureFocus()
+      : this.deps.contextFallback();
     const root = this.deps.root();
     markDialogRoot(root, { labelledBy: 'raid-boss-guide-title' });
     root.style.display = 'block';
@@ -285,6 +298,7 @@ export class RaidBossGuideWindow {
       this.openedFromContext = true;
       this.source = this.context?.source ?? null;
       this.selectedBoss = this.context?.bossKey ?? null;
+      if (this.context?.runDifficulty) this.difficulty = this.context.runDifficulty;
     }
   }
 
@@ -403,7 +417,7 @@ export class RaidBossGuideWindow {
 
   private bossNavigation(source: JournalSource): string {
     const dungeon = source.kind === 'dungeon';
-    const run = dungeon && this.lastRun?.dungeonId === source.id ? this.lastRun : null;
+    const run = dungeon && this.seenRun?.dungeonId === source.id ? this.seenRun : null;
     const label = dungeon
       ? tx('hudChrome.raidBossGuide.dungeonBossesLabel')
       : tx('hudChrome.raidBossGuide.bossesLabel');

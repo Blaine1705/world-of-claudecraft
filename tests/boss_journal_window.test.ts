@@ -161,4 +161,41 @@ describe('RaidBossGuideWindow on a dungeon page', () => {
     expect(root.style.display).toBe('none');
     expect(document.activeElement).toBe(fallback);
   });
+
+  it('does nothing on a repeated identical sync, and repaints when a boss falls', () => {
+    run = {
+      dungeonId: SANCTUM,
+      difficulty: 'normal',
+      bosses: [
+        { mobId: 'korgath_the_bound', defeated: false },
+        { mobId: 'grand_necromancer_velkhar', defeated: false },
+        { mobId: 'korzul_the_gravewyrm', defeated: false },
+      ],
+    };
+    guide.syncAvailability(SANCTUM)?.click();
+    const renders = vi.spyOn(guide, 'render');
+    for (let i = 0; i < 5; i++) guide.syncAvailability(SANCTUM);
+    expect(renders).not.toHaveBeenCalled();
+    run = { ...run, bosses: run.bosses.map((b, i) => ({ ...b, defeated: i === 0 })) };
+    guide.syncAvailability(SANCTUM);
+    expect(renders).toHaveBeenCalledOnce();
+    expect(
+      root.querySelector('[data-boss="korgath_the_bound"]')?.classList.contains('defeated'),
+    ).toBe(true);
+  });
+
+  it('returns a finder-opened page to the stable launcher and the run difficulty', () => {
+    run = {
+      dungeonId: SANCTUM,
+      difficulty: 'normal',
+      bosses: [{ mobId: 'korgath_the_bound', defeated: false }],
+    };
+    guide.syncAvailability(SANCTUM);
+    guide.openJournal(SANCTUM, 'korzul_the_gravewyrm', 'heroic');
+    expect(root.querySelector('.rbg-subtitle')?.textContent).toContain('Heroic');
+    guide.close();
+    expect(document.activeElement).toBe(fallback);
+    guide.button.click();
+    expect(root.querySelector('.rbg-subtitle')?.textContent).toContain('Normal');
+  });
 });

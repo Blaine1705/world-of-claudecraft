@@ -4014,7 +4014,7 @@ export const da_DK: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul smedede Ignivar som en budbringer, et levende segl og nøglen til den indre digel. Kampen tester kontrol over vandkanaler, præcis bevægelse og hurtig prioriteret skade.",

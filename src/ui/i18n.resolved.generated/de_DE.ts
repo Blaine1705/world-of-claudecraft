@@ -4014,7 +4014,7 @@ export const de_DE: EnTranslations = {
       "markHeroicChanged": "Changed on Heroic",
       "damageCompare": "Normal {normal} | Heroic {heroic}",
       "damageRange": "{min} to {max}",
-      "finderOpen": "Boss guide",
+      "finderOpen": "Boss Guide",
       "finderOpenLabel": "Open the boss guide for {boss}",
       "ignivar": {
         "overview": "Varkhul schmiedete Ignivar als Herold, lebendiges Siegel und Schlüssel zum Inneren Schmelztiegel. Die Begegnung prüft die Kontrolle der Wasserkanäle, präzise Bewegung und schnellen Prioritätsschaden.",

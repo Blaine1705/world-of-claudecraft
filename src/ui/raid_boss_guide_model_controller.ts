@@ -71,12 +71,29 @@ export interface RaidBossGuideModelMountOptions {
 
 type ModelState = 'idle' | 'loading' | 'ready' | 'error' | 'nowebgl';
 
+/** The shared GLB cache the real viewer loads through: the journal releases,
+ *  on close, the boss files it was first to bring in (a Dungeon Finder visit
+ *  can browse two dozen bosses the world never needed). Injected for tests. */
+export interface RaidBossGuideGltfCache {
+  isCached(url: string): boolean;
+  release(url: string): void;
+}
+
+let sharedLoader: typeof import('../render/assets/loader') | null = null;
+
+const DEFAULT_GLTF_CACHE: RaidBossGuideGltfCache = {
+  // Unknown until the real viewer has loaded the module: never release then.
+  isCached: (url) => sharedLoader?.isGltfCached(url) ?? true,
+  release: (url) => sharedLoader?.releaseGltf(url),
+};
+
 async function createDefaultViewer(
   stage: HTMLElement,
   canvasLabel: string,
   touchQueue: () => LinkedProgramTouchQueue | null = () => null,
 ): Promise<RaidBossGuideModelViewer> {
   const { ModelViewer } = await import('../guide/viewer/scene');
+  sharedLoader ??= await import('../render/assets/loader');
   return new ModelViewer(stage, canvasLabel, touchQueue);
 }
 
@@ -114,6 +131,8 @@ export class RaidBossGuideModelController {
   private loadedBoss: string | null = null;
   private options: RaidBossGuideModelMountOptions | null = null;
   private webglSupported: boolean | null = null;
+  /** GLB files this journal was first to load (released on destroy). */
+  private readonly ownedUrls = new Set<string>();
   private restoreFocusAfterLoad = false;
   private generation = 0;
   private onscreen = true;
@@ -124,6 +143,7 @@ export class RaidBossGuideModelController {
     private readonly supportsWebGL: () => boolean = () => browserSupportsWebGL(doc),
     private readonly prefersReducedMotion: () => boolean = () => browserPrefersReducedMotion(doc),
     private readonly touchQueue: () => LinkedProgramTouchQueue | null = () => null,
+    private readonly gltfCache: RaidBossGuideGltfCache = DEFAULT_GLTF_CACHE,
   ) {
     this.host = doc.createElement('div');
     this.host.className = 'rbg-model-viewer';
@@ -168,6 +188,9 @@ export class RaidBossGuideModelController {
     this.setState((this.host.dataset.state as ModelState | undefined) ?? 'idle');
 
     if (options.spec === null || !this.canUseWebGL()) {
+      // A portrait-only page holds no WebGL context, and an in-flight load for
+      // the previous boss must never land on it.
+      if (options.spec === null) this.releaseViewer();
       this.requestedBoss = options.boss;
       this.loadedBoss = null;
       this.setState('nowebgl');
@@ -194,17 +217,23 @@ export class RaidBossGuideModelController {
     if (!this.prefersReducedMotion()) this.activate();
   }
 
-  destroy(): void {
+  private releaseViewer(): void {
     this.generation++;
-    this.requestedBoss = null;
-    this.loadedBoss = null;
-    this.options = null;
     this.restoreFocusAfterLoad = false;
     this.visibilityObserver?.disconnect();
     this.visibilityObserver = null;
     const viewer = this.viewer;
     this.viewer = null;
     viewer?.destroy();
+  }
+
+  destroy(): void {
+    this.releaseViewer();
+    this.requestedBoss = null;
+    this.loadedBoss = null;
+    this.options = null;
+    for (const url of this.ownedUrls) this.gltfCache.release(url);
+    this.ownedUrls.clear();
     this.host.remove();
     this.setState('idle');
     this.loadQueue = Promise.resolve();
@@ -271,6 +300,7 @@ export class RaidBossGuideModelController {
     }
     if (generation !== this.generation) return;
     viewer.setLabel(canvasLabel);
+    if (!this.gltfCache.isCached(spec.url)) this.ownedUrls.add(spec.url);
     await viewer.load(spec, options.tint ?? null);
     if (generation !== this.generation) return;
     this.loadedBoss = boss;

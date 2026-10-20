@@ -4014,7 +4014,7 @@ export const en_XA: EnTranslations = {
       "markHeroicChanged": "[Çĥáñĝéð óñ Ĥéŕóíç]",
       "damageCompare": "[Ñóŕɱáļ {normal} | Ĥéŕóíç {heroic}]",
       "damageRange": "[{min} ţó {max}]",
-      "finderOpen": "[Ɓóšš ĝúíðé]",
+      "finderOpen": "[Ɓóšš Ĝúíðé]",
       "finderOpenLabel": "[Óþéñ ţĥé ƀóšš ĝúíðé ƒóŕ {boss}]",
       "ignivar": {
         "overview": "[Ʋáŕķĥúļ ƒóŕĝéð Íĝñíʋáŕ áš á ĥéŕáļð, á ļíʋíñĝ šéáļ, áñð ţĥé ķéý ţó ţĥé Íññéŕ Çŕúçíƀļé. Ţĥé éñçóúñţéŕ ţéšţš ŵáţéŕ-çóñðúíţ çóñţŕóļ, þŕéçíšé ɱóʋéɱéñţ, áñð ƒášţ þŕíóŕíţý ðáɱáĝé.]",

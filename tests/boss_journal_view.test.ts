@@ -5,6 +5,7 @@
 // audit found players misread.
 
 import { describe, expect, it } from 'vitest';
+import { decodeDungeonRun } from '../src/net/dungeon_run_wire';
 import { mobVisualKey, VISUALS } from '../src/render/characters/manifest';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { finderActivity } from '../src/sim/content/dungeon_finder';
@@ -211,6 +212,28 @@ describe('journal room context', () => {
         ...run,
         bosses: run.bosses.map((b) => ({ ...b, defeated: false })),
       }),
+    ).toBe('sledge_tusker');
+  });
+});
+
+describe('journal room context on the online mirror', () => {
+  it('reads a ClientWorld-decoded run exactly like the offline Sim view', () => {
+    const wire = decodeDungeonRun({
+      dungeonId: 'gravewyrm_sanctum',
+      difficulty: 'heroic',
+      bosses: [
+        { mobId: 'korgath_the_bound', defeated: true },
+        { mobId: 'grand_necromancer_velkhar', defeated: false },
+        { mobId: 'korzul_the_gravewyrm', defeated: false },
+      ],
+    });
+    expect(wire).not.toBeNull();
+    const ctx = journalContextFor('gravewyrm_sanctum', wire, dungeonJournalSourceFor);
+    expect(ctx?.bossKey).toBe('grand_necromancer_velkhar');
+    expect(ctx?.runDifficulty).toBe('heroic');
+    expect(
+      journalContextFor('gravewyrm_sanctum', decodeDungeonRun(null), dungeonJournalSourceFor)
+        ?.bossKey,
     ).toBe('sledge_tusker');
   });
 });
