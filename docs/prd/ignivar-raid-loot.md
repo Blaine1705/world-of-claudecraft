@@ -422,9 +422,10 @@ partition, the rings in Varkhul's varkhul_offset), so hit is farmable,
 never a lucky bonus drop. The one-item-per-five-raiders re-cut halved the
 flow of every elective but kept each in a guaranteed group, with one
 consequence stated plainly: those groups are NORMAL-only. The Heroic
-exclusive partitions carry hit only on the six marquee weapons (30 each),
-so a roster that raided Heroic alone would top out at 60 against the 130
-melee and 110 spell caps. That is the intended shape, not a gap: Heroic
+exclusive partitions carry hit only on the six marquee weapons (30 each)
+and the hunter's Infernal Quiver (50, added 2026-10-21), so a roster that
+raided Heroic alone would top out at 60 (80 for a hunter: one weapon plus
+the quiver) against the 130 melee and 110 spell caps. That is the intended shape, not a gap: Heroic
 pays the exclusives, Normal pays the electives, the two difficulties hold
 separate weekly locks, and a Heroic roster farms its cap from its Normal
 lock the same week. Pinned per difficulty by the elective-lanes case in
@@ -787,7 +788,11 @@ Shields are ArmorItemDef with shield: true and blockValue; requiredClass
 covers the shield-capable classes per role. Held offhands take the 0.75 held
 slot budget (18 points). The quiver is worn, not held (occupiesHand false,
 the direfang_quiver precedent): it costs no two-hander, so it takes the
-WORN_OFFHAND_STAT_MULT line (11 points) and a single crit 25, no Hit.
+WORN_OFFHAND_STAT_MULT line (11 points: Agi 8, Sta 3), crit 25 like the
+other offhands, and Hit 50: the one Hit-carrying offhand of the tier (the
+operator's call, 2026-10-21, keeping the hunter quiver ladder's Hit identity).
+A Heroic-only hunter (one weapon plus the quiver) reaches 80 Hit, still short
+of the 130 melee cap, so the Normal lock stays load-bearing for hit.
 
 ### Weapons (9 items)
 

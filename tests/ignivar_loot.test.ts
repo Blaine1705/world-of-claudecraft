@@ -381,6 +381,8 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
     // rating), plus the choker's original 25. Set pieces still carry none
     // (the Hit-scarcity policy holds: hit lives on the elective lanes), and
     // the cap-coverage describe below proves the lanes reach the heroic caps.
+    // The one offhand exception is the hunter's Infernal Quiver at 50 (the
+    // operator's call, 2026-10-21), a Heroic-only lane beside the weapons.
     for (const item of Object.values(IGNIVAR_LOOT_ITEMS)) {
       const want =
         item.slot === 'waist'
@@ -389,7 +391,9 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
             ? 25
             : item.kind === 'weapon'
               ? 30
-              : 0;
+              : item.id === 'infernal_quiver'
+                ? 50
+                : 0;
       expect(item.hitRating ?? 0, item.id).toBe(want);
     }
   });
@@ -1149,7 +1153,9 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
     // The Heroic-exclusive hit carriers are the six marquee weapons plus the
     // redistributed Wand of Quenched Sparks, all at 30, so a Heroic-only kit
     // tops out at 60 (both hands) against both caps: the Normal lock is
-    // load-bearing for hit, by design.
+    // load-bearing for hit, by design. The hunter's Infernal Quiver (Hit 50) is
+    // the one offhand carrier: a hunter cannot dual wield, so its Heroic-only
+    // ceiling is one weapon plus the quiver, 80, still short of the melee cap.
     const heroicIds = [
       ...(HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? []),
       ...(HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? []),
@@ -1160,12 +1166,16 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
       'forgefathers_warhammer',
       'forgefire_spire',
       'heart_of_the_end_greatblade',
+      'infernal_quiver',
       'springtouched_crozier',
       'staff_of_the_last_spring',
       'wand_of_quenched_sparks',
     ]);
-    for (const id of heroicHitCarriers) expect(ITEMS[id].hitRating, id).toBe(30);
+    for (const id of heroicHitCarriers) {
+      expect(ITEMS[id].hitRating, id).toBe(id === 'infernal_quiver' ? 50 : 30);
+    }
     expect(2 * 30).toBeLessThan(Math.min(meleeCap, spellCap));
+    expect(30 + 50, 'Heroic-only hunter: one weapon plus the quiver').toBeLessThan(meleeCap);
   });
 
   it('every class can wear a hit waist and a hit weapon from the tier', () => {

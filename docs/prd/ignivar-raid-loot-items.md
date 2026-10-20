@@ -443,7 +443,7 @@ of 11 (offhand mult 0.45).
 | Ember Warden's Barrier | shield | Int 9, Spi 9 | Healing Power 18 | haste 25 | armor 760, block 22 | paladin, shaman |
 | Orb of the Last Spring | held offhand | Int 9, Spi 9 | Healing Power 18 | haste 25 | | priest, mage, druid, paladin, shaman |
 | Cinder of the First Design | held offhand | Int 12, Spi 6 | Spell Damage 14 | crit 25 | | mage, priest, warlock, druid |
-| Infernal Quiver | worn offhand (quiver) | Agi 7, Sta 4 | none | crit 25 | worn line 11 (offhand mult 0.45) | hunter |
+| Infernal Quiver | worn offhand (quiver) | Agi 8, Sta 3 | none | crit 25, hit 50 | worn line 11 (offhand mult 0.45) | hunter |
 
 ## Weapons (9 items)
 

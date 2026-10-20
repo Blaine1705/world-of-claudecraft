@@ -3103,12 +3103,15 @@ export const IGNIVAR_HELD_ITEMS: Record<string, ItemDef> = {
     // Heroic Varkhul slot (the direfang_quiver precedent on Nythraxis). Worn,
     // not held: it costs no two-hander, so it prices on the worn line,
     // primaryStatBudget(35, epic, offhand, WORN_OFFHAND_STAT_MULT) = 11,
-    // split on the Skirmisher agi/sta ratio. One 25-point rating like every
-    // held offhand of the tier; crit, not Hit, because the plan's Hit program
-    // does not place Hit on an offhand.
+    // weighted to agility. Ratings are the operator's call (2026-10-21): crit 25
+    // like every held offhand of the tier, plus Hit 50, the one Hit-carrying
+    // offhand of the Crucible and a Heroic-only Hit lane beside the marquee
+    // weapons. It keeps the hunter quiver ladder's physical Hit identity (the
+    // ilvl-33 heroic_direfang_quiver carries Hit 55 + crit 20).
     occupiesHand: false,
-    stats: { agi: 7, sta: 4 },
+    stats: { agi: 8, sta: 3 },
     critRating: 25,
+    hitRating: 50,
     sellValue: 12000,
     requiredClass: ['hunter'],
   },
