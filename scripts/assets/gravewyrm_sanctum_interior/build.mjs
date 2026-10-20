@@ -37,6 +37,13 @@ export const GRAVEWYRM_SANCTUM_INTERIOR_PIECES = [
   'LipIceA',
   'LipIceB',
   'BoneHeap',
+  // The walks between the bosses.
+  'EdgeRubbleA',
+  'EdgeRubbleB',
+  'EdgeRubbleIceA',
+  'EdgeRubbleIceB',
+  'DriftA',
+  'DriftB',
 ];
 
 export const ASSET = {
@@ -57,6 +64,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/dungeon-rework/entrance/entrance_common.py',
     'docs/design/dungeon-rework/kit/gravewyrm_interior_sculpt.py',
     'docs/design/dungeon-rework/kit/gravewyrm_vault_sculpt.py',
+    'docs/design/dungeon-rework/kit/gravewyrm_paths_sculpt.py',
     'docs/design/dungeon-rework/kit/build_gravewyrm_sanctum_interior.py',
     'scripts/assets/gravewyrm_sanctum_interior/build.mjs',
   ]) {

@@ -15,6 +15,11 @@
 //   resolveInteriorReplacements), bone heaps against the walls between the
 //   pools (knee low), and ice and slate lips under the stairs in and out
 //   (the works road, the vault stair, the shore and lake stairs).
+// - The walks between the bosses: rubble gathered on every walk's last yard
+//   before its lip drops into the gulf (knee low, a body steps over it; never
+//   in a boss arena, never on a stair), and lip rocks round the round
+//   terraces the first kit's straight lip modules skip (the landing, the
+//   road's two bends, the hollow's shelf).
 //
 // Every piece is render-only dressing: nothing here stands in a body's way
 // over walkable floor (tests/gravewyrm_sanctum_interior_kit.test.ts sweeps
@@ -27,6 +32,7 @@ import {
   RITUAL_VAULT,
   THAW_POOLS,
 } from '../../sim/content/gravewyrm_sanctum_layout';
+import { authoredFieldCliffRuns } from '../../sim/instances/authored_field';
 import type { FieldSurface } from '../../sim/instances/authored_field/types';
 import type { SanctumKitPlacement } from './sanctum_kit_plan_core';
 import { sanctumFloorAt, sanctumGround, sanctumHash } from './sanctum_plan_core';
@@ -182,6 +188,170 @@ export function resolveInteriorReplacements(
   return plan.filter((p) => (INTERIOR_REPLACES[p.piece] ? has(p.piece) : !replaced.has(p.piece)));
 }
 
+/** Rubble module length along a lip (yards) and the spacing between. */
+export const RUBBLE_LENGTH = 4.8;
+const RUBBLE_STEP = 5.6;
+/** Surfaces whose rims carry no rubble: the boss arenas (the terrace's curb,
+ *  the vault's walls, the lake's plates and its shelf) keep their floors
+ *  clean for the fights' telegraphs. */
+const RUBBLE_SKIP: ReadonlySet<string> = new Set([
+  'lock_terrace',
+  'ritual_vault',
+  'frozen_lake',
+  'hollow_shelf',
+]);
+
+function surfaceById(id: string): FieldSurface | undefined {
+  return GRAVEWYRM_SANCTUM_FIELD.surfaces.find((f) => f.id === id);
+}
+
+/** Whether a rubble module's whole footprint lies on its own floor or over
+ *  the gulf: none where it would spill onto a lower walk beside it (a stair,
+ *  a ramp, the next terrace), where its knee-high stones would stand a body
+ *  tall over that floor. */
+function rubbleFootprintClear(
+  x: number,
+  z: number,
+  nx: number,
+  nz: number,
+  floor: number,
+): boolean {
+  // Along the lip (the module's length) and across it (the walk's side, the spill).
+  const tx = -nz;
+  const tz = nx;
+  for (const u of [-3.8, -2.6, -1.3, 0, 1.3, 2.6, 3.8])
+    for (const v of [-2.0, -1.0, 0.0, 0.8, 1.6]) {
+      const f = sanctumFloorAt(x + tx * u + nx * v, z + tz * u + nz * v);
+      if (f === null) continue;
+      if (Math.abs(f - floor) > 0.25) return false;
+    }
+  return true;
+}
+
+/** Rubble on the last yard of every walk whose lip drops into the gulf. */
+export function planEdgeRubble(): SanctumKitPlacement[] {
+  const out: SanctumKitPlacement[] = [];
+  let k = 0;
+  for (const run of authoredFieldCliffRuns(GRAVEWYRM_SANCTUM_FIELD)) {
+    const s = surfaceById(run.surface);
+    if (!s || s.hidden || RUBBLE_SKIP.has(s.id)) continue;
+    if (s.kind === 'path' && s.stairs) continue;
+    if (run.high - run.low < 3) continue;
+    const len = Math.hypot(run.bx - run.ax, run.bz - run.az);
+    const n = Math.floor(len / RUBBLE_STEP);
+    const slots: number[] = [];
+    if (n === 0) {
+      // A short run (a round terrace's facet): one module now and then.
+      if (sanctumHash(k, 61) < len / RUBBLE_STEP) slots.push(0.5);
+    } else for (let j = 0; j < n; j++) slots.push((j + 0.5) / n);
+    const icy = s.ground === 'snow' || s.ground === 'ice';
+    for (const t of slots) {
+      k++;
+      // Not everywhere: a lip reads natural with gaps.
+      if (sanctumHash(k, 62) < 0.3) continue;
+      const x = run.ax + (run.bx - run.ax) * t;
+      const z = run.az + (run.bz - run.az) * t;
+      if (sanctumFloorAt(x + run.nx * 2.5, z + run.nz * 2.5) !== null) continue;
+      const floor = sanctumFloorAt(x - run.nx * 0.6, z - run.nz * 0.6);
+      if (floor === null) continue;
+      if (!rubbleFootprintClear(x, z, run.nx, run.nz, floor)) continue;
+      const variant = sanctumHash(k, 63) < 0.5 ? 'A' : 'B';
+      out.push({
+        piece: `${icy ? 'Kit_EdgeRubbleIce' : 'Kit_EdgeRubble'}${variant}`,
+        x,
+        z,
+        y: floor,
+        rot: Math.atan2(run.nx, run.nz),
+        scale: 0.9 + sanctumHash(k, 64) * 0.25,
+        cosmetic: true,
+      });
+    }
+  }
+  return out;
+}
+
+/** Snowfields that bank wind drifts near their rims (the fork, the wings'
+ *  shelves, the Thaw Works' terraces, the shore). */
+const DRIFT_FIELDS: ReadonlySet<string> = new Set([
+  'fork',
+  'serac_upper',
+  'serac_lower',
+  'anchor_lower',
+  'works_upper',
+  'works_lower',
+  'shore_of_the_held',
+]);
+
+/** Wind drifts on the snowfields, a few yards in from their rims, their lee
+ *  faces downwind (east), knee low (a body walks through them). */
+export function planDrifts(): SanctumKitPlacement[] {
+  const out: SanctumKitPlacement[] = [];
+  let k = 0;
+  for (const run of authoredFieldCliffRuns(GRAVEWYRM_SANCTUM_FIELD)) {
+    if (!DRIFT_FIELDS.has(run.surface)) continue;
+    const len = Math.hypot(run.bx - run.ax, run.bz - run.az);
+    const n = Math.max(1, Math.floor(len / 9));
+    for (let j = 0; j < n; j++) {
+      k++;
+      if (sanctumHash(k, 81) < (len < 6 ? 0.8 : 0.45)) continue;
+      const t = (j + 0.3 + sanctumHash(k, 82) * 0.4) / n;
+      const inset = 3.2 + sanctumHash(k, 83) * 2.5;
+      const x = run.ax + (run.bx - run.ax) * t - run.nx * inset;
+      const z = run.az + (run.bz - run.az) * t - run.nz * inset;
+      const floor = sanctumFloorAt(x, z);
+      if (floor === null || !rubbleFootprintClear(x, z, 1, 0, floor)) continue;
+      out.push({
+        piece: sanctumHash(k, 84) < 0.5 ? 'Kit_DriftA' : 'Kit_DriftB',
+        x,
+        z,
+        y: floor,
+        // The lee (local +X) downwind, east, give or take.
+        rot: (sanctumHash(k, 85) - 0.5) * 0.7,
+        scale: 0.85 + sanctumHash(k, 86) * 0.4,
+        cosmetic: true,
+        noShadow: true,
+      });
+    }
+  }
+  return out;
+}
+
+/** Lip rocks round a round terrace (the first kit's lip modules skip its
+ *  short facets): modules round the rim wherever the gulf lies beyond. */
+export function planCircleLips(id: string, salt: number): SanctumKitPlacement[] {
+  const s = surfaceById(id);
+  if (!s || s.kind !== 'circle') throw new Error(`no circle ${id}`);
+  const out: SanctumKitPlacement[] = [];
+  const n = Math.max(6, Math.round((2 * Math.PI * s.r) / LIP_ROCK_LENGTH));
+  for (let j = 0; j < n; j++) {
+    const a = (2 * Math.PI * j) / n;
+    const nx = Math.sin(a);
+    const nz = Math.cos(a);
+    const x = s.x + nx * s.r;
+    const z = s.z + nz * s.r;
+    if (sanctumFloorAt(x + nx * 2.5, z + nz * 2.5) !== null) continue;
+    const floor = Math.min(
+      sanctumGround(x - nx * LIP_PROBE, z - nz * LIP_PROBE),
+      sanctumGround(
+        s.x + Math.sin(a + 0.5 / s.r) * (s.r - LIP_PROBE),
+        s.z + Math.cos(a + 0.5 / s.r) * (s.r - LIP_PROBE),
+      ),
+    );
+    out.push({
+      piece: LIP_ROCKS[Math.floor(sanctumHash(j + salt, 71) * LIP_ROCKS.length)],
+      x,
+      z,
+      y: floor - LIP_DROP,
+      rot: Math.atan2(nx, nz),
+      scale: 1,
+      stretch: ((2 * Math.PI * s.r) / n / LIP_ROCK_LENGTH) * 1.12,
+      depth: 0.9 + sanctumHash(j + salt, 72) * 0.3,
+      noShadow: true,
+    });
+  }
+  return out;
+}
+
 /** The whole interior plan (instance-local frame). */
 export function planSanctumInteriorPlacements(): SanctumKitPlacement[] {
   return [
@@ -193,5 +363,20 @@ export function planSanctumInteriorPlacements(): SanctumKitPlacement[] {
     ...planStairLips('vault_stair', 43, LIP_ICE),
     ...planStairLips('shore_stair', 57),
     ...planStairLips('lake_stair', 71),
+    // Every other sloping walk's sides: the landing stair, the haul road's
+    // three legs, the two wings' walks and the anchor ramp.
+    ...planStairLips('landing_stair', 151),
+    ...planStairLips('sledge_road_upper', 163),
+    ...planStairLips('sledge_road_middle', 177),
+    ...planStairLips('sledge_road_lower', 191),
+    ...planStairLips('serac_walk', 203, LIP_ICE),
+    ...planStairLips('anchor_walk', 211),
+    ...planStairLips('anchor_ramp', 223),
+    ...planEdgeRubble(),
+    ...planDrifts(),
+    ...planCircleLips('gate_landing', 101),
+    ...planCircleLips('road_upper_bend', 113),
+    ...planCircleLips('road_lower_bend', 127),
+    ...planCircleLips('hollow_shelf', 139),
   ];
 }

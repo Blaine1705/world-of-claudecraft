@@ -40,6 +40,7 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, '..', 'entrance'))
 import entrance_common as ec  # noqa: E402
 import gravewyrm_interior_sculpt as gi  # noqa: E402
+import gravewyrm_paths_sculpt as gp  # noqa: E402
 import gravewyrm_vault_sculpt as gv  # noqa: E402
 import sanctum_gate_sculpt as sg  # noqa: E402
 
@@ -175,6 +176,23 @@ def bone_heap():
     return p
 
 
+def edge_rubble(variant, icy):
+    rng = np.random.default_rng(4000 + variant * 13 + (7 if icy else 0))
+    f = gp.edge_rubble_field(variant, rng, icy)
+    name = ('Kit_EdgeRubbleIce' if icy else 'Kit_EdgeRubble') + 'AB'[variant]
+    p = Piece(name)
+    sg.add_sculpt(p, f, name, 1700, gp.path_paint(f, 4050 + variant, icy), mat=gi.STONE)
+    return p
+
+
+def drift(variant):
+    rng = np.random.default_rng(4300 + variant * 17)
+    f = gp.drift_field(variant, rng)
+    p = Piece('Kit_Drift' + 'AB'[variant])
+    sg.add_sculpt(p, f, 'Drift%d' % variant, 1100, gp.path_paint(f, 4350 + variant, True), mat=gi.STONE)
+    return p
+
+
 def lip_rock(variant):
     rng = np.random.default_rng(2500 + variant * 7)
     f = gi.lip_rock_field(variant, rng)
@@ -289,6 +307,10 @@ def main():
     for v in range(2):
         builders.append(('Kit_LipIce' + 'AB'[v], lambda v=v: lip_ice(v)))
     builders.append(('Kit_BoneHeap', bone_heap))
+    for v in range(2):
+        builders.append(('Kit_EdgeRubble' + 'AB'[v], lambda v=v: edge_rubble(v, False)))
+        builders.append(('Kit_EdgeRubbleIce' + 'AB'[v], lambda v=v: edge_rubble(v, True)))
+        builders.append(('Kit_Drift' + 'AB'[v], lambda v=v: drift(v)))
     objs = []
     for name, build in builders:
         if not wanted(name):
