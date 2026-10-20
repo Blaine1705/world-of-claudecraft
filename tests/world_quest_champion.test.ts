@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
 import {
+  summonWorldQuestChampion,
   WORLD_QUEST_CHAMPION_TUNING as TUNING,
   worldQuestChampionState,
   worldQuestOffersChampion,
@@ -37,8 +40,8 @@ function killTargets(sim: Sim, count: number): void {
   }
 }
 
-function champion(sim: Sim): Entity | undefined {
-  const state = worldQuestChampionState(sim.ctx, QUEST_ID);
+function champion(sim: Sim, questId = QUEST_ID): Entity | undefined {
+  const state = worldQuestChampionState(sim.ctx, questId);
   return state ? sim.entities.get(state.mobId) : undefined;
 }
 
@@ -106,5 +109,60 @@ describe('the world quest champion encore', () => {
     sim.tick();
     expect(sim.entities.has(mob.id)).toBe(false);
     expect(worldQuestChampionState(sim.ctx, QUEST_ID)).toBeUndefined();
+  });
+
+  it('never promotes a training dummy into a site champion', () => {
+    const sim = new Sim({ seed: 31, playerClass: 'warrior' });
+    const quest = WORLD_QUESTS_BY_ID.wq_willowfen_ore;
+    expect(quest.objective.type).toBe('gather');
+    const meta = sim.meta(sim.playerId)!;
+    // A practice dummy right on the area centre, nearer than any real hostile.
+    const dummy = createMob(
+      sim.ctx.nextId++,
+      MOBS.training_dummy,
+      20,
+      sim.groundPos(quest.area.x, quest.area.z),
+    );
+    sim.ctx.addEntity(dummy);
+    expect(dummy.hostile).toBe(true);
+    // The next real hostile of the site is promoted instead.
+    expect(summonWorldQuestChampion(sim.ctx, quest, meta)).toBe(true);
+    const rose = champion(sim, quest.id);
+    expect(rose).toBeDefined();
+    expect(rose?.templateId).not.toBe('training_dummy');
+    expect(MOBS[rose!.templateId]?.dummy).not.toBe(true);
+    // With only the dummy on the site, no champion rises at all.
+    const lone = new Sim({ seed: 31, playerClass: 'warrior' });
+    for (const e of [...lone.entities.values()]) {
+      if (e.kind === 'mob') lone.ctx.dropEntity(e.id);
+    }
+    const loneDummy = createMob(
+      lone.ctx.nextId++,
+      MOBS.training_dummy,
+      20,
+      lone.groundPos(quest.area.x, quest.area.z),
+    );
+    lone.ctx.addEntity(loneDummy);
+    expect(summonWorldQuestChampion(lone.ctx, quest, lone.meta(lone.playerId)!)).toBe(false);
+    expect(worldQuestChampionState(lone.ctx, quest.id)).toBeUndefined();
+  });
+
+  it('promotes a real mob, not the hub dummy, at the Eastbrook bandit camp', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior' });
+    for (let i = 0; i < 40; i++) sim.tick();
+    const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    expect(quest.objective.type).not.toBe('kill');
+    // The reported case: a hostile practice dummy stands inside the pick radius.
+    const dummyNear = [...sim.entities.values()].some(
+      (e) =>
+        e.kind === 'mob' &&
+        MOBS[e.templateId]?.dummy === true &&
+        Math.hypot(e.pos.x - quest.area.x, e.pos.z - quest.area.z) < 150,
+    );
+    expect(dummyNear).toBe(true);
+    expect(summonWorldQuestChampion(sim.ctx, quest, sim.meta(sim.playerId)!)).toBe(true);
+    const rose = champion(sim, quest.id);
+    expect(rose).toBeDefined();
+    expect(MOBS[rose!.templateId]?.dummy).not.toBe(true);
   });
 });
