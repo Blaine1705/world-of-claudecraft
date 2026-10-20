@@ -855,7 +855,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
     // The World PvP trophy skull (pvp_trophy_skull, world_pvp_spoils.ts): 1,618.
     // The World PvP Skull Bag (pvp_skull_bag, pvp/skull_bag.ts): 1,619.
-    expect(Object.keys(ITEMS)).toHaveLength(1619);
+    expect(Object.keys(ITEMS)).toHaveLength(1620);
+    // The art-pending Crucible hunter quiver adds one live item, with no mapping owner.
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1023,7 +1024,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the World PvP Skull Bag (pvp_skull_bag): 1466 owners, 1619 items.
     expect(new Set(currentOwnerIds).size).toBe(1466);
     expect(shippingIds).toHaveLength(1466);
-    expect(Object.keys(ITEMS)).toHaveLength(1619);
+    expect(Object.keys(ITEMS)).toHaveLength(1620);
+    // The art-pending Crucible hunter quiver adds one live item, with no mapping owner.
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);

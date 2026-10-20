@@ -831,8 +831,8 @@ export const RELIQUARY_HEROIC_GEAR = {
     'hunters_tally',
     'echoing_lens',
   ],
-  // Crucible of the Last Spring: the heroic-only weapon, shield and trinket
-  // appends.
+  // Crucible of the Last Spring: the heroic-only weapon, shield, offhand,
+  // quiver and trinket appends.
   // The sigil redemption tokens that share both bosses' heroic tables are
   // NOT catalogued (kind 'tool'): they are per-slot redemption currency the
   // Crucible Quartermaster consumes, not unique spoils, the same carve-out
@@ -857,6 +857,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'staff_of_the_last_spring',
     'orb_of_the_last_spring',
     'cinder_of_the_first_design',
+    'infernal_quiver',
     // The raid trinkets (content/trinkets.ts), heroic exclusives here and
     // Normal off-set drops too, so also on the Normal page.
     'forgefathers_temper',

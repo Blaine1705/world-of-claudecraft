@@ -18647,6 +18647,9 @@ export const ru_RU: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Боевой посох Авангарда"
       },
+      "infernal_quiver": {
+        "name": "Инфернальный колчан"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

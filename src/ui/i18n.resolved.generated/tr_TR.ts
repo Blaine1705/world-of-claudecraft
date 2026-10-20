@@ -18647,6 +18647,9 @@ export const tr_TR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Öncü'nün Savaş Asası"
       },
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },

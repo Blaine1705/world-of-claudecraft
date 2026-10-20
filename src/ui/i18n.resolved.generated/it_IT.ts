@@ -18647,6 +18647,9 @@ export const it_IT: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Bastone da Guerra dell'Avanguardia"
       },
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },

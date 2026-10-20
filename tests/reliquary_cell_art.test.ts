@@ -568,14 +568,15 @@ describe('unknown ids fall through to the caller fallback', () => {
     }
     // The completion wave left no catalogued relic on procedural art. Any
     // future growth is a deliberate exact-set edit here and in the debt ledger.
-    // Open wave: the 135 Warfare Season 2 armor pieces (Vanguard Gallery),
-    // parked on ITEM_ART_PENDING for the follow-up art pass.
+    // Open waves: the 135 Warfare Season 2 armor pieces (Vanguard Gallery),
+    // parked on ITEM_ART_PENDING for the follow-up art pass, and the Crucible
+    // hunter quiver on the Varkhul Heroic page, owed by the next item-art pass.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(
       [...procedural].sort(),
       `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
-    ).toEqual([...season2Armor].sort());
-    expect(procedural).toHaveLength(135);
+    ).toEqual([...season2Armor, 'infernal_quiver'].sort());
+    expect(procedural).toHaveLength(136);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {

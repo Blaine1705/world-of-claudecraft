@@ -18647,6 +18647,9 @@ export const es: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Bastón de Guerra de la Vanguardia"
       },
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
       },
