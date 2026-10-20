@@ -8940,6 +8940,144 @@
       min-width: 40px;
     }
   }
+
+  /* ---------- first-login graphics prompt ---------- */
+  /* Pre-game modal over the start screen (src/ui/graphics_choice_prompt.ts). The dialog is a
+     .ui-panel and the confirm a .ui-btn--gold; this section only sets geometry and type. The
+     backdrop pads by the safe-area insets so a notched landscape phone keeps the dialog clear. */
+  .graphics-prompt-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    box-sizing: border-box;
+    background: var(--color-options-scrim);
+  }
+  .graphics-prompt-dialog {
+    width: min(460px, 100%);
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 18px;
+    box-sizing: border-box;
+    animation: graphics-prompt-in 160ms ease-out;
+  }
+  @keyframes graphics-prompt-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .graphics-prompt-title {
+    margin: 0 0 6px;
+    font-family: var(--title-font);
+    font-size: 19px;
+    font-weight: normal;
+    color: var(--gold);
+  }
+  .graphics-prompt-desc,
+  .graphics-prompt-note {
+    margin: 0 0 14px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .graphics-prompt-note {
+    margin: 0;
+    font-size: 12px;
+  }
+  .graphics-prompt-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .graphics-prompt-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    cursor: var(--cursor-point);
+  }
+  .graphics-prompt-option:has(.graphics-prompt-radio:checked) {
+    border-color: var(--gold);
+  }
+  .graphics-prompt-option:has(.graphics-prompt-radio:focus-visible) {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .graphics-prompt-radio {
+    flex: none;
+    margin-top: 2px;
+    accent-color: var(--gold);
+    width: 18px;
+    height: 18px;
+  }
+  .graphics-prompt-option-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .graphics-prompt-option-title {
+    color: var(--color-text-light);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .graphics-prompt-option-desc {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  /* The "change it later" note shares the confirm's row, so the prompt stays one row shorter. */
+  .graphics-prompt-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .graphics-prompt-confirm {
+    flex: none;
+    min-width: 120px;
+  }
+  /* Landscape phones: two option columns and tighter spacing so the whole prompt fits
+     without scrolling on a short viewport. */
+  @media (max-height: 520px) and (min-width: 560px) {
+    .graphics-prompt-dialog {
+      width: min(640px, 100%);
+      padding: 12px 14px;
+    }
+    .graphics-prompt-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .graphics-prompt-option {
+      padding: 7px 10px;
+    }
+    .graphics-prompt-desc {
+      margin-bottom: 8px;
+    }
+    .graphics-prompt-actions {
+      margin-top: 8px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .graphics-prompt-dialog {
+      animation: none;
+    }
+  }
+  body.reduce-motion .graphics-prompt-dialog {
+    animation: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------

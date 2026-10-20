@@ -3863,6 +3863,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'mobilePreflight.otherStandaloneDetail': '기기를 가로 전체 화면으로 유지하세요.',
   'mobilePreflight.otherInstallDetail':
     '최상의 모바일 전체 화면 경험을 위해 이 페이지를 설치하거나 홈 화면에 추가하세요.',
+  'graphicsPrompt.title': '그래픽 설정 선택',
+  'graphicsPrompt.intro':
+    '이 기기에 사용할 그래픽 프리셋을 선택하세요. 낮은 프리셋은 더 부드럽게, 높은 프리셋은 더 풍부하게 보입니다.',
+  'graphicsPrompt.autoDesc': '이 기기에 맞는 프리셋을 자동으로 선택합니다. 감지됨: {preset}.',
+  'graphicsPrompt.lowDesc':
+    '가장 부드러운 성능. 휴대폰, 태블릿, 구형 또는 내장 그래픽에 적합합니다.',
+  'graphicsPrompt.mediumDesc': '화질과 성능의 균형. 대부분의 노트북에 적합합니다.',
+  'graphicsPrompt.highDesc': '더 많은 디테일과 풍부한 풍경. 외장 그래픽 카드에 적합합니다.',
+  'graphicsPrompt.ultraDesc': '가장 풍부한 고정 프리셋. 고급 그래픽 카드에 적합합니다.',
+  'graphicsPrompt.changeLater': '옵션의 그래픽 품질에서 언제든지 변경할 수 있습니다.',
+  'graphicsPrompt.confirm': '계속',
   'serverUnavailable.title': 'World of ClaudeCraft - 월드 이용 불가',
   'serverUnavailable.logoAlt': 'World of ClaudeCraft',
   'serverUnavailable.eyebrow': '월드 점검',

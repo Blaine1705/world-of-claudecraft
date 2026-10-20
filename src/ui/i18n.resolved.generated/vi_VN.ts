@@ -11494,6 +11494,17 @@ export const vi_VN: EnTranslations = {
     "otherStandaloneDetail": "Hãy giữ thiết bị ở chế độ ngang toàn màn hình.",
     "otherInstallDetail": "Hãy cài đặt hoặc thêm trang này vào Màn hình chính để có trải nghiệm toàn màn hình tốt nhất trên di động."
   },
+  "graphicsPrompt": {
+    "title": "Choose Your Graphics",
+    "intro": "Pick a graphics preset for this device. Lower presets run smoother; higher ones look richer.",
+    "autoDesc": "Picks a preset that suits this device. Detected: {preset}.",
+    "lowDesc": "Smoothest performance. Best for phones, tablets, and older or integrated graphics.",
+    "mediumDesc": "A balance of visuals and performance. Suits most laptops.",
+    "highDesc": "More detail and fuller scenery. Suits a dedicated graphics card.",
+    "ultraDesc": "The richest fixed preset. Suits a high-end graphics card.",
+    "changeLater": "You can change this any time in Options, under Graphics Quality.",
+    "confirm": "Continue"
+  },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Thế Giới Không Khả Dụng",
     "logoAlt": "World of ClaudeCraft",

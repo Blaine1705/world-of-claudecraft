@@ -11494,6 +11494,17 @@ export const zh_CN: EnTranslations = {
     "otherStandaloneDetail": "请保持设备处于横屏全屏。",
     "otherInstallDetail": "安装此页面或将其添加到主屏幕，以获得最佳移动端全屏体验。"
   },
+  "graphicsPrompt": {
+    "title": "选择图形设置",
+    "intro": "为此设备选择一个图形预设。较低的预设运行更流畅，较高的预设画面更丰富。",
+    "autoDesc": "自动为此设备选择合适的预设。检测结果：{preset}。",
+    "lowDesc": "性能最流畅。最适合手机、平板以及较旧或集成显卡。",
+    "mediumDesc": "兼顾画面与性能。适合大多数笔记本电脑。",
+    "highDesc": "更多细节和更丰富的场景。适合独立显卡。",
+    "ultraDesc": "画面最丰富的固定预设。适合高端显卡。",
+    "changeLater": "你可以随时在选项的“图形质量”中更改此设置。",
+    "confirm": "继续"
+  },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - 服务器不可用",
     "logoAlt": "World of ClaudeCraft",

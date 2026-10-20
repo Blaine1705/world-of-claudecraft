@@ -1551,6 +1551,7 @@ const MONOLITHS: MonolithRow[] = [
     // Dot and cooldown row apply/boot/rebuild folds share nameplate_settings.ts.
     ceiling: 10938,
     // The mobile page-zoom guard is now owned by mobile_zoom_guard.ts.
+    // Landing graphics choice now shares the prompt's graphics_choice_core.ts.
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

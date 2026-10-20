@@ -739,6 +739,13 @@ export const BOOL_SETTINGS = {
   // non-false def would fake "applied" and defeat detection. reset() clears it back to false,
   // so Reset to Defaults re-detects the device default on the next reload.
   graphicsDefaultApplied: { def: false },
+  // internal, never shown in the options UI: set true once the player has answered the
+  // first-login graphics prompt (src/ui/graphics_choice_prompt.ts) or picked an explicit
+  // preset on the landing page, so the prompt asks at most once per browser. def is false for
+  // a fresh store; a store persisted before this key existed loads it as TRUE instead
+  // (loadedBoolDefault), so a returning player is never stopped to re-pick a preset they
+  // already play on. reset() returns it to false, so Reset to Defaults asks again.
+  graphicsPromptAnswered: { def: false },
 } as const;
 
 export type NumericSettingKey = keyof typeof SETTING_RANGES;
@@ -792,6 +799,19 @@ function defaultTouchInterface(): boolean {
   }
 }
 
+// Keys whose MISSING value in an already-persisted store means "answered" rather than def:
+// a one-shot first-run marker added after players already had a store must not re-fire for them.
+const LEGACY_STORE_ANSWERED_KEYS: readonly BoolSettingKey[] = ['graphicsPromptAnswered'];
+
+function loadedBoolDefault(
+  key: BoolSettingKey,
+  values: Pick<GameSettings, 'interfaceMode'>,
+  hadStore: boolean,
+): boolean {
+  if (hadStore && LEGACY_STORE_ANSWERED_KEYS.includes(key)) return true;
+  return defaultBoolSetting(key, values);
+}
+
 function defaultBoolSetting(
   key: BoolSettingKey,
   values: Pick<GameSettings, 'interfaceMode'>,
@@ -828,7 +848,8 @@ export class Settings {
 
   private load(): GameSettings {
     const stored = parseStoredJson(STORE_KEY);
-    const raw = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
+    const hadStore = !!stored && typeof stored === 'object';
+    const raw = hadStore ? (stored as Record<string, unknown>) : {};
     const out = {} as GameSettings;
     for (const key of NUMERIC_KEYS) {
       const v = raw[key];
@@ -845,7 +866,7 @@ export class Settings {
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];
-      out[key] = typeof v === 'boolean' ? v : defaultBoolSetting(key, out);
+      out[key] = typeof v === 'boolean' ? v : loadedBoolDefault(key, out, hadStore);
     }
     return out;
   }
