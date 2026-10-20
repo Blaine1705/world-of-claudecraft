@@ -38,7 +38,7 @@ import { hasExplicitAbilityIcon } from '../src/ui/icons';
 
 const TIERS: readonly JournalDifficulty[] = ['normal', 'heroic'];
 const PLACEHOLDER = /\{[a-zA-Z0-9_]+\}/;
-const DASHES = /[–—]/;
+const DASHES = /[\u2013\u2014]/;
 
 function rendered(
   key: TranslationKey,
