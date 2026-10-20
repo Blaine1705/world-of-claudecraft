@@ -38,6 +38,7 @@ import {
   KORGATH_BOUND_STANCE,
   KORGATH_STANDING_STANCE,
   korgathStance,
+  mobEngaged,
 } from '../src/render/gravewyrm_sanctum_bosses/boss_model_core';
 import {
   CHAIN_BRIDGE,
@@ -291,6 +292,14 @@ describe("Korgath's chained clips", () => {
     expect(korgathStance(false, true, false)).toBe('standing');
     // Walking home after an evade: never on his knees.
     expect(korgathStance(false, false, true)).toBe('standing');
+    // Online a mob's inCombat is never mirrored (only the own character's):
+    // its aggro target is, and it keeps him standing through the fight.
+    expect(mobEngaged({ inCombat: false, aggroTargetId: 42 })).toBe(true);
+    expect(mobEngaged({ inCombat: true, aggroTargetId: null })).toBe(true);
+    expect(mobEngaged({ inCombat: false, aggroTargetId: null })).toBe(false);
+    expect(korgathStance(mobEngaged({ inCombat: false, aggroTargetId: 42 }), false, false)).toBe(
+      'standing',
+    );
   });
 
   it('swaps his whole clip map: BoundKneel bound, BoundRise into his fighting clips', () => {

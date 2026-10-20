@@ -128,6 +128,8 @@ export function planStairLips(
           stretch: (len / n / LIP_ROCK_LENGTH) * 1.08,
           depth: 0.9 + sanctumHash(k + salt, 43) * 0.3,
           noShadow: true,
+          // The low tier keeps the terrain's own skirt (as before the pass).
+          cosmetic: true,
         });
         k++;
       }
@@ -352,6 +354,7 @@ export function planCircleLips(id: string, salt: number): SanctumKitPlacement[] 
       stretch: ((2 * Math.PI * s.r) / n / LIP_ROCK_LENGTH) * 1.12,
       depth: 0.9 + sanctumHash(j + salt, 72) * 0.3,
       noShadow: true,
+      cosmetic: true,
     });
   }
   return out;

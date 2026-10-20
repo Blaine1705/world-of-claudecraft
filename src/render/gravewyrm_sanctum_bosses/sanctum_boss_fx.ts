@@ -149,6 +149,7 @@ import {
   KORZUL_TAKEOFF_GESTURE,
   korgathStance,
   korzulBodyView,
+  mobEngaged,
   VELKHAR_FLAME_GESTURE,
   VELKHAR_FLAME_Y,
   VELKHAR_THAW_GESTURE,
@@ -293,6 +294,10 @@ function rgb(hex: number): [number, number, number] {
   return [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
 }
 
+/** Seconds Korgath must stand still before he kneels again (well over a sim
+ *  tick and a snapshot gap, so a walk home never flickers to his knees). */
+const KORGATH_STILL_SEC = 0.6;
+
 export class SanctumBossFx {
   private readonly root = new THREE.Group();
   private readonly kit: TelegraphKit;
@@ -332,7 +337,7 @@ export class SanctumBossFx {
   /** Korgath's stance last sent per view (kneeling at his seal, or standing),
    *  and where he stood on the last frame (a body that walks stands). */
   private readonly korgathStanceSent = new Map<number, 'bound' | 'standing'>();
-  private readonly korgathLastPos = new Map<number, { x: number; z: number }>();
+  private readonly korgathLastPos = new Map<number, { x: number; z: number; movedAt: number }>();
   /** Break Free's cinematic on screen: his id, the clock when the pull came
    *  (from the bar's elapsed time), the last clock its cues were played to. */
   private emerge: { id: number; t0: number; last: number } | null = null;
@@ -1830,11 +1835,31 @@ export class SanctumBossFx {
   private syncKorgathStance(k: Entity, resend: boolean): void {
     const play = this.playGesture;
     if (!play) return;
-    const last = this.korgathLastPos.get(k.id);
-    const moving = !!last && Math.hypot(k.pos.x - last.x, k.pos.z - last.z) > 0.02;
-    this.korgathLastPos.set(k.id, { x: k.pos.x, z: k.pos.z });
-    const want = korgathStance(k.inCombat, k.dead, moving);
-    if (!resend && this.korgathStanceSent.get(k.id) === want) return;
+    const held = this.korgathStanceSent.get(k.id);
+    // A rebuilt view gets the stance already held, never a fresh measure.
+    if (resend && held) {
+      play(k.id, held === 'bound' ? KORGATH_BOUND_STANCE : KORGATH_STANDING_STANCE);
+      return;
+    }
+    // Moving over sim time, not frames: the position steps on the 20 Hz tick
+    // (and on snapshots online), so a body counts as moving until it has held
+    // still for KORGATH_STILL_SEC.
+    let last = this.korgathLastPos.get(k.id);
+    if (!last) {
+      last = { x: k.pos.x, z: k.pos.z, movedAt: -Infinity };
+      this.korgathLastPos.set(k.id, last);
+    }
+    // (A mirrored body without a previous position reads by the last frame.)
+    const prev = k.prevPos as typeof k.prevPos | undefined;
+    const stepped = !!prev && Math.hypot(k.pos.x - prev.x, k.pos.z - prev.z) > 0.01;
+    if (stepped || Math.hypot(k.pos.x - last.x, k.pos.z - last.z) > 0.02) {
+      last.x = k.pos.x;
+      last.z = k.pos.z;
+      last.movedAt = this.clock;
+    }
+    const moving = this.clock - last.movedAt < KORGATH_STILL_SEC;
+    const want = korgathStance(mobEngaged(k), k.dead, moving);
+    if (held === want) return;
     this.korgathStanceSent.set(k.id, want);
     play(k.id, want === 'bound' ? KORGATH_BOUND_STANCE : KORGATH_STANDING_STANCE);
   }

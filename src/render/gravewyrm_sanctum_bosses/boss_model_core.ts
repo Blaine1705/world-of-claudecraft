@@ -192,11 +192,18 @@ export const KORGATH_STANDING_STANCE = 'sanctum_korgath_standing';
  *  alive, standing otherwise (in the fight, dead, or walking back home after
  *  an evade: a body that walks is never drawn on its knees). */
 export function korgathStance(
-  inCombat: boolean,
+  engaged: boolean,
   dead: boolean,
   moving: boolean,
 ): 'bound' | 'standing' {
-  return !inCombat && !dead && !moving ? 'bound' : 'standing';
+  return !engaged && !dead && !moving ? 'bound' : 'standing';
+}
+
+/** Whether a mob is in its fight on BOTH hosts: offline `inCombat` holds from
+ *  the pull to the end of the evade, but online it is mirrored for the own
+ *  character only; a mob's aggro target is mirrored for every mob. */
+export function mobEngaged(e: { inCombat: boolean; aggroTargetId: number | null }): boolean {
+  return e.inCombat || e.aggroTargetId !== null;
 }
 
 /** Korzul's frozen stance (before his pull) and the takeoff one-shot. */

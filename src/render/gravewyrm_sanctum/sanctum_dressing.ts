@@ -17,7 +17,11 @@ import {
   sanctumKitPiece,
   upgradeWhenSanctumKitLands,
 } from './sanctum_kit';
-import { planSanctumKitPlacements, SANCTUM_KIT_SIZES } from './sanctum_kit_plan_core';
+import {
+  planSanctumKitPlacements,
+  SANCTUM_KIT_SIZES,
+  type SanctumKitPlacement,
+} from './sanctum_kit_plan_core';
 import { iceCrystal, ringLoft, rockLump, snowDrift } from './sanctum_shapes';
 
 const ICE_FOOT: readonly [number, number, number] = [0.1, 0.27, 0.45];
@@ -204,8 +208,16 @@ function registerInteriorStandIns(names: Iterable<string>): void {
   for (const n of names) registerSanctumFallback(n, () => []);
 }
 
+/** The interior plan, planned once (its lip and rubble probes walk every
+ *  cliff run). */
+let interiorPlan: SanctumKitPlacement[] | null = null;
+function interiorPlacements(): SanctumKitPlacement[] {
+  interiorPlan ??= planSanctumInteriorPlacements();
+  return interiorPlan;
+}
+
 function buildGroup(lowGfx: boolean, density: number): THREE.Group {
-  const interior = planSanctumInteriorPlacements();
+  const interior = interiorPlacements();
   registerInteriorStandIns(interior.map((p) => p.piece));
   // The interior pass's pieces stand in for the first kit's where its kit
   // has landed (a carved pyre for the boxed one), never both.
@@ -227,5 +239,5 @@ export function buildSanctumKitDressing(lowGfx: boolean, density = 1): THREE.Gro
 
 // Every piece's stand-in is registered as soon as the module loads, so a
 // painter that adopts a piece before the dressing builds still has one.
-registerInteriorStandIns(planSanctumInteriorPlacements().map((p) => p.piece));
+registerInteriorStandIns(interiorPlacements().map((p) => p.piece));
 registerSanctumStandIns([...Object.keys(SANCTUM_KIT_SIZES), ...EXTRA_STAND_INS]);
