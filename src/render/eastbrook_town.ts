@@ -17,9 +17,17 @@ import { activeWorldHasAuthoredTown } from './authored_town_gate';
 import { buildEastbrookHarbor } from './eastbrook_harbor';
 import { buildEastbrookPlacedBuilding, isPlacedBuildingAsset } from './eastbrook_placed_building';
 import {
+  EASTBROOK_STALL_ASSET_URL,
+  isStallCanopyVertex,
+  STALL_CANOPY_SEMANTIC,
+  stallCanopyColor,
+  stallTemplateKey,
+} from './eastbrook_stall_canopy_core';
+import {
   applyEastbrookTownSurfaceDetail,
   EASTBROOK_SURFACE_ATLAS_URL,
   EASTBROOK_SURFACE_NORMAL_SCALE,
+  type EastbrookSurfaceSemantic,
   eastbrookSurfaceAtlasMetadata,
   eastbrookSurfaceAtlasTexture,
   eastbrookSurfaceGeometry,
@@ -297,10 +305,41 @@ function materialIsEmissive(material: THREE.Material): boolean {
   );
 }
 
+/** Each vertex's atlas surface, read off its final colour. The market stall's
+ *  canopy is repainted on the way (eastbrook_stall_canopy_core.ts): every
+ *  canopy vertex takes the stall's canopy colour on the one canvas cell, so
+ *  its three panels read as one awning instead of a flag. */
+function vertexSemantics(
+  geometry: THREE.BufferGeometry,
+  url: string,
+  canopyVariant: string | undefined,
+): EastbrookSurfaceSemantic[] {
+  const color = geometry.getAttribute('color');
+  const position = geometry.getAttribute('position');
+  const canopy =
+    url === EASTBROOK_STALL_ASSET_URL ? new THREE.Color(stallCanopyColor(canopyVariant)) : null;
+  const semantics: EastbrookSurfaceSemantic[] = [];
+  for (let index = 0; index < color.count; index++) {
+    const semantic = eastbrookTownSemanticForColor(
+      color.getX(index),
+      color.getY(index),
+      color.getZ(index),
+    );
+    if (canopy && isStallCanopyVertex(semantic, position.getY(index))) {
+      color.setXYZ(index, canopy.r, canopy.g, canopy.b);
+      semantics.push(STALL_CANOPY_SEMANTIC);
+    } else {
+      semantics.push(semantic);
+    }
+  }
+  return semantics;
+}
+
 function geometryFromMesh(
   mesh: THREE.Mesh,
   material: THREE.Material,
   url: string,
+  canopyVariant?: string,
 ): THREE.BufferGeometry {
   const source = mesh.geometry;
   const position = source.getAttribute('position');
@@ -323,15 +362,9 @@ function geometryFromMesh(
   geometry.applyMatrix4(mesh.matrixWorld);
   if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
   const normalizedGeometry = geometry.index ? geometry.toNonIndexed() : geometry;
-  const finalColor = normalizedGeometry.getAttribute('color');
+  const semantics = vertexSemantics(normalizedGeometry, url, canopyVariant);
   return indexExactVertexTuples(
-    eastbrookSurfaceGeometry(normalizedGeometry, (index) =>
-      eastbrookTownSemanticForColor(
-        finalColor.getX(index),
-        finalColor.getY(index),
-        finalColor.getZ(index),
-      ),
-    ),
+    eastbrookSurfaceGeometry(normalizedGeometry, (index) => semantics[index]),
   );
 }
 
@@ -343,7 +376,11 @@ function mergeParts(parts: THREE.BufferGeometry[], label: string): THREE.BufferG
   return merged;
 }
 
-function extractTemplate(source: THREE.Object3D, url: string): TownAssetTemplate {
+function extractTemplate(
+  source: THREE.Object3D,
+  url: string,
+  canopyVariant?: string,
+): TownAssetTemplate {
   // The loader cache is immutable. Clone the transform graph before updating
   // matrices and clone every geometry attribute before normalization.
   const instance = source.clone(true);
@@ -356,7 +393,7 @@ function extractTemplate(source: THREE.Object3D, url: string): TownAssetTemplate
     if (materials.length !== 1) {
       throw new Error(`Eastbrook town asset uses an unsupported material array: ${url}`);
     }
-    const geometry = geometryFromMesh(child, materials[0], url);
+    const geometry = geometryFromMesh(child, materials[0], url, canopyVariant);
     (materialIsEmissive(materials[0]) ? emissive : opaque).push(geometry);
   });
   if (opaque.length === 0 && emissive.length === 0) {
@@ -404,6 +441,13 @@ function prepareTemplates(
       continue;
     }
     cache.set(url, extractTemplate(source, url));
+    // The market stall draws one template per canopy colour its stalls name.
+    for (const stall of EASTBROOK_LAYOUT.market.stalls) {
+      const key = stallTemplateKey(stall.assetId, stall.canopyVariant);
+      if (stall.assetId === url && !cache.has(key)) {
+        cache.set(key, extractTemplate(source, url, stall.canopyVariant));
+      }
+    }
     if (release) {
       loadedSources.delete(url);
       releaseGltf(url);
@@ -1000,10 +1044,11 @@ function buildMicroBatches(
   }
 
   for (const stall of stalls) {
-    const template = templates.get(stall.assetId);
-    if (!template) throw new Error(`Eastbrook town template is missing: ${stall.assetId}`);
+    const key = stallTemplateKey(stall.assetId, stall.canopyVariant);
+    const template = templates.get(key);
+    if (!template) throw new Error(`Eastbrook town template is missing: ${key}`);
     add(
-      stall.assetId,
+      key,
       placementMatrix(
         template,
         stall.position.x,

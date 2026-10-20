@@ -8,6 +8,12 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { isPlacedBuildingAsset } from '../src/render/eastbrook_placed_building';
 import {
+  EASTBROOK_STALL_ASSET_URL,
+  STALL_CANOPY_COLORS,
+  STALL_CANOPY_MIN_Y,
+  stallCanopyVariant,
+} from '../src/render/eastbrook_stall_canopy_core';
+import {
   EASTBROOK_TOWN_ASSET_INSTANCE_COUNTS,
   EASTBROOK_TOWN_ASSET_URLS,
   EASTBROOK_TOWN_NEW_ASSET_URLS,
@@ -151,6 +157,41 @@ function placedSourceAsset(): THREE.Group {
   interior.add(table);
   source.add(interior);
   return source;
+}
+
+// The market stall's flag (scripts/assets/eastbrook_town/shared.js TOWN_PALETTE).
+const CLOTH_BLUE = 0x315b9d;
+const CLOTH_CREAM = 0xd6c29d;
+const CLOTH_RED = 0xaa4c39;
+
+/** A stand-in for the market stall model as the town repaints it: timber
+ *  posts, a canopy of three cloth panels in the model's flag colours above the
+ *  canopy line, and a cream sack on the counter below it. 2.8 x 2.7 x 2.2, the
+ *  layout's own stall size, base on y 0. */
+function stallSourceAsset(): THREE.Group {
+  const source = new THREE.Group();
+  const add = (hex: number, size: [number, number, number], at: [number, number, number]) => {
+    const material = new THREE.MeshStandardMaterial({ color: hex });
+    material.name = 'TownOpaque';
+    source.add(new THREE.Mesh(new THREE.BoxGeometry(...size).translate(...at), material));
+  };
+  for (const x of [-1.3, 1.3]) add(0x33251c, [0.2, 2.3, 0.2], [x, 1.15, 1]);
+  add(0x33251c, [0.2, 2.3, 0.2], [0, 1.15, -1]);
+  add(CLOTH_BLUE, [0.8, 0.2, 2.2], [-0.8, 2.6, 0]);
+  add(CLOTH_CREAM, [0.8, 0.2, 2.2], [0, 2.6, 0]);
+  add(CLOTH_RED, [0.8, 0.2, 2.2], [0.8, 2.6, 0]);
+  add(CLOTH_CREAM, [0.4, 0.4, 0.4], [0.5, 1.2, 0.5]);
+  return source;
+}
+
+/** Whether a working-space colour is the sRGB hex. */
+function colorIs(color: THREE.BufferAttribute, index: number, hex: number): boolean {
+  const target = new THREE.Color(hex);
+  return (
+    Math.abs(color.getX(index) - target.r) < 1e-6 &&
+    Math.abs(color.getY(index) - target.g) < 1e-6 &&
+    Math.abs(color.getZ(index) - target.b) < 1e-6
+  );
 }
 
 function fixtureSources(): Map<string, THREE.Object3D> {
@@ -469,6 +510,51 @@ describe('Eastbrook town renderer', () => {
       wallSegmentCount: 0,
       gateCount: 0,
     });
+  });
+
+  it("draws each market stall's canopy in its own layout colour, never the model's flag", () => {
+    const sources = fixtureSources();
+    sources.set(EASTBROOK_STALL_ASSET_URL, stallSourceAsset());
+    const ground = 1.5;
+    const view = eastbrookTownInternalsForTest.buildFromSources(sources, () => ground, true);
+    const batch = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
+    if (!(batch instanceof THREE.Mesh)) throw new Error('no micro opaque batch');
+    const position = batch.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const color = batch.geometry.getAttribute('color') as THREE.BufferAttribute;
+    // No flag colour survives anywhere in the batch: blue and red were canopy only.
+    for (let index = 0; index < color.count; index++) {
+      expect(colorIs(color, index, CLOTH_BLUE), `vertex ${index}`).toBe(false);
+      expect(colorIs(color, index, CLOTH_RED), `vertex ${index}`).toBe(false);
+    }
+    const variants = EASTBROOK_LAYOUT.market.stalls.map((stall) =>
+      stallCanopyVariant(stall.canopyVariant),
+    );
+    expect(new Set(variants).size).toBe(2);
+    for (const stall of EASTBROOK_LAYOUT.market.stalls) {
+      const own = stallCanopyVariant(stall.canopyVariant);
+      const counts: Record<string, number> = { gold: 0, green: 0, cream: 0 };
+      for (let index = 0; index < position.count; index++) {
+        const dx = position.getX(index) - stall.position.x;
+        const dz = position.getZ(index) - stall.position.z;
+        if (Math.hypot(dx, dz) > 2) continue;
+        const height = position.getY(index) - ground;
+        for (const variant of ['gold', 'green'] as const) {
+          if (!colorIs(color, index, STALL_CANOPY_COLORS[variant])) continue;
+          counts[variant]++;
+          expect(height, `${stall.id} canopy height`).toBeGreaterThanOrEqual(STALL_CANOPY_MIN_Y);
+        }
+        if (colorIs(color, index, CLOTH_CREAM)) {
+          // The sack on the counter keeps its cream; the cream panel does not.
+          counts.cream++;
+          expect(height, `${stall.id} cream height`).toBeLessThan(STALL_CANOPY_MIN_Y);
+        }
+      }
+      // Three panels of 24 corners, minus the corners two adjacent panels now
+      // share (same place, normal, colour and cell), all in the stall's own colour.
+      expect(counts[own], stall.id).toBeGreaterThan(24);
+      expect(counts[own === 'gold' ? 'green' : 'gold'], stall.id).toBe(0);
+      expect(counts.cream, stall.id).toBe(24);
+    }
   });
 
   it('seats every placed building on the real terrain under its own anchor, footing buried, with no skirt', () => {

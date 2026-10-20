@@ -1302,6 +1302,7 @@ const RENDER_PURE_CORES = [
   'src/render/grass_tuft_cards_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
+  'src/render/eastbrook_stall_canopy_core.ts',
   'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
