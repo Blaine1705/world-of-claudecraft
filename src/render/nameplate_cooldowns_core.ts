@@ -14,7 +14,9 @@
 //   - its auras: a tracked buff's aura carries the bare ability id that applied
 //     it, whoever cast it. So a buff an ally cast on this entity (a priest's
 //     Martyr's Aegis) shows HERE while it lasts, and its cooldown shows on the
-//     caster's own plate.
+//     caster's own plate. The active-only buffs (majorBuffTable: Red Harvest's
+//     Enrage, a short shield) come in this way too, and only this way: their
+//     keys are never read from the cooldown map, so they never show as spent.
 //
 // Order: medallion, then defensives, then offensives; inside a group, the key
 // ascending. Never re-sorted by time, and an ability keeps its slot when it goes
@@ -27,6 +29,7 @@
 import {
   MAJOR_COOLDOWN_GROUP_ORDER,
   type MajorCooldownGroup,
+  majorAuraGroup,
   majorCooldownGroup,
   majorCooldownKeyForAura,
 } from '../sim/major_cooldowns';
@@ -178,7 +181,7 @@ export function nameplateCooldownsInto(
     // The aura's id names its ability directly or through a companion form
     // (majorCooldownKeyForAura), so the slot is keyed by the cooldown it belongs to.
     const key = majorCooldownKeyForAura(aura.id);
-    const group = key === null ? null : majorCooldownGroup(key);
+    const group = key === null ? null : majorAuraGroup(key);
     if (key === null || group === null) continue;
     const existing = findSlot(out, key);
     if (existing) {

@@ -239,4 +239,22 @@ describe('nameplate cooldowns resolve (painter side)', () => {
     resolveNameplateCooldowns(out, player({}, [{ id: 'barkskin', remaining: 59.5 }]), true, 1);
     expect(out.slots[0].timeText).toBe('60');
   });
+
+  it('shows an active-only buff while up and never as spent', () => {
+    const plan = newNameplateCooldownsPlan();
+    // Red Harvest's Enrage is up; Raised Guard's 12 s cooldown is running.
+    nameplateCooldownsInto(plan, new Map([['raised_guard', 9]]), [
+      { id: 'fury_enrage', remaining: 3.2 },
+    ]);
+    expect(plan.count).toBe(1);
+    expect(plan.slots[0]).toMatchObject({
+      key: 'enrage_passive',
+      group: 'offensive',
+      active: true,
+      remaining: 3.2,
+    });
+    // Once the Enrage falls off, nothing is left: no spent slot for it.
+    nameplateCooldownsInto(plan, new Map([['raised_guard', 8]]), []);
+    expect(plan.count).toBe(0);
+  });
 });
