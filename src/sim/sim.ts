@@ -8134,7 +8134,9 @@ export class Sim {
       instance,
     );
     this.ctx.onInventoryChangedForQuests(meta);
-    if (meta.autoEquip && instance.lootQuality) maybeAutoEquip(this.ctx, itemId, meta, instance);
+    // A commissioned (bindOnTrade) copy belongs to its requester: never worn here.
+    if (meta.autoEquip && instance.lootQuality && !instance.bindOnTrade)
+      maybeAutoEquip(this.ctx, itemId, meta, instance);
   }
 
   // Returns the `instance` payload of every instanced UNIT actually consumed

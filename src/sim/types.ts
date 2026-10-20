@@ -1617,7 +1617,7 @@ export type ItemDef =
 // time, see market.ts marketList); #1146 wires real market handling for
 // instanced items later.
 export interface ItemInstancePayload {
-  /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
+  /** Permanent loot quality (enemy drops and other earned rewards), independent of rarity, enchants and upgrades. */
   lootQuality?: LootQualityDescriptor;
   /** Player name that signed/crafted this specific copy, if any. */
   signer?: string;
@@ -7769,8 +7769,8 @@ export type SimEvent = { pid?: number } & (
       // so the online client's lastCraftResult mirror stays field-complete.
       quality?: ItemDef['quality'];
       masterwork?: boolean;
-      // The crafted copy's permanent loot quality, only when above Ordinary.
-      lootQuality?: LootQualityDescriptor;
+      // The crafted copy's whole payload, only when it rolled loot quality.
+      instance?: ItemInstancePayload;
       reason?:
         | 'unknown_recipe'
         | 'insufficient_materials'

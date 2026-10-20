@@ -7,9 +7,9 @@ not change the item's identity, artwork, binding rules, required level or effect
 ## Eligibility and rates
 
 Only uncommon-or-better weapons, armor and held offhands with an equipment slot
-qualify. Jewelry is included. Roll after the enemy's ordinary loot table and
-difficulty selection have selected an item, before anyone can inspect or claim
-the copy. A stack of equipment rolls once per copy. Quality does not increase
+qualify. Jewelry is included. An enemy drop rolls after the enemy's ordinary loot
+table and difficulty selection have selected an item, before anyone can inspect
+or claim the copy; a chest, cache or reward rolls when its copy is granted. A stack of equipment rolls once per copy. Quality does not increase
 the number of items dropped or their underlying drop chance.
 
 | Quality | Badge | Added item levels | Chance per eligible copy |
@@ -99,4 +99,6 @@ older Rift sanitizers: the prior binary rebuilds a band without this descriptor
 and would permanently strip its quality on load/save. A rollback or mixed-version
 deployment requires a preservation-only compatibility patch on that older binary.
 Compatibility with ordinary existing saves does not imply that older binaries
-can safely rewrite newly enhanced items.
+can safely rewrite newly enhanced items. The same holds for Buried Hoard claims:
+a binary from before release/v0.45.0 delivers a pending enhanced hoard piece as
+the Ordinary copy, because it ignores the claim line's descriptor.

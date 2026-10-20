@@ -310,10 +310,18 @@ describe('crafted line names the rolled quality', () => {
     const text = 'Crafted: [[i:ring]]';
     expect(craftedLineBody(doc, text, 'ring', undefined, appendLink)).toBe(text);
     expect(appended).toHaveLength(0);
-    const lootQuality = copy(1).lootQuality!;
-    const body = craftedLineBody(doc, text, 'ring', lootQuality, appendLink);
+    // A signed masterwork copy links with its whole payload, not just the tier.
+    const crafted: ItemInstancePayload = {
+      ...copy(1),
+      signer: 'Maker',
+      rolled: { masterwork: true, stats: { str: 2 } },
+    };
+    const body = craftedLineBody(doc, text, 'ring', crafted, appendLink);
     expect(Array.isArray(body)).toBe(true);
-    expect(appended).toEqual([{ id: 'ring', instance: { lootQuality } }]);
+    expect(appended).toEqual([{ id: 'ring', instance: crafted }]);
+    // A copy with no valid descriptor stays on the plain string path.
+    expect(craftedLineBody(doc, text, 'ring', { signer: 'Maker' }, appendLink)).toBe(text);
+    expect(appended).toHaveLength(1);
   });
 
   it('mirrors the event quality into the online CraftResultView, validated', () => {
@@ -325,10 +333,12 @@ describe('crafted line names the rolled quality', () => {
       count: 1,
       pid: 7,
     };
-    const lootQuality = copy(3).lootQuality!;
-    expect(craftResultViewFromEvent({ ...base, lootQuality }).lootQuality).toEqual(lootQuality);
-    expect('lootQuality' in craftResultViewFromEvent(base)).toBe(false);
-    const bad = { ...lootQuality, tier: 9 } as never;
-    expect('lootQuality' in craftResultViewFromEvent({ ...base, lootQuality: bad })).toBe(false);
+    const instance: ItemInstancePayload = { ...copy(3), signer: 'Maker' };
+    const view = craftResultViewFromEvent({ ...base, instance });
+    expect(view.instance).toEqual(instance);
+    expect(view.instance).not.toBe(instance);
+    expect('instance' in craftResultViewFromEvent(base)).toBe(false);
+    const bad = { signer: 'Maker', lootQuality: { ...copy(3).lootQuality!, tier: 9 } } as never;
+    expect('instance' in craftResultViewFromEvent({ ...base, instance: bad })).toBe(false);
   });
 });

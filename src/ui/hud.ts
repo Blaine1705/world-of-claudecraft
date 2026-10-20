@@ -11577,10 +11577,7 @@ export class Hud {
             });
             const link = (el: HTMLElement, id: string, copy?: ItemInstancePayload) =>
               this.appendChatItemLink(el, id, copy);
-            this.log(
-              craftedLineBody(document, line, ev.itemId, ev.lootQuality, link),
-              PROF_LOG_GRANT,
-            );
+            this.log(craftedLineBody(document, line, ev.itemId, ev.instance, link), PROF_LOG_GRANT);
             const recipe = ALL_RECIPES.find((r) => r.id === ev.recipeId);
             audio.craftSuccess(recipe?.professionId ?? '');
             // Masterwork layers alongside the family cue above, never replaces

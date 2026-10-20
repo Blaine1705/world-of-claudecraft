@@ -120,8 +120,8 @@ describe('crafted equipment', () => {
     expect(crafted).toHaveLength(1);
     expect(crafted[0].instance?.lootQuality?.tier).toBe(2);
     // The craft result (and so the craftResult event and the crafted chat
-    // line) carries the same descriptor the bag copy holds.
-    expect(result.lootQuality).toEqual(crafted[0].instance?.lootQuality);
+    // line) carries the whole payload the bag copy holds, signer included.
+    expect(result.instance).toEqual(crafted[0].instance);
   });
 });
 

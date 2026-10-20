@@ -1,6 +1,6 @@
 // Only authoritative loot receipt metadata supplies an exact-copy chat link.
 // User-typed item tokens retain their static definition-only meaning.
-import type { LootQualityDescriptor } from '../sim/loot_quality';
+import { isValidLootQuality } from '../sim/loot_quality';
 import type { ItemInstancePayload, SimEvent } from '../sim/types';
 import { itemStackDisplayName } from './entity_display_core';
 import { parseChatSegments, tryEncodeItemLink } from './hud/quest/quest_link';
@@ -68,10 +68,10 @@ export function craftedLineBody(
   doc: Document,
   text: string,
   itemId: string,
-  lootQuality: LootQualityDescriptor | undefined,
+  instance: ItemInstancePayload | undefined,
   appendLink: (parent: HTMLElement, id: string, copy?: ItemInstancePayload) => void,
 ): string | Node[] {
-  return lootQuality
-    ? lootQualityReceiptNodes(doc, text, itemId, { lootQuality }, appendLink)
+  return isValidLootQuality(instance?.lootQuality)
+    ? lootQualityReceiptNodes(doc, text, itemId, instance!, appendLink)
     : text;
 }

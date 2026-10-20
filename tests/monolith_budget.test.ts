@@ -537,9 +537,9 @@ const MONOLITHS: MonolithRow[] = [
     // (Reuben's call): both parent pins for the record, the release 18081 and the
     // branch 18235; the two sides' additions compose to 18093 by wc -l on the merged
     // tree (after biome). Exact count, zero slack.
-    // LOWERED to 18092 by the loot-quality-everywhere craft line: the crafted
+    // LOWERED to 18089 by the loot-quality-everywhere craft line: the crafted
     // line body moved to loot_quality_receipt.ts craftedLineBody.
-    ceiling: 18092,
+    ceiling: 18089,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
