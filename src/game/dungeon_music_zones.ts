@@ -6,8 +6,9 @@ const DUNGEON_MUSIC: Record<string, MusicZone> = {
   hollow_crypt: 'dungeon_hollow_crypt',
   sunken_bastion: 'dungeon_sunken_bastion',
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
-  // The Smith's Heart (blockout) is the heart of the same mountain range as
-  // the Sanctum: it borrows the Sanctum's track until it gets its own.
+  // The Smith's Heart is the heart of the same mountain range as the Sanctum:
+  // its entry cue is the Sanctum's track; inside, each area scores with its
+  // own cue (smith_heart_music.ts).
   smith_heart: 'dungeon_gravewyrm_sanctum',
   ignivar_forge_approach: 'ignivar_forge_approach',
   ignivar_raid_arena: 'ignivar_raid_arena',

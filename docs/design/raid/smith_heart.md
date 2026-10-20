@@ -1,14 +1,18 @@
 # The Smith's Heart: raid design
 
-Status: phase 1 (playable blockout) implemented on `feature/smith-heart-raid`, dev
-builds only. Phase 2 (art, real kits, set pieces, quest, loot) is specified here and
-not built. The name is provisional and has not been IP-checked yet.
+Status: phase 1 (playable blockout) and phase 2A (the structure: the final boss in a
+separate room reached by a portal, bigger themed guardian rooms, the structural VFX)
+implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
+kits, own creatures, set pieces, boss kits), the quest and the loot are specified here
+and not built. The name is provisional and has not been IP-checked yet.
 
 At a glance: a ten-player level 20 raid (2 tanks, 2 healers, 6 damage), one
-instanced open-air map inside Stormcrag. Five bosses: the Hammer guardian always
-first, then the Breath, Quench and Heat guardians in any order, then the final boss
-in the Heart. Twenty mandatory trash packs. Target clear: 90 to 120 minutes on
-normal.
+instance slot inside Stormcrag holding two areas no floor joins: the main map (the
+Cleft, the four guardian rooms round the Ring, the heart seal on its dais) and the
+Heart (the final room). Five bosses: the Hammer guardian always first, then the
+Breath, Quench and Heat guardians in any order; with all four lit and the Ring clear
+the seal opens into a portal to the Heart and the final boss. Twenty mandatory trash
+packs. Target clear: 90 to 120 minutes on normal.
 
 Sources of truth, in order:
 
@@ -22,7 +26,9 @@ Sources of truth, in order:
 |---|---|
 | Field: coordinates, heights, surfaces, props, anchors, light rivers, vein colours | `src/sim/content/smith_heart_layout.ts` (`SMITH_HEART_FIELD`, `SMITH_HEART_HEIGHTS`, `SMITH_HEART_ANCHORS`, `LIGHT_RIVERS`, `SMITH_HEART_VEIN_COLORS`) |
 | Mobs (sketch kits), spawns, packs, gates, seal markers, `DungeonDef`, door | `src/sim/content/smith_heart.ts` (`SMITH_HEART_MOBS`, `SMITH_HEART_SPAWNS`, `SMITH_HEART_PACKS`, `SMITH_HEART_GATES`, `SMITH_HEART_SEAL_MARKERS`, `SMITH_HEART_DUNGEON_DEFS`, `SMITH_HEART_DOOR_POS`) |
-| Gating readout and the heart seal | `src/sim/encounters/smith_heart/seal.ts` (`smithHeartProgress`, `tickSmithHeart`) |
+| Gating readout, the heart seal and the portal's state | `src/sim/encounters/smith_heart/seal.ts` (`smithHeartProgress`, `tickSmithHeart`, `SMITH_HEART_PORTAL_BIT`) |
+| The portal hop (both ways) | `src/sim/encounters/smith_heart/portal.ts` (`tickSmithHeartPortal`) |
+| Areas (score, fog, sky) | `smithHeartAreaAt` in the layout; `src/game/smith_heart_music.ts`; `src/render/smith_heart/heart_environment.ts` |
 | Dev-only entry | `src/sim/encounters/smith_heart/entry.ts` (`SMITH_HEART_PLAYABLE`, `smithHeartEntryOpen`) |
 | Gate collision and state engine (shared) | `src/sim/instances/dungeon_gates.ts` |
 | Authored open-air field engine (shared) | `src/sim/instances/authored_field/` (see its `CLAUDE.md`) |
@@ -74,14 +80,15 @@ The Heat vein is a smithy (crucibles, chains, coal, white-gold fire), not lava.
 | Fact | Value | Source |
 |---|---|---|
 | Dungeon id | `smith_heart` | `SMITH_HEART_DUNGEON` |
-| Instance band | overflow `index` 15; the field stays inside one slot (abs x under 300, abs z under 250) | `SMITH_HEART_DUNGEON_DEFS` |
-| Field bounds | x -232 to 230, z -246 to 240 (about 460 by 490 yd) | `SMITH_HEART_FIELD.bounds` |
-| Void | height -70, map void `mist`, `cliffStep` 1.1 | `SMITH_HEART_VOID_HEIGHT` |
+| Instance band | overflow `index` 15; the whole field (both areas) stays inside one slot (abs x under 300, abs z under 250) | `SMITH_HEART_DUNGEON_DEFS` |
+| Field bounds | see `SMITH_HEART_FIELD.bounds` (the Smith's Forge reaches furthest west, the Basin and the Heart furthest east) | `SMITH_HEART_FIELD` |
+| Claim footprint | its own half width, wider than the generic envelope and still inside the 600 yd band | `instanceHalfWidthOf` (`src/sim/instances/instance_footprint.ts`) |
+| Void | height `SMITH_HEART_VOID_HEIGHT`, map void `mist`, `cliffStep` 1.1 | `SMITH_HEART_FIELD` |
 | Group | `suggestedPlayers` 10; raid-only claim | `RAID_ALLOWED_DUNGEON_IDS` (`src/sim/instances/dungeons.ts`), `RAID_REQUIRED_DUNGEON_IDS` (`src/sim/instances/reset_cooldown_policy.ts`) |
 | Interior key | `smith_heart` (authored field) | `src/sim/instances/authored_field/registry.ts` |
 | Flags | `bossChainPull`, `areaCastsPlant` on; `guideVisible` false | `SMITH_HEART_DUNGEON_DEFS` |
-| Entry, exit | entry (-100, -224) on the Cleft; exit offset (-104, -232) | `SMITH_HEART_ANCHORS` |
-| Boss exit portal | (-20, -24) on the Heart's rim, opens when the final boss dies | `bossExitPortal` |
+| Entry, exit | the Cleft (`SMITH_HEART_ANCHORS.entry`, `.exit`) | `SMITH_HEART_ANCHORS` |
+| Boss exit portal | on the Anvil of the World, opens when the final boss dies | `bossExitPortal` |
 | Entry gate | dev builds only while `SMITH_HEART_PLAYABLE` is false | `entry.ts` |
 
 Axes: instance-local yards, north +z, east +x, heights in yards with the Ring at 0.
@@ -95,145 +102,147 @@ precedent: Hollow Crypt, Wildheart Basin). Floors end in cliffs that drop into t
 misted void; cliffs are walls, nobody falls.
 
 ```
-                         CORNICE (+60)  Breath guardian
-                              |  cornice_mouth
-                   b3 (+40) - WIND BRIDGE - b2 (+16)
-                              |
-                           b1 (0)
-                              |
- ANVIL (0) - CASTING FLOOR - FORGE HALL -( RING 0 )- q1 (-8) - q2 (-16)
- Heat        (pour channel)   f1        |  HEART |          SINGING ICE (-24)
- guardian    f2 f3        anvil_mouth   |  (-8)  |          q3
-                                        |  seal  |       lake_mouth
-                           causeways N, E, W     FROZEN LAKE (-30)
-                                                 Quench guardian
-                           BALCONY (+20) + two curved stairs (south arc)
-                              |  the_slab
-                           HAMMER PIT (+14)  Hammer guardian (always first)
-                              |  hammer_pit_mouth
- CLEFT (+40) - h1 (+36) - h2 (+31) - h3 (+26)   the Hammer Gallery
- world entrance
+                    b3 (+40) ---- CORNICE CLIMB ---- STORM CORNICE (+60)
+                    /  wind bridge                    Breath guardian
+          b2 (+16) - chimney - b1 (0)                          THE HEART (separate area,
+                                 |                             north-east corner, walled
+ SMITH'S FORGE (0) - casting - forge hall -( RING 0 )- q1 (-8)  off by the mountain):
+ Heat guardian      f2 f3      f1           seal dais     q2 (-16)   ARRIVAL TERRACE (+4)
+ great hearth, anvil                        (-4, portal)   SINGING ICE (-24, q3)  | bridge
+                                            GRAND STAIR       QUENCH BASIN (-30)  ANVIL OF THE WORLD (0)
+                                            BALCONY (+20)     Quench guardian     final boss, 4 altars,
+                                              |  the Slab                          4 chains, the core
+ CLEFT (+44) - h1 (+40) - h2 (+34) - h3 (+28) - SMITH'S QUARRY (+14)
+ world entrance           the Hammer Gallery    Hammer guardian (always first)
 ```
 
-### 3.1 Sections and coordinates
+### 3.1 The main map
 
-| Section | Centre | Radius or extents | Floor | Constant |
-|---|---|---|---|---|
-| The Cleft (entrance landing) | (-100, -226) | r 12 | +40 | `CLEFT` |
-| Gallery landing h1 | (-50, -232) | r 12 | +36 | `GALLERY_LANDINGS.h1` |
-| Gallery landing h2 | (10, -234) | r 12 | +31 | `GALLERY_LANDINGS.h2` |
-| Gallery landing h3 | (62, -200) | r 12 | +26 | `GALLERY_LANDINGS.h3` |
-| The Hammer Pit | (0, -150) | r 30 (60 yd across) | +14 | `HAMMER_PIT` |
-| The Slab (gate) | (0, -121) | gate across the Slab Stair | +14 to +20 | `SLAB` |
-| The Balcony | x -12 to 12, z -114 to -58 | 24 by 56 yd | +20 | `BALCONY` |
-| Balcony Stairs (east, west) | on the Ring circle, R 70 | east 172 to 142 deg, west 188 to 218 deg, 14 yd wide | +20 to 0 | `balconyStair` |
-| The Ring | (0, 0) | inner r 62, outer r 78 (16 yd wide), arc 222 to 498 deg through north | 0 | `RING`, `RING_ARC` |
-| Void annulus | (0, 0) | r 38 to 62, open air | void | (gap between `HEART` and `RING`) |
-| The Heart | (0, 0) | r 38 (76 yd across) | -8 | `HEART` |
-| Heart seal | (0, 0) | r 9 | -8 | `HEART_SEAL` |
-| Causeways N, E, W | 0, 90, 270 deg | r 66 to 34, 14 yd wide | 0 to -8 | `causeway` |
-| Altars | r 31 at 0 (Breath), 90 (Quench), 180 (Hammer), 270 (Heat) deg | prop r 1.8 | -8 | `HEART_ALTARS` |
-| Breath b1 | (0, 104) | r 13 | 0 | `BREATH.b1` |
-| Breath b2 | (44, 134) | r 11 | +16 | `BREATH.b2` |
-| Wind Bridge | (16, 150) to (-20, 158) | 13 yd wide | +24 to +36 | `WIND_BRIDGE` |
-| Breath b3 | (-44, 160) | r 11 | +40 | `BREATH.b3` |
-| The Cornice | (0, 206) | r 30 (60 yd) | +60 | `BREATH.cornice` |
-| Quench q1 | (110, 0) | r 12 | -8 | `QUENCH.q1` |
-| Quench q2 | (130, -40) | r 12 | -16 | `QUENCH.q2` |
-| Singing Ice | x 150 to 182, z -62 to -36 | 32 by 26 yd | -24 | `QUENCH.ice` |
-| Lake shelf / Frozen Lake | (186, 10) | shelf r 40, ice r 32 (64 yd) | -30 | `QUENCH.shelf`, `QUENCH.lake` |
-| Forge hall | x -122 to -74, z -14 to 14 | 48 by 28 yd | 0 | `HEAT.hall` |
-| Casting floor | x -160 to -120, z -34 to 34 | 40 by 68 yd | 0 | `HEAT.floor` |
-| Pour Channel | x -132, z -34 to 34 | 5 yd wide strip | 0 | `POUR_CHANNEL` |
-| The Anvil | x -172 to -228, z -22 to 22, horn west | about 56 by 44 yd | 0 | `ANVIL_POINTS`, `HEAT.anvil` |
+Every constant lives in `src/sim/content/smith_heart_layout.ts`; the table names them
+rather than repeating numbers that would rot.
 
-Boss spots (`SMITH_HEART_BOSS_SPOTS`): Hammer (0, -150), Breath (0, 210), Quench
-(186, 10), Heat (-196, 0), final (0, 0).
-
-### 3.2 The route, in order
-
-1. **The Cleft** (+40): a crack in the Stormcrag cliffs; spawn landing.
-2. **The Hammer Gallery**, descending east along the south edge: `gallery_upper`,
-   `gallery_middle`, `gallery_lower` paths join landings h1, h2, h3 (one pack each).
-3. **Pit Mouth** gate, then `pit_descent` stairs down into **the Hammer Pit** (+14):
-   the Hammer guardian, always first. Five columns on a 22 yd circle (`PIT_COLUMNS`).
-4. **The Slab** (gate `the_slab`) breaks when the Hammer guardian dies; the
-   `slab_stair` climbs north to **the Balcony** (+20), the first view.
-5. **The two Balcony Stairs** curve down along the Ring's own circle, east and west,
-   to **the Ring** (0): eight packs, two between each pair of vein mouths.
-6. In ANY order:
-   - **north, the Breath**: `breath_mouth`, b1 (0), `breath_chimney` stairs, b2
-     (+16), the **Wind Bridge**, b3 (+40), `cornice_climb` stairs, Cornice Mouth,
-     **the Cornice** (+60), the Breath guardian;
-   - **east, the Quench**: `quench_mouth` stairs, q1 (-8), `quench_stair`, q2 (-16),
-     `quench_shelf_stair`, the **Singing Ice** (-24, pack q3), `lake_descent`, Lake
-     Mouth, **the Frozen Lake** (-30), the Quench guardian;
-   - **west, the Heat**: the forge hall (pack f1), the casting floor across the
-     **Pour Channel** (packs f2, f3), `anvil_bridge`, Anvil Mouth, **the Anvil**
-     (0), the Heat guardian.
-7. Each guardian's death lights its vein on the heart seal. With all four lit and
-   the Ring clear, the three **causeways** open and the raid crosses the void into
-   **the Heart** (-8): the four altars and the final boss.
-
-Each vein follows its **light river** (`LIGHT_RIVERS`): a floor polyline from the
-guardian's arena down the vein's walking line to the seal. Following the light
-always leads to the guardian; a river lights when its guardian dies.
-
-### 3.3 Heights profile
-
-| Vein | Profile (yards) | Feel |
+| Section | Shape | Constant |
 |---|---|---|
-| Hammer | Cleft 40, h1 36, h2 31, h3 26, Pit 14, Balcony 20, Ring 0 | the descent from the entrance |
-| Breath | Ring 0, b1 0, b2 16, bridge 24 to 36, b3 40, Cornice 60 | climbs into the wind |
-| Quench | Ring 0, q1 -8, q2 -16, ice -24, lake -30 | sinks into the cold |
-| Heat | 0 throughout | stays at the forge's level |
-| Heart | -8 | below the Ring, so it is seen from everywhere |
+| The Cleft (entrance landing) | disc, south-west corner | `CLEFT` |
+| The Hammer Gallery | three landings joined by descending paths | `GALLERY_LANDINGS` |
+| The Smith's Quarry (Hammer arena) | a carved ellipse about 92 by 80 yd, deep under four stepped terraces on its east and south sides (unreachable ledges, each several bodies tall), the colossi on the deep top step | `HAMMER_PIT`, `QUARRY_TERRACES` |
+| The Slab, the Balcony | stair from the Quarry up to the Balcony | `SLAB`, `BALCONY` |
+| The Grand Stair | one broad stair (16 yd) from the Balcony's tip down across the chasm to the dais | `GRAND_STAIR` |
+| The Ring | flat annulus sector round the seal, two curved stairs to the Balcony | `RING`, `RING_ARC` |
+| The Seal Dais | a round island a little below the Ring, floating over the chasm; the seal at its centre, the portal over the seal | `SEAL_DAIS`, `HEART_SEAL`, `RING_PORTAL` |
+| The Breath | b1, the chimney, b2, the Wind Bridge, b3, the climb | `BREATH`, `WIND_BRIDGE` |
+| The Storm Cornice (Breath arena) | a cracked plateau about 100 by 80 yd at the top of the mountain, its rim cut by five wind channels | `BREATH.cornice`, `CORNICE_CHANNELS` |
+| The Quench | q1, q2, the Singing Ice, the lake descent | `QUENCH` |
+| The Quench Basin (Quench arena) | a rock shelf about 96 by 92 yd with the frozen lake on it | `QUENCH.shelf`, `QUENCH.lake` |
+| The Heat | the forge hall, the casting floor, the Pour Channel, the anvil bridge | `HEAT`, `POUR_CHANNEL` |
+| The Smith's Forge (Heat arena) | an eight-sided hall about 82 by 92 yd, the great hearth in its west wall, the giant anvil before it | `HEAT.forge`, `GREAT_HEARTH`, `GIANT_ANVIL` |
 
-The player knows where they are by their body alone: down for the Hammer, up for
-the Breath, deeper for the Quench, level for the Heat. Every path's slope stays
-under the authored field's limit (about 0.75 yd of rise per yard,
-`src/sim/instances/authored_field/CLAUDE.md`); `tests/smith_heart_route.test.ts`
-proves no walked step exceeds `MAX_STEP_HEIGHT` or `cliffStep`.
+Each room reads its theme by shape first (kit placeholders in
+`src/render/smith_heart/heart_plan_core.ts`): the Quarry's kneeling colossi, cut blocks,
+derrick, ochre geodes and the five columns (Mountain's Wrath's line-of-sight cover);
+the Cornice's lightning rods and broken bellows; the Basin's colossal half-sunk blades,
+heaped ice shelves, steaming vents and braziers; the Forge's great arched hearth, giant
+anvil (side-on to the door, horn north), bellows, crucibles and casting channels.
 
-### 3.4 Sightlines and the balcony reveal
+### 3.2 The Heart (the separate final room)
 
-- **The reveal.** The Slab splits and opens onto the Balcony, jutting out over the
-  void with its tip at z -58 (58 yd from the seal, 28 yd above the Heart floor).
-  From it the raid sees the whole heart: the caldera open to the storm sky, the
-  full Ring, the three vein mouths (north, east, west), the three causeways and the
-  seal. The ochre Hammer river is already lit (the guardian just died). This is
-  the raid's key shot and the trailer frame.
-- **The seal from the Ring.** The Heart sits 8 yd below the Ring across an open
-  void annulus (r 38 to 62), so nothing stands between any Ring point and the seal.
-  Ring pillars (`sh_ring_pillar`) stand only on the outer rim; altars are 3 yd
-  props. Rule: nothing taller than an altar may ever be placed inside r 62.
-- **Lighting.** One light zone per section (`SMITH_HEART_FIELD.lightZones`); each
-  vein zone's accent is its vein colour, so a player reads the vein from its light.
+| Section | Shape | Constant |
+|---|---|---|
+| The Arrival Terrace | a small round island, a little above the platform, south-west of it | `HEART_TERRACE`, `HEART_ARRIVAL` |
+| The return portal | on the terrace's west side, beside the arrival (never behind it) | `HEART_RETURN_PORTAL` |
+| The Heart Bridge | a short bridge from the terrace onto the platform; its gate seals while the final boss fights | `HEART_BRIDGE_GATE`, gate `heart_bridge` |
+| The Anvil of the World | the final boss's round platform (84 yd across), hung over the chasm | `HEART_ROOM` |
+| The four altars | at the platform's compass points, each under its chain | `HEART_ALTARS` |
+| The chasm | open air round the platform, down to the Smith's glowing heart | `HEART_ROOM_CHASM_R` |
 
-### 3.5 World entrance
+**Why a platform over a glowing core.** The brief offered a chamber inside the mountain
+or a platform over a core; the Heart is both: the platform hangs by four colossal
+chains over the Smith's own heart, a molten white-gold core beating deep in the chasm,
+inside a crown of mountain rock open to a sky of embers and stars. It reads as its own
+place (no vein's colours dominate; the four meet here), it keeps the open-air rules
+(no ceiling, the camera never meets rock), the chains give the room its silhouette and
+carry each vein's light down into its altar (the altars' meaning in the final fight),
+and the chasm round the platform gives every drag and every knockback a wall, never a
+fall (the platform's lip is a balustrade cliff).
 
-`SMITH_HEART_DOOR_POS` (138, 756) in Thornpeak Heights (`src/sim/content/zone3.ts`), at
-the foot of the Stormcrag cliffs past the end of the Stormcrag road, north-east of
-Highwatch (0, 660); leaving sets the raid down to the west, away from the rock face.
-The world door is a crack in the cliffs from which four threads of coloured light
-escape (phase 2 art). While `SMITH_HEART_PLAYABLE` (`src/sim/content/smith_heart.ts`)
-is false the door is NOT built (`overworldDoor` follows the flag: no door entity,
-jambs, terrain pad or cleared ring, so the shipped world and its parity traces are
-untouched), the raid is entered only through `/dev heart`, and any other entry is
-refused with `SMITH_HEART_CLOSED_TEXT`.
+**Separate, not walkable, not visible.** No floor joins the Heart to the main map; the
+portal is the only way in. The mountain's crown round the Heart is deeper and taller
+than the veins' rock, and no line of sight crosses from any main-map eye into the Heart
+(pinned, section 10).
 
-### 3.6 Deviations from the approved pages
+### 3.3 The route, in order
+
+1. **The Cleft**, the **Hammer Gallery** (h1, h2, h3), the **Pit Mouth**, the
+   **Smith's Quarry**: the Hammer guardian, always first.
+2. **The Slab** breaks when the Hammer guardian dies; the Slab Stair climbs to **the
+   Balcony**, the first view: the Grand Stair falling to the seal on its dais, the Ring
+   round it, the three vein mouths.
+3. **The Ring** (eight packs) by the two Balcony Stairs; then in ANY order the
+   **Breath** (to the Storm Cornice), the **Quench** (to the Quench Basin) and the
+   **Heat** (to the Smith's Forge), each behind its own three packs.
+4. Each guardian's death lights its vein's **light river**; the river runs to the seal
+   and its quarter fills. With all four lit and the Ring clear, the seal **opens into
+   the portal**.
+5. Down the Grand Stair to the dais, into the portal: the raid lands on the Heart's
+   **Arrival Terrace**, crosses the **Heart Bridge** to the **Anvil of the World** and
+   the final boss. The exit portal opens there when it dies.
+
+Corpse run: a released spirit rises at the raid's entrance (the instance death model),
+walks the main map (Gallery, Quarry, Slab, Balcony, Grand Stair) to the portal, which
+stays open for the claim's life, and steps through. The return portal walks the raid
+back to the dais at any time.
+
+### 3.4 Heights
+
+| Area | Heights (yards) | Feel |
+|---|---|---|
+| Hammer | Cleft 44, Gallery 40 to 28, Quarry 14 under terraces to 42, Balcony 20 | the descent from the entrance into a deep pit |
+| Ring and dais | Ring 0, dais -4 | the Ring looks down onto the seal |
+| Breath | 0, 16, 40, Cornice 60 | climbs into the wind, a summit |
+| Quench | -8, -16, -24, Basin -30 | sinks into the cold |
+| Heat | 0 throughout | the forge's level |
+| Heart | terrace +4, platform 0 | the arrival looks down onto the platform |
+
+Every path's slope stays under the authored field's limit
+(`src/sim/instances/authored_field/CLAUDE.md`); `tests/smith_heart_route.test.ts` proves
+no walked step exceeds `MAX_STEP_HEIGHT` or `cliffStep` on either area.
+
+### 3.5 Sightlines and the reveals
+
+- **The Balcony.** The Slab splits and opens onto the Balcony: the Grand Stair falls
+  straight to the seal, the dais's four tines round it, the Ring beyond, the vein
+  mouths. The rivers already lit cross the chasm to the seal.
+- **The seal from the Ring.** The dais floats in an open chasm a little below the Ring:
+  nothing stands between any Ring point and the seal or the portal's eye; the tines
+  stand on the diagonals, between the rivers and clear of every ray (pinned).
+- **The portal opening.** Seen from anywhere on the Ring and from the Balcony: the
+  tines charge, a pillar of light stands up, a four-colour shockwave races across the
+  chasm to the Ring, and the vortex and its funnel grow out of the parted seal.
+- **The arrival.** The terrace faces the platform across the short bridge: the boss at
+  its centre, the four altars, the chains rising into the crown, the core's light from
+  below, the ember sky above.
+- **Lighting.** One light zone per section (`SMITH_HEART_FIELD.lightZones`), each vein
+  keyed in its colour; the Heart lit from below by its core.
+
+### 3.6 World entrance
+
+`SMITH_HEART_DOOR_POS` in Thornpeak Heights (`src/sim/content/zone3.ts`), at the foot of
+the Stormcrag cliffs past the end of the Stormcrag road, north-east of Highwatch;
+leaving sets the raid down to the west, away from the rock face. While
+`SMITH_HEART_PLAYABLE` (`src/sim/content/smith_heart.ts`) is false the door is NOT built
+(`overworldDoor` follows the flag), the raid is entered only through `/dev heart`, and
+any other entry is refused with `SMITH_HEART_CLOSED_TEXT`.
+
+### 3.7 Deviations from the approved pages
 
 | Pages | Code | Why |
 |---|---|---|
-| Balcony +25, Pit +20 | Balcony +20, Pit +14 | The curved Balcony Stairs drop to the Ring over about 32 yd of arc; from +25 they exceed the authored field's slope limit. The Pit drops with it so the Slab Stair still climbs from Pit to Balcony. |
-| One wide stair from the balcony to the Ring | Two curved stairs, east and west, along the Ring's circle | The engine allows ONE floor height per point, so the Ring cannot pass under the Balcony. The Balcony replaces the Ring's south arc and the stairs close the loop. |
-| Ring 14 yd wide | 16 yd (r 62 to 78) | Room for packs of three plus a raid of ten passing; see open questions. |
-| The Ring ramps down into the final room | Three causeways (north, east, west) across an open void annulus | Keeps the seal visible from all of the Ring and lets the raid enter from whichever vein it finished last. |
-| One altar before each vein mouth | The south (Hammer) altar sits under the Balcony's sightline with no causeway behind it | The south is the Balcony; see open questions. |
-| Heart 70 yd across | 76 yd (r 38) | Altars at r 31 leave a walkable band behind them for drags and add spawns. |
-| Lake 70 yd, Anvil 55 yd | Lake ice 64 yd on an 80 yd shelf; Anvil about 56 by 44 yd | Shelf carries the braziers outside the ice; the Anvil is shaped, not round. |
-| Map about 420 by 420 yd | about 460 by 490 yd | The three veins at 150 yd each plus the Hammer Gallery; still one instance slot. |
+| Balcony +25, Pit +20 | Balcony +20, Quarry floor +14 | The curved Balcony Stairs exceed the slope limit from +25; the Quarry drops with it. |
+| One wide stair from the balcony to the Ring | Two curved stairs along the Ring's circle | ONE floor height per point: the Ring cannot pass under the Balcony. |
+| Ring 14 yd wide | 16 yd | Room for packs of three plus a raid passing; see open questions. |
+| The final room on the main map (the heart caldera) | A separate Heart reached by a portal from the seal (owner, phase 2A) | The final fight gets its own identity and room; the seal stays the main map's centrepiece. |
+| One altar before each vein mouth | The four altars ring the Heart's platform under its chains | The altars moved with the final boss. |
+| Map about 420 by 420 yd | the slot's whole width | Bigger themed rooms and the Heart; still one instance slot. |
 | About 22 packs | 20 (3 + 8 + 3 x 3) | The pages' figure was an estimate. |
 
 ## 4. Packs
@@ -244,19 +253,15 @@ the other veins are warder, caller, warder.
 
 | Pack | Location | Floor | Composition | Gate that waits on it |
 |---|---|---|---|---|
-| h1 | Gallery landing (-50, -232) | +36 | 3 Hammer Vein Warder | `hammer_pit_mouth` |
-| h2 | Gallery landing (10, -234) | +31 | 3 Hammer Vein Warder | `hammer_pit_mouth` |
-| h3 | Gallery landing (62, -200) | +26 | 3 Hammer Vein Warder | `hammer_pit_mouth` |
-| r1 to r8 | Ring at 30, 60, 105, 125, 235, 255, 300, 330 deg (`RING_PACK_DEGREES`) | 0 | 3 Ring Forge Warder | all three causeways |
-| b1 | Breath b1 (0, 104) | 0 | 2 Breath Vein Warder, 1 Breath Vein Caller | `cornice_mouth` |
-| b2 | Breath b2 (44, 134) | +16 | same | `cornice_mouth` |
-| b3 | Breath b3 (-44, 160) | +40 | same | `cornice_mouth` |
-| q1 | Quench q1 (110, 0) | -8 | 2 Quench Vein Warder, 1 Quench Vein Caller | `lake_mouth` |
-| q2 | Quench q2 (130, -40) | -16 | same | `lake_mouth` |
-| q3 | Singing Ice (172, -49) | -24 | same | `lake_mouth` |
-| f1 | Forge hall (-110, 0) | 0 | 2 Heat Vein Warder, 1 Heat Vein Caller | `anvil_mouth` |
-| f2 | Casting floor (-142, 20) | 0 | same | `anvil_mouth` |
-| f3 | Casting floor (-142, -20) | 0 | same | `anvil_mouth` |
+| h1 | Gallery landing h1 | +40 | 3 Hammer Vein Warder | `hammer_pit_mouth` |
+| h2 | Gallery landing h2 | +34 | 3 Hammer Vein Warder | `hammer_pit_mouth` |
+| h3 | Gallery landing h3 | +28 | 3 Hammer Vein Warder | `hammer_pit_mouth` |
+| r1 to r8 | Ring at the eight `RING_PACK_DEGREES` | 0 | 3 Ring Forge Warder | the portal (with the four guardians) |
+| b1, b2, b3 | Breath landings | 0, +16, +40 | 2 Breath Vein Warder, 1 Breath Vein Caller | `cornice_mouth` |
+| q1, q2 | Quench landings | -8, -16 | 2 Quench Vein Warder, 1 Quench Vein Caller | `lake_mouth` |
+| q3 | the Singing Ice | -24 | same | `lake_mouth` |
+| f1 | the forge hall | 0 | 2 Heat Vein Warder, 1 Heat Vein Caller | `anvil_mouth` |
+| f2, f3 | the casting floor, either side of the Pour Channel | 0 | same | `anvil_mouth` |
 
 Trash sketch kits: warders swing a frontal arc cleave every third swing (Stone,
 Forge, Gale, Rime, Ember Sweep); callers cast a two-second school bolt (Gale Bolt
@@ -274,67 +279,99 @@ and while it stays engaged; open otherwise. Every gate is at least 12 yd wide.
 
 | Gate id | Kind | Where | Waits on | Seals for |
 |---|---|---|---|---|
-| `hammer_pit_mouth` | `stone_slab` | top of the Pit descent (30.5, -175.25) | packs h1, h2, h3 | Hammer guardian |
-| `the_slab` | `stone_slab` | Slab Stair (0, -121) | boss: Hammer guardian | nothing |
-| `cornice_mouth` | `forge_seal` | top of the Cornice climb (-26, 191.2) | packs b1, b2, b3 | Breath guardian |
-| `lake_mouth` | `forge_seal` | foot of the Lake descent (180.5, -31) | packs q1, q2, q3 | Quench guardian |
-| `anvil_mouth` | `forge_seal` | Anvil bridge (-165, 0) | packs f1, f2, f3 | Heat guardian |
-| `causeway_north` | `forge_seal` | (0, 60) | packs r1 to r8; bosses: all four guardians | final boss |
-| `causeway_east` | `forge_seal` | (60, 0) | same | final boss |
-| `causeway_west` | `forge_seal` | (-60, 0) | same | final boss |
+| `hammer_pit_mouth` | `stone_slab` | the Pit descent, near its top | packs h1, h2, h3 | Hammer guardian |
+| `the_slab` | `stone_slab` | the Slab Stair | boss: Hammer guardian | nothing |
+| `cornice_mouth` | `forge_seal` | the Cornice climb, near its top | packs b1, b2, b3 | Breath guardian |
+| `lake_mouth` | `forge_seal` | the lake descent | packs q1, q2, q3 | Quench guardian |
+| `anvil_mouth` | `forge_seal` | the anvil bridge | packs f1, f2, f3 | Heat guardian |
+| `heart_bridge` | `forge_seal` | the Heart Bridge | nothing (the portal is its door) | final boss |
 
-`the_slab` and `causeway_north` carry the `openText` lines the raid reads when they
-open. Gate entities are spawned by `SMITH_HEART_GATE_OBJECTS`.
+`the_slab` carries the `openText` line the raid reads when it opens. Gate entities are
+spawned by `SMITH_HEART_GATE_OBJECTS`.
 
-### 5.2 The heart seal
+### 5.2 The heart seal and the portal
 
-The seal is a lit-vein mask, one bit per dead guardian
-(`SMITH_HEART_VEIN_BITS`): Hammer 1, Breath 2, Quench 4, Heat 8;
-`SMITH_HEART_SEAL_FULL` is 15. It is derived every tick from the claim's roster
-(`smithHeartEarnedMask`), never a timer and never stored. `tickSmithHeartSeal`
-writes the mask into the template id of every seal marker
-(`smithHeartSealTemplate`, prefix `smith_heart_seal_`), so every client mirrors the
-seal with no wire change; the renderer reads it back with `smithHeartSealMaskOf`.
-The markers (`SMITH_HEART_SEAL_MARKERS`) are spread so every walkable point stands
-within the client's interest radius of at least one. Each newly lit vein sends its
-line from `SMITH_HEART_VEIN_LIT_LOG` to the raid (re-localized by
-`src/ui/sim_i18n.ts`).
+The seal is a lit-vein mask, one bit per dead guardian (`SMITH_HEART_VEIN_BITS`):
+Hammer 1, Breath 2, Quench 4, Heat 8; `SMITH_HEART_SEAL_FULL` is 15. The portal is one
+more bit, `SMITH_HEART_PORTAL_BIT` (16): set when the mask is full AND the Ring's eight
+packs are dead (or forced by `/dev heart portal`). Both are derived every tick from the
+claim's roster (`smithHeartProgress`), never a timer and never stored, so a lit vein
+stays lit and the open portal stays open for the claim's life. `tickSmithHeartSeal`
+writes the value into the template id of every seal marker (`smithHeartSealTemplate`,
+prefix `smith_heart_seal_`), so every client mirrors the seal and the portal with no
+wire change; the renderer reads it back with `smithHeartSealMaskOf`. The markers
+(`SMITH_HEART_SEAL_MARKERS`) are spread so every floor of both areas stands within the
+client's interest radius of at least one (pinned). Each newly lit vein sends its line
+from `SMITH_HEART_VEIN_LIT_LOG`, and the opening sends `SMITH_HEART_PORTAL_OPEN_LOG`
+(re-localized by `src/ui/sim_i18n.ts`).
 
-### 5.3 The derived readout
+### 5.3 The portal hop
+
+`tickSmithHeartPortal` (`src/sim/encounters/smith_heart/portal.ts`), once a tick per
+live claim, draws no rng and uses the shared displacement recipe (`displacePlayer`):
+a living player standing in the Ring's portal (`RING_PORTAL`) while it is open is set
+down at `HEART_ARRIVAL`, facing the platform, far outside the final boss's reach; a
+player standing in the return portal (`HEART_RETURN_PORTAL`) is set down at
+`RING_PORTAL_LANDING` on the dais, facing the Grand Stair, clear of the portal. The
+return portal always works (the Heart is only ever reached through the open portal).
+A corpse never crosses. Each crossing sends its own line
+(`SMITH_HEART_PORTAL_HOP_TEXT`, `SMITH_HEART_PORTAL_RETURN_TEXT`).
+
+### 5.4 The derived readout
 
 `smithHeartProgress(ctx, inst)` returns `SmithHeartProgress`:
 
 | Field | Meaning |
 |---|---|
 | `mask` | lit-vein mask |
-| `slabOpen` | Hammer bit lit: the Slab is split, the Ring and the three veins are open |
+| `slabOpen` | Hammer bit lit: the Slab is split, the Ring and the three veins open |
 | `sealLit` | mask is full: all four colours burn |
 | `ringClear` | packs r1 to r8 are dead |
-| `heartOpen` | `sealLit` and `ringClear`: the causeways are open |
+| `portalOpen` | `sealLit` and `ringClear` (or forced by `/dev heart portal`): the seal is a portal |
 
-Used by the dev tools and tests; it mirrors the gate engine, it never drives it.
+### 5.5 Free order, proved
 
-### 5.4 Free order, proved
+- Only `the_slab` lists a guardian among the gates, and only the Hammer. The portal
+  waits on all four. No gate orders the Breath, Quench and Heat against each other.
+- Each arena mouth waits only on its own vein's three packs, and those packs stand on
+  floor reachable from the Ring once the Slab is open.
+- Pinned by `tests/smith_heart_route.test.ts`, "the Slab open: the Ring, the dais and
+  all three veins in any order", and by `tests/smith_heart_gating.test.ts`.
 
-- Only `the_slab` and the three causeways list a guardian. The Slab lists only the
-  Hammer; the causeways list all four. No gate lists the Breath, Quench or Heat
-  guardian before another vein's arena.
-- Each arena mouth waits only on its own vein's three packs, and those packs stand
-  on floor reachable from the Ring once the Slab is open.
-- Pinned by `tests/smith_heart_route.test.ts`, "the Slab open: the Ring and all
-  three veins in any order, never the Heart": with only `hammer_pit_mouth` and
-  `the_slab` open the flood reaches the Ring and every vein up to its mouth, and
-  opening any ONE arena mouth reaches that arena but neither of the others nor the
-  Heart.
+### 5.6 Reset
 
-### 5.5 Reset
+Dead instance mobs stay dead for the claim's life, so a lit vein stays lit, the portal
+stays open and an opened gate stays open (a corpse run always has a path). A fresh
+claim respawns everything: every gate closes and the markers start at
+`smith_heart_seal_0`. The dungeon is in `RAID_REQUIRED_DUNGEON_IDS`, so a replacement
+claim skips the five-minute reset cooldown; the raid lockout is the rate limit (wired
+later, see the Shipping checklist).
 
-Dead instance mobs stay dead for the claim's life, so a lit vein stays lit and an
-opened gate stays open (a corpse run always has a path). A fresh claim respawns
-everything: every gate closes and the markers start at `smith_heart_seal_0`. The
-dungeon is in `RAID_REQUIRED_DUNGEON_IDS`, so a replacement claim skips the
-five-minute reset cooldown; the raid lockout is the rate limit (wired in phase 2,
-see the Shipping checklist).
+### 5.7 The structural VFX (phase 2A)
+
+Every piece is built with the interior, so the renderer's compile gate links its
+programs before the first frame (a hidden mesh's material links too); none reads a
+texture, nothing is added to the scene later, no light but the budgeted point lights.
+The seal, the portal, the bursts and the hop draw on every graphics tier (they show
+progress and the way); only cosmetic motes and embers thin on the low tier
+(`heartPortalMoteCount`, `heartEmberCount`, read from the static preset).
+
+| Moment | Look | Where |
+|---|---|---|
+| A vein lights | its river runs to the seal; its quarter fills rim to centre behind a white-hot front; a column of its colour stands up off it | `heart_rivers.ts`, `heart_seal.ts` (`heartSealQuarterFill`, `heartSealColumn`) |
+| The seal opens | the tines charge and arc, a pillar of light and a bloom stand up, a four-colour shockwave races across the chasm to the Ring, the quarters part | `heart_portal.ts` (`heartPortalStage`) |
+| The living portal | a floor vortex of four spiral arms round a white-gold eye, a funnel of light over it, motes spiralling up | `heart_portal.ts`, `heart_fx_materials.ts` |
+| The hop | a column and a floor ring at the landing, a brief white-gold wash over the view, the sky turning (storm to ember night) | `heart_portal.ts`, `heart_sky.ts` (`heartHopLanding`, `heartAreaBlend`) |
+| The Heart | the core beating in the chasm, its shafts, the chains, each vein's pour down its chain, the rune rings, rising embers | `heart_room.ts` |
+
+### 5.8 Areas: score, air, sky
+
+`smithHeartAreaAt` names the area of any point (hammer, ring, breath, quench, heat,
+heart). The score follows it (`SMITH_HEART_AREA_MUSIC`: each vein and the Heart borrow
+an existing cue whose brief fits until the raid has its own score). The Heart has its
+own fog and light state, `smithHeartCore` (`heart_environment.ts`); the main map keeps
+the borrowed storm grade until the per-room phases. The sky blends from storm to the
+Heart's ember night as the camera arrives.
 
 ## 6. Set pieces (phase 2 specs)
 
@@ -405,10 +442,10 @@ the meters harness, never shipped unmeasured.
 
 ### 7.1 Guardian of the Hammer (always first)
 
-- Look: a stone titan with a huge hammer, half-fused with the Pit floor; the living
+- Look: a stone titan with a huge hammer, half-fused with the Quarry floor; the living
   lock on the way to the heart.
 - Phase 1 (`heart_hammer_guardian`): Hammerfall (frontal arc cleave); Mountain's
-  Wrath (cast-bar line-of-sight nova covering the Pit: hide behind a column).
+  Wrath (cast-bar line-of-sight nova covering the Quarry: hide behind a column).
 - Target: the five columns rise and fall on a cycle, so the safe spots for Mountain's
   Wrath move; ground slams raise new columns; a tank-swap mechanic on the hammer.
   Role jobs: tanks swap and position against the columns, healers recover after
@@ -444,8 +481,8 @@ the meters harness, never shipped unmeasured.
 
 ### 7.5 The Masterless Strength (final)
 
-- Look: the pieces of an unassembled forge body floating over the seal, under a
-  storm sky with lightning every few seconds.
+- Look: the pieces of an unassembled forge body floating over the Anvil of the World,
+  the Smith's heart beating in the chasm below, under the ember sky.
 - Phase 1 (`heart_masterless_strength`): Forge Fist (frontal arc cleave); Forge
   Wrath (line-of-sight nova: hide behind an altar); Forge Pour (cast-bar frontal
   cone). One form only.
@@ -516,14 +553,26 @@ on both difficulties (dungeon rework README, goal 4).
 ## 10. Testing
 
 - `tests/smith_heart_route.test.ts`: the route contract over the real collision seam
-  (`isBlocked`): the end-to-end walk with every gate open, a fresh claim held in the
-  Gallery, the Pit Mouth versus the Slab, free order of the three veins, each
-  causeway alone reaching the Heart, no step over `MAX_STEP_HEIGHT`, 12 yd paths and
-  gates, and the Ring pack spacing.
-- `tests/smith_heart_gating.test.ts`: the seal mask round trip, a fresh claim shut
-  and dark, the Hammer first, the other three in any order, the Heart only with all
-  four lit and the Ring clear.
-- `tests/smith_heart_dev.test.ts`: the `/dev heart` family and the dev-only door.
+  (`isBlocked`): the main-map walk with every gate open (to the portal), the Heart's
+  walk from its arrival (to the boss, the altars and the exit), the two areas never
+  joined by floor, the Heart Bridge sealed, a fresh claim held in the Gallery, the Pit
+  Mouth versus the Slab, free order of the three veins, no step over
+  `MAX_STEP_HEIGHT`, 12 yd paths and gates, every floor within interest range of a
+  seal marker, the Ring pack spacing, and the guardian rooms' size.
+- `tests/smith_heart_gating.test.ts`: the seal value round trip (veins and the portal
+  bit), a fresh claim shut and dark, the Hammer first, the other three in any order,
+  the portal only with all four lit and the Ring clear (said once, staying open), the
+  hop both ways (and never for a corpse), the Heart Bridge's seal.
+- `tests/smith_heart_walls.test.ts`: the drawn terrain against the walked floor on both
+  areas, the Grand Stair alone across the chasm.
+- `tests/smith_heart_render_core.test.ts`: the mountain (clear of every floor, open air
+  kept, tall crowns, the Cornice low, the Heart deepest) and no main-map eye seeing
+  into the Heart; the rivers; the seal memory and fill; the portal, hop and area-blend
+  timelines; the chains, keels and core; the sightlines from the Ring and the Balcony
+  to the seal and the portal's eye; the props and the light budget.
+- `tests/smith_heart_areas.test.ts`: the areas, the score per area, the Heart's air.
+- `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
+  hop included) and the dev-only door.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`
   (walls in the `gravewyrm_sanctum_walls` pattern when the phase 2 kit adds walls).
 - Guard tests that must stay green: `tests/architecture.test.ts` (sim purity and
@@ -539,32 +588,39 @@ on both difficulties (dungeon rework README, goal 4).
 |---|---|
 | `/dev heart` | help line |
 | `/dev heart enter [normal]` | claim a fresh run and step in at the Cleft |
-| `/dev heart tp <area or boss>` | jump inside the run (enters first): cleft, gallery, pit, balcony, ring, ringse, ringsw, breath, bridge, cornice, quench, ice, lake, heat, forge, anvil, heart; a boss name (hammer, breathboss, quenchboss, heatboss, final) lands beside that boss |
+| `/dev heart tp <area or boss>` | jump inside the run (enters first): cleft, gallery, pit, balcony, ring, ringse, ringsw, breath, bridge, cornice, quench, ice, lake, heat, forge, anvil, heart or portal (the Seal Dais beside the portal), heartroom or final (the Heart's Arrival Terrace); a guardian's name (hammer, breathboss, quenchboss, heatboss) lands beside it |
 | `/dev heart kill <what>` | kill a guardian (hammer, breath, quench, heat), the final boss (final), all four guardians (guardians), one pack (`pack h1` and so on), every pack (trash), or all; kills credit through the normal death path, so gates and seal follow on the next tick |
 | `/dev heart gates` | open every gate of the run |
+| `/dev heart portal` | force the seal's portal open for the run (the hop then works) |
 | `/dev heart seal` | print the `smithHeartProgress` readout |
 | `/dev heart reset` | free the run and claim a fresh one |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 `devCommands` and the door refusing a non-dev world.
 
-## 12. Phase 2 plan
+## 12. Plan after phase 2A
 
-1. Blender kit per vein, ONE vein at a time, iterating with renders against the
-   reworked dungeons; start with the Hammer: the world entrance crack, the Cleft and
-   the Gallery. Then the Balcony and Ring (the reveal shot), then Breath, Quench and
-   Heat.
-2. Original creature models for every trash and boss body, emptying
+The structure is in place; each room now gets its own phase, ONE at a time, with
+captures and review before the next:
+
+1. **The Hammer** (the Cleft, the Gallery, the Quarry): a Blender kit for the quarry
+   steps, the colossi (real half-carved figures, faces and tools), geodes, derrick and
+   columns; the collapsing gallery; the columns that rise and fall.
+2. **The Ring and the Seal Dais**: the seal and the tines as real models; the Ring's
+   pillars; the Balcony and the Grand Stair carved.
+3. **The Breath**: the cornice's cracked rock, the bellows wrecks, the lightning rods
+   (with strikes), the wind bridge's gusts.
+4. **The Quench**: ice shelves and blades as models, the singing ice, steam.
+5. **The Heat**: the hearth, anvil, bellows and crucibles as models, the pour.
+6. **The Heart**: the platform, altars, chains and core as models; the final boss's
+   form choice, altar drags and adds.
+7. Original creature models for every trash and boss body (the official pipeline:
+   concept in three T-pose views, Tripo Smart Mesh, a skeleton built for the mesh,
+   hand-solved weights, clips from scratch), emptying
    `smith_heart_placeholder_looks.ts`.
-3. Real boss kits (section 7) as modules behind the `SimContext` seam under
-   `src/sim/encounters/smith_heart/`, with heroic twists.
-4. The four set pieces (section 6) as sim modules with ground cues.
-5. The quest with Captain Thessaly at Highwatch.
-6. Finder entry, raid lockout and loot wiring (section 8).
-7. IP check of every new player-visible proper noun (the raid name, every mob and
-   boss name, the earth hammer) before it ships, per `src/sim/content/CLAUDE.md`
-   "Naming originality" and `docs/design/naming-audit.md`; each verdict recorded in
-   this doc.
+8. The quest with Captain Thessaly, finder entry, lockout, loot (section 8), and the
+   IP check of every new proper noun (the raid name, every mob and boss name, the
+   rooms' names), each verdict recorded here.
 
 ## 13. Shipping checklist
 
@@ -589,6 +645,6 @@ Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
    open entry?
 3. Ring width: keep 16 yd, or narrow to the pages' 14 yd once packs and pulls are
    playtested?
-4. The south (Hammer) altar sits under the Balcony with no causeway or vein mouth
-   behind it. Accept, or move the altars so each faces a causeway and the Hammer
-   altar faces the Balcony stairs?
+4. The Grand Stair is the dais's one way in: a raid finishing in the north walks
+   round the Ring and over the Balcony to reach the portal. Keep it (one processional
+   axis, the straightest corpse run), or add a second stair from the Ring?
