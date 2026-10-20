@@ -20715,4 +20715,245 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推荐奖励会员契约正在发放给此角色。请在发放完成后再尝试删除此角色。',
+  'hudChrome.raidBossGuide.dungeonButton': '首领指南：{dungeon}',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': '地下城首领',
+  'hudChrome.raidBossGuide.rankMiniboss': '小首领',
+  'hudChrome.raidBossGuide.rankFinal': '最终首领',
+  'hudChrome.raidBossGuide.defeated': '已击败',
+  'hudChrome.raidBossGuide.browseBossDefeated': '查看 {boss}（已击败）',
+  'hudChrome.raidBossGuide.heroicHeading': '英雄难度的变化',
+  'hudChrome.raidBossGuide.tipsHeading': '职责建议',
+  'hudChrome.raidBossGuide.choicesHeading': '关键抉择',
+  'hudChrome.raidBossGuide.choiceGain': '收益',
+  'hudChrome.raidBossGuide.choiceRisk': '风险',
+  'hudChrome.raidBossGuide.markHeroicOnly': '仅限英雄',
+  'hudChrome.raidBossGuide.markHeroicChanged': '英雄难度有变化',
+  'hudChrome.raidBossGuide.damageCompare': '普通 {normal} | 英雄 {heroic}',
+  'hudChrome.raidBossGuide.finderOpen': '首领指南',
+  'hudChrome.raidBossGuide.finderOpenLabel': '打开 {boss} 的首领指南',
+  'bossJournal.common.enrageName': '狂暴',
+  'bossJournal.common.phaseEnrageSummary': '生命值低于{health}时，首领进入狂暴状态，直至战斗结束。',
+  'bossJournal.common.enrageSummary':
+    '生命值低于{health}时，其近战攻击伤害提高{damage}，攻击速度加快{haste}，直至战斗结束。',
+  'bossJournal.common.enrageResponse':
+    '坦克和治疗者把防御与治疗冷却留到这个阶段。其他人全力输出，尽快结束战斗。',
+  'bossJournal.common.heroicHarder': '本页的每个技能造成的伤害是普通难度的{scale}倍。',
+  'bossJournal.sanctum.tusker.overview':
+    '一头房屋般巨大的巨牙兽拖着一架满载燃烧灵魂火盆的雪橇，在拖橇之路上来回奔走。它沿道路循环行走，并在你拉怪的地方卸下雪橇。生命值降到一半时雪橇会翻倒，在它身后洒出烈焰。',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    '开战就有两个带预警的攻击：正面横扫，以及沿标出路线的冲锋。',
+  'bossJournal.sanctum.tusker.phaseSpillName': '拖橇倾覆',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    '生命值降到{health}时，雪橇翻倒，魂火洒落在它身后。',
+  'bossJournal.sanctum.tusker.phaseEnrageName': '狂暴',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    '生命值低于{health}时，它会在本场战斗剩余时间内进入狂暴。',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    '每{every}秒读条{cast}秒，随后獠牙横扫其前方{arc}度的扇形，从身体向外延伸{range}码：造成{min}到{max}点伤害，并击退{push}码。',
+  'bossJournal.sanctum.tusker.sweepResponse': '坦克让它背对队伍。其他人从它的侧面或背后攻击。',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    '每{every}秒读条{cast}秒，朝最远的玩家标出一条{length}码的路线，随后沿路线冲锋：对路线内所有人造成{min}到{max}点伤害，并击倒{stun}秒。',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    '在读条结束前向侧面离开标出的路线。最远的玩家是目标，所以远程玩家要留出侧移的空间。',
+  'bossJournal.sanctum.tusker.spillName': '倾倒的火盆',
+  'bossJournal.sanctum.tusker.spillSummary':
+    '仅一次，在生命值{health}时：雪橇翻倒，{count}片魂火（半径{radius}码）在它身后燃烧{seconds}秒，对范围内所有人每秒造成{min}到{max}点伤害。',
+  'bossJournal.sanctum.tusker.spillResponse': '立刻走出火焰，并远离火堆作战。',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    '生命值低于{health}时，在本场战斗剩余时间内伤害提高{damage}。',
+  'bossJournal.sanctum.tusker.enrageResponse': '把治疗和防御冷却留到最后阶段，并尽快将它击杀。',
+  'bossJournal.sanctum.tusker.tipTank':
+    '让它背对队伍并保持不动，这样横扫扇形就不会扫到队友。每次獠牙横扫都会带来击退。',
+  'bossJournal.sanctum.tusker.tipHealer':
+    '獠牙横扫和践踏是伤害高峰。站在它的侧面，不要站在践踏瞄准的最远处，并为它在{health}以下的狂暴留一个冷却。',
+  'bossJournal.sanctum.tusker.tipDamage':
+    '从侧面或背后攻击。留意地面上标出的路线并走出去。生命值一半时，远离它身后的火焰。',
+  'bossJournal.sanctum.korgath.overview':
+    '铁匠的工头，被锁在四根封印石柱上。他身上每条尚存的锁链都会使他受到的伤害降低{perChain}，因此打破锁链能让他更容易被击杀。但你每打破一条锁链，他就会在本场战斗剩余时间内多解放一个攻击。',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    '他开战时被{chains}条锁链束缚，每根石柱一条。每根石柱旁的封印镣铐维系着它的锁链。',
+  'bossJournal.sanctum.korgath.phaseFreedName': '断裂的锁链',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    '每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击，即使锁链之后被重新铆合也一样。',
+  'bossJournal.sanctum.korgath.phaseEnrageName': '狂暴',
+  'bossJournal.sanctum.korgath.lockboundName': '锁缚',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    '每条完好的锁链使他受到的伤害降低{perChain}：四条全在时伤害降低{all}。',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    '打破锁链可加快击杀。先决定打破几条：每条也会解放一个攻击。',
+  'bossJournal.sanctum.korgath.shacklesName': '封印镣铐',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    '每根石柱脚下都有一个封印镣铐。在科加斯被拉怪前无法攻击镣铐。击杀一个镣铐会打破它的锁链。只要铁砧锁链还在，他就无法离开平台中心{leash}码的范围。',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    '输出者击杀你选择打破的锁链所对应的镣铐。与此同时，坦克把科加斯留在中心。',
+  'bossJournal.sanctum.korgath.strainSummary':
+    '只要还有锁链完好：每{every}秒读条{cast}秒，随后在每根锁链仍完好的石柱周围{radius}码的环形范围内爆发：造成{min}到{max}点伤害并击退。四条锁链全部打破后停止。',
+  'bossJournal.sanctum.korgath.strainResponse': '在读条结束前，远离每一根锁链完好的石柱。',
+  'bossJournal.sanctum.korgath.stompSummary':
+    '每{every}秒读条{cast}秒，随后在其身体外{radius}码形成一圈冲击：对圈内所有人造成{min}到{max}点伤害。',
+  'bossJournal.sanctum.korgath.stompResponse':
+    '远程玩家待在圈外。近战能躲就躲出去；治疗者为被击中的人补血。',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    '锁链断裂{delay}秒后，一名龙誓刺棒匠会从石柱后方爬过边缘，走向镣铐并引导重铆{channel}秒。若引导完成，锁链和一个新的镣铐会回归并恢复{perChain}的减伤，但已解放的攻击不会消失。',
+  'bossJournal.sanctum.korgath.rerivetResponse': '在引导结束前打断、眩晕或击杀刺棒匠。',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    '只剩一条锁链时，绷链每{every}秒触发一次，而不是每{base}秒。',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    '尽快打破最后一条锁链，或者做好每{every}秒离开它的石柱的准备。',
+  'bossJournal.sanctum.korgath.maulSummary':
+    '铁锤锁链断裂后：每{every}秒读条{cast}秒，随后在其面前{arc}度扇形、从身体向外{range}码的范围内劈砍，伤害为他近战攻击的{mult}倍。',
+  'bossJournal.sanctum.korgath.maulResponse': '只有坦克站在他正面。其他人在读条期间绕到他身后。',
+  'bossJournal.sanctum.korgath.flailSummary':
+    '铁钳锁链断裂后：每{every}秒读条{cast}秒，朝最远的非坦克玩家标出一条{length}码的路线，随后锁鞭击中路线内所有人：造成{min}到{max}点伤害。',
+  'bossJournal.sanctum.korgath.flailResponse': '在读条结束前向侧面离开路线。',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    '铁砧锁链断裂后：他可以离开平台中心。每{every}秒读条{cast}秒，朝最远的玩家标出一条{length}码的路线，随后沿路线冲锋：造成{min}到{max}点伤害并击退。',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    '离开路线。只要铁砧锁链还在，他就待在中心{leash}码内，不会冲锋。',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    '风箱锁链断裂后：每{every}秒读条{cast}秒，随后对所有人造成{min}到{max}点伤害，并将其推离他{push}码。',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    '它会命中整个队伍且无法躲避：治疗者在它落下前为所有人补满血。',
+  'bossJournal.sanctum.korgath.tipTank':
+    '把他留在中心，背对队伍。铁锤锁链断裂后，重锤弧斩会命中他面前的一切。在铁砧锁链断裂前，他无法离开中心{leash}码的范围。',
+  'bossJournal.sanctum.korgath.tipHealer':
+    '绷链、震颤践踏和每个已解放的攻击都很疼。每多留一条锁链，战斗就更久；每打破一条锁链，就多一个需要硬抗的攻击。',
+  'bossJournal.sanctum.korgath.tipDamage':
+    '击杀镣铐来打破你选择的锁链，然后集火科加斯。离开标出的路线，并远离仍有锁链的石柱。',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    '击杀镣铐来打破你选择的锁链，然后集火科加斯。在每个刺棒匠重铆结束前阻止它。离开标出的路线，并远离仍有锁链的石柱。',
+  'bossJournal.sanctum.korgath.choiceName': '你要打破几条锁链？',
+  'bossJournal.sanctum.korgath.choiceGain':
+    '每打破一条锁链，他的减伤就少{perChain}：从四条全在时的{all}，一路降到零。战斗会短得多。',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    '每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击。铁锤：重锤弧斩。铁钳：锁链鞭笞。铁砧：门槛冲锋，且他可以离开中心。风箱：工头的咆哮。',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    '每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击。铁锤：重锤弧斩。铁钳：锁链鞭笞。铁砧：门槛冲锋，且他可以离开中心。风箱：工头的咆哮。每条断裂的锁链还会引来一个刺棒匠去重铆。',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    '重铆：锁链断裂{delay}秒后，一名刺棒匠会试图修复它。打断、眩晕或击杀它。',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    '最后一环：只剩一条锁链时，绷链每{every}秒触发一次。',
+  'bossJournal.sanctum.velkhar.overview':
+    '维尔卡从三个融水池中唤起解冻的亡者。只有寒冷能让它们安息：在寒冰上被击杀的骨行者会永远死去，而在融水中被击杀的会再次复生并为他回血。',
+  'bossJournal.sanctum.velkhar.phaseVaultName': '仪式地窖',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    '骨行者不断从水池中爬出。生命值降到{wave1}和{wave2}时会额外涌出一波，每个水池各一只。',
+  'bossJournal.sanctum.velkhar.thawName': '苏醒之融',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    '每{every}秒，一个水池的火堆会轰然燃起，{warn}秒后有{count}只复生骨行者爬出。水池轮流发动。生命值降到{wave1}和{wave2}时，每个水池再爬出一只。',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    '坦克把它们聚在一起，拖到寒冰上。输出者在那里击杀它们。',
+  'bossJournal.sanctum.velkhar.heldName': '冰封不起',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    '在寒冰上被击杀的骨行者会被冰封：冻成雕像并保持死亡。在融水中被击杀的会沉入水中，{delay}秒后以{share}的生命值再次复生，并为维尔卡恢复其生命值的{heal}。',
+  'bossJournal.sanctum.velkhar.heldResponse': '只在寒冰上击杀骨行者：绝不要在水池或融水带上击杀。',
+  'bossJournal.sanctum.velkhar.graspName': '融尸之握',
+  'bossJournal.sanctum.velkhar.graspSummary': '站在融水中的骨行者造成的伤害提高{bonus}。',
+  'bossJournal.sanctum.velkhar.graspResponse': '坦克让骨行者远离水面。',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    '每{every}秒读条{cast}秒，从他身前朝一名非坦克玩家标出一条{width}码宽、直达地窖边缘的路线。随后对路线内所有人造成{min}到{max}点伤害，路线会化为融水并持续{seconds}秒。',
+  'bossJournal.sanctum.velkhar.trenchResponse': '离开路线。不要在它留下的融水带上击杀骨行者。',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    '每{every}秒读条{cast}秒，随后对所有人造成{min}到{max}点暗影伤害。',
+  'bossJournal.sanctum.velkhar.volleyResponse': '无法躲避：治疗者要让全队保持满血。',
+  'bossJournal.sanctum.velkhar.warmHandsName': '温热之手',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    '站着不动超过{still}秒的骨行者会在脚下融出一片半径{radius}码的融水坑，持续{seconds}秒。',
+  'bossJournal.sanctum.velkhar.warmHandsResponse': '让骨行者保持移动，绝不要在融水坑上击杀它们。',
+  'bossJournal.sanctum.velkhar.twiceWokenName': '二度苏醒',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    '再次复生的骨行者会以满生命值回归，且造成的伤害提高{bonus}。',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse': '不要让任何一只复生：全部在寒冰上击杀。',
+  'bossJournal.sanctum.velkhar.tipTank':
+    '接住每一只骨行者，拖到寒冰上，远离水池和融水带。在融水中它们的伤害会提高{bonus}。',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    '接住每一只骨行者，拖到寒冰上，远离水池和融水带。让它们保持移动：站着不动的会在脚下融出一片水坑。',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    '暗影箭雨每{every}秒命中所有人。融水中的骨行者伤害提高{bonus}，所以它们碰到水时要盯紧坦克。',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    '只在寒冰上击杀骨行者，然后回到维尔卡身边。离开魂火沟壑的路线。',
+  'bossJournal.sanctum.velkhar.choiceName': '亡者倒在何处？',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    '在寒冰上被击杀的骨行者会彻底消失：小怪更少，战斗更干净。',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    '在融水中被击杀的会再次复生，每次都为维尔卡恢复其生命值的{heal}。把它们拖到寒冰上要花时间，所以在集火前先规划好击杀地点。',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    '温热之手：站着不动超过{still}秒的骨行者会融出一片融水坑。',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    '二度苏醒：再次复生的骨行者会以满生命值回归，且造成的伤害提高{bonus}。',
+  'bossJournal.sanctum.korzul.overview':
+    '一场在冰封湖面上的巨龙之战，而他的烈焰不断击碎冰面。每一次吐息都会消耗冰面，而团队决定他的火焰瞄准何处，也就决定了失去哪块冰。冰面耗尽的巨龙会不停地吐息。',
+  'bossJournal.sanctum.korzul.phaseLakeName': '冰封湖面',
+  'bossJournal.sanctum.korzul.phaseLakeSummary': '他破冰而出，落在湖中央。他落地时战斗才正式开始。',
+  'bossJournal.sanctum.korzul.phaseFlightName': '飞行阶段',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    '生命值降到{first}和{second}时，他会起飞并在空中作战，直到再次坠落。',
+  'bossJournal.sanctum.korzul.phaseLastName': '最后阶段',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    '第二次飞行之后：他在地面上每{breath}秒施放一次坟墓吐息，每{gale}秒施放一次翼风。',
+  'bossJournal.sanctum.korzul.iceName': '破碎之冰',
+  'bossJournal.sanctum.korzul.iceSummary':
+    '湖面由多块冰板组成。他的火焰会使完好的冰板开裂，并击碎已开裂的冰板。开裂的冰板会在{refreeze}秒后重新冻结。碎裂的冰板就是开阔水域。',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    '湖面由多块冰板组成。他的火焰会使完好的冰板开裂，并击碎已开裂的冰板。深度淬火：英雄难度下，开裂的冰板不会重新冻结。碎裂的冰板就是开阔水域。',
+  'bossJournal.sanctum.korzul.iceResponse':
+    '有意识地消耗冰面：把他的火焰瞄向团队承受得起损失的冰板。',
+  'bossJournal.sanctum.korzul.waterName': '开阔水域',
+  'bossJournal.sanctum.korzul.waterSummary':
+    '站在开阔水域中会使你的移动速度降低{slow}，并每秒受到{perSecond}点伤害。',
+  'bossJournal.sanctum.korzul.waterResponse': '待在冰面上。如果被推入水中，立刻离开。',
+  'bossJournal.sanctum.korzul.breathSummary':
+    '每{every}秒沿坦克所在方向读条{cast}秒，随后喷出{arc}度的火焰扇形，从身体向外{range}码：对扇形内除坦克外的所有人造成{min}到{max}点伤害。扇形下最多{plates}块冰板燃烧，由近到远。',
+  'bossJournal.sanctum.korzul.breathResponse':
+    '只有坦克站在正面。坦克把吐息转向团队负担得起的冰面。',
+  'bossJournal.sanctum.korzul.tailSummary':
+    '每{every}秒读条{cast}秒，随后尾巴横扫其身后{arc}度、从身体向外{range}码的范围：造成{min}到{max}点伤害并击退。',
+  'bossJournal.sanctum.korzul.tailResponse': '绝不要站在他身后。从他的侧面攻击。',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    '每{every}秒一次，并在生命值{health}时再触发一次，他引导{duration}秒：在{radius}码内释放{pulses}次火焰脉冲，每次都比上一次更强（最后一次脉冲造成{min}到{max}点伤害）。第{crack}次脉冲使他脚下的冰板开裂，第{brk}次脉冲将其击碎：冰板碎裂时他被淬火，引导随即结束。',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    '离他{radius}码远。让他站在已开裂的冰板上，引导会在第{crack}次脉冲时结束。',
+  'bossJournal.sanctum.korzul.galeSummary': '读条{cast}秒，随后所有人被推离他{push}码。',
+  'bossJournal.sanctum.korzul.galeResponse': '别让身后是开阔水域，这样被推开时会落在冰面上。',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    '在空中，他会用巨龙之眼标记一名非坦克玩家，持续{eye}秒。标记结束时，他向该玩家所在的整块冰板倾泻烈焰：{warn}秒预警后，对冰板上所有人造成{min}到{max}点伤害，并使冰板燃烧。第一次飞行{roundsFirst}轮，第二次飞行{roundsSecond}轮。',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    '在空中，他会用巨龙之眼标记两名非坦克玩家，持续{eye}秒（双子之眼）。标记结束时，他向每名被标记玩家所在的整块冰板倾泻烈焰：{warn}秒预警后，对冰板上所有人造成{min}到{max}点伤害，并使冰板燃烧。第一次飞行{roundsFirst}轮，第二次飞行{roundsSecond}轮。',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    '被标记者：走到远离队伍的完好冰板上。其他人离开那块冰板。',
+  'bossJournal.sanctum.korzul.broodName': '脚下龙群',
+  'bossJournal.sanctum.korzul.broodSummary':
+    '他起飞时，每块碎裂的冰板都会爬出一名鳞卫，最多{max}名。',
+  'bossJournal.sanctum.korzul.broodResponse': '坦克接住它们，团队趁他在空中时将其击杀。',
+  'bossJournal.sanctum.korzul.descentSummary':
+    '每次飞行结束时，他会降落在人数最多的完好冰板上：{warn}秒的阴影预警后，对{radius}码内造成{min}到{max}点伤害并击退，那块冰板随即燃烧。',
+  'bossJournal.sanctum.korzul.descentResponse':
+    '聚在一块承受得起开裂的冰板上，然后在他落地前跑出阴影。',
+  'bossJournal.sanctum.korzul.flareName': '碎片闪耀',
+  'bossJournal.sanctum.korzul.flareSummary':
+    '第二次飞行之后碎片闪耀：他在地面上每{breath}秒施放一次坟墓吐息，每{gale}秒施放一次翼风。',
+  'bossJournal.sanctum.korzul.flareResponse': '吐息更频繁：规划好还剩哪些冰板可以消耗。',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    '如果所有冰板都已碎裂，他会悬停在开阔水域上方并不停地吐息。',
+  'bossJournal.sanctum.korzul.noIceResponse': '绝不要让冰面耗尽：那会导致团灭。',
+  'bossJournal.sanctum.korzul.tipTank':
+    '把坟墓吐息转向团队负担得起的冰面，绝不要横扫过团队。在墓场炼狱前把他移到已开裂的冰板上以缩短它。',
+  'bossJournal.sanctum.korzul.tipHealer':
+    '墓场炼狱的脉冲增长很快：确保所有人都离开。倾泻烈焰、坠击降落以及每次被击退落水都很疼。',
+  'bossJournal.sanctum.korzul.tipDamage':
+    '绝不要站在他的正面或背后。被巨龙之眼标记时，带着它走到远离队伍的完好冰板上。在飞行阶段击杀鳞卫。',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    '绝不要站在他的正面或背后。两名玩家会同时被巨龙之眼标记：各自带着它走到不同的、远离队伍的完好冰板上。在飞行阶段击杀鳞卫。',
+  'bossJournal.sanctum.korzul.choiceIceName': '你要消耗哪块冰？',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    '把他的吐息、倾泻烈焰和落点瞄向选定的冰板，湖面其余部分就能保持安全可站立。',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    '每块碎裂的冰板都是开阔水域，并且在他下次起飞时让一名鳞卫爬出（最多{max}名）。冰面耗尽后他会不停地吐息。',
+  'bossJournal.sanctum.korzul.choiceDouseName': '要浇灭炼狱吗？',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    '让他站在已开裂的冰板上，第{crack}次脉冲会将其击碎，他被淬火，墓场炼狱在最强的脉冲之前提前结束。',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    '那块冰板就永远消失了。若他站在完好的冰面上，引导会持续到第{brk}次脉冲，同样会击碎冰板。',
+  'bossJournal.sanctum.korzul.heroicDeepQuench': '深度淬火：开裂的冰板不会重新冻结。',
+  'bossJournal.sanctum.korzul.heroicTwinEyes': '双子之眼：巨龙之眼同时标记两名玩家。',
 };

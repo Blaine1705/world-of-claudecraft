@@ -15280,6 +15280,13 @@
     margin-left: 6px;
     padding: 0 4px;
   }
+  /* The encounter's boss guide page (src/ui/boss_journal/): opens the journal on it. */
+  .df-encounter-name .df-guide-btn {
+    margin-left: 8px;
+    padding: 2px 8px;
+    font-size: 11px;
+    vertical-align: middle;
+  }
   .df-mechanics {
     margin: 4px 0;
   }

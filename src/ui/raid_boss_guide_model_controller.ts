@@ -3,16 +3,14 @@
 // close() releases it immediately. The committed portrait remains the loading,
 // reduced-motion, no-WebGL, and failure fallback.
 
+import type { GuideModelSpec } from '../guide/content.generated';
 import type { LinkedProgramTouchQueue } from '../render/linked_program_touch_lane';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import type { RaidBossGuideBoss } from './raid_boss_guide_view';
 
-export interface RaidBossGuideModelSpec {
-  url: string;
-  idle: string | null;
-  height: number;
-  yaw?: number;
-}
+/** The standalone guide viewer's model spec (the raid pins its three; a
+ *  dungeon page resolves its boss's in-game model, boss_journal/journal_model_spec.ts). */
+export type RaidBossGuideModelSpec = GuideModelSpec;
 
 export const RAID_BOSS_GUIDE_MODEL_SPECS: Readonly<
   Record<RaidBossGuideBoss, RaidBossGuideModelSpec>
@@ -55,7 +53,12 @@ export type RaidBossGuideModelViewerFactory = (
 ) => Promise<RaidBossGuideModelViewer>;
 
 export interface RaidBossGuideModelMountOptions {
-  boss: RaidBossGuideBoss;
+  /** The model's identity across re-renders: a raid boss slug or a dungeon mob id. */
+  boss: string;
+  /** The model to load. Absent: the raid's pinned spec for `boss`. Null: no 3D
+   *  model for this boss, so the committed portrait stays (no WebGL context). */
+  spec?: RaidBossGuideModelSpec | null;
+  tint?: number | null;
   name: string;
   posterUrl: string;
   canvasLabel: string;
@@ -107,8 +110,8 @@ export class RaidBossGuideModelController {
   private viewer: RaidBossGuideModelViewer | null = null;
   private visibilityObserver: IntersectionObserver | null = null;
   private loadQueue: Promise<void> = Promise.resolve();
-  private requestedBoss: RaidBossGuideBoss | null = null;
-  private loadedBoss: RaidBossGuideBoss | null = null;
+  private requestedBoss: string | null = null;
+  private loadedBoss: string | null = null;
   private options: RaidBossGuideModelMountOptions | null = null;
   private webglSupported: boolean | null = null;
   private restoreFocusAfterLoad = false;
@@ -164,7 +167,7 @@ export class RaidBossGuideModelController {
     slot.replaceChildren(this.host);
     this.setState((this.host.dataset.state as ModelState | undefined) ?? 'idle');
 
-    if (!this.canUseWebGL()) {
+    if (options.spec === null || !this.canUseWebGL()) {
       this.requestedBoss = options.boss;
       this.loadedBoss = null;
       this.setState('nowebgl');
@@ -209,7 +212,14 @@ export class RaidBossGuideModelController {
 
   private activate(): void {
     const options = this.options;
-    if (!options || !this.canUseWebGL() || this.host.dataset.state === 'loading') return;
+    if (
+      !options ||
+      options.spec === null ||
+      !this.canUseWebGL() ||
+      this.host.dataset.state === 'loading'
+    ) {
+      return;
+    }
     const shouldRestoreFocus = this.loadButton.ownerDocument.activeElement === this.loadButton;
     this.restoreFocusAfterLoad ||= shouldRestoreFocus;
     const generation = ++this.generation;
@@ -219,7 +229,7 @@ export class RaidBossGuideModelController {
     if (shouldRestoreFocus) this.status.focus();
     this.loadQueue = this.loadQueue
       .catch(() => undefined)
-      .then(() => this.load(generation, boss, options.canvasLabel))
+      .then(() => this.load(generation, boss, options))
       .catch((error: unknown) => {
         if (generation !== this.generation) return;
         console.error('Raid boss guide model failed to load', error);
@@ -239,9 +249,12 @@ export class RaidBossGuideModelController {
 
   private async load(
     generation: number,
-    boss: RaidBossGuideBoss,
-    canvasLabel: string,
+    boss: string,
+    options: RaidBossGuideModelMountOptions,
   ): Promise<void> {
+    const canvasLabel = options.canvasLabel;
+    const spec = options.spec ?? RAID_BOSS_GUIDE_MODEL_SPECS[boss as RaidBossGuideBoss];
+    if (!spec) throw new Error(`No boss guide model for ${boss}`);
     if (generation !== this.generation) return;
     let viewer = this.viewer;
     if (!viewer) {
@@ -258,7 +271,7 @@ export class RaidBossGuideModelController {
     }
     if (generation !== this.generation) return;
     viewer.setLabel(canvasLabel);
-    await viewer.load(RAID_BOSS_GUIDE_MODEL_SPECS[boss], null);
+    await viewer.load(spec, options.tint ?? null);
     if (generation !== this.generation) return;
     this.loadedBoss = boss;
     this.setState('ready');

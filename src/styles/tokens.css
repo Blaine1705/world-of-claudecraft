@@ -356,6 +356,12 @@
     --color-rbg-cleansable-text: #85d2ff;
     --color-rbg-detail-border: #a77830;
     --color-rbg-detail-bg: #080706a8;
+    /* The dungeon pages' extra sections (src/ui/boss_journal/): the trade-off
+       card's gain side, the Heroic callout's ember wash, and the summary prose. */
+    --color-rbg-gain-border: #3f8a52;
+    --color-rbg-gain-text: #9fe3ad;
+    --color-rbg-heroic-bg: #2a0e0bcc;
+    --color-rbg-summary-text: #cfc3a6;
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */

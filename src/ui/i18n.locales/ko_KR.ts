@@ -21777,4 +21777,266 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 캐릭터를 삭제하기 전에 고정되지 않은 도장 카드를 모두 다른 캐릭터로 옮기세요.',
   'apiError.character.referral_bond_pending':
     '친구 초대 보상인 멤버십 증서를 이 캐릭터에게 지급 중입니다. 지급이 완료된 후 캐릭터 삭제를 다시 시도하세요.',
+  'hudChrome.raidBossGuide.dungeonButton': '우두머리 공략: {dungeon}',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': '던전 우두머리',
+  'hudChrome.raidBossGuide.rankMiniboss': '중간 우두머리',
+  'hudChrome.raidBossGuide.rankFinal': '최종 우두머리',
+  'hudChrome.raidBossGuide.defeated': '처치함',
+  'hudChrome.raidBossGuide.browseBossDefeated': '{boss} 보기 (처치함)',
+  'hudChrome.raidBossGuide.heroicHeading': '영웅 난이도에서 달라지는 점',
+  'hudChrome.raidBossGuide.tipsHeading': '역할별 조언',
+  'hudChrome.raidBossGuide.choicesHeading': '핵심 선택',
+  'hudChrome.raidBossGuide.choiceGain': '얻는 것',
+  'hudChrome.raidBossGuide.choiceRisk': '감수할 위험',
+  'hudChrome.raidBossGuide.markHeroicOnly': '영웅 전용',
+  'hudChrome.raidBossGuide.markHeroicChanged': '영웅에서 변경됨',
+  'hudChrome.raidBossGuide.damageCompare': '일반 {normal} | 영웅 {heroic}',
+  'hudChrome.raidBossGuide.finderOpen': '우두머리 공략',
+  'hudChrome.raidBossGuide.finderOpenLabel': '{boss}의 우두머리 공략 열기',
+  'bossJournal.common.enrageName': '격노',
+  'bossJournal.common.phaseEnrageSummary':
+    '생명력이 {health} 미만이 되면 우두머리가 전투가 끝날 때까지 격노합니다.',
+  'bossJournal.common.enrageSummary':
+    '생명력이 {health} 미만이 되면 전투가 끝날 때까지 근접 공격의 피해가 {damage} 증가하고 공격 속도가 {haste} 빨라집니다.',
+  'bossJournal.common.enrageResponse':
+    '방어 담당과 치유 담당은 이 단계를 위해 생존기와 치유 재사용 대기 기술을 아껴 두세요. 나머지는 피해를 쏟아부어 빨리 끝내세요.',
+  'bossJournal.common.heroicHarder':
+    '이 페이지의 모든 능력이 일반 난이도보다 {scale}배 강하게 들어옵니다.',
+  'bossJournal.sanctum.tusker.overview':
+    '집채만 한 거대엄니가 영혼 화로를 가득 실은 불타는 썰매를 끌고 썰매길을 오갑니다. 길을 따라 순환하며 걷다가 끌어당긴 곳에서 썰매를 풀어 놓습니다. 생명력이 절반이 되면 썰매가 뒤집혀 뒤쪽에 불길이 쏟아집니다.',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    '처음부터 예고되는 공격 두 가지: 정면 휩쓸기와 칠해진 선을 따라 하는 돌진.',
+  'bossJournal.sanctum.tusker.phaseSpillName': '썰매 전복',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    '생명력이 {health}가 되면 썰매가 뒤집히고 뒤쪽에 영혼불이 쏟아집니다.',
+  'bossJournal.sanctum.tusker.phaseEnrageName': '격노',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    '생명력이 {health} 아래로 떨어지면 전투가 끝날 때까지 격노합니다.',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    '{every}초마다 {cast}초 시전 후 엄니로 정면 {arc}도 부채꼴을 휩쓸며, 몸 앞 {range}야드까지 닿습니다: {min}~{max}의 피해와 {push}야드 밀쳐내기.',
+  'bossJournal.sanctum.tusker.sweepResponse':
+    '방어 담당은 일행에게서 등을 돌린 방향으로 붙잡아 두세요. 나머지는 옆이나 뒤에서 공격하세요.',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    '{every}초마다 {cast}초 시전으로 가장 먼 플레이어를 향해 길이 {length}야드의 선을 칠한 뒤 그 선을 따라 돌진합니다: 선 안의 모두에게 {min}~{max}의 피해와 {stun}초 넘어뜨리기.',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    '시전이 끝나기 전에 칠해진 선에서 옆으로 벗어나세요. 가장 먼 플레이어가 대상이므로 원거리 공격 담당은 옆으로 피할 공간을 남겨 두세요.',
+  'bossJournal.sanctum.tusker.spillName': '쏟아진 화로',
+  'bossJournal.sanctum.tusker.spillSummary':
+    '{health}에서 한 번: 썰매가 뒤집히며 뒤쪽에 영혼불 {count}곳({radius}야드)이 {seconds}초 동안 타오르고, 안에 있는 대상은 초당 {min}~{max}의 피해를 입습니다.',
+  'bossJournal.sanctum.tusker.spillResponse': '즉시 불길에서 걸어 나오고 불길 반대편에서 싸우세요.',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    '생명력이 {health} 아래로 떨어지면 전투가 끝날 때까지 주는 피해가 {damage} 증가합니다.',
+  'bossJournal.sanctum.tusker.enrageResponse':
+    '치유와 생존기 재사용 대기 기술을 마지막 구간을 위해 아껴 두고 빠르게 끝내세요.',
+  'bossJournal.sanctum.tusker.tipTank':
+    '일행에게서 등을 돌린 방향으로 붙잡고 움직이지 마세요. 그러면 휩쓸기 부채꼴이 아군을 향하지 않습니다. 엄니 휩쓸기마다 밀쳐내기가 따릅니다.',
+  'bossJournal.sanctum.tusker.tipHealer':
+    '엄니 휩쓸기와 짓밟기가 피해가 크게 들어오는 순간입니다. 짓밟기가 겨냥하는 먼 가장자리가 아니라 옆쪽에 서고, {health} 아래의 격노에 대비해 재사용 대기 기술을 남겨 두세요.',
+  'bossJournal.sanctum.tusker.tipDamage':
+    '옆이나 뒤에서 공격하세요. 바닥에 칠해진 선을 살피고 벗어나세요. 생명력이 절반이 되면 뒤쪽의 불길을 피하세요.',
+  'bossJournal.sanctum.korgath.overview':
+    '대장장이의 감독관이 봉인 기둥 네 개에 사슬로 묶여 있습니다. 몸에 남은 사슬 하나마다 받는 피해가 {perChain} 줄어들므로 사슬을 끊을수록 처치하기 쉬워집니다. 하지만 사슬을 끊을 때마다 전투가 끝날 때까지 그의 공격이 하나씩 풀려납니다.',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    '처음에는 기둥마다 하나씩, 사슬 {chains}개에 묶여 있습니다. 각 기둥의 봉인 족쇄가 그 사슬을 붙들고 있습니다.',
+  'bossJournal.sanctum.korgath.phaseFreedName': '끊어진 사슬',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    '사슬 하나가 끊길 때마다 나중에 다시 리벳으로 박혀도 이번 전투가 끝날 때까지 공격이 하나씩 풀려 있습니다.',
+  'bossJournal.sanctum.korgath.phaseEnrageName': '격노',
+  'bossJournal.sanctum.korgath.lockboundName': '자물쇠 속박',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    '온전한 사슬 하나마다 받는 피해가 {perChain} 줄어듭니다: 사슬 네 개가 모두 버티면 {all} 감소합니다.',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    '사슬을 끊으면 처치가 빨라집니다. 먼저 몇 개를 끊을지 정하세요: 하나 끊을 때마다 공격도 하나 풀립니다.',
+  'bossJournal.sanctum.korgath.shacklesName': '봉인 족쇄',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    '각 기둥 아래에 봉인 족쇄가 서 있습니다. 족쇄는 코르가스를 끌어당기기 전에는 공격할 수 없습니다. 하나를 처치하면 그 사슬이 끊어집니다. 모루 사슬이 버티는 동안 그는 단상 중앙에서 {leash}야드 밖으로 나갈 수 없습니다.',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    '공격 담당은 끊기로 정한 사슬의 족쇄를 처치하세요. 그동안 방어 담당은 코르가스를 중앙에 붙잡아 두세요.',
+  'bossJournal.sanctum.korgath.strainSummary':
+    '사슬이 하나라도 버티는 동안: {every}초마다 {cast}초 시전 후, 사슬이 아직 버티는 각 기둥 주변 반경 {radius}야드 고리에 폭발이 일어납니다: {min}~{max}의 피해와 밀쳐내기. 사슬 네 개가 모두 끊기면 멈춥니다.',
+  'bossJournal.sanctum.korgath.strainResponse':
+    '시전이 끝나기 전에 사슬이 온전한 모든 기둥에서 떨어지세요.',
+  'bossJournal.sanctum.korgath.stompSummary':
+    '{every}초마다 {cast}초 시전 후 몸에서 {radius}야드까지 고리가 퍼집니다: 안에 있는 모두에게 {min}~{max}의 피해.',
+  'bossJournal.sanctum.korgath.stompResponse':
+    '원거리 공격 담당은 고리 밖에 머무르세요. 근접 공격 담당은 가능하면 벗어나고, 치유 담당은 맞은 대상을 채워 주세요.',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    '사슬이 끊기고 {delay}초 후 용서약단 몰이막대장이가 기둥 뒤쪽 가장자리를 넘어와 족쇄까지 걸어가서 {channel}초 동안 재리벳을 정신 집중합니다. 완료되면 사슬과 새 족쇄가 되돌아와 {perChain}의 피해 감소도 돌아오지만 풀려난 공격은 그대로입니다.',
+  'bossJournal.sanctum.korgath.rerivetResponse':
+    '정신 집중이 끝나기 전에 몰이막대장이를 차단하거나 기절시키거나 처치하세요.',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    '사슬이 정확히 하나 남으면 사슬 당기기가 {base}초가 아니라 {every}초마다 옵니다.',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    '마지막 사슬을 빨리 끊거나, {every}초마다 그 기둥에서 벗어날 준비를 하세요.',
+  'bossJournal.sanctum.korgath.maulSummary':
+    '망치 사슬이 끊긴 뒤: {every}초마다 {cast}초 시전 후 정면 {arc}도 범위를 휩쓸며, 몸 앞 {range}야드까지 닿고 근접 공격 피해의 {mult}배를 줍니다.',
+  'bossJournal.sanctum.korgath.maulResponse':
+    '정면에는 방어 담당만 서세요. 나머지는 시전 중에 그의 뒤로 이동하세요.',
+  'bossJournal.sanctum.korgath.flailSummary':
+    '집게 사슬이 끊긴 뒤: {every}초마다 {cast}초 시전으로 방어 담당이 아닌 가장 먼 플레이어를 향해 길이 {length}야드의 선을 칠한 뒤 채찍이 선 안의 모두를 때립니다: {min}~{max}의 피해.',
+  'bossJournal.sanctum.korgath.flailResponse': '시전이 끝나기 전에 선에서 옆으로 벗어나세요.',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    '모루 사슬이 끊긴 뒤: 그가 단상 중앙을 벗어날 수 있습니다. {every}초마다 {cast}초 시전으로 가장 먼 플레이어를 향해 길이 {length}야드의 선을 칠한 뒤 그 선을 따라 돌진합니다: {min}~{max}의 피해와 밀쳐내기.',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    '선에서 벗어나세요. 모루 사슬이 버티는 동안은 중앙에서 {leash}야드 안에 머물며 돌진하지 않습니다.',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    '풀무 사슬이 끊긴 뒤: {every}초마다 {cast}초 시전 후 모두에게 {min}~{max}의 피해를 주고 그에게서 {push}야드 밀쳐냅니다.',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    '일행 전체가 맞으며 피할 수 없습니다: 치유 담당은 맞기 전에 모두를 채워 두세요.',
+  'bossJournal.sanctum.korgath.tipTank':
+    '그를 중앙에서 일행에게서 등을 돌린 방향으로 붙잡으세요. 망치 사슬이 끊기면 대망치 호격이 정면의 모든 것을 때립니다. 모루 사슬이 끊기기 전까지는 중앙에서 {leash}야드 밖으로 나갈 수 없습니다.',
+  'bossJournal.sanctum.korgath.tipHealer':
+    '사슬 당기기, 전율의 발구르기와 풀려난 모든 공격이 강하게 들어옵니다. 사슬이 남을수록 전투가 길어지고, 끊을수록 치유로 버텨야 할 공격이 늘어납니다.',
+  'bossJournal.sanctum.korgath.tipDamage':
+    '족쇄를 처치해 정한 사슬을 끊은 다음 코르가스를 불태우세요. 칠해진 선과 사슬이 아직 버티는 기둥에서 벗어나세요.',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    '족쇄를 처치해 정한 사슬을 끊은 다음 코르가스를 불태우세요. 모든 몰이막대장이의 재리벳이 끝나기 전에 저지하세요. 칠해진 선과 사슬이 아직 버티는 기둥에서 벗어나세요.',
+  'bossJournal.sanctum.korgath.choiceName': '사슬을 몇 개 끊을까?',
+  'bossJournal.sanctum.korgath.choiceGain':
+    '사슬 하나를 끊을 때마다 피해 감소가 {perChain}씩 사라집니다: 네 개가 모두 버틸 때의 {all}에서 0까지. 전투가 훨씬 짧아집니다.',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    '사슬 하나를 끊을 때마다 전투가 끝날 때까지 공격이 하나 풀립니다. 망치: 대망치 호격. 집게: 사슬 채찍. 모루: 문턱 돌진, 그리고 중앙을 벗어날 수 있음. 풀무: 감독관의 포효.',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    '사슬 하나를 끊을 때마다 전투가 끝날 때까지 공격이 하나 풀립니다. 망치: 대망치 호격. 집게: 사슬 채찍. 모루: 문턱 돌진, 그리고 중앙을 벗어날 수 있음. 풀무: 감독관의 포효. 끊어진 사슬마다 몰이막대장이도 다시 리벳을 박으러 옵니다.',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    '재리벳: 사슬이 끊기고 {delay}초 후 몰이막대장이가 복구를 시도합니다. 차단하거나 기절시키거나 처치하세요.',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    '마지막 고리: 사슬이 하나 남으면 사슬 당기기가 {every}초마다 옵니다.',
+  'bossJournal.sanctum.velkhar.overview':
+    '벨카르는 녹은 물웅덩이 세 곳에서 해빙된 망자를 일으킵니다. 오직 냉기만이 그들을 눕혀 둡니다: 차가운 얼음 위에서 처치한 뼈걸음꾼은 죽은 채로 남지만, 녹은 물에서 처치하면 다시 일어나 그를 치유합니다.',
+  'bossJournal.sanctum.velkhar.phaseVaultName': '의식의 지하실',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    '뼈걸음꾼이 계속 웅덩이에서 기어 나옵니다. 생명력이 {wave1}와 {wave2}가 되면 웅덩이마다 하나씩 추가 무리가 일어납니다.',
+  'bossJournal.sanctum.velkhar.thawName': '깨어나는 해빙',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    '{every}초마다 웅덩이 하나의 장작불이 타오르고 {warn}초 후 되살아난 뼈걸음꾼 {count}마리가 기어 나옵니다. 웅덩이는 번갈아 가며 작동합니다. 생명력이 {wave1}와 {wave2}가 되면 각 웅덩이에서 한 마리씩 더 기어 나옵니다.',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    '방어 담당이 한데 모아 차가운 얼음 위로 끌고 갑니다. 공격 담당은 그곳에서 처치하세요.',
+  'bossJournal.sanctum.velkhar.heldName': '봉인과 꺼지지 않음',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    '차가운 얼음 위에서 처치한 뼈걸음꾼은 봉인됩니다: 조각상처럼 얼어붙어 죽은 채로 남습니다. 녹은 물에서 처치하면 가라앉았다가 {delay}초 후 생명력 {share}로 다시 일어나 벨카르의 생명력의 {heal}만큼 치유합니다.',
+  'bossJournal.sanctum.velkhar.heldResponse':
+    '뼈걸음꾼은 반드시 차가운 얼음 위에서만 처치하세요: 웅덩이나 녹은 물 띠 위에서는 절대 안 됩니다.',
+  'bossJournal.sanctum.velkhar.graspName': '해빙된 자의 손아귀',
+  'bossJournal.sanctum.velkhar.graspSummary':
+    '녹은 물에 서 있는 뼈걸음꾼은 주는 피해가 {bonus} 증가합니다.',
+  'bossJournal.sanctum.velkhar.graspResponse': '방어 담당은 뼈걸음꾼을 물에서 떨어뜨려 두세요.',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    '{every}초마다 {cast}초 시전으로 방어 담당이 아닌 플레이어를 향해 그에게서 지하실 가장자리까지 너비 {width}야드의 선을 칠합니다. 그 후 선 안의 모두에게 {min}~{max}의 피해를 주고, 선은 {seconds}초 동안 녹은 물로 남습니다.',
+  'bossJournal.sanctum.velkhar.trenchResponse':
+    '선에서 벗어나세요. 선이 남긴 녹은 물 띠 위에서는 뼈걸음꾼을 처치하지 마세요.',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    '{every}초마다 {cast}초 시전 후 모두에게 {min}~{max}의 암흑 피해.',
+  'bossJournal.sanctum.velkhar.volleyResponse':
+    '피할 수 없습니다: 치유 담당은 일행 전체를 계속 채워 두세요.',
+  'bossJournal.sanctum.velkhar.warmHandsName': '따뜻한 손',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    '{still}초 동안 가만히 서 있는 뼈걸음꾼은 발밑에 반경 {radius}야드의 녹은 물웅덩이를 {seconds}초 동안 만듭니다.',
+  'bossJournal.sanctum.velkhar.warmHandsResponse':
+    '뼈걸음꾼을 계속 움직이게 하고, 웅덩이 위에서는 절대 숨통을 끊지 마세요.',
+  'bossJournal.sanctum.velkhar.twiceWokenName': '두 번 깨어난 자',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    '다시 일어난 뼈걸음꾼은 생명력이 가득 찬 채 돌아오며 주는 피해가 {bonus} 증가합니다.',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse':
+    '하나도 일어나게 두지 마세요: 모두 차가운 얼음 위에서 처치하세요.',
+  'bossJournal.sanctum.velkhar.tipTank':
+    '모든 뼈걸음꾼을 끌어모아 웅덩이와 녹은 물 띠에서 벗어난 차가운 얼음 위로 데려가세요. 녹은 물에서는 {bonus} 더 세게 때립니다.',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    '모든 뼈걸음꾼을 끌어모아 웅덩이와 녹은 물 띠에서 벗어난 차가운 얼음 위로 데려가세요. 계속 움직이게 하세요: 가만히 서 있는 놈은 발밑에 웅덩이를 녹입니다.',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    '암흑 화살 세례는 {every}초마다 모두를 때립니다. 녹은 물 속의 뼈걸음꾼은 {bonus} 더 세게 때리므로 물에 닿으면 방어 담당을 살피세요.',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    '뼈걸음꾼은 차가운 얼음 위에서만 처치한 뒤 벨카르에게 돌아가세요. 영혼불 도랑 선에서 벗어나세요.',
+  'bossJournal.sanctum.velkhar.choiceName': '망자를 어디에 쓰러뜨릴까?',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    '차가운 얼음 위에서 처치한 뼈걸음꾼은 영영 사라집니다: 추가 적이 줄고 전투가 깔끔해집니다.',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    '녹은 물에서 처치하면 다시 일어나 그때마다 벨카르의 생명력의 {heal}만큼 치유합니다. 차가운 얼음으로 끌고 가는 데 시간이 들므로 공격하기 전에 처치할 자리를 계획하세요.',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    '따뜻한 손: {still}초 동안 가만히 서 있는 뼈걸음꾼이 녹은 물웅덩이를 만듭니다.',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    '두 번 깨어난 자: 다시 일어난 뼈걸음꾼은 생명력이 가득 찬 채 돌아오며 주는 피해가 {bonus} 증가합니다.',
+  'bossJournal.sanctum.korzul.overview':
+    '그의 불길이 계속 깨뜨리는 얼어붙은 호수 위의 용 전투입니다. 숨결 한 번마다 얼음을 소모하고 불길은 일행이 겨냥하므로, 어떤 얼음을 잃을지는 일행이 정합니다. 얼음이 하나도 남지 않은 고룡은 쉬지 않고 숨결을 내뿜습니다.',
+  'bossJournal.sanctum.korzul.phaseLakeName': '얼어붙은 호수',
+  'bossJournal.sanctum.korzul.phaseLakeSummary':
+    '얼음을 뚫고 튀어나와 호수 한가운데에 내려앉습니다. 착지하는 순간 전투가 시작됩니다.',
+  'bossJournal.sanctum.korzul.phaseFlightName': '비행',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    '생명력이 {first}와 {second}가 되면 날아올라 다시 추락할 때까지 공중에서 싸웁니다.',
+  'bossJournal.sanctum.korzul.phaseLastName': '마지막 단계',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    '두 번째 비행 이후: 지상에서 {breath}초마다 무덤 숨결, {gale}초마다 날개 돌풍.',
+  'bossJournal.sanctum.korzul.iceName': '깨지는 얼음',
+  'bossJournal.sanctum.korzul.iceSummary':
+    '호수는 얼음판으로 이루어져 있습니다. 그의 불길은 멀쩡한 얼음판에 금을 내고, 금 간 얼음판은 부숩니다. 금 간 얼음판은 {refreeze}초 후 다시 얼어붙습니다. 부서진 얼음판은 열린 물입니다.',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    '호수는 얼음판으로 이루어져 있습니다. 그의 불길은 멀쩡한 얼음판에 금을 내고, 금 간 얼음판은 부숩니다. 깊은 담금질: 영웅 난이도에서는 금 간 얼음판이 다시 얼어붙지 않습니다. 부서진 얼음판은 열린 물입니다.',
+  'bossJournal.sanctum.korzul.iceResponse':
+    '일부러 얼음을 소모하세요: 일행이 잃어도 되는 얼음판에 그의 불길을 유도하세요.',
+  'bossJournal.sanctum.korzul.waterName': '열린 물',
+  'bossJournal.sanctum.korzul.waterSummary':
+    '열린 물에 서 있으면 이동 속도가 {slow} 느려지고 초당 {perSecond}의 피해를 입습니다.',
+  'bossJournal.sanctum.korzul.waterResponse':
+    '얼음 위에 머무르세요. 밀려서 물에 빠지면 즉시 벗어나세요.',
+  'bossJournal.sanctum.korzul.breathSummary':
+    '{every}초마다 방어 담당이 서 있는 방향으로 {cast}초 시전 후, 몸 앞 {range}야드까지 {arc}도 불길 부채꼴이 퍼집니다: 방어 담당을 제외한 범위 안의 모두에게 {min}~{max}의 피해. 부채꼴 아래의 얼음판 최대 {plates}개가 가까운 순서대로 불탑니다.',
+  'bossJournal.sanctum.korzul.breathResponse':
+    '정면에는 방어 담당만 서세요. 방어 담당이 숨결을 일행이 잃어도 되는 얼음 쪽으로 돌리세요.',
+  'bossJournal.sanctum.korzul.tailSummary':
+    '{every}초마다 {cast}초 시전 후 꼬리가 뒤쪽 {arc}도를 몸 뒤 {range}야드까지 휩쓸어 {min}~{max}의 피해와 밀쳐내기를 줍니다.',
+  'bossJournal.sanctum.korzul.tailResponse': '절대 그의 뒤에 서지 마세요. 옆에서 공격하세요.',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    '{every}초마다, 그리고 생명력이 {health}일 때 한 번, {duration}초 동안 정신 집중합니다: 반경 {radius}야드에 불길 파동 {pulses}번, 갈수록 강해집니다(마지막 파동은 {min}~{max}). {crack}번째 파동이 그 아래 얼음판에 금을 내고 {brk}번째 파동이 부숩니다: 부서지면 그는 담금질을 당해 정신 집중이 끝납니다.',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    '그에게서 {radius}야드 떨어지세요. 그를 금 간 얼음판 위에서 시작하게 하면 정신 집중이 {crack}번째 파동에서 끝납니다.',
+  'bossJournal.sanctum.korzul.galeSummary':
+    '{cast}초 시전 후 모두가 그에게서 {push}야드 밀려납니다.',
+  'bossJournal.sanctum.korzul.galeResponse':
+    '등 뒤의 열린 물을 피해 두세요. 그래야 밀려도 얼음 위에 떨어집니다.',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    '공중에서 방어 담당이 아닌 플레이어에게 {eye}초 동안 고룡의 눈 표식을 붙입니다. 표식이 끝나면 그 플레이어가 선 얼음판 전체에 쏟아지는 불길을 퍼붓습니다: {warn}초 경고 후 그 위의 모두에게 {min}~{max}의 피해를 주고 얼음판이 불탑니다. 첫 번째 비행에서는 {roundsFirst}회, 두 번째 비행에서는 {roundsSecond}회.',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    '공중에서 방어 담당이 아닌 플레이어 두 명에게 {eye}초 동안 고룡의 눈 표식을 붙입니다(쌍둥이 눈). 표식이 끝나면 표식을 받은 각 플레이어가 선 얼음판 전체에 쏟아지는 불길을 퍼붓습니다: {warn}초 경고 후 그 위의 모두에게 {min}~{max}의 피해를 주고 얼음판이 불탑니다. 첫 번째 비행에서는 {roundsFirst}회, 두 번째 비행에서는 {roundsSecond}회.',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    '표식을 받으면 일행에게서 떨어진 멀쩡한 얼음판으로 걸어가세요. 나머지는 그 얼음판에서 나오세요.',
+  'bossJournal.sanctum.korzul.broodName': '아래에서 올라온 무리',
+  'bossJournal.sanctum.korzul.broodSummary':
+    '그가 날아오르면 부서진 얼음판마다 비늘수호병이 하나씩 기어 올라옵니다(최대 {max}).',
+  'bossJournal.sanctum.korzul.broodResponse':
+    '방어 담당이 붙잡고 일행은 그가 공중에 있는 동안 처치하세요.',
+  'bossJournal.sanctum.korzul.descentSummary':
+    '비행은 가장 많은 플레이어가 선 멀쩡한 얼음판에 내려앉으며 끝납니다: {warn}초 그림자 후 {radius}야드 안에 {min}~{max}의 피해와 밀쳐내기를 주고 그 얼음판이 불탑니다.',
+  'bossJournal.sanctum.korzul.descentResponse':
+    '금이 가도 괜찮은 얼음판에 모였다가 그가 내려앉기 전에 그림자 밖으로 달려 나가세요.',
+  'bossJournal.sanctum.korzul.flareName': '파편 불꽃',
+  'bossJournal.sanctum.korzul.flareSummary':
+    '두 번째 비행 이후 파편이 타오릅니다: 지상에서 {breath}초마다 무덤 숨결, {gale}초마다 날개 돌풍.',
+  'bossJournal.sanctum.korzul.flareResponse':
+    '숨결이 더 빨리 옵니다: 남은 얼음판 중 어느 것을 소모할지 계획하세요.',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    '얼음판이 모두 부서지면 열린 물 위를 떠다니며 쉬지 않고 숨결을 내뿜습니다.',
+  'bossJournal.sanctum.korzul.noIceResponse': '얼음이 바닥나지 않게 하세요: 전멸로 끝납니다.',
+  'bossJournal.sanctum.korzul.tipTank':
+    '무덤 숨결은 일행을 가로지르지 말고 잃어도 되는 얼음 쪽으로 돌리세요. 무덤 지옥불 전에 그를 금 간 얼음판 위로 옮겨 시간을 줄이세요.',
+  'bossJournal.sanctum.korzul.tipHealer':
+    '무덤 지옥불의 파동은 빠르게 강해집니다: 모두가 벗어나게 하세요. 쏟아지는 불길, 추락 강하, 그리고 물로 떨어지는 모든 밀쳐내기가 강하게 들어옵니다.',
+  'bossJournal.sanctum.korzul.tipDamage':
+    '절대 그의 정면이나 뒤에 서지 마세요. 고룡의 눈을 받으면 일행에게서 떨어진 멀쩡한 얼음판으로 가세요. 비행 중에는 비늘수호병을 처치하세요.',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    '절대 그의 정면이나 뒤에 서지 마세요. 두 플레이어가 동시에 고룡의 눈을 받습니다: 각자 일행에게서 떨어진 서로 다른 멀쩡한 얼음판으로 가세요. 비행 중에는 비늘수호병을 처치하세요.',
+  'bossJournal.sanctum.korzul.choiceIceName': '어떤 얼음을 소모할까?',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    '그의 숨결, 쏟아지는 불길, 착지를 고른 얼음판으로 유도하면 호수의 나머지는 계속 안전하게 설 수 있습니다.',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    '부서진 얼음판은 모두 열린 물이 되고, 하나마다 그의 다음 비행 때 비늘수호병이 기어 올라옵니다(최대 {max}). 얼음이 남지 않으면 쉬지 않고 숨결을 내뿜습니다.',
+  'bossJournal.sanctum.korzul.choiceDouseName': '지옥불을 꺼뜨릴까?',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    '그가 금 간 얼음판 위에 있으면 {crack}번째 파동이 얼음판을 부수고, 그는 담금질을 당해 무덤 지옥불이 가장 강한 파동 전에 일찍 끝납니다.',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    '그 얼음판은 영영 사라집니다. 멀쩡한 얼음 위에 두면 정신 집중이 {brk}번째 파동까지 이어지고 어쨌든 얼음판이 부서집니다.',
+  'bossJournal.sanctum.korzul.heroicDeepQuench':
+    '깊은 담금질: 금 간 얼음판이 다시 얼어붙지 않습니다.',
+  'bossJournal.sanctum.korzul.heroicTwinEyes':
+    '쌍둥이 눈: 고룡의 눈이 두 플레이어에게 동시에 표식을 붙입니다.',
 };

@@ -22190,4 +22190,266 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
   'apiError.character.referral_bond_pending':
     'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
+  'hudChrome.raidBossGuide.dungeonButton': 'Тактика: {dungeon}',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': 'Боссы подземелья',
+  'hudChrome.raidBossGuide.rankMiniboss': 'Мини-босс',
+  'hudChrome.raidBossGuide.rankFinal': 'Финальный босс',
+  'hudChrome.raidBossGuide.defeated': 'Побеждён',
+  'hudChrome.raidBossGuide.browseBossDefeated': 'Показать: {boss} (побеждён)',
+  'hudChrome.raidBossGuide.heroicHeading': 'Что меняется в героическом режиме',
+  'hudChrome.raidBossGuide.tipsHeading': 'Советы по ролям',
+  'hudChrome.raidBossGuide.choicesHeading': 'Ключевые решения',
+  'hudChrome.raidBossGuide.choiceGain': 'Вы получаете',
+  'hudChrome.raidBossGuide.choiceRisk': 'Вы рискуете',
+  'hudChrome.raidBossGuide.markHeroicOnly': 'Только героический',
+  'hudChrome.raidBossGuide.markHeroicChanged': 'Изменено в героическом режиме',
+  'hudChrome.raidBossGuide.damageCompare': 'Обычный {normal} | Героический {heroic}',
+  'hudChrome.raidBossGuide.finderOpen': 'Тактика на босса',
+  'hudChrome.raidBossGuide.finderOpenLabel': 'Открыть тактику на босса: {boss}',
+  'bossJournal.common.enrageName': 'Бешенство',
+  'bossJournal.common.phaseEnrageSummary':
+    'При здоровье ниже {health} босс впадает в бешенство до конца боя.',
+  'bossJournal.common.enrageSummary':
+    'При здоровье ниже {health} его атаки ближнего боя наносят на {damage} больше урона и проводятся на {haste} быстрее до конца боя.',
+  'bossJournal.common.enrageResponse':
+    'Танк и лекарь приберегают защитные способности и лечение для этой фазы. Остальные наращивают урон, чтобы быстро закончить бой.',
+  'bossJournal.common.heroicHarder':
+    'Каждая способность на этой странице бьёт в {scale} раз сильнее, чем в обычном режиме.',
+  'bossJournal.sanctum.tusker.overview':
+    'Бивнерог размером с дом тащит по Санной дороге сани с горящими жаровнями душ. Он ходит по дороге кругами и отцепляет сани там, где вы его остановите. На половине здоровья сани опрокидываются и разливают огонь позади него.',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    'С самого начала две предупреждаемые атаки: размах перед собой и рывок по отмеченной полосе.',
+  'bossJournal.sanctum.tusker.phaseSpillName': 'Сани опрокидываются',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    'При {health} здоровья сани опрокидываются, и позади него разливается душевный огонь.',
+  'bossJournal.sanctum.tusker.phaseEnrageName': 'В бешенстве',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    'Когда остаётся меньше {health} здоровья, он впадает в бешенство до конца боя.',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    'Каждые {every} сек. произносит заклинание {cast} сек., затем бивни сметают конус {arc} градусов перед ним на {range} м от тела: от {min} до {max} урона и отбрасывание на {push} м.',
+  'bossJournal.sanctum.tusker.sweepResponse':
+    'Танк удерживает его лицом от группы. Остальные атакуют сбоку или сзади.',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    'Каждые {every} сек. заклинание {cast} сек. рисует полосу длиной {length} м в сторону самого дальнего игрока, затем он несётся по ней: от {min} до {max} урона и сбивание с ног на {stun} сек. всем, кто в ней.',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    'Шагните в сторону из отмеченной полосы до конца заклинания. Целью становится самый дальний игрок, так что бойцы дальнего боя оставляют себе место для шага.',
+  'bossJournal.sanctum.tusker.spillName': 'Рассыпанные жаровни',
+  'bossJournal.sanctum.tusker.spillSummary':
+    'Один раз, при {health} здоровья: сани опрокидываются, и позади него {count} пятен душевного огня ({radius} м) горят {seconds} сек., нанося от {min} до {max} урона в секунду всем внутри.',
+  'bossJournal.sanctum.tusker.spillResponse': 'Сразу выходите из огня и сражайтесь вдали от пятен.',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    'Когда остаётся меньше {health} здоровья, он наносит на {damage} больше урона до конца боя.',
+  'bossJournal.sanctum.tusker.enrageResponse':
+    'Приберегите лечение и защитные способности для последнего отрезка и быстро добейте его.',
+  'bossJournal.sanctum.tusker.tipTank':
+    'Держите его лицом от группы и стойте на месте, чтобы конус размаха не задевал союзников. Каждый Взмах бивнями отбрасывает.',
+  'bossJournal.sanctum.tusker.tipHealer':
+    'Взмах бивнями и Растаптывание дают пики урона. Стойте сбоку от него, а не на дальнем краю, куда целится Растаптывание, и приберегите способность для его бешенства при здоровье ниже {health}.',
+  'bossJournal.sanctum.tusker.tipDamage':
+    'Атакуйте сбоку или сзади. Следите за полом: заметив отмеченную полосу, выйдите из неё. На половине здоровья уходите от огня позади него.',
+  'bossJournal.sanctum.korgath.overview':
+    'Бригадир кузнеца, прикованный к четырём печатным столпам. Каждая оставшаяся на нём цепь снижает получаемый им урон на {perChain}, так что разбивать цепи выгодно. Но каждая разбитая цепь освобождает ещё одну его атаку до конца боя.',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    'Он начинает бой связанным {chains} цепями, по одной к каждому столпу. Печатные оковы у столпа удерживают его цепь.',
+  'bossJournal.sanctum.korgath.phaseFreedName': 'Разбитые цепи',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    'Каждая разбитая цепь освобождает одну атаку до конца боя, даже если цепь потом переклепают.',
+  'bossJournal.sanctum.korgath.phaseEnrageName': 'В бешенстве',
+  'bossJournal.sanctum.korgath.lockboundName': 'Скованный замком',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    'Каждая целая цепь снижает получаемый им урон на {perChain}: пока держатся все четыре, он получает на {all} меньше урона.',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    'Разбивайте цепи, чтобы ускорить убийство. Сначала решите, сколько: каждая также освобождает атаку.',
+  'bossJournal.sanctum.korgath.shacklesName': 'Печатные оковы',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    'У подножия каждого столпа стоят Печатные оковы. Атаковать их нельзя, пока Коргата не пуллят. Убийство оков разбивает их цепь. Пока держится цепь Наковальни, он не может отойти от середины террасы дальше чем на {leash} м.',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    'Бойцы убивают Печатные оковы тех цепей, которые вы решили разбить. Танк тем временем держит Коргата посередине.',
+  'bossJournal.sanctum.korgath.strainSummary':
+    'Пока держится хоть одна цепь: каждые {every} сек. заклинание {cast} сек., затем взрыв в кольце {radius} м вокруг каждого столпа, цепь которого ещё держится: от {min} до {max} урона и отбрасывание. Прекращается, когда разбиты все четыре цепи.',
+  'bossJournal.sanctum.korgath.strainResponse':
+    'Отойдите от каждого столпа с целой цепью до конца заклинания.',
+  'bossJournal.sanctum.korgath.stompSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем кольцо на {radius} м от его тела: от {min} до {max} урона всем внутри.',
+  'bossJournal.sanctum.korgath.stompResponse':
+    'Бойцы дальнего боя стоят за пределами кольца. Бойцы ближнего боя выходят из него, если успевают; лекари лечат всех, кого задело.',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    'Через {delay} сек. после разрыва цепи Кузнец-погонщик Клятвы Выводка перелезает через край за её столпом, идёт к оковам и направляет Переклёпку {channel} сек. Если он закончит, цепь и новые Печатные оковы возвращаются со снижением урона на {perChain}, но освобождённая атака остаётся.',
+  'bossJournal.sanctum.korgath.rerivetResponse':
+    'Прервите, оглушите или убейте Кузнеца-погонщика до конца направляемого заклинания.',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    'Пока остаётся ровно одна цепь, Натяжение происходит каждые {every} сек. вместо каждых {base} сек.',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    'Быстро разбейте последнюю цепь или будьте готовы уходить от её столпа каждые {every} сек.',
+  'bossJournal.sanctum.korgath.maulSummary':
+    'Цепь Молота разбита: каждые {every} сек. заклинание {cast} сек., затем сметающий удар по конусу {arc} градусов перед ним на {range} м от тела с силой {mult} его удара в ближнем бою.',
+  'bossJournal.sanctum.korgath.maulResponse':
+    'Перед ним стоит только танк. Все остальные во время заклинания заходят ему за спину.',
+  'bossJournal.sanctum.korgath.flailSummary':
+    'Цепь Клещей разбита: каждые {every} сек. заклинание {cast} сек. рисует полосу длиной {length} м на самом дальнем игроке, который не танк, затем плеть бьёт всех в ней: от {min} до {max} урона.',
+  'bossJournal.sanctum.korgath.flailResponse': 'Шагните в сторону из полосы до конца заклинания.',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    'Цепь Наковальни разбита: он может уйти с середины террасы. Каждые {every} сек. заклинание {cast} сек. рисует полосу длиной {length} м на самом дальнем игроке, затем он несётся по ней: от {min} до {max} урона и отбрасывание.',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    'Выйдите из полосы. Пока держится цепь Наковальни, он остаётся в пределах {leash} м от середины и не совершает рывков.',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    'Цепь Мехов разбита: каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона всем и отталкивание от него на {push} м.',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    'Бьёт по всей группе, и избежать этого нельзя: лекари должны подлечить всех до удара.',
+  'bossJournal.sanctum.korgath.tipTank':
+    'Держите его посередине лицом от группы. Когда цепь Молота разбита, Дуга кувалды задевает всё перед ним. Пока цепь Наковальни цела, он не может отойти от середины дальше чем на {leash} м.',
+  'bossJournal.sanctum.korgath.tipHealer':
+    'Натяжение, Сотрясающий топот и каждая освобождённая атака бьют сильно. Каждая оставленная цепь затягивает бой; каждая разбитая добавляет атаку, которую нужно пролечить.',
+  'bossJournal.sanctum.korgath.tipDamage':
+    'Убивайте Печатные оковы, чтобы разбить выбранные цепи, затем жгите Коргата. Выходите из отмеченных полос и отходите от столпов, где ещё держится цепь.',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    'Убивайте Печатные оковы, чтобы разбить выбранные цепи, затем жгите Коргата. Останавливайте каждого Кузнеца-погонщика до конца его Переклёпки. Выходите из отмеченных полос и отходите от столпов, где ещё держится цепь.',
+  'bossJournal.sanctum.korgath.choiceName': 'Сколько цепей вы разобьёте?',
+  'bossJournal.sanctum.korgath.choiceGain':
+    'Каждая разбитая цепь убирает {perChain} его снижения урона: с {all} при всех четырёх цепях до нуля. Бой становится намного короче.',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    'Каждая разбитая цепь освобождает одну атаку до конца боя. Молот: Дуга кувалды. Клещи: Цепной хлыст. Наковальня: Рывок через порог, и он может уйти с середины. Мехи: Рёв бригадира.',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    'Каждая разбитая цепь освобождает одну атаку до конца боя. Молот: Дуга кувалды. Клещи: Цепной хлыст. Наковальня: Рывок через порог, и он может уйти с середины. Мехи: Рёв бригадира. Кроме того, к каждой разбитой цепи приходит Кузнец-погонщик, чтобы переклепать её.',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    'Переклёпка: через {delay} сек. после разрыва цепи Кузнец-погонщик пытается её восстановить. Прервите, оглушите или убейте его.',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    'Последнее звено: когда остаётся одна цепь, Натяжение происходит каждые {every} сек.',
+  'bossJournal.sanctum.velkhar.overview':
+    'Велхар поднимает оттаявших мертвецов из трёх луж талой воды. Их удерживает на земле только холод: костеход, убитый на сухом льду, остаётся мёртвым, а убитый в талой воде встаёт снова и лечит его.',
+  'bossJournal.sanctum.velkhar.phaseVaultName': 'Ритуальный свод',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    'Костеходы продолжают вылезать из луж. При {wave1} и {wave2} здоровья поднимается дополнительная волна, по одному из каждой лужи.',
+  'bossJournal.sanctum.velkhar.thawName': 'Пробуждающая оттепель',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    'Каждые {every} сек. костёр у одной из луж вспыхивает, и через {warn} сек. вылезают {count} Поднятых костеходов. Лужи действуют по очереди. При {wave1} и {wave2} здоровья из каждой лужи вылезает ещё один.',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    'Танк собирает их и оттаскивает на сухой лёд. Бойцы убивают их там.',
+  'bossJournal.sanctum.velkhar.heldName': 'Удержан и не угашен',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    'Костеход, убитый на сухом льду, удержан: он застывает статуей и остаётся мёртвым. Убитый в талой воде тонет, затем через {delay} сек. встаёт снова с {share} здоровья и лечит Велхара на {heal} его здоровья.',
+  'bossJournal.sanctum.velkhar.heldResponse':
+    'Убивайте костеходов только на сухом льду: никогда в луже и не на полосе талой воды.',
+  'bossJournal.sanctum.velkhar.graspName': 'Хватка оттаявших',
+  'bossJournal.sanctum.velkhar.graspSummary':
+    'Костеход, стоящий в талой воде, наносит на {bonus} больше урона.',
+  'bossJournal.sanctum.velkhar.graspResponse': 'Танк не подпускает костеходов к воде.',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    'Каждые {every} сек. заклинание {cast} сек. рисует полосу шириной {width} м от него к игроку, который не танк, до края свода. Затем от {min} до {max} урона всем в ней, а полоса остаётся талой водой на {seconds} сек.',
+  'bossJournal.sanctum.velkhar.trenchResponse':
+    'Выйдите из полосы. Не убивайте костеходов на оставшейся полосе талой воды.',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем от {min} до {max} урона от тьмы всем.',
+  'bossJournal.sanctum.velkhar.volleyResponse':
+    'Избежать нельзя: лекари поддерживают здоровье всей группы.',
+  'bossJournal.sanctum.velkhar.warmHandsName': 'Тёплые руки',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    'Костеход, простоявший на месте {still} сек., растапливает под собой лужу талой воды радиусом {radius} м на {seconds} сек.',
+  'bossJournal.sanctum.velkhar.warmHandsResponse':
+    'Не давайте костеходам стоять на месте и никогда не добивайте их над лужей.',
+  'bossJournal.sanctum.velkhar.twiceWokenName': 'Дважды пробуждённый',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    'Костеход, вставший снова, возвращается с полным здоровьем и наносит на {bonus} больше урона.',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse':
+    'Не давайте никому подняться: убивайте всех на сухом льду.',
+  'bossJournal.sanctum.velkhar.tipTank':
+    'Берите на себя каждого костехода и оттаскивайте на сухой лёд, прочь от луж и полос талой воды. В талой воде они бьют на {bonus} сильнее.',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    'Берите на себя каждого костехода и оттаскивайте на сухой лёд, прочь от луж и полос талой воды. Не давайте им стоять на месте: стоящий растапливает под собой лужу.',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    'Залп тьмы бьёт по всем каждые {every} сек. Костеходы в талой воде бьют на {bonus} сильнее, так что следите за танком, когда они доходят до воды.',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    'Убивайте костеходов только на сухом льду, затем возвращайтесь к Велхару. Выходите из полосы Траншеи душевного огня.',
+  'bossJournal.sanctum.velkhar.choiceName': 'Где падут мёртвые?',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    'Костеход, убитый на сухом льду, исчезает навсегда: меньше помощников и чище бой.',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    'Убитый в талой воде, он встаёт снова и каждый раз лечит Велхара на {heal} его здоровья. Оттаскивание на сухой лёд отнимает время, так что выберите место убийства до того, как начнёте их жечь.',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    'Тёплые руки: костеход, простоявший на месте {still} сек., растапливает лужу талой воды.',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    'Дважды пробуждённый: костеход, вставший снова, возвращается с полным здоровьем и наносит на {bonus} больше урона.',
+  'bossJournal.sanctum.korzul.overview':
+    'Бой с драконом на замёрзшем озере, которое его огонь постоянно ломает. Каждое дыхание тратит лёд, а огонь направляет группа, так что группа решает, какой лёд потерять. Вирм, у которого не осталось льда, дышит без пауз.',
+  'bossJournal.sanctum.korzul.phaseLakeName': 'Замёрзшее озеро',
+  'bossJournal.sanctum.korzul.phaseLakeSummary':
+    'Он вырывается из льда и приземляется посреди озера. Бой начинается, когда он коснётся земли.',
+  'bossJournal.sanctum.korzul.phaseFlightName': 'Полёты',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    'При {first} и {second} здоровья он взлетает и сражается с воздуха, пока не рухнет обратно.',
+  'bossJournal.sanctum.korzul.phaseLastName': 'Последняя фаза',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    'После второго полёта: на земле Могильное дыхание каждые {breath} сек. и Порыв крыльев каждые {gale} сек.',
+  'bossJournal.sanctum.korzul.iceName': 'Ломающийся лёд',
+  'bossJournal.sanctum.korzul.iceSummary':
+    'Озеро состоит из ледяных плит. Его огонь трескает целую плиту и разбивает треснувшую. Треснувшая плита снова замерзает через {refreeze} сек. Разбитая плита становится открытой водой.',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    'Озеро состоит из ледяных плит. Его огонь трескает целую плиту и разбивает треснувшую. Глубокая закалка: в героическом режиме треснувшая плита больше не замерзает. Разбитая плита становится открытой водой.',
+  'bossJournal.sanctum.korzul.iceResponse':
+    'Тратьте лёд осознанно: направляйте его огонь на плиты, которые группа может позволить себе потерять.',
+  'bossJournal.sanctum.korzul.waterName': 'Открытая вода',
+  'bossJournal.sanctum.korzul.waterSummary':
+    'В открытой воде вы замедляетесь на {slow} и получаете {perSecond} урона в секунду.',
+  'bossJournal.sanctum.korzul.waterResponse':
+    'Оставайтесь на льду. Если отбросило в воду, сразу выходите из неё.',
+  'bossJournal.sanctum.korzul.breathSummary':
+    'Каждые {every} сек. заклинание {cast} сек. вдоль линии танка, затем огненный конус {arc} градусов на {range} м от его тела: от {min} до {max} урона всем в нём, кроме танка. До {plates} плит под конусом горят, начиная с ближайших.',
+  'bossJournal.sanctum.korzul.breathResponse':
+    'Перед ним стоит только танк. Танк поворачивает дыхание на лёд, который группа может потерять.',
+  'bossJournal.sanctum.korzul.tailSummary':
+    'Каждые {every} сек. заклинание {cast} сек., затем хвост сметает {arc} градусов позади него на {range} м от тела: от {min} до {max} урона и отбрасывание.',
+  'bossJournal.sanctum.korzul.tailResponse': 'Никогда не стойте позади него. Атакуйте сбоку.',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    'Каждые {every} сек. и один раз при {health} здоровья он направляет заклинание {duration} сек.: {pulses} огненных импульсов в радиусе {radius} м, каждый сильнее предыдущего (последний наносит от {min} до {max}). Импульс {crack} трескает плиту под ним, а импульс {brk} разбивает её: когда она разбивается, он Погашен, и заклинание прерывается.',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    'Отойдите от него на {radius} м. Начните бой с ним на треснувшей плите, и заклинание прервётся на импульсе {crack}.',
+  'bossJournal.sanctum.korzul.galeSummary':
+    'Заклинание {cast} сек., затем всех отбрасывает от него на {push} м.',
+  'bossJournal.sanctum.korzul.galeResponse':
+    'Не оставляйте открытую воду у себя за спиной, чтобы отбрасывание закинуло вас на лёд.',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    'В воздухе он помечает игрока, который не танк, Оком вирма на {eye} сек. Когда оно спадает, он обрушивает Низвергающийся огонь на всю плиту этого игрока: предупреждение {warn} сек., затем от {min} до {max} урона всем на ней, и плита горит. {roundsFirst} залпов в первом полёте, {roundsSecond} во втором.',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    'В воздухе он помечает двух игроков, которые не танки, Оком вирма на {eye} сек. (Двойное око). Когда оно спадает, он обрушивает Низвергающийся огонь на всю плиту каждого помеченного игрока: предупреждение {warn} сек., затем от {min} до {max} урона всем на ней, и плита горит. {roundsFirst} залпов в первом полёте, {roundsSecond} во втором.',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    'Если вы помечены: идите на целую плиту подальше от группы. Все остальные уходят с этой плиты.',
+  'bossJournal.sanctum.korzul.broodName': 'Выводок из глубин',
+  'bossJournal.sanctum.korzul.broodSummary':
+    'Когда он взлетает, из каждой разбитой плиты вылезает Чешуйчатый страж, но не больше {max}.',
+  'bossJournal.sanctum.korzul.broodResponse':
+    'Танк берёт их на себя, а группа убивает их, пока он в воздухе.',
+  'bossJournal.sanctum.korzul.descentSummary':
+    'Каждый полёт он заканчивает приземлением на целую плиту, где больше всего игроков: тень {warn} сек., затем от {min} до {max} урона в радиусе {radius} м и отбрасывание, а плита горит.',
+  'bossJournal.sanctum.korzul.descentResponse':
+    'Соберитесь на плите, которую не жалко треснуть, затем выбегайте из тени до его приземления.',
+  'bossJournal.sanctum.korzul.flareName': 'Вспышка осколка',
+  'bossJournal.sanctum.korzul.flareSummary':
+    'После второго полёта осколок вспыхивает: на земле Могильное дыхание каждые {breath} сек. и Порыв крыльев каждые {gale} сек.',
+  'bossJournal.sanctum.korzul.flareResponse':
+    'Дыхание учащается: заранее решите, какие плиты ещё можно потратить.',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    'Если разбиты все плиты, он зависает над открытой водой и дышит без пауз.',
+  'bossJournal.sanctum.korzul.noIceResponse': 'Не остаться без льда: это заканчивает бой вайпом.',
+  'bossJournal.sanctum.korzul.tipTank':
+    'Направляйте Могильное дыхание на лёд, который группа может потерять, и никогда через группу. Перед Могильным пеклом переведите его на треснувшую плиту, чтобы сократить его.',
+  'bossJournal.sanctum.korzul.tipHealer':
+    'Импульсы Могильного пекла быстро усиливаются: следите, чтобы все ушли. Низвергающийся огонь, Сокрушительное падение и каждое отбрасывание в воду бьют сильно.',
+  'bossJournal.sanctum.korzul.tipDamage':
+    'Никогда не стойте ни перед ним, ни за ним. С Оком вирма идите на целую плиту подальше от группы. Убивайте Чешуйчатых стражей во время полётов.',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    'Никогда не стойте ни перед ним, ни за ним. Око вирма получают сразу двое: каждый идёт на свою целую плиту подальше от группы. Убивайте Чешуйчатых стражей во время полётов.',
+  'bossJournal.sanctum.korzul.choiceIceName': 'Какой лёд вы потратите?',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    'Направляйте его дыхание, Низвергающийся огонь и посадку на выбранные плиты, и остальное озеро останется безопасным.',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    'Каждая разбитая плита становится открытой водой, и из каждой при следующем полёте вылезает Чешуйчатый страж (не больше {max}). Когда льда не остаётся, он дышит без пауз.',
+  'bossJournal.sanctum.korzul.choiceDouseName': 'Погасить пекло?',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    'Если он стоит на треснувшей плите, импульс {crack} разбивает её, он Погашен, и Могильное пекло заканчивается раньше, до самых сильных импульсов.',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    'Эта плита потеряна навсегда. На целом льду заклинание доходит до импульса {brk} и всё равно разбивает плиту.',
+  'bossJournal.sanctum.korzul.heroicDeepQuench':
+    'Глубокая закалка: треснувшая плита больше не замерзает.',
+  'bossJournal.sanctum.korzul.heroicTwinEyes':
+    'Двойное око: Око вирма помечает сразу двух игроков.',
 };

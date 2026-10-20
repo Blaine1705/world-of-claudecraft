@@ -21782,4 +21782,261 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。',
   'apiError.character.referral_bond_pending':
     '招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。',
+  'hudChrome.raidBossGuide.dungeonButton': 'ボス攻略: {dungeon}',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': 'ダンジョンのボス',
+  'hudChrome.raidBossGuide.rankMiniboss': 'ミニボス',
+  'hudChrome.raidBossGuide.rankFinal': '最終ボス',
+  'hudChrome.raidBossGuide.defeated': '撃破済み',
+  'hudChrome.raidBossGuide.browseBossDefeated': '{boss}を表示(撃破済み)',
+  'hudChrome.raidBossGuide.heroicHeading': '英雄での変更点',
+  'hudChrome.raidBossGuide.tipsHeading': 'ロール別のコツ',
+  'hudChrome.raidBossGuide.choicesHeading': '重要な選択',
+  'hudChrome.raidBossGuide.choiceGain': '得られるもの',
+  'hudChrome.raidBossGuide.choiceRisk': '負うリスク',
+  'hudChrome.raidBossGuide.markHeroicOnly': '英雄のみ',
+  'hudChrome.raidBossGuide.markHeroicChanged': '英雄で変更',
+  'hudChrome.raidBossGuide.damageCompare': '通常 {normal} | 英雄 {heroic}',
+  'hudChrome.raidBossGuide.finderOpen': 'ボス攻略',
+  'hudChrome.raidBossGuide.finderOpenLabel': '{boss}のボス攻略を開く',
+  'bossJournal.common.enrageName': '激昂',
+  'bossJournal.common.phaseEnrageSummary': '体力が{health}を下回ると、ボスは戦闘終了まで激昂する。',
+  'bossJournal.common.enrageSummary':
+    '体力が{health}を下回ると、戦闘終了まで近接攻撃のダメージが{damage}増加し、攻撃速度が{haste}上昇する。',
+  'bossJournal.common.enrageResponse':
+    'タンクとヒーラーは防御とヒールのクールダウンをこの段階用に温存。それ以外の全員はダメージを集中して早く終わらせよう。',
+  'bossJournal.common.heroicHarder':
+    'このページのすべてのアビリティは、通常の{scale}倍の威力になる。',
+  'bossJournal.sanctum.tusker.overview':
+    '家ほどもある巨牙獣が、燃える魂の火鉢を載せたそりを引いてそり道を行き来する。道を周回し、引き寄せた場所でそりを切り離す。体力が半分になるとそりが倒れ、背後に炎をぶちまける。',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    '開始時から予兆のある攻撃が2つ。正面への薙ぎ払いと、描かれた線に沿った突進。',
+  'bossJournal.sanctum.tusker.phaseSpillName': 'そりの転倒',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    '体力が{health}になるとそりが倒れ、背後に魂火がこぼれる。',
+  'bossJournal.sanctum.tusker.phaseEnrageName': '激昂',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    '体力が{health}を下回ると、戦闘が終わるまで激昂する。',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、牙で正面{arc}度の扇形を、体から{range}ヤード先まで薙ぎ払う。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.sanctum.tusker.sweepResponse':
+    'タンクは群れに背を向けさせて保持する。それ以外は側面か背後から攻撃。',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、その線に沿って突進する。線内の全員に{min}〜{max}ダメージと{stun}秒のノックダウン。',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    '詠唱が終わる前に、描かれた線から横へ避けること。最も遠い者が標的なので、遠隔は横へ動く余裕を残しておく。',
+  'bossJournal.sanctum.tusker.spillName': 'こぼれた火鉢',
+  'bossJournal.sanctum.tusker.spillSummary':
+    '体力が{health}になった時に1度だけ。そりが倒れ、{count}つの魂火の炎({radius}ヤード)が背後で{seconds}秒間燃え、中にいる者に毎秒{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.tusker.spillResponse': 'すぐに炎から出て、炎の跡から離れて戦う。',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    '体力が{health}を下回ると、戦闘が終わるまで与ダメージが{damage}増える。',
+  'bossJournal.sanctum.tusker.enrageResponse':
+    'ヒールと防御のクールダウンを最後の局面に温存し、早く倒しきろう。',
+  'bossJournal.sanctum.tusker.tipTank':
+    '群れに背を向けさせたまま動かず保持し、薙ぎ払いの扇形が味方に向かないようにする。牙薙ぎのたびにノックバックがある。',
+  'bossJournal.sanctum.tusker.tipHealer':
+    '牙薙ぎと踏みつぶしがダメージのピーク。踏みつぶしが狙う最遠の端ではなく側面に立ち、体力が{health}を下回る激昂に備えてクールダウンを残しておく。',
+  'bossJournal.sanctum.tusker.tipDamage':
+    '側面か背後から攻撃。足元の描かれた線に注意して、そこから出る。体力が半分になったら、背後の炎から離れる。',
+  'bossJournal.sanctum.korgath.overview':
+    '鍛冶師の親方は、4本の封印の柱に鎖でつながれている。残っている鎖1本ごとに被ダメージが{perChain}減るので、鎖を断つほど倒しやすくなる。だが鎖を断つたびに、戦闘が終わるまで彼の攻撃が1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    '開始時は{chains}本の鎖で、各柱に1本ずつ縛られている。各柱の封印の枷が、その鎖を保っている。',
+  'bossJournal.sanctum.korgath.phaseFreedName': '断たれた鎖',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    '鎖を1本断つごとに、のちに鎖が再び鋲で留められても、戦闘が終わるまで攻撃が1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.phaseEnrageName': '激昂',
+  'bossJournal.sanctum.korgath.lockboundName': '鎖縛り',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    '無傷の鎖1本ごとに被ダメージが{perChain}減る。4本すべてが保たれている間は{all}減。',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    '鎖を断てば討伐が早まる。まず何本断つか決めること。1本ごとに攻撃も1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.shacklesName': '封印の枷',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    '各柱の根元に封印の枷が立つ。コルガスを引き寄せるまで枷は攻撃できない。1つ倒すとその鎖が断たれる。金床の鎖が保たれている間、彼はテラス中央から{leash}ヤード以上離れられない。',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    'ダメージ役は、断つと決めた鎖の枷を倒す。その間、タンクはコルガスを中央に保つ。',
+  'bossJournal.sanctum.korgath.strainSummary':
+    '鎖が1本でも保たれている間、{every}秒ごとに{cast}秒の詠唱の後、鎖がまだ保たれている各柱の周囲{radius}ヤードの円環に爆発が起こる。{min}〜{max}ダメージとノックバック。4本すべて断つと止まる。',
+  'bossJournal.sanctum.korgath.strainResponse':
+    '詠唱が終わる前に、鎖が無傷の柱すべてから離れること。',
+  'bossJournal.sanctum.korgath.stompSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、体から{radius}ヤード先までの円環が発生し、内側の全員に{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.korgath.stompResponse':
+    '遠隔は円環の外にいる。近接は可能なら外へ出る。ヒーラーは被弾者を回復する。',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    '鎖が断たれて{delay}秒後、竜誓団の突き棒鍛冶が柱の裏の縁を乗り越えて枷まで歩き、{channel}秒間「再鋲打ち」を詠唱し続ける。完了すると鎖と新しい枷が戻り、{perChain}の被ダメージ軽減も復活するが、解き放たれた攻撃は残る。',
+  'bossJournal.sanctum.korgath.rerivetResponse':
+    '詠唱が終わる前に、突き棒鍛冶を中断、スタン、または倒すこと。',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    '鎖がちょうど1本残っている間、鎖の引き締めは{base}秒ごとではなく{every}秒ごとに来る。',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    '最後の鎖を素早く断つか、{every}秒ごとにその柱から離れる準備をしておく。',
+  'bossJournal.sanctum.korgath.maulSummary':
+    '大槌の鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱の後、正面{arc}度、体から{range}ヤード先までを薙ぎ払う。近接攻撃の{mult}倍のダメージ。',
+  'bossJournal.sanctum.korgath.maulResponse':
+    '正面に立つのはタンクだけ。それ以外は詠唱中に彼の背後へ回る。',
+  'bossJournal.sanctum.korgath.flailSummary':
+    '火ばさみの鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱で、タンク以外の最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、鞭が線内の全員を打つ。{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.korgath.flailResponse': '詠唱が終わる前に、線から横へ避けること。',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    '金床の鎖が断たれている場合、彼はテラス中央から離れられる。{every}秒ごとに{cast}秒の詠唱で、最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、その線に沿って突進する。{min}〜{max}ダメージとノックバック。',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    '線から出ること。金床の鎖が保たれている間、彼は中央から{leash}ヤード以内にとどまり、突進しない。',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    'ふいごの鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱の後、全員に{min}〜{max}ダメージを与え、彼から{push}ヤード突き飛ばす。',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    '全員に当たり回避できない。ヒーラーは着弾前に全員を回復しておく。',
+  'bossJournal.sanctum.korgath.tipTank':
+    '彼を中央で、群れに背を向けさせて保持する。大槌の鎖が断たれたら、大槌の弧撃が正面のすべてに当たる。金床の鎖が断たれるまで、彼は中央から{leash}ヤード以上離れられない。',
+  'bossJournal.sanctum.korgath.tipHealer':
+    '鎖の引き締め、震える踏みつけ、そして解き放たれた攻撃はどれも強烈。鎖が残るほど戦闘は長引き、断つほど耐えるべき攻撃が増える。',
+  'bossJournal.sanctum.korgath.tipDamage':
+    '枷を倒して決めた鎖を断ち、コルガスに火力を集中する。描かれた線から出て、鎖が保たれている柱から離れること。',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    '枷を倒して決めた鎖を断ち、コルガスに火力を集中する。再鋲打ちが終わる前に突き棒鍛冶をすべて止める。描かれた線から出て、鎖が保たれている柱から離れること。',
+  'bossJournal.sanctum.korgath.choiceName': '鎖を何本断つ?',
+  'bossJournal.sanctum.korgath.choiceGain':
+    '鎖を1本断つごとに被ダメージ軽減が{perChain}ずつ消える。4本すべてが保たれている時の{all}から、最後にはゼロに。戦闘が大幅に短くなる。',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    '鎖を1本断つごとに、戦闘が終わるまで攻撃が1つ解き放たれる。大槌: 大槌の弧撃。火ばさみ: 鎖の鞭打ち。金床: 境界の突進、そして中央から離れられるようになる。ふいご: 親方の咆哮。',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    '鎖を1本断つごとに、戦闘が終わるまで攻撃が1つ解き放たれる。大槌: 大槌の弧撃。火ばさみ: 鎖の鞭打ち。金床: 境界の突進、そして中央から離れられるようになる。ふいご: 親方の咆哮。さらに、断たれた鎖ごとに突き棒鍛冶が再び鋲で留めに来る。',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    '再鋲打ち: 鎖が断たれて{delay}秒後、突き棒鍛冶が鎖の復元を試みる。中断、スタン、または倒すこと。',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    '最後の鎖: 鎖が1本残ると、鎖の引き締めが{every}秒ごとに来る。',
+  'bossJournal.sanctum.velkhar.overview':
+    'ヴェルカーは、3つの融水の池から解凍された死者を甦らせる。彼らを鎮めるのは冷たさだけ。乾いた氷の上で倒された骨歩きは死んだままだが、融水の中で倒されると再び起き上がり、彼を回復する。',
+  'bossJournal.sanctum.velkhar.phaseVaultName': '儀式の間',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    '骨歩きが次々と池から這い上がってくる。体力が{wave1}と{wave2}になると追加の波が現れ、各池から1体ずつ。',
+  'bossJournal.sanctum.velkhar.thawName': '目覚めの雪解け',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    '{every}秒ごとに、いずれかの池の火葬壇が燃え上がり、{warn}秒後に{count}体の甦った骨歩きが這い上がる。池は順番に使われる。体力が{wave1}と{wave2}になると、各池からさらに1体ずつ這い上がる。',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    'タンクは敵を集めて乾いた氷の上へ引く。ダメージ役はそこで倒す。',
+  'bossJournal.sanctum.velkhar.heldName': '封じと不滅',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    '乾いた氷の上で倒された骨歩きは封じられ、像のように凍りついて死んだままになる。融水の中で倒されたものは沈み、{delay}秒後に体力{share}で再び起き上がり、ヴェルカーの体力を{heal}回復する。',
+  'bossJournal.sanctum.velkhar.heldResponse':
+    '骨歩きは必ず乾いた氷の上でだけ倒すこと。池の中や融水の帯の上では倒さない。',
+  'bossJournal.sanctum.velkhar.graspName': '解凍された者の握り',
+  'bossJournal.sanctum.velkhar.graspSummary': '融水の中に立つ骨歩きは、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.velkhar.graspResponse': 'タンクは骨歩きを水から遠ざけておく。',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、彼からタンク以外のプレイヤーに向けて、間の縁まで幅{width}ヤードの線を描く。線内の全員に{min}〜{max}ダメージを与え、線は{seconds}秒間融水のまま残る。',
+  'bossJournal.sanctum.velkhar.trenchResponse':
+    '線から出ること。残った融水の帯の上で骨歩きを倒さない。',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、全員に{min}〜{max}の闇ダメージ。',
+  'bossJournal.sanctum.velkhar.volleyResponse': '回避できない。ヒーラーは全員の体力を保っておく。',
+  'bossJournal.sanctum.velkhar.warmHandsName': '温かな手',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    '{still}秒間立ち止まった骨歩きは、足元に半径{radius}ヤードの融水の水たまりを{seconds}秒間作り出す。',
+  'bossJournal.sanctum.velkhar.warmHandsResponse':
+    '骨歩きを動かし続け、水たまりの上でとどめを刺さないこと。',
+  'bossJournal.sanctum.velkhar.twiceWokenName': '二度目の目覚め',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    '再び起き上がった骨歩きは体力全快で戻り、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse':
+    '1体も起き上がらせないこと。すべて乾いた氷の上で倒す。',
+  'bossJournal.sanctum.velkhar.tipTank':
+    'すべての骨歩きを引きつけ、池や融水の帯から離れた乾いた氷の上へ引く。融水の中では攻撃が{bonus}強くなる。',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    'すべての骨歩きを引きつけ、池や融水の帯から離れた乾いた氷の上へ引く。動かし続けること。立ち止まったものは足元に水たまりを作る。',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    '影の斉射は{every}秒ごとに全員に当たる。融水の中の骨歩きは{bonus}強く攻撃するので、水に入ったらタンクの体力に注意。',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    '骨歩きは乾いた氷の上でだけ倒し、その後ヴェルカーへ戻る。魂火の溝の線から出ること。',
+  'bossJournal.sanctum.velkhar.choiceName': '死者をどこで倒す?',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    '乾いた氷の上で倒された骨歩きは完全に消える。敵が減り、戦闘がすっきりする。',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    '融水の中で倒すと再び起き上がり、そのたびにヴェルカーの体力を{heal}回復する。乾いた氷へ引くには時間がかかるので、攻撃を始める前に倒す場所を決めておこう。',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    '温かな手: {still}秒間立ち止まった骨歩きは融水の水たまりを作る。',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    '二度目の目覚め: 再び起き上がった骨歩きは体力全快で戻り、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.korzul.overview':
+    '彼の炎が絶えず砕く凍った湖上での竜との戦い。ブレスのたびに氷が失われ、炎の向きは群れが決めるので、どの氷を失うかも群れ次第。氷を失った竜は、間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.phaseLakeName': '凍った湖',
+  'bossJournal.sanctum.korzul.phaseLakeSummary':
+    '彼は氷を突き破って現れ、湖の中央に降り立つ。着地した時から戦闘が始まる。',
+  'bossJournal.sanctum.korzul.phaseFlightName': '飛翔',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    '体力が{first}と{second}になると飛び立ち、墜落してくるまで空中から戦う。',
+  'bossJournal.sanctum.korzul.phaseLastName': '最後の局面',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    '2度目の飛翔の後: 地上で{breath}秒ごとに墓所のブレス、{gale}秒ごとに翼の烈風。',
+  'bossJournal.sanctum.korzul.iceName': '砕ける氷',
+  'bossJournal.sanctum.korzul.iceSummary':
+    '湖は氷板でできている。彼の炎は無傷の氷板にひびを入れ、ひびの入った氷板を砕く。ひびの入った氷板は{refreeze}秒後に再び凍る。砕けた氷板は開けた水面になる。',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    '湖は氷板でできている。彼の炎は無傷の氷板にひびを入れ、ひびの入った氷板を砕く。深き焼き入れ: 英雄ではひびの入った氷板は二度と凍らない。砕けた氷板は開けた水面になる。',
+  'bossJournal.sanctum.korzul.iceResponse':
+    '氷は意図して使うこと。群れが失ってもよい氷板に彼の炎を向ける。',
+  'bossJournal.sanctum.korzul.waterName': '開けた水面',
+  'bossJournal.sanctum.korzul.waterSummary':
+    '開けた水面に立つと、移動速度が{slow}低下し、毎秒{perSecond}ダメージを受ける。',
+  'bossJournal.sanctum.korzul.waterResponse':
+    '氷の上にとどまる。突き飛ばされて水に入ったら、すぐに出ること。',
+  'bossJournal.sanctum.korzul.breathSummary':
+    '{every}秒ごとに、タンクの方向へ{cast}秒の詠唱の後、体から{range}ヤード先まで{arc}度の炎の扇形を放つ。タンク以外の範囲内の全員に{min}〜{max}ダメージ。扇形の下にある氷板は最大{plates}枚、近い順に燃える。',
+  'bossJournal.sanctum.korzul.breathResponse':
+    '正面に立つのはタンクだけ。タンクはブレスを、群れが失ってもよい氷へ向ける。',
+  'bossJournal.sanctum.korzul.tailSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、背後{arc}度、体から{range}ヤード先まで尾で薙ぎ払う。{min}〜{max}ダメージとノックバック。',
+  'bossJournal.sanctum.korzul.tailResponse': '背後には絶対に立たない。側面から攻撃する。',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    '{every}秒ごと、および体力が{health}の時に1度、{duration}秒間チャネリングし、半径{radius}ヤード以内に{pulses}回の炎の脈動を放つ。脈動は回を追うごとに強まる(最後の脈動は{min}〜{max})。{crack}回目の脈動で足元の氷板にひびが入り、{brk}回目で砕ける。砕けると彼は鎮火され、チャネリングが終わる。',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    '彼から{radius}ヤード離れること。ひびの入った氷板の上で始めさせれば、{crack}回目の脈動でチャネリングが終わる。',
+  'bossJournal.sanctum.korzul.galeSummary':
+    '{cast}秒の詠唱の後、全員が彼から{push}ヤード押し出される。',
+  'bossJournal.sanctum.korzul.galeResponse':
+    '背後の開けた水面を避けておき、押し出された先が氷になるようにする。',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    '空中でタンク以外のプレイヤー1人に{eye}秒間「ワームの眼」の印を付ける。印が消えると、そのプレイヤーのいる氷板全体に「降り注ぐ炎」を浴びせる。{warn}秒の予兆の後、氷板上の全員に{min}〜{max}ダメージを与え、氷板が燃える。1度目の飛翔で{roundsFirst}回、2度目で{roundsSecond}回。',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    '空中でタンク以外のプレイヤー2人に{eye}秒間「ワームの眼」の印を付ける(双つの眼)。印が消えると、印を受けた各プレイヤーのいる氷板全体に「降り注ぐ炎」を浴びせる。{warn}秒の予兆の後、氷板上の全員に{min}〜{max}ダメージを与え、氷板が燃える。1度目の飛翔で{roundsFirst}回、2度目で{roundsSecond}回。',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    '印を受けたら、群れから離れた無傷の氷板へ向かう。それ以外の全員はその氷板から離れる。',
+  'bossJournal.sanctum.korzul.broodName': '地の底からの竜群',
+  'bossJournal.sanctum.korzul.broodSummary':
+    '彼が飛び立つと、砕けた氷板ごとにスケイルガードが這い上がる。最大{max}体。',
+  'bossJournal.sanctum.korzul.broodResponse':
+    'タンクが敵を引きつけ、彼が空中にいる間に群れで倒す。',
+  'bossJournal.sanctum.korzul.descentSummary':
+    '各飛翔の終わりに、最も多くのプレイヤーがいる無傷の氷板へ着地する。{warn}秒の影の予兆の後、半径{radius}ヤード以内に{min}〜{max}ダメージとノックバック、その氷板は燃える。',
+  'bossJournal.sanctum.korzul.descentResponse':
+    '失ってもよい氷板に集まり、彼が着地する前に影から走り出ること。',
+  'bossJournal.sanctum.korzul.flareName': '欠片の閃光',
+  'bossJournal.sanctum.korzul.flareSummary':
+    '2度目の飛翔の後、欠片が閃光を放つ。地上で{breath}秒ごとに墓所のブレス、{gale}秒ごとに翼の烈風。',
+  'bossJournal.sanctum.korzul.flareResponse':
+    'ブレスの間隔が短くなる。残りのどの氷板を使うか計画しておくこと。',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    '氷板がすべて砕けると、彼は開けた水面の上に滞空し、間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.noIceResponse': '氷を切らしてはならない。全滅で戦闘が終わる。',
+  'bossJournal.sanctum.korzul.tipTank':
+    '墓所のブレスは群れの方ではなく、失ってもよい氷へ向ける。墓場のインフェルノの前に彼をひびの入った氷板へ移動させ、短く終わらせる。',
+  'bossJournal.sanctum.korzul.tipHealer':
+    '墓場のインフェルノの脈動は急速に強まる。全員が離れたか確認すること。降り注ぐ炎、墜落着地、水へのノックバックはどれも大ダメージ。',
+  'bossJournal.sanctum.korzul.tipDamage':
+    '彼の正面にも背後にも立たない。ワームの眼を受けたら、群れから離れた無傷の氷板へ向かう。飛翔中にスケイルガードを倒す。',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    '彼の正面にも背後にも立たない。ワームの眼は2人に同時に付く。それぞれ別の、群れから離れた無傷の氷板へ向かうこと。飛翔中にスケイルガードを倒す。',
+  'bossJournal.sanctum.korzul.choiceIceName': 'どの氷を使う?',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    'ブレス、降り注ぐ炎、着地を選んだ氷板へ向ければ、湖の残りは安全に立てるまま保たれる。',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    '砕けた氷板はすべて開けた水面になり、次の飛翔でそれぞれからスケイルガードが這い上がる(最大{max}体)。氷がなくなると、彼は間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.choiceDouseName': 'インフェルノを鎮火する?',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    'ひびの入った氷板の上に彼がいれば、{crack}回目の脈動でそれが砕け、彼は鎮火され、墓場のインフェルノは最も強い脈動の前に早く終わる。',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    'その氷板は永久に失われる。無傷の氷の上に置いたままだと、チャネリングは{brk}回目の脈動まで続き、結局は氷板が砕ける。',
+  'bossJournal.sanctum.korzul.heroicDeepQuench': '深き焼き入れ: ひびの入った氷板は二度と凍らない。',
+  'bossJournal.sanctum.korzul.heroicTwinEyes': '双つの眼: ワームの眼が同時に2人に付く。',
 };

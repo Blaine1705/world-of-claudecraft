@@ -133,12 +133,15 @@ describe('ability icons', () => {
     // lance_thrust, lance_release), at the release/v0.45.0 merge.
     // 477: plus the membership Courier glyph (parked in ABILITY_ART_PENDING until
     // its skill painting ships), at the v0.45.0 integration.
-    expect(ids).toHaveLength(477);
+    // 511: plus the Gravewyrm Sanctum dungeon boss guide mechanic recipes
+    // (dgn_sanctum_*, src/ui/boss_journal/dungeons/gravewyrm_sanctum.ts).
+    expect(ids).toHaveLength(511);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier).
-    expect(hash).toBe('bf012743f0557b561563508a5de75438c406ebdef90b39853c28b260beb72cd0');
+    // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier;
+    // then + the Gravewyrm Sanctum boss guide recipes).
+    expect(hash).toBe('f3f93b9e0813d90726798d590f8d31890e7c5d6749da35218cea566e2dfe0295');
   });
 });

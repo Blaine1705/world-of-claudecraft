@@ -380,6 +380,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_boss_guide_view.ts',
+  'src/ui/boss_journal/journal_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',
