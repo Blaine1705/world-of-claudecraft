@@ -15,8 +15,8 @@
 //   presence heartbeat, community link click events), so a visitor who never interacts
 //   is still counted; each is safe to run again when main.ts boots;
 // - lifting the boot splash once the stylesheets and fonts are ready;
-// - fetching the client's modules into the HTTP cache once the page has settled (no
-//   compile, no execution);
+// - fetching the client's modules into the HTTP cache once the landing and its art
+//   have painted (no compile, no execution);
 // - holding a button click or a select change made before the client is ready: the
 //   control shows a busy state, and the action is replayed once main.ts has wired the
 //   start screens. main.ts signals that by dispatching BOOT_SPLASH_OWNED_EVENT
@@ -70,12 +70,12 @@ const ART_REVEAL_TIMEOUT_MS = 4000;
  */
 export const LANDING_PAINT_FALLBACK_MS = 600;
 /**
- * How long after the load event deferred work (the client prefetch, the slideshow's
- * later scenes) waits before asking for idle time: the landing's own images and fonts
- * are still decoding and painting around load, and anything competing with them would
- * delay the largest paint the visitor is waiting for.
+ * How long after the load event deferred work (the slideshow's later scenes, from
+ * src/boot.ts) waits before asking for idle time: the landing's own images and fonts are
+ * still decoding and painting around load, and anything competing with them would delay
+ * the largest paint the visitor is waiting for.
  */
-export const GAME_PREFETCH_DELAY_MS = 1500;
+export const LOAD_SETTLE_DELAY_MS = 1500;
 /**
  * Mirrors TURNSTILE_SCRIPT_URL in src/game/turnstile_gate.ts (pinned by the test): the
  * captcha script starts loading when the visitor first interacts, so the login form's
@@ -189,7 +189,7 @@ export function prefetchGameModules(): void {
 }
 
 /**
- * Run once the page has loaded, settled for GAME_PREFETCH_DELAY_MS and gone idle.
+ * Run once the page has loaded, settled for LOAD_SETTLE_DELAY_MS and gone idle.
  * Returns a cancel function.
  */
 export function afterLoadSettles(run: () => void): () => void {
@@ -207,7 +207,7 @@ export function afterLoadSettles(run: () => void): () => void {
     }
   };
   const later = () => {
-    timer = window.setTimeout(idle, GAME_PREFETCH_DELAY_MS);
+    timer = window.setTimeout(idle, LOAD_SETTLE_DELAY_MS);
   };
   if (document.readyState === 'complete') later();
   else window.addEventListener('load', later, { once: true });
@@ -321,6 +321,7 @@ export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
   trackCommunityLinkClicks();
 
   let disposed = false;
+  let started = false;
   let cancelArt: (() => void) | undefined;
   const osReducedMotion = matches('(prefers-reduced-motion: reduce)');
   // The art stays held back (art-deferred) so the lift waits only for the stylesheets and
@@ -329,17 +330,20 @@ export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
     landing: true,
     fadeMs: loadingCurtainFadeMs(settings.get('reduceMotion') || osReducedMotion),
   }).then(() => {
-    if (!disposed) cancelArt = afterLandingPainted(performance.now(), revealLandingArt);
+    if (disposed) return;
+    // Then the client, so a visitor who taps Play a few seconds in finds most of it
+    // downloaded; after the art, so it never competes with the landing itself.
+    cancelArt = afterLandingPainted(performance.now(), () => {
+      void revealLandingArt().then(() => {
+        if (!disposed && !started) prefetchGameModules();
+      });
+    });
   });
 
   // The lift above dispatched BOOT_SPLASH_OWNED_EVENT synchronously; the next one is
   // main.ts, once its start screens are wired.
-  let started = false;
   let ready = false;
   let held: HeldAction | null = null;
-  const cancelPrefetch = afterLoadSettles(() => {
-    if (!started) prefetchGameModules();
-  });
 
   const markBusy = (next: HeldAction | null) => {
     held?.el.removeAttribute(LANDING_BOOTING_ATTR);
@@ -415,7 +419,6 @@ export function runLandingFirst(startGame: () => Promise<unknown>): () => void {
   return () => {
     disposed = true;
     stopHolding();
-    cancelPrefetch();
     cancelArt?.();
     for (const type of START_EVENTS) document.removeEventListener(type, start, true);
     document.removeEventListener(BOOT_SPLASH_OWNED_EVENT, onReady);

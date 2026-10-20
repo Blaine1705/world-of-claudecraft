@@ -8,11 +8,11 @@ import { BOOT_PENDING_CLASS, BOOT_SPLASH_OWNED_EVENT } from '../src/ui/boot_spla
 import {
   ART_DEFERRED_CLASS,
   GAME_MODULES_ELEMENT_ID,
-  GAME_PREFETCH_DELAY_MS,
   gameModuleUrls,
   LANDING_ART_URLS,
   LANDING_BOOTING_ATTR,
   LANDING_BOOTING_CLASS,
+  LANDING_PAINT_FALLBACK_MS,
   LANDING_TURNSTILE_SCRIPT_URL,
   revealLandingArt,
   runLandingFirst,
@@ -115,17 +115,18 @@ describe('landing-first boot', () => {
     );
   });
 
-  it('fetches the listed client modules once the page has settled, without running them', async () => {
+  it('fetches the listed client modules once the landing has painted, without running them', async () => {
     mountLanding();
     const startGame = vi.fn(never);
     const prefetched = () => fetchedUrls().filter((url) => url.startsWith('/assets/'));
     run(startGame);
-    // Not while the landing's own images are still arriving.
-    await new Promise((resolve) => setTimeout(resolve, GAME_PREFETCH_DELAY_MS / 2));
+    // Not before the landing's own paint (happy-dom reports no largest-contentful-paint
+    // entries, so the fallback timer stands in for it).
+    await new Promise((resolve) => setTimeout(resolve, LANDING_PAINT_FALLBACK_MS / 2));
     expect(prefetched()).toEqual([]);
     await vi.waitFor(
       () => expect(prefetched()).toEqual(['/assets/main-a.js', '/assets/renderer-b.js']),
-      { timeout: GAME_PREFETCH_DELAY_MS + 3000 },
+      { timeout: LANDING_PAINT_FALLBACK_MS + 3000 },
     );
     // A fetch, not a <link>: a link with the module's URL stops Vite's own preload.
     expect(document.head.querySelector('link[rel="prefetch"], link[rel="modulepreload"]')).toBe(
@@ -138,7 +139,7 @@ describe('landing-first boot', () => {
     mountLanding();
     run(vi.fn(never));
     document.dispatchEvent(new Event('pointerdown'));
-    await new Promise((resolve) => setTimeout(resolve, GAME_PREFETCH_DELAY_MS + 500));
+    await new Promise((resolve) => setTimeout(resolve, LANDING_PAINT_FALLBACK_MS + 500));
     expect(fetchedUrls().filter((url) => url.startsWith('/assets/'))).toEqual([]);
   });
 
