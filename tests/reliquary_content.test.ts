@@ -477,7 +477,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // The five World PvP title relics bring it to 501.
     // The World PvP Skull Bag closes the Warfare armory: 496.
     // Composed together, the Skull Bag adds one more Warfare armory relic: 502.
-    expect(full).toEqual({ owned: 502, total: 502 });
+    expect(full).toEqual({ owned: 503, total: 503 });
+    // The Crucible hunter quiver adds one Varkhul Heroic relic: 503.
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -514,7 +515,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // five World PvP title slots.
     // 467 with the World PvP Skull Bag (a character-scoped item on the Warfare armory).
     // Composed together, the Skull Bag adds one more character-scoped item: 473.
-    expect(character).toEqual({ owned: 473, total: 473 });
+    expect(character).toEqual({ owned: 474, total: 474 });
+    // The hunter quiver adds one character-scoped relic: 474.
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -582,7 +584,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +5 World PvP title slots on horizons_titles: 688.
       // +1 for the World PvP Skull Bag on the Warfare armory: 683.
       // Composed together: 689.
-    ).toBe(689);
+      // The hunter quiver adds one Varkhul Heroic slot: 690.
+    ).toBe(690);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -818,7 +821,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
     // +1: the World PvP Skull Bag (the Warfare armory): 522.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(522);
+    // The Crucible hunter quiver adds another item id: 523.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(523);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }

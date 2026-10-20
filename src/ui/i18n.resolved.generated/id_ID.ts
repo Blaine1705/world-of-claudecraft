@@ -18647,6 +18647,9 @@ export const id_ID: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Tongkat Perang Vanguard"
       },
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },

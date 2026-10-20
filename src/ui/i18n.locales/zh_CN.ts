@@ -889,6 +889,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_oath_blade.name': '先锋之誓约',
   'entities.items.vanguard_verdict_greatsword.name': '先锋之裁决',
   'entities.items.vanguard_warstaff.name': '先锋之战杖',
+  'entities.items.infernal_quiver.name': '炼狱箭袋',
   'entities.npcs.glider_apprentice.name': '斯凯',
   'devCommand.actions.hillend.description': '让当前山丘立即回落。',
   'devCommand.actions.hillend.label': '结束山丘',

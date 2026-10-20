@@ -1041,6 +1041,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warrior_prot_legs.name': '鐵軍腿甲',
   'entities.items.vanguard_warrior_prot_shoulder.name': '鐵軍肩甲',
   'entities.items.vanguard_warstaff.name': '先鋒之戰杖',
+  'entities.items.infernal_quiver.name': '煉獄箭袋',
   'entities.npcs.glider_apprentice.name': '絲凱',
   'guide.arenaPage.vanguardBody':
     '先鋒裝備是戰爭裝備的第二季，由同樣兩位軍需官在原本品級之上一併販售，原本品級依然在架上。每個專精都有自己專屬的先鋒套裝，共五件：頭部、肩部、胸部、腿部與手部，商店只會列出你的職業能穿的三套先鋒套裝，其後才是你能揮舞的先鋒武器。先鋒裝備件帶有與原本品級相同的戰爭評級，只是物品等級更高，而每套套裝都有兩件式與四件式加成，會改變你專精的一項技能。與原本的套裝不同，這些加成在任何地方都會生效，連對付怪物也不例外，但它們是為了對抗玩家而打造的，所以在團隊副本中，團隊套裝依然是更好的選擇。',

@@ -87,12 +87,13 @@ const gearItems = (): ItemDef[] =>
 
 describe('ignivar loot: catalog shape', () => {
   it('carries the exact authored counts', () => {
-    expect(IGNIVAR_LOOT_ITEM_IDS.length).toBe(201);
+    expect(IGNIVAR_LOOT_ITEM_IDS.length).toBe(202);
     expect(Object.keys(IGNIVAR_SET_ITEMS).length).toBe(29 * 5);
     expect(Object.keys(IGNIVAR_SIGIL_ITEMS).length).toBe(15);
     expect(Object.keys(IGNIVAR_OFFSET_ITEMS).length).toBe(20);
     expect(Object.keys(IGNIVAR_JEWELRY_ITEMS).length).toBe(8);
-    expect(Object.keys(IGNIVAR_HELD_ITEMS).length).toBe(4);
+    // Two shields, two caster held offhands, and the hunter quiver.
+    expect(Object.keys(IGNIVAR_HELD_ITEMS).length).toBe(5);
     // 9, not 10: the Emberflight Longbow was pulled from the tier (bows wait
     // for the hunter ranged-slot rework; maintainer decision 2026-08-28).
     expect(Object.keys(IGNIVAR_WEAPON_ITEMS).length).toBe(9);
@@ -107,9 +108,9 @@ describe('ignivar loot: catalog shape', () => {
 });
 
 describe('ignivar loot: every gear piece is item level 35 and budget-exact', () => {
-  it('derives ilvl 35 from source 26 + epic + raid for all 186 gear pieces', () => {
+  it('derives ilvl 35 from source 26 + epic + raid for all 187 gear pieces', () => {
     const gear = gearItems();
-    expect(gear.length).toBe(186);
+    expect(gear.length).toBe(187);
     for (const item of gear) {
       expect(itemSourceLevel(item.id), `${item.id} source`).toBe(IGNIVAR_RAID_LOOT_SOURCE_LEVEL);
       expect(itemFromRaid(item.id), `${item.id} raid flag`).toBe(true);
@@ -142,9 +143,12 @@ describe('ignivar loot: every gear piece is item level 35 and budget-exact', () 
       // adds the free caster baseline on top of that line, so the line is
       // priced here and the total is checked against expectedStatBudget,
       // an independent formula derived from the item's own level and slot.
+      // The hunter quiver is WORN (occupiesHand false), so it prices on the
+      // worn-offhand line: 35 x 0.45 x 0.7 = 11, never the held 18.
+      const isWornOffhand = item.kind === 'held_offhand' && item.occupiesHand === false;
       const line =
         // Two-handers carry the TWOHAND_STAT_MULT premium over the mainhand line.
-        isTwoHand ? 33 : SLOT_BUDGET[item.slot as string];
+        isTwoHand ? 33 : isWornOffhand ? 11 : SLOT_BUDGET[item.slot as string];
       const want = expectedStatBudget(item);
       expect(want, `${item.id} has a derivable budget`).toBe(
         expectedStatTotal(line, statIdentity(item.stats)),
@@ -194,7 +198,7 @@ describe('ignivar loot: binding policy (sigils and tier pieces bind, drops trade
       ...Object.values(IGNIVAR_HELD_ITEMS),
       ...Object.values(IGNIVAR_WEAPON_ITEMS),
     ];
-    expect(droppedGear.length).toBe(41);
+    expect(droppedGear.length).toBe(42);
     for (const item of droppedGear) {
       expect(item.soulbound, item.id).toBeFalsy();
     }
@@ -717,13 +721,16 @@ describe('ignivar loot: the boss drop tables (one item per five raiders, plus th
       'forgefire_spire',
       'staff_of_the_last_spring',
     ];
-    const varkhulHeld = ['orb_of_the_last_spring', 'cinder_of_the_first_design'];
+    const varkhulCasterHeld = ['orb_of_the_last_spring', 'cinder_of_the_first_design'];
+    const varkhulHeld = [...varkhulCasterHeld, 'infernal_quiver'];
     const varkhulTrinkets = ['forgefathers_temper', 'heart_of_the_crucible'];
+    // The hunter quiver APPENDS at the group's tail (append-only partition).
     expect(varkhulGroups.get('varkhul_h_exclusive')?.ids).toEqual([
       ...shields,
       ...varkhulWeapons,
-      ...varkhulHeld,
+      ...varkhulCasterHeld,
       ...varkhulTrinkets,
+      'infernal_quiver',
     ]);
     expect(varkhulGroups.get('varkhul_h_robe')?.ids).toEqual(robes);
     // The Robe has its own group; #3923 keeps held offhands in the exclusive
@@ -731,7 +738,9 @@ describe('ignivar loot: the boss drop tables (one item per five raiders, plus th
     // trinkets take 0.24 with every other non-legendary row scaled together.
     expect(shareOf(varkhul, shields)).toBeCloseTo(0.384, 6); // 0.177 x 2 + Emberward 0.03
     expect(shareOf(varkhul, varkhulWeapons)).toBeCloseTo(0.301, 6);
+    // The quiver takes an equal third of the unchanged 0.075 held share.
     expect(shareOf(varkhul, varkhulHeld)).toBeCloseTo(0.075, 6);
+    for (const id of varkhulHeld) expect(shareOf(varkhul, [id]), id).toBeCloseTo(0.025, 6);
     expect(shareOf(varkhul, varkhulTrinkets)).toBeCloseTo(0.24, 6);
     for (const id of [...ignivarTrinkets, ...varkhulTrinkets]) {
       expect(ITEMS[id].slot, id).toBe('trinket');
@@ -864,10 +873,11 @@ describe('ignivar loot: the boss drop tables (one item per five raiders, plus th
       ['heart_of_the_end_greatblade', 0.1045],
       ['forgefire_spire', 0.098],
       ['staff_of_the_last_spring', 0.0985],
-      ['orb_of_the_last_spring', 0.0375],
-      ['cinder_of_the_first_design', 0.0375],
+      ['orb_of_the_last_spring', 0.025],
+      ['cinder_of_the_first_design', 0.025],
       ['forgefathers_temper', 0.12],
       ['heart_of_the_crucible', 0.12],
+      ['infernal_quiver', 0.025],
     ]);
     expect(rowsOf(varkhulHeroic, 'varkhul_h_robe')).toEqual([
       ['sigil_anvil_chest', 0.34],
@@ -1054,7 +1064,11 @@ describe('the 2026-09-07 Heroic redistribution (docs/prd/ignivar-raid-loot.md)',
 
   it('every held offhand of the tier is Heroic-only', () => {
     const held = crucible.filter((i) => i.kind === 'held_offhand').map((i) => i.id);
-    expect(held.sort()).toEqual(['cinder_of_the_first_design', 'orb_of_the_last_spring']);
+    expect(held.sort()).toEqual([
+      'cinder_of_the_first_design',
+      'infernal_quiver',
+      'orb_of_the_last_spring',
+    ]);
     heroicOnly(held);
   });
 

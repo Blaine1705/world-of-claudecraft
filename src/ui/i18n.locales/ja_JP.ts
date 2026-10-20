@@ -1084,6 +1084,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warrior_prot_legs.name': '鉄壁進撃の脚甲',
   'entities.items.vanguard_warrior_prot_shoulder.name': '鉄壁進撃の肩鎧',
   'entities.items.vanguard_warstaff.name': 'ヴァンガードの戦杖',
+  'entities.items.infernal_quiver.name': '業火の矢筒',
   'entities.npcs.glider_apprentice.name': 'スカイ',
   'guide.arenaPage.vanguardBody':
     'ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ二人の補給官が元の階層に加えて販売し続けます。元の階層も販売終了にはなりません。どのスペックにも頭、肩、胸、脚、手の五部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる三つのセットだけが並び、続けて装備できるヴァンガードの武器が並びます。ヴァンガードの部位は元の階層と同じウォーフェアレーティングを、より高いアイテムレベルで備えており、各セットには2点と4点でスペックのアビリティの一つを変化させる二つのボーナスがあります。元のセットと違い、それらのボーナスはモンスター相手を含めどこでも機能しますが、対プレイヤー戦向けに作られているため、レイド内ではレイドセットの方が依然として優れた選択です。',

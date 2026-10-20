@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { ITEMS, MOBS } from '../src/sim/data';
 import {
   canDualWield,
@@ -7,6 +8,7 @@ import {
   displacedSlotForEquip,
   occupiesHand,
 } from '../src/sim/equipment_rules';
+import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
 import {
   expectedLineBudget,
   expectedStatBudget,
@@ -31,6 +33,7 @@ const QUIVERS = [
   'cragmaw_huntquiver',
   'gravewyrm_bone_quiver',
   'direfang_quiver',
+  'infernal_quiver',
 ] as const;
 
 const primaryStatSum = (item: ItemDef): number => {
@@ -96,25 +99,43 @@ describe('hunter quivers', () => {
     }
   });
 
-  it('ladders the four quivers up by item level and quality', () => {
+  it('ladders the five quivers up by item level and quality', () => {
     const levels = QUIVERS.map((id) => itemLevel(ITEMS[id]));
-    expect(levels).toEqual([7, 17, 23, 29]);
+    // The Crucible raid quiver tops the ladder at the raid's item level 35.
+    expect(levels).toEqual([7, 17, 23, 29, 35]);
     // Two rare rungs on purpose: each quiver matches the tier of the table it
     // drops from, and Cragmaw's own gear line is rare.
-    expect(QUIVERS.map((id) => ITEMS[id].quality)).toEqual(['uncommon', 'rare', 'rare', 'epic']);
+    expect(QUIVERS.map((id) => ITEMS[id].quality)).toEqual([
+      'uncommon',
+      'rare',
+      'rare',
+      'epic',
+      'epic',
+    ]);
     // Strictly increasing, so no rung is a sidegrade of the one below it.
     for (let i = 1; i < levels.length; i++) {
       expect(levels[i]!, QUIVERS[i]).toBeGreaterThan(levels[i - 1]!);
     }
   });
 
-  it('carries the physical-DPS rating only on the raid epic', () => {
+  it('carries a rating only on the raid epics', () => {
     // Matches the nighttalon leather set: Hit is the physical throughput
     // rating, and the sub-epic rungs seed no rating at all.
     expect(ITEMS.direfang_quiver.hitRating).toBe(20);
     expect(ITEMS.moggers_hide_quiver.hitRating ?? 0).toBe(0);
     expect(ITEMS.cragmaw_huntquiver.hitRating ?? 0).toBe(0);
     expect(ITEMS.gravewyrm_bone_quiver.hitRating ?? 0).toBe(0);
+    // The Crucible quiver follows its raid's rating ladder instead: one
+    // 25-point rating like every held offhand of that tier, crit, never Hit
+    // (the Crucible Hit program places no Hit on an offhand).
+    const infernal = ITEMS.infernal_quiver;
+    expect([infernal.critRating ?? 0, infernal.hasteRating ?? 0, infernal.hitRating ?? 0]).toEqual([
+      25, 0, 0,
+    ]);
+    // Physical identity, no caster affix, no armor; the exact authored split.
+    expect(infernal.spellPower ?? 0).toBe(0);
+    expect(infernal.healPower ?? 0).toBe(0);
+    expect(infernal.stats).toEqual({ agi: 7, sta: 4 });
   });
 
   it('sources each quiver from a distinct live loot table', () => {
@@ -132,6 +153,12 @@ describe('hunter quivers', () => {
       ).toBe(true);
     }
     expect(new Set(Object.values(sources)).size).toBe(4);
+    // The fifth rung drops from a Heroic-only table, not a mob loot table:
+    // Heroic Varkhul's exclusive gear slot in the Crucible raid.
+    expect(HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID]?.some((e) => e.itemId === 'infernal_quiver')).toBe(
+      true,
+    );
+    expect(MOBS[VARKHUL_BOSS_ID]?.loot?.some((e) => e.itemId === 'infernal_quiver')).toBe(false);
   });
 
   it('keeps the caster offhand line untouched at the shared Mogger source', () => {
@@ -308,6 +335,7 @@ describe('a worn quiver coexists with a two-hander', () => {
       'gravewyrm_bone_quiver',
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
+      'infernal_quiver',
       'moggers_hide_quiver',
     ]);
   });
@@ -331,6 +359,24 @@ describe('a worn quiver coexists with a two-hander', () => {
     // Still not a dual wield: the quiver is worn, not a second weapon.
     expect(sim.player.dualWielding).toBe(false);
     expect(sim.player.offhandWeapon).toBeNull();
+  });
+
+  it('wears the Crucible quiver beside a Crucible two-hander through the sim', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: false });
+    const pid = sim.player.id;
+    sim.setPlayerLevel(20);
+    const baseAgi = sim.player.stats.agi;
+
+    sim.addItem('heart_of_the_end_greatblade', 1, pid);
+    sim.addItem('infernal_quiver', 1, pid);
+    sim.equipItem('heart_of_the_end_greatblade', pid);
+    sim.equipItem('infernal_quiver', pid);
+
+    expect(sim.equipment.mainhand).toBe('heart_of_the_end_greatblade');
+    expect(sim.equipment.offhand).toBe('infernal_quiver');
+    // The greatblade carries no agility, so the quiver's 7 is the whole gain.
+    expect(sim.player.stats.agi).toBe(baseAgi + 7);
+    expect(sim.player.dualWielding).toBe(false);
   });
 
   it('wears them together in the opposite equip order too', () => {
@@ -395,7 +441,8 @@ describe('worn offhand budget', () => {
     // not only the formula: 15 on the line plus the baseline of 5.
     expect(itemStaminaModel(ITEMS.wraithfire_orb)?.line).toBe(15);
     expect(primaryStatSum(ITEMS.wraithfire_orb)).toBe(20);
-    expect(QUIVERS.map((id) => primaryStatSum(ITEMS[id]))).toEqual([1, 4, 6, 9]);
+    // The Crucible quiver: primaryStatBudget(35, epic, offhand, 0.45) = 11.
+    expect(QUIVERS.map((id) => primaryStatSum(ITEMS[id]))).toEqual([1, 4, 6, 9, 11]);
   });
 
   it('carries the worn line into the generated heroic clones', () => {

@@ -1081,6 +1081,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_oath_blade.name': '선봉대의 맹세',
   'entities.items.vanguard_verdict_greatsword.name': '선봉대의 심판',
   'entities.items.vanguard_warstaff.name': '선봉대의 전투지팡이',
+  'entities.items.infernal_quiver.name': '업화 화살통',
   'entities.npcs.glider_apprentice.name': '스카이',
   'guide.arenaPage.vanguardBody':
     '선봉대 장비는 워페어 장비의 두 번째 시즌으로, 판매를 이어 가는 기존 등급 위에 같은 두 병참장교가 판매합니다. 전문화마다 고유한 선봉대 세트가 머리, 어깨, 가슴, 다리, 손 다섯 부위로 갖춰져 있으며, 상점에는 자신의 직업이 입을 수 있는 세 세트만 나열되고 그 뒤로 사용할 수 있는 선봉대 무기가 이어집니다. 선봉대 부위는 기존 등급과 같은 워페어 수치를 더 높은 아이템 레벨로 지니며, 각 세트에는 두 부위와 네 부위를 채웠을 때 전문화 기술 하나를 바꾸는 보너스가 있습니다. 기존 세트와 달리 이 보너스는 몬스터를 포함해 어디서나 작동하지만, 원래 플레이어와 싸우기 위해 설계된 것이므로 공격대 안에서는 여전히 공격대용 세트가 더 나은 선택입니다.',

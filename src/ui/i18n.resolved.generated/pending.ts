@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "es_ES": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "fr_FR": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "fr_CA": [
+    "entities.items.infernal_quiver.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "de_DE": [
+    "entities.items.infernal_quiver.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.infernal_quiver.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "nl_NL": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "pl_PL": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "id_ID": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "tr_TR": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "sv_SE": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "vi_VN": [
+    "entities.items.infernal_quiver.name"
+  ],
+  "da_DK": [
+    "entities.items.infernal_quiver.name"
+  ]
 };

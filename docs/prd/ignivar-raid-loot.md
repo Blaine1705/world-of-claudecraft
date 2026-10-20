@@ -799,7 +799,7 @@ Physical jewelry splits str/agi evenly so every melee, ranged, and tank spec
 can use it; spell damage jewelry carries Spell Damage; healing jewelry
 carries Healing Power.
 
-### Shields and held offhands (4 items)
+### Shields, held offhands, and the hunter quiver (5 items)
 
 | Item | Slot | For |
 |---|---|---|
@@ -807,10 +807,13 @@ carries Healing Power.
 | Ember Warden's Barrier | offhand shield | mail healers (paladin holy, shaman resto) |
 | Orb of the Last Spring | held offhand | healers (Healing Power) |
 | Cinder of the First Design | held offhand | damage casters (Spell Damage) |
+| Infernal Quiver | worn offhand (quiver) | hunters |
 
 Shields are ArmorItemDef with shield: true and blockValue; requiredClass
 covers the shield-capable classes per role. Held offhands take the 0.75 held
-slot budget (18 points).
+slot budget (18 points). The quiver is worn, not held (occupiesHand false,
+the direfang_quiver precedent): it costs no two-hander, so it takes the
+WORN_OFFHAND_STAT_MULT line (11 points) and a single crit 25, no Hit.
 
 ### Weapons (9 items)
 
@@ -886,7 +889,8 @@ Heroic pays in ACCESS, never in numbers. Each kill's slots are:
   A heroic claim skips the Normal-only off-set group, draws nothing for it,
   and this group pays instead: the marquee weapons, the Wand of Quenched
   Sparks, and on Varkhul the shields (Emberward at its unchanged ABSOLUTE 3
-  percent per heroic kill) plus both held offhands. This slot is GEAR ONLY,
+  percent per heroic kill) plus both held offhands and the hunter's Infernal
+  Quiver. This slot is GEAR ONLY,
   never a sigil, and the boss's raid trinkets sit in it too (they also sit in
   the Normal off-set slot, see below). So every Heroic kill pays one item
   Normal can never drop (the raid trinkets excepted), and Normal remains the
@@ -1001,7 +1005,7 @@ tests/reliquary_content.test.ts.
 | copper | both | 200000 copper (heroic base on a heroic claim) | 1.0 |
 | varkhul_sigils | both | Legging Sigil of the Anvil / Ember / Tempest, Helm Sigil of the Anvil / Ember / Tempest | 0.17 / 0.17 / 0.16, 0.17 / 0.16 / 0.17 |
 | varkhul_offset | Normal only | the 10 feet pieces at 0.0390625 each, the 4 rings at 0.08984375 each, Forgefather's Temper / Heart of the Crucible (raid trinkets) at 0.125 each | sums to 1.0 |
-| varkhul_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Bulwark of the Inner Crucible 0.177, Ember Warden's Barrier 0.177, Varkhul's Emberward 0.03, Heart of the End Greatblade / Forgefire Spire / Staff of the Last Spring at 0.1045 / 0.098 / 0.0985, Orb of the Last Spring / Cinder of the First Design at 0.0375 each, Forgefather's Temper / Heart of the Crucible at 0.12 each | sums to 1.0 |
+| varkhul_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Bulwark of the Inner Crucible 0.177, Ember Warden's Barrier 0.177, Varkhul's Emberward 0.03, Heart of the End Greatblade / Forgefire Spire / Staff of the Last Spring at 0.1045 / 0.098 / 0.0985, Orb of the Last Spring / Cinder of the First Design at 0.025 each, Forgefather's Temper / Heart of the Crucible at 0.12 each, Infernal Quiver 0.025 (appended; the three offhands split the unchanged 0.075 held share in thirds) | sums to 1.0 |
 | varkhul_h_robe | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.34 / 0.33 / 0.33 | sums to 1.0 |
 
 ## Future redistribution
@@ -1030,9 +1034,9 @@ CLAUDE.md, content-obligations-reviewer):
 
 - **Item art**: one committed public/ui/items/<id>.webp per non-weapon item.
   The table adds 202 new item ids total (145 set pieces, 15 sigils, 20
-  waist/feet, 8 jewelry, 4 held/shield, 10 weapons); the 192 non-weapon ids
-  each need an icon, while the 10 weapons register through the weapon
-  variant tables instead. Generated through the assets:items pipeline with
+  waist/feet, 8 jewelry, 5 held/shield/quiver, 9 weapons); the 193 non-weapon
+  ids each need an icon (the later Infernal Quiver's is still pending), while
+  the 9 weapons register through the weapon variant tables instead. Generated through the assets:items pipeline with
   provenance rows in mapping.json; ITEM_IMAGE_IDS auto-picks up non-weapon
   ids and the icon gate fails on any gap.
 - **i18n**: every item id in ITEM_ENTITY_IDS with its English name at the

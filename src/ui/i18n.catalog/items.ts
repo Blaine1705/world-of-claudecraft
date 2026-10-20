@@ -3374,6 +3374,10 @@ const ITEM_ENTITY_IDS = [
   'vanguard_oath_blade',
   'vanguard_fang_dagger',
   'vanguard_warstaff',
+  // The Crucible raid's hunter quiver (content/ignivar_loot.ts), appended at
+  // the END under the append-only contract; resolves BY KEY. The name is
+  // wordy English, so its M16 non-Latin fills land in the overlays.
+  'infernal_quiver',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4309,6 +4313,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_oath_blade: "Vanguard's Oath",
   vanguard_fang_dagger: "Vanguard's Fang",
   vanguard_warstaff: "Vanguard's Warstaff",
+  infernal_quiver: 'Infernal Quiver',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

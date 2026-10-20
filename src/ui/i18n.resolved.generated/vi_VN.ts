@@ -18647,6 +18647,9 @@ export const vi_VN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Trượng Chiến Vanguard"
       },
+      "infernal_quiver": {
+        "name": "Infernal Quiver"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
