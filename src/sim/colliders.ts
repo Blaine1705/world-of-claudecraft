@@ -120,6 +120,7 @@ import { FENCE_END_PAD, FENCE_HALF_DEPTH, FENCE_RAIL_HEIGHT } from './fence_dims
 import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
 import { interiorCollidersNear, resolveInteriorAgainst } from './interior_collider_cells';
 import { interiorCollidersFor } from './interior_collider_sets';
+import { mudHutCollider } from './mudfin_huts';
 import { musterCampColliders, musterPocketSeals } from './muster_camp_colliders';
 import {
   benchDrawnHeight,
@@ -866,15 +867,7 @@ function staticWorldColliders(seed: number): Collider[] {
       moveTopY: topY(seed, x, z, CAMPFIRE_MOVE_TOP),
       underY: topY(seed, x, z, 0),
     });
-  for (const [x, z] of PROPS.mudHuts)
-    out.push({
-      type: 'circle',
-      x,
-      z,
-      r: 1.1,
-      cameraTopY: topY(seed, x, z, 12.5),
-      underY: topY(seed, x, z, 0),
-    });
+  for (const [x, z] of PROPS.mudHuts) out.push(mudHutCollider(x, z, (h) => topY(seed, x, z, h)));
   for (const ruin of PROPS.ruinRings) {
     if (ruin.bare || ruin.columns <= 0) continue;
     // The renderer keeps every fourth column intact (a tall monolith) and

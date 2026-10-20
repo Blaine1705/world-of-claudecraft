@@ -1424,7 +1424,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for the painted towns merged over the art style integration tip:
   // the renderer and town runtime leaves moved. No capture was retaken.
-  '128772011a087e72efebcb9036b3af0349e6321c87eee86ee598940ac2893a6f';
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  '920aa3e032b0536ec1b5a897bf484db6fb73cfe3643b4d4edc09e45effc4f439';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1470,7 +1472,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for the painted towns merged over the art style integration tip:
   // the renderer and town runtime leaves moved. No capture was retaken.
-  'c77bf1ec90017237bb6fe88f581fe1521aff2f6613d46a5586ed74d20e18b82e';
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  '495276bfb295d7b4150fb18c87798bbe052d1749ac95b284b8225fd181f754cd';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2869,7 +2873,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
-    ).toBe('e3f6265dacb9bbbb3a826427b247aa2209649a7b83078f7135fdef6c01b697ca');
+      // The Mirefen mudfin huts: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+    ).toBe('354b97321e00f779893ec5c3e5dfc67e381c666ef26c96ac721c501932ec4302');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

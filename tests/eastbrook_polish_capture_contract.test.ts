@@ -727,7 +727,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for the painted towns merged over the art style integration tip:
   // the renderer and town runtime leaves moved. No capture was retaken.
-  'c77bf1ec90017237bb6fe88f581fe1521aff2f6613d46a5586ed74d20e18b82e';
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  '495276bfb295d7b4150fb18c87798bbe052d1749ac95b284b8225fd181f754cd';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

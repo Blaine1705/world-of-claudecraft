@@ -1042,7 +1042,10 @@ const MONOLITHS: MonolithRow[] = [
     // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
     // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
     // merged tree. Exact count.
-    ceiling: 12405,
+    // LOWERED 12405 -> 12400 with the torched mudfin hut fire: the burn cue's two
+    // inline bursts moved into hut_fire_fx.ts (the particle cloud owns and ticks it),
+    // leaving a one-line hand-off plus the light-pool hook. Same headroom as before.
+    ceiling: 12400,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -2379,7 +2382,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 2327 -> 2288 with the open Fenbridge: the palisade's
     // full-height wall arm and the gate-arch jamb block retired with the
     // ring. wc -l. Exact count.
-    ceiling: 2288,
+    // LOWERED 2288 -> 2281 with the Mirefen mudfin huts: the mud hut collider
+    // moved to mudfin_huts.ts mudHutCollider, beside the table the renderer
+    // draws the huts from. wc -l. Exact count.
+    ceiling: 2281,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

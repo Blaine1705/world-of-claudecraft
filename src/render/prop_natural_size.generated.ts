@@ -192,6 +192,8 @@ export const PROP_NATURAL_SIZE: Readonly<Record<string, PropNaturalSize>> = {
   lanternWall: { x: 0.3573, y: 1.337, z: 1.3022, cx: 0, cz: 0.6002, minY: 0.0818 },
   leafyFoxStatue: { x: 0.7071, y: 0.9818, z: 0.7067, cx: -0.0003, cz: -0.0007, minY: 0.0009 },
   marshReeds: { x: 0.6653, y: 0.998, z: 0.7555, cx: -0.0119, cz: 0.004, minY: 0.0029 },
+  mudfinHutA: { x: 5.2701, y: 4.7502, z: 5.2701, cx: 0, cz: 0, minY: -0.0001 },
+  mudfinHutB: { x: 4.9065, y: 6, z: 5.6689, cx: 0, cz: 0, minY: 0 },
   mushroomGiantPurple: { x: 0.8111, y: 0.9773, z: 0.8172, cx: 0.0009, cz: -0.0011, minY: -0.4895 },
   mushroomGlowCluster: { x: 0.7752, y: 0.9723, z: 0.8618, cx: 0, cz: 0.0013, minY: -0.489 },
   mushroomRed: { x: 0.174, y: 0.2028, z: 0.2009, cx: 0.0009, cz: 0.005, minY: -0.05 },
