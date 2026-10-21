@@ -256,6 +256,9 @@ export function buildFarmPatchProps(
   const group = new THREE.Group();
   group.name = 'farmPatches';
   const seats = new Map<string, FarmBedSeat>();
+  // The editor's live bed drag re-seats the crops through this same map
+  // (editor_api/moved_object_preview.ts), so a plot rebuilt later lands on it.
+  group.userData.farmBedSeats = seats;
   if (patches.length === 0) return { group, seats };
 
   const matrix = new THREE.Matrix4();

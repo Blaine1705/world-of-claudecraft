@@ -18,6 +18,8 @@ import { HOLLOW_CRYPT_ENTRANCE_DUNGEON_ID } from '../../sim/hollow_crypt_entranc
 import { SANCTUM_SEAL_GATE_DUNGEON_ID } from '../../sim/sanctum_seal_gate';
 import { SUNKEN_BASTION_ENTRANCE_DUNGEON_ID } from '../../sim/sunken_bastion_entrance';
 import { WILDHEART_BASIN_ENTRANCE_DUNGEON_ID } from '../../sim/wildheart_basin_entrance';
+import type { FarmBedSeat } from '../farm_patches';
+import { farmSeatAfterBedMove } from '../farm_patches_core';
 
 export type MovedObjectPreview =
   | {
@@ -53,6 +55,7 @@ const DOOR_SET_PIECE_GROUPS: Readonly<Record<string, string>> = {
 };
 
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
+const UP = new THREE.Vector3(0, 1, 0);
 
 /** The world transform that carries the `from` pose onto the `to` pose: about
  *  the base point, turn by the yaw change and resize by the size ratio, then
@@ -137,10 +140,47 @@ function editObject(
 }
 
 /**
+ * The crops growing in a dragged bed go with it. The farm visuals seat a plot
+ * from the renderer's bed-seat map (farm_patches.ts, reachable from the
+ * `farmPatches` group), so the seat is re-posed there: its position replaced
+ * and its orientation turned IN PLACE, because a drawn plot keeps that very
+ * quaternion and composes its idle sway onto it every frame. The drawn plot
+ * moves by the same delta, keeping its height above the soil. A deleted bed
+ * hides its crop; a restore shows it again.
+ */
+function reseatFarmCrops(
+  scene: THREE.Object3D,
+  bedId: string,
+  from: PreviewPose,
+  to: PreviewPose,
+  ground: (x: number, z: number) => number,
+): number {
+  const seats: Map<string, FarmBedSeat> | undefined =
+    scene.getObjectByName('farmPatches')?.userData.farmBedSeats;
+  const seat = seats?.get(bedId);
+  if (!seats || !seat) return 0;
+  const next = farmSeatAfterBedMove(seat, from, to, ground);
+  seat.quat.multiply(new THREE.Quaternion().setFromAxisAngle(UP, next.turn));
+  seats.set(bedId, { ...seat, x: next.x, y: next.y, z: next.z });
+  const plot = scene.getObjectByName(`farmPlot:${bedId}`);
+  if (!plot) return 0;
+  plot.position.set(
+    plot.position.x + next.x - seat.x,
+    plot.position.y + next.y - seat.y,
+    plot.position.z + next.z - seat.z,
+  );
+  plot.quaternion.copy(seat.quat);
+  plot.visible = to.removed !== true;
+  plot.updateMatrix();
+  plot.updateMatrixWorld(true);
+  return 1;
+}
+
+/**
  * Re-pose the drawn instance(s) of `target` from the `from` pose to the `to`
  * pose (ground height from `ground`). Returns how many objects or instances
  * changed, so a caller can tell a preview from a miss (a node the map does
- * not draw, a door with no set piece).
+ * not draw, a door with no set piece). A farm bed carries its growing crops.
  */
 export function shiftMovedObjectInScene(
   scene: THREE.Object3D,
@@ -190,5 +230,8 @@ export function shiftMovedObjectInScene(
       moved++;
     }
   });
+  if (target.kind === 'farmBed' && target.bedId !== undefined) {
+    moved += reseatFarmCrops(scene, target.bedId, from, to, ground);
+  }
   return moved;
 }
