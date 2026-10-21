@@ -54,6 +54,7 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
+import { HammerFx } from './smith_heart_fx';
 import { SummonRiseFx } from './summon_rise_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { TrashEngineFx } from './trash_engine_fx';
@@ -136,6 +137,9 @@ export class RiftDeathZoneVisuals {
   private readonly trashEngine: TrashEngineFx;
   // A boss's summoned dead rising as they land, in any zone (summon_rise_fx.ts).
   private readonly summonRise: SummonRiseFx;
+  // The Smith's Heart's Hammer guardian (Mountain's Wrath, Hammerfall) and the
+  // Slab breaking.
+  private readonly hammerFx: HammerFx;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -272,6 +276,7 @@ export class RiftDeathZoneVisuals {
     );
     this.trashEngine = new TrashEngineFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.summonRise = new SummonRiseFx(playGesture);
+    this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -349,6 +354,7 @@ export class RiftDeathZoneVisuals {
     this.sanctumBosses.update(dt);
     this.trashEngine.update(dt);
     this.summonRise.update(dt);
+    this.hammerFx.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -392,6 +398,7 @@ export class RiftDeathZoneVisuals {
     this.sanctumFx.dispose();
     this.sanctumBosses.dispose();
     this.trashEngine.dispose();
+    this.hammerFx.dispose();
     this.hoardPresentation.dispose();
   }
 
@@ -417,6 +424,7 @@ export class RiftDeathZoneVisuals {
     const sanctumBoss = this.sanctumBosses.handleEvent(event);
     const engine = this.trashEngine.handleEvent(event);
     this.summonRise.handleEvent(event);
+    this.hammerFx.handleEvent(event);
     return (
       this.bastionFx.handleEvent(event) ||
       temple ||
