@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { CLASS_ROLES } from '../server/pbe_boost';
 import { DEV_KIT_ROLES } from '../src/sim/content/dev_kit_roles';
 import { MEMBERSHIP_ARMOUR_SLOTS, MEMBERSHIP_WEAPON_ID } from '../src/sim/content/membership';
-import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import { SPEC_PRIMARY_STAT, type SpecPrimaryStat } from '../src/sim/content/spec_primary_stat';
 import { classSpecs, TALENTS } from '../src/sim/content/talents';
 import { ITEMS } from '../src/sim/data';
@@ -15,7 +14,9 @@ import type { Aura, AuraKind, PlayerClass } from '../src/sim/types';
 // the Vanguard sets, the dev kit weights, the raid loot plan) because each gear
 // table carried its own copy of "what this spec wants". SPEC_PRIMARY_STAT is the
 // one answer; this file re-derives it from the live stat path and holds every
-// per-spec stat table to it.
+// per-spec stat table to it. The Season 2 Vanguard sets are fixed and pinned on
+// the main line (tests/warfare_season2.test.ts) and join this guard once main is
+// merged into this branch.
 
 const CLASSES = Object.keys(TALENTS) as PlayerClass[];
 type Stats = Readonly<Partial<Record<string, number>>> | undefined;
@@ -122,14 +123,6 @@ describe('every per-spec stat table leads with SPEC_PRIMARY_STAT', () => {
       // Across the worn kit the primary leads outright.
       expect(leading(total), `${cls}/${spec} kit`).toBe(primary);
     });
-  });
-
-  it('the Season 2 Vanguard sets', () => {
-    expect(SEASON2_SETS).toHaveLength(27);
-    for (const set of SEASON2_SETS) {
-      const primary = SPEC_PRIMARY_STAT[set.cls as PlayerClass][set.spec];
-      for (const id of set.itemIds) expect(leading(ITEMS[id].stats), id).toBe(primary);
-    }
   });
 
   it('the quest reward, dev kit and PBE boost weights', () => {
