@@ -140,15 +140,17 @@ def cut_benches(f, rng, x0, x1, z_top, z_bot, depth, bench=0.55, proud=0.25, not
             f.put(bed, prim, 0.0)
             prims.append(prim)
         # A boss of harder rock standing out of the lift (never on a rim).
-        if front_max is None and rng.random() < 0.5:
-            w = rng.uniform(1.6, 3.4)
+        # Wide and low, its own bed's tone (phase 2D: tall rounded ones, the
+        # same at every module, read as rows of headstones across the pit).
+        if front_max is None and rng.random() < 0.3:
+            w = rng.uniform(2.8, 5.0)
             bx = rng.uniform(x0 + w / 2, x1 - w / 2)
-            out = rng.uniform(0.3, 0.7)
-            h = (zt - zb) * rng.uniform(0.45, 0.85)
-            bz = rng.uniform(zb + h / 2, zt - h / 2)
-            prim = block(rng, (bx, base_y - out + depth * 0.25, bz), (w, depth * 0.5, h), cuts=7,
-                         chamfer=(0.75, 0.93), R=gs.rot(rz=rng.uniform(-0.15, 0.15)))
-            f.put(NEAR_TONES[bed][int(rng.integers(2))], prim, 0.15)
+            out = rng.uniform(0.25, 0.5)
+            h = (zt - zb) * rng.uniform(0.3, 0.5)
+            bz = zb + h / 2
+            prim = block(rng, (bx, base_y - out + depth * 0.25, bz), (w, depth * 0.5, h), cuts=5,
+                         chamfer=(0.88, 0.97), R=gs.rot(rz=rng.uniform(-0.06, 0.06)))
+            f.put(bed, prim, 0.15)
             prims.append(prim)
         # The overhang: the top lift's brink jutting out over a shadowed undercut.
         if i == 0 and rng.random() < overhang:
@@ -258,9 +260,12 @@ def foot_spoil(p, rng, x0, x1, z_bot, y_foot):
     for k in range(rng.randint(4, 7)):
         s = rng.uniform(0.45, 1.5)
         x = rng.uniform(x0 + 0.5, x1 - 0.5)
-        crystal(p, (x, y_foot - rng.uniform(0.3, 1.8), z_bot + s * 0.3), (s * 1.4, s, s * 0.75),
-                p.vary(QUARRY if k % 3 else QUARRY_PALE, 0.06), n=14, boxy=0.4, jitter=0.15,
-                yaw=rng.uniform(0, TAU), pitch=rng.uniform(-0.4, 0.4), floor=z_bot)
+        # Lying where they fell, broken and low (phase 2D: stood up, the
+        # same few blocks at every module's foot read as rows of headstones).
+        crystal(p, (x, y_foot - rng.uniform(0.3, 1.8), z_bot + s * 0.16), (s * 1.3, s * 1.1, s * 0.5),
+                p.vary(QUARRY if k % 3 else QUARRY_PALE, 0.06), n=14, boxy=0.55, jitter=0.28,
+                yaw=rng.uniform(0, TAU), pitch=rng.uniform(-0.15, 0.15), roll=rng.uniform(-0.15, 0.15),
+                floor=z_bot)
     # A talus of fine spoil along the foot, in heaps.
     x = x0 + rng.uniform(0.3, 1.2)
     while x < x1 - 1.0:
