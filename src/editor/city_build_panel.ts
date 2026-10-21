@@ -3,7 +3,7 @@
 // snap), and each subtool's controls. Pure DOM consumer over an injected deps
 // bag; all state lives in the app (the panel is rebuilt by inspector.refresh).
 
-import { type TranslationKey, t } from '../ui/i18n';
+import { formatNumber, type TranslationKey, t } from '../ui/i18n';
 import {
   CITY_GRID_SIZES,
   CITY_ROT_SNAPS,
@@ -11,8 +11,20 @@ import {
   WALL_STYLES,
 } from './city_build_core';
 import { button, checkbox, el, selectRow, slider } from './dom';
+import type { RoadRef } from './road_edit_core';
 
 export type CitySubtool = 'kit' | 'wall' | 'road' | 'prefab' | 'route';
+
+/** The road selected in the Roads tab's Edit mode. */
+export interface CityRoadSelection {
+  ref: RoadRef;
+  label: string;
+  points: number;
+  /** The held waypoint (0-based), or null. */
+  waypoint: number | null;
+  /** A legacy road this map changed (Reset puts it back). */
+  edited: boolean;
+}
 
 export interface CityBuildPanelDeps {
   getSubtool(): CitySubtool;
@@ -54,6 +66,15 @@ export interface CityBuildPanelDeps {
   cancelRoad(): void;
   roadList(): { id: string; label: string; points: number }[];
   deleteRoad(id: string): void;
+  getRoadMode(): 'draw' | 'edit';
+  setRoadMode(mode: 'draw' | 'edit'): void;
+  roadSelection(): CityRoadSelection | null;
+  selectRoad(ref: RoadRef): void;
+  deleteRoadPoint(): void;
+  removeSelectedRoad(): void;
+  /** Put a legacy road back as the map stores it (moved or removed). */
+  resetRoad(index: number): void;
+  builtinRoadList(): { index: number; label: string; state: 'default' | 'edited' | 'removed' }[];
   // Prefabs
   prefabList(): { name: string; count: number }[];
   savePrefab(name: string): boolean;
@@ -279,61 +300,23 @@ export function buildCityBuildPanel(deps: CityBuildPanelDeps, refresh: () => voi
       break;
     }
     case 'road': {
+      const mode = deps.getRoadMode();
       root.appendChild(
         selectRow(
-          t('editor.city.roadType'),
+          t('editor.city.roadMode'),
           [
-            { value: 'road', label: t('editor.city.roadTypeRoad') },
-            { value: 'path', label: t('editor.city.roadTypePath') },
+            { value: 'draw', label: t('editor.city.roadModeDraw') },
+            { value: 'edit', label: t('editor.city.roadModeEdit') },
           ],
-          deps.getRoadKind(),
-          (v) => deps.setRoadKind(v === 'path' ? 'path' : 'road'),
+          mode,
+          (v) => {
+            deps.setRoadMode(v === 'edit' ? 'edit' : 'draw');
+            refresh();
+          },
         ).root,
       );
-      root.appendChild(hint(t('editor.city.roadDrawing')));
-      if (deps.roadPointCount() > 0) {
-        const row = el('div', 'ed-row');
-        row.appendChild(
-          button(
-            t('editor.city.roadFinish'),
-            () => {
-              deps.finishRoad();
-              refresh();
-            },
-            'primary small',
-          ),
-        );
-        row.appendChild(
-          button(
-            t('editor.city.roadCancel'),
-            () => {
-              deps.cancelRoad();
-              refresh();
-            },
-            'small',
-          ),
-        );
-        root.appendChild(row);
-      }
-      const roads = deps.roadList();
-      if (roads.length > 0) {
-        root.appendChild(el('h3', 'ed-subtitle', t('editor.city.roadList')));
-        for (const road of roads) {
-          const row = el('div', 'ed-row');
-          row.appendChild(el('span', 'ed-chosen', road.label));
-          row.appendChild(
-            button(
-              t('editor.city.roadDelete'),
-              () => {
-                deps.deleteRoad(road.id);
-                refresh();
-              },
-              'small',
-            ),
-          );
-          root.appendChild(row);
-        }
-      }
+      if (mode === 'edit') buildRoadEditSection(root, deps, refresh);
+      else buildRoadDrawSection(root, deps, refresh);
       root.appendChild(hint(t('editor.city.roadHint')));
       break;
     }
@@ -465,4 +448,174 @@ export function buildCityBuildPanel(deps: CityBuildPanelDeps, refresh: () => voi
     }
   }
   return root;
+}
+
+function buildRoadDrawSection(
+  root: HTMLElement,
+  deps: CityBuildPanelDeps,
+  refresh: () => void,
+): void {
+  root.appendChild(
+    selectRow(
+      t('editor.city.roadType'),
+      [
+        { value: 'road', label: t('editor.city.roadTypeRoad') },
+        { value: 'path', label: t('editor.city.roadTypePath') },
+      ],
+      deps.getRoadKind(),
+      (v) => deps.setRoadKind(v === 'path' ? 'path' : 'road'),
+    ).root,
+  );
+  root.appendChild(hint(t('editor.city.roadDrawing')));
+  if (deps.roadPointCount() > 0) {
+    const row = el('div', 'ed-row');
+    row.appendChild(
+      button(
+        t('editor.city.roadFinish'),
+        () => {
+          deps.finishRoad();
+          refresh();
+        },
+        'primary small',
+      ),
+    );
+    row.appendChild(
+      button(
+        t('editor.city.roadCancel'),
+        () => {
+          deps.cancelRoad();
+          refresh();
+        },
+        'small',
+      ),
+    );
+    root.appendChild(row);
+  }
+  const roads = deps.roadList();
+  if (roads.length > 0) {
+    root.appendChild(el('h3', 'ed-subtitle', t('editor.city.roadList')));
+    for (const road of roads) {
+      const row = el('div', 'ed-row');
+      row.appendChild(el('span', 'ed-chosen', road.label));
+      row.appendChild(
+        button(
+          t('editor.city.roadDelete'),
+          () => {
+            deps.deleteRoad(road.id);
+            refresh();
+          },
+          'small',
+        ),
+      );
+      root.appendChild(row);
+    }
+  }
+}
+
+function buildRoadEditSection(
+  root: HTMLElement,
+  deps: CityBuildPanelDeps,
+  refresh: () => void,
+): void {
+  root.appendChild(hint(t('editor.city.roadEditHint')));
+  const sel = deps.roadSelection();
+  if (sel) {
+    root.appendChild(el('p', 'ed-chosen', t('editor.city.roadEditing', { name: sel.label })));
+    root.appendChild(hint(t('editor.city.roadWaypoints', { n: formatNumber(sel.points) })));
+    if (sel.waypoint !== null) {
+      root.appendChild(
+        hint(t('editor.city.roadWaypointHeld', { n: formatNumber(sel.waypoint + 1) })),
+      );
+    }
+    const row = el('div', 'ed-row');
+    const delPoint = button(
+      t('editor.city.roadDeletePoint'),
+      () => {
+        deps.deleteRoadPoint();
+        refresh();
+      },
+      'small',
+    );
+    delPoint.disabled = sel.waypoint === null || sel.points <= 2;
+    row.appendChild(delPoint);
+    row.appendChild(
+      button(
+        t('editor.city.roadRemove'),
+        () => {
+          deps.removeSelectedRoad();
+          refresh();
+        },
+        'small',
+      ),
+    );
+    const ref = sel.ref;
+    if (ref.kind === 'builtin' && sel.edited) {
+      row.appendChild(
+        button(
+          t('editor.city.roadReset'),
+          () => {
+            deps.resetRoad(ref.index);
+            refresh();
+          },
+          'small',
+        ),
+      );
+    }
+    root.appendChild(row);
+    if (ref.kind === 'builtin') root.appendChild(hint(t('editor.city.roadBuiltinNote')));
+  } else {
+    root.appendChild(hint(t('editor.city.roadEditNone')));
+  }
+
+  const authored = deps.roadList();
+  if (authored.length > 0) {
+    root.appendChild(el('h3', 'ed-subtitle', t('editor.city.roadList')));
+    for (const road of authored) {
+      root.appendChild(
+        roadRow(road.label, t('editor.city.roadSelect'), () => {
+          deps.selectRoad({ kind: 'authored', id: road.id });
+          refresh();
+        }),
+      );
+    }
+  }
+  const builtin = deps.builtinRoadList();
+  if (builtin.length > 0) {
+    const details = document.createElement('details');
+    // Keep the list open while the maker works through it (a select or a
+    // restore rebuilds the panel).
+    if (sel?.ref.kind === 'builtin' || builtin.some((r) => r.state !== 'default')) {
+      details.open = true;
+    }
+    details.appendChild(
+      el('summary', undefined, t('editor.city.roadWorldList', { n: formatNumber(builtin.length) })),
+    );
+    for (const road of builtin) {
+      const label =
+        road.state === 'edited'
+          ? t('editor.city.roadBuiltinEdited', { name: road.label })
+          : road.state === 'removed'
+            ? t('editor.city.roadBuiltinRemoved', { name: road.label })
+            : road.label;
+      details.appendChild(
+        road.state === 'removed'
+          ? roadRow(label, t('editor.city.roadRestore'), () => {
+              deps.resetRoad(road.index);
+              refresh();
+            })
+          : roadRow(label, t('editor.city.roadSelect'), () => {
+              deps.selectRoad({ kind: 'builtin', index: road.index });
+              refresh();
+            }),
+      );
+    }
+    root.appendChild(details);
+  }
+}
+
+function roadRow(label: string, action: string, onClick: () => void): HTMLElement {
+  const row = el('div', 'ed-row');
+  row.appendChild(el('span', 'ed-chosen', label));
+  row.appendChild(button(action, onClick, 'small'));
+  return row;
 }

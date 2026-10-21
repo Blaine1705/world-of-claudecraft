@@ -16,7 +16,8 @@
 //    were made on, so a new stamp of mine that overlaps a stamp someone else
 //    added since the base is a conflict too (its result would differ from
 //    what either maker saw). Mine are applied after theirs;
-//  - NPCs and moved gameplay objects: by key;
+//  - NPCs, moved gameplay objects and moved or removed legacy roads: by key;
+//  - authored roads: by id;
 //  - painted ground: cell by cell when the paint grids line up;
 //  - everything else (zones, camps, lighting, water, roads, ...): field by
 //    field, whole values.
@@ -33,6 +34,8 @@ export type MapChangeKind =
   | 'grassClear'
   | 'npc'
   | 'objectMove'
+  | 'road'
+  | 'roadEdit'
   | 'paint'
   | 'field';
 
@@ -119,7 +122,19 @@ function mergeKeyed<T>(
     const b = bm.get(k);
     const m = mm.get(k);
     if (b === undefined) {
-      out.push(t); // theirs added it
+      // Theirs added it. A key both sides added (a record keyed by what it
+      // edits: the same built-in object moved, the same legacy road
+      // reshaped) differently is a clash, not theirs by default.
+      if (m !== undefined && !same(m, t)) {
+        tally.changed = true;
+        if (tally.mineWins) {
+          out.push(m);
+          tally.count(kind, 'changed');
+        } else {
+          tally.conflict(kind, k, 'both');
+          out.push(t);
+        }
+      } else out.push(t);
       continue;
     }
     if (m === undefined) {
@@ -306,6 +321,8 @@ const KEYED_DOC_KEYS = new Set([
   'terrainEdits',
   'grassClear',
   'objectMoves',
+  'roadDefs',
+  'roadEdits',
   'biomePaint',
 ]);
 
@@ -377,6 +394,30 @@ export function mergeMapChanges(
   );
   if (moves && Object.keys(moves).length > 0) merged.objectMoves = moves;
   else delete merged.objectMoves;
+  const roads = mergeKeyed(
+    'road',
+    base.roadDefs ?? [],
+    mine.roadDefs ?? [],
+    theirs.roadDefs ?? [],
+    (r) => r.id,
+    tally,
+  );
+  if (roads.length > 0) merged.roadDefs = roads;
+  else delete merged.roadDefs;
+  const roadEdits = mergeRecord(
+    'roadEdit',
+    base.roadEdits,
+    mine.roadEdits,
+    theirs.roadEdits,
+    tally,
+  );
+  if (roadEdits && Object.keys(roadEdits).length > 0) merged.roadEdits = roadEdits;
+  else delete merged.roadEdits;
+  // Road edits name the legacy roads by index: if someone else changed that
+  // table since the base, my edits could land on different roads.
+  if (!same(base.roadEdits, mine.roadEdits) && !same(base.content.roads, theirs.content.roads)) {
+    tally.conflict('roadEdit', 'content.roads', 'both');
+  }
   const paint = mergePaint(base.biomePaint, mine.biomePaint, theirs.biomePaint, tally);
   if (paint) merged.biomePaint = paint;
   else delete merged.biomePaint;

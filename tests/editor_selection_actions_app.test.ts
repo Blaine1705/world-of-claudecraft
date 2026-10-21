@@ -64,6 +64,7 @@ function harness(placements: AssetPlacement[]): AppHarness {
   return Object.assign(Object.create(EditorApp.prototype), {
     // This repo's movable gameplay objects (dummies) share the undo flush.
     objectMoves: { commitPending: () => {}, selectedKey: null },
+    roadEdit: { endDrag: () => {} },
     map: { placements, buildings: [], meta: { seed: 1, updatedAt: 0 } },
     selectedPlacement: 0,
     selectedSet: new Set([0]),

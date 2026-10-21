@@ -47,6 +47,7 @@ import { assetById } from './asset_catalog.generated';
 import { FEATURE_PROMOTIONS } from './feature_prop_placements';
 import { isLocalAssetId, localAssetUrl } from './local_assets';
 import type { ZoneContent } from './model';
+import { applyRoadEdits } from './road_edit_core';
 import { userAssetPath } from './user_assets';
 import {
   decorPropPlacements,
@@ -490,11 +491,12 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     camps: deepClone(map.content.camps as WorldContent['camps']),
     npcs: deepClone(map.content.npcs as WorldContent['npcs']),
     groundObjects: deepClone(map.content.objects as WorldContent['groundObjects']),
-    roads: deepClone(
-      (map.roadDefs?.length
-        ? [...(map.content.roads ?? BUILTIN_WORLD.roads), ...map.roadDefs.map((def) => def.points)]
-        : (map.content.roads ?? BUILTIN_WORLD.roads)) as WorldContent['roads'],
-    ),
+    // The legacy roads with this map's moves and removals applied, then the
+    // authored roads: the same table the editor viewport builds.
+    roads: deepClone([
+      ...applyRoadEdits(map.content.roads ?? BUILTIN_WORLD.roads, map.roadEdits),
+      ...(map.roadDefs ?? []).map((def) => def.points),
+    ] as WorldContent['roads']),
     // clonePropsWithoutEastbrookLayout already returns an independent clone, so
     // it replaces the deepClone the fork branches used to take.
     props:
@@ -659,7 +661,7 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
     ] as WorldContent['groundObjects'],
     roads: [
       ...deepClone(BUILTIN_WORLD.roads),
-      ...(map.content.roads ?? []).map((road) =>
+      ...applyRoadEdits(map.content.roads ?? [], map.roadEdits).map((road) =>
         road.map((pt) => ({ x: pt.x + ax, z: pt.z + az })),
       ),
       ...(map.roadDefs ?? []).map((def) =>

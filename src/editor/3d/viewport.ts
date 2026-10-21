@@ -3216,9 +3216,15 @@ export class Editor3DViewport {
   /**
    * Draw (or clear, with null/empty) the polyline being authored by the City
    * Build wall or road subtool: a dot per point and a terrain-draped line,
-   * with the last point optionally rubber-banded to the cursor.
+   * with the last point optionally rubber-banded to the cursor. The Roads
+   * tab's Edit mode passes bigger dots (its waypoint handles) and the held
+   * waypoint as `highlight`, drawn white and larger.
    */
-  setCityPathPreview(points: readonly { x: number; z: number }[] | null, color = 0xf3c96b): void {
+  setCityPathPreview(
+    points: readonly { x: number; z: number }[] | null,
+    color = 0xf3c96b,
+    opts: { highlight?: number | null; dotRadius?: number } = {},
+  ): void {
     if (this.cityPathGroup) {
       this.renderer?.scene.remove(this.cityPathGroup);
       this.cityPathGroup.traverse((o) => {
@@ -3233,15 +3239,20 @@ export class Editor3DViewport {
     const g = new THREE.Group();
     g.name = 'editor-city-path';
     const lift = 0.5;
-    const dotGeo = new THREE.SphereGeometry(0.45, 10, 8);
+    const dotGeo = new THREE.SphereGeometry(opts.dotRadius ?? 0.45, 10, 8);
     const dotMat = new THREE.MeshBasicMaterial({
       color,
       depthWrite: false,
       userData: { noWireframe: true },
     });
-    for (const p of points) {
-      const dot = new THREE.Mesh(dotGeo.clone(), dotMat.clone());
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      const held = i === opts.highlight;
+      const mat = dotMat.clone();
+      if (held) mat.color.setHex(0xffffff);
+      const dot = new THREE.Mesh(dotGeo.clone(), mat);
       dot.position.set(p.x, terrainHeight(p.x, p.z, this.seed) + lift, p.z);
+      if (held) dot.scale.setScalar(1.5);
       dot.renderOrder = 3;
       g.add(dot);
     }
