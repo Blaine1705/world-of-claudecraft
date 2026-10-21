@@ -151,14 +151,21 @@ const FERAL_LOADOUT = {
 // way: wolf incoming 262 to 212, bear 157 to 126 (41 percent less, inside the
 // 30 to 42 percent bounds); its threat product and Marrowbreak snap stayed in
 // band.
+// RE-MEASURED 2026-10-21 for the tank probe's two incoming figures, at the
+// wander fix around those huts (an idle pick inside a hut wall is skipped for
+// one more pause, mob/locomotion.ts). No druid, combat or tuning code moved:
+// the murlocs' wander draws fork the shared stream again. Wolf incoming 212 to
+// 216, bear 126 to 139 (36 percent less, inside the 30 to 42 percent bounds);
+// its threat product (214.5) and Marrowbreak snap (1012.44) stayed in band, and
+// all three live-mob arms stayed inside their bands, so they are unchanged.
 const LIVE_MOB_MEASURED = {
   moongrove: { damage: 5492, incomingDamage: 241, threat: 5493, payoffs: 7 },
   wildfang: { damage: 6389, incomingDamage: 213, threat: 7486.7135, payoffs: 10 },
   bruin: { damage: 2765, incomingDamage: 162, threat: 9243.19625, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {
-  wolfIncomingDamage: 212,
-  bruinIncomingDamage: 126,
+  wolfIncomingDamage: 216,
+  bruinIncomingDamage: 139,
   bruinMitigationPct: 0.35,
   bruinThreatFrom100Damage: 214.5,
   marrowbreakSnapThreat: 990.99,
@@ -268,7 +275,8 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     // The two incoming figures and the mitigation they imply are banded on
     // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less),
     // re-measured 2026-10-15 for the Fenbridge rebuild (wolf 262, bear 157)
-    // and 2026-10-20 for the solid Mirefen mudfin huts (wolf 212, bear 126):
+    // and 2026-10-20 for the solid Mirefen mudfin huts (wolf 212, bear 126),
+    // then 2026-10-21 for the wander fix around them (wolf 216, bear 139):
     // the drift the audit read (bear +12 percent) reds on the bear figure.
     const [wolfLo, wolfHi] = within(BRUIN_TANK_MEASURED.wolfIncomingDamage);
     expect(result.wolfIncomingDamage).toBeGreaterThanOrEqual(wolfLo);
