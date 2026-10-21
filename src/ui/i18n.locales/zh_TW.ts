@@ -5122,7 +5122,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '融入周圍環境：敵人幾乎察覺不到你，你以 80% 的速度移動。攻擊或受到傷害會打破戰術偽裝。再次施放即可解除。（野戰技藝）',
   'entities.abilities.play_dead.name': '裝死',
   'entities.abilities.play_dead.description':
-    '倒地裝死：所有人看到你的生命值和集中值都為空。敵人會遺忘你，正以你為目標的敵方玩家會失去目標。移動、攻擊或使用其他技能都會結束裝死。再次施放即可起身。',
+    '倒地裝死：所有人看到你的生命值和集中值都為空。敵人會遺忘你，正以你為目標的敵方玩家會失去目標。移動、攻擊或使用其他技能都會結束裝死。若在移動中施放，你有 1 秒時間停下，否則移動會結束裝死。再次施放即可起身。',
   'entities.abilities.holy_shock.name': '聖光震顫',
   'entities.abilities.holy_shock.description':
     '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
@@ -15066,7 +15066,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '擲出飛刀鞭笞6碼內的所有敵人，造成{damage}點物理傷害，並獲得2個連擊點。（潛行者天賦）',
   'entities.abilities.flurry_of_knives.name': '刀刃亂舞',
   'entities.abilities.frostjaw_trap.description':
-    '在選中的敵人處或腳下放置已啟動的陷阱。它會定身第一個觸發的敵人，並減速附近敵人。',
+    '在選定位置放置一個陷阱。陷阱在 0.75 秒後啟動，持續 1 分鐘，只有你和你的隊伍能看見。第一個觸發陷阱的敵人會被定身 3 秒，4 碼內的敵人會被減速 50%，持續 4 秒。',
   'entities.abilities.frostjaw_trap.name': '霜顎陷阱',
   'entities.abilities.funeral_harvest.description':
     '當一個近期被你或你的亡靈傷害過的敵人死亡時，你獲得1枚靈魂碎片。每3秒最多觸發一次。',
@@ -18668,4 +18668,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '纏縛根鬚的施法時間縮短0.5秒。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': '捕熊陷阱',
+  'entities.abilities.bear_trap.description':
+    '在選定位置放置一個陷阱。陷阱在 0.75 秒後啟動，持續 1 分鐘，只有你和你的隊伍能看見。第一個觸發陷阱的敵人會被捕熊夾咬住：在 15 秒內流血，受到 83 點物理傷害外加你 22.5% 遠程攻擊強度的傷害，並被減速 50%，持續 4 秒。',
+  'entities.abilities.scatterbolt.name': '散射弩箭',
+  'entities.abilities.scatterbolt.description':
+    '向前方 8 碼錐形範圍內射出一片弩箭，將命中的每個敵人擊退，直到其距離你 20 碼。不造成傷害。',
+  'entities.abilities.phosphor_flask.name': '磷火瓶',
+  'entities.abilities.phosphor_flask.description':
+    '一個密封容器，裝有活性化學混合物，會在 8 碼範圍內爆發出白熱火焰，持續 3 秒。站在火焰中的敵人每 0.5 秒受到 {damage} 點火焰傷害。傷害隨遠程攻擊強度提升。',
 };

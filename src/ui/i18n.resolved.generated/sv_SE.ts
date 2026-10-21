@@ -13109,8 +13109,8 @@ export const sv_SE: EnTranslations = {
         "description": "Låter pilar regna över ett område på 8 m i 3 sek. Fiender i området tar {damage} Fysisk skada var 0.5 sek. Skadan ökar med anfallskraft på avstånd."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Fosforflaska",
+        "description": "Ett förseglat kärl med en reaktiv kemisk blandning som flammar upp i vitglödande eld över ett område på 8 m i 3 sek. Fiender som står i lågorna tar {damage} eldskada var 0,5 sek. Skadan ökar med distansattackkraft."
       },
       "pack_command": {
         "name": "Flockbefallning",
@@ -13157,24 +13157,24 @@ export const sv_SE: EnTranslations = {
         "description": "Minskar skadan du tar med 60% i 8 sek, men hindrar attacker medan den är aktiv."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Spela död",
+        "description": "Fall till marken och se död ut: din hälsa och ditt fokus visas som tomma för alla. Fiender glömmer dig, och fientliga spelare som har dig som mål tappar sitt mål. Att röra dig, attackera eller använda en annan förmåga avslutar den. Kastas den medan du rör dig har du 1 sek på dig att stanna innan rörelsen avslutar den. Kasta igen för att resa dig."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktiskt kamouflage",
+        "description": "Smält in i omgivningen: fiender märker dig knappt, och du rör dig med 80% hastighet. Att attackera eller ta skada bryter Taktiskt kamouflage. Kasta igen för att kliva ut. (Fältkonst)"
       },
       "frostjaw_trap": {
         "name": "Frostkäftsfälla",
-        "description": "Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek."
+        "description": "Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Björnfälla",
+        "description": "Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den drabbas när björnfällan slår igen: den blöder för 83 fysisk skada plus 22,5% av din distansattackkraft över 15 sek och saktas ned med 50% i 4 sek."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Spridbult",
+        "description": "Avfyra en kaskad av bultar i en kon på 8 meter framför dig, som slår tillbaka varje träffad fiende tills den är 20 meter från dig. Gör ingen skada."
       },
       "pack_rally": {
         "name": "Flocksamling",

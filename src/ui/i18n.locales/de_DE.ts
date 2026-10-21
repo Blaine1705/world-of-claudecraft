@@ -15044,7 +15044,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passiv: Pfadbruch erneuert den Jagdschwung und bereitet 12 Sek. lang Euren nächsten Weidschlag oder Bluthaken vor. Der Weidschlag verursacht pro Stapel 15% mehr Schaden. Der Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% pro Stapel und durch Eure Distanzangriffskraft. Bei 3 Stapeln verbraucht einer der beiden Angriffe den Jagdschwung. (Feldkunst)',
   'entities.abilities.frostjaw_trap.description':
-    'Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
+    'Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
   'entities.abilities.hunting_momentum.description':
     'Passiv: Der Weidschlag gewährt 8 Sek. lang 1 Jagdschwung, bis zu 3. Bei 3 Stapeln verursacht Wundriss 45% mehr Schlagschaden und verbraucht die Stapel. (Feldkunst)',
   'entities.abilities.measured_shot.description':
@@ -20214,4 +20214,20 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Bärenfalle',
+  'entities.abilities.bear_trap.description':
+    'Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird von der zuschnappenden Bärenfalle erfasst: Er blutet über 15 Sek. für 83 physischen Schaden plus 22,5% Eurer Distanzangriffskraft und wird 4 Sek. lang um 50% verlangsamt.',
+  'entities.abilities.scatterbolt.name': 'Streubolzen',
+  'entities.abilities.scatterbolt.description':
+    'Feuert eine Bolzensalve in einem Kegel von 8 Metern vor Euch ab und stößt jeden getroffenen Gegner zurück, bis er 20 Meter von Euch entfernt ist. Verursacht keinen Schaden.',
+  'entities.abilities.phosphor_flask.name': 'Phosphorflasche',
+  'entities.abilities.phosphor_flask.description':
+    'Ein versiegeltes Gefäß mit einer reaktiven Chemikalienmischung, die 3 Sek. lang über einen Bereich von 8 m in weißglühende Flammen aufgeht. Gegner in den Flammen erleiden alle 0,5 Sek. {damage} Feuerschaden. Der Schaden steigt mit der Distanzangriffskraft.',
+  'entities.abilities.play_dead.name': 'Totstellen',
+  'entities.abilities.play_dead.description':
+    'Lässt Euch zu Boden fallen und tot erscheinen: Eure Gesundheit und Euer Fokus werden für alle als leer angezeigt. Gegner vergessen Euch, und gegnerische Spieler, die Euch anvisieren, verlieren ihr Ziel. Bewegen, Angreifen oder der Einsatz einer anderen Fähigkeit beendet den Effekt. Wirkt Ihr es in Bewegung, habt Ihr 1 Sek. Zeit, anzuhalten, bevor die Bewegung es beendet. Erneut wirken, um aufzustehen.',
+  'entities.abilities.tactical_camo.name': 'Taktische Tarnung',
+  'entities.abilities.tactical_camo.description':
+    'Lässt Euch mit Eurer Umgebung verschmelzen: Gegner bemerken Euch kaum, und Ihr bewegt Euch mit 80% Tempo. Angreifen oder Schaden erleiden bricht Taktische Tarnung. Erneut wirken, um herauszutreten. (Feldkunst)',
 };

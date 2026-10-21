@@ -5342,7 +5342,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '周囲に溶け込む。敵にほとんど気づかれず、移動速度は80%になる。攻撃するかダメージを受けると戦術迷彩は解除される。再使用で解除する。（野戦術）',
   'entities.abilities.play_dead.name': '死んだふり',
   'entities.abilities.play_dead.description':
-    '地面に倒れて死んだふりをする。体力と集中値は全員に空として表示される。敵はあなたを忘れ、あなたをターゲットしている敵プレイヤーはターゲットを失う。移動、攻撃、または他のアビリティの使用で終了する。再使用で起き上がる。',
+    '地面に倒れて死んだふりをする。体力と集中値は全員に空として表示される。敵はあなたを忘れ、あなたをターゲットしている敵プレイヤーはターゲットを失う。移動、攻撃、または他のアビリティの使用で終了する。移動中に使用した場合、1秒以内に止まらないと移動によって終了する。再使用で起き上がる。',
   'entities.abilities.holy_shock.name': 'ライトジョルト',
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
@@ -15799,7 +15799,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '投げナイフで6ヤード以内のすべての敵を切り裂き、{damage}の物理ダメージを与え、コンボポイントを2獲得する。（ローグのタレント）',
   'entities.abilities.flurry_of_knives.name': '短剣乱舞',
   'entities.abilities.frostjaw_trap.description':
-    '選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。',
+    '選択した位置に罠を置きます。罠は0.75秒後に起動して1分間持続し、あなたとグループにしか見えません。最初に作動させた敵を3秒間足止めし、4ヤード以内の敵を4秒間、50%減速させます。',
   'entities.abilities.frostjaw_trap.name': '霜顎の罠',
   'entities.abilities.funeral_harvest.description':
     '自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。',
@@ -19623,4 +19623,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'トラバサミ',
+  'entities.abilities.bear_trap.description':
+    '選択した位置に罠を置きます。罠は0.75秒後に起動して1分間持続し、あなたとグループにしか見えません。最初に作動させた敵はトラバサミに挟まれて15秒かけて出血し、83の物理ダメージに加えて遠隔攻撃力の22.5%のダメージを受け、4秒間、50%減速します。',
+  'entities.abilities.scatterbolt.name': '拡散ボルト',
+  'entities.abilities.scatterbolt.description':
+    '前方8ヤードの円錐範囲にボルトを撃ち散らし、命中したすべての敵をあなたから20ヤード離れるまでノックバックします。ダメージは与えません。',
+  'entities.abilities.phosphor_flask.name': '燐火フラスコ',
+  'entities.abilities.phosphor_flask.description':
+    '反応性の化学混合物を封じた容器で、8ヤードの範囲に3秒間、白熱の炎を噴き上げます。炎の中にいる敵は0.5秒ごとに{damage}の火炎ダメージを受けます。ダメージは遠隔攻撃力とともに上がります。',
 };

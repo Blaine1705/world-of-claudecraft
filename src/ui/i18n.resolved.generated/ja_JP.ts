@@ -13109,8 +13109,8 @@ export const ja_JP: EnTranslations = {
         "description": "8ヤードの範囲へ3秒間、矢を降らせます。範囲内の敵は0.5秒ごとに{damage}の物理ダメージを受けます。ダメージは遠隔攻撃力とともに上がります。"
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "燐火フラスコ",
+        "description": "反応性の化学混合物を封じた容器で、8ヤードの範囲に3秒間、白熱の炎を噴き上げます。炎の中にいる敵は0.5秒ごとに{damage}の火炎ダメージを受けます。ダメージは遠隔攻撃力とともに上がります。"
       },
       "pack_command": {
         "name": "群れの指令",
@@ -13158,7 +13158,7 @@ export const ja_JP: EnTranslations = {
       },
       "play_dead": {
         "name": "死んだふり",
-        "description": "地面に倒れて死んだふりをする。体力と集中値は全員に空として表示される。敵はあなたを忘れ、あなたをターゲットしている敵プレイヤーはターゲットを失う。移動、攻撃、または他のアビリティの使用で終了する。再使用で起き上がる。"
+        "description": "地面に倒れて死んだふりをする。体力と集中値は全員に空として表示される。敵はあなたを忘れ、あなたをターゲットしている敵プレイヤーはターゲットを失う。移動、攻撃、または他のアビリティの使用で終了する。移動中に使用した場合、1秒以内に止まらないと移動によって終了する。再使用で起き上がる。"
       },
       "tactical_camo": {
         "name": "戦術迷彩",
@@ -13166,15 +13166,15 @@ export const ja_JP: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "霜顎の罠",
-        "description": "選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。"
+        "description": "選択した位置に罠を置きます。罠は0.75秒後に起動して1分間持続し、あなたとグループにしか見えません。最初に作動させた敵を3秒間足止めし、4ヤード以内の敵を4秒間、50%減速させます。"
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "トラバサミ",
+        "description": "選択した位置に罠を置きます。罠は0.75秒後に起動して1分間持続し、あなたとグループにしか見えません。最初に作動させた敵はトラバサミに挟まれて15秒かけて出血し、83の物理ダメージに加えて遠隔攻撃力の22.5%のダメージを受け、4秒間、50%減速します。"
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "拡散ボルト",
+        "description": "前方8ヤードの円錐範囲にボルトを撃ち散らし、命中したすべての敵をあなたから20ヤード離れるまでノックバックします。ダメージは与えません。"
       },
       "pack_rally": {
         "name": "群れの結集",

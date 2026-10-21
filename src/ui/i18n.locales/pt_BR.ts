@@ -16235,7 +16235,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passiva: Quebra-Trilha renova o Ímpeto de Caça e prepara seu próximo Golpe Estripador ou Gancho Sangrento por 12 s. O Golpe Estripador causa 15% mais dano por acúmulo. O Gancho Sangrento causa de 18 a 24 de dano Físico adicional, aumentado em 15% por acúmulo e pelo seu poder de ataque à distância. Com 3 acúmulos, qualquer um dos ataques consome o Ímpeto de Caça. (Perícia de Campo)',
   'entities.abilities.frostjaw_trap.description':
-    'Posiciona uma armadilha no inimigo selecionado ou aos seus pés. Ela arma após 0,75 s e dura 30 s. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s.',
+    'Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Passiva: o Golpe Estripador concede 1 de Ímpeto de Caça por 8 s, até 3. Com 3 acúmulos, o Rasga-Feridas causa 45% mais dano de golpe e consome os acúmulos. (Perícia de Campo)',
   'entities.abilities.measured_shot.description':
@@ -20037,4 +20037,20 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Armadilha de Urso',
+  'entities.abilities.bear_trap.description':
+    'Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar sofre com o fechamento da armadilha de urso: sangra por 83 de dano Físico mais 22,5% do seu poder de ataque à distância ao longo de 15 s e é lentificado em 50% por 4 s.',
+  'entities.abilities.scatterbolt.name': 'Leque de Virotes',
+  'entities.abilities.scatterbolt.description':
+    'Dispara uma rajada de virotes em um cone de 8 metros à sua frente, repelindo cada inimigo atingido até que ele esteja a 20 metros de você. Não causa dano.',
+  'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
+  'entities.abilities.phosphor_flask.description':
+    'Um recipiente selado com uma mistura química reativa que irrompe em chamas incandescentes sobre uma área de 8 m por 3 s. Os inimigos nas chamas sofrem {damage} de dano de Fogo a cada 0,5 s. O dano aumenta com o poder de ataque à distância.',
+  'entities.abilities.play_dead.name': 'Fingir de Morto',
+  'entities.abilities.play_dead.description':
+    'Cai no chão e finge estar morto: sua vida e seu foco aparecem vazios para todos. Os inimigos se esquecem de você, e jogadores inimigos que têm você como alvo perdem o alvo. Mover-se, atacar ou usar outra habilidade encerra o efeito. Se lançado em movimento, você tem 1 s para parar antes que o movimento o encerre. Lançar de novo faz você se levantar.',
+  'entities.abilities.tactical_camo.name': 'Camuflagem Tática',
+  'entities.abilities.tactical_camo.description':
+    'Mescla-se ao ambiente: os inimigos mal percebem você, e você se move a 80% da velocidade. Atacar ou sofrer dano interrompe a Camuflagem Tática. Lançar de novo faz você sair dela. (Perícia de Campo)',
 };

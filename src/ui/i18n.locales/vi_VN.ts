@@ -15863,7 +15863,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Bị động: Cắt Dấu làm mới Đà Săn và nạp sẵn Đòn Mổ Bụng hoặc Móc Máu kế tiếp trong 12 giây. Đòn Mổ Bụng gây thêm 15% sát thương mỗi lớp. Móc Máu gây thêm 18 đến 24 sát thương Vật Lý, tăng 15% mỗi lớp và theo sức tấn công tầm xa của bạn. Ở 3 lớp, một trong hai đòn sẽ tiêu Đà Săn. (Dã Chiến)',
   'entities.abilities.frostjaw_trap.description':
-    'Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
+    'Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
   'entities.abilities.hunting_momentum.description':
     'Bị động: Đòn Mổ Bụng ban 1 Đà Săn trong 8 giây, tối đa 3. Ở 3 lớp, Xé Thương gây thêm 45% sát thương đòn đánh và tiêu hết các lớp. (Dã Chiến)',
   'entities.abilities.measured_shot.description':
@@ -19845,4 +19845,20 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Bẫy Gấu',
+  'entities.abilities.bear_trap.description':
+    'Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị bẫy gấu kẹp chặt: chảy máu chịu 83 sát thương Vật Lý cộng 22.5% sức tấn công tầm xa của bạn trong 15 giây và bị làm chậm 50% trong 4 giây.',
+  'entities.abilities.scatterbolt.name': 'Tên Nỏ Tán Xạ',
+  'entities.abilities.scatterbolt.description':
+    'Bắn ra một loạt tên nỏ trong hình nón 8 mét phía trước bạn, đẩy lùi mọi kẻ địch trúng đòn cho đến khi chúng cách bạn 20 mét. Không gây sát thương.',
+  'entities.abilities.phosphor_flask.name': 'Bình Phốt Pho',
+  'entities.abilities.phosphor_flask.description':
+    'Một chiếc bình kín chứa hỗn hợp hóa chất phản ứng, bùng lên thành ngọn lửa trắng nóng rực trên một khu vực 8 mét trong 3 giây. Kẻ địch đứng trong lửa chịu {damage} sát thương Lửa mỗi 0.5 giây. Sát thương tăng theo sức tấn công tầm xa.',
+  'entities.abilities.play_dead.name': 'Giả Chết',
+  'entities.abilities.play_dead.description':
+    'Ngã xuống đất và trông như đã chết: sinh lực và Tập Trung của bạn hiển thị trống rỗng với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang nhắm vào bạn mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc hiệu ứng. Nếu thi triển khi đang di chuyển, bạn có 1 giây để dừng lại trước khi việc di chuyển kết thúc hiệu ứng. Thi triển lại để đứng dậy.',
+  'entities.abilities.tactical_camo.name': 'Ngụy Trang Chiến Thuật',
+  'entities.abilities.tactical_camo.description':
+    'Hòa mình vào môi trường xung quanh: kẻ địch hầu như không nhận ra bạn, và bạn di chuyển với 80% tốc độ. Tấn công hoặc chịu sát thương sẽ phá vỡ Ngụy Trang Chiến Thuật. Thi triển lại để thoát ra. (Dã Chiến)',
 };

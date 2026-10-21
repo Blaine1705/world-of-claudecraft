@@ -13109,8 +13109,8 @@ export const nl_NL: EnTranslations = {
         "description": "Laat 3 sec lang pijlen regenen over een gebied van 8 m. Vijanden in het gebied krijgen elke 0.5 sec {damage} Fysieke schade. De schade stijgt met de aanvalskracht op afstand."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Fosforfles",
+        "description": "Een verzegeld vat met een reactief chemisch mengsel dat 3 sec. lang uitbarst in witgloeiende vlammen over een gebied van 8 m. Vijanden in de vlammen krijgen elke 0,5 sec. {damage} Vuurschade. De schade stijgt met de afstandsaanvalskracht."
       },
       "pack_command": {
         "name": "Roedelbevel",
@@ -13157,24 +13157,24 @@ export const nl_NL: EnTranslations = {
         "description": "Vermindert de opgelopen schade 8 sec. lang met 60%, maar verhindert aanvallen zolang ze actief is."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Speel Dood",
+        "description": "Valt op de grond en lijkt dood: je gezondheid en focus worden voor iedereen als leeg weergegeven. Vijanden vergeten je, en vijandelijke spelers die je als doelwit hebben, verliezen hun doelwit. Bewegen, aanvallen of een andere vaardigheid gebruiken beëindigt het. Gebruik je het tijdens het bewegen, dan heb je 1 sec. om stil te staan voordat bewegen het beëindigt. Gebruik het opnieuw om op te staan."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Tactische Camouflage",
+        "description": "Gaat op in je omgeving: vijanden merken je nauwelijks op, en je beweegt op 80% snelheid. Aanvallen of schade oplopen verbreekt Tactische Camouflage. Gebruik het opnieuw om eruit te stappen. (Veldkunst)"
       },
       "frostjaw_trap": {
         "name": "Vorstkaakval",
-        "description": "Plaatst een val bij de gekozen vijand of aan je voeten. Hij scherpt na 0,75 sec. en duurt 30 sec. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd."
+        "description": "Plaatst een val op de gekozen locatie. Hij scherpt na 0,75 sec. en duurt 1 min, en alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Berenval",
+        "description": "Plaatst een val op de gekozen locatie. Hij scherpt na 0,75 sec. en duurt 1 min, en alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert, krijgt de dichtklappende berenval te verduren: hij bloedt 15 sec. lang voor 83 fysieke schade plus 22,5% van je afstandsaanvalskracht en wordt 4 sec. met 50% vertraagd."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Strooischicht",
+        "description": "Vuurt een waaier van schichten af in een kegel van 8 meter voor je, en slaat elke getroffen vijand terug tot hij 20 meter van je verwijderd is. Richt geen schade aan."
       },
       "pack_rally": {
         "name": "Roedelverzameling",

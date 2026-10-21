@@ -15977,7 +15977,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passiv: Spårbrott förnyar Jaktfarten och laddar ditt nästa Rensarslag eller Blodkrok i 12 sek. Rensarslaget gör 15% mer skada per stapel. Blodkroken gör 18 till 24 extra fysisk skada, ökad med 15% per stapel och av din distansattackkraft. Vid 3 staplar förbrukar endera attacken Jaktfarten. (Fältkonst)',
   'entities.abilities.frostjaw_trap.description':
-    'Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
+    'Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
   'entities.abilities.hunting_momentum.description':
     'Passiv: Rensarslaget ger 1 Jaktfart i 8 sek, upp till 3. Vid 3 staplar gör Sårslitning 45% mer slagskada och förbrukar staplarna. (Fältkonst)',
   'entities.abilities.measured_shot.description':
@@ -19781,4 +19781,20 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Björnfälla',
+  'entities.abilities.bear_trap.description':
+    'Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den drabbas när björnfällan slår igen: den blöder för 83 fysisk skada plus 22,5% av din distansattackkraft över 15 sek och saktas ned med 50% i 4 sek.',
+  'entities.abilities.scatterbolt.name': 'Spridbult',
+  'entities.abilities.scatterbolt.description':
+    'Avfyra en kaskad av bultar i en kon på 8 meter framför dig, som slår tillbaka varje träffad fiende tills den är 20 meter från dig. Gör ingen skada.',
+  'entities.abilities.phosphor_flask.name': 'Fosforflaska',
+  'entities.abilities.phosphor_flask.description':
+    'Ett förseglat kärl med en reaktiv kemisk blandning som flammar upp i vitglödande eld över ett område på 8 m i 3 sek. Fiender som står i lågorna tar {damage} eldskada var 0,5 sek. Skadan ökar med distansattackkraft.',
+  'entities.abilities.play_dead.name': 'Spela död',
+  'entities.abilities.play_dead.description':
+    'Fall till marken och se död ut: din hälsa och ditt fokus visas som tomma för alla. Fiender glömmer dig, och fientliga spelare som har dig som mål tappar sitt mål. Att röra dig, attackera eller använda en annan förmåga avslutar den. Kastas den medan du rör dig har du 1 sek på dig att stanna innan rörelsen avslutar den. Kasta igen för att resa dig.',
+  'entities.abilities.tactical_camo.name': 'Taktiskt kamouflage',
+  'entities.abilities.tactical_camo.description':
+    'Smält in i omgivningen: fiender märker dig knappt, och du rör dig med 80% hastighet. Att attackera eller ta skada bryter Taktiskt kamouflage. Kasta igen för att kliva ut. (Fältkonst)',
 };

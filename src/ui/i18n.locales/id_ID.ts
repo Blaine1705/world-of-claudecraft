@@ -15989,7 +15989,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasif: Putus Jejak menyegarkan Momentum Berburu dan menyiapkan Serangan Pembelah atau Kait Darah berikutnya selama 12 dtk. Serangan Pembelah memberi 15% lebih banyak kerusakan per tumpukan. Kait Darah memberi 18 sampai 24 kerusakan Fisik tambahan, meningkat 15% per tumpukan dan oleh kekuatan serang jarak jauhmu. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Kecakapan Lapangan)',
   'entities.abilities.frostjaw_trap.description':
-    'Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
+    'Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
   'entities.abilities.hunting_momentum.description':
     'Pasif: Serangan Pembelah memberi 1 Momentum Berburu selama 8 dtk, hingga 3. Pada 3 tumpukan, Robek Luka memberi 45% lebih banyak kerusakan serangan dan menghabiskan tumpukan. (Kecakapan Lapangan)',
   'entities.abilities.measured_shot.description':
@@ -20007,4 +20007,20 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Jerat Beruang',
+  'entities.abilities.bear_trap.description':
+    'Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terjepit jerat beruang yang menutup: ia berdarah sebesar 83 kerusakan Fisik ditambah 22,5% kekuatan serang jarak jauhmu selama 15 dtk dan diperlambat 50% selama 4 dtk.',
+  'entities.abilities.scatterbolt.name': 'Panah Sebar',
+  'entities.abilities.scatterbolt.description':
+    'Menembakkan semburan anak panah dalam kerucut 8 meter di depanmu, mendorong mundur setiap musuh yang terkena hingga berjarak 20 meter darimu. Tidak memberi kerusakan.',
+  'entities.abilities.phosphor_flask.name': 'Labu Fosfor',
+  'entities.abilities.phosphor_flask.description':
+    'Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh.',
+  'entities.abilities.play_dead.name': 'Pura-pura Mati',
+  'entities.abilities.play_dead.description':
+    'Menjatuhkan diri ke tanah dan tampak mati: nyawa dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target mereka. Bergerak, menyerang, atau menggunakan kemampuan lain mengakhirinya. Jika digunakan saat bergerak, kamu punya 1 dtk untuk berhenti sebelum gerakan mengakhirinya. Gunakan lagi untuk bangun.',
+  'entities.abilities.tactical_camo.name': 'Kamuflase Taktis',
+  'entities.abilities.tactical_camo.description':
+    'Membaur dengan sekitarmu: musuh nyaris tidak menyadarimu, dan kamu bergerak dengan kecepatan 80%. Menyerang atau menerima kerusakan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. (Kecakapan Lapangan)',
 };

@@ -15875,7 +15875,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passief: Spoorbreuk vernieuwt de Jachtvaart en maakt je volgende Weidslag of Bloedhaak 12 sec. gereed. De Weidslag richt per stapel 15% meer schade aan. De Bloedhaak richt 18 tot 24 extra fysieke schade aan, verhoogd met 15% per stapel en door je afstandsaanvalskracht. Bij 3 stapels verbruikt een van beide aanvallen de Jachtvaart. (Veldkunst)',
   'entities.abilities.frostjaw_trap.description':
-    'Plaatst een val bij de gekozen vijand of aan je voeten. Hij scherpt na 0,75 sec. en duurt 30 sec. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd.',
+    'Plaatst een val op de gekozen locatie. Hij scherpt na 0,75 sec. en duurt 1 min, en alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd.',
   'entities.abilities.hunting_momentum.description':
     'Passief: de Weidslag verleent 8 sec. lang 1 Jachtvaart, tot 3. Bij 3 stapels richt Wondscheur 45% meer slagschade aan en verbruikt de stapels. (Veldkunst)',
   'entities.abilities.measured_shot.description':
@@ -20032,4 +20032,20 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Berenval',
+  'entities.abilities.bear_trap.description':
+    'Plaatst een val op de gekozen locatie. Hij scherpt na 0,75 sec. en duurt 1 min, en alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert, krijgt de dichtklappende berenval te verduren: hij bloedt 15 sec. lang voor 83 fysieke schade plus 22,5% van je afstandsaanvalskracht en wordt 4 sec. met 50% vertraagd.',
+  'entities.abilities.scatterbolt.name': 'Strooischicht',
+  'entities.abilities.scatterbolt.description':
+    'Vuurt een waaier van schichten af in een kegel van 8 meter voor je, en slaat elke getroffen vijand terug tot hij 20 meter van je verwijderd is. Richt geen schade aan.',
+  'entities.abilities.phosphor_flask.name': 'Fosforfles',
+  'entities.abilities.phosphor_flask.description':
+    'Een verzegeld vat met een reactief chemisch mengsel dat 3 sec. lang uitbarst in witgloeiende vlammen over een gebied van 8 m. Vijanden in de vlammen krijgen elke 0,5 sec. {damage} Vuurschade. De schade stijgt met de afstandsaanvalskracht.',
+  'entities.abilities.play_dead.name': 'Speel Dood',
+  'entities.abilities.play_dead.description':
+    'Valt op de grond en lijkt dood: je gezondheid en focus worden voor iedereen als leeg weergegeven. Vijanden vergeten je, en vijandelijke spelers die je als doelwit hebben, verliezen hun doelwit. Bewegen, aanvallen of een andere vaardigheid gebruiken beëindigt het. Gebruik je het tijdens het bewegen, dan heb je 1 sec. om stil te staan voordat bewegen het beëindigt. Gebruik het opnieuw om op te staan.',
+  'entities.abilities.tactical_camo.name': 'Tactische Camouflage',
+  'entities.abilities.tactical_camo.description':
+    'Gaat op in je omgeving: vijanden merken je nauwelijks op, en je beweegt op 80% snelheid. Aanvallen of schade oplopen verbreekt Tactische Camouflage. Gebruik het opnieuw om eruit te stappen. (Veldkunst)',
 };

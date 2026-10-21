@@ -13109,8 +13109,8 @@ export const tr_TR: EnTranslations = {
         "description": "3 sn boyunca 8 m'lik bir alana ok yağdırır. Alandaki düşmanlar her 0.5 sn'de {damage} Fiziksel hasar alır. Hasar menzilli saldırı gücüyle artar."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Fosfor Şişesi",
+        "description": "Reaktif bir kimyasal karışım taşıyan mühürlü bir kap, 8 metrelik bir alanda 3 sn boyunca akkor beyaz alevlerle patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar menzilli saldırı gücüyle artar."
       },
       "pack_command": {
         "name": "Sürü Emri",
@@ -13157,24 +13157,24 @@ export const tr_TR: EnTranslations = {
         "description": "Alınan hasarı 8 sn boyunca 60% azaltır, ancak etkinken saldırmayı engeller."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Ölü Taklidi",
+        "description": "Yere düşer ve ölü taklidi yaparsın: canın ve Odağın herkese boş görünür. Düşmanlar seni unutur ve seni hedef alan düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak bunu sonlandırır. Hareket ederken kullanırsan durmak için 1 sn süren olur, yoksa hareket bunu sonlandırır. Ayağa kalkmak için tekrar kullan."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktik Kamuflaj",
+        "description": "Çevrene karışırsın: düşmanlar seni zar zor fark eder ve 80% hızla hareket edersin. Saldırmak veya hasar almak Taktik Kamuflajı bozar. Çıkmak için tekrar kullan. (Saha Ustalığı)"
       },
       "frostjaw_trap": {
         "name": "Buzçene Tuzağı",
-        "description": "Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar."
+        "description": "Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Ayı Kapanı",
+        "description": "Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman kapanan ayı kapanına yakalanır: 15 sn boyunca kanayarak 83 Fiziksel hasar artı menzilli saldırı gücünün 22,5% kadarını alır ve 4 sn boyunca 50% yavaşlar."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Saçma Oku",
+        "description": "Önündeki 8 metrelik bir koniye bir ok sağanağı fırlatır ve isabet eden her düşmanı senden 20 metre uzaklaşana kadar geri savurur. Hasar vermez."
       },
       "pack_rally": {
         "name": "Sürü Toplanması",

@@ -13109,8 +13109,8 @@ export const zh_CN: EnTranslations = {
         "description": "向一片 8 米的区域降下箭雨，持续 3 秒。区域内的敌人每 0.5 秒受到 {damage} 点物理伤害。伤害随远程攻击强度提升。"
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "磷火瓶",
+        "description": "一个密封容器，装有活性化学混合物，会在 8 码范围内爆发出白热火焰，持续 3 秒。站在火焰中的敌人每 0.5 秒受到 {damage} 点火焰伤害。伤害随远程攻击强度提升。"
       },
       "pack_command": {
         "name": "兽群号令",
@@ -13158,7 +13158,7 @@ export const zh_CN: EnTranslations = {
       },
       "play_dead": {
         "name": "装死",
-        "description": "倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。再次施放即可起身。"
+        "description": "倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。若在移动中施放，你有 1 秒时间停下，否则移动会结束装死。再次施放即可起身。"
       },
       "tactical_camo": {
         "name": "战术伪装",
@@ -13166,15 +13166,15 @@ export const zh_CN: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "霜颚陷阱",
-        "description": "在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。"
+        "description": "在选定位置放置一个陷阱。陷阱在 0.75 秒后启动，持续 1 分钟，只有你和你的小队能看见。第一个触发陷阱的敌人会被定身 3 秒，4 码内的敌人会被减速 50%，持续 4 秒。"
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "捕熊陷阱",
+        "description": "在选定位置放置一个陷阱。陷阱在 0.75 秒后启动，持续 1 分钟，只有你和你的小队能看见。第一个触发陷阱的敌人会被捕熊夹咬住：在 15 秒内流血，受到 83 点物理伤害外加你 22.5% 远程攻击强度的伤害，并被减速 50%，持续 4 秒。"
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "散射弩箭",
+        "description": "向前方 8 码锥形范围内射出一片弩箭，将命中的每个敌人击退，直到其距离你 20 码。不造成伤害。"
       },
       "pack_rally": {
         "name": "兽群集结",

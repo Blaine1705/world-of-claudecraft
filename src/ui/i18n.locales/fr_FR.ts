@@ -16679,7 +16679,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     "Passif : Brise-piste rafraîchit l'Élan de chasse et prépare votre prochaine Frappe éviscérante ou Croc sanglant pendant 12 s. La Frappe éviscérante inflige 15% de dégâts en plus par cumul. Le Croc sanglant inflige 18 à 24 points de dégâts Physiques supplémentaires, augmentés de 15% par cumul et par votre puissance d'attaque à distance. À 3 cumuls, l'une ou l'autre attaque consomme l'Élan de chasse. (Maîtrise du terrain)",
   'entities.abilities.frostjaw_trap.description':
-    "Pose un piège sur l'ennemi sélectionné ou à vos pieds. Il s'arme après 0,75 s et dure 30 s. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s.",
+    "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s.",
   'entities.abilities.hunting_momentum.description':
     "Passif : la Frappe éviscérante octroie 1 Élan de chasse pendant 8 s, jusqu'à 3. À 3 cumuls, le Déchirement inflige 45% de dégâts de frappe en plus et consomme les cumuls. (Maîtrise du terrain)",
   'entities.abilities.measured_shot.description':
@@ -20279,4 +20279,20 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Piège à ours',
+  'entities.abilities.bear_trap.description':
+    "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est pris dans les mâchoires du piège à ours : il saigne pour 83 points de dégâts Physiques plus 22,5% de votre puissance d'attaque à distance sur 15 s et est ralenti de 50% pendant 4 s.",
+  'entities.abilities.scatterbolt.name': 'Gerbe de carreaux',
+  'entities.abilities.scatterbolt.description':
+    "Tire une gerbe de carreaux dans un cône de 8 mètres devant vous, repoussant chaque ennemi touché jusqu'à ce qu'il se trouve à 20 mètres de vous. N'inflige aucun dégât.",
+  'entities.abilities.phosphor_flask.name': 'Fiole de phosphore',
+  'entities.abilities.phosphor_flask.description':
+    "Un récipient scellé contenant un mélange chimique réactif qui s'embrase en flammes chauffées à blanc sur une zone de 8 m pendant 3 s. Les ennemis qui se tiennent dans les flammes subissent {damage} points de dégâts de Feu toutes les 0,5 s. Les dégâts augmentent avec la puissance d'attaque à distance.",
+  'entities.abilities.play_dead.name': 'Faire le mort',
+  'entities.abilities.play_dead.description':
+    "Tombez au sol et faites le mort : vos points de vie et votre concentration s'affichent comme vides pour tout le monde. Les ennemis vous oublient, et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité y met fin. Si vous l'incantez en mouvement, vous avez 1 s pour vous arrêter avant que le déplacement n'y mette fin. Relancez pour vous relever.",
+  'entities.abilities.tactical_camo.name': 'Camouflage tactique',
+  'entities.abilities.tactical_camo.description':
+    'Vous fond dans votre environnement : les ennemis vous remarquent à peine, et vous vous déplacez à 80% de votre vitesse. Attaquer ou subir des dégâts rompt le Camouflage tactique. Relancez pour en sortir. (Maîtrise du terrain)',
 };

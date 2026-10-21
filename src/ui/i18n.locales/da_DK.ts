@@ -15656,7 +15656,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passiv: Sporbrud fornyer Jagtfarten og gør dit næste Sprættende Slag eller Blodkrog klar i 12 sek. Sprættende Slag gør 15% mere skade per stak. Blodkrogen gør 18 til 24 ekstra fysisk skade, øget med 15% per stak og af din afstandsangrebskraft. Ved 3 stakke forbruger et af angrebene Jagtfarten. (Feltkunst)',
   'entities.abilities.frostjaw_trap.description':
-    'Placer en fælde ved den valgte fjende eller ved dine fødder. Den armeres efter 0,75 sek. og varer 30 sek. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek.',
+    'Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek.',
   'entities.abilities.hunting_momentum.description':
     'Passiv: Sprættende Slag giver 1 Jagtfart i 8 sek., op til 3. Ved 3 stakke gør Sårflænge 45% mere slagskade og forbruger stakkene. (Feltkunst)',
   'entities.abilities.measured_shot.description':
@@ -19763,4 +19763,20 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Bjørnefælde',
+  'entities.abilities.bear_trap.description':
+    'Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rammes af bjørnefælden, der klapper i: den bløder for 83 fysisk skade plus 22,5% af din afstandsangrebskraft over 15 sek. og sænkes med 50% i 4 sek.',
+  'entities.abilities.scatterbolt.name': 'Spredebolt',
+  'entities.abilities.scatterbolt.description':
+    'Affyr en byge af bolte i en kegle på 8 meter foran dig, der slår hver ramt fjende tilbage, indtil den er 20 meter fra dig. Gør ingen skade.',
+  'entities.abilities.phosphor_flask.name': 'Fosforflaske',
+  'entities.abilities.phosphor_flask.description':
+    'En forseglet beholder med en reaktiv kemisk blanding, der bryder ud i hvidglødende flammer over et område på 8 m i 3 sek. Fjender, der står i flammerne, tager {damage} Ildskade hvert 0,5 sek. Skaden stiger med afstandsangrebskraft.',
+  'entities.abilities.play_dead.name': 'Spil Død',
+  'entities.abilities.play_dead.description':
+    'Fald til jorden og se død ud: din sundhed og dit fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller brug af en anden evne afslutter den. Kastes den, mens du bevæger dig, har du 1 sek. til at stoppe, før bevægelsen afslutter den. Kast igen for at rejse dig.',
+  'entities.abilities.tactical_camo.name': 'Taktisk Camouflage',
+  'entities.abilities.tactical_camo.description':
+    'Smelt ind i omgivelserne: fjender bemærker dig knap, og du bevæger dig med 80% hastighed. Angreb eller at tage skade bryder Taktisk Camouflage. Kast igen for at træde ud. (Feltkunst)',
 };

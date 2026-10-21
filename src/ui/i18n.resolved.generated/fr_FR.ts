@@ -13109,8 +13109,8 @@ export const fr_FR: EnTranslations = {
         "description": "Fait pleuvoir des flèches sur une zone de 8 m pendant 3 s. Les ennemis dans la zone subissent {damage} points de dégâts Physiques toutes les 0.5 s. Les dégâts augmentent avec la puissance d'attaque à distance."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Fiole de phosphore",
+        "description": "Un récipient scellé contenant un mélange chimique réactif qui s'embrase en flammes chauffées à blanc sur une zone de 8 m pendant 3 s. Les ennemis qui se tiennent dans les flammes subissent {damage} points de dégâts de Feu toutes les 0,5 s. Les dégâts augmentent avec la puissance d'attaque à distance."
       },
       "pack_command": {
         "name": "Ordre de meute",
@@ -13157,24 +13157,24 @@ export const fr_FR: EnTranslations = {
         "description": "Réduit les dégâts subis de 60% pendant 8 s, mais empêche d'attaquer tant que l'effet est actif."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Faire le mort",
+        "description": "Tombez au sol et faites le mort : vos points de vie et votre concentration s'affichent comme vides pour tout le monde. Les ennemis vous oublient, et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité y met fin. Si vous l'incantez en mouvement, vous avez 1 s pour vous arrêter avant que le déplacement n'y mette fin. Relancez pour vous relever."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Camouflage tactique",
+        "description": "Vous fond dans votre environnement : les ennemis vous remarquent à peine, et vous vous déplacez à 80% de votre vitesse. Attaquer ou subir des dégâts rompt le Camouflage tactique. Relancez pour en sortir. (Maîtrise du terrain)"
       },
       "frostjaw_trap": {
         "name": "Piège Mâchegivre",
-        "description": "Pose un piège sur l'ennemi sélectionné ou à vos pieds. Il s'arme après 0,75 s et dure 30 s. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s."
+        "description": "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Piège à ours",
+        "description": "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est pris dans les mâchoires du piège à ours : il saigne pour 83 points de dégâts Physiques plus 22,5% de votre puissance d'attaque à distance sur 15 s et est ralenti de 50% pendant 4 s."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Gerbe de carreaux",
+        "description": "Tire une gerbe de carreaux dans un cône de 8 mètres devant vous, repoussant chaque ennemi touché jusqu'à ce qu'il se trouve à 20 mètres de vous. N'inflige aucun dégât."
       },
       "pack_rally": {
         "name": "Ralliement de meute",

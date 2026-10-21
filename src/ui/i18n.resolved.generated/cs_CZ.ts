@@ -13109,8 +13109,8 @@ export const cs_CZ: EnTranslations = {
         "description": "Nechá 3 s pršet šípy na oblast 8 m. Nepřátelé uvnitř utrpí každých 0.5 s {damage} fyzického poškození. Poškození roste s útočnou silou na dálku."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Fosforová baňka",
+        "description": "Zapečetěná nádoba s reaktivní chemickou směsí, která na 3 s vzplane do běla rozžhaveným plamenem v oblasti 8 m. Nepřátelé stojící v plamenech utrpí každých 0,5 s {damage} ohnivého poškození. Poškození roste se silou útoku na dálku."
       },
       "pack_command": {
         "name": "Povel smečky",
@@ -13157,24 +13157,24 @@ export const cs_CZ: EnTranslations = {
         "description": "Snižuje utrpěné poškození o 60% na 8 s, ale zabraňuje útokům, dokud je aktivní."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Hrát mrtvého",
+        "description": "Padni k zemi a předstírej smrt: tvé zdraví a Soustředění se všem zobrazují jako prázdné. Nepřátelé na tebe zapomenou a nepřátelští hráči, kteří tě mají v cíli, o cíl přijdou. Pohyb, útok nebo použití jiné schopnosti efekt ukončí. Pokud ji sešleš v pohybu, máš 1 s na zastavení, než ji pohyb ukončí. Opětovným sesláním vstaneš."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktická kamufláž",
+        "description": "Splyň s okolím: nepřátelé si tě sotva všimnou a pohybuješ se rychlostí 80%. Útok nebo utržené poškození Taktickou kamufláž zruší. Opětovným sesláním z ní vystoupíš. (Polní um)"
       },
       "frostjaw_trap": {
         "name": "Past mrazivé čelisti",
-        "description": "Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s."
+        "description": "Umísti past na vybrané místo. Aktivuje se po 0,75 s, trvá 1 minutu a vidíš ji jen ty a tvá skupina. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Medvědí past",
+        "description": "Umísti past na vybrané místo. Aktivuje se po 0,75 s, trvá 1 minutu a vidíš ji jen ty a tvá skupina. První nepřítel, který ji spustí, utrpí sevření medvědí pasti: krvácí za 83 Fyzického poškození plus 22,5% tvé síly útoku na dálku po dobu 15 s a je zpomalen o 50% na 4 s."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Rozptylná šipka",
+        "description": "Vystřel spršku šipek v kuželu o dosahu 8 metrů před sebou a odhoď každého zasaženého nepřítele, dokud nebude 20 metrů od tebe. Nezpůsobuje žádné poškození."
       },
       "pack_rally": {
         "name": "Shromáždění smečky",

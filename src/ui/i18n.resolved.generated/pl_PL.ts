@@ -13109,8 +13109,8 @@ export const pl_PL: EnTranslations = {
         "description": "Spuszcza deszcz strzał na obszar 8 m przez 3 s. Wrogowie w obszarze otrzymują {damage} obrażeń fizycznych co 0.5 s. Obrażenia rosną z mocą ataku dystansowego."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Fosforowa Kolba",
+        "description": "Zapieczętowane naczynie z reaktywną mieszanką chemiczną, która przez 3 s wybucha białym, rozżarzonym płomieniem na obszarze 8 m. Wrogowie stojący w płomieniach otrzymują {damage} obrażeń od ognia co 0,5 s. Obrażenia rosną z mocą ataku dystansowego."
       },
       "pack_command": {
         "name": "Rozkaz Sfory",
@@ -13157,24 +13157,24 @@ export const pl_PL: EnTranslations = {
         "description": "Zmniejsza otrzymywane obrażenia o 60% na 8 s, ale uniemożliwia atakowanie, gdy jest aktywna."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Udawanie Martwego",
+        "description": "Padasz na ziemię i udajesz martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie o tobie zapominają, a wrodzy gracze, którzy mają cię w celu, tracą cel. Ruch, atak lub użycie innej umiejętności kończy efekt. Jeśli użyjesz jej w ruchu, masz 1 s na zatrzymanie się, zanim ruch ją przerwie. Użyj ponownie, aby wstać."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktyczny Kamuflaż",
+        "description": "Wtapiasz się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak lub otrzymanie obrażeń przerywa Taktyczny Kamuflaż. Użyj ponownie, aby wyjść. (Rzemiosło Polowe)"
       },
       "frostjaw_trap": {
         "name": "Pułapka Mroźnej Paszczy",
-        "description": "Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s."
+        "description": "Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Pułapka na Niedźwiedzie",
+        "description": "Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje pochwycony przez zatrzaskującą się pułapkę: krwawi, otrzymując 83 obrażeń Fizycznych plus 22,5% twojej mocy ataku dystansowego przez 15 s, i zostaje spowolniony o 50% na 4 s."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Rozpryskowy Bełt",
+        "description": "Wystrzeliwuje grad bełtów w stożku 8 m przed tobą, odrzucając każdego trafionego wroga, aż znajdzie się 20 metrów od ciebie. Nie zadaje obrażeń."
       },
       "pack_rally": {
         "name": "Zbiórka Sfory",

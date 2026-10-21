@@ -16108,7 +16108,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasywna: Zerwanie Tropu odnawia Rozpęd Łowów i przygotowuje twoje następne Patroszące Uderzenie lub Krwawy Hak na 12 s. Patroszące Uderzenie zadaje o 15% więcej obrażeń za ładunek. Krwawy Hak zadaje od 18 do 24 dodatkowych obrażeń Fizycznych, zwiększonych o 15% za ładunek i przez twoją moc ataku dystansowego. Przy 3 ładunkach jeden z ataków zużywa Rozpęd Łowów. (Rzemiosło Polowe)',
   'entities.abilities.frostjaw_trap.description':
-    'Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s.',
+    'Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Pasywna: Patroszące Uderzenie przyznaje 1 Rozpęd Łowów na 8 s, do 3. Przy 3 ładunkach Rozdarcie Rany zadaje o 45% więcej obrażeń uderzenia i zużywa ładunki. (Rzemiosło Polowe)',
   'entities.abilities.measured_shot.description':
@@ -19937,4 +19937,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Pułapka na Niedźwiedzie',
+  'entities.abilities.bear_trap.description':
+    'Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje pochwycony przez zatrzaskującą się pułapkę: krwawi, otrzymując 83 obrażeń Fizycznych plus 22,5% twojej mocy ataku dystansowego przez 15 s, i zostaje spowolniony o 50% na 4 s.',
+  'entities.abilities.scatterbolt.name': 'Rozpryskowy Bełt',
+  'entities.abilities.scatterbolt.description':
+    'Wystrzeliwuje grad bełtów w stożku 8 m przed tobą, odrzucając każdego trafionego wroga, aż znajdzie się 20 metrów od ciebie. Nie zadaje obrażeń.',
+  'entities.abilities.phosphor_flask.name': 'Fosforowa Kolba',
+  'entities.abilities.phosphor_flask.description':
+    'Zapieczętowane naczynie z reaktywną mieszanką chemiczną, która przez 3 s wybucha białym, rozżarzonym płomieniem na obszarze 8 m. Wrogowie stojący w płomieniach otrzymują {damage} obrażeń od ognia co 0,5 s. Obrażenia rosną z mocą ataku dystansowego.',
+  'entities.abilities.play_dead.name': 'Udawanie Martwego',
+  'entities.abilities.play_dead.description':
+    'Padasz na ziemię i udajesz martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie o tobie zapominają, a wrodzy gracze, którzy mają cię w celu, tracą cel. Ruch, atak lub użycie innej umiejętności kończy efekt. Jeśli użyjesz jej w ruchu, masz 1 s na zatrzymanie się, zanim ruch ją przerwie. Użyj ponownie, aby wstać.',
+  'entities.abilities.tactical_camo.name': 'Taktyczny Kamuflaż',
+  'entities.abilities.tactical_camo.description':
+    'Wtapiasz się w otoczenie: wrogowie ledwo cię zauważają, a ty poruszasz się z prędkością 80%. Atak lub otrzymanie obrażeń przerywa Taktyczny Kamuflaż. Użyj ponownie, aby wyjść. (Rzemiosło Polowe)',
 };

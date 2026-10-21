@@ -13109,8 +13109,8 @@ export const pt_BR: EnTranslations = {
         "description": "Faz chover flechas sobre uma área de 8 m durante 3 s. Os inimigos na área sofrem {damage} de dano Físico a cada 0.5 s. O dano aumenta com o poder de ataque à distância."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Frasco de Fósforo",
+        "description": "Um recipiente selado com uma mistura química reativa que irrompe em chamas incandescentes sobre uma área de 8 m por 3 s. Os inimigos nas chamas sofrem {damage} de dano de Fogo a cada 0,5 s. O dano aumenta com o poder de ataque à distância."
       },
       "pack_command": {
         "name": "Comando da Matilha",
@@ -13157,24 +13157,24 @@ export const pt_BR: EnTranslations = {
         "description": "Reduz o dano sofrido em 60% por 8 s, mas impede ataques enquanto está ativa."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Fingir de Morto",
+        "description": "Cai no chão e finge estar morto: sua vida e seu foco aparecem vazios para todos. Os inimigos se esquecem de você, e jogadores inimigos que têm você como alvo perdem o alvo. Mover-se, atacar ou usar outra habilidade encerra o efeito. Se lançado em movimento, você tem 1 s para parar antes que o movimento o encerre. Lançar de novo faz você se levantar."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Camuflagem Tática",
+        "description": "Mescla-se ao ambiente: os inimigos mal percebem você, e você se move a 80% da velocidade. Atacar ou sofrer dano interrompe a Camuflagem Tática. Lançar de novo faz você sair dela. (Perícia de Campo)"
       },
       "frostjaw_trap": {
         "name": "Armadilha Presa Gélida",
-        "description": "Posiciona uma armadilha no inimigo selecionado ou aos seus pés. Ela arma após 0,75 s e dura 30 s. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s."
+        "description": "Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Armadilha de Urso",
+        "description": "Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar sofre com o fechamento da armadilha de urso: sangra por 83 de dano Físico mais 22,5% do seu poder de ataque à distância ao longo de 15 s e é lentificado em 50% por 4 s."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Leque de Virotes",
+        "description": "Dispara uma rajada de virotes em um cone de 8 metros à sua frente, repelindo cada inimigo atingido até que ele esteja a 20 metros de você. Não causa dano."
       },
       "pack_rally": {
         "name": "Reunião da Matilha",

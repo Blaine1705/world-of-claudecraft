@@ -13109,8 +13109,8 @@ export const da_DK: EnTranslations = {
         "description": "Lader pile regne over et område på 8 m i 3 sek. Fjender i området tager {damage} Fysisk skade hvert 0.5 sek. Skaden stiger med angrebsstyrke på afstand."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Fosforflaske",
+        "description": "En forseglet beholder med en reaktiv kemisk blanding, der bryder ud i hvidglødende flammer over et område på 8 m i 3 sek. Fjender, der står i flammerne, tager {damage} Ildskade hvert 0,5 sek. Skaden stiger med afstandsangrebskraft."
       },
       "pack_command": {
         "name": "Flokbefaling",
@@ -13157,24 +13157,24 @@ export const da_DK: EnTranslations = {
         "description": "Reducerer den skade, du tager, med 60% i 8 sek., men forhindrer angreb, mens den er aktiv."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Spil Død",
+        "description": "Fald til jorden og se død ud: din sundhed og dit fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller brug af en anden evne afslutter den. Kastes den, mens du bevæger dig, har du 1 sek. til at stoppe, før bevægelsen afslutter den. Kast igen for at rejse dig."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktisk Camouflage",
+        "description": "Smelt ind i omgivelserne: fjender bemærker dig knap, og du bevæger dig med 80% hastighed. Angreb eller at tage skade bryder Taktisk Camouflage. Kast igen for at træde ud. (Feltkunst)"
       },
       "frostjaw_trap": {
         "name": "Frostkæbefælde",
-        "description": "Placer en fælde ved den valgte fjende eller ved dine fødder. Den armeres efter 0,75 sek. og varer 30 sek. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek."
+        "description": "Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Bjørnefælde",
+        "description": "Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rammes af bjørnefælden, der klapper i: den bløder for 83 fysisk skade plus 22,5% af din afstandsangrebskraft over 15 sek. og sænkes med 50% i 4 sek."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Spredebolt",
+        "description": "Affyr en byge af bolte i en kegle på 8 meter foran dig, der slår hver ramt fjende tilbage, indtil den er 20 meter fra dig. Gør ingen skade."
       },
       "pack_rally": {
         "name": "Floksamling",

@@ -15895,7 +15895,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasivní: Zlom stopy obnoví Lovecký spád a připraví tvůj další Kuchající úder nebo Krvavý hák na 12 s. Kuchající úder způsobí o 15% větší poškození za nános. Krvavý hák způsobí 18 až 24 dodatečného Fyzického poškození, zvýšeného o 15% za nános a tvou silou útoku na dálku. Při 3 nánosech jeden z útoků spotřebuje Lovecký spád. (Polní um)',
   'entities.abilities.frostjaw_trap.description':
-    'Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s.',
+    'Umísti past na vybrané místo. Aktivuje se po 0,75 s, trvá 1 minutu a vidíš ji jen ty a tvá skupina. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Pasivní: Kuchající úder udělí 1 Lovecký spád na 8 s, až do 3. Při 3 nánosech Trhání ran způsobí o 45% větší poškození úderu a spotřebuje nánosy. (Polní um)',
   'entities.abilities.measured_shot.description':
@@ -19678,4 +19678,20 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Medvědí past',
+  'entities.abilities.bear_trap.description':
+    'Umísti past na vybrané místo. Aktivuje se po 0,75 s, trvá 1 minutu a vidíš ji jen ty a tvá skupina. První nepřítel, který ji spustí, utrpí sevření medvědí pasti: krvácí za 83 Fyzického poškození plus 22,5% tvé síly útoku na dálku po dobu 15 s a je zpomalen o 50% na 4 s.',
+  'entities.abilities.scatterbolt.name': 'Rozptylná šipka',
+  'entities.abilities.scatterbolt.description':
+    'Vystřel spršku šipek v kuželu o dosahu 8 metrů před sebou a odhoď každého zasaženého nepřítele, dokud nebude 20 metrů od tebe. Nezpůsobuje žádné poškození.',
+  'entities.abilities.phosphor_flask.name': 'Fosforová baňka',
+  'entities.abilities.phosphor_flask.description':
+    'Zapečetěná nádoba s reaktivní chemickou směsí, která na 3 s vzplane do běla rozžhaveným plamenem v oblasti 8 m. Nepřátelé stojící v plamenech utrpí každých 0,5 s {damage} ohnivého poškození. Poškození roste se silou útoku na dálku.',
+  'entities.abilities.play_dead.name': 'Hrát mrtvého',
+  'entities.abilities.play_dead.description':
+    'Padni k zemi a předstírej smrt: tvé zdraví a Soustředění se všem zobrazují jako prázdné. Nepřátelé na tebe zapomenou a nepřátelští hráči, kteří tě mají v cíli, o cíl přijdou. Pohyb, útok nebo použití jiné schopnosti efekt ukončí. Pokud ji sešleš v pohybu, máš 1 s na zastavení, než ji pohyb ukončí. Opětovným sesláním vstaneš.',
+  'entities.abilities.tactical_camo.name': 'Taktická kamufláž',
+  'entities.abilities.tactical_camo.description':
+    'Splyň s okolím: nepřátelé si tě sotva všimnou a pohybuješ se rychlostí 80%. Útok nebo utržené poškození Taktickou kamufláž zruší. Opětovným sesláním z ní vystoupíš. (Polní um)',
 };

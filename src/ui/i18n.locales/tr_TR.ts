@@ -15985,7 +15985,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasif: İz Kırma, Av İvmesini tazeler ve sonraki Deşen Vuruşunu veya Kanlı Çengelini 12 sn hazırlar. Deşen Vuruş katman başına 15% daha fazla hasar verir. Kanlı Çengel 18 ila 24 ek Fiziksel hasar verir; bu, katman başına 15% ve menzilli saldırı gücünle artar. 3 katmanda iki saldırıdan biri Av İvmesini tüketir. (Saha Ustalığı)',
   'entities.abilities.frostjaw_trap.description':
-    'Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar.',
+    'Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar.',
   'entities.abilities.hunting_momentum.description':
     'Pasif: Deşen Vuruş 8 sn boyunca 1 Av İvmesi verir, en fazla 3. 3 katmanda Yara Yırtma 45% daha fazla vuruş hasarı verir ve katmanları tüketir. (Saha Ustalığı)',
   'entities.abilities.measured_shot.description':
@@ -19772,4 +19772,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Ayı Kapanı',
+  'entities.abilities.bear_trap.description':
+    'Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman kapanan ayı kapanına yakalanır: 15 sn boyunca kanayarak 83 Fiziksel hasar artı menzilli saldırı gücünün 22,5% kadarını alır ve 4 sn boyunca 50% yavaşlar.',
+  'entities.abilities.scatterbolt.name': 'Saçma Oku',
+  'entities.abilities.scatterbolt.description':
+    'Önündeki 8 metrelik bir koniye bir ok sağanağı fırlatır ve isabet eden her düşmanı senden 20 metre uzaklaşana kadar geri savurur. Hasar vermez.',
+  'entities.abilities.phosphor_flask.name': 'Fosfor Şişesi',
+  'entities.abilities.phosphor_flask.description':
+    "Reaktif bir kimyasal karışım taşıyan mühürlü bir kap, 8 metrelik bir alanda 3 sn boyunca akkor beyaz alevlerle patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar menzilli saldırı gücüyle artar.",
+  'entities.abilities.play_dead.name': 'Ölü Taklidi',
+  'entities.abilities.play_dead.description':
+    'Yere düşer ve ölü taklidi yaparsın: canın ve Odağın herkese boş görünür. Düşmanlar seni unutur ve seni hedef alan düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak bunu sonlandırır. Hareket ederken kullanırsan durmak için 1 sn süren olur, yoksa hareket bunu sonlandırır. Ayağa kalkmak için tekrar kullan.',
+  'entities.abilities.tactical_camo.name': 'Taktik Kamuflaj',
+  'entities.abilities.tactical_camo.description':
+    'Çevrene karışırsın: düşmanlar seni zar zor fark eder ve 80% hızla hareket edersin. Saldırmak veya hasar almak Taktik Kamuflajı bozar. Çıkmak için tekrar kullan. (Saha Ustalığı)',
 };

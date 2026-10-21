@@ -13109,8 +13109,8 @@ export const id_ID: EnTranslations = {
         "description": "Menghujani area 8 m dengan anak panah selama 3 dtk. Musuh di dalam area menerima {damage} kerusakan Fisik setiap 0.5 dtk. Kerusakan meningkat dengan daya serang jarak jauh."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Labu Fosfor",
+        "description": "Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh."
       },
       "pack_command": {
         "name": "Perintah Kawanan",
@@ -13157,24 +13157,24 @@ export const id_ID: EnTranslations = {
         "description": "Mengurangi kerusakan yang diterima 60% selama 8 dtk, tetapi mencegah serangan selama aktif."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Pura-pura Mati",
+        "description": "Menjatuhkan diri ke tanah dan tampak mati: nyawa dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target mereka. Bergerak, menyerang, atau menggunakan kemampuan lain mengakhirinya. Jika digunakan saat bergerak, kamu punya 1 dtk untuk berhenti sebelum gerakan mengakhirinya. Gunakan lagi untuk bangun."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Kamuflase Taktis",
+        "description": "Membaur dengan sekitarmu: musuh nyaris tidak menyadarimu, dan kamu bergerak dengan kecepatan 80%. Menyerang atau menerima kerusakan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. (Kecakapan Lapangan)"
       },
       "frostjaw_trap": {
         "name": "Jerat Rahang Beku",
-        "description": "Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
+        "description": "Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Jerat Beruang",
+        "description": "Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terjepit jerat beruang yang menutup: ia berdarah sebesar 83 kerusakan Fisik ditambah 22,5% kekuatan serang jarak jauhmu selama 15 dtk dan diperlambat 50% selama 4 dtk."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Panah Sebar",
+        "description": "Menembakkan semburan anak panah dalam kerucut 8 meter di depanmu, mendorong mundur setiap musuh yang terkena hingga berjarak 20 meter darimu. Tidak memberi kerusakan."
       },
       "pack_rally": {
         "name": "Pengumpulan Kawanan",

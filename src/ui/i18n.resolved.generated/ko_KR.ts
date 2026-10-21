@@ -13109,8 +13109,8 @@ export const ko_KR: EnTranslations = {
         "description": "8미터 지역에 3초 동안 화살을 퍼붓습니다. 지역 안의 적은 0.5초마다 {damage}의 물리 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "인광 플라스크",
+        "description": "반응성 화학 혼합물을 담은 밀봉된 용기로, 8미터 지역에 3초 동안 백열하는 불길을 터뜨립니다. 불길 안에 서 있는 적은 0.5초마다 {damage}의 화염 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다."
       },
       "pack_command": {
         "name": "무리 명령",
@@ -13158,7 +13158,7 @@ export const ko_KR: EnTranslations = {
       },
       "play_dead": {
         "name": "죽은 척하기",
-        "description": "땅에 쓰러져 죽은 척합니다. 모두에게 생명력과 집중이 비어 있는 것으로 보입니다. 적은 당신을 잊고, 당신을 대상으로 삼은 적 플레이어는 대상을 잃습니다. 이동하거나 공격하거나 다른 능력을 사용하면 끝납니다. 다시 시전하면 일어납니다."
+        "description": "땅에 쓰러져 죽은 척합니다. 모두에게 생명력과 집중이 비어 있는 것으로 보입니다. 적은 당신을 잊고, 당신을 대상으로 삼은 적 플레이어는 대상을 잃습니다. 이동하거나 공격하거나 다른 능력을 사용하면 끝납니다. 이동 중에 시전하면 1초 안에 멈춰야 하며, 그렇지 않으면 이동으로 인해 끝납니다. 다시 시전하면 일어납니다."
       },
       "tactical_camo": {
         "name": "전술 위장",
@@ -13166,15 +13166,15 @@ export const ko_KR: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "서리턱 덫",
-        "description": "선택한 적의 위치나 발밑에 작동 준비된 덫을 놓습니다. 처음 발동시킨 적을 이동 불가로 만들고 주변 적을 느리게 합니다."
+        "description": "선택한 위치에 덫을 놓습니다. 덫은 0.75초 후 작동 준비되며 1분 동안 유지되고, 자신과 파티원만 볼 수 있습니다. 처음 발동시킨 적은 3초 동안 이동 불가 상태가 되고, 4미터 이내의 적은 4초 동안 이동 속도가 50% 감소합니다."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "곰덫",
+        "description": "선택한 위치에 덫을 놓습니다. 덫은 0.75초 후 작동 준비되며 1분 동안 유지되고, 자신과 파티원만 볼 수 있습니다. 처음 발동시킨 적은 곰덫에 물려 15초에 걸쳐 83의 물리 피해와 원거리 전투력의 22.5%에 해당하는 출혈 피해를 입고, 4초 동안 이동 속도가 50% 감소합니다."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "산탄 볼트",
+        "description": "전방 8미터 원뿔 범위에 볼트를 흩뿌려, 적중한 모든 적을 자신에게서 20미터 떨어질 때까지 밀쳐냅니다. 피해를 주지 않습니다."
       },
       "pack_rally": {
         "name": "무리 결집",

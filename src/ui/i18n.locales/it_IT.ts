@@ -16331,7 +16331,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     "Passiva: Rompipista rinnova lo Slancio di Caccia e prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Il Colpo Sventratore infligge il 15% di danni in più per accumulo. L'Uncino Sanguinario infligge da 18 a 24 danni Fisici aggiuntivi, aumentati del 15% per accumulo e dalla tua potenza d'attacco a distanza. A 3 accumuli, uno dei due attacchi consuma lo Slancio di Caccia. (Arte del Campo)",
   'entities.abilities.frostjaw_trap.description':
-    'Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
+    'Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Passiva: il Colpo Sventratore concede 1 Slancio di Caccia per 8 s, fino a 3. A 3 accumuli, Squarciaferite infligge il 45% di danni da colpo in più e consuma gli accumuli. (Arte del Campo)',
   'entities.abilities.measured_shot.description':
@@ -20185,4 +20185,20 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Trappola per Orsi',
+  'entities.abilities.bear_trap.description':
+    "Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva subisce la chiusura della trappola per orsi: sanguina per 83 danni Fisici più il 22,5% della tua potenza d'attacco a distanza in 15 s e viene rallentato del 50% per 4 s.",
+  'entities.abilities.scatterbolt.name': 'Ventaglio di Dardi',
+  'entities.abilities.scatterbolt.description':
+    'Scaglia una raffica di dardi in un cono di 8 metri davanti a te, respingendo ogni nemico colpito finché non si trova a 20 metri da te. Non infligge danni.',
+  'entities.abilities.phosphor_flask.name': 'Fiasca di Fosforo',
+  'entities.abilities.phosphor_flask.description':
+    "Un recipiente sigillato contenente una miscela chimica reattiva che esplode in fiamme incandescenti su un'area di 8 m per 3 s. I nemici che restano tra le fiamme subiscono {damage} danni da Fuoco ogni 0,5 s. Il danno aumenta con la potenza d'attacco a distanza.",
+  'entities.abilities.play_dead.name': 'Fingersi Morto',
+  'entities.abilities.play_dead.description':
+    "Cadi a terra e fingiti morto: la tua salute e la tua concentrazione risultano vuote per tutti. I nemici si dimenticano di te, e i giocatori nemici che ti hanno come bersaglio lo perdono. Muoverti, attaccare o usare un'altra abilità lo interrompe. Se lo lanci mentre ti muovi, hai 1 s per fermarti prima che il movimento lo interrompa. Lancialo di nuovo per rialzarti.",
+  'entities.abilities.tactical_camo.name': 'Mimetismo Tattico',
+  'entities.abilities.tactical_camo.description':
+    "Mimetizzati con l'ambiente circostante: i nemici ti notano a malapena, e ti muovi all'80% della velocità. Attaccare o subire danni interrompe Mimetismo Tattico. Lancialo di nuovo per uscirne. (Arte del Campo)",
 };

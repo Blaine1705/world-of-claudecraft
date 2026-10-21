@@ -16450,7 +16450,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasiva: Quiebrasendas refresca el Ímpetu de Caza y prepara tu próximo Golpe Destripador o Garfio Sangriento durante 12 s. El Golpe Destripador inflige un 15% más de daño por acumulación. El Garfio Sangriento inflige de 18 a 24 de daño Físico adicional, aumentado un 15% por acumulación y por tu poder de ataque a distancia. Con 3 acumulaciones, cualquiera de los dos ataques consume el Ímpetu de Caza. (Arte de Campo)',
   'entities.abilities.frostjaw_trap.description':
-    'Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo pueden verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Pasiva: el Golpe Destripador otorga 1 de Ímpetu de Caza durante 8 s, hasta 3. Con 3 acumulaciones, el Desgarraheridas inflige un 45% más de daño de golpe y consume las acumulaciones. (Arte de Campo)',
   'entities.abilities.measured_shot.description':
@@ -20208,4 +20208,20 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  // PR 4488 hunter follow-up (Bear Trap, Scatterbolt, Phosphor Flask).
+  'entities.abilities.bear_trap.name': 'Trampa para Osos',
+  'entities.abilities.bear_trap.description':
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo pueden verla. El primer enemigo que la active sufre el cierre de la trampa para osos: sangra por 83 de daño Físico más un 22,5% de tu poder de ataque a distancia durante 15 s y queda ralentizado un 50% durante 4 s.',
+  'entities.abilities.scatterbolt.name': 'Ráfaga de Virotes',
+  'entities.abilities.scatterbolt.description':
+    'Dispara una ráfaga de virotes en un cono de 8 metros frente a ti, repeliendo a cada enemigo alcanzado hasta que esté a 20 metros de ti. No inflige daño.',
+  'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
+  'entities.abilities.phosphor_flask.description':
+    'Un recipiente sellado con una mezcla química reactiva que estalla en llamas al rojo blanco sobre un área de 8 m durante 3 s. Los enemigos que permanezcan en las llamas sufren {damage} de daño de Fuego cada 0,5 s. El daño aumenta con el poder de ataque a distancia.',
+  'entities.abilities.play_dead.name': 'Hacerse el Muerto',
+  'entities.abilities.play_dead.description':
+    'Cae al suelo y finge estar muerto: tu salud y tu concentración se muestran vacías para todos. Los enemigos se olvidan de ti, y los jugadores enemigos que te tienen como objetivo pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Si lo lanzas en movimiento, tienes 1 s para detenerte antes de que el movimiento lo termine. Vuelve a lanzarlo para levantarte.',
+  'entities.abilities.tactical_camo.name': 'Camuflaje Táctico',
+  'entities.abilities.tactical_camo.description':
+    'Te funde con tu entorno: los enemigos apenas te notan, y te mueves al 80% de velocidad. Atacar o recibir daño rompe el Camuflaje Táctico. Vuelve a lanzarlo para salir. (Arte de Campo)',
 };

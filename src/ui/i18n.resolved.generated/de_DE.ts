@@ -13109,8 +13109,8 @@ export const de_DE: EnTranslations = {
         "description": "Lässt 3 Sek. lang Pfeile über einen Bereich von 8 m niedergehen. Gegner darin erleiden alle 0.5 Sek. {damage} physischen Schaden. Der Schaden steigt mit der Distanzangriffskraft."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Phosphorflasche",
+        "description": "Ein versiegeltes Gefäß mit einer reaktiven Chemikalienmischung, die 3 Sek. lang über einen Bereich von 8 m in weißglühende Flammen aufgeht. Gegner in den Flammen erleiden alle 0,5 Sek. {damage} Feuerschaden. Der Schaden steigt mit der Distanzangriffskraft."
       },
       "pack_command": {
         "name": "Rudelbefehl",
@@ -13157,24 +13157,24 @@ export const de_DE: EnTranslations = {
         "description": "Verringert erlittenen Schaden 8 Sek. lang um 60%, verhindert aber Angriffe, solange sie aktiv ist."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Totstellen",
+        "description": "Lässt Euch zu Boden fallen und tot erscheinen: Eure Gesundheit und Euer Fokus werden für alle als leer angezeigt. Gegner vergessen Euch, und gegnerische Spieler, die Euch anvisieren, verlieren ihr Ziel. Bewegen, Angreifen oder der Einsatz einer anderen Fähigkeit beendet den Effekt. Wirkt Ihr es in Bewegung, habt Ihr 1 Sek. Zeit, anzuhalten, bevor die Bewegung es beendet. Erneut wirken, um aufzustehen."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Taktische Tarnung",
+        "description": "Lässt Euch mit Eurer Umgebung verschmelzen: Gegner bemerken Euch kaum, und Ihr bewegt Euch mit 80% Tempo. Angreifen oder Schaden erleiden bricht Taktische Tarnung. Erneut wirken, um herauszutreten. (Feldkunst)"
       },
       "frostjaw_trap": {
         "name": "Frostkieferfalle",
-        "description": "Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt."
+        "description": "Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Bärenfalle",
+        "description": "Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird von der zuschnappenden Bärenfalle erfasst: Er blutet über 15 Sek. für 83 physischen Schaden plus 22,5% Eurer Distanzangriffskraft und wird 4 Sek. lang um 50% verlangsamt."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Streubolzen",
+        "description": "Feuert eine Bolzensalve in einem Kegel von 8 Metern vor Euch ab und stößt jeden getroffenen Gegner zurück, bis er 20 Meter von Euch entfernt ist. Verursacht keinen Schaden."
       },
       "pack_rally": {
         "name": "Rudelsammlung",

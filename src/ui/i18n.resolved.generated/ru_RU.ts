@@ -13109,8 +13109,8 @@ export const ru_RU: EnTranslations = {
         "description": "Осыпает область в 8 м стрелами в течение 3 сек. Враги в области получают {damage} физического урона каждые 0.5 сек. Урон растёт с силой атаки в дальнем бою."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Фосфорная колба",
+        "description": "Запечатанный сосуд с реактивной химической смесью, которая на 3 сек. вспыхивает раскалённым добела пламенем в области 8 м. Враги, стоящие в пламени, получают {damage} ед. урона от огня каждые 0,5 сек. Урон растёт с силой атаки в дальнем бою."
       },
       "pack_command": {
         "name": "Команда стае",
@@ -13158,7 +13158,7 @@ export const ru_RU: EnTranslations = {
       },
       "play_dead": {
         "name": "Притвориться мёртвым",
-        "description": "Вы падаете на землю и выглядите мёртвым: всем видно, что ваше здоровье и запас концентрации пусты. Враги забывают о вас, а вражеские игроки, выбравшие вас целью, теряют цель. Движение, атака или другая способность прерывают эффект. Примените повторно, чтобы встать."
+        "description": "Вы падаете на землю и выглядите мёртвым: всем видно, что ваше здоровье и запас концентрации пусты. Враги забывают о вас, а вражеские игроки, выбравшие вас целью, теряют цель. Движение, атака или другая способность прерывают эффект. Если применить способность в движении, у вас есть 1 сек., чтобы остановиться, иначе движение прервёт эффект. Примените повторно, чтобы встать."
       },
       "tactical_camo": {
         "name": "Тактический камуфляж",
@@ -13166,15 +13166,15 @@ export const ru_RU: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Капкан ледяной пасти",
-        "description": "Устанавливает взведенную ловушку у выбранного врага или у ваших ног. Она обездвиживает первого сработавшего на ней врага и замедляет врагов рядом."
+        "description": "Устанавливает ловушку в выбранном месте. Она взводится через 0,75 сек. и действует 1 мин. Видеть её можете только вы и ваша группа. Первый враг, попавший в неё, обездвиживается на 3 сек., а враги в радиусе 4 м замедляются на 50% на 4 сек."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Медвежий капкан",
+        "description": "Устанавливает ловушку в выбранном месте. Она взводится через 0,75 сек. и действует 1 мин. Видеть её можете только вы и ваша группа. Первый враг, попавший в неё, оказывается в захлопнувшемся капкане: он истекает кровью, получая 83 ед. физического урона плюс 22,5% вашей силы атаки дальнего боя в течение 15 сек., и замедляется на 50% на 4 сек."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Рассеивающий болт",
+        "description": "Выпускает веер болтов в конусе 8 м перед вами, отбрасывая каждого задетого врага, пока он не окажется в 20 м от вас. Не наносит урона."
       },
       "pack_rally": {
         "name": "Сбор стаи",

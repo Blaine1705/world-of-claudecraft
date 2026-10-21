@@ -13109,8 +13109,8 @@ export const es: EnTranslations = {
         "description": "Hace llover flechas sobre un área de 8 m durante 3 s. Los enemigos dentro sufren {damage} de daño Físico cada 0.5 s. El daño aumenta con el poder de ataque a distancia."
       },
       "phosphor_flask": {
-        "name": "Phosphor Flask",
-        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+        "name": "Frasco de Fósforo",
+        "description": "Un recipiente sellado con una mezcla química reactiva que estalla en llamas al rojo blanco sobre un área de 8 m durante 3 s. Los enemigos que permanezcan en las llamas sufren {damage} de daño de Fuego cada 0,5 s. El daño aumenta con el poder de ataque a distancia."
       },
       "pack_command": {
         "name": "Orden de Manada",
@@ -13157,24 +13157,24 @@ export const es: EnTranslations = {
         "description": "Reduce el daño recibido un 60% durante 8 s, pero impide atacar mientras está activa."
       },
       "play_dead": {
-        "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
+        "name": "Hacerse el Muerto",
+        "description": "Cae al suelo y finge estar muerto: tu salud y tu concentración se muestran vacías para todos. Los enemigos se olvidan de ti, y los jugadores enemigos que te tienen como objetivo pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Si lo lanzas en movimiento, tienes 1 s para detenerte antes de que el movimiento lo termine. Vuelve a lanzarlo para levantarte."
       },
       "tactical_camo": {
-        "name": "Tactical Camo",
-        "description": "Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)"
+        "name": "Camuflaje Táctico",
+        "description": "Te funde con tu entorno: los enemigos apenas te notan, y te mueves al 80% de velocidad. Atacar o recibir daño rompe el Camuflaje Táctico. Vuelve a lanzarlo para salir. (Arte de Campo)"
       },
       "frostjaw_trap": {
         "name": "Trampa Fauces de Escarcha",
-        "description": "Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
+        "description": "Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo pueden verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
       },
       "bear_trap": {
-        "name": "Bear Trap",
-        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+        "name": "Trampa para Osos",
+        "description": "Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo pueden verla. El primer enemigo que la active sufre el cierre de la trampa para osos: sangra por 83 de daño Físico más un 22,5% de tu poder de ataque a distancia durante 15 s y queda ralentizado un 50% durante 4 s."
       },
       "scatterbolt": {
-        "name": "Scatterbolt",
-        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
+        "name": "Ráfaga de Virotes",
+        "description": "Dispara una ráfaga de virotes en un cono de 8 metros frente a ti, repeliendo a cada enemigo alcanzado hasta que esté a 20 metros de ti. No inflige daño."
       },
       "pack_rally": {
         "name": "Reunión de Manada",
