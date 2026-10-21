@@ -28,6 +28,7 @@ import { lootEntryRollsOnClaim } from '../sim/loot/loot_difficulty_gate';
 import { compatibleFinderRoles } from '../sim/social/dungeon_finder';
 import type { FinderAdvertCooldownView } from '../sim/social/finder_advert';
 import { FINDER_PLAYER_APPLICATION_CAP } from '../sim/social/finder_applications';
+import { finderDifficultySiblings } from '../sim/social/finder_listing_edit';
 import type { DungeonDifficulty, PlayerClass } from '../sim/types';
 import { delveCatalogueDetail, delveCatalogueRows } from './dungeon_catalogue_view';
 
@@ -184,6 +185,30 @@ export interface FinderBoardPanelView {
   guild: string;
   // My listing's advert buttons (null until a snapshot carries the cooldowns).
   advert: FinderAdvertCooldownView | null;
+  // The party members other than me that a listing I lead brings along, with
+  // the roles their class can fill (empty when solo or not the leader).
+  partyMembers: FinderPartyMemberView[];
+  // My listing's difficulty switch: the current activity plus the same
+  // content's other difficulties (empty when there is nothing to switch to).
+  difficultyOptions: FinderDifficultyOptionView[];
+}
+
+export interface FinderPartyMemberView {
+  pid: number;
+  name: string;
+  cls: PlayerClass;
+  level: number;
+  roles: Role[];
+  // The role I assigned on my published listing (null = their own selection).
+  assigned: Role | null;
+}
+
+export interface FinderDifficultyOptionView {
+  id: string;
+  difficulty: DungeonDifficulty;
+  current: boolean;
+  // My group fits the option's level band and size.
+  eligible: boolean;
 }
 
 // Live text slots the painter refreshes in place (1 Hz max), outside `sig`.
@@ -208,6 +233,13 @@ export type DungeonFinderViewModel =
       sig: string;
     };
 
+export interface FinderPartyRosterEntry {
+  pid: number;
+  name: string;
+  cls: PlayerClass;
+  level: number;
+}
+
 export interface DungeonFinderViewInput {
   info: DungeonFinderInfo | null;
   board: DungeonFinderBoard | null;
@@ -216,7 +248,12 @@ export interface DungeonFinderViewInput {
   playerId: number;
   specRole: Role | null;
   // Derived from partyInfo by the painter (null = solo).
-  party: { leader: number; size: number } | null;
+  party: {
+    leader: number;
+    size: number;
+    // The roster, for the leader's "bring your party" role pickers.
+    members?: readonly FinderPartyRosterEntry[];
+  } | null;
   // The current party leader's name (mine, if I lead), used only to recognize
   // a board listing as MY OWN group when I am a non-leader member (the board
   // carries no member pids, only class/level/role; character names are
@@ -231,6 +268,45 @@ export interface DungeonFinderViewInput {
   selectedActivityId: string | null;
   stagedActivityIds: readonly string[]; // pre-join checklist while NOT queued
   includeDelves?: boolean;
+}
+
+function partyMembersFor(
+  input: DungeonFinderViewInput,
+  info: DungeonFinderInfo,
+): FinderPartyMemberView[] {
+  const assigned = new Map((info.myListing?.partyRoles ?? []).map((e) => [e.pid, e.role]));
+  return (input.party?.members ?? [])
+    .filter((member) => member.pid !== input.playerId)
+    .map((member) => ({
+      ...member,
+      roles: compatibleFinderRoles(member.cls, member.level, null),
+      assigned: assigned.get(member.pid) ?? null,
+    }));
+}
+
+function difficultyOptionsFor(
+  info: DungeonFinderInfo,
+  members: readonly FinderPartyRosterEntry[] | null,
+  level: number,
+): FinderDifficultyOptionView[] {
+  const mine = info.myListing;
+  const current = mine ? finderActivity(mine.activityId) : undefined;
+  // A running expedition's difficulty belongs to its instance.
+  if (!current || info.expedition?.open) return [];
+  const siblings = finderDifficultySiblings(current.id);
+  if (siblings.length === 0) return [];
+  const levels = members?.map((member) => member.level) ?? [level];
+  const size = members?.length ?? 1;
+  return [current, ...siblings]
+    .sort((a, b) => FINDER_ACTIVITIES.indexOf(a) - FINDER_ACTIVITIES.indexOf(b))
+    .map((activity) => ({
+      id: activity.id,
+      difficulty: activity.difficulty,
+      current: activity.id === current.id,
+      eligible:
+        activity.id === current.id ||
+        (size < activity.size && levels.every((l) => blockReasonFor(activity, l) === null)),
+    }));
 }
 
 function blockReasonFor(activity: FinderActivity, level: number): FinderBlockReason {
@@ -555,6 +631,8 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     tags: FINDER_LISTING_TAGS,
     guild: input.playerGuild ?? '',
     advert: info.advert ?? null,
+    partyMembers: isLeader ? partyMembersFor(input, info) : [],
+    difficultyOptions: difficultyOptionsFor(info, input.party?.members ?? null, level),
   };
 
   const clocks: FinderClocksView = {
@@ -597,6 +675,8 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     ]),
     boardPanel.guild,
     boardPanel.advert,
+    boardPanel.partyMembers,
+    boardPanel.difficultyOptions,
     info.myListing
       ? {
           ...info.myListing,

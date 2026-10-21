@@ -139,14 +139,36 @@ try {
     await shot(`after-${name}-create`);
     await page.locator('[data-cancel-create]').click();
   }
+  // The leader's party: the create form brings it along with role pickers.
   await page.evaluate(() => {
     const { world, panel, members } = window.visualFixture;
     world.partyInfo = { leader: 1, members };
+    panel.render();
+  });
+  for (const [name, width, height] of [
+    ['desktop', 1440, 1000],
+    ['mobile', 390, 844],
+  ]) {
+    await page.setViewport({ width, height });
+    await page.evaluate(
+      (mobile) => document.body.classList.toggle('mobile-touch', mobile),
+      width < 600,
+    );
+    await page.locator('[data-start-create]').click();
+    await shot(`after-${name}-create-party`);
+    await page.locator('[data-cancel-create]').click();
+  }
+  await page.evaluate(() => {
+    const { world, panel, members } = window.visualFixture;
     world.dungeonFinderInfo.myListing = {
       id: 1,
       activityId: 'ignivar_raid_arena_heroic',
       tags: [],
       advertText: 'LFM - Crucible of the Last Spring - Heroic - 4/10 - Tank/Healer/DPS needed',
+      partyRoles: [
+        { pid: 2, role: 'healer' },
+        { pid: 4, role: 'dps' },
+      ],
       applicants: [{ ...members[3], pid: 15, name: 'Solara', gear: {} }],
     };
     panel.render();

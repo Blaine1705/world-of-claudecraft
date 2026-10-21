@@ -1,6 +1,7 @@
 // Validate new optional expedition data without changing legacy finder mirror
 // reference semantics. A malformed expedition cannot enable travel controls.
 
+import { isFinderRole } from '../sim/content/dungeon_finder';
 import {
   QUEUE_BALANCE_CAP,
   QUEUE_DAILY_POINT_CAP,
@@ -8,6 +9,7 @@ import {
 } from '../sim/content/queue_rewards';
 import { validExpeditionDetails } from '../sim/social/expedition_social';
 import { FINDER_PLAYER_APPLICATION_CAP } from '../sim/social/finder_applications';
+import { FINDER_PARTY_ROLES_CAP } from '../sim/social/finder_listing_edit';
 import { isEquipSlot } from '../sim/types';
 import type {
   DungeonFinderBoard,
@@ -96,6 +98,15 @@ export function decodeDungeonFinderInfo(value: unknown): DungeonFinderInfo | nul
     const { advertText: _advertText, ...listing } = decoded.myListing;
     drop('myListing', listing);
   }
+  // A malformed role assignment list only loses the role pickers' state.
+  if (
+    record(decoded.myListing) &&
+    decoded.myListing.partyRoles !== undefined &&
+    !validPartyRoles(decoded.myListing.partyRoles)
+  ) {
+    const { partyRoles: _partyRoles, ...listing } = decoded.myListing;
+    drop('myListing', listing);
+  }
   if (value.myApplication != null && !validApplication(value.myApplication))
     drop('myApplication', null);
   if (value.myApplications !== undefined) {
@@ -131,6 +142,13 @@ function validAdvert(value: unknown): boolean {
     count(value.discord) &&
     value.discord <= 60 &&
     typeof value.discordAvailable === 'boolean'
+  );
+}
+function validPartyRoles(value: unknown): boolean {
+  return (
+    Array.isArray(value) &&
+    value.length <= FINDER_PARTY_ROLES_CAP &&
+    value.every((entry) => record(entry) && id(entry.pid) && isFinderRole(entry.role))
   );
 }
 function validApplication(value: unknown): value is { listingId: number } {

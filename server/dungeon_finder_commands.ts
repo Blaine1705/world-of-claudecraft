@@ -11,6 +11,7 @@ export const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_H
 
 import { validExpeditionDetails } from '../src/sim/social/expedition_social';
 import { type FinderAdvertTarget, isFinderAdvertTarget } from '../src/sim/social/finder_advert';
+import { FINDER_PARTY_ROLES_CAP } from '../src/sim/social/finder_listing_edit';
 
 // `advertise` is the server-owned listing advert (per-account cooldowns and the
 // chat/Discord routes live in server/community_relay.ts). Without it, an
@@ -74,6 +75,36 @@ export function dispatchDungeonFinderCommand(
         );
       else if (value.kind === 'advertise' && isFinderAdvertTarget(value.target))
         advertise?.(value.target);
+      else if (
+        value.kind === 'party_roles' &&
+        Array.isArray(value.roles) &&
+        value.roles.length <= FINDER_PARTY_ROLES_CAP &&
+        value.roles.every(
+          (entry) =>
+            !!entry &&
+            typeof entry === 'object' &&
+            Number.isSafeInteger(entry.pid) &&
+            entry.pid > 0 &&
+            isFinderRole(entry.role),
+        )
+      )
+        sim.dungeonFinderExpeditionConfigure(
+          {
+            kind: 'party_roles',
+            roles: value.roles.map((entry) => ({ pid: entry.pid, role: entry.role })),
+          },
+          pid,
+        );
+      else if (
+        value.kind === 'difficulty' &&
+        typeof value.activityId === 'string' &&
+        value.activityId.length > 0 &&
+        value.activityId.length <= 64
+      )
+        sim.dungeonFinderExpeditionConfigure(
+          { kind: 'difficulty', activityId: value.activityId },
+          pid,
+        );
       else if (
         value.kind === 'reward' &&
         typeof value.buy === 'boolean' &&

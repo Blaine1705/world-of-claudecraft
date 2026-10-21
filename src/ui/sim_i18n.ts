@@ -1255,6 +1255,9 @@ const baseEnTable = {
   'dfinder.assembled': 'Your Dungeon Finder group has assembled. Travel to the entrance together.',
   'dfinder.listingPublished': 'Your group listing is published.',
   'dfinder.appliedListingClosed': 'The group listing you applied to has closed.',
+  'dfinder.listingDifficultyChanged': 'Your group listing difficulty is updated.',
+  'dfinder.appliedListingDifficulty':
+    'The group you applied to changed its difficulty, so your application was withdrawn.',
   'dfinder.listingClosed': 'Your group listing is now closed.',
   'dfinder.applied': 'You apply to a group listing.',
   'dfinder.applicantApplies': '{name} applies to your group listing.',

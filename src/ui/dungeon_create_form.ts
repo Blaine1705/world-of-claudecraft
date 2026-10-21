@@ -6,6 +6,7 @@ import type { IWorld } from '../world_api';
 import { groupedActivityOptionsHtml } from './dungeon_activity_chrome';
 import { boardTagLabel } from './dungeon_board_chrome';
 import type { FinderBoardPanelView, FinderQueuePanelView } from './dungeon_finder_view';
+import { partyRolesHtml } from './dungeon_listing_edit_chrome';
 import { esc } from './esc';
 import { t } from './i18n';
 import { svgIcon } from './ui_icons';
@@ -17,6 +18,8 @@ export interface GroupDraft {
   tags: ReadonlySet<FinderListingTag>;
   // Guild Party: only members of my guild may apply (needs a guild).
   guildOnly: boolean;
+  // Roles for the party members the listing brings along (absent = their own).
+  partyRoles: ReadonlyMap<number, Role>;
 }
 export function createFormState(
   b: FinderBoardPanelView,
@@ -51,6 +54,7 @@ export function publishGroupDraft(
   activityId: string | null,
   role: Role | null,
   tags: ReadonlySet<FinderListingTag>,
+  partyRoles: ReadonlyMap<number, Role> = new Map(),
 ): boolean {
   const info = world.dungeonFinderInfo;
   const activity = activityId ? finderActivity(activityId) : null;
@@ -73,6 +77,12 @@ export function publishGroupDraft(
     return false;
   world.dungeonFinderSetRoles([role]);
   world.dungeonFinderListingCreate(activity.id, [...tags]);
+  // The party joins the listing as it is created; their assigned roles follow
+  // on the same ordered command channel.
+  const roles = [...partyRoles]
+    .filter(([pid]) => party?.members.some((member) => member.pid === pid))
+    .map(([pid, role]) => ({ pid, role }));
+  if (roles.length > 0) world.dungeonFinderExpeditionConfigure({ kind: 'party_roles', roles });
   return true;
 }
 
@@ -103,5 +113,5 @@ export function createGroupFormHtml(
     )
     .join('');
   const guild = `<section class="df-create-guild"><label class="df-guild-toggle"><input type="checkbox" data-create-guild${state.guildOnly ? ' checked' : ''}${b.guild ? '' : ' disabled'}><span>${esc(t('hudChrome.finder.guildPartyToggle'))}</span></label><p class="df-note">${esc(b.guild ? t('hudChrome.finder.guildPartyHint', { guild: b.guild }) : t('hudChrome.finder.guildPartyNeedsGuild'))}</p></section>`;
-  return `<div class="df-create ui-card"><div class="df-create-heading"><label class="df-create-filter"><span>${esc(t('hudChrome.finder.activity'))}</span><select class="ui-input" data-create-kind><option value="dungeon"${draft.kind === 'dungeon' ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.dungeons'))}</option><option value="raid"${draft.kind === 'raid' ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.raids'))}</option></select></label><div class="df-create-actions"><button type="button" class="df-create-cancel ui-btn" data-cancel-create>${esc(t('hudChrome.finder.cancelCreate'))}</button><button type="button" class="btn df-create-btn ui-btn ui-btn--gold" data-act="create"${state.canPublish ? '' : ' disabled'}>${esc(t('hudChrome.finder.publish'))}</button></div></div><section class="df-create-role-section"><div class="df-sub" id="df-create-role-label">${esc(t('hudChrome.finder.yourRole'))}</div><div class="df-create-roles" role="group" aria-labelledby="df-create-role-label">${roles}</div>${state.locked ? `<p class="df-note">${esc(t('hudChrome.finder.createQueueLocked'))}</p>` : ''}</section>${guild}<div class="df-options df-activity-options" role="radiogroup" aria-label="${esc(t('hudChrome.finder.activity'))}">${options || `<p class="df-note">${esc(t('hudChrome.finder.noCreateActivities'))}</p>`}</div><div class="df-create-tags">${tags}</div></div>`;
+  return `<div class="df-create ui-card"><div class="df-create-heading"><label class="df-create-filter"><span>${esc(t('hudChrome.finder.activity'))}</span><select class="ui-input" data-create-kind><option value="dungeon"${draft.kind === 'dungeon' ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.dungeons'))}</option><option value="raid"${draft.kind === 'raid' ? ' selected' : ''}>${esc(t('hudChrome.adventureGuide.raids'))}</option></select></label><div class="df-create-actions"><button type="button" class="df-create-cancel ui-btn" data-cancel-create>${esc(t('hudChrome.finder.cancelCreate'))}</button><button type="button" class="btn df-create-btn ui-btn ui-btn--gold" data-act="create"${state.canPublish ? '' : ' disabled'}>${esc(t('hudChrome.finder.publish'))}</button></div></div><section class="df-create-role-section"><div class="df-sub" id="df-create-role-label">${esc(t('hudChrome.finder.yourRole'))}</div><div class="df-create-roles" role="group" aria-labelledby="df-create-role-label">${roles}</div>${state.locked ? `<p class="df-note">${esc(t('hudChrome.finder.createQueueLocked'))}</p>` : ''}</section>${guild}${partyRolesHtml(b.partyMembers, (pid) => draft.partyRoles.get(pid) ?? null)}<div class="df-options df-activity-options" role="radiogroup" aria-label="${esc(t('hudChrome.finder.activity'))}">${options || `<p class="df-note">${esc(t('hudChrome.finder.noCreateActivities'))}</p>`}</div><div class="df-create-tags">${tags}</div></div>`;
 }

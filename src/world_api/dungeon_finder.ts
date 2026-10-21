@@ -12,6 +12,7 @@ import type {
   ExpeditionFeedback,
 } from '../sim/social/expedition_social';
 import type { FinderAdvertCooldownView, FinderAdvertTarget } from '../sim/social/finder_advert';
+import type { FinderPartyRole } from '../sim/social/finder_listing_edit';
 import type { EquipSlot, PlayerClass } from '../sim/types';
 
 export type ExpeditionSettings =
@@ -21,7 +22,12 @@ export type ExpeditionSettings =
   | { kind: 'reward'; id: QueueRewardId | null; buy: boolean }
   | { kind: 'cancel_application'; listingId: number }
   // Post my listing's "LFM" line to General chat or Discord (cooldown-gated).
-  | { kind: 'advertise'; target: FinderAdvertTarget };
+  | { kind: 'advertise'; target: FinderAdvertTarget }
+  // Assign roles to the party members my listing brought along (leader only;
+  // the whole list, so a member left out seats by their own selection).
+  | { kind: 'party_roles'; roles: FinderPartyRole[] }
+  // Move my listing to the same content's other difficulty.
+  | { kind: 'difficulty'; activityId: string };
 
 export interface DungeonFinderApplicationView {
   listingId: number;
@@ -75,6 +81,9 @@ export interface DungeonFinderMyListingView {
   details?: ExpeditionDetails;
   // The "LFM - ..." line the advert buttons post (built by the sim).
   advertText?: string;
+  // Roles I assigned to the party members this listing brought along (members
+  // without an entry seat by their own role selection). Absent on older snapshots.
+  partyRoles?: FinderPartyRole[];
 }
 
 export interface DungeonFinderExpeditionView {

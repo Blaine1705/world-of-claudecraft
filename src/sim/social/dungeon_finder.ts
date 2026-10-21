@@ -67,6 +67,7 @@ import {
   isGuildParty,
   sharesLeaderGuild,
 } from './finder_guild';
+import { cleanFinderPartyRoles, planFinderDifficulty } from './finder_listing_edit';
 import {
   finderLevelEligible,
   planFinderListing,
@@ -224,6 +225,9 @@ interface FinderListing {
   expeditionExitId?: number;
   expeditionPartyId?: number | null;
   details?: ExpeditionDetails;
+  // Roles the leader assigned to the party members this listing brought along
+  // (read against the live roster, so a departed member's entry is inert).
+  memberRoles?: Map<number, Role>;
 }
 
 // ---------------------------------------------------------------------------
@@ -357,6 +361,21 @@ export class DungeonFinderMachine {
       );
     } else if (settings.kind === 'advertise') {
       if (isFinderAdvertTarget(settings.target)) this.advertise(id, settings.target);
+    } else if (settings.kind === 'party_roles') {
+      const listing = this.listingBy(id);
+      if (!listing || listing.expeditionExitId !== undefined || !Array.isArray(settings.roles))
+        return;
+      // The full assignment list each time: a member left out seats by their
+      // own role selection again.
+      listing.memberRoles = cleanFinderPartyRoles(
+        this.ctx,
+        id,
+        this.listingMembers(listing),
+        settings.roles,
+      );
+      this.bumpBoard();
+    } else if (settings.kind === 'difficulty') {
+      this.changeDifficulty(id, settings.activityId);
     } else if (settings.kind === 'reward') {
       const state = r.meta.queueRewards ?? loadQueueRewards();
       if (typeof settings.buy === 'boolean' && changeQueueReward(state, settings.id, settings.buy))
@@ -389,6 +408,48 @@ export class DungeonFinderMachine {
       return;
     }
     chat(this.ctx, `/general ${text}`, pid);
+  }
+
+  // Switch my listing to the same content's other difficulty. Pending
+  // applicants outside the new level band are released with a notice.
+  private changeDifficulty(id: number, activityId: unknown): void {
+    const listing = this.listingBy(id);
+    if (!listing) {
+      this.ctx.error(id, 'You do not lead a group listing.');
+      return;
+    }
+    if (listing.expeditionExitId !== undefined || typeof activityId !== 'string') {
+      this.ctx.error(id, 'That listing is no longer available.');
+      return;
+    }
+    const target = planFinderDifficulty(
+      this.ctx,
+      id,
+      listing.activityId,
+      activityId,
+      this.listingMembers(listing),
+      (leaderPid, memberPid) => this.memberBlocksError(leaderPid, memberPid),
+    );
+    if (!target) return;
+    listing.activityId = target.id;
+    for (const app of this.applicationsFor(listing)) {
+      if (finderLevelEligible(target, this.levelOf(app.pid))) continue;
+      this.dropApplication(app.pid, listing.id);
+      if (this.ctx.players.has(app.pid))
+        this.ctx.notice(
+          app.pid,
+          'The group you applied to changed its difficulty, so your application was withdrawn.',
+        );
+    }
+    this.bumpBoard();
+    this.ctx.notice(id, 'Your group listing difficulty is updated.');
+  }
+
+  // A party member the leader assigned a role keeps it on this listing; anyone
+  // else (the leader, accepted applicants) seats by their own role selection.
+  private listingRoles(listing: FinderListing, pid: number): Role[] {
+    const assigned = listing.memberRoles?.get(pid);
+    return assigned ? [assigned] : this.allowedRoles(pid);
   }
 
   private listingMembers(listing: FinderListing): number[] {
@@ -970,7 +1031,7 @@ export class DungeonFinderMachine {
     const members = this.listingMembers(listing);
     if (members.length >= activity.size) return false;
     const seated: FinderRoleMember[] = members
-      .map((memberPid) => ({ pid: memberPid, roles: this.allowedRoles(memberPid) }))
+      .map((memberPid) => ({ pid: memberPid, roles: this.listingRoles(listing, memberPid) }))
       .filter((m) => m.roles.length > 0);
     seated.push({ pid: applicantPid, roles: applicantRoles });
     const match = matchFinderRoles(seated, comp);
@@ -1517,6 +1578,10 @@ export class DungeonFinderMachine {
             tags: [...listing.tags],
             ...(listing.details ? { details: { ...listing.details } } : {}),
             ...(advertText ? { advertText } : {}),
+            partyRoles: this.listingMembers(listing).flatMap((memberPid) => {
+              const role = listing.memberRoles?.get(memberPid);
+              return role ? [{ pid: memberPid, role }] : [];
+            }),
             applicants: this.applicationsFor(listing)
               .sort((a, b) => a.at - b.at)
               .map((a) => {
@@ -1638,7 +1703,7 @@ export class DungeonFinderMachine {
       }
     } else if (activity.composition !== null) {
       const seatable: FinderRoleMember[] = members
-        .map((pid) => ({ pid, roles: this.allowedRoles(pid) }))
+        .map((pid) => ({ pid, roles: this.listingRoles(listing, pid) }))
         .filter((m) => m.roles.length > 0);
       const match = matchFinderRoles(seatable, activity.composition);
       assigned = match.assigned;

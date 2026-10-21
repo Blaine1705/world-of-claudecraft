@@ -11,6 +11,7 @@ import type { DungeonFinderApplicantView } from '../world_api';
 import { classIconUrl } from './class_icon_art';
 import { BOARD_CONTENT_FILTERS, type BoardContentFilter } from './dungeon_board_filter';
 import type { FinderBoardPanelView, FinderListingRowView } from './dungeon_finder_view';
+import { difficultySwitchHtml, partyRolesHtml } from './dungeon_listing_edit_chrome';
 import { classDisplayName, dungeonDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { expeditionImageUrl } from './hud/expeditions/expedition_art';
@@ -207,7 +208,7 @@ export function boardMyListingHtml(board: FinderBoardPanelView, groupHtml = ''):
   const hero = activity
     ? `<div class="df-board-hero"><img src="${esc(expeditionImageUrl(activity.dungeonId))}" alt="" decoding="async" draggable="false"><div class="df-board-hero-copy"><span class="df-board-eyebrow">${esc(t('hudChrome.finder.yourListing'))}</span><h3>${esc(dungeonDisplayName(activity.dungeonId))}</h3>${difficultyBadge(activity.difficulty)}${guild}</div></div>`
     : `<h3 class="df-sub">${esc(t('hudChrome.finder.yourListing'))}</h3>`;
-  return `<section class="df-mine ui-card ui-card-tile">${hero}<div class="df-mine-content">${groupHtml}<div class="df-mine-tags">${tagsHtml(mine.tags)}</div>${advertHtml(board)}<div class="df-board-heading"><h3>${esc(t('hudChrome.finder.applicants'))}</h3><span class="df-board-count">${esc(num(mine.applicants.length))}</span></div><div class="df-applicants">${mine.applicants.length ? mine.applicants.map(boardApplicantHtml).join('') : `<div class="df-board-empty df-note">${svgIcon('social')}<p>${esc(t('hudChrome.finder.noApplicants'))}</p></div>`}</div><button type="button" class="btn leave df-close-listing ui-btn" data-act="closelisting">${esc(t('hudChrome.finder.closeListing'))}</button></div></section>`;
+  return `<section class="df-mine ui-card ui-card-tile">${hero}<div class="df-mine-content">${difficultySwitchHtml(board.difficultyOptions)}${groupHtml}${partyRolesHtml(board.partyMembers)}<div class="df-mine-tags">${tagsHtml(mine.tags)}</div>${advertHtml(board)}<div class="df-board-heading"><h3>${esc(t('hudChrome.finder.applicants'))}</h3><span class="df-board-count">${esc(num(mine.applicants.length))}</span></div><div class="df-applicants">${mine.applicants.length ? mine.applicants.map(boardApplicantHtml).join('') : `<div class="df-board-empty df-note">${svgIcon('social')}<p>${esc(t('hudChrome.finder.noApplicants'))}</p></div>`}</div><button type="button" class="btn leave df-close-listing ui-btn" data-act="closelisting">${esc(t('hudChrome.finder.closeListing'))}</button></div></section>`;
 }
 
 const FILTER_KEYS: Record<BoardContentFilter, TranslationKey> = {

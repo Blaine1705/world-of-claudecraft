@@ -13291,6 +13291,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.postDiscordOffline': 'Только в онлайн-игре',
   'hudChrome.finder.inspect': 'Осмотреть',
   'hudChrome.finder.inspectApplicantAria': 'Осмотреть: {name}',
+  'hudChrome.finder.partyHeading': 'Ваша группа идёт с вами',
+  'hudChrome.finder.partyNote':
+    'Ваша группа присоединяется к этому отряду. Выберите роль для каждого участника или оставьте его собственную.',
+  'hudChrome.finder.partyRolesHeading': 'Роли в группе',
+  'hudChrome.finder.partyRolesNote':
+    'Выберите роль для каждого участника или оставьте его собственную.',
+  'hudChrome.finder.partyRoleOwn': 'На их выбор',
+  'hudChrome.finder.partyRoleAria': 'Роль: {name}',
+  'hudChrome.finder.partyMemberMeta': '{cls}, уровень {level}',
+  'hudChrome.finder.difficultyHeading': 'Сложность',
   'hudChrome.finder.mech.shadow_pulse': 'Пульс тьмы (периодический урон по области)',
   'hudChrome.finder.mech.reaping_arc': 'Жатвенная дуга (рассекающий удар спереди)',
   'hudChrome.finder.mech.mist_surge': 'Волна тумана (периодический урон по области)',

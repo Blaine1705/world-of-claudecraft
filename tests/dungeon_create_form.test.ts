@@ -26,6 +26,7 @@ const draft: GroupDraft = {
   role: null,
   tags: new Set(),
   guildOnly: false,
+  partyRoles: new Map(),
 };
 
 describe('group creation draft', () => {

@@ -1766,6 +1766,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'finder_advert.ts',
       'finder_applications.ts',
       'finder_guild.ts',
+      'finder_listing_edit.ts',
       'finder_recruitment.ts',
       'party.ts',
       'pull_timer.ts',

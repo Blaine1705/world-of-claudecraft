@@ -16652,6 +16652,57 @@
   .df-create-guild .df-note {
     margin: 4px 0 0;
   }
+  .df-party-roles {
+    margin-top: 12px;
+  }
+  .df-party-roles .df-note {
+    margin: 4px 0 8px;
+  }
+  .df-party-list {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .df-party-member {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(120px, auto);
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--color-finder-ink);
+  }
+  .df-party-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: 600 14px / 1.3 var(--font-ui);
+    color: var(--color-finder-text);
+  }
+  .df-difficulty-switch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .df-difficulty-switch .df-sub {
+    margin: 0;
+  }
+  .df-difficulty-options {
+    display: inline-flex;
+    gap: 6px;
+  }
+  .df-difficulty-option.active {
+    border-color: var(--color-finder-gold);
+    color: var(--color-finder-gold);
+  }
+  .df-difficulty-option.active:disabled {
+    opacity: 1;
+  }
   .df-advert {
     display: grid;
     gap: 8px;
@@ -17134,6 +17185,13 @@
     }
     .df-board-shell .df-listing-action > .ui-btn {
       width: 100%;
+    }
+    /* The role select drops under the member's name and level. */
+    .df-party-member {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    .df-party-member select {
+      grid-column: 1 / -1;
     }
   }
   @container finder-board (max-width: 900px) {

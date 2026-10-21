@@ -145,6 +145,8 @@ describe('premade board chrome', () => {
       tags: [],
       guild: '',
       advert: null,
+      partyMembers: [],
+      difficultyOptions: [],
     };
     const root = markup(premadeBoardHtml(board, '<button data-act="create"></button>'));
     expect(root.querySelector('.df-board-own .df-applicants')).not.toBeNull();

@@ -22,6 +22,7 @@ import {
   FINDER_GUILD_TAG,
   type FinderListingTag,
   finderActivity,
+  isFinderRole,
 } from '../sim/content/dungeon_finder';
 import type { Role } from '../sim/content/talents';
 import { DELVES, ITEMS } from '../sim/data';
@@ -116,6 +117,7 @@ export class DungeonFinderWindow {
   private createKind: 'dungeon' | 'raid' = 'dungeon';
   private stagedCreateRole: Role | null = null;
   private stagedGuildOnly = false;
+  private stagedPartyRoles = new Map<number, Role>();
   private boardFilter: BoardContentFilter = 'all';
   // Mobile master-detail: which pane the single column shows.
   private pane: 'list' | 'detail' = 'list';
@@ -192,7 +194,13 @@ export class DungeonFinderWindow {
       playerClass: world.cfg.playerClass,
       playerId: world.playerId,
       specRole: world.talentRole,
-      party: party ? { leader: party.leader, size: party.members.length } : null,
+      party: party
+        ? {
+            leader: party.leader,
+            size: party.members.length,
+            members: party.members.map(({ pid, name, cls, level }) => ({ pid, name, cls, level })),
+          }
+        : null,
       partyLeaderName: party
         ? (party.members.find((m) => m.pid === party.leader)?.name ?? null)
         : null,
@@ -541,6 +549,33 @@ export class DungeonFinderWindow {
         rerender();
       },
     );
+    // Party member roles: staged while creating, sent whole for my listing.
+    el.querySelectorAll<HTMLSelectElement>('[data-party-role]').forEach((select) => {
+      select.addEventListener('change', () => {
+        const pid = Number(select.dataset.partyRole);
+        const role = isFinderRole(select.value) ? select.value : null;
+        if (!view.board.myListing) {
+          if (role) this.stagedPartyRoles.set(pid, role);
+          else this.stagedPartyRoles.delete(pid);
+          rerender();
+          return;
+        }
+        const roles = view.board.partyMembers.flatMap((member) => {
+          const next = member.pid === pid ? role : member.assigned;
+          return next ? [{ pid: member.pid, role: next }] : [];
+        });
+        world().dungeonFinderExpeditionConfigure({ kind: 'party_roles', roles });
+        audio.click();
+      });
+    });
+    el.querySelectorAll<HTMLButtonElement>('[data-listing-difficulty]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const activityId = btn.dataset.listingDifficulty;
+        if (btn.disabled || !activityId) return;
+        world().dungeonFinderExpeditionConfigure({ kind: 'difficulty', activityId });
+        audio.click();
+      });
+    });
     el.querySelectorAll<HTMLButtonElement>('[data-advert]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const target = btn.dataset.advert;
@@ -592,10 +627,14 @@ export class DungeonFinderWindow {
       const state = createFormState(view.board, view.queue, this.createDraft());
       const tags = new Set(this.stagedTags);
       if (state.guildOnly) tags.add(FINDER_GUILD_TAG);
-      if (!state.canPublish || !publishGroupDraft(world(), state.activity, state.role, tags)) {
+      if (
+        !state.canPublish ||
+        !publishGroupDraft(world(), state.activity, state.role, tags, this.stagedPartyRoles)
+      ) {
         rerender();
         return;
       }
+      this.stagedPartyRoles.clear();
       audio.click();
     });
     el.querySelector('[data-act="closelisting"]')?.addEventListener('click', () => {
@@ -941,6 +980,7 @@ export class DungeonFinderWindow {
       role: this.stagedCreateRole,
       tags: this.stagedTags,
       guildOnly: this.stagedGuildOnly,
+      partyRoles: this.stagedPartyRoles,
     };
   }
 

@@ -45,6 +45,8 @@ const panel = (over: Partial<FinderBoardPanelView> = {}): FinderBoardPanelView =
   tags: [],
   guild: '',
   advert: null,
+  partyMembers: [],
+  difficultyOptions: [],
   ...over,
 });
 function markup(html: string): HTMLElement {
@@ -146,6 +148,7 @@ describe('Guild Parties in the board UI', () => {
       role: null,
       tags: new Set<never>(),
       guildOnly: true,
+      partyRoles: new Map(),
     };
     const guilded = markup(createGroupFormHtml(panel({ guild: 'Nightwatch' }), queue, draft));
     const toggle = guilded.querySelector<HTMLInputElement>('[data-create-guild]');

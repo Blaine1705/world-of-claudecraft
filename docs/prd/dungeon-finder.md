@@ -97,6 +97,16 @@ boost groups. Existing manually created groups and physical dungeon entry rules 
 - Each applicant card has an Inspect action that opens Player Info: the live card when the
   applicant is in view, otherwise the applicant's finder snapshot (class, spec, worn gear), which
   only that listing's leader receives. Player Info names the specialization by default.
+- A leader's current party joins the listing it creates. The create form and the published
+  listing show the other members under "Bringing your party", each with a role picker limited to
+  roles their class can fill ("Their choice" keeps the member's own finder role). The assignment
+  is listing-scoped (the `party_roles` configure kind, `src/sim/social/finder_listing_edit.ts`):
+  it drives the roster roles, the open-slot counts, applicant seating and the advert line, and
+  never changes the member's own role selection.
+- The leader can switch a published listing to the same content's other difficulty (the
+  `difficulty` configure kind). The switch keeps the listing and its applicants, refuses when a
+  member is outside the new level band, and releases any pending applicant outside it with a
+  notice. A running expedition's listing keeps its instance difficulty.
 
 ### Travel and entry
 
