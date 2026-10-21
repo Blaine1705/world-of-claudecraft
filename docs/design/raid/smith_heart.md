@@ -1,8 +1,10 @@
 # The Smith's Heart: raid design
 
-Status: phase 1 (playable blockout) and phase 2A (the structure: the final boss in a
-separate room reached by a portal, bigger themed guardian rooms, the structural VFX)
-implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
+Status: phase 1 (playable blockout), phase 2A (the structure: the final boss in a
+separate room reached by a portal, bigger themed guardian rooms, the structural VFX) and
+phase 2B (the Hammer vein dressed: its Blender kit, its floor, air and light, the Hammer
+guardian's and the Slab's effects, section 5.9) implemented on `feature/smith-heart-raid`,
+dev builds only. The per-room phases (Blender
 kits, own creatures, set pieces, boss kits), the quest and the loot are specified here
 and not built. The name is provisional and has not been IP-checked yet.
 
@@ -33,6 +35,9 @@ Sources of truth, in order:
 | Gate collision and state engine (shared) | `src/sim/instances/dungeon_gates.ts` |
 | Authored open-air field engine (shared) | `src/sim/instances/authored_field/` (see its `CLAUDE.md`) |
 | Placeholder looks (the one list phase 2 replaces) | `src/render/characters/smith_heart_placeholder_looks.ts` |
+| The Hammer vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_hammer_kit.py`, `scripts/assets/smith_heart_hammer_kit/build.mjs`, `src/render/smith_heart/hammer_kit_plan_core.ts`, `src/render/smith_heart/heart_kit.ts` |
+| The Hammer vein's air and light | `src/render/smith_heart/hammer_air_core.ts`, `src/render/smith_heart/heart_environment.ts` (`smithHeartHammer`) |
+| The Hammer guardian's and the Slab's effects | `src/render/smith_heart_fx/` (`HammerFx`) |
 | Dev commands | `src/sim/dev/smith_heart_dev.ts` (`/dev heart`) |
 
 ## 1. Summary and lore
@@ -125,7 +130,7 @@ rather than repeating numbers that would rot.
 |---|---|---|
 | The Cleft (entrance landing) | disc, south-west corner | `CLEFT` |
 | The Hammer Gallery | three landings joined by descending paths | `GALLERY_LANDINGS` |
-| The Smith's Quarry (Hammer arena) | a carved ellipse about 92 by 80 yd, deep under four stepped terraces on its east and south sides (unreachable ledges, each several bodies tall), the colossi on the deep top step | `HAMMER_PIT`, `QUARRY_TERRACES` |
+| The Smith's Quarry (Hammer arena) | a carved ellipse about 92 by 80 yd, deep under four stepped terraces on its east and south sides (unreachable ledges, each several bodies tall), the colossi carved out of the terraces, kneeling on the first step (`QUARRY_COLOSSUS_OUT`) so the play camera on the pit floor frames them | `HAMMER_PIT`, `QUARRY_TERRACES` |
 | The Slab, the Balcony | stair from the Quarry up to the Balcony | `SLAB`, `BALCONY` |
 | The Grand Stair | one broad stair (16 yd) from the Balcony's tip down across the chasm to the dais | `GRAND_STAIR` |
 | The Ring | flat annulus sector round the seal, two curved stairs to the Balcony | `RING`, `RING_ARC` |
@@ -369,8 +374,39 @@ progress and the way); only cosmetic motes and embers thin on the low tier
 `smithHeartAreaAt` names the area of any point (hammer, ring, breath, quench, heat,
 heart). The score follows it (`SMITH_HEART_AREA_MUSIC`: each vein and the Heart borrow
 an existing cue whose brief fits until the raid has its own score). The Heart has its
-own fog and light state, `smithHeartCore` (`heart_environment.ts`); the main map keeps
-the borrowed storm grade until the per-room phases. The sky blends from storm to the
+own fog and light state, `smithHeartCore` (`heart_environment.ts`), and so does the
+Hammer vein, `smithHeartHammer` (phase 2B: a warm quarry dusk, the key low from the
+south-west raking the terraces, the realm's blue sky light all but off); the rest of the
+main map keeps the borrowed storm grade until the per-room phases.
+
+### 5.9 The Hammer vein dressed (phase 2B)
+
+| Piece | Look | Where |
+|---|---|---|
+| The Cleft | two flanks of ochre granite leaning together to a crack open to the sky, a chockstone jammed in it, the way back to the world cut as a doorway of the Smith's dressed stone (jambs, a lintel with the hammer rune, steps), the vein's glow at its foot | `Kit_CleftGate` on `sh_cleft_mouth` |
+| The Gallery | quarried lips leaning out over the void along every ledge, chain hoists hung off them, the Smith's rough statues on the rims (one standing, one kneeling, scaffold poles), geodes of amber crystal, chips on the landings | the edge plan, `sh_rough_statue`, `sh_geode` |
+| The collapse spot (6.1) | a great flake of rock split from the mountain hanging out over the lower Gallery nine yards up, iron straps across its crack, chains back to the rock, the masons' red warning chevrons, grit trickling steadily onto the walk | `Kit_CollapseOverhang` at `collapseSpot()`, `hammer_air_core.ts` |
+| The Smith's Quarry | three colossi in the Smith's likeness carved out of the terraces (the Vigil kneels with his hammer planted, the Waking heaves himself out of the step on his hands, the Bearer kneels with the hammer on his shoulder), worked quarry faces on every riser and a flat worked rim round the pit floor, a cut-bedrock floor (`quarry` ground), carved columns in square sockets (made to sink: the rising and falling columns of 7.1 stand in them), cut blocks, the derrick, a scaffold against the Vigil, spoil heaps on the steps | `planHammerKit()` |
+| The Slab | a frame of dressed monoliths with the Smith's tools and the hammer rune; the slab itself two carved halves with the hammer rune across its split | `Kit_SlabFrame`, `Kit_SlabHalfL`, `Kit_SlabHalfR` |
+| The Balcony | two lookouts, kneeling Smiths on corbels at its sides holding bowls of the vein's coals toward the heart | `Kit_LookoutStatue` |
+| The air | dust in the low sun, grit off the terrace lips and the colossi, a warm haze over the pit, the geodes' halos | `hammer_air.ts` |
+
+Effects (`src/render/smith_heart_fx/`, presentation only, the sim untouched):
+
+| Moment | Look |
+|---|---|
+| Mountain's Wrath, on its bar | molten cracks race out from the guardian's feet, loose stones lift and hang round it, dust is drawn in toward it, grit shakes down |
+| Mountain's Wrath, landing | a wall of rock dust rides the sight field's wave out to the nova's radius, the floating stones and a spray of rubble fly outward, shock rings, a flash, grit pours off the terraces, the quarry shakes |
+| Hammerfall | a fan of cracks torn open in its arc, rubble and dust thrown along it, a short shake |
+| The Slab breaking | the split flares, the stone bursts both ways along the stair, a dust cloud rolls out, shock rings, grit pours off the lintel while the halves part and sink |
+| The Pit Mouth sealing | a dust skirt along its foot as it slams shut behind the raid |
+
+Readability: the telegraph of Mountain's Wrath stays the trash engine's sight field (the
+nova's ring and the hatched safe shadow behind each column) on every graphics tier; the
+cracks draw over its fill, under its wave. The effects, the air and the rubble are
+cosmetic and thin on the low tier and under reduced motion. Everything is built with
+the interior or under one compile-gated root, so nothing links on first use. Kit piece
+names (Vigil, Waking, Bearer, lookout) are internal node names, never shown to a player. The sky blends from storm to the
 Heart's ember night as the camera arrives.
 
 ## 6. Set pieces (phase 2 specs)
@@ -448,6 +484,9 @@ the meters harness, never shipped unmeasured.
   Wrath (cast-bar line-of-sight nova covering the Quarry: hide behind a column).
 - Target: the five columns rise and fall on a cycle, so the safe spots for Mountain's
   Wrath move; ground slams raise new columns; a tank-swap mechanic on the hammer.
+- Presentation (phase 2B, section 5.9): Mountain's Wrath and Hammerfall have their
+  effects; the columns are carved pillars standing in sockets they will sink into.
+  Mechanics and numbers unchanged.
   Role jobs: tanks swap and position against the columns, healers recover after
   each Wrath, damage dealers manage column timing.
 
@@ -603,9 +642,11 @@ Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 The structure is in place; each room now gets its own phase, ONE at a time, with
 captures and review before the next:
 
-1. **The Hammer** (the Cleft, the Gallery, the Quarry): a Blender kit for the quarry
-   steps, the colossi (real half-carved figures, faces and tools), geodes, derrick and
-   columns; the collapsing gallery; the columns that rise and fall.
+1. **The Hammer** (the Cleft, the Gallery, the Quarry): DRESSED in phase 2B (section
+   5.9: the kit, the floor, the air and light, the guardian's and the Slab's effects).
+   Still to build: the collapsing gallery's mechanic (its spot is marked), the columns
+   that rise and fall (they stand in their sockets), the guardian's target kit and its
+   own body.
 2. **The Ring and the Seal Dais**: the seal and the tines as real models; the Ring's
    pillars; the Balcony and the Grand Stair carved.
 3. **The Breath**: the cornice's cracked rock, the bellows wrecks, the lightning rods
