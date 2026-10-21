@@ -194,6 +194,19 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.wildheart_snaring_tongue': true,
   'abilityUi.cast.wildheart_saurian_tail_swipe': true,
   'abilityUi.cast.wildheart_saurian_stomp': true,
+  // The Smith's Heart raid's sketch kits (src/sim/content/smith_heart.ts
+  // SMITH_HEART_CASTS): the guardians', the final boss's and the callers'.
+  'abilityUi.cast.heart_mountains_wrath': true,
+  'abilityUi.cast.heart_bellows_gust': true,
+  'abilityUi.cast.heart_storm_lance': true,
+  'abilityUi.cast.heart_quenching_breath': true,
+  'abilityUi.cast.heart_molten_pour': true,
+  'abilityUi.cast.heart_anvil_clang': true,
+  'abilityUi.cast.heart_forge_wrath': true,
+  'abilityUi.cast.heart_forge_pour': true,
+  'abilityUi.cast.heart_gale_bolt': true,
+  'abilityUi.cast.heart_rime_bolt': true,
+  'abilityUi.cast.heart_ember_bolt': true,
   // The Wildheart Basin's three bosses.
   'abilityUi.cast.wildheart_beast_pit_quake': true,
   'abilityUi.cast.wildheart_jaguar_heel': true,

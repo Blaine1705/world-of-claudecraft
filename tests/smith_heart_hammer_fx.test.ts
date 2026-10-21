@@ -28,10 +28,11 @@ import {
   wrathChargeLook,
 } from '../src/render/smith_heart_fx/hammer_fx_core';
 import { NOVA_WAVE_SECONDS, novaWave } from '../src/render/trash_engine_fx/trash_engine_fx_core';
-import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
+import { SMITH_HEART_CASTS, SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
 import { authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { castDisplayName } from '../src/ui/cast_display_name';
 import type { IWorld } from '../src/world_api';
 
 describe('hammer_fx_core: the guardian read, never tuned', () => {
@@ -87,6 +88,13 @@ describe('hammer_fx_core: the guardian read, never tuned', () => {
     ).toBeNull();
     expect(slabBreakLook(SLAB_BURST_AT).flash).toBeCloseTo(1, 6);
     expect(slabBreakLook(SLAB_BREAK_SECONDS + 0.1)).toEqual({ flash: 0, dust: 0, grit: 0 });
+  });
+});
+
+describe('the raid’s cast bars', () => {
+  it('names every Smith Heart cast on the bar, never its raw id', () => {
+    for (const id of Object.values(SMITH_HEART_CASTS)) expect(castDisplayName(id), id).not.toBe(id);
+    expect(castDisplayName(SMITH_HEART_CASTS.hammerWrath)).toBe("Mountain's Wrath");
   });
 });
 
