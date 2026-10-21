@@ -448,6 +448,13 @@ them. A flag takes `WORLD_PVP_DISARM_SECONDS` (300, the classic five minutes) to
 come down and the drop waits for combat to end, so switching off can never fizzle
 the blow already on its way. Raising it needs `WORLD_PVP_MIN_LEVEL` (10).
 
+Keeping `/pvp` fully armed grants 10% more XP, including lifetime XP at the
+level cap. `WORLD_PVP_XP_BONUS` and `worldPvpXpAmount` in
+`src/sim/pvp/world_pvp_rewards_rules.ts` own the multiplier. `grantXp` applies it
+before rested kill XP and rounds boosted awards down to whole points. Requesting
+`/pvp off` stops the bonus immediately, including during the disarm countdown.
+The realm kill switch disables it. Faction reputation is unchanged.
+
 World PvP also tracks a capped played-time streak for five permanent cosmetic
 titles: Bold at 1 hour (5 Renown), Defiant at 3 hours (10), Dauntless at 6 hours
 (10), Unyielding at 24 hours (25), and Indomitable at 168 hours (50).

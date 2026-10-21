@@ -182,7 +182,10 @@ ratings.
   (`tests/warfare_vendor_npc.test.ts` asserts both). His stock is the one
   canonical `content/pvp_honor.ts` table, shared with FURY.
 - `world_pvp_rewards_rules.ts` owns the five literal played-time thresholds,
-  the seven-day counter cap and saved-tick sanitization.
+  the seven-day counter cap, saved-tick sanitization and the pure 10% XP bonus.
+  `grantXp` imports the leaf directly and applies the bonus before rested XP and
+  lifetime accounting; pending disarm and the realm kill switch stop it. The
+  multiplier is XP-only and does not change faction reputation.
 - `world_pvp_rewards.ts` advances one bounded scalar per connected, armed
   player per tick and grants permanent deeds only at five threshold crossings.
   Dead players, disconnect grace, leaving players, sanctuaries and PvE
