@@ -940,6 +940,11 @@ async function drainStragglingSaves(): Promise<void> {
       if (spin > 2_000) throw new Error('a previous world never drained its save queues');
       await new Promise((r) => setTimeout(r, 0));
     }
+    // Release the drained world: its membership re-check timers otherwise keep
+    // every earlier server (and its whole sim) reachable, and a sweep of
+    // hundreds of worlds runs the vitest fork out of heap.
+    server.stop();
+    server.membership.stop();
   }
   straggleWatch.length = 0;
 }

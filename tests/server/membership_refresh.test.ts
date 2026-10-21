@@ -139,4 +139,44 @@ describe('realm membership refresh capacity', () => {
     expect(stamp).toHaveBeenCalledWith(2, expect.any(Number));
     service.onLeave(sessions.get(2)!);
   });
+
+  it('stop clears every refresh timer, and a batch landing after stop never re-arms one', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    let finish!: (rows: Map<number, MembershipAuthorization>) => void;
+    const row = (): MembershipAuthorization => ({
+      active: true,
+      expiresAt: 1_000_000,
+      authorizedUntil: 60_000,
+      recurringExpiresAt: null,
+    });
+    source.batch.mockImplementationOnce(
+      async (ids: number[]) => new Map(ids.map((id) => [id, row()])),
+    );
+    const { service, sessions, stamp } = fixture(2);
+    await vi.advanceTimersByTimeAsync(25);
+    // Both members are resident with a 30-second re-check armed: a timer that
+    // keeps the whole server reachable until it fires, and then re-arms forever.
+    expect(stamp).toHaveBeenCalledTimes(2);
+    expect(vi.getTimerCount()).toBeGreaterThan(0);
+    // A re-check is in flight when the server stops.
+    source.batch.mockImplementationOnce(
+      () =>
+        new Promise((done) => {
+          finish = done;
+        }),
+    );
+    await vi.advanceTimersByTimeAsync(31_000);
+    expect(source.batch).toHaveBeenCalledTimes(2);
+    service.stop();
+    expect(vi.getTimerCount()).toBe(0);
+    finish(new Map([1, 2].map((id) => [id, row()])));
+    await vi.advanceTimersByTimeAsync(1);
+    expect(vi.getTimerCount()).toBe(0);
+    // A stopped service takes no new refreshes either.
+    service.onJoin({ ...sessions.get(1)!, accountId: 9 } as ClientSession);
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(source.batch).toHaveBeenCalledTimes(2);
+  });
 });
