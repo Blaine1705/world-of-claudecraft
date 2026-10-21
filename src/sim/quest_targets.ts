@@ -4,16 +4,18 @@
 // glyphs from questGiverNpcMarkers(), and the mob hover tooltip lists the
 // objectives a mob advances via questObjectivesForMob(). A host-agnostic leaf
 // like threat.ts / format_money.ts: no DOM, no rng, no Sim state. Everything
-// derives from the QUESTS/CAMPS/MOBS/GROUND_OBJECTS/NPCS content plus the
+// derives from the QUESTS/MOBS/NPCS content plus the
 // player's live quest log, so the offline Sim and the online ClientWorld
 // mirror produce identical output, and (unlike world.entities) none of it is
 // interest-radius limited: a camp or quest giver far across the zone still resolves.
+// The PLACES an objective is circled at (mob camps, ground-object clusters,
+// gather nodes, farm beds) come from the ACTIVE world, so a Studio map that
+// moves a camp moves its quest blob too; the built-in world wraps the shipped
+// tables themselves, so the shipped game reads exactly what it always did.
 
 import { FARM_PATCHES } from './content/farm_patches';
 import {
-  CAMPS,
   ESCORTS,
-  GROUND_OBJECTS,
   gatherNodesInActiveWorld,
   getActiveWorldContent,
   MOBS,
@@ -335,9 +337,12 @@ export function questObjectiveAreas(
     byCircle.set(key, area);
     out.push(area);
   };
+  // The loaded world's camps and ground objects: a map's own roster, or the
+  // shipped CAMPS / GROUND_OBJECTS tables when the built-in world is active.
+  const world = getActiveWorldContent();
   const pushMobCamps = (ref: QuestObjectiveRef, mobId: string): void => {
-    for (const camp of CAMPS) {
-      // fresh {x,z}: never alias the shared CAMPS content the sim spawns from
+    for (const camp of world.camps) {
+      // fresh {x,z}: never alias the shared camp content the sim spawns from
       if (camp.mobId === mobId)
         push(ref, { x: camp.center.x, z: camp.center.z }, camp.radius + CAMP_AREA_PAD);
     }
@@ -367,7 +372,7 @@ export function questObjectiveAreas(
   // One enclosing circle per ground-object definition: each def already carries
   // its own authored cluster of spawn positions.
   const pushObjectCluster = (ref: QuestObjectiveRef, itemId: string): void => {
-    for (const def of GROUND_OBJECTS) {
+    for (const def of world.groundObjects) {
       if (def.itemId !== itemId || def.positions.length === 0) continue;
       pushEnclosing(ref, def.positions);
     }
@@ -387,7 +392,7 @@ export function questObjectiveAreas(
   // patchless objective is honestly earned at any bed in the world. Beds are
   // static content like GATHER_NODES (no entity id to resolve).
   const pushFarmPatches = (ref: QuestObjectiveRef, patchId: string | undefined): void => {
-    for (const patch of farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES)) {
+    for (const patch of farmPatchesFor(world.objectMoves, FARM_PATCHES)) {
       if (patchId !== undefined && patch.id !== patchId) continue;
       // fresh {x,z}: never alias the deep-frozen FARM_PATCHES content
       pushEnclosing(
