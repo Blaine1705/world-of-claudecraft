@@ -1781,7 +1781,9 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
       startRotatingRays(ctx, boss, target, st);
       return;
     }
-    if (st.forgeWaveTimer <= CAST_COMPLETE_EPS) {
+    // Hold a due wave until every active Water Conduit closes, so its
+    // knockback never throws branded players out of a cleanse window.
+    if (st.forgeWaveTimer <= CAST_COMPLETE_EPS && Object.keys(st.conduitTimers).length === 0) {
       startForgeWave(ctx, boss, st);
       return;
     }

@@ -63,7 +63,10 @@ import {
 } from '../src/sim/encounters/ignivar';
 import { IGNIVAR_DIALOGUE } from '../src/sim/encounters/ignivar_dialogue';
 import { polygonContainsPoint } from '../src/sim/geometry2d';
-import { IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../src/sim/ignivar_arena';
+import {
+  IGNIVAR_WATER_CONDUIT_TEMPLATES,
+  ignivarConduitStateForTemplate,
+} from '../src/sim/ignivar_arena';
 import {
   IGNIVAR_FORGE_CHAINS_ATTACH_GRACE_SECONDS,
   IGNIVAR_FORGE_CHAINS_AURA_ID,
@@ -1038,6 +1041,66 @@ describe('Ignivar encounter', () => {
       expect(waveEndTick).toBeLessThan(secondTorrentTick);
     },
   );
+
+  // Every later wave hit the same seam: the Torrent wins a near tie, major
+  // ability spacing holds the wave six seconds behind it, and the windup puts
+  // its impact 8.5 seconds into the cleanse window. No wave may overlap an
+  // active Water Conduit at any point of a long pull.
+  it.each([
+    ['normal', claimedEncounter],
+    ['heroic', claimedHeroicEncounter],
+  ] as const)('never runs a %s Forge Wave while a Water Conduit is active', (_, claim) => {
+    const { sim, boss } = claim(418);
+    const tank = sim.player;
+    const party = [
+      tank,
+      addEncounterPlayer(sim, boss, 'Window Two'),
+      addEncounterPlayer(sim, boss, 'Window Three'),
+      addEncounterPlayer(sim, boss, 'Window Four'),
+    ];
+    const conduits = [...sim.entities.values()].filter(
+      (e) => ignivarConduitStateForTemplate(e.templateId) !== null,
+    );
+    expect(conduits).toHaveLength(4);
+    let activations = 0;
+    let waves = 0;
+    let overlapTicks = 0;
+    let wasOpen = false;
+    let wasWave = false;
+    for (let tick = 0; tick < 6_000; tick++) {
+      for (const player of party) {
+        player.hp = player.maxHp;
+        player.dead = false;
+      }
+      // Hold the tank on the ray toward the next ready conduit so every
+      // Searing Torrent opens a real cleanse window.
+      const next = conduits.find((c) => c.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.ready);
+      if (next) {
+        const dx = next.pos.x - boss.pos.x;
+        const dz = next.pos.z - boss.pos.z;
+        const len = Math.hypot(dx, dz);
+        tank.pos = {
+          x: boss.pos.x + (dx / len) * 2,
+          y: boss.pos.y,
+          z: boss.pos.z + (dz / len) * 2,
+        };
+        tank.prevPos = { ...tank.pos };
+      }
+      updateIgnivarEncounter(sim.ctx, boss);
+      if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+      const open = Object.keys(boss.ignivar.conduitTimers).length > 0;
+      const wave =
+        boss.ignivar.forgeWaveWindupRemaining > 0 || boss.ignivar.forgeWaveActiveRemaining > 0;
+      if (open && !wasOpen) activations++;
+      if (wave && !wasWave) waves++;
+      if (open && wave) overlapTicks++;
+      wasOpen = open;
+      wasWave = wave;
+    }
+    expect(activations).toBe(4);
+    expect(waves).toBeGreaterThanOrEqual(4);
+    expect(overlapTicks).toBe(0);
+  });
 
   it('warns before three rays rotate, damages crossings, and reverses the next cast', () => {
     const { sim, boss } = claimedEncounter(8120);
