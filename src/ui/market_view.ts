@@ -157,8 +157,7 @@ export type MarketHistoryBody =
       sales: MarketSaleRow[];
       /** Sales not listed in `sales`: dropped by the sim's ledger cap, or skipped
        *  here because the item id no longer resolves. This tab reports the count
-       *  instead of
-       *  quietly under-listing. */
+       *  instead of quietly under-listing. */
       salesOmitted: number;
     };
 

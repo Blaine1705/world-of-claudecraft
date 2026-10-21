@@ -218,7 +218,7 @@ export interface MarketSave {
     key: string;
     copper: number;
     items: InvSlot[];
-    /** Additive: the pending sale ledger. Absent on every pre-ledger save and on
+    /** Additive: the sale ledger (History). Absent on every pre-ledger save and on
      *  any collection holding only returns, which load as an empty log. */
     sales?: MarketSaleLog;
   }[];
@@ -444,9 +444,8 @@ export class Market {
     // cloneInvSlot: an instanced return's payload must never alias between the
     // merged-away bucket and the surviving one.
     to.items.push(...from.items.map(cloneInvSlot));
-    // The ledger follows its gold: the merged-away bucket's copper landed in `to`
-    // above, so the rows explaining it have to travel with it or the surviving
-    // collection would show proceeds it cannot account for.
+    // The ledger follows its seller: the merged-away bucket's sale history moves
+    // to `to` with its gold, or the History tab would lose it on a rename.
     mergeSaleLogs(to.sales, from.sales);
     this.marketCollections.delete(fromKey);
     this.bumpCollections();

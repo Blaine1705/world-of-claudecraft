@@ -599,6 +599,19 @@ describe('the World Market: the Merchant', () => {
       ).toBe(true);
     });
 
+    it('still drops a collected bucket that never sold anything', () => {
+      const { sim, seller } = world();
+      sim.addItem('bone_fragments', 1, seller);
+      sim.marketList('bone_fragments', 1, 50, seller);
+      listingBy(sim, (l) => l.itemId === 'bone_fragments', 'expiring listing').expiresAt =
+        sim.time - 1;
+      for (let i = 0; i < 20; i++) sim.tick(); // updateMarket runs once a second
+
+      sim.marketCollect(seller);
+
+      expect(sim.serializeMarket().collections).toEqual([]);
+    });
+
     it('keeps the History ledger through a save/load after the gold is collected', () => {
       const { sim, seller, buyer } = world();
       sellOne(sim, seller, buyer, 'wolf_fang', 2, 1000);
