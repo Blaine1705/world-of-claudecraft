@@ -300,7 +300,16 @@ export class RaidBossGuideModelController {
     }
     if (generation !== this.generation) return;
     viewer.setLabel(canvasLabel);
-    if (!this.gltfCache.isCached(spec.url)) this.ownedUrls.add(spec.url);
+    // Every file the viewer loads for this spec: the body, its weapons, and
+    // any clip or armor files a split body carries.
+    for (const url of [
+      spec.url,
+      ...(spec.attach ?? []).map((a) => a.url),
+      ...(spec.animUrls ?? []),
+      ...(spec.armor ?? []),
+    ]) {
+      if (!this.gltfCache.isCached(url)) this.ownedUrls.add(url);
+    }
     await viewer.load(spec, options.tint ?? null);
     if (generation !== this.generation) return;
     this.loadedBoss = boss;

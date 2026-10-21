@@ -501,6 +501,9 @@ export class RaidBossGuideWindow {
     const values = this.values(dungeon, mechanic.values, mechanic.percentValues);
     const name = tx(mechanic.nameKey, values);
     const detailId = `rbg-detail-${mechanic.id}`;
+    // A dungeon toggle shows the summary inline; its aria-label replaces the
+    // button's text as the name, so the summary is wired as its description.
+    const summaryId = `rbg-summary-${mechanic.id}`;
     const actionKey = expanded
       ? 'hudChrome.raidBossGuide.collapseAbility'
       : 'hudChrome.raidBossGuide.expandAbility';
@@ -520,7 +523,7 @@ export class RaidBossGuideWindow {
     const main = dungeon
       ? `<span class="rbg-ability-main"><span class="rbg-expand-mark" aria-hidden="true">${expanded ? '−' : '+'}</span><span class="rbg-ability-text"><span class="rbg-ability-name">${esc(
           name,
-        )}</span>${markChipsHtml(mechanic.marks)}<span class="rbg-ability-summary">${esc(summary)}</span></span></span>`
+        )}</span>${markChipsHtml(mechanic.marks)}<span class="rbg-ability-summary" id="${esc(summaryId)}">${esc(summary)}</span></span></span>`
       : `<span class="rbg-ability-main"><span class="rbg-expand-mark" aria-hidden="true">${expanded ? '−' : '+'}</span><span class="rbg-ability-name">${esc(
           name,
         )}</span></span>`;
@@ -535,7 +538,7 @@ export class RaidBossGuideWindow {
       mechanic.id,
     )}" data-focus-key="mechanic:${esc(mechanic.id)}" aria-expanded="${expanded}"${
       expanded ? ` aria-controls="${esc(detailId)}"` : ''
-    } aria-label="${esc(accessibleLabel)}"><img src="${esc(
+    }${dungeon ? ` aria-describedby="${esc(summaryId)}"` : ''} aria-label="${esc(accessibleLabel)}"><img src="${esc(
       iconDataUrl('ability', mechanic.iconId, 48),
     )}" alt="" aria-hidden="true">${main}${mechanicBadges(mechanic)}</button>${
       expanded

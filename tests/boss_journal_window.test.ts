@@ -98,6 +98,28 @@ describe('RaidBossGuideWindow on a dungeon page', () => {
     );
   });
 
+  it('describes every dungeon mechanic toggle by its visible summary', () => {
+    // The toggle's aria-label replaces its text as the accessible name, so the
+    // summary reaches assistive tech through aria-describedby.
+    guide.syncAvailability(SANCTUM);
+    guide.button.click();
+    root.querySelector<HTMLButtonElement>('[data-boss="korgath_the_bound"]')?.click();
+    const toggles = [...root.querySelectorAll<HTMLButtonElement>('.rbg-ability-toggle')];
+    expect(toggles.length).toBeGreaterThan(0);
+    for (const toggle of toggles) {
+      const id = toggle.getAttribute('aria-describedby');
+      expect(id, toggle.dataset.mechanic).toBeTruthy();
+      const summary = id ? document.getElementById(id) : null;
+      expect(summary?.classList.contains('rbg-ability-summary'), toggle.dataset.mechanic).toBe(
+        true,
+      );
+      expect(toggle.contains(summary)).toBe(true);
+    }
+    const lockbound = root.querySelector<HTMLButtonElement>('[data-mechanic="lockbound"]');
+    const described = document.getElementById(lockbound?.getAttribute('aria-describedby') ?? '');
+    expect(described?.textContent).toContain('80%');
+  });
+
   it('marks heroic-only and changed mechanics and lists what Heroic changes', () => {
     guide.syncAvailability(SANCTUM);
     guide.button.click();

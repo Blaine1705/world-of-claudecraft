@@ -108,4 +108,27 @@ describe('RaidBossGuideModelController on dungeon pages', () => {
     expect(cache.release).toHaveBeenCalledWith(SPEC.url);
     expect(cache.cached.has('models/creatures/already_in_world.glb')).toBe(true);
   });
+
+  it('releases the weapon attachments it brought in along with the body', async () => {
+    const c = controller();
+    const armed: RaidBossGuideModelSpec = {
+      ...SPEC,
+      attach: [
+        { url: 'models/weapons/korgath_maul.glb', bone: 'handslot.r' },
+        { url: 'models/creatures/already_in_world.glb', bone: 'handslot.l' },
+      ],
+    };
+    c.mount(slot, options('korgath_the_bound', armed));
+    await vi.waitFor(() => expect(viewer.load).toHaveBeenCalledOnce());
+    resolveLoad();
+    await vi.waitFor(() =>
+      expect(slot.querySelector<HTMLElement>('.rbg-model-viewer')?.dataset.state).toBe('ready'),
+    );
+
+    c.destroy();
+    expect(cache.release).toHaveBeenCalledTimes(2);
+    expect(cache.release).toHaveBeenCalledWith(SPEC.url);
+    expect(cache.release).toHaveBeenCalledWith('models/weapons/korgath_maul.glb');
+    expect(cache.cached.has('models/creatures/already_in_world.glb')).toBe(true);
+  });
 });
