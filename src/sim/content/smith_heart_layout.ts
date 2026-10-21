@@ -459,7 +459,7 @@ function quarryStep(i: number): FieldSurface {
     points,
     h: step.h,
     edge: 'rock',
-    ground: 'earth',
+    ground: 'quarry',
   };
 }
 
@@ -559,9 +559,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-160, -223, H.galleryUpper],
       [-155, -224, H.galleryUpper],
     ],
-    { ground: 'earth' },
+    { ground: 'quarry' },
   ),
-  disc('gallery_h1', GALLERY_LANDINGS.h1, { edge: 'rock', ground: 'earth' }),
+  disc('gallery_h1', GALLERY_LANDINGS.h1, { edge: 'rock', ground: 'quarry' }),
   path(
     'gallery_middle',
     [
@@ -570,9 +570,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-108, -231, H.galleryMiddle],
       [-103, -232, H.galleryMiddle],
     ],
-    { ground: 'earth' },
+    { ground: 'quarry' },
   ),
-  disc('gallery_h2', GALLERY_LANDINGS.h2, { edge: 'rock', ground: 'earth' }),
+  disc('gallery_h2', GALLERY_LANDINGS.h2, { edge: 'rock', ground: 'quarry' }),
   path(
     'gallery_lower',
     [
@@ -581,16 +581,16 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-74, -212, H.galleryLower],
       [-70, -209, H.galleryLower],
     ],
-    { ground: 'earth' },
+    { ground: 'quarry' },
   ),
-  disc('gallery_h3', GALLERY_LANDINGS.h3, { edge: 'rock', ground: 'earth' }),
+  disc('gallery_h3', GALLERY_LANDINGS.h3, { edge: 'rock', ground: 'quarry' }),
   // The quarry's steps, deepest reach first (each later, lower step wins
   // nearer the pit), then the pit's own floor.
   quarryStep(3),
   quarryStep(2),
   quarryStep(1),
   quarryStep(0),
-  carvedEllipse('hammer_pit', HAMMER_PIT, 3, 13, { edge: 'rock', ground: 'earth' }),
+  carvedEllipse('hammer_pit', HAMMER_PIT, 3, 13, { edge: 'rock', ground: 'quarry' }),
   path(
     'pit_descent',
     [
@@ -813,17 +813,21 @@ const PIT_COLUMNS: FieldProp[] = [20, 92, 164, 236, 308].map((deg) => {
   };
 });
 
-/** The colossi: half-carved giants the Smith left in the quarry's top step,
+/** How far past the pit's rim the colossi stand: carved out of the terraces
+ *  themselves, their knees on the first step, their backs still one with the
+ *  steps above, so the whole figure reads from the pit floor's camera. */
+export const QUARRY_COLOSSUS_OUT = 12;
+
+/** The colossi: half-carved giants the Smith left in the quarry's terraces,
  *  kneeling over the pit. */
 const QUARRY_COLOSSI: FieldProp[] = [72, 128, 182].map((deg) => {
-  const p = around(HAMMER_PIT, deg, 27);
+  const p = around(HAMMER_PIT, deg, QUARRY_COLOSSUS_OUT);
   return {
     kind: 'sh_quarry_colossus',
     ...p,
     rot: face(p.x, p.z, HAMMER_PIT.x, HAMMER_PIT.z),
-    scale: 1.35,
     r: 7,
-    h: 31,
+    h: 28,
   };
 });
 
@@ -884,8 +888,9 @@ const LIGHTNING_RODS: FieldProp[] = [0, 50, 104, 155, 210, 305].map((deg) => {
 });
 
 const PROPS: FieldProp[] = [
-  // The Cleft: the crack's mouth behind the landing (render only).
-  { kind: 'sh_cleft_mouth', x: -215, z: -226, rot: 0.88 },
+  // The Cleft: the crack's mouth behind the landing (render only), its
+  // doorway's steps starting just past the landing's lip.
+  { kind: 'sh_cleft_mouth', x: -213.4, z: -224.7, rot: 0.88 },
   // The Hammer Gallery: the Smith's half-carved mountain statues on the rims.
   { kind: 'sh_rough_statue', x: -150, z: -240, rot: 0, r: 3.2, h: 14 },
   { kind: 'sh_rough_statue', x: -96, z: -218, rot: Math.PI, r: 3.2, h: 14 },

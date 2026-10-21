@@ -65,6 +65,8 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   snow: [0.66, 0.72, 0.8],
   ice: [0.3, 0.47, 0.6],
   slate: [0.2, 0.21, 0.235],
+  // The Smith's Heart's quarry: warm ochre granite bedrock, cut and dusty.
+  quarry: [0.34, 0.27, 0.2],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
@@ -78,13 +80,17 @@ export const FIELD_TOP_FAMILIES = [
   'snow',
   'ice',
   'slate',
+  'quarry',
 ] as const;
 export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
 
 /** Texture repeats per yard of a top family (most tile every 4 yd; the
  *  slate flags are drawn at a plate's real size, one tile every 12 yd). */
 export function fieldFamilyUvScale(family: FieldTopFamily): number {
-  return family === 'slate' ? 1 / 12 : 0.25;
+  if (family === 'slate') return 1 / 12;
+  // The quarry's cut panels are a few yards across: one tile every 10 yd.
+  if (family === 'quarry') return 1 / 10;
+  return 0.25;
 }
 
 /** Which texture family a ground kind draws with. */
@@ -95,6 +101,7 @@ export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
   if (ground === 'snow') return 'snow';
   if (ground === 'ice') return 'ice';
   if (ground === 'slate') return 'slate';
+  if (ground === 'quarry') return 'quarry';
   if (ground === 'plate') return 'plate';
   if (ground === 'grating') return 'grating';
   return ground === 'earth' ||
@@ -396,10 +403,20 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   if (ground === 'snow') return snowColor(base, x, z, onPath);
   if (ground === 'ice') return iceColor(base, x, z);
   if (ground === 'slate') return slateColor(base, k, x, z, onPath);
+  if (ground === 'quarry') return quarryColor(base, k, patch, dirt);
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
   const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
   return [r, g, b];
+}
+
+/** Quarried bedrock: warm ochre granite in broad beds, paler where dust has
+ *  drifted, darker in the worked hollows; never green, never wet. */
+function quarryColor(base: Rgb, k: number, patch: number, dirt: number): Rgb {
+  const dust = Math.max(0, patch - 0.52) * 1.6;
+  const shade = Math.min(1, dirt * 1.2);
+  const t = k * (1 - shade * 0.18);
+  return [base[0] * t + dust * 0.1, base[1] * t + dust * 0.085, base[2] * t + dust * 0.06];
 }
 
 /** Jungle moss: bright sunlit cushions, darker damp loam showing through,
@@ -521,6 +538,7 @@ export function planFieldTops(
     snow: { positions: [], colors: [], uvs: [], indices: [] },
     ice: { positions: [], colors: [], uvs: [], indices: [] },
     slate: { positions: [], colors: [], uvs: [], indices: [] },
+    quarry: { positions: [], colors: [], uvs: [], indices: [] },
   };
   const clippers = laterClippers(def);
   def.surfaces.forEach((s, layer) => {

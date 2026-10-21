@@ -24,6 +24,7 @@ import {
   iceDetail,
   mossDetail,
   plateDetail,
+  quarryDetail,
   rockDetail,
   slateDetail,
   snowDetail,
@@ -103,6 +104,8 @@ export function buildAuthoredFieldTerrain(
     snow: { detail: snowDetail, rough: 0.92 },
     ice: { detail: iceDetail, rough: 0.46, metal: 0.04 },
     slate: { detail: slateDetail, rough: 0.7 },
+    // The Smith's Heart's quarry: dry cut granite, matte.
+    quarry: { detail: quarryDetail, rough: 0.9 },
   };
   for (const family of FIELD_TOP_FAMILIES) {
     const data = tops[family];

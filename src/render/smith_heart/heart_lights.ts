@@ -59,6 +59,7 @@ export function buildHeartLights(
     light.position.set(spot.x, y, spot.z);
     group.add(light);
     deps.fireLights.push(light);
+    if (spot.noHalo) continue;
     const halo = new THREE.Sprite(haloMaterial(spot.color));
     halo.position.set(spot.x, y, spot.z);
     const hs = 2 + spot.range * 0.12;

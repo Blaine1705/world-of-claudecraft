@@ -47,6 +47,7 @@ const FIELD_MAP_TOKENS = {
   snow: '--color-field-map-snow',
   ice: '--color-field-map-ice',
   slate: '--color-field-map-slate',
+  quarry: '--color-field-map-quarry',
   crevasse: '--color-field-map-crevasse',
   crevasseDeep: '--color-field-map-crevasse-deep',
   wall: '--color-field-map-wall',

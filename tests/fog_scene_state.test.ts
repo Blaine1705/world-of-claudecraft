@@ -6,7 +6,7 @@ import {
 } from '../src/render/fog_scene_state';
 import { IGNIVAR_RAID_ENVIRONMENT } from '../src/render/ignivar_raid_environment';
 import type { FogSceneState } from '../src/render/interior_light_rig';
-import { HEART_ROOM } from '../src/sim/content/smith_heart_layout';
+import { CLEFT, HAMMER_PIT, HEART_ROOM } from '../src/sim/content/smith_heart_layout';
 import {
   battlegroundOrigin,
   DUNGEON_LIST,
@@ -76,18 +76,20 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
       'sunkenBastion',
     );
     // The Smith's Heart's main map borrows the Bastion's storm-dusk state;
-    // its Heart (the separate final room) has its own ember-night state, read
-    // from where the camera stands in the slot.
-    expect(resolveFogScene(true, interiorPx('smith_heart'), 5, cam, SEED).desired).toBe(
-      'sunkenBastion',
-    );
+    // its Heart (the separate final room) has its own ember-night state and
+    // its Hammer vein its own quarry dusk, each read from where the camera
+    // stands in the slot.
     const heart = DUNGEON_LIST.find((d) => d.id === 'smith_heart');
     if (!heart) throw new Error('no smith_heart dungeon');
     const slotOrigin = instanceOrigin(heart.index, 2);
     const inHeart = { x: slotOrigin.x + HEART_ROOM.x, z: slotOrigin.z + HEART_ROOM.z };
     const onRing = { x: slotOrigin.x, z: slotOrigin.z + 70 };
+    const inQuarry = { x: slotOrigin.x + HAMMER_PIT.x, z: slotOrigin.z + HAMMER_PIT.z };
+    const atCleft = { x: slotOrigin.x + CLEFT.x, z: slotOrigin.z + CLEFT.z };
     expect(resolveFogScene(true, slotOrigin.x, 5, inHeart, SEED).desired).toBe('smithHeartCore');
     expect(resolveFogScene(true, slotOrigin.x, 5, onRing, SEED).desired).toBe('sunkenBastion');
+    expect(resolveFogScene(true, slotOrigin.x, 5, inQuarry, SEED).desired).toBe('smithHeartHammer');
+    expect(resolveFogScene(true, slotOrigin.x, 5, atCleft, SEED).desired).toBe('smithHeartHammer');
     expect(resolveFogScene(true, interiorPx('gravewyrm_sanctum'), 5, cam, SEED).desired).toBe(
       'gravewyrmSanctum',
     );
@@ -130,6 +132,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['hollowCrypt', 0x1c2238, 70, 460],
     ['sunkenBastion', 0x4d5a57, 70, 640],
     ['smithHeartCore', 0x1c1424, 80, 520],
+    ['smithHeartHammer', 0x75614f, 70, 560],
     ['drownedTemple', 0x252a4c, 140, 1050],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],

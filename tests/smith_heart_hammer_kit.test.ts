@@ -1,0 +1,323 @@
+// The Smith's Heart raid's Hammer vein kit (scripts/assets/smith_heart_hammer_kit/
+// build.mjs, built from docs/design/raid/kit/build_smith_heart_hammer_kit.py)
+// and its plan (src/render/smith_heart/hammer_kit_plan_core.ts):
+//   - the shipped GLB is the current sources' (fingerprint, nodes, materials),
+//     inside the dungeon kit budget, every piece with a sane triangle count;
+//   - the pieces a body touches stay within their layout colliders (plus a
+//     body's width), the edge modules keep their lip frame (a rim never stands
+//     proud of the floor below it), the Slab's halves fill the gate, the
+//     Slab's frame clears the stair, the Cleft's gate keeps the landing clear;
+//   - the plan fits every vein prop with its piece, kneels the colossi on the
+//     first step, and stands nothing render-only over a walked floor (the
+//     terraces are dressing floors nobody reaches; the chips lie flat).
+// The glTF frame is the kit's Blender frame turned y up: (x, z, -y), so a
+// piece's front (Blender -Y) is +Z here, as in the game.
+
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
+import { beforeAll, describe, expect, it } from 'vitest';
+import {
+  ASSET,
+  SMITH_HEART_HAMMER_KIT_PIECES,
+  sourceFingerprint,
+} from '../scripts/assets/smith_heart_hammer_kit/build.mjs';
+import {
+  collapseSpot,
+  HAMMER_COLOSSI,
+  HAMMER_KIT_KINDS,
+  isQuarryStep,
+  planHammerDressing,
+  planHammerEdges,
+  planHammerKit,
+  planHammerProps,
+} from '../src/render/smith_heart/hammer_kit_plan_core';
+import { HEART_PROP_RECIPES } from '../src/render/smith_heart/heart_plan_core';
+import { SMITH_HEART_GATES } from '../src/sim/content/smith_heart';
+import { QUARRY_TERRACES, SLAB, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
+import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
+
+const KIT = ASSET.target;
+const haveKit = existsSync(KIT);
+const F = SMITH_HEART_FIELD;
+
+type V3 = [number, number, number];
+interface Shape {
+  min: V3;
+  max: V3;
+  points: V3[];
+  triangles: number;
+  materials: Set<string>;
+}
+
+const shapes = new Map<string, Shape>();
+let extras: Record<string, unknown> = {};
+let nodeNames: string[] = [];
+let materialNames: string[] = [];
+
+beforeAll(async () => {
+  if (!haveKit) return;
+  await MeshoptDecoder.ready;
+  const io = new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+  const doc = await io.readBinary(new Uint8Array(readFileSync(KIT)));
+  extras = (doc.getRoot().getExtras() ?? {}) as Record<string, unknown>;
+  nodeNames = doc
+    .getRoot()
+    .listNodes()
+    .map((n) => n.getName())
+    .sort();
+  materialNames = doc
+    .getRoot()
+    .listMaterials()
+    .map((m) => m.getName())
+    .sort();
+  for (const node of doc.getRoot().listNodes()) {
+    const name = node.getName();
+    if (!name.startsWith('Kit_')) continue;
+    const points: V3[] = [];
+    const materials = new Set<string>();
+    let triangles = 0;
+    const m = node.getWorldMatrix();
+    for (const prim of node.getMesh()?.listPrimitives() ?? []) {
+      const a = prim.getAttribute('POSITION');
+      if (!a) continue;
+      materials.add(prim.getMaterial()?.getName() ?? '');
+      triangles += (prim.getIndices()?.getCount() ?? a.getCount()) / 3;
+      const e: number[] = [];
+      for (let i = 0; i < a.getCount(); i++) {
+        a.getElement(i, e);
+        points.push([
+          m[0] * e[0] + m[4] * e[1] + m[8] * e[2] + m[12],
+          m[1] * e[0] + m[5] * e[1] + m[9] * e[2] + m[13],
+          m[2] * e[0] + m[6] * e[1] + m[10] * e[2] + m[14],
+        ]);
+      }
+    }
+    const min: V3 = [Infinity, Infinity, Infinity];
+    const max: V3 = [-Infinity, -Infinity, -Infinity];
+    for (const p of points)
+      for (let k = 0; k < 3; k++) {
+        min[k] = Math.min(min[k], p[k]);
+        max[k] = Math.max(max[k], p[k]);
+      }
+    shapes.set(name, { min, max, points, triangles, materials });
+  }
+});
+
+const shape = (name: string): Shape => {
+  const s = shapes.get(name);
+  if (!s) throw new Error(`no kit piece ${name}`);
+  return s;
+};
+
+/** How far a piece reaches from its origin across the ground below `top`. */
+function footReach(name: string, top: number): number {
+  let r = 0;
+  for (const p of shape(name).points) if (p[1] < top) r = Math.max(r, Math.hypot(p[0], p[2]));
+  return r;
+}
+
+describe('Smith Heart Hammer kit: the piece list and the shipped GLB', () => {
+  it('lists every piece once, the colossi, the Slab and the edges included', () => {
+    const list = SMITH_HEART_HAMMER_KIT_PIECES;
+    expect(new Set(list).size).toBe(list.length);
+    for (const piece of [
+      'ColossusVigil',
+      'ColossusWaking',
+      'ColossusBearer',
+      'PitColumn',
+      'QuarryFaceA',
+      'QuarryRimA',
+      'QuarryLipA',
+      'CleftGate',
+      'CollapseOverhang',
+      'SlabHalfL',
+      'SlabHalfR',
+      'SlabFrame',
+    ])
+      expect(list, piece).toContain(piece);
+    for (const p of list) expect(p, p).toMatch(/^[A-Za-z0-9_]+$/);
+  });
+
+  it.skipIf(!haveKit)('was built from the current sources, nodes and materials intact', () => {
+    expect(extras.sourceFingerprint).toBe(sourceFingerprint());
+    expect(nodeNames).toEqual(
+      [ASSET.root, ...SMITH_HEART_HAMMER_KIT_PIECES.map((p) => `Kit_${p}`)].sort(),
+    );
+    expect(materialNames).toEqual(ASSET.materials);
+    expect(statSync(KIT).size).toBeLessThanOrEqual(4 * 1024 * 1024);
+  });
+
+  it.skipIf(!haveKit)('keeps every piece inside its triangle budget', () => {
+    // The edge modules are drawn by the dozen: light. A colossus at most 20k.
+    let total = 0;
+    for (const [name, s] of shapes) {
+      expect(s.triangles, name).toBeGreaterThan(0);
+      const tile = /Quarry(Face|Rim|Lip)|ChipScatter|RubblePile|SlabChunk/.test(name);
+      expect(s.triangles, name).toBeLessThanOrEqual(tile ? 2500 : 20000);
+      total += s.triangles;
+    }
+    expect(total).toBeLessThan(200_000);
+  });
+
+  it.skipIf(!haveKit)('lights only the vein, the geodes and the runes', () => {
+    for (const glowing of [
+      'Kit_GeodeA',
+      'Kit_GeodeB',
+      'Kit_PitColumn',
+      'Kit_SlabHalfL',
+      'Kit_SlabFrame',
+    ])
+      expect(shape(glowing).materials.has('KitGlow'), glowing).toBe(true);
+    for (const plain of ['Kit_QuarryFaceA', 'Kit_QuarryRimA', 'Kit_Scaffold', 'Kit_CutBlockA'])
+      expect(shape(plain).materials, plain).toEqual(new Set(['KitStone']));
+  });
+});
+
+describe('Smith Heart Hammer kit: sizes the sim and the plan rely on', () => {
+  it.skipIf(!haveKit)('keeps every piece a body can touch within its collider', () => {
+    const body = 0.6;
+    const collider = (kind: string) => {
+      const p = F.props.find((q) => q.kind === kind);
+      if (!p) throw new Error(kind);
+      return { foot: p.r ?? Math.hypot(p.hw ?? 0, p.hd ?? 0), h: p.h ?? 0 };
+    };
+    const fits: [string, string][] = [
+      ['Kit_PitColumn', 'sh_pit_column'],
+      ['Kit_CutBlockA', 'sh_quarry_block'],
+      ['Kit_CutBlockB', 'sh_quarry_block'],
+      ['Kit_Derrick', 'sh_quarry_derrick'],
+      ['Kit_GeodeA', 'sh_geode'],
+      ['Kit_GeodeB', 'sh_geode'],
+      ['Kit_RoughStatueA', 'sh_rough_statue'],
+      ['Kit_RoughStatueB', 'sh_rough_statue'],
+    ];
+    for (const [piece, kind] of fits) {
+      const c = collider(kind);
+      expect(footReach(piece, 2.6), piece).toBeLessThanOrEqual(c.foot + body);
+    }
+    // A column stands no taller than its sight-blocking collider.
+    expect(shape('Kit_PitColumn').max[1]).toBeLessThanOrEqual(collider('sh_pit_column').h);
+    expect(shape('Kit_PitColumn').max[1]).toBeGreaterThan(11);
+  });
+
+  it.skipIf(!haveKit)('keeps the edge modules on their lip, never proud of a walked floor', () => {
+    for (const name of ['Kit_QuarryFaceA', 'Kit_QuarryFaceB', 'Kit_QuarryFaceC']) {
+      const s = shape(name);
+      expect(s.max[1], name).toBeLessThanOrEqual(0.15);
+      expect(s.min[1], name).toBeLessThan(-7);
+    }
+    for (const name of ['Kit_QuarryRimA', 'Kit_QuarryRimB']) {
+      const s = shape(name);
+      expect(s.max[1], name).toBeLessThanOrEqual(0.15);
+      expect(s.min[1], name).toBeLessThan(-7);
+      // The rim faces the pit's walked floor: it never stands out over it.
+      expect(s.max[2], name).toBeLessThanOrEqual(0.35);
+    }
+    for (const name of ['Kit_QuarryLipA', 'Kit_QuarryLipB']) {
+      expect(shape(name).max[1], name).toBeLessThanOrEqual(0.15);
+      expect(shape(name).min[1], name).toBeLessThan(-24);
+    }
+    // The flat floor dressing stays under a hand's height.
+    expect(shape('Kit_ChipScatter').max[1]).toBeLessThan(0.3);
+    expect(shape('Kit_PitColumnSocket').max[1]).toBeLessThan(0.3);
+  });
+
+  it.skipIf(!haveKit)('fills the Slab gate with its two halves and clears its stair', () => {
+    const gate = SMITH_HEART_GATES.find((g) => g.id === 'the_slab');
+    if (!gate) throw new Error('no slab gate');
+    const L = shape('Kit_SlabHalfL');
+    const R = shape('Kit_SlabHalfR');
+    expect(L.min[0]).toBeCloseTo(-gate.hw, 1);
+    expect(R.max[0]).toBeCloseTo(gate.hw, 1);
+    expect(Math.max(L.max[1], R.max[1])).toBeGreaterThan(8.5);
+    expect(Math.min(L.min[1], R.min[1])).toBeGreaterThan(-0.05);
+    // The frame's jambs stand clear of the stair (half width 7) at a walk's height.
+    const frame = shape('Kit_SlabFrame');
+    const low = frame.points.filter((p) => p[1] > -1 && p[1] < 9);
+    expect(Math.min(...low.map((p) => Math.abs(p[0])))).toBeGreaterThan(7.6);
+  });
+
+  it.skipIf(!haveKit)('keeps the Cleft landing clear and the colossi colossal', () => {
+    // Nothing of the gate reaches more than 7.8 yd toward the landing.
+    expect(shape('Kit_CleftGate').max[2]).toBeLessThanOrEqual(7.9);
+    for (const c of HAMMER_COLOSSI) {
+      const s = shape(c);
+      expect(s.max[1], c).toBeGreaterThan(24);
+      expect(s.max[1], c).toBeLessThan(30);
+    }
+  });
+});
+
+describe('hammer_kit_plan_core: the Hammer vein dressed', () => {
+  it('fits every vein prop with its piece, the colossi kneeling on the first step', () => {
+    const props = planHammerProps();
+    const vein = F.props.filter((p) => HAMMER_KIT_KINDS.has(p.kind));
+    expect(vein.length).toBeGreaterThan(15);
+    for (const k of HAMMER_KIT_KINDS) expect(HEART_PROP_RECIPES[k], k).toBeDefined();
+    // Every prop has its piece (a column adds its socket).
+    const columns = vein.filter((p) => p.kind === 'sh_pit_column').length;
+    expect(props.length).toBe(vein.length + columns);
+    const colossi = props.filter((p) => p.piece.startsWith('Kit_Colossus'));
+    expect(colossi.map((c) => c.piece).sort()).toEqual([...HAMMER_COLOSSI].sort());
+    for (const c of colossi) {
+      expect(c.y).toBe(QUARRY_TERRACES.steps[0].h);
+      expect(isQuarryStep(authoredFieldSurfaceAt(F, c.x, c.z)?.id), c.piece).toBe(true);
+    }
+    expect(props.find((p) => p.piece === 'Kit_SlabFrame')).toMatchObject({ x: SLAB.x, z: SLAB.z });
+  });
+
+  it('dresses every terrace riser, the pit rim and the void lips of the vein', () => {
+    const edges = planHammerEdges();
+    const count = (re: RegExp) => edges.filter((e) => re.test(e.piece)).length;
+    expect(count(/QuarryFace/)).toBeGreaterThan(30);
+    expect(count(/QuarryRim/)).toBeGreaterThan(10);
+    expect(count(/QuarryLip/)).toBeGreaterThan(60);
+    for (const e of edges) {
+      expect(Number.isFinite(e.y), e.piece).toBe(true);
+      expect(e.stretch, e.piece).toBeGreaterThanOrEqual(0.4);
+      expect(e.stretch, e.piece).toBeLessThan(1.6);
+    }
+  });
+
+  it.skipIf(!haveKit)('stands nothing render-only over a walked floor', () => {
+    // Every render-only piece's real mesh, placed: no vertex between a hand and
+    // a head over a floor somebody walks (the terraces nobody reaches are
+    // dressing floors; the edge modules sit on their lips, pinned above).
+    const flat = new Set(['Kit_ChipScatter', 'Kit_PitColumnSocket']);
+    const bad: string[] = [];
+    for (const p of planHammerDressing()) {
+      if (flat.has(p.piece)) continue;
+      const c = Math.cos(p.rot);
+      const s = Math.sin(p.rot);
+      const k = p.scale ?? 1;
+      const pts = shape(p.piece).points;
+      for (let i = 0; i < pts.length; i += 3) {
+        const [lx, ly, lz] = pts[i];
+        const x = p.x + (lx * c + lz * s) * k;
+        const z = p.z + (-lx * s + lz * c) * k;
+        const y = p.y + ly * k;
+        const surface = authoredFieldSurfaceAt(F, x, z);
+        if (!surface || isQuarryStep(surface.id)) continue;
+        const floor = authoredFieldHeight(F, x, z);
+        if (y > floor + 0.35 && y < floor + 2.6) {
+          bad.push(`${p.piece} over ${surface.id} at (${x.toFixed(1)}, ${z.toFixed(1)})`);
+          break;
+        }
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('hangs the collapse spot over the lower Gallery, high over its walk', () => {
+    const c = collapseSpot();
+    // Its origin is off the path, on the rim; its front turns over the path.
+    expect(authoredFieldSurfaceAt(F, c.x, c.z)).toBeNull();
+    const ahead = { x: c.x + Math.sin(c.rot) * 8, z: c.z + Math.cos(c.rot) * 8 };
+    expect(authoredFieldSurfaceAt(F, ahead.x, ahead.z)?.id).toBe('gallery_lower');
+    expect(planHammerKit().filter((p) => p.piece === 'Kit_CollapseOverhang')).toHaveLength(1);
+  });
+});

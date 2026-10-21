@@ -20,6 +20,7 @@
 import {
   BREATH,
   GREAT_HEARTH,
+  HAMMER_PIT,
   HEART_ALTARS,
   HEART_RETURN_PORTAL,
   HEART_ROOM,
@@ -383,6 +384,8 @@ export interface HeartLightSpot {
   color: number;
   intensity: number;
   range: number;
+  /** Draws no halo card (a light that only shapes stone, never a lamp). */
+  noHalo?: boolean;
 }
 
 function veinKey(id: string, vein: SmithHeartVein, at: { x: number; z: number }): HeartLightSpot {
@@ -490,6 +493,37 @@ export function planHeartLights(): HeartLightSpot[] {
       range: 20,
     },
   ];
+  // The Hammer: a warm fill on each colossus's face from the pit side (the
+  // carving must read against the terraces), and the vein's glow at the
+  // Cleft's door.
+  for (const p of SMITH_HEART_FIELD.props) {
+    if (p.kind === 'sh_quarry_colossus') {
+      const dx = HAMMER_PIT.x - p.x;
+      const dz = HAMMER_PIT.z - p.z;
+      const d = Math.hypot(dx, dz);
+      spots.push({
+        id: `colossus:${p.x.toFixed(0)}:${p.z.toFixed(0)}`,
+        x: p.x + (dx / d) * 9,
+        z: p.z + (dz / d) * 9,
+        lift: 13,
+        color: 0xffc27a,
+        intensity: 3.2,
+        range: 24,
+        noHalo: true,
+      });
+    } else if (p.kind === 'sh_cleft_mouth') {
+      spots.push({
+        id: 'cleft_door',
+        x: p.x + Math.sin(p.rot) * 6,
+        z: p.z + Math.cos(p.rot) * 6,
+        lift: 5,
+        color: SMITH_HEART_VEIN_COLORS.hammer,
+        intensity: 4,
+        range: 22,
+        noHalo: true,
+      });
+    }
+  }
   // Two of the Cornice's lightning rods (east and west of the arena) carry
   // their tip's storm light; the rest only glow.
   let rod = 0;

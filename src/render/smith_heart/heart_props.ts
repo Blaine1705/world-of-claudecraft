@@ -116,11 +116,21 @@ function partMesh(p: HeartPart): THREE.Mesh {
   return mesh;
 }
 
-/** Every placeholder prop of the field (instance-local). */
-export function buildHeartProps(): THREE.Group {
+/** The field's placeholder props (instance-local), and apart from them the
+ *  placeholders of the kinds a vein's kit draws (`kitKinds`), so the kit can
+ *  take their place the moment it lands (hammer_kit.ts). A kind in `skip`
+ *  is not drawn at all (its kit has already landed). */
+export function buildHeartProps(
+  kitKinds: ReadonlySet<string> = new Set(),
+  skip: ReadonlySet<string> = new Set(),
+): { group: THREE.Group; kitOwned: THREE.Group } {
   const group = new THREE.Group();
   group.name = 'smithHeartProps';
+  const kitOwned = new THREE.Group();
+  kitOwned.name = 'smithHeartKitPlaceholders';
+  group.add(kitOwned);
   for (const prop of SMITH_HEART_FIELD.props) {
+    if (skip.has(prop.kind)) continue;
     const recipe = HEART_PROP_RECIPES[prop.kind];
     if (!recipe || recipe.length === 0) continue;
     const holder = new THREE.Group();
@@ -129,13 +139,13 @@ export function buildHeartProps(): THREE.Group {
     holder.rotation.y = prop.rot;
     if (prop.scale) holder.scale.setScalar(prop.scale);
     for (const p of recipe) holder.add(partMesh(p));
-    group.add(holder);
+    (kitKinds.has(prop.kind) ? kitOwned : group).add(holder);
   }
   group.updateMatrixWorld(true);
   group.traverse((o) => {
     o.matrixAutoUpdate = false;
   });
-  return group;
+  return { group, kitOwned };
 }
 
 /** A weathered rock palette, darker than the props' stone, matching the

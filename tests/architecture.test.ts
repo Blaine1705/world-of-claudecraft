@@ -987,6 +987,12 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_portal_core.ts',
   'src/render/smith_heart/heart_room_core.ts',
   'src/render/smith_heart/heart_mountain_core.ts',
+  // The Hammer vein's Blender kit: the placement record and its plan.
+  'src/render/smith_heart/heart_kit_core.ts',
+  'src/render/smith_heart/hammer_kit_plan_core.ts',
+  // The Hammer vein's air and the Hammer guardian's and the Slab's effects.
+  'src/render/smith_heart/hammer_air_core.ts',
+  'src/render/smith_heart_fx/hammer_fx_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

@@ -36,7 +36,9 @@ export type FieldGround =
   // bare slate of Thornpeak.
   | 'snow'
   | 'ice'
-  | 'slate';
+  | 'slate'
+  // The Smith's Heart's Hammer vein: the quarry's cut bedrock.
+  | 'quarry';
 
 interface FieldSurfaceBase {
   id: string;

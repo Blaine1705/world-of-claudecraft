@@ -850,6 +850,77 @@ const paintStrata: Painter = (h, size, rnd) => {
   }
 };
 
+/** Quarried bedrock (the Smith's Heart's Hammer vein, one tile = 10 yd):
+ *  the floor left where blocks were cut out, in large rectangular panels
+ *  a few yards across, each split off along a narrow joint, its face
+ *  dressed in parallel pick strokes running one way or the other, drill
+ *  holes in a row down a few joints, and pale dust drifted over it. */
+const paintQuarry: Painter = (h, size, rnd) => {
+  const grain = noiseField(size, rnd, 48);
+  const broad = noiseField(size, rnd, 5);
+  const dust = noiseField(size, rnd, 9);
+  const rows: { y0: number; y1: number }[] = [];
+  let y = 0;
+  while (y < size) {
+    const hgt = Math.round(size * (0.3 + rnd() * 0.3));
+    rows.push({ y0: y, y1: Math.min(size, y + hgt) });
+    y += hgt;
+  }
+  for (const row of rows) {
+    let x = Math.floor(rnd() * size * 0.3);
+    const start = x;
+    while (x < start + size) {
+      const w = Math.round(size * (0.4 + rnd() * 0.35));
+      const tone = 0.5 + rnd() * 0.3;
+      const along = rnd() < 0.5;
+      const pitch = 5 + rnd() * 4;
+      const phase = rnd() * 10;
+      const tilt = (rnd() - 0.5) * 0.3;
+      for (let py = row.y0; py < row.y1; py++) {
+        for (let xi = x; xi < Math.min(x + w, start + size); xi++) {
+          const px = ((xi % size) + size) % size;
+          const i = py * size + px;
+          const ex = Math.min(xi - x, x + w - xi);
+          const ey = Math.min(py - row.y0, row.y1 - py);
+          const edge = Math.min(ex, ey);
+          // The pick strokes: shallow parallel grooves across the panel.
+          const u = along ? xi + py * tilt : py + xi * tilt;
+          const stroke = Math.abs(Math.sin((u + phase) / pitch)) ** 6 * 0.08;
+          let v = tone + (grain[i] - 0.5) * 0.14 + (broad[i] - 0.5) * 0.22 - stroke;
+          if (edge < 1.2) v *= 0.45;
+          else if (edge < 3) v *= 0.86;
+          // Quarry dust drifted over the low spots.
+          v += Math.max(0, dust[i] - 0.62) * 0.6;
+          h[i] = v;
+        }
+      }
+      // Drill holes down one joint of some panels.
+      if (rnd() < 0.35) {
+        for (let py = row.y0 + 6; py < row.y1 - 4; py += 9) {
+          for (let dy = -2; dy <= 2; dy++)
+            for (let dx = -2; dx <= 2; dx++)
+              if (dx * dx + dy * dy <= 5) h[wrapAt(x + dx + 2, py + dy, size)] = 0.15;
+        }
+      }
+      x += w;
+    }
+  }
+  // Chips: small bright flakes scattered.
+  for (let k = 0; k < 220; k++) {
+    const cx = rnd() * size;
+    const cy = rnd() * size;
+    const r = 1 + rnd() * 2;
+    for (let dy = -r; dy <= r; dy++)
+      for (let dx = -r; dx <= r; dx++)
+        if (dx * dx + dy * dy <= r * r) h[wrapAt(cx + dx, cy + dy, size)] += 0.12;
+  }
+};
+
+/** Quarried bedrock panels (one tile = 10 yd: the family's UV scale). */
+export function quarryDetail(): DetailPair {
+  return bake('quarry', paintQuarry, 0x9a77, 512, 5, 1, 125);
+}
+
 export function strataDetail(): DetailPair {
   return bake('strata', paintStrata, 0x57a7, 256, 6, 1, 150);
 }

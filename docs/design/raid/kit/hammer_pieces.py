@@ -189,7 +189,7 @@ def derrick():
         a = TAU * k / 4 + 0.3
         beam(p, (1.05, 0.7, 1.8), (1.05, 0.7 + math.cos(a) * 1.0, 1.8 + math.sin(a) * 1.0), 0.12, 0.12, TIMBER_DARK)
     # Guy ropes from the apex to iron pins.
-    for (x, y) in ((-2.9, 1.2), (2.9, 1.2)):
+    for (x, y) in ((-2.7, 1.1), (2.7, 1.1)):
         rope(p, apex, (x, y, 0.45), 0.05, sag=0.4)
         with p.as_kind(METAL):
             p.prism((x, y, 0.25), 6, 0.1, 0.08, 0.45, IRON_DARK)

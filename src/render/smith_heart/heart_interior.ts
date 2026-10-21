@@ -20,6 +20,8 @@ import { authoredFieldHeight } from '../../sim/instances/authored_field';
 import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
 import { sharedUniforms } from '../gfx';
 import type { FireLightSink } from '../point_light_budget';
+import { buildHammerAir } from './hammer_air';
+import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { buildHeartGates } from './heart_gates';
 import { buildHeartLights } from './heart_lights';
 import { buildHeartMountain } from './heart_mountain';
@@ -50,12 +52,13 @@ const ground = (x: number, z: number): number => authoredFieldHeight(SMITH_HEART
 const DRIVER_GAP = 0.5;
 
 /** Build the whole Smith's Heart for the slot anchored at (ox, oz),
- *  instance-local. */
-export function buildSmithHeartInterior(
+ *  instance-local. Waits (capped) for the veins' Blender kits first. */
+export async function buildSmithHeartInterior(
   deps: SmithHeartInteriorDeps,
   ox: number,
   oz: number,
-): THREE.Group {
+): Promise<THREE.Group> {
+  await ensureHammerKit();
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   group.add(
@@ -68,7 +71,11 @@ export function buildSmithHeartInterior(
   );
   group.add(buildHeartMountain(deps.lowGfx));
   group.add(buildHeartWalls(deps.lowGfx));
-  group.add(buildHeartProps());
+  const kitReady = hammerKitReady();
+  const props = buildHeartProps(HAMMER_KIT_KINDS, kitReady ? HAMMER_KIT_KINDS : new Set());
+  group.add(props.group);
+  dressHammerVein(group, props.kitOwned, deps.lowGfx);
+  group.add(buildHammerAir(deps.lowGfx));
   group.add(buildHeartRoom(deps.lowGfx));
   buildHeartLights(group, deps, ground);
   const rivers = buildHeartRivers();

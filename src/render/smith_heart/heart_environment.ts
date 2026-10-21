@@ -1,8 +1,13 @@
 // The Smith's Heart's air and light per area (the renderer's fog scene state
 // and interior light rig dispatch here, the way the Ignivar raid's rooms do):
-//   - the main map keeps the storm-dusk grade it shares with the Sunken
-//     Bastion (`sunkenBastion`) until the per-room phases give each vein its
-//     own;
+//   - the Hammer vein (the Cleft, the Gallery, the Quarry, the Slab) has
+//     its own state, `smithHeartHammer`: a warm dusty quarry dusk, the low
+//     sun raking in from the west down the fissure so the colossi's faces
+//     catch it across the pit, a warm sky and a warmer bounce off the cut
+//     stone, quarry dust thickening the distance (phase 2B);
+//   - the rest of the main map keeps the storm-dusk grade it shares with the
+//     Sunken Bastion (`sunkenBastion`) until the per-room phases give each
+//     vein its own;
 //   - the Heart (the separate final room) gets its own state,
 //     `smithHeartCore`: an ember-violet night air, nearer than the storm's so
 //     the chamber's crown closes round the platform, and a light rig lit from
@@ -13,7 +18,7 @@
 //
 // Three-free, DOM-free, deterministic.
 
-import { inSmithHeartRoom } from '../../sim/content/smith_heart_layout';
+import { inSmithHeartRoom, smithHeartAreaAt } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 
 /** The fog state of the Heart. */
@@ -26,6 +31,40 @@ export function smithHeartCameraInHeart(x: number, z: number): boolean {
   const o = instanceOrigin(def.index, instanceSlotForZ(z));
   return inSmithHeartRoom(x - o.x, z - o.z);
 }
+
+/** The fog state of the Hammer vein. */
+export const SMITH_HEART_HAMMER_FOG_STATE = 'smithHeartHammer';
+
+/** Is the camera at world (x, z) in the Hammer vein of its Smith's Heart slot? */
+export function smithHeartCameraInHammer(x: number, z: number): boolean {
+  const def = DUNGEONS.smith_heart;
+  if (!def) return false;
+  const o = instanceOrigin(def.index, instanceSlotForZ(z));
+  return smithHeartAreaAt(x - o.x, z - o.z) === 'hammer';
+}
+
+/** The Hammer's air: quarry dust lit amber by the low sun, thin near (the
+ *  pit reads crisp across) and thickening past the terraces into the
+ *  fissure's far rock. */
+export const SMITH_HEART_HAMMER_FOG = { color: 0x75614f, near: 70, far: 560 } as const;
+
+/** The Hammer's light rig: a warm low key from the west (the dusk down the
+ *  fissure, the colossi facing it across the pit), a dusty amber sky, the
+ *  cut stone's warm bounce, a warm rim on every silhouette. The image-based
+ *  light (the realm's daytime sky, blue) is all but off: the quarry's fill is
+ *  the warm hemisphere. */
+export const SMITH_HEART_HAMMER_LIGHT = {
+  sun: 2.5,
+  hemi: 1.45,
+  env: 0.05,
+  rim: 1.8,
+  sunColor: 0xffd2a4,
+  hemiSky: 0xa89482,
+  hemiGround: 0x60482f,
+  rimColor: 0xffb05c,
+  /** Low in the west, a little south (from the ground toward it). */
+  keyDirection: [-0.84, 0.44, -0.18] as const,
+} as const;
 
 /** The Heart's fog: an ember-violet dark, pushed back past the platform and
  *  its chasm so the chains read to the crown, closing before the crown's far

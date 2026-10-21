@@ -14,7 +14,12 @@ import { waterLevelAt } from '../sim/world';
 import { SANCTUM_FOG_COLOR } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import type { FogSceneState } from './interior_light_rig';
-import { SMITH_HEART_CORE_FOG, smithHeartCameraInHeart } from './smith_heart/heart_environment';
+import {
+  SMITH_HEART_CORE_FOG,
+  SMITH_HEART_HAMMER_FOG,
+  smithHeartCameraInHammer,
+  smithHeartCameraInHeart,
+} from './smith_heart/heart_environment';
 import { BASIN_FOG_COLOR } from './wildheart_basin/basin_plan_core';
 
 /** The Hollow Crypt's night fog colour (its sky dome fades to it at the horizon). */
@@ -72,9 +77,13 @@ export function resolveFogScene(
   // fog and light rig (its interior carries its own storm sky) until the
   // per-room phases give each vein its own.
   const inSmithHeartCore = interior === 'smith_heart' && smithHeartCameraInHeart(cam.x, cam.z);
+  // Its Hammer vein has its own warm quarry dusk (phase 2B).
+  const inSmithHeartHammer =
+    interior === 'smith_heart' && !inSmithHeartCore && smithHeartCameraInHammer(cam.x, cam.z);
   // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
   const inSunkenBastion =
-    interior === 'sunken_bastion' || (interior === 'smith_heart' && !inSmithHeartCore);
+    interior === 'sunken_bastion' ||
+    (interior === 'smith_heart' && !inSmithHeartCore && !inSmithHeartHammer);
   // The Drowned Temple: open-air at night over its lagoon, under its own sky.
   const inDrownedTemple = interior === 'drowned_temple';
   // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.
@@ -99,21 +108,23 @@ export function resolveFogScene(
                   ? 'hollowCrypt'
                   : inSmithHeartCore
                     ? 'smithHeartCore'
-                    : inSunkenBastion
-                      ? 'sunkenBastion'
-                      : inDrownedTemple
-                        ? 'drownedTemple'
-                        : inGravewyrmSanctum
-                          ? 'gravewyrmSanctum'
-                          : inLastKeep
-                            ? 'lastkeep'
-                            : inDawnhold
-                              ? 'dawnhold'
-                              : inside
-                                ? 'dungeon'
-                                : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                                  ? 'underwater'
-                                  : 'outdoor';
+                    : inSmithHeartHammer
+                      ? 'smithHeartHammer'
+                      : inSunkenBastion
+                        ? 'sunkenBastion'
+                        : inDrownedTemple
+                          ? 'drownedTemple'
+                          : inGravewyrmSanctum
+                            ? 'gravewyrmSanctum'
+                            : inLastKeep
+                              ? 'lastkeep'
+                              : inDawnhold
+                                ? 'dawnhold'
+                                : inside
+                                  ? 'dungeon'
+                                  : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                    ? 'underwater'
+                                    : 'outdoor';
   return { interior, desired };
 }
 
@@ -170,6 +181,12 @@ export function applyFogScenePreset(
     fog.color.setHex(SMITH_HEART_CORE_FOG.color);
     fog.near = SMITH_HEART_CORE_FOG.near;
     fog.far = SMITH_HEART_CORE_FOG.far;
+  } else if (desired === 'smithHeartHammer') {
+    // The Hammer vein: quarry dust lit amber by the low sun, thin across the
+    // pit, thickening past the terraces into the fissure's far rock.
+    fog.color.setHex(SMITH_HEART_HAMMER_FOG.color);
+    fog.near = SMITH_HEART_HAMMER_FOG.near;
+    fog.far = SMITH_HEART_HAMMER_FOG.far;
   } else if (desired === 'sunkenBastion') {
     // Storm-tide sea fog: grey-green and heavy low over the water, pushed back
     // far enough that the whole headland climbs out of it from the landing and

@@ -22,6 +22,7 @@ import {
   heartGateRig,
   heartSealGatePose,
 } from './heart_gates_core';
+import { heartKitMeshes, SMITH_HEART_HAMMER_KIT_URL } from './heart_kit';
 import { HEART_PALETTE } from './heart_plan_core';
 
 let unitBox: THREE.BufferGeometry | null = null;
@@ -75,8 +76,27 @@ function buildRig(rig: HeartGateRig, width: number): GateRig {
         })
       : null;
   const glow = new THREE.Color(SMITH_HEART_VEIN_COLORS.heat);
-  const meshes: { part: HeartGatePart; mesh: THREE.Mesh }[] = [];
+  const meshes: { part: HeartGatePart; mesh: THREE.Object3D; kit: boolean }[] = [];
   for (const part of heartGateParts(rig, width)) {
+    // The Slab's halves are the Hammer kit's carved halves once it has
+    // landed (both in the shut slab's frame: its base centre); the box
+    // stand-ins and the seam otherwise.
+    if (rig === 'slab') {
+      const kit =
+        part.role === 'half'
+          ? heartKitMeshes(
+              SMITH_HEART_HAMMER_KIT_URL,
+              (part.side ?? 1) < 0 ? 'Kit_SlabHalfL' : 'Kit_SlabHalfR',
+            )
+          : null;
+      if (kit) {
+        root.add(kit);
+        meshes.push({ part, mesh: kit, kit: true });
+        continue;
+      }
+      if (part.role === 'crack' && heartKitMeshes(SMITH_HEART_HAMMER_KIT_URL, 'Kit_SlabHalfL'))
+        continue;
+    }
     const material =
       part.role === 'half'
         ? stoneMaterial()
@@ -89,7 +109,7 @@ function buildRig(rig: HeartGateRig, width: number): GateRig {
     mesh.scale.set(part.w, part.h, part.d);
     mesh.position.set(part.x, part.y, part.z);
     root.add(mesh);
-    meshes.push({ part, mesh });
+    meshes.push({ part, mesh, kit: false });
   }
   let lastK = -1;
   let lastFilm = -1;
@@ -98,9 +118,12 @@ function buildRig(rig: HeartGateRig, width: number): GateRig {
     apply(k, sealed, t) {
       if (k !== lastK) {
         lastK = k;
-        for (const { part, mesh } of meshes) {
+        for (const { part, mesh, kit } of meshes) {
           const pose = heartGatePartPose(part, rig, k);
-          mesh.position.set(pose.x, pose.y, pose.z);
+          // A kit half stands on the slab's base centre: it moves by the
+          // pose's offset from the box half's own shut centre.
+          if (kit) mesh.position.set(pose.x - part.x, pose.y - part.y, pose.z - part.z);
+          else mesh.position.set(pose.x, pose.y, pose.z);
           mesh.visible = pose.shown;
         }
       }
