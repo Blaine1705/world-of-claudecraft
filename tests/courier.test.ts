@@ -69,6 +69,9 @@ describe('membership courier custody', () => {
     f.meta.inventory = [food(19), ...Array.from({ length: 15 }, () => meat(20))];
     const courier = f.meta.courier!;
     courier.phase = 'waiting';
+    // A legacy waiting courier already stands at its owner (no follow offset).
+    courier.x = f.player.pos.x;
+    courier.z = f.player.pos.z;
     courier.cargo = [{ ...food(2), craftedRecipeId: 'known_recipe' }];
     f.tick();
     expect(f.meta.inventory[0].count).toBe(19);
@@ -83,6 +86,8 @@ describe('membership courier custody', () => {
     const f = fixture();
     f.meta.inventory = [food(18)];
     f.meta.courier!.phase = 'waiting';
+    f.meta.courier!.x = f.player.pos.x;
+    f.meta.courier!.z = f.player.pos.z;
     f.meta.courier!.cargo = [food(2)];
     f.tick();
     expect(f.meta.inventory).toEqual([food(20)]);

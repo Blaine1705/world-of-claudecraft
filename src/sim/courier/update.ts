@@ -7,7 +7,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot, DT, type Entity, type InvSlot } from '../types';
 import { courierPayloadFits, courierSlotFingerprint } from './identity';
-import { courierLandingPoint, startCourierLeg, travelCourier } from './motion';
+import { courierFollowPoint, courierLandingPoint, startCourierLeg, travelCourier } from './motion';
 import { COURIER_ADMISSION_BYTES, COURIER_CAPACITY, type CourierState } from './types';
 
 function withdrawOriginal(
@@ -101,7 +101,10 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
   const state = meta.courier;
   if (!state) return;
   if (state.phase === 'ready') {
-    if (player.pos.x < INSTANCE_X_BASE) travelCourier(state, player.pos.x, player.pos.z, false);
+    if (player.pos.x < INSTANCE_X_BASE) {
+      const spot = courierFollowPoint(player.pos, player.facing);
+      travelCourier(state, spot.x, spot.z, false);
+    }
     return;
   }
   state.retryRemaining = Math.max(0, state.retryRemaining - DT);

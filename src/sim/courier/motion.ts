@@ -17,6 +17,11 @@ export const COURIER_GROUND_SPEED = 7;
 export const COURIER_CRUISE_SPEED = 21;
 /** The returning courier lands this far in front of its owner, not inside them. */
 export const COURIER_LANDING_OFFSET = 2.2;
+/** A summoned courier waits off the owner's LEFT shoulder and slightly behind,
+ * mirroring the buddy's right-and-behind heel (src/sim/pet/buddy_ai.ts:
+ * BUDDY_FOLLOW_RIGHT 3, BUDDY_FOLLOW_BACK 2.2) so the two never overlap. */
+export const COURIER_FOLLOW_LEFT = 3;
+export const COURIER_FOLLOW_BACK = 2.2;
 // Retained for older wire poses and saves during a rolling deployment.
 export const COURIER_GROUND_DISTANCE = 3;
 export const COURIER_FLIGHT_DISTANCE = 8;
@@ -197,6 +202,18 @@ export function courierLandingPoint(pos: { x: number; z: number }, facing: numbe
   return {
     x: pos.x + Math.sin(yaw) * COURIER_LANDING_OFFSET,
     z: pos.z + Math.cos(yaw) * COURIER_LANDING_OFFSET,
+  };
+}
+
+/** Where a ready courier stands: owner - right * LEFT - forward * BACK, on the
+ * player movement kernel's axes (forward = (sin f, cos f), right = (-cos f, sin f)). */
+export function courierFollowPoint(pos: { x: number; z: number }, facing: number) {
+  const yaw = Number.isFinite(facing) ? facing : 0;
+  const sinF = Math.sin(yaw);
+  const cosF = Math.cos(yaw);
+  return {
+    x: pos.x + COURIER_FOLLOW_LEFT * cosF - COURIER_FOLLOW_BACK * sinF,
+    z: pos.z - COURIER_FOLLOW_LEFT * sinF - COURIER_FOLLOW_BACK * cosF,
   };
 }
 

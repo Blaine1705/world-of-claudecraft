@@ -359,7 +359,6 @@ export const ru_RU: EnTranslations = {
       "inventory": "Инвентарь",
       "bankTitle": "Банк",
       "capacity": "{used} / {capacity} ячеек",
-      "travelTime": "10 секунд в каждую сторону",
       "cargo": "Груз курьера",
       "empty": "Нет предметов",
       "send": "Отправить курьера",

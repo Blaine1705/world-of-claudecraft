@@ -359,7 +359,6 @@ export const en_XA: EnTranslations = {
       "inventory": "[Íñʋéñţóŕý]",
       "bankTitle": "[Ɓáñķ]",
       "capacity": "[{used} / {capacity} šļóţš]",
-      "travelTime": "[Úþ ţó 15 šéçóñðš éáçĥ ŵáý]",
       "cargo": "[Çóúŕíéŕ íñʋéñţóŕý]",
       "empty": "[Ñó íţéɱš]",
       "send": "[Šéñð çóúŕíéŕ]",

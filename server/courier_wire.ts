@@ -36,7 +36,7 @@ export function readCourierDispatch(value: Record<string, unknown>): CourierDisp
   if (
     !Array.isArray(deposits) ||
     !Array.isArray(withdrawals) ||
-    deposits.length + withdrawals.length < 1 ||
+    // Zero selections is the courier dismissal (the window closed unsent).
     deposits.length + withdrawals.length > 24 ||
     Buffer.byteLength(JSON.stringify(value), 'utf8') > 12 * 1024
   )

@@ -13,9 +13,12 @@ import {
 } from '../src/sim/courier';
 import {
   COURIER_CRUISE_SPEED,
+  COURIER_FOLLOW_BACK,
+  COURIER_FOLLOW_LEFT,
   COURIER_GROUND_SPEED,
   COURIER_LANDING_OFFSET,
   COURIER_MAX_LEG_TICKS,
+  courierFollowPoint,
   courierLandingPoint,
   courierLegPlan,
   courierLegProgress,
@@ -400,5 +403,48 @@ describe('courier capped-duration flight and grounded endpoints', () => {
     expect(f.meta.courier!.travelTicks).toBe(0);
     f.tick();
     expect(f.meta.courier!.travelTicks).toBe(1);
+  });
+
+  it('waits off the left shoulder and behind, mirroring the buddy, never underfoot', () => {
+    // Facing +Z: left is +X, behind is -Z (forward (sin f, cos f), right (-cos f, sin f)).
+    expect(courierFollowPoint({ x: 10, z: 10 }, 0)).toEqual({
+      x: 10 + COURIER_FOLLOW_LEFT,
+      z: 10 - COURIER_FOLLOW_BACK,
+    });
+    // Facing +X: left is -Z, behind is -X.
+    const east = courierFollowPoint({ x: 0, z: 0 }, Math.PI / 2);
+    expect(east.x).toBeCloseTo(-COURIER_FOLLOW_BACK, 9);
+    expect(east.z).toBeCloseTo(-COURIER_FOLLOW_LEFT, 9);
+    // The buddy's right-and-behind heel sits on the other side of the owner.
+    expect(COURIER_FOLLOW_LEFT).toBe(3);
+    expect(COURIER_FOLLOW_BACK).toBe(2.2);
+    const f = journey();
+    const state = f.meta.courier!;
+    expect(state.phase).toBe('ready');
+    expect([state.x, state.z]).toEqual([COURIER_FOLLOW_LEFT, -COURIER_FOLLOW_BACK]);
+    f.player.pos.x = 20;
+    for (let i = 0; i < 200; i++) f.tick();
+    expect(state.x).toBeCloseTo(20 + COURIER_FOLLOW_LEFT, 9);
+    expect(state.z).toBeCloseTo(-COURIER_FOLLOW_BACK, 9);
+    expect(Math.hypot(state.x - f.player.pos.x, state.z - f.player.pos.z)).toBeGreaterThan(3);
+  });
+
+  it('an empty request dismisses only a waiting, empty courier, even after expiry', () => {
+    const empty = { deposits: [], withdrawals: [] };
+    const f = journey();
+    f.meta.membershipExpiresAt = 0;
+    expect(courierDispatch(f.ctx, empty, 1)).toBe(true);
+    expect(f.meta.courier).toBeUndefined();
+    expect(courierDispatch(f.ctx, empty, 1)).toBe(false);
+    for (const phase of ['outbound', 'returning', 'waiting'] as const) {
+      const g = journey();
+      g.meta.courier!.phase = phase;
+      expect(courierDispatch(g.ctx, empty, 1), phase).toBe(false);
+      expect(g.meta.courier, phase).toBeDefined();
+    }
+    const loaded = journey();
+    loaded.meta.courier!.cargo = [{ itemId: 'baked_bread', count: 1 }];
+    expect(courierDispatch(loaded.ctx, empty, 1)).toBe(false);
+    expect(loaded.meta.courier!.cargo).toHaveLength(1);
   });
 });

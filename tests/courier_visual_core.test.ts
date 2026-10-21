@@ -8,7 +8,9 @@ import {
   type CourierVisualPose,
   courierDelivered,
   courierFacing,
+  courierFarewellKind,
   courierFarewellPoseInto,
+  courierFarewellSeconds,
   courierVisualPoseInto,
 } from '../src/render/courier_visual_core';
 
@@ -97,9 +99,9 @@ describe('courier visual presentation', () => {
     expect(out.lift).toBe(COURIER_FLIGHT_LIFT);
   });
   it('spins once with a hop after delivery, then shrinks away', () => {
-    const out: CourierFarewellPose = { spin: 0, lift: 0, scale: 1, done: false };
+    const out: CourierFarewellPose = { spin: 0, roll: 0, lift: 0, scale: 1, done: false };
     courierFarewellPoseInto(out, 0);
-    expect(out).toEqual({ spin: 0, lift: 0, scale: 1, done: false });
+    expect(out).toEqual({ spin: 0, roll: 0, lift: 0, scale: 1, done: false });
     courierFarewellPoseInto(out, COURIER_SPIN_SECONDS / 2);
     expect(out.spin).toBeCloseTo(Math.PI, 9);
     expect(out.lift).toBeGreaterThan(0.4);
@@ -127,5 +129,42 @@ describe('courier visual presentation', () => {
     expect(courierFacing(0, 0, 1, 0, 0)).toBe(Math.PI / 2);
     expect(courierFacing(1, 2, 1, 2, 1.2)).toBe(1.2);
     expect(courierFacing(0, 1, 0, 0, 0)).toBe(Math.PI);
+  });
+  it('dances three bounces with a sway when dismissed, then shrinks away', () => {
+    const out: CourierFarewellPose = { spin: 0, roll: 0, lift: 0, scale: 1, done: false };
+    const dance = courierFarewellSeconds('dance');
+    expect(dance).toBeGreaterThan(courierFarewellSeconds('spin'));
+    const lifts: number[] = [];
+    let maxRoll = 0;
+    let maxSway = 0;
+    for (let t = 0; t <= 1.2; t += 0.01) {
+      courierFarewellPoseInto(out, t, 'dance');
+      lifts.push(out.lift);
+      maxRoll = Math.max(maxRoll, Math.abs(out.roll));
+      maxSway = Math.max(maxSway, Math.abs(out.spin));
+      expect(out.scale).toBe(1);
+    }
+    // Three bounce peaks, a visible hip sway, and never a full spin.
+    const peaks = lifts.filter(
+      (v, i) => i > 0 && i < lifts.length - 1 && v > lifts[i - 1] && v >= lifts[i + 1],
+    );
+    expect(peaks).toHaveLength(3);
+    expect(maxRoll).toBeGreaterThan(0.15);
+    expect(maxSway).toBeGreaterThan(0.3);
+    expect(maxSway).toBeLessThan(1);
+    courierFarewellPoseInto(out, dance - 0.1, 'dance');
+    expect(out.scale).toBeGreaterThan(0);
+    expect(out.scale).toBeLessThan(1);
+    courierFarewellPoseInto(out, dance, 'dance');
+    expect(out).toMatchObject({ scale: 0, done: true });
+  });
+  it('picks the spin after a delivery, the dance for a waiting courier, else nothing', () => {
+    const base = { x: 0, z: 0, legTicks: 300 };
+    expect(courierFarewellKind({ ...base, phase: 'returning', travelTicks: 299 })).toBe('spin');
+    expect(courierFarewellKind({ ...base, phase: 'ready' })).toBe('dance');
+    expect(courierFarewellKind({ ...base, phase: 'returning', travelTicks: 40 })).toBeNull();
+    expect(courierFarewellKind({ ...base, phase: 'outbound', travelTicks: 299 })).toBeNull();
+    expect(courierFarewellKind({ ...base, phase: 'waiting' })).toBeNull();
+    expect(courierFarewellKind(null)).toBeNull();
   });
 });

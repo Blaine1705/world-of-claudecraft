@@ -3,11 +3,12 @@ import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
+  type CourierFarewellKind,
   type CourierFarewellPose,
   type CourierVisualInfo,
   type CourierVisualPose,
-  courierDelivered,
   courierFacing,
+  courierFarewellKind,
   courierFarewellPoseInto,
   courierVisualPoseInto,
 } from './courier_visual_core';
@@ -64,8 +65,10 @@ export class CourierVisual {
   /** Seconds into the post-delivery spin, or -1 when none is playing. */
   private farewell = -1;
   private farewellYaw = 0;
+  private farewellKind: CourierFarewellKind = 'spin';
   private readonly farewellPose: CourierFarewellPose = {
     spin: 0,
+    roll: 0,
     lift: 0,
     scale: 1,
     done: true,
@@ -130,28 +133,32 @@ export class CourierVisual {
     this.root.scale.setScalar(1);
   }
 
-  /** The delivered courier stays where it landed for one spin, then shrinks away. */
+  /** A delivered courier spins where it landed; a dismissed one dances where it
+   * waited. Either then shrinks away. */
   private updateFarewell(elapsed: number, reducedMotion: boolean): void {
     if (this.farewell < 0) {
-      if (!this.hasLast || !courierDelivered(this.last) || !this.model || reducedMotion) {
+      const kind = this.hasLast ? courierFarewellKind(this.last) : null;
+      if (!kind || !this.model || reducedMotion) {
         this.hasLast = false;
         this.hide();
         return;
       }
       this.hasLast = false;
+      this.farewellKind = kind;
       this.farewell = 0;
       this.farewellYaw = this.root.rotation.y;
     } else if (reducedMotion) {
       this.hide();
       return;
     } else this.farewell += elapsed;
-    courierFarewellPoseInto(this.farewellPose, this.farewell);
+    courierFarewellPoseInto(this.farewellPose, this.farewell, this.farewellKind);
     if (this.farewellPose.done) {
       this.hide();
       return;
     }
     const model = this.model!;
     model.rotation.x = 0;
+    model.rotation.z = this.farewellPose.roll;
     this.root.rotation.y = this.farewellYaw + this.farewellPose.spin;
     this.root.position.y = this.groundAt(this.last.x, this.last.z) + this.farewellPose.lift;
     this.root.scale.setScalar(Math.max(0.001, this.farewellPose.scale));
@@ -206,6 +213,7 @@ export class CourierVisual {
     );
     // The model faces +Z, so a nose-up tilt is a negative local X rotation.
     this.model!.rotation.x = -this.pose.pitch;
+    this.model!.rotation.z = 0;
     this.actions.get('Idle')?.setEffectiveWeight(this.pose.moving ? 0 : 1);
     const run = this.actions.get('Run');
     run?.setEffectiveWeight(this.pose.moving ? 1 - this.pose.flight : 0);

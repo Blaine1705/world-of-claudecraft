@@ -75,9 +75,14 @@ export class CourierWindow {
     this.render(true);
     this.el.querySelector<HTMLButtonElement>('.x-btn')?.focus({ preventScroll: true });
   }
-  close(): void {
+  /** Closing without a delivery sends a waiting, empty courier away (an empty
+   * dispatch); the Send button closes with `dismiss` false. */
+  close(dismiss = true): void {
     if (!this.opened) return;
     this.opened = false;
+    const info = this.deps.info();
+    if (dismiss && info?.phase === 'ready' && info.cargo.length === 0)
+      this.deps.dispatch(emptyCourierDraft());
     this.deps.hideTooltip();
     this.el.style.display = 'none';
     this.reset();
@@ -182,7 +187,7 @@ export class CourierWindow {
         if (canDispatchCourier(live, this.draft)) {
           this.deps.dispatch(this.draft);
           // The courier is on its way: get the window out of the player's view.
-          this.close();
+          this.close(false);
           return;
         }
         this.render(true);
@@ -238,7 +243,7 @@ export class CourierWindow {
     return `<section class="courier-storage" data-courier-storage="${side}" aria-labelledby="courier-${side}-title"><div class="courier-storage-head"><h3 id="courier-${side}-title">${esc(title)}</h3><span class="ui-num ui-muted">${esc(t('hudChrome.courier.capacity', { used: formatNumber(slots.length), capacity: formatNumber(capacity) }))}</span></div><p class="ui-muted courier-storage-hint">${esc(hint)}</p><div class="bank-grid courier-grid">${cells.join('')}</div></section>`;
   }
   private portrait(): string {
-    return `<section class="courier-companion"><div class="courier-portrait"><img src="${esc(apiUrl('/ui/courier/donkey.webp'))}" alt="" draggable="false"></div><span class="courier-emblem" aria-hidden="true">${svgIcon('mail')}</span><strong>${esc(t('hudChrome.courier.title'))}</strong><p class="ui-muted">${esc(t('hudChrome.courier.travelTime'))}</p></section>`;
+    return `<section class="courier-companion"><div class="courier-portrait"><img src="${esc(apiUrl('/ui/courier/donkey.webp'))}" alt="" draggable="false"></div><span class="courier-emblem" aria-hidden="true">${svgIcon('mail')}</span><strong>${esc(t('hudChrome.courier.title'))}</strong></section>`;
   }
   private cargo(slots: readonly InvSlot[]): string {
     if (!slots.length) return `<p class="ui-muted">${esc(t('hudChrome.courier.empty'))}</p>`;

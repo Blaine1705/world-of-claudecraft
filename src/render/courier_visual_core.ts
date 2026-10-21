@@ -103,25 +103,47 @@ export function courierVisualPoseInto(
 }
 
 export const COURIER_SPIN_SECONDS = 1;
+export const COURIER_DANCE_SECONDS = 1.2;
 export const COURIER_VANISH_SECONDS = 0.4;
 export const COURIER_FAREWELL_SECONDS = COURIER_SPIN_SECONDS + COURIER_VANISH_SECONDS;
+/** A delivered courier spins; one dismissed without a trip dances. */
+export type CourierFarewellKind = 'spin' | 'dance';
 
 export interface CourierFarewellPose {
-  /** Extra yaw added to the landing facing (one full turn by the spin's end). */
+  /** Extra yaw added to the last facing (one full turn by the spin's end). */
   spin: number;
+  /** Side-to-side body tilt in radians (the dance's sway). */
+  roll: number;
   lift: number;
   scale: number;
   done: boolean;
 }
 
-/** After the final delivery the donkey does one happy hop-spin, then shrinks away. */
-export function courierFarewellPoseInto(out: CourierFarewellPose, elapsed: number): void {
+export function courierFarewellSeconds(kind: CourierFarewellKind): number {
+  return (kind === 'dance' ? COURIER_DANCE_SECONDS : COURIER_SPIN_SECONDS) + COURIER_VANISH_SECONDS;
+}
+
+/** After the final delivery the donkey does one happy hop-spin; dismissed
+ * unsent, it dances (three bounces, swaying hips) instead. Then it shrinks away. */
+export function courierFarewellPoseInto(
+  out: CourierFarewellPose,
+  elapsed: number,
+  kind: CourierFarewellKind = 'spin',
+): void {
   const t = Math.max(0, elapsed);
-  const spinU = Math.min(1, t / COURIER_SPIN_SECONDS);
-  out.spin = 2 * Math.PI * smoothstep(spinU);
-  out.lift = 0.45 * 4 * spinU * (1 - spinU);
-  const vanishU = Math.max(0, Math.min(1, (t - COURIER_SPIN_SECONDS) / COURIER_VANISH_SECONDS));
-  out.done = t >= COURIER_FAREWELL_SECONDS;
+  const show = kind === 'dance' ? COURIER_DANCE_SECONDS : COURIER_SPIN_SECONDS;
+  const u = Math.min(1, t / show);
+  if (kind === 'dance') {
+    out.spin = 0.45 * Math.sin(4 * Math.PI * u);
+    out.roll = 0.2 * Math.sin(6 * Math.PI * u);
+    out.lift = 0.3 * Math.abs(Math.sin(3 * Math.PI * u));
+  } else {
+    out.spin = 2 * Math.PI * smoothstep(u);
+    out.roll = 0;
+    out.lift = 0.45 * 4 * u * (1 - u);
+  }
+  const vanishU = Math.max(0, Math.min(1, (t - show) / COURIER_VANISH_SECONDS));
+  out.done = t >= show + COURIER_VANISH_SECONDS;
   out.scale = out.done ? 0 : 1 - vanishU * vanishU;
   out.lift += 0.3 * vanishU;
 }
@@ -136,6 +158,13 @@ export function courierDelivered(last: CourierVisualInfo | null): boolean {
     last.travelTicks <= last.legTicks &&
     last.legTicks - last.travelTicks <= 10
   );
+}
+
+/** Which goodbye a vanished courier plays: a spin after its return skid, a dance
+ * when it was waiting unsent (dismissed), and none otherwise (unloaded or cancelled). */
+export function courierFarewellKind(last: CourierVisualInfo | null): CourierFarewellKind | null {
+  if (courierDelivered(last)) return 'spin';
+  return last?.phase === 'ready' ? 'dance' : null;
 }
 
 /** No route prediction: orient along the last observed authoritative movement. */

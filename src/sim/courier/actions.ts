@@ -4,7 +4,7 @@ import { membershipActive } from '../membership';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot } from '../types';
 import { courierPayloadFits, courierSlotFingerprint, validCourierRequest } from './identity';
-import { startCourierLeg } from './motion';
+import { courierFollowPoint, startCourierLeg } from './motion';
 import { COURIER_ADMISSION_BYTES, COURIER_CAPACITY, type CourierDispatchRequest } from './types';
 
 export function courierSummon(ctx: SimContext, pid?: number): boolean {
@@ -14,10 +14,12 @@ export function courierSummon(ctx: SimContext, pid?: number): boolean {
   // Existing custody remains inspectable even after entitlement expiry.
   if (!meta.courier) {
     if (!membershipActive(meta, ctx.time) || e.dead || e.pos.x >= INSTANCE_X_BASE) return false;
+    // Appear at the waiting spot off the owner's shoulder, not underfoot.
+    const spot = courierFollowPoint(e.pos, e.facing);
     meta.courier = {
       phase: 'ready',
-      x: e.pos.x,
-      z: e.pos.z,
+      x: spot.x,
+      z: spot.z,
       bankerId: null,
       travelDistance: 0,
       cargo: [],
@@ -39,6 +41,13 @@ export function courierDispatch(
   if (!r || !validCourierRequest(raw)) return false;
   const { meta, e } = r;
   const state = meta.courier;
+  // An empty request sends a ready, empty courier away (the window closed
+  // without a delivery). It never touches custody, so membership is not needed.
+  if (raw.deposits.length + raw.withdrawals.length === 0) {
+    if (!state || state.phase !== 'ready' || state.cargo.length > 0) return false;
+    delete meta.courier;
+    return true;
+  }
   if (
     !state ||
     state.phase !== 'ready' ||

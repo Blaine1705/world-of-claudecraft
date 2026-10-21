@@ -359,7 +359,6 @@ export const ja_JP: EnTranslations = {
       "inventory": "所持品",
       "bankTitle": "銀行",
       "capacity": "{used} / {capacity} スロット",
-      "travelTime": "片道10秒",
       "cargo": "配達員の荷物",
       "empty": "アイテムなし",
       "send": "配達員を送る",

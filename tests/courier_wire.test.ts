@@ -119,8 +119,14 @@ describe('courier wire validation and owner mirror', () => {
     dispatchCourierCommand(sim, { ...request(), accountId: 99 }, 17);
     expect(sim.courierDispatch).toHaveBeenCalledTimes(1);
   });
+  it('accepts the empty dismissal request but still refuses a missing direction', () => {
+    expect(readCourierDispatch({ cmd: 'courier_dispatch', deposits: [], withdrawals: [] })).toEqual(
+      { deposits: [], withdrawals: [] },
+    );
+    expect(readCourierDispatch({ cmd: 'courier_dispatch', deposits: [] })).toBeNull();
+    expect(readCourierDispatch({ cmd: 'courier_dispatch', withdrawals: [] })).toBeNull();
+  });
   it.each([
-    { deposits: [] },
     { deposits: [{ index: -1, fingerprint: 'x' }] },
     { deposits: [{ index: 0.5, fingerprint: 'x' }] },
     { deposits: [{ index: 0, fingerprint: '' }] },

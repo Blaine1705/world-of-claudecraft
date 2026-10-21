@@ -6,6 +6,12 @@ The window shows the existing bank and inventory item grids with the courier
 portrait between them. It selects whole stacks from the character's bags and personal bank.
 Quest items cannot travel. A trip accepts at most 24 selected stacks in total.
 
+A summoned courier waits 3 yards off its owner's left shoulder and 2.2 behind
+(`courierFollowPoint`), mirroring the buddy's right-and-behind heel so the two
+never overlap. Closing the window without sending dismisses a waiting, empty
+courier: the window sends an empty dispatch, and the renderer plays a short dance
+before it shrinks away.
+
 Dispatch moves deposits out of the bags into persistent courier custody and closes
 the courier window. The courier travels in a straight line to the nearest overworld
 banker. Every leg follows one profile: a short ground run, three rising hops, a
