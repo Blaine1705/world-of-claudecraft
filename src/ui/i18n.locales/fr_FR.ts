@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus de spécialisation',
+  'hudChrome.specPanel.healing': 'soins',
+  'hudChrome.specPanel.absorption': 'absorption de dégâts',
+  'hudChrome.specPanel.physicalAbilityDamage': 'dégâts des techniques de mêlée et à distance',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Augmente les soins principaux de {pct} après les autres bonus de soins.',
   'hud.pet.assist': 'Assistance',
   'hud.pet.assistDesc':
     "N'attaque que votre cible actuelle, une fois que vous avez utilisé une technique sur elle. Ignore les ennemis qui vous attaquent.",

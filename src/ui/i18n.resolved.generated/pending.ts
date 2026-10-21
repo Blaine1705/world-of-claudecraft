@@ -9,55 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "es_ES": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "fr_FR": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "fr_CA": [
-    "hudChrome.specPanel.specBonus"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "de_DE": [
-    "hudChrome.specPanel.specBonus"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "hudChrome.specPanel.specBonus"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "nl_NL": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "pl_PL": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "id_ID": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "tr_TR": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "sv_SE": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "vi_VN": [
-    "hudChrome.specPanel.specBonus"
-  ],
-  "da_DK": [
-    "hudChrome.specPanel.specBonus"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

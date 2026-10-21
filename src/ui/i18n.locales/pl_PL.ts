@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Premia specjalizacji',
+  'hudChrome.specPanel.healing': 'leczenie',
+  'hudChrome.specPanel.absorption': 'pochłanianie obrażeń',
+  'hudChrome.specPanel.physicalAbilityDamage': 'obrażenia umiejętności wręcz i dystansowych',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Zwiększa podstawowe leczenie o {pct} po uwzględnieniu pozostałych premii do leczenia.',
   'hud.pet.assist': 'Wsparcie',
   'hud.pet.assistDesc':
     'Atakuje tylko twój bieżący cel, gdy użyjesz na nim zdolności. Ignoruje wrogów, którzy cię atakują.',

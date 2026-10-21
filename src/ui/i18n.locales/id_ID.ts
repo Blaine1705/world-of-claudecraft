@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus spesialisasi',
+  'hudChrome.specPanel.healing': 'pemulihan',
+  'hudChrome.specPanel.absorption': 'penyerapan kerusakan',
+  'hudChrome.specPanel.physicalAbilityDamage': 'kerusakan kemampuan jarak dekat dan jarak jauh',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Meningkatkan pemulihan utama sebesar {pct} setelah bonus pemulihan lainnya diterapkan.',
   'hud.pet.assist': 'Bantu',
   'hud.pet.assistDesc':
     'Hanya menyerang targetmu saat ini setelah kamu menggunakan kemampuan padanya. Mengabaikan musuh yang menyerangmu.',

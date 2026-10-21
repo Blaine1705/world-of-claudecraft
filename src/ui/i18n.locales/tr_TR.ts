@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Uzmanlık bonusu',
+  'hudChrome.specPanel.healing': 'iyileştirme',
+  'hudChrome.specPanel.absorption': 'hasar soğurma',
+  'hudChrome.specPanel.physicalAbilityDamage': 'yakın ve uzak mesafe yetenek hasarı',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Diğer iyileştirme bonusları uygulandıktan sonra birincil iyileştirmeyi {pct} artırır.',
   'hud.pet.assist': 'Yardım',
   'hud.pet.assistDesc':
     'Yalnızca mevcut hedefine bir yetenek kullandıktan sonra o hedefe saldırır. Sana saldıran düşmanları görmezden gelir.',

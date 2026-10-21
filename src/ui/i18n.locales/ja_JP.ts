@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.healing': '回復量',
+  'hudChrome.specPanel.absorption': 'ダメージ吸収量',
+  'hudChrome.specPanel.physicalAbilityDamage': '近接および遠隔アビリティのダメージ',
+  'hudChrome.specPanel.primaryHealingBonus':
+    '他の回復ボーナスを適用した後、主な回復効果の回復量が{pct}増加します。',
   'hudChrome.options.enemyHighlightDistance': '{yards}ヤード',
   'hud.pet.stanceDesc': 'クリックして受動、防御、攻撃、アシストを選びます。',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分',

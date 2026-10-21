@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Specialiseringsbonus',
+  'hudChrome.specPanel.healing': 'heling',
+  'hudChrome.specPanel.absorption': 'skadeabsorbering',
+  'hudChrome.specPanel.physicalAbilityDamage': 'skade fra nærkamps- og afstandsevner',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Øger den primære heling med {pct}, efter at andre helingsbonusser er anvendt.',
   'hud.pet.assist': 'Assistance',
   'hud.pet.assistDesc':
     'Angriber kun dit aktuelle mål, når du har brugt en evne på det. Ignorerer fjender, der angriber dig.',

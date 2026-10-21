@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Specialiseringsbonus',
+  'hudChrome.specPanel.healing': 'läkning',
+  'hudChrome.specPanel.absorption': 'skadeabsorption',
+  'hudChrome.specPanel.physicalAbilityDamage': 'skada från närstrids- och avståndsförmågor',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Ökar den primära läkningen med {pct} efter övriga läkningsbonusar.',
   'hud.pet.assist': 'Assistans',
   'hud.pet.assistDesc':
     'Angriper bara ditt nuvarande mål när du har använt en förmåga på det. Ignorerar fiender som angriper dig.',

@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonificación de especialización',
+  'hudChrome.specPanel.healing': 'sanación',
+  'hudChrome.specPanel.absorption': 'absorción de daño',
+  'hudChrome.specPanel.physicalAbilityDamage': 'daño de habilidades cuerpo a cuerpo y a distancia',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Aumenta la sanación principal un {pct} después de las demás bonificaciones de sanación.',
   'hud.pet.assist': 'Asistir',
   'hud.pet.assistDesc':
     'Solo ataca a tu objetivo actual después de que uses una habilidad sobre él. Ignora a los enemigos que te atacan.',

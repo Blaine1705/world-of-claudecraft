@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.healing': '治疗量',
+  'hudChrome.specPanel.absorption': '伤害吸收量',
+  'hudChrome.specPanel.physicalAbilityDamage': '近战和远程技能伤害',
+  'hudChrome.specPanel.primaryHealingBonus': '在其他治疗加成结算后，主要治疗量提高{pct}。',
   'hudChrome.options.enemyHighlightDistance': '{yards} 码',
   'hud.pet.stanceDesc': '点击选择被动、防御、攻击或协助。',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}分钟',

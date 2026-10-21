@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Thưởng chuyên môn',
+  'hudChrome.specPanel.healing': 'hồi máu',
+  'hudChrome.specPanel.absorption': 'hấp thụ sát thương',
+  'hudChrome.specPanel.physicalAbilityDamage': 'sát thương kỹ năng cận chiến và tầm xa',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Tăng lượng hồi máu chính thêm {pct} sau khi áp dụng các mức thưởng hồi máu khác.',
   'hud.pet.assist': 'Hỗ trợ',
   'hud.pet.assistDesc':
     'Chỉ tấn công mục tiêu hiện tại sau khi bạn dùng kỹ năng lên mục tiêu đó. Bỏ qua kẻ địch tấn công bạn.',

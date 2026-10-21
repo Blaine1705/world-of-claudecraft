@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Spezialisierungsbonus',
+  'hudChrome.specPanel.healing': 'Heilung',
+  'hudChrome.specPanel.absorption': 'Schadensabsorption',
+  'hudChrome.specPanel.physicalAbilityDamage': 'Schaden von Nahkampf- und Fernkampffähigkeiten',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Erhöht die primäre Heilung nach allen anderen Heilungsboni um {pct}.',
   'hud.pet.assist': 'Unterstützen',
   'hud.pet.assistDesc':
     'Greift nur dein aktuelles Ziel an, sobald du eine Fähigkeit darauf wirkst. Ignoriert Gegner, die dich angreifen.',

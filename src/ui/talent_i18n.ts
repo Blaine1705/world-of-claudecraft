@@ -1,4 +1,3 @@
-import { specBaselineFor } from '../sim/content/spec_baselines';
 import {
   type ClassTalents,
   type GlobalModEffect,
@@ -14,7 +13,6 @@ import {
   type TalentRowOption,
 } from '../sim/content/talents';
 import { ABILITIES, CLASSES } from '../sim/data';
-import { offensiveSpecTuningFor, primaryHealingMultiplier } from '../sim/spec_output_tuning';
 import type { AbilityEffect, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
@@ -25,6 +23,7 @@ import {
   type SupportedLanguage,
   t,
 } from './i18n';
+import { type BaselineEffectLabels, describeSpecBaseline } from './spec_baseline_description';
 import { TALENT_NEW, TALENT_NEW_TITLE_OVERRIDES } from './talent_i18n.newlocales';
 import { RETAINED_ROW_DESCRIPTION_OVERRIDES } from './talent_i18n.row_description_overrides';
 import { RETAINED_ROW_TITLE_OVERRIDES } from './talent_i18n.row_title_overrides';
@@ -11072,6 +11071,7 @@ function effectDescription(
   effect: TalentEffect | undefined,
   maxRank: number,
   lang: SupportedLanguage,
+  baselineLabels?: BaselineEffectLabels,
 ): string {
   if (!effect) return localeText[lang].noEffect;
   const text = localeText[lang];
@@ -11151,7 +11151,9 @@ function effectDescription(
     if (NON_DISPLAY_GLOBALS.has(key)) continue;
     // Fail closed here too: a global key missing from both NON_DISPLAY_GLOBALS and
     // statLabels must never surface as "Increases undefined by 70%".
-    const label: string | undefined = text.statLabels[key as DisplayGlobalKey];
+    const label: string | undefined =
+      (key === 'meleeDmgPct' ? baselineLabels?.physical : undefined) ??
+      text.statLabels[key as DisplayGlobalKey];
     if (label === undefined) continue;
     parts.push(text.increase(label, formatPercent(value, lang), perRank));
   }
@@ -11192,7 +11194,7 @@ function effectDescription(
       const target =
         mod.ability === 'life_tap'
           ? `${name} ${t('classDetails.labels.resource')}`
-          : `${name} ${text.statLabels.damage}`;
+          : `${name} ${baselineLabels?.abilityOutput.get(mod.ability) ?? text.statLabels.damage}`;
       parts.push(text.increase(target, formatPercent(mod.dmgPct, lang), perRank));
     }
     if (mod.flatDmg)
@@ -11273,31 +11275,12 @@ function effectDescription(
 // never reach the character sheet. Null when the spec has neither.
 export function specBaselineDescription(spec: SpecDef): string | null {
   const lang = getLanguage();
-  const text = localeText[lang];
-  const baseline = specBaselineFor(spec.class, spec.id);
-  const tuning = offensiveSpecTuningFor(spec.class, spec.id);
-  const primaryHealing = primaryHealingMultiplier(spec.class, spec.id);
-  if (!baseline && !tuning && primaryHealing === 1) return null;
-
-  const global: GlobalModEffect = { ...baseline?.global };
-  const extra: string[] = [];
-  const physical = tuning?.physical ?? 0;
-  const spell = tuning?.spell ?? 0;
-  if (physical > 0 && physical === spell && !global.meleeDmgPct && !global.spellDmgPct) {
-    // Doctrine's flat bonus covers both buckets (and its wand), so it reads as plain damage.
-    extra.push(text.increase(text.statLabels.damage, formatPercent(physical, lang), ''));
-  } else {
-    // talent_hit_mult adds the offense bonus to the legacy bucket, so one total per bucket
-    // is the damage the player actually deals.
-    if (physical) global.meleeDmgPct = (global.meleeDmgPct ?? 0) + physical;
-    if (spell) global.spellDmgPct = (global.spellDmgPct ?? 0) + spell;
-  }
-  // The primary-healing factor multiplies after healPct.
-  if (primaryHealing !== 1) global.healPct = (1 + (global.healPct ?? 0)) * primaryHealing - 1;
-
-  const described = effectDescription({ ...baseline, global }, 1, lang);
-  const parts = described === text.noEffect ? extra : [described, ...extra];
-  return parts.length > 0 ? parts.join(' ') : null;
+  return describeSpecBaseline(
+    spec,
+    localeText[lang],
+    (effect, labels) => effectDescription(effect, 1, lang, labels),
+    (value) => formatPercent(value, lang),
+  );
 }
 
 function className(id: PlayerClass): string {

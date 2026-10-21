@@ -2862,6 +2862,10 @@ export const hudChromeStrings = {
     // Label for what a spec gets just for being picked (spec_baselines.ts plus
     // spec_output_tuning.ts), which otherwise never surfaces anywhere.
     specBonus: 'Specialization bonus',
+    healing: 'healing',
+    absorption: 'absorption',
+    physicalAbilityDamage: 'melee and ranged ability damage',
+    primaryHealingBonus: 'Increases primary healing by {pct} after other healing bonuses.',
     viewTalents: 'View talents',
     selectSpec: 'Select specialization',
     specUnlockBanner: 'Specialization Unlocked!',

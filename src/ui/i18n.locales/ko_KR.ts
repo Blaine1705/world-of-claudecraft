@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.healing': '치유량',
+  'hudChrome.specPanel.absorption': '피해 흡수량',
+  'hudChrome.specPanel.physicalAbilityDamage': '근접 및 원거리 능력 피해',
+  'hudChrome.specPanel.primaryHealingBonus':
+    '다른 치유 보너스 적용 후 주 치유량이 {pct} 증가합니다.',
   'hudChrome.options.enemyHighlightDistance': '{yards}야드',
   'hud.pet.stanceDesc': '클릭해 수동, 방어, 공격 또는 지원을 선택하세요.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}분',

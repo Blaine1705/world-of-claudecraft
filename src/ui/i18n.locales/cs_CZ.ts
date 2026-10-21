@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus specializace',
+  'hudChrome.specPanel.healing': 'léčení',
+  'hudChrome.specPanel.absorption': 'pohlcení poškození',
+  'hudChrome.specPanel.physicalAbilityDamage': 'poškození schopností na blízko i na dálku',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Zvyšuje hlavní léčení o {pct} po započtení ostatních bonusů k léčení.',
   'hud.pet.assist': 'Podpora',
   'hud.pet.assistDesc':
     'Útočí pouze na tvůj aktuální cíl poté, co na něj použiješ schopnost. Ignoruje nepřátele, kteří na tebe útočí.',

@@ -2,6 +2,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Specialisatiebonus',
+  'hudChrome.specPanel.healing': 'genezing',
+  'hudChrome.specPanel.absorption': 'schadeabsorptie',
+  'hudChrome.specPanel.physicalAbilityDamage':
+    'schade van vaardigheden voor nabij- en afstandsgevechten',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Verhoogt de primaire genezing met {pct} nadat andere genezingsbonussen zijn toegepast.',
   'hud.pet.assist': 'Assisteren',
   'hud.pet.assistDesc':
     'Valt alleen je huidige doelwit aan nadat je er een vaardigheid op hebt gebruikt. Negeert vijanden die jou aanvallen.',

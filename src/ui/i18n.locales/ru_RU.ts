@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.healing': 'исцеление',
+  'hudChrome.specPanel.absorption': 'поглощение урона',
+  'hudChrome.specPanel.physicalAbilityDamage': 'урон способностей ближнего и дальнего боя',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Увеличивает основное исцеление на {pct} после применения остальных бонусов к исцелению.',
   'hudChrome.options.enemyHighlightDistance': '{yards} ярд.',
   'hud.pet.stanceDesc': 'Нажмите, чтобы выбрать Пассивный, Защитный, Агрессивный или Помощь.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes} мин',
