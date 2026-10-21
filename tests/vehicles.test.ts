@@ -11,7 +11,10 @@ import { Sim } from '../src/sim/sim';
 import { type SimEvent, TICK_RATE } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { applyWorldQuestReroll } from '../src/sim/world_quest_reroll';
-import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
+import {
+  activeWorldQuestsForCycle,
+  worldQuestCycleOfferingQuest,
+} from '../src/sim/world_quest_rotation';
 import { worldQuestCopperReward } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -239,6 +242,11 @@ describe('authoritative personal vehicles', () => {
     sim.setPlayerLevel(WORLD_QUESTS_BY_ID[LAST_KEEP_CANNON.questId].minLevel);
     meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', rotatingId);
     sim.tick();
+    expect(
+      activeWorldQuestsForCycle(meta.worldQuestCycle).some(
+        (quest) => quest.objective.type === 'vehicle',
+      ),
+    ).toBe(false);
     applyWorldQuestReroll(
       meta,
       rotatingId,
