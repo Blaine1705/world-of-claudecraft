@@ -506,14 +506,23 @@ The 10 armor variants map to the 27 specs (and 29 sets) like this:
 
 Notes that are not the genre default and must not be "corrected": mage arcane
 (Chronomancy) is a healer; druid feral (Wildfang) is the declared tank spec;
-hunters are a leather class; enhancement, hunter, and feral itemize
-Agility-led, not Strength-led (dev_kit_roles.ts weights).
+hunters are a leather class; enhancement and feral are Strength specs, not the
+genre's Agility specs (shaman and druid attack power is 2 per Strength and
+never reads Agility). The one source for every spec's primary stat is
+`src/sim/content/spec_primary_stat.ts`, pinned against the live stat path by
+`tests/spec_primary_stat.test.ts`.
+
+AMENDED (2026-10-21): this note once said enhancement and feral itemize
+Agility-led, copied from the dev kit weights. That was wrong: the shipped
+Warspirit and Wildfang sets were re-statted to Strength on 2026-08-30
+(aa2601951ae), Stonehearth matches the shield-tank twins, and Cinderbark Ward
+keeps Agility beside Strength only because bears cannot block.
 
 Two specs carry two sets each, by maintainer decision: feral gets a cat
 damage set (Wildfang Emberhide) and a bear tank set (Cinderbark Ward), and
 enhancement gets its damage set (Warspirit Emberscale) and an off-tank set
 (Stonehearth Bastion). That makes 29 sets across 27 specs, with tank
-coverage in both leather and Agility mail.
+coverage in both leather and Strength mail.
 
 ## The 29 tier sets
 
@@ -540,16 +549,16 @@ Primary budgets split by identity, then normalize to the exact slot budget:
 
 - Cloth spell damage: int 2 : spi 1, Spell Damage, crit and haste ratings.
 - Cloth healing: int 1 : spi 1, Healing Power, haste or crit rating.
-- Leather tanking: sta 1.2 : agi 1, crit rating, extra armor line.
-- Leather dps: agi 2 : sta 1, crit and haste ratings.
+- Leather tanking (Cinderbark): sta 1.2 : str and agi 1 (split about evenly;
+  bears cannot block, so Agility's dodge is their avoidance), crit rating,
+  extra armor line.
+- Leather dps: agi 2 : sta 1 (rogue, hunter) or str 2 : sta 1 (Wildfang, the
+  feral cat set), crit and haste ratings.
 - Leather spell damage: int 2 : spi 1, Spell Damage, crit rating.
 - Leather healing: int 1 : spi 1, Healing Power, haste rating.
-- Mail tanking (Strength): sta 1.2 : str 1, crit rating, extra armor line,
-  shields.
-- Mail tanking (Agility, Stonehearth): sta 1.2 : agi 1, crit rating, extra
-  armor line, shields.
-- Mail dps (Strength): str 2 : sta 1, crit and haste ratings.
-- Mail dps (Agility, Warspirit): agi 2 : sta 1, crit and haste ratings.
+- Mail tanking (Strength, incl. Stonehearth): sta 1.2 : str 1, crit rating,
+  extra armor line, shields.
+- Mail dps (Strength, incl. Warspirit): str 2 : sta 1, crit and haste ratings.
 - Mail spell damage: int 2 : spi 1, Spell Damage, crit and haste ratings.
 - Mail healing: int 1 : spi 1, Healing Power, crit or haste rating.
 

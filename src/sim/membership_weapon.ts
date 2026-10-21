@@ -1,11 +1,6 @@
 // The one owned item keeps its identity; class/spec choose its live hand, damage,
 // attribute profile and held-model identity. No donor item's effects are copied.
-import {
-  MEMBERSHIP_DEFAULT_PROFILE,
-  MEMBERSHIP_PROFILES,
-  MEMBERSHIP_SPEC_PROFILE,
-  MEMBERSHIP_WEAPON_ID,
-} from './content/membership';
+import { MEMBERSHIP_PROFILES, MEMBERSHIP_WEAPON_ID } from './content/membership';
 import {
   normalizeToStaminaModel,
   primaryStatBudget,
@@ -14,6 +9,7 @@ import {
   TWOHAND_STAT_MULT,
   weaponDpsBudget,
 } from './item_budget';
+import { membershipProfile } from './membership_profile';
 import type { ItemDef, PlayerClass, WeaponHand } from './types';
 
 export function isMembershipWeapon(id: string): boolean {
@@ -77,7 +73,7 @@ export function membershipWeaponItem(
   if (!active) return { ...shaped, stats: {}, weapon: { min: 1, max: 2, speed: 2 } };
   const ilvl = Math.max(1, Math.floor(level)) + 5;
   const twohand = shaped.hand === 'twohand';
-  const profile = MEMBERSHIP_SPEC_PROFILE[`${cls}_${spec}`] ?? MEMBERSHIP_DEFAULT_PROFILE[cls];
+  const profile = membershipProfile(cls, spec);
   const budget = Math.round(
     primaryStatBudget(ilvl, 'rare', 'mainhand') * (twohand ? TWOHAND_STAT_MULT : 1),
   );

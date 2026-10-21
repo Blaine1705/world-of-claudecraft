@@ -6,6 +6,7 @@ import {
   MEMBERSHIP_WEAPON_ID,
 } from '../src/sim/content/membership';
 import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
+import { SPEC_PRIMARY_STAT } from '../src/sim/content/spec_primary_stat';
 import { ITEMS } from '../src/sim/data';
 import { maxArmorTypeForClass } from '../src/sim/equipment_rules';
 import { checkStaminaModel, primaryStatBudget } from '../src/sim/item_budget';
@@ -23,6 +24,27 @@ function member(cls: PlayerClass = 'warrior') {
   for (const slot of MEMBERSHIP_ARMOUR_SLOTS) sim.equipItem(`membership_${slot}`, pid);
   return { sim, pid, meta };
 }
+
+describe('membership gear primary stats', () => {
+  it('raises attack power through the live stat derivation for every physical specialisation', () => {
+    // The per-spec primary itself is pinned in tests/spec_primary_stat.test.ts.
+    for (const [cls, specs] of Object.entries(SPEC_PRIMARY_STAT) as [
+      PlayerClass,
+      Record<string, string>,
+    ][]) {
+      for (const [spec, primary] of Object.entries(specs)) {
+        if (primary === 'int') continue;
+        const { sim, pid } = member(cls);
+        sim.setPlayerLevel(20, pid);
+        expect(sim.setSpec(spec, pid)).toBe(true);
+        const power = () => (cls === 'hunter' ? sim.player.rangedPower : sim.player.attackPower);
+        const worn = power();
+        for (const slot of MEMBERSHIP_ARMOUR_SLOTS) sim.unequipItem(slot, pid);
+        expect(worn - power(), `${cls}/${spec}`).toBeGreaterThan(0);
+      }
+    }
+  });
+});
 
 describe('membership armour', () => {
   it('uses the normal stat budget for every class/spec and stays rare and five item levels above every character level', () => {
