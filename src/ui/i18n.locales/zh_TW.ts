@@ -3217,6 +3217,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'footer.terms': '服務條款',
   'footer.privacy': '隱私權政策',
   'footer.discordLabel': '加入Discord社區',
+  'footer.levyStreet': 'Levy Street',
   'footer.guidesLabel': '玩家指南',
   'footer.guideGamesLikeWow': '類似 WoW 的遊戲',
   'footer.guideBrowser': '瀏覽器 MMORPG',

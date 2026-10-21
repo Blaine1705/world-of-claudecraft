@@ -9510,6 +9510,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'FÖRSTÄRKNINGAR!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Gå med i Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Projekt med öppen källkod',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Whitepaper',
