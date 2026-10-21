@@ -5,7 +5,7 @@
 // on a coarser grid (fewer facets, the same mountain).
 
 import * as THREE from 'three';
-import { surfaceMat } from '../gfx';
+import { detailedSurfaceMat } from '../worn_stone';
 import {
   HEART_MOUNTAIN_CHASM,
   heartMountainCellDrawn,
@@ -62,7 +62,13 @@ export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
   geometry.computeBoundingSphere();
   const mesh = new THREE.Mesh(
     geometry,
-    surfaceMat({ color: 0xffffff, vertexColors: true, roughness: 0.95, flatShading: true }),
+    // The shared triplanar rock (natural fracture) on the tiers that draw it:
+    // the faceted mass reads as stone, not as painted card.
+    detailedSurfaceMat(
+      { color: 0xffffff, vertexColors: true, roughness: 0.95, flatShading: true },
+      'rock',
+      { strength: 0.6 },
+    ),
   );
   mesh.name = 'smithHeartMountain';
   mesh.matrixAutoUpdate = false;

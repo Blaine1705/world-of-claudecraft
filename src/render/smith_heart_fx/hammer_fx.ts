@@ -433,9 +433,7 @@ export class HammerFx {
     // The crack stars: two all-round (Mountain's Wrath), two forward fans
     // (Hammerfall), each its own material (one program).
     const wrathGeo = crackGeometry(crackLines(0x6a11, 14, 17));
-    const fallGeo = crackGeometry(
-      crackLines(0x2b07, 7, this.kit.range + 1.5, 0, this.kit.arcDeg),
-    );
+    const fallGeo = crackGeometry(crackLines(0x2b07, 7, this.kit.range + 1.5, 0, this.kit.arcDeg));
     this.geometries.push(wrathGeo, fallGeo);
     for (let i = 0; i < HAMMER_FX_POOLS.crackStars * 2; i++) {
       const wrath = i < HAMMER_FX_POOLS.crackStars;
@@ -593,7 +591,15 @@ export class HammerFx {
     star.mesh.visible = true;
     star.mat.uniforms.uGrow.value = 0;
     star.mat.uniforms.uAlpha.value = 0.8;
-    this.charges.set(e.id, { id: e.id, x: e.pos.x, y, z: e.pos.z, star, progress: 0, seen: this.clock });
+    this.charges.set(e.id, {
+      id: e.id,
+      x: e.pos.x,
+      y,
+      z: e.pos.z,
+      star,
+      progress: 0,
+      seen: this.clock,
+    });
     this.pebbles.visible = true;
   }
 
@@ -660,7 +666,10 @@ export class HammerFx {
       const h = rise * (0.4 + fxHash(i, 71) * 2.6) + Math.sin(this.clock * 2.3 + i) * 0.12 * rise;
       const size = 0.25 + fxHash(i, 73) * 0.5;
       this.v.set(c.x + Math.sin(a) * r, c.y + h + size * 0.3, c.z + Math.cos(a) * r);
-      this.q.setFromAxisAngle(this.s.set(0.3, 1, 0.2).normalize(), this.clock * (0.5 + fxHash(i, 79)));
+      this.q.setFromAxisAngle(
+        this.s.set(0.3, 1, 0.2).normalize(),
+        this.clock * (0.5 + fxHash(i, 79)),
+      );
       this.s.setScalar(size * Math.min(1, rise * 3));
       this.pebbles.setMatrixAt(i, this.m.compose(this.v, this.q, this.s));
     }
@@ -773,7 +782,10 @@ export class HammerFx {
         if (this.charges.get(star.owner)?.star === star) continue;
         const heat = wrathBlastLook(age, this.kit.radius).heat;
         star.mat.uniforms.uHeat.value = heat;
-        star.mat.uniforms.uAlpha.value = Math.min(1, Math.max(0, 1 - (age - WRATH_AFTERGLOW) / 1.2));
+        star.mat.uniforms.uAlpha.value = Math.min(
+          1,
+          Math.max(0, 1 - (age - WRATH_AFTERGLOW) / 1.2),
+        );
         if (age > WRATH_AFTERGLOW + 1.2) {
           star.kind = 'idle';
           star.mesh.visible = false;
@@ -834,7 +846,13 @@ export class HammerFx {
         spread: 0.6,
       });
     }
-    this.particles.shockRing(x + Math.sin(e.facing) * 3, z + Math.cos(e.facing) * 3, C.ringDust, this.kit.range, 0.35);
+    this.particles.shockRing(
+      x + Math.sin(e.facing) * 3,
+      z + Math.cos(e.facing) * 3,
+      C.ringDust,
+      this.kit.range,
+      0.35,
+    );
     this.shakeNear(x, z, 0.35, 30);
   }
 
@@ -849,7 +867,16 @@ export class HammerFx {
     const fz = Math.cos(rot);
     const at = this.clock - late;
     // The flash along the split, then the burst (both ways along the stair).
-    this.emitters.push({ x, y: y + 4.5, z, until: at + SLAB_BURST_AT, acc: 0, rate: 60, kind: 'dust', spread: 0.3 });
+    this.emitters.push({
+      x,
+      y: y + 4.5,
+      z,
+      until: at + SLAB_BURST_AT,
+      acc: 0,
+      rate: 60,
+      kind: 'dust',
+      spread: 0.3,
+    });
     const burst = () => {
       const n = Math.round(70 * this.density * (this.reducedMotion() ? 0.5 : 1));
       for (let i = 0; i < n; i++) {
@@ -909,7 +936,6 @@ export class HammerFx {
     if (late >= SLAB_BURST_AT) burst();
     else this.pending.push({ at: at + SLAB_BURST_AT, run: burst });
   }
-
 
   /** The Pit Mouth slamming shut behind the raid: a dust skirt along its foot. */
   private slamShut(x: number, z: number, rot: number, hw: number): void {

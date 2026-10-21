@@ -395,34 +395,35 @@ def colossus_vigil(bpy, p, S=17.0, target=18000):
 
 
 def colossus_waking(bpy, p, S=17.0, target=16000):
-    """Head, shoulders and arms out of a wall of uncut rock: his hands flat
-    on its lip as if pushing himself free, his head bowed to the pit. The
-    rest of him is still the mountain."""
+    """Half out of a wall of uncut rock: his hips still in it, his torso
+    heaved forward out of it, both hands planted on the ground before him
+    as if pushing himself free, his head bowed to the pit. Low and broad:
+    from the pit floor the whole of him reads over the step below."""
     rng = np.random.default_rng(73)
-    f = Sculpt((-0.98 * S, -0.75 * S, -0.06 * S), (0.98 * S, 0.82 * S, 1.66 * S), 0.009 * S)
+    f = Sculpt((-0.98 * S, -0.75 * S, -0.06 * S), (0.98 * S, 0.9 * S, 1.5 * S), 0.009 * S)
     m = Smith(f, S)
     P = m.P
-    m.torso(P(0, -0.12, 0.72), P(0, 0.12, 1.04))
-    m.head(_n(m.fw * 0.8 - UP * 0.6))
+    m.torso(P(0, -0.22, 0.55), P(0, 0.16, 0.84))
+    m.head(_n(m.fw * 0.72 - UP * 0.69))
     for s in (1, -1):
-        m.arm(s, P(s * 0.31, 0.1, 1.14), P(s * 0.46, 0.34, 0.96), P(s * 0.38, 0.55, 0.8), fist_dir=m.fw * 0.6 - UP * 0.8)
+        m.arm(s, P(s * 0.32, 0.22, 0.94), P(s * 0.5, 0.42, 0.52), P(s * 0.42, 0.64, 0.1), fist_dir=-UP)
     near = [
-        # The wall he is coming out of, rising past his shoulders at the sides.
-        raw_block(f, rng, P(0, -0.42, 0.66), np.array((1.85, 0.6, 1.32)) * S, k=0.01 * S),
-        raw_block(f, rng, P(0.74, -0.05, 0.72), np.array((0.4, 0.75, 1.44)) * S, k=0.012 * S, label='rawd'),
-        raw_block(f, rng, P(-0.76, -0.1, 0.6), np.array((0.38, 0.7, 1.2)) * S, k=0.012 * S),
-        # The lip in front he pushes on (a bench the masons left).
-        raw_block(f, rng, P(0, 0.4, 0.38), np.array((1.5, 0.55, 0.78)) * S, k=0.01 * S, cuts=3, top_tilt=0.02),
-        # His belly and hips still one with the rock.
-        raw_block(f, rng, P(0, 0.06, 0.68), np.array((0.7, 0.42, 0.42)) * S, k=0.02 * S, cuts=8, top_tilt=0.15,
+        # The wall he is heaving out of, past his shoulders at the sides.
+        raw_block(f, rng, P(0, -0.5, 0.6), np.array((1.85, 0.6, 1.2)) * S, k=0.01 * S),
+        raw_block(f, rng, P(0.74, -0.15, 0.55), np.array((0.4, 0.75, 1.1)) * S, k=0.012 * S, label='rawd'),
+        raw_block(f, rng, P(-0.76, -0.2, 0.5), np.array((0.38, 0.7, 1.0)) * S, k=0.012 * S),
+        # The floor he pushes on: a low bench the masons left.
+        raw_block(f, rng, P(0, 0.45, 0.03), np.array((1.6, 0.8, 0.1)) * S, k=0.01 * S, cuts=3, top_tilt=0.02),
+        # His hips and thighs still one with the rock.
+        raw_block(f, rng, P(0, -0.12, 0.42), np.array((0.72, 0.5, 0.5)) * S, k=0.02 * S, cuts=8, top_tilt=0.15,
                   chamfer=(0.8, 0.95)),
     ]
-    bench_lines(f, P(-0.6, 0.675, 0), P(0.6, 0.675, 0), (0.2 * S, 0.42 * S, 0.62 * S), S)
-    drill_grooves(f, [(P(x, 0.675, 0.0), P(x, 0.675, 0.74)) for x in np.linspace(-0.66, 0.66, 9)], S)
-    drill_grooves(f, [(P(0.94, -0.05 + y, 0.1), P(0.94, -0.05 + y, 1.3)) for y in np.linspace(-0.3, 0.3, 4)], S)
-    f.put('vein', Polyline([P(-0.9, 0.2, 0.3), P(-0.5, 0.67, 0.5), P(-0.1, 0.67, 0.28), P(0.3, 0.67, 0.55),
-                            P(0.7, 0.4, 0.4)], 0.013 * S), 0.004 * S)
-    f.put('vein', Polyline([P(0.6, -0.12, 1.36), P(0.75, 0.3, 1.0), P(0.95, 0.2, 0.7)], 0.01 * S), 0.004 * S)
+    bench_lines(f, P(-0.85, -0.2, 0), P(0.85, -0.2, 0), (0.95 * S, 1.1 * S), S)
+    drill_grooves(f, [(P(0.94, -0.15 + y, 0.1), P(0.94, -0.15 + y, 1.1)) for y in np.linspace(-0.3, 0.3, 4)], S)
+    drill_grooves(f, [(P(-0.94, -0.2 + y, 0.1), P(-0.94, -0.2 + y, 0.95)) for y in np.linspace(-0.3, 0.3, 4)], S)
+    f.put('vein', Polyline([P(-0.9, 0.2, 0.12), P(-0.5, 0.82, 0.1), P(-0.1, 0.84, 0.11), P(0.3, 0.84, 0.1),
+                            P(0.7, 0.5, 0.12)], 0.013 * S), 0.004 * S)
+    f.put('vein', Polyline([P(0.6, -0.22, 1.16), P(0.75, 0.2, 0.8), P(0.95, 0.1, 0.5)], 0.01 * S), 0.004 * S)
     quarry_noise(f, 73, S, near=near)
     mesh_colossus(bpy, p, f, 'ColossusWaking', target)
     return p

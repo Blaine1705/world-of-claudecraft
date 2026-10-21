@@ -280,7 +280,7 @@ def chain_hoist():
 
 
 # ===================================================================== quarry faces
-def _course_face(p, rng, x0, x1, z_top, z_bot, depth, course=(2.4, 3.7), stepout=0.0, drill=0.45, wedge=0.0,
+def _course_face(p, rng, x0, x1, z_top, z_bot, depth, course=(2.4, 3.7), stepout=0.0, drill=0.16, wedge=0.0,
                  pale=0.25, bench=0.55, pull=0.18, width=(5.5, 10.0)):
     """A worked quarry face toward -Y from z_top down to z_bot between x0 and
     x1, the way a quarry is cut: in benches, each lift of blocks standing a
@@ -316,7 +316,7 @@ def _course_face(p, rng, x0, x1, z_top, z_bot, depth, course=(2.4, 3.7), stepout
                     xx = a + 0.12 if rng.random() < 0.5 else b - 0.12
                     drill_line(p, (xx, yo - 0.02, z - h + 0.15), (xx, yo - 0.02, z - 0.15), 0.07, 0.32,
                                out=(0, -1, 0))
-                if rng.random() < drill * 0.5:
+                if rng.random() < drill * 0.25:
                     drill_line(p, (a + 0.2, yo - 0.02, z - 0.12), (b - 0.2, yo - 0.02, z - 0.12), 0.06, 0.36,
                                out=(0, -1, 0))
                 if wedge and rng.random() < wedge:
@@ -361,7 +361,7 @@ def quarry_lip(variant):
     p = SP('QuarryLip' + variant, seed=seeds[variant], ao_dist=2.4)
     rng = p.rng
     with p.as_kind(RAW):
-        _course_face(p, rng, -5.4, 5.4, -0.02, -8.0, 3.2, course=(2.0, 3.0), drill=0.4, bench=0.85, pull=0.1)
+        _course_face(p, rng, -5.4, 5.4, -0.02, -8.0, 3.2, course=(2.0, 3.0), drill=0.18, bench=0.85, pull=0.1)
         z = -7.0
         while z > -30:
             h = rng.uniform(5.0, 8.0)

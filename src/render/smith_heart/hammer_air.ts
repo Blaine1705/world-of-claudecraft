@@ -181,7 +181,7 @@ function points(plan: HammerAirPlan) {
     for (let i = 0; i < v.count; i++) {
       const h = (k: number) => heartHash(vi * 1000 + i, k);
       motes.push([v.x + (h(1) - 0.5) * 2 * v.hw, v.y0, v.z + (h(2) - 0.5) * 2 * v.hd]);
-      moteP.push([h(3), 0.05 + h(4) * 0.12, 0.25 + h(5) * 0.5, v.y1 - v.y0]);
+      moteP.push([h(3), 0.025 + h(4) * 0.05, 0.25 + h(5) * 0.5, v.y1 - v.y0]);
     }
   });
   const grit: [number, number, number][] = [];
@@ -240,7 +240,7 @@ export function buildHammerAir(lowGfx: boolean): THREE.Group {
     'smithHeartDustMotes',
     p.motes,
     p.moteP,
-    airMaterial('smithHeartDustMotes', MOTE_VERT, MOTE_FRAG, 0xffd9a0, 0.55, true),
+    airMaterial('smithHeartDustMotes', MOTE_VERT, MOTE_FRAG, 0xffd9a0, 0.4, true),
     5,
   );
   add(

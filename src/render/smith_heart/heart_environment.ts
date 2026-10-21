@@ -46,24 +46,27 @@ export function smithHeartCameraInHammer(x: number, z: number): boolean {
 /** The Hammer's air: quarry dust lit amber by the low sun, thin near (the
  *  pit reads crisp across) and thickening past the terraces into the
  *  fissure's far rock. */
-export const SMITH_HEART_HAMMER_FOG = { color: 0x75614f, near: 70, far: 560 } as const;
+export const SMITH_HEART_HAMMER_FOG = { color: 0x75665a, near: 70, far: 560 } as const;
 
-/** The Hammer's light rig: a warm low key from the west (the dusk down the
- *  fissure, the colossi facing it across the pit), a dusty amber sky, the
+/** The Hammer's light rig: a warm low key from the south-west (the dusk
+ *  down the fissure, raking the terraces), a dusty amber sky, the
  *  cut stone's warm bounce, a warm rim on every silhouette. The image-based
  *  light (the realm's daytime sky, blue) is all but off: the quarry's fill is
  *  the warm hemisphere. */
 export const SMITH_HEART_HAMMER_LIGHT = {
-  sun: 2.5,
-  hemi: 1.45,
+  sun: 2.15,
+  hemi: 1.5,
   env: 0.05,
   rim: 1.8,
-  sunColor: 0xffd2a4,
+  sunColor: 0xffdcb8,
   hemiSky: 0xa89482,
   hemiGround: 0x60482f,
   rimColor: 0xffb05c,
-  /** Low in the west, a little south (from the ground toward it). */
-  keyDirection: [-0.84, 0.44, -0.18] as const,
+  /** Low in the south-west (from the ground toward it): it rakes across
+   *  the east terraces as the raid enters (every bench and block throws its
+   *  shadow), lights the Vigil from the side and rims the Bearer from
+   *  behind. */
+  keyDirection: [-0.5, 0.62, -0.6] as const,
 } as const;
 
 /** The Heart's fog: an ember-violet dark, pushed back past the platform and

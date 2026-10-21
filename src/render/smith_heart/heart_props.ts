@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { surfaceMat } from '../gfx';
 import { markSharedGeometry } from '../shared_resource';
+import { detailedSurfaceMat } from '../worn_stone';
 import {
   HEART_PALETTE,
   HEART_PROP_RECIPES,
@@ -163,7 +164,13 @@ export function buildHeartWalls(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
   group.name = 'smithHeartWalls';
   const blocks = planHeartWalls(lowGfx ? 7 : 5);
-  const material = surfaceMat({ color: 0xffffff, roughness: 0.96, flatShading: true });
+  const material = detailedSurfaceMat(
+    { color: 0xffffff, roughness: 0.96, flatShading: true },
+    'rock',
+    {
+      strength: 0.6,
+    },
+  );
   const scale = new THREE.Matrix4();
   const turn = new THREE.Matrix4();
   const shear = new THREE.Matrix4();

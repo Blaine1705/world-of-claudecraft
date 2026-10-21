@@ -54,15 +54,15 @@ RAW, METAL, PAINT, DRESSED, WOOD = 0, 3, 4, 6, 7
 # ---- the palette (sRGB) ------------------------------------------------------------
 # The Hammer's stone: a warm ochre granite (the vein's colour #C8903C lives in
 # its light, never painted flat on the rock).
-QUARRY = (0.54, 0.44, 0.33)
-QUARRY_DARK = (0.38, 0.31, 0.24)
+QUARRY = (0.45, 0.37, 0.29)
+QUARRY_DARK = (0.33, 0.27, 0.21)
 QUARRY_DEEP = (0.25, 0.2, 0.16)
-QUARRY_PALE = (0.76, 0.66, 0.52)     # a fresh cut face
+QUARRY_PALE = (0.62, 0.53, 0.42)     # a fresh cut face
 QUARRY_RED = (0.56, 0.4, 0.3)        # iron-stained beds
 DRESSED_STONE = (0.66, 0.58, 0.46)   # the Smith's finished carving
 DRESSED_SHADE = (0.55, 0.48, 0.39)
 GRANITE_DARK = (0.34, 0.32, 0.31)    # the colossi's hammers, the plinths
-DUST = (0.83, 0.74, 0.6)
+DUST = (0.7, 0.62, 0.5)
 GRIME = (0.18, 0.14, 0.11)
 MASON_RED = (0.6, 0.2, 0.11)         # the masons' red-ochre lines
 TIMBER = (0.47, 0.35, 0.24)

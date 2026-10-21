@@ -8,7 +8,11 @@
 //
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
-import { SMITH_HEART_CASTS, SMITH_HEART_GUARDIANS, SMITH_HEART_MOBS } from '../../sim/content/smith_heart';
+import {
+  SMITH_HEART_CASTS,
+  SMITH_HEART_GUARDIANS,
+  SMITH_HEART_MOBS,
+} from '../../sim/content/smith_heart';
 import { NOVA_WAVE_SECONDS } from '../trash_engine_fx/trash_engine_fx_core';
 
 /** The guardian whose kit these effects dress. */
@@ -19,7 +23,12 @@ export const MOUNTAINS_WRATH = SMITH_HEART_CASTS.hammerWrath;
 export const ARC_CLEAVE_ABILITY = 'brood_cleave';
 
 /** The sim's own numbers (read, never tuned here). */
-export function hammerGuardianKit(): { radius: number; castTime: number; arcDeg: number; range: number } {
+export function hammerGuardianKit(): {
+  radius: number;
+  castTime: number;
+  arcDeg: number;
+  range: number;
+} {
   const t = SMITH_HEART_MOBS[HAMMER_GUARDIAN];
   return {
     radius: t?.trashKit?.nova?.radius ?? 45,

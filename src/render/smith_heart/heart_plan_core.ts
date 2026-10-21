@@ -505,21 +505,21 @@ export function planHeartLights(): HeartLightSpot[] {
         id: `colossus:${p.x.toFixed(0)}:${p.z.toFixed(0)}`,
         x: p.x + (dx / d) * 9,
         z: p.z + (dz / d) * 9,
-        lift: 13,
-        color: 0xffc27a,
-        intensity: 3.2,
-        range: 24,
+        lift: 9,
+        color: 0xffc890,
+        intensity: 2.2,
+        range: 26,
         noHalo: true,
       });
     } else if (p.kind === 'sh_cleft_mouth') {
       spots.push({
         id: 'cleft_door',
-        x: p.x + Math.sin(p.rot) * 6,
-        z: p.z + Math.cos(p.rot) * 6,
-        lift: 5,
-        color: SMITH_HEART_VEIN_COLORS.hammer,
-        intensity: 4,
-        range: 22,
+        x: p.x + Math.sin(p.rot) * 7,
+        z: p.z + Math.cos(p.rot) * 7,
+        lift: 7,
+        color: 0xffb860,
+        intensity: 7,
+        range: 30,
         noHalo: true,
       });
     }

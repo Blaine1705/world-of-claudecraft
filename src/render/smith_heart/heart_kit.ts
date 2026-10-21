@@ -179,7 +179,7 @@ export function heartKitSlotMaterial(slot: HeartKitSlot): THREE.Material {
         roughness: 0.86,
         name: 'SmithHeartKitStone',
       });
-      applySurfaceDetail(std, 'rock', { strength: 0.35 });
+      applySurfaceDetail(std, 'rock', { strength: 0.5 });
       m = std;
     } else {
       m = new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitStone' });

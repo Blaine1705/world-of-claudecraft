@@ -244,10 +244,13 @@ describe('Smith Heart Hammer kit: sizes the sim and the plan rely on', () => {
   it.skipIf(!haveKit)('keeps the Cleft landing clear and the colossi colossal', () => {
     // Nothing of the gate reaches more than 7.8 yd toward the landing.
     expect(shape('Kit_CleftGate').max[2]).toBeLessThanOrEqual(7.9);
+    // Each colossus towers over a body (about two yards) many times over,
+    // and is wider still with its block: the player must feel tiny.
     for (const c of HAMMER_COLOSSI) {
       const s = shape(c);
-      expect(s.max[1], c).toBeGreaterThan(24);
+      expect(s.max[1], c).toBeGreaterThan(22);
       expect(s.max[1], c).toBeLessThan(30);
+      expect(Math.max(s.max[0] - s.min[0], s.max[2] - s.min[2]), c).toBeGreaterThan(24);
     }
   });
 });

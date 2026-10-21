@@ -876,6 +876,7 @@ const paintQuarry: Painter = (h, size, rnd) => {
       const pitch = 5 + rnd() * 4;
       const phase = rnd() * 10;
       const tilt = (rnd() - 0.5) * 0.3;
+      const joint = rnd() < 0.4 ? 0.9 : 0.62;
       for (let py = row.y0; py < row.y1; py++) {
         for (let xi = x; xi < Math.min(x + w, start + size); xi++) {
           const px = ((xi % size) + size) % size;
@@ -887,8 +888,9 @@ const paintQuarry: Painter = (h, size, rnd) => {
           const u = along ? xi + py * tilt : py + xi * tilt;
           const stroke = Math.abs(Math.sin((u + phase) / pitch)) ** 6 * 0.08;
           let v = tone + (grain[i] - 0.5) * 0.14 + (broad[i] - 0.5) * 0.22 - stroke;
-          if (edge < 1.2) v *= 0.45;
-          else if (edge < 3) v *= 0.86;
+          // The joint: a narrow parting, fainter where the split ran clean.
+          if (edge < 1.2) v *= joint;
+          else if (edge < 3) v *= 0.92;
           // Quarry dust drifted over the low spots.
           v += Math.max(0, dust[i] - 0.62) * 0.6;
           h[i] = v;
