@@ -182,6 +182,7 @@ export function gaitClip(spec, model, extra = {}) {
       air: smooth((u - air[0]) / air[1]) * (1 - smooth((u - air[2]) / air[3])),
       pitch: u < 0.5 ? offPitch : onPitch,
       yaw: spec.toeOut,
+      ...(spec.airYaw !== undefined ? { airYaw: spec.airYaw } : {}),
       // The toes stay curled from the push-off, then relax.
       toe: offPitch < 0 ? -offPitch * (1 - smooth((u - 0.08) / 0.22)) : 0,
       knee: spec.knee.stance + (spec.knee.swing - spec.knee.stance) * Math.sin(Math.PI * u),

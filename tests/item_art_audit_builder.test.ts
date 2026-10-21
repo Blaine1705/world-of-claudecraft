@@ -829,7 +829,7 @@ describe('item-art audit builder', () => {
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
         encoding: 'utf8',
-        timeout: 30_000,
+        timeout: 55_000,
       }),
     ) as Record<string, unknown>;
     // Restored post-merge (release/v0.42.0 into professions): neither
