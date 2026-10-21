@@ -6112,6 +6112,7 @@ export type TranslationKeyFlat =
   | 'footer.guideGamesLikeWow'
   | 'footer.guideNew'
   | 'footer.guidesLabel'
+  | 'footer.levyStreet'
   | 'footer.privacy'
   | 'footer.terms'
   | 'footer.whitepaper'

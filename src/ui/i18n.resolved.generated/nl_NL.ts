@@ -9717,6 +9717,7 @@ export const nl_NL: EnTranslations = {
     "terms": "Servicevoorwaarden",
     "privacy": "Privacybeleid",
     "discordLabel": "Word lid van de Discord",
+    "levyStreet": "Levy Street",
     "guidesLabel": "Spelersgidsen",
     "guideFree": "Gratis MMORPG's",
     "guideGamesLikeWow": "Spellen zoals WoW",

@@ -9717,6 +9717,7 @@ export const ko_KR: EnTranslations = {
     "terms": "서비스 이용약관",
     "privacy": "개인정보 처리방침",
     "discordLabel": "Discord 참여하기",
+    "levyStreet": "Levy Street",
     "guidesLabel": "플레이어 가이드",
     "guideFree": "무료 MMORPG",
     "guideGamesLikeWow": "WoW 같은 게임",

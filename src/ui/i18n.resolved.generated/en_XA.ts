@@ -9717,6 +9717,7 @@ export const en_XA: EnTranslations = {
     "terms": "[Ţéŕɱš óƒ Šéŕʋíçé]",
     "privacy": "[Þŕíʋáçý Þóļíçý]",
     "discordLabel": "[Ĵóíñ ţĥé Ðíšçóŕð]",
+    "levyStreet": "[Ļéʋý Šţŕééţ]",
     "guidesLabel": "[Þļáýéŕ ĝúíðéš]",
     "guideFree": "[Ƒŕéé ⱮⱮÓŔÞĜš]",
     "guideGamesLikeWow": "[Ĝáɱéš ļíķé ŴóŴ]",

@@ -9717,6 +9717,7 @@ export const id_ID: EnTranslations = {
     "terms": "Ketentuan Layanan",
     "privacy": "Kebijakan Privasi",
     "discordLabel": "Gabung Discord",
+    "levyStreet": "Levy Street",
     "guidesLabel": "Panduan Pemain",
     "guideFree": "MMORPG Gratis",
     "guideGamesLikeWow": "Permainan seperti WoW",
