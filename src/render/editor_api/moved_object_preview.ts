@@ -146,7 +146,7 @@ function editObject(
  * and its orientation turned IN PLACE, because a drawn plot keeps that very
  * quaternion and composes its idle sway onto it every frame. The drawn plot
  * moves by the same delta, keeping its height above the soil. A deleted bed
- * hides its crop; a restore shows it again.
+ * shrinks its crop to nothing; a restore brings it back.
  */
 function reseatFarmCrops(
   scene: THREE.Object3D,
@@ -170,7 +170,9 @@ function reseatFarmCrops(
     plot.position.z + next.z - seat.z,
   );
   plot.quaternion.copy(seat.quat);
-  plot.visible = to.removed !== true;
+  // Hidden by size, never by `visible`: the plot's compile gate owns that
+  // flag (gated_scene_attach.ts), and a restore must not reveal it early.
+  plot.scale.setScalar(to.removed === true ? 0 : 1);
   plot.updateMatrix();
   plot.updateMatrixWorld(true);
   return 1;
