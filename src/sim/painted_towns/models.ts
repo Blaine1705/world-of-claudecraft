@@ -181,7 +181,7 @@ export const PAINTED_LOOK_MODELS: Readonly<Record<PaintedLook, readonly PaintedM
       'house_c',
     ],
     fenrire: ['hall', 'house_a', 'shop_a', 'shop_b', 'tavern'],
-    highwatch: ['hall', 'house_c', 'shop_a', 'smithy', 'tavern_b'],
+    highwatch: ['bank', 'hall', 'house_c', 'shop_a', 'smithy', 'tavern_b'],
     pantile: ['house_a', 'shop_a', 'tavern'],
     shakes: ['hall', 'house_a', 'tavern'],
     diamond: ['hall', 'house_c', 'shop_a', 'smithy', 'tavern'],
