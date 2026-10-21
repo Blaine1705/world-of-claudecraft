@@ -179,7 +179,9 @@ export function heartKitSlotMaterial(slot: HeartKitSlot): THREE.Material {
         roughness: 0.86,
         name: 'SmithHeartKitStone',
       });
-      applySurfaceDetail(std, 'rock', { strength: 0.5 });
+      // A light touch (phase 2D): stronger, the low sun broke the sculpts'
+      // shaded sides into hard blotches.
+      applySurfaceDetail(std, 'rock', { strength: 0.22 });
       m = std;
     } else {
       m = new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitStone' });

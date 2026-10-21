@@ -887,7 +887,9 @@ const paintQuarry: Painter = (h, size, rnd) => {
   const oy = Math.floor(rnd() * size);
   split(ox, oy, ox + size, oy + size, 0);
   for (const p of panels) {
-    const tone = 0.42 + rnd() * 0.42;
+    // A narrow tone swing (phase 2D): wide, the panels read as a floor of
+    // big painted tiles from the Gallery's camera.
+    const tone = 0.5 + rnd() * 0.3;
     const sunk = rnd() < 0.25 ? -0.06 : 0;
     // Most partings show faintly (the split ran clean), a few are open.
     const joint = rnd() < 0.55 ? 0.8 : 0.55;
@@ -975,11 +977,16 @@ const paintQuarry: Painter = (h, size, rnd) => {
 
 /** Quarried bedrock panels (one tile = 16 yd: the family's UV scale). */
 export function quarryDetail(): DetailPair {
-  return bake('quarry', paintQuarry, 0x9a77, 512, 5, 1, 125);
+  // Softer relief (phase 2D): at 5 the joints' bevels turned from the low
+  // sun into hard blue lines.
+  return bake('quarry', paintQuarry, 0x9a77, 512, 3.2, 1, 125);
 }
 
 export function strataDetail(): DetailPair {
-  return bake('strata', paintStrata, 0x57a7, 256, 6, 1, 150);
+  // Soft relief and a gentler swing (the Smith's Heart, phase 2D): at 6 and
+  // 150 the fine lamination's normals flipped faces edge-on to a low sun
+  // between lit and dark, a hard camouflage of flecks over every cliff.
+  return bake('strata', paintStrata, 0x57a7, 256, 2.4, 2, 105);
 }
 
 export function mossDetail(): DetailPair {

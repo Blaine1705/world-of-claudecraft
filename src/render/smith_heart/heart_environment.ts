@@ -51,19 +51,21 @@ export const SMITH_HEART_HAMMER_FOG = { color: 0x6c6c70, near: 90, far: 600 } as
 
 /** The Hammer's light rig (phase 2C, the warm-key cool-fill grade of the
  *  Wildheart Basin): a strong warm low key from the south-west (the dusk
- *  down the fissure, raking the terraces), and a COOL grey-blue sky fill and
- *  a dark ground bounce, so every face turned from the sun falls to a cool
- *  slate-violet shadow (never black, never a saturated blue: the painted
- *  world's L1) and the lit faces, the vein's ochre glow, the geodes and the
- *  colossi's warm rims read against it. */
+ *  down the fissure, raking the terraces), and a COOL slate-violet sky fill
+ *  over a warm grey ground bounce, so every face turned from the sun falls
+ *  to a cool slate-violet shadow (never black, never a saturated blue: the
+ *  painted world's L1) and the lit faces, the vein's ochre glow, the geodes
+ *  and the colossi's warm rims read against it. Phase 2D lifted the fill:
+ *  under 2C's the fissure's shaded rock sank to a near-black navy that ate
+ *  every form (the descent's foreground, the Gallery's walls). */
 export const SMITH_HEART_HAMMER_LIGHT = {
-  sun: 2.9,
-  hemi: 1.15,
-  env: 0.1,
+  sun: 2.7,
+  hemi: 2.0,
+  env: 0.15,
   rim: 1.6,
   sunColor: 0xffd3a0,
-  hemiSky: 0x8f8d9a,
-  hemiGround: 0x3e3a38,
+  hemiSky: 0x9a96aa,
+  hemiGround: 0x665a52,
   rimColor: 0xffa858,
   /** Low in the south-west (from the ground toward it): it rakes across
    *  the east terraces as the raid enters (every bench and block throws its
