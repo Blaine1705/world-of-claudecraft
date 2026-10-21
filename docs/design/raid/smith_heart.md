@@ -515,6 +515,67 @@ camera zoomed out past an arena's rim never sees a wall: cosmetic, every tier.
 Readability unchanged: no light, nothing over a walked floor, every key sightline pinned
 with the rock in it.
 
+### 5.13 The Ring, the seal and the portal (phase 2F)
+
+The owner's ask: the Ring is the hub every vein crosses and the place of the raid's
+biggest reveal; make it the raid's best space. Everything the Ring had was the field's
+own geometry (a slate annulus, two ramps, a disc) and box placeholders (bronze tines,
+forge pillars). Now it is one Blender kit (`docs/design/raid/kit/ring_pieces.py`,
+`ring_sculpt.py`, built by `build_smith_heart_ring_kit.py` and shipped as
+`public/models/props/smith_heart_ring_kit.glb`), primal and divine: living granite and
+crystal, no metal, no machinery (the raid's line against Varkhul's).
+
+| Piece | Look | Where |
+|---|---|---|
+| The Ring's walk | Dressed granite flags in nine courses round the seal, every course's joints staggered at the modules' ends, a band of dark basalt running the whole circle, worn arrises, chipped corners, a crack here and there, grit in the joints; a 6 degree module each, Start and End closing the arc square | `Kit_RingPave*`, `planRingPaving` |
+| The Ring's edges | Over the chasm a curb under a hand on a carved fascia three lifts deep (none where the Quench's and the Heat's light leap); against the mountain a gutter of setts and the scree and fallen blocks heaped at the rock's foot | `Kit_RingCurb*`, `Kit_RingFoot*`, `planRingEdges` |
+| The light-rivers | A channel inlaid where each river crosses the Ring (two carved lips, a polished dark bed the ribbon burns on), the dais's four channels from its rim to the seal's notches, a chute down the middle of both stairs | `Kit_RingChannel`, `Kit_SealDais`, `Kit_StairChute` |
+| The two stairs | The Grand Stair and the North Stair laid tread by tread: two or three blocks a tread, worn hollow, nosings rounded and chipped; every tread's top on the walked ramp at its middle (half a riser either way), short treads on the Grand Stair, long low ones on the gentle North Stair; carved stringers three lifts deep and a low coped parapet (0.8, with newels) down both sides of every stair to the seal (the Balcony Stairs keep their field ramp and take the parapets) | `Kit_StairTread*`, `Kit_StairParapet*`, `planRingStairs`, `planRingStairSteps` |
+| The Seal Dais | Its walk in courses round the seal (the seal's basalt ring first), the two stairs' landings out to their first treads, a rim of carved face and a low coped parapet open where the stairs land and where the Quench's and the Heat's light leap on; under it an inverted mountain some 46 yards deep, ledged and fissured, the four veins' crystal breaking out of it under each channel and crystal hanging from its root | `Kit_SealDais` |
+| The seal | Four quarters of raw granite, each a rough rim (notched where its channel runs in), ribs along its sides and a bed of crystal cells; a crystal boss at the middle. The crystal is the runtime's own shader (`heartCrystalMaterial`): smoky and dark until its vein lights | `Kit_SealQuarter`, `Kit_SealHeart`, `heart_seal.ts` |
+| The spires | The four bronze tines became four crystal spires (`sh_portal_tine`, collider 1.6): a banded drum of rough granite and a cluster of great crystal leaning in over the seal, the tallest's tip 16 yards up; each burns for its vein. The southern two stand a breath off the diagonals (`RING_SPIRE_BEARINGS`) so the Ring's two ends see past them to the portal | `Kit_SealSpire`, `ringSpireSpots` |
+| The pack spots | A cairn at the rim behind each of the eight packs (`sh_ring_cairn`, collider 2): a block fallen from the mountain with a crystal lamp in a rock cradle, or a toppled standing stone broken in two with its lamp in the break, rubble round both | `Kit_RingCairn*` |
+| The standing stones | The forge pillars became rough-hewn standing stones, chevrons carved in a band, a warm crystal lamp in the cleft of each one's head; the one that stood on the east Balcony Stair's edge is gone | `Kit_RingMonolith` |
+| The vein mouths | A threshold of dark stones flush across each mouth and a pair of standing stones flanking it, each its vein's: the Breath's slender, twisted and holed by the gale, a pale teal crystal in its crown; the Quench's squat, frost-cracked, ice crystal growing out of its seams; the Heat's dark and sooted, split by seams of white-gold fire, a crystal ember at its head; the Hammer's (`sh_hammer_jamb`, on colliders at the Grand Stair's head on the Balcony) broad and heavy with ochre geodes broken open in it | `Kit_Jamb*`, `Kit_RingSill`, `planRingMouths` |
+
+**How it sits on the field.** The field keeps every floor the sim walks; the kit
+draws over it. The Ring's, the dais's and the two stairs' field tops are left out once
+the kit has landed (`RING_KIT_OMIT_TOPS`, the field terrain's `omitTops`: neither drawn
+nor cutting the ground under them), so the paving's joints show its own grit and the
+treads never fight a ramp; the paving lies a breath over the walk, the curbs and
+thresholds under a hand, the parapets, fascias, feet and mouth stones past the lips,
+and every solid a body can touch on a layout collider (pinned against the shipped
+GLB). Without the kit (it failed to land) the field's tops, its keel under the dais and
+the placeholders stand, as before. The mountain's hanging lips start under the
+fascias and stringers (`RING_KIT_FASCIA_DEPTH`).
+
+**The Ring's rock (the 2E kit seen from the Ring).** Close up it read as squared slabs
+with hooked cut-outs and saturated navy shade. The plates are now broken every way and
+crossed by a second block turned its own way (never a rectangle), spalls knocked off
+them, the weather deeper; the lips' brink no longer cut flat at the walk's height (its
+cross-sections were the hooks): it rounds over and falls away out over the void. The
+navy was light, not paint: the storm sky's reflection and joints sinking to black.
+The rock's material keeps a shade floor of its own colour, a breath cooler, that no
+occlusion takes away (`HEART_ROCK_SHADE_FLOOR`), the sky's reflection is a trace in the
+Hammer's grade, and the Ring has its own state (`smithHeartRing`, out to
+`SMITH_HEART_RING_LIGHT_R` past its rim): the same low warm sun as the quarry over a
+neutral grey sky fill. The crest gained its landmarks: up to nine needles of stacked
+beds (`Kit_RockNeedle*`, `planHeartNeedles`) on the deepest points of the mountain
+round the Ring, 60 to 100 yards tall. A band piece whose body would reach over a walk
+behind it is never placed (`backOverFloor`).
+
+**The moments (VFX).** Every material is built with the interior (the seal's late
+pieces carry hidden carriers of their crystal, plain and instanced), nothing reads a
+texture, no light is added; all draw on every tier but the shards (fewer on the low
+tier, `heartShardCount`) and the shake (reduced motion).
+
+| Moment | Look | Where |
+|---|---|---|
+| A colour arrives | the river's ribbon flows toward the seal with a white-hot surge riding the light's front (`heartRiverSurgeHead`); the spire of its vein ignites foot to tip with a white flare (`heartSpireIgnite`); the quarter's crystal fills rim to centre under a flush light; its column stands up; a shockwave of its colour runs out across the chasm and the whole Ring (`heartSealArrivalWave`); the camera thuds | `heart_rivers.ts`, `heart_seal.ts`, `seal_shake.ts` |
+| The seal splits | the four spires flare, the tines' arcs blaze from their crystal tips, a beam stands up out of the seal to the sky (`HEART_PORTAL_SKY_BEAM`), the bloom, the quarters part like petals (`heartQuarterPose`), the boss bursts into shards that lift out of the seams tumbling (`heartShardPose`), a four-colour ring wave and a wall of light ride out across the whole Ring, the camera trembles, jolts on the flash and shakes again as the shards lift (`HEART_PORTAL_SHAKES`) | `heart_portal.ts`, `heart_seal.ts`, `seal_shake.ts` |
+| The living portal | the vortex and the funnel in the four colours, a slower wider sleeve round them, the shards turning round the funnel for good over every head, the four spires burning, a thin beam to the sky marking it from the whole main map | `heart_portal.ts`, `heart_seal.ts` |
+| The hop | the arrival's column and ring, and the four colours whirling up round whoever arrives | `heart_portal.ts` |
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -726,6 +787,13 @@ on both difficulties (dungeon rework README, goal 4).
   nothing over a walked floor) and the camera cutaway.
 - `tests/smith_heart_hammer_kit.test.ts`: the Hammer kit and its plan, the Gallery's
   paving, kerb, rail and fallen blocks.
+- `tests/smith_heart_ring_kit.test.ts`: the Ring kit's GLB (fingerprint, budget, the
+  measures the plan relies on), the plan (the arc paved, the channels on the rivers,
+  the curb broken where a river leaps, every stair railed, both stairs stepped on their
+  ramp half a riser either way, the omitted tops, the props, the mouths), nothing
+  render-only over a walked floor, and the seal's and the portal's moments (the
+  arrival's wave, the spire igniting, the quarters parting, the shards over every head,
+  the surge, the camera's jolts).
 - `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
   hop included) and the dev-only door.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`

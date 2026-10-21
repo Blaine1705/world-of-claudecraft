@@ -14,6 +14,7 @@ offline and online look the same. The interior's static dressing and air are
 |---|---|
 | `index.ts` | Public surface: `HammerFx`. |
 | `hammer_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Hammer guardian's numbers read off its sim template (never tuned here), the crack lines, Mountain's Wrath's charge and blast timelines (the dust wall rides the trash engine's `novaWave` front on the same clock), Hammerfall's heat, the Slab's break timeline and the once-per-change rule (`slabBreakDue`), the pool sizes. |
+| `seal_shake.ts` | `SealShake` (phase 2F): the seal's moments felt in the camera (the arrival's thud, the opening's tremor, jolt and aftershock), read from the slot's seal memory, scaled by distance, through the shake sink (reduced motion honoured). |
 | `hammer_fx.ts` | `HammerFx`: Mountain's Wrath (molten cracks racing out over its bar, loose stones lifting, dust drawn in; on landing the dust wall, rubble, rings, flash, grit off the terraces, a shake), Hammerfall (a fan of cracks in its arc, rubble, dust), the Slab breaking (the split flaring, the burst both ways, dust, rings, grit off the lintel while the halves part) and the Pit Mouth slamming shut (a dust skirt). |
 
 Rules:
