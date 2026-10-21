@@ -13285,6 +13285,10 @@ export const id_ID: EnTranslations = {
         "name": "Hujan Panah",
         "description": "Menghujani area 8 m dengan anak panah selama 3 dtk. Musuh di dalam area menerima {damage} kerusakan Fisik setiap 0.5 dtk. Kerusakan meningkat dengan daya serang jarak jauh."
       },
+      "phosphor_flask": {
+        "name": "Labu Fosfor",
+        "description": "Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh."
+      },
       "pack_command": {
         "name": "Perintah Kawanan",
         "description": "Memerintahkan hewan peliharaanmu yang hidup untuk menyerang sebesar 36 sampai 48 kerusakan Fisik. Kerusakan meningkat dengan kekuatan serang hewan peliharaan. Serangan yang mengenai memulihkan 20 fokus dan memberi 1 Keganasan Kawanan selama 30 dtk, hingga 3. Setiap tumpukan menambah semua kerusakan hewan peliharaanmu sebesar 10%. Serangan ini memakai tumpukan yang kamu miliki sebelum benturan."
@@ -13331,7 +13335,7 @@ export const id_ID: EnTranslations = {
       },
       "play_dead": {
         "name": "Pura-pura Mati",
-        "description": "Jatuhkan diri dan pura-pura mati: kesehatan dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target. Bergerak, menyerang, atau memakai kemampuan lain mengakhirinya. Gunakan lagi untuk bangkit."
+        "description": "Menjatuhkan diri ke tanah dan tampak mati: nyawa dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target mereka. Bergerak, menyerang, atau menggunakan kemampuan lain mengakhirinya. Jika digunakan saat bergerak, kamu punya 1 dtk untuk berhenti sebelum gerakan mengakhirinya. Gunakan lagi untuk bangun."
       },
       "tactical_camo": {
         "name": "Kamuflase Taktis",
@@ -13339,7 +13343,15 @@ export const id_ID: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Jerat Rahang Beku",
-        "description": "Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
+        "description": "Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
+      },
+      "bear_trap": {
+        "name": "Jerat Beruang",
+        "description": "Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terjepit jerat beruang yang menutup: ia berdarah sebesar 83 kerusakan Fisik ditambah 22,5% kekuatan serang jarak jauhmu selama 15 dtk dan diperlambat 50% selama 4 dtk."
+      },
+      "scatterbolt": {
+        "name": "Panah Sebar",
+        "description": "Menembakkan semburan anak panah dalam kerucut 8 meter di depanmu, mendorong mundur setiap musuh yang terkena hingga berjarak 20 meter darimu. Tidak memberi kerusakan."
       },
       "pack_rally": {
         "name": "Pengumpulan Kawanan",

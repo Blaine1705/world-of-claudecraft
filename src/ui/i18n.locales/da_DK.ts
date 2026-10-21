@@ -15703,7 +15703,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passiv: Med Jagtfart gør Sporbrud dit næste Sprættende Slag eller Blodkrog klar i 12 sek. Sprættende Slag gør 15% mere skade pr. stak. Blodkrog gør 18 til 24 ekstra fysisk skade, øget med 15% pr. stak og af afstandsangrebsstyrke. Ved 3 stakke bruger et af angrebene Jagtfart. (Overlevelse)',
   'entities.abilities.frostjaw_trap.description':
-    'Placer en fælde ved den valgte fjende eller ved dine fødder. Den armeres efter 0,75 sek. og varer 30 sek. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek.',
+    'Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek.',
   'entities.abilities.hunting_momentum.description':
     'Passiv: Sprættende Slag og en Splintladning, der rammer en fjende, giver hver 1 Jagtfart, op til 3. Varer, indtil de bruges eller du forlader kamp, og hver stak øger bevægelseshastigheden med 15%. Ved 3 stakke gør Sårflænger 60% mere slagskade og bruger stakkene. (Overlevelse)',
   'entities.abilities.measured_shot.description':
@@ -19957,7 +19957,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Bruger dine 5 Grønske: hver allieret med dine heling-over-tid-effekter heles straks for {buff}% af den heling, effekterne havde tilbage. Effekterne fjernes, og målet får en ny Sporeheling.',
   'entities.abilities.play_dead.description':
-    'Fald til jorden og spil død: dit helbred og fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller en anden evne afslutter det. Kast igen for at rejse dig.',
+    'Fald til jorden og se død ud: din sundhed og dit fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller brug af en anden evne afslutter den. Kastes den, mens du bevæger dig, har du 1 sek. til at stoppe, før bevægelsen afslutter den. Kast igen for at rejse dig.',
   'entities.abilities.play_dead.name': 'Spil død',
   'entities.abilities.rejuvenation.name': 'Sporeheling',
   'entities.abilities.scratch.description':
@@ -20028,4 +20028,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Den visuelt rigeste faste forudindstilling. Passer til et grafikkort i topklassen.',
   'graphicsPrompt.changeLater': 'Du kan altid ændre dette i Indstillinger under Grafikkvalitet.',
   'graphicsPrompt.confirm': 'Fortsæt',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Bjørnefælde',
+  'entities.abilities.bear_trap.description':
+    'Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rammes af bjørnefælden, der klapper i: den bløder for 83 fysisk skade plus 22,5% af din afstandsangrebskraft over 15 sek. og sænkes med 50% i 4 sek.',
+  'entities.abilities.scatterbolt.name': 'Spredebolt',
+  'entities.abilities.scatterbolt.description':
+    'Affyr en byge af bolte i en kegle på 8 meter foran dig, der slår hver ramt fjende tilbage, indtil den er 20 meter fra dig. Gør ingen skade.',
+  'entities.abilities.phosphor_flask.name': 'Fosforflaske',
+  'entities.abilities.phosphor_flask.description':
+    'En forseglet beholder med en reaktiv kemisk blanding, der bryder ud i hvidglødende flammer over et område på 8 m i 3 sek. Fjender, der står i flammerne, tager {damage} Ildskade hvert 0,5 sek. Skaden stiger med afstandsangrebskraft.',
 };

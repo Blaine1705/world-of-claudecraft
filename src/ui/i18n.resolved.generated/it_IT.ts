@@ -13285,6 +13285,10 @@ export const it_IT: EnTranslations = {
         "name": "Scarica di Frecce",
         "description": "Fa piovere frecce su un'area di 8 m per 3 sec. I nemici nell'area subiscono {damage} danni Fisici ogni 0.5 sec. Il danno aumenta con la potenza d'attacco a distanza."
       },
+      "phosphor_flask": {
+        "name": "Fiasca di Fosforo",
+        "description": "Un recipiente sigillato contenente una miscela chimica reattiva che esplode in fiamme incandescenti su un'area di 8 m per 3 s. I nemici che restano tra le fiamme subiscono {damage} danni da Fuoco ogni 0,5 s. Il danno aumenta con la potenza d'attacco a distanza."
+      },
       "pack_command": {
         "name": "Comando del Branco",
         "description": "Ordina al tuo famiglio vivo di colpire per 36-48 danni Fisici. I danni aumentano con la potenza d'attacco del famiglio. Un colpo a segno recupera 20 concentrazione e concede 1 Ferocia del Branco per 30 s, fino a 3. Ogni accumulo aumenta del 10% tutti i danni inflitti dal tuo famiglio. Questo colpo usa gli accumuli che avevi prima dell'impatto."
@@ -13331,7 +13335,7 @@ export const it_IT: EnTranslations = {
       },
       "play_dead": {
         "name": "Fingere la morte",
-        "description": "Cadi a terra e fingi di essere morto: tutti vedono salute e Concentrazione vuote. I nemici ti dimenticano e i giocatori nemici che ti selezionano perdono il bersaglio. Muoversi, attaccare o usare un'altra abilità termina l'effetto. Usa di nuovo per rialzarti."
+        "description": "Cadi a terra e fingiti morto: la tua salute e la tua concentrazione risultano vuote per tutti. I nemici si dimenticano di te, e i giocatori nemici che ti hanno come bersaglio lo perdono. Muoverti, attaccare o usare un'altra abilità lo interrompe. Se lo lanci mentre ti muovi, hai 1 s per fermarti prima che il movimento lo interrompa. Lancialo di nuovo per rialzarti."
       },
       "tactical_camo": {
         "name": "Mimetismo Tattico",
@@ -13339,7 +13343,15 @@ export const it_IT: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Trappola Fauci di Gelo",
-        "description": "Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s."
+        "description": "Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s."
+      },
+      "bear_trap": {
+        "name": "Trappola per Orsi",
+        "description": "Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva subisce la chiusura della trappola per orsi: sanguina per 83 danni Fisici più il 22,5% della tua potenza d'attacco a distanza in 15 s e viene rallentato del 50% per 4 s."
+      },
+      "scatterbolt": {
+        "name": "Ventaglio di Dardi",
+        "description": "Scaglia una raffica di dardi in un cono di 8 metri davanti a te, respingendo ogni nemico colpito finché non si trova a 20 metri da te. Non infligge danni."
       },
       "pack_rally": {
         "name": "Adunata del Branco",

@@ -108,6 +108,10 @@
       "spec": "452fd2d9220ca48025163c0f6ec9e57e08da9b73dec089bd36cf15a41bf41515",
       "full": "f94cec3ca4878628179a087886fc130b228adc2703cb8643bfcad460e409abed"
     },
+    "bear_trap": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "berserk": {
       "spec": "cf4531c557965d39d5b9364d5a183fe921297265019925cd66e7d71f3f19b6dc",
       "full": "4995910eae0effe7a244fb1b9eb817edb2ca5765f0ab516492b79bc99b5c3c02"
@@ -892,6 +896,10 @@
       "spec": "b0e17955aafe6a950cc7899693d0788bc8825af64225a9f0b22d928a458c120f",
       "full": "a1832578c80b0214cb6222cb9372f8b0a197d75dce7041904cfbc14e7b83d691"
     },
+    "phosphor_flask": {
+      "spec": "55723709657d635bf1f6b41d86cbb0d9ccb6930659f168ce6dc603b274ac8709",
+      "full": "236631f1de67f0375f612c2c6e2f82a94e85143daccaf4bc081bc3f115036ad2"
+    },
     "play_dead": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
@@ -1087,6 +1095,10 @@
     "sap": {
       "spec": "f4793f16beeb2e40bb66e7a584f39fc73128a889b596c874e365b20815c02b3e",
       "full": "5cb05770a8de1dd731882339134d595e8511e783053d9cd9ecd8f0e9a7939fb5"
+    },
+    "scatterbolt": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "scorch": {
       "spec": "b19610ea0e0608ca9e9eed828c275db7d4bc0a3bf349d1e5f811451996ddac64",

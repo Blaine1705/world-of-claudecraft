@@ -13285,6 +13285,10 @@ export const da_DK: EnTranslations = {
         "name": "Pileregn",
         "description": "Lader pile regne over et område på 8 m i 3 sek. Fjender i området tager {damage} Fysisk skade hvert 0.5 sek. Skaden stiger med angrebsstyrke på afstand."
       },
+      "phosphor_flask": {
+        "name": "Fosforflaske",
+        "description": "En forseglet beholder med en reaktiv kemisk blanding, der bryder ud i hvidglødende flammer over et område på 8 m i 3 sek. Fjender, der står i flammerne, tager {damage} Ildskade hvert 0,5 sek. Skaden stiger med afstandsangrebskraft."
+      },
       "pack_command": {
         "name": "Flokbefaling",
         "description": "Befal dit levende kæledyr at slå for 36 til 48 fysisk skade. Skaden stiger med kæledyrets angrebskraft. Et træf genopretter 20 fokus og giver 1 Flokvildskab i 30 sek., op til 3. Hver stak øger al skade, dit kæledyr gør, med 10%. Dette slag bruger de stakke, du havde før træffet."
@@ -13331,7 +13335,7 @@ export const da_DK: EnTranslations = {
       },
       "play_dead": {
         "name": "Spil død",
-        "description": "Fald til jorden og spil død: dit helbred og fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller en anden evne afslutter det. Kast igen for at rejse dig."
+        "description": "Fald til jorden og se død ud: din sundhed og dit fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller brug af en anden evne afslutter den. Kastes den, mens du bevæger dig, har du 1 sek. til at stoppe, før bevægelsen afslutter den. Kast igen for at rejse dig."
       },
       "tactical_camo": {
         "name": "Taktisk Camouflage",
@@ -13339,7 +13343,15 @@ export const da_DK: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Frostkæbefælde",
-        "description": "Placer en fælde ved den valgte fjende eller ved dine fødder. Den armeres efter 0,75 sek. og varer 30 sek. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek."
+        "description": "Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek."
+      },
+      "bear_trap": {
+        "name": "Bjørnefælde",
+        "description": "Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rammes af bjørnefælden, der klapper i: den bløder for 83 fysisk skade plus 22,5% af din afstandsangrebskraft over 15 sek. og sænkes med 50% i 4 sek."
+      },
+      "scatterbolt": {
+        "name": "Spredebolt",
+        "description": "Affyr en byge af bolte i en kegle på 8 meter foran dig, der slår hver ramt fjende tilbage, indtil den er 20 meter fra dig. Gør ingen skade."
       },
       "pack_rally": {
         "name": "Floksamling",

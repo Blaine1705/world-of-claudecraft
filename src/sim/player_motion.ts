@@ -18,7 +18,11 @@
 // by the extraction.
 
 import { type Collider, isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
-import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/cast_move_gate';
+import {
+  abilityCastSurvivesMovement,
+  isFeigningDeath,
+  movementInputWouldMove,
+} from './combat/cast_move_gate';
 import { isRooted, isStunned } from './combat/cc';
 import { SPOREMENDER_FORM_KIND, SPOREMENDER_MOVE_SPEED_MULT } from './combat/druid_sporemender';
 import { huntingMomentumSpeedMult } from './combat/hunting_momentum_speed';
@@ -746,7 +750,14 @@ function verticalPass(
     p.vy <= 0 &&
     p.vy > -GRAVITY * COYOTE_TIME &&
     terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed) <= MAX_CLIMB_SLOPE;
-  if (inp.jump && (p.onGround || coyote) && !isRooted(p) && !steepGround && !mountLocked) {
+  if (
+    inp.jump &&
+    (p.onGround || coyote) &&
+    !isRooted(p) &&
+    !isFeigningDeath(p) &&
+    !steepGround &&
+    !mountLocked
+  ) {
     p.vy = JUMP_VELOCITY * jumpMult(p);
     p.vx = wishX * wishSpeed;
     p.vz = wishZ * wishSpeed;
@@ -897,7 +908,7 @@ function swimVerticalPass(
   // Never let the clamp push the body UP into the surface in water too shallow
   // to dive in: there, the floor and the ceiling are the same line.
   const floor = Math.min(surface, ground + SWIM_FLOOR_CLEARANCE);
-  const controllable = !isRooted(p) && !mountLocked;
+  const controllable = !isRooted(p) && !isFeigningDeath(p) && !mountLocked;
   p.vx = 0;
   p.vz = 0;
   p.vy = 0;

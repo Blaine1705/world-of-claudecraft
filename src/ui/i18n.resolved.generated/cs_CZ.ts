@@ -13285,6 +13285,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Salva",
         "description": "Nechá 3 s pršet šípy na oblast 8 m. Nepřátelé uvnitř utrpí každých 0.5 s {damage} fyzického poškození. Poškození roste s útočnou silou na dálku."
       },
+      "phosphor_flask": {
+        "name": "Fosforová baňka",
+        "description": "Zapečetěná nádoba s reaktivní chemickou směsí, která na 3 s vzplane do běla rozžhaveným plamenem v oblasti 8 m. Nepřátelé stojící v plamenech utrpí každých 0,5 s {damage} ohnivého poškození. Poškození roste se silou útoku na dálku."
+      },
       "pack_command": {
         "name": "Povel smečky",
         "description": "Přikaž svému živému společníkovi udeřit za 36 až 48 Fyzického poškození. Poškození roste se silou útoku společníka. Zásah obnoví 20 soustředění a udělí 1 Zuřivost smečky na 30 s, až do 3. Každý nános zvyšuje veškeré poškození tvého společníka o 10%. Tento úder používá nánosy, které jsi měl před zásahem."
@@ -13331,7 +13335,7 @@ export const cs_CZ: EnTranslations = {
       },
       "play_dead": {
         "name": "Předstírání smrti",
-        "description": "Padni na zem a předstírej smrt: všem se tvé zdraví a soustředění zobrazí jako prázdné. Nepřátelé na tebe zapomenou a nepřátelští hráči, kteří tě mají zaměřeného, ztratí cíl. Pohyb, útok nebo jiná schopnost účinek ukončí. Dalším sesláním vstaneš."
+        "description": "Padni k zemi a předstírej smrt: tvé zdraví a Soustředění se všem zobrazují jako prázdné. Nepřátelé na tebe zapomenou a nepřátelští hráči, kteří tě mají v cíli, o cíl přijdou. Pohyb, útok nebo použití jiné schopnosti efekt ukončí. Pokud ji sešleš v pohybu, máš 1 s na zastavení, než ji pohyb ukončí. Opětovným sesláním vstaneš."
       },
       "tactical_camo": {
         "name": "Taktické maskování",
@@ -13339,7 +13343,15 @@ export const cs_CZ: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Past mrazivé čelisti",
-        "description": "Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s."
+        "description": "Umísti past na vybrané místo. Aktivuje se po 0,75 s, trvá 1 minutu a vidíš ji jen ty a tvá skupina. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s."
+      },
+      "bear_trap": {
+        "name": "Medvědí past",
+        "description": "Umísti past na vybrané místo. Aktivuje se po 0,75 s, trvá 1 minutu a vidíš ji jen ty a tvá skupina. První nepřítel, který ji spustí, utrpí sevření medvědí pasti: krvácí za 83 Fyzického poškození plus 22,5% tvé síly útoku na dálku po dobu 15 s a je zpomalen o 50% na 4 s."
+      },
+      "scatterbolt": {
+        "name": "Rozptylná šipka",
+        "description": "Vystřel spršku šipek v kuželu o dosahu 8 metrů před sebou a odhoď každého zasaženého nepřítele, dokud nebude 20 metrů od tebe. Nezpůsobuje žádné poškození."
       },
       "pack_rally": {
         "name": "Shromáždění smečky",

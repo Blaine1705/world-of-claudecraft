@@ -13285,6 +13285,10 @@ export const pt_BR: EnTranslations = {
         "name": "Saraivada",
         "description": "Faz chover flechas sobre uma área de 8 m durante 3 s. Os inimigos na área sofrem {damage} de dano Físico a cada 0.5 s. O dano aumenta com o poder de ataque à distância."
       },
+      "phosphor_flask": {
+        "name": "Frasco de Fósforo",
+        "description": "Um recipiente selado com uma mistura química reativa que irrompe em chamas incandescentes sobre uma área de 8 m por 3 s. Os inimigos nas chamas sofrem {damage} de dano de Fogo a cada 0,5 s. O dano aumenta com o poder de ataque à distância."
+      },
       "pack_command": {
         "name": "Comando da Matilha",
         "description": "Ordena que seu companheiro vivo golpeie causando de 36 a 48 de dano Físico. O dano aumenta com o poder de ataque do companheiro. Um acerto restaura 20 de foco e concede 1 de Ferocidade da Matilha por 30 s, até 3. Cada acúmulo aumenta em 10% todo o dano causado pelo seu companheiro. Este golpe usa os acúmulos que você tinha antes do acerto."
@@ -13331,7 +13335,7 @@ export const pt_BR: EnTranslations = {
       },
       "play_dead": {
         "name": "Fingir de morto",
-        "description": "Caia no chão e finja estar morto: sua vida e seu Foco aparecem vazios para todos. Inimigos esquecem você e jogadores inimigos que miram em você perdem o alvo. Mover-se, atacar ou usar outra habilidade encerra o efeito. Use de novo para levantar."
+        "description": "Cai no chão e finge estar morto: sua vida e seu foco aparecem vazios para todos. Os inimigos se esquecem de você, e jogadores inimigos que têm você como alvo perdem o alvo. Mover-se, atacar ou usar outra habilidade encerra o efeito. Se lançado em movimento, você tem 1 s para parar antes que o movimento o encerre. Lançar de novo faz você se levantar."
       },
       "tactical_camo": {
         "name": "Camuflagem Tática",
@@ -13339,7 +13343,15 @@ export const pt_BR: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Armadilha Presa Gélida",
-        "description": "Posiciona uma armadilha no inimigo selecionado ou aos seus pés. Ela arma após 0,75 s e dura 30 s. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s."
+        "description": "Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s."
+      },
+      "bear_trap": {
+        "name": "Armadilha de Urso",
+        "description": "Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar sofre com o fechamento da armadilha de urso: sangra por 83 de dano Físico mais 22,5% do seu poder de ataque à distância ao longo de 15 s e é lentificado em 50% por 4 s."
+      },
+      "scatterbolt": {
+        "name": "Leque de Virotes",
+        "description": "Dispara uma rajada de virotes em um cone de 8 metros à sua frente, repelindo cada inimigo atingido até que ele esteja a 20 metros de você. Não causa dano."
       },
       "pack_rally": {
         "name": "Reunião da Matilha",

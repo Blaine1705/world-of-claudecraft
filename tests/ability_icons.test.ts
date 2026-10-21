@@ -134,11 +134,12 @@ describe('ability icons', () => {
     // 476: plus the druid's Spore Burst (spore_burst).
     // 477: plus the druid's Nature's Boon passive (natures_boon).
     // 479: plus the Fieldcraft rework glyphs (tactical_camo, play_dead).
-    expect(ids).toHaveLength(479);
+    // 482: plus Bear Trap, Scatterbolt and Phosphor Flask (PR 4488 follow-up).
+    expect(ids).toHaveLength(482);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('63720788dd219fbd6dc4a1a9463aeb311c4bd663c7a1ba4fc83fbaf2a3a53dde');
+    expect(hash).toBe('fc159e273ae50d61a9f59d79f8a9a7b1806b63dad5fcbf8995e8802122bda678');
   });
 });

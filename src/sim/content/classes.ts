@@ -382,6 +382,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'wildheart',
       'shellskin',
       'frostjaw_trap',
+      'bear_trap',
+      'scatterbolt',
       'tame_beast',
       'dismiss_pet',
       'revive_pet',
@@ -394,6 +396,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'tactical_camo',
       'play_dead',
       'volley',
+      'phosphor_flask',
       'counter_shot',
     ],
     color: 0xa6d84f,
@@ -2283,18 +2286,41 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Volley',
     class: 'hunter',
     learnLevel: 11,
+    // Fieldcraft throws Phosphor Flask in this slot instead.
+    excludeSpecs: ['survival'],
     cost: 60,
     castTime: 0,
-    cooldown: 8,
+    cooldown: 10,
     range: 35,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: false,
     targetMode: 'position',
-    channel: { duration: 3, ticks: 6 },
-    effects: [{ type: 'aoeDamage', min: 12, max: 16, radius: 8 }],
+    // Instant: the arrows keep falling for the full 3 sec after the hunter moves on
+    // (combat/hunter_ground_zone.ts keeps the armor mitigation the channel had).
+    effects: [{ type: 'groundAoE', min: 12, max: 16, radius: 8, duration: 3, interval: 0.5 }],
     description:
       'Rain arrows over an 8-yard area for 3 sec. Enemies in the area take $d Physical damage every 0.5 sec. Damage increases with Ranged Attack Power.',
+  },
+  phosphor_flask: {
+    id: 'phosphor_flask',
+    name: 'Phosphor Flask',
+    class: 'hunter',
+    specs: ['survival'],
+    learnLevel: 11,
+    cost: 60,
+    castTime: 0,
+    cooldown: 10,
+    range: 35,
+    school: 'fire',
+    scalesWith: 'ranged',
+    requiresTarget: false,
+    targetMode: 'position',
+    // Fieldcraft's Volley: the same zone, burning instead of raining arrows. Only
+    // enemies standing in the flames take damage; nothing lingers once they leave.
+    effects: [{ type: 'groundAoE', min: 12, max: 16, radius: 8, duration: 3, interval: 0.5 }],
+    description:
+      'A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take $d Fire damage every 0.5 sec. Damage increases with Ranged Attack Power.',
   },
   hurricane: {
     id: 'hurricane',
@@ -3790,6 +3816,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 6,
+    // Every hunter cast is mobile (Fieldcraft rework, PR 4488).
+    castWhileMoving: true,
     cooldown: 0,
     range: 20,
     school: 'nature',
@@ -3819,6 +3847,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 3,
+    castWhileMoving: true,
     cooldown: 0,
     range: 0,
     school: 'nature',
@@ -3948,6 +3977,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 5,
     cost: 0,
     castTime: 1.5,
+    castWhileMoving: true,
     cooldown: 0,
     range: 35,
     school: 'physical',
@@ -4200,6 +4230,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 11,
     cost: 35,
     castTime: 2.5,
+    castWhileMoving: true,
     cooldown: 0,
     range: 35,
     school: 'physical',
@@ -4338,9 +4369,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     // Display-only death (combat/hunter_play_dead.ts): the hunter never dies.
-    effects: [{ type: 'hunterPlayDead' }],
+    effects: [{ type: 'hunterPlayDead', movingGrace: 1 }],
     description:
-      'Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up.',
+      'Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up.',
   },
   tactical_camo: {
     id: 'tactical_camo',
@@ -4373,19 +4404,71 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'frost',
     requiresTarget: false,
+    // Thrown at a chosen ground point like the Hourglass of Suspension; enemy
+    // players never see the armed trap (combat/hunter_trap.ts).
+    targetMode: 'position',
     effects: [
       {
         type: 'frostjawTrap',
         radius: 4,
         armTime: 0.75,
-        lifetime: 30,
+        lifetime: 60,
         rootDuration: 3,
         slowMult: 0.5,
         slowDuration: 4,
       },
     ],
     description:
-      'Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+      'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+  },
+  bear_trap: {
+    id: 'bear_trap',
+    name: 'Bear Trap',
+    class: 'hunter',
+    learnLevel: 16,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 30,
+    school: 'physical',
+    scalesWith: 'ranged',
+    requiresTarget: false,
+    targetMode: 'position',
+    // Frostjaw's placement and trigger rules. The jaws bleed the victim for 1.5x
+    // Venom Barb's top rank (55 base plus 15% Ranged AP over 15 sec) and slow it.
+    effects: [
+      {
+        type: 'hunterBearTrap',
+        radius: 4,
+        armTime: 0.75,
+        lifetime: 60,
+        bleedTotal: 83,
+        bleedDuration: 15,
+        bleedInterval: 3,
+        rangedPowerCoeff: 0.225,
+        slowMult: 0.5,
+        slowDuration: 4,
+      },
+    ],
+    description:
+      'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec.',
+  },
+  scatterbolt: {
+    id: 'scatterbolt',
+    name: 'Scatterbolt',
+    class: 'hunter',
+    learnLevel: 12,
+    cost: 0,
+    castTime: 0,
+    cooldown: 15,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    // Shrapnel Charge's 90 degree cone at 8 yards: no damage, only displacement.
+    effects: [{ type: 'hunterScatterbolt', coneRange: 8, coneAngleDeg: 90, pushTo: 20 }],
+    description:
+      'Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage.',
   },
 
   // ====================== PRIEST ======================

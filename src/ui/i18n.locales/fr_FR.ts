@@ -16715,7 +16715,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     "Passif : avec Élan de chasse, Brise-piste prépare votre prochaine Frappe éventrante ou Croc sanglant pendant 12 s. Frappe éventrante inflige 15% de dégâts supplémentaires par charge. Croc sanglant inflige 18 à 24 dégâts physiques supplémentaires, augmentés de 15% par charge et par la puissance d'attaque à distance. À 3 charges, l'une ou l'autre attaque consomme Élan de chasse. (Survie)",
   'entities.abilities.frostjaw_trap.description':
-    "Pose un piège sur l'ennemi sélectionné ou à vos pieds. Il s'arme après 0,75 s et dure 30 s. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s.",
+    "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s.",
   'entities.abilities.hunting_momentum.description':
     "Passif : Frappe éventrante et une Charge à fragmentation qui touche un ennemi accordent chacun 1 Élan de chasse, jusqu'à 3. Dure jusqu'à consommation ou sortie du combat ; chaque charge augmente votre vitesse de déplacement de 15%. À 3 charges, Déchirure inflige 60% de dégâts de frappe supplémentaires et consomme les charges. (Survie)",
   'entities.abilities.measured_shot.description':
@@ -20466,7 +20466,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     "Dépense vos 5 points de Verdoyance : chaque allié portant vos soins sur la durée reçoit instantanément {buff}% des soins qu'il leur restait, les effets sont retirés et la cible reçoit un nouveau Soin de spores.",
   'entities.abilities.play_dead.description':
-    "Tombez au sol en feignant la mort : votre santé et votre Focalisation apparaissent vides à tous. Les ennemis vous oublient et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité met fin à l'effet. Relancez pour vous relever.",
+    "Tombez au sol et faites le mort : vos points de vie et votre concentration s'affichent comme vides pour tout le monde. Les ennemis vous oublient, et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité y met fin. Si vous l'incantez en mouvement, vous avez 1 s pour vous arrêter avant que le déplacement n'y mette fin. Relancez pour vous relever.",
   'entities.abilities.play_dead.name': 'Feindre la mort',
   'entities.abilities.rejuvenation.name': 'Soin de spores',
   'entities.abilities.scratch.description':
@@ -20540,4 +20540,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Vous pouvez modifier ce choix à tout moment dans Options, sous Qualité graphique.',
   'graphicsPrompt.confirm': 'Continuer',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Piège à ours',
+  'entities.abilities.bear_trap.description':
+    "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est pris dans les mâchoires du piège à ours : il saigne pour 83 points de dégâts Physiques plus 22,5% de votre puissance d'attaque à distance sur 15 s et est ralenti de 50% pendant 4 s.",
+  'entities.abilities.scatterbolt.name': 'Gerbe de carreaux',
+  'entities.abilities.scatterbolt.description':
+    "Tire une gerbe de carreaux dans un cône de 8 mètres devant vous, repoussant chaque ennemi touché jusqu'à ce qu'il se trouve à 20 mètres de vous. N'inflige aucun dégât.",
+  'entities.abilities.phosphor_flask.name': 'Fiole de phosphore',
+  'entities.abilities.phosphor_flask.description':
+    "Un récipient scellé contenant un mélange chimique réactif qui s'embrase en flammes chauffées à blanc sur une zone de 8 m pendant 3 s. Les ennemis qui se tiennent dans les flammes subissent {damage} points de dégâts de Feu toutes les 0,5 s. Les dégâts augmentent avec la puissance d'attaque à distance.",
 };

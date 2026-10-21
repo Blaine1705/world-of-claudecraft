@@ -13285,6 +13285,10 @@ export const nl_NL: EnTranslations = {
         "name": "Pijlenregen",
         "description": "Laat 3 sec lang pijlen regenen over een gebied van 8 m. Vijanden in het gebied krijgen elke 0.5 sec {damage} Fysieke schade. De schade stijgt met de aanvalskracht op afstand."
       },
+      "phosphor_flask": {
+        "name": "Fosforfles",
+        "description": "Een verzegeld vat met een reactief chemisch mengsel dat 3 sec. lang uitbarst in witgloeiende vlammen over een gebied van 8 m. Vijanden in de vlammen krijgen elke 0,5 sec. {damage} Vuurschade. De schade stijgt met de afstandsaanvalskracht."
+      },
       "pack_command": {
         "name": "Roedelbevel",
         "description": "Beveelt je levende huisdier toe te slaan voor 36 tot 48 fysieke schade. De schade stijgt met de aanvalskracht van het huisdier. Een treffer herstelt 20 focus en verleent 30 sec. lang 1 Roedelfelheid, tot 3. Elke stapel verhoogt alle schade van je huisdier met 10%. Deze slag gebruikt de stapels die je vóór de treffer had."
@@ -13331,7 +13335,7 @@ export const nl_NL: EnTranslations = {
       },
       "play_dead": {
         "name": "Dood spelen",
-        "description": "Val op de grond en doe alsof je dood bent: je gezondheid en Focus lijken voor iedereen leeg. Vijanden vergeten je en vijandelijke spelers die je geselecteerd hebben verliezen hun doel. Bewegen, aanvallen of een andere vaardigheid gebruiken beëindigt dit. Werp opnieuw om op te staan."
+        "description": "Valt op de grond en lijkt dood: je gezondheid en focus worden voor iedereen als leeg weergegeven. Vijanden vergeten je, en vijandelijke spelers die je als doelwit hebben, verliezen hun doelwit. Bewegen, aanvallen of een andere vaardigheid gebruiken beëindigt het. Gebruik je het tijdens het bewegen, dan heb je 1 sec. om stil te staan voordat bewegen het beëindigt. Gebruik het opnieuw om op te staan."
       },
       "tactical_camo": {
         "name": "Tactische Camouflage",
@@ -13339,7 +13343,15 @@ export const nl_NL: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Vorstkaakval",
-        "description": "Plaatst een val bij de gekozen vijand of aan je voeten. Hij scherpt na 0,75 sec. en duurt 30 sec. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd."
+        "description": "Plaatst een val op de gekozen locatie. Hij scherpt na 0,75 sec. en duurt 1 min, en alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd."
+      },
+      "bear_trap": {
+        "name": "Berenval",
+        "description": "Plaatst een val op de gekozen locatie. Hij scherpt na 0,75 sec. en duurt 1 min, en alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert, krijgt de dichtklappende berenval te verduren: hij bloedt 15 sec. lang voor 83 fysieke schade plus 22,5% van je afstandsaanvalskracht en wordt 4 sec. met 50% vertraagd."
+      },
+      "scatterbolt": {
+        "name": "Strooischicht",
+        "description": "Vuurt een waaier van schichten af in een kegel van 8 meter voor je, en slaat elke getroffen vijand terug tot hij 20 meter van je verwijderd is. Richt geen schade aan."
       },
       "pack_rally": {
         "name": "Roedelverzameling",

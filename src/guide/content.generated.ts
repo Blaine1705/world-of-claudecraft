@@ -920,6 +920,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Frostjaw Trap"
       },
       {
+        "id": "bear_trap",
+        "name": "Bear Trap"
+      },
+      {
+        "id": "scatterbolt",
+        "name": "Scatterbolt"
+      },
+      {
         "id": "tame_beast",
         "name": "Wildbond"
       },
@@ -966,6 +974,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "volley",
         "name": "Volley"
+      },
+      {
+        "id": "phosphor_flask",
+        "name": "Phosphor Flask"
       },
       {
         "id": "counter_shot",

@@ -13285,6 +13285,10 @@ export const es_ES: EnTranslations = {
         "name": "Andanada",
         "description": "Hace llover flechas sobre un área de 8 m durante 3 s. Los enemigos dentro sufren {damage} de daño Físico cada 0.5 s. El daño aumenta con el poder de ataque a distancia."
       },
+      "phosphor_flask": {
+        "name": "Frasco de Fósforo",
+        "description": "Un recipiente sellado con una mezcla química reactiva que estalla en llamas al rojo blanco sobre un área de 8 m durante 3 s. Los enemigos que permanezcan en las llamas sufren {damage} de daño de Fuego cada 0,5 s. El daño aumenta con el poder de ataque a distancia."
+      },
       "pack_command": {
         "name": "Orden de Manada",
         "description": "Ordena a tu mascota viva golpear por 36 a 48 de daño Físico. El daño aumenta con el poder de ataque de la mascota. Un impacto restaura 20 de concentración y otorga 1 de Ferocidad de Manada durante 30 s, hasta 3. Cada acumulación aumenta un 10% todo el daño infligido por tu mascota. Este golpe usa las acumulaciones que tenías antes del impacto."
@@ -13331,7 +13335,7 @@ export const es_ES: EnTranslations = {
       },
       "play_dead": {
         "name": "Hacerse el muerto",
-        "description": "Cae al suelo y finge estar muerto: todos ven tu salud y tu Enfoque vacíos. Los enemigos te olvidan y los jugadores enemigos que te seleccionaban pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Vuelve a usarlo para levantarte."
+        "description": "Cae al suelo y finge estar muerto: tu salud y tu concentración se muestran vacías para todos. Los enemigos se olvidan de ti, y los jugadores enemigos que te tienen como objetivo pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Si lo lanzas en movimiento, tienes 1 s para detenerte antes de que el movimiento lo termine. Vuelve a lanzarlo para levantarte."
       },
       "tactical_camo": {
         "name": "Camuflaje Táctico",
@@ -13339,7 +13343,15 @@ export const es_ES: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Trampa Fauces de Escarcha",
-        "description": "Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
+        "description": "Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo podéis verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
+      },
+      "bear_trap": {
+        "name": "Trampa para Osos",
+        "description": "Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo podéis verla. El primer enemigo que la active sufre el cierre de la trampa para osos: sangra por 83 de daño Físico más un 22,5% de tu poder de ataque a distancia durante 15 s y queda ralentizado un 50% durante 4 s."
+      },
+      "scatterbolt": {
+        "name": "Ráfaga de Virotes",
+        "description": "Dispara una ráfaga de virotes en un cono de 8 metros frente a ti, repeliendo a cada enemigo alcanzado hasta que esté a 20 metros de ti. No inflige daño."
       },
       "pack_rally": {
         "name": "Reunión de Manada",

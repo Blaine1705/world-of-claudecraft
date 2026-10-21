@@ -5202,7 +5202,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '融入周围环境：敌人几乎察觉不到你，你以80%的速度移动。攻击或受到伤害会打破战术伪装。再次施放即可解除。（野战技艺）',
   'entities.abilities.play_dead.name': '装死',
   'entities.abilities.play_dead.description':
-    '倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。再次施放即可起身。',
+    '倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。若在移动中施放，你有 1 秒时间停下，否则移动会结束装死。再次施放即可起身。',
   'entities.abilities.holy_shock.name': '圣光震颤',
   'entities.abilities.holy_shock.description':
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
@@ -15159,7 +15159,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '掷出飞刀鞭笞6码内的所有敌人，造成{damage}点物理伤害，并获得2个连击点。（潜行者天赋）',
   'entities.abilities.flurry_of_knives.name': '刀刃乱舞',
   'entities.abilities.frostjaw_trap.description':
-    '在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。',
+    '在选定位置放置一个陷阱。陷阱在 0.75 秒后启动，持续 1 分钟，只有你和你的小队能看见。第一个触发陷阱的敌人会被定身 3 秒，4 码内的敌人会被减速 50%，持续 4 秒。',
   'entities.abilities.frostjaw_trap.name': '霜颚陷阱',
   'entities.abilities.funeral_harvest.description':
     '当一个近期被你或你的亡灵伤害过的敌人死亡时，你获得1枚灵魂碎片。每3秒最多触发一次。',
@@ -18891,4 +18891,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.hearthstoneBound': '你的盟约炉石现已绑定至{hub}。',
   'hudChrome.factionRewards.hearthstoneTransport': '炉石将你传送至{hub}。',
   'hudChrome.factionRewards.itemCooldown': '该物品尚未就绪（还需{minutes}分钟）。',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': '捕熊陷阱',
+  'entities.abilities.bear_trap.description':
+    '在选定位置放置一个陷阱。陷阱在 0.75 秒后启动，持续 1 分钟，只有你和你的小队能看见。第一个触发陷阱的敌人会被捕熊夹咬住：在 15 秒内流血，受到 83 点物理伤害外加你 22.5% 远程攻击强度的伤害，并被减速 50%，持续 4 秒。',
+  'entities.abilities.scatterbolt.name': '散射弩箭',
+  'entities.abilities.scatterbolt.description':
+    '向前方 8 码锥形范围内射出一片弩箭，将命中的每个敌人击退，直到其距离你 20 码。不造成伤害。',
+  'entities.abilities.phosphor_flask.name': '磷火瓶',
+  'entities.abilities.phosphor_flask.description':
+    '一个密封容器，装有活性化学混合物，会在 8 码范围内爆发出白热火焰，持续 3 秒。站在火焰中的敌人每 0.5 秒受到 {damage} 点火焰伤害。伤害随远程攻击强度提升。',
 };

@@ -5401,7 +5401,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주변 환경에 녹아듭니다. 적이 거의 알아채지 못하며, 이동 속도가 80%가 됩니다. 공격하거나 피해를 받으면 전술 위장이 해제됩니다. 다시 시전하면 해제됩니다. (야전술)',
   'entities.abilities.play_dead.name': '죽은 척하기',
   'entities.abilities.play_dead.description':
-    '땅에 쓰러져 죽은 척합니다. 모두에게 생명력과 집중이 비어 있는 것으로 보입니다. 적은 당신을 잊고, 당신을 대상으로 삼은 적 플레이어는 대상을 잃습니다. 이동하거나 공격하거나 다른 능력을 사용하면 끝납니다. 다시 시전하면 일어납니다.',
+    '땅에 쓰러져 죽은 척합니다. 모두에게 생명력과 집중이 비어 있는 것으로 보입니다. 적은 당신을 잊고, 당신을 대상으로 삼은 적 플레이어는 대상을 잃습니다. 이동하거나 공격하거나 다른 능력을 사용하면 끝납니다. 이동 중에 시전하면 1초 안에 멈춰야 하며, 그렇지 않으면 이동으로 인해 끝납니다. 다시 시전하면 일어납니다.',
   'entities.abilities.holy_shock.name': '빛의 충격',
   'entities.abilities.holy_shock.description':
     '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
@@ -15872,7 +15872,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '투척 단검으로 6야드 내 모든 적을 베어 {damage}의 물리 피해를 입히고 연계 점수 2점을 얻습니다. (도적 특성)',
   'entities.abilities.flurry_of_knives.name': '칼날 난무',
   'entities.abilities.frostjaw_trap.description':
-    '선택한 적의 위치나 발밑에 작동 준비된 덫을 놓습니다. 처음 발동시킨 적을 이동 불가로 만들고 주변 적을 느리게 합니다.',
+    '선택한 위치에 덫을 놓습니다. 덫은 0.75초 후 작동 준비되며 1분 동안 유지되고, 자신과 파티원만 볼 수 있습니다. 처음 발동시킨 적은 3초 동안 이동 불가 상태가 되고, 4미터 이내의 적은 4초 동안 이동 속도가 50% 감소합니다.',
   'entities.abilities.frostjaw_trap.name': '서리턱 덫',
   'entities.abilities.funeral_harvest.description':
     '자신이나 자신의 언데드가 최근 피해를 준 적이 죽으면 영혼 조각 1개를 얻습니다. 3초에 한 번만 발동합니다.',
@@ -19852,4 +19852,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.hearthstoneBound': '동맹 귀환석이 {hub}(으)로 조율되었습니다.',
   'hudChrome.factionRewards.hearthstoneTransport': '귀환석이 당신을 {hub}(으)로 이동시킵니다.',
   'hudChrome.factionRewards.itemCooldown': '아직 사용할 수 없는 아이템입니다({minutes}분 남음).',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': '곰덫',
+  'entities.abilities.bear_trap.description':
+    '선택한 위치에 덫을 놓습니다. 덫은 0.75초 후 작동 준비되며 1분 동안 유지되고, 자신과 파티원만 볼 수 있습니다. 처음 발동시킨 적은 곰덫에 물려 15초에 걸쳐 83의 물리 피해와 원거리 전투력의 22.5%에 해당하는 출혈 피해를 입고, 4초 동안 이동 속도가 50% 감소합니다.',
+  'entities.abilities.scatterbolt.name': '산탄 볼트',
+  'entities.abilities.scatterbolt.description':
+    '전방 8미터 원뿔 범위에 볼트를 흩뿌려, 적중한 모든 적을 자신에게서 20미터 떨어질 때까지 밀쳐냅니다. 피해를 주지 않습니다.',
+  'entities.abilities.phosphor_flask.name': '인광 플라스크',
+  'entities.abilities.phosphor_flask.description':
+    '반응성 화학 혼합물을 담은 밀봉된 용기로, 8미터 지역에 3초 동안 백열하는 불길을 터뜨립니다. 불길 안에 서 있는 적은 0.5초마다 {damage}의 화염 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다.',
 };

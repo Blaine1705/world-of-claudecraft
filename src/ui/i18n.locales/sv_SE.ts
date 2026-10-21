@@ -16023,7 +16023,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passivt: Med Jaktfart förbereder Spårbrott ditt nästa Uppsprättande hugg eller Blodkrok i 12 sek. Uppsprättande hugg ger 15% mer skada per laddning. Blodkrok ger 18 till 24 extra fysisk skada, ökad med 15% per laddning och av avståndsanfallskraft. Vid 3 laddningar förbrukar vilket som helst av anfallen Jaktfart. (Överlevnad)',
   'entities.abilities.frostjaw_trap.description':
-    'Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
+    'Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
   'entities.abilities.hunting_momentum.description':
     'Passivt: Uppsprättande hugg och en Splitterladdning som träffar en fiende ger vardera 1 Jaktfart, upp till 3. Varar tills de används eller du lämnar strid, och varje laddning ökar rörelsehastigheten med 15%. Vid 3 laddningar ger Sårslitare 60% mer slagskada och förbrukar laddningarna. (Överlevnad)',
   'entities.abilities.measured_shot.description':
@@ -19981,7 +19981,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Förbrukar dina 5 Grönska: varje allierad med dina läkningseffekter över tid läks omedelbart med {buff}% av den läkning som återstod i effekterna, effekterna tas bort och målet får en ny Sporläkning.',
   'entities.abilities.play_dead.description':
-    'Fall till marken och spela död: din hälsa och ditt Fokus ser tomma ut för alla. Fiender glömmer dig, och fiendespelare som har dig som mål förlorar sitt mål. Rörelse, attacker eller andra förmågor avslutar effekten. Använd igen för att resa dig.',
+    'Fall till marken och se död ut: din hälsa och ditt fokus visas som tomma för alla. Fiender glömmer dig, och fientliga spelare som har dig som mål tappar sitt mål. Att röra dig, attackera eller använda en annan förmåga avslutar den. Kastas den medan du rör dig har du 1 sek på dig att stanna innan rörelsen avslutar den. Kasta igen för att resa dig.',
   'entities.abilities.play_dead.name': 'Spela död',
   'entities.abilities.rejuvenation.name': 'Sporläkning',
   'entities.abilities.scratch.description':
@@ -20045,4 +20045,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Du kan ändra detta när som helst i Alternativ, under Grafikkvalitet.',
   'graphicsPrompt.confirm': 'Fortsätt',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Björnfälla',
+  'entities.abilities.bear_trap.description':
+    'Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den drabbas när björnfällan slår igen: den blöder för 83 fysisk skada plus 22,5% av din distansattackkraft över 15 sek och saktas ned med 50% i 4 sek.',
+  'entities.abilities.scatterbolt.name': 'Spridbult',
+  'entities.abilities.scatterbolt.description':
+    'Avfyra en kaskad av bultar i en kon på 8 meter framför dig, som slår tillbaka varje träffad fiende tills den är 20 meter från dig. Gör ingen skada.',
+  'entities.abilities.phosphor_flask.name': 'Fosforflaska',
+  'entities.abilities.phosphor_flask.description':
+    'Ett förseglat kärl med en reaktiv kemisk blandning som flammar upp i vitglödande eld över ett område på 8 m i 3 sek. Fiender som står i lågorna tar {damage} eldskada var 0,5 sek. Skadan ökar med distansattackkraft.',
 };

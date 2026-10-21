@@ -16030,7 +16030,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasif: Av İvmesi varken İz Kırma sonraki Deşen Darbe veya Kanlı Çengel yeteneğini 12 sn için hazırlar. Deşen Darbe yük başına %15 daha fazla hasar verir. Kanlı Çengel, yük başına %15 ve Menzilli Saldırı Gücüyle artan 18 ila 24 ek Fiziksel hasar verir. 3 yükte her iki saldırıdan biri Av İvmesi yüklerini tüketir. (Hayatta Kalma)',
   'entities.abilities.frostjaw_trap.description':
-    'Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar.',
+    'Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar.',
   'entities.abilities.hunting_momentum.description':
     'Pasif: Deşen Darbe ve bir düşmana isabet eden Şarapnel Yükü birer Av İvmesi verir, en fazla 3. Harcanana veya savaştan çıkana kadar sürer ve her yük hareket hızını %15 artırır. 3 yükte Yara Yırtışı %60 daha fazla darbe hasarı verir ve yükleri tüketir. (Hayatta Kalma)',
   'entities.abilities.measured_shot.description':
@@ -19971,7 +19971,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     '5 Yeşilliğini harcar: zamana yayılan iyileştirme etkilerini taşıyan her müttefik, bu etkilerin kalan iyileştirmesinin %{buff} kadarıyla anında iyileştirilir; etkiler kaldırılır ve hedefe yeni bir Spor Şifası uygulanır.',
   'entities.abilities.play_dead.description':
-    'Yere düş ve ölü taklidi yap: canın ve Odak değerin herkese boş görünür. Düşmanlar seni unutur ve seni hedefleyen düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak etkiyi sona erdirir. Kalkmak için tekrar kullan.',
+    'Yere düşer ve ölü taklidi yaparsın: canın ve Odağın herkese boş görünür. Düşmanlar seni unutur ve seni hedef alan düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak bunu sonlandırır. Hareket ederken kullanırsan durmak için 1 sn süren olur, yoksa hareket bunu sonlandırır. Ayağa kalkmak için tekrar kullan.',
   'entities.abilities.play_dead.name': 'Ölü Taklidi',
   'entities.abilities.rejuvenation.name': 'Spor Şifası',
   'entities.abilities.scratch.description':
@@ -20035,4 +20035,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Bunu istediğin zaman Seçenekler içindeki Grafik Kalitesi bölümünden değiştirebilirsin.',
   'graphicsPrompt.confirm': 'Devam Et',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Ayı Kapanı',
+  'entities.abilities.bear_trap.description':
+    'Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman kapanan ayı kapanına yakalanır: 15 sn boyunca kanayarak 83 Fiziksel hasar artı menzilli saldırı gücünün 22,5% kadarını alır ve 4 sn boyunca 50% yavaşlar.',
+  'entities.abilities.scatterbolt.name': 'Saçma Oku',
+  'entities.abilities.scatterbolt.description':
+    'Önündeki 8 metrelik bir koniye bir ok sağanağı fırlatır ve isabet eden her düşmanı senden 20 metre uzaklaşana kadar geri savurur. Hasar vermez.',
+  'entities.abilities.phosphor_flask.name': 'Fosfor Şişesi',
+  'entities.abilities.phosphor_flask.description':
+    "Reaktif bir kimyasal karışım taşıyan mühürlü bir kap, 8 metrelik bir alanda 3 sn boyunca akkor beyaz alevlerle patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar menzilli saldırı gücüyle artar.",
 };

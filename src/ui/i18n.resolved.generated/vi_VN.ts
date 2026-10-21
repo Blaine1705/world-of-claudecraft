@@ -13285,6 +13285,10 @@ export const vi_VN: EnTranslations = {
         "name": "Loạt Tên",
         "description": "Trút mưa tên xuống một khu vực 8 m trong 3 giây. Kẻ địch trong khu vực chịu {damage} sát thương Vật Lý mỗi 0.5 giây. Sát thương tăng theo sức tấn công tầm xa."
       },
+      "phosphor_flask": {
+        "name": "Bình Phốt Pho",
+        "description": "Một chiếc bình kín chứa hỗn hợp hóa chất phản ứng, bùng lên thành ngọn lửa trắng nóng rực trên một khu vực 8 mét trong 3 giây. Kẻ địch đứng trong lửa chịu {damage} sát thương Lửa mỗi 0.5 giây. Sát thương tăng theo sức tấn công tầm xa."
+      },
       "pack_command": {
         "name": "Lệnh Bầy Đàn",
         "description": "Ra lệnh cho thú nuôi còn sống của bạn đánh gây 36 đến 48 sát thương Vật Lý. Sát thương tăng theo sức tấn công của thú nuôi. Một đòn trúng hồi 20 tập trung và ban 1 Hung Tính Bầy Đàn trong 30 giây, tối đa 3. Mỗi lớp tăng 10% toàn bộ sát thương thú nuôi của bạn gây ra. Đòn này dùng số lớp bạn có trước khi trúng."
@@ -13331,7 +13335,7 @@ export const vi_VN: EnTranslations = {
       },
       "play_dead": {
         "name": "Giả Chết",
-        "description": "Ngã xuống đất giả chết: máu và Tập Trung của bạn hiển thị trống với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang chọn bạn sẽ mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc. Dùng lại để đứng dậy."
+        "description": "Ngã xuống đất và trông như đã chết: sinh lực và Tập Trung của bạn hiển thị trống rỗng với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang nhắm vào bạn mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc hiệu ứng. Nếu thi triển khi đang di chuyển, bạn có 1 giây để dừng lại trước khi việc di chuyển kết thúc hiệu ứng. Thi triển lại để đứng dậy."
       },
       "tactical_camo": {
         "name": "Ngụy Trang Chiến Thuật",
@@ -13339,7 +13343,15 @@ export const vi_VN: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Bẫy Hàm Băng",
-        "description": "Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây."
+        "description": "Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây."
+      },
+      "bear_trap": {
+        "name": "Bẫy Gấu",
+        "description": "Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị bẫy gấu kẹp chặt: chảy máu chịu 83 sát thương Vật Lý cộng 22.5% sức tấn công tầm xa của bạn trong 15 giây và bị làm chậm 50% trong 4 giây."
+      },
+      "scatterbolt": {
+        "name": "Tên Nỏ Tán Xạ",
+        "description": "Bắn ra một loạt tên nỏ trong hình nón 8 mét phía trước bạn, đẩy lùi mọi kẻ địch trúng đòn cho đến khi chúng cách bạn 20 mét. Không gây sát thương."
       },
       "pack_rally": {
         "name": "Tập Hợp Bầy Đàn",

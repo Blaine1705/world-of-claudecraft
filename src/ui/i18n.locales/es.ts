@@ -16490,7 +16490,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasivo: Con Ímpetu de Caza, Quiebrasendas prepara tu siguiente Golpe Destripador o Garfio Sangriento durante 12 s. Golpe Destripador inflige un 15% más de daño por acumulación. Garfio Sangriento inflige de 18 a 24 de daño físico adicional, aumentado un 15% por acumulación y por el poder de ataque a distancia. Con 3 acumulaciones, cualquiera de los dos consume Ímpetu de Caza. (Supervivencia)',
   'entities.abilities.frostjaw_trap.description':
-    'Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo pueden verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Pasivo: Golpe Destripador y una Carga de Metralla que alcance a un enemigo otorgan 1 de Ímpetu de Caza cada uno, hasta 3. Dura hasta gastarse o salir de combate, y cada acumulación aumenta tu velocidad un 15%. Con 3 acumulaciones, Desgarro Cruento inflige un 60% más de daño de golpe y las consume. (Supervivencia)',
   'entities.abilities.measured_shot.description':
@@ -20391,7 +20391,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'entities.abilities.overbloom.specNote_restoration':
     'Consume tus 5 de Verdor: cada aliado con tus efectos de sanación periódica recibe al instante un {buff}% de la sanación que les quedaba, se eliminan los efectos y el objetivo recibe un nuevo Remiendo de Esporas.',
   'entities.abilities.play_dead.description':
-    'Cae al suelo y finge estar muerto: todos ven tu salud y tu Enfoque vacíos. Los enemigos te olvidan y los jugadores enemigos que te seleccionaban pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Vuelve a usarlo para levantarte.',
+    'Cae al suelo y finge estar muerto: tu salud y tu concentración se muestran vacías para todos. Los enemigos se olvidan de ti, y los jugadores enemigos que te tienen como objetivo pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Si lo lanzas en movimiento, tienes 1 s para detenerte antes de que el movimiento lo termine. Vuelve a lanzarlo para levantarte.',
   'entities.abilities.play_dead.name': 'Hacerse el muerto',
   'entities.abilities.rejuvenation.name': 'Remiendo de Esporas',
   'entities.abilities.scratch.description':
@@ -20462,4 +20462,14 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'El ajuste fijo con mayor calidad visual. Adecuado para una tarjeta gráfica de gama alta.',
   'graphicsPrompt.changeLater': 'Puedes cambiarlo cuando quieras en Opciones, en Calidad gráfica.',
   'graphicsPrompt.confirm': 'Continuar',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Trampa para Osos',
+  'entities.abilities.bear_trap.description':
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo pueden verla. El primer enemigo que la active sufre el cierre de la trampa para osos: sangra por 83 de daño Físico más un 22,5% de tu poder de ataque a distancia durante 15 s y queda ralentizado un 50% durante 4 s.',
+  'entities.abilities.scatterbolt.name': 'Ráfaga de Virotes',
+  'entities.abilities.scatterbolt.description':
+    'Dispara una ráfaga de virotes en un cono de 8 metros frente a ti, repeliendo a cada enemigo alcanzado hasta que esté a 20 metros de ti. No inflige daño.',
+  'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
+  'entities.abilities.phosphor_flask.description':
+    'Un recipiente sellado con una mezcla química reactiva que estalla en llamas al rojo blanco sobre un área de 8 m durante 3 s. Los enemigos que permanezcan en las llamas sufren {damage} de daño de Fuego cada 0,5 s. El daño aumenta con el poder de ataque a distancia.',
 };

@@ -16371,7 +16371,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     "Passivo: con Slancio di Caccia, Rompipista prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Colpo Sventratore infligge il 15% di danni in più per accumulo. Uncino Sanguinario infligge da 18 a 24 danni fisici aggiuntivi, aumentati del 15% per accumulo e dalla potenza d'attacco a distanza. Con 3 accumuli, uno qualunque dei due attacchi consuma Slancio di Caccia. (Sopravvivenza)",
   'entities.abilities.frostjaw_trap.description':
-    'Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
+    'Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
   'entities.abilities.hunting_momentum.description':
     "Passivo: Colpo Sventratore e una Carica a Frammentazione che colpisce un nemico forniscono ciascuno 1 Slancio di Caccia, fino a 3. Dura fino al consumo o all'uscita dal combattimento; ogni accumulo aumenta del 15% la velocità. Con 3 accumuli, Squarciaferite infligge il 60% di danni da colpo in più e li consuma. (Sopravvivenza)",
   'entities.abilities.measured_shot.description':
@@ -20373,7 +20373,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Consuma i tuoi 5 punti di Verzura: ogni alleato con i tuoi effetti di cura periodica riceve subito il {buff}% delle cure rimanenti, gli effetti vengono rimossi e il bersaglio riceve una nuova Cura delle Spore.',
   'entities.abilities.play_dead.description':
-    "Cadi a terra e fingi di essere morto: tutti vedono salute e Concentrazione vuote. I nemici ti dimenticano e i giocatori nemici che ti selezionano perdono il bersaglio. Muoversi, attaccare o usare un'altra abilità termina l'effetto. Usa di nuovo per rialzarti.",
+    "Cadi a terra e fingiti morto: la tua salute e la tua concentrazione risultano vuote per tutti. I nemici si dimenticano di te, e i giocatori nemici che ti hanno come bersaglio lo perdono. Muoverti, attaccare o usare un'altra abilità lo interrompe. Se lo lanci mentre ti muovi, hai 1 s per fermarti prima che il movimento lo interrompa. Lancialo di nuovo per rialzarti.",
   'entities.abilities.play_dead.name': 'Fingere la morte',
   'entities.abilities.rejuvenation.name': 'Cura delle Spore',
   'entities.abilities.scratch.description':
@@ -20448,4 +20448,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Puoi modificare questa scelta in qualsiasi momento in Opzioni, sotto Qualità grafica.',
   'graphicsPrompt.confirm': 'Continua',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Trappola per Orsi',
+  'entities.abilities.bear_trap.description':
+    "Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva subisce la chiusura della trappola per orsi: sanguina per 83 danni Fisici più il 22,5% della tua potenza d'attacco a distanza in 15 s e viene rallentato del 50% per 4 s.",
+  'entities.abilities.scatterbolt.name': 'Ventaglio di Dardi',
+  'entities.abilities.scatterbolt.description':
+    'Scaglia una raffica di dardi in un cono di 8 metri davanti a te, respingendo ogni nemico colpito finché non si trova a 20 metri da te. Non infligge danni.',
+  'entities.abilities.phosphor_flask.name': 'Fiasca di Fosforo',
+  'entities.abilities.phosphor_flask.description':
+    "Un recipiente sigillato contenente una miscela chimica reattiva che esplode in fiamme incandescenti su un'area di 8 m per 3 s. I nemici che restano tra le fiamme subiscono {damage} danni da Fuoco ogni 0,5 s. Il danno aumenta con la potenza d'attacco a distanza.",
 };

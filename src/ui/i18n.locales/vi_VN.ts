@@ -15919,7 +15919,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Bị động: Khi có Đà Săn, Cắt Dấu chuẩn bị Đòn Moi Ruột hoặc Móc Máu kế tiếp trong 12 giây. Đòn Moi Ruột gây thêm 15% sát thương mỗi cộng dồn. Móc Máu gây thêm 18 đến 24 sát thương Vật Lý, tăng 15% mỗi cộng dồn và theo Sức Mạnh Tấn Công Tầm Xa. Khi có 3 cộng dồn, một trong hai đòn tiêu hao Đà Săn. (Sinh Tồn)',
   'entities.abilities.frostjaw_trap.description':
-    'Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
+    'Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
   'entities.abilities.hunting_momentum.description':
     'Bị động: Đòn Moi Ruột và Đạn Mảnh đánh trúng địch mỗi kỹ năng cho 1 Đà Săn, tối đa 3. Kéo dài đến khi tiêu hao hoặc rời giao tranh; mỗi cộng dồn tăng 15% tốc độ di chuyển. Khi có 3 cộng dồn, Xé Vết Thương gây thêm 60% sát thương đòn đánh và tiêu hao cộng dồn. (Sinh Tồn)',
   'entities.abilities.measured_shot.description':
@@ -20047,7 +20047,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Tiêu hao 5 Sắc Xanh: mỗi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn được hồi ngay {buff}% lượng hồi máu còn lại, các hiệu ứng bị xóa và mục tiêu nhận Chữa Lành Bào Tử mới.',
   'entities.abilities.play_dead.description':
-    'Ngã xuống đất giả chết: máu và Tập Trung của bạn hiển thị trống với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang chọn bạn sẽ mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc. Dùng lại để đứng dậy.',
+    'Ngã xuống đất và trông như đã chết: sinh lực và Tập Trung của bạn hiển thị trống rỗng với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang nhắm vào bạn mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc hiệu ứng. Nếu thi triển khi đang di chuyển, bạn có 1 giây để dừng lại trước khi việc di chuyển kết thúc hiệu ứng. Thi triển lại để đứng dậy.',
   'entities.abilities.play_dead.name': 'Giả Chết',
   'entities.abilities.rejuvenation.name': 'Chữa Lành Bào Tử',
   'entities.abilities.scratch.description':
@@ -20117,4 +20117,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Bạn có thể thay đổi bất cứ lúc nào trong Tùy Chọn, ở mục Chất Lượng Đồ Họa.',
   'graphicsPrompt.confirm': 'Tiếp Tục',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Bẫy Gấu',
+  'entities.abilities.bear_trap.description':
+    'Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị bẫy gấu kẹp chặt: chảy máu chịu 83 sát thương Vật Lý cộng 22.5% sức tấn công tầm xa của bạn trong 15 giây và bị làm chậm 50% trong 4 giây.',
+  'entities.abilities.scatterbolt.name': 'Tên Nỏ Tán Xạ',
+  'entities.abilities.scatterbolt.description':
+    'Bắn ra một loạt tên nỏ trong hình nón 8 mét phía trước bạn, đẩy lùi mọi kẻ địch trúng đòn cho đến khi chúng cách bạn 20 mét. Không gây sát thương.',
+  'entities.abilities.phosphor_flask.name': 'Bình Phốt Pho',
+  'entities.abilities.phosphor_flask.description':
+    'Một chiếc bình kín chứa hỗn hợp hóa chất phản ứng, bùng lên thành ngọn lửa trắng nóng rực trên một khu vực 8 mét trong 3 giây. Kẻ địch đứng trong lửa chịu {damage} sát thương Lửa mỗi 0.5 giây. Sát thương tăng theo sức tấn công tầm xa.',
 };

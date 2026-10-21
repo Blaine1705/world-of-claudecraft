@@ -16149,7 +16149,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasywnie: Z Rozpęd Łowów zdolność Zerwanie Tropu przygotowuje twój następny Patroszące uderzenie lub Krwawy Hak na 12 s. Patroszące uderzenie zadaje o 15% więcej obrażeń na ładunek. Krwawy Hak zadaje dodatkowe 18 do 24 obrażeń fizycznych, zwiększone o 15% na ładunek i mocą ataku dystansowego. Przy 3 ładunkach każdy z tych ataków zużywa Rozpęd Łowów. (Przetrwanie)',
   'entities.abilities.frostjaw_trap.description':
-    'Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s.',
+    'Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Pasywnie: Patroszące uderzenie i Ładunek Odłamkowy trafiający wroga dają po 1 Rozpęd Łowów, do 3. Trwa do zużycia lub wyjścia z walki; każdy ładunek zwiększa szybkość ruchu o 15%. Przy 3 ładunkach Rozdarcie ran zadaje o 60% więcej obrażeń uderzenia i zużywa ładunki. (Przetrwanie)',
   'entities.abilities.measured_shot.description':
@@ -20127,7 +20127,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Zużywa twoje 5 punktów Zieleni: każdy sojusznik z twoimi efektami leczenia w czasie natychmiast odzyskuje {buff}% leczenia, które im pozostało. Efekty są usuwane, a cel otrzymuje nowe Zarodnikowe gojenie.',
   'entities.abilities.play_dead.description':
-    'Padnij na ziemię i udawaj martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie zapominają o tobie, a wrodzy gracze, którzy cię namierzyli, tracą cel. Ruch, atak lub użycie innej zdolności kończy ten stan. Użyj ponownie, aby wstać.',
+    'Padasz na ziemię i udajesz martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie o tobie zapominają, a wrodzy gracze, którzy mają cię w celu, tracą cel. Ruch, atak lub użycie innej umiejętności kończy efekt. Jeśli użyjesz jej w ruchu, masz 1 s na zatrzymanie się, zanim ruch ją przerwie. Użyj ponownie, aby wstać.',
   'entities.abilities.play_dead.name': 'Udawanie martwego',
   'entities.abilities.rejuvenation.name': 'Zarodnikowe gojenie',
   'entities.abilities.scratch.description':
@@ -20201,4 +20201,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Możesz to zmienić w dowolnej chwili w Opcjach, w sekcji Jakość grafiki.',
   'graphicsPrompt.confirm': 'Kontynuuj',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Pułapka na Niedźwiedzie',
+  'entities.abilities.bear_trap.description':
+    'Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje pochwycony przez zatrzaskującą się pułapkę: krwawi, otrzymując 83 obrażeń Fizycznych plus 22,5% twojej mocy ataku dystansowego przez 15 s, i zostaje spowolniony o 50% na 4 s.',
+  'entities.abilities.scatterbolt.name': 'Rozpryskowy Bełt',
+  'entities.abilities.scatterbolt.description':
+    'Wystrzeliwuje grad bełtów w stożku 8 m przed tobą, odrzucając każdego trafionego wroga, aż znajdzie się 20 metrów od ciebie. Nie zadaje obrażeń.',
+  'entities.abilities.phosphor_flask.name': 'Fosforowa Kolba',
+  'entities.abilities.phosphor_flask.description':
+    'Zapieczętowane naczynie z reaktywną mieszanką chemiczną, która przez 3 s wybucha białym, rozżarzonym płomieniem na obszarze 8 m. Wrogowie stojący w płomieniach otrzymują {damage} obrażeń od ognia co 0,5 s. Obrażenia rosną z mocą ataku dystansowego.',
 };

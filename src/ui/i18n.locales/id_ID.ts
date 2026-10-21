@@ -16037,7 +16037,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasif: Dengan Momentum Berburu, Putus Jejak menyiapkan Serangan Cabik Perut atau Kait Darah berikutnya selama 12 dtk. Serangan Cabik Perut memberikan 15% kerusakan tambahan per tumpukan. Kait Darah memberikan tambahan 18 hingga 24 kerusakan Fisik, ditingkatkan 15% per tumpukan dan oleh Daya Serang Jarak Jauh. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Bertahan Hidup)',
   'entities.abilities.frostjaw_trap.description':
-    'Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
+    'Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
   'entities.abilities.hunting_momentum.description':
     'Pasif: Serangan Cabik Perut dan Muatan Serpihan yang mengenai musuh masing-masing memberi 1 Momentum Berburu, maksimal 3. Bertahan hingga dihabiskan atau kamu keluar dari pertempuran; setiap tumpukan meningkatkan kecepatan gerak sebesar 15%. Pada 3 tumpukan, Robekan Luka memberikan 60% kerusakan serangan lebih besar dan menghabiskan tumpukan. (Bertahan Hidup)',
   'entities.abilities.measured_shot.description':
@@ -20203,7 +20203,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Menghabiskan 5 Kehijauanmu: setiap sekutu dengan efek penyembuhan berkalamu langsung dipulihkan sebesar {buff}% sisa penyembuhannya, efek tersebut dihapus, dan target mendapat Pemulihan Spora baru.',
   'entities.abilities.play_dead.description':
-    'Jatuhkan diri dan pura-pura mati: kesehatan dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target. Bergerak, menyerang, atau memakai kemampuan lain mengakhirinya. Gunakan lagi untuk bangkit.',
+    'Menjatuhkan diri ke tanah dan tampak mati: nyawa dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target mereka. Bergerak, menyerang, atau menggunakan kemampuan lain mengakhirinya. Jika digunakan saat bergerak, kamu punya 1 dtk untuk berhenti sebelum gerakan mengakhirinya. Gunakan lagi untuk bangun.',
   'entities.abilities.play_dead.name': 'Pura-pura Mati',
   'entities.abilities.rejuvenation.name': 'Pemulihan Spora',
   'entities.abilities.scratch.description':
@@ -20274,4 +20274,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Preset tetap dengan tampilan paling kaya. Cocok untuk kartu grafis kelas atas.',
   'graphicsPrompt.changeLater': 'Kamu bisa mengubahnya kapan saja di Opsi, pada Kualitas Grafik.',
   'graphicsPrompt.confirm': 'Lanjutkan',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Jerat Beruang',
+  'entities.abilities.bear_trap.description':
+    'Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terjepit jerat beruang yang menutup: ia berdarah sebesar 83 kerusakan Fisik ditambah 22,5% kekuatan serang jarak jauhmu selama 15 dtk dan diperlambat 50% selama 4 dtk.',
+  'entities.abilities.scatterbolt.name': 'Panah Sebar',
+  'entities.abilities.scatterbolt.description':
+    'Menembakkan semburan anak panah dalam kerucut 8 meter di depanmu, mendorong mundur setiap musuh yang terkena hingga berjarak 20 meter darimu. Tidak memberi kerusakan.',
+  'entities.abilities.phosphor_flask.name': 'Labu Fosfor',
+  'entities.abilities.phosphor_flask.description':
+    'Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh.',
 };

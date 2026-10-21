@@ -13285,6 +13285,10 @@ export const fr_CA: EnTranslations = {
         "name": "Volée de flèches",
         "description": "Fait pleuvoir des flèches sur une zone de 8 m pendant 3 s. Les ennemis dans la zone subissent {damage} points de dégâts Physiques toutes les 0.5 s. Les dégâts augmentent avec la puissance d'attaque à distance."
       },
+      "phosphor_flask": {
+        "name": "Fiole de phosphore",
+        "description": "Un récipient scellé contenant un mélange chimique réactif qui s'embrase en flammes chauffées à blanc sur une zone de 8 m pendant 3 s. Les ennemis qui se tiennent dans les flammes subissent {damage} points de dégâts de Feu toutes les 0,5 s. Les dégâts augmentent avec la puissance d'attaque à distance."
+      },
       "pack_command": {
         "name": "Ordre de meute",
         "description": "Ordonne à votre familier vivant de frapper pour 36 à 48 points de dégâts Physiques. Les dégâts augmentent avec la puissance d'attaque du familier. Un coup au but restaure 20 concentration et octroie 1 Férocité de meute pendant 30 s, jusqu'à 3. Chaque cumul augmente de 10% tous les dégâts infligés par votre familier. Cette frappe utilise les cumuls que vous aviez avant le coup."
@@ -13331,7 +13335,7 @@ export const fr_CA: EnTranslations = {
       },
       "play_dead": {
         "name": "Feindre la mort",
-        "description": "Tombez au sol en feignant la mort : votre santé et votre Focalisation apparaissent vides à tous. Les ennemis vous oublient et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité met fin à l'effet. Relancez pour vous relever."
+        "description": "Tombez au sol et faites le mort : vos points de vie et votre concentration s'affichent comme vides pour tout le monde. Les ennemis vous oublient, et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité y met fin. Si vous l'incantez en mouvement, vous avez 1 s pour vous arrêter avant que le déplacement n'y mette fin. Relancez pour vous relever."
       },
       "tactical_camo": {
         "name": "Camouflage tactique",
@@ -13339,7 +13343,15 @@ export const fr_CA: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Piège Mâchegivre",
-        "description": "Pose un piège sur l'ennemi sélectionné ou à vos pieds. Il s'arme après 0,75 s et dure 30 s. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s."
+        "description": "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s."
+      },
+      "bear_trap": {
+        "name": "Piège à ours",
+        "description": "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est pris dans les mâchoires du piège à ours : il saigne pour 83 points de dégâts Physiques plus 22,5% de votre puissance d'attaque à distance sur 15 s et est ralenti de 50% pendant 4 s."
+      },
+      "scatterbolt": {
+        "name": "Gerbe de carreaux",
+        "description": "Tire une gerbe de carreaux dans un cône de 8 mètres devant vous, repoussant chaque ennemi touché jusqu'à ce qu'il se trouve à 20 mètres de vous. N'inflige aucun dégât."
       },
       "pack_rally": {
         "name": "Ralliement de meute",

@@ -15080,7 +15080,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passiv: Mit Jagdschwung bereitet Pfadbruch deinen nächsten Ausweidender Hieb oder Bluthaken für 12 Sek. vor. Ausweidender Hieb verursacht pro Stufe 15% mehr Schaden. Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% je Stufe und durch Distanzangriffskraft. Bei 3 Stufen verbraucht jeder dieser Angriffe Jagdschwung. (Überleben)',
   'entities.abilities.frostjaw_trap.description':
-    'Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
+    'Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
   'entities.abilities.hunting_momentum.description':
     'Passiv: Ausweidender Hieb und eine Splitterladung, die einen Gegner trifft, gewähren jeweils 1 Jagdschwung, bis zu 3. Hält bis zum Verbrauch oder bis du den Kampf verlässt; jede Stufe erhöht dein Bewegungstempo um 15%. Bei 3 Stufen verursacht Wundriss 60% mehr Schlagschaden und verbraucht die Stufen. (Überleben)',
   'entities.abilities.measured_shot.description':
@@ -20402,7 +20402,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Verbraucht deine 5 Grünkraft: Jeder Verbündete mit deinen Heilung-über-Zeit-Effekten wird sofort um {buff}% ihrer verbleibenden Heilung geheilt, die Effekte werden entfernt und das Ziel erhält eine neue Sporenheilung.',
   'entities.abilities.play_dead.description':
-    'Lass dich zu Boden fallen und stelle dich tot: Allen werden deine Gesundheit und dein Fokus als leer angezeigt. Gegner vergessen dich, und gegnerische Spieler verlieren dich als Ziel. Bewegung, Angriff oder eine andere Fähigkeit beendet dies. Erneut wirken, um aufzustehen.',
+    'Lässt Euch zu Boden fallen und tot erscheinen: Eure Gesundheit und Euer Fokus werden für alle als leer angezeigt. Gegner vergessen Euch, und gegnerische Spieler, die Euch anvisieren, verlieren ihr Ziel. Bewegen, Angreifen oder der Einsatz einer anderen Fähigkeit beendet den Effekt. Wirkt Ihr es in Bewegung, habt Ihr 1 Sek. Zeit, anzuhalten, bevor die Bewegung es beendet. Erneut wirken, um aufzustehen.',
   'entities.abilities.play_dead.name': 'Totstellen',
   'entities.abilities.rejuvenation.name': 'Sporenheilung',
   'entities.abilities.scratch.description':
@@ -20477,4 +20477,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Du kannst dies jederzeit in den Optionen unter Grafikqualität ändern.',
   'graphicsPrompt.confirm': 'Weiter',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Bärenfalle',
+  'entities.abilities.bear_trap.description':
+    'Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird von der zuschnappenden Bärenfalle erfasst: Er blutet über 15 Sek. für 83 physischen Schaden plus 22,5% Eurer Distanzangriffskraft und wird 4 Sek. lang um 50% verlangsamt.',
+  'entities.abilities.scatterbolt.name': 'Streubolzen',
+  'entities.abilities.scatterbolt.description':
+    'Feuert eine Bolzensalve in einem Kegel von 8 Metern vor Euch ab und stößt jeden getroffenen Gegner zurück, bis er 20 Meter von Euch entfernt ist. Verursacht keinen Schaden.',
+  'entities.abilities.phosphor_flask.name': 'Phosphorflasche',
+  'entities.abilities.phosphor_flask.description':
+    'Ein versiegeltes Gefäß mit einer reaktiven Chemikalienmischung, die 3 Sek. lang über einen Bereich von 8 m in weißglühende Flammen aufgeht. Gegner in den Flammen erleiden alle 0,5 Sek. {damage} Feuerschaden. Der Schaden steigt mit der Distanzangriffskraft.',
 };

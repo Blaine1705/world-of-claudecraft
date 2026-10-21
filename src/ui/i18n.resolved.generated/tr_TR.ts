@@ -13285,6 +13285,10 @@ export const tr_TR: EnTranslations = {
         "name": "Ok Yağmuru",
         "description": "3 sn boyunca 8 m'lik bir alana ok yağdırır. Alandaki düşmanlar her 0.5 sn'de {damage} Fiziksel hasar alır. Hasar menzilli saldırı gücüyle artar."
       },
+      "phosphor_flask": {
+        "name": "Fosfor Şişesi",
+        "description": "Reaktif bir kimyasal karışım taşıyan mühürlü bir kap, 8 metrelik bir alanda 3 sn boyunca akkor beyaz alevlerle patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar menzilli saldırı gücüyle artar."
+      },
       "pack_command": {
         "name": "Sürü Emri",
         "description": "Yaşayan evcil hayvanına 36 ila 48 Fiziksel hasar vurması için emir verir. Hasar evcil hayvanın saldırı gücüyle artar. İsabet 20 odak geri kazandırır ve 30 sn boyunca 1 Sürü Vahşeti verir, en fazla 3. Her katman evcil hayvanının verdiği tüm hasarı 10% artırır. Bu vuruş, isabetten önceki katmanlarını kullanır."
@@ -13331,7 +13335,7 @@ export const tr_TR: EnTranslations = {
       },
       "play_dead": {
         "name": "Ölü Taklidi",
-        "description": "Yere düş ve ölü taklidi yap: canın ve Odak değerin herkese boş görünür. Düşmanlar seni unutur ve seni hedefleyen düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak etkiyi sona erdirir. Kalkmak için tekrar kullan."
+        "description": "Yere düşer ve ölü taklidi yaparsın: canın ve Odağın herkese boş görünür. Düşmanlar seni unutur ve seni hedef alan düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak bunu sonlandırır. Hareket ederken kullanırsan durmak için 1 sn süren olur, yoksa hareket bunu sonlandırır. Ayağa kalkmak için tekrar kullan."
       },
       "tactical_camo": {
         "name": "Taktik Kamuflaj",
@@ -13339,7 +13343,15 @@ export const tr_TR: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Buzçene Tuzağı",
-        "description": "Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar."
+        "description": "Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar."
+      },
+      "bear_trap": {
+        "name": "Ayı Kapanı",
+        "description": "Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman kapanan ayı kapanına yakalanır: 15 sn boyunca kanayarak 83 Fiziksel hasar artı menzilli saldırı gücünün 22,5% kadarını alır ve 4 sn boyunca 50% yavaşlar."
+      },
+      "scatterbolt": {
+        "name": "Saçma Oku",
+        "description": "Önündeki 8 metrelik bir koniye bir ok sağanağı fırlatır ve isabet eden her düşmanı senden 20 metre uzaklaşana kadar geri savurur. Hasar vermez."
       },
       "pack_rally": {
         "name": "Sürü Toplanması",

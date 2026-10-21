@@ -13285,6 +13285,10 @@ export const de_DE: EnTranslations = {
         "name": "Pfeilhagel",
         "description": "Lässt 3 Sek. lang Pfeile über einen Bereich von 8 m niedergehen. Gegner darin erleiden alle 0.5 Sek. {damage} physischen Schaden. Der Schaden steigt mit der Distanzangriffskraft."
       },
+      "phosphor_flask": {
+        "name": "Phosphorflasche",
+        "description": "Ein versiegeltes Gefäß mit einer reaktiven Chemikalienmischung, die 3 Sek. lang über einen Bereich von 8 m in weißglühende Flammen aufgeht. Gegner in den Flammen erleiden alle 0,5 Sek. {damage} Feuerschaden. Der Schaden steigt mit der Distanzangriffskraft."
+      },
       "pack_command": {
         "name": "Rudelbefehl",
         "description": "Befiehlt Eurem lebenden Begleiter, für 36 bis 48 physischen Schaden zuzuschlagen. Der Schaden steigt mit der Angriffskraft des Begleiters. Ein Treffer stellt 20 Fokus wieder her und gewährt 30 Sek. lang 1 Rudelwildheit, bis zu 3. Jeder Stapel erhöht allen von Eurem Begleiter verursachten Schaden um 10%. Dieser Schlag nutzt die Stapel, die Ihr vor dem Treffer hattet."
@@ -13331,7 +13335,7 @@ export const de_DE: EnTranslations = {
       },
       "play_dead": {
         "name": "Totstellen",
-        "description": "Lass dich zu Boden fallen und stelle dich tot: Allen werden deine Gesundheit und dein Fokus als leer angezeigt. Gegner vergessen dich, und gegnerische Spieler verlieren dich als Ziel. Bewegung, Angriff oder eine andere Fähigkeit beendet dies. Erneut wirken, um aufzustehen."
+        "description": "Lässt Euch zu Boden fallen und tot erscheinen: Eure Gesundheit und Euer Fokus werden für alle als leer angezeigt. Gegner vergessen Euch, und gegnerische Spieler, die Euch anvisieren, verlieren ihr Ziel. Bewegen, Angreifen oder der Einsatz einer anderen Fähigkeit beendet den Effekt. Wirkt Ihr es in Bewegung, habt Ihr 1 Sek. Zeit, anzuhalten, bevor die Bewegung es beendet. Erneut wirken, um aufzustehen."
       },
       "tactical_camo": {
         "name": "Taktische Tarnung",
@@ -13339,7 +13343,15 @@ export const de_DE: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Frostkieferfalle",
-        "description": "Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt."
+        "description": "Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt."
+      },
+      "bear_trap": {
+        "name": "Bärenfalle",
+        "description": "Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird von der zuschnappenden Bärenfalle erfasst: Er blutet über 15 Sek. für 83 physischen Schaden plus 22,5% Eurer Distanzangriffskraft und wird 4 Sek. lang um 50% verlangsamt."
+      },
+      "scatterbolt": {
+        "name": "Streubolzen",
+        "description": "Feuert eine Bolzensalve in einem Kegel von 8 Metern vor Euch ab und stößt jeden getroffenen Gegner zurück, bis er 20 Meter von Euch entfernt ist. Verursacht keinen Schaden."
       },
       "pack_rally": {
         "name": "Rudelsammlung",

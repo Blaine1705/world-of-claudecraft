@@ -13285,6 +13285,10 @@ export const pl_PL: EnTranslations = {
         "name": "Salwa",
         "description": "Spuszcza deszcz strzał na obszar 8 m przez 3 s. Wrogowie w obszarze otrzymują {damage} obrażeń fizycznych co 0.5 s. Obrażenia rosną z mocą ataku dystansowego."
       },
+      "phosphor_flask": {
+        "name": "Fosforowa Kolba",
+        "description": "Zapieczętowane naczynie z reaktywną mieszanką chemiczną, która przez 3 s wybucha białym, rozżarzonym płomieniem na obszarze 8 m. Wrogowie stojący w płomieniach otrzymują {damage} obrażeń od ognia co 0,5 s. Obrażenia rosną z mocą ataku dystansowego."
+      },
       "pack_command": {
         "name": "Rozkaz Sfory",
         "description": "Rozkazuje twojemu żywemu towarzyszowi uderzyć za 36 do 48 obrażeń Fizycznych. Obrażenia rosną wraz z mocą ataku towarzysza. Trafienie odnawia 20 skupienia i przyznaje 1 Zaciekłość Sfory na 30 s, do 3. Każdy ładunek zwiększa wszystkie obrażenia twojego towarzysza o 10%. To uderzenie korzysta z ładunków sprzed trafienia."
@@ -13331,7 +13335,7 @@ export const pl_PL: EnTranslations = {
       },
       "play_dead": {
         "name": "Udawanie martwego",
-        "description": "Padnij na ziemię i udawaj martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie zapominają o tobie, a wrodzy gracze, którzy cię namierzyli, tracą cel. Ruch, atak lub użycie innej zdolności kończy ten stan. Użyj ponownie, aby wstać."
+        "description": "Padasz na ziemię i udajesz martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie o tobie zapominają, a wrodzy gracze, którzy mają cię w celu, tracą cel. Ruch, atak lub użycie innej umiejętności kończy efekt. Jeśli użyjesz jej w ruchu, masz 1 s na zatrzymanie się, zanim ruch ją przerwie. Użyj ponownie, aby wstać."
       },
       "tactical_camo": {
         "name": "Kamuflaż taktyczny",
@@ -13339,7 +13343,15 @@ export const pl_PL: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "Pułapka Mroźnej Paszczy",
-        "description": "Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s."
+        "description": "Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s."
+      },
+      "bear_trap": {
+        "name": "Pułapka na Niedźwiedzie",
+        "description": "Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje pochwycony przez zatrzaskującą się pułapkę: krwawi, otrzymując 83 obrażeń Fizycznych plus 22,5% twojej mocy ataku dystansowego przez 15 s, i zostaje spowolniony o 50% na 4 s."
+      },
+      "scatterbolt": {
+        "name": "Rozpryskowy Bełt",
+        "description": "Wystrzeliwuje grad bełtów w stożku 8 m przed tobą, odrzucając każdego trafionego wroga, aż znajdzie się 20 metrów od ciebie. Nie zadaje obrażeń."
       },
       "pack_rally": {
         "name": "Zbiórka Sfory",

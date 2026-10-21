@@ -88,7 +88,8 @@ const SECOND_PASS_RECORD_SHA256 =
   // Spore Burst (spore_burst) and the Nature's Boon passive (natures_boon)
   // advance it 409 -> 411 the same way.
   // Fieldcraft's Play Dead and Tactical Camo advance it 411 -> 413 the same way.
-  'ef4c19a9529272baf1065b00693512484750f4127a75bc2780874e1fd64400de';
+  // Bear Trap, Scatterbolt and Phosphor Flask advance it 413 -> 416.
+  'b37dc011f28aae2d7b47f537d2c95787127242ee8971bd78ebf5c95e0c124f3d';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -386,7 +387,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // the release arm's two new abilities riding the v0.40.0 sync merge.
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
-        abilities: { live: 413, painted: 413 },
+        abilities: { live: 416, painted: 416 },
         // 76 at the first v0.42.0 sync: the release's one new hotbar item, the
         // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
         // the census and ships committed painted art, so painted moves with
@@ -493,7 +494,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(413);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(416);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',
