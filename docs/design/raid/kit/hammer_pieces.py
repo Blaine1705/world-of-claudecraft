@@ -550,9 +550,11 @@ def floor_crack(variant):
             ang += rng.uniform(-0.12, 0.12) + (rng.choice([-1, 1]) * rng.uniform(0.4, 0.8) if rng.random() < 0.15 else 0)
             nx, ny = x + math.cos(ang) * seg, y + math.sin(ang) * seg
             ww = w * (1 - i / n * 0.8)
+            # Paper thin (phase 2D): at 2C's 0.036 the sides caught the low sun
+            # and the cracks read as sticks lying on the floor.
             with p.as_kind(PAINT):
-                p.box(((x + nx) / 2, (y + ny) / 2, 0.018), (seg * 1.08, max(0.03, ww), 0.036),
-                      mix(QUARRY_DARK, QUARRY_DEEP, 0.55), yaw=ang)
+                p.box(((x + nx) / 2, (y + ny) / 2, 0.006), (seg * 1.08, max(0.03, ww), 0.012),
+                      mix(QUARRY_DARK, QUARRY_DEEP, 0.75), yaw=ang)
             if ww > 0.06 and rng.random() < 0.25:
                 side = rng.choice([-1, 1])
                 ox, oy = -math.sin(ang) * side * (ww + 0.12), math.cos(ang) * side * (ww + 0.12)
