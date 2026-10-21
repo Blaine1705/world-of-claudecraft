@@ -56,22 +56,20 @@ describe('the world quest champion encore', () => {
     expect(worldQuestOffersChampion(WORLD_QUESTS_BY_ID.wq_eastbrook_shadow)).toBe(false);
   });
 
-  it('rises inside every offering quest area, an authored site on open lawn', () => {
+  it('rises at an open spot inside every offering quest area, never in the hedge maze', () => {
     for (const quest of WORLD_QUESTS) {
       if (!worldQuestOffersChampion(quest)) continue;
       const site = worldQuestChampionSite(quest);
-      expect(
-        Math.hypot(site.x - quest.area.x, site.z - quest.area.z),
-        quest.id,
-      ).toBeLessThanOrEqual(quest.area.radius);
       if (!quest.championAt) {
         expect(site, quest.id).toEqual({
           x: quest.area.x + TUNING.offsetYards,
           z: quest.area.z + TUNING.offsetYards,
         });
-        continue;
       }
-      // An authored site exists to dodge an unfit centre, so it must be open.
+      expect(
+        Math.hypot(site.x - quest.area.x, site.z - quest.area.z),
+        quest.id,
+      ).toBeLessThanOrEqual(quest.area.radius);
       expect(inGardenMaze(site.x, site.z), quest.id).toBe(false);
       expect(isBlocked(WORLD_SEED, site.x, site.z, 1.5), quest.id).toBe(false);
     }
