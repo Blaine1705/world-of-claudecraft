@@ -1080,7 +1080,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Bạn cũng sẽ nhận được:',
   'hudChrome.weekly.anyDifficulty': 'Bất kỳ độ khó nào',
   'hudChrome.weekly.cacheDesc':
-    'Mở thành một mảnh trang phục Cấp độ Bình thường cho lớp của bạn (không bao giờ là mảnh trang phục phân tầng), cộng với {count} x {item}.',
+    'Mở thành một mảnh trang phục Cấp độ Bình thường cho lớp của bạn (không bao giờ là mảnh trang phục phân tầng của Ignivar), cộng với {count} x {item}.',
   'hudChrome.weekly.choose': 'Chọn nhiệm vụ',
   'hudChrome.weekly.chosen': 'Nhiệm vụ hàng tuần đã chọn: {category}',
   'hudChrome.weekly.close': 'Đóng nhiệm vụ hàng tuần',

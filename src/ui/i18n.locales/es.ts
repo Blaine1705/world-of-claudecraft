@@ -974,7 +974,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'También recibirás:',
   'hudChrome.weekly.anyDifficulty': 'Cualquier dificultad',
   'hudChrome.weekly.cacheDesc':
-    'Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango), más {count} x {item}.',
+    'Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango de Ignivar), más {count} x {item}.',
   'hudChrome.weekly.choose': 'Elegir misión',
   'hudChrome.weekly.chosen': 'Misión semanal aceptada: {category}',
   'hudChrome.weekly.close': 'Cerrar misiones semanales',

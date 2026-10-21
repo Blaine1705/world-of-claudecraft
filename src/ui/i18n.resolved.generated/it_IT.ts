@@ -6609,7 +6609,7 @@ export const it_IT: EnTranslations = {
       "rewards": "Ricompense",
       "alsoReceive": "Riceverai anche:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set), più {count} x {item}.",
+      "cacheDesc": "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set di Ignivar), più {count} x {item}.",
       "dialogNote": "Solo un incarico settimanale può essere attivo. {reset}",
       "accept": "Accetta",
       "decline": "Rifiuta",

@@ -6609,7 +6609,7 @@ export const fr_FR: EnTranslations = {
       "rewards": "Récompenses",
       "alsoReceive": "Vous recevrez aussi :",
       "tally": "{count} / {required}",
-      "cacheDesc": "S'ouvre sur une pièce de raid Normal pour votre classe (jamais une pièce d'ensemble), plus {count} x {item}.",
+      "cacheDesc": "S'ouvre sur une pièce de raid Normal pour votre classe (jamais une pièce d'ensemble d'Ignivar), plus {count} x {item}.",
       "dialogNote": "Une seule charge hebdomadaire peut être active. Elle {reset}",
       "accept": "Accepter",
       "decline": "Refuser",

@@ -6609,7 +6609,7 @@ export const zh_TW: EnTranslations = {
       "rewards": "獎勵",
       "alsoReceive": "你還將獲得：",
       "tally": "{count} / {required}",
-      "cacheDesc": "開啟後獲得一件你職業可用的普通團隊副本裝備（不含套裝），外加{count}個{item}。",
+      "cacheDesc": "開啟後獲得一件你職業可用的普通團隊副本裝備（不含伊格尼瓦套裝），外加{count}個{item}。",
       "dialogNote": "同一時間只能有一項每週委託生效。它{reset}",
       "accept": "接受",
       "decline": "拒絕",

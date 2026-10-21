@@ -1097,7 +1097,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Kamu juga akan menerima:',
   'hudChrome.weekly.anyDifficulty': 'Kesulitan apa pun',
   'hudChrome.weekly.cacheDesc':
-    'Membuka satu potongan serangan Normal untuk kelasmu (tidak pernah potongan set tingkat), plus {count} x {item}.',
+    'Membuka satu potongan serangan Normal untuk kelasmu (tidak pernah potongan set tingkat Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Pilih misi',
   'hudChrome.weekly.chosen': 'Misi mingguan diambil: {category}',
   'hudChrome.weekly.close': 'Tutup misi mingguan',

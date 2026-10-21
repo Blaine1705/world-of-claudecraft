@@ -6609,7 +6609,7 @@ export const pt_BR: EnTranslations = {
       "rewards": "Recompensas",
       "alsoReceive": "Você também receberá:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto), além de {count} x {item}.",
+      "cacheDesc": "Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto do Ignivar), além de {count} x {item}.",
       "dialogNote": "Apenas um encargo semanal pode estar ativo. Ele {reset}",
       "accept": "Aceitar",
       "decline": "Recusar",

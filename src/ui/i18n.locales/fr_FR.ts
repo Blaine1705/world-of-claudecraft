@@ -1131,7 +1131,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Vous recevrez aussi :',
   'hudChrome.weekly.anyDifficulty': 'Toute difficulté',
   'hudChrome.weekly.cacheDesc':
-    "S'ouvre sur une pièce de raid Normal pour votre classe (jamais une pièce d'ensemble), plus {count} x {item}.",
+    "S'ouvre sur une pièce de raid Normal pour votre classe (jamais une pièce d'ensemble d'Ignivar), plus {count} x {item}.",
   'hudChrome.weekly.choose': 'Choisir la quête',
   'hudChrome.weekly.chosen': 'Quête hebdomadaire prise : {category}',
   'hudChrome.weekly.close': 'Fermer les quêtes hebdomadaires',

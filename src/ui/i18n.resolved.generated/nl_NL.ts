@@ -6609,7 +6609,7 @@ export const nl_NL: EnTranslations = {
       "rewards": "Beloningen",
       "alsoReceive": "Je krijgt ook:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opent naar één Normaal raid-item voor je klas (nooit een setpiece), plus {count} x {item}.",
+      "cacheDesc": "Opent naar één Normaal raid-item voor je klas (nooit een setpiece van Ignivar), plus {count} x {item}.",
       "dialogNote": "Slechts één weeklijkse lading kan actief zijn. Het {reset}",
       "accept": "Accepteer",
       "decline": "Afwijzen",

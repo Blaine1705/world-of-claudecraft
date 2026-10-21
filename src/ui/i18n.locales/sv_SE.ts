@@ -1080,7 +1080,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Du får också:',
   'hudChrome.weekly.anyDifficulty': 'Vilken svårighetsgrad som helst',
   'hudChrome.weekly.cacheDesc':
-    'Öppnas till en Normal raidkläder för din klass (aldrig en setkläder), plus {count} x {item}.',
+    'Öppnas till ett Normalt raidplagg för din klass (aldrig ett setplagg från Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Välj uppdrag',
   'hudChrome.weekly.chosen': 'Veckouppdrag taget: {category}',
   'hudChrome.weekly.close': 'Stäng veckoupdrag',

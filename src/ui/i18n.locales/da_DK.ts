@@ -1084,7 +1084,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Du vil også modtage:',
   'hudChrome.weekly.anyDifficulty': 'Enhver sværhedsgrad',
   'hudChrome.weekly.cacheDesc':
-    'Åbner til ét Normalt raid-stykke for din klasse (aldrig et tier-set-stykke), plus {count} x {item}.',
+    'Åbner til ét Normalt raid-stykke for din klasse (aldrig et tier-set-stykke fra Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Vælg quest',
   'hudChrome.weekly.chosen': 'Ugentlig quest taget: {category}',
   'hudChrome.weekly.close': 'Luk ugentlige quester',

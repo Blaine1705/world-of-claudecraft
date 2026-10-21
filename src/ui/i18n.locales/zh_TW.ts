@@ -17742,7 +17742,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': '你還將獲得：',
   'hudChrome.weekly.tally': '{count} / {required}',
   'hudChrome.weekly.cacheDesc':
-    '開啟後獲得一件你職業可用的普通團隊副本裝備（不含套裝），外加{count}個{item}。',
+    '開啟後獲得一件你職業可用的普通團隊副本裝備（不含伊格尼瓦套裝），外加{count}個{item}。',
   'hudChrome.weekly.dialogNote': '同一時間只能有一項每週委託生效。它{reset}',
   'hudChrome.weekly.accept': '接受',
   'hudChrome.weekly.decline': '拒絕',

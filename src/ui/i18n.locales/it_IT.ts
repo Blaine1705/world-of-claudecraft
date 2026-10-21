@@ -1279,7 +1279,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Riceverai anche:',
   'hudChrome.weekly.anyDifficulty': 'Qualsiasi difficoltà',
   'hudChrome.weekly.cacheDesc':
-    "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set), più {count} x {item}.",
+    "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set di Ignivar), più {count} x {item}.",
   'hudChrome.weekly.choose': 'Scegli missione',
   'hudChrome.weekly.chosen': 'Missione settimanale presa: {category}',
   'hudChrome.weekly.close': 'Chiudi le missioni settimanali',

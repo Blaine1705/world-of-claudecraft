@@ -1202,7 +1202,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Du erhältst außerdem:',
   'hudChrome.weekly.anyDifficulty': 'Beliebiger Schwierigkeitsgrad',
   'hudChrome.weekly.cacheDesc':
-    'Öffnet sich zu einem Normal-Schlachtzugsteil für deine Klasse (nie ein Set-Teil), plus {count} x {item}.',
+    'Öffnet sich zu einem Normal-Schlachtzugsteil für deine Klasse (nie ein Set-Teil von Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Quest wählen',
   'hudChrome.weekly.chosen': 'Wochenquest angenommen: {category}',
   'hudChrome.weekly.close': 'Wochenquests schließen',

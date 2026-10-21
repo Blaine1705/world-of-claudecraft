@@ -6609,7 +6609,7 @@ export const pl_PL: EnTranslations = {
       "rewards": "Nagrody",
       "alsoReceive": "Otrzymasz także:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Otwiera się na jeden kawałek ze zwykłego rajdu dla twojej klasy (nigdy kawałek zestawu tier), plus {count} x {item}.",
+      "cacheDesc": "Otwiera się na jeden kawałek ze zwykłego rajdu dla twojej klasy (nigdy kawałek zestawu tier Ignivara), plus {count} x {item}.",
       "dialogNote": "Tylko jeden tygodniowy przydział może być aktywny. {reset}",
       "accept": "Zaakceptuj",
       "decline": "Odrzuć",

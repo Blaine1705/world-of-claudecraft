@@ -1080,7 +1080,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Ayrıca alacaksın:',
   'hudChrome.weekly.anyDifficulty': 'Herhangi bir zorluk',
   'hudChrome.weekly.cacheDesc':
-    'Sınıfın için bir Normal baskın parçası (asla tier-set parçası değil) artı {count} x {item} açılır.',
+    'Sınıfın için bir Normal baskın parçası (asla Ignivar tier-set parçası değil) artı {count} x {item} açılır.',
   'hudChrome.weekly.choose': 'Görevi seç',
   'hudChrome.weekly.chosen': 'Haftalık görev seçildi: {category}',
   'hudChrome.weekly.close': 'Haftalık görevleri kapat',

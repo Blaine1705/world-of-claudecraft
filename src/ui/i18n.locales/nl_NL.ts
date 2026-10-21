@@ -1098,7 +1098,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Je krijgt ook:',
   'hudChrome.weekly.anyDifficulty': 'Willekeurige moeilijkheidsgraad',
   'hudChrome.weekly.cacheDesc':
-    'Opent naar één Normaal raid-item voor je klas (nooit een setpiece), plus {count} x {item}.',
+    'Opent naar één Normaal raid-item voor je klas (nooit een setpiece van Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Kies quest',
   'hudChrome.weekly.chosen': 'Weeklijkse quest genomen: {category}',
   'hudChrome.weekly.close': 'Sluit weekelijkse quests',
