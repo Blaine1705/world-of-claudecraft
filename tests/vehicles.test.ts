@@ -10,6 +10,7 @@ import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { type SimEvent, TICK_RATE } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { applyWorldQuestReroll } from '../src/sim/world_quest_reroll';
 import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 import { worldQuestCopperReward } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -226,5 +227,36 @@ describe('authoritative personal vehicles', () => {
     expect(save).not.toHaveProperty('vehicle');
     expect(save).not.toHaveProperty('vehicleRetryAtTick');
     expect(JSON.stringify(save)).not.toContain('slowUntilTick');
+  });
+
+  it('admits a station quest that arrived through the daily reroll', () => {
+    // The Drakelands slot rotates a non-vehicle quest, so no station is in the
+    // shared rotation; the character's own reroll swapped in the Last Keep.
+    const rotatingId = 'wq_drakelands_raiders';
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'mage' });
+    const player = sim.player;
+    const meta = sim.meta(player.id)!;
+    sim.setPlayerLevel(WORLD_QUESTS_BY_ID[LAST_KEEP_CANNON.questId].minLevel);
+    meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', rotatingId);
+    sim.tick();
+    applyWorldQuestReroll(
+      meta,
+      rotatingId,
+      WORLD_QUESTS_BY_ID[LAST_KEEP_CANNON.questId],
+      meta.worldQuestCycle,
+    );
+    player.pos = {
+      x: LAST_KEEP_CANNON.x,
+      z: LAST_KEEP_CANNON.z + 2,
+      y: terrainHeight(LAST_KEEP_CANNON.x, LAST_KEEP_CANNON.z + 2, WORLD_SEED),
+    };
+    player.prevPos = { ...player.pos };
+    sim.tick();
+    expect(meta.worldQuestLog.get(LAST_KEEP_CANNON.questId)?.state).toBe('active');
+    expect(sim.entities.get(LAST_KEEP_CANNON.entityId)?.templateId).toBe(LAST_KEEP_CANNON.id);
+    expect(sim.pickUpObject(LAST_KEEP_CANNON.entityId)).toBe(true);
+    expect(sim.vehicleSession?.stationId).toBe(LAST_KEEP_CANNON.id);
+    sim.tick();
+    expect(sim.vehicleSession?.stationId).toBe(LAST_KEEP_CANNON.id);
   });
 });
