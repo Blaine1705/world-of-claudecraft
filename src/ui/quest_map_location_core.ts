@@ -7,7 +7,7 @@
 // discarded the selected quest entirely. Both go through here, so the two controls
 // can never disagree about where a quest lives. DOM-free and i18n-free.
 
-import { NPCS, QUESTS } from '../sim/data';
+import { getActiveWorldContent, QUESTS } from '../sim/data';
 import { questObjectiveAreas } from '../sim/quest_targets';
 import type { QuestProgress } from '../sim/types';
 import { ownEntry } from './known_item';
@@ -65,6 +65,7 @@ export function questMapLocation(
   const npcId = progress.state === 'ready' ? quest.turnInNpcId : quest.giverNpcId;
   const live = livePos?.(npcId);
   if (live) return { questId, x: live.x, z: live.z };
-  const npc = NPCS[npcId];
+  // Where the loaded world stands the NPC (a Studio map may move one).
+  const npc = getActiveWorldContent().npcs[npcId];
   return npc ? { questId, x: npc.pos.x, z: npc.pos.z } : null;
 }
