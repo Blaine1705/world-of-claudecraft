@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
+import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
@@ -57,7 +57,7 @@ describe('the world quest champion encore', () => {
   });
 
   it('rises at an open spot inside every offering quest area, never in the hedge maze', () => {
-    for (const quest of WORLD_QUESTS) {
+    for (const quest of Object.values(WORLD_QUESTS_BY_ID)) {
       if (!worldQuestOffersChampion(quest)) continue;
       const site = worldQuestChampionSite(quest);
       expect(TUNING.offsetYards).toBe(8);
