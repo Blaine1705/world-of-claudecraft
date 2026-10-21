@@ -278,3 +278,26 @@ def drill_line(p, a, b, r, spacing, color=QUARRY_DEEP, out=(0, -1, 0)):
     for i in range(n + 1):
         q = a.lerp(b, i / n) + o * 0.02
         p.box(tuple(q), tuple(size), color)
+
+
+def light_chain(p, a, b, pitch, ring, bar, color, sag=0.0):
+    """A chain from a to b sagging by `sag`, its links a quarter turn apart
+    and cut from few facets (a chain drawn by the dozen: a rail, a hoist's
+    fall). Returns the last link's end."""
+    from gwkit import chain_link
+    a, b = Vector(a), Vector(b)
+    count = max(1, int((b - a).length / pitch))
+    half = pitch * 0.5 - ring + bar * 2.0
+    q1 = a
+    for i in range(count):
+        t0, t1 = i / count, (i + 1) / count
+        q0 = a.lerp(b, t0) - Vector((0, 0, sag * 4 * t0 * (1 - t0)))
+        q1 = a.lerp(b, t1) - Vector((0, 0, sag * 4 * t1 * (1 - t1)))
+        u = (q1 - q0).normalized()
+        side = u.cross(Vector((0, 0, 1)))
+        if side.length < 1e-3:
+            side = Vector((1, 0, 0))
+        side.normalize()
+        up = side.cross(u).normalized()
+        chain_link(p, (q0 + q1) / 2, u, up if i % 2 else side, max(0.05, half), ring, bar, color, sides=5, segs=3)
+    return q1

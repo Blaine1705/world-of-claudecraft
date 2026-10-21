@@ -1,0 +1,645 @@
+"""The Smith's Heart's mountain rock kit, SCULPTED (build_smith_heart_rock_kit.py).
+
+Phase 2E: the raid's mountain is one heightfield, and from the walks its
+walls read as huge flat faceted planes. This kit is the rock that skins it:
+modular faces of Stormcrag's own granite (never the quarry's worked benches:
+this is the mountain as the weather left it), stacked up the slope in bands
+by the runtime (src/render/smith_heart/heart_rock_plan_core.ts) so the
+heightfield only ever shows as the dark between them.
+
+Each piece is a signed-distance field (the sculpt primitives of
+jaguar_head_sculpt.py and gravewyrm_sculpt.py) meshed once through OpenVDB:
+  - the face is a few great leaning slabs of every width, each its own bed of
+    the granite, the joints between them cut deep (big readable planes, the
+    three-value read: lit tops, mid faces, dark joints);
+  - the beds step back as they rise, so ledges run across the face and the
+    low sun catches them; a parting cut along each;
+  - wedges broken off the corners along oblique planes, a crack or two down
+    through the beds, now and then an overhang over a shadowed undercut;
+  - the crest broken into teeth and shoulders, falling back into the
+    mountain; scree and boulders lying on the ledges (each stone set on the
+    rock the field finds under it, nothing hangs);
+  - the weather (RockPiece.finish): worn crests chipped pale, joints and
+    hollows deep cool grey (never black), rain streaks under every ledge,
+    the warm dust and a rust lichen only where they settle, on the tops.
+
+Frame (the kit's): yards, +Z up, the face toward -Y. A face piece's origin is
+on its FRONT plane at its foot's centre: nothing of it stands in front of
+y = 0 (the runtime keeps that plane on the clearance line, so no camera
+behind a player at a lip is ever inside rock), the body runs back to +Y.
+
+Deterministic: every noise is seeded, nothing reads the clock.
+"""
+import math
+
+import numpy as np
+
+import gravewyrm_sculpt as gs
+from gravewyrm_sculpt import Planes, Polyline, RoundBox, Sculpt, block
+from gwkit import add_sculpt, crystal, mix, sstep
+from hckit import STONE, _fbm
+from jaguar_head_sculpt import Noise, smax
+from shkit import DUST, GRIME, QUARRY_RED, RAW, SPiece, TAU
+
+# ---- the granite (sRGB) ------------------------------------------------------------
+# Stormcrag's granite as the mountain wears it: cool mid greys with a warm
+# grey bed here and there (warm and cool greys mix, M5), a paler weathered
+# skin on the big slabs, the dark of the joints a cool blue-grey. The warm
+# lives in the low sun, the dust and a little rust lichen on the tops.
+GRANITE = (0.4, 0.39, 0.39)
+GRANITE_COOL = (0.35, 0.35, 0.37)
+GRANITE_WARM = (0.44, 0.41, 0.38)
+GRANITE_PALE = (0.5, 0.48, 0.46)
+GRANITE_DARK = (0.29, 0.29, 0.31)
+GRANITE_DEEP = (0.19, 0.19, 0.21)
+LICHEN = (0.62, 0.45, 0.24)
+LICHEN_GREY = (0.6, 0.6, 0.55)
+
+ROCK_COLOURS = {
+    'g0': GRANITE,
+    'g1': GRANITE_COOL,
+    'g2': GRANITE_WARM,
+    'g3': mix(GRANITE, GRANITE_PALE, 0.5),
+    'g4': mix(GRANITE_COOL, GRANITE_DARK, 0.5),
+    'g5': mix(GRANITE, GRANITE_WARM, 0.5),
+    'deep': mix(GRANITE_DARK, GRANITE_DEEP, 0.25),
+    'body': mix(GRANITE_COOL, GRANITE_DARK, 0.55),
+}
+ROCK_KINDS = {k: RAW for k in ROCK_COLOURS}
+BED_TONES = ('g0', 'g5', 'g1', 'g2', 'g0', 'g3', 'g4')
+
+
+# ---- the weather ----------------------------------------------------------------------
+class RockPiece(SPiece):
+    """SPiece with the mountain's own weather on its RAW faces: the big value
+    groups first (pale worn crests, mid faces, deep cool joints), rain
+    streaks hanging under every ledge, lichen and dust only on the tops."""
+
+    def __init__(self, name, seed=0, **kw):
+        kw.setdefault('ao', 0.8)
+        super().__init__(name, seed=seed, **kw)
+
+    def finish(self, materials, parent):
+        import bmesh
+        from mathutils import Vector
+        bm = self.bm
+        if getattr(self, 'front_zero', None) is not None and bm.verts:
+            # The front plane: the most forward rock at y = 0 (read off the
+            # sculpt, so a piece's far build shares its near build's frame).
+            y0 = self.front_zero
+            for v in bm.verts:
+                v.co.y -= y0
+        # The winding first, on the closed sculpt (an open shell's would be
+        # guessed, and could turn a whole piece inside out).
+        free = [f for f in bm.faces if not f[self.keep]]
+        if free:
+            bmesh.ops.recalc_face_normals(bm, faces=free)
+        if getattr(self, 'open_back', False) and bm.faces:
+            # The back of the piece (deep in the mountain, never seen from a
+            # walk) is left open: a camera zoomed far out behind a player at
+            # the rim of an arena stands behind the rock and must see through
+            # it, as it does through the heightfield (faces culled from
+            # inside), never a flat wall.
+            bm.normal_update()
+            back = max(v.co.y for v in bm.verts)
+            gone = [f for f in bm.faces
+                    if f.normal.y > 0.55 and f.calc_center_median().y > back * 0.45]
+            bmesh.ops.delete(bm, geom=gone, context='FACES')
+        bm.normal_update()
+        bm.verts.index_update()
+        floor = min(v.co.z for v in bm.verts) if bm.verts else 0.0
+        top = max(v.co.z for v in bm.verts) if bm.verts else 1.0
+        span = max(0.5, top - floor)
+        conv = [0.0] * len(bm.verts)
+        for v in bm.verts:
+            if not v.link_edges:
+                continue
+            mean = Vector()
+            length = 0.0
+            for e in v.link_edges:
+                mean += e.other_vert(v).co
+                length += e.calc_length()
+            n = len(v.link_edges)
+            mean /= n
+            length = max(1e-3, length / n)
+            conv[v.index] = max(-1.0, min(1.0, (v.co - mean).dot(v.normal) / length * 1.6))
+        occ = self._bake_ao(span) if self.ao > 0 else None
+        # Rain streaks: under every overhanging face (a downward normal) the
+        # face below darkens in vertical runs. Sampled per vertex from the
+        # nearest overhang above it (a coarse column test on the mesh).
+        overhang = []
+        for f in bm.faces:
+            if f.normal.z < -0.35 and f.calc_area() > 0.05:
+                c = f.calc_center_median()
+                overhang.append((c.x, c.y, c.z))
+        oh = np.array(overhang) if overhang else np.zeros((0, 3))
+        for face in bm.faces:
+            if face.material_index != STONE:
+                continue
+            fn = face.normal
+            for loop in face.loops:
+                n = loop.vert.normal if face.smooth else fn
+                p = loop.vert.co
+                c = conv[loop.vert.index]
+                r, g, b, _ = loop[self.col]
+                col = (r, g, b)
+                height = p.z - floor
+                up = max(0.0, n.z)
+                # Broad tone drift (the slab's own weathered skin), the beds,
+                # a soft darkening down to the foot (the mountain's shade).
+                tone = 0.86 + 0.26 * _fbm(p.x * 0.09 + 3.0, p.y * 0.09, p.z * 0.07)
+                bed = 0.96 + 0.06 * math.sin(p.z * 1.3 + _fbm(p.x * 0.05, p.y * 0.05, p.z * 0.05) * 6.0)
+                foot = 0.8 + 0.2 * min(1.0, height / max(3.0, span * 0.3))
+                under = 0.82 if n.z < -0.3 else 1.0
+                # Chipped light edges and deep joints: the convexity carries
+                # the value range (big groups, never a speckle).
+                wear = 1.0 + 0.4 * max(0.0, c) - 0.55 * max(0.0, -c)
+                k = tone * bed * foot * under * wear
+                col = tuple(ch * k for ch in col)
+                # Rain streaks under an overhang, on the faces that stand
+                # upright below it.
+                if len(oh) and abs(n.z) < 0.6:
+                    dx = oh[:, 0] - p.x
+                    dy = oh[:, 1] - p.y
+                    dz = oh[:, 2] - p.z
+                    near = (np.abs(dx) < 1.6) & (np.abs(dy) < 2.2) & (dz > 0.3) & (dz < 9.0)
+                    if near.any():
+                        fade = 1.0 - float(dz[near].min()) / 9.0
+                        run = 0.55 + 0.45 * _fbm(p.x * 1.7 + 9.0, p.y * 1.7, 0.0)
+                        col = mix(col, GRIME, min(0.42, 0.42 * fade * run))
+                # Iron stain in a few beds.
+                stain = sstep(0.66, 0.84, _fbm(p.x * 0.1 + 3.0, p.y * 0.1, p.z * 0.45))
+                col = mix(col, QUARRY_RED, stain * 0.16)
+                # The tops: warm dust drifts and rust and grey lichen, only
+                # where they settle (M6).
+                patch = _fbm(p.x * 0.6 + 11.0, p.y * 0.6 - 5.0, p.z * 0.6)
+                dust = sstep(0.6, 0.93, n.z) * (0.35 + 0.65 * patch)
+                col = mix(col, DUST, min(0.32, dust * 0.36 * self.dust))
+                lich = sstep(0.4, 0.8, n.z) * sstep(0.55, 0.75, _fbm(p.x * 0.9 - 7.0, p.y * 0.9, p.z * 0.9))
+                col = mix(col, LICHEN if patch > 0.5 else LICHEN_GREY, min(0.45, lich * 0.55))
+                if occ is not None:
+                    o = occ[loop.vert.index] * self.ao
+                    col = tuple(ch * (1 - 0.7 * o) for ch in col)
+                # Never black (L6): the deepest joint keeps a cool grey.
+                col = tuple(max(lo, ch) for ch, lo in zip(col, (0.1, 0.1, 0.125)))
+                loop[self.col] = (min(1.0, col[0]), min(1.0, col[1]), min(1.0, col[2]), 1.0)
+        # Crisp where the rock breaks, soft over a slab's swell: smooth
+        # shading with every edge sharper than SHARP marked (the big planes
+        # read as planes, the decimation never as facets).
+        for e in bm.edges:
+            if len(e.link_faces) == 2:
+                a, b2 = e.link_faces
+                if a.normal.angle(b2.normal, 0.0) > SHARP:
+                    e.smooth = False
+        mesh = __import__('bpy').data.meshes.new(self.name)
+        bm.to_mesh(mesh)
+        bm.free()
+        for mat in materials:
+            mesh.materials.append(mat)
+        mesh.color_attributes.active_color = mesh.color_attributes[0]
+        mesh.color_attributes.render_color_index = 0
+        bpy = __import__('bpy')
+        obj = bpy.data.objects.new(self.name, mesh)
+        bpy.context.scene.collection.objects.link(obj)
+        obj.parent = parent
+        return obj
+
+
+SHARP = math.radians(28)
+
+
+def RP(name, **kw):
+    return RockPiece('Kit_' + name, **kw)
+
+
+# A piece's near and far builds mesh the SAME sculpt (built once per run).
+_FIELDS = {}
+
+
+def _sculpt_once(key, build):
+    if key not in _FIELDS:
+        _FIELDS[key] = build()
+    return _FIELDS[key]
+
+
+def front_of(f):
+    """The most forward y the sculpt's rock reaches (its front plane)."""
+    inside = np.nonzero((f.d < 0).any(axis=(0, 2)))[0]
+    return float(f.axes[1][inside[0]]) if len(inside) else 0.0
+
+
+# ---- field helpers ---------------------------------------------------------------------
+def _axes(f):
+    return f.axes[0][:, None, None], f.axes[1][None, :, None], f.axes[2][None, None, :]
+
+
+def clamp_front(f, y0=0.0, k=0.25):
+    """Nothing in front of the plane y = y0 (softly rounded where it bites)."""
+    _X, Y, _Z = _axes(f)
+    f.d = smax(f.d, (y0 - Y).astype(np.float32) + np.zeros_like(f.d), k)
+
+
+def clamp_below(f, z0=0.0):
+    _X, _Y, Z = _axes(f)
+    f.d = np.maximum(f.d, (z0 - Z).astype(np.float32))
+
+
+class Lens(Planes):
+    """The part of a ball (centre c, radius r) past a plane through c with
+    outward normal n: a spall knocked off the rock, leaving one flat
+    oblique facet and a broken rim."""
+
+    def __init__(self, c, n, r):
+        n = np.asarray(n, dtype=np.float64)
+        n = n / np.linalg.norm(n)
+        super().__init__(c, [tuple(-n)], [0.0])
+        self.r = float(r)
+        self.lo = self.c - self.r
+        self.hi = self.c + self.r
+
+    def dist(self, X, Y, Z):
+        plane = super().dist(X, Y, Z)
+        ball = np.sqrt((X - self.c[0]) ** 2 + (Y - self.c[1]) ** 2 + (Z - self.c[2]) ** 2) - self.r
+        return np.maximum(plane, ball)
+
+
+def wedge(f, rng, c, n, r, k=0.08):
+    """Knock a spall off the rock at c (on or just inside its surface): the
+    big oblique fracture facets a weathered face shows."""
+    f.sub(Lens(c, n, r), k)
+
+
+def crest(f, W, H, D, rng, seed, peaks=2, lift=0.0, fall=0.35, rough=1.1):
+    """Shape the top: a ridge falling back into the mountain, low shoulders
+    at the ends, a few unequal peaks and notches, a broken jag along it."""
+    X, Y, Z = _axes(f)
+    nc = Noise(seed + 31)
+    xs = np.sort(rng.uniform(-W * 0.36, W * 0.36, peaks))
+    # Broad, low peaks (phase 2E review: tall narrow ones read as a skyline
+    # of teeth from across the fissure).
+    pk = [(c, H * rng.uniform(0.04, 0.09), W * rng.uniform(0.18, 0.3), W * rng.uniform(0.18, 0.3)) for c in xs]
+    notches = [((xs[i] + xs[i + 1]) / 2 + rng.uniform(-1, 1), H * rng.uniform(0.05, 0.1), W * rng.uniform(0.04, 0.07))
+               for i in range(len(xs) - 1) if rng.random() < 0.75]
+    tilt = rng.uniform(-0.1, 0.1)
+    yr = D * 0.45
+
+    def z_of(Xa, Ya):
+        t = np.clip(Xa / (W / 2), -1.3, 1.3)
+        z = (H * (0.86 + lift)) * (1 - 0.16 * np.abs(t) ** 3) * (1 + tilt * t)
+        for (c, a, wl, wr) in pk:
+            w = np.where(Xa < c, wl, wr)
+            z = z + a * np.maximum(0.0, 1 - ((Xa - c) / w) ** 2 - ((Ya - yr) / (1.2 * w)) ** 2)
+        for (c, a, w) in notches:
+            z = z - a * np.maximum(0.0, 1 - np.abs(Xa - c) / w)
+        z = z + rough * (nc.ridged(Xa * 0.14, Ya * 0.12, 1.0, 2) - 0.5) + 0.8 * nc.fbm(Xa * 0.06, Ya * 0.06, 2.0, 2)
+        # The brink at the front sits a little under the ridge, the back
+        # falls away gently into the mountain.
+        return z - np.maximum(0.0, yr - Ya) * fall - np.maximum(0.0, Ya - yr) * 0.15
+
+    f.d = np.maximum(f.d, ((Z - z_of(X, Y)) * 0.6).astype(np.float32))
+
+
+def weather(f, seed, amp=1.0, band=2.0):
+    """The mountain's own unevenness: a broad swell (no face is ever a plane),
+    ridged fracture facets at medium frequency, a fine chatter."""
+    n1, n2 = Noise(seed), Noise(seed + 5)
+    f.displace(lambda X, Y, Z: 0.9 * n2.fbm(X * 0.035 + 4.2, Y * 0.035, Z * 0.03, 2)
+               + amp * (0.5 * n1.fbm(X * 0.07 + 1.7, Y * 0.07, Z * 0.05, 2)
+                                      + 0.32 * (n1.ridged(X * 0.2, Y * 0.2, Z * 0.26, 2) - 0.45)
+                                      + 0.07 * n2.fbm(X * 0.9, Y * 0.9, Z * 0.9, 2)), band=band)
+
+
+def ground_on(f, x, y, z_top, z_bot=0.0, step=0.2):
+    """The rock's top under (x, y) (None if it misses)."""
+    zs = np.arange(z_top, z_bot, -step)
+    P = np.stack([np.full_like(zs, x), np.full_like(zs, y), zs], axis=1)
+    d = f.sample(P)
+    hit = np.nonzero(d < 0)[0]
+    return float(zs[hit[0]]) if len(hit) else None
+
+
+def scree(p, f, rng, x0, x1, y0, y1, z_top, count, size=(0.4, 1.3), flat=0.5, z_min=1.0):
+    """Stones fallen from the face, lying in heaps on its ledges and its
+    crest wherever the rock lies flat (each set on the rock under it)."""
+    placed = 0
+    tries = 0
+    while placed < count and tries < count * 8:
+        tries += 1
+        cx = float(rng.uniform(x0, x1))
+        cy = float(rng.uniform(y0, y1))
+        g = ground_on(f, cx, cy, z_top)
+        if g is None or g < z_min:
+            continue
+        gx, gy = ground_on(f, cx + 0.8, cy, z_top), ground_on(f, cx, cy + 0.8, z_top)
+        if gx is None or gy is None or max(abs(gx - g), abs(gy - g)) > flat:
+            continue
+        for j in range(int(rng.integers(2, 6))):
+            x = cx + float(rng.uniform(-1.6, 1.6))
+            y = cy + float(rng.uniform(-0.8, 0.8))
+            gg = ground_on(f, x, y, z_top)
+            if gg is None or abs(gg - g) > 1.2 or y < 0.3:
+                continue
+            s = float(rng.uniform(*size)) * (1.6 if j == 0 else 1.0)
+            tone = (GRANITE, GRANITE_COOL, GRANITE_DARK, GRANITE_WARM)[int(rng.integers(0, 4))]
+            crystal(p, (x, y, gg + s * 0.25), (s * 1.3, s * 1.05, s * 0.62), p.vary(tone, 0.06), n=12, boxy=0.5,
+                    jitter=0.2, yaw=float(rng.uniform(0, TAU)), pitch=float(rng.uniform(-0.3, 0.3)), floor=gg - 0.15)
+        placed += 1
+
+
+# ---- the pieces -------------------------------------------------------------------------
+def _segments(rng, W, wmin, wmax):
+    """Split [-W/2, W/2] into unequal widths (a great slab beside narrow ones)."""
+    xs = [-W / 2]
+    while xs[-1] < W / 2 - wmin:
+        xs.append(min(W / 2, xs[-1] + float(rng.uniform(wmin, wmax))))
+    xs[-1] = W / 2
+    return list(zip(xs[:-1], xs[1:]))
+
+
+class Body(gs.Prim if hasattr(gs, 'Prim') else object):
+    """The band's own mass: everything behind its front surface (a function
+    of x and z), back to the depth D, above the foot."""
+
+    def __init__(self, front, lo, hi, D, half=None):
+        self.front = front
+        self.D = D
+        self.half = half
+        self.lo = np.asarray(lo, dtype=np.float64)
+        self.hi = np.asarray(hi, dtype=np.float64)
+
+    def dist(self, X, Y, Z):
+        d = np.maximum((self.front(X, Z) - Y) * 0.75, Y - self.D)
+        return d if self.half is None else np.maximum(d, np.abs(X) - self.half)
+
+    def at(self, P):
+        return self.dist(P[:, 0], P[:, 1], P[:, 2])
+
+
+def rock_face(bpy, p, name, seed, W, H, D, beds=3, overhang=False, peaks=2, lift=0.0, wedges=0, target=4200,
+              voxel=0.2, scree_n=4, ends=True, lean=0.06, relief=1.0, plate=(5.5, 13.0), thick=(2.8, 6.5),
+              dip=0.14, key=None):
+    """A band of the mountain's face (see the module doc): the band's own
+    mass, its front a slow wave leaning back as it rises, and on it the
+    plates of the granite's beds, stacked up the face, each broken to its
+    own outline, dipping a little and overlapping its neighbours (never a
+    grid: no two rows share a joint), standing out of the mass by up to a
+    yard and a half; then cracks, an overhang, the crest and the weather.
+    Returns p."""
+    def build():
+        rng = np.random.default_rng(seed)
+        f = Sculpt((-W / 2 - 3.0, -2.0, -0.6), (W / 2 + 3.0, D + 2.0, H * 1.25 + 2.0), voxel)
+        nf = Noise(seed + 3)
+
+        def front_v(X, Z):
+            # The face's line: wavy across, leaning back as it rises, the ends
+            # turned back into the mountain.
+            # (The ends turn right back to the body's back: a piece left at
+            # the end of a run, or seen past a spur, shows rock falling away,
+            # never a flat cut.)
+            t = np.abs(X) / (W / 2)
+            return (relief * (0.5 + 0.5 * nf.fbm(X * 0.09, X * 0.0, Z * 0.07, 2)) + Z * lean
+                    + (np.maximum(0.0, t - 0.72) * 9.0 + np.maximum(0.0, t - 0.86) ** 1.5 * D * 9.0
+                       if ends else 0.0))
+
+        def front(x, z):
+            return float(front_v(np.array(x), np.array(z)))
+
+        f.put('body', Body(lambda X, Z: front_v(X, Z) + 1.1, (-W / 2 - 3.0, -2.0, -0.6),
+                           (W / 2 + 3.0, D + 2.0, H * 1.25 + 2.0), D), 0.0)
+        # The beds' dip: one way across the whole piece (strata run on), each
+        # plate a breath off it.
+        dip0 = float(rng.uniform(-dip, dip))
+        z = -0.5
+        row = 0
+        while z < H * 1.12:
+            t = float(rng.uniform(*thick)) * (1.25 if z < H * 0.3 else 1.0)
+            bed = BED_TONES[int(rng.integers(0, len(BED_TONES)))]
+            x = -W / 2 - 2.0 - float(rng.uniform(0, plate[0]))
+            while x < W / 2 + 2.0:
+                # A great slab now and then among the plates (big planes first).
+                big = rng.random() < 0.28
+                w = float(rng.uniform(plate[1], plate[1] * 1.6)) if big else float(rng.uniform(*plate))
+                cx = x + w / 2
+                th = t * float(rng.uniform(1.3, 2.0) if big else rng.uniform(0.8, 1.25))
+                cz = z + th / 2 + float(rng.uniform(-0.9, 0.6))
+                d = D * float(rng.uniform(0.35, 0.55))
+                fy = front(cx, cz) + float(rng.uniform(-0.35, 0.9))
+                # Turned and tipped each its own way (a weathered bed is
+                # never a course of masonry), more the smaller it is.
+                tip = 0.06 if big else 0.13
+                R = gs.rot(rx=float(rng.uniform(-0.1, 0.05)), ry=dip0 + float(rng.uniform(-tip, tip)),
+                           rz=float(rng.uniform(-tip, tip)))
+                label = bed if rng.random() < 0.7 else BED_TONES[int(rng.integers(0, len(BED_TONES)))]
+                # Now and then a plate is missing (fallen): the mass shows.
+                if rng.random() > 0.1:
+                    f.put(label, block(rng, (cx, fy + d / 2, cz), (w, d, th), cuts=14, chamfer=(0.6, 0.9), R=R,
+                                       top_tilt=0.22), 0.02)
+                    # A crack across the bigger plates (no long straight edge
+                    # survives the weather).
+                    if w > 6.0 and rng.random() < 0.6:
+                        sx = cx + float(rng.uniform(-w * 0.3, w * 0.3))
+                        lean_c = float(rng.uniform(-0.6, 0.6))
+                        f.groove(Polyline([(sx - lean_c * th * 0.5, fy - 0.05, cz - th * 0.55),
+                                           (sx + lean_c * th * 0.5, fy - 0.05, cz + th * 0.55)], 0.04),
+                                 0.3, 0.12)
+                x += w * float(rng.uniform(0.6, 0.95))
+            z += t * float(rng.uniform(0.72, 0.95))
+            row += 1
+        # Cracks down through the blocks.
+        for _ in range(int(rng.integers(1, 3))):
+            cx = float(rng.uniform(-W * 0.35, W * 0.35))
+            pts = []
+            z = H * float(rng.uniform(0.6, 1.0))
+            z_end = H * float(rng.uniform(0.0, 0.35))
+            while z > z_end:
+                pts.append((cx, front(cx, z), z))
+                cx += float(rng.uniform(-0.7, 0.7))
+                z -= float(rng.uniform(1.0, 2.4))
+            if len(pts) > 1:
+                for dy in (0.4, 1.4, 2.4):
+                    f.groove(Polyline([(x, y + dy, z) for (x, y, z) in pts], 0.06), 0.4, 0.15)
+        # An overhang: a great slab of a bed jutting out over the face below
+        # (its own shadow is the undercut).
+        if overhang:
+            ow = float(rng.uniform(W * 0.3, W * 0.45))
+            ox = float(rng.uniform(-W / 2 + ow / 2, W / 2 - ow / 2))
+            oz = H * float(rng.uniform(0.58, 0.72))
+            fy = front(ox, oz)
+            f.put('g4', block(rng, (ox, fy + 1.4, oz), (ow, 5.0, 2.2), cuts=12, chamfer=(0.7, 0.92),
+                              R=gs.rot(rx=0.08, ry=dip0, rz=float(rng.uniform(-0.12, 0.12)))), 0.05)
+        crest(f, W, H, D, rng, seed, peaks=peaks, lift=lift)
+        weather(f, seed, amp=0.22)
+        clamp_below(f, 0.0)
+        return f
+
+    f = _sculpt_once(key or name, build)
+    rng = np.random.default_rng(seed + 77)
+    verts, faces = gs.mesh_sculpt(f, bpy, name, target)
+    add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    if scree_n:
+        scree(p, f, rng, -W / 2 + 1.5, W / 2 - 1.5, 0.6, D * 0.8, H * 1.3, scree_n)
+    p.front_zero = front_of(f)
+    p.open_back = True
+    return p
+
+
+def rock_lip(bpy, p, name, seed, W, H, D, out=0.3, target=1100, voxel=0.18, key=None, grain=1.0):
+    """A module of a walk's side where it falls into the chasm (the rock
+    under a floor's lip): the same granite plates on their mass, hanging
+    from the lip (origin on it, z 0; nothing stands above z -0.12, so no
+    stone is ever proud of the walk) down H yards, the face leaning OUT
+    over the void by `out` yards per yard of drop (in front of the field's
+    own flaring rock, toward -Y) and the body running back under the floor
+    (+Y). The top lift is a worn brink; the beds dip a little across it."""
+    def build():
+        rng = np.random.default_rng(seed)
+        lo = (-W / 2 - 2.5, -out * H - 3.0, -H - 0.6)
+        hi = (W / 2 + 2.5, D + 1.5, 1.0)
+        f = Sculpt(lo, hi, voxel)
+        nf = Noise(seed + 3)
+
+        def front_v(X, Z):
+            # Out over the void as it falls (Z is negative under the lip),
+            # wavy across, a slow swell down the face: from the brink (a
+            # breath out past the walk's edge) it always stands in front of
+            # the field's own rock, which flares out a fifth of a yard per
+            # yard of drop.
+            # The ends turn back under the walk (a module left at the end of
+            # its run shows broken rock, never a cut side).
+            return (Z * out - 0.8 + 0.7 * (0.5 + 0.5 * nf.fbm(X * 0.11, X * 0.0, Z * 0.06, 2))
+                    + 0.5 * nf.fbm(X * 0.03 + 7.0, 0.0, Z * 0.025, 2)
+                    + np.maximum(0.0, np.abs(X) - (W / 2 - 3.0)) * (2.2 - Z * out * 0.35))
+
+        def front(x, z):
+            return float(front_v(np.array(x), np.array(z)))
+
+        # The mass stops short of the module's ends (the plates run past it,
+        # so an end left open reads as broken rock, never a cut).
+        f.put('body', Body(lambda X, Z: front_v(X, Z) + 0.5, lo, hi, D, half=W / 2 + 1.0), 0.0)
+        dip0 = float(rng.uniform(-0.1, 0.1))
+        z = 0.6
+        while z > -H - 1.0:
+            t = float(rng.uniform(2.6, 6.0)) * grain
+            bed = BED_TONES[int(rng.integers(0, len(BED_TONES)))]
+            x = -W / 2 - 1.5 - float(rng.uniform(0, 4.0))
+            while x < W / 2 + 1.5:
+                big = rng.random() < 0.25
+                w = (float(rng.uniform(9.0, 14.0)) if big else float(rng.uniform(4.0, 9.0))) * grain
+                cx = x + w / 2
+                th = t * float(rng.uniform(1.2, 1.8) if big else rng.uniform(0.8, 1.2))
+                cz = z - th / 2 + float(rng.uniform(-0.5, 0.6))
+                d = float(rng.uniform(3.0, 5.0)) * max(grain, 0.7)
+                fy = front(cx, cz) + float(rng.uniform(-0.3, 0.8)) * grain
+                tip = 0.06 if big else 0.13
+                R = gs.rot(rx=float(rng.uniform(-0.05, 0.12)), ry=dip0 + float(rng.uniform(-tip, tip)),
+                           rz=float(rng.uniform(-tip, tip)))
+                label = bed if rng.random() < 0.7 else BED_TONES[int(rng.integers(0, len(BED_TONES)))]
+                if rng.random() > 0.08:
+                    f.put(label, block(rng, (cx, fy + d / 2, cz), (w, d, th), cuts=14, chamfer=(0.6, 0.9), R=R,
+                                       top_tilt=0.2), 0.02)
+                x += w * float(rng.uniform(0.6, 0.95))
+            z -= t * float(rng.uniform(0.72, 0.95))
+        # Cracks down the face.
+        for _ in range(int(rng.integers(1, 3))):
+            cx = float(rng.uniform(-W * 0.35, W * 0.35))
+            pts = []
+            zz = -float(rng.uniform(0.5, 3.0))
+            z_end = -H * float(rng.uniform(0.4, 0.9))
+            while zz > z_end:
+                pts.append((cx, front(cx, zz), zz))
+                cx += float(rng.uniform(-0.6, 0.6))
+                zz -= float(rng.uniform(1.0, 2.4))
+            if len(pts) > 1:
+                for dy in (0.3, 1.2):
+                    f.groove(Polyline([(x, y + dy, z) for (x, y, z) in pts], 0.06), 0.35, 0.14)
+        weather(f, seed, amp=0.18)
+        # The brink: flat under the walk's top (never proud of it), the ends
+        # square for the next module to meet, the foot open (the chasm).
+        f.cut_above(-0.05)
+        clamp_below(f, -H)
+        return f
+
+    f = _sculpt_once(key or name, build)
+    verts, faces = gs.mesh_sculpt(f, bpy, name, target)
+    add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    p.open_back = True
+    return p
+
+
+def buttress(bpy, p, name, seed, W, H, D, target=3400, voxel=0.2, key=None, scree_n=2):
+    """A rib of the mountain standing out of the face: tall sheets of the
+    granite on edge, in two or three lifts, closing to a prow toward -Y (the
+    front plane), each sheet its own width and tone, the joints between them
+    deep; a ledge or two across it where a lift stops, wedges off its
+    flanks, a broken crag on top."""
+    def build():
+        rng = np.random.default_rng(seed)
+        f = Sculpt((-W / 2 - 2.5, -2.0, -0.6), (W / 2 + 2.5, D + 2.0, H * 1.2 + 2.0), voxel)
+        # The rib's own mass behind its sheets, closing to its prow and
+        # falling back into the mountain at its flanks (never a flat side).
+        f.put('body', Body(lambda X, Z: (np.abs(X) / (W / 2)) ** 2 * D * 0.95 + 1.6 + Z * 0.02,
+                           (-W / 2 - 2.5, -2.0, -0.6), (W / 2 + 2.5, D + 2.0, H * 1.2 + 2.0), D), 0.0)
+        lifts = np.sort(rng.uniform(H * 0.3, H * 0.8, int(rng.integers(1, 3))))
+        zs = [0.0, *lifts.tolist(), H * 1.1]
+        for li in range(len(zs) - 1):
+            z0, z1 = zs[li], zs[li + 1]
+            x = -W / 2 - 0.5
+            k = 0
+            while x < W / 2 + 0.5:
+                w = float(rng.uniform(2.2, 4.8))
+                cx = x + w / 2
+                t = cx / (W / 2)
+                # The prow: the sheets close toward the middle, the flanks fall
+                # back; each lift a step back from the one below.
+                fy = abs(t) ** 1.4 * W * 0.55 + li * float(rng.uniform(0.6, 1.4)) + float(rng.uniform(0.0, 0.5))
+                h = (z1 - z0) * float(rng.uniform(0.92, 1.12)) * (1 - 0.25 * abs(t))
+                d = D * float(rng.uniform(0.55, 0.85))
+                R = gs.rot(rx=float(rng.uniform(-0.06, 0.0)), rz=-t * 0.45 + float(rng.uniform(-0.06, 0.06)),
+                           ry=float(rng.uniform(-0.05, 0.05)))
+                f.put(BED_TONES[int(rng.integers(0, len(BED_TONES)))],
+                      block(rng, (cx, fy + d / 2, z0 + h / 2), (w, d, h), cuts=8, chamfer=(0.8, 0.96), R=R,
+                            top_tilt=0.4), 0.05)
+                x += w * float(rng.uniform(0.75, 0.95))
+                k += 1
+        for _ in range(3):
+            side = rng.choice([-1.0, 1.0])
+            wedge(f, rng, (side * float(rng.uniform(0.5, W * 0.4)), float(rng.uniform(1.0, 3.0)),
+                           float(rng.uniform(H * 0.3, H * 0.95))),
+                  (side * float(rng.uniform(0.4, 1.0)), -float(rng.uniform(0.5, 1.0)), float(rng.uniform(0.0, 0.8))),
+                  float(rng.uniform(2.5, 4.0)))
+        crest(f, W, H, D, rng, seed, peaks=1, lift=0.08, fall=0.5, rough=1.6)
+        weather(f, seed, amp=0.35)
+        clamp_below(f, 0.0)
+        return f
+
+    f = _sculpt_once(key or name, build)
+    rng = np.random.default_rng(seed + 77)
+    verts, faces = gs.mesh_sculpt(f, bpy, name, target)
+    add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    if scree_n:
+        scree(p, f, rng, -W / 2 + 1, W / 2 - 1, 0.6, D * 0.7, H * 1.25, scree_n)
+    p.front_zero = front_of(f)
+    p.open_back = True
+    return p
+
+
+def boulder(bpy, p, name, seed, size, target=420, voxel=0.08):
+    """A boulder fallen from the face: a heavy faceted block, its corners
+    knocked round, a fracture plane or two across it, sunk a little into the
+    ground it lies on (origin at its foot's centre)."""
+    rng = np.random.default_rng(seed)
+    sx, sy, sz = size
+    r = max(size) * 0.75 + 0.6
+    f = Sculpt((-r, -r, -0.6), (r, r, sz + 0.8), voxel)
+    f.put('g0', block(rng, (0, 0, sz * 0.42), (sx, sy, sz * 1.05), cuts=12, chamfer=(0.7, 0.92),
+                      R=gs.rot(rz=float(rng.uniform(0, TAU)), rx=float(rng.uniform(-0.15, 0.15)))), 0.0)
+    f.put('g5', block(rng, (sx * 0.15, -sy * 0.1, sz * 0.32), (sx * 0.8, sy * 0.85, sz * 0.75), cuts=9,
+                      chamfer=(0.72, 0.92), R=gs.rot(rz=float(rng.uniform(0, TAU)))), 0.25)
+    wedge(f, rng, (sx * 0.3, -sy * 0.3, sz * 0.8), (0.6, -0.7, 0.7), max(size) * 0.45, k=0.04)
+    n1 = Noise(seed)
+    f.displace(lambda X, Y, Z: 0.12 * n1.fbm(X * 0.4, Y * 0.4, Z * 0.4, 2)
+               + 0.05 * (n1.ridged(X * 1.3, Y * 1.3, Z * 1.3, 2) - 0.45), band=0.6)
+    clamp_below(f, 0.0)
+    verts, faces = gs.mesh_sculpt(f, bpy, name, target)
+    add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    return p
