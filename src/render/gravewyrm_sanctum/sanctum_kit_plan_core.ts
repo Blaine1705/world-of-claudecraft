@@ -59,6 +59,9 @@ export interface SanctumKitPlacement {
   /** Shed when the effects density is below this (0..1; the gulf's
    *  scenery thins on the middle tier). */
   shed?: number;
+  /** Drawn only while this interior-pass piece is missing: the first kit's
+   *  own version of something the second kit sculpts (resolveInteriorReplacements). */
+  withoutPiece?: string;
 }
 
 /** The kit's measured footprints (x by z after export) and heights, from its
@@ -580,19 +583,24 @@ function stairHalfWidth(id: string): number {
  *  never by a walkway's edge where the fall's lip crust would stand on the
  *  floor): their lip sits a yard and a half under the floor and a yard out. */
 export function planFrozenFalls(): SanctumKitPlacement[] {
-  const spots: [number, number, number][] = [
-    // Under the shore's wings (the Lock Terrace's own seeps are sculpted
-    // into its pedestal: sanctum_interior_plan_core.ts).
+  const spots: [number, number, number, string?][] = [
+    // Under the Lock Terrace's east and west rims: the interior pass sculpts
+    // these seeps into its pedestal (sanctum_interior_plan_core.ts), so they
+    // draw only while that kit is missing.
+    [23.5, -14, Math.PI / 2, 'Kit_LockSpur'],
+    [-23.5, -14, -Math.PI / 2, 'Kit_LockSpur'],
+    // Under the shore's wings.
     [60, 174, 1.1],
     [-60, 174, -1.1],
   ];
-  return spots.map(([x, z, rot]) => ({
+  return spots.map(([x, z, rot, withoutPiece]) => ({
     piece: 'Kit_FrozenFall',
     x,
     z,
     y: sanctumGround(x - Math.sin(rot) * 3, z - Math.cos(rot) * 3) - 1.6,
     rot,
     scale: 1,
+    ...(withoutPiece ? { withoutPiece } : {}),
   }));
 }
 

@@ -180,14 +180,18 @@ export function planRitualVault(): SanctumKitPlacement[] {
 
 /** Drop whichever of each replaced pair cannot draw: the interior piece when
  *  its kit is missing (`has` false), else the first-kit piece it replaces at
- *  the same spot. */
+ *  the same spot. A first-kit placement tagged `withoutPiece` (the terrace's
+ *  frozen falls, sculpted into the pedestal) drops once that piece is there. */
 export function resolveInteriorReplacements(
   plan: readonly SanctumKitPlacement[],
   has: (piece: string) => boolean,
 ): SanctumKitPlacement[] {
   const replaced = new Set<string>();
   for (const [v2, old] of Object.entries(INTERIOR_REPLACES)) if (has(v2)) replaced.add(old);
-  return plan.filter((p) => (INTERIOR_REPLACES[p.piece] ? has(p.piece) : !replaced.has(p.piece)));
+  return plan.filter((p) => {
+    if (p.withoutPiece !== undefined && has(p.withoutPiece)) return false;
+    return INTERIOR_REPLACES[p.piece] ? has(p.piece) : !replaced.has(p.piece);
+  });
 }
 
 /** Rubble module length along a lip (yards) and the spacing between. */

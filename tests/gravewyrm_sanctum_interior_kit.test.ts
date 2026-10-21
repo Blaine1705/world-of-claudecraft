@@ -30,6 +30,7 @@ import {
   SANCTUM_INTERIOR_PLAN_PIECES,
 } from '../src/render/gravewyrm_sanctum/sanctum_interior_plan_core';
 import { sanctumPlacementMatrix } from '../src/render/gravewyrm_sanctum/sanctum_kit';
+import { planSanctumKitPlacements } from '../src/render/gravewyrm_sanctum/sanctum_kit_plan_core';
 import {
   CHAIN_BRIDGE,
   GRAVEWYRM_SANCTUM_FIELD,
@@ -309,6 +310,22 @@ describe('the interior plan stands clear of every walk', () => {
       (p) => p.piece,
     );
     expect(without).toEqual(['Kit_ThawPyre', 'Kit_SeracS']);
+  });
+
+  it("keeps the first kit's terrace falls only while the interior pedestal is missing", () => {
+    const plan = [...planSanctumKitPlacements(), ...placed];
+    const falls = (resolved: readonly { piece: string; x: number; z: number }[]) =>
+      resolved.filter((p) => p.piece === 'Kit_FrozenFall');
+    const onTerrace = (p: { x: number; z: number }) =>
+      Math.hypot(p.x - LOCK_TERRACE.x, p.z - LOCK_TERRACE.z) < LOCK_TERRACE.r + 6;
+    // The interior kit failed to load: the terrace keeps its two falls.
+    const interior = new Set(SANCTUM_INTERIOR_PLAN_PIECES);
+    const without = falls(resolveInteriorReplacements(plan, (p) => !interior.has(p)));
+    expect(without.filter(onTerrace)).toHaveLength(2);
+    // Both kits landed: the pedestal's own falls replace them, the shore's stay.
+    const withKit = falls(resolveInteriorReplacements(plan, () => true));
+    expect(withKit.filter(onTerrace)).toHaveLength(0);
+    expect(withKit).toHaveLength(without.length - 2);
   });
 
   it('the pedestal clears the Chain Bridge deck by a body', () => {
