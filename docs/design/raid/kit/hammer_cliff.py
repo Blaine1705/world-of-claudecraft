@@ -293,7 +293,7 @@ def sculpt_face(bpy, p, name, seed, x0, x1, z_top, z_bot, depth, target, foot=Tr
     return p
 
 
-def great_cliff(bpy, p, variant, target=13400):
+def great_cliff(bpy, p, variant, target=12600):
     """A crown of the quarry's back wall (stands on the top step, the face
     toward the pit, -Y; origin at its foot): the mountain's own craggy rock,
     its natural fractures and leaning slabs breaking the skyline, the lower

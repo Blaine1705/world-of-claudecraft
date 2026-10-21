@@ -8,7 +8,7 @@
 //   - the quarry faces and lips along every cliff run of the vein's floors
 //     (the shared edge planner, field_edge_plan_core.ts): a worked riser on
 //     each terrace step, a flat worked rim where the pit's walked floor meets
-//     the first step, a quarried lip leaning out over the void elsewhere;
+//     the first step (the void lips are the rock kit's since phase 2E);
 //   - the render-only dressing: a scaffold against the Vigil, chain hoists
 //     hung off the Gallery's lips, spoil heaps on the terraces, chips on the
 //     walked floors, the collapse spot's overhang over the lower Gallery, and
@@ -37,6 +37,7 @@ import {
   type FieldEdgePiece,
   planFieldEdgePieces,
 } from '../authored_field/field_edge_plan_core';
+import { planHammerWalk } from './hammer_walk_plan_core';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { heartHash, heartPropBase } from './heart_plan_core';
 
@@ -74,6 +75,7 @@ export const HAMMER_KIT_KINDS: ReadonlySet<string> = new Set([
   'sh_quarry_block',
   'sh_quarry_derrick',
   'sh_slab_frame',
+  'sh_fallen_block',
 ]);
 
 /** The three colossi, in the layout's order (east, south-east, south). */
@@ -85,7 +87,7 @@ export const HAMMER_KIT_SIZES = {
   /** A quarry face or rim module: half its run, its drop. */
   faceHalf: 4.4,
   faceDrop: 7.4,
-  /** A quarried lip over the void: half its run. */
+  /** A lip station over the void (the hoists' spacing): half its run. */
   lipHalf: 5.4,
   /** How far the colossi reach from their origin across the ground. */
   colossusReach: 14,
@@ -145,6 +147,9 @@ export function planHammerEdges(): FieldEdgePiece[] {
       return kind(pick, HAMMER_KIT_SIZES.faceHalf, -0.05);
     },
   });
+  // The lip stations over the void: no kit piece of their own since phase
+  // 2E (the rock kit's lips hang there, heart_rock_plan_core.ts); the chain
+  // hoists hang off them.
   const lips = planFieldEdgePieces(F, {
     segment: 9.5,
     minDrop: 6,
@@ -216,6 +221,9 @@ export function planHammerProps(): HeartKitPlacement[] {
         break;
       case 'sh_slab_frame':
         out.push({ ...at, piece: 'Kit_SlabFrame' });
+        break;
+      case 'sh_fallen_block':
+        out.push({ ...at, piece: i % 2 ? 'Kit_FallenBlockB' : 'Kit_FallenBlockA' });
         break;
     }
   }
@@ -387,21 +395,28 @@ function surfaceOf(e: FieldEdgePiece): string | undefined {
   )?.id;
 }
 
-/** The whole plan: the props, the edges and the dressing. */
+/** The whole plan: the props, the edges, the dressing and the Gallery's
+ *  walk (phase 2E: its kerb and chain rail, hammer_walk_plan_core.ts). */
 export function planHammerKit(): HeartKitPlacement[] {
-  const edges: HeartKitPlacement[] = planHammerEdges().map((e) => ({
-    piece: e.piece,
-    x: e.x,
-    y: e.y,
-    z: e.z,
-    rot: e.rot,
-    stretch: e.stretch,
-    shear: e.shear,
-    noShadow: true,
-    // The low tier keeps the pit's own rim (the arena's edge) and sheds the
-    // far dressing: the terraces' risers and the void lips fall back to the
-    // field's own rock faces.
-    cosmetic: !e.piece.startsWith('Kit_QuarryRim'),
-  }));
-  return [...planHammerProps(), ...edges, ...planHammerDressing()];
+  // The void lips are the rock kit's now (phase 2E, heart_rock_plan_core.ts
+  // planHeartLips): a quarried lip's worked face stood on the lip line, inside
+  // the field's own rock flaring out under it, and never read. The planner
+  // still places them: the hoists hang where they were.
+  const edges: HeartKitPlacement[] = planHammerEdges()
+    .filter((e) => !e.piece.startsWith('Kit_QuarryLip'))
+    .map((e) => ({
+      piece: e.piece,
+      x: e.x,
+      y: e.y,
+      z: e.z,
+      rot: e.rot,
+      stretch: e.stretch,
+      shear: e.shear,
+      noShadow: true,
+      // The low tier keeps the pit's own rim (the arena's edge) and sheds the
+      // far dressing: the terraces' risers and the void lips fall back to the
+      // field's own rock faces.
+      cosmetic: !e.piece.startsWith('Kit_QuarryRim'),
+    }));
+  return [...planHammerProps(), ...edges, ...planHammerDressing(), ...planHammerWalk()];
 }

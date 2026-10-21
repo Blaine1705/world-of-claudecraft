@@ -975,6 +975,138 @@ const paintQuarry: Painter = (h, size, rnd) => {
   }
 };
 
+/** The Hammer Gallery's paving (phase 2E), one tile = 10 yd: dressed granite
+ *  flags laid in courses along the walk (each course its own height, each
+ *  flag its own length, so no joint runs on for long), every flag its own
+ *  tone of the warm and cool greys and tipped a hair, its arrises worn
+ *  round by centuries of feet, a corner chipped off here and there, a crack
+ *  across a few; the joints dark and narrow with dust packed in stretches
+ *  of them. Broad relief only (the low sun turned fine line work to grit). */
+const paintPaving: ColorPainter = (h, rgb, size, rnd) => {
+  const pxPerYd = size / 10;
+  // The courses: heights that tile the texture exactly.
+  const rows: number[] = [];
+  let total = 0;
+  while (total < size) {
+    const r = Math.round(pxPerYd * (1.1 + rnd() * 0.65));
+    rows.push(r);
+    total += r;
+  }
+  const scaleRows = size / total;
+  const rowY: number[] = [];
+  let acc = 0;
+  for (const r of rows) {
+    rowY.push(Math.round(acc));
+    acc += r * scaleRows;
+  }
+  rowY.push(size);
+  const mottle = noiseField(size, rnd, 6);
+  const grain = noiseField(size, rnd, 40);
+  const dust = noiseField(size, rnd, 10);
+  const chip = noiseField(size, rnd, 24);
+  for (let r = 0; r < rowY.length - 1; r++) {
+    const y0 = rowY[r];
+    const y1 = rowY[r + 1];
+    // The flags of this course: lengths that tile the row exactly, from a
+    // random start (wrapped), so courses never share a joint line.
+    const lens: number[] = [];
+    let t = 0;
+    while (t < size) {
+      const l = Math.round(pxPerYd * (1.2 + rnd() * 1.5));
+      lens.push(l);
+      t += l;
+    }
+    const k = size / t;
+    let x = Math.floor(rnd() * size);
+    for (const l0 of lens) {
+      const l = Math.max(8, Math.round(l0 * k));
+      const x0 = x;
+      const x1 = x + l;
+      x = x1;
+      const pick = rnd();
+      const hue: [number, number, number] =
+        pick < 0.08
+          ? [1.1, 1.0, 0.86] // an iron-stained flag
+          : pick < 0.42
+            ? [1.04, 1.0, 0.95] // warmer
+            : pick < 0.74
+              ? [0.95, 0.98, 1.04] // cooler
+              : [1, 1, 1];
+      const tone = 0.74 + rnd() * 0.24;
+      const gx = (rnd() - 0.5) * 0.25;
+      const gy = (rnd() - 0.5) * 0.25;
+      // A chipped corner (a bite out of one of its four corners), a crack.
+      const corner = rnd() < 0.35 ? Math.floor(rnd() * 4) : -1;
+      const bite = pxPerYd * (0.2 + rnd() * 0.35);
+      const crack = rnd() < 0.22;
+      const ca = rnd() * Math.PI;
+      const cc = rnd() * (x1 - x0);
+      const packed = rnd() < 0.4;
+      for (let py = y0; py < y1; py++) {
+        for (let pxl = x0; pxl < x1; pxl++) {
+          const i = wrapAt(pxl, py, size);
+          const ex = Math.min(pxl - x0, x1 - 1 - pxl);
+          const ey = Math.min(py - y0, y1 - 1 - py);
+          let edge = Math.min(ex, ey);
+          // The chipped corner: the flag's edge pulled in round it.
+          if (corner >= 0) {
+            const cx = corner & 1 ? x1 : x0;
+            const cy = corner & 2 ? y1 : y0;
+            const d = Math.hypot(pxl - cx, py - cy) - bite * (0.75 + chip[i] * 0.5);
+            edge = Math.min(edge, Math.max(-4, d));
+          }
+          const u = (pxl - (x0 + x1) / 2) / pxPerYd;
+          const v = (py - (y0 + y1) / 2) / pxPerYd;
+          let hv = 0.62 + u * gx + v * gy + (mottle[i] - 0.5) * 0.1 + (grain[i] - 0.5) * 0.05;
+          // Worn arris: the flag falls away round over its last few pixels.
+          const arris = 7;
+          if (edge < arris) hv -= ((arris - Math.max(0, edge)) / arris) ** 1.6 * 0.42;
+          const joint = edge < 1.5;
+          let c = tone * (0.9 + mottle[i] * 0.2);
+          if (edge < arris && edge >= 1.5) c *= 1.06; // the worn arris catches the light
+          let cr = c * hue[0];
+          let cg = c * hue[1];
+          let cb = c * hue[2];
+          if (joint) {
+            // The joint: dark, or packed with dust in stretches.
+            const pd = packed && dust[i] > 0.5;
+            const j = pd ? 0.82 : 0.32;
+            cr = j * (pd ? 1.04 : 0.98);
+            cg = j * (pd ? 0.98 : 0.97);
+            cb = j * (pd ? 0.9 : 1.02);
+            hv = pd ? 0.3 : 0.05;
+          }
+          if (crack) {
+            const lx = pxl - x0 - cc;
+            const ly = py - y0 - (y1 - y0) / 2;
+            const dd = Math.abs(lx * Math.sin(ca) - ly * Math.cos(ca));
+            if (dd < 1.2 && edge > 2) {
+              cr *= 0.55;
+              cg *= 0.55;
+              cb *= 0.58;
+              hv -= 0.2;
+            }
+          }
+          // Dust drifted onto the flags in broad patches.
+          const drift = Math.max(0, dust[i] - 0.62) * 0.9;
+          cr += drift * 0.12;
+          cg += drift * 0.1;
+          cb += drift * 0.06;
+          h[i] = hv;
+          rgb[i * 3] = cr;
+          rgb[i * 3 + 1] = cg;
+          rgb[i * 3 + 2] = cb;
+        }
+      }
+    }
+  }
+};
+
+/** The Hammer Gallery's worn paving (one tile = 10 yd: the family's UV scale). */
+export function pavingDetail(): DetailPair {
+  return bakeColored('paving', paintPaving, 0x9a7e, 512, 2.6, 1);
+}
+
 /** Quarried bedrock panels (one tile = 16 yd: the family's UV scale). */
 export function quarryDetail(): DetailPair {
   // Softer relief (phase 2D): at 5 the joints' bevels turned from the low

@@ -37,8 +37,10 @@ export type FieldGround =
   | 'snow'
   | 'ice'
   | 'slate'
-  // The Smith's Heart's Hammer vein: the quarry's cut bedrock.
-  | 'quarry';
+  // The Smith's Heart's Hammer vein: the quarry's cut bedrock, and the
+  // Gallery's worn paving (phase 2E).
+  | 'quarry'
+  | 'paving';
 
 interface FieldSurfaceBase {
   id: string;

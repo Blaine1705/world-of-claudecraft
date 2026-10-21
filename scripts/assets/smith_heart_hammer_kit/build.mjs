@@ -37,8 +37,6 @@ export const SMITH_HEART_HAMMER_KIT_PIECES = [
   'QuarryFaceA',
   'QuarryFaceB',
   'QuarryFaceC',
-  'QuarryLipA',
-  'QuarryLipB',
   'QuarryRimA',
   'QuarryRimB',
   'GreatCliffA',
@@ -56,6 +54,12 @@ export const SMITH_HEART_HAMMER_KIT_PIECES = [
   'GeodeB',
   'CollapseOverhang',
   'LookoutStatue',
+  // The Gallery's walk (phase 2E).
+  'WalkCurbA',
+  'WalkCurbB',
+  'WalkRail',
+  'FallenBlockA',
+  'FallenBlockB',
   // The Slab.
   'SlabFrame',
   'SlabHalfL',
@@ -86,6 +90,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/hammer_sculpt.py',
     'docs/design/raid/kit/hammer_pieces.py',
     'docs/design/raid/kit/hammer_cliff.py',
+    'docs/design/raid/kit/walk_pieces.py',
     'docs/design/raid/kit/build_smith_heart_hammer_kit.py',
     'scripts/assets/smith_heart_hammer_kit/build.mjs',
   ]) {

@@ -23,6 +23,7 @@ import {
   gratingDetail,
   iceDetail,
   mossDetail,
+  pavingDetail,
   plateDetail,
   quarryDetail,
   rockDetail,
@@ -106,6 +107,8 @@ export function buildAuthoredFieldTerrain(
     slate: { detail: slateDetail, rough: 0.7 },
     // The Smith's Heart's quarry: dry cut granite, matte.
     quarry: { detail: quarryDetail, rough: 0.9 },
+    // The Hammer Gallery's worn paving: dry dressed granite, matte.
+    paving: { detail: pavingDetail, rough: 0.88 },
   };
   for (const family of FIELD_TOP_FAMILIES) {
     const data = tops[family];

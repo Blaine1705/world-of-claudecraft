@@ -42,6 +42,10 @@ import {
   planHammerKit,
   planHammerProps,
 } from '../src/render/smith_heart/hammer_kit_plan_core';
+import {
+  HAMMER_WALK_SURFACES,
+  planHammerWalk,
+} from '../src/render/smith_heart/hammer_walk_plan_core';
 import { heartKitPlacementMatrix, mergeHeartKitParts } from '../src/render/smith_heart/heart_kit';
 import { HEART_PROP_RECIPES } from '../src/render/smith_heart/heart_plan_core';
 import { SMITH_HEART_GATES } from '../src/sim/content/smith_heart';
@@ -141,8 +145,10 @@ describe('Smith Heart Hammer kit: the piece list and the shipped GLB', () => {
       'PitColumn',
       'QuarryFaceA',
       'QuarryRimA',
-      'QuarryLipA',
       'CleftGate',
+      'WalkCurbA',
+      'WalkRail',
+      'FallenBlockA',
       'CollapseOverhang',
       'SlabHalfL',
       'SlabHalfR',
@@ -168,7 +174,8 @@ describe('Smith Heart Hammer kit: the piece list and the shipped GLB', () => {
     let total = 0;
     for (const [name, s] of shapes) {
       expect(s.triangles, name).toBeGreaterThan(0);
-      const tile = /Quarry(Face|Rim|Lip)|ChipScatter|RubblePile|SlabChunk|FloorCrack/.test(name);
+      const tile =
+        /Quarry(Face|Rim)|ChipScatter|RubblePile|SlabChunk|FloorCrack|Walk|FallenBlock/.test(name);
       expect(s.triangles, name).toBeLessThanOrEqual(tile ? 2500 : 20000);
       total += s.triangles;
     }
@@ -206,6 +213,8 @@ describe('Smith Heart Hammer kit: sizes the sim and the plan rely on', () => {
       ['Kit_GeodeB', 'sh_geode'],
       ['Kit_RoughStatueA', 'sh_rough_statue'],
       ['Kit_RoughStatueB', 'sh_rough_statue'],
+      ['Kit_FallenBlockA', 'sh_fallen_block'],
+      ['Kit_FallenBlockB', 'sh_fallen_block'],
     ];
     for (const [piece, kind] of fits) {
       const c = collider(kind);
@@ -229,12 +238,13 @@ describe('Smith Heart Hammer kit: sizes the sim and the plan rely on', () => {
       // The rim faces the pit's walked floor: it never stands out over it.
       expect(s.max[2], name).toBeLessThanOrEqual(0.35);
     }
-    for (const name of ['Kit_QuarryLipA', 'Kit_QuarryLipB']) {
-      expect(shape(name).max[1], name).toBeLessThanOrEqual(0.15);
-      expect(shape(name).min[1], name).toBeLessThan(-24);
-    }
-    // The flat floor dressing stays under a hand's height.
+    // The flat floor dressing stays under a hand's height; so does the
+    // Gallery's kerb (phase 2E), and its chain rail stands wholly past the
+    // lip, over the drop (glTF +Z is the drop side).
     expect(shape('Kit_ChipScatter').max[1]).toBeLessThan(0.3);
+    for (const name of ['Kit_WalkCurbA', 'Kit_WalkCurbB'])
+      expect(shape(name).max[1], name).toBeLessThan(0.3);
+    expect(shape('Kit_WalkRail').min[2]).toBeGreaterThan(0.25);
     expect(shape('Kit_PitColumnSocket').max[1]).toBeLessThan(0.3);
     // The floor's cracks are inlays under the telegraphs' lift (0.06): the
     // sight field of Mountain's Wrath always draws over them.
@@ -336,9 +346,12 @@ describe('hammer_kit_plan_core: the Hammer vein dressed', () => {
       'Kit_PitColumnSocket',
       'Kit_FloorCrackA',
       'Kit_FloorCrackB',
+      // The kerb: under a hand's height (pinned above).
+      'Kit_WalkCurbA',
+      'Kit_WalkCurbB',
     ]);
     const bad: string[] = [];
-    for (const p of planHammerDressing()) {
+    for (const p of [...planHammerDressing(), ...planHammerWalk()]) {
       if (flat.has(p.piece)) continue;
       const c = Math.cos(p.rot);
       const s = Math.sin(p.rot);
@@ -412,6 +425,69 @@ describe('hammer_kit_plan_core: the Hammer vein dressed', () => {
     const ahead = { x: c.x + Math.sin(c.rot) * 8, z: c.z + Math.cos(c.rot) * 8 };
     expect(authoredFieldSurfaceAt(F, ahead.x, ahead.z)?.id).toBe('gallery_lower');
     expect(planHammerKit().filter((p) => p.piece === 'Kit_CollapseOverhang')).toHaveLength(1);
+  });
+});
+
+describe('hammer_walk_plan_core: the Gallery walk (phase 2E)', () => {
+  it('kerbs every Gallery lip over the chasm and rails most of it', () => {
+    const walk = planHammerWalk();
+    const kerbs = walk.filter((p) => p.piece.startsWith('Kit_WalkCurb'));
+    const rails = walk.filter((p) => p.piece === 'Kit_WalkRail');
+    expect(kerbs.length).toBeGreaterThan(40);
+    // Broken away into rubble here and there, never all of it.
+    const broken = kerbs.filter((p) => p.piece === 'Kit_WalkCurbB').length;
+    expect(broken).toBeGreaterThan(4);
+    expect(broken).toBeLessThan(kerbs.length / 2);
+    expect(rails.length).toBeGreaterThan(kerbs.length * 0.75);
+    expect(rails.length).toBeLessThanOrEqual(kerbs.length);
+    for (const p of walk) {
+      // On a Gallery floor's lip, the drop in front of it.
+      const back = authoredFieldSurfaceAt(
+        F,
+        p.x - Math.sin(p.rot) * 0.6,
+        p.z - Math.cos(p.rot) * 0.6,
+      );
+      expect(HAMMER_WALK_SURFACES.has(back?.id ?? ''), `${p.piece} on ${back?.id}`).toBe(true);
+      const ahead = authoredFieldHeight(
+        F,
+        p.x + Math.sin(p.rot) * 1.2,
+        p.z + Math.cos(p.rot) * 1.2,
+      );
+      expect(ahead, p.piece).toBeLessThan(p.y - 6);
+      expect(p.cosmetic).toBe(true);
+    }
+  });
+
+  it('paves the Gallery in worn flags, its own ground, and lays fallen blocks at its edges', () => {
+    expect(fieldGroundFamily('paving')).toBe('paving');
+    expect(fieldFamilyUvScale('paving')).toBeCloseTo(1 / 10, 9);
+    for (const id of HAMMER_WALK_SURFACES)
+      expect(F.surfaces.find((s) => s.id === id)?.ground, id).toBe('paving');
+    // A painted floor, never one flat colour.
+    const lum: number[] = [];
+    for (let x = 0; x < 120; x += 7)
+      for (let z = 0; z < 120; z += 11) {
+        const [r, g, b] = topColor('paving', x, z, true);
+        lum.push(0.3 * r + 0.59 * g + 0.11 * b);
+      }
+    expect(Math.max(...lum) / Math.min(...lum)).toBeGreaterThan(1.4);
+    const blocks = F.props.filter((p) => p.kind === 'sh_fallen_block');
+    expect(blocks.length).toBeGreaterThanOrEqual(3);
+    for (const b of blocks) {
+      const s = authoredFieldSurfaceAt(F, b.x, b.z);
+      expect(HAMMER_WALK_SURFACES.has(s?.id ?? ''), s?.id).toBe(true);
+      // On a collider (a body walks round it, never through it).
+      expect(b.hw ?? 0).toBeGreaterThan(0);
+      expect(b.h ?? 0).toBeGreaterThan(1);
+    }
+    expect(planHammerProps().filter((p) => p.piece.startsWith('Kit_FallenBlock'))).toHaveLength(
+      blocks.length,
+    );
+  });
+
+  it('leaves the void lips to the rock kit, the hoists hung where they were', () => {
+    expect(planHammerKit().some((p) => p.piece.startsWith('Kit_QuarryLip'))).toBe(false);
+    expect(planHammerKit().filter((p) => p.piece === 'Kit_ChainHoist').length).toBeGreaterThan(4);
   });
 });
 

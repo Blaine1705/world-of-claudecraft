@@ -568,9 +568,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-160, -223, H.galleryUpper],
       [-155, -224, H.galleryUpper],
     ],
-    { ground: 'quarry' },
+    { ground: 'paving' },
   ),
-  disc('gallery_h1', GALLERY_LANDINGS.h1, { edge: 'rock', ground: 'quarry' }),
+  disc('gallery_h1', GALLERY_LANDINGS.h1, { edge: 'rock', ground: 'paving' }),
   path(
     'gallery_middle',
     [
@@ -579,9 +579,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-108, -231, H.galleryMiddle],
       [-103, -232, H.galleryMiddle],
     ],
-    { ground: 'quarry' },
+    { ground: 'paving' },
   ),
-  disc('gallery_h2', GALLERY_LANDINGS.h2, { edge: 'rock', ground: 'quarry' }),
+  disc('gallery_h2', GALLERY_LANDINGS.h2, { edge: 'rock', ground: 'paving' }),
   path(
     'gallery_lower',
     [
@@ -590,9 +590,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-74, -212, H.galleryLower],
       [-70, -209, H.galleryLower],
     ],
-    { ground: 'quarry' },
+    { ground: 'paving' },
   ),
-  disc('gallery_h3', GALLERY_LANDINGS.h3, { edge: 'rock', ground: 'quarry' }),
+  disc('gallery_h3', GALLERY_LANDINGS.h3, { edge: 'rock', ground: 'paving' }),
   // The quarry's steps, deepest reach first (each later, lower step wins
   // nearer the pit), then the pit's own floor.
   quarryStep(3),
@@ -865,6 +865,14 @@ const QUARRY_BLOCKS: FieldProp[] = [
   h: 7.4,
 }));
 
+/** Blocks fallen onto the Gallery's walk, each by an edge of its path (a
+ *  path is 14 yd across: the walking line keeps nine of them clear). */
+const GALLERY_FALLEN_BLOCKS: FieldProp[] = [
+  { x: -169.9, z: -215.4, rot: -0.27 },
+  { x: -128.7, z: -234.0, rot: -0.1 },
+  { x: -84.3, z: -215.0, rot: 0.75 },
+].map((b) => ({ kind: 'sh_fallen_block', ...b, hw: 1.3, hd: 1.0, h: 1.5 }));
+
 /** The Frozen Lake's braziers on its rock shelf (the Quench form's warmth). */
 const LAKE_BRAZIERS: FieldProp[] = [40, 140, 220, 320].map((deg) => {
   const p = around(QUENCH.shelf, deg, -5);
@@ -916,6 +924,9 @@ const PROPS: FieldProp[] = [
   { kind: 'sh_rough_statue', x: -78, z: -198, rot: 2.2, r: 3.2, h: 14 },
   { kind: 'sh_geode', x: -140, z: -216, rot: 0.4, r: 2, h: 4 },
   { kind: 'sh_geode', x: -90, z: -242, rot: 1.9, r: 2, h: 4 },
+  // Blocks fallen from the Smith's work onto the Gallery's walk (phase 2E),
+  // at its edges, clear of its walking line and the packs' landings.
+  ...GALLERY_FALLEN_BLOCKS,
   // The Smith's Quarry: columns, colossi, cut blocks, ochre geodes.
   ...PIT_COLUMNS,
   ...QUARRY_COLOSSI,

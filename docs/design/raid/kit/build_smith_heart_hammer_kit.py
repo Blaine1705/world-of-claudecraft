@@ -21,7 +21,8 @@ Edge pieces run along X with their OUTER (drop) side toward -Y.
 Exceptions to "origin at the base centre", by design:
   - Kit_QuarryFaceA to C: origin on the lip (z 0), the face drops 7 yd to
     -7 toward -Y, its body behind the lip (+Y);
-  - Kit_QuarryLipA and B: origin on the lip, the face drops to -24;
+  - Kit_WalkCurbA, B and Kit_WalkRail: origin on the walk's lip, the drop
+    toward -Y (walk_pieces.py);
   - Kit_SlabHalfL and R: both in the shut slab's frame (its base centre), so
     the gate painter moves them from one origin;
   - Kit_SlabChunkA to C: origin at the chunk's middle (the runtime tumbles it);
@@ -48,6 +49,7 @@ sys.path.insert(0, HERE)
 import shkit  # noqa: E402,F401  (puts the shared dungeon kit on the path)
 import hammer_pieces as hp  # noqa: E402
 import hammer_sculpt as hs  # noqa: E402
+import walk_pieces as wp  # noqa: E402
 from hckit import export_kit  # noqa: E402
 from shkit import PAINT, SP, TAU  # noqa: E402
 
@@ -189,8 +191,6 @@ BUILDERS = {
     'QuarryFaceA': lambda: hp.quarry_face('A'),
     'QuarryFaceB': lambda: hp.quarry_face('B'),
     'QuarryFaceC': lambda: hp.quarry_face('C'),
-    'QuarryLipA': lambda: hp.quarry_lip('A'),
-    'QuarryLipB': lambda: hp.quarry_lip('B'),
     'QuarryRimA': lambda: hp.quarry_rim('A'),
     'QuarryRimB': lambda: hp.quarry_rim('B'),
     'GreatCliffA': lambda: hp.great_cliff('A'),
@@ -208,6 +208,12 @@ BUILDERS = {
     'GeodeB': lambda: geode('B'),
     'CollapseOverhang': collapse_overhang,
     'LookoutStatue': lookout_statue,
+    # The Gallery's walk (phase 2E).
+    'WalkCurbA': lambda: wp.walk_curb('A'),
+    'WalkCurbB': lambda: wp.walk_curb('B'),
+    'WalkRail': wp.walk_rail,
+    'FallenBlockA': lambda: wp.fallen_block('A'),
+    'FallenBlockB': lambda: wp.fallen_block('B'),
     # The Slab.
     'SlabFrame': hp.slab_frame,
     'SlabHalfL': lambda: hp.slab_half(-1),

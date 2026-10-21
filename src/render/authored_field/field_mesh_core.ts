@@ -68,6 +68,9 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   // The Smith's Heart's quarry: Stormcrag's cool grey granite bedrock, cut
   // and dusty (the warm comes from the low sun and the dust drifts).
   quarry: [0.3, 0.3, 0.315],
+  // The Hammer Gallery's paving: dressed granite flags, a warm grey (the
+  // kerbs a shade paler), dust in the joints.
+  paving: [0.33, 0.315, 0.3],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
@@ -82,6 +85,7 @@ export const FIELD_TOP_FAMILIES = [
   'ice',
   'slate',
   'quarry',
+  'paving',
 ] as const;
 export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
 
@@ -92,6 +96,8 @@ export function fieldFamilyUvScale(family: FieldTopFamily): number {
   // The quarry's cut panels are a few yards across: one tile every 16 yd
   // (a broad tile, so the floor's repeat never reads as a grid of tiles).
   if (family === 'quarry') return 1 / 16;
+  // The Gallery's flags are a yard or two each: one tile every 10 yd.
+  if (family === 'paving') return 1 / 10;
   return 0.25;
 }
 
@@ -104,6 +110,7 @@ export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
   if (ground === 'ice') return 'ice';
   if (ground === 'slate') return 'slate';
   if (ground === 'quarry') return 'quarry';
+  if (ground === 'paving') return 'paving';
   if (ground === 'plate') return 'plate';
   if (ground === 'grating') return 'grating';
   return ground === 'earth' ||
@@ -406,6 +413,7 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   if (ground === 'ice') return iceColor(base, x, z);
   if (ground === 'slate') return slateColor(base, k, x, z, onPath);
   if (ground === 'quarry') return quarryColor(base, k, patch, dirt);
+  if (ground === 'paving') return pavingColor(base, k, patch, dirt);
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
   const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
@@ -423,6 +431,20 @@ function quarryColor(base: Rgb, k: number, patch: number, dirt: number): Rgb {
     base[0] * t + dust * 0.15,
     base[1] * t + dust * 0.13,
     base[2] * t * (1 + shade * 0.06) + dust * 0.1,
+  ];
+}
+
+/** The Gallery's paving: a warm grey in broad drifts (the flags' own tones
+ *  live in the texture), the dust settled in patches and the low spots
+ *  cooler and darker; never one flat colour, never the quarry's pale slab. */
+function pavingColor(base: Rgb, k: number, patch: number, dirt: number): Rgb {
+  const dust = Math.max(0, patch - 0.5) * 1.6;
+  const shade = Math.min(1, dirt * 1.4);
+  const t = k * (1 - shade * 0.32);
+  return [
+    base[0] * t + dust * 0.1,
+    base[1] * t + dust * 0.085,
+    base[2] * t * (1 + shade * 0.08) + dust * 0.06,
   ];
 }
 
@@ -546,6 +568,7 @@ export function planFieldTops(
     ice: { positions: [], colors: [], uvs: [], indices: [] },
     slate: { positions: [], colors: [], uvs: [], indices: [] },
     quarry: { positions: [], colors: [], uvs: [], indices: [] },
+    paving: { positions: [], colors: [], uvs: [], indices: [] },
   };
   const clippers = laterClippers(def);
   def.surfaces.forEach((s, layer) => {

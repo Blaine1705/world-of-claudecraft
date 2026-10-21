@@ -17,7 +17,7 @@ from hckit import GLOW
 from shkit import (
     BRONZE, BRONZE_DARK, DRESSED, DRESSED_SHADE, DRESSED_STONE, DUST, GRANITE_DARK, IRON, IRON_DARK, LEATHER,
     MASON_RED, METAL, PAINT, PI, QUARRY, QUARRY_DARK, QUARRY_DEEP, QUARRY_PALE, QUARRY_RED, RAW, ROPE, RUNE_OCHRE,
-    SP, TAU, TIMBER, WOOD, TIMBER_DARK, TIMBER_GREY, VEIN, VEIN_DIM, beam, drill_line, pole, rope,
+    SP, TAU, TIMBER, WOOD, TIMBER_DARK, TIMBER_GREY, VEIN, VEIN_DIM, beam, drill_line, light_chain, pole, rope,
 )
 
 CHAIN_IRON = (0.25, 0.235, 0.22)
@@ -265,8 +265,8 @@ def chain_hoist():
         tip = Vector((0, -5.0, 0.0))
         loop_tube(p, [tip + Vector((0, math.cos(a) * 0.5, math.sin(a) * 0.5 - 0.35))
                       for a in [TAU * i / 14 for i in range(14)]], 0.11, IRON, normal=(1, 0, 0))
-    end = chain_run(p, tip + Vector((0, -0.5, -0.5)), tip + Vector((0, -0.5, -13.5)), 0.66, 0.3, 0.085,
-                    color=CHAIN_IRON)
+    # Light chains (phase 2E: a hoist is hung by the dozen along the lips).
+    end = light_chain(p, tip + Vector((0, -0.5, -0.5)), tip + Vector((0, -0.5, -13.5)), 0.66, 0.3, 0.085, CHAIN_IRON)
     with p.as_kind(METAL):
         p.sweep([end, end + Vector((0, 0, -0.6)), end + Vector((0, -0.4, -1.0)), end + Vector((0, -0.6, -0.6))],
                 0.11, 0.08, IRON_DARK, sides=6)
@@ -275,7 +275,7 @@ def chain_hoist():
              chamfer=0.05)
     for s in (-1, 1):
         rope(p, end + Vector((s * 0.9, -0.2, -1.8)), end + Vector((0, -0.4, -0.9)), 0.07)
-    chain_run(p, tip + Vector((0, 0.45, -0.5)), tip + Vector((0, 0.6, -7.5)), 0.66, 0.3, 0.085, color=CHAIN_IRON)
+    light_chain(p, tip + Vector((0, 0.45, -0.5)), tip + Vector((0, 0.6, -7.5)), 0.66, 0.3, 0.085, CHAIN_IRON)
     return p
 
 
@@ -426,39 +426,6 @@ def quarry_face(variant):
     hc.sculpt_face(bpy, p, 'QuarryFace' + variant, seeds[variant], -4.4, 4.4, -0.02, -7.4, 3.0, target=2200,
                    crack=0.9 if variant == 'A' else 0.4, notch=0.8 if variant == 'B' else 0.3,
                    overhang=0.45 if variant == 'B' else 0.25, vein=vein, wmin=4.5, wmax=11.0)
-    return p
-
-
-def quarry_lip(variant):
-    """A module for a quarried lip over the void (10.8 yd along X): origin on
-    the lip, a sculpted giant-cut face down the first eight yards, then rough
-    split rock leaning out over the void to -30, toward -Y, so it stays in
-    front of the field's flaring massif below."""
-    import bpy
-    import hammer_cliff as hc
-    seeds = {'A': 171, 'B': 177}
-    p = SP('QuarryLip' + variant, seed=seeds[variant], ao_dist=2.4)
-    rng = p.rng
-    hc.sculpt_face(bpy, p, 'QuarryLip' + variant, seeds[variant], -5.4, 5.4, -0.02, -8.0, 3.2, target=1500,
-                   foot=False, bench=0.85, crack=0.7, wmin=3.5, wmax=8.0, voxel=0.1)
-    with p.as_kind(RAW):
-        # The split rock under the worked face (phase 2D): tall sheets and
-        # shards of the mountain's granite, leaning and stepping in and out
-        # (the rock's own jointing), never courses of boulders.
-        z = -7.0
-        while z > -30:
-            h = rng.uniform(8.0, 13.0)
-            x = -5.8 + rng.uniform(-0.8, 0.4)
-            out = 2.4 + 0.3 * (-z - 7.0)
-            while x < 5.6:
-                w = rng.uniform(2.2, 4.6)
-                hh = h * rng.uniform(0.75, 1.15)
-                tone = mix(QUARRY_DARK, QUARRY_DEEP, rng.uniform(0.05, 0.4))
-                crystal(p, (x + w / 2, 1.6 - out + rng.uniform(-1.2, 1.0), z - hh / 2 + rng.uniform(-1.0, 1.0)),
-                        (w * 1.15, 4.6, hh), p.vary(tone, 0.05), n=14, boxy=0.4, jitter=0.2,
-                        yaw=rng.uniform(-0.25, 0.25), pitch=rng.uniform(-0.15, 0.1), roll=rng.uniform(-0.14, 0.14))
-                x += w * 0.85
-            z -= h * 0.8
     return p
 
 

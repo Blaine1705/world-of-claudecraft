@@ -183,6 +183,8 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'ochre', 'hammer', [4.8, 4.8, 4.8], [0, 2.4, 0]),
     part('box', 'ochre', 'hammer', [3.2, 2.6, 3.4], [0.4, 6.1, -0.3], { yaw: 0.5 }),
   ],
+  // A block fallen onto the Gallery's walk (phase 2E), tipped on its edge.
+  sh_fallen_block: [part('box', 'ochre', 'hammer', [2.2, 1.3, 1.6], [0, 0.65, 0], { yaw: 0.25 })],
   // The derrick that lifted them: an A of timbers, a boom over the pit, a
   // chain and a hoisted block.
   sh_quarry_derrick: [
