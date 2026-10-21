@@ -2333,6 +2333,7 @@ export const id_ID: EnTranslations = {
       "complexityMedium": "Sedang",
       "complexityHigh": "Tinggi",
       "exampleAbilities": "Contoh kemampuan",
+      "specBonus": "Specialization bonus",
       "viewTalents": "Lihat talenta",
       "selectSpec": "Pilih spesialisasi",
       "specUnlockBanner": "Spesialisasi Terbuka!",

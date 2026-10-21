@@ -2333,6 +2333,7 @@ export const cs_CZ: EnTranslations = {
       "complexityMedium": "Střední",
       "complexityHigh": "Vysoká",
       "exampleAbilities": "Ukázkové schopnosti",
+      "specBonus": "Specialization bonus",
       "viewTalents": "Zobrazit talenty",
       "selectSpec": "Vybrat specializaci",
       "specUnlockBanner": "Specializace odemčena!",

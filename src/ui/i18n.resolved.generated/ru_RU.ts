@@ -2333,6 +2333,7 @@ export const ru_RU: EnTranslations = {
       "complexityMedium": "Средняя",
       "complexityHigh": "Высокая",
       "exampleAbilities": "Примеры способностей",
+      "specBonus": "Бонус специализации",
       "viewTalents": "Смотреть таланты",
       "selectSpec": "Выбрать специализацию",
       "specUnlockBanner": "Специализация открыта!",

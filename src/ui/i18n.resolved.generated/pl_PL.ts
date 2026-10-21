@@ -2333,6 +2333,7 @@ export const pl_PL: EnTranslations = {
       "complexityMedium": "Średnia",
       "complexityHigh": "Wysoka",
       "exampleAbilities": "Przykładowe umiejętności",
+      "specBonus": "Specialization bonus",
       "viewTalents": "Zobacz talenty",
       "selectSpec": "Wybierz specjalizację",
       "specUnlockBanner": "Odblokowano specjalizację!",

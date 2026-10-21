@@ -2333,6 +2333,7 @@ export const nl_NL: EnTranslations = {
       "complexityMedium": "Gemiddeld",
       "complexityHigh": "Hoog",
       "exampleAbilities": "Voorbeeldvaardigheden",
+      "specBonus": "Specialization bonus",
       "viewTalents": "Talenten bekijken",
       "selectSpec": "Specialisatie kiezen",
       "specUnlockBanner": "Specialisatie Ontgrendeld!",

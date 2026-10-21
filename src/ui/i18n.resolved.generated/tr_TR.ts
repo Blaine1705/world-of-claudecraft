@@ -2333,6 +2333,7 @@ export const tr_TR: EnTranslations = {
       "complexityMedium": "Orta",
       "complexityHigh": "Yüksek",
       "exampleAbilities": "Örnek yetenekler",
+      "specBonus": "Specialization bonus",
       "viewTalents": "Yetenekleri görüntüle",
       "selectSpec": "Uzmanlık seç",
       "specUnlockBanner": "Uzmanlık Kilidi Açıldı!",

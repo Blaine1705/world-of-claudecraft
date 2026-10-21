@@ -2859,6 +2859,9 @@ export const hudChromeStrings = {
     complexityMedium: 'Medium',
     complexityHigh: 'High',
     exampleAbilities: 'Example abilities',
+    // Label for what a spec gets just for being picked (spec_baselines.ts plus
+    // spec_output_tuning.ts), which otherwise never surfaces anywhere.
+    specBonus: 'Specialization bonus',
     viewTalents: 'View talents',
     selectSpec: 'Select specialization',
     specUnlockBanner: 'Specialization Unlocked!',

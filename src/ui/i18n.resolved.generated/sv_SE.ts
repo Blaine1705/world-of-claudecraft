@@ -2333,6 +2333,7 @@ export const sv_SE: EnTranslations = {
       "complexityMedium": "Medel",
       "complexityHigh": "Hög",
       "exampleAbilities": "Exempelförmågor",
+      "specBonus": "Specialization bonus",
       "viewTalents": "Visa talanger",
       "selectSpec": "Välj specialisering",
       "specUnlockBanner": "Specialisering upplåst!",

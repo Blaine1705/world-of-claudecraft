@@ -1545,6 +1545,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.complexityMedium': '中等',
   'hudChrome.specPanel.exampleAbilities': '示例技能',
   'hudChrome.specPanel.primaryAttr': '主属性',
+  'hudChrome.specPanel.specBonus': '专精加成',
   'hudChrome.specPanel.selectSpec': '选择专精',
   'hudChrome.specPanel.viewTalents': '查看天赋',
   'hudChrome.talentRows.comingSoon': '敬请期待',

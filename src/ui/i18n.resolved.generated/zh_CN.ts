@@ -2333,6 +2333,7 @@ export const zh_CN: EnTranslations = {
       "complexityMedium": "中等",
       "complexityHigh": "高",
       "exampleAbilities": "示例技能",
+      "specBonus": "专精加成",
       "viewTalents": "查看天赋",
       "selectSpec": "选择专精",
       "specUnlockBanner": "专精已解锁！",

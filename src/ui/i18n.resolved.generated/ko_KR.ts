@@ -2333,6 +2333,7 @@ export const ko_KR: EnTranslations = {
       "complexityMedium": "중간",
       "complexityHigh": "높음",
       "exampleAbilities": "대표 능력",
+      "specBonus": "전문화 보너스",
       "viewTalents": "특성 보기",
       "selectSpec": "전문화 선택",
       "specUnlockBanner": "전문화 해제!",
