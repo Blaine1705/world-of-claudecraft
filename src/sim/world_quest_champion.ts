@@ -98,14 +98,21 @@ export function worldQuestChampionSite(quest: WorldQuestDef): { x: number; z: nu
   );
 }
 
-function tellNear(ctx: SimContext, quest: WorldQuestDef, banner: WorldQuestBannerId): void {
-  // An authored site is the alert's centre; otherwise the area centre, as before.
-  const centre = quest.championAt ?? quest.area;
+/** Banner the completer (who may finish a wide ring far from the site) and
+ *  every live player within alert range of where the champion rises. */
+function tellNear(
+  ctx: SimContext,
+  quest: WorldQuestDef,
+  banner: WorldQuestBannerId,
+  completerId: number,
+): void {
+  const site = worldQuestChampionSite(quest);
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead) continue;
     if (
-      Math.hypot(e.pos.x - centre.x, e.pos.z - centre.z) <= WORLD_QUEST_CHAMPION_TUNING.alertYards
+      meta.entityId === completerId ||
+      Math.hypot(e.pos.x - site.x, e.pos.z - site.z) <= WORLD_QUEST_CHAMPION_TUNING.alertYards
     )
       ctx.emit({ type: 'worldQuestBanner', banner, pid: meta.entityId });
   }
@@ -149,8 +156,7 @@ export function summonWorldQuestChampion(
     lastTick: -1,
     participants: [],
   });
-  tellNear(ctx, quest, 'championRises');
-  void meta;
+  tellNear(ctx, quest, 'championRises', meta.entityId);
   return true;
 }
 

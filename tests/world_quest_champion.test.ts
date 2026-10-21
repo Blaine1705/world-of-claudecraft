@@ -60,6 +60,7 @@ describe('the world quest champion encore', () => {
     for (const quest of WORLD_QUESTS) {
       if (!worldQuestOffersChampion(quest)) continue;
       const site = worldQuestChampionSite(quest);
+      expect(TUNING.offsetYards).toBe(8);
       if (!quest.championAt) {
         expect(site, quest.id).toEqual({
           x: quest.area.x + TUNING.offsetYards,
@@ -114,6 +115,59 @@ describe('the world quest champion encore', () => {
     expect(meta.copper - copperBefore).toBe(
       Math.round(TUNING.purse.base + TUNING.purse.perLevel * sim.player.level),
     );
+  });
+
+  it('banners the completer anywhere in the ring and bystanders near the site only', () => {
+    const sim = armed();
+    const quest = WORLD_QUESTS_BY_ID[QUEST_ID];
+    const site = worldQuestChampionSite(quest);
+    // The completer finishes at the far side of the wide ring, beyond alert
+    // range of the site; one bystander waits by the site, one far off it.
+    const far = sim.groundPos(quest.area.x - 40, quest.area.z - 40);
+    expect(Math.hypot(far.x - site.x, far.z - site.z)).toBeGreaterThan(TUNING.alertYards);
+    sim.player.pos = far;
+    sim.player.prevPos = { ...far };
+    const near = sim.addPlayer('warrior', 'Nearby');
+    const away = sim.addPlayer('warrior', 'Faraway');
+    sim.entities.get(near)!.pos = sim.groundPos(site.x + 10, site.z);
+    sim.entities.get(away)!.pos = sim.groundPos(far.x, far.z - 20);
+    sim.tick();
+    const seen: number[] = [];
+    const objective = quest.objective;
+    if (objective.type !== 'kill') throw new Error('expected a kill quest');
+    const targets = [...sim.entities.values()].filter(
+      (e) => e.kind === 'mob' && !e.dead && e.templateId === objective.targetMobId,
+    );
+    for (const mob of targets.slice(0, quest.count)) {
+      mob.pos = sim.groundPos(far.x + 2, far.z);
+      sim.player.targetId = mob.id;
+      sim.chat('/dev killtarget');
+      for (const ev of sim.tick()) {
+        if (ev.type === 'worldQuestBanner' && ev.banner === 'championRises')
+          seen.push(ev.pid ?? -1);
+      }
+    }
+    expect(champion(sim)).toBeDefined();
+    expect(seen.sort((a, b) => a - b)).toEqual([sim.playerId, near].sort((a, b) => a - b));
+  });
+
+  it('pays no purse to a participant beyond credit range of the fallen champion', () => {
+    const sim = armed();
+    const meta = sim.meta(sim.playerId)!;
+    killTargets(sim, WORLD_QUESTS_BY_ID[QUEST_ID].count);
+    const mob = champion(sim)!;
+    expect(mob).toBeDefined();
+    addThreat(mob, sim.playerId, 10);
+    sim.player.targetId = mob.id;
+    sim.player.pos = sim.groundPos(mob.pos.x + TUNING.creditYards + 1, mob.pos.z);
+    sim.player.prevPos = { ...sim.player.pos };
+    const copperBefore = meta.copper;
+    sim.chat('/dev killtarget');
+    sim.tick();
+    sim.tick();
+    expect(mob.dead).toBe(true);
+    expect(worldQuestChampionState(sim.ctx, QUEST_ID)?.paid).toBe(true);
+    expect(meta.copper).toBe(copperBefore);
   });
 
   it('fades an unclaimed champion after its lifetime', () => {
