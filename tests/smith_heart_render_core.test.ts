@@ -27,6 +27,8 @@ import {
   planHeartMountain,
 } from '../src/render/smith_heart/heart_mountain_core';
 import {
+  HEART_CLEFT_BRAZIER,
+  HEART_PALETTE,
   HEART_PROP_RECIPES,
   type HeartPart,
   heartLightZoneOf,
@@ -90,6 +92,7 @@ import { SMITH_HEART_GATES, SMITH_HEART_MOBS } from '../src/sim/content/smith_he
 import {
   BALCONY,
   BREATH,
+  CLEFT,
   GREAT_HEARTH,
   HEART_ALTARS,
   HEART_ARRIVAL,
@@ -777,6 +780,29 @@ describe('heart_plan_core: the props and the lights', () => {
     }
     expect(perZone.has('none')).toBe(false);
     for (const [zone, n] of perZone) expect(n, zone).toBeLessThanOrEqual(8);
+  });
+
+  it("lights the Cleft's first image: the door's glow and two braziers, at the landing's height", () => {
+    // They stand past the landing's lip, where the field's height is the
+    // void: each carries its own height (never ground + lift: that hung the
+    // door's light seventy yards down in phase 2B).
+    const lights = planHeartLights();
+    const door = lights.find((l) => l.id === 'cleft_door');
+    const braziers = lights.filter((l) => l.id.startsWith('cleft_brazier:'));
+    expect(door?.y).toBeGreaterThan(CLEFT.h + 4);
+    expect(door?.y).toBeLessThan(CLEFT.h + 12);
+    expect(braziers).toHaveLength(2);
+    for (const b of braziers) {
+      expect(b.y).toBe(CLEFT.h + HEART_CLEFT_BRAZIER.lift);
+      // A lamp: it carries its halo and flickers like a fire.
+      expect(b.noHalo).toBeFalsy();
+      expect(b.color).toBe(HEART_PALETTE.coal);
+      // Beside the landing, within a short walk of its centre.
+      expect(Math.hypot(b.x - CLEFT.x, b.z - CLEFT.z)).toBeLessThan(CLEFT.r + 12);
+    }
+    // Either side of the doorway, a doorway's width apart.
+    const [a, c] = braziers;
+    expect(Math.hypot(a.x - c.x, a.z - c.z)).toBeCloseTo(HEART_CLEFT_BRAZIER.x * 2, 3);
   });
 });
 

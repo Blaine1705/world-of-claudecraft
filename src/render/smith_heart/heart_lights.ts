@@ -49,7 +49,7 @@ export function buildHeartLights(
   ground: (x: number, z: number) => number,
 ): void {
   for (const spot of planHeartLights()) {
-    const y = ground(spot.x, spot.z) + spot.lift;
+    const y = spot.y ?? ground(spot.x, spot.z) + spot.lift;
     const intensity = deps.lowGfx ? spot.intensity * 0.6 : spot.intensity;
     const light = new THREE.PointLight(
       spot.color,

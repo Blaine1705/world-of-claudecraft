@@ -19,6 +19,7 @@
 
 import {
   BREATH,
+  CLEFT,
   GREAT_HEARTH,
   HAMMER_PIT,
   HEART_ALTARS,
@@ -376,6 +377,11 @@ export function heartPropBase(x: number, z: number, reach = 10): number {
 // ---- lights -------------------------------------------------------------------------
 
 /** One budgeted point light (instance-local; `lift` above the floor). */
+/** The Cleft's braziers in the gate's frame (the kit builds them there:
+ *  build_smith_heart_hammer_kit.py cleft_gate): across, out toward the
+ *  landing, and the height of their fire over the landing. */
+export const HEART_CLEFT_BRAZIER = { x: 6.4, z: 5.0, lift: 2.6 } as const;
+
 export interface HeartLightSpot {
   id: string;
   x: number;
@@ -386,6 +392,10 @@ export interface HeartLightSpot {
   range: number;
   /** Draws no halo card (a light that only shapes stone, never a lamp). */
   noHalo?: boolean;
+  /** The light's absolute height, for a light hung off the walked floor (the
+   *  Cleft's door and braziers stand past the landing's lip, where the
+   *  field's height is the void). Otherwise the floor under it plus `lift`. */
+  y?: number;
 }
 
 function veinKey(id: string, vein: SmithHeartVein, at: { x: number; z: number }): HeartLightSpot {
@@ -512,16 +522,48 @@ export function planHeartLights(): HeartLightSpot[] {
         noHalo: true,
       });
     } else if (p.kind === 'sh_cleft_mouth') {
+      // The raid's first image: the vein's glow in the doorway, and the two
+      // braziers flanking its steps (the kit's, at x +-6.4, 5 yd out of the
+      // gate's origin), all standing past the landing's lip at its height.
+      const at = (lx: number, lz: number) => ({
+        x: p.x + lx * Math.cos(p.rot) + lz * Math.sin(p.rot),
+        z: p.z - lx * Math.sin(p.rot) + lz * Math.cos(p.rot),
+      });
       spots.push({
         id: 'cleft_door',
-        x: p.x + Math.sin(p.rot) * 7,
-        z: p.z + Math.cos(p.rot) * 7,
+        ...at(0, 7),
         lift: 7,
+        y: CLEFT.h + 9,
         color: 0xffb860,
-        intensity: 7,
-        range: 30,
+        // Physical falloff: a light that must reach the flanks 15 to 25 yd
+        // off needs a strong source (the colossi's fills sit 9 yd off).
+        intensity: 40,
+        range: 44,
         noHalo: true,
       });
+      // The flanks' bounce: the sun off the landing and the braziers' glow
+      // lifting the rock over the door out of the dark (no halo, steady).
+      spots.push({
+        id: 'cleft_fill',
+        ...at(0, 14),
+        lift: 20,
+        y: CLEFT.h + 20,
+        color: 0xffd2a8,
+        intensity: 60,
+        range: 56,
+        noHalo: true,
+      });
+      for (const s of [-1, 1]) {
+        spots.push({
+          id: `cleft_brazier:${s}`,
+          ...at(s * HEART_CLEFT_BRAZIER.x, HEART_CLEFT_BRAZIER.z),
+          lift: HEART_CLEFT_BRAZIER.lift,
+          y: CLEFT.h + HEART_CLEFT_BRAZIER.lift,
+          color: HEART_PALETTE.coal,
+          intensity: 12,
+          range: 22,
+        });
+      }
     }
   }
   // Two of the Cornice's lightning rods (east and west of the arena) carry

@@ -1021,7 +1021,7 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   walls: [],
   props: PROPS,
   lightZones: [
-    { id: 'cleft', x: -150, z: -222, r: 62, key: 0xc8c0b0, accent: 0xc8903c, fog: 0x5a5448 },
+    { id: 'cleft', x: -150, z: -222, r: 68, key: 0xc8c0b0, accent: 0xc8903c, fog: 0x5a5448 },
     { id: 'pit', x: 8, z: -172, r: 60, key: 0xc8bca8, accent: 0xc8903c, fog: 0x584e40 },
     { id: 'balcony', x: 0, z: -86, r: 26, key: 0xc4c8d8, accent: 0xc8903c, fog: 0x4c5468 },
     { id: 'ring', x: 0, z: 0, r: 85, key: 0xbcc4d8, accent: 0xd8c8a0, fog: 0x485068 },

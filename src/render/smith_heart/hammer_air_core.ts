@@ -1,5 +1,6 @@
-// Pure plan of the Hammer vein's air (hammer_air.ts draws it): where quarry
-// dust hangs in the low sun, where grit trickles off the terraces' lips and
+// Pure plan of the Hammer vein's air (hammer_air.ts draws it): the shafts of
+// late sun falling through the Cleft's crack onto the landing (phase 2C: the
+// raid's first image is lit), where quarry dust hangs in the low sun, where grit trickles off the terraces' lips and
 // the colossi's shoulders, where the collapse spot sheds its warning, the
 // haze low over the pit floor, and the amber halos of the geodes. Cosmetic:
 // all of it thins with the effects tier, nothing of it is a telegraph, and
@@ -9,6 +10,7 @@
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
 import {
+  CLEFT,
   GALLERY_LANDINGS,
   HAMMER_PIT,
   QUARRY_TERRACES,
@@ -56,11 +58,62 @@ export interface GeodeGlow {
   size: number;
 }
 
+/** A shaft of sun falling from (x, y1, z) to the floor at y0, `width`
+ *  across, leaning `lean` yards along +x and +z per yard of its fall. */
+export interface LightShaft {
+  x: number;
+  z: number;
+  y0: number;
+  y1: number;
+  width: number;
+  leanX: number;
+  leanZ: number;
+  strength: number;
+}
+
 export interface HammerAirPlan {
   motes: MoteVolume[];
   grit: GritStream[];
   haze: HazeCard[];
   geodes: GeodeGlow[];
+  shafts: LightShaft[];
+}
+
+/** The Cleft's shafts: the late sun through the crack between its flanks,
+ *  falling onto the landing before the door (the main one) and a fainter
+ *  one further out; they lean with the low sun (from the south-west). Not
+ *  thinned by the tier: two quads. */
+export function planCleftShafts(): LightShaft[] {
+  const door = F.props.find((p) => p.kind === 'sh_cleft_mouth');
+  if (!door) return [];
+  // From the landing's centre toward the door.
+  const dx = door.x - CLEFT.x;
+  const dz = door.z - CLEFT.z;
+  const d = Math.hypot(dx, dz) || 1;
+  const ux = dx / d;
+  const uz = dz / d;
+  return [
+    {
+      x: CLEFT.x + ux * 3,
+      z: CLEFT.z + uz * 3,
+      y0: CLEFT.h,
+      y1: CLEFT.h + 34,
+      width: 5.5,
+      leanX: -0.22,
+      leanZ: -0.18,
+      strength: 1,
+    },
+    {
+      x: CLEFT.x - uz * 6 - ux * 2,
+      z: CLEFT.z + ux * 6 - uz * 2,
+      y0: CLEFT.h,
+      y1: CLEFT.h + 28,
+      width: 3,
+      leanX: -0.22,
+      leanZ: -0.18,
+      strength: 0.55,
+    },
+  ];
 }
 
 const F = SMITH_HEART_FIELD;
@@ -81,7 +134,17 @@ export function planHammerAir(density = 1): HammerAirPlan {
       hd: pit.rz + 8,
       count: Math.round(520 * k),
     },
-    // The Gallery's three landings and the Cleft.
+    // The Cleft: dust turning in its shafts of sun.
+    {
+      x: CLEFT.x,
+      z: CLEFT.z,
+      y0: CLEFT.h + 0.5,
+      y1: CLEFT.h + 16,
+      hw: 10,
+      hd: 10,
+      count: Math.round(140 * k),
+    },
+    // The Gallery's three landings.
     ...Object.values(GALLERY_LANDINGS).map((l) => ({
       x: l.x,
       z: l.z,
@@ -152,5 +215,5 @@ export function planHammerAir(density = 1): HammerAirPlan {
   const geodes: GeodeGlow[] = F.props
     .filter((p) => p.kind === 'sh_geode')
     .map((p) => ({ x: p.x, y: heartPropBase(p.x, p.z) + 1.6, z: p.z, size: 4.5 }));
-  return { motes, grit, haze, geodes };
+  return { motes, grit, haze, geodes, shafts: planCleftShafts() };
 }

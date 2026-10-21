@@ -150,6 +150,40 @@ void main() {
 }
 `;
 
+const SHAFT_VERT = /* glsl */ `
+attribute vec2 aCorner;
+attribute vec4 aParams; // height, width, leanX, leanZ
+varying vec2 vCorner;
+void main() {
+  // A column turned to face the camera about the vertical: its foot on the
+  // floor at the base, its head up the crack, leaning with the low sun.
+  float t = aCorner.y * 0.5 + 0.5;
+  vec3 p = position;
+  p.y += t * aParams.x;
+  p.x += aParams.z * t * aParams.x;
+  p.z += aParams.w * t * aParams.x;
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  mv.x += aCorner.x * aParams.y * (0.7 + 0.3 * t);
+  vCorner = aCorner;
+  gl_Position = projectionMatrix * mv;
+}
+`;
+const SHAFT_FRAG = /* glsl */ `
+uniform vec3 uColor;
+uniform float uAlpha;
+uniform float uTime;
+varying vec2 vCorner;
+void main() {
+  float t = vCorner.y * 0.5 + 0.5;
+  float across = pow(1.0 - smoothstep(0.0, 1.0, abs(vCorner.x)), 1.6);
+  // Brightest up in the crack, thinning toward the floor.
+  float along = smoothstep(0.0, 0.35, t) * (1.0 - smoothstep(0.8, 1.0, t)) * (0.45 + 0.55 * t);
+  float shimmer = 0.85 + 0.15 * sin(uTime * 0.6 + vCorner.x * 3.0 + t * 5.0);
+  gl_FragColor = vec4(uColor, across * along * shimmer * uAlpha);
+  #include <colorspace_fragment>
+}
+`;
+
 function airMaterial(
   name: string,
   vert: string,
@@ -212,7 +246,12 @@ function points(plan: HammerAirPlan) {
   const geoP = plan.geodes.map(
     (g, i) => [heartHash(i, 97), g.size, 0, 1] as [number, number, number, number],
   );
-  return { motes, moteP, grit, gritP, haze, hazeP, geo, geoP };
+  const shaft = plan.shafts.map((s) => [s.x, s.y0, s.z] as [number, number, number]);
+  const shaftP = plan.shafts.map(
+    (s) =>
+      [s.y1 - s.y0, s.width * s.strength, s.leanX, s.leanZ] as [number, number, number, number],
+  );
+  return { motes, moteP, grit, gritP, haze, hazeP, geo, geoP, shaft, shaftP };
 }
 
 /** The vein's air, instance-local (a cosmetic group: the low tier builds a
@@ -254,7 +293,8 @@ export function buildHammerAir(lowGfx: boolean): THREE.Group {
     'smithHeartPitHaze',
     p.haze,
     p.hazeP,
-    airMaterial('smithHeartPitHaze', HAZE_VERT, HAZE_FRAG, 0xc8a47a, 0.14, false),
+    // Grey quarry dust (never an amber wash over the whole pit: phase 2C).
+    airMaterial('smithHeartPitHaze', HAZE_VERT, HAZE_FRAG, 0xaaa7a8, 0.12, false),
     4,
   );
   add(
@@ -263,6 +303,13 @@ export function buildHammerAir(lowGfx: boolean): THREE.Group {
     p.geoP,
     airMaterial('smithHeartGeodeHalos', HAZE_VERT, HAZE_FRAG, 0xff9a3a, 0.35, true),
     7,
+  );
+  add(
+    'smithHeartCleftShafts',
+    p.shaft,
+    p.shaftP,
+    airMaterial('smithHeartCleftShafts', SHAFT_VERT, SHAFT_FRAG, 0xffd6a0, 0.13, true),
+    8,
   );
   return group;
 }
