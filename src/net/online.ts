@@ -34,7 +34,6 @@ import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/
 import { applyAbilityCostTail, resolveAbilityChain } from '../sim/combat/ability_resolution';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
 import type { BuddyKey } from '../sim/content/buddies';
-import { FARM_PATCHES } from '../sim/content/farm_patches';
 import { type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -54,6 +53,7 @@ import {
   ALL_RECIPES,
   CLASSES,
   dungeonAt,
+  farmPatchesInActiveWorld,
   getActiveWorldContent,
   NPCS,
   resolveDelveShopOffers,
@@ -1408,10 +1408,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // and reset null on reconnect hello (the harvestPreference/marketInfo
   // precedent) so a resume never shows a stale goal.
   gatheringGoal: GatheringGoalView | null = null;
-  // Static content read (the recipeList precedent below): the garden-bed
-  // geography ships with the client bundle like every other content table, so
-  // this needs no wire round-trip. See src/world_api/farming.ts.
-  farmPatches: readonly FarmPatchDef[] = FARM_PATCHES;
+  // The beds as the loaded world places them (data.ts), like the server's Sim.
+  get farmPatches(): readonly FarmPatchDef[] {
+    return farmPatchesInActiveWorld();
+  }
   // The viewer's own farm plots, one row per planted bed sorted by bed id,
   // mirrored from the `fplot` self-wire delta. Empty for every player with no
   // planted bed, which is the server's own default (the sim projects [] for an

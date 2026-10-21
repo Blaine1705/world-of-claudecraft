@@ -4,22 +4,19 @@
 // glyphs from questGiverNpcMarkers(), and the mob hover tooltip lists the
 // objectives a mob advances via questObjectivesForMob(). A host-agnostic leaf
 // like threat.ts / format_money.ts: no DOM, no rng, no Sim state. Everything
-// derives from the QUESTS/CAMPS/MOBS/GROUND_OBJECTS/NPCS content plus the
-// player's live quest log, so the offline Sim and the online ClientWorld
-// mirror produce identical output, and (unlike world.entities) none of it is
-// interest-radius limited: a camp or quest giver far across the zone still resolves.
+// derives from the QUESTS/MOBS content plus the player's live quest log, so
+// the offline Sim and the online ClientWorld mirror produce identical output,
+// and (unlike world.entities) none of it is interest-radius limited: a camp
+// or quest giver far across the zone still resolves.
+// The PLACES an objective is circled at (mob camps, ground-object clusters,
+// gather nodes, farm beds, interact NPCs) and the quest givers' glyphs come
+// from the ACTIVE world, so a Studio map that moves a camp or a quest giver
+// moves its marker too (escort starts stay authored: no map moves them). The
+// built-in world wraps the shipped tables themselves, so the shipped game
+// reads exactly what it always did.
 
 import { FARM_PATCHES } from './content/farm_patches';
-import {
-  CAMPS,
-  ESCORTS,
-  GROUND_OBJECTS,
-  gatherNodesInActiveWorld,
-  getActiveWorldContent,
-  MOBS,
-  NPCS,
-  QUESTS,
-} from './data';
+import { ESCORTS, gatherNodesInActiveWorld, getActiveWorldContent, MOBS, QUESTS } from './data';
 import { farmPatchesFor } from './moved_objects';
 import { nodeMaterialFor } from './professions/gathering';
 import { fineGradeReachable, fineMaterialFor } from './professions/material_grades';
@@ -335,9 +332,12 @@ export function questObjectiveAreas(
     byCircle.set(key, area);
     out.push(area);
   };
+  // The loaded world's camps and ground objects: a map's own roster, or the
+  // shipped CAMPS / GROUND_OBJECTS tables when the built-in world is active.
+  const world = getActiveWorldContent();
   const pushMobCamps = (ref: QuestObjectiveRef, mobId: string): void => {
-    for (const camp of CAMPS) {
-      // fresh {x,z}: never alias the shared CAMPS content the sim spawns from
+    for (const camp of world.camps) {
+      // fresh {x,z}: never alias the shared camp content the sim spawns from
       if (camp.mobId === mobId)
         push(ref, { x: camp.center.x, z: camp.center.z }, camp.radius + CAMP_AREA_PAD);
     }
@@ -367,7 +367,7 @@ export function questObjectiveAreas(
   // One enclosing circle per ground-object definition: each def already carries
   // its own authored cluster of spawn positions.
   const pushObjectCluster = (ref: QuestObjectiveRef, itemId: string): void => {
-    for (const def of GROUND_OBJECTS) {
+    for (const def of world.groundObjects) {
       if (def.itemId !== itemId || def.positions.length === 0) continue;
       pushEnclosing(ref, def.positions);
     }
@@ -387,7 +387,7 @@ export function questObjectiveAreas(
   // patchless objective is honestly earned at any bed in the world. Beds are
   // static content like GATHER_NODES (no entity id to resolve).
   const pushFarmPatches = (ref: QuestObjectiveRef, patchId: string | undefined): void => {
-    for (const patch of farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES)) {
+    for (const patch of farmPatchesFor(world.objectMoves, FARM_PATCHES)) {
       if (patchId !== undefined && patch.id !== patchId) continue;
       // fresh {x,z}: never alias the deep-frozen FARM_PATCHES content
       pushEnclosing(
@@ -417,8 +417,9 @@ export function questObjectiveAreas(
         break;
       case 'interact': {
         if (obj.targetObjectItemId) pushObjectCluster(ref, obj.targetObjectItemId);
-        const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
-        // fresh {x,z}: never alias the shared NPCS content the sim places from
+        // Where the loaded world stands the NPC (the Sim places from world.npcs).
+        const npc = obj.targetNpcId ? world.npcs[obj.targetNpcId] : undefined;
+        // fresh {x,z}: never alias the shared npc content the sim places from
         if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
         break;
       }
@@ -506,7 +507,7 @@ export interface QuestGiverNpcMarker {
  * Every static NPC currently offering an available quest (first-offer gold or
  * repeatable blue), holding a ready turn-in, or holding a work order inside
  * its cooldown window (the dimmed marker where the NPC previously showed
- * nothing), resolved from the NPCS content table rather than world.entities
+ * nothing), resolved from the loaded world's NPC table rather than world.entities
  * so (like questObjectiveAreas above) it is never interest-radius limited: a
  * quest giver far across an online zone still surfaces its glyph. Dynamic
  * NPCs (spawned on demand by their owning system, e.g. mid-encounter or
@@ -525,7 +526,9 @@ export function questGiverNpcMarkers(
   cadenceBlocked?: ReadonlySet<string>,
 ): QuestGiverNpcMarker[] {
   const out: QuestGiverNpcMarker[] = [];
-  for (const npc of Object.values(NPCS)) {
+  // The loaded world's NPCs, the very records the Sim places (a Studio map
+  // may move or drop a quest giver); NPCS itself on the built-in world.
+  for (const npc of Object.values(getActiveWorldContent().npcs)) {
     if (npc.dynamic && !npc.fixedPost) continue;
     const refs: QuestGiverNpcQuestRef[] = [];
     for (const questId of npc.questIds) {
@@ -551,7 +554,7 @@ export function questGiverNpcMarkers(
     // sorts in place.
     refs.sort((a, b) => questMarkerRank(b.kind) - questMarkerRank(a.kind));
     out.push({
-      // fresh {x,z}: never alias the shared NPCS content the sim places from
+      // fresh {x,z}: never alias the shared npc content the sim places from
       pos: { x: npc.pos.x, z: npc.pos.z },
       kind: refs[0].kind,
       quests: refs,
