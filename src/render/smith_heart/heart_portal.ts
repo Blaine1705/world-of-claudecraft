@@ -7,8 +7,9 @@
 //   - in the Heart: the return portal on the Arrival Terrace (a smaller
 //     vortex and funnel, always open: the Heart is only ever reached through
 //     the open seal);
-//   - the hop: an arrival burst at the landing (a column and a floor ring)
-//     and a brief white-gold wash over the view.
+//   - the hop: an arrival burst at the landing (a column, a floor ring and
+//     the four colours whirling up round the arrival) and a brief white-gold
+//     wash over the view.
 // Every material here is built with the interior (the compile gate links it,
 // hidden or not) and belongs to this slot; the frame driver writes uniforms
 // only while a value moves. The vortex, funnel and bursts draw on every tier;
@@ -19,6 +20,7 @@ import {
   HEART_RETURN_PORTAL,
   HEART_SEAL,
   HEART_TERRACE,
+  RING_SPIRE_BEARINGS,
   SEAL_DAIS,
 } from '../../sim/content/smith_heart_layout';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -34,6 +36,7 @@ import {
 import {
   HEART_PORTAL_RING_REACH,
   HEART_PORTAL_SIZE,
+  HEART_PORTAL_SKY_BEAM,
   HEART_RETURN_SIZE,
   type HeartHopStage,
   type HeartPortalStage,
@@ -42,10 +45,11 @@ import {
 } from './heart_portal_core';
 
 const WHITE_GOLD = 0xfff0d0;
-/** Where the tines' tips stand (bearing, radius, height over the dais). */
-const TINE_TIPS = [45, 135, 225, 315].map((deg) => {
+/** Where the spires' crystal tips stand (bearing, radius, height over the
+ *  dais): each leans 3.2 yd in over its 16 (the Ring kit's Kit_SealSpire). */
+const TINE_TIPS = RING_SPIRE_BEARINGS.map((deg) => {
   const a = (deg * Math.PI) / 180;
-  return { x: Math.sin(a) * 12.5, z: Math.cos(a) * 12.5, y: 16 };
+  return { x: Math.sin(a) * 12.3, z: Math.cos(a) * 12.3, y: 16 };
 });
 /** Where the arcs meet over the seal (height over the dais). */
 const ARC_EYE_Y = 9;
@@ -128,6 +132,8 @@ function portalRig(
 interface HopRig {
   column: THREE.ShaderMaterial;
   ring: THREE.ShaderMaterial;
+  /** The four colours' swirl round the arrival (phase 2F). */
+  swirl: THREE.ShaderMaterial;
   meshes: THREE.Object3D[];
 }
 
@@ -141,10 +147,17 @@ function hopRig(group: THREE.Group, side: 'heart' | 'ring', y: number): HopRig {
   const r = floorDisc(ring, 16, floorVfxRenderOrder('ground', 7));
   r.position.set(at.x, y + 0.11, at.z);
   r.name = `hopRing:${side}`;
-  group.add(c, r);
+  // The four colours whirling up round whoever arrives (a short wide
+  // sleeve, fading with the column).
+  const swirl = heartFunnelMaterial(`smithHeartHopSwirl:${side}`);
+  const w = new THREE.Mesh(sleeve(2.4, 7, 16, 32), swirl);
+  w.position.set(at.x, y, at.z);
+  w.name = `hopSwirl:${side}`;
+  group.add(c, r, w);
   c.visible = false;
   r.visible = false;
-  return { column, ring, meshes: [c, r] };
+  w.visible = false;
+  return { column, ring, swirl, meshes: [c, r, w] };
 }
 
 export interface HeartPortals {
@@ -200,7 +213,16 @@ export function buildHeartPortals(
   bloom.position.set(seal.x, y, seal.z);
   bloom.name = 'portalBloom';
   bloom.visible = false;
-  group.add(flash, bloom);
+  // The beam to the sky (phase 2F): a white-gold shaft standing up out of
+  // the seal past the storm, blinding through the burst, then a thin living
+  // beam over the open portal for good (it marks the way from the whole
+  // main map).
+  const skyMat = heartBeamMaterial(WHITE_GOLD, 'smithHeartPortalSkyBeam', 2.2);
+  const skyBeam = new THREE.Mesh(sleeve(2.6, 1.3, HEART_PORTAL_SKY_BEAM, 18), skyMat);
+  skyBeam.position.set(seal.x, y, seal.z);
+  skyBeam.name = 'portalSkyBeam';
+  skyBeam.visible = false;
+  group.add(flash, bloom, skyBeam);
   const innerRingMat = heartRingMaterial('smithHeartPortalRingInner');
   const innerRing = floorDisc(innerRingMat, SEAL_DAIS.r, floorVfxRenderOrder('ground', 7));
   innerRing.position.set(seal.x, y + 0.12, seal.z);
@@ -214,6 +236,23 @@ export function buildHeartPortals(
   outerRing.position.set(seal.x, 0.14, seal.z);
   outerRing.visible = false;
   group.add(innerRing, outerRing);
+  // The wall of light riding the wave across the Ring (a short sleeve
+  // scaled to the wave's reach).
+  const curtainMat = heartFunnelMaterial('smithHeartPortalCurtain');
+  const curtain = new THREE.Mesh(sleeve(1, 1, 1, 64), curtainMat);
+  curtain.position.set(seal.x, -1.5, seal.z);
+  curtain.name = 'portalCurtain';
+  curtain.visible = false;
+  group.add(curtain);
+  // The living portal's outer sleeve: a slower, wider turn of the four
+  // colours round the funnel (it gives the open portal its volume).
+  const outerMat = heartFunnelMaterial('smithHeartPortalOuterFunnel');
+  const outerFunnel = new THREE.Mesh(sleeve(7.5, 15, 36, 40), outerMat);
+  outerFunnel.position.set(seal.x, y, seal.z);
+  outerFunnel.name = 'portalOuterFunnel';
+  outerFunnel.visible = false;
+  outerFunnel.rotation.y = Math.PI / 4;
+  group.add(outerFunnel);
 
   // ---- the Heart's return portal (always open) ---------------------------------------
   const retY = ground(HEART_RETURN_PORTAL.x, HEART_RETURN_PORTAL.z);
@@ -252,6 +291,7 @@ export function buildHeartPortals(
   group.add(wash);
 
   let lastSwirl = -1;
+  let lastSky = -1;
   let lastFlash = -1;
   let lastRing = -1;
   let lastCharge = -1;
@@ -267,6 +307,8 @@ export function buildHeartPortals(
         live.vortex.uniforms.uK.value = swirl;
         live.funnel.uniforms.uK.value = swirl;
         live.motes.uniforms.uK.value = swirl;
+        outerFunnel.visible = swirl > 0;
+        outerMat.uniforms.uK.value = swirl * 0.45;
       }
       // The tines' arcs: blazing through the charge, then a steady feed.
       const charge = Math.round(Math.max(portal.charge, swirl * 0.35) * 100) / 100;
@@ -276,12 +318,18 @@ export function buildHeartPortals(
         arcMat.uniforms.uK.value = charge * 2.2;
       }
       const f = Math.round(portal.flash * 100) / 100;
-      if (f !== lastFlash) {
+      if (f !== lastFlash || swirl !== lastSky) {
         lastFlash = f;
+        lastSky = swirl;
         flash.visible = f > 0;
         flashMat.uniforms.uK.value = f * 4;
         bloom.visible = f > 0;
         bloomMat.uniforms.uK.value = f * 1.6;
+        // The sky beam: the burst's flash, then a steady thin shaft.
+        const sky = Math.max(f * 5, swirl * 0.55);
+        skyBeam.visible = sky > 0;
+        skyMat.uniforms.uK.value = sky;
+        skyBeam.scale.set(1 + f * 2.2, 1, 1 + f * 2.2);
       }
       const ring = Math.round(portal.ring * 400) / 400;
       if (ring !== lastRing) {
@@ -294,6 +342,10 @@ export function buildHeartPortals(
         outerRing.visible = ring > 0 && reach > SEAL_DAIS.r - 2;
         outerRingMat.uniforms.uR.value = ring;
         outerRingMat.uniforms.uK.value = k;
+        // The wall of light rides the wave out past the dais, fading.
+        curtain.visible = ring > 0 && reach > SEAL_DAIS.r;
+        curtain.scale.set(reach, 6 * (1 - ring * 0.5), reach);
+        curtainMat.uniforms.uK.value = ring > 0 ? 1.4 * (1 - ring) : 0;
       }
       // The hop's arrival burst.
       const h = Math.round(hop.column * 100) / 100 + Math.round(hop.ring * 100) / 1000;
@@ -306,6 +358,7 @@ export function buildHeartPortals(
           rig.column.uniforms.uK.value = on ? hop.column * 2.6 : 0;
           rig.ring.uniforms.uR.value = on ? hop.ring : 0;
           rig.ring.uniforms.uK.value = on ? (1 - hop.ring) * 2.2 : 0;
+          rig.swirl.uniforms.uK.value = on ? hop.column * 2.4 : 0;
         }
       }
     },

@@ -134,3 +134,32 @@ export function heartRiverLitSegments(since: number, segments: number): number {
   const t = Math.min(1, since / HEART_RIVER_RUN_SECONDS);
   return Math.round(segments * t);
 }
+
+/** The yards from a river's source of each strip vertex (four per segment:
+ *  left and right at its start, then at its end), for the surge's shader. */
+export function heartRiverArcs(strip: HeartRiverStrip): Float32Array {
+  const out = new Float32Array(strip.segments * 4);
+  let arc = 0;
+  for (let i = 0; i < strip.segments; i++) {
+    const a = strip.points[i];
+    const b = strip.points[i + 1];
+    const len = Math.hypot(b.x - a.x, b.z - a.z);
+    out[i * 4] = arc;
+    out[i * 4 + 1] = arc;
+    out[i * 4 + 2] = arc + len;
+    out[i * 4 + 3] = arc + len;
+    arc += len;
+  }
+  return out;
+}
+
+/** Where the surge rides (yards from the source) `since` seconds after its
+ *  vein lit, its river `total` yards long: with the bright ribbon's front
+ *  while the light runs, then a little past the mouth as it pours onto the
+ *  seal; -1 before and after (no surge). */
+export function heartRiverSurgeHead(since: number, total: number): number {
+  if (since < 0) return -1;
+  const t = since / HEART_RIVER_RUN_SECONDS;
+  if (t > 1.15) return -1;
+  return total * t;
+}

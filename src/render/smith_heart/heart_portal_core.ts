@@ -24,6 +24,7 @@ import {
   inSmithHeartRoom,
   RING_PORTAL_LANDING,
 } from '../../sim/content/smith_heart_layout';
+import { HEART_SEAL_ARRIVAL } from './heart_seal_core';
 
 /** The opening's timeline (seconds from the portal bit's first sighting). */
 export const HEART_PORTAL_OPEN = {
@@ -41,6 +42,37 @@ export const HEART_PORTAL_OPEN = {
 /** How far the shockwave runs (yards from the seal: across the void to the
  *  Ring's outer edge). */
 export const HEART_PORTAL_RING_REACH = 82;
+/** The camera's jolts (phase 2F, presentation only: the renderer's shake
+ *  sink honours reduced motion, the caller scales them by distance): as the
+ *  seal opens, a tremor through the charge, the heavy jolt on the flash, an
+ *  aftershock as the shards lift; as a vein's light reaches the seal, a
+ *  thud. Seconds on each moment's own clock. */
+export const HEART_PORTAL_SHAKES: readonly { at: number; amount: number }[] = [
+  { at: HEART_PORTAL_OPEN.charge * 0.5, amount: 0.16 },
+  { at: HEART_PORTAL_OPEN.charge, amount: 0.8 },
+  { at: HEART_PORTAL_OPEN.charge + 0.7, amount: 0.3 },
+];
+export const HEART_ARRIVAL_SHAKES: readonly { at: number; amount: number }[] = [
+  { at: HEART_SEAL_ARRIVAL, amount: 0.22 },
+];
+
+/** The jolt due as a moment's clock moved from `prev` to `now` (seconds;
+ *  a clock first seen, prev null, is never due: a moment met long done
+ *  never shakes). */
+export function heartShakeDue(
+  schedule: readonly { at: number; amount: number }[],
+  prev: number | null,
+  now: number,
+): number {
+  if (prev === null || now < 0 || (prev < 0 && now < 0)) return 0;
+  let sum = 0;
+  for (const s of schedule) if (s.at > prev && s.at <= now) sum += s.amount;
+  return sum;
+}
+
+/** How tall the portal's beam to the sky stands (yards over the dais: past
+ *  the storm's cloud floor). */
+export const HEART_PORTAL_SKY_BEAM = 420;
 /** How far each seal quarter slides out when the seal splits (yards). */
 export const HEART_PORTAL_SPLIT_OUT = 3.6;
 /** The floor vortex's radius and the funnel's height and radii (yards). */
@@ -99,6 +131,96 @@ export function heartPortalStage(
   // The ring runs 0 to 1, then reads 0 (gone) past its run.
   out.ring = after < 0 || after > O.ring ? 0 : Math.max(0.001, after / O.ring);
   out.swirl = ease((after - 0.15) / O.swirl);
+  return out;
+}
+
+/** How a seal quarter stands as the seal splits (phase 2F): slid `out`
+ *  yards from the centre, lifted `lift`, its outer edge tipped down by
+ *  `tilt` radians (the quarters open like a flower's petals). */
+export function heartQuarterPose(
+  split: number,
+  out: { out: number; lift: number; tilt: number } = { out: 0, lift: 0, tilt: 0 },
+): { out: number; lift: number; tilt: number } {
+  out.out = split * HEART_PORTAL_SPLIT_OUT;
+  out.lift = Math.sin(Math.min(1, split) * Math.PI) * 0.35 + split * 0.08;
+  out.tilt = split * 0.07;
+  return out;
+}
+
+/** How many shards the seal bursts into (the low tier keeps fewer:
+ *  cosmetic). */
+export function heartShardCount(lowGfx: boolean): number {
+  return lowGfx ? 12 : 24;
+}
+
+/** Seconds after the split begins that the shards have risen and settle
+ *  into their orbit round the portal. */
+export const HEART_SHARD_RISE = 2.6;
+
+export interface HeartShardPose {
+  x: number;
+  y: number;
+  z: number;
+  /** Euler turn (radians). */
+  rx: number;
+  ry: number;
+  rz: number;
+  scale: number;
+}
+
+function h01(i: number, k: number): number {
+  const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
+  return v - Math.floor(v);
+}
+
+/**
+ * Shard `i` of the split seal `since` seconds after the portal bit was first
+ * seen (-1: shut, the shard hidden: scale 0): it bursts up out of the seal's
+ * seams as the quarters part, tumbling, rises to its height (7 to 21 yd over
+ * the dais, always over a body's head once it has left the floor) and then
+ * turns slowly round the portal's funnel for good, bobbing. Positions are
+ * relative to the seal's centre on the dais. A portal met already open shows
+ * the shards in their orbit.
+ */
+export function heartShardPose(
+  i: number,
+  since: number,
+  out: HeartShardPose = { x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, scale: 0 },
+): HeartShardPose {
+  const start = HEART_PORTAL_OPEN.charge + 0.05;
+  const t = since - start;
+  if (since < 0 || t < 0) {
+    out.scale = 0;
+    out.x = 0;
+    out.y = 0;
+    out.z = 0;
+    out.rx = 0;
+    out.ry = 0;
+    out.rz = 0;
+    return out;
+  }
+  // Where it bursts from: one of the four seams (the diagonals) or the boss.
+  const seam = i % 5;
+  const along = 1 + h01(i, 1) * 7;
+  const a0 = seam === 4 ? h01(i, 2) * Math.PI * 2 : ((45 + seam * 90) * Math.PI) / 180;
+  const r0 = seam === 4 ? h01(i, 3) * 1.6 : along;
+  // Where it settles: a ring round the funnel, its own height and radius.
+  const r1 = 6.5 + h01(i, 4) * 5.5;
+  const y1 = 7 + h01(i, 5) * 14;
+  const spin = (0.1 + h01(i, 6) * 0.08) * (i % 2 ? 1 : -1);
+  const rise = Math.min(1, t / HEART_SHARD_RISE);
+  const e = 1 - (1 - rise) ** 3;
+  // The burst overshoots up and out, then sinks back into the orbit.
+  const kick = Math.sin(Math.min(1, t / 1.2) * Math.PI) * (3 + h01(i, 7) * 5);
+  const ang = a0 + spin * t + (h01(i, 8) - 0.5) * 0.6 * e;
+  const r = r0 + (r1 - r0) * e;
+  out.x = Math.sin(ang) * r;
+  out.z = Math.cos(ang) * r;
+  out.y = y1 * e + kick * (1 - e * 0.6) + Math.sin(t * (0.7 + h01(i, 9) * 0.5) + i) * 0.45 * e;
+  out.rx = t * (0.6 + h01(i, 10) * 1.4) * (1 - e * 0.75) + h01(i, 11) * 6;
+  out.ry = t * (0.3 + h01(i, 12)) + h01(i, 13) * 6;
+  out.rz = t * (0.5 + h01(i, 14)) * (1 - e * 0.75);
+  out.scale = (0.75 + h01(i, 15) * 0.6) * Math.min(1, t / 0.12);
   return out;
 }
 

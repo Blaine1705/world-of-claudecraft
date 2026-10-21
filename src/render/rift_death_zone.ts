@@ -54,7 +54,7 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
-import { HammerFx } from './smith_heart_fx';
+import { HammerFx, SealShake } from './smith_heart_fx';
 import { SummonRiseFx } from './summon_rise_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { TrashEngineFx } from './trash_engine_fx';
@@ -140,6 +140,8 @@ export class RiftDeathZoneVisuals {
   // The Smith's Heart's Hammer guardian (Mountain's Wrath, Hammerfall) and the
   // Slab breaking.
   private readonly hammerFx: HammerFx;
+  // The Smith's Heart's seal moments felt in the camera.
+  private readonly sealShake: SealShake;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -277,6 +279,7 @@ export class RiftDeathZoneVisuals {
     this.trashEngine = new TrashEngineFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.summonRise = new SummonRiseFx(playGesture);
     this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.sealShake = new SealShake(world, shake);
   }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
@@ -355,6 +358,7 @@ export class RiftDeathZoneVisuals {
     this.trashEngine.update(dt);
     this.summonRise.update(dt);
     this.hammerFx.update(dt);
+    this.sealShake.update();
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);

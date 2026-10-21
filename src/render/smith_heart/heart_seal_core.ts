@@ -166,6 +166,38 @@ export function heartSealColumn(since: number): number {
   return rise * (1 - t / HEART_SEAL_COLUMN_SECONDS) ** 1.5;
 }
 
+/** Seconds the arrival's shockwave takes to cross from the seal to the
+ *  Ring's outer rim. */
+export const HEART_SEAL_WAVE_SECONDS = 1.7;
+
+/** The arrival's shockwave (phase 2F): how far across it has run (0 to 1 of
+ *  its reach) `since` seconds after its vein lit, 0 before the light reaches
+ *  the seal and after it has crossed. */
+export function heartSealArrivalWave(since: number): number {
+  const t = (since - HEART_SEAL_ARRIVAL) / HEART_SEAL_WAVE_SECONDS;
+  if (t < 0 || t > 1) return 0;
+  return Math.max(0.001, 1 - (1 - t) * (1 - t));
+}
+
+/** A spire igniting with its vein (phase 2F): `fill` how far up the light
+ *  has climbed (0 to 1, from just before the river reaches the seal), and
+ *  `flare` a white flash as it reaches the tip, fading. */
+export function heartSpireIgnite(
+  since: number,
+  out: { fill: number; flare: number } = { fill: 0, flare: 0 },
+): { fill: number; flare: number } {
+  const t = since - (HEART_SEAL_ARRIVAL - 0.25);
+  if (since < 0 || t < 0) {
+    out.fill = 0;
+    out.flare = 0;
+    return out;
+  }
+  out.fill = Math.min(1, t / 0.9);
+  const after = t - 0.9;
+  out.flare = after < 0 ? 0 : Math.max(0, 1 - after / 0.8) ** 2;
+  return out;
+}
+
 /** The seal's four quarters: each vein's, centred on the bearing (degrees
  *  clockwise from north) its light-river arrives from: the Breath from the
  *  north, the Quench from the east, the Hammer down the Grand Stair from the

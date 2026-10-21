@@ -100,10 +100,12 @@ export function heartBeamMaterial(color: number, name: string, flow = 1): THREE.
 /** A floor ring on a flat disc of radius 1 (scaled to the reach): a bright
  *  band at `uR` (0 to 1 of the disc) in the four colours, a soft wake inside.
  *  `uK` is its strength. */
-export function heartRingMaterial(name: string): THREE.ShaderMaterial {
+export function heartRingMaterial(name: string, mono?: number): THREE.ShaderMaterial {
   return additive(name, {
     uniforms: {
       ...fourColourUniforms(),
+      uMono: { value: new THREE.Color(mono ?? 0xffffff) },
+      uUseMono: { value: mono === undefined ? 0 : 1 },
       uR: { value: 0 },
       uK: { value: 0 },
       uTime: sharedUniforms.uTime,
@@ -114,13 +116,14 @@ export function heartRingMaterial(name: string): THREE.ShaderMaterial {
     fragmentShader: /* glsl */ `
       ${FOUR}
       uniform float uR; uniform float uK; uniform float uTime;
+      uniform vec3 uMono; uniform float uUseMono;
       varying vec2 vP;
       void main() {
         float r = length(vP);
         float band = smoothstep(0.06, 0.0, abs(r - uR)) + 0.5 * smoothstep(0.03, 0.0, abs(r - uR * 0.82));
         float wake = smoothstep(uR, uR * 0.55, r) * step(r, uR) * 0.3;
         float ang = atan(vP.x, vP.y) / 6.2831853 + 0.5;
-        vec3 c = mix(fourColour(ang + uTime * 0.05), vec3(1.0, 0.95, 0.85), 0.35);
+        vec3 c = mix(mix(fourColour(ang + uTime * 0.05), uMono, uUseMono), vec3(1.0, 0.95, 0.85), 0.35);
         float a = uK * (band + wake) * (1.0 - uR * 0.6);
         gl_FragColor = vec4(c * a, 1.0);
         #include <colorspace_fragment>
@@ -317,6 +320,110 @@ export function heartCoreMaterial(name: string): THREE.ShaderMaterial {
         col = mix(col, white, smoothstep(0.7, 0.95, churn) * 0.8);
         col *= 1.1 + beat * 0.9;
         col += hot * pow(1.0 - vRim, 2.0) * (0.8 + beat);
+        gl_FragColor = vec4(col, 1.0);
+        #include <colorspace_fragment>
+      }`,
+  });
+}
+
+/**
+ * The crystal of the seal, its heart, the spires and the shards (the Ring
+ * kit's glow slot: a grey facet shade per vertex): dark smoky crystal with
+ * a hint of its vein's colour while the vein is dark; lit (`uLevel`), the
+ * light runs through it from one end (`uFill` 0 to 1 along the radius from
+ * the seal's boss, `uAxis` 0, or up its height, `uAxis` 1, over `uSpan`) and
+ * it burns in its colour, the facets brighter, a white flare on `uFlare`.
+ * Unlit by the scene (it is its own light), instanced or not.
+ */
+export function heartCrystalMaterial(name: string, color: number): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    name,
+    fog: false,
+    vertexColors: true,
+    uniforms: {
+      uColor: { value: new THREE.Color(color) },
+      uLevel: { value: 0 },
+      uFill: { value: 0 },
+      uFlare: { value: 0 },
+      uAxis: { value: 0 },
+      uSpan: { value: new THREE.Vector2(1.85, 9) },
+      uTime: sharedUniforms.uTime,
+    },
+    vertexShader: /* glsl */ `
+      uniform float uAxis; uniform vec2 uSpan;
+      varying vec3 vShade; varying float vT; varying float vRim; varying float vH;
+      void main() {
+        vShade = color;
+        vec3 p = position;
+        vT = clamp((mix(length(p.xz), p.y, uAxis) - uSpan.x) / max(0.001, uSpan.y - uSpan.x), 0.0, 1.0);
+        vH = p.x * 0.7 + p.y * 1.3 + p.z * 0.9;
+        vec4 w = vec4(p, 1.0);
+        #ifdef USE_INSTANCING
+          w = instanceMatrix * w;
+        #endif
+        vec4 mv = modelViewMatrix * w;
+        vec3 n = normal;
+        #ifdef USE_INSTANCING
+          n = mat3(instanceMatrix) * n;
+        #endif
+        vRim = abs(dot(normalize(normalMatrix * n), normalize(-mv.xyz)));
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform vec3 uColor; uniform float uLevel; uniform float uFill; uniform float uFlare;
+      uniform float uAxis; uniform float uTime;
+      varying vec3 vShade; varying float vT; varying float vRim; varying float vH;
+      void main() {
+        float shade = vShade.r;
+        float rim = pow(1.0 - vRim, 2.0);
+        // Dark: smoky crystal, a breath of its colour in the facets.
+        vec3 dark = mix(vec3(0.06, 0.06, 0.07), uColor * 0.22, 0.22) * (0.5 + 0.7 * shade) + uColor * rim * 0.06;
+        // The light runs in from the rim (or up the spire) behind a hot front.
+        float front = mix(1.0 - uFill, uFill, uAxis);
+        float lit = mix(smoothstep(front - 0.04, front + 0.04, vT), 1.0 - smoothstep(front - 0.04, front + 0.04, vT), uAxis);
+        lit *= step(0.0001, uFill);
+        float edge = smoothstep(0.08, 0.0, abs(vT - front)) * step(0.0001, uFill) * step(uFill, 0.999);
+        float pulse = 0.82 + 0.18 * sin(uTime * 1.7 + vH * 0.6);
+        vec3 burn = uColor * (0.55 + 1.1 * shade) * pulse * uLevel + mix(uColor, vec3(1.0), 0.6) * rim * uLevel * 0.9;
+        vec3 col = mix(dark, burn, lit);
+        col += vec3(1.0, 0.97, 0.9) * (edge * 1.4 + uFlare * (0.6 + rim));
+        gl_FragColor = vec4(col, 1.0);
+        #include <colorspace_fragment>
+      }`,
+  });
+}
+
+/**
+ * A light-river's bright ribbon: its vein's colour flowing toward the seal
+ * (bands running along `aArc`, the yards from its source), and a white-hot
+ * surge riding at `uHead` (yards) while the light runs, its wake trailing.
+ */
+export function heartRiverSurgeMaterial(name: string, color: number): THREE.ShaderMaterial {
+  return additive(name, {
+    uniforms: {
+      uColor: { value: new THREE.Color(color) },
+      uHead: { value: -1 },
+      uK: { value: 0.95 },
+      uTime: sharedUniforms.uTime,
+    },
+    vertexShader: /* glsl */ `
+      attribute float aArc;
+      attribute float aSide;
+      varying float vArc; varying float vAcross;
+      void main() {
+        vArc = aArc;
+        vAcross = aSide;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform vec3 uColor; uniform float uHead; uniform float uK; uniform float uTime;
+      varying float vArc; varying float vAcross;
+      void main() {
+        float flow = 0.72 + 0.28 * sin(vArc * 0.9 - uTime * 5.0) * sin(vArc * 0.31 - uTime * 2.1 + 1.3);
+        float core = 1.0 - 0.45 * vAcross * vAcross;
+        float d = uHead - vArc;
+        float head = uHead < 0.0 ? 0.0 : exp(-d * d * 0.06) * 2.6 + step(0.0, d) * exp(-d * 0.08) * 0.9;
+        vec3 col = uColor * flow * core * uK + mix(uColor, vec3(1.0, 0.97, 0.9), 0.65) * head;
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }`,

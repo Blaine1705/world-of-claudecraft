@@ -41,6 +41,13 @@ import { buildHeartRoom } from './heart_room';
 import { buildHeartSeal } from './heart_seal';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from './heart_seal_core';
 import { buildHeartSky } from './heart_sky';
+import {
+  dressRing,
+  ensureRingKit,
+  RING_KIT_KINDS,
+  RING_KIT_OMIT_TOPS,
+  ringKitReady,
+} from './ring_kit';
 
 export interface SmithHeartInteriorDeps {
   lowGfx: boolean;
@@ -61,7 +68,10 @@ export async function buildSmithHeartInterior(
   ox: number,
   oz: number,
 ): Promise<THREE.Group> {
-  await Promise.all([ensureHammerKit(), ensureHeartRockKit()]);
+  await Promise.all([ensureHammerKit(), ensureHeartRockKit(), ensureRingKit()]);
+  // The Ring kit draws the two stairs tread by tread and the dais's keel
+  // (phase 2F); without it the field's own ramps and keel stand.
+  const ringReady = ringKitReady();
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   group.add(
@@ -72,24 +82,31 @@ export async function buildSmithHeartInterior(
       cliffPaint: heartCliffPaint,
       // The round islands hang over the void on keels (heart_room.ts).
       shallow: { surfaces: new Set(SMITH_HEART_FLOATING_SURFACES), depth: 3 },
+      ...(ringReady ? { omitTops: RING_KIT_OMIT_TOPS } : {}),
     }),
   );
   group.add(buildHeartMountain(deps.lowGfx));
   // The mountain's rock (phase 2E), the loose crags until its kit lands.
   dressHeartMountain(group, () => buildHeartWalls(deps.lowGfx), deps.lowGfx);
   const kitReady = hammerKitReady();
-  const props = buildHeartProps(HAMMER_KIT_KINDS, kitReady ? HAMMER_KIT_KINDS : new Set());
+  const kitKinds = new Set([...HAMMER_KIT_KINDS, ...RING_KIT_KINDS]);
+  const drawn = new Set([
+    ...(kitReady ? HAMMER_KIT_KINDS : []),
+    ...(ringReady ? RING_KIT_KINDS : []),
+  ]);
+  const props = buildHeartProps(kitKinds, drawn);
   group.add(props.group);
   dressHammerVein(group, props.kitOwned, deps.lowGfx);
+  dressRing(group, props.kitOwned, deps.lowGfx);
   // The kit's slot programs link with the interior even when the kit lands
   // late (the swap then links nothing in a live frame).
   group.add(heartKitProgramWarmers());
   group.add(buildHammerAir(deps.lowGfx));
-  group.add(buildHeartRoom(deps.lowGfx));
+  group.add(buildHeartRoom(deps.lowGfx, ringReady ? new Set(['seal_dais']) : new Set()));
   buildHeartLights(group, deps, ground);
   const rivers = buildHeartRivers();
   group.add(rivers.group);
-  const seal = buildHeartSeal();
+  const seal = buildHeartSeal(deps.lowGfx);
   group.add(seal.group);
   const portals = buildHeartPortals(deps.lowGfx, ground);
   group.add(portals.group);
@@ -133,7 +150,7 @@ export async function buildSmithHeartInterior(
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);
       rivers.update(view);
-      seal.update(view, stage);
+      seal.update(view, stage, view.portalSince);
       portals.update(stage, hop, hopSide);
       portals.wash(hop.flash, local);
       gates.update();
