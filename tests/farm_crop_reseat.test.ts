@@ -141,9 +141,12 @@ describe('dragging a planted bed in the map editor', () => {
     const target = { kind: 'farmBed' as const, patchId, bedId: BED };
     const at = { x: bed.x, z: bed.z };
     shiftMovedObjectInScene(scene, target, at, { ...at, removed: true }, ground);
-    expect(crop?.visible).toBe(false);
+    const shown = crop?.visible;
+    expect(crop?.scale.toArray()).toEqual([0, 0, 0]);
     shiftMovedObjectInScene(scene, target, { ...at, removed: true }, at, ground);
-    expect(crop?.visible).toBe(true);
+    expect(crop?.scale.toArray()).toEqual([1, 1, 1]);
+    // The compile gate owns visibility; the preview never touches it.
+    expect(crop?.visible).toBe(shown);
     visuals.dispose();
   });
 
