@@ -684,6 +684,15 @@ export interface RoadDef {
   kind: 'road' | 'path';
 }
 
+// A per-map change to one of the legacy roads the document carries in
+// content.roads (for a map seeded from the shipped world, the game's own dirt
+// roads): new waypoints, or the road removed. Keyed by the road's index in
+// content.roads as a decimal string; nothing rewrites that table, so the key
+// stays put and the change-only push merges road by road. A key past the end
+// of the table is ignored. Absent = every road as content.roads has it.
+export type RoadEdit = { points: { x: number; z: number }[] } | { removed: true };
+export type RoadEdits = Record<string, RoadEdit>;
+
 // The spatial content tables, mirroring the per-zone content modules. `objects`
 // matches the stored-JSON key (WorldContent calls them groundObjects).
 export interface MapDocContent {
@@ -779,6 +788,8 @@ export interface MapDoc {
   buildings?: BuildingDef[];
   // v3 optional: City Build editable roads (see RoadDef). Absent = none.
   roadDefs?: RoadDef[];
+  // v3 optional: moved or removed legacy roads (see RoadEdit). Absent = none.
+  roadEdits?: RoadEdits;
   // v2: map-wide water surface height; absent = the built-in WATER_LEVEL.
   waterLevel?: number;
   // v3 optional: map-wide water TINT (the Water tab's hue/lightness sliders,
@@ -1849,18 +1860,49 @@ function sanitizeWallRun(v: unknown): WallRunDef | null {
   return out;
 }
 
+function sanitizeRoadPoints(v: unknown): { x: number; z: number }[] {
+  const points: { x: number; z: number }[] = [];
+  for (const p of arr(v).slice(0, MAX_ROAD_POINTS)) {
+    const pt = p as Record<string, unknown> | null;
+    if (pt && finiteNum(pt.x) && finiteNum(pt.z)) points.push({ x: coord(pt.x), z: coord(pt.z) });
+  }
+  return points;
+}
+
 function sanitizeRoadDef(v: unknown): RoadDef | null {
   if (!v || typeof v !== 'object') return null;
   const r = v as Record<string, unknown>;
   const id = idStr(r.id);
   if (!id) return null;
-  const points: { x: number; z: number }[] = [];
-  for (const p of arr(r.points).slice(0, MAX_ROAD_POINTS)) {
-    const pt = p as Record<string, unknown> | null;
-    if (pt && finiteNum(pt.x) && finiteNum(pt.z)) points.push({ x: coord(pt.x), z: coord(pt.z) });
-  }
+  const points = sanitizeRoadPoints(r.points);
   if (points.length < 2) return null;
   return { id, points, kind: r.kind === 'path' ? 'path' : 'road' };
+}
+
+// Keys are canonical decimal indices below MAX_ROADS (no sign, no leading
+// zero), so "07" and "7" can never both name road 7.
+const ROAD_EDIT_KEY = /^(0|[1-9][0-9]{0,2})$/;
+
+function sanitizeRoadEdits(v: unknown): RoadEdits | undefined {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return undefined;
+  const out: RoadEdits = {};
+  let count = 0;
+  for (const [key, value] of Object.entries(v as Record<string, unknown>)) {
+    if (count >= MAX_ROADS) break;
+    if (!ROAD_EDIT_KEY.test(key) || Number(key) >= MAX_ROADS) continue;
+    if (!value || typeof value !== 'object') continue;
+    const e = value as Record<string, unknown>;
+    if (e.removed === true) {
+      out[key] = { removed: true };
+      count++;
+      continue;
+    }
+    const points = sanitizeRoadPoints(e.points);
+    if (points.length < 2) continue;
+    out[key] = { points };
+    count++;
+  }
+  return count > 0 ? out : undefined;
 }
 
 function sanitizeRoads(v: unknown): { x: number; z: number }[][] {
@@ -1964,6 +2006,8 @@ export function sanitizeMapDoc(raw: unknown): MapDoc | null {
     .map(sanitizeRoadDef)
     .filter((r): r is RoadDef => r !== null);
   if (roadDefs.length > 0) doc.roadDefs = roadDefs;
+  const roadEdits = sanitizeRoadEdits(o.roadEdits);
+  if (roadEdits) doc.roadEdits = roadEdits;
   const caves = arr(o.caves)
     .slice(0, MAX_CAVES)
     .map(sanitizeCave)
