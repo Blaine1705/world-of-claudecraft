@@ -301,6 +301,8 @@ export function planHammerDressing(): HeartKitPlacement[] {
       y: e.y - 3.5,
       rot: e.rot,
       noShadow: true,
+      // Hung off a lip module: shed with it on the low tier.
+      cosmetic: true,
     });
   });
   // The collapse spot: the overhang over the lower Gallery.
@@ -339,6 +341,10 @@ export function planHammerKit(): HeartKitPlacement[] {
     stretch: e.stretch,
     shear: e.shear,
     noShadow: true,
+    // The low tier keeps the pit's own rim (the arena's edge) and sheds the
+    // far dressing: the terraces' risers and the void lips fall back to the
+    // field's own rock faces.
+    cosmetic: !e.piece.startsWith('Kit_QuarryRim'),
   }));
   return [...planHammerProps(), ...edges, ...planHammerDressing()];
 }

@@ -17,12 +17,18 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
+import * as THREE from 'three';
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
   ASSET,
   SMITH_HEART_HAMMER_KIT_PIECES,
   sourceFingerprint,
 } from '../scripts/assets/smith_heart_hammer_kit/build.mjs';
+import {
+  fieldFamilyUvScale,
+  fieldGroundFamily,
+  topColor,
+} from '../src/render/authored_field/field_mesh_core';
 import {
   collapseSpot,
   HAMMER_COLOSSI,
@@ -33,6 +39,7 @@ import {
   planHammerKit,
   planHammerProps,
 } from '../src/render/smith_heart/hammer_kit_plan_core';
+import { heartKitPlacementMatrix, mergeHeartKitParts } from '../src/render/smith_heart/heart_kit';
 import { HEART_PROP_RECIPES } from '../src/render/smith_heart/heart_plan_core';
 import { SMITH_HEART_GATES } from '../src/sim/content/smith_heart';
 import { QUARRY_TERRACES, SLAB, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
@@ -322,5 +329,57 @@ describe('hammer_kit_plan_core: the Hammer vein dressed', () => {
     const ahead = { x: c.x + Math.sin(c.rot) * 8, z: c.z + Math.cos(c.rot) * 8 };
     expect(authoredFieldSurfaceAt(F, ahead.x, ahead.z)?.id).toBe('gallery_lower');
     expect(planHammerKit().filter((p) => p.piece === 'Kit_CollapseOverhang')).toHaveLength(1);
+  });
+});
+
+describe('the Hammer vein floor and the kit instancer', () => {
+  it('paves the vein in cut bedrock: its own texture family and tile', () => {
+    expect(fieldGroundFamily('quarry')).toBe('quarry');
+    expect(fieldFamilyUvScale('quarry')).toBeCloseTo(1 / 10, 9);
+    const pit = F.surfaces.find((s) => s.id === 'hammer_pit');
+    const steps = F.surfaces.filter((s) => isQuarryStep(s.id));
+    expect(pit?.ground).toBe('quarry');
+    expect(steps.length).toBe(4);
+    for (const s of steps) expect(s.ground, s.id).toBe('quarry');
+    const [r, g, b] = topColor('quarry', 3, 7, false);
+    // Warm ochre granite: red over green over blue, never green or blue cast.
+    expect(r).toBeGreaterThan(g);
+    expect(g).toBeGreaterThan(b);
+  });
+
+  it('places, stretches and shears an edge module as planned', () => {
+    const m = new THREE.Matrix4();
+    heartKitPlacementMatrix(
+      { piece: 'Kit_QuarryLipA', x: 10, y: 5, z: -3, rot: 0, stretch: 2, shear: 0.25 },
+      m,
+    );
+    // A point 2 yd along the module's local X lands 4 yd along (stretched)
+    // and 1 yd higher (the shear follows the slope per stretched yard).
+    const p = new THREE.Vector3(2, 0, 0).applyMatrix4(m);
+    expect(p.x).toBeCloseTo(14, 6);
+    expect(p.y).toBeCloseTo(6, 6);
+    expect(p.z).toBeCloseTo(-3, 6);
+    // Turned: rot pi/2 sends its front (+Z) to +X.
+    heartKitPlacementMatrix({ piece: 'Kit_PitColumn', x: 0, y: 0, z: 0, rot: Math.PI / 2 }, m);
+    const f = new THREE.Vector3(0, 0, 1).applyMatrix4(m);
+    expect(f.x).toBeCloseTo(1, 6);
+    expect(f.z).toBeCloseTo(0, 6);
+  });
+
+  it("merges a piece's parts into one indexed geometry, colours kept", () => {
+    const a = new THREE.BufferGeometry();
+    a.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3));
+    a.setAttribute('normal', new THREE.Float32BufferAttribute([0, 0, 1, 0, 0, 1, 0, 0, 1], 3));
+    a.setAttribute('color', new THREE.Float32BufferAttribute([1, 0, 0, 1, 0, 0, 1, 0, 0], 3));
+    a.setIndex([0, 1, 2]);
+    const b = new THREE.BufferGeometry();
+    b.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 1, 1, 0, 1, 0, 1, 1], 3));
+    const m = mergeHeartKitParts([a, b]);
+    expect(m.attributes.position.count).toBe(6);
+    expect(Array.from(m.index?.array ?? [])).toEqual([0, 1, 2, 3, 4, 5]);
+    // The first part's red survives; a part without colour stays white.
+    expect(m.attributes.color.getX(0)).toBe(1);
+    expect(m.attributes.color.getY(0)).toBe(0);
+    expect(m.attributes.color.getY(4)).toBe(1);
   });
 });

@@ -51,7 +51,6 @@ import {
   MOUNTAINS_WRATH,
   SLAB_BURST_AT,
   slabBreakDue,
-  slabBreakLook,
   WRATH_AFTERGLOW,
   wrathBlastLook,
   wrathChargeLook,
@@ -254,13 +253,19 @@ class Rubble {
     const i = this.cursor;
     this.cursor = (this.cursor + 1) % this.capacity;
     if (this.state[i] === 0) this.live++;
-    this.pos.set([x, y, z], i * 3);
-    this.vel.set([vx, vy, vz], i * 3);
+    this.pos[i * 3] = x;
+    this.pos[i * 3 + 1] = y;
+    this.pos[i * 3 + 2] = z;
+    this.vel[i * 3] = vx;
+    this.vel[i * 3 + 1] = vy;
+    this.vel[i * 3 + 2] = vz;
     const ax = this.rand() - 0.5;
     const ay = this.rand() - 0.5;
     const az = this.rand() - 0.5;
     const al = Math.hypot(ax, ay, az) || 1;
-    this.axis.set([ax / al, ay / al, az / al], i * 3);
+    this.axis[i * 3] = ax / al;
+    this.axis[i * 3 + 1] = ay / al;
+    this.axis[i * 3 + 2] = az / al;
     this.angle[i] = this.rand() * Math.PI * 2;
     this.spin[i] = (this.rand() - 0.5) * 14;
     this.size[i] = size;
@@ -417,7 +422,8 @@ export class HammerFx {
       (x, z) => this.groundY(x, z),
       () => this.rand(),
     );
-    this.materials.push(this.rubble.mesh.material as THREE.Material);
+    // The rubble's material is the shared surfaceMat cache's (never ours to
+    // dispose); the pebbles share it.
     this.pebbles = new THREE.InstancedMesh(
       chunk,
       this.rubble.mesh.material as THREE.Material,
@@ -774,31 +780,31 @@ export class HammerFx {
   }
 
   private updateStars(): void {
-    for (const star of [...this.stars, ...this.fallStars]) {
-      if (star.kind === 'idle') continue;
-      const age = this.clock - star.born;
-      if (star.kind === 'wrath') {
-        // While charging the charge drives it; after the blast it smoulders.
-        if (this.charges.get(star.owner)?.star === star) continue;
-        const heat = wrathBlastLook(age, this.kit.radius).heat;
-        star.mat.uniforms.uHeat.value = heat;
-        star.mat.uniforms.uAlpha.value = Math.min(
-          1,
-          Math.max(0, 1 - (age - WRATH_AFTERGLOW) / 1.2),
-        );
-        if (age > WRATH_AFTERGLOW + 1.2) {
-          star.kind = 'idle';
-          star.mesh.visible = false;
-        }
-      } else {
-        star.mat.uniforms.uGrow.value = Math.min(1, age / 0.18);
-        star.mat.uniforms.uHeat.value = hammerfallHeat(age);
-        star.mat.uniforms.uAlpha.value = Math.min(1, Math.max(0, 1 - (age - 1.6) / 1.0));
-        if (age > 2.6) {
-          star.kind = 'idle';
-          star.mesh.visible = false;
-        }
+    for (const star of this.stars) this.updateStar(star);
+    for (const star of this.fallStars) this.updateStar(star);
+  }
+
+  private updateStar(star: CrackStar): void {
+    if (star.kind === 'idle') return;
+    const age = this.clock - star.born;
+    if (star.kind === 'wrath') {
+      // While charging the charge drives it; after the blast it smoulders.
+      if (this.charges.get(star.owner)?.star === star) return;
+      const heat = wrathBlastLook(age, this.kit.radius).heat;
+      star.mat.uniforms.uHeat.value = heat;
+      star.mat.uniforms.uAlpha.value = Math.min(1, Math.max(0, 1 - (age - WRATH_AFTERGLOW) / 1.2));
+      if (age > WRATH_AFTERGLOW + 1.2) {
+        star.kind = 'idle';
+        star.mesh.visible = false;
       }
+      return;
+    }
+    star.mat.uniforms.uGrow.value = Math.min(1, age / 0.18);
+    star.mat.uniforms.uHeat.value = hammerfallHeat(age);
+    star.mat.uniforms.uAlpha.value = Math.min(1, Math.max(0, 1 - (age - 1.6) / 1.0));
+    if (age > 2.6) {
+      star.kind = 'idle';
+      star.mesh.visible = false;
     }
   }
 
@@ -1000,6 +1006,7 @@ export class HammerFx {
   }
 
   dispose(): void {
+    if (this.disposed) return;
     this.disposed = true;
     this.root.removeFromParent();
     this.particles.dispose();

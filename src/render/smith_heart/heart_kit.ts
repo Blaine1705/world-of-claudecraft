@@ -335,6 +335,10 @@ export function upgradeWhenHeartKitLands(
   void s.loading.then(() => {
     const parent = group.parent;
     if (!parent || s.baked.size === 0) return;
+    // Only a slot still in the scene swaps (a retired interior builds nothing).
+    let root: THREE.Object3D = parent;
+    while (root.parent) root = root.parent;
+    if (!(root as THREE.Scene).isScene) return;
     parent.add(build());
     group.removeFromParent();
     group.traverse((o) => {

@@ -22,7 +22,7 @@ import {
   heartGateRig,
   heartSealGatePose,
 } from './heart_gates_core';
-import { heartKitMeshes, SMITH_HEART_HAMMER_KIT_URL } from './heart_kit';
+import { heartKitMeshes, heartKitPiece, SMITH_HEART_HAMMER_KIT_URL } from './heart_kit';
 import { HEART_PALETTE } from './heart_plan_core';
 
 let unitBox: THREE.BufferGeometry | null = null;
@@ -94,7 +94,7 @@ function buildRig(rig: HeartGateRig, width: number): GateRig {
         meshes.push({ part, mesh: kit, kit: true });
         continue;
       }
-      if (part.role === 'crack' && heartKitMeshes(SMITH_HEART_HAMMER_KIT_URL, 'Kit_SlabHalfL'))
+      if (part.role === 'crack' && heartKitPiece(SMITH_HEART_HAMMER_KIT_URL, 'Kit_SlabHalfL'))
         continue;
     }
     const material =

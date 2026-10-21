@@ -3,9 +3,12 @@
 // crucibles and the Frozen Lake's braziers (heart_plan_core.ts
 // planHeartLights). Every point light rides the renderer's budgeted carriers,
 // pushed to the fire-light sink (at most eight per light zone:
-// tests/smith_heart_render_core.test.ts); each carries a halo card, never a
-// second light. The storm dusk itself is the `sunkenBastion` state of
-// ../interior_light_rig.ts, which the blockout borrows.
+// tests/smith_heart_render_core.test.ts); a lamp carries a halo card, never a
+// second light, and a light that only shapes stone (the colossi's fills, the
+// Cleft's door glow: `noHalo`) carries none and holds steady instead of
+// flickering like a fire. The dusk itself is a fog state of
+// ../interior_light_rig.ts: the Hammer vein's own (`smithHeartHammer`), the
+// Heart's own, and the borrowed `sunkenBastion` over the rest of the main map.
 
 import * as THREE from 'three';
 import type { FireLightSink } from '../point_light_budget';
@@ -56,6 +59,7 @@ export function buildHeartLights(
     );
     // The budget's flicker pass owns the live intensity from this base.
     light.userData.baseIntensity = intensity;
+    if (spot.noHalo) light.userData.steady = true;
     light.position.set(spot.x, y, spot.z);
     group.add(light);
     deps.fireLights.push(light);
