@@ -6,6 +6,7 @@ import {
   MEMBERSHIP_WEAPON_ID,
 } from '../src/sim/content/membership';
 import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
+import { classSpecs, TALENTS } from '../src/sim/content/talents';
 import { ITEMS } from '../src/sim/data';
 import { maxArmorTypeForClass } from '../src/sim/equipment_rules';
 import { checkStaminaModel, primaryStatBudget } from '../src/sim/item_budget';
@@ -23,6 +24,61 @@ function member(cls: PlayerClass = 'warrior') {
   for (const slot of MEMBERSHIP_ARMOUR_SLOTS) sim.equipItem(`membership_${slot}`, pid);
   return { sim, pid, meta };
 }
+
+// The stat each spec's output scales with in recalcPlayerStats (entity.ts):
+// warrior, paladin, shaman and druid attack power is 2 per Strength and never
+// reads Agility; rogue and hunter power reads Agility; casters and healers read
+// Intellect. Enhancement and Feral once carried Agility and gained no power.
+const PRIMARY_STAT: Record<PlayerClass, Record<string, 'str' | 'agi' | 'int'>> = {
+  warrior: { arms: 'str', fury: 'str', prot: 'str' },
+  paladin: { holy: 'int', protection: 'str', retribution: 'str' },
+  hunter: { beast_mastery: 'agi', marksmanship: 'agi', survival: 'agi' },
+  rogue: { assassination: 'agi', combat: 'agi', subtlety: 'agi' },
+  priest: { discipline: 'int', holy: 'int', shadow: 'int' },
+  shaman: { elemental: 'int', enhancement: 'str', restoration: 'int' },
+  mage: { arcane: 'int', fire: 'int', frost: 'int' },
+  warlock: { affliction: 'int', demonology: 'int', destruction: 'int' },
+  druid: { balance: 'int', feral: 'str', restoration: 'int' },
+};
+
+describe('membership gear primary stats', () => {
+  it('leads every specialisation with the one primary stat its power derives from', () => {
+    for (const cls of Object.keys(TALENTS) as PlayerClass[]) {
+      expect(Object.keys(PRIMARY_STAT[cls]).sort()).toEqual(classSpecs(cls).sort());
+      for (const [spec, primary] of Object.entries(PRIMARY_STAT[cls])) {
+        for (const id of [
+          ...MEMBERSHIP_ARMOUR_SLOTS.map((slot) => `membership_${slot}`),
+          MEMBERSHIP_WEAPON_ID,
+        ]) {
+          const stats = membershipArmourItem(ITEMS[id], cls, spec, 20, true).stats ?? {};
+          const label = `${cls}/${spec} ${id}`;
+          expect(stats[primary] ?? 0, label).toBeGreaterThan(0);
+          for (const other of ['str', 'agi', 'int'] as const) {
+            if (other !== primary) expect(stats[other] ?? 0, label).toBe(0);
+          }
+        }
+      }
+    }
+  });
+
+  it('raises attack power through the live stat derivation for every physical specialisation', () => {
+    for (const [cls, specs] of Object.entries(PRIMARY_STAT) as [
+      PlayerClass,
+      Record<string, string>,
+    ][]) {
+      for (const [spec, primary] of Object.entries(specs)) {
+        if (primary === 'int') continue;
+        const { sim, pid } = member(cls);
+        sim.setPlayerLevel(20, pid);
+        expect(sim.setSpec(spec, pid)).toBe(true);
+        const power = () => (cls === 'hunter' ? sim.player.rangedPower : sim.player.attackPower);
+        const worn = power();
+        for (const slot of MEMBERSHIP_ARMOUR_SLOTS) sim.unequipItem(slot, pid);
+        expect(worn - power(), `${cls}/${spec}`).toBeGreaterThan(0);
+      }
+    }
+  });
+});
 
 describe('membership armour', () => {
   it('uses the normal stat budget for every class/spec and stays rare and five item levels above every character level', () => {
