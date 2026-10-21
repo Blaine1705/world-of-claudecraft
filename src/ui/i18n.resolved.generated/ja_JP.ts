@@ -13108,6 +13108,10 @@ export const ja_JP: EnTranslations = {
         "name": "乱射",
         "description": "8ヤードの範囲へ3秒間、矢を降らせます。範囲内の敵は0.5秒ごとに{damage}の物理ダメージを受けます。ダメージは遠隔攻撃力とともに上がります。"
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "群れの指令",
         "description": "生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。"
@@ -13163,6 +13167,14 @@ export const ja_JP: EnTranslations = {
       "frostjaw_trap": {
         "name": "霜顎の罠",
         "description": "選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。"
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "群れの結集",

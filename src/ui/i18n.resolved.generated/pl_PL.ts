@@ -13108,6 +13108,10 @@ export const pl_PL: EnTranslations = {
         "name": "Salwa",
         "description": "Spuszcza deszcz strzał na obszar 8 m przez 3 s. Wrogowie w obszarze otrzymują {damage} obrażeń fizycznych co 0.5 s. Obrażenia rosną z mocą ataku dystansowego."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Rozkaz Sfory",
         "description": "Rozkazuje twojemu żywemu towarzyszowi uderzyć za 36 do 48 obrażeń Fizycznych. Obrażenia rosną wraz z mocą ataku towarzysza. Trafienie odnawia 20 skupienia i przyznaje 1 Zaciekłość Sfory na 30 s, do 3. Każdy ładunek zwiększa wszystkie obrażenia twojego towarzysza o 10%. To uderzenie korzysta z ładunków sprzed trafienia."
@@ -13154,7 +13158,7 @@ export const pl_PL: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const pl_PL: EnTranslations = {
       "frostjaw_trap": {
         "name": "Pułapka Mroźnej Paszczy",
         "description": "Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Zbiórka Sfory",

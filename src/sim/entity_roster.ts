@@ -20,6 +20,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { pulseArmoredGroundAoE } from './combat/hunter_ground_zone';
 import { tickHunterTrap } from './combat/hunter_trap';
 import { isTemporaryNecromancyUndead } from './combat/necromancy';
 import { cleanupPaladinAegis } from './combat/paladin_aegis';
@@ -104,8 +105,12 @@ export type GroundAoE = {
     innerRadius: number;
     triggeredIds: Set<number>;
   };
-  // Hunter trap (combat/hunter_trap.ts): placed at the owner's feet, arms
-  // after armRemaining, freezes the first enemy contact, then is consumed.
+  // Physical ground zones (Volley) roll armor per struck target, the rule the
+  // old channel path applied; combat/hunter_ground_zone.ts owns that pulse.
+  armorMitigated?: boolean;
+  // Hunter trap (combat/hunter_trap.ts): placed at the owner's feet or aimed
+  // point, arms after armRemaining, springs on the first enemy contact, then is
+  // consumed. A concealed trap's cues reach only its owner and their group.
   hunterTrap?: {
     abilityId: string;
     armRemaining: number;
@@ -114,6 +119,10 @@ export type GroundAoE = {
     rootInstead?: boolean;
     slowMult?: number;
     slowDuration?: number;
+    concealed?: boolean;
+    // Bear Trap: the victim bleeds instead of being rooted. Total is resolved
+    // (Ranged AP included) when the trap is placed.
+    bleed?: { total: number; duration: number; interval: number };
   };
   temporalHourglass?: {
     id: string;
@@ -327,7 +336,8 @@ export function tickGroundAoEs(ctx: SimContext): void {
     effect.tickTimer -= DT;
     while (effect.tickTimer <= CAST_COMPLETE_EPS && effect.remaining > CAST_COMPLETE_EPS) {
       effect.tickTimer += effect.interval;
-      ctx.pulseGroundAoE(effect, effect.threat);
+      if (effect.armorMitigated) pulseArmoredGroundAoE(ctx, effect, effect.threat);
+      else ctx.pulseGroundAoE(effect, effect.threat);
     }
     if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
   }

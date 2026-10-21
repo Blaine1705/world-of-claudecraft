@@ -13108,6 +13108,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Salva",
         "description": "Nechá 3 s pršet šípy na oblast 8 m. Nepřátelé uvnitř utrpí každých 0.5 s {damage} fyzického poškození. Poškození roste s útočnou silou na dálku."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Povel smečky",
         "description": "Přikaž svému živému společníkovi udeřit za 36 až 48 Fyzického poškození. Poškození roste se silou útoku společníka. Zásah obnoví 20 soustředění a udělí 1 Zuřivost smečky na 30 s, až do 3. Každý nános zvyšuje veškeré poškození tvého společníka o 10%. Tento úder používá nánosy, které jsi měl před zásahem."
@@ -13154,7 +13158,7 @@ export const cs_CZ: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const cs_CZ: EnTranslations = {
       "frostjaw_trap": {
         "name": "Past mrazivé čelisti",
         "description": "Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Shromáždění smečky",

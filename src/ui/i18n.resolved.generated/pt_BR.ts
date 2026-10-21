@@ -13108,6 +13108,10 @@ export const pt_BR: EnTranslations = {
         "name": "Saraivada",
         "description": "Faz chover flechas sobre uma área de 8 m durante 3 s. Os inimigos na área sofrem {damage} de dano Físico a cada 0.5 s. O dano aumenta com o poder de ataque à distância."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Comando da Matilha",
         "description": "Ordena que seu companheiro vivo golpeie causando de 36 a 48 de dano Físico. O dano aumenta com o poder de ataque do companheiro. Um acerto restaura 20 de foco e concede 1 de Ferocidade da Matilha por 30 s, até 3. Cada acúmulo aumenta em 10% todo o dano causado pelo seu companheiro. Este golpe usa os acúmulos que você tinha antes do acerto."
@@ -13154,7 +13158,7 @@ export const pt_BR: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const pt_BR: EnTranslations = {
       "frostjaw_trap": {
         "name": "Armadilha Presa Gélida",
         "description": "Posiciona uma armadilha no inimigo selecionado ou aos seus pés. Ela arma após 0,75 s e dura 30 s. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Reunião da Matilha",

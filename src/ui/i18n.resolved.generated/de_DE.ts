@@ -13108,6 +13108,10 @@ export const de_DE: EnTranslations = {
         "name": "Pfeilhagel",
         "description": "Lässt 3 Sek. lang Pfeile über einen Bereich von 8 m niedergehen. Gegner darin erleiden alle 0.5 Sek. {damage} physischen Schaden. Der Schaden steigt mit der Distanzangriffskraft."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Rudelbefehl",
         "description": "Befiehlt Eurem lebenden Begleiter, für 36 bis 48 physischen Schaden zuzuschlagen. Der Schaden steigt mit der Angriffskraft des Begleiters. Ein Treffer stellt 20 Fokus wieder her und gewährt 30 Sek. lang 1 Rudelwildheit, bis zu 3. Jeder Stapel erhöht allen von Eurem Begleiter verursachten Schaden um 10%. Dieser Schlag nutzt die Stapel, die Ihr vor dem Treffer hattet."
@@ -13154,7 +13158,7 @@ export const de_DE: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const de_DE: EnTranslations = {
       "frostjaw_trap": {
         "name": "Frostkieferfalle",
         "description": "Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Rudelsammlung",

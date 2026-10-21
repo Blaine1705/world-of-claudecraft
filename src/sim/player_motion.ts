@@ -18,7 +18,11 @@
 // by the extraction.
 
 import { type Collider, isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
-import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/cast_move_gate';
+import {
+  abilityCastSurvivesMovement,
+  isFeigningDeath,
+  movementInputWouldMove,
+} from './combat/cast_move_gate';
 import { isRooted, isStunned } from './combat/cc';
 import { huntingMomentumSpeedMult } from './combat/hunting_momentum_speed';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
@@ -724,7 +728,14 @@ function verticalPass(
     p.vy <= 0 &&
     p.vy > -GRAVITY * COYOTE_TIME &&
     terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed) <= MAX_CLIMB_SLOPE;
-  if (inp.jump && (p.onGround || coyote) && !isRooted(p) && !steepGround && !mountLocked) {
+  if (
+    inp.jump &&
+    (p.onGround || coyote) &&
+    !isRooted(p) &&
+    !isFeigningDeath(p) &&
+    !steepGround &&
+    !mountLocked
+  ) {
     p.vy = JUMP_VELOCITY * jumpMult(p);
     p.vx = wishX * wishSpeed;
     p.vz = wishZ * wishSpeed;

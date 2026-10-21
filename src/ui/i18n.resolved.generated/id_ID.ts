@@ -13108,6 +13108,10 @@ export const id_ID: EnTranslations = {
         "name": "Hujan Panah",
         "description": "Menghujani area 8 m dengan anak panah selama 3 dtk. Musuh di dalam area menerima {damage} kerusakan Fisik setiap 0.5 dtk. Kerusakan meningkat dengan daya serang jarak jauh."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Perintah Kawanan",
         "description": "Memerintahkan hewan peliharaanmu yang hidup untuk menyerang sebesar 36 sampai 48 kerusakan Fisik. Kerusakan meningkat dengan kekuatan serang hewan peliharaan. Serangan yang mengenai memulihkan 20 fokus dan memberi 1 Keganasan Kawanan selama 30 dtk, hingga 3. Setiap tumpukan menambah semua kerusakan hewan peliharaanmu sebesar 10%. Serangan ini memakai tumpukan yang kamu miliki sebelum benturan."
@@ -13154,7 +13158,7 @@ export const id_ID: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const id_ID: EnTranslations = {
       "frostjaw_trap": {
         "name": "Jerat Rahang Beku",
         "description": "Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Pengumpulan Kawanan",

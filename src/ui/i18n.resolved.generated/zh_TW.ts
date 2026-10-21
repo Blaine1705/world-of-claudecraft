@@ -13108,6 +13108,10 @@ export const zh_TW: EnTranslations = {
         "name": "亂射",
         "description": "向一片 8 公尺的區域降下箭雨，持續 3 秒。區域內的敵人每 0.5 秒受到 {damage} 點物理傷害。傷害隨遠程攻擊強度提升。"
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "獸群號令",
         "description": "命令你的活體寵物發動攻擊。命中後產生 20 點集中值和一層獸群兇性。"
@@ -13163,6 +13167,14 @@ export const zh_TW: EnTranslations = {
       "frostjaw_trap": {
         "name": "霜顎陷阱",
         "description": "在選中的敵人處或腳下放置已啟動的陷阱。它會定身第一個觸發的敵人，並減速附近敵人。"
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "獸群集結",

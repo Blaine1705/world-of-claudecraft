@@ -13108,6 +13108,10 @@ export const ru_RU: EnTranslations = {
         "name": "Залп",
         "description": "Осыпает область в 8 м стрелами в течение 3 сек. Враги в области получают {damage} физического урона каждые 0.5 сек. Урон растёт с силой атаки в дальнем бою."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Команда стае",
         "description": "Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи."
@@ -13163,6 +13167,14 @@ export const ru_RU: EnTranslations = {
       "frostjaw_trap": {
         "name": "Капкан ледяной пасти",
         "description": "Устанавливает взведенную ловушку у выбранного врага или у ваших ног. Она обездвиживает первого сработавшего на ней врага и замедляет врагов рядом."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Сбор стаи",

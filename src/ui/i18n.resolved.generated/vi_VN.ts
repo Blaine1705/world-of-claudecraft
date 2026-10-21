@@ -13108,6 +13108,10 @@ export const vi_VN: EnTranslations = {
         "name": "Loạt Tên",
         "description": "Trút mưa tên xuống một khu vực 8 m trong 3 giây. Kẻ địch trong khu vực chịu {damage} sát thương Vật Lý mỗi 0.5 giây. Sát thương tăng theo sức tấn công tầm xa."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Lệnh Bầy Đàn",
         "description": "Ra lệnh cho thú nuôi còn sống của bạn đánh gây 36 đến 48 sát thương Vật Lý. Sát thương tăng theo sức tấn công của thú nuôi. Một đòn trúng hồi 20 tập trung và ban 1 Hung Tính Bầy Đàn trong 30 giây, tối đa 3. Mỗi lớp tăng 10% toàn bộ sát thương thú nuôi của bạn gây ra. Đòn này dùng số lớp bạn có trước khi trúng."
@@ -13154,7 +13158,7 @@ export const vi_VN: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const vi_VN: EnTranslations = {
       "frostjaw_trap": {
         "name": "Bẫy Hàm Băng",
         "description": "Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Tập Hợp Bầy Đàn",

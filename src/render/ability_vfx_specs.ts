@@ -1353,6 +1353,20 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
     wu: 0.4,
     a: 'nova',
   },
+  // Fieldcraft's Volley: a thrown flask bursting into white-hot flame.
+  phosphor_flask: {
+    c: '#fff0cf',
+    p: 'fire',
+    pw: 1.05,
+    sp: 20,
+    rg: 1.2,
+    db: 1,
+    sm: 1,
+    li: 0.7,
+    lg: 3,
+    wu: 0.4,
+    a: 'nova',
+  },
   counter_shot: { c: '#dfe6ee', p: 'physical', pw: 0.7, sp: 14, vr: 1, li: 0.5, a: 'burst' },
   bestial_wrath: {
     c: '#ff2e1a',

@@ -13108,6 +13108,10 @@ export const nl_NL: EnTranslations = {
         "name": "Pijlenregen",
         "description": "Laat 3 sec lang pijlen regenen over een gebied van 8 m. Vijanden in het gebied krijgen elke 0.5 sec {damage} Fysieke schade. De schade stijgt met de aanvalskracht op afstand."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Roedelbevel",
         "description": "Beveelt je levende huisdier toe te slaan voor 36 tot 48 fysieke schade. De schade stijgt met de aanvalskracht van het huisdier. Een treffer herstelt 20 focus en verleent 30 sec. lang 1 Roedelfelheid, tot 3. Elke stapel verhoogt alle schade van je huisdier met 10%. Deze slag gebruikt de stapels die je vóór de treffer had."
@@ -13154,7 +13158,7 @@ export const nl_NL: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const nl_NL: EnTranslations = {
       "frostjaw_trap": {
         "name": "Vorstkaakval",
         "description": "Plaatst een val bij de gekozen vijand of aan je voeten. Hij scherpt na 0,75 sec. en duurt 30 sec. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Roedelverzameling",

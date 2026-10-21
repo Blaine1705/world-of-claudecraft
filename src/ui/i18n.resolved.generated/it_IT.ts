@@ -13108,6 +13108,10 @@ export const it_IT: EnTranslations = {
         "name": "Scarica di Frecce",
         "description": "Fa piovere frecce su un'area di 8 m per 3 sec. I nemici nell'area subiscono {damage} danni Fisici ogni 0.5 sec. Il danno aumenta con la potenza d'attacco a distanza."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Comando del Branco",
         "description": "Ordina al tuo famiglio vivo di colpire per 36-48 danni Fisici. I danni aumentano con la potenza d'attacco del famiglio. Un colpo a segno recupera 20 concentrazione e concede 1 Ferocia del Branco per 30 s, fino a 3. Ogni accumulo aumenta del 10% tutti i danni inflitti dal tuo famiglio. Questo colpo usa gli accumuli che avevi prima dell'impatto."
@@ -13154,7 +13158,7 @@ export const it_IT: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const it_IT: EnTranslations = {
       "frostjaw_trap": {
         "name": "Trappola Fauci di Gelo",
         "description": "Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Adunata del Branco",

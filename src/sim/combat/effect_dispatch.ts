@@ -157,6 +157,7 @@ import {
   startBloodhook,
   trailbreak,
 } from './hunter_fieldcraft';
+import { pulseArmoredGroundAoE } from './hunter_ground_zone';
 import {
   applyHowlingRage,
   runFrenzyFellShotCleave,
@@ -165,6 +166,7 @@ import {
   runUnleashBeast,
 } from './hunter_packlord';
 import { startPlayDead } from './hunter_play_dead';
+import { runScatterbolt } from './hunter_scatterbolt';
 import {
   activateHunterMajorWindow,
   cripplingPursuit,
@@ -174,7 +176,7 @@ import {
   runHunterPackRally,
   runHunterWildheart,
 } from './hunter_shared';
-import { spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
+import { spawnBearTrap, spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
 import {
   addSoulFragments,
@@ -2913,6 +2915,7 @@ export function runEffects(
           orbCdr: eff.orbCdr,
           threat: threatOpts,
           devotionOnFirstHit: eff.devotionOnFirstHit,
+          armorMitigated: ability.school === 'physical' || undefined,
           consecration:
             ability.id === 'consecration'
               ? {
@@ -3006,7 +3009,9 @@ export function runEffects(
         }
         // A delayed zone (Meteor's fall) skips the on-cast pulse: its first
         // hit lands one interval later, exactly the fall time.
-        if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
+        if (!eff.delayed && groundEffect.armorMitigated) {
+          pulseArmoredGroundAoE(ctx, groundEffect, threatOpts, true);
+        } else if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
         if (echoThunderVent) {
           // Faultwake's full vent is the whole zone, so mirror each pulse one
@@ -3915,7 +3920,7 @@ export function runEffects(
         break;
       }
       case 'hunterPlayDead': {
-        startPlayDead(ctx, p, ability.name, dropSelfFromHostileFocus(ctx, p));
+        startPlayDead(ctx, p, ability.name, dropSelfFromHostileFocus(ctx, p), eff.movingGrace);
         break;
       }
       case 'hunterTrailbreak': {
@@ -3927,7 +3932,15 @@ export function runEffects(
         break;
       }
       case 'frostjawTrap': {
-        spawnFrostjawTrap(ctx, p, eff, ability.name, ability.id, ability.range);
+        spawnFrostjawTrap(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterBearTrap': {
+        spawnBearTrap(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterScatterbolt': {
+        runScatterbolt(ctx, p, eff, ability.id);
         break;
       }
       case 'aoeAllyMaxHp': {

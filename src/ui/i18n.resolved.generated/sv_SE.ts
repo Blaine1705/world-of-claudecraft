@@ -13108,6 +13108,10 @@ export const sv_SE: EnTranslations = {
         "name": "Pilregn",
         "description": "Låter pilar regna över ett område på 8 m i 3 sek. Fiender i området tar {damage} Fysisk skada var 0.5 sek. Skadan ökar med anfallskraft på avstånd."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Flockbefallning",
         "description": "Befall ditt levande husdjur att slå för 36 till 48 fysisk skada. Skadan ökar med husdjurets attackkraft. En träff återställer 20 fokus och ger 1 Flockvildhet i 30 sek, upp till 3. Varje stapel ökar all skada ditt husdjur gör med 10%. Detta slag använder de staplar du hade före träffen."
@@ -13154,7 +13158,7 @@ export const sv_SE: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const sv_SE: EnTranslations = {
       "frostjaw_trap": {
         "name": "Frostkäftsfälla",
         "description": "Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Flocksamling",

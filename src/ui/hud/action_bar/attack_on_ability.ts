@@ -158,6 +158,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   hunterPlayDead: 'other',
   hunterPackRally: 'other',
   frostjawTrap: 'other',
+  hunterBearTrap: 'other',
+  hunterScatterbolt: 'other',
 };
 
 /**

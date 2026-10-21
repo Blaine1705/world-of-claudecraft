@@ -3178,7 +3178,8 @@ export type AbilityEffect =
       damageMult?: number;
     }
   | { type: 'hunterTrailbreak'; distance: number }
-  | { type: 'hunterPlayDead' }
+  /** movingGrace: seconds a hunter who cast it while moving has to stop. */
+  | { type: 'hunterPlayDead'; movingGrace: number }
   | { type: 'hunterPackRally'; duration: number; radius: number }
   | {
       type: 'frostjawTrap';
@@ -3189,6 +3190,21 @@ export type AbilityEffect =
       slowMult: number;
       slowDuration: number;
     }
+  | {
+      type: 'hunterBearTrap';
+      radius: number;
+      armTime: number;
+      lifetime: number;
+      /** The victim's bleed: base total plus rangedPowerCoeff x Ranged AP over its duration. */
+      bleedTotal: number;
+      bleedDuration: number;
+      bleedInterval: number;
+      rangedPowerCoeff: number;
+      slowMult: number;
+      slowDuration: number;
+    }
+  /** Shove every enemy in the cone straight back until it stands pushTo yards away. */
+  | { type: 'hunterScatterbolt'; coneRange: number; coneAngleDeg: number; pushTo: number }
   // Ice Block: strip every player-removable debuff (control, DoTs, stat saps, ...)
   // Broader than breakRoots and breakControl. See effect_dispatch.
   | { type: 'cleanseSelf' }
@@ -7673,6 +7689,10 @@ export type SimEvent = { pid?: number } & (
       // of the generic per-school impact; unset for every other spellfxAt
       // caller, which keeps the existing generic sound unchanged.
       sfxKey?: string;
+      // A hidden hunter trap's placement and armed shimmer: the server delivers
+      // it only to sourceId and their group (server/event_delivery.ts), so enemy
+      // players never see where the trap lies.
+      concealedFromHostiles?: boolean;
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide

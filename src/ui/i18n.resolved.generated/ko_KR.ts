@@ -13108,6 +13108,10 @@ export const ko_KR: EnTranslations = {
         "name": "일제 사격",
         "description": "8미터 지역에 3초 동안 화살을 퍼붓습니다. 지역 안의 적은 0.5초마다 {damage}의 물리 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "무리 명령",
         "description": "살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다."
@@ -13163,6 +13167,14 @@ export const ko_KR: EnTranslations = {
       "frostjaw_trap": {
         "name": "서리턱 덫",
         "description": "선택한 적의 위치나 발밑에 작동 준비된 덫을 놓습니다. 처음 발동시킨 적을 이동 불가로 만들고 주변 적을 느리게 합니다."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "무리 결집",

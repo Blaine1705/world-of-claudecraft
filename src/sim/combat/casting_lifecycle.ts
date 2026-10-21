@@ -275,6 +275,15 @@ export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'shield_slam',
 ]);
 
+// Position spells whose no-aim press (a bare keybind, the RL env) lands on the
+// selected hostile instead of the caster's feet.
+const SELECTED_HOSTILE_AIM_FALLBACK = new Set([
+  'earthquake',
+  'earthbind',
+  'frostjaw_trap',
+  'bear_trap',
+]);
+
 function isStasisToggle(ability: AbilityDef): boolean {
   return ability.effects.some((effect) => effect.type === 'selfBuff' && effect.kind === 'stasis');
 }
@@ -295,6 +304,10 @@ function shellskinBlocksAbility(entity: Entity, meta: PlayerMeta, ability: Abili
       'hunterBloodhook',
       'hunterShrapnel',
       'frostjawTrap',
+      // Volley and Phosphor Flask are instant ground zones since PR 4488.
+      'groundAoE',
+      'hunterBearTrap',
+      'hunterScatterbolt',
     ].includes(effect.type),
   );
 }
@@ -1755,11 +1768,12 @@ export function castAbility(
         return;
       }
     } else {
-      // Faultwake's keybind default is the selected hostile; other position
-      // spells retain the canonical at-feet fallback. Clamp the selected point
-      // through the same authoritative range rule as explicit ground input.
+      // Faultwake's (and the hunter traps') keybind default is the selected
+      // hostile; other position spells retain the canonical at-feet fallback.
+      // Clamp the selected point through the same authoritative range rule as
+      // explicit ground input.
       const selected =
-        (ability.id === 'earthquake' || ability.id === 'earthbind') && p.targetId !== null
+        SELECTED_HOSTILE_AIM_FALLBACK.has(ability.id) && p.targetId !== null
           ? (ctx.entities.get(p.targetId) ?? null)
           : null;
       const fallback =

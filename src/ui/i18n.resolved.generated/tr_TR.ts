@@ -13108,6 +13108,10 @@ export const tr_TR: EnTranslations = {
         "name": "Ok Yağmuru",
         "description": "3 sn boyunca 8 m'lik bir alana ok yağdırır. Alandaki düşmanlar her 0.5 sn'de {damage} Fiziksel hasar alır. Hasar menzilli saldırı gücüyle artar."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Sürü Emri",
         "description": "Yaşayan evcil hayvanına 36 ila 48 Fiziksel hasar vurması için emir verir. Hasar evcil hayvanın saldırı gücüyle artar. İsabet 20 odak geri kazandırır ve 30 sn boyunca 1 Sürü Vahşeti verir, en fazla 3. Her katman evcil hayvanının verdiği tüm hasarı 10% artırır. Bu vuruş, isabetten önceki katmanlarını kullanır."
@@ -13154,7 +13158,7 @@ export const tr_TR: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const tr_TR: EnTranslations = {
       "frostjaw_trap": {
         "name": "Buzçene Tuzağı",
         "description": "Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Sürü Toplanması",

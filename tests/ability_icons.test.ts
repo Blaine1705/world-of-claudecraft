@@ -130,11 +130,12 @@ describe('ability icons', () => {
     // 473: plus the Buried Hoards Clockwork Shock Bomb glyph (the 2026-09-28
     // release/v0.44.0 merge into feature/buried-hoards).
     // 475: plus the Fieldcraft rework glyphs (tactical_camo, play_dead).
-    expect(ids).toHaveLength(475);
+    // 478: plus bear_trap, scatterbolt and phosphor_flask (PR 4488 follow-up).
+    expect(ids).toHaveLength(478);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('da7ca266a1705f38e2ded1239974669eb406972840397b8824669d08f2d3f720');
+    expect(hash).toBe('ae3f51291836240f322e35d314f378b2433b903b318d051d6982f2facc6735c3');
   });
 });

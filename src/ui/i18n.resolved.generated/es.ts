@@ -13108,6 +13108,10 @@ export const es: EnTranslations = {
         "name": "Andanada",
         "description": "Hace llover flechas sobre un área de 8 m durante 3 s. Los enemigos dentro sufren {damage} de daño Físico cada 0.5 s. El daño aumenta con el poder de ataque a distancia."
       },
+      "phosphor_flask": {
+        "name": "Phosphor Flask",
+        "description": "A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power."
+      },
       "pack_command": {
         "name": "Orden de Manada",
         "description": "Ordena a tu mascota viva golpear por 36 a 48 de daño Físico. El daño aumenta con el poder de ataque de la mascota. Un impacto restaura 20 de concentración y otorga 1 de Ferocidad de Manada durante 30 s, hasta 3. Cada acumulación aumenta un 10% todo el daño infligido por tu mascota. Este golpe usa las acumulaciones que tenías antes del impacto."
@@ -13154,7 +13158,7 @@ export const es: EnTranslations = {
       },
       "play_dead": {
         "name": "Play Dead",
-        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up."
+        "description": "Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up."
       },
       "tactical_camo": {
         "name": "Tactical Camo",
@@ -13163,6 +13167,14 @@ export const es: EnTranslations = {
       "frostjaw_trap": {
         "name": "Trampa Fauces de Escarcha",
         "description": "Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
+      },
+      "bear_trap": {
+        "name": "Bear Trap",
+        "description": "Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec."
+      },
+      "scatterbolt": {
+        "name": "Scatterbolt",
+        "description": "Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage."
       },
       "pack_rally": {
         "name": "Reunión de Manada",

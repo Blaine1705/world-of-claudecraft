@@ -1723,6 +1723,8 @@ export const VISUALS: Record<string, VisualDef> = {
         counter_shot: 'Hunter_Shot_Snap',
         aimed_shot: 'Hunter_Shot_LongDraw',
         volley: 'Hunter_Shot_Volley',
+        phosphor_flask: 'Hunter_Shot_Snap',
+        scatterbolt: 'Hunter_Shot_Snap',
         aspect_of_the_hawk: 'Spellcast_Raise',
         aspect_of_the_monkey: 'Spellcast_Raise',
         aspect_of_the_cheetah: 'Spellcast_Raise',
