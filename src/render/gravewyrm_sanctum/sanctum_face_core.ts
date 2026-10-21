@@ -147,7 +147,10 @@ export const FROZEN_WYRM_URL = '/models/props/gravewyrm_sanctum_korzul_frozen.gl
  * hundred yards thick and the coiled wyrm fills the hollow behind the shell
  * (the fighting Korzul on the lake keeps the model's own 1.0).
  */
-export const FROZEN_WYRM = { x: 8.4, y: 3, z: 275.9, yaw: Math.PI / 2, scale: 1.7 } as const;
+export const FROZEN_WYRM = { x: 4.89, y: -2.0, z: 275.9, yaw: Math.PI / 2, scale: 2.35 } as const;
+// (Scaled up from 1.7 about his heart, which stays where the kit's heart
+// glow and the window expect it: the interior pass, so he fills the window
+// and reads from the road down, the way he waits at the end of the run.)
 
 /** A point of the frozen model's own frame in the instance frame. */
 export function frozenToGame(lx: number, ly: number, lz: number): [number, number, number] {

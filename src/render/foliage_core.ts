@@ -13,11 +13,13 @@ import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
 import { tavernGroundsRects } from '../sim/mirefen_tavern_grounds';
 import { PAINTED_TOWNS } from '../sim/painted_towns';
+import { SANCTUM_SEAL_GATE_DUNGEON_ID } from '../sim/sanctum_seal_gate';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 import {
   onWildheartBasinEntranceCauseway,
   WILDHEART_BASIN_ENTRANCE_DUNGEON_ID,
 } from '../sim/wildheart_basin_entrance';
+import { onSanctumSealGateFloor } from './sanctum_seal_gate_core';
 
 /** The foliage placement hash: a deterministic [0, 1) value per (a, b, salt k).
  *  Shared by foliage.ts and the dressing-spot generator (foliage_dressing_spots.ts). */
@@ -61,10 +63,15 @@ export function insideGrassHubExclusion(
  *  reads as paving at every distance. */
 export function insidePavedGrassExclusion(x: number, z: number): boolean {
   const dungeon = DUNGEONS[WILDHEART_BASIN_ENTRANCE_DUNGEON_ID];
-  return (
+  if (
     dungeon !== undefined &&
     onWildheartBasinEntranceCauseway(activeDungeonDoorPos(dungeon), x, z, 0.3)
-  );
+  ) {
+    return true;
+  }
+  // the Smith's Seal Gate: the frozen flags of its tunnel and lane
+  const sanctum = DUNGEONS[SANCTUM_SEAL_GATE_DUNGEON_ID];
+  return sanctum !== undefined && onSanctumSealGateFloor(activeDungeonDoorPos(sanctum), x, z, 0.2);
 }
 
 /** Hub and camp clearings for bushes/ferns, sourced from the active world only. */

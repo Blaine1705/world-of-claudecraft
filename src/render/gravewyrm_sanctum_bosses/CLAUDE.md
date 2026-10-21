@@ -9,7 +9,7 @@ owners, never edited from here.
 
 | Module | Role |
 |---|---|
-| `boss_model_core.ts` | PURE (`RENDER_PURE_CORES`): the three art-guide bodies measured (URLs, sim scales, Idle bounds, gait refs, clip contact beats, Korgath's anchor bones and their rest spots, Korzul's mouth and shard), and the presentation gesture ids. |
+| `boss_model_core.ts` | PURE (`RENDER_PURE_CORES`): the three art-guide bodies measured (URLs, sim scales, Idle bounds, gait refs, clip contact beats, Korgath's anchor bones and their rest spots, his maul-clip donor (one-handed blows; the left hand kept off the haft) and the fist-bone drops (the body's clips bent his modeled right fist off the haft; authoring in `docs/design/dungeon-rework/korgath/maul_rig/`), Korzul's mouth and shard), and the presentation gesture ids. |
 | `boss_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the cast specs (which bar lays which shape at the sim's size, in the threat palette), the chain sag and whip, the shackle glow, the plate looks and refreeze clock, the breath's plate pick, the Inferno's pulse fill, the landing shadow, the Unquenched countdown. |
 | `sanctum_boss_art.ts` | Shaders and procedural geometry (plates, meltwater, rings, shadow, chain links, the Held ice, the Wyrm's Eye canvas, the wyrm fire ramp). |
 | `sanctum_boss_fx.ts` | `SanctumBossFx`: binds pooled slots to the boss casts and encounter objects each scan, draws the frame, plays the beat bursts, sends the presentation gestures (Korgath's broken arm chains, Korzul's frozen stance and takeoff, Velkhar's thaw). |
@@ -36,4 +36,4 @@ mesh and material is built once in the constructor under one root attached throu
 `tests/floor_vfx_layer.test.ts`).
 
 Tests: `tests/gravewyrm_sanctum_boss_fx_core.test.ts`,
-`tests/gravewyrm_sanctum_boss_models.test.ts`.
+`tests/gravewyrm_sanctum_boss_models.test.ts`, `tests/gravewyrm_sanctum_korgath_clips.test.ts` (the grip and the blows).
