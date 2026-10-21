@@ -3844,6 +3844,41 @@
   body.mobile-touch #raid-boss-guide-window .rbg-ability-detail p {
     font-size: 10px;
   }
+  /* Dungeon pages: four or five bosses ride one horizontal strip instead of a
+     two-column grid, so the journal keeps its height on a landscape phone. */
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon .rbg-boss-tab {
+    flex: 0 0 auto;
+    width: 150px;
+    scroll-snap-align: start;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-tip-grid,
+  body.mobile-touch #raid-boss-guide-window .rbg-choice-sides {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-tip p,
+  body.mobile-touch #raid-boss-guide-window .rbg-choice p,
+  body.mobile-touch #raid-boss-guide-window .rbg-heroic ul,
+  body.mobile-touch #raid-boss-guide-window .rbg-ability-summary {
+    font-size: 10px;
+  }
+  body.mobile-touch
+    #raid-boss-guide-window
+    .rbg-boss-nav-dungeon
+    ~ .rbg-journal
+    .rbg-ability-toggle {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon ~ .rbg-journal .rbg-badges {
+    grid-column: 2;
+    padding-bottom: 4px;
+  }
   /* One anchor for both strips: the column (hud.css #aura-stack) owns the
      buff-to-debuff clearance, so the two `top` offsets that used to set it are
      gone. The old pair put the debuff row 36px under the buff row while a buff

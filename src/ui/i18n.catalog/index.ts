@@ -7,6 +7,7 @@ import { ITEM_SETS } from '../../sim/data';
 import { worldEntityText as worldNames } from '../world_entity_i18n';
 import { abilityStrings, classAbilityNames } from './abilities';
 import { apiErrorStrings } from './api_error';
+import { bossJournalStrings } from './boss_journal';
 import { clueStrings } from './clues';
 import { dungeonGuideStrings } from './dungeon_guides';
 import { editorStrings } from './editor';
@@ -22,6 +23,7 @@ import { shellStrings } from './shell';
 
 export { abilityStrings, classAbilityNames } from './abilities';
 export { apiErrorStrings } from './api_error';
+export { bossJournalStrings } from './boss_journal';
 export { clueStrings } from './clues';
 export { dungeonGuideStrings } from './dungeon_guides';
 export { editorStrings } from './editor';
@@ -255,6 +257,8 @@ export const en = {
   clues: clueStrings,
   // The dungeon lore guides' lines and dialog (src/ui/i18n.catalog/dungeon_guides.ts).
   dungeonGuide: dungeonGuideStrings,
+  // The five-player dungeon boss guides (src/ui/i18n.catalog/boss_journal.ts).
+  bossJournal: bossJournalStrings,
   guide: guideStrings,
   editor: editorStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.
