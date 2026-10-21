@@ -1223,6 +1223,74 @@ async function stageWheelBinds(page) {
 }
 
 export const TARGETS = [
+  // The leveling quest shields: each quest's detail page, as a paladin (the
+  // warrior reward archetype), so the reward row shows the shield. The base
+  // shows the same quests with no item reward.
+  {
+    key: 'quest-shield-rewards',
+    label: 'Quest reward shields (Eastbrook, Mirefen, Thornpeak)',
+    when: ['src/sim/content/quest_shields.ts'],
+    variants: [
+      {
+        key: 'eastbrook-desktop',
+        charClass: 'paladin',
+        charName: 'Dawnward',
+        questId: 'q_bones',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      {
+        key: 'mirefen-desktop',
+        charClass: 'paladin',
+        charName: 'Dawnward',
+        questId: 'q_bastion_door',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      {
+        key: 'thornpeak-desktop',
+        charClass: 'paladin',
+        charName: 'Dawnward',
+        questId: 'q_revenants',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      {
+        key: 'eastbrook-mobile',
+        mobile: true,
+        charClass: 'paladin',
+        charName: 'Dawnward',
+        questId: 'q_bones',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+    ],
+    async capture(page, variant) {
+      await dismissEntryOverlays(page);
+      const opened = await page.evaluate((questId) => {
+        const hud = window.__game?.hud;
+        if (!hud?.openLinkedQuestDialog) return false;
+        hud.openLinkedQuestDialog(questId);
+        return true;
+      }, variant.questId);
+      if (!opened) throw new Error('quest dialog hook unavailable');
+      await page.waitForFunction(
+        () => {
+          const el = document.querySelector('#quest-dialog');
+          return (
+            !!el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0
+          );
+        },
+        { timeout: 15000, polling: 200 },
+      );
+      // On a short (mobile) screen the dialog body scrolls: bring the reward row
+      // into view so the shot shows the item.
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('#quest-dialog, #quest-dialog *')) {
+          if (el.scrollHeight > el.clientHeight + 1) el.scrollTop = el.scrollHeight;
+        }
+      });
+      // Let the reward icon and its item name settle.
+      await wait(800);
+      return { clip: '#quest-dialog' };
+    },
+  },
   ...hoardTideReviewTargets(),
   // World quests round 2: the forge workshop panel moved off the bottom-pinned
   // vehicle-bar family into the centred window family, so it no longer covers
