@@ -259,6 +259,29 @@ describe('Smith Heart Hammer kit: sizes the sim and the plan rely on', () => {
     expect(Math.min(...low.map((p) => Math.abs(p[0])))).toBeGreaterThan(7.6);
   });
 
+  it.skipIf(!haveKit)('crowns the quarry with mountain crests, never a broken wall top', () => {
+    // Phase 2D: each great cliff's skyline (its highest point per 1.5 yd
+    // across) falls to low shoulders at both ends and peaks only briefly: a
+    // massif's silhouette. 2C's crests ran level across most of the piece.
+    for (const name of ['Kit_GreatCliffA', 'Kit_GreatCliffB', 'Kit_GreatCliffC']) {
+      const bins = new Map<number, number>();
+      for (const p of shape(name).points) {
+        const b = Math.floor(p[0] / 1.5);
+        bins.set(b, Math.max(bins.get(b) ?? -Infinity, p[1]));
+      }
+      const top = [...bins.keys()].sort((a, b) => a - b).map((k) => bins.get(k) ?? 0);
+      const peak = Math.max(...top);
+      expect(peak - Math.max(top[0], top[top.length - 1]), name).toBeGreaterThan(peak * 0.45);
+      let run = 0;
+      let longest = 0;
+      for (const t of top) {
+        run = t > peak - 0.6 ? run + 1 : 0;
+        longest = Math.max(longest, run);
+      }
+      expect(longest, name).toBeLessThanOrEqual(4);
+    }
+  });
+
   it.skipIf(!haveKit)('keeps the Cleft landing clear and the colossi colossal', () => {
     // Nothing of the gate reaches more than 7.8 yd toward the landing.
     expect(shape('Kit_CleftGate').max[2]).toBeLessThanOrEqual(7.9);

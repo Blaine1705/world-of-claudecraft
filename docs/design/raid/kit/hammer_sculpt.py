@@ -41,6 +41,8 @@ from shkit import (
 )
 
 UP = np.array((0.0, 0.0, 1.0))
+TAU = 2 * math.pi
+TAU3 = TAU / 3
 
 
 def _n(v):
@@ -97,6 +99,30 @@ COLOSSUS_KINDS = {
 }
 
 
+def plait(f, label, a, b, side, w0, w1, turns=2.0, phase=0.0):
+    """A three-strand plait from a to b: each strand swings across the
+    braid (along `side`) and in and out of it at twice the rate, a third of
+    a turn behind the last, so the three cross over and under one another
+    and the surface reads as the plait's slanting lobes. w0 the braid's half
+    width at a, w1 at b."""
+    a, b = np.asarray(a, dtype=np.float64), np.asarray(b, dtype=np.float64)
+    d = _n(b - a)
+    u = np.asarray(side, dtype=np.float64)
+    u = _n(u - d * float(u @ d))
+    v = np.cross(d, u)
+    n = max(8, int(turns * 14))
+    for k in range(3):
+        ph = phase + k * TAU3
+        pts, rad = [], []
+        for i in range(n + 1):
+            t = i / n
+            th = TAU * turns * t + ph
+            w = w0 + (w1 - w0) * t
+            pts.append(a + (b - a) * t + u * (w * 0.5 * math.sin(th)) + v * (w * 0.28 * math.sin(2 * th)))
+            rad.append(w * 0.5)
+        f.put(label, Polyline(pts, rad), 0.0015 * w0 / 0.04)
+
+
 # ------------------------------------------------------------------ the figure
 class Smith:
     """The Smith's likeness from a few joints (yards). The body frame: the
@@ -110,6 +136,8 @@ class Smith:
         self.fw = _n(facing)
         self.right = _n(np.cross(UP, self.fw))   # facing -Y: right is -X
         self.k = 0.035 * S
+        # The braids' lengths (the middle one, the corners'), fractions of S.
+        self.braid = (0.3, 0.21)
 
     def P(self, x, y, z):
         """A point in the body frame (x to his right, y forward, z up), S units."""
@@ -163,7 +191,7 @@ class Smith:
         c = self.neck + self.spine * 0.15 * S0 + look * 0.05 * S0
         low = self.chest + self.fw * 0.25 * S0 - self.spine * 0.12 * S0
         r = 0.33 * S0 * scale / 1.35
-        tail = low - UP * 0.24 * S0 + self.fw * 0.1 * S0
+        tail = low - UP * (self.braid[0] + 0.1) * S0 + self.fw * 0.12 * S0
         lo = np.minimum(np.minimum(c - r, low - 0.16 * S0), tail - 0.06 * S0)
         hi = np.maximum(np.maximum(c + r, low + 0.16 * S0), tail + 0.06 * S0)
         self.fh = Sculpt(tuple(lo), tuple(hi), voxel)
@@ -279,23 +307,34 @@ class Smith:
                 # The strand cut down the middle of the lock.
                 f.groove(Polyline([a + look * r0 * 0.8 * S, mid + look * r0 * 0.9 * S, b + look * r0 * 0.7 * S],
                                   0.0015 * S), 0.006 * S, 0.004 * S)
-        # The five plaited braids: knots of stone one under the other,
-        # alternately offset (the plait), banded twice in bronze.
-        for s in (-2, -1, 0, 1, 2):
-            a = low + left * s * 0.04 * S + self.fw * 0.06 * S0
-            # The braids hang (stone hair falls, whatever the lean).
-            b = a + _n(-UP * 0.9 + self.fw * 0.25 + self.spine * -0.2) * (0.16 - 0.025 * abs(s) + 0.01 * s) * S0
-            n_knots = 6
-            for i in range(n_knots):
-                t = (i + 0.5) / n_knots
-                q = a + (b - a) * t + left * (0.007 * S if i % 2 else -0.007 * S)
-                r = 0.022 * S * (1 - t * 0.35)
-                f.put('beard', Ellipsoid(q, np.array((r * 0.95, r * 0.8, r * 0.75)), frame(b - a, left)), 0.003 * S)
-            for t in (0.32, 0.8):
-                f.put('bronze', Torus(a + (b - a) * t, 0.024 * S * (1 - t * 0.33), 0.008 * S, b - a), 0.003 * S)
-            # The braid's end: a short blunt tassel, never a point.
-            f.put('beard', Ellipsoid(b + (b - a) * 0.06, np.array((0.016, 0.014, 0.022)) * S, frame(b - a, left)),
-                  0.003 * S)
+        # The braids (phase 2D): the beard's locks gather into three true
+        # plaits, each three strands crossing over and under one another
+        # (the diagonal lobes of a plait, never a string of beads), a long
+        # one down the middle and two shorter at the corners, bound at the
+        # top and near the end in bronze and ending in a combed tassel. They
+        # hang (stone hair falls, whatever the lean) and are thick enough to
+        # read across the pit.
+        hang = _n(-UP * 0.94 + self.fw * 0.18 + self.spine * -0.12)
+        for s, length, w0 in ((0, self.braid[0], 0.042), (-1, self.braid[1], 0.034), (1, self.braid[1], 0.034)):
+            a = low + left * s * 0.085 * S + self.fw * 0.035 * S0 + UP * 0.03 * S0
+            b = a + hang * length * S0
+            # The gather: the locks above narrow into the braid's head.
+            f.put('beard', RoundCone(a + UP * 0.07 * S0 - self.fw * 0.01 * S0, a, w0 * 1.25 * S, w0 * 0.95 * S),
+                  0.01 * S)
+            plait(f, 'beard', a, b, left, w0 * S, w0 * 0.62 * S, turns=2.2 if s == 0 else 1.7, phase=0.7 * s)
+            # The bronze band: one short sleeve hugging the plait over its
+            # end (more than one, and the plait reads as a string of beads).
+            q = a + (b - a) * 0.84
+            r = w0 * S * 0.7
+            f.put('bronze', RoundCone(q - hang * 0.016 * S, q + hang * 0.016 * S, r, r * 0.96), 0.003 * S)
+            # The tassel: the strands loosed under the last band into a
+            # combed brush, its locks fanning a little, cut blunt.
+            w = w0 * 0.62 * S
+            for j in range(5):
+                e = (j - 2) / 2.0
+                q0 = b + left * e * w * 0.45 + self.fw * (0.25 - abs(e) * 0.3) * w
+                q1 = b + hang * (0.07 - 0.012 * abs(e)) * S0 + left * e * w * 0.95 + self.fw * (0.3 - abs(e) * 0.5) * w
+                f.put('beard', RoundCone(q0, q1, w * 0.42, w * 0.22), 0.05 * w)
         # The hair: swept back from the brow over the crown (it never covers
         # the face), combed in strands, a topknot bound in bronze.
         f.put('hair', RoundBox(H(0, -0.025, 0.06), np.array((0.098, 0.085, 0.075)) * S, 0.05 * S, Rh), k * 0.25)
@@ -435,15 +474,49 @@ def bench_lines(f, a, b, zs, S, depth=0.01, width=0.008):
         f.groove(Polyline([a + UP * z, b + UP * z], 0.002 * S), depth * S, width * S)
 
 
-def mesh_colossus(bpy, p, f, name, target, fh=None, head_target=7000, S=17.0):
+# The figure's own stone where a bronze part sits (the bronze is its own
+# shell over it: bronze_shell).
+STONE_COLOURS = dict(COLOSSUS_COLOURS, bronze=DRESSED_STONE)
+STONE_KINDS = dict(COLOSSUS_KINDS, bronze=DRESSED)
+
+
+def bronze_shell(bpy, p, f, name, target, subs=()):
+    """Mesh the field's bronze parts (bands, bracers, belt, rings) as their
+    own crisp shell, a hair proud of the stone they wrap (phase 2D): painted
+    per face on the figure's decimated mesh, a thin band broke into a
+    zigzag of bronze and stone triangles. `subs` are cavities the shell
+    keeps too (a bowl's hollow)."""
+    prims = [prim for (label, prim) in f.parts if label == 'bronze']
+    if not prims:
+        return
+    vox = f.voxel * 0.7
+    lo = np.min([q.lo for q in prims], axis=0) - vox * 4
+    hi = np.max([q.hi for q in prims], axis=0) + vox * 4
+    g = Sculpt(tuple(lo), tuple(hi), vox)
+    for q in prims:
+        g.put('bronze', q, vox * 0.5)
+    for q in subs:
+        g.sub(q, vox)
+    # Proud of the stone by more than its weathering, so no stone grain
+    # pokes through the bronze.
+    g.d -= np.float32(vox * 2.6)
+    verts, faces = gs.mesh_sculpt(g, bpy, name + 'Bronze', target)
+    add_sculpt(p, g, verts, faces, {'bronze': BRONZE}, {'bronze': METAL})
+
+
+def mesh_colossus(bpy, p, f, name, target, fh=None, head_target=7000, S=17.0, shell=1400):
     """Mesh the body (and the head's finer field apart, when given, with the
-    same stone grain) into p."""
-    verts, faces = gs.mesh_sculpt(f, bpy, name, target - (head_target if fh is not None else 0))
-    add_sculpt(p, f, verts, faces, COLOSSUS_COLOURS, COLOSSUS_KINDS)
+    same stone grain) into p, the bronze as its own shells."""
+    head_shell = shell // 3 if fh is not None else 0
+    body = target - (head_target if fh is not None else 0) - shell
+    verts, faces = gs.mesh_sculpt(f, bpy, name, body)
+    add_sculpt(p, f, verts, faces, STONE_COLOURS, STONE_KINDS)
+    bronze_shell(bpy, p, f, name, shell - head_shell)
     if fh is not None:
         quarry_noise(fh, len(name), S, grain=0.0022)
         verts, faces = gs.mesh_sculpt(fh, bpy, name + 'Head', head_target)
-        add_sculpt(p, fh, verts, faces, COLOSSUS_COLOURS, COLOSSUS_KINDS)
+        add_sculpt(p, fh, verts, faces, STONE_COLOURS, STONE_KINDS)
+        bronze_shell(bpy, p, fh, name + 'Head', head_shell)
 
 
 def claw_band(f, a, step, stroke, n, S, depth=0.007, width=0.0045):
@@ -505,6 +578,8 @@ def colossus_vigil(bpy, p, S=17.0, target=19400):
     chest = P(0, 0.1, 0.98)
     m.torso(pelvis, chest)
     look = _n(m.fw * 0.93 - UP * 0.36)
+    # His braids fall behind his stacked hands: shorter, so they end at them.
+    m.braid = (0.22, 0.16)
     fh = m.head_field(look, 0.0048 * S)
     m.head(look)
     # The hammer planted before his knees, the haft rising to his hands.
@@ -646,6 +721,7 @@ def rough_statue(bpy, p, variant, S=6.6, target=6000):
     f = Sculpt((-0.5 * S, -0.5 * S, -0.04 * S), (0.5 * S, 0.5 * S, 2.25 * S), 0.012 * S)
     m = Smith(f, S)
     m.k = 0.06 * S
+    m.braid = (0.2, 0.14)
     P = m.P
     if variant == 'A':
         m.torso(P(0, 0.0, 1.06), P(0, 0.02, 1.42))
@@ -666,7 +742,8 @@ def rough_statue(bpy, p, variant, S=6.6, target=6000):
                 raw_block(f, rng, P(0, -0.2, 0.75), np.array((0.6, 0.34, 0.7)) * S, k=0.03 * S, cuts=6)]
     quarry_noise(f, 83 + ord(variant), S, near=near, grain=0.006)
     verts, faces = gs.mesh_sculpt(f, bpy, 'RoughStatue' + variant, target)
-    add_sculpt(p, f, verts, faces, COLOSSUS_COLOURS, COLOSSUS_KINDS)
+    add_sculpt(p, f, verts, faces, STONE_COLOURS, STONE_KINDS)
+    bronze_shell(bpy, p, f, 'RoughStatue' + variant, 900)
     return p
 
 
@@ -677,6 +754,7 @@ def lookout_statue(bpy, p, S=4.4, target=5000):
     rng = np.random.default_rng(89)
     f = Sculpt((-0.75 * S, -0.9 * S, -0.5 * S), (0.75 * S, 0.7 * S, 1.75 * S), 0.012 * S)
     m = Smith(f, S)
+    m.braid = (0.18, 0.13)
     P = m.P
     m.torso(P(0, 0.0, 0.62), P(0, 0.08, 0.98))
     m.head(_n(m.fw * 0.9 - UP * 0.42))
@@ -685,13 +763,15 @@ def lookout_statue(bpy, p, S=4.4, target=5000):
         m.leg(P(s * 0.13, 0.02, 0.56), P(s * 0.15, 0.24, 0.1), P(s * 0.15, -0.28, 0.07), toe_dir=-m.fw)
     bowl = P(0, 0.6, 0.86)
     f.put('bronze', Ellipsoid(bowl, np.array((0.32, 0.32, 0.12)) * S), 0.02 * S)
-    f.sub(Ellipsoid(bowl + UP * 0.08 * S, np.array((0.27, 0.27, 0.1)) * S), 0.01 * S)
+    hollow = Ellipsoid(bowl + UP * 0.08 * S, np.array((0.27, 0.27, 0.1)) * S)
+    f.sub(hollow, 0.01 * S)
     f.put('vein', Ellipsoid(bowl + UP * 0.03 * S, np.array((0.24, 0.24, 0.05)) * S), 0.01 * S)
     near = [raw_block(f, rng, P(0, 0.0, -0.22), np.array((1.2, 1.2, 0.5)) * S, k=0.02 * S, cuts=3, top_tilt=0.02),
             raw_block(f, rng, P(0, -0.05, 0.08), np.array((0.8, 0.9, 0.18)) * S, k=0.02 * S, cuts=3, top_tilt=0.02)]
     quarry_noise(f, 89, S, near=near)
     verts, faces = gs.mesh_sculpt(f, bpy, 'LookoutStatue', target)
-    add_sculpt(p, f, verts, faces, COLOSSUS_COLOURS, COLOSSUS_KINDS)
+    add_sculpt(p, f, verts, faces, STONE_COLOURS, STONE_KINDS)
+    bronze_shell(bpy, p, f, 'LookoutStatue', 900, subs=(hollow,))
     return p
 
 

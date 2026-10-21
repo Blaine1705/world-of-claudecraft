@@ -102,12 +102,15 @@ def cut_block(variant):
     A: a block with a smaller one set on it, wedge slots along its top edge,
     the drill line it split on, a rope sling and an iron lifting dog. B: one
     great block on a timber sledge over rollers, chocked, a rope coil."""
+    import bpy
+    import hammer_cliff as hc
     p = SP('CutBlock' + variant, seed=110 + ord(variant), ao_dist=2.0)
     if variant == 'A':
+        # The blocks sculpted as split stone (phase 2D: 2C's were boxes).
+        hc.cut_stone(bpy, p, 'CutBlockA0', 1101, (0, 0, 2.3), (4.6, 4.5, 4.6))
+        hc.cut_stone(bpy, p, 'CutBlockA1', 1103, (0.3, -0.2, 5.85), (3.2, 3.0, 2.5), yaw=0.42, drill=False,
+                     target=900)
         with p.as_kind(RAW):
-            slab(p, (0, 0, 2.3), (4.6, 4.5, 4.6), p.vary(QUARRY_PALE, 0.05), chamfer=0.04, jitter=0.02)
-            slab(p, (0.3, -0.2, 5.85), (3.2, 3.0, 2.5), p.vary(QUARRY, 0.05), yaw=0.42, chamfer=0.05, jitter=0.03)
-            drill_line(p, (-2.1, -2.27, 0.3), (-2.1, -2.27, 4.3), 0.08, 0.42, out=(0, -1, 0))
             for k in range(5):
                 p.box((-1.6 + k * 0.8, -2.27, 4.45), (0.32, 0.06, 0.22), QUARRY_DEEP)
         with p.as_kind(METAL):
@@ -123,10 +126,7 @@ def cut_block(variant):
         for s in (-1, 1):
             rope(p, (s * 1.4, -1.55, 4.6), (s * 1.4, 1.5, 4.6), 0.08, sag=-0.05)
     else:
-        with p.as_kind(RAW):
-            slab(p, (0, 0, 3.45), (4.3, 4.6, 4.9), p.vary(QUARRY_PALE, 0.05), chamfer=0.04, jitter=0.02)
-            drill_line(p, (2.17, -1.9, 1.3), (2.17, 1.9, 1.3), 0.08, 0.42, out=(1, 0, 0))
-            drill_line(p, (-1.9, -2.32, 5.6), (1.9, -2.32, 5.6), 0.08, 0.42, out=(0, -1, 0))
+        hc.cut_stone(bpy, p, 'CutBlockB0', 1105, (0, 0, 3.45), (4.3, 4.6, 4.9))
         # The sledge: two runners upturned at the front, cross-ties, rollers under.
         for s in (-1, 1):
             beam(p, (s * 1.5, 2.6, 0.75), (s * 1.5, -2.2, 0.75), 0.45, 0.5, TIMBER)
@@ -425,7 +425,7 @@ def quarry_face(variant):
         vein = [(-4.9, -0.12, -1.1), (-2.0, -0.15, -0.8), (0.4, -0.15, -1.3), (2.6, -0.15, -0.9), (4.9, -0.12, -1.2)]
     hc.sculpt_face(bpy, p, 'QuarryFace' + variant, seeds[variant], -4.4, 4.4, -0.02, -7.4, 3.0, target=2200,
                    crack=0.9 if variant == 'A' else 0.4, notch=0.8 if variant == 'B' else 0.3,
-                   overhang=0.45 if variant == 'B' else 0.25, vein=vein, wmin=3.5, wmax=9.0)
+                   overhang=0.45 if variant == 'B' else 0.25, vein=vein, wmin=4.5, wmax=11.0)
     return p
 
 
@@ -440,21 +440,25 @@ def quarry_lip(variant):
     p = SP('QuarryLip' + variant, seed=seeds[variant], ao_dist=2.4)
     rng = p.rng
     hc.sculpt_face(bpy, p, 'QuarryLip' + variant, seeds[variant], -5.4, 5.4, -0.02, -8.0, 3.2, target=1500,
-                   foot=False, bench=0.85, crack=0.7, wmin=2.2, wmax=6.5, voxel=0.1)
+                   foot=False, bench=0.85, crack=0.7, wmin=3.5, wmax=8.0, voxel=0.1)
     with p.as_kind(RAW):
+        # The split rock under the worked face (phase 2D): tall sheets and
+        # shards of the mountain's granite, leaning and stepping in and out
+        # (the rock's own jointing), never courses of boulders.
         z = -7.0
         while z > -30:
-            h = rng.uniform(5.0, 8.0)
-            x = -5.6
+            h = rng.uniform(8.0, 13.0)
+            x = -5.8 + rng.uniform(-0.8, 0.4)
             out = 2.4 + 0.3 * (-z - 7.0)
             while x < 5.6:
-                w = rng.uniform(4.0, 7.0)
-                tone = mix(QUARRY_DARK, QUARRY_DEEP, rng.uniform(0.1, 0.45))
-                crystal(p, (x + w / 2, 1.6 - out + rng.uniform(-0.6, 0.6), z - h / 2), (w * 1.1, 4.6, h * 1.08),
-                        p.vary(tone, 0.04), n=16, boxy=0.3, jitter=0.12, yaw=rng.uniform(-0.08, 0.08),
-                        pitch=rng.uniform(-0.12, 0.05))
-                x += w * 0.9
-            z -= h * 0.9
+                w = rng.uniform(2.2, 4.6)
+                hh = h * rng.uniform(0.75, 1.15)
+                tone = mix(QUARRY_DARK, QUARRY_DEEP, rng.uniform(0.05, 0.4))
+                crystal(p, (x + w / 2, 1.6 - out + rng.uniform(-1.2, 1.0), z - hh / 2 + rng.uniform(-1.0, 1.0)),
+                        (w * 1.15, 4.6, hh), p.vary(tone, 0.05), n=14, boxy=0.4, jitter=0.2,
+                        yaw=rng.uniform(-0.25, 0.25), pitch=rng.uniform(-0.15, 0.1), roll=rng.uniform(-0.14, 0.14))
+                x += w * 0.85
+            z -= h * 0.8
     return p
 
 
@@ -622,54 +626,14 @@ def slab_half(side):
     jagged down the middle. side -1 the west half (L), +1 the east (R)."""
     name = 'SlabHalfL' if side < 0 else 'SlabHalfR'
     p = SP(name, seed=191 if side < 0 else 193, ao_dist=1.6)
-    half = SLAB_W / 2
-    if side < 0:
-        outline = [(-half, 0.0)] + [(x, z) for x, z in SPLIT] + [(-half, SLAB_H)]
-    else:
-        outline = [(SPLIT[0][0], 0.0), (half, 0.0), (half, SLAB_H)] + [(x, z) for x, z in reversed(SPLIT)][:-1]
-    with p.as_kind(DRESSED):
-        faces = _prism_poly(p, outline, -SLAB_T / 2, SLAB_T / 2, p.vary(DRESSED_SHADE, 0.03))
-    # The border, raised a hand on both faces.
-    x_out = -half if side < 0 else half
-    with p.as_kind(DRESSED):
-        for yf in (-1, 1):
-            y = yf * (SLAB_T / 2 + 0.08)
-            p.box((x_out - side * 0.45, y, SLAB_H / 2), (0.9, 0.16, SLAB_H - 0.2), DRESSED_STONE, bevel=0.04)
-            for zz in (0.45, SLAB_H - 0.45):
-                p.box((x_out - side * half / 2, y, zz), (half - 0.2, 0.16, 0.9), DRESSED_STONE, bevel=0.04)
-            # The field's tool marks: bands of fine pick-dressing.
-            for k in range(6):
-                zz = 1.4 + k * 1.15
-                p.box((x_out - side * half * 0.55, y * 0.985, zz), (half * 0.62, 0.04, 0.08), QUARRY_DEEP)
+    import bpy
+    import hammer_cliff as hc
     # The great hammer rune of the vein across both halves (the handle and
-    # its grip on the west half, the head spanning the split): each half
-    # draws the strokes that lie on it.
-    strokes = [((-1.3, 1.2), (-1.3, 5.6), 'v'), ((-4.0, 5.6), (3.0, 5.6), 'h'), ((-4.0, 7.8), (3.0, 7.8), 'h'),
-               ((-4.0, 5.6), (-4.0, 7.8), 'v'), ((3.0, 5.6), (3.0, 7.8), 'v'), ((-2.3, 2.0), (-0.3, 2.0), 'h')]
-    for yf in (-1, 1):
-        y = yf * (SLAB_T / 2 + 0.1)
-        for (x0, z0), (x1, z1), kind in strokes:
-            if kind == 'v':
-                if (x0 < 0) != (side < 0):
-                    continue
-                mx, mz, L = x0, (z0 + z1) / 2, abs(z1 - z0)
-                size_g, size_l = (0.34, 0.08, L + 0.3), (0.16, 0.06, L)
-            else:
-                lo, hi = (x0, min(x1, -0.8)) if side < 0 else (max(x0, 0.9), x1)
-                if hi - lo < 0.2:
-                    continue
-                mx, mz, L = (lo + hi) / 2, z0, hi - lo
-                size_g, size_l = (L + 0.3, 0.08, 0.34), (L, 0.06, 0.16)
-            p.box((mx, y, mz), size_g, QUARRY_DEEP)
-            with p.as_kind(PAINT):
-                p.box((mx, y + yf * 0.04, mz), size_l, RUNE_OCHRE, mat=GLOW)
-    # The split's lips, raw and pale.
-    with p.as_kind(RAW):
-        for (x0, z0), (x1, z1) in zip(SPLIT, SPLIT[1:]):
-            mx, mz = (x0 + x1) / 2 - side * 0.12, (z0 + z1) / 2
-            L = math.hypot(x1 - x0, z1 - z0)
-            ang = math.atan2(z1 - z0, x1 - x0)
-            p.box((mx, 0, mz), (L, SLAB_T + 0.05, 0.22), QUARRY_PALE, roll=-ang)
+    # its grip on the west half, the head spanning the split); the sculpt
+    # cuts every stroke and the split keeps each half's share.
+    strokes = [((-1.3, 1.2), (-1.3, 5.6)), ((-4.0, 5.6), (3.0, 5.6)), ((-4.0, 7.8), (3.0, 7.8)),
+               ((-4.0, 5.6), (-4.0, 7.8)), ((3.0, 5.6), (3.0, 7.8)), ((-2.3, 2.0), (-0.3, 2.0))]
+    hc.slab_half_sculpt(bpy, p, side, SPLIT, SLAB_W, SLAB_H, SLAB_T, strokes)
     return p
 
 
@@ -679,18 +643,11 @@ def slab_frame():
     the fissure from -20 to 14 at x +-9.6 (clear of the stair), banded and
     cut with the Smith's four tools, a lintel 22 yd across with the vein's
     hammer rune, a cornice over it, the split already showing through it."""
+    import bpy
+    import hammer_cliff as hc
     p = SP('SlabFrame', seed=197, ao_dist=3.0)
     y = -2.0
-    with p.as_kind(DRESSED):
-        for s in (-1, 1):
-            x = s * 9.7
-            p.box((x, y, -3.0), (2.8, 3.2, 34.0), p.vary(DRESSED_SHADE, 0.03), bevel=0.12)
-            p.box((x, y, 13.6), (3.4, 3.8, 0.8), DRESSED_STONE, bevel=0.1)
-            for zz in (2.0, 7.0):
-                p.box((x, y, zz), (3.1, 3.5, 0.5), DRESSED_STONE, bevel=0.06)
-        p.box((0, y, 15.4), (23.6, 3.6, 2.8), p.vary(DRESSED_STONE, 0.03), bevel=0.14)
-        p.box((0, y, 17.2), (25.0, 4.2, 0.8), DRESSED_SHADE, bevel=0.1)
-        p.box((0, y + 0.3, 18.0), (21.0, 3.2, 0.9), p.vary(DRESSED_STONE, 0.03), bevel=0.1, taper=0.92)
+    hc.slab_frame_sculpt(bpy, p, y)
     with p.as_kind(RAW):
         for s in (-1, 1):
             crystal(p, (s * 9.7, y + 0.4, -18.0), (5.0, 5.0, 8.0), QUARRY_DARK, n=16, boxy=0.4)
