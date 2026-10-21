@@ -242,7 +242,7 @@ describe('winning Warrior cast VFX routing', () => {
     expect(VISUALS.player_warrior.clips.swimSurface).toBe('Woc_Swim');
     expect(VISUALS.player_warrior.clips.swimIdle).toBe('Woc_Swim_Idle');
     expect(VISUALS.player_warrior.hideWeaponsWhileSwimming).toBe(true);
-    expect(VISUALS.player_warrior.swimRise?.stroke).toBeCloseTo(-0.65, 6);
+    expect(VISUALS.player_warrior.swimRise?.stroke).toBeCloseTo(-1.0, 6);
     expect(VISUALS.player_warrior.clips.emote?.flex?.clips[0]).toBe('Woc_Emote_Flex');
     expect(KAYKIT_KNIGHT_WARRIOR.clips.shoutEmote).toBeUndefined();
     const renderer = readFileSync('src/render/renderer.ts', 'utf8');

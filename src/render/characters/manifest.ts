@@ -2617,12 +2617,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // timing and are meant to play at 1x (handoff INTEGRATION.md), not the
     // KayKit-era 1.3x speed-up playAttack defaults to.
     attackTimeScale: 1,
-    // The stroke rides its hips 1.33 world units above the origin, which the sim
-    // seats 0.75 under the line: this leaves the chest at the surface and the
-    // hips 0.07 under it (measured, tmp/woc/swim_measure.mjs). The upright
-    // Swim_Idle tread keeps its hips at standing height, so it sinks further
-    // to put the waterline at the chest.
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    // Woc_Swim rides its neck ~1.72 world units above the origin, which the sim
+    // seats 0.75 under the line: -1.0 puts the waterline at the neck and keeps
+    // the chest and stroking hands submerged across both fits. The upright
+    // Woc_Swim_Idle tread stands its chest at ~1.9, so it sinks further to put
+    // the waterline at the shoulders and keep the sculling hands under water.
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
@@ -2696,7 +2696,7 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_PALADIN_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
@@ -2745,7 +2745,7 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_HUNTER_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
@@ -2802,7 +2802,7 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_ROGUE_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
@@ -2849,7 +2849,7 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_PRIEST_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
@@ -2889,7 +2889,7 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_SHAMAN_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
@@ -2927,7 +2927,7 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_MAGE_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
@@ -2978,7 +2978,7 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_WARLOCK_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
@@ -3031,7 +3031,7 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_DRUID_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
