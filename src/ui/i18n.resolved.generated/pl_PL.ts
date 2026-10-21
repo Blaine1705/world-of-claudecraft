@@ -13347,11 +13347,11 @@ export const pl_PL: EnTranslations = {
       },
       "bear_trap": {
         "name": "Pułapka na Niedźwiedzie",
-        "description": "Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje pochwycony przez zatrzaskującą się pułapkę: krwawi, otrzymując 83 obrażeń Fizycznych plus 22,5% twojej mocy ataku dystansowego przez 15 s, i zostaje spowolniony o 50% na 4 s."
+        "description": "Zastaw pułapkę w wybranym miejscu. Uzbraja się po 0,75 sek. i utrzymuje przez 1 min; widzisz ją tylko ty i twoja grupa. Pierwszy wróg, który ją uruchomi, krwawi, otrzymując {damage} obrażeń fizycznych w ciągu 15 sek., i zostaje spowolniony o 50% na 4 sek. Obrażenia rosną wraz z siłą ataku dystansowego. Jednocześnie może być aktywna tylko jedna Pułapka na Niedźwiedzie. Może współistnieć z twoją Pułapką Mroźnej Paszczy. Zastawienie kolejnej Pułapki na Niedźwiedzie zastępuje poprzednią."
       },
       "scatterbolt": {
         "name": "Rozpryskowy Bełt",
-        "description": "Wystrzeliwuje grad bełtów w stożku 8 m przed tobą, odrzucając każdego trafionego wroga, aż znajdzie się 20 metrów od ciebie. Nie zadaje obrażeń."
+        "description": "Wystrzel grad bełtów w stożku o kącie 90 stopni i zasięgu 8 jardów przed tobą, odrzucając wrogów na odległość do 20 jardów od ciebie. Wrogowie odporni na odrzucenie pozostają niewzruszeni. Nie zadaje obrażeń."
       },
       "pack_rally": {
         "name": "Zbiórka Sfory",

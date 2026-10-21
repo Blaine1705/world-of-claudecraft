@@ -20480,10 +20480,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': 'Bärenfalle',
   'entities.abilities.bear_trap.description':
-    'Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird von der zuschnappenden Bärenfalle erfasst: Er blutet über 15 Sek. für 83 physischen Schaden plus 22,5% Eurer Distanzangriffskraft und wird 4 Sek. lang um 50% verlangsamt.',
+    'Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min.; nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, erleidet durch Blutung {damage} physischen Schaden über 15 Sek. und wird 4 Sek. lang um 50% verlangsamt. Der Schaden steigt mit der Distanzangriffskraft. Es kann jeweils nur eine Bärenfalle aktiv sein. Sie kann gleichzeitig mit Eurer Frostkieferfalle bestehen. Eine neue Bärenfalle ersetzt Eure vorherige.',
   'entities.abilities.scatterbolt.name': 'Streubolzen',
   'entities.abilities.scatterbolt.description':
-    'Feuert eine Bolzensalve in einem Kegel von 8 Metern vor Euch ab und stößt jeden getroffenen Gegner zurück, bis er 20 Meter von Euch entfernt ist. Verursacht keinen Schaden.',
+    'Feuert einen Bolzenhagel in einem 90-Grad-Kegel mit 8 Metern Reichweite vor Euch ab und stößt Gegner bis auf 20 Meter Entfernung von Euch zurück. Gegen Rückstoß immune Gegner sind nicht betroffen. Verursacht keinen Schaden.',
   'entities.abilities.phosphor_flask.name': 'Phosphorflasche',
   'entities.abilities.phosphor_flask.description':
     'Ein versiegeltes Gefäß mit einer reaktiven Chemikalienmischung, die 3 Sek. lang über einen Bereich von 8 m in weißglühende Flammen aufgeht. Gegner in den Flammen erleiden alle 0,5 Sek. {damage} Feuerschaden. Der Schaden steigt mit der Distanzangriffskraft.',

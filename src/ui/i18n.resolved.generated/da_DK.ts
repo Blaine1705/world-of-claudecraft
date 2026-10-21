@@ -13347,11 +13347,11 @@ export const da_DK: EnTranslations = {
       },
       "bear_trap": {
         "name": "Bjørnefælde",
-        "description": "Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rammes af bjørnefælden, der klapper i: den bløder for 83 fysisk skade plus 22,5% af din afstandsangrebskraft over 15 sek. og sænkes med 50% i 4 sek."
+        "description": "Læg en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer i 1 min.; kun du og din gruppe kan se den. Den første fjende, der udløser den, bløder for {damage} fysisk skade over 15 sek. og bremses med 50% i 4 sek. Skaden stiger med angrebskraft på afstand. Kun én Bjørnefælde kan være aktiv ad gangen. Den kan være aktiv samtidig med din Frostkæbefælde. Hvis du lægger en ny Bjørnefælde, erstatter den den gamle."
       },
       "scatterbolt": {
         "name": "Spredebolt",
-        "description": "Affyr en byge af bolte i en kegle på 8 meter foran dig, der slår hver ramt fjende tilbage, indtil den er 20 meter fra dig. Gør ingen skade."
+        "description": "Affyr en byge af armbrøstpile i en 90 graders kegle, der rækker 8 yards foran dig, og skub fjender tilbage til op til 20 yards fra dig. Fjender, der er immune over for tilbageskub, påvirkes ikke. Giver ingen skade."
       },
       "pack_rally": {
         "name": "Floksamling",

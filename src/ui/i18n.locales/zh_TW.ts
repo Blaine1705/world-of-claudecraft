@@ -18911,10 +18911,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': '捕熊陷阱',
   'entities.abilities.bear_trap.description':
-    '在選定位置放置一個陷阱。陷阱在 0.75 秒後啟動，持續 1 分鐘，只有你和你的隊伍能看見。第一個觸發陷阱的敵人會被捕熊夾咬住：在 15 秒內流血，受到 83 點物理傷害外加你 22.5% 遠程攻擊強度的傷害，並被減速 50%，持續 4 秒。',
+    '在選定位置放置陷阱。0.75秒後就緒，持續1分鐘，僅你和你的小隊可見。首個觸發的敵人會流血，在15秒內受到{damage}點物理傷害，並被減速50%，持續4秒。傷害隨遠程攻擊強度提高。同時只能有一個捕熊陷阱生效，可與你的霜顎陷阱同時存在。放置新的捕熊陷阱會替換原來的陷阱。',
   'entities.abilities.scatterbolt.name': '散射弩箭',
   'entities.abilities.scatterbolt.description':
-    '向前方 8 碼錐形範圍內射出一片弩箭，將命中的每個敵人擊退，直到其距離你 20 碼。不造成傷害。',
+    '向前方8碼、90度的錐形區域散射弩箭，將敵人擊退至距你最多20碼的位置。免疫擊退的敵人不受影響。不造成傷害。',
   'entities.abilities.phosphor_flask.name': '磷火瓶',
   'entities.abilities.phosphor_flask.description':
     '一個密封容器，裝有活性化學混合物，會在 8 碼範圍內爆發出白熱火焰，持續 3 秒。站在火焰中的敵人每 0.5 秒受到 {damage} 點火焰傷害。傷害隨遠程攻擊強度提升。',

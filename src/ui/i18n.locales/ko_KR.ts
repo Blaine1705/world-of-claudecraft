@@ -19855,10 +19855,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': '곰덫',
   'entities.abilities.bear_trap.description':
-    '선택한 위치에 덫을 놓습니다. 덫은 0.75초 후 작동 준비되며 1분 동안 유지되고, 자신과 파티원만 볼 수 있습니다. 처음 발동시킨 적은 곰덫에 물려 15초에 걸쳐 83의 물리 피해와 원거리 전투력의 22.5%에 해당하는 출혈 피해를 입고, 4초 동안 이동 속도가 50% 감소합니다.',
+    '선택한 위치에 덫을 설치합니다. 0.75초 후 활성화되어 1분 동안 유지되며 자신과 파티만 볼 수 있습니다. 처음 작동시킨 적은 출혈로 15초에 걸쳐 {damage}의 물리 피해를 받고 4초 동안 이동 속도가 50% 감소합니다. 피해는 원거리 공격력에 따라 증가합니다. 곰덫은 동시에 하나만 활성화할 수 있습니다. 서리턱 덫과는 함께 설치할 수 있습니다. 새 곰덫을 설치하면 이전 곰덫을 대체합니다.',
   'entities.abilities.scatterbolt.name': '산탄 볼트',
   'entities.abilities.scatterbolt.description':
-    '전방 8미터 원뿔 범위에 볼트를 흩뿌려, 적중한 모든 적을 자신에게서 20미터 떨어질 때까지 밀쳐냅니다. 피해를 주지 않습니다.',
+    '전방 8야드, 90도 부채꼴 범위에 쇠뇌 화살을 흩뿌려 적을 자신에게서 최대 20야드 떨어진 위치까지 밀쳐냅니다. 밀쳐내기에 면역인 적은 영향을 받지 않습니다. 피해를 주지 않습니다.',
   'entities.abilities.phosphor_flask.name': '인광 플라스크',
   'entities.abilities.phosphor_flask.description':
     '반응성 화학 혼합물을 담은 밀봉된 용기로, 8미터 지역에 3초 동안 백열하는 불길을 터뜨립니다. 불길 안에 서 있는 적은 0.5초마다 {damage}의 화염 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다.',

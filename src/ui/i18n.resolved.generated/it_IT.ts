@@ -13347,11 +13347,11 @@ export const it_IT: EnTranslations = {
       },
       "bear_trap": {
         "name": "Trappola per Orsi",
-        "description": "Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva subisce la chiusura della trappola per orsi: sanguina per 83 danni Fisici più il 22,5% della tua potenza d'attacco a distanza in 15 s e viene rallentato del 50% per 4 s."
+        "description": "Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min; solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva sanguina per {damage} danni fisici in 15 s ed è rallentato del 50% per 4 s. I danni aumentano con la Potenza d’Attacco a Distanza. Può essere attiva una sola Trappola per Orsi alla volta. Può coesistere con la tua Trappola Fauci di Gelo. Piazzare un’altra Trappola per Orsi sostituisce la precedente."
       },
       "scatterbolt": {
         "name": "Ventaglio di Dardi",
-        "description": "Scaglia una raffica di dardi in un cono di 8 metri davanti a te, respingendo ogni nemico colpito finché non si trova a 20 metri da te. Non infligge danni."
+        "description": "Spara una raffica di dardi in un cono di 90 gradi che si estende per 8 metri davanti a te, respingendo i nemici fino a una distanza massima di 20 metri da te. I nemici immuni alle respinte non subiscono effetti. Non infligge danni."
       },
       "pack_rally": {
         "name": "Adunata del Branco",

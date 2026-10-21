@@ -20294,10 +20294,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': 'Berenval',
   'entities.abilities.bear_trap.description':
-    'Plaatst een val op de gekozen locatie. Hij scherpt na 0,75 sec. en duurt 1 min, en alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert, krijgt de dichtklappende berenval te verduren: hij bloedt 15 sec. lang voor 83 fysieke schade plus 22,5% van je afstandsaanvalskracht en wordt 4 sec. met 50% vertraagd.',
+    'Plaats een val op de gekozen locatie. Hij wordt na 0,75 sec. actief en blijft 1 min. liggen; alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert, bloedt voor {damage} fysieke schade over 15 sec. en wordt 4 sec. lang met 50% vertraagd. De schade neemt toe met afstandsaanvalskracht. Er kan maar één Berenval tegelijk actief zijn. Deze kan tegelijk met je Vorstkaakval bestaan. Een nieuwe Berenval vervangt de vorige.',
   'entities.abilities.scatterbolt.name': 'Strooischicht',
   'entities.abilities.scatterbolt.description':
-    'Vuurt een waaier van schichten af in een kegel van 8 meter voor je, en slaat elke getroffen vijand terug tot hij 20 meter van je verwijderd is. Richt geen schade aan.',
+    'Vuur een salvo kruisboogpijlen af in een kegel van 90 graden die 8 meter voor je uit reikt en duw vijanden terug tot maximaal 20 meter van je vandaan. Vijanden die immuun zijn voor terugduwen worden niet beïnvloed. Richt geen schade aan.',
   'entities.abilities.phosphor_flask.name': 'Fosforfles',
   'entities.abilities.phosphor_flask.description':
     'Een verzegeld vat met een reactief chemisch mengsel dat 3 sec. lang uitbarst in witgloeiende vlammen over een gebied van 8 m. Vijanden in de vlammen krijgen elke 0,5 sec. {damage} Vuurschade. De schade stijgt met de afstandsaanvalskracht.',

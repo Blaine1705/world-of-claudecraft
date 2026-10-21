@@ -13347,11 +13347,11 @@ export const fr_CA: EnTranslations = {
       },
       "bear_trap": {
         "name": "Piège à ours",
-        "description": "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est pris dans les mâchoires du piège à ours : il saigne pour 83 points de dégâts Physiques plus 22,5% de votre puissance d'attaque à distance sur 15 s et est ralenti de 50% pendant 4 s."
+        "description": "Pose un piège à l’emplacement choisi. Il s’arme après 0,75 s et dure 1 min ; seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche subit un saignement infligeant {damage} points de dégâts physiques en 15 s et est ralenti de 50% pendant 4 s. Les dégâts augmentent avec la puissance d’attaque à distance. Un seul Piège à ours peut être actif à la fois. Il peut coexister avec votre Piège Mâchegivre. Poser un autre Piège à ours remplace le précédent."
       },
       "scatterbolt": {
         "name": "Gerbe de carreaux",
-        "description": "Tire une gerbe de carreaux dans un cône de 8 mètres devant vous, repoussant chaque ennemi touché jusqu'à ce qu'il se trouve à 20 mètres de vous. N'inflige aucun dégât."
+        "description": "Tire une volée de carreaux dans un cône de 90 degrés d’une portée de 8 mètres devant vous, repoussant les ennemis jusqu’à une distance maximale de 20 mètres de vous. Les ennemis insensibles aux effets de recul ne sont pas affectés. N’inflige aucun dégât."
       },
       "pack_rally": {
         "name": "Ralliement de meute",

@@ -20302,10 +20302,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': 'Armadilha de Urso',
   'entities.abilities.bear_trap.description':
-    'Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar sofre com o fechamento da armadilha de urso: sangra por 83 de dano Físico mais 22,5% do seu poder de ataque à distância ao longo de 15 s e é lentificado em 50% por 4 s.',
+    'Coloca uma armadilha no local selecionado. Ela se arma após 0,75 s e dura 1 min; apenas você e seu grupo podem vê-la. O primeiro inimigo que a ativar sofre sangramento de {damage} de dano Físico ao longo de 15 s e fica 50% mais lento por 4 s. O dano aumenta com o Poder de Ataque à Distância. Apenas uma Armadilha de Urso pode ficar ativa por vez. Ela pode coexistir com sua Armadilha Presa Gélida. Colocar outra Armadilha de Urso substitui a anterior.',
   'entities.abilities.scatterbolt.name': 'Leque de Virotes',
   'entities.abilities.scatterbolt.description':
-    'Dispara uma rajada de virotes em um cone de 8 metros à sua frente, repelindo cada inimigo atingido até que ele esteja a 20 metros de você. Não causa dano.',
+    'Dispara uma chuva de virotes em um cone de 90 graus que alcança 8 metros à sua frente, repelindo os inimigos até uma distância máxima de 20 metros de você. Inimigos imunes a repulsão não são afetados. Não causa dano.',
   'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
   'entities.abilities.phosphor_flask.description':
     'Um recipiente selado com uma mistura química reativa que irrompe em chamas incandescentes sobre uma área de 8 m por 3 s. Os inimigos nas chamas sofrem {damage} de dano de Fogo a cada 0,5 s. O dano aumenta com o poder de ataque à distância.',

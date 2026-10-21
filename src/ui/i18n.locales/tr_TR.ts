@@ -20038,10 +20038,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': 'Ayı Kapanı',
   'entities.abilities.bear_trap.description':
-    'Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman kapanan ayı kapanına yakalanır: 15 sn boyunca kanayarak 83 Fiziksel hasar artı menzilli saldırı gücünün 22,5% kadarını alır ve 4 sn boyunca 50% yavaşlar.',
+    'Seçilen konuma bir kapan kurar. 0,75 sn sonra hazır olur ve 1 dk sürer; yalnızca sen ve grubun görebilirsiniz. İlk tetikleyen düşman 15 sn boyunca kanayarak {damage} Fiziksel hasar alır ve 4 sn boyunca %50 yavaşlar. Hasar, Menzilli Saldırı Gücü ile artar. Aynı anda yalnızca bir Ayı Kapanı etkin olabilir. Buzçene Tuzağın ile aynı anda kurulabilir. Yeni bir Ayı Kapanı kurmak öncekinin yerini alır.',
   'entities.abilities.scatterbolt.name': 'Saçma Oku',
   'entities.abilities.scatterbolt.description':
-    'Önündeki 8 metrelik bir koniye bir ok sağanağı fırlatır ve isabet eden her düşmanı senden 20 metre uzaklaşana kadar geri savurur. Hasar vermez.',
+    'Önündeki 8 yardalık, 90 derecelik koni içine bir ok yağmuru ateşleyerek düşmanları senden en fazla 20 yarda uzağa geri iter. Geri itmeye bağışık düşmanlar etkilenmez. Hasar vermez.',
   'entities.abilities.phosphor_flask.name': 'Fosfor Şişesi',
   'entities.abilities.phosphor_flask.description':
     "Reaktif bir kimyasal karışım taşıyan mühürlü bir kap, 8 metrelik bir alanda 3 sn boyunca akkor beyaz alevlerle patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar menzilli saldırı gücüyle artar.",

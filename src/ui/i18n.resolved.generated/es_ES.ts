@@ -13347,11 +13347,11 @@ export const es_ES: EnTranslations = {
       },
       "bear_trap": {
         "name": "Trampa para Osos",
-        "description": "Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo podéis verla. El primer enemigo que la active sufre el cierre de la trampa para osos: sangra por 83 de daño Físico más un 22,5% de tu poder de ataque a distancia durante 15 s y queda ralentizado un 50% durante 4 s."
+        "description": "Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min; solo tú y tu grupo podéis verla. El primer enemigo que la active sangra por {damage} de daño Físico durante 15 s y queda ralentizado un 50% durante 4 s. El daño aumenta con el poder de ataque a distancia. Solo puede haber una Trampa para Osos activa a la vez. Puede coexistir con tu Trampa Fauces de Escarcha. Colocar otra Trampa para Osos reemplaza la anterior."
       },
       "scatterbolt": {
         "name": "Ráfaga de Virotes",
-        "description": "Dispara una ráfaga de virotes en un cono de 8 metros frente a ti, repeliendo a cada enemigo alcanzado hasta que esté a 20 metros de ti. No inflige daño."
+        "description": "Dispara una ráfaga de virotes en un cono de 90 grados que alcanza 8 metros frente a ti y repele a los enemigos hasta dejarlos a una distancia de hasta 20 metros de ti. Los enemigos inmunes a la repulsión no se ven afectados. No inflige daño."
       },
       "pack_rally": {
         "name": "Reunión de Manada",

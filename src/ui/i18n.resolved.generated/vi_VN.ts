@@ -13347,11 +13347,11 @@ export const vi_VN: EnTranslations = {
       },
       "bear_trap": {
         "name": "Bẫy Gấu",
-        "description": "Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị bẫy gấu kẹp chặt: chảy máu chịu 83 sát thương Vật Lý cộng 22.5% sức tấn công tầm xa của bạn trong 15 giây và bị làm chậm 50% trong 4 giây."
+        "description": "Đặt bẫy tại vị trí đã chọn. Bẫy kích hoạt sau 0,75 giây và tồn tại 1 phút; chỉ bạn và nhóm của bạn nhìn thấy. Kẻ địch đầu tiên giẫm bẫy bị chảy máu, chịu {damage} sát thương Vật lý trong 15 giây và bị làm chậm 50% trong 4 giây. Sát thương tăng theo Sức mạnh Công kích Tầm xa. Mỗi lúc chỉ có thể kích hoạt một Bẫy Gấu. Bẫy này có thể tồn tại cùng Bẫy Hàm Băng của bạn. Đặt Bẫy Gấu mới sẽ thay thế bẫy trước đó."
       },
       "scatterbolt": {
         "name": "Tên Nỏ Tán Xạ",
-        "description": "Bắn ra một loạt tên nỏ trong hình nón 8 mét phía trước bạn, đẩy lùi mọi kẻ địch trúng đòn cho đến khi chúng cách bạn 20 mét. Không gây sát thương."
+        "description": "Bắn một loạt tên trong hình nón 90 độ, vươn xa 8 thước phía trước, đẩy lùi kẻ địch ra xa bạn tối đa 20 thước. Kẻ địch miễn nhiễm đẩy lùi không bị ảnh hưởng. Không gây sát thương."
       },
       "pack_rally": {
         "name": "Tập Hợp Bầy Đàn",

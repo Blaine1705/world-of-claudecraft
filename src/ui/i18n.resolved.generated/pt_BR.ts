@@ -13347,11 +13347,11 @@ export const pt_BR: EnTranslations = {
       },
       "bear_trap": {
         "name": "Armadilha de Urso",
-        "description": "Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar sofre com o fechamento da armadilha de urso: sangra por 83 de dano Físico mais 22,5% do seu poder de ataque à distância ao longo de 15 s e é lentificado em 50% por 4 s."
+        "description": "Coloca uma armadilha no local selecionado. Ela se arma após 0,75 s e dura 1 min; apenas você e seu grupo podem vê-la. O primeiro inimigo que a ativar sofre sangramento de {damage} de dano Físico ao longo de 15 s e fica 50% mais lento por 4 s. O dano aumenta com o Poder de Ataque à Distância. Apenas uma Armadilha de Urso pode ficar ativa por vez. Ela pode coexistir com sua Armadilha Presa Gélida. Colocar outra Armadilha de Urso substitui a anterior."
       },
       "scatterbolt": {
         "name": "Leque de Virotes",
-        "description": "Dispara uma rajada de virotes em um cone de 8 metros à sua frente, repelindo cada inimigo atingido até que ele esteja a 20 metros de você. Não causa dano."
+        "description": "Dispara uma chuva de virotes em um cone de 90 graus que alcança 8 metros à sua frente, repelindo os inimigos até uma distância máxima de 20 metros de você. Inimigos imunes a repulsão não são afetados. Não causa dano."
       },
       "pack_rally": {
         "name": "Reunião da Matilha",

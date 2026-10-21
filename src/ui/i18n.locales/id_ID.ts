@@ -20277,10 +20277,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': 'Jerat Beruang',
   'entities.abilities.bear_trap.description':
-    'Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terjepit jerat beruang yang menutup: ia berdarah sebesar 83 kerusakan Fisik ditambah 22,5% kekuatan serang jarak jauhmu selama 15 dtk dan diperlambat 50% selama 4 dtk.',
+    'Pasang jerat di lokasi pilihan. Jerat siap setelah 0,75 detik dan bertahan 1 menit; hanya kamu dan grupmu yang bisa melihatnya. Musuh pertama yang memicunya mengalami pendarahan sebesar {damage} kerusakan Fisik selama 15 detik dan diperlambat 50% selama 4 detik. Kerusakan meningkat seiring Daya Serang Jarak Jauh. Hanya satu Jerat Beruang yang dapat aktif pada satu waktu. Jerat ini dapat aktif bersamaan dengan Jerat Rahang Bekumu. Memasang Jerat Beruang baru menggantikan yang sebelumnya.',
   'entities.abilities.scatterbolt.name': 'Panah Sebar',
   'entities.abilities.scatterbolt.description':
-    'Menembakkan semburan anak panah dalam kerucut 8 meter di depanmu, mendorong mundur setiap musuh yang terkena hingga berjarak 20 meter darimu. Tidak memberi kerusakan.',
+    'Tembakkan hujan anak panah dalam kerucut 90 derajat sejauh 8 yard di depanmu, memukul mundur musuh hingga berjarak paling jauh 20 yard darimu. Musuh yang kebal terhadap pukulan mundur tidak terpengaruh. Tidak menimbulkan kerusakan.',
   'entities.abilities.phosphor_flask.name': 'Labu Fosfor',
   'entities.abilities.phosphor_flask.description':
     'Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh.',

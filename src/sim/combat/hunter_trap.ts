@@ -16,6 +16,7 @@ import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 import { DT, dist2d } from '../types';
 import { hunterBindingPayload, onHunterTrapTriggered } from './hunter_shared';
+import { hunterTrapBleedAmounts } from './hunter_trap_bleed';
 import { segmentTouchesAnnulus } from './ring_of_frost';
 
 // Hostile query padding so a fast mover cannot tunnel past the contact sweep.
@@ -219,14 +220,14 @@ function springBearTrap(
 ): void {
   const trap = effect.hunterTrap;
   if (!trap) return;
-  const ticks = Math.max(1, Math.round(bleed.duration / bleed.interval));
+  const { perTick } = hunterTrapBleedAmounts(bleed);
   ctx.applyAura(target, {
     id: `${trap.abilityId}_bleed`,
     name: effect.ability ?? 'Bear Trap',
     kind: 'dot',
     remaining: bleed.duration,
     duration: bleed.duration,
-    value: Math.max(1, Math.round(bleed.total / ticks)),
+    value: perTick,
     tickInterval: bleed.interval,
     tickTimer: bleed.interval,
     sourceId: source.id,

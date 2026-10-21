@@ -126037,8 +126037,8 @@ Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, a
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="572">== Description ==
-Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it suffers from the bear trap closing: it bleeds for 83 Physical damage plus 22.5% of your Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec.
+      <text xml:space="preserve" bytes="768">== Description ==
+Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it bleeds for 85 Physical damage at zero Ranged Attack Power over 15 sec and is slowed by 50% for 4 sec. Damage increases with Ranged Attack Power. Only one Bear Trap can be active at a time. Placing another replaces it. It can coexist with your Frostjaw Trap. The bleed deals damage 5 times, once every 3 sec; each tick is rounded to a whole number.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -126081,8 +126081,8 @@ Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, a
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="419">== Description ==
-Fire a spray of bolts in an 8-yard cone in front of you, knocking every enemy hit back until it is 20 yards away from you. Deals no damage.
+      <text xml:space="preserve" bytes="454">== Description ==
+Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Knockback-immune enemies are unaffected. Deals no damage.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;

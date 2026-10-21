@@ -19948,10 +19948,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': 'Medvědí past',
   'entities.abilities.bear_trap.description':
-    'Umísti past na vybrané místo. Aktivuje se po 0,75 s, trvá 1 minutu a vidíš ji jen ty a tvá skupina. První nepřítel, který ji spustí, utrpí sevření medvědí pasti: krvácí za 83 Fyzického poškození plus 22,5% tvé síly útoku na dálku po dobu 15 s a je zpomalen o 50% na 4 s.',
+    'Položí past na vybrané místo. Aktivuje se po 0,75 s a vydrží 1 minutu; vidíš ji jen ty a tvoje skupina. První nepřítel, který ji spustí, krvácením utrpí {damage} fyzického poškození během 15 s a je na 4 s zpomalen o 50 %. Poškození roste se silou útoku na dálku. Současně může být aktivní jen jedna Medvědí past. Může být položena zároveň s tvou Pastí mrazivé čelisti. Položení další Medvědí pasti nahradí tu předchozí.',
   'entities.abilities.scatterbolt.name': 'Rozptylná šipka',
   'entities.abilities.scatterbolt.description':
-    'Vystřel spršku šipek v kuželu o dosahu 8 metrů před sebou a odhoď každého zasaženého nepřítele, dokud nebude 20 metrů od tebe. Nezpůsobuje žádné poškození.',
+    'Vystřelí salvu šipek do kužele o úhlu 90 stupňů a dosahu 8 yardů před tebou a odrazí nepřátele až do vzdálenosti 20 yardů od tebe. Nepřátele imunní vůči odražení neovlivní. Nezpůsobuje poškození.',
   'entities.abilities.phosphor_flask.name': 'Fosforová baňka',
   'entities.abilities.phosphor_flask.description':
     'Zapečetěná nádoba s reaktivní chemickou směsí, která na 3 s vzplane do běla rozžhaveným plamenem v oblasti 8 m. Nepřátelé stojící v plamenech utrpí každých 0,5 s {damage} ohnivého poškození. Poškození roste se silou útoku na dálku.',

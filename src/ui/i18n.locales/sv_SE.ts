@@ -20048,10 +20048,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.name': 'Björnfälla',
   'entities.abilities.bear_trap.description':
-    'Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den drabbas när björnfällan slår igen: den blöder för 83 fysisk skada plus 22,5% av din distansattackkraft över 15 sek och saktas ned med 50% i 4 sek.',
+    'Placera en fälla på den valda platsen. Den armeras efter 0,75 sek. och varar i 1 min.; bara du och din grupp kan se den. Den första fienden som utlöser den blöder för {damage} fysisk skada under 15 sek. och saktas ned med 50% i 4 sek. Skadan ökar med distansattackkraft. Endast en Björnfälla kan vara aktiv åt gången. Den kan vara aktiv samtidigt som din Frostkäftsfälla. Om du placerar en ny Björnfälla ersätter den den gamla.',
   'entities.abilities.scatterbolt.name': 'Spridbult',
   'entities.abilities.scatterbolt.description':
-    'Avfyra en kaskad av bultar i en kon på 8 meter framför dig, som slår tillbaka varje träffad fiende tills den är 20 meter från dig. Gör ingen skada.',
+    'Avfyra en skur av armborstpilar i en 90 graders kon som når 8 yards framför dig och knuffar tillbaka fiender till högst 20 yards från dig. Fiender som är immuna mot tillbakaknuffning påverkas inte. Orsakar ingen skada.',
   'entities.abilities.phosphor_flask.name': 'Fosforflaska',
   'entities.abilities.phosphor_flask.description':
     'Ett förseglat kärl med en reaktiv kemisk blandning som flammar upp i vitglödande eld över ett område på 8 m i 3 sek. Fiender som står i lågorna tar {damage} eldskada var 0,5 sek. Skadan ökar med distansattackkraft.',
