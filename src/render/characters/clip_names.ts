@@ -2,7 +2,7 @@
 // (visual.ts constructor), so a clip missing here never plays.
 import type { ClipMap, VisualDef } from './manifest';
 import { seatClipNames } from './seat_clips';
-import { WOC_AUTO_ATTACK_NAMES } from './woc_autoattack_core';
+import { WOC_KEYED_CLIP_NAMES } from './woc_keyed_animations';
 
 export function clipNamesOf(def: VisualDef): string[] {
   // A stance's vocabulary (phaseClips) must be bound too, or its clips never
@@ -11,11 +11,7 @@ export function clipNamesOf(def: VisualDef): string[] {
     ...clipMapNames(p.clips),
     ...(p.enter ? [p.enter] : []),
   ]);
-  return [
-    ...clipMapNames(def.clips),
-    ...phases,
-    ...(def.wocCharacter ? WOC_AUTO_ATTACK_NAMES : []),
-  ];
+  return [...clipMapNames(def.clips), ...phases, ...(def.wocCharacter ? WOC_KEYED_CLIP_NAMES : [])];
 }
 
 function clipMapNames(c: ClipMap): string[] {
@@ -66,7 +62,10 @@ function clipMapNames(c: ClipMap): string[] {
     // tickIdleVariant/tickIdleBeat bail on every fire and the rig simply never
     // fidgets. Silent: no throw, no warning, just a clip that is never seen.
     ...(c.idleVariants ?? []),
-    ...Object.values(c.loadoutSwaps ?? {}).flatMap((m) => Object.values(m ?? {})),
+    ...Object.values(c.loadoutSwaps ?? {}).flatMap((m) => [
+      ...Object.keys(m ?? {}),
+      ...Object.values(m ?? {}),
+    ]),
     c.idleBeat?.clip,
     // The night pair (mob/slumber.ts): a slot named here is the ONLY way a clip becomes an
     // action, so a new ClipMap field joins this list or it never plays (pinned per rig by

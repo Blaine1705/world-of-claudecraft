@@ -191,11 +191,13 @@ describe('the WOC entry file sets (woc_entry_core.ts)', () => {
 
   it('keeps world entry lighter than the player bodies the release preloaded at boot', () => {
     // The release preloaded 10.58 MB of player bodies before the launcher drew (PR 4360
-    // review, census). The whole entry-critical set is under half of that (each fit's
-    // hand-keyed movement and autoattack library adds about 0.32 MB), and a player
-    // arriving from the launcher already holds their own fit: the other fit is what is added.
+    // review, census). The whole entry-critical set stays well under that. Each fit's
+    // hand-keyed library (movement, autoattacks, combat stances, casts and ability
+    // strikes) adds about 0.66 MB; the owner accepted that cost for the combat clips
+    // (2026-10-21), raising these ceilings from 5 / 2.75 / 2.25 MiB. A player arriving
+    // from the launcher already holds their own fit: the other fit is what is added.
     const critical = bytes([...wocEntryBodyUrls(), ...wocEntryHeadCoreUrls()]);
-    expect(critical).toBeLessThan(5 * 1024 * 1024);
+    expect(critical).toBeLessThan(5.5 * 1024 * 1024);
     const fitBytes = (fit: 'male' | 'female'): number =>
       bytes([
         wocBaseUrl(fit),
@@ -204,8 +206,8 @@ describe('the WOC entry file sets (woc_entry_core.ts)', () => {
         wocHeadCoreUrl(fit === 'female' ? 'b' : 'a'),
       ]);
     expect(fitBytes('male') + fitBytes('female')).toBe(critical);
-    expect(fitBytes('female')).toBeLessThan(2.75 * 1024 * 1024);
-    expect(fitBytes('male')).toBeLessThan(2.25 * 1024 * 1024);
+    expect(fitBytes('female')).toBeLessThan(3.1 * 1024 * 1024);
+    expect(fitBytes('male')).toBeLessThan(2.5 * 1024 * 1024);
   });
 });
 
