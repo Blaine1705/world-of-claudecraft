@@ -26,8 +26,10 @@
 //   - stats: exactly primaryStatBudget(ilvl, quality, offhand) = 2 / 4 / 9 on
 //     the physical line, stamina-heavy for the tank identity (about 2:1 like
 //     the Bulwark, rounded: 1/1 at the 2-point floor, 3/1 at 4, 6/3 at 9) and at
-//     or above the stamina baseline. As a rare the tower shield takes the rare
-//     level gate (item_level_req.ts requiredLevelFor), level 12.
+//     or above the stamina baseline. As a rare the tower shield is level gated
+//     (item_level_req.ts requiredLevelFor) at its source level, 19, one above
+//     the quest's minLevel, like the other rare quest rewards (e.g.
+//     knight_commanders_greaves at 13 on the level-12 q_olen).
 import type { ItemDef } from '../types';
 
 const SHIELD_CLASSES: ItemDef['requiredClass'] = ['warrior', 'paladin', 'shaman'];

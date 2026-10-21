@@ -9,6 +9,7 @@ import { QUEST_SHIELD_ART_PENDING_ITEM_IDS } from '../src/sim/content/quest_shie
 import { ITEMS, QUESTS, questRewardItem } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { expectedStatBudget, itemLevel, itemStaminaModel } from '../src/sim/item_level';
+import { requiredLevelFor } from '../src/sim/item_level_req';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, type ItemDef, type PlayerClass } from '../src/sim/types';
 import { ITEM_ART_PENDING, itemImageUrl } from '../src/ui/icons';
@@ -89,6 +90,12 @@ describe('leveling quest shields', () => {
     for (let i = 1; i < rows.length; i++) {
       for (let k = 0; k < 3; k++) expect(rows[i - 1][k]).toBeLessThan(rows[i][k]);
     }
+  });
+
+  it('gates only the rare: the greens equip at 1, the tower shield at its source level 19', () => {
+    expect(requiredLevelFor(ITEMS.lychgate_buckler)).toBe(1);
+    expect(requiredLevelFor(ITEMS.bastion_kite_shield)).toBe(1);
+    expect(requiredLevelFor(ITEMS.barrowfield_tower_shield)).toBe(19);
   });
 
   it('the greens never out-mitigate the same-band rare shield (pearlward_aegis)', () => {
