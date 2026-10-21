@@ -1129,7 +1129,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Otrzymasz także:',
   'hudChrome.weekly.anyDifficulty': 'Dowolna trudność',
   'hudChrome.weekly.cacheDesc':
-    'Otwiera się na jeden kawałek ze zwykłego rajdu dla twojej klasy (nigdy kawałek zestawu tier), plus {count} x {item}.',
+    'Otwiera się na jeden kawałek ze zwykłego rajdu dla twojej klasy (nigdy kawałek zestawu tier Ignivara), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Wybierz zadanie',
   'hudChrome.weekly.chosen': 'Tygodniowe zadanie wzięte: {category}',
   'hudChrome.weekly.close': 'Zamknij tygodniowe zadania',

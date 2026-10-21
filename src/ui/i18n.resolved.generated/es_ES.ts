@@ -6756,7 +6756,7 @@ export const es_ES: EnTranslations = {
       "rewards": "Recompensas",
       "alsoReceive": "También recibirás:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango), más {count} x {item}.",
+      "cacheDesc": "Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango de Ignivar), más {count} x {item}.",
       "dialogNote": "Solo puede haber una carga semanal activa. Se {reset}",
       "accept": "Aceptar",
       "decline": "Rechazar",

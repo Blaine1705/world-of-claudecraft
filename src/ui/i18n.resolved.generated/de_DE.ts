@@ -6756,7 +6756,7 @@ export const de_DE: EnTranslations = {
       "rewards": "Belohnungen",
       "alsoReceive": "Du erhältst außerdem:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Öffnet sich zu einem Normal-Schlachtzugsteil für deine Klasse (nie ein Set-Teil), plus {count} x {item}.",
+      "cacheDesc": "Öffnet sich zu einem Normal-Schlachtzugsteil für deine Klasse (nie ein Set-Teil von Ignivar), plus {count} x {item}.",
       "dialogNote": "Nur eine Wochenaufgabe kann aktiv sein. Sie {reset}",
       "accept": "Annehmen",
       "decline": "Ablehnen",

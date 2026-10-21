@@ -6756,7 +6756,7 @@ export const da_DK: EnTranslations = {
       "rewards": "Belønninger",
       "alsoReceive": "Du vil også modtage:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Åbner til ét Normalt raid-stykke for din klasse (aldrig et tier-set-stykke), plus {count} x {item}.",
+      "cacheDesc": "Åbner til ét Normalt raid-stykke for din klasse (aldrig et tier-set-stykke fra Ignivar), plus {count} x {item}.",
       "dialogNote": "Kun én ugentlig ladning kan være aktiv. Den {reset}",
       "accept": "Acceptér",
       "decline": "Afslå",

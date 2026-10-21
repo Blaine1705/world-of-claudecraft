@@ -6756,7 +6756,7 @@ export const sv_SE: EnTranslations = {
       "rewards": "Belöningar",
       "alsoReceive": "Du får också:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Öppnas till en Normal raidkläder för din klass (aldrig en setkläder), plus {count} x {item}.",
+      "cacheDesc": "Öppnas till ett Normalt raidplagg för din klass (aldrig ett setplagg från Ignivar), plus {count} x {item}.",
       "dialogNote": "Endast en veckouppgift kan vara aktiv. Det {reset}",
       "accept": "Acceptera",
       "decline": "Avslå",

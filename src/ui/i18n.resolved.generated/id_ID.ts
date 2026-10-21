@@ -6756,7 +6756,7 @@ export const id_ID: EnTranslations = {
       "rewards": "Hadiah",
       "alsoReceive": "Kamu juga akan menerima:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Membuka satu potongan serangan Normal untuk kelasmu (tidak pernah potongan set tingkat), plus {count} x {item}.",
+      "cacheDesc": "Membuka satu potongan serangan Normal untuk kelasmu (tidak pernah potongan set tingkat Ignivar), plus {count} x {item}.",
       "dialogNote": "Hanya satu muatan mingguan yang dapat aktif. Itu {reset}",
       "accept": "Terima",
       "decline": "Tolak",

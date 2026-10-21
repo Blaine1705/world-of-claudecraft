@@ -17854,7 +17854,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': '你还将获得：',
   'hudChrome.weekly.tally': '{count} / {required}',
   'hudChrome.weekly.cacheDesc':
-    '开启后获得一件你职业可用的普通团队副本装备（不含套装），外加{count}个{item}。',
+    '开启后获得一件你职业可用的普通团队副本装备（不含伊格尼瓦套装），外加{count}个{item}。',
   'hudChrome.weekly.dialogNote': '同一时间只能有一项每周委托生效。它{reset}',
   'hudChrome.weekly.accept': '接受',
   'hudChrome.weekly.decline': '拒绝',

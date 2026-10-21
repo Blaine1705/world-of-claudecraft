@@ -1116,7 +1116,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Navíc obdržíš:',
   'hudChrome.weekly.anyDifficulty': 'Libovolná obtížnost',
   'hudChrome.weekly.cacheDesc':
-    'Otevře jeden kus raidové výbavy v normální obtížnosti pro tvou třídu (nikdy sadový kus), plus {count}x {item}.',
+    'Otevře jeden kus raidové výbavy v normální obtížnosti pro tvou třídu (nikdy kus Ignivarovy sady), plus {count}x {item}.',
   'hudChrome.weekly.choose': 'Vybrat úkol',
   'hudChrome.weekly.chosen': 'Přijat týdenní úkol: {category}',
   'hudChrome.weekly.close': 'Zavřít týdenní úkoly',

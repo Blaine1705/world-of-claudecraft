@@ -6756,7 +6756,7 @@ export const tr_TR: EnTranslations = {
       "rewards": "Ödüller",
       "alsoReceive": "Ayrıca alacaksın:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Sınıfın için bir Normal baskın parçası (asla tier-set parçası değil) artı {count} x {item} açılır.",
+      "cacheDesc": "Sınıfın için bir Normal baskın parçası (asla Ignivar tier-set parçası değil) artı {count} x {item} açılır.",
       "dialogNote": "Yalnızca bir haftalık şarj aktif olabilir. {reset}",
       "accept": "Kabul Et",
       "decline": "Reddet",

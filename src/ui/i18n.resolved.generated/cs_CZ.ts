@@ -6756,7 +6756,7 @@ export const cs_CZ: EnTranslations = {
       "rewards": "Odměny",
       "alsoReceive": "Navíc obdržíš:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Otevře jeden kus raidové výbavy v normální obtížnosti pro tvou třídu (nikdy sadový kus), plus {count}x {item}.",
+      "cacheDesc": "Otevře jeden kus raidové výbavy v normální obtížnosti pro tvou třídu (nikdy kus Ignivarovy sady), plus {count}x {item}.",
       "dialogNote": "Aktivní může být jen jeden týdenní závazek. Ten {reset}",
       "accept": "Přijmout",
       "decline": "Odmítnout",

@@ -19105,7 +19105,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Вы также получите:',
   'hudChrome.weekly.tally': '{count} / {required}',
   'hudChrome.weekly.cacheDesc':
-    'Открывается в один предмет из обычного рейда для вашего класса (никогда не часть комплекта), плюс {item} x {count}.',
+    'Открывается в один предмет из обычного рейда для вашего класса (никогда не часть комплекта Игнивара), плюс {item} x {count}.',
   'hudChrome.weekly.dialogNote':
     'Активным может быть только одно еженедельное поручение. Оно {reset}',
   'hudChrome.weekly.accept': 'Принять',

@@ -1152,7 +1152,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Você também receberá:',
   'hudChrome.weekly.anyDifficulty': 'Qualquer dificuldade',
   'hudChrome.weekly.cacheDesc':
-    'Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto), além de {count} x {item}.',
+    'Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto do Ignivar), além de {count} x {item}.',
   'hudChrome.weekly.choose': 'Escolher missão',
   'hudChrome.weekly.chosen': 'Missão semanal aceita: {category}',
   'hudChrome.weekly.close': 'Fechar missões semanais',

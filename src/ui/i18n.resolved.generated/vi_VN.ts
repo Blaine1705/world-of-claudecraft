@@ -6756,7 +6756,7 @@ export const vi_VN: EnTranslations = {
       "rewards": "Phần thưởng",
       "alsoReceive": "Bạn cũng sẽ nhận được:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Mở thành một mảnh trang phục Cấp độ Bình thường cho lớp của bạn (không bao giờ là mảnh trang phục phân tầng), cộng với {count} x {item}.",
+      "cacheDesc": "Mở thành một mảnh trang phục Cấp độ Bình thường cho lớp của bạn (không bao giờ là mảnh trang phục phân tầng của Ignivar), cộng với {count} x {item}.",
       "dialogNote": "Chỉ có thể hoạt động một lần tính phí hàng tuần. Nó {reset}",
       "accept": "Nhận",
       "decline": "Từ chối",
