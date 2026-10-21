@@ -84,6 +84,7 @@ import {
 import {
   heartGateSolids,
   heartPropSolids,
+  heartRockSolids,
   heartSightlineHits,
   heartWallSolids,
 } from '../src/render/smith_heart/heart_sightline_core';
@@ -681,6 +682,8 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     ...heartGateSolids(0),
     ...heartGateSolids(0.5),
     ...heartGateSolids(1),
+    // The mountain's rock and the walks' lips (phase 2E).
+    ...heartRockSolids(),
   ];
   const seal = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 0.5, z: HEART_SEAL.z };
   const portalEye = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 9, z: HEART_SEAL.z };
@@ -691,6 +694,7 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     expect(heartWallSolids(5).length).toBeGreaterThan(300);
     expect(heartPropSolids().length).toBeGreaterThan(100);
     expect(heartGateSolids(0).length).toBeGreaterThan(30);
+    expect(heartRockSolids().length).toBeGreaterThan(900);
     const g = SMITH_HEART_GATES.find((x) => x.id === 'anvil_mouth');
     if (!g) throw new Error('no anvil mouth gate');
     const low = authoredFieldHeight(F, g.x, g.z) + 0.3;

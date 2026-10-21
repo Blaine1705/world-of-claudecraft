@@ -992,6 +992,10 @@ const RENDER_PURE_CORES = [
   // The Hammer vein's Blender kit: the placement record and its plan.
   'src/render/smith_heart/heart_kit_core.ts',
   'src/render/smith_heart/hammer_kit_plan_core.ts',
+  // The mountain's rock kit (phase 2E): its bands and lips, and the Hammer
+  // Gallery's kerb and chain rail.
+  'src/render/smith_heart/heart_rock_plan_core.ts',
+  'src/render/smith_heart/hammer_walk_plan_core.ts',
   // The Hammer vein's air and the Hammer guardian's and the Slab's effects.
   'src/render/smith_heart/hammer_air_core.ts',
   'src/render/smith_heart_fx/hammer_fx_core.ts',

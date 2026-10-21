@@ -16,6 +16,9 @@ export interface HeartKitPlacement {
   stretch?: number;
   /** Rise per yard along local +X (an edge module following a slope). */
   shear?: number;
+  /** Extra scale up local Y on top of `scale` (a mountain rock piece fitted
+   *  to the slope it skins). */
+  rise?: number;
   /** Never casts a shadow (scenery far down a face, flat floor dressing). */
   noShadow?: boolean;
   /** Shed on the low tier (cosmetic dressing only). */

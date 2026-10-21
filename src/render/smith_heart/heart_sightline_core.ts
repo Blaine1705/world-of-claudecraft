@@ -1,5 +1,7 @@
 // The Smith's Heart's render-only solids as plain volumes, for the sightline
-// pin: every rock block (a cylinder bounding it, lean included), every
+// pin: every piece of the mountain's rock kit and every walk's lip (turned
+// boxes bounding them, heart_rock_plan_core.ts), every crag (a cylinder
+// bounding it, lean included), every
 // placeholder prop part (a cylinder bounding it, tilt included) and every
 // gate part at a given openness (a turned box), all from the SAME plans the
 // painters draw (heart_walls_core.ts, heart_plan_core.ts,
@@ -14,6 +16,12 @@ import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { authoredFieldHeight } from '../../sim/instances/authored_field';
 import { heartGatePartPose, heartGateParts, heartGateRig } from './heart_gates_core';
 import { HEART_PROP_RECIPES, type HeartPart, heartPropBase } from './heart_plan_core';
+import {
+  HEART_ROCK_LIP,
+  heartRockPieceOf,
+  planHeartLips,
+  planHeartRock,
+} from './heart_rock_plan_core';
 import { heartWallReach, planHeartWalls } from './heart_walls_core';
 
 /** An upright cylinder (y0 to y1, radius r) or a box turned by `yaw` about
@@ -43,6 +51,66 @@ export function heartWallSolids(spacing = 5): HeartSolid[] {
     y1: b.top,
     what: `wall (${b.x.toFixed(1)}, ${b.z.toFixed(1)})`,
   }));
+}
+
+/** Every piece of the mountain's rock (phase 2E) as a turned box bounding
+ *  it (its whole reach across, its body back from the front plane, foot to
+ *  crest), and every lip module under a walk as a box from its brink down
+ *  its drop, out over the void as far as its face leans. */
+export function heartRockSolids(): HeartSolid[] {
+  const out: HeartSolid[] = [];
+  for (const p of planHeartRock()) {
+    const m = heartRockPieceOf(p.piece);
+    const k = p.scale ?? 1;
+    const hh = (m.height * k * (p.rise ?? 1)) / 2;
+    const back = (m.depth * k) / 2;
+    out.push({
+      kind: 'box',
+      x: p.x - Math.sin(p.rot) * back,
+      y: p.y + hh,
+      z: p.z - Math.cos(p.rot) * back,
+      hw: m.reach * k,
+      hh,
+      hd: back,
+      yaw: p.rot,
+      what: `rock ${p.piece} (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
+    });
+  }
+  // A lip leans out as it falls: bound it in two lifts (the first ten yards
+  // under the brink, then the rest), each out as far as its foot leans.
+  const lifts: [number, number][] = [
+    [0.12, 10],
+    [10, HEART_ROCK_LIP.drop],
+  ];
+  // A lip on a stair is sheared up its slope: it is bounded in four boxes
+  // along its run, each at the slope's height there.
+  const parts = 4;
+  for (const p of planHeartLips()) {
+    const hw = (HEART_ROCK_LIP.half + 2.6) * (p.stretch ?? 1);
+    const shear = p.shear ?? 0;
+    const ux = Math.cos(p.rot);
+    const uz = -Math.sin(p.rot);
+    for (const [top, foot] of lifts) {
+      const reach = HEART_ROCK_LIP.out * foot + 1;
+      const hd = (reach + HEART_ROCK_LIP.depth + 0.5) / 2;
+      const mid = reach - hd;
+      for (let i = 0; i < parts; i++) {
+        const along = ((i + 0.5) / parts) * 2 * hw - hw;
+        out.push({
+          kind: 'box',
+          x: p.x + Math.sin(p.rot) * mid + ux * along,
+          y: p.y + shear * along - (top + foot) / 2,
+          z: p.z + Math.cos(p.rot) * mid + uz * along,
+          hw: hw / parts,
+          hh: (foot - top) / 2 + (Math.abs(shear) * hw) / parts,
+          hd,
+          yaw: p.rot,
+          what: `lip ${p.piece} (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`,
+        });
+      }
+    }
+  }
+  return out;
 }
 
 function partBound(p: HeartPart): { r: number; hh: number } {

@@ -19,7 +19,7 @@ import {
   HEART_MOUNTAIN_CHASM,
   heartHammerTerraceStep,
   heartMountainCellDrawn,
-  planHeartMountain,
+  heartMountainGrid,
 } from './heart_mountain_core';
 import { heartHash } from './heart_plan_core';
 import { HEART_WALL_CLEAR, HEART_WALL_PATH_CLEAR, heartFloorClearance } from './heart_walls_core';
@@ -44,7 +44,7 @@ function hammerStepShade(step: { k: number; f: number }): number {
 
 /** Build the mountain (instance-local). */
 export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
-  const g = planHeartMountain(lowGfx ? 5 : 3);
+  const g = heartMountainGrid(lowGfx ? 5 : 3);
   const count = g.nx * g.nz;
   const positions = new Float32Array(count * 3);
   const colors = new Float32Array(count * 3);

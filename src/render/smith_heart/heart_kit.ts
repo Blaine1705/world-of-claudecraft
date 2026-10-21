@@ -21,12 +21,20 @@ import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { applySurfaceDetail } from '../worn_stone';
 import type { HeartKitPlacement } from './heart_kit_core';
+import { applyRockCutaway } from './heart_rock_cutaway';
 
 export const SMITH_HEART_HAMMER_KIT_URL = '/models/props/smith_heart_hammer_kit.glb';
+/** The raid-wide mountain rock kit (phase 2E, heart_rock.ts). */
+export const SMITH_HEART_ROCK_KIT_URL = '/models/props/smith_heart_rock_kit.glb';
 
 export type HeartKitSlot = 'stone' | 'glow';
 export type HeartBakedPiece = Partial<Record<HeartKitSlot, THREE.BufferGeometry>>;
 export const HEART_KIT_SLOTS: readonly HeartKitSlot[] = ['stone', 'glow'];
+/** The materials a kit slot draws with: its own, or (the mountain's rock,
+ *  phase 2E) the stone slot drawn as `rock`, the same lit vertex colour
+ *  with a heavier, broader triplanar fracture (big faces seen from far). */
+export type HeartKitMaterial = HeartKitSlot | 'rock';
+export const HEART_KIT_MATERIALS: readonly HeartKitMaterial[] = ['stone', 'glow', 'rock'];
 
 /** How long the interior waits for a kit before building with placeholders. */
 const KIT_WAIT_MS = 8000;
@@ -137,8 +145,10 @@ function startKitLoad(url: string): Promise<void> {
 }
 
 // World content: fetched on the deferred lane once the game starts.
-if (typeof window !== 'undefined')
+if (typeof window !== 'undefined') {
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_HAMMER_KIT_URL));
+  registerDeferredPreload(() => startKitLoad(SMITH_HEART_ROCK_KIT_URL));
+}
 
 /** Fetch and bake a kit once. Never rejects; resolves within the wait cap
  *  (a later arrival upgrades in place: upgradeWhenHeartKitLands). */
@@ -163,15 +173,35 @@ export function heartKitPiece(url: string, piece: string): HeartBakedPiece | nul
 
 // ---- materials --------------------------------------------------------------------
 
-const slotMats = new Map<HeartKitSlot, THREE.Material>();
+const slotMats = new Map<HeartKitMaterial, THREE.Material>();
 
 /** The shared material of a slot (one program per slot for every Smith's
  *  Heart kit). The stone takes the shared triplanar rock detail (real
- *  KTX2 normal, AO and roughness, world space) on the tiers that draw it. */
-export function heartKitSlotMaterial(slot: HeartKitSlot): THREE.Material {
+ *  KTX2 normal, AO and roughness, world space) on the tiers that draw it;
+ *  the mountain's rock a heavier, broader one. */
+export function heartKitSlotMaterial(slot: HeartKitMaterial): THREE.Material {
   let m = slotMats.get(slot);
   if (m) return m;
-  if (slot === 'stone') {
+  if (slot === 'rock') {
+    if (GFX.standardMaterials) {
+      const std = new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        metalness: 0.02,
+        roughness: 0.92,
+        name: 'SmithHeartKitRock',
+      });
+      // Cut away round the camera first (the detail layer composes on it).
+      applyRockCutaway(std);
+      // The mountain's faces are tens of yards across: the fracture reads
+      // at the family's own strength and a broad tile (a stone's detail
+      // tiled every 3 yd turned to grain over a cliff).
+      applySurfaceDetail(std, 'rock', { strength: 0.5, tileScale: 1 / 7 });
+      m = std;
+    } else {
+      m = new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitRock' });
+      applyRockCutaway(m);
+    }
+  } else if (slot === 'stone') {
     if (GFX.standardMaterials) {
       const std = new THREE.MeshStandardMaterial({
         vertexColors: true,
@@ -216,7 +246,7 @@ export function heartKitPlacementMatrix(p: HeartKitPlacement, out: THREE.Matrix4
   tmpQ.setFromAxisAngle(UP, p.rot);
   tmpPos.set(p.x, p.y, p.z);
   const s = p.scale ?? 1;
-  tmpScl.set(s * (p.stretch ?? 1), s, s);
+  tmpScl.set(s * (p.stretch ?? 1), s * (p.rise ?? 1), s);
   if (!p.shear) return out.compose(tmpPos, tmpQ, tmpScl);
   // y += shear * x in the piece's own (stretched) frame.
   out.compose(tmpPos, tmpQ, ONE);
@@ -229,12 +259,16 @@ export function heartKitPlacementMatrix(p: HeartKitPlacement, out: THREE.Matrix4
 const CULL_CELL = 80;
 
 /** Instance a list of placements of one kit (one InstancedMesh per piece,
- *  culling cell, shadow class and slot), plus the slot program warmers. */
+ *  culling cell, shadow class and slot), plus the slot program warmers. A
+ *  kit of big pieces drawn by the hundred (the mountain's rock) passes a
+ *  wider `cell`: fewer, larger buckets, fewer draws. */
 export function instanceHeartKit(
   url: string,
   list: readonly HeartKitPlacement[],
   lowGfx: boolean,
   name: string,
+  cell = CULL_CELL,
+  stoneAs: HeartKitMaterial = 'stone',
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = name;
@@ -242,7 +276,7 @@ export function instanceHeartKit(
   for (const p of list) {
     if (lowGfx && p.cosmetic) continue;
     if (!heartKitPiece(url, p.piece)) continue;
-    const key = `${p.piece}|${Math.floor(p.x / CULL_CELL)}|${Math.floor(p.z / CULL_CELL)}|${p.noShadow ? 1 : 0}`;
+    const key = `${p.piece}|${Math.floor(p.x / cell)}|${Math.floor(p.z / cell)}|${p.noShadow ? 1 : 0}`;
     const bucket = buckets.get(key) ?? [];
     bucket.push(p);
     buckets.set(key, bucket);
@@ -255,7 +289,8 @@ export function instanceHeartKit(
     for (const slot of HEART_KIT_SLOTS) {
       const g = geo[slot];
       if (!g) continue;
-      const mesh = new THREE.InstancedMesh(g, heartKitSlotMaterial(slot), bucket.length);
+      const mat = heartKitSlotMaterial(slot === 'stone' ? stoneAs : slot);
+      const mesh = new THREE.InstancedMesh(g, mat, bucket.length);
       mesh.name = `${piece}:${slot}`;
       for (const [i, p] of bucket.entries())
         mesh.setMatrixAt(i, heartKitPlacementMatrix(p, tmpOut));
@@ -291,12 +326,12 @@ export function heartKitProgramWarmers(): THREE.Group {
   }
   const group = new THREE.Group();
   group.name = 'smithHeartKitWarmers';
-  for (const slot of HEART_KIT_SLOTS) {
+  for (const slot of HEART_KIT_MATERIALS) {
     const inst = new THREE.InstancedMesh(warmGeometry, heartKitSlotMaterial(slot), 1);
     const plain = new THREE.Mesh(warmGeometry, heartKitSlotMaterial(slot));
     for (const m of [inst, plain]) {
-      m.castShadow = slot === 'stone';
-      m.receiveShadow = slot === 'stone';
+      m.castShadow = slot !== 'glow';
+      m.receiveShadow = slot !== 'glow';
       m.visible = false;
       m.frustumCulled = false;
       m.name = `smithHeartKitWarmer:${slot}`;

@@ -36,6 +36,7 @@ import {
 } from './heart_portal_core';
 import { buildHeartProps, buildHeartWalls } from './heart_props';
 import { buildHeartRivers } from './heart_rivers';
+import { dressHeartMountain, ensureHeartRockKit } from './heart_rock';
 import { buildHeartRoom } from './heart_room';
 import { buildHeartSeal } from './heart_seal';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from './heart_seal_core';
@@ -60,7 +61,7 @@ export async function buildSmithHeartInterior(
   ox: number,
   oz: number,
 ): Promise<THREE.Group> {
-  await ensureHammerKit();
+  await Promise.all([ensureHammerKit(), ensureHeartRockKit()]);
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   group.add(
@@ -74,7 +75,8 @@ export async function buildSmithHeartInterior(
     }),
   );
   group.add(buildHeartMountain(deps.lowGfx));
-  group.add(buildHeartWalls(deps.lowGfx));
+  // The mountain's rock (phase 2E), the loose crags until its kit lands.
+  dressHeartMountain(group, () => buildHeartWalls(deps.lowGfx), deps.lowGfx);
   const kitReady = hammerKitReady();
   const props = buildHeartProps(HAMMER_KIT_KINDS, kitReady ? HAMMER_KIT_KINDS : new Set());
   group.add(props.group);

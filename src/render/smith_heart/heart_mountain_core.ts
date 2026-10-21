@@ -37,6 +37,17 @@ export const HEART_MOUNTAIN_CHASM = SMITH_HEART_FIELD.voidHeight - 4;
 /** How far inside the clearance the mountain's foot falls into the chasm
  *  (yards); it stays at least six yards under the floor it faces. */
 export const HEART_MOUNTAIN_FOOT = 5;
+/** How far back of its clearance line the mountain's slope begins to climb
+ *  (yards; phase 2E). The rock kit's bands stand on contours of the
+ *  clearance (heart_rock_plan_core.ts) with their faces leaning back as they
+ *  rise: a slope climbing from the line itself buried the foot of every
+ *  face, so the slope is pushed back by this much (a ledge behind the first
+ *  band, every contour's slope lower under the band that skins it). */
+export const HEART_MOUNTAIN_RECESS = 6;
+/** How far under its floor the ledge in that recess lies (yards): under the
+ *  walk's own lip, so the heightfield's foot never stands as a wall in
+ *  front of the first band's faces. */
+export const HEART_MOUNTAIN_LEDGE = 8;
 /** How far past the field's bounds the mountain reaches (yards). */
 const PAD = HEART_WALL_PATH_CLEAR + HEART_ROOM_WALL_BAND + 18;
 
@@ -111,15 +122,16 @@ export function heartMountainHeight(x: number, z: number): number {
   // ledges and sheer risers instead of one smooth slope (blended in at the
   // vein's edge; never higher than the slope, so no clearance is touched).
   const lift = back > 0 ? hammerRockLift(x, z) : 0;
-  const climb =
-    lift > 0 ? back + (heartHammerTerrace(back, x, z) - back) * lift : Math.max(0, back);
+  const up = Math.max(0, back - HEART_MOUNTAIN_RECESS);
+  const climb = lift > 0 ? up + (heartHammerTerrace(up, x, z) - up) * lift : up;
   const top = c.floor + heartMountainRise(climb, ridge, jag, scale.band) * scale.tall;
-  if (back >= 0) return top;
+  if (back >= HEART_MOUNTAIN_RECESS) return top;
+  if (back >= 0) return Math.min(top, c.floor - HEART_MOUNTAIN_LEDGE);
   // The foot: inside the clearance the face falls away into the chasm, well
   // under the floor (a camera above the floor never meets it), so the rock's
   // edge reads as one slanted face, never a saw of single cells.
   const k = (back + HEART_MOUNTAIN_FOOT) / HEART_MOUNTAIN_FOOT;
-  const sink = Math.min(top, c.floor - 6);
+  const sink = Math.min(top, c.floor - HEART_MOUNTAIN_LEDGE);
   return HEART_MOUNTAIN_CHASM + (sink - HEART_MOUNTAIN_CHASM) * k * k;
 }
 
@@ -138,6 +150,45 @@ export function planHeartMountain(cell = 3): HeartMountainGrid {
     }
   }
   return { x0, z0, cell, nx, nz, heights };
+}
+
+const grids = new Map<number, HeartMountainGrid>();
+
+/** The mountain's grid at `cell` yards, built once (the layout is static):
+ *  the painter and the rock plan read the same heights. */
+export function heartMountainGrid(cell = 3): HeartMountainGrid {
+  let g = grids.get(cell);
+  if (!g) {
+    g = planHeartMountain(cell);
+    grids.set(cell, g);
+  }
+  return g;
+}
+
+/** The drawn mountain at (x, z) on a grid: `mid` the bilinear height, `high`
+ *  the highest corner of the cell round it (nothing drawn there stands
+ *  above it), `low` the lowest. */
+export function heartMountainSample(
+  g: HeartMountainGrid,
+  x: number,
+  z: number,
+): { mid: number; high: number; low: number } {
+  const fx = Math.max(0, Math.min(g.nx - 1.001, (x - g.x0) / g.cell));
+  const fz = Math.max(0, Math.min(g.nz - 1.001, (z - g.z0) / g.cell));
+  const i = Math.floor(fx);
+  const j = Math.floor(fz);
+  const u = fx - i;
+  const v = fz - j;
+  const k = j * g.nx + i;
+  const a = g.heights[k];
+  const b = g.heights[k + 1];
+  const c = g.heights[k + g.nx];
+  const d = g.heights[k + g.nx + 1];
+  return {
+    mid: a * (1 - u) * (1 - v) + b * u * (1 - v) + c * (1 - u) * v + d * u * v,
+    high: Math.max(a, b, c, d),
+    low: Math.min(a, b, c, d),
+  };
 }
 
 /** Does the cell whose low corner is grid point (i, j) carry rock? */
