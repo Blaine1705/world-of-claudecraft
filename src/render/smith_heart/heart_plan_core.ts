@@ -381,6 +381,13 @@ export function heartPropBase(x: number, z: number, reach = 10): number {
  *  build_smith_heart_hammer_kit.py cleft_gate): across, out toward the
  *  landing, and the height of their fire over the landing. */
 export const HEART_CLEFT_BRAZIER = { x: 6.4, z: 5.0, lift: 2.6 } as const;
+/** The two larger amber crystal clusters at the Cleft gate's foot that carry
+ *  a light (the gate's frame, as the braziers'; hammer_air_core.ts
+ *  HEART_CLEFT_CRYSTALS lists all four for their halos). */
+export const HEART_CLEFT_GLOW_LIGHTS = [
+  { x: -10.5, z: 4.6, lift: 1.8 },
+  { x: 11.5, z: 3.8, lift: 2.0 },
+] as const;
 
 export interface HeartLightSpot {
   id: string;
@@ -562,6 +569,21 @@ export function planHeartLights(): HeartLightSpot[] {
           color: HEART_PALETTE.coal,
           intensity: 12,
           range: 22,
+        });
+      }
+      // The amber crystals at the flanks' foot cast their own warm glow on
+      // the rock round them (phase 2D: the first image's accent; small,
+      // steady, no card: the air draws their halos).
+      for (const c of HEART_CLEFT_GLOW_LIGHTS) {
+        spots.push({
+          id: `cleft_crystals:${c.x}`,
+          ...at(c.x, c.z),
+          lift: c.lift,
+          y: CLEFT.h + c.lift,
+          color: 0xff9a3c,
+          intensity: 9,
+          range: 13,
+          noHalo: true,
         });
       }
     }

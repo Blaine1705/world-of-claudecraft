@@ -77,42 +77,65 @@ export interface HammerAirPlan {
   haze: HazeCard[];
   geodes: GeodeGlow[];
   shafts: LightShaft[];
+  /** The Cleft's first image (phase 2D): bright dust hanging in its shafts,
+   *  the warm pools where the shafts land, and the halos of the amber
+   *  crystals breaking out of the flanks' foot. */
+  shaftMotes: MoteVolume[];
+  sunPools: HazeCard[];
+  cleftGlows: GeodeGlow[];
+}
+
+/** The amber crystal clusters at the Cleft gate's foot, in the gate's frame
+ *  (across, out toward the landing, height over the landing; the kit builds
+ *  them there: build_smith_heart_hammer_kit.py cleft_gate, Blender (x, -y, z)). */
+export const HEART_CLEFT_CRYSTALS: readonly { x: number; z: number; lift: number; size: number }[] =
+  [
+    { x: -10.5, z: 3.6, lift: 1.4, size: 5.5 },
+    { x: 11.5, z: 2.8, lift: 1.6, size: 6 },
+    { x: -14.5, z: 1.2, lift: 2.6, size: 4 },
+    { x: 15.8, z: 0.4, lift: 3.2, size: 4 },
+  ];
+
+/** The Cleft gate's frame: a point `lx` across and `lz` out of it. */
+function cleftGateAt(lx: number, lz: number): { x: number; z: number } | null {
+  const door = F.props.find((p) => p.kind === 'sh_cleft_mouth');
+  if (!door) return null;
+  return {
+    x: door.x + lx * Math.cos(door.rot) + lz * Math.sin(door.rot),
+    z: door.z - lx * Math.sin(door.rot) + lz * Math.cos(door.rot),
+  };
 }
 
 /** The Cleft's shafts: the late sun through the crack between its flanks,
- *  falling onto the landing before the door (the main one) and a fainter
- *  one further out; they lean with the low sun (from the south-west). Not
- *  thinned by the tier: two quads. */
+ *  falling onto the landing before the door. Phase 2D made them the raid's
+ *  first image: a broad main shaft, two beside it and two thin blades
+ *  through the crack's notches, every one leaning with the low sun (from
+ *  the south-west). Not thinned by the tier: five quads. */
 export function planCleftShafts(): LightShaft[] {
   const door = F.props.find((p) => p.kind === 'sh_cleft_mouth');
   if (!door) return [];
-  // From the landing's centre toward the door.
+  // From the landing's centre toward the door, and across it.
   const dx = door.x - CLEFT.x;
   const dz = door.z - CLEFT.z;
   const d = Math.hypot(dx, dz) || 1;
   const ux = dx / d;
   const uz = dz / d;
+  const shaft = (along: number, across: number, rise: number, width: number, strength: number) => ({
+    x: CLEFT.x + ux * along - uz * across,
+    z: CLEFT.z + uz * along + ux * across,
+    y0: CLEFT.h,
+    y1: CLEFT.h + rise,
+    width,
+    leanX: -0.22,
+    leanZ: -0.18,
+    strength,
+  });
   return [
-    {
-      x: CLEFT.x + ux * 3,
-      z: CLEFT.z + uz * 3,
-      y0: CLEFT.h,
-      y1: CLEFT.h + 34,
-      width: 5.5,
-      leanX: -0.22,
-      leanZ: -0.18,
-      strength: 1,
-    },
-    {
-      x: CLEFT.x - uz * 6 - ux * 2,
-      z: CLEFT.z + ux * 6 - uz * 2,
-      y0: CLEFT.h,
-      y1: CLEFT.h + 28,
-      width: 3,
-      leanX: -0.22,
-      leanZ: -0.18,
-      strength: 0.55,
-    },
+    shaft(3, 0, 36, 7.5, 1),
+    shaft(1, 5.5, 32, 4, 0.75),
+    shaft(5, -4.5, 30, 3.2, 0.6),
+    shaft(-2, 2.5, 28, 1.6, 0.85),
+    shaft(-3.5, -7, 26, 1.4, 0.7),
   ];
 }
 
@@ -215,5 +238,27 @@ export function planHammerAir(density = 1): HammerAirPlan {
   const geodes: GeodeGlow[] = F.props
     .filter((p) => p.kind === 'sh_geode')
     .map((p) => ({ x: p.x, y: heartPropBase(p.x, p.z) + 1.6, z: p.z, size: 4.5 }));
-  return { motes, grit, haze, geodes, shafts: planCleftShafts() };
+  // The Cleft's first image: dust thick and lit inside each shaft (it rises
+  // in a column the shaft's width, leaning out of it as it climbs: the shaft
+  // shows it brightest near the floor), a warm pool where each lands, the
+  // amber crystals' halos.
+  const shafts = planCleftShafts();
+  const shaftMotes: MoteVolume[] = shafts.map((sh) => ({
+    x: sh.x + sh.leanX * 6,
+    z: sh.z + sh.leanZ * 6,
+    y0: sh.y0 + 0.3,
+    y1: sh.y0 + 12,
+    hw: sh.width * 0.45,
+    hd: sh.width * 0.45,
+    count: Math.round(70 * sh.strength * k),
+  }));
+  const sunPools: HazeCard[] = shafts
+    .filter((sh) => sh.width >= 3)
+    .map((sh) => ({ x: sh.x, z: sh.z, y: sh.y0 + 0.6, size: sh.width * 0.9 }));
+  const cleftGlows: GeodeGlow[] = [];
+  for (const c of HEART_CLEFT_CRYSTALS) {
+    const at = cleftGateAt(c.x, c.z);
+    if (at) cleftGlows.push({ x: at.x, y: CLEFT.h + c.lift, z: at.z, size: c.size });
+  }
+  return { motes, grit, haze, geodes, shafts, shaftMotes, sunPools, cleftGlows };
 }

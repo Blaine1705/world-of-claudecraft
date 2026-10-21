@@ -65,6 +65,8 @@ void main() {
   p.z += cos(uTime * 0.17 + seed * 5.1) * 2.2;
   vFade = smoothstep(0.0, 0.15, lift) * (1.0 - smoothstep(0.75, 1.0, lift));
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  // A mote at the lens is a blot, never dust: fade the nearest out.
+  vFade *= smoothstep(2.0, 9.0, -mv.z);
   mv.xy += aCorner * aParams.y;
   vCorner = aCorner;
   gl_Position = projectionMatrix * mv;
@@ -100,7 +102,7 @@ void main() {
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   // A streak: narrow, drawn out along its fall (view up).
   mv.x += aCorner.x * aParams.y;
-  mv.y += aCorner.y * aParams.y * 6.0;
+  mv.y += aCorner.y * aParams.y * 8.0;
   vCorner = aCorner;
   gl_Position = projectionMatrix * mv;
 }
@@ -224,10 +226,12 @@ function points(plan: HammerAirPlan) {
     const n = s.heavy ? 22 : 8;
     for (let i = 0; i < n; i++) {
       const h = (k: number) => heartHash(si * 100 + i, k + 40);
+      // Tight: a trickle reads as a thread of sand off the lip; spread
+      // wide, the streaks read as rain (phase 2D).
       grit.push([
-        s.x + (h(1) - 0.5) * (s.heavy ? 2.4 : 0.8),
+        s.x + (h(1) - 0.5) * (s.heavy ? 0.9 : 0.4),
         s.top,
-        s.z + (h(2) - 0.5) * (s.heavy ? 2.4 : 0.8),
+        s.z + (h(2) - 0.5) * (s.heavy ? 0.9 : 0.4),
       ]);
       gritP.push([h(3), s.heavy ? 0.07 : 0.04, s.heavy ? 6 + h(4) * 4 : 3 + h(4) * 3, s.drop]);
     }
@@ -246,12 +250,46 @@ function points(plan: HammerAirPlan) {
   const geoP = plan.geodes.map(
     (g, i) => [heartHash(i, 97), g.size, 0, 1] as [number, number, number, number],
   );
+  const sMotes: [number, number, number][] = [];
+  const sMoteP: [number, number, number, number][] = [];
+  plan.shaftMotes.forEach((v, vi) => {
+    for (let i = 0; i < v.count; i++) {
+      const h = (k: number) => heartHash(vi * 1000 + i + 77_000, k);
+      sMotes.push([v.x + (h(1) - 0.5) * 2 * v.hw, v.y0, v.z + (h(2) - 0.5) * 2 * v.hd]);
+      sMoteP.push([h(3), 0.025 + h(4) * 0.035, 0.18 + h(5) * 0.3, v.y1 - v.y0]);
+    }
+  });
+  const pool = plan.sunPools.map((c) => [c.x, c.y, c.z] as [number, number, number]);
+  const poolP = plan.sunPools.map(
+    (c, i) => [heartHash(i, 131), c.size, 0.3, 0.55] as [number, number, number, number],
+  );
+  const glow = plan.cleftGlows.map((g) => [g.x, g.y, g.z] as [number, number, number]);
+  const glowP = plan.cleftGlows.map(
+    (g, i) => [heartHash(i, 137), g.size, 0, 1] as [number, number, number, number],
+  );
   const shaft = plan.shafts.map((s) => [s.x, s.y0, s.z] as [number, number, number]);
   const shaftP = plan.shafts.map(
     (s) =>
       [s.y1 - s.y0, s.width * s.strength, s.leanX, s.leanZ] as [number, number, number, number],
   );
-  return { motes, moteP, grit, gritP, haze, hazeP, geo, geoP, shaft, shaftP };
+  return {
+    motes,
+    moteP,
+    grit,
+    gritP,
+    haze,
+    hazeP,
+    geo,
+    geoP,
+    shaft,
+    shaftP,
+    sMotes,
+    sMoteP,
+    pool,
+    poolP,
+    glow,
+    glowP,
+  };
 }
 
 /** The vein's air, instance-local (a cosmetic group: the low tier builds a
@@ -308,8 +346,31 @@ export function buildHammerAir(lowGfx: boolean): THREE.Group {
     'smithHeartCleftShafts',
     p.shaft,
     p.shaftP,
-    airMaterial('smithHeartCleftShafts', SHAFT_VERT, SHAFT_FRAG, 0xffd6a0, 0.13, true),
+    // Phase 2D: bright enough to make the raid's first image (2C's 0.13
+    // read as a faint smear), still a soft additive veil the door reads through.
+    airMaterial('smithHeartCleftShafts', SHAFT_VERT, SHAFT_FRAG, 0xffd29a, 0.3, true),
     8,
+  );
+  add(
+    'smithHeartCleftShaftDust',
+    p.sMotes,
+    p.sMoteP,
+    airMaterial('smithHeartCleftShaftDust', MOTE_VERT, MOTE_FRAG, 0xffe2b0, 0.7, true),
+    9,
+  );
+  add(
+    'smithHeartCleftSunPools',
+    p.pool,
+    p.poolP,
+    airMaterial('smithHeartCleftSunPools', HAZE_VERT, HAZE_FRAG, 0xffc884, 0.22, true),
+    7,
+  );
+  add(
+    'smithHeartCleftCrystalGlow',
+    p.glow,
+    p.glowP,
+    airMaterial('smithHeartCleftCrystalGlow', HAZE_VERT, HAZE_FRAG, 0xff9636, 0.42, true),
+    7,
   );
   return group;
 }

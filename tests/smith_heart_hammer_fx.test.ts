@@ -4,14 +4,20 @@
 //     rides the trash engine's wave front on the same clock, the Slab plays
 //     its break only for a gate seen opening, once;
 //   - hammer_air_core.ts thins with the tier, puts the collapse spot's heavy
-//     grit over the lower Gallery's walk, haloes every geode;
+//     grit over the lower Gallery's walk, haloes every geode; the Cleft's
+//     first image (phase 2D): five shafts, dust in them, warm pools, the
+//     crystals' glow and their two lamps;
 //   - HammerFx over a fake world: builds, follows the guardian's bar, plays
 //     the blast and Hammerfall, never claims an event, and disposes.
 
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { planHammerAir } from '../src/render/smith_heart/hammer_air_core';
+import { HEART_CLEFT_CRYSTALS, planHammerAir } from '../src/render/smith_heart/hammer_air_core';
 import { collapseSpot } from '../src/render/smith_heart/hammer_kit_plan_core';
+import {
+  HEART_CLEFT_GLOW_LIGHTS,
+  planHeartLights,
+} from '../src/render/smith_heart/heart_plan_core';
 import { HammerFx } from '../src/render/smith_heart_fx';
 import {
   crackLines,
@@ -29,7 +35,7 @@ import {
 } from '../src/render/smith_heart_fx/hammer_fx_core';
 import { NOVA_WAVE_SECONDS, novaWave } from '../src/render/trash_engine_fx/trash_engine_fx_core';
 import { SMITH_HEART_CASTS, SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
-import { SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
+import { CLEFT, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
 import { authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { castDisplayName } from '../src/ui/cast_display_name';
@@ -117,6 +123,53 @@ describe('hammer_air_core: the vein’s air', () => {
       SMITH_HEART_FIELD.props.filter((p) => p.kind === 'sh_geode').length,
     );
     expect(full.grit.filter((g) => !g.heavy).length).toBeGreaterThan(10);
+  });
+});
+
+describe('hammer_air_core: the Cleft, the raid’s first image', () => {
+  it('lights the landing with five shafts, dust in them, warm pools and the crystals’ glow', () => {
+    const full = planHammerAir(1);
+    const low = planHammerAir(0.35);
+    // Never thinned: the shafts are the image (five quads).
+    expect(full.shafts.length).toBeGreaterThanOrEqual(5);
+    expect(low.shafts.length).toBe(full.shafts.length);
+    for (const s of full.shafts) {
+      expect(Math.hypot(s.x - CLEFT.x, s.z - CLEFT.z)).toBeLessThan(CLEFT.r);
+      expect(s.y0).toBe(CLEFT.h);
+      expect(s.y1 - s.y0).toBeGreaterThan(20);
+    }
+    // At least one broad main shaft, and thin blades beside it.
+    expect(Math.max(...full.shafts.map((s) => s.width))).toBeGreaterThanOrEqual(6);
+    expect(Math.min(...full.shafts.map((s) => s.width))).toBeLessThan(2);
+    // The dust hangs in the shafts (one volume each) and thins with the tier.
+    expect(full.shaftMotes.length).toBe(full.shafts.length);
+    const count = (p: typeof full) => p.shaftMotes.reduce((n, v) => n + v.count, 0);
+    expect(count(low)).toBeLessThan(count(full));
+    for (const v of full.shaftMotes) {
+      expect(Math.hypot(v.x - CLEFT.x, v.z - CLEFT.z)).toBeLessThan(CLEFT.r + 4);
+      expect(v.y0).toBeGreaterThan(CLEFT.h);
+    }
+    // A warm pool where each broad shaft lands, on the landing.
+    expect(full.sunPools.length).toBeGreaterThanOrEqual(2);
+    for (const c of full.sunPools) expect(c.y).toBeCloseTo(CLEFT.h + 0.6, 5);
+    // The four amber crystal clusters at the gate's foot glow, at the landing's height.
+    expect(full.cleftGlows.length).toBe(HEART_CLEFT_CRYSTALS.length);
+    for (const g of full.cleftGlows) {
+      expect(g.y).toBeGreaterThan(CLEFT.h);
+      expect(g.y).toBeLessThan(CLEFT.h + 4);
+    }
+  });
+
+  it('lights the crystals with two small steady lamps inside the Cleft’s budget', () => {
+    const lights = planHeartLights().filter((l) => l.id.startsWith('cleft'));
+    const crystals = lights.filter((l) => l.id.startsWith('cleft_crystals'));
+    expect(crystals.length).toBe(HEART_CLEFT_GLOW_LIGHTS.length);
+    for (const l of crystals) {
+      expect(l.y).toBeGreaterThan(CLEFT.h);
+      expect(l.range).toBeLessThan(16);
+      expect(l.noHalo).toBe(true);
+    }
+    expect(lights.length).toBeLessThanOrEqual(8);
   });
 });
 
