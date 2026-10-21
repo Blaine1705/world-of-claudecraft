@@ -18451,6 +18451,15 @@ export const vi_VN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Trượng Chiến Vanguard"
       },
+      "lychgate_buckler": {
+        "name": "Lychgate Buckler"
+      },
+      "bastion_kite_shield": {
+        "name": "Bastion Kite Shield"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Barrowfield Tower Shield"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },

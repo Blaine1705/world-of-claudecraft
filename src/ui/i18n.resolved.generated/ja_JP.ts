@@ -18451,6 +18451,15 @@ export const ja_JP: EnTranslations = {
       "vanguard_warstaff": {
         "name": "ヴァンガードの戦杖"
       },
+      "lychgate_buckler": {
+        "name": "墓門のバックラー"
+      },
+      "bastion_kite_shield": {
+        "name": "砦のカイトシールド"
+      },
+      "barrowfield_tower_shield": {
+        "name": "塚野のタワーシールド"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

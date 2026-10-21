@@ -18451,6 +18451,15 @@ export const ru_RU: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Боевой посох Авангарда"
       },
+      "lychgate_buckler": {
+        "name": "Баклер кладбищенских врат"
+      },
+      "bastion_kite_shield": {
+        "name": "Каплевидный щит бастиона"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Башенный щит Курганного поля"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

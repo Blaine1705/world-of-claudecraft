@@ -1399,6 +1399,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': '高望巨剑',
   'entities.items.highwatch_wallshield.name': '高望壁盾',
   'entities.items.eastbrook_buckler.name': '东溪小圆盾',
+  'entities.items.lychgate_buckler.name': '停柩门小圆盾',
+  'entities.items.bastion_kite_shield.name': '堡垒鸢盾',
+  'entities.items.barrowfield_tower_shield.name': '古冢原塔盾',
   'entities.abilities.avatar.name': '战争化身',
   'entities.abilities.avatar.description':
     '化身为巨像，持续 20 秒，解除你身上的所有控制效果，并使你造成的伤害提高 20%。',

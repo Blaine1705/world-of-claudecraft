@@ -18451,6 +18451,15 @@ export const fr_FR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Bâton de guerre de l'Avant-garde"
       },
+      "lychgate_buckler": {
+        "name": "Lychgate Buckler"
+      },
+      "bastion_kite_shield": {
+        "name": "Bastion Kite Shield"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Barrowfield Tower Shield"
+      },
       "conjured_water4": {
         "name": "Eau de source invoquée"
       },

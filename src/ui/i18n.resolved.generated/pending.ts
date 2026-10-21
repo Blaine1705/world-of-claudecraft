@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "es_ES": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "fr_FR": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "fr_CA": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "de_DE": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "nl_NL": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "pl_PL": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "id_ID": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "tr_TR": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "sv_SE": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "vi_VN": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ],
+  "da_DK": [
+    "entities.items.barrowfield_tower_shield.name",
+    "entities.items.bastion_kite_shield.name",
+    "entities.items.lychgate_buckler.name"
+  ]
 };

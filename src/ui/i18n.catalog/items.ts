@@ -3374,6 +3374,12 @@ const ITEM_ENTITY_IDS = [
   'vanguard_oath_blade',
   'vanguard_fang_dagger',
   'vanguard_warstaff',
+  // The three leveling quest shields (content/quest_shields.ts), appended at the
+  // END under the append-only contract; resolve BY KEY. The names are wordy
+  // English, so their M16 non-Latin fills land in the overlays.
+  'lychgate_buckler',
+  'bastion_kite_shield',
+  'barrowfield_tower_shield',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4309,6 +4315,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_oath_blade: "Vanguard's Oath",
   vanguard_fang_dagger: "Vanguard's Fang",
   vanguard_warstaff: "Vanguard's Warstaff",
+  lychgate_buckler: 'Lychgate Buckler',
+  bastion_kite_shield: 'Bastion Kite Shield',
+  barrowfield_tower_shield: 'Barrowfield Tower Shield',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -18451,6 +18451,15 @@ export const tr_TR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Öncü'nün Savaş Asası"
       },
+      "lychgate_buckler": {
+        "name": "Lychgate Buckler"
+      },
+      "bastion_kite_shield": {
+        "name": "Bastion Kite Shield"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Barrowfield Tower Shield"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },

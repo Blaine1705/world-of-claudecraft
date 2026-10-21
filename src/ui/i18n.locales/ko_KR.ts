@@ -1441,6 +1441,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': '하이워치 대검',
   'entities.items.highwatch_wallshield.name': '하이워치 벽방패',
   'entities.items.eastbrook_buckler.name': '이스트브룩 버클러',
+  'entities.items.lychgate_buckler.name': '묘지문 버클러',
+  'entities.items.bastion_kite_shield.name': '요새 카이트 실드',
+  'entities.items.barrowfield_tower_shield.name': '고분 들판 타워 실드',
   'entities.abilities.avatar.name': '화신',
   'entities.abilities.avatar.description':
     '20초 동안 거상으로 변신하여 자신에게 걸린 모든 군중 제어 효과를 해제하고 입히는 피해가 20% 증가합니다.',

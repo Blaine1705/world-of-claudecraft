@@ -18451,6 +18451,15 @@ export const en_XA: EnTranslations = {
       "vanguard_warstaff": {
         "name": "[Ʋáñĝúáŕð'š Ŵáŕšţáƒƒ]"
       },
+      "lychgate_buckler": {
+        "name": "[Ļýçĥĝáţé Ɓúçķļéŕ]"
+      },
+      "bastion_kite_shield": {
+        "name": "[Ɓášţíóñ Ķíţé Šĥíéļð]"
+      },
+      "barrowfield_tower_shield": {
+        "name": "[Ɓáŕŕóŵƒíéļð Ţóŵéŕ Šĥíéļð]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

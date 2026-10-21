@@ -1447,6 +1447,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': 'ハイウォッチの大剣',
   'entities.items.highwatch_wallshield.name': 'ハイウォッチの壁盾',
   'entities.items.eastbrook_buckler.name': 'イーストブルックのバックラー',
+  'entities.items.lychgate_buckler.name': '墓門のバックラー',
+  'entities.items.bastion_kite_shield.name': '砦のカイトシールド',
+  'entities.items.barrowfield_tower_shield.name': '塚野のタワーシールド',
   'entities.abilities.avatar.name': '化身',
   'entities.abilities.avatar.description':
     '20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。',

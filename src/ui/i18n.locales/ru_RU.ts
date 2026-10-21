@@ -1470,6 +1470,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': 'Двуручный меч Хайвотча',
   'entities.items.highwatch_wallshield.name': 'Стенной щит Хайвотча',
   'entities.items.eastbrook_buckler.name': 'Истврукский баклер',
+  'entities.items.lychgate_buckler.name': 'Баклер кладбищенских врат',
+  'entities.items.bastion_kite_shield.name': 'Каплевидный щит бастиона',
+  'entities.items.barrowfield_tower_shield.name': 'Башенный щит Курганного поля',
   'entities.abilities.avatar.name': 'Аватара',
   'entities.abilities.bladestorm.name': 'Клинковая буря',
   'entities.abilities.battle_stance.description':

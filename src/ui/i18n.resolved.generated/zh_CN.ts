@@ -18451,6 +18451,15 @@ export const zh_CN: EnTranslations = {
       "vanguard_warstaff": {
         "name": "先锋之战杖"
       },
+      "lychgate_buckler": {
+        "name": "停柩门小圆盾"
+      },
+      "bastion_kite_shield": {
+        "name": "堡垒鸢盾"
+      },
+      "barrowfield_tower_shield": {
+        "name": "古冢原塔盾"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

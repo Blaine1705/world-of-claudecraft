@@ -18451,6 +18451,15 @@ export const ko_KR: EnTranslations = {
       "vanguard_warstaff": {
         "name": "선봉대의 전투지팡이"
       },
+      "lychgate_buckler": {
+        "name": "묘지문 버클러"
+      },
+      "bastion_kite_shield": {
+        "name": "요새 카이트 실드"
+      },
+      "barrowfield_tower_shield": {
+        "name": "고분 들판 타워 실드"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
