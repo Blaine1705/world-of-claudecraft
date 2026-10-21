@@ -15,6 +15,7 @@
 //   the donor carries them with only the left arm re-solved off it.
 // - The body file and its rig are the shipped ones (no bones added).
 
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { Animation, Document } from '@gltf-transform/core';
 import { NodeIO } from '@gltf-transform/core';
@@ -158,6 +159,17 @@ const frames = (T: number, step = 2) =>
   Array.from({ length: Math.floor((T * 30) / step + 1e-6) + 1 }, (_, k) => (k * step) / 30);
 
 describe("Korgath's grip", () => {
+  it('ships the reviewed clip donor (re-pin with the ship script output)', () => {
+    // The donor is authored in Blender outside the repo and shipped by
+    // docs/design/dungeon-rework/korgath/ship_korgath_clip_fixes.mjs, so the
+    // shipped file itself is pinned: a stray re-export fails here.
+    const bytes = readFileSync(DONOR);
+    expect(bytes.length).toBe(190404);
+    expect(createHash('sha256').update(bytes).digest('hex')).toBe(
+      'dcf1a8c03f69d8d35a3fe92741f25a77f5947454c1442f0f01d28d3ebe2c8a24',
+    );
+  });
+
   it('keeps the shipped body and its rig (no bones added)', () => {
     const skin = body
       .getRoot()
