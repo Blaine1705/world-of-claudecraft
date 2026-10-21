@@ -239,4 +239,25 @@ describe('the sim throws the bottle for a hut click or interact press', () => {
     ).toBe(true);
     expect(meta.questLog.get(HUT_QUEST_ID)?.counts[0]).toBe(0);
   });
+
+  // The throw plays no character animation: the renderer answers a `windup`
+  // spellfx with triggerAttack, which on a warrior is a melee swing at the hut.
+  // Every route sends only the bottle's flight and the blaze.
+  it('throws with no swing on a click, an interact press or a bag use', () => {
+    const routes: [string, (sim: Sim, hut: Entity) => void][] = [
+      ['click', (sim, hut) => sim.pickUpObject(hut.id)],
+      ['interact', (sim) => sim.interact()],
+      ['bag', (sim) => sim.useItem(FIREBOTTLE_ITEM_ID)],
+    ];
+    for (const [index, [route, act]] of routes.entries()) {
+      const { sim, hut } = atHut(index, true);
+      act(sim, hut);
+      const events = settle(sim);
+      expect(burnedId(events), route).toEqual([hut.id]);
+      const playerFx = events.flatMap((e) =>
+        e.type === 'spellfx' && e.sourceId === sim.playerId ? [e.fx] : [],
+      );
+      expect(playerFx, route).toEqual(['projectile']);
+    }
+  });
 });
