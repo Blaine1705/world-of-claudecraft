@@ -1,8 +1,9 @@
 // Garden beds a map moves (WorldContent.objectMoves, sim/moved_objects.ts)
 // stand at the same spot in BOTH worlds: the offline/server Sim seats, plants
 // and harvests crops on its own world's beds, and the online ClientWorld draws
-// those crops on IWorld.farmPatches, so the two must agree on every bed or a
-// realm running a map would draw its crops at the shipped spots. Also pins the
+// those crops on IWorld.farmPatches, so the two must agree on every bed. No
+// realm runs a map today (the server runs the built-in world), but if one
+// ever does, its crops must not draw at the shipped spots. Also pins the
 // published maps themselves: a headless Sim on each map that moves a bed
 // serves the moved positions the crops are drawn on.
 

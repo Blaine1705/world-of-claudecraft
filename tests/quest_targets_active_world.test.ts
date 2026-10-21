@@ -1,9 +1,10 @@
-// The quest-objective areas (src/sim/quest_targets.ts questObjectiveAreas)
-// follow the LOADED world, not the built-in tables: a Studio map that moves a
-// mob camp or a ground-object cluster must move the world map's quest blob,
-// the quest log's "Show on Map" route and the map sidebar with it. Driven
-// with synthetic variants of the built-in world (never a particular map
-// file), so the pin holds on any branch.
+// The quest markers (src/sim/quest_targets.ts questObjectiveAreas and
+// questGiverNpcMarkers, plus the quest log's "Show on Map" fallback in
+// src/ui/quest_map_location_core.ts) follow the LOADED world, not the
+// built-in tables: a Studio map that moves a mob camp, a ground-object
+// cluster or an NPC must move the marker with it. Driven with synthetic
+// variants of the built-in world (never a particular map file), so the pin
+// holds on any branch.
 
 import { afterEach, describe, expect, it } from 'vitest';
 import {
@@ -11,11 +12,13 @@ import {
   CAMPS,
   GROUND_OBJECTS,
   MOBS,
+  NPCS,
   QUESTS,
   setActiveWorldContent,
 } from '../src/sim/data';
-import { questObjectiveAreas } from '../src/sim/quest_targets';
-import type { QuestDef, QuestProgress, WorldContent } from '../src/sim/types';
+import { questGiverNpcMarkers, questObjectiveAreas } from '../src/sim/quest_targets';
+import type { NpcDef, QuestDef, QuestProgress, WorldContent } from '../src/sim/types';
+import { questMapLocation } from '../src/ui/quest_map_location_core';
 
 function activeLog(quest: QuestDef): Map<string, QuestProgress> {
   return new Map([
@@ -159,5 +162,87 @@ describe('questObjectiveAreas reads the active world', () => {
     // shipped game draws exactly what it always drew.
     expect(BUILTIN_WORLD.camps).toBe(CAMPS);
     expect(BUILTIN_WORLD.groundObjects).toBe(GROUND_OBJECTS);
+    expect(BUILTIN_WORLD.npcs).toBe(NPCS);
+  });
+});
+
+function withNpc(id: string, npc: NpcDef | null): WorldContent {
+  const npcs: Record<string, NpcDef> = { ...NPCS };
+  if (npc) npcs[id] = npc;
+  else delete npcs[id];
+  return { ...BUILTIN_WORLD, npcs };
+}
+
+const MOVED_NPC_POS = { x: -86.25, z: -44.5 };
+const at = (p: { x: number; z: number }) => `${p.x},${p.z}`;
+
+describe('quest givers and quest NPCs follow the active world', () => {
+  const available = () => 'available' as const;
+
+  function requireGiver(): { npc: NpcDef; questId: string } {
+    for (const marker of questGiverNpcMarkers(available, new Set())) {
+      const questId = marker.quests[0].questId;
+      const npc = Object.values(NPCS).find(
+        (n) => n.questIds.includes(questId) && at(n.pos) === at(marker.pos),
+      );
+      if (npc) return { npc, questId };
+    }
+    throw new Error('expected a quest giver with a map glyph');
+  }
+
+  it('moves the glyph of a moved quest giver', () => {
+    const { npc, questId } = requireGiver();
+    setActiveWorldContent(withNpc(npc.id, { ...npc, pos: MOVED_NPC_POS }));
+    const markers = questGiverNpcMarkers(available, new Set());
+    const glyph = markers.find((m) => m.quests.some((q) => q.questId === questId));
+    expect(glyph?.pos).toEqual(MOVED_NPC_POS);
+    expect(markers.some((m) => at(m.pos) === at(npc.pos))).toBe(false);
+  });
+
+  it('draws no glyph for a quest giver the map dropped', () => {
+    const { npc } = requireGiver();
+    setActiveWorldContent(withNpc(npc.id, null));
+    const markers = questGiverNpcMarkers(available, new Set());
+    expect(markers.some((m) => at(m.pos) === at(npc.pos))).toBe(false);
+  });
+
+  it('moves an interact-NPC objective area with the map', () => {
+    let found: { quest: QuestDef; npcId: string; objIndex: number } | null = null;
+    for (const quest of Object.values(QUESTS)) {
+      for (const [objIndex, o] of quest.objectives.entries()) {
+        if (o.type === 'interact' && o.targetNpcId && NPCS[o.targetNpcId]) {
+          found = { quest, npcId: o.targetNpcId, objIndex };
+          break;
+        }
+      }
+      if (found) break;
+    }
+    expect(found, 'expected a quest with an interact-NPC objective').not.toBeNull();
+    if (!found) return;
+    const { quest, npcId, objIndex } = found;
+    setActiveWorldContent(withNpc(npcId, { ...NPCS[npcId], pos: MOVED_NPC_POS }));
+    const centers = centersFor(quest, objIndex);
+    expect(centers).toContain(at(MOVED_NPC_POS));
+    expect(centers).not.toContain(at(NPCS[npcId].pos));
+  });
+
+  it('routes a ready quest to the moved turn-in NPC', () => {
+    const quest = Object.values(QUESTS).find(
+      (q) => NPCS[q.turnInNpcId] && !NPCS[q.turnInNpcId].dynamic,
+    );
+    expect(quest, 'expected a quest with a placed turn-in NPC').toBeDefined();
+    if (!quest) return;
+    const npc = NPCS[quest.turnInNpcId];
+    setActiveWorldContent(withNpc(npc.id, { ...npc, pos: MOVED_NPC_POS }));
+    const log = new Map([
+      [
+        quest.id,
+        { questId: quest.id, counts: quest.objectives.map(() => 0), state: 'ready' as const },
+      ],
+    ]);
+    expect(questMapLocation(quest.id, log)).toEqual({
+      questId: quest.id,
+      ...MOVED_NPC_POS,
+    });
   });
 });
