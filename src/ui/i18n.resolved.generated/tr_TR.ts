@@ -479,7 +479,6 @@ export const tr_TR: EnTranslations = {
       "inventory": "Inventory",
       "bankTitle": "Bank",
       "capacity": "{used} / {capacity} slots",
-      "travelTime": "Up to 15 seconds each way",
       "cargo": "Courier inventory",
       "empty": "No items",
       "send": "Send courier",

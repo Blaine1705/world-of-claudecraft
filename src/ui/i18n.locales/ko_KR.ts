@@ -16,7 +16,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.inventory': '소지품',
   'hudChrome.courier.bankTitle': '은행',
   'hudChrome.courier.capacity': '{used} / {capacity}칸',
-  'hudChrome.courier.travelTime': '편도 10초',
   'hudChrome.courier.cargoSafe':
     '가방이 가득 차면 돌아온 아이템은 초과 소지품으로 보관됩니다. 배달 후 배달부는 다시 소환할 때까지 사라집니다.',
   'entities.abilities.courier.description':

@@ -16,7 +16,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.inventory': '背包',
   'hudChrome.courier.bankTitle': '銀行',
   'hudChrome.courier.capacity': '{used} / {capacity} 欄位',
-  'hudChrome.courier.travelTime': '單程10秒',
   'hudChrome.courier.cargoSafe':
     '送回的物品會在背包已滿時存為溢出物品。送達後信使會消失，直到再次召喚。',
   'entities.abilities.courier.description':

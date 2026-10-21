@@ -479,7 +479,6 @@ export const zh_TW: EnTranslations = {
       "inventory": "背包",
       "bankTitle": "銀行",
       "capacity": "{used} / {capacity} 欄位",
-      "travelTime": "單程10秒",
       "cargo": "信使背包",
       "empty": "沒有物品",
       "send": "派出信使",

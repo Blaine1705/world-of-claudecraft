@@ -13241,7 +13241,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.courier.selectedItem'
   | 'hudChrome.courier.send'
   | 'hudChrome.courier.title'
-  | 'hudChrome.courier.travelTime'
   | 'hudChrome.courier.unavailable'
   | 'hudChrome.courier.waiting'
   | 'hudChrome.craftName.alchemy'

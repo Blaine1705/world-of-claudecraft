@@ -12,6 +12,8 @@ export interface CourierSelection {
   index: number;
   fingerprint: string;
 }
+/** Selected stacks for one trip. No selections at all dismisses a ready,
+ * empty courier instead (the window closed without a delivery). */
 export interface CourierDispatchRequest {
   deposits: CourierSelection[];
   withdrawals: CourierSelection[];

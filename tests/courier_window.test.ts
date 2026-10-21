@@ -191,4 +191,37 @@ describe('courier window', () => {
     expect(deps.restoreFocus).toHaveBeenCalledOnce();
     expect(deps.onClosed).toHaveBeenCalledOnce();
   });
+  it('closing a waiting courier unsent dismisses it with one empty request', () => {
+    const { root, deps, window } = rig();
+    root.querySelector<HTMLButtonElement>('.x-btn')!.click();
+    expect(window.isOpen()).toBe(false);
+    expect(deps.dispatch).toHaveBeenCalledOnce();
+    expect(deps.dispatch.mock.calls[0][0]).toEqual({ deposits: [], withdrawals: [] });
+    // A second close is a no-op, never a second dismissal.
+    window.close();
+    expect(deps.dispatch).toHaveBeenCalledOnce();
+  });
+  it('never dismisses after Send or while the courier is busy or carrying cargo', () => {
+    const sent = rig();
+    sent.root.querySelector<HTMLButtonElement>('[data-courier-side="deposits"]')!.click();
+    sent.root.querySelector<HTMLButtonElement>('.courier-send')!.click();
+    expect(sent.deps.dispatch).toHaveBeenCalledOnce();
+    expect(sent.deps.dispatch.mock.calls[0][0].deposits).toHaveLength(1);
+    for (const phase of ['outbound', 'returning', 'waiting'] as const) {
+      const busy = rig();
+      busy.info.phase = phase;
+      busy.window.close();
+      expect(busy.deps.dispatch, phase).not.toHaveBeenCalled();
+    }
+    const loaded = rig();
+    loaded.info.cargo = [{ itemId: 'linen_cloth', count: 1 }];
+    loaded.window.close();
+    expect(loaded.deps.dispatch).not.toHaveBeenCalled();
+  });
+  it('drops the travel-time line from the courier portrait', () => {
+    const { root } = rig();
+    const portrait = root.querySelector('.courier-companion')!;
+    expect(portrait.querySelector('p')).toBeNull();
+    expect(portrait.textContent).not.toMatch(/seconds/i);
+  });
 });

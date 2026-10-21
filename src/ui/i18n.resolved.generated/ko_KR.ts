@@ -479,7 +479,6 @@ export const ko_KR: EnTranslations = {
       "inventory": "소지품",
       "bankTitle": "은행",
       "capacity": "{used} / {capacity}칸",
-      "travelTime": "편도 10초",
       "cargo": "배달부 소지품",
       "empty": "아이템 없음",
       "send": "배달부 보내기",

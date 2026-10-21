@@ -13,6 +13,9 @@ private instances pause return travel. travelTicks plus legTicks (derived, wired
 separately) drive the renderer's hop, lift and skid schedule (courierLegSegmentAt);
 travelDistance remains for older pose readers. No RNG, pathfinding or realm scan.
 
+A ready courier walks to courierFollowPoint (left of and behind the owner). An
+empty dispatch request dismisses a ready, empty courier and needs no membership.
+
 Cargo is owned inventory in CharacterState. Logout freezes it; expiry prevents
 new dispatches but does not destroy or strand existing deliveries. Loads refuse
 oversized custody rather than truncate items. Existing container movement owns

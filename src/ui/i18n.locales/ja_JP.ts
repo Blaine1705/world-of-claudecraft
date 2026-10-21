@@ -16,7 +16,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.inventory': '所持品',
   'hudChrome.courier.bankTitle': '銀行',
   'hudChrome.courier.capacity': '{used} / {capacity} スロット',
-  'hudChrome.courier.travelTime': '片道10秒',
   'hudChrome.courier.cargoSafe':
     'バッグが満杯の場合、返却品は超過分として保管されます。配達後、再召喚するまでクーリエは姿を消します。',
   'entities.abilities.courier.description':

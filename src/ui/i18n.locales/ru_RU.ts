@@ -16,7 +16,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.inventory': 'Инвентарь',
   'hudChrome.courier.bankTitle': 'Банк',
   'hudChrome.courier.capacity': '{used} / {capacity} ячеек',
-  'hudChrome.courier.travelTime': '10 секунд в каждую сторону',
   'hudChrome.courier.cargoSafe':
     'Если сумки полны, доставленные предметы сохраняются сверх лимита. После доставки курьер исчезает до следующего вызова.',
   'entities.abilities.courier.description':
