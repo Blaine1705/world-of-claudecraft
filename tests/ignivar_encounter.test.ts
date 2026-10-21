@@ -745,7 +745,7 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FORGE_STRIKE_EVERY).toBe(14);
     expect(IGNIVAR_FORGE_STRIKE_MAX_HP).toBe(0.35);
     expect(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS).toBe(6);
-    expect(IGNIVAR_FIRST_FORGE_WAVE_SECONDS).toBe(50);
+    expect(IGNIVAR_FIRST_FORGE_WAVE_SECONDS).toBe(24);
     expect(IGNIVAR_FORGE_WAVE_EVERY).toBe(60);
     expect(IGNIVAR_FORGE_WAVE_WINDUP_SECONDS).toBe(2.5);
     expect(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS).toBe(3);
@@ -980,21 +980,64 @@ describe('Ignivar encounter', () => {
     expect(forgeWaveCadenceTrace(418)).toEqual(first);
     expect(first).toEqual([
       {
-        startTick: 1101,
-        endTick: 1211,
-        facingSlot: 0,
+        startTick: 523,
+        endTick: 633,
+        facingSlot: 3,
         windupFrames: 50,
         activeFrames: 60,
       },
       {
-        startTick: 2380,
-        endTick: 2490,
-        facingSlot: 4,
+        startTick: 1802,
+        endTick: 1912,
+        facingSlot: 3,
         windupFrames: 50,
         activeFrames: 60,
       },
     ]);
   });
+
+  // Live parses showed the opening Forge Wave landing about 8.5 seconds into
+  // the second Water Conduit's cleanse window on both difficulties: the
+  // knockback threw branded players out of the pool and its damage stacked on
+  // Cleansing Backlash. The opening wave must resolve before that Torrent.
+  it.each([
+    ['normal', claimedEncounter],
+    ['heroic', claimedHeroicEncounter],
+  ] as const)(
+    'resolves the opening %s Forge Wave before the second Searing Torrent',
+    (_, claim) => {
+      const { sim, boss } = claim(418);
+      const party = [
+        sim.player,
+        addEncounterPlayer(sim, boss, 'Opening Two'),
+        addEncounterPlayer(sim, boss, 'Opening Three'),
+        addEncounterPlayer(sim, boss, 'Opening Four'),
+      ];
+      let torrentStarts = 0;
+      let secondTorrentTick = -1;
+      let waveEndTick = -1;
+      let previous: string | null = null;
+      for (let tick = 0; tick < 3_000 && secondTorrentTick < 0; tick++) {
+        for (const player of party) {
+          player.hp = player.maxHp;
+          player.dead = false;
+        }
+        updateIgnivarEncounter(sim.ctx, boss);
+        const casting = boss.castingAbility ?? null;
+        if (casting === IGNIVAR_FRONTAL_CAST_ID && previous !== IGNIVAR_FRONTAL_CAST_ID) {
+          torrentStarts++;
+          if (torrentStarts === 2) secondTorrentTick = tick;
+        }
+        if (previous === IGNIVAR_FORGE_WAVE_CAST_ID && casting !== IGNIVAR_FORGE_WAVE_CAST_ID) {
+          if (waveEndTick < 0) waveEndTick = tick;
+        }
+        previous = casting;
+      }
+      expect(secondTorrentTick).toBeGreaterThan(0);
+      expect(waveEndTick).toBeGreaterThan(0);
+      expect(waveEndTick).toBeLessThan(secondTorrentTick);
+    },
+  );
 
   it('warns before three rays rotate, damages crossings, and reverses the next cast', () => {
     const { sim, boss } = claimedEncounter(8120);

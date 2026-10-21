@@ -151,7 +151,9 @@ recoverable while repeated contact remains lethal.
 
 ## Forge Wave
 
-After a 50-second opening delay, Forge Wave begins a 60-second recharge. Ignivar
+After a 24-second opening delay, Forge Wave begins a 60-second recharge. The
+opening wave resolves before the second Searing Torrent, clear of that Water
+Conduit's cleanse window (pinned in `tests/ignivar_encounter.test.ts`). Ignivar
 locks to one of eight deterministic arena facings and casts for 2.5 seconds. Two
 opposite 30-degree safe lanes remain fixed for the complete cast. On release, a
 thin circular fire wall expands across the complete room over three seconds,
