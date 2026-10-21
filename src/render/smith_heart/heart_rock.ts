@@ -17,7 +17,7 @@ import {
   SMITH_HEART_ROCK_KIT_URL,
   upgradeWhenHeartKitLands,
 } from './heart_kit';
-import { planHeartLips, planHeartRock } from './heart_rock_plan_core';
+import { planHeartLips, planHeartNeedles, planHeartRock } from './heart_rock_plan_core';
 
 /** The rock's culling cell (yards). */
 const ROCK_CELL = 200;
@@ -36,7 +36,7 @@ export function heartRockKitReady(): boolean {
 export function buildHeartRock(lowGfx: boolean): THREE.Group {
   return instanceHeartKit(
     SMITH_HEART_ROCK_KIT_URL,
-    [...planHeartRock(), ...planHeartLips()],
+    [...planHeartRock(), ...planHeartLips(), ...planHeartNeedles()],
     lowGfx,
     'smithHeartRock',
     ROCK_CELL,

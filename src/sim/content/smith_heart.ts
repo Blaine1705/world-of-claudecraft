@@ -28,6 +28,7 @@ import {
   HEART_ROOM,
   HEART_TERRACE,
   QUENCH,
+  RING_PACK_DEGREES,
   ringPoint,
   SLAB,
   SMITH_HEART_ANCHORS,
@@ -384,8 +385,9 @@ function toward(x: number, z: number, tx: number, tz: number): number {
   return Math.atan2(tx - x, tz - z);
 }
 
-/** The Ring's eight pack angles: two between each pair of vein mouths. */
-export const RING_PACK_DEGREES = [30, 60, 105, 125, 235, 255, 300, 330] as const;
+/** The Ring's eight pack angles: two between each pair of vein mouths (the
+ *  layout's, where their cairns stand too). */
+export { RING_PACK_DEGREES };
 
 const RING_PACK_IDS = RING_PACK_DEGREES.map((_, i) => `r${i + 1}`);
 

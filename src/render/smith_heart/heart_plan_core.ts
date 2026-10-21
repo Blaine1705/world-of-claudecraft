@@ -210,6 +210,17 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('cyl', 'bronze', 'ring', [2.8, 0.8, 2.8], [0, 10.6, 0]),
     part('cone', 'glow', 'ring', [1.6, 1.4, 0], [0, 12.7, 0]),
   ],
+  // A pack spot's cairn on the Ring's rim (the Ring kit's fallen block or
+  // toppled stone with its crystal lamp; this is its stand-in).
+  sh_ring_cairn: [
+    part('box', 'stone', 'ring', [2.8, 1.8, 2.2], [0.3, 0.9, 0]),
+    part('gem', 'glow', 'ring', [0.8, 1.2, 0.8], [-1.3, 0.9, 0.2]),
+  ],
+  // A jamb of the Hammer's mouth at the Grand Stair's head (stand-in).
+  sh_hammer_jamb: [
+    part('box', 'stone', 'hammer', [2.6, 8.6, 2.2], [0, 4.3, 0]),
+    part('gem', 'glow', 'hammer', [0.9, 1.4, 0.9], [0, 9.2, 0]),
+  ],
   // One of the four bronze tines crowning the Seal Dais: a shaft rising off
   // the dais, its head bent in over the seal, a glowing tip the portal's
   // light runs from.

@@ -26,6 +26,9 @@ import { applyRockCutaway } from './heart_rock_cutaway';
 export const SMITH_HEART_HAMMER_KIT_URL = '/models/props/smith_heart_hammer_kit.glb';
 /** The raid-wide mountain rock kit (phase 2E, heart_rock.ts). */
 export const SMITH_HEART_ROCK_KIT_URL = '/models/props/smith_heart_rock_kit.glb';
+/** The Ring's kit (phase 2F, ring_kit.ts): the Ring, the stairs, the dais,
+ *  the seal and its spires. */
+export const SMITH_HEART_RING_KIT_URL = '/models/props/smith_heart_ring_kit.glb';
 
 export type HeartKitSlot = 'stone' | 'glow';
 export type HeartBakedPiece = Partial<Record<HeartKitSlot, THREE.BufferGeometry>>;
@@ -148,6 +151,7 @@ function startKitLoad(url: string): Promise<void> {
 if (typeof window !== 'undefined') {
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_HAMMER_KIT_URL));
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_ROCK_KIT_URL));
+  registerDeferredPreload(() => startKitLoad(SMITH_HEART_RING_KIT_URL));
 }
 
 /** Fetch and bake a kit once. Never rejects; resolves within the wait cap

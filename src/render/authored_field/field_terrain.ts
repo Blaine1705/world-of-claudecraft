@@ -66,6 +66,8 @@ export interface FieldTerrainOptions {
   cliffRock?: 'slabs' | 'strata' | 'glacier';
   /** The cliff faces' vertex paint (the plan's default rock tint otherwise). */
   cliffPaint?: CliffPaint;
+  /** Surfaces whose walkable tops the dungeon's own kit draws (FieldTopOptions.omit). */
+  omitTops?: ReadonlySet<string>;
 }
 
 /** Build the ground of a field: tops (one mesh per texture family) and cliffs. */
@@ -78,6 +80,7 @@ export function buildAuthoredFieldTerrain(
   const tops = planFieldTops(def, {
     maxEdge: opts.maxEdge ?? (opts.lowGfx ? 6 : 3),
     layerLift: 0,
+    ...(opts.omitTops ? { omit: opts.omitTops } : {}),
   });
   const rock =
     opts.cliffRock === 'strata'

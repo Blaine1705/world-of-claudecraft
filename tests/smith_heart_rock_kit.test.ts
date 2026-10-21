@@ -186,15 +186,17 @@ describe('Smith Heart rock kit: the piece list and the shipped GLB', () => {
       expect(s.triangles, name).toBeGreaterThan(0);
       const cap = /Far$/.test(name)
         ? 1100
-        : /Boulder/.test(name)
-          ? 600
-          : /Lip/.test(name)
-            ? 1300
-            : 3000;
+        : /Needle/.test(name)
+          ? 4000
+          : /Boulder/.test(name)
+            ? 600
+            : /Lip/.test(name)
+              ? 1300
+              : 3000;
       expect(s.triangles, name).toBeLessThanOrEqual(cap);
       total += s.triangles;
     }
-    expect(total).toBeLessThan(40_000);
+    expect(total).toBeLessThan(42_000);
   });
 });
 

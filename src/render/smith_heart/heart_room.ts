@@ -60,8 +60,9 @@ void main() {
   #include <colorspace_fragment>
 }`;
 
-/** The keels under the floating islands. */
-function buildKeels(group: THREE.Group): void {
+/** The keels under the floating islands (but those a kit draws: the Seal
+ *  Dais's is the Ring kit's since phase 2F). */
+function buildKeels(group: THREE.Group, skip: ReadonlySet<string>): void {
   const stone = surfaceMat({
     color: HEART_PALETTE.dark,
     roughness: 0.9,
@@ -69,6 +70,7 @@ function buildKeels(group: THREE.Group): void {
     side: THREE.DoubleSide,
   });
   for (const k of heartKeels()) {
+    if (skip.has(k.id)) continue;
     const pts = k.profile.map(([r, y]) => new THREE.Vector2(Math.max(0.01, r), y));
     const keel = new THREE.Mesh(new THREE.LatheGeometry(pts, 40), stone);
     keel.position.set(k.x, k.h, k.z);
@@ -250,10 +252,13 @@ function buildEmbers(group: THREE.Group, lowGfx: boolean): void {
 }
 
 /** The Heart's dressing and every island's keel (instance-local). */
-export function buildHeartRoom(lowGfx: boolean): THREE.Group {
+export function buildHeartRoom(
+  lowGfx: boolean,
+  skipKeels: ReadonlySet<string> = new Set(),
+): THREE.Group {
   const group = new THREE.Group();
   group.name = 'smithHeartRoom';
-  buildKeels(group);
+  buildKeels(group, skipKeels);
   buildCore(group);
   buildChains(group);
   buildRuneRings(group);

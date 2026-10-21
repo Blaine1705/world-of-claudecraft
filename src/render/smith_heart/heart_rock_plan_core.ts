@@ -56,6 +56,7 @@ import {
   heartFloorClearance,
   heartOpenAir,
 } from './heart_walls_core';
+import { RING_KIT_FASCIA_DEPTH, RING_KIT_FASCIA_SURFACES } from './ring_kit_plan_core';
 
 /** A rock piece's measures (game yards, unscaled): `half` the half width of
  *  its true front (the ends past it turn back into the mountain), `reach`
@@ -70,14 +71,14 @@ export interface HeartRockPiece {
 }
 
 export const HEART_ROCK_PIECES: Readonly<Record<string, HeartRockPiece>> = {
-  Kit_RockFaceA: { half: 12, reach: 15.1, depth: 16.6, height: 27.9 },
-  Kit_RockFaceB: { half: 10, reach: 13.1, depth: 13.7, height: 23.6 },
-  Kit_RockFaceC: { half: 13, reach: 16.3, depth: 17.8, height: 31.9 },
-  Kit_RockTallA: { half: 11, reach: 14.1, depth: 14.5, height: 43.3 },
-  Kit_RockTallB: { half: 9, reach: 12.1, depth: 15.8, height: 39.1 },
-  Kit_RockButtress: { half: 6, reach: 8.7, depth: 17.7, height: 44.1 },
-  Kit_RockCrestA: { half: 12, reach: 15.2, depth: 17.6, height: 30.1 },
-  Kit_RockCrestB: { half: 10, reach: 13.1, depth: 17.6, height: 33.1 },
+  Kit_RockFaceA: { half: 12, reach: 15.0, depth: 17.0, height: 26.7 },
+  Kit_RockFaceB: { half: 10, reach: 13.0, depth: 15.2, height: 23.5 },
+  Kit_RockFaceC: { half: 13, reach: 16.0, depth: 17.8, height: 29.2 },
+  Kit_RockTallA: { half: 11, reach: 14.0, depth: 16.2, height: 44.4 },
+  Kit_RockTallB: { half: 9, reach: 12.0, depth: 15.6, height: 39.3 },
+  Kit_RockButtress: { half: 6, reach: 8.6, depth: 17.6, height: 44.2 },
+  Kit_RockCrestA: { half: 12, reach: 15.1, depth: 19.8, height: 28.9 },
+  Kit_RockCrestB: { half: 10, reach: 13.0, depth: 17.6, height: 33.2 },
 };
 
 /** A placed piece's measures (a far build shares its near build's). */
@@ -258,6 +259,27 @@ function slopeUnder(
   return { front, high };
 }
 
+/** Does a piece's body (back to its depth, across its reach) stand over a
+ *  walked floor between its foot and its crest? */
+function backOverFloor(
+  p: { x: number; z: number; rot: number; scale?: number },
+  piece: HeartRockPiece,
+  foot: number,
+  height: number,
+): boolean {
+  const F = SMITH_HEART_FIELD;
+  const k = p.scale ?? 1;
+  for (let i = -4; i <= 4; i++) {
+    for (let j = 1; j <= 6; j++) {
+      const q = at(p, (i / 4) * piece.reach * k, (-j / 6) * (piece.depth + 0.5) * k);
+      if (!authoredFieldSurfaceAt(F, q.x, q.z)) continue;
+      const floor = authoredFieldHeight(F, q.x, q.z);
+      if (floor > foot - 2.6 && floor < foot + height) return true;
+    }
+  }
+  return false;
+}
+
 interface Candidate {
   x: number;
   z: number;
@@ -357,6 +379,10 @@ function planBand(
         if (heartRockFrontPoints(q, piece).some((f) => clearOf(f.x, f.z).back < band.back - slack))
           continue;
         if (heartOpenAir(px, pz, piece.reach * k)) continue;
+        // Its back never reaches over a walk behind it (a floor higher up
+        // the mountain under its crest).
+        if (backOverFloor(q, piece, foot, piece.height * k * Math.max(HEART_ROCK_RISE[0], rise)))
+          continue;
         return {
           piece: index >= HEART_ROCK_FAR_FROM ? `${name}Far` : name,
           x: px,
@@ -563,7 +589,13 @@ export function planHeartLips(): HeartKitPlacement[] {
           over = Math.max(over, ym + shear * a - authoredFieldHeight(F, px, pz) + 0.05);
         }
       }
-      const y = ym - over - (stairs.has(surface) ? 0.3 : 0);
+      // Under the Ring kit's carved fascias and stringers (phase 2F) the
+      // rock starts below them.
+      const y =
+        ym -
+        over -
+        (stairs.has(surface) ? 0.3 : 0) -
+        (RING_KIT_FASCIA_SURFACES.has(surface) ? RING_KIT_FASCIA_DEPTH : 0);
       // Not where another floor lies under its leaning face (a stair's foot
       // beside the arena it enters, a bridge's end): the rock would stand
       // through that floor.
@@ -581,6 +613,63 @@ export function planHeartLips(): HeartKitPlacement[] {
       });
     }
   }
+  return out;
+}
+
+// ---- the crest's needles ------------------------------------------------------------
+
+/** A needle's measures (yards at scale 1, pinned against the GLB): its foot's
+ *  half width and its height. */
+export const HEART_ROCK_NEEDLES: Readonly<Record<string, { half: number; height: number }>> = {
+  Kit_RockNeedleA: { half: 12.5, height: 68.6 },
+  Kit_RockNeedleB: { half: 15, height: 57.5 },
+};
+
+/** Where the crest's needles may stand: round the Ring (yards from its
+ *  centre), deep in the mountain (at least `back` past the clearance), at
+ *  least `spacing` apart, at most `count` of them. */
+export const HEART_NEEDLE_RULES = { from: 105, to: 225, back: 30, spacing: 58, count: 9 } as const;
+
+let needles: HeartKitPlacement[] | null = null;
+
+/** The needles on the mountain's crest round the Ring (phase 2F: the
+ *  skyline's landmarks): the points deepest in the mountain, spaced round
+ *  it, each sunk into the slope under it and standing tall over the bands. */
+export function planHeartNeedles(): HeartKitPlacement[] {
+  if (needles) return needles;
+  const R = HEART_NEEDLE_RULES;
+  const cands: { x: number; z: number; back: number }[] = [];
+  for (let z = -R.to; z <= R.to; z += 6) {
+    for (let x = -R.to; x <= R.to; x += 6) {
+      const r = Math.hypot(x, z);
+      if (r < R.from || r > R.to) continue;
+      const c = clearOf(x, z);
+      if (!Number.isFinite(c.back) || c.back < R.back) continue;
+      if (heartOpenAir(x, z, 16)) continue;
+      cands.push({ x, z, back: c.back });
+    }
+  }
+  cands.sort((a, b) => b.back - a.back || a.x - b.x || a.z - b.z);
+  const out: HeartKitPlacement[] = [];
+  for (const c of cands) {
+    if (out.length >= R.count) break;
+    if (out.some((p) => Math.hypot(p.x - c.x, p.z - c.z) < R.spacing)) continue;
+    const h = heartHash(Math.round(c.x), Math.round(c.z) + 91);
+    const piece = out.length % 2 ? 'Kit_RockNeedleB' : 'Kit_RockNeedleA';
+    const g = heartMountainGrid(HEART_ROCK_GRID);
+    const ground = heartMountainSample(g, c.x, c.z).mid;
+    out.push({
+      piece,
+      x: c.x,
+      y: ground - 6,
+      z: c.z,
+      rot: h * Math.PI * 2,
+      scale: 1.0 + h * 0.45,
+      noShadow: true,
+      cosmetic: false,
+    });
+  }
+  needles = out;
   return out;
 }
 

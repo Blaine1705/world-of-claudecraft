@@ -996,6 +996,8 @@ const RENDER_PURE_CORES = [
   // Gallery's kerb and chain rail.
   'src/render/smith_heart/heart_rock_plan_core.ts',
   'src/render/smith_heart/hammer_walk_plan_core.ts',
+  // The Ring's kit (phase 2F): the Ring, its stairs, the dais, the spires, the mouths.
+  'src/render/smith_heart/ring_kit_plan_core.ts',
   // The Hammer vein's air and the Hammer guardian's and the Slab's effects.
   'src/render/smith_heart/hammer_air_core.ts',
   'src/render/smith_heart_fx/hammer_fx_core.ts',

@@ -129,6 +129,10 @@ export const RING_PORTAL = { x: 0, z: 0, r: 4 } as const;
  *  the Grand Stair (sim facing, 0 = +z), clear of the portal's trigger. */
 export const RING_PORTAL_LANDING = { x: 0, z: -12, facing: Math.PI } as const;
 
+/** The Ring's eight pack spots (bearings, degrees): two between each pair of
+ *  vein mouths. */
+export const RING_PACK_DEGREES = [30, 60, 105, 125, 235, 255, 300, 330] as const;
+
 /** A point on the Ring's circle at `deg` (clockwise from north) and radius `r`. */
 export function ringPoint(deg: number, r: number = RING.R): { x: number; z: number } {
   const a = (deg * Math.PI) / 180;
@@ -621,7 +625,7 @@ const AUTHORED_SURFACES: FieldSurface[] = [
     ],
     { stairs: true },
   ),
-  rect('balcony', BALCONY, { edge: 'balustrade', ground: 'slate' }),
+  rect('balcony', BALCONY, { edge: 'balustrade', ground: 'paving' }),
   path(
     'grand_stair',
     [
@@ -837,6 +841,18 @@ const PIT_COLUMNS: FieldProp[] = [20, 92, 164, 236, 308].map((deg) => {
  *  steps above, so the whole figure reads from the pit floor's camera. */
 export const QUARRY_COLOSSUS_OUT = 12;
 
+/** The four crystal spires on the Seal Dais (bearings, degrees): on the
+ *  diagonals, the two southern ones turned a breath off them so the Ring's
+ *  two ends (its arc's feet at 138 and 222) see past them to the portal. */
+export const RING_SPIRE_BEARINGS = [45, 134, 226, 315] as const;
+
+/** How far out from the Ring's centre the pack spots' cairns stand (on the
+ *  walk, against its outer rim). */
+export const RING_CAIRN_R = 75.6;
+/** How far either side of the Balcony's middle the Hammer's jambs stand
+ *  (between the Grand Stair's side and the Balcony's). */
+export const HAMMER_JAMB_X = 10.3;
+
 /** The colossi: half-carved giants the Smith left in the quarry's terraces,
  *  kneeling over the pit. */
 const QUARRY_COLOSSI: FieldProp[] = [72, 128, 182].map((deg) => {
@@ -938,16 +954,42 @@ const PROPS: FieldProp[] = [
   { kind: 'sh_geode', ...around(HAMMER_PIT, 300, -4), rot: 5.2, r: 2, h: 4 },
   // The Slab's broken halves lie either side of the stair once it falls.
   { kind: 'sh_slab_frame', x: SLAB.x, z: SLAB.z, rot: 0 },
-  // The Ring: forge pillars on the outer rim, between the pack spots.
-  ...[0, 45, 90, 135, 225, 270, 315].map((deg) => {
+  // The Ring: standing stones on the outer rim, between the pack spots, a
+  // crystal lamp in each one's head (none on the east Balcony Stair: phase
+  // 2F, it stood on the stair's edge).
+  ...[0, 45, 90, 225, 270, 315].map((deg) => {
     const p = ringPoint(deg + 22.5, RING.outerR - 1.5);
     return { kind: 'sh_ring_pillar', x: p.x, z: p.z, rot: 0, r: 1.2, h: 12 };
   }),
-  // The Seal Dais: the four bronze tines of the portal's crown, on the
-  // diagonals (clear of the four rivers and the two stairs).
-  ...[45, 135, 225, 315].map((deg) => {
+  // The Ring's pack spots made places (phase 2F): a cairn at the rim behind
+  // each pack, a fallen block or a toppled stone with a crystal lamp.
+  ...RING_PACK_DEGREES.map((deg, i) => {
+    const p = ringPoint(deg + 3, RING_CAIRN_R);
+    return {
+      kind: 'sh_ring_cairn',
+      x: p.x,
+      z: p.z,
+      rot: face(p.x, p.z, RING.x, RING.z) + (i % 2 ? 0.5 : -0.35),
+      r: 2,
+      h: 2.2,
+    };
+  }),
+  // The Hammer's mouth on the Ring side: two standing stones flanking the
+  // Grand Stair's head at the Balcony's tip (phase 2F), clear of the stair.
+  ...[-1, 1].map((s) => ({
+    kind: 'sh_hammer_jamb',
+    x: s * HAMMER_JAMB_X,
+    z: BALCONY.z1 - 2.5,
+    rot: s < 0 ? 0 : Math.PI,
+    r: 1.5,
+    h: 10,
+  })),
+  // The Seal Dais: the four crystal spires of the portal's crown, on the
+  // diagonals (clear of the four rivers and the two stairs), each lighting
+  // with its vein.
+  ...RING_SPIRE_BEARINGS.map((deg) => {
     const p = ringPoint(deg, 15.5);
-    return { kind: 'sh_portal_tine', x: p.x, z: p.z, rot: (deg * Math.PI) / 180, r: 1, h: 16 };
+    return { kind: 'sh_portal_tine', x: p.x, z: p.z, rot: (deg * Math.PI) / 180, r: 1.6, h: 16 };
   }),
   { kind: 'sh_heart_seal', x: HEART_SEAL.x, z: HEART_SEAL.z, rot: 0 },
   // The Breath: wind shelters on the bridge's windward edge (phase 2 gusts

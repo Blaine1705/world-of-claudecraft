@@ -355,16 +355,19 @@ function surfaceTris(s: FieldSurface, maxEdge: number): Tri[] {
  * surface (the drawbridge that exists once lowered) never cuts the ground
  * under it, so that ground stays drawn while the bridge is raised.
  */
-export function laterClippers(def: AuthoredFieldDef): PreparedClipper[][] {
+export function laterClippers(
+  def: AuthoredFieldDef,
+  omit: ReadonlySet<string> = new Set(),
+): PreparedClipper[][] {
   const rings = def.surfaces.map((s) => renderOutline(s));
   const boxes = rings.map((r) => ringBox(r));
   const prepared = new Map<number, PreparedClipper>();
   return def.surfaces.map((s, i) => {
     const out: PreparedClipper[] = [];
-    if (s.hidden) return out;
+    if (s.hidden || omit.has(s.id)) return out;
     const box = boxes[i];
     for (let j = i + 1; j < def.surfaces.length; j++) {
-      if (def.surfaces[j].hidden) continue;
+      if (def.surfaces[j].hidden || omit.has(def.surfaces[j].id)) continue;
       const b = boxes[j];
       if (b.minX >= box.maxX || box.minX >= b.maxX || b.minZ >= box.maxZ || box.minZ >= b.maxZ) {
         continue;
@@ -386,6 +389,10 @@ export interface FieldTopOptions {
   /** Each later surface floats this much above the one before (a z-fight
    *  guard; 0 is right now the tops are clipped and never overlap). */
   layerLift: number;
+  /** Surfaces whose tops a dungeon's own kit draws (a stair laid tread by
+   *  tread): neither drawn nor cutting the ground under them, as a hidden
+   *  surface's top. Their cliffs are still the field's. */
+  omit?: ReadonlySet<string>;
 }
 
 /** Vertex paint of a walkable top: ground colour, broad mottling, grit. */
@@ -570,9 +577,9 @@ export function planFieldTops(
     quarry: { positions: [], colors: [], uvs: [], indices: [] },
     paving: { positions: [], colors: [], uvs: [], indices: [] },
   };
-  const clippers = laterClippers(def);
+  const clippers = laterClippers(def, opts.omit);
   def.surfaces.forEach((s, layer) => {
-    if (s.hidden) return;
+    if (s.hidden || opts.omit?.has(s.id)) return;
     const ground: FieldGround = s.ground ?? (s.kind === 'path' ? 'flagstone' : 'earth');
     const batch = out[fieldGroundFamily(ground)];
     const uvScale = fieldFamilyUvScale(fieldGroundFamily(ground));

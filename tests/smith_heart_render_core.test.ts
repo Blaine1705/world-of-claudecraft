@@ -84,6 +84,7 @@ import {
 import {
   heartGateSolids,
   heartPropSolids,
+  heartRingSolids,
   heartRockSolids,
   heartSightlineHits,
   heartWallSolids,
@@ -684,6 +685,8 @@ describe('heart_sightline_core: the raid sees the seal and the portal', () => {
     ...heartGateSolids(1),
     // The mountain's rock and the walks' lips (phase 2E).
     ...heartRockSolids(),
+    // The Ring kit's jambs, spires and parapets (phase 2F).
+    ...heartRingSolids(),
   ];
   const seal = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 0.5, z: HEART_SEAL.z };
   const portalEye = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 9, z: HEART_SEAL.z };
