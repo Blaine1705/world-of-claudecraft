@@ -9717,6 +9717,7 @@ export const ja_JP: EnTranslations = {
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "discordLabel": "Discordに参加する",
+    "levyStreet": "Levy Street",
     "guidesLabel": "プレイヤーガイド",
     "guideFree": "無料MMORPG",
     "guideGamesLikeWow": "WoWに似たゲーム",

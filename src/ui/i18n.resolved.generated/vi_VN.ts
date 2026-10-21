@@ -9717,6 +9717,7 @@ export const vi_VN: EnTranslations = {
     "terms": "Điều Khoản Dịch Vụ",
     "privacy": "Chính Sách Bảo Mật",
     "discordLabel": "Tham Gia Discord",
+    "levyStreet": "Levy Street",
     "guidesLabel": "Hướng Dẫn Của Người Chơi",
     "guideFree": "MMORPG Miễn Phí",
     "guideGamesLikeWow": "Trò Chơi Giống WoW",

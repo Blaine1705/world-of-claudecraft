@@ -9717,6 +9717,7 @@ export const it_IT: EnTranslations = {
     "terms": "Termini di servizio",
     "privacy": "Informativa sulla privacy",
     "discordLabel": "Entra nel Discord",
+    "levyStreet": "Levy Street",
     "guidesLabel": "Guide dei Giocatori",
     "guideFree": "MMORPG Gratuiti",
     "guideGamesLikeWow": "Giochi come WoW",

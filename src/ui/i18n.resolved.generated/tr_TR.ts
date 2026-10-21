@@ -9717,6 +9717,7 @@ export const tr_TR: EnTranslations = {
     "terms": "Hizmet Koşulları",
     "privacy": "Gizlilik Politikası",
     "discordLabel": "Discord'a Katıl",
+    "levyStreet": "Levy Street",
     "guidesLabel": "Oyuncu Rehberleri",
     "guideFree": "Ücretsiz MMORPG'ler",
     "guideGamesLikeWow": "WoW Gibi Oyunlar",

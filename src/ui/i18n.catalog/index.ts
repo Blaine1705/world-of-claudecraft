@@ -314,6 +314,8 @@ export const en = {
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
     discordLabel: 'Join the Discord',
+    // Studio name on the footer link to levystreet.com; a brand, kept verbatim in every locale.
+    levyStreet: 'Levy Street',
     // Footer row linking the player guides (the /mmorpgs, /games-like and /browser
     // pages served beside the game). English page titles; the pages are English-only.
     guidesLabel: 'Player guides',

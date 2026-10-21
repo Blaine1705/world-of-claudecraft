@@ -9717,6 +9717,7 @@ export const zh_CN: EnTranslations = {
     "terms": "服务条款",
     "privacy": "隐私政策",
     "discordLabel": "加入Discord社区",
+    "levyStreet": "Levy Street",
     "guidesLabel": "玩家指南",
     "guideFree": "免费 MMORPG",
     "guideGamesLikeWow": "类似 WoW 的游戏",

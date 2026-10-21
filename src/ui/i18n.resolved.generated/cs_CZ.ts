@@ -9717,6 +9717,7 @@ export const cs_CZ: EnTranslations = {
     "terms": "Podmínky služby",
     "privacy": "Zásady ochrany soukromí",
     "discordLabel": "Připojit se na Discord",
+    "levyStreet": "Levy Street",
     "guidesLabel": "Průvodce pro hráče",
     "guideFree": "MMORPG zdarma",
     "guideGamesLikeWow": "Hry podobné WoW",
