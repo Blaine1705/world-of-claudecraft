@@ -103,6 +103,11 @@ BUILDERS['RockButtressFar'] = rib('RockButtress', 531, 12.0, 44.0, 16.0, far=Tru
 # The walks' sides where they fall into the chasm.
 BUILDERS['RockLipA'] = lip('RockLipA', 581, 12.0, 40.0, 4.0, 0.38)
 BUILDERS['RockLipB'] = lip('RockLipB', 587, 12.0, 40.0, 4.0, 0.38)
+# The crest's needles (phase 2F): the skyline's landmarks.
+BUILDERS['RockNeedleA'] = lambda: rs.needle(bpy, rs.RP('RockNeedleA', seed=591, ao_dist=6.0), 'RockNeedleA', 591,
+                                            18.0, 72.0)
+BUILDERS['RockNeedleB'] = lambda: rs.needle(bpy, rs.RP('RockNeedleB', seed=597, ao_dist=6.0), 'RockNeedleB', 597,
+                                            24.0, 58.0, twin=True)
 # Boulders.
 BUILDERS['BoulderA'] = stone('BoulderA', 561, (3.6, 2.8, 2.4))
 BUILDERS['BoulderB'] = stone('BoulderB', 563, (5.2, 3.8, 3.0))

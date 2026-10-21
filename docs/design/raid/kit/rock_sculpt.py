@@ -426,14 +426,34 @@ def rock_face(bpy, p, name, seed, W, H, D, beds=3, overhang=False, peaks=2, lift
                 fy = front(cx, cz) + float(rng.uniform(-0.35, 0.9))
                 # Turned and tipped each its own way (a weathered bed is
                 # never a course of masonry), more the smaller it is.
-                tip = 0.06 if big else 0.13
-                R = gs.rot(rx=float(rng.uniform(-0.1, 0.05)), ry=dip0 + float(rng.uniform(-tip, tip)),
+                tip = 0.1 if big else 0.2
+                R = gs.rot(rx=float(rng.uniform(-0.12, 0.06)), ry=dip0 + float(rng.uniform(-tip, tip)),
                            rz=float(rng.uniform(-tip, tip)))
                 label = bed if rng.random() < 0.7 else BED_TONES[int(rng.integers(0, len(BED_TONES)))]
                 # Now and then a plate is missing (fallen): the mass shows.
                 if rng.random() > 0.1:
-                    f.put(label, block(rng, (cx, fy + d / 2, cz), (w, d, th), cuts=14, chamfer=(0.6, 0.9), R=R,
-                                       top_tilt=0.22), 0.02)
+                    # Broken deep on every side (phase 2F: at 2E's shallow
+                    # chamfers a plate read as a squared slab from the walks),
+                    # blended into its neighbours where they meet.
+                    f.put(label, block(rng, (cx, fy + d / 2, cz), (w, d, th), cuts=16, chamfer=(0.55, 0.9), R=R,
+                                       top_tilt=0.3), 0.06)
+                    # A second block across it, turned its own way: the
+                    # plate's outline is never a rectangle.
+                    if rng.random() < 0.6:
+                        R2 = gs.rot(rx=float(rng.uniform(-0.15, 0.08)), ry=dip0 + float(rng.uniform(-0.3, 0.3)),
+                                    rz=float(rng.uniform(-0.3, 0.3)))
+                        cx2 = cx + w * float(rng.uniform(-0.35, 0.35))
+                        cz2 = cz + th * float(rng.uniform(-0.3, 0.3))
+                        # On the face's own line there (the ends turn back).
+                        fy2 = front(cx2, cz2) + float(rng.uniform(-0.2, 0.6))
+                        f.put(label, block(rng, (cx2, fy2 + d / 2, cz2),
+                                           (w * float(rng.uniform(0.35, 0.65)), d, th * float(rng.uniform(0.6, 1.1))),
+                                           cuts=12, chamfer=(0.55, 0.9), R=R2, top_tilt=0.35), 0.06)
+                    if rng.random() < 0.45:
+                        wedge(f, rng, (cx + float(rng.uniform(-w, w)) * 0.4, fy - 0.1,
+                                       cz + th * float(rng.uniform(-0.2, 0.5))),
+                              (float(rng.uniform(-0.6, 0.6)), -1.0, float(rng.uniform(-0.2, 0.9))),
+                              float(rng.uniform(0.9, 2.0)))
                     # A crack across the bigger plates (no long straight edge
                     # survives the weather).
                     if w > 6.0 and rng.random() < 0.6:
@@ -468,7 +488,7 @@ def rock_face(bpy, p, name, seed, W, H, D, beds=3, overhang=False, peaks=2, lift
             f.put('g4', block(rng, (ox, fy + 1.4, oz), (ow, 5.0, 2.2), cuts=12, chamfer=(0.7, 0.92),
                               R=gs.rot(rx=0.08, ry=dip0, rz=float(rng.uniform(-0.12, 0.12)))), 0.05)
         crest(f, W, H, D, rng, seed, peaks=peaks, lift=lift)
-        weather(f, seed, amp=0.22)
+        weather(f, seed, amp=0.38)
         clamp_below(f, 0.0)
         return f
 
@@ -552,10 +572,20 @@ def rock_lip(bpy, p, name, seed, W, H, D, out=0.3, target=1100, voxel=0.18, key=
             if len(pts) > 1:
                 for dy in (0.3, 1.2):
                     f.groove(Polyline([(x, y + dy, z) for (x, y, z) in pts], 0.06), 0.35, 0.14)
-        weather(f, seed, amp=0.18)
+        weather(f, seed, amp=0.32)
         # The brink: flat under the walk's top (never proud of it), the ends
         # square for the next module to meet, the foot open (the chasm).
-        f.cut_above(-0.05)
+        # (Phase 2F: 2E cut it flat at the walk's height, and from the play
+        # camera the plates' cross-sections read as pale hooked slabs lying
+        # beside the walk. The brink now rounds over and falls away out over
+        # the void, a yard and a half per yard, so only rock face is seen.)
+        _X, Y, Z = _axes(f)
+        out_of = np.maximum(0.0, -Y - 0.2)
+        top = -0.05 - 1.5 * out_of - 0.25 * out_of ** 2
+        # Only the brink's first yards: lower down, the face leans out as
+        # it falls and stays whole.
+        cut = np.where(Z > -7.0, (Z - top) * 0.8, -50.0)
+        f.d = smax(f.d, (cut + np.zeros_like(f.d)).astype(np.float32), 0.35)
         clamp_below(f, -H)
         return f
 
@@ -639,6 +669,59 @@ def boulder(bpy, p, name, seed, size, target=420, voxel=0.08):
     n1 = Noise(seed)
     f.displace(lambda X, Y, Z: 0.12 * n1.fbm(X * 0.4, Y * 0.4, Z * 0.4, 2)
                + 0.05 * (n1.ridged(X * 1.3, Y * 1.3, Z * 1.3, 2) - 0.45), band=0.6)
+    clamp_below(f, 0.0)
+    verts, faces = gs.mesh_sculpt(f, bpy, name, target)
+    add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    return p
+
+
+def needle(bpy, p, name, seed, W, H, twin=False, target=3600, voxel=None):
+    """A needle of the mountain's crest (phase 2F: the skyline had only
+    broad low crests): a tall spire of the granite's beds stacked and
+    narrowing, each bed a broken block turned its own way and set off the
+    one under it (the spire leans and kinks, never a cone), shoulders of
+    fallen beds at its foot, a split tip (two tips for `twin`), weathered.
+    Origin at its foot's centre; it stands on the mountain's crest and is
+    seen from every side, so it is closed all round."""
+    rng = np.random.default_rng(seed)
+    vox = voxel or max(0.3, H / 170)
+    f = Sculpt((-W * 0.9, -W * 0.9, -1.0), (W * 0.9, W * 0.9, H * 1.08), vox)
+    lean = np.array([float(rng.uniform(-0.12, 0.12)), float(rng.uniform(-0.12, 0.12))])
+    z = -0.5
+    cx, cy = 0.0, 0.0
+    k = 0
+    while z < H * 0.9:
+        t = max(0.0, z) / H
+        h = H * float(rng.uniform(0.07, 0.13))
+        w = W * (1 - t) ** 0.85 * float(rng.uniform(0.85, 1.1)) + 1.2
+        label = BED_TONES[k % len(BED_TONES)]
+        f.put(label, block(rng, (cx, cy, z + h / 2), (w, w * float(rng.uniform(0.7, 0.95)), h * 1.3), cuts=14,
+                           chamfer=(0.5, 0.86), R=gs.rot(rz=float(rng.uniform(0, TAU)),
+                                                        rx=float(rng.uniform(-0.12, 0.12)),
+                                                        ry=float(rng.uniform(-0.12, 0.12))), top_tilt=0.3), 0.6)
+        cx += lean[0] * h + float(rng.uniform(-0.6, 0.6))
+        cy += lean[1] * h + float(rng.uniform(-0.6, 0.6))
+        z += h * 0.82
+        k += 1
+    tips = [(cx, cy)] if not twin else [(cx - W * 0.12, cy), (cx + W * 0.1, cy + W * 0.05)]
+    for i, (tx, ty) in enumerate(tips):
+        top = H * (1.0 if i == 0 else 0.86)
+        f.put('g3', Polyline([(tx, ty, z - H * 0.08), (tx + float(rng.uniform(-1, 1)), ty, top)],
+                             [max(1.4, W * 0.14), 0.25]), 0.8)
+    # Shoulders: fallen beds heaped at its foot.
+    for _ in range(5):
+        a = float(rng.uniform(0, TAU))
+        r = W * float(rng.uniform(0.35, 0.6))
+        s = W * float(rng.uniform(0.25, 0.45))
+        f.put(BED_TONES[int(rng.integers(0, len(BED_TONES)))],
+              block(rng, (math.cos(a) * r, math.sin(a) * r, s * 0.35), (s, s * 0.8, s * 0.7), cuts=12,
+                    chamfer=(0.5, 0.85), R=gs.rot(rz=a)), 0.8)
+    for _ in range(3):
+        cz = float(rng.uniform(H * 0.2, H * 0.7))
+        a = float(rng.uniform(0, TAU))
+        wedge(f, rng, (math.cos(a) * W * 0.3, math.sin(a) * W * 0.3, cz),
+              (math.cos(a), math.sin(a), float(rng.uniform(-0.3, 0.5))), W * float(rng.uniform(0.18, 0.3)))
+    weather(f, seed, amp=0.7, band=2.4)
     clamp_below(f, 0.0)
     verts, faces = gs.mesh_sculpt(f, bpy, name, target)
     add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)

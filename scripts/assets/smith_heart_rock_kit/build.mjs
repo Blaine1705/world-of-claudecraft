@@ -45,6 +45,9 @@ export const SMITH_HEART_ROCK_KIT_PIECES = [
   // The walks' sides where they fall into the chasm.
   'RockLipA',
   'RockLipB',
+  // The crest's needles (phase 2F).
+  'RockNeedleA',
+  'RockNeedleB',
   // Boulders.
   'BoulderA',
   'BoulderB',
