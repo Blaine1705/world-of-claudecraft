@@ -13,7 +13,6 @@ import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
 import { GuildBankLogMirror } from '../../src/net/guild_bank_log_mirror';
 import { ClientWorld } from '../../src/net/online';
 import { freshAccountLedger } from '../../src/sim/account_ledger';
-import { FARM_PATCHES } from '../../src/sim/content/farm_patches';
 import { emptyAllocation, emptyModifiers } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
 import { freshDeedStats } from '../../src/sim/deeds';
@@ -189,12 +188,12 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   // null until the first `ggoal` snapshot decodes, matching the class field
   // default (src/net/online.ts).
   c.gatheringGoal = null;
-  // The tslot/fplot self-delta mirrors and the static patch table, matching
-  // the class's own static defaults (src/net/online.ts): a consumer test
-  // reading IWorldFarming or the tool slots through this fixture must see
-  // what a freshly constructed online client sees, not undefined.
+  // The tslot/fplot self-delta mirrors, matching the class's own static
+  // defaults (src/net/online.ts): a consumer test reading IWorldFarming or
+  // the tool slots through this fixture must see what a freshly constructed
+  // online client sees, not undefined. farmPatches is a prototype getter over
+  // the active world, so the fixture inherits it.
   c.toolEffectSlots = [];
-  c.farmPatches = FARM_PATCHES;
   c.myFarmPlots = [];
   c.delveClears = {};
   c.delveDaily = { date: '', firstClearXp: [], markClears: 0 };
