@@ -64,6 +64,7 @@ import { reviveFacing } from './revive_facing';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { BgMatch } from './social/battleground';
+import { settleTeleportArrival } from './teleport_arrival';
 import { creditDeathLesson } from './tutorial/death_lesson';
 import { dist2d, type Entity, emptyMoveInput, type Vec3 } from './types';
 
@@ -472,6 +473,12 @@ function reviveAt(
   ctx.rebucket(p);
   p.facing = heading.facing;
   p.prevFacing = heading.prevFacing;
+  // Land settled, as the release above does: a ghost that accepts a revive mid-plunge
+  // must not hand its fall arc and fall origin to the body, or the next motion tick
+  // lands it with the ghost's whole drop as fall damage.
+  p.vx = 0;
+  p.vz = 0;
+  settleTeleportArrival(p);
   // As with the release above: a held movement key at the moment the revive lands must
   // not carry over, or the freshly-revived body immediately walks off in whatever
   // direction was last held (this is what made revived players drift with no input).
