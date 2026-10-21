@@ -3,7 +3,8 @@
 Status: phase 1 (playable blockout), phase 2A (the structure: the final boss in a
 separate room reached by a portal, bigger themed guardian rooms, the structural VFX) and
 phase 2B (the Hammer vein dressed: its Blender kit, its floor, air and light, the Hammer
-guardian's and the Slab's effects, section 5.9) implemented on `feature/smith-heart-raid`,
+guardian's and the Slab's effects, section 5.9) and phase 2C (the Hammer vein's polish
+round and the North Stair, section 5.10) implemented on `feature/smith-heart-raid`,
 dev builds only. The per-room phases (Blender
 kits, own creatures, set pieces, boss kits), the quest and the loot are specified here
 and not built. The name is provisional and has not been IP-checked yet.
@@ -35,7 +36,7 @@ Sources of truth, in order:
 | Gate collision and state engine (shared) | `src/sim/instances/dungeon_gates.ts` |
 | Authored open-air field engine (shared) | `src/sim/instances/authored_field/` (see its `CLAUDE.md`) |
 | Placeholder looks (the one list phase 2 replaces) | `src/render/characters/smith_heart_placeholder_looks.ts` |
-| The Hammer vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_hammer_kit.py`, `scripts/assets/smith_heart_hammer_kit/build.mjs`, `src/render/smith_heart/hammer_kit_plan_core.ts`, `src/render/smith_heart/heart_kit.ts` |
+| The Hammer vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_hammer_kit.py` (the sculpted quarry rock: `hammer_cliff.py`), `scripts/assets/smith_heart_hammer_kit/build.mjs`, `src/render/smith_heart/hammer_kit_plan_core.ts`, `src/render/smith_heart/heart_kit.ts` |
 | The Hammer vein's air and light | `src/render/smith_heart/hammer_air_core.ts`, `src/render/smith_heart/heart_environment.ts` (`smithHeartHammer`) |
 | The Hammer guardian's and the Slab's effects | `src/render/smith_heart_fx/` (`HammerFx`) |
 | Dev commands | `src/sim/dev/smith_heart_dev.ts` (`/dev heart`) |
@@ -415,6 +416,28 @@ the interior or under one compile-gated root, so nothing links on first use. Kit
 names (Vigil, Waking, Bearer, lookout) are internal node names, never shown to a player. The sky blends from storm to the
 Heart's ember night as the camera arrives.
 
+### 5.10 The Hammer vein's polish round and the North Stair (phase 2C)
+
+The owner's review of 2B: the vein read monochrome (floor, walls, statues and light all one
+orange-tan), the quarry's back wall read as stacked boxes, the colossi were crude up close,
+the floor read as big flat tiles and the Cleft (back to the sun) was too dark. The round
+follows the painted world's look bar (warm key, cool blue-violet shadows never black, a
+three-value read, muted stone with few rich accents; detail at medium frequency).
+
+| Piece | Now | Where |
+|---|---|---|
+| The grade | A strong warm low key, a slate-violet sky fill and a dark ground bounce, a neutral grey dust for the fog and the pit's haze: shadows fall cool, the lit faces, the vein's glow, the geodes and the colossi's warm rims pop | `smithHeartHammer` (`heart_environment.ts`), `hammer_air.ts` |
+| The stone | Stormcrag's cool grey granite, warm and cool grey beds mixed, crevices dark but never black; the warm lives in the light, the dust and the accents (bronze, vein light, braziers) | `shkit.py` palette, `heart_mountain.ts`, `heart_cliff_paint_core.ts` (the vein's cliff faces) |
+| The back wall | Every terrace riser, the pit's rim and the Gallery's lips are sculpted rock cut in benches (wide blocks, faint partings, a few deep cracks, an overhang, spoil at the foot), and great cliffs of the mountain itself, cut in giant benches with a block half split out on its drill line and a seam of the vein's light, crown the top step behind the colossi and break the skyline | `hammer_cliff.py`, `Kit_QuarryFace*`, `Kit_QuarryRim*`, `Kit_QuarryLip*`, `Kit_GreatCliff*` (`HAMMER_CROWN`) |
+| The colossi | A finer head (its own sculpt field): a knitted brow, heavy lids and drilled pupils, crow's feet, the nose's wings, a lower lip, a beard of carved locks ending in plaited braids; hands with fingers (stacked on the pommel, flat and heaving, hanging, gripping the haft); claw-chisel strokes and pointing holes where the carving stops | `hammer_sculpt.py` |
+| The floor | Bedrock panels of every size on a broad tile, faint partings with a few open ones, the point's pocking and short claw scars, worn patches, wandering cracks, warm dust drifts in the vertex paint; fine fracture inlays on the pit floor (under the telegraphs' lift) | `paintQuarry` (`field_textures.ts`), `quarryColor`, `Kit_FloorCrack*` |
+| The Cleft | Two braziers flanking the doorway, amber crystals breaking out of the flanks' foot, shafts of late sun through the crack with dust in them, the door's glow and a warm bounce on the flanks. The lights stand past the landing's lip at the landing's height (`HeartLightSpot.y`): 2B's door light had been planted on the void's height | `cleft_gate` (kit), `planHeartLights`, `planCleftShafts` |
+| The North Stair | The dais's second way in, from the Ring's north (section 3.1) | `NORTH_STAIR` |
+
+Readability: unchanged. The sight field of Mountain's Wrath is the trash engine's on every
+tier; the floor's crack inlays stay under its lift (pinned), and the new dressing (cliffs,
+cracks) is cosmetic and shed on the low tier.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -652,7 +675,8 @@ The structure is in place; each room now gets its own phase, ONE at a time, with
 captures and review before the next:
 
 1. **The Hammer** (the Cleft, the Gallery, the Quarry): DRESSED in phase 2B (section
-   5.9: the kit, the floor, the air and light, the guardian's and the Slab's effects).
+   5.9: the kit, the floor, the air and light, the guardian's and the Slab's effects) and
+   polished in phase 2C (section 5.10).
    Still to build: the collapsing gallery's mechanic (its spot is marked), the columns
    that rise and fall (they stand in their sockets), the guardian's target kit and its
    own body.

@@ -1,5 +1,6 @@
 <!-- src/render/smith_heart/: the Smith's Heart raid's open-air renderer (phase 2A:
-     the structure; phase 2B: the Hammer vein's Blender kit, air and light). Presentation only (parent dirs cover the IWorld seam,
+     the structure; phase 2B: the Hammer vein's Blender kit, air and light; phase 2C:
+     its polish round). Presentation only (parent dirs cover the IWorld seam,
      determinism and the GPU scheduler contract). Don't repeat root / src / render
      CLAUDE.md. -->
 
@@ -30,9 +31,10 @@ bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 | `heart_walls_core.ts` | PURE: the floor clearance field (`heartFloorClearance`), the open-air regions (`heartOpenAir`), each room's rock scale (`heartWallScale`), the ridge noise, and the loose crags at the mountain's foot (`planHeartWalls`, `heartRockShape`). |
 | `heart_props.ts` | Instances the recipes (shared unit geometry, `surfaceMat` tones) and the crags (one instanced draw per rock shape, the shared triplanar rock on them); the placeholders of the kinds a kit draws stand apart (`kitOwned`) so the kit takes their place. |
 | `heart_kit_core.ts` / `heart_kit.ts` | A vein's Blender kit: the placement record (PURE), then the loader and baker (each Kit_* node split by slot: KitStone lit with the shared triplanar rock, KitGlow emissive), the instancer (culling cells, stretch and shear for the edge modules), the slot program warmers built with every interior, the late-landing swap. |
-| `hammer_kit_plan_core.ts` / `hammer_kit.ts` | PURE plan and painter of the Hammer vein's kit: every vein prop fitted with its piece (the colossi kneeling on the first step, carved out of the terraces), the worked faces, rims and lips along every cliff run of the vein (the shared edge planner), and the render-only dressing (scaffold, hoists, spoil, chips, the collapse spot's overhang, the Balcony's lookouts). |
-| `hammer_air_core.ts` / `hammer_air.ts` | PURE plan and painter of the Hammer vein's air: dust motes in the low sun, grit off the terrace lips and the colossi, the collapse spot's heavy trickles, the pit's haze, the geodes' halos. Shader-driven quads, cosmetic, a third on the low tier. |
-| `heart_lights.ts` | The point lights through the fire-light sink (at most eight per light zone), each with a halo card. |
+| `hammer_kit_plan_core.ts` / `hammer_kit.ts` | PURE plan and painter of the Hammer vein's kit: every vein prop fitted with its piece (the colossi kneeling on the first step, carved out of the terraces), the worked faces, rims and lips along every cliff run of the vein (the shared edge planner), and the render-only dressing (the great cliffs crowning the top step, `HAMMER_CROWN`; scaffold, hoists, spoil, chips, the floor's crack inlays, the collapse spot's overhang, the Balcony's lookouts). The sculpted quarry rock is `docs/design/raid/kit/hammer_cliff.py`. |
+| `hammer_air_core.ts` / `hammer_air.ts` | PURE plan and painter of the Hammer vein's air: the Cleft's shafts of sun, dust motes in the low sun, grit off the terrace lips and the colossi, the collapse spot's heavy trickles, the pit's grey haze, the geodes' halos. Shader-driven quads, cosmetic, a third on the low tier. |
+| `heart_cliff_paint_core.ts` | PURE: the field's cliff faces' vertex paint, the Hammer vein's in its cool quarry granite (never near-black), the shared tint elsewhere. |
+| `heart_lights.ts` | The point lights through the fire-light sink (at most eight per light zone), each with a halo card. A light hung past a walked floor's lip (the Cleft's) carries its own height (`HeartLightSpot.y`): the field's height there is the void. |
 | `heart_rivers_core.ts` / `heart_rivers.ts` | The floor light-rivers: a ribbon per vein, dim always, the bright twin's draw range running arena to seal as the vein lights; the last leg leaps the chasm onto the dais. |
 | `heart_seal_core.ts` / `heart_seal.ts` | The seal memory (veins and the portal, fed by `../gate_objects.ts`), the fill timeline (`heartSealQuarterFill`, `heartSealColumn`) and the four shader quarters that fill, charge and part; the arrival columns. |
 | `heart_portal_core.ts` / `heart_portal.ts` | The opening (`heartPortalStage`: charge, flash, split, ring, swirl), the living portal (vortex, funnel, motes, tine arcs), the return portal, the hop (`heartHopLanding`, `heartHopStage`, the wash) and the area blend. |
@@ -54,8 +56,11 @@ Rules:
   tier (progress and the way); only the motes and embers thin on the low tier (the
   static preset), and the mountain's grid coarsens (the same mountain).
 - No light but the budgeted point lights through the fire-light sink; the Heart's grade
-  is its own fog state, the Hammer vein's too (`smithHeartHammer`), the rest of the main
-  map's is the borrowed `sunkenBastion` state.
+  is its own fog state, the Hammer vein's too (`smithHeartHammer`: warm key, cool
+  slate-violet fill, a neutral dust; never a warm wash over everything), the rest of the
+  main map's is the borrowed `sunkenBastion` state.
+- A point light falls off physically: one that must reach rock 15 to 25 yd away needs a
+  strong source (the Cleft's door and fill), a lamp's pool a small one.
 - A kit piece a body can touch stays within its layout collider (plus a body's width); a
   render-only piece never stands over a walked floor (the terraces are dressing floors
   nobody reaches); the edge modules keep their lip frame (a rim never stands proud of the
