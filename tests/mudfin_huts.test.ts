@@ -11,6 +11,7 @@ import { PROPS } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 import { HUT_BURN_RANGE, HUT_OBJECT_ID } from '../src/sim/interactions/firebottle_hut';
 import {
+  insideMudfinHutWall,
   MUDFIN_HUT_MODELS,
   MUDFIN_HUT_TEMPLATE_ID,
   MUDFIN_HUTS,
@@ -18,6 +19,9 @@ import {
   mudfinHutNear,
   mudHutCollider,
 } from '../src/sim/mudfin_huts';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
+import { Sim } from '../src/sim/sim';
+import type { Vec3 } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const CAMP_LINK_YD = 15;
@@ -194,5 +198,51 @@ describe('mud hut colliders', () => {
         isBlocked(WORLD_SEED, hut.x + outX * (spec.radius + 1), hut.z + outZ * (spec.radius + 1)),
       ).toBe(false);
     }
+  }, 120_000);
+});
+
+describe('idle wander around the solid huts', () => {
+  it('knows the spots inside a hut wall, a body width out, and nothing else', () => {
+    for (const hut of MUDFIN_HUTS) {
+      const clear = MUDFIN_HUT_MODELS[hut.model].radius + PLAYER_BODY_RADIUS;
+      expect(insideMudfinHutWall(hut.x, hut.z, PLAYER_BODY_RADIUS)).toBe(true);
+      for (const a of [0, 1.3, 2.9, 4.4]) {
+        const [dx, dz] = [Math.sin(a), Math.cos(a)];
+        const at = (d: number) => insideMudfinHutWall(hut.x + dx * d, hut.z + dz * d, 0.5);
+        expect(at(clear - 0.01)).toBe(true);
+        expect(at(clear + 0.01)).toBe(false);
+      }
+    }
+    // the clearance is the caller's: with none, only the wall itself counts
+    const [hut] = MUDFIN_HUTS;
+    const wall = MUDFIN_HUT_MODELS[hut.model].radius;
+    expect(insideMudfinHutWall(hut.x + wall + 0.2, hut.z, 0)).toBe(false);
+    expect(insideMudfinHutWall(hut.x + wall + 0.2, hut.z, PLAYER_BODY_RADIUS)).toBe(true);
+    // the Eastbrook and Palm Reach mushroom huts keep their old stem, no wander keep-out
+    for (const [x, z] of [...ZONE1_PROPS.mudHuts, ...PALMREACH_PROPS.mudHuts]) {
+      expect(insideMudfinHutWall(x, z, PLAYER_BODY_RADIUS)).toBe(false);
+    }
+  });
+
+  it('never sends an idle mob to a spot inside a hut wall, where it would stand at the wall until the 30 s wander timeout', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
+    const lastPick = new Map<number, Vec3>();
+    let campPicks = 0;
+    for (let tick = 0; tick < 20 * 90; tick++) {
+      sim.tick();
+      for (const mob of sim.entities.values()) {
+        const pick = mob.kind === 'mob' ? mob.wanderTarget : null;
+        if (!pick || lastPick.get(mob.id) === pick) continue;
+        lastPick.set(mob.id, pick);
+        for (const hut of MUDFIN_HUTS) {
+          const clear = MUDFIN_HUT_MODELS[hut.model].radius + PLAYER_BODY_RADIUS;
+          const d = Math.hypot(pick.x - hut.x, pick.z - hut.z);
+          if (d < clear + 9) campPicks++;
+          expect(d, `${mob.templateId} #${mob.id} at tick ${tick}`).toBeGreaterThanOrEqual(clear);
+        }
+      }
+    }
+    // the camp murlocs really wandered round the huts in this run
+    expect(campPicks).toBeGreaterThan(20);
   }, 120_000);
 });

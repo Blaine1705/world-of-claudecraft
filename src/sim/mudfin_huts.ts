@@ -7,7 +7,8 @@
 // is: src/render/props.ts places the mesh from it and colliders.ts builds the
 // solid wall from it (the huts are not walk-in), so the drawn hut and its
 // collision cannot drift (the decoration_dims.ts contract). The hut fire the
-// renderer plays when one is torched sizes itself from it too. Pure leaf.
+// renderer plays when one is torched sizes itself from it too, and idle wander
+// (mob/locomotion.ts) skips a pick inside a wall through it. Pure leaf.
 import type { Collider } from './collider_shapes';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { propPlacementRoll } from './prop_layout';
@@ -100,6 +101,21 @@ export function mudfinHutNear(x: number, z: number, within = 0.75): MudfinHut | 
     }
   }
   return best;
+}
+
+/** Whether (x, z) is inside a mudfin hut's wall or within `clearance` of it: a
+ *  spot no body of that radius can stand on. An idle mob only re-rolls its wander
+ *  pick on arrival or after a 30 s timeout (mob/locomotion.ts), so a pick in here
+ *  held it at the wall for the whole timeout; locomotion skips such a pick. */
+export function insideMudfinHutWall(x: number, z: number, clearance: number): boolean {
+  for (const hut of MUDFIN_HUTS) {
+    const reach = MUDFIN_HUT_MODELS[hut.model].radius + clearance;
+    const dx = x - hut.x;
+    const dz = z - hut.z;
+    if (Math.abs(dx) >= reach || Math.abs(dz) >= reach) continue;
+    if (dx * dx + dz * dz < reach * reach) return true;
+  }
+  return false;
 }
 
 /** The static collider of the mud hut at (x, z): a mudfin hut's solid wall at
