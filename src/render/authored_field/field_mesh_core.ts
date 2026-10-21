@@ -65,8 +65,9 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   snow: [0.66, 0.72, 0.8],
   ice: [0.3, 0.47, 0.6],
   slate: [0.2, 0.21, 0.235],
-  // The Smith's Heart's quarry: warm ochre granite bedrock, cut and dusty.
-  quarry: [0.34, 0.27, 0.2],
+  // The Smith's Heart's quarry: Stormcrag's cool grey granite bedrock, cut
+  // and dusty (the warm comes from the low sun and the dust drifts).
+  quarry: [0.3, 0.3, 0.315],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
@@ -88,8 +89,9 @@ export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
  *  slate flags are drawn at a plate's real size, one tile every 12 yd). */
 export function fieldFamilyUvScale(family: FieldTopFamily): number {
   if (family === 'slate') return 1 / 12;
-  // The quarry's cut panels are a few yards across: one tile every 10 yd.
-  if (family === 'quarry') return 1 / 10;
+  // The quarry's cut panels are a few yards across: one tile every 16 yd
+  // (a broad tile, so the floor's repeat never reads as a grid of tiles).
+  if (family === 'quarry') return 1 / 16;
   return 0.25;
 }
 
@@ -410,13 +412,18 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   return [r, g, b];
 }
 
-/** Quarried bedrock: warm ochre granite in broad beds, paler where dust has
- *  drifted, darker in the worked hollows; never green, never wet. */
+/** Quarried bedrock: cool grey granite in broad beds, darker and bluer in
+ *  the worked hollows, warm pale dust drifted over it in patches (the only
+ *  warm in the floor); never green, never wet. */
 function quarryColor(base: Rgb, k: number, patch: number, dirt: number): Rgb {
-  const dust = Math.max(0, patch - 0.52) * 1.6;
-  const shade = Math.min(1, dirt * 1.2);
-  const t = k * (1 - shade * 0.18);
-  return [base[0] * t + dust * 0.1, base[1] * t + dust * 0.085, base[2] * t + dust * 0.06];
+  const dust = Math.max(0, patch - 0.48) * 2.0;
+  const shade = Math.min(1, dirt * 1.6);
+  const t = k * (1 - shade * 0.42);
+  return [
+    base[0] * t + dust * 0.15,
+    base[1] * t + dust * 0.13,
+    base[2] * t * (1 + shade * 0.06) + dust * 0.1,
+  ];
 }
 
 /** Jungle moss: bright sunlit cushions, darker damp loam showing through,

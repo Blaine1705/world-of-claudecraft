@@ -22,6 +22,7 @@ import { sharedUniforms } from '../gfx';
 import type { FireLightSink } from '../point_light_budget';
 import { buildHammerAir } from './hammer_air';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
+import { heartCliffPaint } from './heart_cliff_paint_core';
 import { buildHeartGates } from './heart_gates';
 import { heartKitProgramWarmers } from './heart_kit';
 import { buildHeartLights } from './heart_lights';
@@ -66,6 +67,8 @@ export async function buildSmithHeartInterior(
     buildAuthoredFieldTerrain(SMITH_HEART_FIELD, {
       lowGfx: deps.lowGfx,
       cliffRock: 'strata',
+      // The Hammer vein's faces in its cool quarry granite (phase 2C).
+      cliffPaint: heartCliffPaint,
       // The round islands hang over the void on keels (heart_room.ts).
       shallow: { surfaces: new Set(SMITH_HEART_FLOATING_SURFACES), depth: 3 },
     }),

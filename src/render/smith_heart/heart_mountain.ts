@@ -13,9 +13,12 @@ import {
 } from './heart_mountain_core';
 import { heartHash } from './heart_plan_core';
 
-const ROCK_LOW = new THREE.Color(0x24221f);
-const ROCK_MID = new THREE.Color(0x4a4540);
-const ROCK_HIGH = new THREE.Color(0x6e665c);
+// Stormcrag's granite, a cool grey with a breath of violet low down and a
+// warmer grey on the sunlit heights (phase 2C: the warm tan it had washed
+// every vein to one tone under the Hammer's low sun).
+const ROCK_LOW = new THREE.Color(0x24232a);
+const ROCK_MID = new THREE.Color(0x48474c);
+const ROCK_HIGH = new THREE.Color(0x6a6766);
 
 /** Build the mountain (instance-local). */
 export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {

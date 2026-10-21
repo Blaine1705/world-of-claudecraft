@@ -132,7 +132,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['hollowCrypt', 0x1c2238, 70, 460],
     ['sunkenBastion', 0x4d5a57, 70, 640],
     ['smithHeartCore', 0x1c1424, 80, 520],
-    ['smithHeartHammer', 0x75665a, 70, 560],
+    ['smithHeartHammer', 0x6c6c70, 90, 600],
     ['drownedTemple', 0x252a4c, 140, 1050],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],

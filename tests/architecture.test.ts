@@ -987,6 +987,8 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heart_portal_core.ts',
   'src/render/smith_heart/heart_room_core.ts',
   'src/render/smith_heart/heart_mountain_core.ts',
+  // The Hammer vein's cliff faces' quarry granite paint.
+  'src/render/smith_heart/heart_cliff_paint_core.ts',
   // The Hammer vein's Blender kit: the placement record and its plan.
   'src/render/smith_heart/heart_kit_core.ts',
   'src/render/smith_heart/hammer_kit_plan_core.ts',

@@ -43,25 +43,28 @@ export function smithHeartCameraInHammer(x: number, z: number): boolean {
   return smithHeartAreaAt(x - o.x, z - o.z) === 'hammer';
 }
 
-/** The Hammer's air: quarry dust lit amber by the low sun, thin near (the
- *  pit reads crisp across) and thickening past the terraces into the
- *  fissure's far rock. */
-export const SMITH_HEART_HAMMER_FOG = { color: 0x75665a, near: 70, far: 560 } as const;
+/** The Hammer's air: a grey quarry dust, thin near (the pit reads crisp
+ *  across) and thickening past the terraces into the fissure's far rock. It
+ *  is neutral on purpose (phase 2C): a warm haze washed the whole vein to one
+ *  orange-tan, so the warm stays in the sunlight and the vein's own glow. */
+export const SMITH_HEART_HAMMER_FOG = { color: 0x6c6c70, near: 90, far: 600 } as const;
 
-/** The Hammer's light rig: a warm low key from the south-west (the dusk
- *  down the fissure, raking the terraces), a dusty amber sky, the
- *  cut stone's warm bounce, a warm rim on every silhouette. The image-based
- *  light (the realm's daytime sky, blue) is all but off: the quarry's fill is
- *  the warm hemisphere. */
+/** The Hammer's light rig (phase 2C, the warm-key cool-fill grade of the
+ *  Wildheart Basin): a strong warm low key from the south-west (the dusk
+ *  down the fissure, raking the terraces), and a COOL grey-blue sky fill and
+ *  a dark ground bounce, so every face turned from the sun falls to a cool
+ *  slate-violet shadow (never black, never a saturated blue: the painted
+ *  world's L1) and the lit faces, the vein's ochre glow, the geodes and the
+ *  colossi's warm rims read against it. */
 export const SMITH_HEART_HAMMER_LIGHT = {
-  sun: 2.15,
-  hemi: 1.5,
-  env: 0.05,
-  rim: 1.8,
-  sunColor: 0xffdcb8,
-  hemiSky: 0xa89482,
-  hemiGround: 0x60482f,
-  rimColor: 0xffb05c,
+  sun: 2.9,
+  hemi: 1.15,
+  env: 0.1,
+  rim: 1.6,
+  sunColor: 0xffd3a0,
+  hemiSky: 0x8f8d9a,
+  hemiGround: 0x3e3a38,
+  rimColor: 0xffa858,
   /** Low in the south-west (from the ground toward it): it rakes across
    *  the east terraces as the raid enters (every bench and block throws its
    *  shadow), lights the Vigil from the side and rims the Bearer from

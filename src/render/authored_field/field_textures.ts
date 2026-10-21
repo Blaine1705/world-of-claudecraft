@@ -851,74 +851,129 @@ const paintStrata: Painter = (h, size, rnd) => {
 };
 
 /** Quarried bedrock (the Smith's Heart's Hammer vein, one tile = 10 yd):
- *  the floor left where blocks were cut out, in large rectangular panels
- *  a few yards across, each split off along a narrow joint, its face
- *  dressed in parallel pick strokes running one way or the other, drill
- *  holes in a row down a few joints, and pale dust drifted over it. */
+ *  the floor left where blocks were cut out. Panels of every size (a great
+ *  slab beside a cluster of small ones), each parted from its neighbours by
+ *  a dark joint; the point's pocking and short claw scars over each panel
+ *  (never long even strokes: those read as wood grain), smoother worn
+ *  patches where the masons walked, cracks wandering across the panels,
+ *  drill holes down a few joints, chips, and pale dust drifted into the
+ *  joints and low spots. */
 const paintQuarry: Painter = (h, size, rnd) => {
   const grain = noiseField(size, rnd, 48);
   const broad = noiseField(size, rnd, 5);
   const dust = noiseField(size, rnd, 9);
-  const rows: { y0: number; y1: number }[] = [];
-  let y = 0;
-  while (y < size) {
-    const hgt = Math.round(size * (0.3 + rnd() * 0.3));
-    rows.push({ y0: y, y1: Math.min(size, y + hgt) });
-    y += hgt;
+  const wear = noiseField(size, rnd, 3);
+  // The panels: a recursive split of the tile (wrapped), so sizes vary.
+  const panels: { x0: number; y0: number; x1: number; y1: number }[] = [];
+  const split = (x0: number, y0: number, x1: number, y1: number, depth: number) => {
+    const w = x1 - x0;
+    const hh = y1 - y0;
+    const min = size * 0.12;
+    if (depth >= 4 || (w < min * 2 && hh < min * 2) || (depth >= 2 && rnd() < 0.25)) {
+      panels.push({ x0, y0, x1, y1 });
+      return;
+    }
+    if ((w > hh && w >= min * 2) || hh < min * 2) {
+      const c = Math.round(x0 + w * (0.3 + rnd() * 0.4));
+      split(x0, y0, c, y1, depth + 1);
+      split(c, y0, x1, y1, depth + 1);
+    } else {
+      const c = Math.round(y0 + hh * (0.3 + rnd() * 0.4));
+      split(x0, y0, x1, c, depth + 1);
+      split(x0, c, x1, y1, depth + 1);
+    }
+  };
+  const ox = Math.floor(rnd() * size);
+  const oy = Math.floor(rnd() * size);
+  split(ox, oy, ox + size, oy + size, 0);
+  for (const p of panels) {
+    const tone = 0.42 + rnd() * 0.42;
+    const sunk = rnd() < 0.25 ? -0.06 : 0;
+    // Most partings show faintly (the split ran clean), a few are open.
+    const joint = rnd() < 0.55 ? 0.8 : 0.55;
+    // Claw scars: a few short clusters of parallel strokes, each its own way.
+    const scars: { cx: number; cy: number; a: number; r: number }[] = [];
+    for (let k = 0; k < 2 + Math.floor(rnd() * 3); k++) {
+      scars.push({
+        cx: p.x0 + rnd() * (p.x1 - p.x0),
+        cy: p.y0 + rnd() * (p.y1 - p.y0),
+        a: rnd() * Math.PI,
+        r: 6 + rnd() * 14,
+      });
+    }
+    for (let py = p.y0; py < p.y1; py++) {
+      for (let px = p.x0; px < p.x1; px++) {
+        const i = wrapAt(px, py, size);
+        const ex = Math.min(px - p.x0, p.x1 - 1 - px);
+        const ey = Math.min(py - p.y0, p.y1 - 1 - py);
+        const edge = Math.min(ex, ey);
+        let v = tone + sunk + (grain[i] - 0.5) * 0.18 + (broad[i] - 0.5) * 0.22;
+        // Worn smooth where feet passed: the grain fades, the tone lifts.
+        const smooth = Math.max(0, wear[i] - 0.55) * 1.6;
+        v += smooth * 0.08 - (grain[i] - 0.5) * 0.12 * smooth;
+        for (const s of scars) {
+          const dx = px - s.cx;
+          const dy = py - s.cy;
+          const d = Math.hypot(dx, dy);
+          if (d > s.r) continue;
+          const u = dx * Math.cos(s.a) + dy * Math.sin(s.a);
+          const stroke = Math.abs(Math.sin(u / 2.2)) ** 8;
+          v -= stroke * 0.09 * (1 - d / s.r);
+        }
+        // The joint: dark and narrow, a bevel on the panel's lip.
+        if (edge < 1.5) v *= joint;
+        else if (edge < 3.5) v *= 0.5 + joint * 0.45;
+        // Dust drifts into the joints' lips and the low spots.
+        const drift = Math.max(0, dust[i] - 0.58) * 0.7;
+        v += drift * (edge < 5 ? 1.4 : 1);
+        h[i] = v;
+      }
+    }
+    // Drill holes down one joint of some panels.
+    if (rnd() < 0.08 && p.y1 - p.y0 > 40) {
+      for (let py = p.y0 + 6; py < p.y1 - 4; py += 9) {
+        for (let dy = -2; dy <= 2; dy++)
+          for (let dx = -2; dx <= 2; dx++)
+            if (dx * dx + dy * dy <= 5) h[wrapAt(p.x0 + dx + 3, py + dy, size)] = 0.12;
+      }
+    }
   }
-  for (const row of rows) {
-    let x = Math.floor(rnd() * size * 0.3);
-    const start = x;
-    while (x < start + size) {
-      const w = Math.round(size * (0.4 + rnd() * 0.35));
-      const tone = 0.5 + rnd() * 0.3;
-      const along = rnd() < 0.5;
-      const pitch = 5 + rnd() * 4;
-      const phase = rnd() * 10;
-      const tilt = (rnd() - 0.5) * 0.3;
-      const joint = rnd() < 0.4 ? 0.9 : 0.62;
-      for (let py = row.y0; py < row.y1; py++) {
-        for (let xi = x; xi < Math.min(x + w, start + size); xi++) {
-          const px = ((xi % size) + size) % size;
-          const i = py * size + px;
-          const ex = Math.min(xi - x, x + w - xi);
-          const ey = Math.min(py - row.y0, row.y1 - py);
-          const edge = Math.min(ex, ey);
-          // The pick strokes: shallow parallel grooves across the panel.
-          const u = along ? xi + py * tilt : py + xi * tilt;
-          const stroke = Math.abs(Math.sin((u + phase) / pitch)) ** 6 * 0.08;
-          let v = tone + (grain[i] - 0.5) * 0.14 + (broad[i] - 0.5) * 0.22 - stroke;
-          // The joint: a narrow parting, fainter where the split ran clean.
-          if (edge < 1.2) v *= joint;
-          else if (edge < 3) v *= 0.92;
-          // Quarry dust drifted over the low spots.
-          v += Math.max(0, dust[i] - 0.62) * 0.6;
-          h[i] = v;
-        }
+  // The point's pocking: small dark pits over everything.
+  for (let k = 0; k < 900; k++) {
+    const cx = Math.floor(rnd() * size);
+    const cy = Math.floor(rnd() * size);
+    h[wrapAt(cx, cy, size)] -= 0.12;
+    if (rnd() < 0.4) h[wrapAt(cx + 1, cy, size)] -= 0.06;
+  }
+  // Cracks: wandering dark lines across the panels, narrowing.
+  for (let k = 0; k < 9; k++) {
+    let x = rnd() * size;
+    let y = rnd() * size;
+    let a = rnd() * Math.PI * 2;
+    const len = 40 + rnd() * 120;
+    for (let s = 0; s < len; s++) {
+      a += (rnd() - 0.5) * 0.5;
+      x += Math.cos(a);
+      y += Math.sin(a);
+      const w = s < len * 0.6 ? 1 : 0;
+      for (let d = -w; d <= w; d++) {
+        const i = wrapAt(x - Math.sin(a) * d, y + Math.cos(a) * d, size);
+        h[i] *= d === 0 ? 0.35 : 0.7;
       }
-      // Drill holes down one joint of some panels.
-      if (rnd() < 0.35) {
-        for (let py = row.y0 + 6; py < row.y1 - 4; py += 9) {
-          for (let dy = -2; dy <= 2; dy++)
-            for (let dx = -2; dx <= 2; dx++)
-              if (dx * dx + dy * dy <= 5) h[wrapAt(x + dx + 2, py + dy, size)] = 0.15;
-        }
-      }
-      x += w;
     }
   }
   // Chips: small bright flakes scattered.
-  for (let k = 0; k < 220; k++) {
+  for (let k = 0; k < 90; k++) {
     const cx = rnd() * size;
     const cy = rnd() * size;
-    const r = 1 + rnd() * 2;
+    const r = 1 + rnd() * 1.5;
     for (let dy = -r; dy <= r; dy++)
       for (let dx = -r; dx <= r; dx++)
-        if (dx * dx + dy * dy <= r * r) h[wrapAt(cx + dx, cy + dy, size)] += 0.12;
+        if (dx * dx + dy * dy <= r * r) h[wrapAt(cx + dx, cy + dy, size)] += 0.08;
   }
 };
 
-/** Quarried bedrock panels (one tile = 10 yd: the family's UV scale). */
+/** Quarried bedrock panels (one tile = 16 yd: the family's UV scale). */
 export function quarryDetail(): DetailPair {
   return bake('quarry', paintQuarry, 0x9a77, 512, 5, 1, 125);
 }
