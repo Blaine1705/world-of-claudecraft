@@ -32,8 +32,9 @@ const FITS = {
     period: 48 / 60,
     stance: 9 / 60,
     contact: 0.14,
-    track: 0.07,
-    toeOut: 6,
+    track: 0.064,
+    toeOut: -12,
+    airYaw: -10,
     // Foot pitch through stance (fraction of stance): heel strike, flat, heel rise.
     stancePitch: [
       [0, 6],
@@ -42,17 +43,17 @@ const FITS = {
       [0.82, -14],
       [1, -34],
     ],
-    // Swing ankle keys: [fraction of swing, z, height, ankle flex relative to shin].
+    // Swing ankle keys: [fraction of swing, z, height, ankle flex relative to shin, lateral].
     swing: [
-      [0.12, -0.35, 0.24, -34],
-      [0.27, -0.39, 0.36, -30],
-      [0.42, -0.26, 0.32, -18],
-      [0.57, -0.08, 0.22, -6],
-      [0.72, 0.12, 0.185, 2],
-      [0.86, 0.245, 0.15, 8],
-      [0.94, 0.21, 0.11, 10],
+      [0.12, -0.35, 0.24, -34, 0],
+      [0.27, -0.39, 0.36, -30, 0],
+      [0.42, -0.26, 0.32, -18, 0],
+      [0.57, -0.08, 0.22, -6, 0],
+      [0.72, 0.12, 0.185, 2, 0],
+      [0.86, 0.245, 0.15, 8, 0],
+      [0.94, 0.21, 0.11, 10, 0],
     ],
-    knee: { stance: 4, swing: 9 },
+    knee: { stance: 9, swing: 11 },
     // Half-cycle body keys at cycle phase (0 = left contact); the second half mirrors them.
     half: [
       {
@@ -115,8 +116,9 @@ const FITS = {
     period: 38 / 60,
     stance: 7 / 60,
     contact: 0.14,
-    track: 0.055,
-    toeOut: 4,
+    track: 0.052,
+    toeOut: -13,
+    airYaw: -9,
     stancePitch: [
       [0, 5],
       [0.22, 0],
@@ -125,15 +127,15 @@ const FITS = {
       [1, -36],
     ],
     swing: [
-      [0.12, -0.3, 0.2, -32],
-      [0.27, -0.35, 0.3, -28],
-      [0.42, -0.25, 0.28, -16],
-      [0.57, -0.06, 0.22, -6],
-      [0.72, 0.09, 0.16, 2],
-      [0.86, 0.16, 0.125, 6],
-      [0.94, 0.155, 0.108, 8],
+      [0.12, -0.3, 0.2, -32, 0],
+      [0.27, -0.35, 0.3, -28, 0],
+      [0.42, -0.25, 0.28, -16, 0],
+      [0.57, -0.06, 0.22, -6, 0],
+      [0.72, 0.09, 0.16, 2, 0],
+      [0.86, 0.16, 0.125, 6, 0],
+      [0.94, 0.155, 0.108, 8, 0],
     ],
-    knee: { stance: 1, swing: 4 },
+    knee: { stance: 9, swing: 11 },
     half: [
       {
         p: 0,
