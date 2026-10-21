@@ -138,8 +138,16 @@
     {
       "abilityId": "shrapnel_charge",
       "sourcePack": "OpenAI image generation through Codex",
-      "sourceFile": "project-generated for PR #2218",
-      "output": "shrapnel_charge.webp"
+      "sourceFile": "project-generated Scatterbolt art for PR #4488",
+      "output": "shrapnel_charge.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A wooden and steel crossbow firing three scattered bolts through an orange-gold explosion.",
+      "generationPrompt": "Use case: stylized-concept. Asset type: square painted fantasy MMO action-bar ability icon, Scatterbolt. Primary request: a crossbow with an explosion. A single unmistakable chunky medieval crossbow in a dramatic three-quarter view, dark wood stock and steel bow limbs, firing a powerful orange-gold explosive burst with three short bolts scattering outward. Large clear crossbow silhouette occupies most of the square, diagonal lower-left to upper-right composition, blast just beyond the front of the weapon. Dark smoky brown background with vivid amber sparks. Hand-painted classic fantasy RPG spell icon, bold brushwork, strong warm highlights and dark outlines, simple readable shapes at 32 pixels. Full-bleed square artwork, opaque background. No border, no frame, no lettering, no text, no watermark, no hands or people, no modern gun.",
+      "supersedes": "The earlier Shrapnel Charge painting generated for PR #2218.",
+      "acceptedSha256": "90e5e8fbe4c382226f47a29c57ada5f74acea4fcfe36d0b45ef39f4b918dc169",
+      "acceptedBytes": 6650
     },
     {
       "abilityId": "bloodtrail_assault",
