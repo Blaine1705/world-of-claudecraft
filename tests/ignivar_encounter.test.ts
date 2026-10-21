@@ -1047,9 +1047,9 @@ describe('Ignivar encounter', () => {
   // its impact 8.5 seconds into the cleanse window. No wave may overlap an
   // active Water Conduit at any point of a long pull.
   it.each([
-    ['normal', claimedEncounter],
-    ['heroic', claimedHeroicEncounter],
-  ] as const)('never runs a %s Forge Wave while a Water Conduit is active', (_, claim) => {
+    ['normal', claimedEncounter, false],
+    ['heroic', claimedHeroicEncounter, true],
+  ] as const)('never runs a %s Forge Wave while a Water Conduit is active', (_, claim, holds) => {
     const { sim, boss } = claim(418);
     const tank = sim.player;
     const party = [
@@ -1065,6 +1065,7 @@ describe('Ignivar encounter', () => {
     let activations = 0;
     let waves = 0;
     let overlapTicks = 0;
+    let heldTicks = 0;
     let wasOpen = false;
     let wasWave = false;
     for (let tick = 0; tick < 6_000; tick++) {
@@ -1088,18 +1089,54 @@ describe('Ignivar encounter', () => {
       }
       updateIgnivarEncounter(sim.ctx, boss);
       if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-      const open = Object.keys(boss.ignivar.conduitTimers).length > 0;
+      const open = conduits.some((c) => c.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.active);
       const wave =
         boss.ignivar.forgeWaveWindupRemaining > 0 || boss.ignivar.forgeWaveActiveRemaining > 0;
       if (open && !wasOpen) activations++;
       if (wave && !wasWave) waves++;
       if (open && wave) overlapTicks++;
+      if (open && !wave && boss.ignivar.forgeWaveTimer <= 0) heldTicks++;
       wasOpen = open;
       wasWave = wave;
     }
     expect(activations).toBe(4);
     expect(waves).toBeGreaterThanOrEqual(4);
     expect(overlapTicks).toBe(0);
+    // Heroic's later Torrent cadence makes a wave come due inside a window at
+    // this seed, so the hold itself is exercised rather than only the opener.
+    if (holds) expect(heldTicks).toBeGreaterThan(0);
+  });
+
+  it('holds a due Forge Wave while a conduit is active and releases it on close', () => {
+    const { sim, boss, conduit } = claimedEncounter();
+    prepareConduitCleanse(sim, boss, conduit);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    boss.ignivar.forgeWaveTimer = 0;
+    boss.ignivar.conduitTimers.north_west = 1;
+    let openTicks = 0;
+    while (conduit.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.active && openTicks < 40) {
+      expect(boss.ignivar.forgeWaveWindupRemaining).toBe(0);
+      updateIgnivarEncounter(sim.ctx, boss);
+      openTicks++;
+    }
+    expect(openTicks).toBeGreaterThanOrEqual(19);
+    expect(conduit.templateId).toBe(IGNIVAR_WATER_CONDUIT_TEMPLATES.cooldown);
+    // The conduit pass runs before the wave check, so the wave starts on the
+    // same tick the window closes.
+    expect(boss.ignivar.forgeWaveWindupRemaining).toBeGreaterThan(0);
+  });
+
+  it('does not hold Forge Wave on a timer left by a conduit outside the encounter', () => {
+    const { sim, boss, conduit } = claimedEncounter();
+    prepareConduitCleanse(sim, boss, conduit);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    // A stale entry the conduit pass can no longer visit must not stall the
+    // wave for the rest of the pull.
+    conduit.pos = { ...conduit.pos, x: conduit.pos.x + 10 };
+    boss.ignivar.forgeWaveTimer = 0;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(boss.ignivar.conduitTimers.north_west).toBe(5);
+    expect(boss.ignivar.forgeWaveWindupRemaining).toBeGreaterThan(0);
   });
 
   it('warns before three rays rotate, damages crossings, and reverses the next cast', () => {
