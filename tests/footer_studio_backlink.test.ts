@@ -3,8 +3,10 @@
 // crawlers see it without running script, and it carries no nofollow/ugc/sponsored rel
 // so it passes link equity. These pins keep both shells in step.
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { en } from '../src/ui/i18n.catalog';
+import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
 
 const read = (p: string) =>
   readFileSync(new URL(`../${p}`, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
@@ -25,5 +27,22 @@ describe('homepage footer links the Levy Street studio site', () => {
 
   it('labels the link from the catalog with the studio name', () => {
     expect(en.footer.levyStreet).toBe('Levy Street');
+  });
+});
+
+// A production build throws from t() on any key a locale has left pending, and main
+// deploys without the release-tier i18n lane, so the label must be filled (the brand,
+// verbatim) in every locale or the footer throws for every non-English player.
+describe('the footer backlink label renders in every locale on a release build', () => {
+  afterAll(() => {
+    delete process.env.I18N_RELEASE;
+    setLanguage('en');
+  });
+
+  it.each(SUPPORTED_LANGUAGES)('%s', async (lang) => {
+    process.env.I18N_RELEASE = '1';
+    setLanguage(lang);
+    await ensureLocaleLoaded(lang);
+    expect(t('footer.levyStreet')).toBe('Levy Street');
   });
 });

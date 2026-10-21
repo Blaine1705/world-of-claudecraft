@@ -3324,6 +3324,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'footer.terms': '서비스 이용약관',
   'footer.privacy': '개인정보 처리방침',
   'footer.discordLabel': 'Discord 참여하기',
+  'footer.levyStreet': 'Levy Street',
   'footer.guidesLabel': '플레이어 가이드',
   'footer.guideGamesLikeWow': 'WoW 같은 게임',
   'footer.guideBrowser': '브라우저 MMORPG',

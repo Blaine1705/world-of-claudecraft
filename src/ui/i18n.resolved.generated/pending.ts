@@ -9,65 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "footer.levyStreet"
-  ],
-  "es_ES": [
-    "footer.levyStreet"
-  ],
-  "fr_FR": [
-    "footer.levyStreet"
-  ],
-  "fr_CA": [
-    "footer.levyStreet"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "footer.levyStreet"
-  ],
-  "de_DE": [
-    "footer.levyStreet"
-  ],
-  "zh_CN": [
-    "footer.levyStreet"
-  ],
-  "zh_TW": [
-    "footer.levyStreet"
-  ],
-  "ko_KR": [
-    "footer.levyStreet"
-  ],
-  "ja_JP": [
-    "footer.levyStreet"
-  ],
-  "pt_BR": [
-    "footer.levyStreet"
-  ],
-  "ru_RU": [
-    "footer.levyStreet"
-  ],
-  "cs_CZ": [
-    "footer.levyStreet"
-  ],
-  "nl_NL": [
-    "footer.levyStreet"
-  ],
-  "pl_PL": [
-    "footer.levyStreet"
-  ],
-  "id_ID": [
-    "footer.levyStreet"
-  ],
-  "tr_TR": [
-    "footer.levyStreet"
-  ],
-  "sv_SE": [
-    "footer.levyStreet"
-  ],
-  "vi_VN": [
-    "footer.levyStreet"
-  ],
-  "da_DK": [
-    "footer.levyStreet"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };
