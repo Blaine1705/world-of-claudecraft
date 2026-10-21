@@ -1389,6 +1389,13 @@ function updateConduitStates(
   }
 }
 
+function ignivarAnyConduitActive(conduits: ReadonlyMap<IgnivarConduitId, Entity>): boolean {
+  for (const conduit of conduits.values()) {
+    if (conduit.templateId === IGNIVAR_WATER_CONDUIT_TEMPLATES.active) return true;
+  }
+  return false;
+}
+
 function startFrontal(boss: Entity, target: Entity, st: IgnivarEncounterState): void {
   st.frontalFacing = Math.atan2(target.pos.x - boss.pos.x, target.pos.z - boss.pos.z);
   st.frontalCastRemaining = IGNIVAR_FRONTAL_CAST_SECONDS;
@@ -1777,7 +1784,10 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
       startRotatingRays(ctx, boss, target, st);
       return;
     }
-    if (st.forgeWaveTimer <= CAST_COMPLETE_EPS) {
+    // Hold a due wave until every active Water Conduit closes, so its
+    // knockback never throws branded players out of a cleanse window. Reads
+    // the live conduits, not conduitTimers, so a stale timer cannot stall it.
+    if (st.forgeWaveTimer <= CAST_COMPLETE_EPS && !ignivarAnyConduitActive(conduits)) {
       startForgeWave(ctx, boss, st);
       return;
     }
