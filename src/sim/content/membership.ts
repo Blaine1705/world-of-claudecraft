@@ -23,10 +23,10 @@ export const MEMBERSHIP_ARMOUR_NAMES = [
   'Membership Boots',
 ] as const;
 
-// Primary stats follow the sim's attack power derivation (recalcPlayerStats in
-// entity.ts): shaman and druid melee power comes from Strength alone, so
-// Enhancement and Feral lead with Strength, never Agility. Tank stamina spends
-// the ordinary stat line, and caster stamina follows the shared baseline.
+// Damage specs take the profile of their primary stat (SPEC_PRIMARY_STAT, via
+// membership_profile.ts); the role table below overrides tanks and healers. Tank
+// stamina spends the ordinary stat line, and caster stamina follows the shared
+// baseline.
 export const MEMBERSHIP_PROFILES: Readonly<Record<string, Partial<CoreStats>>> = {
   strength: { str: 17, sta: 8 },
   agility: { agi: 17, sta: 8 },
@@ -51,7 +51,6 @@ export const MEMBERSHIP_SPEC_PROFILE: Readonly<Record<string, string>> = {
   paladin_holy: 'healer',
   priest_discipline: 'healer',
   priest_holy: 'healer',
-  shaman_enhancement: 'strength',
   shaman_restoration: 'healer',
   mage_arcane: 'healer',
   druid_feral: 'tank',
