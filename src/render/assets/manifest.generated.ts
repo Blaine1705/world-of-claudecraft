@@ -1717,6 +1717,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/mirefen_tavern.glb": "/media/models/props/mirefen_tavern.6843861a5f5d.glb",
   "models/props/mirefen_tavern.half.glb": "/media/models/props/mirefen_tavern.half.acd0b689e4c6.glb",
   "models/props/mirefen_tavern.quarter.glb": "/media/models/props/mirefen_tavern.quarter.3eb727b349b6.glb",
+  "models/props/mudfin_hut_a.glb": "/media/models/props/mudfin_hut_a.8204b87bdf1c.glb",
+  "models/props/mudfin_hut_b.glb": "/media/models/props/mudfin_hut_b.84ae6f74ce9d.glb",
   "models/props/mushroom_giant_purple.glb": "/media/models/props/mushroom_giant_purple.3a4b881f27cc.glb",
   "models/props/mushroom_glow_cluster.glb": "/media/models/props/mushroom_glow_cluster.2e1fb6831e3b.glb",
   "models/props/mushroom_red.glb": "/media/models/props/mushroom_red.19e8e69c9304.glb",

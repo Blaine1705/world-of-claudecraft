@@ -3140,6 +3140,7 @@ export class Renderer {
     const offsetVfxAnchor = createOffsetVfxAnchor(fillVfxPose);
     bd('scene-misc');
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor, this.groundSample, gate);
+    this.vfx.hutFires.setLight(this.lightPulses);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
     this.farmPatchVisuals = new FarmPatchVisuals(
@@ -7721,15 +7722,9 @@ export class Renderer {
         this.fishingBobbers.bite(ev.pid);
         break;
       }
-      case 'worldObjectBurning': {
-        // A torched murloc hut (q_deepfen_purge) bursts into flame. First-pass
-        // fire cue: a strong low burst plus a taller follow-up so it reads as
-        // catching, not a single puff. The lingering blaze is iterated in playtest.
-        const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
-        this.vfx.burst(new THREE.Vector3(ev.x, gy + 0.6, ev.z), 'fire', 48, 2.2);
-        this.vfx.burst(new THREE.Vector3(ev.x, gy + 1.4, ev.z), 'fire', 30, 1.6);
+      case 'worldObjectBurning': // a torched mudfin hut burns (hut_fire_fx.ts)
+        this.vfx.hutFires.handleEvent(ev);
         break;
-      }
       case 'yumiTeleport': {
         // Arcane burst at both ends of the cat's blink (the event is personal
         // per participant; ignore copies addressed to other local pids so an
