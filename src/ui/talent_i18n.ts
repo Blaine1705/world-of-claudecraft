@@ -13,6 +13,7 @@ import {
   type TalentRowOption,
 } from '../sim/content/talents';
 import { ABILITIES, CLASSES } from '../sim/data';
+import { offensiveSpecTuningFor, primaryHealingMultiplier } from '../sim/spec_output_tuning';
 import type { AbilityEffect, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
@@ -11252,15 +11253,37 @@ function effectDescription(
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
 }
 
-// The spec's always-on baseline (spec_baselines.ts), generated from the data in
-// every locale so the card can never drift from the live numbers. Null when the
-// spec has no baseline (paladin, warrior, mage) or nothing in it is describable.
+// Everything a spec gets just for being picked, generated from the data in every
+// locale so the card can never drift from the live numbers: the always-on
+// baseline (spec_baselines.ts) plus the spec_output_tuning.ts multipliers, which
+// never reach the character sheet. Null when the spec has neither.
 export function specBaselineDescription(spec: SpecDef): string | null {
   const lang = getLanguage();
-  const effect = specBaselineFor(spec.class, spec.id);
-  if (!effect) return null;
-  const described = effectDescription(effect, 1, lang);
-  return described === localeText[lang].noEffect ? null : described;
+  const text = localeText[lang];
+  const baseline = specBaselineFor(spec.class, spec.id);
+  const tuning = offensiveSpecTuningFor(spec.class, spec.id);
+  const primaryHealing = primaryHealingMultiplier(spec.class, spec.id);
+  if (!baseline && !tuning && primaryHealing === 1) return null;
+
+  const global: GlobalModEffect = { ...baseline?.global };
+  const extra: string[] = [];
+  const physical = tuning?.physical ?? 0;
+  const spell = tuning?.spell ?? 0;
+  if (physical > 0 && physical === spell && !global.meleeDmgPct && !global.spellDmgPct) {
+    // Doctrine's flat bonus covers both buckets (and its wand), so it reads as plain damage.
+    extra.push(text.increase(text.statLabels.damage, formatPercent(physical, lang), ''));
+  } else {
+    // talent_hit_mult adds the offense bonus to the legacy bucket, so one total per bucket
+    // is the damage the player actually deals.
+    if (physical) global.meleeDmgPct = (global.meleeDmgPct ?? 0) + physical;
+    if (spell) global.spellDmgPct = (global.spellDmgPct ?? 0) + spell;
+  }
+  // The primary-healing factor multiplies after healPct.
+  if (primaryHealing !== 1) global.healPct = (1 + (global.healPct ?? 0)) * primaryHealing - 1;
+
+  const described = effectDescription({ ...baseline, global }, 1, lang);
+  const parts = described === text.noEffect ? extra : [described, ...extra];
+  return parts.length > 0 ? parts.join(' ') : null;
 }
 
 function className(id: PlayerClass): string {

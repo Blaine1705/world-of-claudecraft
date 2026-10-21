@@ -118,6 +118,15 @@ export function offensiveAbilityBonus(
   return bonus ?? 0;
 }
 
+/** The raw offense-only row for one spec, for display (the spec card's
+ *  Specialization bonus line). Undefined for every untuned spec. */
+export function offensiveSpecTuningFor(
+  cls: PlayerClass,
+  spec: string,
+): Readonly<OffensiveSpecTuning> | undefined {
+  return OFFENSIVE_SPEC_TUNING[cls]?.[spec];
+}
+
 /** The explicit destruction-only Pyre Aura pet bonus (combat/destruction.ts).
  *  Zero for every class/spec other than committed destruction. */
 export function petOffenseMultiplier(cls: PlayerClass, spec: string | null): number {

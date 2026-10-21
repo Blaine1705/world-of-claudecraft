@@ -258,8 +258,8 @@ export class TalentsWindow {
           `</div>`;
       }
       html += `<div class="ts-det-mastery"><b>${esc(masteryName)}</b> - ${esc(masteryDescription)}</div>`;
-      // The hidden per-spec stat floor (AP, crit, ability tuning): without this
-      // line two specs on the same gear show different sheets for no visible reason.
+      // The hidden per-spec power (stat floor plus output multipliers): without this
+      // line two specs on the same gear differ for no visible reason.
       const baseline = specBaselineDescription(spec);
       if (baseline) {
         html += `<div class="ts-det-mastery ts-det-baseline"><b>${esc(t('hudChrome.specPanel.specBonus'))}</b> - ${esc(baseline)}</div>`;
