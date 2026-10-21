@@ -325,8 +325,8 @@ class Smith:
             # The bronze band: one short sleeve hugging the plait over its
             # end (more than one, and the plait reads as a string of beads).
             q = a + (b - a) * 0.84
-            r = w0 * S * 0.7
-            f.put('bronze', RoundCone(q - hang * 0.016 * S, q + hang * 0.016 * S, r, r * 0.96), 0.003 * S)
+            r = w0 * S * 0.55
+            f.put('bronze', RoundCone(q - hang * 0.01 * S, q + hang * 0.01 * S, r, r * 0.96), 0.003 * S)
             # The tassel: the strands loosed under the last band into a
             # combed brush, its locks fanning a little, cut blunt.
             w = w0 * 0.62 * S
