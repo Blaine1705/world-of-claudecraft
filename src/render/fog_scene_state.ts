@@ -17,8 +17,10 @@ import type { FogSceneState } from './interior_light_rig';
 import {
   SMITH_HEART_CORE_FOG,
   SMITH_HEART_HAMMER_FOG,
+  SMITH_HEART_RING_FOG,
   smithHeartCameraInHammer,
   smithHeartCameraInHeart,
+  smithHeartCameraInRing,
 } from './smith_heart/heart_environment';
 import { BASIN_FOG_COLOR } from './wildheart_basin/basin_plan_core';
 
@@ -80,10 +82,16 @@ export function resolveFogScene(
   // Its Hammer vein has its own warm quarry dusk (phase 2B).
   const inSmithHeartHammer =
     interior === 'smith_heart' && !inSmithHeartCore && smithHeartCameraInHammer(cam.x, cam.z);
+  // And the Ring round the seal its own (phase 2F).
+  const inSmithHeartRing =
+    interior === 'smith_heart' &&
+    !inSmithHeartCore &&
+    !inSmithHeartHammer &&
+    smithHeartCameraInRing(cam.x, cam.z);
   // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
   const inSunkenBastion =
     interior === 'sunken_bastion' ||
-    (interior === 'smith_heart' && !inSmithHeartCore && !inSmithHeartHammer);
+    (interior === 'smith_heart' && !inSmithHeartCore && !inSmithHeartHammer && !inSmithHeartRing);
   // The Drowned Temple: open-air at night over its lagoon, under its own sky.
   const inDrownedTemple = interior === 'drowned_temple';
   // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.
@@ -110,21 +118,23 @@ export function resolveFogScene(
                     ? 'smithHeartCore'
                     : inSmithHeartHammer
                       ? 'smithHeartHammer'
-                      : inSunkenBastion
-                        ? 'sunkenBastion'
-                        : inDrownedTemple
-                          ? 'drownedTemple'
-                          : inGravewyrmSanctum
-                            ? 'gravewyrmSanctum'
-                            : inLastKeep
-                              ? 'lastkeep'
-                              : inDawnhold
-                                ? 'dawnhold'
-                                : inside
-                                  ? 'dungeon'
-                                  : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                                    ? 'underwater'
-                                    : 'outdoor';
+                      : inSmithHeartRing
+                        ? 'smithHeartRing'
+                        : inSunkenBastion
+                          ? 'sunkenBastion'
+                          : inDrownedTemple
+                            ? 'drownedTemple'
+                            : inGravewyrmSanctum
+                              ? 'gravewyrmSanctum'
+                              : inLastKeep
+                                ? 'lastkeep'
+                                : inDawnhold
+                                  ? 'dawnhold'
+                                  : inside
+                                    ? 'dungeon'
+                                    : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                      ? 'underwater'
+                                      : 'outdoor';
   return { interior, desired };
 }
 
@@ -187,6 +197,12 @@ export function applyFogScenePreset(
     fog.color.setHex(SMITH_HEART_HAMMER_FOG.color);
     fog.near = SMITH_HEART_HAMMER_FOG.near;
     fog.far = SMITH_HEART_HAMMER_FOG.far;
+  } else if (desired === 'smithHeartRing') {
+    // The Ring: a cool neutral air, thin across the hub so the seal and the
+    // vein mouths read crisp.
+    fog.color.setHex(SMITH_HEART_RING_FOG.color);
+    fog.near = SMITH_HEART_RING_FOG.near;
+    fog.far = SMITH_HEART_RING_FOG.far;
   } else if (desired === 'sunkenBastion') {
     // Storm-tide sea fog: grey-green and heavy low over the water, pushed back
     // far enough that the whole headland climbs out of it from the landing and

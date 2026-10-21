@@ -26,6 +26,7 @@ describe('isOpenAirFogState', () => {
       'gravewyrmSanctum',
       'smithHeartCore',
       'smithHeartHammer',
+      'smithHeartRing',
     ];
     for (const state of openAir) expect(isOpenAirFogState(state), state).toBe(true);
     for (const state of covered) expect(isOpenAirFogState(state), state).toBe(false);

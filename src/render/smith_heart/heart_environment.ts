@@ -5,6 +5,9 @@
 //     sun raking in from the west down the fissure so the colossi's faces
 //     catch it across the pit, a warm sky and a warmer bounce off the cut
 //     stone, quarry dust thickening the distance (phase 2B);
+//   - the Ring (round the seal) has its own, `smithHeartRing` (phase 2F): the
+//     same low warm sun over a neutral grey sky fill, so its shade is a cool
+//     grey and never the storm's saturated blue;
 //   - the rest of the main map keeps the storm-dusk grade it shares with the
 //     Sunken Bastion (`sunkenBastion`) until the per-room phases give each
 //     vein its own;
@@ -18,7 +21,7 @@
 //
 // Three-free, DOM-free, deterministic.
 
-import { inSmithHeartRoom, smithHeartAreaAt } from '../../sim/content/smith_heart_layout';
+import { inSmithHeartRoom, RING, smithHeartAreaAt } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 
 /** The fog state of the Heart. */
@@ -43,6 +46,51 @@ export function smithHeartCameraInHammer(x: number, z: number): boolean {
   return smithHeartAreaAt(x - o.x, z - o.z) === 'hammer';
 }
 
+/** The fog state of the Ring (phase 2F). */
+export const SMITH_HEART_RING_FOG_STATE = 'smithHeartRing';
+
+/** How far from the seal the Ring's air and light reach: past the Ring's
+ *  rim, so the play camera standing back from a player at the rim (or at a
+ *  vein's mouth) still sees the Ring in its own light. */
+export const SMITH_HEART_RING_LIGHT_R = RING.outerR + 26;
+
+/** Is the camera at world (x, z) over the Ring (round the seal) of its
+ *  Smith's Heart slot? (The Hammer vein's own state wins on the Balcony.) */
+export function smithHeartCameraInRing(x: number, z: number): boolean {
+  const def = DUNGEONS.smith_heart;
+  if (!def) return false;
+  const o = instanceOrigin(def.index, instanceSlotForZ(z));
+  return Math.hypot(x - o.x - RING.x, z - o.z - RING.z) <= SMITH_HEART_RING_LIGHT_R;
+}
+
+/** The Ring's air (phase 2F): a cool neutral grey, thin across the Ring so
+ *  the seal and every vein mouth read crisp, the mountain's far crest
+ *  softening into it. Never the borrowed storm's blue (2E's shaded rock read
+ *  a saturated navy there). */
+export const SMITH_HEART_RING_FOG = { color: 0x686a72, near: 120, far: 700 } as const;
+
+/** The Ring's light rig (phase 2F): the same low warm sun as the Hammer's
+ *  quarry (one sky over the mountain), a little higher so it reaches down
+ *  onto the Ring's paving and the seal, over a desaturated grey-violet sky
+ *  fill and a warm grey bounce: every face turned from the sun falls to a
+ *  cool grey, never a saturated blue nor black (the painted world's L1, L6),
+ *  the stones' warm tops, the crystal and the rivers read against it. The
+ *  sky's reflection is a trace (`env`): the storm sky's blue was what turned
+ *  2E's shaded rock navy. */
+export const SMITH_HEART_RING_LIGHT = {
+  sun: 2.55,
+  hemi: 2.45,
+  // The storm sky's reflections stay a trace: at the Hammer's 0.15 they
+  // washed every shaded face of the rock a saturated navy.
+  env: 0.03,
+  rim: 1.45,
+  sunColor: 0xffdab0,
+  hemiSky: 0x9c9ca6,
+  hemiGround: 0x645c56,
+  rimColor: 0xffb072,
+  keyDirection: [-0.42, 0.72, -0.55] as const,
+} as const;
+
 /** The Hammer's air: a grey quarry dust, thin near (the pit reads crisp
  *  across) and thickening past the terraces into the fissure's far rock. It
  *  is neutral on purpose (phase 2C): a warm haze washed the whole vein to one
@@ -60,8 +108,10 @@ export const SMITH_HEART_HAMMER_FOG = { color: 0x6c6c70, near: 90, far: 600 } as
  *  every form (the descent's foreground, the Gallery's walls). */
 export const SMITH_HEART_HAMMER_LIGHT = {
   sun: 2.7,
-  hemi: 2.0,
-  env: 0.15,
+  hemi: 2.2,
+  // Phase 2F: a trace of the sky's reflection (at 0.15 the storm sky's blue
+  // turned the vein's shaded rock and the Ring seen from the Balcony navy).
+  env: 0.03,
   rim: 1.6,
   sunColor: 0xffd3a0,
   hemiSky: 0x9a96aa,
