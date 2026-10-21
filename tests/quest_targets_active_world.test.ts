@@ -1,0 +1,163 @@
+// The quest-objective areas (src/sim/quest_targets.ts questObjectiveAreas)
+// follow the LOADED world, not the built-in tables: a Studio map that moves a
+// mob camp or a ground-object cluster must move the world map's quest blob,
+// the quest log's "Show on Map" route and the map sidebar with it. Driven
+// with synthetic variants of the built-in world (never a particular map
+// file), so the pin holds on any branch.
+
+import { afterEach, describe, expect, it } from 'vitest';
+import {
+  BUILTIN_WORLD,
+  CAMPS,
+  GROUND_OBJECTS,
+  MOBS,
+  QUESTS,
+  setActiveWorldContent,
+} from '../src/sim/data';
+import { questObjectiveAreas } from '../src/sim/quest_targets';
+import type { QuestDef, QuestProgress, WorldContent } from '../src/sim/types';
+
+function activeLog(quest: QuestDef): Map<string, QuestProgress> {
+  return new Map([
+    [
+      quest.id,
+      { questId: quest.id, counts: quest.objectives.map(() => 0), state: 'active' as const },
+    ],
+  ]);
+}
+
+// Far enough that no moved blob can coincide with any built-in one.
+const SHIFT = { x: 37.5, z: -41.25 };
+
+function withCampsShifted(mobId: string): WorldContent {
+  return {
+    ...BUILTIN_WORLD,
+    camps: CAMPS.map((camp) =>
+      camp.mobId === mobId
+        ? { ...camp, center: { x: camp.center.x + SHIFT.x, z: camp.center.z + SHIFT.z } }
+        : camp,
+    ),
+  };
+}
+
+function centersFor(quest: QuestDef, objectiveIndex: number): string[] {
+  return questObjectiveAreas(activeLog(quest))
+    .filter((area) =>
+      area.objectives.some((o) => o.questId === quest.id && o.objectiveIndex === objectiveIndex),
+    )
+    .map((area) => `${area.center.x},${area.center.z}`)
+    .sort();
+}
+
+function campCenters(world: WorldContent, mobId: string): string[] {
+  return world.camps
+    .filter((camp) => camp.mobId === mobId)
+    .map((camp) => `${camp.center.x},${camp.center.z}`)
+    .sort();
+}
+
+function requireKillQuest(): { quest: QuestDef; mobId: string; objIndex: number } {
+  for (const quest of Object.values(QUESTS)) {
+    for (const [objIndex, o] of quest.objectives.entries()) {
+      if (o.type === 'kill' && CAMPS.some((camp) => camp.mobId === o.targetMobId))
+        return { quest, mobId: o.targetMobId, objIndex };
+    }
+  }
+  throw new Error('expected a kill quest whose target mob has camps');
+}
+
+function requireLootQuest(): { quest: QuestDef; mobId: string; objIndex: number } {
+  for (const quest of Object.values(QUESTS)) {
+    for (const [objIndex, o] of quest.objectives.entries()) {
+      if (o.type !== 'collect' || !o.itemId) continue;
+      for (const [mobId, def] of Object.entries(MOBS)) {
+        if (
+          def.loot.some((l) => l.itemId === o.itemId && l.questId === quest.id) &&
+          CAMPS.some((camp) => camp.mobId === mobId)
+        )
+          return { quest, mobId, objIndex };
+      }
+    }
+  }
+  throw new Error('expected a collect quest fed by tagged loot from a camp mob');
+}
+
+afterEach(() => setActiveWorldContent(null));
+
+describe('questObjectiveAreas reads the active world', () => {
+  it('moves a kill objective blob onto the moved camps', () => {
+    const { quest, mobId, objIndex } = requireKillQuest();
+    const builtin = centersFor(quest, objIndex);
+    expect(builtin).toEqual(campCenters(BUILTIN_WORLD, mobId));
+
+    const world = withCampsShifted(mobId);
+    setActiveWorldContent(world);
+    const moved = centersFor(quest, objIndex);
+    expect(moved.length).toBeGreaterThan(0);
+    expect(moved).toEqual(campCenters(world, mobId));
+    // Nothing is left behind at a built-in spot the map moved away from.
+    for (const center of builtin) expect(moved).not.toContain(center);
+  });
+
+  it('moves a loot objective blob onto the moved camps of the dropping mob', () => {
+    const { quest, mobId, objIndex } = requireLootQuest();
+    const world = withCampsShifted(mobId);
+    setActiveWorldContent(world);
+    const centers = centersFor(quest, objIndex);
+    for (const center of campCenters(world, mobId)) expect(centers).toContain(center);
+    for (const center of campCenters(BUILTIN_WORLD, mobId)) expect(centers).not.toContain(center);
+  });
+
+  it('drops the blob when the map has no camp of the target mob', () => {
+    const { quest, mobId, objIndex } = requireKillQuest();
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      camps: CAMPS.filter((camp) => camp.mobId !== mobId),
+    });
+    expect(centersFor(quest, objIndex)).toEqual([]);
+  });
+
+  it('moves a ground-object cluster blob with the map', () => {
+    let found: { quest: QuestDef; itemId: string; objIndex: number } | null = null;
+    for (const quest of Object.values(QUESTS)) {
+      for (const [objIndex, o] of quest.objectives.entries()) {
+        const itemId =
+          o.type === 'collect'
+            ? o.itemId
+            : o.type === 'interact'
+              ? o.targetObjectItemId
+              : undefined;
+        if (itemId && GROUND_OBJECTS.some((g) => g.itemId === itemId && g.positions.length > 0)) {
+          found = { quest, itemId, objIndex };
+          break;
+        }
+      }
+      if (found) break;
+    }
+    expect(found, 'expected a quest fed by ground objects').not.toBeNull();
+    if (!found) return;
+    const { quest, itemId, objIndex } = found;
+    const builtin = centersFor(quest, objIndex);
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      groundObjects: GROUND_OBJECTS.map((def) =>
+        def.itemId === itemId
+          ? {
+              ...def,
+              positions: def.positions.map((p) => ({ x: p.x + SHIFT.x, z: p.z + SHIFT.z })),
+            }
+          : def,
+      ),
+    });
+    const moved = centersFor(quest, objIndex);
+    expect(moved.length).toBeGreaterThan(0);
+    for (const center of builtin) expect(moved).not.toContain(center);
+  });
+
+  it('keeps the built-in world on the shipped tables', () => {
+    // The default world wraps the very tables the old reader used, so the
+    // shipped game draws exactly what it always drew.
+    expect(BUILTIN_WORLD.camps).toBe(CAMPS);
+    expect(BUILTIN_WORLD.groundObjects).toBe(GROUND_OBJECTS);
+  });
+});
