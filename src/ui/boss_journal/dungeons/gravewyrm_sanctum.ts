@@ -7,12 +7,14 @@
 // states are the encounter modules' headers and code (korgath.ts, velkhar.ts,
 // korzul.ts, sledge_tusker.ts).
 
+import { MOBS } from '../../../sim/data';
 import {
   GOADSMITH_RERIVET,
   KORGATH_BELLOW,
   KORGATH_CHAIN_FLAIL,
   KORGATH_ID,
   KORGATH_MAUL_ARC,
+  KORGATH_REACH,
   KORGATH_STOMP,
   KORGATH_STRAIN,
   KORGATH_THRESHOLD_CHARGE,
@@ -55,6 +57,11 @@ const T = TUSKER_TUNING;
 const KG = KORGATH_TUNING;
 const VK = VELKHAR_TUNING;
 const KZ = KORZUL_TUNING;
+
+/** The Tusker's body radius: its Trample lane runs `trampleLength` past it
+ *  (sledge_tusker.ts hits length + body from its centre; the floor lane
+ *  draws the same). */
+const TUSKER_BODY = MOBS[SLEDGE_TUSKER_ID]?.bodyRadius ?? 0;
 
 const KORGATH_ENRAGE = templateEnrage(KORGATH_ID);
 const KORZUL_ENRAGE = templateEnrage(KORZUL_ID);
@@ -100,7 +107,7 @@ const SLEDGE_TUSKER: JournalBossDef = {
           values: {
             every: T.trampleEvery,
             cast: T.trampleCast,
-            length: T.trampleLength,
+            length: T.trampleLength + TUSKER_BODY,
             stun: T.knockdown,
           },
           difficultyValues: tierDamage(D, SLEDGE_TUSKER_ID, T.trampleMin, T.trampleMax),
@@ -291,7 +298,9 @@ const KORGATH: JournalBossDef = {
           responseKey: k('korgath.flailResponse'),
           roles: ['healer', 'damage'],
           flags: ['deadly'],
-          values: { every: KG.flailEvery, cast: KG.flailCast, length: KG.flailLength },
+          // The lane's true reach from his centre (length plus his body), as
+          // the sim hits it and the floor telegraph draws it.
+          values: { every: KG.flailEvery, cast: KG.flailCast, length: KORGATH_REACH.flail },
           difficultyValues: tierDamage(D, KORGATH_ID, KG.flailMin, KG.flailMax),
           compare: true,
         },
@@ -307,7 +316,7 @@ const KORGATH: JournalBossDef = {
           values: {
             every: KG.chargeEvery,
             cast: KG.chargeCast,
-            length: KG.chargeLength,
+            length: KORGATH_REACH.charge,
             leash: KG.leashRadius,
           },
           difficultyValues: tierDamage(D, KORGATH_ID, KG.chargeMin, KG.chargeMax),

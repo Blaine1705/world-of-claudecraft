@@ -7,13 +7,19 @@
 import { describe, expect, it } from 'vitest';
 import { decodeDungeonRun } from '../src/net/dungeon_run_wire';
 import { mobVisualKey, VISUALS } from '../src/render/characters/manifest';
+import { SANCTUM_CAST_SPECS } from '../src/render/gravewyrm_sanctum_bosses/boss_fx_core';
+import { sanctumTelegraphSpecs } from '../src/render/gravewyrm_sanctum_fx/sanctum_fx_core';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { finderActivity } from '../src/sim/content/dungeon_finder';
 import { MOBS } from '../src/sim/data';
 import { hydraRegrowShare, YSOLEI_MOON_TUNING } from '../src/sim/encounters/drowned_temple/ids';
 import {
+  KORGATH_BODY,
+  KORGATH_CHAIN_FLAIL,
+  KORGATH_THRESHOLD_CHARGE,
   KORGATH_TUNING,
   KORZUL_TUNING,
+  TUSKER_TRAMPLE,
   TUSKER_TUNING,
 } from '../src/sim/encounters/gravewyrm_sanctum/ids';
 import { embraceBreakShare, LADY_TUNING } from '../src/sim/encounters/hollow_crypt/lady_ids';
@@ -310,6 +316,20 @@ describe('Gravewyrm Sanctum facts', () => {
     expect(heroic.compare?.heroic.min).toBe(heroic.values?.min);
   });
 
+  it('prints every lane at the reach the sim hits and the floor telegraph draws', () => {
+    // The lanes reach from the caster's centre: the tuning length plus the
+    // body, never the tuning length alone (a player standing at the printed
+    // distance would still be hit).
+    const flail = mechanic('korgath_the_bound', 'chain-flail', 'normal').values?.length;
+    const charge = mechanic('korgath_the_bound', 'threshold-charge', 'normal').values?.length;
+    const trample = mechanic('sledge_tusker', 'trample', 'normal').values?.length;
+    expect(flail).toBe(SANCTUM_CAST_SPECS[KORGATH_CHAIN_FLAIL].range);
+    expect(charge).toBe(SANCTUM_CAST_SPECS[KORGATH_THRESHOLD_CHARGE].range);
+    expect(trample).toBe(sanctumTelegraphSpecs()[TUSKER_TRAMPLE].range);
+    expect(flail).toBe(KORGATH_TUNING.flailLength + KORGATH_BODY);
+    expect(trample).toBeGreaterThan(TUSKER_TUNING.trampleLength);
+  });
+
   it('pins the Tusker thresholds and the Korzul flights to the sim', () => {
     const tusker = dungeonJournalBossView(boss('sledge_tusker'), 'normal');
     expect(tusker.phases.find((p) => p.id === 'spill')?.values?.health).toBe(
@@ -371,6 +391,15 @@ describe('Wildheart Basin facts', () => {
     expect(mechanic('wildheart_high_priest', 'spirit-of-the-hunt', 'normal').values?.maul).toBe(
       ZULGAR_TUNING.maulDamage,
     );
+  });
+
+  it('says hunt stuns last half as long only while the sim halves them', () => {
+    const glyphs = mechanic('wildheart_high_priest', 'sun-glyphs', 'normal');
+    expect(rendered(glyphs.summaryKey, glyphs.values, glyphs.percentValues)).toContain(
+      'stuns last half as long',
+    );
+    // glyphSummary states the share in words, so the tuning is pinned here.
+    expect(ZULGAR_TUNING.huntStunScale).toBe(0.5);
   });
 });
 

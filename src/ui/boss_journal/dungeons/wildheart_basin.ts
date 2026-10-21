@@ -8,7 +8,7 @@
 // control_gate.ts, gorgebloom.ts, zulgar.ts).
 
 import { WILDHEART_MOBS } from '../../../sim/content/wildheart';
-import { GORGEBLOOM_LOAM_BEDS, SUN_GLYPHS } from '../../../sim/content/wildheart_basin_layout';
+import { SUN_GLYPHS } from '../../../sim/content/wildheart_basin_layout';
 import {
   BEAST_HEEL,
   BEAST_PIT_QUAKE,
@@ -339,7 +339,6 @@ const GORGEBLOOM: JournalBossDef = {
             every: G.seedEvery,
             cast: G.seedCast,
             count: G.seedCount,
-            beds: GORGEBLOOM_LOAM_BEDS.length,
             sprout: G.podSprout,
             burrow: G.heroicBurrow,
           },
@@ -527,7 +526,6 @@ const ZULGAR: JournalBossDef = {
             slow: Z.sunstruckSlow,
             seconds: Z.sunstruckSeconds,
             dark: Z.glyphDarkSeconds,
-            stunShare: Z.huntStunScale,
           },
           percentValues: ['slow'],
         },
