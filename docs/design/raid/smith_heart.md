@@ -133,6 +133,7 @@ rather than repeating numbers that would rot.
 | The Smith's Quarry (Hammer arena) | a carved ellipse about 92 by 80 yd, deep under four stepped terraces on its east and south sides (unreachable ledges, each several bodies tall), the colossi carved out of the terraces, kneeling on the first step (`QUARRY_COLOSSUS_OUT`) so the play camera on the pit floor frames them | `HAMMER_PIT`, `QUARRY_TERRACES` |
 | The Slab, the Balcony | stair from the Quarry up to the Balcony | `SLAB`, `BALCONY` |
 | The Grand Stair | one broad stair (16 yd) from the Balcony's tip down across the chasm to the dais | `GRAND_STAIR` |
+| The North Stair | the dais's second way in (phase 2C): a broad stair (16 yd) from the Ring's inner edge at its north (the Breath's mouth) straight down across the chasm to the dais, a gentle fall from the Ring to the dais | `NORTH_STAIR` |
 | The Ring | flat annulus sector round the seal, two curved stairs to the Balcony | `RING`, `RING_ARC` |
 | The Seal Dais | a round island a little below the Ring, floating over the chasm; the seal at its centre, the portal over the seal | `SEAL_DAIS`, `HEART_SEAL`, `RING_PORTAL` |
 | The Breath | b1, the chimney, b2, the Wind Bridge, b3, the climb | `BREATH`, `WIND_BRIDGE` |
@@ -188,7 +189,8 @@ than the veins' rock, and no line of sight crosses from any main-map eye into th
 4. Each guardian's death lights its vein's **light river**; the river runs to the seal
    and its quarter fills. With all four lit and the Ring clear, the seal **opens into
    the portal**.
-5. Down the Grand Stair to the dais, into the portal: the raid lands on the Heart's
+5. Down the Grand Stair (or the North Stair, from the Ring's north) to the dais, into
+   the portal: the raid lands on the Heart's
    **Arrival Terrace**, crosses the **Heart Bridge** to the **Anvil of the World** and
    the final boss. The exit portal opens there when it dies.
 
@@ -219,7 +221,10 @@ no walked step exceeds `MAX_STEP_HEIGHT` or `cliffStep` on either area.
   mouths. The rivers already lit cross the chasm to the seal.
 - **The seal from the Ring.** The dais floats in an open chasm a little below the Ring:
   nothing stands between any Ring point and the seal or the portal's eye; the tines
-  stand on the diagonals, between the rivers and clear of every ray (pinned).
+  stand on the diagonals, between the rivers and clear of every ray (pinned). The two
+  stairs that cross the chasm (the Grand Stair from the Balcony, the North Stair from
+  the Ring's north) fall gently enough to stay under every Ring eye's line to the seal
+  (pinned in `tests/smith_heart_walls.test.ts`).
 - **The portal opening.** Seen from anywhere on the Ring and from the Balcony: the
   tines charge, a pillar of light stands up, a four-colour shockwave races across the
   chasm to the Ring, and the vortex and its funnel grow out of the parted seal.
@@ -242,6 +247,7 @@ any other entry is refused with `SMITH_HEART_CLOSED_TEXT`.
 
 | Pages | Code | Why |
 |---|---|---|
+| One stair from the Balcony to the dais | The Grand Stair plus the North Stair from the Ring's north (owner, phase 2C) | A raid finishing in the north (the Breath, the vein mouth furthest from the Balcony) reaches the portal without walking round the Ring. |
 | Balcony +25, Pit +20 | Balcony +20, Quarry floor +14 | The curved Balcony Stairs exceed the slope limit from +25; the Quarry drops with it. |
 | One wide stair from the balcony to the Ring | Two curved stairs along the Ring's circle | ONE floor height per point: the Ring cannot pass under the Balcony. |
 | Ring 14 yd wide | 16 yd | Room for packs of three plus a raid passing; see open questions. |
@@ -595,7 +601,9 @@ on both difficulties (dungeon rework README, goal 4).
   (`isBlocked`): the main-map walk with every gate open (to the portal), the Heart's
   walk from its arrival (to the boss, the altars and the exit), the two areas never
   joined by floor, the Heart Bridge sealed, a fresh claim held in the Gallery, the Pit
-  Mouth versus the Slab, free order of the three veins, no step over
+  Mouth versus the Slab, free order of the three veins, the dais reached by either
+  stair alone and by nothing else, the North Stair's short walk from the Breath's
+  mouth, no step over
   `MAX_STEP_HEIGHT`, 12 yd paths and gates, every floor within interest range of a
   seal marker, the Ring pack spacing, and the guardian rooms' size.
 - `tests/smith_heart_gating.test.ts`: the seal value round trip (veins and the portal
@@ -603,7 +611,8 @@ on both difficulties (dungeon rework README, goal 4).
   the portal only with all four lit and the Ring clear (said once, staying open), the
   hop both ways (and never for a corpse), the Heart Bridge's seal.
 - `tests/smith_heart_walls.test.ts`: the drawn terrain against the walked floor on both
-  areas, the Grand Stair alone across the chasm.
+  areas, the Grand Stair and the North Stair alone across the chasm, both under every
+  Ring eye's line to the seal.
 - `tests/smith_heart_render_core.test.ts`: the mountain (clear of every floor, open air
   kept, tall crowns, the Cornice low, the Heart deepest) and no main-map eye seeing
   into the Heart; the rivers; the seal memory and fill; the portal, hop and area-blend
@@ -686,6 +695,5 @@ captures and review before the next:
    open entry?
 3. Ring width: keep 16 yd, or narrow to the pages' 14 yd once packs and pulls are
    playtested?
-4. The Grand Stair is the dais's one way in: a raid finishing in the north walks
-   round the Ring and over the Balcony to reach the portal. Keep it (one processional
-   axis, the straightest corpse run), or add a second stair from the Ring?
+4. Resolved (phase 2C, owner): the dais has a second way in, the North Stair from the
+   Ring's north, so a raid finishing in the north no longer walks round the Ring.

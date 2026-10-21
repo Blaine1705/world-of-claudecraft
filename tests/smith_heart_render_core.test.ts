@@ -330,10 +330,17 @@ describe('heart_rivers_core: the floor light-rivers', () => {
       }
     });
   }
-  it('the Hammer runs down the Grand Stair; the other three leap the chasm onto the dais', () => {
-    const hammer = planHeartRiver(LIGHT_RIVERS.hammer, floorAt);
-    expect(hammer.points.every((q) => floorAt(q.x, q.z) !== null)).toBe(true);
-    for (const vein of ['breath', 'quench', 'heat'] as const) {
+  it('the Hammer and the Breath run down their stairs; the other two leap the chasm onto the dais', () => {
+    // The Hammer down the Grand Stair, the Breath down the North Stair: on
+    // the floor all the way.
+    for (const vein of ['hammer', 'breath'] as const) {
+      const strip = planHeartRiver(LIGHT_RIVERS[vein], floorAt);
+      expect(
+        strip.points.every((q) => floorAt(q.x, q.z) !== null),
+        vein,
+      ).toBe(true);
+    }
+    for (const vein of ['quench', 'heat'] as const) {
       const strip = planHeartRiver(LIGHT_RIVERS[vein], floorAt);
       let bridged = 0;
       for (const { x, y, z } of strip.points) {

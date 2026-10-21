@@ -8,7 +8,9 @@
 // - every ramp and stair runs clear end to end: no step taller than the
 //   cliff step, no generated cliff across its corridor;
 // - the Balcony looks out over open air: only the Grand Stair runs from its
-//   tip to the Seal Dais, and the seal is in plain sight of the Ring;
+//   tip to the Seal Dais; only the North Stair crosses from the Ring's north;
+//   both stairs stay under every Ring eye's line to the seal, so the seal is
+//   in plain sight of the Ring;
 // - the Heart (the separate final room) gets the same sweep from its own
 //   arrival.
 //
@@ -25,6 +27,8 @@ import {
   GRAND_STAIR,
   HEART_ARRIVAL,
   HEART_ROOM,
+  HEART_SEAL,
+  NORTH_STAIR,
   RING,
   RING_ARC,
   ringPoint,
@@ -310,13 +314,13 @@ describe("the Smith's Heart: the drawn walls and the walked floor agree", () => 
     expect(authoredFieldHeight(FIELD, 0, -SEAL_DAIS.r + 2)).toBe(SEAL_DAIS.h);
   });
 
-  it('nothing walkable stands between the Ring and the dais but the Grand Stair', () => {
-    // Off the stair, the annulus between the dais's rim and the Ring's inner
-    // edge is open air at every bearing: the seal is in sight of every point
-    // of the Ring, and the Ring looks DOWN onto it.
+  it('nothing walkable stands between the Ring and the dais but the two stairs', () => {
+    // Off the stairs, the annulus between the dais's rim and the Ring's inner
+    // edge is open air at every bearing, and the Ring looks DOWN onto the seal.
     expect(SEAL_DAIS.h).toBeLessThan(RING.h);
     for (let d = 0; d < 360; d += 5) {
       if (d >= 160 && d <= 200) continue; // the Grand Stair's band
+      if (d <= 25 || d >= 335) continue; // the North Stair's band
       for (let r = SEAL_DAIS.r + 1; r < RING.innerR - 1; r += 2) {
         const p = ringPoint(d, r);
         expect(authoredFieldHeight(FIELD, p.x, p.z), `${d} deg r ${r}`).toBe(VOID);
@@ -329,5 +333,55 @@ describe("the Smith's Heart: the drawn walls and the walked floor agree", () => 
       const p = ringPoint(d);
       expect(authoredFieldHeight(FIELD, p.x, p.z), `ring ${d}`).toBe(RING.h);
     }
+  });
+
+  it("the North Stair alone crosses from the Ring's north to the dais, a broad gentle fall", () => {
+    // Either side of it, from the Ring's inner edge to the dais's rim, only
+    // the void; along it, the floor only ever falls toward the dais.
+    for (let z = NORTH_STAIR.top - 2; z > NORTH_STAIR.foot + 1; z--) {
+      for (const x of [-NORTH_STAIR.halfWidth - 3, NORTH_STAIR.halfWidth + 3]) {
+        expect(authoredFieldHeight(FIELD, x, z), `${x}, ${z}`).toBe(VOID);
+      }
+      // As broad as the Grand Stair (a raid of ten walks it abreast).
+      for (const x of [-NORTH_STAIR.halfWidth + 0.5, 0, NORTH_STAIR.halfWidth - 0.5]) {
+        expect(authoredFieldHeight(FIELD, x, z), `${x}, ${z}`).toBeGreaterThan(VOID);
+      }
+      expect(authoredFieldHeight(FIELD, 0, z - 1)).toBeLessThanOrEqual(
+        authoredFieldHeight(FIELD, 0, z) + 1e-6,
+      );
+    }
+    expect(NORTH_STAIR.halfWidth * 2).toBeGreaterThanOrEqual(12);
+    expect(authoredFieldHeight(FIELD, 0, NORTH_STAIR.top + 1)).toBe(RING.h);
+    expect(authoredFieldHeight(FIELD, 0, NORTH_STAIR.foot - 2)).toBe(SEAL_DAIS.h);
+  });
+
+  it("both stairs stay under every Ring eye's line to the seal", () => {
+    // A walked floor is not a render solid, so the sightline pin
+    // (smith_heart_render_core) does not see it: this does. From every 2
+    // degrees of the Ring's walked arc, the line from a body's eye to the
+    // seal clears every floor it crosses over the chasm.
+    const bad: string[] = [];
+    const seal = { x: HEART_SEAL.x, y: SEAL_DAIS.h + 0.5, z: HEART_SEAL.z };
+    for (let d = RING_ARC.fromDeg; d <= RING_ARC.toDeg; d += 2) {
+      for (const r of [RING.innerR + 0.5, RING.R, RING.outerR - 0.5]) {
+        const p = ringPoint(d, r);
+        const ey = authoredFieldHeight(FIELD, p.x, p.z) + 1.7;
+        for (let t = 0.02; t < 1; t += 0.01) {
+          const x = p.x + (seal.x - p.x) * t;
+          const z = p.z + (seal.z - p.z) * t;
+          if (Math.hypot(x, z) < SEAL_DAIS.r) break;
+          if (Math.hypot(x, z) > RING.innerR - 0.5) continue;
+          const y = ey + (seal.y - ey) * t;
+          const floor = authoredFieldHeight(FIELD, x, z);
+          if (floor > y - 0.25) {
+            bad.push(
+              `ring ${d % 360} r ${r}: floor ${floor.toFixed(2)} at (${x.toFixed(1)}, ${z.toFixed(1)})`,
+            );
+            break;
+          }
+        }
+      }
+    }
+    expect(bad).toEqual([]);
   });
 });

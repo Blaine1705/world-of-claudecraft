@@ -23,8 +23,9 @@
 //     west, the Heat (level, the Smith's own forge: packs f1 to f3, the Pour
 //       Channel, the great hearth and the giant anvil);
 //   -> four colours lit on the heart seal, on the Seal Dais in the middle of
-//   the Ring, reached by the Grand Stair down from the Balcony's tip -> the
-//   seal opens into a portal.
+//   the Ring, reached by the Grand Stair down from the Balcony's tip or by the
+//   North Stair down from the Ring's north (the Breath's mouth) -> the seal
+//   opens into a portal.
 //
 // The Heart (a separate area in the slot's north-east corner, walled off by
 // the mountain): the portal lands the raid on the Arrival Terrace, a short
@@ -35,8 +36,9 @@
 //
 // Engine limit: ONE floor height per point (authored_field/CLAUDE.md), so the
 // Balcony replaces the Ring's south arc and the Ring loops over it by the two
-// stairs. The void between the Ring and the dais is open air: the seal is in
-// sight from every point of the Ring. The whole field stays inside one slot of
+// stairs. The void between the Ring and the dais is open air but for the two
+// stairs down to the dais (south and north), both below every Ring eye's line
+// to the seal: the seal is in sight from every point of the Ring. The whole field stays inside one slot of
 // the instance band (|x| < 300, |z| < 250).
 //
 // Pure data: the sim (height, collision, spawns, gates, the portal hop) and
@@ -166,6 +168,13 @@ export const SLAB = { x: 0, z: -124 } as const;
 export const BALCONY = { x0: -12, z0: -114, x1: 12, z1: -58, h: H.balcony } as const;
 /** The Grand Stair: from the Balcony's tip down across the void to the dais. */
 export const GRAND_STAIR = { halfWidth: 8, top: -58, foot: -SEAL_DAIS.r } as const;
+/** The North Stair: the dais's second way in, straight down from the Ring's
+ *  inner edge at its north (the Breath's mouth, the vein mouth furthest from
+ *  the Balcony) to the dais, as broad as the Grand Stair. A raid finishing in
+ *  the north (or a spirit on its corpse run) reaches the portal without
+ *  walking round the Ring. Its fall is gentle (the Ring at 0 to the dais at
+ *  -4 over the chasm), so it stays under every Ring eye's line to the seal. */
+export const NORTH_STAIR = { halfWidth: 8, top: RING.innerR, foot: SEAL_DAIS.r } as const;
 
 // ---- the main map: the Breath (north, high) -----------------------------------------
 
@@ -625,6 +634,16 @@ const AUTHORED_SURFACES: FieldSurface[] = [
   ),
   // --- The Ring, its two stairs and the Seal Dais -------------------------------------
   ringSector(),
+  path(
+    'north_stair',
+    [
+      [0, NORTH_STAIR.top + 4, H.ring],
+      [0, NORTH_STAIR.top, H.ring],
+      [0, NORTH_STAIR.foot + 4, H.dais],
+      [0, NORTH_STAIR.foot - 4, H.dais],
+    ],
+    { stairs: true, edge: 'balustrade', halfWidth: NORTH_STAIR.halfWidth },
+  ),
   balconyStair('balcony_stair_east', 172, 142),
   balconyStair('balcony_stair_west', 188, 218),
   disc('seal_dais', SEAL_DAIS, { edge: 'balustrade', ground: 'ritual' }),
@@ -914,7 +933,7 @@ const PROPS: FieldProp[] = [
     return { kind: 'sh_ring_pillar', x: p.x, z: p.z, rot: 0, r: 1.2, h: 12 };
   }),
   // The Seal Dais: the four bronze tines of the portal's crown, on the
-  // diagonals (clear of the four rivers and the Grand Stair).
+  // diagonals (clear of the four rivers and the two stairs).
   ...[45, 135, 225, 315].map((deg) => {
     const p = ringPoint(deg, 15.5);
     return { kind: 'sh_portal_tine', x: p.x, z: p.z, rot: (deg * Math.PI) / 180, r: 1, h: 16 };

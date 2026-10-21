@@ -14,6 +14,9 @@
 // - the Slab open lets the raid onto the Ring, down the Grand Stair to the
 //   dais, and into all three remaining veins up to their arena mouths, in any
 //   order;
+// - the dais has exactly two ways in, the Grand Stair from the Balcony and
+//   the North Stair from the Ring's north, each enough on its own, and the
+//   North Stair cuts the walk from the Breath's mouth to the portal;
 // - walked floor never steps more than a body's step between neighbours
 //   without a collider between them, and every path is at least 12 yd wide.
 
@@ -28,12 +31,14 @@ import {
 import {
   BREATH,
   GALLERY_LANDINGS,
+  GRAND_STAIR,
   HAMMER_PIT,
   HEART_ALTARS,
   HEART_ARRIVAL,
   HEART_RETURN_PORTAL,
   HEART_ROOM,
   inSmithHeartRoom,
+  NORTH_STAIR,
   QUENCH,
   RING_PORTAL,
   RING_PORTAL_LANDING,
@@ -92,6 +97,51 @@ function flood(
   return seen;
 }
 
+/** One-yard steps from `start` to every reached cell (-1 where unreached),
+ *  the cells `cut` names treated as blocked (a stair taken away). */
+function walkSteps(
+  open: readonly string[],
+  start: { x: number; z: number },
+  cut: (x: number, z: number) => boolean = () => false,
+): Int32Array {
+  setOpenDungeonGates(O.x, O.z, [...open]);
+  const steps = new Int32Array(W * H).fill(-1);
+  const queue: number[] = [Math.round(start.x), Math.round(start.z)];
+  steps[cell(start.x, start.z)] = 0;
+  for (let q = 0; q < queue.length; q += 2) {
+    const x = queue[q];
+    const z = queue[q + 1];
+    const here = steps[cell(x, z)];
+    for (const [dx, dz] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
+      const nx = x + dx;
+      const nz = z + dz;
+      if (nx < minX || nx > maxX || nz < minZ || nz > maxZ) continue;
+      const i = cell(nx, nz);
+      if (steps[i] >= 0 || cut(nx, nz)) continue;
+      if (isBlocked(SEED, O.x + nx, O.z + nz, 0.5)) continue;
+      steps[i] = here + 1;
+      queue.push(nx, nz);
+    }
+  }
+  return steps;
+}
+
+/** The fewest steps to any cell within 2 yd of (x, z), or -1. */
+function stepsTo(steps: Int32Array, p: { x: number; z: number }): number {
+  let best = -1;
+  for (let dz = -2; dz <= 2; dz++)
+    for (let dx = -2; dx <= 2; dx++) {
+      const s = steps[cell(Math.round(p.x) + dx, Math.round(p.z) + dz)];
+      if (s >= 0 && (best < 0 || s < best)) best = s;
+    }
+  return best;
+}
+
 /** Is any cell within 2 yd of (x, z) reached? (A spot may hold a prop.) */
 function reaches(seen: Uint8Array, p: { x: number; z: number }): boolean {
   for (let dz = -2; dz <= 2; dz++)
@@ -112,6 +162,7 @@ const SPOTS = {
   pit: { x: HAMMER_PIT.x - 20, z: HAMMER_PIT.z },
   balconyTip: { x: 0, z: -62 },
   grandStair: { x: 0, z: -40 },
+  northStair: { x: 0, z: 40 },
   dais: RING_PORTAL_LANDING,
   portal: RING_PORTAL,
   ring: ringPoint(0),
@@ -258,6 +309,38 @@ describe("the Smith's Heart route", () => {
       expect(reaches(one, SPOTS[inside]), inside).toBe(true);
       for (const o of others) expect(reaches(one, SPOTS[o]), o).toBe(false);
     }
+  });
+
+  it('reaches the dais by either stair alone, and by nothing else', () => {
+    const slabOpen = ['hammer_pit_mouth', 'the_slab'];
+    // A stair taken away: its band across the chasm, a yard past each side.
+    const grand = (x: number, z: number) =>
+      Math.abs(x) <= GRAND_STAIR.halfWidth + 1 && z > GRAND_STAIR.top + 1 && z < GRAND_STAIR.foot;
+    const north = (x: number, z: number) =>
+      Math.abs(x) <= NORTH_STAIR.halfWidth + 1 && z < NORTH_STAIR.top - 1 && z > NORTH_STAIR.foot;
+    const ring = ringPoint(0, 70);
+    // Only the North Stair: from the Ring's north down to the portal.
+    expect(stepsTo(walkSteps(slabOpen, ring, grand), SPOTS.portal)).toBeGreaterThan(0);
+    // Only the Grand Stair: from the Balcony's tip down to the portal.
+    expect(stepsTo(walkSteps(slabOpen, SPOTS.balconyTip, north), SPOTS.portal)).toBeGreaterThan(0);
+    // Neither: the dais is an island (no other floor reaches it).
+    const both = (x: number, z: number) => grand(x, z) || north(x, z);
+    expect(stepsTo(walkSteps(slabOpen, ring, both), SPOTS.portal)).toBe(-1);
+    expect(stepsTo(walkSteps(slabOpen, SPOTS.balconyTip, both), SPOTS.portal)).toBe(-1);
+  });
+
+  it('the North Stair cuts the walk from the Breath mouth to the portal', () => {
+    const slabOpen = ['hammer_pit_mouth', 'the_slab'];
+    const mouth = ringPoint(0, 70);
+    const direct = stepsTo(walkSteps(slabOpen, mouth), SPOTS.portal);
+    // Straight down: about the Ring's radius (a hand of side steps allowed).
+    expect(direct).toBeGreaterThan(0);
+    expect(direct).toBeLessThan(80);
+    // Without it, round the Ring and over the Balcony: more than three times as far.
+    const north = (x: number, z: number) =>
+      Math.abs(x) <= NORTH_STAIR.halfWidth + 1 && z < NORTH_STAIR.top - 1 && z > NORTH_STAIR.foot;
+    const around = stepsTo(walkSteps(slabOpen, mouth, north), SPOTS.portal);
+    expect(around).toBeGreaterThan(direct * 3);
   });
 
   it('never steps more than a body can climb between reached neighbours', () => {
