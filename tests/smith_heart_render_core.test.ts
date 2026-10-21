@@ -11,6 +11,14 @@ import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { SMITH_HEART_PLACEHOLDER_LOOKS } from '../src/render/characters/smith_heart_placeholder_looks';
 import { gateObjectPlan } from '../src/render/gate_objects';
 import {
+  HAMMER_CLIFF_COOL,
+  HAMMER_CLIFF_FLOOR,
+  HAMMER_CLIFF_WARM,
+  hammerRiserShade,
+  hammerRockBed,
+  hammerRockLift,
+} from '../src/render/smith_heart/heart_cliff_paint_core';
+import {
   HEART_SEAL_BARRIER,
   heartGatePartPose,
   heartGateParts,
@@ -21,6 +29,7 @@ import {
 import {
   HEART_MOUNTAIN_CHASM,
   HEART_MOUNTAIN_FOOT,
+  heartHammerTerrace,
   heartMountainBlocks,
   heartMountainCellDrawn,
   heartMountainHeight,
@@ -93,7 +102,9 @@ import {
   BALCONY,
   BREATH,
   CLEFT,
+  GALLERY_LANDINGS,
   GREAT_HEARTH,
+  HAMMER_PIT,
   HEART_ALTARS,
   HEART_ARRIVAL,
   HEART_ROOM,
@@ -196,6 +207,61 @@ describe('heart_walls_core: the loose crags at the mountain foot', () => {
       }
       expect(maxY).toBeGreaterThan(0.85);
     }
+  });
+});
+
+describe('the Hammer vein’s rock (phase 2D)', () => {
+  it('climbs the fissure in ledges and sheer risers, never above the smooth slope', () => {
+    for (const [x, z] of [
+      [-142, -200],
+      [-90, -190],
+      [-180, -195],
+    ]) {
+      let prev = 0;
+      let flat = 0;
+      let steep = 0;
+      const n = 240;
+      for (let i = 1; i <= n; i++) {
+        const back = i * 0.25;
+        const t = heartHammerTerrace(back, x, z);
+        expect(t).toBeLessThanOrEqual(back + 1e-9);
+        expect(t).toBeGreaterThanOrEqual(prev - 1e-9);
+        const slope = (t - prev) / 0.25;
+        if (slope < 0.05) flat++;
+        if (slope > 1.8) steep++;
+        prev = t;
+      }
+      // Most of the run is ledge, and every step has its riser.
+      expect(flat / n, `${x}, ${z}`).toBeGreaterThan(0.45);
+      expect(steep, `${x}, ${z}`).toBeGreaterThan(8);
+    }
+    // Outside the vein the slope stays the shared smooth one.
+    expect(hammerRockLift(0, 70)).toBe(0);
+    expect(hammerRockLift(HAMMER_PIT.x, HAMMER_PIT.z)).toBe(1);
+    expect(hammerRockLift(GALLERY_LANDINGS.h2.x, GALLERY_LANDINGS.h2.z)).toBe(1);
+  });
+
+  it('paints the vein’s rock a true mid granite, never near-black, its beds banded', () => {
+    const lum = (c: readonly number[]) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    // The darkest a Hammer cliff face gets (the lowest noise at its deepest).
+    const darkest =
+      Math.min(lum(HAMMER_CLIFF_COOL), lum(HAMMER_CLIFF_WARM)) * HAMMER_CLIFF_FLOOR * 0.78;
+    expect(darkest).toBeGreaterThan(0.15);
+    // The beds: a band's swing reads in full sun, never a blowout.
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (let y = 0; y < 120; y += 0.5) {
+      const b = hammerRockBed(-120, y, -200);
+      lo = Math.min(lo, b);
+      hi = Math.max(hi, b);
+    }
+    expect(hi - lo).toBeGreaterThan(0.3);
+    expect(lo).toBeGreaterThan(-0.45);
+    expect(hi).toBeLessThan(0.3);
+    // Risers shade darker than ledges, by at most a third.
+    expect(hammerRiserShade(0.2)).toBe(0);
+    expect(hammerRiserShade(5)).toBeGreaterThan(0.2);
+    expect(hammerRiserShade(5)).toBeLessThanOrEqual(0.34);
   });
 });
 

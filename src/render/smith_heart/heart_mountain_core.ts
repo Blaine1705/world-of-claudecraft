@@ -20,6 +20,7 @@
 // Three-free, DOM-free, deterministic.
 
 import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
+import { hammerRockLift } from './heart_cliff_paint_core';
 import {
   HEART_ROOM_WALL_BAND,
   HEART_WALL_BAND,
@@ -59,6 +60,39 @@ export function heartMountainRise(back: number, ridge: number, jag: number, band
   return (3 + 0.035 * b * b + b * 0.75) * (0.6 + 0.8 * ridge) + jag * (2 + b * 0.3);
 }
 
+/** The Hammer vein's terrace step (yards back from the clearance) and the
+ *  share of each step its sheer riser takes. */
+export const HAMMER_TERRACE_STEP = 12;
+export const HAMMER_TERRACE_RISER = 0.34;
+
+/** Where `back` falls on the Hammer vein's stepped slope: the step's index
+ *  and how far across it (0 at its ledge's outer lip, 1 at the top of its
+ *  riser); the step's line wanders so no ledge runs ruled. */
+export function heartHammerTerraceStep(
+  back: number,
+  x: number,
+  z: number,
+): { k: number; f: number } {
+  const wander = (heartRidgeNoise(x * 2.3 - 57, z * 2.3 + 91) - 0.5) * HAMMER_TERRACE_STEP * 0.5;
+  const b = Math.max(0, back) + wander + HAMMER_TERRACE_STEP;
+  const k = Math.floor(b / HAMMER_TERRACE_STEP);
+  return { k, f: b / HAMMER_TERRACE_STEP - k };
+}
+
+/** How far back a point of the Hammer vein's stepped slope climbs as: each
+ *  step a flat ledge (the climb held at the step's foot) and then a sheer
+ *  riser up to the next. Never more than `back` (the stepped slope stands
+ *  under the smooth one). */
+export function heartHammerTerrace(back: number, x: number, z: number): number {
+  if (back <= 0) return Math.max(0, back);
+  const { k, f } = heartHammerTerraceStep(back, x, z);
+  const wander = (heartRidgeNoise(x * 2.3 - 57, z * 2.3 + 91) - 0.5) * HAMMER_TERRACE_STEP * 0.5;
+  const r = HAMMER_TERRACE_RISER;
+  const t = Math.max(0, Math.min(1, (f - (1 - r)) / r));
+  const stepped = (k + t * t * (3 - 2 * t)) * HAMMER_TERRACE_STEP - wander - HAMMER_TERRACE_STEP;
+  return Math.max(0, Math.min(back, stepped));
+}
+
 /** The mountain's height at (x, z), or HEART_MOUNTAIN_CHASM where none. */
 export function heartMountainHeight(x: number, z: number): number {
   const c = heartFloorClearance(x, z);
@@ -73,7 +107,13 @@ export function heartMountainHeight(x: number, z: number): number {
   const scale = heartWallScale(x, z, c.floor);
   const ridge = heartRidgeNoise(x, z);
   const jag = heartRidgeNoise(x * 3.7 + 913, z * 3.7 - 271);
-  const top = c.floor + heartMountainRise(Math.max(0, back), ridge, jag, scale.band) * scale.tall;
+  // The Hammer vein's fissure climbs in bedded steps (phase 2D): flat
+  // ledges and sheer risers instead of one smooth slope (blended in at the
+  // vein's edge; never higher than the slope, so no clearance is touched).
+  const lift = back > 0 ? hammerRockLift(x, z) : 0;
+  const climb =
+    lift > 0 ? back + (heartHammerTerrace(back, x, z) - back) * lift : Math.max(0, back);
+  const top = c.floor + heartMountainRise(climb, ridge, jag, scale.band) * scale.tall;
   if (back >= 0) return top;
   // The foot: inside the clearance the face falls away into the chasm, well
   // under the floor (a camera above the floor never meets it), so the rock's

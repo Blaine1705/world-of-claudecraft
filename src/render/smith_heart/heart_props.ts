@@ -11,6 +11,7 @@ import { SMITH_HEART_FIELD } from '../../sim/content/smith_heart_layout';
 import { surfaceMat } from '../gfx';
 import { markSharedGeometry } from '../shared_resource';
 import { detailedSurfaceMat } from '../worn_stone';
+import { HAMMER_ROCK_GAIN, HAMMER_ROCK_TONE, hammerRockLift } from './heart_cliff_paint_core';
 import {
   HEART_PALETTE,
   HEART_PROP_RECIPES,
@@ -153,6 +154,7 @@ export function buildHeartProps(
  *  strata cliffs: basalt shadow to lichen-grey granite. */
 const ROCK_DARK = 0x2b2927;
 const ROCK_LIGHT = 0x5a544d;
+const HAMMER_CRAG = new THREE.Color(HAMMER_ROCK_TONE);
 
 /**
  * The mountain's rock: one instanced draw per rock shape (heartRockShape:
@@ -201,6 +203,11 @@ export function buildHeartWalls(lowGfx: boolean): THREE.Group {
       const k = heartHash(Math.round(b.x * 3), Math.round(b.z * 3));
       const tall = Math.min(1, (b.top - SMITH_HEART_FIELD.voidHeight) / 160);
       color.setHex(mix(ROCK_DARK, ROCK_LIGHT, 0.2 + k * 0.45 + tall * 0.25));
+      // The Hammer vein's crags in its own cool granite, lifted out of the
+      // warm dark that read as sandy card under its low sun (phase 2D).
+      const lift = hammerRockLift(b.x, b.z);
+      if (lift > 0)
+        color.lerp(HAMMER_CRAG, lift * 0.65).multiplyScalar(1 + lift * (HAMMER_ROCK_GAIN - 1));
       mesh.setColorAt(i, color);
     });
     mesh.instanceMatrix.needsUpdate = true;

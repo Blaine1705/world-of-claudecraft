@@ -361,30 +361,44 @@ export function planHeartWalls(spacing = 5): HeartWallBlock[] {
 export function heartRockShape(variant: number): number[] {
   const v = ((variant % HEART_ROCK_VARIANTS) + HEART_ROCK_VARIANTS) % HEART_ROCK_VARIANTS;
   const sides = v === 2 ? 4 : v === 1 ? 7 : 6;
-  // Rings (height, radius scale) up the shape, then the crown.
+  // Rings (height, radius scale) up the shape, then the crown. Phase 2D:
+  // the upper body (the part that stands over the floors) steps in at a few
+  // bedding ledges, each a shelf the low sun catches, instead of one smooth
+  // taper (2C's crags read as tall flat card slabs beside the Gallery).
   const rings: [number, number][] =
     v === 0
       ? [
           [0, 1],
-          [0.48, 0.8],
-          [0.8, 0.5],
+          [0.4, 0.9],
+          [0.55, 0.82],
+          [0.556, 0.72],
+          [0.66, 0.67],
+          [0.75, 0.58],
+          [0.756, 0.48],
+          [0.8, 0.45],
         ]
       : v === 1
         ? [
             [0, 1],
-            [0.5, 0.82],
+            [0.36, 0.93],
+            [0.46, 0.88],
+            [0.466, 0.79],
+            [0.58, 0.76],
           ]
         : [
             [0, 1],
-            [0.55, 0.9],
+            [0.38, 0.95],
+            [0.5, 0.92],
+            [0.506, 0.84],
+            [0.6, 0.8],
           ];
   const ringPts: [number, number, number][][] = rings.map(([y, s], ri) => {
     const pts: [number, number, number][] = [];
     for (let k = 0; k < sides; k++) {
       const a = (k / sides) * Math.PI * 2 + (v === 2 ? Math.PI / 4 : 0);
-      const jr = 0.78 + heartHash(v * 97 + ri * 13, k) * 0.22;
+      const jr = 0.8 + heartHash(v * 97 + ri * 13, k) * 0.2;
       const rr = Math.min(1, s * (ri === 0 ? Math.max(0.86, jr) : jr));
-      const jy = ri === 0 ? 0 : (heartHash(k + 7, v * 5 + ri) - 0.5) * 0.08;
+      const jy = ri === 0 ? 0 : (heartHash(k + 7, v * 5 + ri) - 0.5) * 0.008;
       pts.push([Math.cos(a) * rr, y + jy, Math.sin(a) * rr]);
     }
     return pts;
