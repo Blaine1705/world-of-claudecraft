@@ -74,6 +74,21 @@ describe('view model: party members and the difficulty switch', () => {
     ]);
     // A non-leader member gets no pickers; the leader manages the roster.
     expect(live({ playerId: 2 }).board.partyMembers).toEqual([]);
+    // An open expedition seats by its own roster roles: no pickers there.
+    const base = input();
+    const expedition = {
+      exitId: 1,
+      activityId: 'gravewyrm_sanctum_normal',
+      dungeonId: 'gravewyrm_sanctum',
+      leaderPid: 1,
+      isLeader: true,
+      isInside: true,
+      canTravel: false,
+      open: true,
+      bossesDefeated: 1,
+      bossesTotal: 4,
+    };
+    expect(live({ info: { ...base.info!, expedition } }).board.partyMembers).toEqual([]);
   });
 
   it('offers Normal and Heroic in catalogue order, gating Heroic on every member level', () => {

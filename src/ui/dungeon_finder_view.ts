@@ -631,7 +631,9 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     tags: FINDER_LISTING_TAGS,
     guild: input.playerGuild ?? '',
     advert: info.advert ?? null,
-    partyMembers: isLeader ? partyMembersFor(input, info) : [],
+    // A running expedition seats by its own roster roles, so no pickers there.
+    partyMembers:
+      isLeader && !(info.myListing && info.expedition?.open) ? partyMembersFor(input, info) : [],
     difficultyOptions: difficultyOptionsFor(info, input.party?.members ?? null, level),
   };
 

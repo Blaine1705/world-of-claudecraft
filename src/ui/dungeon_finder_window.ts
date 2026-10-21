@@ -118,6 +118,10 @@ export class DungeonFinderWindow {
   private stagedCreateRole: Role | null = null;
   private stagedGuildOnly = false;
   private stagedPartyRoles = new Map<number, Role>();
+  // Picks sent for my published listing but maybe not yet in a snapshot, so
+  // two quick picks never resend the first member's stale role (null = theirs).
+  private listingRoleEdits = new Map<number, Role | null>();
+  private listingRoleEditsFor: number | null = null;
   private boardFilter: BoardContentFilter = 'all';
   // Mobile master-detail: which pane the single column shows.
   private pane: 'list' | 'detail' = 'list';
@@ -560,8 +564,15 @@ export class DungeonFinderWindow {
           rerender();
           return;
         }
+        if (this.listingRoleEditsFor !== view.board.myListing.id) {
+          this.listingRoleEdits.clear();
+          this.listingRoleEditsFor = view.board.myListing.id;
+        }
+        this.listingRoleEdits.set(pid, role);
         const roles = view.board.partyMembers.flatMap((member) => {
-          const next = member.pid === pid ? role : member.assigned;
+          const next = this.listingRoleEdits.has(member.pid)
+            ? this.listingRoleEdits.get(member.pid)
+            : member.assigned;
           return next ? [{ pid: member.pid, role: next }] : [];
         });
         world().dungeonFinderExpeditionConfigure({ kind: 'party_roles', roles });
@@ -634,7 +645,6 @@ export class DungeonFinderWindow {
         rerender();
         return;
       }
-      this.stagedPartyRoles.clear();
       audio.click();
     });
     el.querySelector('[data-act="closelisting"]')?.addEventListener('click', () => {

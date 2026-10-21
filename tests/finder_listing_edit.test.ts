@@ -125,6 +125,31 @@ describe('bring your party: leader-assigned member roles', () => {
   });
 });
 
+describe('a returning member seats by the role they applied with', () => {
+  it('drops a stale assignment when the player is accepted back', () => {
+    const { sim, add, party } = setup();
+    const leader = add('warrior', 8, 'Lead');
+    const druid = add('druid', 8, 'Bramble');
+    sim.dungeonFinderSetRoles(['tank'], leader);
+    party(leader, druid);
+    sim.dungeonFinderListingCreate('hollow_crypt_normal', [], leader);
+    sim.dungeonFinderExpeditionConfigure(
+      { kind: 'party_roles', roles: [{ pid: druid, role: 'dps' }] },
+      leader,
+    );
+    sim.partyLeave(druid);
+    sim.tick();
+    sim.dungeonFinderSetRoles(['healer'], druid);
+    sim.dungeonFinderApply(sim.dungeonFinderBoardView()[0].id, druid);
+    sim.dungeonFinderApplicationRespond(druid, true, leader);
+    sim.tick();
+    const row = sim.dungeonFinderBoardView()[0];
+    expect(row.size).toBe(2);
+    expect(row.members.map((m) => m.role)).toEqual(['tank', 'healer']);
+    expect(sim.dungeonFinderInfoFor(leader)?.myListing?.partyRoles).toEqual([]);
+  });
+});
+
 describe('changing a listing difficulty', () => {
   it('offers only the same content at its other difficulties', () => {
     expect(finderDifficultySiblings('gravewyrm_sanctum_normal').map((a) => a.id)).toEqual([
@@ -163,6 +188,10 @@ describe('changing a listing difficulty', () => {
     const mine = sim.dungeonFinderInfoFor(leader)?.myListing;
     expect(mine?.activityId).toBe('gravewyrm_sanctum_heroic');
     expect(mine?.applicants.map((a) => a.pid)).toEqual([capped]);
+    // The kept applicant's own application row follows the new difficulty.
+    expect(sim.dungeonFinderInfoFor(capped)?.myApplications?.[0]?.activityId).toBe(
+      'gravewyrm_sanctum_heroic',
+    );
     expect(mine?.advertText).toMatch(/^LFM - .* - Heroic - 1\/5 - /);
 
     sim.dungeonFinderExpeditionConfigure(

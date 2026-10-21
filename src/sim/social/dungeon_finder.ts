@@ -433,7 +433,11 @@ export class DungeonFinderMachine {
     if (!target) return;
     listing.activityId = target.id;
     for (const app of this.applicationsFor(listing)) {
-      if (finderLevelEligible(target, this.levelOf(app.pid))) continue;
+      if (finderLevelEligible(target, this.levelOf(app.pid))) {
+        // Kept applicants see the group's new difficulty in their applications.
+        app.activityId = target.id;
+        continue;
+      }
       this.dropApplication(app.pid, listing.id);
       if (this.ctx.players.has(app.pid))
         this.ctx.notice(
@@ -1168,6 +1172,9 @@ export class DungeonFinderMachine {
       return;
     }
     if (app.selectedRole !== undefined) this.roleSelections.set(applicantPid, [app.selectedRole]);
+    // An accepted applicant seats by the role they applied with, never by an
+    // assignment left over from an earlier spell in this party.
+    listing.memberRoles?.delete(applicantPid);
     if (expeditionClaim && expeditionClaim.exitId !== null) {
       admitQueueHelper(this.ctx, expeditionClaim, applicantPid, formed.id);
       this.social.outcome(applicantPid, 'accepted', r.meta.name);
