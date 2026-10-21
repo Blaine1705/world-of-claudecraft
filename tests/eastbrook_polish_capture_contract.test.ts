@@ -727,7 +727,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for the painted towns merged over the art style integration tip:
   // the renderer and town runtime leaves moved. No capture was retaken.
-  'c77bf1ec90017237bb6fe88f581fe1521aff2f6613d46a5586ed74d20e18b82e';
+  // Re-minted for the one-colour market stall canopies: the town runtime leaf
+  // moved. No capture was retaken.
+  'f93c15814a853326ac45d00ce026e1d91a7bdccb569e17c72fa5921b1afa3342';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

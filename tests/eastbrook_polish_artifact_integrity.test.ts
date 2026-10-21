@@ -1424,7 +1424,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for the painted towns merged over the art style integration tip:
   // the renderer and town runtime leaves moved. No capture was retaken.
-  '128772011a087e72efebcb9036b3af0349e6321c87eee86ee598940ac2893a6f';
+  // Re-minted for the one-colour market stall canopies: the town runtime leaf
+  // moved. No capture was retaken.
+  '697528c01efe60c8cf97350a450dd01f5a04c73619063fdbcb68807d4fb9b6c0';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1470,7 +1472,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for the painted towns merged over the art style integration tip:
   // the renderer and town runtime leaves moved. No capture was retaken.
-  'c77bf1ec90017237bb6fe88f581fe1521aff2f6613d46a5586ed74d20e18b82e';
+  // Re-minted for the one-colour market stall canopies: the town runtime leaf
+  // moved. No capture was retaken.
+  'f93c15814a853326ac45d00ce026e1d91a7bdccb569e17c72fa5921b1afa3342';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2869,7 +2873,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
-    ).toBe('e3f6265dacb9bbbb3a826427b247aa2209649a7b83078f7135fdef6c01b697ca');
+      // The one-colour market stall canopies: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+    ).toBe('9feda46152b8dbb806b216c96b000d267c464ef7c18e5a3e2ef758e2102667e3');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
