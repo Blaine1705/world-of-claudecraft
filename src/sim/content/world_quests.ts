@@ -469,8 +469,9 @@ const PALMREACH_MATCH3_LEVELS = [
 ] as const;
 
 /** One rotation candidate in every shipped overworld zone. Areas deliberately
- *  cover the authored targets, so the marker and credit describe the same
- *  physical space in every host. */
+ *  cover the authored targets (a kill quest's ring holds EVERY camp of its
+ *  target in the zone, plus wander), so the marker and credit describe the
+ *  same physical space in every host. */
 export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_eastbrook_bandits',
@@ -498,7 +499,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_mirefen_gravecallers',
     zoneId: 'mirefen_marsh',
     minLevel: 6,
-    area: { x: 0, z: 485, radius: 46 },
+    area: { x: 0, z: 485, radius: 51 },
     objective: { type: 'kill', targetMobId: 'gravecaller_cultist' },
     count: 6,
   },
@@ -506,7 +507,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_thornpeak_stormcrag',
     zoneId: 'thornpeak_heights',
     minLevel: 13,
-    area: { x: 122, z: 778, radius: 46 },
+    area: { x: 122, z: 778, radius: 51 },
     objective: { type: 'kill', targetMobId: 'stormcrag_elemental' },
     count: 6,
   },
@@ -514,7 +515,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_hollow_sporelings',
     zoneId: 'veiled_hollow',
     minLevel: 15,
-    area: { x: -42, z: 1222, radius: 38 },
+    area: { x: -42, z: 1222, radius: 41 },
     objective: { type: 'kill', targetMobId: 'corrupted_sporeling' },
     count: 5,
   },
@@ -522,7 +523,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_drakelands_brood',
     zoneId: 'drakelands',
     minLevel: 16,
-    area: { x: 382, z: 2310, radius: 132 },
+    area: { x: 382, z: 2310, radius: 145 },
     objective: { type: 'kill', targetMobId: 'dragonkin_broodguard' },
     count: 5,
     // Rift-forge currency on top of the bundle, never equipment (the day's item slots own gear).
@@ -545,7 +546,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_amberfall_lurkers',
     zoneId: 'amberfall',
     minLevel: 18,
-    area: { x: -298, z: 2192, radius: 46 },
+    area: { x: -298, z: 2192, radius: 55 },
     objective: { type: 'kill', targetMobId: 'mere_lurker' },
     count: 3,
   },
@@ -577,7 +578,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_nightbloom_barrow',
     zoneId: 'nightbloom',
     minLevel: 20,
-    area: { x: -354, z: 1648, radius: 48 },
+    area: { x: -354, z: 1648, radius: 49 },
     objective: { type: 'kill', targetMobId: 'barrow_wight' },
     count: 4,
   },
@@ -585,7 +586,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_wraithwood_restless',
     zoneId: 'wraithwood',
     minLevel: 20,
-    area: { x: 360, z: 1592, radius: 72 },
+    area: { x: 360, z: 1592, radius: 82 },
     objective: { type: 'kill', targetMobId: 'wood_wraith' },
     count: 4,
   },
@@ -607,7 +608,11 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_evergarden_watch',
     zoneId: 'evergarden',
     minLevel: 20,
-    area: { x: 410, z: 1110, radius: 42 },
+    // Centred between the knights' garden posts and their north camp so the
+    // ring holds every hedge knight in the zone. That centre sits in the Great
+    // Maze, so the champion keeps its open-lawn spot at the north watch.
+    area: { x: 358, z: 995, radius: 151 },
+    championAt: { x: 418, z: 1118 },
     objective: { type: 'kill', targetMobId: 'hedge_knight' },
     count: 3,
   },

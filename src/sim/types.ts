@@ -4998,6 +4998,10 @@ export interface WorldQuestDef {
   faction?: 'rift_watch' | 'church_order' | 'automatons';
   minLevel: number;
   area: { x: number; z: number; radius: number };
+  /** Where the completion champion rises (world_quest_champion.ts), for a
+   *  ring whose centre plus the default offset lands somewhere unfit, such as
+   *  inside a hedge maze; omitted means that offset from the area centre. */
+  championAt?: { x: number; z: number };
   objective: WorldQuestObjective;
   count: number;
   /** Overrides of the shared reward schedule; omitted means XP, copper and
