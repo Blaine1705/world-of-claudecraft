@@ -10708,7 +10708,9 @@ export function grantAbilityValues(id: string): InterpolationValues {
     ),
   );
   const ground = effects.find((effect) => effect.type === 'groundAoE');
-  const absorb = effects.find((effect) => effect.type === 'absorb');
+  const absorb = effects.find(
+    (effect) => effect.type === 'absorb' || effect.type === 'aoeAllyAbsorb',
+  );
   const overTime = effects.find((effect) => effect.type === 'dot' || effect.type === 'hot');
   const resource = effects.find((effect) => effect.type === 'gainResource');
   const selfHealPctMax = effects.find((effect) => effect.type === 'selfHealPctMax');
