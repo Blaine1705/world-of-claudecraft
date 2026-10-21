@@ -38,9 +38,11 @@ import { mapObjectivesFromPlacements } from '../sim/map_objectives';
 import { freezeObjectMoves } from '../sim/moved_objects';
 import {
   emptyZoneProps,
+  type GraveyardDef,
   type PlacedAsset,
   type PromotedScenery,
   type WorldContent,
+  type ZoneDef,
 } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
 import { assetById } from './asset_catalog.generated';
@@ -473,6 +475,16 @@ export function promotedSceneryFor(
   };
 }
 
+/** A custom world's respawn graveyards: one per zone, at its graveyard point. */
+export function zoneGraveyards(zones: readonly ZoneDef[]): GraveyardDef[] {
+  return zones.map((zone) => ({
+    id: `gy_${zone.id}`,
+    name: zone.name,
+    x: zone.graveyard.x,
+    z: zone.graveyard.z,
+  }));
+}
+
 // Project a CustomMap onto the engine's WorldContent for play-testing. The
 // editor does not author structured ZoneProps yet, so custom worlds retain an
 // independent clone of reusable built-in props outside Eastbrook, filtered by
@@ -520,6 +532,12 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
   // the same frozen record the editor viewport does (sim/moved_objects.ts).
   const objectMoves = freezeObjectMoves(map.objectMoves);
   if (objectMoves) world.objectMoves = objectMoves;
+  // Every zone's graveyard point (the editor's graveyard handle) is a respawn:
+  // a released spirit appears at the nearest one and a Spirit Healer hovers
+  // there. Without this record a custom world has no graveyards at all and
+  // every death released to the map's start point.
+  const graveyards = zoneGraveyards(world.zones);
+  if (graveyards.length > 0) world.services = { graveyards };
   if (map.blockers && map.blockers.length > 0) world.blockers = deepClone(map.blockers);
   // Imported-model collision bakes ride into the play world so the sim's
   // placement colliders resolve 'local/<sha>' / 'user/<sha>' paths.

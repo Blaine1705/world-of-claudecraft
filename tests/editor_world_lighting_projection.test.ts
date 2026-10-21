@@ -41,4 +41,17 @@ describe('editor active-world projection', () => {
     const facade = sourceOf('../src/render/editor_api/editor_api.ts');
     expect(facade).toContain('this.zoneAtmosphere = new ZoneAtmosphere(this)');
   });
+
+  it("carries the zone graveyards the viewport's Sim spawns its Spirit Healers at", () => {
+    // The viewport builds its Sim from customMapToWorldContent, which projects
+    // services.graveyards; sim.ts requires the active content to carry the same
+    // record, or the collider build's healer-spot veto forks from the Sim's.
+    const app = sourceOf('../src/editor/app.ts');
+    const start = app.indexOf('  private rebuildActiveWorld(): void {');
+    const body = app.slice(start, app.indexOf('\n  }\n', start));
+    expect(body).toContain('zoneGraveyards(world.zones)');
+    expect(body).toMatch(/world\.services = \{ graveyards \}/);
+    const projection = sourceOf('../src/editor/custom_map.ts');
+    expect(projection).toContain('zoneGraveyards(world.zones)');
+  });
 });

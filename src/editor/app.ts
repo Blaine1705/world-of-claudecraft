@@ -392,6 +392,7 @@ import {
   newCustomMap,
   newFlatCustomMap,
   promotedSceneryFor,
+  zoneGraveyards,
 } from './custom_map';
 import {
   applyCutChange,
@@ -2349,6 +2350,11 @@ export class EditorApp {
     // Moved gameplay objects: the same frozen record the document holds, so
     // the viewport's Sim, colliders and renderer read the live edits.
     if (map.objectMoves) world.objectMoves = map.objectMoves;
+    // The zone graveyards the viewport's Sim spawns its Spirit Healers at: the
+    // active content must carry the same record (sim.ts world invariant), or
+    // the collider build's healer-spot veto forks from the Sim's.
+    const graveyards = zoneGraveyards(world.zones);
+    if (graveyards.length > 0) world.services = { graveyards };
     if (map.blockers) world.blockers = map.blockers;
     if (map.caves) world.caves = map.caves;
     if (map.holes) world.holes = map.holes;
