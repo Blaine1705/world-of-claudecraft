@@ -1262,7 +1262,8 @@ export class Market {
       return;
     }
     const col = this.collectionForSeller(meta);
-    if (!col || (col.copper <= 0 && col.items.length === 0 && isSaleLogEmpty(col.sales))) {
+    // The sale ledger is History, not a pickup: only gold and returned goods pend.
+    if (!col || (col.copper <= 0 && col.items.length === 0)) {
       this.ctx.error(meta.entityId, 'You have nothing to collect.');
       return;
     }
@@ -1280,13 +1281,9 @@ export class Market {
       this.ctx.bumpDeedStat(meta, 'marketSaleCopper', col.copper);
       col.copper = 0;
     }
-    // The ledger clears with the GOLD, not at the end of the method: the capacity
-    // gate below can leave items behind and return early, and rows describing gold
-    // already paid out must not survive to be shown (and re-shown) next collect.
-    // Cleared unconditionally, because a sale whose proceeds floored to 0 copper
-    // (a 1-copper listing against the Merchant's cut) still logs a row, and that
-    // row would otherwise be uncollectable forever.
-    col.sales = emptySaleLog();
+    // The sale ledger is deliberately NOT cleared here: it is what the History
+    // tab lists, and wiping it with the gold left that tab empty for every seller
+    // who had ever collected. It stays bounded by its own cap (market_sale_log.ts).
     // Capacity gate: items that don't fit stay in the collection box (never
     // destroyed); the gold above is always collected. Instance-aware on both
     // arms so a returned instanced listing keeps its payload here too.
@@ -1321,7 +1318,9 @@ export class Market {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
-    this.marketCollections.delete(this.marketSellerKey(meta));
+    col.items = [];
+    // A bucket holding sale history stays (copper 0, no goods) so History survives.
+    if (isSaleLogEmpty(col.sales)) this.marketCollections.delete(this.marketSellerKey(meta));
   }
 
   // Once a second: return expired player listings to their seller's collection.
@@ -1371,7 +1370,7 @@ export class Market {
     const meta = this.ctx.players.get(pid);
     if (!meta) return false;
     const col = this.collectionForSeller(meta);
-    return !!col && (col.copper > 0 || col.items.length > 0 || !isSaleLogEmpty(col.sales));
+    return !!col && (col.copper > 0 || col.items.length > 0);
   }
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
