@@ -12,6 +12,29 @@ import { questObjectiveAreas } from '../sim/quest_targets';
 import type { QuestProgress } from '../sim/types';
 import { ownEntry } from './known_item';
 
+/** Where a named NPC stands right now in the loaded world, or null. */
+export type LiveNpcPos = (npcId: string) => { x: number; z: number } | null;
+
+/** A live-position lookup over the world's entities: the living NPC with
+ *  that template id. A map can move NPCs away from their content position,
+ *  and the map controls must lead to the NPC the player can see. Called on a
+ *  click or a map refresh, never per frame. */
+export function liveNpcPosLookup(
+  entities: ReadonlyMap<
+    number,
+    { kind: string; templateId?: string; dead?: boolean; pos: { x: number; z: number } }
+  >,
+): LiveNpcPos {
+  return (npcId) => {
+    for (const entity of entities.values()) {
+      if (entity.kind === 'npc' && entity.templateId === npcId && !entity.dead) {
+        return { x: entity.pos.x, z: entity.pos.z };
+      }
+    }
+    return null;
+  };
+}
+
 /** A quest plus the world position the map should pan to and ring. */
 export interface QuestMapLocation {
   questId: string;
@@ -27,6 +50,7 @@ export interface QuestMapLocation {
 export function questMapLocation(
   questId: string | null,
   questLog: ReadonlyMap<string, QuestProgress>,
+  livePos?: LiveNpcPos,
 ): QuestMapLocation | null {
   if (questId === null) return null;
   const progress = questLog.get(questId);
@@ -38,6 +62,9 @@ export function questMapLocation(
     );
     if (area) return { questId, x: area.center.x, z: area.center.z };
   }
-  const npc = NPCS[progress.state === 'ready' ? quest.turnInNpcId : quest.giverNpcId];
+  const npcId = progress.state === 'ready' ? quest.turnInNpcId : quest.giverNpcId;
+  const live = livePos?.(npcId);
+  if (live) return { questId, x: live.x, z: live.z };
+  const npc = NPCS[npcId];
   return npc ? { questId, x: npc.pos.x, z: npc.pos.z } : null;
 }

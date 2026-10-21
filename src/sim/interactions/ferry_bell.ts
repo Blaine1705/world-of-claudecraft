@@ -23,21 +23,16 @@ import type { Entity } from '../types';
 
 export const FERRY_BELL_OBJECT_ID = 'ps_ferry_bell';
 
-/** Where the island bell sets a graduate down: the civic square, a few
- *  strides north of the return bell at (-7.5, -100), facing west across the
- *  square past the Ravenpost mailbox and the monument and down the main
- *  street, so the first thing a graduate sees is the town, not the sea. Well
- *  clear of the authored spawn at (-94, -58), so an arrival never stacks on a
- *  fresh spawn. The optional golden guidance leads from here to Marshal on
- *  the civic square.
- *
- *  Moved 4.3 yd north-west in the Tidehold rebuild: the Weekly Vault took the
- *  green south of the square, and the old point at (-4.5, -101.5) stood a
- *  stride off its front wall, on the weekly emissary's spot, with the chase
- *  camera inside the hall. From here the camera settles in the open square,
- *  and the walk to each starter quest giver is clear
- *  (tests/eastbrook_combat_giver_visibility.test.ts). */
-export const FERRY_BELL_TOWN_LANDING = { x: -6, z: -97.5, facing: -1.3 } as const;
+/** Where the island bell sets a graduate down: on Eastbrook's quay, a
+ *  stride from the return bell at (-95, -45), facing up into town toward the
+ *  Eastbrook chapel (anchor (28.2, -119.6), eastbrook_layout.ts), so the first
+ *  thing a graduate sees is the town, not the sea. Clear of the bell's own
+ *  footprint and of the quay's crates. The optional golden guidance leads
+ *  from here to Marshal Redbrook wherever he stands
+ *  (render/eastbrook_wolves_guidance_core.ts). Facing follows the player
+ *  convention: f points along (sin f, cos f), as eastbrook_layout.ts
+ *  facingToward computes it. */
+export const FERRY_BELL_TOWN_LANDING = { x: -92.5, z: -46.5, facing: 2.12 } as const;
 
 /** Whether this character has never worked the shore: no Proving Shore quest
  *  in the log and none turned in. The arrival note is a TEACHING moment (it

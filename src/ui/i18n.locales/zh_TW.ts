@@ -17439,7 +17439,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professionTrainers.mining': '採礦訓練師',
   'hudChrome.professionTrainers.hobby': '嗜好訓練師',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    '這麼快就從海濱回來了？你剛才敲響的正是渡船鈴。它的孿生兄弟就掛在那邊鴉郵信箱旁：想回試煉之濱，隨時敲響它，渡航就會送你過去。敲錯了也不打緊。',
+    '這麼快就從海濱回來了？你剛才敲響的正是渡船鈴。它的孿生兄弟就掛在你身旁的碼頭上：想回試煉之濱，隨時敲響它，渡航就會送你過去。敲錯了也不打緊。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     '剛下渡船嗎？歡迎來到試煉之濱。看守塔姆就在你正前方的海灘上守著試煉跑道：走到他跟前，直到他的名字顯示出來，然後按 F，或用滑鼠左鍵點擊他，他的跑道會把你雙腿該會的都教給你。等你準備離開時，敲響立在我碼頭旁的那口鈴，渡航就會送你回東溪鎮。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
@@ -17579,7 +17579,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人布琳',
   'entities.npcs.wayfarer_bryn.title': '港口嚮導',
   'entities.npcs.wayfarer_bryn.greeting':
-    '東溪谷來者不拒，朋友。而對腳下還不穩的人來說，總還有試煉之濱：鴉郵信箱旁的渡船鈴一年到頭隨時送你過去，島上那口孿生鈴再送你回家。',
+    '東溪谷來者不拒，朋友。而對腳下還不穩的人來說，總還有試煉之濱：碼頭上的渡船鈴一年到頭隨時送你過去，島上那口孿生鈴再送你回家。',
   'entities.npcs.instructor_maren.name': '教官瑪倫',
   'entities.npcs.instructor_maren.title': '試煉導師',
   'entities.npcs.instructor_maren.greeting':

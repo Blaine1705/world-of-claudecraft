@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, lineOfSightClear, pathCrossesFence } from '../src/sim/colliders';
 import { EASTBROOK_LAYOUT, EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../src/sim/eastbrook_layout';
-import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
 import { findPlayerPath } from '../src/sim/pathfind';
 import { groundHeight, roadDistance, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -14,10 +13,11 @@ const GIVERS = [
   'fisherman_brandt',
 ] as const;
 const SQUARE_CENTER = { x: -14, z: -102 };
-// Where the tutorial ferry bell sets a graduate down on the square. Read off
-// the constant since the Tidehold rebuild moved it: the old point at
-// (-4.5, -101.5) is a stride from the Weekly Vault's new front wall.
-const SQUARE_ENTRY = { x: FERRY_BELL_TOWN_LANDING.x, z: FERRY_BELL_TOWN_LANDING.z };
+// Where a player walks into the civic square from the north road: the
+// point the tutorial ferry used to land on. The ferry now sets graduates down
+// on the quay (FERRY_BELL_TOWN_LANDING) and the golden guidance walks them up,
+// so the square's own entry is pinned here as a literal.
+const SQUARE_ENTRY = { x: -6, z: -97.5 };
 
 describe('Eastbrook starter combat quest group', () => {
   it('spreads the givers around the town square with generous spacing', () => {
