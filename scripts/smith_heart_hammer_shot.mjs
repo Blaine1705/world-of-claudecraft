@@ -89,7 +89,7 @@ try {
     () => {
       let found = false;
       window.__game.renderer.scene.traverse((o) => {
-        if (/smithHeart/i.test(o.name)) found = true;
+        if (o.name === 'smithHeartField') found = true;
       });
       return found;
     },
