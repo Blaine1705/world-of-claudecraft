@@ -438,6 +438,27 @@ Readability: unchanged. The sight field of Mountain's Wrath is the trash engine'
 tier; the floor's crack inlays stay under its lift (pinned), and the new dressing (cliffs,
 cracks) is cosmetic and shed on the low tier.
 
+### 5.11 The Hammer vein's last weak points (phase 2D)
+
+The owner's ask after 2C: no weak point left in the Hammer vein. Every item 2C flagged, and
+what a walk with the play camera (Cleft, Gallery, descent, pit, Slab) found next to the
+Wildheart Basin and the Gravewyrm Sanctum:
+
+| Weak point | Now | Where |
+|---|---|---|
+| The terrace faces read as a wall of blocks from the side and far | Each riser is a few continuous lifts at the SAME heights on every module (the benches run on unbroken round the quarry), the beds in one strata tone per lift, splits cut into the rock instead of gaps between boxes, the lip broken by spalls, rare wide bosses; the spoil lies flat | `cut_benches` (`hammer_cliff.py`), `Kit_QuarryFace*`, `Kit_QuarryRim*`, `Kit_QuarryLip*` (whose lower rock is now tall leaning shards) |
+| The crown cliffs' crests ran straight like a broken wall | A mountain crest on each: low shoulders at both ends, a few asymmetric domed peaks, notches, a jagged ridge, the summit falling back from the face, an overhanging slab, scree laid on the benches where the rock is flat; pinned by the crests' silhouette test | `great_cliff` (`hammer_cliff.py`), `tests/smith_heart_hammer_kit.test.ts` |
+| The Waking's braids read as beads on his chest | True three-strand plaits (a long one in the middle, shorter ones at the corners) gathered out of the beard, each with one snug bronze cuff and a combed tassel; every bronze part of the figures is now its own crisp shell, so no band breaks into a zigzag | `plait`, `bronze_shell` (`hammer_sculpt.py`) |
+| The descent's foreground rock was too dark | The vein's grade lifts its fill to a slate-violet shadow (never black), the field's cliff faces and the shared strata texture take a true mid granite and soft relief, so the rock frames the pit | `smithHeartHammer` (`heart_environment.ts`), `heart_cliff_paint_core.ts`, `strataDetail` |
+| The Cleft's shafts were too subtle | A fan of shafts of late sun (a broad one, lesser ones beside it, thin blades) with bright dust hanging in them, warm pools where they land, the amber crystals at the gate's foot glowing with halos and two small lamps | `planCleftShafts`, `HEART_CLEFT_CRYSTALS` (`hammer_air_core.ts`), `HEART_CLEFT_GLOW_LIGHTS` |
+| The Gallery walked between smooth sandy slopes of the shared mountain and prism crags | In the Hammer vein the mountain climbs in flat ledges and sheer risers (never above the smooth slope, so no clearance moves), banded in granite beds, risers a value darker, each step its own shade; the crags are no longer drawn deep in the vein | `heartHammerTerrace` (`heart_mountain_core.ts`), `hammerRockBed`, `hammerRiserShade`, `heart_props.ts` |
+| The cut blocks were pale boxes; the Slab a white board | The cut blocks are split stone with drill flutes down a fresh face; the Slab's halves are carved granite (a raised border round a pick-dressed field, the rune cut deep with the light in its groove, the split torn rough) under a sculpted frame | `cut_stone`, `slab_half_sculpt`, `slab_frame_sculpt` (`hammer_cliff.py`) |
+| Small things | Motes fade near the lens (never blots), the grit falls as tight threads (never rain), the floor cracks lie paper thin (never sticks) | `hammer_air.ts`, `floor_crack` |
+
+Readability: unchanged. The new light is grade only (Mountain's Wrath's sight field is the
+trash engine's on every tier); the Cleft's lamps sit inside its light zone's budget; the
+stepped mountain only ever stands lower than the smooth one.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -677,6 +698,7 @@ captures and review before the next:
 1. **The Hammer** (the Cleft, the Gallery, the Quarry): DRESSED in phase 2B (section
    5.9: the kit, the floor, the air and light, the guardian's and the Slab's effects) and
    polished in phase 2C (section 5.10).
+   Its last weak points closed in phase 2D (section 5.11).
    Still to build: the collapsing gallery's mechanic (its spot is marked), the columns
    that rise and fall (they stand in their sockets), the guardian's target kit and its
    own body.
