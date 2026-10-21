@@ -1,7 +1,8 @@
-// Evidence captures for the Smith's Heart raid's Hammer vein (phase 2B,
-// docs/design/raid/smith_heart.md): the Cleft, the Gallery and its collapse
-// spot, the Smith's Quarry from above and from the play camera with the
-// guardian's Mountain's Wrath on its bar, the Slab breaking and the Balcony.
+// Evidence captures for the Smith's Heart raid's Hammer vein (phases 2B and
+// 2C, docs/design/raid/smith_heart.md): the Cleft, the Gallery and its
+// collapse spot, the Smith's Quarry from above and from the play camera with
+// the guardian's Mountain's Wrath on its bar, the quarry's back wall close,
+// the Ring with both stairs to the seal dais, and the Slab breaking.
 // Evidence tooling, not a repo test. Needs a dev Vite serving the worktree
 // (ALLOW_DEV_COMMANDS is implied offline).
 //
@@ -20,7 +21,7 @@ import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.SHOT_URL ?? 'http://127.0.0.1:5186/';
 const OUT = process.argv[2] ?? path.join('tmp', 'smith_heart_hammer');
-const LABEL = process.argv[3] ?? 'fase2b';
+const LABEL = process.argv[3] ?? 'fase2c';
 const W = Number(process.env.SHOT_W ?? 1600);
 const H = Number(process.env.SHOT_H ?? 900);
 const PRESET = Number(process.env.SHOT_PRESET ?? 4);
@@ -37,12 +38,13 @@ const ENTRY = { x: -196, z: -210 };
 // shoots just after a Hammerfall; 'slab' kills the guardian and shoots the
 // Slab breaking `SHOT_SLAB_MS` after; 'alive' revives the guardian first.
 const SHOTS = [
-  ['01_grieta', [-194, -214], [-150, -226], 0.5, 0.18, 16, ''],
+  ['01_grieta', [-194, -208], [-213, -225], 0.0, 0.2, 15, ''],
   ['02_galeria', [-146, -224], [-96, -230], 0.2, 0.24, 18, ''],
   ['03_cantera_vista', [-30, -176], [40, -176], 0.0, 0.42, 40, ''],
   ['04_cantera_onda', [-20, -160], [8, -170], 0.25, 0.32, 14, 'wrath'],
-  ['05_losa_rompe', [0, -146], [0, -124], 0.0, 0.2, 16, 'slab'],
-  ['06_balcon', [0, -66], [0, -20], 0.0, 0.38, 22, ''],
+  ['05_pared_fondo', [20, -190], [60, -205], 0.3, 0.02, 16, ''],
+  ['06_anillo_escaleras', [0, 74], [0, 0], 0.0, 0.42, 36, ''],
+  ['07_losa_rompe', [0, -146], [0, -124], 0.0, 0.2, 16, 'slab'],
 ];
 
 const list = process.env.SHOT_JSON ? JSON.parse(process.env.SHOT_JSON) : SHOTS;

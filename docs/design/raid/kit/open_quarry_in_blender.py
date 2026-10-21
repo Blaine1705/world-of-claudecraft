@@ -97,22 +97,23 @@ def build(scene_path):
     mesh = bpy.data.meshes.new('QuarryFloor')
     mesh.from_pydata([tuple(v) for v in verts], [], faces)
     floor = bpy.data.objects.new('QuarryFloor', mesh)
-    floor.data.materials.append(material('Bedrock', (0.36, 0.28, 0.2)))
+    floor.data.materials.append(material('Bedrock', (0.3, 0.3, 0.31)))
     coll.objects.link(floor)
     # Scale figure on the pit floor.
     bpy.ops.mesh.primitive_cylinder_add(radius=0.45, depth=2.0, location=tuple(g2b(-6, 15, -172)))
     fig = bpy.context.view_layer.objects.active
     fig.name = 'ScaleFigure_2yd'
     fig.data.materials.append(material('Figure', (0.1, 0.25, 0.6), 0.5))
-    # The quarry's dusk: a warm low key from the south-west, a dusty sky.
+    # The quarry's dusk (phase 2C): a warm low key from the south-west, a cool
+    # slate-violet sky fill.
     world = bpy.data.worlds.new('QuarryDusk')
     world.use_nodes = True
-    world.node_tree.nodes['Background'].inputs['Color'].default_value = (0.36, 0.29, 0.22, 1)
+    world.node_tree.nodes['Background'].inputs['Color'].default_value = (0.3, 0.3, 0.36, 1)
     world.node_tree.nodes['Background'].inputs['Strength'].default_value = 0.6
     bpy.context.scene.world = world
     sun = bpy.data.objects.new('Sun', bpy.data.lights.new('Sun', 'SUN'))
-    sun.data.energy = 3.0
-    sun.data.color = (1.0, 0.86, 0.72)
+    sun.data.energy = 3.6
+    sun.data.color = (1.0, 0.83, 0.63)
     d = g2b(-0.5, 0.62, -0.6).normalized()
     sun.rotation_euler = (-d).to_track_quat('-Z', 'Y').to_euler()
     bpy.context.scene.collection.objects.link(sun)
