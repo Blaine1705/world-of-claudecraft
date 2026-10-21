@@ -71,13 +71,17 @@ export function worldQuestOffersChampion(quest: WorldQuestDef): boolean {
   return WORLD_QUEST_CHAMPION_TYPES.has(quest.objective.type);
 }
 
-/** The champion's kind: the kill target itself, else the nearest hostile of the site. */
+/** The champion's kind: the kill target itself, else the nearest hostile of the site.
+ *  A training dummy is never a candidate: it is hostile (attackable) but inert,
+ *  so a site whose nearest hostile is a practice dummy (the Eastbrook bandit
+ *  camp sits by the hub's) picks the next real mob, or raises no champion. */
 function championTemplate(ctx: SimContext, quest: WorldQuestDef): MobTemplate | null {
   if (quest.objective.type === 'kill') return MOBS[quest.objective.targetMobId] ?? null;
   let best: Entity | null = null;
   let bestDistance = 150;
   for (const e of ctx.entities.values()) {
     if (e.kind !== 'mob' || !e.hostile || e.summonedAdd || !e.templateId) continue;
+    if (MOBS[e.templateId]?.dummy) continue;
     const d = Math.hypot(e.pos.x - quest.area.x, e.pos.z - quest.area.z);
     if (d < bestDistance) {
       best = e;
