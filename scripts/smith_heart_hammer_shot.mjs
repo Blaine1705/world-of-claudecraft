@@ -36,7 +36,8 @@ const ENTRY = { x: -196, z: -210 };
 //  pitch, distance, action]. Actions: '' a still; 'wrath' pulls the Hammer
 // guardian and shoots while Mountain's Wrath is on its bar; 'hammerfall'
 // shoots just after a Hammerfall; 'slab' kills the guardian and shoots the
-// Slab breaking `SHOT_SLAB_MS` after; 'alive' revives the guardian first.
+// Slab breaking `SHOT_SLAB_MS` after; 'alive' revives the guardian first;
+// 'seq:<steps>' runs chat lines and waits ('c:/dev heart portal;w:1400').
 const SHOTS = [
   ['01_grieta', [-194, -208], [-213, -225], 0.0, 0.2, 15, ''],
   ['02_galeria', [-146, -224], [-96, -230], 0.2, 0.24, 18, ''],
@@ -187,6 +188,14 @@ try {
         await sleep(Number(process.env.SHOT_BLAST_MS ?? 260));
       } else {
         await sleep(Number(process.env.SHOT_WRATH_MS ?? 1800));
+      }
+      await place(at, look, yaw, pitch, dist);
+    } else if (action.startsWith('seq:')) {
+      // A scripted moment (phase 2F, the Ring): 'seq:' then steps split by
+      // ';', each 'c:<chat line>' or 'w:<ms>' (the still is taken after).
+      for (const step of action.slice(4).split(';')) {
+        if (step.startsWith('c:')) await chat(step.slice(2), 0);
+        else if (step.startsWith('w:')) await sleep(Number(step.slice(2)));
       }
       await place(at, look, yaw, pitch, dist);
     } else if (action === 'slab') {
