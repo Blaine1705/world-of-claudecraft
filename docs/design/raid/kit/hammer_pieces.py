@@ -421,10 +421,11 @@ def quarry_face(variant):
     p = SP('QuarryFace' + variant, seed=seeds[variant], marks=variant == 'C', ao_dist=2.0)
     vein = None
     if variant == 'C':
-        vein = [(-4.9, -0.9, -3.4), (-2.0, -1.0, -2.9), (0.4, -1.0, -3.6), (2.6, -1.0, -3.0), (4.9, -0.9, -3.3)]
+        # In the lip's own bench (never pulled out): the seam can't hang in a notch.
+        vein = [(-4.9, -0.12, -1.1), (-2.0, -0.15, -0.8), (0.4, -0.15, -1.3), (2.6, -0.15, -0.9), (4.9, -0.12, -1.2)]
     hc.sculpt_face(bpy, p, 'QuarryFace' + variant, seeds[variant], -4.4, 4.4, -0.02, -7.4, 3.0, target=2200,
                    crack=0.9 if variant == 'A' else 0.4, notch=0.8 if variant == 'B' else 0.3,
-                   overhang=0.45 if variant == 'B' else 0.25, vein=vein, wmin=2.8, wmax=7.5)
+                   overhang=0.45 if variant == 'B' else 0.25, vein=vein, wmin=3.5, wmax=9.0)
     return p
 
 

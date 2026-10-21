@@ -118,7 +118,7 @@ def cut_benches(f, rng, x0, x1, z_top, z_bot, depth, bench=0.55, proud=0.25, not
                 yo = max(yo, -front_max)
             # The block may split into two lifts of its own.
             rows = [(zt, zb)]
-            if zt - zb > 2.0 and rng.random() < 0.4:
+            if zt - zb > 2.4 and rng.random() < 0.15:
                 m = zb + (zt - zb) * rng.uniform(0.35, 0.65)
                 rows = [(zt, m), (m, zb)]
             for (rt, rb) in rows:
@@ -126,7 +126,7 @@ def cut_benches(f, rng, x0, x1, z_top, z_bot, depth, bench=0.55, proud=0.25, not
                 size = (b - a + 0.02, depth, rt - rb + 0.02)
                 R = gs.rot(rz=rng.uniform(-0.02, 0.02), ry=rng.uniform(-0.015, 0.015))
                 prim = block(rng, c, size, cuts=3, chamfer=(0.93, 0.995), R=R)
-                tone = bed if rng.random() < 0.75 else TONES[int(rng.integers(len(TONES)))]
+                tone = bed if rng.random() < 0.92 else TONES[int(rng.integers(len(TONES)))]
                 f.put(tone, prim, 0.0)
                 prims.append(prim)
                 # The split beside it: some cut deep, most faint (a parting

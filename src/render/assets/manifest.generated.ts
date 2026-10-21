@@ -1753,7 +1753,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/ship_monument.glb": "/media/models/props/ship_monument.d6d2914bc4bb.glb",
   "models/props/shrub_flowering.glb": "/media/models/props/shrub_flowering.d6ce0506f713.glb",
   "models/props/slag_cauldron.glb": "/media/models/props/slag_cauldron.d884ca344f1a.glb",
-  "models/props/smith_heart_hammer_kit.glb": "/media/models/props/smith_heart_hammer_kit.4f5acc9a0daa.glb",
+  "models/props/smith_heart_hammer_kit.glb": "/media/models/props/smith_heart_hammer_kit.569f2edf4817.glb",
   "models/props/stag_shrine.glb": "/media/models/props/stag_shrine.212a9bf579fc.glb",
   "models/props/star_heart_crystal.glb": "/media/models/props/star_heart_crystal.413842e8d919.glb",
   "models/props/statue_block.glb": "/media/models/props/statue_block.522cacbeb3b0.glb",
