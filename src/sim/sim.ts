@@ -3467,12 +3467,7 @@ export class Sim {
       player.prevPos = { ...player.pos };
       this.rebucket(player);
       player.dead = true;
-      releasePlayerSpirit(
-        this.ctx,
-        player.id,
-        this.worldContent.services?.graveyards ?? [],
-        this.worldContent.playerStart,
-      );
+      releasePlayerSpirit(this.ctx, player.id);
     }
     if (savedState?.pet && petCommands.canRestorePetState(meta, savedState.pet)) {
       this.restorePet(player, savedState.pet);
@@ -4990,6 +4985,12 @@ export class Sim {
       },
       get objectMoves() {
         return sim.worldContent.objectMoves;
+      },
+      get graveyards() {
+        return sim.worldContent.services?.graveyards ?? [];
+      },
+      get playerStart() {
+        return sim.worldContent.playerStart;
       },
       get primaryId() {
         return sim.primaryId;
@@ -8925,12 +8926,7 @@ export class Sim {
   // Player death/respawn lives in entity_roster.ts (E1, merged E2). Thin delegate
   // keeps the public IWorld surface (`sim.releaseSpirit`) resolving unchanged.
   releaseSpirit(pid?: number): void {
-    releasePlayerSpirit(
-      this.ctx,
-      pid,
-      this.worldContent.services?.graveyards ?? [],
-      this.worldContent.playerStart,
-    );
+    releasePlayerSpirit(this.ctx, pid);
   }
   // Ghost resurrection (src/sim/spirit.ts): run the spirit back to its corpse to
   // resurrect penalty-free, or accept a Spirit Healer's resurrection (with

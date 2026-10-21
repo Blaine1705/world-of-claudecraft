@@ -3,8 +3,8 @@
 // headstone clusters, houses and farm plots in the browser editor; this suite pins the
 // map-data fixes that keep it playable: every zone graveyard is a working respawn on open,
 // dry, walkable ground just outside its own headstones, a released spirit appears there
-// beside a Spirit Healer, the farm plots are level and grass-free, the camp tents are
-// Balgath's muster tents, and Balgath's camp still stands.
+// beside a Spirit Healer, /unstuck lands at that same graveyard, the farm plots are level
+// and grass-free, the camp tents are Balgath's muster tents, and Balgath's camp still stands.
 
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -21,7 +21,9 @@ import {
 import { farmPatchesFor } from '../src/sim/moved_objects';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
-import type { Entity, ZoneDef } from '../src/sim/types';
+import { nearestOverworldGraveyard } from '../src/sim/spirit';
+import type { Entity, SimEvent, ZoneDef } from '../src/sim/types';
+import { UNSTUCK_COOLDOWN_ID, UNSTUCK_COUNTDOWN_SECONDS } from '../src/sim/unstuck';
 import { terrainHeight, terrainSteepnessAt, waterLevelAt } from '../src/sim/world';
 
 const DOC = JSON.parse(
@@ -166,6 +168,78 @@ describe('combined map: respawn graveyards', () => {
           Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z) < 2,
       );
       expect(healer, zone.id).toBe(true);
+    }
+  });
+});
+
+describe('combined map: /unstuck', () => {
+  // A fresh, monster-free copy of the map keeps the ten-second countdown out of
+  // combat; its graveyards and player start are still the published map's own.
+  const quiet = { ...WORLD, camps: [] };
+  let unstuckSim: Sim;
+  let pid: number;
+  beforeAll(() => {
+    setActiveWorldContent(quiet);
+    unstuckSim = new Sim({ seed: MAP_SEED, playerClass: 'warrior', noPlayer: true, world: quiet });
+    pid = unstuckSim.addPlayer('warrior', 'Wayfinder');
+  });
+  afterAll(() => setActiveWorldContent(WORLD));
+
+  /** Run a whole /unstuck from a short walk off `gy`; returns the player and the completion. */
+  function unstuckNear(gy: { x: number; z: number }, dead: boolean) {
+    const p = unstuckSim.entities.get(pid) as Entity;
+    p.dead = dead;
+    p.ghost = false;
+    p.hp = dead ? 0 : p.maxHp;
+    p.pos = unstuckSim.groundPos(gy.x + 9, gy.z + 9);
+    p.prevPos = { ...p.pos };
+    p.vx = 0;
+    p.vy = 0;
+    p.vz = 0;
+    p.onGround = true;
+    p.jumping = false;
+    p.inCombat = false;
+    p.combatTimer = 999;
+    p.cooldowns.delete(UNSTUCK_COOLDOWN_ID);
+    unstuckSim.grid.update(p);
+    unstuckSim.playerGrid.update(p);
+    unstuckSim.drainEvents();
+    expect(unstuckSim.unstuck(pid)).toBe(true);
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20 + 2; i++) events.push(...unstuckSim.tick());
+    const done = events.find(
+      (e): e is Extract<SimEvent, { type: 'unstuck'; phase: 'completed' }> =>
+        e.type === 'unstuck' && e.phase === 'completed',
+    );
+    expect(done).toBeDefined();
+    return { p, done };
+  }
+
+  it('is decisive: some zone graveyard is far from every built-in graveyard', () => {
+    const far = WORLD.zones.filter((zone) => {
+      const builtin = nearestOverworldGraveyard(zone.graveyard.x + 9, zone.graveyard.z + 9);
+      return Math.hypot(builtin.x - zone.graveyard.x, builtin.z - zone.graveyard.z) > 5;
+    });
+    expect(far.length).toBeGreaterThan(0);
+  });
+
+  it('moves a living player to the nearest zone graveyard, not a built-in one', () => {
+    for (const zone of WORLD.zones) {
+      const gy = zone.graveyard;
+      const { p, done } = unstuckNear(gy, false);
+      expect(done?.reason, zone.id).toBe('moved_to_graveyard');
+      expect(p.dead, zone.id).toBe(false);
+      expect(Math.hypot(p.pos.x - gy.x, p.pos.z - gy.z), zone.id).toBeLessThan(0.01);
+    }
+  });
+
+  it('raises a dead player at the nearest zone graveyard, where release puts the spirit', () => {
+    for (const zone of WORLD.zones) {
+      const gy = zone.graveyard;
+      const { p, done } = unstuckNear(gy, true);
+      expect(done?.reason, zone.id).toBe('revived_at_graveyard');
+      expect(p.dead, zone.id).toBe(false);
+      expect(Math.hypot(p.pos.x - gy.x, p.pos.z - gy.z), zone.id).toBeLessThan(0.01);
     }
   });
 });

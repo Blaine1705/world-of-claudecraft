@@ -154,6 +154,14 @@ export interface SimContextPrimitives {
    *  farm beds, practice dummies, gather nodes, dungeon doors. Undefined for
    *  the built-in world, so every resolver returns the shipped row. */
   readonly objectMoves?: ObjectMoves;
+  /** This Sim's authored world graveyards: spirit release AND /unstuck pick the
+   *  nearest of these (spirit.ts ghostGraveyard), so a custom map never sends a
+   *  player to a built-in yard. Empty when the world authors none. The built-in
+   *  world's rows are OVERWORLD_GRAVEYARDS. */
+  readonly graveyards: readonly { x: number; z: number }[];
+  /** This Sim's authored world player start: the respawn anchor when the world
+   *  has no graveyards (PLAYER_START for the built-in world). */
+  readonly playerStart: { x: number; z: number };
   // The local / RL player id (single-player + renderer contexts). Reassigned on the
   // first join and on the primary's departure, so it is a LIVE getter, not a snapshot.
   // Stays a Sim field; the moved raid-marker `markerFor` (T1) reads it through the seam.
@@ -1311,6 +1319,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get objectMoves() {
       return host.objectMoves;
+    },
+    get graveyards() {
+      return host.graveyards;
+    },
+    get playerStart() {
+      return host.playerStart;
     },
     get primaryId() {
       return host.primaryId;
