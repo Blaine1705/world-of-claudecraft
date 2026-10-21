@@ -50,6 +50,10 @@ const LIBRARY = [
   '2H_Chop',
   'Dual_Chop',
   'Ranged_Shoot',
+  'Woc_Attack_Rifle',
+  'Woc_Attack_1H_0',
+  'Woc_Attack_1H_1',
+  'Woc_Cast_Omni',
   'Cast_Loop',
   'Cast_Shoot',
 ];
@@ -98,7 +102,7 @@ afterEach(() => {
 });
 
 describe('the halves a clip is cut into are minted once per source clip', () => {
-  const HUNTER_HALVES = ['Ranged_Shoot#aim', 'Ranged_Shoot#release'];
+  const HUNTER_HALVES = ['Woc_Attack_Rifle#aim', 'Woc_Attack_Rifle#release'];
   const DUAL_HALVES = ['Dual_Chop#main', 'Dual_Chop#off'];
 
   it('two rigs of one key hold the same two clips, each on actions of its own', async () => {
@@ -113,8 +117,11 @@ describe('the halves a clip is cut into are minted once per source clip', () => 
       expect(mine, name).not.toBe(theirs);
     }
     // the cut itself is what it was: the hunter's 0.17 s aim, the rest its release
-    expect(need(peek(a).action('Ranged_Shoot#aim')).getClip().duration).toBeCloseTo(0.17, 5);
-    expect(need(peek(a).action('Ranged_Shoot#release')).getClip().duration).toBeCloseTo(0.83, 5);
+    expect(need(peek(a).action('Woc_Attack_Rifle#aim')).getClip().duration).toBeCloseTo(0.17, 5);
+    expect(need(peek(a).action('Woc_Attack_Rifle#release')).getClip().duration).toBeCloseTo(
+      0.83,
+      5,
+    );
     w.disposeAll();
   }, 40000);
 
@@ -144,11 +151,11 @@ describe('the halves a clip is cut into are minted once per source clip', () => 
     for (const v of [a, b]) v.update(1 / 60, IDLE, true);
     // the damage-event arm of a timed shot plays the release half
     a.playAttack('aimed_shot');
-    expect(peek(a).current?.getClip().name).toBe('Ranged_Shoot#release');
+    expect(peek(a).current?.getClip().name).toBe('Woc_Attack_Rifle#release');
     a.update(0.1, IDLE, true);
     b.update(0.1, IDLE, true);
-    const released = need(peek(a).action('Ranged_Shoot#release'));
-    const idle = need(peek(b).action('Ranged_Shoot#release'));
+    const released = need(peek(a).action('Woc_Attack_Rifle#release'));
+    const idle = need(peek(b).action('Woc_Attack_Rifle#release'));
     expect(released.time).toBeGreaterThan(0);
     expect(released.isRunning()).toBe(true);
     expect(idle.time).toBe(0);
@@ -163,7 +170,7 @@ describe('the halves a clip is cut into are minted once per source clip', () => 
     expect(idle.time).toBeGreaterThan(0);
     // ...and a rig built after that one went is handed the same half again
     const c = w.build('player_hunter');
-    expect(need(peek(c).action('Ranged_Shoot#release')).getClip()).toBe(shared);
+    expect(need(peek(c).action('Woc_Attack_Rifle#release')).getClip()).toBe(shared);
     w.disposeAll();
   }, 40000);
 });
@@ -184,11 +191,11 @@ describe('a one-shot started again mid-play crossfades through its twin', () => 
     const w = await world(['player_hunter']);
     const v = w.build('player_hunter');
     const { first, twin } = strikeTwice(v);
-    expect(first.getClip().name).toBe('1H_Chop');
+    expect(first.getClip().name).toBe('Woc_Attack_1H_0');
     expect(twin).not.toBe(first);
     // one action cannot crossfade into itself, and a mixer keeps one action per clip and
     // root: the twin is another clip object under the same name
-    expect(twin.getClip().name).toBe('1H_Chop');
+    expect(twin.getClip().name).toBe('Woc_Attack_1H_0');
     expect(twin.getClip()).not.toBe(first.getClip());
     expect(twin.getClip().duration).toBe(first.getClip().duration);
     expect(twin.time).toBe(0);
@@ -247,7 +254,7 @@ describe('a clip name resolves through the loadout swap with no closure per call
     // the variant is NOT in the library: the named clip plays
     expect(peek(v).action('1H_Chop')?.getClip().name).toBe('1H_Chop');
     // a name the swap does not mention is itself
-    expect(peek(v).action('Cast_Loop')?.getClip().name).toBe('Cast_Loop');
+    expect(peek(v).action('Woc_Cast_Omni')?.getClip().name).toBe('Woc_Cast_Omni');
     // no clip, no name: no action
     expect(peek(v).action('Not_A_Clip')).toBeNull();
     expect(peek(v).action(undefined)).toBeNull();

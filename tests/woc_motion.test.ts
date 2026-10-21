@@ -231,9 +231,9 @@ describe('WOC attack and shout routing', () => {
     // the second hand of a same-frame pair lands on the pair clip's second contact
     expect(visual.playAttack()).toBeCloseTo(keyed.Woc_Attack_Dual[1], 6);
     tick(visual);
-    // an ability routed through the one-hand slash plays the X-slash with two blades
-    expect(visual.playAttack('overpower')).toBeCloseTo(contacts.Dual_Cross[0], 6);
-    expect(peek(visual).current.getClip().name).toBe('Dual_Cross');
+    // an ability routed through the one-hand slash plays the dual strike with two blades
+    expect(visual.playAttack('overpower')).toBeCloseTo(contacts.Woc_Attack_Dual[0], 6);
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Dual');
   });
 
   it('the same clip started again mid-swing crossfades from where it is (no snap to frame 0)', () => {
@@ -298,26 +298,26 @@ describe('WOC two-hand weapon: the single set, no two-hand stance', () => {
     expect(visual.playAttack()).toBeCloseTo(wocAutoAttackContacts.male.Woc_Attack_1H_0[0], 6);
     expect(clip(visual)).toBe('Woc_Attack_1H_0');
     tick(visual, {}, 90);
-    expect(clip(visual)).toBe('Combat_Idle_Single');
+    expect(clip(visual)).toBe('Woc_Combat_Idle_1H');
     visual.playAttack();
     expect(clip(visual)).toBe('Woc_Attack_1H_1');
     tick(visual, {}, 90);
-    expect(clip(visual)).toBe('Combat_Idle_Single');
+    expect(clip(visual)).toBe('Woc_Combat_Idle_1H');
     for (const [ability, strike] of [
-      ['mortal_strike', '1H_Chop_Single'],
-      ['execute', '1H_Chop_Single'],
-      ['heroic_leap', '1H_Chop_Single'],
-      ['thunder_clap', '1H_Chop_Single'],
-      ['overpower', '1H_Slash_Single'],
-      ['heroic_strike', '1H_Slash_Single'],
+      ['mortal_strike', 'Woc_Attack_1H_0'],
+      ['execute', 'Woc_Attack_1H_0'],
+      ['heroic_leap', 'Woc_Attack_1H_0'],
+      ['thunder_clap', 'Woc_Special_1H'],
+      ['overpower', 'Woc_Attack_1H_1'],
+      ['heroic_strike', 'Woc_Attack_1H_0'],
     ] as const) {
       visual.playAttack(ability);
       expect(clip(visual), ability).toBe(strike);
       tick(visual, {}, 90);
-      expect(clip(visual), ability).toBe('Combat_Idle_Single');
+      expect(clip(visual), ability).toBe('Woc_Combat_Idle_1H');
     }
     visual.playHit();
-    expect(clip(visual)).toBe('Hit_Single');
+    expect(clip(visual)).toBe('Woc_Hit');
   });
 
   it('routes the paladin and shaman two-hand swings the same way, Final Edict included', () => {
@@ -328,13 +328,13 @@ describe('WOC two-hand weapon: the single set, no two-hand stance', () => {
       visual.playAttack();
       expect(clip(visual), key).toBe('Woc_Attack_1H_0');
       tick(visual, {}, 90);
-      expect(clip(visual), key).toBe('Combat_Idle_Single');
+      expect(clip(visual), key).toBe('Woc_Combat_Idle_1H');
     }
     const paladin = create('player_paladin');
     paladin.setWeapon('eastbrook_greatsword');
     tick(paladin, {}, 20);
     paladin.playAttack('final_edict');
-    expect(clip(paladin)).toBe('1H_Chop_Single');
+    expect(clip(paladin)).toBe('Woc_Attack_1H_0');
   });
 
   it("keeps a Titan's Grip pair on the crossed-blade dual set", () => {
@@ -345,9 +345,9 @@ describe('WOC two-hand weapon: the single set, no two-hand stance', () => {
     visual.playAttack();
     expect(clip(visual)).toBe('Woc_Attack_Dual#main');
     tick(visual, {}, 90);
-    expect(clip(visual)).toBe('Combat_Idle_Dual');
+    expect(clip(visual)).toBe('Woc_Combat_Idle_Dual');
     visual.playAttack('mortal_strike');
-    expect(clip(visual)).toBe('Dual_Cross');
+    expect(clip(visual)).toBe('Woc_Attack_Dual');
   });
 
   it('leaves a staff on its two-hand chop: the caster auto attack and a staff shaman swing', () => {
@@ -370,36 +370,36 @@ describe('hunter cast-to-shot state transitions', () => {
     const visual = create('player_hunter');
     tick(visual, { casting: true, castingAbility: 'aimed_shot' }, 45);
     const aim = peek(visual).current;
-    expect(aim.getClip().name).toBe('Ranged_Shoot#aim');
+    expect(aim.getClip().name).toBe('Woc_Attack_Rifle#aim');
     expect(aim.time).toBeCloseTo(0.15);
     expect(aim.paused).toBe(true);
     tick(visual, { casting: true, castingAbility: 'aimed_shot' }, 30);
     expect(aim.time).toBeCloseTo(0.15);
     visual.playAttack();
-    expect(peek(visual).current.getClip().name).toBe('Ranged_Shoot#release');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Rifle#release');
     expect(peek(visual).current.paused).toBe(false);
     // the release half runs 0.76 s (the 2026-09-29 snap shot splits at 0.17 s of 0.93), then
     // the hand-off fade
     tick(visual, {}, 75);
     // the shot braces the rig (combat_brace_core.ts): it holds the battle stance, free hand
     // down (the hunter's crossbow leaves the off hand empty), instead of the relaxed idle
-    expect(peek(visual).current.getClip().name).toBe('Combat_Idle_Single');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Combat_Idle_1H');
     expect(peek(visual).current.getEffectiveWeight()).toBe(1);
   });
 
   it('plays the full shot when the aim has not reached its hold point', () => {
     const visual = create('player_hunter');
     tick(visual, { casting: true, castingAbility: 'aimed_shot' }, 6);
-    expect(peek(visual).current.getClip().name).toBe('Ranged_Shoot#aim');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Rifle#aim');
     expect(peek(visual).current.paused).toBe(false);
     visual.playAttack();
-    expect(peek(visual).current.getClip().name).toBe('Ranged_Shoot');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Rifle');
   });
 
   it('does not release a paused aim when the base state is no longer casting', () => {
     const visual = create('player_hunter');
     tick(visual, { casting: true, castingAbility: 'aimed_shot' }, 45);
-    expect(peek(visual).current.getClip().name).toBe('Ranged_Shoot#aim');
+    expect(peek(visual).current.getClip().name).toBe('Woc_Attack_Rifle#aim');
     expect(peek(visual).current.paused).toBe(true);
     // Change only the state: leaving the actual held action paused makes
     // this exercise the cast-state guard independently of its pause guard.
