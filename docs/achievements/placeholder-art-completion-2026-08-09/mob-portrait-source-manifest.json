@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "90452b01f6a185a36ca42449d6b67484696201e4c94c4984979ce512378dcfed",
+  "rendererFingerprint": "ed91b96f362db8326e91b0310ca3f0da3ddee6587f9492fb0a4bf88f87ce22e4",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6445392,
-      "sha256": "34087c6abcec2046d83c488825365ef240292391c8672290eb3bd4f0fe21a9fe",
+      "bytes": 6447638,
+      "sha256": "e1f0add74c09c8d304a961f9371019e6195ac5413aca0912486216412867c5fc",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -108,8 +108,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -127,7 +127,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f04fb261871d6cfb832c3ca3199001559ceadbd038823021158c1230379ef53f",
+      "sourceFingerprint": "b85432d89e596508b46eb43a76fa06750bdba6e668c1f302dc63f7f2a8e1af3c",
       "output": {
         "path": "public/ui/mobs/acolyte_tessa.webp",
         "bytes": 3066,
@@ -228,8 +228,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -247,7 +247,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "91cc74871f4ff9f5eda4e1816edc3d1b58136ba1bca97d865fe660de2d71c35d",
+      "sourceFingerprint": "0e5abde1c9c1c8e2ffc90a2ec68b31b3ea93ef8c11e1160c7f383c5a8695a073",
       "output": {
         "path": "public/ui/mobs/apprentice_wren.webp",
         "bytes": 2798,
@@ -1261,8 +1261,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -1280,7 +1280,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/castaway_navigator.webp",
         "bytes": 2384,
@@ -1682,8 +1682,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -1701,7 +1701,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/crypt_crow_caller.webp",
         "bytes": 2384,
@@ -2146,8 +2146,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -2165,7 +2165,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3b01a15d04386125404f682cd0895bbe39abf555b3caf98976acc3061f260ef8",
+      "sourceFingerprint": "c6df29df71f69e25c34eac8554d767d5153c098266e4ea4365b915ed81b03c43",
       "output": {
         "path": "public/ui/mobs/deacon_voss.webp",
         "bytes": 3118,
@@ -2567,8 +2567,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -2586,7 +2586,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "7e787502d6d90ab0f5a45ad1f28a751ec1cc625eb50e4c8268f05545d4aa1bac",
+      "sourceFingerprint": "ba0c4f173de841220ef10412decea75ee1fc098435e1c68dc217d6faa55cc151",
       "output": {
         "path": "public/ui/mobs/drowned_cantor.webp",
         "bytes": 3148,
@@ -3056,8 +3056,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -3075,7 +3075,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/eastbrook_freight_caravan.webp",
         "bytes": 2384,
@@ -3137,8 +3137,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -3156,7 +3156,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "b5df0eddc52c0d245e9bdb50f1234cee8f5bcc2d796daeca2aa2ccd2c364e175",
+      "sourceFingerprint": "c687a3a325401caed833a9a906a9633e49bd57247dc10eee57104dbd986f57fa",
       "output": {
         "path": "public/ui/mobs/edda_reedhand.webp",
         "bytes": 2862,
@@ -3456,8 +3456,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -3475,7 +3475,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/fisher_bram.webp",
         "bytes": 2384,
@@ -3673,8 +3673,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -3692,7 +3692,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/frostveil_supply_caravan.webp",
         "bytes": 2384,
@@ -4162,8 +4162,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -4181,7 +4181,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
+      "sourceFingerprint": "5bf841bec1cfc7286839706ab3069a65ff760d326c66f3a9a39d2e0b2781d086",
       "output": {
         "path": "public/ui/mobs/gorrak.webp",
         "bytes": 2484,
@@ -4311,8 +4311,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -4330,7 +4330,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "681f43a11779c9fc29ff17023574d8f5dfa144c825fdf2d0753f056c856c08cb",
+      "sourceFingerprint": "a65565e8b40da7e7a8f025012c9f2bb7f4f087b884bfc9b410a1495169ca6597",
       "output": {
         "path": "public/ui/mobs/gravecaller_cultist.webp",
         "bytes": 2424,
@@ -4392,8 +4392,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -4411,7 +4411,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3b01a15d04386125404f682cd0895bbe39abf555b3caf98976acc3061f260ef8",
+      "sourceFingerprint": "c6df29df71f69e25c34eac8554d767d5153c098266e4ea4365b915ed81b03c43",
       "output": {
         "path": "public/ui/mobs/gravecaller_mender.webp",
         "bytes": 3118,
@@ -4473,8 +4473,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -4492,7 +4492,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "4755348f41b3a87df4a4de18947160a172dc15f7286ba2e66be1629fb31e44e6",
+      "sourceFingerprint": "043c761e0df96696ce4efcb6bb8b023c8ed8d99eae615dc2ae66351d098312c5",
       "output": {
         "path": "public/ui/mobs/gravecaller_summoner.webp",
         "bytes": 2428,
@@ -4554,8 +4554,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -4573,7 +4573,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/gravedigger_mosley.webp",
         "bytes": 2384,
@@ -5043,8 +5043,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -5062,7 +5062,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "fd097fdab731a680287b768f56fbd085a21a9d9fb4986dd192ce2df296479cf0",
+      "sourceFingerprint": "332bb96bc05da92463b067d5da11c877825495e2b36b9aaf148eb0e0510b9398",
       "output": {
         "path": "public/ui/mobs/hedge_knight.webp",
         "bytes": 3588,
@@ -6876,8 +6876,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -6895,7 +6895,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
+      "sourceFingerprint": "5bf841bec1cfc7286839706ab3069a65ff760d326c66f3a9a39d2e0b2781d086",
       "output": {
         "path": "public/ui/mobs/mogger.webp",
         "bytes": 2484,
@@ -6957,8 +6957,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -6976,7 +6976,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
+      "sourceFingerprint": "5bf841bec1cfc7286839706ab3069a65ff760d326c66f3a9a39d2e0b2781d086",
       "output": {
         "path": "public/ui/mobs/mogger_lackey.webp",
         "bytes": 2484,
@@ -7276,8 +7276,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -7295,7 +7295,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c00339f470977c5184c049659b597e49b31dfc2b7adda15c4b96ba5605277510",
+      "sourceFingerprint": "1a3e58e2c1b54da5462f1fe59be2a48d765f1ca3b9d17dea9caeace6eb9a0fa2",
       "output": {
         "path": "public/ui/mobs/muster_chaplain.webp",
         "bytes": 3342,
@@ -7357,8 +7357,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -7376,7 +7376,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
+      "sourceFingerprint": "5bf841bec1cfc7286839706ab3069a65ff760d326c66f3a9a39d2e0b2781d086",
       "output": {
         "path": "public/ui/mobs/muster_drillmaster.webp",
         "bytes": 2484,
@@ -7472,8 +7472,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -7491,7 +7491,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
+      "sourceFingerprint": "5bf841bec1cfc7286839706ab3069a65ff760d326c66f3a9a39d2e0b2781d086",
       "output": {
         "path": "public/ui/mobs/muster_footman.webp",
         "bytes": 2484,
@@ -7553,8 +7553,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -7572,7 +7572,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
+      "sourceFingerprint": "5bf841bec1cfc7286839706ab3069a65ff760d326c66f3a9a39d2e0b2781d086",
       "output": {
         "path": "public/ui/mobs/muster_sergeant.webp",
         "bytes": 2484,
@@ -7749,8 +7749,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -7768,7 +7768,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f04fb261871d6cfb832c3ca3199001559ceadbd038823021158c1230379ef53f",
+      "sourceFingerprint": "b85432d89e596508b46eb43a76fa06750bdba6e668c1f302dc63f7f2a8e1af3c",
       "output": {
         "path": "public/ui/mobs/nhalia_mourner.webp",
         "bytes": 3066,
@@ -8630,8 +8630,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -8649,7 +8649,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "681f43a11779c9fc29ff17023574d8f5dfa144c825fdf2d0753f056c856c08cb",
+      "sourceFingerprint": "a65565e8b40da7e7a8f025012c9f2bb7f4f087b884bfc9b410a1495169ca6597",
       "output": {
         "path": "public/ui/mobs/reliquary_gravecall_acolyte.webp",
         "bytes": 2424,
@@ -9570,8 +9570,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -9589,7 +9589,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "d6b2a6787cee61adfe87825ae7d78112144597d306c94eec42176f052cbf993f",
+      "sourceFingerprint": "681edb7b0161018cb50151b417856ee7bfc7f9d124e9e6e45356f0d646e2c7a3",
       "output": {
         "path": "public/ui/mobs/rift_pact_acolyte.webp",
         "bytes": 2488,
@@ -10603,8 +10603,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -10622,7 +10622,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "f04fb261871d6cfb832c3ca3199001559ceadbd038823021158c1230379ef53f",
+      "sourceFingerprint": "b85432d89e596508b46eb43a76fa06750bdba6e668c1f302dc63f7f2a8e1af3c",
       "output": {
         "path": "public/ui/mobs/sister_nhalia.webp",
         "bytes": 3066,
@@ -10684,8 +10684,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_female.glb",
             "path": "public/models/chars/players/woc_keyed/woc_female.glb",
-            "bytes": 658800,
-            "sha256": "f53d85551279e0696ed493cb59526c882a40e4ab2c013c47438169cb11330108"
+            "bytes": 658796,
+            "sha256": "ec96c6a76aad609c739310ccbbc260e53cd2846542b1dd94f275cea802d3775a"
           }
         ],
         "armor": [
@@ -10703,7 +10703,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "21e142603511749f4394ae2a2f4e58e26246e99325bb3606b2c5660011c77405",
+      "sourceFingerprint": "995a206981178989aa981d129406150d143fef6117769563344e8a374d00d55e",
       "output": {
         "path": "public/ui/mobs/sister_nhalia_drowned_canticle.webp",
         "bytes": 3112,
@@ -11411,8 +11411,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -11430,7 +11430,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "550bb93e78c172baae5d3e9d0aaa7f5b3c47ecceac80ce137b5a4d04d53e1595",
+      "sourceFingerprint": "568df1cff8d32ea0f72052a0a0c35dd4b15cf5507ee687b64b25c25ac0b058d0",
       "output": {
         "path": "public/ui/mobs/the_wreck_warden.webp",
         "bytes": 2510,
@@ -11594,8 +11594,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -11613,7 +11613,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "681f43a11779c9fc29ff17023574d8f5dfa144c825fdf2d0753f056c856c08cb",
+      "sourceFingerprint": "a65565e8b40da7e7a8f025012c9f2bb7f4f087b884bfc9b410a1495169ca6597",
       "output": {
         "path": "public/ui/mobs/threnos_first_voice.webp",
         "bytes": 2424,
@@ -11845,8 +11845,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -11864,7 +11864,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "f119a098fe244bb58c335faff90775d91d9e44c742bf669de9de9e5fb6c981a7",
+      "sourceFingerprint": "12f41c5ccd568501eab90e11d2688450b647eb48c0f35637fc63f114b7e10abd",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection.webp",
         "bytes": 2400,
@@ -11926,8 +11926,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -11945,7 +11945,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "2bbd64643bab1ecebd99aeb5d7c43b8c16edc4d4a1dbed3f57b3b4182b1140e7",
+      "sourceFingerprint": "f77e11b08f1bd6062ac85de702f5dd8e8fd1b23c3c367bd0ad4b8cf20e330c60",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_druid.webp",
         "bytes": 2774,
@@ -11995,8 +11995,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -12014,7 +12014,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "f0e23b23b04b046d2a4b3a12f37229a2abae83eb18651a424a8c8e0af755205a",
+      "sourceFingerprint": "d920e823d1d1779c80c8406a882b5213a58dd4e4a234bd30f2c6b519fecc7a32",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_hunter.webp",
         "bytes": 2486,
@@ -12076,8 +12076,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -12095,7 +12095,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "19b19d5d4f38cb51dfff06fbaa2c7a30cdcb7774540fc6773d32f40e40342e8c",
+      "sourceFingerprint": "dbb5bed4689cce6dc73d3665c81e30ad38c6d80854b83a44a6764a1abc2c27de",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_mage.webp",
         "bytes": 2716,
@@ -12157,8 +12157,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -12176,7 +12176,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "9bbfa02056d61570407337bbd51e5e9b3cd9abbb8816d43319acb0933a7fac9a",
+      "sourceFingerprint": "f5697237e73d0a8f9dfec6afd463578c19f0167bea9f748f0fd0875e8b0b3137",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_paladin.webp",
         "bytes": 3340,
@@ -12238,8 +12238,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -12257,7 +12257,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "a80164feb87d610d7dae76e93576b0544bfba6e7f3b47c9639f5c7e5e5aa0de5",
+      "sourceFingerprint": "3af351af9770e258dc5e4e44eefc8bf6cc912fcd2eed12c92ccdd63329592d73",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_priest.webp",
         "bytes": 2932,
@@ -12319,8 +12319,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -12338,7 +12338,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "a91b3e48ff0c3c08d89160a4bda812914f7dc32c3a1683a79fe43c0cda958f4e",
+      "sourceFingerprint": "ee52383e5df6a685fae72a9ebf46dcef0d41d14575f7063f1fff3b8ffc42515f",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_rogue.webp",
         "bytes": 2210,
@@ -12400,8 +12400,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -12419,7 +12419,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "20c4a955ab0d3d61431d2ee64ff4239d04fc0912c0ffb7e61b15f04f40ad65ca",
+      "sourceFingerprint": "69eaa352d9a9448ca752ae2bf0b322af27686704de3c83afc59934077591d60f",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_shaman.webp",
         "bytes": 2786,
@@ -12481,8 +12481,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -12500,7 +12500,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "d71899ae904cb59711abb5885de03b46de7acd5693255d512eff9914c3a778f4",
+      "sourceFingerprint": "d3fa77d2100ca8d9bc298dbce89ed076e722e805b3fabf0eb722a235064f2f59",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_warlock.webp",
         "bytes": 2292,
@@ -12562,8 +12562,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -12581,7 +12581,7 @@
         "resolved": "#7fb2ff",
         "strength": 0.88
       },
-      "sourceFingerprint": "f119a098fe244bb58c335faff90775d91d9e44c742bf669de9de9e5fb6c981a7",
+      "sourceFingerprint": "12f41c5ccd568501eab90e11d2688450b647eb48c0f35637fc63f114b7e10abd",
       "output": {
         "path": "public/ui/mobs/tideglass_reflection_warrior.webp",
         "bytes": 2400,
@@ -13017,8 +13017,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -13036,7 +13036,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/vale_bandit.webp",
         "bytes": 2384,
@@ -13268,8 +13268,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -13287,7 +13287,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "ead37094d398e03d57acb1c32d3b93fd957bbedc3ad2e794b59053d04c340183",
+      "sourceFingerprint": "5bf841bec1cfc7286839706ab3069a65ff760d326c66f3a9a39d2e0b2781d086",
       "output": {
         "path": "public/ui/mobs/vision_aldren_warrior.webp",
         "bytes": 2484,
@@ -13349,8 +13349,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -13368,7 +13368,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/vision_deathstalker_voss.webp",
         "bytes": 2384,
@@ -13430,8 +13430,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -13449,7 +13449,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9b527fcda55e06c0506974f931d42af048f60fff0d4f7beb9555da021ab493e1",
+      "sourceFingerprint": "b53a8d7523328866edafddb882e978a926beba631c95c83683d7bc19f4cb6365",
       "output": {
         "path": "public/ui/mobs/vision_malric_mage.webp",
         "bytes": 2896,
@@ -14094,8 +14094,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -14113,7 +14113,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/willowfen_remedy_caravan.webp",
         "bytes": 2384,
@@ -14277,8 +14277,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -14296,7 +14296,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "681f43a11779c9fc29ff17023574d8f5dfa144c825fdf2d0753f056c856c08cb",
+      "sourceFingerprint": "a65565e8b40da7e7a8f025012c9f2bb7f4f087b884bfc9b410a1495169ca6597",
       "output": {
         "path": "public/ui/mobs/wyrmcult_necromancer.webp",
         "bytes": 2424,
@@ -14358,8 +14358,8 @@
           {
             "url": "models/chars/players/woc_keyed/woc_male.glb",
             "path": "public/models/chars/players/woc_keyed/woc_male.glb",
-            "bytes": 655932,
-            "sha256": "65acb3c149433d60ed97f28bdea41086e966a6b8c58448e3b317d275915f99f7"
+            "bytes": 655884,
+            "sha256": "1237bc923c91529c1d798e46072760324720ab88dbbc7f8b84c531c920941085"
           }
         ],
         "armor": [
@@ -14377,7 +14377,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "c72e3200ffd093f19c3192ac0f8c6f93ccc86b04b4c9313fd4440ed36fd111ca",
+      "sourceFingerprint": "6cfa8f3257c98c999941efe6a1a74f34c9112088bd670ca0f70e381dc0c6a3cf",
       "output": {
         "path": "public/ui/mobs/wyrmcult_zealot.webp",
         "bytes": 2384,
