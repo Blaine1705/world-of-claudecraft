@@ -232,9 +232,20 @@ export interface FarmBedSeat {
   readonly x: number;
   readonly y: number;
   readonly z: number;
+  /** Shared with the bed's drawn plot, which sways about it; only the map
+   *  editor's live bed drag turns it, in place. */
   readonly quat: THREE.Quaternion;
   readonly patchId: string;
   readonly zoneId: string;
+}
+
+/** The bed-seat map buildFarmPatchProps hangs on its group, for the map
+ *  editor's live bed drag (editor_api/moved_object_preview.ts). */
+export function farmBedSeatsOf(
+  group: THREE.Object3D | undefined,
+): Map<string, FarmBedSeat> | undefined {
+  const seats: unknown = group?.userData.farmBedSeats;
+  return seats instanceof Map ? (seats as Map<string, FarmBedSeat>) : undefined;
 }
 
 export interface FarmPatchPropsView {
