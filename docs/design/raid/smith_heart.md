@@ -38,6 +38,8 @@ Sources of truth, in order:
 | Placeholder looks (the one list phase 2 replaces) | `src/render/characters/smith_heart_placeholder_looks.ts` |
 | The Hammer vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_hammer_kit.py` (the sculpted quarry rock: `hammer_cliff.py`), `scripts/assets/smith_heart_hammer_kit/build.mjs`, `src/render/smith_heart/hammer_kit_plan_core.ts`, `src/render/smith_heart/heart_kit.ts` |
 | The Hammer vein's air and light | `src/render/smith_heart/hammer_air_core.ts`, `src/render/smith_heart/heart_environment.ts` (`smithHeartHammer`) |
+| The mountain's rock kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_rock_kit.py` (the sculpts: `rock_sculpt.py`), `scripts/assets/smith_heart_rock_kit/build.mjs`, `src/render/smith_heart/heart_rock_plan_core.ts`, `src/render/smith_heart/heart_rock.ts` |
+| The Gallery's walk (paving, kerb, chain rail, fallen blocks) | the `paving` ground (`field_textures.ts` `pavingDetail`), `docs/design/raid/kit/walk_pieces.py`, `src/render/smith_heart/hammer_walk_plan_core.ts`, `sh_fallen_block` in the layout |
 | The Hammer guardian's and the Slab's effects | `src/render/smith_heart_fx/` (`HammerFx`) |
 | Dev commands | `src/sim/dev/smith_heart_dev.ts` (`/dev heart`) |
 
@@ -459,6 +461,60 @@ Readability: unchanged. The new light is grade only (Mountain's Wrath's sight fi
 trash engine's on every tier); the Cleft's lamps sit inside its light zone's budget; the
 stepped mountain only ever stands lower than the smooth one.
 
+### 5.12 The mountain's rock and the Gallery's walk (phase 2E)
+
+The owner's ask: "AAA, and the Hammer not weak". After 2D the mountain's walls, every
+room's, were still the heightfield's huge flat facets, and the Gallery walked on a plain
+pale slab.
+
+**The rock kit, and why bands on the heightfield.** One Blender kit of sculpted granite
+(`rock_sculpt.py`): tall faces, faces, crests (broad low peaks), a rib standing out of
+the face, boulders, and the lips that hang under the walks. Each face is the band's own
+mass with the beds' plates stacked on it, each plate broken to its own outline, dipping
+and overlapping (never a grid), cracks through them, an overhang now and then, the crest
+falling back into the mountain, scree on the ledges; the weather paints big value groups
+(pale worn crests, mid faces, cool joints never black, rain streaks under ledges, dust
+and lichen only on the tops). 2D's sculpted walls were buried because they stood at a
+fixed height at the walk's edge while the mountain climbed a hundred yards behind them.
+Here the heightfield stays (the clearance, the open air and the sightline pins rest on
+it) and becomes the dark mass BEHIND the rock: the plan (`planHeartRock`) lays the pieces
+in bands along contours of the clearance (the yards past it), each piece's front plane
+on its contour, its foot sunk into the slope, scaled so its crest reaches past the slope
+behind it to the next band (its beds never stretched past half again), and a second pass
+fills the bends a broad face cannot take with narrower pieces. The slope itself steps
+back behind the first band, a ledge under the floor (`HEART_MOUNTAIN_RECESS`,
+`HEART_MOUNTAIN_LEDGE`), so the first faces stand clear instead of buried. Rejected:
+rebuilding the mountain from the kit (it would move the clearance every pin rests on,
+for no visible gain).
+
+**The walks' sides.** Every walk falling into the chasm (not the floating islands) takes
+a hanging lip under its brink (`planHeartLips`): the same granite, leaning out over the
+void past the field's own flaring face, following a stair's slope, its brink under the
+lowest floor along it, and none where it would stand through another floor. The
+quarried lips of 2B and 2D gave way to them (their worked face stood inside the field's
+rock and never read); the chain hoists hang where they were.
+
+**The Gallery's walk.** Its paths and landings are paved (`paving`): dressed flags in
+courses, each its own tone, worn arrises, chipped corners, a crack here and there, dust
+in the joints. A worn kerb runs along every lip over the chasm, broken into a rubble edge
+about one module in four, and the masons' chain rail stands past it over the drop (none
+where the lip bends onto another floor). Three blocks fallen from the Smith's work lie at
+the walk's edges, on colliders (`sh_fallen_block`).
+
+**Budget and tiers.** The rock is one lit material for the whole mountain (a heavier
+triplanar fracture, a broad tile), instanced per piece in wide culling cells: measured
+from the play camera the whole mountain adds about 75 to 85 draws and 1 to 1.4 million
+triangles (the Ring view: about 410 draws and 3.2 million triangles in all, under the
+Gravewyrm Sanctum's court's draws and half the Wildheart Basin's triangles). The bands
+from the fourth up draw far builds of the same sculpts at about a third of the
+triangles; the low tier keeps the first two bands (the walls the walks see) and sheds
+the rest. The rock casts no shadow. Its material and its program warmers link with the
+interior (the kit is awaited with the Hammer kit), so nothing compiles on first view.
+The rock is cut away within a few yards of the camera (`heart_rock_cutaway.ts`), so a
+camera zoomed out past an arena's rim never sees a wall: cosmetic, every tier.
+Readability unchanged: no light, nothing over a walked floor, every key sightline pinned
+with the rock in it.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -663,6 +719,13 @@ on both difficulties (dungeon rework README, goal 4).
   timelines; the chains, keels and core; the sightlines from the Ring and the Balcony
   to the seal and the portal's eye; the props and the light budget.
 - `tests/smith_heart_areas.test.ts`: the areas, the score per area, the Heart's air.
+- `tests/smith_heart_rock_kit.test.ts`: the rock kit's GLB (fingerprint, budget, the
+  measures the plan relies on), the bands (every area skinned, fronts behind their
+  contours, out of the open air, beds never over-stretched, the coverage of the slope,
+  only upper bands shed), the slope's ledge, the lips (never under a floating island,
+  nothing over a walked floor) and the camera cutaway.
+- `tests/smith_heart_hammer_kit.test.ts`: the Hammer kit and its plan, the Gallery's
+  paving, kerb, rail and fallen blocks.
 - `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
   hop included) and the dev-only door.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`

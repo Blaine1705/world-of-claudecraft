@@ -1,6 +1,7 @@
 <!-- src/render/smith_heart/: the Smith's Heart raid's open-air renderer (phase 2A:
      the structure; phase 2B: the Hammer vein's Blender kit, air and light; phase 2C:
-     its polish round; phase 2D: its last weak points). Presentation only (parent dirs cover the IWorld seam,
+     its polish round; phase 2D: its last weak points; phase 2E: the mountain's rock
+     kit and the Gallery's walk). Presentation only (parent dirs cover the IWorld seam,
      determinism and the GPU scheduler contract). Don't repeat root / src / render
      CLAUDE.md. -->
 
@@ -27,11 +28,14 @@ bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 | `index.ts` | Public surface: `buildSmithHeartInterior` (registered for interior `smith_heart` in `../open_air_fields.ts`). |
 | `heart_interior.ts` | Composes the slot (terrain with the floating islands `shallow`, mountain, crags, props, Heart, lights, rivers, seal, portals, gates, sky) and owns the frame driver: the seal view, the portal stage, the hop detection and the sky's area blend. |
 | `heart_plan_core.ts` | PURE: the palette and tones, the recipe of every `sh_*` prop kind (`HEART_PROP_RECIPES`: each room's hero shapes), a prop's base height, the budgeted lights (`planHeartLights`) and their zones, the hash. |
-| `heart_mountain_core.ts` / `heart_mountain.ts` | PURE plan and painter of the mountain: one faceted heightfield rising out of the chasm past every floor's clearance (`heartMountainHeight`), low round the Cornice, deepest round the Heart, open air kept; `heartMountainBlocks` pins that no main-map eye sees into the Heart. In the Hammer vein it climbs in ledges and sheer risers (`heartHammerTerrace`, never above the smooth slope), banded in granite beds. |
+| `heart_mountain_core.ts` / `heart_mountain.ts` | PURE plan and painter of the mountain: one faceted heightfield rising out of the chasm past every floor's clearance (`heartMountainHeight`; since 2E a ledge under the floor for its first yards, `HEART_MOUNTAIN_RECESS`, and the dark mass behind the rock kit), low round the Cornice, deepest round the Heart, open air kept; `heartMountainBlocks` pins that no main-map eye sees into the Heart. In the Hammer vein it climbs in ledges and sheer risers (`heartHammerTerrace`, never above the smooth slope), banded in granite beds. |
 | `heart_walls_core.ts` | PURE: the floor clearance field (`heartFloorClearance`), the open-air regions (`heartOpenAir`), each room's rock scale (`heartWallScale`), the ridge noise, and the loose crags at the mountain's foot (`planHeartWalls`, `heartRockShape`). |
 | `heart_props.ts` | Instances the recipes (shared unit geometry, `surfaceMat` tones) and the crags (one instanced draw per rock shape, the shared triplanar rock on them; none deep in the Hammer vein, whose stepped granite stands in for them); the placeholders of the kinds a kit draws stand apart (`kitOwned`) so the kit takes their place. |
 | `heart_kit_core.ts` / `heart_kit.ts` | A vein's Blender kit: the placement record (PURE), then the loader and baker (each Kit_* node split by slot: KitStone lit with the shared triplanar rock, KitGlow emissive), the instancer (culling cells, stretch and shear for the edge modules), the slot program warmers built with every interior, the late-landing swap. |
 | `hammer_kit_plan_core.ts` / `hammer_kit.ts` | PURE plan and painter of the Hammer vein's kit: every vein prop fitted with its piece (the colossi kneeling on the first step, carved out of the terraces), the worked faces, rims and lips along every cliff run of the vein (the shared edge planner), and the render-only dressing (the great cliffs crowning the top step, `HAMMER_CROWN`; scaffold, hoists, spoil, chips, the floor's crack inlays, the collapse spot's overhang, the Balcony's lookouts). The sculpted quarry rock is `docs/design/raid/kit/hammer_cliff.py`. |
+| `heart_rock_plan_core.ts` / `heart_rock.ts` | PURE plan and painter of the mountain's rock kit (`public/models/props/smith_heart_rock_kit.glb`, from `docs/design/raid/kit/build_smith_heart_rock_kit.py`): the sculpted faces laid in bands along contours of the clearance over the whole main map and the Heart (`planHeartRock`: fronts on their contour, feet sunk, crests reaching the next band, far builds high up), the lips hanging under every walk's brink (`planHeartLips`); one lit material, wide culling cells, no shadow, upper bands shed on the low tier. The loose crags stand in until the kit lands. |
+| `heart_rock_cutaway.ts` | The rock's material discards its fragments near the camera (a camera zoomed out past an arena's rim stands in the mountain). |
+| `hammer_walk_plan_core.ts` | PURE: the Gallery's worn kerb and chain rail along its lips over the chasm (the rail never over a walk); the paving is its `paving` ground, the fallen blocks layout props. |
 | `hammer_air_core.ts` / `hammer_air.ts` | PURE plan and painter of the Hammer vein's air: the Cleft's fan of sun shafts with their dust, warm pools and the crystals' halos (the raid's first image), dust motes in the low sun, grit off the terrace lips and the colossi, the collapse spot's heavy trickles, the pit's grey haze, the geodes' halos. Shader-driven quads, cosmetic, a third on the low tier. |
 | `heart_cliff_paint_core.ts` | PURE: the field's cliff faces' vertex paint, the Hammer vein's in its cool quarry granite (never near-black), the shared tint elsewhere; the vein's share at a point (`hammerRockLift`), its granite beds (`hammerRockBed`) and its risers' shade (`hammerRiserShade`) for the mountain and the crags. |
 | `heart_lights.ts` | The point lights through the fire-light sink (at most eight per light zone), each with a halo card. A light hung past a walked floor's lip (the Cleft's) carries its own height (`HeartLightSpot.y`): the field's height there is the void. |
@@ -61,6 +65,11 @@ Rules:
   main map's is the borrowed `sunkenBastion` state.
 - A point light falls off physically: one that must reach rock 15 to 25 yd away needs a
   strong source (the Cleft's door and fill), a lamp's pool a small one.
+- The mountain's rock never stands nearer a floor than its band's contour of the
+  clearance, never in the open air, never over a walked floor (a lip's brink under its
+  walk); its pieces stretch at most half again up their slope. Pinned by
+  `tests/smith_heart_rock_kit.test.ts`, its volumes in the sightline pin
+  (`heartRockSolids`).
 - A kit piece a body can touch stays within its layout collider (plus a body's width); a
   render-only piece never stands over a walked floor (the terraces are dressing floors
   nobody reaches); the edge modules keep their lip frame (a rim never stands proud of the
@@ -78,4 +87,4 @@ seal memory and fill, portal and hop timelines, chains, keels, core, gate poses,
 light budget), `tests/smith_heart_areas.test.ts` (areas, score, the Heart's air),
 `tests/smith_heart_hammer_kit.test.ts` (the Hammer kit's GLB and its plan) and
 `tests/smith_heart_hammer_fx.test.ts` (the vein's air, the guardian's and the Slab's
-effects). Evidence: `scripts/smith_heart_hammer_shot.mjs`.
+effects) and `tests/smith_heart_rock_kit.test.ts` (the rock kit and its plan). Evidence: `scripts/smith_heart_hammer_shot.mjs`.
