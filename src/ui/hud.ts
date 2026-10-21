@@ -5585,6 +5585,8 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#dungeon-finder-window'),
     hideTooltip: () => this.hideTooltip(),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    hasBossGuide: RaidBossGuideWindow.hasJournal,
+    openBossGuide: (d, m, diff) => this.raidBossGuideWindow.openJournal(d, m, diff),
     ...this.windowFocus('#dungeon-finder-window'),
   });
 
@@ -5595,6 +5597,7 @@ export class Hud {
     attachTooltip: (element, html) => this.attachTooltip(element, html),
     hideTooltip: () => this.hideTooltip(),
     modelTouchQueue: () => previewTouchQueueOf(this.renderer),
+    dungeonRun: () => this.sim.dungeonRun,
     ...this.windowFocus('#raid-boss-guide-window'),
   });
 

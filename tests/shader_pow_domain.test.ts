@@ -210,7 +210,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/drowned_temple/temple_tsunami_fx.ts': 3,
   'src/render/floor_telegraph/telegraph_material.ts': 1,
   'src/render/gravewyrm_sanctum/sanctum_air.ts': 2,
-  'src/render/gravewyrm_sanctum/sanctum_face.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_face.ts': 3,
   'src/render/gravewyrm_sanctum/sanctum_fire.ts': 2,
   'src/render/gravewyrm_sanctum/sanctum_lake.ts': 3,
   'src/render/gravewyrm_sanctum/sanctum_sky.ts': 3,

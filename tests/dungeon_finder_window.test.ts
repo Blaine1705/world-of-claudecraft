@@ -190,3 +190,12 @@ describe('dungeon finder window stylesheet contract', () => {
     expect(hud).toContain("$('#dungeon-finder-window').style.display === 'flex'");
   });
 });
+
+describe('dungeon finder boss guide button (source contract)', () => {
+  it('offers the boss guide only through the injected hooks, labelled and escaped', () => {
+    expect(src).toContain('this.deps.hasBossGuide?.(dungeonId, e.mobId)');
+    expect(src).toContain("t('hudChrome.raidBossGuide.finderOpenLabel', { boss: name })");
+    expect(src).toContain('data-bossguide="${esc(e.mobId)}"');
+    expect(src).toContain('this.deps.openBossGuide(detail.dungeonId, mobId, detail.difficulty);');
+  });
+});

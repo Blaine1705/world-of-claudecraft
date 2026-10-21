@@ -32,29 +32,28 @@ describe('winning Warrior attack animation routing', () => {
     // library, the hand-keyed library keyed on the same bind pose, and the warrior
     // armor set): no KayKit donor clip is ever layered on.
     expect(VISUALS.player_warrior.clips.attackByHand).toEqual({
-      twohand: '2H_Chop',
+      twohand: 'Woc_Attack_2H_0',
       dualwield: 'Dual_Chop',
     });
     expect(VISUALS.player_warrior.clips.attackByAbility).toMatchObject({
-      mortal_strike: '2H_Chop',
-      execute: '2H_Chop',
-      slam: '2H_Chop',
-      red_harvest: '2H_Chop',
-      breachmaker: '2H_Chop',
-      // Shieldcrack braces behind the offhand SHIELD (the rig's guard beat;
-      // it ships no shield bash), never a sword chop.
-      shield_slam: 'Block',
-      raging_gale: 'Dual_Chop',
-      bloodthirst: 'Dual_Chop',
-      // The two frontal-arc AoE strikes reap sideways (the slash), never the
-      // top-to-bottom chop.
-      cleave: '1H_Slash',
-      revenge: '1H_Slash',
-      thunder_clap: '1H_Chop',
-      faultline: '1H_Chop',
-      heroic_strike: '1H_Slash',
-      overpower: '1H_Slash',
-      hamstring: '1H_Slash',
+      mortal_strike: 'Woc_Attack_2H_0',
+      execute: 'Woc_Attack_2H_0',
+      slam: 'Woc_Attack_2H_0',
+      red_harvest: 'Woc_Attack_2H_1',
+      breachmaker: 'Woc_Attack_2H_1',
+      // Shieldcrack drives the offhand shield forward (the keyed shield bash),
+      // never a sword chop.
+      shield_slam: 'Woc_Shield_Bash',
+      raging_gale: 'Woc_Attack_Dual',
+      bloodthirst: 'Woc_Attack_Dual',
+      // The frontal-arc AoE strikes reap sideways, never the top-to-bottom chop.
+      cleave: 'Woc_Special_1H',
+      revenge: 'Woc_Attack_1H_1',
+      thunder_clap: 'Woc_Special_1H',
+      faultline: 'Woc_Attack_2H_1',
+      heroic_strike: 'Woc_Attack_1H_0',
+      overpower: 'Woc_Attack_1H_1',
+      hamstring: 'Woc_Attack_1H_Stab',
     });
     // Instant casts carry no gesture entry on this body (owner call): with
     // none, the ability painter draws nothing and the generic cast arm goes
@@ -216,12 +215,12 @@ describe('winning Warrior cast VFX routing', () => {
     expect(pal.clips.run).toBe('Woc_Run');
     // Weapon strikes and interrupts swing; the timed holy bolt releases a cast.
     expect(pal.clips.attackByAbility).toEqual({
-      crusader_strike: '1H_Chop',
-      vowkeeper_strike: '1H_Slash',
-      final_edict: '2H_Chop',
-      hushbrand: '1H_Chop',
-      rebuke: '1H_Chop',
-      mercy_lance: 'Cast_Shoot',
+      crusader_strike: 'Woc_Attack_1H_0',
+      vowkeeper_strike: 'Woc_Attack_1H_1',
+      final_edict: 'Woc_Attack_2H_0',
+      hushbrand: 'Woc_Shield_Bash',
+      rebuke: 'Woc_Attack_1H_0',
+      mercy_lance: 'Woc_Cast_Shoot',
     });
     for (const silent of [
       'consecration',

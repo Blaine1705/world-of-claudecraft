@@ -143,6 +143,16 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
     'Woc_Attack_Dual',
     'Woc_Attack_Dual#main',
     'Woc_Attack_Dual#off',
+    'Woc_Combat_Idle_1H',
+    'Woc_Combat_Idle_2H',
+    'Woc_Combat_Idle_Dual',
+    'Woc_Hit',
+    'Woc_Shout',
+    'Woc_Cast_Directed',
+    'Woc_Cast_Omni',
+    'Woc_Cast_Shoot',
+    'Woc_Cast_Omni_Release',
+    'Woc_Channel_Directed',
   ];
   it('holds planted contacts still in standing clips and keeps every foot above the floor', () => {
     const rig = rigs[fit],
@@ -298,7 +308,7 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
   it('keeps the support hand on the haft through every keyed two-handed swing', () => {
     const model = bindModel(rigs[fit]);
     const twoHanded = CLIPS.filter((clip) => ['twohand', 'long'].includes(CATALOG[clip].weapon));
-    expect(twoHanded).toHaveLength(5);
+    expect(twoHanded).toHaveLength(6);
     for (const name of twoHanded) {
       const { spec } = keyedSpec(model, fit, name);
       expect(spec.grip?.hand, name).toBe('l');

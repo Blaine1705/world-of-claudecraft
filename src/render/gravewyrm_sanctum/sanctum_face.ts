@@ -326,12 +326,16 @@ function wyrmMaterial(
         `{
           float depthIce = max(0.0, vSWorld.z - uFrontZ);
           float bare = (1.0 - smoothstep(9.0, 16.0, length(vSWorld - uHeadPos))) * uCalved;
-          float absorb = (1.0 - exp(-depthIce / 11.0)) * (1.0 - bare);
+          float absorb = (1.0 - exp(-depthIce / 15.0)) * (1.0 - bare);
           vec3 ice = vec3(${ICE_LIN.map((v) => (v * 1.4).toFixed(3)).join(', ')});
           vec3 lit = gl_FragColor.rgb - totalEmissiveRadiance;
           // Rime on every surface that faces the sky.
           lit = mix(lit, lit + ice * 0.12, 0.5);
-          lit = mix(lit, ice * (0.18 + 0.3 * exp(-depthIce / 30.0)), absorb * 0.84);
+          lit = mix(lit, ice * (0.18 + 0.3 * exp(-depthIce / 30.0)), absorb * 0.62);
+          // A cold rim on his silhouette (the backlit ice behind him), so the
+          // horns, the wing and the spine read from the far end of the road.
+          float rim = pow(1.0 - clamp(abs(dot(normalize(normal), normalize(vViewPosition))), 0.0, 1.0), 3.0);
+          lit += vec3(0.42, 0.62, 0.8) * rim * 0.5 * (1.0 - bare * 0.5);
           gl_FragColor.rgb = lit + totalEmissiveRadiance * mix(1.0, 0.6, absorb);
         }
         #include <tonemapping_fragment>`,
@@ -811,6 +815,15 @@ export function buildSanctumFace(
   wide.position.set(WYRM_HEART[0], WYRM_HEART[1] + 6, WYRM_HEART[2] - 10);
   wide.scale.set(110, 80, 1);
   wide.renderOrder = 2;
+  // The ice behind him lit from within: his silhouette stands dark against
+  // it from every path (the wyrm's own depth hides what falls behind him).
+  const backMat = haloMat.clone();
+  backMat.color.set(0x9fe4ff);
+  backMat.name = 'gravewyrmSanctumBacklight';
+  const back = new THREE.Sprite(backMat);
+  back.position.set(WYRM_HEART[0], WYRM_HEART[1] + 8, WYRM_HEART[2] + 16);
+  back.scale.set(150, 96, 1);
+  back.renderOrder = 1;
   const eyeMat = haloMat.clone();
   eyeMat.color.set(0xffc35a);
   eyeMat.name = 'gravewyrmSanctumEye';
@@ -819,7 +832,7 @@ export function buildSanctumFace(
   eye.position.set(WYRM_EYE[0], WYRM_EYE[1], WYRM_EYE[2] - 1.2);
   eye.scale.set(0.01, 0.01, 1);
   eye.renderOrder = 4;
-  root.add(halo, wide, eye);
+  root.add(halo, wide, back, eye);
   // The great split's light deep in the ice (stage 3): a soft warm ribbon
   // down the split's line behind the kit's thin glowing strokes, revealed
   // from the crest down as the split runs.
@@ -876,7 +889,8 @@ export function buildSanctumFace(
     SANCTUM_SHARD_UNIFORMS.uBeat.value = glow;
     wyrmMat.emissiveIntensity = 0.35 + glow * 0.9;
     haloMat.opacity = Math.min(1, 0.18 + glow * 0.42);
-    wideMat.opacity = Math.min(0.5, 0.05 + glow * 0.12);
+    wideMat.opacity = Math.min(0.3, 0.04 + glow * 0.08);
+    backMat.opacity = Math.min(0.75, 0.42 + glow * 0.18);
     // Stage 4+: the face calved; 5: torn free and collapsing.
     const s4 = v.stageSince[4];
     const s5 = v.stageSince[5];
@@ -958,6 +972,7 @@ export function buildSanctumFace(
       const held = frozenWyrmShown(s5);
       const sinceBurst = s5 - FACE_BURST_AT;
       wyrm.visible = held;
+      back.visible = held;
       halo.visible = s5 < FACE_BURST_AT + 0.4;
       wide.visible = pose.k < 0.6;
       eye.visible = held;
@@ -978,6 +993,7 @@ export function buildSanctumFace(
       frame.rotation.x = 0;
       frame.visible = true;
       wyrm.visible = true;
+      back.visible = true;
       halo.visible = true;
       wide.visible = true;
       eye.visible = true;

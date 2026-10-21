@@ -374,6 +374,18 @@ describe('Ignivar encounter renderer', () => {
       kind: 'mob',
     });
 
+    expect(bodyGlow).not.toHaveBeenCalled();
+
+    painter.syncEntity({
+      id: 81,
+      templateId: 'other_boss',
+      castingAbility: 'shadowform',
+      castRemaining: 0.25,
+      castTotal: 0.5,
+      auras: [],
+      kind: 'mob',
+    });
+
     expect(bodyGlow).toHaveBeenCalledTimes(1);
 
     painter.syncEntity({

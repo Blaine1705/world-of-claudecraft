@@ -1,6 +1,7 @@
 // The Smith's Seal Gate, the Gravewyrm Sanctum's world entrance (door (0, 858),
-// Thornpeak Heights): the three Blender GLBs (the gate and its tunnel, the plaza
-// props, the far ice tongue on the ridge) seated on the door's terrain height,
+// Thornpeak Heights): the three Blender GLBs (the carved gate, its crown and the
+// spur's tunnel, the plaza props, the far icefall in the ridge notch) seated on
+// the door's terrain height,
 // plus its cosmetic layer: the faint blue rune light (the one point light, a
 // fire-light sink source), the cold mist film across the tunnel mouth (the
 // door's portal look; the door body itself is only the invisible click box,
@@ -65,7 +66,8 @@ export interface SanctumSealGateView {
 let runeMat: THREE.MeshBasicMaterial | null = null;
 
 /** The Blender nodes whose KitStone is the MOUNTAIN's rock (the spur the
- *  tunnel is cut into, the ice tongue's cheeks), not the Smith's masonry. */
+ *  tunnel is cut into, and any rock the icefall node carries), not the
+ *  Smith's masonry. */
 const MOUNTAIN_ROCK_NODES = new Set(['Entrance_Tunnel', 'Entrance_IceTongue']);
 
 /** The lit slots go through surfaceMat every time (it caches per graphics
@@ -138,14 +140,16 @@ let filmGlow: THREE.MeshBasicMaterial | null = null;
 function mistFilm(): THREE.Group {
   filmGeo ??= markSharedGeometry(new THREE.PlaneGeometry(1, 1));
   // The mist gate family's own drifting sheet (one shared program), in the
-  // Quench's colours: a pale cold haze and a faint rune-blue breath over it.
+  // Quench's colours: a cold slate haze over the dark of the tunnel (it
+  // veils the depths instead of glowing white by day) and a faint rune-blue
+  // breath moving over it.
   filmHaze ??= markSharedMaterial(
     decorateMistMaterial(
       new THREE.MeshBasicMaterial({
-        color: 0x8aa3b4,
+        color: SANCTUM_MIST_FILM.hazeColor,
         map: mistNoiseTexture() ?? undefined,
         transparent: true,
-        opacity: 0.6,
+        opacity: SANCTUM_MIST_FILM.hazeOpacity,
         side: THREE.DoubleSide,
         depthWrite: false,
       }),
@@ -154,10 +158,10 @@ function mistFilm(): THREE.Group {
   );
   if (!filmGlow) {
     const glow = new THREE.MeshBasicMaterial({
-      color: 0x5ab8ff,
+      color: SANCTUM_MIST_FILM.breathColor,
       map: mistNoiseTexture() ?? undefined,
       transparent: true,
-      opacity: 0.32,
+      opacity: SANCTUM_MIST_FILM.breathOpacity,
       side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -220,10 +224,10 @@ gl_Position = projectionMatrix * mvPosition;`;
 function coldMistMaterial(): THREE.MeshBasicMaterial {
   if (mistMat) return mistMat;
   const material = new THREE.MeshBasicMaterial({
-    color: 0xb4c6d3,
+    color: SANCTUM_MIST_FLOW.color,
     map: puffTexture() ?? undefined,
     transparent: true,
-    opacity: 0.22,
+    opacity: SANCTUM_MIST_FLOW.opacity,
     depthWrite: false,
   });
   material.onBeforeCompile = (shader) => {
@@ -358,8 +362,8 @@ export function buildSanctumSealGate(seed: number): SanctumSealGateView {
   });
   gate.add(coldMist(fx.tier));
   group.add(gate);
-  // The ice tongue hangs 50 yd up the ridge: its own cull group, so it stays on
-  // the skyline while the gate itself is still beyond the fog.
+  // The icefall breaks down the ridge notch 20 to 75 yd up: its own cull group,
+  // so it stays on the skyline while the gate itself is still beyond the fog.
   const ice = new THREE.Group();
   ice.name = 'sanctumIceTongue';
   ice.position.copy(gate.position);

@@ -309,7 +309,9 @@ diluting, and final bosses were carrying most of each dungeon's heroic epics.
 ## 9. Environment performance budget (proposed, confirm with `render-performance-reviewer`)
 
 - One kit GLB per dungeon, meshopt compressed, at most 4 MB; repeated pieces
-  instanced.
+  instanced. A later art pass may ship a second kit GLB beside it (the
+  Gravewyrm Sanctum interior pass), but the 4 MB cap covers both together
+  (pinned in `tests/gravewyrm_sanctum_interior_kit.test.ts`).
 - Room-level visibility: only the current room and its neighbors render (rooms
   are the light zones of G9).
 - At most 8 dynamic point lights live per light zone (torch rig), one

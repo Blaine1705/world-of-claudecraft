@@ -61,6 +61,10 @@ export interface DungeonFinderWindowDeps extends PainterHostPresentation {
   // Close the finder, open the world map, and ping the given overworld point
   // (the activity entrance). Never teleports.
   showOnMap(x: number, z: number): void;
+  // The dungeon's boss guide page for one encounter, when the dungeon ships one
+  // (raid_boss_guide_window.ts openJournal). Absent: no guide buttons.
+  hasBossGuide?(dungeonId: string, mobId: string): boolean;
+  openBossGuide?(dungeonId: string, mobId: string, difficulty: DungeonDifficulty): void;
 }
 
 export class DungeonFinderWindow {
@@ -256,6 +260,15 @@ export class DungeonFinderWindow {
       audio.click();
       rerender();
     });
+    for (const btn of el.querySelectorAll<HTMLButtonElement>('[data-bossguide]')) {
+      btn.addEventListener('click', () => {
+        const detail = view.detail;
+        const mobId = btn.dataset.bossguide;
+        if (!detail || !mobId || !this.deps.openBossGuide) return;
+        audio.click();
+        this.deps.openBossGuide(detail.dungeonId, mobId, detail.difficulty);
+      });
+    }
     el.querySelector('[data-showmap]')?.addEventListener('click', () => {
       const detail = view.detail;
       if (!detail) return;
@@ -479,12 +492,17 @@ export class DungeonFinderWindow {
       `</div>`;
     const encounters =
       `<div class="df-sub">${esc(t('hudChrome.finder.encounters'))}</div>` +
-      d.encounters.map((e) => this.encounterHtml(e)).join('');
+      d.encounters.map((e) => this.encounterHtml(e, d.dungeonId)).join('');
     return head + meta + encounters;
   }
 
-  private encounterHtml(e: FinderEncounterViewModel): string {
+  private encounterHtml(e: FinderEncounterViewModel, dungeonId: string): string {
     const name = tEntity({ kind: 'mob', id: e.mobId, field: 'name' });
+    const guide = this.deps.hasBossGuide?.(dungeonId, e.mobId)
+      ? `<button type="button" class="btn df-guide-btn ui-btn" data-bossguide="${esc(e.mobId)}" aria-label="${esc(
+          t('hudChrome.raidBossGuide.finderOpenLabel', { boss: name }),
+        )}">${esc(t('hudChrome.raidBossGuide.finderOpen'))}</button>`
+      : '';
     const flags = [
       e.final ? t('hudChrome.finder.finalBoss') : null,
       e.summoned ? t('hudChrome.finder.summoned') : null,
@@ -532,7 +550,7 @@ export class DungeonFinderWindow {
     return (
       `<div class="df-encounter ui-card">` +
       `<img class="df-portrait" src="${esc(e.portraitUrl)}" width="64" height="64" loading="lazy" decoding="async" alt="">` +
-      `<div class="df-encounter-body"><div class="df-encounter-name">${esc(name)}${flags}</div>` +
+      `<div class="df-encounter-body"><div class="df-encounter-name">${esc(name)}${flags}${guide}</div>` +
       mechanics +
       `<div class="df-loot">${lootSections}${money}</div></div></div>`
     );

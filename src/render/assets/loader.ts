@@ -357,6 +357,12 @@ function loadGltfFragment(
   return p;
 }
 
+/** Whether a GLB is already parsed or in flight in the shared cache (a borrower
+ *  such as the encounter journal releases on close only what it brought in). */
+export function isGltfCached(url: string): boolean {
+  return gltfCache.has(assetUrl(url));
+}
+
 export function releaseGltf(url: string): void {
   gltfCache.delete(assetUrl(url));
 }

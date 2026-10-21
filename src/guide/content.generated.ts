@@ -22051,13 +22051,13 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "mob_wolf": {
     "url": "models/creatures/wolf_basic.glb",
     "idle": "Idle",
-    "height": 1.6,
+    "height": 1.47,
     "tintStrength": 0.35
   },
   "greyjaw": {
     "url": "models/creatures/greyjaw.glb",
     "idle": "Idle",
-    "height": 2.2
+    "height": 2.05
   },
   "mob_boar": {
     "url": "models/creatures/wild_boar.glb",

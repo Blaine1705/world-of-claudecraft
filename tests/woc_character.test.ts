@@ -989,27 +989,39 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
     }
   });
 
-  it('casters raise and hold, release bolts through the throw, and channel the loop', () => {
+  it('casters weave their cast loops and release bolts and bursts through the keyed throws', () => {
     for (const cls of ['mage', 'priest', 'warlock', 'druid', 'shaman'] as const) {
       const clips = VISUALS[`player_${cls}`].clips;
-      expect(clips.cast, cls).toBe('Cast_Raise');
-      expect(clips.castHoldPointSeconds, cls).toBe(1.0);
-      expect(clips.castPlayOut, cls).toEqual(['Cast_Raise']);
+      expect(clips.cast, cls).toBe('Woc_Cast_Directed');
       for (const clip of Object.values(clips.attackByAbility ?? {})) {
-        expect(['Cast_Shoot', '1H_Chop', '1H_Slash', '2H_Chop'], cls).toContain(clip);
+        expect(
+          [
+            'Woc_Cast_Shoot',
+            'Woc_Cast_Omni_Release',
+            'Woc_Attack_1H_0',
+            'Woc_Attack_1H_1',
+            'Woc_Attack_2H_0',
+            'Woc_Special_1H',
+          ],
+          cls,
+        ).toContain(clip);
       }
       for (const clip of Object.values(clips.castByAbility ?? {}))
-        expect(clip, cls).toBe('Cast_Loop');
+        expect(['Woc_Channel_Directed', 'Woc_Cast_Omni'], cls).toContain(clip);
     }
     // The hunter aims from the shot clip's raise and releases its tail.
     const hunter = VISUALS.player_hunter.clips;
     expect(hunter.clipSplits).toEqual([
-      { clip: 'Ranged_Shoot', at: 0.17, names: ['Ranged_Shoot#aim', 'Ranged_Shoot#release'] },
+      {
+        clip: 'Woc_Attack_Rifle',
+        at: 0.17,
+        names: ['Woc_Attack_Rifle#aim', 'Woc_Attack_Rifle#release'],
+      },
     ]);
-    expect(hunter.cast).toBe('Ranged_Shoot#aim');
+    expect(hunter.cast).toBe('Woc_Attack_Rifle#aim');
     expect(hunter.castHoldPointSeconds).toBeLessThan(0.17);
-    expect(hunter.attackByAbility?.aimed_shot).toBe('Ranged_Shoot#release');
-    expect(hunter.attack).toEqual(['Ranged_Shoot']);
+    expect(hunter.attackByAbility?.aimed_shot).toBe('Woc_Attack_Rifle#release');
+    expect(hunter.attack).toEqual(['Woc_Attack_Rifle']);
     expect(VISUALS.player_hunter.weaponSlots).toBeUndefined();
     // Dual wielders split the two-strike clip like the warrior.
     expect(VISUALS.player_rogue.clips.dualWieldSplit).toBe(
