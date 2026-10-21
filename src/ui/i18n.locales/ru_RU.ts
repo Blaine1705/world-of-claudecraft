@@ -3374,6 +3374,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Условия использования',
   'footer.privacy': 'Политика конфиденциальности',
   'footer.discordLabel': 'Присоединиться к Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.guidesLabel': 'Гайды для игроков',
   'footer.guideGamesLikeWow': 'Игры, похожие на WoW',
   'footer.guideBrowser': 'Браузерные MMORPG',
@@ -18766,10 +18767,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Учетные записи операторов нельзя отключить.',
   'apiError.kick.reason_required': 'Необходимо указать причину.',
   'apiError.kick.target_offline': 'Этот игрок больше не в сети на этом мире.',
-  'apiError.world_quest_block.admin_target': 'Учетные записи операторов нельзя лишить доступа к локальным заданиям.',
+  'apiError.world_quest_block.admin_target':
+    'Учетные записи операторов нельзя лишить доступа к локальным заданиям.',
   'apiError.world_quest_block.reason_required': 'Необходимо указать причину.',
-  'apiError.world_quest_block.already_blocked': 'Эта учетная запись уже лишена доступа к локальным заданиям.',
-  'apiError.world_quest_block.not_blocked': 'Эта учетная запись не лишена доступа к локальным заданиям.',
+  'apiError.world_quest_block.already_blocked':
+    'Эта учетная запись уже лишена доступа к локальным заданиям.',
+  'apiError.world_quest_block.not_blocked':
+    'Эта учетная запись не лишена доступа к локальным заданиям.',
   'entities.items.reins_goblin_rocket_sled.name': 'Ключ зажигания гоблинских ракетных саней',
   'entities.items.reins_rallycart_rxt.name': 'Ключ зажигания ралликарта RXT',
   'guide.settingsPage.ifAuraBarBelowFrame':

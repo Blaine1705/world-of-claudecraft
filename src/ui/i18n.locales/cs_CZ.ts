@@ -6527,6 +6527,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'nav.wiki': 'Wiki',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Připojit se na Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Open-source projekt',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.privacy': 'Zásady ochrany soukromí',
