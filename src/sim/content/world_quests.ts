@@ -331,7 +331,7 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'eastbrook_freight_wagon',
     name: 'Eastbrook Freight Wagon',
-    positions: [{ x: -46, z: -56 }],
+    positions: [{ x: -78, z: -57 }],
     entityIds: [2_147_100_004],
   },
   {
@@ -480,7 +480,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_eastbrook_bandits',
     zoneId: 'eastbrook_vale',
     minLevel: WORLD_QUEST_MIN_LEVEL,
-    area: { x: -54, z: -68, radius: 20 },
+    area: { x: -61, z: -68, radius: 26 },
     objective: {
       type: 'delivery',
       pickupObjectItemId: 'eastbrook_freight_crate',

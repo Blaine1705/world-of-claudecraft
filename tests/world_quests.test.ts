@@ -510,7 +510,7 @@ describe('world quest content', () => {
     expect(pickups.map((pickup) => ({ x: pickup.pos.x, z: pickup.pos.z }))).toEqual(
       pickupPositions,
     );
-    expect(destination?.pos).toMatchObject({ x: -46, z: -56 });
+    expect(destination?.pos).toMatchObject({ x: -78, z: -57 });
     if (!destination) throw new Error('Missing freight wagon');
 
     for (const object of [...pickups, destination]) {
