@@ -165,7 +165,10 @@ const HAMMER_CRAG = new THREE.Color(HAMMER_ROCK_TONE);
 export function buildHeartWalls(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
   group.name = 'smithHeartWalls';
-  const blocks = planHeartWalls(lowGfx ? 7 : 5);
+  // Deep in the Hammer vein the mountain's own stepped granite stands in
+  // for the crags (phase 2D: their plain prisms read as a blockout's slabs
+  // beside its sculpted rock); at the vein's edge they stay.
+  const blocks = planHeartWalls(lowGfx ? 7 : 5).filter((b) => hammerRockLift(b.x, b.z) < 0.99);
   const material = detailedSurfaceMat(
     { color: 0xffffff, roughness: 0.96, flatShading: true },
     'rock',
@@ -203,8 +206,8 @@ export function buildHeartWalls(lowGfx: boolean): THREE.Group {
       const k = heartHash(Math.round(b.x * 3), Math.round(b.z * 3));
       const tall = Math.min(1, (b.top - SMITH_HEART_FIELD.voidHeight) / 160);
       color.setHex(mix(ROCK_DARK, ROCK_LIGHT, 0.2 + k * 0.45 + tall * 0.25));
-      // The Hammer vein's crags in its own cool granite, lifted out of the
-      // warm dark that read as sandy card under its low sun (phase 2D).
+      // The Hammer vein's edge crags in its own cool granite, lifted out of
+      // the warm dark that read as sandy card under its low sun (phase 2D).
       const lift = hammerRockLift(b.x, b.z);
       if (lift > 0)
         color.lerp(HAMMER_CRAG, lift * 0.65).multiplyScalar(1 + lift * (HAMMER_ROCK_GAIN - 1));
