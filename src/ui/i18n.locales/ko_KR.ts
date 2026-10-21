@@ -22214,7 +22214,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'bossJournal.wildheart.zulgar.glyphSummary':
     '문양 {count}개가 제단을 둘러쌉니다. 재규어의 영혼이 켜진 문양을 지나면 {seconds}초 동안 {slow} 감속되고, 그 문양은 {dark}초 동안 꺼집니다. 사냥 중에는 감속과 속박이 통하고 기절 지속시간은 절반이 됩니다.',
   'bossJournal.wildheart.zulgar.glyphResponse': '문양을 나눠 쓰세요: 첫 사냥에 전부 태우지 마세요.',
-  'bossJournal.wildheart.zulgar.ambushName': '매복',
+  'bossJournal.wildheart.zulgar.ambushName': '사냥꾼의 매복',
   'bossJournal.wildheart.zulgar.ambushSummary':
     '사냥이 끝날 때마다 {seconds}초 동안 모습을 감춥니다. 반경 {radius}야드의 원이 가장 먼 플레이어를 표시하고 {warn}초의 경고 뒤, 그곳에 내려앉습니다: 원 안의 모두가 {min}~{max}의 피해를 입습니다.',
   'bossJournal.wildheart.zulgar.ambushResponse': '원 밖으로 나가세요.',

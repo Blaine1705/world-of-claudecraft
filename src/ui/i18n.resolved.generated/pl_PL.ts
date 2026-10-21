@@ -7811,7 +7811,7 @@ export const pl_PL: EnTranslations = {
   },
   "bossJournal": {
     "common": {
-      "enrageName": "Enrage",
+      "enrageName": "Enraged",
       "phaseEnrageSummary": "Below {health} health the boss enrages for the rest of the fight.",
       "enrageSummary": "Below {health} health its melee attacks deal {damage} more damage and come {haste} faster, for the rest of the fight.",
       "enrageResponse": "Tank and healer save their defensive and healing cooldowns for this phase. Everyone else pushes damage to end it fast.",
@@ -7869,7 +7869,7 @@ export const pl_PL: EnTranslations = {
         "wardSummary": "Every {every} sec the jaguar gains a shield that absorbs {amount} damage for {seconds} sec.",
         "wardResponse": "Hit the Beastmaster while the shield is up: the health pool is shared.",
         "heelSummary": "Every {every} sec, a {cast} sec cast on the jaguar, then it leaps back to the Beastmaster and the bond returns.",
-        "heelResponse": "Stun, incapacitate or polymorph the jaguar during the cast to cancel it. It only works if the jaguar is not already Wary of stuns.",
+        "heelResponse": "Stun, incapacitate or transform the jaguar during the cast to cancel it. It only works if the jaguar is not already Wary of stuns.",
         "tipTank": "Pull the Beastmaster more than {normal} yd from the jaguar at once and hold him there, facing away from the group.",
         "tipTankHeroic": "Pull the Beastmaster more than {heroic} yd from the jaguar at once and hold him there. After each Heel! drag him clear again.",
         "tipHealer": "Watch the Stalk target: bites and bleeds land fast, faster during Call of the Hunt.",
@@ -7930,7 +7930,7 @@ export const pl_PL: EnTranslations = {
         "glyphName": "Sun Glyphs",
         "glyphSummary": "{count} glyphs ring the shrine. When the jaguar spirit crosses a lit glyph he is slowed by {slow} for {seconds} sec, and that glyph goes dark for {dark} sec. During the hunt slows and roots land on him, and stuns last half as long.",
         "glyphResponse": "Spread the glyphs out: do not burn them all on the first hunt.",
-        "ambushName": "Ambush",
+        "ambushName": "Hunter's Ambush",
         "ambushSummary": "After each hunt he vanishes for {seconds} sec. A {radius} yd circle marks the farthest player, giving a {warn} sec warning, then he lands there: {min} to {max} damage to everyone inside.",
         "ambushResponse": "Get out of the circle.",
         "tipTank": "Keep open ground behind you for Jaguar Roar. When the hunt ends he comes back to you: be ready to take him.",

@@ -21124,7 +21124,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'bossJournal.wildheart.zulgar.glyphSummary':
     '{count}个符文环绕神殿。美洲豹之魂踏过点亮的符文时，会减速{slow}，持续{seconds}秒，该符文随后熄灭{dark}秒。追猎期间，减速和定身对他生效，击晕持续时间减半。',
   'bossJournal.wildheart.zulgar.glyphResponse': '把符文分散使用：不要在第一次追猎就全部用掉。',
-  'bossJournal.wildheart.zulgar.ambushName': '伏击',
+  'bossJournal.wildheart.zulgar.ambushName': '猎手伏击',
   'bossJournal.wildheart.zulgar.ambushSummary':
     '每次追猎后他会隐匿{seconds}秒。一个半径{radius}码的圆圈标出最远的玩家，并给出{warn}秒预警，随后他落在那里：对圈内所有人造成{min}到{max}点伤害。',
   'bossJournal.wildheart.zulgar.ambushResponse': '离开圆圈。',

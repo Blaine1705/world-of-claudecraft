@@ -7930,7 +7930,7 @@ export const zh_TW: EnTranslations = {
         "glyphName": "太陽符文",
         "glyphSummary": "{count}個符文環繞神殿。美洲豹之魂踏過點亮的符文時，會減速{slow}，持續{seconds}秒，該符文隨後熄滅{dark}秒。追獵期間，減速和定身對他生效，擊暈持續時間減半。",
         "glyphResponse": "把符文分散使用：不要在第一次追獵就全部用掉。",
-        "ambushName": "伏擊",
+        "ambushName": "獵手伏擊",
         "ambushSummary": "每次追獵後他會隱匿{seconds}秒。一個半徑{radius}碼的圓圈標出最遠的玩家，並給出{warn}秒預警，隨後他落在那裡：對圈內所有人造成{min}至{max}傷害。",
         "ambushResponse": "離開圓圈。",
         "tipTank": "為美洲豹咆哮在身後留出空地。追獵結束時他會回到你身邊：做好接住他的準備。",

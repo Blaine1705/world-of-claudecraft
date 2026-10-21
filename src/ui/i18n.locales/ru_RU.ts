@@ -22628,7 +22628,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Глифов вокруг святилища: {count}. Когда дух ягуара пересекает горящий глиф, он замедляется на {slow} на {seconds} сек., а этот глиф гаснет на {dark} сек. Во время охоты замедления и обездвиживания действуют, а оглушения длятся вдвое меньше.',
   'bossJournal.wildheart.zulgar.glyphResponse':
     'Расходуйте глифы по одному: не сжигайте все на первой охоте.',
-  'bossJournal.wildheart.zulgar.ambushName': 'Засада',
+  'bossJournal.wildheart.zulgar.ambushName': 'Засада охотника',
   'bossJournal.wildheart.zulgar.ambushSummary':
     'После каждой охоты он исчезает на {seconds} сек. Круг радиусом {radius} м отмечает самого дальнего игрока и даёт {warn} сек. предупреждения, затем он приземляется туда: от {min} до {max} урона всем внутри.',
   'bossJournal.wildheart.zulgar.ambushResponse': 'Выйдите из круга.',

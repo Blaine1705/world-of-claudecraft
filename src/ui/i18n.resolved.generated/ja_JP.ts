@@ -7930,7 +7930,7 @@ export const ja_JP: EnTranslations = {
         "glyphName": "太陽紋",
         "glyphSummary": "{count}個の紋が祭壇を囲む。ジャガーの霊が点灯した紋を越えると{seconds}秒間{slow}鈍足になり、その紋は{dark}秒間消灯する。狩りの間、鈍足と拘束は効き、スタンの持続は半分になる。",
         "glyphResponse": "紋は分けて使う：最初の狩りで使い切らない。",
-        "ambushName": "待ち伏せ",
+        "ambushName": "狩人の待ち伏せ",
         "ambushSummary": "狩りのたびに{seconds}秒間姿を消す。最も遠い者に半径{radius}ヤードの円が示され、{warn}秒の予告の後、彼がそこに降り立つ：円内の全員が{min}〜{max}ダメージ。",
         "ambushResponse": "円から出る。",
         "tipTank": "ジャガーロアに備えて背後に空間を確保する。狩りが終わると彼はあなたの元へ戻る：引き受ける準備をしておく。",
