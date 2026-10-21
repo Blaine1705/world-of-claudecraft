@@ -36,7 +36,7 @@ export function readCourierDispatch(value: Record<string, unknown>): CourierDisp
   if (
     !Array.isArray(deposits) ||
     !Array.isArray(withdrawals) ||
-    deposits.length + withdrawals.length < 1 ||
+    // Zero selections is the courier dismissal (the window closed unsent).
     deposits.length + withdrawals.length > 24 ||
     Buffer.byteLength(JSON.stringify(value), 'utf8') > 12 * 1024
   )
@@ -75,7 +75,19 @@ export function emitCourierSelfKeys(
   sim: CourierWireSim,
   session: CourierWireSession,
 ): void {
-  emit('courier', sim.courierPoseFor(session.pid));
+  const pose = sim.courierPoseFor(session.pid);
+  // Older clients strictly validate the original pose keys. Publish timing as
+  // a separate self delta, which they ignore, while retaining the legacy pose.
+  if (pose) {
+    const { travelTicks, legTicks, ...legacyPose } = pose;
+    emit('courier', legacyPose);
+    emit('courierTravelTicks', travelTicks ?? null);
+    emit('courierLegTicks', legTicks ?? null);
+  } else {
+    emit('courier', null);
+    emit('courierTravelTicks', null);
+    emit('courierLegTicks', null);
+  }
   const revision = sim.courierWireRevisionFor(session.pid);
   if (session.lastSent.courierData === undefined || revision !== session.lastCourierWireRevision) {
     const info = revision === null ? null : sim.courierInfoFor(session.pid);
@@ -88,6 +100,8 @@ export function emitCourierSelfKeys(
         bankerId: _bankerId,
         inventoryRevision: _inventoryRevision,
         travelDistance: _travelDistance,
+        travelTicks: _travelTicks,
+        legTicks: _legTicks,
         remainingDistance: _remainingDistance,
         ...data
       } = info;

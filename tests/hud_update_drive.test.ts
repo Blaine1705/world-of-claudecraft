@@ -1315,9 +1315,12 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     guard: {
       kind: 'module',
       module: 'hud/referral_cards/referral_cards_controller.ts',
-      proof: 'if (this.lastRevision === revision) return;',
+      proof:
+        'if (this.lastRevision === revision && this.lastFriendshipInviter === inviter) return;',
     },
-    why: 'launcher and open card rebuild only after an authoritative revision changes',
+    // The friendship armour claim (0c118462629) widened the guard to the
+    // inviter name as well; the early return still skips identical passes.
+    why: 'launcher and open card rebuild only after the authoritative revision or the friendship inviter changes',
   },
   {
     call: 'this.updateGuildBillboardEcho',
@@ -1990,7 +1993,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     ).toEqual(
       [
         'arena_window.ts: if (ravenriftSig === this.lastSig) return;',
-        'hud/referral_cards/referral_cards_controller.ts: if (this.lastRevision === revision) return;',
+        'hud/referral_cards/referral_cards_controller.ts: if (this.lastRevision === revision && this.lastFriendshipInviter === inviter) return;',
         'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
         'bank_window.ts: if (sig === this.lastSig) return;',
         'calendar_window.ts: if (sig === this.lastSig) return;',

@@ -1156,8 +1156,12 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       // drop-shadow scaled by the tier, never a blur. Base 97; the release's
       // two extra library composites (+4) and the world-quests branch's vault
       // blooms (+11) compose to 112 at the release/v0.44.0 base merge.
-      'the style graph owns 112 reviewed tier-shadow uses',
-    ).toHaveLength(112);
+      // 112 -> 114: the dungeon objectives tracker's completion flash
+      // (c8702ec4f81, hud.css @keyframes dungeon-tracker-complete) scales its
+      // outer and inset box-shadow blur by the tier; the completed state itself
+      // (the unscaled gold keyline, bar and tally) reads the same at every preset.
+      'the style graph owns 114 reviewed tier-shadow uses',
+    ).toHaveLength(114);
 
     for (const [name, body] of [
       [

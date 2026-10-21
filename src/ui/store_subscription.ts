@@ -196,7 +196,7 @@ export class StoreSubscription {
     };
   }
   private benefitsHtml(): string {
-    return `<section class="ui-card" data-membership-benefits><div class="charter-body"><h2 class="ui-h">${esc(t('hudChrome.wocStore.subscription.benefitsTitle'))}</h2><ul>${(['benefitBank', 'benefitSlots', 'benefitArmour', 'benefitTax'] as const).map((key) => `<li>${esc(t(`hudChrome.wocStore.subscription.${key}`))}</li>`).join('')}</ul><p>${esc(t('hudChrome.wocStore.subscription.benefitExpiry'))}</p></div></section>`;
+    return `<section class="ui-card" data-membership-benefits><div class="charter-body"><h2 class="ui-h">${esc(t('hudChrome.wocStore.subscription.benefitsTitle'))}</h2><ul>${(['benefitBank', 'benefitSlots', 'benefitArmour', 'benefitBag', 'benefitTax'] as const).map((key) => `<li>${esc(t(`hudChrome.wocStore.subscription.${key}`))}</li>`).join('')}</ul><p>${esc(t('hudChrome.wocStore.subscription.benefitExpiry'))}</p></div></section>`;
   }
 
   private tokenHtml(): string {

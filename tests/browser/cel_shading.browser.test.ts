@@ -7,14 +7,19 @@
 
 import * as THREE from 'three';
 import { afterAll, describe, expect, it } from 'vitest';
-import { installCelShading, syncCelMaterialInk } from '../../src/render/cel_shading';
 import { CEL_SHADING_DEFAULTS } from '../../src/render/cel_shading_core';
 import { OutputGradePass } from '../../src/render/post_output_grade';
 
 type Kind = 'standard' | 'lambert' | 'phong' | 'toon';
 const KINDS: readonly Kind[] = ['standard', 'lambert', 'phong', 'toon'];
+// Read BEFORE cel_shading.ts loads. Since the genshin overhaul (8bff2cec638)
+// the look is on by default (`?cel=off` opts out), and the module installs the
+// ramp at import, so a static import would hand this file a patched "stock"
+// chunk. Nothing imported above patches either chunk.
 const STOCK_CHUNK = THREE.ShaderChunk.lights_fragment_begin;
 const STOCK_OPAQUE = THREE.ShaderChunk.opaque_fragment;
+const { installCelShading, syncCelMaterialInk } = await import('../../src/render/cel_shading');
+const DEFAULT_INSTALL_CHUNK = THREE.ShaderChunk.lights_fragment_begin;
 const SIZE = 8;
 
 afterAll(() => {
@@ -95,7 +100,13 @@ function compileAll(renderer: THREE.WebGLRenderer): void {
 }
 
 describe('cel light ramp on a real WebGL context', () => {
+  it('installs the ramp by default on a page with no cel flag', () => {
+    expect(DEFAULT_INSTALL_CHUNK).not.toBe(STOCK_CHUNK);
+  });
+
   it('bands the sun where the stock chunk falls off with NL', () => {
+    // Measure the stock look on the stock chunk, then install the ramp anew.
+    THREE.ShaderChunk.lights_fragment_begin = STOCK_CHUNK;
     const stockErrors: string[] = [];
     const stock = makeRenderer(stockErrors);
     const stockHigh = lambertLevel(stock, 0.9);

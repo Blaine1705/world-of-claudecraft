@@ -70,7 +70,7 @@ const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number
   // clamp reined in from 2.6 with the contrast pass, so the re-expanded cloud
   // tops do not just feed the bloom smear instead
   vale: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
-  marsh: { gain: 0.6, clamp: 2.2 },
+  marsh: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
   peaks: { gain: 0.48, clamp: 1.7, contrast: 1.15 },
   // Paint-only biomes reuse the closest shipped sky (no new HDRI downloads).
   beach: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
@@ -399,7 +399,7 @@ const HDRI_SUN_U: Record<SkyKey, number> = {
 // shared photographs are retired.
 const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
   vale: [0.94, 1.04, 1.14],
-  marsh: [1, 1, 1],
+  marsh: [0.94, 1.04, 1.14],
   peaks: [0.95, 1.03, 1.12],
   beach: [0.94, 1.05, 1.14],
   desert: [1, 1, 1],

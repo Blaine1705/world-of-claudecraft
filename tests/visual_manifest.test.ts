@@ -488,10 +488,10 @@ describe('character visual manifest', () => {
       const baseNames = byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
       byUrl.set(visual.url, baseNames);
 
-      // A bespoke clip (e.g. greyjaw's Greyjaw_Attack) can live in a separate
-      // mesh-free animUrls donor GLB instead of the base rig, same pattern as
-      // player_mage/mob_elemental; the runtime merges both into one clip pool
-      // (assets.ts), so the existence check must too.
+      // A bespoke clip can live in a separate mesh-free animUrls donor GLB
+      // instead of the base rig (the player_mage/mob_elemental pattern); the
+      // runtime merges both into one clip pool (assets.ts), so the existence
+      // check must too.
       const animationNames = new Set(baseNames);
       for (const animUrl of visual.animUrls ?? []) {
         const donorNames = await glbAnimationNames(`public/${animUrl}`);

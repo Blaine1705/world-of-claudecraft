@@ -590,24 +590,13 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(
       verdict.auditScope.heroicDefinitionsWithOwnWebp + verdict.auditScope.heroicWeaponArtAliases,
     ).toBe(verdict.auditScope.generatedHeroicDefinitions);
-    const shippingIds = new Set(
-      readdirSync(path.join(repoRoot, 'public/ui/items'))
-        .filter((name) => name.endsWith('.webp'))
-        .map((name) => name.slice(0, -'.webp'.length)),
-    );
-    // The art-pending ledger (ITEM_ART_PENDING) stages a wave's generated
-    // heroic variants outside the audited catalog until their paintings land,
-    // exactly as the audit CLI accounts them (scripts/lib/item_art_audit.mjs).
-    const generatedHeroics = Object.entries(ITEMS).filter(
-      ([id, item]) =>
-        'heroicOf' in item && typeof item.heroicOf === 'string' && !ITEM_ART_PENDING.has(id),
-    );
-    const heroicWithOwnWebp = generatedHeroics.filter(([id]) => shippingIds.has(id));
-    const heroicArtAliases = generatedHeroics.filter(([id]) => !shippingIds.has(id));
-    expect(generatedHeroics).toHaveLength(verdict.auditScope.generatedHeroicDefinitions);
-    expect(heroicWithOwnWebp).toHaveLength(verdict.auditScope.heroicDefinitionsWithOwnWebp);
-    expect(heroicArtAliases).toHaveLength(verdict.auditScope.heroicWeaponArtAliases);
-    expect(heroicArtAliases.every(([, item]) => item.kind === 'weapon')).toBe(true);
+    // The sealed verdict's heroic scope is the 2026-08-10 historical record, so it
+    // is pinned as that record. The LIVE heroic census grew past it (the
+    // five-dungeon rework's Heroic variants on the v0.45.0 integration) and is
+    // pinned, with every later wave named, in the current-owner case below.
+    expect(verdict.auditScope.generatedHeroicDefinitions).toBe(78);
+    expect(verdict.auditScope.heroicDefinitionsWithOwnWebp).toBe(59);
+    expect(verdict.auditScope.heroicWeaponArtAliases).toBe(19);
     expect(verdict.reviewContract.everyShippingFileReviewedInModes).toEqual([
       '128-color',
       '40-color',
@@ -858,7 +847,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
     // The restored legacy whistle and charm definitions add 36 item ids.
     // Five referral rewards reuse existing art while their own paintings are pending.
-    expect(Object.keys(ITEMS)).toHaveLength(2210);
+    expect(Object.keys(ITEMS)).toHaveLength(2211);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1084,11 +1073,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // integration: 1,890 owners over 2,043 items.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
     // Buddy provenance contributes 34 additional owners.
-    expect(new Set(currentOwnerIds).size).toBe(2039);
-    expect(shippingIds).toHaveLength(2039);
+    expect(new Set(currentOwnerIds).size).toBe(2040);
+    expect(shippingIds).toHaveLength(2040);
     // The restored legacy whistle and charm definitions add 36 item ids.
     // Five referral rewards reuse existing art while their own paintings are pending.
-    expect(Object.keys(ITEMS)).toHaveLength(2210);
+    expect(Object.keys(ITEMS)).toHaveLength(2211);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1333,6 +1322,8 @@ describe('item-art consistency accepted-art provenance', () => {
         'barrowstone_heart',
         'muster_grapnel',
         'craterglass_stave',
+        // The membership Staff of Changing (membership-weapon-2026-10-14, PR 4281).
+        'membership_staff',
         // The dungeon reworks' loot batches (Sunken Bastion, Drowned Temple,
         // Wildheart Basin, Gravewyrm Sanctum, Hollow Crypt).
         ...mapping.generatedBatches
@@ -1523,7 +1514,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // bring it to 51 on the v0.45.0 integration.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57.
     // Buddy whistle and charm provenance add two batches.
-    expect(mapping.generatedBatches).toHaveLength(59);
+    // The membership weapon batch (membership-weapon-2026-10-14, PR 4281): 60.
+    expect(mapping.generatedBatches).toHaveLength(60);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1598,16 +1590,17 @@ describe('item-art consistency accepted-art provenance', () => {
     // role fill (quest-role-fill-icons-2026-10-07) adds 75: 1330. Membership adds 8
     // and referral armour 7: 1345. The Mirefen world-boss branch's 15 batch ids: 1360.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
-    // Buddy batches add 34 owner ids to the integration inventory.
-    expect(priorGeneratedIds).toHaveLength(1509);
+    // Buddy batches add 34 owner ids to the integration inventory. The membership
+    // Staff of Changing batch (PR 4281) adds one: 1510.
+    expect(priorGeneratedIds).toHaveLength(1510);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    expect(allCurrentOwnerIds).toHaveLength(2039);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2039);
+    expect(allCurrentOwnerIds).toHaveLength(2040);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2040);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1627,8 +1620,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + 8 membership paintings + 7 referral paintings = 1345.
       // + the Mirefen world-boss branch's 15 = 1360.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
-      // Plus 34 restored buddy provenance owners.
-      priorGenerated: 1509,
+      // Plus 34 restored buddy provenance owners, and the membership staff: 1510.
+      priorGenerated: 1510,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1723,6 +1716,7 @@ describe('item-art consistency accepted-art provenance', () => {
                 'quest-leveling-gear-icons-2026-10-06',
                 'quest-blue-rewards-icons-2026-10-07',
                 'membership-items-2026-10-05',
+                'membership-weapon-2026-10-14',
                 'referral-items-2026-10-07',
                 'quest-role-fill-icons-2026-10-07',
                 // The Sunken Bastion rework's loot.
@@ -1908,9 +1902,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    if (ownerIds.length !== 2039)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2039`);
-    if (fileIds.length !== 2039) violations.push(`shipping WebP count: ${fileIds.length} != 2039`);
+    if (ownerIds.length !== 2040)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2040`);
+    if (fileIds.length !== 2040) violations.push(`shipping WebP count: ${fileIds.length} != 2040`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

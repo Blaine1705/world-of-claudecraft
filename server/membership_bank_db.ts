@@ -1,5 +1,6 @@
 import type { PoolClient } from 'pg';
 import type { CharacterState } from '../src/sim/character_state';
+import { savedMembershipBags } from '../src/sim/membership_bag_slot';
 import {
   type MembershipBankTransferRequest,
   membershipBankView,
@@ -183,7 +184,11 @@ export async function transferMembershipBank(
     );
     if (targetLease.rows.length !== 0) throw new BankRefusal('online');
     if (!input.stillAuthorized()) throw new BankRefusal('invalid');
-    const plan = planMembershipBankTransfer(input.state, target.bank ?? undefined, input.request);
+    const plan = planMembershipBankTransfer(
+      { ...input.state, bags: savedMembershipBags(input.state) },
+      target.bank ?? undefined,
+      input.request,
+    );
     if (!plan.ok) throw new BankRefusal(plan.error);
     // A growing save must not make the deliberate read unrepresentable.
     if (Buffer.byteLength(JSON.stringify(plan.bank), 'utf8') > MEMBERSHIP_BANK_MAX_BYTES) {

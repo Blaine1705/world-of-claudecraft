@@ -10,6 +10,14 @@ import {
 import { GFX } from './gfx';
 import { type GloamCompileGate, GloamField } from './gloam_field';
 import {
+  type HutFireBody,
+  type HutFireKind,
+  type HutFireParticle,
+  sampleHutFireParticle,
+} from './hut_fire_core';
+import { HutFireFx } from './hut_fire_fx';
+import { buildHutSmoke, type HutSmokeView, hutSmokeEnabled } from './hut_smoke';
+import {
   type IgnivarJudgmentFireSample,
   ignivarJudgmentFireAllowsSmoke,
   ignivarJudgmentFireInitialCount,
@@ -394,6 +402,26 @@ export class Vfx {
   /** Gloamveil's pool and dark smoke, which an additive cloud cannot draw. The
    *  renderer reports its wearers and closes its frame (gloam_field.ts). */
   readonly gloam: GloamField;
+  /** Torched mudfin huts burning (hut_fire_fx.ts): the renderer hands it the
+   *  `worldObjectBurning` events and update() ticks it. */
+  readonly hutFires: HutFireFx;
+  /** Their lit smoke plumes (hut_smoke.ts), which an additive cloud cannot draw;
+   *  null on the low effects tier. */
+  private readonly hutSmoke: HutSmokeView | null;
+  private readonly hutFireParticle: HutFireParticle = {
+    x: 0,
+    y: 0,
+    z: 0,
+    vx: 0,
+    vy: 0,
+    vz: 0,
+    color: 0,
+    size: 0,
+    life: 0,
+    gravity: 0,
+    sprite: 'flame',
+    spin: 0,
+  };
   private paladinSpellFx: PaladinSpellVfxController;
   private swimWakeVfx: SwimWakeVfx;
   private disposed = false;
@@ -599,6 +627,9 @@ export class Vfx {
       compileGate,
     );
     this.swimWakeVfx = new SwimWakeVfx(scene);
+    this.hutSmoke = hutSmokeEnabled() ? buildHutSmoke() : null;
+    if (this.hutSmoke) scene.add(this.hutSmoke.mesh);
+    this.hutFires = new HutFireFx(this, groundY, this.hutSmoke);
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
@@ -721,6 +752,31 @@ export class Vfx {
     }
   }
 
+  /** A torched mudfin hut's fire (hut_fire_fx.ts): `rate` particles a second
+   *  of one kind, sampled over the hut by hut_fire_core.ts. Frame-rate
+   *  independent and scaled by the quality level, like the steady auras. */
+  hutFire(kind: HutFireKind, body: HutFireBody, rate: number, dt: number): void {
+    const p = this.hutFireParticle;
+    const count = this.emitCount(rate, dt);
+    for (let i = 0; i < count; i++) {
+      sampleHutFireParticle(kind, body, Math.random, p);
+      this.spawn(
+        p.x,
+        p.y,
+        p.z,
+        p.vx,
+        p.vy,
+        p.vz,
+        p.color,
+        p.size,
+        p.life,
+        p.gravity,
+        SPR[p.sprite],
+        p.spin,
+      );
+    }
+  }
+
   prewarm(at: THREE.Vector3): void {
     const sprites = Object.values(SPR);
     for (let i = 0; i < sprites.length; i++) {
@@ -751,6 +807,7 @@ export class Vfx {
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
     this.gloam.clear();
+    this.hutFires.clear();
     this.swimWakeVfx.clear();
     this.life.fill(0);
     this.size.fill(0);
@@ -772,6 +829,7 @@ export class Vfx {
     this.drainLifeVfx.dispose();
     this.gloam.dispose();
     this.swimWakeVfx.dispose();
+    this.hutSmoke?.dispose();
     this.points.removeFromParent();
     const material = this.points.material as THREE.ShaderMaterial;
     const atlas = material.uniforms.uAtlas?.value;
@@ -917,6 +975,9 @@ export class Vfx {
   prepareDraw(camera: THREE.Camera): void {
     if (this.disposed) return;
     this.packRenderCloud(camera);
+    // the hut smoke plumes face this frame's camera (hut_smoke.ts)
+    const eye = camera.matrixWorld.elements;
+    this.hutFires.prepareDraw(eye[12], eye[14]);
   }
 
   private drainParticleSprite(kind: DrainLifeParticleKind): number {
@@ -2635,6 +2696,7 @@ export class Vfx {
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
     this.drainLifeVfx.update(dt, reducedMotion);
+    this.hutFires.update(dt, reducedMotion);
 
     for (let i = this.pendingBursts.length - 1; i >= 0; i--) {
       const pending = this.pendingBursts[i];

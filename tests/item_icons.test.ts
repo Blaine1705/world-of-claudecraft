@@ -353,7 +353,8 @@ describe('item webp icons', () => {
     // 148 with the Mirefen world-boss branch's three held weapons, 149 with Balgath's
     // Craterglass Stave.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 163.
-    expect(WEAPON_IMAGE_IDS.size).toBe(163);
+    // + the membership Staff of Changing (PR 4281): 164.
+    expect(WEAPON_IMAGE_IDS.size).toBe(164);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

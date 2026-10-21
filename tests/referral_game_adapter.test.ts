@@ -9,6 +9,7 @@ import { EMPTY_TEST_WORLD } from './sim_shared';
 const captured = vi.hoisted(() => ({
   host: null as ReferralGameHost | null,
   delivery: null as ReferralRewardDeliveryHost | null,
+  command: (): Promise<void> => Promise.resolve(),
 }));
 vi.mock('../server/db', () => ({ pool: {} }));
 vi.mock('../server/referral_store_db', () => ({
@@ -25,6 +26,9 @@ vi.mock('../server/referral_game_services', () => ({
     }
     attach() {}
     updateEntitlements() {}
+    command() {
+      return captured.command();
+    }
     stop() {}
   },
 }));
@@ -137,4 +141,48 @@ it('bills a full 25-recipient outbox projection through the production adapter',
     }) + '\n',
   );
   await adapter.stop();
+});
+
+it('logs a rejected card command instead of leaking an unhandled rejection', async () => {
+  // A page request while the account friend index is still warming rejects
+  // after scheduling its own retry; the adapter's fire-and-forget entry point
+  // must catch it, or Node sees an unhandled rejection on a live realm.
+  const sim = new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  });
+  const pid = sim.addPlayer('warrior', 'Pager', { characterId: 700 });
+  const session = {
+    pid,
+    characterId: 700,
+    accountId: 70,
+    left: false,
+    escrowQuarantined: false,
+  } as ClientSession;
+  const adapter = new ReferralGameAdapter({
+    sim,
+    session: () => session,
+    withPermit: async (run: () => Promise<unknown>) => run(),
+    observeCost: () => {},
+  } as unknown as ReferralAdapterHost);
+  const failure = new Error('Account friend index is not ready');
+  captured.command = () => Promise.reject(failure);
+  const unhandled: unknown[] = [];
+  const onUnhandled = (reason: unknown) => unhandled.push(reason);
+  process.on('unhandledRejection', onUnhandled);
+  const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+  try {
+    adapter.command(session, { type: 'page', after: 0 });
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    expect(unhandled).toEqual([]);
+    expect(logged).toHaveBeenCalledWith('referral card operation failed:', failure);
+  } finally {
+    process.off('unhandledRejection', onUnhandled);
+    logged.mockRestore();
+    captured.command = () => Promise.resolve();
+    await adapter.stop();
+  }
 });

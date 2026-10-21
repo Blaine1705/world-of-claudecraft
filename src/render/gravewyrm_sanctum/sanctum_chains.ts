@@ -26,6 +26,7 @@ import { chainFall, FACE_EVENT_SECONDS } from './sanctum_face_core';
 import {
   registerSanctumFallback,
   SANCTUM_SLOTS,
+  sanctumKitFirst,
   sanctumKitMeshes,
   sanctumPieceGeometry,
   sanctumSlotMaterial,
@@ -82,8 +83,13 @@ export function buildSanctumChains(
     holder.position.set(p.x, LOCK_TERRACE.h, p.z);
     holder.rotation.y = Math.atan2(LOCK_TERRACE.x - p.x, LOCK_TERRACE.z - p.z);
     holder.scale.setScalar(PILLAR_SCALE);
-    const intact = sanctumKitMeshes(`Kit_SealPillar_${tool}`);
-    const cracked = sanctumKitMeshes(`Kit_SealPillarCracked_${tool}`);
+    // The interior pass's carved pillars (same frame and size) when they ship.
+    const intact = sanctumKitMeshes(
+      sanctumKitFirst([`Kit_SealPillarV2_${tool}`]) ?? `Kit_SealPillar_${tool}`,
+    );
+    const cracked = sanctumKitMeshes(
+      sanctumKitFirst([`Kit_SealPillarCrackedV2_${tool}`]) ?? `Kit_SealPillarCracked_${tool}`,
+    );
     cracked.visible = false;
     holder.add(intact, cracked);
     group.add(holder);

@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { HoverCursorKind } from '../src/game/cursors';
 import { createHoverCursorUpdate, type HoverCursorHost } from '../src/game/hover_cursor';
-import type { Entity } from '../src/sim/types';
+import { FIREBOTTLE_ITEM_ID } from '../src/sim/interactions/firebottle_hut';
+import { MUDFIN_HUT_TEMPLATE_ID } from '../src/sim/mudfin_huts';
+import type { Entity, InvSlot } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 // The world hover cursor moved whole out of main.ts (src/game/hover_cursor.ts). These pin
@@ -23,6 +25,7 @@ function mob(partial: Partial<Entity> = {}): Entity {
 function harness(opts: { picked?: number | null; seat?: boolean; modal?: boolean } = {}) {
   const entities = new Map<number, Entity>();
   const cursors: HoverCursorKind[] = [];
+  const inventory: InvSlot[] = [];
   const world = {
     player: { id: 1 },
     playerId: 1,
@@ -31,6 +34,7 @@ function harness(opts: { picked?: number | null; seat?: boolean; modal?: boolean
     duelInfo: null,
     arenaInfo: null,
     bgInfo: null,
+    inventory,
   } as unknown as IWorld;
   const input = {
     hoverActive: true,
@@ -56,6 +60,7 @@ function harness(opts: { picked?: number | null; seat?: boolean; modal?: boolean
   return {
     update: createHoverCursorUpdate(host),
     entities,
+    inventory,
     cursors,
     input,
     hud,
@@ -101,6 +106,26 @@ describe('createHoverCursorUpdate', () => {
     expect(h.picking.pick).toHaveBeenCalledTimes(1);
     expect(h.cursors).toEqual(['attack', 'default']);
     expect(h.hud.clearHoverTooltip).toHaveBeenCalledTimes(1);
+  });
+
+  it('wears the gear over a torchable hut only while the firebottle is in the bags', () => {
+    const h = harness({ picked: 7 });
+    h.entities.set(7, {
+      id: 7,
+      kind: 'object',
+      templateId: MUDFIN_HUT_TEMPLATE_ID,
+      lootable: true,
+      dead: false,
+    } as Entity);
+    h.update();
+    h.inventory.push({ itemId: FIREBOTTLE_ITEM_ID, count: 1 } as InvSlot);
+    h.update();
+    h.inventory.length = 0;
+    h.update();
+    // the bags are read live each frame: no re-pick needed for the cursor to follow
+    expect(h.picking.pick).toHaveBeenCalledTimes(1);
+    expect(h.cursors).toEqual(['default', 'gear', 'default']);
+    expect(h.hud.clearHoverTooltip).toHaveBeenCalled();
   });
 
   it('re-picks at once when the pointer moves', () => {

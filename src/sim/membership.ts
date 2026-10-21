@@ -2,6 +2,7 @@
 // loaded from CharacterState. Stored armour carries no authority of its own.
 import { recalcPlayerStats } from './entity';
 import { perfectMembershipArmour } from './membership_armour_progression';
+import { syncMembershipBag } from './membership_bag_slot';
 import { claimScalingArmour } from './scaling_armour_claim';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -24,6 +25,7 @@ export function setMembership(ctx: SimContext, pid: number, remainingSeconds: nu
   // inspect character storage, so they belong to activation or explicit actions.
   if (p.membershipActive === active) return;
   p.membershipActive = active;
+  syncMembershipBag(meta, active);
   meta.wireRev++;
   ctx.refreshKnownAbilities(meta, false);
   if (active) {
@@ -36,6 +38,7 @@ export function setMembership(ctx: SimContext, pid: number, remainingSeconds: nu
 export function updateMembership(ctx: SimContext, meta: PlayerMeta, p: Entity): void {
   if (p.membershipActive && !membershipActive(meta, ctx.time)) {
     p.membershipActive = false;
+    syncMembershipBag(meta, false);
     meta.wireRev++;
     ctx.refreshKnownAbilities(meta, false);
     recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);

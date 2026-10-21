@@ -124,16 +124,16 @@ describe('referral armour', () => {
     expect(meta.lifetimeXp).toBe(340);
   });
 
-  it('retries partial claims without membership or duplicate inventory, bank, equipment or courier pieces', () => {
+  it('overflows full bags without membership or duplicate inventory, bank, equipment or courier pieces', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior' });
     const pid = sim.player.id,
       meta = sim.players.get(pid)!;
     meta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'worn_sword', count: 1 }));
     setReferralArmour(sim.ctx, pid, { inviterAccountId: 22, inviterName: 'Inviter' });
-    expect(meta.inventory.filter((x) => x.itemId.startsWith('referral_'))).toHaveLength(0);
+    expect(meta.inventory.filter((x) => x.itemId.startsWith('referral_'))).toHaveLength(7);
     meta.inventory.splice(0, 3);
     sim.claimMembershipArmour(pid);
-    expect(meta.inventory.filter((x) => x.itemId.startsWith('referral_'))).toHaveLength(3);
+    expect(meta.inventory.filter((x) => x.itemId.startsWith('referral_'))).toHaveLength(7);
     meta.inventory = meta.inventory.filter((x) => x.itemId.startsWith('referral_'));
     meta.bank.inventory.push(meta.inventory.shift()!);
     meta.courier = {

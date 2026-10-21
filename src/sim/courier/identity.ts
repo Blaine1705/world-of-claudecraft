@@ -30,7 +30,8 @@ export function validCourierRequest(raw: unknown): raw is CourierDispatchRequest
   const r = raw as CourierDispatchRequest;
   if (!Array.isArray(r.deposits) || !Array.isArray(r.withdrawals)) return false;
   const total = r.deposits.length + r.withdrawals.length;
-  if (total < 1 || total > COURIER_CAPACITY) return false;
+  // Zero selections is the dismissal request (see courierDispatch).
+  if (total > COURIER_CAPACITY) return false;
   for (const list of [r.deposits, r.withdrawals]) {
     const indices = new Set<number>();
     for (const s of list) {

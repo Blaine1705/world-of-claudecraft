@@ -29,6 +29,15 @@ const EXPECTED: readonly {
   ids: readonly string[];
   resolved: string;
 }[] = [
+  // The Hollow Crypt rework (df3bb72577e, PR 4352): Sexton Marrow's grave adds
+  // are "the zone's Restless Bones at the crypt's level" (content/hollow_crypt.ts),
+  // named as the zone1 mob on purpose. Neither is a boss, so the sorted id picks.
+  {
+    kind: 'mob',
+    name: 'Restless Bones',
+    ids: ['marrow_restless_bones', 'restless_bones'],
+    resolved: 'marrow_restless_bones',
+  },
   {
     kind: 'mob',
     name: 'Training Dummy',
@@ -111,6 +120,10 @@ const UNRESOLVABLE: readonly { name: string; why: string }[] = [
   {
     name: 'Rime Elemental',
     why: 'rime_elemental is the Frostveil mob, rift_rime_elemental the rift elite; both live, and 5 locales translate them apart.',
+  },
+  {
+    name: 'Restless Bones',
+    why: "marrow_restless_bones is Sexton Marrow's Hollow Crypt add, a copy of the zone1 restless_bones named alike on purpose; the non-Latin locales already copy the zone mob's rendering onto it, but its Latin-locale names are still pending, so those locales show it in English. The release fill must copy the zone mob's rendering onto it, and this row then leaves.",
   },
   {
     name: 'Vael the Fogbinder',

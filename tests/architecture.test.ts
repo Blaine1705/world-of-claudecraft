@@ -380,6 +380,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_boss_guide_view.ts',
+  'src/ui/boss_journal/journal_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',
@@ -621,6 +622,7 @@ const UI_PURE_CORES = [
   'src/ui/char_stats_view.ts',
   // The live world -> stat-sheet model bridge (extracted from Hud.statModel).
   'src/ui/char_stat_model_core.ts',
+  'src/ui/worn_item_definition_core.ts',
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
@@ -971,6 +973,8 @@ const RENDER_PURE_CORES = [
   'src/render/gravewyrm_sanctum/sanctum_story_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_chains_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_kit_plan_core.ts',
+  // The interior AAA pass's placement plan (the second kit, zone by zone).
+  'src/render/gravewyrm_sanctum/sanctum_interior_plan_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_gates_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_lake_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
@@ -1216,6 +1220,7 @@ const RENDER_PURE_CORES = [
   'src/render/ground_palette_override_core.ts',
   'src/render/meadow_fullness_core.ts',
   'src/render/palette_lab/zone_look_core.ts',
+  'src/render/spell_lab/spell_lab_catalog_core.ts',
   'src/render/ocean/ocean_spectrum_core.ts',
   'src/render/ocean/ocean_foam_core.ts',
   'src/render/ocean/water_character_core.ts',
@@ -1290,6 +1295,11 @@ const RENDER_PURE_CORES = [
   'src/render/ignivar_encounter_core.ts',
   'src/render/varkhul_encounter_core.ts',
   'src/render/ignivar_judgment_fire_core.ts',
+  // A torched mudfin hut's fire: the ten-second flame and smoke timeline and
+  // the particle sampler over the hut (randomness passed in).
+  'src/render/hut_fire_core.ts',
+  // ...and its lit smoke plume: how much smoke, where each puff is (hashed, no rng).
+  'src/render/hut_smoke_core.ts',
   'src/render/stations_core.ts',
   'src/render/mobile_stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
@@ -3008,6 +3018,7 @@ const UI_DOM_MODULES = [
   'src/ui/mount_inspect_controller.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/membership_bag_socket.ts',
   'src/ui/bank_buy_prompt.ts',
   'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_status_line.ts',

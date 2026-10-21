@@ -11,6 +11,7 @@
 
 import { bagPools, canGrantCopies, instancedCountCap } from './bags';
 import { rekeySigner } from './character_rename';
+import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
 import {
@@ -943,6 +944,7 @@ export class Market {
       return;
     }
     if (
+      listing.itemId !== MEMBERSHIP_TOKEN_ID &&
       !canGrantCopies(
         meta.inventory,
         bagPools(meta.bags),
@@ -1149,7 +1151,10 @@ export class Market {
     // eligibility), so they all merge into the same stack and ONE summed check is
     // the exact whole-sweep capacity question: nothing can fail after the first
     // settlement, which is what makes the sweep all-or-nothing.
-    if (!canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, plan.units)) {
+    if (
+      itemId !== MEMBERSHIP_TOKEN_ID &&
+      !canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, plan.units)
+    ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return [];
     }
@@ -1229,6 +1234,7 @@ export class Market {
       return;
     }
     if (
+      listing.itemId !== MEMBERSHIP_TOKEN_ID &&
       !canGrantCopies(
         meta.inventory,
         bagPools(meta.bags),
@@ -1301,9 +1307,11 @@ export class Market {
     // Capacity gate: items that don't fit stay in the collection box (never
     // destroyed); the gold above is always collected. Instance-aware on both
     // arms so a returned instanced listing keeps its payload here too.
+    // Membership tokens may use visible inventory overflow on every return/buy path.
     const kept: typeof col.items = [];
     for (const s of col.items) {
       if (
+        s.itemId === MEMBERSHIP_TOKEN_ID ||
         canGrantCopies(
           meta.inventory,
           bagPools(meta.bags),

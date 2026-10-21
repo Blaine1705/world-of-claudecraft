@@ -1934,9 +1934,9 @@ export class AbilityVfx {
         const full = abilityVfxFullSpecFor(e.castingAbility);
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
-        // Preserve armour and skin detail throughout the cast. Physical
-        // channels carry weapon motion, never an emissive whole-body wash.
-        glowStrength = full?.physical ? 0 : 1.2 * (full?.power ?? 1);
+        // Preserve armour and skin detail throughout casts. Only morph form
+        // transitions tint the character body; offensive and normal spells do not.
+        glowStrength = full?.buff?.style === 'morph' ? 1.2 * (full?.power ?? 1) : 0;
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
         const windupStarted = fx.windup(

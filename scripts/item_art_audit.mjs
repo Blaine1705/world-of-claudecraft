@@ -163,8 +163,10 @@ const build = await buildItemArtAudit({
     // sheet pages, re-measured with `--verify-only` (116 generated Heroic definitions,
     // 86 with their own WebP, 30 weapon art aliases).
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
-    catalogCount: 2039,
-    liveItemCount: 2068,
+    // + the membership Staff of Changing (PR 4281): 2040 / 2069, re-measured with
+    // `--verify-only`.
+    catalogCount: 2040,
+    liveItemCount: 2069,
     // Five referral rewards reuse existing art until their own paintings land.
     pendingArtCount: 142,
     generatedHeroicDefinitions: 116,

@@ -139,6 +139,7 @@ import { type SeatClipPhase, seatClip } from './seat_clips';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
 import { shardpikeProp } from './shardpike_prop';
+import { SHARDPIKE_THROW_CLIP } from './shardpike_throw_clip';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -1649,8 +1650,17 @@ export class CharacterVisual {
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
+      // Signature_* is the warrior rigs' convention; every other player rig binds
+      // only the Shardpike throw prepareShardpikeThrowClip mints for it, never a
+      // same-named clip some other GLB happens to ship.
+      const warriorRig =
+        key === 'player_warrior' ||
+        key === 'player_warrior_female' ||
+        key === 'player_warrior_modular';
       const signatureClips = key.startsWith('player_')
-        ? Array.from(prep.clips.keys()).filter((n) => n.startsWith('Signature_'))
+        ? Array.from(prep.clips.keys()).filter((n) =>
+            warriorRig ? n.startsWith('Signature_') : n === SHARDPIKE_THROW_CLIP,
+          )
         : [];
       for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES, ...signatureClips]) {
         const clip = prep.clips.get(name);
@@ -1664,9 +1674,11 @@ export class CharacterVisual {
       const split = prep.def.clips.dualWieldSplit;
       if (dual && dualClip && split !== undefined && split > 0 && split < dualClip.duration) {
         const names = dualWieldHalfNames(dual);
-        const [main, off] = sharedClipSplit(dualClip, split, names);
-        this.actions.set(names[0], this.mixer.clipAction(main));
-        this.actions.set(names[1], this.mixer.clipAction(off));
+        if (!this.actions.has(names[0]) || !this.actions.has(names[1])) {
+          const [main, off] = sharedClipSplit(dualClip, split, names);
+          this.actions.set(names[0], this.mixer.clipAction(main));
+          this.actions.set(names[1], this.mixer.clipAction(off));
+        }
       }
       // Hold-and-release clips (ClipMap.clipSplits): the same cut, under the
       // rig's own names, for a cast that holds one half and plays the other.
@@ -2769,7 +2781,7 @@ export class CharacterVisual {
     // Spellcast_Raise) keeps its authored clip automatically
     // (tests/weapon_skins.test.ts).
     const rawOverride = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
-    const overrideIsRanged = rawOverride !== undefined && /Shot|Shoot/.test(rawOverride);
+    const overrideIsRanged = rawOverride !== undefined && /Shot|Shoot|Rifle|Bow/.test(rawOverride);
     // Light the fist BEFORE the clip choice, so an ability that declares a glow gets one
     // even on a rig whose authored clip is missing: the telegraph is the load-bearing half
     // of a slam, and it must not depend on the animation having been baked.

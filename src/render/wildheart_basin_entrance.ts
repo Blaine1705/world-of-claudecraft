@@ -88,7 +88,7 @@ export const wildheartBasinEntrancePreloadInternalsForTest = { urls: [...URLS] }
 
 export const WILDHEART_THROAT_PROGRAM_CACHE_KEY = 'wildheart-basin-flooded-throat-v1';
 export const WILDHEART_MIST_PROGRAM_CACHE_KEY = 'wildheart-basin-maw-mist-v1';
-export const WILDHEART_SPRITE_PROGRAM_CACHE_KEY = 'wildheart-basin-maw-sprites-v2';
+export const WILDHEART_SPRITE_PROGRAM_CACHE_KEY = 'wildheart-basin-maw-sprites-v3';
 
 export interface WildheartBasinEntranceView {
   group: THREE.Group;
@@ -669,7 +669,7 @@ if (wKind > 0.5 && wKind < 2.5) {
   // a tongue of flame: wide at the foot, drawn to a point, its edge alive
   float v = vWildU.y;
   float x = vWildU.x * 2.0;
-  float width = pow(1.0 - v, 0.75) * (0.45 + 0.55 * sin(min(v * 2.6, 1.5708)));
+  float width = pow(max(1.0 - v, 0.0), 0.75) * (0.45 + 0.55 * sin(min(v * 2.6, 1.5708)));
   float flick = 0.5 + 0.5 * sin(v * 11.0 - vWildS.z * 7.0 + x * 3.0);
   float body = smoothstep(width, width * 0.05, abs(x) + 0.16 * flick * v);
   float heart = body * (1.0 - v);

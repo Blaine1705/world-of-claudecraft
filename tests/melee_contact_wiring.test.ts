@@ -11,6 +11,9 @@ import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 // sentence describing a line can never stand in for it.
 const renderer = codeWithoutLineComments(readFileSync('src/render/renderer.ts', 'utf8'));
 const hud = codeWithoutLineComments(readFileSync('src/ui/hud.ts', 'utf8'));
+// The sloppy-pick assist moved out of renderer.ts into the picking facade with the Studio
+// import (6d81eed7e54), taking its own read of the entity's death with it.
+const picking = codeWithoutLineComments(readFileSync('src/render/world_picking.ts', 'utf8'));
 
 /** `source` from `from` up to (not including) `to`, both anchors required. */
 function between(source: string, from: string, to: string): string {
@@ -168,7 +171,8 @@ describe('one death hold per body, read by the pose, the mount and the wings', (
     expect(count(renderer, 'deathHeld')).toBe(5);
     expect(count(renderer, 'heldUntilCollapse(')).toBe(2);
     expect(count(renderer, 'collapsed(')).toBe(2);
-    // the nameplate pass decides its own death from the entity
-    expect(renderer).toContain('const dead = !!e.dead;');
+    // the sloppy pick (renderer.picking) decides its own death from the entity, never the hold
+    expect(picking).toContain('const dead = !!e.dead;');
+    expect(picking).not.toContain('deathHeld');
   });
 });

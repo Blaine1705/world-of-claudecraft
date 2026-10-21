@@ -7,7 +7,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot, DT, type Entity, type InvSlot } from '../types';
 import { courierPayloadFits, courierSlotFingerprint } from './identity';
-import { travelCourier } from './motion';
+import { courierFollowPoint, courierLandingPoint, startCourierLeg, travelCourier } from './motion';
 import { COURIER_ADMISSION_BYTES, COURIER_CAPACITY, type CourierState } from './types';
 
 function withdrawOriginal(
@@ -32,7 +32,27 @@ function withdrawOriginal(
   }
 }
 
-function exchange(ctx: SimContext, meta: PlayerMeta, state: CourierState): boolean {
+const facingOf = (player: Entity) => (Number.isFinite(player.facing) ? player.facing : 0);
+
+function returnHome(state: CourierState, player: Entity): void {
+  state.phase = 'returning';
+  state.withdrawals = [];
+  state.revision++;
+  if (player.pos.x >= INSTANCE_X_BASE || player.dead) {
+    // Instance or corpse coordinates must not size the leg: plan it on the
+    // first tick the owner is back in the overworld and alive.
+    delete state.travelTicks;
+    delete state.legDistance;
+    delete state.landingYaw;
+    return;
+  }
+  // Lock the landing side now, so turning the camera never swings the target.
+  state.landingYaw = facingOf(player);
+  const landing = courierLandingPoint(player.pos, state.landingYaw);
+  startCourierLeg(state, landing.x, landing.z);
+}
+
+function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: CourierState): boolean {
   // Deposits only top up existing indices or append. Resolve identities before
   // those top-ups, then withdraw descending indices and the original quantities.
   let selected: ({ slot: InvSlot; index: number } | null)[] = [];
@@ -72,10 +92,7 @@ function exchange(ctx: SimContext, meta: PlayerMeta, state: CourierState): boole
     withdraw();
   }
   bumpBankWireRev(meta);
-  state.withdrawals = [];
-  state.phase = 'returning';
-  state.travelDistance = 0;
-  state.revision++;
+  returnHome(state, player);
   return true;
 }
 
@@ -84,53 +101,44 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
   const state = meta.courier;
   if (!state) return;
   if (state.phase === 'ready') {
-    if (player.pos.x < INSTANCE_X_BASE) travelCourier(state, player.pos.x, player.pos.z, false);
+    if (player.pos.x < INSTANCE_X_BASE) {
+      const spot = courierFollowPoint(player.pos, player.facing);
+      travelCourier(state, spot.x, spot.z, false);
+    }
     return;
   }
   state.retryRemaining = Math.max(0, state.retryRemaining - DT);
   if (state.phase === 'outbound') {
     const banker = state.bankerId === null ? undefined : ctx.entities.get(state.bankerId);
     if (!banker || banker.kind !== 'npc' || banker.dead) {
-      state.phase = 'returning';
-      state.travelDistance = 0;
-      state.withdrawals = [];
-      state.revision++;
+      returnHome(state, player);
       return;
     }
     if (!travelCourier(state, banker.pos.x, banker.pos.z) || state.retryRemaining > 0) return;
     // A saved entity id may resolve to a different NPC after a content release.
     // Validate the static banker anchor only at arrival, never during flight.
     if (!ctx.bankerIds.includes(banker.id)) {
-      state.phase = 'returning';
-      state.travelDistance = 0;
-      state.withdrawals = [];
-      state.revision++;
+      returnHome(state, player);
       return;
     }
-    if (!exchange(ctx, meta, state)) state.retryRemaining = 1;
+    if (!exchange(ctx, meta, player, state)) state.retryRemaining = 1;
     return;
   }
   // Private instance coordinates must never redirect the overworld courier.
   if (player.pos.x >= INSTANCE_X_BASE || player.dead) return;
-  if (
-    !travelCourier(state, player.pos.x, player.pos.z, state.phase === 'returning') ||
-    state.retryRemaining > 0
-  )
-    return;
-  let delivered = 0;
-  for (let i = state.cargo.length - 1; i >= 0; i--) {
-    delivered += moveBetweenContainers(
-      state.cargo,
-      i,
-      undefined,
-      meta.inventory,
-      bagPools(meta.bags),
-    ).moved;
-  }
-  const phase = state.cargo.length > 0 ? 'waiting' : 'ready';
-  if (state.phase !== phase || delivered > 0) state.revision++;
-  state.phase = phase;
-  state.travelDistance = 0;
-  state.retryRemaining = state.cargo.length > 0 ? 1 : 0;
+  // The returning courier skids to a stop just in front of its owner; a legacy
+  // waiting courier simply walks up to them.
+  const returning = state.phase === 'returning';
+  if (returning && state.landingYaw === undefined) state.landingYaw = facingOf(player);
+  const end = returning ? courierLandingPoint(player.pos, state.landingYaw!) : player.pos;
+  if (!travelCourier(state, end.x, end.z, returning) || state.retryRemaining > 0) return;
+  // The player already owns this bounded cargo. Returning it may overflow bags;
+  // capacity must never strand custody or keep the courier visible after arrival.
+  const delivered = state.cargo.length;
+  for (let i = state.cargo.length - 1; i >= 0; i--)
+    moveBetweenContainers(state.cargo, i, undefined, meta.inventory, bagPools(meta.bags));
+  meta.inventory.push(...state.cargo);
+  state.cargo = [];
+  delete meta.courier;
   if (delivered > 0) ctx.onInventoryChangedForQuests(meta);
 }

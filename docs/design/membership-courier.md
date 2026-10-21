@@ -2,25 +2,40 @@
 
 An active member learns Courier in the spellbook and can place it on an action
 bar. Casting it summons an owner-only flying donkey and opens the courier window.
-The window selects whole stacks from the character's bags and personal bank.
+The window shows the existing bank and inventory item grids with the courier
+portrait between them. It selects whole stacks from the character's bags and personal bank.
 Quest items cannot travel. A trip accepts at most 24 selected stacks in total.
 
-Dispatch moves deposits out of the bags into persistent courier custody. The
-courier travels in a straight line to the nearest overworld banker. Each leg
-starts and ends with ground running at seven units per second. Between three and
-eight units from either end, speed and flight height ease up to 17.5 units per
-second (250% of normal running speed) and two units above the ground. Very short
-trips remain grounded. At arrival it deposits first, then
-collects the exact bank stacks requested at dispatch, then follows the owner's
-current position home. Changes to a requested bank stack invalidate that request;
+A summoned courier waits 3 yards off its owner's left shoulder and 2.2 behind
+(`courierFollowPoint`), mirroring the buddy's right-and-behind heel so the two
+never overlap. Closing the window without sending dismisses a waiting, empty
+courier: the window sends an empty dispatch, and the renderer plays a short dance
+before it shrinks away.
+
+Dispatch moves deposits out of the bags into persistent courier custody and closes
+the courier window. The courier travels in a straight line to the nearest overworld
+banker. Every leg follows one profile: a short ground run, three rising hops, a
+smooth takeoff, a cruise, a descent and a touchdown skid that brakes to a stop.
+The cruise flies at three times run speed, but no leg ever takes longer than
+fifteen seconds (`COURIER_MAX_LEG_SECONDS`): a longer route cruises faster instead.
+That extra speed applies only while fully airborne, easing in and out over one
+second of the cruise; the run, hops, takeoff, descent and skid keep their normal speeds.
+`courierLegPlan` derives the duration and speeds from the distance at leg start
+alone, so the deadline holds even when the owner moves during the return.
+At arrival it deposits first, then collects the exact bank stacks requested at
+dispatch, then flies home and skids to a stop just in front of its owner
+(`courierLandingPoint`). Changes to a requested bank stack invalidate that request;
 the courier never substitutes a different item occupying its old index.
 
-Full banks leave undeposited cargo with the courier. Full bags leave returned
-cargo waiting for space, with retries at one-second intervals. Transfer helpers
+Full banks leave undeposited cargo with the courier for the return trip. Returned
+cargo overflows full bags, then the courier vanishes until summoned again. The
+simulation removes it on the landing tick; the renderer alone plays a short happy
+hop-spin and shrinks it away (skipped under reduced motion). Transfer helpers
 preserve item instances and material provenance and move whole requested stacks.
 Existing journeys finish after membership expires; new dispatches require active
 membership. Logout saves custody and freezes travel. Private instances cannot
 start a trip, and a returning courier waits while its owner is dead or inside one.
+Those pauses and any durable ledger admission delay do not consume travel ticks.
 
 ## Ownership and durability
 

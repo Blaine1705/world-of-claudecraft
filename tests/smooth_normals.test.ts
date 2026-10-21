@@ -10,6 +10,7 @@ import { VISUALS } from '../src/render/characters/manifest';
 import { smoothedGeometry } from '../src/render/characters/smooth_normals';
 import { creaseCosine, creasedNormals } from '../src/render/characters/smooth_normals_core';
 import { wildheartPlaceholderLooks } from '../src/render/characters/wildheart_creature_looks';
+import { RAPTOR_MODEL } from '../src/render/wildheart_basin/basin_trash_model_core';
 
 /** Two facets meeting on the edge (0,0,0)-(1,0,0) at `deg` between their
  *  normals, as a flat-shaded asset ships them: every corner its own vertex. */
@@ -79,10 +80,16 @@ describe('smoothedGeometry', () => {
 });
 
 describe('the Basin Raptor', () => {
-  it('wears the velociraptor shaded smooth; the Deepfen Spearjaw keeps its facets', () => {
+  // The raptor first borrowed the Deepfen Spearjaw's faceted velociraptor and
+  // wore it shaded smooth (c61c6113b0b); "the Basin Raptor in Blender"
+  // (d57007c3cb6) gave it its own authored body, whose shading is baked in the
+  // asset, so it no longer takes the smoothing twin (its model is pinned in
+  // tests/wildheart_basin_raptor.test.ts). The Spearjaw keeps its facets either way.
+  it('wears its own authored body, no smoothing twin; the Deepfen Spearjaw keeps its facets', () => {
     const looks = wildheartPlaceholderLooks(VISUALS);
-    expect(looks.wildheart_basin_raptor.url).toBe(VISUALS.mob_spearjaw.url);
-    expect(looks.wildheart_basin_raptor.smoothNormals).toBe(60);
+    expect(looks.wildheart_basin_raptor.url).toBe(RAPTOR_MODEL.url);
+    expect(looks.wildheart_basin_raptor.url).not.toBe(VISUALS.mob_spearjaw.url);
+    expect(looks.wildheart_basin_raptor.smoothNormals).toBeUndefined();
     expect(VISUALS.mob_spearjaw.smoothNormals).toBeUndefined();
   });
 });

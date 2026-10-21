@@ -315,8 +315,10 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
 - WOC split character files (the player bodies, 2026-09-28): one base and one
   animation library per body fit, plus the hand-keyed library over it
   (`woc_keyed_animations.ts`: `players/woc_keyed/woc_<fit>.glb`, keyed on the same bind
-  pose by `scripts/assets/woc_keyed_anims/`, for the idle, gaits, swim, jump take-off,
-  death, four emotes and the white swings), and per armor set and fit a low file, a medium
+  pose by `scripts/assets/woc_keyed_anims/`, for the idle and combat stances, gaits,
+  swim, jump take-off, death, hit flinch, emotes, the white swings, and the ability
+  strikes, casts and channels each class routes in `manifest.ts`), and per armor set and
+  fit a low file, a medium
   file and a TOP file (`woc_armor_core.ts`: file names, the tier a character
   draws, the stand-in tier, the idle rule and its ledger; pure). Since 2026-10-03 the
   medium file carries every map of the set's one full layout at half its size and

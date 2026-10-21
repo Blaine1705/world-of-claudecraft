@@ -19,12 +19,21 @@
 import * as THREE from 'three';
 import { loadGltf, releaseGltf } from '../assets/loader';
 import { registerDeferredPreload } from '../assets/preload';
+import { timeBuildSpan } from '../build_spans';
 import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import type { SanctumKitPlacement } from './sanctum_kit_plan_core';
 import { sanctumGround } from './sanctum_plan_core';
 
 export const GRAVEWYRM_SANCTUM_KIT_URL = '/models/props/gravewyrm_sanctum_kit.glb';
+/** The interior pass's second kit (docs/design/dungeon-rework/kit/
+ *  build_gravewyrm_sanctum_interior.py): its Kit_* pieces bake into the same
+ *  slot materials and the same piece map, under the same load (one wait cap,
+ *  one late swap). */
+export const GRAVEWYRM_SANCTUM_INTERIOR_URL = '/models/props/gravewyrm_sanctum_interior.glb';
+const SANCTUM_KIT_URLS = [GRAVEWYRM_SANCTUM_KIT_URL, GRAVEWYRM_SANCTUM_INTERIOR_URL] as const;
+/** The build-ledger kind of a late kit swap (zone lane). */
+export const SANCTUM_KIT_LATE_SWAP_SPAN = 'zone:sanctum-kit-late-swap';
 
 export type SanctumSlot = 'stone' | 'glow' | 'glass';
 export type SanctumBakedPiece = Partial<Record<SanctumSlot, THREE.BufferGeometry>>;
@@ -113,19 +122,24 @@ function bakeNode(node: THREE.Object3D): SanctumBakedPiece {
   return out;
 }
 
-function startKitLoad(): Promise<void> {
-  loading ??= loadGltf(GRAVEWYRM_SANCTUM_KIT_URL)
+function loadOneKit(url: string): Promise<void> {
+  return loadGltf(url)
     .then((gltf) => {
       gltf.scene.traverse((node) => {
         if (node.name.startsWith('Kit_') && !baked.has(node.name))
           baked.set(node.name, bakeNode(node));
       });
-      releaseGltf(GRAVEWYRM_SANCTUM_KIT_URL);
+      releaseGltf(url);
     })
-    .catch(() => undefined)
-    .then(() => {
-      loaded = true;
-    });
+    .catch(() => undefined);
+}
+
+function startKitLoad(): Promise<void> {
+  // Both kits land together: a piece of either is never seen without the
+  // other (the interior pass replaces some first-kit pieces outright).
+  loading ??= Promise.all(SANCTUM_KIT_URLS.map(loadOneKit)).then(() => {
+    loaded = true;
+  });
   return loading;
 }
 
@@ -414,7 +428,10 @@ export function slotProgramWarmers(): THREE.Group {
 }
 
 /** Swap a group built from stand-ins for the real kit the moment it lands
- *  (same materials, so no new program). `build` rebuilds it. */
+ *  (same materials, so no new program). `build` rebuilds it. Both kits land
+ *  together, so a swap after the wait cap rebuilds from both in one live
+ *  frame: the rebuild files under the build ledger's zone lane
+ *  (`SANCTUM_KIT_LATE_SWAP_SPAN`) so a slow entry shows what it cost. */
 export function upgradeWhenSanctumKitLands(
   group: THREE.Object3D,
   build: () => THREE.Object3D,
@@ -423,7 +440,7 @@ export function upgradeWhenSanctumKitLands(
   void loading.then(() => {
     const parent = group.parent;
     if (!parent || baked.size === 0) return;
-    parent.add(build());
+    parent.add(timeBuildSpan(SANCTUM_KIT_LATE_SWAP_SPAN, build));
     group.removeFromParent();
     group.traverse((o) => {
       if (o instanceof THREE.InstancedMesh) o.dispose();

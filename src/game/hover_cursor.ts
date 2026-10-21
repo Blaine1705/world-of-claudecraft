@@ -1,7 +1,7 @@
 // The world hover cursor and the mouseover tooltip, moved whole out of main.ts (the
 // bootstrap firewall): the cursor kind under the pointer (attack, friendly, a vault door's
-// hand, a seat) and the mob or player card beside it. main.ts calls the returned update
-// once a frame.
+// hand, a seat, the gear over a hut the carried firebottle torches) and the mob or player
+// card beside it. main.ts calls the returned update once a frame.
 
 import type { WorldPicking } from '../render/world_picking';
 import type { Entity } from '../sim/types';
@@ -13,7 +13,15 @@ import { pickPlacedMoverAt } from './placed_mover_input';
 export interface HoverCursorHost {
   world: Pick<
     IWorld,
-    'player' | 'playerId' | 'entities' | 'partyInfo' | 'duelInfo' | 'arenaInfo' | 'bgInfo'
+    | 'player'
+    | 'playerId'
+    | 'entities'
+    | 'partyInfo'
+    | 'duelInfo'
+    | 'arenaInfo'
+    | 'bgInfo'
+    // the bags, for the quest-item gear over a torchable hut (hut_torch.ts)
+    | 'inventory'
   >;
   input: Pick<Input, 'hoverActive' | 'hoverX' | 'hoverY' | 'isDragging' | 'setHoverCursor'>;
   hud: {
@@ -74,6 +82,7 @@ export function createHoverCursorUpdate(host: HoverCursorHost): () => void {
               world.playerId,
               partyMemberIds(hoverPartyMemberIds),
               pvpOpponents,
+              world.inventory,
             ),
     );
     // WoW-style mouseover tooltip (name / level / creature type) for a mob under

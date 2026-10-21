@@ -7,12 +7,22 @@
 
 import type * as THREE from 'three';
 import {
+  planSanctumInteriorPlacements,
+  resolveInteriorReplacements,
+  SANCTUM_INTERIOR_PLAN_PIECES,
+} from './sanctum_interior_plan_core';
+import {
   instanceSanctumPlacements,
   registerSanctumFallback,
   type SanctumPart,
+  sanctumKitPiece,
   upgradeWhenSanctumKitLands,
 } from './sanctum_kit';
-import { planSanctumKitPlacements, SANCTUM_KIT_SIZES } from './sanctum_kit_plan_core';
+import {
+  planSanctumKitPlacements,
+  SANCTUM_KIT_SIZES,
+  type SanctumKitPlacement,
+} from './sanctum_kit_plan_core';
 import { iceCrystal, ringLoft, rockLump, snowDrift } from './sanctum_shapes';
 
 const ICE_FOOT: readonly [number, number, number] = [0.1, 0.27, 0.45];
@@ -192,8 +202,30 @@ const EXTRA_STAND_INS = [
   'Kit_FaceChunkC',
 ];
 
+/** The interior pass's pieces draw NOTHING while their kit is missing (the
+ *  first kit's own pieces and the terrain still read): registered before the
+ *  generic stand-ins so a crystal never stands in for a pedestal. */
+function registerInteriorStandIns(names: Iterable<string>): void {
+  for (const n of names) registerSanctumFallback(n, () => []);
+}
+
+/** The interior plan, planned once (its lip and rubble probes walk every
+ *  cliff run). */
+let interiorPlan: SanctumKitPlacement[] | null = null;
+function interiorPlacements(): SanctumKitPlacement[] {
+  interiorPlan ??= planSanctumInteriorPlacements();
+  return interiorPlan;
+}
+
 function buildGroup(lowGfx: boolean, density: number): THREE.Group {
-  const plan = planSanctumKitPlacements();
+  const interior = interiorPlacements();
+  registerInteriorStandIns(interior.map((p) => p.piece));
+  // The interior pass's pieces stand in for the first kit's where its kit
+  // has landed (a carved pyre for the boxed one), never both.
+  const plan = resolveInteriorReplacements(
+    [...planSanctumKitPlacements(), ...interior],
+    (piece) => sanctumKitPiece(piece) !== null,
+  );
   registerSanctumStandIns([...new Set(plan.map((p) => p.piece)), ...EXTRA_STAND_INS]);
   return instanceSanctumPlacements(plan, lowGfx, 'gravewyrmSanctumKit', density);
 }
@@ -208,4 +240,5 @@ export function buildSanctumKitDressing(lowGfx: boolean, density = 1): THREE.Gro
 
 // Every piece's stand-in is registered as soon as the module loads, so a
 // painter that adopts a piece before the dressing builds still has one.
+registerInteriorStandIns(SANCTUM_INTERIOR_PLAN_PIECES);
 registerSanctumStandIns([...Object.keys(SANCTUM_KIT_SIZES), ...EXTRA_STAND_INS]);

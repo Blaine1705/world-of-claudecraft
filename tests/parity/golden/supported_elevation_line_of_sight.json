@@ -9,8 +9,8 @@
     "airborne player elevation is rejected behind ordinary open-world cover",
     "shared Sim cast entry point and completion LOS recheck"
   ],
-  "draws": 362,
-  "drawDigest": "156325a6",
+  "draws": 363,
+  "drawDigest": "a438d31c",
   "frames": [
     {
       "tick": 0,
@@ -1000,8 +1000,8 @@
       "state": "5bfc07bd",
       "events": "741638a5",
       "rng": {
-        "draws": 249,
-        "digest": "2457c444"
+        "draws": 250,
+        "digest": "3d6c5d68"
       }
     },
     {
@@ -1011,19 +1011,19 @@
       "state": "f4f06cae",
       "events": "741638a5",
       "rng": {
-        "draws": 353,
-        "digest": "5f74472b"
+        "draws": 354,
+        "digest": "6f936d90"
       }
     },
     {
       "tick": 81,
       "time": 4.05,
       "nextId": 1013,
-      "state": "1aea5cda",
-      "events": "c480a1f9",
+      "state": "9b21260b",
+      "events": "645bcfaa",
       "rng": {
-        "draws": 362,
-        "digest": "156325a6"
+        "draws": 363,
+        "digest": "a438d31c"
       },
       "label": "canopy-jump-heal-complete",
       "players": [
@@ -1274,7 +1274,7 @@
           "fallStartY": 2.057629,
           "fiveSecondRule": 103.05,
           "healPower": 5,
-          "hp": 74,
+          "hp": 79,
           "id": 1012,
           "kind": "player",
           "level": 1,
@@ -1323,8 +1323,8 @@
       "state": "a085cbde",
       "events": "2d150004",
       "rng": {
-        "draws": 362,
-        "digest": "156325a6"
+        "draws": 363,
+        "digest": "a438d31c"
       },
       "label": "airborne-cover-denied",
       "players": [
@@ -1624,8 +1624,8 @@
       "state": "a085cbde",
       "events": "741638a5",
       "rng": {
-        "draws": 362,
-        "digest": "156325a6"
+        "draws": 363,
+        "digest": "a438d31c"
       },
       "label": "final",
       "players": [

@@ -51,12 +51,17 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // 53.9; holy and protection unmoved. The Fenbridge rebuild forks it once more
 // (the painted buildings, the open ring, the walk-in floors, re-threaded
 // streets and lamps: world-gen inputs): protection 40.15 to 41.7, retribution
-// 53.9 to 48.35; holy unmoved.
+// 53.9 to 48.35; holy unmoved. The Mirefen mudfin huts becoming solid walls
+// fork it once more (the camp murlocs' idle wander now settles on other ticks):
+// protection 41.7 to 39.3, retribution 48.35 to 53.9; holy unmoved. The wander
+// fix around those huts (an idle pick inside a hut wall is skipped for one more
+// pause, mob/locomotion.ts) forks it again: holy 41.25 to 43, protection 39.3 to
+// 41.7, retribution 53.9 to 52.45.
 // The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
-  holy: 41.25,
+  holy: 43,
   protection: 41.7,
-  retribution: 48.35,
+  retribution: 52.45,
 };
 
 function addDummy(sim: Sim): Entity {

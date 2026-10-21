@@ -414,7 +414,17 @@ describe('generated chunk geometry is stable', () => {
     // same town plus the Genshin Impact terrain palette, meadow splat, beach
     // sand strand, road verge, non-directional cliff stone mottling, and Low-tier
     // baked canopy and building contact shadows.
-    expect(digestOf(inRect)).toBe('ae70fd63f5dd1113739c93f883d2f05b');
+    // Re-minted for Wayfarer Bryn standing by the docks spawn again: her calm
+    // pad reshapes the ground around (-79, -52), about twenty points of the
+    // dense height atlas (tests/terrain_height_parity.test.ts, re-minted with it).
+    // Re-minted after aligning BIOME_PALETTE.marsh with Eastbrook's vale meadow
+    // palette (which blends across the z = 150..215 northern border strip).
+    // Re-minted for the six Stolen Supply Crates moving off the eastern
+    // hillside into the bandit camps: their ground-object calm pads leave the
+    // slope. Checked against the dense height atlas re-minted in the same
+    // commit: 13 points move, all within 17 yd of an old crate spot, by at
+    // most 2.7 yd. Measured on the merged tree, twice in separate processes.
+    expect(digestOf(inRect)).toBe('b7dff740a0ac6d2381c7ad9759f01364');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

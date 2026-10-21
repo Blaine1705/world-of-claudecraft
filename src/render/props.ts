@@ -12,6 +12,7 @@ import {
   dockSurfaceLine,
   dockSurfaceYAt,
 } from '../sim/dock_layout';
+import { MUDFIN_HUT_MODELS, type MudfinHutModel, mudfinHutAt } from '../sim/mudfin_huts';
 import {
   CHAPEL_HALL,
   CHAPEL_TOWER,
@@ -51,6 +52,7 @@ import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
+import { hutSmokePrewarmParts } from './hut_smoke';
 import {
   type KitSurfaceFamily,
   kitHasUvSurfaceRouting,
@@ -230,6 +232,10 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   rockLargeF: { url: '/models/props/rock_large_f.glb', kit: 'minerock' },
   mushroomRed: { url: '/models/props/mushroom_red.glb', kit: 'shroom' },
   mushroomTan: { url: '/models/props/mushroom_tan.glb', kit: 'shroom' },
+  // The Mirefen mudfin huts (src/sim/mudfin_huts.ts): the art lead's painted
+  // Tripo3D huts, baked real size by scripts/assets/build_mudfin_huts.mjs.
+  mudfinHutA: { url: '/models/props/mudfin_hut_a.glb', kit: 'mudfin' },
+  mudfinHutB: { url: '/models/props/mudfin_hut_b.glb', kit: 'mudfin' },
   column: { url: '/models/props/column.glb', kit: 'nature' },
   columnBroken: { url: '/models/props/column_broken.glb', kit: 'nature' },
   statueHead: { url: '/models/props/statue_head.glb', kit: 'nature' },
@@ -473,6 +479,13 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
 
 export type PropKey = keyof typeof PROP_ASSET_DEFS;
 
+/** The prop each mudfin hut model draws (sim/mudfin_huts.ts); the editor's
+ *  world prop conversion mirrors the placement. */
+export const MUDFIN_HUT_PROP_KEYS: Readonly<Record<MudfinHutModel, PropKey>> = {
+  a: 'mudfinHutA',
+  b: 'mudfinHutB',
+};
+
 const loadedProps = new Map<string, GLTF>();
 const propLoadTasks = new Map<string, Promise<void>>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
@@ -502,6 +515,9 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'tentSmall',
   'rockLargeD',
   'mushroomRed',
+  // solid walls (mudfin_huts.ts), so every tier draws what blocks
+  'mudfinHutA',
+  'mudfinHutB',
   'column',
   'columnBroken',
   'dockPlatform',
@@ -1068,8 +1084,9 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   // (transport_ship.ts), and so do the berths' route markers
   // (harbor_route_markers.ts), the Wyrmwatch cliff harbor (wyrmwatch_harbor.ts), the
   // Wickharbor ferry wharf (wickharbor_wharf.ts), the rest of Wickharbor's harbor
-  // (wickharbor_harbor.ts) and the Mirefen tavern (mirefen_tavern.ts): one twin per
-  // distinct program, shadow variant included
+  // (wickharbor_harbor.ts) and the Mirefen tavern (mirefen_tavern.ts), and a torched
+  // mudfin hut's smoke plume (hut_smoke.ts, the tavern chimney's program, warmed even
+  // where no tavern is built): one twin per distinct program, shadow variant included
   for (const part of [
     ...transportShipPrewarmParts(),
     ...harborRouteMarkerPrewarmParts(),
@@ -1077,6 +1094,7 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     ...wickharborWharfPrewarmParts(),
     ...wickharborHarborPrewarmParts(),
     ...mirefenTavernPrewarmParts(),
+    ...hutSmokePrewarmParts(),
   ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
@@ -2076,6 +2094,18 @@ export function buildProps(
   );
   for (const [x, z] of getActiveWorldContent().props.mudHuts) {
     const y = ground(x, z);
+    // The Mirefen camp stands the painted mudfin huts at the size, turn and
+    // wall the shared table gives the colliders too (sim/mudfin_huts.ts).
+    const mudfin = mudfinHutAt(x, z);
+    if (mudfin) {
+      const spec = MUDFIN_HUT_MODELS[mudfin.model];
+      const hut = new THREE.Group();
+      addParts(hut, MUDFIN_HUT_PROP_KEYS[mudfin.model], { y: -0.08, rot: mudfin.yaw, scale: 1 });
+      hut.position.set(x, y, z);
+      group.add(shadowed(hut));
+      registerHideable(hut, circleFootprint(x, z, spec.radius, y + spec.height, spec.radius + 0.6));
+      continue;
+    }
     const g = new THREE.Group();
     const sxz = 13 + propRand(x, z, 15) * 3;
     const sy = 10.5 + propRand(x, z, 16) * 3;

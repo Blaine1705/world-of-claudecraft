@@ -2009,9 +2009,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(state.bank).toEqual(baseline.bank);
     const bytes = Buffer.byteLength(JSON.stringify(state));
     const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
-    expect(baselineBytes).toBe(258370);
+    // +19 at the merge of the Staff of Changing's discovery id (PR 4281).
+    expect(baselineBytes).toBe(258389);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(266654);
+    expect(bytes).toBe(266673);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2269,17 +2270,26 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 241,763 on the membership integration: the release's 233,515 plus the
     // quest gear (+5,019), quest blues (+1,688) and role fill (+1,541) underneath.
     // 242,954 on the v0.45.0 integration: plus the Mirefen world-boss branch (+1,191).
-    // 246,084 with the five-dungeon rework's attributed +3,130 (PR 4352).
-    expect(beforeReferralBytes).toBe(246084);
+    // 249,054 with the five-dungeon rework (PR 4352), re-measured 2026-10 at
+    // its merge 106a086b617: +6,100, not the +3,130 first attributed here
+    // (reliquary +2,453, deedStats.itemsDiscovered +2,818, and 24 more deeds
+    // +829). 249,939 with the account-wide buddy merge 7bc9c74af57: +885, the
+    // new buddies record (+179 with its key) and +706 of discoverable item ids.
+    // Unchanged from there through the referral cards and the later v0.45.0
+    // integration merges. 249,958 with the Staff of Changing's discovery id
+    // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
+    expect(beforeReferralBytes).toBe(249958);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
     ).toBe(122);
-    // Membership adds eight discoverable item ids and no character entitlement
-    // fields. Isolate the measured content-only growth from the settled save:
+    // Membership adds nine discoverable item ids (the eight pieces, then the
+    // Staff of Changing's 19 bytes, PR 4281) and no character entitlement
+    // fields; the byte history below predates the staff. Isolate the measured content-only growth from the settled save:
     // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered (241,608 ->
     // 241,763 with the quest gear, blues and role fill underneath; 242,799 -> 242,954 with
-    // the Mirefen world-boss branch too). Removing only those ids
+    // the Mirefen world-boss branch too; 249,784 -> 249,939 with the five-dungeon
+    // rework and the account-wide buddies). Removing only those ids
     // must reproduce the preceding measurement exactly.
     const membershipIds = new Set(Object.keys(MEMBERSHIP_ITEMS));
     const withoutMembership: CharacterState = {
@@ -2291,13 +2301,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         ),
       },
     };
-    expect(membershipIds.size).toBe(8);
+    expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
-    expect(beforeMembershipBytes).toBe(245929);
-    expect(beforeReferralBytes - beforeMembershipBytes).toBe(155);
+    expect(beforeMembershipBytes).toBe(249784);
+    expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
-    ).toBe(155);
+    ).toBe(174);
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
@@ -2718,13 +2728,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // no Reliquary pages). Predicted from the literals BEFORE the run and
         // MEASURED equal (83,911 to 85,452).
         1541 +
-        // Membership's eight discoverable item ids, isolated from withoutReferral above.
-        155 +
-        // Plus 3,089 at the five-dungeon rework (PR 4352) and 41 at its lore guide's
-        // deed, on the v0.45.0 integration (the rework's own attribution: its 19
-        // encounter deed ids, 66 item ids and 19 relics' reliquary rows).
-        3089 +
-        41 +
+        // Membership's nine discoverable item ids (the eight pieces plus the Staff
+        // of Changing's 19 bytes, PR 4281), isolated from withoutReferral above.
+        174 +
+        // Plus 6,100 at the five-dungeon rework (PR 4352) on the v0.45.0
+        // integration, MEASURED 2026-10 across its merge (fc742198392 to
+        // 106a086b617): deeds +829 (24 more deed rows, its encounter deeds and
+        // its lore guide's), deedStats.itemsDiscovered +2,818 and reliquary
+        // +2,453. The branch's own attribution (3,089 + 41) undercounted the
+        // merged tree by 2,970.
+        829 +
+        2818 +
+        2453 +
         // Legacy whistle and charm discovery ids, plus the retained buddy collection.
         706 +
         buddyCollectionBytes,
@@ -2770,11 +2785,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
       // (the +154 above).
-      // deeds 743 -> 1,391, deedStats 9,427 -> 10,875 and reliquary
-      // 11,501 -> 12,494 at the five-dungeon rework (the +648, +1,448 and
-      // +993 of the 3,089 attributed above).
-      // deeds 1,391 -> 1,432 with the lore guide's deed (the +41 above).
-      deeds: 1432,
+      // deeds 743 -> 1,572 and reliquary 11,501 -> 13,954 at the five-dungeon
+      // rework, lore guide deed included, MEASURED 2026-10 across its merge
+      // (the +829 and +2,453 above; the branch's own +648 + 41 and +993
+      // undercounted the merged tree).
+      deeds: 1572,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
@@ -2782,10 +2797,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // rewards' 76 rare ids (the +1,688 above), then -> 17,675 at the quest
       // role fill's 75 ids (the +1,541 above).
       // Then -> 17,830 with membership item discovery (+155, measured above).
-      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: deedStats +1,448 and reliquary +993.
-      // The 36 legacy buddy item ids add 706 discovery bytes.
-      deedStats: 19984,
-      reliquary: 12494,
+      // Then -> 20,648 at the five-dungeon rework (PR 4352): the +2,818 above,
+      // MEASURED across its merge (the branch's own +1,448 undercounted).
+      // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
+      // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
+      deedStats: 21373,
+      reliquary: 13954,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2827,9 +2844,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 236,748 -> 238,436 at the quest blue rewards (+1,688, the 76 rare ids).
       // 238,436 -> 239,977 at the quest role fill (+1,541, the 75 ids).
       // Membership's eight discovered item ids remain here: +155 bytes (240,132).
-      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +3,130 (240,132 -> 243,262).
-      // Retained buddy data adds 706 discovery bytes and 179 collection bytes.
-    ).toBe(244147);
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +6,100
+      // (240,132 -> 246,232), MEASURED 2026-10 across its merge (the +829,
+      // +2,818 and +2,453 attributed above; the branch's own +3,130 undercounted).
+      // Retained buddy data adds 706 discovery bytes and 179 collection bytes (247,117).
+      // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
+    ).toBe(247136);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2864,9 +2884,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 241,751 -> 242,942 with the Mirefen world-boss branch on the v0.45.0
       // integration (+1,191, the balgathDelta above: the boss content, Balgath's
       // loot, and the muster weekly as a kill credit with no item of its own).
-      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +3,130 (242,942 -> 246,072).
-      // Retained buddy data adds 706 discovery bytes and 179 collection bytes.
-    ).toBe(246957);
+      // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: +6,100
+      // (242,942 -> 249,042), MEASURED 2026-10 across its merge (the branch's
+      // own +3,130 undercounted).
+      // Retained buddy data adds 706 discovery bytes and 179 collection bytes (249,927).
+      // The Staff of Changing's discovery id adds 19 (249,946, PR 4281).
+    ).toBe(249946);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2994,8 +3017,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 246,206 bytes = 243,076 + 3,089 + 41, attributed above. Floor at measurement
     // minus 380, edge at measurement plus one: 245826..246207.
     // Buddy discovery and collection fields add 885 bytes; keep the 381-byte band.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(246711);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(247092);
+    // RE-BASED 2026-10 on the merged v0.45.0 integration: 250,061 bytes =
+    // 243,076 + 6,100 (the five-dungeon rework MEASURED across its merge
+    // 106a086b617: deeds +829, deedStats.itemsDiscovered +2,818, reliquary
+    // +2,453; the 3,089 + 41 above undercounted by 2,970) + 885 (buddies). No
+    // container or ceiling changed shape, and nothing has moved it since through
+    // the head of the integration branch. Floor at measurement minus 380, edge
+    // at measurement plus one: 249681..250062.
+    // RE-BASED for the Staff of Changing (PR 4281): 250,080 bytes, exactly +19
+    // from its one discovery id, isolated above with membership. Same band:
+    // 249700..250081.
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249700);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(250081);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

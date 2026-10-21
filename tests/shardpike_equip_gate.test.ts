@@ -9,6 +9,8 @@
 // the equip just refuses), and nothing about it is visible from the content side either
 // (the quest's minLevel and the item's derived requirement live in different files).
 import { describe, expect, it } from 'vitest';
+import { MEMBERSHIP_ITEMS } from '../src/sim/content/membership';
+import { REFERRAL_ITEMS } from '../src/sim/content/referral';
 import { ITEMS, QUESTS } from '../src/sim/data';
 import { requiredLevelFor } from '../src/sim/item_level_req';
 import { LANCE_ITEM_ID } from '../src/sim/lance_trial';
@@ -63,9 +65,17 @@ describe('the quest tool is holdable by the players its quest is for', () => {
 
   it('leaves the shared rare band alone for everything else', () => {
     // The fix is a per-item override, not a rule change: an ordinary rare with no
-    // derivable source must still gate where it always did.
+    // derivable source must still gate where it always did. Membership and
+    // friendship gear is the other deliberate exception: it always scales to
+    // its wearer's level plus five, so it is wearable from level 1 (PR 4281).
+    const scaling = new Set([...Object.keys(MEMBERSHIP_ITEMS), ...Object.keys(REFERRAL_ITEMS)]);
     const ordinary = Object.values(ITEMS).filter(
-      (i) => i.quality === 'rare' && i.id !== LANCE_ITEM_ID && !i.questTool && i.slot,
+      (i) =>
+        i.quality === 'rare' &&
+        i.id !== LANCE_ITEM_ID &&
+        !i.questTool &&
+        i.slot &&
+        !scaling.has(i.id),
     );
     expect(ordinary.length).toBeGreaterThan(5);
     expect(ordinary.every((i) => requiredLevelFor(i) > 1)).toBe(true);

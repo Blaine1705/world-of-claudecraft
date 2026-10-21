@@ -8,8 +8,8 @@
     "Cat Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll",
     "bear-form control swinging at the equipped weapon speed on the same loadout"
   ],
-  "draws": 1475,
-  "drawDigest": "4d840bd6",
+  "draws": 1479,
+  "drawDigest": "039d2a21",
   "frames": [
     {
       "tick": 0,
@@ -285,8 +285,8 @@
       "state": "bf8f1c7a",
       "events": "741638a5",
       "rng": {
-        "draws": 762,
-        "digest": "38598d8a"
+        "draws": 763,
+        "digest": "25338553"
       }
     },
     {
@@ -296,118 +296,118 @@
       "state": "e86ba0cd",
       "events": "741638a5",
       "rng": {
-        "draws": 815,
-        "digest": "64196b67"
+        "draws": 816,
+        "digest": "ba333ccc"
       }
     },
     {
       "tick": 130,
       "time": 6.5,
       "nextId": 1015,
-      "state": "39240fcc",
-      "events": "fc5673fe",
+      "state": "4928d83a",
+      "events": "0021a333",
       "rng": {
-        "draws": 871,
-        "digest": "872c982e"
+        "draws": 872,
+        "digest": "53bd0f68"
       }
     },
     {
       "tick": 135,
       "time": 6.75,
       "nextId": 1015,
-      "state": "c602f950",
+      "state": "97a43fe8",
       "events": "741ce20f",
       "rng": {
-        "draws": 922,
-        "digest": "496829fa"
+        "draws": 921,
+        "digest": "4663e4c6"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 1015,
-      "state": "341e77e8",
+      "state": "c96063f6",
       "events": "741638a5",
       "rng": {
-        "draws": 990,
-        "digest": "7146dd9f"
+        "draws": 988,
+        "digest": "085fb958"
       }
     },
     {
       "tick": 145,
       "time": 7.25,
       "nextId": 1015,
-      "state": "3f942e28",
+      "state": "4efc38a8",
       "events": "741638a5",
       "rng": {
-        "draws": 1051,
-        "digest": "1106c744"
+        "draws": 1056,
+        "digest": "c3a10785"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
       "nextId": 1015,
-      "state": "9763993b",
+      "state": "30c4d0ed",
       "events": "741638a5",
       "rng": {
-        "draws": 1099,
-        "digest": "e38d8e70"
+        "draws": 1100,
+        "digest": "e2962881"
       }
     },
     {
       "tick": 155,
       "time": 7.75,
       "nextId": 1015,
-      "state": "0bd5ce42",
-      "events": "978a663e",
+      "state": "6903b818",
+      "events": "741ce20f",
       "rng": {
-        "draws": 1164,
-        "digest": "e15b9dc6"
+        "draws": 1168,
+        "digest": "171bfbdd"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 1015,
-      "state": "5420c58a",
+      "state": "e4975c5e",
       "events": "741638a5",
       "rng": {
-        "draws": 1228,
-        "digest": "993dcf38"
+        "draws": 1235,
+        "digest": "081630f3"
       }
     },
     {
       "tick": 165,
       "time": 8.25,
       "nextId": 1015,
-      "state": "bf814bb0",
+      "state": "2fb2b79a",
       "events": "741638a5",
       "rng": {
-        "draws": 1278,
-        "digest": "7284e50d"
+        "draws": 1286,
+        "digest": "cfafc133"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
       "nextId": 1015,
-      "state": "f36cbe45",
+      "state": "e580b2c9",
       "events": "741638a5",
       "rng": {
-        "draws": 1345,
-        "digest": "a22c3edc"
+        "draws": 1349,
+        "digest": "2cefc31d"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
       "nextId": 1015,
-      "state": "f36cbe45",
+      "state": "e580b2c9",
       "events": "741638a5",
       "rng": {
-        "draws": 1345,
-        "digest": "a22c3edc"
+        "draws": 1349,
+        "digest": "2cefc31d"
       },
       "label": "after-swings",
       "players": [
@@ -437,13 +437,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 92
+            "damageDealt": 105
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 92
+              "dummyDamage": 105
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -556,13 +556,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 140
+            "damageDealt": 139
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 140
+              "dummyDamage": 139
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -685,7 +685,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": 12.55,
+          "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
             "x": -30,
@@ -773,7 +773,7 @@
               "dru_loping_stride": 11.5
             }
           },
-          "resource": 14.480761,
+          "resource": 14.377327,
           "resourceType": "rage",
           "savedMana": 1073,
           "spawnPos": {
@@ -810,7 +810,7 @@
           "fallStartY": 0.552596,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999908,
+          "hp": 999895,
           "id": 1013,
           "inCombat": true,
           "kind": "mob",
@@ -842,7 +842,7 @@
           "threat": [
             [
               1011,
-              109.778
+              125.0075
             ]
           ],
           "weapon": {
@@ -860,7 +860,7 @@
           "fallStartY": 2.932068,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999860,
+          "hp": 999861,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
@@ -892,7 +892,7 @@
           "threat": [
             [
               1012,
-              302.3
+              300.155
             ]
           ],
           "weapon": {
@@ -905,33 +905,33 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 1015,
-      "state": "52385188",
+      "state": "2a8adfc6",
       "events": "741638a5",
       "rng": {
-        "draws": 1402,
-        "digest": "d29b1117"
+        "draws": 1406,
+        "digest": "8bd888ba"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1015,
-      "state": "914eba46",
+      "state": "3a56d150",
       "events": "741638a5",
       "rng": {
-        "draws": 1475,
-        "digest": "4d840bd6"
+        "draws": 1479,
+        "digest": "039d2a21"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 1015,
-      "state": "914eba46",
+      "state": "3a56d150",
       "events": "741638a5",
       "rng": {
-        "draws": 1475,
-        "digest": "4d840bd6"
+        "draws": 1479,
+        "digest": "039d2a21"
       },
       "label": "final",
       "players": [
@@ -961,13 +961,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 92
+            "damageDealt": 105
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 92
+              "dummyDamage": 105
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1080,13 +1080,13 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 140
+            "damageDealt": 139
           },
           "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 140
+              "dummyDamage": 139
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1208,7 +1208,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": 12.55,
+          "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
             "x": -30,
@@ -1294,7 +1294,7 @@
               "dru_loping_stride": 11
             }
           },
-          "resource": 14.480761,
+          "resource": 14.377327,
           "resourceType": "rage",
           "savedMana": 1073,
           "spawnPos": {
@@ -1331,7 +1331,7 @@
           "fallStartY": 0.552596,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999908,
+          "hp": 999895,
           "id": 1013,
           "inCombat": true,
           "kind": "mob",
@@ -1363,7 +1363,7 @@
           "threat": [
             [
               1011,
-              109.778
+              125.0075
             ]
           ],
           "weapon": {
@@ -1381,7 +1381,7 @@
           "fallStartY": 2.932068,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999860,
+          "hp": 999861,
           "id": 1014,
           "inCombat": true,
           "kind": "mob",
@@ -1413,7 +1413,7 @@
           "threat": [
             [
               1012,
-              302.3
+              300.155
             ]
           ],
           "weapon": {

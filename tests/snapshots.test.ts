@@ -5739,6 +5739,8 @@ const ALL_DELTA_KEYS = [
   'cosmetics',
   'courier',
   'courierData',
+  'courierLegTicks',
+  'courierTravelTicks',
   'cprof',
   'crat',
   'crit',
@@ -5888,6 +5890,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   cosmetics: 'accountCosmetics',
   courier: 'courierInfo',
   courierData: 'courierInfo',
+  courierLegTicks: 'courierInfo',
+  courierTravelTicks: 'courierInfo',
   cprof: 'craftingIdentity',
   crat: 'critRating',
   crit: 'critChance',
@@ -6054,9 +6058,14 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
-  // The courier's pose and revision-gated custody blob recombine into one owner mirror.
+  // Pose, optional elapsed ticks and revision-gated custody recombine into one owner mirror.
   meta.courier = {
     phase: 'returning',
+    travelTicks: 77,
+    // A long route caps the leg at fifteen seconds (300 ticks).
+    legDistance: 10000,
+    legStartX: 0,
+    legStartZ: 0,
     travelDistance: 8,
     x: 17,
     z: 29,
@@ -7160,18 +7169,25 @@ describe('full self-state snapshot delta fixture', () => {
       cargo: [{ itemId: 'wolf_fang', count: 3 }],
       revision: 7,
     });
+    expect(initial.self.courierTravelTicks).toBe(77);
+    expect(initial.self.courierLegTicks).toBe(300);
     expect(initial.self.courierData).not.toHaveProperty('x');
     expect(initial.self.courierData).not.toHaveProperty('travelDistance');
     expect(initial.self.courierData).not.toHaveProperty('remainingDistance');
     expect(
       initial.ents.every(
-        (entry: Record<string, unknown>) => !('courier' in entry) && !('courierData' in entry),
+        (entry: Record<string, unknown>) =>
+          !('courier' in entry) &&
+          !('courierData' in entry) &&
+          !('courierTravelTicks' in entry) &&
+          !('courierLegTicks' in entry),
       ),
     ).toBe(true);
     (client as any).applySnapshot(initial);
     const cargo = client.courierInfo!.cargo;
     const meta = server.sim.meta(leader.pid)!;
     meta.courier!.x = 41;
+    meta.courier!.travelTicks = 78;
     fc.sent.length = 0;
     broadcast(server);
     const moved = lastSnap(fc.sent);
@@ -7184,9 +7200,12 @@ describe('full self-state snapshot delta fixture', () => {
       remainingDistance: 0,
       inventoryRevision: 0,
     });
+    expect(moved.self.courierTravelTicks).toBe(78);
     expect(moved.self).not.toHaveProperty('courierData');
     (client as any).applySnapshot(moved);
     expect(client.courierInfo!.x).toBe(41);
+    expect(client.courierInfo!.travelTicks).toBe(78);
+    expect(client.courierInfo!.legTicks).toBe(300);
     expect(client.courierInfo!.cargo).toBe(cargo);
     meta.courier = undefined;
     fc.sent.length = 0;
@@ -7194,6 +7213,8 @@ describe('full self-state snapshot delta fixture', () => {
     const ended = lastSnap(fc.sent);
     expect(ended.self.courier).toBeNull();
     expect(ended.self.courierData).toBeNull();
+    expect(ended.self.courierTravelTicks).toBeNull();
+    expect(ended.self.courierLegTicks).toBeNull();
     (client as any).applySnapshot(ended);
     expect(client.courierInfo).toBeNull();
   });
@@ -7309,9 +7330,10 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 122 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 124 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
     // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
+    // +2: the courier's courierTravelTicks and courierLegTicks (PR 4281), for 124.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -7373,8 +7395,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 119.
     // The buddy collection adds budOwn and budPend to the integration keys.
     // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
-    expect(ALL_DELTA_KEYS).toHaveLength(122);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(122);
+    // +2: the courier's courierTravelTicks and courierLegTicks leg timing (PR 4281), for 124.
+    expect(ALL_DELTA_KEYS).toHaveLength(124);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(124);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7498,6 +7521,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('cvault')).toBe(true);
     expect(scraped.has('courier')).toBe(true);
     expect(scraped.has('courierData')).toBe(true);
+    expect(scraped.has('courierTravelTicks')).toBe(true);
+    expect(scraped.has('courierLegTicks')).toBe(true);
     // ...and the narrowing really narrows. A member `emit` is not a delta call,
     // and asserting it on a synthetic source keeps the claim honest even while
     // neither emitter file happens to contain one.
@@ -7549,7 +7574,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The courier's keys and the Shardpike trial's lance, lrest and lguide self emits make 119.
     // The buddy collection adds budOwn and budPend.
     // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
-    expect(scraped.size).toBe(122);
+    // The courier's courierTravelTicks and courierLegTicks make 124.
+    expect(scraped.size).toBe(124);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7630,6 +7656,8 @@ describe('delta-key contract pins (anti-drift)', () => {
       fplot: 'myFarmPlots',
       courier: 'courierInfo',
       courierData: 'courierInfo',
+      courierLegTicks: 'courierInfo',
+      courierTravelTicks: 'courierInfo',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);

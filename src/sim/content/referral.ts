@@ -19,7 +19,7 @@ export const REFERRAL_ITEMS: Record<string, ItemDef> = Object.fromEntries(
       kind: 'armor',
       armorType: 'cloth',
       slot,
-      quality: 'epic',
+      quality: 'rare',
       requiredLevel: 1,
       soulbound: true,
       noSalvage: true,

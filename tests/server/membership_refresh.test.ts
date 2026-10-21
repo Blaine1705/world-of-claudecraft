@@ -139,4 +139,37 @@ describe('realm membership refresh capacity', () => {
     expect(stamp).toHaveBeenCalledWith(2, expect.any(Number));
     service.onLeave(sessions.get(2)!);
   });
+
+  it('leaves no refresh timer behind once stopped, even for a batch still in flight', async () => {
+    // A stopped GameServer must not stay reachable through a pending refresh
+    // timer: the cohort wakeups hold the service, its host and the whole Sim, so
+    // a test that builds hundreds of servers pinned every one of them (the
+    // audit_conservation_property OOM on CI).
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    let finish!: (rows: Map<number, MembershipAuthorization>) => void;
+    const active = (ids: number[]) =>
+      new Map(
+        ids.map((id) => [
+          id,
+          { active: true, expiresAt: 1_000_000, authorizedUntil: 60_000, recurringExpiresAt: null },
+        ]),
+      );
+    source.batch.mockResolvedValueOnce(active([1, 2, 3]));
+    const { service } = fixture(3);
+    await vi.advanceTimersByTimeAsync(25);
+    expect(vi.getTimerCount()).toBeGreaterThan(0);
+    source.batch.mockImplementation(
+      () =>
+        new Promise((done) => {
+          finish = done;
+        }),
+    );
+    await vi.advanceTimersByTimeAsync(31_000);
+    service.stop();
+    expect(vi.getTimerCount()).toBe(0);
+    finish(active([1, 2, 3]));
+    await vi.advanceTimersByTimeAsync(1);
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });

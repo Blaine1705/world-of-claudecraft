@@ -46,11 +46,11 @@ export const WATER_CHARACTERS: Readonly<Record<BiomeId, WaterCharacter>> = {
   vale: OPEN_SEA,
   beach: TROPICAL,
   desert: { ...OPEN_SEA, deep: 0x123f5e, shallow: 0x3b9a92 },
-  // Tea-dark marsh water: you see the reeds at the edge and nothing below.
+  // Sheltered marsh water with Eastbrook's blue-teal colour profile.
   marsh: {
-    deep: 0x242b19,
-    shallow: 0x4a5430,
-    absorb: [1.1, 0.62, 0.95],
+    deep: 0x0d3a5a,
+    shallow: 0x2d8a86,
+    absorb: [0.48, 0.14, 0.095],
     chop: 0.45,
     foam: 0.3,
   },
