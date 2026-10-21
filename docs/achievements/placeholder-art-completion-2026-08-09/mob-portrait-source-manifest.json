@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "590d1084fa4d931d43d3a068a6bbf15ead37c5ae195465bbc6140464138a0466",
+  "rendererFingerprint": "90452b01f6a185a36ca42449d6b67484696201e4c94c4984979ce512378dcfed",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6445508,
-      "sha256": "73daf80bd7329b416c21a3218921ed3e9357e055829ed1419cf2557e85805d1d",
+      "bytes": 6445392,
+      "sha256": "34087c6abcec2046d83c488825365ef240292391c8672290eb3bd4f0fe21a9fe",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3525,11 +3525,11 @@
         "model": {
           "url": "models/creatures/wolf_basic.glb",
           "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "bytes": 369180,
+          "sha256": "1d8c3c652467f2e4ba8b9746f926eda43254adf5ddaaca722dce582ec629d381"
         },
         "idle": "Idle",
-        "height": 1.6,
+        "height": 1.47,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -3543,11 +3543,11 @@
         "resolved": "#7f8c8d",
         "strength": 0.35
       },
-      "sourceFingerprint": "e033ddc7be001f0300ac90137fbe1b40ad0504158511205888c92c142df63264",
+      "sourceFingerprint": "c17816b6f525c8e7c7c73b4aab8b1b7eb90525be7f28cecffe8748f5b654e417",
       "output": {
         "path": "public/ui/mobs/forest_wolf.webp",
-        "bytes": 1824,
-        "sha256": "0c86184b43b1a77083f488c1a87e41ad20fbb7b5b91417368383ad18a82264c1"
+        "bytes": 2044,
+        "sha256": "bfd9c0dca83b08a24280bccca194c7f0b4fa01a6a50e357fa890d9e477822122"
       }
     },
     {
@@ -6558,11 +6558,11 @@
         "model": {
           "url": "models/creatures/wolf_basic.glb",
           "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "bytes": 369180,
+          "sha256": "1d8c3c652467f2e4ba8b9746f926eda43254adf5ddaaca722dce582ec629d381"
         },
         "idle": "Idle",
-        "height": 1.6,
+        "height": 1.47,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -6576,11 +6576,11 @@
         "resolved": "#4d5656",
         "strength": 0.35
       },
-      "sourceFingerprint": "e1b4b7c59b4d85f358400a311e96aa69866324f6b1f2b2daa43ec50e51cdaaa3",
+      "sourceFingerprint": "c3bf0629c77831cd33fc56fa3ec3e5df7b76b247b26f8c95eb9ca5e6d0d81ef5",
       "output": {
         "path": "public/ui/mobs/mire_prowler.webp",
-        "bytes": 1818,
-        "sha256": "7a630561f0dd825442c465b8045adb7bb6d186f4f9e8d5176644d0e859b5b6c7"
+        "bytes": 1980,
+        "sha256": "252801e166c89d790c31f222aaa84c555299fa6c744d49858114d0f8ca3d04bc"
       }
     },
     {
@@ -8163,11 +8163,11 @@
         "model": {
           "url": "models/creatures/greyjaw.glb",
           "path": "public/models/creatures/greyjaw.glb",
-          "bytes": 414832,
-          "sha256": "b78718b95a66a3fd38e158dfe7245ceabc8e76381ad122aeb274f9784e85c6a5"
+          "bytes": 442916,
+          "sha256": "21dfd73d6797ca35b1e79242769e0467af014ef60666c5ee2b8c66a86fd1e23a"
         },
         "idle": "Idle",
-        "height": 2.2,
+        "height": 2.05,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -8181,11 +8181,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "72c1fdff96d0f6a368720e97d0a401e43e66d9b73e14abafae21741a4c725324",
+      "sourceFingerprint": "ce61e544a4297a8721b8555535e9719812d17027e0991c908c6f19ce88f7cbff",
       "output": {
         "path": "public/ui/mobs/old_greyjaw.webp",
-        "bytes": 2006,
-        "sha256": "d7f0c0e9a263db57f8e61d10f9fce2d57d5c20470b3d50cfaeada5da19802fa1"
+        "bytes": 2150,
+        "sha256": "de670d782ae029116b415826f5f4df8b12578697c335149c282d38778a9670bb"
       }
     },
     {
@@ -8792,11 +8792,11 @@
         "model": {
           "url": "models/creatures/wolf_basic.glb",
           "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "bytes": 369180,
+          "sha256": "1d8c3c652467f2e4ba8b9746f926eda43254adf5ddaaca722dce582ec629d381"
         },
         "idle": "Idle",
-        "height": 1.6,
+        "height": 1.47,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -8810,11 +8810,11 @@
         "resolved": "#8c8270",
         "strength": 0.35
       },
-      "sourceFingerprint": "8af1837aeff637d8122095d63ee7c7ce0b066a7b0ce29305fdb09a08d02e0902",
+      "sourceFingerprint": "3282c1c42b7c50daa4bff8a591989a6bb4ca71b32b5441a7bb6b711f9415b883",
       "output": {
         "path": "public/ui/mobs/ridge_stalker.webp",
-        "bytes": 1840,
-        "sha256": "4d6eac26cb086269a9843b9cb3da91de91fa58e55085afb8651890236ec749a8"
+        "bytes": 2022,
+        "sha256": "cee147084aa714e320c49867a0c125efd46977092f262bbdaf02552840212cc1"
       }
     },
     {
@@ -10787,11 +10787,11 @@
         "model": {
           "url": "models/creatures/wolf_basic.glb",
           "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "bytes": 369180,
+          "sha256": "1d8c3c652467f2e4ba8b9746f926eda43254adf5ddaaca722dce582ec629d381"
         },
         "idle": "Idle",
-        "height": 1.6,
+        "height": 1.47,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -10805,11 +10805,11 @@
         "resolved": "#eef4f8",
         "strength": 0.35
       },
-      "sourceFingerprint": "c9eebda31b0b3d2a4290e31160adf2985c52fc3a89ba2e03e98d71daad5f5f61",
+      "sourceFingerprint": "5b0f83e5130402c60bb1e06cc6d6cce98dc8a67b3213e63795f91b4dbbdcc8e7",
       "output": {
         "path": "public/ui/mobs/snowdrift_wolf.webp",
-        "bytes": 1976,
-        "sha256": "9ac8afbfc351eb3b0ee7f1d64827bee2e1e39fa32ea02c86b5396c6211dc86f5"
+        "bytes": 2120,
+        "sha256": "95f6c744d5822780b6040a0da6e93bb7a0932716f9e05678c180178cd3eafa7d"
       }
     },
     {
@@ -11229,11 +11229,11 @@
         "model": {
           "url": "models/creatures/wolf_basic.glb",
           "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "bytes": 369180,
+          "sha256": "1d8c3c652467f2e4ba8b9746f926eda43254adf5ddaaca722dce582ec629d381"
         },
         "idle": "Idle",
-        "height": 1.6,
+        "height": 1.47,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -11247,11 +11247,11 @@
         "resolved": "#9db4c8",
         "strength": 0.35
       },
-      "sourceFingerprint": "81e52142fbe236eb5b6d7572fe343c48eda5b4adfc7a7e0475a626192e06bdf8",
+      "sourceFingerprint": "cce38928f585cda0573a12f9aef3fd6da6b69a0935c6ceedb903e911a8d7e5be",
       "output": {
         "path": "public/ui/mobs/terrace_howler.webp",
-        "bytes": 1924,
-        "sha256": "ab589c6489af04c92795461eee5747db3ed98fd23e19fb11211188f434fae476"
+        "bytes": 2096,
+        "sha256": "1ce995526b30ad083de71a27de243701617f6e89619966ea1bdbce4c56afb620"
       }
     },
     {
@@ -12699,11 +12699,11 @@
         "model": {
           "url": "models/creatures/wolf_basic.glb",
           "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "bytes": 369180,
+          "sha256": "1d8c3c652467f2e4ba8b9746f926eda43254adf5ddaaca722dce582ec629d381"
         },
         "idle": "Idle",
-        "height": 1.6,
+        "height": 1.47,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -12717,11 +12717,11 @@
         "resolved": "#4a8a4e",
         "strength": 0.35
       },
-      "sourceFingerprint": "fceb8e7950b5d709ea39d5d7d0a74028701b26cd92ca06b754307ba22f379a43",
+      "sourceFingerprint": "4f3d2b67c0b63f8df68d3735934492f020e1874814e856d0444e8280aa323e5d",
       "output": {
         "path": "public/ui/mobs/topiary_wolf.webp",
-        "bytes": 1810,
-        "sha256": "9baf724d551d018481adba526f14fb9f5fcee3f35a8a6ec95758b6d239273b9d"
+        "bytes": 1984,
+        "sha256": "aded6f63d14a1bf93159966351e656ae9a48b0898ce25df93c039d22a1e93515"
       }
     },
     {
@@ -13465,11 +13465,11 @@
         "model": {
           "url": "models/creatures/wolf_basic.glb",
           "path": "public/models/creatures/wolf_basic.glb",
-          "bytes": 334888,
-          "sha256": "0edf50b21a051f79c4127fdf2534cdebba09c421660a2b7ad4cf72f964911dcf"
+          "bytes": 369180,
+          "sha256": "1d8c3c652467f2e4ba8b9746f926eda43254adf5ddaaca722dce582ec629d381"
         },
         "idle": "Idle",
-        "height": 1.6,
+        "height": 1.47,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -13483,11 +13483,11 @@
         "resolved": "#2f2a44",
         "strength": 0.35
       },
-      "sourceFingerprint": "0616ef7b82bae498a417f8ff03e723ebd214fd772bbf439b691b072de996675c",
+      "sourceFingerprint": "e446834bae3d26145c3ac12ff7135e6da095252771a0f533416af4ea1ae17c2c",
       "output": {
         "path": "public/ui/mobs/void_stalker.webp",
-        "bytes": 1820,
-        "sha256": "6d8007fc91a4678cf86d4a99c79ef519678fcb0e9f39f7f20e502ff8460a4432"
+        "bytes": 1972,
+        "sha256": "4079376524d005709ce9fc1b72e6676caa16f68611e13e58b291a5e0c1b8703b"
       }
     },
     {

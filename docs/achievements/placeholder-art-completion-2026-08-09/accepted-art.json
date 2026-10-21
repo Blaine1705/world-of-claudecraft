@@ -366,8 +366,8 @@
   "sourceManifests": [
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
-      "acceptedSha256": "7791aaaae6d86abc974134a84c31e0a6522af18cc40a1c44651c703de2b9634b",
-      "acceptedBytes": 463455
+      "acceptedSha256": "0f1c158e0d10c9434358c9e6ce0eb2e1d8b6a379eceae52e82824768b4236b8e",
+      "acceptedBytes": 463463
     }
   ],
   "assets": [
