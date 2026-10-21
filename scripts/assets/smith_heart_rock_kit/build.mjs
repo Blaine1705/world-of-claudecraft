@@ -1,6 +1,6 @@
 // Ship the Blender-authored mountain rock kit of the Smith's Heart raid
-// (phase 2E, docs/design/raid/kit/): the sculpted faces, ribs and crests that
-// skin the raid's mountain, and the boulders fallen from them. Never flatten
+// (phase 2E, calmed in 2G, docs/design/raid/kit/): the great faces and masses
+// that skin the raid's mountain, and the boulders fallen from them. Never flatten
 // or join: the runtime bakes each Kit_* node on its own
 // (src/render/smith_heart/heart_kit.ts) and instances it over the rock plan
 // (src/render/smith_heart/heart_rock_plan_core.ts).
@@ -21,27 +21,22 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 /** Every piece of the kit (docs/design/raid/smith_heart.md, section 5.12).
  *  The faces' origins sit on their front plane at the foot's centre. */
 export const SMITH_HEART_ROCK_KIT_PIECES = [
-  // The bands of the face.
-  'RockFaceA',
-  'RockFaceB',
-  'RockFaceC',
-  // The tall faces of the first band.
-  'RockTallA',
-  'RockTallB',
-  // The crests of the top bands.
-  'RockCrestA',
-  'RockCrestB',
-  // A rib standing out of the face.
-  'RockButtress',
+  // The great faces of the first bands (phase 2G, the calm mountain).
+  'RockWallA',
+  'RockWallB',
+  'RockWallC',
+  // The mountain's upper body.
+  'RockMassA',
+  'RockMassB',
+  // A buttress where the eye goes (the vein mouths, the stair heads).
+  'RockProw',
   // The far builds (the same sculpts, lighter) the bands high up draw.
-  'RockFaceAFar',
-  'RockFaceBFar',
-  'RockFaceCFar',
-  'RockTallAFar',
-  'RockTallBFar',
-  'RockCrestAFar',
-  'RockCrestBFar',
-  'RockButtressFar',
+  'RockWallAFar',
+  'RockWallBFar',
+  'RockWallCFar',
+  'RockMassAFar',
+  'RockMassBFar',
+  'RockProwFar',
   // The walks' sides where they fall into the chasm.
   'RockLipA',
   'RockLipB',

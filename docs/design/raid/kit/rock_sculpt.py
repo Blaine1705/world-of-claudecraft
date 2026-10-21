@@ -103,7 +103,7 @@ class RockPiece(SPiece):
             bm.normal_update()
             back = max(v.co.y for v in bm.verts)
             gone = [f for f in bm.faces
-                    if f.normal.y > 0.55 and f.calc_center_median().y > back * 0.45]
+                    if f.normal.y > 0.7 and f.calc_center_median().y > back * 0.7]
             bmesh.ops.delete(bm, geom=gone, context='FACES')
         bm.normal_update()
         bm.verts.index_update()
@@ -299,11 +299,11 @@ def crest(f, W, H, D, rng, seed, peaks=2, lift=0.0, fall=0.35, rough=1.1):
     f.d = np.maximum(f.d, ((Z - z_of(X, Y)) * 0.6).astype(np.float32))
 
 
-def weather(f, seed, amp=1.0, band=2.0):
+def weather(f, seed, amp=1.0, band=2.0, broad=0.9):
     """The mountain's own unevenness: a broad swell (no face is ever a plane),
     ridged fracture facets at medium frequency, a fine chatter."""
     n1, n2 = Noise(seed), Noise(seed + 5)
-    f.displace(lambda X, Y, Z: 0.9 * n2.fbm(X * 0.035 + 4.2, Y * 0.035, Z * 0.03, 2)
+    f.displace(lambda X, Y, Z: broad * n2.fbm(X * 0.035 + 4.2, Y * 0.035, Z * 0.03, 2)
                + amp * (0.5 * n1.fbm(X * 0.07 + 1.7, Y * 0.07, Z * 0.05, 2)
                                       + 0.32 * (n1.ridged(X * 0.2, Y * 0.2, Z * 0.26, 2) - 0.45)
                                       + 0.07 * n2.fbm(X * 0.9, Y * 0.9, Z * 0.9, 2)), band=band)
@@ -725,4 +725,303 @@ def needle(bpy, p, name, seed, W, H, twin=False, target=3600, voxel=None):
     clamp_below(f, 0.0)
     verts, faces = gs.mesh_sculpt(f, bpy, name, target)
     add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    return p
+
+
+# ---- phase 2G: the calm mountain ---------------------------------------------------
+# The owner's review of 2F: from the Ring and the Balcony the walls read as a
+# wall of crumpled paper (hundreds of same-sized tilted plates, noise
+# everywhere, no rest). The style guide's S5 (a few big parts), H2 (bend in one
+# or two gentle arcs, never wiggle) and R2 (cluster detail, leave rest areas).
+# The mountain is now built of a few great masses: tall faces split into two to
+# four columns by deep vertical clefts, every column a broad plane turned its
+# own way, the granite's beds running across the whole face in lifts that
+# step back as they rise (a lit ledge on top of each, a dark drip-edge under
+# it); great fracture planes knock oblique facets off the columns' corners; the
+# small stuff (cracks, partings, scree) gathers round the clefts and nowhere
+# else.
+
+# The lifts' spacing in the kit's own yards: every lift line of every wall
+# piece sits at a multiple of it above the piece's foot, so the runtime, which
+# draws every piece at the same vertical scale on a foot set to the world's
+# bed grid (heart_rock_plan_core.ts HEART_ROCK_STRATA), lines the beds up
+# from piece to piece round the whole mountain.
+ROCK_LIFT = 12.0
+
+
+def _sstep(a, b, x):
+    t = np.clip((x - a) / (b - a), 0.0, 1.0)
+    return t * t * (3 - 2 * t)
+
+
+def _columns(rng, W, n):
+    """Split [-W/2, W/2] into n columns of unequal width (one broad, the
+    others narrower): their bounds."""
+    w = rng.dirichlet(np.full(n, 2.2)) * 0.55 + 0.45 / n
+    w = w / w.sum() * W
+    xs = np.concatenate([[-W / 2], -W / 2 + np.cumsum(w)])
+    return [(float(xs[i]), float(xs[i + 1])) for i in range(n)]
+
+
+def rock_wall(bpy, p, name, seed, W, H, D, cols=3, clefts=None, lean=0.05, setback=(0.6, 1.6), lip=(0.45, 1.0),
+              crown='shoulder', fall=0.4, detail=0, prow=0.0, target=3000, voxel=0.3, key=None,
+              scree_n=4):
+    """A great face of the mountain (see the phase 2G notes above): W across,
+    H tall (a whole number of ROCK_LIFT lifts reads best), its body D deep.
+
+    `cols` columns, each a broad plane turned a little its own way and
+    rounded back at its edges; `clefts` (per inner bound: 1 full height, a
+    fraction 0..1 a cleft from the crest down that far, 0 none) deep V cuts
+    wandering in one gentle arc; every ROCK_LIFT the face steps back
+    (`setback`) with a drip-edge (`lip`) over the lift below; `crown` the
+    crest's character ('shoulder' rounded and falling back, 'tower' columns
+    ending at their own heights, 'dome' one broad swell; every column's top
+    a table tipped one way with a corner chopped off, and most columns a
+    great fracture plane off one corner); `detail` (0, 1, 2) how much small
+    work clusters round the clefts (cracks, partings); `prow` turns the
+    outer columns back like a ship's prow (a buttress). Returns p."""
+    def build():
+        rng = np.random.default_rng(seed)
+        lo = (-W / 2 - 3.0, -4.0, -0.6)
+        hi = (W / 2 + 3.0, D + 2.0, H * 1.15 + 2.0)
+        f = Sculpt(lo, hi, voxel)
+        nf = Noise(seed + 3)
+        bounds = _columns(rng, W, cols)
+        cuts = [b[1] for b in bounds[:-1]]
+        depth_of = clefts if clefts is not None else [1.0] * len(cuts)
+        col = []
+        for i, (a, b) in enumerate(bounds):
+            c = (a + b) / 2
+            t = (2 * i / max(1, cols - 1) - 1) if cols > 1 else 0.0
+            hw = (b - a) / 2
+            col.append(dict(a=a, b=b, c=c, hw=hw,
+                            off=float(rng.uniform(0.0, 2.0)) + abs(t) * prow * hw,
+                            tilt=float(rng.uniform(-0.17, 0.17)) + t * prow,
+                            # The column's edges bevelled back in one plane
+                            # each (chunky facets, never a rounded barrel).
+                            bev=float(rng.uniform(0.78, 0.9)), bslope=float(rng.uniform(0.9, 1.6)),
+                            top=float(rng.uniform(0.84, 1.0)) * H,
+                            tslope=float(rng.uniform(0.12, 0.3)) * (-1.0 if rng.random() < 0.5 else 1.0),
+                            shave=rng.random() < 0.65,
+                            sside=-1.0 if rng.random() < 0.5 else 1.0,
+                            tside=-1.0 if rng.random() < 0.5 else 1.0,
+                            cside=-1.0 if rng.random() < 0.5 else 1.0,
+                            bedk=float(rng.uniform(0.35, 1.4)),
+                            chop=float(rng.uniform(0.0, 0.08)) * H,
+                            cslope=float(rng.uniform(0.6, 1.1)),
+                            sz=float(rng.uniform(0.3, 0.75)) * H,
+                            sgx=float(rng.uniform(0.9, 1.6)), sgz=float(rng.uniform(0.18, 0.4)),
+                            sdepth=float(rng.uniform(0.25, 0.5)) * hw))
+        cleft = []
+        cut_has = [((depth_of[k] if k < len(depth_of) else 1.0) > 0) for k in range(len(cuts))]
+        for i, c in enumerate(col):
+            c['bev_l'] = 1.0 if i == 0 or cut_has[i - 1] else 0.15
+            c['bev_r'] = 1.0 if i == cols - 1 or cut_has[i] else 0.15
+        for k, x0 in enumerate(cuts):
+            dk = depth_of[k] if k < len(depth_of) else 1.0
+            if dk <= 0:
+                continue
+            cleft.append(dict(x=x0, d=float(rng.uniform(3.6, 5.5)), w=float(rng.uniform(1.8, 3.0)),
+                              arc=float(rng.uniform(-2.2, 2.2)), ph=float(rng.uniform(0, TAU)),
+                              z_end=H * (1.0 - dk)))
+        n_lift = int(math.ceil(H * 1.15 / ROCK_LIFT)) + 1
+        # The lift lines: about half are strong beds (a ledge stepping back,
+        # a drip-edge over the face below), the rest only in the paint (the
+        # runtime's world beds, so the face is never banded like a barrel).
+        strong = rng.random(n_lift) < 0.42
+        steps = np.where(strong, rng.uniform(*setback, n_lift), 0.0)
+        steps[0] = 0.0
+        backs = np.cumsum(steps)
+        lips = np.where(strong, rng.uniform(*lip, n_lift) * 0.2, 0.0)
+        wave_ph = float(rng.uniform(0, TAU))
+
+        def front_v(X, Z):
+            # The face's line: one slow swell across (never a wiggle), a
+            # gentle batter, the columns' planes, the beds stepping back lift
+            # by lift, the clefts, the ends turned back.
+            u = np.maximum(Z, 0.0) / ROCK_LIFT
+            i = np.clip(np.floor(u).astype(np.int64), 0, n_lift - 1)
+            fr = u - np.floor(u)
+            out = 0.9 * np.sin(X / W * 3.4 + wave_ph) + 0.5 * nf.fbm(X * 0.03, 0.0, Z * 0.025, 2) + Z * lean * 0.4
+            # Each line a step back over a short slope (a lit ledge), its
+            # strong lines with a drip-edge just under them.
+            beds = backs[i] + (steps[np.minimum(i + 1, n_lift - 1)]) * _sstep(0.93, 1.0, fr)
+            beds = beds - lips[i] * _sstep(0.8, 0.9, fr) * (1.0 - _sstep(0.97, 1.0, fr))
+            # Each column takes the beds its own way (a deep ledge on one, a
+            # shallow one on the next: the line runs on, never a belt).
+            bedk = np.ones_like(X)
+            for c in col:
+                bedk = np.where((X >= c['a'] - 1e-6) & (X <= c['b'] + 1e-6), c['bedk'], bedk)
+            out = out + beds * bedk
+            # The columns: a plane each, its edges bevelled back.
+            colv = np.zeros_like(X)
+            for c in col:
+                inside = (X >= c['a'] - 1e-6) & (X <= c['b'] + 1e-6)
+                e = np.abs(X - c['c']) / c['hw']
+                # Bevelled back only toward a cleft or the piece's end (two
+                # columns meeting without a cleft just crease, so the face
+                # reads as one great mass, never a row of pillars).
+                side_r = (X - c['c']) > 0
+                bevel = np.where(side_r, c['bev_r'], c['bev_l'])
+                v = (c['off'] + c['tilt'] * (X - c['c'])
+                     + bevel * np.maximum(0.0, e - c['bev']) * c['hw'] * c['bslope'])
+                if c['shave']:
+                    # A great fracture plane taking one corner off from
+                    # partway up (a crisp oblique facet catching the light).
+                    edge = c['c'] + c['sside'] * c['hw']
+                    cut = (c['sside'] * (X - edge) + c['sdepth']) * c['sgx'] + (Z - c['sz']) * c['sgz'] + c['off']
+                    v = np.maximum(v, np.where(Z > c['sz'] - 6.0, cut, -1e3))
+                colv = np.where(inside, v, colv)
+            out = out + colv
+            # The clefts: a deep V wandering in one gentle arc, widening up.
+            for c in cleft:
+                xc = c['x'] + c['arc'] * np.sin(Z / H * 2.2 + c['ph'])
+                w = c['w'] * (0.7 + 0.6 * np.clip(Z / H, 0, 1))
+                v = np.maximum(0.0, 1.0 - np.abs(X - xc) / w) ** 1.2
+                out = out + c['d'] * v * _sstep(c['z_end'] - 4.0, c['z_end'] + 2.0, Z)
+            # The ends turn back into the mountain (a piece left at a run's
+            # end shows rock falling away, never a cut).
+            # Gently at first, so a neighbour's face crosses it in a crease
+            # (a dark notch at every join read as one more cleft).
+            t = np.abs(X) / (W / 2)
+            out = out + np.maximum(0.0, t - 0.78) * 4.0 + np.maximum(0.0, t - 0.9) ** 1.5 * D * 7.0
+            return out
+
+        def front(x, z):
+            return float(front_v(np.array([x], dtype=np.float64), np.array([z], dtype=np.float64))[0])
+
+        f.put('g0', Body(front_v, lo, hi, D), 0.0)
+        # The crest: each column a table of its own, tipped one way, falling
+        # back into the mountain (never a dome or a bullet), notched at the
+        # clefts.
+        yr = D * 0.55
+
+        def top_v(X, Y):
+            z = np.zeros_like(X) + col[0]['top']
+            for c in col:
+                inside = (X >= c['a'] - 1e-6) & (X <= c['b'] + 1e-6)
+                e = np.clip(np.abs(X - c['c']) / c['hw'], 0, 1)
+                if crown == 'dome':
+                    zc = H * (0.97 - 0.16 * (X / (W / 2)) ** 2) + (c['top'] - H) * 0.25
+                else:
+                    # A table tipped one way (its brink a long gentle
+                    # slope, never an arch), its far corner knocked off.
+                    zc = c['top'] + c['tslope'] * (X - c['c'])
+                    if crown == 'shoulder':
+                        zc = zc - 0.12 * H * np.maximum(0.0, c['tside'] * (X - c['c']) / c['hw'] - 0.55)
+                if crown != 'dome':
+                    # A great chop off one corner of the column's top (an
+                    # oblique facet: the crest reads broken and angular,
+                    # never a pillow).
+                    edge = c['c'] + c['cside'] * c['hw']
+                    zc = np.minimum(zc, c['top'] - c['chop'] + c['cslope'] * (c['hw'] - c['cside'] * (X - c['c'])))
+                z = np.where(inside, zc, z)
+            for c in cleft:
+                z = z - 0.045 * H * np.maximum(0.0, 1.0 - np.abs(X - c['x']) / (c['w'] * 4.5)) ** 1.5
+            # The ends fall away in one straight chop each (never a rounded
+            # shoulder).
+            z = np.minimum(z, H * 0.7 + (W / 2 - np.abs(X)) * 1.6) + 0.6 * nf.fbm(X * 0.05 + 3.0, Y * 0.05, 1.0, 2)
+            return z - np.maximum(0.0, yr - Y) * 0.02 - np.maximum(0.0, Y - yr) * fall
+
+        X3, Y3, Z3 = _axes(f)
+        Xa = X3 + 0 * Y3
+        Ya = Y3 + 0 * X3
+        f.d = np.maximum(f.d, ((Z3 - top_v(Xa, Ya)) * 0.6).astype(np.float32))
+        # The small work, only round the clefts (the eye goes to the dark
+        # cut; the planes between are left quiet).
+        for c in cleft:
+            for _ in range(detail):
+                side = -1.0 if rng.random() < 0.5 else 1.0
+                sx = c['x'] + side * float(rng.uniform(c['w'] + 0.8, c['w'] + 3.5))
+                pts = []
+                z = float(rng.uniform(0.45, 0.95)) * H
+                z_end = max(c['z_end'], z - float(rng.uniform(10.0, 22.0)))
+                while z > z_end:
+                    pts.append((sx, front(sx, z) - 0.05, z))
+                    sx += float(rng.uniform(-0.35, 0.35))
+                    z -= float(rng.uniform(1.6, 3.0))
+                if len(pts) > 1:
+                    for dy in (0.3, 1.2):
+                        f.groove(Polyline([(x, y + dy, zz) for (x, y, zz) in pts], 0.07), 0.35, 0.14)
+            if detail > 1:
+                # A short parting across a bed beside the cleft.
+                for _ in range(2):
+                    side = -1.0 if rng.random() < 0.5 else 1.0
+                    li = int(rng.integers(1, max(2, int(H / ROCK_LIFT))))
+                    pz = li * ROCK_LIFT - float(rng.uniform(3.0, 6.0))
+                    x0 = c['x'] + side * (c['w'] + 0.5)
+                    x1 = x0 + side * float(rng.uniform(4.0, 8.0))
+                    f.groove(Polyline([(x0, front(x0, pz) - 0.05, pz),
+                                       (x1, front(x1, pz + 0.3) - 0.05, pz + 0.3)], 0.05), 0.28, 0.12)
+        weather(f, seed, amp=0.16, band=2.0, broad=0.45)
+        clamp_below(f, 0.0)
+        f.cleft_xs = [c['x'] for c in cleft]
+        return f
+
+    f = _sculpt_once(key or name, build)
+    rng = np.random.default_rng(seed + 77)
+    verts, faces = gs.mesh_sculpt(f, bpy, name, target)
+    add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    # Scree only at the clefts' feet, on the ledges (the detail clusters).
+    if scree_n:
+        for x in getattr(f, 'cleft_xs', [])[:3]:
+            scree(p, f, rng, x - 4.0, x + 4.0, 0.6, 8.0, H * 1.2, scree_n, size=(0.6, 1.8))
+    # A breath behind the plane (the far build's coarser mesh bulges a
+    # little past the sculpt's own front).
+    p.front_zero = front_of(f) - 0.15
+    p.open_back = True
+    return p
+
+
+def rock_lip_calm(bpy, p, name, seed, W, H, D, out=0.38, target=1100, voxel=0.2, key=None):
+    """A module of a walk's side where it falls into the chasm (phase 2G: the
+    calm grammar of rock_wall). Hanging from the lip (origin on it, z 0;
+    nothing above z -0.05), down H yards, the face leaning OUT over the void
+    by `out` per yard of drop; in a few tall lifts, each stepping out from
+    the one above (a lit ledge seen from the walk), one cleft at most, a
+    great spall, a worn brink rounding over. Returns p."""
+    def build():
+        rng = np.random.default_rng(seed)
+        lo = (-W / 2 - 2.5, -out * H - 4.0, -H - 0.6)
+        hi = (W / 2 + 2.5, D + 1.5, 1.0)
+        f = Sculpt(lo, hi, voxel)
+        nf = Noise(seed + 3)
+        lift = float(rng.uniform(8.0, 11.0))
+        n_lift = int(math.ceil(H / lift)) + 1
+        steps = np.concatenate([[0.0], np.cumsum(rng.uniform(0.5, 1.2, n_lift))])
+        cx = float(rng.uniform(-W * 0.25, W * 0.25))
+        has_cleft = rng.random() < 0.6
+        cd = float(rng.uniform(2.0, 3.2))
+
+        def front_v(X, Z):
+            u = np.maximum(-Z, 0.0) / lift
+            i = np.clip(np.floor(u).astype(np.int64), 0, n_lift - 1)
+            v = (Z * out * 0.72 - 0.8 + 0.6 * np.sin(X / W * 3.0 + seed) + 0.5 * nf.fbm(X * 0.04, 0.0, Z * 0.03, 2)
+                 - steps[i] + np.maximum(0.0, np.abs(X) - (W / 2 - 3.0)) * (2.2 - Z * out * 0.35))
+            if has_cleft:
+                xc = cx + 1.2 * np.sin(Z / H * 2.0 + seed)
+                v = v + cd * np.maximum(0.0, 1.0 - np.abs(X - xc) / 1.8) ** 1.3
+            return v
+
+        f.put('g0', Body(lambda X, Z: front_v(X, Z) + 0.5, lo, hi, D, half=W / 2 + 1.0), 0.0)
+        for _ in range(int(rng.integers(1, 3))):
+            side = -1.0 if rng.random() < 0.5 else 1.0
+            ex = side * float(rng.uniform(W * 0.15, W * 0.4))
+            ez = -float(rng.uniform(4.0, H * 0.7))
+            fy = float(front_v(np.array([ex]), np.array([ez]))[0])
+            wedge(f, rng, (ex, fy - 0.2, ez), (side * 0.6, -1.0, float(rng.uniform(-0.6, 0.2))),
+                  float(rng.uniform(2.5, 4.5)), k=0.12)
+        weather(f, seed, amp=0.16, broad=0.45)
+        _X, Y, Z = _axes(f)
+        out_of = np.maximum(0.0, -Y - 0.2)
+        top = -0.05 - 1.5 * out_of - 0.25 * out_of ** 2
+        cut = np.where(Z > -7.0, (Z - top) * 0.8, -50.0)
+        f.d = smax(f.d, (cut + np.zeros_like(f.d)).astype(np.float32), 0.35)
+        clamp_below(f, -H)
+        return f
+
+    f = _sculpt_once(key or name, build)
+    verts, faces = gs.mesh_sculpt(f, bpy, name, target)
+    add_sculpt(p, f, verts, faces, ROCK_COLOURS, ROCK_KINDS, smooth=True)
+    p.open_back = True
     return p

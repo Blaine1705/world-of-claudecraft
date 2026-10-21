@@ -37,36 +37,39 @@ from build_smith_heart_hammer_kit import camera, look, preview_materials, scale_
 from hckit import export_kit  # noqa: E402
 
 
-# The pieces' sizes (W across, H tall, D deep): the runtime plan reads them
-# off the shipped GLB's bounds (tests/smith_heart_rock_kit.test.ts pins them).
-def face(name, seed, W, H, D, far=False, **kw):
-    """A face band (rock_sculpt.rock_face). Its far build (`far`) meshes the
-    SAME sculpt at a third of the triangles, with fewer stones on it: the
-    bands high up the mountain are seen from fifty yards and more."""
+# Each band piece (phase 2G, the calm mountain: rock_sculpt.rock_wall):
+# (name, seed, W, H, D, options). The near build of every one, then the far
+# build of each the runtime draws high up the mountain. Every H is a whole
+# number of rock_sculpt.ROCK_LIFT lifts (the beds line up piece to piece).
+WALL_SPECS = [
+    # The great faces of the first bands: columns, clefts, beds.
+    ('RockWallA', 601, 48.0, 72.0, 30.0, dict(cols=2, clefts=[1.0], crown='shoulder', detail=1)),
+    ('RockWallB', 607, 40.0, 60.0, 28.0, dict(cols=2, clefts=[0.7], crown='tower', detail=1, lip=(0.7, 1.2))),
+    ('RockWallC', 613, 56.0, 84.0, 32.0, dict(cols=3, clefts=[0.0, 1.0], crown='shoulder', detail=1)),
+    # The mountain's upper body (seen from fifty yards and more).
+    ('RockMassA', 619, 64.0, 48.0, 40.0, dict(cols=2, clefts=[0.5], crown='dome', fall=0.5, setback=(1.0, 2.2))),
+    ('RockMassB', 631, 52.0, 60.0, 36.0, dict(cols=2, clefts=[0.6], crown='tower', setback=(0.9, 2.0))),
+    # A buttress standing out of the face where the eye goes (the vein
+    # mouths, the stair heads): the detail clusters on it.
+    ('RockProw', 641, 30.0, 72.0, 26.0, dict(cols=3, clefts=[0.7, 1.0], prow=0.5, detail=2, crown='tower')),
+]
+
+
+def wall(name, seed, W, H, D, far=False, **kw):
     def make():
         pn = name + ('Far' if far else '')
-        p = rs.RP(pn, seed=seed, ao_dist=5.0)
+        p = rs.RP(pn, seed=seed, ao_dist=7.0)
         args = dict(kw)
-        if far:
-            args['target'] = max(700, int(args.get('target', 2100) * 0.36))
-            args['scree_n'] = args.get('scree_n', 4) // 2
-        return rs.rock_face(bpy, p, pn, seed, W, H, D, key=name, **args)
+        args['target'] = 1100 if far else 3000
+        args['scree_n'] = 0 if far else 3
+        return rs.rock_wall(bpy, p, pn, seed, W, H, D, key=name, **args)
     return make
 
 
-def rib(name, seed, W, H, D, far=False, target=1700):
-    def make():
-        pn = name + ('Far' if far else '')
-        p = rs.RP(pn, seed=seed, ao_dist=5.0)
-        return rs.buttress(bpy, p, pn, seed, W, H, D, key=name, target=int(target * 0.4) if far else target,
-                           scree_n=1 if far else 2)
-    return make
-
-
-def lip(name, seed, W, H, D, out, grain=1.0, target=1100):
+def lip(name, seed, W, H, D, out, target=1100):
     def make():
         p = rs.RP(name, seed=seed, ao_dist=4.0)
-        return rs.rock_lip(bpy, p, name, seed, W, H, D, out=out, grain=grain, target=target)
+        return rs.rock_lip_calm(bpy, p, name, seed, W, H, D, out=out, target=target)
     return make
 
 
@@ -77,29 +80,11 @@ def stone(name, seed, size):
     return make
 
 
-# Each band piece: (name, seed, W, H, D, options). The near build of every
-# one, then the far build of each the runtime draws high up the mountain.
-FACE_SPECS = [
-    # The bands of the face, stacked up the slope.
-    ('RockFaceA', 501, 24.0, 28.0, 15.0, dict(beds=3, peaks=2, target=2100)),
-    ('RockFaceB', 503, 20.0, 24.0, 14.0, dict(beds=2, plate=(6.0, 14.0), thick=(3.0, 6.5), peaks=1, target=2000)),
-    ('RockFaceC', 509, 26.0, 30.0, 16.0, dict(beds=3, overhang=True, peaks=3, target=2200)),
-    # The tall faces of the first band (down into the chasm past the lip).
-    ('RockTallA', 521, 22.0, 46.0, 15.0, dict(beds=4, peaks=2, target=2500)),
-    ('RockTallB', 523, 18.0, 42.0, 14.0, dict(beds=4, overhang=True, peaks=1, target=2300)),
-    # The crests of the top bands (the skyline).
-    ('RockCrestA', 541, 24.0, 26.0, 18.0, dict(beds=2, peaks=3, lift=0.14, scree_n=6, target=2100)),
-    ('RockCrestB', 547, 20.0, 30.0, 16.0, dict(beds=3, overhang=True, peaks=2, lift=0.1, target=2100)),
-]
-
 BUILDERS = {}
-for (n, seed, W, H, D, kw) in FACE_SPECS:
-    BUILDERS[n] = face(n, seed, W, H, D, **kw)
-# A rib standing out of the face.
-BUILDERS['RockButtress'] = rib('RockButtress', 531, 12.0, 44.0, 16.0)
-for (n, seed, W, H, D, kw) in FACE_SPECS:
-    BUILDERS[n + 'Far'] = face(n, seed, W, H, D, far=True, **kw)
-BUILDERS['RockButtressFar'] = rib('RockButtress', 531, 12.0, 44.0, 16.0, far=True)
+for (n, seed, W, H, D, kw) in WALL_SPECS:
+    BUILDERS[n] = wall(n, seed, W, H, D, **kw)
+for (n, seed, W, H, D, kw) in WALL_SPECS:
+    BUILDERS[n + 'Far'] = wall(n, seed, W, H, D, far=True, **kw)
 # The walks' sides where they fall into the chasm.
 BUILDERS['RockLipA'] = lip('RockLipA', 581, 12.0, 40.0, 4.0, 0.38)
 BUILDERS['RockLipB'] = lip('RockLipB', 587, 12.0, 40.0, 4.0, 0.38)
@@ -156,37 +141,34 @@ def build_rock_kit(root_name, names):
 
 # ==================================================================== review
 def stack_preview(parts, path):
-    """A stretch of mountain as the runtime stacks it: three bands up a 60
-    degree slope, the tall faces first, a rib, the crests on top, boulders
-    at the foot and a 2 yd figure on a walk 8 yd out, under the Hammer's
-    low warm key. Copies of the pieces (linked data), so the kit is kept."""
+    """A stretch of mountain as the runtime stacks it (phase 2G): the great
+    faces of the first band along a gentle curve, the upper body behind and
+    above, a buttress, their beds on the same lift lines (every piece at the
+    same height scale, its foot on the bed grid), boulders at the foot and a
+    2 yd figure on a walk 8 yd out, under the Hammer's low warm key. Copies of
+    the pieces (linked data), so the kit is kept."""
     by = {o.name[4:]: o for o in parts}
+    lift = rs.ROCK_LIFT
     rows = [
-        (0.0, -14.0, ['RockTallA', 'RockTallB', 'RockTallA', 'RockTallB']),
-        (12.0, 14.0, ['RockFaceA', 'RockFaceB', 'RockFaceC', 'RockFaceA', 'RockFaceB']),
-        (24.0, 34.0, ['RockFaceC', 'RockFaceA', 'RockFaceB', 'RockFaceC']),
-        (36.0, 56.0, ['RockCrestA', 'RockCrestB', 'RockCrestA', 'RockCrestB']),
+        (0.0, -lift * 2, 0.0, ['RockWallA', 'RockWallC', 'RockProw', 'RockWallB', 'RockWallA']),
+        (34.0, lift * 2, 0.06, ['RockMassB', 'RockMassA', 'RockMassB', 'RockMassA']),
     ]
     made = []
-    for (yb, zb, names) in rows:
-        x = -40.0 + (yb * 0.37) % 9
+    for (yb, zb, curve, names) in rows:
+        x = -78.0
         for k, n in enumerate(names):
             if n not in by:
                 continue
             ob = by[n].copy()
             bpy.context.scene.collection.objects.link(ob)
             ob.parent = None
-            ob.location = (x, yb + (k % 2) * 1.2, zb - (k % 3) * 1.5)
-            ob.rotation_euler = (0, 0, (k % 3 - 1) * 0.08)
+            w = (ob.dimensions.x if ob.dimensions.x > 1 else 40.0) * 0.72
+            x += w / 2
+            ob.location = (x, yb + curve * x * x * 0.02 + (k % 2) * 1.5, zb)
+            ob.rotation_euler = (0, 0, -x * 0.004 + (k % 3 - 1) * 0.06)
             made.append(ob)
-            x += 19.0 + (k % 2) * 2
-    if 'RockButtress' in by:
-        ob = by['RockButtress'].copy()
-        bpy.context.scene.collection.objects.link(ob)
-        ob.parent = None
-        ob.location = (2.0, -0.5, -16.0)
-        made.append(ob)
-    for (n, loc) in (('BoulderB', (-12, -9, 2.5)), ('BoulderA', (14, -8, 2.0)), ('BoulderC', (6, -10, 2.5))):
+            x += w / 2
+    for (n, loc) in (('BoulderB', (-12, -9, 0.0)), ('BoulderA', (14, -8, 0.0)), ('BoulderC', (6, -10, 0.0))):
         if n in by:
             ob = by[n].copy()
             bpy.context.scene.collection.objects.link(ob)
@@ -196,19 +178,19 @@ def stack_preview(parts, path):
     for o in parts:
         o.hide_render = True
     # The walk the camera stands on (8 yd out from the front plane).
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(0, -22, 1.0))
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(0, -22, -1.0))
     walk = bpy.context.active_object
-    walk.scale = (90, 14, 2)
+    walk.scale = (160, 26, 2)
     mat = bpy.data.materials.new('WalkMat')
     mat.use_nodes = True
     mat.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value = (0.3, 0.29, 0.28, 1)
     walk.data.materials.append(mat)
     fig = scale_figure()
-    fig.location = (0, -20, 3.0)
+    fig.location = (0, -20, 1.0)
     scene = setup_render(path, res=(1600, 1000))
-    cam = camera('stack', lens=24)
+    cam = camera('stack', lens=22)
     scene.camera = cam
-    look(cam, (-6, -36, 10), (4, 10, 30))
+    look(cam, (-10, -70, 14), (0, 10, 40))
     bpy.ops.render.render(write_still=True)
     print('PREVIEW', path)
     return made
