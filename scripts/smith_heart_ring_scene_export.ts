@@ -12,6 +12,7 @@ import {
   planHeartLips,
   planHeartNeedles,
   planHeartRock,
+  planHeartUnderCliffs,
 } from '../src/render/smith_heart/heart_rock_plan_core';
 import { HEART_SEAL_QUARTERS } from '../src/render/smith_heart/heart_seal_core';
 import { planRingKit, ringSpireSpots } from '../src/render/smith_heart/ring_kit_plan_core';
@@ -75,7 +76,12 @@ const seal = [
     lit: lit.has(s.vein),
   })),
 ];
-const rock = [...planHeartRock(), ...planHeartLips(), ...planHeartNeedles()]
+const rock = [
+  ...planHeartRock(),
+  ...planHeartUnderCliffs(),
+  ...planHeartLips(),
+  ...planHeartNeedles(),
+]
   .filter((p) => near(p, 260))
   .map((p) => ({ ...p, kit: 'rock' }));
 const placements = [...ring, ...seal, ...rock];

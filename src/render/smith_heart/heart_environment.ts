@@ -79,13 +79,13 @@ export const SMITH_HEART_RING_FOG = { color: 0x686a72, near: 120, far: 700 } as 
  *  2E's shaded rock navy. */
 export const SMITH_HEART_RING_LIGHT = {
   sun: 2.55,
-  hemi: 2.45,
+  hemi: 2.35,
   // The storm sky's reflections stay a trace: at the Hammer's 0.15 they
   // washed every shaded face of the rock a saturated navy.
   env: 0.03,
   rim: 1.45,
   sunColor: 0xffdab0,
-  hemiSky: 0x9c9ca6,
+  hemiSky: 0x989aa8,
   hemiGround: 0x645c56,
   rimColor: 0xffb072,
   keyDirection: [-0.42, 0.72, -0.55] as const,
@@ -108,7 +108,7 @@ export const SMITH_HEART_HAMMER_FOG = { color: 0x6c6c70, near: 90, far: 600 } as
  *  every form (the descent's foreground, the Gallery's walls). */
 export const SMITH_HEART_HAMMER_LIGHT = {
   sun: 2.7,
-  hemi: 2.2,
+  hemi: 2.35,
   // Phase 2F: a trace of the sky's reflection (at 0.15 the storm sky's blue
   // turned the vein's shaded rock and the Ring seen from the Balcony navy).
   env: 0.03,

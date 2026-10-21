@@ -23,6 +23,7 @@ import {
   planHeartLips,
   planHeartNeedles,
   planHeartRock,
+  planHeartUnderCliffs,
 } from './heart_rock_plan_core';
 import { heartWallReach, planHeartWalls } from './heart_walls_core';
 import { planRingEdges, planRingMouths, ringSpireSpots } from './ring_kit_plan_core';
@@ -62,7 +63,7 @@ export function heartWallSolids(spacing = 5): HeartSolid[] {
  *  its drop, out over the void as far as its face leans. */
 export function heartRockSolids(): HeartSolid[] {
   const out: HeartSolid[] = [];
-  for (const p of planHeartRock()) {
+  for (const p of [...planHeartRock(), ...planHeartUnderCliffs()]) {
     const m = heartRockPieceOf(p.piece);
     const k = p.scale ?? 1;
     const hh = (m.height * k * (p.rise ?? 1)) / 2;

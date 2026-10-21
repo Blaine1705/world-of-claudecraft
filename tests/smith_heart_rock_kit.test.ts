@@ -37,21 +37,27 @@ import {
   HEART_MOUNTAIN_RECESS,
   heartMountainHeight,
 } from '../src/render/smith_heart/heart_mountain_core';
-import { applyRockCutaway } from '../src/render/smith_heart/heart_rock_cutaway';
+import { applyRockCutaway, heartRockBedGlsl } from '../src/render/smith_heart/heart_rock_cutaway';
 import {
   HEART_ROCK_BANDS,
   HEART_ROCK_CUT_FAR,
   HEART_ROCK_CUT_NEAR,
   HEART_ROCK_FAR_FROM,
   HEART_ROCK_FIRST_SLACK,
+  HEART_ROCK_FOCUS_R,
   HEART_ROCK_LIP,
   HEART_ROCK_PIECES,
   HEART_ROCK_RISE,
+  HEART_ROCK_STRATA,
+  HEART_ROCK_UNDER,
   HEART_ROCK_UPPER_SLACK,
+  heartRockBedFloor,
+  heartRockFocus,
   heartRockFrontPoints,
   heartRockPieceOf,
   planHeartLips,
   planHeartRock,
+  planHeartUnderCliffs,
 } from '../src/render/smith_heart/heart_rock_plan_core';
 import {
   HEART_WALL_CLEAR,
@@ -158,6 +164,7 @@ function bandOf(p: HeartKitPlacement): number {
 const FACES = Object.keys(HEART_ROCK_PIECES);
 const rock = planHeartRock();
 const lips = planHeartLips();
+const under = planHeartUnderCliffs();
 
 describe('Smith Heart rock kit: the piece list and the shipped GLB', () => {
   it('lists every piece once: the faces, their far builds, the lips, the boulders', () => {
@@ -236,7 +243,7 @@ describe('Smith Heart rock kit: the measures the plan relies on', () => {
   it('stretches a piece up its slope through the placement matrix', () => {
     const m = new THREE.Matrix4();
     heartKitPlacementMatrix(
-      { piece: 'Kit_RockFaceA', x: 3, y: -2, z: 1, rot: 0, scale: 1.5, rise: 1.2 },
+      { piece: 'Kit_RockWallA', x: 3, y: -2, z: 1, rot: 0, scale: 1.5, rise: 1.2 },
       m,
     );
     const p = new THREE.Vector3(1, 10, 0).applyMatrix4(m);
@@ -248,7 +255,10 @@ describe('Smith Heart rock kit: the measures the plan relies on', () => {
 
 describe('heart_rock_plan_core: the mountain skinned band by band', () => {
   it('plans every band, the Hammer vein and every other area of the main map', () => {
-    expect(rock.length).toBeGreaterThan(800);
+    // Phase 2G: a few hundred great faces (2F's eleven hundred small plated
+    // pieces read as crumpled paper).
+    expect(rock.length).toBeGreaterThan(300);
+    expect(rock.length).toBeLessThan(800);
     const bands = new Set(rock.map(bandOf));
     for (let i = 0; i < HEART_ROCK_BANDS.length; i++) expect(bands.has(i), `band ${i}`).toBe(true);
     const areas = new Map<string, number>();
@@ -257,7 +267,7 @@ describe('heart_rock_plan_core: the mountain skinned band by band', () => {
       areas.set(a, (areas.get(a) ?? 0) + 1);
     }
     for (const a of ['hammer', 'breath', 'quench', 'heat', 'heart'])
-      expect(areas.get(a) ?? 0, a).toBeGreaterThan(80);
+      expect(areas.get(a) ?? 0, a).toBeGreaterThan(30);
   });
 
   it('keeps every front behind its contour and out of the open air', () => {
@@ -352,7 +362,7 @@ describe('heart_rock_plan_core: the mountain skinned band by band', () => {
 
 describe('heart_rock_plan_core: the walks’ sides', () => {
   it('hangs a lip under every walk falling into the chasm, never under a floating island', () => {
-    expect(lips.length).toBeGreaterThan(300);
+    expect(lips.length).toBeGreaterThan(200);
     const floating = new Set(SMITH_HEART_FLOATING_SURFACES);
     for (const p of lips) {
       expect(p.cosmetic).toBe(false);
@@ -373,7 +383,7 @@ describe('heart_rock_plan_core: the walks’ sides', () => {
     const bad: string[] = [];
     const m = new THREE.Matrix4();
     const v = new THREE.Vector3();
-    for (const p of [...rock, ...lips]) {
+    for (const p of [...rock, ...under, ...lips]) {
       heartKitPlacementMatrix(p, m);
       const pts = shape(p.piece).points;
       for (let i = 0; i < pts.length; i += 5) {
@@ -388,6 +398,80 @@ describe('heart_rock_plan_core: the walks’ sides', () => {
       }
     }
     expect(bad.slice(0, 10)).toEqual([]);
+  });
+});
+
+describe('heart_rock_plan_core: the calm mountain (phase 2G)', () => {
+  it('lines every face up on the world’s beds: one height scale, every foot on the grid', () => {
+    const S = HEART_ROCK_STRATA;
+    expect(S.lift).toBeCloseTo(S.kitLift * S.scale, 6);
+    for (const p of [...rock, ...under]) {
+      // The beds' height scale (a piece's lifts stand `lift` apart).
+      expect((p.scale ?? 1) * (p.rise ?? 1), p.piece).toBeCloseTo(S.scale, 6);
+      // Its foot on a bed line.
+      expect(heartRockBedFloor(p.y + 1e-6), p.piece).toBeCloseTo(p.y, 5);
+    }
+  });
+
+  it('keeps the faces broad: few pieces, each several times 2F’s plates', () => {
+    for (const [name, m] of Object.entries(HEART_ROCK_PIECES)) {
+      expect(m.half * 2, name).toBeGreaterThan(20);
+      expect(m.height, name).toBeGreaterThan(44);
+    }
+    const mean =
+      rock.reduce((a, p) => a + heartRockPieceOf(p.piece).half * 2 * (p.scale ?? 1), 0) /
+      rock.length;
+    expect(mean).toBeGreaterThan(30);
+  });
+
+  it('stands the buttress where the eye goes, the plain faces elsewhere', () => {
+    const prows = rock.filter((p) => /Prow/.test(p.piece));
+    // Nearly every focus (a vein mouth, a stair head, a way into an arena)
+    // with the mountain beside it has a buttress there.
+    let foci = 0;
+    let dressed = 0;
+    for (const f of heartRockFocus()) {
+      const near = rock.filter((p) => Math.hypot(p.x - f.x, p.z - f.z) < HEART_ROCK_FOCUS_R + 10);
+      if (near.length === 0) continue;
+      foci++;
+      if (near.some((p) => /Prow/.test(p.piece))) dressed++;
+    }
+    expect(foci).toBeGreaterThan(15);
+    expect(dressed / foci).toBeGreaterThan(0.85);
+    // Never the mountain's common piece (the rest fill bends too sharp for
+    // a broad face).
+    expect(prows.length).toBeLessThan(rock.length * 0.2);
+  });
+
+  it('hangs a great face under every high walk, under its lip and never over a walk', () => {
+    expect(under.length).toBeGreaterThan(30);
+    const F2 = SMITH_HEART_FIELD;
+    for (const p of under) {
+      const m = heartRockPieceOf(p.piece);
+      const top = p.y + m.height * HEART_ROCK_STRATA.scale;
+      // The walk it stands under: back toward it from its front.
+      let floor = Number.NEGATIVE_INFINITY;
+      for (let back = 0; back <= HEART_ROCK_UNDER.out + 16; back += 0.5) {
+        const x = p.x - Math.sin(p.rot) * back;
+        const z = p.z - Math.cos(p.rot) * back;
+        if (authoredFieldSurfaceAt(F2, x, z)) {
+          floor = authoredFieldHeight(F2, x, z);
+          break;
+        }
+      }
+      expect(Number.isFinite(floor), `${p.x.toFixed(1)}, ${p.z.toFixed(1)}`).toBe(true);
+      expect(top, `${p.x.toFixed(1)}, ${p.z.toFixed(1)}`).toBeLessThanOrEqual(
+        floor - HEART_ROCK_UNDER.below + 1e-6,
+      );
+      expect(heartOpenAir(p.x, p.z, 4)).toBe(false);
+    }
+  });
+
+  it('paints the world’s beds on the rock on the same grid', () => {
+    const glsl = heartRockBedGlsl();
+    expect(glsl).toContain(HEART_ROCK_STRATA.lift.toFixed(2));
+    expect(glsl).toContain(HEART_ROCK_STRATA.zero.toFixed(2));
+    expect(glsl).toContain('diffuseColor.rgb');
   });
 });
 

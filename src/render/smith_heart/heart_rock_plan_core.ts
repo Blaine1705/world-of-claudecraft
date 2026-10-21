@@ -1,4 +1,6 @@
-// Pure plan of the Smith's Heart's mountain rock (phase 2E): the sculpted
+// Pure plan of the Smith's Heart's mountain rock (phase 2E, calmed in 2G:
+// a few great faces with long beds and deep clefts, where 2F's eleven
+// hundred small plated pieces read as crumpled paper): the sculpted
 // faces of the rock kit (docs/design/raid/kit/build_smith_heart_rock_kit.py,
 // painted by heart_rock.ts) stacked up the mountain in bands, so its walls
 // read as rock and never as the heightfield's flat facets.
@@ -15,6 +17,13 @@
 // under it and its height fitted (`rise`) to reach past the slope behind it
 // to the next band up. A piece's front face therefore stands proud of the
 // slope it covers: the heightfield can only ever show behind it.
+//
+// Phase 2G: every piece is drawn at the beds' one height scale on a foot
+// sunk to the world's bed grid (`HEART_ROCK_STRATA`), so the ledges run on
+// from piece to piece round the mountain; where the slope climbs past one
+// face a second stands on its upper beds a step back (two storeys); a
+// buttress stands where the eye goes (`heartRockFocus`); the walks high
+// over the chasm stand on great faces of their own (`planHeartUnderCliffs`).
 //
 // Rules the plan keeps (pinned by tests/smith_heart_rock_kit.test.ts):
 //   - no piece stands nearer a walkable floor than the mountain itself does
@@ -34,6 +43,7 @@
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
 import {
+  HEAT,
   SMITH_HEART_FIELD,
   SMITH_HEART_FLOATING_SURFACES,
 } from '../../sim/content/smith_heart_layout';
@@ -71,14 +81,12 @@ export interface HeartRockPiece {
 }
 
 export const HEART_ROCK_PIECES: Readonly<Record<string, HeartRockPiece>> = {
-  Kit_RockFaceA: { half: 12, reach: 15.0, depth: 17.0, height: 26.7 },
-  Kit_RockFaceB: { half: 10, reach: 13.0, depth: 15.2, height: 23.5 },
-  Kit_RockFaceC: { half: 13, reach: 16.0, depth: 17.8, height: 29.2 },
-  Kit_RockTallA: { half: 11, reach: 14.0, depth: 16.2, height: 44.4 },
-  Kit_RockTallB: { half: 9, reach: 12.0, depth: 15.6, height: 39.3 },
-  Kit_RockButtress: { half: 6, reach: 8.6, depth: 17.6, height: 44.2 },
-  Kit_RockCrestA: { half: 12, reach: 15.1, depth: 19.8, height: 28.9 },
-  Kit_RockCrestB: { half: 10, reach: 13.0, depth: 17.6, height: 33.2 },
+  Kit_RockWallA: { half: 18.5, reach: 27.0, depth: 30.6, height: 64.7 },
+  Kit_RockWallB: { half: 15.5, reach: 23.2, depth: 28.6, height: 52.2 },
+  Kit_RockWallC: { half: 21.5, reach: 31.1, depth: 32.7, height: 83.2 },
+  Kit_RockMassA: { half: 24.5, reach: 35.2, depth: 41.0, height: 45.9 },
+  Kit_RockMassB: { half: 20, reach: 29.2, depth: 36.0, height: 56.3 },
+  Kit_RockProw: { half: 11.5, reach: 17.5, depth: 24.9, height: 67.6 },
 };
 
 /** A placed piece's measures (a far build shares its near build's). */
@@ -104,62 +112,105 @@ export interface HeartRockBand {
   cosmetic: boolean;
 }
 
-const FACES = ['Kit_RockFaceA', 'Kit_RockFaceC', 'Kit_RockFaceB'];
-const TALL = ['Kit_RockTallA', 'Kit_RockTallB'];
+const WALLS = ['Kit_RockWallA', 'Kit_RockWallC', 'Kit_RockWallB'];
+const MASSES = ['Kit_RockMassA', 'Kit_RockMassB'];
 
+/** The bands (phase 2G, the calm mountain): few and broad. The first two
+ *  are the great faces the walks see (a buttress where the eye goes, see
+ *  `HEART_ROCK_FOCUS`); higher up the mountain's upper body in a few huge
+ *  masses. 2F's eight bands of small plates read as crumpled paper. */
 export const HEART_ROCK_BANDS: readonly HeartRockBand[] = [
   {
     back: 0,
-    pieces: [
-      'Kit_RockTallA',
-      'Kit_RockTallB',
-      'Kit_RockTallA',
-      'Kit_RockTallB',
-      'Kit_RockButtress',
-    ],
-    fallback: [...TALL, 'Kit_RockButtress'],
-    scale: [0.95, 1.65],
-    spacing: 15,
+    pieces: ['Kit_RockWallA', 'Kit_RockWallC', 'Kit_RockWallC', 'Kit_RockWallA'],
+    fallback: [...WALLS, 'Kit_RockProw'],
+    scale: [0.85, 1.5],
+    spacing: 30,
     cosmetic: false,
   },
   {
-    back: 11,
-    pieces: [
-      'Kit_RockFaceA',
-      'Kit_RockFaceB',
-      'Kit_RockFaceC',
-      'Kit_RockFaceA',
-      'Kit_RockButtress',
-    ],
-    fallback: [...FACES, ...TALL, 'Kit_RockButtress'],
-    scale: [0.95, 1.65],
-    spacing: 16,
+    back: 18,
+    pieces: ['Kit_RockWallC', 'Kit_RockWallA', 'Kit_RockMassB', 'Kit_RockWallC'],
+    fallback: [...WALLS, ...MASSES, 'Kit_RockProw'],
+    scale: [0.9, 1.55],
+    spacing: 28,
     cosmetic: false,
   },
-  ...[22, 33, 44].map(
-    (back): HeartRockBand => ({
-      back,
-      pieces: ['Kit_RockFaceA', 'Kit_RockFaceC', 'Kit_RockFaceB', 'Kit_RockFaceC'],
-      fallback: [...FACES, ...TALL, 'Kit_RockButtress'],
-      scale: [1.0, 1.75],
-      spacing: 16.5,
-      cosmetic: true,
-    }),
-  ),
-  ...[56, 69, 84].map(
+  {
+    back: 44,
+    pieces: ['Kit_RockMassA', 'Kit_RockWallC', 'Kit_RockMassB'],
+    fallback: [...MASSES, ...WALLS],
+    scale: [1.0, 1.6],
+    spacing: 38,
+    cosmetic: true,
+  },
+  ...[72, 104].map(
     (back): HeartRockBand => ({
       back,
       // High up the mountain the rock is seen from fifty yards and more:
-      // broad masses (a few great faces, a crest now and then), never a
-      // skyline of teeth.
-      pieces: ['Kit_RockFaceA', 'Kit_RockFaceC', 'Kit_RockCrestA', 'Kit_RockFaceC'],
-      fallback: ['Kit_RockFaceA', 'Kit_RockFaceC', 'Kit_RockCrestA', 'Kit_RockFaceB'],
-      scale: [1.35, 2.0],
-      spacing: 16,
+      // a few huge masses, never a skyline of teeth.
+      pieces: ['Kit_RockMassA', 'Kit_RockMassB'],
+      fallback: [...MASSES, 'Kit_RockWallC'],
+      scale: [1.2, 1.64],
+      spacing: 44,
       cosmetic: true,
     }),
   ),
 ];
+
+/** The upper storey of a cliff where the mountain climbs past one face
+ *  (phase 2G): the pieces it draws from and how far back it stands (yards
+ *  at scale 1). */
+const HEART_ROCK_STACK = ['Kit_RockWallA', 'Kit_RockMassB', 'Kit_RockWallC'] as const;
+export const HEART_ROCK_STACK_BACK = 5;
+
+/** The world's beds (phase 2G): every wall piece is drawn at the same
+ *  height scale (`scale`, so its lifts, ROCK_LIFT yards apart in the kit,
+ *  stand `lift` apart in the world) on a foot sunk to the grid (`zero` plus
+ *  a whole number of lifts): the beds' ledges run on from piece to piece
+ *  round the whole mountain, and the rock's paint lays its bed tones on the
+ *  same grid (heart_rock_cutaway.ts). */
+export const HEART_ROCK_STRATA = { kitLift: 12, scale: 1.15, lift: 13.8, zero: -7.3 } as const;
+
+/** The world height of a bed line at or under `y`. */
+export function heartRockBedFloor(y: number): number {
+  const S = HEART_ROCK_STRATA;
+  return S.zero + Math.floor((y - S.zero) / S.lift + 1e-9) * S.lift;
+}
+
+/** Where the eye goes (phase 2G, R2): the vein mouths, the stair heads and
+ *  the ways into the arenas (both ends of these walks, and the Heat's mouth
+ *  at the forge hall's east end). Within `HEART_ROCK_FOCUS_R` of one the
+ *  first two bands stand a buttress (`Kit_RockProw`, the detail clustered on
+ *  it) before their plain faces; everywhere else the faces stay quiet. */
+export const HEART_ROCK_FOCUS_R = 30;
+const FOCUS_PATHS = new Set([
+  'breath_mouth',
+  'quench_mouth',
+  'grand_stair',
+  'north_stair',
+  'balcony_stair_east',
+  'balcony_stair_west',
+  'slab_stair',
+  'pit_descent',
+  'breath_chimney',
+  'wind_bridge',
+  'cornice_climb',
+  'quench_stair',
+  'lake_descent',
+]);
+let focus: { x: number; z: number }[] | null = null;
+export function heartRockFocus(): readonly { x: number; z: number }[] {
+  if (!focus) {
+    focus = [{ x: HEAT.hall.x1, z: 0 }];
+    for (const s of SMITH_HEART_FIELD.surfaces) {
+      if (s.kind !== 'path' || !FOCUS_PATHS.has(s.id)) continue;
+      for (const q of [s.points[0], s.points[s.points.length - 1]])
+        focus.push({ x: q[0], z: q[1] });
+    }
+  }
+  return focus;
+}
 
 /** How far a piece's foot sinks into the slope under its front (yards per
  *  unit scale), how far it reaches past the slope behind it, and how deep
@@ -175,7 +226,6 @@ export const HEART_ROCK_UPPER_SLACK = 3;
  *  plate stretched further reads as a shard), and the stretch a piece is
  *  scaled toward (a breath taller than built). */
 export const HEART_ROCK_RISE: readonly [number, number] = [0.7, 1.55];
-const RISE_AIM = 1.12;
 
 /** The rock is cut away round the camera (heart_rock_cutaway.ts): gone
  *  within NEAR yards of it, dithered back in by FAR. */
@@ -187,7 +237,7 @@ export const HEART_ROCK_CUT_FAR = 7;
 export const HEART_ROCK_GRID = 3;
 /** The bands from this one up draw their pieces' far builds (seen from
  *  fifty yards and more). */
-export const HEART_ROCK_FAR_FROM = 3;
+export const HEART_ROCK_FAR_FROM = 2;
 /** The candidate grid (yards) and how far off its contour a candidate may
  *  lie before it is pulled onto it. */
 const GRID = 2;
@@ -244,19 +294,21 @@ function slopeUnder(
   p: { x: number; z: number; rot: number },
   piece: HeartRockPiece,
   k: number,
-): { front: number; high: number } {
+): { front: number; high: number; near: number } {
   const g = heartMountainGrid(HEART_ROCK_GRID);
   let front = Number.POSITIVE_INFINITY;
   let high = Number.NEGATIVE_INFINITY;
+  let near = Number.NEGATIVE_INFINITY;
   for (let i = -2; i <= 2; i++) {
     for (let j = 0; j <= 4; j++) {
       const q = at(p, (i / 2) * piece.half * k, (-j / 4) * piece.depth * k);
       const h = heartMountainSample(g, q.x, q.z);
       if (j === 0) front = Math.min(front, h.mid);
+      if (j <= 2) near = Math.max(near, h.high);
       high = Math.max(high, h.high);
     }
   }
-  return { front, high };
+  return { front, high, near };
 }
 
 /** Does a piece's body (back to its depth, across its reach) stand over a
@@ -339,6 +391,7 @@ function planBand(
   // grain (the clearance is itself conservative by a cell and a half);
   // an upper band only has to stay behind the band under it.
   const slack = index === 0 ? HEART_ROCK_FIRST_SLACK : HEART_ROCK_UPPER_SLACK;
+  const S = HEART_ROCK_STRATA;
   const tryPiece = (
     c: Candidate,
     order: readonly string[],
@@ -349,63 +402,92 @@ function planBand(
   ) => {
     for (const name of order) {
       const piece = HEART_ROCK_PIECES[name];
-      // Scaled so its height covers the slope behind it (within the stretch
-      // it may take), then a size smaller (narrower, for a bend).
-      for (const shrink of [1, 0.78]) {
-        let k = k0;
-        let foot = 0;
-        let need = 0;
-        for (let iter = 0; iter < 3; iter++) {
-          const slope = slopeUnder({ x: px, z: pz, rot }, piece, k);
-          if (!Number.isFinite(slope.high) || slope.high <= HEART_MOUNTAIN_CHASM) {
-            need = -1;
-            break;
-          }
-          // The foot: sunk into the slope under the front (the first band
-          // falls deep into the chasm under its floor).
-          foot =
-            index === 0
-              ? Math.min(slope.front, c.floor) - HEART_ROCK_FIRST_DROP
-              : Math.max(HEART_MOUNTAIN_CHASM, slope.front) - HEART_ROCK_SINK * k;
-          need = slope.high + HEART_ROCK_OVERLAP * k - foot;
-          const kFit = need / (piece.height * RISE_AIM);
-          const kMin = need / (piece.height * HEART_ROCK_RISE[1]);
-          k = Math.max(band.scale[0] * 0.7, Math.min(band.scale[1], Math.max(kMin, kFit * shrink)));
-        }
-        if (need <= 0) return null;
-        const rise = need / (piece.height * k);
-        if (rise > HEART_ROCK_RISE[1] + 1e-6) continue;
+      // Every piece at the beds' one height scale (its lifts on the world's
+      // grid); its width scaled within the band (a size smaller for a bend),
+      // so its rise is the beds' scale over its width's.
+      for (const shrink of [1, 0.8]) {
+        const k = Math.max(band.scale[0], Math.min(band.scale[1], k0 * shrink));
+        const rise = S.scale / k;
+        if (rise < HEART_ROCK_RISE[0] - 1e-9 || rise > HEART_ROCK_RISE[1] + 1e-9) continue;
+        const slope = slopeUnder({ x: px, z: pz, rot }, piece, k);
+        if (!Number.isFinite(slope.high) || slope.high <= HEART_MOUNTAIN_CHASM) return null;
+        // The foot: sunk into the slope under the front (the first band
+        // falls deep into the chasm under its floor), then down to a bed
+        // line of the world's grid.
+        const raw =
+          index === 0
+            ? Math.min(slope.front, c.floor) - HEART_ROCK_FIRST_DROP
+            : Math.max(HEART_MOUNTAIN_CHASM, slope.front) - HEART_ROCK_SINK;
+        const foot = heartRockBedFloor(raw);
+        const tall = piece.height * S.scale;
         const q = { x: px, z: pz, rot, scale: k };
+        // Its crest reaches past the slope over the front half of its body
+        // (the band behind covers the rest); where the mountain climbs past
+        // it, a second face stands on its upper beds a step back (the cliff
+        // in two great storeys, its beds on the same grid), never a piece
+        // stretched past its beds.
+        const need = slope.near + HEART_ROCK_OVERLAP;
+        let upper: HeartKitPlacement | null = null;
+        if (foot + tall < need) {
+          const name2 =
+            HEART_ROCK_STACK[Math.floor(heartHash(Math.round(px), Math.round(pz) + 3) * 3) % 3];
+          const piece2 = HEART_ROCK_PIECES[name2];
+          const foot2 = heartRockBedFloor(foot + tall - 2 * S.lift);
+          if (foot2 + piece2.height * S.scale < need) continue;
+          const back = HEART_ROCK_STACK_BACK * k;
+          const q2 = { x: px - Math.sin(rot) * back, z: pz - Math.cos(rot) * back, rot, scale: k };
+          if (!Number.isFinite(clearOf(q2.x, q2.z).back)) continue;
+          if (heartOpenAir(q2.x, q2.z, piece2.reach * k)) continue;
+          if (backOverFloor(q2, piece2, foot2, piece2.height * S.scale)) continue;
+          if (
+            heartRockFrontPoints(q2, piece2).some((f) => clearOf(f.x, f.z).back < band.back - slack)
+          )
+            continue;
+          upper = {
+            piece: index >= HEART_ROCK_FAR_FROM ? `${name2}Far` : name2,
+            x: q2.x,
+            y: foot2,
+            z: q2.z,
+            rot,
+            scale: k,
+            rise,
+            noShadow: true,
+            cosmetic: band.cosmetic,
+          };
+        }
         if (heartRockFrontPoints(q, piece).some((f) => clearOf(f.x, f.z).back < band.back - slack))
           continue;
         if (heartOpenAir(px, pz, piece.reach * k)) continue;
         // Its back never reaches over a walk behind it (a floor higher up
         // the mountain under its crest).
-        if (backOverFloor(q, piece, foot, piece.height * k * Math.max(HEART_ROCK_RISE[0], rise)))
-          continue;
-        return {
+        if (backOverFloor(q, piece, foot, piece.height * S.scale)) continue;
+        const placed: HeartKitPlacement = {
           piece: index >= HEART_ROCK_FAR_FROM ? `${name}Far` : name,
           x: px,
           y: foot,
           z: pz,
           rot,
           scale: k,
-          rise: Math.max(HEART_ROCK_RISE[0], rise),
+          rise,
           noShadow: true,
           cosmetic: band.cosmetic,
         };
+        return upper ? [placed, upper] : [placed];
       }
     }
     return null;
   };
-  const narrow = [...new Set(band.fallback)].sort(
-    (a, b) => HEART_ROCK_PIECES[a].half - HEART_ROCK_PIECES[b].half,
-  );
+  // The filling pass: the narrower faces first, the buttress only last
+  // (its detail belongs where the eye goes, never everywhere a bend is).
+  const narrow = [...new Set(band.fallback)]
+    .filter((n) => n !== 'Kit_RockProw')
+    .sort((a, b) => HEART_ROCK_PIECES[a].half - HEART_ROCK_PIECES[b].half);
+  if (band.fallback.includes('Kit_RockProw')) narrow.push('Kit_RockProw');
   for (const pass of [0, 1]) {
     const taken: { x: number; z: number }[] = out.map((p) => ({ x: p.x, z: p.z }));
     // The band's spacing at its smallest scale (a slot is a slot); the
     // filling pass packs closer.
-    const gap = band.spacing * band.scale[0] * (pass === 0 ? 1 : 0.45);
+    const gap = band.spacing * band.scale[0] * (pass === 0 ? 1 : 0.32);
     for (const c of candidates) {
       // Pulled onto the contour, away from the floor (its front then sits
       // exactly `band.back` past the clearance).
@@ -421,13 +503,18 @@ function planBand(
       // yards: the nearest floor cell's bearing is too grainy for a piece
       // twenty yards wide), turned a little either way.
       const rot = rot0 + (h1 - 0.5) * 0.2;
-      const first = band.pieces[Math.floor(h1 * band.pieces.length) % band.pieces.length];
+      const near =
+        index <= 1 &&
+        heartRockFocus().some((f) => Math.hypot(f.x - px, f.z - pz) < HEART_ROCK_FOCUS_R);
+      const first = near
+        ? 'Kit_RockProw'
+        : band.pieces[Math.floor(h1 * band.pieces.length) % band.pieces.length];
       const order = pass === 0 ? [first, ...band.fallback.filter((n) => n !== first)] : narrow;
       const k0 = band.scale[0] + (band.scale[1] - band.scale[0]) * h2 * 0.4;
       const placed = tryPiece(c, order, px, pz, rot, k0);
       if (!placed) continue;
       taken.push({ x: px, z: pz });
-      out.push(placed);
+      out.push(...placed);
     }
   }
   return out;
@@ -443,7 +530,9 @@ export const HEART_ROCK_LIP = {
   drop: 40,
   depth: 4,
   out: 0.38,
-  segment: 10,
+  // Phase 2G: a module every 15 yards (at 10 the chasm's walls read as a
+  // fence of narrow stripes).
+  segment: 15,
   overlap: 1.6,
   /** How far out past the lip line a module's brink is set: the field's
    *  own face under a lip flares out a fifth of a yard per yard of drop and
@@ -488,18 +577,12 @@ function lipCrossesFloor(
   return false;
 }
 
-/** The rock under every walk's lip where it falls into the chasm (the
- *  field's own faces are flat strata planes): a hanging module per stretch
- *  of each cliff run (about `segment` yards, overlapping its neighbours), its
- *  brink following the walk's own slope (a stair's too) and set under the
- *  lowest of the floor along it, so no stone ever stands proud of the walk;
- *  its face leans out over the void. Not under the floating islands (their
- *  keels are theirs). */
-export function planHeartLips(): HeartKitPlacement[] {
+/** The cliff runs of every walk falling into the chasm (not the floating
+ *  islands', nor the hidden surfaces'), chained end to end per surface. */
+function chasmChains(): FieldCliffRun[][] {
   const F = SMITH_HEART_FIELD;
   const floating = new Set(SMITH_HEART_FLOATING_SURFACES);
   const hidden = new Set(F.surfaces.filter((x) => x.hidden).map((x) => x.id));
-  const stairs = new Set(F.surfaces.filter((x) => x.kind === 'path' && x.stairs).map((x) => x.id));
   // The runs into the chasm, chained end to end per surface (a disc's
   // outline is many short runs: one chain, cut into modules along it).
   const runs = authoredFieldCliffRuns(F).filter(
@@ -518,6 +601,20 @@ export function planHeartLips(): HeartKitPlacement[] {
       last.push(r);
     else chains.push([r]);
   }
+  return chains;
+}
+
+/** The rock under every walk's lip where it falls into the chasm (the
+ *  field's own faces are flat strata planes): a hanging module per stretch
+ *  of each cliff run (about `segment` yards, overlapping its neighbours), its
+ *  brink following the walk's own slope (a stair's too) and set under the
+ *  lowest of the floor along it, so no stone ever stands proud of the walk;
+ *  its face leans out over the void. Not under the floating islands (their
+ *  keels are theirs). */
+export function planHeartLips(): HeartKitPlacement[] {
+  const F = SMITH_HEART_FIELD;
+  const stairs = new Set(F.surfaces.filter((x) => x.kind === 'path' && x.stairs).map((x) => x.id));
+  const chains = chasmChains();
   const out: HeartKitPlacement[] = [];
   let index = 0;
   for (const chain of chains) {
@@ -543,7 +640,7 @@ export function planHeartLips(): HeartKitPlacement[] {
       return authoredFieldHeight(F, q.x - q.nx * 0.4, q.z - q.nz * 0.4);
     };
     const surface = chain[0].surface;
-    const n = Math.max(1, Math.round(total / HEART_ROCK_LIP.segment));
+    const n = Math.max(1, Math.ceil(total / HEART_ROCK_LIP.segment));
     for (let i = 0; i < n; i++) {
       const s0 = (total * i) / n;
       const s1 = (total * (i + 1)) / n;
@@ -613,6 +710,94 @@ export function planHeartLips(): HeartKitPlacement[] {
       });
     }
   }
+  return out;
+}
+
+// ---- the walls under the high walks -------------------------------------------------
+
+/** The great faces under the walks that stand high over the chasm (phase
+ *  2G): under the lips (`planHeartLips`, forty yards) the field's own face
+ *  fell flat to the mist, and from the Ring and the Balcony the Cornice and
+ *  the Breath's landings stood on a smooth plinth a hundred yards tall. A
+ *  wall piece per stretch of each such walk's side (`segment` yards),
+ *  facing out over the void `out` yards past the lip line, its crest at
+ *  least `below` under the walk, drawn on the beds' grid like the bands. */
+export const HEART_ROCK_UNDER = { segment: 34, out: 12, below: 30, minDrop: 60 } as const;
+
+let under: HeartKitPlacement[] | null = null;
+
+export function planHeartUnderCliffs(): HeartKitPlacement[] {
+  if (under) return under;
+  const F = SMITH_HEART_FIELD;
+  const S = HEART_ROCK_STRATA;
+  const U = HEART_ROCK_UNDER;
+  const out: HeartKitPlacement[] = [];
+  for (const chain of chasmChains()) {
+    const lens = chain.map((r) => Math.hypot(r.bx - r.ax, r.bz - r.az));
+    const total = lens.reduce((a, b) => a + b, 0);
+    if (total < 10) continue;
+    const at = (t: number) => {
+      let rest = Math.max(0, Math.min(total, t));
+      for (let k = 0; k < chain.length; k++) {
+        if (rest <= lens[k] || k === chain.length - 1) {
+          const r = chain[k];
+          const f = Math.min(1, rest / lens[k]);
+          return { x: r.ax + (r.bx - r.ax) * f, z: r.az + (r.bz - r.az) * f, nx: r.nx, nz: r.nz };
+        }
+        rest -= lens[k];
+      }
+      throw new Error('unreachable');
+    };
+    const n = Math.max(1, Math.round(total / U.segment));
+    for (let i = 0; i < n; i++) {
+      const s0 = (total * i) / n;
+      const s1 = (total * (i + 1)) / n;
+      const A = at(s0);
+      const B = at(s1);
+      const M = at((s0 + s1) / 2);
+      const chord = Math.hypot(B.x - A.x, B.z - A.z);
+      if (chord < 6) continue;
+      // The walk's lowest floor along the stretch.
+      let floor = Number.POSITIVE_INFINITY;
+      for (let k = 0; k <= 6; k++) {
+        const q = at(s0 + ((s1 - s0) * k) / 6);
+        floor = Math.min(floor, authoredFieldHeight(F, q.x - q.nx * 0.5, q.z - q.nz * 0.5));
+      }
+      if (floor - F.voidHeight < U.minDrop) continue;
+      const ux = (B.x - A.x) / chord;
+      const uz = (B.z - A.z) / chord;
+      let nx = uz;
+      let nz = -ux;
+      if (nx * M.nx + nz * M.nz < 0) {
+        nx = -nx;
+        nz = -nz;
+      }
+      const cx = (A.x + B.x) / 2 + nx * U.out;
+      const cz = (A.z + B.z) / 2 + nz * U.out;
+      if (heartOpenAir(cx, cz, 4)) continue;
+      const h = heartHash(Math.round(cx * 3), Math.round(cz * 3) + 57);
+      const name = h < 0.5 ? 'Kit_RockWallC' : 'Kit_RockWallA';
+      const piece = HEART_ROCK_PIECES[name];
+      const k = Math.max(0.85, Math.min(1.5, (chord * 1.05) / (piece.half * 2)));
+      const tall = piece.height * S.scale;
+      const foot = heartRockBedFloor(floor - U.below - tall);
+      const q = { x: cx, z: cz, rot: Math.atan2(nx, nz), scale: k };
+      // Never over another walk (a lower landing beside it).
+      if (backOverFloor(q, piece, foot, tall)) continue;
+      out.push({
+        piece: name,
+        x: cx,
+        y: foot,
+        z: cz,
+        rot: q.rot,
+        scale: k,
+        rise: S.scale / k,
+        noShadow: true,
+        cosmetic: false,
+      });
+    }
+  }
+  under = out;
   return out;
 }
 
