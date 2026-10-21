@@ -134,8 +134,22 @@ def lookout_statue():
 
 
 def cleft_gate():
+    """The Cleft's gate (hammer_sculpt.cleft_gate), lit for the raid's first
+    image (phase 2C): two braziers of the Smith's flanking the doorway's
+    steps, and clusters of the vein's amber crystals breaking out of the
+    flanks' foot either side of the landing, glowing."""
     p = SP('CleftGate', seed=97, ao_dist=6.0, dust=0.8)
-    return hs.cleft_gate(bpy, p)
+    hs.cleft_gate(bpy, p)
+    for s in (-1, 1):
+        hp.brazier(p, (s * 6.4, -5.0, 0.0))
+    rng = p.rng
+    for (cx, cy, cz, n) in ((-10.5, -3.6, 0.2, 6), (11.5, -2.8, 0.4, 7), (-14.5, -1.2, 1.5, 4), (15.8, -0.4, 2.2, 4)):
+        for k in range(n):
+            a = rng.uniform(0, TAU)
+            d = Vector((math.cos(a) * 0.5, -0.6 - rng.uniform(0, 0.4), 1.0)).normalized()
+            base = (cx + math.cos(a) * rng.uniform(0, 0.9), cy + math.sin(a) * rng.uniform(0, 0.5), cz)
+            amber_crystal(p, base, d, rng.uniform(0.9, 2.2), rng.uniform(0.16, 0.32))
+    return p
 
 
 def collapse_overhang():
@@ -179,8 +193,13 @@ BUILDERS = {
     'QuarryLipB': lambda: hp.quarry_lip('B'),
     'QuarryRimA': lambda: hp.quarry_rim('A'),
     'QuarryRimB': lambda: hp.quarry_rim('B'),
+    'GreatCliffA': lambda: hp.great_cliff('A'),
+    'GreatCliffB': lambda: hp.great_cliff('B'),
+    'GreatCliffC': lambda: hp.great_cliff('C'),
     'RubblePile': hp.rubble_pile,
     'ChipScatter': hp.chip_scatter,
+    'FloorCrackA': lambda: hp.floor_crack('A'),
+    'FloorCrackB': lambda: hp.floor_crack('B'),
     # The Cleft and the Gallery.
     'CleftGate': cleft_gate,
     'RoughStatueA': lambda: rough_statue('A'),

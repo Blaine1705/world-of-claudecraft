@@ -89,7 +89,25 @@ export const HAMMER_KIT_SIZES = {
   lipHalf: 5.4,
   /** How far the colossi reach from their origin across the ground. */
   colossusReach: 14,
+  /** How far past the pit's rim the great cliffs stand (on the top step,
+   *  their faces' feet on its lip). */
+  crownOut: 30,
+  /** How far a great cliff's face reaches out of its origin (+Z). */
+  crownFront: 7,
 } as const;
+
+/** The great cliffs crowning the quarry's back wall, on its top step behind
+ *  the colossi (bearing from the pit's centre, piece, scale): the mountain
+ *  cut by the Smith in giant benches, breaking the terraces' skyline. */
+export const HAMMER_CROWN: readonly { deg: number; piece: string; scale: number }[] = [
+  { deg: 46, piece: 'Kit_GreatCliffB', scale: 0.95 },
+  { deg: 74, piece: 'Kit_GreatCliffA', scale: 1.0 },
+  { deg: 101, piece: 'Kit_GreatCliffC', scale: 0.92 },
+  { deg: 128, piece: 'Kit_GreatCliffB', scale: 1.08 },
+  { deg: 155, piece: 'Kit_GreatCliffA', scale: 0.96 },
+  { deg: 182, piece: 'Kit_GreatCliffC', scale: 1.0 },
+  { deg: 206, piece: 'Kit_GreatCliffB', scale: 0.9 },
+];
 
 /** Where the quarry faces, rims and lips stand along every cliff run of the
  *  vein (two passes: the risers and rims at 7 yd modules, the lips at 9.5). */
@@ -265,6 +283,45 @@ export function planHammerDressing(): HeartKitPlacement[] {
         cosmetic: true,
       });
     }
+  }
+  // The great cliffs on the top step (render only, far dressing: shed on the
+  // low tier, no shadow).
+  const top = QUARRY_TERRACES.steps[QUARRY_TERRACES.steps.length - 1];
+  for (const c of HAMMER_CROWN) {
+    const a = (c.deg * Math.PI) / 180;
+    const x = HAMMER_PIT.x + Math.sin(a) * (HAMMER_PIT.rx + HAMMER_KIT_SIZES.crownOut);
+    const z = HAMMER_PIT.z + Math.cos(a) * (HAMMER_PIT.rz + HAMMER_KIT_SIZES.crownOut);
+    out.push({
+      piece: c.piece,
+      x,
+      z,
+      y: top.h,
+      rot: Math.atan2(HAMMER_PIT.x - x, HAMMER_PIT.z - z),
+      scale: c.scale,
+      noShadow: true,
+      cosmetic: true,
+    });
+  }
+  // Cracks in the pit's bedrock floor (flat inlays under the telegraphs'
+  // lift), clear of the columns' sockets.
+  const columns = F.props.filter((p) => p.kind === 'sh_pit_column');
+  for (let k = 0, placed = 0; k < 40 && placed < 12; k++) {
+    const a = heartHash(k, 61) * Math.PI * 2;
+    const r = 0.15 + heartHash(k, 67) * 0.75;
+    const x = HAMMER_PIT.x + Math.sin(a) * HAMMER_PIT.rx * r;
+    const z = HAMMER_PIT.z + Math.cos(a) * HAMMER_PIT.rz * r;
+    if (authoredFieldSurfaceAt(F, x, z)?.id !== 'hammer_pit') continue;
+    if (columns.some((c) => Math.hypot(c.x - x, c.z - z) < 9)) continue;
+    out.push({
+      piece: k % 3 === 0 ? 'Kit_FloorCrackB' : 'Kit_FloorCrackA',
+      x,
+      z,
+      y: authoredFieldHeight(F, x, z) + 0.01,
+      rot: heartHash(k, 71) * Math.PI * 2,
+      noShadow: true,
+      cosmetic: true,
+    });
+    placed++;
   }
   // Chips round the columns and on the Gallery's landings (flat).
   const chipAt = (x: number, z: number, seed: number) => {

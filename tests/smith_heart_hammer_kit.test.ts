@@ -25,6 +25,7 @@ import {
   sourceFingerprint,
 } from '../scripts/assets/smith_heart_hammer_kit/build.mjs';
 import {
+  FIELD_GROUND_COLORS,
   fieldFamilyUvScale,
   fieldGroundFamily,
   topColor,
@@ -32,7 +33,9 @@ import {
 import {
   collapseSpot,
   HAMMER_COLOSSI,
+  HAMMER_CROWN,
   HAMMER_KIT_KINDS,
+  HAMMER_KIT_SIZES,
   isQuarryStep,
   planHammerDressing,
   planHammerEdges,
@@ -144,6 +147,8 @@ describe('Smith Heart Hammer kit: the piece list and the shipped GLB', () => {
       'SlabHalfL',
       'SlabHalfR',
       'SlabFrame',
+      'GreatCliffA',
+      'FloorCrackA',
     ])
       expect(list, piece).toContain(piece);
     for (const p of list) expect(p, p).toMatch(/^[A-Za-z0-9_]+$/);
@@ -163,7 +168,7 @@ describe('Smith Heart Hammer kit: the piece list and the shipped GLB', () => {
     let total = 0;
     for (const [name, s] of shapes) {
       expect(s.triangles, name).toBeGreaterThan(0);
-      const tile = /Quarry(Face|Rim|Lip)|ChipScatter|RubblePile|SlabChunk/.test(name);
+      const tile = /Quarry(Face|Rim|Lip)|ChipScatter|RubblePile|SlabChunk|FloorCrack/.test(name);
       expect(s.triangles, name).toBeLessThanOrEqual(tile ? 2500 : 20000);
       total += s.triangles;
     }
@@ -231,6 +236,12 @@ describe('Smith Heart Hammer kit: sizes the sim and the plan rely on', () => {
     // The flat floor dressing stays under a hand's height.
     expect(shape('Kit_ChipScatter').max[1]).toBeLessThan(0.3);
     expect(shape('Kit_PitColumnSocket').max[1]).toBeLessThan(0.3);
+    // The floor's cracks are inlays under the telegraphs' lift (0.06): the
+    // sight field of Mountain's Wrath always draws over them.
+    for (const name of ['Kit_FloorCrackA', 'Kit_FloorCrackB']) {
+      expect(shape(name).max[1], name).toBeLessThan(0.05);
+      expect(shape(name).min[1], name).toBeGreaterThan(-0.02);
+    }
   });
 
   it.skipIf(!haveKit)('fills the Slab gate with its two halves and clears its stair', () => {
@@ -297,7 +308,12 @@ describe('hammer_kit_plan_core: the Hammer vein dressed', () => {
     // Every render-only piece's real mesh, placed: no vertex between a hand and
     // a head over a floor somebody walks (the terraces nobody reaches are
     // dressing floors; the edge modules sit on their lips, pinned above).
-    const flat = new Set(['Kit_ChipScatter', 'Kit_PitColumnSocket']);
+    const flat = new Set([
+      'Kit_ChipScatter',
+      'Kit_PitColumnSocket',
+      'Kit_FloorCrackA',
+      'Kit_FloorCrackB',
+    ]);
     const bad: string[] = [];
     for (const p of planHammerDressing()) {
       if (flat.has(p.piece)) continue;
@@ -322,6 +338,50 @@ describe('hammer_kit_plan_core: the Hammer vein dressed', () => {
     expect(bad).toEqual([]);
   });
 
+  it('crowns the back wall with great cliffs on the top step, never floating over the step below', () => {
+    const crown = planHammerDressing().filter((p) => p.piece.startsWith('Kit_GreatCliff'));
+    expect(crown).toHaveLength(HAMMER_CROWN.length);
+    const top = QUARRY_TERRACES.steps[QUARRY_TERRACES.steps.length - 1];
+    const topId = `quarry_step_${QUARRY_TERRACES.steps.length}`;
+    for (const c of crown) {
+      expect(c.y).toBe(top.h);
+      expect(authoredFieldSurfaceAt(F, c.x, c.z)?.id, c.piece).toBe(topId);
+      // Its face's foot (toward the pit) still stands on the top step.
+      const reach = HAMMER_KIT_SIZES.crownFront * (c.scale ?? 1);
+      const fx = c.x + Math.sin(c.rot) * reach;
+      const fz = c.z + Math.cos(c.rot) * reach;
+      expect(authoredFieldSurfaceAt(F, fx, fz)?.id, `${c.piece} front`).toBe(topId);
+      // Facing the pit.
+      const toPit = Math.atan2(8 - c.x, -170 - c.z);
+      expect(Math.cos(c.rot - toPit)).toBeGreaterThan(0.99);
+      // Far dressing: shed on the low tier, no shadow pass.
+      expect(c.cosmetic).toBe(true);
+      expect(c.noShadow).toBe(true);
+    }
+  });
+
+  it.skipIf(!haveKit)('keeps the great cliffs within the face reach the plan assumes', () => {
+    for (const name of ['Kit_GreatCliffA', 'Kit_GreatCliffB', 'Kit_GreatCliffC']) {
+      const s = shape(name);
+      // glTF +Z is the face's front (Blender -Y).
+      expect(s.max[2], name).toBeLessThanOrEqual(HAMMER_KIT_SIZES.crownFront);
+      expect(s.min[1], name).toBeGreaterThan(-0.1);
+      // Tall enough to break the skyline over the top step.
+      expect(s.max[1], name).toBeGreaterThan(18);
+    }
+  });
+
+  it('cracks the pit floor clear of the columns', () => {
+    const cracks = planHammerDressing().filter((p) => p.piece.startsWith('Kit_FloorCrack'));
+    expect(cracks.length).toBeGreaterThan(6);
+    const columns = F.props.filter((p) => p.kind === 'sh_pit_column');
+    for (const c of cracks) {
+      expect(authoredFieldSurfaceAt(F, c.x, c.z)?.id).toBe('hammer_pit');
+      expect(c.y - authoredFieldHeight(F, c.x, c.z)).toBeLessThan(0.02);
+      for (const col of columns) expect(Math.hypot(col.x - c.x, col.z - c.z)).toBeGreaterThan(8);
+    }
+  });
+
   it('hangs the collapse spot over the lower Gallery, high over its walk', () => {
     const c = collapseSpot();
     // Its origin is off the path, on the rim; its front turns over the path.
@@ -335,16 +395,28 @@ describe('hammer_kit_plan_core: the Hammer vein dressed', () => {
 describe('the Hammer vein floor and the kit instancer', () => {
   it('paves the vein in cut bedrock: its own texture family and tile', () => {
     expect(fieldGroundFamily('quarry')).toBe('quarry');
-    expect(fieldFamilyUvScale('quarry')).toBeCloseTo(1 / 10, 9);
+    expect(fieldFamilyUvScale('quarry')).toBeCloseTo(1 / 16, 9);
     const pit = F.surfaces.find((s) => s.id === 'hammer_pit');
     const steps = F.surfaces.filter((s) => isQuarryStep(s.id));
     expect(pit?.ground).toBe('quarry');
     expect(steps.length).toBe(4);
     for (const s of steps) expect(s.ground, s.id).toBe('quarry');
-    const [r, g, b] = topColor('quarry', 3, 7, false);
-    // Warm ochre granite: red over green over blue, never green or blue cast.
-    expect(r).toBeGreaterThan(g);
-    expect(g).toBeGreaterThan(b);
+    // Cool grey granite (phase 2C): the warm lives in the sun and the dust,
+    // never in the stone's own colour.
+    const [r, g, b] = FIELD_GROUND_COLORS.quarry;
+    expect(b).toBeGreaterThanOrEqual(r);
+    expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(0.03);
+    // Its painted floor ranges in value (dark worked hollows to pale dust)
+    // and only the dust drifts run warm.
+    const samples: (readonly [number, number, number])[] = [];
+    for (let x = 0; x < 200; x += 7)
+      for (let z = 0; z < 200; z += 11) samples.push(topColor('quarry', x, z, false));
+    const lum = samples.map(([a, c, d]) => 0.3 * a + 0.59 * c + 0.11 * d);
+    expect(Math.max(...lum) / Math.min(...lum)).toBeGreaterThan(1.6);
+    const warm = samples.filter(([a, , d]) => a > d * 1.04);
+    const cool = samples.filter(([a, , d]) => d >= a);
+    expect(warm.length).toBeGreaterThan(0);
+    expect(cool.length).toBeGreaterThan(warm.length);
   });
 
   it('places, stretches and shears an edge module as planned', () => {

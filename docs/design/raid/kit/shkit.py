@@ -52,19 +52,24 @@ PI = math.pi
 RAW, METAL, PAINT, DRESSED, WOOD = 0, 3, 4, 6, 7
 
 # ---- the palette (sRGB) ------------------------------------------------------------
-# The Hammer's stone: a warm ochre granite (the vein's colour #C8903C lives in
-# its light, never painted flat on the rock).
-QUARRY = (0.45, 0.37, 0.29)
-QUARRY_DARK = (0.33, 0.27, 0.21)
-QUARRY_DEEP = (0.25, 0.2, 0.16)
-QUARRY_PALE = (0.62, 0.53, 0.42)     # a fresh cut face
-QUARRY_RED = (0.56, 0.4, 0.3)        # iron-stained beds
-DRESSED_STONE = (0.66, 0.58, 0.46)   # the Smith's finished carving
-DRESSED_SHADE = (0.55, 0.48, 0.39)
-GRANITE_DARK = (0.34, 0.32, 0.31)    # the colossi's hammers, the plinths
-DUST = (0.7, 0.62, 0.5)
-GRIME = (0.18, 0.14, 0.11)
-MASON_RED = (0.6, 0.2, 0.11)         # the masons' red-ochre lines
+# The Hammer's stone (phase 2C): Stormcrag's COOL grey granite, a hint of
+# blue in the shadowed beds, so the warm light reads against it: the low sun
+# warms the lit faces, the sky's cool fill keeps the shadows grey-blue, and
+# the vein's ochre (#C8903C) lives only in its light (the seams, the geodes,
+# the runes, the rims), never painted flat on the rock. Value contrast is
+# carried by the stone itself: pale fresh cuts and finished carving, mid
+# granite, dark weathered beds and near-black crevices.
+QUARRY = (0.42, 0.42, 0.43)
+QUARRY_DARK = (0.27, 0.28, 0.3)
+QUARRY_DEEP = (0.17, 0.16, 0.19)     # crevices, joints, drill holes (never black)
+QUARRY_PALE = (0.66, 0.64, 0.6)      # a fresh cut face
+QUARRY_RED = (0.52, 0.38, 0.28)      # iron-stained beds (sparing)
+DRESSED_STONE = (0.72, 0.69, 0.64)   # the Smith's finished carving
+DRESSED_SHADE = (0.58, 0.56, 0.53)
+GRANITE_DARK = (0.22, 0.23, 0.25)    # the colossi's hammers, the plinths
+DUST = (0.68, 0.64, 0.57)
+GRIME = (0.16, 0.15, 0.17)
+MASON_RED = (0.62, 0.19, 0.1)        # the masons' red-ochre lines
 TIMBER = (0.47, 0.35, 0.24)
 TIMBER_GREY = (0.52, 0.47, 0.4)
 TIMBER_DARK = (0.27, 0.2, 0.14)
@@ -73,8 +78,8 @@ LEATHER = (0.36, 0.25, 0.17)
 IRON = (0.23, 0.22, 0.21)
 IRON_DARK = (0.13, 0.125, 0.12)
 RUST = (0.45, 0.26, 0.14)
-BRONZE = (0.52, 0.38, 0.2)
-BRONZE_DARK = (0.38, 0.26, 0.13)
+BRONZE = (0.46, 0.34, 0.19)
+BRONZE_DARK = (0.31, 0.22, 0.12)
 VERDIGRIS = (0.33, 0.5, 0.42)
 # Light (glow slot, read as emissive colour). Decoration never out-glows a
 # telegraph: the vein light stays a deep amber, the geodes' hearts the only
@@ -184,14 +189,18 @@ class SPiece(GPiece):
                     tone = 0.84 + 0.3 * _fbm(p.x * 0.33, p.y * 0.33, p.z * 0.33)
                     bed = 0.95 + 0.07 * math.sin(p.z * 2.1 + _fbm(p.x * 0.2, p.y * 0.2, p.z * 0.2) * 5.0)
                     pick = 0.93 + 0.12 * _fbm(p.x * 3.2 + p.z * 3.2, p.y * 3.2 - p.z * 3.2, p.x * 0.4)
-                    wear = 1.0 + 0.3 * max(0.0, c) - 0.38 * max(0.0, -c)
+                    # Worn crests pale, hollows and joints sink toward black
+                    # (the value range the cool stone needs to read).
+                    wear = 1.0 + 0.32 * max(0.0, c) - 0.5 * max(0.0, -c)
                     k = ground * under * tone * bed * pick * wear
                     k = 1 - (1 - k) * self.weather
                     col = tuple(ch * k for ch in col)
-                    stain = sstep(0.62, 0.8, _fbm(p.x * 0.12 + 3.0, p.y * 0.12, p.z * 0.5))
-                    col = mix(col, QUARRY_RED, stain * 0.35)
-                    dust = sstep(0.4, 0.88, n.z) * (0.45 + 0.55 * patch) + max(0.0, -c) * up * 0.3
-                    col = mix(col, DUST, min(0.75, dust * 0.6 * self.dust))
+                    stain = sstep(0.64, 0.82, _fbm(p.x * 0.12 + 3.0, p.y * 0.12, p.z * 0.5))
+                    col = mix(col, QUARRY_RED, stain * 0.22)
+                    # Dust only where it settles (the upward faces, in drifts),
+                    # never a coat over the whole stone.
+                    dust = sstep(0.55, 0.92, n.z) * (0.3 + 0.7 * patch) + max(0.0, -c) * up * 0.25
+                    col = mix(col, DUST, min(0.5, dust * 0.5 * self.dust))
                     if self.marks and abs(n.z) < 0.45:
                         # Guide lines snapped in red ochre across the face:
                         # the masons' measure, broken where the rock was cut.

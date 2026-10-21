@@ -280,88 +280,167 @@ def chain_hoist():
 
 
 # ===================================================================== quarry faces
-def _course_face(p, rng, x0, x1, z_top, z_bot, depth, course=(2.4, 3.7), stepout=0.0, drill=0.16, wedge=0.0,
-                 pale=0.25, bench=0.55, pull=0.18, width=(5.5, 10.0)):
-    """A worked quarry face toward -Y from z_top down to z_bot between x0 and
-    x1, the way a quarry is cut: in benches, each lift of blocks standing a
-    little proud of the one above (a ledge on each), the split faces flat,
-    drill lines down the splits, iron wedges left in a few, and here and
-    there a block already pulled out (a square notch showing the face
-    behind). The body runs `depth` back (+Y), a dark back mass behind it."""
-    p.box(((x0 + x1) / 2, depth * 0.8, (z_top + z_bot) / 2), (x1 - x0, depth * 0.4, z_top - z_bot), QUARRY_DEEP)
-    z = z_top
-    row = 0
-    while z > z_bot + 0.05:
-        h = min(rng.uniform(*course), z - z_bot)
-        if z - h - z_bot < 0.8:
-            h = z - z_bot
-        x = x0 - rng.uniform(0, 2.5)
-        inset = -row * bench * rng.uniform(0.7, 1.2) + rng.uniform(-stepout, stepout)
-        # One tone per lift (a lift reads as one band of the same bed), a
-        # fresh pale block now and then.
-        lift_tone = QUARRY if rng.random() < 0.6 else mix(QUARRY, QUARRY_DARK, rng.uniform(0.3, 0.7))
-        while x < x1 - 0.05:
-            w = rng.uniform(*width)
-            a, b = max(x0, x), min(x1, x + w)
-            if b - a > 0.4:
-                if row > 0 and rng.random() < pull:
-                    x += w
-                    continue
-                fresh = rng.random() < pale
-                c = mix(lift_tone, QUARRY_PALE, 0.4) if fresh else lift_tone
-                yo = inset + rng.uniform(-0.06, 0.06)
-                slab(p, ((a + b) / 2, yo + depth / 2, z - h / 2), (b - a - 0.05, depth, h - 0.05), p.vary(c, 0.03),
-                     chamfer=0.025, jitter=0.015)
-                if rng.random() < drill:
-                    xx = a + 0.12 if rng.random() < 0.5 else b - 0.12
-                    drill_line(p, (xx, yo - 0.02, z - h + 0.15), (xx, yo - 0.02, z - 0.15), 0.07, 0.32,
-                               out=(0, -1, 0))
-                if rng.random() < drill * 0.25:
-                    drill_line(p, (a + 0.2, yo - 0.02, z - 0.12), (b - 0.2, yo - 0.02, z - 0.12), 0.06, 0.36,
-                               out=(0, -1, 0))
-                if wedge and rng.random() < wedge:
-                    with p.as_kind(METAL):
-                        for k in range(int((b - a) / 0.7)):
-                            p.box((a + 0.35 + k * 0.7, yo - 0.05, z - 0.05), (0.18, 0.18, 0.4), IRON_DARK, pitch=0.2)
-            x += w
-        z -= h
-        row += 1
+def _split_face(rng, x0, x1, z0, z1, min_w, min_h, depth=0, out=None):
+    """Cut a face's rectangle into blocks the way a quarry gives them up:
+    a recursive split, mostly across the longer side, so a face holds great
+    monoliths beside clusters of smaller lifts (never one even grid of
+    courses). Returns (x0, x1, z0, z1) boxes."""
+    out = [] if out is None else out
+    w, h = x1 - x0, z1 - z0
+    stop = depth >= 5 or (w < min_w * 2 and h < min_h * 2) or (depth >= 2 and rng.random() < 0.2)
+    if stop:
+        out.append((x0, x1, z0, z1))
+        return out
+    vertical = (w / max(h, 1e-3)) * rng.uniform(0.55, 1.6) > 1.0
+    if vertical and w >= min_w * 2:
+        c = x0 + w * rng.uniform(0.3, 0.7)
+        _split_face(rng, x0, c, z0, z1, min_w, min_h, depth + 1, out)
+        _split_face(rng, c, x1, z0, z1, min_w, min_h, depth + 1, out)
+    elif h >= min_h * 2:
+        c = z0 + h * rng.uniform(0.32, 0.68)
+        _split_face(rng, x0, x1, z0, c, min_w, min_h, depth + 1, out)
+        _split_face(rng, x0, x1, c, z1, min_w, min_h, depth + 1, out)
+    else:
+        out.append((x0, x1, z0, z1))
+    return out
+
+
+def _giant_face(p, rng, x0, x1, z_top, z_bot, depth, proud=(-0.9, 0.25), bench=0.55, crack=0.35, chisel=0.4,
+                drill=0.22, wedge=0.0, pale=0.14, foot=True, overhang=0.25, min_w=1.6, min_h=1.1, front_max=None,
+                rough=0.22):
+    """A face cut by a giant: z_top (the lip) down to z_bot between x0 and
+    x1, toward -Y, its body `depth` back. Blocks of every size (a recursive
+    split), the lower lifts standing proud of the upper ones (`bench` yd a
+    lift), a few jutting out under the lip as overhangs with a black
+    underside, deep joints and long vertical cracks down to a near-black back
+    mass, bands of chisel strokes across some blocks, drill lines down the
+    splits, iron wedges left in a few, and (with `foot`) broken blocks and
+    spoil fallen at its foot. `front_max` caps how far anything stands out
+    (-Y) of the lip line (a rim over a walked floor)."""
+    span = z_top - z_bot
+    # The back mass: the near-black of every joint and crack.
+    p.box(((x0 + x1) / 2, depth * 0.72, (z_top + z_bot) / 2), (x1 - x0, depth * 0.5, span), QUARRY_DEEP)
+    limit = -1e9 if front_max is None else -front_max
+    # Long cracks running down through several blocks: the blocks either side
+    # stand apart there (a dark gap) and the crack is cut black down the face.
+    n_cracks = 2 if rng.random() < crack * 0.5 else (1 if rng.random() < crack else 0)
+    cracks = [rng.uniform(x0 + 1.0, x1 - 1.0) for _ in range(n_cracks)]
+    for (a, b, zb, zt) in _split_face(rng, x0, x1, z_bot, z_top, min_w, min_h):
+        if b - a < 0.35 or zt - zb < 0.35:
+            continue
+        lift = (z_top - (zt + zb) / 2) / max(span, 1e-3)          # 0 at the lip, 1 at the foot
+        yo = -bench * lift * (span / 2.6) + rng.uniform(*proud)
+        top_row = zt > z_top - 0.05
+        hang = top_row and rng.random() < overhang
+        if hang:
+            yo = proud[0] - rng.uniform(0.2, 0.6)
+        yo = max(yo, limit)
+        gap = 0.06 + (0.24 if any(a - 0.2 < c < b + 0.2 for c in cracks) else 0.0) + rng.uniform(0.0, 0.06)
+        aa, bb = a + gap / 2, b - gap / 2
+        zz0, zz1 = zb + gap / 2, zt - (0.02 if top_row else gap / 2)
+        d = depth * rng.uniform(0.8, 1.0)
+        r = rng.random()
+        if r < 0.5:
+            tone = QUARRY
+        elif r < 0.85:
+            tone = mix(QUARRY, QUARRY_DARK, rng.uniform(0.35, 0.9))
+        else:
+            tone = mix(QUARRY, QUARRY_PALE, rng.uniform(0.35, 0.75))
+        if rng.random() < pale * 0.6:
+            tone = mix(tone, QUARRY_PALE, 0.55)
+        if rng.random() < 0.08:
+            tone = mix(tone, QUARRY_RED, 0.35)
+        broken = rng.random() < rough and not hang
+        cx, cz = (aa + bb) / 2, (zz0 + zz1) / 2
+        w, h = bb - aa, zz1 - zz0
+        if broken:
+            # A split block: rough, its corners knocked off, its face uneven.
+            crystal(p, (cx, yo + d / 2, cz), (w, d, h), p.vary(tone, 0.04), n=22, boxy=0.22, jitter=0.08)
+        else:
+            slab(p, (cx, yo + d / 2, cz), (w, d, h), p.vary(tone, 0.03),
+                 chamfer=rng.uniform(0.02, 0.06), jitter=rng.uniform(0.02, 0.06),
+                 yaw=rng.uniform(-0.015, 0.015), roll=rng.uniform(-0.012, 0.012))
+        face_y = yo - 0.02
+        # Chisel bands: a run of parallel strokes across part of the block
+        # (the giant's point and claw), sometimes on the slant.
+        if not broken and w > 1.2 and h > 0.9 and rng.random() < chisel:
+            n = int(rng.uniform(3, 7))
+            band_w = w * rng.uniform(0.45, 0.9)
+            bx = cx + rng.uniform(-(w - band_w) / 2, (w - band_w) / 2)
+            slant = rng.choice([0.0, 0.0, 0.5, -0.5])
+            pitch_z = min(0.32, h / (n + 1))
+            z0b = zz0 + rng.uniform(0.15, max(0.2, h - n * pitch_z - 0.15))
+            for k in range(n):
+                p.box((bx, face_y, z0b + k * pitch_z), (band_w, 0.04, 0.05), QUARRY_DEEP, roll=slant * 0.35)
+        if rng.random() < drill:
+            xx = aa + 0.14 if rng.random() < 0.5 else bb - 0.14
+            drill_line(p, (xx, face_y, zz0 + 0.15), (xx, face_y, zz1 - 0.15), 0.07, 0.34, out=(0, -1, 0))
+        if wedge and not top_row and rng.random() < wedge:
+            with p.as_kind(METAL):
+                for k in range(max(1, int(w / 0.8))):
+                    p.box((aa + 0.4 + k * 0.8, face_y - 0.03, zz1 + 0.02), (0.18, 0.16, 0.38), IRON_DARK, pitch=0.25)
+        if hang:
+            # The overhang's underside: a black shadow line under the lip.
+            p.box((cx, yo + 0.6, zz0 - 0.03), (w * 0.96, 1.0, 0.06), QUARRY_DEEP)
+    for c in cracks:
+        # The crack itself: a black wedge down the face, wider at the top.
+        n = 5
+        for k in range(n):
+            za = z_top - span * k / n
+            zb2 = z_top - span * (k + 1) / n
+            xa = c + rng.uniform(-0.25, 0.25)
+            yc = -0.06 if front_max is not None else -0.35
+            p.box((xa, yc, (za + zb2) / 2), (0.16 + 0.12 * (n - k) / n, 0.4, za - zb2 + 0.05), QUARRY_DEEP,
+                  roll=rng.uniform(-0.12, 0.12))
+    if foot:
+        # Spoil and broken blocks fallen at the foot (on the step below).
+        y_foot = -bench * (span / 2.6) - 0.5
+        for k in range(int(rng.uniform(4, 8))):
+            s = rng.uniform(0.45, 1.6)
+            x = rng.uniform(x0 + 0.5, x1 - 0.5)
+            crystal(p, (x, y_foot - rng.uniform(0.2, 1.8), z_bot + s * 0.32), (s * 1.4, s, s * 0.75),
+                    p.vary(QUARRY if k % 3 else QUARRY_PALE, 0.06), n=14, boxy=0.4, jitter=0.15,
+                    yaw=rng.uniform(0, TAU), pitch=rng.uniform(-0.4, 0.4), floor=z_bot)
+        # A talus of fine spoil along the foot.
+        crystal(p, ((x0 + x1) / 2 + rng.uniform(-1, 1), y_foot - 0.6, z_bot + 0.1), ((x1 - x0) * 0.7, 2.2, 0.9),
+                QUARRY_DARK, n=16, boxy=0.7, jitter=0.1, floor=z_bot)
 
 
 def quarry_face(variant):
-    """A module of the quarry's terrace risers (8 yd along X, ends run 0.4 past
-    to overlap): origin on the lip, the worked face dropping 7.4 to below
-    the step beneath, toward -Y; its body 3 yd back under the step above.
-    A: courses and benches. B: a block half split out of the face, its drill
-    line and wedges. C: a seam of the Hammer's light across a fresh face, a
-    red-ochre guide line snapped across."""
+    """A module of the quarry's terrace risers (8.8 yd along X, ends run 0.4
+    past to overlap): origin on the lip, the face dropping 7.4 to the step
+    beneath, toward -Y; its body 3 yd back under the step above. Sculpted as
+    a giant cut it (hammer_cliff.py: benches, blocks of every size, deep
+    joints and cracks, an overhang, chisel bands and drill channels), spoil
+    fallen at its foot. A: a long crack. B: a block pulled out and another
+    jutting. C: a seam of the Hammer's light across a fresh face, a red-ochre
+    guide line snapped across."""
+    import bpy
+    import hammer_cliff as hc
     seeds = {'A': 151, 'B': 157, 'C': 163}
-    p = SP('QuarryFace' + variant, seed=seeds[variant], marks=variant != 'A', ao_dist=1.6)
-    rng = p.rng
-    with p.as_kind(RAW):
-        _course_face(p, rng, -4.4, 4.4, -0.02, -7.4, 3.0, wedge=0.25 if variant == 'B' else 0.05,
-                     pale=0.18 if variant == 'C' else 0.08)
-        if variant == 'B':
-            slab(p, (0.6, -0.9, -3.0), (3.4, 2.4, 2.6), p.vary(QUARRY_PALE, 0.04), yaw=0.08, chamfer=0.04)
-            drill_line(p, (-1.05, -2.12, -4.2), (2.25, -2.12, -4.2), 0.07, 0.36, out=(0, -1, 0))
+    p = SP('QuarryFace' + variant, seed=seeds[variant], marks=variant == 'C', ao_dist=2.0)
+    vein = None
     if variant == 'C':
-        with p.as_kind(PAINT):
-            pts = [(-4.4, -0.42, -3.4), (-2.0, -0.45, -2.9), (0.4, -0.45, -3.6), (2.6, -0.45, -3.0), (4.4, -0.42, -3.3)]
-            for a, b in zip(pts, pts[1:]):
-                p.sweep([a, b], 0.09, 0.09, VEIN, sides=5, mat=GLOW)
+        vein = [(-4.9, -0.9, -3.4), (-2.0, -1.0, -2.9), (0.4, -1.0, -3.6), (2.6, -1.0, -3.0), (4.9, -0.9, -3.3)]
+    hc.sculpt_face(bpy, p, 'QuarryFace' + variant, seeds[variant], -4.4, 4.4, -0.02, -7.4, 3.0, target=2200,
+                   crack=0.9 if variant == 'A' else 0.4, notch=0.8 if variant == 'B' else 0.3,
+                   overhang=0.45 if variant == 'B' else 0.25, vein=vein, wmin=2.8, wmax=7.5)
     return p
 
 
 def quarry_lip(variant):
-    """A module for a quarried lip over the void (10 yd along X): origin on
-    the lip, worked lifts down the first eight yards (each a little proud of
-    the one above), then rough split rock leaning out over the void to -30,
-    toward -Y, so it stays in front of the field's flaring massif below."""
+    """A module for a quarried lip over the void (10.8 yd along X): origin on
+    the lip, a sculpted giant-cut face down the first eight yards, then rough
+    split rock leaning out over the void to -30, toward -Y, so it stays in
+    front of the field's flaring massif below."""
+    import bpy
+    import hammer_cliff as hc
     seeds = {'A': 171, 'B': 177}
     p = SP('QuarryLip' + variant, seed=seeds[variant], ao_dist=2.4)
     rng = p.rng
+    hc.sculpt_face(bpy, p, 'QuarryLip' + variant, seeds[variant], -5.4, 5.4, -0.02, -8.0, 3.2, target=1500,
+                   foot=False, bench=0.85, crack=0.7, wmin=2.2, wmax=6.5, voxel=0.1)
     with p.as_kind(RAW):
-        _course_face(p, rng, -5.4, 5.4, -0.02, -8.0, 3.2, course=(2.0, 3.0), drill=0.18, bench=0.85, pull=0.1)
         z = -7.0
         while z > -30:
             h = rng.uniform(5.0, 8.0)
@@ -369,10 +448,10 @@ def quarry_lip(variant):
             out = 2.4 + 0.3 * (-z - 7.0)
             while x < 5.6:
                 w = rng.uniform(4.0, 7.0)
-                tone = mix(QUARRY_DARK, QUARRY_DEEP, rng.uniform(0.2, 0.7))
-                slab(p, (x + w / 2, 1.6 - out + rng.uniform(-0.4, 0.4), z - h / 2), (w * 1.1, 4.6, h * 1.08),
-                     p.vary(tone, 0.04), yaw=rng.uniform(-0.06, 0.06), pitch=rng.uniform(-0.12, 0.05),
-                     chamfer=0.12, jitter=0.12)
+                tone = mix(QUARRY_DARK, QUARRY_DEEP, rng.uniform(0.1, 0.45))
+                crystal(p, (x + w / 2, 1.6 - out + rng.uniform(-0.6, 0.6), z - h / 2), (w * 1.1, 4.6, h * 1.08),
+                        p.vary(tone, 0.04), n=16, boxy=0.3, jitter=0.12, yaw=rng.uniform(-0.08, 0.08),
+                        pitch=rng.uniform(-0.12, 0.05))
                 x += w * 0.9
             z -= h * 0.9
     return p
@@ -380,15 +459,25 @@ def quarry_lip(variant):
 
 def quarry_rim(variant):
     """A module for the pit's own rim, where a walked floor meets the
-    terrace above (8 yd along X, 7.4 tall): flat worked lifts, drill lines,
-    no bench proud of the lip, so it never stands out over the floor below
-    (origin on the lip, the face toward -Y)."""
+    terrace above (8.8 yd along X, 7.4 tall): the giant's benches, joints,
+    cracks and tool marks, but nothing standing out over the floor below
+    (origin on the lip, the face toward -Y, never more than 0.25 yd proud)."""
+    import bpy
+    import hammer_cliff as hc
     seeds = {'A': 211, 'B': 217}
     p = SP('QuarryRim' + variant, seed=seeds[variant], marks=variant == 'B', ao_dist=1.6)
-    with p.as_kind(RAW):
-        _course_face(p, p.rng, -4.4, 4.4, -0.02, -7.4, 3.0, bench=0.0, pull=0.0, wedge=0.08,
-                     pale=0.12 if variant == 'B' else 0.06)
+    hc.sculpt_face(bpy, p, 'QuarryRim' + variant, seeds[variant], -4.4, 4.4, -0.02, -7.4, 3.0, target=2000,
+                   foot=False, bench=0.08, proud=0.12, overhang=0.0, notch=0.4, front_max=0.25, wmin=2.8,
+                   wmax=7.5)
     return p
+
+
+def great_cliff(variant):
+    """A crown of the quarry's back wall (hammer_cliff.great_cliff)."""
+    import bpy
+    import hammer_cliff as hc
+    p = SP('GreatCliff' + variant, seed=400 + ord(variant), ao_dist=6.0)
+    return hc.great_cliff(bpy, p, variant)
 
 
 def rubble_pile():
@@ -405,6 +494,85 @@ def rubble_pile():
             slab(p, (math.cos(a) * r, math.sin(a) * r, 0.5 + (2.6 - r) * 0.35), (s * 1.3, s, s * 0.7),
                  p.vary(QUARRY if k % 3 else QUARRY_PALE, 0.08), yaw=rng.uniform(0, TAU), pitch=rng.uniform(-0.4, 0.4),
                  roll=rng.uniform(-0.4, 0.4), chamfer=0.12, jitter=0.12)
+    return p
+
+
+def brazier(p, base, h=1.7, plinth=3.0):
+    """A warm brazier of the Smith's (the Cleft's welcome): a dressed
+    octagonal pedestal (its plinth run `plinth` yd down into the rock, so it
+    stands on any ledge), a bronze bowl on three lion-less claws, a bed of the
+    vein's coals glowing in it and low tongues of fire (the glow slot: the
+    light itself is the budgeted point light over it)."""
+    from shkit import COAL, DRESSED, GEODE_TIP, METAL
+    bx, by, bz = base
+    with p.as_kind(DRESSED):
+        p.prism((bx, by, bz - plinth), 8, 0.85, 0.85, plinth, p.vary(DRESSED_SHADE, 0.04))
+        p.prism((bx, by, bz), 8, 0.7, 0.6, h * 0.2, DRESSED_STONE)
+        p.prism((bx, by, bz + h * 0.2), 8, 0.42, 0.4, h * 0.55, p.vary(DRESSED_STONE, 0.04))
+        p.prism((bx, by, bz + h * 0.72), 8, 0.5, 0.62, h * 0.1, DRESSED_SHADE)
+    with p.as_kind(METAL):
+        p.lathe((bx, by, bz + h * 0.8), [(0.35, 0.0), (0.75, 0.18), (0.95, 0.5), (0.98, 0.58), (0.86, 0.6)], 12,
+                BRONZE, smooth=False)
+        for k in range(3):
+            a = TAU * k / 3
+            p.sweep([(bx + math.cos(a) * 0.55, by + math.sin(a) * 0.55, bz + h * 0.82),
+                     (bx + math.cos(a) * 0.95, by + math.sin(a) * 0.95, bz + h * 1.05)], 0.07, 0.04, BRONZE_DARK,
+                    sides=5)
+    with p.as_kind(PAINT):
+        crystal(p, (bx, by, bz + h * 0.8 + 0.42), (1.5, 1.5, 0.35), COAL, n=14, boxy=0.6, jitter=0.2, mat=GLOW)
+        for k in range(5):
+            a = TAU * k / 5 + 0.3
+            r = 0.35 if k else 0.0
+            tip = (bx + math.cos(a) * r * 0.6, by + math.sin(a) * r * 0.6, bz + h * 0.8 + 0.6 + p.rng.uniform(0.5, 0.95))
+            p.sweep([(bx + math.cos(a) * r, by + math.sin(a) * r, bz + h * 0.8 + 0.5), tip], 0.18, 0.02,
+                    GEODE_TIP if k == 0 else COAL, sides=5, mat=GLOW)
+
+
+def floor_crack(variant):
+    """Cracks in the quarry's bedrock floor (inlaid flat, under 0.05 tall:
+    the floor's telegraphs always draw over them): a main fissure wandering
+    across with its branches, dark and wide where the stone parted, narrowing
+    to hairlines, pale crumbs and spalls lifted along its lips. A: a long
+    fissure (about 9 yd). B: a star of cracks from a struck point."""
+    p = SP('FloorCrack' + variant, seed=191 + ord(variant), ao=0.0)
+    rng = p.rng
+
+    def run(x, y, ang, length, w, depth=0):
+        seg = 0.45
+        n = max(2, int(length / seg))
+        for i in range(n):
+            # A fracture runs straight and kinks (never a wandering worm).
+            ang += rng.uniform(-0.12, 0.12) + (rng.choice([-1, 1]) * rng.uniform(0.4, 0.8) if rng.random() < 0.15 else 0)
+            nx, ny = x + math.cos(ang) * seg, y + math.sin(ang) * seg
+            ww = w * (1 - i / n * 0.8)
+            with p.as_kind(PAINT):
+                p.box(((x + nx) / 2, (y + ny) / 2, 0.018), (seg * 1.08, max(0.03, ww), 0.036),
+                      mix(QUARRY_DARK, QUARRY_DEEP, 0.55), yaw=ang)
+            if ww > 0.06 and rng.random() < 0.25:
+                side = rng.choice([-1, 1])
+                ox, oy = -math.sin(ang) * side * (ww + 0.12), math.cos(ang) * side * (ww + 0.12)
+                with p.as_kind(RAW):
+                    p.box((x + ox, y + oy, 0.012), (rng.uniform(0.12, 0.3), rng.uniform(0.1, 0.22), 0.024),
+                          p.vary(QUARRY_PALE, 0.06), yaw=rng.uniform(0, TAU))
+            if depth < 1 and rng.random() < 0.08:
+                run(nx, ny, ang + rng.choice([-1, 1]) * rng.uniform(0.5, 1.1), length * rng.uniform(0.25, 0.45),
+                    ww * 0.6, depth + 1)
+            x, y = nx, ny
+
+    if variant == 'A':
+        run(-4.5, 0.0, 0.0, 9.5, 0.1)
+    else:
+        for k in range(3):
+            run(0.0, 0.0, TAU * k / 3 + rng.uniform(-0.5, 0.5), rng.uniform(2.0, 5.0), 0.09)
+        with p.as_kind(RAW):
+            crystal(p, (0, 0, 0.015), (0.9, 0.8, 0.03), p.vary(QUARRY_DARK, 0.04), n=12, boxy=0.5, jitter=0.2)
+    # Centre the cracks on the origin (the walk wanders off its start).
+    xs = [v.co.x for v in p.bm.verts]
+    ys = [v.co.y for v in p.bm.verts]
+    cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    for v in p.bm.verts:
+        v.co.x -= cx
+        v.co.y -= cy
     return p
 
 

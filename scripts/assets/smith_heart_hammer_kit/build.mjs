@@ -41,8 +41,13 @@ export const SMITH_HEART_HAMMER_KIT_PIECES = [
   'QuarryLipB',
   'QuarryRimA',
   'QuarryRimB',
+  'GreatCliffA',
+  'GreatCliffB',
+  'GreatCliffC',
   'RubblePile',
   'ChipScatter',
+  'FloorCrackA',
+  'FloorCrackB',
   // The Cleft and the Gallery.
   'CleftGate',
   'RoughStatueA',
@@ -80,6 +85,7 @@ export function sourceFingerprint(root = ROOT) {
     'docs/design/raid/kit/shkit.py',
     'docs/design/raid/kit/hammer_sculpt.py',
     'docs/design/raid/kit/hammer_pieces.py',
+    'docs/design/raid/kit/hammer_cliff.py',
     'docs/design/raid/kit/build_smith_heart_hammer_kit.py',
     'scripts/assets/smith_heart_hammer_kit/build.mjs',
   ]) {
