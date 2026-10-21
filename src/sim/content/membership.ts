@@ -26,11 +26,13 @@ export const MEMBERSHIP_ARMOUR_NAMES = [
 // Damage specs take the profile of their primary stat (SPEC_PRIMARY_STAT, via
 // membership_profile.ts); the role table below overrides tanks and healers. Tank
 // stamina spends the ordinary stat line, and caster stamina follows the shared
-// baseline.
+// baseline. Bears cannot block, so dodge is their avoidance: Agility rides beside
+// Strength in the Cinderbark Ward chest's proportions (content/ignivar_loot.ts).
 export const MEMBERSHIP_PROFILES: Readonly<Record<string, Partial<CoreStats>>> = {
   strength: { str: 17, sta: 8 },
   agility: { agi: 17, sta: 8 },
   tank: { str: 10, sta: 15 },
+  bear: { str: 6, agi: 5, sta: 14 },
   caster: { int: 17, spi: 8 },
   healer: { int: 12, spi: 13 },
 };
@@ -53,7 +55,7 @@ export const MEMBERSHIP_SPEC_PROFILE: Readonly<Record<string, string>> = {
   priest_holy: 'healer',
   shaman_restoration: 'healer',
   mage_arcane: 'healer',
-  druid_feral: 'tank',
+  druid_feral: 'bear',
   druid_restoration: 'healer',
 };
 
