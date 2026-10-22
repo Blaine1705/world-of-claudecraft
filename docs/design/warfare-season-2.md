@@ -103,9 +103,11 @@ everywhere. These rules hold them together:
   sets (the sets are class-locked, so the shop shows only what the viewer can wear), then the
   season weapons the viewer can wield. The entry tier follows as its own group, unfiltered.
 - **Art:** the four weapons ship painted icons (the `warfare-season2-weapons-2026-09-25`
-  batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. The 135 armor
-  pieces sit on `ITEM_ART_PENDING` (pinned in `tests/item_icons.test.ts`) and draw their
-  procedural icon until a follow-up art pass paints them.
+  batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. All 135 armor
+  pieces across the nine classes ship individual paintings from the
+  `warfare-season2-*-icons-2026-10-22` batches in `public/ui/items/mapping.json`.
+  `tests/item_icons.test.ts` verifies complete static coverage;
+  `tests/warfare_season2_icon_art.test.ts` pins every set and its accepted shipping hashes.
 - **Ids:** sets use a new prefix, `vanguard_<spec>`, so the existing `warfare_*` pins keep
   meaning the entry tier.
 

@@ -117,7 +117,8 @@ describe('painted weapon inventory icons', () => {
     // Thirteen with Balgath's loot batch (balgath-loot-icons-2026-09-28, the staff).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 19.
     // + the membership weapon batch (membership-weapon-2026-10-14): 20.
-    expect(weaponBatches).toHaveLength(20);
+    // Integration 45 replaces the former shared faction batch with three painted batches.
+    expect(weaponBatches).toHaveLength(24);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -224,20 +225,28 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(gapWeaponIds).toEqual(['courtiers_bonefang', 'gravecourt_hewer', 'thornpeak_wardblade']);
-    // The faction quartermaster epics ship deterministic SVG compositions
-    // (scripts/generate_faction_vendor_icons.mjs) in their own batch.
-    const factionBatch = weaponBatches.find(
-      ({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16',
+    // Each faction weapon now belongs to its current painted batch.
+    const automatonPaintedBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'faction-automaton-painted-icons-v045-2026-10-22',
     );
-    expect(factionBatch).toBeDefined();
-    const factionWeaponIds = (factionBatch?.itemIds ?? [])
-      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
-      .sort();
-    expect(factionWeaponIds).toEqual([
-      'dawnkeeper_consecrated_mace',
-      'forgemaster_crag_cleaver',
-      'riftwarden_voidblade',
-    ]);
+    expect(automatonPaintedBatch).toBeDefined();
+    expect(
+      automatonPaintedBatch?.itemIds?.filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
+    ).toEqual(['forgemaster_crag_cleaver']);
+    const churchPaintedBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'faction-church-painted-icons-v045-2026-10-22',
+    );
+    expect(churchPaintedBatch).toBeDefined();
+    expect(
+      churchPaintedBatch?.itemIds?.filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
+    ).toEqual(['dawnkeeper_consecrated_mace']);
+    const riftPaintedBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'faction-rift-painted-icons-v045-2026-10-22',
+    );
+    expect(riftPaintedBatch).toBeDefined();
+    expect(
+      riftPaintedBatch?.itemIds?.filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
+    ).toEqual(['riftwarden_voidblade']);
     // The Warfare Season 2 honor weapons ship paintings in their own batch
     // (warfare-season2-weapons-2026-09-25).
     const season2Batch = weaponBatches.find(
@@ -294,15 +303,17 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(lootWeaponIds).toEqual(['craterglass_stave']);
-    // The dungeon rework's weapons ship deterministic SVG compositions in one
-    // batch per dungeon (scripts/generate_<dungeon>_item_icons.mjs).
+    // Dungeon paintings retain one current provenance owner per weapon.
+    // Historical SVG generators remain unchanged.
     const reworkBatchIds = [
-      'sunken-bastion-icons-2026-09-29',
-      'drowned-temple-icons-2026-09-30',
-      'wildheart-basin-icons-2026-10-02',
-      'gravewyrm-sanctum-icons-2026-10-03',
-      'hollow-crypt-icons-2026-10-03',
-      'lower-dungeon-blues-icons-2026-10-08',
+      'dungeon-temple-blues-painted-icons-v045-2026-10-22',
+      'dungeon-bastion-blues-painted-icons-v045-2026-10-22',
+      'dungeon-bastion-painted-icons-v045-2026-10-22',
+      'dungeon-temple-painted-icons-v045-2026-10-22',
+      'dungeon-wildheart-painted-icons-v045-2026-10-22',
+      'dungeon-gravewyrm-painted-icons-v045-2026-10-22',
+      'dungeon-crypt-painted-icons-v045-2026-10-22',
+      'dungeon-crypt-blues-painted-icons-v045-2026-10-22',
     ];
     for (const batchId of reworkBatchIds) {
       expect(
@@ -343,7 +354,9 @@ describe('painted weapon inventory icons', () => {
           !crucibleWeaponIds.includes(id) &&
           !varkhulWeaponIds.includes(id) &&
           !gapWeaponIds.includes(id) &&
-          !factionWeaponIds.includes(id) &&
+          id !== 'forgemaster_crag_cleaver' &&
+          id !== 'riftwarden_voidblade' &&
+          id !== 'dawnkeeper_consecrated_mace' &&
           !season2WeaponIds.includes(id) &&
           !bossWeaponIds.includes(id) &&
           !shardpikeWeaponIds.includes(id) &&
@@ -404,7 +417,9 @@ describe('painted weapon inventory icons', () => {
         !crucibleWeaponIds.includes(id) &&
         !varkhulWeaponIds.includes(id) &&
         !gapWeaponIds.includes(id) &&
-        !factionWeaponIds.includes(id) &&
+        id !== 'forgemaster_crag_cleaver' &&
+        id !== 'riftwarden_voidblade' &&
+        id !== 'dawnkeeper_consecrated_mace' &&
         !season2WeaponIds.includes(id) &&
         !bossWeaponIds.includes(id) &&
         !shardpikeWeaponIds.includes(id) &&
