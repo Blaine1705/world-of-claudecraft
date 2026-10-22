@@ -126,7 +126,7 @@ export class CourierWindow {
     const info = this.deps.info();
     // The vault rides its own frame (no revision of its own on the mirror), so it
     // joins the cheap signature whole; it is a few dozen rows at most.
-    const accountInfo = this.deps.accounts?.().accountBankInfo ?? null;
+    const accountInfo = this.accountApi()?.accountBankInfo ?? null;
     const cheapSignature = `${info?.phase}:${info?.active}:${info?.revision}:${info?.inventoryRevision}:${info?.bankRevision}:${info?.bankCapacity}:${this.deps.inventoryCapacity?.()}:${this.store}:${JSON.stringify(info?.vault ?? null)}:${JSON.stringify(accountInfo)}`;
     if (!force && cheapSignature === this.cheapSignature) return;
     this.cheapSignature = cheapSignature;
@@ -194,7 +194,7 @@ export class CourierWindow {
         const live = this.deps.info();
         if (!live?.active || live.phase !== 'ready') return;
         const side = button.dataset.courierSide as RowSide;
-        const loaded = this.loadedBank(this.deps.accounts?.().accountBankInfo ?? null);
+        const loaded = this.loadedBank(this.accountApi()?.accountBankInfo ?? null);
         const slotsFor = (bank: readonly InvSlot[], other: readonly InvSlot[]) =>
           side === 'withdrawals' ? bank : side === 'accountWithdrawals' ? other : null;
         const slots = slotsFor(live.bankSlots, loaded?.slots ?? []) ?? this.deps.inventory();
@@ -254,7 +254,7 @@ export class CourierWindow {
       if (focusFollow) findFocusKey(this.el, `store-${id}`)?.focus();
     });
     wireTabStrip(this.el, 'courier-account-tab', (id, focusFollow) => {
-      this.deps.accounts?.().selectAccountBank(Number(id));
+      this.accountApi()?.selectAccountBank(Number(id));
       this.render(true);
       if (focusFollow) findFocusKey(this.el, `character-${id}`)?.focus();
     });
@@ -263,8 +263,8 @@ export class CourierWindow {
     for (const retry of this.el.querySelectorAll<HTMLButtonElement>('[data-courier-account-retry]'))
       retry.onclick = () => {
         const id = Number(retry.dataset.courierAccountRetry);
-        if (id > 0) this.deps.accounts?.().selectAccountBank(id);
-        else this.deps.accounts?.().requestAccountBanks(true);
+        if (id > 0) this.accountApi()?.selectAccountBank(id);
+        else this.accountApi()?.requestAccountBanks(true);
         this.render(true);
       };
     for (const tab of this.el.querySelectorAll<HTMLElement>('.courier-store-tab'))
@@ -295,7 +295,7 @@ export class CourierWindow {
           this.deps.inventory(),
           live?.bankSlots ?? [],
           live?.vault ?? null,
-          this.loadedBank(this.deps.accounts?.().accountBankInfo ?? null),
+          this.loadedBank(this.accountApi()?.accountBankInfo ?? null),
         );
         if (canDispatchCourier(live, this.draft)) {
           this.deps.dispatch(courierDispatchRequest(this.draft));
@@ -407,9 +407,12 @@ export class CourierWindow {
     const name = info?.characters.find((c) => c.characterId === loaded.characterId)?.name ?? '';
     return { characterId: loaded.characterId, name };
   }
+  private accountApi() {
+    return this.deps.accounts?.() ?? null;
+  }
   /** Membership opens other characters' banks; an older host has no roster. */
   private accountsAvailable(info: CourierInfo): boolean {
-    return !!this.deps.accounts && info.active;
+    return !!this.accountApi() && info.active;
   }
   /** The selected character's loaded bank, when there is one to plan against. */
   private loadedBank(
@@ -421,9 +424,9 @@ export class CourierWindow {
   }
   /** Showing the tab opens a bank, like the bank window's Other characters tab. */
   private openAccounts(): void {
-    const info = this.deps.accounts?.().accountBankInfo ?? null;
+    const info = this.accountApi()?.accountBankInfo ?? null;
     if (!info || (info.selectedCharacterId === null && !info.error))
-      this.deps.accounts?.().requestAccountBanks(true);
+      this.accountApi()?.requestAccountBanks(true);
   }
   /** The left column: the bank, with a strip over it when the vault or other
    *  characters' banks are reachable too. */
