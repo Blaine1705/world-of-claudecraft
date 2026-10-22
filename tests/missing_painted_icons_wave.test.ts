@@ -703,7 +703,8 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // Coinsack Scurrier catch (cmb_coinsack_caught) joins the pending side.
     // 322 with the Mirefen world-boss branch's three combat deeds, all pending.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
-    expect(DEED_ORDER).toHaveLength(346);
+    // 352 with Lantern Hall's six, all on the pending ledger: still 289 painted.
+    expect(DEED_ORDER).toHaveLength(352);
     expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);

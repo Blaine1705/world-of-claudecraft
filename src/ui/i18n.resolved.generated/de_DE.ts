@@ -648,6 +648,102 @@ export const de_DE: EnTranslations = {
         "pvp": "Kriegsführungsausrüstung"
       }
     },
+    "guildHall": {
+      "title": "Lantern Hall",
+      "signSubtitle": "Adventurers' Guild",
+      "close": "Close the guild window",
+      "tabsLabel": "Lantern Hall sections",
+      "tabs": {
+        "contracts": "Contracts",
+        "quartermaster": "Quartermaster"
+      },
+      "seals": "Lantern Seals: {count}",
+      "resetIn": "New contracts in {time}",
+      "resetSoon": "New contracts at the next weekly reset",
+      "contractsIntro": "Three contracts a week, the same for every adventurer in the realm. No need to sign: see one through and its seals go straight to your bags, once each week.",
+      "kinds": {
+        "boss": "Bounty",
+        "heroic": "Heroic Clear",
+        "task": "Execution"
+      },
+      "goals": {
+        "boss": "Defeat {boss} in {dungeon}, on either difficulty.",
+        "heroic": "Clear {dungeon} on Heroic: defeat {boss} on Heroic difficulty.",
+        "task": "{task} ({dungeon})"
+      },
+      "contractLabel": "{kind}: {dungeon}",
+      "reward": {
+        "one": "{count} Lantern Seal",
+        "few": "{count} Lantern Seals",
+        "many": "{count} Lantern Seals",
+        "other": "{count} Lantern Seals"
+      },
+      "done": "Completed this week",
+      "open": "Open",
+      "lifetime": "Contracts completed: {count}",
+      "emptyBoard": "The board is being rewritten. Come back after the weekly reset.",
+      "quartermasterIntro": "Garrick trades Lantern Seals for honors only: titles to wear in the Book of Deeds, the guild's sword appearance and its war horse. Nothing here makes you stronger in a fight.",
+      "titleOffer": "Title: {title}",
+      "titlePreview": "Shown as {preview}",
+      "mountOffer": "Mount: {mount}",
+      "mountPreview": "Ground mount: +{pct}% movement speed while riding. Requires riding training.",
+      "skinOffer": "Sword appearance: {skin}",
+      "skinPreview": "Changes how your equipped sword looks, on every character of your account. Appearance only: no stats.",
+      "buy": "Buy",
+      "owned": "Owned",
+      "needSeals": "Needs {count} more",
+      "bought": "You bought the title {title}. Choose it in the Book of Deeds.",
+      "boughtMount": "You bought the {mount}. Its reins are in your bags.",
+      "boughtSkin": "You bought the {skin} appearance. Apply it from the Cosmetics window.",
+      "refused": {
+        "owned": "You already own that.",
+        "seals": "You do not have enough Lantern Seals.",
+        "range": "Stand at the quartermaster to trade.",
+        "riding": "Learn to ride before you buy a mount.",
+        "bags": "Your bags are full."
+      },
+      "board": {
+        "noticesLabel": "This week's contracts",
+        "weekProgress": "This week: {done} of {total} contracts complete",
+        "weekProgressAria": "Contracts completed this week",
+        "cardProgress": "{done}/{total} this week",
+        "rewardLine": "Reward: {reward}",
+        "stamp": "Sealed",
+        "sealsTip": "Lantern Seals are paid for Lantern Hall's weekly contracts and spent only at Garrick Holt, the quartermaster. They are bound to you."
+      },
+      "shop": {
+        "stockLabel": "Garrick Holt's stock",
+        "kindTitle": "Title",
+        "kindMount": "Mount",
+        "kindSword": "Sword appearance",
+        "plateHeading": "Your nameplate",
+        "mountHeading": "You, in the saddle",
+        "skinHeading": "In your hand",
+        "stageLabel": "3D preview of {name}",
+        "stageUnavailable": "3D preview unavailable on this device.",
+        "mountHowTo": "After you buy it, its reins go to your bags. Use them to ride; the horse is yours while you keep them.",
+        "mountOwned": "You own this mount. Its reins are in your bags.",
+        "skinHowTo": "After you buy it, apply it from the Cosmetics window. It works on every character of your account.",
+        "skinOwned": "You own this appearance. Apply it from the Cosmetics window.",
+        "howTo": "After you buy it, choose it in the Book of Deeds to show it with your name.",
+        "cosmetic": "Cosmetic only: it changes no stats.",
+        "price": "Price: {price}",
+        "have": "You have {count}",
+        "ownedLong": "You own this title. Choose it in the Book of Deeds.",
+        "short": {
+          "one": "You need {count} more Lantern Seal.",
+          "few": "You need {count} more Lantern Seals.",
+          "many": "You need {count} more Lantern Seals.",
+          "other": "You need {count} more Lantern Seals."
+        }
+      },
+      "contractDone": {
+        "one": "Contract complete: {contract}. You receive {count} Lantern Seal.",
+        "few": "Contract complete: {contract}. You receive {count} Lantern Seals.",
+        "many": "Contract complete: {contract}. You receive {count} Lantern Seals.",
+        "other": "Contract complete: {contract}. You receive {count} Lantern Seals."
+      }
+    },
     "ferry": {
       "regionLabel": "Fährfahrplan",
       "departsIn": "Die Fähre nach {dest} legt in {time} ab",
@@ -1102,9 +1198,35 @@ export const de_DE: EnTranslations = {
         "guildmark": "Gildenzeichen",
         "emberwrought": "Glutgeschmiedet",
         "hoarfrost": "Raureif",
-        "fallen_star": "Gefallener Stern"
+        "fallen_star": "Gefallener Stern",
+        "lantern_hall": "Lantern Hall"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "Blade of Lantern Hall",
+          "look": "Broad steel blade with a fuller of banked lantern-fire, gilt cheeks, a caged lantern burning in the crossguard, blue leather grip.",
+          "lore": "Garrick Holt will not sell this blade to a stranger. It goes to members who have kept Lantern Hall's contracts week after week, and he hands it over with the same words every time: the lantern in the guard is lit from the hall's own hearth, so wherever you carry it, the hall goes with you. The fire in the fuller is only a look. The promise is the point."
+        },
+        "hearthbrand_sword": {
+          "name": "Hearthbrand",
+          "look": "Flame-waved blade of blackened steel with forge-hot edges, a molten seam branching up both faces, a guard of bronze flames around a burning stone, oxblood grip.",
+          "lore": "Lantern Hall keeps a hearth that has not gone out since the hall was raised, and Garrick Holt swears this blade was quenched in its coals. Members who carry it say the grip stays warm on the coldest watch. The fire along its edges is only a look."
+        },
+        "squallcrest_sword": {
+          "name": "Squallcrest",
+          "look": "Long sea-blue blade with edges bright as breaking surf, a storm channel holding a forked bolt, a gilt wave over the ricasso, a fin down one edge and a guard of gilt breakers around a storm pearl.",
+          "lore": "A captain who sailed for the guild brought this blade home from a squall that took her mast and left her ship ringing like a bell. Garrick sells it only for seals, and warns every buyer that it hums before a storm. The lightning and the sea light are only a look."
+        },
+        "rimelight_staff": {
+          "name": "Rimelight Staff",
+          "look": "Pale shaft bound in silver and wound with glowing rime, crowned by a silver claw holding a great crystal of cold light inside a crown of ice shards, icicles hanging from its collar.",
+          "lore": "Lantern Hall's winter watch carried staves like this along the high road, their crowns lit for travellers lost in the snow. Garrick keeps one on the rack for members with seals to spare. The frost and its cold light are only a look."
+        },
+        "duskwick_staff": {
+          "name": "Duskwick Staff",
+          "look": "Two twisted strands of black wood bound in iron, crowned by an open iron lantern burning a violet dusk-flame between two curling horns, chains swinging from its floor.",
+          "lore": "Every lantern in the hall burns bright save one. The dusk-flame was lit to keep the hall by night, and it gives off shadow where the others give light; Garrick trims its wick himself. The smoke and the violet glow are only a look."
+        },
         "guildmark_arming_sword": {
           "name": "Gildenzeichen-Ritterschwert",
           "look": "Klinge aus gebläutem Stahl, bronzene Parierstange in Fischschwanzform, Griff aus blaugrün gefärbtem Leder und ein kleines eingeprägtes Gildensiegel.",
@@ -2228,6 +2350,7 @@ export const de_DE: EnTranslations = {
       "name_avian_strider": "Smaragdener Talschreiter",
       "name_mech_bird": "Cluckwork-Mechvogel",
       "name_lanternback_troll": "Grumbol der Laternenrücken",
+      "name_lantern_hall_destrier": "Lantern Hall Destrier",
       "name_chimeglass_tortoise": "Tolliver das Chimeglass",
       "name_rickshaw_mount": "Knochengebundene Rikscha",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
@@ -2247,6 +2370,7 @@ export const de_DE: EnTranslations = {
       "desc_avian_strider": "Ein hochgewachsener Sattelvogel, dessen schwere Klauen und gefaltete Schwingen jede Reise in einen donnernden Sprint verwandeln.",
       "desc_mech_bird": "Ein handgefertigtes Uhrwerk-Kriegshuhn, das mit schnappenden Servos sprintet, während sich der Aufziehschlüssel noch dreht.",
       "desc_lanternback_troll": "Ein von Lampenanzündern bis zum Joch gebrochener Bergtroll, der einen eisernen Thron über seinen Schultern trägt und auf beiden Armen eine brennende Sturmlaterne trägt.",
+      "desc_lantern_hall_destrier": "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
       "desc_chimeglass_tortoise": "Eine Salzschildkröte, die drei Generationen von Wohnwagen überholt hat. Kesselflicker haben ihm eine Brille aus Sturmglas geschliffen und ihm eine Bronzeglocke an den Hals gehängt, damit die Straße ihn hört, lange bevor sie ihn sieht.",
       "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht."
     },
@@ -6914,6 +7038,7 @@ export const de_DE: EnTranslations = {
       "sourceActivityMasterworkCraft": "Durch die Herstellung eines Meisterwerks verdient",
       "sourceActivityRiftFirstClear": "Wird jedem Mitglied der Gruppe verliehen, die den ersten Durchgang eines gewerteten Risses gewinnt",
       "sourceActivityBuriedHoard": "Gefunden in der Belohnungstruhe eines Vergrabenen Schatzes, dem Tresor, zu dem eine Schatzkarte führt",
+      "sourceActivityLanternHall": "Bought for Lantern Seals from Lantern Hall's quartermaster",
       "cellMissingSourceAria": "{name}, noch nicht gefunden, {source}",
       "cellOwnedClearsAria": "{name}, katalogisiert, erstmals bei Durchgang {count} gefunden",
       "searchPlaceholder": "Reliquien durchsuchen",
@@ -24270,6 +24395,12 @@ export const de_DE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroische Marke"
       },
+      "lantern_seal": {
+        "name": "Lantern Seal"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "Reins of the Lantern Hall Destrier"
+      },
       "wyrmfall_core": {
         "name": "Wyrmfall-Kern"
       },
@@ -26557,6 +26688,26 @@ export const de_DE: EnTranslations = {
         "name": "Alchemist Verane",
         "title": "Meister der Apotheke",
         "greeting": "Zweimal messen, einmal gießen, {className}. In der Apotheke hat niemand Geduld mit verschütteten Reagenzien."
+      },
+      "guildmaster_hesper_dunmore": {
+        "name": "Hesper Dunmore",
+        "title": "Guildmaster of Lantern Hall",
+        "greeting": "Welcome to Lantern Hall, {className}. Tobias keeps the week's contracts on the board, Garrick trades our seals for honors worth wearing, and Mira will find you a party for any door below the mountain. Bring back a trophy and it hangs in the hall behind me."
+      },
+      "contract_clerk_tobias_wren": {
+        "name": "Tobias Wren",
+        "title": "Contract Clerk",
+        "greeting": "Three contracts a week, posted every reset. No signing, no fees: see one through and the seals are yours."
+      },
+      "guild_quartermaster_garrick_holt": {
+        "name": "Garrick Holt",
+        "title": "Guild Quartermaster",
+        "greeting": "Seals for honors, friend. Nothing on my shelves will sharpen a blade, but every hall in Highwatch will know where you earned it."
+      },
+      "guild_recruiter_mira_fairweather": {
+        "name": "Mira Fairweather",
+        "title": "Guild Recruiter",
+        "greeting": "Looking for a party? Every crypt, bastion and temple on this map has a name on my list. Tell me where you are headed."
       },
       "farmer_jessica": {
         "name": "Bäuerin Jessica",

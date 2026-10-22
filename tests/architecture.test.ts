@@ -283,6 +283,8 @@ const UI_PURE_CORES = [
   'src/ui/leaderboard_podium_html.ts',
   'src/ui/leaderboard_board_html.ts',
   'src/ui/weekly_quests_view.ts',
+  'src/ui/hud/guild_hall/guild_hall_view.ts',
+  'src/ui/hud/guild_hall/guild_quartermaster_view.ts',
   'src/ui/world_quest_wisp_maze_view.ts',
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
@@ -842,6 +844,14 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
+  'src/render/mount_embers_core.ts',
+  // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)
+  'src/render/mount_rear_core.ts',
+  // the per-skin swing trail lookup (renderer.ts triggerAttack)
+  'src/render/weapon_skin_trail_core.ts',
+  // the ambient motes' fade around the local player (motes.ts)
+  'src/render/motes_keepout_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
@@ -851,6 +861,7 @@ const RENDER_PURE_CORES = [
   'src/render/chase_camera_floor_core.ts',
   // the air of a walk-in placed town building (its rooms and doors) for the indoor camera
   'src/render/placed_town_interior_core.ts',
+  'src/render/highwatch_guild_trophies_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
@@ -3034,6 +3045,8 @@ const UI_DOM_MODULES = [
   'src/ui/calendar_window.ts',
   'src/ui/hud/action_bar/action_bar_bind_banner.ts',
   'src/ui/weekly_quests_window.ts',
+  'src/ui/hud/guild_hall/guild_hall_window.ts',
+  'src/ui/hud/guild_hall/guild_offer_stage_controller.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',

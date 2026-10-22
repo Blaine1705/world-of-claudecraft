@@ -5936,6 +5936,14 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_lady_nobody_hanging',
   'dgn_ilvane_hush',
   'dgn_morthen_candlelight',
+  // Lantern Hall's contract milestones and the quartermaster's three titles: the
+  // category crest until their paintings are commissioned.
+  'dgn_guild_first_contract',
+  'dgn_guild_ten_contracts',
+  'dgn_guild_fifty_contracts',
+  'feat_guild_writ_runner',
+  'feat_guild_hallsworn',
+  'feat_guild_of_lantern_hall',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

@@ -2010,9 +2010,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const bytes = Buffer.byteLength(JSON.stringify(state));
     const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
     // +19 at the merge of the Staff of Changing's discovery id (PR 4281).
-    expect(baselineBytes).toBe(258389);
+    // +251 with Lantern Hall's content in the maximal character (the receipt delta holds),
+    // +30 with its horse's reins id in itemsDiscovered.
+    expect(baselineBytes).toBe(258670);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(266673);
+    expect(bytes).toBe(266954);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2278,7 +2280,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Unchanged from there through the referral cards and the later v0.45.0
     // integration merges. 249,958 with the Staff of Changing's discovery id
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
-    expect(beforeReferralBytes).toBe(249958);
+    // 250,239 with Lantern Hall (#4530) merged onto the v0.45.0 integration: +281, its
+    // content in the maximal character (+251) and its horse's reins id in itemsDiscovered
+    // (+30), the same growth the maximal blob above records.
+    expect(beforeReferralBytes).toBe(250239);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2303,7 +2308,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     };
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
-    expect(beforeMembershipBytes).toBe(249784);
+    // 250,065 with Lantern Hall (#4530): the same +281 as beforeReferralBytes above.
+    expect(beforeMembershipBytes).toBe(250065);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2742,7 +2748,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         2453 +
         // Legacy whistle and charm discovery ids, plus the retained buddy collection.
         706 +
-        buddyCollectionBytes,
+        buddyCollectionBytes +
+        // Plus 281 for Lantern Hall (#4530) merged onto the v0.45.0 integration: its deed
+        // rows (+236) and the Lantern Seal's and its horse's reins discovery ids (+15 and
+        // +30), MEASURED on the merged tree (split by field in forgeBaseline below).
+        281,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2789,7 +2799,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // rework, lore guide deed included, MEASURED 2026-10 across its merge
       // (the +829 and +2,453 above; the branch's own +648 + 41 and +993
       // undercounted the merged tree).
-      deeds: 1572,
+      // deeds 1,572 -> 1,808 with Lantern Hall (#4530), its deed rows (+236 of the +281
+      // above), MEASURED on the merged tree.
+      deeds: 1808,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
@@ -2801,7 +2813,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // MEASURED across its merge (the branch's own +1,448 undercounted).
       // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
       // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
-      deedStats: 21373,
+      // Then -> 21,418 with Lantern Hall (#4530): the Lantern Seal's and its horse's reins
+      // discovery ids (+15 and +30, the rest of the +281 above).
+      deedStats: 21418,
       reliquary: 13954,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2849,7 +2863,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // +2,818 and +2,453 attributed above; the branch's own +3,130 undercounted).
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (247,117).
       // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
-    ).toBe(247136);
+      // Lantern Hall (#4530) adds its 281, attributed above (247,417).
+    ).toBe(247417);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2889,7 +2904,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // own +3,130 undercounted).
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (249,927).
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281).
-    ).toBe(249946);
+      // Lantern Hall (#4530) adds its 281, attributed above (250,227).
+    ).toBe(250227);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3027,8 +3043,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // RE-BASED for the Staff of Changing (PR 4281): 250,080 bytes, exactly +19
     // from its one discovery id, isolated above with membership. Same band:
     // 249700..250081.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249700);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(250081);
+    // RE-BASED for Lantern Hall (#4530) merged onto the v0.45.0 integration: 250,361
+    // bytes, exactly +281 (its deed rows and the Lantern Seal's and its horse's reins
+    // discovery ids, attributed above). No container or ceiling changed shape. Same
+    // band: 249981..250362.
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249981);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(250362);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

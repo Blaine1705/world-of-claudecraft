@@ -373,9 +373,11 @@ import { APEX_PATTERN_ITEMS } from './content/apex_patterns';
 import { CRUCIBLE_PROFESSION_ITEMS } from './content/crucible_professions';
 import { DELVE_ITEMS } from './content/delves/items';
 import { FARM_PATTERN_ITEMS } from './content/farm_patterns';
+import { GUILD_CONTRACT_ITEMS } from './content/guild_contracts';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { HIGHWATCH_GUILD_NPCS } from './content/highwatch_guild';
 import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { MIREFEN_TAVERN_NPCS } from './content/mirefen_tavern';
@@ -467,6 +469,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
   QUEST_LEVELING_GEAR_ITEMS,
+  GUILD_CONTRACT_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -568,6 +571,8 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
+  // ...and the Highwatch guild's four residents (content/highwatch_guild.ts), dynamic too
+  ...HIGHWATCH_GUILD_NPCS,
   // The Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
   // dynamic, spawned per Temple claim, appended last so no placed NPC moves.
   ...CANTOR_NPCS,

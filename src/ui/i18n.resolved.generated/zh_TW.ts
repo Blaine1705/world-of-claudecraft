@@ -648,6 +648,102 @@ export const zh_TW: EnTranslations = {
         "pvp": "戰爭裝備"
       }
     },
+    "guildHall": {
+      "title": "燈火大廳",
+      "signSubtitle": "冒險者公會",
+      "close": "關閉公會視窗",
+      "tabsLabel": "燈火大廳分頁",
+      "tabs": {
+        "contracts": "契約",
+        "quartermaster": "軍需官"
+      },
+      "seals": "燈火印章：{count}",
+      "resetIn": "{time}後發布新契約",
+      "resetSoon": "下次每週重置時發布新契約",
+      "contractsIntro": "每週三份契約，王國中的每位冒險者看到的都一樣。無需簽署：完成其中一份，它的印章就會直接放進你的背包，每週一次。",
+      "kinds": {
+        "boss": "懸賞",
+        "heroic": "英雄通關",
+        "task": "執行"
+      },
+      "goals": {
+        "boss": "在{dungeon}擊敗{boss}，難度不限。",
+        "heroic": "以英雄難度通關{dungeon}：在英雄難度下擊敗{boss}。",
+        "task": "{task}（{dungeon}）"
+      },
+      "contractLabel": "{kind}：{dungeon}",
+      "reward": {
+        "one": "{count}枚燈火印章",
+        "few": "{count}枚燈火印章",
+        "many": "{count}枚燈火印章",
+        "other": "{count}枚燈火印章"
+      },
+      "done": "本週已完成",
+      "open": "進行中",
+      "lifetime": "已完成契約：{count}",
+      "emptyBoard": "告示板正在重寫。請在每週重置後再來。",
+      "quartermasterIntro": "加里克只用燈火印章換取榮譽：可在功績之書中佩戴的頭銜、公會之劍的外觀和公會的戰馬。這裡沒有任何東西能讓你在戰鬥中變得更強。",
+      "titleOffer": "頭銜：{title}",
+      "titlePreview": "顯示為{preview}",
+      "mountOffer": "坐騎：{mount}",
+      "mountPreview": "地面坐騎：騎乘時移動速度+{pct}%。需要騎術訓練。",
+      "skinOffer": "劍的外觀：{skin}",
+      "skinPreview": "改變你所裝備的劍的樣子，適用於帳號中的所有角色。僅為外觀：沒有屬性。",
+      "buy": "購買",
+      "owned": "已擁有",
+      "needSeals": "還需{count}枚",
+      "bought": "你購買了頭銜{title}。請在功績之書中選擇它。",
+      "boughtMount": "你購買了{mount}。它的韁繩在你的背包裡。",
+      "boughtSkin": "你購買了外觀{skin}。請在外觀視窗中套用它。",
+      "refused": {
+        "owned": "你已經擁有它了。",
+        "seals": "你的燈火印章不足。",
+        "range": "站到軍需官身邊才能交易。",
+        "riding": "先學會騎術，再購買坐騎。",
+        "bags": "你的背包已滿。"
+      },
+      "board": {
+        "noticesLabel": "本週契約",
+        "weekProgress": "本週：已完成{done}/{total}份契約",
+        "weekProgressAria": "本週已完成的契約",
+        "cardProgress": "本週 {done}/{total}",
+        "rewardLine": "獎勵：{reward}",
+        "stamp": "已蓋印",
+        "sealsTip": "燈火印章由燈火大廳的每週契約發放，只能在軍需官加里克·霍爾特處使用。它們與你綁定。"
+      },
+      "shop": {
+        "stockLabel": "加里克·霍爾特的貨品",
+        "kindTitle": "頭銜",
+        "kindMount": "坐騎",
+        "kindSword": "劍的外觀",
+        "plateHeading": "你的名牌",
+        "mountHeading": "你騎在馬鞍上",
+        "skinHeading": "握在你手中",
+        "stageLabel": "{name}的3D預覽",
+        "stageUnavailable": "此裝置無法顯示3D預覽。",
+        "mountHowTo": "購買後，它的韁繩會放入你的背包。使用韁繩即可騎乘；只要你留著韁繩，這匹馬就是你的。",
+        "mountOwned": "你已擁有這匹坐騎。它的韁繩在你的背包裡。",
+        "skinHowTo": "購買後，請在外觀視窗中套用它。它適用於你帳號中的所有角色。",
+        "skinOwned": "你已擁有此外觀。請在外觀視窗中套用它。",
+        "howTo": "購買後，在功績之書中選擇它，即可與你的名字一同顯示。",
+        "cosmetic": "僅限外觀：不改變任何屬性。",
+        "price": "價格：{price}",
+        "have": "你擁有{count}",
+        "ownedLong": "你已擁有此頭銜。可在功績之書中選擇。",
+        "short": {
+          "one": "你還需要{count}枚燈火印章。",
+          "few": "你還需要{count}枚燈火印章。",
+          "many": "你還需要{count}枚燈火印章。",
+          "other": "你還需要{count}枚燈火印章。"
+        }
+      },
+      "contractDone": {
+        "one": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
+        "few": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
+        "many": "契約完成：{contract}。你獲得了{count}枚燈火印章。",
+        "other": "契約完成：{contract}。你獲得了{count}枚燈火印章。"
+      }
+    },
     "ferry": {
       "regionLabel": "渡船時刻表",
       "departsIn": "前往{dest}的渡船將在{time}後啟航",
@@ -1102,9 +1198,35 @@ export const zh_TW: EnTranslations = {
         "guildmark": "公會印記",
         "emberwrought": "餘燼鍛造",
         "hoarfrost": "白霜",
-        "fallen_star": "隕星"
+        "fallen_star": "隕星",
+        "lantern_hall": "燈火大廳"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "燈火大廳之劍",
+          "look": "寬闊的鋼製劍身，血槽中燃著燈火，鍍金的護頰，護手中燃著一盞籠中提燈，藍色皮革劍柄。",
+          "lore": "加里克·霍爾特不會把這把劍賣給陌生人。他只把它交給一週又一週履行燈火大廳契約的成員，每次都說同樣的話：護手裡的燈火取自大廳自己的爐膛，所以無論你把它帶到哪裡，大廳都與你同在。血槽裡的火只是外觀。重要的是承諾。"
+        },
+        "hearthbrand_sword": {
+          "name": "爐火之刃",
+          "look": "焦黑鋼鐵鑄成的火焰波紋劍身，兩側刃口如出爐般熾熱，熔融的裂縫在兩面分叉蔓延，青銅火焰護手環繞一塊燃燒的寶石，牛血色握柄。",
+          "lore": "燈火大廳裡有一座自大廳建成以來從未熄滅的爐膛，加里克·霍爾特發誓這把劍就是在它的炭火中淬火的。佩戴它的成員說，即使在最寒冷的守夜裡，劍柄也依然溫暖。刃口上的火焰只是外觀。"
+        },
+        "squallcrest_sword": {
+          "name": "風暴浪峰",
+          "look": "海藍色的修長劍身，刃口如碎浪般明亮，風暴血槽中封著分叉的閃電，劍根上方是一道鍍金的浪，一側刃口生著鰭，鍍金浪濤護手環繞一顆風暴珍珠。",
+          "lore": "一位為公會出海的船長從一場狂風中帶回了這把劍，那場風暴折斷了她的桅桿，讓整艘船像鐘一樣鳴響。加里克只肯用印章出售它，並提醒每位買家，風暴來臨前它會嗡嗡作響。閃電與海光只是外觀。"
+        },
+        "rimelight_staff": {
+          "name": "霜光法杖",
+          "look": "蒼白的杖身以銀箍束緊，纏繞著發光的霧凇，杖頂的銀爪在冰晶之冠中托著一顆巨大的寒光水晶，杖頸垂著冰柱。",
+          "lore": "燈火大廳的冬季守望者曾手持這樣的法杖行走在高路上，點亮杖頂，為迷失在雪中的旅人引路。加里克在架上留了一根，給印章有餘的成員。寒霜與冷光只是外觀。"
+        },
+        "duskwick_staff": {
+          "name": "暮芯法杖",
+          "look": "兩股扭結的黑木以鐵箍束緊，杖頂是一盞敞開的鐵提燈，在兩隻捲曲的角之間燃著紫色的暮光火焰，燈底垂著晃動的鎖鏈。",
+          "lore": "大廳裡的每一盞燈都明亮地燃燒，只有一盞例外。暮光之焰是為在夜裡守護大廳而點燃的，別的燈發出光的地方，它發出影子；加里克親自修剪它的燈芯。煙霧與紫色光輝只是外觀。"
+        },
         "guildmark_arming_sword": {
           "name": "公會印記武裝劍",
           "look": "發藍鋼劍刃、青銅魚尾形十字護手、青綠色染皮握柄，以及一枚小巧的公會鋼印。",
@@ -2228,6 +2350,7 @@ export const zh_TW: EnTranslations = {
       "name_avian_strider": "蒼翠谷行者",
       "name_mech_bird": "發條機械鳥",
       "name_lanternback_troll": "提燈背者格倫博",
+      "name_lantern_hall_destrier": "燈火大廳戰馬",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
       "name_rickshaw_mount": "白骨人力車",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
@@ -2247,6 +2370,7 @@ export const zh_TW: EnTranslations = {
       "desc_avian_strider": "高大的坐騎巨鳥，粗壯的利爪與收攏的雙翼讓每一段旅程都化作雷鳴般的疾馳。",
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
       "desc_lanternback_troll": "被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。",
+      "desc_lantern_hall_destrier": "燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
       "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。"
     },
@@ -6914,6 +7038,7 @@ export const zh_TW: EnTranslations = {
       "sourceActivityMasterworkCraft": "製作傑作時獲得",
       "sourceActivityRiftFirstClear": "授予率先通關分級裂隙的隊伍全體成員",
       "sourceActivityBuriedHoard": "在埋藏寶藏的獎勵寶箱中找到，即藏寶圖所指引的寶庫",
+      "sourceActivityLanternHall": "在燈火大廳的軍需官處用燈火印章購買",
       "cellMissingSourceAria": "{name}，尚未獲得，{source}",
       "cellOwnedClearsAria": "{name}，已收錄，首次獲得於第 {count} 次通關",
       "searchPlaceholder": "搜尋聖物",
@@ -24270,6 +24395,12 @@ export const zh_TW: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽記"
       },
+      "lantern_seal": {
+        "name": "燈火印章"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "燈火大廳戰馬的韁繩"
+      },
       "wyrmfall_core": {
         "name": "墜龍核心"
       },
@@ -26557,6 +26688,26 @@ export const zh_TW: EnTranslations = {
         "name": "韋蘭煉金術士",
         "title": "藥坊大師",
         "greeting": "量兩次，倒一次，{className}。藥坊裡容不得灑掉的藥劑。"
+      },
+      "guildmaster_hesper_dunmore": {
+        "name": "赫斯珀·鄧莫爾",
+        "title": "燈火大廳會長",
+        "greeting": "歡迎來到燈火大廳，{className}。托拜厄斯把本週的契約貼在告示板上，加里克用我們的印章換取值得佩戴的榮譽，米拉能為你找到前往山下任何一扇門的隊伍。帶回一件戰利品，它就會掛在我身後的大廳裡。"
+      },
+      "contract_clerk_tobias_wren": {
+        "name": "托拜厄斯·雷恩",
+        "title": "契約文書",
+        "greeting": "每週三份契約，每次重置時張貼。無需簽字，也不收費：完成一份，印章就歸你了。"
+      },
+      "guild_quartermaster_garrick_holt": {
+        "name": "加里克·霍爾特",
+        "title": "公會軍需官",
+        "greeting": "用印章換榮譽，朋友。我的貨架上沒有能磨利刀刃的東西，但高望的每座大廳都會知道你是在哪裡贏得的。"
+      },
+      "guild_recruiter_mira_fairweather": {
+        "name": "米拉·費爾韋瑟",
+        "title": "公會招募官",
+        "greeting": "在找隊伍嗎？這張地圖上的每座墓穴、堡壘和神殿都在我的名單上。告訴我你要去哪兒。"
       },
       "farmer_jessica": {
         "name": "農婦潔西卡",

@@ -731,7 +731,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  'f7e90ef6fdde5b42ff2a99f85e067c1216b240a6a0d78f5da4b2d30eeaac5fb2';
+  // Re-minted for Lantern Hall (the Highwatch adventurers' guild, #4530) merged onto the
+  // v0.45.0 integration: the renderer leaf moved. No capture was retaken.
+  '7695f6ab10b10e91b521133d8d6a56704f9533cb7a54b526b53ffc24407763b1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

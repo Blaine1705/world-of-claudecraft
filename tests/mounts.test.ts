@@ -110,7 +110,7 @@ function ride(sim: Sim, pid: number, key: string): void {
 
 describe('mount catalog', () => {
   it('keeps the horse first and appends the two referral milestone mounts', () => {
-    expect(MOUNT_KEYS).toHaveLength(13);
+    expect(MOUNT_KEYS).toHaveLength(14);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -134,6 +134,7 @@ describe('mount catalog', () => {
     expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     expect(spec('drakemaw_raptor')).toEqual(['epic', 0.8]);
+    expect(spec('lantern_hall_destrier')).toEqual(['uncommon', 0.7]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -287,6 +288,24 @@ describe('mount reins items (the collection: owning the item is owning the mount
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
       if (key === 'avian_strider') continue; // the Rift Watch Champion purchase, pinned above
+      if (key === 'lantern_hall_destrier') {
+        // Lantern Hall's seal purchase (content/guild_contracts.ts, tests/guild_steed_and_sword):
+        // ONE door, so it rides no mob table, no heroic boss and no rift pool.
+        const reins = mountItemId(key)!;
+        for (const mob of Object.values(MOBS))
+          expect(
+            mob.loot.some((l) => l.itemId === reins),
+            `${reins} on ${mob.id}`,
+          ).toBe(false);
+        for (const rows of Object.values(HEROIC_BOSS_LOOT))
+          expect(
+            rows.some((l) => l.itemId === reins),
+            `${reins} heroic`,
+          ).toBe(false);
+        for (const pool of [RIFT_EPIC_MOUNT_REINS, RIFT_BLUE_MOUNT_REINS, RIFT_GREEN_MOUNT_REINS])
+          expect(pool as readonly string[]).not.toContain(reins);
+        continue;
+      }
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
       if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts

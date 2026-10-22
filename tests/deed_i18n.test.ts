@@ -101,20 +101,24 @@ describe('deed_i18n English resolution', () => {
     // 322 with the Mirefen world-boss branch's three combat deeds (cmb_balgath,
     // cmb_balgath_ten, cmb_point_taken), each a name and a desc, no title.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(346);
+    // 352 with Lantern Hall's six (three contract milestones, three bought titles).
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(352);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
     // casket deeds. 300 with the Coinsack deed, 303 with the Mirefen three.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 327.
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(327);
+    // 333 with Lantern Hall's six.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(333);
     // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
     // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
     // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc;
     // 676 with the Mirefen three.
-    expect(manifest.length).toBe(725);
+    // 740 with Lantern Hall's six names, six descs and three titles.
+    expect(manifest.length).toBe(740);
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 725 rows, 52 titles
     // (the Drowned Temple lore guide's Witness of the Choir).
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(52);
+    // 55 with Lantern Hall's three (Writ-Runner, Hallsworn, of Lantern Hall).
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(55);
     expect(manifest.filter((row) => row.id === 'cmb_balgath')).toEqual([
       { id: 'cmb_balgath', field: 'name', source: 'Foreman No More' },
       {

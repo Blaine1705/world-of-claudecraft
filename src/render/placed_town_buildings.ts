@@ -75,6 +75,10 @@ export interface PlacedTownSpec {
   /** The promoted-scenery family a document sets when it owns these
    *  buildings as its own placements (sim/authored_town_registry.ts). */
   readonly promotedBy: keyof PromotedScenery;
+  /** A town's own additions to one of its models, built fresh for each view (in the model's
+   *  frame): they join the building before its materials convert, so they fade, cull and
+   *  reveal with it (Highwatch's guild sign, highwatch_guild_sign.ts). */
+  readonly decorate?: (buildingId: string) => readonly THREE.Object3D[];
 }
 
 export interface PlacedTownView {
@@ -270,7 +274,13 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
     for (const building of buildings) {
       const source = sources.get(building.assetId);
       if (!source) throw new Error(`${spec.town} town building is missing: ${building.assetId}`);
-      const built = buildPlacedTownBuilding(spec.town, building, source, groundAt);
+      const built = buildPlacedTownBuilding(
+        spec.town,
+        building,
+        source,
+        groundAt,
+        spec.decorate?.(building.id),
+      );
       built.group.userData.placementId = building.id;
       // its rooms go to the indoor camera (placed_town_interiors.ts), and its doors to the
       // fade: a player stepping in sees in through one (fenbridge_town_visibility_core.ts)

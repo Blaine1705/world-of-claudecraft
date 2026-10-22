@@ -28,6 +28,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'После окончания подписки характеристики снаряжения и бонусы комплекта отключаются до её продления.',
   'itemUi.tooltip.membershipDormant':
     'Неактивно: продлите подписку, чтобы восстановить характеристики снаряжения и бонусы комплекта.',
+  'entities.items.lantern_seal.name': 'Печать Фонаря',
+  'entities.items.reins_lantern_hall_destrier.name': 'Поводья боевого коня Зала Фонаря',
   'entities.items.membership_staff.name': 'Посох перемен',
   'hudChrome.bags.membershipSlot': 'Ячейка сумки по подписке',
   'hudChrome.bags.membershipSlotLocked': 'Оформите подписку, чтобы открыть эту ячейку сумки.',
@@ -484,6 +486,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': 'Обмотки отбойного течения властителя',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     'Находится в наградном сундуке зарытого клада, к которому ведёт карта сокровищ',
+  'hudChrome.reliquary.sourceActivityLanternHall':
+    'Покупается за печати Фонаря у интенданта Зала Фонаря',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     'Ветер принёс пепел с восточных дюн, а пустой песок пепла не носит. Хранительница гарнизонных складов записывает каждый дозор. Она заговорит, как только её кто-нибудь накормит.',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -1065,6 +1069,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunderstorm.name': 'Раскол бури',
   'entities.abilities.thunderstorm.description':
     'Призывает раскат грома, нанося {damage} урона от природы врагам в пределах 10 м и замедляя их на 50% на 5 сек. Восстанавливает 8% от максимального запаса маны. Урон растёт с силой заклинаний. (Стихии)',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    'Три контракта в неделю, вывешиваю после каждого сброса. Ни подписей, ни сборов: выполни один, и печати твои.',
+  'entities.npcs.contract_clerk_tobias_wren.name': 'Тобиас Рен',
+  'entities.npcs.contract_clerk_tobias_wren.title': 'Писарь контрактов',
   'entities.npcs.glider_apprentice.name': 'Скай',
   'entities.items.vanguard_druid_balance_chest.name': 'Жилет звёздного стража',
   'entities.items.vanguard_druid_balance_gloves.name': 'Перчатки звёздного стража',
@@ -2253,6 +2261,32 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': 'Закалённое углями',
   'hudChrome.wocStore.collections.hoarfrost': 'Иней',
   'hudChrome.wocStore.collections.fallen_star': 'Падшая звезда',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    'Гаррик Холт не продаст этот клинок чужаку. Он отдаёт его тем, кто неделю за неделей выполнял контракты Зала Фонаря, и каждый раз говорит одно и то же: фонарь в гарде зажжён от очага самого зала, так что куда бы вы его ни понесли, зал идёт с вами. Огонь в доле лишь украшение. Главное в нём обещание.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    'Широкий стальной клинок с долом, полным тлеющего огня фонаря, позолоченные щёчки, фонарь в клетке, горящий в гарде, рукоять из синей кожи.',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': 'Клинок Зала Фонаря',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': 'Пламя Очага',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    'Пламевидный клинок из воронёной стали с раскалёнными кромками, расплавленный шов ветвится по обеим сторонам, гарда из бронзовых языков пламени вокруг горящего камня, рукоять цвета бычьей крови.',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    'В Зале Фонаря есть очаг, который не гас с тех пор, как зал был построен, и Гаррик Холт клянётся, что этот клинок закаляли в его углях. Те, кто его носит, говорят, что рукоять остаётся тёплой в самый холодный дозор. Огонь вдоль кромок лишь украшение.',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': 'Гребень Шквала',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    'Длинный клинок цвета морской синевы с кромками, яркими, как разбивающаяся волна, грозовой дол с раздвоенной молнией, позолоченная волна над пятой клинка, плавник вдоль одной кромки и гарда из позолоченных бурунов вокруг грозовой жемчужины.',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    'Капитан, ходившая под парусом ради гильдии, привезла этот клинок из шквала, который сломал ей мачту и заставил корабль звенеть, как колокол. Гаррик продаёт его только за печати и предупреждает каждого покупателя, что перед бурей клинок гудит. Молния и морское сияние лишь украшение.',
+  'hudChrome.wocStore.skins.rimelight_staff.name': 'Посох Инейного Света',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    'Светлое древко, окованное серебром и обвитое светящимся инеем, увенчано серебряной лапой, что держит большой кристалл холодного света в короне ледяных осколков; с воротника свисают сосульки.',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    'Зимний дозор Зала Фонаря ходил с такими посохами по горной дороге, зажигая их навершия для путников, заблудившихся в снегу. Гаррик держит один на стойке для тех, у кого есть лишние печати. Иней и его холодный свет лишь украшение.',
+  'hudChrome.wocStore.skins.duskwick_staff.name': 'Посох Сумеречного Фитиля',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    'Две скрученные пряди чёрного дерева, окованные железом, увенчаны открытым железным фонарём, в котором между двумя загнутыми рогами горит фиолетовое сумеречное пламя; с его дна свисают цепи.',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    'Все фонари зала горят ярко, кроме одного. Сумеречное пламя зажгли, чтобы стеречь зал по ночам, и там, где другие дают свет, оно даёт тень; Гаррик сам подрезает его фитиль. Дым и фиолетовое сияние лишь украшение.',
+  'hudChrome.wocStore.collections.lantern_hall': 'Зал Фонаря',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Боевой меч с клеймом гильдии',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     'Клинок из воронёной стали, бронзовая гарда «рыбий хвост», рукоять из кожи, окрашенной в бирюзовый цвет, и небольшое клеймо гильдии.',
@@ -6491,6 +6525,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.spiritHealerAlive': 'Целитель душ оберегает мёртвых. Вы всё ещё среди живых.',
   'hudChrome.death.ghostHint':
     'Бегите к месту своей гибели или поговорите с Целителем душ, чтобы воскреснуть',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    'Печати на почести, друг. На моих полках нет ничего, что заточит клинок, но каждый зал Хайвотча узнает, где ты это заслужил.',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': 'Гаррик Холт',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': 'Интендант гильдии',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    'Ищешь отряд? У каждого склепа, бастиона и храма на этой карте есть имя в моём списке. Скажи, куда держишь путь.',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': 'Мира Фэйрвезер',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': 'Вербовщица гильдии',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    'Добро пожаловать в Зал Фонаря, {className}. Тобиас вывешивает контракты недели на доску, Гаррик меняет наши печати на почести, которые не стыдно носить, а Мира найдёт тебе отряд к любой двери под горой. Принеси трофей, и он повиснет в зале за моей спиной.',
+  'entities.npcs.guildmaster_hesper_dunmore.name': 'Геспер Данмор',
+  'entities.npcs.guildmaster_hesper_dunmore.title': 'Глава гильдии Зала Фонаря',
   'entities.npcs.spirit_healer.name': 'Целитель душ',
   'entities.npcs.spirit_healer.title': 'Хранитель мёртвых',
   'entities.npcs.spirit_healer.greeting':
@@ -14152,6 +14198,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
   'hudChrome.mounts.name_avian_strider': 'Изумрудный Долиноход',
   'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
+  'hudChrome.mounts.name_lantern_hall_destrier': 'Боевой конь Зала Фонаря',
   'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
   'hudChrome.mounts.desc_drakemaw_raptor':
     'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
@@ -14162,6 +14209,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Огромная верховая птица, чьи тяжёлые когти и сложенные крылья превращают любое путешествие в громоподобный бросок.',
   'hudChrome.mounts.desc_lanternback_troll':
     'Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    'Боевой конь Зала Фонаря в дубово-железной броне под синим сукном гильдии; два штормовых фонаря, качаясь у седла, освещают дорогу домой.',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     'Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
@@ -22246,6 +22295,96 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Перед удалением этого персонажа перенесите все незакреплённые карточки с отметками на другого персонажа.',
   'apiError.character.referral_bond_pending':
     'Этому персонажу доставляется облигация подписки за приглашение друга. Повторите попытку удаления после завершения доставки.',
+  'hudChrome.guildHall.title': 'Зал Фонаря',
+  'hudChrome.guildHall.close': 'Закрыть окно гильдии',
+  'hudChrome.guildHall.tabsLabel': 'Разделы Зала Фонаря',
+  'hudChrome.guildHall.tabs.contracts': 'Контракты',
+  'hudChrome.guildHall.tabs.quartermaster': 'Интендант',
+  'hudChrome.guildHall.seals': 'Печати Фонаря: {count}',
+  'hudChrome.guildHall.resetIn': 'Новые контракты через {time}',
+  'hudChrome.guildHall.resetSoon': 'Новые контракты после еженедельного сброса',
+  'hudChrome.guildHall.contractsIntro':
+    'Три контракта в неделю, одни и те же для всех искателей приключений королевства. Подписывать ничего не нужно: выполните контракт, и его печати сразу попадут в ваши сумки, раз в неделю.',
+  'hudChrome.guildHall.kinds.boss': 'Награда за голову',
+  'hudChrome.guildHall.kinds.heroic': 'Героическое прохождение',
+  'hudChrome.guildHall.kinds.task': 'Поручение',
+  'hudChrome.guildHall.goals.boss': 'Победите {boss} в подземелье «{dungeon}» на любой сложности.',
+  'hudChrome.guildHall.goals.heroic':
+    'Пройдите «{dungeon}» на героической сложности: победите {boss} на героической сложности.',
+  'hudChrome.guildHall.goals.task': '{task} («{dungeon}»)',
+  'hudChrome.guildHall.contractLabel': '{kind}: {dungeon}',
+  'hudChrome.guildHall.done': 'Выполнено на этой неделе',
+  'hudChrome.guildHall.open': 'Открыт',
+  'hudChrome.guildHall.lifetime': 'Выполнено контрактов: {count}',
+  'hudChrome.guildHall.emptyBoard': 'Доску переписывают. Возвращайтесь после еженедельного сброса.',
+  'hudChrome.guildHall.quartermasterIntro':
+    'Гаррик меняет печати Фонаря только на почести: звания, которые носят в Книге Деяний, облик меча гильдии и её боевого коня. Ничто здесь не сделает вас сильнее в бою.',
+  'hudChrome.guildHall.titleOffer': 'Звание: {title}',
+  'hudChrome.guildHall.titlePreview': 'Отображается как {preview}',
+  'hudChrome.guildHall.buy': 'Купить',
+  'hudChrome.guildHall.owned': 'Есть',
+  'hudChrome.guildHall.needSeals': 'Не хватает: {count}',
+  'hudChrome.guildHall.bought': 'Вы купили звание {title}. Выберите его в Книге Деяний.',
+  'hudChrome.guildHall.refused.owned': 'У вас это уже есть.',
+  'hudChrome.guildHall.refused.seals': 'У вас недостаточно печатей Фонаря.',
+  'hudChrome.guildHall.refused.bags': 'Ваши сумки полны.',
+  'hudChrome.guildHall.refused.riding': 'Сначала научитесь верховой езде.',
+  'hudChrome.guildHall.boughtSkin': 'Вы купили облик «{skin}». Примените его в окне косметики.',
+  'hudChrome.guildHall.boughtMount': 'Вы купили скакуна «{mount}». Поводья в ваших сумках.',
+  'hudChrome.guildHall.skinPreview':
+    'Меняет облик надетого меча у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.',
+  'hudChrome.guildHall.skinOffer': 'Облик меча: {skin}',
+  'hudChrome.guildHall.mountPreview':
+    'Наземный скакун: +{pct}% к скорости передвижения верхом. Требуется навык верховой езды.',
+  'hudChrome.guildHall.mountOffer': 'Скакун: {mount}',
+  'hudChrome.guildHall.refused.range': 'Чтобы торговать, встаньте рядом с интендантом.',
+  'hudChrome.guildHall.reward.one': '{count} печать Фонаря',
+  'hudChrome.guildHall.reward.few': '{count} печати Фонаря',
+  'hudChrome.guildHall.reward.many': '{count} печатей Фонаря',
+  'hudChrome.guildHall.reward.other': '{count} печати Фонаря',
+  'hudChrome.guildHall.contractDone.one':
+    'Контракт выполнен: {contract}. Вы получаете {count} печать Фонаря.',
+  'hudChrome.guildHall.contractDone.few':
+    'Контракт выполнен: {contract}. Вы получаете {count} печати Фонаря.',
+  'hudChrome.guildHall.contractDone.many':
+    'Контракт выполнен: {contract}. Вы получаете {count} печатей Фонаря.',
+  'hudChrome.guildHall.contractDone.other':
+    'Контракт выполнен: {contract}. Вы получаете {count} печати Фонаря.',
+  'hudChrome.guildHall.signSubtitle': 'Гильдия искателей приключений',
+  'hudChrome.guildHall.board.noticesLabel': 'Контракты этой недели',
+  'hudChrome.guildHall.board.weekProgress':
+    'На этой неделе: выполнено {done} из {total} контрактов',
+  'hudChrome.guildHall.board.weekProgressAria': 'Контракты, выполненные на этой неделе',
+  'hudChrome.guildHall.board.cardProgress': '{done}/{total} на этой неделе',
+  'hudChrome.guildHall.board.rewardLine': 'Награда: {reward}',
+  'hudChrome.guildHall.board.stamp': 'Скреплено',
+  'hudChrome.guildHall.board.sealsTip':
+    'Печати Фонаря выдаются за еженедельные контракты Зала Фонаря и тратятся только у интенданта Гаррика Холта. Они привязаны к вам.',
+  'hudChrome.guildHall.shop.stockLabel': 'Товары Гаррика Холта',
+  'hudChrome.guildHall.shop.kindMount': 'Скакун',
+  'hudChrome.guildHall.shop.kindSword': 'Облик меча',
+  'hudChrome.guildHall.shop.mountHeading': 'Вы в седле',
+  'hudChrome.guildHall.shop.skinHeading': 'В вашей руке',
+  'hudChrome.guildHall.shop.stageLabel': '3D-просмотр: {name}',
+  'hudChrome.guildHall.shop.stageUnavailable': '3D-просмотр недоступен на этом устройстве.',
+  'hudChrome.guildHall.shop.mountHowTo':
+    'После покупки поводья окажутся в ваших сумках. Используйте их, чтобы сесть верхом: конь ваш, пока поводья при вас.',
+  'hudChrome.guildHall.shop.mountOwned': 'Этот скакун уже ваш. Поводья в ваших сумках.',
+  'hudChrome.guildHall.shop.skinHowTo':
+    'После покупки примените облик в окне косметики. Он действует для всех персонажей вашей учетной записи.',
+  'hudChrome.guildHall.shop.skinOwned': 'Этот облик уже ваш. Примените его в окне косметики.',
+  'hudChrome.guildHall.shop.kindTitle': 'Звание',
+  'hudChrome.guildHall.shop.plateHeading': 'Ваша табличка с именем',
+  'hudChrome.guildHall.shop.howTo':
+    'После покупки выберите его в Книге Деяний, чтобы оно отображалось рядом с вашим именем.',
+  'hudChrome.guildHall.shop.cosmetic': 'Только внешний вид: характеристики не меняются.',
+  'hudChrome.guildHall.shop.price': 'Цена: {price}',
+  'hudChrome.guildHall.shop.have': 'У вас: {count}',
+  'hudChrome.guildHall.shop.ownedLong': 'Это звание уже ваше. Выберите его в Книге Деяний.',
+  'hudChrome.guildHall.shop.short.one': 'Нужна ещё {count} печать Фонаря.',
+  'hudChrome.guildHall.shop.short.few': 'Нужно ещё {count} печати Фонаря.',
+  'hudChrome.guildHall.shop.short.many': 'Нужно ещё {count} печатей Фонаря.',
+  'hudChrome.guildHall.shop.short.other': 'Нужно ещё {count} печати Фонаря.',
   'hudChrome.raidBossGuide.dungeonButton': 'Тактика: {dungeon}',
   'hudChrome.raidBossGuide.dungeonBossesLabel': 'Боссы подземелья',
   'hudChrome.raidBossGuide.rankMiniboss': 'Мини-босс',

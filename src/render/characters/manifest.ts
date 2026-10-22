@@ -3229,6 +3229,28 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12,
     lazyPreload: true,
   },
+  // Lantern Hall's war horse (scripts/assets/lantern_hall_steed/build_steed.py): a heavy
+  // draught-built destrier regrown on the valorsteed's rig (steed_body.py), playing its authored
+  // clips under oak-and-iron barding, sized well over its rider. Same gait refs as the horse it
+  // is built from (the clips are the same strides) scaled by the size ratio (4.25 / 3.8), so the
+  // longer legs take slower strides and the hooves keep their plant at the larger size.
+  mount_lantern_hall_destrier: {
+    url: `${MOUNTS_DIR}/lantern_hall_destrier.glb`,
+    height: 4.25,
+    // its own authored rear (build_steed.py author_rear), played as the flourish on a standing
+    // jump (render/mount_rear_core.ts), and its own backing-up walk (author_walkback)
+    clips: { ...MOUNT_RIGGED, flourish: 'Rear', walkBack: 'WalkBack' },
+    walkRef: 2.57,
+    // WalkBack reaches 1.5 times the walk's stride (build_steed.py STRIDE), so it matches at
+    // 1.5 times the walk's reference. A mounted backpedal runs at the sim's BACKPEDAL_MULT of the
+    // mount's speed (about 7.8 here), which would need twice the clip's cadence to plant every
+    // hoof; that read as pedalling. The cadence is capped near a calm walk instead and the
+    // hooves glide a little: a deliberate back-up, not a scramble.
+    walkBackRef: 3.86,
+    walkTimeScaleMax: 1.3,
+    runRef: 13.4,
+    lazyPreload: true,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,

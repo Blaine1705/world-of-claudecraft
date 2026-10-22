@@ -9287,6 +9287,15 @@ export type SimEvent = { pid?: number } & (
   | { type: 'worldQuestWeeklyChosen'; questId: string }
   | { type: 'worldQuestWeeklyProgress'; questId: string; count: number; required: number }
   | { type: 'worldQuestWeeklyDone'; questId: string }
+  // Lantern Hall, the Highwatch adventurers' guild (src/sim/guild_contracts.ts,
+  // src/sim/guild_quartermaster.ts, src/sim/highwatch_guild.ts): a resident opens the guild
+  // window on a tab or the Dungeon Finder; a contract paid its seals; a cosmetic was bought
+  // or refused. All personal (pid); the client owns every visible string.
+  | { type: 'guildHallOpen'; tab: 'contracts' | 'quartermaster' }
+  | { type: 'guildRecruiterOpen' }
+  | { type: 'guildContractDone'; contractId: string; seals: number }
+  | { type: 'guildCosmeticBought'; offerId: string }
+  | { type: 'guildCosmeticRefused'; offerId: string; reason: GuildCosmeticRefusal }
   /** A big on-screen line for a shared world-quest moment (the client owns the
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
@@ -13489,3 +13498,8 @@ export interface VehicleSession {
   origin: Vec3;
   encounter: CannonEncounterState;
 }
+
+/** Why Lantern Hall's quartermaster refused a purchase (src/sim/guild_quartermaster.ts): out of
+ *  reach, already owned, short of seals, the horse's reins to a rider who cannot ride yet, or
+ *  no bag room for the reins. The client owns every visible string. */
+export type GuildCosmeticRefusal = 'owned' | 'seals' | 'range' | 'riding' | 'bags';

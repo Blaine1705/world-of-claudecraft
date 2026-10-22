@@ -1208,6 +1208,15 @@ export const VOICE_ALIAS = {
   patron_grissel_sedgeworth: 'mother_sedge',
   patron_ned_oxley: 'provisioner_hale',
   patron_hester_quillby: 'chronicler_edda_hartwell',
+  // The Highwatch guild's four residents (src/sim/content/highwatch_guild.ts), each a ROLE
+  // match until an ElevenLabs key is available to design their own: the guildmaster, a
+  // capable woman handing out work, borrows the Reeve's; the clerk at his ledger the bursar's;
+  // the quartermaster at his counter the Heroic Quartermaster's; the recruiter, wry and
+  // weather-hardened, the pass watcher's.
+  guildmaster_hesper_dunmore: 'reeve_ottoline',
+  contract_clerk_tobias_wren: 'bursar_fernando',
+  guild_quartermaster_garrick_holt: 'heroic_quartermaster',
+  guild_recruiter_mira_fairweather: 'watcher_maren',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

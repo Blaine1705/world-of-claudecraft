@@ -24,6 +24,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipScaling': '物品等级{level}。始终比角色等级高5级。',
   'itemUi.tooltip.membershipRequired': '会员到期后，装备属性和套装加成会停用，续订后恢复。',
   'itemUi.tooltip.membershipDormant': '未激活：续订会员以恢复装备属性和套装加成。',
+  'entities.items.lantern_seal.name': '灯火印章',
+  'entities.items.reins_lantern_hall_destrier.name': '灯火大厅战马的缰绳',
   'entities.items.membership_staff.name': '万变法杖',
   'hudChrome.bags.membershipSlot': '会员背包栏位',
   'hudChrome.bags.membershipSlotLocked': '开通会员以解锁此背包栏位。',
@@ -454,6 +456,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至尊激流裹手',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '在埋藏宝藏的奖励宝箱中找到，即藏宝图所指引的宝库',
+  'hudChrome.reliquary.sourceActivityLanternHall': '在灯火大厅的军需官处用灯火印章购买',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '风从东边的沙丘吹来，带着灰烬，而空荡荡的沙地不会吹出灰烬。驻军仓库的塞拉记着每一次巡逻。只要有人给她带点吃的，她就会开口。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -1371,6 +1374,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '盐骸护肩',
   'entities.items.saltwrack_pauldrons.name': '盐骸肩甲',
   'entities.items.saltwrack_epaulets.name': '盐骸肩饰',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '每周三份契约，每次重置时张贴。无需签字，也不收费：完成一份，印章就归你了。',
+  'entities.npcs.contract_clerk_tobias_wren.name': '托拜厄斯·雷恩',
+  'entities.npcs.contract_clerk_tobias_wren.title': '契约文书',
   'entities.npcs.glider_apprentice.name': '斯凯',
   'devCommand.actions.hillend.description': '让当前山丘立即回落。',
   'devCommand.actions.hillend.label': '结束山丘',
@@ -2219,6 +2226,32 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': '余烬锻造',
   'hudChrome.wocStore.collections.hoarfrost': '白霜',
   'hudChrome.wocStore.collections.fallen_star': '陨星',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    '加里克·霍尔特不会把这把剑卖给陌生人。他只把它交给一周又一周履行灯火大厅契约的成员，每次都说同样的话：护手里的灯火取自大厅自己的炉膛，所以无论你把它带到哪里，大厅都与你同在。血槽里的火只是外观。重要的是承诺。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    '宽阔的钢制剑身，血槽中燃着灯火，镀金的护颊，护手中燃着一盏笼中提灯，蓝色皮革剑柄。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': '灯火大厅之剑',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火之刃',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '焦黑钢铁铸成的火焰波纹剑身，两侧刃口如出炉般炽热，熔融的裂缝在两面分叉蔓延，青铜火焰护手环绕一块燃烧的宝石，牛血色握柄。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '灯火大厅里有一座自大厅建成以来从未熄灭的炉膛，加里克·霍尔特发誓这把剑就是在它的炭火中淬火的。佩戴它的成员说，即使在最寒冷的守夜里，剑柄也依然温暖。刃口上的火焰只是外观。',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': '风暴浪峰',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '海蓝色的修长剑身，刃口如碎浪般明亮，风暴血槽中封着分叉的闪电，剑根上方是一道镀金的浪，一侧刃口生着鳍，镀金浪涛护手环绕一颗风暴珍珠。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '一位为公会出海的船长从一场狂风中带回了这把剑，那场风暴折断了她的桅杆，让整艘船像钟一样鸣响。加里克只肯用印章出售它，并提醒每位买家，风暴来临前它会嗡嗡作响。闪电与海光只是外观。',
+  'hudChrome.wocStore.skins.rimelight_staff.name': '霜光法杖',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '苍白的杖身以银箍束紧，缠绕着发光的雾凇，杖顶的银爪在冰晶之冠中托着一颗巨大的寒光水晶，杖颈垂着冰柱。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '灯火大厅的冬季守望者曾手持这样的法杖行走在高路上，点亮杖顶，为迷失在雪中的旅人引路。加里克在架上留了一根，给印章有余的成员。寒霜与冷光只是外观。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '暮芯法杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '两股扭结的黑木以铁箍束紧，杖顶是一盏敞开的铁提灯，在两只卷曲的角之间燃着紫色的暮光火焰，灯底垂着晃动的锁链。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '大厅里的每一盏灯都明亮地燃烧，只有一盏例外。暮光之焰是为在夜里守护大厅而点燃的，别的灯发出光的地方，它发出影子；加里克亲自修剪它的灯芯。烟雾与紫色光辉只是外观。',
+  'hudChrome.wocStore.collections.lantern_hall': '灯火大厅',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公会印记武装剑',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '发蓝钢剑刃、青铜鱼尾形十字护手、青绿色染皮握柄，以及一枚小巧的公会钢印。',
@@ -6190,6 +6223,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '确定吗？灵魂医者会在此复活你。你还不到10级，所以这次复活后遗症不会削弱你。',
   'hudChrome.death.spiritHealerAlive': '灵魂医者只看护逝者。你仍是生者。',
   'hudChrome.death.ghostHint': '跑回你死亡的地点，或与灵魂医者交谈以复活',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '用印章换荣誉，朋友。我的货架上没有能磨利刀刃的东西，但高望的每座大厅都会知道你是在哪里赢得的。',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': '加里克·霍尔特',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': '公会军需官',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '在找队伍吗？这张地图上的每座墓穴、堡垒和神殿都在我的名单上。告诉我你要去哪儿。',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': '米拉·费尔韦瑟',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': '公会招募官',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '欢迎来到灯火大厅，{className}。托拜厄斯把本周的契约贴在告示板上，加里克用我们的印章换取值得佩戴的荣誉，米拉能为你找到前往山下任何一扇门的队伍。带回一件战利品，它就会挂在我身后的大厅里。',
+  'entities.npcs.guildmaster_hesper_dunmore.name': '赫斯珀·邓莫尔',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '灯火大厅会长',
   'entities.npcs.spirit_healer.name': '灵魂医者',
   'entities.npcs.spirit_healer.title': '亡者的守护者',
   'entities.npcs.spirit_healer.greeting':
@@ -13272,6 +13317,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
   'hudChrome.mounts.name_avian_strider': '苍翠谷行者',
   'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
+  'hudChrome.mounts.name_lantern_hall_destrier': '灯火大厅战马',
   'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
@@ -13282,6 +13328,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。',
   'hudChrome.mounts.desc_lanternback_troll':
     '被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    '灯火大厅的战马，在公会的蓝色披布下披挂橡木与铁制马铠，鞍边摇曳的两盏风灯照亮归途。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
@@ -20763,6 +20811,88 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推荐奖励会员契约正在发放给此角色。请在发放完成后再尝试删除此角色。',
+  'hudChrome.guildHall.title': '灯火大厅',
+  'hudChrome.guildHall.close': '关闭公会窗口',
+  'hudChrome.guildHall.tabsLabel': '灯火大厅分页',
+  'hudChrome.guildHall.tabs.contracts': '契约',
+  'hudChrome.guildHall.tabs.quartermaster': '军需官',
+  'hudChrome.guildHall.seals': '灯火印章：{count}',
+  'hudChrome.guildHall.resetIn': '{time}后发布新契约',
+  'hudChrome.guildHall.resetSoon': '下次每周重置时发布新契约',
+  'hudChrome.guildHall.contractsIntro':
+    '每周三份契约，王国中的每位冒险者看到的都一样。无需签署：完成其中一份，它的印章就会直接放进你的背包，每周一次。',
+  'hudChrome.guildHall.kinds.boss': '悬赏',
+  'hudChrome.guildHall.kinds.heroic': '英雄通关',
+  'hudChrome.guildHall.kinds.task': '执行',
+  'hudChrome.guildHall.goals.boss': '在{dungeon}击败{boss}，难度不限。',
+  'hudChrome.guildHall.goals.heroic': '以英雄难度通关{dungeon}：在英雄难度下击败{boss}。',
+  'hudChrome.guildHall.goals.task': '{task}（{dungeon}）',
+  'hudChrome.guildHall.contractLabel': '{kind}：{dungeon}',
+  'hudChrome.guildHall.done': '本周已完成',
+  'hudChrome.guildHall.open': '进行中',
+  'hudChrome.guildHall.lifetime': '已完成契约：{count}',
+  'hudChrome.guildHall.emptyBoard': '告示板正在重写。请在每周重置后再来。',
+  'hudChrome.guildHall.quartermasterIntro':
+    '加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔、公会之剑的外观和公会的战马。这里没有任何东西能让你在战斗中变得更强。',
+  'hudChrome.guildHall.titleOffer': '头衔：{title}',
+  'hudChrome.guildHall.titlePreview': '显示为{preview}',
+  'hudChrome.guildHall.buy': '购买',
+  'hudChrome.guildHall.owned': '已拥有',
+  'hudChrome.guildHall.needSeals': '还需{count}枚',
+  'hudChrome.guildHall.bought': '你购买了头衔{title}。请在功绩之书中选择它。',
+  'hudChrome.guildHall.refused.owned': '你已经拥有它了。',
+  'hudChrome.guildHall.refused.seals': '你的灯火印章不足。',
+  'hudChrome.guildHall.refused.bags': '你的背包已满。',
+  'hudChrome.guildHall.refused.riding': '先学会骑术，再购买坐骑。',
+  'hudChrome.guildHall.boughtSkin': '你购买了外观{skin}。请在外观窗口中应用它。',
+  'hudChrome.guildHall.boughtMount': '你购买了{mount}。它的缰绳在你的背包里。',
+  'hudChrome.guildHall.skinPreview':
+    '改变你所装备的剑的样子，适用于账号中的所有角色。仅为外观：没有属性。',
+  'hudChrome.guildHall.skinOffer': '剑的外观：{skin}',
+  'hudChrome.guildHall.mountPreview': '地面坐骑：骑乘时移动速度+{pct}%。需要骑术训练。',
+  'hudChrome.guildHall.mountOffer': '坐骑：{mount}',
+  'hudChrome.guildHall.refused.range': '站到军需官身边才能交易。',
+  'hudChrome.guildHall.reward.one': '{count}枚灯火印章',
+  'hudChrome.guildHall.reward.few': '{count}枚灯火印章',
+  'hudChrome.guildHall.reward.many': '{count}枚灯火印章',
+  'hudChrome.guildHall.reward.other': '{count}枚灯火印章',
+  'hudChrome.guildHall.contractDone.one': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.contractDone.few': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.contractDone.many': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.contractDone.other': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.signSubtitle': '冒险者公会',
+  'hudChrome.guildHall.board.noticesLabel': '本周契约',
+  'hudChrome.guildHall.board.weekProgress': '本周：已完成{done}/{total}份契约',
+  'hudChrome.guildHall.board.weekProgressAria': '本周已完成的契约',
+  'hudChrome.guildHall.board.cardProgress': '本周 {done}/{total}',
+  'hudChrome.guildHall.board.rewardLine': '奖励：{reward}',
+  'hudChrome.guildHall.board.stamp': '已盖印',
+  'hudChrome.guildHall.board.sealsTip':
+    '灯火印章由灯火大厅的每周契约发放，只能在军需官加里克·霍尔特处使用。它们与你绑定。',
+  'hudChrome.guildHall.shop.stockLabel': '加里克·霍尔特的货品',
+  'hudChrome.guildHall.shop.kindMount': '坐骑',
+  'hudChrome.guildHall.shop.kindSword': '剑的外观',
+  'hudChrome.guildHall.shop.mountHeading': '你骑在马鞍上',
+  'hudChrome.guildHall.shop.skinHeading': '握在你手中',
+  'hudChrome.guildHall.shop.stageLabel': '{name}的3D预览',
+  'hudChrome.guildHall.shop.stageUnavailable': '此设备无法显示3D预览。',
+  'hudChrome.guildHall.shop.mountHowTo':
+    '购买后，它的缰绳会放入你的背包。使用缰绳即可骑乘；只要你留着缰绳，这匹马就是你的。',
+  'hudChrome.guildHall.shop.mountOwned': '你已拥有这匹坐骑。它的缰绳在你的背包里。',
+  'hudChrome.guildHall.shop.skinHowTo':
+    '购买后，请在外观窗口中应用它。它适用于你账号中的所有角色。',
+  'hudChrome.guildHall.shop.skinOwned': '你已拥有此外观。请在外观窗口中应用它。',
+  'hudChrome.guildHall.shop.kindTitle': '头衔',
+  'hudChrome.guildHall.shop.plateHeading': '你的名牌',
+  'hudChrome.guildHall.shop.howTo': '购买后，在功绩之书中选择它，即可与你的名字一同显示。',
+  'hudChrome.guildHall.shop.cosmetic': '仅限外观：不改变任何属性。',
+  'hudChrome.guildHall.shop.price': '价格：{price}',
+  'hudChrome.guildHall.shop.have': '你拥有{count}',
+  'hudChrome.guildHall.shop.ownedLong': '你已拥有此头衔。可在功绩之书中选择。',
+  'hudChrome.guildHall.shop.short.one': '你还需要{count}枚灯火印章。',
+  'hudChrome.guildHall.shop.short.few': '你还需要{count}枚灯火印章。',
+  'hudChrome.guildHall.shop.short.many': '你还需要{count}枚灯火印章。',
+  'hudChrome.guildHall.shop.short.other': '你还需要{count}枚灯火印章。',
   'hudChrome.raidBossGuide.dungeonButton': '首领指南：{dungeon}',
   'hudChrome.raidBossGuide.dungeonBossesLabel': '地下城首领',
   'hudChrome.raidBossGuide.rankMiniboss': '小首领',

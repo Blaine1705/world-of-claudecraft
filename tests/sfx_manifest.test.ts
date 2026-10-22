@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps release cues, Warrior recordings, hoard cues and the tavern bed in 394 keys', () => {
+  it('keeps release cues, Warrior recordings, hoard cues, the tavern bed and the destrier in 395 keys', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
     // Release inventory: 319 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
@@ -178,10 +178,11 @@ describe('buildManifest', () => {
     // it calls at the apex of a jump. Mount cues 34 -> 40; UI is unchanged.
     // The six Buried Hoard cues (the entrance open/hum pair and the four
     // tide-wave boss cues) bring that total to 393 (release/v0.44.0 merge
-    // into feature/buried-hoards), and the Mirefen tavern's
-    // room bed, amb_tavern, makes 394.
+    // into feature/buried-hoards), the Mirefen tavern's room bed, amb_tavern, makes 394,
+    // and the Lantern Hall Destrier's whinny as it rears (mount_neigh_lantern_hall_destrier,
+    // synthesized) makes 395, mount cues 41.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(394);
+    expect(keys.size).toBe(395);
     expect([...keys].filter((key) => key.startsWith('hoard_')).sort()).toEqual([
       'hoard_entrance_hum',
       'hoard_entrance_open',
@@ -199,7 +200,7 @@ describe('buildManifest', () => {
     expect(keys.has('piercing_howl')).toBe(true);
     expect([...keys].filter((key) => key.startsWith('ui_aura_'))).toHaveLength(20);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(92);
-    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(40);
+    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(41);
     expect(keys.has('ui_craft_cast')).toBe(true);
     expect(keys.has('ui_farm_plant')).toBe(true);
     expect(keys.has('ui_farm_harvest')).toBe(true);
@@ -292,7 +293,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(394);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(395);
     expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });

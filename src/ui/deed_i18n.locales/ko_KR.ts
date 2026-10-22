@@ -1159,4 +1159,31 @@ export const table: DeedLocaleTable = {
     name: '현행범',
     desc: '묻힌 보물에서 동전자루 좀도둑이 금화를 들고 도망치기 전에 처치하세요.',
   },
+  dgn_guild_first_contract: {
+    name: '계약 체결',
+    desc: '등불 회관의 주간 던전 계약을 하나 완수합니다.',
+  },
+  dgn_guild_ten_contracts: {
+    name: '게시판 단골',
+    desc: '등불 회관의 주간 던전 계약을 10개 완수합니다.',
+  },
+  dgn_guild_fifty_contracts: {
+    name: '계약 베테랑',
+    desc: '등불 회관의 주간 던전 계약을 50개 완수합니다.',
+  },
+  feat_guild_writ_runner: {
+    name: '영장 전령',
+    desc: '등불 회관의 병참관 개릭 홀트에게서 등불 인장 6개로 구입했습니다.',
+    title: '영장 전령',
+  },
+  feat_guild_hallsworn: {
+    name: '회관의 맹세자',
+    desc: '등불 회관의 병참관 개릭 홀트에게서 등불 인장 14개로 구입했습니다.',
+    title: '회관의 맹세자',
+  },
+  feat_guild_of_lantern_hall: {
+    name: '등불 회관의 일원',
+    desc: '등불 회관의 병참관 개릭 홀트에게서 등불 인장 24개로 구입했습니다.',
+    title: '등불 회관의 일원',
+  },
 };

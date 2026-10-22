@@ -131,6 +131,13 @@ const EXCLUSIONS = [
   // Fenbridge's painted buildings stood grand (fenbridge_layout.ts): the tree
   // the apothecary's back corner now stands on, past the hub's scatter-free ring.
   { x: 20.594, z: 335.37 },
+  // The Highwatch adventurers' guild (highwatch_layout.ts) at the old stable yard: every
+  // tree and rock on its pad, its yard or under its eaves.
+  { x: 101.428, z: 679.908 },
+  { x: 103.913, z: 707.165 },
+  { x: 113.21, z: 715.414 },
+  { x: 127.18, z: 687.533 },
+  { x: 129.304, z: 692.734 },
 ];
 
 /** Scatter keeps this far off the Mirefen tavern's walls (a trunk, a canopy or a rock

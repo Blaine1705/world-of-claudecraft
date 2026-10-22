@@ -383,11 +383,13 @@ describe('Book of Deeds webp icons', () => {
     // world-boss branch's three combat deeds append behind it: 322 live, still 289
     // painted, 33 pending, cmb_point_taken last.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(346);
+    // Lantern Hall's six join the pending set: 352 live, still 289 painted.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(352);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57 pending, Morthen's last.
-    expect(DEED_ART_PENDING_IDS).toHaveLength(57);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('dgn_morthen_candlelight');
+    // +6: Lantern Hall's three contract milestones and three quartermaster titles
+    expect(DEED_ART_PENDING_IDS).toHaveLength(63);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('feat_guild_of_lantern_hall');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);
