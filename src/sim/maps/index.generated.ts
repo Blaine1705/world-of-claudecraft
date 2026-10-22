@@ -13,6 +13,12 @@ export interface PublishedMapEntry {
 
 export const PUBLISHED_MAPS: readonly PublishedMapEntry[] = [
   {
+    slug: "eastbrook_and_mirefen_changes",
+    name: "Eastbrook and Mirefen changes",
+    seed: 20061,
+    load: async () => (await import('./eastbrook_and_mirefen_changes.generated')).loadPublishedMap(),
+  },
+  {
     slug: "eastbrook_rebuild",
     name: "Eastbrook Rebuild",
     seed: 20061,

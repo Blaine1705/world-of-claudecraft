@@ -226,7 +226,7 @@ describe('quest givers and quest NPCs follow the active world', () => {
     expect(centers).not.toContain(at(NPCS[npcId].pos));
   });
 
-  it('routes a ready quest to the moved turn-in NPC', () => {
+  it('routes a ready quest to the moved turn-in NPC when no live entity answers', () => {
     const quest = Object.values(QUESTS).find(
       (q) => NPCS[q.turnInNpcId] && !NPCS[q.turnInNpcId].dynamic,
     );
@@ -240,7 +240,7 @@ describe('quest givers and quest NPCs follow the active world', () => {
         { questId: quest.id, counts: quest.objectives.map(() => 0), state: 'ready' as const },
       ],
     ]);
-    expect(questMapLocation(quest.id, log)).toEqual({
+    expect(questMapLocation(quest.id, log, () => null)).toEqual({
       questId: quest.id,
       ...MOVED_NPC_POS,
     });

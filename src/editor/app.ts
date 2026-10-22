@@ -395,6 +395,7 @@ import {
   newCustomMap,
   newFlatCustomMap,
   promotedSceneryFor,
+  zoneGraveyards,
 } from './custom_map';
 import {
   applyCutChange,
@@ -428,6 +429,7 @@ import {
   splitCampIntoIndividuals,
   toggledMobSelection,
 } from './entity_edit_core';
+import { type EntityPasteHost, pasteMobs, pasteNpcs } from './entity_paste';
 import {
   bundleDependencyRefs,
   ExportCompatibilityError,
@@ -572,8 +574,6 @@ import {
   copyNpcSelection,
   copyPlacementSelection,
   marqueePlacementSelection,
-  pasteCampSelection,
-  pasteNpcSelection,
   pastePlacementSelection,
   toggledKeySelection,
 } from './selection_clipboard';
@@ -1546,6 +1546,9 @@ export class EditorApp {
   /** Pixels dragged since the 2D paint press; gates jitter, see pointermove. */
   private paint2dDragPx = 0;
   private cursorWorld: Vec2 | null = null;
+  /** The ground under the cursor in the 3D view (null off the map): where a
+   *  pasted mob or NPC group lands. */
+  private hover3dWorld: Vec2 | null = null;
   private canvasDirty = true;
 
   private readonly io = new MapIO();
@@ -2389,6 +2392,11 @@ export class EditorApp {
     // Moved gameplay objects: the same frozen record the document holds, so
     // the viewport's Sim, colliders and renderer read the live edits.
     if (map.objectMoves) world.objectMoves = map.objectMoves;
+    // The zone graveyards the viewport's Sim spawns its Spirit Healers at: the
+    // active content must carry the same record (sim.ts world invariant), or
+    // the collider build's healer-spot veto forks from the Sim's.
+    const graveyards = zoneGraveyards(world.zones);
+    if (graveyards.length > 0) world.services = { graveyards };
     if (map.blockers) world.blockers = map.blockers;
     if (map.caves) world.caves = map.caves;
     if (map.holes) world.holes = map.holes;
@@ -3878,6 +3886,7 @@ export class EditorApp {
   }
 
   private hover3d(w: Vec2 | null): void {
+    this.hover3dWorld = w ? { x: w.x, z: w.z } : null;
     if (this.tool === 'building') {
       if (w) this.buildingWorkspace.hover(w);
       return;
@@ -14106,57 +14115,70 @@ export class EditorApp {
       this.toasts.success(t('editor.status.selectionPasted', { count: added }));
       return;
     }
+    // Mobs and NPCs land centred on the cursor (entity_paste.ts) and update
+    // the editor in place, never with a whole-world reload.
+    const target = this.hover3dWorld ?? this.cursorWorld;
     if (clipboard.kind === 'mobs') {
-      const room = capRoom(this.camps().length, MAX_CAMPS);
-      const accepted = pasteCampSelection(clipboard.items.slice(0, room), 2, 2);
-      if (accepted.length < clipboard.items.length) {
-        this.toasts.error(t('editor.status.entityCapReached'));
-      }
-      if (accepted.length === 0) return;
-      const start = appendSpan(this.camps(), accepted);
       this.clearMobSelection();
+      const done = pasteMobs(this.entityPasteHost(), clipboard.items, target, MAX_CAMPS);
+      if (!done || done.capped) this.toasts.error(t('editor.status.entityCapReached'));
+      if (!done) return;
       this.map.meta.updatedAt = now();
-      this.refreshEntityWorld();
-      this.pushUndo({
-        label: 'paste-mobs',
-        undo: () => {
-          removeSpan(this.camps(), start, accepted);
-          this.refreshEntityWorld();
-        },
-        redo: () => {
-          this.camps().push(...accepted);
-          this.refreshEntityWorld();
-        },
-      });
+      this.pushUndo({ label: 'paste-mobs', undo: done.undo, redo: done.redo });
       this.inspector.refresh();
-      this.toasts.success(t('editor.status.selectionPasted', { count: accepted.length }));
+      this.toasts.success(t('editor.status.selectionPasted', { count: done.count }));
       return;
     }
 
-    const npcs = this.map.content.npcs as Record<string, NpcDef>;
-    const room = capRoom(Object.keys(npcs).length, MAX_NPCS);
-    const accepted = pasteNpcSelection(npcs, clipboard.items.slice(0, room), 2, 2);
-    if (accepted.length < clipboard.items.length) {
-      this.toasts.error(t('editor.status.entityCapReached'));
-    }
-    if (accepted.length === 0) return;
-    const insert = (): void => {
-      for (const { key, npc } of accepted) npcs[key] = npc;
-      this.selectedNpcKeys = new Set(accepted.map(({ key }) => `npc:${key}`));
-      this.selectedKey = `npc:${accepted[accepted.length - 1].key}`;
-      this.refreshEntityWorld();
+    const done = pasteNpcs(this.entityPasteHost(), clipboard.items, target, MAX_NPCS);
+    if (!done || done.capped) this.toasts.error(t('editor.status.entityCapReached'));
+    if (!done) return;
+    const select = (): void => {
+      this.selectedNpcKeys = new Set(done.keys.map((key) => `npc:${key}`));
+      this.selectedKey = `npc:${done.keys[done.keys.length - 1]}`;
+      this.viewport3d?.setSelectedRuntimeNpcs(this.selectedNpcKeys);
     };
-    const remove = (): void => {
-      for (const { key } of accepted) delete npcs[key];
-      this.selectedKey = null;
-      this.clearNpcSelection();
-      this.refreshEntityWorld();
-    };
-    insert();
+    select();
     this.map.meta.updatedAt = now();
-    this.pushUndo({ label: 'paste-npcs', undo: remove, redo: insert });
+    this.pushUndo({
+      label: 'paste-npcs',
+      undo: () => {
+        this.selectedKey = null;
+        this.clearNpcSelection();
+        done.undo();
+      },
+      redo: () => {
+        done.redo();
+        select();
+      },
+    });
     this.inspector.refresh();
-    this.toasts.success(t('editor.status.selectionPasted', { count: accepted.length }));
+    this.toasts.success(t('editor.status.selectionPasted', { count: done.count }));
+  }
+
+  /** The in-place camp and NPC updates a mob or NPC paste runs through. */
+  private entityPasteHost(): EntityPasteHost {
+    return {
+      camps: () => this.camps(),
+      npcs: () => this.map.content.npcs as Record<string, NpcDef>,
+      campsChanged: () => this.afterCampsChanged(),
+      npcAdded: (npc) => {
+        this.viewport3d?.addMapNpc(npc);
+        this.afterNpcListChanged();
+      },
+      npcRemoved: (id) => {
+        this.viewport3d?.removeMapNpc(id);
+        this.afterNpcListChanged();
+      },
+    };
+  }
+
+  /** An NPC joined or left the map: refresh the handles, not the 3D world. */
+  private afterNpcListChanged(): void {
+    this.entities = buildEntities(this.content);
+    this.base = snapshot(this.entities);
+    this.canvasDirty = true;
+    this.markDirty();
   }
 
   private duplicateSelectedPlacement(): void {

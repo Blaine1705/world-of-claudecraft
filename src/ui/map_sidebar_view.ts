@@ -8,7 +8,11 @@ import { type QuestProgress, questObjectiveRequired } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { ownEntry } from './known_item';
 import { questNumbersByLog } from './map_quest_list_view';
-import { type QuestMapLocation, questMapLocation } from './quest_map_location_core';
+import {
+  liveNpcPosLookup,
+  type QuestMapLocation,
+  questMapLocation,
+} from './quest_map_location_core';
 
 export type MapAtlasFilterId = 'quests' | 'gather' | 'dungeons' | 'services' | 'players';
 
@@ -64,7 +68,7 @@ export interface MapSidebarView {
 }
 
 export interface MapSidebarViewInput {
-  world: Pick<IWorld, 'player' | 'questLog' | 'questState'>;
+  world: Pick<IWorld, 'player' | 'questLog' | 'questState' | 'entities'>;
   zone: ZoneDef;
   filters: Readonly<MapAtlasFilters>;
   selectedQuestId: string | null;
@@ -218,6 +222,10 @@ export function buildMapSidebarView(input: MapSidebarViewInput): MapSidebarView 
     quests,
     nearby: nearbyQuests(input),
     selectedQuestId,
-    route: questMapLocation(selectedQuestId, input.world.questLog),
+    route: questMapLocation(
+      selectedQuestId,
+      input.world.questLog,
+      liveNpcPosLookup(input.world.entities),
+    ),
   };
 }

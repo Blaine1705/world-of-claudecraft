@@ -542,12 +542,23 @@ describe('walking into the walk-in Highwatch buildings', () => {
     }
   });
 
-  it('stands the floors of the built-in world, never of the Studio map', () => {
+  it('leaves promoted Highwatch floors to the Studio map placements', () => {
     const paths = townWalkInPlacements(BUILTIN_WORLD).map((placement) => placement.path);
     for (const building of BUILDINGS.filter((candidate) => candidate.walkIn)) {
       expect(paths).toContain(building.assetId);
     }
-    expect(townWalkInPlacements(loadPublishedMap())).toEqual([]);
+    // Other unpromoted towns reuse the Highwatch models. Only this town's
+    // layout records stand down; matching the asset path alone is too broad.
+    expect(
+      townWalkInPlacements(loadPublishedMap()).filter((placement) =>
+        BUILDINGS.some(
+          (building) =>
+            building.assetId === placement.path &&
+            building.placement.x === placement.x &&
+            building.placement.z === placement.z,
+        ),
+      ),
+    ).toEqual([]);
   });
 });
 

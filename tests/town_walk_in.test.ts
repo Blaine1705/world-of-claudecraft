@@ -166,7 +166,11 @@ describe('the walk-in town placement', () => {
         promotedScenery: { authoredTowns: true, highwatchTown: true, paintedTowns: true },
       } as WorldContent),
     ).toEqual([]);
-    expect(townWalkInPlacements(loadPublishedMap())).toEqual([]);
+    // The published map promotes the three original towns, but leaves the
+    // other painted towns as built-in records with their own walk-in floors.
+    expect(townWalkInPlacements(loadPublishedMap()).map((p) => p.path)).toEqual(
+      PAINTED_WALK_IN_PATHS,
+    );
   });
 
   it('collides exactly as the same model placed in Studio', () => {

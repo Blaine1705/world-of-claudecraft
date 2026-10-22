@@ -1388,31 +1388,8 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     setActiveWorldContent(BUILTIN_WORLD);
     const rebuilt = new Sim({ seed: stabilitySeed, playerClass: 'warrior', noPlayer: true });
 
-    // The Weekly Vault's terrain pad is a built-in-world rule
-    // (sim/eastbrook_vault_terrain.ts gates on isBuiltinWorldActive), so the
-    // legacy fixture, a custom content object, can never carry it. The vault
-    // stands against the bank at the harbour end of the main street now (the
-    // World of ClaudeCraft Studio map's arrangement), and its pad apron
-    // reaches three of the freight yard's crates beside it, which seat on the
-    // pad in the rebuilt world and on the bare ground in the fixture, the
-    // pad's own lift and nothing else. So a spawn point standing on the pad is
-    // compared without its ground height (everything else about the entity
-    // still is), and the row below the first comparison pins that those
-    // crates are the ONLY projected entities this covers. Same reach as the
-    // pad.
-    const onVaultTerrainPad = (point: { x: number; z: number }): boolean => {
-      const hall = EASTBROOK_LAYOUT.weeklyVault;
-      const dx = point.x - hall.x;
-      const dz = point.z - hall.z;
-      const lx = dx * Math.cos(hall.rot) - dz * Math.sin(hall.rot);
-      const lz = dx * Math.sin(hall.rot) + dz * Math.cos(hall.rot);
-      return (
-        Math.hypot(
-          Math.max(0, Math.abs(lx) - hall.w / 2 - 0.5),
-          Math.max(0, -hall.d / 2 - 0.5 - lz, lz - hall.d / 2 - 3.5),
-        ) < 4
-      );
-    };
+    // The freight yard moved clear of the Weekly Vault's terrain pad.
+    // Both worlds now compare every spawn height as well as its x/z position.
     const stableProjection = (sim: Sim) =>
       [...sim.entities.values()]
         .filter((entity) => entity.kind === 'mob' || entity.kind === 'object')
@@ -1437,24 +1414,12 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
           level: entity.level,
           dead: entity.dead,
           hp: entity.hp,
-          spawnPos: onVaultTerrainPad(entity.spawnPos)
-            ? { x: entity.spawnPos.x, z: entity.spawnPos.z }
-            : entity.spawnPos,
+          spawnPos: entity.spawnPos,
           wanderTarget: entity.wanderTarget,
           wanderTimer: entity.wanderTimer,
           respawnTimer: entity.respawnTimer,
         }));
     expect(stableProjection(rebuilt)).toEqual(stableProjection(legacy));
-    expect(
-      stableProjection(rebuilt)
-        .filter((row) => !('y' in row.spawnPos))
-        .map((row) => row.templateId),
-      'projected entities standing on the vault terrain pad',
-    ).toEqual([
-      'ground_eastbrook_freight_crate',
-      'ground_eastbrook_freight_crate',
-      'ground_eastbrook_freight_crate',
-    ]);
     expect(rebuilt.postOffice.mailboxIds).toEqual(legacy.postOffice.mailboxIds);
     expect(rebuilt.entities.get(rebuilt.postOffice.mailboxIds[0])?.pos).toMatchObject({
       x: EASTBROOK_LAYOUT.services.mailbox.position.x,

@@ -18345,7 +18345,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professionTrainers.mining': '採鉱のトレーナー',
   'hudChrome.professionTrainers.hobby': '趣味のトレーナー',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
+    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそば、波止場に掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、そのレーンが体の動かし方を全部教えてくれる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
@@ -18490,7 +18490,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
   'entities.npcs.wayfarer_bryn.title': '港の案内人',
   'entities.npcs.wayfarer_bryn.greeting':
-    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。レイヴンポストの郵便柱のそばの渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。波止場の渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
   'entities.npcs.instructor_maren.name': '教官マレン',
   'entities.npcs.instructor_maren.title': '修練の師',
   'entities.npcs.instructor_maren.greeting':

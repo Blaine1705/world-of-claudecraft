@@ -524,7 +524,16 @@ describe('walking into the walk-in Fenbridge buildings', () => {
       fenbridgePaths.has(placement.path),
     );
     expect(builtIn).toHaveLength(4);
-    expect(townWalkInPlacements(loadPublishedMap())).toEqual([]);
+    expect(
+      townWalkInPlacements(loadPublishedMap()).filter((placement) =>
+        BUILDINGS.some(
+          (building) =>
+            building.assetId === placement.path &&
+            building.placement.x === placement.x &&
+            building.placement.z === placement.z,
+        ),
+      ),
+    ).toEqual([]);
   });
 });
 

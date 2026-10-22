@@ -424,7 +424,10 @@ describe('generated chunk geometry is stable', () => {
     // slope. Checked against the dense height atlas re-minted in the same
     // commit: 13 points move, all within 17 yd of an old crate spot, by at
     // most 2.7 yd. Measured on the merged tree, twice in separate processes.
-    expect(digestOf(inRect)).toBe('b7dff740a0ac6d2381c7ad9759f01364');
+    // Re-minted for the freight yard and ferry bell moving to the quay. The
+    // dense height atlas changes at 74 of 167,188 samples, all within 5.93 yd
+    // of an old or new object position (maximum height delta 2.84 yd).
+    expect(digestOf(inRect)).toBe('3d621f9335e944b43575c00e60652941');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

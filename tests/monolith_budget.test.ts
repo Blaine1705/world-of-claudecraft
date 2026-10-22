@@ -1285,7 +1285,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
     // (bound straight into the context and the motion deps), paying for the sitOnSeat and
     // resting delegates. Exact count.
-    ceiling: 11594,
+    // LOWERED to 11587 by /unstuck on custom maps: the world's graveyards and
+    // player start became ctx views spirit.ts defaults to, so both
+    // releasePlayerSpirit call sites dropped their explicit arguments. Exact count.
+    ceiling: 11587,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
