@@ -13,9 +13,8 @@
 //   - the marsh fog, ONE instanced draw of soft noise-broken puffs pouring out
 //     of the court, down the causeway and lying in the hollows;
 //   - the gate sprites, ONE instanced additive draw: the rosette's pale core
-//     and its shafts, the beacon's shaft through the portcullis bars, the beam
-//     over the towers, the drips and their rings, the marsh lights, the glow
-//     on the wet threshold.
+//     and its shafts, the beacon's shaft through the portcullis bars, the
+//     drips and their rings, the marsh lights, the glow on the wet threshold.
 // Pure placement and motion math lives in sunken_bastion_entrance_core.ts;
 // what collides is src/sim/sunken_bastion_entrance.ts.
 //
@@ -82,7 +81,7 @@ export const sunkenBastionEntrancePreloadInternalsForTest = { urls: [...URLS] };
 
 export const BASTION_PASSAGE_PROGRAM_CACHE_KEY = 'sunken-bastion-flooded-passage-v2';
 export const BASTION_FOG_PROGRAM_CACHE_KEY = 'sunken-bastion-marsh-fog-v2';
-export const BASTION_SPRITE_PROGRAM_CACHE_KEY = 'sunken-bastion-gate-sprites-v4';
+export const BASTION_SPRITE_PROGRAM_CACHE_KEY = 'sunken-bastion-gate-sprites-v5';
 
 export interface SunkenBastionEntranceView {
   group: THREE.Group;
@@ -567,9 +566,8 @@ function marshFog(
 
 let spriteMat: THREE.MeshBasicMaterial | null = null;
 
-// Mirrors bastionSpritePose and bastionBeaconDirection. Kinds: 0 rosette
-// core, 1 rosette shaft, 2 gate shaft, 3 sky beam, 4 drip, 5 ring, 6 marsh
-// light, 7 threshold pool, 8 mouth glow.
+// Mirrors bastionSpritePose. Kinds: 0 rosette core, 1 rosette shaft, 2 gate
+// shaft, 4 drip, 5 ring, 6 marsh light, 7 threshold pool, 8 mouth glow.
 const SPRITE_VERTEX = `float bK = aK.z;
 float bTm = uTime * uBastion.y;
 float bN = uBastion.x;
@@ -579,13 +577,9 @@ vec2 bQ = position.xy;
 float bA = 1.0;
 vec4 mvPosition;
 vBastU = vec2(bQ.x, bQ.y + 0.5);
-if (bK > 0.5 && bK < 3.5) {
+if (bK > 0.5 && bK < 2.5) {
   // a shaft: a quad along its own axis, turned about it to face the eye
   vec3 dir = aD.xyz;
-  if (bK > 2.5) {
-    float bearing = mix(2.3, 6.2831853 * fract(bTm / ${fx(BASTION_BEACON.period)}), uBastion.y);
-    dir = vec3(sin(bearing) * ${fx(Math.cos(BASTION_BEACON.pitch))}, ${fx(Math.sin(BASTION_BEACON.pitch))}, -cos(bearing) * ${fx(Math.cos(BASTION_BEACON.pitch))});
-  }
   float u = bQ.y + 0.5;
   vec3 foot = (modelMatrix * vec4(bC, 1.0)).xyz;
   vec3 toEye = normalize(cameraPosition - (foot + dir * aK.w * 0.5));
@@ -597,8 +591,7 @@ if (bK > 0.5 && bK < 3.5) {
   mvPosition = modelViewMatrix * vec4(bC, 1.0);
   mvPosition.xyz += mat3(viewMatrix) * (dir * (aK.w * u) + side * (bQ.x * mix(aS.w, aD.w, u)));
   if (bK < 1.5) bA = bN * (0.7 + 0.3 * sin(bTm * 0.5 + aK.x * 6.2831853));
-  else if (bK < 2.5) bA = bPulse * bPulse * bPulse * (0.55 + 0.45 * bN);
-  else bA = 0.3 + 0.7 * bN;
+  else bA = bPulse * bPulse * bPulse * (0.55 + 0.45 * bN);
   // seen end on a shaft has no side to show: it fades instead of folding;
   // and a shaft is for the eye outside it, so it stands down at its own foot
   bA *= smoothstep(0.06, 0.45, sl) * smoothstep(3.0, 11.0, distance(cameraPosition, foot));
@@ -643,7 +636,7 @@ if (bK > 0.5 && bK < 3.5) {
 }
 // what hangs on the gatehouse (the rosette's light, the shafts in the arch,
 // the drips off the spikes) goes with it when it is the camera's ghost
-if (bK < 2.5 || (bK > 3.5 && bK < 4.5)) bA *= uBastGhost;
+if (bK < 4.5) bA *= uBastGhost;
 vBastQ = bQ;
 vBastS = vec3(bK, bA, bTm);
 gl_Position = projectionMatrix * mvPosition;`;
@@ -653,25 +646,19 @@ float bKind = vBastS.x;
 vec3 bCol;
 float bAl;
 float bR = clamp(1.0 - length(bQ) * 2.0, 0.0, 1.0);
-if (bKind > 0.5 && bKind < 3.5) {
+if (bKind > 0.5 && bKind < 2.5) {
   float across = max(1.0 - 4.0 * vBastU.x * vBastU.x, 0.0);
   float v = vBastU.y;
   if (bKind < 1.5) {
     bCol = vec3(0.32, 0.58, 1.0) * 0.2;
     bAl = across * across * smoothstep(0.0, 0.1, v) * pow(max(1.0 - v, 0.0), 1.6);
-  } else if (bKind < 2.5) {
+  } else {
     // the portcullis bars stand in the light: their shadows ride the shaft
     // a shaft in the haze: no edge, thick at its heart, uneven down its
     // length, gone well before its tip (the real bars in front of it cut it)
     float haze = 0.7 + 0.3 * sin(v * 9.0 + vBastS.z * 0.8 + vBastU.x * 3.0);
     bCol = vec3(0.2, 1.0, 0.5) * 0.7;
     bAl = across * across * across * haze * smoothstep(0.0, 0.2, v) * pow(max(1.0 - v, 0.0), 2.0);
-  } else {
-    // a lighthouse beam through marsh haze: no edge, thinning to nothing,
-    // the dust in it drifting down its length
-    float dust = 0.72 + 0.28 * sin(v * 34.0 - vBastS.z * 0.7 + vBastU.x * 5.0) * sin(v * 9.0 + vBastS.z * 0.23);
-    bCol = vec3(0.16, 1.0, 0.5) * 0.42;
-    bAl = across * across * across * dust * smoothstep(0.0, 0.1, v) * pow(max(1.0 - v, 0.0), 2.2);
   }
 } else if (bKind < 0.5) {
   float heart = clamp(1.0 - length(bQ) * 6.0, 0.0, 1.0);

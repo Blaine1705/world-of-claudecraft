@@ -3,20 +3,23 @@
 // everything: the Fogbeacon's turn. Somewhere inside the drowned keep the
 // beacon still sweeps; once a turn its light comes down the flooded passage
 // behind the door, and for a second the black water lights, a green shaft
-// pours out through the portcullis bars, the fog on the causeway glows and
-// the beam passes over the towers. Between turns the gate only breathes.
+// pours out through the portcullis bars and the fog on the causeway glows.
+// Between turns the gate only breathes. The beam itself is never drawn out
+// here: its light stays in the gate, so nothing of it rises through the
+// knoll behind the door or sweeps the marsh.
 //
 // This module holds: that clock, the virtual flooded passage the door's
 // window shader traces (so the water, its walls, the drowned inner grille and
 // the far light keep true parallax), the marsh fog's puffs, and the additive
-// sprites (the rosette's pale core and its shafts, the gate shaft, the sky
-// beam, the drips and their rings, the marsh lights, the glow on the wet
-// threshold). src/render/sunken_bastion_entrance.ts is the thin painter and
-// its shaders evaluate THESE formulas on the GPU. Every value is door-local:
+// sprites (the rosette's pale core and its shafts, the gate shaft, the drips
+// and their rings, the marsh lights, the glow on the wet threshold).
+// src/render/sunken_bastion_entrance.ts is the thin painter and its shaders
+// evaluate THESE formulas on the GPU. Every value is door-local:
 // lx = x - door.x (+x WEST), lz = z - door.z (+z NORTH), y above the door's
 // terrain height. Cosmetic only: nothing here is a telegraph, the door stays
 // a click box and a nameplate on every tier, and the effects tier only thins
-// the fog, the drips and the marsh lights.
+// the fog, the drips and the marsh lights and sheds the rosette's shafts and
+// the puddle rings on low.
 import { globalDayness } from './day_night_core';
 import { OCCLUDER_FADE_ALPHA } from './occluder_fade_core';
 
@@ -60,34 +63,7 @@ export const BASTION_BEACON = {
   breath: 0.04,
   /** The still value under reduced motion. */
   still: 0.45,
-  /** The sky beam's foot, hidden behind the knoll north of the gate, its
-   *  climb, its reach and its width at foot and tip. */
-  lx: -5,
-  y: -4,
-  lz: 44,
-  pitch: 0.3,
-  length: 170,
-  width0: 1.6,
-  width1: 9,
 } as const;
-
-/** The beam's bearing at a time (radians, 0 pointing SOUTH down the road at
- *  whoever climbs it, turning by way of the west). */
-export function bastionBeaconBearing(time: number, motion: number): number {
-  return TAU * fract((time * motion) / BASTION_BEACON.period);
-}
-
-/** The beam's unit direction (door-local x, y, z) at a bearing. */
-export function bastionBeaconDirection(
-  bearing: number,
-  out: { x: number; y: number; z: number },
-): { x: number; y: number; z: number } {
-  const c = Math.cos(BASTION_BEACON.pitch);
-  out.x = Math.sin(bearing) * c;
-  out.y = Math.sin(BASTION_BEACON.pitch);
-  out.z = -Math.cos(bearing) * c;
-  return out;
-}
 
 /**
  * How much of the beacon's light stands in the gate at a time, 0 to 1: a low
@@ -479,6 +455,7 @@ export function bastionFogStrength(night: number): number {
 
 // ---- the additive sprites ------------------------------------------------------------
 
+/** The painter's shaders branch on these numbers (3 is unused). */
 export const BASTION_SPRITE_KIND = {
   /** The rosette's pale core: a soft disc that never goes out. */
   roseCore: 0,
@@ -486,8 +463,6 @@ export const BASTION_SPRITE_KIND = {
   roseShaft: 1,
   /** The beacon's light through the gate, cut by the portcullis bars. */
   gateShaft: 2,
-  /** The beam over the towers. */
-  skyBeam: 3,
   /** A drop falling from the portcullis or an arch. */
   drip: 4,
   /** The ring where it lands (lies on the ground). */
@@ -496,8 +471,8 @@ export const BASTION_SPRITE_KIND = {
   marshLight: 6,
   /** The green pool on the wet threshold (lies on the ground). */
   pool: 7,
-  /** A glow of the beacon's light seen down its own length: in the door's
-   *  mouth behind the bars, and over the knoll when the beam bears on the road. */
+  /** A glow of the beacon's light seen down its own length, in the door's
+   *  mouth behind the bars. */
   mouth: 8,
 } as const;
 export type BastionSpriteKind = (typeof BASTION_SPRITE_KIND)[keyof typeof BASTION_SPRITE_KIND];
@@ -596,8 +571,7 @@ export function bastionDripFallTime(fall: number): number {
  * own height (the painter passes the sim's terrainHeight), so drops land and
  * rings lie where the ground really is. The door's own cues (the core, the
  * mouth glow, the pool, the gate shaft) draw on every tier; the tier thins
- * the drips and the marsh lights and drops the sky beam and the rosette's
- * shafts on low.
+ * the drips and the marsh lights and drops the rosette's shafts on low.
  */
 export function bastionSprites(
   tier: BastionEffectsTier,
@@ -694,28 +668,6 @@ export function bastionSprites(
         phase: fract(i * 0.38196601125 + 0.5),
       });
     }
-    out.push({
-      ...base,
-      kind: K.skyBeam,
-      x: BASTION_BEACON.lx,
-      y: BASTION_BEACON.y,
-      z: BASTION_BEACON.lz,
-      size: BASTION_BEACON.width0,
-      spread: BASTION_BEACON.width1,
-      range: BASTION_BEACON.length,
-    });
-    // The beam end on: the sky over the knoll flares when it bears on the road.
-    out.push({
-      ...base,
-      kind: K.mouth,
-      x: BASTION_BEACON.lx,
-      y: 9,
-      z: 16,
-      size: 26,
-      phase: 0.6,
-      range: 0.85,
-      spread: 0,
-    });
   }
   // Drips: every other source on low, all of them above; each with its ring.
   const step = rank === 0 ? 3 : rank === 1 ? 2 : 1;
@@ -787,10 +739,10 @@ export interface BastionSpritePose {
 }
 
 /**
- * Where a point-like sprite is and how bright (the shafts and the beam are
- * placed by their own axis in the shader): the painter's vertex shader runs
- * the same formula. night in [0, 1] (bastionNightAmount), motion 1 or 0, pulse
- * the gate pulse of the same instant.
+ * Where a point-like sprite is and how bright (the shafts are placed by their
+ * own axis in the shader): the painter's vertex shader runs the same formula.
+ * night in [0, 1] (bastionNightAmount), motion 1 or 0, pulse the gate pulse of
+ * the same instant.
  */
 export function bastionSpritePose(
   s: BastionSprite,
@@ -846,8 +798,6 @@ export function bastionSpritePose(
     case K.gateShaft:
       out.alpha = pulse * pulse * pulse * (0.55 + 0.45 * night);
       break;
-    default:
-      out.alpha = 0.3 + 0.7 * night;
   }
   return out;
 }
