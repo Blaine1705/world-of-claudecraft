@@ -15,15 +15,16 @@ table) are kept clear. Original procedural work for this project; no imported me
 """
 import math
 
-from manor_furnish import (barrel, bench, candelabrum, candle, chair, chandelier, goblet, plate, rug, sconce,
-                           shield, sword, table, weapon_rack)
-from manor_furnish import banner as manor_banner
-from manor_lib import (GLASS_BLUE, GLOW, GLOW_CANDLE, GLOW_LANTERN, LAYER, METAL, PAL, STONE, WOOD, abox, cbox, cyl,
+from guild_kit import _ball, chain
+from guild_lib import (GLASS_BLUE, GLOW, GLOW_CANDLE, GLOW_LANTERN, LAYER, METAL, PAL, STONE, WOOD, abox, cbox, cyl,
                        flat_face, hashf, pick, tone)
-from manor_shell import _ball, chain
+from guild_pieces import (barrel, bench, candelabrum, candle, chair, chandelier, goblet, plate, rug, sconce, shield,
+                          sword, table, weapon_rack)
+from guild_pieces import banner as cloth_banner
 
 from guild_plan import (BOARD, BOARD_DESK, COUNTER, FLOOR, FRONT_TABLES, HALL, HEARTH, RECRUIT_TABLE, TROPHY,
                         TROPHY_HEARTH, TROPHY_SLOTS)
+from guild_props import back_depth, has, hang, hang_fit, height_for_width, light_wicks, size, stand, stand_fit
 
 H = HALL
 TROPHY_IDS = tuple(TROPHY_SLOTS)
@@ -182,7 +183,7 @@ def quartermaster(p, glow):
     # the three title banners over the shelves, a blue, a garnet and a gold, each with the guild's
     # lantern, and the border's emblem between them on a round shield
     for zz, field in ((-2.7, PAL['blue']), (0.0, PAL['garnet']), (2.7, PAL['gold_dark'])):
-        manor_banner(p, H['x0'] + 0.08, zz, FLOOR + 9.6, (1, 0), width=1.7, length=3.8, field=field, emblem=False)
+        cloth_banner(p, H['x0'] + 0.08, zz, FLOOR + 9.6, (1, 0), width=1.7, length=3.8, field=field, emblem=False)
         lx = H['x0'] + 0.08 + 0.14 + 3 * LAYER
         flat_face(p, [(lx, FLOOR + 7.2, zz - 0.3), (lx, FLOOR + 7.2, zz + 0.3), (lx, FLOOR + 7.95, zz + 0.3),
                       (lx, FLOOR + 7.95, zz - 0.3)], PAL['gold'], METAL, (1, 0, 0))
@@ -265,7 +266,7 @@ def fireside(p, glow):
     goblet(p, xf + 4.3, FLOOR + 0.75, zm + 0.2)
     # the guild's great banner over the hearth, a sword crossed on a shield under it
     # (hung on the breast's dressed face, over the mantel)
-    manor_banner(p, xf, zm, FLOOR + 9.3, (1, 0), width=2.4, length=3.8, field=PAL['blue'], emblem=False)
+    cloth_banner(p, xf, zm, FLOOR + 9.3, (1, 0), width=2.4, length=3.8, field=PAL['blue'], emblem=False)
     lx = xf + 0.14 + 3 * LAYER
     flat_face(p, [(lx, FLOOR + 7.2, zm - 0.45), (lx, FLOOR + 7.2, zm + 0.45), (lx, FLOOR + 8.3, zm + 0.45),
                   (lx, FLOOR + 8.3, zm - 0.45)], PAL['gold'], METAL, (1, 0, 0))
@@ -300,9 +301,9 @@ def great_hall(p, glow):
         chandelier(p, glow, sx * 7.0, 0.0, FLOOR + 10.4, r=1.9, hang_to=H['ridge'] - 0.7, candles=12)
     # banners on the front wall between the windows and on the back wall either side of the arch
     for x in (8.2, -8.2):
-        manor_banner(p, x, H['z0'], FLOOR + 9.6, (0, 1), width=1.6, length=3.8, field=PAL['garnet'], emblem=True)
+        cloth_banner(p, x, H['z0'], FLOOR + 9.6, (0, 1), width=1.6, length=3.8, field=PAL['garnet'], emblem=True)
     for x in (7.6, -7.6):
-        manor_banner(p, x, H['z1'], FLOOR + 9.6, (0, -1), width=1.6, length=3.8, field=PAL['blue'], emblem=True)
+        cloth_banner(p, x, H['z1'], FLOOR + 9.6, (0, -1), width=1.6, length=3.8, field=PAL['blue'], emblem=True)
     # shields and crossed swords on the gables over the wainscot
     for (zz, field) in ((-7.4, PAL['blue']), (9.0, PAL['garnet'])):
         shield(p, H['x1'] - 0.02, FLOOR + 5.6, zz, (-1, 0), r=0.8, field=field)
@@ -645,14 +646,299 @@ def trophy_room(p, glow, trophies, gilt):
         sconce(p, glow, sx * (T['x1'] - 0.02), FLOOR + 4.6, 15.4, (-sx, 0))
 
 
+# ---------------------------------------------------------------------------
+# The painted props (guild_props.py): each piece the hall is dressed with stands where its built
+# twin above stood, in the same collision box, the built piece kept for a checkout that has not
+# packed the props
+# ---------------------------------------------------------------------------
+# the trophies' sizes on their plaques: (height, the plaque's own (width, height)); the wyrm's
+# skull over the hearth reaches out into the room
+TROPHY_SIZE = {
+    'hollow_crypt': 2.0,
+    'sunken_bastion': 2.1,
+    'drowned_temple': 2.3,
+    'wildheart_basin': 2.0,
+    'gravewyrm_sanctum': 3.0,
+}
+TROPHY_PROP = {
+    'hollow_crypt': 'trophy_crypt',
+    'sunken_bastion': 'trophy_bastion',
+    'drowned_temple': 'trophy_temple',
+    'wildheart_basin': 'trophy_wildheart',
+    'gravewyrm_sanctum': 'trophy_gravewyrm',
+}
+PLAQUE = (2.0, 2.5)
+PLAQUE_BIG = (3.4, 2.8)
+PLAQUE_DEPTH = 0.26
+# how far the wyrm's skull reaches out of its plaque into the trophy hall
+WYRM_REACH = 2.0
+# the painted long table's plank top over the floor (four fifths of the 1.12 it stands, the
+# tankards and the bread over that)
+LONG_TABLE_TOP = 0.9
+
+
+def board_props(p, glow):
+    """The contracts board (a wide oak board under a little slate hood, pinned with notices), on
+    the left wall over the board's own span, and a lantern on its iron arm either side."""
+    if not has('notice_board'):
+        contracts_board(p, glow)
+        return
+    B = BOARD
+    width = (B['z1'] - B['z0']) + 0.8
+    height = (B['y1'] - B['y0']) + 1.1
+    # (its back clear of the wainscot, where the built board's stood)
+    hang_fit(p, 'notice_board', (B['x'], (B['y0'] + B['y1']) / 2 + 0.3, 0.0), (-1.0, 0.0), width, height,
+             depth=0.6, standoff=0.42)
+    if has('wall_lantern'):
+        for zz in (-5.25, 5.25):
+            hang(p, 'wall_lantern', (B['x'], B['y1'] - 0.4, zz), (-1.0, 0.0), 1.35)
+
+
+def desk_props(p, glow):
+    """The clerk's slanted desk in its box, its panelled front to the hall (-x), the clerk
+    behind it at the board."""
+    if not has('clerk_desk'):
+        clerk_desk(p, glow)
+        return
+    D = BOARD_DESK
+    stand_fit(p, 'clerk_desk', ((D['x0'] + D['x1']) / 2, FLOOR, (D['z0'] + D['z1']) / 2), -math.pi / 2,
+              D['z1'] - D['z0'] + 0.1, D['x1'] - D['x0'] + 0.1, 1.55)
+
+
+def quartermaster_props(p, glow):
+    """Garrick's counter (built: a long panelled oak counter with a gilded rail), his wares on it,
+    the shelves of folded cloth behind him on the right wall, the title banners over them, and
+    the guild's tabard on its stand at the counter's front end."""
+    C = COUNTER
+    x0, x1, z0, z1 = C['x0'], C['x1'], C['z0'], C['z1']
+    top = FLOOR + 1.25
+    shelves = has('cloth_shelf')
+    if not shelves:
+        quartermaster(p, glow)
+        return
+    abox(p, x0, x1, FLOOR, top - 0.1, z0, z1, PAL['oak'][0], WOOD)
+    n = 5
+    for k in range(n):
+        za = z0 + (z1 - z0) * k / n + 0.12
+        zb = z0 + (z1 - z0) * (k + 1) / n - 0.12
+        abox(p, x1, x1 + 0.06, FLOOR + 0.2, top - 0.3, za, zb, PAL['oak'][2], WOOD)
+    abox(p, x0 - 0.1, x1 + 0.12, top - 0.1, top, z0 - 0.1, z1 + 0.1, PAL['oak_dark'], WOOD)
+    abox(p, x1 + 0.12, x1 + 0.12 + LAYER * 2, top - 0.08, top - 0.02, z0 - 0.1, z1 + 0.1, PAL['gold'], METAL)
+    if has('counter_wares'):
+        stand(p, 'counter_wares', ((x0 + x1) / 2, top, z0 + 1.6), math.pi / 2, 0.55)
+    if has('ale_jug'):
+        stand(p, 'ale_jug', ((x0 + x1) / 2, top, z1 - 1.0), math.pi / 2 + 0.6, 0.42)
+    if has('bottle_trio'):
+        stand(p, 'bottle_trio', ((x0 + x1) / 2, top, z0 + 3.4), math.pi / 2 - 0.4, 0.5)
+    # three shelf units side by side on the wall behind him, in the shelves' collision box, their
+    # backs a hand clear of the wall's timbers
+    sx = H['x0'] + 0.47
+    span = z1 - z0
+    for k in range(3):
+        zc = z0 + span * (k + 0.5) / 3
+        stand_fit(p, 'cloth_shelf', (sx, FLOOR, zc), math.pi / 2, span / 3 - 0.08, 0.76, 4.1)
+    if has('guild_banner'):
+        for zz in (-2.7, 0.0, 2.7):
+            hang(p, 'guild_banner', (H['x0'], FLOOR + 7.75, zz), (1.0, 0.0), 3.6)
+    if has('tabard_stand'):
+        stand(p, 'tabard_stand', (-12.8, FLOOR, -6.2), math.pi / 2, 2.35)
+
+
+def recruitment_props(p, glow):
+    """Mira's map table (the painted map of the passes and the dungeons' doors), chairs along
+    its near side and at its ends, a candelabrum at its far end."""
+    if not has('map_table'):
+        recruitment(p, glow)
+        return
+    R = RECRUIT_TABLE
+    x0, x1, z0, z1 = R['x0'], R['x1'], R['z0'], R['z1']
+    xm, zm = (x0 + x1) / 2, (z0 + z1) / 2
+    stand_fit(p, 'map_table', (xm, FLOOR, zm), math.pi, x1 - x0, z1 - z0, 1.12)
+    for k in range(3):
+        chair(p, x0 + 1.0 + k * 2.1, z0 - 0.75, 0.0, high=2.2, col=PAL['oak'][k % 3])
+    chair(p, x1 + 0.8, zm, -math.pi / 2, high=2.2)
+    chair(p, x0 - 0.8, zm, math.pi / 2, high=2.2)
+    if has('candelabrum'):
+        at = stand(p, 'candelabrum', (x1 + 1.6, FLOOR, z1 + 0.9), -0.6, 2.4)
+        light_wicks(glow, 'candelabrum', at)
+    else:
+        candelabrum(p, glow, x1 + 1.6, z1 + 0.9, h=2.4)
+
+
+def fireside_props(p, glow):
+    """The guildmaster's fireside: the bearskin before the hearth, two armchairs turned to the
+    fire, a little table with goblets between them, the guild's great banner over the mantel."""
+    if not has('armchair'):
+        fireside(p, glow)
+        return
+    xf = H['x0'] + HEARTH['depth']
+    zm = (HEARTH['z0'] + HEARTH['z1']) / 2
+    if has('bearskin_rug'):
+        stand(p, 'bearskin_rug', (xf + 2.3, FLOOR + 2 * LAYER, zm), -math.pi / 2, 0.42)
+    for sz, turn in ((-1, 0.5), (1, -0.5)):
+        stand(p, 'armchair', (xf + 3.3, FLOOR, zm + sz * 2.25), -math.pi / 2 + turn, 2.3)
+    table(p, xf + 4.3, zm, 0.9, 0.9, h=0.75, col=PAL['walnut'])
+    # a basket of split logs by the hearth's breast, on the room's side of it
+    if has('firewood_basket'):
+        stand(p, 'firewood_basket', (xf + 0.75, FLOOR, HEARTH['z1'] + 0.55), -math.pi / 2 + 0.3, 0.95)
+    goblet(p, xf + 4.2, FLOOR + 0.75, zm - 0.2)
+    goblet(p, xf + 4.4, FLOOR + 0.75, zm + 0.2)
+    if has('guild_banner'):
+        hang(p, 'guild_banner', (xf, FLOOR + 7.55, zm), (1.0, 0.0), 3.7)
+    else:
+        cloth_banner(p, xf, zm, FLOOR + 9.3, (1, 0), width=2.4, length=3.8, field=PAL['blue'], emblem=False)
+
+
+def hall_props(p, glow):
+    """The great hall's dressing: the runner from the door to the trophy arch, the adventurers'
+    long tables and their benches, tankards and bread on them, the weapon racks against the
+    front wall, two wheel chandeliers hung from the ridge beam, the guild's banners, shields and
+    crossed swords on the gables, the sconces on the trusses' pilasters, barrels and crates in
+    the front corners."""
+    rug(p, -2.0, 2.0, H['z0'] + 0.9, -2.6, field=PAL['blue'], border=PAL['gold_dark'], seed=1)
+    rug(p, -2.0, 2.0, 2.6, H['z1'] - 0.4, field=PAL['blue'], border=PAL['gold_dark'], seed=2)
+    for i, (fx, fz) in enumerate(FRONT_TABLES):
+        if has('long_table'):
+            stand_fit(p, 'long_table', (fx, FLOOR, fz), 0.0, 5.2, 1.5, 1.12)
+        else:
+            table(p, fx, fz, 5.2, 1.5, h=1.0, col=PAL['oak'][i])
+        for sz in (-1, 1):
+            if has('bench'):
+                stand_fit(p, 'bench', (fx, FLOOR, fz + sz * 1.2), 0.0, 4.6, 0.5, 0.62)
+            else:
+                bench(p, fx, fz + sz * 1.2, 4.6, 0.5)
+        # the painted table carries its own tankards, bread and candle stub, its plank top at
+        # about four fifths of its height; the built one gets them stood on it
+        top = FLOOR + (LONG_TABLE_TOP if has('long_table') else 1.0)
+        if has('table_candles'):
+            at = stand(p, 'table_candles', (fx + (1.6 if i else -1.6), top, fz), 0.3 + i, 0.5)
+            light_wicks(glow, 'table_candles', at)
+        if has('tankard') and not has('long_table'):
+            for k, dx in enumerate((-0.4, 0.9)):
+                stand(p, 'tankard', (fx + dx, top, fz + (0.3 if k else -0.32)), 0.7 + k * 2.1, 0.32)
+    # weapon racks against the front wall, two to a corner, their feet on the floor
+    if has('weapon_rack'):
+        for x in (10.2, 12.4, -10.2, -12.4):
+            hang(p, 'weapon_rack', (x, FLOOR + 1.15, H['z0']), (0.0, 1.0), 2.1)
+    else:
+        for x in (11.0, -11.0):
+            weapon_rack(p, x, H['z0'] + 0.5)
+    # two wheel chandeliers over the hall on chains from the ridge beam (their wheels where the
+    # built ones hung, the runtime's lights in them)
+    for sx in (1, -1):
+        if has('wheel_chandelier'):
+            # its candles a little over the runtime's light in it (render/highwatch_guild_lights.ts,
+            # y 10.2), its foot over the camera's air (render/placed_town_interior_core.ts, 9.6)
+            ch = 3.6
+            foot = FLOOR + 9.15
+            at = stand(p, 'wheel_chandelier', (sx * 7.0, foot, 0.0), 0.2, ch / size('wheel_chandelier')[0]
+                       * size('wheel_chandelier')[1])
+            light_wicks(glow, 'wheel_chandelier', at)
+            ring = foot + ch / size('wheel_chandelier')[0] * size('wheel_chandelier')[1]
+            p.beam([(sx * 7.0, ring - 0.03, 0.0), (sx * 7.0, H['ridge'] - 0.75, 0.0)], 0.05, 0.05, PAL['iron'], METAL)
+        else:
+            chandelier(p, glow, sx * 7.0, 0.0, FLOOR + 10.4, r=1.9, hang_to=H['ridge'] - 0.7, candles=12)
+    for x in (8.2, -8.2):
+        if has('guild_banner'):
+            hang(p, 'guild_banner', (x, FLOOR + 7.75, H['z0']), (0.0, 1.0), 3.6)
+        else:
+            cloth_banner(p, x, H['z0'], FLOOR + 9.6, (0, 1), width=1.6, length=3.8, field=PAL['garnet'], emblem=True)
+    for x in (7.6, -7.6):
+        if has('guild_banner'):
+            hang(p, 'guild_banner', (x, FLOOR + 7.75, H['z1']), (0.0, -1.0), 3.6)
+        else:
+            cloth_banner(p, x, H['z1'], FLOOR + 9.6, (0, -1), width=1.6, length=3.8, field=PAL['blue'], emblem=True)
+    for (zz, field) in ((-7.4, PAL['blue']), (9.0, PAL['garnet'])):
+        shield(p, H['x1'] - 0.02, FLOOR + 5.6, zz, (-1, 0), r=0.8, field=field)
+        sword(p, H['x1'] - 0.02, FLOOR + 5.6, zz, 0.7, (-1, 0))
+        sword(p, H['x1'] - 0.02, FLOOR + 5.6, zz, -0.7, (-1, 0))
+    # sconces on the trusses' pilasters (proud of the back and front walls)
+    for x in (-10.5, 10.5):
+        for sz in (1, -1):
+            if has('wall_sconce'):
+                at = hang(p, 'wall_sconce', (x, FLOOR + 4.0, sz * (H['z1'] - 0.34)), (0.0, -sz), 0.95, standoff=0.02)
+                light_wicks(glow, 'wall_sconce', at)
+            else:
+                sconce(p, glow, x, FLOOR + 4.2, sz * (H['z1'] - 0.36), (0, -sz))
+    if has('barrel_stack'):
+        stand(p, 'barrel_stack', (-12.6, FLOOR, -7.9), 0.6, 1.7)
+    else:
+        barrel(p, -13.2, -7.6)
+        barrel(p, -12.3, -8.6, h=0.9, r=0.38)
+    if has('crate_stack'):
+        stand(p, 'crate_stack', (12.7, FLOOR, -7.8), -0.5, 1.5)
+
+
+def trophy_props(p, glow, trophies, gilt):
+    """The trophy hall: a runner to the hearth, benches, candelabra in the back corners beside
+    the hearth, a sconce between each wall's two plaques, and for each dungeon its oak plaque (in
+    the furnishings, always there), its trophy on the plaque (its own part: shown once the viewer
+    has cleared it) and the gilded laurels framing it (its own part: shown for a Heroic clear).
+    Each slot's piece is the painted prop where it is packed, the built one where it is not."""
+    T = TROPHY
+    rug(p, -2.4, 2.4, H['oz1'] + 0.8, T['z1'] - TROPHY_HEARTH['depth'] - 1.6, field=PAL['garnet'],
+        border=PAL['gold_dark'], seed=5)
+    for sx in (1, -1):
+        if has('bench'):
+            stand_fit(p, 'bench', (sx * 4.4, FLOOR, 15.4), math.pi / 2, 3.2, 0.6, 0.62)
+        else:
+            bench(p, sx * 4.4, 15.4, 0.6, 3.2, col=PAL['oak'][2])
+    if has('firewood_basket'):
+        stand(p, 'firewood_basket', (TROPHY_HEARTH['x1'] + 0.9, FLOOR, T['z1'] - 0.75), math.pi + 0.4, 0.9)
+    for sx in (1, -1):
+        if has('candelabrum'):
+            at = stand(p, 'candelabrum', (sx * 5.4, FLOOR, T['z1'] - TROPHY_HEARTH['depth'] - 0.6), math.pi, 2.4)
+            light_wicks(glow, 'candelabrum', at)
+        else:
+            candelabrum(p, glow, sx * 5.4, T['z1'] - TROPHY_HEARTH['depth'] - 0.6, h=2.4)
+    for dungeon, slot in TROPHY_SLOTS.items():
+        x, y, z, normal = slot
+        big = dungeon == 'gravewyrm_sanctum'
+        w, h = PLAQUE_BIG if big else PLAQUE
+        if has('trophy_plaque'):
+            hang_fit(p, 'trophy_plaque', (x, y, z), normal, w, h, depth=PLAQUE_DEPTH, standoff=0.12)
+            # the trophy's back seats on the board's face, its iron straps and hook (the plaque's
+            # front-most third) tucked into the trophy's back
+            front = 0.12 + PLAQUE_DEPTH * 0.7
+        else:
+            w, h, front = plaque(p, slot, big=big)
+        # the laurels behind the plaque, framing it (a little wider and taller, their star over
+        # its crown)
+        if has('gilt_laurel'):
+            hang_fit(gilt[dungeon], 'gilt_laurel', (x, y + 0.12, z), normal, w * 1.32, h * 1.18, depth=0.12,
+                     standoff=0.07)
+        else:
+            gilding(gilt[dungeon], slot, w, h, front)
+        prop = TROPHY_PROP[dungeon]
+        if has(prop) and big:
+            # the wyrm's long snout drawn in a little, so the skull reaches two yards into the
+            # room over the hearth, not three; its back plate seated on the plaque, the horns
+            # that sweep back past the plate passing behind the board into the breast
+            h_ = TROPHY_SIZE[dungeon]
+            seat = back_depth(prop) * WYRM_REACH / size(prop)[2]
+            hang_fit(trophies[dungeon], prop, (x, y + 0.05, z), normal, h_ * size(prop)[0] / size(prop)[1], h_,
+                     depth=WYRM_REACH, standoff=front - seat)
+        elif has(prop):
+            seat = back_depth(prop) * TROPHY_SIZE[dungeon] / size(prop)[1]
+            hang(trophies[dungeon], prop, (x, y + 0.1, z), normal, TROPHY_SIZE[dungeon], standoff=front - seat)
+        else:
+            TROPHIES[dungeon](trophies[dungeon], slot, front)
+    for sx in (1, -1):
+        if has('wall_sconce'):
+            at = hang(p, 'wall_sconce', (sx * T['x1'], FLOOR + 4.4, 15.4), (-sx, 0.0), 0.95)
+            light_wicks(glow, 'wall_sconce', at)
+        else:
+            sconce(p, glow, sx * (T['x1'] - 0.02), FLOOR + 4.6, 15.4, (-sx, 0))
+
+
 def build(parts):
     f, glow = parts['G_INT_Furnishings'], parts['GuildGlow']
-    contracts_board(f, glow)
-    clerk_desk(f, glow)
-    quartermaster(f, glow)
-    recruitment(f, glow)
-    fireside(f, glow)
-    great_hall(f, glow)
-    trophy_room(f, glow, {d: parts[f'G_INT_Trophy_{d}'] for d in TROPHY_IDS},
-                {d: parts[f'G_INT_TrophyGilt_{d}'] for d in TROPHY_IDS})
-    _ = (GLOW, GLOW_CANDLE, cbox, _ball, STONE)
+    board_props(f, glow)
+    desk_props(f, glow)
+    quartermaster_props(f, glow)
+    recruitment_props(f, glow)
+    fireside_props(f, glow)
+    hall_props(f, glow)
+    trophy_props(f, glow, {d: parts[f'G_INT_Trophy_{d}'] for d in TROPHY_IDS},
+                 {d: parts[f'G_INT_TrophyGilt_{d}'] for d in TROPHY_IDS})
+    _ = (GLOW, GLOW_CANDLE, cbox, _ball, STONE, height_for_width)

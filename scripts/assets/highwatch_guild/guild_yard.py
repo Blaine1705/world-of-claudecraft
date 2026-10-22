@@ -4,13 +4,12 @@ from the stables, crates and barrels by the tower. Part: GuildYard (and GuildGlo
 lamps' panes)."""
 import math
 
-from manor_furnish import barrel
-from manor_grounds import PAVE, lamp
-from manor_lib import GLOW_LANTERN
-from manor_shell import _ball, finial, hanging_lantern
-from manor_lib import LAYER, METAL, PAL, STONE, WOOD, abox, cyl, flat_face, hashf, pick, tone
+from guild_kit import _ball, finial, hanging_lantern
+from guild_lib import GLOW_LANTERN, LAYER, METAL, PAL, STONE, WOOD, abox, cyl, flat_face, hashf, pick, tone
+from guild_pieces import PAVE, barrel, lamp
 
 from guild_plan import CRATES, GATE, HITCH, PORCH, STEPS, TOWER, TROUGH, YARD, YARD_LAMPS
+from guild_props import has, stand, stand_fit
 
 
 def _paving(p, x0, x1, z0, z1, seed=0):
@@ -183,12 +182,34 @@ def crates(p):
     barrel(p, x + 0.9, z + 0.9, y=PAVE, h=1.0, r=0.4)
 
 
+def yard_props(p, glow):
+    """The yard's painted props where the built pieces stood (their collision boxes unchanged):
+    the old stables' hitching rail and its granite trough, and the crates and barrels stacked by
+    the tower; a built piece stands in for any prop not packed. The lamp by the steps."""
+    # (the lamp by the steps stays built: its panes are lit glass that glows at night, as the
+    # gateway's lanterns do)
+    for (lx, lz) in YARD_LAMPS:
+        lamp(p, glow, lx, lz)
+    x, z0, z1 = HITCH['x'], HITCH['z0'], HITCH['z1']
+    if has('hitching_rail') and has('water_trough'):
+        stand_fit(p, 'hitching_rail', (x, PAVE, (z0 + z1) / 2), math.pi / 2, z1 - z0, 0.42, 1.3)
+        T = TROUGH
+        stand_fit(p, 'water_trough', (T['x'], PAVE, T['z']), math.pi / 2, T['lz'], T['lx'], 0.9)
+    else:
+        hitching_rail(p)
+    if has('crate_stack') and has('barrel_stack'):
+        cx, cz = CRATES['x'], CRATES['z']
+        stand(p, 'crate_stack', (cx - 0.4, PAVE, cz - 0.3), -0.35, 1.55)
+        stand(p, 'barrel_stack', (cx + 0.9, PAVE, cz + 0.9), -1.2, 1.45)
+        if has('grain_sacks'):
+            stand(p, 'grain_sacks', (cx - 0.5, PAVE, cz + 0.85), -0.8, 0.85)
+    else:
+        crates(p)
+
+
 def build(parts):
     y, glow = parts['GuildYard'], parts['GuildGlow']
     paving(y)
-    for (lx, lz) in YARD_LAMPS:
-        lamp(y, glow, lx, lz)
     gateway(y, glow)
-    hitching_rail(y)
-    crates(y)
+    yard_props(y, glow)
     _ = cyl

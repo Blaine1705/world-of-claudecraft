@@ -1,18 +1,26 @@
 """The Highwatch adventurers' guild, Lantern Hall: the walk-in guild hall at the old stable
-yard west of Highwatch, the home of the dungeon contracts.
+yard west of Highwatch, the home of the dungeon contracts, in the painted world style.
 
-  blender --background --python scripts/assets/highwatch_guild/build_guild.py -- \
+  blender --background --factory-startup --python scripts/assets/highwatch_guild/build_guild.py -- \
       [--save FILE.blend] [--render OUT_DIR] [--only name,name]
 
 Writes guild_source.glb and guild.collision.json beside this file.
-`node scripts/assets/highwatch_guild/build.mjs` ships the GLB (validate, fingerprint, meshopt)
-to public/models/tidehold/highwatch/guild.glb and merges the collision rows into
-data/asset_collision_overrides.json; the town stands it like the painted buildings and the
-manor (src/sim/highwatch_layout.ts), so the model frame is theirs: yards, origin on the ground
-line, a yard of footing under it, the door on the -z face.
+`node scripts/assets/highwatch_guild/build.mjs` ships the GLB (validate, fingerprint, embed the
+painted maps and the props' atlas, KTX2, meshopt) to public/models/tidehold/highwatch/guild.glb
+and its .half and .quarter texture tiers, and merges the collision rows into
+data/asset_collision_overrides.json; the town stands it like the painted buildings
+(src/sim/highwatch_layout.ts), so the model frame is theirs: yards, origin on the ground line, a
+yard of footing under it, the door on the -z face.
 
-It is built with the manor's kit (scripts/assets/highwatch_manor/: the walls, windows, slates,
-porch, furniture, the warm-light and weathering bakes), so the two houses read as one town's.
+It is built with the guild's own kit (guild_lib.py and guild_kit.py: the walls, windows, slates,
+porch, built furniture, the warm-light and weathering bakes the Highwatch manor was raised with,
+kept here since the manor left the town), then, in the painted world style (the team's painted
+world style guide): settled as one structure (guild_settle.py: the ridge's sag, the eaves' droop,
+the spire's bend, the chimneys' taper; the floors, walls, door and collision square), painted with
+Highwatch's Alpine slate maps of the painted town (guild_texture.py, textures.json, tex/) and
+dressed with painted props made with Tripo (guild_props.py, props/: the trophies, plaques and
+gilding, the boards, tables, shelves and banners, and the Mirefen tavern's lights, tankards,
+barrels and crates), each standing where its built twin stood.
 
 Hierarchy (the town view draws the whole; G_INT* parts cast no shadow, the rule the painted
 buildings follow, render/eastbrook_placed_building.ts):
@@ -29,8 +37,9 @@ buildings follow, render/eastbrook_placed_building.ts):
     G_INT_TrophyGilt_<dungeon>      each plaque's heroic gilding (five)
 
 The runtime shows a trophy only to a player who has cleared its dungeon, and the gilding only
-once cleared on Heroic (render/highwatch_guild_trophies.ts). Original procedural work for this
-project (shiplib + the manor's kit + these modules); no imported meshes.
+once cleared on Heroic (render/highwatch_guild_trophies.ts). Original work for this project
+(shiplib, the guild's kit and these modules; the props' meshes and paint from the project's own
+Tripo models, CREDITS.md).
 """
 import json
 import math
@@ -40,18 +49,18 @@ import sys
 sys.dont_write_bytecode = True
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, '..', 'eastbrook_ferry'))
-sys.path.insert(0, os.path.join(HERE, '..', 'highwatch_manor'))
 sys.path.insert(0, HERE)
 
 import bpy  # noqa: E402
-from guild_materials import PlainPainter, make_materials  # noqa: E402
-from manor_lib import EMISSIVE, SLATE, encode_for_export  # noqa: E402
-from manor_weather import bake_weather  # noqa: E402
-from shiplib import Piece, empty, triangles  # noqa: E402
+from guild_lib import EMISSIVE, SLATE, encode_for_export  # noqa: E402
+from guild_settle import settle, settled  # noqa: E402
+from guild_weather import bake_weather  # noqa: E402
+from shiplib import empty, triangles  # noqa: E402
 
 import guild_furnish as U  # noqa: E402
 import guild_plan as PL  # noqa: E402
 import guild_shell as S  # noqa: E402
+import guild_texture as TX  # noqa: E402
 import guild_yard as Y  # noqa: E402
 
 TROPHY_PARTS = tuple(f'G_INT_Trophy_{d}' for d in PL.TROPHY_SLOTS)
@@ -66,7 +75,7 @@ for name in TROPHY_PARTS + GILT_PARTS:
 
 # ---------------------------------------------------------------------------
 # The warm light baked into the inside (the runtime adds a few point lights; the vertex colours
-# carry the rest of the glow, the tavern's and the manor's method)
+# carry the rest of the glow, the Mirefen tavern's method)
 # ---------------------------------------------------------------------------
 def _sources():
     F = PL.FLOOR
@@ -88,6 +97,9 @@ def _sources():
         src.append(((sx * (PL.TROPHY['x1'] - 0.5), F + 4.8, 15.4), 0.3, 4.5))
     return src
 
+
+# the share of the room's warm light a painted prop takes (guild_props.py)
+PROP_WARMTH = 0.45
 
 ROOMS = (
     # x0, x1, y0, y1, z0, z1: where the warm bake applies (the inside of every room)
@@ -125,22 +137,40 @@ def bake_warm_light(parts):
                 fall = (1 - d / reach) ** 2
                 light += k * fall * (0.35 + 0.65 * max(0.0, facing))
             light = min(light, 1.1)
-            mult = (0.92 + light * 0.55, 0.86 + light * 0.44, 0.76 + light * 0.3)
+            if f.material_index == TX.PROPS:
+                # a painted prop carries its own light and shade in its paint: only a touch of
+                # the room's warmth, and none of the cool of the unlit corners
+                light *= PROP_WARMTH
+                mult = (1.0 + light * 0.55, 0.96 + light * 0.44, 0.9 + light * 0.3)
+            else:
+                mult = (0.92 + light * 0.55, 0.86 + light * 0.44, 0.76 + light * 0.3)
             for loop in f.loops:
                 r, g, b, a = loop[piece.col]
                 loop[piece.col] = (min(1.0, r * mult[0]), min(1.0, g * mult[1]), min(1.0, b * mult[2]), a)
 
 
-def build_scene():
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    mats = make_materials()
+def build_scene(fresh=True):
+    if fresh:
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+    mats = TX.make_materials()
     root = empty('HighwatchGuild_ROOT', None, display='ARROWS', size=2.0)
-    parts = {name: Piece(name, wear=w, gradient=g) for name, (w, g) in SHADING.items()}
+    # every face is filed under its palette family as it is painted (guild_texture.py)
+    painter = TX.Painter()
+    piece = painter.piece_class()
+    parts = {name: piece(name, wear=w, gradient=g) for name, (w, g) in SHADING.items()}
     S.build(parts)
     U.build(parts)
     Y.build(parts)
+    # the hall settled as one (guild_settle.py), then the painted maps laid on its final shape:
+    # each face onto its material, its colour a tint, its UVs laid; then the warm light and the
+    # weathering over the paint
+    moved = settle(parts)
+    print(f'SETTLED {moved} corners')
+    faces = painter.paint_faces(parts)
+    for name, n in zip(TX.MATERIALS, faces):
+        print(f'MATERIAL {name} faces {n}')
     bake_warm_light(parts)
-    bake_weather(parts, _inside, PlainPainter(), roof_name='GuildRoof')
+    bake_weather(parts, _inside, painter, roof_name='GuildRoof')
     encode_for_export(parts)
     pieces = {}
     for name in PARTS:
@@ -152,7 +182,8 @@ def build_scene():
         'floor': PL.FLOOR,
         'door': [round(PL.DOOR['x1'] - PL.DOOR['x0'], 4), round(PL.DOOR['head'] - PL.FLOOR, 4)],
         'hall': {'plate': PL.HALL['plate'], 'ridge': PL.HALL['ridge'], 'truss': PL.HALL['truss']},
-        'tower': [PL.TOWER['cx'], PL.TOWER['belfry'] - 1.6, PL.TOWER['cz']],
+        # the belfry's great lantern, where the tower's lean carries it
+        'tower': [round(c, 4) for c in settled(PL.TOWER['cx'], PL.TOWER['belfry'] - 1.6, PL.TOWER['cz'])],
         'trophies': list(PL.TROPHY_SLOTS),
         # the gateway's name board: its centre, the painted area and the faces' offset from
         # the centre (render/highwatch_guild_sign.ts pins its own copy equal)
@@ -219,10 +250,12 @@ def export(path, objs):
     for o in root.children_recursive:
         o.select_set(True)
     bpy.context.view_layer.objects.active = root
+    # the maps are not embedded here: build.mjs embeds them (textures.json) at each texture tier
     bpy.ops.export_scene.gltf(
         filepath=path, export_format='GLB', use_selection=True, export_apply=True, export_yup=True,
         export_extras=True, export_animations=False, export_cameras=False, export_lights=False,
         export_vertex_color='ACTIVE', export_all_vertex_colors=False, export_morph=False,
+        export_texcoords=True, export_image_format='NONE',
     )
     print('WROTE', path)
 

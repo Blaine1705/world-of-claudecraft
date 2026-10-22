@@ -5,135 +5,28 @@ Parts (build_guild.py makes them): GuildShell (the walls and floors), GuildRoof 
 everything above the plates outside), GuildTimber (the open roof's trusses inside the hall),
 GuildTrim (gold, iron and the carved crest) and GuildGlow (lit glass and flames).
 
-It builds with the manor's kit (scripts/assets/highwatch_manor/): the same walls, windows,
-slates and porch, so the two houses read as one town's. The manor's porch and door read the
-manor's plan at module level; `_borrow_manor_kit` points them at this plan first.
+It builds with the guild's own kit (guild_lib.py, guild_kit.py): the walls, windows, slates
+and porch Highwatch's manor was raised with, kept here since the manor left the town.
 """
 import math
 
-import manor_shell as MS
-from manor_lib import (GLOW, GLOW_LANTERN, GLOW_SOFT, LAYER, METAL, PAL, PLASTER, SLATE, STONE, WOOD, Wall, abox,
-                       cbox, cyl, flat_face, hexa, manor_wall, pick, slate_roof, tone, window)
-from manor_shell import _ball, arch_ring, chimney, finial, flag_floor, hanging_lantern, hip_roof, oculus, wainscot
+from guild_kit import (STONE_TO, _ashlar_face, _ball, arch_ring, chimney, door_frame, finial, flag_floor, hip_roof,
+                       oculus, porch, slate_roof, wainscot)
+from guild_lib import (GLOW, GLOW_LANTERN, LAYER, METAL, PAL, SLATE, STONE, WOOD, Wall, abox, cbox, cyl, flat_face,
+                       hexa, pick, stone_wall, tone, window)
 
-import guild_plan as GP
+from guild_props import has, hang
+
 from guild_plan import (ARCH_TROPHY, DOOR, EAVE_OUT, FLOOR, FOOT, HALL, HALL_PITCH, HEARTH, PORCH, TOWER, TROPHY,
                         TROPHY_HEARTH, TROPHY_OUT, TROPHY_PITCH, TRUSS_X, VERGE_OUT)
 
 H = HALL
-STONE_TO = FLOOR + 3.6   # the ashlar storey under the plaster and timber
-_manor_slate_roof = slate_roof
-# the underlay's lift off the roof plane: clear of a gable wall's raking top (which lies in the
-# plane) by more than the depth buffer's reach, and still well under the slates (0.07 up)
-UNDERLAY = 0.035
 
 
-def slate_roof_u(p, e0, along, up, la, lu, seed=0, step=0.66, seg=1.75, thick=0.07, clip=None, under=True):
-    """The manor's slate slope, over a dark underlay a hand under the slates: the courses
-    leave hairline gaps, and through bare gaps the lit room under the boards shows as specks
-    of light on the roof. The underlay follows the same courses and clip, so a cut slope (a
-    hip, a cross gable, the lantern tower) is underlaid only where it is slated."""
-    _manor_slate_roof(p, e0, along, up, la, lu, seed=seed, step=step, seg=seg, thick=thick, clip=clip, under=under)
-    nx = along[1] * up[2] - along[2] * up[1]
-    ny = along[2] * up[0] - along[0] * up[2]
-    nz = along[0] * up[1] - along[1] * up[0]
-    if ny < 0:
-        nx, ny, nz = -nx, -ny, -nz
-
-    def at(a, s_, lift):
-        return (e0[0] + along[0] * a + up[0] * s_ + nx * lift, e0[1] + along[1] * a + up[1] * s_ + ny * lift,
-                e0[2] + along[2] * a + up[2] * s_ + nz * lift)
-    rows = max(1, int(round(lu / step)))
-    rstep = lu / rows
-    for r in range(rows):
-        s0 = r * rstep
-        spans = [(0.0, la)] if clip is None else clip(s0, min(lu, s0 + rstep * 1.3))
-        if not spans:
-            continue
-        s1 = min(lu, s0 + rstep)
-        for (a0, a1) in spans:
-            if a1 - a0 > 0.15:
-                flat_face(p, [at(a0, s0, UNDERLAY), at(a1, s0, UNDERLAY), at(a1, s1, UNDERLAY), at(a0, s1, UNDERLAY)],
-                          PAL['slate_ridge'], SLATE, (nx, ny, nz))
 
 
-def _borrow_manor_kit():
-    """The manor's porch(), door_frame() and crest read the manor's plan from their module's
-    globals: point them at the guild's plan (and the guild's own crest) before calling them."""
-    MS.PORCH = GP.PORCH
-    MS.STEPS = GP.STEPS
-    MS.COLUMNS = GP.COLUMNS
-    MS.COLUMN_R = GP.COLUMN_R
-    MS.DOOR = GP.DOOR
-    MS.H = GP.HALL
-    MS.HALL = GP.HALL
-    MS.HALL_PITCH = GP.HALL_PITCH
-    MS.crest = guild_crest
-    MS.slate_roof = slate_roof_u
 
 
-# ---------------------------------------------------------------------------
-# The guild's crest: our own sign, a lantern over two crossed swords on a blue heater shield,
-# a gilded border, laurels and a scroll (the manor's crest's frame, a new charge)
-# ---------------------------------------------------------------------------
-def guild_crest(p, x, y, z):
-    w, hgt = 1.55, 2.3
-    rows = 10
-    for i in range(rows):
-        t0, t1 = i / rows, (i + 1) / rows
-
-        def half_w(t):
-            return w if t < 0.45 else w * math.cos((t - 0.45) / 0.55 * math.pi / 2) ** 0.8
-        ya, yb = y + hgt / 2 - hgt * t0, y + hgt / 2 - hgt * t1
-        wa, wb = half_w(t0), max(0.04, half_w(t1))
-        pts = [(x - wa, ya, z), (x + wa, ya, z), (x + wb, yb, z), (x - wb, yb, z),
-               (x - wa, ya, z - 0.14), (x + wa, ya, z - 0.14), (x + wb, yb, z - 0.14), (x - wb, yb, z - 0.14)]
-        hexa(p, [pts[3], pts[2], pts[1], pts[0], pts[7], pts[6], pts[5], pts[4]], PAL['blue'], METAL)
-        for sgn in (1, -1):
-            pts = [(x + sgn * wa, ya, z - 0.1), (x + sgn * (wa + 0.14), ya, z - 0.1),
-                   (x + sgn * (wb + 0.14), yb, z - 0.1), (x + sgn * wb, yb, z - 0.1),
-                   (x + sgn * wa, ya, z - 0.14 - 2.5 * LAYER), (x + sgn * (wa + 0.14), ya, z - 0.14 - 2.5 * LAYER),
-                   (x + sgn * (wb + 0.14), yb, z - 0.14 - 2.5 * LAYER), (x + sgn * wb, yb, z - 0.14 - 2.5 * LAYER)]
-            hexa(p, pts, PAL['gold'], METAL)
-    abox(p, x - w - 0.14, x + w + 0.14, y + hgt / 2 - 0.02, y + hgt / 2 + 0.14, z - 0.14 - 4 * LAYER, z, PAL['gold'],
-         METAL)
-    face = z - 0.14
-    # two crossed swords, silver blades and gilded guards, each a layer over the field
-    for k, sgn in enumerate((1, -1)):
-        lift = face - (1 + k) * LAYER
-        a, b = (x - sgn * 1.0, y - 0.95), (x + sgn * 0.95, y + 0.85)
-        dx, dy = b[0] - a[0], b[1] - a[1]
-        n = math.hypot(dx, dy)
-        px, py = -dy / n * 0.09, dx / n * 0.09
-        flat_face(p, [(a[0] + px, a[1] + py, lift), (a[0] - px, a[1] - py, lift), (b[0], b[1], lift)],
-                  PAL['silver'], METAL, (0, 0, -1))
-        gx, gy = a[0] + dx * 0.18, a[1] + dy * 0.18
-        flat_face(p, [(gx + px * 3.2, gy + py * 3.2, lift - LAYER), (gx + px * 3.2 + dx / n * 0.1, gy + py * 3.2 + dy / n * 0.1, lift - LAYER),
-                      (gx - px * 3.2 + dx / n * 0.1, gy - py * 3.2 + dy / n * 0.1, lift - LAYER),
-                      (gx - px * 3.2, gy - py * 3.2, lift - LAYER)], PAL['gold'], METAL, (0, 0, -1))
-    # the lantern over the cross: a gilded frame round a pane of lit amber, a ring on top
-    lift = face - 4 * LAYER
-    ly = y + 0.2
-    flat_face(p, [(x - 0.42, ly - 0.5, lift), (x + 0.42, ly - 0.5, lift), (x + 0.42, ly + 0.45, lift),
-                  (x - 0.42, ly + 0.45, lift)], PAL['gold'], METAL, (0, 0, -1))
-    flat_face(p, [(x - 0.28, ly - 0.38, lift - LAYER), (x + 0.28, ly - 0.38, lift - LAYER),
-                  (x + 0.28, ly + 0.32, lift - LAYER), (x - 0.28, ly + 0.32, lift - LAYER)], PAL['lantern_lit'], METAL,
-              (0, 0, -1))
-    flat_face(p, [(x - 0.55, ly + 0.45, lift), (x + 0.55, ly + 0.45, lift), (x, ly + 0.85, lift)], PAL['gold_dark'],
-              METAL, (0, 0, -1))
-    p.ring((x, ly + 0.98, lift - 0.02), 0.13, 0.035, PAL['gold'], 8, axis=(0, 0, 1), mat=METAL)
-    for sgn in (1, -1):
-        for k in range(9):
-            a = -1.2 + 2.0 * k / 8
-            r = w + 0.65
-            lx = x + sgn * math.cos(a) * r
-            ly2 = y - 0.1 + math.sin(a) * r * 0.95
-            p.box((lx, ly2, z - 0.1), (0.42, 0.18, 0.06), PAL['gold'] if k % 2 else PAL['gold_dark'], METAL,
-                  roll=sgn * (a + math.pi / 2) * 0.9)
-    abox(p, x - 1.6, x + 1.6, y - hgt / 2 - 0.55, y - hgt / 2 - 0.18, z - 0.16, z, PAL['cream'], METAL)
-    for sgn in (1, -1):
-        p.cylinder((x + sgn * 1.6, y - hgt / 2 - 0.36, z - 0.2), (x + sgn * 1.6, y - hgt / 2 - 0.36, z + 0.02),
-                   0.22, PAL['cream'], METAL, sides=8)
 
 
 # ---------------------------------------------------------------------------
@@ -153,10 +46,15 @@ def hall_walls(p, p_trim, glow):
     for x in (-4.7, 4.7):
         win.append((U(x) - 0.85, U(x) + 0.85, FLOOR + 2.2, FLOOR + 5.9))
     door = (U(DOOR['x0']), U(DOOR['x1']), FLOOR, DOOR['head'])
-    manor_wall(p, front, t, flat, win + [door], plinth=STONE_TO, seed=1)
+    stone_wall(p, front, t, flat, win + [door], plinth=STONE_TO, seed=1)
     for (u0, u1, v0, v1) in win:
         window(p, front, u0, u1, v0, v1, t, lit=True, arch=True, bars=3 if v1 - v0 > 5 else 2)
-    MS.door_frame(p, front, U(DOOR['x0']), U(DOOR['x1']), t)
+    door_frame(p, front, U(DOOR['x0']), U(DOOR['x1']), t)
+    # the guild's banners on the front either side of the porch, over the ashlar storey and
+    # between the porch's eaves and the tall windows (the town hall's civic dress)
+    if has('guild_banner'):
+        for x in (-8.05, 8.05):
+            hang(p_trim, 'guild_banner', (x, FLOOR + 7.55, H['oz0']), (0.0, -1.0), 4.2, standoff=0.06)
     wainscot(p, front, t, 0.9, U(DOOR['x0']) - 0.4)
     wainscot(p, front, t, U(DOOR['x1']) + 0.4, front.length - 0.9)
     # the back wall, its outer face north, the round arch into the trophy hall in its middle
@@ -166,7 +64,7 @@ def hall_walls(p, p_trim, glow):
     spring = ARCH_TROPHY['head'] - span / 2
     arch = (U(ARCH_TROPHY['x0']), U(ARCH_TROPHY['x1']), FLOOR, ARCH_TROPHY['head'])
     bwin = [(U(x) - 1.1, U(x) + 1.1, FLOOR + 3.4, FLOOR + 9.2) for x in (-11.9, 11.9)]
-    manor_wall(p, back, t, flat, bwin + [arch], plinth=STONE_TO, seed=2)
+    stone_wall(p, back, t, flat, bwin + [arch], plinth=STONE_TO, seed=2)
     for (u0, u1, v0, v1) in bwin:
         window(p, back, u0, u1, v0, v1, t, lit=True, arch=True, bars=3)
     arch_ring(p, back, arch[0], arch[1], spring, t, n=9)
@@ -186,7 +84,7 @@ def hall_walls(p, p_trim, glow):
             wins = [(Z(5.6), Z(8.0), FLOOR + 3.2, FLOOR + 9.0)]
         else:
             wins = [(Z(-8.0), Z(-5.6), FLOOR + 3.2, FLOOR + 9.0)]
-        manor_wall(p, g, t, top, wins + [oc], plinth=STONE_TO, seed=3 + sx,
+        stone_wall(p, g, t, top, wins + [oc], plinth=STONE_TO, seed=3 + sx,
                    rails=[STONE_TO + 0.12, FLOOR + 6.8, H['plate'] - 0.21, FLOOR + 13.8])
         for (u0, u1, v0, v1) in wins:
             window(p, g, u0, u1, v0, v1, t, lit=True, arch=True, bars=3)
@@ -229,9 +127,9 @@ def hall_roof(p_roof, p_timber):
             spans = [(lo, hi) for (lo, hi) in ((0.0, a), (b, end)) if hi - lo > 0.1]
         return spans or None
 
-    slate_roof_u(p_roof, (ex0, eave_y, -ez), (1, 0, 0), (0, h, c), ex1 - ex0, slope, seed=11, clip=clip_south,
+    slate_roof(p_roof, (ex0, eave_y, -ez), (1, 0, 0), (0, h, c), ex1 - ex0, slope, seed=11, clip=clip_south,
                under=False)
-    slate_roof_u(p_roof, (ex1, eave_y, ez), (-1, 0, 0), (0, h, -c), ex1 - ex0, slope, seed=12, under=False)
+    slate_roof(p_roof, (ex1, eave_y, ez), (-1, 0, 0), (0, h, -c), ex1 - ex0, slope, seed=12, under=False)
     p_roof.beam([(ex0, ridge + 0.12, 0), (ex1, ridge + 0.12, 0)], 0.4, 0.3, PAL['slate_ridge'], SLATE)
     for x in (ex0 + 0.1, ex1 - 0.1):
         finial(p_roof, x, ridge + 0.25, 0.0, h=1.8, r=0.2)
@@ -370,7 +268,7 @@ def hall_hearth(p, p_trim, glow):
     # the hearthstone
     abox(p, xf, xf + 1.0, FLOOR - 0.02, FLOOR + LAYER, hz0 - 0.4, hz1 + 0.4, PAL['stone_dark'], STONE)
     # the breast's face over the mantel dressed in coursed ashlar
-    MS._ashlar_face(p, Wall(xf, hz0, xf, hz1, (1, 0)), 0.0, hz1 - hz0, HEARTH['mantel'] + 0.05, HEARTH['hood_top'],
+    _ashlar_face(p, Wall(xf, hz0, xf, hz1, (1, 0)), 0.0, hz1 - hz0, HEARTH['mantel'] + 0.05, HEARTH['hood_top'],
                     0.0, seed=17)
     # the chimney stack outside the gable, up past the roof slope
     zc = (hz0 + hz1) / 2
@@ -413,14 +311,14 @@ def trophy_hall(p, p_roof, p_trim, glow):
         g = Wall(xc, H['oz1'], xc, T['z1'], (sx, 0))
         Z = lambda z: z - H['oz1']  # noqa: E731
         wins = [(Z(14.7), Z(16.1), FLOOR + 6.6, FLOOR + 8.4)]
-        manor_wall(p, g, t, flat, wins, plinth=FLOOR + 2.8, seed=31 + sx, rails=[FLOOR + 2.92, FLOOR + 6.2, plate - 0.21])
+        stone_wall(p, g, t, flat, wins, plinth=FLOOR + 2.8, seed=31 + sx, rails=[FLOOR + 2.92, FLOOR + 6.2, plate - 0.21])
         for (u0, u1, v0, v1) in wins:
             window(p, g, u0, u1, v0, v1, t, lit=True, arch=True, bars=1)
         wainscot(p, g, t, 0.2, g.length - 1.1, top=FLOOR + 2.4)
     # the back wall
     zc = T['z1'] + t / 2
     back = Wall(T['ox0'], zc, T['ox1'], zc, (0, 1))
-    manor_wall(p, back, t, flat, [], plinth=FLOOR + 2.8, seed=35, rails=[FLOOR + 2.92, FLOOR + 6.2, plate - 0.21])
+    stone_wall(p, back, t, flat, [], plinth=FLOOR + 2.8, seed=35, rails=[FLOOR + 2.92, FLOOR + 6.2, plate - 0.21])
     # the floor: dark and pale flags in a chequer
     flag_floor(p, T['x0'], T['x1'], H['oz1'], T['z1'], FLOOR, size=1.4, seed=91,
                colors=[(0.36, 0.38, 0.44), (0.56, 0.57, 0.6), (0.4, 0.42, 0.47), (0.6, 0.6, 0.62)])
@@ -454,9 +352,9 @@ def trophy_hall(p, p_roof, p_trim, glow):
               GLOW, (0, 1, 0))
     abox(p, th['x0'] - 0.3, th['x1'] + 0.3, FLOOR - 0.02, FLOOR + LAYER, zf - 1.0, zf, PAL['stone_dark'], STONE)
     face = Wall(th['x0'], zf, th['x1'], zf, (0, -1))
-    MS._ashlar_face(p, face, 0.0, th['x1'] - th['x0'], th['mantel'] + 0.05, th['hood_top'], 0.0, seed=19)
+    _ashlar_face(p, face, 0.0, th['x1'] - th['x0'], th['mantel'] + 0.05, th['hood_top'], 0.0, seed=19)
     for (ua, ub) in ((0.0, 0.55), (th['x1'] - th['x0'] - 0.55, th['x1'] - th['x0'])):
-        MS._ashlar_face(p, face, ua, ub, FLOOR, th['mantel'] - 0.25, 0.0, seed=23)
+        _ashlar_face(p, face, ua, ub, FLOOR, th['mantel'] - 0.25, 0.0, seed=23)
     # the chimney stack behind, up past the hip
     chimney(p, p_trim, 0.0, T['oz1'] + 0.7, plate + 5.6, 2.2, 1.4)
 
@@ -482,7 +380,7 @@ def tower(p, p_roof, p_trim, glow):
         wins = [(L / 2 - 0.7, L / 2 + 0.7, FLOOR + 8.2, FLOOR + 11.0), (L / 2 - 0.7, L / 2 + 0.7, FLOOR + 14.6, FLOOR + 17.4)]
         if name == 'front':
             wins.append((L / 2 - 0.8, L / 2 + 0.8, FLOOR + 2.6, FLOOR + 5.6))
-        manor_wall(p, wall, t, flat, wins, plinth=STONE_TO, seed=50 + k, inner=False,
+        stone_wall(p, wall, t, flat, wins, plinth=STONE_TO, seed=50 + k, inner=False,
                    rails=[STONE_TO + 0.12, FLOOR + 7.4, FLOOR + 12.6, plate - 0.21])
         for (u0, u1, v0, v1) in wins:
             window(p, wall, u0, u1, v0, v1, t, lit=True, arch=True, bars=2, inner=False)
@@ -490,7 +388,7 @@ def tower(p, p_roof, p_trim, glow):
     inner_wall = Wall(x0 + t / 2, z0 + t, x0 + t / 2, z1 - t, (-1, 0))
     # (from just under the hall's plate: the great roof's slope runs into it below)
     lo = H['plate'] - 0.5
-    manor_wall(p, inner_wall, t, flat, [], plinth=STONE_TO, y0=lo, seed=55, inner=False,
+    stone_wall(p, inner_wall, t, flat, [], plinth=STONE_TO, y0=lo, seed=55, inner=False,
                rails=[lo + 0.2, plate - 0.21])
     # two dressed string courses round the three free faces, a gilded fillet on the upper
     for (yy, gilt) in ((FLOOR + 7.4, False), (FLOOR + 12.6, True)):
@@ -498,8 +396,12 @@ def tower(p, p_roof, p_trim, glow):
         if gilt:
             abox(p_trim, x0 + 0.01, x1 + 0.17, yy - 0.04, yy + 0.04, z0 - 0.17, z1 + 0.17, PAL['gold'], METAL)
     # a contract writ of the guild's own hung on the tower's face toward the yard: a long blue
-    # banner from the upper course with the lantern in gold
+    # banner from the upper course with the lantern in gold (the painted banner where it is
+    # packed, guild_props.py)
     bx = (x0 + x1) / 2 + 1.9
+    if has('guild_banner'):
+        hang(p, 'guild_banner', (bx, FLOOR + 10.2, z0), (0.0, -1.0), 4.4, standoff=0.05)
+        return _tower_top(p, p_roof, p_trim, glow, x0, x1, z0, z1, plate)
     p.cylinder((bx - 0.75, FLOOR + 12.3, z0 - 0.22), (bx + 0.75, FLOOR + 12.3, z0 - 0.22), 0.05, PAL['gold'], METAL,
                sides=6)
     flat_face(p, [(bx - 0.6, FLOOR + 12.3, z0 - 0.24), (bx + 0.6, FLOOR + 12.3, z0 - 0.24), (bx + 0.6, FLOOR + 8.4, z0 - 0.24),
@@ -517,6 +419,12 @@ def tower(p, p_roof, p_trim, glow):
     flat_face(p, [(bx - 0.18, FLOOR + 10.12, z0 - 0.24 - 2 * LAYER), (bx + 0.18, FLOOR + 10.12, z0 - 0.24 - 2 * LAYER),
                   (bx + 0.18, FLOOR + 10.66, z0 - 0.24 - 2 * LAYER), (bx - 0.18, FLOOR + 10.66, z0 - 0.24 - 2 * LAYER)],
               PAL['lantern_lit'], METAL, (0, 0, -1))
+    _tower_top(p, p_roof, p_trim, glow, x0, x1, z0, z1, plate)
+
+
+def _tower_top(p, p_roof, p_trim, glow, x0, x1, z0, z1, plate):
+    """The tower's quoins, its belfry and the great lantern in it, and its spire."""
+    W = TOWER
     # corner quoins up the stone storey
     for (cx, cz) in ((x0, z0), (x1, z0), (x1, z1)):
         v = FOOT
@@ -589,7 +497,7 @@ def tower(p, p_roof, p_trim, glow):
             inset = s1 * cc
             a0, a1 = inset, la - inset
             return [(a0, a1)] if a1 - a0 > 0.1 else None
-        slate_roof_u(p_roof, e0, along, up, 2 * half, slope, seed=61, clip=clip, under=False, step=0.55, seg=1.2)
+        slate_roof(p_roof, e0, along, up, 2 * half, slope, seed=61, clip=clip, under=False, step=0.55, seg=1.2)
     for (sx, sz) in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
         p_roof.beam([(cx + sx * half, sy + 0.1, cz + sz * half), (cx, W['spire'] + 0.1, cz)], 0.22, 0.18,
                     PAL['slate_ridge'], SLATE)
@@ -609,7 +517,6 @@ def tower(p, p_roof, p_trim, glow):
 # The whole
 # ---------------------------------------------------------------------------
 def build(parts):
-    _borrow_manor_kit()
     shell, roof, timber, trim, glow = (parts['GuildShell'], parts['GuildRoof'], parts['G_INT_Timber'],
                                        parts['GuildTrim'], parts['GuildGlow'])
     hall_walls(shell, trim, glow)
@@ -618,5 +525,4 @@ def build(parts):
     hall_hearth(shell, trim, glow)
     trophy_hall(shell, roof, trim, glow)
     tower(shell, roof, trim, glow)
-    MS.porch(shell, roof, trim, glow)
-    _ = (GLOW_SOFT, PLASTER, hanging_lantern)
+    porch(shell, roof, trim, glow)

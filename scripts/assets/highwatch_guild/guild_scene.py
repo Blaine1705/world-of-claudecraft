@@ -12,8 +12,74 @@ import math
 import os
 
 import bpy
-from manor_scene import _collection, _mat, _set_night, figure, ground, point_light
 from shiplib import P
+
+
+def _move(obj, coll):
+    for c in list(obj.users_collection):
+        c.objects.unlink(obj)
+    coll.objects.link(obj)
+
+
+
+def _mat(name, color, rough=0.8, emit=0.0):
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    b = m.node_tree.nodes['Principled BSDF']
+    b.inputs['Base Color'].default_value = (*color, 1)
+    b.inputs['Roughness'].default_value = rough
+    if emit:
+        b.inputs['Emission Color'].default_value = (*color, 1)
+        b.inputs['Emission Strength'].default_value = emit
+    return m
+
+
+def _collection(name):
+    c = bpy.data.collections.new(name)
+    bpy.context.scene.collection.children.link(c)
+    return c
+
+
+def ground(coll):
+    bpy.ops.mesh.primitive_plane_add(size=200, location=P(0, -0.02, -10))
+    g = bpy.context.object
+    g.name = 'Pad'
+    g.data.materials.append(_mat('PadMat', (0.24, 0.32, 0.18), 0.95))
+    _move(g, coll)
+
+
+def figure(name, x, y, z, coll, body, head):
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.42, depth=1.45, location=P(x, y + 0.72, z))
+    b = bpy.context.object
+    b.name = f'Figure_{name}_body'
+    b.data.materials.append(body)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=0.58, location=P(x, y + 1.98, z))
+    h = bpy.context.object
+    h.name = f'Figure_{name}_head'
+    h.data.materials.append(head)
+    for o in (b, h):
+        _move(o, coll)
+
+
+def point_light(name, x, y, z, color, energy, radius, coll):
+    light = bpy.data.lights.new(name, 'POINT')
+    light.color = color
+    light.energy = energy
+    light.shadow_soft_size = radius
+    obj = bpy.data.objects.new(name, light)
+    obj.location = P(x, y, z)
+    coll.objects.link(obj)
+    return obj
+
+
+def _set_night(night):
+    scene = bpy.context.scene
+    sun = bpy.data.objects['Sun']
+    sun.hide_render = night
+    bg = scene.world.node_tree.nodes['Background']
+    bg.inputs['Color'].default_value = (0.03, 0.04, 0.08, 1) if night else (0.5, 0.62, 0.8, 1)
+    bg.inputs['Strength'].default_value = 0.5 if night else 0.9
+
 
 FLOOR = 0.6
 
@@ -66,6 +132,9 @@ def sign_preview(coll):
 
 def stage(objs):
     scene = bpy.context.scene
+    # draw the painted materials as the game does (their colours stored under the headroom)
+    import guild_texture as TX
+    TX.show_headroom(objs['mats'])
     looks = _collection('Review')
     ground(looks)
     body = _mat('FigureBody', (0.62, 0.12, 0.1), 0.7)

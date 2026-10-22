@@ -1,13 +1,13 @@
 """The Highwatch adventurers' guild (Lantern Hall): every dimension the build, the collision and
 the runtime read.
 
-Model frame (yards), the manor's: origin on the ground line under the great hall's middle, +y
+Model frame (yards), the painted Tidehold buildings': origin on the ground line under the great hall's middle, +y
 up, +x to the left of a visitor walking in, +z into the house; the front door looks out along
 -z. The footing runs a yard under the ground line (y -1), the painted Tidehold convention the
 town's placement buries (sim/placed_town_kit.ts). The town turns the model a quarter so the
 door looks east, down the old stables road toward the square (sim/highwatch_layout.ts).
 
-One storey everywhere (the manor's lesson: two-storey interiors were cramped and fought the
+One storey everywhere (the Highwatch manor's lesson: two-storey interiors were cramped and fought the
 camera): a great hall 28 x 20 inside with walls of 10.5 and an open timber roof to 19, the
 contracts board on its left wall, the quartermaster's counter on its right, the recruitment
 table and the guildmaster's hearth at the back; behind it, through a round arch, the trophy
@@ -26,8 +26,8 @@ HALL = dict(x0=-14.0, x1=14.0, z0=-10.0, z1=10.0, t=0.9,
 HALL['ox0'], HALL['ox1'] = HALL['x0'] - HALL['t'], HALL['x1'] + HALL['t']
 HALL['oz0'], HALL['oz1'] = HALL['z0'] - HALL['t'], HALL['z1'] + HALL['t']
 HALL_PITCH = (HALL['ridge'] - HALL['plate']) / HALL['oz1']   # rise per yard of the main roof
-EAVE_OUT = 1.0
-VERGE_OUT = 0.6
+EAVE_OUT = 1.35       # the great roof's eaves past the walls (deep, the roof the hero)
+VERGE_OUT = 0.85     # and past the gables
 TRUSS_X = (-10.5, -3.5, 3.5, 10.5)
 
 DOOR = dict(x0=-1.9, x1=1.9, head=FLOOR + 5.6)            # the front door: 3.8 x 5.6
