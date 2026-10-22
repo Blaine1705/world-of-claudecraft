@@ -1,15 +1,19 @@
 """The guild's yard: the old stable yard where the road ends, paved in flags round the porch,
-a lamp, the guild's gateway over the road with its name board and seal, the old hitching rail and trough kept
+a lamp, the guild's gateway over the road with its name board and crest, the old hitching rail and trough kept
 from the stables, crates and barrels by the tower. Part: GuildYard (and GuildGlow for the
 lamps' panes)."""
 import math
 
 from guild_kit import _ball, finial, hanging_lantern
-from guild_lib import GLOW_LANTERN, LAYER, METAL, PAL, STONE, WOOD, abox, cyl, flat_face, hashf, pick, tone
+from guild_lib import LAYER, METAL, PAL, STONE, WOOD, abox, cyl, flat_face, hashf, pick, tone
 from guild_pieces import PAVE, barrel, lamp
 
 from guild_plan import CRATES, GATE, HITCH, PORCH, STEPS, TOWER, TROUGH, YARD, YARD_LAMPS
-from guild_props import has, stand, stand_fit
+from guild_props import hang, has, stand, stand_fit
+
+# the gateway's crest: its height, and the gap each of its two faces keeps off the beam's middle
+CREST_H = 2.0
+CREST_GAP = 0.02
 
 
 def _paving(p, x0, x1, z0, z1, seed=0):
@@ -46,19 +50,13 @@ def paving(p):
         abox(p, a, b, -0.15, PAVE + 0.1, c, d, PAL['ashlar_hi'], STONE)
 
 
-def _quad(p, pts, z, sz, color, mat):
-    """A flat polygon in the plane z, wound to face +z or -z (sz)."""
-    ring = [(u, v, z) for (u, v) in pts]
-    flat_face(p, ring if sz > 0 else list(reversed(ring)), color, mat, (0, 0, sz))
-
-
 def gateway(p, glow):
     """The guild's gateway over the spur road: two chamfered oak posts on coursed ashlar feet,
     iron bands and a gilded finial on each, a heavy beam with carved stepped ends, a gilded
     moulding and iron straps, knee braces, the name board on chains (a dark blue board in a
-    gilded moulding; the localized name is painted on at the text anchor), the guild's seal
-    standing on the beam (the lantern over two crossed swords in a gilded octagon, both faces),
-    and an iron lantern hung from either end of the beam."""
+    gilded moulding; the localized name is painted on at the text anchor), the guild's painted
+    crest standing on the beam (facing both ways), and an iron lantern hung from either end of the
+    beam."""
     g = GATE
     z = g['z']
     zt = g['post'] / 2
@@ -116,36 +114,14 @@ def gateway(p, glow):
     for (a, b, c, d) in ((-hx - 0.1, hx + 0.1, y1, y1 + 0.1), (-hx - 0.1, hx + 0.1, y0 - 0.1, y0),
                          (-hx - 0.1, -hx, y0, y1), (hx, hx + 0.1, y0, y1)):
         abox(p, g['x'] + a, g['x'] + b, c, d, z - t - 0.03, z + t + 0.03, PAL['gold'], METAL)
-    # the guild's seal on the beam
-    sx0, sr = g['x'], 0.88
-    sy0 = by1 + 0.25 + sr
-    p.prism((sx0, sy0, z - 0.09), 8, sr, sr, 0.18, PAL['gold'], METAL, axis=(0, 0, 1), phase=math.pi / 8)
-    abox(p, sx0 - 0.3, sx0 + 0.3, by1, sy0 - sr * 0.8, z - 0.12, z + 0.12, PAL['gold_dark'], METAL)
-    for sz in (-1, 1):
-        w = z + sz * (0.09 + LAYER)
-        octo = [(sx0 + math.cos(math.pi / 8 + math.tau * i / 8) * sr * 0.8,
-                 sy0 + math.sin(math.pi / 8 + math.tau * i / 8) * sr * 0.8) for i in range(8)]
-        _quad(p, octo, w, sz, PAL['blue'], METAL)
-        w2 = w + sz * LAYER
-        for sgn in (1, -1):
-            a, b = (sx0 - sgn * 0.55, sy0 - 0.5), (sx0 + sgn * 0.5, sy0 + 0.42)
-            dx, dy = b[0] - a[0], b[1] - a[1]
-            n = math.hypot(dx, dy)
-            ux, uy = dx / n, dy / n
-            px, py = -uy * 0.05, ux * 0.05
-            _quad(p, [(a[0] + px, a[1] + py), (a[0] - px, a[1] - py), (b[0], b[1])], w2, sz, PAL['silver'], METAL)
-            # the cross-guard and the grip
-            gx, gy = a[0] + dx * 0.26, a[1] + dy * 0.26
-            q = [(gx - uy * 0.16 - ux * 0.025, gy + ux * 0.16 - uy * 0.025), (gx + uy * 0.16 - ux * 0.025, gy - ux * 0.16 - uy * 0.025),
-                 (gx + uy * 0.16 + ux * 0.025, gy - ux * 0.16 + uy * 0.025), (gx - uy * 0.16 + ux * 0.025, gy + ux * 0.16 + uy * 0.025)]
-            _quad(p, q, w2 + sz * LAYER, sz, PAL['gold'], METAL)
-        w3 = w + sz * 3 * LAYER
-        _quad(p, [(sx0 - 0.2, sy0 - 0.26), (sx0 + 0.2, sy0 - 0.26), (sx0 + 0.2, sy0 + 0.2), (sx0 - 0.2, sy0 + 0.2)],
-              w3, sz, PAL['gold'], METAL)
-        _quad(glow, [(sx0 - 0.12, sy0 - 0.18), (sx0 + 0.12, sy0 - 0.18), (sx0 + 0.12, sy0 + 0.12),
-                     (sx0 - 0.12, sy0 + 0.12)], w3 + sz * LAYER, sz, PAL['lantern_lit'], GLOW_LANTERN)
-        _quad(p, [(sx0 - 0.28, sy0 + 0.2), (sx0 + 0.28, sy0 + 0.2), (sx0, sy0 + 0.42)], w3, sz, PAL['gold_dark'],
-              METAL)
+    # the guild's crest standing on the beam: the painted crest the porch gable wears
+    # (guild_kit.guild_crest), two of it back to back so the road and the yard both read it, on a
+    # gilded stem
+    if has('guild_crest'):
+        cy = by1 + 0.2 + CREST_H / 2
+        abox(p, g['x'] - 0.2, g['x'] + 0.2, by1, cy - CREST_H * 0.3, z - 0.1, z + 0.1, PAL['gold_dark'], METAL)
+        for sz in (-1.0, 1.0):
+            hang(p, 'guild_crest', (g['x'], cy, z), (0.0, sz), CREST_H, standoff=CREST_GAP)
     # an iron lantern hung from either end of the beam
     for sx in (-1, 1):
         lx = g['x'] + sx * (g['half'] + 0.85)

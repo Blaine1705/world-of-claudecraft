@@ -110,8 +110,30 @@ ROOMS = (
 )
 
 
-def _inside(x, y, z):
-    return any(x0 <= x <= x1 and y0 <= y <= y1 and z0 <= z <= z1 for (x0, x1, y0, y1, z0, z1) in ROOMS)
+def _inside(x, y, z, rooms=ROOMS):
+    return any(x0 <= x <= x1 and y0 <= y <= y1 and z0 <= z <= z1 for (x0, x1, y0, y1, z0, z1) in rooms)
+
+
+# The plaster inside the great hall and the trophy hall, one even paint. The warm light and the
+# weathering are baked a face at a time (at its centre), so the walls' big panels each took a tan
+# or a grey-green of their own and read as two plasters side by side: every inner plaster face
+# takes this one stored tint after the bakes instead, and the rooms' runtime lights still shade it:
+# a warm tan plaster, warm enough to stay tan under the hall's cool daylight (paler, it read as
+# sage in the shade). (Not the porch's room: the front wall's outer face stands in its box.)
+INTERIOR_PLASTER = (0.58, 0.49, 0.38)
+
+
+def even_interior_plaster(parts):
+    from shiplib import G as game
+    for piece in parts.values():
+        for f in piece.bm.faces:
+            if f.material_index != TX.PLASTER:
+                continue
+            c = game(f.calc_center_median())
+            if not _inside(c.x, c.y, c.z, ROOMS[:2]):
+                continue
+            for loop in f.loops:
+                loop[piece.col] = (*INTERIOR_PLASTER, loop[piece.col][3])
 
 
 def bake_warm_light(parts):
@@ -171,6 +193,7 @@ def build_scene(fresh=True):
         print(f'MATERIAL {name} faces {n}')
     bake_warm_light(parts)
     bake_weather(parts, _inside, painter, roof_name='GuildRoof')
+    even_interior_plaster(parts)
     encode_for_export(parts)
     pieces = {}
     for name in PARTS:

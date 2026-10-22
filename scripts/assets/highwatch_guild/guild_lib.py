@@ -394,9 +394,11 @@ def stone_wall(p, wall, t, top, openings, plinth=2.4, y0=-1.0, seed=0, bays=3.0,
 
 def window(p, wall, u0, u1, v0, v1, t, lit=True, arch=True, bars=2, inner=True, shutters=False,
            frame=PAL['timber']):
-    """A tall glazed window in a wall: a dressed stone surround with a gold keystone, a mullion
-    and transoms, small square leaded panes, a stone sill. A lit window's glass glows warm
-    (GuildGlow), the hall behind it lit; an unlit one is cool dark glass."""
+    """A tall glazed window in a wall: a dressed stone surround, a mullion and transoms, small
+    square leaded panes, a stone sill. A lit window's glass glows warm (GuildGlow), the hall
+    behind it lit; an unlit one is cool dark glass. The wall is cut square to the window's full
+    height (stone_wall), so an arched window fills the two corners over its round head through
+    the wall, as arch_ring does over the trophy arch."""
     half = t / 2
     um = (u0 + u1) / 2
     w = u1 - u0
@@ -408,8 +410,8 @@ def window(p, wall, u0, u1, v0, v1, t, lit=True, arch=True, bars=2, inner=True, 
     for s in ((1, -1) if inner else (1,)):
         wall.skin(p, u0, u1, v0, top_rect, s * 0.03, s, glass, gm, tag=FLAT)
     if arch:
-        # the round head in five glass slices
-        n = 6
+        # the round head in five glass slices (the voussoirs' five: their chords meet)
+        n = 5
         for i in range(n):
             a0, a1 = math.pi * i / n, math.pi * (i + 1) / n
             xa, xb = um - math.cos(a0) * w / 2, um - math.cos(a1) * w / 2
@@ -418,23 +420,59 @@ def window(p, wall, u0, u1, v0, v1, t, lit=True, arch=True, bars=2, inner=True, 
                    wall.pt(xa, top_rect, 0.03), wall.pt(xa, ya, -0.03), wall.pt(xb, yb, -0.03),
                    wall.pt(xb, yb, 0.03), wall.pt(xa, ya, 0.03)]
             hexa(p, pts, glass, gm, FLAT)
-    # mullion and transoms (leaded grid)
+            # the spandrel over the slice, up to the square head the wall was cut to, flush with
+            # both of the wall's plaster faces (the inner one takes the hall's even plaster)
+            fi, fo = -half, half - 0.05
+            pts = [wall.pt(xa, ya, fi), wall.pt(xb, yb, fi), wall.pt(xb, yb, fo), wall.pt(xa, ya, fo),
+                   wall.pt(xa, v1, fi), wall.pt(xb, v1, fi), wall.pt(xb, v1, fo), wall.pt(xa, v1, fo)]
+            hexa(p, pts, pick(PAL['plaster'], i), PLASTER)
+    # the leading, the same on both faces: the mullion and two lighter uprights run from the sill
+    # up into the round head, each to the head's edge over it, with the transoms across the body
+    # and one at the spring line where the head begins
     lead = (0.14, 0.13, 0.13)
+
+    def head_at(uu):
+        """How high the glass reaches over uu: the round head's five chords, or the square top."""
+        if not arch:
+            return v1
+        n = 5
+        for i in range(n):
+            a0, a1 = math.pi * i / n, math.pi * (i + 1) / n
+            xa, xb = um - math.cos(a0) * w / 2, um - math.cos(a1) * w / 2
+            if xa - 1e-6 <= uu <= xb + 1e-6:
+                ya, yb = top_rect + math.sin(a0) * w / 2, top_rect + math.sin(a1) * w / 2
+                return ya + (yb - ya) * (uu - xa) / max(xb - xa, 1e-6)
+        return top_rect
+
     for s in ([1, -1] if inner else [1]):
         g = s * 0.045
-        wall.box(p, um - 0.05, um + 0.05, v0, top_rect, g - 0.02, g + 0.02, lead, METAL)
-        for k in range(1, bars + 1 if s > 0 else 1):
+        wall.box(p, um - 0.05, um + 0.05, v0, head_at(um) - 0.03, g - 0.02, g + 0.02, lead, METAL)
+        for f in (0.25, 0.75):
+            uu = u0 + w * f
+            wall.box(p, uu - 0.015, uu + 0.015, v0, head_at(uu) - 0.03, g - 0.015, g + 0.015, lead, METAL)
+        for k in range(1, bars + 1):
             vv = v0 + (top_rect - v0) * k / (bars + 1)
             wall.box(p, u0, u1, vv - 0.03, vv + 0.03, g - 0.02, g + 0.02, lead, METAL)
-        # quarry leading: two more uprights (outside only)
-        for f in ((0.25, 0.75) if s > 0 else ()):
-            uu = u0 + w * f
-            wall.box(p, uu - 0.015, uu + 0.015, v0, top_rect, g - 0.015, g + 0.015, lead, METAL)
-    # the stone surround: jambs, the arch's voussoirs, a keystone in gold (outside); inside an
-    # oak frame round the reveal
+        if arch:
+            wall.box(p, u0, u1, top_rect - 0.03, top_rect + 0.03, g - 0.02, g + 0.02, lead, METAL)
+    # the stone surround: jambs and the arch's voussoirs (outside); inside an oak frame round
+    # the reveal, over the head too
     if inner:
         wall.box(p, u0 - 0.16, u0, v0, top_rect, -half - 0.08, -half + 0.02, PAL['oak_dark'], WOOD)
         wall.box(p, u1, u1 + 0.16, v0, top_rect, -half - 0.08, -half + 0.02, PAL['oak_dark'], WOOD)
+        if arch:
+            n = 5
+            r0, r1 = w / 2, w / 2 + 0.16
+            wa, wb = -half - 0.08, -half + 0.02
+            for i in range(n):
+                a0, a1 = math.pi * i / n, math.pi * (i + 1) / n
+                c0, c1 = math.cos(a0), math.cos(a1)
+                s0, s1 = math.sin(a0), math.sin(a1)
+                pts = [wall.pt(um - c0 * r0, top_rect + s0 * r0, wa), wall.pt(um - c1 * r0, top_rect + s1 * r0, wa),
+                       wall.pt(um - c1 * r1, top_rect + s1 * r1, wa), wall.pt(um - c0 * r1, top_rect + s0 * r1, wa),
+                       wall.pt(um - c0 * r0, top_rect + s0 * r0, wb), wall.pt(um - c1 * r0, top_rect + s1 * r0, wb),
+                       wall.pt(um - c1 * r1, top_rect + s1 * r1, wb), wall.pt(um - c0 * r1, top_rect + s0 * r1, wb)]
+                hexa(p, pts, PAL['oak_dark'], WOOD)
     for s in [1]:
         wo = s * half
         wa, wb = (wo - 0.02, wo + 0.12) if s > 0 else (wo - 0.12, wo + 0.02)
@@ -451,8 +489,7 @@ def window(p, wall, u0, u1, v0, v1, t, lit=True, arch=True, bars=2, inner=True, 
                        wall.pt(um - c1 * r1, top_rect + s1 * r1, wa), wall.pt(um - c0 * r1, top_rect + s0 * r1, wa),
                        wall.pt(um - c0 * r0, top_rect + s0 * r0, wb), wall.pt(um - c1 * r0, top_rect + s1 * r0, wb),
                        wall.pt(um - c1 * r1, top_rect + s1 * r1, wb), wall.pt(um - c0 * r1, top_rect + s0 * r1, wb)]
-                key = i == n // 2
-                hexa(p, pts, PAL['gold'] if key else tone(PAL['ashlar_hi'], i, u0), METAL if key else STONE)
+                hexa(p, pts, tone(PAL['ashlar_hi'], i, u0), STONE)
         else:
             wall.box(p, u0 - 0.28, u1 + 0.28, v1, v1 + 0.3, wa, wb, PAL['ashlar_hi'], STONE)
     # the sill

@@ -17,8 +17,8 @@ from guild_lib import (GLOW, GLOW_LANTERN, LAYER, METAL, PAL, SLATE, STONE, WOOD
 
 from guild_props import has, hang
 
-from guild_plan import (ARCH_TROPHY, DOOR, EAVE_OUT, FLOOR, FOOT, HALL, HALL_PITCH, HEARTH, PORCH, TOWER, TROPHY,
-                        TROPHY_HEARTH, TROPHY_OUT, TROPHY_PITCH, TRUSS_X, VERGE_OUT)
+from guild_plan import (ARCH_TROPHY, DOOR, EAVE_OUT, FLOOR, FOOT, HALL, HALL_PITCH, HEARTH, PILASTER, PORCH, TOWER,
+                        TROPHY, TROPHY_HEARTH, TROPHY_OUT, TROPHY_PITCH, TRUSS_X, VERGE_OUT)
 
 H = HALL
 
@@ -90,13 +90,16 @@ def hall_walls(p, p_trim, glow):
             window(p, g, u0, u1, v0, v1, t, lit=True, arch=True, bars=3)
         oculus(p, g, (oc[0] + oc[1]) / 2, (oc[2] + oc[3]) / 2, 1.3, t, glow)
         wainscot(p, g, t, 0.9, g.length - 0.9)
-    # pilasters inside under each truss, on corbels
+    # pilasters inside under each truss, from a dressed stone base on the floor up to the plate
+    # (the base sunk a hair under the flags, the oak let a hair into the base)
+    P = PILASTER
     for x in TRUSS_X:
         for sz in (1, -1):
-            zf = sz * (H['z1'] - 0.02 - 0.12)
-            abox(p, x - 0.32, x + 0.32, FLOOR + 2.8, H['plate'], min(zf, zf - sz * 0.22), max(zf, zf - sz * 0.22),
+            zf = sz * (H['z1'] - P['off'])
+            zp, zb = zf - sz * P['depth'], zf - sz * P['base_depth']
+            abox(p, x - P['half'], x + P['half'], FLOOR + P['base_h'] - 0.05, H['plate'], min(zf, zp), max(zf, zp),
                  PAL['oak_dark'], WOOD)
-            abox(p, x - 0.42, x + 0.42, FLOOR + 2.7, FLOOR + 3.0, min(zf, zf - sz * 0.3), max(zf, zf - sz * 0.3),
+            abox(p, x - P['base_half'], x + P['base_half'], FLOOR - 0.02, FLOOR + P['base_h'], min(zf, zb), max(zf, zb),
                  PAL['ashlar_hi'], STONE)
 
 
@@ -249,8 +252,6 @@ def hall_hearth(p, p_trim, glow):
     abox(p, xw, xf + 0.45, HEARTH['mantel'] - 0.25, HEARTH['mantel'], hz0 - 0.2, hz1 + 0.2, PAL['oak_dark'], WOOD)
     for zz in (hz0 + 0.25, hz1 - 0.25):
         abox(p, xf, xf + 0.38, HEARTH['opening'], HEARTH['mantel'] - 0.25, zz - 0.18, zz + 0.18, PAL['oak_dark'], WOOD)
-    abox(p_trim, xf + 0.1 + LAYER, xf + 0.12 + LAYER, HEARTH['mantel'] + 0.6, HEARTH['mantel'] + 1.0, hz0 + 0.8,
-         hz1 - 0.8, PAL['gold'], METAL)
     # logs and the fire (glow) in the box
     for k, zz in enumerate((hz0 + 1.2, (hz0 + hz1) / 2, hz1 - 1.2)):
         p.cylinder((xw + 0.5, FLOOR + 0.3, zz - 0.7), (xw + 0.75, FLOOR + 0.32, zz + 0.7), 0.16, tone(PAL['oak_dark'], k),
@@ -281,20 +282,6 @@ def hall_floor(p, p_trim):
     # the arch's dressed sill, a layer proud over the wall core's cut
     abox(p, ARCH_TROPHY['x0'], ARCH_TROPHY['x1'], FLOOR - 0.02, FLOOR + LAYER, H['z1'], H['oz1'], PAL['ashlar_hi'],
          STONE)
-    # the guild's lantern inlaid in gold in the floor's middle: a ring and eight rays
-    for i in range(16):
-        a0, a1 = math.tau * i / 16, math.tau * (i + 1) / 16
-        r0, r1 = 1.8, 2.1
-        flat_face(p_trim, [(math.cos(a0) * r0, FLOOR + LAYER, math.sin(a0) * r0),
-                           (math.cos(a1) * r0, FLOOR + LAYER, math.sin(a1) * r0),
-                           (math.cos(a1) * r1, FLOOR + LAYER, math.sin(a1) * r1),
-                           (math.cos(a0) * r1, FLOOR + LAYER, math.sin(a0) * r1)], PAL['gold'], METAL, (0, 1, 0))
-    for i in range(8):
-        a = math.tau * i / 8
-        ca, sa = math.cos(a), math.sin(a)
-        pa, pb = (-sa * 0.18, ca * 0.18), (sa * 0.18, -ca * 0.18)
-        flat_face(p_trim, [(ca * 0.5 + pa[0], FLOOR + LAYER, sa * 0.5 + pa[1]), (ca * 0.5 + pb[0], FLOOR + LAYER, sa * 0.5 + pb[1]),
-                           (ca * 1.6, FLOOR + LAYER, sa * 1.6)], PAL['gold_dark'], METAL, (0, 1, 0))
 
 
 # ---------------------------------------------------------------------------
@@ -341,8 +328,6 @@ def trophy_hall(p, p_roof, p_trim, glow):
                   (th['x1'] - 0.55, FLOOR + 0.12, zw - 0.25), (th['x0'] + 0.55, FLOOR + 0.12, zw - 0.25)], PAL['soot'],
               STONE, (0, 1, 0))
     abox(p, th['x0'] - 0.25, th['x1'] + 0.25, th['mantel'] - 0.25, th['mantel'], zf - 0.4, zw, PAL['ashlar_hi'], STONE)
-    abox(p_trim, th['x0'] + 0.2, th['x1'] - 0.2, th['mantel'] - 0.42, th['mantel'] - 0.3, zf - 0.02 - LAYER, zf - LAYER,
-         PAL['gold'], METAL)
     # (its fire is the campfire's live flame too: render/highwatch_guild_lights.ts)
     for xx in (-0.9, 0.9):
         p.cylinder((xx - 0.6, FLOOR + 0.25, zw - 0.55), (xx + 0.6, FLOOR + 0.27, zw - 0.7), 0.14, PAL['oak_dark'], WOOD,

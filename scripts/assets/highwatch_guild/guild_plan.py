@@ -29,6 +29,10 @@ HALL_PITCH = (HALL['ridge'] - HALL['plate']) / HALL['oz1']   # rise per yard of 
 EAVE_OUT = 1.35       # the great roof's eaves past the walls (deep, the roof the hero)
 VERGE_OUT = 0.85     # and past the gables
 TRUSS_X = (-10.5, -3.5, 3.5, 10.5)
+# the oak pilaster under each truss end, against the front and back walls, from a stone base on the
+# floor up to the plate: its half width and depth, its base's, how high the base stands, and how far
+# the pilaster stands off the wall's inner face
+PILASTER = dict(half=0.32, depth=0.22, base_half=0.42, base_depth=0.3, base_h=0.45, off=0.14)
 
 DOOR = dict(x0=-1.9, x1=1.9, head=FLOOR + 5.6)            # the front door: 3.8 x 5.6
 ARCH_TROPHY = dict(x0=-4.2, x1=4.2, head=FLOOR + 8.0)     # the hall to the trophy hall
@@ -133,6 +137,15 @@ def collision_boxes():
         T['z1'] - TROPHY_HEARTH['depth'], T['z1'])
     # the lantern tower: solid, the front's left corner
     add('tower', W['x0'], W['x1'], FOOT, W['plate'], W['z0'], W['z1'])
+    # the truss pilasters on their bases, against the front and back walls (the pair at the trophy
+    # arch stands in its mouth, where a player walks past it): body-high, what a player bumps,
+    # while the camera's air keeps its own clearance off the walls above
+    P = PILASTER
+    for x in TRUSS_X:
+        for sz in (1, -1):
+            zf = sz * (H['z1'] - P['off'])
+            zb = zf - sz * P['base_depth']
+            add('hall_pilaster', x - P['base_half'], x + P['base_half'], FOOT, FLOOR + 2.0, min(zf, zb), max(zf, zb))
     # the two chimney stacks outside the walls (the hearth's up the right gable, the trophy
     # hall's behind its back wall)
     hz = (HEARTH['z0'] + HEARTH['z1']) / 2

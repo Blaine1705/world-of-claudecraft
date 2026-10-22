@@ -44,29 +44,29 @@ type GuildTier = 'full' | 'half' | 'quarter';
 /** Each tier's shipped bytes and sha256 (build.mjs prints both). */
 const SHIPPED: Record<GuildTier, { bytes: number; sha256: string }> = {
   full: {
-    bytes: 4265488,
-    sha256: '59f8f47e14a5979f2997907ad0338fe3ebf6abe527dc501c3727a01160874c9b',
+    bytes: 4189756,
+    sha256: '7a860f1e452f263fd5bfd79e12af29039b28269b3ae3099369d10247b34e3441',
   },
   half: {
-    bytes: 2479704,
-    sha256: '8a9a04170eb631d67c2cf4c8d6cbcfe1356acc262dfa8c3db35694eb0da39550',
+    bytes: 2500200,
+    sha256: '3bf7acaeae9b83ad210dd18e28712e14b55f1cb9fd5e6fa81806f5fcb9dfea4f',
   },
   quarter: {
-    bytes: 1974176,
-    sha256: 'f9b0042c879cb97cfbeeed5583201ad6290e358283294cd3913a17701f4c4886',
+    bytes: 2025032,
+    sha256: '4549ee17ff7380e296f355f75aa6d393a86e47921489a162a509df52ad80fe06',
   },
 };
 const TIERS = Object.keys(SHIPPED) as GuildTier[];
 const tierFile = (tier: GuildTier) => path.join(ROOT, tierTarget(tier));
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  GuildShell: 20560,
+  GuildShell: 22828,
   GuildRoof: 11608,
-  GuildTrim: 2188,
-  GuildYard: 4433,
-  GuildGlow: 668,
+  GuildTrim: 2124,
+  GuildYard: 4975,
+  GuildGlow: 664,
   G_INT_Timber: 1968,
-  G_INT_Furnishings: 21036,
+  G_INT_Furnishings: 20962,
   G_INT_Trophy_hollow_crypt: 800,
   G_INT_Trophy_sunken_bastion: 797,
   G_INT_Trophy_drowned_temple: 700,
@@ -374,9 +374,10 @@ describe('the Highwatch guild GLB', () => {
   it('ships its texture tiers: the same model with every map at half and a quarter of its size', () => {
     const base = readGlb(GLB);
     const baseImages = images(base);
-    // the five tiling colour maps (plaster, timber, dressed stone, slate, cloth), their five
-    // normal maps and the props' atlas
-    expect(baseImages).toHaveLength(11);
+    // the four tiling colour maps a shipped face wears (plaster, timber, dressed stone, slate),
+    // their four normal maps and the props' atlas (the cloth maps stay in textures.json for the
+    // built pieces that stand in where a prop is not packed: no shipped face wears cloth)
+    expect(baseImages).toHaveLength(9);
     for (const img of baseImages) expect(img.mime).toBe('image/ktx2');
     // at full: every tiling map at the tier table's size (the builder resizes by that table, so
     // its numbers are pinned here too) and the props' one atlas at its packed size

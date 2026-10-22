@@ -123,10 +123,10 @@ crest = guild_crest
 # ---------------------------------------------------------------------------
 # Small pieces
 # ---------------------------------------------------------------------------
-def arch_ring(p, wall, u0, u1, spring, t, color=None, n=7, depth=0.3, key=True):
+def arch_ring(p, wall, u0, u1, spring, t, color=None, n=7, depth=0.3):
     """A dressed-stone round arch over an opening (u0..u1) springing at `spring`, on both
-    faces, with the stone between the arch and the square head the opening was cut to; the
-    keystone gilded."""
+    faces, with the stone between the arch and the square head the opening was cut to (every
+    voussoir dressed stone, the keystone too: a gilded one drew as a flat yellow block)."""
     um, r = (u0 + u1) / 2, (u1 - u0) / 2
     half = t / 2
     color = color or PAL['ashlar_hi']
@@ -148,8 +148,7 @@ def arch_ring(p, wall, u0, u1, spring, t, color=None, n=7, depth=0.3, key=True):
                    wall.pt(um - c1 * r1, spring + s1 * r1, wa), wall.pt(um - c0 * r1, spring + s0 * r1, wa),
                    wall.pt(um - c0 * r0, spring + s0 * r0, wb), wall.pt(um - c1 * r0, spring + s1 * r0, wb),
                    wall.pt(um - c1 * r1, spring + s1 * r1, wb), wall.pt(um - c0 * r1, spring + s0 * r1, wb)]
-            is_key = key and i == n // 2
-            hexa(p, pts, PAL['gold'] if is_key else tone(color, i, s, u0), METAL if is_key else STONE)
+            hexa(p, pts, tone(color, i, s, u0), STONE)
     # the jambs' dressed quoins and the imposts the arch springs from
     for s in (1, -1):
         wa, wb = (half - 0.02, half + depth / 2) if s > 0 else (-half - depth / 2, -half + 0.02)

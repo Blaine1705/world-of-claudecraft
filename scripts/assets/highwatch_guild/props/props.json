@@ -169,14 +169,6 @@
       "dense": "tmp/asset_src/highwatch_guild_props/src/weapon_rack_tripo.glb"
     },
     {
-      "id": "bearskin_rug",
-      "about": "the fireside's bearskin (the tavern's)",
-      "source": "tmp/asset_src/highwatch_guild_props/low/bearskin_rug.glb",
-      "triangles": 600,
-      "tile": [512, 3584, 512],
-      "dense": "tmp/asset_src/highwatch_guild_props/src/bearskin_rug_tripo.glb"
-    },
-    {
       "id": "barrel_stack",
       "about": "the stacked barrels (the tavern's)",
       "source": "tmp/asset_src/highwatch_guild_props/low/barrel_stack.glb",
@@ -271,6 +263,21 @@
       "triangles": 300,
       "tile": [256, 4352, 256],
       "dense": "tmp/asset_src/highwatch_guild_props/src/bottle_trio_tripo.glb"
+    },
+    {
+      "id": "shield_blue_iron",
+      "about": "the Crucible's blue iron epic shield on the board wall (the game's own epic shield model)",
+      "source": "public/models/weapons/shield_epic_crucible_heat_blue_iron.glb",
+      "triangles": 600,
+      "tile": [512, 3584, 512],
+      "turn": 180
+    },
+    {
+      "id": "shield_ember_warden",
+      "about": "the Votive ember warden epic shield on the board wall (the game's own epic shield model)",
+      "source": "public/models/weapons/shield_epic_votive_ember_warden.glb",
+      "triangles": 600,
+      "tile": [0, 4608, 512]
     }
   ]
 }

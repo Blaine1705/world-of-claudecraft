@@ -18,8 +18,8 @@ import math
 from guild_kit import _ball, chain
 from guild_lib import (GLASS_BLUE, GLOW, GLOW_CANDLE, GLOW_LANTERN, LAYER, METAL, PAL, STONE, WOOD, abox, cbox, cyl,
                        flat_face, hashf, pick, tone)
-from guild_pieces import (barrel, bench, candelabrum, candle, chair, chandelier, goblet, plate, rug, sconce, shield,
-                          sword, table, weapon_rack)
+from guild_pieces import (barrel, bench, candelabrum, candle, chair, chandelier, goblet, plate, sconce, shield, sword,
+                          table, weapon_rack)
 from guild_pieces import banner as cloth_banner
 
 from guild_plan import (BOARD, BOARD_DESK, COUNTER, FLOOR, FRONT_TABLES, HALL, HEARTH, RECRUIT_TABLE, TROPHY,
@@ -252,12 +252,6 @@ def recruitment(p, glow):
 def fireside(p, glow):
     xf = H['x0'] + HEARTH['depth']
     zm = (HEARTH['z0'] + HEARTH['z1']) / 2
-    # a bear-skin rug before the fire (a plain hide shape, a layer over the floor)
-    hide = [(xf + 0.6, zm - 1.6), (xf + 1.4, zm - 1.9), (xf + 2.4, zm - 1.5), (xf + 3.2, zm - 1.8), (xf + 3.4, zm - 0.6),
-            (xf + 3.6, zm + 0.6), (xf + 3.2, zm + 1.8), (xf + 2.4, zm + 1.5), (xf + 1.4, zm + 1.9), (xf + 0.6, zm + 1.6),
-            (xf + 0.9, zm)]
-    # (two layers up: the hearthstone's top is a layer over the floor and the hide lies on it)
-    flat_face(p, [(a, FLOOR + 2 * LAYER, b) for (a, b) in hide], (0.34, 0.24, 0.17), WOOD, (0, 1, 0))
     # two high-backed armchairs facing the fire, a little table with goblets between them
     chair(p, xf + 3.2, zm - 2.2, -math.pi / 2 - 0.5, high=2.8, col=PAL['oak'][2], carved=True, cushion=PAL['garnet'])
     chair(p, xf + 3.2, zm + 2.2, -math.pi / 2 + 0.5, high=2.8, col=PAL['oak'][2], carved=True, cushion=PAL['blue'])
@@ -280,9 +274,6 @@ def fireside(p, glow):
 # The rest of the great hall
 # ---------------------------------------------------------------------------
 def great_hall(p, glow):
-    # the runner from the door to the trophy arch, broken round the lantern inlaid in the floor
-    rug(p, -2.0, 2.0, H['z0'] + 0.9, -2.6, field=PAL['blue'], border=PAL['gold_dark'], seed=1)
-    rug(p, -2.0, 2.0, 2.6, H['z1'] - 0.4, field=PAL['blue'], border=PAL['gold_dark'], seed=2)
     # the adventurers' tables near the door, benches either side, mugs and plates
     for i, (fx, fz) in enumerate(FRONT_TABLES):
         table(p, fx, fz, 5.2, 1.5, h=1.0, col=PAL['oak'][i])
@@ -294,7 +285,7 @@ def great_hall(p, glow):
             plate(p, px, FLOOR + 1.0, pz)
             p.prism((px + 0.3, FLOOR + 1.0, pz), 8, 0.11, 0.12, 0.26, PAL['pewter'], METAL, axis=(0, 1, 0), cap1=False)
     # weapon racks in the front corners, against the front wall
-    for x in (11.0, -11.0):
+    for x in (12.4, -12.4):
         weapon_rack(p, x, H['z0'] + 0.5)
     # two wheel chandeliers over the hall, hung from the ridge beam above the camera's air
     for sx in (1, -1):
@@ -629,8 +620,6 @@ TROPHIES = {
 
 def trophy_room(p, glow, trophies, gilt):
     T = TROPHY
-    rug(p, -2.4, 2.4, H['oz1'] + 0.8, T['z1'] - TROPHY_HEARTH['depth'] - 1.6, field=PAL['garnet'], border=PAL['gold_dark'],
-        seed=5)
     for sx in (1, -1):
         bench(p, sx * 4.4, 15.4, 0.6, 3.2, col=PAL['oak'][2])
     # (in the back corners beside the hearth, clear of the way in through the arch)
@@ -766,15 +755,14 @@ def recruitment_props(p, glow):
 
 
 def fireside_props(p, glow):
-    """The guildmaster's fireside: the bearskin before the hearth, two armchairs turned to the
-    fire, a little table with goblets between them, the guild's great banner over the mantel."""
+    """The guildmaster's fireside: two armchairs turned to the fire, a little table with goblets
+    between them, the guild's great banner over the mantel (the floors inside are bare flags: no
+    rug or hide on them anywhere)."""
     if not has('armchair'):
         fireside(p, glow)
         return
     xf = H['x0'] + HEARTH['depth']
     zm = (HEARTH['z0'] + HEARTH['z1']) / 2
-    if has('bearskin_rug'):
-        stand(p, 'bearskin_rug', (xf + 2.3, FLOOR + 2 * LAYER, zm), -math.pi / 2, 0.42)
     for sz, turn in ((-1, 0.5), (1, -0.5)):
         stand(p, 'armchair', (xf + 3.3, FLOOR, zm + sz * 2.25), -math.pi / 2 + turn, 2.3)
     table(p, xf + 4.3, zm, 0.9, 0.9, h=0.75, col=PAL['walnut'])
@@ -790,13 +778,10 @@ def fireside_props(p, glow):
 
 
 def hall_props(p, glow):
-    """The great hall's dressing: the runner from the door to the trophy arch, the adventurers'
-    long tables and their benches, tankards and bread on them, the weapon racks against the
-    front wall, two wheel chandeliers hung from the ridge beam, the guild's banners, shields and
-    crossed swords on the gables, the sconces on the trusses' pilasters, barrels and crates in
-    the front corners."""
-    rug(p, -2.0, 2.0, H['z0'] + 0.9, -2.6, field=PAL['blue'], border=PAL['gold_dark'], seed=1)
-    rug(p, -2.0, 2.0, 2.6, H['z1'] - 0.4, field=PAL['blue'], border=PAL['gold_dark'], seed=2)
+    """The great hall's dressing: the adventurers' long tables and their benches, tankards and
+    bread on them, the weapon racks against the front wall, two wheel chandeliers hung from the
+    ridge beam, the guild's banners, shields and crossed swords on the gables, the sconces on the
+    trusses' pilasters, barrels and crates in the front corners."""
     for i, (fx, fz) in enumerate(FRONT_TABLES):
         if has('long_table'):
             stand_fit(p, 'long_table', (fx, FLOOR, fz), 0.0, 5.2, 1.5, 1.12)
@@ -816,12 +801,13 @@ def hall_props(p, glow):
         if has('tankard') and not has('long_table'):
             for k, dx in enumerate((-0.4, 0.9)):
                 stand(p, 'tankard', (fx + dx, top, fz + (0.3 if k else -0.32)), 0.7 + k * 2.1, 0.32)
-    # weapon racks against the front wall, two to a corner, their feet on the floor
+    # weapon racks against the front wall, two to a corner either side of the corner's truss
+    # pilaster, their feet on the floor
     if has('weapon_rack'):
-        for x in (10.2, 12.4, -10.2, -12.4):
+        for x in (8.9, 12.5, -8.9, -12.5):
             hang(p, 'weapon_rack', (x, FLOOR + 1.15, H['z0']), (0.0, 1.0), 2.1)
     else:
-        for x in (11.0, -11.0):
+        for x in (12.4, -12.4):
             weapon_rack(p, x, H['z0'] + 0.5)
     # two wheel chandeliers over the hall on chains from the ridge beam (their wheels where the
     # built ones hung, the runtime's lights in them)
@@ -848,10 +834,16 @@ def hall_props(p, glow):
             hang(p, 'guild_banner', (x, FLOOR + 7.75, H['z1']), (0.0, -1.0), 3.6)
         else:
             cloth_banner(p, x, H['z1'], FLOOR + 9.6, (0, -1), width=1.6, length=3.8, field=PAL['blue'], emblem=True)
-    for (zz, field) in ((-7.4, PAL['blue']), (9.0, PAL['garnet'])):
-        shield(p, H['x1'] - 0.02, FLOOR + 5.6, zz, (-1, 0), r=0.8, field=field)
-        sword(p, H['x1'] - 0.02, FLOOR + 5.6, zz, 0.7, (-1, 0))
-        sword(p, H['x1'] - 0.02, FLOOR + 5.6, zz, -0.7, (-1, 0))
+    # the game's own epic shields on the board's gable over the wainscot, the Crucible's blue iron
+    # by the front and the Votive's ember warden by the back (built shields and crossed swords
+    # where they are not packed)
+    for (zz, name, field) in ((-7.4, 'shield_blue_iron', PAL['blue']), (9.0, 'shield_ember_warden', PAL['garnet'])):
+        if has(name):
+            hang(p, name, (H['x1'] - 0.02, FLOOR + 5.6, zz), (-1.0, 0.0), 1.75, standoff=0.04)
+        else:
+            shield(p, H['x1'] - 0.02, FLOOR + 5.6, zz, (-1, 0), r=0.8, field=field)
+            sword(p, H['x1'] - 0.02, FLOOR + 5.6, zz, 0.7, (-1, 0))
+            sword(p, H['x1'] - 0.02, FLOOR + 5.6, zz, -0.7, (-1, 0))
     # sconces on the trusses' pilasters (proud of the back and front walls)
     for x in (-10.5, 10.5):
         for sz in (1, -1):
@@ -870,14 +862,12 @@ def hall_props(p, glow):
 
 
 def trophy_props(p, glow, trophies, gilt):
-    """The trophy hall: a runner to the hearth, benches, candelabra in the back corners beside
-    the hearth, a sconce between each wall's two plaques, and for each dungeon its oak plaque (in
-    the furnishings, always there), its trophy on the plaque (its own part: shown once the viewer
-    has cleared it) and the gilded laurels framing it (its own part: shown for a Heroic clear).
-    Each slot's piece is the painted prop where it is packed, the built one where it is not."""
+    """The trophy hall: benches, candelabra in the back corners beside the hearth, a sconce
+    between each wall's two plaques, and for each dungeon its oak plaque (in the furnishings,
+    always there), its trophy on the plaque (its own part: shown once the viewer has cleared it)
+    and the gilded laurels framing it (its own part: shown for a Heroic clear). Each slot's piece
+    is the painted prop where it is packed, the built one where it is not."""
     T = TROPHY
-    rug(p, -2.4, 2.4, H['oz1'] + 0.8, T['z1'] - TROPHY_HEARTH['depth'] - 1.6, field=PAL['garnet'],
-        border=PAL['gold_dark'], seed=5)
     for sx in (1, -1):
         if has('bench'):
             stand_fit(p, 'bench', (sx * 4.4, FLOOR, 15.4), math.pi / 2, 3.2, 0.6, 0.62)
