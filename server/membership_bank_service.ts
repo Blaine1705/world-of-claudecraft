@@ -66,25 +66,30 @@ export function createMembershipBankService<S extends MembershipBankSession>(
     views.set(session, info);
     host.publish(session, info);
   };
-  const fail = (session: S, error: string): void =>
+  // A refused move keeps the bank it was aimed at on screen (keep = that
+  // character); every other refusal clears the stale contents.
+  const fail = (session: S, error: string, keep?: number): void => {
+    const view = views.get(session) ?? empty();
     send(session, {
-      ...(views.get(session) ?? empty()),
-      bank: null,
+      ...view,
+      bank: keep !== undefined && view.selectedCharacterId === keep ? view.bank : null,
       error,
     });
+  };
   const membershipActive = (member: MembershipAuthorization): boolean =>
     member.active && Number(member.expiresAt) > now() && member.authorizedUntil > now();
 
   async function run(
     session: S,
     work: (membership: MembershipAuthorization) => Promise<void>,
+    keep?: number,
   ): Promise<void> {
     if (!host.authorized(session)) {
       fail(session, 'invalid');
       return;
     }
     if (pending.has(session.accountId) || pending.size >= MEMBERSHIP_BANK_MAX_IN_FLIGHT) {
-      fail(session, 'busy');
+      fail(session, 'busy', keep);
       return;
     }
     const time = now();
@@ -92,7 +97,7 @@ export function createMembershipBankService<S extends MembershipBankSession>(
     meter.tokens = Math.min(METER_BURST, meter.tokens + Math.max(0, time - meter.at) / 1000);
     meter.at = time;
     if (meter.tokens < 1) {
-      fail(session, 'rate_limited');
+      fail(session, 'rate_limited', keep);
       return;
     }
     meter.tokens--;
@@ -157,70 +162,75 @@ export function createMembershipBankService<S extends MembershipBankSession>(
       characterId: number,
       request: MembershipBankTransferRequest,
     ): Promise<void> {
-      return run(session, async (member) => {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), MEMBERSHIP_BANK_QUEUE_WAIT_MS);
-        try {
-          const answer = await host.enqueueExclusive(
-            session,
-            async () => {
-              clearTimeout(timer);
-              if (
-                controller.signal.aborted ||
-                !host.authorized(session) ||
-                !membershipActive(member)
-              )
-                return false;
-              const capture = host.capture(session);
-              if (!capture || !session.leaseNonce) return false;
-              const result = await database.transfer({
-                accountId: session.accountId,
-                characterId: session.characterId,
-                targetCharacterId: characterId,
-                leaseNonce: session.leaseNonce,
-                state: capture.state,
-                membership: member,
-                storageEffects: capture.storageEffects,
-                ledgerEffects: capture.bankLedgerSnapshot
-                  ? bankLedgerSaveEffects(capture.bankLedgerSnapshot)
-                  : undefined,
-                request,
-                stillAuthorized: () => host.authorized(session) && membershipActive(member),
-              });
-              if (!result.ok) {
-                if (result.error === 'uncertain' || result.error === 'lease_lost')
-                  host.quarantine(session, result.error);
-                fail(session, result.error);
+      return run(
+        session,
+        async (member) => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), MEMBERSHIP_BANK_QUEUE_WAIT_MS);
+          try {
+            const answer = await host.enqueueExclusive(
+              session,
+              async () => {
+                clearTimeout(timer);
+                if (
+                  controller.signal.aborted ||
+                  !host.authorized(session) ||
+                  !membershipActive(member)
+                )
+                  return false;
+                const capture = host.capture(session);
+                if (!capture || !session.leaseNonce) return false;
+                const result = await database.transfer({
+                  accountId: session.accountId,
+                  characterId: session.characterId,
+                  targetCharacterId: characterId,
+                  leaseNonce: session.leaseNonce,
+                  state: capture.state,
+                  membership: member,
+                  storageEffects: capture.storageEffects,
+                  ledgerEffects: capture.bankLedgerSnapshot
+                    ? bankLedgerSaveEffects(capture.bankLedgerSnapshot)
+                    : undefined,
+                  request,
+                  stillAuthorized: () => host.authorized(session) && membershipActive(member),
+                });
+                if (!result.ok) {
+                  if (result.error === 'uncertain' || result.error === 'lease_lost') {
+                    host.quarantine(session, result.error);
+                    fail(session, result.error);
+                  } else fail(session, result.error, characterId);
+                  return true;
+                }
+                // This section is synchronous: no economy command or passive grant
+                // can interleave the durable acknowledgement and exact-delta apply.
+                let applied = false;
+                try {
+                  applied = host.apply(session, result.value) && host.acknowledge(session, capture);
+                } catch (error) {
+                  host.onError(error);
+                }
+                if (!applied) {
+                  host.quarantine(session, 'changed');
+                  fail(session, 'uncertain');
+                  return true;
+                }
+                send(session, {
+                  ...(views.get(session) ?? empty()),
+                  selectedCharacterId: characterId,
+                  bank: result.value.bank,
+                  error: undefined,
+                });
                 return true;
-              }
-              // This section is synchronous: no economy command or passive grant
-              // can interleave the durable acknowledgement and exact-delta apply.
-              let applied = false;
-              try {
-                applied = host.apply(session, result.value) && host.acknowledge(session, capture);
-              } catch (error) {
-                host.onError(error);
-              }
-              if (!applied) {
-                host.quarantine(session, 'changed');
-                fail(session, 'uncertain');
-                return true;
-              }
-              send(session, {
-                ...(views.get(session) ?? empty()),
-                selectedCharacterId: characterId,
-                bank: result.value.bank,
-                error: undefined,
-              });
-              return true;
-            },
-            controller.signal,
-          );
-          if (!answer) fail(session, 'busy');
-        } finally {
-          clearTimeout(timer);
-        }
-      });
+              },
+              controller.signal,
+            );
+            if (!answer) fail(session, 'busy', characterId);
+          } finally {
+            clearTimeout(timer);
+          }
+        },
+        characterId,
+      );
     },
   };
 }

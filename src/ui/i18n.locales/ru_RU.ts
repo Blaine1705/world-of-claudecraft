@@ -77,13 +77,29 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountSelect': 'Выберите персонажа, чтобы загрузить его банк.',
   'hudChrome.bank.accountUnavailable':
     'Этот банк недоступен. Выберите персонажа ещё раз, чтобы обновить данные.',
-  'hudChrome.bank.accountDeposit': 'Ваши сумки: положить в этот банк',
-  'hudChrome.bank.accountWithdraw': 'Выбранный банк: забрать в свои сумки',
   'hudChrome.bank.accountDepositHint':
     'Нажмите, чтобы положить эту стопку в банк выбранного персонажа.',
   'hudChrome.bank.accountWithdrawHint': 'Нажмите, чтобы забрать эту стопку в свои сумки.',
   'hudChrome.bank.accountBound':
     'Привязанные, заблокированные и квестовые предметы нельзя передавать между персонажами.',
+  'hudChrome.bank.accountLoading': 'Загрузка персонажей...',
+  'hudChrome.bank.accountOpening': 'Открываем банк персонажа {name}...',
+  'hudChrome.bank.accountOnline':
+    'Персонаж {name} в игре. Выйдите этим персонажем, чтобы открыть его банк здесь.',
+  'hudChrome.bank.accountBusy': 'Банк занят. Попробуйте ещё раз через мгновение.',
+  'hudChrome.bank.accountNoFit': 'Для этой стопки нет места.',
+  'hudChrome.bank.accountStale': 'Стопка изменилась до переноса. Попробуйте ещё раз.',
+  'hudChrome.bank.accountTooLarge':
+    'Банк персонажа {name} слишком велик, чтобы открыть его отсюда. Войдите за персонажа {name}, чтобы им воспользоваться.',
+  'hudChrome.bank.accountRetry': 'Повторить',
+  'hudChrome.bank.accountBankTitle': 'Банк персонажа {name}',
+  'hudChrome.bank.accountBagsTitle': 'Ваши сумки',
+  'hudChrome.bank.accountSlots': 'Ячеек: {used} / {total}',
+  'hudChrome.bank.accountWithdrawLead': 'Нажмите на предмет, чтобы забрать его в сумки.',
+  'hudChrome.bank.accountDepositLead':
+    'Нажмите на предмет, чтобы отправить его в банк персонажа {name}.',
+  'hudChrome.bank.accountBankEmpty': 'Этот банк пуст.',
+  'hudChrome.bank.accountBagsEmpty': 'Ваши сумки пусты.',
   'hudChrome.wocStore.subscription.tokenTitle': 'Передаваемый жетон членства',
   'hudChrome.wocStore.subscription.tokenTerms':
     'Разовый платёж {price} за 30 дней. Жетон придёт этому персонажу по почте. Используйте его, чтобы продлить членство, или продайте на аукционе.',

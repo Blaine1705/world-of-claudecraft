@@ -76,14 +76,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountSelect': 'キャラクターを選んで銀行を読み込んでください。',
   'hudChrome.bank.accountUnavailable':
     'この銀行は利用できません。キャラクターを選び直して更新してください。',
-  'hudChrome.bank.accountDeposit': '自分のバッグ：この銀行に預ける',
-  'hudChrome.bank.accountWithdraw': '選択中の銀行：自分のバッグに引き出す',
   'hudChrome.bank.accountDepositHint':
     'クリックすると、このスタックを選択中のキャラクターの銀行に預けます。',
   'hudChrome.bank.accountWithdrawHint':
     'クリックすると、このスタックを自分のバッグに引き出します。',
   'hudChrome.bank.accountBound':
     '魂縛、ロック済み、クエスト用のアイテムはキャラクター間で移動できません。',
+  'hudChrome.bank.accountLoading': 'キャラクターを読み込んでいます…',
+  'hudChrome.bank.accountOpening': '{name}の銀行を開いています…',
+  'hudChrome.bank.accountOnline':
+    '{name}はログイン中です。そのキャラクターをログアウトすると、ここで銀行を開けます。',
+  'hudChrome.bank.accountBusy': '銀行が混み合っています。少し待ってからもう一度お試しください。',
+  'hudChrome.bank.accountNoFit': 'そのスタックを入れる空きがありません。',
+  'hudChrome.bank.accountStale': '移動する前にスタックが変化しました。もう一度お試しください。',
+  'hudChrome.bank.accountTooLarge':
+    '{name}の銀行は大きすぎるため、ここでは開けません。{name}でログインして利用してください。',
+  'hudChrome.bank.accountRetry': 'もう一度試す',
+  'hudChrome.bank.accountBankTitle': '{name}の銀行',
+  'hudChrome.bank.accountBagsTitle': '自分のバッグ',
+  'hudChrome.bank.accountSlots': '{used} / {total} スロット',
+  'hudChrome.bank.accountWithdrawLead': 'アイテムをクリックすると自分のバッグに移します。',
+  'hudChrome.bank.accountDepositLead': 'アイテムをクリックすると{name}の銀行に送ります。',
+  'hudChrome.bank.accountBankEmpty': 'この銀行は空です。',
+  'hudChrome.bank.accountBagsEmpty': 'バッグは空です。',
   'hudChrome.wocStore.subscription.tokenTitle': '取引可能なメンバーシップトークン',
   'hudChrome.wocStore.subscription.tokenTerms':
     '{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。',
