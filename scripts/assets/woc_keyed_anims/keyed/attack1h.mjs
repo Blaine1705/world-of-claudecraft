@@ -39,19 +39,19 @@ export const SWORD_GUARD = {
     blade: { r: [-0.5, -0.2, 0.84] },
   },
   female: {
-    pelvis: { pos: [-0.005, 0.54, -0.015], rot: [2, -40, 0] },
-    spine: [0, -6, 0],
-    chest: [0, -6, 0],
-    neck: [5, 22, 0],
-    head: [5, 26, 0],
+    pelvis: { pos: [-0.02, 0.535, -0.035], rot: [6, -28, 0] },
+    spine: [7, 5, -2],
+    chest: [9, 6, -3],
+    neck: [-8, 7, 1],
+    head: [-11, 8, 1],
     clav: { l: [0, 0], r: [0, 0] },
     reach: {
-      r: R([-0.16, 0.52, -0.24], [-0.3, 0, -1]),
-      l: R([-0.07, 0.73, 0.22], [0.8, -0.6, 0]),
+      r: R([-0.26, 0.54, -0.08], [-0.4, -0.2, -1]),
+      l: R([0.24, 0.55, 0.12], [0.6, -0.2, -1]),
     },
-    forearm: { l: 40 },
-    wrist: { l: [20, 0] },
-    blade: { r: [-0.64, 0.23, 0.73] },
+    forearm: { l: 25 },
+    wrist: { l: [10, 0] },
+    blade: { r: [-0.5, -0.18, 0.85] },
   },
 };
 /** Guard foot anchors: the lead (left) and rear (right) feet. */
@@ -372,8 +372,8 @@ function female() {
       t: 0,
       ease: 1,
       foot: {
-        l: { pos: front, pitch: 0, yaw: -10, knee: 4 },
-        r: { pos: back, pitch: 0, yaw: 55, knee: 6 },
+        l: { pos: front, pitch: 0, yaw: 10, knee: 6 },
+        r: { pos: back, pitch: 0, yaw: 30, knee: 8 },
       },
     },
     { t: 0.36, ease: 1, foot: { r: { pitch: -2 } } },
@@ -383,8 +383,8 @@ function female() {
       t: 1,
       ease: 1,
       foot: {
-        l: { pos: front, pitch: 0, yaw: -10, knee: 4 },
-        r: { pos: back, pitch: 0, yaw: 55, knee: 6 },
+        l: { pos: front, pitch: 0, yaw: 10, knee: 6 },
+        r: { pos: back, pitch: 0, yaw: 30, knee: 8 },
       },
     },
   ];
