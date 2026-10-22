@@ -527,11 +527,13 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // They are parked in ITEM_ART_PENDING and borrow existing paintings through
     // src/ui/item_art_placeholders.ts until their own art lands, so the
     // art-subject set stays 133 and the parked hotbar set is exactly those four.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(137);
+    // + Lantern Hall's destrier reins (PR 4530), painted in
+    // lantern-hall-destrier-reins-2026-10-16: 138 live, 134 art subjects.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(138);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(133);
+    ).toHaveLength(134);
     expect([...pendingHotbarItemIds].sort(), 'ITEM_ART_PENDING hotbar items').toEqual([
       'referral_fog_charm',
       'referral_hollow_charm',
