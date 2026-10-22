@@ -1,8 +1,10 @@
+import type { VaultSpecialRef } from '../../world_api/bank';
 import { bagPools } from '../bags';
 import { bankPools, bumpBankWireRev, moveBetweenContainers } from '../bank';
 import { INSTANCE_X_BASE } from '../data';
 import { isMaterialItemId } from '../material_ids';
 import { normalizeLoadedMaterialSlot } from '../material_slot_load';
+import { vaultDepositFromCourier, vaultWithdrawToCourier } from '../materials_vault';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot, DT, type Entity, type InvSlot } from '../types';
@@ -37,6 +39,10 @@ const facingOf = (player: Entity) => (Number.isFinite(player.facing) ? player.fa
 function returnHome(state: CourierState, player: Entity): void {
   state.phase = 'returning';
   state.withdrawals = [];
+  // A trip abandoned before the exchange brings its vault-bound stacks home.
+  if (state.vaultCargo?.length) state.cargo.push(...state.vaultCargo);
+  delete state.vaultCargo;
+  delete state.vaultWithdrawals;
   state.revision++;
   if (player.pos.x >= INSTANCE_X_BASE || player.dead) {
     // Instance or corpse coordinates must not size the leg: plan it on the
@@ -56,7 +62,28 @@ function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: Cour
   // Deposits only top up existing indices or append. Resolve identities before
   // those top-ups, then withdraw descending indices and the original quantities.
   let selected: ({ slot: InvSlot; index: number } | null)[] = [];
+  let vaultSelected: { itemId: string; count: number | undefined; ref?: VaultSpecialRef }[] = [];
   const deposit = () => {
+    // Vault rows resolve before any deposit can merge into (and so re-key) the
+    // identity row the player picked. Pooled stock pays the count shown; an
+    // identity row pays the whole row as it was seen.
+    vaultSelected = (state.vaultWithdrawals ?? []).flatMap((s) => {
+      if (!s.special) return [{ itemId: s.itemId, count: s.count }];
+      const row = meta.vault.special[s.special.index];
+      if (!row || row.itemId !== s.itemId || courierSlotFingerprint(row) !== s.special.fingerprint)
+        return [];
+      return [
+        {
+          itemId: s.itemId,
+          count: row.count,
+          ref: {
+            index: s.special.index,
+            instance: row.instance,
+            craftedRecipeId: row.craftedRecipeId,
+          },
+        },
+      ];
+    });
     // A refused host admission does no fingerprinting or container cloning.
     selected = [...state.withdrawals]
       .sort((a, b) => b.index - a.index)
@@ -69,6 +96,12 @@ function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: Cour
     for (let i = state.cargo.length - 1; i >= 0; i--) {
       moveBetweenContainers(state.cargo, i, undefined, meta.bank.inventory, bankPools(meta.bank));
     }
+    // After the bank leg, so what the vault cannot hold rides home with the bank
+    // leftovers instead of falling into the personal bank.
+    const vaultCargo = state.vaultCargo ?? [];
+    for (let i = vaultCargo.length - 1; i >= 0; i--) vaultDepositFromCourier(meta, vaultCargo, i);
+    state.cargo.push(...vaultCargo);
+    delete state.vaultCargo;
   };
   const withdraw = () => {
     for (const selection of selected) {
@@ -83,6 +116,18 @@ function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: Cour
       if (!courierPayloadFits({ cargo: plannedCargo, withdrawals: [] }, COURIER_ADMISSION_BYTES))
         continue;
       withdrawOriginal(meta.bank.inventory, index, slot, state.cargo);
+    }
+    for (const { itemId, count, ref } of vaultSelected) {
+      vaultWithdrawToCourier(
+        meta,
+        state.cargo,
+        { general: COURIER_CAPACITY, materials: 0 },
+        itemId,
+        count,
+        ref,
+        (planned) =>
+          courierPayloadFits({ cargo: planned, withdrawals: [] }, COURIER_ADMISSION_BYTES),
+      );
     }
   };
   if (ctx.courierBankExchange) {

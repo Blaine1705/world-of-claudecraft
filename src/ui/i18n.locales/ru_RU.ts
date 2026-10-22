@@ -55,9 +55,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.select': 'Выбрать: {item}, {count}',
   'hudChrome.courier.selectedItem': 'Снять выбор: {item}, {count}',
   'hudChrome.courier.instructions':
-    'Выберите целые стопки. Курьер сначала положит их в банк, затем заберёт выбранные предметы. Предметы заданий отправлять нельзя.',
+    'Выберите целые стопки для банка или хранилища. Курьер сначала положит их, затем заберёт выбранные предметы. Предметы заданий отправлять нельзя.',
   'hudChrome.courier.membership': 'Продлите подписку, чтобы начать новую доставку.',
   'hudChrome.courier.unavailable': 'Призовите курьера, чтобы подготовить доставку.',
+  'hudChrome.courier.bagsVault': 'Отправить материалы в хранилище',
+  'hudChrome.courier.vault': 'Забрать из хранилища. Выбранная строка забирается целиком.',
+  'hudChrome.courier.vaultTitle': 'Хранилище',
+  'hudChrome.courier.storeTabs': 'Хранилища курьера',
+  'hudChrome.courier.vaultCap': 'До {cap} шт. каждого материала',
+  'hudChrome.courier.vaultEmpty': 'Хранилище пусто.',
+  'hudChrome.courier.vaultLocked':
+    'Откройте хранилище у банкира, чтобы пользоваться им через курьера.',
+  'hudChrome.courier.boundBank': 'Отправится в банк',
+  'hudChrome.courier.boundVault': 'Отправится в хранилище',
   'entities.abilities.courier.name': 'Курьер',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': 'Преимущества действующего членства',

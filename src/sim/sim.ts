@@ -10674,6 +10674,12 @@ export class Sim {
   courierBankInfoFor(pid: number) {
     return courierMod.courierBankInfoFor(this.ctx, pid);
   }
+  courierVaultInfoFor(pid: number) {
+    return courierMod.courierVaultInfoFor(this.ctx, pid);
+  }
+  courierVaultTripFor(pid: number) {
+    return courierMod.courierVaultTripFor(this.ctx, pid);
+  }
   courierPoseFor(pid: number) {
     return courierMod.courierPoseFor(this.ctx, pid);
   }
