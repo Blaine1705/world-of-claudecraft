@@ -772,6 +772,12 @@ export const guideStrings = {
     // along.
     framesGovernedUnitTooltip:
       "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
+    // The detachable resource bar ('playerResource') and the King of the Hill
+    // bar ('hillBar') joined HUD_FRAME_SPECS together. Own key for the same
+    // reason as the aura tracks; the option names are the live
+    // hudChrome.options values. Wordy (M16): non-Latin fills ride along.
+    framesGovernedResourceAndHill:
+      'Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background on that tab fades its panel while the text stays clear.',
 
     barsTitle: 'Bars, timers, and combat text',
     barsBody:

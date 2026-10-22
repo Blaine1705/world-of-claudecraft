@@ -26,9 +26,11 @@ const UNIT_KEYS = {
   focusTarget1: ['focusTarget1Width', 'focusTarget1Height'],
   focusTarget2: ['focusTarget2Width', 'focusTarget2Height'],
   focusTarget3: ['focusTarget3Width', 'focusTarget3Height'],
+  playerResource: ['playerFrameResourceWidth', 'playerFrameResourceHeight'],
 } as const;
 
-/** Pet and focus frames resize their bars without stretching text or portraits. */
+/** Pet and focus frames resize their bars without stretching text or portraits;
+ *  the detached resource bar is one unzoomed bar, so its height drag is 1:1. */
 export function additionalUnitDimensions(
   id: string,
   options: () => FramesMenuSettingsHooks | null,
@@ -37,9 +39,10 @@ export function additionalUnitDimensions(
   if (!keys) return undefined;
   const zoom = () =>
     id === 'petFrame' ? 0.8 * Number(options()?.settings.get('playerFrameScale') ?? 1) : 1;
+  const bars = id === 'playerResource' ? 1 : 2;
   return {
     width: frameDimension(options, keys[0], zoom),
-    height: frameDimension(options, keys[1], () => 2 * zoom()),
+    height: frameDimension(options, keys[1], () => bars * zoom()),
   };
 }
 

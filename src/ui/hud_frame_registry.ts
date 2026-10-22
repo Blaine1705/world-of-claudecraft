@@ -20,10 +20,12 @@ export function registerHudFrames(deps: {
   options(): FramesMenuSettingsHooks | null;
 }): (force?: boolean) => void {
   const independentTarget = () => !!deps.options()?.settings.get('moveTargetOfTargetIndependently');
+  const detachedResource = () => !!deps.options()?.settings.get('playerFrameResourceDetached');
   let petMover: MovableFrame | undefined;
   let petStorageKey: string | undefined;
   let petMigrated = false;
   let targetMover: MovableFrame | undefined;
+  let resourceMover: MovableFrame | undefined;
   for (const spec of HUD_FRAME_SPECS) {
     const frame = deps.document.getElementById(spec.elementId);
     if (!frame) continue;
@@ -61,6 +63,7 @@ export function registerHudFrames(deps: {
       petStorageKey = spec.storageKey;
     }
     if (spec.id === 'targetOfTarget') targetMover = mover;
+    if (spec.id === 'playerResource') resourceMover = mover;
     const setting = frameRowSettingKey(spec.id);
     deps.registry.register({
       id: spec.id,
@@ -68,13 +71,15 @@ export function registerHudFrames(deps: {
       geometryActive: () =>
         deps.groups.isActive(spec.id) &&
         (spec.id !== 'targetOfTarget' || independentTarget()) &&
+        (spec.id !== 'playerResource' || detachedResource()) &&
         (spec.id !== 'actionBarGroup' || deps.isActive('actionBarGroup')) &&
         (!['actionBar1', 'actionBar2', 'actionBar3'].includes(spec.id) ||
           !deps.isActive('actionBarGroup')),
       isActive: () =>
         deps.groups.isActive(spec.id) &&
         deps.isActive(spec.id) &&
-        (spec.id !== 'targetOfTarget' || independentTarget()),
+        (spec.id !== 'targetOfTarget' || independentTarget()) &&
+        (spec.id !== 'playerResource' || detachedResource()),
       ...(setting
         ? {
             rowOverride: {
@@ -99,6 +104,7 @@ export function registerHudFrames(deps: {
     });
   }
   let independent: boolean | undefined;
+  let resourceDetached: boolean | undefined;
   return (force = false) => {
     if (!deps.options()) return;
     if ((!petMigrated || force) && petMover && petStorageKey) {
@@ -114,6 +120,11 @@ export function registerHudFrames(deps: {
         /* Storage unavailable. */
       }
     }
+    const resource = detachedResource();
+    if (resource !== resourceDetached || force) {
+      resourceDetached = resource;
+      syncResourceDetach(deps, resource, resourceMover);
+    }
     const next = independentTarget();
     if (next === independent && !force) return;
     independent = next;
@@ -126,6 +137,34 @@ export function registerHudFrames(deps: {
       });
     } else deps.registry.clearAppliedGeometry('targetOfTarget');
   };
+}
+
+/**
+ * Detach Resource Bar: on, the bar adopts its saved spot, or (first time) a
+ * seat exactly where it sits on the player frame, so the flip never moves it
+ * under the player's eye; off, its applied geometry drops (the saved spot
+ * stays for the next flip) and it rides the player frame again. A hide from
+ * the frames menu belongs to the DETACHED frame only, so re-docking shows the
+ * bar again: the player frame's own bar is never hidden through this row.
+ */
+function syncResourceDetach(
+  deps: { registry: InterfaceUnlock; document: Document },
+  detached: boolean,
+  mover: MovableFrame | undefined,
+): void {
+  if (!mover) return;
+  if (detached) {
+    deps.registry.restoreSavedPosition('playerResource');
+    const bar = deps.document.getElementById('pf-resource-frame')?.getBoundingClientRect();
+    mover.detachAtCurrentPosition({
+      left: bar && bar.width > 0 ? bar.left : 320,
+      top: bar && bar.height > 0 ? bar.top : 200,
+    });
+  } else {
+    deps.registry.clearAppliedGeometry('playerResource');
+    if (mover.isUserHidden) mover.setUserHidden(false);
+  }
+  deps.registry.refresh();
 }
 
 /** The edit preview replaces the live party rows while arranging frames. */

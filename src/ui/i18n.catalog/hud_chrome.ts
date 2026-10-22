@@ -2696,6 +2696,17 @@ export const hudChromeStrings = {
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY
     // for the M16 guard.
     showPetFrame: 'Show Your Pet',
+    // Interface > Frames toggle (off by default): lifts the player's resource bar
+    // (mana, energy, rage) out of the player frame into a frame of its own. The
+    // two sliders under it size that frame and show only while it is detached.
+    playerFrameResourceDetached: 'Detach Resource Bar',
+    playerFrameResourceWidth: 'Resource Bar Width',
+    playerFrameResourceHeight: 'Resource Bar Height',
+    // Interface > Frames slider: how solid the King of the Hill bar's panel is
+    // behind its text (the text itself never fades).
+    hillBarOpacity: 'King of the Hill Background',
+    // A pixel-size slider readout, e.g. "232 px".
+    pixelsValue: '{value} px',
     // Interface > Combat toggles (both on by default) for the two dot-tracking
     // surfaces. Both show only the LOCAL player's OWN debuffs, on every class:
     // the icon row on an enemy's nameplate, and the standalone Target dots frame
@@ -5738,6 +5749,7 @@ export const hudChromeStrings = {
       // aria labels (Your Hero / Your Mark / Your Band), which read as riddles
       // in an arrangement mode.
       playerFrame: 'Player',
+      playerResource: 'Resource Bar',
       targetFrame: 'Target',
       partyFrames: 'Party',
       // The auto-attack swing timer (#swingbar), hidden outside combat like

@@ -2115,6 +2115,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.minimap': 'ミニマップ',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': 'スタンスバー',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'プレイヤー',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'リソースバー',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': 'ターゲット',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': 'パーティ',
   'hudChrome.options.combineActionBars': 'アクションバーをまとめる',
@@ -13605,6 +13606,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
   'hudChrome.options.showTargetSwingTimer': 'ターゲットの攻撃タイマーを表示',
   'hudChrome.options.showPetFrame': '自分のペットを表示',
+  'hudChrome.options.playerFrameResourceDetached': 'リソースバーを分離',
+  'hudChrome.options.playerFrameResourceWidth': 'リソースバーの幅',
+  'hudChrome.options.playerFrameResourceHeight': 'リソースバーの高さ',
+  'hudChrome.options.hillBarOpacity': '丘の王の背景の不透明度',
   'hudChrome.options.showDefensivesTrack': '防御クールダウンを表示',
   'hudChrome.options.showSelfBuffTrack': '自分のバフを表示',
   'hudChrome.options.showOffensiveTrack': '攻撃クールダウンを表示',
@@ -18303,6 +18308,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    '「フレーム」タブで「リソースバーを分離」をオンにすると、「フレーム編集」でリソースバーも動かせるようになり、マナ、エネルギー、怒りを好きな場所に単独で置けます。同じタブの「リソースバーの幅」と「リソースバーの高さ」でサイズを変えられます。「フレーム編集」では丘の王のバーも動かせ、同じタブの「丘の王の背景の不透明度」で文字はそのままにパネルを薄くできます。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.mapBodyZoneFirst':

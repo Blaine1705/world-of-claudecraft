@@ -16345,11 +16345,13 @@
   }
 
   /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */
-  /* Self-mounted by src/ui/hud/hill/hill_bar_painter.ts, top centre below the
-     Thornhollow Fields scoreboard's slot; shown only while the player stands in
-     the hill's zone. The tone classes are chosen by the painter from the
-     readout's union; the state is carried by text too, so colour is never the
-     only channel. */
+  /* Static #hill-bar in both entries (a governed frame: move, resize, hide,
+     backdrop opacity), painted by src/ui/hud/hill/hill_bar_painter.ts into its
+     #hill-body. Stock seat top centre below the Thornhollow Fields
+     scoreboard's slot; shown only while the player stands in the hill's
+     zone. The tone classes are chosen by the painter from the readout's
+     union; the state is carried by text too, so colour is never the only
+     channel. */
   #hill-bar {
     position: absolute;
     top: 8px;
@@ -16361,13 +16363,30 @@
     max-width: min(360px, calc(100vw - 24px));
     pointer-events: none;
     text-align: center;
-    background: var(--panel-bg-strong);
-    border: 1px solid var(--color-bg-field-edge);
+    /* The backdrop lives on ::before so King of the Hill Background
+       (hillBarOpacity, --hill-bar-opacity) can fade the panel without the
+       text; the transparent border keeps the stock box geometry. */
+    border: 1px solid transparent;
     border-radius: 9px;
     padding: 6px 14px 8px;
-    box-shadow: 0 2px 16px color-mix(in srgb, var(--color-keyline) 63%, transparent);
     font-size: 12px;
     color: var(--color-text);
+  }
+  /* The panel itself: fill, border and shadow fade together at the player's
+     chosen opacity, and the text above them never does. The root's own
+     z-index makes it a stacking context, so -1 still paints inside it. At the
+     stock 1 this is exactly the solid panel the bar always had. */
+  #hill-bar::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--panel-bg-strong);
+    border: 1px solid var(--color-bg-field-edge);
+    box-shadow: 0 2px 16px color-mix(in srgb, var(--color-keyline) 63%, transparent);
+    opacity: var(--hill-bar-opacity, 1);
+    pointer-events: none;
   }
   #hill-bar .hill-head {
     display: flex;

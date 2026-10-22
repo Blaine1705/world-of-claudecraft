@@ -1030,6 +1030,8 @@ describe('options_window: off-menu reset keys are pinned per tab', () => {
       'focusTarget2Height',
       'focusTarget3Width',
       'focusTarget3Height',
+      'playerFrameResourceWidth',
+      'playerFrameResourceHeight',
       'showPetFrame',
       'showEmptyFocusFrames',
       'partyFrameWidth',

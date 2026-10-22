@@ -2109,6 +2109,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.minimap': '미니맵',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': '태세 바',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': '플레이어',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': '자원 바',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': '대상',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': '파티',
   'hudChrome.options.combineActionBars': '액션 바 합치기',
@@ -13563,6 +13564,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
   'hudChrome.options.showTargetSwingTimer': '대상의 공격 타이머 표시',
   'hudChrome.options.showPetFrame': '내 펫 표시',
+  'hudChrome.options.playerFrameResourceDetached': '자원 바 분리',
+  'hudChrome.options.playerFrameResourceWidth': '자원 바 너비',
+  'hudChrome.options.playerFrameResourceHeight': '자원 바 높이',
+  'hudChrome.options.hillBarOpacity': '언덕의 왕 배경 투명도',
   'hudChrome.options.showDefensivesTrack': '방어 재사용 대기시간 표시',
   'hudChrome.options.showSelfBuffTrack': '내 버프 표시',
   'hudChrome.options.showOffensiveTrack': '공격 재사용 대기시간 표시',
@@ -18261,6 +18266,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '프레임 편집은 대화 패널도 해제합니다. 대화 패널은 말하는 NPC가 시야 밖에 있을 때 그 NPC의 대사를 담으며, 해제된 동안에는 자신의 이름 칩을 표시합니다.',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '"프레임 편집"은 툴팁 프레임도 풀어 줍니다. 마우스를 올린 대상의 카드가 나타나는 자리로, 생물이면 레벨과 종류, 다른 플레이어면 칭호, 길드, 레벨과 직업, 그리고 전문화와 그 역할이 표시됩니다. 원하는 곳으로 끌어 놓으면 카드는 그 자리에서 가장 가까운 화면 가장자리를 피하는 방향으로 펼쳐집니다. "프레임 설정"의 "프레임 표시 및 숨기기"에서 툴팁 체크를 해제하면 이 카드를 완전히 숨길 수 있습니다.',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    '프레임 탭에서 자원 바 분리를 켜면 프레임 편집으로 자원 바도 풀려, 마나, 기력, 분노를 원하는 곳에 따로 둘 수 있습니다. 같은 탭의 자원 바 너비와 자원 바 높이로 크기를 조절합니다. 프레임 편집은 언덕의 왕 바도 풀어 주며, 같은 탭의 언덕의 왕 배경 투명도로 글자는 선명하게 둔 채 패널을 흐리게 할 수 있습니다.',
   'guide.interfacePage.framesGovernedAuraTracks':
     '"프레임 편집"은 같은 인터페이스 옵션의 전투 탭에서 켠 선택형 오라 트랙 여섯 개, 곧 "내 버프" 트랙, "방어 재사용 대기시간" 트랙, "내 보호막" 트랙, "공격 재사용 대기시간" 트랙, "이동 및 은신" 트랙, "아군에게 건 내 버프" 트랙도 함께 풀어 줍니다. 모든 트랙은 기본적으로 꺼져 있으며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.',
   'guide.interfacePage.mapBodyZoneFirst':

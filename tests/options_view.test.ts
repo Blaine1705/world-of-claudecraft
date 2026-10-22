@@ -887,6 +887,10 @@ const FRAMES_KEYS = [
   'mouseoverCast',
   'partyFrameStyle',
   'showPetFrame',
+  // The resource bar's size sliders join this toggle only while it is on
+  // (pinned in the detached-arm test below); the default source has it off.
+  'playerFrameResourceDetached',
+  'hillBarOpacity',
   // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
   // partyFrameColumns and partyFrameSpacing moved into the in-editor Frames
   // Settings dropdown.
@@ -1274,6 +1278,46 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
 // catches the historical showAttackButton dupe (and any future control added
 // without a category, which would land uncategorized / drop out of the union).
 // ---------------------------------------------------------------------------
+describe('options_view: detachable resource bar rows', () => {
+  it('shows the width and height sliders under the toggle only while detached', () => {
+    const docked = keysOf(interfaceControlsForTab(buildInterfaceControls(makeSource()), 'frames'));
+    expect(docked).not.toContain('playerFrameResourceWidth');
+    expect(docked).not.toContain('playerFrameResourceHeight');
+    const toggle = find(buildInterfaceControls(makeSource()), 'playerFrameResourceDetached');
+    // The flip must rebuild the panel, or the sliders would not appear until
+    // the next visit.
+    expect(toggle?.control === 'boolToggle' && toggle.rerender).toBe(true);
+    const controls = buildInterfaceControls(
+      makeSource(
+        { playerFrameResourceWidth: 300, playerFrameResourceHeight: 18 },
+        { playerFrameResourceDetached: true },
+      ),
+    );
+    const keys = keysOf(interfaceControlsForTab(controls, 'frames'));
+    const at = keys.indexOf('playerFrameResourceDetached');
+    expect(keys.slice(at, at + 3)).toEqual([
+      'playerFrameResourceDetached',
+      'playerFrameResourceWidth',
+      'playerFrameResourceHeight',
+    ]);
+    for (const key of ['playerFrameResourceWidth', 'playerFrameResourceHeight'] as const) {
+      const row = find(controls, key);
+      expect(row?.control).toBe('slider');
+      if (row?.control !== 'slider') continue;
+      // Whole pixels, read as px, bounded by the setting's own range.
+      expect(row.fmt).toBe('pixels');
+      expect(row.step).toBe(1);
+      expect([row.min, row.max]).toEqual([SETTING_RANGES[key].min, SETTING_RANGES[key].max]);
+    }
+    expect(find(controls, 'playerFrameResourceWidth')).toMatchObject({ value: 300 });
+  });
+
+  it('carries the King of the Hill backdrop slider as a percent', () => {
+    const row = find(buildInterfaceControls(makeSource({ hillBarOpacity: 0.4 })), 'hillBarOpacity');
+    expect(row).toMatchObject({ control: 'slider', fmt: 'percent', value: 0.4, min: 0, max: 1 });
+  });
+});
+
 describe('options_view: interface tab taxonomy', () => {
   it('declares the four tabs, in strip order, each with a label key', () => {
     expect([...INTERFACE_TAB_ORDER]).toEqual(['general', 'frames', 'chat', 'combat']);

@@ -2042,6 +2042,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.minimap': '小地图',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': '姿态栏',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': '玩家',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': '资源条',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': '目标',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': '队伍',
   'hudChrome.interfaceUnlock.frameNames.chat': '聊天',
@@ -12944,6 +12945,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showTargetOfTarget': '显示目标的目标',
   'hudChrome.options.showTargetSwingTimer': '显示目标的挥击计时器',
   'hudChrome.options.showPetFrame': '显示你的宠物',
+  'hudChrome.options.playerFrameResourceDetached': '分离资源条',
+  'hudChrome.options.playerFrameResourceWidth': '资源条宽度',
+  'hudChrome.options.playerFrameResourceHeight': '资源条高度',
+  'hudChrome.options.hillBarOpacity': '山丘之王背景不透明度',
   'hudChrome.options.showDefensivesTrack': '显示防御性冷却',
   'hudChrome.options.showSelfBuffTrack': '显示我的增益',
   'hudChrome.options.showOffensiveTrack': '显示攻击性冷却',
@@ -17406,6 +17411,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '“编辑框体”也会解锁对话面板：当某个 NPC 不在你的视野内时，它承载该 NPC 说出的台词；处于解锁状态时它会显示自己的名称标签。',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '“编辑框体”也会解锁提示框框体，也就是鼠标所停留对象的信息卡出现的位置：生物的等级与种类，或其他玩家的头衔、公会、等级与职业，以及专精和对应定位。把它拖到任意位置，信息卡就会从那里朝远离屏幕最近边缘的方向展开。在“框体设置”的“显示或隐藏框体”中取消勾选“提示框”，即可完全隐藏这张信息卡。',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    '在“头像框”标签页中开启“分离资源条”后，“编辑框体”也会解锁你的资源条，让你的法力、能量或怒气可以单独放在任意位置；同一标签页中的“资源条宽度”和“资源条高度”可调整它的大小。“编辑框体”也会解锁山丘之王条，同一标签页中的“山丘之王背景不透明度”可淡化它的面板，而文字保持清晰。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '“编辑框体”还会松开六条可选的光环轨道，前提是你已在同一“界面”选项的“战斗”页中开启它们：“我的增益”轨道、“防御性冷却”轨道、“我的护盾”轨道、“攻击性冷却”轨道、“移动与潜行”轨道，以及“我给队友的增益”轨道。所有轨道默认关闭，松开期间每一条都挂着自己的名牌。',
   'guide.interfacePage.mapBodyZoneFirst':

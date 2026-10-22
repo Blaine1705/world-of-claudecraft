@@ -237,6 +237,17 @@ export const SETTING_RANGES = {
   focusTarget2Height: { min: 8, max: 30, def: 15 },
   focusTarget3Width: { min: 120, max: 460, def: 240 },
   focusTarget3Height: { min: 8, max: 30, def: 15 },
+  // The player's resource bar (mana / energy / rage) once it is detached from
+  // the player frame (playerFrameResourceDetached): its own width and bar
+  // thickness in px (--player-resource-width / --player-resource-height). Read
+  // only while detached; docked, the bar keeps the player frame's geometry.
+  // Stock = the docked bar (the 232px bars panel, the 11px --bar-h-res).
+  playerFrameResourceWidth: { min: 60, max: 460, def: 232 },
+  playerFrameResourceHeight: { min: 6, max: 40, def: 11 },
+  // The King of the Hill bar's BACKDROP opacity (--hill-bar-opacity): the
+  // panel fill, border and shadow fade, the text never does (it is what the
+  // player reads the contest from). 1 = the stock solid panel, 0 = text only.
+  hillBarOpacity: { min: 0, max: 1, def: 1 },
   // Health text on the player frame and on the target (plus target-of-target)
   // frame, same mode table as partyFrameHealthText below; both default to the
   // historical always-on "current / max".
@@ -649,6 +660,10 @@ export const BOOL_SETTINGS = {
   // as an ordinary owned mob entity.
   showPetFrame: { def: true },
   showEmptyFocusFrames: { def: false },
+  // off by default: lift the resource bar (mana / energy / rage) out of the
+  // player frame into a frame of its own, placed and sized through the
+  // interface editor and the frame options (playerFrameResourceWidth/Height).
+  playerFrameResourceDetached: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },

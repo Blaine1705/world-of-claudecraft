@@ -65,7 +65,7 @@ export function withGraphicsDraft<K extends string>(
 /** How a slider's readout is formatted; the painter maps this to a formatter. */
 // 'shoulder' reads a -1..1 offset as "Left 60%" / "Center" / "Right 100%"
 // (actionCamShoulderReadout below resolves which key and percent).
-export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'shoulder';
+export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'shoulder' | 'pixels';
 
 /** The Action Cam shoulder slider's readout: which label key, and the
  *  magnitude as a 0..1 fraction for the percent formatter. */
@@ -1047,6 +1047,37 @@ export function buildInterfaceControls(
         { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
       ]),
       boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
+      // Detach Resource Bar lifts mana / energy / rage into a frame of its own;
+      // its size rows exist only while it is detached (docked, the bar takes
+      // the player frame's geometry), so the toggle re-renders the panel.
+      boolToggle(
+        s,
+        'playerFrameResourceDetached',
+        'hudChrome.options.playerFrameResourceDetached',
+        {
+          rerender: true,
+        },
+      ),
+      ...(s.bool('playerFrameResourceDetached')
+        ? [
+            slider(
+              s,
+              'playerFrameResourceWidth',
+              'hudChrome.options.playerFrameResourceWidth',
+              'pixels',
+              1,
+            ),
+            slider(
+              s,
+              'playerFrameResourceHeight',
+              'hudChrome.options.playerFrameResourceHeight',
+              'pixels',
+              1,
+            ),
+          ]
+        : []),
+      // The King of the Hill bar's backdrop; its text stays solid.
+      slider(s, 'hillBarOpacity', 'hudChrome.options.hillBarOpacity'),
       choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
