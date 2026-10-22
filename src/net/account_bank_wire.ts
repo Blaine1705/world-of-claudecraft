@@ -60,6 +60,8 @@ export function selectAccountBankMirror(
  *  for a bank to open with the roster (a plain bank visit reads no other
  *  character's bank), and the one roster read in flight, which expires so a
  *  lost reply can be retried. */
+/** How long an unanswered roster read blocks another (a lost reply retries). */
+const ROSTER_READ_EXPIRY_MS = 6_000;
 export class AccountBankRequests {
   private preferred: number | null = null;
   private openFirst = false;
@@ -68,7 +70,7 @@ export class AccountBankRequests {
    *  since a second would only bounce off the server's pending slot as busy. */
   list(openFirst: boolean, now = performance.now()): boolean {
     if (openFirst) this.openFirst = true;
-    if (this.listSentAt !== null && now - this.listSentAt < 5_000) return false;
+    if (this.listSentAt !== null && now - this.listSentAt < ROSTER_READ_EXPIRY_MS) return false;
     this.listSentAt = now;
     return true;
   }
