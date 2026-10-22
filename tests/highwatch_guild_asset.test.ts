@@ -337,8 +337,10 @@ describe('the Highwatch guild GLB', () => {
     // normal maps and the props' atlas
     expect(baseImages).toHaveLength(11);
     for (const img of baseImages) expect(img.mime).toBe('image/ktx2');
+    // the props' one atlas at its packed size (props/props.json): a re-pack at twice the side
+    // would quadruple its memory in every tier and still halve cleanly, so the size is pinned
     const atlas = baseImages.find((img) => img.name === 'GuildProps_color');
-    expect(atlas).toBeDefined();
+    expect(atlas).toMatchObject({ w: 2048, h: 5120 });
     for (const tier of TIERS.filter((t) => t !== 'full')) {
       const file = readGlb(tierFile(tier));
       expect(shape(file), tier).toBe(shape(base));
@@ -372,6 +374,19 @@ describe('the Highwatch guild GLB', () => {
     expect(placedTextureTierPath(model, 'quarter', exists)).toBe(
       '/models/tidehold/highwatch/guild.quarter.glb',
     );
+  });
+
+  it('holds every tier to its file budget', () => {
+    // The files: the model under 4400 KiB, its .half under 2600 KiB and its .quarter (what a
+    // phone loads) under 2100 KiB, so a re-export that grows one fails here and not only at
+    // its re-pinned hash. Every tier carries the same geometry and float UVs (about 1740 KiB:
+    // the painted faces' UVs repeat far past [0, 1], so they cannot be normalized). The rest is
+    // the KTX2 maps: five tiling colour maps at 1024, five normal maps at 128 and the props'
+    // 2048 by 5120 atlas, about 2430 KiB at full (the atlas 1480 KiB of it), 680 KiB at half
+    // and 190 KiB at a quarter.
+    expect(readFileSync(GLB).length).toBeLessThan(4400 * 1024);
+    expect(readFileSync(tierFile('half')).length).toBeLessThan(2600 * 1024);
+    expect(readFileSync(tierFile('quarter')).length).toBeLessThan(2100 * 1024);
   });
 
   it("was packed from the live props manifest: each piece's source, budget and tile", () => {
