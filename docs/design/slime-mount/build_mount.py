@@ -327,6 +327,10 @@ for b in pb:  # rest pose for the bind
     b.location, b.scale = (0, 0, 0), (1, 1, 1)
     b.rotation_quaternion = (1, 0, 0, 0)
 
+for screen in bpy.data.screens:  # open the .blend textured, not in plain Solid
+    for area in screen.areas:
+        if area.type == "VIEW_3D":
+            area.spaces[0].shading.type = "MATERIAL"
 bpy.ops.wm.save_as_mainfile(filepath=out_glb.replace(".glb", ".blend"))
 bpy.ops.export_scene.gltf(
     filepath=out_glb,
