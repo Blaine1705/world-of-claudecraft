@@ -838,7 +838,9 @@ describe('Masterwrought art completion evidence', () => {
     // + the account-wide buddies (PR 4240): 32 whistle icons rendered from the buddy
     // GLBs and the 2 stag charm re-tints of them, on the same integration: 2039.
     // + the membership Staff of Changing (membership-weapon-2026-10-14, PR 4281): 2040.
-    expect(currentOwnerIds).toHaveLength(2040);
+    // + Lantern Hall's seal and its destrier's reins (lantern-hall-seal-2026-10-16,
+    // lantern-hall-destrier-reins-2026-10-16, PR 4530): 2042.
+    expect(currentOwnerIds).toHaveLength(2042);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1106,6 +1108,20 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => buddyIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(34);
 
+    // Lantern Hall (PR 4530): its seal and its destrier's reins, two more additive
+    // batches on the v0.45.0 integration, pinned by identity like the waves above.
+    const lanternHallBatchIds: readonly (string | undefined)[] = [
+      'lantern-hall-seal-2026-10-16',
+      'lantern-hall-destrier-reins-2026-10-16',
+    ];
+    const lanternHallIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => lanternHallBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect([...lanternHallIds].sort()).toEqual(['lantern_seal', 'reins_lantern_hall_destrier']);
+    expect(datedIds.filter((id) => lanternHallIds.has(id))).toEqual([]);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
@@ -1140,7 +1156,8 @@ describe('Masterwrought art completion evidence', () => {
         !balgathIds.has(id) &&
         !musterIds.has(id) &&
         !dungeonReworkIds.has(id) &&
-        !buddyIds.has(id),
+        !buddyIds.has(id) &&
+        !lanternHallIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

@@ -165,8 +165,10 @@ const build = await buildItemArtAudit({
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
     // + the membership Staff of Changing (PR 4281): 2040 / 2069, re-measured with
     // `--verify-only`.
-    catalogCount: 2040,
-    liveItemCount: 2069,
+    // + Lantern Hall's seal and its destrier's reins (PR 4530): 2042 / 2071,
+    // re-measured with `--verify-only` on the merged tree.
+    catalogCount: 2042,
+    liveItemCount: 2071,
     // Five referral rewards reuse existing art until their own paintings land.
     pendingArtCount: 142,
     generatedHeroicDefinitions: 116,
