@@ -155,7 +155,13 @@ import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { stoneboundShellStyle } from './stonebound_shell_core';
-import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
+import {
+  createStowTransition,
+  forceStow,
+  requestStow,
+  syncSittingStow,
+  tickStow,
+} from './stow_transition';
 import { auraHeldClip, stunIdleClip } from './stun_idle_core';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
@@ -1904,6 +1910,11 @@ export class CharacterVisual {
     this.stunIdle = stunIdle;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
+      const sittingStow = s.sitting || desired === 'sit' || desired === 'sitUp';
+      if (sittingStow && !this.stow.sitting && this.currentIsOneShot && this.isStowOneShot()) {
+        this.cancelOneShot();
+        this.stowLift.t = -1;
+      }
       const baseChanged = desired !== this.baseState;
       const previousBase = this.baseState;
       // the seated states play in the seat's anchor space (render/seated_pose.ts)
@@ -2009,6 +2020,10 @@ export class CharacterVisual {
         if (want && this.current !== want && this.current !== this.seatAction('down')) {
           this.fadeTo(want, 0.4, false);
         }
+      }
+      if (syncSittingStow(this.stow, sittingStow)) {
+        this.stowLift.t = -1;
+        this.applyStowSwap(false);
       }
       this.tickIdleBeat(dt, desired);
       this.tickIdleVariant(dt, desired);

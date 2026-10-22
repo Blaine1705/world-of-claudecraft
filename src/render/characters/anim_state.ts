@@ -254,10 +254,10 @@ export function isSwimmingAtDepth(
 
 /**
  * Should the rig show its weapon sheathed this frame? An OVERLAY on the sim's
- * cosmetic `weaponStowed` bit, not a write to it: swimming and riding both
- * force the sheathed pose (nobody swims or rides with a sword in hand)
- * without touching the player's own sheathe choice, so surfacing or
- * dismounting restores exactly what they had drawn. The caller MUST diff the
+ * cosmetic `weaponStowed` bit, not a write to it: swimming, riding, and sitting
+ * force the sheathed pose (nobody swims, rides, or sits with a sword in hand)
+ * without touching the player's own sheathe choice, so surfacing, dismounting,
+ * or standing up restores exactly what they had drawn. The caller MUST diff the
  * result into a single write site (renderer.ts): a second write against the
  * bare `weaponStowed` bit disagrees with this overlay on every frame the two
  * differ, which replays the sheathe gesture forever and never lands it.
@@ -266,8 +266,9 @@ export function weaponStowedOverlay(
   weaponStowed: boolean,
   swimming: boolean,
   mounted: boolean,
+  sitting = false,
 ): boolean {
-  return weaponStowed || swimming || mounted;
+  return weaponStowed || swimming || mounted || sitting;
 }
 
 /**

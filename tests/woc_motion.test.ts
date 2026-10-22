@@ -206,6 +206,32 @@ describe('WOC authored movement and held props', () => {
     expect(peek(visual).current.getClip().name).toBe('Woc_Swim_Idle');
     expect(visual.isMidOneShot).toBe(false);
   });
+
+  it('sheathes both weapon and shield onto the chest while sitting and restores drawn hands on stand-up', () => {
+    const visual = create('player_warrior_female');
+    expect(visual.setWeapon('worn_sword')).toHaveLength(1);
+    expect(visual.setOffhand('eastbrook_buckler')).toHaveLength(1);
+    tick(visual, {}, 10);
+    expect(heldProps(visual.root).map((h) => h.parent?.name)).toEqual(['handslotr', 'handslotl']);
+
+    // Sitting immediately moves both mainhand weapon and offhand shield to the back (chest)
+    // without playing the standing sheathe gesture one-shot over Sit_Down / Sit_Idle.
+    tick(visual, { sitting: true });
+    expect(heldProps(visual.root).map((h) => h.parent?.name)).toEqual(['chest', 'chest']);
+    expect(peek(visual).current.getClip().name).toBe('Sit_Down');
+
+    // Standing back up restores drawn weapons to the hands.
+    tick(visual, { sitting: false });
+    expect(heldProps(visual.root).map((h) => h.parent?.name)).toEqual(['handslotr', 'handslotl']);
+
+    // Sitting mid-flight during a standing Sheathe gesture cancels the one-shot
+    // so Sit_Down takes the rig immediately and props land on chest.
+    visual.setWeaponStowed(true);
+    expect(peek(visual).current.getClip().name).toBe('Sheathe');
+    tick(visual, { sitting: true });
+    expect(peek(visual).current.getClip().name).toBe('Sit_Down');
+    expect(heldProps(visual.root).map((h) => h.parent?.name)).toEqual(['chest', 'chest']);
+  });
 });
 
 describe('WOC attack and shout routing', () => {
