@@ -96,25 +96,6 @@ export function serializeBuddyCollection(c: BuddyCollection): SavedBuddyCollecti
   };
 }
 
-// The whistle itemId per catalog buddy, derived once from the merged ITEMS
-// table (single source: the item record declares `buddy`, nothing re-lists
-// the map). Static content, so the lazy module-level cache is multi-Sim safe.
-let buddyItemIds: Map<string, string> | null = null;
-
-/** The grant-token item for `key` (null for an unknown key, or a catalog
- *  buddy with no whistle). Used by the admin/mail/vendor channels, never by
- *  ownership. */
-export function buddyItemId(key: string): string | null {
-  if (!buddyDef(key)) return null;
-  if (!buddyItemIds) {
-    buddyItemIds = new Map();
-    for (const def of Object.values(ITEMS)) {
-      if (def.kind === 'buddy') buddyItemIds.set(def.buddy, def.id);
-    }
-  }
-  return buddyItemIds.get(key) ?? null;
-}
-
 /** Whether the player has collected the buddy. Unknown keys are never owned.
  *  A fresh player owns nothing. */
 export function buddyOwned(meta: PlayerMeta, key: string): boolean {

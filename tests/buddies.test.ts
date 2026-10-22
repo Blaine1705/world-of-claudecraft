@@ -16,7 +16,6 @@ vi.mock('../server/db', () => ({
 
 import {
   attachPendingBuddy,
-  buddyItemId,
   buddyOwned,
   grantBuddy,
   ownedBuddies,
@@ -29,7 +28,7 @@ import {
 } from '../src/sim/buddies';
 import { BUDDIES, BUDDY_KEYS, buddyDef, normalizeBuddyKey } from '../src/sim/content/buddies';
 import { buddyTemplateId } from '../src/sim/content/buddy_mobs';
-import { MOBS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { useItem } from '../src/sim/items';
 import {
@@ -64,11 +63,19 @@ describe('buddy catalog', () => {
     for (const [key, def] of Object.entries(BUDDIES)) expect(def.key).toBe(key);
   });
 
-  it('every catalog buddy has exactly one grant token, and it names the buddy back', () => {
-    for (const key of BUDDY_KEYS) {
-      const itemId = buddyItemId(key);
-      expect(itemId, `${key} has no whistle token`).not.toBeNull();
-    }
+  it('there is exactly one whistle per catalog buddy and no other', () => {
+    const whistles = Object.values(ITEMS).filter((item) => item.kind === 'buddy');
+    expect(whistles.map((item) => item.id).sort()).toEqual([
+      'whistle_crystal_lich',
+      'whistle_forgemaw',
+      'whistle_horse',
+      'whistle_sapling',
+      'whistle_sprites',
+    ]);
+    expect(whistles.map((item) => (item.kind === 'buddy' ? item.buddy : '')).sort()).toEqual(
+      [...BUDDY_KEYS].sort(),
+    );
+    expect(Object.values(ITEMS).filter((item) => item.kind === 'buddy_cosmetic')).toEqual([]);
   });
 
   it('buddyDef/normalizeBuddyKey resolve known ids and reject unknown ones', () => {
@@ -156,13 +163,6 @@ describe('grant tokens: a whistle attaches the companion and is consumed', () =>
     ).toBe(true);
   });
 
-  it('a retired cosmetic charm is refused without consumption or an unlock', () => {
-    const sim = makeWorld();
-    const pid = join(sim);
-    sim.addItem('charm_stag_gilded', 1, pid);
-    useItem(sim.ctx, 'charm_stag_gilded', pid);
-    expect(sim.countItem('charm_stag_gilded', pid)).toBe(1);
-  });
 });
 
 describe('summonBuddy: pick a collected buddy, pick it again to dismiss', () => {

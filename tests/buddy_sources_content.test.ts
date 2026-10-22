@@ -12,7 +12,7 @@ import type { ItemDef } from '../src/sim/types';
 const whistles: ItemDef[] = Object.values(ITEMS).filter((item) => item.kind === 'buddy');
 const charms: ItemDef[] = Object.values(ITEMS).filter((item) => item.kind === 'buddy_cosmetic');
 
-describe('buddy tokens: soulbound, consumed on use, never loot', () => {
+describe('buddy whistles: soulbound, never loot', () => {
   it('has a whistle for every buddy, so the sweeps below are not vacuous', () => {
     const active = whistles.filter((item) => item.kind === 'buddy' && buddyDef(item.buddy));
     expect(active.map((item) => item.id).sort()).toEqual([
@@ -38,11 +38,6 @@ describe('buddy tokens: soulbound, consumed on use, never loot', () => {
         // sells back for nothing and the vendor refuses it.
         expect(item.sellValue, `${item.id} sellValue`).toBe(0);
         expect(item.noVendorSell, `${item.id} noVendorSell`).toBe(true);
-        continue;
-      }
-      if (item.kind === 'buddy_cosmetic' && item.id === 'charm_stag_acorn') {
-        // The crafted charm vendors below its fifteen logs (recipe_economy).
-        expect(item.sellValue, `${item.id} sellValue`).toBe(200);
         continue;
       }
       expect(item.sellValue, `${item.id} sellValue`).toBe(50_000);
@@ -104,11 +99,8 @@ describe('every buddy source resolves', () => {
     for (const row of forge) expect(row.heroicOnly).toBe(true);
   });
 
-  it('historical charms have no active look and no remaining crafting source', () => {
-    expect(charms.map((charm) => charm.id).sort()).toEqual([
-      'charm_stag_acorn',
-      'charm_stag_gilded',
-    ]);
+  it('no charm items remain and nothing crafts a buddy item', () => {
+    expect(charms).toEqual([]);
     const recipes = ALL_RECIPES.filter((r) =>
       ['buddy', 'buddy_cosmetic'].includes(ITEMS[r.resultItemId]?.kind),
     );

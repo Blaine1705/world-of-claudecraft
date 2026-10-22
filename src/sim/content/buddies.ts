@@ -7,8 +7,8 @@
 // MobTemplate per key, spawned/despawned by src/sim/buddies.ts and heeled by
 // src/sim/pet/buddy_ai.ts using the same A*-pathed locomotion as a hunter
 // pet), which is the "AI" this catalog has: purely locomotion, never combat.
-// Ownership is a per-character collection flag. Soulbound whistle tokens
-// grant the companion once and are consumed on use. Summoning pairs the
+// Ownership is an account collection online. Active whistle tokens remain
+// usable for existing saves and developer grants. Summoning pairs the
 // Entity.buddyKey identity with a real follower entity spawn or despawn.
 //
 // Used by the authoritative Sim (ownership + the active-buddy flip + the
@@ -19,42 +19,6 @@
 // ---------------------------------------------------------------------------
 
 export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling' | 'sprites';
-
-// Historical whistle identities remain readable in existing bags and bank saves.
-// This type is only for item definitions; active ownership uses BuddyKey.
-export type BuddyTokenKey =
-  | BuddyKey
-  | 'sapling'
-  | 'ember_fox'
-  | 'moss_hare'
-  | 'frog'
-  | 'crimson_claw_crab'
-  | 'golden_sentinel'
-  | 'nightfang'
-  | 'tuskhorn_boar'
-  | 'emerald_wolf'
-  | 'tiger'
-  | 'cate_coin'
-  | 'alon'
-  | 'trollface'
-  | 'ansem'
-  | 'triple_t'
-  | 'kekius'
-  | 'solbot'
-  | 'frostfire'
-  | 'rocky'
-  | 'proud_grunt'
-  | 'loot_goblin'
-  | 'penny_goldspark'
-  | 'stag'
-  | 'alpaca'
-  | 'bull'
-  | 'spider'
-  | 'raptor'
-  | 'skeleton'
-  | 'crystal_tide'
-  | 'phantom'
-  | 'emberfall_phoenix';
 
 export interface BuddyDef {
   key: BuddyKey;
@@ -82,10 +46,8 @@ export const BUDDIES: Record<BuddyKey, BuddyDef> = {
   },
 };
 
-// Retired Emberfall Phoenix tokens remain readable in old saves and retain their
-// procedural icon. The companion has no live model or acquisition source; see
-// docs/achievements/icon-backlog-v045/retired-phoenix-disposition.md.
-export const BUDDY_ART_PENDING_ITEM_IDS: readonly string[] = ['whistle_emberfall_phoenix'];
+// Every active companion whistle has committed artwork.
+export const BUDDY_ART_PENDING_ITEM_IDS: readonly string[] = [];
 
 /** Catalog order: declaration order. */
 export const BUDDY_KEYS = Object.keys(BUDDIES) as readonly BuddyKey[];

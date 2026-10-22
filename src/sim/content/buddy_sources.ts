@@ -7,8 +7,8 @@
 // 100,000-honor direct purchase at both honor vendors (content/pvp_honor.ts).
 // Flicker and Glimmer come from the inviter's fifth completed referral card (referral_rewards.ts).
 //
-// Active whistle items are soulbound grant tokens, consumed on use. Historical
-// tokens remain readable in old inventories but cannot grant retired companions.
+// Gameplay rewards grant directly into the collection. Active whistle items
+// remain usable for saved inventories and developer grants.
 // The deed reward table is currently empty.
 //
 // `src/sim`-pure, rng-free (the rolls live in buddy_drops.ts).

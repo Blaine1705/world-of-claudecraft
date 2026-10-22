@@ -7,7 +7,7 @@ import type { MaterialComposition } from './material_sources';
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { ClutterStamp } from './city_clutter';
-import type { BuddyTokenKey } from './content/buddies';
+import type { BuddyKey } from './content/buddies';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
@@ -1679,15 +1679,13 @@ export interface MountItemDef extends BaseItemDef {
   weapon?: never;
 }
 
-// A buddy GRANT TOKEN (a whistle). Using it attaches the named companion to
-// the character (src/sim/buddies.ts useBuddyToken) and consumes the token;
-// ownership is the per-character collection flag, never the item. Soulbound
-// and never listed by any loot table: a whistle is the channel a vendor, a
-// letter or an admin grant uses to hand a companion over, nothing more. A
-// token for a companion the player already has is refused unconsumed.
+// A buddy WHISTLE: the item record of one active companion. Never in a bag
+// and never usable: every buddy is granted straight into the per-character
+// collection, and a vendor offer for a whistle grants the buddy instead of
+// the item (src/sim/vendor_buddy_purchase.ts).
 export interface BuddyItemDef extends BaseItemDef {
   kind: 'buddy';
-  buddy: BuddyTokenKey;
+  buddy: BuddyKey;
   armorType?: never;
   weapon?: never;
 }
