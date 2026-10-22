@@ -1,13 +1,17 @@
 // Owner-only courier snapshots and the admitted bank and vault exchange.
 // Cargo is bounded to 24 stacks. Moving the courier never rebuilds its bank projection.
 import {
+  type CourierAccountExchange,
   type CourierBankExchange,
   type CourierDispatchRequest,
   type CourierInfo,
   type CourierPose,
   type CourierVaultSelection,
   courierSelectionCount,
+  courierVaultInfoFor,
+  courierVaultTripFor,
 } from '../src/sim/courier';
+import type { SimContext } from '../src/sim/sim_context';
 import type { InvSlot, VaultConsumptionAdmission } from '../src/sim/types';
 import type { BankInfo, VaultInfo } from '../src/world_api/bank';
 import { buildPersonalBankLedgerRows, buildVaultLedgerRows } from './bank_ledger';
@@ -77,8 +81,8 @@ export interface CourierWireSim {
   courierPoseFor(pid: number): CourierPose | null;
   courierWireRevisionFor(pid: number): string | number | null;
   courierBankInfoFor(pid: number): BankInfo | null;
-  courierVaultInfoFor(pid: number): VaultInfo | null;
-  courierVaultTripFor(pid: number): Pick<CourierInfo, 'vaultCargo' | 'vaultWithdrawals'> | null;
+  /** The vault leg reads go straight to the courier module (no Sim delegates). */
+  readonly ctx: SimContext;
   meta(pid: number): { characterId?: number; inventory?: readonly InvSlot[] } | null | undefined;
 }
 export interface CourierWireSession {
@@ -146,7 +150,7 @@ export function dispatchCourierCommand(
     const vaultCargo = (request.vaultDeposits ?? []).flatMap((s) =>
       inventory[s.index] ? [inventory[s.index]] : [],
     );
-    const bound = courierVaultLedgerRowBound(sim.courierVaultInfoFor(pid), {
+    const bound = courierVaultLedgerRowBound(courierVaultInfoFor(sim.ctx, pid), {
       vaultCargo,
       vaultWithdrawals: request.vaultWithdrawals,
     });
@@ -226,9 +230,9 @@ export function courierBankExchangeFor(
   let vaultReservation: ReturnType<typeof owner.bankVaultLedgerGuard.admission.tryReserve> = null;
   try {
     before = sim.courierBankInfoFor(pid);
-    const trip = sim.courierVaultTripFor(pid);
+    const trip = courierVaultTripFor(sim.ctx, pid);
     if (trip?.vaultCargo?.length || trip?.vaultWithdrawals?.length) {
-      vaultBefore = sim.courierVaultInfoFor(pid);
+      vaultBefore = courierVaultInfoFor(sim.ctx, pid);
       const rows = courierVaultLedgerRowBound(vaultBefore, trip);
       // A trip the vault ledger cannot admit waits at the banker, like a full
       // personal bucket; dispatch already refused any trip above the burst.
@@ -255,7 +259,7 @@ export function courierBankExchangeFor(
     deposit();
     const middle = sim.courierBankInfoFor(pid);
     if (!middle) throw new Error('courier bank disappeared after deposit');
-    const vaultMiddle = vaultReservation ? sim.courierVaultInfoFor(pid) : null;
+    const vaultMiddle = vaultReservation ? courierVaultInfoFor(sim.ctx, pid) : null;
     withdraw();
     const after = sim.courierBankInfoFor(pid);
     if (!after) throw new Error('courier bank disappeared after withdraw');
@@ -267,7 +271,7 @@ export function courierBankExchangeFor(
     ];
     if (!reservation.commit(rows)) throw new Error('courier bank ledger commit refused');
     if (vaultReservation) {
-      const vaultAfter = sim.courierVaultInfoFor(pid);
+      const vaultAfter = courierVaultInfoFor(sim.ctx, pid);
       const vaultRows = [
         ...buildVaultLedgerRows('deposit', owner, vaultBefore, vaultMiddle),
         ...buildVaultLedgerRows('withdraw', owner, vaultMiddle, vaultAfter),
@@ -304,10 +308,12 @@ export function courierVaultLedgerRowBound(
 export function storageAdmissionsFor(
   simFor: () => CourierWireSim,
   sessionFor: (pid: number) => StorageAdmissionSession | undefined,
-): [VaultConsumptionAdmission, CourierBankExchange] {
+  courierAccountExchange: CourierAccountExchange,
+): [VaultConsumptionAdmission, CourierBankExchange, CourierAccountExchange] {
   return [
     vaultConsumptionAdmissionFor(sessionFor, (pid) => simFor().meta(pid)),
     (pid, deposit, withdraw) =>
       courierBankExchangeFor(simFor(), sessionFor(pid), pid, deposit, withdraw),
+    courierAccountExchange,
   ];
 }

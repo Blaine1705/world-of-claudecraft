@@ -4,7 +4,7 @@ import { courierSelectionCount } from '../../../sim/courier/types';
 import { ITEMS } from '../../../sim/data';
 import { isItemLocked } from '../../../sim/item_lock_flag';
 import type { InvSlot } from '../../../sim/types';
-import type { AccountBankInfo } from '../../../world_api/bank';
+import type { AccountBankInfo, IWorldBank } from '../../../world_api/bank';
 import { accountBankStage } from '../../account_bank_view';
 import { bagCornerMark, bagRimClasses } from '../../bag_corner_mark_view';
 import { bagFineMark } from '../../bag_fine_mark_view';
@@ -64,9 +64,7 @@ export interface CourierWindowDeps
   hideTooltip(): void;
   dispatch(request: CourierDispatchRequest): void;
   /** The shared bank roster and the selected character's bank (membership). */
-  accountBanks?(): AccountBankInfo | null;
-  requestAccountBanks?(openFirst?: boolean): void;
-  selectAccountBank?(characterId: number): void;
+  accounts?(): Pick<IWorldBank, 'accountBankInfo' | 'requestAccountBanks' | 'selectAccountBank'>;
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
@@ -128,7 +126,7 @@ export class CourierWindow {
     const info = this.deps.info();
     // The vault rides its own frame (no revision of its own on the mirror), so it
     // joins the cheap signature whole; it is a few dozen rows at most.
-    const accountInfo = this.deps.accountBanks?.() ?? null;
+    const accountInfo = this.deps.accounts?.().accountBankInfo ?? null;
     const cheapSignature = `${info?.phase}:${info?.active}:${info?.revision}:${info?.inventoryRevision}:${info?.bankRevision}:${info?.bankCapacity}:${this.deps.inventoryCapacity?.()}:${this.store}:${JSON.stringify(info?.vault ?? null)}:${JSON.stringify(accountInfo)}`;
     if (!force && cheapSignature === this.cheapSignature) return;
     this.cheapSignature = cheapSignature;
@@ -196,7 +194,7 @@ export class CourierWindow {
         const live = this.deps.info();
         if (!live?.active || live.phase !== 'ready') return;
         const side = button.dataset.courierSide as RowSide;
-        const loaded = this.loadedBank(this.deps.accountBanks?.() ?? null);
+        const loaded = this.loadedBank(this.deps.accounts?.().accountBankInfo ?? null);
         const slotsFor = (bank: readonly InvSlot[], other: readonly InvSlot[]) =>
           side === 'withdrawals' ? bank : side === 'accountWithdrawals' ? other : null;
         const slots = slotsFor(live.bankSlots, loaded?.slots ?? []) ?? this.deps.inventory();
@@ -256,7 +254,7 @@ export class CourierWindow {
       if (focusFollow) findFocusKey(this.el, `store-${id}`)?.focus();
     });
     wireTabStrip(this.el, 'courier-account-tab', (id, focusFollow) => {
-      this.deps.selectAccountBank?.(Number(id));
+      this.deps.accounts?.().selectAccountBank(Number(id));
       this.render(true);
       if (focusFollow) findFocusKey(this.el, `character-${id}`)?.focus();
     });
@@ -265,8 +263,8 @@ export class CourierWindow {
     for (const retry of this.el.querySelectorAll<HTMLButtonElement>('[data-courier-account-retry]'))
       retry.onclick = () => {
         const id = Number(retry.dataset.courierAccountRetry);
-        if (id > 0) this.deps.selectAccountBank?.(id);
-        else this.deps.requestAccountBanks?.(true);
+        if (id > 0) this.deps.accounts?.().selectAccountBank(id);
+        else this.deps.accounts?.().requestAccountBanks(true);
         this.render(true);
       };
     for (const tab of this.el.querySelectorAll<HTMLElement>('.courier-store-tab'))
@@ -297,7 +295,7 @@ export class CourierWindow {
           this.deps.inventory(),
           live?.bankSlots ?? [],
           live?.vault ?? null,
-          this.loadedBank(this.deps.accountBanks?.() ?? null),
+          this.loadedBank(this.deps.accounts?.().accountBankInfo ?? null),
         );
         if (canDispatchCourier(live, this.draft)) {
           this.deps.dispatch(courierDispatchRequest(this.draft));
@@ -411,7 +409,7 @@ export class CourierWindow {
   }
   /** Membership opens other characters' banks; an older host has no roster. */
   private accountsAvailable(info: CourierInfo): boolean {
-    return !!this.deps.accountBanks && info.active;
+    return !!this.deps.accounts && info.active;
   }
   /** The selected character's loaded bank, when there is one to plan against. */
   private loadedBank(
@@ -423,9 +421,9 @@ export class CourierWindow {
   }
   /** Showing the tab opens a bank, like the bank window's Other characters tab. */
   private openAccounts(): void {
-    const info = this.deps.accountBanks?.() ?? null;
+    const info = this.deps.accounts?.().accountBankInfo ?? null;
     if (!info || (info.selectedCharacterId === null && !info.error))
-      this.deps.requestAccountBanks?.(true);
+      this.deps.accounts?.().requestAccountBanks(true);
   }
   /** The left column: the bank, with a strip over it when the vault or other
    *  characters' banks are reachable too. */

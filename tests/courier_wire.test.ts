@@ -92,8 +92,7 @@ function host() {
     ),
     courierWireRevisionFor: () => rev,
     courierBankInfoFor: vi.fn(() => null),
-    courierVaultInfoFor: vi.fn(() => null),
-    courierVaultTripFor: vi.fn(() => null),
+    ctx: { players: new Map(), resolve: () => null } as never,
     meta: () => ({ characterId: 10 }),
   };
   return {

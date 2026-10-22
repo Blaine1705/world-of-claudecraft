@@ -1704,6 +1704,9 @@ export class GameServer {
         ...courierWire.storageAdmissionsFor(
           () => this.sim,
           (pid) => this.clients.get(pid),
+          // The courier's other-character leg runs on the membership bank path
+          // (constructed below; the Sim only calls it on a later tick).
+          (pid) => this.membership.courierAccountExchange(pid),
         ),
       ),
     );
@@ -1739,8 +1742,6 @@ export class GameServer {
       database: (job, signal) => this.withBackgroundDbPermit(job, signal),
       mailWrite: (job, signal) => this.enqueueMarketWriteForSave(signal, job),
     });
-    // The courier's other-character leg runs through the membership bank path.
-    this.sim.courierAccountExchange = (pid) => this.membership.courierAccountExchange(pid);
     this.sim.onBuddyGranted = (pid) => this.accountBuddies.granted(pid);
     this.referral = new ReferralGameAdapter({
       sim: this.sim,

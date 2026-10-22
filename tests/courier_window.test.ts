@@ -280,9 +280,13 @@ describe('courier window', () => {
     const requestAccountBanks = vi.fn();
     const selectAccountBank = vi.fn();
     Object.assign(deps, {
-      accountBanks: () => accounts,
-      requestAccountBanks,
-      selectAccountBank,
+      accounts: () => ({
+        get accountBankInfo() {
+          return accounts;
+        },
+        requestAccountBanks,
+        selectAccountBank,
+      }),
     });
     replaceBags([
       { itemId: 'healing_potion', count: 3 },

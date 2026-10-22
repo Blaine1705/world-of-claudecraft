@@ -59,8 +59,7 @@ function sim(value: CourierInfo | null): CourierWireSim {
       },
     courierWireRevisionFor: () => (value ? '1' : null),
     courierBankInfoFor: () => null,
-    courierVaultInfoFor: () => null,
-    courierVaultTripFor: () => null,
+    ctx: { players: new Map(), resolve: () => null } as never,
     meta: () => ({ characterId: 10, inventory: [] }),
   };
 }
@@ -148,15 +147,24 @@ describe('courier vault wire', () => {
   });
 
   it('reserves the vault ledger beside the bank and records both vault legs', () => {
-    const live = vault({ linen_scrap: 4 });
+    const live = { stock: { linen_scrap: 4 } as Record<string, number>, special: [], upgrades: 1 };
     const bank = { slots: [], purchasedSlots: 0, nextExpansionCost: 500 } as unknown as BankInfo;
-    const host = sim(info());
-    host.courierBankInfoFor = () => structuredClone(bank);
-    host.courierVaultInfoFor = () => structuredClone(live);
-    host.courierVaultTripFor = () => ({
-      vaultCargo: [{ itemId: 'copper_ore', count: 3 }],
-      vaultWithdrawals: [{ itemId: 'linen_scrap', count: 4 }],
-    });
+    const meta = {
+      vault: live,
+      courier: {
+        vaultCargo: [{ itemId: 'copper_ore', count: 3 }],
+        vaultWithdrawals: [{ itemId: 'linen_scrap', count: 4 }],
+      },
+    };
+    const host = {
+      ...sim(info()),
+      courierBankInfoFor: () => structuredClone(bank),
+      ctx: {
+        players: new Map([[17, meta]]),
+        resolve: () => ({ meta }),
+        storagePrices: { vaultUpgrades: [20000, 50000, 100000, 200000, 400000] },
+      } as never,
+    };
     const rows: { surface: string; batch: unknown[] }[] = [];
     const admission = {
       tryReserve: vi.fn((_rows: number, _guild: number, surface: string) => ({

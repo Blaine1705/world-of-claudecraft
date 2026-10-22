@@ -110,6 +110,7 @@ export type RuntimeSimConfig = Required<
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
     | 'courierBankExchange'
+    | 'courierAccountExchange'
     | 'gathererIdentity'
     // Deliberately NOT defaulted: undefined is the "no day/night clock" world
     // (dayNightPhase() answers null), which tests and the RL env rely on.
