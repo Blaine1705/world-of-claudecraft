@@ -18,7 +18,7 @@ the wobble (MountSeatSpec bone `saddle`). Bone space for every bone: X right,
 Y up, Z toward the viewer (the mount's front, Blender -Y).
 
 The body texture is painted here: a sky-blue jelly gradient with an aqua glow
-at its base, soft highlights and suspended bubbles, equirect over the body
+at its base and soft highlights, equirect over the body
 (u = (phi + pi) / 2pi with phi = 0 at the front, v = 1 - theta / 180).
 """
 import math
@@ -70,15 +70,6 @@ STOPS = [  # (theta from the top, sRGB)
     (150, (0.14, 0.60, 1.0)),
     (180, (0.50, 0.96, 1.0)),
 ]
-# (theta, phi, radius in radians of arc): phi 0 at the front, + toward the left.
-BUBBLES = [
-    (100, 1.95, 0.15), (116, 1.30, 0.07), (122, 2.45, 0.045), (128, 0.95, 0.17),
-    (94, 2.70, 0.05), (118, 2.95, 0.11), (108, -1.40, 0.16), (126, -2.05, 0.09),
-    (105, -0.70, 0.06), (131, -0.45, 0.13), (96, 0.35, 0.07), (114, -2.80, 0.07),
-    (88, -2.35, 0.045), (124, 0.20, 0.045), (86, -1.05, 0.04), (87, 1.55, 0.045),
-    (138, 1.70, 0.05), (140, -1.75, 0.06), (92, 3.10, 0.04), (110, 0.75, 0.035),
-]
-BUBBLE_IN, BUBBLE_RIM, GLINT = np.array((0.42, 0.80, 1.0)), np.array((0.82, 0.97, 1.0)), np.array((0.97, 1.0, 1.0))
 
 th = np.radians(180 * (1 - (np.arange(TH) + 0.5) / TH))[:, None] * np.ones((1, TW))
 ph = (-np.pi + 2 * np.pi * (np.arange(TW) + 0.5) / TW)[None, :] * np.ones((TH, 1))
@@ -102,24 +93,6 @@ for hp in (1.25, -1.25):
     col += (0.16 * np.exp(-((deg - 62) / 9) ** 2 - (dph / 0.22) ** 2))[..., None]
 
 
-def unit(t, p):
-    t = math.radians(t)
-    return np.array((math.sin(t) * math.sin(p), -math.sin(t) * math.cos(p), math.cos(t)))
-
-
-for bt, bp, br in BUBBLES:
-    c = unit(bt, bp)
-    up = unit(bt - math.degrees(br) * 0.45, bp)  # the glint sits high on the bubble
-    ang = np.arccos(np.clip(D @ c, -1, 1))
-    s = ang / br
-    inside = s < 1
-    w_in = np.where(inside, 0.22 + 0.25 * s**2, 0.0)
-    col = col * (1 - w_in[..., None]) + BUBBLE_IN * w_in[..., None]
-    rim = np.clip(1 - np.abs(s - 0.9) / 0.12, 0, 1) * 0.65
-    col = col * (1 - rim[..., None]) + BUBBLE_RIM * rim[..., None]
-    g = np.clip(1 - np.arccos(np.clip(D @ up, -1, 1)) / (0.22 * br), 0, 1)
-    g = 0.9 * g * g * (3 - 2 * g)
-    col = col * (1 - g[..., None]) + GLINT * g[..., None]
 col = np.clip(col, 0, 1)
 px = np.concatenate([col, np.ones((TH, TW, 1))], -1).reshape(-1)  # row 0 is v = 0, the bottom
 img = bpy.data.images.new("SlimeColor", TW, TH)

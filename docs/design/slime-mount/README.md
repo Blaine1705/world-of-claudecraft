@@ -20,7 +20,7 @@ hovering, hops to move, and jiggles. Not wired into the mount catalog yet.
   alone, and fits a smooth body to it. It keeps the tack whole and tucks the
   body just under it. The new body replaces Tripo's jelly skin, which had
   lighting and highlights baked in.
-- `build_mount.py`: paints the jelly (gradient, base glow, highlights,
+- `build_mount.py`: paints the jelly (gradient, base glow, highlights; no
   bubbles), then builds the rig and clips (Blender 5.2, headless).
 - `finish_mount.mjs`: resamples, prunes, dedups and converts textures to WebP,
   then checks that the clips and the saddle bone survived.
