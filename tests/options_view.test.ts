@@ -1068,7 +1068,8 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       const withoutCapability = buildInterfaceControls(makeSource(), env);
       expect(keysOf(withoutCapability)).toEqual([
         ...GENERAL_KEYS,
-        ...FRAMES_KEYS,
+        // The touch HUD drops only the desktop-only Detach Resource Bar row.
+        ...FRAMES_KEYS.filter((key) => !env?.touch || key !== 'playerFrameResourceDetached'),
         ...CHAT_KEYS,
         ...COMBAT_KEYS,
       ]);
@@ -1310,6 +1311,16 @@ describe('options_view: detachable resource bar rows', () => {
       expect([row.min, row.max]).toEqual([SETTING_RANGES[key].min, SETTING_RANGES[key].max]);
     }
     expect(find(controls, 'playerFrameResourceWidth')).toMatchObject({ value: 300 });
+  });
+
+  it('offers none of the resource bar rows on the touch HUD', () => {
+    const touch = keysOf(
+      buildInterfaceControls(makeSource({}, { playerFrameResourceDetached: true }), {
+        touch: true,
+        nativeShell: false,
+      }),
+    );
+    expect(touch.filter((key) => key.startsWith('playerFrameResource'))).toEqual([]);
   });
 
   it('carries the King of the Hill backdrop slider as a percent', () => {

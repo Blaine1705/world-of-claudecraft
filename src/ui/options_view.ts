@@ -968,6 +968,35 @@ export const INTERFACE_TAB_LABEL_KEY: Record<InterfaceTab, TranslationKey> = {
 const tag = (category: InterfaceTab, controls: OptionsControl[]): OptionsControl[] =>
   controls.map((c): OptionsControl => ({ ...c, category }));
 
+/** The Detach Resource Bar toggle plus, while it is on, its two size sliders;
+ *  nothing on the touch HUD, where the mover never applies a seat. */
+function resourceBarRows(s: OptionsSettingsSource, env?: OptionsEnv): OptionsControl[] {
+  if (env?.touch) return [];
+  const rows: OptionsControl[] = [
+    boolToggle(s, 'playerFrameResourceDetached', 'hudChrome.options.playerFrameResourceDetached', {
+      rerender: true,
+    }),
+  ];
+  if (s.bool('playerFrameResourceDetached'))
+    rows.push(
+      slider(
+        s,
+        'playerFrameResourceWidth',
+        'hudChrome.options.playerFrameResourceWidth',
+        'pixels',
+        1,
+      ),
+      slider(
+        s,
+        'playerFrameResourceHeight',
+        'hudChrome.options.playerFrameResourceHeight',
+        'pixels',
+        1,
+      ),
+    );
+  return rows;
+}
+
 export function buildInterfaceControls(
   s: OptionsSettingsSource,
   env?: OptionsEnv,
@@ -1049,33 +1078,10 @@ export function buildInterfaceControls(
       boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
       // Detach Resource Bar lifts mana / energy / rage into a frame of its own;
       // its size rows exist only while it is detached (docked, the bar takes
-      // the player frame's geometry), so the toggle re-renders the panel.
-      boolToggle(
-        s,
-        'playerFrameResourceDetached',
-        'hudChrome.options.playerFrameResourceDetached',
-        {
-          rerender: true,
-        },
-      ),
-      ...(s.bool('playerFrameResourceDetached')
-        ? [
-            slider(
-              s,
-              'playerFrameResourceWidth',
-              'hudChrome.options.playerFrameResourceWidth',
-              'pixels',
-              1,
-            ),
-            slider(
-              s,
-              'playerFrameResourceHeight',
-              'hudChrome.options.playerFrameResourceHeight',
-              'pixels',
-              1,
-            ),
-          ]
-        : []),
+      // the player frame's geometry), so the toggle re-renders the panel. The
+      // touch HUD owns its own layout (frame editing is desktop-only), so it
+      // offers none of the three rows.
+      ...resourceBarRows(s, env),
       // The King of the Hill bar's backdrop; its text stays solid.
       slider(s, 'hillBarOpacity', 'hudChrome.options.hillBarOpacity'),
       choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),

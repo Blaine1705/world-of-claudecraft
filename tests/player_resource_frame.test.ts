@@ -5,10 +5,17 @@
 // and turning the option off rides it back to the end of the bars column.
 // Driven through the REAL registry wiring (registerHudFrames + InterfaceUnlock),
 // the target-of-target independence test's shape in hud_frame_groups.test.ts.
+
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { applyFrameGeometrySetting } from '../src/game/frame_geometry_settings';
 import { BOOL_SETTINGS, SETTING_RANGES } from '../src/game/settings';
-import { additionalUnitDimensions } from '../src/ui/frame_dimensions';
+import {
+  additionalUnitDimensions,
+  RESOURCE_BAR_DETACH_GAP,
+  resourceBarFirstSeat,
+} from '../src/ui/frame_dimensions';
 import { frameMenuGroup, frameSettingRelated } from '../src/ui/frame_menu_core';
 import { HudFrameGroups } from '../src/ui/hud_frame_groups';
 import { registerHudFrames } from '../src/ui/hud_frame_registry';
@@ -32,7 +39,7 @@ function mountPlayerFrame(): { bars: HTMLElement; wrap: HTMLElement; bar: HTMLEl
   };
 }
 
-function rig(store: Record<string, number | boolean>) {
+function rig(store: Record<string, number | boolean>, mobile = false) {
   const writes: Array<[string, number | boolean]> = [];
   const hooks: FramesMenuSettingsHooks = {
     settings: {
@@ -49,7 +56,7 @@ function rig(store: Record<string, number | boolean>) {
     document,
     registry,
     groups: new HudFrameGroups(document, HUD_FRAME_SPECS),
-    isMobileLayout: () => false,
+    isMobileLayout: () => mobile,
     snapToGrid: () => false,
     labelKey: (row) => row.labelKey,
     isActive: () => true,
@@ -114,6 +121,85 @@ describe('player resource frame (Detach Resource Bar)', () => {
       left: saved.left,
       top: saved.top,
     });
+  });
+
+  it('a live flip seeds the size from the docked bar; a boot keeps the stored size', () => {
+    mountPlayerFrame();
+    const store: Record<string, number | boolean> = {
+      playerFrameResourceDetached: false,
+      playerFrameResourceWidth: 300,
+    };
+    const { sync, writes } = rig(store);
+    sync(true);
+    store.playerFrameResourceDetached = true;
+    sync();
+    // happy-dom lays nothing out, so the docked rect is empty and the seed
+    // falls back to the stock size (the seat math is pinned separately).
+    expect(writes).toEqual([
+      ['playerFrameResourceWidth', SETTING_RANGES.playerFrameResourceWidth.def],
+      ['playerFrameResourceHeight', SETTING_RANGES.playerFrameResourceHeight.def],
+    ]);
+    localStorage.clear();
+    mountPlayerFrame();
+    const booted: Record<string, number | boolean> = {
+      playerFrameResourceDetached: true,
+      playerFrameResourceWidth: 300,
+    };
+    const second = rig(booted);
+    second.sync(true);
+    expect(second.writes).toEqual([]);
+    expect(booted.playerFrameResourceWidth).toBe(300);
+  });
+
+  it('stays docked and stores nothing on the touch HUD', () => {
+    const { bars, wrap } = mountPlayerFrame();
+    const store: Record<string, number | boolean> = { playerFrameResourceDetached: false };
+    const { sync, writes } = rig(store, true);
+    sync(true);
+    store.playerFrameResourceDetached = true;
+    sync();
+    expect(wrap.parentElement).toBe(bars);
+    expect(localStorage.getItem(SPEC.storageKey)).toBeNull();
+    expect(writes).toEqual([]);
+  });
+
+  it('seats a first detach just below the player frame at its docked size', () => {
+    const bar = { left: 520, top: 790, width: 232, height: 11 };
+    const frame = { bottom: 805, height: 60 };
+    expect(resourceBarFirstSeat(bar, frame, 1)).toEqual({
+      seat: { left: 520, top: 805 + RESOURCE_BAR_DETACH_GAP },
+      width: 232,
+      height: 11,
+    });
+    // Visual px back to setting px under UI Scale, clamped to the ranges.
+    expect(resourceBarFirstSeat({ ...bar, width: 464, height: 2 }, frame, 2)).toMatchObject({
+      width: 232,
+      height: SETTING_RANGES.playerFrameResourceHeight.min,
+    });
+    // No laid-out frame or bar: the stock size and a reachable fallback seat.
+    expect(resourceBarFirstSeat({ left: 0, top: 0, width: 0, height: 0 }, null, 1)).toEqual({
+      seat: { left: 320, top: 200 },
+      width: SETTING_RANGES.playerFrameResourceWidth.def,
+      height: SETTING_RANGES.playerFrameResourceHeight.def,
+    });
+  });
+
+  it('styles the detached bar from its own settings and leaves it click-through while locked', () => {
+    const css = readFileSync(join(import.meta.dirname, '..', 'src', 'styles', 'hud.css'), 'utf8');
+    const rule = (selector: string) => {
+      const at = css.indexOf(`${selector} {`);
+      expect(at, `${selector} rule`).toBeGreaterThan(-1);
+      return css.slice(at, css.indexOf('}', at));
+    };
+    expect(rule('#pf-resource-frame.hud-frame-detached')).toContain(
+      'width: var(--player-resource-width',
+    );
+    const bar = rule('#pf-resource-frame.hud-frame-detached > .bar');
+    expect(bar).toContain('height: var(--player-resource-height');
+    expect(bar).toContain('--uf-bar-height: var(--player-resource-height');
+    expect(rule('#pf-resource-frame.hud-frame-detached:not(.tf-unlocked)')).toContain(
+      'pointer-events: none',
+    );
   });
 
   it('comes back to the spot the player chose', () => {

@@ -2324,6 +2324,12 @@
     z-index: 20;
     width: var(--player-resource-width, 232px);
   }
+  /* A readout, not a control: once it is off the player frame (whose body
+     click targets yourself) a locked bar is click-through, so it never eats a
+     click meant for the world under it. Arranging hands events back. */
+  #pf-resource-frame.hud-frame-detached:not(.tf-unlocked) {
+    pointer-events: none;
+  }
   #pf-resource-frame.hud-frame-detached > .bar {
     --uf-bar-height: var(--player-resource-height, 11px);
     height: var(--player-resource-height, 11px);
@@ -2352,8 +2358,6 @@
   .hud-frame-group > .tf-move-btn,
   .focus-target-row > .tf-move-btn,
   #unit-tooltip-anchor .tf-move-btn,
-  #pf-resource-frame .tf-move-btn,
-  #hill-bar .tf-move-btn,
   #meters-window .tf-move-btn {
     position: absolute;
     top: -10px;
@@ -2392,8 +2396,6 @@
   .hud-frame-group > .tf-move-btn:focus-visible,
   .focus-target-row > .tf-move-btn:focus-visible,
   #unit-tooltip-anchor .tf-move-btn:focus-visible,
-  #pf-resource-frame .tf-move-btn:focus-visible,
-  #hill-bar .tf-move-btn:focus-visible,
   #meters-window .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
@@ -2531,9 +2533,15 @@
     opacity: 0.55;
   }
   /* An empty King of the Hill placeholder (the player is outside the hill's
-     zone, so the painter never built its skeleton) keeps a graspable box. */
+     zone, so the painter never built its skeleton) keeps a graspable box.
+     Its stock seat is the top centre, which the Edit Frames toolbar
+     (#interface-edit-controls, z 40) covers, so while arranging an unmoved
+     bar steps down below the toolbar; a moved bar keeps its own spot. */
   body.interface-unlocked #hill-bar.tf-unlocked {
     min-height: 48px;
+  }
+  body.interface-unlocked #hill-bar.tf-unlocked:not(.hud-frame-detached) {
+    top: 64px;
   }
   /* Unlocking shows the frames the class could have that are merely EMPTY
      right now (a target frame with nothing selected, a pet frame with no pet

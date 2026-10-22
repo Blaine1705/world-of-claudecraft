@@ -777,7 +777,7 @@ export const guideStrings = {
     // reason as the aura tracks; the option names are the live
     // hudChrome.options values. Wordy (M16): non-Latin fills ride along.
     framesGovernedResourceAndHill:
-      'Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background on that tab fades its panel while the text stays clear.',
+      'Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.',
 
     barsTitle: 'Bars, timers, and combat text',
     barsBody:

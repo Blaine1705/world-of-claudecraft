@@ -72,3 +72,33 @@ export function migratePetFrameSize(
     return false;
   }
 }
+
+/** Gap below the player frame where a first-time detached resource bar sits. */
+export const RESOURCE_BAR_DETACH_GAP = 6;
+
+/**
+ * Where and how big the resource bar lands the first time it is detached:
+ * just below the player frame, left-aligned with the bar's docked spot, at the
+ * size it had there (rects are visual px; the sizes are setting px, so the UI
+ * Scale zoom is divided back out), clamped to the settings' own ranges.
+ */
+export function resourceBarFirstSeat(
+  bar: { left: number; top: number; width: number; height: number },
+  frame: { bottom: number; height: number } | null,
+  uiScale: number,
+): { seat: { left: number; top: number }; width: number; height: number } {
+  const scale = uiScale > 0 ? uiScale : 1;
+  const w = SETTING_RANGES.playerFrameResourceWidth;
+  const h = SETTING_RANGES.playerFrameResourceHeight;
+  const clamp = (v: number, r: { min: number; max: number; def: number }) =>
+    v > 0 ? Math.min(r.max, Math.max(r.min, Math.round(v / scale))) : r.def;
+  const below = frame && frame.height > 0 ? frame.bottom + RESOURCE_BAR_DETACH_GAP : null;
+  return {
+    seat: {
+      left: bar.width > 0 ? bar.left : 320,
+      top: below ?? (bar.height > 0 ? bar.top : 200),
+    },
+    width: clamp(bar.width, w),
+    height: clamp(bar.height, h),
+  };
+}

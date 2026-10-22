@@ -22,7 +22,6 @@ export const FRAME_PRESET_SETTINGS = new Set([
   'playerFrameResourceDetached',
   'playerFrameResourceWidth',
   'playerFrameResourceHeight',
-  'hillBarOpacity',
   'showPetFrame',
   'showEmptyFocusFrames',
   'partyFrameWidth',

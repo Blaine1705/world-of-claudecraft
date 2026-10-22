@@ -243,7 +243,7 @@ export const SETTING_RANGES = {
   // only while detached; docked, the bar keeps the player frame's geometry.
   // Stock = the docked bar (the 232px bars panel, the 11px --bar-h-res).
   playerFrameResourceWidth: { min: 60, max: 460, def: 232 },
-  playerFrameResourceHeight: { min: 6, max: 40, def: 11 },
+  playerFrameResourceHeight: { min: 8, max: 40, def: 11 },
   // The King of the Hill bar's BACKDROP opacity (--hill-bar-opacity): the
   // panel fill, border and shadow fade, the text never does (it is what the
   // player reads the contest from). 1 = the stock solid panel, 0 = text only.

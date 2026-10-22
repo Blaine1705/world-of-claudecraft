@@ -2704,7 +2704,7 @@ export const hudChromeStrings = {
     playerFrameResourceHeight: 'Resource Bar Height',
     // Interface > Frames slider: how solid the King of the Hill bar's panel is
     // behind its text (the text itself never fades).
-    hillBarOpacity: 'King of the Hill Background',
+    hillBarOpacity: 'King of the Hill Background Opacity',
     // A pixel-size slider readout, e.g. "232 px".
     pixelsValue: '{value} px',
     // Interface > Combat toggles (both on by default) for the two dot-tracking

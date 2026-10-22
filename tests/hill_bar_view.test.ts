@@ -5,6 +5,8 @@
 // per-second value through the elided writers, the tone classes chosen from
 // the union, the mount attributes, the language switch), plus the ring's pure
 // core and the sim matcher rows for the hill's lines.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { applyFrameGeometrySetting } from '../src/game/frame_geometry_settings';
 import { SETTING_RANGES } from '../src/game/settings';
@@ -310,8 +312,9 @@ describe('HillBar (the painter)', () => {
     layer.innerHTML =
       '<div id="hill-bar" role="status" aria-live="polite"><div id="hill-body"></div></div>';
     const root = layer.querySelector('#hill-bar') as HTMLElement;
+    // The registry mover's real chrome on a governed frame is its resize grip.
     const chrome = document.createElement('button');
-    chrome.className = 'tf-move-btn';
+    chrome.className = 'mf-resize-grip';
     root.appendChild(chrome);
     bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
     expect(layer.querySelectorAll('#hill-bar')).toHaveLength(1);
@@ -348,6 +351,30 @@ describe('the King of the Hill frame row', () => {
     };
     expect(applyFrameGeometrySetting(style, 'hillBarOpacity', 0.4)).toBe(true);
     expect(vars).toEqual({ '--hill-bar-opacity': '0.4' });
+  });
+
+  it('fades only the backdrop layer, and steps below the editor toolbar while arranging', () => {
+    const read = (f: string) =>
+      readFileSync(join(import.meta.dirname, '..', 'src', 'styles', f), 'utf8');
+    const block = (css: string, selector: string) => {
+      const at = css.indexOf(`${selector} {`);
+      expect(at, `${selector} rule`).toBeGreaterThan(-1);
+      return css.slice(at, css.indexOf('}', at));
+    };
+    const components = read('components.css');
+    // The stock panel moved onto ::before unchanged; the root keeps no fill of
+    // its own (the text must never fade with the opacity).
+    const backdrop = block(components, '#hill-bar::before');
+    expect(backdrop).toContain('background: var(--panel-bg-strong)');
+    expect(backdrop).toContain('border: 1px solid var(--color-bg-field-edge)');
+    expect(backdrop).toContain('opacity: var(--hill-bar-opacity, 1)');
+    expect(block(components, '#hill-bar')).not.toContain('background:');
+    expect(
+      block(
+        read('hud.css'),
+        'body.interface-unlocked #hill-bar.tf-unlocked:not(.hud-frame-detached)',
+      ),
+    ).toContain('top: 64px');
   });
 });
 
