@@ -2997,7 +2997,7 @@ export const hudChromeStrings = {
     // default); off declutters crowded hubs, the current target stays visible.
     showPlayerNameplates: 'Show Player Nameplates',
     // Interface panel toggle: render a cosmetic buddy follower's nameplate,
-    // name only, never a health bar (off by default — a buddy cannot be
+    // name only, never a health bar (off by default: a buddy cannot be
     // attacked and has no health worth showing).
     showPetNames: 'Show Pet Names',
     // Interface panel: global HUD zoom slider, and the mirror of the landing

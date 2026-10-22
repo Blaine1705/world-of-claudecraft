@@ -8,7 +8,7 @@ import type { BuddyKey } from './buddies';
 // with a real tameable/summoned mob's. hp/dmg are non-zero only because
 // createMob's stat math (src/sim/entity.ts) always runs it; a buddy never
 // takes or deals damage (spawned hostile:false, and nothing ever targets an
-// owned, non-hostile entity). scale is the ONLY visible-size knob now — the
+// owned, non-hostile entity). scale is the ONLY visible-size knob now: the
 // old render-only BUDDY_VISUAL_SPECS.scale multiplier is gone along with the
 // purely-cosmetic follower system it belonged to.
 export const BUDDY_TEMPLATE_PREFIX = 'buddy_';
@@ -81,6 +81,6 @@ export const BUDDY_MOBS: Record<string, MobTemplate> = {
 };
 
 /** Every valid buddy templateId, for the cheap `isBuddyMob` membership check
- *  (src/sim/pet/buddy_ai.ts) — a Set so a per-tick per-owned-mob check never
+ *  (src/sim/pet/buddy_ai.ts), a Set so a per-tick per-owned-mob check never
  *  scans the catalog. */
 export const BUDDY_TEMPLATE_IDS: ReadonlySet<string> = new Set(Object.keys(BUDDY_MOBS));
