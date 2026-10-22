@@ -1098,15 +1098,94 @@ function sunOffsetU(biome: SkyKey, sunDir: THREE.Vector3): number {
   return HDRI_SUN_U[biome] - sunU;
 }
 
-function deferBasicSkyFragments(material: THREE.MeshBasicMaterial): void {
+interface BasicSkyUniforms {
+  uTintA: { value: THREE.Vector3 };
+  uTintB: { value: THREE.Vector3 };
+  uMix: { value: number };
+  uSunDirLive: { value: THREE.Vector3 };
+  uDuskWarm: { value: number };
+  uNightDesat: { value: number };
+  uStarAmt: { value: number };
+  uTime: { value: number };
+  uFog: { value: THREE.Color };
+}
+
+function deferBasicSkyFragments(
+  material: THREE.MeshBasicMaterial,
+  uniforms: BasicSkyUniforms,
+): void {
   material.onBeforeCompile = (shader) => {
     const anchor = '#include <logdepthbuf_vertex>';
     if (!shader.vertexShader.includes(anchor)) {
       throw new Error('sky shader is missing the pinned log-depth vertex anchor');
     }
-    shader.vertexShader = shader.vertexShader.replace(anchor, `${anchor}\n${SKY_FAR_DEPTH}`);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWocSkyDir;')
+      .replace(anchor, `vWocSkyDir = position;\n${anchor}\n${SKY_FAR_DEPTH}`);
+    if (!shader.fragmentShader || !shader.uniforms) return;
+    Object.assign(shader.uniforms, uniforms);
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+uniform vec3 uTintA;
+uniform vec3 uTintB;
+uniform float uMix;
+uniform vec3 uSunDirLive;
+uniform float uDuskWarm;
+uniform float uNightDesat;
+uniform float uStarAmt;
+uniform float uTime;
+uniform vec3 uFog;
+varying vec3 vWocSkyDir;
+float wocSkyHash12(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>
+diffuseColor.rgb *= mix(uTintA, uTintB, uMix);
+float wocCycleLum = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+diffuseColor.rgb = mix(diffuseColor.rgb, vec3(wocCycleLum), uNightDesat);`,
+      )
+      .replace(
+        '#include <tonemapping_fragment>',
+        `vec3 wocDir = normalize(vWocSkyDir);
+vec3 wocC = gl_FragColor.rgb;
+if (uDuskWarm > 0.001) {
+  vec2 sunAz = normalize(uSunDirLive.xz);
+  vec2 dirAz = normalize(wocDir.xz + vec2(1e-5, 0.0));
+  float align = max(dot(dirAz, sunAz), 0.0);
+  float band = (1.0 - smoothstep(0.04, 0.55, wocDir.y)) * smoothstep(-0.24, -0.02, wocDir.y);
+  float warm = uDuskWarm * band * (0.2 + 0.8 * align * align);
+  vec3 duskCol = vec3(1.0, 0.34, 0.09);
+  float duskTarget = min(0.3 + 0.9 * wocCycleLum, 0.95);
+  wocC = mix(wocC, duskCol * duskTarget, warm * 0.8);
+  wocC += duskCol * warm * align * align * 0.5;
+}
+if (uStarAmt > 0.001) {
+  float upper = smoothstep(-0.02, 0.2, wocDir.y);
+  if (upper > 0.0) {
+    vec2 suv = vec2(atan(wocDir.z, wocDir.x), asin(clamp(wocDir.y, -1.0, 1.0))) * 72.0;
+    vec2 scell = floor(suv);
+    if (wocSkyHash12(scell) >= 0.9) {
+      vec2 sf = fract(suv) - vec2(wocSkyHash12(scell + 7.0), wocSkyHash12(scell + 13.0));
+      float point = smoothstep(0.012, 0.0, dot(sf, sf));
+      if (point > 0.0) {
+        float twinkle = 0.55 + 0.45 * sin(uTime * (1.5 + wocSkyHash12(scell + 3.0) * 3.5) + wocSkyHash12(scell + 19.0) * 6.2832);
+        float star = point * (0.4 + 0.6 * wocSkyHash12(scell + 41.0)) * twinkle;
+        wocC += vec3(0.9, 0.93, 1.0) * star * upper * uStarAmt;
+      }
+    }
+  }
+}
+wocC = mix(uFog, wocC, smoothstep(0.1, 0.36, wocDir.y));
+gl_FragColor.rgb = wocC;
+#include <tonemapping_fragment>`,
+      );
   };
-  material.customProgramCacheKey = () => 'woc-sky-far-depth-v1';
+  material.customProgramCacheKey = () => 'woc-sky-far-depth-v2';
 }
 
 export function buildSky(
@@ -1119,6 +1198,17 @@ export function buildSky(
   const startBiomes = start.from === start.to ? [start.from] : [start.from, start.to];
   if (lowGfx || !hasSkyHdriAssets(startBiomes)) {
     let current = start;
+    const basicUniforms: BasicSkyUniforms = {
+      uTintA: { value: new THREE.Vector3(...BIOME_TINT[start.from]) },
+      uTintB: { value: new THREE.Vector3(...BIOME_TINT[start.to]) },
+      uMix: { value: start.t },
+      uSunDirLive: { value: sunDir.clone().normalize() },
+      uDuskWarm: { value: 0 },
+      uNightDesat: { value: 0 },
+      uStarAmt: { value: 0 },
+      uTime: { value: 0 },
+      uFog: { value: new THREE.Color(0x9ec8ea) },
+    };
     const dome = new THREE.Mesh(
       new THREE.SphereGeometry(DOME_RADIUS, 24, 16),
       new THREE.MeshBasicMaterial({
@@ -1128,7 +1218,7 @@ export function buildSky(
         depthWrite: false,
       }),
     );
-    deferBasicSkyFragments(dome.material);
+    deferBasicSkyFragments(dome.material, basicUniforms);
     // Draw after opaque geometry at far depth. Covered fragments fail depth
     // before the texture sample while untouched background pixels stay exact.
     dome.renderOrder = SKY_BACKGROUND_RENDER_ORDER;
@@ -1137,13 +1227,25 @@ export function buildSky(
       dome,
       setCameraPos: (x, z) => {
         current = biomeBlendAt(x, z);
+        basicUniforms.uTintA.value.set(...BIOME_TINT[current.from]);
+        basicUniforms.uTintB.value.set(...BIOME_TINT[current.to]);
+        basicUniforms.uMix.value = current.t;
       },
       setDayNight: (mul) => {
         dome.material.color.setRGB(mul[0], mul[1], mul[2]);
       },
-      setCycle: () => {},
-      setFog: () => {},
-      setStars: () => {},
+      setCycle: (liveSunDir, duskWarm, nightDesat) => {
+        basicUniforms.uSunDirLive.value.copy(liveSunDir);
+        basicUniforms.uDuskWarm.value = duskWarm;
+        basicUniforms.uNightDesat.value = nightDesat;
+      },
+      setFog: (c) => {
+        basicUniforms.uFog.value.copy(c);
+      },
+      setStars: (amt, time) => {
+        basicUniforms.uStarAmt.value = amt;
+        basicUniforms.uTime.value = time;
+      },
       envTexture: () => null,
       domeTexture: () => null,
       skyBiomeAssetsResident,
