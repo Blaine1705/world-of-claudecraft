@@ -134,6 +134,12 @@ import {
   grassCardProgramCacheKey,
   grassCollapseBandFor,
 } from './grass_cap_collapse_core';
+import { createWorldGrassEdgeTaperContext, taperTuftScales } from './grass_edge_taper_core';
+import {
+  attachGrassInteractionUniforms,
+  grassTuftInteractionGlsl,
+  stepSharedGrassInteraction,
+} from './grass_interaction_core';
 import { grassTuftCards, grassTuftHasCap } from './grass_tuft_cards_core';
 import { grassTuftWindGlsl, windGustGlsl } from './grass_tuft_wind';
 import {
@@ -2362,6 +2368,7 @@ function applyGrassShader(
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uniforms.uPlayerPos;
     sh.uniforms.uFadeFar = uniforms.uFadeFar;
+    attachGrassInteractionUniforms(sh.uniforms);
     const capDecl = hasCap
       ? `
         attribute float aCap;`
@@ -2374,6 +2381,8 @@ function applyGrassShader(
         `#include <common>
         uniform float uTime;
         uniform vec2 uPlayerPos;
+        uniform vec4 uGrassMove;
+        uniform vec4 uGrassWake;
         uniform float uFadeFar;
         varying vec2 vTuftWorld;${capDecl}`,
       )
@@ -2385,7 +2394,7 @@ function applyGrassShader(
         #else
           vec2 tuftBase = vec2(0.0);
         #endif${capCollapse}
-        ${wind}
+        ${wind}${grassTuftInteractionGlsl()}
         vTuftWorld = tuftBase;`,
       );
     // Every card used the exact up value here already. Keeping it as a shader
@@ -2560,6 +2569,13 @@ function buildGrassRing(
     activeContent.props.buildings,
     activeContent === BUILTIN_WORLD,
     activeContent.services?.noticeboards ?? [],
+  );
+  const edgeTaperCtx = createWorldGrassEdgeTaperContext(
+    activeContent,
+    townExclusions,
+    GRASS_BUILDING_PADDING,
+    2.2,
+    15,
   );
 
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
@@ -2882,7 +2898,8 @@ function buildGrassRing(
         // The maker's painted no-grass discs. Third and last consumer of the
         // layer (sim/grass_clear.ts), which until now had none at all.
         if (grassClearedAt(activeContent.grassClear, x, z)) continue;
-        if (roadDistance(x, z) < 2.2 || insidePavedGrassExclusion(x, z)) continue;
+        const rd = roadDistance(x, z);
+        if (rd < 2.2 || insidePavedGrassExclusion(x, z)) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
         if (insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85)) continue;
         // the stable yard is worked dirt; deck planks grow nothing through
@@ -2896,8 +2913,7 @@ function buildGrassRing(
         // anchors too, the frost/garden idiom, which is not what fen wants)
         const fenTuft = tuftBiome === 'fen';
         if (!fenTuft) {
-          const sx = ((lush ? 0.74 : 0.82) + r * (lush ? 0.96 : 1.04)) * (0.75 + lushness * 0.55);
-          const sy = sx * (0.75 + lushness * 0.25);
+          const [sx, sy] = taperTuftScales(edgeTaperCtx, x, z, rd, r, lush, lushness);
           q.setFromAxisAngle(up, r * 12.4);
           m.compose(v.set(x, h, z), q, sv.set(sx, sy, sx));
           im.setMatrixAt(n, m);
@@ -3347,6 +3363,7 @@ function buildGrassRing(
     ): void {
       uniforms.uPlayerPos.value.set(px, pz);
       uniforms.uFadeFar.value = activeRadius();
+      stepSharedGrassInteraction(px, pz, sharedUniforms.uTime.value);
       if (px > DUNGEON_X_THRESHOLD) {
         // dungeon instances live far outside the strip: no meadow indoors.
         // This branch returns before buildQueuedChunks, so a build paused

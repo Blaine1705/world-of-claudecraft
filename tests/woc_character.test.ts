@@ -974,7 +974,7 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
         const def = VISUALS[key];
         expect(def.attackTimeScale, key).toBe(1);
         expect(def.hideWeaponsWhileSwimming, key).toBe(true);
-        expect(def.swimRise, key).toEqual({ stroke: -0.65, tread: -1.0 });
+        expect(def.swimRise, key).toEqual({ stroke: -1.0, tread: -1.3 });
         expect(def.clips.shoutEmote, key).toBeNull();
         expect(def.clips.climb, key).toBe('Climb');
         expect(def.clips.swim, key).toBe('Woc_Swim');

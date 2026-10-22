@@ -155,7 +155,13 @@ import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { stoneboundShellStyle } from './stonebound_shell_core';
-import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
+import {
+  createStowTransition,
+  forceStow,
+  requestStow,
+  syncSittingStow,
+  tickStow,
+} from './stow_transition';
 import { auraHeldClip, stunIdleClip } from './stun_idle_core';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
@@ -1308,6 +1314,8 @@ export class CharacterVisual {
   private wasDead = false;
   /** previous frame's airborne flag, for the touchdown edge (see ClipMap.land) */
   private wasAirborne = false;
+  /** previous frame's swimming flag, so water entry/exit snaps stow without a gesture */
+  private wasSwimming = false;
   /** Was the body moving at takeoff? See the ClipMap's jumpMoving. */
   private jumpWhileMoving = false;
   private initialized = false;
@@ -1835,10 +1843,24 @@ export class CharacterVisual {
     // Deferred sheathe swap: lands at the gesture's windup peak (see
     // setWeaponStowed), where the clip is also cut so the chop's downswing never
     // plays. Ticks even when `animate` is false so a throttled rig still settles.
-    const stowTick = tickStow(this.stow, dt);
-    if (stowTick !== 'none') {
-      if (stowTick === 'swap') this.applyStowSwap();
-      this.endStowGesture();
+    // Entering water cuts straight to swimming: snap any pending stow swap at once
+    // and drop the sheathe (or any land one-shot) so it never holds up the stroke.
+    const enteringWater = s.swimming && !this.wasSwimming;
+    this.wasSwimming = s.swimming;
+    let swimInterruptedOneShot = false;
+    if (s.swimming) {
+      this.stowLift.t = -1;
+      if (this.currentIsOneShot && (enteringWater || this.isStowOneShot())) {
+        this.cancelOneShot();
+        swimInterruptedOneShot = true;
+      }
+      if (forceStow(this.stow, this.stow.target)) this.applyStowSwap(false);
+    } else {
+      const stowTick = tickStow(this.stow, dt);
+      if (stowTick !== 'none') {
+        if (stowTick === 'swap') this.applyStowSwap();
+        this.endStowGesture();
+      }
     }
 
     // death is a level sim-side, edge-trigger the clip locally
@@ -1888,6 +1910,11 @@ export class CharacterVisual {
     this.stunIdle = stunIdle;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
+      const sittingStow = s.sitting || desired === 'sit' || desired === 'sitUp';
+      if (sittingStow && !this.stow.sitting && this.currentIsOneShot && this.isStowOneShot()) {
+        this.cancelOneShot();
+        this.stowLift.t = -1;
+      }
       const baseChanged = desired !== this.baseState;
       const previousBase = this.baseState;
       // the seated states play in the seat's anchor space (render/seated_pose.ts)
@@ -1960,7 +1987,11 @@ export class CharacterVisual {
         this.currentOneShotIsEmote = false;
         this.fadeTo(this.baseAction(), 0.12, false);
       } else if (
-        (baseChanged || rushChanged || auraIdleChanged || stunIdleChanged) &&
+        (baseChanged ||
+          swimInterruptedOneShot ||
+          rushChanged ||
+          auraIdleChanged ||
+          stunIdleChanged) &&
         !this.currentIsOneShot
       ) {
         // a cast clip frozen at its hold point must never stay paused through
@@ -1972,7 +2003,6 @@ export class CharacterVisual {
           this.fadeTo(this.baseAction(), CUT_FADE, false);
         } else if (previousBase !== 'cast' || !this.beginCastExitPlayOut()) {
           this.fadeTo(this.baseAction(), this.baseTransitionFade(desired, previousBase), false);
-          this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
         }
       } else if (
         desired === 'cast' &&
@@ -1990,6 +2020,10 @@ export class CharacterVisual {
         if (want && this.current !== want && this.current !== this.seatAction('down')) {
           this.fadeTo(want, 0.4, false);
         }
+      }
+      if (syncSittingStow(this.stow, sittingStow)) {
+        this.stowLift.t = -1;
+        this.applyStowSwap(false);
       }
       this.tickIdleBeat(dt, desired);
       this.tickIdleVariant(dt, desired);
@@ -3625,6 +3659,7 @@ export class CharacterVisual {
   resetForReuse(): void {
     this.turnState.seeded = false;
     this.entranceFor = undefined;
+    this.wasSwimming = false;
     if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
   }
 
@@ -4815,7 +4850,7 @@ export class CharacterVisual {
     }
     const clip = this.def.clips.stow;
     const gesture = clip ? this.action(clip) : null;
-    if (!this.initialized || this.deadLock || !gesture) {
+    if (!this.initialized || this.deadLock || this.wasSwimming || !gesture) {
       if (forceStow(this.stow, stowed)) this.applyStowSwap();
       return;
     }
@@ -4832,6 +4867,28 @@ export class CharacterVisual {
         this.stowLift.dur = swapDelay * 2;
       }
     }
+  }
+
+  private isStowOneShot(): boolean {
+    const clip = this.def.clips.stow;
+    if (!clip || !this.current) return false;
+    return this.current.getClip().name === clip;
+  }
+
+  /** Cancel the active one-shot immediately, unwinding a same-frame trigger back
+   *  to the action that was driving the pose before it started. */
+  private cancelOneShot(): void {
+    if (this.oneShotAt === this.mixer.time) {
+      this.current?.stop();
+      this.oneShotFrom?.stopFading();
+      this.current = this.oneShotFrom;
+    }
+    this.currentIsOneShot = false;
+    this.currentOneShotIsAttack = false;
+    this.currentOneShotIsEmote = false;
+    this.currentOneShotIsIdleVariant = false;
+    this.currentOneShotIsLanding = false;
+    this.currentOneShotIsCastExit = false;
   }
 
   /** Cut the stow gesture at its windup peak: hand back to base so the chop
@@ -4851,8 +4908,8 @@ export class CharacterVisual {
    *  the transition just landed on, keeping the applied weapon skin, then run the
    *  shared re-attach tail (materials, caster snapshot, skin VFX rebuilt on the
    *  new payloads). Mixer state is untouched. */
-  private applyStowSwap(): void {
-    this.refreshLoadout();
+  private applyStowSwap(fadeBase = true): void {
+    this.refreshLoadout(fadeBase);
     // The swap lands mid-gesture, long after the renderer's stow diff returned,
     // so the rig it rebuilds (and the skin VFX point light hanging off it) can
     // only be reconciled into the light budget on a later frame: raise an edge
@@ -5147,7 +5204,7 @@ export class CharacterVisual {
     // The outgoing clip keeps playing through a crossfade, so any real fade
     // here spins the wheels on after the throttle is released.
     if (this.def.cutToIdle && next === 'idle') return CUT_FADE;
-    return FADE;
+    return from !== undefined ? waterFade(from, next) : FADE;
   }
 
   private effectMaterial<T extends THREE.Material | THREE.Material[]>(material: T): T {
@@ -5305,7 +5362,7 @@ export class CharacterVisual {
   /** Re-pick the loadout clip set (weapon_loadout_core.ts) after the hands' contents change:
    *  a mainhand or offhand swap, or the sheathe landing. A rig standing in a base state
    *  crossfades onto its new variant (the base machine only re-resolves on a state change). */
-  private refreshLoadout(): void {
+  private refreshLoadout(fadeBase = true): void {
     const swaps = this.def.clips.loadoutSwaps;
     if (!swaps) return;
     const attach = this.def.attach ?? [];
@@ -5323,7 +5380,7 @@ export class CharacterVisual {
     const next = loadout ? (swaps[loadout] ?? null) : null;
     if (next === this.loadoutSwap) return;
     this.loadoutSwap = next;
-    if (this.initialized && !this.deadLock && !this.currentIsOneShot) {
+    if (fadeBase && this.initialized && !this.deadLock && !this.currentIsOneShot) {
       const base = this.baseAction();
       if (base && base !== this.current) this.fadeTo(base, 0.2, false);
     }

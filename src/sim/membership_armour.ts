@@ -2,10 +2,8 @@
 // never establish entitlement, level, or specialisation.
 import {
   MEMBERSHIP_ARMOUR_SLOTS,
-  MEMBERSHIP_DEFAULT_PROFILE,
   MEMBERSHIP_ITEMS,
   MEMBERSHIP_PROFILES,
-  MEMBERSHIP_SPEC_PROFILE,
 } from './content/membership';
 import { SEASON2_ARMOR_FRACTION, SEASON2_ITEMS } from './content/pvp_honor_season2';
 import { REFERRAL_ITEMS } from './content/referral';
@@ -17,6 +15,7 @@ import {
   primaryStatBudget,
   SLOT_STAT_MULT,
 } from './item_budget';
+import { membershipProfile } from './membership_profile';
 import { membershipWeaponItem } from './membership_weapon';
 import type { ArmorItemDef, ItemDef, PlayerClass } from './types';
 
@@ -71,7 +70,7 @@ function scalingArmourItem(
 ): ItemDef {
   const armorType = maxArmorTypeForClass(cls);
   if (!active) return { ...item, armorType, stats: {}, spellPower: 0, healPower: 0 };
-  const profile = MEMBERSHIP_SPEC_PROFILE[`${cls}_${spec}`] ?? MEMBERSHIP_DEFAULT_PROFILE[cls];
+  const profile = membershipProfile(cls, spec);
   const ilvl = membershipItemLevel(level);
   const stats = normalizeToStaminaModel(
     MEMBERSHIP_PROFILES[profile],

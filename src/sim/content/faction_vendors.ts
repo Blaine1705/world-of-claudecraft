@@ -27,9 +27,11 @@
 //               swap every dev kit and DPS fixture onto faction stock)
 // Each faction serves one role family across its whole ladder (the three
 // factions progress in parallel, so every character walks all three):
-//   Rift Watch    Agility (rogue, hunter, feral, enhancement)
+//   Rift Watch    Agility (rogue, hunter)
 //   Church Order  casters and healers
-//   Automatons    Strength and the stamina line (warrior, paladin, shaman)
+//   Automatons    Strength and the stamina line (warrior, paladin, enhancement
+//                 shaman; feral druids wear its jewelry and two-hander, since
+//                 Feral is a Strength spec: content/spec_primary_stat.ts)
 // Budgets are COPIED from the live raid and heroic tables, never invented:
 // jewelry mirrors content/ignivar_loot.ts IGNIVAR_JEWELRY_ITEMS (one 25
 // rating, 15 to 16 primary) and content/heroic_vendor.ts; waist and feet
