@@ -103,6 +103,7 @@ import {
   EVERGARDEN_ZONE,
 } from './content/evergarden';
 import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
+import { FARM_PATCHES, type FarmPatchDef } from './content/farm_patches';
 import {
   FARSHORE_CAMPS,
   FARSHORE_ESCORTS,
@@ -386,7 +387,7 @@ import { REFERRAL_STAMP_ITEMS } from './content/referral_rewards';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
-import { dungeonDoorPos, freezeObjectMoves, gatherNodesFor } from './moved_objects';
+import { dungeonDoorPos, farmPatchesFor, freezeObjectMoves, gatherNodesFor } from './moved_objects';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
   const merged = Object.assign({}, ...parts);
@@ -768,6 +769,16 @@ export function activeGatherNodes(): GatherNodeDef[] {
  */
 export function gatherNodesInActiveWorld(): GatherNodeDef[] {
   return gatherNodesFor(getActiveWorldContent().objectMoves, GATHER_NODES);
+}
+
+/**
+ * The garden beds as the active world places them: any bed a Studio map moved
+ * (moved_objects.ts) at its new spot, the shipped table itself otherwise. The
+ * online client's IWorld.farmPatches, so its crops sit on the same beds the
+ * server's Sim plants and harvests at (the Sim reads its own world the same way).
+ */
+export function farmPatchesInActiveWorld(): readonly FarmPatchDef[] {
+  return farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES);
 }
 
 /** One node of gatherNodesInActiveWorld by id (a click pick), or undefined. */

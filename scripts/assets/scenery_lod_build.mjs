@@ -43,6 +43,17 @@ export const SCENERY_LOD_ASSETS = [
   },
 ];
 
+const LOD_COPY_CATALOG_IDS = new Set(
+  SCENERY_LOD_ASSETS.map((asset) => asset.output.replace(/^models\//, '').replace(/\.glb$/, '')),
+);
+
+/** True for a derived `<model>_lod` copy: the source plus far index levels, drawn only by the
+ *  zone features. Not placeable (an authored map places the source), so the editor catalog and
+ *  the collision bake skip it. */
+export function isSceneryLodCopyCatalogId(id) {
+  return LOD_COPY_CATALOG_IDS.has(id);
+}
+
 export async function addSceneryLod(doc, options = {}) {
   await MeshoptSimplifier.ready;
   const bounds = getBounds(doc.getRoot().listScenes()[0]);

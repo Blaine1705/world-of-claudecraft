@@ -6,6 +6,7 @@ export declare const SCENERY_LOD_ASSETS: readonly {
   sha256: string;
   materials?: readonly string[];
 }[];
+export declare function isSceneryLodCopyCatalogId(id: string): boolean;
 export declare function addSceneryLod(
   document: Document,
   options?: { materials?: readonly string[] },
