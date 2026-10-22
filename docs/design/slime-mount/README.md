@@ -59,10 +59,12 @@ changes the bytes, so update the pin in `tests/slime_mount_asset.test.ts`.
   double-sided, so the saddle's underside shows through the jelly instead
   of vanishing. The low graphics tier keeps both: its Lambert rebuild copies
   `transparent`, `opacity` and `side`.
-- Bubbles: 14 opaque, faintly glowing spheres (`slime_bubbles`, material
-  `bubble`), each on its own bone (`bubble_00` to `bubble_13`, children of
+- Bubbles: 7 opaque, faintly glowing spheres (`slime_bubbles`, material
+  `bubble`), each on its own bone (`bubble_00` to `bubble_06`, children of
   `base`, so they squash and lean with the jelly). In every clip each one
-  rises along a seeded random, wobbling path, swells in and pops. Each path
+  rises along a seeded random, wobbling path, swells in and pops. They are
+  spread out: each keeps to its own slice of the body around the middle,
+  rides out toward the skin, and is staggered in time. Each path
   repeats on a period that divides the clip length, so the loops stay
   seamless. In Idle they cross the whole body slowly; when moving they take
   short trips swept toward the back.

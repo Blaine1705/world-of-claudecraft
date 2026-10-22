@@ -1538,7 +1538,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/mounts/rickshaw_mount.glb": "/media/models/mounts/rickshaw_mount.5f539e1f2ad4.glb",
   "models/mounts/shadowjump_toad.glb": "/media/models/mounts/shadowjump_toad.2811f4fadfda.glb",
   "models/mounts/shiba_inu.glb": "/media/models/mounts/shiba_inu.91d3ff0fc7c2.glb",
-  "models/mounts/slime.glb": "/media/models/mounts/slime.e99e54235a7f.glb",
+  "models/mounts/slime.glb": "/media/models/mounts/slime.c2c06924c37c.glb",
   "models/mounts/stalkglider_snail.glb": "/media/models/mounts/stalkglider_snail.418aa794d44f.glb",
   "models/mounts/stormfeather_griffin.glb": "/media/models/mounts/stormfeather_griffin.32a487152ca2.glb",
   "models/mounts/terrorspark_groundshaker.glb": "/media/models/mounts/terrorspark_groundshaker.f8463280b384.glb",

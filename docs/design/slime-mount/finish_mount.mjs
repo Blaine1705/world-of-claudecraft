@@ -20,7 +20,7 @@ if (!src || !out) throw new Error('usage: finish_mount.mjs <blender.glb> <out.gl
 
 const CLIPS = ['Idle', 'Walk', 'Run', 'Jump'];
 const JOINTS = ['base', 'mid', 'move', 'root', 'saddle', 'squash', 'top'];
-const BUBBLES = 14;
+const BUBBLES = 7;
 
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
 const doc = await io.read(src);

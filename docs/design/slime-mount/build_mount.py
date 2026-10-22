@@ -26,7 +26,9 @@ its underside shows through the jelly instead of vanishing.
 Bubbles: NB little spheres inside the jelly, one bone each (`bubble_00`...,
 children of `base`, so they squash and lean with the body). In every clip each
 bubble rises along a seeded random, wobbling path, swells in, and pops near the
-end of it. Each path repeats on a period that divides the clip length, so the
+end of it. The bubbles are spread out: each keeps to its own slice of the body
+around the vertical axis, rides out toward the skin rather than the middle, and
+is staggered in time so they never bunch at one height. Each path repeats on a period that divides the clip length, so the
 loops stay seamless; a popped bubble jumps back to its start at scale zero.
 """
 import math
@@ -42,7 +44,7 @@ from mathutils.bvhtree import BVHTree
 src_glb, out_glb = sys.argv[sys.argv.index("--") + 1 :]
 FPS = 30
 JELLY_ALPHA = 0.7
-NB = 14  # bubbles
+NB = 7  # bubbles
 
 
 def smooth(x):
@@ -144,22 +146,26 @@ rng = random.Random(11)
 BUBBLE_R = [rng.uniform(0.12, 0.3) for _ in range(NB)]
 
 
-def bubble_path(clip_len, kind):
-    """One bubble's loop in a clip: start and end points, period, phase, wobble."""
+def bubble_path(i, clip_len, kind):
+    """Bubble i's loop in a clip: start and end points, period, phase, wobble.
+    Bubble i keeps to its own slice of azimuth and its own share of the phase,
+    so the few bubbles there are stay apart in space and in time."""
+    slot = (i + rng.uniform(0.2, 0.8)) / NB
     if kind == "idle":  # slow, the whole height of the body
-        period = clip_len / rng.choice((1, 2, 3))
-        h0, h1 = rng.uniform(0.08, 0.3), rng.uniform(0.62, 0.86)
+        period = clip_len / rng.choice((1, 2))
+        h0, h1 = rng.uniform(0.08, 0.25), rng.uniform(0.65, 0.86)
     else:  # moving: short trips, swept back as the slime pushes forward
         period = clip_len
-        h0 = rng.uniform(0.1, 0.5)
-        h1 = h0 + rng.uniform(0.2, 0.35)
-    psi = rng.uniform(-math.pi, math.pi)
-    a = inside(h0, psi, rng.uniform(0.1, 0.65))
-    b = inside(h1, psi + rng.uniform(-0.7, 0.7), rng.uniform(0.1, 0.55))
+        h0 = 0.1 + 0.4 * slot
+        h1 = h0 + rng.uniform(0.2, 0.3)
+    psi = 2 * math.pi * slot
+    a = inside(h0, psi, rng.uniform(0.35, 0.75))
+    b = inside(h1, psi + rng.uniform(-0.35, 0.35), rng.uniform(0.3, 0.6))
     if kind != "idle":
-        b += Vector((0.0, rng.uniform(0.15, 0.4), 0.0))  # +Y is the back
-    return dict(a=a, b=b, period=period, phase=rng.random(), amp=rng.uniform(0.06, 0.16),
-                waves=rng.choice((1, 2, 3)), turn=rng.uniform(0, 2 * math.pi))
+        b += Vector((0.0, rng.uniform(0.15, 0.35), 0.0))  # +Y is the back
+    phase = (rng.choice((1, 3, 5)) * i / NB + rng.uniform(0, 0.4 / NB)) % 1.0  # interleaved
+    return dict(a=a, b=b, period=period, phase=phase, amp=rng.uniform(0.06, 0.14),
+                waves=rng.choice((1, 2)), turn=rng.uniform(0, 2 * math.pi))
 
 
 def bubble_at(path, t):
@@ -177,7 +183,7 @@ def bubble_at(path, t):
 
 PATH_KIND = {"Idle": "idle", "Walk": "move", "Run": "move", "Jump": "move"}
 PATH_LEN = {"Idle": 6.0, "Walk": 1.0, "Run": 0.9, "Jump": 0.8}
-BUBBLE_PATHS = {c: [bubble_path(PATH_LEN[c], PATH_KIND[c]) for _ in range(NB)] for c in PATH_KIND}
+BUBBLE_PATHS = {c: [bubble_path(i, PATH_LEN[c], PATH_KIND[c]) for i in range(NB)] for c in PATH_KIND}
 BUBBLE_REST = [BUBBLE_PATHS["Idle"][i]["a"].copy() for i in range(NB)]
 
 # --- armature -----------------------------------------------------------------------

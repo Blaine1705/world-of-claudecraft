@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 // renames it breaks the mount with nothing else failing. The byte pin makes any
 // re-export a deliberate, reviewed change.
 const ASSET_PATH = path.join(__dirname, '..', 'public/models/mounts/slime.glb');
-const EXPECTED_ASSET_SHA256 = 'e99e54235a7f859f95bb09270054cfbd7581df45c42deaa5c1130109c0899b00';
+const EXPECTED_ASSET_SHA256 = 'c2c06924c37c69ad07df8311dab438716909c965f679b37de9c3c516499a16cd';
 const CLIP_SECONDS = { Idle: 6, Walk: 1, Run: 0.9, Jump: 0.8 };
 
 async function readAsset() {
@@ -44,7 +44,7 @@ describe('slime mount asset', () => {
     const joints = [
       ...new Set(root.listSkins().flatMap((s) => s.listJoints().map((j) => j.getName()))),
     ].sort();
-    const bubbles = Array.from({ length: 14 }, (_, i) => `bubble_${String(i).padStart(2, '0')}`);
+    const bubbles = Array.from({ length: 7 }, (_, i) => `bubble_${String(i).padStart(2, '0')}`);
     expect(joints).toEqual(
       ['base', ...bubbles, 'mid', 'move', 'root', 'saddle', 'squash', 'top'].sort(),
     );
