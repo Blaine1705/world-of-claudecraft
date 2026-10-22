@@ -282,7 +282,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   // max(x, 0.0) (sprite key bumped to v3) and the ghost discharge's collar
   // Gaussian above took abs(), in the change that listed them here
   'src/render/drowned_temple_entrance.ts': 8,
-  'src/render/sunken_bastion_entrance.ts': 7,
+  'src/render/sunken_bastion_entrance.ts': 6,
   'src/render/wildheart_basin_entrance.ts': 6,
   'src/render/material_finishes.ts': 1,
 };
