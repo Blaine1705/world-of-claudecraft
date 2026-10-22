@@ -24,6 +24,56 @@ const FIELD_KIT_BATCH_ID = 'intentional-gathering-field-kit-2026-09-06';
 const CRUCIBLE_BATCH_ID = 'crucible-professions-2026-09-05';
 const LICENSE = 'World of ClaudeCraft project-generated art, project asset, rights reserved';
 
+// Integration45 current owners, also pinned by per-batch accepted-art tests.
+const BACKLOG_BATCH_IDS = [
+  'warfare-season2-warrior-icons-2026-10-22',
+  'warfare-season2-paladin-icons-2026-10-22',
+  'warfare-season2-hunter-icons-2026-10-22',
+  'warfare-season2-rogue-icons-2026-10-22',
+  'warfare-season2-priest-icons-2026-10-22',
+  'warfare-season2-shaman-icons-2026-10-22',
+  'warfare-season2-mage-icons-2026-10-22',
+  'warfare-season2-warlock-icons-2026-10-22',
+  'warfare-season2-druid-icons-2026-10-22',
+  'horse-whistle-icon-v045-2026-10-22',
+  'referral-reward-icons-v045-2026-10-22',
+  'hoard-arcane-painted-icons-v045-2026-10-22',
+  'hoard-frost-painted-icons-v045-2026-10-22',
+  'hoard-ember-painted-icons-v045-2026-10-22',
+  'hoard-storm-painted-icons-v045-2026-10-22',
+  'hoard-brute-painted-icons-v045-2026-10-22',
+  'hoard-venom-painted-icons-v045-2026-10-22',
+  'hoard-necro-painted-icons-v045-2026-10-22',
+  'hoard-tide-painted-icons-v045-2026-10-22',
+  'faction-rift-painted-icons-v045-2026-10-22',
+  'faction-church-painted-icons-v045-2026-10-22',
+  'faction-automaton-painted-icons-v045-2026-10-22',
+  'clue-painted-icons-v045-2026-10-22',
+  'rewards-painted-icons-v045-2026-10-22',
+  'dungeon-bastion-painted-icons-v045-2026-10-22',
+  'dungeon-temple-painted-icons-v045-2026-10-22',
+  'dungeon-wildheart-painted-icons-v045-2026-10-22',
+  'dungeon-gravewyrm-painted-icons-v045-2026-10-22',
+  'dungeon-crypt-painted-icons-v045-2026-10-22',
+  'dungeon-bastion-blues-painted-icons-v045-2026-10-22',
+  'dungeon-temple-blues-painted-icons-v045-2026-10-22',
+  'dungeon-crypt-blues-painted-icons-v045-2026-10-22',
+];
+
+// Preserve historical membership through explicit supersession records.
+function replacedBatchItemIds(mapping: ItemMapping, oldBatchId: string): string[] {
+  return mapping.generatedBatches
+    .filter(({ batchId }) => BACKLOG_BATCH_IDS.includes(batchId ?? ''))
+    .flatMap(({ provenanceRecord }) => {
+      const manifest = readJson<{
+        assets: Array<{ id: string; superseded?: { batchId: string } }>;
+      }>(String(provenanceRecord));
+      return manifest.assets
+        .filter((asset) => asset.superseded?.batchId === oldBatchId)
+        .map(({ id }) => id);
+    });
+}
+
 type ReportPin = {
   chunk: string;
   path: string;
@@ -846,10 +896,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 2043.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
     // The restored legacy whistle and charm definitions add 36 item ids.
-    // Five referral rewards reuse existing art while their own paintings are pending.
-    // +1: the membership Staff of Changing (PR 4281).
-    // +1: Lantern Hall's Lantern Seal (its own generated batch and owner).
-    // +1: Lantern Hall's horse reins (its own rendered batch and owner).
+    // All five referral rewards now own paintings; only the retired Phoenix remains pending.
+    // +2: Lantern Hall's Lantern Seal and its horse's reins (each its own rendered batch and owner).
     expect(Object.keys(ITEMS)).toHaveLength(2213);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
@@ -935,14 +983,20 @@ describe('item-art consistency accepted-art provenance', () => {
     // The lower dungeons' normal blues add 30 more, named by their batch the
     // same way: its 25 own-art Heroic armour clones plus the generated Heroic
     // copies of its five weapons, which alias their base painting.
-    const bluesBatch = mapping.generatedBatches.find(
-      ({ batchId }) => batchId === 'lower-dungeon-blues-icons-2026-10-08',
+    const bluesBatchIds = [
+      'dungeon-bastion-blues-painted-icons-v045-2026-10-22',
+      'dungeon-temple-blues-painted-icons-v045-2026-10-22',
+      'dungeon-crypt-blues-painted-icons-v045-2026-10-22',
+    ];
+    const bluesBatches = mapping.generatedBatches.filter(({ batchId }) =>
+      bluesBatchIds.includes(batchId ?? ''),
     );
+    expect(bluesBatches).toHaveLength(3);
+    const bluesItemIds = bluesBatches.flatMap(({ itemIds }) => itemIds);
+    expect(bluesItemIds).toHaveLength(55);
     const blueHeroicIds = [
-      ...(bluesBatch?.itemIds.filter((id) => id.startsWith('heroic_')) ?? []),
-      ...(bluesBatch?.itemIds
-        .filter((id) => ITEMS[id]?.kind === 'weapon')
-        .map((id) => heroicVariantId(id)) ?? []),
+      ...bluesItemIds.filter((id) => id.startsWith('heroic_')),
+      ...bluesItemIds.filter((id) => ITEMS[id]?.kind === 'weapon').map(heroicVariantId),
     ];
     expect(blueHeroicIds).toHaveLength(30);
     for (const id of blueHeroicIds) {
@@ -1076,11 +1130,13 @@ describe('item-art consistency accepted-art provenance', () => {
     // integration: 1,890 owners over 2,043 items.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
     // Buddy provenance contributes 34 additional owners.
-    expect(new Set(currentOwnerIds).size).toBe(2042);
-    expect(shippingIds).toHaveLength(2042);
+    // Icon backlog adds 135 Season 2 armour icons, five referral icons and the Horse Whistle.
+    // + Lantern Hall's seal and its destrier's reins (PR 4530): 2183.
+    expect(new Set(currentOwnerIds).size).toBe(2183);
+    expect(shippingIds).toHaveLength(2183);
     // The restored legacy whistle and charm definitions add 36 item ids.
-    // Five referral rewards reuse existing art while their own paintings are pending.
-    // +1: Lantern Hall's Lantern Seal (its own generated batch and owner).
+    // All five referral rewards now own paintings; only the retired Phoenix remains pending.
+    // +2: Lantern Hall's seal and reins.
     expect(Object.keys(ITEMS)).toHaveLength(2213);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
@@ -1127,9 +1183,7 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     // The wq-reputation merge's faction quartermaster stock, one SVG batch
     // (faction-vendor-icons-2026-09-16), additive beyond the chain the same way.
-    const factionVendorBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
-      .flatMap(({ itemIds }) => itemIds);
+    const factionVendorBatchIds = replacedBatchItemIds(mapping, 'faction-vendor-icons-2026-09-16');
     expect(sorted(factionVendorBatchIds)).toEqual([
       'artificers_welding_cowl',
       'automaton_cog_ring',
@@ -1149,9 +1203,7 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     // The faction ladder rework's periphery rows and formulas, one SVG batch
     // (faction-ladder-icons-2026-09-23), additive beyond the chain the same way.
-    const factionLadderBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'faction-ladder-icons-2026-09-23')
-      .flatMap(({ itemIds }) => itemIds);
+    const factionLadderBatchIds = replacedBatchItemIds(mapping, 'faction-ladder-icons-2026-09-23');
     expect(sorted(factionLadderBatchIds)).toEqual([
       'acolytes_signet',
       'champions_dawn_loop',
@@ -1173,15 +1225,11 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17),
     // additive beyond the chain the same way.
-    const clueScrollBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
-      .flatMap(({ itemIds }) => itemIds);
+    const clueScrollBatchIds = replacedBatchItemIds(mapping, 'clue-scroll-icons-2026-09-17');
     expect(sorted(clueScrollBatchIds)).toEqual(['clue_scroll', 'treasure_casket']);
     // The faction reward items, one SVG batch (faction-rewards-icons-2026-09-17),
     // additive beyond the chain the same way.
-    const factionRewardBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'faction-rewards-icons-2026-09-17')
-      .flatMap(({ itemIds }) => itemIds);
+    const factionRewardBatchIds = replacedBatchItemIds(mapping, 'faction-rewards-icons-2026-09-17');
     expect(sorted(factionRewardBatchIds)).toEqual([
       'allied_hearthstone',
       'allied_vanguard_duffel',
@@ -1216,9 +1264,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Buried Hoard boss loot (hoard-boss-loot-icons-2026-09-20): one icon per
     // generated item id, 32 pieces at three tiers, pinned against the live table
     // rather than as 96 literals.
-    const hoardLootBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'hoard-boss-loot-icons-2026-09-20')
-      .flatMap(({ itemIds }) => itemIds);
+    const hoardLootBatchIds = replacedBatchItemIds(mapping, 'hoard-boss-loot-icons-2026-09-20');
     expect(hoardLootBatchIds).toHaveLength(96);
     expect(sorted(hoardLootBatchIds)).toEqual(sorted(Object.keys(HOARD_ITEMS)));
     // The choose-one leveling quest armor (quest-leveling-gear-icons-2026-10-06)
@@ -1328,20 +1374,32 @@ describe('item-art consistency accepted-art provenance', () => {
         'craterglass_stave',
         // The membership Staff of Changing (membership-weapon-2026-10-14, PR 4281).
         'membership_staff',
-        // The dungeon reworks' loot batches (Sunken Bastion, Drowned Temple,
-        // Wildheart Basin, Gravewyrm Sanctum, Hollow Crypt).
+        // Dungeon replacements plus 141 new files: Season 2, referral and horse.
         ...mapping.generatedBatches
           .filter(({ batchId }) =>
             [
-              'sunken-bastion-icons-2026-09-29',
-              'drowned-temple-icons-2026-09-30',
-              'wildheart-basin-icons-2026-10-02',
-              'gravewyrm-sanctum-icons-2026-10-03',
-              'hollow-crypt-icons-2026-10-03',
-              'lower-dungeon-blues-icons-2026-10-08',
-              // Lantern Hall's guild currency (the Blender-rendered seal).
+              'warfare-season2-warrior-icons-2026-10-22',
+              'warfare-season2-paladin-icons-2026-10-22',
+              'warfare-season2-hunter-icons-2026-10-22',
+              'warfare-season2-rogue-icons-2026-10-22',
+              'warfare-season2-priest-icons-2026-10-22',
+              'warfare-season2-shaman-icons-2026-10-22',
+              'warfare-season2-mage-icons-2026-10-22',
+              'warfare-season2-warlock-icons-2026-10-22',
+              'warfare-season2-druid-icons-2026-10-22',
+              'horse-whistle-icon-v045-2026-10-22',
+              'referral-reward-icons-v045-2026-10-22',
+              'dungeon-bastion-painted-icons-v045-2026-10-22',
+              'dungeon-temple-painted-icons-v045-2026-10-22',
+              'dungeon-wildheart-painted-icons-v045-2026-10-22',
+              'dungeon-gravewyrm-painted-icons-v045-2026-10-22',
+              'dungeon-crypt-painted-icons-v045-2026-10-22',
+              'dungeon-bastion-blues-painted-icons-v045-2026-10-22',
+              'dungeon-temple-blues-painted-icons-v045-2026-10-22',
+              'dungeon-crypt-blues-painted-icons-v045-2026-10-22',
+              // Lantern Hall's guild currency (the Blender-rendered seal) and its war horse's
+              // reins (the Blender-rendered portrait).
               'lantern-hall-seal-2026-10-16',
-              // ...and its war horse's reins (the Blender-rendered portrait).
               'lantern-hall-destrier-reins-2026-10-16',
             ].includes(batchId ?? ''),
           )
@@ -1523,8 +1581,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57.
     // Buddy whistle and charm provenance add two batches.
     // The membership weapon batch (membership-weapon-2026-10-14, PR 4281): 60.
-    // Lantern Hall's seal and its horse's reins add two: 62.
-    expect(mapping.generatedBatches).toHaveLength(62);
+    // Backlog replacements consolidate old owners into a net 21 additional batches; Lantern
+    // Hall's seal and its horse's reins add two: 83.
+    expect(mapping.generatedBatches).toHaveLength(83);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1601,16 +1660,17 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
     // Buddy batches add 34 owner ids to the integration inventory. The membership
     // Staff of Changing batch (PR 4281) adds one: 1510.
-    // Lantern Hall's seal batch adds one: 1511. Its horse's reins batch one more: 1512.
-    expect(priorGeneratedIds).toHaveLength(1512);
+    // Backlog adds 141 files; replacements preserve the remaining owner count. Lantern Hall's
+    // seal and its horse's reins add two: 1653.
+    expect(priorGeneratedIds).toHaveLength(1653);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    expect(allCurrentOwnerIds).toHaveLength(2042);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2042);
+    expect(allCurrentOwnerIds).toHaveLength(2183);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2183);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1631,7 +1691,7 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Mirefen world-boss branch's 15 = 1360.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
       // Plus 34 restored buddy provenance owners, and the membership staff: 1510.
-      priorGenerated: 1512, // +1 Lantern Hall's seal, +1 its horse's reins
+      priorGenerated: 1653, // +1 Lantern Hall's seal, +1 its horse's reins
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1714,34 +1774,17 @@ describe('item-art consistency accepted-art provenance', () => {
               [
                 'world-quest-puzzle-activators-2026-09-01',
                 'world-quest-freight-icons-2026-09-01',
-                // The faction quartermaster stock (wq-reputation merge).
-                'faction-vendor-icons-2026-09-16',
-                // The faction ladder rework's periphery rows and formulas.
-                'faction-ladder-icons-2026-09-23',
-                // The Clue Scroll items.
-                'clue-scroll-icons-2026-09-17',
-                'faction-rewards-icons-2026-09-17',
                 'buried-hoard-treasure-maps-2026-09-19',
-                'hoard-boss-loot-icons-2026-09-20',
                 'quest-leveling-gear-icons-2026-10-06',
                 'quest-blue-rewards-icons-2026-10-07',
                 'membership-items-2026-10-05',
                 'membership-weapon-2026-10-14',
                 'referral-items-2026-10-07',
                 'quest-role-fill-icons-2026-10-07',
-                // The Sunken Bastion rework's loot.
-                'sunken-bastion-icons-2026-09-29',
-                // The Drowned Temple rework's loot.
-                'drowned-temple-icons-2026-09-30',
-                // The Wildheart Basin rework's loot.
-                'wildheart-basin-icons-2026-10-02',
-                // The Gravewyrm Sanctum rework's loot.
-                'gravewyrm-sanctum-icons-2026-10-03',
-                // The Hollow Crypt rework's loot.
-                'hollow-crypt-icons-2026-10-03',
-                // The lower dungeons' normal blues.
-                'lower-dungeon-blues-icons-2026-10-08',
-                // Lantern Hall's guild currency (the Blender-rendered seal).
+                // Current replacements for factions, hoards and dungeons, plus new art.
+                ...BACKLOG_BATCH_IDS,
+                // Lantern Hall's guild currency (the Blender-rendered seal) and its war
+                // horse's reins.
                 'lantern-hall-seal-2026-10-16',
                 'lantern-hall-destrier-reins-2026-10-16',
               ].includes(batchId),
@@ -1915,9 +1958,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    if (ownerIds.length !== 2042)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2042`);
-    if (fileIds.length !== 2042) violations.push(`shipping WebP count: ${fileIds.length} != 2042`);
+    if (ownerIds.length !== 2183)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2183`);
+    if (fileIds.length !== 2183) violations.push(`shipping WebP count: ${fileIds.length} != 2183`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

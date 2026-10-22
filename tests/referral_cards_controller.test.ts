@@ -102,7 +102,7 @@ describe('referral card controller', () => {
     expect(f.playReward).toHaveBeenCalledOnce();
     expect(popup.textContent).toContain('Friendship Satchel');
     expect(popup.textContent).toContain('Trailmate');
-    expect(popup.querySelector('img')?.getAttribute('src')).toContain('resonant_weave_bag.webp');
+    expect(popup.querySelector('img')?.getAttribute('src')).toBe('/ui/items/referral_satchel.webp');
     expect(popup.getAttribute('role')).toBe('dialog');
     expect(f.root.inert).toBe(true);
     expect(document.querySelector('.referral-celebration')!.contains(document.activeElement)).toBe(

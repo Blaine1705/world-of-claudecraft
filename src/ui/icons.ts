@@ -12,7 +12,6 @@ import { BUDDY_ART_PENDING_ITEM_IDS } from '../sim/content/buddies';
 import { HOLLOW_CRYPT_ART_PENDING_ITEM_IDS } from '../sim/content/hollow_crypt_items';
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
-import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
 import {
   BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
@@ -4717,6 +4716,11 @@ const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
   'wlk_r20_curse_mastery',
 ]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
+  // Integration 45: final four procedural ability fallbacks receive painted art.
+  'courier',
+  'lunge',
+  'hamstring_bite',
+  'clockwork_shock_bomb',
   // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Painted rather than procedural
   // because the player's entire job in this mechanic is choosing between these three under
   // pressure, and three composited tiles built from the same primitives read as one tile at
@@ -5249,16 +5253,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 // abilities). The painted-census guards (tests/missing_painted_icons_wave,
 // tests/release_v039_icon_art) treat these as parked, never as painted, and
 // reject a stale entry once art lands.
-export const ABILITY_ART_PENDING = new Set<string>([
-  // Wildfang kit pass 2: the VFX and art retune owns the final paintings.
-  'lunge',
-  'hamstring_bite',
-  // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
-  // its skill painting ships (the item itself already ships painted art).
-  'clockwork_shock_bomb',
-  // Membership Courier: the summon draws its glyph until its skill painting ships.
-  'courier',
-]);
+export const ABILITY_ART_PENDING = new Set<string>();
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
@@ -5828,10 +5823,7 @@ export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
-  // Warfare Season 2 armor: painted icons owned by a follow-up art pass; the
-  // procedural icon stands in until then. The season weapons never park here:
-  // an unpainted weapon already draws its procedural icon.
-  ...SEASON2_SETS.flatMap((set) => set.itemIds),
+  // All 135 Season 2 armor pieces now ship individual paintings.
   // The Hollow Crypt rework's per-boss loot: EMPTY since its painted wave
   // (hollow-crypt-icons-2026-10-03) landed; the seam stays for the next park.
   ...HOLLOW_CRYPT_ART_PENDING_ITEM_IDS,
@@ -5856,88 +5848,13 @@ export function itemImageUrl(id: string): string | null {
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
 
-// Exhaustive live-deed art debt ledger. The Masterwrought completion wave clears its
-// eleven crests (including the commissioned Harvestmaster replacement). Inherited release
-// rows and the hidden hammer celebration retain their deliberate procedural category fallback.
+// Exhaustive live-deed art debt ledger. Accepted paintings are removed as each batch
+// lands; remaining rows retain their deliberate procedural category fallback.
 // Insertion order mirrors DEED_ORDER because the deed-art gate derives its exact debt in order.
+// Integration 45 completed all 57 formerly pending paintings. Lantern Hall's contract
+// milestones and the quartermaster's three titles came after it: the category crest until their
+// paintings are commissioned.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
-  'exp_the_last_keep',
-  'exp_dawnhold_castle',
-  'soc_strongbox_outfitter',
-  'soc_four_bags_deep',
-  'prog_ready_for_an_adventure',
-  'dgn_ignivar',
-  'dgn_ignivar_heroic',
-  'dgn_varkhul',
-  'dgn_varkhul_heroic',
-  'dgn_varkhul_flawless',
-  // Hidden self-craft celebration; 512px RGBA commission brief in docs/achievements/icon-brief.md.
-  'hid_forgebreaker',
-  // Arcane Calligraphy's completion and Gold-rating deeds are both
-  // 'exploration'. They use the category crest until their commissioned
-  // paintings land (docs/achievements/icon-brief.md).
-  'exp_arcane_calligraphy',
-  'exp_arcane_calligraphy_gold',
-  // World-quest completion deeds use the exploration category crest pending art.
-  'exp_forge_helper',
-  'exp_last_barricade',
-  'exp_borrowed_face',
-  'exp_windrider_slalom',
-  'exp_duskweave_dispatches',
-  'exp_wisp_maze',
-  // Faction standing deeds use the progression category crest pending art.
-  'prog_rift_watch_trusted',
-  'prog_church_order_trusted',
-  'prog_automatons_trusted',
-  'prog_rift_watch_champion',
-  'prog_church_order_champion',
-  'prog_automatons_champion',
-  'prog_faction_champion_all',
-  // Clue Scroll casket deeds use the exploration category crest pending art.
-  'exp_clue_first_casket',
-  'exp_clue_ten_caskets',
-  // The Buried Hoard goblin catch uses the combat category crest pending art.
-  'cmb_coinsack_caught',
-  // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
-  'exp_harbor_to_harbor',
-  // The Mirefen world boss pair: both are 'combat', so both fall back to the
-  // deed_cat_combat crest until their commissioned art lands.
-  'cmb_balgath',
-  'cmb_balgath_ten',
-  // The muster's pike drill (content/mirefen_muster_quests.ts), also a 'combat' crest.
-  'cmb_point_taken',
-  // The five-dungeon rework's encounter deeds (content/deeds.ts, appended in
-  // DEED_ORDER): the dungeon category crest until their paintings are commissioned.
-  'dgn_olen_buttress',
-  'dgn_ossick_moored',
-  'dgn_vael_beacon',
-  'dgn_turretback',
-  'dgn_selthe_pitch',
-  'dgn_colossus_mirror',
-  'dgn_ysolei_high_and_dry',
-  'dgn_mere_hydra',
-  'dgn_crypt_knellwyrm',
-  'dgn_turnkey_cage',
-  'dgn_beastmaster_apart',
-  'dgn_gorgebloom_clean',
-  'dgn_zulgar_uncaught',
-  'dgn_great_saurian',
-  'dgn_korgath_all_chains',
-  'dgn_korgath_still_bound',
-  'dgn_velkhar_cold',
-  'dgn_korzul_thin_ice',
-  'dgn_sledge_tusker',
-  // The Drowned Temple's lore guide deed (The Last Verse): the dungeon crest
-  // until its painting is commissioned.
-  'dgn_drowned_temple_cantor',
-  // The Hollow Crypt's wing-boss deeds: the dungeon crest until their paintings
-  // are commissioned.
-  'dgn_marrow_tidy',
-  'dgn_lady_nobody_hanging',
-  'dgn_ilvane_hush',
-  'dgn_morthen_candlelight',
-  // Lantern Hall's contract milestones and the quartermaster's three titles: the
-  // category crest until their paintings are commissioned.
   'dgn_guild_first_contract',
   'dgn_guild_ten_contracts',
   'dgn_guild_fifty_contracts',

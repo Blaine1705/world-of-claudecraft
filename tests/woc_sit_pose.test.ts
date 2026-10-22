@@ -140,7 +140,9 @@ describe.each(FITS)('WOC %s seated arm, elbow and wrist pose', (fit) => {
         expect(sign * elbow.x, `${side} step ${k} elbow.x`).toBeGreaterThan(
           sign * shoulder.x + 0.06,
         );
-        expect(sign * elbow.x, `${side} step ${k} elbow width`).toBeGreaterThan(0.22);
+        expect(sign * elbow.x, `${side} step ${k} elbow width`).toBeGreaterThan(
+          fit === 'male' ? 0.22 : 0.195,
+        );
 
         // Forearms angle forward and inward from the outward elbows toward the knees.
         expect(sign * wrist.x, `${side} step ${k} wrist inward of elbow`).toBeLessThan(

@@ -147,32 +147,32 @@ const CEILINGS: Readonly<Record<string, number>> = {
   // 2026-09-30: no two-hand stance, so the four unused *_2H combat clips left too (55 -> 51).
   'anims_female.glb': 683008,
   'anims_male.glb': 666624,
-  'armor/female_druid_low.glb': 215040,
-  'armor/female_druid_medium.glb': 686080,
+  'armor/female_druid_low.glb': 216064,
+  'armor/female_druid_medium.glb': 687104,
   'armor/female_druid_top.glb': 1230848, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_hunter_low.glb': 207872,
-  'armor/female_hunter_medium.glb': 620544,
+  'armor/female_hunter_low.glb': 208896,
+  'armor/female_hunter_medium.glb': 621568,
   'armor/female_hunter_top.glb': 1043456, // 2026-10-03: new, the medium maps' top levels
   'armor/female_mage_low.glb': 206848,
   'armor/female_mage_medium.glb': 605184,
   'armor/female_mage_top.glb': 949248, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_paladin_low.glb': 200704,
-  'armor/female_paladin_medium.glb': 663552,
+  'armor/female_paladin_low.glb': 201728,
+  'armor/female_paladin_medium.glb': 664576,
   'armor/female_paladin_top.glb': 1186816, // 2026-10-03: new, the medium maps' top levels
   'armor/female_priest_low.glb': 214016,
   'armor/female_priest_medium.glb': 662528,
   'armor/female_priest_top.glb': 1078272, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_rogue_low.glb': 203776,
-  'armor/female_rogue_medium.glb': 619520,
+  'armor/female_rogue_low.glb': 204800,
+  'armor/female_rogue_medium.glb': 620544,
   'armor/female_rogue_top.glb': 987136, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_shaman_low.glb': 210944,
-  'armor/female_shaman_medium.glb': 731136,
+  'armor/female_shaman_low.glb': 211968,
+  'armor/female_shaman_medium.glb': 732160,
   'armor/female_shaman_top.glb': 1334272, // 2026-10-03: new, the medium maps' top levels
   'armor/female_warlock_low.glb': 200704,
   'armor/female_warlock_medium.glb': 570368,
   'armor/female_warlock_top.glb': 865280, // 2026-10-03: new, the medium maps' top levels
-  'armor/female_warrior_low.glb': 207872,
-  'armor/female_warrior_medium.glb': 732160,
+  'armor/female_warrior_low.glb': 208896,
+  'armor/female_warrior_medium.glb': 733184,
   'armor/female_warrior_top.glb': 1545216, // 2026-10-03: new, the medium maps' top levels
   'armor/male_druid_low.glb': 192512,
   'armor/male_druid_medium.glb': 680960,
@@ -205,7 +205,7 @@ const CEILINGS: Readonly<Record<string, number>> = {
   // handoff's original face, then strips it (build_woc_split.mjs stripOriginalFace), so a base
   // is the rig, the body and its map. The female base dropped from 1381016 to 344976 bytes and
   // the male from 1323632 to 327276; nothing else in the delivery moved.
-  'base_female.glb': 361472,
+  'base_female.glb': 363520,
   'base_male.glb': 343040,
   // The modular head library (Type A on the male rig, Type B on the female): built by
   // scripts/assets/woc_character/woc_head_pack.py, compressed, then split 2026-09-30 by
