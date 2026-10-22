@@ -55,6 +55,40 @@ export function selectAccountBankMirror(
 ): AccountBankInfo | null {
   return info ? { ...info, selectedCharacterId: characterId, bank: null, error: undefined } : null;
 }
+/** ClientWorld's shared bank request state, kept here so the client stays a
+ *  thin seam: the remembered character, whether the Other characters tab asked
+ *  for a bank to open with the roster (a plain bank visit reads no other
+ *  character's bank), and the one roster read in flight, which expires so a
+ *  lost reply can be retried. */
+export class AccountBankRequests {
+  private preferred: number | null = null;
+  private openFirst = false;
+  private listSentAt: number | null = null;
+  /** Whether to send a roster read now; a read in flight is armed instead,
+   *  since a second would only bounce off the server's pending slot as busy. */
+  list(openFirst: boolean, now = performance.now()): boolean {
+    if (openFirst) this.openFirst = true;
+    if (this.listSentAt !== null && now - this.listSentAt < 5_000) return false;
+    this.listSentAt = now;
+    return true;
+  }
+  /** Decode a reply, and open the next bank through `select` when the tab
+   *  asked. A remembered character that refuses stops being reopened. */
+  receive(wire: unknown, select: (characterId: number) => void): AccountBankInfo | null {
+    const info = decodeAccountBankInfo(wire);
+    this.listSentAt = null;
+    if (info?.error && info.selectedCharacterId === this.preferred) this.preferred = null;
+    const pick = this.openFirst ? accountBankAutoSelect(info, this.preferred) : null;
+    this.openFirst = false;
+    if (pick !== null) select(pick);
+    return info;
+  }
+  /** Remember the pick and return the mirror while its bank loads. */
+  select(info: AccountBankInfo | null, characterId: number): AccountBankInfo | null {
+    this.preferred = characterId;
+    return selectAccountBankMirror(info, characterId);
+  }
+}
 export function accountBankTransferPayload(
   ...[characterId, direction, slotIndex, count, expectedSlot]: Parameters<
     IWorldBank['accountBankTransfer']
