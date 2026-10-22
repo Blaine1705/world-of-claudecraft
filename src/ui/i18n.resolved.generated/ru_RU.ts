@@ -1252,6 +1252,18 @@ export const ru_RU: EnTranslations = {
         }
       },
       "seasonOne": "Сезон 1",
+      "membershipPromo": {
+        "open": "Членство в магазине WOC",
+        "close": "Закрыть рекламу членства",
+        "eyebrow": "Преимущества аккаунта",
+        "title": "Членство",
+        "cta": "Вступить"
+      },
+      "referralPromo": {
+        "close": "Закрыть рекламу «Пригласить друга»",
+        "eyebrow": "Приключения вместе",
+        "cta": "Пригласить друзей"
+      },
       "rarity": {
         "uncommon": "Необычный",
         "rare": "Редкий",

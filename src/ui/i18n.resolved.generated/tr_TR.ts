@@ -1252,6 +1252,18 @@ export const tr_TR: EnTranslations = {
         }
       },
       "seasonOne": "1. Sezon",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Yaygın olmayan",
         "rare": "Nadir",

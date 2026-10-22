@@ -5924,12 +5924,56 @@
     cursor: var(--cursor-point);
     overflow: hidden;
   }
+  /* Each advert is a full-card layer; only the active one shows, crossfading on rotation. */
+  .store-promo-card-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.45s ease,
+      visibility 0s linear 0.45s;
+  }
+  .store-promo-card-slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s ease;
+  }
   .store-promo-card-open img {
     width: 100%;
     height: 100%;
     display: block;
     object-fit: cover;
     transition: filter 0.12s ease;
+  }
+  .store-promo-card-dots {
+    position: absolute;
+    left: 4%;
+    bottom: 7%;
+    z-index: 1;
+    display: flex;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .store-promo-card-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-text-light);
+    opacity: 0.4;
+    box-shadow: 0 0 2px #000;
+  }
+  .store-promo-card-dot.is-active {
+    opacity: 1;
+  }
+  .store-promo-card-dot.is-retired {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .store-promo-card-slide,
+    .store-promo-card-slide.is-active {
+      transition: none;
+    }
   }
   .store-promo-card-copy {
     /* The copy sits inside the card's own <button>, which carries no colour, so
