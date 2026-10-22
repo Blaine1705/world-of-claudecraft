@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   eyeInTavern,
   hallRoofUnderside,
+  inHallRoof,
   mirefenTavernParts,
   newTavernShellState,
   TAVERN_EYE_OVER_FEET,
@@ -11,11 +12,13 @@ import {
   tavernShellOcclusion,
   tavernShelters,
 } from '../src/render/mirefen_tavern_core';
+import { TAVERN_HALL_AIR_TOP } from '../src/render/mirefen_tavern_interior_core';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import {
   TAVERN_DOOR,
   TAVERN_FLOOR_Y,
   TAVERN_HALL,
+  TAVERN_JETTY,
   TAVERN_PROPS,
   TAVERN_TOWER,
   tavernToWorld,
@@ -140,7 +143,7 @@ describe('tavern cutaway: outdoors', () => {
   });
 
   it('ghosts only the piece of the front between the lens and the player, never the whole', () => {
-    // a lens up over the door, the player just inside: only the gable over the door
+    // a lens up over the door, the player just inside: only the cross gable over the door
     let d = decide(eye(0, 11), cam(0, 20, 20), false);
     expect(d.cut).toContain('HallWallFront');
     expect(d.cut).not.toContain('HallWallFrontLeft');
@@ -151,7 +154,7 @@ describe('tavern cutaway: outdoors', () => {
     expect(d.cut).toEqual(['HallWallFrontLeft']);
     d = decide(eye(0, 11), cam(14, 4, 17), false);
     expect(d.cut).toEqual(['HallWallFrontRight']);
-    // a player in the doorway under a lens high out behind: the porch's canopy alone
+    // a player in the doorway under a lens high out behind: the porch's awning alone
     d = decide(eye(0, 13.8), cam(0, 16, 24), false);
     expect(d.cut).toEqual(['HallPorch']);
     // (the front's three pieces meet beside the door's posts)
@@ -160,11 +163,46 @@ describe('tavern cutaway: outdoors', () => {
 });
 
 describe('tavern roof and shelter', () => {
-  it('reads the roof underside from its line, and the hammer beams along the walls', () => {
-    expect(hallRoofUnderside(0, 0)).toBeGreaterThan(TAVERN_HALL.ridge - 1);
-    expect(hallRoofUnderside(14, 0)).toBeLessThanOrEqual(TAVERN_HALL.truss);
-    expect(hallRoofUnderside(8, 0)).toBeGreaterThan(TAVERN_HALL.truss);
+  it('reads the roof underside from its line along the hall, and the hammer beams', () => {
+    // the ridge runs along the hall midway between the jettied front's face and the back wall,
+    // settled toward its middle (the painted rebuild's sag), the sarking under it
+    const front = TAVERN_HALL.z1 + TAVERN_JETTY.out;
+    const ridgeZ = (front + TAVERN_HALL.z0) / 2;
+    const half = (front - TAVERN_HALL.z0) / 2;
+    expect(hallRoofUnderside(0, ridgeZ)).toBeGreaterThan(TAVERN_HALL.ridge - 2);
+    expect(hallRoofUnderside(0, ridgeZ)).toBeLessThan(TAVERN_HALL.ridge);
+    // from gable to gable it runs level but for the sag (no pitch along the hall)
+    expect(Math.abs(hallRoofUnderside(12, ridgeZ) - hallRoofUnderside(-12, ridgeZ))).toBeLessThan(
+      0.2,
+    );
+    // the bell-cast across the ridge: steep under it, easing toward the eave walls (under a
+    // straight pitch)
+    const straight = TAVERN_HALL.ridge - 8 * ((TAVERN_HALL.ridge - TAVERN_HALL.eave) / half);
+    expect(hallRoofUnderside(0, ridgeZ + 8)).toBeLessThan(straight);
+    expect(hallRoofUnderside(0, ridgeZ - 8)).toBeLessThan(straight);
+    // the hammer beams off the front and the back walls: under the trusses' level, over the
+    // camera's air; the room's middle open to the roof
+    for (const z of [-12, 12]) {
+      expect(hallRoofUnderside(0, z)).toBeLessThanOrEqual(TAVERN_HALL.truss);
+      expect(hallRoofUnderside(0, z)).toBeGreaterThan(TAVERN_HALL_AIR_TOP);
+    }
+    expect(hallRoofUnderside(0, 5)).toBeGreaterThan(TAVERN_HALL.truss);
+    // nothing past the verges, nor out over the door's bay (the cross gable's own roof)
     expect(hallRoofUnderside(40, 0)).toBe(Infinity);
+    expect(hallRoofUnderside(0, front + 1)).toBe(Infinity);
+  });
+
+  it("keeps the cross gable's loft open air, its own slopes roof", () => {
+    const front = TAVERN_HALL.z1 + TAVERN_JETTY.out;
+    // in the loft behind the cross gable's face, over the main slates: air
+    expect(inHallRoof(0, 12, front)).toBe(false);
+    expect(inHallRoof(0, 14, front - 3)).toBe(false);
+    // up in its slopes over the door, and the main roof's slab under its loft: roof
+    expect(inHallRoof(0, 17.4, front + 0.6)).toBe(true);
+    expect(inHallRoof(0, 11.2, 11.5)).toBe(true);
+    // out past its eaves the main roof is roof all the way up, the hall's air under it
+    expect(inHallRoof(11, 17, 6)).toBe(true);
+    expect(inHallRoof(11, 14, 6)).toBe(false);
   });
 
   it('shelters a body inside from the weather, never one on the porch', () => {

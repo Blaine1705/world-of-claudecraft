@@ -80,9 +80,11 @@ describe('Eastbrook town grass exclusion', () => {
     // The painted towns (sim/painted_towns/) clear their buildings the Highwatch way: two
     // rows each, the reach and the door apron (their old kit houses had none), so the
     // count follows the town list rather than a re-pin per town.
+    // Re-pinned for the painted inn: the two stone flower tubs on the terrace's corners came
+    // out of its grounds, taking their rectangles with them: 27 to 25.
     const painted = PAINTED_TOWNS.flatMap((town) => town.buildings);
     expect(exclusions).toHaveLength(99 + tavernGroundsRects().length + 2 * painted.length);
-    expect(tavernGroundsRects().length).toBe(27);
+    expect(tavernGroundsRects().length).toBe(25);
     for (const building of [...HIGHWATCH_LAYOUT.buildings, ...painted]) {
       expect(exclusions.some((item) => item.id === building.id)).toBe(true);
       expect(exclusions.some((item) => item.id === `${building.id}:serviceApron`)).toBe(true);

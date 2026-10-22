@@ -140,29 +140,6 @@ export const TAVERN_GROUNDS_PROPS: readonly TavernProp[] = [
   post(-5.7, 21.0, -2.686),
   post(5.6, 19.6, -2.062),
   post(13.0, 19.2, -1.215),
-  // stone flower tubs at the terrace's outer corners
-  {
-    kind: 'planter',
-    x: -16.6,
-    z: 19.8,
-    rot: 0.9,
-    r: 0.5,
-    height: 0.95,
-    level: 'ground',
-    baseY: -2.56,
-    standable: true,
-  },
-  {
-    kind: 'planter',
-    x: 14.2,
-    z: 19.9,
-    rot: 2.1,
-    r: 0.5,
-    height: 0.95,
-    level: 'ground',
-    baseY: -1.147,
-    standable: true,
-  },
   // casks and crates stacked at the front's right corner
   {
     kind: 'cask',
