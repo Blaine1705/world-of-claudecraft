@@ -77,12 +77,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountSelect': '은행을 불러올 캐릭터를 선택하세요.',
   'hudChrome.bank.accountUnavailable':
     '이 은행을 이용할 수 없습니다. 캐릭터를 다시 선택하여 새로고침하세요.',
-  'hudChrome.bank.accountDeposit': '내 가방: 이 은행에 보관',
-  'hudChrome.bank.accountWithdraw': '선택한 은행: 내 가방으로 인출',
   'hudChrome.bank.accountDepositHint': '클릭하면 이 묶음을 선택한 캐릭터의 은행에 보관합니다.',
   'hudChrome.bank.accountWithdrawHint': '클릭하면 이 묶음을 내 가방으로 인출합니다.',
   'hudChrome.bank.accountBound':
     '귀속 아이템, 잠긴 아이템, 퀘스트 아이템은 캐릭터 간에 이동할 수 없습니다.',
+  'hudChrome.bank.accountLoading': '캐릭터를 불러오는 중...',
+  'hudChrome.bank.accountOpening': '{name}의 은행을 여는 중...',
+  'hudChrome.bank.accountOnline':
+    '{name} 캐릭터가 접속 중입니다. 해당 캐릭터를 로그아웃하면 여기서 은행을 열 수 있습니다.',
+  'hudChrome.bank.accountBusy': '은행이 바쁩니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.bank.accountNoFit': '그 묶음을 넣을 공간이 없습니다.',
+  'hudChrome.bank.accountStale': '옮기기 전에 묶음이 바뀌었습니다. 다시 시도하세요.',
+  'hudChrome.bank.accountTooLarge':
+    '{name}의 은행이 너무 커서 여기서 열 수 없습니다. {name}(으)로 접속하여 이용하세요.',
+  'hudChrome.bank.accountRetry': '다시 시도',
+  'hudChrome.bank.accountBankTitle': '{name}의 은행',
+  'hudChrome.bank.accountBagsTitle': '내 가방',
+  'hudChrome.bank.accountSlots': '{used} / {total}칸',
+  'hudChrome.bank.accountWithdrawLead': '아이템을 클릭하면 내 가방으로 옮깁니다.',
+  'hudChrome.bank.accountDepositLead': '아이템을 클릭하면 {name}의 은행으로 보냅니다.',
+  'hudChrome.bank.accountBankEmpty': '이 은행은 비어 있습니다.',
+  'hudChrome.bank.accountBagsEmpty': '가방이 비어 있습니다.',
   'hudChrome.wocStore.subscription.tokenTitle': '거래 가능한 멤버십 토큰',
   'hudChrome.wocStore.subscription.tokenTerms':
     '{price}를 한 번 결제하면 30일 이용권을 받습니다. 이 캐릭터에게 우편으로 전달됩니다. 사용하여 멤버십 기간을 추가하거나 경매장에서 판매하세요.',

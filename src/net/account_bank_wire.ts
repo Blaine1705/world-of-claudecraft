@@ -23,7 +23,7 @@ export function decodeAccountBankInfo(value: unknown): AccountBankInfo | null {
   }
   if (value.selectedCharacterId !== null && !ids.has(value.selectedCharacterId as number))
     return null;
-  const bank = decodeBankInfoWire(value.bank);
+  const bank = decodeBankInfoWire(value.bank, { unpriced: true });
   if (bank === undefined || (bank !== null && value.selectedCharacterId === null)) return null;
   return {
     characters,
@@ -31,6 +31,20 @@ export function decodeAccountBankInfo(value: unknown): AccountBankInfo | null {
     bank,
     ...(typeof value.error === 'string' ? { error: value.error.slice(0, 128) } : {}),
   };
+}
+
+/** A fresh roster opens a bank straight away instead of waiting on a click: the
+ *  last one viewed while it is still listed, else the first. Refusals and
+ *  replies that already name a selection never trigger a second read. */
+export function accountBankAutoSelect(
+  info: AccountBankInfo | null,
+  preferred: number | null,
+): number | null {
+  if (!info || info.error || info.selectedCharacterId !== null || !info.characters.length)
+    return null;
+  return info.characters.some((c) => c.characterId === preferred)
+    ? (preferred as number)
+    : info.characters[0].characterId;
 }
 
 /** Selecting a tab clears only its stale contents while the owner response loads. */

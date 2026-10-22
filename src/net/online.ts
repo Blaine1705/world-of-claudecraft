@@ -4,6 +4,7 @@ import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import type { ReferralCardsAction, ReferralCardsSnapshot } from '../sim/referral_contract';
 import type { AccountBankInfo } from '../world_api/bank';
 import {
+  accountBankAutoSelect,
   accountBankTransferPayload,
   decodeAccountBankInfo,
   selectAccountBankMirror,
@@ -1242,6 +1243,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   bankInfo: BankInfo | null = null;
   courierInfo: CourierInfo | null = null;
   accountBankInfo: AccountBankInfo | null = null;
+  // The character bank last opened, reopened first when the roster arrives.
+  private accountBankPreferred: number | null = null;
   // --- IWorldBank: Materials Vault contents view, the per-material store beside
   // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
   // The payload is OWNER-ONLY and never rides the interest-scoped entity
@@ -2305,6 +2308,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     if (msg.t === 'account_bank') {
       this.accountBankInfo = decodeAccountBankInfo(msg.info);
+      const pick = accountBankAutoSelect(this.accountBankInfo, this.accountBankPreferred);
+      if (pick !== null) this.selectAccountBank(pick);
       return;
     }
     if (msg.t === 'gbanklog') {
@@ -4589,6 +4594,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'account_bank_list' });
   }
   selectAccountBank(characterId: number): void {
+    this.accountBankPreferred = characterId;
     this.accountBankInfo = selectAccountBankMirror(this.accountBankInfo, characterId);
     this.cmd({ cmd: 'account_bank_select', characterId });
   }

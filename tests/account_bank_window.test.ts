@@ -63,6 +63,32 @@ describe('other character banks', () => {
     expect(root.querySelector('.account-bank-tab')).toBeNull();
     expect(root.querySelector('.bank-grid')).toBeNull();
   });
+  it('names each refusal instead of hiding the pane behind the membership line', () => {
+    const { world, root, repaint, deps } = setup(true);
+    Object.assign(world.accountBankInfo, { bank: null, error: 'online' });
+    renderAccountBank(root, deps, repaint);
+    expect(root.querySelector('[role="alert"]')?.textContent).toBe(
+      '<Alice> is logged in. Log that character out to open their bank here.',
+    );
+    root.querySelector<HTMLButtonElement>('[data-focus-key="account-retry"]')!.click();
+    expect(world.selectAccountBank).toHaveBeenCalledWith(2);
+    root.innerHTML = '';
+    world.accountBankInfo = null as unknown as typeof world.accountBankInfo;
+    renderAccountBank(root, deps, repaint);
+    expect(root.textContent).toContain('Loading your characters');
+    expect(root.textContent).not.toContain('An active membership');
+  });
+
+  it('titles the selected bank and shows its free room', () => {
+    const { root, repaint, deps } = setup(true);
+    renderAccountBank(root, deps, repaint);
+    const bankSection = root.querySelector('.account-bank-withdraw')!;
+    expect(bankSection.querySelector('h3')?.textContent).toBe("<Alice>'s bank");
+    expect(bankSection.querySelector('.account-bank-count')?.textContent).toBe('1 / 24 slots');
+    expect(bankSection.querySelectorAll('.bank-item.empty').length).toBe(23);
+    expect(root.querySelector('.account-bank-deposit h3')?.textContent).toBe('Your bags');
+  });
+
   it('loads contents only after selecting a character and escapes account names', () => {
     const { world, root, repaint, deps } = setup();
     renderAccountBank(root, deps, repaint);

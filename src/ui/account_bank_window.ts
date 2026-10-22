@@ -1,12 +1,17 @@
 import { ITEMS } from '../sim/data';
 import type { InvSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
-import { accountBankTransferAllowed } from './account_bank_view';
+import type { BankInfo } from '../world_api/bank';
+import {
+  type AccountBankStage,
+  accountBankStage,
+  accountBankTransferAllowed,
+} from './account_bank_view';
 import { buildBankView } from './bank_view';
 import { formatCount } from './count_format';
 import { esc } from './esc';
 import { findFocusKey } from './focus_restore';
-import { t } from './i18n';
+import { type TranslationKey, t } from './i18n';
 import { knownItemDef } from './known_item';
 import {
   buildPersonalBankItemCell,
@@ -25,42 +30,104 @@ export function request(world: IWorld, force = false): void {
     world.requestAccountBanks?.();
 }
 
+type AccountBankDeps = PersonalBankItemCellDeps & { world(): IWorld };
+
 /** The parent bank owns invalidation, focus restoration and the one open-time request. */
 export function renderAccountBank(
   root: HTMLElement,
-  deps: PersonalBankItemCellDeps & { world(): IWorld },
+  deps: AccountBankDeps,
   repaint: () => void,
 ): void {
-  const info = deps.world().accountBankInfo;
+  const world = deps.world();
+  const info = world.accountBankInfo;
+  const stage = accountBankStage(info, world.player?.membershipActive);
   const pane = document.createElement('div');
   pane.id = 'account-bank-panel';
   pane.className = 'bank-scroll account-bank-panel';
   pane.setAttribute('role', 'tabpanel');
   pane.setAttribute('aria-labelledby', 'bank-tab-account');
   root.appendChild(pane);
-  if (deps.world().player.membershipActive) {
-    const claim = document.createElement('button');
-    claim.type = 'button';
-    claim.className = 'btn ui-btn';
-    claim.textContent = t('hudChrome.bank.accountArmour');
-    claim.dataset.focusKey = 'account-armour';
-    claim.addEventListener('click', () => deps.world().claimMembershipArmour());
-    pane.appendChild(claim);
-  }
-  if (deps.world().player.membershipActive !== true || !info) {
-    pane.insertAdjacentHTML('beforeend', `<p>${esc(t('hudChrome.bank.accountMembership'))}</p>`);
+  if (stage.kind === 'membership') {
+    pane.appendChild(notice('hudChrome.bank.accountMembership'));
     return;
   }
-  if (info.characters.length === 0) {
-    pane.insertAdjacentHTML('beforeend', `<p>${esc(t('hudChrome.bank.accountEmpty'))}</p>`);
-    return;
+  if (info && info.characters.length > 0) appendCharacterTabs(root, pane, deps, info, repaint);
+  const name = (id: number | null): string =>
+    info?.characters.find((c) => c.characterId === id)?.name ?? '';
+  switch (stage.kind) {
+    case 'loading':
+      pane.appendChild(notice('hudChrome.bank.accountLoading', undefined, 'status'));
+      break;
+    case 'no_characters':
+      pane.appendChild(notice('hudChrome.bank.accountEmpty'));
+      break;
+    case 'choose':
+      pane.appendChild(notice('hudChrome.bank.accountSelect'));
+      break;
+    case 'opening':
+      pane.appendChild(
+        notice('hudChrome.bank.accountOpening', { name: name(stage.characterId) }, 'status'),
+      );
+      break;
+    case 'failed':
+      pane.appendChild(failure(stage, name(stage.characterId), deps));
+      break;
+    case 'ready':
+      if (info?.bank)
+        appendGrids(pane, deps, stage.characterId, name(stage.characterId), info.bank, repaint);
+      break;
   }
+  pane.appendChild(footer(deps));
+}
+
+function notice(
+  key: TranslationKey,
+  values?: Record<string, string>,
+  role?: 'status' | 'alert',
+): HTMLElement {
+  const p = document.createElement('p');
+  p.className = 'bank-empty account-bank-notice';
+  if (role) p.setAttribute('role', role);
+  p.textContent = t(key, values);
+  return p;
+}
+
+function failure(
+  stage: Extract<AccountBankStage, { kind: 'failed' }>,
+  name: string,
+  deps: AccountBankDeps,
+): HTMLElement {
+  const box = document.createElement('div');
+  box.className = 'account-bank-failure';
+  box.appendChild(notice(stage.errorKey, { name }, 'alert'));
+  if (stage.errorKey === 'hudChrome.bank.accountMembership') return box;
+  const retry = document.createElement('button');
+  retry.type = 'button';
+  retry.className = 'btn ui-btn account-bank-retry';
+  retry.textContent = t('hudChrome.bank.accountRetry');
+  retry.dataset.focusKey = 'account-retry';
+  retry.addEventListener('click', () => {
+    const world = deps.world();
+    if (stage.characterId === null) request(world, true);
+    else world.selectAccountBank(stage.characterId);
+  });
+  box.appendChild(retry);
+  return box;
+}
+
+function appendCharacterTabs(
+  root: HTMLElement,
+  pane: HTMLElement,
+  deps: AccountBankDeps,
+  info: NonNullable<IWorld['accountBankInfo']>,
+  repaint: () => void,
+): void {
   pane.insertAdjacentHTML(
     'beforeend',
     tabStripHtml(
       tabStripModel({
         ariaLabel: t('hudChrome.bank.accountCharacters'),
-        stripClass: 'bank-tabs ui-tabs',
+        stripClass: 'bank-tabs ui-tabs account-bank-tabs',
         tabClass: 'account-bank-tab ui-tab',
         selectedClass: 'on is-on',
         selected: String(info.selectedCharacterId ?? info.characters[0].characterId),
@@ -78,36 +145,68 @@ export function renderAccountBank(
   });
   for (const tab of pane.querySelectorAll<HTMLElement>('.account-bank-tab'))
     tab.dataset.focusKey = `account-character:${tab.dataset.tab}`;
-  if (info.error) {
-    const status = document.createElement('p');
-    status.setAttribute('role', 'status');
-    status.textContent = t('hudChrome.bank.accountUnavailable');
-    pane.appendChild(status);
-  }
-  if (!info.bank || info.selectedCharacterId === null) {
-    pane.insertAdjacentHTML('beforeend', `<p>${esc(t('hudChrome.bank.accountSelect'))}</p>`);
-    return;
-  }
-  const characterId = info.selectedCharacterId;
-  const selectedBank = info.bank;
-  const appendGrid = (slots: InvSlot[], direction: 'deposit' | 'withdraw') => {
-    const model = buildBankView({ ...selectedBank, slots }, (id) => knownItemDef(ITEMS, id));
-    if (model.kind === 'away') return;
+}
+
+function appendGrids(
+  pane: HTMLElement,
+  deps: AccountBankDeps,
+  characterId: number,
+  name: string,
+  bank: BankInfo,
+  repaint: () => void,
+): void {
+  const section = (
+    direction: 'deposit' | 'withdraw',
+    slots: InvSlot[],
+    title: string,
+    count: string | null,
+    emptyCells: number,
+  ) => {
+    const box = document.createElement('section');
+    box.className = `account-bank-section account-bank-${direction}`;
+    const head = document.createElement('div');
+    head.className = 'account-bank-section-head';
     const heading = document.createElement('h3');
-    heading.textContent = t(
-      direction === 'deposit' ? 'hudChrome.bank.accountDeposit' : 'hudChrome.bank.accountWithdraw',
+    heading.textContent = title;
+    head.appendChild(heading);
+    if (count !== null) {
+      const meter = document.createElement('span');
+      meter.className = 'account-bank-count';
+      meter.textContent = count;
+      head.appendChild(meter);
+    }
+    box.appendChild(head);
+    const hint = document.createElement('p');
+    hint.className = 'account-bank-hint';
+    hint.textContent = t(
+      direction === 'withdraw'
+        ? 'hudChrome.bank.accountWithdrawLead'
+        : 'hudChrome.bank.accountDepositLead',
+      { name },
     );
-    pane.appendChild(heading);
+    box.appendChild(hint);
     const grid = document.createElement('div');
     grid.className = 'bank-grid';
+    const model = buildBankView({ ...bank, slots }, (id) => knownItemDef(ITEMS, id));
+    if (model.kind === 'away') return;
+    if (model.empty) {
+      grid.appendChild(
+        notice(
+          direction === 'withdraw'
+            ? 'hudChrome.bank.accountBankEmpty'
+            : 'hudChrome.bank.accountBagsEmpty',
+        ),
+      );
+    }
     for (const slot of model.slots) {
       const source = slots[slot.slotIndex];
+      const allowed = accountBankTransferAllowed(source, knownItemDef(ITEMS, source.itemId));
       const cell = buildPersonalBankItemCell(
         deps,
         slot,
         formatCount(slot.count),
         () => {
-          if (!accountBankTransferAllowed(source, knownItemDef(ITEMS, source.itemId))) return;
+          if (!allowed) return;
           deps
             .world()
             .accountBankTransfer(
@@ -128,16 +227,47 @@ export function renderAccountBank(
               : 'hudChrome.bank.accountWithdrawHint',
         },
       );
-      (cell as HTMLButtonElement).disabled = !accountBankTransferAllowed(
-        source,
-        knownItemDef(ITEMS, source.itemId),
-      );
+      (cell as HTMLButtonElement).disabled = !allowed;
       cell.dataset.focusKey = `account-${direction}:${slot.slotIndex}`;
       grid.appendChild(cell);
     }
-    pane.appendChild(grid);
+    // Free squares make the selected bank's remaining room visible at a glance.
+    for (let i = 0; !model.empty && i < emptyCells; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'bank-item ui-socket ui-socket--bag empty';
+      cell.setAttribute('aria-hidden', 'true');
+      grid.appendChild(cell);
+    }
+    box.appendChild(grid);
+    pane.appendChild(box);
   };
-  appendGrid(info.bank.slots, 'withdraw');
-  appendGrid(deps.world().inventory, 'deposit');
-  pane.insertAdjacentHTML('beforeend', `<p>${esc(t('hudChrome.bank.accountBound'))}</p>`);
+  const used = bank.slots.length;
+  section(
+    'withdraw',
+    bank.slots,
+    t('hudChrome.bank.accountBankTitle', { name }),
+    t('hudChrome.bank.accountSlots', {
+      used: formatCount(used),
+      total: formatCount(bank.capacity),
+    }),
+    Math.max(0, bank.capacity - used),
+  );
+  section('deposit', deps.world().inventory, t('hudChrome.bank.accountBagsTitle'), null, 0);
+}
+
+function footer(deps: AccountBankDeps): HTMLElement {
+  const foot = document.createElement('div');
+  foot.className = 'account-bank-footer';
+  const note = document.createElement('p');
+  note.className = 'account-bank-note';
+  note.textContent = t('hudChrome.bank.accountBound');
+  foot.appendChild(note);
+  const claim = document.createElement('button');
+  claim.type = 'button';
+  claim.className = 'btn ui-btn account-bank-claim';
+  claim.textContent = t('hudChrome.bank.accountArmour');
+  claim.dataset.focusKey = 'account-armour';
+  claim.addEventListener('click', () => deps.world().claimMembershipArmour());
+  foot.appendChild(claim);
+  return foot;
 }
