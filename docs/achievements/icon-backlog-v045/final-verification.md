@@ -106,3 +106,30 @@ then passed. Later selective-gate steps remain outstanding; use CI before mergin
 The publication pre-push guard suites passed 163 tests with three skipped. The
 initial hook chose the release comparison base for lint; the final push uses the
 explicit integration base and runs the repository hook. No check is bypassed.
+
+## PR CI regression fixes
+
+PR #4605's initial CI run (39781811866) found stale pending-art assertions in
+Reliquary, Deed and Clue Hunt tests; an outdated catalog snapshot and historical
+ownership reconciliation; a referral popup assertion still naming borrowed art;
+four new ability files absent from the freeze manifest; and 45 referenced
+screenshot subtrees missing from the five sparse test-job checkouts.
+
+The follow-up updates those expectations against the shipping files and accepted
+provenance. Historical hashes remain intact. The spell freeze adds only
+`druid/hamstring_bite.webp`, `druid/lunge.webp`,
+`warrior/clockwork_shock_bomb.webp` and `warrior/courier.webp`; no existing pin is
+changed or removed. Sparse checkout expands from 56 to 101 referenced subtrees
+without changing test selection, required jobs or the reference-corpus guard.
+
+Focused verification:
+
+- `npx vitest run --maxWorkers=2 tests/reliquary_cell_art.test.ts tests/release_art_audit_v036_reliquary_deeds.test.ts tests/clue_hunts_content.test.ts tests/item_art_audit_builder.test.ts tests/masterwrought_art_completion.test.ts`: 76 passed.
+- `npx vitest run --maxWorkers=2 tests/spell_icon_freeze.test.ts tests/referral_cards_controller.test.ts tests/ci_workflow.test.ts`: 50 passed.
+- The full `tests/varkhul_forge_encounter.test.ts` suite passed unchanged alongside
+  the local reproducer for the three failures above. CI's Heroic reset case hit
+  its 20-second timeout; fresh CI will establish whether it recurs.
+- `git diff --check` and scoped Biome checks passed (existing lint warnings only).
+
+The PR checks, browser tests and both long-simulation lanes passed on the initial
+CI run. Fresh CI at the follow-up commit remains required before merging.
