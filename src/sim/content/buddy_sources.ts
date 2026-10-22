@@ -4,7 +4,7 @@
 // Crystal Lich and Forgemaw come from independent per-player boss rolls.
 // A successful roll attaches a pending companion that reveals when the player
 // leaves the instance (src/sim/buddy_drops.ts). Horse instead comes from a
-// 100,000-honor direct purchase at both honor vendors (content/pvp_honor.ts).
+// 10,000-honor direct purchase at both honor vendors (content/pvp_honor.ts).
 // Flicker and Glimmer come from the inviter's fifth completed referral card (referral_rewards.ts).
 //
 // Gameplay rewards grant directly into the collection. Active whistle items

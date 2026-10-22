@@ -32,8 +32,8 @@ function shop(npcKey: string, honor: number) {
 }
 
 describe.each(VENDORS)('Horse at %s', (npcKey) => {
-  it('costs exactly 100,000 honor and immediately reveals Horse without an item', () => {
-    const { sim, pid, vendor, meta } = shop(npcKey, 100_000);
+  it('costs exactly 10,000 honor and immediately reveals Horse without an item', () => {
+    const { sim, pid, vendor, meta } = shop(npcKey, 10_000);
     buyItem(sim.ctx, vendor.id, WHISTLE, pid);
     expect(meta.honor).toBe(0);
     expect(meta.copper).toBe(12345);
@@ -47,34 +47,34 @@ describe.each(VENDORS)('Horse at %s', (npcKey) => {
   });
 
   it('refuses a purchase one honor short without charging either currency', () => {
-    const { sim, pid, vendor, meta } = shop(npcKey, 99_999);
+    const { sim, pid, vendor, meta } = shop(npcKey, 9_999);
     buyItem(sim.ctx, vendor.id, WHISTLE, pid);
-    expect(meta.honor).toBe(99_999);
+    expect(meta.honor).toBe(9_999);
     expect(meta.copper).toBe(12345);
     expect(sim.countItem(WHISTLE, pid)).toBe(0);
     expect(buddyOwned(meta, 'horse')).toBe(false);
   });
 
   it('does not charge again or reveal twice for a duplicate purchase', () => {
-    const { sim, pid, vendor, meta } = shop(npcKey, 200_000);
+    const { sim, pid, vendor, meta } = shop(npcKey, 20_000);
     buyItem(sim.ctx, vendor.id, WHISTLE, pid);
     buyItem(sim.ctx, vendor.id, WHISTLE, pid);
-    expect(meta.honor).toBe(100_000);
+    expect(meta.honor).toBe(10_000);
     expect(meta.inventory).toEqual([]);
     expect(sim.events.filter((event) => event.type === 'buddyRevealed')).toHaveLength(1);
   });
 
   it('does not charge for a buddy already waiting to reveal', () => {
-    const { sim, pid, vendor, meta } = shop(npcKey, 100_000);
+    const { sim, pid, vendor, meta } = shop(npcKey, 10_000);
     attachPendingBuddy(sim.ctx, pid, 'horse', 'world', vendor.pos);
     buyItem(sim.ctx, vendor.id, WHISTLE, pid);
-    expect(meta.honor).toBe(100_000);
+    expect(meta.honor).toBe(10_000);
     expect(meta.buddies.pending).toHaveLength(1);
     expect(buddyOwned(meta, 'horse')).toBe(false);
   });
 
   it('works with full bags and preserves the contents', () => {
-    const { sim, pid, vendor, meta } = shop(npcKey, 100_000);
+    const { sim, pid, vendor, meta } = shop(npcKey, 10_000);
     for (let i = 0; i < 128; i++)
       meta.inventory.push({ itemId: 'whistle_horse', count: stackSizeOf(ITEMS[WHISTLE]) });
     expect(sim.ctx.canAddItem(WHISTLE, 1, pid)).toBe(false);
@@ -88,20 +88,20 @@ describe.each(VENDORS)('Horse at %s', (npcKey) => {
   it.each(['dead', 'out of range', 'not stocked'])(
     'refuses an invalid purchase when %s without charging or granting',
     (reason) => {
-      const { sim, pid, vendor, meta } = shop(npcKey, 100_000);
+      const { sim, pid, vendor, meta } = shop(npcKey, 10_000);
       const player = sim.entities.get(pid)!;
       if (reason === 'dead') player.dead = true;
       if (reason === 'out of range') player.pos.x += 100;
       if (reason === 'not stocked') vendor.vendorItems = [];
       buyItem(sim.ctx, vendor.id, WHISTLE, pid);
-      expect(meta.honor).toBe(100_000);
+      expect(meta.honor).toBe(10_000);
       expect(meta.inventory).toEqual([]);
       expect(buddyOwned(meta, 'horse')).toBe(false);
     },
   );
 
   it('persists the unlock across character reload', () => {
-    const { sim, pid, vendor } = shop(npcKey, 100_000);
+    const { sim, pid, vendor } = shop(npcKey, 10_000);
     buyItem(sim.ctx, vendor.id, WHISTLE, pid);
     const state = sim.serializeCharacter(pid)!;
     const loaded = new Sim({
@@ -116,24 +116,24 @@ describe.each(VENDORS)('Horse at %s', (npcKey) => {
     expect(loaded.countItem(WHISTLE, nextPid)).toBe(0);
   });
 
-  it('rejects retired buddy offers even if a stale vendor stocks them', () => {
-    const { sim, pid, vendor, meta } = shop(npcKey, 100_000);
+  it('rejects a deleted whistle id even if a stale vendor stocks it', () => {
+    const { sim, pid, vendor, meta } = shop(npcKey, 10_000);
     vendor.vendorItems = [...vendor.vendorItems, 'whistle_proud_grunt'];
     buyItem(sim.ctx, vendor.id, 'whistle_proud_grunt', pid);
-    expect(meta.honor).toBe(100_000);
+    expect(meta.honor).toBe(10_000);
     expect(meta.inventory).toEqual([]);
     expect(meta.buddies.owned.size).toBe(0);
   });
 
   it.each([{ count: 100 }, { bulk: true }])('always charges for one companion with %o', (opts) => {
-    const { sim, pid, vendor, meta } = shop(npcKey, 200_000);
+    const { sim, pid, vendor, meta } = shop(npcKey, 20_000);
     buyItem(sim.ctx, vendor.id, WHISTLE, pid, opts);
-    expect(meta.honor).toBe(100_000);
+    expect(meta.honor).toBe(10_000);
     expect(meta.inventory).toEqual([]);
     expect(sim.events.filter((event) => event.type === 'buddyRevealed')).toHaveLength(1);
   });
 
-  it.each([99_999, 100_000])('shows the companion price and affordability at %i honor', (honor) => {
+  it.each([9_999, 10_000])('shows the companion price and affordability at %i honor', (honor) => {
     const view = buildWarfareVendorView(NPCS[npcKey].vendorItems!, ITEMS, ITEM_SETS, {
       honor,
       acquiredBuddyKeys: new Set<string>(),
@@ -144,25 +144,25 @@ describe.each(VENDORS)('Horse at %s', (npcKey) => {
     expect(section?.offers).toHaveLength(1);
     expect(section?.offers[0]).toMatchObject({
       itemId: WHISTLE,
-      honor: 100_000,
-      affordable: honor >= 100_000,
+      honor: 10_000,
+      affordable: honor >= 10_000,
     });
   });
 });
 
 describe('account purchase admission', () => {
   it('accepts a valid offer without charging or granting', () => {
-    const { sim, pid, vendor, meta } = shop('fury', 100_000);
+    const { sim, pid, vendor, meta } = shop('fury', 10_000);
     const before = sim.events.length;
     expect(canBuyBuddyOffer(sim.ctx, pid, vendor.id, WHISTLE)).toBe(true);
-    expect(meta.honor).toBe(100_000);
+    expect(meta.honor).toBe(10_000);
     expect(meta.buddies.owned.size).toBe(0);
     expect(sim.events).toHaveLength(before);
   });
   it.each(['dead', 'range', 'stock', 'honor', 'owned', 'pending', 'count', 'merchant'])(
     'rejects %s before database work',
     (reason) => {
-      const { sim, pid, vendor, meta } = shop('fury', 100_000);
+      const { sim, pid, vendor, meta } = shop('fury', 10_000);
       if (reason === 'dead') sim.entities.get(pid)!.dead = true;
       if (reason === 'range') sim.entities.get(pid)!.pos.x += 100;
       if (reason === 'stock') vendor.vendorItems = [];

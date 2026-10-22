@@ -209,7 +209,7 @@ describe('renderWarfareVendorWindow: direct buddy purchases', () => {
           {
             itemId: 'whistle_horse',
             item: ITEMS.whistle_horse,
-            honor: 100_000,
+            honor: 10_000,
             affordable: true,
             owned,
           },
@@ -237,7 +237,7 @@ describe('renderWarfareVendorWindow: direct buddy purchases', () => {
     );
     const horse = tile(el, 'buy:companions:whistle_horse');
     expect(horse.querySelector('.vi-name')?.textContent).toBe('Tug, the Warhorse');
-    expect(horse.getAttribute('aria-label')).toBe('Buy Tug, the Warhorse for 100,000 Honor');
+    expect(horse.getAttribute('aria-label')).toBe('Buy Tug, the Warhorse for 10,000 Honor');
     expect(tooltip).toContain('Permanently unlocks this buddy and summons it immediately.');
     expect(tooltip).toContain('No item is added to your bags.');
     expect(itemTooltip).not.toHaveBeenCalled();

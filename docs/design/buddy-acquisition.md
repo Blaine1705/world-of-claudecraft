@@ -13,7 +13,7 @@ are cleared when loaded.
 
 | Buddy | Normal gameplay source | Chance per eligible player |
 |---|---|---|
-| Tug, the Warhorse | Purchase directly from FURY (Eastbrook Vale) or Warmarshal Draven Kole (Highwatch) | 100,000 honor (placeholder price) |
+| Tug, the Warhorse | Purchase directly from FURY (Eastbrook Vale) or Warmarshal Draven Kole (Highwatch) | 10,000 honor |
 | Crystal Lich | Defeat Nythraxis, Scourge of Thornpeak | 0.5% normal, 1% heroic |
 | Forgemaw The Molten | Defeat Ignivar or Varkhul in the heroic Crucible | 1% from either boss; no normal-mode drop |
 | Flicker and Glimmer | Help five referred friends complete their referral stamp cards | Guaranteed account-wide unlock |
