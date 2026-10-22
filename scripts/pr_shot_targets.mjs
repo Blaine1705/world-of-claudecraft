@@ -1440,6 +1440,117 @@ export const TARGETS = [
       return { clip: '#ui' };
     },
   },
+  // The Drowned Gate Tower (the Sunken Bastion's world entrance) at night: the
+  // gate's own glow at the beacon's crest, and the gate from the east ridge
+  // (where a sky beam once rose out of the hillside). Both legs seed the
+  // medium preset, the lowest whose effects tier draws the whole gate layer
+  // (low sheds the rosette's shafts and the marsh lights). Each leg holds the
+  // shared shader clock at one turn of the beacon, so a before and an after
+  // frame catch the beacon at the same point of its turn whatever the capture
+  // timing, and moves the mobs nearby off, so the pair compares scenery.
+  {
+    key: 'sunken-bastion-entrance-night',
+    label: "The Drowned Gate Tower at night: the gate's glow at the crest, and from the east ridge",
+    when: ['render/sunken_bastion_entrance'],
+    variants: [
+      {
+        key: 'gate-at-the-crest',
+        beforeLoad: seedMediumGraphicsPreset,
+        spot: { x: 45, z: 492, facing: 0, camYaw: 0, pitch: -0.05, dist: 13, turn: 0 },
+      },
+      {
+        key: 'from-the-east-ridge',
+        beforeLoad: seedMediumGraphicsPreset,
+        spot: {
+          x: -34,
+          z: 574,
+          facing: Math.atan2(40 + 34, 562 - 574),
+          camYaw: 1.98,
+          pitch: 0.18,
+          dist: 15,
+          turn: 255,
+        },
+      },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await dismissArrivalGreeting(page);
+      await page.evaluate(async () => {
+        const clock = await import('/src/render/day_night_clock.ts');
+        clock.setDayNightPhaseOverride(0);
+      });
+      const staged = await page.evaluate(async (spot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev level 20');
+        world.chat('/dev god');
+        world.chat('/dev noaggro');
+        await sleep(300);
+        world.chat(`/dev tp ${spot.x} ${spot.z}`);
+        await sleep(600);
+        const player = sim.player;
+        player.pos = sim.groundPos(spot.x, spot.z);
+        player.prevPos = { ...player.pos };
+        player.facing = spot.facing;
+        sim.rebucket?.(player);
+        // The east ridge is a wolf pack's ground and the road has its cultists:
+        // relocate every mob nearby (the fen target's idiom), so neither leg of
+        // a pair has a wanderer the other lacks.
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.id === player.id) continue;
+          const dx = e.pos.x - player.pos.x;
+          const dz = e.pos.z - player.pos.z;
+          if (dx * dx + dz * dz > 90 * 90) continue;
+          e.pos.x += 400;
+          if (e.prevPos) {
+            e.prevPos.x = e.pos.x;
+            e.prevPos.y = e.pos.y;
+            e.prevPos.z = e.pos.z;
+          }
+          if (e.spawnPos) e.spawnPos = { ...e.pos };
+          if (e.leashAnchor) e.leashAnchor = { ...e.pos };
+          sim.rebucket?.(e);
+        }
+        game.hud.closeAll?.();
+        return { ok: true };
+      }, variant.spot);
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      // The zone-entry vista owns the camera until it settles home.
+      await page.waitForFunction(() => window.__game?.renderer?.camDirector?.kind == null, {
+        timeout: 120000,
+      });
+      await page.evaluate(async (spot) => {
+        const game = window.__game;
+        game.input.camYaw = spot.camYaw;
+        game.input.camPitch = spot.pitch;
+        game.input.camDist = spot.dist;
+        // Hold the shared shader clock at the beacon's turn, in degrees (0 is
+        // the crest, when its light comes down the passage into the gate).
+        const { sharedUniforms } = await import('/src/render/gfx.ts');
+        const { BASTION_BEACON } = await import('/src/render/sunken_bastion_entrance_core.ts');
+        const period = BASTION_BEACON.period;
+        // (the next turn, so the clock never steps back under CPU readers)
+        const start = Math.ceil(sharedUniforms.uTime.value / period) * period;
+        const held = start + (period * spot.turn) / 360;
+        Object.defineProperty(sharedUniforms.uTime, 'value', {
+          configurable: true,
+          get: () => held,
+          set: () => {},
+        });
+      }, variant.spot);
+      await wait(8000);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
   // World quests round 2: the airborne glider is a built GLB now. /dev glider
   // start launches at once; three seconds of countdown, then the pilot is in
   // the air with the apparatus overhead and the chase camera behind.
