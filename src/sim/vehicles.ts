@@ -42,6 +42,8 @@ export function ensureVehicleStation(ctx: SimContext): void {
   }
 }
 
+// The character's own board (after its daily reroll), not the shared rotation:
+// a rerolled-in station quest must find its station.
 export function ensureActiveVehicleStations(ctx: SimContext, meta: PlayerMeta): void {
   if (playerActiveWorldQuests(meta).some((q) => q.objective.type === 'vehicle'))
     ensureVehicleStation(ctx);
