@@ -729,7 +729,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the renderer and town runtime leaves moved. No capture was retaken.
   // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
   // the renderer leaf. No capture was retaken.
-  '495276bfb295d7b4150fb18c87798bbe052d1749ac95b284b8225fd181f754cd';
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  'f7e90ef6fdde5b42ff2a99f85e067c1216b240a6a0d78f5da4b2d30eeaac5fb2';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

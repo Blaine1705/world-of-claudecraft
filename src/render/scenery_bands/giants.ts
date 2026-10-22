@@ -44,8 +44,9 @@ function lightColor(scene: THREE.Scene, output: THREE.Color): void {
   }
 }
 
-/** Four 256px views per giant, retaining the selected prototype's atlas and
- * draw budget. Live light grading and biome haze prevent a frozen noon card. */
+/** Sixteen 256px views per giant (22.5-degree steps in a 1024px atlas) so
+ * asymmetric leaning crowns hold their silhouette without 90-degree flips.
+ * Live light grading and biome haze prevent a frozen noon card. */
 export async function buildGiantSprites(options: GiantBuildOptions): Promise<GiantSprites> {
   const root = new THREE.Group();
   root.name = 'scenery-band:giants';
@@ -74,9 +75,9 @@ export async function buildGiantSprites(options: GiantBuildOptions): Promise<Gia
     if (options.cancelled()) throw new Error('Giant scenery preparation cancelled');
   };
   try {
-    for (let start = 0; start < options.items.length; start += 4) {
+    for (let start = 0; start < options.items.length; start += 1) {
       assertActive();
-      const end = Math.min(start + 4, options.items.length);
+      const end = Math.min(start + 1, options.items.length);
       const target = new THREE.WebGLRenderTarget(1024, 1024, {
         depthBuffer: true,
         stencilBuffer: false,
@@ -164,51 +165,51 @@ export async function buildGiantSprites(options: GiantBuildOptions): Promise<Gia
         await options.prepareBake(bake, camera, target);
         assertActive();
         for (let i = start; i < end; i++) {
-          for (let view = 0; view < 4; view++) {
-            await options.prepare(() => {
-              assertActive();
-              for (let j = 0; j < groups.length; j++) groups[j].visible = j === i - start;
-              const frame = frames[i];
-              camera.left = -frame.width / 2;
-              camera.right = frame.width / 2;
-              camera.top = frame.height / 2;
-              camera.bottom = -frame.height / 2;
-              camera.updateProjectionMatrix();
-              const angle = (view * Math.PI) / 2;
-              camera.position.set(Math.sin(angle) * 500, 0, Math.cos(angle) * 500);
-              camera.lookAt(0, 0, 0);
-              camera.updateMatrixWorld();
-              const webgl = options.webgl;
-              const previous = webgl.getRenderTarget();
-              const viewport = webgl.getViewport(new THREE.Vector4());
-              const scissor = webgl.getScissor(new THREE.Vector4());
-              const scissorTest = webgl.getScissorTest();
-              const clear = webgl.getClearColor(new THREE.Color());
-              const alpha = webgl.getClearAlpha();
-              const autoClear = webgl.autoClear;
-              try {
-                const cell = (i - start) * 4 + view;
+          await options.prepare(() => {
+            assertActive();
+            for (let j = 0; j < groups.length; j++) groups[j].visible = j === i - start;
+            const frame = frames[i];
+            camera.left = -frame.width / 2;
+            camera.right = frame.width / 2;
+            camera.top = frame.height / 2;
+            camera.bottom = -frame.height / 2;
+            camera.updateProjectionMatrix();
+            const webgl = options.webgl;
+            const previous = webgl.getRenderTarget();
+            const viewport = webgl.getViewport(new THREE.Vector4());
+            const scissor = webgl.getScissor(new THREE.Vector4());
+            const scissorTest = webgl.getScissorTest();
+            const clear = webgl.getClearColor(new THREE.Color());
+            const alpha = webgl.getClearAlpha();
+            const autoClear = webgl.autoClear;
+            try {
+              webgl.setRenderTarget(target);
+              webgl.setScissorTest(true);
+              webgl.setClearColor(0, 0);
+              webgl.autoClear = false;
+              for (let view = 0; view < 16; view++) {
+                const angle = (view * Math.PI) / 8;
+                camera.position.set(Math.sin(angle) * 500, 0, Math.cos(angle) * 500);
+                camera.lookAt(0, 0, 0);
+                camera.updateMatrixWorld();
+                const cell = (i - start) * 16 + view;
                 target.viewport.set((cell % 4) * 256, Math.floor(cell / 4) * 256, 256, 256);
                 target.scissor.copy(target.viewport);
                 target.scissorTest = true;
-                webgl.setRenderTarget(target);
                 webgl.setViewport(target.viewport);
                 webgl.setScissor(target.scissor);
-                webgl.setScissorTest(true);
-                webgl.setClearColor(0, 0);
-                webgl.autoClear = false;
                 webgl.clear();
                 webgl.render(bake, camera);
-              } finally {
-                webgl.setRenderTarget(previous);
-                webgl.setViewport(viewport);
-                webgl.setScissor(scissor);
-                webgl.setScissorTest(scissorTest);
-                webgl.setClearColor(clear, alpha);
-                webgl.autoClear = autoClear;
               }
-            }, 'scenery-giant:cell');
-          }
+            } finally {
+              webgl.setRenderTarget(previous);
+              webgl.setViewport(viewport);
+              webgl.setScissor(scissor);
+              webgl.setScissorTest(scissorTest);
+              webgl.setClearColor(clear, alpha);
+              webgl.autoClear = autoClear;
+            }
+          }, 'scenery-giant:cell');
         }
       } finally {
         for (const material of materials) material.dispose();
@@ -253,10 +254,11 @@ export class GiantSprites {
         if (!selected[i]) continue;
         const frame = this.frames[i];
         const angle = Math.atan2(x - frame.center.x, z - frame.center.z);
-        const view = ((Math.round(angle / (Math.PI / 2)) % 4) + 4) % 4;
-        const cell = (i - atlas.start) * 4 + view;
-        const rightX = Math.cos(angle),
-          rightZ = -Math.sin(angle);
+        const view = ((Math.round(angle / (Math.PI / 8)) % 16) + 16) % 16;
+        const cell = (i - atlas.start) * 16 + view;
+        const viewAngle = (view * Math.PI) / 8;
+        const rightX = Math.cos(viewAngle),
+          rightZ = -Math.sin(viewAngle);
         for (let k = 0; k < 4; k++) {
           const side = k % 2 ? 0.5 : -0.5;
           positions.setXYZ(

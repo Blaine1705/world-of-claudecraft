@@ -371,7 +371,6 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
     vineGeo.translate(0, -0.5, 0); // hangs from its anchor
     const vineMats = [mat(0x4a8c46, 0.9), mat(0x6aa858, 0.9)]; // two-tone curtain
     const vineSpots: { x: number; z: number; y: number; s: number; rot: number }[][] = [[], []];
-    const rootParts: THREE.BufferGeometry[] = [];
     const barkMat = mat(0x6a5a48, 0.92);
     const trees = PALMREACH_PROPS.greatTrees ?? [];
     // The document may own the giants themselves as placements. Only the TRUNK
@@ -384,7 +383,9 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
         const y = terrainHeight(t.x, t.z, seed);
         if (y < WATER_LEVEL) continue;
         const scale = t.r * (2.5 + hash2(t.x, t.z, seed + 5201) * 0.5);
+        let banyan: THREE.Group | null = null;
         if (!trunksArePlacements) {
+          banyan = new THREE.Group();
           const tree = greatTreeScene.clone(true);
           tree.position.set(t.x, y - 0.2, t.z);
           tree.scale.setScalar(scale);
@@ -399,10 +400,12 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
                 : lushen(mesh.material);
             }
           });
-          group.add(tree);
+          banyan.add(tree);
+          group.add(banyan);
         }
         // the buttress roots: tapered flares leaning into the trunk base,
         // so the giant reads rooted instead of set down
+        const treeRootParts: THREE.BufferGeometry[] = [];
         const roots = 5 + Math.floor(hash2(t.z, t.x, seed + 5271) * 3);
         for (let k = 0; k < roots; k++) {
           const ang = (k / roots) * Math.PI * 2 + hash2(k, t.z, seed + 5281) * 0.8;
@@ -413,8 +416,9 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
           g.rotateX(0.5); // lean the flare outward, foot away from the trunk
           g.rotateY(ang);
           g.translate(t.x + Math.sin(ang) * len, y - 0.3, t.z + Math.cos(ang) * len);
-          rootParts.push(g.toNonIndexed());
+          treeRootParts.push(g.toNonIndexed());
         }
+        if (treeRootParts.length > 0) (banyan ?? group).add(mergeBoxes(treeRootParts, barkMat));
         // the vine curtain: strands hung in a ring under the crown, plus an
         // inner ring so the canopy reads properly overgrown
         const crownR = scale * 1.6;
@@ -435,7 +439,6 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
         }
       }
     }
-    if (rootParts.length > 0) group.add(mergeBoxes(rootParts, barkMat));
     // vines scale on Y only: compose with a per-instance non-uniform scale
     vineSpots.forEach((list, tone) => {
       if (list.length === 0) return;

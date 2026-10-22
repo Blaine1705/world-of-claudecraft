@@ -31,7 +31,11 @@ export class SceneryNearSources {
   private exemptRoots?: ReadonlySet<THREE.Object3D>;
 
   register(root: THREE.Object3D, zoneFeature = false): void {
-    if (!zoneFeature && !['garden-features', 'jungle-features'].includes(root.name)) return;
+    if (
+      !zoneFeature &&
+      !['garden-features', 'jungle-features', 'haunt-features', 'realm-flora'].includes(root.name)
+    )
+      return;
     root.updateWorldMatrix(true, true);
     if (root.name === 'jungle-features') {
       for (const child of root.children) {
