@@ -11,9 +11,6 @@
 // tokens remain readable in old inventories but cannot grant retired companions.
 // The deed reward table is currently empty.
 //
-// Hunting derives sources from these tables and the live vendor stock
-// (src/ui/collections/collection_sources.ts).
-//
 // `src/sim`-pure, rng-free (the rolls live in buddy_drops.ts).
 // ---------------------------------------------------------------------------
 
@@ -69,11 +66,6 @@ for (const drop of BUDDY_BOSS_DROPS) {
 /** The per-player rolls a kill of `bossId` makes (empty for every other mob). */
 export function buddyBossDropsFor(bossId: string): readonly BuddyBossDrop[] {
   return BOSS_DROPS_BY_BOSS.get(bossId) ?? [];
-}
-
-/** Every boss-drop row for one companion, for the Hunting pane. */
-export function buddyBossDropsOf(key: BuddyKey): readonly BuddyBossDrop[] {
-  return BUDDY_BOSS_DROPS.filter((drop) => drop.key === key);
 }
 
 /** The deed (if any) that grants one companion. */

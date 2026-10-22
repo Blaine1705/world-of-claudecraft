@@ -1745,8 +1745,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // 37 on the merged tree: both pairs above are present.
       // 38 at the release/v0.43.0 merge into feature/world-quests: the forge
       // action bar's numeric world-quest clock memo.
-      // The retired Hunting painter adds its dormant memo classification.
-    ).toBe(40);
+    ).toBe(39);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

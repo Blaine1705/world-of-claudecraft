@@ -102,8 +102,8 @@ export function serializeBuddyCollection(c: BuddyCollection): SavedBuddyCollecti
 let buddyItemIds: Map<string, string> | null = null;
 
 /** The grant-token item for `key` (null for an unknown key, or a catalog
- *  buddy with no whistle). Used by the admin/mail/vendor channels and the
- *  Hunting pane's vendor line, never by ownership. */
+ *  buddy with no whistle). Used by the admin/mail/vendor channels, never by
+ *  ownership. */
 export function buddyItemId(key: string): string | null {
   if (!buddyDef(key)) return null;
   if (!buddyItemIds) {

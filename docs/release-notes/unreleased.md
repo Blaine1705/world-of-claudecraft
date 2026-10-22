@@ -18,7 +18,7 @@
   player for the boss's companion (you read a presence line and the buddy reveals itself
   on the walk out), the gathering-cap and Master Angler deeds grant theirs outright, and the
   Warfare and Heroic Quartermaster counters keep their honor and marks companions. Every
-  companion attaches to the character (the Hunting window summons it; no whistle in the
+  companion attaches to the character (the Cosmetics window summons it; no whistle in the
   bags), and companions now wear looks: speed and damage challenges on the raid bosses, a
   crafted Acorn Crown for the Stag, a gold-bought Gilded charm, a deed look for the Moss
   Hare, and seasonal ladder and parse awards granted by the team.
