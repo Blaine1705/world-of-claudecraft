@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 // renames it breaks the mount with nothing else failing. The byte pin makes any
 // re-export a deliberate, reviewed change.
 const ASSET_PATH = path.join(__dirname, '..', 'public/models/mounts/slime.glb');
-const EXPECTED_ASSET_SHA256 = '9a20509bd15886f922d7aea44d2b50f5898e7cff86d79d4f75e653d9f670e2f9';
+const EXPECTED_ASSET_SHA256 = 'a9ae50765717494c736d77e2e09951255493302210b929891dcebe167c1811c6';
 const CLIP_SECONDS = { Idle: 6, Walk: 1, Run: 0.9, Jump: 0.8 };
 
 async function readAsset() {

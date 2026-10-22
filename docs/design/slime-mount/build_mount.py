@@ -254,7 +254,7 @@ def walk(t):
 
 
 def run(t):
-    return hop(t, RUN_LEN, 0.35, 0.14 * H, land=0.12, squash_in=0.08, stretch=0.05,
+    return hop(t, RUN_LEN, 0.35, 0.26 * H, land=0.14, squash_in=0.08, stretch=0.05,
                lag=0.07, follow=0.08, f=3.2, tau=0.15, tilt=0.05)
 
 
@@ -262,7 +262,7 @@ def run(t):
 # with a stretch that wobbles out in the air, and end neutral on the ground pose
 # because the game holds the last frame through a fall.
 JUMP_LEN = 0.8
-JUMP_UP = 0.33 * H
+JUMP_UP = 0.55 * H
 
 
 def jump(t):

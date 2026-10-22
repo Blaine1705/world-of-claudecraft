@@ -60,8 +60,8 @@ changes the bytes, so update the pin in `tests/slime_mount_asset.test.ts`.
     gathers before take-off, stretches as it leaves the ground and squashes on
     landing, then jiggles down. The top lags back on take-off and carries on
     forward on landing. Each loop picks up the end of the previous landing's
-    jiggle, so the seam does not show. Run hops twice as high and leans
-    forward.
+    jiggle, so the seam does not show. Run hops almost four times as high
+    and leans forward.
   - `Jump` (0.8 s): squash, spring off with a stretch that wobbles out in the
     air. It ends on the neutral pose, because the game holds the last frame
     through a fall.
