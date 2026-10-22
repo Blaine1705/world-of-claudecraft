@@ -864,11 +864,11 @@ describe('item-art audit builder', () => {
       // painted weapons, re-measured with `--verify-only` on the merged tree.
       // 1464 / 1482 at the 2026-09-28 release/v0.44.0 merge into feature/buried-hoards
       // (the hoard boss loot and map paintings on 36 sheet pages), re-measured the same way.
-      catalogSha256: 'e3f58abc4acad903941898542c592ca749451e776bdb34935821a6e79e32e7c6',
-      catalogBytes: 801291,
+      catalogSha256: '1a598216aab46de623291d78f5b5c45f245f5997597c9b45471a8e9a3118581f',
+      catalogBytes: 802907,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1464,
-      liveItemCount: 1482,
+      catalogCount: 1467,
+      liveItemCount: 1485,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -886,7 +886,7 @@ describe('item-art audit builder', () => {
         identity: 36,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '53d42dd05b8370ad9bf62c5b1d779efc05f02f28fe129a7fe8b53c1b863557fc',
+      shippingCatalogSha256: '793b06753d87fef6809907e8303376af79deea52a3f42903a51448831f0a3c44',
       machineChecksPassed: true,
       verdict: null,
     });

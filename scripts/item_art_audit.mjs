@@ -145,11 +145,10 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    // The three art-pending leveling quest shields (content/quest_shields.ts)
-    // add three definitions and three debt rows, so the art subjects hold.
-    catalogCount: 1464,
-    liveItemCount: 1482,
-    pendingArtCount: 138,
+    // The three leveling quest shields now have paintings and leave the debt ledger.
+    catalogCount: 1467,
+    liveItemCount: 1485,
+    pendingArtCount: 135,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,

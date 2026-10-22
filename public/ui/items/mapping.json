@@ -7120,6 +7120,24 @@
         "tempest_strike_grips",
         "venom_etched_waistcord"
       ]
+    },
+    {
+      "batchId": "quest-shield-icons-2026-10-23",
+      "source": "OpenAI built-in image generation, one painting per item and one framing edit per painting",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Eastbrook Buckler, Kingsbane Last Oath and Linen Pouch, inspected as house-style anchors",
+      "commonPrompt": "Opaque dark painted ground, warm top-left light, complete centered shield silhouette with safe padding, tactile materials, no text or frame. Exact per-item prompts and framing edit retained in provenance.",
+      "provenanceRecord": "docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json",
+      "itemIds": [
+        "lychgate_buckler",
+        "bastion_kite_shield",
+        "barrowfield_tower_shield"
+      ]
     }
   ]
 }

@@ -76,9 +76,5 @@ export const QUEST_SHIELD_ITEMS: Record<string, ItemDef> = {
   },
 };
 
-// The art-pending ledger for these three. ITEM_ART_PENDING (src/ui/icons.ts)
-// serves the procedural icon for every id listed here and the item-art audit
-// excludes them from the every-live-item-has-art sweep. Commission per
-// docs/design/item-icon-art-style.md, then EMPTY this list
-// (tests/item_icons.test.ts A2 reds on a stale entry once art is committed).
-export const QUEST_SHIELD_ART_PENDING_ITEM_IDS: readonly string[] = Object.keys(QUEST_SHIELD_ITEMS);
+// All three shield paintings ship under public/ui/items; no art debt remains.
+export const QUEST_SHIELD_ART_PENDING_ITEM_IDS: readonly string[] = [];

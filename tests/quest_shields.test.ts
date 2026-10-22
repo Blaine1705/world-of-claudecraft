@@ -108,13 +108,11 @@ describe('leveling quest shields', () => {
     }
   });
 
-  it('parks all three on the art-pending ledger so they draw the procedural icon', () => {
-    expect([...QUEST_SHIELD_ART_PENDING_ITEM_IDS].sort()).toEqual(
-      CASES.map((c) => c.itemId).sort(),
-    );
+  it('serves dedicated painted art for all three quest shields', () => {
+    expect(QUEST_SHIELD_ART_PENDING_ITEM_IDS).toEqual([]);
     for (const c of CASES) {
-      expect(ITEM_ART_PENDING.has(c.itemId)).toBe(true);
-      expect(itemImageUrl(c.itemId)).toBeNull();
+      expect(ITEM_ART_PENDING.has(c.itemId)).toBe(false);
+      expect(itemImageUrl(c.itemId)).toBe(`/ui/items/${c.itemId}.webp`);
     }
   });
 
