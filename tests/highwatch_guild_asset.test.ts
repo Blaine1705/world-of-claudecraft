@@ -619,11 +619,11 @@ describe('the Highwatch guild GLB', () => {
  * facing): how many and their area in square yards. Every one is a joint of the kit's own shell
  * and roof (a timber against a wall's plaster or stone, a porch slate on its dressed gable, the
  * trophy hall's posts meeting the great hall's back wall, two slate courses lapping a finger's
- * width apart at the front eave), which the audit passed as twins while the model wore no maps
- * (one material, one colour: the same pixel). The painted maps and the baked light tint each
- * face its own way, so the audit now weighs them, as it did the painted Highwatch manor on the
- * same kit. The largest, the eave's lap, is about a quarter of a square yard. A new contact
- * anywhere, or one of these grown, turns this red.
+ * width apart at the front eave): joints the audit passes as twins on an unpainted model (one
+ * material, one colour: the same pixel). The painted maps and the baked light tint each face its
+ * own way, so the audit weighs them here, as it did the painted Highwatch manor on the same kit.
+ * The largest, the eave's lap, is about a quarter of a square yard. A new contact anywhere, or
+ * one of these grown, turns this red.
  */
 const KNOWN_CONTACTS: Record<string, { hits: number; area: number }> = {
   'GuildRoof/GuildSlate x GuildRoof/GuildSlate n=0,0.8,-0.6': { hits: 1, area: 0.254 },
