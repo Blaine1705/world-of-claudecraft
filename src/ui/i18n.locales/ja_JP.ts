@@ -13944,6 +13944,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
+  'hudChrome.mounts.name_wobbles_slime': 'スライムのプルプル',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '鞍を着けられるよう馴らされた大きな青いスライム。歩く代わりに跳ねて進み、乗り手の下でぷるぷると揺れ、体の中を泡がゆっくり昇っていく。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのドレッドスパーク',
   'hudChrome.mounts.name_rickshaw_mount': '骨縛りの人力車',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
@@ -14931,6 +14934,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
+  'entities.items.reins_wobbles_slime.name': 'ゼリーの鞍：プルプル',
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.items.reins_avian_strider.name': 'ヴィリジアン・ヴェイルストライダーの手綱',
   'entities.items.reins_lanternback_troll.name': '点灯人の軛：グルンボル',

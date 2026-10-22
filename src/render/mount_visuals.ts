@@ -321,6 +321,17 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     // weight onto it.
     { bone: 'chair', offset: [0, 0.918, 0.25] },
   ),
+  // Wobbles the Slime (docs/design/slime-mount). The jelly squashes, leans and
+  // hops under the rider in every clip, so the rider rides the `saddle` bone,
+  // which carries the seat rigidly over the wobble. Offset measured in Blender:
+  // the seat's low point sits 0.19 model units above the bone head, centred
+  // between pommel and cantle, and the rider's root rides a hair above it.
+  // `seat` is the fallback at the manifest height 4.0 (seat 5.53 of 6.61 model
+  // units). The snail's slime trail suits a slime too.
+  wobbles_slime: spec('mount_wobbles_slime', 3.35, true, undefined, 0, 'slime', [], {
+    bone: 'saddle',
+    offset: [0, 0.22, 0],
+  }),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */

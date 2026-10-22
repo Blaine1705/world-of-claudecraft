@@ -2230,6 +2230,7 @@ export const zh_TW: EnTranslations = {
       "name_lanternback_troll": "提燈背者格倫博",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
       "name_rickshaw_mount": "白骨人力車",
+      "name_wobbles_slime": "晃晃史萊姆",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
@@ -2240,6 +2241,7 @@ export const zh_TW: EnTranslations = {
       "desc_goblin_rocket_sled": "一輛結構過剩到危險的哥布林雪橇，靠雙發火箭和極差的判斷力推進。",
       "desc_rallycart_rxt": "一輛小巧卻道地的拉力賽車，能提升移動速度。",
       "desc_rallycart_skin": "一輛小巧的拉力賽車，轟鳴聲卻震天響。",
+      "desc_wobbles_slime": "一隻被馴服上鞍的大藍史萊姆。牠不走路而是蹦跳，在騎手身下晃來晃去，體內還有氣泡緩緩上浮。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
       "desc_referral_tank": "完成一張推薦集章卡後獲得。",
       "desc_referral_raptor": "幫助你的首位綁定好友完成一張集章卡後獲得。",
@@ -20018,6 +20020,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "守道人的鈴帶：托利弗"
+      },
+      "reins_wobbles_slime": {
+        "name": "果凍鞍：晃晃"
       },
       "reins_rickshaw_mount": {
         "name": "白骨人力車縛繩"

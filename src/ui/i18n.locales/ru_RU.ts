@@ -14165,6 +14165,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     'Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
+  'hudChrome.mounts.name_wobbles_slime': 'Слизень Трясунчик',
+  'hudChrome.mounts.desc_wobbles_slime':
+    'Большой синий слизень, приученный к седлу. Он не ходит, а прыгает, колышется под всадником, а сквозь его желе медленно поднимаются пузырьки.',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Ужасоискр, сотрясатель земли',
   'hudChrome.mounts.name_rickshaw_mount': 'Костяная рикша',
   'hudChrome.mounts.desc_valorsteed':
@@ -15178,6 +15181,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText':
     'Вы входите в холодные безмолвные залы Последнего оплота.',
+  'entities.items.reins_wobbles_slime.name': 'Желейное седло: Трясунчик',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Ужасоискра',
   'entities.items.reins_avian_strider.name': 'Поводья изумрудного долинохода',
   'entities.items.reins_lanternback_troll.name': 'Ярмо фонарщика: Грумбол',

@@ -277,6 +277,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'drakemaw_raptor',
   'avian_strider',
   'lanternback_troll',
+  'wobbles_slime',
   'terrorspark_groundshaker',
   'referral_raptor',
   'referral_tank',

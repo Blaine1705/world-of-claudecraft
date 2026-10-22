@@ -2230,6 +2230,7 @@ export const vi_VN: EnTranslations = {
       "name_lanternback_troll": "Grumbol Lưng Đèn",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
+      "name_wobbles_slime": "Wobbles the Slime",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
@@ -2240,6 +2241,7 @@ export const vi_VN: EnTranslations = {
       "desc_goblin_rocket_sled": "Một chiếc xe trượt goblin được chế tạo quá mức đến nguy hiểm, phóng đi nhờ hai tên lửa và óc phán đoán tồi một cách xuất sắc.",
       "desc_rallycart_rxt": "Một cỗ máy đua rally nhỏ gọn giúp tăng tốc độ di chuyển.",
       "desc_rallycart_skin": "Một chiếc xe đua nhỏ có tiếng gầm vang dội.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -20018,6 +20020,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Dây đeo chuông của Roadwarden: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Dây cương ràng buộc: Xe kéo Buộc Xương"

@@ -76,6 +76,7 @@ await page.evaluate(() => {
     'reins_referral_tank',
     'reins_referral_raptor',
     'reins_lanternback_troll',
+    'reins_wobbles_slime',
   ])
     sim.addItem(id, 1);
 });

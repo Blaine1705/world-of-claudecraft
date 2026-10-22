@@ -13285,6 +13285,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
+  'hudChrome.mounts.name_wobbles_slime': '晃晃史莱姆',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '一只被驯服上鞍的大蓝史莱姆。它不走路而是蹦跳，在骑手身下晃来晃去，体内还有气泡缓缓上浮。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '骇雷撼地者',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力车',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
@@ -14218,6 +14221,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
+  'entities.items.reins_wobbles_slime.name': '果冻鞍：晃晃',
   'entities.items.reins_terrorspark_groundshaker.name': '骇雷撼地者点火钥匙',
   'entities.items.reins_avian_strider.name': '苍翠谷行者的缰绳',
   'entities.items.reins_lanternback_troll.name': '点灯人之轭：格伦博',

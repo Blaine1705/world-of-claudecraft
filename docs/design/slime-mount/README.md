@@ -25,6 +25,11 @@ move, and jiggles.
 - `build_mount.py`: paints the jelly (gradient, base glow, highlights) and
   makes it translucent, adds the bubbles, then builds the rig and clips
   (Blender 5.2, headless).
+- `render_icon.py` and `compose_icon.py`: the reins icon
+  (`public/ui/items/reins_wobbles_slime.webp`), a render of the mount at rest
+  composed onto the dark woc-item-icon-v1 ground, like the Chimeglass
+  Tortoise's. Run `render_icon.py` on the `.blend` that `build_mount.py`
+  saves beside its GLB, then `compose_icon.py` on the render's folder.
 - `finish_mount.mjs`: resamples, prunes, dedups and converts textures to WebP,
   then checks that the clips and the saddle bone survived.
 

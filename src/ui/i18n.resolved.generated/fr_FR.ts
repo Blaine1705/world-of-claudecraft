@@ -2230,6 +2230,7 @@ export const fr_FR: EnTranslations = {
       "name_lanternback_troll": "Grumbol le Lanternback",
       "name_chimeglass_tortoise": "Tolliver le Chimeglass",
       "name_rickshaw_mount": "Rickshaw d'os liés",
+      "name_wobbles_slime": "Wobbles the Slime",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
@@ -2240,6 +2241,7 @@ export const fr_FR: EnTranslations = {
       "desc_goblin_rocket_sled": "Une luge gobeline dangereusement surconstruite, propulsée par deux fusées et un excellent mauvais jugement.",
       "desc_rallycart_rxt": "Une petite machine de rallye qui augmente la vitesse de déplacement.",
       "desc_rallycart_skin": "Une minuscule voiture de rallye au rugissement puissant.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -20018,6 +20020,9 @@ export const fr_FR: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Cloche de gardien de route: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Rênes liées : Rickshaw d'os liés"

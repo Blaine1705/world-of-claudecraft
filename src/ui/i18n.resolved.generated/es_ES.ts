@@ -2230,6 +2230,7 @@ export const es_ES: EnTranslations = {
       "name_lanternback_troll": "Grumbol el lomo de linterna",
       "name_chimeglass_tortoise": "Tolliver el timbre de cristal",
       "name_rickshaw_mount": "Rickshaw Atahuesos",
+      "name_wobbles_slime": "Wobbles the Slime",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
@@ -2240,6 +2241,7 @@ export const es_ES: EnTranslations = {
       "desc_goblin_rocket_sled": "Un trineo goblin peligrosamente sobredimensionado, propulsado por dos cohetes y un excelente mal juicio.",
       "desc_rallycart_rxt": "Una máquina de rally en miniatura que proporciona mayor velocidad de viaje.",
       "desc_rallycart_skin": "Un pequeño coche de carreras con un rugido enorme.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -20018,6 +20020,9 @@ export const es_ES: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Campana del guardián del camino: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Riendas vinculadas: Rickshaw Atahuesos"

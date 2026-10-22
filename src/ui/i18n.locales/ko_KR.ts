@@ -13903,6 +13903,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
+  'hudChrome.mounts.name_wobbles_slime': '말랑이 슬라임',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '안장을 얹도록 길들여진 커다란 파란 슬라임. 걷는 대신 통통 튀어 다니고, 기수 아래에서 말랑하게 흔들리며, 젤리 몸속으로 거품이 천천히 떠오른다.',
   'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 드레드스파크',
   'hudChrome.mounts.name_rickshaw_mount': '뼈에 묶인 인력거',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
@@ -14893,6 +14896,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
+  'entities.items.reins_wobbles_slime.name': '젤리 안장: 말랑이',
   'entities.items.reins_terrorspark_groundshaker.name': '드레드스파크 시동 열쇠',
   'entities.items.reins_avian_strider.name': '비리디안 베일스트라이더의 고삐',
   'entities.items.reins_lanternback_troll.name': '점등인의 멍에: 그룸볼',

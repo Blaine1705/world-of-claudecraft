@@ -2230,6 +2230,7 @@ export const da_DK: EnTranslations = {
       "name_lanternback_troll": "Lanternryggen Grumbol",
       "name_chimeglass_tortoise": "Tolliver kimeglasset",
       "name_rickshaw_mount": "Knogebundet Rickshaw",
+      "name_wobbles_slime": "Wobbles the Slime",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
@@ -2240,6 +2241,7 @@ export const da_DK: EnTranslations = {
       "desc_goblin_rocket_sled": "En farligt overbygget goblinslæde, drevet af to raketter og fremragende dårlig dømmekraft.",
       "desc_rallycart_rxt": "En lille rallymaskine, der øger rejsehastigheden.",
       "desc_rallycart_skin": "En lille rallybil med et mægtigt brøl.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -20018,6 +20020,9 @@ export const da_DK: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Vejvagts klokkerem: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Bundne tøjler: Knogebundet Rickshaw"

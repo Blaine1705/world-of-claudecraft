@@ -2230,6 +2230,7 @@ export const ja_JP: EnTranslations = {
       "name_lanternback_troll": "ランタンバックのグルンボル",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
+      "name_wobbles_slime": "スライムのプルプル",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -2240,6 +2241,7 @@ export const ja_JP: EnTranslations = {
       "desc_goblin_rocket_sled": "危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。",
       "desc_rallycart_rxt": "小型ながら本格的なラリーマシン。移動速度を高めてくれる。",
       "desc_rallycart_skin": "小さな車体から豪快なエンジン音を響かせるラリーカー。",
+      "desc_wobbles_slime": "鞍を着けられるよう馴らされた大きな青いスライム。歩く代わりに跳ねて進み、乗り手の下でぷるぷると揺れ、体の中を泡がゆっくり昇っていく。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_referral_tank": "招待スタンプカードを完成させると獲得できます。",
       "desc_referral_raptor": "最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。",
@@ -20018,6 +20020,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "道守の鈴帯：トリヴァー"
+      },
+      "reins_wobbles_slime": {
+        "name": "ゼリーの鞍：プルプル"
       },
       "reins_rickshaw_mount": {
         "name": "縛りの手綱：骨縛りの人力車"

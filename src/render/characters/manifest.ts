@@ -1075,6 +1075,21 @@ const MOUNT_RIGGED: ClipMap = {
   death: 'Death',
 };
 
+// Wobbles the Slime ships Idle / Walk / Run / Jump / Land (docs/design/slime-mount).
+// Naming `land` opts it into the held-jump treatment, like the tortoise: `Jump`
+// is the gather and spring, clamped on its airborne pose for the whole flight,
+// and `Land` is the touchdown splat. Neither carries a rise (the arc is the
+// game's). Death holds Idle: a ridden mount never plays one.
+const MOUNT_SLIME: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: [],
+  death: 'Idle',
+  jump: 'Jump',
+  land: 'Land',
+};
+
 // The Viridian Valestrider is authored as a mount-specific four-clip rig. It
 // only runs forward, has a deliberate look-behind reverse gait, and carries
 // its own full-body jump. Death falls back to Idle because mounts never die
@@ -3364,6 +3379,21 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
+  // Wobbles the Slime: 4.0 tall, a touch over the horse, so the seat lands
+  // about a body higher than a horse's. One hop per Walk/Run loop; the refs
+  // pick a hop cadence that reads as bounding at mounted speed rather than
+  // matching any foot (it has none).
+  mount_wobbles_slime: {
+    url: `${MOUNTS_DIR}/wobbles_slime.glb`,
+    height: 4.0,
+    clips: MOUNT_SLIME,
+    // The tack is Tripo's baked texture (dark leather and navy): keep black
+    // black on the low tier rather than lifting it to a flat grey.
+    authoredAtlas: true,
+    walkRef: 2.5,
+    runRef: 11,
+    lazyPreload: true,
+  },
   mount_terrorspark_groundshaker: {
     url: `${MOUNTS_DIR}/terrorspark_groundshaker.glb`,
     height: 2.8,

@@ -13285,6 +13285,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
+  'hudChrome.mounts.name_wobbles_slime': '晃晃史萊姆',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '一隻被馴服上鞍的大藍史萊姆。牠不走路而是蹦跳，在騎手身下晃來晃去，體內還有氣泡緩緩上浮。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '駭雷撼地者',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力車',
   'hudChrome.mounts.desc_valorsteed': '一匹堅韌穩健的駿馬，可提升旅行速度。',
@@ -14221,6 +14224,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後的堡壘',
   'entities.items.last_keep_signet.name': '最後的堡壘印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
+  'entities.items.reins_wobbles_slime.name': '果凍鞍：晃晃',
   'entities.items.reins_terrorspark_groundshaker.name': '駭雷撼地者點火鑰匙',
   'entities.items.reins_avian_strider.name': '蒼翠谷行者的韁繩',
   'entities.items.reins_lanternback_troll.name': '點燈人之軛：格倫博',

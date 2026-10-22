@@ -282,6 +282,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "reins_wobbles_slime",
+      "name": "Jelly Saddle: Wobbles",
+      "sourcePack": "project-authored",
+      "sourceFile": "front three-quarter render of the shipped mount model (public/models/mounts/wobbles_slime.glb) in headless Blender, keyed onto an opaque dark vignette and downscaled to the 128px opaque woc-item-icon-v1 shipping format (docs/design/slime-mount/README.md)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "reins_rickshaw_mount",
       "name": "Bonebound Rickshaw Reins",
       "sourcePack": "woc_item_icon_v1_generated",
