@@ -6601,6 +6601,9 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       talkingHead: 'the Dialogue panel',
       // guide.interfacePage.framesGovernedUnitTooltip, named by its live chip.
       unitTooltip: `the ${t('hudChrome.interfaceUnlock.frameNames.unitTooltip')} frame`,
+      // guide.interfacePage.framesGovernedResourceAndHill.
+      playerResource: 'your resource bar',
+      hillBar: 'the King of the Hill bar',
     };
     expect(Object.keys(phraseFor).sort()).toEqual(HUD_FRAME_SPECS.map((s) => s.id).sort());
     for (const spec of HUD_FRAME_SPECS) {

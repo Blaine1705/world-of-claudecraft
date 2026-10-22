@@ -216,8 +216,10 @@ const RUNTIME_MOUNTED_FRAME_IDS = [
   'tracker-group',
   'aura-track-group',
 ];
-// The compact target frame starts nested inside #target-frame and detaches on drag.
-const NESTED_FRAME_IDS = ['totarget-frame'];
+// The compact target frame starts nested inside #target-frame and detaches on drag;
+// the player's resource bar wrapper starts inside #player-frame and detaches
+// while the Detach Resource Bar option is on.
+const NESTED_FRAME_IDS = ['totarget-frame', 'pf-resource-frame'];
 
 interface Harvest {
   ids: string[];

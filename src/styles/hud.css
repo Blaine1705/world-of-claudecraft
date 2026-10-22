@@ -2257,6 +2257,8 @@
   #proc-overlay.tf-unlocked,
   #talking-head.tf-unlocked,
   #unit-tooltip-anchor.tf-unlocked,
+  #pf-resource-frame.tf-unlocked,
+  #hill-bar.tf-unlocked,
   #meters-window.tf-unlocked {
     cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
@@ -2275,6 +2277,7 @@
   #practice-tracker.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
+  #hill-bar.tf-unlocked,
   #talking-head.tf-unlocked {
     pointer-events: auto;
   }
@@ -2357,6 +2360,29 @@
   #practice-tracker.hud-frame-detached,
   .gathering-goal-panel.hud-frame-detached {
     width: var(--tracker-w);
+  }
+  /* The player's resource bar, detached (Detach Resource Bar: the
+     playerResource frame row). Docked, the wrapper is a plain block in the
+     player frame's bars column and the bar keeps every .unitframe rule. Once
+     re-homed onto #ui those ancestor rules no longer reach it, so the frame
+     takes its own size from playerFrameResourceWidth / Height (the editor
+     drags and the frame-option sliders), and the bar text tracks the
+     thickness through --uf-bar-height exactly as on the frame. */
+  #pf-resource-frame.hud-frame-detached {
+    position: absolute;
+    margin: 0;
+    z-index: 20;
+    width: var(--player-resource-width, 232px);
+  }
+  /* A readout, not a control: once it is off the player frame (whose body
+     click targets yourself) a locked bar is click-through, so it never eats a
+     click meant for the world under it. Arranging hands events back. */
+  #pf-resource-frame.hud-frame-detached:not(.tf-unlocked) {
+    pointer-events: none;
+  }
+  #pf-resource-frame.hud-frame-detached > .bar {
+    --uf-bar-height: var(--player-resource-height, 11px);
+    height: var(--player-resource-height, 11px);
   }
   #actionbar .tf-move-btn,
   #actionbar2 .tf-move-btn,
@@ -2551,9 +2577,21 @@
      this, so it never suppresses live cast information. */
   body.interface-unlocked #castbar,
   body.interface-unlocked #swingbar,
-  body.interface-unlocked #swingbar-offhand.tf-unlocked {
+  body.interface-unlocked #swingbar-offhand.tf-unlocked,
+  body.interface-unlocked #hill-bar.tf-unlocked {
     display: block !important;
     opacity: 0.55;
+  }
+  /* An empty King of the Hill placeholder (the player is outside the hill's
+     zone, so the painter never built its skeleton) keeps a graspable box.
+     Its stock seat is the top centre, which the Edit Frames toolbar
+     (#interface-edit-controls, z 40) covers, so while arranging an unmoved
+     bar steps down below the toolbar; a moved bar keeps its own spot. */
+  body.interface-unlocked #hill-bar.tf-unlocked {
+    min-height: 48px;
+  }
+  body.interface-unlocked #hill-bar.tf-unlocked:not(.hud-frame-detached) {
+    top: 64px;
   }
   /* Unlocking shows the frames the class could have that are merely EMPTY
      right now (a target frame with nothing selected, a pet frame with no pet

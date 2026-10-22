@@ -2099,6 +2099,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.minimap': '小地圖',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': '姿態欄',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': '玩家',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': '資源條',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': '目標',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': '隊伍',
   'hudChrome.interfaceUnlock.frameNames.chat': '聊天',
@@ -13048,6 +13049,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.enemyHighlightOverhead': '頭頂浮動標記',
   'hudChrome.options.enemyHighlightReticle': '加粗的敵對目標光圈',
   'hudChrome.options.showPetFrame': '顯示你的寵物',
+  'hudChrome.options.playerFrameResourceDetached': '分離資源條',
+  'hudChrome.options.playerFrameResourceWidth': '資源條寬度',
+  'hudChrome.options.playerFrameResourceHeight': '資源條高度',
+  'hudChrome.options.hillBarOpacity': '山丘之王背景透明度',
   'hudChrome.options.showDefensivesTrack': '顯示防禦性冷卻',
   'hudChrome.options.showSelfBuffTrack': '顯示我的增益',
   'hudChrome.options.showOffensiveTrack': '顯示攻擊性冷卻',
@@ -17534,6 +17539,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '「編輯框體」也會解鎖對話面板：當某個 NPC 不在你的視野內時，它承載該 NPC 說出的台詞；處於解鎖狀態時它會顯示自己的名稱標籤。',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '「編輯框體」也會解鎖提示框框體，也就是滑鼠所停留對象的資訊卡出現的位置：生物的等級與種類，或其他玩家的頭銜、公會、等級與職業，以及專精和對應定位。把它拖到任意位置，資訊卡就會從那裡朝遠離螢幕最近邊緣的方向展開。在「框體設定」的「顯示或隱藏框體」中取消勾選「提示框」，即可完全隱藏這張資訊卡。',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    '在「頭像框」分頁中開啟「分離資源條」後，「編輯框體」也會解鎖你的資源條，讓你的法力、能量或怒氣可以單獨放在任意位置；同一分頁中的「資源條寬度」和「資源條高度」可調整它的大小。「編輯框體」也會解鎖山丘之王條，同一分頁中的「山丘之王背景透明度」可淡化它的面板，而文字保持清晰。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '「編輯框體」也會鬆開六條可選的光環軌道，前提是你已在同一「介面」選項的「戰鬥」分頁中開啟它們：「我的增益」軌道、「防禦性冷卻」軌道、「我的護盾」軌道、「攻擊性冷卻」軌道、「移動與潛行」軌道，以及「我給隊友的增益」軌道。所有軌道預設關閉，每一條在鬆開期間都掛著一枚名稱標籤。',
   'guide.interfacePage.mapBodyZoneFirst':

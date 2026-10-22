@@ -330,6 +330,7 @@
       <span class="ctm-arrow ctm-s"></span>
       <span class="ctm-arrow ctm-w"></span>
     </div>
+    <div id="hill-bar" role="status" aria-live="polite"><div id="hill-body"></div></div>
     <div id="talking-head" class="talking-head ui-panel-strong" hidden role="status" data-i18n-aria="hudChrome.talkingHead.label" aria-label="Dialogue">
       <div class="portrait-wrap ui-portrait-wrap th-portrait-wrap"><div class="portrait ui-portrait"><canvas class="th-portrait" width="54" height="54"></canvas></div></div>
       <div class="th-body"><div class="th-name ui-h"></div><div class="th-text"></div></div>
@@ -519,7 +520,7 @@
               <div class="combat-flash ui-combat-badge" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" data-crest-fallback-id="status_combat" data-crest-fallback-size="32" alt="" aria-hidden="true" /></div>
               <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
-            <div class="uf-bars">
+            <div class="uf-bars" id="pf-bars">
               <div class="uf-name-header deed-heraldry-plaque ui-ribbon" id="pf-name-header">
                 <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                   <path id="pf-heraldry-pattern-motif"></path>
@@ -529,7 +530,7 @@
               </div>
               <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
               <div class="bar hp ui-bevel"><div class="bar-fill ui-bevel-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-hp-text"></div></div>
-              <div class="bar mana ui-bevel ui-bevel--res" id="pf-resource"><div class="bar-fill ui-bevel-fill" id="pf-res"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
+              <div id="pf-resource-frame" class="pf-resource-frame"><div class="bar mana ui-bevel ui-bevel--res" id="pf-resource"><div class="bar-fill ui-bevel-fill" id="pf-res"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div></div>
             </div>
           </div>
           <div id="stancebar"></div>

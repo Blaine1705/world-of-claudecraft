@@ -2203,6 +2203,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.minimap': 'Мини-карта',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': 'Панель стоек',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'Игрок',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Полоса ресурса',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': 'Цель',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': 'Группа',
   'hudChrome.interfaceUnlock.frameNames.chat': 'Чат',
@@ -13953,6 +13954,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.enemyHighlightOverhead': 'Парящий маркер над головой',
   'hudChrome.options.enemyHighlightReticle': 'Усиленный круг враждебной цели',
   'hudChrome.options.showPetFrame': 'Показывать вашего питомца',
+  'hudChrome.options.playerFrameResourceDetached': 'Отделить полосу ресурса',
+  'hudChrome.options.playerFrameResourceWidth': 'Ширина полосы ресурса',
+  'hudChrome.options.playerFrameResourceHeight': 'Высота полосы ресурса',
+  'hudChrome.options.hillBarOpacity': 'Прозрачность фона „Короля горы“',
   'hudChrome.options.showDefensivesTrack': 'Показывать защитные умения',
   'hudChrome.options.showSelfBuffTrack': 'Показывать мои эффекты',
   'hudChrome.options.showOffensiveTrack': 'Показывать атакующие умения',
@@ -18757,6 +18762,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     '«Редактировать фреймы» также освобождает панель диалога: она показывает реплику NPC, пока тот находится вне вашего поля зрения, и носит свою табличку с именем, пока откреплена.',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '«Редактирование фреймов» также освобождает фрейм подсказки: место, где появляется карточка того, на что наведён курсор. Для существа это уровень и вид, для другого игрока: звание, гильдия, уровень и класс, а также специализация с её ролью. Перетащите фрейм куда угодно, и карточка будет раскрываться оттуда в сторону от ближайших краёв экрана. Снимите флажок «Подсказка» в разделе «Показать или скрыть фреймы» в «Настройках фреймов», чтобы совсем скрыть эту карточку.',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Включите «Отделить полосу ресурса» на вкладке «Рамки», и «Редактирование фреймов» освободит и полосу ресурса: ману, энергию или ярость можно поставить куда угодно отдельно, а «Ширина полосы ресурса» и «Высота полосы ресурса» на той же вкладке задают её размер. «Редактирование фреймов» освобождает и полосу «Короля горы», а «Прозрачность фона „Короля горы“» на той же вкладке приглушает её панель, не трогая текст.',
   'guide.interfacePage.framesGovernedAuraTracks':
     '«Редактирование фреймов» также отпускает шесть необязательных дорожек эффектов, если вы включили их на вкладке «Бой» тех же настроек интерфейса: дорожки «Мои эффекты», «Защитные умения», «Мои щиты», «Атакующие умения», «Движение и скрытность» и «Мои эффекты на союзниках». По умолчанию все они выключены, а пока дорожка отпущена, на ней висит ярлык с её названием.',
   'guide.interfacePage.mapBodyZoneFirst':
