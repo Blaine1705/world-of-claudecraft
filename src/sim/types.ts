@@ -2095,14 +2095,6 @@ export interface LootEntry {
   // always rides a truthy `copper` (the roller's money arm gates on copper).
   heroicCopper?: number;
   chance: number; // 0..1
-  // Heroic-claim drop rate for THIS row, substituted for `chance` exactly the
-  // way heroicCopper substitutes for `copper`: a value swap on the same single
-  // draw, never an extra one, so the per-kill draw count (and every parity
-  // golden riding it) is identical on both difficulties. Authored where one
-  // item is meant to drop from the same boss at two rates rather than living
-  // on two tables (the Crystal Lich whistle: 0.5% normal, 1% heroic). Ignored
-  // on a rollGroup row, where the group's partition owns the odds.
-  heroicChance?: number;
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
   // their chances, so at most one matching entry drops.
