@@ -13150,7 +13150,7 @@ export const en_CA: EnTranslations = {
       "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
       "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Sold to {buyer}",
-      "saleOlder": "Plus {count} earlier sales, included in the total.",
+      "saleOlder": "Plus {count} earlier sales not listed.",
       "ordersTab": "Wanted",
       "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
       "ordersListAria": "Open buy orders",
