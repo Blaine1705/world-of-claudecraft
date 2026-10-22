@@ -3,11 +3,7 @@ import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import type { ReferralCardsAction, ReferralCardsSnapshot } from '../sim/referral_contract';
 import type { AccountBankInfo } from '../world_api/bank';
-import {
-  accountBankTransferPayload,
-  decodeAccountBankInfo,
-  selectAccountBankMirror,
-} from './account_bank_wire';
+import { AccountBankRequests, accountBankTransferPayload } from './account_bank_wire';
 import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { CharacterRequests } from './character_requests';
 import { applyCharacterRoster, type CharacterMembership } from './character_roster';
@@ -1242,6 +1238,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   bankInfo: BankInfo | null = null;
   courierInfo: CourierInfo | null = null;
   accountBankInfo: AccountBankInfo | null = null;
+  private readonly accountBankRequests = new AccountBankRequests();
   // --- IWorldBank: Materials Vault contents view, the per-material store beside
   // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
   // The payload is OWNER-ONLY and never rides the interest-scoped entity
@@ -2304,7 +2301,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     if (msg.t === 'account_bank') {
-      this.accountBankInfo = decodeAccountBankInfo(msg.info);
+      this.accountBankInfo = this.accountBankRequests.receive(msg.info, (id) =>
+        this.selectAccountBank(id),
+      );
       return;
     }
     if (msg.t === 'gbanklog') {
@@ -4584,12 +4583,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   claimMembershipArmour(): void {
     this.cmd({ cmd: 'membership_claim_armour' });
   }
-  requestAccountBanks(): void {
+  requestAccountBanks(openFirst = false): void {
+    if (!this.accountBankRequests.list(openFirst)) return;
     this.accountBankInfo = null;
     this.cmd({ cmd: 'account_bank_list' });
   }
   selectAccountBank(characterId: number): void {
-    this.accountBankInfo = selectAccountBankMirror(this.accountBankInfo, characterId);
+    this.accountBankInfo = this.accountBankRequests.select(this.accountBankInfo, characterId);
     this.cmd({ cmd: 'account_bank_select', characterId });
   }
   accountBankTransfer(...args: Parameters<typeof accountBankTransferPayload>): void {

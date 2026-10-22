@@ -89,6 +89,26 @@ describe('membership bank admission and live apply', () => {
     expect(db.load).toHaveBeenCalledExactlyOnceWith(1, 12);
   });
 
+  it('keeps the selected bank on screen when a move is refused, but not after a fatal one', async () => {
+    const { service, db, host } = fixture();
+    const s = session();
+    await service.select(s, 12);
+    const bank = membershipBankView(undefined);
+    db.transfer.mockResolvedValueOnce({ ok: false, error: 'no_fit' } as never);
+    await service.transfer(s, 12, request);
+    expect(host.publish).toHaveBeenLastCalledWith(
+      s,
+      expect.objectContaining({ selectedCharacterId: 12, bank, error: 'no_fit' }),
+    );
+    db.transfer.mockResolvedValueOnce({ ok: false, error: 'uncertain' } as never);
+    await service.transfer(s, 12, request);
+    expect(host.quarantine).toHaveBeenCalledWith(s, 'uncertain');
+    expect(host.publish).toHaveBeenLastCalledWith(
+      s,
+      expect.objectContaining({ bank: null, error: 'uncertain' }),
+    );
+  });
+
   it('serializes capture, commit, live delta and durable acknowledgements in that order', async () => {
     const { service, calls } = fixture();
     await service.transfer(session(), 12, request);
