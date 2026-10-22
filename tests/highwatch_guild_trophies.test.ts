@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { GUILD_TROPHY_DUNGEONS as BUILT } from '../scripts/assets/highwatch_guild/build.mjs';
-import { createGuildTrophyRoom } from '../src/render/highwatch_guild_trophies';
+import { createGuildTrophyRoom, visibilityNode } from '../src/render/highwatch_guild_trophies';
 import {
   GUILD_TROPHY_DUNGEONS,
   guildTrophyNodeNames,
@@ -91,5 +91,57 @@ describe('the trophy room painter', () => {
     parts.G_INT_Trophy_hollow_crypt.visible = true;
     room.sync(world);
     expect(parts.G_INT_Trophy_hollow_crypt.visible).toBe(true);
+  });
+
+  it("keeps an unearned trophy hidden through the low tier's interior cull, a mesh part too", () => {
+    // the painted rebuild carries each trophy and gilding in one material, so each loads as one
+    // bare mesh: the very object the interior cull (placed_town_buildings.ts) flips
+    const root = new THREE.Group();
+    const guild = new THREE.Group();
+    guild.name = 'highwatchBuilding:highwatch_guild';
+    const meshes: Record<string, THREE.Mesh> = {};
+    for (const dungeon of GUILD_TROPHY_DUNGEONS) {
+      for (const name of Object.values(guildTrophyNodeNames(dungeon))) {
+        const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+        mesh.name = name;
+        mesh.position.set(1, 2, 3);
+        guild.add(mesh);
+        meshes[name] = mesh;
+      }
+    }
+    root.add(guild);
+    root.updateMatrixWorld(true);
+    const before = meshes.G_INT_Trophy_hollow_crypt.matrixWorld.clone();
+    const room = createGuildTrophyRoom(root);
+    const world = { deedStats: { dungeonClears: { hollow_crypt: 1 } } } as never;
+    room.sync(world);
+    const shown = (name: string) => {
+      let node: THREE.Object3D | null = meshes[name];
+      while (node) {
+        if (!node.visible) return false;
+        node = node.parent;
+      }
+      return true;
+    };
+    expect(shown('G_INT_Trophy_hollow_crypt')).toBe(true);
+    expect(shown('G_INT_Trophy_sunken_bastion')).toBe(false);
+    expect(shown('G_INT_TrophyGilt_hollow_crypt')).toBe(false);
+    // the cull hides every interior mesh as the viewer walks away, then re-shows them all
+    for (const mesh of Object.values(meshes)) mesh.visible = false;
+    room.sync(world);
+    for (const mesh of Object.values(meshes)) mesh.visible = true;
+    room.sync(world);
+    expect(shown('G_INT_Trophy_hollow_crypt')).toBe(true);
+    expect(shown('G_INT_Trophy_sunken_bastion')).toBe(false);
+    expect(shown('G_INT_TrophyGilt_hollow_crypt')).toBe(false);
+    // the holder stands where the mesh did: the part has not moved, and keeps its name
+    root.updateMatrixWorld(true);
+    expect(meshes.G_INT_Trophy_hollow_crypt.matrixWorld.equals(before)).toBe(true);
+    expect(guild.getObjectByName('G_INT_Trophy_hollow_crypt')).toBe(
+      meshes.G_INT_Trophy_hollow_crypt,
+    );
+    // a group part is flipped as itself
+    const group = new THREE.Group();
+    expect(visibilityNode(group)).toBe(group);
   });
 });

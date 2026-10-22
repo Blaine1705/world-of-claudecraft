@@ -8,7 +8,13 @@
 // Driven from the Highwatch town view's update (highwatch_town.ts). The parts are bound once
 // the guild's model has loaded (retried on a slow cadence until then), and re-applied only
 // when the viewer's clear records move.
-import type * as THREE from 'three';
+//
+// A part the model carries in one material loads as one bare mesh, and the low tier's interior
+// cull (placed_town_buildings.ts) flips `visible` on that same mesh as the viewer walks out of
+// and back into its range: shared, the cull's re-show would show a trophy the viewer has not
+// earned. So the room flips a holder group of its own round such a part (visibilityNode), never
+// the mesh, and the two flags multiply.
+import * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import {
   GUILD_TROPHY_DUNGEONS,
@@ -31,6 +37,20 @@ export interface GuildTrophyRoom {
   sync(world: Pick<IWorld, 'deedStats'>): void;
 }
 
+/** The node the room flips for a part: the part itself when it loaded as a group of meshes (the
+ *  cull flips those meshes, never the group), or a holder group put round it, in its place and
+ *  with no transform of its own, when it loaded as one bare mesh. */
+export function visibilityNode(part: THREE.Object3D): THREE.Object3D {
+  const parent = part.parent;
+  if (!(part as THREE.Mesh).isMesh || !parent) return part;
+  const holder = new THREE.Group();
+  holder.name = `${part.name}:trophyRoom`;
+  parent.add(holder);
+  holder.add(part);
+  holder.updateMatrixWorld(true);
+  return holder;
+}
+
 export function createGuildTrophyRoom(townGroup: THREE.Object3D): GuildTrophyRoom {
   let parts: BoundParts[] | null = null;
   let applied = -1;
@@ -47,7 +67,11 @@ export function createGuildTrophyRoom(townGroup: THREE.Object3D): GuildTrophyRoo
       if (!trophy || !gilt) return null;
       found.push({ trophy, gilt });
     }
-    return found;
+    // (only once every part is there, so a half-loaded model is never wrapped)
+    return found.map(({ trophy, gilt }) => ({
+      trophy: visibilityNode(trophy),
+      gilt: visibilityNode(gilt),
+    }));
   };
 
   return {
