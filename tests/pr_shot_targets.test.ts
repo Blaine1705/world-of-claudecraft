@@ -1226,3 +1226,42 @@ describe('the Materials Vault evidence target', () => {
     expect(target.capture.toString()).toContain('signedSpecial');
   });
 });
+
+describe('the Drowned Gate Tower night target', () => {
+  it('routes both entrance halves and seeds the medium preset, the lowest that draws the whole gate layer', async () => {
+    for (const path of [
+      'src/render/sunken_bastion_entrance.ts',
+      'src/render/sunken_bastion_entrance_core.ts',
+    ]) {
+      expect(
+        classifyDiff([path]).specific.map((target: { key: string }) => target.key),
+        path,
+      ).toEqual(['sunken-bastion-entrance-night']);
+    }
+    const target = classifyDiff(['src/render/sunken_bastion_entrance_core.ts']).specific[0];
+    expect(target.variants.map((variant: { key: string }) => variant.key)).toEqual([
+      'gate-at-the-crest',
+      'from-the-east-ridge',
+    ]);
+    // the gate leg at the beacon's crest, the ridge leg where the beam rose
+    expect(target.variants.map((variant: { spot: { turn: number } }) => variant.spot.turn)).toEqual(
+      [0, 255],
+    );
+    for (const variant of target.variants) {
+      const storageSeeds: string[] = [];
+      await variant.beforeLoad({
+        async evaluateOnNewDocument(script: string) {
+          storageSeeds.push(script);
+        },
+      });
+      expect(storageSeeds.join('\n').match(/graphicsPreset = \d/g), variant.key).toEqual([
+        'graphicsPreset = 2',
+      ]);
+    }
+    // night, after the zone-entry vista, held at one turn of the beacon
+    const capture = target.capture.toString();
+    expect(capture).toContain('setDayNightPhaseOverride(0)');
+    expect(capture).toContain('camDirector?.kind == null');
+    expect(capture).toContain('BASTION_BEACON.period');
+  });
+});
