@@ -287,6 +287,9 @@ export class LowSceneryBands {
               const matName = part.source.material.name;
               const regional = palmBudgetTree(item.x, item.z, item.owner.name, matName, palm);
               const isBark = /^Bark_/i.test(matName);
+              if (item.owner.name === 'jungle-features' && matName === 'Atlas') {
+                return { triangles: 256, mode: 'palm' };
+              }
               if (index === 0) {
                 if (isBark) return { triangles: 48, mode: 'coarse' };
                 return { triangles: regional ? 256 : 512, mode: regional ? 'palm' : 'quality' };

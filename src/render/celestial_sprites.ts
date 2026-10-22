@@ -291,19 +291,6 @@ function paintMoonFace(
   ctx.fillRect(0, 0, MOON_TEX, MOON_TEX);
   paintMoonMaria(ctx, lowGfx);
   paintMoonCraters(ctx, rnd, lowGfx);
-  if (lowGfx) {
-    // Low keeps a bright daytime sky and no bloom pass, so a dark-shaded limb
-    // under NormalBlending would read as a grey smudge darker than the sky
-    // behind it; feathering alpha toward the shaded limb lets the sky show
-    // through the shadow the same way the phase terminator does.
-    const limbFade = ctx.createLinearGradient(64, 64, 214, 214);
-    limbFade.addColorStop(0, 'rgba(0, 0, 0, 0)');
-    limbFade.addColorStop(0.48, 'rgba(0, 0, 0, 0)');
-    limbFade.addColorStop(1, 'rgba(0, 0, 0, 0.52)');
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.fillStyle = limbFade;
-    ctx.fillRect(0, 0, MOON_TEX, MOON_TEX);
-  }
   ctx.restore(); // drops the clip AND the composite mode together
   if (term && term.litFrac < 0.985) paintMoonPhaseShadow(ctx, term);
 }

@@ -1138,7 +1138,9 @@ export function buildSky(
       setCameraPos: (x, z) => {
         current = biomeBlendAt(x, z);
       },
-      setDayNight: () => {},
+      setDayNight: (mul) => {
+        dome.material.color.setRGB(mul[0], mul[1], mul[2]);
+      },
       setCycle: () => {},
       setFog: () => {},
       setStars: () => {},

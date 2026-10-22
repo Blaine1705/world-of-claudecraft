@@ -5156,9 +5156,9 @@ export class Renderer {
     // it there left a black void above the ramparts).
     this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
+      this.skyView.setDayNight(this.dnGrade.sky);
       hoardValley.setSkyCamera(this.skyView, this.sim.riftFloor, this.camera.position, dt);
       if (!this.lowGfx) {
-        this.skyView.setDayNight(this.dnGrade.sky);
         this.skyView.setCycle(
           this.sunDir,
           duskWarmAmount(this.sunDir.y),
@@ -8908,9 +8908,11 @@ export class Renderer {
       applyRiftLightRig(this.riftFogAuthored, targets);
       return;
     }
+    const baseSun = this.lowGfx ? lowSunIntensity(GFX) : SUN_INTENSITY;
+    const baseHemi = this.lowGfx ? lowHemiIntensity(GFX) : hemiOutdoorIntensity();
     applyInteriorLightRig(state, targets, {
-      sunIntensity: SUN_INTENSITY * this.dnGrade.lightScale,
-      hemiIntensity: hemiOutdoorIntensity() * this.dnGrade.ambientScale,
+      sunIntensity: baseSun * this.dnGrade.lightScale,
+      hemiIntensity: baseHemi * this.dnGrade.ambientScale,
       envIntensity: this.envOutdoorIntensity * this.dnGrade.ambientScale,
     });
   }
@@ -9215,9 +9217,7 @@ export class Renderer {
         fog.far = style.fog.far;
       }
       this.fogState = 'rift';
-      if (!this.lowGfx) {
-        this.applyStateLightRig('rift');
-      }
+      this.applyStateLightRig('rift');
       return;
     }
     this.riftFogKey = null;
@@ -9228,9 +9228,7 @@ export class Renderer {
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead, silhouettes must split from the murk.
       // Which numbers each state means is interior_light_rig.ts's to own.
-      if (!this.lowGfx) {
-        this.applyStateLightRig(desired);
-      }
+      this.applyStateLightRig(desired);
       return;
     }
     // Outdoors, fog is also the residency boundary. Pull it inward immediately
@@ -9351,7 +9349,6 @@ export class Renderer {
       const preset =
         desired === 'battleground' ? BATTLEGROUND_FOG : (valley?.fog ?? this.outdoorFogPreset());
       const k = transitionAlpha(dt, ZONE_ENVIRONMENT_RESPONSE);
-      if (this.lowGfx) return;
       // fog color: the biome hue multiplied by the day/night color (a dark
       // dusk-blue by night)
       this.fogScratch.setHex(preset.color);
@@ -9434,13 +9431,14 @@ export class Renderer {
       this.dnColorScratch.g *= realmTint[1];
       this.dnColorScratch.b *= realmTint[2];
       this.hemi.groundColor.lerp(this.dnColorScratch, k);
+      const baseSun = this.lowGfx ? lowSunIntensity(GFX) : SUN_INTENSITY;
+      const baseHemi = this.lowGfx ? lowHemiIntensity(GFX) : hemiOutdoorIntensity();
       this.sun.intensity +=
-        (SUN_INTENSITY * g.lightScale * (light.sunScale ?? 1) - this.sun.intensity) * k;
+        (baseSun * g.lightScale * (light.sunScale ?? 1) - this.sun.intensity) * k;
       // The ambient half rides its own higher night floor, so terrain shape and
       // body silhouettes survive deep night while the moon key light stays dim.
       this.hemi.intensity +=
-        (hemiOutdoorIntensity() * g.ambientScale * (light.hemiScale ?? 1) - this.hemi.intensity) *
-        k;
+        (baseHemi * g.ambientScale * (light.hemiScale ?? 1) - this.hemi.intensity) * k;
       // The character rim (the cheapest silhouette separator the renderer owns:
       // one shared uniform, no extra draw, every rig at once) lifts after dark
       // for the same reason the ambient floor does. Outdoors this is the only
@@ -9500,6 +9498,7 @@ export class Renderer {
   // Aim the key light (sun by day, moon by night) at the player. On the low tier
   // day/night is off, so it keeps the fixed anchor for a stable, cheap look.
   private updateKeyLight(pp: THREE.Vector3): void {
+    setWaterDayNight(this.dnGrade.fog);
     if (this.lowGfx && !this.sun.castShadow) return;
     // Follow the player in whole shadow-map texel steps, not raw sub-texel
     // ones: position and target translate together, so the light DIRECTION
@@ -9517,6 +9516,7 @@ export class Renderer {
         anchor.y + SUN_ANCHOR.y,
         anchor.z + SUN_ANCHOR.z,
       );
+      setWaterDayNight(this.dnGrade.fog);
     } else {
       // the key light hands off from the sun to the moon across the terminator.
       // Blend the two directions smoothly (rather than a hard switch) as the sun
@@ -11764,9 +11764,9 @@ export class Renderer {
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
+      this.skyView.setDayNight(this.dnGrade.sky);
       hoardValley.setSkyCamera(this.skyView, this.sim.riftFloor, this.camera.position, dt);
       if (!this.lowGfx) {
-        this.skyView.setDayNight(this.dnGrade.sky);
         this.skyView.setCycle(
           this.sunDir,
           duskWarmAmount(this.sunDir.y),

@@ -80,6 +80,10 @@ describe('jungle coconut integration', () => {
       const view = buildJungleFeatures(42);
       expect(coconuts(view.group)).toHaveLength(1);
       expect(coconuts(view.group)[0].count).toBe(reachCoconutSpots(42).length);
+      const banyans = view.group.children.filter(
+        (child) => !(child as THREE.Mesh).isMesh && child.children.length === 2,
+      );
+      expect(banyans.length).toBeGreaterThan(0);
       view.dispose();
     } finally {
       restore();

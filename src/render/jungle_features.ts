@@ -383,7 +383,9 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
         const y = terrainHeight(t.x, t.z, seed);
         if (y < WATER_LEVEL) continue;
         const scale = t.r * (2.5 + hash2(t.x, t.z, seed + 5201) * 0.5);
+        let banyan: THREE.Group | null = null;
         if (!trunksArePlacements) {
+          banyan = new THREE.Group();
           const tree = greatTreeScene.clone(true);
           tree.position.set(t.x, y - 0.2, t.z);
           tree.scale.setScalar(scale);
@@ -398,7 +400,8 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
                 : lushen(mesh.material);
             }
           });
-          group.add(tree);
+          banyan.add(tree);
+          group.add(banyan);
         }
         // the buttress roots: tapered flares leaning into the trunk base,
         // so the giant reads rooted instead of set down
@@ -415,7 +418,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
           g.translate(t.x + Math.sin(ang) * len, y - 0.3, t.z + Math.cos(ang) * len);
           treeRootParts.push(g.toNonIndexed());
         }
-        if (treeRootParts.length > 0) group.add(mergeBoxes(treeRootParts, barkMat));
+        if (treeRootParts.length > 0) (banyan ?? group).add(mergeBoxes(treeRootParts, barkMat));
         // the vine curtain: strands hung in a ring under the crown, plus an
         // inner ring so the canopy reads properly overgrown
         const crownR = scale * 1.6;

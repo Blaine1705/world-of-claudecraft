@@ -106,6 +106,8 @@ describe('water follows the cycle (source pins)', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     expect(source).toContain('setWaterSunDirection(this.lightDir);');
     expect(source).toContain('setWaterDayNight(this.dnGrade.fog);');
+    const sky = readFileSync(new URL('../src/render/sky.ts', import.meta.url), 'utf8');
+    expect(sky).toContain('dome.material.color.setRGB(mul[0], mul[1], mul[2]);');
   });
 
   it('precipitation follows the cycle too, or snow falls white at midnight', () => {
