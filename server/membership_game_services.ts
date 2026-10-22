@@ -262,19 +262,30 @@ export class MembershipGameServices {
         session,
         async () => {
           clearTimeout(timer);
-          if (!sameLeg() || !session.leaseNonce) return;
+          if (!sameLeg()) return;
           const snap = this.host.capture(session.characterId);
-          // The captured courier must be the live one, leg and all.
-          if (!snap || JSON.stringify(snap.state.courier?.account) !== JSON.stringify(leg)) return;
+          // The captured courier must be the live one, leg and all; a leg that
+          // cannot be captured or fenced can never run, so its stacks ride home.
+          if (
+            !session.leaseNonce ||
+            !snap ||
+            JSON.stringify(snap.state.courier?.account) !== JSON.stringify(leg)
+          ) {
+            abandon();
+            return;
+          }
+          const leaseNonce = session.leaseNonce;
           const save: CharacterSaveArgs = {
             ...snap,
             characterId: session.characterId,
-            leaseNonce: session.leaseNonce,
+            leaseNonce,
           };
+          // A thrown write rolled back (a lost COMMIT acknowledgement returns
+          // 'uncertain' instead), so its stacks ride home rather than retry forever.
           const result = await transferCourierAccountLeg({
             accountId: session.accountId,
             characterId: session.characterId,
-            leaseNonce: session.leaseNonce,
+            leaseNonce,
             state: snap.state,
             membership,
             storageEffects: snap.storageEffects,
@@ -285,6 +296,9 @@ export class MembershipGameServices {
             fits: (cargo) =>
               cargo.length <= COURIER_CAPACITY &&
               courierPayloadFits({ cargo, withdrawals: [] }, COURIER_ADMISSION_BYTES),
+          }).catch((error: unknown) => {
+            console.error('courier account leg write failed:', error);
+            return { ok: false as const, error: 'unavailable' as const };
           });
           if (!result.ok) {
             if (result.error === 'uncertain' || result.error === 'lease_lost') {

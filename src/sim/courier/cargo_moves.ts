@@ -14,10 +14,11 @@ export function withdrawOriginal(
   index: number,
   original: InvSlot,
   cargo: InvSlot[],
+  capacity = COURIER_CAPACITY,
 ): number {
   const current = source[index];
   if (!current || current.itemId !== original.itemId || current.count < original.count) return 0;
-  const pools = { general: COURIER_CAPACITY, materials: 0 };
+  const pools = { general: capacity, materials: 0 };
   if (original.instance && !isMaterialItemId(original.itemId) && current.count > original.count) {
     const remaining = cloneInvSlot(current);
     remaining.count -= original.count;

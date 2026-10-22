@@ -193,4 +193,39 @@ describe('planCourierAccountExchange', () => {
     expect(refused.cargo).toEqual([]);
     expect(refused.bank.inventory).toMatchObject([bread(5)]);
   });
+
+  describe('courier custody budget across legs', () => {
+    it('leaves room for the other-character leg when vault rows come back', () => {
+      const f = fixture(() => 'pending');
+      f.meta.vault.upgrades = 5;
+      f.meta.vault.stock = { copper_ore: 200, linen_scrap: 200, wolf_fang: 200 };
+      f.meta.inventory = [potion(1), potion(2)];
+      expect(
+        courierDispatch(
+          f.ctx,
+          {
+            deposits: [],
+            withdrawals: [],
+            vaultWithdrawals: [
+              { itemId: 'copper_ore', count: 200 },
+              { itemId: 'linen_scrap', count: 200 },
+              { itemId: 'wolf_fang', count: 200 },
+            ],
+            account: {
+              characterId: 12,
+              deposits: [pick(f.meta.inventory, 0), pick(f.meta.inventory, 1)],
+              withdrawals: [],
+            },
+          },
+          1,
+        ),
+      ).toBe(true);
+      for (let i = 0; i < 400 && !f.meta.courier?.banked; i++) f.tick();
+      const courier = f.meta.courier!;
+      expect(courier.cargo.length + (courier.account?.cargo.length ?? 0)).toBeLessThanOrEqual(24);
+      // The custody a save would write must load again.
+      const saved = JSON.parse(JSON.stringify(savedCourierState(courier)));
+      expect(() => sanitizeCourierState(saved, 'Courier test')).not.toThrow();
+    });
+  });
 });

@@ -172,4 +172,40 @@ describe('courier Materials Vault leg', () => {
     expect(home?.vaultCargo).toBeUndefined();
     expect(home?.cargo).toMatchObject([ore(5)]);
   });
+
+  it('brings back exactly the picked identity row even when a deposit merged into it', () => {
+    const f = fixture(5);
+    const picked: InvSlot = {
+      itemId: 'copper_ore',
+      count: 4,
+      materialSources: [{ source: { signer: 'C' }, count: 4 }],
+    };
+    f.meta.vault.special = [structuredClone(picked)];
+    f.meta.inventory = [
+      {
+        itemId: 'copper_ore',
+        count: 2,
+        materialSources: [
+          { source: { signer: 'A' }, count: 1 },
+          { source: { signer: 'B' }, count: 1 },
+        ],
+      },
+    ];
+    const row = { itemId: 'copper_ore', count: 4, special: pick(f.meta.vault.special) };
+    expect(
+      courierDispatch(
+        f.ctx,
+        {
+          deposits: [],
+          withdrawals: [],
+          vaultDeposits: [pick(f.meta.inventory)],
+          vaultWithdrawals: [row],
+        },
+        1,
+      ),
+    ).toBe(true);
+    f.finish();
+    expect(f.meta.inventory).toEqual([picked]);
+    expect(f.meta.vault.special).toMatchObject([{ itemId: 'copper_ore', count: 2 }]);
+  });
 });

@@ -143,4 +143,16 @@ describe('courier other-character leg on the server', () => {
       'courier account leg projection',
     );
   });
+
+  it('sends the stacks home when the write throws (it rolled back), never retrying forever', async () => {
+    const r = rig();
+    transfer.mockRejectedValue(new Error('malformed target bank'));
+    const quiet = vi.spyOn(console, 'error').mockImplementation(() => {});
+    r.services.courierAccountExchange(1);
+    await r.settle();
+    quiet.mockRestore();
+    expect(r.meta.courier.account).toBeUndefined();
+    expect(r.meta.courier.cargo).toHaveLength(2);
+    expect(r.host.quarantine).not.toHaveBeenCalled();
+  });
 });

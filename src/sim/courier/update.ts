@@ -4,6 +4,7 @@ import { bankPools, bumpBankWireRev, moveBetweenContainers } from '../bank';
 import { INSTANCE_X_BASE } from '../data';
 import { isMaterialItemId } from '../material_ids';
 import { normalizeLoadedMaterialSlot } from '../material_slot_load';
+import type { MaterialComposition } from '../material_sources';
 import { vaultDepositFromCourier, vaultWithdrawToCourier } from '../materials_vault';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -45,7 +46,12 @@ function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: Cour
   // Deposits only top up existing indices or append. Resolve identities before
   // those top-ups, then withdraw descending indices and the original quantities.
   let selected: ({ slot: InvSlot; index: number } | null)[] = [];
-  let vaultSelected: { itemId: string; count: number | undefined; ref?: VaultSpecialRef }[] = [];
+  let vaultSelected: {
+    itemId: string;
+    count: number | undefined;
+    ref?: VaultSpecialRef;
+    sources?: MaterialComposition;
+  }[] = [];
   const deposit = () => {
     // Vault rows resolve before any deposit can merge into (and so re-key) the
     // identity row the player picked. Pooled stock pays the count shown; an
@@ -64,6 +70,9 @@ function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: Cour
             instance: row.instance,
             craftedRecipeId: row.craftedRecipeId,
           },
+          // A vault deposit may merge into this very row before the withdrawal:
+          // take back exactly the picked buckets, never the ones just deposited.
+          ...(row.materialSources ? { sources: row.materialSources } : {}),
         },
       ];
     });
@@ -86,6 +95,11 @@ function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: Cour
     state.cargo.push(...vaultCargo);
     delete state.vaultCargo;
   };
+  // Stacks the other-character leg still carries share the courier's 24-stack
+  // and byte budgets with everything these withdrawals bring back.
+  const room = () => COURIER_CAPACITY - (state.account?.cargo.length ?? 0);
+  const fits = (cargo: readonly InvSlot[]) =>
+    courierPayloadFits({ cargo, account: state.account, withdrawals: [] }, COURIER_ADMISSION_BYTES);
   const withdraw = () => {
     for (const selection of selected) {
       if (!selection) continue;
@@ -95,21 +109,20 @@ function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: Cour
       // Packing can split a tolerated legacy over-stack or expand provenance.
       // Preflight one source slot and bounded cargo, never clone the whole bank.
       const plannedCargo = state.cargo.map(cloneInvSlot);
-      withdrawOriginal([cloneInvSlot(current)], 0, slot, plannedCargo);
-      if (!courierPayloadFits({ cargo: plannedCargo, withdrawals: [] }, COURIER_ADMISSION_BYTES))
-        continue;
-      withdrawOriginal(meta.bank.inventory, index, slot, state.cargo);
+      withdrawOriginal([cloneInvSlot(current)], 0, slot, plannedCargo, room());
+      if (!fits(plannedCargo)) continue;
+      withdrawOriginal(meta.bank.inventory, index, slot, state.cargo, room());
     }
-    for (const { itemId, count, ref } of vaultSelected) {
+    for (const { itemId, count, ref, sources } of vaultSelected) {
       vaultWithdrawToCourier(
         meta,
         state.cargo,
-        { general: COURIER_CAPACITY, materials: 0 },
+        { general: room(), materials: 0 },
         itemId,
         count,
         ref,
-        (planned) =>
-          courierPayloadFits({ cargo: planned, withdrawals: [] }, COURIER_ADMISSION_BYTES),
+        fits,
+        sources,
       );
     }
   };

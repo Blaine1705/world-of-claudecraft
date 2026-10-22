@@ -818,8 +818,10 @@ export function vaultWithdrawToCourier(
   count: number | undefined,
   specialRef: VaultSpecialRef | undefined,
   fits: (plannedCargo: readonly InvSlot[]) => boolean,
+  sources?: MaterialComposition,
 ): boolean {
   if (typeof itemId !== 'string' || itemId === '') return false;
+  const selection = sources ? { sources } : undefined;
   const trial = {
     ...meta.vault,
     stock: { ...meta.vault.stock },
@@ -827,11 +829,11 @@ export function vaultWithdrawToCourier(
   };
   const plannedCargo = cargo.map(cloneInvSlot);
   if (
-    withdrawVaultInto(trial, plannedCargo, pools, itemId, count, specialRef, undefined) !== 'moved'
+    withdrawVaultInto(trial, plannedCargo, pools, itemId, count, specialRef, selection) !== 'moved'
   )
     return false;
   if (!fits(plannedCargo)) return false;
-  if (withdrawVaultInto(meta.vault, cargo, pools, itemId, count, specialRef, undefined) !== 'moved')
+  if (withdrawVaultInto(meta.vault, cargo, pools, itemId, count, specialRef, selection) !== 'moved')
     return false;
   bumpVaultWireRev(meta);
   return true;
