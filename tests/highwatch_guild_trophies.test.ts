@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { GUILD_TROPHY_DUNGEONS as BUILT } from '../scripts/assets/highwatch_guild/build.mjs';
+import { buildPlacedTownBuilding } from '../src/render/eastbrook_placed_building';
 import { createGuildTrophyRoom, visibilityNode } from '../src/render/highwatch_guild_trophies';
 import {
   GUILD_TROPHY_DUNGEONS,
@@ -12,6 +13,13 @@ import {
   guildTrophySignatureOf,
   guildTrophyStates,
 } from '../src/render/highwatch_guild_trophies_core';
+import { HIGHWATCH_BUILDINGS_BY_ID } from '../src/sim/highwatch_layout';
+
+/** Whether a node draws: it and every parent visible. */
+function drawn(node: THREE.Object3D | undefined | null): boolean {
+  for (; node; node = node.parent) if (!node.visible) return false;
+  return true;
+}
 
 describe('the trophy states', () => {
   it('keeps a plaque for each of the five dungeons the model carries', () => {
@@ -109,26 +117,26 @@ describe('the trophy room painter', () => {
         meshes[name] = mesh;
       }
     }
+    // placed and turned, as the town places the guild, so a holder that took any transform of
+    // its own would move the part
+    guild.position.set(5, 0.5, -7);
+    guild.rotation.y = 0.6;
+    root.position.set(100, 3, -40);
     root.add(guild);
     root.updateMatrixWorld(true);
     const before = meshes.G_INT_Trophy_hollow_crypt.matrixWorld.clone();
     const room = createGuildTrophyRoom(root);
     const world = { deedStats: { dungeonClears: { hollow_crypt: 1 } } } as never;
     room.sync(world);
-    const shown = (name: string) => {
-      let node: THREE.Object3D | null = meshes[name];
-      while (node) {
-        if (!node.visible) return false;
-        node = node.parent;
-      }
-      return true;
-    };
+    const shown = (name: string) => drawn(meshes[name]);
     expect(shown('G_INT_Trophy_hollow_crypt')).toBe(true);
     expect(shown('G_INT_Trophy_sunken_bastion')).toBe(false);
     expect(shown('G_INT_TrophyGilt_hollow_crypt')).toBe(false);
-    // the cull hides every interior mesh as the viewer walks away, then re-shows them all
+    // the cull hides every interior mesh as the viewer walks away, then re-shows them all;
+    // while culled even the earned trophy is hidden (the cull's flag and the room's multiply)
     for (const mesh of Object.values(meshes)) mesh.visible = false;
     room.sync(world);
+    expect(shown('G_INT_Trophy_hollow_crypt')).toBe(false);
     for (const mesh of Object.values(meshes)) mesh.visible = true;
     room.sync(world);
     expect(shown('G_INT_Trophy_hollow_crypt')).toBe(true);
@@ -140,8 +148,61 @@ describe('the trophy room painter', () => {
     expect(guild.getObjectByName('G_INT_Trophy_hollow_crypt')).toBe(
       meshes.G_INT_Trophy_hollow_crypt,
     );
-    // a group part is flipped as itself
+    // a group part is flipped as itself, left where it hangs; so is a mesh with no parent
+    const parent = new THREE.Group();
     const group = new THREE.Group();
+    parent.add(group);
     expect(visibilityNode(group)).toBe(group);
+    expect(group.parent).toBe(parent);
+    const loose = new THREE.Mesh();
+    expect(visibilityNode(loose)).toBe(loose);
+    expect(loose.parent).toBeNull();
+  });
+
+  it('holds over the real cull: the interiors it flips are meshes, never a part the room flips', () => {
+    // the low tier's cull flips exactly the interiors buildPlacedTownBuilding collects, which are
+    // meshes only: so a part that loads as a group (a trophy of two materials) is safe flipped
+    // as itself, and one that loads as a bare mesh (a gilding of one) needs its holder
+    const source = new THREE.Group();
+    for (const dungeon of GUILD_TROPHY_DUNGEONS) {
+      const { trophy, gilt } = guildTrophyNodeNames(dungeon);
+      const group = new THREE.Group();
+      group.name = trophy;
+      for (let i = 0; i < 2; i++) {
+        group.add(new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial()));
+      }
+      const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
+      mesh.name = gilt;
+      source.add(group, mesh);
+    }
+    const built = buildPlacedTownBuilding(
+      'highwatch',
+      HIGHWATCH_BUILDINGS_BY_ID.highwatch_guild,
+      source,
+      () => 0,
+    );
+    expect(built.interiors).toHaveLength(GUILD_TROPHY_DUNGEONS.length * 3);
+    expect(built.interiors.every((o) => (o as THREE.Mesh).isMesh)).toBe(true);
+    const root = new THREE.Group();
+    root.add(built.group);
+    const room = createGuildTrophyRoom(root);
+    const world = {
+      deedStats: { dungeonClears: { hollow_crypt: 1, 'sunken_bastion:heroic': 1 } },
+    } as never;
+    room.sync(world);
+    for (const o of built.interiors) o.visible = false;
+    room.sync(world);
+    for (const o of built.interiors) o.visible = true;
+    room.sync(world);
+    const shown = (name: string) => drawn(built.group.getObjectByName(name));
+    expect(shown('G_INT_Trophy_hollow_crypt')).toBe(true);
+    expect(shown('G_INT_TrophyGilt_hollow_crypt')).toBe(false);
+    expect(shown('G_INT_Trophy_sunken_bastion')).toBe(true);
+    expect(shown('G_INT_TrophyGilt_sunken_bastion')).toBe(true);
+    for (const dungeon of ['drowned_temple', 'wildheart_basin', 'gravewyrm_sanctum'] as const) {
+      const { trophy, gilt } = guildTrophyNodeNames(dungeon);
+      expect(shown(trophy), trophy).toBe(false);
+      expect(shown(gilt), gilt).toBe(false);
+    }
   });
 });

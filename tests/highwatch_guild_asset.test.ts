@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { type Document, type Node as GltfNode, getBounds, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
@@ -85,6 +85,7 @@ const TEXTURES = JSON.parse(
   headroom: number;
   materials: Record<string, { color: string; normal?: string; atlas?: boolean }>;
 };
+const srgbToLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
 
 let doc: Document;
 
@@ -152,7 +153,8 @@ function shape({ json }: { json: GlbJson }): string {
   });
 }
 
-/** Each image's name, type and pixel size (read from its KTX2 header). */
+/** Each image's name, type, pixel size, mip count and supercompression (read from its KTX2
+ *  header: 1 is BasisLZ, the ETC1S colour maps; 2 is Zstandard, the UASTC normal maps). */
 function images({ json, bin }: { json: GlbJson; bin: Buffer }) {
   return json.images.map((img) => {
     const view = json.bufferViews[img.bufferView];
@@ -162,6 +164,8 @@ function images({ json, bin }: { json: GlbJson; bin: Buffer }) {
       mime: img.mimeType,
       w: bin.readUInt32LE(at + 20),
       h: bin.readUInt32LE(at + 24),
+      levels: bin.readUInt32LE(at + 40),
+      scheme: bin.readUInt32LE(at + 44),
     };
   });
 }
@@ -206,9 +210,12 @@ describe('the Highwatch guild GLB', () => {
       expect(bytes.length, tier).toBe(SHIPPED[tier].bytes);
       expect(createHash('sha256').update(bytes).digest('hex'), tier).toBe(SHIPPED[tier].sha256);
       expect(bytes.toString('latin1'), tier).toContain('EXT_meshopt_compression');
+      // served under its own content hash, so a manifest left on an old export fails
       const key = tierTarget(tier).replace(/^public\//, '');
-      const stem = key.replace(/\.glb$/, '').replace(/\./g, '\\.');
-      expect(MEDIA_ASSETS[key], tier).toMatch(new RegExp(`^/media/${stem}\\.[0-9a-f]{12}\\.glb$`));
+      const stem = key.replace(/\.glb$/, '');
+      expect(MEDIA_ASSETS[key], tier).toBe(
+        `/media/${stem}.${SHIPPED[tier].sha256.slice(0, 12)}.glb`,
+      );
     }
     const credits = readFileSync(path.join(ROOT, 'CREDITS.md'), 'utf8');
     const row = credits
@@ -222,6 +229,11 @@ describe('the Highwatch guild GLB', () => {
     // the painted maps it wears and the painted props it is dressed with are named
     expect(row).toMatch(/painted/i);
     expect(row).toMatch(/Tripo/);
+    // all three tiers, under the project's own licence (the Tripo pieces are a paid plan's
+    // output: never redistributed apart from the game)
+    expect(row).toContain('guild.half.glb');
+    expect(row).toContain('guild.quarter.glb');
+    expect(row).toContain('Project asset, rights reserved | **No, permission required**');
   });
 
   it('carries the live source fingerprint on every tier, its own kit, maps and props included', async () => {
@@ -235,18 +247,34 @@ describe('the Highwatch guild GLB', () => {
         sourceFingerprint: guildSourceFingerprint(),
       });
     }
-    // a change to the guild's kit, its paint, its settling or its props re-ships it; the
-    // manor's kit it was first built with is gone from the tree and from its inputs
+    // a change to the guild's kit, its paint, its settling or its props re-ships it: every map
+    // the paint wears, the paint table, the props' manifest and pack, the shared ship kit, and
+    // every builder script in the kit's folder. Three scripts there never touch the export:
+    // guild_scene.py stages the review scene after it, props/bake_low.py bakes the props'
+    // local source pack (props_data.json and the atlas stand for its output) and
+    // render_lantern_seal_icon.py renders an item icon.
+    const kit = 'scripts/assets/highwatch_guild';
+    for (const spec of Object.values(TEXTURES.materials)) {
+      for (const file of [spec.color, spec.normal].filter((f): f is string => !!f)) {
+        expect(HIGHWATCH_GUILD_ASSET.inputs).toContain(`${kit}/${file}`);
+      }
+    }
     for (const input of [
-      'scripts/assets/highwatch_guild/guild_lib.py',
-      'scripts/assets/highwatch_guild/guild_texture.py',
-      'scripts/assets/highwatch_guild/guild_settle.py',
-      'scripts/assets/highwatch_guild/textures.json',
-      'scripts/assets/highwatch_guild/props/props_data.json',
-      'scripts/assets/highwatch_guild/tex/GuildProps_Color.jpg',
+      `${kit}/textures.json`,
+      `${kit}/props/props.json`,
+      `${kit}/props/props_data.json`,
+      'scripts/assets/eastbrook_ferry/shiplib.py',
     ]) {
       expect(HIGHWATCH_GUILD_ASSET.inputs).toContain(input);
     }
+    const offExport = ['guild_scene.py', 'props/bake_low.py', 'render_lantern_seal_icon.py'];
+    const scripts = (readdirSync(path.join(ROOT, kit), { recursive: true }) as string[])
+      .map((file) => file.split(path.sep).join('/'))
+      .filter((file) => file.endsWith('.py') && !offExport.includes(file));
+    expect(scripts.length).toBeGreaterThanOrEqual(12);
+    for (const script of scripts)
+      expect(HIGHWATCH_GUILD_ASSET.inputs).toContain(`${kit}/${script}`);
+    // the manor's kit it was first built with is gone from the tree and from its inputs
     expect(HIGHWATCH_GUILD_ASSET.inputs.some((input) => input.includes('highwatch_manor'))).toBe(
       false,
     );
@@ -300,17 +328,30 @@ describe('the Highwatch guild GLB', () => {
       const name = material.getName();
       const spec = TEXTURES.materials[name];
       const map = material.getBaseColorTexture();
+      // the vertex colour is the whole colour (times the map): no factor tints it
+      expect(material.getBaseColorFactor(), name).toEqual([1, 1, 1, 1]);
       if (!spec) {
         expect(map, name).toBeNull();
+        expect(material.getNormalTexture(), name).toBeNull();
+        // an untextured material's vertex colours are drawn as they are
+        expect(
+          (material.getExtras() as { vertexColourScale?: number }).vertexColourScale,
+          name,
+        ).toBe(undefined);
         continue;
       }
       expect(map, name).not.toBeNull();
       expect(map?.getMimeType(), name).toBe('image/ktx2');
       expect(material.getNormalTexture() !== null, name).toBe(Boolean(spec.normal));
       // the vertex colours sit under the headroom; the runtime multiplies them back
-      expect(material.getExtras(), name).toMatchObject({ vertexColourScale: VERTEX_COLOUR_SCALE });
+      // (src/render/vertex_colour_glb_parts.ts)
+      expect(material.getExtras(), name).toEqual({ vertexColourScale: VERTEX_COLOUR_SCALE });
     }
-    expect(VERTEX_COLOUR_SCALE).toBeGreaterThan(1);
+    // the factor undoes the headroom: the Blender export ships a stored colour v as
+    // srgbToLinear(v), so a tint of 1 stored at 1 / headroom draws as the map itself
+    expect(TEXTURES.headroom).toBe(1.5);
+    expect(VERTEX_COLOUR_SCALE).toBe(Number((1 / srgbToLinear(1 / TEXTURES.headroom)).toFixed(6)));
+    expect(VERTEX_COLOUR_SCALE).toBeCloseTo(2.4877, 4);
     const hue = (name: string) =>
       root
         .listMaterials()
@@ -337,10 +378,18 @@ describe('the Highwatch guild GLB', () => {
     // normal maps and the props' atlas
     expect(baseImages).toHaveLength(11);
     for (const img of baseImages) expect(img.mime).toBe('image/ktx2');
-    // the props' one atlas at its packed size (props/props.json): a re-pack at twice the side
-    // would quadruple its memory in every tier and still halve cleanly, so the size is pinned
-    const atlas = baseImages.find((img) => img.name === 'GuildProps_color');
-    expect(atlas).toMatchObject({ w: 2048, h: 5120 });
+    // at full: every tiling map at the tier table's size (the builder resizes by that table, so
+    // its numbers are pinned here too) and the props' one atlas at its packed size
+    // (props/props.json). A re-pack at twice the side would quadruple its memory in every tier
+    // and still halve cleanly, and an atlas flag dropped from textures.json squashes it square.
+    expect(HIGHWATCH_GUILD_ASSET.tiers.full).toEqual({ suffix: '', color: 1024, normal: 128 });
+    expect(TEXTURES.materials.GuildProps.atlas).toBe(true);
+    expect(baseImages.filter((img) => img.name === 'GuildProps_color')).toHaveLength(1);
+    for (const img of baseImages) {
+      const side = img.name.endsWith('_normal') ? 128 : 1024;
+      const want = img.name === 'GuildProps_color' ? { w: 2048, h: 5120 } : { w: side, h: side };
+      expect({ w: img.w, h: img.h }, img.name).toEqual(want);
+    }
     for (const tier of TIERS.filter((t) => t !== 'full')) {
       const file = readGlb(tierFile(tier));
       expect(shape(file), tier).toBe(shape(base));
@@ -350,13 +399,22 @@ describe('the Highwatch guild GLB', () => {
         images(file).map(({ name, mime, w, h }) => ({ name, mime, w, h })),
         tier,
       ).toEqual(
-        baseImages.map((img) => {
-          if (img.name.endsWith('_normal')) return { ...img, w: sizes.normal, h: sizes.normal };
-          if (img.name === 'GuildProps_color') return { ...img, w: img.w * k, h: img.h * k };
-          return { ...img, w: sizes.color, h: sizes.color };
+        baseImages.map(({ name, mime, w, h }) => {
+          if (name.endsWith('_normal')) return { name, mime, w: sizes.normal, h: sizes.normal };
+          if (name === 'GuildProps_color') return { name, mime, w: w * k, h: h * k };
+          return { name, mime, w: sizes.color, h: sizes.color };
         }),
       );
       expect(readFileSync(tierFile(tier)).length, tier).toBeLessThan(readFileSync(GLB).length);
+    }
+    // every map of every tier carries its whole mip chain, the colour maps in ETC1S (BasisLZ)
+    // and the normal maps in UASTC (Zstandard)
+    for (const tier of TIERS) {
+      for (const img of images(readGlb(tierFile(tier)))) {
+        const label = `${tier} ${img.name}`;
+        expect(img.scheme, label).toBe(img.name.endsWith('_normal') ? 2 : 1);
+        expect(img.levels, label).toBe(Math.floor(Math.log2(Math.max(img.w, img.h))) + 1);
+      }
     }
     const { full, half, quarter } = HIGHWATCH_GUILD_ASSET.tiers;
     for (const kind of ['color', 'normal'] as const) {
@@ -374,6 +432,30 @@ describe('the Highwatch guild GLB', () => {
     expect(placedTextureTierPath(model, 'quarter', exists)).toBe(
       '/models/tidehold/highwatch/guild.quarter.glb',
     );
+  });
+
+  it('ships the same geometry in every tier, only its maps resized', async () => {
+    // shape() reads each accessor's layout and bounds, never its data: decode every tier and
+    // compare each accessor's bytes, so a UV snap or a tint that varied by tier fails here
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const digests = (d: Document) =>
+      d
+        .getRoot()
+        .listAccessors()
+        .map((accessor) => {
+          const a = accessor.getArray();
+          if (!a) return '';
+          return createHash('sha256')
+            .update(Buffer.from(a.buffer, a.byteOffset, a.byteLength))
+            .digest('hex');
+        });
+    const full = digests(doc);
+    expect(full.length).toBeGreaterThan(100);
+    for (const tier of TIERS.filter((t) => t !== 'full')) {
+      expect(digests(await io.read(tierFile(tier))), tier).toEqual(full);
+    }
   });
 
   it('holds every tier to its file budget', () => {
@@ -423,6 +505,19 @@ describe('the Highwatch guild GLB', () => {
       const v1 = 1 - (top + pad) / height + slack;
       const outside = piece.uvs.filter(([u, v]) => u < u0 || u > u1 || v < v0 || v > v1);
       expect(outside.length, `${p.id} corners off its tile`).toBe(0);
+      // and the tile itself inside the atlas
+      expect(left >= 0 && top >= 0 && left + side <= width && top + side <= height, p.id).toBe(
+        true,
+      );
+    }
+    // no two tiles share a texel, or one piece would paint over another
+    for (const [i, a] of manifest.props.entries()) {
+      const [ax, ay, aSide] = a.tile;
+      for (const b of manifest.props.slice(i + 1)) {
+        const [bx, by, bSide] = b.tile;
+        const apart = ax + aSide <= bx || bx + bSide <= ax || ay + aSide <= by || by + bSide <= ay;
+        expect(apart, `${a.id} and ${b.id} share texels`).toBe(true);
+      }
     }
     // the trophy room's five trophies, its plaques and their gilding are all painted pieces
     for (const id of [
@@ -502,18 +597,33 @@ describe('the Highwatch guild GLB', () => {
     );
     const raw = readFileSync(path.join(ROOT, 'data/asset_collision_overrides.json'), 'utf8');
     expect(mergeGuildCollision(raw, written.rows)).toBe(raw);
+    // a re-export replaces the guild's row in place with every other row as it was (merging
+    // the shipped rows back restores the file byte for byte), and adds it to a table without it
+    const swapped = mergeGuildCollision(raw, { boxes: [], ramps: [] });
+    expect(swapped).not.toBe(raw);
+    const swappedTable = JSON.parse(swapped) as Record<string, unknown>;
+    expect(swappedTable[HIGHWATCH_GUILD_ASSET.collisionId]).toEqual({ boxes: [], ramps: [] });
+    expect(Object.keys(swappedTable)).toEqual(Object.keys(table));
+    expect(mergeGuildCollision(swapped, written.rows)).toBe(raw);
+    const added = mergeGuildCollision('{\n  "other": { "boxes": [] }\n}\n', written.rows);
+    expect(JSON.parse(added)).toEqual({
+      other: { boxes: [] },
+      [HIGHWATCH_GUILD_ASSET.collisionId]: written.rows,
+    });
+    expect(added.endsWith('\n}\n')).toBe(true);
   });
 });
 
 /**
  * The contacts the audit sees on the shipped model, by group (the two parts and materials, the
- * facing): how many and their area in square yards. Every one is a flush joint of the kit's own
- * shell and roof the texture-free model already had (a timber against a wall's plaster or
- * stone, a porch slate on its dressed gable, the trophy hall's posts meeting the great hall's
- * back wall), which the audit then passed as twins (one material, one colour: the same pixel).
- * The painted maps and the baked light tint each face its own way, so the audit now weighs
- * them, as it did the painted Highwatch manor on the same kit; each stays under a quarter of a
- * square yard. A new contact anywhere, or one of these grown, turns this red.
+ * facing): how many and their area in square yards. Every one is a joint of the kit's own shell
+ * and roof (a timber against a wall's plaster or stone, a porch slate on its dressed gable, the
+ * trophy hall's posts meeting the great hall's back wall, two slate courses lapping a finger's
+ * width apart at the front eave), which the audit passed as twins while the model wore no maps
+ * (one material, one colour: the same pixel). The painted maps and the baked light tint each
+ * face its own way, so the audit now weighs them, as it did the painted Highwatch manor on the
+ * same kit. The largest, the eave's lap, is about a quarter of a square yard. A new contact
+ * anywhere, or one of these grown, turns this red.
  */
 const KNOWN_CONTACTS: Record<string, { hits: number; area: number }> = {
   'GuildRoof/GuildSlate x GuildRoof/GuildSlate n=0,0.8,-0.6': { hits: 1, area: 0.254 },
@@ -545,6 +655,11 @@ describe('the Highwatch guild has no coplanar faces fighting in the depth buffer
     expect(
       visible.filter((hit) => !hit.parts.every((part) => frame.test(part))).map(label),
     ).toEqual([]);
+    // and not vacuous outside the frame: the props, the rugs and the paving lie flush on what
+    // they stand on in hundreds of places the visibility pass has to clear
+    expect(
+      all.filter((hit) => !hit.parts.every((part) => frame.test(part))).length,
+    ).toBeGreaterThan(200);
     const groups: Record<string, { hits: number; area: number }> = {};
     for (const hit of visible) {
       const key = `${[...hit.parts].sort().join(' x ')} n=${hit.normal.join(',')}`;
