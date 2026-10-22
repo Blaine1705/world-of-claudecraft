@@ -1219,7 +1219,7 @@ export const it_IT: EnTranslations = {
         },
         "rimelight_staff": {
           "name": "Rimelight Staff",
-          "look": "Pale shaft bound in silver and wound with glowing rime, crowned by a silver claw holding a great crystal of cold light inside a crown of ice shards, icicles hanging from its collar.",
+          "look": "Pale shaft bound in silver and wound with glowing rime, crowned by a silver claw holding a great crystal of cold light inside a crown of splintered ice, icicles hanging from its collar.",
           "lore": "Lantern Hall's winter watch carried staves like this along the high road, their crowns lit for travellers lost in the snow. Garrick keeps one on the rack for members with seals to spare. The frost and its cold light are only a look."
         },
         "duskwick_staff": {
