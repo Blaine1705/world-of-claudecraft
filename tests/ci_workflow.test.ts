@@ -582,9 +582,12 @@ describe('CI workflow parity', () => {
     // v0.43 release batches cannot update workflow files with their current
     // push credentials. Keep discovering this reference, but do not require
     // the sparse cone to grow until a workflow-scoped follow-up can land it.
+    // (Lantern Hall's shop preview script writes under highwatch-guild, from a
+    // branch pushed without the workflow scope too.)
     const workflowScopedFollowup = new Set([
       'charselect-zone',
       'dash-speed-stack',
+      'highwatch-guild',
       'nythraxis-dread-curse-swap',
     ]);
     for (const dir of workflowScopedFollowup) {
