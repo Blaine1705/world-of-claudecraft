@@ -5107,6 +5107,9 @@ export class Sim {
       },
       reserveVaultConsumption,
       courierBankExchange,
+      get courierAccountExchange() {
+        return sim.courierAccountExchange;
+      },
       // A2: duel + arena state stays on Sim, exposed as live views (backing fields
       // mutated in place / the queues reassigned by the matchmaker filter).
       get trades() {
@@ -10677,6 +10680,8 @@ export class Sim {
   courierVaultInfoFor(pid: number) {
     return courierMod.courierVaultInfoFor(this.ctx, pid);
   }
+  /** The server's other-character leg (membership services install it). */
+  courierAccountExchange?: courierMod.CourierAccountExchange;
   courierVaultTripFor(pid: number) {
     return courierMod.courierVaultTripFor(this.ctx, pid);
   }

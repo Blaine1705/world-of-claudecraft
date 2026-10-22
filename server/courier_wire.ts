@@ -19,7 +19,15 @@ import {
 } from './storage_admission';
 import { vaultLedgerKeyCount } from './vault_ledger_row_bound';
 
-const DISPATCH_KEYS = ['t', 'cmd', 'deposits', 'withdrawals', 'vaultDeposits', 'vaultWithdrawals'];
+const DISPATCH_KEYS = [
+  't',
+  'cmd',
+  'deposits',
+  'withdrawals',
+  'vaultDeposits',
+  'vaultWithdrawals',
+  'account',
+];
 
 function readSelections(value: unknown): { index: number; fingerprint: string }[] | null {
   if (!Array.isArray(value)) return null;
@@ -94,6 +102,28 @@ export function readCourierDispatch(value: Record<string, unknown>): CourierDisp
     if (!vaultWithdrawals) return null;
     request.vaultWithdrawals = vaultWithdrawals;
   }
+  if (value.account !== undefined) {
+    const account = value.account as Record<string, unknown> | null;
+    if (
+      !account ||
+      typeof account !== 'object' ||
+      Array.isArray(account) ||
+      Object.keys(account).some(
+        (key) => !['characterId', 'deposits', 'withdrawals'].includes(key),
+      ) ||
+      !Number.isSafeInteger(account.characterId) ||
+      (account.characterId as number) <= 0
+    )
+      return null;
+    const accountDeposits = readSelections(account.deposits);
+    const accountWithdrawals = readSelections(account.withdrawals);
+    if (!accountDeposits || !accountWithdrawals) return null;
+    request.account = {
+      characterId: account.characterId as number,
+      deposits: accountDeposits,
+      withdrawals: accountWithdrawals,
+    };
+  }
   if (
     // Zero selections is the courier dismissal (the window closed unsent).
     courierSelectionCount(request) > 24 ||
@@ -160,17 +190,19 @@ export function emitCourierSelfKeys(
         vault,
         vaultCargo,
         vaultWithdrawals,
+        account,
         ...data
       } = info;
       emit('courierData', data);
       // Its own key: older clients reject any courierData key they do not know.
-      emit('courierVault', {
+      emit('courierStores', {
         vault: vault ?? null,
         vaultCargo: vaultCargo ?? [],
         vaultWithdrawals: vaultWithdrawals ?? [],
+        account: account ?? null,
       });
     }
-    if (!info) emit('courierVault', null);
+    if (!info) emit('courierStores', null);
     session.lastCourierWireRevision = revision;
   }
 }

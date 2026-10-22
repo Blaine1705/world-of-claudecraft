@@ -273,4 +273,65 @@ describe('courier window', () => {
     root.querySelector<HTMLButtonElement>('.courier-store-tab[data-tab="vault"]')!.click();
     expect(root.textContent).toContain('Unlock the Materials Vault');
   });
+
+  it('plans a delivery to another character from the Other characters tab', () => {
+    const { root, deps, window, replaceBags } = rig();
+    let accounts: import('../src/world_api/bank').AccountBankInfo | null = null;
+    const requestAccountBanks = vi.fn();
+    const selectAccountBank = vi.fn();
+    Object.assign(deps, {
+      accountBanks: () => accounts,
+      requestAccountBanks,
+      selectAccountBank,
+    });
+    replaceBags([
+      { itemId: 'healing_potion', count: 3 },
+      { itemId: 'membership_helmet', count: 1 },
+    ]);
+    window.render(true);
+    root.querySelector<HTMLButtonElement>('.courier-store-tab[data-tab="account"]')!.click();
+    expect(requestAccountBanks).toHaveBeenCalledWith(true);
+    expect(root.textContent).toContain('Loading your characters');
+    accounts = {
+      characters: [{ characterId: 12, name: 'Alt' }],
+      selectedCharacterId: 12,
+      bank: {
+        slots: [{ itemId: 'wolf_fang', count: 5 }],
+        capacity: 24,
+        purchasedSlots: 0,
+        bonusSlots: 0,
+        nextExpansionCost: null,
+        bonusSources: [],
+        socketsUnlocked: 0,
+        socketBags: [null, null, null, null],
+        nextSocketCost: null,
+        generalCapacity: 24,
+        materialsCapacity: 0,
+        generalUsed: 1,
+        materialsUsed: 0,
+      },
+    };
+    window.refreshIfChanged();
+    expect(root.querySelector('[data-courier-storage="account"] h3')?.textContent).toBe(
+      "Alt's bank",
+    );
+    // Soulbound gear cannot go to another character.
+    expect(
+      root.querySelector<HTMLButtonElement>(
+        '[data-courier-side="accountDeposits"][data-courier-index="1"]',
+      )!.disabled,
+    ).toBe(true);
+    root
+      .querySelector<HTMLButtonElement>(
+        '[data-courier-side="accountDeposits"][data-courier-index="0"]',
+      )!
+      .click();
+    root.querySelector<HTMLButtonElement>('[data-courier-side="accountWithdrawals"]')!.click();
+    root.querySelector<HTMLButtonElement>('.courier-send')!.click();
+    expect(deps.dispatch.mock.calls[0][0]).toMatchObject({
+      deposits: [],
+      withdrawals: [],
+      account: { characterId: 12, deposits: [{ index: 0 }], withdrawals: [{ index: 0 }] },
+    });
+  });
 });

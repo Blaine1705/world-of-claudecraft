@@ -88,6 +88,19 @@ export function validCourierRequest(raw: unknown): raw is CourierDispatchRequest
   )
     return false;
   if (r.vaultWithdrawals !== undefined && !validVaultSelections(r.vaultWithdrawals)) return false;
+  if (r.account !== undefined) {
+    const a = r.account;
+    const carried = new Set([...r.deposits, ...(r.vaultDeposits ?? [])].map((s) => s.index));
+    if (
+      !a ||
+      typeof a !== 'object' ||
+      !Number.isSafeInteger(a.characterId) ||
+      a.characterId <= 0 ||
+      !validSelections(a.deposits, carried) ||
+      !validSelections(a.withdrawals)
+    )
+      return false;
+  }
   // Zero selections is the dismissal request (see courierDispatch).
   if (courierSelectionCount(r) > COURIER_CAPACITY) return false;
   return courierPayloadFits(raw);

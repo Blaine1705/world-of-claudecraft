@@ -5,6 +5,8 @@ import { COURIER_FLIGHT_DISTANCE, courierLegPlan } from './motion';
 import {
   COURIER_CAPACITY,
   COURIER_CUSTODY_BYTES,
+  type CourierAccountLeg,
+  type CourierSelection,
   type CourierState,
   type CourierVaultSelection,
 } from './types';
@@ -18,7 +20,31 @@ export function savedCourierState(state: CourierState): CourierState {
     ...(state.vaultWithdrawals
       ? { vaultWithdrawals: state.vaultWithdrawals.map(cloneVaultRow) }
       : {}),
+    ...(state.account ? { account: cloneAccountLeg(state.account) } : {}),
   };
+}
+
+function cloneAccountLeg(leg: CourierAccountLeg): CourierAccountLeg {
+  return {
+    characterId: leg.characterId,
+    cargo: leg.cargo.map(cloneInvSlot),
+    withdrawals: leg.withdrawals.map((s) => ({ ...s })),
+  };
+}
+
+function loadSelections(raw: unknown): CourierSelection[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .slice(0, COURIER_CAPACITY)
+    .filter(
+      (s): s is CourierSelection =>
+        !!s &&
+        Number.isSafeInteger(s.index) &&
+        s.index >= 0 &&
+        typeof s.fingerprint === 'string' &&
+        s.fingerprint.length <= 12 * 1024,
+    )
+    .map((s) => ({ index: s.index, fingerprint: s.fingerprint }));
 }
 
 function cloneVaultRow(s: CourierVaultSelection): CourierVaultSelection {
@@ -59,7 +85,9 @@ export function sanitizeCourierState(
   if (!raw || typeof raw !== 'object') return undefined;
   const r = raw as Partial<CourierState>;
   const vaultBound = Array.isArray(r.vaultCargo) ? r.vaultCargo.length : 0;
-  if (Array.isArray(r.cargo) && r.cargo.length + vaultBound > COURIER_CAPACITY) {
+  const rawAccount = r.account && typeof r.account === 'object' ? r.account : undefined;
+  const accountBound = Array.isArray(rawAccount?.cargo) ? rawAccount.cargo.length : 0;
+  if (Array.isArray(r.cargo) && r.cargo.length + vaultBound + accountBound > COURIER_CAPACITY) {
     throw new Error('Courier cargo exceeds its bounded storage capacity');
   }
   const cargo = sanitizeBankState({ inventory: r.cargo }, owner, drops, ownerId).inventory;
@@ -69,7 +97,15 @@ export function sanitizeCourierState(
     drops,
     ownerId,
   ).inventory;
-  if (!courierPayloadFits({ cargo, vaultCargo, withdrawals: [] }, COURIER_CUSTODY_BYTES)) {
+  const accountCargo = sanitizeBankState(
+    { inventory: rawAccount?.cargo },
+    owner,
+    drops,
+    ownerId,
+  ).inventory;
+  if (
+    !courierPayloadFits({ cargo, vaultCargo, accountCargo, withdrawals: [] }, COURIER_CUSTODY_BYTES)
+  ) {
     throw new Error('Courier cargo exceeds its bounded payload capacity');
   }
   const phase = ['ready', 'outbound', 'returning', 'waiting'].includes(r.phase ?? '')
@@ -131,20 +167,44 @@ export function sanitizeCourierState(
   }
   const vaultRows = state.phase === 'outbound' ? loadVaultRows(r.vaultWithdrawals) : [];
   if (vaultRows.length > 0) state.vaultWithdrawals = vaultRows;
+  // The other-character leg is owned cargo too. Only an outbound trip keeps it
+  // (its database half has not committed: a committed leg is already cleared
+  // from the saved courier), and a malformed target brings its stacks home.
+  const characterId = rawAccount?.characterId;
+  if (
+    state.phase === 'outbound' &&
+    Number.isSafeInteger(characterId) &&
+    (characterId as number) > 0
+  ) {
+    if (accountCargo.length > 0 || Array.isArray(rawAccount?.withdrawals))
+      state.account = {
+        characterId: characterId as number,
+        cargo: accountCargo,
+        withdrawals: loadSelections(rawAccount?.withdrawals),
+      };
+    if (r.banked === true) state.banked = true;
+  } else state.cargo.push(...accountCargo);
   // Invalid request metadata can be abandoned without deleting owned inventory.
-  const requests = () => state.withdrawals.length + (state.vaultWithdrawals?.length ?? 0);
+  const requests = () =>
+    state.withdrawals.length +
+    (state.vaultWithdrawals?.length ?? 0) +
+    (state.account?.withdrawals.length ?? 0);
+  const stacks = () =>
+    state.cargo.length + (state.vaultCargo?.length ?? 0) + (state.account?.cargo.length ?? 0);
   const payload = () => ({
     cargo: state.cargo,
     vaultCargo: state.vaultCargo ?? [],
     withdrawals: state.withdrawals,
     vaultWithdrawals: state.vaultWithdrawals ?? [],
+    account: state.account,
   });
   if (
-    state.cargo.length + (state.vaultCargo?.length ?? 0) + requests() > COURIER_CAPACITY ||
+    stacks() + requests() > COURIER_CAPACITY ||
     !courierPayloadFits(payload(), COURIER_CUSTODY_BYTES)
   ) {
     state.withdrawals = [];
     delete state.vaultWithdrawals;
+    if (state.account) state.account.withdrawals = [];
   }
   return state;
 }

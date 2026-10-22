@@ -8,41 +8,24 @@ import { vaultDepositFromCourier, vaultWithdrawToCourier } from '../materials_va
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot, DT, type Entity, type InvSlot } from '../types';
+import { abandonCourierAccountLeg } from './account';
+import { withdrawOriginal } from './cargo_moves';
 import { courierPayloadFits, courierSlotFingerprint } from './identity';
 import { courierFollowPoint, courierLandingPoint, startCourierLeg, travelCourier } from './motion';
 import { COURIER_ADMISSION_BYTES, COURIER_CAPACITY, type CourierState } from './types';
-
-function withdrawOriginal(
-  source: InvSlot[],
-  index: number,
-  original: InvSlot,
-  cargo: InvSlot[],
-): void {
-  const current = source[index];
-  if (!current || current.itemId !== original.itemId || current.count < original.count) return;
-  const pools = { general: COURIER_CAPACITY, materials: 0 };
-  if (original.instance && !isMaterialItemId(original.itemId) && current.count > original.count) {
-    const remaining = cloneInvSlot(current);
-    remaining.count -= original.count;
-    const countBefore = current.count;
-    current.count = original.count;
-    const result = moveBetweenContainers(source, index, undefined, cargo, pools);
-    if (result.moved > 0) source.splice(index, 0, remaining);
-    else current.count = countBefore;
-  } else {
-    moveBetweenContainers(source, index, original.count, cargo, pools, original.materialSources);
-  }
-}
 
 const facingOf = (player: Entity) => (Number.isFinite(player.facing) ? player.facing : 0);
 
 function returnHome(state: CourierState, player: Entity): void {
   state.phase = 'returning';
   state.withdrawals = [];
-  // A trip abandoned before the exchange brings its vault-bound stacks home.
+  // A trip abandoned before an exchange brings its vault- and character-bound
+  // stacks home.
   if (state.vaultCargo?.length) state.cargo.push(...state.vaultCargo);
   delete state.vaultCargo;
   delete state.vaultWithdrawals;
+  abandonCourierAccountLeg(state);
+  delete state.banked;
   state.revision++;
   if (player.pos.x >= INSTANCE_X_BASE || player.dead) {
     // Instance or corpse coordinates must not size the leg: plan it on the
@@ -137,8 +120,24 @@ function exchange(ctx: SimContext, meta: PlayerMeta, player: Entity, state: Cour
     withdraw();
   }
   bumpBankWireRev(meta);
-  returnHome(state, player);
+  state.banked = true;
+  state.withdrawals = [];
+  delete state.vaultWithdrawals;
+  state.revision++;
   return true;
+}
+
+/** The other-character leg, after the bank and vault legs left the cargo
+ *  homeward. Without a host (an offline world has no other characters) the leg
+ *  is abandoned and its stacks ride home. */
+function exchangeAccount(ctx: SimContext, meta: PlayerMeta, state: CourierState): boolean {
+  if (!state.account) return true;
+  if (!ctx.courierAccountExchange) {
+    abandonCourierAccountLeg(state);
+    state.revision++;
+    return true;
+  }
+  return ctx.courierAccountExchange(meta.entityId) === 'settled';
 }
 
 /** Invoked once per resident player tick. No clock work while the owner is offline. */
@@ -166,7 +165,15 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
       returnHome(state, player);
       return;
     }
-    if (!exchange(ctx, meta, player, state)) state.retryRemaining = 1;
+    if (!state.banked && !exchange(ctx, meta, player, state)) {
+      state.retryRemaining = 1;
+      return;
+    }
+    if (!exchangeAccount(ctx, meta, state)) {
+      state.retryRemaining = 0.5;
+      return;
+    }
+    returnHome(state, player);
     return;
   }
   // Private instance coordinates must never redirect the overworld courier.

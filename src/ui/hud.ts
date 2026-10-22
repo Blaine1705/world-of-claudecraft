@@ -5376,6 +5376,9 @@ export class Hud {
     inventory: () => this.sim.inventory,
     inventoryCapacity: () => this.sim.bagCapacity,
     dispatch: (request) => this.sim.courierDispatch(request),
+    accountBanks: () => this.sim.accountBankInfo,
+    requestAccountBanks: (openFirst) => this.sim.requestAccountBanks?.(openFirst),
+    selectAccountBank: (characterId) => this.sim.selectAccountBank(characterId),
     closeOthers: () => this.closeOtherWindows('#courier-window'),
     hideTooltip: () => this.hideTooltip(),
   });

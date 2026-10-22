@@ -18,6 +18,13 @@ export const courierStrings = {
   vaultLocked: 'Unlock the Materials Vault at a banker to use it with your courier.',
   boundBank: 'Going to the bank',
   boundVault: 'Going to the Materials Vault',
+  boundAccount: "Going to another character's bank",
+  accountTitle: 'Other characters',
+  accountBank: 'Bring from this bank. That character must be logged out when the courier arrives.',
+  bagsAccount: "Send to {name}'s bank",
+  bagsAccountNone: 'Choose a character to send items to.',
+  accountPlanned:
+    'Planned for {name}: {count} stacks. Picking for another character replaces them.',
   capacity: '{used} / {capacity} slots',
   cargo: 'Courier inventory',
   empty: 'No items',
@@ -26,7 +33,7 @@ export const courierStrings = {
   select: 'Select {item}, {count}',
   selectedItem: 'Deselect {item}, {count}',
   instructions:
-    'Select whole stacks for the bank or the Materials Vault. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.',
+    'Select whole stacks for your bank, the Materials Vault or another character. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.',
   membership: 'Renew your membership to start another trip.',
   cargoSafe:
     'Returned items overflow full bags. The courier vanishes after delivery until summoned again.',

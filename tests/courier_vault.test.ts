@@ -62,19 +62,19 @@ describe('courier Materials Vault leg', () => {
   it('carries a material stack into the vault and brings a pooled row back', () => {
     const f = fixture();
     f.meta.inventory = [ore(12)];
-    f.meta.vault.stock.linen_cloth = 7;
+    f.meta.vault.stock.linen_scrap = 7;
     const request = {
       deposits: [],
       withdrawals: [],
       vaultDeposits: [pick(f.meta.inventory)],
-      vaultWithdrawals: [{ itemId: 'linen_cloth', count: 7 }],
+      vaultWithdrawals: [{ itemId: 'linen_scrap', count: 7 }],
     };
     expect(courierDispatch(f.ctx, request, 1)).toBe(true);
     expect(f.meta.inventory).toEqual([]);
     expect(f.meta.courier?.vaultCargo).toMatchObject([ore(12)]);
     f.finish();
     expect(f.meta.vault.stock).toEqual({ copper_ore: 12 });
-    expect(f.meta.inventory).toEqual([{ itemId: 'linen_cloth', count: 7 }]);
+    expect(f.meta.inventory).toMatchObject([{ itemId: 'linen_scrap', count: 7 }]);
   });
 
   it('brings back what the vault could not hold, and nothing is lost', () => {
@@ -157,7 +157,7 @@ describe('courier Materials Vault leg', () => {
     expect(courierInfoFor(f.ctx, 1)?.vault).toMatchObject({ upgrades: 1, perMaterialCap: 40 });
     f.meta.inventory = [ore(5)];
     // A pooled row the vault does not hold refuses the whole trip.
-    const missing = { itemId: 'linen_cloth', count: 2 };
+    const missing = { itemId: 'linen_scrap', count: 2 };
     const trip = { deposits: [], withdrawals: [], vaultDeposits: [pick(f.meta.inventory)] };
     expect(courierDispatch(f.ctx, { ...trip, vaultWithdrawals: [missing] }, 1)).toBe(false);
     expect(f.meta.inventory).toMatchObject([ore(5)]);

@@ -2,6 +2,7 @@ import { INSTANCE_X_BASE, ITEMS } from '../data';
 import { normalizeLoadedMaterialSlot } from '../material_slot_load';
 import { isVaultDepositableSlot, vaultMaterialIds } from '../materials_vault';
 import { membershipActive } from '../membership';
+import { membershipBankTransferable } from '../membership_bank';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneInvSlot } from '../types';
@@ -89,10 +90,18 @@ export function courierDispatch(
     if (!slot || !isVaultDepositableSlot(slot, vaultMaterialIds())) return false;
   }
   for (const selection of vaultWithdrawals) if (!vaultRowSelectable(meta, selection)) return false;
+  const account = raw.account;
+  // Never this character's own bank: that is the personal leg.
+  if (account && account.characterId === meta.characterId) return false;
+  for (const selection of account?.deposits ?? []) {
+    const slot = meta.inventory[selection.index];
+    if (!slot || !membershipBankTransferable(slot)) return false;
+  }
   for (const [selections, inventory] of [
     [raw.deposits, meta.inventory],
     [raw.withdrawals, meta.bank.inventory],
     [vaultDeposits, meta.inventory],
+    [account?.deposits ?? [], meta.inventory],
   ] as const) {
     for (const selection of selections) {
       const slot = inventory[selection.index];
@@ -123,6 +132,14 @@ export function courierDispatch(
     normalizeLoadedMaterialSlot(cloneInvSlot(meta.inventory[s.index]));
   const cargo = raw.deposits.map(carried);
   const vaultCargo = vaultDeposits.map(carried);
+  const accountCargo = (account?.deposits ?? []).map(carried);
+  const accountLeg = account
+    ? {
+        characterId: account.characterId,
+        cargo: accountCargo,
+        withdrawals: account.withdrawals.map((s) => ({ ...s })),
+      }
+    : undefined;
   const withdrawals = raw.withdrawals.map((s) => ({ ...s }));
   const vaultRows = vaultWithdrawals.map((s) => ({
     ...s,
@@ -130,14 +147,15 @@ export function courierDispatch(
   }));
   // Refuse before custody changes if persisted state would exceed its budget.
   if (
-    cargo.length + vaultCargo.length > COURIER_CAPACITY ||
+    cargo.length + vaultCargo.length + accountCargo.length > COURIER_CAPACITY ||
     !courierPayloadFits(
-      { cargo, withdrawals, vaultCargo, vaultWithdrawals: vaultRows },
+      { cargo, withdrawals, vaultCargo, vaultWithdrawals: vaultRows, account: accountLeg },
       COURIER_ADMISSION_BYTES,
     )
   )
     return false;
-  for (const selection of [...raw.deposits, ...vaultDeposits].sort((a, b) => b.index - a.index)) {
+  const taken = [...raw.deposits, ...vaultDeposits, ...(account?.deposits ?? [])];
+  for (const selection of taken.sort((a, b) => b.index - a.index)) {
     meta.inventory.splice(selection.index, 1);
   }
   state.cargo = cargo;
@@ -146,6 +164,9 @@ export function courierDispatch(
   else delete state.vaultCargo;
   if (vaultRows.length > 0) state.vaultWithdrawals = vaultRows;
   else delete state.vaultWithdrawals;
+  if (accountLeg) state.account = accountLeg;
+  else delete state.account;
+  delete state.banked;
   state.bankerId = bankerId;
   state.x = e.pos.x;
   state.z = e.pos.z;

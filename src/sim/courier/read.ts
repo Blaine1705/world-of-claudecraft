@@ -87,6 +87,15 @@ export function courierInfoFor(ctx: SimContext, pid: number): CourierInfo | null
           })),
         }
       : {}),
+    ...(state.account
+      ? {
+          account: {
+            characterId: state.account.characterId,
+            cargo: state.account.cargo.map(cloneInvSlot),
+            withdrawals: state.account.withdrawals.map((s) => ({ ...s })),
+          },
+        }
+      : {}),
     revision: state.revision + meta.bankWireRev,
     active: membershipActive(meta, ctx.time),
     bankSlots: state.phase === 'ready' ? meta.bank.inventory.map(cloneInvSlot) : [],

@@ -1,12 +1,17 @@
 // Small courier pose and revision-gated cargo arrive independently. Omission
 // retains the previous value; malformed frames never replace a valid mirror.
-import type { CourierInfo, CourierPose, CourierVaultSelection } from '../sim/courier';
+import type {
+  CourierAccountLeg,
+  CourierInfo,
+  CourierPose,
+  CourierVaultSelection,
+} from '../sim/courier';
 import { COURIER_FLIGHT_DISTANCE, COURIER_MAX_LEG_TICKS } from '../sim/courier/motion';
 import type { InvSlot } from '../sim/types';
 import { decodeVaultInfoWire, isRecord, isWireBankSlot } from './vault_snapshot_wire';
 
 type Pose = Omit<CourierPose, 'travelTicks' | 'legTicks'>;
-type VaultPart = Pick<CourierInfo, 'vault' | 'vaultCargo' | 'vaultWithdrawals'>;
+type VaultPart = Pick<CourierInfo, 'vault' | 'vaultCargo' | 'vaultWithdrawals' | 'account'>;
 type Data = Omit<CourierInfo, keyof CourierPose | keyof VaultPart>;
 const PHASES = new Set(['ready', 'outbound', 'returning', 'waiting']);
 export function decodeCourierPose(value: unknown): Pose | null | undefined {
@@ -97,11 +102,13 @@ const isSelection = (r: unknown): boolean =>
 /** The vault half of the courier (`courierVault`): its own key because older
  *  clients reject unknown courierData keys. Null clears it; undefined means
  *  malformed, and the prior mirror stays. */
-export function decodeCourierVault(value: unknown): VaultPart | null | undefined {
+export function decodeCourierStores(value: unknown): VaultPart | null | undefined {
   if (value === null) return null;
   if (
     !isRecord(value) ||
-    Object.keys(value).some((k) => !['vault', 'vaultCargo', 'vaultWithdrawals'].includes(k)) ||
+    Object.keys(value).some(
+      (k) => !['vault', 'vaultCargo', 'vaultWithdrawals', 'account'].includes(k),
+    ) ||
     !Array.isArray(value.vaultCargo) ||
     value.vaultCargo.length > 24 ||
     !value.vaultCargo.every(isWireBankSlot) ||
@@ -122,6 +129,22 @@ export function decodeCourierVault(value: unknown): VaultPart | null | undefined
     return undefined;
   const vault = value.vault === null ? null : decodeVaultInfoWire(value.vault);
   if (value.vault !== null && vault === null) return undefined;
+  const account = value.account;
+  if (
+    account !== undefined &&
+    account !== null &&
+    (!isRecord(account) ||
+      Object.keys(account).some((k) => !['characterId', 'cargo', 'withdrawals'].includes(k)) ||
+      !Number.isSafeInteger(account.characterId) ||
+      (account.characterId as number) <= 0 ||
+      !Array.isArray(account.cargo) ||
+      account.cargo.length > 24 ||
+      !account.cargo.every(isWireBankSlot) ||
+      !Array.isArray(account.withdrawals) ||
+      account.withdrawals.length > 24 ||
+      !account.withdrawals.every(isSelection))
+  )
+    return undefined;
   // Empty legs stay absent, exactly as the sim's CourierInfo carries them.
   return {
     vault,
@@ -129,6 +152,7 @@ export function decodeCourierVault(value: unknown): VaultPart | null | undefined
     ...(value.vaultWithdrawals.length
       ? { vaultWithdrawals: value.vaultWithdrawals as CourierVaultSelection[] }
       : {}),
+    ...(isRecord(account) ? { account: account as unknown as CourierAccountLeg } : {}),
   };
 }
 
@@ -152,16 +176,16 @@ export function applyCourierSelfWire(
     self.courierData === undefined &&
     self.courierTravelTicks === undefined &&
     self.courierLegTicks === undefined &&
-    self.courierVault === undefined
+    self.courierStores === undefined
   )
     return;
   const pose = decodeCourierPose(self.courier);
   const data = decodeCourierData(self.courierData);
   const travelTicks = decodeCourierTravelTicks(self.courierTravelTicks);
   const legTicks = decodeCourierTravelTicks(self.courierLegTicks, 1);
-  const vaultPart = decodeCourierVault(self.courierVault);
+  const vaultPart = decodeCourierStores(self.courierStores);
   if (
-    (self.courierVault !== undefined && vaultPart === undefined) ||
+    (self.courierStores !== undefined && vaultPart === undefined) ||
     (self.courier !== undefined && pose === undefined) ||
     (self.courierData !== undefined && data === undefined) ||
     (self.courierTravelTicks !== undefined && travelTicks === undefined) ||
@@ -174,11 +198,12 @@ export function applyCourierSelfWire(
   }
   const prior = target.courierInfo;
   if ((!pose || !data) && !prior) return;
-  // An older server never sends courierVault: its courier simply has no vault.
+  // An older server never sends courierStores: its courier simply has no vault.
   const merged = { vault: null, ...prior, ...data, ...pose } as CourierInfo;
   if (vaultPart !== undefined) {
     delete merged.vaultCargo;
     delete merged.vaultWithdrawals;
+    delete merged.account;
     if (vaultPart === null) merged.vault = null;
     else Object.assign(merged, vaultPart);
   }

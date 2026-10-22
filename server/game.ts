@@ -1739,6 +1739,8 @@ export class GameServer {
       database: (job, signal) => this.withBackgroundDbPermit(job, signal),
       mailWrite: (job, signal) => this.enqueueMarketWriteForSave(signal, job),
     });
+    // The courier's other-character leg runs through the membership bank path.
+    this.sim.courierAccountExchange = (pid) => this.membership.courierAccountExchange(pid);
     this.sim.onBuddyGranted = (pid) => this.accountBuddies.granted(pid);
     this.referral = new ReferralGameAdapter({
       sim: this.sim,

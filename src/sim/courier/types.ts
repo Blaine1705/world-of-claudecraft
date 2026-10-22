@@ -31,14 +31,36 @@ export interface CourierDispatchRequest {
   vaultDeposits?: CourierSelection[];
   /** Vault rows the courier brings back. */
   vaultWithdrawals?: CourierVaultSelection[];
+  /** One of the owner's other characters, whose bank this trip also visits. */
+  account?: CourierAccountRequest;
 }
+/** The other-character leg as requested: carried stacks for that character's
+ *  bank, and its bank stacks (by index and fingerprint as shown) to bring back. */
+export interface CourierAccountRequest {
+  characterId: number;
+  deposits: CourierSelection[];
+  withdrawals: CourierSelection[];
+}
+/** The other-character leg in custody. Its database half runs while the courier
+ *  waits at the banker; until that commits the stacks stay the owner's cargo. */
+export interface CourierAccountLeg {
+  characterId: number;
+  cargo: InvSlot[];
+  withdrawals: CourierSelection[];
+}
+/** The host's answer for the other-character leg: still running at the banker,
+ *  or settled (committed or abandoned) with the courier state already updated. */
+export type CourierAccountExchange = (pid: number) => 'pending' | 'settled';
 /** Selections across every list of one request; COURIER_CAPACITY bounds it. */
-export function courierSelectionCount(request: CourierDispatchRequest): number {
+export function courierSelectionCount(
+  request: Omit<CourierDispatchRequest, 'account'> & { account?: CourierAccountRequest | null },
+): number {
   return (
     request.deposits.length +
     request.withdrawals.length +
     (request.vaultDeposits?.length ?? 0) +
-    (request.vaultWithdrawals?.length ?? 0)
+    (request.vaultWithdrawals?.length ?? 0) +
+    (request.account ? request.account.deposits.length + request.account.withdrawals.length : 0)
   );
 }
 export interface CourierState {
@@ -61,6 +83,9 @@ export interface CourierState {
   /** Outbound stacks bound for the Materials Vault; what does not fit rides home. */
   vaultCargo?: InvSlot[];
   vaultWithdrawals?: CourierVaultSelection[];
+  account?: CourierAccountLeg;
+  /** The bank and vault legs are done; the courier waits only on `account`. */
+  banked?: true;
   revision: number;
   /** Remaining simulation seconds, so logout never advances custody. */
   retryRemaining: number;
@@ -73,7 +98,7 @@ export type CourierBankExchange = (
 export interface CourierInfo
   extends Omit<
     CourierState,
-    'retryRemaining' | 'legStartX' | 'legStartZ' | 'legDistance' | 'landingYaw'
+    'retryRemaining' | 'legStartX' | 'legStartZ' | 'legDistance' | 'landingYaw' | 'banked'
   > {
   /** Total ticks of the current leg (at most fifteen seconds); absent while unplanned. */
   legTicks?: number;

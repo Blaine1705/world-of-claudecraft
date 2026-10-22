@@ -75,7 +75,7 @@ describe('courier selection custody', () => {
   it('picks whole vault rows and drops a pick once the row changes', () => {
     const vault: VaultInfo = {
       stock: { copper_ore: 6 },
-      special: [{ itemId: 'tin_ore', count: 2, craftedRecipeId: 'smelt_tin' }],
+      special: [{ itemId: 'wolf_fang', count: 2, craftedRecipeId: 'tan_fang' }],
       upgrades: 1,
       perMaterialCap: 40,
       nextUpgradeCost: 50000,
@@ -83,11 +83,11 @@ describe('courier selection custody', () => {
     const rows = courierVaultRows(vault);
     expect(rows.map((r) => [r.itemId, r.count, r.special?.index])).toEqual([
       ['copper_ore', 6, undefined],
-      ['tin_ore', 2, 0],
+      ['wolf_fang', 2, 0],
     ]);
     let draft = toggleCourierVaultRow(emptyCourierDraft(), rows[1]);
     expect(courierVaultRowSelected(draft, rows[1])).toBe(true);
-    expect(draft.vaultWithdrawals[0]).toMatchObject({ itemId: 'tin_ore', count: 2 });
+    expect(draft.vaultWithdrawals[0]).toMatchObject({ itemId: 'wolf_fang', count: 2 });
     draft = toggleCourierVaultRow(draft, rows[0]);
     const grown = { ...vault, stock: { copper_ore: 9 } };
     expect(reconcileCourierDraft(draft, [], [], grown).vaultWithdrawals).toHaveLength(1);

@@ -4,6 +4,8 @@ import { courierSelectionCount } from '../../../sim/courier/types';
 import { ITEMS } from '../../../sim/data';
 import { isItemLocked } from '../../../sim/item_lock_flag';
 import type { InvSlot } from '../../../sim/types';
+import type { AccountBankInfo } from '../../../world_api/bank';
+import { accountBankStage } from '../../account_bank_view';
 import { bagCornerMark, bagRimClasses } from '../../bag_corner_mark_view';
 import { bagFineMark } from '../../bag_fine_mark_view';
 import { bagInstanceGlyphKind } from '../../bag_instance_glyph_view';
@@ -34,6 +36,7 @@ import {
   type CourierStackSide,
   type CourierVaultRow,
   canDispatchCourier,
+  courierAccountStackSelectable,
   courierDispatchRequest,
   courierSelectionMatches,
   courierStackSelectable,
@@ -42,12 +45,16 @@ import {
   courierVaultStackSelectable,
   emptyCourierDraft,
   reconcileCourierDraft,
+  toggleCourierAccountStack,
   toggleCourierStack,
   toggleCourierVaultRow,
 } from './courier_core';
 
 /** Which store the left column shows and the bags send to. */
-type CourierStore = 'bank' | 'vault';
+type CourierStore = 'bank' | 'vault' | 'account';
+/** A grid of stacks: the three index-picked courier lists plus the
+ *  other-character leg's two (carried stacks for it, its bank stacks). */
+type RowSide = CourierStackSide | 'accountDeposits' | 'accountWithdrawals';
 
 export interface CourierWindowDeps
   extends Pick<PainterHostPresentation, 'itemIcon' | 'itemTooltip' | 'attachTooltip'> {
@@ -56,6 +63,10 @@ export interface CourierWindowDeps
   inventoryCapacity?(): number;
   hideTooltip(): void;
   dispatch(request: CourierDispatchRequest): void;
+  /** The shared bank roster and the selected character's bank (membership). */
+  accountBanks?(): AccountBankInfo | null;
+  requestAccountBanks?(openFirst?: boolean): void;
+  selectAccountBank?(characterId: number): void;
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
@@ -117,17 +128,26 @@ export class CourierWindow {
     const info = this.deps.info();
     // The vault rides its own frame (no revision of its own on the mirror), so it
     // joins the cheap signature whole; it is a few dozen rows at most.
-    const cheapSignature = `${info?.phase}:${info?.active}:${info?.revision}:${info?.inventoryRevision}:${info?.bankRevision}:${info?.bankCapacity}:${this.deps.inventoryCapacity?.()}:${this.store}:${JSON.stringify(info?.vault ?? null)}`;
+    const accountInfo = this.deps.accountBanks?.() ?? null;
+    const cheapSignature = `${info?.phase}:${info?.active}:${info?.revision}:${info?.inventoryRevision}:${info?.bankRevision}:${info?.bankCapacity}:${this.deps.inventoryCapacity?.()}:${this.store}:${JSON.stringify(info?.vault ?? null)}:${JSON.stringify(accountInfo)}`;
     if (!force && cheapSignature === this.cheapSignature) return;
     this.cheapSignature = cheapSignature;
     const inventory = info?.phase === 'ready' ? this.deps.inventory() : [];
     const ready = info?.phase === 'ready';
     const inventoryCapacity = this.deps.inventoryCapacity?.() ?? inventory.length;
     const vault = ready ? (info.vault ?? null) : null;
+    const accounts = ready && this.accountsAvailable(info) ? accountInfo : null;
     // A courier from an older server (or a vault gone missing) has only the bank.
-    if (!vault) this.store = 'bank';
+    if (!vault && this.store === 'vault') this.store = 'bank';
+    if (this.store === 'account' && !(ready && this.accountsAvailable(info))) this.store = 'bank';
     this.draft = ready
-      ? reconcileCourierDraft(this.draft, inventory, info.bankSlots, vault)
+      ? reconcileCourierDraft(
+          this.draft,
+          inventory,
+          info.bankSlots,
+          vault,
+          this.loadedBank(accounts),
+        )
       : emptyCourierDraft();
     // Pose is deliberately absent: moving the donkey never rebuilds this window.
     const signature = JSON.stringify([
@@ -139,6 +159,7 @@ export class CourierWindow {
       ready ? info.bankSlots : null,
       ready ? info.bankCapacity : null,
       vault,
+      accounts,
       this.store,
       inventoryCapacity,
       this.draft,
@@ -156,12 +177,17 @@ export class CourierWindow {
     );
     markDialogRoot(this.el, { labelledBy: 'courier-title' });
     const count = courierSelectionCount(this.draft);
-    const bagSide: CourierStackSide = this.store === 'vault' ? 'vaultDeposits' : 'deposits';
+    const bagSide: RowSide =
+      this.store === 'vault'
+        ? 'vaultDeposits'
+        : this.store === 'account'
+          ? 'accountDeposits'
+          : 'deposits';
     const status = info ? t(`hudChrome.courier.${info.phase}`) : t('hudChrome.courier.unavailable');
     this.el.innerHTML = `<div class="panel-title ui-win-head"><span id="courier-title" class="ui-win-title">${esc(t('hudChrome.courier.title'))}</span><button type="button" class="x-btn ui-x-btn" aria-label="${esc(t('hudChrome.courier.close'))}"${focusKeyAttr('close')}>×</button></div>
       <div class="ui-win-body"><p role="status">${esc(status)}</p>
       ${info && !info.active ? `<p class="ui-muted">${esc(t('hudChrome.courier.membership'))}</p>` : ''}
-      ${ready ? `<p class="ui-muted courier-instructions">${esc(t('hudChrome.courier.instructions'))}</p><div class="courier-columns">${this.storeColumn(info.bankSlots, info.bankCapacity, vault, !!info.active)}${this.portrait()}${this.rows(bagSide, inventory, !!info.active, inventoryCapacity)}</div>` : this.portrait()}
+      ${ready ? `<p class="ui-muted courier-instructions">${esc(t('hudChrome.courier.instructions'))}</p><div class="courier-columns">${this.storeColumn(info, vault, accounts)}${this.portrait()}${this.rows(bagSide, inventory, !!info.active, inventoryCapacity, this.store === 'account' ? this.owner(accounts) : null)}</div>` : this.portrait()}
       ${info && !ready ? `<section><h3>${esc(t('hudChrome.courier.cargo'))}</h3>${this.cargo(info.cargo)}<p class="ui-muted">${esc(t('hudChrome.courier.cargoSafe'))}</p></section>` : ''}</div>
       ${ready ? `<div class="ui-win-foot"><span>${esc(t('hudChrome.courier.selected', { count: formatNumber(count), limit: formatNumber(COURIER_SELECTION_LIMIT) }))}</span><button class="ui-btn ui-btn--gold courier-send" type="button"${focusKeyAttr('send')} ${canDispatchCourier(info, this.draft) ? '' : 'disabled'}>${esc(t('hudChrome.courier.send'))}</button></div>` : ''}`;
     this.el.querySelector<HTMLButtonElement>('.x-btn')!.onclick = () => this.close();
@@ -169,18 +195,30 @@ export class CourierWindow {
       button.onclick = () => {
         const live = this.deps.info();
         if (!live?.active || live.phase !== 'ready') return;
-        const side = button.dataset.courierSide as CourierStackSide;
-        const fromBags = side !== 'withdrawals';
-        const slots = fromBags ? this.deps.inventory() : live.bankSlots;
+        const side = button.dataset.courierSide as RowSide;
+        const loaded = this.loadedBank(this.deps.accountBanks?.() ?? null);
+        const slotsFor = (bank: readonly InvSlot[], other: readonly InvSlot[]) =>
+          side === 'withdrawals' ? bank : side === 'accountWithdrawals' ? other : null;
+        const slots = slotsFor(live.bankSlots, loaded?.slots ?? []) ?? this.deps.inventory();
         // Refresh before applying a stale row click; never silently select its replacement.
         const index = Number(button.dataset.courierIndex);
         if (!courierStackSelectable(slots[index])) return;
-        const previous = fromBags ? inventory : info!.bankSlots;
+        const previous =
+          slotsFor(info!.bankSlots, this.loadedBank(accounts)?.slots ?? []) ?? inventory;
         if (JSON.stringify(previous[index]) !== JSON.stringify(slots[index])) {
           this.render(true);
           return;
         }
-        this.draft = toggleCourierStack(this.draft, side, index, slots);
+        if (side === 'accountDeposits' || side === 'accountWithdrawals') {
+          if (!loaded) return;
+          this.draft = toggleCourierAccountStack(
+            this.draft,
+            loaded.characterId,
+            side === 'accountDeposits' ? 'deposits' : 'withdrawals',
+            index,
+            slots,
+          );
+        } else this.draft = toggleCourierStack(this.draft, side, index, slots);
         this.render(true);
       };
     }
@@ -210,23 +248,39 @@ export class CourierWindow {
           ),
         );
     }
-    if (vault)
-      wireTabStrip(this.el, 'courier-store-tab', (id, focusFollow) => {
-        if ((id !== 'bank' && id !== 'vault') || id === this.store) return;
-        this.store = id;
+    wireTabStrip(this.el, 'courier-store-tab', (id, focusFollow) => {
+      if ((id !== 'bank' && id !== 'vault' && id !== 'account') || id === this.store) return;
+      this.store = id;
+      if (id === 'account') this.openAccounts();
+      this.render(true);
+      if (focusFollow) findFocusKey(this.el, `store-${id}`)?.focus();
+    });
+    wireTabStrip(this.el, 'courier-account-tab', (id, focusFollow) => {
+      this.deps.selectAccountBank?.(Number(id));
+      this.render(true);
+      if (focusFollow) findFocusKey(this.el, `character-${id}`)?.focus();
+    });
+    for (const tab of this.el.querySelectorAll<HTMLElement>('.courier-account-tab'))
+      tab.dataset.focusKey = `character-${tab.dataset.tab}`;
+    for (const retry of this.el.querySelectorAll<HTMLButtonElement>('[data-courier-account-retry]'))
+      retry.onclick = () => {
+        const id = Number(retry.dataset.courierAccountRetry);
+        if (id > 0) this.deps.selectAccountBank?.(id);
+        else this.deps.requestAccountBanks?.(true);
         this.render(true);
-        if (focusFollow) findFocusKey(this.el, `store-${id}`)?.focus();
-      });
+      };
     for (const tab of this.el.querySelectorAll<HTMLElement>('.courier-store-tab'))
       tab.dataset.focusKey = `store-${tab.dataset.tab}`;
     for (const cell of this.el.querySelectorAll<HTMLElement>('[data-courier-item]')) {
       const side = cell.dataset.courierItem;
       const slots =
-        side === 'deposits' || side === 'vaultDeposits'
+        side === 'deposits' || side === 'vaultDeposits' || side === 'accountDeposits'
           ? inventory
           : side === 'withdrawals'
             ? (info?.bankSlots ?? [])
-            : (info?.cargo ?? []);
+            : side === 'accountWithdrawals'
+              ? (this.loadedBank(accounts)?.slots ?? [])
+              : (info?.cargo ?? []);
       const slot = slots[Number(cell.dataset.courierSlot)];
       const item = slot && ITEMS[slot.itemId];
       if (item)
@@ -243,6 +297,7 @@ export class CourierWindow {
           this.deps.inventory(),
           live?.bankSlots ?? [],
           live?.vault ?? null,
+          this.loadedBank(this.deps.accountBanks?.() ?? null),
         );
         if (canDispatchCourier(live, this.draft)) {
           this.deps.dispatch(courierDispatchRequest(this.draft));
@@ -265,40 +320,71 @@ export class CourierWindow {
       ]);
   }
   private rows(
-    side: CourierStackSide,
+    side: RowSide,
     slots: readonly InvSlot[],
     active: boolean,
     capacity: number,
+    owner: { characterId: number; name: string } | null = null,
   ): string {
-    const fromBags = side !== 'withdrawals';
-    const title = t(fromBags ? 'hudChrome.courier.inventory' : 'hudChrome.courier.bankTitle');
-    const hint = t(
-      side === 'vaultDeposits'
-        ? 'hudChrome.courier.bagsVault'
-        : side === 'deposits'
-          ? 'hudChrome.courier.bags'
-          : 'hudChrome.courier.bank',
-    );
+    const fromBags = side !== 'withdrawals' && side !== 'accountWithdrawals';
+    const title =
+      side === 'accountWithdrawals' && owner
+        ? t('hudChrome.bank.accountBankTitle', { name: owner.name })
+        : t(fromBags ? 'hudChrome.courier.inventory' : 'hudChrome.courier.bankTitle');
+    const hint =
+      side === 'accountDeposits'
+        ? owner
+          ? t('hudChrome.courier.bagsAccount', { name: owner.name })
+          : t('hudChrome.courier.bagsAccountNone')
+        : t(
+            side === 'vaultDeposits'
+              ? 'hudChrome.courier.bagsVault'
+              : side === 'deposits'
+                ? 'hudChrome.courier.bags'
+                : side === 'accountWithdrawals'
+                  ? 'hudChrome.courier.accountBank'
+                  : 'hudChrome.courier.bank',
+          );
     const atLimit = courierSelectionCount(this.draft) >= COURIER_SELECTION_LIMIT;
-    const picked = (list: CourierStackSide, index: number) =>
-      this.draft[list].some((s) => s.index === index && courierSelectionMatches(s, slots));
+    const account = this.draft.account;
+    const listFor = (list: RowSide) =>
+      list === 'accountDeposits'
+        ? (account?.deposits ?? [])
+        : list === 'accountWithdrawals'
+          ? account && account.characterId === owner?.characterId
+            ? account.withdrawals
+            : []
+          : this.draft[list];
+    const picked = (list: RowSide, index: number) =>
+      listFor(list).some((s) => s.index === index && courierSelectionMatches(s, slots));
     const cells = slots.map((slot, index) => {
       const selected = picked(side, index);
-      // A carried stack already bound for the other store keeps its mark, so a
-      // pick on one tab is visible from the other.
-      const elsewhere =
-        side === 'deposits'
-          ? picked('vaultDeposits', index)
-          : side === 'vaultDeposits'
-            ? picked('deposits', index)
-            : false;
-      const vaultBound = side === 'vaultDeposits' ? selected : elsewhere;
+      // A carried stack keeps the mark of the store it is bound for, so a pick on
+      // one tab is visible from the others.
+      const bound: 'bank' | 'vault' | 'account' | null = !fromBags
+        ? selected
+          ? 'bank'
+          : null
+        : picked('deposits', index)
+          ? 'bank'
+          : picked('vaultDeposits', index)
+            ? 'vault'
+            : picked('accountDeposits', index)
+              ? 'account'
+              : null;
+      const elsewhere = fromBags && !selected && bound !== null;
+      const vaultBound = bound === 'vault';
       const mark = selected || elsewhere;
+      const icon = bound === 'vault' ? 'chest' : bound === 'account' ? 'character' : 'check';
       const def = knownItemDef(ITEMS, slot.itemId);
       const parts = def ? wornItemCellParts(def, slot.instance) : null;
       const item = parts?.ariaName ?? slot.itemId;
       const selectable =
-        side === 'vaultDeposits' ? courierVaultStackSelectable(slot) : courierStackSelectable(slot);
+        side === 'vaultDeposits'
+          ? courierVaultStackSelectable(slot)
+          : side === 'accountDeposits' || side === 'accountWithdrawals'
+            ? !!owner && courierAccountStackSelectable(slot)
+            : courierStackSelectable(slot);
       const fine = bagFineMark(slot.itemId);
       const quest = def?.kind === 'quest' ? 'quest' : null;
       const glyph = bagInstanceGlyphKind(slot.instance);
@@ -309,7 +395,7 @@ export class CourierWindow {
           ? t(INSTANCE_GLYPH_ARIA_KEYS[glyph], { item, count: formatNumber(slot.count) })
           : '';
       const quality = parts?.quality ?? 'common';
-      return `<button type="button" class="bank-item ${fromBags ? 'bag-item' : ''} ui-socket ui-socket--bag courier-item q-${quality}${bagRimClasses(quest, fine)}" style="--bank-slot-quality:${QUALITY_COLOR[quality]}" data-courier-side="${side}" data-courier-index="${index}" data-courier-item="${side}" data-courier-slot="${index}" aria-pressed="${selected}" aria-description="${esc(elsewhere ? t(vaultBound ? 'hudChrome.courier.boundVault' : 'hudChrome.courier.boundBank') : description)}" aria-label="${esc(t(selected ? 'hudChrome.courier.selectedItem' : 'hudChrome.courier.select', { item, count: formatNumber(slot.count) }))}"${focusKeyAttr(`${side}-${index}`)} ${!active || !selectable || (atLimit && !selected) ? 'disabled' : ''}>${def && parts ? this.deps.itemIcon(def, parts.quality) : unknownItemIconHtml(slot.itemId)}${parts?.qualityBadge ?? ''}${cornerMarkHtml(corner)}${lockMarkHtml(isItemLocked(slot.instance))}<span class="bank-count">${slot.count > 1 ? esc(formatNumber(slot.count)) : ''}</span>${mark ? `<span class="courier-selected${vaultBound ? ' courier-selected--vault' : ''}" aria-hidden="true">${svgIcon(vaultBound ? 'chest' : 'check')}</span>` : ''}</button>`;
+      return `<button type="button" class="bank-item ${fromBags ? 'bag-item' : ''} ui-socket ui-socket--bag courier-item q-${quality}${bagRimClasses(quest, fine)}" style="--bank-slot-quality:${QUALITY_COLOR[quality]}" data-courier-side="${side}" data-courier-index="${index}" data-courier-item="${side}" data-courier-slot="${index}" aria-pressed="${selected}" aria-description="${esc(elsewhere ? t(vaultBound ? 'hudChrome.courier.boundVault' : bound === 'account' ? 'hudChrome.courier.boundAccount' : 'hudChrome.courier.boundBank') : description)}" aria-label="${esc(t(selected ? 'hudChrome.courier.selectedItem' : 'hudChrome.courier.select', { item, count: formatNumber(slot.count) }))}"${focusKeyAttr(`${side}-${index}`)} ${!active || !selectable || (atLimit && !selected) ? 'disabled' : ''}>${def && parts ? this.deps.itemIcon(def, parts.quality) : unknownItemIconHtml(slot.itemId)}${parts?.qualityBadge ?? ''}${cornerMarkHtml(corner)}${lockMarkHtml(isItemLocked(slot.instance))}<span class="bank-count">${slot.count > 1 ? esc(formatNumber(slot.count)) : ''}</span>${mark ? `<span class="courier-selected${bound && bound !== 'bank' ? ` courier-selected--${bound}` : ''}" aria-hidden="true">${svgIcon(icon)}</span>` : ''}</button>`;
     });
     for (let index = slots.length; index < capacity; index++)
       cells.push(
@@ -317,18 +403,52 @@ export class CourierWindow {
       );
     return `<section class="courier-storage" data-courier-storage="${side}" aria-labelledby="courier-${side}-title"><div class="courier-storage-head"><h3 id="courier-${side}-title">${esc(title)}</h3><span class="ui-num ui-muted">${esc(t('hudChrome.courier.capacity', { used: formatNumber(slots.length), capacity: formatNumber(capacity) }))}</span></div><p class="ui-muted courier-storage-hint">${esc(hint)}</p><div class="bank-grid courier-grid">${cells.join('')}</div></section>`;
   }
-  /** The left column: the bank, or with a vault a Bank / Materials Vault strip. */
+  private owner(info: AccountBankInfo | null): { characterId: number; name: string } | null {
+    const loaded = this.loadedBank(info);
+    if (!loaded) return null;
+    const name = info?.characters.find((c) => c.characterId === loaded.characterId)?.name ?? '';
+    return { characterId: loaded.characterId, name };
+  }
+  /** Membership opens other characters' banks; an older host has no roster. */
+  private accountsAvailable(info: CourierInfo): boolean {
+    return !!this.deps.accountBanks && info.active;
+  }
+  /** The selected character's loaded bank, when there is one to plan against. */
+  private loadedBank(
+    info: AccountBankInfo | null,
+  ): { characterId: number; slots: readonly InvSlot[] } | null {
+    return info?.bank && info.selectedCharacterId !== null && !info.error
+      ? { characterId: info.selectedCharacterId, slots: info.bank.slots }
+      : null;
+  }
+  /** Showing the tab opens a bank, like the bank window's Other characters tab. */
+  private openAccounts(): void {
+    const info = this.deps.accountBanks?.() ?? null;
+    if (!info || (info.selectedCharacterId === null && !info.error))
+      this.deps.requestAccountBanks?.(true);
+  }
+  /** The left column: the bank, with a strip over it when the vault or other
+   *  characters' banks are reachable too. */
   private storeColumn(
-    bankSlots: readonly InvSlot[],
-    bankCapacity: number,
+    info: CourierInfo,
     vault: CourierInfo['vault'],
-    active: boolean,
+    accounts: AccountBankInfo | null,
   ): string {
+    const active = info.active;
     const pane =
       this.store === 'vault' && vault
         ? this.vaultRows(vault, active)
-        : this.rows('withdrawals', bankSlots, active, bankCapacity);
-    if (!vault) return pane;
+        : this.store === 'account'
+          ? this.accountPane(accounts, active)
+          : this.rows('withdrawals', info.bankSlots, active, info.bankCapacity);
+    const tabs = [
+      { id: 'bank', label: t('hudChrome.courier.bankTitle') },
+      ...(vault ? [{ id: 'vault', label: t('hudChrome.courier.vaultTitle') }] : []),
+      ...(this.accountsAvailable(info)
+        ? [{ id: 'account', label: t('hudChrome.courier.accountTitle') }]
+        : []),
+    ];
+    if (tabs.length < 2) return pane;
     const strip = tabStripHtml(
       tabStripModel({
         ariaLabel: t('hudChrome.courier.storeTabs'),
@@ -336,13 +456,79 @@ export class CourierWindow {
         tabClass: 'courier-store-tab ui-tab',
         selectedClass: 'on is-on',
         selected: this.store,
-        tabs: [
-          { id: 'bank', label: t('hudChrome.courier.bankTitle') },
-          { id: 'vault', label: t('hudChrome.courier.vaultTitle') },
-        ],
+        tabs,
       }),
     );
     return `<div class="courier-store">${strip}${pane}</div>`;
+  }
+  /** The Other characters pane: a roster strip, then the chosen bank to plan
+   *  against, with the shared bank window's loading and refusal lines. */
+  private accountPane(info: AccountBankInfo | null, active: boolean): string {
+    const stage = accountBankStage(info, true);
+    const name = (id: number | null) =>
+      info?.characters.find((c) => c.characterId === id)?.name ?? '';
+    const roster =
+      info && info.characters.length > 0
+        ? tabStripHtml(
+            tabStripModel({
+              ariaLabel: t('hudChrome.bank.accountCharacters'),
+              stripClass: 'bank-tabs ui-tabs courier-account-tabs',
+              tabClass: 'courier-account-tab ui-tab',
+              selectedClass: 'on is-on',
+              selected: String(info.selectedCharacterId ?? info.characters[0].characterId),
+              tabs: info.characters.map((c) => ({ id: String(c.characterId), label: c.name })),
+            }),
+          )
+        : '';
+    const line = (text: string, role = '') =>
+      `<p class="ui-muted courier-storage-hint"${role ? ` role="${role}"` : ''}>${esc(text)}</p>`;
+    const retry = (id: number | null) =>
+      `<button type="button" class="ui-btn courier-account-retry" data-courier-account-retry="${id ?? 0}"${focusKeyAttr('account-retry')}>${esc(t('hudChrome.bank.accountRetry'))}</button>`;
+    const planned = this.draft.account;
+    const elsewhere =
+      planned && planned.characterId !== info?.selectedCharacterId
+        ? line(
+            t('hudChrome.courier.accountPlanned', {
+              name: name(planned.characterId),
+              count: formatNumber(planned.deposits.length + planned.withdrawals.length),
+            }),
+          )
+        : '';
+    let body: string;
+    switch (stage.kind) {
+      case 'ready': {
+        const bank = info!.bank!;
+        body =
+          (stage.errorKey
+            ? line(t(stage.errorKey, { name: name(stage.characterId) }), 'alert')
+            : '') +
+          this.rows('accountWithdrawals', bank.slots, active, bank.capacity, {
+            characterId: stage.characterId,
+            name: name(stage.characterId),
+          });
+        break;
+      }
+      case 'failed':
+        body =
+          line(t(stage.errorKey, { name: name(stage.characterId) }), 'alert') +
+          (stage.errorKey === 'hudChrome.bank.accountMembership' ? '' : retry(stage.characterId));
+        break;
+      case 'loading':
+        body = line(t('hudChrome.bank.accountLoading'), 'status') + retry(null);
+        break;
+      case 'opening':
+        body = line(
+          t('hudChrome.bank.accountOpening', { name: name(stage.characterId) }),
+          'status',
+        );
+        break;
+      case 'no_characters':
+        body = line(t('hudChrome.bank.accountEmpty'));
+        break;
+      default:
+        body = line(t('hudChrome.bank.accountSelect'));
+    }
+    return `<section class="courier-storage" data-courier-storage="account" aria-label="${esc(t('hudChrome.courier.accountTitle'))}">${roster}${elsewhere}${body}</section>`;
   }
   private vaultRows(vault: NonNullable<CourierInfo['vault']>, active: boolean): string {
     const head = (detail: string) =>

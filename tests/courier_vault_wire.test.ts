@@ -15,7 +15,7 @@ import {
   readCourierDispatch,
 } from '../server/courier_wire';
 import type { StorageAdmissionSession } from '../server/storage_admission';
-import { applyCourierSelfWire, decodeCourierVault } from '../src/net/courier_wire';
+import { applyCourierSelfWire, decodeCourierStores } from '../src/net/courier_wire';
 import type { CourierInfo } from '../src/sim/courier';
 import type { BankInfo, VaultInfo } from '../src/world_api/bank';
 
@@ -103,20 +103,21 @@ describe('courier vault wire', () => {
     const session = { pid: 17, lastSent: sent, lastCourierWireRevision: null };
     emitCourierSelfKeys(emit, sim(info()), session);
     expect(Object.keys(frame.courierData as object)).not.toContain('vault');
-    expect(frame.courierVault).toEqual({
+    expect(frame.courierStores).toEqual({
       vault: vault({ copper_ore: 6 }),
       vaultCargo: [],
       vaultWithdrawals: [],
+      account: null,
     });
     const target = { courierInfo: null as CourierInfo | null };
     applyCourierSelfWire(target, frame);
     expect(target.courierInfo).toEqual(info());
     // A malformed vault frame leaves the mirror alone; null clears the vault.
-    applyCourierSelfWire(target, { courierVault: { vault: { stock: 'x' } } });
+    applyCourierSelfWire(target, { courierStores: { vault: { stock: 'x' } } });
     expect(target.courierInfo?.vault).toEqual(vault({ copper_ore: 6 }));
-    applyCourierSelfWire(target, { courierVault: null });
+    applyCourierSelfWire(target, { courierStores: null });
     expect(target.courierInfo?.vault).toBeNull();
-    expect(decodeCourierVault({ vault: null, vaultCargo: [], vaultWithdrawals: [] })).toEqual({
+    expect(decodeCourierStores({ vault: null, vaultCargo: [], vaultWithdrawals: [] })).toEqual({
       vault: null,
     });
   });
@@ -139,22 +140,22 @@ describe('courier vault wire', () => {
       courierVaultLedgerRowBound(vault(), {
         vaultCargo: [
           { itemId: 'copper_ore', count: 3 },
-          { itemId: 'linen_cloth', count: 2 },
+          { itemId: 'linen_scrap', count: 2 },
         ],
-        vaultWithdrawals: [{ itemId: 'tin_ore', count: 2 }],
+        vaultWithdrawals: [{ itemId: 'wolf_fang', count: 2 }],
       }),
     ).toBe(3);
   });
 
   it('reserves the vault ledger beside the bank and records both vault legs', () => {
-    const live = vault({ linen_cloth: 4 });
+    const live = vault({ linen_scrap: 4 });
     const bank = { slots: [], purchasedSlots: 0, nextExpansionCost: 500 } as unknown as BankInfo;
     const host = sim(info());
     host.courierBankInfoFor = () => structuredClone(bank);
     host.courierVaultInfoFor = () => structuredClone(live);
     host.courierVaultTripFor = () => ({
       vaultCargo: [{ itemId: 'copper_ore', count: 3 }],
-      vaultWithdrawals: [{ itemId: 'linen_cloth', count: 4 }],
+      vaultWithdrawals: [{ itemId: 'linen_scrap', count: 4 }],
     });
     const rows: { surface: string; batch: unknown[] }[] = [];
     const admission = {
@@ -189,7 +190,7 @@ describe('courier vault wire', () => {
         live.stock.copper_ore = 3;
       },
       () => {
-        delete live.stock.linen_cloth;
+        delete live.stock.linen_scrap;
       },
     );
     expect(ok).toBe(true);
@@ -197,7 +198,38 @@ describe('courier vault wire', () => {
     const vaultRows = rows.find((r) => r.surface === 'vault')?.batch;
     expect(vaultRows).toMatchObject([
       { op: 'deposit', itemId: 'copper_ore', count: 3, container: 'vault' },
-      { op: 'withdraw', itemId: 'linen_cloth', count: 4, container: 'vault' },
+      { op: 'withdraw', itemId: 'linen_scrap', count: 4, container: 'vault' },
     ]);
+  });
+
+  it('reads the other-character leg strictly and round-trips it on courierStores', () => {
+    const account = {
+      characterId: 12,
+      deposits: [{ index: 0, fingerprint: 'f' }],
+      withdrawals: [{ index: 3, fingerprint: 'g' }],
+    };
+    expect(readCourierDispatch({ ...base, account })).toMatchObject({ account });
+    for (const bad of [
+      { ...account, characterId: 0 },
+      { ...account, extra: 1 },
+      { ...account, deposits: [{ index: -1, fingerprint: 'f' }] },
+    ])
+      expect(readCourierDispatch({ ...base, account: bad })).toBeNull();
+    const leg = {
+      characterId: 12,
+      cargo: [{ itemId: 'healing_potion', count: 2 }],
+      withdrawals: [],
+    };
+    expect(
+      decodeCourierStores({ vault: null, vaultCargo: [], vaultWithdrawals: [], account: leg }),
+    ).toEqual({ vault: null, account: leg });
+    expect(
+      decodeCourierStores({
+        vault: null,
+        vaultCargo: [],
+        vaultWithdrawals: [],
+        account: { ...leg, characterId: -1 },
+      }),
+    ).toBeUndefined();
   });
 });

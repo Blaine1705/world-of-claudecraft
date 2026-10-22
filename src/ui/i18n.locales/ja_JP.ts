@@ -55,7 +55,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.select': '{item}、{count}を選択',
   'hudChrome.courier.selectedItem': '{item}、{count}の選択を解除',
   'hudChrome.courier.instructions':
-    'スタック全体を銀行または保管庫向けに選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。',
+    'スタック全体を自分の銀行、保管庫、またはほかのキャラクター向けに選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。',
   'hudChrome.courier.membership': '次の配達にはメンバーシップの更新が必要です。',
   'hudChrome.courier.unavailable': '配達員を召喚して配達を計画しましょう。',
   'hudChrome.courier.bagsVault': '素材を保管庫へ送る',
@@ -67,6 +67,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.vaultLocked': '配達員で使うには、銀行員のところで保管庫を解放してください。',
   'hudChrome.courier.boundBank': '銀行へ送る予定',
   'hudChrome.courier.boundVault': '保管庫へ送る予定',
+  'hudChrome.courier.boundAccount': 'ほかのキャラクターの銀行へ送る予定',
+  'hudChrome.courier.accountTitle': 'ほかのキャラクター',
+  'hudChrome.courier.accountBank':
+    'この銀行から取り出す。配達員の到着時、そのキャラクターはログアウトしている必要があります。',
+  'hudChrome.courier.bagsAccount': '{name}の銀行へ送る',
+  'hudChrome.courier.bagsAccountNone': 'アイテムを送るキャラクターを選んでください。',
+  'hudChrome.courier.accountPlanned':
+    '{name}向けに{count}スタックを予定中。別のキャラクター向けに選ぶと置き換わります。',
   'entities.abilities.courier.name': '配達員',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '有効なメンバーシップの特典',
