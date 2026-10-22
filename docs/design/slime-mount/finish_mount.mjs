@@ -18,7 +18,7 @@ import { dedup, prune, resample, textureCompress } from '@gltf-transform/functio
 const [src, out] = process.argv.slice(2);
 if (!src || !out) throw new Error('usage: finish_mount.mjs <blender.glb> <out.glb>');
 
-const CLIPS = ['Idle', 'Walk', 'Run', 'Jump'];
+const CLIPS = ['Idle', 'Walk', 'Run', 'Jump', 'Land'];
 const JOINTS = ['base', 'mid', 'move', 'root', 'saddle', 'squash', 'top'];
 const BUBBLES = 7;
 

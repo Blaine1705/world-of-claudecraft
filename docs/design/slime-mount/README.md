@@ -1,10 +1,12 @@
-# Slime mount
+# Wobbles the Slime (slime mount)
 
 A big blue jelly slime with a saddle, blanket, girth straps and stirrups,
-built from `concept.webp` (top, side and front views). It has the same clip list
-and seat contract as the gold sprite mount (`docs/design/sprite-mount` on
-`feat/gold-sprite-mount`), but it sits on the ground in its idle instead of
-hovering, hops to move, and jiggles. Not wired into the mount catalog yet.
+built from `concept.webp` (top, side and front views). In game it is the
+mount `wobbles_slime` ("Wobbles the Slime"), developer-only for now
+(`DEVELOPER_MOUNTS`). It has the gold sprite mount's seat contract
+(`docs/design/sprite-mount` on `feat/gold-sprite-mount`) and its clips plus a
+touchdown, but it sits on the ground in its idle instead of hovering, hops to
+move, and jiggles.
 
 ## Files
 
@@ -34,13 +36,13 @@ From the repo root, with `$W` an empty working directory:
 D=docs/design/slime-mount
 blender --background --python $D/assemble_mount.py -- $D/slime_tripo.glb $W/static.glb
 blender --background --python $D/build_mount.py -- $W/static.glb $W/slime_anim.glb
-node $D/finish_mount.mjs $W/slime_anim.glb public/models/mounts/slime.glb
-node scripts/assets/compress_glb_textures.mjs public/models/mounts/slime.glb
+node $D/finish_mount.mjs $W/slime_anim.glb public/models/mounts/wobbles_slime.glb
+node scripts/assets/compress_glb_textures.mjs public/models/mounts/wobbles_slime.glb
 node scripts/build_media_manifest.mjs generate
 ```
 
 The KTX2 step is mandatory (`tests/glb_texture_compression.test.ts`). A rebuild
-changes the bytes, so update the pin in `tests/slime_mount_asset.test.ts`.
+changes the bytes, so update the pin in `tests/wobbles_slime_asset.test.ts`.
 
 ## What the GLB carries
 
@@ -77,6 +79,8 @@ changes the bytes, so update the pin in `tests/slime_mount_asset.test.ts`.
     forward on landing. Each loop picks up the end of the previous landing's
     jiggle, so the seam does not show. Run hops almost four times as high
     and leans forward.
-  - `Jump` (0.8 s): squash, spring off with a stretch that wobbles out in the
-    air. It ends on the neutral pose, because the game holds the last frame
-    through a fall.
+  - `Jump` (0.5 s) and `Land` (0.6 s) follow the game's held-jump contract
+    (`ClipMap.land`): the arc is the game's, so neither carries a rise. `Jump`
+    gathers, springs and settles on an airborne pose (stretched tall, the top
+    lagging back) that the game clamps on for the whole flight. `Land` fires
+    on touchdown: a splat that jiggles out and ends on the idle pose.

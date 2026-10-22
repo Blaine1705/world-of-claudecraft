@@ -2,9 +2,9 @@
 
 blender --background --python build_mount.py -- <slime_static.glb> <out.glb>
 
-The same clip list and seat contract as the gold sprite mount
-(docs/design/sprite-mount on feat/gold-sprite-mount): Idle, Walk, Run, Jump at
-30 fps, and a `saddle` bone the rider sits on. The slime sits on the ground in
+The gold sprite mount's clip list plus a touchdown (docs/design/sprite-mount on
+feat/gold-sprite-mount): Idle, Walk, Run, Jump, Land at 30 fps, and a `saddle`
+bone the rider sits on. The slime sits on the ground in
 its idle (the sprite hovers) and hops to move, and everything jiggles.
 
 Rig: root -> move (translation, yaw) -> squash (scale, pivot on the ground so
@@ -181,8 +181,8 @@ def bubble_at(path, t):
     return pos, max(size, 1e-4)
 
 
-PATH_KIND = {"Idle": "idle", "Walk": "move", "Run": "move", "Jump": "move"}
-PATH_LEN = {"Idle": 6.0, "Walk": 1.0, "Run": 0.9, "Jump": 0.8}
+PATH_KIND = {"Idle": "idle", "Walk": "move", "Run": "move", "Jump": "move", "Land": "move"}
+PATH_LEN = {"Idle": 6.0, "Walk": 1.0, "Run": 0.9, "Jump": 0.5, "Land": 0.6}
 BUBBLE_PATHS = {c: [bubble_path(i, PATH_LEN[c], PATH_KIND[c]) for i in range(NB)] for c in PATH_KIND}
 BUBBLE_REST = [BUBBLE_PATHS["Idle"][i]["a"].copy() for i in range(NB)]
 
@@ -345,24 +345,39 @@ def run(t):
                lag=0.07, follow=0.08, f=3.2, tau=0.15, tilt=0.05)
 
 
-# Jump spans the game's own airtime (2 x 6 / 16 = 0.75 s): gather, spring off
-# with a stretch that wobbles out in the air, and end neutral on the ground pose
-# because the game holds the last frame through a fall.
-JUMP_LEN = 0.8
-JUMP_UP = 0.55 * H
+# Jump and Land follow the game's held-jump contract (ClipMap.land in
+# src/render/characters/manifest.ts): the arc is the game's, so neither clip
+# carries a rise. Jump is the gather and the spring, settling on an airborne
+# pose (stretched tall, top lagging back) that the game CLAMPS on for however
+# long the slime is off the ground; Land fires on touchdown: a splat that
+# jiggles out and ends on the idle pose.
+JUMP_LEN = 0.5
+LAND_LEN = 0.6
+AIR = dict(sy=1.1, lean=-0.04)  # the held airborne pose: Jump's last frame, Land's first
 
 
 def jump(t):
-    if t < 0.1:
-        k = smooth(t / 0.1)
-        return pose(sy=lerp(1.0, 0.78, k), lean=-0.02 * k)
-    x = t - 0.1
-    a = min(x / 0.6, 1.0)
-    sy = 1 - 0.22 * ring(x, 3.0, 0.2) + 0.06 * math.sin(math.pi * a)
-    lean = -0.02 - 0.08 * ring(x, 2.5, 0.22, phase=0.0)
-    side = 0.03 * ring(x, 2.2, 0.25, phase=0.0)
-    k = smooth((t - 0.62) / 0.18)
-    return pose(up=JUMP_UP * 4 * a * (1 - a), sy=lerp(sy, 1.0, k), lean=lerp(lean, 0.0, k), side=lerp(side, 0.0, k))
+    if t < 0.07:
+        k = smooth(t / 0.07)
+        return pose(sy=lerp(1.0, 0.82, k), lean=-0.015 * k)
+    x = t - 0.07
+    sy = AIR["sy"] - (AIR["sy"] - 0.82) * math.exp(-x / 0.1) * math.cos(2 * math.pi * 3.5 * x)
+    lean = AIR["lean"] - 0.06 * ring(x, 2.5, 0.12, phase=0.0)
+    side = 0.025 * ring(x, 2.2, 0.12, phase=0.0)
+    k = smooth((t - 0.3) / 0.2)  # lands exactly on the held pose
+    return pose(sy=lerp(sy, AIR["sy"], k), lean=lerp(lean, AIR["lean"], k), side=lerp(side, 0.0, k))
+
+
+def land(t):
+    if t < 0.05:
+        k = smooth(t / 0.05)
+        return pose(sy=lerp(AIR["sy"], 0.72, k), lean=AIR["lean"] * (1 - k))
+    x = t - 0.05
+    sy = 1 - 0.28 * math.exp(-x / 0.15) * math.cos(2 * math.pi * 2.8 * x)
+    lean = 0.08 * ring(x, 2.2, 0.18, phase=0.0)
+    side = 0.03 * ring(x, 1.9, 0.2, phase=0.0)
+    k = smooth((t - 0.45) / 0.15)  # ends on the idle pose
+    return pose(sy=lerp(sy, 1.0, k), lean=lerp(lean, 0.0, k), side=lerp(side, 0.0, k))
 
 
 CLIPS = [
@@ -370,6 +385,7 @@ CLIPS = [
     ("Walk", WALK_LEN, walk),
     ("Run", RUN_LEN, run),
     ("Jump", JUMP_LEN, jump),
+    ("Land", LAND_LEN, land),
 ]
 
 # --- bake ---------------------------------------------------------------------------

@@ -5,25 +5,26 @@ import { getBounds, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { describe, expect, it } from 'vitest';
 
-// Structural contract for the slime mount (docs/design/slime-mount). The render
-// side looks the saddle bone up by name (the rider's seat), so a re-export that
-// renames it breaks the mount with nothing else failing. The byte pin makes any
+// Structural contract for Wobbles the Slime (docs/design/slime-mount). The render
+// side looks the saddle bone up by name (the rider's seat, MountSeatSpec) and
+// plays the clips by name (MOUNT_SLIME in characters/manifest.ts), so a
+// re-export that renames either breaks the mount with nothing else failing. The byte pin makes any
 // re-export a deliberate, reviewed change.
-const ASSET_PATH = path.join(__dirname, '..', 'public/models/mounts/slime.glb');
-const EXPECTED_ASSET_SHA256 = 'c2c06924c37c69ad07df8311dab438716909c965f679b37de9c3c516499a16cd';
-const CLIP_SECONDS = { Idle: 6, Walk: 1, Run: 0.9, Jump: 0.8 };
+const ASSET_PATH = path.join(__dirname, '..', 'public/models/mounts/wobbles_slime.glb');
+const EXPECTED_ASSET_SHA256 = '537be13089d67594266b9c4c2813633a47d0c019d61fea3ca34bbf4e1d8f67dd';
+const CLIP_SECONDS = { Idle: 6, Walk: 1, Run: 0.9, Jump: 0.5, Land: 0.6 };
 
 async function readAsset() {
   return new NodeIO().registerExtensions(ALL_EXTENSIONS).read(ASSET_PATH);
 }
 
-describe('slime mount asset', () => {
+describe('Wobbles the Slime mount asset', () => {
   it('ships the exact bytes this test pins, changed only by a deliberate re-export', () => {
     const hash = createHash('sha256').update(readFileSync(ASSET_PATH)).digest('hex');
     expect(hash).toBe(EXPECTED_ASSET_SHA256);
   });
 
-  it('carries the four gait clips at their authored lengths', async () => {
+  it('carries the gait, jump and touchdown clips at their authored lengths', async () => {
     const root = (await readAsset()).getRoot();
     const lengths = Object.fromEntries(
       root
