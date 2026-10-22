@@ -79,6 +79,58 @@ describe('other character banks', () => {
     expect(root.textContent).not.toContain('An active membership');
   });
 
+  it('walks every stage with the line and recovery it needs', () => {
+    const { world, root, repaint, deps } = setup();
+    const render = () => {
+      root.innerHTML = '';
+      renderAccountBank(root, deps, repaint);
+    };
+    const info = world.accountBankInfo as Record<string, unknown>;
+    // A null mirror is loading, with its own way out.
+    world.accountBankInfo = null as unknown as typeof world.accountBankInfo;
+    render();
+    root.querySelector<HTMLButtonElement>('[data-focus-key="account-retry"]')!.click();
+    expect(world.requestAccountBanks).toHaveBeenCalledWith(true);
+    world.accountBankInfo = info as typeof world.accountBankInfo;
+    Object.assign(info, { selectedCharacterId: 2, bank: null, error: undefined });
+    render();
+    expect(root.textContent).toContain("Opening <Alice>'s bank");
+    Object.assign(info, { selectedCharacterId: null, error: 'busy' });
+    render();
+    expect(root.querySelector('[role="alert"]')?.textContent).toBe(
+      'The bank is busy. Try again in a moment.',
+    );
+    world.requestAccountBanks.mockClear();
+    root.querySelector<HTMLButtonElement>('[data-focus-key="account-retry"]')!.click();
+    expect(world.requestAccountBanks).toHaveBeenCalledWith(true);
+    Object.assign(info, { error: 'membership_required' });
+    render();
+    expect(root.querySelector('[data-focus-key="account-retry"]')).toBeNull();
+    Object.assign(info, { error: 'lease_lost' });
+    render();
+    expect(root.textContent).toContain('This bank is unavailable');
+    Object.assign(info, { characters: [], error: undefined });
+    render();
+    expect(root.textContent).toContain('Create another character');
+  });
+
+  it('keeps the grids under a refused move and marks both empty sides', () => {
+    const { world, root, repaint, deps } = setup(true);
+    Object.assign(world.accountBankInfo, { bank: bank([]), error: 'no_fit' });
+    world.inventory.length = 0;
+    renderAccountBank(root, deps, repaint);
+    expect(root.querySelector('[role="alert"]')?.textContent).toBe(
+      'There is no room for that stack.',
+    );
+    expect(root.querySelector('.account-bank-withdraw')?.textContent).toContain(
+      'This bank is empty.',
+    );
+    expect(root.querySelector('.account-bank-withdraw .bank-item.empty')).toBeNull();
+    expect(root.querySelector('.account-bank-deposit')?.textContent).toContain(
+      'Your bags are empty.',
+    );
+  });
+
   it('titles the selected bank and shows its free room', () => {
     const { root, repaint, deps } = setup(true);
     renderAccountBank(root, deps, repaint);
@@ -183,6 +235,11 @@ describe('other character banks', () => {
     win.refreshIfChanged();
     win.refreshIfChanged();
     expect(world.requestAccountBanks).toHaveBeenCalledOnce();
+    // Showing the tab over a roster with nothing selected asks it to open a bank.
+    root.querySelector<HTMLButtonElement>('[data-tab="personal"]')!.click();
+    Object.assign(world.accountBankInfo, { selectedCharacterId: null, bank: null });
+    root.querySelector<HTMLButtonElement>('[data-tab="account"]')!.click();
+    expect(world.requestAccountBanks).toHaveBeenLastCalledWith(true);
     world.player.membershipActive = false;
     win.refreshIfChanged();
     expect(root.querySelector('[data-tab="account"]')).toBeNull();

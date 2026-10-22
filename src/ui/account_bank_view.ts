@@ -22,7 +22,7 @@ export type AccountBankStage =
   | { kind: 'choose' }
   | { kind: 'opening'; characterId: number }
   | { kind: 'failed'; characterId: number | null; errorKey: TranslationKey }
-  | { kind: 'ready'; characterId: number };
+  | { kind: 'ready'; characterId: number; errorKey?: TranslationKey };
 
 export function accountBankStage(
   info: AccountBankInfo | null,
@@ -32,10 +32,14 @@ export function accountBankStage(
   // The roster request is in flight (or its reply was refused by the decoder).
   if (!info) return { kind: 'loading' };
   const characterId = info.selectedCharacterId;
-  if (info.error) return { kind: 'failed', characterId, errorKey: accountBankErrorKey(info.error) };
+  const errorKey = info.error ? accountBankErrorKey(info.error) : undefined;
+  // A refused move keeps its bank (the server resends it), so the grids stay up
+  // under the refusal instead of vanishing behind it.
+  if (characterId !== null && info.bank) return { kind: 'ready', characterId, errorKey };
+  if (errorKey) return { kind: 'failed', characterId, errorKey };
   if (info.characters.length === 0) return { kind: 'no_characters' };
   if (characterId === null) return { kind: 'choose' };
-  return info.bank ? { kind: 'ready', characterId } : { kind: 'opening', characterId };
+  return { kind: 'opening', characterId };
 }
 
 /** Server refusal codes (membership_bank_service / membership_bank_db) to the line

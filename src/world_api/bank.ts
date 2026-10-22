@@ -107,7 +107,8 @@ export interface IWorldBank {
   readonly courierInfo: CourierInfo | null;
   courierDispatch(request: CourierDispatchRequest): void;
   readonly accountBankInfo: AccountBankInfo | null;
-  requestAccountBanks(): void;
+  /** openFirst: open the remembered (or first) character's bank once the roster lands. */
+  requestAccountBanks(openFirst?: boolean): void;
   selectAccountBank(characterId: number): void;
   accountBankTransfer(
     characterId: number,

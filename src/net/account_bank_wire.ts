@@ -47,12 +47,13 @@ export function accountBankAutoSelect(
     : info.characters[0].characterId;
 }
 
-/** Selecting a tab clears only its stale contents while the owner response loads. */
+/** Selecting a tab clears its stale contents and any earlier refusal while the
+ *  owner response loads. */
 export function selectAccountBankMirror(
   info: AccountBankInfo | null,
   characterId: number,
 ): AccountBankInfo | null {
-  return info ? { ...info, selectedCharacterId: characterId, bank: null } : null;
+  return info ? { ...info, selectedCharacterId: characterId, bank: null, error: undefined } : null;
 }
 export function accountBankTransferPayload(
   ...[characterId, direction, slotIndex, count, expectedSlot]: Parameters<

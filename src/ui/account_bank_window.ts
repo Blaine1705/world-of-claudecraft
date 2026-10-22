@@ -9,7 +9,6 @@ import {
 } from './account_bank_view';
 import { buildBankView } from './bank_view';
 import { formatCount } from './count_format';
-import { esc } from './esc';
 import { findFocusKey } from './focus_restore';
 import { type TranslationKey, t } from './i18n';
 import { knownItemDef } from './known_item';
@@ -25,9 +24,16 @@ export function available(world: IWorld): boolean {
 }
 
 /** Only active members request other characters' bank data. */
-export function request(world: IWorld, force = false): void {
+export function request(world: IWorld, force = false, openFirst = false): void {
   if (world.player?.membershipActive && (force || !world.accountBankInfo))
-    world.requestAccountBanks?.();
+    world.requestAccountBanks?.(openFirst);
+}
+
+/** Showing the tab opens a bank: the roster is fetched (or the in-flight fetch
+ *  armed) so the remembered or first character loads without a click. */
+export function openTab(world: IWorld): void {
+  const info = world.accountBankInfo;
+  request(world, !info || (info.selectedCharacterId === null && !info.error), true);
 }
 
 type AccountBankDeps = PersonalBankItemCellDeps & { world(): IWorld };
@@ -57,6 +63,7 @@ export function renderAccountBank(
   switch (stage.kind) {
     case 'loading':
       pane.appendChild(notice('hudChrome.bank.accountLoading', undefined, 'status'));
+      pane.appendChild(retryButton(() => request(deps.world(), true, true)));
       break;
     case 'no_characters':
       pane.appendChild(notice('hudChrome.bank.accountEmpty'));
@@ -73,6 +80,8 @@ export function renderAccountBank(
       pane.appendChild(failure(stage, name(stage.characterId), deps));
       break;
     case 'ready':
+      if (stage.errorKey)
+        pane.appendChild(notice(stage.errorKey, { name: name(stage.characterId) }, 'alert'));
       if (info?.bank)
         appendGrids(pane, deps, stage.characterId, name(stage.characterId), info.bank, repaint);
       break;
@@ -101,18 +110,24 @@ function failure(
   box.className = 'account-bank-failure';
   box.appendChild(notice(stage.errorKey, { name }, 'alert'));
   if (stage.errorKey === 'hudChrome.bank.accountMembership') return box;
+  box.appendChild(
+    retryButton(() => {
+      const world = deps.world();
+      if (stage.characterId === null) request(world, true, true);
+      else world.selectAccountBank(stage.characterId);
+    }),
+  );
+  return box;
+}
+
+function retryButton(onClick: () => void): HTMLElement {
   const retry = document.createElement('button');
   retry.type = 'button';
   retry.className = 'btn ui-btn account-bank-retry';
   retry.textContent = t('hudChrome.bank.accountRetry');
   retry.dataset.focusKey = 'account-retry';
-  retry.addEventListener('click', () => {
-    const world = deps.world();
-    if (stage.characterId === null) request(world, true);
-    else world.selectAccountBank(stage.characterId);
-  });
-  box.appendChild(retry);
-  return box;
+  retry.addEventListener('click', onClick);
+  return retry;
 }
 
 function appendCharacterTabs(
@@ -159,8 +174,7 @@ function appendGrids(
     direction: 'deposit' | 'withdraw',
     slots: InvSlot[],
     title: string,
-    count: string | null,
-    emptyCells: number,
+    showRoom: boolean,
   ) => {
     const box = document.createElement('section');
     box.className = `account-bank-section account-bank-${direction}`;
@@ -169,10 +183,15 @@ function appendGrids(
     const heading = document.createElement('h3');
     heading.textContent = title;
     head.appendChild(heading);
-    if (count !== null) {
+    const model = buildBankView({ ...bank, slots }, (id) => knownItemDef(ITEMS, id));
+    if (model.kind === 'away') return;
+    if (showRoom) {
       const meter = document.createElement('span');
       meter.className = 'account-bank-count';
-      meter.textContent = count;
+      meter.textContent = t('hudChrome.bank.accountSlots', {
+        used: formatCount(model.meter.used),
+        total: formatCount(model.meter.total),
+      });
       head.appendChild(meter);
     }
     box.appendChild(head);
@@ -187,8 +206,6 @@ function appendGrids(
     box.appendChild(hint);
     const grid = document.createElement('div');
     grid.className = 'bank-grid';
-    const model = buildBankView({ ...bank, slots }, (id) => knownItemDef(ITEMS, id));
-    if (model.kind === 'away') return;
     if (model.empty) {
       grid.appendChild(
         notice(
@@ -232,7 +249,7 @@ function appendGrids(
       grid.appendChild(cell);
     }
     // Free squares make the selected bank's remaining room visible at a glance.
-    for (let i = 0; !model.empty && i < emptyCells; i++) {
+    for (let i = 0; showRoom && !model.empty && i < model.emptyCells; i++) {
       const cell = document.createElement('div');
       cell.className = 'bank-item ui-socket ui-socket--bag empty';
       cell.setAttribute('aria-hidden', 'true');
@@ -241,18 +258,8 @@ function appendGrids(
     box.appendChild(grid);
     pane.appendChild(box);
   };
-  const used = bank.slots.length;
-  section(
-    'withdraw',
-    bank.slots,
-    t('hudChrome.bank.accountBankTitle', { name }),
-    t('hudChrome.bank.accountSlots', {
-      used: formatCount(used),
-      total: formatCount(bank.capacity),
-    }),
-    Math.max(0, bank.capacity - used),
-  );
-  section('deposit', deps.world().inventory, t('hudChrome.bank.accountBagsTitle'), null, 0);
+  section('withdraw', bank.slots, t('hudChrome.bank.accountBankTitle', { name }), true);
+  section('deposit', deps.world().inventory, t('hudChrome.bank.accountBagsTitle'), false);
 }
 
 function footer(deps: AccountBankDeps): HTMLElement {

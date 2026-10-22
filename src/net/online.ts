@@ -1243,8 +1243,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
   bankInfo: BankInfo | null = null;
   courierInfo: CourierInfo | null = null;
   accountBankInfo: AccountBankInfo | null = null;
-  // The character bank last opened, reopened first when the roster arrives.
+  // The character bank last opened, reopened first when the Other characters
+  // tab asked for the roster (accountBankOpenFirst). A plain bank visit lists
+  // the roster without reading any other character's bank.
   private accountBankPreferred: number | null = null;
+  private accountBankOpenFirst = false;
+  // One roster read in flight: a second only bounces off the server's
+  // per-account pending slot as `busy`. Expires so a lost reply can be retried.
+  private accountBankListSentAt: number | null = null;
   // --- IWorldBank: Materials Vault contents view, the per-material store beside
   // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
   // The payload is OWNER-ONLY and never rides the interest-scoped entity
@@ -2307,8 +2313,17 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     if (msg.t === 'account_bank') {
-      this.accountBankInfo = decodeAccountBankInfo(msg.info);
-      const pick = accountBankAutoSelect(this.accountBankInfo, this.accountBankPreferred);
+      const info = decodeAccountBankInfo(msg.info);
+      this.accountBankInfo = info;
+      this.accountBankListSentAt = null;
+      // A remembered character that refuses (logged in, too large, gone) stops
+      // being the one reopened on the next visit.
+      if (info?.error && info.selectedCharacterId === this.accountBankPreferred)
+        this.accountBankPreferred = null;
+      const pick = this.accountBankOpenFirst
+        ? accountBankAutoSelect(info, this.accountBankPreferred)
+        : null;
+      this.accountBankOpenFirst = false;
       if (pick !== null) this.selectAccountBank(pick);
       return;
     }
@@ -4589,7 +4604,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   claimMembershipArmour(): void {
     this.cmd({ cmd: 'membership_claim_armour' });
   }
-  requestAccountBanks(): void {
+  requestAccountBanks(openFirst = false): void {
+    if (openFirst) this.accountBankOpenFirst = true;
+    const now = performance.now();
+    if (this.accountBankListSentAt !== null && now - this.accountBankListSentAt < 5_000) return;
+    this.accountBankListSentAt = now;
     this.accountBankInfo = null;
     this.cmd({ cmd: 'account_bank_list' });
   }

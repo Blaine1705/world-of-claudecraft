@@ -1,5 +1,9 @@
 import { expect, it } from 'vitest';
-import { accountBankAutoSelect, decodeAccountBankInfo } from '../src/net/account_bank_wire';
+import {
+  accountBankAutoSelect,
+  decodeAccountBankInfo,
+  selectAccountBankMirror,
+} from '../src/net/account_bank_wire';
 import { membershipBankView } from '../src/sim/membership_bank';
 
 it('validates bounded roster identity before displaying any other character bank', () => {
@@ -55,4 +59,21 @@ it('opens the remembered character bank, else the first, only on a fresh roster'
   expect(accountBankAutoSelect({ ...roster, selectedCharacterId: 3 }, null)).toBeNull();
   expect(accountBankAutoSelect({ ...roster, characters: [] }, null)).toBeNull();
   expect(accountBankAutoSelect(null, 2)).toBeNull();
+});
+
+it('drops an earlier refusal when another character is selected', () => {
+  const info = {
+    characters: [
+      { characterId: 2, name: 'Alice' },
+      { characterId: 3, name: 'Bram' },
+    ],
+    selectedCharacterId: 2,
+    bank: null,
+    error: 'online',
+  };
+  expect(selectAccountBankMirror(info, 3)).toMatchObject({
+    selectedCharacterId: 3,
+    bank: null,
+    error: undefined,
+  });
 });
