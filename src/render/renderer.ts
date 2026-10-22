@@ -3804,6 +3804,9 @@ export class Renderer {
       // sky behind an opaque loading screen, and its bar stays monotonic.
       if (!idlePace) await skyLane;
       onProgress?.(5, 100);
+      this.lastAttachedFeatureGroups = [];
+      this.ensureZoneFeatures(zone);
+      const featureGroups = this.lastAttachedFeatureGroups.slice();
       const terrainStarted = performance.now();
       await this.terrainView.ensureZone(
         zone,
@@ -3820,9 +3823,6 @@ export class Renderer {
       for (const mesh of waterMeshes) freezeStaticMatrices(mesh);
       const waterDone = performance.now();
       onProgress?.(96, 100);
-      this.lastAttachedFeatureGroups = [];
-      this.ensureZoneFeatures(zone);
-      const featureGroups = this.lastAttachedFeatureGroups.slice();
       // A background prepare precompiles every program this zone just added
       // (water lakes, bespoke biome features), one idle slot apart: a program
       // whose driver link has not finished BLOCKS the main thread at its first
@@ -4172,11 +4172,15 @@ export class Renderer {
   private zoneFeatureGroups: ZoneFeatureEntry[] = [];
 
   private attachZoneFeature(
-    view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
+    view: {
+      group: THREE.Group;
+      glowLights?: THREE.PointLight[];
+      cullGroups?: THREE.Group[];
+      animated?: THREE.Object3D[];
+    },
     freeze = true,
   ): void {
     setRenderCategory(view.group, 'props');
-    if (freeze) sceneryDetail.prepareSceneryDetailRoot(view.group, true);
     // Attach hidden until the live gate links the group's programs (the same
     // contract as dungeon interiors): a lazily built biome feature otherwise
     // links its freshly minted materials synchronously on its first visible
@@ -4188,7 +4192,14 @@ export class Renderer {
     // Point lights ride the fireLights budget, NEVER the cull-toggled group
     // (fire_light_registry.ts carries the why).
     reparentStrandedLightsToScene(this.scene, view.group);
-    if (freeze) freezeStaticMatrices(view.group);
+    if (freeze) {
+      freezeStaticMatrices(view.group);
+      // the freeze above stills the whole subtree; foam swell, mist drift and
+      // ghost-lights move via object transforms, so they get their motion back
+      // before scenery-detail registration inspects matrixAutoUpdate
+      for (const moving of view.animated ?? []) moving.matrixAutoUpdate = true;
+      sceneryDetail.prepareSceneryDetailRoot(view.group, true);
+    }
     // adoptFireLight, not a bare push: a feature attaches from a zone-prepare
     // continuation, so its glow lights would otherwise be visible and unranked
     // for the frames until the next budget pass.
@@ -4252,10 +4263,6 @@ export class Renderer {
         if (!this.realmFlora) {
           this.realmFlora = this.timedBuild('buildRealmFlora', buildRealmFlora);
           this.attachZoneFeature(this.realmFlora);
-          // the freeze above stills the whole subtree; foam swell and mist
-          // drift move via object transforms, so they get their motion back
-          // (the props.flames idiom)
-          for (const moving of this.realmFlora.animated) moving.matrixAutoUpdate = true;
         }
         break;
       case 'ember':
@@ -4291,7 +4298,7 @@ export class Renderer {
       case 'haunt':
         if (!this.hauntFeatures) {
           this.hauntFeatures = this.timedBuild('buildHauntFeatures', buildHauntFeatures);
-          this.attachZoneFeature(this.hauntFeatures, false);
+          this.attachZoneFeature(this.hauntFeatures);
         }
         break;
       case 'jungle':
