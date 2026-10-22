@@ -4,11 +4,17 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { addSceneryLod, SCENERY_LOD_ASSETS } from '../scripts/assets/scenery_lod_build.mjs';
+import {
+  addSceneryLod,
+  isSceneryLodCopyCatalogId,
+  SCENERY_LOD_ASSETS,
+} from '../scripts/assets/scenery_lod_build.mjs';
 import { verifyLodIndices } from '../scripts/assets/woc_character/lod_indices.mjs';
 import { WocLodExtension } from '../scripts/assets/woc_character/woc_lod_extension.mjs';
+import { assetById } from '../src/editor/asset_catalog.generated';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { gfxInternalsForTest } from '../src/render/gfx';
+import { ASSET_COLLISION } from '../src/sim/asset_collision.generated';
 
 const io = new NodeIO()
   .registerExtensions([...ALL_EXTENSIONS, WocLodExtension])
@@ -93,6 +99,31 @@ describe('scenery LOD assets', () => {
       expect(MEDIA_ASSETS[asset.output as keyof typeof MEDIA_ASSETS]).toContain(`.${hash}.glb`);
     });
   }
+
+  it('keeps the derived copies out of the editor catalog and the collision bake', () => {
+    const catalogId = (path: string) => path.replace(/^models\//, '').replace(/\.glb$/, '');
+    for (const { source, output } of SCENERY_LOD_ASSETS) {
+      const copy = catalogId(output);
+      const original = catalogId(source);
+      expect(isSceneryLodCopyCatalogId(copy), copy).toBe(true);
+      expect(assetById(copy), copy).toBeUndefined();
+      expect(ASSET_COLLISION[copy], copy).toBeUndefined();
+      // An authored map places the source, which stays placeable and baked.
+      expect(isSceneryLodCopyCatalogId(original), original).toBe(false);
+      expect(assetById(original)?.path, original).toBe(`/${source}`);
+      expect(ASSET_COLLISION[original], original).toBeDefined();
+    }
+    // Exact outputs only, never a suffix rule.
+    expect(isSceneryLodCopyCatalogId('props/fenbridge_scout_lodge')).toBe(false);
+    expect(isSceneryLodCopyCatalogId('foliage/twisted_2_lod')).toBe(false);
+    // The generators apply the rule (a catalog regen is not a gate step).
+    expect(readFileSync('scripts/gen_asset_catalog.mjs', 'utf8')).toContain(
+      '.filter((e) => !isSceneryLodCopyCatalogId(e.id))',
+    );
+    expect(readFileSync('scripts/assets/bake_collision.mjs', 'utf8')).toContain(
+      '|| isSceneryLodCopyCatalogId(id)) continue;',
+    );
+  });
 
   it('enables the same distance policy for desktop and Android Low only', () => {
     for (const platform of ['other', 'android'] as const) {
