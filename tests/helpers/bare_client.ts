@@ -7,6 +7,7 @@
 // hand-rolling either fixture again.
 
 import type { ClientSession, GameServer } from '../../server/game';
+import { AccountBankRequests } from '../../src/net/account_bank_wire';
 import { ActionBarLayoutUploader } from '../../src/net/action_bar_upload';
 import { emptyBuddySelfMirror } from '../../src/net/buddy_wire';
 import { EMPTY_MST_CRAFTS } from '../../src/net/crafting_wire';
@@ -131,9 +132,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.mailUnread = 0;
   c.bankInfo = null;
   c.accountBankInfo = null;
-  c.accountBankPreferred = null;
-  c.accountBankOpenFirst = false;
-  c.accountBankListSentAt = null;
+  c.accountBankRequests = new AccountBankRequests();
   c.courierInfo = null;
   c.bankPurchasedSlots = null;
   c.vaultInfo = null;
