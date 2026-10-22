@@ -704,11 +704,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 322 with the Mirefen world-boss branch's three combat deeds, all pending.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, its 24 pending on the dungeon crest.
     expect(DEED_ORDER).toHaveLength(346);
-    expect(DEED_ART_PENDING.has('cmb_point_taken')).toBe(true);
-    expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
-    expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);
-    expect(DEED_ART_PENDING.has('cmb_balgath_ten')).toBe(true);
-    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
+    // The integration45 backlog supplies all 57 formerly missing crests.
+    expect(DEED_ART_PENDING.size).toBe(0);
+    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(
       path.join(repoRoot, 'docs/achievements/missing-painted-icons-provenance.md'),
