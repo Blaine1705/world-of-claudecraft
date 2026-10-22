@@ -182,8 +182,10 @@ export function sanitizeCourierState(
         cargo: accountCargo,
         withdrawals: loadSelections(rawAccount?.withdrawals),
       };
-    if (r.banked === true) state.banked = true;
   } else state.cargo.push(...accountCargo);
+  // An outbound courier whose bank and vault legs are done carries homeward
+  // cargo, with or without a leg still to run: never run those legs again.
+  if (state.phase === 'outbound' && r.banked === true) state.banked = true;
   // Invalid request metadata can be abandoned without deleting owned inventory.
   const requests = () =>
     state.withdrawals.length +

@@ -132,6 +132,9 @@ describe('courier other-character leg', () => {
     expect(home?.account).toBeUndefined();
     expect(home?.banked).toBeUndefined();
     expect(home?.cargo).toMatchObject([potion(2)]);
+    // After the leg committed (no leg left), the bank leg must still never rerun.
+    const { account: _settled, ...committed } = saved;
+    expect(sanitizeCourierState(committed, 'Courier test')?.banked).toBe(true);
   });
 });
 

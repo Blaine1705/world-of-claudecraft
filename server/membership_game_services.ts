@@ -314,7 +314,7 @@ export class MembershipGameServices {
           }
           live.courier.cargo = result.value.cargo;
           delete live.courier.account;
-          live.courier.revision = result.value.revision;
+          live.courier.revision++;
         },
         controller.signal,
       );

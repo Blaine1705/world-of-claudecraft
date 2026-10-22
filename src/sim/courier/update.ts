@@ -153,6 +153,18 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
   }
   state.retryRemaining = Math.max(0, state.retryRemaining - DT);
   if (state.phase === 'outbound') {
+    // Already at the banker with the bank and vault legs done: the courier only
+    // waits on the other-character leg, whose transaction may be committing, so
+    // nothing here may send its stacks home underneath it (the host settles it).
+    if (state.banked) {
+      if (state.retryRemaining > 0) return;
+      if (!exchangeAccount(ctx, meta, state)) {
+        state.retryRemaining = 0.5;
+        return;
+      }
+      returnHome(state, player);
+      return;
+    }
     const banker = state.bankerId === null ? undefined : ctx.entities.get(state.bankerId);
     if (!banker || banker.kind !== 'npc' || banker.dead) {
       returnHome(state, player);
@@ -165,7 +177,7 @@ export function updateCourier(ctx: SimContext, meta: PlayerMeta, player: Entity)
       returnHome(state, player);
       return;
     }
-    if (!state.banked && !exchange(ctx, meta, player, state)) {
+    if (!exchange(ctx, meta, player, state)) {
       state.retryRemaining = 1;
       return;
     }
