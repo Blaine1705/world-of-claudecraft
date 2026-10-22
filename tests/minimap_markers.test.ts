@@ -354,6 +354,32 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     },
   );
 
+  it('shows the rerolled replacement instead of the rotation quest it replaced', () => {
+    const rotated = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    const replacement = WORLD_QUESTS_BY_ID.wq_eastbrook_boars;
+    const world = makeWorld('client') as unknown as {
+      player: { level: number; pos: { x: number; z: number } };
+      worldQuestCycle: string;
+      worldQuestLog: ReadonlyMap<string, never>;
+      worldQuestReplacements: Readonly<Record<string, string>>;
+    };
+    const worldQuestIds = () =>
+      buildMarkers(world as unknown as IWorld).flatMap((marker) =>
+        marker.kind === 'world-quest' ? [marker.questId] : [],
+      );
+    world.player.level = Math.max(rotated.minLevel, replacement.minLevel);
+    world.worldQuestCycle = '2026-08-31';
+    world.worldQuestLog = new Map<string, never>();
+    world.worldQuestReplacements = { [rotated.id]: replacement.id };
+
+    world.player.pos.x = replacement.area.x;
+    world.player.pos.z = replacement.area.z;
+    expect(worldQuestIds()).toContain(replacement.id);
+    world.player.pos.x = rotated.area.x;
+    world.player.pos.z = rotated.area.z;
+    expect(worldQuestIds()).not.toContain(rotated.id);
+  });
+
   it('marks an entered objective active while keeping the same small emblem', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const world = makeWorld('client') as unknown as {
