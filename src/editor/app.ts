@@ -1,3 +1,5 @@
+import { liveWorldPreview, newLiveWorldMap } from './live_world_core';
+import { showLiveWorldNotice } from './live_world_notice';
 // The map-editor application coordinator. Thin by design: layout assembly,
 // tool state, the undo stack, and event routing live here; everything with a
 // nameable responsibility is a sibling module (topbar, toolbar, inspector,
@@ -1587,17 +1589,22 @@ export class EditorApp {
     // the quota that used to block every save). The constructor proceeds on
     // the built-in default; finishBoot loadMap()s the maker's real map the
     // moment the store is ready.
-    promoteMajorWorldProps(this.map as CustomMap);
-    promoteEditablePalms(this.map as CustomMap);
-    promoteStreetlamps(this.map as CustomMap);
-    promoteWillows(this.map as CustomMap);
-    promoteFarshorePalms(this.map as CustomMap);
-    promoteFeatureDressing(this.map as CustomMap);
-    repairLegacyWorldPropFit(this.map as CustomMap);
-    repairStretchedWorldProps(this.map);
-    repairPlacedAssetShapes(this.map);
-    repairMissingTreeCollision(this.map, applyDefaultCollision);
-    repairDecorBuildingCollision(this.map);
+    if (new URLSearchParams(location.search).get('liveWorld') === '1') {
+      this.map = newLiveWorldMap(t('editor.liveWorld.name'));
+      this.content = this.map.content;
+    } else {
+      promoteMajorWorldProps(this.map as CustomMap);
+      promoteEditablePalms(this.map as CustomMap);
+      promoteStreetlamps(this.map as CustomMap);
+      promoteWillows(this.map as CustomMap);
+      promoteFarshorePalms(this.map as CustomMap);
+      promoteFeatureDressing(this.map as CustomMap);
+      repairLegacyWorldPropFit(this.map as CustomMap);
+      repairStretchedWorldProps(this.map);
+      repairPlacedAssetShapes(this.map);
+      repairMissingTreeCollision(this.map, applyDefaultCollision);
+      repairDecorBuildingCollision(this.map);
+    }
     this.entities = buildEntities(this.content);
     this.base = snapshot(this.entities);
     this.rebuildActiveWorld();
@@ -1707,7 +1714,7 @@ export class EditorApp {
     // there). Set it at construction, not only on the map-load path: the
     // most-recent-save boot never went through that path, so the button stayed
     // hidden (SPACEY 2026-09-07: "I don't have that button").
-    this.topbar.setPublishEnabled(import.meta.env.DEV);
+    this.topbar.setPublishEnabled(import.meta.env.DEV && !this.map.meta.overworldBase);
     // Autosave preference: default off; a blocked storage read stays off.
     try {
       this.autosaveOn = localStorage.getItem(AUTOSAVE_PREF_KEY) === '1';
@@ -2142,7 +2149,12 @@ export class EditorApp {
     // shipped version is still seeded into the store in the background (kept
     // alongside their maps, never opened over them), so an updated default
     // is one click away in Open rather than hijacking the boot.
-    let autoloaded = resumed ? null : await this.seedDefaultMap();
+    const liveWorld = new URLSearchParams(location.search).get('liveWorld') === '1';
+    let autoloaded = resumed
+      ? null
+      : liveWorld
+        ? (this.io.store.load(this.map.meta.id) ?? this.map)
+        : await this.seedDefaultMap();
     if (!resumed && !autoloaded) autoloaded = this.loadMostRecentSave();
     const opened = resumed ?? autoloaded;
     if (opened) {
@@ -2452,6 +2464,7 @@ export class EditorApp {
     // the engine reload setZoneIsolate triggers) is what actually unloads them
     //, without it the terrain vanishes and every building keeps standing.
     // Safe to filter in place: props above is already a fresh clone per call.
+    if (map.meta.overworldBase) Object.assign(world, liveWorldPreview(map));
     const isolate = this.isolateRect();
     if (isolate) world.props = propsWithinRect(world.props, isolate);
     this.activeWorld = world;
@@ -10538,6 +10551,7 @@ export class EditorApp {
   /** A moved placement's seat: detached to float where it is (the default),
    *  or re-seated on the ground under its new spot when snapping is on. */
   private moveSeat(index: number): void {
+    if (this.map.meta.overworldBase && !this.snapToGroundOnMove) return;
     if (!this.snapToGroundOnMove) {
       this.detachPlacement(index);
       return;
@@ -16045,6 +16059,16 @@ export class EditorApp {
    * zip, which Import reads back on any computer.
    */
   private async exportBundle(): Promise<void> {
+    if (this.map.meta.overworldBase) {
+      try {
+        downloadMap(this.map);
+        this.toasts.success(t('editor.status.exported', { name: this.map.meta.name }));
+      } catch (error) {
+        console.error('Live-world export rejected', error);
+        this.toasts.error(t('editor.status.exportBlockedInvalid'));
+      }
+      return;
+    }
     this.map.meta.updatedAt = now();
     const safe = this.map.meta.name.replace(/[^a-z0-9-_]+/gi, '-').toLowerCase() || 'map';
     try {
@@ -16698,7 +16722,7 @@ export class EditorApp {
     // A region map (Open -> Shipped -> Ravenrift) can be written back to the
     // game; every other document cannot, so the action only exists for it.
     this.topbar.setRegionExport(import.meta.env.DEV && map.regionSource !== undefined);
-    this.topbar.setPublishEnabled(import.meta.env.DEV);
+    this.topbar.setPublishEnabled(import.meta.env.DEV && !this.map.meta.overworldBase);
     this.cityActiveWallId = null;
     this.cityWallRuntime.clear();
     this.cityWallUpdateRevision++;
@@ -16740,6 +16764,7 @@ export class EditorApp {
     if (!preserveViewportTerrain) this.rebuildActiveWorld();
     this.applySkybox();
     this.topbar.setMapName(map.meta.name);
+    showLiveWorldNotice(this.root, !!map.meta.overworldBase);
     this.topbar.setDirty(false);
     this.syncUndoUi();
     this.topbar.setForkEnabled(this.io.linkFor(map.meta.id) !== null);

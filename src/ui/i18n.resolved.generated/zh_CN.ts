@@ -10900,6 +10900,10 @@ export const zh_CN: EnTranslations = {
     "appTitle": "地图编辑器",
     "docTitle": "地图编辑器 - World of ClaudeCraft",
     "untitledMap": "未命名地图",
+    "liveWorld": {
+      "name": "游戏世界微调",
+      "scope": "游戏世界：可编辑地形高度与涂色、道路、游戏对象的位置及新增摆件。现有建筑保持固定。使用“导出”保存修改以供审核。"
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "制图师",
     "playtestBack": "Back to Editor",

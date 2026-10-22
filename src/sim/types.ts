@@ -11976,6 +11976,8 @@ export type MapPresentationMode =
   | 'yumiMaze';
 
 export interface WorldContent {
+  /** Editor preview of the live overworld: retain release terrain, scenery and movement rules. */
+  liveWorldPreview?: true;
   zones: ZoneDef[];
   camps: CampDef[];
   npcs: Record<string, NpcDef>;

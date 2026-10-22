@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': 'ゲーム世界の調整',
+  'editor.liveWorld.scope':
+    'ゲーム世界：地形の高さと塗装、道路、ゲーム内オブジェクトの位置、追加した小物を編集できます。既存の建物は固定されています。「エクスポート」で変更を保存し、レビューに送ってください。',
   'hudChrome.courier.inventory': '所持品',
   'hudChrome.courier.bankTitle': '銀行',
   'hudChrome.courier.capacity': '{used} / {capacity} スロット',

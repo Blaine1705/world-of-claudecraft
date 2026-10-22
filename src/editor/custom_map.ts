@@ -1,6 +1,7 @@
 import { cloneMaterialFinishes } from '../sim/material_finishes';
 import { cloneWallFinishes } from '../sim/wall_finishes';
 import { WORLD_SEED } from '../sim/world_seed';
+import { compileLiveWorldDocument } from './live_world_core';
 // The CustomMap document: the editor's canonical, serializable map. The type and
 // its sanitizer live in src/sim/map_doc.ts (shared with the server, which
 // validates uploaded documents with the SAME code); this module adapts the
@@ -493,6 +494,9 @@ export function zoneGraveyards(zones: readonly ZoneDef[]): GraveyardDef[] {
 // placements carry their collide footprint so the Sim's colliders and the
 // renderer read the SAME records.
 export function customMapToWorldContent(map: CustomMap): WorldContent {
+  if (map.meta.overworldBase) {
+    return { ...compileLiveWorldDocument(map).world, liveWorldPreview: true };
+  }
   // LINKED map: the maker anchored this map into the world, project its
   // layers into the FULL built-in world at that offset instead of booting the
   // standalone authored slate.

@@ -10900,6 +10900,10 @@ export const id_ID: EnTranslations = {
     "appTitle": "Editor Peta",
     "docTitle": "Editor Peta - World of ClaudeCraft",
     "untitledMap": "Peta Tanpa Judul",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Pembuat Peta",
     "playtestBack": "Back to Editor",

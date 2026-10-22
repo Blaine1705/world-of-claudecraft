@@ -2612,7 +2612,7 @@ export class Renderer {
     // treeline to the fog wall, the same distance treatment procedural
     // foliage gets. The editor viewport still boots without them
     // (viewport.ts clears the set): no sprites there, full asset range.
-    const farMirrorPlacements = this.sim.cfg.world?.placements;
+    const farMirrorPlacements = (this.sim.cfg.world ?? getActiveWorldContent()).placements;
     setFoliageFarPlacements(
       farMirrorPlacements && farMirrorPlacements.length > 0
         ? farFoliageDecorations(farMirrorPlacements, (x, z) => biomeAt(x, z))
@@ -2767,7 +2767,7 @@ export class Renderer {
     // async and pops in; absent for the built-in world. The view supports live
     // editing (add/move/remove/reSeat), reached through the editor-only
     // `placedAssets` getter below; the shipped game only ever builds it here.
-    const placements = this.sim.cfg.world?.placements;
+    const placements = (this.sim.cfg.world ?? getActiveWorldContent()).placements;
     if (placements && placements.length > 0) {
       // Residency streaming is DORMANT (no streamAround): it coincided with a
       // reported frame-rate regression, so game hosts build the full set at

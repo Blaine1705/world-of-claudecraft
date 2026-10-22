@@ -149,6 +149,11 @@ export const editorStrings = {
   // Browser tab title. Hyphen separator (not a dash character).
   docTitle: 'ClaudeCraft Studio - World of ClaudeCraft',
   untitledMap: 'Untitled Map',
+  liveWorld: {
+    name: 'Live world touch-ups',
+    scope:
+      'Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review.',
+  },
   flatMapName: 'Flat World',
   // The offline character name a playtest boots with.
   playtestPlayerName: 'Mapmaker',

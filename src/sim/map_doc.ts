@@ -633,6 +633,10 @@ export interface MapDocMeta {
    *  its slug and the git blob id of the file as it was opened (the base the
    *  push compares against). Absent on a map not opened from the repo. */
   basedOn?: MapDocBase;
+  /** Live overworld editing baseline, separate from standalone custom maps. */
+  overworldBase?: string;
+  /** The last published touch-up revision, to reject stale concurrent edits. */
+  overworldRevision?: string;
 }
 
 export interface MapDocBase {
@@ -1577,6 +1581,14 @@ function sanitizeMeta(v: unknown): MapDocMeta {
     seed: Math.floor(num(m.seed, DEFAULT_SEED)),
     parentId: str(m.parentId, '').slice(0, 64),
     ...sanitizeMapBase(m.basedOn),
+    ...(typeof m.overworldBase === 'string' &&
+    /^[0-9a-f]+-[0-9a-f]+-[0-9a-f]+$/.test(m.overworldBase)
+      ? { overworldBase: m.overworldBase.slice(0, 64) }
+      : {}),
+    ...(typeof m.overworldRevision === 'string' &&
+    /^[0-9a-f]+-[0-9a-f]+-[0-9a-f]+$/.test(m.overworldRevision)
+      ? { overworldRevision: m.overworldRevision.slice(0, 64) }
+      : {}),
   };
 }
 

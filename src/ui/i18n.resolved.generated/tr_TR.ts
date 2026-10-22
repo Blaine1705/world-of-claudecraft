@@ -10900,6 +10900,10 @@ export const tr_TR: EnTranslations = {
     "appTitle": "Harita Editörü",
     "docTitle": "Harita Editörü - World of ClaudeCraft",
     "untitledMap": "Adsız Harita",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Haritacı",
     "playtestBack": "Back to Editor",

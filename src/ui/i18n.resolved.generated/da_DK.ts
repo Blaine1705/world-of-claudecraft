@@ -10900,6 +10900,10 @@ export const da_DK: EnTranslations = {
     "appTitle": "Korteditor",
     "docTitle": "Korteditor - World of ClaudeCraft",
     "untitledMap": "Unavngivet kort",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Kortmager",
     "playtestBack": "Back to Editor",

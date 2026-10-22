@@ -3034,6 +3034,8 @@ export type TranslationKeyFlat =
   | 'editor.lighting.zoneReset'
   | 'editor.lighting.zoneSelect'
   | 'editor.lighting.zoneTitle'
+  | 'editor.liveWorld.name'
+  | 'editor.liveWorld.scope'
   | 'editor.map.close'
   | 'editor.map.pinHint'
   | 'editor.map.showWorld'
