@@ -20,8 +20,9 @@ hovering, hops to move, and jiggles. Not wired into the mount catalog yet.
   alone, and fits a smooth body to it. It keeps the tack whole and tucks the
   body just under it. The new body replaces Tripo's jelly skin, which had
   lighting and highlights baked in.
-- `build_mount.py`: paints the jelly (gradient, base glow, highlights; no
-  bubbles), then builds the rig and clips (Blender 5.2, headless).
+- `build_mount.py`: paints the jelly (gradient, base glow, highlights) and
+  makes it translucent, adds the bubbles, then builds the rig and clips
+  (Blender 5.2, headless).
 - `finish_mount.mjs`: resamples, prunes, dedups and converts textures to WebP,
   then checks that the clips and the saddle bone survived.
 
@@ -53,6 +54,18 @@ changes the bytes, so update the pin in `tests/slime_mount_asset.test.ts`.
   is placed where the spine carries the top of the body, turned with it but
   never squashed. Use `saddle` as the rider's seat bone (`MountSeatSpec`) so
   the rider rides the wobble.
+- Look: the jelly (`slime` material) is alpha blended at 0.7 and
+  single-sided, so only its near wall draws. The tack (`tack`) is
+  double-sided, so the saddle's underside shows through the jelly instead
+  of vanishing. The low graphics tier keeps both: its Lambert rebuild copies
+  `transparent`, `opacity` and `side`.
+- Bubbles: 14 opaque, faintly glowing spheres (`slime_bubbles`, material
+  `bubble`), each on its own bone (`bubble_00` to `bubble_13`, children of
+  `base`, so they squash and lean with the jelly). In every clip each one
+  rises along a seeded random, wobbling path, swells in and pops. Each path
+  repeats on a period that divides the clip length, so the loops stay
+  seamless. In Idle they cross the whole body slowly; when moving they take
+  short trips swept toward the back.
 - Clips at 30 fps:
   - `Idle` (6 s loop): sat on the ground (no hover), breathing, swaying, with
     two little shivers.

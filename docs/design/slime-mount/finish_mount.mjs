@@ -7,7 +7,8 @@
 // resample + prune + dedup + WebP textures at most 512 px, no meshopt (skinned
 // geometry stays plainly encoded). The KTX2 pass after it is not optional:
 // tests/glb_texture_compression.test.ts holds every model to KTX2. Fails if a
-// clip went missing or stopped carrying the saddle (the rider's seat).
+// clip went missing or stopped carrying the saddle (the rider's seat), a
+// bubble bone went missing, or the jelly lost its translucency.
 // biome-ignore assist/source/organizeImports: sharp must initialize before @gltf-transform/functions on Windows.
 import sharp from 'sharp';
 import { NodeIO } from '@gltf-transform/core';
@@ -19,6 +20,7 @@ if (!src || !out) throw new Error('usage: finish_mount.mjs <blender.glb> <out.gl
 
 const CLIPS = ['Idle', 'Walk', 'Run', 'Jump'];
 const JOINTS = ['base', 'mid', 'move', 'root', 'saddle', 'squash', 'top'];
+const BUBBLES = 14;
 
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
 const doc = await io.read(src);
@@ -36,7 +38,11 @@ const joints = root
   .listSkins()
   .flatMap((s) => s.listJoints().map((j) => j.getName()))
   .sort();
-if (joints.join() !== JOINTS.join()) throw new Error(`unexpected joints ${joints}`);
+const rigJoints = joints.filter((j) => !j.startsWith('bubble_'));
+if (rigJoints.join() !== JOINTS.join()) throw new Error(`unexpected joints ${joints}`);
+if (joints.length - rigJoints.length !== BUBBLES) throw new Error(`expected ${BUBBLES} bubbles`);
+const slime = root.listMaterials().find((m) => m.getName() === 'slime');
+if (slime?.getAlphaMode() !== 'BLEND') throw new Error('the jelly is not translucent');
 for (const a of root.listAnimations()) {
   if (!a.listChannels().some((ch) => ch.getTargetNode()?.getName() === 'saddle')) {
     throw new Error(`clip ${a.getName()} does not move the saddle`);

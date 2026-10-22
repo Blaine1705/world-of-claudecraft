@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 // renames it breaks the mount with nothing else failing. The byte pin makes any
 // re-export a deliberate, reviewed change.
 const ASSET_PATH = path.join(__dirname, '..', 'public/models/mounts/slime.glb');
-const EXPECTED_ASSET_SHA256 = '7f0225bb1135f483b523ab66487863f096da3a119d5135cf382ba348005945d1';
+const EXPECTED_ASSET_SHA256 = 'e99e54235a7f859f95bb09270054cfbd7581df45c42deaa5c1130109c0899b00';
 const CLIP_SECONDS = { Idle: 6, Walk: 1, Run: 0.9, Jump: 0.8 };
 
 async function readAsset() {
@@ -41,11 +41,13 @@ describe('slime mount asset', () => {
 
   it('rigs the saddle on its own bone, moved by every clip, so a rider can sit on it', async () => {
     const root = (await readAsset()).getRoot();
-    const joints = root
-      .listSkins()
-      .flatMap((s) => s.listJoints().map((j) => j.getName()))
-      .sort();
-    expect(joints).toEqual(['base', 'mid', 'move', 'root', 'saddle', 'squash', 'top']);
+    const joints = [
+      ...new Set(root.listSkins().flatMap((s) => s.listJoints().map((j) => j.getName()))),
+    ].sort();
+    const bubbles = Array.from({ length: 14 }, (_, i) => `bubble_${String(i).padStart(2, '0')}`);
+    expect(joints).toEqual(
+      ['base', ...bubbles, 'mid', 'move', 'root', 'saddle', 'squash', 'top'].sort(),
+    );
     const saddle = root.listNodes().find((n) => n.getName() === 'saddle');
     expect(saddle?.getParentNode()?.getName()).toBe('move');
     for (const anim of root.listAnimations()) {
@@ -53,6 +55,22 @@ describe('slime mount asset', () => {
       expect(targets).toContain('saddle');
     }
   });
+
+  it('draws the jelly translucent, single-sided, with the tack double-sided under it', () =>
+    readAsset().then((doc) => {
+      const mats = Object.fromEntries(
+        doc
+          .getRoot()
+          .listMaterials()
+          .map((m) => [m.getName(), m]),
+      );
+      expect(mats.slime?.getAlphaMode()).toBe('BLEND');
+      expect(mats.slime?.getAlpha()).toBeCloseTo(0.7, 2);
+      expect(mats.slime?.getDoubleSided()).toBe(false);
+      expect(mats.tack?.getAlphaMode()).toBe('OPAQUE');
+      expect(mats.tack?.getDoubleSided()).toBe(true);
+      expect(mats.bubble?.getAlphaMode()).toBe('OPAQUE');
+    }));
 
   it('keeps every texture KTX2 and stands 6.61 units tall at rest, on the ground', async () => {
     const doc = await readAsset();

@@ -19,17 +19,30 @@ Y up, Z toward the viewer (the mount's front, Blender -Y).
 
 The body texture is painted here: a sky-blue jelly gradient with an aqua glow
 at its base and soft highlights, equirect over the body
-(u = (phi + pi) / 2pi with phi = 0 at the front, v = 1 - theta / 180).
+(u = (phi + pi) / 2pi with phi = 0 at the front, v = 1 - theta / 180). The
+jelly is translucent (alpha blended, single-sided); the tack is double-sided so
+its underside shows through the jelly instead of vanishing.
+
+Bubbles: NB little spheres inside the jelly, one bone each (`bubble_00`...,
+children of `base`, so they squash and lean with the body). In every clip each
+bubble rises along a seeded random, wobbling path, swells in, and pops near the
+end of it. Each path repeats on a period that divides the clip length, so the
+loops stay seamless; a popped bubble jumps back to its start at scale zero.
 """
 import math
+import random
 import sys
 
+import bmesh
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
+from mathutils.bvhtree import BVHTree
 
 src_glb, out_glb = sys.argv[sys.argv.index("--") + 1 :]
 FPS = 30
+JELLY_ALPHA = 0.7
+NB = 14  # bubbles
 
 
 def smooth(x):
@@ -91,8 +104,6 @@ col += (0.10 * np.exp(-((deg - 28) / 16) ** 2))[..., None]
 for hp in (1.25, -1.25):
     dph = np.angle(np.exp(1j * (ph - hp)))
     col += (0.16 * np.exp(-((deg - 62) / 9) ** 2 - (dph / 0.22) ** 2))[..., None]
-
-
 col = np.clip(col, 0, 1)
 px = np.concatenate([col, np.ones((TH, TW, 1))], -1).reshape(-1)  # row 0 is v = 0, the bottom
 img = bpy.data.images.new("SlimeColor", TW, TH)
@@ -105,7 +116,69 @@ tex.image = img
 bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
 bsdf.inputs["Roughness"].default_value = 0.25
 nt.links.new(tex.outputs[0], bsdf.inputs["Emission Color"])  # jelly glows a little in shade
-bsdf.inputs["Emission Strength"].default_value = 0.25
+bsdf.inputs["Emission Strength"].default_value = 0.2
+bsdf.inputs["Alpha"].default_value = JELLY_ALPHA
+mat.use_backface_culling = True  # single-sided: only the near wall of the jelly draws
+if hasattr(mat, "surface_render_method"):
+    mat.surface_render_method = "BLENDED"
+for tack_mat in mesh.materials:
+    if tack_mat is not mat:
+        tack_mat.use_backface_culling = False  # double-sided, seen from under the jelly
+
+# --- bubble paths -------------------------------------------------------------------
+jelly_faces = [p for p in mesh.polygons if p.material_index == slime_index]
+jelly_bvh = BVHTree.FromPolygons([v.co for v in mesh.vertices], [tuple(p.vertices) for p in jelly_faces])
+
+
+def inside(h, psi, rho):
+    """A point inside the jelly: at height h (share of H), azimuth psi, rho of
+    the way out from the axis to the skin."""
+    z = h * H
+    d = Vector((math.cos(psi), math.sin(psi), 0.0))
+    hit, *_ = jelly_bvh.ray_cast(Vector((0.0, 0.0, z)), d)
+    reach = (hit.xy.length if hit is not None else 1.0)
+    return Vector((0.0, 0.0, z)) + d * reach * rho
+
+
+rng = random.Random(11)
+BUBBLE_R = [rng.uniform(0.12, 0.3) for _ in range(NB)]
+
+
+def bubble_path(clip_len, kind):
+    """One bubble's loop in a clip: start and end points, period, phase, wobble."""
+    if kind == "idle":  # slow, the whole height of the body
+        period = clip_len / rng.choice((1, 2, 3))
+        h0, h1 = rng.uniform(0.08, 0.3), rng.uniform(0.62, 0.86)
+    else:  # moving: short trips, swept back as the slime pushes forward
+        period = clip_len
+        h0 = rng.uniform(0.1, 0.5)
+        h1 = h0 + rng.uniform(0.2, 0.35)
+    psi = rng.uniform(-math.pi, math.pi)
+    a = inside(h0, psi, rng.uniform(0.1, 0.65))
+    b = inside(h1, psi + rng.uniform(-0.7, 0.7), rng.uniform(0.1, 0.55))
+    if kind != "idle":
+        b += Vector((0.0, rng.uniform(0.15, 0.4), 0.0))  # +Y is the back
+    return dict(a=a, b=b, period=period, phase=rng.random(), amp=rng.uniform(0.06, 0.16),
+                waves=rng.choice((1, 2, 3)), turn=rng.uniform(0, 2 * math.pi))
+
+
+def bubble_at(path, t):
+    """Position and scale of a bubble at clip time t."""
+    u = (t / path["period"] + path["phase"]) % 1.0
+    rise = u * (0.6 + 0.4 * u)  # it speeds up as it rises
+    w = 2 * math.pi * path["waves"] * u + path["turn"]
+    pos = path["a"].lerp(path["b"], rise) + Vector((math.sin(w), math.cos(w), 0.0)) * path["amp"]
+    if u >= 0.95:  # popped
+        size = 0.0
+    else:
+        size = smooth(u / 0.12) * (0.75 + 0.35 * u) * (1 + 0.25 * smooth((u - 0.86) / 0.09))
+    return pos, max(size, 1e-4)
+
+
+PATH_KIND = {"Idle": "idle", "Walk": "move", "Run": "move", "Jump": "move"}
+PATH_LEN = {"Idle": 6.0, "Walk": 1.0, "Run": 0.9, "Jump": 0.8}
+BUBBLE_PATHS = {c: [bubble_path(PATH_LEN[c], PATH_KIND[c]) for _ in range(NB)] for c in PATH_KIND}
+BUBBLE_REST = [BUBBLE_PATHS["Idle"][i]["a"].copy() for i in range(NB)]
 
 # --- armature -----------------------------------------------------------------------
 arm_data = bpy.data.armatures.new("SlimeRig")
@@ -126,6 +199,11 @@ saddle = eb.new("saddle")
 saddle.head, saddle.tail = (0, 0, H), (0, 0, 1.3 * H)
 saddle.roll = 0
 saddle.parent, saddle.use_connect = eb["move"], False
+for i, rest in enumerate(BUBBLE_REST):
+    bb = eb.new(f"bubble_{i:02d}")
+    bb.head, bb.tail = rest, rest + Vector((0, 0, 0.3))
+    bb.roll = 0
+    bb.parent, bb.use_connect = eb["base"], False
 bpy.ops.object.mode_set(mode="OBJECT")
 m = arm_data.bones["move"].matrix_local.to_3x3()
 assert (m.col[0] - Vector((1, 0, 0))).length < 1e-5, m
@@ -150,6 +228,36 @@ for v in mesh.vertices:
         groups["saddle"].add([v.index], ws, "REPLACE")
 body.parent = rig
 body.modifiers.new("Armature", "ARMATURE").object = rig
+
+# The bubbles: one mesh, a little sphere per bone, pale and faintly glowing so
+# they read through the blue.
+bubble_mesh = bpy.data.meshes.new("slime_bubbles")
+bubbles = bpy.data.objects.new("slime_bubbles", bubble_mesh)
+sc.collection.objects.link(bubbles)
+bverts, bfaces, owner = [], [], []
+for i, (rest, r) in enumerate(zip(BUBBLE_REST, BUBBLE_R)):
+    ibm = bmesh.new()
+    bmesh.ops.create_icosphere(ibm, subdivisions=2, radius=r)
+    o = len(bverts)
+    bverts += [tuple(rest + v.co) for v in ibm.verts]
+    bfaces += [tuple(o + v.index for v in f.verts) for f in ibm.faces]
+    owner += [i] * len(ibm.verts)
+    ibm.free()
+bubble_mesh.from_pydata(bverts, [], bfaces)
+for p in bubble_mesh.polygons:
+    p.use_smooth = True
+bmat = bpy.data.materials.new("bubble")
+bmat.use_nodes = True
+bb_bsdf = next(n for n in bmat.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+bb_bsdf.inputs["Base Color"].default_value = (0.9, 0.98, 1.0, 1)
+bb_bsdf.inputs["Emission Color"].default_value = (0.85, 0.97, 1.0, 1)
+bb_bsdf.inputs["Emission Strength"].default_value = 0.8
+bb_bsdf.inputs["Roughness"].default_value = 0.15
+bubble_mesh.materials.append(bmat)
+for i in range(NB):
+    bubbles.vertex_groups.new(name=f"bubble_{i:02d}").add([k for k, b in enumerate(owner) if b == i], 1.0, "REPLACE")
+bubbles.parent = rig
+bubbles.modifiers.new("Armature", "ARMATURE").object = rig
 
 
 # --- motion helpers -----------------------------------------------------------------
@@ -280,6 +388,12 @@ for clip, length, fn in CLIPS:
             pb[name].rotation_quaternion = (
                 Matrix.Rotation(p["lean"] * share, 3, "X") @ Matrix.Rotation(-p["side"] * share, 3, "Z")
             ).to_quaternion()
+        for i in range(NB):
+            pos, size = bubble_at(BUBBLE_PATHS[clip][i], f / FPS)
+            d = pos - BUBBLE_REST[i]
+            bb = pb[f"bubble_{i:02d}"]
+            bb.location = (d.x, d.z, -d.y)  # bone space: X right, Y up, Z front
+            bb.scale = (size, size, size)
         bpy.context.view_layer.update()
         # The seat goes where the spine carries the top of the body, turned with
         # the top bone but unscaled.
@@ -288,7 +402,7 @@ for clip, length, fn in CLIPS:
         turn = carry.to_3x3().normalized().to_4x4()
         pb["saddle"].matrix = Matrix.Translation(seat) @ turn @ Matrix.Translation(-SEAT) @ saddle_rest
         bpy.context.view_layer.update()
-        for b in ("move", "squash", "base", "mid", "top", "saddle"):
+        for b in ["move", "squash", "base", "mid", "top", "saddle"] + [f"bubble_{i:02d}" for i in range(NB)]:
             for path in ("location", "rotation_quaternion", "scale"):
                 pb[b].keyframe_insert(path, frame=f)  # full TRS per bone, no stale values
     rig.animation_data.action = None
