@@ -1164,6 +1164,7 @@ const RENDER_PURE_CORES = [
   'src/render/quest_beacon_core.ts',
   'src/render/coach_trail_core.ts',
   'src/render/eastbrook_wolves_guidance_core.ts',
+  'src/render/wolf_hunt_area_core.ts',
   'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',

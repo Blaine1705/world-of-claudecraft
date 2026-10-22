@@ -8,12 +8,18 @@
 // and loaded world (a small cache, never per frame).
 import { lineOfSightClear } from '../sim/colliders';
 import { ZONE1_CAMPS } from '../sim/content/zone1';
-import { getContentGeneration, zoneContaining } from '../sim/data';
+import {
+  getActiveWorldContent,
+  getContentGeneration,
+  isBuiltinWorldActive,
+  zoneContaining,
+} from '../sim/data';
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../sim/eastbrook_layout';
 import { FERRY_BELL_TOWN_LANDING } from '../sim/interactions/ferry_bell';
 import { findPlayerPath } from '../sim/pathfind';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { CoachGuides } from './coach_trail_core';
+import { wolfHuntArea } from './wolf_hunt_area_core';
 
 /** The slice of a world entity the guide reads to find Marshal. */
 export interface WolvesGuideEntity {
@@ -82,6 +88,7 @@ function plansFrom(
   offerPoints: readonly Point[],
   huntPoints: readonly Point[],
   keySuffix: string,
+  huntArea = WOLF_RUN_CAMP,
 ): WolvesPlans {
   return {
     offer: {
@@ -90,14 +97,14 @@ function plansFrom(
       glowNpcId: MARSHAL_ID,
       glowNpcPos: marshal,
     },
-    active: WOLF_RUN_CAMP
+    active: huntArea
       ? {
           ...EMPTY,
           plan: { key: `wolves:active${keySuffix}`, points: huntPoints },
-          areaRing: WOLF_RUN_CAMP,
+          areaRing: huntArea,
         }
       : EMPTY,
-    ready: WOLF_RUN_CAMP
+    ready: huntArea
       ? {
           ...EMPTY,
           plan: { key: `wolves:ready${keySuffix}`, points: [...huntPoints].reverse() },
@@ -148,7 +155,10 @@ const planCache: { at: Point; generation: number; plans: WolvesPlans }[] = [];
  *  (the content generation changes whenever a different map is activated,
  *  so a route never outlives the colliders it was found against). */
 function plansFor(marshal: Point): WolvesPlans {
-  if (Math.hypot(marshal.x - MARSHAL_POS.x, marshal.z - MARSHAL_POS.z) <= LAYOUT_TOLERANCE_YD) {
+  if (
+    isBuiltinWorldActive() &&
+    Math.hypot(marshal.x - MARSHAL_POS.x, marshal.z - MARSHAL_POS.z) <= LAYOUT_TOLERANCE_YD
+  ) {
     return LAYOUT_PLANS;
   }
   const generation = getContentGeneration();
@@ -165,12 +175,17 @@ function plansFor(marshal: Point): WolvesPlans {
   const where = { x: marshal.x, z: marshal.z };
   const key = `@${Math.round(where.x * 2) / 2},${Math.round(where.z * 2) / 2}#${generation}`;
   const offer = routeBetween(FERRY_BELL_TOWN_LANDING, where);
+  const huntArea = isBuiltinWorldActive()
+    ? WOLF_RUN_CAMP
+    : wolfHuntArea(
+        getActiveWorldContent().camps.filter(
+          (camp) => zoneContaining(camp.center.x, camp.center.z)?.id === 'eastbrook_vale',
+        ),
+      );
   // The hunt ends on the camp itself (its ring carries the radius), as the
   // authored route does.
-  const hunt = WOLF_RUN_CAMP
-    ? [...routeBetween(where, WOLF_RUN_CAMP).slice(0, -1), WOLF_RUN_CAMP]
-    : [];
-  const plans = plansFrom(where, offer, hunt, key);
+  const hunt = huntArea ? [...routeBetween(where, huntArea).slice(0, -1), huntArea] : [];
+  const plans = plansFrom(where, offer, hunt, key, huntArea);
   planCache.unshift({ at: where, generation, plans });
   if (planCache.length > PLAN_CACHE_SIZE) planCache.length = PLAN_CACHE_SIZE;
   return plans;
@@ -234,7 +249,9 @@ export function eastbrookWolvesGuide(
   if (!state && world.questsDone?.has(WOLVES_QUEST_ID)) return EMPTY;
   if (zoneContaining(p.pos.x, p.pos.z)?.id !== 'eastbrook_vale') return EMPTY;
   if (isDismissed()) return EMPTY;
-  const plans = plansFor(liveMarshal(world.entities) ?? MARSHAL_POS);
+  const marshal = liveMarshal(world.entities) ?? getActiveWorldContent().npcs[MARSHAL_ID]?.pos;
+  if (!marshal) return EMPTY;
+  const plans = plansFor(marshal);
   if (!state && world.questState?.(WOLVES_QUEST_ID) === 'available') return plans.offer;
   return state === 'active' ? plans.active : state === 'ready' ? plans.ready : EMPTY;
 }

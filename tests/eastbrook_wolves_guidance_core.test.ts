@@ -1,5 +1,5 @@
 import { CatmullRomCurve3, Vector3 } from 'three';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   eastbrookWolvesGuide,
   resetWolvesGuideCache,
@@ -8,6 +8,7 @@ import {
   type WolvesGuideReader,
 } from '../src/render/eastbrook_wolves_guidance_core';
 import { isBlocked, pathCrossesFence } from '../src/sim/colliders';
+import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../src/sim/eastbrook_layout';
 import { FERRY_BELL_TOWN_LANDING } from '../src/sim/interactions/ferry_bell';
 import { groundHeight, waterLevelAt } from '../src/sim/world';
@@ -135,6 +136,7 @@ describe('wolves guidance geometry and visibility', () => {
 
 describe('wolves guidance follows Marshal where he stands', () => {
   beforeEach(() => resetWolvesGuideCache());
+  afterEach(() => setActiveWorldContent(BUILTIN_WORLD));
   // A map can move Marshal Redbrook (the Studio "Eastbrook and Mirefen
   // changes" map stands him on the quay beside the ferry bell); the golden
   // guidance must lead to the NPC the player can see, not the code layout.
@@ -208,6 +210,33 @@ describe('wolves guidance follows Marshal where he stands', () => {
       const guide = eastbrookWolvesGuide(offeredAt(entities), () => false);
       expect(guide.glowNpcPos).toEqual(EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position);
     }
+  });
+
+  it('uses the loaded map position while Marshal is outside entity interest range', () => {
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      npcs: {
+        ...BUILTIN_WORLD.npcs,
+        marshal_redbrook: { ...BUILTIN_WORLD.npcs.marshal_redbrook, pos: MOVED },
+      },
+    });
+    const guide = eastbrookWolvesGuide(offeredAt(new Map()), () => false);
+    expect(guide.glowNpcPos).toEqual(MOVED);
+    expect(guide.plan?.points.at(-1)).toEqual(MOVED);
+  });
+
+  it('rebuilds the hunt for moved map camps even when Marshal stays at his layout spot', () => {
+    const original = eastbrookWolvesGuide(world(), () => false);
+    const movedCamp = { mobId: 'forest_wolf', center: { x: 60, z: 70 }, radius: 10, count: 8 };
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      camps: [...BUILTIN_WORLD.camps.filter((camp) => camp.mobId !== 'forest_wolf'), movedCamp],
+    });
+    const guide = eastbrookWolvesGuide(world(), () => false);
+    expect(guide.areaRing).toEqual({ x: 60, z: 70, radius: 10 });
+    expect(guide.plan?.points.at(-1)).toEqual(guide.areaRing);
+    expect(guide.plan).not.toBe(original.plan);
+    expect(eastbrookWolvesGuide(world(), () => false).plan).toBe(guide.plan);
   });
 
   it('walks the ferry landing to Marshal on the square clear of every collider', () => {
