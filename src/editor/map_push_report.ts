@@ -13,6 +13,8 @@ const KIND_LABEL: Readonly<Record<MapChangeKind, TranslationKey>> = {
   grassClear: 'editor.push.kindGrassClear',
   npc: 'editor.push.kindNpc',
   objectMove: 'editor.push.kindObjectMove',
+  road: 'editor.push.kindRoad',
+  roadEdit: 'editor.push.kindRoadEdit',
   paint: 'editor.push.kindPaint',
   field: 'editor.push.kindField',
 };
@@ -46,8 +48,14 @@ export function showPushConflicts(
         undefined,
         t('editor.push.conflictRow', {
           kind: t(KIND_LABEL[conflict.kind]),
-          // A paint clash names how many cells clash, not an item.
-          id: conflict.kind === 'paint' ? formatNumber(Number(conflict.id)) : conflict.id,
+          // A paint clash names how many cells clash, not an item; a world
+          // road is numbered from 1, as the Roads tab lists it.
+          id:
+            conflict.kind === 'paint'
+              ? formatNumber(Number(conflict.id))
+              : conflict.kind === 'roadEdit' && /^[0-9]+$/.test(conflict.id)
+                ? formatNumber(Number(conflict.id) + 1)
+                : conflict.id,
           reason: t(REASON_LABEL[conflict.reason]),
         }),
       ),
