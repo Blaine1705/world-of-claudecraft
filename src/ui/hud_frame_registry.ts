@@ -58,6 +58,7 @@ export function registerHudFrames(deps: {
       // clamped while it was hidden re-clamps once it shows.
       observeSizeChanges: spec.id === 'menu' || spec.id === 'hillBar',
       preserveSavedSize: spec.id === 'petFrame',
+      userHiddenOnlyWhenPositioned: spec.id === 'playerResource',
       maxScale: spec.maxScale,
       buttonOnlyWhenUnlocked: true,
       onPositioned: (active) => {
@@ -187,7 +188,7 @@ function syncResourceDetach(
           hooks.settings.set('playerFrameResourceHeight', first.height),
         );
       }
-      mover.detachAtCurrentPosition(first.seat);
+      mover.detachAtPosition(first.seat);
     }
   } else {
     deps.registry.clearAppliedGeometry('playerResource');

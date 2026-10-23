@@ -8,7 +8,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyFrameGeometrySetting } from '../src/game/frame_geometry_settings';
 import { BOOL_SETTINGS, SETTING_RANGES } from '../src/game/settings';
 import {
@@ -39,7 +39,7 @@ function mountPlayerFrame(): { bars: HTMLElement; wrap: HTMLElement; bar: HTMLEl
   };
 }
 
-function rig(store: Record<string, number | boolean>, mobile = false) {
+function rig(store: Record<string, number | boolean>, mobile: boolean | (() => boolean) = false) {
   const writes: Array<[string, number | boolean]> = [];
   const hooks: FramesMenuSettingsHooks = {
     settings: {
@@ -56,7 +56,7 @@ function rig(store: Record<string, number | boolean>, mobile = false) {
     document,
     registry,
     groups: new HudFrameGroups(document, HUD_FRAME_SPECS),
-    isMobileLayout: () => mobile,
+    isMobileLayout: () => (typeof mobile === 'function' ? mobile() : mobile),
     snapToGrid: () => false,
     labelKey: (row) => row.labelKey,
     isActive: () => true,
@@ -67,6 +67,7 @@ function rig(store: Record<string, number | boolean>, mobile = false) {
 }
 
 beforeEach(() => localStorage.clear());
+afterEach(() => vi.restoreAllMocks());
 
 describe('player resource frame (Detach Resource Bar)', () => {
   it('is a wrapper frame seated last in the player frame bars column', () => {
@@ -183,6 +184,84 @@ describe('player resource frame (Detach Resource Bar)', () => {
       height: SETTING_RANGES.playerFrameResourceHeight.def,
     });
   });
+
+  it('uses the below-frame seat when a first live detach has real layout geometry', () => {
+    const { wrap } = mountPlayerFrame();
+    vi.spyOn(wrap, 'getBoundingClientRect').mockReturnValue(new DOMRect(120, 140, 232, 11));
+    vi.spyOn(document.getElementById('player-frame')!, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(100, 100, 278, 60),
+    );
+    const store: Record<string, number | boolean> = { playerFrameResourceDetached: false };
+    const { sync, writes } = rig(store);
+    sync(true);
+    store.playerFrameResourceDetached = true;
+    sync();
+    expect(JSON.parse(localStorage.getItem(SPEC.storageKey)!)).toMatchObject({
+      left: 120,
+      top: 166,
+    });
+    expect(wrap.style.top).toBe('166px');
+    expect(writes).toEqual([
+      ['playerFrameResourceWidth', 232],
+      ['playerFrameResourceHeight', 11],
+    ]);
+  });
+
+  it('keeps an existing saved seat and size when nonzero docked geometry differs', () => {
+    const { wrap } = mountPlayerFrame();
+    vi.spyOn(wrap, 'getBoundingClientRect').mockReturnValue(new DOMRect(120, 140, 232, 11));
+    localStorage.setItem(SPEC.storageKey, JSON.stringify({ left: 410, top: 520 }));
+    const store: Record<string, number | boolean> = {
+      playerFrameResourceDetached: false,
+      playerFrameResourceWidth: 300,
+      playerFrameResourceHeight: 18,
+    };
+    const { sync, writes } = rig(store);
+    sync(true);
+    store.playerFrameResourceDetached = true;
+    sync();
+    expect(wrap.style.left).toBe('410px');
+    expect(wrap.style.top).toBe('520px');
+    expect(writes).toEqual([]);
+    expect(store.playerFrameResourceWidth).toBe(300);
+    expect(store.playerFrameResourceHeight).toBe(18);
+  });
+
+  it.each([false, true])(
+    'shows the docked touch resource while preserving a hidden desktop seat (mobile boot: %s)',
+    (mobileBoot) => {
+      const { bars, wrap } = mountPlayerFrame();
+      const saved = JSON.stringify({ left: 410, top: 520, vw: 1024, vh: 768 });
+      localStorage.setItem(SPEC.storageKey, saved);
+      localStorage.setItem(`${SPEC.storageKey}_hidden`, '1');
+      let mobile = mobileBoot;
+      const { registry, sync, writes } = rig({ playerFrameResourceDetached: true }, () => mobile);
+      sync(true);
+      const check = () => {
+        expect(wrap.parentElement).toBe(mobile ? bars : document.getElementById('ui'));
+        expect(wrap.classList.contains(FRAME_USER_HIDDEN_CLASS)).toBe(!mobile);
+        expect(wrap.classList.contains('hud-frame-detached')).toBe(!mobile);
+        expect(localStorage.getItem(`${SPEC.storageKey}_hidden`)).toBe('1');
+        expect(localStorage.getItem(SPEC.storageKey)).toBe(saved);
+        expect(writes).toEqual([]);
+        if (mobile) {
+          expect(wrap.style.left).toBe('');
+          expect(wrap.style.top).toBe('');
+        } else {
+          expect(wrap.style.left).toBe('410px');
+          expect(wrap.style.top).toBe('520px');
+        }
+      };
+      check();
+      // The same shared reapply path used on a viewport/layout change.
+      mobile = !mobile;
+      registry.reapplyAll();
+      check();
+      mobile = !mobile;
+      registry.reapplyAll();
+      check();
+    },
+  );
 
   it('styles the detached bar from its own settings and leaves it click-through while locked', () => {
     const css = readFileSync(join(import.meta.dirname, '..', 'src', 'styles', 'hud.css'), 'utf8');
