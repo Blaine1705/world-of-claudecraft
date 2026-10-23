@@ -6,9 +6,14 @@
 // Rigged-asset optimization, as scripts/asset_pipeline's assembleRiggedModel:
 // resample + prune + dedup + WebP textures at most 512 px, no meshopt (skinned
 // geometry stays plainly encoded). The KTX2 pass after it is not optional:
-// tests/glb_texture_compression.test.ts holds every model to KTX2. Fails if a
-// clip went missing or stopped carrying the saddle (the rider's seat), a
-// bubble bone went missing, or the jelly lost its translucency.
+// tests/glb_texture_compression.test.ts holds every model to KTX2.
+//
+// The bubbles loop on their own clip (`Bubbles`) beside whichever body clip is
+// playing, so each clip keeps only its own bones: the body clips lose any
+// bubble channels the exporter sampled and Bubbles loses every other channel.
+// A shared channel would blend the two actions together in the game's mixer.
+// Fails if a clip went missing or a body clip stopped carrying the saddle (the
+// rider's seat), a bubble bone went missing, or the jelly lost its translucency.
 // biome-ignore assist/source/organizeImports: sharp must initialize before @gltf-transform/functions on Windows.
 import sharp from 'sharp';
 import { NodeIO } from '@gltf-transform/core';
@@ -18,12 +23,22 @@ import { dedup, prune, resample, textureCompress } from '@gltf-transform/functio
 const [src, out] = process.argv.slice(2);
 if (!src || !out) throw new Error('usage: finish_mount.mjs <blender.glb> <out.glb>');
 
-const CLIPS = ['Idle', 'Walk', 'Run', 'Jump', 'Land'];
+const CLIPS = ['Idle', 'Walk', 'Run', 'Jump', 'Land', 'Bubbles'];
 const JOINTS = ['base', 'mid', 'move', 'root', 'saddle', 'squash', 'top'];
 const BUBBLES = 7;
 
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
 const doc = await io.read(src);
+for (const a of doc.getRoot().listAnimations()) {
+  const bubbles = a.getName() === 'Bubbles';
+  for (const ch of a.listChannels()) {
+    if ((ch.getTargetNode()?.getName().startsWith('bubble_') ?? false) !== bubbles) {
+      const sampler = ch.getSampler();
+      ch.dispose();
+      if (sampler && !a.listChannels().some((c) => c.getSampler() === sampler)) sampler.dispose();
+    }
+  }
+}
 await doc.transform(
   resample(),
   prune(),
@@ -44,6 +59,7 @@ if (joints.length - rigJoints.length !== BUBBLES) throw new Error(`expected ${BU
 const slime = root.listMaterials().find((m) => m.getName() === 'slime');
 if (slime?.getAlphaMode() !== 'BLEND') throw new Error('the jelly is not translucent');
 for (const a of root.listAnimations()) {
+  if (a.getName() === 'Bubbles') continue;
   if (!a.listChannels().some((ch) => ch.getTargetNode()?.getName() === 'saddle')) {
     throw new Error(`clip ${a.getName()} does not move the saddle`);
   }

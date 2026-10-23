@@ -4,6 +4,7 @@ import path from 'node:path';
 import { getBounds, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { describe, expect, it } from 'vitest';
+import { VISUALS } from '../src/render/characters/manifest';
 
 // Structural contract for Wobbles the Slime (docs/design/slime-mount). The render
 // side looks the saddle bone up by name (the rider's seat, MountSeatSpec) and
@@ -11,8 +12,8 @@ import { describe, expect, it } from 'vitest';
 // re-export that renames either breaks the mount with nothing else failing. The byte pin makes any
 // re-export a deliberate, reviewed change.
 const ASSET_PATH = path.join(__dirname, '..', 'public/models/mounts/wobbles_slime.glb');
-const EXPECTED_ASSET_SHA256 = '537be13089d67594266b9c4c2813633a47d0c019d61fea3ca34bbf4e1d8f67dd';
-const CLIP_SECONDS = { Idle: 6, Walk: 1, Run: 0.9, Jump: 0.5, Land: 0.6 };
+const EXPECTED_ASSET_SHA256 = 'bac206e61d3538ba1609e1d91749ece5b7d75a91166499487203f0d92ebae295';
+const CLIP_SECONDS = { Idle: 6, Walk: 1, Run: 0.9, Jump: 0.6, Land: 0.6, Bubbles: 6 };
 
 async function readAsset() {
   return new NodeIO().registerExtensions(ALL_EXTENSIONS).read(ASSET_PATH);
@@ -40,7 +41,7 @@ describe('Wobbles the Slime mount asset', () => {
     }
   });
 
-  it('rigs the saddle on its own bone, moved by every clip, so a rider can sit on it', async () => {
+  it('rigs the saddle on its own bone, moved by every body clip, so a rider can sit on it', async () => {
     const root = (await readAsset()).getRoot();
     const joints = [
       ...new Set(root.listSkins().flatMap((s) => s.listJoints().map((j) => j.getName()))),
@@ -52,8 +53,24 @@ describe('Wobbles the Slime mount asset', () => {
     const saddle = root.listNodes().find((n) => n.getName() === 'saddle');
     expect(saddle?.getParentNode()?.getName()).toBe('move');
     for (const anim of root.listAnimations()) {
+      if (anim.getName() === 'Bubbles') continue;
       const targets = anim.listChannels().map((c) => c.getTargetNode()?.getName());
       expect(targets).toContain('saddle');
+    }
+  });
+
+  it('keeps the bubbles on their own ambient loop, apart from every body clip', async () => {
+    // The game loops Bubbles beside the body clips (VisualDef.ambientClips) so a
+    // gait change never restarts the bubbles. A bone keyed by both would blend.
+    expect(VISUALS.mount_wobbles_slime?.ambientClips).toEqual(['Bubbles']);
+    const root = (await readAsset()).getRoot();
+    for (const anim of root.listAnimations()) {
+      const bubbleKeys = anim
+        .listChannels()
+        .map((c) => c.getTargetNode()?.getName() ?? '')
+        .map((n) => n.startsWith('bubble_'));
+      expect(bubbleKeys.length).toBeGreaterThan(0);
+      expect(new Set(bubbleKeys), anim.getName()).toEqual(new Set([anim.getName() === 'Bubbles']));
     }
   });
 

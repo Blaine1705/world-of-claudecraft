@@ -24,12 +24,16 @@ jelly is translucent (alpha blended, single-sided); the tack is double-sided so
 its underside shows through the jelly instead of vanishing.
 
 Bubbles: NB little spheres inside the jelly, one bone each (`bubble_00`...,
-children of `base`, so they squash and lean with the body). In every clip each
-bubble rises along a seeded random, wobbling path, swells in, and pops near the
-end of it. The bubbles are spread out: each keeps to its own slice of the body
-around the vertical axis, rides out toward the skin rather than the middle, and
-is staggered in time so they never bunch at one height. Each path repeats on a period that divides the clip length, so the
-loops stay seamless; a popped bubble jumps back to its start at scale zero.
+children of `base`, so they squash and lean with the body). They have a clip
+of their own, `Bubbles`, which the game loops for the mount's whole life beside
+whichever body clip is playing (VisualDef.ambientClips), so they never jump
+when the body changes clips. The body clips carry no bubble keys and Bubbles
+carries nothing else. Each bubble rises along a seeded random, wobbling path,
+swells in, and pops near the end of it. The bubbles are spread out: each keeps
+to its own slice of the body around the vertical axis, rides out toward the
+skin rather than the middle, and is staggered in time so they never bunch at
+one height. Each path repeats on a period that divides the clip length, so the
+loop stays seamless; a popped bubble jumps back to its start at scale zero.
 """
 import math
 import random
@@ -185,6 +189,7 @@ PATH_KIND = {"Idle": "idle", "Walk": "move", "Run": "move", "Jump": "move", "Lan
 PATH_LEN = {"Idle": 6.0, "Walk": 1.0, "Run": 0.9, "Jump": 0.5, "Land": 0.6}
 BUBBLE_PATHS = {c: [bubble_path(i, PATH_LEN[c], PATH_KIND[c]) for i in range(NB)] for c in PATH_KIND}
 BUBBLE_REST = [BUBBLE_PATHS["Idle"][i]["a"].copy() for i in range(NB)]
+BUBBLES_LEN = PATH_LEN["Idle"]  # the Bubbles clip runs the Idle draw's paths
 
 # --- armature -----------------------------------------------------------------------
 arm_data = bpy.data.armatures.new("SlimeRig")
@@ -351,21 +356,39 @@ def run(t):
 # pose (stretched tall, top lagging back) that the game CLAMPS on for however
 # long the slime is off the ground; Land fires on touchdown: a splat that
 # jiggles out and ends on the idle pose.
-JUMP_LEN = 0.5
+#
+# The game lifts the mount off the ground on the jump frame, so a crouch played
+# in place would happen in mid-air. Jump instead holds the body down against the
+# game's rise for its first CROUCH seconds (the slime stays planted and squashes)
+# and then springs up to meet the arc, overshooting into a tall stretch: the
+# push-off reads as the slime gaining its height. GAME_RISE is the mounted
+# jump's rise in model units: v = JUMP_VELOCITY * MOUNT_JUMP_MULT = 7.5 yd/s,
+# g = GRAVITY = 16 (src/sim/player_motion.ts), at 6.61 model units to the
+# manifest's 4.0 yd.
+JUMP_LEN = 0.6  # 18 frames: whole frames so it ends exactly on the held pose
 LAND_LEN = 0.6
+CROUCH, SPRING = 0.1, 0.08
+CROUCH_SY = 0.76
 AIR = dict(sy=1.1, lean=-0.04)  # the held airborne pose: Jump's last frame, Land's first
+YD_TO_MODEL = 6.607 / 4.0
+
+
+def game_rise(t):
+    return (7.5 * t - 8.0 * t * t) * YD_TO_MODEL
 
 
 def jump(t):
-    if t < 0.07:
-        k = smooth(t / 0.07)
-        return pose(sy=lerp(1.0, 0.82, k), lean=-0.015 * k)
-    x = t - 0.07
-    sy = AIR["sy"] - (AIR["sy"] - 0.82) * math.exp(-x / 0.1) * math.cos(2 * math.pi * 3.5 * x)
-    lean = AIR["lean"] - 0.06 * ring(x, 2.5, 0.12, phase=0.0)
+    if t < CROUCH:
+        k = smooth(t / CROUCH)
+        return pose(up=-game_rise(t), sy=lerp(1.0, CROUCH_SY, k), lean=-0.03 * k)
+    x = t - CROUCH
+    held = game_rise(CROUCH) * (1 - smooth(x / SPRING))  # snaps up to the arc
+    sy = AIR["sy"] - (AIR["sy"] - CROUCH_SY) * math.exp(-x / 0.09) * math.cos(2 * math.pi * 3.2 * x)
+    lean = AIR["lean"] - 0.07 * ring(x, 2.5, 0.12, phase=0.0)
     side = 0.025 * ring(x, 2.2, 0.12, phase=0.0)
-    k = smooth((t - 0.3) / 0.2)  # lands exactly on the held pose
-    return pose(sy=lerp(sy, AIR["sy"], k), lean=lerp(lean, AIR["lean"], k), side=lerp(side, 0.0, k))
+    k = smooth((t - 0.4) / 0.2)  # lands exactly on the held pose
+    return pose(up=-held, sy=lerp(sy, AIR["sy"], k), lean=lerp(lean, AIR["lean"], k),
+                side=lerp(side, 0.0, k))
 
 
 def land(t):
@@ -386,6 +409,7 @@ CLIPS = [
     ("Run", RUN_LEN, run),
     ("Jump", JUMP_LEN, jump),
     ("Land", LAND_LEN, land),
+    ("Bubbles", BUBBLES_LEN, None),  # bubble bones only, looped beside the others
 ]
 
 # --- bake ---------------------------------------------------------------------------
@@ -397,10 +421,22 @@ rig.animation_data_create()
 SEAT = Vector((0, 0, H))  # armature space, rest
 top_rest_inv = arm_data.bones["top"].matrix_local.inverted()
 saddle_rest = arm_data.bones["saddle"].matrix_local.copy()
+BUBBLE_BONES = [f"bubble_{i:02d}" for i in range(NB)]
+BODY_BONES = ["move", "squash", "base", "mid", "top", "saddle"]
 for clip, length, fn in CLIPS:
     action = bpy.data.actions.new(f"Slime_{clip}")
     rig.animation_data.action = action
     for f in range(round(length * FPS) + 1):
+        if fn is None:
+            for i in range(NB):
+                pos, size = bubble_at(BUBBLE_PATHS["Idle"][i], f / FPS)
+                d = pos - BUBBLE_REST[i]
+                bb = pb[BUBBLE_BONES[i]]
+                bb.location = (d.x, d.z, -d.y)  # bone space: X right, Y up, Z front
+                bb.scale = (size, size, size)
+                for path in ("location", "rotation_quaternion", "scale"):
+                    bb.keyframe_insert(path, frame=f)
+            continue
         p = fn(f / FPS)
         sxz = 1 / math.sqrt(p["sy"])
         pb["move"].location = (0.0, p["up"], 0.0)
@@ -410,12 +446,6 @@ for clip, length, fn in CLIPS:
             pb[name].rotation_quaternion = (
                 Matrix.Rotation(p["lean"] * share, 3, "X") @ Matrix.Rotation(-p["side"] * share, 3, "Z")
             ).to_quaternion()
-        for i in range(NB):
-            pos, size = bubble_at(BUBBLE_PATHS[clip][i], f / FPS)
-            d = pos - BUBBLE_REST[i]
-            bb = pb[f"bubble_{i:02d}"]
-            bb.location = (d.x, d.z, -d.y)  # bone space: X right, Y up, Z front
-            bb.scale = (size, size, size)
         bpy.context.view_layer.update()
         # The seat goes where the spine carries the top of the body, turned with
         # the top bone but unscaled.
@@ -424,7 +454,7 @@ for clip, length, fn in CLIPS:
         turn = carry.to_3x3().normalized().to_4x4()
         pb["saddle"].matrix = Matrix.Translation(seat) @ turn @ Matrix.Translation(-SEAT) @ saddle_rest
         bpy.context.view_layer.update()
-        for b in ["move", "squash", "base", "mid", "top", "saddle"] + [f"bubble_{i:02d}" for i in range(NB)]:
+        for b in BODY_BONES:
             for path in ("location", "rotation_quaternion", "scale"):
                 pb[b].keyframe_insert(path, frame=f)  # full TRS per bone, no stale values
     rig.animation_data.action = None

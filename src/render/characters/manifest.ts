@@ -663,6 +663,11 @@ export interface VisualDef {
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
   lazyPreload?: boolean;
+  /** Clips looped for the visual's whole life BESIDE the state clips (idle,
+   *  walk, jump, ...), on their own clock, so they never restart when the
+   *  state changes: Wobbles the Slime's drifting bubbles. Each must animate
+   *  only bones no state clip touches, or the two actions blend. */
+  ambientClips?: readonly string[];
   /** Post-load orientation fixups for weapon/prop nodes baked INTO a creature
    *  GLB at the wrong angle (some KayKit handslot weapons ship without the grip
    *  flip the standalone weapon files carry). Node name as authored in the GLB;
@@ -3387,6 +3392,8 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${MOUNTS_DIR}/wobbles_slime.glb`,
     height: 4.0,
     clips: MOUNT_SLIME,
+    // The bubbles drift on their own loop, never reset by a gait change.
+    ambientClips: ['Bubbles'],
     // The tack is Tripo's baked texture (dark leather and navy): keep black
     // black on the low tier rather than lifting it to a flat grey.
     authoredAtlas: true,
