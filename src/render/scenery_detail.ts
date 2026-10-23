@@ -329,6 +329,8 @@ export class SceneryDetailSession {
           child.layers.mask = mesh.layers.mask;
           child.renderOrder = mesh.renderOrder;
           mesh.add(child);
+          // Frozen owners will not force a later compose for this new child.
+          child.updateMatrixWorld(true);
           entry.batches.push({ mesh: child, geometry, level, slots: [], model: batchModel });
         }
     } else {
@@ -355,6 +357,8 @@ export class SceneryDetailSession {
         color.renderOrder = mesh.renderOrder;
         preserveSceneryShadow(color, source, 0);
         mesh.add(color);
+        // Bake the owner's placement before any colour draw or frustum test.
+        color.updateMatrixWorld(true);
         entry.colorMesh = color;
       }
     }

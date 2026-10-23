@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { WebGLGeometries } from 'three/src/renderers/webgl/WebGLGeometries.js';
 import { describe, expect, it, vi } from 'vitest';
 import { SceneryDetailBatches } from '../src/render/scenery_detail_batches';
+import { freezeStaticSubtreeMatrices } from '../src/render/static_matrix';
 
 function fixture() {
   const root = new THREE.Group();
@@ -30,6 +31,42 @@ function fixture() {
 }
 
 describe('scenery cell draw consolidation', () => {
+  it('places gated pooled draws in their frozen parent frame before revealing them', async () => {
+    const f = fixture();
+    const scene = new THREE.Scene();
+    scene.matrixAutoUpdate = false;
+    scene.add(f.root);
+    f.root.position.set(80, 12, 70);
+    f.root.rotation.y = Math.PI / 3;
+    f.root.scale.set(2, 3, 4);
+    for (const owner of f.owners) {
+      owner.position.set(4, 2, -3);
+      owner.rotation.y = -Math.PI / 4;
+    }
+    freezeStaticSubtreeMatrices(f.root);
+    scene.updateMatrixWorld();
+    const expected = f.owners[0].matrixWorld.clone();
+    const batches = new SceneryDetailBatches(f.children);
+    try {
+      await batches.prepare(async (mesh) => {
+        // GPU preparation can bake the standalone mesh before its final attach.
+        mesh.updateMatrixWorld(true);
+      });
+      const pooled = f.root.getObjectByName('scenery-batched') as THREE.InstancedMesh;
+      expect(pooled).toBeDefined();
+      expect(pooled.visible).toBe(false);
+      expect(pooled.matrixWorld.elements).toEqual(expected.elements);
+      scene.updateMatrixWorld();
+      expect(pooled.matrixWorld.elements).toEqual(expected.elements);
+      expect(pooled.matrixAutoUpdate).toBe(false);
+      expect(f.root.matrixWorldAutoUpdate).toBe(false);
+    } finally {
+      batches.dispose();
+      f.geometry.dispose();
+      f.material.dispose();
+    }
+  });
+
   it('reintroduces empty cells with their current material and transform data', async () => {
     const f = fixture();
     const batches = new SceneryDetailBatches(f.children);
