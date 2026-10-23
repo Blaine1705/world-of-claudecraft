@@ -163,6 +163,11 @@ describe('tavern cutaway: outdoors', () => {
 });
 
 describe('tavern roof and shelter', () => {
+  it('keeps the kitchen roof opaque for a sightline wholly in front of the inn', () => {
+    expect(decide(eye(10, 18), cam(10, 18, 18), false).cut).not.toContain('WingRoof');
+    expect(decide(eye(10, -22), cam(10, 18, -22), false).cut).toContain('WingRoof');
+  });
+
   it('reads the roof underside from its line along the hall, and the hammer beams', () => {
     // the ridge runs along the hall midway between the jettied front's face and the back wall,
     // settled toward its middle (the painted rebuild's sag), the sarking under it

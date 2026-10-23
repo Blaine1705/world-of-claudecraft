@@ -425,7 +425,9 @@ function wingRoofTop(d: number): number {
  *  meets those slates. */
 export function wingRoofUnderside(x: number, z: number): number {
   const d = Math.abs(x - WING_MID);
-  if (d > WING_HALF + W.eaveOut || z < W.z0 - W.vergeOut) return Infinity;
+  // The kitchen meets only the hall's rear slope; the falling front slope
+  // must not create a second, disconnected wing-roof region.
+  if (d > WING_HALF + W.eaveOut || z < W.z0 - W.vergeOut || z > RIDGE_Z) return Infinity;
   const top = wingRoofTop(d);
   if (z > W.z1) {
     const hall = hallRoofTop(x, z);
