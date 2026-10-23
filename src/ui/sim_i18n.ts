@@ -1247,6 +1247,10 @@ const baseEnTable = {
   'dfinder.advertCooldown': 'You posted your group recently. Please wait before posting again.',
   'dfinder.noApplication': 'You have no pending application.',
   'dfinder.playerUnavailable': 'That player is no longer available.',
+  'dfinder.expeditionOpenUnavailable':
+    'You must be inside an unfinished dungeon run to open recruitment.',
+  'dfinder.expeditionUnavailable': 'Your expedition is no longer available.',
+  'dfinder.expeditionTravelUnavailable': 'You cannot travel to your expedition right now.',
   'dfinder.queueJoined': 'You join the Dungeon Finder queue.',
   'dfinder.queueLeft': 'You leave the Dungeon Finder queue.',
   'dfinder.youLeftQueue': 'You left the Dungeon Finder queue.',
@@ -7733,6 +7737,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardWhiteoutGust': 'Weißout-Windbö',
   },
   zh_CN: {
+    'dfinder.expeditionOpenUnavailable': '必须身处尚未完成的地下城冒险中才能开放招募。',
+    'dfinder.expeditionUnavailable': '你的远征已不可用。',
+    'dfinder.expeditionTravelUnavailable': '你现在无法传送至自己的远征。',
+
     'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
     'aura.craftedMomentum': '匠造势能',
     'aura.craftedShelter': '匠造庇护',
@@ -8583,6 +8591,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardSweep': '宝藏横扫',
   },
   zh_TW: {
+    'dfinder.expeditionOpenUnavailable': '必須身處尚未完成的地城冒險中才能開放招募。',
+    'dfinder.expeditionUnavailable': '你的遠征已無法使用。',
+    'dfinder.expeditionTravelUnavailable': '你現在無法傳送至自己的遠征。',
+
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
     'aura.craftedMomentum': '匠造勢能',
     'aura.craftedShelter': '匠造庇護',
@@ -9433,6 +9445,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardSweep': '寶藏橫掃',
   },
   ko_KR: {
+    'dfinder.expeditionOpenUnavailable': '모집을 시작하려면 완료하지 않은 던전 안에 있어야 합니다.',
+    'dfinder.expeditionUnavailable': '더 이상 원정에 참여할 수 없습니다.',
+    'dfinder.expeditionTravelUnavailable': '지금은 원정으로 이동할 수 없습니다.',
+
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
     'aura.craftedMomentum': '장인의 기세',
     'aura.craftedShelter': '장인의 피난처',
@@ -10323,6 +10339,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardSweep': '보물 쓸기',
   },
   ja_JP: {
+    'dfinder.expeditionOpenUnavailable': '募集を開始するには、未完了のダンジョン内にいる必要があります。',
+    'dfinder.expeditionUnavailable': '遠征は利用できなくなりました。',
+    'dfinder.expeditionTravelUnavailable': '今は自分の遠征に移動できません。',
+
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
     'aura.craftedMomentum': '匠の勢い',
     'aura.craftedShelter': '匠の庇護',
@@ -12215,6 +12235,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.hoardWhiteoutGust': 'Rajada de Neblina Branca',
   },
   ru_RU: {
+    'dfinder.expeditionOpenUnavailable': 'Чтобы открыть набор, нужно находиться в незавершённом подземелье.',
+    'dfinder.expeditionUnavailable': 'Ваша экспедиция больше недоступна.',
+    'dfinder.expeditionTravelUnavailable': 'Сейчас нельзя переместиться к своей экспедиции.',
+
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
     'aura.craftedMomentum': 'Импульс мастера',
     'aura.craftedShelter': 'Укрытие мастера',

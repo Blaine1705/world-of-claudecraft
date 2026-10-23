@@ -357,6 +357,10 @@ export const en_XA: EnTranslations = {
       "search": "[Šéáŕçĥ áðʋéñţúŕéš]",
       "eligible": "[Ɱý ļéʋéļ]",
       "catalogueCount": "[{count} áðʋéñţúŕéš]",
+      "catalogueCountPlural": {
+        "one": "[{count} áðʋéñţúŕé]",
+        "other": "[{count} áðʋéñţúŕéš]"
+      },
       "empty": "[Ñó áðʋéñţúŕéš ɱáţçĥ ţĥéšé ƒíļţéŕš.]",
       "reset": "[Çļéáŕ ƒíļţéŕš]",
       "delve": "[Ðéļʋé]",
@@ -378,6 +382,10 @@ export const en_XA: EnTranslations = {
     },
     "expeditions": {
       "bell": "[Óþéñ Ĝŕóúþš: {count} ñóţíƒíçáţíóñš]",
+      "bellCount": {
+        "one": "[Óþéñ Ĝŕóúþš: {count} ñóţíƒíçáţíóñ]",
+        "other": "[Óþéñ Ĝŕóúþš: {count} ñóţíƒíçáţíóñš]"
+      },
       "alerts": "[Áļéŕţš]",
       "groups": "[Ĝŕóúþš]",
       "rewards": "[Ŕéŵáŕðš]",

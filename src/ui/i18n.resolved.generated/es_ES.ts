@@ -357,6 +357,10 @@ export const es_ES: EnTranslations = {
       "search": "Search adventures",
       "eligible": "My level",
       "catalogueCount": "{count} adventures",
+      "catalogueCountPlural": {
+        "one": "{count} adventure",
+        "other": "{count} adventures"
+      },
       "empty": "No adventures match these filters.",
       "reset": "Clear filters",
       "delve": "Delve",
@@ -378,6 +382,10 @@ export const es_ES: EnTranslations = {
     },
     "expeditions": {
       "bell": "Open Groups: {count} notifications",
+      "bellCount": {
+        "one": "Open Groups: {count} notification",
+        "other": "Open Groups: {count} notifications"
+      },
       "alerts": "Alerts",
       "groups": "Groups",
       "rewards": "Rewards",

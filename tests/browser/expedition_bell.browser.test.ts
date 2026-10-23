@@ -14,6 +14,11 @@ function control<T extends HTMLElement>(root: ParentNode, selector: string): T {
 }
 function setup() {
   const ui = host('ui', '');
+  const rail = document.createElement('div');
+  rail.id = 'side-buttons';
+  rail.innerHTML =
+    '<button type="button" id="expedition-bell" class="micro-btn ui-icon-btn ui-icon-btn--micro"></button>';
+  ui.append(rail);
   const root = host('dungeon-finder-window');
   ui.append(root);
   root.style.display = 'none';
@@ -78,13 +83,24 @@ function setup() {
     ),
   });
   surfaces.expeditions.render();
-  return { root, world, surfaces, bell: control<HTMLButtonElement>(ui, '#expedition-bell') };
+  let launcher = control<HTMLButtonElement>(ui, '#expedition-bell');
+  if (document.body.classList.contains('mobile-touch')) {
+    // The desktop rail is hidden on touch. This is the existing Groups entry
+    // after opening More, whose full bootstrap is covered by the real HUD tour.
+    launcher = document.createElement('button');
+    launcher.id = 'mobile-dfinder';
+    launcher.className = 'ui-btn';
+    launcher.textContent = 'Groups';
+    launcher.addEventListener('click', () => surfaces.window.open());
+    ui.append(launcher);
+  }
+  return { root, world, surfaces, bell: launcher };
 }
 afterEach(() => {
   cleanup();
   document.body.classList.remove('mobile-touch', 'game-active');
 });
-describe('one Groups window from the notification bell', () => {
+describe('one Groups window from the HUD launchers', () => {
   it.each([
     [1280, 800],
     [390, 844],
@@ -96,7 +112,8 @@ describe('one Groups window from the notification bell', () => {
     const { root, bell, world, surfaces } = setup();
     expect(root.style.display).toBe('none');
     expect(document.getElementById('expedition-panel')).toBeNull();
-    expect(document.querySelectorAll('.expedition-tools button')).toHaveLength(1);
+    expect(document.querySelectorAll('#side-buttons #expedition-bell')).toHaveLength(1);
+    expect(document.getElementById('expedition-hud')).toBeNull();
     bell.focus();
     await userEvent.keyboard('{Enter}');
     expect(root.style.display).toBe('flex');

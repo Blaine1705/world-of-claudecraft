@@ -8,7 +8,10 @@ describe('expedition wire commands', () => {
     const configure = vi.fn();
     const allowNote = vi.fn(() => false);
     dispatchDungeonFinderCommand(
-      { dungeonFinderExpeditionConfigure: configure } as unknown as Sim,
+      {
+        dungeonFinderExpeditionConfigure: configure,
+        dungeonFinderInfoFor: () => null,
+      } as unknown as Sim,
       7,
       {
         cmd: 'df_expedition_configure',

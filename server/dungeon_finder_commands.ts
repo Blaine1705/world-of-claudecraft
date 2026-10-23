@@ -35,14 +35,14 @@ export function dispatchDungeonFinderCommand(
         value.activityId.length <= 64 &&
         isFinderRole(value.role) &&
         validExpeditionDetails(value.details) &&
-        allowNote(value.details.note)
+        allowNote(value.details.note.trim())
       )
         sim.dungeonFinderExpeditionConfigure(
           {
             kind: 'recruit',
             activityId: value.activityId,
             role: value.role,
-            details: { purpose: value.details.purpose, note: value.details.note },
+            details: { purpose: value.details.purpose, note: value.details.note.trim() },
           },
           pid,
         );
@@ -56,13 +56,18 @@ export function dispatchDungeonFinderCommand(
           { kind: 'cancel_application', listingId: value.listingId },
           pid,
         );
-      else if (
-        value.kind === 'details' &&
-        validExpeditionDetails(value.details) &&
-        allowNote(value.details.note)
-      )
-        sim.dungeonFinderExpeditionConfigure({ kind: 'details', details: value.details }, pid);
-      else if (
+      else if (value.kind === 'details' && validExpeditionDetails(value.details)) {
+        const listing = sim.dungeonFinderInfoFor(pid)?.myListing;
+        const details = { purpose: value.details.purpose, note: value.details.note.trim() };
+        if (
+          listing &&
+          (listing.details?.purpose ?? 'clear') === details.purpose &&
+          (listing.details?.note ?? '') === details.note
+        )
+          break;
+        if (allowNote(details.note))
+          sim.dungeonFinderExpeditionConfigure({ kind: 'details', details }, pid);
+      } else if (
         value.kind === 'available' &&
         typeof value.enabled === 'boolean' &&
         Array.isArray(value.roles) &&

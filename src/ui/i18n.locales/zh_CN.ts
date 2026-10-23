@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.expeditions.bellCount.one': '打开队伍：{count}条通知',
+  'hudChrome.expeditions.bellCount.other': '打开队伍：{count}条通知',
+  'hudChrome.adventureGuide.catalogueCountPlural.one': '{count}项冒险',
+  'hudChrome.adventureGuide.catalogueCountPlural.other': '{count}项冒险',
   'hudChrome.adventureGuide.title': '冒险指南',
   'hudChrome.adventureGuide.eyebrow': '远征手册',
   'hudChrome.adventureGuide.intro': '探索世界，了解敌人，选择你的下一场冒险。',

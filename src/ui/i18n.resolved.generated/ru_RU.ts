@@ -357,6 +357,10 @@ export const ru_RU: EnTranslations = {
       "search": "Поиск приключений",
       "eligible": "Мой уровень",
       "catalogueCount": "Приключений: {count}",
+      "catalogueCountPlural": {
+        "one": "{count} приключение",
+        "other": "{count} приключений"
+      },
       "empty": "По этим фильтрам приключений не найдено.",
       "reset": "Сбросить фильтры",
       "delve": "Вылазка",
@@ -378,6 +382,10 @@ export const ru_RU: EnTranslations = {
     },
     "expeditions": {
       "bell": "Открыть группы: уведомлений {count}",
+      "bellCount": {
+        "one": "Открыть группы: {count} уведомление",
+        "other": "Открыть группы: {count} уведомлений"
+      },
       "alerts": "Уведомления",
       "groups": "Группы",
       "rewards": "Награды",

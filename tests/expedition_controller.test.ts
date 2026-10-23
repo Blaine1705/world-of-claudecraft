@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ExpeditionController } from '../src/ui/hud/expeditions';
+import { setNotificationSound } from '../src/ui/hud/expeditions/notification_sound';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import type { IWorld, RaidLockout } from '../src/world_api';
 import type { DungeonFinderBoard, DungeonFinderInfo } from '../src/world_api/dungeon_finder';
@@ -54,17 +55,22 @@ const badge = () => document.querySelector('[data-badge]');
 
 describe('unified Groups notification bell', () => {
   beforeEach(() => {
-    document.body.innerHTML = '<div id="ui"></div>';
+    document.body.innerHTML =
+      '<div id="ui"><div id="side-buttons"><button id="expedition-bell" class="micro-btn ui-icon-btn ui-icon-btn--micro"><span data-badge aria-hidden="true"></span></button></div></div>';
     localStorage.clear();
+    setNotificationSound(false);
   });
 
   it('has one entry button and opens Groups without constructing another finder', () => {
     const { deps, controller } = setup();
-    expect(document.querySelectorAll('#expedition-hud button')).toHaveLength(1);
+    expect(document.querySelectorAll('#side-buttons #expedition-bell')).toHaveLength(1);
+    expect(document.getElementById('expedition-hud')).toBeNull();
     const bell = document.getElementById('expedition-bell')!;
     expect(bell.getAttribute('aria-controls')).toBe('dungeon-finder-window');
+    expect(bell.getAttribute('aria-label')).toBe('Open Groups: 1 notification');
     expect(badge()?.textContent).toBe('1');
     bell.click();
+    expect(bell.getAttribute('aria-label')).toBe('Open Groups: 0 notifications');
     expect(deps.openFinder).toHaveBeenCalledOnce();
     expect(document.getElementById('expedition-panel')).toBeNull();
     expect(document.querySelector('[data-expedition-notice]')).toBeNull();
@@ -151,7 +157,7 @@ describe('unified Groups notification bell', () => {
 
   it('defers optional sound in combat and sounds once without showing a popup', () => {
     const { world, controller, deps } = setup();
-    localStorage.setItem('woc_expedition_sound', '1');
+    setNotificationSound(true);
     world.player.inCombat = true;
     world.dungeonFinderBoard.push({ ...world.dungeonFinderBoard[0], id: 4 });
     controller.render();
@@ -166,7 +172,7 @@ describe('unified Groups notification bell', () => {
 
   it('does no DOM work on unchanged medium polls or countdown-only updates', () => {
     const { controller } = setup();
-    const root = document.getElementById('expedition-hud')!;
+    const root = document.getElementById('side-buttons')!;
     const query = vi.spyOn(root, 'querySelector');
     const observer = new MutationObserver(() => {});
     observer.observe(root, {
@@ -179,6 +185,16 @@ describe('unified Groups notification bell', () => {
     expect(query).not.toHaveBeenCalled();
     expect(observer.takeRecords()).toEqual([]);
     observer.disconnect();
+  });
+  it('reuses compatibility on stable polls while observing in-place board changes', () => {
+    const { world, controller } = setup();
+    const filter = vi.spyOn(world.dungeonFinderBoard, 'filter');
+    for (let n = 0; n < 20; n++) controller.render();
+    expect(filter).not.toHaveBeenCalled();
+    world.dungeonFinderBoard[0].size = 5;
+    controller.render();
+    expect(filter).toHaveBeenCalledOnce();
+    expect(badge()?.textContent).toBe('0');
   });
 
   it('keeps outside clicks independent and preserves the active Groups focus', () => {

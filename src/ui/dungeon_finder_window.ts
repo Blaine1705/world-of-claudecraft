@@ -749,7 +749,7 @@ export class DungeonFinderWindow {
       return `<div class="df-empty"><p>${esc(t('hudChrome.adventureGuide.empty'))}</p><button class="ui-btn" type="button" data-guide-reset>${esc(t('hudChrome.adventureGuide.reset'))}</button></div>`;
     const rail = `<div class="df-rail ui-panel-soft" role="group" aria-label="${esc(
       t('hudChrome.finder.tabCatalogue'),
-    )}"><div class="df-rail-count">${esc(t('hudChrome.adventureGuide.catalogueCount', { count: num(rows.length) }))}</div>${rows.map((r) => this.rowHtml(r)).join('')}</div>`;
+    )}"><div class="df-rail-count">${esc(tPlural('hudChrome.adventureGuide.catalogueCountPlural', rows.length, { count: num(rows.length) }))}</div>${rows.map((r) => this.rowHtml(r)).join('')}</div>`;
     const detailHtml = `<div class="df-detail">${detail ? this.detailHtml(detail, selection) : ''}</div>`;
     return `<div class="df-cols df-pane-${this.pane}">${rail}${detailHtml}</div>`;
   }

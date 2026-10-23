@@ -15021,10 +15021,7 @@
     font: 400 16px / 1.45 var(--font-ui);
     color: var(--color-finder-text);
   }
-  #dungeon-finder-window:has(.df-body-catalogue) .df-tab {
-    font-size: 15px;
-    min-height: 44px;
-  }
+
   #dungeon-finder-window:has(.df-body-catalogue) .ui-win-title {
     font-size: 22px;
   }
@@ -15302,21 +15299,7 @@
     text-align: center;
     color: var(--color-text-secondary);
   }
-  .df-tabs {
-    display: flex;
-    gap: 6px;
-    margin: 6px 0 10px;
-  }
-  .df-tab {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 6px 0;
-    border: 1px solid var(--df-border);
-    cursor: var(--cursor-point);
-  }
+
   .df-body {
     flex: 1 1 auto;
     min-height: 0;
@@ -15814,10 +15797,7 @@
     gap: 3px;
     margin-right: 8px;
   }
-  #dungeon-finder-window .df-tab .ui-icon {
-    width: 14px;
-    height: 14px;
-  }
+
   #dungeon-finder-window .df-role-count .ui-icon,
   #dungeon-finder-window .df-role .ui-icon,
   #dungeon-finder-window .df-member .ui-icon,
@@ -15935,10 +15915,7 @@
   #dungeon-finder-window .df-body:has(.df-queue-shell) {
     container: finder-queue / inline-size;
   }
-  #dungeon-finder-window:has(.df-queue-shell) .df-tab {
-    font-size: 15px;
-    min-height: 44px;
-  }
+
   #dungeon-finder-window:has(.df-queue-shell) .ui-win-title {
     font-size: 22px;
   }
@@ -16194,12 +16171,6 @@
     text-decoration: underline;
     text-underline-offset: 4px;
   }
-  .df-current-group .expedition-member {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
-  }
 
   .df-current-group {
     padding: 18px;
@@ -16236,20 +16207,6 @@
     flex-basis: 100%;
     margin: 0;
   }
-  .df-group-settings {
-    min-width: 0;
-  }
-  .df-group-settings[open] {
-    flex-basis: 100%;
-  }
-  .df-group-settings > summary {
-    width: fit-content;
-    cursor: pointer;
-  }
-  .df-group-settings > .expedition-helper,
-  .df-group-settings > .expedition-shop {
-    padding: 16px 0;
-  }
 
   .df-board-shell--browse {
     grid-template-columns: minmax(0, 1fr);
@@ -16257,10 +16214,7 @@
   #dungeon-finder-window .df-body:has(.df-board-shell) {
     container: finder-board / inline-size;
   }
-  #dungeon-finder-window:has(.df-board-shell) .df-tab {
-    font-size: 15px;
-    min-height: 44px;
-  }
+
   #dungeon-finder-window:has(.df-board-shell) .ui-win-title {
     font-size: 22px;
   }

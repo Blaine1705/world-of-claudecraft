@@ -190,6 +190,7 @@ describe('independent expedition applications through the authoritative Sim', ()
   });
 
   it('refuses new requests when the recent-attempt window is full and recovers on expiry', () => {
+    expect(FINDER_EXPEDITION_RECENT_APPLICATION_CAP).toBe(50);
     const { sim, helper, leaders, pending } = setup(1);
     const leader = leaders[0];
     let listing = sim.dungeonFinderInfoFor(leader)!.myListing!.id;

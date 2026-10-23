@@ -357,6 +357,10 @@ export const zh_TW: EnTranslations = {
       "search": "搜尋冒險",
       "eligible": "適合我的等級",
       "catalogueCount": "{count}項冒險",
+      "catalogueCountPlural": {
+        "one": "{count}項冒險",
+        "other": "{count}項冒險"
+      },
       "empty": "沒有符合這些篩選條件的冒險。",
       "reset": "清除篩選",
       "delve": "地下探險",
@@ -378,6 +382,10 @@ export const zh_TW: EnTranslations = {
     },
     "expeditions": {
       "bell": "開啟隊伍：{count}則通知",
+      "bellCount": {
+        "one": "開啟隊伍：{count}則通知",
+        "other": "開啟隊伍：{count}則通知"
+      },
       "alerts": "提醒",
       "groups": "隊伍",
       "rewards": "獎勵",

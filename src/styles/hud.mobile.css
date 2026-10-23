@@ -768,7 +768,6 @@
      body.mobile-touch (hidden below); xpbar/player-frame/petbar keep rendering
      (their own mobile rules are untouched).
 
-
      GEOMETRY: the 5 paged buttons sit on one circular arc centred on the attack
      button's centre, a quarter sweep from due-left (180deg) to due-up (90deg) in
      22.5deg steps, so every adjacent pair has the same centre distance
@@ -2373,7 +2372,7 @@
   body.mobile-touch #mobile-extra-controls .mobile-btn.active .mobile-label {
     color: var(--gold);
   }
-  /* music toggle: a diagonal slash over the note signals "off" (mirrors #mm-music) */
+  /* music toggle: a diagonal slash over the note signals "off" */
   body.mobile-touch #mobile-music {
     position: relative;
   }
@@ -10011,11 +10010,7 @@
     font-size: 16px;
     min-height: 44px;
   }
-  body.mobile-touch #dungeon-finder-window:has(.df-board-shell, .df-body-catalogue) .df-tab {
-    font-size: 13px;
-    white-space: normal;
-    min-height: 44px;
-  }
+
   @media (max-width: 650px) {
     body.mobile-touch #dungeon-finder-window .df-category {
       display: grid;
@@ -10079,7 +10074,6 @@
       font-size: 20px;
     }
   }
-  body.mobile-touch #dungeon-finder-window .df-tab,
   body.mobile-touch #dungeon-finder-window .df-row,
   body.mobile-touch #dungeon-finder-window .df-role,
   body.mobile-touch #dungeon-finder-window .df-opt,
@@ -10406,65 +10400,5 @@
   }
   body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-detail {
     font-size: 16px;
-  }
-}
-@layer hud-mobile {
-  body.mobile-touch #expedition-hud {
-    --expedition-inset: 8px;
-  }
-  body.mobile-touch #expedition-panel {
-    padding: 8px;
-  }
-  body.mobile-touch .expedition-run {
-    max-width: calc(100dvw - 76px);
-  }
-  body.mobile-touch .expedition-run > span {
-    max-width: 120px;
-  }
-  body.mobile-touch .expedition-card {
-    flex-basis: 240px;
-  }
-  body.mobile-touch .expedition-zones {
-    grid-template-columns: minmax(250px, 280px) minmax(0, 1fr);
-    gap: 10px;
-  }
-  body.mobile-touch .expedition-other,
-  body.mobile-touch .expedition-own-body {
-    padding: 10px;
-  }
-  body.mobile-touch .expedition-own > .expedition-zone-head {
-    padding: 10px;
-  }
-  body.mobile-touch .expedition-hero {
-    height: 124px;
-  }
-  body.mobile-touch .expedition-hero-copy h3 {
-    font-size: 18px;
-  }
-  body.mobile-touch .expedition-title h2 {
-    font-size: 16px;
-  }
-  body.mobile-touch .expedition-card-body {
-    padding: 12px;
-  }
-  @media (max-height: 500px) {
-    body.mobile-touch .expedition-hero {
-      height: 80px;
-    }
-    body.mobile-touch .expedition-own .expedition-hero {
-      height: 80px;
-    }
-    body.mobile-touch .expedition-zone-head p,
-    body.mobile-touch .expedition-title p {
-      display: none;
-    }
-  }
-  @media (max-width: 700px) {
-    body.mobile-touch .expedition-zones {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-  body.mobile-touch #expedition-hud .ui-btn {
-    min-height: 40px;
   }
 }

@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.expeditions.bellCount.one': 'Открыть группы: {count} уведомление',
+  'hudChrome.expeditions.bellCount.other': 'Открыть группы: {count} уведомлений',
+  'hudChrome.adventureGuide.catalogueCountPlural.one': '{count} приключение',
+  'hudChrome.adventureGuide.catalogueCountPlural.other': '{count} приключений',
   'hudChrome.adventureGuide.title': 'Путеводитель по приключениям',
   'hudChrome.adventureGuide.eyebrow': 'Журнал экспедиций',
   'hudChrome.adventureGuide.intro': 'Откройте мир. Изучите врага. Выберите следующее приключение.',

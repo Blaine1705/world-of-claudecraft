@@ -40,6 +40,37 @@ function markup(html: string): HTMLElement {
 }
 
 describe('premade board chrome', () => {
+  it('masks another player note before escaping its HTML', () => {
+    const root = markup(
+      boardListingHtml(
+        {
+          ...listing,
+          details: { purpose: 'clear', note: '<img src=x onerror=alert(1)> forbidden' },
+        },
+        (note) => note.replace('forbidden', '***'),
+      ),
+    );
+    expect(root.querySelector('.expedition-note')?.textContent).toBe(
+      '<img src=x onerror=alert(1)> ***',
+    );
+    expect(root.querySelector('.expedition-note img, [onerror]')).toBeNull();
+  });
+  it.each(['future_class', '__proto__', 'constructor'])(
+    'renders unknown class %s with the shared fallback color',
+    (value) => {
+      const cls = value as import('../src/sim/types').PlayerClass;
+      expect(() => boardMemberHtml({ pid: 42, name: 'Visitor', cls, level: 8 })).not.toThrow();
+      expect(() =>
+        boardApplicantHtml({ pid: 42, name: 'Visitor', cls, level: 8, roles: [], remaining: 30 }),
+      ).not.toThrow();
+      for (const html of [
+        boardMemberHtml({ pid: 42, name: 'Visitor', cls, level: 8 }),
+        boardApplicantHtml({ pid: 42, name: 'Visitor', cls, level: 8, roles: [], remaining: 30 }),
+      ]) {
+        expect(markup(html).firstElementChild?.getAttribute('style')).toBe('--class-color:#5fa8ff');
+      }
+    },
+  );
   it('renders admitted members with canonical spec, class and actual role without applicant actions', () => {
     const spec = TALENTS.priest.specs.find((entry) => entry.role === 'dps')!;
     const root = markup(

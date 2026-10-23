@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.expeditions.bellCount.one': '그룹 열기: 알림 {count}개',
+  'hudChrome.expeditions.bellCount.other': '그룹 열기: 알림 {count}개',
+  'hudChrome.adventureGuide.catalogueCountPlural.one': '모험 {count}개',
+  'hudChrome.adventureGuide.catalogueCountPlural.other': '모험 {count}개',
   'hudChrome.adventureGuide.title': '모험 안내서',
   'hudChrome.adventureGuide.eyebrow': '원정 기록',
   'hudChrome.adventureGuide.intro': '세계를 탐험하고 적을 파악하여 다음 모험을 선택하세요.',

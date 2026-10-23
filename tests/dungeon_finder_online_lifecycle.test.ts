@@ -76,6 +76,49 @@ function publish(player: ReturnType<ReturnType<typeof harness>['connect']>, role
 }
 
 describe('Groups authoritative online lifecycle', () => {
+  it('shares the chat quota for changed notes and leaves rejected or unchanged board data intact', () => {
+    const { server, connect } = harness();
+    const leader = connect('NoteLeader', 'warrior', 'tank');
+    publish(leader, 'tank');
+    const update = (note: string) =>
+      leader.client.dungeonFinderExpeditionConfigure({
+        kind: 'details',
+        details: { purpose: 'relaxed', note },
+      });
+    leader.session.chatTokens = 1;
+    leader.session.chatLastRefill = Date.now() / 1000;
+    update('New recruitment note');
+    expect(leader.session.chatTokens).toBeLessThan(0.01);
+    const acceptedBoard = server.sim.dungeonFinderBoardView();
+    update('Another recruitment note');
+    expect(server.sim.dungeonFinderBoardView()).toBe(acceptedBoard);
+    expect(server.sim.dungeonFinderInfoFor(leader.session.pid)?.myListing?.details?.note).toBe(
+      'New recruitment note',
+    );
+    const violations = leader.session.chatRateViolations;
+    update(' New recruitment note ');
+    expect(leader.session.chatRateViolations).toBe(violations);
+    expect(server.sim.dungeonFinderBoardView()).toBe(acceptedBoard);
+  });
+
+  it('allows muted players to publish an empty note while rejecting nonempty text', () => {
+    const { server, connect } = harness();
+    const leader = connect('MutedLeader', 'warrior', 'tank');
+    leader.session.chatMutedUntil = Date.now() + 60_000;
+    leader.client.dungeonFinderExpeditionConfigure({
+      kind: 'recruit',
+      activityId: 'nythraxis_boss_arena_normal',
+      role: 'tank',
+      details: { purpose: 'clear', note: '   ' },
+    });
+    expect(server.sim.dungeonFinderInfoFor(leader.session.pid)?.myListing?.details?.note).toBe('');
+    leader.client.dungeonFinderExpeditionConfigure({
+      kind: 'details',
+      details: { purpose: 'clear', note: 'Muted text' },
+    });
+    expect(server.sim.dungeonFinderInfoFor(leader.session.pid)?.myListing?.details?.note).toBe('');
+  });
+
   it('publishes, mirrors fourteen applicants, accepts the chosen role, and joins another group after leaving', async () => {
     const { server, connect, sync } = harness();
     const leader = connect('RaidLeader', 'warrior', 'tank');

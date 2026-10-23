@@ -357,6 +357,10 @@ export const ko_KR: EnTranslations = {
       "search": "모험 검색",
       "eligible": "내 레벨",
       "catalogueCount": "모험 {count}개",
+      "catalogueCountPlural": {
+        "one": "모험 {count}개",
+        "other": "모험 {count}개"
+      },
       "empty": "필터에 맞는 모험이 없습니다.",
       "reset": "필터 초기화",
       "delve": "탐구",
@@ -378,6 +382,10 @@ export const ko_KR: EnTranslations = {
     },
     "expeditions": {
       "bell": "그룹 열기: 알림 {count}개",
+      "bellCount": {
+        "one": "그룹 열기: 알림 {count}개",
+        "other": "그룹 열기: 알림 {count}개"
+      },
       "alerts": "알림",
       "groups": "그룹",
       "rewards": "보상",

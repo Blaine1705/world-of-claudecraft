@@ -247,6 +247,8 @@ export class DungeonFinderMachine {
   // Offline advert cooldowns (sim clock, keyed by player); online the server
   // owns them per account and never forwards an advertise command here.
   private readonly adverts = new FinderAdvertCooldowns();
+  // At most FINDER_EXPEDITION_RECENT_APPLICATION_CAP entries per player,
+  // including reservations held by pending applications until their response.
   private readonly expeditionApplicationUntil = new Map<number, Map<number, number>>();
   private readonly expeditionMemberships = new Map<
     number,
@@ -342,7 +344,13 @@ export class DungeonFinderMachine {
       const listing = this.listingBy(id);
       if (!listing || !this.listingValid(listing) || !validExpeditionDetails(settings.details))
         return;
-      listing.details = { purpose: settings.details.purpose, note: settings.details.note.trim() };
+      const details = { purpose: settings.details.purpose, note: settings.details.note.trim() };
+      if (
+        (listing.details?.purpose ?? 'clear') === details.purpose &&
+        (listing.details?.note ?? '') === details.note
+      )
+        return;
+      listing.details = details;
       this.bumpBoard();
     } else if (settings.kind === 'available') {
       const eligible = compatibleFinderRoles(r.meta.cls, r.e.level, r.meta.talentMods.role);
@@ -797,7 +805,7 @@ export class DungeonFinderMachine {
       r.e.ghost ||
       expeditionFinished(this.ctx, claim, activity)
     ) {
-      this.ctx.error(id, 'That listing is no longer available.');
+      this.ctx.error(id, 'You must be inside an unfinished dungeon run to open recruitment.');
       return;
     }
     if (this.unitFor(id) || this.proposalFor(id)) {
@@ -848,8 +856,9 @@ export class DungeonFinderMachine {
     if (!r) return;
     const view = this.expeditionViewFor(r.meta.entityId);
     const claim = view ? expeditionClaimByExit(this.ctx, view.exitId) : null;
-    if (!claim || !travelToExpedition(this.ctx, claim, r.meta.entityId))
-      this.ctx.error(r.meta.entityId, 'That player is no longer available.');
+    if (!claim) this.ctx.error(r.meta.entityId, 'Your expedition is no longer available.');
+    else if (!travelToExpedition(this.ctx, claim, r.meta.entityId))
+      this.ctx.error(r.meta.entityId, 'You cannot travel to your expedition right now.');
   }
 
   dungeonFinderExpeditionApply(listingId: number, role: Role, pid?: number): void {
@@ -966,7 +975,8 @@ export class DungeonFinderMachine {
       const cooldowns = this.expeditionApplicationUntil.get(id);
       if (cooldowns) {
         for (const [targetId, until] of cooldowns)
-          if (until <= this.ctx.time) cooldowns.delete(targetId);
+          if (until <= this.ctx.time && !this.applications.get(id, targetId))
+            cooldowns.delete(targetId);
         if (cooldowns.has(listingId) || cooldowns.size >= FINDER_EXPEDITION_RECENT_APPLICATION_CAP)
           return;
       }
@@ -1086,6 +1096,12 @@ export class DungeonFinderMachine {
     this.dropApplication(applicantPid, listing.id);
     this.bumpBoard();
     if (!accept) {
+      if (listing.expeditionExitId !== undefined) {
+        // Pending requests keep their bounded reservation until answered.
+        this.expeditionApplicationUntil
+          .get(applicantPid)
+          ?.set(listing.id, this.ctx.time + FINDER_EXPEDITION_APPLICATION_COOLDOWN);
+      }
       if (this.ctx.players.has(applicantPid))
         this.ctx.notice(applicantPid, 'Your application was declined.');
       return;
@@ -1317,7 +1333,8 @@ export class DungeonFinderMachine {
     }
     for (const [pid, cooldowns] of this.expeditionApplicationUntil) {
       for (const [listingId, until] of cooldowns)
-        if (until <= this.ctx.time) cooldowns.delete(listingId);
+        if (until <= this.ctx.time && !this.applications.get(pid, listingId))
+          cooldowns.delete(listingId);
       if (!cooldowns.size) this.expeditionApplicationUntil.delete(pid);
     }
     for (const [pid, membership] of this.expeditionMemberships) {

@@ -247,6 +247,7 @@ interface Harness {
   stateFile: string;
   lockFile: string;
   restartLog: string;
+  timeoutLog: string;
 }
 
 // A temp PATH dir holding three shims. `docker` prints a scripted `<running> <health>`
@@ -285,7 +286,15 @@ exit "\${SHIM_FLOCK_EXIT:-0}"
   chmodSync(join(dir, 'flock'), 0o755);
   const timeoutShim = `
 const { spawn } = require('node:child_process');
+const { appendFileSync } = require('node:fs');
 const args = process.argv.slice(2);
+appendFileSync(process.env.SHIM_TIMEOUT_LOG, JSON.stringify({
+  args,
+  dryRun: process.env.WATCHDOG_DRY_RUN,
+  cooldown: process.env.WATCHDOG_COOLDOWN,
+  inspectTimeout: process.env.WATCHDOG_INSPECT_TIMEOUT,
+  restartTimeout: process.env.WATCHDOG_RESTART_TIMEOUT,
+}) + '\\n');
 if (args[0] === '-k') args.splice(0, 2);
 const seconds = Number(args.shift());
 // Fail closed: only the fixture docker script is ever executable here, even if
@@ -314,6 +323,7 @@ child.on('exit', (code) => {
   chmodSync(join(dir, 'timeout'), 0o755);
   return {
     dir,
+    timeoutLog: join(dir, 'timeout-calls.ndjson'),
     stateFile: join(dir, 'state'),
     lockFile: join(dir, 'lock'),
     restartLog: join(dir, 'restart.log'),
@@ -330,6 +340,11 @@ function runWatchdog(
   h: Harness,
   opts: { inspect: string; args?: string[]; env?: Record<string, string> },
 ): RunResult {
+  // Exercise production defaults, not duplicate defaults in the fixture. Ambient
+  // operator settings must not change these isolated fake-service cases.
+  const env = Object.fromEntries(
+    Object.entries(bashFixtureEnv()).filter(([key]) => !/^(watchdog_|shim_)/i.test(key)),
+  );
   const res = spawnSync(
     bashExecutable(),
     [
@@ -350,17 +365,14 @@ exec bash "$SHIM_DIR/watchdog.sh" "$@"
       encoding: 'utf8',
       timeout: 15000,
       env: {
-        ...bashFixtureEnv(),
+        ...env,
         SHIM_DIR: bashPath(h.dir),
         SHIM_NODE: bashPath(process.execPath),
         SHIM_TIMEOUT_JS: join(h.dir, 'timeout.cjs').replace(/\\/g, '/'),
+        SHIM_TIMEOUT_LOG: join(h.dir, 'timeout-calls.ndjson'),
         WATCHDOG_CONTAINER: CONTAINER,
         WATCHDOG_STATE_FILE: bashPath(h.stateFile),
         WATCHDOG_LOCK_FILE: bashPath(h.lockFile),
-        WATCHDOG_DRY_RUN: '0',
-        WATCHDOG_COOLDOWN: '300',
-        WATCHDOG_INSPECT_TIMEOUT: '55',
-        WATCHDOG_RESTART_TIMEOUT: '150',
         SHIM_INSPECT_HANG: '0',
         SHIM_INSPECT_EXIT: '0',
         SHIM_RESTART_HANG: '0',
@@ -387,14 +399,79 @@ afterAll(() => {
 });
 
 describe('game watchdog behavior (executed against a fake docker)', () => {
-  it('refuses execution if the fixture docker shim is missing', () => {
+  it('uses production defaults with all behavioral WATCHDOG variables absent', () => {
     const h = makeHarness();
-    rmSync(join(h.dir, 'docker'));
     const res = runWatchdog(h, { inspect: 'true unhealthy' });
-    expect(res.status).toBe(126);
+    expect(res.status).toBe(0);
+    expect(res.restarted).toBe(true);
+    const calls = readFileSync(h.timeoutLog, 'utf8')
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line));
+    expect(calls).toHaveLength(2);
+    for (const call of calls) {
+      expect(call).not.toHaveProperty('dryRun');
+      expect(call).not.toHaveProperty('cooldown');
+      expect(call).not.toHaveProperty('inspectTimeout');
+      expect(call).not.toHaveProperty('restartTimeout');
+    }
+    expect(calls[0].args.slice(0, 5)).toEqual(['-k', '5', '55', 'docker', 'inspect']);
+    expect(calls[1].args).toEqual(['-k', '5', '150', 'docker', 'restart', CONTAINER]);
+  });
+
+  it('uses the production 300-second cooldown without an environment override', () => {
+    const h = makeHarness();
+    writeFileSync(h.stateFile, `${nowSeconds() - 200}\n`);
+    const res = runWatchdog(h, { inspect: 'true unhealthy' });
+    expect(res.status).toBe(0);
     expect(res.restarted).toBe(false);
+    expect(res.output).toContain('cooldown 300s');
+  });
+
+  it('honors explicit cooldown and timeout overrides', () => {
+    const h = makeHarness();
+    writeFileSync(h.stateFile, `${nowSeconds() - 200}\n`);
+    const res = runWatchdog(h, {
+      inspect: 'true unhealthy',
+      env: {
+        WATCHDOG_COOLDOWN: '60',
+        WATCHDOG_INSPECT_TIMEOUT: '13',
+        WATCHDOG_RESTART_TIMEOUT: '29',
+      },
+    });
+    expect(res.status).toBe(0);
+    expect(res.restarted).toBe(true);
+    const calls = readFileSync(h.timeoutLog, 'utf8')
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line));
+    expect(calls[0].args.slice(0, 5)).toEqual(['-k', '5', '13', 'docker', 'inspect']);
+    expect(calls[1].args).toEqual(['-k', '5', '29', 'docker', 'restart', CONTAINER]);
+  });
+
+  it('honors an explicit dry-run environment setting without restarting', () => {
+    const h = makeHarness();
+    const res = runWatchdog(h, {
+      inspect: 'true unhealthy',
+      env: { WATCHDOG_DRY_RUN: '1' },
+    });
+    expect(res.status).toBe(0);
+    expect(res.restarted).toBe(false);
+    expect(res.output).toContain('DRY RUN');
     expect(existsSync(h.stateFile)).toBe(false);
   });
+
+  it.each(['docker', 'flock', 'timeout'])(
+    'refuses execution if the fixture %s shim is missing',
+    (tool) => {
+      const h = makeHarness();
+      rmSync(join(h.dir, tool));
+      const res = runWatchdog(h, { inspect: 'true unhealthy' });
+      expect(res.status).toBe(126);
+      expect(res.restarted).toBe(false);
+      expect(existsSync(h.stateFile)).toBe(false);
+    },
+  );
 
   // The harness must be able to observe a REAL restart, or every negative case below
   // passes vacuously. An unhealthy, running container is the one case the watchdog

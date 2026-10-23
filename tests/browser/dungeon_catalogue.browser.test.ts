@@ -200,6 +200,7 @@ describe('Adventure Guide in a real browser', () => {
   it('preserves the focused search caret and exposes class/spec previews without gameplay commands', async () => {
     await page.viewport(1440, 1000);
     const { root, world } = setup();
+    expect(root.querySelector('.df-rail-count')?.textContent).toMatch(/ adventures$/);
     expect(control<HTMLSelectElement>(root, '[data-loot-class]').value).toBe('paladin');
     expect(control<HTMLSelectElement>(root, '[data-loot-spec]').value).toBe('holy');
     const classes = control<HTMLSelectElement>(root, '[data-loot-class]');
@@ -216,9 +217,18 @@ describe('Adventure Guide in a real browser', () => {
     search.setSelectionRange(3, 3);
     search.dispatchEvent(new Event('input', { bubbles: true }));
     const current = control<HTMLInputElement>(root, '[data-guide-search]');
+    expect(root.querySelector('.df-rail-count')?.textContent).toBe('2 adventures');
     expect(document.activeElement).toBe(current);
     expect(current.selectionStart).toBe(3);
     expect(root.querySelectorAll('[data-row]').length).toBeGreaterThan(0);
+    current.value = '';
+    current.dispatchEvent(new Event('input', { bubbles: true }));
+    await userEvent.click(control(root, '[data-category="delves"]'));
+    const singleName = control(root, '[data-row^="delve:"] .df-row-name').textContent!.trim();
+    const singleSearch = control<HTMLInputElement>(root, '[data-guide-search]');
+    singleSearch.value = singleName;
+    singleSearch.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(root.querySelector('.df-rail-count')?.textContent).toBe('1 adventure');
     expect(world.dungeonFinderQueueJoin).not.toHaveBeenCalled();
     expect(world.dungeonFinderSetRoles).not.toHaveBeenCalled();
     const violations = await axeSeriousViolations(root);

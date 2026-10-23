@@ -187,6 +187,11 @@ describe('Groups expedition controls', () => {
     note.dispatchEvent(new Event('input'));
     note.focus();
     note.setSelectionRange(3, 7);
+    world.player.inCombat = true;
+    window.render();
+    expect(root.querySelector('[data-group-note]')).toBe(note);
+    expect(document.activeElement).toBe(note);
+    expect([note.selectionStart, note.selectionEnd]).toEqual([3, 7]);
     info.expedition!.bossesDefeated = 2;
     window.render();
     const updated = root.querySelector<HTMLInputElement>('[data-group-note]')!;

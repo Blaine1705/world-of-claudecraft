@@ -357,6 +357,10 @@ export const zh_CN: EnTranslations = {
       "search": "搜索冒险",
       "eligible": "适合我的等级",
       "catalogueCount": "{count}项冒险",
+      "catalogueCountPlural": {
+        "one": "{count}项冒险",
+        "other": "{count}项冒险"
+      },
       "empty": "没有符合这些筛选条件的冒险。",
       "reset": "清除筛选",
       "delve": "地下探险",
@@ -378,6 +382,10 @@ export const zh_CN: EnTranslations = {
     },
     "expeditions": {
       "bell": "打开队伍：{count}条通知",
+      "bellCount": {
+        "one": "打开队伍：{count}条通知",
+        "other": "打开队伍：{count}条通知"
+      },
       "alerts": "提醒",
       "groups": "队伍",
       "rewards": "奖励",

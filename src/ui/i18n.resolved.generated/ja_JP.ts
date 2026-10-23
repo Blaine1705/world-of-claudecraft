@@ -357,6 +357,10 @@ export const ja_JP: EnTranslations = {
       "search": "冒険を検索",
       "eligible": "自分のレベル",
       "catalogueCount": "冒険 {count}件",
+      "catalogueCountPlural": {
+        "one": "冒険{count}件",
+        "other": "冒険{count}件"
+      },
       "empty": "条件に合う冒険はありません。",
       "reset": "絞り込みを解除",
       "delve": "探索",
@@ -378,6 +382,10 @@ export const ja_JP: EnTranslations = {
     },
     "expeditions": {
       "bell": "グループを開く：通知{count}件",
+      "bellCount": {
+        "one": "グループを開く：通知{count}件",
+        "other": "グループを開く：通知{count}件"
+      },
       "alerts": "通知",
       "groups": "グループ",
       "rewards": "報酬",

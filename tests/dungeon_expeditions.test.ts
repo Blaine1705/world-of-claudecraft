@@ -166,6 +166,11 @@ describe('open dungeon expeditions through the real Sim', () => {
       expect(sim.entities.get(helper)!.pos).toEqual(position);
       expect([...claim.enteredBy]).toEqual(entered);
       expect(claim.exitId).toBe(exit);
+      expect(sim.tick()).toContainEqual({
+        type: 'error',
+        pid: helper,
+        text: 'You cannot travel to your expedition right now.',
+      });
     },
   );
 
@@ -280,6 +285,101 @@ describe('open dungeon expeditions through the real Sim', () => {
     sim.time += 11;
     sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
     expect(sim.dungeonFinderInfoFor(helper)?.myApplication?.listingId).toBe(listing.id);
+  });
+
+  it('starts the reapplication cooldown when a delayed application is declined', () => {
+    const { sim, leader, helper, listing } = setup();
+    sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
+    sim.time += 20;
+    for (let i = 0; i < 20; i++) sim.tick();
+    sim.dungeonFinderApplicationRespond(helper, false, leader);
+    sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
+    expect(sim.dungeonFinderInfoFor(helper)?.myApplication).toBeNull();
+    sim.time += 9;
+    sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
+    expect(sim.dungeonFinderInfoFor(helper)?.myApplication).toBeNull();
+    sim.time += 1;
+    sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
+    expect(sim.dungeonFinderInfoFor(helper)?.myApplication?.listingId).toBe(listing.id);
+  });
+
+  it('does not invalidate the board when an offline note edit has no semantic change', () => {
+    const { sim, leader } = setup();
+    sim.dungeonFinderExpeditionConfigure(
+      {
+        kind: 'details',
+        details: { purpose: 'clear', note: 'Coordinated run' },
+      },
+      leader,
+    );
+    const board = sim.dungeonFinderBoardView();
+    sim.dungeonFinderExpeditionConfigure(
+      {
+        kind: 'details',
+        details: { purpose: 'clear', note: ' Coordinated run ' },
+      },
+      leader,
+    );
+    expect(sim.dungeonFinderBoardView()).toBe(board);
+  });
+
+  it('keeps pending cooldown reservations bounded and clears them when the applicant logs out', () => {
+    const { sim, helper, listing } = setup();
+    const cooldowns = (
+      sim as unknown as {
+        dungeonFinder: { expeditionApplicationUntil: Map<number, Map<number, number>> };
+      }
+    ).dungeonFinder.expeditionApplicationUntil;
+    sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
+    sim.time += 20;
+    for (let i = 0; i < 20; i++) sim.tick();
+    expect(cooldowns.get(helper)?.size).toBe(1);
+    sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
+    expect(cooldowns.get(helper)?.size).toBe(1);
+    sim.removePlayer(helper);
+    expect(cooldowns.has(helper)).toBe(false);
+  });
+
+  it('replaces a premade publication and removes its pending requests when opening a live run', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    const leader = addPlayer(sim, 'Leader');
+    const helper = addPlayer(sim, 'Helper');
+    sim.dungeonFinderListingCreate('hollow_crypt_normal', [], leader);
+    const premade = sim.dungeonFinderBoardView()[0];
+    sim.dungeonFinderApply(premade.id, helper);
+    expect(sim.dungeonFinderInfoFor(helper)?.myApplication?.listingId).toBe(premade.id);
+    expect(sim.enterDungeon('hollow_crypt', leader)).toBe(true);
+    sim.dungeonFinderExpeditionOpen(leader);
+    expect(sim.dungeonFinderBoardView()[0].id).not.toBe(premade.id);
+    expect(sim.dungeonFinderInfoFor(helper)?.myApplication).toBeNull();
+    expect(() => sim.dungeonFinderApplicationRespond(helper, false, leader)).not.toThrow();
+    sim.dungeonFinderExpeditionApply(sim.dungeonFinderBoardView()[0].id, 'dps', helper);
+    sim.dungeonFinderApplicationRespond(helper, false, leader);
+    sim.dungeonFinderExpeditionApply(sim.dungeonFinderBoardView()[0].id, 'dps', helper);
+    expect(sim.dungeonFinderInfoFor(helper)?.myApplication).toBeNull();
+  });
+
+  it('reports the expedition action that failed without changing the player position', () => {
+    const { sim, helper } = setup();
+    sim.tick();
+    const position = { ...sim.entities.get(helper)!.pos };
+    sim.dungeonFinderExpeditionOpen(helper);
+    sim.dungeonFinderExpeditionTravel(helper);
+    const errors = sim.tick().filter((event) => event.type === 'error' && event.pid === helper);
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          text: 'You must be inside an unfinished dungeon run to open recruitment.',
+        }),
+        expect.objectContaining({ text: 'Your expedition is no longer available.' }),
+      ]),
+    );
+    expect(sim.entities.get(helper)!.pos).toEqual(position);
   });
 
   it('closes recruitment when full and refuses the remaining applicant', () => {

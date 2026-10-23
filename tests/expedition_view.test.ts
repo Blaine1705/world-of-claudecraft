@@ -172,4 +172,11 @@ describe('open expedition view', () => {
     listing.expedition!.bossesDefeated++;
     expect(buildExpeditionView(state, [listing], 1, false, false, null).sig).not.toBe(sig);
   });
+  it('does not rebuild the Groups controls for combat-only changes', () => {
+    const state = info();
+    const board = [group()];
+    expect(buildExpeditionView(state, board, 1, false, true, null).sig).toBe(
+      buildExpeditionView(state, board, 1, false, false, null).sig,
+    );
+  });
 });

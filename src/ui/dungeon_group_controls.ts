@@ -10,11 +10,20 @@ import { dungeonDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { focusKeyAttr } from './focus_restore';
 import { buildExpeditionView } from './hud/expeditions/expedition_view';
+import {
+  notificationSoundEnabled,
+  setNotificationSound,
+} from './hud/expeditions/notification_sound';
 import { formatNumber, t } from './i18n';
 import type { hudChromeStrings } from './i18n.catalog/hud_chrome';
 
 type View = ReturnType<typeof buildExpeditionView>;
-const text = (key: keyof typeof hudChromeStrings.expeditions, values?: Record<string, string>) =>
+type ExpeditionTextKey = {
+  [Key in keyof typeof hudChromeStrings.expeditions]: (typeof hudChromeStrings.expeditions)[Key] extends string
+    ? Key
+    : never;
+}[keyof typeof hudChromeStrings.expeditions];
+const text = (key: ExpeditionTextKey, values?: Record<string, string>) =>
   esc(t(`hudChrome.expeditions.${key}`, values));
 const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
 const button = (action: string, label: string, disabled = false) =>
@@ -82,12 +91,7 @@ export class DungeonGroupControls {
     view: View,
     visibleListingIds: readonly number[] = view.groups.map((group) => group.id),
   ): string {
-    let sound = false;
-    try {
-      sound = localStorage.getItem('woc_expedition_sound') === '1';
-    } catch {
-      /* Storage may be disabled. */
-    }
+    const sound = notificationSoundEnabled();
     const feedback = view.feedback
       ? `<p role="status">${text(feedbackKeys[view.feedback.outcome], { name: view.feedback.leaderName })}</p>`
       : '';
@@ -153,14 +157,7 @@ export class DungeonGroupControls {
       if (this.details) this.details.note = (e.currentTarget as HTMLInputElement).value;
     });
     root.querySelector<HTMLInputElement>('[data-group-sound]')?.addEventListener('change', (e) => {
-      try {
-        localStorage.setItem(
-          'woc_expedition_sound',
-          (e.currentTarget as HTMLInputElement).checked ? '1' : '0',
-        );
-      } catch {
-        /* Keep the usable control if storage is disabled. */
-      }
+      setNotificationSound((e.currentTarget as HTMLInputElement).checked);
     });
   }
 }

@@ -539,7 +539,8 @@ const MONOLITHS: MonolithRow[] = [
     // tree (after biome). Exact count, zero slack.
     // LOWERED 18093 -> 18082 for the Groups window extras: the remote Player
     // Info mapping moved into InspectWindow.openProfile. Exact count after biome.
-    ceiling: 18082,
+    // LOWERED after removing the retired desktop music shortcut wiring.
+    ceiling: 18070,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

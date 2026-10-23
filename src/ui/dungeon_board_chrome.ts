@@ -5,10 +5,9 @@ import {
   type FinderListingTag,
 } from '../sim/content/dungeon_finder';
 import { type Role, TALENTS } from '../sim/content/talents';
-import { CLASSES } from '../sim/data';
 import type { DungeonDifficulty } from '../sim/types';
 import type { DungeonFinderApplicantView } from '../world_api';
-import { classIconUrl } from './class_icon_art';
+import { classIconUrl, hasClassIconArt } from './class_icon_art';
 import { BOARD_CONTENT_FILTERS, type BoardContentFilter } from './dungeon_board_filter';
 import type { FinderBoardPanelView, FinderListingRowView } from './dungeon_finder_view';
 import { difficultySwitchHtml, partyRolesHtml } from './dungeon_listing_edit_chrome';
@@ -16,6 +15,7 @@ import { classDisplayName, dungeonDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { expeditionImageUrl } from './hud/expeditions/expedition_art';
 import { formatNumber, type TranslationKey, t } from './i18n';
+import { classColorCss } from './inspect_view';
 import { tTalent } from './talent_i18n';
 import { svgIcon } from './ui_icons';
 
@@ -76,17 +76,17 @@ export function boardApplicantHtml(applicant: DungeonFinderApplicantView): strin
         `<span class="df-role-chip" data-combat-role="${role}">${roleIcon(role)}${esc(roleLabel(role))}</span>`,
     )
     .join('');
-  const spec = TALENTS[applicant.cls]?.specs.find((entry) => entry.id === applicant.spec);
+  const spec = TALENTS[applicant.cls]?.specs?.find((entry) => entry.id === applicant.spec);
   const specName = spec
     ? tTalent({ kind: 'talentSpec', spec, field: 'name' })
     : applicant.spec === null
       ? t('game.talents.noSpec')
       : '';
-  const classColor = CLASSES[applicant.cls].color.toString(16).padStart(6, '0');
+  const classColor = classColorCss(applicant.cls);
   const meta = t('hudChrome.finder.levelOne', { level: num(applicant.level) });
-  return `<article class="df-applicant ui-card ui-card-tile" data-player-class="${esc(applicant.cls)}" style="--class-color:#${classColor}">
+  return `<article class="df-applicant ui-card ui-card-tile" data-player-class="${esc(applicant.cls)}" style="--class-color:${classColor}">
     ${portraitHtml(applicant.cls, 'df-app-portrait')}
-    <div class="df-app-person"><strong class="df-app-name">${esc(applicant.name)}</strong><span class="df-app-class">${esc(classDisplayName(applicant.cls))}<span class="df-app-meta">${esc(meta)}</span></span><span class="df-app-spec">${esc(specName)}</span></div><div class="df-app-roles">${roles}</div>
+    <div class="df-app-person"><strong class="df-app-name">${esc(applicant.name)}</strong><span class="df-app-class">${esc(hasClassIconArt(applicant.cls) ? classDisplayName(applicant.cls) : applicant.cls)}<span class="df-app-meta">${esc(meta)}</span></span><span class="df-app-spec">${esc(specName)}</span></div><div class="df-app-roles">${roles}</div>
     <div class="df-app-actions"><button type="button" class="btn df-app-inspect ui-btn" data-appinspect="${applicant.pid}" aria-label="${esc(t('hudChrome.finder.inspectApplicantAria', { name: applicant.name }))}">${svgIcon('character')}${esc(t('hudChrome.finder.inspect'))}</button><button type="button" class="btn df-accept df-app-accept ui-btn ui-btn--gold" data-appacc="${applicant.pid}" aria-label="${esc(t('hudChrome.finder.acceptApplicantAria', { name: applicant.name }))}">${svgIcon('social')}${esc(t('hudChrome.finder.accept'))}</button><button type="button" class="btn df-decline df-app-decline ui-btn" data-appdec="${applicant.pid}" aria-label="${esc(t('hudChrome.finder.declineApplicantAria', { name: applicant.name }))}">${esc(t('hudChrome.finder.decline'))}</button></div>
   </article>`;
 }
@@ -100,16 +100,16 @@ export function boardMemberHtml(member: {
   role?: Role;
   spec?: string | null;
 }): string {
-  const spec = TALENTS[member.cls]?.specs.find((entry) => entry.id === member.spec);
+  const spec = TALENTS[member.cls]?.specs?.find((entry) => entry.id === member.spec);
   const specName = spec
     ? tTalent({ kind: 'talentSpec', spec, field: 'name' })
     : member.spec === null
       ? t('game.talents.noSpec')
       : '';
-  const classColor = CLASSES[member.cls].color.toString(16).padStart(6, '0');
-  return `<article class="df-group-member ui-card ui-card-tile" data-member="${member.pid}" style="--class-color:#${classColor}">
+  const classColor = classColorCss(member.cls);
+  return `<article class="df-group-member ui-card ui-card-tile" data-member="${member.pid}" style="--class-color:${classColor}">
     ${portraitHtml(member.cls, 'df-app-portrait')}
-    <div class="df-app-person"><strong class="df-app-name">${esc(member.name)}</strong><span class="df-app-class">${esc(classDisplayName(member.cls))}<span class="df-app-meta">${esc(t('hudChrome.finder.levelOne', { level: num(member.level) }))}</span></span><span class="df-app-spec">${esc(specName)}</span></div>
+    <div class="df-app-person"><strong class="df-app-name">${esc(member.name)}</strong><span class="df-app-class">${esc(hasClassIconArt(member.cls) ? classDisplayName(member.cls) : member.cls)}<span class="df-app-meta">${esc(t('hudChrome.finder.levelOne', { level: num(member.level) }))}</span></span><span class="df-app-spec">${esc(specName)}</span></div>
     ${member.role ? `<div class="df-app-roles"><span class="df-role-chip" data-combat-role="${member.role}">${roleIcon(member.role)}${esc(roleLabel(member.role))}</span></div>` : ''}</article>`;
 }
 
@@ -117,7 +117,7 @@ function rosterHtml(listing: FinderListingRowView): string {
   const members = listing.members.map((member) => {
     const meta = t('hudChrome.finder.levelClass', {
       level: num(member.level),
-      className: classDisplayName(member.cls),
+      className: hasClassIconArt(member.cls) ? classDisplayName(member.cls) : member.cls,
     });
     return `<span class="df-member df-roster-seat" data-seat-role="${member.role ?? 'any'}" title="${esc(meta)}">${portraitHtml(member.cls, 'df-member-portrait')}<span class="df-member-role">${member.role ? roleIcon(member.role) : ''}</span><span class="df-member-label">${esc(meta)}${member.role ? `<span>${esc(roleLabel(member.role))}</span>` : ''}</span></span>`;
   });

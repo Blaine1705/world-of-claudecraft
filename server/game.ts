@@ -7335,7 +7335,7 @@ export class GameServer {
           sim,
           pid,
           msg,
-          (note) => !this.enforceChatPolicy(session, note),
+          (s) => this.consumeChatToken(session) && (!s || !this.enforceChatPolicy(session, s)),
           (target) =>
             this.relay.advertise(
               session,

@@ -137,8 +137,10 @@ export function buildExpeditionView(
   // or announcing the whole request again. Expiry still changes button state.
   return {
     ...view,
-    sig: JSON.stringify(view, (key, value) =>
-      key === 'remaining' ? (value === 0 ? 0 : 1) : value,
-    ),
+    sig: JSON.stringify(view, (key, value) => {
+      // These legacy automatic-prompt fields are not rendered by Groups.
+      if (key === 'prompt' || key === 'alert' || key === 'inCombat') return undefined;
+      return key === 'remaining' ? (value === 0 ? 0 : 1) : value;
+    }),
   };
 }
