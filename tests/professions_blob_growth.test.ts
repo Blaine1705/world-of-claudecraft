@@ -178,6 +178,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'lifetimeHonor',
   'honorArenaDaily',
   'worldPvp',
+  // The World PvP Skull Bag's stored skulls (src/sim/pvp/skull_bag.ts).
+  'skullBag',
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
@@ -192,6 +194,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'corpsePos',
   'resSickness',
   'unstuckSickness',
+  // Persisted buffs (src/sim/aura_persist.ts auraSaveFragment): bounded by
+  // MAX_PERSISTED_AURAS and absent while no buff is worn.
+  'auras',
   'equipment',
   'inventory',
   'bags',
@@ -1361,6 +1366,11 @@ describe('the professions blob growth bound (phase 16)', () => {
     // put crafted copies into inventory, not equipment), so the clamp must
     // bite there too; the review round found an equipment-only first cut.
     if (!s1.inventory?.[0]) throw new Error('ceiling fixture has no inventory row');
+    // Current saves carry canonical source buckets. This arm models historical
+    // sourceless stock, whose legacy instance signer is sanitized on load;
+    // retaining the buckets would create a different, ambiguous source record.
+    expect(s1.inventory[0].materialSources).toBeDefined();
+    delete s1.inventory[0].materialSources;
     s1.inventory[0].instance = { enchant: 'enchant_weapon_might', signer: overSigner };
     // The SURVIVOR half of the bag arm: a legal maximum-length signer on
     // another bag row must come back byte-faithfully, or a clamp that simply
@@ -1425,10 +1435,18 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.equipmentInstance?.[keptSlot]?.signer).toBe(legalSigner);
     expect('signer' in (s2.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
-    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.signer).toBe(legalSigner);
+    expect(s2.inventory?.[bagSurvivorIndex]?.materialSources).toEqual([
+      { source: { signer: legalSigner }, count: 1 },
+    ]);
+    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.enchant).toBe('enchant_weapon_might');
     expect('signer' in (s2.bank?.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.bank?.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
-    expect(s2.bank?.inventory?.[1]?.instance?.signer).toBe(legalSigner);
+    expect(s2.bank?.inventory?.[1]?.materialSources).toEqual([
+      { source: { signer: legalSigner }, count: 1 },
+    ]);
+    expect(s2.bank?.inventory?.[1]?.instance?.enchant).toBe('enchant_weapon_might');
+    expect(s2.bank?.inventory?.[0]?.materialSources).toEqual([{ source: {}, count: 1 }]);
+    expect(s2.vendorBuyback?.[0]?.materialSources).toEqual([{ source: {}, count: 1 }]);
     expect('signer' in (s2.vendorBuyback?.[0]?.instance ?? {})).toBe(false);
     expect(s2.vendorBuyback?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
   });
@@ -1898,7 +1916,8 @@ function applyMeasuredMaterialCase(sim: Sim, shape: MaterialSourceCase): void {
   const bankSlots = BANK_BASE_SLOTS + BANK_PURCHASED_SLOTS_MAX + BANK_MAX_BONUS_SLOTS;
   meta.bank.inventory = Array.from({ length: bankSlots + BANK_BAG_SOCKETS * 24 }, () => stack(20));
   meta.vault.stock = {};
-  meta.vault.special = materialIds.map((id) => ({ ...stack(200), itemId: id }));
+  const perMaterial = vaultCapacityPerMaterial(meta.vault);
+  meta.vault.special = materialIds.map((id) => ({ ...stack(perMaterial), itemId: id }));
   meta.vendorBuyback = Array.from({ length: 12 }, () => stack(20));
 }
 
@@ -1942,14 +1961,16 @@ describe('whole-character material source composition matrix', () => {
       expect(second.vault?.stock).toEqual({});
       expect(second.inventory.every((slot) => slot.count === 20)).toBe(true);
       expect(second.bank?.inventory.every((slot) => slot.count === 20)).toBe(true);
-      expect(second.vault?.special?.every((slot) => slot.count === 200)).toBe(true);
+      const perMaterial = vaultCapacityPerMaterial({ upgrades: VAULT_UPGRADE_RUNGS });
+      expect(perMaterial).toBe(1000);
+      expect(second.vault?.special?.every((slot) => slot.count === perMaterial)).toBe(true);
 
       const expectedSources =
         shape === 'representative'
           ? 1
           : shape === 'varied'
             ? 5
-            : 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200;
+            : 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * perMaterial;
       expect(sourceCount(second)).toBe(expectedSources);
       process.stdout.write(
         `[professions-blob-material-sources] ${JSON.stringify({
@@ -1959,7 +1980,7 @@ describe('whole-character material source composition matrix', () => {
           warningBytes: CHARACTER_BLOB_WARN_BYTES,
           relationToWarning:
             materialSourceBytes(second) < CHARACTER_BLOB_WARN_BYTES ? 'below' : 'at-or-above',
-          physicalUnits: 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200,
+          physicalUnits: 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * perMaterial,
         })}\n`,
       );
     }
@@ -2151,6 +2172,25 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // pure content-table arithmetic with no shape question in them: `deeds`
     // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
     const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
+
+    // Isolate this retune from all inherited content and identity changes.
+    const priorVault = structuredClone(s2);
+    if (!priorVault.vault) throw new Error('maximal fixture lacks its vault');
+    const stockRows = Object.keys(priorVault.vault.stock).length;
+    priorVault.vault.upgrades = 5;
+    for (const id of Object.keys(priorVault.vault.stock)) priorVault.vault.stock[id] = 200;
+    const vaultRetuneBytes = bytes - Buffer.byteLength(JSON.stringify(priorVault), 'utf8');
+    expect(vaultRetuneBytes).toBe(stockRows + 1);
+    expect(vaultRetuneBytes).toBe(119);
+    process.stdout.write(
+      `[professions-blob-compact-vault] ${JSON.stringify({
+        bytes,
+        stockRows,
+        vaultRetuneBytes,
+        warningBytes: CHARACTER_BLOB_WARN_BYTES,
+      })}\n`,
+    );
+
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
@@ -2250,6 +2290,29 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       },
     };
     const counterfactualBytes = Buffer.byteLength(JSON.stringify(withoutFieldKit), 'utf8');
+    // The five World PvP deed dates add only 138 bytes: three 27-byte rows,
+    // one 28-byte row and one 29-byte row. The timer is unarmed in this fixture.
+    const pvpTitleDeedIds = [
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
+    ] as const;
+    const withoutPvpTitleDeeds = JSON.parse(JSON.stringify(withoutFieldKit)) as CharacterState;
+    for (const id of pvpTitleDeedIds) {
+      expect(withoutFieldKit.deeds?.[id]).toBe('2026-08-08');
+      delete withoutPvpTitleDeeds.deeds?.[id];
+    }
+    expect(fieldBytes(withoutFieldKit, 'deeds') - fieldBytes(withoutPvpTitleDeeds, 'deeds')).toBe(
+      138,
+    );
+    expect(
+      counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutPvpTitleDeeds), 'utf8'),
+    ).toBe(138);
+    for (const key of Object.keys(withoutFieldKit) as (keyof CharacterState)[]) {
+      if (key !== 'deeds') expect(withoutPvpTitleDeeds[key], key).toEqual(withoutFieldKit[key]);
+    }
     expect(bytes - counterfactualBytes, 'field_kit contributes exactly one array entry').toBe(12);
 
     // The one-time hammer recipe/proof content adds against the pre-hammer,
@@ -2442,7 +2505,37 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // itemsDiscovered (+2,889), the hoardGoblinKills counter (+26), and the 32
         // hoard gear reliquary.firstFind rows plus the conquerors_buried_hoards page
         // (+1,761), Blaine's itemization; MEASURED on the 2026-09-28 merged tree.
-        4711,
+        4711 +
+        // Plus 42 for the World PvP trophy skull: `"pvp_trophy_skull",` in
+        // deedStats.itemsDiscovered (+19; the deedStats row below moves by the
+        // same 19) and, because the skull is a provenance-tracked material, its
+        // row in the Materials Vault stock this fixture fills to every
+        // material's ceiling (+23). MEASURED on this tree.
+        42 +
+        // Plus 26 for the sixth lifetime-XP rung: prog_titan in the deeds row
+        // (10 characters of id plus 16 bytes of quoting, colon, date and comma),
+        // earned by this maximal fixture. MEASURED (77,204 to 77,230).
+        26 +
+        // The five World PvP title dates, isolated above without any other field change.
+        138 +
+        // Plus 34 for the Groveheart deed row that this maximal fixture earns,
+        // measured on the merged v0.45 tree.
+        34 +
+        // Plus 62 for the World PvP Skull Bag (an honor purchase, so a Warfare
+        // armory relic): `"pvp_skull_bag",` in deedStats.itemsDiscovered (+16)
+        // and its reliquary.firstFind row (+46). MEASURED on this tree.
+        62 +
+        // The ten-rung vault raises the compact ceiling from 200 to 1000:
+        // one extra digit in each of 118 stock rows plus upgrades 5 to 10.
+        // This composes with every inherited content delta above.
+        119 +
+        // The Crucible hunter quiver adds 18 deedStats and 48 reliquary bytes.
+        66 +
+        // Plus 68 for the three leveling quest shields (content/quest_shields.ts):
+        // `"lychgate_buckler",` (+19), `"bastion_kite_shield",` (+22) and
+        // `"barrowfield_tower_shield",` (+27) in deedStats.itemsDiscovered. Quest
+        // rewards carry no Reliquary page, so no firstFind row. MEASURED.
+        68,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2484,12 +2577,18 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       knownRecipes: 411,
       // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
       // release/v0.44.0 base merge: the ferry deed and its four visit marks
-      // (the +154 above).
-      deeds: 743,
+      // (the +154 above). deeds 743 -> 769 with prog_titan (the +26 above),
+      // then -> 907 with the five World PvP title dates (the +138 above).
+      deeds: 941,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      deedStats: 9427,
-      reliquary: 11501,
+      // +19 for the World PvP trophy skull id (attributed above).
+      // +16 for the World PvP Skull Bag id (attributed above).
+      deedStats: 9548,
+      // +46 for the World PvP Skull Bag's reliquary.firstFind row (attributed above).
+      reliquary: 11595,
+      // The Crucible hunter quiver composes +18 deedStats and +48 reliquary.
+      // Three quest shield ids add 68 deedStats bytes; no relic rows.
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2526,7 +2625,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // ferry deed and its visit marks, which this counterfactual keeps).
       // 226,238 -> 231,729 at the 2026-09-28 Buried Hoards merge (+5,491: the
       // +247 knownRecipes, +533 and +4,711 attributed above, all kept here).
-    ).toBe(231729);
+      // +42 for the World PvP trophy skull (deedStats id and Materials Vault row),
+      // which this counterfactual keeps.
+      // 231,729 -> 231,755 with prog_titan in the deeds row (+26, kept here).
+      // Five World PvP title dates add +138, also kept here.
+      // Groveheart's deed row adds +34, also kept here.
+      // +62 for the World PvP Skull Bag (deedStats id and reliquary row), kept.
+      // The ten-rung vault adds 119 bytes, retained by this counterfactual.
+      // The Crucible hunter quiver adds 66 bytes, retained here.
+      // Three leveling quest shield ids add 68 bytes.
+    ).toBe(232284);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2554,7 +2662,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
       // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
       // 227,857 -> 233,348 at the 2026-09-28 Buried Hoards merge (+5,491, kept).
-    ).toBe(233348);
+      // +42 for the World PvP trophy skull, which this baseline keeps.
+      // 233,348 -> 233,374 with prog_titan in the deeds row (+26, kept).
+      // Five World PvP title dates add +138, also kept here.
+      // Groveheart's deed row adds +34, also kept here.
+      // +62 for the World PvP Skull Bag, which this baseline keeps.
+      // The ten-rung vault adds 119 bytes, retained by this counterfactual.
+      // The Crucible hunter quiver adds 66 bytes, retained here.
+      // Three leveling quest shield ids add 68 bytes.
+    ).toBe(233903);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2645,8 +2761,36 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above; no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 232980..233361.
-    expect(bytes, reMint).toBeGreaterThan(232980);
-    expect(bytes, reMint).toBeLessThan(233361);
+    // RE-BASED with the World PvP trophy skull: 233,402 bytes, up 42 from
+    // 233,360 (its deedStats id +19 and its Materials Vault stock row +23, both
+    // attributed in the growth equation above). Floor at measurement minus 380,
+    // edge at measurement plus one: 233022..233403.
+    // RE-BASED for the sixth lifetime-XP rung: 233,386 bytes, up 26 from
+    // 233,360: prog_titan in the deeds row (10 characters of id plus 16 bytes
+    // of quoting, colon, date and comma), attributed in the growth equation
+    // above; no container or ceiling changed shape. Floor at measurement minus
+    // 380, edge at measurement plus one: 233006..233387.
+    // World PvP deed dates add the measured 138 bytes, retaining the same
+    // 381-byte tracking band and the unchanged character warning threshold.
+    // Together they measure 233,566 bytes. Floor at measurement minus 380,
+    // edge at measurement plus one: 233186..233567.
+    // Groveheart's deed row adds the measured 34 bytes, retaining the same
+    // 381-byte tracking band and the unchanged character warning threshold.
+    // Together they measure 233,600 bytes. Floor at measurement minus 380,
+    // edge at measurement plus one: 233220..233601.
+    // RE-BASED with the World PvP Skull Bag: 233,464 bytes, up 62 (its
+    // deedStats id +16 and its reliquary.firstFind row +46, both attributed in
+    // the growth equation above). Floor at measurement minus 380, edge at
+    // measurement plus one: 233084..233465.
+    // Composed together they measure 233,662 bytes. Floor at measurement minus
+    // 380, edge at measurement plus one: 233282..233663.
+    // The ten-rung vault adds 119 bytes to the composed 233,662-byte
+    // fixture: 118 stock rows gain a digit and upgrades changes 5 to 10.
+    // Keep the same 381-byte band and the existing warning threshold.
+    // Quiver +66 composes to 233,847 bytes, with the same 381-byte tracking band.
+    // Quest shields add 68 bytes, preserving the same 381-byte band.
+    expect(bytes, reMint).toBeGreaterThan(233535);
+    expect(bytes, reMint).toBeLessThan(233916);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

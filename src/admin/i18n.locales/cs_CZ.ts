@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const cs_CZ: Record<string, string> = {
+  'moderationHistory.actionAnnounce': 'Oznámení pro celou říši',
+  'moderationHistory.actionGmInvisible': 'Stal se neviditelným',
+  'moderationHistory.actionGmVisible': 'Stal se viditelným',
+  'moderationHistory.actionUnwatch': 'Odebrán ze seznamu sledovaných',
+  'moderationHistory.actionWatch': 'Přidán na seznam sledovaných',
   'error.flagActiveExists': 'tento účet už má otevřený příznak tohoto druhu',
   'wealth.largeMovementsUnavailable':
     'velké bankovní pohyby se nepodařilo načíst (čtení z účetní knihy vypršelo); rozpis zlata výše je úplný',

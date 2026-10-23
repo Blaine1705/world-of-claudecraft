@@ -1315,4 +1315,38 @@ export const table: DeedLocaleTable = {
     name: 'Fångad rödhänt',
     desc: 'Fånga en Myntpåseskinmare i ett begravt lagom innan det flyr med guldet.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Klarare an skuggorna',
+    desc: 'Ta tillbaka de stulna myntpungarna och fly fran Evergarden-labyrinten pa Hard.',
+  },
+  prog_titan: {
+    name: 'Jätte',
+    desc: 'Tjäna sammanlagt 10 000 000 erfarenhet under din livstid.',
+    title: 'Jätte',
+  },
+  pvp_flag_1h: {
+    name: 'Djärv',
+    desc: 'Ha Världs-PvP på under 1 timme speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
+    title: 'Djärv',
+  },
+  pvp_flag_3h: {
+    name: 'Trotsig',
+    desc: 'Ha Världs-PvP på under 3 timmar speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
+    title: 'Trotsig',
+  },
+  pvp_flag_6h: {
+    name: 'Orädd',
+    desc: 'Ha Världs-PvP på under 6 timmar speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
+    title: 'Orädd',
+  },
+  pvp_flag_24h: {
+    name: 'Orubblig',
+    desc: 'Ha Världs-PvP på under 24 timmar speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
+    title: 'Orubblig',
+  },
+  pvp_flag_168h: {
+    name: 'Okuvlig',
+    desc: 'Ha Världs-PvP på under 7 dagar speltid medan du är vid liv i den öppna världen eller en PvP-match. Fristäder, PvE-instanser, död och utloggning pausar framstegen; att stänga av nollställer dem. Intjänade titlar är permanenta.',
+    title: 'Okuvlig',
+  },
 };

@@ -12,7 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   HEROIC_DUNGEON_TUNING,
-  HEROIC_MARK_ITEM_ID,
+  HEROIC_MARK_CURRENCY_ID,
   NYTHRAXIS_HEROIC_COPPER,
 } from '../../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../../src/sim/content/heroic_loot';
@@ -441,7 +441,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const raid = [...sim.players.values()] as any[];
     expect(raid.length).toBe(5);
     for (const meta of raid) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, meta.entityId), `${meta.name} heroic marks`).toBe(
+      expect(sim.meta(meta.entityId)!.heroicMarks, `${meta.name} heroic marks`).toBe(
         tuning.marksPerParticipant,
       );
     }
@@ -475,7 +475,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(ev.some((e) => e.type === 'damage' && e.ability === 'Bladestorm')).toBe(true);
   });
 
-  it('professions_craft: denial draws nothing, each craft draws once, and the vestments proc mints + surfaces a masterwork', () => {
+  it('professions_craft: denial draws nothing, each craft draws once plus one quality draw per equipment copy, and the vestments proc mints + surfaces a masterwork', () => {
     const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_craft')!);
     const ev = rec.allEvents as Ev[];
     const pid = rec.notes.pid as number;
@@ -515,8 +515,10 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // The phase 07 daily-gate arm (step 4b): the catalyst success stamps
     // craftDaily with real content and draws once like every success; the
     // daily_limit re-attempt returns BEFORE any draw and leaves the stamp
-    // unmutated, so the scenario's total stays at exactly four draws (three
-    // pre-existing crafts + the catalyst; the two denials contribute zero).
+    // unmutated, so the scenario's total is five draws: three pre-existing
+    // crafts + the catalyst (one proc draw each), plus one permanent
+    // loot-quality draw for the one eligible equipment output (the
+    // vestments, loot/fresh_quality_grant.ts); the two denials contribute zero.
     expect(
       crafts.some(
         (e) => e.ok === true && e.itemId === 'quickening_catalyst' && e.masterwork === undefined,
@@ -527,7 +529,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
       date: '2099-06-25',
       crafted: new Set(['recipe_quickening_catalyst']),
     });
-    expect(trace.draws).toBe(4);
+    expect(trace.draws).toBe(5);
   });
 
   it('professions_gather: two draws per harvest, zero-draw denial, zone materials, and the hunted rare event fires', () => {
@@ -1234,7 +1236,7 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // broken recipe (a moved banker failing the proximity gate, every vault op
     // refusing) would mint a no-op arm with nothing red. Pin the final state
     // both stores must reach; the numbers are the scenario's own arithmetic
-    // (71000 - 20000 - 50000 = 1000 copper; 10 ore deposited 6 then 2 back,
+    // (61000 - 20000 - 40000 = 1000 copper; 10 ore deposited 6 then 2 back,
     // then the step-12 sweep re-stocks the carried 6; the whole 4-stack of
     // logs; the bank ladder's first 500-copper rung; and the sweep takes the
     // 5 wolf_fang the bank arm returned to the bags, wolf_fang being a recipe
@@ -1891,15 +1893,13 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const tuning = HEROIC_DUNGEON_TUNING[HEROIC_FIVE_MAN_DUNGEON_ID];
     expect(tuning.marksPerParticipant).toBe(1);
     for (const pid of partyPids) {
-      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid), `marks pid ${pid}`).toBe(
-        tuning.marksPerParticipant,
-      );
+      expect(sim.meta(pid)!.heroicMarks, `marks pid ${pid}`).toBe(tuning.marksPerParticipant);
       const lockouts = sim.players.get(pid).raidLockouts;
       expect(lockouts.has(`${HEROIC_FIVE_MAN_DUNGEON_ID}:heroic`), `lock pid ${pid}`).toBe(true);
       expect(lockouts.has(HEROIC_FIVE_MAN_DUNGEON_ID), `plain key pid ${pid}`).toBe(false);
     }
     // Marks are paid into the bags, never onto the corpse.
-    expect(droppedIds).not.toContain(HEROIC_MARK_ITEM_ID);
+    expect(droppedIds).not.toContain(HEROIC_MARK_CURRENCY_ID);
   });
 
   it('flask_consumables: one flask ever rides, upward replaces, downward refuses, and the whole path draws nothing', () => {

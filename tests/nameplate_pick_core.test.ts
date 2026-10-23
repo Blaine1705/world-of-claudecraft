@@ -7,6 +7,7 @@ import {
   NAMEPLATE_HEALTH_PICK_PADDING_Y,
   type NameplatePickCandidate,
   pickNameplateHealthBarAt,
+  raiseNameplateCandidate,
 } from '../src/render/nameplate_pick_core';
 
 function plate(
@@ -93,5 +94,25 @@ describe('nameplate health-bar picking', () => {
     expect(nameplateWins).toBeGreaterThan(nameplatePick);
     expect(raycast).toBeGreaterThan(nameplateWins);
     expect(canvas).toContain("canvas.style.pointerEvents = 'none';");
+  });
+});
+
+describe('raising a plate to the top', () => {
+  it('moves the raised id to the end and keeps the others in order', () => {
+    const plates = [plate(1), plate(2), plate(3), plate(4)];
+    raiseNameplateCandidate(plates, 4, 2);
+    expect(plates.map((p) => p.id)).toEqual([1, 3, 4, 2]);
+    expect(pickNameplateHealthBarAt(plates, 4, 200, 100)).toBe(2);
+  });
+
+  it('ignores slots past the live count, an absent id, and a null id', () => {
+    const plates = [plate(1), plate(2), plate(3)];
+    raiseNameplateCandidate(plates, 2, 3);
+    expect(plates.map((p) => p.id)).toEqual([1, 2, 3]);
+    raiseNameplateCandidate(plates, 3, 9);
+    raiseNameplateCandidate(plates, 3, null);
+    expect(plates.map((p) => p.id)).toEqual([1, 2, 3]);
+    raiseNameplateCandidate(plates, 3, 1);
+    expect(plates.map((p) => p.id)).toEqual([2, 3, 1]);
   });
 });

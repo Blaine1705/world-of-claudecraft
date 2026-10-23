@@ -1,6 +1,7 @@
 import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
+import { sanitizeHeroicMarks } from '../sim/heroic_marks';
 import type {
   CannonActionId,
   CannonPoint,
@@ -34,7 +35,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_reroll'; quest: string }
   | { cmd: 'world_quest_weekly_choose'; quest: string }
   | { cmd: 'world_quest_weekly_commend'; faction: string }
-  | { cmd: 'clue_hunt_abandon' };
+  | { cmd: 'clue_hunt_abandon' }
+  | { cmd: 'allied_hearthstone_attune'; npcId: number };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -50,17 +52,23 @@ export class QuestWorldWireState {
   nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[] = [];
   factions: Readonly<Record<FactionId, number>> = freshFactionReputation();
   factionCurrencies: Readonly<Record<FactionId, number>> = freshFactionCurrencies();
+  /** The Heroic Marks balance mirrored from the `hmarks` self key. */
+  heroicMarks = 0;
   worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
   worldQuestRerollCycle = '';
   /** The active clue hunt mirrored from the `cluh` self key (null when none). */
   clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
   /** The read treasure map mirrored from the `tmap` self key (null when none). */
   treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null = null;
+  /** The Allied Hearthstone's bound hub mirrored from the `ahs` self key (null when unbound). */
+  alliedHearthstoneAttunement: FactionId | null = null;
   /** Client clock mirror of the authoritative Buried Hoard boss telegraphs;
    *  the host feeds it every routed event (ClientWorld's event loop). */
   protected readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
   private activeWorldBossIds = new Set<string>();
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
+  /** A release was already requested for the undecodable session on the wire. */
+  private vehicleReleaseRequested = false;
   private questWorldRestBase = '';
 
   /** The host's command transport and REST origin, bound once at construction. */
@@ -84,14 +92,41 @@ export class QuestWorldWireState {
     return fetchWorldQuestLeaderboard(this.questWorldRestBase, board, page, pageSize, viewer);
   }
 
-  /** The owner-only quest family plus the world-boss and vehicle mirrors of one self record. */
+  /** The owner-only quest family plus the world-boss, vehicle and Heroic Marks
+   *  mirrors of one self record. Returns true when the Heroic Marks balance
+   *  really moved, so the host can repaint balance-priced windows: a marks
+   *  credit no longer echoes through the inventory the way a bag item did. */
   applyQuestSelfSnapshot(
-    self: Parameters<typeof applyQuestSelfWire>[1] & { wba?: unknown; vehicle?: unknown },
+    self: Parameters<typeof applyQuestSelfWire>[1] & {
+      wba?: unknown;
+      vehicle?: unknown;
+      hmarks?: unknown;
+    },
     simTime?: unknown,
-  ): void {
+  ): boolean {
     applyQuestSelfWire(this, self, simTime);
     if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
-    if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
+    if (self.vehicle !== undefined) this.applyVehicleWire(self.vehicle);
+    if (self.hmarks === undefined) return false;
+    const marks = sanitizeHeroicMarks(self.hmarks);
+    const moved = marks !== this.heroicMarks;
+    this.heroicMarks = marks;
+    return moved;
+  }
+
+  /** Mirror the owner's cannon session. A live server session the client cannot
+   *  decode would hide the cannon controls while the server still holds the
+   *  movement lock and runs the waves, leaving the player frozen until the line
+   *  falls; so the mirror asks the server, once per such session, to release it. */
+  private applyVehicleWire(value: unknown): void {
+    this.vehicleSession = decodeVehicleSession(value);
+    if (value === null || this.vehicleSession !== null) {
+      this.vehicleReleaseRequested = false;
+      return;
+    }
+    if (this.vehicleReleaseRequested) return;
+    this.vehicleReleaseRequested = true;
+    this.questWorldTransport?.({ cmd: 'vehicle_leave' });
   }
 
   enterVehicle(stationId: string): void {
@@ -151,6 +186,10 @@ export class QuestWorldWireState {
     this.sendQuestWorldCommand({ cmd: 'clue_hunt_abandon' });
   }
 
+  attuneAlliedHearthstone(npcId: number): void {
+    this.sendQuestWorldCommand({ cmd: 'allied_hearthstone_attune', npcId });
+  }
+
   canRerollWorldQuest(questId: string): { canReroll: boolean; reason?: string } {
     if (!this.worldQuestCycle) {
       return { canReroll: false, reason: 'No active world quest cycle.' };
@@ -165,9 +204,6 @@ export class QuestWorldWireState {
       progress?.glider?.practiceOnly
     ) {
       return { canReroll: false, reason: 'Completed world quests cannot be rerolled.' };
-    }
-    if (progress && progress.count > 0) {
-      return { canReroll: false, reason: 'In-progress world quests cannot be rerolled.' };
     }
     return { canReroll: true };
   }
@@ -197,6 +233,7 @@ export class QuestWorldWireState {
 
   resetQuestWorldWireState(): void {
     this.vehicleSession = null;
+    this.vehicleReleaseRequested = false;
     this.worldQuestCycle = '';
     this.worldQuestExpiresAtMs = 0;
     this.worldQuestTime = 0;
@@ -207,6 +244,8 @@ export class QuestWorldWireState {
     this.weeklyQuestResetAtMs = 0;
     this.clueHunt = null;
     this.treasureMap = null;
+    this.alliedHearthstoneAttunement = null;
+    this.heroicMarks = 0;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

@@ -38,6 +38,10 @@ export function emitActivitySelfKeys(
   // from sim sites that never mark this session dirty, and neither cosmetic
   // echo must wait on the heavy gate).
   emit('renown', meta.renown);
+  // Heroic Marks balance (src/sim/heroic_marks.ts): a cheap scalar diffed per
+  // tick for the same reason, since a kill, cache or mail take credits it from
+  // sim sites that never mark this session dirty.
+  emit('hmarks', meta.heroicMarks);
   emit('atitle', meta.activeTitle);
   emit('aborder', meta.activeBorder);
   // Lifetime played time (IWorldProgressionXp.playtimeSeconds), quantized to
@@ -99,6 +103,9 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
     'tmap',
     meta.treasureMap ? { rarity: meta.treasureMap.rarity, siteId: meta.treasureMap.siteId } : null,
   );
+  // The Allied Hearthstone's bound hub (null while unbound); every bind bumps
+  // wireRev (src/sim/content/faction_rewards.ts) so the gate re-diffs it.
+  emit('ahs', meta.alliedHearthstoneAttunement ?? null);
   emit('wqrr', meta.worldQuestRerollCycle);
   emit('wqrep', meta.worldQuestReplacements ?? {});
   emit('wkq', meta.weeklyQuest);

@@ -13,6 +13,49 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bônus de especialização',
+  'hudChrome.specPanel.healing': 'cura',
+  'hudChrome.specPanel.absorption': 'absorção de dano',
+  'hudChrome.specPanel.physicalAbilityDamage': 'dano de habilidades corpo a corpo e à distância',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Aumenta a cura primária em {pct} após os outros bônus de cura.',
+  'hud.pet.assist': 'Assistir',
+  'hud.pet.assistDesc':
+    'Ataca apenas seu alvo atual depois que você usa uma habilidade nele. Ignora inimigos que atacam você.',
+  'hudChrome.cooldownManager.auraActive': 'Ativa',
+  'hudChrome.cooldownManager.auraMissing': 'Ausente',
+  'hudChrome.cooldownManager.auraShowWhen': 'Mostrar botão quando a aura estiver',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Iluminar quando ausente',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Sem nenhum local marcado, este grupo nunca aparece nem reproduz sons.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Sem nenhuma das duas opções marcada, o botão nunca aparece, mas seu som continua tocando.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Não pronto significa em recarga ou indisponível para uso no momento.',
+  'hudChrome.cooldownManager.placeHint':
+    'As instâncias incluem masmorras, raides, incursões, fendas, campos de batalha, a arena e qualquer outra área instanciada. Fora dos locais marcados, o grupo fica oculto e silencioso.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Ilumina, contorna e faz o botão pulsar enquanto a aura estiver ausente.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Lembrete de benefício: o botão se ilumina enquanto esta aura estiver ausente e se oculta assim que você a obtém.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Toca quando a aura termina.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Mostrar botão quando',
+  'hudChrome.cooldownManager.showIn': 'Mostrar em',
+  'hudChrome.cooldownManager.showInInstances': 'Áreas instanciadas',
+  'hudChrome.cooldownManager.showInWorld': 'Mundo aberto',
+  'hudChrome.cooldownManager.showNotReady': 'Não pronto',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Fora de combate',
+  'hudChrome.cooldownManager.showReady': 'Pronto',
+  'hudChrome.cooldownManager.showWhile': 'Mostrar durante',
+  'hudChrome.options.enemyHighlightDistance': '{yards} jardas',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Seta na borda da tela fora da câmera',
+  'hudChrome.options.enemyHighlightNameplate': 'Placa de alvo grande com moldura',
+  'hudChrome.options.enemyHighlightOverhead': 'Marcador flutuante sobre a cabeça',
+  'hudChrome.options.enemyHighlightReticle': 'Retículo hostil mais forte',
+  'hudChrome.options.enemyHighlightStyle': 'Estilo de destaque de inimigos',
+  'hudChrome.options.nameplateCooldownScale': 'Tamanho do rastreador ofensivo/defensivo',
+  'hudChrome.options.showNameplateCooldowns': 'Rastreador ofensivo/defensivo',
+  'hud.pet.stanceDesc': 'Clique para escolher Passivo, Defensivo, Agressivo ou Assistir.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Mergulhando',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Mergulho em Profundidade',
@@ -61,8 +104,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     'Usar: Reforça sua armadura de peito, aumentando Armadura em 12 por 1 hora.',
   'hudChrome.factionRewards.battleStandardUse':
-    'Usar: Planta o Estandarte de Batalha da Alvorada Consagrada por 5 minutos, aumentando significativamente a regeneração de vida e mana fora de combate para todos os aliados próximos. Permanecer perto dele por 10 segundos também concede Bênção da Alvorada (+5% para todas as estatísticas por 30 min). (5 min de recarga)',
-  'hudChrome.factionRewards.hub_automatons': 'South Reach (A Fundição Autômata)',
+    'Usar: finca o Estandarte de Batalha da Alvorada Consagrada por 5 min. Jogadores fora de combate a até 15 jardas regeneram 10% mais vida; usuários de mana também recuperam mana igual a 5% do Espírito a cada 2 s. Permanecer perto por 10 s concede Bênção da Alvorada, aumentando Força, Agilidade, Vigor, Intelecto e Espírito em 5% por 30 min. (Recarga de 5 min)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Autômatos)',
   'hudChrome.factionRewards.hub_church_order': 'Vale de Eastbrook (A Ordem da Igreja)',
   'hudChrome.factionRewards.hub_none': 'Nenhum (Use perto de um centro de facção para sintonizar)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (A Vigília das Fissuras)',
@@ -423,6 +466,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchAria': 'Pesquisar materiais do cofre por nome',
   'hudChrome.bank.vaultSearchNoMatch': 'Nenhum material do seu cofre corresponde à sua pesquisa.',
   'hudChrome.charSheet.ratings': 'Índices',
+  'hudChrome.charSheet.gearScore': 'Pontuação de equipamento',
   'hudChrome.charSheet.spell': 'Feitiço',
   'hudChrome.charSidebar.character': 'Personagem',
   'hudChrome.charSidebar.currencies': 'Moedas',
@@ -483,8 +527,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Coloque este feitiço em um grupo para exibir seu botão.',
   'hudChrome.cooldownManager.notKnown': '{spell} (ainda não conhecido)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Mostrar Apenas Quando Pronto',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Mostrar Apenas Enquanto Ativo',
   'hudChrome.cooldownManager.opacity': 'Opacidade',
   'hudChrome.cooldownManager.orientation': 'Orientação',
   'hudChrome.cooldownManager.otherSpells': 'Outros Feitiços',
@@ -508,12 +550,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Arraste um feitiço até um grupo, ou selecione-o para escolher seu grupo e alertas. Um botão acompanha seu feitiço quando ele se transforma em outro, e se ilumina quando isso acontece.',
   'hudChrome.cooldownManager.trackedTitle': 'Feitiços Rastreados',
   'hudChrome.cooldownManager.vertical': 'Vertical',
-  'hudChrome.cooldownManager.visAlways': 'Sempre Visível',
   'hudChrome.cooldownManager.visCombat': 'Em Combate',
-  'hudChrome.cooldownManager.visHidden': 'Oculto',
   'hudChrome.cooldownManager.visHiddenHint':
     'Um grupo oculto ainda reproduz seus sons e ilumina sua barra de ação.',
-  'hudChrome.cooldownManager.visibility': 'Visibilidade',
   'hudChrome.crafting.mobileStationTitle': '{station} de {name}',
   'hudChrome.currencies.activities': 'Atividades',
   'hudChrome.currencies.delveMark': 'Marca de Incursão',
@@ -522,7 +561,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Facções',
   'hudChrome.currencies.heroicMarkNote': 'Masmorras heroicas. Use com o intendente heroico',
   'hudChrome.currencies.honor': 'Honra',
-  'hudChrome.currencies.honorNote': 'Campos de batalha e arena',
+  'hudChrome.currencies.honorNote': 'Campos de batalha, arena e missões de mundo',
   'hudChrome.currencies.intro':
     'Nenhuma delas ocupa espaço na mochila. As moedas continuam na sua mochila como sempre.',
   'hudChrome.currencies.lifetime': 'Acumulado: {amount}',
@@ -551,7 +590,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     'Grava permanentemente uma arma de duas mãos com 12 de Força e 25 de índice de crítico. Não pode ser aplicado a uma arma de uma mão. Um bônus fixo, que não escala.',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Seus ataques corpo a corpo bem-sucedidos podem conceder 60 de Agilidade e 2% de velocidade de ataque corpo a corpo por 15 s. Cada acerto tem 1% de chance a cada 0.6 s da velocidade base da arma usada. Sem recarga interna. As duas mãos compartilham um único benefício; qualquer ativação o renova, e ele nunca se acumula. Ataques à distância não ativam este efeito. A Forma de Gato usa sua velocidade base de golpe de 1 s no lugar disso.',
+    'Seus ataques corpo a corpo que acertam podem conceder 60 de Agilidade e ataques corpo a corpo 2% mais rápidos por 15 s. Cada acerto tem 1% de chance por 0,6 s da velocidade básica da arma que golpeia. Sem recarga interna. As duas mãos compartilham um único benefício: cada ativação o renova, sem acumular. Ataques à distância não ativam o efeito. Na Forma de Gato, ataques automáticos usam a velocidade das patas de 1 s. Golpes e finalizações na Forma de Gato e na Forma de Bruin usam a velocidade da própria arma; Garras Varredoras faz uma rolagem por uso, não por alvo.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Gravura de arma: Fogo da Alvorada',
   'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Gravura de arma: Bênção da Alvorada',
   'hudChrome.enchantName.enchant_weapon_piston_drive': 'Gravura de arma: Impulso de Pistão',
@@ -1119,7 +1158,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Você também receberá:',
   'hudChrome.weekly.anyDifficulty': 'Qualquer dificuldade',
   'hudChrome.weekly.cacheDesc':
-    'Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto), além de {count} x {item}.',
+    'Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto do Ignivar), além de {count} x {item}.',
   'hudChrome.weekly.choose': 'Escolher missão',
   'hudChrome.weekly.chosen': 'Missão semanal aceita: {category}',
   'hudChrome.weekly.close': 'Fechar missões semanais',
@@ -1677,6 +1716,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Doce vitória',
   'questUi.worldQuest.matchConfections': 'Combine confeitos encantados',
   'questUi.worldQuest.mineOre': 'Minere minério de cobre',
+  'questUi.worldQuest.mineMaterial': 'Minere {name}',
   'questUi.worldQuest.practiceRewards':
     'Prática: jogue de novo sem ganhar mais moedas, experiência ou reputação.',
   'questUi.worldQuest.puzzleBeamReach': 'Cristais alcançados: {count}',
@@ -2107,77 +2147,77 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Ladrões esconderam seu ouro roubado por todo o meu labirinto, e agora as sombras o protegem. Recupere todas as bolsas de moedas. Evite os guardiões, ou pegue um lampejo radiante para bani-los. Perder três vidas te devolve à entrada, mas as bolsas que você já recolheu permanecem seguras.',
   'entities.itemSets.vanguard_druid_balance.name': 'Vestimenta do Guarda-Estelar',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'O tempo de conjuração de Raízes Agarradoras é reduzido em 0,5 s.',
+    'O tempo de conjuração de Raízes Agarradoras é reduzido em 0,5 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Conjurar Raízes Agarradoras permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s.',
   'entities.itemSets.vanguard_druid_feral.name': 'Pelagem da Juba de Sangue',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'O tempo de recarga de Investida de Bruin é reduzido em 3 s.',
+    'O tempo de recarga de Investida de Bruin é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Investida de Bruin te escuda em 6% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Veste da Flor de Cardo',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'O tempo de recarga de Recuperação Rápida é reduzido em 1 s.',
+    'O tempo de recarga de Recuperação Rápida é reduzido em 1 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Recuperação Rápida também aumenta sua velocidade de movimento em 30% por 3 s.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Arreios do Guarda da Matilha',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'O tempo de recarga de Tiro Desnorteante é reduzido em 4 s.',
+    'O tempo de recarga de Tiro Desnorteante é reduzido em 4 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Tiro Desnorteante reduz em 1 s o tempo de recarga restante de Ira Bestial.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Arreios da Vista Longínqua',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'O tempo de recarga de Quebra-Trilha é reduzido em 4 s.',
+    'O tempo de recarga de Quebra-Trilha é reduzido em 4 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Quebra-Trilha torna sua próxima Puxada Longa em até 6 s instantânea. Não pode ocorrer mais de uma vez a cada 15 s.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Arreios do Dente de Armadilha',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    'O tempo de recarga de Gancho Sangrento é reduzido em 3 s.',
+    'O tempo de recarga de Gancho Sangrento é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_hunter_survival.bonus4':
     'Gancho Sangrento concede 1 de Ímpeto de Caça.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Vestes do Vínculo das Horas',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'O tempo de recarga de Barreira Temporal é reduzido em 2 s.',
+    'O tempo de recarga de Barreira Temporal é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Barreira Temporal também aumenta a velocidade de movimento do alvo escudado em 20% por 3 s.',
   'entities.itemSets.vanguard_mage_fire.name': 'Regália do Chicote de Brasa',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    'O tempo de recarga de Chuva de Brasas é reduzido em 3 s.',
+    'O tempo de recarga de Chuva de Brasas é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Conjurar Chuva de Brasas reduz o tempo de recarga restante de Barreira Flamejante em 2 s.',
   'entities.itemSets.vanguard_mage_frost.name': 'Traje do Guarda da Geada',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'O tempo de recarga de Grilhão de Gelo é reduzido em 2 s.',
+    'O tempo de recarga de Grilhão de Gelo é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Conjurar Grilhão de Gelo reduz em 5 s o tempo de recarga restante de Passo Ligeiro.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Regália da Vigília Solar',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'O tempo de recarga de Pacto da Vida é reduzido em 30 s.',
+    'O tempo de recarga de Pacto da Vida é reduzido em 30 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Pacto da Vida também escuda o aliado em 8% da vida máxima dele por 6 s.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Bastião do Voto do Escudo',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'O tempo de recarga de Corrente do Juramento é reduzido em 2 s.',
+    'O tempo de recarga de Corrente do Juramento é reduzido em 2 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Inimigos puxados por Corrente do Juramento conjuram magias 30% mais devagar por 4 s, e Corrente do Juramento concede Represália Solar quando prende um inimigo que pode ser puxado.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Placas de Guerra da Marca da Luz',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'O tempo de recarga de Chamado da Valquíria é reduzido em 15 s.',
+    'O tempo de recarga de Chamado da Valquíria é reduzido em 15 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Chamado da Valquíria reinicia o tempo de recarga de Édito Final, e seu próximo Édito Final conjurado em até 6 s causa 15% mais dano.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Vestimenta do Salmo do Véu',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'O tempo de recarga de Grito Psíquico é reduzido em 3 s.',
+    'O tempo de recarga de Grito Psíquico é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Quando seu Salmo de Proteção é totalmente consumido, o aliado escudado ganha 20% de velocidade de movimento por 3 s. Não pode ocorrer mais de uma vez a cada 8 s.',
   'entities.itemSets.vanguard_priest_holy.name': 'Vestimenta da Asa da Graça',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'O tempo de recarga de Passo do Véu é reduzido em 6 s.',
+    'O tempo de recarga de Passo do Véu é reduzido em 6 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Passo do Véu também te escuda em 8% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Regália do Hino do Crepúsculo',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litania da Aflição também reduz a velocidade de movimento do alvo em 30% enquanto você a canaliza.',
+    'Litania da Aflição também reduz a velocidade de movimento do alvo em 30% enquanto você a canaliza. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Invocar Demônio do Dízimo também te escuda em 10% da sua vida máxima por 8 s.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Couros do Corte Noturno',
@@ -2187,7 +2227,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Golpe Baixo também torna seu próximo ataque em até 6 s um acerto crítico.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Couros da Marca da Briga',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'O tempo de recarga de Pés Ligeiros é reduzido em 60 s.',
+    'O tempo de recarga de Pés Ligeiros é reduzido em 15 s.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Enquanto Pés Ligeiros está ativo, Talho Perverso e Golpe no Corpo concedem 1 ponto de combo adicional.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Couros do Passo Sombrio',
@@ -2197,32 +2237,32 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Soco no Estômago concede 2 pontos de combo adicionais quando usado a partir de Fumaça Dissipante.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Malha de Batalha do Desígnio da Tempestade',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    'O tempo de recarga de Desencadear Arma é reduzido em 3 s.',
+    'O tempo de recarga de Desencadear Arma é reduzido em 3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Desencadear Arma permite conjurar em movimento e aumenta sua velocidade de movimento em 20% por 4 s. Não pode ocorrer mais de uma vez a cada 20 s.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Malha de Guerra do Filho do Vendaval',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Golpe Ancestral reduz a velocidade de movimento do alvo em 30% por 4 s.',
+    'Golpe Ancestral reduz a velocidade de movimento do alvo em 30% por 4 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Golpe Ancestral reduz em 4 s o tempo de recarga restante de Elemental Trance.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cota de Malha do Guarda da Salmoura',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Águas Restauradoras é conjurada 0,5 s mais rápido em um aliado abaixo de 50% de vida.',
+    'Águas Restauradoras é conjurada 0,5 s mais rápido em um aliado abaixo de 50% de vida. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Chamado da Maré também escuda seu alvo em 5% da sua vida máxima por 6 s.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vestes da Pena do Pavor',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'O tempo de conjuração de Atormentar é reduzido em 0,3 s.',
+    'O tempo de conjuração de Atormentar é reduzido em 0,3 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Consumir cura 30% a mais e pode ser canalizado em movimento.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Regália do Vínculo da Medula',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'O tempo de recarga de Bone Armor é reduzido em 10 s.',
+    'O tempo de recarga de Bone Armor é reduzido em 10 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command reduz em 2 s o tempo de recarga restante de Bone Armor.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vestes da Coroa de Escória',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'O tempo de recarga de Cinderhide é reduzido em 30 s.',
+    'O tempo de recarga de Cinderhide é reduzido em 30 s. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'A cada segunda conjuração de Conflagrar, sua próxima Seta da Ruína em até 8 s se torna instantânea.',
   'entities.itemSets.vanguard_warrior_arms.name': 'Equipamento de Batalha do Rastro da Lâmina',
@@ -2255,7 +2295,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Anuncia uma colina agora; ela surge após o aviso completo.',
   'devCommand.actions.hillwarn.label': 'Contagem regressiva da colina',
   'entities.abilities.lava_burst.description':
-    'Causa {damage} de dano de Fogo. Sempre acerta criticamente um alvo que estiver queimando com seu Abalo de Brasa. Surto de Magma: cada tique de Abalo de Brasa tem 20% de chance de reiniciar este tempo de recarga e tornar seu próximo Magma Burst instantâneo em até 10 s. O dano aumenta com o Poder Mágico. (Distintivo de Chamado do Trovão)',
+    'Causa {damage} de dano de Fogo. Um acerto concede 1 de Trovão. Sempre acerta criticamente um alvo que estiver queimando com seu Abalo de Brasa. Um acerto crítico causa 24% adicionais do dano normal. Surto de Magma: cada tique de Abalo de Brasa tem 20% de chance de reiniciar este tempo de recarga e tornar seu próximo Magma Burst instantâneo em até 10 s. O dano aumenta com o Poder Mágico. (Distintivo de Chamado do Trovão)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Passiva: Raio em Arco e Relâmpago Bifurcado têm 20% de chance de sofrer Sobrecarga, atingindo o primeiro alvo novamente por 50% do dano causado e concedendo 1 de Trovão. (Distintivo de Chamado do Trovão)',
@@ -2341,7 +2381,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     'Adiciona uma linha "Conjurado por" a toda dica de benefício ou penalidade, nomeando quem o aplicou. Útil para diferenciar vários conjuradores do mesmo benefício, como as Bênçãos de dois paladinos.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Posiciona a fileira de benefícios e penalidades do quadro de alvo abaixo do quadro, em vez de acima, o layout clássico. Desativado por padrão, já que o quadro de alvo padrão fica bem acima da barra de ação; ative depois de mover o quadro para algum lugar com espaço abaixo dele.',
+    'Coloca a faixa de benefícios e penalidades abaixo do quadro do alvo, sob o nome e a barra de vida, em vez de acima: a disposição clássica. Na posição padrão, o quadro do alvo, junto da sua barra de lançamento e dos temporizadores de golpes, sobe uma linha para que a primeira linha de efeitos não invada a barra de ações; um quadro movido permanece onde você o colocou.',
   'guide.settingsPage.rowFrameRateCap':
     'Um teto para quantas imagens o jogo desenha por segundo. Um computador que não consegue acompanhar sua tela cai em um ritmo irregular; um valor constante de 30 parece mais suave que isso, reduz o trabalho pela metade e mantém o computador mais fresco. Tela significa sem limite.',
   'guide.stats.warfareBodyPets':
@@ -3508,9 +3548,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Forma de Fleet',
   'guide.classPage.formsHeading': 'Mudança de Forma',
   'guide.classPage.formsMoonwing':
-    'Um druida Equilíbrio ganha mais uma forma, a Forma de Luniscante, a forma de conjurador em que um druida Equilíbrio luta. É a única forma animal que mantém suas magias, e sua varinha só funciona nela ou na sua forma normal de conjurador.',
+    'Um druida Equilíbrio recebe mais uma forma, a Forma de Luniscante, a forma de conjurador usada em combate por essa especialização. Como a Forma de Curandeiro de Esporos de Restauração, ela mantém suas magias, e sua varinha só funciona nessas duas formas ou na forma normal de conjurador.',
   'guide.classPage.formsWolfEngage':
-    'Um lobo abre a luta com Investida de Bruin, muda logo para a Forma de Lobo para fixar o alvo, fecha a distância com Bote quando não está furtivo e prende um inimigo com Derrubada.',
+    'Um gato abre a luta com Investida de Bruin, muda logo para a Forma de Gato para fixar o alvo, fecha a distância com Bote quando não está furtivo e prende um inimigo com Derrubada.',
   'guide.classPage.formsNote':
     'Um druida luta mudando de forma. A maioria das habilidades de druida pertence a uma forma específica, então a forma em que você está decide o que pode conjurar, e mudar de forma custa um pouco de mana. Você pode mudar de forma dentro ou fora de combate, quantas vezes quiser.',
   'guide.classPage.mageEleHeading': 'Elemental da Água',
@@ -4756,31 +4796,36 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Estilo',
   'editor.status.campCapReached':
     'Limite de acampamentos atingido ({max}). O novo acampamento não foi adicionado.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Matar um jogador hostil concede Passo de Cinzas, aumentando a velocidade de movimento em 40% por 6 s.',
   'entities.itemSets.warfare_ashstalker.name': 'Equipamento Ashstalker',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Vossas magias têm 15% de chance de conceder Guarda de Brasa, absorvendo 120 de dano por 8 s.',
   'entities.itemSets.warfare_cinderweave.name': 'Vestes Cinderweave',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_furyforged.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Matar um jogador hostil concede Juramento Inquebrado, absorvendo 200 de dano por 10 s.',
   'entities.itemSets.warfare_furyforged.name': 'Traje de Batalha Furyforged',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Aumenta o Ataque e a Defesa de Guerra em 80. Vossas magias têm 15% de chance de conceder Guarda de Brasa, absorvendo 120 de dano por 8 s.',
   'entities.itemSets.warfare_stormbound.name': 'Vestes Stormbound',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Aumenta a Defesa de Guerra em 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Aumenta a Defesa de Guerra em 40. Dano recebido não atrasa mais suas conjurações.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Aumenta o Ataque de Guerra em 40, e o controle de grupo lançado sobre vós por jogadores hostis dura 15% menos.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -5101,7 +5146,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Possuído',
   'hudChrome.warfareShop.weapons': 'Armas',
   'itemUi.market.saleBuyer': 'Vendido para {buyer}',
-  'itemUi.market.saleOlder': 'Mais {count} vendas anteriores, incluídas no total.',
+  'itemUi.market.saleOlder': 'Mais {count} vendas anteriores não listadas.',
   'itemUi.tooltip.maxStack': 'Pilha máxima: {count}',
   'hud.system.deathRecapAbility': 'Você morreu. Morto por {ability}.',
   'hud.system.deathRecapDrowned': 'Você morreu. Você se afogou.',
@@ -6303,7 +6348,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um grito aterrorizante que faz até 5 inimigos a até 8 m fugirem de medo por 4 s. O dano pode quebrar o efeito.',
   'entities.abilities.intimidating_shout.name': 'Brado Intimidador',
   'entities.abilities.iron_resolve.description':
-    'Cerre os dentes e ignore a dor: gasta até 40 de raiva (mínimo de 20) para absorver {absorbPerRage} de dano por ponto de raiva gasto, por até 10 s. (Proteção)',
+    'Cerre os dentes e ignore a dor: um escudo absorve dano igual a {damage}% da sua vida máxima no momento do uso, por até {duration} s. (Proteção)',
   'entities.abilities.iron_resolve.name': 'Determinação de Ferro',
   'entities.abilities.measured_fury.description':
     'Sua fúria comedida apura sua economia: suas habilidades custam 10% menos raiva. (Armas)',
@@ -6422,7 +6467,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um tiro selvagem que desorienta o alvo por {duration} s. Qualquer dano interrompe o efeito.',
   'entities.abilities.typhoon.name': 'Tufão',
   'entities.abilities.typhoon.description':
-    'Uma rajada de vento repele todos os inimigos num raio de 8 m e os atordoa, reduzindo a velocidade de movimento em 50% por 4 s.',
+    'Uma rajada de vento arremessa todos os inimigos em até 8 m para 15 m de distância e os atordoa levemente, reduzindo sua velocidade em 50% por 4 s. Jogadores inimigos são lançados pelo ar em linha reta: ao passar de uma borda, continuam avançando e recebem dano de queda; uma queda fatal conta como sua eliminação.',
   'entities.abilities.voidfeast.name': 'Banquete do Vazio',
   'entities.abilities.voidfeast.description':
     'Devora um efeito mágico (um benéfico de um inimigo ou um nocivo de um aliado) e cura você em 6% da vida máxima.',
@@ -8696,7 +8741,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     'Clique e depois clique em comida nas bolsas para alimentar e curar seu mascote por 5 segundos.',
   'hud.pet.stanceTitle': 'Postura do mascote',
-  'hud.pet.stanceDesc': 'Clique para escolher Passivo, Defensivo ou Agressivo.',
   'hud.pet.passiveDesc': 'Só ataca quando você comanda.',
   'hud.pet.defensiveDesc': 'Ataca inimigos que ferem você ou seu mascote.',
   'hud.pet.aggressiveDesc': 'Ataca inimigos hostis próximos.',
@@ -9208,7 +9252,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Passivo: os acertos críticos das suas magias queimam o alvo, causando 30% do dano provocado ao longo de 6 s; acumula. (Maestria de Fogo)',
   'entities.abilities.mass_barrier.name': 'Barreira em Massa',
   'entities.abilities.mass_barrier.description':
-    'Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve 130 de dano por 60 s. (Talento de mago)',
+    'Protege você e até 4 aliados próximos em um raio de 30 m; cada escudo absorve {damage} de dano por 15 s. (Talento de mago)',
   'entities.abilities.overload.name': 'Sobrecarga',
   'entities.abilities.overload.description':
     'Sua próxima magia é amplificada em 40%, mas custa 50% mais mana. Dura 10 s. (Talento de mago)',
@@ -9282,7 +9326,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Brecha na Armadura',
   'entities.abilities.rupture.name': 'Hemorragia',
   'entities.abilities.vanish.description':
-    'Some de vista, entrando em Duskveil mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s.',
+    'Some de vista, entrando em Duskveil mesmo em combate. Você se move em velocidade máxima enquanto escondido. Dura até 10 s.',
   'entities.abilities.instant_poison.name': 'Mordida da Víbora',
   'entities.abilities.instant_poison.description':
     'Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar {damage} de dano adicional da Natureza.',
@@ -9360,7 +9404,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Assumi o aspecto da marta e aumentai vossa chance de esquiva em 8% por 30 min.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Forma do Corcel',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Assumi o aspecto do corcel e aumentai vossa velocidade de movimento em 30% por 30 min. Enquanto estiver ativo, sofrer dano vos desnorteia, reduzindo vossa velocidade de movimento pela metade por 4 s (cada acerto renova a duração).',
+    'Assumi o aspecto do corcel e aumentai vossa velocidade de movimento em 30% por 30 min. Enquanto estiver ativo, sofrer dano vos desnorteia, reduzindo vossa velocidade de movimento pela metade por 2 s (cada acerto renova a duração).',
   'entities.abilities.aimed_shot.name': 'Puxada Longa',
   'entities.abilities.aimed_shot.description':
     'Atira no alvo causando {damage} de dano Físico. O dano aumenta com o poder de ataque à distância.',
@@ -9414,7 +9458,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Envolve-vos em relâmpagos por 10 min. Os 3 próximos ataques corpo a corpo contra vós causam {buff} de dano de Natureza ao atacante, no máximo uma vez a cada 5 s.',
   'entities.abilities.flame_shock.name': 'Abalo de Brasa',
   'entities.abilities.flame_shock.description':
-    'Causa {damage} de dano de Fogo, e depois {overTime} de dano de Fogo ao longo de 12 s. O acerto inicial aumenta com o Poder Mágico.',
+    'Causa {damage} de dano de Fogo, e depois {overTime} de dano de Fogo ao longo de {duration} s. O acerto inicial aumenta com o Poder Mágico.',
   'entities.abilities.flametongue_weapon.name': 'Arma Flamígera',
   'entities.abilities.flametongue_weapon.description':
     'Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano de Fogo adicional.',
@@ -9462,11 +9506,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.name': 'Raio Selvagem',
   'entities.abilities.healing_touch.name': 'Cura Selvagem',
   'entities.abilities.healing_touch.description': 'Cura um alvo aliado em {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Cada lançamento concluído adiciona 1 de Verdor (máx. 3). O Verdor acumulado encurta este lançamento: 2,2 s com 1 de Verdor, 1,9 s com 2 e 1,5 s com 3. Dádiva da Natureza o torna instantâneo, gratuito e 25% mais forte.',
   'entities.abilities.mark_of_the_wild.name': 'Guarda Selvagem',
   'entities.abilities.mark_of_the_wild.description':
     'Coloca o Wildward em um alvo aliado, aumentando a armadura em {buff} por 30 min.',
   'entities.abilities.moonfire.name': 'Tempestade Lunar',
-  'entities.abilities.rejuvenation.name': 'Florescer Selvagem',
   'entities.abilities.thorns.name': 'Guarda de Espinhos',
   'entities.abilities.thorns.description':
     'Espinhos brotam do alvo: atacantes corpo a corpo sofrem {buff} de dano de Natureza.',
@@ -9474,14 +9519,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': 'Enraíza o alvo no lugar por até 12 s.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
-    'Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Transformar-se em qualquer forma concede Passada Solta, um breve aumento de velocidade de movimento. Lance de novo para voltar à forma de conjurador.',
+    'Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Você ataca duas vezes mais rápido com metade do dano por golpe, e cada golpe gera o dobro de raiva. Transformar-se em qualquer forma concede Passada Solta, um breve aumento de velocidade de movimento. Lance de novo para voltar à forma de conjurador.',
   'entities.abilities.maul.name': 'Esmaga-Ossos',
   'entities.abilities.growl.name': 'Ameaçar',
   'entities.abilities.growl.description':
     'Rosna para o alvo: sua ameaça sobe para igualar a do inimigo mais odiado por ele, que é forçado a atacar você por 3 s. Apenas Forma de Bruin.',
   'entities.abilities.cat_form.name': 'Forma de Gato',
   'entities.abilities.cat_form.description':
-    'Transforma-vos em lobo: a agilidade sobe com vosso nível, poder de ataque +8 mais 2 por nível, vossos ataques usam energia e pontos de combo, e gerais 29% menos ameaça. Mudar para qualquer forma concede Passo ligeiro: 60% de velocidade de movimento por 3 s, uma vez a cada 20 s. Conjurai novamente para voltar à forma de conjurador.',
+    'Transforme-se em gato: a agilidade sobe com o nível, o poder de ataque aumenta em 8 mais 2 por nível, seus ataques usam energia e pontos de combo, você se move 15% mais rápido e gera 29% menos ameaça. Toda mudança de forma concede Passo ligeiro, um breve aumento de velocidade. Use de novo para voltar à forma de conjurador.',
   'entities.abilities.claw.name': 'Garra Dilacerante',
   'entities.abilities.ferocious_bite.name': 'Mordida Sanguinária',
   'entities.abilities.swipe.name': 'Garras Varredoras',
@@ -9501,19 +9546,19 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.name': 'Luz Bruxa',
   'entities.abilities.hibernate.name': 'Sono Profundo',
   'entities.abilities.hibernate.description':
-    'Força o alvo a um sono profundo por até 8 s. Qualquer dano o desperta.',
+    'Faz o alvo dormir profundamente por até 8 s. Qualquer dano o desperta. Contra jogadores, cada repetição em 18 s dura metade da anterior, e a quarta falha.',
   'entities.abilities.dash.name': 'Corrida',
   'entities.abilities.dash.description':
-    'Dispara para a frente, aumentando a velocidade de movimento em 50% por 15 s. Apenas Forma de Gato.',
+    'Assuma a Forma de Gato se necessário, depois corra com 50% mais velocidade por 15 s. Utilizável em qualquer forma. Instantâneo e não ativa a recarga global.',
   'entities.abilities.pounce.name': 'Bote Furtivo',
   'entities.abilities.lunge.description':
-    'Dá um bote em um inimigo a até 12 m, causando 60% do dano da arma e concedendo 1 ponto de combo. Apenas Forma de Lobo.',
+    'Dá um bote em um inimigo a até 12 m, causando 60% do dano da arma e concedendo 1 ponto de combo. Apenas Forma de Gato.',
   'entities.abilities.lunge.name': 'Bote',
   'entities.abilities.hamstring_bite.description':
-    'Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s). Apenas Forma de Lobo.',
+    'Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s). Apenas Forma de Gato.',
   'entities.abilities.hamstring_bite.name': 'Derrubada',
   'entities.abilities.pounce.description':
-    'Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo. Apenas Forma de Lobo. Fora da furtividade, este botão é Bote.',
+    'Abertura furtiva que atordoa o alvo por 2 s. Concede 1 ponto de combo. Apenas Forma de Gato. Fora da furtividade, este botão é Bote.',
   'entities.abilities.insect_swarm.name': 'Enxame Ferroante',
   'entities.abilities.insect_swarm.description':
     'O inimigo é atacado por um enxame de insetos, sofrendo {damage} de dano de Natureza ao longo de 12 s.',
@@ -9559,17 +9604,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Vincula um Wraithborn à sua vontade, um demônio de elite que faz chover pesado dano Sombrio à distância. Uma longa recarga limita seu poder devastador. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez.',
   'entities.abilities.bear_charge.name': 'Investida de Bruin',
   'entities.abilities.bear_charge.description':
-    'Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Durante os 3 s seguintes, a Forma de Lobo é gratuita e fixa o alvo, reduzindo sua velocidade em 50% por 4 s. Alcance de 8 a 25 m. Apenas Forma de Bruin.',
+    'Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Durante os 3 s seguintes, a Forma de Gato é gratuita e fixa o alvo, reduzindo sua velocidade em 50% por 4 s. Alcance de 8 a 25 m. Apenas Forma de Bruin.',
   'entities.abilities.demoralizing_roar.name': 'Rugido Covarde',
   'entities.abilities.demoralizing_roar.description':
     'Desmoraliza os inimigos próximos, reduzindo seu poder de ataque em 20 por 20 s. Apenas Forma de Bruin.',
   'entities.abilities.prowl.name': 'Espreitar',
   'entities.abilities.prowl.description':
-    'Entra em furtividade enquanto na Forma de Lobo. Não pode ser usado em combate.',
+    'Entra em furtividade enquanto na Forma de Gato. Não pode ser usado em combate.',
   'entities.abilities.rake.name': 'Esfolar',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':
-    'Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida.',
+    'Restaura 10% da vida máxima do seu companheiro vivo a cada segundo durante 8 s. Se ele estiver morto, revive-o com 50% da vida.',
   'entities.abilities.holy_shock.description':
     'Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)',
   'entities.abilities.holy_shield.name': 'Escudo Sagrado',
@@ -14451,7 +14496,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Habilidade',
   'guide.search.typeDeed': 'Feito',
   'guide.settingsPage.audioBody':
-    'A janela de opções não é só pixels. Áudio reúne três controles de volume, para efeitos sonoros, música e voz, mais um interruptor de música e quatro interruptores para os sons que mais cansam: vozes de NPC, passos, sons da interface e retorno de clique. A aba Geral do painel Interface traz um seletor de idioma que relocaliza a interface inteira na hora, sem recarregar, e um seletor de tema para o acabamento das janelas.',
+    'As opções vão além da imagem. Áudio tem quatro controles de volume: efeitos, ambiente, música e vozes, além de um botão para ligar a música e quatro para os sons que mais costumam cansar: vozes de PNJs, passos, sons da interface e resposta de clique. A aba Geral do painel Interface oferece um seletor de idioma que traduz toda a interface imediatamente, sem recarregar, e um seletor de tema para as janelas.',
   'guide.settingsPage.audioTitle': 'Som e idioma',
   'guide.settingsPage.autolootBody':
     'Prefere não clicar em cada cadáver? O saque automático de passagem, na aba Combate do painel Interface e desligado por padrão, recolhe o espólio das suas próprias vítimas enquanto você passa por elas.',
@@ -14970,7 +15015,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Canaliza por 3 s, causando {damage} de dano das Sombras a cada segundo aos inimigos a até 8 m da área alvo. O dano aumenta com o Poder Mágico. (Talento de sacerdote)',
   'entities.abilities.multi_shot.description':
-    'Dispara uma saraivada na área-alvo, causando {damage} de dano Físico aos inimigos num raio de 8 m. (talento de Caçador)',
+    'Dispara uma saraivada na área-alvo, causando {damage} de dano Físico aos inimigos a até 8 jardas. (talento de Caçador)',
   'entities.abilities.prayer_of_healing.description':
     'Cura os aliados a até 30 m em {damage}. A cura aumenta com o Poder Mágico. (Sagrado)',
   'entities.abilities.preparation.description':
@@ -14980,7 +15025,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Aterroriza os inimigos a até 8 m por até 4 s. O dano pode quebrar o efeito.',
   'entities.abilities.shadowstep.description':
-    'Avança pelas sombras até seu alvo, amigo ou inimigo, sem quebrar o Duskveil. (talento de Ladino)',
+    'Avança pelas sombras até seu alvo, amigo ou inimigo, sem quebrar o Duskveil. Acumula até 2 cargas. (talento de Ladino)',
   'entities.abilities.silence.description': 'Silencia o alvo por 4 s. (talento de Sacerdote)',
   'entities.abilities.tranquility.description':
     'Canaliza energia restauradora por 4 s, curando os aliados num raio de 30 m em 42 a 52 a cada segundo. (talento de Druida)',
@@ -16227,17 +16272,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Desencadear Fera',
   'entities.abilities.wildheart.name': 'Coração Selvagem',
   'entities.abilities.bloodhook.description':
-    'Avança contra um inimigo e aplica Ferida de Gancho Sangrento, causando 34 de dano Físico base mais 26% do seu poder de ataque à distância ao longo de 12 s em 4 pulsos. (Distintivo de Perícia de Campo)',
+    'Avança contra um inimigo e aplica uma ferida de Gancho Sangrento, causando 34 de dano físico base mais 26% do seu Poder de Ataque à Distância em 4 pulsos ao longo de 12 s. Ao chegar, reduz a velocidade do alvo em 30% por 3 s. (Assinatura de Sobrevivência)',
   'entities.abilities.bloodtrail_assault.description':
-    'Por 12 s, o Gancho Sangrento espalha uma ferida com 60% de força para até 2 inimigos próximos, o Rasga-Feridas comanda um ataque do companheiro de 18 de dano, e a Carga de Estilhaços ganha 2 metros, causa 25% mais dano base ao alvo principal e aciona 50% mais dano de ferida.',
+    'Por 12 s, Gancho Sangrento espalha uma ferida com 60% da força a até 2 inimigos em 5 m, Rasga-Feridas ordena um ataque do ajudante de 18 de dano e Carga de Estilhaços alcança 2 m mais longe, causa 25% mais dano base ao alvo principal e ativa 50% mais dano de ferida. Sem ajudante vivo, seu Foco também regenera 100% mais rápido.',
   'entities.abilities.cold_focus.description':
     'Por 12 s, o Tiro Medido restaura 50% mais foco, e o Puxo Longo custa 25% menos e é conjurado 30% mais rápido. (Distintivo de Visão Gélida)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Passiva: Quebra-Trilha renova o Ímpeto de Caça e prepara seu próximo Golpe Estripador ou Gancho Sangrento por 12 s. O Golpe Estripador causa 15% mais dano por acúmulo. O Gancho Sangrento causa de 18 a 24 de dano Físico adicional, aumentado em 15% por acúmulo e pelo seu poder de ataque à distância. Com 3 acúmulos, qualquer um dos ataques consome o Ímpeto de Caça. (Perícia de Campo)',
+    'Passivo: com Ímpeto de Caça, Quebra-Trilha prepara seu próximo Golpe Estripador ou Gancho Sangrento por 12 s. Golpe Estripador causa 15% mais dano por acúmulo. Gancho Sangrento causa de 18 a 24 de dano físico adicional, aumentado em 15% por acúmulo e por Poder de Ataque à Distância. Com 3 acúmulos, qualquer um dos ataques consome Ímpeto de Caça. (Sobrevivência)',
   'entities.abilities.frostjaw_trap.description':
-    'Posiciona uma armadilha no inimigo selecionado ou aos seus pés. Ela arma após 0,75 s e dura 30 s. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s.',
+    'Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s.',
   'entities.abilities.hunting_momentum.description':
-    'Passiva: o Golpe Estripador concede 1 de Ímpeto de Caça por 8 s, até 3. Com 3 acúmulos, o Rasga-Feridas causa 45% mais dano de golpe e consome os acúmulos. (Perícia de Campo)',
+    'Passivo: Golpe Estripador e uma Carga de Estilhaços que acerte um inimigo concedem 1 de Ímpeto de Caça cada, até 3. Dura até ser gasto ou você sair de combate; cada acúmulo aumenta sua velocidade em 15%. Com 3 acúmulos, Rasga-Feridas causa 60% mais dano de golpe e os consome. (Sobrevivência)',
   'entities.abilities.measured_shot.description':
     'Atira no alvo causando {damage} de dano Físico. Um acerto restaura 20 de foco. O dano aumenta com o poder de ataque à distância.',
   'entities.abilities.pack_command.description':
@@ -16247,11 +16292,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Reduz o dano sofrido em 60% por 8 s, mas impede ataques enquanto está ativa.',
   'entities.abilities.shrapnel_charge.description':
-    'Atinge o alvo causando de 24 a 30 de dano Físico e até 4 outros inimigos a até 6 metros causando de 13 a 17. Os demais alvos também sangram por 12 de dano ao longo de 6 s. Se o alvo principal tiver sua Ferida de Gancho Sangrento, causa 1 pulso de ferida imediatamente. O dano direto aumenta com o poder de ataque à distância.',
+    'Atinge um cone de 10 m à sua frente. Seu alvo, ou o inimigo atingido mais próximo se o alvo estiver fora do cone, recebe de 24 a 30 de dano físico. Os outros inimigos no cone recebem de 7 a 9 e sangram por 12 de dano ao longo de 6 s. Se o alvo principal tiver sua ferida de Gancho Sangrento, recebe imediatamente 1 pulso da ferida. Atingir um inimigo concede 1 de Ímpeto de Caça. O dano direto aumenta com Poder de Ataque à Distância.',
   'entities.abilities.stampede.description':
     'Invoca 3 feras por 12 s. Cada uma ataca a cada 2 s causando {damage} de dano Físico. O dano exibido inclui 8% do seu poder de ataque à distância antes dos bônus de dano de companheiro. As feras fixam a Ferocidade da Matilha ao serem invocadas, ganhando 10% de dano por acúmulo. Enquanto a Debandada está em recarga, Comandos da Matilha bem-sucedidos têm 20% de chance de reiniciá-la, garantido após 5 chances falhas. Ela não pode reiniciar enquanto as feras estiverem ativas. (Senhor da Matilha)',
   'entities.abilities.trailbreak.description':
-    'Salta 12 metros para trás. Se você tiver Ímpeto de Caça, ele é renovado e prepara a Reentrada por 12 s.',
+    'Salta 25 metros para trás e liberta você de enraizamentos e lentidões de movimento. Se você tiver Ímpeto de Caça, ele é renovado e prepara a Reentrada por 12 s.',
   'entities.abilities.unleash_beast.description':
     'Consome 3 de Ferocidade da Matilha depois que seu companheiro golpeia causando de 83 a 105 de dano Físico e sacode todos os inimigos a até 6 metros causando de 26 a 34. O golpe e a sacudida usam o bônus completo de 30% de dano de companheiro da Ferocidade da Matilha e aumentam com o poder de ataque do companheiro. Pelos 8 s seguintes, o companheiro causa 25% mais dano, ataca 35% mais rápido e faz o Tiro Vil atingir até 2 inimigos próximos.',
   'entities.abilities.wildheart.description': 'Restaura instantaneamente 30% da sua vida máxima.',
@@ -16278,7 +16323,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiva: enquanto o Golpe Ancestral está em recarga, consumir um Presságio de Tempestade tem 25% de chance de reiniciá-lo. Se as 3 primeiras chances falharem, a 4.ª sempre o reinicia. (Espírito Guerreiro)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiva: o Raio em Arco e o Relâmpago Bifurcado concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)',
+    'Passiva: o Raio em Arco, o Relâmpago Bifurcado e o Magma Burst concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)',
   'entities.abilities.tidecall.description':
     'Cura um alvo aliado em {damage}. A cura aumenta com o poder mágico. Adiciona a cura completa antes do excesso à Corrente Restauradora, até 30% da vida máxima do alvo.',
   'entities.abilities.unleash_weapon.description':
@@ -16352,7 +16397,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Quebra-Medula',
   'entities.abilities.marrowbreak.description':
-    'Consome seus 3 de Sangue Antigo para um golpe pesado de alta ameaça com {damage} de dano. Abaixo de metade da vida, em vez disso protege você com um escudo de 18% da sua vida máxima por 8 s e devolve 15 de fúria.',
+    'Consome seus 3 de Sangue Antigo para um golpe pesado de alta ameaça com {damage} de dano. Abaixo de metade da vida, em vez disso cura você em 18% da sua vida máxima e devolve 15 de fúria.',
   'entities.abilities.moonlash.name': 'Onda Lunar',
   'entities.abilities.moonlash.description':
     'Consome seus 3 de Maré Lunar para um golpe pesado de {damage} de dano Arcano: a escolha de dano. Esteira Solar consome os mesmos 3 de Maré Lunar, então escolha um.',
@@ -16361,7 +16406,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até {duration} s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar.',
   'entities.abilities.overbloom.name': 'Superflorescência',
   'entities.abilities.overbloom.description':
-    'Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo.',
+    'Consome 3 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Cura de Esporos novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
     'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura {rage} de energia. Funciona sem pontos de combo.',
@@ -16477,7 +16522,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Acompanhar {count} criações de {name} como meta de coleta',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Seus ataques corpo a corpo que acertarem podem conceder 50 de Força por 15 s e curar 200 de vida. Modificadores de cura se aplicam. Cada golpe tem 1% de chance por 0,6 s da velocidade-base da arma. Não há recarga interna. As duas mãos compartilham um único benefício; qualquer acionamento o renova e ele nunca acumula. Ataques à distância não acionam este efeito. Forma de Lobo usa sua velocidade-base de ataque de 1 s.',
+    'Seus ataques corpo a corpo que acertam podem conceder 50 de Força por 15 s e curar você em 200 de vida. Aplicam-se modificadores de cura. Cada acerto tem 1% de chance por 0,6 s da velocidade básica da arma que golpeia. Sem recarga interna. As duas mãos compartilham um único benefício: cada ativação o renova, sem acumular. Ataques à distância não ativam o efeito. Na Forma de Gato, ataques automáticos usam a velocidade das patas de 1 s. Golpes e finalizações na Forma de Gato e na Forma de Bruin usam a velocidade da própria arma; Garras Varredoras faz uma rolagem por uso, não por alvo.',
   'hudChrome.enchantName.enchant_chest_armor': 'Gravura de peito: Reforço',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Gravura de peito: Vigor Maior',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Gravura de peito: Vigor Luminoso',
@@ -16976,7 +17021,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
     'O destaque da coleção congelada e a primeira peça que todo colecionador procura. Presa de Gelo foi entalhada, não forjada, de uma presa da geleira que coroa Thornpeak acima de Highwatch; seu núcleo ciano arde frio como a luz sobre Glimmermere. Ela congela o próprio ar que corta. Os guardas da muralha juram que um soldado a carregou na noite em que as neves altas seguraram os Juramentados da Ninhada e “compraram um inverno para a muralha”.',
   'hudChrome.auraEffect.verdance':
-    'Verdance {stacks}/{max}. Cada Florescer Selvagem ou Segundo Florescer NOVO que você plantar adiciona 1. Em {max}, Recuperação Rápida vira Superflorescência',
+    'Verdor {stacks}/{max}. Cada Cura de Esporos, Segundo Florescer ou Cura Selvagem que você lançar adiciona 1, e cada ponto encurta o lançamento de Cura Selvagem. Com {max}, Recuperação Rápida vira Superflorescência',
   'hudChrome.continentMap.levels': 'Níveis {min} a {max}',
   'hudChrome.continentMap.summary': 'Mapa do mundo. Escolha uma zona para abrir seu mapa.',
   'hudChrome.continentMap.title': 'Mapa do Mundo',
@@ -17137,7 +17182,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Cada acerto adiciona 1 de Ritual de Veneno (máx. 6) e reembolsa 15 de energia. Em 6 de Ritual de Veneno, Sono Eterno se torna Rasgaveneno (causa instantaneamente todo o dano restante dos seus sangramentos de uma vez).',
   'entities.abilities.blade_flurry.description':
-    'Desencadeia uma torrente de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura de Thuggery)',
+    'Desencadeia uma torrente de lâminas, aumentando a velocidade de ataque em 20% por 30 s. (assinatura de Thuggery)',
   'entities.abilities.bone_armor.description':
     'Envolve você em ossos, absorvendo dano igual a 20% da sua vida máxima.',
   'entities.abilities.bone_armor.name': 'Bone Armor',
@@ -17152,7 +17197,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Gato.',
   'entities.abilities.claw.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
   'entities.abilities.cold_blood.description':
-    'Concentra sua intenção mortal para que seu próximo ataque seja um acerto crítico. (assinatura de Knifework)',
+    'Concentra sua intenção mortal para que seus próximos 5 ataques sejam acertos críticos. (assinatura de Knifework)',
   'entities.abilities.corpse_explosion.description':
     'Sacrifica primeiro um Mago de Ossos, depois um Guerreiro Esquelético, e uma Asa Tumular apenas como último recurso. Entre duplicatas, escolhe a que tem menos duração restante e, em seguida, a mais fraca, para causar {damage} de dano das Sombras no local escolhido.',
   'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
@@ -17204,7 +17249,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Invoca o julgamento sobre seu Evil Eye primário por 15 s, concedendo 40 de Condenação e 3 Fios do Destino, ativando a Possessão, dobrando a Condenação gerada pelo Eye primário e aumentando o dano de Sentence em 20%. A primeira Sentence reembolsa 50 de Condenação.',
   'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
   'entities.abilities.kidney_shot.description':
-    'Movimento finalizador que atordoa o alvo por 1 s mais 1 s por ponto de combo (5 pontos de combo: 6 s).',
+    'Movimento finalizador que atordoa o alvo por 2 s mais 1 s por ponto de combo (5 pontos de combo: 7 s).',
   'entities.abilities.litany_of_guilt.description':
     'Amaldiçoa seu Evil Eye primário por 6 s. Ganhos de Condenação liberam uma onda que causa dano a até 2 outros inimigos num raio de 8 m, no máximo uma vez por segundo. O Grau 2 estende para 8 s e 4 inimigos.',
   'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
@@ -17214,7 +17259,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Um ataque brutal que aumenta o dano corpo a corpo em {damage} e causa uma grande quantidade de ameaça. Ativa no seu próximo golpe. Apenas Forma de Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe de 78 a 96 de dano com alta ameaça; abaixo de metade da vida, ele em vez disso escuda você em 18% da sua vida máxima e reembolsa 15 de raiva.',
+    'Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Quebra-Medula: um golpe de 78 a 96 de dano com alta ameaça; abaixo de metade da vida, ele em vez disso cura você em 18% da sua vida máxima e reembolsa 15 de raiva.',
   'entities.abilities.moonfire.description':
     'Queima o inimigo com fogo lunar causando {damage} de dano Arcano mais dano ao longo do tempo.',
   'entities.abilities.moonfire.specNote_balance':
@@ -17241,20 +17286,20 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Gasta 1 Fragmento de Alma para adicionar um Guerreiro Esquelético permanente ao seu Domínio de 2 vagas. Apenas um pode servi-lo. Ele atinge em área os inimigos próximos por 45% de dano a cada 6 s, e Reaping Command imobiliza seu alvo com uma lentidão de 40% por 4 s.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Esfola o inimigo por dano da arma mais {damage} e causa dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.',
+    'Esfola o inimigo por dano da arma mais {damage} e causa {overTime} de dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.',
   'entities.abilities.rake.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
   'entities.abilities.reaping_command.description':
     'Gasta 2 Fragmentos de Alma para comandar todos os servos mortos-vivos a golpear em uníssono. Guardas Tumulares provocam e se preparam, Guerreiros imobilizam, Magos de Ossos expõem defesas mágicas, e a Asa Tumular dilacera todos os inimigos atingidos.',
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Cura um alvo aliado em {damage} e uma quantidade adicional ao longo de 21 s.',
+    'Cura um alvo aliado em {damage} e uma quantidade adicional ao longo de 15 s. Se o efeito durar até o fim, cura o alvo novamente na mesma quantidade da cura inicial.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Plantar uma NOVA floração adiciona 1 Verdance (máx. 5).',
+    'Cada lançamento adiciona 1 de Verdor (máx. 3), inclusive ao renovar uma floração que já está ativa.',
   'entities.abilities.rejuvenation.description': 'Cura o alvo em {damage} ao longo de 12 s.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Plantar uma NOVA floração adiciona 1 Verdance (máx. 5). Em 5 Verdance, Recuperação Rápida se torna Superflorescência.',
+    'Cada lançamento adiciona 1 de Verdor (máx. 3), inclusive ao renovar uma floração que já está ativa. Com 3 de Verdor, Recuperação Rápida se torna Superflorescência.',
   'entities.abilities.rip.description':
-    'Movimento finalizador que faz o alvo sangrar a cada 2 s por 24 s: 36 de dano mais 24 por ponto de combo gasto (5 pontos de combo: {damage} no total). Apenas Forma de Gato.',
+    'Golpe final que faz o alvo sangrar a cada 2 s por 24 s: 72 de dano mais 48 por ponto de combo gasto (5 pontos: {damage} no total). Apenas na Forma de Gato.',
   'entities.abilities.rip.specNote_feral': 'O acerto adiciona 1 de Sangue Antigo (máx. 3).',
   'entities.abilities.ruinous_brand.description':
     'Marca um inimigo por 15 s. Seus próximos 3 feitiços diretos ecoam por 25% de dano contra o inimigo marcado, ou copiam 50% de dano para ele quando conjurados contra outro alvo. Ecos de Seta da Ruína também contam como acertos críticos, sem outro multiplicador de dano crítico.',
@@ -17292,11 +17337,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'Na Forma de Luniscante, cada conjuração concluída adiciona 1 Moontide (máx. 3). Em 3 Moontide, este botão se torna Despertar Solar: um golpe instantâneo de 80 a 100 de dano de Natureza mais uma queimadura de 45 ao longo de 9 s, restaurando 35 de mana e gastando todos os 3.',
   'entities.abilities.stealth.description':
-    'Oculta você nas sombras: os inimigos mal percebem sua presença, mas você se move 50% mais devagar. Atacar ou sofrer dano quebra o Duskveil. Lance de novo para sair.',
+    'Oculta você nas sombras: os inimigos mal percebem sua presença e você se move em velocidade máxima. Atacar ou sofrer dano quebra o Duskveil. Lance de novo para sair.',
   'entities.abilities.stealth.specNote_subtlety':
     'Cada abertura usada a partir de Duskveil adiciona 1 Gloam (máx. 3).',
   'entities.abilities.swiftmend.description':
-    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Plantios de Florescer Selvagem e Segundo Florescer adicionam Verdance; em 5 Verdance, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Coração do Bosque)',
+    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. Cada lançamento de Cura de Esporos, Segundo Florescer e Cura Selvagem adiciona 1 de Verdor; com 3 de Verdor, este botão se torna Superflorescência, que cura instantaneamente cada aliado portando seus efeitos de cura ao longo do tempo em 60% do que restava desses efeitos. (assinatura de Restauração)',
   'entities.abilities.swipe.description':
     'Varre com suas garras os inimigos próximos causando {damage} de dano. Causa ameaça extra. Apenas Forma de Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Cada acerto adiciona 1 de Sangue Antigo (máx. 3).',
@@ -17369,7 +17414,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cauterizeFatigue': 'Cauterizar não pode evitar outro acerto letal',
   'hudChrome.auraEffect.cooldownCap': '{used} de {cap} s de redução de recarga usados nesta janela',
   'hudChrome.auraEffect.bruinRushWindow':
-    'A Forma de Lobo não custa mana e fixa o alvo da vossa Investida de Bruin, reduzindo sua velocidade em {pct}% por {sec} s',
+    'A Forma de Gato não custa mana e fixa o alvo da vossa Investida de Bruin, reduzindo sua velocidade em {pct}% por {sec} s',
   'hudChrome.auraEffect.desolation':
     '{charges} cargas: sua próxima Seta da Ruína conjura {castPct}% mais rápido ou sua próxima Chuva de Fogo cai imediatamente',
   'hudChrome.auraEffect.duskfireClaim': 'A morte concede {value} de Ruína',
@@ -17738,7 +17783,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'São duas ações separadas no mesmo corpo. Tudo que um cadáver contém, moedas e drops mais quaisquer componentes coletáveis, abre na mesma janela, mas a tecla de interação e Pegar Saque recolhem apenas o saque comum, que segue as regras normais de saque. A colheita é o lado das profissões, extraindo materiais do próprio cadáver, e só acontece quando você escolhe Coletar nessa janela.\n\nA colheita é por ordem de chegada e de uso único: cada cadáver pode ser colhido exatamente uma vez, por quem o reivindicar primeiro, inclusive online. O Foco do Vilarejo molda o que você obtém: enquanto estiver em um centro de vilarejo, você pode distribuir 10 pontos de foco pelos tipos de componente que lhe interessam, e cada componente focado rola um nível melhor (a cada 5 pontos sobe um degrau, no máximo dois degraus) e rende mais (10 por cento por ponto). Componentes sem foco nunca são piorados.',
   'guide.profPages.faq.a4':
-    'Você teve um golpe de sorte. Aproximadamente 1 coleta em 90 dispara um evento de coleta raro (cerne antigo em uma árvore, uma veia imaculada no minério, uma flor ao luar entre as ervas): ele multiplica o rendimento por cinco, assina cada unidade com o seu nome e anuncia o achado para a zona inteira. Uma rolagem de raridade rara ou melhor em uma coleta comum também assina o rendimento.\n\nMateriais assinados valem a pena guardar ou vender caro: ter na bancada qualquer cópia assinada de um reagente exigido soma 2 pontos percentuais à chance de obra-prima. Só lembre que eles se empilham apenas com cópias assinadas de forma idêntica, então ficam em um encaixe de bolsa só deles.',
+    'Você encontrou uma colheita excepcional. Cerca de 1 a cada 90 coletas ativa um evento raro: cerne ancestral em árvores, veio intacto em minério ou flor enluarada em ervas. Ele multiplica a produção por cinco, assina cada unidade com seu nome e anuncia a descoberta para toda a zona. Uma coleta comum que resulte em qualidade rara ou superior também assina toda a produção.\n\nVale guardar os materiais assinados ou vendê-los caro: ter qualquer unidade assinada de um reagente necessário nas bolsas ou no Depósito de Materiais, onde a fabricação possa utilizá-la, adiciona 2 pontos percentuais à chance de obra-prima. Eles podem compartilhar uma pilha compatível com material sem assinatura ou unidades de outros coletores e signatários sem perder marcas; cada origem e quantidade fica registrada separadamente.',
   'guide.profPages.faq.a5':
     'Vá a qualquer posto de criação com a peça nas bolsas e pague o mestre. A taxa segue a qualidade do item: 25 pratas para uma peça incomum, 1 ouro para uma rara, 4 ouros para uma épica; uma lendária paga a taxa épica, e uma peça comum encomendada paga a taxa de incomum. Deve ser um posto real: uma estação móvel nunca oferece o serviço.\n\nA taxa compra uma lousa limpa, não uma cura: a peça continua sendo uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação. Se várias cópias vinculadas compartilharem uma pilha, uma cópia é separada e desvinculada por pagamento.',
   'guide.profPages.faq.a8':
@@ -18376,7 +18421,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Quando seu Salmo de Proteção é totalmente consumido, seu próximo Hino Purificador em até 10 s é instantâneo. Só pode ocorrer uma vez a cada 15 s.',
   'entities.itemSets.emberscreed.name': 'Vestes do Credo das Brasas',
   'entities.itemSets.forgewall.bonus2':
-    'Determinação de Ferro converte raiva em 5 de absorção por ponto, em vez de 4.',
+    'O escudo de Determinação de Ferro absorve 25% da sua vida máxima em vez de 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Conjurar Quebra-escudo reduz o tempo de recarga restante de Determinação de Ferro em 2 s.',
   'entities.itemSets.forgewall.name': 'Égide da Muralha da Forja',
@@ -18390,8 +18435,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Os golpes uníssonos do Comando Ceifador causam 25% a mais de dano.',
   'entities.itemSets.gravebrand.name': 'Regalia da Marca Tumular',
-  'entities.itemSets.grovespring.bonus2':
-    'Cura Rápida consome primeiro sua própria Florescência Selvagem ou Segunda Florescência e cura 25% a mais. Dano sofrido não atrasa mais suas conjurações.',
   'entities.itemSets.grovespring.bonus4':
     'Florescência Excedente colhe 75% dos seus efeitos restantes e armazena 1 Verdância depois.',
   'entities.itemSets.grovespring.name': 'Paramento da Nascente do Bosque',
@@ -19166,13 +19209,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Pingentes de gelo',
 
   'entities.abilities.grove_awakening.description':
-    'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Coração do Bosque)',
+    'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Restauração)',
   'entities.abilities.grove_awakening.name': 'Despertar do Bosque',
   'entities.abilities.prayer_of_returning.description':
     'Chama de volta para o seu lado, com 30% de vida e mana, todos os membros caídos do seu grupo ou raide a até 40 m e dentro da sua linha de visão. Não pode ser conjurada em combate. (Sagrado e Disciplina)',
   'entities.abilities.prayer_of_returning.name': 'Prece do Retorno',
   'entities.abilities.wildwake.description':
-    'Induz um aliado caído a um florescer repentino, trazendo-o de volta à vida ao seu lado com 35% de vida e mana, mesmo em pleno combate. (Coração do Bosque)',
+    'Induz um aliado caído a um florescer repentino, trazendo-o de volta à vida ao seu lado com 35% de vida e mana, mesmo em pleno combate. (Restauração)',
   'entities.abilities.wildwake.name': 'Despertar Selvagem',
   'devCommand.actions.farmgrow.description':
     'Avança seus canteiros plantados até a hora de ficarem prontos, ou avança um canteiro pelo id. Nada mais muda: o resultado foi definido quando você plantou.',
@@ -19563,7 +19606,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Uma vitória ranqueada paga Honra, a moeda de jogador contra jogador, e uma derrota jogada até o fim ainda paga uma parte menor, assim como um empate, então a classificação é o único custo real de uma derrota. Honra deve recompensar partidas reais: vencer o mesmo oponente ou a mesma equipe outra vez no mesmo dia não paga nada além, nem perder para eles novamente, uma longa sequência de vitórias paga por inteiro no primeiro trecho e depois reduz pela metade o pagamento de uma vitória, reduzindo-o de novo mais adiante e permanecendo assim, e uma partida abandonada pelo oponente ainda move sua classificação, mas não paga Honra. O dia é do reino: ele reinicia na hora do reset noturno, o mesmo limite em que toda restrição diária é liberada.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros.',
+    'Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros. Há uma exceção que funciona em todo lugar: duas peças de qualquer um desses conjuntos também fazem com que o dano recebido não atrase mais suas conjurações.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras.',
   'guide.controls.harvestJournal': 'Diário de Colheita',
@@ -19660,7 +19703,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Como as moedas circulam nas profissões: taxas e sumidouros exatos, o que realmente vende, regras do Mercado Mundial, encomendas, comissões e o lugar das coleções financiadas por raide junto da criação comum.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Alguns itens carregam um nome. As linhas de origem de um material dizem quem coletou cada grupo de unidades, enquanto uma marca separada de assinatura identifica o artesão premium quando existe um. Esses fatos são independentes: um material comum coletado registra o coletor sem ganhar assinatura, e um estoque antigo assinado pode nomear seu assinante dizendo honestamente que nenhum coletor foi registrado. Uma peça pronta, por sua vez, informa quem a criou. Esses registros viajam com o item por trocas, banco, correio, Mercado Mundial e até recompra de vendedor, e nunca desaparecem.\n\nA coleta assina automaticamente seu melhor trabalho: qualquer colheita que role rara ou superior chega assinada, e achados raros assinam todo o ganho de cinco unidades. A rolagem de sorte de uma coleta de cadáver assina seu rendimento quando a família não tem um espécime, e, quando tem, mantém o rendimento comum e cria ao lado dele o espécime imaculado assinado. A criação assina do mesmo modo: toda cópia de uma saída rara ou superior cria uma versão assinada, e uma obra-prima sempre assina qualquer qualidade, então a melhor versão de qualquer peça sempre nomeia seu criador. A assinatura de um material comum acompanha as próprias unidades e não pode ser perdida só porque uma pilha compatível já contém outro coletor ou assinante. Um espécime imaculado distinto é um item separado e ainda precisa de espaço; se não couber, o rendimento comum do cadáver fica, mas o espécime se perde.\n\nItens prontos mantêm uma identidade estrita, então duas cópias só se juntam quando todas as marcas coincidem exatamente: mesmo item, mesmo assinante, mesmos atributos de obra-prima, mesmo encantamento e mesmo vínculo. Materiais compatíveis compartilham um espaço entre coletores e assinantes, mantendo uma contagem para cada origem. O tooltip ao passar o mouse resume as origens; clique com o botão direito na pilha para a lista completa (no toque, use o botão Origens). Separar por coletor mantém essas pilhas distintas nas bolsas, e a ordenação respeita essa escolha. Material transferido pode formar pilha normalmente com os materiais do destinatário.\n\nAssinaturas retribuem artesãos: manter na bancada qualquer cópia assinada de um reagente necessário, independentemente de quem a assinou, adiciona 2 pontos percentuais à chance de obra-prima, e manter um reagente assinado por você reduz em um a quantidade necessária daquele reagente, nunca abaixo de um, a menos que ele esteja marcado sem desconto; núcleos de raide sempre mantêm o custo completo. Seu próprio trabalho raro ou superior assinado também continua ensinando, hoje apenas por meio de poções criadas: beba uma poção rara que você preparou e assinou e um pequeno fluxo de habilidade volta à profissão que a criou, desde que ela seja uma das suas principais ativas. É realmente apenas o braço das poções: um elixir, um pergaminho ou um frasco de ápice não ensina nada de volta, por mais fina que seja sua assinatura.',
+    'Alguns itens carregam um nome. As linhas de origem de um material dizem quem coletou cada grupo de unidades, enquanto uma marca separada de assinatura identifica o artesão premium quando existe um. Esses fatos são independentes: um material comum coletado registra o coletor sem ganhar assinatura, e um estoque antigo assinado pode nomear seu assinante dizendo honestamente que nenhum coletor foi registrado. Uma peça pronta, por sua vez, informa quem a criou. Esses registros viajam com o item por trocas, banco, correio, Mercado Mundial e até recompra de vendedor, e nunca desaparecem.\n\nA coleta assina automaticamente seu melhor trabalho: qualquer colheita que role rara ou superior chega assinada, e achados raros assinam todo o ganho de cinco unidades. A rolagem de sorte de uma coleta de cadáver assina seu rendimento quando a família não tem um espécime, e, quando tem, mantém o rendimento comum e cria ao lado dele o espécime imaculado assinado. A criação assina do mesmo modo: toda cópia de uma saída rara ou superior cria uma versão assinada, e uma obra-prima sempre assina qualquer qualidade, então a melhor versão de qualquer peça sempre nomeia seu criador. A assinatura de um material comum acompanha as próprias unidades e não pode ser perdida só porque uma pilha compatível já contém outro coletor ou assinante. Um espécime imaculado distinto é um item separado e ainda precisa de espaço; se não couber, o rendimento comum do cadáver fica, mas o espécime se perde.\n\nItens prontos mantêm uma identidade estrita, então duas cópias só se juntam quando todas as marcas coincidem exatamente: mesmo item, mesmo assinante, mesmos atributos de obra-prima, mesmo encantamento e mesmo vínculo. Materiais compatíveis compartilham um espaço entre coletores e assinantes, mantendo uma contagem para cada origem. O tooltip ao passar o mouse resume as origens; clique com o botão direito na pilha para a lista completa (no toque, use o botão Origens). Separar por coletor mantém essas pilhas distintas nas bolsas, e a ordenação respeita essa escolha. Material transferido pode formar pilha normalmente com os materiais do destinatário.\n\nAssinaturas retribuem artesãos: ter qualquer unidade assinada de um reagente necessário, independentemente de quem a assinou, nas bolsas ou no Depósito de Materiais, onde a fabricação possa utilizá-la, adiciona 2 pontos percentuais à chance de obra-prima, e manter um reagente assinado por você reduz em um a quantidade necessária daquele reagente, nunca abaixo de um, a menos que ele esteja marcado sem desconto; núcleos de raide sempre mantêm o custo completo. Seu próprio trabalho raro ou superior assinado também continua ensinando, hoje apenas por meio de poções criadas: beba uma poção rara que você preparou e assinou e um pequeno fluxo de habilidade volta à profissão que a criou, desde que ela seja uma das suas principais ativas. É realmente apenas o braço das poções: um elixir, um pergaminho ou um frasco de ápice não ensina nada de volta, por mais fina que seja sua assinatura.',
   'guide.profPages.effectFeast':
     'Coloca um banquete para outros comerem, uma porção para cada pessoa: {servings} porções, com duração de {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -20037,4 +20080,250 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Efetiva: {effective} | Sobrecura: {overheal} ({overhealPercent}) | Acertos: {hits} ({critPercent} crítico)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Acertos: {hits} | Críticos: {crits} ({critPercent}) | Média: {average} | Mín./máx.: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volume do ambiente',
+  'hudChrome.mapAtlas.resizeRailAria': 'Largura da barra lateral do mapa',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Arraste para redimensionar a barra lateral do mapa. Clique duas vezes para redefinir.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Uma vez a cada três horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas de combate livre em quinze minutos, e seu círculo é marcado em terreno aberto. Ela permanece por quarenta e cinco minutos e depois desaparece. Enquanto isso, a cada cinco minutos são anunciados sua localização e os grupos com os maiores tempos totais de controle. O grupo com mais jogadores dentro do círculo disputa a colina e a captura após acumular trinta segundos de superioridade numérica. A entrada de um grupo rival apenas pausa a contagem até o seu voltar à liderança; ela só recomeça do zero se não restar nenhum integrante vivo do seu grupo dentro do círculo. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raide não contam. Cada membro do grupo que controla a colina e está dentro recebe a mesma quantidade de Honra por minuto, independentemente do tempo de controle. Um grupo completo que a mantenha sem oposição durante toda a sua existência ganha aproximadamente o mesmo que por três vitórias em campos de batalha. Quando ela desaparece, se o grupo com o maior tempo total de controle acumulou pelo menos dez minutos, todos que ficaram dentro por pelo menos um minuto durante o controle desse grupo e ainda fazem parte dele recebem uma vitória para a linha de PvP do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, a quantidade de jogadores dos dois lados e a contagem de captura; /hill no chat informa onde ela está.',
+  'errors.noUpdateFound': 'Nenhuma atualização encontrada. Tente novamente em breve.',
+  'errors.searchUpdates': 'Buscar atualizações',
+  'errors.updateSearchFailed': 'Não foi possível verificar as atualizações. Tente novamente.',
+  'errors.updateUnavailable': 'Atualize pela sua loja de jogos ou baixe o cliente mais recente.',
+  'hudChrome.auraEffect.formSporemender':
+    'Forma de Curandeiro de Esporos: cura aumentada em {pct}%, armadura aumentada em {armorPct}% e velocidade de movimento reduzida em {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Itens bloqueados ficam no mesmo espaço da bolsa. Desbloqueie para movê-los.',
+  'hudChrome.death.pvpResurrect': 'Ressurreição JxJ',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Ressurreição JxJ pronta: você reviverá no cemitério mais próximo.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Reviva no cemitério mais próximo com a vida cheia, sem um novo Tributo do Guardião.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Ressurreição JxJ ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Você poderá ressuscitar em JxJ em {seconds}: reviverá no cemitério mais próximo.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Mudança de dificuldade pendente cancelada porque o grupo ou o líder mudou.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Mudança de dificuldade na fila porque alguém ou seu cadáver ainda está lá dentro. Será aplicada quando as instâncias estiverem vazias.',
+  'hudChrome.ferry.arrivesIn': 'A balsa chega em {time}',
+  'hudChrome.ferry.boardNow': 'Embarcar agora',
+  'hudChrome.ferry.destination': 'Destino: {dest}',
+  'hudChrome.ferry.portLabel': 'Balsa de {port} para {dest}',
+  'hudChrome.ferry.portTitle': 'Porto de balsas de {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Horários da balsa indisponíveis.',
+  'hudChrome.graphicsRestore.note': 'Restaurando gráficos',
+  'hudChrome.hill.contestOtherPaused': 'Rival em pausa: {seconds} de {total}',
+  'hudChrome.hill.contestYouPaused': 'Em pausa: {seconds} de {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Obtido de {name}',
+  'hudChrome.keybindLayout.apply': 'Converter atalhos',
+  'hudChrome.keybindLayout.converted': 'Atalhos convertidos de {from} para {to}.',
+  'hudChrome.keybindLayout.from': 'Atalhos feitos para',
+  'hudChrome.keybindLayout.help':
+    'Cada atalho vai para a tecla que escreve o mesmo caractere no novo layout. A fileira de números fica no lugar. Os nomes nesta lista são posições QWERTY; o esquema do teclado mostra seu próprio layout.',
+  'hudChrome.keybindLayout.keepMovement': 'Manter teclas de movimento no lugar',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'As teclas de movimento ficaram no lugar da última vez e ficarão novamente. Restaure os padrões para recomeçar.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belga)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (francês)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Layout Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Layout Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brasileiro ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (dinamarquês)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (espanhol)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italiano)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norueguês)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (sueco, finlandês)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (português)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turco)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Reino Unido)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Estados Unidos)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (suíço)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (alemão)',
+  'hudChrome.keybindLayout.moves': 'Atalhos que mudarão de lugar: {count}',
+  'hudChrome.keybindLayout.noChange': 'Nenhum atalho muda entre estes layouts.',
+  'hudChrome.keybindLayout.open': 'Converter',
+  'hudChrome.keybindLayout.title': 'Layout do teclado',
+  'hudChrome.keybindLayout.to': 'Converter para',
+  'hudChrome.nameplate.bountyTag': 'Recompensa pela cabeça',
+  'hudChrome.options.classicCombatText': 'Texto de combate clássico',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Itens abaixo desta qualidade são vendidos com um clique. Você pode recomprar um item vendido por engano, exceto itens cinzentos sem assinatura.',
+  'hudChrome.options.spellEffects': 'Efeitos de feitiços',
+  'hudChrome.options.spellTooltipOnHover': 'Descrições de feitiços ao passar o cursor',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.realmMotd.cleared': 'Mensagem do dia removida.',
+  'hudChrome.realmMotd.line': 'Mensagem do dia: {text}',
+  'hudChrome.realmMotd.none': 'Nenhuma mensagem do dia definida.',
+  'hudChrome.realmMotd.saveFailed':
+    'Não foi possível salvar a mensagem do dia; ela será perdida ao reiniciar.',
+  'hudChrome.realmMotd.tooLong': 'A mensagem do dia é limitada a {max} caracteres.',
+  'hudChrome.realmMotd.updated': 'Mensagem do dia atualizada.',
+  'hudChrome.realmMotd.usage': 'Uso: /motd "<mensagem>" para definir, /motd clear para remover.',
+  'hudChrome.skullBag.clickOpen': 'Clique para abrir',
+  'hudChrome.skullBag.close': 'Fechar a Bolsa de Crânios',
+  'hudChrome.skullBag.empty':
+    'Vazia. Enquanto você carregar a bolsa, os crânios saqueados vão direto para ela.',
+  'hudChrome.skullBag.notCarried':
+    'Carregue a Bolsa de Crânios no inventário para guardar ou retirar crânios.',
+  'hudChrome.skullBag.store': 'Guardar crânios carregados ({count})',
+  'hudChrome.skullBag.storeNone': 'Nenhum crânio para guardar',
+  'hudChrome.skullBag.takeAll': 'Retirar todos',
+  'hudChrome.skullBag.takeAllAria': 'Retirar todos: {item}',
+  'hudChrome.skullBag.takeOne': 'Retirar 1',
+  'hudChrome.skullBag.takeOneAria': 'Retirar 1: {item}',
+  'hudChrome.skullBag.title': 'Bolsa de Crânios',
+  'hudChrome.skullBag.tooltip':
+    'Guarda qualquer quantidade de Crânios de Troféu sem ocupar espaço nas bolsas. Enquanto estiver no inventário, os crânios saqueados vão direto para ela. Clique na bolsa para guardar ou retirar crânios.',
+  'hudChrome.skullBag.total': 'Crânios: {count}',
+  'hudChrome.skullBag.unrecorded': 'Crânio de Troféu',
+  'hudChrome.treasureMap.inkPickerCancel': 'Cancelar',
+  'hudChrome.treasureMap.inkPickerCost': 'Redesenhar para {rarity}: {inks} de tinta',
+  'hudChrome.treasureMap.inkPickerHeld': 'Você tem {held} de Tinta de Cartógrafo.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Em acompanhamento: o X fica em {zone}. O X não muda de lugar.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Em qual mapa usar a Tinta de Cartógrafo?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Não lido ({count} em posse)',
+  'hudChrome.warfare.reasons.worldQuest': 'missão mundial',
+  'hudChrome.warfareShop.goods': 'Mercadorias',
+  'hudChrome.weeklyRewards.allClassGear': 'Equipamento de todas as classes',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} vitórias JxJ',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} vitória JxJ',
+  'hudChrome.weeklyRewards.lootFocus': 'Foco de saque',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Aplica-se apenas a cofres ainda não abertos.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': 'Nenhum saque elegível. Escolha outro foco.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Obtenha {count} vitórias JxJ',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Obtenha {count} vitória JxJ',
+  'hudChrome.weeklyRewards.rolledFocus': 'Sorteado para: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Sequência JxJ atual: {time} jogados (em pausa em um santuário)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Sequência JxJ atual: {time} jogados (em pausa enquanto morto)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Sequência JxJ atual: {time} jogados (em pausa em instâncias JxA)',
+  'hudChrome.worldPvp.rewardProgress': 'Sequência JxJ atual: {time} jogados',
+  'hudChrome.worldPvp.rewardTitles':
+    'Ganhe títulos permanentes após {thresholds} de jogo com JxJ mundial ativo no mundo aberto ou em instâncias JxJ. Sair, morrer, instâncias JxA e santuários pausam o contador. Desativar reinicia o contador.',
+  'hudChrome.worldPvp.skullName': 'Crânio de {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Se ambos estiverem marcados, o ouro do golpe fatal cai no corpo junto com o crânio do perdedor.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Itens cinzentos sem assinatura não entram na lista de recompra, portanto a venda não pode ser desfeita.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Suas bolsas estão cheias. Sua recompensa foi enviada à caixa de correio: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Seus feitiços podem ativar Dádiva da Natureza por 10 s: o feitiço indicado fica gratuito, 25% mais forte e utilizável em qualquer forma. Uma nova ativação renova a duração.',
+  'entities.abilities.natures_boon.name': 'Dádiva da Natureza',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Cada Raio Selvagem ou Queda Celeste lançado tem 10% de chance de ativá-la para Explosão de Esporos, no máximo uma vez a cada 10 s.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Cada ataque automático corpo a corpo que acerta tem 1 chance em 15 de ativá-la para Cura de Esporos, ou para Pele de Carvalho na Forma de Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Cada pulso dos seus efeitos de cura ao longo do tempo tem 10% de chance de ativá-la para Explosão de Esporos, no máximo uma vez a cada 10 s.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Consome seus 5 de Verdor: cada aliado com seus efeitos de cura ao longo do tempo recebe instantaneamente {buff}% da cura restante, os efeitos são removidos e o alvo recebe uma nova Cura de Esporos.',
+  'entities.abilities.play_dead.description':
+    'Cai no chão e finge estar morto: sua vida e seu foco aparecem vazios para todos. Os inimigos se esquecem de você, e jogadores inimigos que têm você como alvo perdem o alvo. Mover-se, atacar ou usar outra habilidade encerra o efeito. Se lançado em movimento, você tem 1 s para parar antes que o movimento o encerre. Lançar de novo faz você se levantar.',
+  'entities.abilities.play_dead.name': 'Fingir de morto',
+  'entities.abilities.rejuvenation.name': 'Cura de Esporos',
+  'entities.abilities.scratch.description':
+    'Arranha os alvos próximos em até 6 m, causando dano da arma mais {damage}. Concede 1 ponto de combo por alvo atingido. Revela inimigos furtivos na varredura. Apenas na Forma Felina.',
+  'entities.abilities.scratch.name': 'Arranhão',
+  'entities.abilities.scratch.specNote_feral': 'Cada acerto adiciona 1 Sangue Antigo (máximo 3).',
+  'entities.abilities.spore_burst.description':
+    'Invoca um cogumelo explosivo na área alvo. Após {duration} s ele explode, curando aliados em {healing} e causando {damage} de dano de Natureza aos inimigos em até 8 m.',
+  'entities.abilities.spore_burst.name': 'Explosão de Esporos',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Com 3 de Maré Lunar, fica 25% mais forte e consome sua Maré Lunar.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Também aplica Cura de Esporos a cada aliado curado. Com Verdor cheio, fica 25% mais forte e consome seu Verdor.',
+  'entities.abilities.sporemender_form.description':
+    'Transforme-se em um Curandeiro de Esporos, aumentando sua cura em 20% e armadura em 40%, mas reduzindo a velocidade de movimento em 20%. Todos os feitiços da forma de conjurador continuam disponíveis. Dura até você mudar de forma. Toda transformação concede Passo ligeiro, um breve aumento de velocidade. Use de novo para voltar à forma de conjurador. (Assinatura de Restauração)',
+  'entities.abilities.sporemender_form.name': 'Forma de Curandeiro de Esporos',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Consome um efeito de cura ao longo do tempo em um aliado para curá-lo em {damage}. Aplicações de Cura de Esporos e Segundo Florescer adicionam Verdor; com 5 de Verdor este botão vira Superflorescência, que cura instantaneamente cada aliado com seus efeitos de cura ao longo do tempo em 60% da cura restante. (Assinatura de Restauração)',
+  'entities.abilities.tactical_camo.description':
+    'Misture-se ao ambiente: inimigos mal percebem você, e sua velocidade é de 80%. Atacar ou receber dano rompe Camuflagem Tática. Use de novo para sair. (Sobrevivência)',
+  'entities.abilities.tactical_camo.name': 'Camuflagem Tática',
+  'entities.itemSets.grovespring.bonus2':
+    'Recuperação Rápida consome primeiro sua própria Cura de Esporos ou Segundo Florescer e cura 25 por cento a mais. O dano recebido não atrasa mais seus feitiços.',
+  'entities.items.pvp_skull_bag.name': 'Bolsa de Crânios',
+  'entities.items.pvp_trophy_skull.name': 'Crânio de Troféu',
+  'entities.letters.world_quest_reward.body':
+    'Suas bolsas estavam cheias quando você ganhou esta recompensa de missão mundial, então os corvos a trouxeram aqui. Abra espaço e retire-a em qualquer pilar dos corvos.\n\n- O Correio dos Corvos',
+  'entities.letters.world_quest_reward.sender': 'O Correio dos Corvos',
+  'entities.letters.world_quest_reward.subject': 'Sua recompensa de missão mundial',
+  'guide.classPage.formLine.form_sporemender':
+    'A forma curativa de Restauração: pele mais resistente e cura mais forte com passos mais lentos, mantendo todos os feitiços e seu mana.',
+  'guide.classPage.formName.form_sporemender': 'Forma de Curandeiro de Esporos',
+  'guide.economy.junkBodyFinal':
+    'Os itens que você não usa ainda podem ser vendidos a qualquer mercador com loja própria. Esvazie as bolsas sempre que passar pela cidade. A janela do mercador tem até um botão Vender Sucata que vende todos os objetos de qualidade Ruim com um clique. Você também pode descartar itens sem valor para abrir espaço. Itens cinzentos sem assinatura vendidos assim não entram na lista de recompra; confira se queria guardar algo antes de clicar.',
+  'guide.models.formSporemender': 'Forma de Curandeiro de Esporos',
+  'guide.settingsPage.ifClassicCombatText':
+    'Traz de volta os números de dano simples, brancos e dourados claros, que sobem em linha reta. Deixe desativado (padrão) para números mais fortes que se abrem para os lados, com brilhos nos acertos críticos ou excepcionalmente grandes.',
+  'guide.settingsPage.rowSpellEffects':
+    'O brilho, as faíscas, os projéteis e as explosões de impacto dos feitiços de jogadores e seus ajudantes, incluindo os seus. Desative para uma tela mais calma ou alguns quadros extras nas grandes lutas em grupo. Tudo que um inimigo conjura continua visível, assim como os círculos de perigo, as marcas sobre alvos atordoados, amedrontados ou enraizados e todas as barras de conjuração.',
+  'questUi.dialog.attuneHearthstone': 'Sintonizar minha Pedra de Regresso Aliada aqui.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Sintonize sua Pedra de Regresso Aliada com {hub} por meio de {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Sua Pedra de Regresso Aliada não está sintonizada. Fale com um intendente aliado ou use-a em um centro aliado.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Sua Pedra de Regresso Aliada agora está sintonizada com {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport':
+    'A pedra de regresso transporta você para {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    'Esse item ainda não está pronto (faltam {minutes} min).',
+  'hudChrome.weekly.completedLastWeek': 'Concluído na semana passada',
+  'hudChrome.weekly.claimFirst': 'Resgatar primeiro',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} de reputação da semana passada ainda não resgatada. Resgate para escolher uma nova carga.',
+  'hudChrome.options.rawMouseInput': 'Entrada direta do mouse',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Lê o movimento diretamente do mouse enquanto você arrasta para girar a câmera, sem aplicar a velocidade e a aceleração do ponteiro do sistema, para giros mais estáveis. Desative para usar as configurações de mouse do sistema. Só funciona com Bloquear cursor ao girar ativado e não é compatível com todos os navegadores ou sistemas.',
+  'entities.items.infernal_quiver.name': 'Aljava infernal',
+  'graphicsPrompt.title': 'Escolha seus gráficos',
+  'graphicsPrompt.intro':
+    'Escolha uma predefinição gráfica para este dispositivo. As mais baixas oferecem maior fluidez; as mais altas, visuais mais ricos.',
+  'graphicsPrompt.autoDesc':
+    'Escolhe uma predefinição adequada para este dispositivo. Detectada: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'A maior fluidez. Ideal para celulares, tablets e placas gráficas antigas ou integradas.',
+  'graphicsPrompt.mediumDesc':
+    'Um equilíbrio entre visual e desempenho. Adequado para a maioria dos notebooks.',
+  'graphicsPrompt.highDesc':
+    'Mais detalhes e cenários mais completos. Adequado para uma placa gráfica dedicada.',
+  'graphicsPrompt.ultraDesc':
+    'A predefinição fixa mais rica em detalhes. Adequado para uma placa gráfica de alto desempenho.',
+  'graphicsPrompt.changeLater':
+    'Você pode alterar isso a qualquer momento em Opções, em Qualidade gráfica.',
+  'graphicsPrompt.confirm': 'Continuar',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Armadilha de Urso',
+  'entities.abilities.bear_trap.description':
+    'Coloca uma armadilha no local selecionado. Ela se arma após 0,75 s e dura 1 min; apenas você e seu grupo podem vê-la. O primeiro inimigo que a ativar sofre sangramento de {damage} de dano Físico ao longo de 15 s e fica 50% mais lento por 4 s. O dano aumenta com o Poder de Ataque à Distância. Apenas uma Armadilha de Urso pode ficar ativa por vez. Ela pode coexistir com sua Armadilha Presa Gélida. Colocar outra Armadilha de Urso substitui a anterior.',
+  'entities.abilities.scatterbolt.name': 'Leque de Virotes',
+  'entities.abilities.scatterbolt.description':
+    'Dispara uma chuva de virotes em um cone de 90 graus que alcança 8 metros à sua frente, repelindo os inimigos até uma distância máxima de 20 metros de você. Inimigos imunes a repulsão não são afetados. Não causa dano.',
+  'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
+  'entities.abilities.phosphor_flask.description':
+    'Um recipiente selado com uma mistura química reativa que irrompe em chamas incandescentes sobre uma área de 8 m por 3 s. Os inimigos nas chamas sofrem {damage} de dano de Fogo a cada 0,5 s. O dano aumenta com o poder de ataque à distância.',
+  'entities.items.lychgate_buckler.name': 'Broquel do portão do cemitério',
+  'entities.items.bastion_kite_shield.name': 'Escudo de pipa do bastião',
+  'entities.items.barrowfield_tower_shield.name': 'Escudo torre do Campo dos Túmulos',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barra de recursos',
+  'hudChrome.options.hillBarOpacity': 'Opacidade do fundo do Rei da Colina',
+  'hudChrome.options.playerFrameResourceDetached': 'Separar barra de recursos',
+  'hudChrome.options.playerFrameResourceHeight': 'Altura da barra de recursos',
+  'hudChrome.options.playerFrameResourceWidth': 'Largura da barra de recursos',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Ative Separar barra de recursos na aba Quadros para que Editar Quadros também libere sua barra de recursos, permitindo posicionar mana, energia ou raiva separadamente onde quiser. Largura da barra de recursos e Altura da barra de recursos, na mesma aba, ajustam seu tamanho. Editar Quadros também libera a barra do Rei da Colina; Opacidade do fundo do Rei da Colina, nessa aba, esmaece o painel sem prejudicar a leitura do texto.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

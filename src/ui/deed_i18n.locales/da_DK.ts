@@ -1162,4 +1162,38 @@ export const table: DeedLocaleTable = {
     name: 'Pågrebet på Fersk Gerning',
     desc: 'Fang en Møntposekryber i en Begravet Hoard, før den stikker af med guldet.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Klarere end skyggerne',
+    desc: 'Find de stjalne pengepunge og undslip Evergarden-labyrinten pa Hard.',
+  },
+  prog_titan: {
+    name: 'Kæmpe',
+    desc: 'Optjen i alt 10.000.000 erfaringspoint i din levetid.',
+    title: 'Kæmpe',
+  },
+  pvp_flag_1h: {
+    name: 'Dristig',
+    desc: 'Hold Verdens-PvP slået til i 1 time spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Dristig',
+  },
+  pvp_flag_3h: {
+    name: 'Trodsig',
+    desc: 'Hold Verdens-PvP slået til i 3 timer spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Trodsig',
+  },
+  pvp_flag_6h: {
+    name: 'Frygtløs',
+    desc: 'Hold Verdens-PvP slået til i 6 timer spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Frygtløs',
+  },
+  pvp_flag_24h: {
+    name: 'Ubøjelig',
+    desc: 'Hold Verdens-PvP slået til i 24 timer spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Ubøjelig',
+  },
+  pvp_flag_168h: {
+    name: 'Uovervindelig',
+    desc: 'Hold Verdens-PvP slået til i 7 dage spilletid, mens du er i live i den åbne verden eller en PvP-kamp. Helligdomme, PvE-instanser, død og udlogning sætter fremskridt på pause; at slå det fra nulstiller dem. Optjente titler er permanente.',
+    title: 'Uovervindelig',
+  },
 };

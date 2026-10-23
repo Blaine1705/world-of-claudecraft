@@ -122,7 +122,11 @@ import {
 } from './market_backfill';
 import { MARKET_SOLD_VOLUME_SCHEMA } from './market_sold_volume_db';
 import { materialSourceConnection } from './material_source_connection';
-import { applyMaterialSourceSchema, applyMaterialSourceWriterGuard } from './material_source_host';
+import {
+  applyMaterialSourceSchema,
+  applyMaterialSourceWriterGuard,
+  prepareMaterialSourceWriterUpgrade,
+} from './material_source_host';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { runOfflineCharacterSave } from './offline_character_save_db';
 import { PLAY_SESSION_RETENTION_SCHEMA } from './play_session_retention_db';
@@ -137,10 +141,12 @@ import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { REALM_BUILDER_SCHEMA } from './realm_builder_db';
+import { REALM_MOTD_SCHEMA } from './realm_motd_db';
 import { chooseArchiveName } from './reclaim_name';
 import { attachSchemaNoticeForwarder } from './schema_notices';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
+import { STAFF_WATCHLIST_SCHEMA } from './staff_watchlist_db';
 import {
   STORAGE_PURCHASE_SCHEMA,
   type StorageAppliedEffect,
@@ -1253,16 +1259,12 @@ export async function ensureSchema(): Promise<void> {
     // failure (end() on a never-connected client is a harmless no-op).
     await client.connect();
     await client.query('BEGIN');
-    // Boot DDL serializes on the advisory lock across every realm process, so it
-    // can legitimately wait far longer than any per-request budget. The dedicated
-    // client above escapes the pool's timeouts; this SET LOCAL additionally
-    // overrides any database- or role-level statement_timeout an operator may
-    // have set server-side (SET LOCAL reverts at COMMIT).
+    // Boot serializes across realms outside request budgets. Override role/DB
+    // deadlines for this transaction; SET LOCAL reverts at COMMIT.
     await client.query('SET LOCAL statement_timeout = 0');
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+    await prepareMaterialSourceWriterUpgrade(client, pool);
     await client.query(SCHEMA);
-    // The material source audit's anchor + journal pair: after SCHEMA (it
-    // FK-references characters), before the growth budget that must count it.
     await applyMaterialSourceSchema(client);
     await client.query(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
     // Local-recovery reports reference accounts/characters, so their additive
@@ -1300,6 +1302,9 @@ export async function ensureSchema(): Promise<void> {
     // them" column, so it runs after SCHEMA. Bounded at one row a month and
     // deliberately keep-forever: deleting an old row erases a real award.
     await client.query(REALM_BUILDER_SCHEMA);
+    // The admin-set realm message of the day (server/realm_motd.ts): one row
+    // per realm, FK-references accounts(id) for who set it, so after SCHEMA.
+    await client.query(REALM_MOTD_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
@@ -1315,6 +1320,9 @@ export async function ensureSchema(): Promise<void> {
     // (idempotent), like the Discord tables.
     await client.query(GITHUB_SCHEMA);
     await client.query(GENERAL_CHAT_QUOTA_SCHEMA);
+    // The in-game /watch staff watchlist (server/staff_watchlist_db.ts).
+    // FK-references accounts(id), so it runs after SCHEMA.
+    await client.query(STAFF_WATCHLIST_SCHEMA);
     // Tier-2 global rate-limit backstop table (pg-backed fixed-window counters,
     // one row per (policy, key)) for the multi-realm deployment. Applied
     // unconditionally (idempotent), like the Discord/GitHub tables. See

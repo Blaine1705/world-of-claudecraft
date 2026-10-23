@@ -661,6 +661,20 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     // a ~4.7yd invisible ring around each ~2.5yd post and blocked the open
     // grass beside the gate (live-playtest "invisible wall").
     expect(gate).toHaveLength(6);
+    // Pin the restored pre-#4297 layout so a partial withdrawal cannot leave
+    // either the stone-foot positions or their smaller radii behind.
+    for (const [index, [dx, dz]] of [
+      [-12.5, -5],
+      [-12.5, -0.5],
+      [-12.5, 4],
+      [12.5, -5],
+      [12.5, -0.5],
+      [12.5, 4],
+    ].entries()) {
+      expect(gate[index].x).toBeCloseTo(dx * 1.1, 10);
+      expect(gate[index].z).toBeCloseTo(16 + dz * 1.1, 10);
+      expect(gate[index].r).toBeCloseTo(2.4 * 1.1, 10);
+    }
     for (const post of gate) expect(post.r).toBeLessThanOrEqual(2.7);
     const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
     // Beside the east pylon (just past the pillar's push zone: post r 2.64 +

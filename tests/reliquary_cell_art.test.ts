@@ -194,7 +194,9 @@ describe('title relics resolve the deed crest', () => {
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
     // The three faction Champion titles (world quests, art-pending on the
     // progression crest) follow them on the shelf, then the Clue Scroll
-    // Treasure Hunter title (art-pending on the exploration crest).
+    // Treasure Hunter title (art-pending on the exploration crest), then the
+    // sixth lifetime-XP rung's Titan title (art-pending on the progression
+    // crest).
     expect(pending, 'artless shelf titles must be the pinned art-pending set').toEqual([
       'exp_arcane_calligraphy_gold',
       'dgn_varkhul_flawless',
@@ -202,6 +204,12 @@ describe('title relics resolve the deed crest', () => {
       'prog_church_order_champion',
       'prog_automatons_champion',
       'exp_clue_ten_caskets',
+      'prog_titan',
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
     ]);
     for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {
@@ -560,14 +568,15 @@ describe('unknown ids fall through to the caller fallback', () => {
     }
     // The completion wave left no catalogued relic on procedural art. Any
     // future growth is a deliberate exact-set edit here and in the debt ledger.
-    // Open wave: the 135 Warfare Season 2 armor pieces (Vanguard Gallery),
-    // parked on ITEM_ART_PENDING for the follow-up art pass.
+    // Open waves: the 135 Warfare Season 2 armor pieces (Vanguard Gallery),
+    // parked on ITEM_ART_PENDING for the follow-up art pass, and the Crucible
+    // hunter quiver on the Varkhul Heroic page, owed by the next item-art pass.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(
       [...procedural].sort(),
       `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
-    ).toEqual([...season2Armor].sort());
-    expect(procedural).toHaveLength(135);
+    ).toEqual([...season2Armor, 'infernal_quiver'].sort());
+    expect(procedural).toHaveLength(136);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {

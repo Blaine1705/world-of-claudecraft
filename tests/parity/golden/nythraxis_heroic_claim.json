@@ -760,8 +760,8 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "445286af",
-      "events": "3b126ae3",
+      "state": "11f6b13b",
+      "events": "36881bf1",
       "rng": {
         "draws": 14,
         "digest": "31372acd"
@@ -904,14 +904,11 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1101,6 +1098,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1109,10 +1107,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1298,6 +1292,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1306,10 +1301,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1495,6 +1486,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1503,10 +1495,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1692,6 +1680,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1700,10 +1689,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2068,15 +2053,6 @@
             ]
           },
           "lootFfaTimer": 59.95,
-          "lootPartyTradeEligibility": {
-            "names": [
-              "HeroicTank",
-              "HeroicDps0",
-              "HeroicDps1",
-              "HeroicDps2",
-              "HeroicDps3"
-            ]
-          },
           "lootRecipientIds": [
             1010,
             1011,
@@ -2120,7 +2096,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "445286af",
+      "state": "11f6b13b",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -2264,14 +2240,11 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2461,6 +2434,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -2469,10 +2443,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2658,6 +2628,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -2666,10 +2637,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2855,6 +2822,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -2863,10 +2831,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -3052,6 +3016,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -3060,10 +3025,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -3428,15 +3389,6 @@
             ]
           },
           "lootFfaTimer": 59.95,
-          "lootPartyTradeEligibility": {
-            "names": [
-              "HeroicTank",
-              "HeroicDps0",
-              "HeroicDps1",
-              "HeroicDps2",
-              "HeroicDps3"
-            ]
-          },
           "lootRecipientIds": [
             1010,
             1011,

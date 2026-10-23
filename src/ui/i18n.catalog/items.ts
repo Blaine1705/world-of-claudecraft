@@ -386,13 +386,12 @@ const itemStringsEn = {
       collectAll: 'Collect All',
       // The History tab: the itemized sale ledger, split out of Collect so a
       // completed sale stays visible after its proceeds are claimed. saleOlder
-      // covers the rows the ledger cap dropped, whose gold IS still counted in
-      // the Collect tab's proceeds total.
+      // covers the oldest rows the ledger cap dropped.
       history: 'History',
       historyEmpty: 'No sales yet. Items you sell on the World Market show up here.',
       historyNote: 'Your recent sales on the World Market.',
       saleBuyer: 'Sold to {buyer}',
-      saleOlder: 'Plus {count} earlier sales, included in the total.',
+      saleOlder: 'Plus {count} earlier sales not listed.',
       // The Wanted tab (src/sim/market_orders.ts): buy orders and the not-on-the-
       // market strip. Place card, order rows (Deliver / Withdraw), and the strip.
       ordersTab: 'Wanted',
@@ -3374,6 +3373,16 @@ const ITEM_ENTITY_IDS = [
   'vanguard_oath_blade',
   'vanguard_fang_dagger',
   'vanguard_warstaff',
+  // The Crucible raid's hunter quiver (content/ignivar_loot.ts), appended at
+  // the END under the append-only contract; resolves BY KEY. The name is
+  // wordy English, so its M16 non-Latin fills land in the overlays.
+  'infernal_quiver',
+  // The three leveling quest shields (content/quest_shields.ts), appended at the
+  // END under the append-only contract; resolve BY KEY. The names are wordy
+  // English, so their M16 non-Latin fills land in the overlays.
+  'lychgate_buckler',
+  'bastion_kite_shield',
+  'barrowfield_tower_shield',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4309,6 +4318,10 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_oath_blade: "Vanguard's Oath",
   vanguard_fang_dagger: "Vanguard's Fang",
   vanguard_warstaff: "Vanguard's Warstaff",
+  infernal_quiver: 'Infernal Quiver',
+  lychgate_buckler: 'Lychgate Buckler',
+  bastion_kite_shield: 'Bastion Kite Shield',
+  barrowfield_tower_shield: 'Barrowfield Tower Shield',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -194,6 +194,11 @@ export const TRINKET_AURA_ITEM: Readonly<Record<string, string>> = Object.freeze
   [TRINKET_AURA.guardHeat]: 'heart_of_the_crucible',
 });
 
+/** Successful medallion use provenance, aged by the existing cooldown engine.
+ * Equip/inherited lockouts never mint it. Hidden from ability readouts; the
+ * ordinary trinket gate may outlive this actual-use timer after a swap. */
+export const MEDALLION_USE_COOLDOWN_KEY = 'system_medallion_use';
+
 /** The cooldown key a trinket's use rides in the wearer's cooldown map (wired to
  *  the client and persisted like an ability's). */
 export function trinketCooldownKey(itemId: string): string {
@@ -218,7 +223,6 @@ const trinket = (
   requiredLevel: 20,
   stats,
   sellValue: 4500,
-  soulbound: true,
 });
 
 // Stat values are the item-level budget of each trinket's source (checked by
@@ -244,6 +248,7 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   wayfarers_lodestone: trinket('wayfarers_lodestone', "Wayfarer's Lodestone", { spi: 11 }),
   medallion_of_defiance: {
     ...trinket('medallion_of_defiance', 'Medallion of Defiance', { sta: 10 }),
+    soulbound: true,
     pvpOffenseRating: 13,
     pvpDefenseRating: 13,
     priceHonor: 800,
@@ -251,6 +256,7 @@ export const TRINKET_ITEMS: Record<string, ItemDef> = {
   },
   duelists_brand: {
     ...trinket('duelists_brand', "Duelist's Brand", { agi: 10 }),
+    soulbound: true,
     pvpOffenseRating: 13,
     pvpDefenseRating: 13,
     priceHonor: 800,
