@@ -169,6 +169,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/campfire_flame.ts': 1,
   // the brazier flame's taper ramp
   'src/render/placed_assets.ts': 1,
+  // the spirit veil's fresnel rim (base 1.0 - clamp(x, 0.0, 1.0))
+  'src/render/characters/ghost_veil.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/hoard_entrance.ts': 3,
   // the Buried Hoard glow cards, sparks, reward-chest rays and column (bases

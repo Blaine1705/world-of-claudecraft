@@ -196,6 +196,15 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // Hall's three contract milestones and three quartermaster titles came after it, on the
     // pending ledger until their paintings are commissioned.
     expect([...DEED_ART_PENDING]).toEqual([
+      'prog_titan',
+      // World PvP streak titles currently use the PvP category crest.
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
+      // The hard Wisp Maze deed rides the exploration category crest.
+      'exp_wisp_maze_hard',
       'dgn_guild_first_contract',
       'dgn_guild_ten_contracts',
       'dgn_guild_fifty_contracts',
@@ -203,7 +212,7 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'feat_guild_hallsworn',
       'feat_guild_of_lantern_hall',
     ]);
-    expect(DEED_ORDER).toHaveLength(352);
+    expect(DEED_ORDER).toHaveLength(359);
     expect(DEED_IMAGE_IDS.size).toBe(346);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

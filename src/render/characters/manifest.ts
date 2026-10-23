@@ -1512,6 +1512,7 @@ const DRUID_CAT_FORM: ClipMap = {
   attack: ['Attack_Left', 'Attack_Right'],
   attackByAbility: {
     claw: 'Attack_Left',
+    scratch: 'Attack_Left',
     rake: 'Attack_Right',
     ferocious_bite: 'Bite',
     rip: 'Finisher',
@@ -2123,6 +2124,10 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   votive_ward_of_the_deathless_court: 'shield_rare_b_violet', // Nythraxis gap-fill healer shield
   templar_dawn_shield: 'shield_rare_a_dawn', // Church Order quartermaster's mail shield (faction_vendors.ts)
   varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
+  // The leveling quest shields (content/quest_shields.ts), one per starting zone.
+  lychgate_buckler: 'shield_round',
+  bastion_kite_shield: 'shield_badge', // the pointed heater silhouette reads as a kite shield
+  barrowfield_tower_shield: 'shield_square',
 };
 
 /** Held-model GLBs whose materials are AUTHORED surfaces: a Tripo or Blender
@@ -2860,6 +2865,8 @@ export const VISUALS: Record<string, VisualDef> = {
         concussive_shot: 'Woc_Attack_Rifle',
         multi_shot: 'Woc_Attack_Rifle',
         shrapnel_charge: 'Woc_Attack_Rifle',
+        phosphor_flask: 'Woc_Attack_Rifle',
+        scatterbolt: 'Woc_Attack_Rifle',
       },
     },
     attach: [{ url: `${WEAPONS}/crossbow_starter.glb`, bone: 'handslot.r' }],
@@ -3268,6 +3275,36 @@ export const VISUALS: Record<string, VisualDef> = {
     swimHeadHeight: 1.74,
     attackTimeScale: 1,
     deathTimeScale: 1,
+  },
+  // Shaman Shadewolf keeps the original wolf and tint, drawn under the spirit
+  // veil's wolf palette (its tint shows through the kept colours).
+  // Druid Sporemender Form (Groveheart): the owner's concept redrawn in T-pose
+  // (Tripo image-to-image) and built, auto-rigged and retargeted by Tripo, so
+  // the skeleton is fitted to this short-torso chibi (the KayKit rig put the
+  // shoulders at face height and folded the arms into the robe). The rig was
+  // then post-processed: arm-chain weight stripped from the robe and satchels,
+  // the cap and face bound rigidly to the head, and both upper arms spread 30
+  // degrees in every clip so the hands clear the satchels. Tripo bipeds face
+  // +X; its slash and defeat presets run long (the Lich form's time scales).
+  // Auto-attack plays the Cast gesture: the form fights with the wand, and the
+  // slash preset buries the face under the cap. Jump is left out the same way
+  // as the Lich (airborne frames hold Idle). Same height as the player bodies.
+  form_sporemender: {
+    url: `${CREATURES}/sporemender_form.glb`,
+    height: HUMANOID_H,
+    yaw: -Math.PI / 2,
+    authoredAtlas: true,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Cast'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
   },
   // Shaman Shadewolf retains the original wolf, tint and ghost-material overlay.
   // Height: as mob_wolf (same file, same on-screen size).
@@ -8541,6 +8578,8 @@ export function authoredRigOverride(e: Entity): string | null {
   return e.kind === 'npc' && e.visualKey && VISUALS[e.visualKey] ? e.visualKey : null;
 }
 
+const MOB_FALLBACK_KEY = 'mob_bandit';
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
@@ -8558,6 +8597,34 @@ export function visualKeyFor(e: Entity): string {
   if (look) return npcBodyKey(look);
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';
+}
+
+/** The mob arm of visualKeyFor, by template id alone. */
+export function mobVisualKeyFor(templateId: string): string {
+  return mobVisualKey(templateId);
+}
+
+/** Every template id the mob dispatch names, including transient templates
+ *  that have no MOBS row (the Packlord Stampede guardians). */
+export function mobKeyTemplateIds(): string[] {
+  return Object.keys(MOB_KEYS);
+}
+
+/** The visual keys the dispatch reaches WITHOUT naming a mob template: the
+ *  family and global mob fallbacks and every NPC route (the table plus the two
+ *  defaults visualKeyFor returns). Any entity no content table describes can
+ *  land on one of these, so no content-derived class of keys
+ *  (rift_body_stream_core.ts) may ever claim them. */
+export function fallbackVisualKeys(): string[] {
+  return [
+    ...new Set([
+      ...Object.values(FAMILY_KEYS),
+      MOB_FALLBACK_KEY,
+      ...Object.values(NPC_KEYS),
+      'npc_villager',
+      'npc_aldric',
+    ]),
+  ];
 }
 
 /** Held-weapon layout override for the class-agnostic Combat Mech body. The mech

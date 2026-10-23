@@ -64,20 +64,20 @@ function ensureUsable(key: 'localStorage' | 'sessionStorage'): void {
   }
 }
 
-const MemoryProgressEvent =
-  globalThis.ProgressEvent ??
-  class extends Event implements ProgressEvent {
-    readonly lengthComputable: boolean;
-    readonly loaded: number;
-    readonly total: number;
+class FallbackProgressEvent extends Event implements ProgressEvent {
+  readonly lengthComputable: boolean;
+  readonly loaded: number;
+  readonly total: number;
 
-    constructor(type: string, init: ProgressEventInit = {}) {
-      super(type, init);
-      this.lengthComputable = init.lengthComputable ?? false;
-      this.loaded = init.loaded ?? 0;
-      this.total = init.total ?? 0;
-    }
-  };
+  constructor(type: string, init: ProgressEventInit = {}) {
+    super(type, init);
+    this.lengthComputable = init.lengthComputable ?? false;
+    this.loaded = init.loaded ?? 0;
+    this.total = init.total ?? 0;
+  }
+}
+
+const MemoryProgressEvent = globalThis.ProgressEvent ?? FallbackProgressEvent;
 
 if (typeof globalThis.ProgressEvent === 'undefined') {
   Object.defineProperty(globalThis, 'ProgressEvent', {

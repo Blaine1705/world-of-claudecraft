@@ -87,8 +87,18 @@ export function mobEffectiveMeleeRange(mob: Entity): number {
   return effectiveMobMeleeRange(profile, mobMoved);
 }
 
+function mobCanReachMeleeTarget(
+  mob: Entity,
+  target: Entity,
+  reach = mobEffectiveMeleeRange(mob),
+): boolean {
+  return (
+    Math.abs(mob.pos.y - target.pos.y) <= Math.max(4, reach) && dist2d(mob.pos, target.pos) <= reach
+  );
+}
+
 export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: Entity): boolean {
-  if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) {
+  if (!mobCanReachMeleeTarget(mob, target)) {
     mob.autoAttack = false;
     return false;
   }
@@ -265,9 +275,17 @@ export function updateMobCombatProfile(
   }
 
   updatePursuitProfileCombat(ctx, mob, target, profile);
+  const meleeReach = mobEffectiveMeleeRange(mob);
   if (
     profile.canLeash &&
-    chaseStalledUnreachable(ctx, mob, target, profile.meleeRange, chaseSpeed)
+    chaseStalledUnreachable(
+      ctx,
+      mob,
+      target,
+      meleeReach,
+      chaseSpeed,
+      mobCanReachMeleeTarget(mob, target, meleeReach),
+    )
   ) {
     onChaseStalled(mob, instanceHold);
     return 'done';
@@ -299,10 +317,12 @@ export function holdPinnedMob(ctx: SimContext, mob: Entity): void {
   const chaseSpeed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
   mob.autoAttack = false;
   mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
-  // A caster is in reach at spell range only when it also sees its target
-  // (mob/cast_sight.ts); walled off, it holds and then phases like a melee mob.
+  const reached =
+    spell !== undefined
+      ? dist2d(mob.pos, target.pos) <= reach
+      : mobCanReachMeleeTarget(mob, target, reach);
   if (
-    dist2d(mob.pos, target.pos) <= reach &&
+    reached &&
     !(
       spell !== undefined &&
       casterObeysSight(mob, profile) &&
@@ -469,7 +489,7 @@ function updatePursuitProfileCombat(
     tryMobMeleeSwingInRange(ctx, mob, target);
   }
 
-  if (dist2d(mob.pos, target.pos) > profile.desiredRange) {
+  if (!mobCanReachMeleeTarget(mob, target, profile.desiredRange)) {
     if (!ctx.isRooted(mob)) {
       // Straight at the target, and (a mob that leashes; chase_route.ts
       // leaves bosses and pets out itself) round a wall the straight chase has
@@ -494,5 +514,5 @@ function updatePursuitProfileCombat(
   ) {
     tryMobMeleeSwingInRange(ctx, mob, target);
   }
-  mob.aiState = dist2d(mob.pos, target.pos) <= profile.meleeRange ? 'attack' : 'chase';
+  mob.aiState = mobCanReachMeleeTarget(mob, target) ? 'attack' : 'chase';
 }

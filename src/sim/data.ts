@@ -388,6 +388,7 @@ import { MIREFEN_TAVERN_PATRON_NPCS } from './content/mirefen_tavern_patrons';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
+import { QUEST_SHIELD_ITEMS } from './content/quest_shields';
 import { REFERRAL_STAMP_ITEMS } from './content/referral_rewards';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
@@ -473,6 +474,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   HOARD_ITEMS,
   QUEST_LEVELING_GEAR_ITEMS,
   GUILD_CONTRACT_ITEMS,
+  QUEST_SHIELD_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';

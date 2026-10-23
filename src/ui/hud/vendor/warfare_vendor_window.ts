@@ -66,6 +66,7 @@ function sectionTitleText(section: WarfareShopSection): string {
   if (section.kind === 'set') {
     return tEntity({ kind: 'itemSet', id: section.setId, field: 'name' });
   }
+  if (section.kind === 'goods') return t('hudChrome.warfareShop.goods');
   if (section.kind === 'jewelry') return t('hudChrome.warfareShop.jewelry');
   if (section.kind === 'companions') return t('hudChrome.warfareShop.companions');
   return t('hudChrome.warfareShop.weapons');

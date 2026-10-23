@@ -21,6 +21,7 @@ import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isEntombed } from '../sim/encounters/hollow_crypt/ids';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import type { Entity, QuestProgress, WorldQuestProgress } from '../sim/types';
+import { vaultPortalVisible } from '../sim/vault_portal_visibility';
 import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import {
   isWorldQuestSalvageObject,
@@ -38,6 +39,9 @@ export interface QuestObjectGateOptions {
 export type QuestObjectGate = (entity: Entity, questLog: Map<string, QuestProgress>) => boolean;
 
 export interface WorldQuestObjectReader {
+  playerId?: number;
+  partyInfo?: { members: readonly { pid: number }[] } | null;
+  characterId?: number;
   worldQuestCycle: string;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
 }
@@ -54,6 +58,15 @@ export function makeQuestObjectGate(
   if (worldQuests) {
     return (entity, questLog) => {
       if (isEntombed(entity)) return true;
+      if (
+        !vaultPortalVisible(
+          entity,
+          worldQuests.playerId,
+          worldQuests.partyInfo,
+          worldQuests.characterId,
+        )
+      )
+        return true;
       if (investigationDisguiseHidden(entity, worldQuests)) return true;
       if (shadowGuardHidden(entity, worldQuests)) return true;
       if (salvageQuest && isWorldQuestSalvageObject(entity, salvageQuest)) {

@@ -9,7 +9,8 @@ import type {
 import type { VaultConsumptionAdmission } from '../src/sim/types';
 import type { BankInfo } from '../src/world_api/bank';
 import { buildPersonalBankLedgerRows } from './bank_ledger';
-import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
+import { BANK_VAULT_LEDGER_ROW_BURST } from './bank_vault_ledger_guard';
+import { type CourierLedgerState, courierLedgerRowBound } from './courier_ledger_row_bound';
 import {
   type StorageAdmissionSession,
   storageAdmissionSession,
@@ -22,7 +23,7 @@ export interface CourierWireSim {
   courierPoseFor(pid: number): CourierPose | null;
   courierWireRevisionFor(pid: number): string | number | null;
   courierBankInfoFor(pid: number): BankInfo | null;
-  meta(pid: number): { characterId?: number } | null | undefined;
+  meta(pid: number): ({ characterId?: number } & CourierLedgerState) | null | undefined;
 }
 export interface CourierWireSession {
   pid: number;
@@ -117,13 +118,15 @@ export function courierBankExchangeFor(
   deposit: () => void,
   withdraw: () => void,
 ): boolean {
-  const owner = storageAdmissionSession(session, sim.meta(pid), pid);
-  if (!owner) return false;
-  const reservation = owner.bankVaultLedgerGuard.admission.tryReserve(
-    bankVaultLedgerMaxRows('courier_dispatch'),
-    0,
-    'personal',
-  );
+  const meta = sim.meta(pid);
+  const owner = storageAdmissionSession(session, meta, pid);
+  if (!owner || !meta?.courier) return false;
+  const rowBound = courierLedgerRowBound(meta);
+  // A trip that can never fit the journal's burst returns its cargo unchanged.
+  // Resolving it without either callback lets the sim return home instead of
+  // retrying forever at the bank. Temporary admission pressure still retries.
+  if (rowBound > BANK_VAULT_LEDGER_ROW_BURST) return true;
+  const reservation = owner.bankVaultLedgerGuard.admission.tryReserve(rowBound, 0, 'personal');
   if (!reservation) return false;
   let before: BankInfo | null;
   try {

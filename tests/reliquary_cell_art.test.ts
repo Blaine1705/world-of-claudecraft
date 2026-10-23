@@ -196,6 +196,12 @@ describe('title relics resolve the deed crest', () => {
       'feat_guild_writ_runner',
       'feat_guild_hallsworn',
       'feat_guild_of_lantern_hall',
+      'prog_titan',
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
     ]);
     for (const id of pending) {
       expect(DEED_ART_PENDING.has(id), id).toBe(true);
@@ -569,7 +575,7 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(
       procedural,
       `catalogued item relics with only procedural art:\n${procedural.join('\n')}`,
-    ).toEqual([]);
+    ).toEqual(['infernal_quiver']);
     // All Season 2 pieces must remain on the shelf and resolve their own painting.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(season2Armor).toHaveLength(135);

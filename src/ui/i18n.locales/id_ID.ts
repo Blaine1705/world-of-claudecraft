@@ -2,6 +2,49 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus spesialisasi',
+  'hudChrome.specPanel.healing': 'pemulihan',
+  'hudChrome.specPanel.absorption': 'penyerapan kerusakan',
+  'hudChrome.specPanel.physicalAbilityDamage': 'kerusakan kemampuan jarak dekat dan jarak jauh',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Meningkatkan pemulihan utama sebesar {pct} setelah bonus pemulihan lainnya diterapkan.',
+  'hud.pet.assist': 'Bantu',
+  'hud.pet.assistDesc':
+    'Hanya menyerang targetmu saat ini setelah kamu menggunakan kemampuan padanya. Mengabaikan musuh yang menyerangmu.',
+  'hudChrome.cooldownManager.auraActive': 'Aktif',
+  'hudChrome.cooldownManager.auraMissing': 'Tidak ada',
+  'hudChrome.cooldownManager.auraShowWhen': 'Tampilkan tombol saat aura',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Nyalakan saat aura tidak ada',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Jika tidak ada tempat yang dicentang, grup ini tidak pernah muncul atau memutar suara.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Jika kedua pilihan tidak dicentang, tombol tidak pernah muncul, tetapi suaranya tetap diputar.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Belum siap berarti masih dalam jeda pakai atau belum dapat digunakan saat ini.',
+  'hudChrome.cooldownManager.placeHint':
+    'Instans mencakup ruang bawah tanah, raid, delve, rift, medan tempur, arena, dan semua area berinstans lainnya. Di luar tempat yang dicentang, grup disembunyikan dan tidak bersuara.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Menerangi, memberi garis tepi, dan membuat tombol berdenyut saat aura tidak ada.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Pengingat penguatan: tombol menyala saat aura ini tidak ada dan bersembunyi begitu kamu memilikinya.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Diputar saat aura berakhir.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Tampilkan tombol saat',
+  'hudChrome.cooldownManager.showIn': 'Tampilkan di',
+  'hudChrome.cooldownManager.showInInstances': 'Area instans',
+  'hudChrome.cooldownManager.showInWorld': 'Dunia terbuka',
+  'hudChrome.cooldownManager.showNotReady': 'Belum siap',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Di luar pertempuran',
+  'hudChrome.cooldownManager.showReady': 'Siap',
+  'hudChrome.cooldownManager.showWhile': 'Tampilkan selama',
+  'hudChrome.options.enemyHighlightDistance': '{yards} yar',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Panah tepi layar saat di luar kamera',
+  'hudChrome.options.enemyHighlightNameplate': 'Papan nama target besar berbingkai',
+  'hudChrome.options.enemyHighlightOverhead': 'Penanda melayang di atas kepala',
+  'hudChrome.options.enemyHighlightReticle': 'Bidikan musuh lebih tebal',
+  'hudChrome.options.enemyHighlightStyle': 'Gaya penyorotan musuh',
+  'hudChrome.options.nameplateCooldownScale': 'Ukuran Pelacak Ofensif/Defensif',
+  'hudChrome.options.showNameplateCooldowns': 'Pelacak Ofensif/Defensif',
+  'hud.pet.stanceDesc': 'Klik untuk memilih Pasif, Bertahan, Agresif, atau Bantu.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Menyelam',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Menyelam Dalam',
@@ -49,8 +92,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     'Gunakan: Memperkuat baju zirah dada Anda, meningkatkan Pertahanan sebesar 50 untuk 1 jam.',
   'hudChrome.factionRewards.battleStandardUse':
-    'Gunakan: Menanam Bendera Pertempuran Fajar yang Ditahbiskan selama 10 detik, meningkatkan Kekuatan Serangan untuk semua pemain terdekat sebesar 10% selama 1 menit.',
-  'hudChrome.factionRewards.hub_automatons': 'Jangkauan Selatan (Pendiri Automaton)',
+    'Gunakan: Menancapkan Bendera Pertempuran Fajar yang Ditahbiskan selama 5 mnt. Pemain di luar pertempuran dalam jarak 15 yard memulihkan kesehatan 10% lebih banyak; pengguna mana juga memulihkan mana sebesar 5% Roh mereka setiap 2 dtk. Berada di dekatnya selama 10 dtk memberikan Berkat Fajar, meningkatkan Kekuatan, Kelincahan, Stamina, Intelek, dan Roh sebesar 5% selama 30 mnt. (Jeda 5 mnt)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automatons)',
   'hudChrome.factionRewards.hub_church_order': 'Lembah Eastbrook (Tatanan Gereja)',
   'hudChrome.factionRewards.hub_none': 'Tidak Ada (Gunakan dekat pusat faksi untuk diselaraskan)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (Pengawas Celah)',
@@ -404,6 +447,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchNoMatch':
     'Tidak ada bahan di brankas Anda yang cocok dengan pencarian Anda.',
   'hudChrome.charSheet.ratings': 'Peringkat',
+  'hudChrome.charSheet.gearScore': 'Skor perlengkapan',
   'hudChrome.charSheet.spell': 'Sihir',
   'hudChrome.charSidebar.character': 'Karakter',
   'hudChrome.charSidebar.currencies': 'Mata Uang',
@@ -464,8 +508,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Letakkan sihir ini di grup untuk menampilkan tombolnya.',
   'hudChrome.cooldownManager.notKnown': '{spell} (belum diketahui)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Hanya Tampilkan Saat Siap',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Hanya Tampilkan Saat Aktif',
   'hudChrome.cooldownManager.opacity': 'Opasitas',
   'hudChrome.cooldownManager.orientation': 'Orientasi',
   'hudChrome.cooldownManager.otherSpells': 'Sihir Lain',
@@ -489,12 +531,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Seret sihir ke grup, atau pilih untuk memilih grup dan peringatannya. Tombol mengikuti sikirnya saat berubah menjadi yang lain, dan bersinar saat melakukannya.',
   'hudChrome.cooldownManager.trackedTitle': 'Sihir Terlacak',
   'hudChrome.cooldownManager.vertical': 'Vertikal',
-  'hudChrome.cooldownManager.visAlways': 'Selalu Terlihat',
   'hudChrome.cooldownManager.visCombat': 'Di Pertempuran',
-  'hudChrome.cooldownManager.visHidden': 'Tersembunyi',
   'hudChrome.cooldownManager.visHiddenHint':
     'Grup tersembunyi masih memutar suaranya dan menerangi bilah acsimu.',
-  'hudChrome.cooldownManager.visibility': 'Visibilitas',
   'hudChrome.crafting.mobileStationTitle': "{name}'s {station}",
   'hudChrome.currencies.activities': 'Aktivitas',
   'hudChrome.currencies.delveMark': 'Merek Galian',
@@ -503,7 +542,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Faksi-faksi',
   'hudChrome.currencies.heroicMarkNote': 'Dungeon Heroik: belanjakan di kepala perlengkapan heroik',
   'hudChrome.currencies.honor': 'Kehormatan',
-  'hudChrome.currencies.honorNote': 'Medan Pertempuran dan arena',
+  'hudChrome.currencies.honorNote': 'Medan Pertempuran, arena, dan Misi Dunia',
   'hudChrome.currencies.intro':
     'Tidak satu pun dari ini menggunakan ruang tas. Koin tetap di tas seperti biasanya.',
   'hudChrome.currencies.lifetime': 'Seumur hidup {amount}',
@@ -532,7 +571,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     'Mengukir permanen senjata dua tangan dengan 12 Kekuatan dan 25 Peringkat Serangan Kritis. Tidak dapat diterapkan pada senjata satu tangan. Bonus datar; tidak terskalakan.',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Serangan jarak dekat yang mendarat darimu dapat memberikan 60 Kelincahan dan 2% serangan jarak dekat lebih cepat selama 15 det. Setiap pukulan menggulung 1% per 0,6 det kecepatan dasar senjata penyerang. Tidak ada waktu tunggu internal. Kedua tangan berbagi satu buff; pemicu apa pun menyegarkannya, dan tidak pernah bertumpuk. Serangan jarak jauh tidak memicu efek ini. Wujud Kucing menggunakan kecepatan ayunan dasar 1 detik sebagai gantinya.',
+    'Serangan jarak dekatmu yang mengenai sasaran dapat memberikan 60 Kelincahan dan serangan jarak dekat 2% lebih cepat selama 15 dtk. Setiap hantaman memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menghantam. Tanpa jeda internal. Kedua tangan berbagi satu penguat; setiap pemicuan memperbaruinya dan efeknya tidak bertumpuk. Serangan jarak jauh tidak memicunya. Dalam Wujud Kucing, serangan otomatis memakai kecepatan cakar 1 dtk. Hantaman dan jurus penyelesai dalam Wujud Kucing dan Wujud Bruin memakai kecepatan senjata itu sendiri; Cakar Menyapu mengundi sekali per penggunaan, bukan per sasaran.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Ukiran Senjata: Dawnfire',
   'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Ukiran Senjata: Berkah Fajar',
   'hudChrome.enchantName.enchant_weapon_piston_drive': 'Ukiran Senjata: Dorongan Piston',
@@ -1097,7 +1136,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Kamu juga akan menerima:',
   'hudChrome.weekly.anyDifficulty': 'Kesulitan apa pun',
   'hudChrome.weekly.cacheDesc':
-    'Membuka satu potongan serangan Normal untuk kelasmu (tidak pernah potongan set tingkat), plus {count} x {item}.',
+    'Membuka satu potongan serangan Normal untuk kelasmu (tidak pernah potongan set tingkat Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Pilih misi',
   'hudChrome.weekly.chosen': 'Misi mingguan diambil: {category}',
   'hudChrome.weekly.close': 'Tutup misi mingguan',
@@ -1662,6 +1701,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Kemenangan manis',
   'questUi.worldQuest.matchConfections': 'Cocokkan permen yang dipesona',
   'questUi.worldQuest.mineOre': 'Tambang bijih tembaga',
+  'questUi.worldQuest.mineMaterial': 'Tambang {name}',
   'questUi.worldQuest.practiceRewards':
     'Praktik: mainkan lagi tanpa menghasilkan lebih banyak koin, pengalaman atau reputasi.',
   'questUi.worldQuest.puzzleBeamReach': 'Kristal tercapai: {count}',
@@ -1875,7 +1915,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Umumkan bukit sekarang; ia naik setelah peringatan penuh.',
   'devCommand.actions.hillwarn.label': 'Hitungan mundur bukit',
   'entities.abilities.lava_burst.description':
-    'Berikan {damage} kerusakan Api. Selalu membuat serangan kritis pada target yang terbakar dengan Sentakan Bara-mu. Gelombang Magma: setiap tik Sentakan Bara-mu memiliki 20% kemungkinan untuk mengatur ulang jeda ini dan membuat Ledakan Magma berikutnya dalam 10 detik instan. Kerusakan meningkat dengan Kekuatan Mantra.',
+    'Berikan {damage} kerusakan Api. Pukulan telak memberi 1 Guntur. Selalu membuat serangan kritis pada target yang terbakar dengan Sentakan Bara-mu. Serangan kritis memberi tambahan 24% dari kerusakan normal. Gelombang Magma: setiap tik Sentakan Bara-mu memiliki 20% kemungkinan untuk mengatur ulang jeda ini dan membuat Ledakan Magma berikutnya dalam 10 detik instan. Kerusakan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.lava_burst.name': 'Ledakan Magma',
   'entities.abilities.lightning_overload.description':
     'Pasif: Sambaran Busur dan Petir Bercabang memiliki 20% kemungkinan untuk Beban Berlebih, menyerang target pertama mereka lagi karena 50% dari kerusakan yang dihadapi dan memberikan 1 Guntur.',
@@ -1884,65 +1924,76 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Panggil sambaran petir, berikan {damage} kerusakan Alam kepada musuh dalam 10 yard dan perlambat mereka sebesar 50% selama 5 detik. Pulihkan 8% dari Mana maksimal-mu. Kerusakan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.thunderstorm.name': 'Putus Badai',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Waktu jentikan Akar Cengkeram dikurangi 0.5 detik.',
+    'Waktu jentikan Akar Cengkeram dikurangi 0.5 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Melempar Akar Cengkeram membiarkanmu menyampaikan sambil bergerak dan meningkatkan kecepatan gerakmu sebesar 20 persen selama 4 detik. Tidak dapat terjadi lebih dari sekali setiap 20 detik.',
   'entities.itemSets.vanguard_druid_balance.name': 'Gaun Penjaga Bintang',
-  'entities.itemSets.vanguard_druid_feral.bonus2': 'Jeda Terjangan Bruin dikurangi 3 detik.',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    'Jeda Terjangan Bruin dikurangi 3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Terjangan Bruin melindungimu sebesar 6 persen dari kesehatan maksimal-mu selama 6 detik.',
   'entities.itemSets.vanguard_druid_feral.name': 'Kulit Bersurai Darah',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': 'Jeda Pemulihan Cepat dikurangi 1 detik.',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    'Jeda Pemulihan Cepat dikurangi 1 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Pemulihan Cepat juga meningkatkan kecepatan gerakmu sebesar 30 persen selama 3 detik.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Jubah Mekar Thistle',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'Jeda Tembakan Pengguncang dikurangi 4 detik.',
+    'Jeda Tembakan Pengguncang dikurangi 4 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Tembakan Pengguncang mengurangi jeda tersisa Murka Buas sebesar 1 detik.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Pengaman Penjaga Kawanan',
-  'entities.itemSets.vanguard_hunter_marksmanship.bonus2': 'Jeda Putus Jejak dikurangi 4 detik.',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    'Jeda Putus Jejak dikurangi 4 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Putus Jejak membuat Tarikan Panjang berikutnya dalam 6 detik instan. Tidak dapat terjadi lebih dari sekali setiap 15 detik.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Pengaman Penglihatan Jauh',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': 'Jeda Kait Darah dikurangi 3 detik.',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    'Jeda Kait Darah dikurangi 3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Kait Darah memberikan 1 Momentum Berburu.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Pengaman Gigi Jebakan',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': 'Jeda Penghalang Waktu dikurangi 2 detik.',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    'Jeda Penghalang Waktu dikurangi 2 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Penghalang Waktu juga meningkatkan kecepatan gerak target yang dilindungi sebesar 20 persen selama 3 detik.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Gaun Pengikatan Jam',
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Guguran Bara diisi ulang 3 detik lebih cepat.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Guguran Bara diisi ulang 3 detik lebih cepat. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Melempar Guguran Bara mengurangi jeda tersisa Penghalang Membara sebesar 2 detik.',
   'entities.itemSets.vanguard_mage_fire.name': 'Perhiasan Cambuk Bara',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Jeda Belenggu Es dikurangi 2 detik.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Jeda Belenggu Es dikurangi 2 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Melempar Belenggu Es mengurangi jeda tersisa Langkah Lincah sebesar 5 detik.',
   'entities.itemSets.vanguard_mage_frost.name': 'Pakaian Penjaga Rime',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Jeda Perjanjian Kehidupan dikurangi 30 detik.',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Jeda Perjanjian Kehidupan dikurangi 30 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Perjanjian Kehidupan juga melindungi sekutu sebesar 8 persen dari kesehatan maksimal mereka selama 6 detik.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Perhiasan Vigil Surya',
-  'entities.itemSets.vanguard_paladin_protection.bonus2': 'Jeda Rantai Sumpah dikurangi 2 detik.',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    'Jeda Rantai Sumpah dikurangi 2 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Musuh ditarik oleh Rantai Sumpah melempar mantra 30 persen lebih lambat selama 4 detik, dan Rantai Sumpah memberikan Penyangkalan Matahari ketika ia mengikat musuh yang dapat ditarik.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Benteng Janji Perisai',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'Jeda Panggilan Valkyrie dikurangi 15 detik.',
+    'Jeda Panggilan Valkyrie dikurangi 15 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Panggilan Valkyrie mengatur ulang jeda Titah Terakhir, dan Titah Terakhir berikutnya dalam 6 detik pendaratan memberikan 15 persen lebih banyak kerusakan.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Pelat Perang Merek Cahaya',
-  'entities.itemSets.vanguard_priest_discipline.bonus2': 'Jeda Jerit Psikis dikurangi 3 detik.',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    'Jeda Jerit Psikis dikurangi 3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Ketika Mazmur Penangkal-mu sepenuhnya dikonsumsi, sekutu yang dilindungi mendapat 20 persen kecepatan gerak selama 3 detik. Tidak dapat terjadi lebih dari sekali setiap 8 detik.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Gaun Mazmur Veil',
-  'entities.itemSets.vanguard_priest_holy.bonus2': 'Jeda Langkah Tabir dikurangi 6 detik.',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Jeda Langkah Tabir dikurangi 6 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Langkah Tabir juga melindungimu sebesar 8 persen dari kesehatan maksimal-mu selama 6 detik.',
   'entities.itemSets.vanguard_priest_holy.name': 'Gaun Bersayap Karunia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litani Nestapa juga memperlambat gerakan target 30 persen saat kamu menyalurkannya.',
+    'Litani Nestapa juga memperlambat gerakan target 30 persen saat kamu menyalurkannya. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Panggil Iblis Persepuluhan juga melindungimu sebesar 10 persen dari kesehatan maksimal-mu selama 8 detik.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Perhiasan Himne Senja',
@@ -1951,7 +2002,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Pukulan Curang juga membuat serangan berikutnya dalam 6 detik serangan kritis.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Kulit Potong Malam',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Jeda Tumit Gesit dikurangi 60 detik.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Jeda Tumit Gesit dikurangi 15 detik.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Sementara Tumit Gesit aktif, Tebasan Keji dan Pukulan Tubuh memberikan 1 poin combo tambahan.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Kulit Merek Pertarungan',
@@ -1959,30 +2010,33 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_subtlety.bonus4':
     'Pukulan Ulu Hati memberikan 2 poin combo tambahan saat digunakan dari Luruh Asap.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Kulit Berjalan Bayangan',
-  'entities.itemSets.vanguard_shaman_elemental.bonus2': 'Jeda Lepaskan Senjata dikurangi 3 detik.',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    'Jeda Lepaskan Senjata dikurangi 3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Lepaskan Senjata membiarkanmu menyampaikan sambil bergerak dan meningkatkan kecepatan gerakmu sebesar 20 persen selama 4 detik. Tidak dapat terjadi lebih dari sekali setiap 20 detik.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Perang Tulis Badai',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Serangan Leluhur memperlambat kecepatan gerak target 30 persen selama 4 detik.',
+    'Serangan Leluhur memperlambat kecepatan gerak target 30 persen selama 4 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Serangan Leluhur mengurangi jeda tersisa Elemental Trance sebesar 4 detik.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Perang Berasal Badai',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Air Pemulih melempar 0.5 detik lebih cepat pada sekutu di bawah 50 persen kesehatan.',
+    'Air Pemulih melempar 0.5 detik lebih cepat pada sekutu di bawah 50 persen kesehatan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Panggilan Pasang juga melindungi targetnya sebesar 5 persen dari kesehatan maksimal-mu selama 6 detik.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Perang Garam Brineward',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Waktu jentikan Cekaman dikurangi 0.3 detik.',
+    'Waktu jentikan Cekaman dikurangi 0.3 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Melahap menyembuhkan 30 persen lebih banyak dan dapat disalurkan sambil bergerak.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Gaun Bulu Dread',
-  'entities.itemSets.vanguard_warlock_demonology.bonus2': 'Jeda Bone Armor dikurangi 10 detik.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    'Jeda Bone Armor dikurangi 10 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command mengurangi jeda tersisa Bone Armor sebesar 2 detik.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Perhiasan Terikat Sumsum',
-  'entities.itemSets.vanguard_warlock_destruction.bonus2': 'Jeda Cinderhide dikurangi 30 detik.',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    'Jeda Cinderhide dikurangi 30 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Setiap Kobaran Api kedua membuat Baut Reruntuhan berikutnya dalam 8 detik instan.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Gaun Mahkota Terak',
@@ -2376,7 +2430,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     'Menambahkan baris "Dilempar oleh" ke setiap tooltip buff/debuff, menamai siapa yang menerapkannya. Berguna untuk membedakan beberapa pemberi casting dari buff yang sama, seperti dua berkat Paladin.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Menggantung strip buff dan debuff bingkai target di bawah bingkai daripada di atasnya, tata letak klasik. Mati secara bawaan, karena bingkai target stok duduk langsung di atas bilah tindakan; nyalakan setelah kamu memindahkan bingkai ke suatu tempat dengan ruang di bawahnya.',
+    'Menempatkan deretan penguat dan pelemah sasaran di bawah bingkai, di bawah nama dan bilah kesehatannya, bukan di atasnya: tata letak klasik. Pada posisi bawaan, bingkai sasaran beserta bilah perapalan dan pewaktu ayunanmu naik satu baris agar baris efek pertama tidak menutupi bilah aksi; bingkai yang telah kamu pindahkan tetap di tempatnya.',
   'guide.settingsPage.rowFrameRateCap':
     'Batas berapa banyak gambar yang ditarik permainan setiap detik. Komputer yang tidak dapat mengikuti layarnya mendarat pada irama tidak merata; mantap 30 terlihat lebih mulus dari itu, mengurangi pekerjaan setengahnya, dan membuat komputer tetap dingin. Tampilan berarti tanpa batas.',
   'guide.stats.warfareBodyPets':
@@ -3473,9 +3527,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Wujud Fleet',
   'guide.classPage.formsHeading': 'Perubahan Wujud',
   'guide.classPage.formsMoonwing':
-    'Druid Keseimbangan mendapat satu wujud lagi, Wujud Burung Bulan, wujud perapal yang menjadi cara bertarung druid Keseimbangan. Inilah satu-satunya wujud hewan yang tetap mempertahankan mantramu, dan tongkat sihirmu hanya berfungsi dalam wujud ini atau dalam wujud perapal normalmu.',
+    'Druid Keseimbangan memperoleh satu wujud lagi, Wujud Burung Bulan, wujud perapal yang dipakai spesialisasi ini saat bertempur. Seperti Wujud Penyembuh Spora dari Pemulihan, wujud ini mempertahankan mantramu, dan tongkat sihir hanya berfungsi dalam kedua wujud itu atau wujud perapal normalmu.',
   'guide.classPage.formsWolfEngage':
-    'Serigala membuka pertarungan dengan Terjangan Bruin, langsung berubah ke Wujud Serigala untuk menjepit target, menutup jarak dengan Terkaman saat tidak menyelinap, dan menahan musuh dengan Penjatuhan.',
+    'Kucing membuka pertarungan dengan Terjangan Bruin, langsung berubah ke Wujud Kucing untuk menjepit target, menutup jarak dengan Terkaman saat tidak menyelinap, dan menahan musuh dengan Penjatuhan.',
   'guide.classPage.formsNote':
     'Seorang druid bertarung dengan berganti wujud. Sebagian besar kemampuan druid terikat pada satu wujud tertentu, jadi wujud yang sedang kamu tempati menentukan apa yang bisa kamu rapalkan, dan berganti wujud menghabiskan sedikit mana. Kamu bisa berubah wujud masuk atau keluar dari pertempuran, sesering yang kamu mau.',
   'guide.classPage.mageEleHeading': 'Elemental Air',
@@ -4709,35 +4763,35 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Gaya',
   'editor.status.campCapReached': 'Batas kemah tercapai ({max}). Kemah baru tidak ditambahkan.',
   'entities.itemSets.warfare_ashstalker.bonus2':
-    'Meningkatkan Peringkat Pertahanan Perang sebesar 40.',
+    'Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.',
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Membunuh pemain lawan memberi Langkah Abu, yang meningkatkan kecepatan gerak sebesar 40% selama 6 dtk.',
   'entities.itemSets.warfare_ashstalker.name': 'Perlengkapan Ashstalker',
   'entities.itemSets.warfare_cinderweave.bonus2':
-    'Meningkatkan Peringkat Pertahanan Perang sebesar 40.',
+    'Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.',
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Mantramu punya peluang 15% memberi Jaga Bara, yang menyerap 120 kerusakan selama 8 dtk.',
   'entities.itemSets.warfare_cinderweave.name': 'Regalia Cinderweave',
   'entities.itemSets.warfare_furyforged.bonus2':
-    'Meningkatkan Peringkat Pertahanan Perang sebesar 40.',
+    'Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.',
   'entities.itemSets.warfare_furyforged.bonus7':
     'Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Membunuh pemain lawan memberi Sumpah Tak Terpatahkan, yang menyerap 200 kerusakan selama 10 dtk.',
   'entities.itemSets.warfare_furyforged.name': 'Perlengkapan Tempur Furyforged',
   'entities.itemSets.warfare_stormbound.bonus2':
-    'Meningkatkan Peringkat Pertahanan Perang sebesar 40.',
+    'Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Mantramu punya peluang 15% memberi Jaga Bara, yang menyerap 120 kerusakan selama 8 dtk.',
   'entities.itemSets.warfare_stormbound.name': 'Jubah Stormbound',
   'entities.itemSets.warfare_thornhide.bonus2':
-    'Meningkatkan Peringkat Pertahanan Perang sebesar 40.',
+    'Meningkatkan Peringkat Pertahanan Perang sebesar 40. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -5052,7 +5106,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Dimiliki',
   'hudChrome.warfareShop.weapons': 'Senjata',
   'itemUi.market.saleBuyer': 'Terjual kepada {buyer}',
-  'itemUi.market.saleOlder': 'Ditambah {count} penjualan sebelumnya, termasuk dalam total.',
+  'itemUi.market.saleOlder': 'Ditambah {count} penjualan sebelumnya yang tidak ditampilkan.',
   'itemUi.tooltip.maxStack': 'Tumpukan maks: {count}',
   'hud.system.deathRecapAbility': 'Kamu telah tewas. Tewas oleh {ability}.',
   'hud.system.deathRecapDrowned': 'Kamu telah tewas. Kamu tenggelam.',
@@ -6170,7 +6224,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Teriakan menakutkan yang membuat hingga 5 musuh dalam 8 m lari ketakutan selama 4 dtk. Kerusakan bisa mematahkan efeknya.',
   'entities.abilities.intimidating_shout.name': 'Teriakan Menggentarkan',
   'entities.abilities.iron_resolve.description':
-    'Kertakkan gigi dan abaikan rasa sakit: menghabiskan hingga 40 amarah (minimal 20) untuk menyerap {absorbPerRage} kerusakan per amarah yang dihabiskan, bertahan hingga 10 detik. (Perlindungan)',
+    'Kertakkan gigi dan abaikan rasa sakit: sebuah perisai menyerap kerusakan sebesar {damage}% dari nyawa maksimummu saat digunakan, bertahan hingga {duration} detik. (Perlindungan)',
   'entities.abilities.iron_resolve.name': 'Tekad Besi',
   'entities.abilities.measured_fury.description':
     'Amarah terukurmu mempertajam penghematanmu: kemampuanmu membutuhkan 10% lebih sedikit amarah. (Arms)',
@@ -6289,7 +6343,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Tembakan liar yang membuat target kehilangan arah selama {duration} dtk. Kerusakan apa pun mengakhiri efeknya.',
   'entities.abilities.typhoon.name': 'Topan',
   'entities.abilities.typhoon.description':
-    'Hembusan angin mendorong mundur semua musuh dalam jarak 8 m dan membuat mereka linglung, mengurangi kecepatan gerak sebesar 50% selama 4 dtk.',
+    'Hembusan angin melempar semua musuh dalam 8 meter sejauh 15 meter darimu dan membuat mereka linglung, memperlambat gerak sebesar 50% selama 4 dtk. Pemain musuh dilempar lurus melalui udara: jika melewati tepian, mereka terus melaju dan menerima kerusakan jatuh; jatuh yang mematikan dihitung sebagai pembunuhanmu.',
   'entities.abilities.voidfeast.name': 'Santapan Kehampaan',
   'entities.abilities.voidfeast.description':
     'Melahap efek sihir (efek menguntungkan dari musuh atau efek berbahaya dari sekutu) dan memulihkan 6% nyawa maksimummu.',
@@ -7822,7 +7876,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menembak sasaran sebesar {damage} kerusakan Arkana. Kerusakan meningkat dengan daya serang jarak jauh.',
   'entities.abilities.arcane_shot.name': 'Tembakan Bengis',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Mengambil wujud kuda pacu, meningkatkan kecepatan gerakmu sebesar 30% selama 30 menit. Selagi aktif, menerima kerusakan akan membuatmu limbung, mengurangi kecepatan gerakmu hingga separuh selama 4 dtk (setiap pukulan menyegarkan efek limbungnya).',
+    'Mengambil wujud kuda pacu, meningkatkan kecepatan gerakmu sebesar 30% selama 30 menit. Selagi aktif, menerima kerusakan akan membuatmu limbung, mengurangi kecepatan gerakmu hingga separuh selama 2 dtk (setiap pukulan menyegarkan efek limbungnya).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Wujud Kuda Pacu',
   'entities.abilities.aspect_of_the_hawk.description':
     'Mengambil wujud elang penyambar, meningkatkan daya serangmu sebesar {buff} selama 30 menit.',
@@ -7841,10 +7895,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Teriakan yang meningkatkan daya serang semua anggota kelompok sebesar {buff}% selama 30 menit.',
   'entities.abilities.battle_shout.name': 'Raungan Besi',
   'entities.abilities.bear_charge.description':
-    'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Selama 3 detik setelahnya, Wujud Serigala gratis dan menjepit target, memperlambatnya 50% selama 4 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin.',
+    'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Selama 3 detik setelahnya, Wujud Kucing gratis dan menjepit target, memperlambatnya 50% selama 4 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin.',
   'entities.abilities.bear_charge.name': 'Terjangan Bruin',
   'entities.abilities.bear_form.description':
-    'Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Berubah menjadi wujud apa pun memberikan Langkah Berderap, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal.',
+    'Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Kamu menyerang dua kali lebih cepat dengan setengah kerusakan per ayunan, dan setiap ayunan membangun amarah dua kali lipat. Berubah menjadi wujud apa pun memberikan Langkah Berderap Lambat, ledakan singkat kecepatan gerak. Rapal lagi untuk kembali ke wujud perapal.',
   'entities.abilities.bear_form.name': 'Wujud Bruin',
   'entities.abilities.berserker_rage.description':
     'Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)',
@@ -7861,7 +7915,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Seketika menyerang dalam amukan darah untuk 60% kerusakan senjata ditambah {damage}. (Penanda Fury)',
   'entities.abilities.bloodthirst.name': 'Pertumpahan Darah',
   'entities.abilities.cat_form.description':
-    'Mengubahmu menjadi serigala: agility naik seiring levelmu, daya serang +8 ditambah 2 per level, seranganmu memakai energi dan poin kombo, dan kamu menghasilkan 29% ancaman lebih sedikit. Berubah ke wujud apa pun memberi Langkah Berderap Lambat: 60% kecepatan gerak selama 3 dtk, sekali setiap 20 dtk. Rapal lagi untuk kembali ke wujud pemantra.',
+    'Berubah menjadi kucing: kelincahan naik sesuai level, daya serang +8 ditambah 2 per level, serangan memakai energi dan poin kombo, gerak 15% lebih cepat dan ancaman berkurang 29%. Setiap perubahan wujud memberi Langkah Berderap Lambat, peningkatan kecepatan singkat. Gunakan lagi untuk kembali ke wujud perapal.',
   'entities.abilities.cat_form.name': 'Wujud Kucing',
   'entities.abilities.charge.description':
     'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard.',
@@ -7893,7 +7947,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengutuk target dengan penderitaan: {damage} kerusakan Bayangan selama 24 detik.',
   'entities.abilities.curse_of_agony.name': 'Tenung Derita',
   'entities.abilities.dash.description':
-    'Melesat ke depan, meningkatkan kecepatan gerak sebesar 50% selama 15 detik. Hanya dalam Wujud Kucing.',
+    'Berubah ke Wujud Kucing jika belum, lalu berlari dengan kecepatan 50% lebih tinggi selama 15 dtk. Dapat dipakai dalam wujud apa pun. Instan dan tidak memicu jeda global.',
   'entities.abilities.dash.name': 'Lesatan',
   'entities.abilities.deadly_poison.description':
     'Melapisi senjatamu selama 30 menit. Setiap ayunan jarak dekatmu menambah satu tumpukan racun pada target, hingga 5, dan menyegarkan durasi 12 detik. Setiap tumpukan memberi {damage} Kerusakan alam setiap 2 detik.',
@@ -7968,7 +8022,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Memanggil ledakan api di area sasaran, memberikan {damage} kerusakan Api kepada musuh yang terkena ledakan.',
   'entities.abilities.flame_shock.description':
-    'Memberi {damage} kerusakan Api, lalu {overTime} kerusakan Api selama 12 dtk. Pukulan awalnya meningkat dengan Kekuatan Mantra.',
+    'Memberi {damage} kerusakan Api, lalu {overTime} kerusakan Api selama {duration} dtk. Pukulan awalnya meningkat dengan Kekuatan Mantra.',
   'entities.abilities.flame_shock.name': 'Sentakan Bara',
   'entities.abilities.flametongue_weapon.description':
     'Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan Api tambahan.',
@@ -8014,6 +8068,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.heal.name': 'Doa Khidmat',
   'entities.abilities.healing_touch.description': 'Menyembuhkan target sekutu sebesar {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Setiap rapalan yang selesai menambah 1 Kehijauan (maks 3). Kehijauan yang tersimpan mempersingkat rapalan ini: 2,2 dtk pada 1 Kehijauan, 1,9 dtk pada 2, dan 1,5 dtk pada 3. Karunia Alam membuatnya instan, gratis, dan 25% lebih kuat.',
   'entities.abilities.healing_touch.name': 'Penyembuhan Liar',
   'entities.abilities.healing_wave.description':
     'Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra. Pemulihan: menyimpan 50% dari penyembuhan penuh sebelum kelebihan sebagai Arus Pemulih selama 12 dtk, sampai 30% nyawa maksimum sasaran.',
@@ -8022,7 +8078,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan kuat yang meningkatkan kerusakan jarak dekat sebesar {damage}. Aktif pada ayunan berikutnya.',
   'entities.abilities.heroic_strike.name': 'Serangan Perampas',
   'entities.abilities.hibernate.description':
-    'Memaksa target ke dalam tidur lelap hingga 8 detik. Kerusakan apa pun akan membangunkannya.',
+    'Membuat target tidur lelap hingga 8 dtk. Kerusakan apa pun akan membangunkannya. Terhadap pemain, setiap pengulangan dalam 18 dtk berlangsung setengah durasi sebelumnya, dan yang keempat gagal.',
   'entities.abilities.hibernate.name': 'Lelap',
   'entities.abilities.holy_light.description':
     'Menyembuhkan sasaran sekutu dengan cepat sebesar {damage}. Memulihkan nyawa menghasilkan 1 Pengabdian, bahkan tanpa spesialisasi. Resonansi Berseri atau Pembalasan Surya membuatnya seketika.',
@@ -8081,13 +8137,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengubah musuh menjadi katak hingga {duration} detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid.',
   'entities.abilities.polymorph.name': 'Guna-guna',
   'entities.abilities.pounce.description':
-    'Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo. Hanya dalam Wujud Serigala. Di luar siluman, tombol ini adalah Terkaman.',
+    'Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo. Hanya dalam Wujud Kucing. Di luar siluman, tombol ini adalah Terkaman.',
   'entities.abilities.pounce.name': 'Terkaman Senyap',
   'entities.abilities.lunge.description':
-    'Terkam musuh hingga 12 yard jauhnya, memberikan 60% kerusakan senjata dan menghasilkan 1 poin kombo. Hanya dalam Wujud Serigala.',
+    'Terkam musuh hingga 12 yard jauhnya, memberikan 60% kerusakan senjata dan menghasilkan 1 poin kombo. Hanya dalam Wujud Kucing.',
   'entities.abilities.lunge.name': 'Terkaman',
   'entities.abilities.hamstring_bite.description':
-    'Jurus penutup yang membuat target terpana selama 1 detik plus 1 detik per poin combo (5 poin combo: 6 detik). Hanya dalam Wujud Serigala.',
+    'Jurus penutup yang membuat target terpana selama 1 detik plus 1 detik per poin combo (5 poin combo: 6 detik). Hanya dalam Wujud Kucing.',
   'entities.abilities.hamstring_bite.name': 'Penjatuhan',
   'entities.abilities.power_word_fortitude.description':
     'Meningkatkan Stamina setiap anggota kelompok sebesar {buff}% selama 30 menit.',
@@ -8096,7 +8152,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melindungi sasaran sekutu, menyerap {damage} kerusakan selama 30 dtk. Disiplin juga menautkan sasaran itu pada kerusakan Sucimu selama 30 dtk.',
   'entities.abilities.power_word_shield.name': 'Mazmur Penangkal',
   'entities.abilities.prowl.description':
-    'Masuk ke siluman saat dalam Wujud Serigala. Tidak dapat digunakan dalam pertempuran.',
+    'Masuk ke siluman saat dalam Wujud Kucing. Tidak dapat digunakan dalam pertempuran.',
   'entities.abilities.prowl.name': 'Mengintai',
   'entities.abilities.pyroblast.description':
     'Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu.',
@@ -8109,7 +8165,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memukul sebesar 10% kerusakan senjata ditambah {damage}. Sebuah pukulan telak memulihkan 15 Fokus dan memberi 1 Momentum Berburu. Kerusakan meningkat dengan daya serang melalui kerusakan senjata.',
   'entities.abilities.raptor_strike.name': 'Serangan Cabik Perut',
   'entities.abilities.regrowth.name': 'Mekar Kedua',
-  'entities.abilities.rejuvenation.name': 'Mekar Liar',
   'entities.abilities.renew.description':
     'Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Mantra.',
   'entities.abilities.renew.name': 'Rahmat Berlanjut',
@@ -8117,7 +8172,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyelimuti dirimu dan kelompokmu dengan energi suci hingga mati atau digantikan. Musuh yang menyerang sekutu terpengaruh dari jarak dekat menerima {buff} kerusakan Suci, dan sekutu terpengaruh memberikan {buff} kerusakan Suci tambahan dengan serangan otomatis.',
   'entities.abilities.retribution_aura.name': 'Aura Ganjaran',
   'entities.abilities.revive_pet.description':
-    'Mengobati peliharaanmu. Jika masih hidup, memulihkan total {overTime} kesehatan selama 12 detik dengan pemulihan setiap 3 detik. Jika mati, menghidupkannya kembali dengan 35% kesehatan.',
+    'Memulihkan 10% nyawa maksimum pendampingmu yang hidup setiap detik selama 8 dtk. Jika pendampingmu mati, hidupkan kembali dengan 50% nyawa.',
   'entities.abilities.revive_pet.name': 'Obati',
   'entities.abilities.righteous_fury.description':
     'Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 30%. Hanya Penjaga iman.',
@@ -8209,10 +8264,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Kucing.',
   'entities.abilities.tigers_fury.name': 'Darah Lynx',
   'entities.abilities.travel_form.description':
-    'Seketika berubah menjadi wujud Fleet yang gesit, meningkatkan kecepatan gerak sebesar 40% dan menghapus efek akar serta perlambatan yang dapat diputus. Kau tidak bisa menggunakan kemampuan lain saat berubah wujud, tetapi bisa berubah masuk atau keluar dari pertempuran, ideal untuk melarikan diri. Berubah menjadi wujud apa pun memberikan Langkah Berderap, ledakan singkat kecepatan gerak.',
+    'Seketika berubah menjadi wujud Fleet yang gesit, meningkatkan kecepatan gerak sebesar 40% dan menghapus efek akar serta perlambatan yang dapat diputus. Kau tidak bisa menggunakan kemampuan lain saat berubah wujud, tetapi bisa berubah masuk atau keluar dari pertempuran, ideal untuk melarikan diri. Berubah menjadi wujud apa pun memberikan Langkah Berderap Lambat, ledakan singkat kecepatan gerak.',
   'entities.abilities.travel_form.name': 'Wujud Fleet',
   'entities.abilities.vanish.description':
-    'Menghilang dari pandangan, masuk ke Duskveil bahkan dalam pertempuran. Kau bergerak 50% lebih lambat saat tersembunyi. Bertahan hingga 10 detik.',
+    'Menghilang dari pandangan, masuk ke Duskveil bahkan dalam pertempuran. Kau bergerak dengan kecepatan penuh saat tersembunyi. Bertahan hingga 10 detik.',
   'entities.abilities.whirlwind.description':
     'Berputar dalam busur mematikan, menyerang semua musuh di sekitar sebesar {damage}. (Talenta Murka)',
   'entities.abilities.whirlwind.name': 'Pusaran Berpisau',
@@ -8265,7 +8320,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memajukan satu denyut mendatang dari Pakta Membaramu, lalu membakar sasaran sebesar {damage} kerusakan Api. Menghasilkan 1 Pemusnahan dan 1 Kehancuran. Menampung {charges} muatan. (Ciri khas Penghancuran)',
   'entities.abilities.moonkin_form.name': 'Wujud Burung Bulan',
   'entities.abilities.moonkin_form.description':
-    'Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Berubah menjadi wujud apa pun memberikan Langkah Berderap, ledakan singkat kecepatan gerak. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)',
+    'Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Berubah menjadi wujud apa pun memberikan Langkah Berderap Lambat, ledakan singkat kecepatan gerak. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)',
   'entities.abilities.feral_charge.name': 'Gelora Purba',
   'entities.abilities.feral_charge.description':
     'Lepaskan gelora purba. Dalam Wujud Kucing, regenerasi energi meningkat 100% selama 10 detik. Dalam Wujud Bruin, langsung menghasilkan 50 Amukan. (ciri khas Keganasan)',
@@ -11940,7 +11995,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Ganti Nama',
   'hud.pet.renameLabel': 'Pilih nama baru untuk peliharaan.',
   'hud.pet.revive': 'Obati',
-  'hud.pet.stanceDesc': 'Klik untuk memilih Pasif, Bertahan, atau Agresif.',
   'hud.pet.stanceTitle': 'Sikap Peliharaan',
   'hud.pet.taunt': 'Provokasi',
   'hud.prompts.acceptDuel': 'Terima Duel',
@@ -14119,7 +14173,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Kemampuan',
   'guide.search.typeDeed': 'Jasa',
   'guide.settingsPage.audioBody':
-    'Jendela opsi bukan cuma piksel. Audio menampung tiga penggeser volume, untuk efek suara, musik, dan suara tokoh, ditambah sakelar musik nyala mati dan empat sakelar untuk suara yang paling cepat membosankan: suara NPC, langkah kaki, suara antarmuka, dan umpan balik klik. Tab Umum pada panel Antarmuka membawa pemilih bahasa yang melokalkan ulang seluruh antarmuka seketika, tanpa muat ulang, dan pemilih tema untuk dandanan jendela.',
+    'Jendela opsi juga mengatur suara. Audio memiliki empat penggeser volume untuk efek suara, suasana, musik, dan suara tokoh, sakelar musik, serta empat sakelar untuk suara yang paling sering melelahkan: suara NPC, langkah kaki, suara antarmuka, dan respons klik. Tab Umum di panel Antarmuka menyediakan pemilih bahasa yang langsung menerjemahkan seluruh antarmuka tanpa memuat ulang, serta pemilih tema untuk tampilan jendela.',
   'guide.settingsPage.audioTitle': 'Suara dan bahasa',
   'guide.settingsPage.autolootBody':
     'Lebih suka tidak mengeklik setiap mayat? Jarahan Otomatis Sambil Lewat, di tab Tempur pada panel Antarmuka dan mati secara bawaan, menciduk jarahan dari buruanmu sendiri saat kamu berjalan melewatinya.',
@@ -14636,7 +14690,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Menyalurkan selama 3 dtk, memberi {damage} kerusakan Bayangan setiap detik kepada musuh dalam 8 m dari area sasaran. Kerusakan meningkat dengan Kekuatan Mantra. (Talenta pendeta)',
   'entities.abilities.multi_shot.description':
-    'Menembakkan rentetan ke area target dan menghasilkan {damage} kerusakan Fisik kepada musuh dalam radius 8 m. (talenta Hunter)',
+    'Melepaskan hujan tembakan ke area sasaran, memberikan {damage} kerusakan Fisik kepada musuh dalam jarak 8 yard. (talenta Pemburu)',
   'entities.abilities.prayer_of_healing.description':
     'Menyembuhkan sekutu dalam 30 m sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra. (Suci)',
   'entities.abilities.preparation.description':
@@ -14646,7 +14700,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Menakuti musuh dalam 8 m sampai 4 dtk. Kerusakan bisa mematahkan efeknya.',
   'entities.abilities.shadowstep.description':
-    'Melangkah menembus bayangan menuju targetmu, kawan maupun lawan, tanpa mematahkan Duskveil. (talenta Rogue)',
+    'Melangkah menembus bayangan menuju targetmu, kawan maupun lawan, tanpa mematahkan Duskveil. Menyimpan hingga 2 muatan. (talenta Rogue)',
   'entities.abilities.silence.description': 'Membungkam target selama 4 detik. (talenta Priest)',
   'entities.abilities.tranquility.description':
     'Menyalurkan energi pemulihan selama 4 detik, memulihkan 42 sampai 52 nyawa sekutu dalam jarak 30 m setiap detik. (talenta Druid)',
@@ -14671,7 +14725,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pasif: serangan kritis mantramu membakar target sebesar 30% kerusakan yang ditimbulkan selama 6 dtk. dan dapat bertumpuk. (penguasaan Api)',
   'entities.abilities.mass_barrier.name': 'Penghalang Massal',
   'entities.abilities.mass_barrier.description':
-    'Melindungi dirimu dan hingga 4 sekutu di dekatmu dalam jarak 30 m; masing-masing menyerap 130 kerusakan selama 60 dtk. (talenta mage)',
+    'Melindungi dirimu dan hingga 4 sekutu di dekatmu dalam jarak 30 m; masing-masing menyerap {damage} kerusakan selama 15 dtk. (talenta mage)',
   'entities.abilities.overload.name': 'Beban Berlebih',
   'entities.abilities.overload.description':
     'Mantra berikutnya diperkuat sebesar 40%, tetapi membutuhkan 50% lebih banyak mana. Berlangsung 10 dtk. (talenta mage)',
@@ -15994,17 +16048,17 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Lepaskan Sang Buas',
   'entities.abilities.wildheart.name': 'Hati Liar',
   'entities.abilities.bloodhook.description':
-    'Menerjang ke arah musuh dan menerapkan Luka Kait Darah, memberi 34 kerusakan Fisik dasar ditambah 26% kekuatan serang jarak jauhmu selama 12 dtk dalam 4 denyut. (Ciri khas Kecakapan Lapangan)',
+    'Menerjang musuh dan menerapkan luka Kait Darah, memberikan 34 kerusakan Fisik dasar ditambah 26% Daya Serang Jarak Jauhmu dalam 4 denyut selama 12 dtk. Saat tiba, memperlambat target sebesar 30% selama 3 dtk. (Bertahan Hidup)',
   'entities.abilities.bloodtrail_assault.description':
-    'Selama 12 dtk, Kait Darah menyebarkan luka berkekuatan 60% ke maksimal 2 musuh di dekatnya, Robek Luka memerintahkan serangan hewan peliharaan sebesar 18 kerusakan, dan Muatan Serpihan bertambah 2 meter, memberi 25% lebih banyak kerusakan dasar ke sasaran utamanya, serta memicu 50% lebih banyak kerusakan luka.',
+    'Selama 12 dtk, Kait Darah menyebarkan luka dengan kekuatan 60% ke maksimal 2 musuh dalam 5 meter, Robekan Luka memerintahkan serangan peliharaan sebesar 18 kerusakan, dan Muatan Serpihan menjangkau 2 meter lebih jauh, memberikan 25% kerusakan dasar lebih besar kepada target utama serta memicu 50% kerusakan luka lebih besar. Tanpa peliharaan hidup, Fokusmu juga pulih 100% lebih cepat.',
   'entities.abilities.cold_focus.description':
     'Selama 12 dtk, Tembakan Terukur memulihkan 50% lebih banyak fokus, dan Tarikan Panjang menghabiskan 25% lebih sedikit serta dirapal 30% lebih cepat. (Ciri khas Pandangan Dingin)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Pasif: Putus Jejak menyegarkan Momentum Berburu dan menyiapkan Serangan Pembelah atau Kait Darah berikutnya selama 12 dtk. Serangan Pembelah memberi 15% lebih banyak kerusakan per tumpukan. Kait Darah memberi 18 sampai 24 kerusakan Fisik tambahan, meningkat 15% per tumpukan dan oleh kekuatan serang jarak jauhmu. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Kecakapan Lapangan)',
+    'Pasif: Dengan Momentum Berburu, Putus Jejak menyiapkan Serangan Cabik Perut atau Kait Darah berikutnya selama 12 dtk. Serangan Cabik Perut memberikan 15% kerusakan tambahan per tumpukan. Kait Darah memberikan tambahan 18 hingga 24 kerusakan Fisik, ditingkatkan 15% per tumpukan dan oleh Daya Serang Jarak Jauh. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Bertahan Hidup)',
   'entities.abilities.frostjaw_trap.description':
-    'Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
+    'Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
   'entities.abilities.hunting_momentum.description':
-    'Pasif: Serangan Pembelah memberi 1 Momentum Berburu selama 8 dtk, hingga 3. Pada 3 tumpukan, Robek Luka memberi 45% lebih banyak kerusakan serangan dan menghabiskan tumpukan. (Kecakapan Lapangan)',
+    'Pasif: Serangan Cabik Perut dan Muatan Serpihan yang mengenai musuh masing-masing memberi 1 Momentum Berburu, maksimal 3. Bertahan hingga dihabiskan atau kamu keluar dari pertempuran; setiap tumpukan meningkatkan kecepatan gerak sebesar 15%. Pada 3 tumpukan, Robekan Luka memberikan 60% kerusakan serangan lebih besar dan menghabiskan tumpukan. (Bertahan Hidup)',
   'entities.abilities.measured_shot.description':
     'Menembak sasaran sebesar {damage} kerusakan Fisik. Tembakan yang mengenai memulihkan 20 fokus. Kerusakan meningkat dengan kekuatan serang jarak jauh.',
   'entities.abilities.pack_command.description':
@@ -16014,11 +16068,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Mengurangi kerusakan yang diterima 60% selama 8 dtk, tetapi mencegah serangan selama aktif.',
   'entities.abilities.shrapnel_charge.description':
-    'Mengenai sasaran sebesar 24 sampai 30 kerusakan Fisik dan hingga 4 musuh lain dalam 6 meter sebesar 13 sampai 17. Sasaran lain juga berdarah sebesar 12 kerusakan selama 6 dtk. Bila sasaran utama membawa Luka Kait Darahmu, 1 denyut luka diberikan seketika. Kerusakan langsung meningkat dengan kekuatan serang jarak jauh.',
+    'Menyerang kerucut sepanjang 10 meter di depanmu. Targetmu, atau musuh terdekat yang terkena jika target berada di luar kerucut, menerima 24 hingga 30 kerusakan Fisik. Musuh lain dalam kerucut menerima 7 hingga 9 dan berdarah sebesar 12 kerusakan selama 6 dtk. Jika target utama memiliki luka Kait Darah milikmu, langsung berikan 1 denyut luka. Mengenai musuh memberi 1 Momentum Berburu. Kerusakan langsung meningkat dengan Daya Serang Jarak Jauh.',
   'entities.abilities.stampede.description':
     'Memanggil 3 binatang buas selama 12 dtk. Masing-masing menyerang tiap 2 dtk sebesar {damage} kerusakan Fisik. Kerusakan yang ditampilkan mencakup 8% kekuatan serang jarak jauhmu sebelum bonus kerusakan hewan peliharaan. Binatang buas mengunci Keganasan Kawanan saat dipanggil, memperoleh 10% kerusakan per tumpukan. Saat Serbuan Liar dalam jeda, Perintah Kawanan yang berhasil berpeluang 20% mengatur ulangnya, dijamin setelah 5 peluang gagal. Ia tidak dapat diatur ulang selama binatang buas aktif. (Penguasa Kawanan)',
   'entities.abilities.trailbreak.description':
-    'Melompat 12 meter ke belakang. Bila kamu punya Momentum Berburu, ia disegarkan dan menyiapkan Masuk Kembali selama 12 dtk.',
+    'Melompat 25 meter ke belakang dan lepas dari efek akar serta perlambatan gerak. Bila kamu punya Momentum Berburu, ia disegarkan dan menyiapkan Masuk Kembali selama 12 dtk.',
   'entities.abilities.unleash_beast.description':
     'Menghabiskan 3 Keganasan Kawanan setelah hewan peliharaanmu menyerang sebesar 83 sampai 105 kerusakan Fisik dan mengguncang setiap musuh dalam 6 meter sebesar 26 sampai 34. Serangan dan guncangan memakai bonus kerusakan hewan peliharaan penuh 30% dari Keganasan Kawanan dan meningkat dengan kekuatan serang hewan peliharaan. Selama 8 dtk sesudahnya, hewan peliharaan memberi 25% lebih banyak kerusakan, menyerang 35% lebih cepat, dan membuat Tembakan Bengis membelah hingga 2 musuh di dekatnya.',
   'entities.abilities.wildheart.description': 'Seketika memulihkan 30% nyawa maksimummu.',
@@ -16045,7 +16099,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Pasif: selama Serangan Leluhur dalam jeda, menghabiskan Pertanda Badai berpeluang 25% mengatur ulangnya. Bila 3 peluang pertama gagal, yang ke-4 selalu mengatur ulangnya. (Roh Perang)',
   'entities.abilities.thunder_reservoir.description':
-    'Pasif: Sambaran Busur dan Petir Bercabang memberi Guruh, hingga 5. Pada 5 Guruh, Sentakan Bumi memberi 125% lebih banyak kerusakan atau Gempa Bumi 100% lebih banyak, lalu menghabiskan seluruh Guruh. (Panggilan Guruh)',
+    'Pasif: Sambaran Busur, Petir Bercabang, dan Ledakan Magma memberi Guruh, hingga 5. Pada 5 Guruh, Sentakan Bumi memberi 125% lebih banyak kerusakan atau Gempa Bumi 100% lebih banyak, lalu menghabiskan seluruh Guruh. (Panggilan Guruh)',
   'entities.abilities.tidecall.description':
     'Menyembuhkan sasaran kawan sebesar {damage}. Penyembuhan meningkat dengan kekuatan mantra. Menambahkan penyembuhan penuh sebelum kelebihan ke Arus Pemulih, hingga 30% dari nyawa maksimum sasaran.',
   'entities.abilities.unleash_weapon.description':
@@ -16121,7 +16175,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Pematah Sumsum',
   'entities.abilities.marrowbreak.description':
-    'Menghabiskan 3 Darah Tua milikmu untuk serangan berat berancaman tinggi sebesar {damage} kerusakan. Di bawah setengah nyawa, sebagai gantinya melindungimu dengan perisai sebesar 18% nyawa maksimum selama 8 dtk dan mengembalikan 15 amarah.',
+    'Menghabiskan 3 Darah Tua milikmu untuk serangan berat berancaman tinggi sebesar {damage} kerusakan. Di bawah setengah nyawa, sebagai gantinya menyembuhkanmu sebesar 18% nyawa maksimum dan mengembalikan 15 amarah.',
   'entities.abilities.moonlash.name': 'Gelombang Rembulan',
   'entities.abilities.moonlash.description':
     'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan berat sebesar {damage} kerusakan Gaib: pilihan kerusakan. Jejak Surya menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
@@ -16130,7 +16184,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga {duration} dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan.',
   'entities.abilities.overbloom.name': 'Mekar Raya',
   'entities.abilities.overbloom.description':
-    'Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran.',
+    'Menghabiskan 3 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Pemulihan Spora segar pada sasaran.',
   'entities.abilities.redharvest.name': 'Panen Merah',
   'entities.abilities.redharvest.description':
     'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo.',
@@ -16144,7 +16198,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Darah Tua: tahap {stacks} dari {max}. Serangan Kucing dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi',
   'hudChrome.auraEffect.verdance':
-    'Kehijauan: tahap {stacks} dari {max}. Setiap Mekar Liar atau Mekar Kedua BARU yang kamu tanam menambah 1. Pada {max}, Pemulihan Cepat menjadi Mekar Raya',
+    'Kehijauan: tahap {stacks} dari {max}. Setiap Pemulihan Spora, Mekar Kedua, atau Penyembuhan Liar yang kamu rapal menambah 1, dan setiap tahap mempersingkat rapalan Penyembuhan Liar. Pada {max}, Pemulihan Cepat menjadi Mekar Raya',
   'hudChrome.continentMap.levels': 'Level {min} hingga {max}',
   'hudChrome.continentMap.summary': 'Peta dunia. Pilih zona untuk membuka petanya.',
   'hudChrome.continentMap.title': 'Peta Dunia',
@@ -16526,7 +16580,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Setiap serangan menambah 1 Ritus Bisa (maks 6) dan mengembalikan 15 energi. Pada 6 Ritus Bisa, Dirt Nap berubah menjadi Venomrend (menimbulkan seluruh sisa kerusakan pendarahanmu sekaligus).',
   'entities.abilities.blade_flurry.description':
-    'Melepaskan rentetan bilah, meningkatkan kecepatan serang sebesar 20% selama 12 detik. (mesin Thuggery)',
+    'Melepaskan rentetan bilah, meningkatkan kecepatan serang sebesar 20% selama 30 detik. (mesin Thuggery)',
   'entities.abilities.bone_armor.description':
     'Menyelimutimu dengan tulang, menyerap kerusakan setara 20% dari nyawa maksimummu.',
   'entities.abilities.bone_armor.name': 'Bone Armor',
@@ -16542,7 +16596,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.specNote_feral':
     'Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
   'entities.abilities.cold_blood.description':
-    'Memusatkan niat membunuhmu sehingga seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)',
+    'Memusatkan niat membunuhmu sehingga 5 seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)',
   'entities.abilities.corpse_explosion.description':
     'Mengorbankan Bone Mage terlebih dahulu, lalu Skeletal Warrior, dan Gravewing hanya sebagai upaya terakhir. Di antara duplikat, ia memilih yang durasi tersisanya paling sedikit, lalu yang terlemah, untuk memberikan {damage} kerusakan Bayangan di lokasi yang dipilih.',
   'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
@@ -16595,7 +16649,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memanggil penghakiman atas Evil Eye utamamu selama 15 detik, memberikan 40 Kecaman dan 3 Benang Takdir, mengaktifkan Possession, menggandakan Kecaman yang dihasilkan melalui Eye utama, dan meningkatkan kerusakan Sentence sebesar 20%. Sentence pertama mengembalikan 50 Kecaman.',
   'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
   'entities.abilities.kidney_shot.description':
-    'Jurus penutup yang membuat target terpana selama 1 detik plus 1 detik per poin combo (5 poin combo: 6 detik).',
+    'Jurus penutup yang membuat target terpana selama 2 detik plus 1 detik per poin combo (5 poin combo: 7 detik).',
   'entities.abilities.litany_of_guilt.description':
     'Mengutuk Evil Eye utamamu selama 6 detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain dalam radius 8 m, paling banyak sekali per detik. Peringkat 2 memperpanjangnya menjadi 8 detik dan 4 musuh.',
   'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
@@ -16605,7 +16659,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman besar. Aktif pada ayunanmu berikutnya. Hanya dalam Wujud Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru melindungimu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah.',
+    'Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru menyembuhkanmu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah.',
   'entities.abilities.moonfire.description':
     'Membakar musuh dengan api rembulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16632,22 +16686,22 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 1 Serpihan Jiwa untuk menambahkan Skeletal Warrior persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Ia membelah musuh terdekat sebesar 45% kerusakan setiap 6 detik, dan Reaping Command menahan targetnya dengan perlambatan 40% selama 4 detik.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Kucing.',
+    'Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan {overTime} kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Kucing.',
   'entities.abilities.rake.specNote_feral':
     'Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
   'entities.abilities.reaping_command.description':
     'Menghabiskan 2 Serpihan Jiwa untuk memerintahkan setiap abdi mayat hidup menyerang secara serentak. Graveguard memancing perhatian dan bersiaga, Warrior menahan, Bone Mage membuka pertahanan sihir, dan Gravewing merobek semua musuh yang terkena.',
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Menyembuhkan target kawan sebesar {damage} dan jumlah tambahan selama 21 detik.',
+    'Menyembuhkan target kawan sebesar {damage} dan jumlah tambahan selama 15 detik. Jika efek berlangsung penuh, efek itu menyembuhkan target lagi sebesar jumlah penyembuhan awal.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Menanam kuntum BARU menambah 1 Verdance (maks 5).',
+    'Setiap rapalan menambah 1 Kehijauan (maks 3), termasuk saat menyegarkan kuntum yang masih aktif.',
   'entities.abilities.rejuvenation.description':
     'Menyembuhkan target sebesar {damage} selama 12 detik.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Menanam kuntum BARU menambah 1 Verdance (maks 5). Pada 5 Verdance, Fleetmend berubah menjadi Overbloom.',
+    'Setiap rapalan menambah 1 Kehijauan (maks 3), termasuk saat menyegarkan kuntum yang masih aktif. Pada 3 Kehijauan, Pemulihan Cepat berubah menjadi Mekar Raya.',
   'entities.abilities.rip.description':
-    'Jurus penutup yang membuat target berdarah setiap 2 detik selama 24 detik: 36 kerusakan plus 24 per poin combo yang dipakai (5 poin combo: {damage} total). Hanya dalam Wujud Kucing.',
+    'Serangan penutup yang membuat target berdarah setiap 2 dtk selama 24 dtk: 72 kerusakan ditambah 48 per poin kombo yang dipakai (5 poin: total {damage}). Hanya Wujud Kucing.',
   'entities.abilities.rip.specNote_feral': 'Pukulan yang mengenai menambah 1 Darah Tua (maks 3).',
   'entities.abilities.ruinous_brand.description':
     'Menandai musuh selama 15 detik. 3 mantra langsung berikutnya bergema sebesar 25% kerusakan terhadap musuh yang ditandai, atau menyalin 50% kerusakan kepadanya saat dirapalkan terhadap target lain. Gema Baut Reruntuhan juga terhitung sebagai pukulan kritis, tanpa pengganda kerusakan kritis tambahan.',
@@ -16684,11 +16738,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan seketika sebesar 80 hingga 100 kerusakan Alam plus bakaran 45 selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3.',
   'entities.abilities.stealth.description':
-    'Menyembunyikanmu dalam bayangan: musuh nyaris tidak menyadarimu, tetapi kamu bergerak 50% lebih lambat. Menyerang atau menerima kerusakan membatalkan Selubung Senja. Rapal lagi untuk keluar.',
+    'Menyembunyikanmu dalam bayangan: musuh nyaris tidak menyadarimu, dan kamu bergerak dengan kecepatan penuh. Menyerang atau menerima kerusakan membatalkan Selubung Senja. Rapal lagi untuk keluar.',
   'entities.abilities.stealth.specNote_subtlety':
     'Setiap pembuka yang kamu pakai dari Selubung Senja menambah 1 Gloam (maks 3).',
   'entities.abilities.swiftmend.description':
-    'Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Penanaman Wildbloom dan Second Bloom menambah Verdance; pada 5 Verdance tombol ini berubah menjadi Overbloom, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)',
+    'Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Setiap rapalan Pemulihan Spora, Mekar Kedua, dan Penyembuhan Liar menambah 1 Kehijauan; pada 3 Kehijauan tombol ini berubah menjadi Mekar Raya, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)',
   'entities.abilities.swipe.description':
     'Sapukan cakarmu melalui musuh terdekat sebesar {damage} kerusakan. Menimbulkan ancaman ekstra. Hanya dalam Wujud Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -16765,7 +16819,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     '{used} dari {cap} dtk pengurangan jeda terpakai dalam jendela ini',
   'hudChrome.auraEffect.bruinRushWindow':
-    'Wujud Serigala tidak memakai mana dan menjepit target Terjangan Bruin-mu, memperlambatnya {pct}% selama {sec} dtk',
+    'Wujud Kucing tidak memakai mana dan menjepit target Terjangan Bruin-mu, memperlambatnya {pct}% selama {sec} dtk',
   'hudChrome.auraEffect.desolation':
     '{charges} muatan: Baut Reruntuhanmu berikutnya dirapal {castPct}% lebih cepat atau Hujan Apimu berikutnya mendarat seketika',
   'hudChrome.auraEffect.duskfireClaim': 'Kematian memberikan {value} Wrack',
@@ -17132,7 +17186,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Keduanya adalah dua tindakan terpisah pada tubuh yang sama. Semua yang dipegang bangkai, koin dan jarahan ditambah komponen yang bisa dipanen, terbuka di jendela yang sama, tetapi tombol interaksi dan Ambil Jarahan hanya mengambil jarahan biasa, yang mengikuti aturan jarahan normal. Pemanenan adalah sisi profesi, mengupas bahan dari bangkai itu sendiri, dan baru terjadi saat kamu memilih Panen di jendela itu.\n\nPemanenan adalah siapa cepat, sekali pakai: setiap bangkai hanya bisa dipanen sekali, oleh siapapun yang mengklaimnya pertama, termasuk secara online. Fokus Kotamu membentuk apa yang kamu dapatkan: saat berdiri di pusat kota kamu bisa menyebarkan 10 poin fokus ke jenis komponen yang kamu pedulikan, dan setiap komponen yang difokuskan menghasilkan tingkat yang lebih baik (setiap 5 poin menaikkannya satu langkah, maksimal dua langkah) dan menghasilkan lebih banyak (10 persen per poin). Komponen yang tidak difokuskan tidak pernah dibuat lebih buruk.',
   'guide.profPages.faq.a4':
-    'Kamu mendapat rejeki nomplok. Kira-kira 1 dari 90 panen memicu peristiwa pengumpulan langka (kayu inti kuno pada pohon, urat bijih pilihan pada bijih, mekar yang bersinar di bawah sinar bulan pada herba): peristiwa itu melipatgandakan hasil lima kali, menandatangani setiap unit dengan namamu, dan mengumumkan temuan itu ke seluruh zona. Gulungan kelangkaan langka atau lebih baik pada panen biasa juga menandatangani hasilnya.\n\nMaterial bertanda tangan layak disimpan atau dijual mahal: memegang salinan bertanda tangan mana pun dari reagen yang dibutuhkan di bangku kerja menambah 2 poin persentase pada peluang karya master. Ingat saja bahwa material itu hanya menumpuk dengan salinan yang ditandatangani secara identik, jadi masing-masing memakai slot tasnya sendiri.',
+    'Kamu menemukan hasil berlimpah. Sekitar 1 dari 90 panen memicu kejadian pengumpulan langka: kayu teras purba pada pohon, urat murni pada bijih, atau bunga bermandikan bulan pada herba. Hasilnya dikalikan lima, setiap unit ditandatangani dengan namamu, dan temuannya diumumkan ke seluruh zona. Panen biasa yang mendapat kualitas langka atau lebih baik juga menandatangani hasilnya.\n\nBahan bertanda tangan layak disimpan atau dijual mahal: memiliki unit bertanda tangan dari reagen yang diperlukan di tas atau Brankas Material, di tempat pembuatan dapat mengambilnya, menambah 2 poin persentase peluang karya master. Unit itu dapat berbagi tumpukan yang cocok dengan bahan tanpa tanda tangan atau unit pengumpul dan penanda tangan lain tanpa kehilangan tanda; sumber dan jumlah masing-masing tetap dicatat terpisah.',
   'guide.profPages.faq.a5':
     'Pergi ke stasiun kerajinan mana pun dengan item di tasmu dan bayar masternya. Biaya mengikuti kualitas item: 25 perak untuk item tidak umum, 1 emas untuk langka, 4 emas untuk epik; legendaris membayar tarif epik, dan karya pesanan biasa membayar tarif tidak umum. Harus berupa stasiun sungguhan: stasiun bergerak tidak pernah menawarkan layanan ini.\n\nBiaya tersebut membeli lembar bersih, bukan penyembuhan: item tetap merupakan karya pesanan, sehingga ia terikat kembali pada siapapun yang menerimanya dalam perdagangan berikutnya. Jika beberapa salinan terikat berbagi tumpukan, satu salinan diambil dan dilepas ikatannya per pembayaran.',
   'guide.profPages.faq.a8':
@@ -17815,7 +17869,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Saat Mazmur Penjagaan Anda habis sepenuhnya, Nyanyian Pengikisan berikutnya dalam 10 detik bersifat instan. Tidak dapat terjadi lebih dari sekali tiap 15 detik.',
   'entities.itemSets.emberscreed.name': 'Busana Kredo Bara',
   'entities.itemSets.forgewall.bonus2':
-    'Tekad Besi mengubah amarah menjadi 5 serapan per poin, bukan 4.',
+    'Perisai Tekad Besi menyerap 25% dari nyawa maksimummu, bukan 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Merapal Retak Perisai mengurangi waktu pulih Tekad Besi yang tersisa sebesar 2 detik.',
   'entities.itemSets.forgewall.name': 'Aegis Tembok Tungku',
@@ -17829,8 +17883,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Serangan serempak Perintah Penuai menghasilkan kerusakan 25 persen lebih besar.',
   'entities.itemSets.gravebrand.name': 'Regalia Tanda Kubur',
-  'entities.itemSets.grovespring.bonus2':
-    'Sembuh Kilat terlebih dahulu mengonsumsi Mekar Liar atau Mekar Kedua milik Anda dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'entities.itemSets.grovespring.bonus4':
     'Mekar Berlebih memanen 75 persen efek Anda yang tersisa dan setelahnya menyimpan 1 Verdansi.',
   'entities.itemSets.grovespring.name': 'Busana Mata Air Rimba',
@@ -18662,7 +18714,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Lacak {count} pembuatan {name} sebagai target pengumpulanmu',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Serangan jarak dekatmu yang mengenai target dapat memberi 50 Kekuatan selama 15 dtk dan memulihkan 200 kesehatanmu. Pengubah penyembuhan berlaku. Setiap serangan memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menyerang. Tanpa cooldown internal. Kedua tangan berbagi satu buff; setiap pemicu menyegarkannya dan buff ini tidak pernah bertumpuk. Serangan jarak jauh tidak memicu efek ini. Bentuk Serigala menggunakan kecepatan ayunan dasar 1 dtk sebagai gantinya.',
+    'Serangan jarak dekatmu yang mengenai sasaran dapat memberikan 50 Kekuatan selama 15 dtk dan memulihkan 200 kesehatanmu. Pengubah penyembuhan berlaku. Setiap hantaman memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menghantam. Tanpa jeda internal. Kedua tangan berbagi satu penguat; setiap pemicuan memperbaruinya dan efeknya tidak bertumpuk. Serangan jarak jauh tidak memicunya. Dalam Wujud Kucing, serangan otomatis memakai kecepatan cakar 1 dtk. Hantaman dan jurus penyelesai dalam Wujud Kucing dan Wujud Bruin memakai kecepatan senjata itu sendiri; Cakar Menyapu mengundi sekali per penggunaan, bukan per sasaran.',
   'hudChrome.enchantName.enchant_chest_armor': 'Ukiran Dada: Penguatan',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Ukiran Dada: Stamina Lebih Besar',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Ukiran Dada: Stamina Bercahaya',
@@ -19537,7 +19589,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Kemenangan berperingkat membayar Kehormatan, mata uang pemain melawan pemain, dan kekalahan yang kamu mainkan sampai selesai tetap membayar bagian yang lebih kecil, begitu juga hasil seri, jadi rating adalah satu-satunya hal yang benar-benar hilang karena kalah. Kehormatan dimaksudkan untuk memberi hadiah pada pertandingan sungguhan: mengalahkan lawan atau tim yang sama lagi pada hari yang sama tidak memberi bayaran tambahan, begitu juga kalah dari mereka lagi, hari kemenangan panjang membayar penuh untuk rentang kemenangan awal lalu membagi dua bayaran kemenangan, membaginya lagi lebih dalam dan bertahan di sana, dan pertandingan yang dibatalkan lawan tetap mengubah ratingmu tetapi sama sekali tidak membayar Kehormatan. Hari itu milik realm sendiri: berganti saat reset malam realm, batas yang sama ketika semua penguncian harian dibersihkan.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tidak berpengaruh melawan monster. Keduanya hanya berlaku saat kamu melawan pemain lain, dalam duel, arena, atau medan pertempuran, saat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batasnya sendiri. Setiap keluarga zirah juga merupakan set, dan bonus setnya juga berupa rating Perang atau efek yang hanya bekerja melawan pemain, jadi bonus set lengkap Kehormatan tidak berarti apa-apa pada bos dungeon. Potongannya sendiri tetap membawa statistik biasa, zirah, dan kerusakan senjata yang bekerja di mana-mana; rating Perang dan bonus setlah yang diam terhadap monster.',
+    'Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tidak berpengaruh melawan monster. Keduanya hanya berlaku saat kamu melawan pemain lain, dalam duel, arena, atau medan pertempuran, saat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batasnya sendiri. Setiap keluarga zirah juga merupakan set, dan bonus setnya juga berupa rating Perang atau efek yang hanya bekerja melawan pemain, jadi bonus set lengkap Kehormatan tidak berarti apa-apa pada bos dungeon. Potongannya sendiri tetap membawa statistik biasa, zirah, dan kerusakan senjata yang bekerja di mana-mana; rating Perang dan bonus setlah yang diam terhadap monster. Satu pengecualian berlaku di mana saja: dua bagian dari set mana pun ini juga membuat kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Itulah pertukaran yang disengaja. Perlengkapan Perang dibuat untuk melawan pemain, bukan jalan pintas melewati tingkatan dungeon: perlengkapan Perang tidak pernah membawa rating pertarungan yang dimiliki epik dungeon pada slot yang sama, dan rating Perang serta bonus set yang dibawanya sepenuhnya digunakan untuk melawan pemain lain. Jika ingin bertahan di arena, belilah. Jika ingin menuntaskan mode heroik lebih cepat, dapatkan perlengkapanmu di dungeon.',
   'guide.controls.harvestJournal': 'Jurnal Panen',
@@ -19642,7 +19694,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Cara koin bergerak melalui perdagangan: biaya dan saluran keluar yang tepat, apa yang benar-benar laku, aturan Pasar Dunia, pesanan kerja, komisi, dan tempat koleksi yang dibiayai raid di samping kerajinan biasa.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Beberapa barang membawa nama. Baris sumber material menyebut siapa yang mengumpulkan setiap kelompok unit, sementara tanda terpisah Ditandatangani oleh mengidentifikasi penanda tangan premium bila ada. Fakta itu berdiri sendiri: material yang dikumpulkan biasa mencatat pengumpul tanpa mendapat tanda tangan, dan stok bertanda tangan lama dapat menyebut penanda tangannya sambil jujur mengatakan bahwa tidak ada pengumpul tercatat. Potongan yang selesai justru menyebut siapa pembuatnya. Catatan ini ikut dalam perdagangan, bank, surat, Pasar Dunia, bahkan pembelian kembali vendor, dan tidak pernah pudar.\n\nPengumpulan menandatangani hasil terbaiknya secara otomatis: panen apa pun yang menghasilkan langka atau lebih baik datang bertanda tangan, dan temuan langka menandatangani seluruh rezeki lipat limanya. Panen mayat dengan lemparan beruntung menandatangani hasilnya saat keluarga itu tidak memiliki spesimen untuk diberikan, dan bila ada spesimen, mempertahankan hasil biasa lalu mencetak spesimen murni bertanda tangan di sampingnya. Kerajinan menandatangani dengan cara yang sama: setiap salinan hasil langka atau lebih baik dicetak bertanda tangan, dan karya master selalu bertanda tangan apa pun mutunya, sehingga versi terbaik setiap potongan selalu menyebut pembuatnya. Tanda tangan material biasa ikut pada unit itu sendiri dan tidak dapat hilang hanya karena tumpukan yang cocok sudah berisi pengumpul atau penanda tangan lain. Spesimen murni terpisah adalah barang berbeda dan tetap membutuhkan ruang; jika tidak muat, hasil biasa dari mayat tetap ada tetapi spesimen hilang.\n\nBarang selesai mempertahankan identitas ketat, sehingga dua salinan hanya menyatu saat semua tandanya sama persis: barang yang sama, penanda tangan yang sama, statistik karya master yang sama, mantra yang sama, dan ikatan yang sama. Material yang cocok berbagi slot di antara pengumpul dan penanda tangan sambil mempertahankan hitungan untuk setiap sumber. Tooltip saat diarahkan merangkum sumber; klik kanan tumpukan untuk daftar lengkap (di perangkat sentuh, gunakan tombol Sumber). Pisahkan berdasarkan pengumpul membuat tumpukan itu tetap terpisah di tas, dan penyortiran menghormati pilihan itu. Material yang dipindahkan dapat bertumpuk normal dengan material penerima.\n\nTanda tangan mengembalikan manfaat kepada perajin: memegang salinan bertanda tangan dari reagen yang dibutuhkan di meja kerja, siapa pun penandatangannya, menambah 2 poin persentase peluang karya master, dan memegang reagen yang ditandatangani tanganmu sendiri mengurangi jumlah yang dibutuhkan untuk reagen itu sebanyak satu, tidak pernah di bawah satu, kecuali reagen ditandai tidak dapat didiskon; inti raid selalu mempertahankan biaya penuh. Hasil langka atau lebih baik bertanda tangan buatanmu sendiri bahkan terus mengajarimu, hari ini hanya melalui ramuan yang dibuat: minum ramuan langka yang kamu racik dan tandatangani, dan sedikit keahlian mengalir kembali ke kerajinan yang membuatnya, selama kerajinan itu salah satu bidang utama aktifmu. Ini benar-benar hanya lengan ramuan, jadi eliksir, gulungan, atau labu puncak tidak mengajarimu kembali betapa halus pun tandanya.',
+    'Beberapa barang membawa nama. Baris sumber material menyebut siapa yang mengumpulkan setiap kelompok unit, sementara tanda terpisah Ditandatangani oleh mengidentifikasi penanda tangan premium bila ada. Fakta itu berdiri sendiri: material yang dikumpulkan biasa mencatat pengumpul tanpa mendapat tanda tangan, dan stok bertanda tangan lama dapat menyebut penanda tangannya sambil jujur mengatakan bahwa tidak ada pengumpul tercatat. Potongan yang selesai justru menyebut siapa pembuatnya. Catatan ini ikut dalam perdagangan, bank, surat, Pasar Dunia, bahkan pembelian kembali vendor, dan tidak pernah pudar.\n\nPengumpulan menandatangani hasil terbaiknya secara otomatis: panen apa pun yang menghasilkan langka atau lebih baik datang bertanda tangan, dan temuan langka menandatangani seluruh rezeki lipat limanya. Panen mayat dengan lemparan beruntung menandatangani hasilnya saat keluarga itu tidak memiliki spesimen untuk diberikan, dan bila ada spesimen, mempertahankan hasil biasa lalu mencetak spesimen murni bertanda tangan di sampingnya. Kerajinan menandatangani dengan cara yang sama: setiap salinan hasil langka atau lebih baik dicetak bertanda tangan, dan karya master selalu bertanda tangan apa pun mutunya, sehingga versi terbaik setiap potongan selalu menyebut pembuatnya. Tanda tangan material biasa ikut pada unit itu sendiri dan tidak dapat hilang hanya karena tumpukan yang cocok sudah berisi pengumpul atau penanda tangan lain. Spesimen murni terpisah adalah barang berbeda dan tetap membutuhkan ruang; jika tidak muat, hasil biasa dari mayat tetap ada tetapi spesimen hilang.\n\nBarang selesai mempertahankan identitas ketat, sehingga dua salinan hanya menyatu saat semua tandanya sama persis: barang yang sama, penanda tangan yang sama, statistik karya master yang sama, mantra yang sama, dan ikatan yang sama. Material yang cocok berbagi slot di antara pengumpul dan penanda tangan sambil mempertahankan hitungan untuk setiap sumber. Tooltip saat diarahkan merangkum sumber; klik kanan tumpukan untuk daftar lengkap (di perangkat sentuh, gunakan tombol Sumber). Pisahkan berdasarkan pengumpul membuat tumpukan itu tetap terpisah di tas, dan penyortiran menghormati pilihan itu. Material yang dipindahkan dapat bertumpuk normal dengan material penerima.\n\nTanda tangan mengembalikan manfaat kepada perajin: memiliki unit bertanda tangan dari reagen yang diperlukan, siapa pun penandatangannya, di tas atau Brankas Material di tempat pembuatan dapat mengambilnya, menambah 2 poin persentase peluang karya master, dan memegang reagen yang ditandatangani tanganmu sendiri mengurangi jumlah yang dibutuhkan untuk reagen itu sebanyak satu, tidak pernah di bawah satu, kecuali reagen ditandai tidak dapat didiskon; inti raid selalu mempertahankan biaya penuh. Hasil langka atau lebih baik bertanda tangan buatanmu sendiri bahkan terus mengajarimu, hari ini hanya melalui ramuan yang dibuat: minum ramuan langka yang kamu racik dan tandatangani, dan sedikit keahlian mengalir kembali ke kerajinan yang membuatnya, selama kerajinan itu salah satu bidang utama aktifmu. Ini benar-benar hanya lengan ramuan, jadi eliksir, gulungan, atau labu puncak tidak mengajarimu kembali betapa halus pun tandanya.',
   'guide.profPages.effectFeast':
     'Menyajikan pesta untuk disantap orang lain, satu porsi per orang: {servings} porsi, berlangsung {minutes} mnt.',
   'guide.profPages.effectFeastServing':
@@ -20020,4 +20072,246 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Efektif: {effective} | Overheal: {overheal} ({overhealPercent}) | Kena: {hits} ({critPercent} krit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Kena: {hits} | Kritis: {crits} ({critPercent}) | Rata-rata: {average} | Min/maks: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volume ambience',
+  'hudChrome.mapAtlas.resizeRailAria': 'Lebar bilah sisi peta',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Seret untuk mengubah ukuran bilah sisi peta. Klik dua kali untuk mengatur ulang.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Sekali setiap tiga jam, pada waktu yang tidak dapat diprediksi, seluruh realm diberi tahu bahwa sebuah bukit akan muncul di salah satu zona pertempuran bebas dalam lima belas menit, dan lingkarannya ditandai di tanah terbuka. Bukit bertahan selama empat puluh lima menit, lalu menghilang. Selama itu, setiap lima menit lokasi dan kelompok dengan total waktu penguasaan terlama diumumkan. Kelompok dengan pemain terbanyak di dalam lingkaran memperebutkan bukit dan merebutnya setelah mengumpulkan tiga puluh detik keunggulan jumlah. Kedatangan kelompok lawan hanya menjeda hitungan sampai kelompokmu kembali unggul; hitungan hanya diulang dari awal jika tidak ada anggota kelompokmu yang masih hidup di dalam. Pemain sendirian dihitung sebagai kelompok beranggotakan satu orang dan tetap menguasai bukit saat membentuk kelompok, tetapi anggota raid tidak dihitung sama sekali. Setiap anggota kelompok penguasa yang berdiri di dalam mendapat jumlah Kehormatan yang sama setiap menit, berapa pun lamanya mereka menguasai bukit. Kelompok penuh yang menguasainya tanpa gangguan selama seluruh masa bukit mendapat kira-kira setara tiga kemenangan medan perang. Saat bukit menghilang, jika kelompok dengan total penguasaan terlama telah menguasainya setidaknya sepuluh menit, semua pemain yang berdiri di dalam setidaknya satu menit selama penguasaan kelompok itu dan masih tergabung di dalamnya mendapat satu kemenangan untuk baris PvP Gudang Mingguan. Bilah di atas medan menunjukkan penguasa, jumlah pemain kedua pihak, dan hitungan perebutan; /hill di obrolan menunjukkan lokasinya.',
+  'errors.noUpdateFound': 'Tidak ada pembaruan. Coba lagi sebentar lagi.',
+  'errors.searchUpdates': 'Cari pembaruan',
+  'errors.updateSearchFailed': 'Tidak dapat memeriksa pembaruan. Silakan coba lagi.',
+  'errors.updateUnavailable': 'Perbarui melalui toko gim atau unduh klien terbaru.',
+  'hudChrome.auraEffect.formSporemender':
+    'Wujud Penyembuh Spora: penyembuhan meningkat {pct}%, zirah meningkat {armorPct}%, dan kecepatan gerak berkurang {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Barang terkunci tetap di slot tasnya. Buka kuncinya untuk memindahkannya.',
+  'hudChrome.death.pvpResurrect': 'Bangkit PvP',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Bangkit PvP siap: kamu akan bangkit di pemakaman terdekat.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Bangkit di pemakaman terdekat dengan kesehatan penuh tanpa Beban Penjaga yang baru.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Bangkit PvP ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Kamu dapat Bangkit PvP dalam {seconds}: kamu akan bangkit di pemakaman terdekat.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Perubahan kesulitan tertunda dibatalkan karena kelompok atau pemimpinnya berubah.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Perubahan kesulitan diantrekan karena masih ada seseorang atau jasadnya di dalam. Perubahan berlaku setelah semua instans kosong.',
+  'hudChrome.ferry.arrivesIn': 'Feri tiba dalam {time}',
+  'hudChrome.ferry.boardNow': 'Naik sekarang',
+  'hudChrome.ferry.destination': 'Tujuan: {dest}',
+  'hudChrome.ferry.portLabel': 'Feri {port} menuju {dest}',
+  'hudChrome.ferry.portTitle': 'Pelabuhan feri {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Jadwal feri tidak tersedia.',
+  'hudChrome.graphicsRestore.note': 'Memulihkan grafis',
+  'hudChrome.hill.contestOtherPaused': 'Lawan dijeda: {seconds} dari {total}',
+  'hudChrome.hill.contestYouPaused': 'Dijeda: {seconds} dari {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Diambil dari {name}',
+  'hudChrome.keybindLayout.apply': 'Konversi pintasan',
+  'hudChrome.keybindLayout.converted': 'Pintasan dikonversi dari {from} ke {to}.',
+  'hudChrome.keybindLayout.from': 'Pintasan dibuat untuk',
+  'hudChrome.keybindLayout.help':
+    'Setiap pintasan berpindah ke tombol yang menghasilkan karakter sama pada tata letak baru. Baris angka tetap di tempatnya. Nama tombol dalam daftar ini adalah posisi QWERTY; gambar papan ketik menampilkan tata letakmu.',
+  'hudChrome.keybindLayout.keepMovement': 'Pertahankan posisi tombol gerak',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Tombol gerak dipertahankan sebelumnya, jadi posisinya tetap dipertahankan. Pulihkan ke bawaan untuk memulai ulang.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (Belgia)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (Prancis)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Tata letak Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Tata letak Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (Brasil ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (Denmark)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (Spanyol)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (Italia)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (Norwegia)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (Swedia, Finlandia)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (Portugal)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (Turki)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Britania Raya)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Amerika Serikat)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ versi Swiss',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (Jerman)',
+  'hudChrome.keybindLayout.moves': 'Pintasan yang akan berpindah: {count}',
+  'hudChrome.keybindLayout.noChange': 'Tidak ada pintasan yang berubah di antara tata letak ini.',
+  'hudChrome.keybindLayout.open': 'Konversi',
+  'hudChrome.keybindLayout.title': 'Tata letak papan ketik',
+  'hudChrome.keybindLayout.to': 'Konversi ke',
+  'hudChrome.nameplate.bountyTag': 'Buruan berhadiah',
+  'hudChrome.options.classicCombatText': 'Teks tempur klasik',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Barang di bawah kualitas ini dijual dengan satu klik. Barang yang salah dijual dapat dibeli kembali, kecuali barang abu-abu tanpa tanda tangan.',
+  'hudChrome.options.spellEffects': 'Efek mantra',
+  'hudChrome.options.spellTooltipOnHover': 'Keterangan mantra saat ditunjuk',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.realmMotd.cleared': 'Pesan harian dihapus.',
+  'hudChrome.realmMotd.line': 'Pesan harian: {text}',
+  'hudChrome.realmMotd.none': 'Belum ada pesan harian.',
+  'hudChrome.realmMotd.saveFailed':
+    'Pesan harian tidak dapat disimpan dan akan hilang saat dimulai ulang.',
+  'hudChrome.realmMotd.tooLong': 'Pesan harian dibatasi hingga {max} karakter.',
+  'hudChrome.realmMotd.updated': 'Pesan harian diperbarui.',
+  'hudChrome.realmMotd.usage':
+    'Penggunaan: /motd "<pesan>" untuk menetapkan, /motd clear untuk menghapus.',
+  'hudChrome.skullBag.clickOpen': 'Klik untuk membuka',
+  'hudChrome.skullBag.close': 'Tutup Kantong Tengkorak',
+  'hudChrome.skullBag.empty':
+    'Kosong. Selama kantong dibawa, tengkorak yang dijarah langsung masuk ke dalamnya.',
+  'hudChrome.skullBag.notCarried':
+    'Bawa Kantong Tengkorak di tas untuk menyimpan atau mengambil tengkorak.',
+  'hudChrome.skullBag.store': 'Simpan tengkorak yang dibawa ({count})',
+  'hudChrome.skullBag.storeNone': 'Tidak ada tengkorak untuk disimpan',
+  'hudChrome.skullBag.takeAll': 'Ambil semua',
+  'hudChrome.skullBag.takeAllAria': 'Ambil semua: {item}',
+  'hudChrome.skullBag.takeOne': 'Ambil 1',
+  'hudChrome.skullBag.takeOneAria': 'Ambil 1: {item}',
+  'hudChrome.skullBag.title': 'Kantong Tengkorak',
+  'hudChrome.skullBag.tooltip':
+    'Menyimpan Tengkorak Trofi tanpa batas tanpa memakai ruang tas. Selama berada di tas, tengkorak yang dijarah langsung masuk ke dalamnya. Klik kantong di tas untuk menyimpan atau mengambil tengkorak.',
+  'hudChrome.skullBag.total': 'Tengkorak: {count}',
+  'hudChrome.skullBag.unrecorded': 'Tengkorak Trofi',
+  'hudChrome.treasureMap.inkPickerCancel': 'Batal',
+  'hudChrome.treasureMap.inkPickerCost': 'Gambar ulang menjadi {rarity}: {inks} tinta',
+  'hudChrome.treasureMap.inkPickerHeld': 'Kamu memiliki {held} Tinta Kartografer.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Sedang diikuti: tanda X-nya berada di {zone}. Tanda X tetap di tempatnya.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Gunakan Tinta Kartografer pada peta yang mana?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Belum dibaca ({count} dimiliki)',
+  'hudChrome.warfare.reasons.worldQuest': 'misi dunia',
+  'hudChrome.warfareShop.goods': 'Barang dagangan',
+  'hudChrome.weeklyRewards.allClassGear': 'Perlengkapan semua kelas',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} kemenangan PvP',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} kemenangan PvP',
+  'hudChrome.weeklyRewards.lootFocus': 'Fokus jarahan',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Hanya berlaku untuk peti yang belum dibuka.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    'Tidak ada jarahan yang memenuhi syarat. Pilih fokus lain.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Raih {count} kemenangan PvP',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Raih {count} kemenangan PvP',
+  'hudChrome.weeklyRewards.rolledFocus': 'Diundi untuk: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused': 'Rentetan PvP saat ini: {time} dimainkan (dijeda di suaka)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Rentetan PvP saat ini: {time} dimainkan (dijeda saat mati)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Rentetan PvP saat ini: {time} dimainkan (dijeda dalam instans PvE)',
+  'hudChrome.worldPvp.rewardProgress': 'Rentetan PvP saat ini: {time} dimainkan',
+  'hudChrome.worldPvp.rewardTitles':
+    'Dapatkan gelar permanen setelah {thresholds} waktu bermain dengan PvP Dunia aktif di dunia terbuka atau instans PvP. Keluar, kematian, instans PvE, dan suaka menjeda penghitung. Menonaktifkannya mengatur ulang penghitung.',
+  'hudChrome.worldPvp.skullName': 'Tengkorak {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Saat kalian berdua ditandai, emas dari pukulan mematikan jatuh pada jasad bersama tengkorak yang kalah.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Barang abu-abu tanpa tanda tangan tidak masuk daftar pembelian kembali, jadi penjualannya tidak dapat dibatalkan.',
+  'questUi.logs.worldQuestRewardMailed': 'Tasmu penuh. Hadiah dikirim ke kotak suratmu: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Mantramu dapat mengaktifkan Karunia Alam selama 10 dtk: mantra yang disebut menjadi gratis, 25% lebih kuat, dan dapat digunakan dalam wujud apa pun. Aktivasi baru memperbarui durasinya.',
+  'entities.abilities.natures_boon.name': 'Karunia Alam',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Setiap Panah Liar atau Langit Runtuh yang digunakan memiliki peluang 10% untuk mengaktifkannya bagi Ledakan Spora, paling sering sekali setiap 10 dtk.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Setiap serangan otomatis jarak dekat yang mengenai sasaran memiliki peluang 1 dari 15 untuk mengaktifkannya bagi Pemulihan Spora, atau bagi Kulit Ek dalam Wujud Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Setiap denyut efek penyembuhan berkalamu memiliki peluang 10% untuk mengaktifkannya bagi Ledakan Spora, paling sering sekali setiap 10 dtk.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Menghabiskan 5 Kehijauanmu: setiap sekutu dengan efek penyembuhan berkalamu langsung dipulihkan sebesar {buff}% sisa penyembuhannya, efek tersebut dihapus, dan target mendapat Pemulihan Spora baru.',
+  'entities.abilities.play_dead.description':
+    'Menjatuhkan diri ke tanah dan tampak mati: nyawa dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target mereka. Bergerak, menyerang, atau menggunakan kemampuan lain mengakhirinya. Jika digunakan saat bergerak, kamu punya 1 dtk untuk berhenti sebelum gerakan mengakhirinya. Gunakan lagi untuk bangun.',
+  'entities.abilities.play_dead.name': 'Pura-pura Mati',
+  'entities.abilities.rejuvenation.name': 'Pemulihan Spora',
+  'entities.abilities.scratch.description':
+    'Cakar target di sekitar dalam jarak 6 meter, memberikan kerusakan senjata ditambah {damage}. Memberi 1 poin kombo per target yang terkena. Mengungkap musuh tersembunyi dalam sapuan. Hanya Wujud Kucing.',
+  'entities.abilities.scratch.name': 'Cakaran',
+  'entities.abilities.scratch.specNote_feral':
+    'Setiap serangan yang mengenai sasaran menambah 1 Darah Tua (maksimal 3).',
+  'entities.abilities.spore_burst.description':
+    'Memanggil peledak spora di area target. Setelah {duration} dtk ia meledak, menyembuhkan sekutu sebesar {healing} dan memberikan {damage} kerusakan Alam kepada musuh dalam jarak 8 meter.',
+  'entities.abilities.spore_burst.name': 'Ledakan Spora',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Pada 3 Pasang Rembulan, kekuatannya bertambah 25% dan menghabiskan Pasang Rembulanmu.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Juga menerapkan Pemulihan Spora pada setiap sekutu yang disembuhkan. Saat Kehijauan penuh, kekuatannya bertambah 25% dan menghabiskan Kehijauanmu.',
+  'entities.abilities.sporemender_form.description':
+    'Berubah menjadi Penyembuh Spora, meningkatkan penyembuhan sebesar 20% dan zirah sebesar 40%, tetapi mengurangi kecepatan gerak sebesar 20%. Semua mantra wujud perapal tetap dapat dipakai. Bertahan hingga kamu berganti wujud. Berganti ke wujud apa pun memberi Langkah Berderap Lambat, peningkatan kecepatan singkat. Gunakan lagi untuk kembali ke wujud perapal. (Ciri khas Pemulihan)',
+  'entities.abilities.sporemender_form.name': 'Wujud Penyembuh Spora',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Menghabiskan efek penyembuhan berkala pada target sekutu untuk memulihkannya sebesar {damage}. Penerapan Pemulihan Spora dan Mekar Kedua menambah Kehijauan; pada 5 Kehijauan tombol ini menjadi Mekar Raya, yang langsung memulihkan setiap sekutu dengan efek penyembuhan berkalamu sebesar 60% sisa penyembuhannya. (Ciri khas Pemulihan)',
+  'entities.abilities.tactical_camo.description':
+    'Menyatu dengan lingkungan: musuh nyaris tidak menyadari kehadiranmu, dan kamu bergerak dengan kecepatan 80%. Menyerang atau menerima kerusakan mengakhiri Kamuflase Taktis. Gunakan lagi untuk keluar. (Bertahan Hidup)',
+  'entities.abilities.tactical_camo.name': 'Kamuflase Taktis',
+  'entities.itemSets.grovespring.bonus2':
+    'Pemulihan Cepat menghabiskan Pemulihan Spora atau Mekar Kedua milikmu terlebih dahulu dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantramu.',
+  'entities.items.pvp_skull_bag.name': 'Kantong Tengkorak',
+  'entities.items.pvp_trophy_skull.name': 'Tengkorak Trofi',
+  'entities.letters.world_quest_reward.body':
+    'Tasmu penuh saat memperoleh hadiah misi dunia ini, jadi para gagak mengantarkannya ke sini. Kosongkan ruang dan ambil hadiah di pilar gagak mana pun.\n\n- Pos Gagak',
+  'entities.letters.world_quest_reward.sender': 'Pos Gagak',
+  'entities.letters.world_quest_reward.subject': 'Hadiah misi duniamu',
+  'guide.classPage.formLine.form_sporemender':
+    'Wujud penyembuhan Pemulihan: kulit lebih kuat dan penyembuhan lebih besar dengan langkah lebih lambat, tetap mempertahankan semua mantra dan mana.',
+  'guide.classPage.formName.form_sporemender': 'Wujud Penyembuh Spora',
+  'guide.economy.junkBodyFinal':
+    'Jarahan yang tidak terpakai tetap bisa dijual kepada pedagang yang memiliki toko sendiri, jadi kosongkan tas setiap melewati kota. Jendela pedagang memiliki tombol Jual Rongsokan yang menjual semua barang berkualitas Buruk sekaligus. Barang tanpa nilai juga bisa dibuang untuk mengosongkan ruang. Barang abu-abu tanpa tanda tangan yang dijual dengan cara ini tidak masuk daftar pembelian kembali; periksa barang yang ingin disimpan sebelum menekan tombolnya.',
+  'guide.models.formSporemender': 'Wujud Penyembuh Spora',
+  'guide.settingsPage.ifClassicCombatText':
+    'Mengembalikan angka kerusakan sederhana berwarna putih dan emas pucat yang naik lurus. Biarkan nonaktif (bawaan) untuk angka lebih tegas yang menyebar ke samping, dengan kilatan pada serangan kritis dan serangan yang sangat besar.',
+  'guide.settingsPage.rowSpellEffects':
+    'Cahaya, percikan, proyektil, dan ledakan benturan mantra pemain beserta peliharaannya, termasuk milikmu. Nonaktifkan untuk layar lebih tenang atau beberapa bingkai tambahan dalam pertarungan kelompok besar. Semua mantra musuh tetap terlihat, begitu juga lingkaran bahaya, penanda target yang terkena stun, ketakutan, atau tidak bisa bergerak, dan semua bilah perapalan.',
+  'questUi.dialog.attuneHearthstone': 'Selaraskan Batu Pulang Sekutuku di sini.',
+  'questUi.dialog.attuneHearthstoneAria': 'Selaraskan Batu Pulang Sekutumu ke {hub} melalui {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Batu Pulang Sekutumu belum diselaraskan. Bicaralah dengan pengurus perbekalan sekutu atau gunakan di pusat sekutu.',
+  'hudChrome.factionRewards.hearthstoneBound': 'Batu Pulang Sekutumu kini diselaraskan ke {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Batu pulang memindahkanmu ke {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Barang itu belum siap (tersisa {minutes} mnt).',
+  'hudChrome.weekly.completedLastWeek': 'Diselesaikan minggu lalu',
+  'hudChrome.weekly.claimFirst': 'Klaim dahulu',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} reputasi dari minggu lalu masih belum diklaim. Klaim untuk memilih muatan baru.',
+  'hudChrome.options.rawMouseInput': 'Input Mouse Mentah',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Membaca gerakan langsung dari mouse saat kamu menyeret untuk memutar kamera, tanpa menerapkan kecepatan dan akselerasi penunjuk sistem agar putaran lebih stabil. Nonaktifkan untuk menggunakan pengaturan mouse sistem. Hanya berfungsi jika Kunci Kursor Saat Memutar aktif, dan tidak didukung semua browser atau sistem.',
+  'entities.items.infernal_quiver.name': 'Tabung Panah Neraka',
+  'graphicsPrompt.title': 'Pilih Pengaturan Grafik',
+  'graphicsPrompt.intro':
+    'Pilih preset grafik untuk perangkat ini. Preset lebih rendah berjalan lebih lancar; preset lebih tinggi memberi tampilan lebih kaya.',
+  'graphicsPrompt.autoDesc':
+    'Memilih preset yang sesuai untuk perangkat ini. Terdeteksi: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Kinerja paling lancar. Terbaik untuk ponsel, tablet, serta grafis lama atau terintegrasi.',
+  'graphicsPrompt.mediumDesc':
+    'Keseimbangan antara tampilan dan kinerja. Cocok untuk sebagian besar laptop.',
+  'graphicsPrompt.highDesc':
+    'Lebih banyak detail dan pemandangan lebih kaya. Cocok untuk kartu grafis khusus.',
+  'graphicsPrompt.ultraDesc':
+    'Preset tetap dengan tampilan paling kaya. Cocok untuk kartu grafis kelas atas.',
+  'graphicsPrompt.changeLater': 'Kamu bisa mengubahnya kapan saja di Opsi, pada Kualitas Grafik.',
+  'graphicsPrompt.confirm': 'Lanjutkan',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Jerat Beruang',
+  'entities.abilities.bear_trap.description':
+    'Pasang jerat di lokasi pilihan. Jerat siap setelah 0,75 detik dan bertahan 1 menit; hanya kamu dan grupmu yang bisa melihatnya. Musuh pertama yang memicunya mengalami pendarahan sebesar {damage} kerusakan Fisik selama 15 detik dan diperlambat 50% selama 4 detik. Kerusakan meningkat seiring Daya Serang Jarak Jauh. Hanya satu Jerat Beruang yang dapat aktif pada satu waktu. Jerat ini dapat aktif bersamaan dengan Jerat Rahang Bekumu. Memasang Jerat Beruang baru menggantikan yang sebelumnya.',
+  'entities.abilities.scatterbolt.name': 'Panah Sebar',
+  'entities.abilities.scatterbolt.description':
+    'Tembakkan hujan anak panah dalam kerucut 90 derajat sejauh 8 yard di depanmu, memukul mundur musuh hingga berjarak paling jauh 20 yard darimu. Musuh yang kebal terhadap pukulan mundur tidak terpengaruh. Tidak menimbulkan kerusakan.',
+  'entities.abilities.phosphor_flask.name': 'Labu Fosfor',
+  'entities.abilities.phosphor_flask.description':
+    'Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh.',
+  'entities.items.lychgate_buckler.name': 'Perisai Bundar Gerbang Makam',
+  'entities.items.bastion_kite_shield.name': 'Perisai Layang Benteng',
+  'entities.items.barrowfield_tower_shield.name': 'Perisai Menara Padang Gundukan Makam',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Bilah sumber daya',
+  'hudChrome.options.hillBarOpacity': 'Opasitas latar Raja Bukit',
+  'hudChrome.options.playerFrameResourceDetached': 'Pisahkan bilah sumber daya',
+  'hudChrome.options.playerFrameResourceHeight': 'Tinggi bilah sumber daya',
+  'hudChrome.options.playerFrameResourceWidth': 'Lebar bilah sumber daya',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Aktifkan Pisahkan bilah sumber daya pada tab Bingkai agar Edit Bingkai juga membuka kunci bilah sumber dayamu, sehingga mana, energi, atau amarah dapat ditempatkan sendiri di mana saja. Lebar bilah sumber daya dan Tinggi bilah sumber daya pada tab yang sama mengatur ukurannya. Edit Bingkai juga membuka kunci bilah Raja Bukit. Opasitas latar Raja Bukit pada tab itu memudarkan panelnya tanpa mengurangi kejelasan teks.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

@@ -94,6 +94,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const mobileZoomGuardTs = readFileSync(
+  new URL('../src/game/mobile_zoom_guard.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const padTargetPickTs = readFileSync(
   new URL('../src/game/pad_target_pick.ts', import.meta.url),
   'utf8',
@@ -1052,7 +1056,7 @@ describe('client HTML shell', () => {
     expect(supportHtml).toContain('href="/data-deletion">Data Deletion page</a>');
     expect(supportHtml).toContain('"@type": "ContactPage"');
     expect(html).toContain(
-      'href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper"',
+      'href="https://worldofclaudecraft.com/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.whitepaper"',
     );
     expect(html.indexOf('data-i18n="footer.whitepaper"')).toBeLessThan(
       html.indexOf('data-i18n="footer.terms"'),
@@ -2211,9 +2215,10 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain(
       'touch-action: manipulation;\n    -webkit-tap-highlight-color: transparent;',
     );
-    expect(mainTs).toContain(
+    expect(mobileZoomGuardTs).toContain(
       'target?.closest(\'button, a, input, textarea, select, [role="button"], [role="option"], [tabindex]\')',
     );
+    expect(mainTs).toContain('installMobileZoomGuard();');
     expect(mainTs).toContain(
       "document.addEventListener('pointerup', handleNativeMenuToggle, true);",
     );

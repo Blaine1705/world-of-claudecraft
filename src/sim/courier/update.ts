@@ -1,10 +1,10 @@
 import { bagPools } from '../bags';
 import { bankPools, bumpBankWireRev, moveBetweenContainers } from '../bank';
 import { INSTANCE_X_BASE } from '../data';
-import { isMaterialItemId } from '../material_ids';
 import { normalizeLoadedMaterialSlot } from '../material_slot_load';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { isStackProvenanceItemId } from '../stack_provenance_ids';
 import { cloneInvSlot, DT, type Entity, type InvSlot } from '../types';
 import { courierPayloadFits, courierSlotFingerprint } from './identity';
 import { courierFollowPoint, courierLandingPoint, startCourierLeg, travelCourier } from './motion';
@@ -19,7 +19,11 @@ function withdrawOriginal(
   const current = source[index];
   if (!current || current.itemId !== original.itemId || current.count < original.count) return;
   const pools = { general: COURIER_CAPACITY, materials: 0 };
-  if (original.instance && !isMaterialItemId(original.itemId) && current.count > original.count) {
+  if (
+    original.instance &&
+    !isStackProvenanceItemId(original.itemId) &&
+    current.count > original.count
+  ) {
     const remaining = cloneInvSlot(current);
     remaining.count -= original.count;
     const countBefore = current.count;

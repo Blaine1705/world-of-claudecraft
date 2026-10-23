@@ -23,6 +23,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { setBuildSpanSink } from '../src/render/build_spans';
 import * as assets from '../src/render/characters/assets';
+import { SpiritVeilRig } from '../src/render/characters/ghost_veil';
 import { SanguineWeaponSheath } from '../src/render/characters/sanguine_weapon_sheath';
 import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
@@ -66,8 +67,10 @@ function fakeVisual(overrides: Record<string, unknown> = {}): AnyVisual {
     farMesh: null,
     farMaterials: null,
     ghosted: false,
-    ghostStyle: 'spirit',
-    ghostMaterials: new Map(),
+    ghostLook: 'spirit',
+    veilMaterials: new Map(),
+    spiritVeil: new SpiritVeilRig(),
+    weaponVfx: [],
     soulRend: false,
     metamorph: false,
     moonkin: false,

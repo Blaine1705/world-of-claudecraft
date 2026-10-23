@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ko_KR: Record<string, string> = {
+  'moderationHistory.actionAnnounce': '서버 전체 공지',
+  'moderationHistory.actionGmInvisible': '투명 상태로 전환',
+  'moderationHistory.actionGmVisible': '표시 상태로 전환',
+  'moderationHistory.actionUnwatch': '감시 목록에서 제거',
+  'moderationHistory.actionWatch': '감시 목록에 추가',
   'error.flagActiveExists': '이 계정에는 이미 해당 종류의 열려 있는 플래그가 있습니다.',
   'wealth.largeMovementsUnavailable':
     '대규모 은행 이동 내역을 불러오지 못했습니다(장부 조회 시간이 초과되었습니다). 위의 금 내역은 완전합니다.',

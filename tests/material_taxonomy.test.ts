@@ -37,6 +37,7 @@ import {
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { SALVAGE_MATERIAL_BY_QUALITY } from '../src/sim/professions/salvage';
+import { WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS } from '../src/sim/pvp/world_pvp_trophy';
 
 // The ruled material set, exactly (staples in; grey trash and the allowlisted
 // oddments out; raw fishing catches IN as junk cooking reagents). A diff here is a
@@ -148,6 +149,10 @@ const HONEST_MATERIALS = [
   'pristine_hide',
   'pristine_silk',
   'pristine_venom_gland',
+  // The World PvP trophy skull (src/sim/pvp/world_pvp_trophy.ts): no recipe
+  // consumes it, but it stacks with per-unit provenance (whose skull each unit
+  // is) through the material-source machinery, so it derives IN as a trophy.
+  'pvp_trophy_skull',
   // Masterwrought phase 07: derives IN as the junk-kind reagent all nine
   // intermediate recipes consume (INTERMEDIATE_RECIPES).
   'quickening_catalyst',
@@ -237,6 +242,9 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'harvest_feast',
   'last_keep_signet',
   'membership_token',
+  // The World PvP Skull Bag is a carried sub-inventory, kind-junk by the bag
+  // taxonomy, not a crafting material.
+  'pvp_skull_bag',
   // Retired premium reins remain inert saved items, with no use or material role.
   'reins_chimeglass_tortoise',
   'reins_goblin_rocket_sled',
@@ -564,6 +572,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
     recipes: ALL_RECIPES,
     enchants: ENCHANTS,
     recipePendingMaterialItemIds: CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
+    trophyMaterialItemIds: WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS,
     items: ITEMS,
   };
   // The probe def rides the real catalog so the junk-kind filter sees it.
@@ -624,6 +633,10 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
       {
         recipePendingMaterialItemIds: [...CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS, PROBE],
       },
+    ],
+    [
+      'provenance trophy',
+      { trophyMaterialItemIds: [...WORLD_PVP_TROPHY_MATERIAL_ITEM_IDS, PROBE] },
     ],
   ];
   for (const [source, override] of CASES) {

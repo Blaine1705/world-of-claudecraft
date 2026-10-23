@@ -2,6 +2,7 @@ import { isGuildServiceNpc } from '../../../sim/content/highwatch_guild';
 import { isOnProvingShore } from '../../../sim/content/proving_shore';
 import { DELVES, ITEMS, NPCS, QUESTS } from '../../../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
+import type { FactionId } from '../../../sim/factions';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
@@ -43,6 +44,7 @@ import { clueStepRowFor, clueStepRowSig } from './clue_step_row_view';
 import { clueReplyKey, clueTalkFor } from './clue_talk_row_core';
 import { guideDialogView } from './dungeon_guide_dialog_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
+import { hearthstoneAttuneRowFaction } from './hearthstone_attune_row_core';
 import { masterCraftTarget } from './master_craft_core';
 import { PROF_INTRO_QUEST_ID, professionIntroHintVisible } from './prof_intro_hint_core';
 import { questRewardChoiceHtml, questRewardChoiceModel } from './quest_reward_choice_view';
@@ -51,6 +53,13 @@ import { questRewardChoiceHtml, questRewardChoiceModel } from './quest_reward_ch
  *  (the refreshIfChanged staleness signature). */
 const gossipRowSig = (rows: { questId: string; kind: QuestMarkerKind }[]): string =>
   rows.map((r) => `${r.questId}:${r.kind}`).join('|');
+
+/** The Allied Hearthstone attune row's localized hub label, per faction. */
+const HEARTH_HUB_KEYS: Readonly<Record<FactionId, TranslationKey>> = {
+  rift_watch: 'hudChrome.factionRewards.hub_rift_watch',
+  church_order: 'hudChrome.factionRewards.hub_church_order',
+  automatons: 'hudChrome.factionRewards.hub_automatons',
+};
 
 export interface QuestDialogTextPort {
   npcName(templateId: string): string;
@@ -139,6 +148,9 @@ export class QuestDialogController {
   // A dungeon guide's offer state as of the last gossip render (null = not a
   // guide): another member's answer flips it while this dialog is open.
   private lastGuideState: string | null = null;
+  // The Allied Hearthstone attune row reads LIVE attunement and bags, so it
+  // joins the watch too (hearthstone_attune_row_core.ts).
+  private lastHearthRowFaction: string | null = null;
   private trap: FocusTrapHandle | null = null;
   private openedAt = 0;
   // The choose-one reward the player checked in the open quest's dialog, kept
@@ -252,6 +264,7 @@ export class QuestDialogController {
     this.lastGossipRowSig = null;
     this.lastClueRowSig = '';
     this.lastGuideState = null;
+    this.lastHearthRowFaction = null;
     this.deps.hideTooltip();
     this.trap?.release(restoreFocus);
     this.trap = null;
@@ -296,7 +309,8 @@ export class QuestDialogController {
       gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig ||
       clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !==
         this.lastClueRowSig ||
-      (guideDialogView(npc)?.state ?? null) !== this.lastGuideState
+      (guideDialogView(npc)?.state ?? null) !== this.lastGuideState ||
+      this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction
     ) {
       this.refresh();
     }
@@ -351,6 +365,17 @@ export class QuestDialogController {
     if (this.openState) return;
     this.openState = true;
     this.deps.onOpenChange(true);
+  }
+
+  /** The Allied Hearthstone attune row's hub (or null), shared by the gossip
+   *  render and the staleness probe so the two can never drift. */
+  private hearthRowFactionFor(npc: Entity): FactionId | null {
+    const world = this.deps.world();
+    return hearthstoneAttuneRowFaction(
+      npc.templateId,
+      world.alliedHearthstoneAttunement,
+      world.inventory ?? [],
+    );
   }
 
   /** The one rule for the intro hint row, shared by the gossip render and the
@@ -584,6 +609,14 @@ export class QuestDialogController {
     if (hasVendor) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${currencyIconHtml('coin_gold')} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
+    // "Speak with an allied quartermaster": the faction quartermaster binds the
+    // Allied Hearthstone to its hub (the sim re-validates range and the stone).
+    const hearthFaction = this.hearthRowFactionFor(npc);
+    this.lastHearthRowFaction = hearthFaction;
+    if (hearthFaction) {
+      const hub = t(HEARTH_HUB_KEYS[hearthFaction]);
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-hearth-attune="1" aria-label="${esc(t('questUi.dialog.attuneHearthstoneAria', { hub, name: npcName }))}"><span class="gold">${svgIcon('map')}</span> ${esc(t('questUi.dialog.attuneHearthstone'))}</button>`;
+    }
     // Crafting shortcut: the master's Crafting option opens the crafting
     // window straight to their own craft's tab (the viewer's stronger craft
     // when the station serves two), skipping the keybind-then-find-the-tab
@@ -689,6 +722,11 @@ export class QuestDialogController {
     // successor window that restores focus when IT closes; with no successor
     // that chain would drop keyboard focus to <body>. Send, then close WITH
     // the trap's own focus restore.
+    // The attune row sends and closes (the sim's bind line is the feedback).
+    this.deps.element.querySelector('[data-hearth-attune]')?.addEventListener('click', () => {
+      this.deps.world().attuneAlliedHearthstone(npc.id);
+      this.close(true);
+    });
     this.deps.element.querySelector('[data-husk-trade]')?.addEventListener('click', () => {
       this.deps.world().convertHusks();
       this.close(true);

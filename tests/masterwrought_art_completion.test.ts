@@ -841,7 +841,7 @@ describe('Masterwrought art completion evidence', () => {
     // The icon backlog adds 135 Season 2 paintings, five referral rewards, the horse, and Nightwing Chimaera.
     // Wobbles the Slime's reins owner (outside the dated universe too): 2,183.
     // + the sprite buddy's whistle render: 2,184.
-    expect(currentOwnerIds).toHaveLength(2186);
+    expect(currentOwnerIds).toHaveLength(2191);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1165,7 +1165,28 @@ describe('Masterwrought art completion evidence', () => {
     expect([...lanternHallIds].sort()).toEqual(['lantern_seal', 'reins_lantern_hall_destrier']);
     expect(datedIds.filter((id) => lanternHallIds.has(id))).toEqual([]);
 
-    // Strip all six later additive waves (Crucible professions, the Field Kit, the
+    // The leveling quest shields are a distinct later batch. Pin its exact ids
+    // and provenance before subtracting them from the historical completion set.
+    const questShieldBatches = mapping.generatedBatches.filter(
+      ({ batchId }) => batchId === 'quest-shield-icons-2026-10-23',
+    );
+    expect(questShieldBatches).toHaveLength(1);
+    const questShieldProvenance =
+      'docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json';
+    expect(questShieldBatches[0]).toMatchObject({ provenanceRecord: questShieldProvenance });
+    const questShieldIds = new Set(questShieldBatches[0].itemIds);
+    expect(sorted(questShieldIds)).toEqual([
+      'barrowfield_tower_shield',
+      'bastion_kite_shield',
+      'lychgate_buckler',
+    ]);
+    expect(questShieldBatches[0].itemIds).toHaveLength(3);
+    const questShieldArt = readJson<{ assets: Array<{ id: string }> }>(questShieldProvenance);
+    expect(sorted(questShieldArt.assets.map(({ id }) => id))).toEqual(sorted(questShieldIds));
+    expect(datedIds.filter((id) => questShieldIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => questShieldIds.has(id))).toHaveLength(3);
+
+    // Strip the later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
     // faction quartermaster, and Clue Scroll batches, the Buried Hoards
@@ -1193,8 +1214,12 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'reins_nightwing_chimera' &&
         // Wobbles the Slime's reins, additive the same way.
         id !== 'reins_wobbles_slime' &&
+        // The World PvP trophy skull, additive the same way.
+        id !== 'pvp_trophy_skull' &&
+        id !== 'pvp_skull_bag' &&
         !season2WeaponIds.has(id) &&
         !hoardBranchIds.has(id) &&
+        !questShieldIds.has(id) &&
         !questGearIds.has(id) &&
         !membershipIds.has(id) &&
         !referralIds.has(id) &&

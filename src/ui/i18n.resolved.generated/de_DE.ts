@@ -561,6 +561,13 @@ export const de_DE: EnTranslations = {
       "heroicClears": "{count} Heroisch",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Mögliche Beute ansehen",
+      "lootFocus": "Beutefokus",
+      "allClassGear": "Ausrüstung aller Klassen",
+      "specRole": "{name} ({role})",
+      "mixedRole": "{first} / {second}",
+      "lootFocusHelp": "Gilt nur für ungeöffnete Schatzkammern.",
+      "noFocusedLoot": "Keine geeignete Beute. Wähle einen anderen Fokus.",
+      "rolledFocus": "Ausgewürfelt für: {focus}",
       "chooseTable": "Wähle, von welcher Tabelle gewürfelt wird",
       "selectAllTables": "Alle auswählen",
       "selectedTables": "{count} Tabellen ausgewählt",
@@ -581,7 +588,9 @@ export const de_DE: EnTranslations = {
         "worldOne": "{count} Weltquest abgeschlossen",
         "worldMany": "{count} Weltquests abgeschlossen",
         "pvpOne": "{count} gewertetes Match gewonnen",
-        "pvpMany": "{count} gewertete Matches gewonnen"
+        "pvpMany": "{count} gewertete Matches gewonnen",
+        "pvpWinOne": "{count} PvP-Sieg",
+        "pvpWinMany": "{count} PvP-Siege"
       },
       "requiredTask": {
         "raidOne": "Bereinige {count} Schlachtzugsbegegnung",
@@ -591,7 +600,9 @@ export const de_DE: EnTranslations = {
         "worldOne": "Schließe {count} Weltquest ab",
         "worldMany": "Schließe {count} Weltquests ab",
         "pvpOne": "Gewinne {count} gewertetes Match",
-        "pvpMany": "Gewinne {count} gewertete Matches"
+        "pvpMany": "Gewinne {count} gewertete Matches",
+        "pvpWinOne": "Erringe {count} PvP-Sieg",
+        "pvpWinMany": "Erringe {count} PvP-Siege"
       },
       "readyWeeks": "Nicht abgeholte Wochen: {count}. Hole zuerst die älteste abgeschlossene Woche ab.",
       "claimLastWeek": "Belohnung der letzten Woche abholen",
@@ -749,7 +760,13 @@ export const de_DE: EnTranslations = {
       "departsIn": "Die Fähre nach {dest} legt in {time} ab",
       "castingOff": "Die Fähre nach {dest} legt ab",
       "boardHint": "Steh an Deck, wenn sie ablegt. Die Überfahrt ist kostenlos.",
-      "sailing": "Unterwegs nach {dest}"
+      "sailing": "Unterwegs nach {dest}",
+      "portLabel": "Fähre von {port} nach {dest}",
+      "portTitle": "Fährhafen {port}",
+      "destination": "Ziel: {dest}",
+      "boardNow": "Jetzt einsteigen",
+      "arrivesIn": "Fähre kommt in {time}",
+      "scheduleUnavailable": "Fährfahrplan nicht verfügbar."
     },
     "materialStackSelectionUnavailable": "Diese Materialauswahl ist nicht mehr verfügbar.",
     "shardpike": {
@@ -851,6 +868,15 @@ export const de_DE: EnTranslations = {
     "spectate": {
       "banner": "{name} wird beobachtet"
     },
+    "realmMotd": {
+      "line": "Nachricht des Tages: {text}",
+      "updated": "Nachricht des Tages aktualisiert.",
+      "cleared": "Nachricht des Tages gelöscht.",
+      "none": "Keine Nachricht des Tages festgelegt.",
+      "usage": "Verwendung: /motd \"<Nachricht>\" zum Festlegen, /motd clear zum Löschen.",
+      "tooLong": "Die Nachricht des Tages ist auf {max} Zeichen begrenzt.",
+      "saveFailed": "Die Nachricht des Tages konnte nicht gespeichert werden und geht beim Neustart verloren."
+    },
     "readyCheck": {
       "title": "Bereitschaftsprüfung",
       "close": "Schließen",
@@ -874,6 +900,11 @@ export const de_DE: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
+      "pvpResurrect": "PvP-Wiederbelebung",
+      "pvpResurrectTitle": "Am nächsten Friedhof mit voller Gesundheit und ohne neue Bürde des Hüters wiederbeleben.",
+      "pvpResurrectWaitButton": "PvP-Wiederbelebung ({seconds})",
+      "pvpResurrectWaitNote": "PvP-Wiederbelebung in {seconds}: Du wirst am nächsten Friedhof wiederbelebt.",
+      "pvpResurrectReadyNote": "PvP-Wiederbelebung bereit: Du wirst am nächsten Friedhof wiederbelebt.",
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",
       "ghostHint": "Laufe zum Ort deines Todes oder sprich mit dem Bleichen Hüter, um wiederbelebt zu werden",
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden.",
@@ -889,6 +920,9 @@ export const de_DE: EnTranslations = {
       "keeperConfirmSparedBody": "Bist du sicher? Der Bleiche Hüter wird dich hier wiederbeleben. Du bist unter Stufe 10, daher schwächt dich der Zoll des Hüters diesmal nicht.",
       "healerConfirmAccept": "Belebe mich wieder",
       "healerConfirmCancel": "Abbrechen"
+    },
+    "graphicsRestore": {
+      "note": "Grafik wird wiederhergestellt"
     },
     "wiki": {
       "confirmTitle": "Wiki öffnen?",
@@ -2222,6 +2256,8 @@ export const de_DE: EnTranslations = {
       "reportSent": "Bericht kopiert und in den Chat gesendet",
       "reportNoData": "Keine Daten aufgezeichnet.",
       "noDetailedData": "Keine detaillierten Daten",
+      "detailHealSubtitle": "Effektiv: {effective} | Überheilung: {overheal} ({overhealPercent}) | Treffer: {hits} ({critPercent} Krit.)",
+      "detailHitSubtitle": "Treffer: {hits} | Kritisch: {crits} ({critPercent}) | Durchschnitt: {average} | Min./max.: {min} / {max}",
       "noDeathEvents": "Keine Ereignisse vor dem Tod aufgezeichnet",
       "killedBy": "Getötet von {killer} ({ability})",
       "lethalHit": "Tödlicher Treffer",
@@ -2502,6 +2538,7 @@ export const de_DE: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Zaubertooltip beim Darüberfahren",
       "clickMoveLeft": "Linksklick",
       "clickMoveRight": "Rechtsklick",
       "version": "v{version} ({build})",
@@ -2547,11 +2584,14 @@ export const de_DE: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto wählt je nach Gerät die Desktop- oder Touch-Steuerung. Wähle Desktop, um Tastatur und Maus zu erzwingen (praktisch bei einem Tablet mit Tastatur), oder Touch für die Bildschirmsteuerung.",
+      "ambienceVolume": "Ambiente-Lautstärke",
       "footstepSounds": "Schrittgeräusche",
       "interfaceSounds": "Interface- und Feedback-Sounds",
       "clickFeedback": "Klickmarkierung",
       "lockCursorOnRotate": "Cursor beim Drehen sperren",
       "keybindHelpLockCursorOnRotate": "Hält den Mauszeiger im Fenster, während Ihr zum Drehen der Kamera zieht, damit er nicht den Bildschirmrand erreicht oder auf einen anderen Monitor wandert. Schaltet dies aus, wenn Ihr einen freien Cursor bevorzugt.",
+      "rawMouseInput": "Ungefilterte Mauseingabe",
+      "keybindHelpRawMouseInput": "Liest Mausbewegungen beim Ziehen zum Drehen der Kamera direkt vom Gerät. Die Zeigergeschwindigkeit und Mausbeschleunigung des Systems werden für gleichmäßigere Drehungen umgangen. Deaktiviere dies, um die Mauseinstellungen des Systems zu verwenden. Funktioniert nur mit aktivierter Option Cursor beim Drehen sperren und nicht in jedem Browser oder System.",
       "showWalletOnCharacterScreen": "Wallet auf dem Charakterbildschirm anzeigen",
       "showWalletOnPlayerCard": "Wallet auf der Spielerkarte anzeigen",
       "showPlaytime": "Spielzeit auf dem Charakterbildschirm anzeigen",
@@ -2617,6 +2657,7 @@ export const de_DE: EnTranslations = {
       "confirmVendorSellNote": "Wird dies deaktiviert, verkaufst du Gegenstände mit einem einzigen Klick ohne Bestätigung, sodass ein verschobener Taschenplatz den falschen Gegenstand verkaufen könnte.",
       "confirmVendorSellMinQuality": "Bestätigen Sie Verkäufe durch Qualität",
       "confirmVendorSellMinQualityNote": "Artikel unter dieser Qualität werden mit einem einzigen Klick verkauft; Ein falsch verkaufter Artikel kann immer noch vom Verkäufer zurückgekauft werden.",
+      "confirmVendorSellMinQualityNoteGray": "Gegenstände unter dieser Qualität werden mit einem Klick verkauft. Versehentlich verkaufte Gegenstände können zurückgekauft werden, ausgenommen unsignierte graue Gegenstände.",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
@@ -2626,9 +2667,22 @@ export const de_DE: EnTranslations = {
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
       "showTargetSwingTimer": "Zielschwungtimer anzeigen",
+      "enemyHighlightStyle": "Art der Gegnerhervorhebung",
+      "enemyHighlightEdgeArrow": "Pfeil am Bildschirmrand bei Ziel außerhalb des Bildes",
+      "enemyHighlightNameplate": "Großes gerahmtes Zielnamensschild",
+      "enemyHighlightOverhead": "Schwebende Markierung über dem Kopf",
+      "enemyHighlightReticle": "Kräftigeres feindliches Fadenkreuz",
+      "enemyHighlightDistance": "{yards} Yards",
       "showPetFrame": "Euren Begleiter anzeigen",
+      "playerFrameResourceDetached": "Ressourcenleiste abtrennen",
+      "playerFrameResourceWidth": "Breite der Ressourcenleiste",
+      "playerFrameResourceHeight": "Höhe der Ressourcenleiste",
+      "hillBarOpacity": "Hintergrunddeckkraft von König des Hügels",
+      "pixelsValue": "{value} px",
       "showNameplateDots": "Zeigen Sie meine Punkte auf Namensschildern",
       "nameplateDotScale": "Punktgröße des Typenschilds",
+      "showNameplateCooldowns": "Offensiv-/Defensivanzeige",
+      "nameplateCooldownScale": "Größe der Offensiv-/Defensivanzeige",
       "showTargetDots": "Zielpunkte anzeigen",
       "showDefensivesTrack": "Defensive Abklingzeiten anzeigen",
       "showSelfBuffTrack": "Meine Stärkungen anzeigen",
@@ -2637,7 +2691,9 @@ export const de_DE: EnTranslations = {
       "showUtilityModes": "Verstohlenheits- und Reisemodi einbeziehen",
       "showFriendlyTrack": "Meine Stärkungen auf Verbündeten anzeigen",
       "showShieldTrack": "Meine Schilde anzeigen",
+      "classicCombatText": "Klassischer Kampftext",
       "waterRipples": "Wasserwellen (Kielwasser)",
+      "spellEffects": "Zaubereffekte",
       "actionCam": "Aktionskamera",
       "actionCamShoulder": "Aktionskamera-Versatz",
       "actionCamShoulderLeft": "Links {pct}",
@@ -2668,6 +2724,11 @@ export const de_DE: EnTranslations = {
       "complexityMedium": "Mittel",
       "complexityHigh": "Hoch",
       "exampleAbilities": "Beispielfähigkeiten",
+      "specBonus": "Spezialisierungsbonus",
+      "healing": "Heilung",
+      "absorption": "Schadensabsorption",
+      "physicalAbilityDamage": "Schaden von Nahkampf- und Fernkampffähigkeiten",
+      "primaryHealingBonus": "Erhöht die primäre Heilung nach allen anderen Heilungsboni um {pct}.",
       "viewTalents": "Talente anzeigen",
       "selectSpec": "Spezialisierung wählen",
       "specUnlockBanner": "Spezialisierung freigeschaltet!",
@@ -2991,11 +3052,15 @@ export const de_DE: EnTranslations = {
       "iconSize": "Symbolgröße",
       "iconPadding": "Symbolabstand",
       "opacity": "Deckkraft",
-      "visibility": "Sichtbarkeit",
-      "visAlways": "Immer sichtbar",
       "visCombat": "Im Kampf",
-      "visHidden": "Ausgeblendet",
       "visHiddenHint": "Eine ausgeblendete Gruppe spielt weiterhin ihre Töne ab und lässt deine Aktionsleiste leuchten.",
+      "showWhile": "Anzeigen während",
+      "showOutOfCombat": "Außerhalb des Kampfes",
+      "showIn": "Anzeigen in",
+      "showInWorld": "Offene Welt",
+      "showInInstances": "Instanzierte Gebiete",
+      "placeHint": "Instanzen umfassen Dungeons, Schlachtzüge, Tiefgänge, Risse, Schlachtfelder, die Arena und alle anderen instanzierten Gebiete. Außerhalb der ausgewählten Orte bleibt die Gruppe verborgen und stumm.",
+      "groupOffHint": "Wenn kein Ort ausgewählt ist, wird diese Gruppe nie angezeigt und spielt keine Töne ab.",
       "showTimer": "Timer anzeigen",
       "positionX": "Horizontale Position",
       "positionY": "Vertikale Position",
@@ -3013,7 +3078,6 @@ export const de_DE: EnTranslations = {
       "aurasTitle": "Procs, Ressourcen und Stärkungszauber",
       "aurasHint": "Deine Ressourcen und ihre Stapel, Procs sowie die Stärkungszauber, die deine Zauber auf dich legen. Alles andere, das auf dir lag, erscheint hier ebenfalls.",
       "auraFallback": "Aura",
-      "onlyWhileActive": "Nur anzeigen, solange aktiv",
       "alertStacks": "Warnung bei Stapeln",
       "alertStacksAny": "Beim Erhalt",
       "alertStacksHint": "Die Schaltfläche leuchtet, pulsiert und ertönt, sobald die Aura diese Anzahl an Stapeln erreicht. Beim Erhalt bedeutet, sobald sie erscheint.",
@@ -3030,7 +3094,18 @@ export const de_DE: EnTranslations = {
       "glowWhenReadyHint": "Hellt die Schaltfläche auf und umrandet sie, solange der Zauber gewirkt werden kann.",
       "hotbarGlow": "Aktionsleisten-Leuchten",
       "hotbarGlowHint": "Lässt diesen Zauber zusätzlich auf deiner Aktionsleiste leuchten, solange er bereit ist.",
-      "onlyWhenReady": "Nur anzeigen, wenn bereit",
+      "showButtonWhen": "Schaltfläche anzeigen, wenn",
+      "showReady": "Bereit",
+      "showNotReady": "Nicht bereit",
+      "notReadyHint": "Nicht bereit bedeutet, dass die Abklingzeit läuft oder die Fähigkeit gerade nicht nutzbar ist.",
+      "auraShowWhen": "Schaltfläche anzeigen, solange die Aura",
+      "auraActive": "Aktiv",
+      "auraMissing": "Fehlend",
+      "neverShownHint": "Wenn keines der beiden Kästchen ausgewählt ist, wird die Schaltfläche nie angezeigt, ihr Ton wird aber weiterhin abgespielt.",
+      "reminderHint": "Stärkungserinnerung: Die Schaltfläche leuchtet auf, solange diese Aura fehlt, und wird ausgeblendet, sobald du sie hast.",
+      "glowWhileMissing": "Bei fehlender Aura aufleuchten",
+      "reminderGlowHint": "Lässt die Schaltfläche bei fehlender Aura aufleuchten, umrandet sie und lässt sie pulsieren.",
+      "reminderSoundHint": "Wird abgespielt, wenn die Aura endet.",
       "sound": "Bereitschaftston",
       "soundHint": "Ertönt, wenn der Zauber bereit wird, oder wenn sich seine Schaltfläche in einen anderen Zauber verwandelt, während sie bereit ist."
     },
@@ -3160,7 +3235,8 @@ export const de_DE: EnTranslations = {
         "battlegroundAssist": "Unterstützung beim Todesstoß",
         "worldKill": "Welt-Tötung",
         "worldAssist": "Welt-Tötung unterstützt",
-        "hillHold": "den Hügel gehalten"
+        "hillHold": "den Hügel gehalten",
+        "worldQuest": "Weltquest"
       },
       "floatReasons": {
         "kill": "Ausschaltung",
@@ -3170,6 +3246,11 @@ export const de_DE: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Verdiene dauerhafte Titel nach {thresholds} Spielzeit mit aktiviertem Welt-PvP in der offenen Welt oder in PvP-Instanzen. Ausloggen, Tod, PvE-Instanzen und Heiligtümer pausieren den Zähler. Ausschalten setzt ihn zurück.",
+      "rewardPaused": "Aktuelle PvP-Serie: {time} gespielt (in einem Heiligtum pausiert)",
+      "rewardPausedDead": "Aktuelle PvP-Serie: {time} gespielt (während des Todes pausiert)",
+      "rewardPausedInstance": "Aktuelle PvP-Serie: {time} gespielt (in PvE-Instanzen pausiert)",
+      "rewardProgress": "Aktuelle PvP-Serie: {time} gespielt",
       "tab": "Welt-PvP",
       "title": "Welt-PvP",
       "blurb": "Hebt Eure Flagge, um gegen andere markierte Spieler überall in der offenen Welt zu kämpfen. Besiegt einen und nehmt einen Teil seines Beutels, dazu Ehre für Kriegsführungsausrüstung. Schlachtfelder und Arenen zahlen weiterhin mehr.",
@@ -3188,6 +3269,8 @@ export const de_DE: EnTranslations = {
       "markLine": "Einen unmarkierten Spieler dort anzugreifen hebt Eure eigene Flagge; einen markierten anzugreifen tut das nie.",
       "aidLine": "Einen markierten Spieler in einem Weltkampf zu heilen, zu schützen oder zu stärken hebt Eure eigene Flagge.",
       "stakeLine": "Der Verlierer zahlt {cap} oder {percent} seines Beutels, je nachdem, was weniger ist.",
+      "spoilsLine": "Wenn ihr beide markiert seid, liegt das Gold des Todesstoßes zusammen mit dem Schädel des Verlierers auf der Leiche.",
+      "skullName": "Schädel von {name}",
       "noStakeLine": "Ein unmarkierter Spieler, der auf Jeder-gegen-Jeden-Gebiet getötet wird, verliert kein Gold.",
       "noTakeLine": "Ein unmarkierter Kämpfer nimmt ebenfalls kein Gold: Es wechselt nur zwischen zwei markierten Spielern.",
       "honorLine": "{honor} Ehre pro Tötung, aufgeteilt unter allen, die geholfen haben.",
@@ -3217,6 +3300,8 @@ export const de_DE: EnTranslations = {
       "countsHolding": "Innen: du {yours}, Rivale {theirs}",
       "contestYou": "Nimmt den Hügel ein: {seconds} von {total}",
       "contestOther": "Verliert den Hügel: {seconds} von {total}",
+      "contestYouPaused": "Pausiert: {seconds} von {total}",
+      "contestOtherPaused": "Gegner pausiert: {seconds} von {total}",
       "contestNone": "Halte für {total} die Mehrheit im Inneren, um es einzunehmen",
       "inside": "Du bist im Kreis",
       "distance": "{yards} yd bis zum Kreis",
@@ -3224,11 +3309,28 @@ export const de_DE: EnTranslations = {
       "falls": "Sinkt in {minutes}",
       "standingRaid": "Schlachtzugsmitglieder zählen nicht: Nur Gruppen können den Hügel halten"
     },
+    "skullBag": {
+      "title": "Schädeltasche",
+      "total": "Schädel: {count}",
+      "close": "Schädeltasche schließen",
+      "clickOpen": "Zum Öffnen klicken",
+      "notCarried": "Trage die Schädeltasche im Inventar, um Schädel einzulagern oder zu entnehmen.",
+      "empty": "Leer. Solange du die Tasche trägst, landen erbeutete Schädel direkt darin.",
+      "unrecorded": "Trophäenschädel",
+      "store": "Mitgeführte Schädel einlagern ({count})",
+      "storeNone": "Keine Schädel zum Einlagern",
+      "takeOne": "1 entnehmen",
+      "takeAll": "Alle entnehmen",
+      "takeOneAria": "1 entnehmen: {item}",
+      "takeAllAria": "Alle entnehmen: {item}",
+      "tooltip": "Fasst beliebig viele Trophäenschädel ohne Taschenplätze zu belegen. Solange sie in deinem Inventar liegt, landen erbeutete Schädel direkt darin. Klicke sie im Inventar an, um Schädel einzulagern oder zu entnehmen."
+    },
     "warfareShop": {
       "gossipOption": "Kriegsführungs-Sets durchsuchen",
       "gossipOptionAria": "Den von {name} angebotenen Kriegsführungs-Set-Laden durchsuchen",
       "jewelry": "Schmuck",
       "weapons": "Waffen",
+      "goods": "Waren",
       "groupSeason2": "Kriegsführung Saison 2: Vorhut",
       "groupEntry": "Kriegsführung Saison 1",
       "companions": "Companions",
@@ -3244,6 +3346,7 @@ export const de_DE: EnTranslations = {
       "spell": "Zauber",
       "defense": "Verteidigung",
       "ratings": "Wertungen",
+      "gearScore": "Ausrüstungswert",
       "playtimeLabel": "Spielzeit",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Weniger als eine Minute",
@@ -3272,6 +3375,12 @@ export const de_DE: EnTranslations = {
       "hint": "Finde den Boden, den diese Karte zeigt, stelle dich auf das X und nutze die Karte erneut um zu graben. Ein vergrabener Schatz öffnet sich für dich und deine Gruppe.",
       "upgradeNote": "Das Neuzeichnen als {rarity}-Karte kostet {inks} Kartograph-Tinte (du hältst {held}). Die Fraktionsquartiermeister verkaufen sie.",
       "upgradeMaxed": "Kein Kartograph könnte diese Karte verbessern.",
+      "inkPickerTitle": "Auf welche Karte soll Kartografentinte angewendet werden?",
+      "inkPickerHeld": "Du hast {held} Kartografentinte.",
+      "inkPickerRead": "Wird verfolgt: Das X liegt in {zone}. Das X bleibt an seinem Ort.",
+      "inkPickerUnread": "Ungelesen ({count} im Besitz)",
+      "inkPickerCost": "Auf {rarity} neu zeichnen: {inks} Tinte",
+      "inkPickerCancel": "Abbrechen",
       "rarity": {
         "common": "Verbreitet",
         "rare": "Selten",
@@ -3287,7 +3396,7 @@ export const de_DE: EnTranslations = {
       "delveMark": "Tiefgang-Marke",
       "wocToken": "WoC-Token",
       "heroicMarkNote": "Heroische Dungeons . beim heroischen Quartiermeister ausgeben",
-      "honorNote": "Schlachtfelder und die Arena",
+      "honorNote": "Schlachtfelder, die Arena und Weltquests",
       "delveMarkNote": "Abgeschlossene Tiefgänge",
       "wocTokenNote": "Guthaben der verknüpften Wallet",
       "walletNotLinked": "Keine Wallet verknüpft",
@@ -4008,6 +4117,8 @@ export const de_DE: EnTranslations = {
       "resetDone": "Alle Instanzen wurden zurückgesetzt.",
       "resetNone": "Du hast keine Instanzen zum Zurücksetzen.",
       "resetOccupied": "Du kannst Instanzen nicht zurücksetzen, solange sich noch jemand darin befindet.",
+      "queuedOccupied": "Schwierigkeitswechsel vorgemerkt, da noch jemand oder dessen Leiche darin ist. Er wird angewendet, sobald die Instanzen leer sind.",
+      "queuedCancelled": "Vorgemerkter Schwierigkeitswechsel abgebrochen, da sich Gruppe oder Gruppenleitung geändert hat.",
       "resetSameDifficulty": "Ändere die Dungeon-Schwierigkeit, bevor du diese Instanzen zurücksetzt. Leere Instanzen werden nach 5 Minuten automatisch zurückgesetzt.",
       "resetLoot": "Du kannst Instanzen nicht zurücksetzen, solange sich noch Beute darin befindet.",
       "resetConfirmTitle": "Alle Instanzen zurücksetzen?",
@@ -4027,6 +4138,7 @@ export const de_DE: EnTranslations = {
       "dragEquipHint": "Auf deinen Charakter ziehen, um anzulegen",
       "dragDestroyHint": "In die Welt ziehen, um zu vernichten",
       "reorderNeedsRecent": "Filter aufheben und nach Zuletzt sortieren, um deine Taschen neu anzuordnen",
+      "reorderLocked": "Gesperrte Gegenstände bleiben auf ihrem Taschenplatz. Entsperre sie zum Verschieben.",
       "itemAriaInstanced": "{item}, Menge {count}, herstellermarkierte Kopie",
       "itemAriaEnchanted": "{item}, Menge {count}, verzauberte Kopie",
       "itemAriaBound": "{item}, Menge {count}, gebundene Kopie",
@@ -4436,7 +4548,7 @@ export const de_DE: EnTranslations = {
       "elementalConvergencePrimed": "Dein nächster Zauber der anderen Elementarschule gewährt Elementarkonvergenz",
       "hunterFerocity": "{stacks} Rudelwildheit: Euer Begleiter verursacht {pct}% mehr Schaden",
       "cooldownCap": "{used} von {cap} Sek. Abklingzeit-Verkürzung in diesem Fenster verbraucht",
-      "bruinRushWindow": "Die Wolfsgestalt kostet kein Mana und nagelt das Ziel eures Bruin-Ansturms fest, was es {sec} Sek. lang um {pct}% verlangsamt",
+      "bruinRushWindow": "Die Katzengestalt kostet kein Mana und nagelt das Ziel eures Bruin-Ansturms fest, was es {sec} Sek. lang um {pct}% verlangsamt",
       "funeralHarvestLock": "Funeral Harvest kann noch kein weiteres Seelenfragment erschaffen",
       "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
       "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
@@ -4490,7 +4602,7 @@ export const de_DE: EnTranslations = {
       "duskEconomy": "Fähigkeiten kosten {pct}% weniger Energie",
       "moontide": "Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr",
       "oldBlood": "Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer",
-      "verdance": "Grünkraft: Stufe {stacks} von {max}. Jede NEUE Wildblüte oder Zweite Blüte, die du pflanzt, fügt 1 hinzu. Bei {max} wird Flinkheilung zu Überblüte.",
+      "verdance": "Grünkraft: Stufe {stacks} von {max}. Jede Sporenheilung, Zweite Blüte oder Wildheilung, die du wirkst, fügt 1 hinzu, und jede Stufe verkürzt die Zauberzeit von Wildheilung. Bei {max} wird Rasche Heilung zu Überblüte.",
       "freeExecute": "Eure nächste berechtigte Hinrichtungsfähigkeit kostet nichts",
       "resourceSap": "Stellt alle {interval} Sek. {value} Eurer aktuellen Ressource wieder her",
       "nextAttackCrit": "Euer nächster Angriff trifft garantiert kritisch",
@@ -4607,6 +4719,7 @@ export const de_DE: EnTranslations = {
       "formTravel": "Fleet Form: Bewegungstempo um {pct}% erhöht",
       "formFireball": "Glutgestalt: Bewegungsgeschwindigkeit um {pct}% erhöht; Angriffe und Zauber deaktiviert",
       "formMoonkin": "Mondkingestalt: Zauberschaden um {pct}% und Rüstung um {armorPct}% erhöht",
+      "formSporemender": "Sporenheilerform: Heilung um {pct}% und Rüstung um {armorPct}% erhöht, Bewegungstempo um {slowPct}% verringert",
       "formShadow": "Schattenform: Schattenschaden um {pct}% erhöht",
       "resourceCount": "{value} von {max}",
       "formLich": "Soul Lance trifft zusätzlich bis zu {targets} nahe Gegner für {pct}% Schaden",
@@ -4695,6 +4808,7 @@ export const de_DE: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Kopfgeld",
       "cheaterTag": "< Schummler >",
       "pledgeTag": "Gelöbnis: {guild}",
       "npcRoleTag": "<{role}>",
@@ -4804,6 +4918,7 @@ export const de_DE: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Aktionsleisten",
         "playerFrame": "Spieler",
+        "playerResource": "Ressourcenleiste",
         "targetFrame": "Ziel",
         "partyFrames": "Gruppe",
         "swingBar": "Automatischer Angriff",
@@ -4856,6 +4971,37 @@ export const de_DE: EnTranslations = {
       "apply": "Anwenden",
       "imported": "Tastenkürzel-Einrichtung importiert.",
       "wrongKind": "Dieser Code ist ein Einstellungsexport, keine Tastenkürzel-Einrichtung."
+    },
+    "keybindLayout": {
+      "title": "Tastaturbelegung",
+      "open": "Umwandeln",
+      "from": "Tastenkürzel erstellt für",
+      "to": "Umwandeln nach",
+      "keepMovement": "Bewegungstasten an ihrem Platz lassen",
+      "keepMovementLocked": "Die Bewegungstasten blieben letztes Mal an ihrem Platz und bleiben es erneut. Setze auf Standardwerte zurück, um neu zu beginnen.",
+      "help": "Jedes Tastenkürzel wandert auf die Taste, die im neuen Layout dasselbe Zeichen schreibt. Die Zahlenreihe bleibt an ihrem Platz. Tastennamen in dieser Liste bezeichnen QWERTY-Positionen; die Tastaturübersicht zeigt dein eigenes Layout.",
+      "moves": "Tastenkürzel, die verschoben werden: {count}",
+      "noChange": "Zwischen diesen Layouts ändern sich keine Tastenkürzel.",
+      "apply": "Tastenkürzel umwandeln",
+      "converted": "Tastenkürzel von {from} nach {to} umgewandelt.",
+      "layouts": {
+        "qwertyUs": "QWERTY (USA)",
+        "qwertyUk": "QWERTY (Großbritannien)",
+        "qwertzDe": "QWERTZ (Deutsch)",
+        "qwertzCh": "QWERTZ (Schweiz)",
+        "azertyFr": "AZERTY (Französisch)",
+        "azertyBe": "AZERTY (Belgisch)",
+        "qwertyEs": "QWERTY (Spanisch)",
+        "qwertyIt": "QWERTY (Italienisch)",
+        "qwertyNordic": "QWERTY (Schwedisch, Finnisch)",
+        "qwertyDa": "QWERTY (Dänisch)",
+        "qwertyNo": "QWERTY (Norwegisch)",
+        "qwertyBr": "QWERTY (Brasilianisch, ABNT2)",
+        "qwertyPt": "QWERTY (Portugiesisch)",
+        "qwertyTr": "QWERTY (Türkisch)",
+        "dvorak": "Dvorak-Belegung",
+        "colemak": "Colemak-Belegung"
+      }
     },
     "keyboardMap": {
       "title": "Tastaturübersicht",
@@ -4946,6 +5092,7 @@ export const de_DE: EnTranslations = {
       "perfectedBadge": "Perfektioniert",
       "perfectingRank": "Perfektionierung: Rang {rank} von {ranks}",
       "materialSourceGatherer": "{count} × Gesammelt von {name}",
+      "trophySkullSource": "{count} × Erbeutet von {name}",
       "materialSourceGathererSigned": "{count} × Gesammelt von {name}, signiert von {signer}",
       "materialSourceUnrecorded": "{count} × Kein Sammler verzeichnet",
       "materialSourceUnrecordedSigned": "{count} × Kein Sammler verzeichnet, signiert von {name}",
@@ -6061,22 +6208,26 @@ export const de_DE: EnTranslations = {
       "enchant_weapon_piston_drive": "Waffenätzung: Kolbenantrieb"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Deine erfolgreichen Nahkampfangriffe können 50 Stärke für 15 Sek. gewähren und dich um 200 Gesundheit heilen. Heilmodifikatoren gelten. Jeder Treffer würfelt 1 % pro 0,6 Sek. der Grundgeschwindigkeit der angreifenden Waffe. Keine interne Abklingzeit. Beide Hände teilen sich eine Stärkung; jede Auslösung erneuert sie, und sie stapelt sich nie. Fernkampfangriffe lösen diesen Effekt nicht aus. Wolfsform verwendet stattdessen ihre Grundschwunggeschwindigkeit von 1 Sek.",
-      "enchant_weapon_riftwalkers_grace": "Deine gelandeten Nahkampfangriffe können dir 15 Sek. lang 60 Beweglichkeit und 2% schnellere Nahkampfangriffe gewähren. Jeder Treffer würfelt 1% pro 0,6 Sek. der Grundgeschwindigkeit der treffenden Waffe. Keine interne Abklingzeit. Beide Hände teilen sich einen Effekt; jede Auslösung erneuert ihn, und er stapelt sich nie. Fernkampfangriffe lösen diesen Effekt nicht aus. Katzengestalt verwendet stattdessen ihre Grundschlaggeschwindigkeit von 1 Sek.",
+      "enchant_weapon_lastflame_zeal": "Deine erfolgreichen Nahkampfangriffe können dir 15 Sek. lang 50 Stärke gewähren und dich um 200 Gesundheit heilen. Heilungsmodifikatoren gelten. Jeder Treffer würfelt mit 1% Chance pro 0,6 Sek. Grundtempo der treffenden Waffe. Keine interne Abklingzeit. Beide Hände teilen sich einen Stärkungseffekt; jede Auslösung erneuert ihn, er ist nicht stapelbar. Fernkampfangriffe lösen ihn nicht aus. In Katzengestalt würfeln automatische Angriffe stattdessen mit dem Pfotentempo von 1 Sek. Schläge und Finisher in Katzen- und Bruin-Gestalt würfeln mit dem Tempo der Waffe; Fegende Klauen würfelt einmal pro Einsatz, nicht pro Ziel.",
+      "enchant_weapon_riftwalkers_grace": "Deine erfolgreichen Nahkampfangriffe können dir 15 Sek. lang 60 Beweglichkeit und 2% schnellere Nahkampfangriffe gewähren. Jeder Treffer würfelt mit 1% Chance pro 0,6 Sek. Grundtempo der treffenden Waffe. Keine interne Abklingzeit. Beide Hände teilen sich einen Stärkungseffekt; jede Auslösung erneuert ihn, er ist nicht stapelbar. Fernkampfangriffe lösen ihn nicht aus. In Katzengestalt würfeln automatische Angriffe stattdessen mit dem Pfotentempo von 1 Sek. Schläge und Finisher in Katzen- und Bruin-Gestalt würfeln mit dem Tempo der Waffe; Fegende Klauen würfelt einmal pro Einsatz, nicht pro Ziel.",
       "enchant_weapon_dawnfire_etching": "Ätzt eine Waffe dauerhaft mit 18 Zaubermacht. Zaubermacht zählt auch zur Heilkraft. Ein fester Bonus, der nicht skaliert.",
       "enchant_weapon_dawns_benediction": "Ätzt eine Waffe dauerhaft mit 34 Heilkraft. Heilkraft erhöht nur Heilung, niemals Zauberschaden. Ein fester Bonus, der nicht skaliert.",
       "enchant_weapon_piston_drive": "Ätzt eine zweihändige Waffe dauerhaft mit 12 Stärke und 25 kritischer Trefferwertung. Kann nicht auf eine einhändige Waffe angewendet werden. Ein fester Bonus, der nicht skaliert."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Dein Herdstein des Bündnisses ist nicht gebunden. Sprich mit einem verbündeten Quartiermeister oder benutze ihn an einem verbündeten Knotenpunkt.",
+      "hearthstoneBound": "Dein Herdstein des Bündnisses ist nun an {hub} gebunden.",
+      "hearthstoneTransport": "Der Herdstein bringt dich nach {hub}.",
+      "itemCooldown": "Dieser Gegenstand ist noch nicht bereit ({minutes} Min. verbleibend).",
       "alliedHearthstoneUse": "Einsatz: Teleportiert dich zu deinem angestimmten Fraktionshub. (10 Sek. Zauber, 15 Min. Abklingzeit)",
       "alliedHearthstoneAttuned": "Angestimmt auf: {hub}",
       "hub_none": "Keine (Nutze es in der Nähe eines Fraktionshubs um es anzustimmen)",
       "hub_rift_watch": "Drifthaven (Die Risswacht)",
       "hub_church_order": "Eastbrook-Tal (Der Kirchenorden)",
-      "hub_automatons": "South Reach (Die Automatenschmiede)",
+      "hub_automatons": "Wyrmwatch (Automaten)",
       "riftGliderUse": "Einsatz: Entfaltet den Gleitschirm und verringert die Fallgeschwindigkeit für 30 Sekunden. Das Landen oder Schadensaufnahme bricht den Effekt ab. (2 Min. Abklingzeit)",
       "targetDummyUse": "Einsatz: Stellt in der freien Welt ein mechanisches Zieltrainingspuppe für 2 Minuten auf, um Kampffähigkeiten zu trainieren. (5 Min. Abklingzeit)",
-      "battleStandardUse": "Einsatz: Pflanzt die Morgenröte-Kriegsflagge für 5 Minuten, erhöht die Gesundheits- und Manaregeneration außerhalb des Kampfes erheblich für alle nahen Verbündeten. Das Verweilen in ihrer Nähe für 10 Sekunden gewährt auch Segen der Morgenröte (+5% auf alle Attribute für 30 Min.). (5 Min. Abklingzeit)",
+      "battleStandardUse": "Benutzen: Stellt die Morgenröte-Kriegsflagge für 5 Min. auf. Spieler außerhalb des Kampfes im Umkreis von 15 Yards regenerieren 10% mehr Gesundheit; Mananutzer erhalten außerdem alle 2 Sek. Mana in Höhe von 5% ihrer Willenskraft. Nach 10 Sek. in ihrer Nähe erhältst du Segen der Morgenröte: Stärke, Beweglichkeit, Ausdauer, Intelligenz und Willenskraft steigen 30 Min. lang um 5%. (5 Min. Abklingzeit)",
       "shockBombUse": "Einsatz: Wirft eine Schockbombe bis zu 30 Yard entfernt und verursacht 120 bis 160 Naturschaden an allen Feinden im Umkreis von 5 Yards. (1 Min. Abklingzeit)",
       "invisibilityUse": "Einsatz: Hüllt dich für 6 Sekunden in Heimlichkeit. (2 Min. Abklingzeit)",
       "armorKitUse": "Einsatz: Verstärkt deine Brustplatte und erhöht Rüstung um 12 für 1 Stunde.",
@@ -6436,7 +6587,9 @@ export const de_DE: EnTranslations = {
     },
     "pattern": {
       "teaches": "Benutzen: Zeigt dir, wie du {item} herstellst.",
-      "teachesEnchant": "Benutzen: Zeigt dir, wie du {enchant} anwendest."
+      "teachesEnchant": "Benutzen: Zeigt dir, wie du {enchant} anwendest.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Entbindung: {name}",
@@ -7248,7 +7401,9 @@ export const de_DE: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Kartenseitenleiste einklappen",
-      "expandHint": "Kartenseitenleiste ausklappen"
+      "expandHint": "Kartenseitenleiste ausklappen",
+      "resizeRailAria": "Breite der Karten-Seitenleiste",
+      "resizeRailHint": "Ziehen, um die Karten-Seitenleiste zu vergrößern oder zu verkleinern. Doppelklick setzt zurück."
     },
     "arenaGate": {
       "minLevelNote": "Erfordert Stufe {level}"
@@ -7533,6 +7688,8 @@ export const de_DE: EnTranslations = {
       "choose": "Quest wählen",
       "inProgress": "In Arbeit ({count}/{required})",
       "completed": "Diese Woche abgeschlossen",
+      "completedLastWeek": "Letzte Woche abgeschlossen",
+      "claimFirst": "Zuerst abholen",
       "lockedThisWeek": "Diese Woche gesperrt",
       "footerPick": "Du kannst jeweils eine Wochenaufgabe halten. Wähle eine Karte, um ihre Bedingungen zu lesen.",
       "footerHeld": "Deine Aufgabe für diese Woche ist festgelegt. Die anderen drei schalten sich bei der Zurücksetzung frei.",
@@ -7541,7 +7698,7 @@ export const de_DE: EnTranslations = {
       "rewards": "Belohnungen",
       "alsoReceive": "Du erhältst außerdem:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Öffnet sich zu einem Normal-Schlachtzugsteil für deine Klasse (nie ein Set-Teil), plus {count} x {item}.",
+      "cacheDesc": "Öffnet sich zu einem Normal-Schlachtzugsteil für deine Klasse (nie ein Set-Teil von Ignivar), plus {count} x {item}.",
       "dialogNote": "Nur eine Wochenaufgabe kann aktiv sein. Sie {reset}",
       "accept": "Annehmen",
       "decline": "Ablehnen",
@@ -7573,6 +7730,7 @@ export const de_DE: EnTranslations = {
       },
       "commendHeading": "Empfehlung des Gesandten",
       "commendNote": "{amount} Ruf bei einer Fraktion deiner Wahl, einmal pro Woche.",
+      "commendCarriedNote": "{amount} Ruf von letzter Woche, noch nicht abgeholt. Hole ihn ab, um eine neue Ladung zu wählen.",
       "commendClaimed": "Die Empfehlung dieser Woche ging an die {faction}.",
       "commendRewardLine": "{amount} Ruf bei einer Fraktion deiner Wahl",
       "chosen": "Wochenquest angenommen: {category}",
@@ -9016,7 +9174,7 @@ export const de_DE: EnTranslations = {
       "mobileBody": "Auf einem Telefon oder Tablet startet dich das Spiel auf Low. Jedes Touch-Gerät landet beim ersten Start dort, mit Absicht, damit du in die Welt kommst und spielst; hebe die Stufe jederzeit selbst im Grafik-Bedienfeld an. In einem Android-Browser steht dir die ganze Leiter offen und deine Wahl bleibt bestehen. Auf iPhone und iPad kannst du die obersten Presets ebenfalls wählen, und sie greifen, sobald du Übernehmen drückst, doch das Spiel setzt dich beim nächsten Start auf High zurück, weil iOS den Tab beenden kann, während eine so große Szene aufgebaut wird. Die heruntergeladene App ist noch knapper: Ihre Preset-Liste endet bei High und die einzelnen Systemregler sind ausgeblendet, weil die App diese selbst verwaltet.",
       "touchBody": "Auf einem Touchscreen wächst dem Grafik-Bedienfeld eine eigene Karte Touch-Steuerung zu: Joystick-Größe und Totzone, Größe der Bildschirmtasten, Deckkraft der Steuerung, ein optionaler Kamerastick, ein linkshändig gespiegeltes Layout und eine invertierte Touch-Blickrichtung, sodass sich der Bildschirm deinen Händen anpasst und nicht umgekehrt.",
       "audioTitle": "Ton und Sprache",
-      "audioBody": "Das Optionsfenster besteht nicht nur aus Pixeln. Audio hält drei Lautstärkeregler bereit, für Soundeffekte, Musik und Stimme, dazu einen Schalter für Musik an und aus und vier Schalter für die Geräusche, die am ehesten lästig werden: NPC-Stimmen, Schritte, Oberflächengeräusche und Klick-Rückmeldung. Der Reiter Allgemein im Bedienfeld Benutzeroberfläche trägt eine Sprachauswahl, die die gesamte Oberfläche auf der Stelle neu lokalisiert, ohne Neuladen, und eine Themenauswahl für das Fensterbild.",
+      "audioBody": "Das Optionsfenster regelt mehr als Pixel. Unter Audio findest du vier Lautstärkeregler für Effekte, Umgebungsgeräusche, Musik und Stimmen, einen Musikschalter sowie vier Schalter für häufig lästige Geräusche: NSC-Stimmen, Schritte, Oberflächengeräusche und Klickrückmeldungen. Der Reiter Allgemein unter Oberfläche bietet eine Sprachauswahl, die sofort die gesamte Oberfläche ohne Neuladen übersetzt, und eine Designauswahl für die Fenster.",
       "autolootBody": "Lieber nicht jede Leiche anklicken? Automatisches Aufsammeln im Vorbeigehen, auf dem Reiter Kampf im Bedienfeld Benutzeroberfläche und standardmäßig deaktiviert, sammelt die Beute deiner eigenen Tötungen ein, während du an ihnen vorbeigehst.",
       "panelsMoreBody": "Die beiden Bedienfelder, die diese Seite nicht auflistet, lohnen trotzdem einen Blick. Unter Auren gestalten Sie die großen Bildschirmwarnungen, die auflaufen, sobald einer der Procs Ihrer Klasse auftritt: welche angezeigt werden, ihre Größe, Farbe, Deckkraft und wo sie auf dem Bildschirm sitzen. Leistungsanzeige ist die Anzeige, die Sie einschalten, während Sie diese Seite abstimmen, und danach wieder ausblenden.",
       "valueUltraOrInsane": "Ultra, oder Extrem, wenn Sie alles wollen",
@@ -9033,6 +9191,7 @@ export const de_DE: EnTranslations = {
       "rowCameraSpeed": "Wie schnell die Kamera schwenkt, wenn Sie sich mit der Maus umsehen.",
       "rowTouchLookSpeed": "Dasselbe für die Wischsicht, und es erscheint nur, wenn Sie einen Touchscreen verwenden.",
       "rowFullscreen": "Füllt den gesamten Bildschirm mit dem Spiel.",
+      "rowSpellEffects": "Glühen, Funken, Geschosse und Einschläge der Zauber von Spielern und ihren Begleitern, deine eingeschlossen. Schalte sie für ein ruhigeres Bild oder ein paar zusätzliche Bilder pro Sekunde in großen Gruppenkämpfen aus. Gegnerische Zauber bleiben sichtbar, ebenso Gefahrenringe, Markierungen über betäubten, verängstigten oder bewegungsunfähigen Zielen und sämtliche Zauberleisten.",
       "rowWaterRipples": "Kielwasser und Wellen, die sich beim Schwimmen hinter Ihnen ausbreiten. Standardmäßig aus, und der einzige Wassereffekt, der echte Bildrate kostet, Spritzer und Blasen bleiben davon unberührt.",
       "rowOverflowXp": "Ob Ihr Balken auf Höchststufe weiterhin mit Überschuss-EP gefüllt wird oder stattdessen den klassischen, statischen Text für die Höchststufe zeigt.",
       "rowInterfaceMode": "Ob Sie die Desktop-Oberfläche oder die Touch-Steuerung auf dem Bildschirm erhalten. Auto liest Ihr Gerät aus, und Sie können jeden der beiden Modi erzwingen: Ein Tablet mit Tastatur kann das Desktop-Layout nutzen, und ein Laptop mit Touchscreen kann die Touch-Steuerung nutzen.",
@@ -9067,7 +9226,7 @@ export const de_DE: EnTranslations = {
       "ifPartyShowAuras": "Ob Stärkungs- und Schwächungseffekte auf den Gruppenfenstern erscheinen. Passende Schalter regeln Ressourcenbalken, Absorptionsschilde, Begleiter und ob Sie selbst in Ihrer eigenen Gruppenliste erscheinen.",
       "ifAurasOnPlayerFrame": "Zeigt Ihre Stärkungs- und Schwächungseffekte zusätzlich zur Auren-Leiste auch auf Ihrem eigenen Spielerfenster.",
       "ifAuraBarBelowFrame": "Verschiebt die Stärkungszauberleiste unter dein Einheitenfenster statt darüber. Wirkt nur, solange Stärkungszauber am Spielerfenster angezeigt werden.",
-      "ifTargetAurasBelowFrame": "Hängt die Effektleiste des Zielrahmens unter statt über den Rahmen, das klassische Layout. Standardmäßig aus, da der Standard-Zielrahmen direkt über der Aktionsleiste sitzt; schalte es ein, sobald du den Rahmen an eine Stelle mit Platz darunter verschoben hast.",
+      "ifTargetAurasBelowFrame": "Platziert die Leiste mit Stärkungs- und Schwächungseffekten unter dem Zielrahmen, unter Name und Gesundheitsbalken, statt darüber: die klassische Anordnung. In seiner Standardposition rückt der Zielrahmen samt deinem Zauberbalken und deinen Schlagtimern um eine Leistenzeile nach oben, damit die erste Zeile die Aktionsleiste freilässt. Ein von dir verschobener Rahmen bleibt an seinem Platz.",
       "ifAlwaysShowAllBuffs": "Zeigt jeden aktiven Stärkungseffekt auch bei der Grafikeinstellung Niedrig an und umgeht das übliche Limit für Stärkungssymbole.",
       "ifShowAuraCaster": "Fügt jedem Tooltip für Segen/Effekt eine Zeile \"Gewirkt von\" hinzu, die nennt, wer ihn angewendet hat. Praktisch, um mehrere Wirkende desselben Effekts auseinanderzuhalten, etwa die Segnungen zweier Paladine.",
       "ifTargetOfTarget": "Zeigt, wen Ihr Ziel anvisiert, die klassische Art zu erkennen, ob der Tank es noch hält.",
@@ -9085,6 +9244,7 @@ export const de_DE: EnTranslations = {
       "ifMouseoverCast": "Lässt eine Heilung oder einen freundlichen Zauber auf dem Gruppenfenster landen, über dem Ihr Mauszeiger schwebt, ohne Ihr Ziel zu ändern.",
       "ifStickyTarget": "Behält Ihr aktuelles Ziel, wenn Sie auf leeren Boden klicken, statt es aufzuheben.",
       "ifFctScale": "Die Größe der Schadens- und Heilzahlen, die von Ihrem Ziel abschweben.",
+      "ifClassicCombatText": "Bringt die schlichten weißen und blassgoldenen Schadenszahlen zurück, die gerade nach oben steigen. Lasse es für kräftigere, seitlich auffächernde Zahlen ausgeschaltet (Standard); kritische und ungewöhnlich große Treffer leuchten auf.",
       "ifExtraBars": "Blendet eine zweite Aktionsleistenreihe ein, und eine dritte, sobald die zweite aktiv ist. Die Felder bleiben über ihre Tastenbelegung erreichbar, selbst während die Reihen ausgeblendet sind.",
       "ifHideUnused": "Blendet leere Aktionsfelder aus, sodass nur die Schaltflächen gezeichnet werden, die Sie tatsächlich nutzen.",
       "ifLockBars": "Sperrt Ihre Leisten, damit Sie eine Fähigkeit nicht versehentlich aus einem Feld ziehen.",
@@ -9150,6 +9310,7 @@ export const de_DE: EnTranslations = {
       "framesGovernedTalkingHead": "Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.",
       "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
+      "framesGovernedResourceAndHill": "Aktiviere Ressourcenleiste abtrennen im Reiter Rahmen. Dann gibt Rahmen bearbeiten auch deine Ressourcenleiste frei, sodass du Mana, Energie oder Wut unabhängig an einer beliebigen Stelle platzieren kannst. Breite der Ressourcenleiste und Höhe der Ressourcenleiste im selben Reiter passen ihre Größe an. Rahmen bearbeiten gibt auch die Leiste für König des Hügels frei. Hintergrunddeckkraft von König des Hügels im selben Reiter blendet deren Fläche aus, während der Text gut lesbar bleibt.",
       "barsTitle": "Leisten, Timer und Kampftext",
       "barsBody": "Deine Zauberleiste erscheint in der Mitte des Bildschirms, direkt über deinen Aktionsleisten, sobald du zauberst oder kanalisierst, und zeigt den Namen des Zaubers sowie die verbleibende Zeit. Dein Ziel bekommt eine eigene Zauberleiste auf seinem Fenster, sodass du siehst, was kommt, und darauf reagieren kannst.\n\nEine dünne Schwungleiste liegt unter deiner Zauberleiste und füllt sich zwischen deinen Waffenschwüngen, sodass ein Nah- oder Fernkämpfer sehen kann, wann der nächste automatische Treffer landet.\n\nDeine Erfahrungsleiste läuft über die volle Breite unter deinen Aktionsleisten, in Segmente unterteilt, mit einem helleren Abschnitt, der die ausgeruhte Erfahrung zeigt, die du angesammelt hast.\n\nSchwimme unter Wasser, und am oberen Bildschirmrand erscheint eine blaue Atemleiste. Sie leert sich, während dein Kopf unter Wasser ist, blinkt rot auf, sobald sie aufgebraucht ist und du zu ertrinken beginnst, und füllt sich schnell wieder, sobald du auftauchst. Die Leertaste lässt dich nach oben schwimmen, und die Taste zum Abtauchen, standardmäßig Strg, bringt dich tiefer.\n\nSchaden und Heilung schweben als kleine Zahlen über dem auf, was sie getroffen haben, sodass du einen Kampf lesen kannst, ohne Text lesen zu müssen. Der Kampf-Reiter in deinem Chatfenster führt das vollständige schriftliche Protokoll.",
       "aurasTitle": "Stärkungs- und Schwächungszauber",
@@ -9511,18 +9672,20 @@ export const de_DE: EnTranslations = {
       "formsHeading": "Gestaltwandel",
       "formsNote": "Ein Druide kämpft, indem er die Gestalt wechselt. Die meisten Druidenfähigkeiten gehören zu einer bestimmten Gestalt, sodass die Form, in der du dich befindest, entscheidet, was du wirken kannst, und der Wechsel kostet etwas Mana. Du kannst innerhalb oder außerhalb des Kampfes wechseln, so oft du willst.",
       "formsAutoUnshift": "Ein Heilzauber oder ein Schadenszauber, den du in einer Gestalt wirkst, holt dich selbst daraus hervor. Eine Gestalt auf diese Weise zu verlassen ist gratis und verbraucht keine globale Abklingzeit, ein Sofortzauber geht also in dem Moment los, in dem du ihn drückst. Zurückzuwechseln ist eine gewöhnliche Fähigkeit und kostet weiterhin Mana und deine globale Abklingzeit.",
-      "formsMoonwing": "Ein Gleichgewichts-Druide erhält eine weitere Gestalt, die Mondkingestalt, die Zaubergestalt, in der er kämpft. Sie ist die einzige Tiergestalt, die deine Zauber behält, und dein Zauberstab funktioniert nur in ihr oder in deiner gewöhnlichen Zaubergestalt.",
-      "formsWolfEngage": "Ein Wolf eröffnet den Kampf mit Bruin-Ansturm, wechselt sofort in die Wolfsgestalt, um das Ziel festzunageln, schließt die Lücke mit Ansprung, wenn er nicht schleicht, und hält einen Gegner mit Niederreißen fest.",
+      "formsMoonwing": "Ein Gleichgewichts-Druide erhält eine weitere Gestalt, die Mondkingestalt, in der diese Spezialisierung als Zauberwirker kämpft. Wie die Sporenheilerform der Wiederherstellung behält sie deine Zauber; dein Zauberstab funktioniert nur in diesen beiden oder in deiner normalen Zaubergestalt.",
+      "formsWolfEngage": "Ein Wolf eröffnet den Kampf mit Bruin-Ansturm, wechselt sofort in die Katzengestalt, um das Ziel festzunageln, schließt die Lücke mit Ansprung, wenn er nicht schleicht, und hält einen Gegner mit Niederreißen fest.",
       "formLine": {
         "form_bear": "Die Tank-Gestalt: ein dickes Fell, Wut statt Mana und zusätzliche Bedrohung, damit Gegner weiter auf dich einschlagen.",
         "form_cat": "Die Nahkampf-Schadensgestalt: Energie und Combopunkte wie ein Schurke, dazu deutlich weniger Bedrohung.",
-        "form_travel": "Die Reisegestalt: deutlich schneller am Boden unterwegs, aber ohne andere Fähigkeiten, bis du zurückwechselst."
+        "form_travel": "Die Reisegestalt: deutlich schneller am Boden unterwegs, aber ohne andere Fähigkeiten, bis du zurückwechselst.",
+        "form_sporemender": "Die Heilgestalt der Wiederherstellung: robustere Haut und stärkere Heilung bei langsamerem Gang, alle Zauber und dein Mana bleiben erhalten."
       },
       "mageEleSummon": "Ein Frost-Zauber, der den Elementar an deine Seite ruft und auf dein Ziel hetzt.",
       "formName": {
         "form_bear": "Bruin-Gestalt",
         "form_cat": "Katzengestalt",
-        "form_travel": "Fleet-Gestalt"
+        "form_travel": "Fleet-Gestalt",
+        "form_sporemender": "Sporenheilerform"
       }
     },
     "classHook": {
@@ -10021,7 +10184,7 @@ export const de_DE: EnTranslations = {
       "honorFinalNoteSoldBack": "Ehrenkäufe sind endgültig. Die Rückkaufliste enthält nur Dinge, die du verkauft hast. Ein Münzkauf kann normalerweise zum Verkaufspreis zurückverkauft und aus dieser Liste zurückgeholt werden, falls du es dir anders überlegst. Kriegsführungsausrüstung bindet sich jedoch im Augenblick des Kaufs an die Seele. Sie kann daher nie gehandelt, verschickt oder für irgendetwas zurückverkauft werden und erreicht die Liste nie. Genau deshalb verlangt der Laden eine Bestätigung: Prüfe das Stück, bevor du drückst.",
       "warfareHeading": "Kriegsführungsausrüstung",
       "warfareBody": "Jedes Kriegsführungs-Ausrüstungsteil trägt Kriegsführungs-Angriffswertung und Kriegsführungs-Verteidigungswertung, und diese beiden Wertungen bewirken gegen Monster überhaupt nichts. Sie wirken nur, wenn du gegen einen anderen Spieler kämpfst, in einem Duell, in der Arena oder auf dem Schlachtfeld, wo Angriff dem von dir verursachten Schaden hinzufügt und Verteidigung den an dir erlittenen Schaden verringert, jeweils bis zu einer eigenen Obergrenze. Jede Rüstungsfamilie ist zugleich ein Set, und seine Set-Boni sind ebenso Kriegsführungswertung oder Effekte, die nur gegen Spieler wirken, sodass eine komplette Ehrenausrüstung auf einem Dungeon-Boss nichts wert ist.",
-      "warfareBodyStatsStay": "Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster.",
+      "warfareBodyStatsStay": "Jedes Kriegsführungsstück trägt Kriegsführungs-Offensivwertung und Kriegsführungs-Defensivwertung. Beide Werte wirken überhaupt nicht gegen Monster. Sie gelten nur, wenn du einen anderen Spieler bekämpfst, im Duell, in der Arena oder auf dem Schlachtfeld: Offensivwertung erhöht deinen verursachten Schaden, Defensivwertung senkt deinen erlittenen Schaden, jeweils bis zur eigenen Obergrenze. Jede Rüstungsfamilie ist außerdem ein Set, dessen Boni ebenfalls Kriegsführungswerte oder Effekte enthalten, die nur gegen Spieler wirken. Die Setboni einer vollständigen Ehrenausrüstung zählen daher gegen einen Dungeonboss nicht. Die gewöhnlichen Werte, Rüstung und Waffenschaden der Stücke gelten weiterhin überall; nur Kriegsführungswerte und Setboni schweigen gegen Monster. Eine Ausnahme wirkt überall: Zwei Teile eines dieser Sets sorgen außerdem dafür, dass erlittener Schaden dein Zauberwirken nicht mehr verzögert.",
       "warfareTradeBody": "Das ist der bewusste Kompromiss. Kriegsführungsausrüstung ist für den Kampf gegen Spieler gebaut, nicht als Abkürzung an den Dungeon-Stufen vorbei: Ein Kriegsführungsteil trägt niemals die Kampfwertungen, die ein Dungeon-Epic im selben Slot bietet, und alles, was es mitbringt, ist für andere Spieler bestimmt. Willst du dich in der Arena behaupten, kauf sie dir. Willst du heroische Dungeons schneller schaffen, verdiene dir deine Ausrüstung in den Dungeons.",
       "warfareTradeBodyRatingSpent": "Kriegsführungsausrüstung ist für Spieler gegen Spieler gedacht und überspringt keine Dungeonstufen. Sie trägt nicht die Kampfbewertungen eines Dungeonepics, sondern investiert ihre Bewertungen und Setboni vollständig in Kämpfe gegen Spieler. Für die Arena kaufst du sie, für schnellere heroische Dungeons verdienst du deine Ausrüstung dort.",
       "vanguardHeading": "Vorhut-Ausrüstung: Kriegsführung Saison 2",
@@ -10046,6 +10209,8 @@ export const de_DE: EnTranslations = {
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Einmal alle drei Stunden, zu einem Zeitpunkt, den niemand vorhersehen kann, wird dem ganzen Reich mitgeteilt, dass in fünfzehn Minuten in einer der Jeder-gegen-jeden-Zonen ein Hügel entstehen wird, und der Kreis, an dem er stehen wird, ist auf offenem Gelände markiert. Sobald er entsteht, besteht er fünfundvierzig Minuten lang, dann fällt er. Die Gruppe mit den meisten Spielern darin bestreitet den Hügel, und nach einer Minute ungebrochener Mehrheit gehört der Hügel ihr; ein einzelner Spieler zählt als Gruppe von einem, doch Schlachtzugsmitglieder zählen überhaupt nicht. Solange eine Gruppe den Hügel hält, verdient jedes ihrer Mitglieder darin jede Minute Ehre, und je länger dieselbe Gruppe ihn hält, desto mehr zahlt jede Minute: Eine volle Gruppe, die einen unbestrittenen Hügel seine gesamte Standzeit über hält, verdient etwa so viel wie drei Schlachtfeldsiege. Wechselt der Hügel den Besitzer, beginnen die neuen Halter die Zählung von vorn. Ein Balken über dem Feld zeigt, wer ihn hält, deine Zahlen gegen ihre und die Bestreitungsuhr; /hill im Chat verrät, wo er steht.",
+      "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyFlat": "Alle drei Stunden wird dem gesamten Reich zu einem unvorhersehbaren Zeitpunkt angekündigt, dass in fünfzehn Minuten in einem Gebiet mit freiem Kampf ein Hügel erscheint. Sein Kreis wird auf offenem Boden markiert. Er bleibt fünfundvierzig Minuten bestehen und verschwindet dann. Währenddessen werden alle fünf Minuten sein Standort und die Gruppen mit den längsten gesamten Haltezeiten bekannt gegeben. Die Gruppe mit den meisten Spielern im Kreis bestreitet den Hügel und erobert ihn nach insgesamt dreißig Sekunden zahlenmäßiger Überlegenheit. Eine gegnerische Gruppe pausiert den Zähler nur, bis eure Gruppe wieder führt; er beginnt erst von vorn, wenn kein lebendes Mitglied eurer Gruppe im Kreis bleibt. Einzelspieler zählen als Gruppe aus einer Person und behalten ihren Hügel, wenn sie eine Gruppe bilden. Schlachtzugsmitglieder zählen überhaupt nicht. Jedes Mitglied der haltenden Gruppe, das im Kreis steht, erhält jede Minute gleich viel Ehre, unabhängig von der bisherigen Haltezeit. Eine volle Gruppe, die den Hügel seine ganze Dauer ungestört hält, erhält ungefähr so viel Ehre wie für drei Schlachtfeldsiege. Wenn der Hügel verschwindet und die Gruppe mit der längsten gesamten Haltezeit mindestens zehn Minuten gehalten hat, erhält jeder Spieler einen Sieg für die PvP-Reihe des Wöchentlichen Tresors, der während ihrer Haltezeit mindestens eine Minute im Kreis stand und noch zu dieser Gruppe gehört. Ein Balken über dem Feld zeigt den Besitzer, eure und ihre Spielerzahl sowie den Eroberungszähler; /hill im Chat nennt den Standort.",
       "limitsBodyRaids": "Denselben Spieler immer wieder zu besiegen zahlt jedes Mal weniger und bald nichts mehr, und deine Zählung gegen diesen Spieler beginnt erst etwa eine Stunde nach der ersten dieser Tötungen von Neuem, sodass das Campen eines einzelnen Opfers nie das Warten wert ist. Ein Ziel weit unter deiner Stufe zahlt überhaupt nichts. Schlachtfelder und Arenen folgen ihren eigenen Regeln, solange du dich darin befindest, und sie zahlen mehr Ehre als die offene Welt, sodass Welt-PvP der langsamere Weg zu demselben Händler ist. Schlachtzüge verdienen nichts an Welttötungen: Ein Schlachtzugsmitglied erhält keine Ehre oder kein Gold und verkleinert auch niemandes Anteil, kämpfe also als Gruppe, um bezahlt zu werden."
     },
     "thornhollowPage": {
@@ -10223,6 +10388,7 @@ export const de_DE: EnTranslations = {
       "formBear": "Bruin Form",
       "formCat": "Katzengestalt",
       "formTravel": "Fleet Form",
+      "formSporemender": "Sporenheilerform",
       "groupCreatures": "Kreaturen",
       "groupPets": "Dämonen des Hexenmeisters",
       "pickerLabel": "Wähle ein Modell zum Ansehen",
@@ -10656,8 +10822,8 @@ export const de_DE: EnTranslations = {
         "commissionsHeading": "Auftragsarbeiten und die Herstellerbindung",
         "commissionsBody": "Eine Auftragsarbeit ist ein Handwerk, das für jemanden gefertigt wird. Beim Herstellen einer Waffe, eines Rüstungsteils oder eines gehaltenen Nebenhandgegenstands (ein Trank kann keine Bindung tragen) kann der Handwerker das Stück als Auftragsarbeit kennzeichnen: Das fertige Stück verhält sich in den Händen des Herstellers normal, aber in dem Moment, in dem es beim Handel den Besitzer wechselt, bindet es sich an die Person, die es erhalten hat. Das ist die Herstellerbindung: Der Käufer bekommt sein Stück, und das Stück kann nicht weitergegeben oder wiederverkauft werden.\n\nBindungen sind nicht für immer, nur kostspielig. Jeder Stationsmeister kann ein gebundenes Stück lösen, solange du an seiner Station stehst (eine mobile Station bietet diesen Dienst nie), gegen eine Gebühr, die von der Qualität des Gegenstands abhängt: 25 Silber für Ungewöhnlich, 1 Gold für Selten, 4 Gold für Episch; ein Legendäres zahlt den Episch-Tarif, ein beauftragtes Gewöhnliches den Ungewöhnlich-Tarif.\n\nDie Gebühr kauft eine saubere Weste, keine Heilung: Das Stück ist noch immer eine Auftragsarbeit, also bindet es sich beim nächsten Handel erneut an denjenigen, der es erhält, und alles andere an ihm, Signatur, Meisterwerk und Verzauberungen, bleibt unberührt.",
         "provenanceHeading": "Signierte Arbeit",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Manche Gegenstände tragen einen Namen. Die Herkunftszeilen eines Materials sagen, wer jede Einheitengruppe gesammelt hat, während ein getrenntes Signiert-von-Zeichen den Premiumsignierer nennt, falls es einen gibt. Diese Tatsachen sind unabhängig: Gewöhnliches Sammelmaterial bewahrt den Sammler ohne Signatur, und alter signierter Bestand kann seinen Signierer nennen, obwohl ehrlich kein Sammler aufgezeichnet wurde. Ein fertiges Stück nennt stattdessen seinen Handwerker. Diese Aufzeichnungen reisen durch Handel, Bank, Post, Weltmarkt und sogar den Händlerrückkauf mit dem Gegenstand und verblassen nie.\n\nSammeln signiert die beste Arbeit automatisch. Jede Ernte, die selten oder besser würfelt, kommt signiert an, und seltene Funde signieren ihren gesamten fünffachen Glücksertrag. Der Glückswurf bei einer Leichenverarbeitung signiert den Ertrag, wenn die Familie kein Exemplar besitzt. Wenn sie ein Exemplar besitzt, bleibt der normale Ertrag gewöhnlich und daneben wird das signierte makellose Exemplar erzeugt. Herstellung folgt derselben Linie: Jede seltene oder bessere Ausgabe wird in jeder Kopie signiert, und ein Meisterwerk ist unabhängig von seiner Qualität immer signiert. Die Signatur eines gewöhnlichen Materials sitzt auf den Einheiten selbst und geht nicht verloren, nur weil ein passender Stapel bereits einen anderen Sammler oder Signierer enthält. Ein getrenntes makelloses Exemplar ist ein eigener Gegenstand und braucht Platz. Passt es nicht, bleibt der gewöhnliche Leichenertrag, aber das Exemplar geht verloren.\n\nFertige Gegenstände haben eine strenge Identität. Zwei Kopien verschmelzen nur, wenn jedes Merkmal exakt gleich ist: Gegenstand, Signierer, Meisterwerkwerte, Verzauberung und Bindung. Kompatible Materialien teilen einen Platz über Sammler und Signierer hinweg, behalten aber je Quelle ihre Menge. Der Tooltip beim Darüberfahren fasst die Quellen zusammen; ein Rechtsklick auf den Stapel öffnet die vollständige Liste (auf Touchgeräten nutze dessen Schaltfläche Quellen). Nach Sammler trennen hält diese Stapel in deinen Taschen auseinander, und Sortieren respektiert die Wahl. Übertragenes Material stapelt sich beim Empfänger normal.\n\nSignaturen zahlen Handwerkern etwas zurück. Hältst du an der Werkbank eine signierte Kopie eines benötigten Reagenzes, erhöht der Signierer die Meisterwerkchance um 2 Prozentpunkte. Hältst du ein mit deiner eigenen Hand signiertes Reagenz, sinkt seine benötigte Menge um eins, nie unter eins, außer das Reagenz ist als nicht rabattierbar markiert; Raidkerne behalten immer die volle Menge. Deine eigene signierte Arbeit der Stufe selten oder besser lehrt dich heute sogar zurück, allerdings nur bei gefertigten Tränken: Trinkst du einen seltenen Trank, den du selbst gebraut und signiert hast, fließt ein kleiner Fertigkeitsstrom in den Beruf zurück, solange er aktiver Hauptberuf ist. Ein Elixier, eine Schriftrolle oder ein Apexfläschchen lehrt unabhängig von seiner feinen Signatur nichts zurück.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Manche Gegenstände tragen einen Namen. Die Herkunftszeilen eines Materials sagen, wer jede Einheitengruppe gesammelt hat, während ein getrenntes Signiert-von-Zeichen den Premiumsignierer nennt, falls es einen gibt. Diese Tatsachen sind unabhängig: Gewöhnliches Sammelmaterial bewahrt den Sammler ohne Signatur, und alter signierter Bestand kann seinen Signierer nennen, obwohl ehrlich kein Sammler aufgezeichnet wurde. Ein fertiges Stück nennt stattdessen seinen Handwerker. Diese Aufzeichnungen reisen durch Handel, Bank, Post, Weltmarkt und sogar den Händlerrückkauf mit dem Gegenstand und verblassen nie.\n\nSammeln signiert die beste Arbeit automatisch. Jede Ernte, die selten oder besser würfelt, kommt signiert an, und seltene Funde signieren ihren gesamten fünffachen Glücksertrag. Der Glückswurf bei einer Leichenverarbeitung signiert den Ertrag, wenn die Familie kein Exemplar besitzt. Wenn sie ein Exemplar besitzt, bleibt der normale Ertrag gewöhnlich und daneben wird das signierte makellose Exemplar erzeugt. Herstellung folgt derselben Linie: Jede seltene oder bessere Ausgabe wird in jeder Kopie signiert, und ein Meisterwerk ist unabhängig von seiner Qualität immer signiert. Die Signatur eines gewöhnlichen Materials sitzt auf den Einheiten selbst und geht nicht verloren, nur weil ein passender Stapel bereits einen anderen Sammler oder Signierer enthält. Ein getrenntes makelloses Exemplar ist ein eigener Gegenstand und braucht Platz. Passt es nicht, bleibt der gewöhnliche Leichenertrag, aber das Exemplar geht verloren.\n\nFertige Gegenstände haben eine strenge Identität. Zwei Kopien verschmelzen nur, wenn jedes Merkmal exakt gleich ist: Gegenstand, Signierer, Meisterwerkwerte, Verzauberung und Bindung. Kompatible Materialien teilen einen Platz über Sammler und Signierer hinweg, behalten aber je Quelle ihre Menge. Der Tooltip beim Darüberfahren fasst die Quellen zusammen; ein Rechtsklick auf den Stapel öffnet die vollständige Liste (auf Touchgeräten nutze dessen Schaltfläche Quellen). Nach Sammler trennen hält diese Stapel in deinen Taschen auseinander, und Sortieren respektiert die Wahl. Übertragenes Material stapelt sich beim Empfänger normal.\n\nSignaturen zahlen Handwerkern etwas zurück. Jede signierte Einheit eines benötigten Reagenzes in deinen Taschen oder im Materialtresor, auf die das Handwerk zugreifen kann, erhöht die Meisterwerkchance um 2 Prozentpunkte, unabhängig vom Unterzeichner. Hältst du ein mit deiner eigenen Hand signiertes Reagenz, sinkt seine benötigte Menge um eins, nie unter eins, außer das Reagenz ist als nicht rabattierbar markiert; Raidkerne behalten immer die volle Menge. Deine eigene signierte Arbeit der Stufe selten oder besser lehrt dich heute sogar zurück, allerdings nur bei gefertigten Tränken: Trinkst du einen seltenen Trank, den du selbst gebraut und signiert hast, fließt ein kleiner Fertigkeitsstrom in den Beruf zurück, solange er aktiver Hauptberuf ist. Ein Elixier, eine Schriftrolle oder ein Apexfläschchen lehrt unabhängig von seiner feinen Signatur nichts zurück.",
         "collectorsHeading": "Sammler, Trophäen und der Preis einer Geschichte",
         "collectorsBody": "Händler sind blind für Provenienz: Ein signierter Gegenstand verkauft sich an einen NSC für genau seinen schlichten Preis. Der Aufpreis für eine Signatur besteht nur zwischen Spielern, und genau das macht ihn interessant: ein Stapel Glückserz, signiert von einem berühmten Sammler, ein Erstklassiges Stück aus einer glücklichen Ernte, eine Meisterwerksklinge mit dem Namen eines längst zurückgezogenen Schmieds, all das kostet, was jemandes Erinnerung sagt, dass es wert ist.\n\nDas Buch der Taten spielt mit demselben Instinkt: Makellose Ader, Altes Herzholz, Mondlichtblüte, Ein Makelloses Exemplar und Schimmer der Hoffnung sind Sammlertaten mit null Ansehen, die einzig dazu da sind, zu beweisen, dass dir ein Moment passiert ist. Behalte den Gegenstand, der die Tat verdient hat, und du hältst den Beleg. Das ist keine Macht; Provenienz kauft keine Attributpunkte und gewinnt keine Kämpfe, sie ist die Papierspur der Welt an guten Tagen.",
         "castPaceHeading": "Herstellungszeit und der Goldabfluss",
@@ -10706,7 +10872,7 @@ export const de_DE: EnTranslations = {
         "q3": "Was ist der Unterschied zwischen Plündern und Ernten einer Leiche?",
         "a3": "Das sind zwei getrennte Handlungen an derselben Leiche. Alles, was eine Leiche hält, Münzen und Drops plus alle erntbaren Komponenten, öffnet sich in demselben Fenster, doch die Interaktionstaste und Beute nehmen holen nur die gewöhnliche Beute, die den normalen Beuteregeln folgt. Das Ernten ist die Berufsseite, wobei Materialien direkt von der Leiche selbst abgestreift werden, und es geschieht erst, wenn du in diesem Fenster Verwerten wählst.\n\nErnten ist nach dem Prinzip Erster kommt, einzelne Nutzung: Jede Leiche kann genau einmal geerntet werden, von wem auch immer sie zuerst beansprucht, inklusive online. Dein Stadtfokus beeinflusst, was du bekommst: Während du in einem Stadthub stehst, kannst du 10 Fokuspunkte auf die Komponententypen verteilen, die dir wichtig sind, und jede fokussierte Komponente würfelt eine bessere Güte (alle 5 Punkte erhöht sich diese um eine Stufe, maximal um zwei Stufen) und ergibt mehr (10 Prozent pro Punkt). Unfokussierte Komponenten werden nie verschlechtert.",
         "q4": "Warum ist mein Eisenrindenholz signiert?",
-        "a4": "Du hattest einen Glücksfund. Etwa 1 von 90 Ernten löst ein seltenes Sammelereignis aus (uraltes Kernholz an einem Baum, eine makellose Ader beim Erz, eine mondscheinbeleuchtete Blüte bei Kräutern): Es verfünffacht den Ertrag, signiert jede Einheit mit deinem Namen und verkündet den Fund der ganzen Zone. Auch ein Seltenheitswurf von Selten oder besser bei einer gewöhnlichen Ernte signiert den Ertrag.\n\nSignierte Materialien lohnt es sich aufzuheben oder teuer zu verkaufen: Wer an der Werkbank irgendeine signierte Kopie eines benötigten Reagenz hält, erhält 2 Prozentpunkte mehr Meisterwerkchance. Sie können sich mit schlichtem Material oder Einheiten anderer Sammler und Signierer einen passenden Stapel teilen, ohne einen Vermerk zu verlieren; der Stapel bewahrt jede Quelle und Anzahl getrennt.",
+        "a4": "Du hast einen besonders ergiebigen Fund gemacht. Etwa 1 von 90 Ernten löst ein seltenes Sammelereignis aus: uraltes Kernholz bei Bäumen, eine makellose Ader bei Erz oder eine mondbeschienene Blüte bei Kräutern. Es verfünffacht den Ertrag, signiert jede Einheit mit deinem Namen und meldet den Fund der ganzen Zone. Auch ein Seltenheitswurf von selten oder besser bei einer normalen Ernte signiert den Ertrag.\n\nSignierte Materialien solltest du aufheben oder teuer verkaufen: Jede signierte Einheit einer benötigten Zutat in deinen Taschen oder im Materialtresor, auf die das Handwerk zugreifen kann, erhöht die Meisterwerkchance um 2 Prozentpunkte. Sie kann einen kompatiblen Stapel mit unsignierten Materialien sowie Einheiten anderer Sammler und Unterzeichner teilen, ohne eine Markierung zu verlieren; Quelle und Menge bleiben jeweils einzeln erhalten.",
         "q5": "Wie entbinde ich eine Auftragsarbeit und was kostet es?",
         "a5": "Gehe zu einer Handwerksstation mit dem Stück in deinen Beuteln und bezahle den Meister. Die Gebühr richtet sich nach der Qualität des Gegenstands: 25 Silber für ein ungewöhnliches Stück, 1 Gold für ein seltenes, 4 Gold für ein episches; ein legendäres zahlt den Episch-Tarif, und ein beauftragtes gewöhnliches Stück den Ungewöhnlich-Tarif. Es muss eine echte Station sein: eine mobile Station bietet diesen Dienst nie.\n\nEin Stück mit einem beliebigen Perfektionierungsrang oder dem Perfektioniert-Siegel kann nicht entbunden werden. Dazu gehört auch ein beauftragtes Stück, das mit einem Meisterwerk-Vorsprung hergestellt wurde. Ein fehlgeschlagener erster Perfektionierungsversuch, der Rang null hinterlässt, kann weiterhin gegen die übliche Gebühr entbunden werden.\n\nDas Stück bleibt nach dem Entbinden eine Auftragsarbeit, bindet sich also beim nächsten Handel erneut an denjenigen, der es erhält. Wenn mehrere gebundene Kopien einen Stapel teilen, wird eine Kopie abgelöst und pro Zahlung entbunden.",
         "q6": "Wo lerne ich Rezepte und was kosten sie?",
@@ -10742,6 +10908,7 @@ export const de_DE: EnTranslations = {
       "buyingBody": "Sprich mit einem Händler und wähle, seine Waren durchzusehen, und sein Laden öffnet sich mit drei Reitern: Kaufen, Verkaufen und Rückkauf. Kaufen enthält alles, was er führt, deins, sofern du es dir leisten kannst. Verkaufen listet auf, was aus deinen Taschen er dir abkauft, und ein Stück mit eigener gewürfelter Güte zu verkaufen verlangt zuerst eine Bestätigung, sodass ein wertvolles Exemplar nie versehentlich verloren geht. Trennst du dich von etwas, das du bereust, hebt der Reiter Rückkauf deine jüngsten Verkäufe auf, sodass du sie für die Münzen zurückkaufen kannst, die du erhalten hast.",
       "junkTitle": "Plunder loswerden",
       "junkBody": "Beute, für die du keine Verwendung hast, lässt sich immer noch an jeden Händler verkaufen, leere deine Taschen also, wann immer du durch eine Stadt kommst, statt sie volllaufen zu lassen. Der Reiter Verkaufen des Händlers hat sogar eine Ein-Klick-Schaltfläche, die jeden Kram von schlechter Güte auf einmal verkauft. Wirklich wertlosen Kleinkram kannst du auch einfach wegwerfen, um Platz zu schaffen.",
+      "junkBodyFinal": "Unbrauchbare Beute lässt sich weiterhin bei jedem Händler mit eigenem Laden verkaufen. Leere deine Taschen bei jedem Stadtbesuch. Das Händlerfenster bietet sogar eine Schaltfläche zum Verkauf sämtlichen Plunders schlechter Qualität mit einem Klick. Völlig wertlose Dinge kannst du auch wegwerfen, um Platz zu schaffen. Unsignierte graue Gegenstände gelangen dabei nicht in die Rückkaufliste. Prüfe also vor dem Verkauf, ob du etwas behalten wolltest.",
       "tradeTitle": "Handeln mit anderen Spielern",
       "tradeBody": "Du kannst von Angesicht zu Angesicht mit jedem handeln, der nahe bei dir steht. Ihr beide legt Gegenstände und Münzen in ein gemeinsames Fenster, und der Tausch findet erst statt, sobald ihr ihn beide bestätigt, sodass keine Seite übers Ohr gehauen werden kann. Es ist der einfache Weg, einem Freund eine Beute zu reichen oder ein Geschäft abzuschließen.",
       "mailTitle": "Die Rabenpost",
@@ -14748,6 +14915,10 @@ export const de_DE: EnTranslations = {
     "selectClass": "Bitte wähle eine Klasse.",
     "pickClass": "Wähle eine Klasse.",
     "returnToLogin": "Zurück zur Anmeldung",
+    "searchUpdates": "Nach Aktualisierungen suchen",
+    "noUpdateFound": "Keine Aktualisierung gefunden. Versuche es in Kürze erneut.",
+    "updateUnavailable": "Aktualisiere über deinen Spieleladen oder lade den neuesten Client herunter.",
+    "updateSearchFailed": "Aktualisierungen konnten nicht geprüft werden. Bitte versuche es erneut.",
     "api": {
       "tooManyAttempts": "Zu viele Versuche. Warte eine Minute und versuche es erneut.",
       "usernameShape": "Der Benutzername muss 3-24 Zeichen lang sein und Buchstaben, Ziffern oder Unterstrich verwenden.",
@@ -14979,6 +15150,17 @@ export const de_DE: EnTranslations = {
     "androidOpenStep": "Öffne World of ClaudeCraft über das neue Symbol.",
     "otherStandaloneDetail": "Halte dein Gerät im Vollbild-Querformat.",
     "otherInstallDetail": "Installiere diese Seite oder füge sie zum Startbildschirm hinzu, um das beste mobile Vollbild-Erlebnis zu erhalten."
+  },
+  "graphicsPrompt": {
+    "title": "Wähle deine Grafikeinstellungen",
+    "intro": "Wähle eine Grafikvoreinstellung für dieses Gerät. Niedrigere Stufen laufen flüssiger, höhere bieten eine aufwendigere Darstellung.",
+    "autoDesc": "Wählt eine passende Voreinstellung für dieses Gerät. Erkannt: {preset}.",
+    "lowDesc": "Die flüssigste Darstellung. Ideal für Smartphones, Tablets sowie ältere oder integrierte Grafikchips.",
+    "mediumDesc": "Ein Gleichgewicht zwischen Optik und Leistung. Für die meisten Laptops geeignet.",
+    "highDesc": "Mehr Details und dichtere Landschaften. Für eine dedizierte Grafikkarte geeignet.",
+    "ultraDesc": "Die optisch aufwendigste feste Voreinstellung. Für eine High-End-Grafikkarte geeignet.",
+    "changeLater": "Du kannst dies jederzeit in den Optionen unter Grafikqualität ändern.",
+    "confirm": "Weiter"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Welt nicht verfügbar",
@@ -15627,6 +15809,7 @@ export const de_DE: EnTranslations = {
       "passive": "Passiv",
       "defensive": "Defensiv",
       "aggressive": "Aggressiv",
+      "assist": "Unterstützen",
       "petAttackTitle": "Begleiterangriff",
       "petAttackDesc": "Befiehlt deinem Begleiter, dein aktuelles feindliches Ziel anzugreifen.",
       "waterJetTitle": "Wasserstrahl",
@@ -15640,10 +15823,11 @@ export const de_DE: EnTranslations = {
       "healDemonDesc": "Verbraucht Mana, um 5 Sekunden lang Heilung in deinen Dämon zu kanalisieren.",
       "healPetDesc": "Klicke hier und dann auf Nahrung in deinen Taschen, um deinen Begleiter 5 Sekunden lang zu füttern und zu heilen.",
       "stanceTitle": "Begleiterhaltung",
-      "stanceDesc": "Klicken, um Passiv, Defensiv oder Aggressiv zu wählen.",
+      "stanceDesc": "Klicken, um Passiv, Defensiv, Aggressiv oder Unterstützen zu wählen.",
       "passiveDesc": "Greift nur an, wenn du es befiehlst.",
       "defensiveDesc": "Greift Gegner an, die dich oder deinen Begleiter verletzen.",
       "aggressiveDesc": "Greift nahe feindliche Gegner an.",
+      "assistDesc": "Greift nur dein aktuelles Ziel an, sobald du eine Fähigkeit darauf wirkst. Ignoriert Gegner, die dich angreifen.",
       "rename": "Begleiter umbenennen",
       "revive": "Zusammenflicken",
       "abandon": "Begleiter aufgeben",
@@ -16088,6 +16272,8 @@ export const de_DE: EnTranslations = {
       "clueTalkAria": "Nach dem Hinweis fragen: {name}",
       "clueDeliver": "Übergebt {count} {item}.",
       "clueDeliverAria": "{count} {item} an {name} übergeben",
+      "attuneHearthstone": "Meinen Herdstein des Bündnisses hier binden.",
+      "attuneHearthstoneAria": "Binde deinen Herdstein des Bündnisses bei {name} an {hub}",
       "profIntroHint": "Sprich mit {name} wegen \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Die drei Relikte erzählen dieselbe Geschichte: Aldren kämpfte, um seinen König zu verteidigen, Malric durchbrach die Grenze des Todes, und Voss versuchte aufzuhalten, was danach kam. Das Siegel wird schwächer, und die verlassene Krypta ist der Weg hinab.",
       "browseGoods": "Lasst mich Eure Waren ansehen.",
@@ -16129,6 +16315,7 @@ export const de_DE: EnTranslations = {
       "activeStatus": "Aktive Weltquest",
       "expiresIn": "Läuft ab in {time}",
       "mineOre": "Baut Kupfererz ab",
+      "mineMaterial": "Baut {name} ab",
       "recoverObject": "Bergt {name}",
       "redirectLeyBeam": "Lenkt den Ley-Strahl um",
       "matchConfections": "Verzauberte Konfekte kombinieren",
@@ -16476,6 +16663,7 @@ export const de_DE: EnTranslations = {
       "clueCasketOpened": "Die Truhe enthält {money} und {items}.",
       "treasureMapEarned": "Alle Weltquests des Tages sind erledigt: du hast {map} gefunden.",
       "treasureMapLost": "Alle Weltquests des Tages sind erledigt, aber dein Rucksack hat keinen Platz für die Schatzkarte.",
+      "worldQuestRewardMailed": "Deine Taschen sind voll. Deine Belohnung wurde an dein Postfach geschickt: {items}.",
       "treasureMapRead": "Du studierst {map}. Das X liegt irgendwo in {zone}.",
       "treasureMapUpgraded": "Die Karte wird mit feinerer Tinte neu gezeichnet: sie ist jetzt {map}.",
       "treasureVaultOpened": "Der Boden weicht. Ein vergrabener Schatz liegt offen vor dir.",
@@ -16668,7 +16856,8 @@ export const de_DE: EnTranslations = {
       "sellQuantityCancel": "Abbrechen",
       "sellJunk": "Graues verkaufen",
       "sellJunkAria": "Alle grauen Gegenstände für {price} verkaufen",
-      "sellJunkHint": "Verkauft alle grauen Gegenstände in euren Taschen außer Questgegenständen."
+      "sellJunkHint": "Verkauft alle grauen Gegenstände in euren Taschen außer Questgegenständen.",
+      "sellJunkNoBuyback": "Unsignierte graue Gegenstände erscheinen nicht in der Rückkaufliste. Ihr Verkauf kann daher nicht rückgängig gemacht werden."
     },
     "market": {
       "title": "Weltmarkt",
@@ -16781,7 +16970,7 @@ export const de_DE: EnTranslations = {
       "historyEmpty": "Noch keine Verkäufe. Gegenstände, die Ihr auf dem Weltmarkt verkauft, erscheinen hier.",
       "historyNote": "Eure jüngsten Verkäufe auf dem Weltmarkt.",
       "saleBuyer": "Verkauft an {buyer}",
-      "saleOlder": "Zuzüglich {count} früherer Verkäufe, in der Summe enthalten.",
+      "saleOlder": "Dazu {count} frühere Verkäufe, die nicht aufgeführt sind.",
       "ordersTab": "Gewünscht",
       "ordersNote": "Gebt auf, was Ihr wollt, und das Gold wird beim Händler hinterlegt. Angebote zu oder unter Eurem Preis werden sofort erfüllt, der Rest wartet auf einen Verkäufer. Der Händler nimmt {cut}% von dem, wer liefert. Ihr habt {used}/{max} Aufträge offen.",
       "ordersListAria": "Offene Kaufaufträge",
@@ -16932,6 +17121,10 @@ export const de_DE: EnTranslations = {
         "name": "Pfeilhagel",
         "description": "Lässt 3 Sek. lang Pfeile über einen Bereich von 8 m niedergehen. Gegner darin erleiden alle 0.5 Sek. {damage} physischen Schaden. Der Schaden steigt mit der Distanzangriffskraft."
       },
+      "phosphor_flask": {
+        "name": "Phosphorflasche",
+        "description": "Ein versiegeltes Gefäß mit einer reaktiven Chemikalienmischung, die 3 Sek. lang über einen Bereich von 8 m in weißglühende Flammen aufgeht. Gegner in den Flammen erleiden alle 0,5 Sek. {damage} Feuerschaden. Der Schaden steigt mit der Distanzangriffskraft."
+      },
       "pack_command": {
         "name": "Rudelbefehl",
         "description": "Befiehlt Eurem lebenden Begleiter, für 36 bis 48 physischen Schaden zuzuschlagen. Der Schaden steigt mit der Angriffskraft des Begleiters. Ein Treffer stellt 20 Fokus wieder her und gewährt 30 Sek. lang 1 Rudelwildheit, bis zu 3. Jeder Stapel erhöht allen von Eurem Begleiter verursachten Schaden um 10%. Dieser Schlag nutzt die Stapel, die Ihr vor dem Treffer hattet."
@@ -16954,19 +17147,19 @@ export const de_DE: EnTranslations = {
       },
       "bloodhook": {
         "name": "Bluthaken",
-        "description": "Stürmt auf einen Gegner zu und wendet die Bluthakenwunde an, die über 12 Sek. in 4 Ticks 34 physischen Grundschaden plus 26% Eurer Distanzangriffskraft verursacht. (Feldkunst-Signatur)"
+        "description": "Stürme auf einen Gegner zu und belege ihn mit einer Wunde durch Bluthaken: über 12 Sek. in 4 Ticks 34 physischer Grundschaden plus 26% deiner Distanzangriffskraft. Verlangsamt das Ziel bei Ankunft 3 Sek. lang um 30%. (Überleben-Signatur)"
       },
       "shrapnel_charge": {
         "name": "Splitterladung",
-        "description": "Trifft das Ziel für 24 bis 30 physischen Schaden und bis zu 4 weitere Gegner innerhalb von 6 Metern für 13 bis 17. Die anderen Ziele bluten außerdem über 6 Sek. für 12 Schaden. Trägt das Hauptziel Eure Bluthakenwunde, wird sofort 1 Wundtick verursacht. Der direkte Schaden steigt mit der Distanzangriffskraft."
+        "description": "Trifft einen Kegel von 10 Metern vor dir. Dein Ziel, oder der nächste getroffene Gegner, wenn dein Ziel außerhalb steht, erleidet 24 bis 30 physischen Schaden. Alle anderen Gegner im Kegel erleiden 7 bis 9 und bluten über 6 Sek. für 12 Schaden. Trägt das Hauptziel deine Wunde durch Bluthaken, erleidet es sofort 1 Wundtick. Ein getroffener Gegner gewährt 1 Jagdschwung. Direkter Schaden steigt mit der Distanzangriffskraft."
       },
       "bloodtrail_assault": {
         "name": "Blutspurangriff",
-        "description": "12 Sek. lang verbreitet der Bluthaken eine Wunde mit 60% Stärke auf bis zu 2 nahe Gegner, Wundriss befiehlt einen Begleiterangriff mit 18 Schaden, und die Splitterladung gewinnt 2 Meter, verursacht 25% mehr Grundschaden an ihrem Hauptziel und löst 50% mehr Wundschaden aus."
+        "description": "12 Sek. lang verteilt Bluthaken eine Wunde mit 60% Stärke auf bis zu 2 Gegner innerhalb von 5 Metern, Wundriss befiehlt einen Begleiterangriff für 18 Schaden, und Splitterladung reicht 2 Meter weiter, verursacht am Hauptziel 25% mehr Grundschaden und löst 50% mehr Wundschaden aus. Ohne lebenden Begleiter regeneriert dein Fokus außerdem 100% schneller."
       },
       "trailbreak": {
         "name": "Pfadbruch",
-        "description": "Springt 12 Meter rückwärts. Habt Ihr Jagdschwung, wird er erneuert und bereitet 12 Sek. lang den Wiedereintritt vor."
+        "description": "Springt 25 Meter rückwärts und befreit Euch von Bewegungsunfähigkeit und Verlangsamungen. Habt Ihr Jagdschwung, wird er erneuert und bereitet 12 Sek. lang den Wiedereintritt vor."
       },
       "wildheart": {
         "name": "Wildherz",
@@ -16976,9 +17169,25 @@ export const de_DE: EnTranslations = {
         "name": "Panzerhaut",
         "description": "Verringert erlittenen Schaden 8 Sek. lang um 60%, verhindert aber Angriffe, solange sie aktiv ist."
       },
+      "play_dead": {
+        "name": "Totstellen",
+        "description": "Lässt Euch zu Boden fallen und tot erscheinen: Eure Gesundheit und Euer Fokus werden für alle als leer angezeigt. Gegner vergessen Euch, und gegnerische Spieler, die Euch anvisieren, verlieren ihr Ziel. Bewegen, Angreifen oder der Einsatz einer anderen Fähigkeit beendet den Effekt. Wirkt Ihr es in Bewegung, habt Ihr 1 Sek. Zeit, anzuhalten, bevor die Bewegung es beendet. Erneut wirken, um aufzustehen."
+      },
+      "tactical_camo": {
+        "name": "Taktische Tarnung",
+        "description": "Passe dich der Umgebung an: Gegner nehmen dich kaum wahr und du bewegst dich mit 80% Tempo. Angriffe oder erlittener Schaden beenden die taktische Tarnung. Erneut wirken, um hervorzutreten. (Überleben)"
+      },
       "frostjaw_trap": {
         "name": "Frostkieferfalle",
-        "description": "Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt."
+        "description": "Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt."
+      },
+      "bear_trap": {
+        "name": "Bärenfalle",
+        "description": "Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min.; nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, erleidet durch Blutung {damage} physischen Schaden über 15 Sek. und wird 4 Sek. lang um 50% verlangsamt. Der Schaden steigt mit der Distanzangriffskraft. Es kann jeweils nur eine Bärenfalle aktiv sein. Sie kann gleichzeitig mit Eurer Frostkieferfalle bestehen. Eine neue Bärenfalle ersetzt Eure vorherige."
+      },
+      "scatterbolt": {
+        "name": "Streubolzen",
+        "description": "Feuert einen Bolzenhagel in einem 90-Grad-Kegel mit 8 Metern Reichweite vor Euch ab und stößt Gegner bis auf 20 Meter Entfernung von Euch zurück. Gegen Rückstoß immune Gegner sind nicht betroffen. Verursacht keinen Schaden."
       },
       "pack_rally": {
         "name": "Rudelsammlung",
@@ -17094,7 +17303,7 @@ export const de_DE: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Massenbarriere",
-        "description": "Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 60 Sek. lang 130 Schaden. (Magiertalent)"
+        "description": "Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 15 Sek. lang {damage} Schaden. (Magiertalent)"
       },
       "overload": {
         "name": "Überladung",
@@ -17231,7 +17440,7 @@ export const de_DE: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Tiefschlag",
-        "description": "Finishing-Move, der das Ziel 1 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 6 Sek.)."
+        "description": "Finishing-Move, der das Ziel 2 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 7 Sek.)."
       },
       "ambush": {
         "name": "Lauererstoß",
@@ -17240,7 +17449,7 @@ export const de_DE: EnTranslations = {
       },
       "stealth": {
         "name": "Dämmerschleier",
-        "description": "Verbirgt Euch im Schatten: Gegner bemerken Euch kaum, doch Ihr bewegt Euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um herauszutreten.",
+        "description": "Verbirgt Euch im Schatten: Gegner bemerken Euch kaum, und Ihr bewegt Euch mit voller Geschwindigkeit. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um herauszutreten.",
         "specNote_subtlety": "Jede Eröffnung, die Ihr aus Duskveil einsetzt, fügt 1 Dämmer hinzu (max. 3)."
       },
       "adrenaline_rush": {
@@ -17284,7 +17493,7 @@ export const de_DE: EnTranslations = {
       },
       "vanish": {
         "name": "Rauchschwund",
-        "description": "Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an."
+        "description": "Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch mit voller Geschwindigkeit, solange ihr verborgen seid. Hält bis zu 10 Sek. an."
       },
       "instant_poison": {
         "name": "Natternbiss",
@@ -17517,11 +17726,11 @@ export const de_DE: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Jagdschwung",
-        "description": "Passiv: Der Weidschlag gewährt 8 Sek. lang 1 Jagdschwung, bis zu 3. Bei 3 Stapeln verursacht Wundriss 45% mehr Schlagschaden und verbraucht die Stapel. (Feldkunst)"
+        "description": "Passiv: Ausweidender Hieb und eine Splitterladung, die einen Gegner trifft, gewähren jeweils 1 Jagdschwung, bis zu 3. Hält bis zum Verbrauch oder bis du den Kampf verlässt; jede Stufe erhöht dein Bewegungstempo um 15%. Bei 3 Stufen verursacht Wundriss 60% mehr Schlagschaden und verbraucht die Stufen. (Überleben)"
       },
       "fieldcraft_reentry": {
         "name": "Bewaffneter Wiedereintritt",
-        "description": "Passiv: Pfadbruch erneuert den Jagdschwung und bereitet 12 Sek. lang Euren nächsten Weidschlag oder Bluthaken vor. Der Weidschlag verursacht pro Stapel 15% mehr Schaden. Der Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% pro Stapel und durch Eure Distanzangriffskraft. Bei 3 Stapeln verbraucht einer der beiden Angriffe den Jagdschwung. (Feldkunst)"
+        "description": "Passiv: Mit Jagdschwung bereitet Pfadbruch deinen nächsten Ausweidender Hieb oder Bluthaken für 12 Sek. vor. Ausweidender Hieb verursacht pro Stufe 15% mehr Schaden. Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% je Stufe und durch Distanzangriffskraft. Bei 3 Stufen verbraucht jeder dieser Angriffe Jagdschwung. (Überleben)"
       },
       "wing_clip": {
         "name": "Fesselnder Hieb",
@@ -17533,7 +17742,7 @@ export const de_DE: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Gestalt des Renners",
-        "description": "Nehmt die Gestalt des Renners an und erhöht euer Bewegungstempo 30 Min. lang um 30%. Solange aktiv, macht euch erlittener Schaden benommen, wodurch sich euer Bewegungstempo 4 Sek. lang um 50% verringert (jeder Treffer erneuert die Benommenheit)."
+        "description": "Nehmt die Gestalt des Renners an und erhöht euer Bewegungstempo 30 Min. lang um 30%. Solange aktiv, macht euch erlittener Schaden benommen, wodurch sich euer Bewegungstempo 2 Sek. lang um 50% verringert (jeder Treffer erneuert die Benommenheit)."
       },
       "aimed_shot": {
         "name": "Langer Zug",
@@ -17589,7 +17798,7 @@ export const de_DE: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Donnerspeicher",
-        "description": "Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)"
+        "description": "Passiv: Der Lichtbogenblitz, der Gabelblitz und Magma Burst gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -17597,7 +17806,7 @@ export const de_DE: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Verursacht {damage} Feuerschaden. Trifft ein Ziel, das von Eurem Cinder-Stoß brennt, immer kritisch. Magma Surge: Bei jedem Cinder-Stoß-Tick besteht eine Chance von 20%, diese Abklingzeit zurückzusetzen und Euren nächsten Magma Burst innerhalb von 10 Sek. sofort wirkbar zu machen. Der Schaden steigt mit der Zaubermacht. (Donnerruf)"
+        "description": "Verursacht {damage} Feuerschaden. Ein Treffer gewährt 1 Donner. Trifft ein Ziel, das von Eurem Cinder-Stoß brennt, immer kritisch. Ein kritischer Treffer verursacht zusätzlich 24% des normalen Schadens. Magma Surge: Bei jedem Cinder-Stoß-Tick besteht eine Chance von 20%, diese Abklingzeit zurückzusetzen und Euren nächsten Magma Burst innerhalb von 10 Sek. sofort wirkbar zu machen. Der Schaden steigt mit der Zaubermacht. (Donnerruf)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -17621,7 +17830,7 @@ export const de_DE: EnTranslations = {
       },
       "flame_shock": {
         "name": "Cinder-Stoß",
-        "description": "Verursacht {damage} Feuerschaden, danach über 12 Sek. {overTime} Feuerschaden. Der erste Treffer steigt mit der Zaubermacht."
+        "description": "Verursacht {damage} Feuerschaden, danach über {duration} Sek. {overTime} Feuerschaden. Der erste Treffer steigt mit der Zaubermacht."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand-Waffe",
@@ -17754,7 +17963,8 @@ export const de_DE: EnTranslations = {
       },
       "healing_touch": {
         "name": "Wildheilung",
-        "description": "Heilt ein freundliches Ziel um {damage}."
+        "description": "Heilt ein freundliches Ziel um {damage}.",
+        "specNote_restoration": "Jeder abgeschlossene Zauber fügt 1 Grünkraft hinzu (max. 3). Gesammelte Grünkraft verkürzt diesen Zauber: 2,2 Sek. bei 1 Grünkraft, 1,9 Sek. bei 2 und 1,5 Sek. bei 3. Segen der Natur macht ihn sofort, kostenlos und 25% stärker."
       },
       "mark_of_the_wild": {
         "name": "Wildwacht",
@@ -17770,9 +17980,9 @@ export const de_DE: EnTranslations = {
         "description": "Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu {duration} Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge."
       },
       "rejuvenation": {
-        "name": "Wildblüte",
+        "name": "Sporenheilung",
         "description": "Heilt das Ziel über 12 Sek. um {damage}.",
-        "specNote_restoration": "Das Pflanzen einer NEUEN Blüte fügt 1 Grünkraft hinzu (max. 5). Bei 5 Grünkraft wird Rasche Heilung zu Überblüte."
+        "specNote_restoration": "Jeder Zauber fügt 1 Grünkraft hinzu (max. 3), auch wenn er eine bereits wirkende Blüte erneuert. Bei 3 Grünkraft wird Rasche Heilung zu Überblüte."
       },
       "thorns": {
         "name": "Dornenwacht",
@@ -17784,12 +17994,12 @@ export const de_DE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-Gestalt",
-        "description": "Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur Zauberergestalt zurückzukehren."
+        "description": "Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Ihr schlagt doppelt so schnell für den halben Schaden pro Schlag, und jeder Schlag erzeugt doppelt so viel Wut. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur Zauberergestalt zurückzukehren."
       },
       "maul": {
         "name": "Knochenmalmer",
         "description": "Ein malmender Angriff, der den Nahkampfschaden um {damage} erhöht und hohe Bedrohung verursacht. Aktiviert sich bei Eurem nächsten Schwung. Nur in Bruin-Gestalt.",
-        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück."
+        "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Markbrecher: ein Schlag für 78 bis 96 Schaden bei hoher Bedrohung; unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück."
       },
       "growl": {
         "name": "Bedrohen",
@@ -17801,12 +18011,17 @@ export const de_DE: EnTranslations = {
       },
       "cat_form": {
         "name": "Katzengestalt",
-        "description": "Verwandelt euch in einen Wolf: Beweglichkeit steigt mit eurer Stufe, Angriffskraft +8 plus 2 je Stufe, eure Angriffe nutzen Energie und Combopunkte, und ihr erzeugt 29% weniger Bedrohung. Der Wechsel in eine beliebige Gestalt gewährt Weiter Schritt: 3 Sek. lang 60% Bewegungstempo, einmal alle 20 Sek. Erneut wirken, um zur Zauberergestalt zurückzukehren."
+        "description": "Verwandle dich in eine Katze: Beweglichkeit steigt mit deiner Stufe, Angriffskraft +8 plus 2 pro Stufe, deine Angriffe nutzen Energie und Combopunkte, du bewegst dich 15% schneller und erzeugst 29% weniger Bedrohung. Jeder Gestaltwechsel gewährt Weiter Schritt, einen kurzen Temposchub. Erneut wirken, um zur Zaubergestalt zurückzukehren."
       },
       "claw": {
         "name": "Reißklaue",
         "description": "Krallt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Katzengestalt.",
         "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3)."
+      },
+      "scratch": {
+        "name": "Kratzen",
+        "description": "Kratze durch nahe Ziele innerhalb von 6 Metern und verursache Waffenschaden plus {damage}. Gewährt 1 Combopunkt pro getroffenem Ziel. Deckt schleichende Gegner im Bereich auf. Nur in Katzengestalt.",
+        "specNote_feral": "Jeder gelandete Treffer fügt 1 Altes Blut hinzu (max. 3)."
       },
       "ferocious_bite": {
         "name": "Blutbiss",
@@ -17820,8 +18035,8 @@ export const de_DE: EnTranslations = {
       },
       "regrowth": {
         "name": "Zweite Blüte",
-        "description": "Heilt ein freundliches Ziel um {damage} und einen zusätzlichen Betrag über 21 Sek.",
-        "specNote_restoration": "Das Pflanzen einer NEUEN Blüte fügt 1 Grünkraft hinzu (max. 5)."
+        "description": "Heilt ein freundliches Ziel um {damage} und einen zusätzlichen Betrag über 15 Sek. Läuft der Effekt seine volle Dauer, heilt er das Ziel erneut um denselben Betrag wie die anfängliche Heilung.",
+        "specNote_restoration": "Jeder Zauber fügt 1 Grünkraft hinzu (max. 3), auch wenn er eine bereits wirkende Blüte erneuert."
       },
       "barkskin": {
         "name": "Eichenhaut",
@@ -17858,23 +18073,23 @@ export const de_DE: EnTranslations = {
       },
       "hibernate": {
         "name": "Schlummer",
-        "description": "Versetzt das Ziel bis zu 8 Sek. in tiefen Schlaf. Jeglicher Schaden weckt es auf."
+        "description": "Versetzt das Ziel bis zu 8 Sek. in tiefen Schlaf. Jeder Schaden weckt es. Gegen Spieler hält jede Wiederholung innerhalb von 18 Sek. nur halb so lange wie die vorherige; die vierte schlägt fehl."
       },
       "dash": {
         "name": "Sprint",
-        "description": "Sprintet vorwärts und erhöht das Lauftempo 15 Sek. lang um 50%. Nur in Katzengestalt."
+        "description": "Wechsle in Katzengestalt, falls du sie noch nicht hast, und sprinte mit 50% mehr Bewegungstempo für 15 Sek. In jeder Gestalt nutzbar. Sofort und ohne globale Abklingzeit."
       },
       "pounce": {
         "name": "Schleichschlag",
-        "description": "Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt. Nur in Wolfsgestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung."
+        "description": "Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt. Nur in Katzengestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung."
       },
       "lunge": {
         "name": "Ansprung",
-        "description": "Springt einen bis zu 12 m entfernten Gegner an, verursacht 60% Waffenschaden und gewährt 1 Combopunkt. Nur in Wolfsgestalt."
+        "description": "Springt einen bis zu 12 m entfernten Gegner an, verursacht 60% Waffenschaden und gewährt 1 Combopunkt. Nur in Katzengestalt."
       },
       "hamstring_bite": {
         "name": "Niederreißen",
-        "description": "Finishing-Move, der das Ziel 1 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 6 Sek.). Nur in Wolfsgestalt."
+        "description": "Finishing-Move, der das Ziel 1 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 6 Sek.). Nur in Katzengestalt."
       },
       "insect_swarm": {
         "name": "Stechender Schwarm",
@@ -17886,7 +18101,7 @@ export const de_DE: EnTranslations = {
       },
       "rip": {
         "name": "Blutriss",
-        "description": "Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 36 Schaden plus 24 pro eingesetztem Combopunkt (5 Combopunkte: {damage} insgesamt). Nur in Katzengestalt.",
+        "description": "Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 72 Schaden plus 48 pro verbrauchtem Combopunkt (5 Combopunkte: insgesamt {damage}). Nur in Katzengestalt.",
         "specNote_feral": "Der gelandete Treffer fügt 1 Altes Blut hinzu (max. 3)."
       },
       "mortal_strike": {
@@ -18047,11 +18262,11 @@ export const de_DE: EnTranslations = {
       },
       "cold_blood": {
         "name": "Kaltblütigkeit",
-        "description": "Bündelt Euren Tötungswillen, sodass Euer nächster Angriff kritisch trifft. (Knifework-Engine)"
+        "description": "Bündelt Euren Tötungswillen, sodass Eure nächsten 5 Angriffe kritisch treffen. (Knifework-Engine)"
       },
       "blade_flurry": {
         "name": "Klingenwirbel",
-        "description": "Entfesselt einen Klingenwirbel, der das Angriffstempo 12 Sek. lang um 20% erhöht. (Thuggery-Engine)"
+        "description": "Entfesselt einen Klingenwirbel, der das Angriffstempo 30 Sek. lang um 20% erhöht. (Thuggery-Engine)"
       },
       "hemorrhage": {
         "name": "Blutsturz",
@@ -18091,7 +18306,8 @@ export const de_DE: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rasche Heilung",
-        "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Das Pflanzen von Wildblüte und Zweite Blüte fügt Grünkraft hinzu; bei 5 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Hainherz-Signatur)"
+        "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. Jeder Zauber von Sporenheilung, Zweite Blüte und Wildheilung fügt 1 Grünkraft hinzu; bei 3 Grünkraft wird diese Taste zu Überblüte, das sofort jeden Verbündeten, der Eure Heilung-über-Zeit-Effekte trägt, um 60% der verbleibenden Heilung dieser Effekte heilt. (Signatur der Wiederherstellung)",
+        "specNote_restoration": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem befreundeten Ziel, um es um {damage} zu heilen. Sporenheilung und Pflanzungen von Zweite Blüte gewähren Grünkraft; bei 5 Grünkraft wird diese Taste zu Überblüte, die sofort alle Verbündeten mit deinen Heilung-über-Zeit-Effekten um 60% ihrer verbleibenden Heilung heilt. (Signatur der Wiederherstellung)"
       },
       "moonlash": {
         "name": "Mondwoge",
@@ -18107,7 +18323,7 @@ export const de_DE: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Markbrecher",
-        "description": "Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit für 8 Sek. und erstattet 15 Wut zurück."
+        "description": "Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit heilt er Euch stattdessen um 18% Eurer maximalen Gesundheit und erstattet 15 Wut zurück."
       },
       "wildwake": {
         "name": "Wildwecken",
@@ -18117,9 +18333,27 @@ export const de_DE: EnTranslations = {
         "name": "Erwachen des Hains",
         "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Hainherz)"
       },
+      "sporemender_form": {
+        "name": "Sporenheilerform",
+        "description": "Verwandle dich in einen Sporenheiler: Heilung um 20% und Rüstung um 40% erhöht, Bewegungstempo um 20% verringert. Alle Zauber deiner Zaubergestalt bleiben nutzbar. Hält bis zum Gestaltwechsel. Jeder Gestaltwechsel gewährt für kurze Zeit erhöhtes Bewegungstempo durch Weiter Schritt. Erneut wirken, um zur Zaubergestalt zurückzukehren. (Signatur der Wiederherstellung)"
+      },
+      "spore_burst": {
+        "name": "Sporenexplosion",
+        "description": "Beschwört einen Sporenplatzer im Zielgebiet. Nach {duration} Sek. platzt er, heilt Verbündete um {healing} und fügt Gegnern innerhalb von 8 Metern {damage} Naturschaden zu.",
+        "specNote_balance": "Bei 3 Mondflut ist sie 25% stärker und verbraucht deine Mondflut.",
+        "specNote_restoration": "Belegt außerdem jeden geheilten Verbündeten mit Sporenheilung. Bei voller Grünkraft ist sie 25% stärker und verbraucht deine Grünkraft."
+      },
+      "natures_boon": {
+        "name": "Segen der Natur",
+        "description": "Deine Zauber können Segen der Natur für 10 Sek. aktivieren: Der angezeigte Zauber wird kostenlos, 25% stärker und in jeder Gestalt nutzbar. Ein neuer Auslöser erneuert die Dauer.",
+        "specNote_feral": "Jeder gelandete automatische Nahkampfangriff hat eine Chance von 1 zu 15, ihn für Sporenheilung zu aktivieren, in Bruin-Gestalt für Eichenhaut.",
+        "specNote_balance": "Jeder gewirkte Wildblitz oder Himmelssturz hat eine Chance von 10%, ihn für Sporenexplosion zu aktivieren, höchstens einmal alle 10 Sek.",
+        "specNote_restoration": "Jeder Tick deiner Heilung-über-Zeit-Effekte hat eine Chance von 10%, ihn für Sporenexplosion zu aktivieren, höchstens einmal alle 10 Sek."
+      },
       "overbloom": {
         "name": "Überblüte",
-        "description": "Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel."
+        "description": "Verbraucht 3 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Sporenheilung auf das Ziel.",
+        "specNote_restoration": "Verbraucht deine 5 Grünkraft: Jeder Verbündete mit deinen Heilung-über-Zeit-Effekten wird sofort um {buff}% ihrer verbleibenden Heilung geheilt, die Effekte werden entfernt und das Ziel erhält eine neue Sporenheilung."
       },
       "summon_imp": {
         "name": "Emberkin beschwören",
@@ -18191,7 +18425,7 @@ export const de_DE: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Eiserne Entschlossenheit",
-        "description": "Beißt die Zähne zusammen und ignoriert den Schmerz: Verbraucht bis zu 40 Wut (mindestens 20), um pro verbrauchtem Wutpunkt {absorbPerRage} Schaden zu absorbieren. Hält bis zu 10 Sek. an. (Schutz)"
+        "description": "Beißt die Zähne zusammen und ignoriert den Schmerz: Ein Schild absorbiert Schaden in Höhe von {damage}% Eurer maximalen Gesundheit beim Wirken. Hält bis zu {duration} Sek. an. (Schutz)"
       },
       "faultline": {
         "name": "Bruchlinie",
@@ -18463,7 +18697,7 @@ export const de_DE: EnTranslations = {
       },
       "multi_shot": {
         "name": "Spaltschuss",
-        "description": "Feuert einen Geschosshagel auf das Zielgebiet ab und fügt Gegnern im Umkreis von 8 m {damage} körperlichen Schaden zu. (Jägertalent)"
+        "description": "Feuert eine Salve auf das Zielgebiet und fügt Gegnern innerhalb von 8 Yards {damage} körperlichen Schaden zu. (Jägertalent)"
       },
       "prayer_of_healing": {
         "name": "Chorheilung",
@@ -18491,7 +18725,7 @@ export const de_DE: EnTranslations = {
       },
       "shadowstep": {
         "name": "Schattengleiten",
-        "description": "Tretet durch die Schatten auf Euer Ziel zu, Freund oder Feind, ohne Duskveil zu brechen. (Schurkentalent)"
+        "description": "Tretet durch die Schatten auf Euer Ziel zu, Freund oder Feind, ohne Duskveil zu brechen. Speichert bis zu 2 Aufladungen. (Schurkentalent)"
       },
       "silence": {
         "name": "Stille",
@@ -18552,7 +18786,7 @@ export const de_DE: EnTranslations = {
       },
       "typhoon": {
         "name": "Taifun",
-        "description": "Eine Windböe stößt alle Gegner im Umkreis von 8 m zurück und macht sie benommen, wodurch ihr Bewegungstempo 4 Sek. lang um 50 % verringert wird."
+        "description": "Ein Windstoß schleudert alle Gegner innerhalb von 8 Metern 15 Meter von dir weg und macht sie benommen: 50% langsamer für 4 Sek. Gegnerische Spieler werden geradlinig durch die Luft geschleudert; über einer Kante fliegen sie weiter und erleiden Fallschaden. Ein tödlicher Sturz zählt als deine Tötung."
       },
       "voidfeast": {
         "name": "Leerenmahl",
@@ -18588,7 +18822,7 @@ export const de_DE: EnTranslations = {
       },
       "bear_charge": {
         "name": "Bruin-Ansturm",
-        "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. 3 Sek. lang danach ist die Wolfsgestalt kostenlos und nagelt das Ziel fest, was es 4 Sek. lang um 50% verlangsamt. Reichweite 8-25 m. Nur in Bruin Form."
+        "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. 3 Sek. lang danach ist die Katzengestalt kostenlos und nagelt das Ziel fest, was es 4 Sek. lang um 50% verlangsamt. Reichweite 8-25 m. Nur in Bruin Form."
       },
       "demoralizing_roar": {
         "name": "Feiges Gebrüll",
@@ -18596,16 +18830,16 @@ export const de_DE: EnTranslations = {
       },
       "prowl": {
         "name": "Anpirschen",
-        "description": "Geht in Wolfsgestalt in den Schleichmodus über. Im Kampf nicht einsetzbar."
+        "description": "Geht in Katzengestalt in den Schleichmodus über. Im Kampf nicht einsetzbar."
       },
       "rake": {
         "name": "Schinden",
-        "description": "Schindet den Gegner für Waffenschaden plus {damage} und verursacht Blutungsschaden über 18 Sek. Gewährt 1 Combopunkt. Nur in Katzengestalt.",
+        "description": "Schindet den Gegner für Waffenschaden plus {damage} und verursacht {overTime} Blutungsschaden über 18 Sek. Gewährt 1 Combopunkt. Nur in Katzengestalt.",
         "specNote_feral": "Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3)."
       },
       "revive_pet": {
         "name": "Zusammenflicken",
-        "description": "Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt."
+        "description": "Stellt deinem lebenden Begleiter 8 Sek. lang jede Sekunde 10 % seiner maximalen Gesundheit wieder her. Ist er tot, wird er stattdessen mit 50 % Gesundheit wiederbelebt."
       }
     },
     "items": {
@@ -22416,6 +22650,18 @@ export const de_DE: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Kriegsstab der Vorhut"
       },
+      "infernal_quiver": {
+        "name": "Höllenköcher"
+      },
+      "lychgate_buckler": {
+        "name": "Faustschild des Friedhofstors"
+      },
+      "bastion_kite_shield": {
+        "name": "Langspitzschild der Bastion"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Turmschild des Hügelgräberfelds"
+      },
       "brookwatch_robe": {
         "name": "Brookwatch Robe"
       },
@@ -24416,6 +24662,12 @@ export const de_DE: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Beutekiste des Emissärs"
+      },
+      "pvp_trophy_skull": {
+        "name": "Trophäenschädel"
+      },
+      "pvp_skull_bag": {
+        "name": "Schädeltasche"
       },
       "clue_scroll": {
         "name": "Hinweisschriftrolle"
@@ -29968,6 +30220,11 @@ export const de_DE: EnTranslations = {
         "sender": "Die Rabenpflicht",
         "subject": "Deine Tresor-Belohnung",
         "body": "Der Tresor wurde geleert, aber dein Anteil wurde nicht aus der Kiste eingesammelt. Die Raben haben ihn dir hier gebracht, zusammen mit den Waren und Münzen, die du verdient hast.\n\n- Die Rabenpflicht"
+      },
+      "world_quest_reward": {
+        "sender": "Die Rabenpost",
+        "subject": "Deine Weltquestbelohnung",
+        "body": "Deine Taschen waren voll, als du diese Weltquestbelohnung verdient hast. Deshalb haben die Raben sie dir hierher gebracht. Schaffe Platz und hole sie an einer beliebigen Rabensäule ab.\n\n- Die Rabenpost"
       }
     },
     "itemSets": {
@@ -30084,7 +30341,7 @@ export const de_DE: EnTranslations = {
       },
       "forgewall": {
         "name": "Ägide der Schmiedemauer",
-        "bonus2": "Eiserne Entschlossenheit wandelt Wut mit 5 Absorption pro Punkt statt 4 um.",
+        "bonus2": "Der Schild von Eiserne Entschlossenheit absorbiert 25% Eurer maximalen Gesundheit statt 20%.",
         "bonus4": "Das Wirken von Schildbruch verringert die verbleibende Abklingzeit von Eiserne Entschlossenheit um 2 Sek."
       },
       "frostquench": {
@@ -30103,7 +30360,7 @@ export const de_DE: EnTranslations = {
       },
       "grovespring": {
         "name": "Gewand der Hainquelle",
-        "bonus2": "Schnellheilung verbraucht zuerst deine Wildblüte oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus2": "Rasche Heilung verbraucht zuerst deine eigene Sporenheilung oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zaubern nicht mehr.",
         "bonus4": "Überblüte erntet 75 Prozent deiner verbleibenden Effekte und speichert danach 1 Üppigkeit."
       },
       "hexthread": {
@@ -30196,77 +30453,77 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Sternwächter-Gewand",
-        "bonus2": "Die Zauberzeit von Greifende Wurzeln wird um 0,5 Sek. verkürzt.",
+        "bonus2": "Die Zauberzeit von Greifende Wurzeln wird um 0,5 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Greifende Wurzeln lässt dich während des Wirkens umherlaufen und erhöht dein Lauftempo 4 Sek. lang um 20 Prozent. Kann höchstens einmal alle 20 Sek. auftreten."
       },
       "vanguard_druid_feral": {
         "name": "Blutmähnen-Fell",
-        "bonus2": "Die Abklingzeit von Bruin-Ansturm wird um 3 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Bruin-Ansturm wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Bruin-Ansturm gewährt dir 6 Sek. lang einen Schild in Höhe von 6 Prozent deiner maximalen Gesundheit."
       },
       "vanguard_druid_restoration": {
         "name": "Distelblüten-Gewand",
-        "bonus2": "Die Abklingzeit von Rasche Heilung wird um 1 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Rasche Heilung wird um 1 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Rasche Heilung erhöht zudem dein Lauftempo 3 Sek. lang um 30 Prozent."
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Rudelwächter-Geschirr",
-        "bonus2": "Die Abklingzeit von Rasselnder Schuss wird um 4 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Rasselnder Schuss wird um 4 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Rasselnder Schuss verringert die verbleibende Abklingzeit von Zorn des Wildtiers um 1 Sek."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Weitsicht-Geschirr",
-        "bonus2": "Die Abklingzeit von Pfadbruch wird um 4 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Pfadbruch wird um 4 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Pfadbruch lässt deinen nächsten Langen Zug innerhalb von 6 Sek. sofort wirken. Kann höchstens einmal alle 15 Sek. auftreten."
       },
       "vanguard_hunter_survival": {
         "name": "Fallenzahn-Geschirr",
-        "bonus2": "Die Abklingzeit von Bluthaken wird um 3 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Bluthaken wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Bluthaken gewährt 1 Jagdschwung."
       },
       "vanguard_mage_arcane": {
         "name": "Gewänder des Stundenbinders",
-        "bonus2": "Die Abklingzeit von Temporale Barriere wird um 2 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Temporale Barriere wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Temporale Barriere erhöht zudem 3 Sek. lang das Lauftempo des geschildeten Ziels um 20 Prozent."
       },
       "vanguard_mage_fire": {
         "name": "Glutpeitschen-Ornat",
-        "bonus2": "Die Abklingzeit von Glutsturz wird um 3 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Glutsturz wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Das Wirken von Glutsturz verringert die verbleibende Abklingzeit von Flammende Barriere um 2 Sek."
       },
       "vanguard_mage_frost": {
         "name": "Reifwächter-Tracht",
-        "bonus2": "Die Abklingzeit von Eisfessel wird um 2 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Eisfessel wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Das Wirken von Eisfessel verringert die verbleibende Abklingzeit von Flitzschritt um 5 Sek."
       },
       "vanguard_paladin_holy": {
         "name": "Sonnenwacht-Ornat",
-        "bonus2": "Die Abklingzeit von Bund des Lebens wird um 30 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Bund des Lebens wird um 30 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Bund des Lebens gewährt dem Verbündeten zudem 6 Sek. lang einen Schild in Höhe von 8 Prozent seiner maximalen Gesundheit."
       },
       "vanguard_paladin_protection": {
         "name": "Schildschwur-Bastion",
-        "bonus2": "Die Abklingzeit von Eidkette wird um 2 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Eidkette wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Von Eidkette herangezogene Gegner wirken ihre Zauber 4 Sek. lang 30 Prozent langsamer, und Eidkette gewährt dir Sonnenvergeltung, wenn sie einen ziehbaren Gegner bindet."
       },
       "vanguard_paladin_retribution": {
         "name": "Lichtbrand-Kriegsplatte",
-        "bonus2": "Die Abklingzeit von Ruf der Walküre wird um 15 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Ruf der Walküre wird um 15 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Ruf der Walküre setzt die Abklingzeit von Letztes Edikt zurück, und dein nächstes Letztes Edikt innerhalb von 6 Sek. nach dem Treffer verursacht 15 Prozent mehr Schaden."
       },
       "vanguard_priest_discipline": {
         "name": "Schleierpsalm-Gewand",
-        "bonus2": "Die Abklingzeit von Schreckensschrei wird um 3 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Schreckensschrei wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Wird dein Psalm der Abschirmung vollständig verbraucht, erhält der geschildete Verbündete 3 Sek. lang 20 Prozent mehr Lauftempo. Kann höchstens einmal alle 8 Sek. auftreten."
       },
       "vanguard_priest_holy": {
         "name": "Gnadenschwingen-Gewand",
-        "bonus2": "Die Abklingzeit von Schleierschritt wird um 6 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Schleierschritt wird um 6 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Schleierschritt gewährt dir zudem 6 Sek. lang einen Schild in Höhe von 8 Prozent deiner maximalen Gesundheit."
       },
       "vanguard_priest_shadow": {
         "name": "Dämmerhymnen-Ornat",
-        "bonus2": "Litanei des Leids verlangsamt zudem das Lauftempo des Ziels um 30 Prozent, solange du sie kanalisierst.",
+        "bonus2": "Litanei des Leids verlangsamt zudem das Lauftempo des Ziels um 30 Prozent, solange du sie kanalisierst. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Zehntteufel rufen gewährt dir zudem 8 Sek. lang einen Schild in Höhe von 10 Prozent deiner maximalen Gesundheit."
       },
       "vanguard_rogue_assassination": {
@@ -30276,7 +30533,7 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Kampfmal-Lederrüstung",
-        "bonus2": "Die Abklingzeit von Flinke Fersen wird um 60 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Flinke Fersen wird um 15 Sek. verkürzt.",
         "bonus4": "Während Flinke Fersen aktiv ist, gewähren Boshafter Hieb und Körpertreffer 1 zusätzlichen Kombopunkt."
       },
       "vanguard_rogue_subtlety": {
@@ -30286,32 +30543,32 @@ export const de_DE: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Sturmschrift-Kampfkettenhemd",
-        "bonus2": "Die Abklingzeit von Waffe entfesseln wird um 3 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Waffe entfesseln wird um 3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Waffe entfesseln lässt dich während des Wirkens umherlaufen und erhöht dein Lauftempo 4 Sek. lang um 20 Prozent. Kann höchstens einmal alle 20 Sek. auftreten."
       },
       "vanguard_shaman_enhancement": {
         "name": "Sturmgeboren-Kriegskette",
-        "bonus2": "Ahnenhieb verlangsamt das Lauftempo des Ziels 4 Sek. lang um 30 Prozent.",
+        "bonus2": "Ahnenhieb verlangsamt das Lauftempo des Ziels 4 Sek. lang um 30 Prozent. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Ahnenhieb verringert die verbleibende Abklingzeit von Elemental Trance um 4 Sek."
       },
       "vanguard_shaman_restoration": {
         "name": "Brandungswacht-Kettenhemd",
-        "bonus2": "Heilende Wasser wird 0,5 Sek. schneller gewirkt, wenn das Ziel unter 50 Prozent Gesundheit hat.",
+        "bonus2": "Heilende Wasser wird 0,5 Sek. schneller gewirkt, wenn das Ziel unter 50 Prozent Gesundheit hat. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Gezeitenruf gewährt seinem Ziel zudem 6 Sek. lang einen Schild in Höhe von 5 Prozent deiner maximalen Gesundheit."
       },
       "vanguard_warlock_affliction": {
         "name": "Furchtfeder-Gewänder",
-        "bonus2": "Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt.",
+        "bonus2": "Die Zauberzeit von Heimsuchung wird um 0,3 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Verzehren heilt dich um 30 Prozent mehr und kann während der Bewegung kanalisiert werden."
       },
       "vanguard_warlock_demonology": {
         "name": "Markgebundenes Ornat",
-        "bonus2": "Die Abklingzeit von Bone Armor wird um 10 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Bone Armor wird um 10 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Reaping Command verringert die verbleibende Abklingzeit von Bone Armor um 2 Sek."
       },
       "vanguard_warlock_destruction": {
         "name": "Schlackenkronen-Gewänder",
-        "bonus2": "Die Abklingzeit von Cinderhide wird um 30 Sek. verkürzt.",
+        "bonus2": "Die Abklingzeit von Cinderhide wird um 30 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Jede zweite Feuersbrunst lässt deinen nächsten Verderbensblitz innerhalb von 8 Sek. sofort wirken."
       },
       "vanguard_warrior_arms": {
@@ -30336,31 +30593,31 @@ export const de_DE: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Aschenpirscher-Ausrüstung",
-        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40.",
+        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
         "bonus7": "Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ascheschritt, was das Bewegungstempo 6 Sek. lang um 40% erhöht."
       },
       "warfare_cinderweave": {
         "name": "Gewänder aus Glutgewebe",
-        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40.",
+        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
         "bonus7": "Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert."
       },
       "warfare_furyforged": {
         "name": "Zorngeschmiedete Kriegstracht",
-        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40.",
+        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
         "bonus7": "Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ungebrochenen Eid, was 10 Sek. lang 200 Schaden absorbiert."
       },
       "warfare_stormbound": {
         "name": "Sturmgebundene Gewänder",
-        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40.",
+        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
         "bonus7": "Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert."
       },
       "warfare_thornhide": {
         "name": "Dornhautgewandung",
-        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40.",
+        "bonus2": "Erhöht Kriegsführungs-Verteidigungswertung um 40. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
         "bonus4": "Erhöht Kriegsführungs-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
         "bonus7": "Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Dornwacht zu gewähren, was die Ausweichchance 6 Sek. lang um 15% erhöht."
       },

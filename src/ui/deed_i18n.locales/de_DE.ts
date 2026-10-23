@@ -1213,4 +1213,38 @@ export const table: DeedLocaleTable = {
     name: 'Auf frischer Tat ertappt',
     desc: 'Schnap dir einen Münzsakk-Ratte in einem Begrabenen Hort, bevor er mit dem Gold entwischt.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Heller als die Schatten',
+    desc: 'Hol die gestohlenen Geldborsen zuruck und entkomme dem Evergarden-Labyrinth auf Hard.',
+  },
+  prog_titan: {
+    name: 'Gigant',
+    desc: 'Verdiene insgesamt 10.000.000 Erfahrungspunkte.',
+    title: 'Gigant',
+  },
+  pvp_flag_1h: {
+    name: 'Kühn',
+    desc: 'Lasse Welt-PvP für 1 Stunde Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    title: 'Kühn',
+  },
+  pvp_flag_3h: {
+    name: 'Aufbegehrend',
+    desc: 'Lasse Welt-PvP für 3 Stunden Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    title: 'Aufbegehrend',
+  },
+  pvp_flag_6h: {
+    name: 'Furchtlos',
+    desc: 'Lasse Welt-PvP für 6 Stunden Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    title: 'Furchtlos',
+  },
+  pvp_flag_24h: {
+    name: 'Unbeugsam',
+    desc: 'Lasse Welt-PvP für 24 Stunden Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    title: 'Unbeugsam',
+  },
+  pvp_flag_168h: {
+    name: 'Unbezwingbar',
+    desc: 'Lasse Welt-PvP für 7 Tage Spielzeit aktiviert, während du lebendig in der offenen Welt oder in einem PvP-Kampf bist. Heiligtümer, PvE-Instanzen, Tod und Ausloggen pausieren den Fortschritt; Ausschalten setzt ihn zurück. Verdiente Titel bleiben dauerhaft erhalten.',
+    title: 'Unbezwingbar',
+  },
 };

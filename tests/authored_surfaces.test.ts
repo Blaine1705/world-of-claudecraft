@@ -154,6 +154,7 @@ const AUTHORED_ATLAS_DEFS = [
   'player_druid_female',
   'player_shaman',
   'player_shaman_female',
+  'form_sporemender',
   'mob_wolf',
   'greyjaw',
   'mob_ogre',

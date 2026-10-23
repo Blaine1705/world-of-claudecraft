@@ -1229,4 +1229,38 @@ export const table: DeedLocaleTable = {
     name: 'Betrapt op Heterdaad',
     desc: 'Vang een Muntzak Haastige in een Begraven Hoard voordat het met het goud vandoor gaat.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Helderder dan de schaduwen',
+    desc: 'Haal de gestolen muntenbuidels terug en ontsnap uit het Evergarden-doolhof op Hard.',
+  },
+  prog_titan: {
+    name: 'Titaan',
+    desc: 'Verdien in totaal 10.000.000 ervaringspunten.',
+    title: 'Titaan',
+  },
+  pvp_flag_1h: {
+    name: 'Stoutmoedig',
+    desc: 'Houd Wereld-PvP gedurende 1 uur speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
+    title: 'Stoutmoedig',
+  },
+  pvp_flag_3h: {
+    name: 'Opstandig',
+    desc: 'Houd Wereld-PvP gedurende 3 uur speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
+    title: 'Opstandig',
+  },
+  pvp_flag_6h: {
+    name: 'Onverschrokken',
+    desc: 'Houd Wereld-PvP gedurende 6 uur speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
+    title: 'Onverschrokken',
+  },
+  pvp_flag_24h: {
+    name: 'Onverzettelijk',
+    desc: 'Houd Wereld-PvP gedurende 24 uur speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
+    title: 'Onverzettelijk',
+  },
+  pvp_flag_168h: {
+    name: 'Ontembaar',
+    desc: 'Houd Wereld-PvP gedurende 7 dagen speeltijd aan terwijl je leeft in de open wereld of een PvP-wedstrijd. Heiligdommen, PvE-instanties, dood en uitloggen pauzeren de voortgang; uitschakelen zet hem terug op nul. Verdiende titels blijven permanent.',
+    title: 'Ontembaar',
+  },
 };

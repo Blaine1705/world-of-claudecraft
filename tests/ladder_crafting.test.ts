@@ -287,13 +287,16 @@ describe('crafted potions and elixirs stack', () => {
     expect(ITEMS[recipe.resultItemId].quality).toBe('rare');
     expect(sim.countItem(recipe.resultItemId, pid)).toBe(2 * recipe.resultCount);
     const slots = meta.inventory.filter((s: InvSlot) => s.itemId === recipe.resultItemId);
-    // Both crafts mint the same {signer} payload, so the second one must top
-    // up the first craft's instanced slot, never sit beside it. The literal
-    // name pin keeps the signer compare from being production-vs-production.
+    // Both crafts mint units from the same maker, so the second one must top
+    // up the first craft's source-counted slot, never sit beside it. Exact
+    // attribution now lives on each source bucket, not the shared payload.
     expect(meta.name).toBe('Adventurer');
     expect(slots.length).toBe(1);
     expect(slots[0].count).toBe(2 * recipe.resultCount);
-    expect(slots[0].instance?.signer).toBe(meta.name);
+    expect(slots[0].materialSources).toEqual([
+      { source: { signer: 'Adventurer' }, count: 2 * recipe.resultCount },
+    ]);
+    expect(slots[0].instance?.signer).toBeUndefined();
   });
 });
 

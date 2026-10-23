@@ -25,8 +25,8 @@ import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_a
 // "a rule was dropped during extraction" regression we want to catch.
 //
 // The extraction is now COMPLETE, so today the union is lopsided: both inline
-// <style> blocks are comment-only (pinned by tests/per_entry_css_wiring.test.ts) and
-// carry no ten-dash banner, so every pinned section below is accounted for by
+// <style> blocks hold only the boot splash (pinned by tests/per_entry_css_wiring.test.ts)
+// and carry no ten-dash banner, so every pinned section below is accounted for by
 // src/styles alone. The union side stays because it is what makes the guard
 // indifferent to WHERE a section lives, which is the property being guarded, but it
 // means the src/styles read below is now the whole corpus rather than a supplement
@@ -163,6 +163,7 @@ const INDEX_SECTIONS = [
   'vendor',
   'courier',
   'bags',
+  'skull bag pane',
   'social',
   'map',
   'Dungeon Finder',
@@ -253,11 +254,11 @@ describe('css_corpus section manifest', () => {
     // + the dungeon objectives tracker (hud.css, in both entries): 78, 76.
     // + the launcher turntable's loading silhouette (shell.css, in both entries): 79, 77.
     // + the phone creator's pinch hint (shell.css, in both entries): 80, 78.
-    expect(INDEX_SECTIONS.length).toBe(80);
-    expect(PLAY_SECTIONS.length).toBe(78);
-    expect(MANIFEST.length).toBe(80);
-    expect(new Set(INDEX_SECTIONS).size).toBe(80);
-    expect(new Set(PLAY_SECTIONS).size).toBe(78);
+    expect(INDEX_SECTIONS.length).toBe(81);
+    expect(PLAY_SECTIONS.length).toBe(79);
+    expect(MANIFEST.length).toBe(81);
+    expect(new Set(INDEX_SECTIONS).size).toBe(81);
+    expect(new Set(PLAY_SECTIONS).size).toBe(79);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

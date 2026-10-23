@@ -13,6 +13,50 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus di specializzazione',
+  'hudChrome.specPanel.healing': 'guarigione',
+  'hudChrome.specPanel.absorption': 'assorbimento dei danni',
+  'hudChrome.specPanel.physicalAbilityDamage': 'danni delle abilità in mischia e a distanza',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Aumenta le cure primarie del {pct} dopo gli altri bonus alle cure.',
+  'hud.pet.assist': 'Assistenza',
+  'hud.pet.assistDesc':
+    "Attacca solo il tuo bersaglio attuale, dopo che hai usato un'abilità su di esso. Ignora i nemici che ti attaccano.",
+  'hudChrome.cooldownManager.auraActive': 'Attiva',
+  'hudChrome.cooldownManager.auraMissing': 'Assente',
+  'hudChrome.cooldownManager.auraShowWhen': "Mostra pulsante quando l'aura è",
+  'hudChrome.cooldownManager.glowWhileMissing': 'Illumina se assente',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Se non selezioni alcun luogo, questo gruppo non appare mai e non riproduce suoni.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Se nessuna delle due opzioni è selezionata, il pulsante non appare mai, ma il suo suono viene comunque riprodotto.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Non pronto significa in recupero o non utilizzabile al momento.',
+  'hudChrome.cooldownManager.placeHint':
+    "Le istanze comprendono spedizioni, incursioni di gruppo, incursioni, squarci, campi di battaglia, l'arena e ogni altra area istanziata. Fuori dai luoghi selezionati, il gruppo resta nascosto e silenzioso.",
+  'hudChrome.cooldownManager.reminderGlowHint':
+    "Illumina, contorna e fa pulsare il pulsante quando l'aura è assente.",
+  'hudChrome.cooldownManager.reminderHint':
+    'Promemoria beneficio: il pulsante si illumina quando questa aura è assente e si nasconde appena la ottieni.',
+  'hudChrome.cooldownManager.reminderSoundHint': "Riproduce il suono quando l'aura svanisce.",
+  'hudChrome.cooldownManager.showButtonWhen': 'Mostra pulsante quando',
+  'hudChrome.cooldownManager.showIn': 'Mostra in',
+  'hudChrome.cooldownManager.showInInstances': 'Aree istanziate',
+  'hudChrome.cooldownManager.showInWorld': 'Mondo aperto',
+  'hudChrome.cooldownManager.showNotReady': 'Non pronto',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Fuori dal combattimento',
+  'hudChrome.cooldownManager.showReady': 'Pronto',
+  'hudChrome.cooldownManager.showWhile': 'Mostra durante',
+  'hudChrome.options.enemyHighlightDistance': '{yards} iarde',
+  'hudChrome.options.enemyHighlightEdgeArrow':
+    "Freccia al bordo dello schermo fuori dall'inquadratura",
+  'hudChrome.options.enemyHighlightNameplate': 'Targhetta bersaglio grande con cornice',
+  'hudChrome.options.enemyHighlightOverhead': 'Indicatore fluttuante sopra la testa',
+  'hudChrome.options.enemyHighlightReticle': 'Reticolo ostile più marcato',
+  'hudChrome.options.enemyHighlightStyle': 'Stile di evidenziazione dei nemici',
+  'hudChrome.options.nameplateCooldownScale': 'Dimensione monitor offensivo/difensivo',
+  'hudChrome.options.showNameplateCooldowns': 'Monitor offensivo/difensivo',
+  'hud.pet.stanceDesc': 'Clicca per scegliere Passiva, Difensiva, Aggressiva o Assistenza.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}m',
   'abilityUi.cast.hoard_cast_bat_dive': 'Tuffo',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Tuffo Precipitoso',
@@ -62,8 +106,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     "Uso: Rinforza la tua armatura al petto, aumentando l'Armatura di 12 per 1 ora.",
   'hudChrome.factionRewards.battleStandardUse':
-    "Uso: Pianta lo Stendardo di Battaglia della Consecrated Dawn per 5 minuti, aumentando significativamente la rigenerazione della salute e della mana fuori dal combattimento per tutti gli alleati vicini. Rimanere vicino ad esso per 10 secondi concede anche la Benedizione dell'Alba (+5% a tutte le statistiche per 30 min). (5 min di recupero)",
-  'hudChrome.factionRewards.hub_automatons': 'South Reach (La Fonderia Automa)',
+    'Uso: pianta lo Stendardo da Battaglia dell’Alba Consacrata per 5 min. I giocatori fuori dal combattimento entro 15 iarde rigenerano il 10% di salute in più; chi usa mana recupera inoltre mana pari al 5% del proprio Spirito ogni 2 s. Restare vicino per 10 s conferisce Benedizione dell’Alba, aumentando Forza, Agilità, Tempra, Intelletto e Spirito del 5% per 30 min. (Recupero: 5 min)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Automi)',
   'hudChrome.factionRewards.hub_church_order': "Valle di Eastbrook (L'Ordine della Chiesa)",
   'hudChrome.factionRewards.hub_none':
     'Nessuno (Usalo vicino a un fulcro fazione per sintonizzarti)',
@@ -428,6 +472,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchNoMatch':
     'Nessun materiale nel tuo caveau corrisponde alla tua ricerca.',
   'hudChrome.charSheet.ratings': 'Valutazioni',
+  'hudChrome.charSheet.gearScore': 'Punteggio equipaggiamento',
   'hudChrome.charSheet.spell': 'Magia',
   'hudChrome.charSidebar.character': 'Personaggio',
   'hudChrome.charSidebar.currencies': 'Valute',
@@ -488,8 +533,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'Metti questo incantesimo in un gruppo per mostrarne il pulsante.',
   'hudChrome.cooldownManager.notKnown': '{spell} (non ancora appreso)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Mostra solo quando pronto',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Mostra solo quando attivo',
   'hudChrome.cooldownManager.opacity': 'Opacità',
   'hudChrome.cooldownManager.orientation': 'Orientamento',
   'hudChrome.cooldownManager.otherSpells': 'Altri incantesimi',
@@ -513,12 +556,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Trascina un incantesimo su un gruppo, oppure selezionalo per sceglierne il gruppo e gli avvisi. Un pulsante segue il proprio incantesimo quando questo cambia in un altro, e si illumina quando lo fa.',
   'hudChrome.cooldownManager.trackedTitle': 'Incantesimi monitorati',
   'hudChrome.cooldownManager.vertical': 'Verticale',
-  'hudChrome.cooldownManager.visAlways': 'Sempre visibile',
   'hudChrome.cooldownManager.visCombat': 'In combattimento',
-  'hudChrome.cooldownManager.visHidden': 'Nascosta',
   'hudChrome.cooldownManager.visHiddenHint':
     'Un gruppo nascosto continua comunque a riprodurre i suoi suoni e a illuminare la tua barra delle azioni.',
-  'hudChrome.cooldownManager.visibility': 'Visibilità',
   'hudChrome.crafting.mobileStationTitle': '{station} di {name}',
   'hudChrome.currencies.activities': 'Attività',
   'hudChrome.currencies.delveMark': "Marchio dell'Incursione",
@@ -527,7 +567,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Fazioni',
   'hudChrome.currencies.heroicMarkNote': 'Dungeon eroici . spendi dal quartiermastro eroico',
   'hudChrome.currencies.honor': 'Onore',
-  'hudChrome.currencies.honorNote': 'Campi di battaglia e arena',
+  'hudChrome.currencies.honorNote': 'Campi di battaglia, arena e missioni mondiali',
   'hudChrome.currencies.intro':
     'Nessuna di queste occupa spazio nelle borse. Il denaro resta nella tua borsa come sempre.',
   'hudChrome.currencies.lifetime': 'Cumulativo: {amount}',
@@ -556,7 +596,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     "Incide permanentemente un'arma a due mani con 12 Forza e 25 Indice di Critico. Non può essere applicato a un'arma a una mano. Un bonus fisso: non scala.",
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    "I tuoi attacchi in mischia che colpiscono possono concedere 60 Agilità e il 2% di velocità d'attacco in mischia in più per 15 s. Ogni colpo ha una probabilità dell'1% per ogni 0,6 s della velocità base dell'arma che colpisce. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano questo effetto. Forma del Gatto usa invece la sua velocità base di attacco di 1 s.",
+    'I tuoi attacchi in mischia andati a segno possono conferire 60 Agilità e attacchi in mischia più rapidi del 2% per 15 s. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma che colpisce. Nessun recupero interno. Le due mani condividono un solo beneficio: ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non lo attivano. In Forma del Gatto, gli attacchi automatici usano invece la velocità delle zampe di 1 s. Colpi e mosse finali in Forma del Gatto e Forma di Bruin usano la velocità propria dell’arma; Artigli Falcianti effettua un tiro per utilizzo, non per bersaglio.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': "Incisione dell'arma: Fuoco dell'Alba",
   'hudChrome.enchantName.enchant_weapon_dawns_benediction':
     "Incisione dell'arma: Benedizione dell'Alba",
@@ -1279,7 +1319,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Riceverai anche:',
   'hudChrome.weekly.anyDifficulty': 'Qualsiasi difficoltà',
   'hudChrome.weekly.cacheDesc':
-    "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set), più {count} x {item}.",
+    "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set di Ignivar), più {count} x {item}.",
   'hudChrome.weekly.choose': 'Scegli missione',
   'hudChrome.weekly.chosen': 'Missione settimanale presa: {category}',
   'hudChrome.weekly.close': 'Chiudi le missioni settimanali',
@@ -1695,6 +1735,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Dolce vittoria',
   'questUi.worldQuest.matchConfections': 'Abbina i dolciumi incantati',
   'questUi.worldQuest.mineOre': 'Estrai minerale di rame',
+  'questUi.worldQuest.mineMaterial': 'Estrai {name}',
   'questUi.worldQuest.practiceRewards':
     'Prova: gioca di nuovo senza guadagnare altre monete, esperienza o reputazione.',
   'questUi.worldQuest.puzzleBeamReach': 'Cristalli raggiunti: {count}',
@@ -1823,77 +1864,77 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.wispMaze.startNormal': 'Entra nel labirinto: Normale ({shadows} ombre)',
   'questUi.worldQuest.wispMaze.title': 'Labirinto di Wispwood',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Il tempo di lancio di Radici Avvinghianti è ridotto di 0,5 sec.',
+    'Il tempo di lancio di Radici Avvinghianti è ridotto di 0,5 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Lanciare Radici Avvinghianti ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec.',
   'entities.itemSets.vanguard_druid_balance.name': 'Paramenti Guardiastelle',
   'entities.itemSets.vanguard_druid_feral.bonus2':
-    'Il tempo di recupero di Carica di Bruin è ridotto di 3 sec.',
+    'Il tempo di recupero di Carica di Bruin è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Carica di Bruin ti protegge con uno scudo pari al 6 percento della tua salute massima per 6 sec.',
   'entities.itemSets.vanguard_druid_feral.name': 'Pelle Sanguicriniera',
   'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'Il tempo di recupero di Rapidità di Guarigione è ridotto di 1 sec.',
+    'Il tempo di recupero di Rapidità di Guarigione è ridotto di 1 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Rapidità di Guarigione aumenta inoltre la tua velocità di movimento del 30 percento per 3 sec.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Veste Cardofiore',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    'Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec.',
+    'Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Tiro Scuotente riduce di 1 sec il tempo di recupero rimanente di Ira Bestiale.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Finimenti Guardiabranco',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    'Il tempo di recupero di Rompipista è ridotto di 4 sec.',
+    'Il tempo di recupero di Rompipista è ridotto di 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Rompipista rende istantaneo il tuo prossimo Tiro Teso lanciato entro 6 sec. Non può verificarsi più di una volta ogni 15 sec.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Finimenti Vistalontana',
   'entities.itemSets.vanguard_hunter_survival.bonus2':
-    'Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec.',
+    'Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_hunter_survival.bonus4':
     'Uncino Sanguinario concede 1 Slancio di Caccia.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Finimenti Dentetrappola',
   'entities.itemSets.vanguard_mage_arcane.bonus2':
-    'Il tempo di recupero di Barriera Temporale è ridotto di 2 sec.',
+    'Il tempo di recupero di Barriera Temporale è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Barriera Temporale aumenta inoltre del 20 percento la velocità di movimento del bersaglio protetto per 3 sec.',
   'entities.itemSets.vanguard_mage_arcane.name': 'Vesti Legatempo',
   'entities.itemSets.vanguard_mage_fire.bonus2':
-    'Pioggia di Braci si ricarica 3 sec più in fretta.',
+    'Pioggia di Braci si ricarica 3 sec più in fretta. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Lanciare Pioggia di Braci riduce di 2 sec il tempo di recupero rimanente di Barriera Ardente.',
   'entities.itemSets.vanguard_mage_fire.name': 'Paramenti Sferzabraci',
   'entities.itemSets.vanguard_mage_frost.bonus2':
-    'Il tempo di recupero di Vincolo di Ghiaccio è ridotto di 2 sec.',
+    'Il tempo di recupero di Vincolo di Ghiaccio è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Lanciare Vincolo di Ghiaccio riduce di 5 sec il tempo di recupero rimanente di Passo Furtivo.',
   'entities.itemSets.vanguard_mage_frost.name': 'Tenuta Guardiabrina',
   'entities.itemSets.vanguard_paladin_holy.bonus2':
-    'Il tempo di recupero di Patto della Vita è ridotto di 30 sec.',
+    'Il tempo di recupero di Patto della Vita è ridotto di 30 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     "Patto della Vita protegge inoltre l'alleato con uno scudo pari all'8 percento della sua salute massima per 6 sec.",
   'entities.itemSets.vanguard_paladin_holy.name': 'Paramenti Vegliasole',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    'Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec.',
+    'Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'I nemici trascinati da Catena del Giuramento lanciano incantesimi il 30 percento più lentamente per 4 sec, e Catena del Giuramento ti concede Rappresaglia Solare quando vincola un nemico che può essere trascinato.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Baluardo Giuroscudo',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec.',
+    'Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Richiamo della Valchiria azzera il tempo di recupero di Editto Finale, e il tuo prossimo Editto Finale lanciato entro 6 sec dal colpo infligge il 15 percento di danni in più.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Piastre di Guerra Marchioluce',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    'Il tempo di recupero di Urlo Psichico è ridotto di 3 sec.',
+    'Il tempo di recupero di Urlo Psichico è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     "Quando il tuo Salmo di Protezione viene consumato del tutto, l'alleato protetto ottiene il 20 percento di velocità di movimento in più per 3 sec. Non può verificarsi più di una volta ogni 8 sec.",
   'entities.itemSets.vanguard_priest_discipline.name': 'Paramenti Salmovelo',
   'entities.itemSets.vanguard_priest_holy.bonus2':
-    'Il tempo di recupero di Passo del Velo è ridotto di 6 sec.',
+    'Il tempo di recupero di Passo del Velo è ridotto di 6 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     "Passo del Velo ti protegge inoltre con uno scudo pari all'8 percento della tua salute massima per 6 sec.",
   'entities.itemSets.vanguard_priest_holy.name': 'Paramenti Alagrazia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Litania della Sventura rallenta inoltre il movimento del bersaglio del 30 percento mentre la canalizzi.',
+    'Litania della Sventura rallenta inoltre il movimento del bersaglio del 30 percento mentre la canalizzi. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Evoca Demone della Decima ti protegge inoltre con uno scudo pari al 10 percento della tua salute massima per 8 sec.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Paramenti Innocrepuscolo',
@@ -1902,7 +1943,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpo Basso rende inoltre critico il tuo prossimo attacco sferrato entro 6 sec.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Cuoio Taglianotte',
   'entities.itemSets.vanguard_rogue_combat.bonus2':
-    'Il tempo di recupero di Calcagni Veloci è ridotto di 60 sec.',
+    'Il tempo di recupero di Calcagni Veloci è ridotto di 15 sec.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Mentre Calcagni Veloci è attivo, Fendente Malvagio e Colpo al Corpo concedono 1 punto combo aggiuntivo.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Cuoio Marchiorissa',
@@ -1912,32 +1953,32 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Pugno allo Stomaco concede 2 punti combo aggiuntivi se usato durante Foschia Evanescente.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Cuoio Ombrapasso',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    "Il tempo di recupero di Scatena l'Arma è ridotto di 3 sec.",
+    "Il tempo di recupero di Scatena l'Arma è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     "Scatena l'Arma ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec.",
   'entities.itemSets.vanguard_shaman_elemental.name': 'Maglia da Battaglia Editempesta',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec.',
+    'Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Colpo Ancestrale riduce di 4 sec il tempo di recupero rimanente di Elemental Trance.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Maglia di Guerra Ventonato',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Acque Risananti si lancia 0,5 sec più in fretta su un alleato sotto il 50 percento di salute.',
+    'Acque Risananti si lancia 0,5 sec più in fretta su un alleato sotto il 50 percento di salute. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Richiamo della Marea protegge inoltre il suo bersaglio con uno scudo pari al 5 percento della tua salute massima per 6 sec.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Cotta di Maglia Guardiasalmastra',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Il tempo di lancio di Tormento è ridotto di 0,3 sec.',
+    'Il tempo di lancio di Tormento è ridotto di 0,3 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Divorare ti cura il 30 percento in più e può essere canalizzato in movimento.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Vesti Pennaterrore',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    'Il tempo di recupero di Bone Armor è ridotto di 10 sec.',
+    'Il tempo di recupero di Bone Armor è ridotto di 10 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command riduce di 2 sec il tempo di recupero rimanente di Bone Armor.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Paramenti Legamidollo',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    'Il tempo di recupero di Cinderhide è ridotto di 30 sec.',
+    'Il tempo di recupero di Cinderhide è ridotto di 30 sec. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Ogni secondo lancio di Conflagrazione rende istantaneo il tuo prossimo Dardo della Rovina lanciato entro 8 sec.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Vesti Coronascoria',
@@ -2259,7 +2300,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "I ladri hanno nascosto il loro oro rubato per tutto il mio labirinto, e ora le ombre lo custodiscono. Recupera ogni borsa di monete. Evita i guardiani, oppure prendi una fiammella radiosa per bandirli. Tre vite perse ti riportano all'ingresso, ma le borse che hai raccolto restano al sicuro.",
   'entities.abilities.lava_burst.name': 'Scoppio di Magma',
   'entities.abilities.lava_burst.description':
-    'Infligge {damage} danni da Fuoco. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)',
+    'Infligge {damage} danni da Fuoco. Un colpo a segno concede 1 Tuono. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Un colpo critico infligge un ulteriore 24% dei danni normali. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)',
   'entities.abilities.lightning_overload.name': 'Sovraccarico Folgorante',
   'entities.abilities.lightning_overload.description':
     'Passiva: Dardo Folgorante e Fulmine Biforcuto hanno il 20% di probabilità di andare in Sovraccarico, colpendo di nuovo il primo bersaglio per il 50% dei danni inflitti e concedendo 1 Tuono. (Richiamo del Tuono)',
@@ -2429,7 +2470,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     'Aggiunge una riga "Lanciato da" a ogni descrizione di potenziamento/indebolimento, indicando chi lo ha applicato. Utile per distinguere più lanciatori dello stesso potenziamento, come le Benedizioni di due paladini.',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Colloca la striscia di potenziamenti e indebolimenti del riquadro bersaglio sotto il riquadro invece che sopra, la disposizione classica. Disattivata di default, poiché il riquadro bersaglio predefinito si trova appena sopra la barra delle azioni; attivala una volta spostato il riquadro in un punto con spazio sottostante.',
+    'Colloca la fila di benefici e penalità del bersaglio sotto il suo riquadro, sotto nome e barra della salute, anziché sopra: la disposizione classica. Nella posizione predefinita, il riquadro del bersaglio, insieme alla tua barra di lancio e ai timer degli attacchi, sale di una fila per lasciare la prima riga libera dalla barra delle azioni; un riquadro spostato rimane dove lo hai messo.',
   'guide.settingsPage.rowFrameRateCap':
     'Un tetto massimo a quante immagini il gioco disegna ogni secondo. Un computer che non riesce a stare al passo con il proprio schermo cade in un ritmo irregolare; un valore costante di 30 sembra più fluido, dimezza il lavoro e mantiene il computer più fresco. Schermo indica nessun limite.',
   'guide.stats.warfareBodyPets':
@@ -3536,9 +3577,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Forma di Fleet',
   'guide.classPage.formsHeading': 'Trasformazioni',
   'guide.classPage.formsMoonwing':
-    "Un druido di Equilibrio ottiene una forma in più, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. È l'unica forma animale che conserva i tuoi incantesimi, e la tua bacchetta funziona solo con essa o con la tua normale forma da incantatore.",
+    'Un druido di Equilibrio ottiene un’altra forma, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. Come la Forma di Curatore delle Spore di Ripristino, conserva i tuoi incantesimi; la bacchetta funziona solo in queste due forme o nella tua normale forma da incantatore.',
   'guide.classPage.formsWolfEngage':
-    'Un lupo apre lo scontro con Carica di Bruin, passa subito in Forma del Lupo per bloccare il bersaglio, chiude la distanza con Balzo quando non è in furtività e ferma un nemico con Atterramento.',
+    'Un gatto apre lo scontro con Carica di Bruin, passa subito in Forma del Gatto per bloccare il bersaglio, chiude la distanza con Balzo quando non è in furtività e ferma un nemico con Atterramento.',
   'guide.classPage.formsNote':
     "Un druido combatte cambiando forma. La maggior parte delle abilità del druido appartiene a una forma specifica, quindi la forma in cui ti trovi decide cosa puoi lanciare, e trasformarti costa un po' di mana. Puoi trasformarti dentro o fuori dal combattimento, tutte le volte che vuoi.",
   'guide.classPage.mageEleHeading': "Elementale dell'Acqua",
@@ -4794,31 +4835,36 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Stile',
   'editor.status.campCapReached':
     'Limite di accampamenti raggiunto ({max}). Il nuovo accampamento non è stato aggiunto.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_ashstalker.bonus7':
     "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Passo di Cenere, aumentando la velocità di movimento del 40% per 6 sec.",
   'entities.itemSets.warfare_ashstalker.name': 'Kit Braccacenere',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_cinderweave.bonus7':
     "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Brace, assorbendo 120 danni per 8 sec.",
   'entities.itemSets.warfare_cinderweave.name': 'Paramenti Braciotessuti',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_furyforged.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_furyforged.bonus7':
     "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Giuramento Infranto, assorbendo 200 danni per 10 sec.",
   'entities.itemSets.warfare_furyforged.name': 'Armatura da Battaglia Forgiafuria',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_stormbound.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_stormbound.bonus7':
     "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Brace, assorbendo 120 danni per 8 sec.",
   'entities.itemSets.warfare_stormbound.name': 'Paramenti Legatempesta',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Aumenta di 40 la Difesa da Guerra.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.warfare_thornhide.bonus4':
     "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -5146,7 +5192,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Posseduto',
   'hudChrome.warfareShop.weapons': 'Armi',
   'itemUi.market.saleBuyer': 'Venduto a {buyer}',
-  'itemUi.market.saleOlder': 'Più {count} vendite precedenti, incluse nel totale.',
+  'itemUi.market.saleOlder': 'Più {count} vendite precedenti non elencate.',
   'itemUi.tooltip.maxStack': 'Pila massima: {count}',
   'hud.system.deathRecapAbility': 'Sei morto. Ucciso da {ability}.',
   'hud.system.deathRecapDrowned': 'Sei morto. Sei annegato.',
@@ -6361,7 +6407,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Un urlo terrificante che fa fuggire per la paura fino a 5 nemici entro 8 m per 4 sec. Il danno può spezzare l'effetto.",
   'entities.abilities.intimidating_shout.name': 'Urlo Intimidatorio',
   'entities.abilities.iron_resolve.description':
-    'Stringi i denti e ignora il dolore: consuma fino a 40 rabbia (minimo 20) per assorbire {absorbPerRage} danni per ogni punto di rabbia speso, per un massimo di 10 s. (Protezione)',
+    'Stringi i denti e ignora il dolore: uno scudo assorbe danni pari al {damage}% della tua salute massima al momento del lancio, per un massimo di {duration} s. (Protezione)',
   'entities.abilities.iron_resolve.name': 'Fermezza di Ferro',
   'entities.abilities.measured_fury.description':
     'La tua furia misurata affina la tua economia: le tue abilità costano il 10% di rabbia in meno. (Armi)',
@@ -6480,7 +6526,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un tiro selvaggio che disorienta il bersaglio per {duration} s. Qualsiasi danno interrompe l’effetto.',
   'entities.abilities.typhoon.name': 'Tifone',
   'entities.abilities.typhoon.description':
-    'Una raffica di vento respinge tutti i nemici entro 8 m e li frastorna, riducendone del 50% la velocità di movimento per 4 s.',
+    'Una raffica scaglia tutti i nemici entro 8 m a 15 m da te e li frastorna, rallentandoli del 50% per 4 s. I giocatori nemici volano in linea retta: oltre un bordo continuano il volo e subiscono danni da caduta; una caduta mortale conta come tua uccisione.',
   'entities.abilities.voidfeast.name': 'Banchetto del Vuoto',
   'entities.abilities.voidfeast.description':
     'Divora un effetto magico (uno benefico da un nemico o uno dannoso da un alleato) e ti cura del 6% della salute massima.',
@@ -8781,7 +8827,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     'Clicca, poi clicca del cibo nelle borse per nutrire e curare la mascotte per 5 secondi.',
   'hud.pet.stanceTitle': 'Posizione mascotte',
-  'hud.pet.stanceDesc': 'Clicca per scegliere Passiva, Difensiva o Aggressiva.',
   'hud.pet.passiveDesc': 'Attacca solo quando glielo ordini.',
   'hud.pet.defensiveDesc': 'Attacca i nemici che feriscono te o la tua mascotte.',
   'hud.pet.aggressiveDesc': 'Attacca i nemici ostili vicini.',
@@ -9290,7 +9335,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Passivo: i colpi critici delle tue magie incendiano il bersaglio, infliggendo il 30% dei danni causati nell'arco di 6 s; si accumula. (Maestria del Fuoco)",
   'entities.abilities.mass_barrier.name': 'Barriera di massa',
   'entities.abilities.mass_barrier.description':
-    'Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe 130 danni per 60 s. (Talento del mago)',
+    'Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe {damage} danni per 15 s. (Talento del mago)',
   'entities.abilities.overload.name': 'Sovraccarico',
   'entities.abilities.overload.description':
     'La tua prossima magia viene amplificata del 40%, ma costa il 50% di mana in più. Dura 10 s. (Talento del mago)',
@@ -9365,7 +9410,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': "Breccia nell'Armatura",
   'entities.abilities.rupture.name': 'Dissanguamento',
   'entities.abilities.vanish.description':
-    'Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec.',
+    'Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi a piena velocità mentre sei nascosto. Dura fino a 10 sec.',
   'entities.abilities.instant_poison.name': 'Morso della Vipera',
   'entities.abilities.instant_poison.description':
     'Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga {damage} danni della Natura aggiuntivi.',
@@ -9444,7 +9489,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Assumete l'aspetto della martora e aumentate la vostra probabilità di schivata dell'8% per 30 min.",
   'entities.abilities.aspect_of_the_cheetah.name': 'Sembianze del Corsiero',
   'entities.abilities.aspect_of_the_cheetah.description':
-    "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 4 sec (ogni colpo rinnova lo stordimento).",
+    "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 2 sec (ogni colpo rinnova lo stordimento).",
   'entities.abilities.aimed_shot.name': 'Tiro Teso',
   'entities.abilities.aimed_shot.description':
     "Colpisce il bersaglio per {damage} danni Fisici. Il danno aumenta con la potenza d'attacco a distanza.",
@@ -9498,7 +9543,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Vi circonda di fulmini per 10 min. I 3 attacchi in mischia successivi contro di voi infliggono {buff} danni da Natura all'attaccante, al massimo una volta ogni 5 sec.",
   'entities.abilities.flame_shock.name': 'Scossa di Braci',
   'entities.abilities.flame_shock.description':
-    "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di 12 sec. Il colpo iniziale aumenta con il Potere Magico.",
+    "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di {duration} sec. Il colpo iniziale aumenta con il Potere Magico.",
   'entities.abilities.flametongue_weapon.name': 'Arma Marchiofuoco',
   'entities.abilities.flametongue_weapon.description':
     'Permea la vostra arma per 30 min. Ogni colpo infligge {damage} danni da Fuoco aggiuntivi.',
@@ -9546,11 +9591,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.name': 'Dardo Silvano',
   'entities.abilities.healing_touch.name': 'Rammendo Selvaggio',
   'entities.abilities.healing_touch.description': 'Cura un bersaglio alleato di {damage}.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Ogni lancio completato aggiunge 1 Verzura (massimo 3). La Verzura accumulata accorcia questo lancio: 2,2 s con 1 Verzura, 1,9 s con 2 e 1,5 s con 3. Favore della Natura lo rende istantaneo, gratuito e più forte del 25%.',
   'entities.abilities.mark_of_the_wild.name': 'Custodia Selvaggia',
   'entities.abilities.mark_of_the_wild.description':
     "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.moonfire.name': 'Tempesta Lunare',
-  'entities.abilities.rejuvenation.name': 'Fioritura Selvaggia',
   'entities.abilities.thorns.name': 'Guardia di Rovi',
   'entities.abilities.thorns.description':
     'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono {buff} danni da Natura.',
@@ -9559,14 +9605,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Radica il bersaglio sul posto per un massimo di 12 s.',
   'entities.abilities.bear_form.name': 'Forma di Bruin',
   'entities.abilities.bear_form.description':
-    "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore.",
+    "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Colpisci il doppio più velocemente con metà danni per colpo, e ogni colpo genera il doppio della rabbia. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.maul.name': 'Frantumaossa',
   'entities.abilities.growl.name': 'Intimidazione',
   'entities.abilities.growl.description':
     'Ringhia al bersaglio: la tua minaccia sale fino a eguagliare quella del suo nemico più odiato e lo costringe ad attaccarti per 3 s. Solo in Forma di Bruin.',
   'entities.abilities.cat_form.name': 'Forma del Gatto',
   'entities.abilities.cat_form.description':
-    "Vi trasforma in lupo: l'agilità sale con il vostro livello, potenza d'attacco +8 più 2 per livello, i vostri attacchi usano energia e punti combo, e generate il 29% di minaccia in meno. Passare a qualsiasi forma concede Passo leggero: il 60% di velocità di movimento per 3 sec, una volta ogni 20 sec. Lanciate di nuovo per tornare alla forma da incantatore.",
+    "Trasformati in gatto: l'agilità sale con il livello, la potenza d'attacco aumenta di 8 più 2 per livello, gli attacchi usano energia e punti combo, ti muovi il 15% più velocemente e generi il 29% di minaccia in meno. Ogni cambio di forma concede Passo leggero, un breve aumento di velocità. Usa di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.claw.name': 'Artiglio Lacerante',
   'entities.abilities.ferocious_bite.name': 'Morso Cruento',
   'entities.abilities.swipe.name': 'Artigli Falcianti',
@@ -9587,19 +9633,19 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.name': 'Luce Stregata',
   'entities.abilities.hibernate.name': 'Sopore',
   'entities.abilities.hibernate.description':
-    'Costringe il bersaglio in un sonno profondo per un massimo di 8 sec. Qualsiasi danno lo risveglia.',
+    'Costringe il bersaglio a un sonno profondo per un massimo di 8 s. Qualsiasi danno lo sveglia. Contro i giocatori ogni ripetizione entro 18 s dura la metà della precedente e la quarta fallisce.',
   'entities.abilities.dash.name': 'Scatto',
   'entities.abilities.dash.description':
-    'Scatta in avanti, aumentando la velocità di movimento del 50% per 15 sec. Solo Forma del Gatto.',
+    'Assumi Forma del Gatto se necessario, poi scatta con il 50% di velocità in più per 15 s. Utilizzabile in ogni forma. Istantaneo e non attiva il tempo di recupero globale.',
   'entities.abilities.pounce.name': 'Colpo Strisciante',
   'entities.abilities.lunge.description':
-    "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Lupo.",
+    "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Gatto.",
   'entities.abilities.lunge.name': 'Balzo',
   'entities.abilities.hamstring_bite.description':
-    'Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec). Solo in Forma del Lupo.',
+    'Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec). Solo in Forma del Gatto.',
   'entities.abilities.hamstring_bite.name': 'Atterramento',
   'entities.abilities.pounce.description':
-    'Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Lupo. Fuori dalla furtività questo pulsante è Balzo.',
+    'Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Gatto. Fuori dalla furtività questo pulsante è Balzo.',
   'entities.abilities.insect_swarm.name': 'Sciame Pungente',
   'entities.abilities.insect_swarm.description':
     'Il nemico è assalito da uno sciame di insetti, subendo {damage} danni da Natura in 12 sec.',
@@ -9645,17 +9691,17 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Vincola un Wraithborn al tuo volere: un demone d'élite che scaglia da lontano ingenti danni d'Ombra. Un lungo tempo di recupero ne limita la potenza devastante. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.",
   'entities.abilities.bear_charge.name': 'Carica di Bruin',
   'entities.abilities.bear_charge.description':
-    'Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Per i 3 sec successivi, la Forma del Lupo è gratuita e blocca il bersaglio, rallentandolo del 50% per 4 sec. Gittata di 7-23 metri. Solo in Forma di Bruin.',
+    'Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Per i 3 sec successivi, la Forma del Gatto è gratuita e blocca il bersaglio, rallentandolo del 50% per 4 sec. Gittata di 7-23 metri. Solo in Forma di Bruin.',
   'entities.abilities.demoralizing_roar.name': 'Ruggito Codardo',
   'entities.abilities.demoralizing_roar.description':
     "Demoralizza i nemici vicini, riducendone la potenza d'attacco di 20 per 20 sec. Solo in Forma di Bruin.",
   'entities.abilities.prowl.name': 'Appostamento',
   'entities.abilities.prowl.description':
-    'Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento.',
+    'Entra in furtività mentre sei in Forma del Gatto. Non utilizzabile in combattimento.',
   'entities.abilities.rake.name': 'Scarnificare',
   'entities.abilities.revive_pet.name': 'Rattoppare',
   'entities.abilities.revive_pet.description':
-    'Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute.',
+    'Ripristina il 10% della salute massima del tuo compagno vivo ogni secondo per 8 sec. Se è morto, lo rianima con il 50% della salute.',
   'entities.abilities.holy_shock.description':
     'Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)',
   'entities.abilities.holy_shield.name': 'Scudo Sacro',
@@ -14619,7 +14665,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Abilità',
   'guide.search.typeDeed': 'Impresa',
   'guide.settingsPage.audioBody':
-    "La finestra delle opzioni non è fatta solo di pixel. Audio raccoglie tre cursori del volume, per effetti sonori, musica e voce, più un interruttore per la musica e quattro interruttori per i suoni che stancano prima: voci dei PNG, passi, suoni dell'interfaccia e riscontro al clic. La linguetta Generale del pannello Interfaccia porta un selettore di lingua che rilocalizza l'intera interfaccia all'istante, senza ricaricare, e un selettore di tema per l'aspetto delle finestre.",
+    'Le opzioni non riguardano solo la grafica. Audio offre quattro cursori del volume per effetti, ambiente, musica e voci, un interruttore per la musica e quattro per i suoni che più spesso stancano: voci dei PNG, passi, suoni dell’interfaccia e risposta ai clic. La scheda Generale del pannello Interfaccia contiene un selettore della lingua che traduce subito tutta l’interfaccia senza ricaricare e un selettore del tema delle finestre.',
   'guide.settingsPage.audioTitle': 'Suono e lingua',
   'guide.settingsPage.autolootBody':
     'Preferisci non cliccare ogni cadavere? Il saccheggio automatico di passaggio, nella linguetta Combattimento del pannello Interfaccia e disattivato per impostazione predefinita, raccoglie il bottino delle tue uccisioni mentre ci passi accanto.',
@@ -15136,7 +15182,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     "Incanala per 3 sec, infliggendo {damage} danni da Ombra ogni secondo ai nemici entro 8 m dall'area bersaglio. Il danno aumenta con il Potere Magico. (Talento da sacerdote)",
   'entities.abilities.multi_shot.description':
-    'Scaglia una raffica sull’area bersaglio, infliggendo {damage} danni fisici ai nemici entro un raggio di 8 m. (talento del Cacciatore)',
+    'Scaglia una salva sull’area bersaglio, infliggendo {damage} danni fisici ai nemici entro 8 iarde. (talento del Cacciatore)',
   'entities.abilities.prayer_of_healing.description':
     'Cura gli alleati entro 30 m di {damage}. La cura aumenta con il Potere Magico. (Sacro)',
   'entities.abilities.preparation.description':
@@ -15146,7 +15192,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     "Atterrisce i nemici entro 8 m per un massimo di 4 sec. Il danno può spezzare l'effetto.",
   'entities.abilities.shadowstep.description':
-    'Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. (talento del Ladro)',
+    'Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. Accumula fino a 2 cariche. (talento del Ladro)',
   'entities.abilities.silence.description':
     'Silenzia il bersaglio per 4 sec. (talento del Sacerdote)',
   'entities.abilities.tranquility.description':
@@ -16336,17 +16382,17 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Scatena la Bestia',
   'entities.abilities.wildheart.name': 'Cuore Selvaggio',
   'entities.abilities.bloodhook.description':
-    "Carica verso un nemico e applica Ferita da Uncino Sanguinario, infliggendo 34 danni Fisici base più il 26% della tua potenza d'attacco a distanza in 12 s con 4 impulsi. (Distintivo di Arte del Campo)",
+    "Carica un nemico e applica una ferita di Uncino Sanguinario, infliggendo 34 danni fisici base più il 26% della tua potenza d'attacco a distanza in 4 impulsi in 12 s. All'arrivo rallenta il bersaglio del 30% per 3 s. (Tratto distintivo di Sopravvivenza)",
   'entities.abilities.bloodtrail_assault.description':
-    "Per 12 s l'Uncino Sanguinario propaga una ferita al 60% di potenza fino a 2 nemici vicini, Squarciaferite comanda un attacco del famiglio da 18 danni, e la Carica a Frammentazione guadagna 2 metri, infligge il 25% di danni base in più al bersaglio principale e attiva il 50% di danni da ferita in più.",
+    'Per 12 s, Uncino Sanguinario diffonde una ferita al 60% della potenza a un massimo di 2 nemici entro 5 m, Squarciaferite ordina un attacco del famiglio da 18 danni e Carica a Frammentazione arriva 2 m più lontano, infligge il 25% di danni base in più al bersaglio principale e attiva il 50% di danni da ferita in più. Senza un famiglio vivo, la tua Concentrazione si rigenera anche il 100% più rapidamente.',
   'entities.abilities.cold_focus.description':
     'Per 12 s il Tiro Misurato recupera il 50% di concentrazione in più, e la Tesa Lunga costa il 25% in meno e si lancia il 30% più velocemente. (Distintivo di Vista Gelida)',
   'entities.abilities.fieldcraft_reentry.description':
-    "Passiva: Rompipista rinnova lo Slancio di Caccia e prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Il Colpo Sventratore infligge il 15% di danni in più per accumulo. L'Uncino Sanguinario infligge da 18 a 24 danni Fisici aggiuntivi, aumentati del 15% per accumulo e dalla tua potenza d'attacco a distanza. A 3 accumuli, uno dei due attacchi consuma lo Slancio di Caccia. (Arte del Campo)",
+    "Passivo: con Slancio di Caccia, Rompipista prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Colpo Sventratore infligge il 15% di danni in più per accumulo. Uncino Sanguinario infligge da 18 a 24 danni fisici aggiuntivi, aumentati del 15% per accumulo e dalla potenza d'attacco a distanza. Con 3 accumuli, uno qualunque dei due attacchi consuma Slancio di Caccia. (Sopravvivenza)",
   'entities.abilities.frostjaw_trap.description':
-    'Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
+    'Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
   'entities.abilities.hunting_momentum.description':
-    'Passiva: il Colpo Sventratore concede 1 Slancio di Caccia per 8 s, fino a 3. A 3 accumuli, Squarciaferite infligge il 45% di danni da colpo in più e consuma gli accumuli. (Arte del Campo)',
+    "Passivo: Colpo Sventratore e una Carica a Frammentazione che colpisce un nemico forniscono ciascuno 1 Slancio di Caccia, fino a 3. Dura fino al consumo o all'uscita dal combattimento; ogni accumulo aumenta del 15% la velocità. Con 3 accumuli, Squarciaferite infligge il 60% di danni da colpo in più e li consuma. (Sopravvivenza)",
   'entities.abilities.measured_shot.description':
     "Colpisci il bersaglio per {damage} danni Fisici. Un colpo a segno recupera 20 concentrazione. I danni aumentano con la potenza d'attacco a distanza.",
   'entities.abilities.pack_command.description':
@@ -16356,11 +16402,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Riduce i danni subiti del 60% per 8 s, ma impedisce di attaccare mentre è attiva.',
   'entities.abilities.shrapnel_charge.description':
-    "Colpisci il bersaglio per 24-30 danni Fisici e fino ad altri 4 nemici entro 6 metri per 13-17. Gli altri bersagli sanguinano anche per 12 danni in 6 s. Se il bersaglio principale ha la tua Ferita da Uncino Sanguinario, infligge subito 1 impulso di ferita. I danni diretti aumentano con la potenza d'attacco a distanza.",
+    "Colpisce un cono di 10 m davanti a te. Il tuo bersaglio, o il nemico colpito più vicino se il bersaglio è fuori dal cono, subisce da 24 a 30 danni fisici. Gli altri nemici nel cono subiscono da 7 a 9 danni e sanguinano per 12 danni in 6 s. Se il bersaglio principale ha la tua ferita di Uncino Sanguinario, subisce subito 1 impulso della ferita. Colpire un nemico fornisce 1 Slancio di Caccia. I danni diretti aumentano con la potenza d'attacco a distanza.",
   'entities.abilities.stampede.description':
     "Evoca 3 bestie per 12 s. Ognuna attacca ogni 2 s per {damage} danni Fisici. I danni mostrati includono l'8% della tua potenza d'attacco a distanza prima dei bonus ai danni del famiglio. Le bestie fissano la Ferocia del Branco all'evocazione, guadagnando il 10% di danni per accumulo. Mentre Fuggifuggi è in recupero, i Comandi del Branco riusciti hanno il 20% di probabilità di azzerarlo, garantito dopo 5 tentativi falliti. Non può azzerarsi mentre le bestie sono attive. (Signore del Branco)",
   'entities.abilities.trailbreak.description':
-    "Balza 12 metri all'indietro. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s.",
+    "Balza 25 metri all'indietro e liberati da immobilizzazioni e rallentamenti. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s.",
   'entities.abilities.unleash_beast.description':
     "Consuma 3 Ferocia del Branco dopo che il tuo famiglio ha colpito per 83-105 danni Fisici e scosso ogni nemico entro 6 metri per 26-34. Il colpo e la scossa usano il bonus completo del 30% ai danni del famiglio della Ferocia del Branco e aumentano con la potenza d'attacco del famiglio. Per gli 8 s successivi il famiglio infligge il 25% di danni in più, attacca il 35% più velocemente e fa sì che il Tiro Nefasto colpisca fino a 2 nemici vicini.",
   'entities.abilities.wildheart.description':
@@ -16388,7 +16434,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Passiva: mentre il Colpo Ancestrale è in recupero, consumare un Presagio di Tempesta ha il 25% di probabilità di azzerarlo. Se i primi 3 tentativi falliscono, il 4° lo azzera sempre. (Spirito Guerriero)',
   'entities.abilities.thunder_reservoir.description':
-    'Passiva: il Dardo Folgorante e il Fulmine Biforcuto concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)',
+    'Passiva: il Dardo Folgorante, il Fulmine Biforcuto e lo Scoppio di Magma concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)',
   'entities.abilities.tidecall.description':
     'Cura un bersaglio alleato di {damage}. La cura aumenta con il potere magico. Aggiunge la cura completa prima delle cure in eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio.',
   'entities.abilities.unleash_weapon.description':
@@ -16461,7 +16507,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Spezzamidollo',
   'entities.abilities.marrowbreak.description':
-    'Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia.',
+    'Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia.',
   'entities.abilities.moonlash.name': 'Ondata Lunare',
   'entities.abilities.moonlash.description':
     'Consuma 3 Marea Lunare per un colpo pesante da {damage} danni Arcani: la scelta del danno. Scia Solare consuma le stesse 3 Marea Lunare, quindi scegline una.',
@@ -16470,7 +16516,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a {duration} sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare.',
   'entities.abilities.overbloom.name': 'Sovrafioritura',
   'entities.abilities.overbloom.description':
-    'Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio.',
+    'Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Cura delle Spore fresca sul bersaglio.',
   'entities.abilities.redharvest.name': 'Mietitura Rossa',
   'entities.abilities.redharvest.description':
     "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo.",
@@ -16587,7 +16633,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Segui {count} creazioni di {name} come obiettivo di raccolta',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'I tuoi attacchi in mischia che colpiscono possono concedere 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori di cura. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano l’effetto. Forma di Lupo usa invece la sua velocità base di 1 s.',
+    'I tuoi attacchi in mischia andati a segno possono conferire 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori alle cure. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma che colpisce. Nessun recupero interno. Le due mani condividono un solo beneficio: ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non lo attivano. In Forma del Gatto, gli attacchi automatici usano invece la velocità delle zampe di 1 s. Colpi e mosse finali in Forma del Gatto e Forma di Bruin usano la velocità propria dell’arma; Artigli Falcianti effettua un tiro per utilizzo, non per bersaglio.',
   'hudChrome.enchantName.enchant_chest_armor': 'Incisione del petto: Rinforzo',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Incisione del petto: Vigore superiore',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Incisione del petto: Vigore lucente',
@@ -17088,7 +17134,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.ice_fang_sword.lore':
     'Il pezzo simbolo della collezione glaciale, quello che ogni collezionista cerca per primo. Zanna di Ghiaccio è stata scolpita, non forgiata, da una zanna del ghiacciaio che corona Thornpeak sopra Highwatch; il suo nucleo ciano brucia freddo come la luce su Glimmermere. Brina l’aria che taglia. Le guardie delle mura giurano che un soldato la portò la notte in cui le nevi alte tennero a bada i Giurati della Stirpe e “comprarono un inverno per le mura”.',
   'hudChrome.auraEffect.verdance':
-    'Verzura {stacks}/{max}. Ogni nuova Fioritura Selvaggia o Seconda Fioritura che pianti aggiunge 1. A {max}, Rapidità di Guarigione diventa Sovrafioritura',
+    'Verzura {stacks}/{max}. Ogni Cura delle Spore, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura',
   'hudChrome.continentMap.levels': 'Livelli da {min} a {max}',
   'hudChrome.continentMap.summary': 'Mappa del mondo. Scegli una zona per aprire la sua mappa.',
   'hudChrome.continentMap.title': 'Mappa del Mondo',
@@ -17246,7 +17292,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Ogni colpo aggiunge 1 Rituale del Veleno (massimo 6) e rimborsa 15 energia. A 6 Rituale del Veleno, Sonno Eterno diventa Squarcio velenoso (infligge tutti i danni da sanguinamento residui in una volta).',
   'entities.abilities.blade_flurry.description':
-    "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 12 sec. (firma Thuggery)",
+    "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 30 sec. (firma Thuggery)",
   'entities.abilities.bone_armor.description':
     'Ti avvolge nelle ossa, assorbendo danni pari al 20% della tua salute massima.',
   'entities.abilities.bone_armor.name': 'Bone Armor',
@@ -17262,7 +17308,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.specNote_feral':
     'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
   'entities.abilities.cold_blood.description':
-    'Concentra il tuo istinto omicida così che il tuo prossimo attacco sia un colpo critico. (firma Knifework)',
+    'Concentra il tuo istinto omicida così che i tuoi prossimi 5 attacchi siano colpi critici. (firma Knifework)',
   'entities.abilities.corpse_explosion.description':
     "Sacrifica prima un Mago d'Ossa, poi un Guerriero Scheletrico, e un'Ala Sepolcrale solo come ultima risorsa. Tra i duplicati sceglie quello con la durata residua minore, poi il più debole, per infliggere {damage} danni da Ombra nel punto scelto.",
   'entities.abilities.corpse_explosion.name': 'Corpse Explosion',
@@ -17315,7 +17361,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Chiama un giudizio sul tuo Evil Eye primario per 15 sec, concedendo 40 Condanna e 3 Filamenti del Fato, attivando la Possessione, raddoppiando la Condanna generata tramite l'Evil Eye primario e aumentando i danni di Sentence del 20%. La prima Sentence rimborsa 50 Condanna.",
   'entities.abilities.hour_of_judgment.name': 'Hour of Judgment',
   'entities.abilities.kidney_shot.description':
-    'Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec).',
+    'Mossa finale che stordisce il bersaglio per 2 sec più 1 sec per punto combo (5 punti combo: 7 sec).',
   'entities.abilities.litany_of_guilt.description':
     "Maledice il tuo Evil Eye primario per 6 sec. I guadagni di Condanna rilasciano un'onda che danneggia fino a 2 altri nemici entro 8 metri, al massimo una volta al secondo. Il Grado 2 lo estende a 8 sec e 4 nemici.",
   'entities.abilities.litany_of_guilt.name': 'Litany of Guilt',
@@ -17325,7 +17371,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     "Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.",
   'entities.abilities.maul.specNote_feral':
-    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti protegge invece con uno scudo pari al 18% della tua salute massima e rimborsa 15 rabbia.',
+    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia.',
   'entities.abilities.moonfire.description':
     'Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.',
   'entities.abilities.moonfire.specNote_balance':
@@ -17352,21 +17398,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Spende 1 Frammento d'Anima per aggiungere un Guerriero Scheletrico permanente al tuo Dominio a 2 posti. Solo uno può servirti. Colpisce in area i nemici vicini per il 45% dei danni ogni 6 sec, e Reaping Command blocca il suo bersaglio con un rallentamento del 40% per 4 sec.",
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    "Scarnifica il nemico per danni dell'arma più {damage} e causa danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
+    "Scarnifica il nemico per danni dell'arma più {damage} e causa {overTime} danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
   'entities.abilities.rake.specNote_feral':
     'Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
   'entities.abilities.reaping_command.description':
     "Spende 2 Frammenti d'Anima per comandare ogni servitore non morto a colpire all'unisono. I Guardiani Sepolcrali provocano e si preparano, i Guerrieri bloccano, i Maghi d'Ossa espongono le difese magiche, e l'Ala Sepolcrale lacera tutti i nemici colpiti.",
   'entities.abilities.reaping_command.name': 'Reaping Command',
   'entities.abilities.regrowth.description':
-    'Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.',
+    "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 15 s. Se l'effetto dura per tutta la sua durata, cura di nuovo il bersaglio della stessa quantità della cura iniziale.",
   'entities.abilities.regrowth.specNote_restoration':
-    'Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5).',
+    'Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva.',
   'entities.abilities.rejuvenation.description': 'Cura il bersaglio di {damage} in 12 s.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5). A 5 Verzura, Rapidità di Guarigione diventa Sovrafioritura.',
+    'Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva. A 3 Verzura, Rapidità di Guarigione diventa Sovrafioritura.',
   'entities.abilities.rip.description':
-    'Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Gatto.',
+    'Mossa finale che fa sanguinare il bersaglio ogni 2 s per 24 s: 72 danni più 48 per punto combo consumato (5 punti: {damage} totali). Solo in Forma del Gatto.',
   'entities.abilities.rip.specNote_feral': 'Il colpo a segno aggiunge 1 Sangue Antico (massimo 3).',
   'entities.abilities.ruinous_brand.description':
     'Marchia un nemico per 15 sec. I tuoi prossimi 3 incantesimi diretti riecheggiano per il 25% dei danni contro il nemico marchiato, oppure copiano il 50% dei danni su di esso quando lanciati contro un altro bersaglio. Gli echi di Dardo della Rovina contano anche come colpi critici, senza un ulteriore moltiplicatore di danno critico.',
@@ -17404,11 +17450,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'In Forma di Lunagufo, ogni lancio completato aggiunge 1 Marea Lunare (massimo 3). A 3 Marea Lunare, questo pulsante diventa Scia Solare: un colpo istantaneo da 80 a 100 danni da Natura più una bruciatura di 45 in 9 sec, che ripristina 35 mana e spende tutte e 3.',
   'entities.abilities.stealth.description':
-    "Ti nasconde nell'ombra: i nemici a stento ti notano, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
+    "Ti nasconde nell'ombra: i nemici a stento ti notano e ti muovi a piena velocità. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
   'entities.abilities.stealth.specNote_subtlety':
     'Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3).',
   'entities.abilities.swiftmend.description':
-    'Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Piantare Fioritura Selvaggia e Seconda Fioritura aggiunge Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)',
+    'Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Cura delle Spore, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)',
   'entities.abilities.swipe.description':
     'Colpisci con gli artigli i nemici vicini per {damage} danni. Causa minaccia aggiuntiva. Solo Forma di Bruin.',
   'entities.abilities.swipe.specNote_feral':
@@ -17484,7 +17530,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     '{used} di {cap} sec di riduzione del tempo di recupero usati in questa finestra',
   'hudChrome.auraEffect.bruinRushWindow':
-    'La Forma del Lupo non costa mana e blocca il bersaglio della vostra Carica di Bruin, rallentandolo del {pct}% per {sec} sec',
+    'La Forma del Gatto non costa mana e blocca il bersaglio della vostra Carica di Bruin, rallentandolo del {pct}% per {sec} sec',
   'hudChrome.auraEffect.desolation':
     '{charges} cariche: il tuo prossimo Dardo della Rovina si lancia il {castPct}% più veloce, oppure la tua prossima Pioggia di Fuoco atterra immediatamente',
   'hudChrome.auraEffect.duskfireClaim': 'La morte concede {value} Rovina',
@@ -17862,7 +17908,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Sono due azioni distinte sullo stesso corpo. Tutto cio che una carcassa contiene, monete e drop piu eventuali componenti raccoglibili, si apre nella stessa finestra, ma il tasto interagisci e Prendi il bottino raccolgono solo il bottino ordinario, che segue le normali regole di saccheggio. La raccolta e il lato delle professioni, che strappa i materiali dalla carcassa stessa, e avviene solo quando scegli Raccogli in quella finestra.\n\nLa raccolta e chi prima arriva, uso singolo: ogni carcassa puo essere raccolta esattamente una volta, da chiunque la rivendichi per primo, anche online. Il tuo Focus della Citta determina cosa ottieni: mentre sei in un hub cittadino puoi distribuire 10 punti di focus tra i tipi di componenti che ti interessano, e ogni componente focalizzato tira un livello migliore (ogni 5 punti lo fa avanzare di un gradino, al massimo due gradini) e produce di piu (10 percento per punto). I componenti non focalizzati non vengono mai peggiorati.',
   'guide.profPages.faq.a4':
-    "Hai avuto un colpo di fortuna. Circa 1 raccolto su 90 innesca un evento di raccolta raro (antico cuore di legno su un albero, un filone intatto nel minerale, un fiore lunare tra le erbe): moltiplica per cinque la resa, firma ogni unità con il tuo nome e annuncia il ritrovamento all'intera zona. Anche un tiro di rarità raro o superiore su un raccolto ordinario firma la resa.\n\nI materiali firmati vanno tenuti o venduti cari: avere al banco una qualsiasi copia firmata di un reagente richiesto aggiunge 2 punti percentuali alla probabilità di capolavoro. Ricorda soltanto che si impilano unicamente con copie firmate in modo identico, quindi occupano uno slot della borsa tutto loro.",
+    'Hai trovato una raccolta eccezionale. Circa 1 raccolta su 90 attiva un evento raro: durame antico negli alberi, una vena intatta nei minerali o una fioritura lunare nelle erbe. Moltiplica per cinque la resa, firma ogni unità con il tuo nome e annuncia il ritrovamento all’intera zona. Anche un normale raccolto di qualità rara o superiore riceve la firma su tutta la resa.\n\nConviene conservare i materiali firmati o venderli cari: possedere una copia firmata di un reagente necessario nelle borse o nella Caveau dei Materiali, dove la lavorazione può attingervi, aggiunge 2 punti percentuali alla probabilità di capolavoro. Possono condividere una pila compatibile con materiali non firmati o unità di altri raccoglitori e firmatari senza perdere alcun marchio; ogni origine e quantità rimane registrata separatamente.',
   'guide.profPages.faq.a5':
     "Vai a qualsiasi stazione di lavorazione con il pezzo nelle borse e paga il maestro. La tariffa segue la qualita dell'oggetto: 25 argento per un pezzo non comune, 1 oro per un raro, 4 oro per un epico; un leggendario paga la tariffa dell'epico, e un pezzo comune commissionato paga quella del non comune. Deve essere una vera stazione: una stazione mobile non offre mai il servizio.\n\nLa tariffa compra una lavagna pulita, non una cura: il pezzo rimane una commissione, quindi si vincola di nuovo a chiunque lo riceva nel successivo scambio. Se piu copie vincolate condividono una pila, una copia viene staccata e svincolata per ogni pagamento.",
   'guide.profPages.faq.a8':
@@ -18506,7 +18552,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Quando il tuo Salmo della Protezione è consumato del tutto, il prossimo Inno Purificatore entro 10 s è istantaneo. Non può accadere più di una volta ogni 15 s.',
   'entities.itemSets.emberscreed.name': 'Vesti del Credo delle Braci',
   'entities.itemSets.forgewall.bonus2':
-    'Risolutezza Ferrea converte la rabbia in 5 assorbimento per punto invece di 4.',
+    'Lo scudo di Risolutezza Ferrea assorbe il 25% della tua salute massima invece del 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Lanciare Spacca-scudo riduce di 2 s il tempo di recupero rimanente di Risolutezza Ferrea.',
   'entities.itemSets.forgewall.name': 'Egida della Muraglia della Forgia',
@@ -18520,10 +18566,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'I colpi all’unisono del Comando della Mietitura infliggono il 25 percento di danni in più.',
   'entities.itemSets.gravebrand.name': 'Regalia del Marchio Sepolcrale',
-  'entities.itemSets.grovespring.bonus2':
-    'Cura Rapida consuma prima la tua Fioritura Selvatica o Seconda Fioritura e cura il 25 percento in più. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.grovespring.bonus4':
-    'Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Rigoglio.',
+    'Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Verzura.',
   'entities.itemSets.grovespring.name': 'Paramento Grovespring',
   'entities.itemSets.hexthread.bonus2':
     'Ago del Destino concede 2 Condanne aggiuntive. I danni subiti non ritardano più il lancio degli incantesimi.',
@@ -19715,7 +19759,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Una vittoria classificata paga Onore, la valuta giocatore contro giocatore, e anche una sconfitta giocata fino alla fine paga una parte minore, così la valutazione è l’unico vero costo della sconfitta. L’Onore serve a ricompensare partite reali: battere di nuovo lo stesso avversario o la stessa squadra nello stesso giorno non paga altro, e nemmeno perdere di nuovo contro di loro; una lunga giornata di vittorie paga per intero la prima serie, poi dimezza la ricompensa, la dimezza ancora più avanti e resta a quel livello, mentre una partita abbandonata dall’avversario muove comunque la valutazione ma non paga Onore. Il giorno è quello del reame: ricomincia all’ora del reset notturno, lo stesso confine in cui si azzerano tutti i blocchi giornalieri.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra.',
+    "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra. Un'eccezione funziona ovunque: due pezzi di uno qualsiasi di questi set fanno anche sì che i danni subiti non ritardino più il lancio degli incantesimi.",
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'È questo lo scambio voluto. L’equipaggiamento da Guerra serve a combattere i giocatori, non a saltare i livelli dei dungeon: un pezzo da Guerra non porta mai le valutazioni di combattimento che avrebbe un epico da dungeon nello stesso slot, e la valutazione da Guerra e i bonus del completo che porta sono spesi interamente contro altri giocatori. Se vuoi reggere nell’arena, compralo. Se vuoi superare più velocemente le modalità eroiche, guadagna l’equipaggiamento nei dungeon.',
   'guide.controls.harvestJournal': 'Diario del Raccolto',
@@ -19814,7 +19858,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'L’economia delle collezioni d’incursione ruota attorno a nuclei, essenze e braci. Le ricette richiedono materiali ottenuti da boss, spedizioni e raccolta, con pezzi commerciabili finché non vengono perfezionati.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Alcuni oggetti portano un nome. Le righe della provenienza di un materiale indicano chi ha raccolto ogni gruppo di unità, mentre un marchio separato firmato da identifica l’eventuale firmatario premium. I due fatti sono indipendenti: un materiale raccolto normalmente registra il raccoglitore senza ottenere una firma, mentre una scorta firmata ereditata può indicare il firmatario dichiarando onestamente che non è stato registrato alcun raccoglitore. Un pezzo finito indica invece chi lo ha fabbricato. Questi dati viaggiano con l’oggetto attraverso scambi, banca, posta, Mercato Globale e perfino il riacquisto dal venditore, senza mai svanire.\n\nLa raccolta firma automaticamente il lavoro migliore: ogni raccolto che ottiene raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intero bottino di cinque unità. Un raccolto da cadavere con tiro fortunato firma la resa quando la famiglia non ha un esemplare da offrire; quando ce l’ha, mantiene la resa normale e crea accanto l’esemplare intatto firmato. L’artigianato firma allo stesso modo: ogni copia di un’uscita rara o superiore crea una copia firmata, e un capolavoro firma sempre qualunque sia la sua qualità, così la versione migliore di ogni pezzo indica sempre il suo creatore. La firma di un materiale ordinario viaggia con le unità e non si perde solo perché una pila compatibile contiene già un altro raccoglitore o firmatario. Un esemplare intatto distinto è un oggetto separato e richiede spazio; se non può entrare, la resa ordinaria del cadavere resta ma l’esemplare viene perso.\n\nGli oggetti finiti mantengono un’identità rigida, quindi due copie si fondono solo quando ogni marchio coincide esattamente: stesso oggetto, stesso firmatario, stesse statistiche del capolavoro, stesso incantamento e stesso vincolo. I materiali compatibili condividono uno slot fra raccoglitori e firmatari, mantenendo però un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; fai clic destro sulla pila per l’elenco completo (su touch, usa il suo pulsante Fonti). Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.\n\nLe firme ricompensano gli artigiani: tenere al banco una copia firmata di un reagente necessario, da chiunque sia stata firmata, aggiunge 2 punti percentuali alla probabilità di capolavoro; tenere un reagente firmato da te riduce di uno la quantità richiesta di quel reagente, mai sotto uno, salvo che il reagente sia marcato come non scontabile; i nuclei da incursione mantengono sempre il costo pieno. Il tuo lavoro raro o superiore firmato continua persino a insegnarti, oggi solo tramite le pozioni fabbricate: bevi una bevanda rara che hai preparato e firmato e un piccolo rivolo di competenza torna alla professione che l’ha creata, purché sia una delle tue professioni principali attive. Vale davvero solo per il ramo delle pozioni: un elisir, una pergamena o una fiasca d’apice non ti insegna nulla, per quanto finemente sia stata firmata.',
+    'Alcuni oggetti portano un nome. Le righe della provenienza di un materiale indicano chi ha raccolto ogni gruppo di unità, mentre un marchio separato firmato da identifica l’eventuale firmatario premium. I due fatti sono indipendenti: un materiale raccolto normalmente registra il raccoglitore senza ottenere una firma, mentre una scorta firmata ereditata può indicare il firmatario dichiarando onestamente che non è stato registrato alcun raccoglitore. Un pezzo finito indica invece chi lo ha fabbricato. Questi dati viaggiano con l’oggetto attraverso scambi, banca, posta, Mercato Globale e perfino il riacquisto dal venditore, senza mai svanire.\n\nLa raccolta firma automaticamente il lavoro migliore: ogni raccolto che ottiene raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intero bottino di cinque unità. Un raccolto da cadavere con tiro fortunato firma la resa quando la famiglia non ha un esemplare da offrire; quando ce l’ha, mantiene la resa normale e crea accanto l’esemplare intatto firmato. L’artigianato firma allo stesso modo: ogni copia di un’uscita rara o superiore crea una copia firmata, e un capolavoro firma sempre qualunque sia la sua qualità, così la versione migliore di ogni pezzo indica sempre il suo creatore. La firma di un materiale ordinario viaggia con le unità e non si perde solo perché una pila compatibile contiene già un altro raccoglitore o firmatario. Un esemplare intatto distinto è un oggetto separato e richiede spazio; se non può entrare, la resa ordinaria del cadavere resta ma l’esemplare viene perso.\n\nGli oggetti finiti mantengono un’identità rigida, quindi due copie si fondono solo quando ogni marchio coincide esattamente: stesso oggetto, stesso firmatario, stesse statistiche del capolavoro, stesso incantamento e stesso vincolo. I materiali compatibili condividono uno slot fra raccoglitori e firmatari, mantenendo però un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; fai clic destro sulla pila per l’elenco completo (su touch, usa il suo pulsante Fonti). Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.\n\nLe firme ricompensano gli artigiani: possedere una copia firmata di un reagente necessario, da chiunque sia stata firmata, nelle borse o nel Caveau dei Materiali dove la lavorazione può attingervi, aggiunge 2 punti percentuali alla probabilità di capolavoro; tenere un reagente firmato da te riduce di uno la quantità richiesta di quel reagente, mai sotto uno, salvo che il reagente sia marcato come non scontabile; i nuclei da incursione mantengono sempre il costo pieno. Il tuo lavoro raro o superiore firmato continua persino a insegnarti, oggi solo tramite le pozioni fabbricate: bevi una bevanda rara che hai preparato e firmato e un piccolo rivolo di competenza torna alla professione che l’ha creata, purché sia una delle tue professioni principali attive. Vale davvero solo per il ramo delle pozioni: un elisir, una pergamena o una fiasca d’apice non ti insegna nulla, per quanto finemente sia stata firmata.',
   'guide.profPages.effectFeast':
     'Prepara un banchetto da cui gli altri possono mangiare, una porzione ciascuno: {servings} porzioni, per {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -20198,4 +20242,250 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Effettive: {effective} | Sovracura: {overheal} ({overhealPercent}) | Colpi: {hits} ({critPercent} crit.)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Colpi: {hits} | Critici: {crits} ({critPercent}) | Media: {average} | Min/max: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Volume ambiente',
+  'hudChrome.mapAtlas.resizeRailAria': 'Larghezza della barra laterale della mappa',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Trascina per ridimensionare la barra laterale della mappa. Fai doppio clic per reimpostare.',
+  'guide.worldPvpPage.hillBodyFlat':
+    "Ogni tre ore, in un momento imprevedibile, tutto il reame viene avvisato che tra quindici minuti apparirà una collina in una delle zone di combattimento libero, e il suo cerchio viene segnato su terreno aperto. Rimane per quarantacinque minuti, poi scompare. Nel frattempo, ogni cinque minuti vengono annunciate la posizione e le classifiche dei gruppi con il maggior tempo totale di controllo. Il gruppo con più giocatori nel cerchio contende la collina e la conquista dopo trenta secondi complessivi di superiorità numerica. L'arrivo di un gruppo rivale mette solo in pausa il conteggio finché il tuo gruppo non torna in vantaggio; il conteggio riparte da zero solo se nel cerchio non resta alcun membro vivo del tuo gruppo. Un giocatore solo conta come un gruppo di una persona e conserva la collina quando forma un gruppo, ma i membri delle incursioni non contano affatto. Ogni membro del gruppo che controlla la collina e si trova nel cerchio riceve la stessa quantità di Onore ogni minuto, indipendentemente dalla durata del controllo. Un gruppo completo che la tiene indisturbato per tutta la sua durata guadagna circa quanto tre vittorie nei campi di battaglia. Quando scompare, se il gruppo con il maggior controllo totale ha accumulato almeno dieci minuti, chiunque sia rimasto nel cerchio almeno un minuto durante il controllo di quel gruppo e ne faccia ancora parte ottiene una vittoria per la riga PvP del Forziere Settimanale. Una barra sopra il campo mostra chi la controlla, i giocatori dei due schieramenti e il conteggio di conquista; /hill in chat indica dove si trova.",
+  'errors.noUpdateFound': 'Nessun aggiornamento trovato. Riprova tra poco.',
+  'errors.searchUpdates': 'Cerca aggiornamenti',
+  'errors.updateSearchFailed': 'Impossibile verificare gli aggiornamenti. Riprova.',
+  'errors.updateUnavailable': 'Aggiorna dal tuo negozio di giochi o scarica il client più recente.',
+  'hudChrome.auraEffect.formSporemender':
+    'Forma di Curatore delle Spore: cure aumentate del {pct}%, armatura aumentata del {armorPct}% e velocità di movimento ridotta del {slowPct}%',
+  'hudChrome.bags.reorderLocked':
+    'Gli oggetti bloccati restano nel loro scomparto. Sbloccali per spostarli.',
+  'hudChrome.death.pvpResurrect': 'Resurrezione PvP',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Resurrezione PvP pronta: risorgerai al cimitero più vicino.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Risorgi al cimitero più vicino con salute piena, senza un nuovo Tributo del Custode.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Resurrezione PvP ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Potrai risorgere in PvP tra {seconds}: risorgerai al cimitero più vicino.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Cambio di difficoltà in attesa annullato perché il gruppo o il capogruppo è cambiato.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Cambio di difficoltà in attesa perché qualcuno o il suo cadavere è ancora dentro. Verrà applicato quando le istanze saranno vuote.',
+  'hudChrome.ferry.arrivesIn': 'Il traghetto arriva tra {time}',
+  'hudChrome.ferry.boardNow': 'Sali ora',
+  'hudChrome.ferry.destination': 'Destinazione: {dest}',
+  'hudChrome.ferry.portLabel': 'Traghetto da {port} a {dest}',
+  'hudChrome.ferry.portTitle': 'Imbarcadero di {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Orari del traghetto non disponibili.',
+  'hudChrome.graphicsRestore.note': 'Ripristino della grafica',
+  'hudChrome.hill.contestOtherPaused': 'Rivale in pausa: {seconds} su {total}',
+  'hudChrome.hill.contestYouPaused': 'In pausa: {seconds} su {total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Preso da {name}',
+  'hudChrome.keybindLayout.apply': 'Converti scorciatoie',
+  'hudChrome.keybindLayout.converted': 'Scorciatoie convertite da {from} a {to}.',
+  'hudChrome.keybindLayout.from': 'Scorciatoie create per',
+  'hudChrome.keybindLayout.help':
+    'Ogni scorciatoia passa al tasto che scrive lo stesso carattere nella nuova disposizione. La fila dei numeri resta al suo posto. I nomi in questo elenco indicano posizioni QWERTY; la panoramica della tastiera mostra la tua disposizione.',
+  'hudChrome.keybindLayout.keepMovement': 'Mantieni fermi i tasti di movimento',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    "I tasti di movimento sono rimasti fermi l'ultima volta, quindi resteranno fermi anche stavolta. Ripristina i valori predefiniti per ricominciare.",
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (belga)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (francese)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Disposizione Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Disposizione Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (brasiliana ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (danese)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (spagnola)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (italiana)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (norvegese)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (svedese, finlandese)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (portoghese)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (turca)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Regno Unito)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Stati Uniti)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (svizzera)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (tedesca)',
+  'hudChrome.keybindLayout.moves': 'Scorciatoie che si sposteranno: {count}',
+  'hudChrome.keybindLayout.noChange': 'Nessuna scorciatoia cambia tra queste disposizioni.',
+  'hudChrome.keybindLayout.open': 'Converti',
+  'hudChrome.keybindLayout.title': 'Disposizione della tastiera',
+  'hudChrome.keybindLayout.to': 'Converti in',
+  'hudChrome.nameplate.bountyTag': 'Taglia',
+  'hudChrome.options.classicCombatText': 'Testo di combattimento classico',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Gli oggetti sotto questa qualità si vendono con un clic. Puoi ricomprare quelli venduti per errore, tranne gli oggetti grigi non firmati.',
+  'hudChrome.options.spellEffects': 'Effetti degli incantesimi',
+  'hudChrome.options.spellTooltipOnHover': 'Descrizioni degli incantesimi al passaggio del cursore',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.realmMotd.cleared': 'Messaggio del giorno cancellato.',
+  'hudChrome.realmMotd.line': 'Messaggio del giorno: {text}',
+  'hudChrome.realmMotd.none': 'Nessun messaggio del giorno impostato.',
+  'hudChrome.realmMotd.saveFailed':
+    'Impossibile salvare il messaggio del giorno: andrà perso al riavvio.',
+  'hudChrome.realmMotd.tooLong': 'Il messaggio del giorno è limitato a {max} caratteri.',
+  'hudChrome.realmMotd.updated': 'Messaggio del giorno aggiornato.',
+  'hudChrome.realmMotd.usage':
+    'Uso: /motd "<messaggio>" per impostarlo, /motd clear per cancellarlo.',
+  'hudChrome.skullBag.clickOpen': 'Fai clic per aprire',
+  'hudChrome.skullBag.close': 'Chiudi la Sacca dei Teschi',
+  'hudChrome.skullBag.empty':
+    'Vuota. Finché porti la sacca, i teschi raccolti vi entrano direttamente.',
+  'hudChrome.skullBag.notCarried':
+    'Tieni la Sacca dei Teschi nelle borse per depositare o prelevare teschi.',
+  'hudChrome.skullBag.store': 'Deposita i teschi trasportati ({count})',
+  'hudChrome.skullBag.storeNone': 'Nessun teschio da depositare',
+  'hudChrome.skullBag.takeAll': 'Preleva tutti',
+  'hudChrome.skullBag.takeAllAria': 'Preleva tutti: {item}',
+  'hudChrome.skullBag.takeOne': 'Preleva 1',
+  'hudChrome.skullBag.takeOneAria': 'Preleva 1: {item}',
+  'hudChrome.skullBag.title': 'Sacca dei Teschi',
+  'hudChrome.skullBag.tooltip':
+    'Contiene un numero illimitato di Teschi Trofeo senza occupare spazio nelle borse. Finché è nelle borse, i teschi raccolti vi entrano direttamente. Fai clic sulla sacca per depositare o prelevare teschi.',
+  'hudChrome.skullBag.total': 'Teschi: {count}',
+  'hudChrome.skullBag.unrecorded': 'Teschio Trofeo',
+  'hudChrome.treasureMap.inkPickerCancel': 'Annulla',
+  'hudChrome.treasureMap.inkPickerCost': 'Ridisegna in {rarity}: {inks} inchiostro',
+  'hudChrome.treasureMap.inkPickerHeld': 'Possiedi {held} di Inchiostro del Cartografo.',
+  'hudChrome.treasureMap.inkPickerRead': 'In corso: la sua X è in {zone}. La X resta ferma.',
+  'hudChrome.treasureMap.inkPickerTitle': "Su quale mappa vuoi usare l'Inchiostro del Cartografo?",
+  'hudChrome.treasureMap.inkPickerUnread': 'Non letta ({count} possedute)',
+  'hudChrome.warfare.reasons.worldQuest': 'missione mondiale',
+  'hudChrome.warfareShop.goods': 'Merci',
+  'hudChrome.weeklyRewards.allClassGear': 'Equipaggiamento di tutte le classi',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} vittorie PvP',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} vittoria PvP',
+  'hudChrome.weeklyRewards.lootFocus': 'Preferenza del bottino',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Vale solo per i forzieri non ancora aperti.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot': "Nessun bottino idoneo. Scegli un'altra preferenza.",
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Ottieni {count} vittorie PvP',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Ottieni {count} vittoria PvP',
+  'hudChrome.weeklyRewards.rolledFocus': 'Estratto per: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Serie PvP attuale: {time} di gioco (in pausa in un santuario)',
+  'hudChrome.worldPvp.rewardPausedDead':
+    'Serie PvP attuale: {time} di gioco (in pausa durante la morte)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Serie PvP attuale: {time} di gioco (in pausa nelle istanze PvE)',
+  'hudChrome.worldPvp.rewardProgress': 'Serie PvP attuale: {time} di gioco',
+  'hudChrome.worldPvp.rewardTitles':
+    'Ottieni titoli permanenti dopo {thresholds} di gioco con PvP mondiale attivo nel mondo aperto o nelle istanze PvP. Disconnessione, morte, istanze PvE e santuari sospendono il timer. Disattivarlo lo azzera.',
+  'hudChrome.worldPvp.skullName': 'Teschio di {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    "Se siete entrambi contrassegnati, l'oro del colpo mortale cade sul corpo insieme al teschio dello sconfitto.",
+  'itemUi.vendor.sellJunkNoBuyback':
+    "Gli oggetti grigi non firmati non compaiono nell'elenco di riacquisto: venderli è irreversibile.",
+  'questUi.logs.worldQuestRewardMailed':
+    'Le borse sono piene. La ricompensa è stata inviata alla tua casella postale: {items}.',
+  'entities.abilities.natures_boon.description':
+    "I tuoi incantesimi possono attivare Favore della Natura per 10 s: l'incantesimo indicato diventa gratuito, più potente del 25% e utilizzabile in ogni forma. Una nuova attivazione rinnova la durata.",
+  'entities.abilities.natures_boon.name': 'Favore della Natura',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Ogni Dardo Silvano o Caduta Celeste che lanci ha il 10% di probabilità di attivarlo per Esplosione di Spore, al massimo una volta ogni 10 s.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Ogni attacco automatico in mischia riuscito ha 1 probabilità su 15 di attivarlo per Cura delle Spore, o per Scorza di Quercia in Forma di Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Ogni impulso dei tuoi effetti di cura periodica ha il 10% di probabilità di attivarlo per Esplosione di Spore, al massimo una volta ogni 10 s.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Consuma i tuoi 5 punti di Verzura: ogni alleato con i tuoi effetti di cura periodica riceve subito il {buff}% delle cure rimanenti, gli effetti vengono rimossi e il bersaglio riceve una nuova Cura delle Spore.',
+  'entities.abilities.play_dead.description':
+    "Cadi a terra e fingiti morto: la tua salute e la tua concentrazione risultano vuote per tutti. I nemici si dimenticano di te, e i giocatori nemici che ti hanno come bersaglio lo perdono. Muoverti, attaccare o usare un'altra abilità lo interrompe. Se lo lanci mentre ti muovi, hai 1 s per fermarti prima che il movimento lo interrompa. Lancialo di nuovo per rialzarti.",
+  'entities.abilities.play_dead.name': 'Fingere la morte',
+  'entities.abilities.rejuvenation.name': 'Cura delle Spore',
+  'entities.abilities.scratch.description':
+    "Graffia i bersagli vicini entro 6 m, infliggendo danni dell'arma più {damage}. Fornisce 1 punto combo per bersaglio colpito. Rivela i nemici furtivi nell'area spazzata. Solo in Forma Felina.",
+  'entities.abilities.scratch.name': 'Graffio',
+  'entities.abilities.scratch.specNote_feral':
+    'Ogni colpo riuscito aggiunge 1 Sangue Antico (massimo 3).',
+  'entities.abilities.spore_burst.description':
+    'Evoca un fungo esplosivo nella zona bersaglio. Dopo {duration} s esplode, curando gli alleati di {healing} e infliggendo {damage} danni da Natura ai nemici entro 8 m.',
+  'entities.abilities.spore_burst.name': 'Esplosione di Spore',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Con 3 di Marea Lunare è più potente del 25% e consuma la tua Marea Lunare.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Applica anche Cura delle Spore a ogni alleato curato. Con Verzura pieno è più potente del 25% e consuma il tuo Verzura.',
+  'entities.abilities.sporemender_form.description':
+    'Assumi la forma di un Curatore delle Spore: cure aumentate del 20% e armatura del 40%, ma velocità di movimento ridotta del 20%. Tutti gli incantesimi della forma da incantatore restano disponibili. Dura finché non cambi forma. Ogni trasformazione fornisce Passo leggero, un breve aumento di velocità. Usa di nuovo per tornare alla forma da incantatore. (Tratto distintivo di Ripristino)',
+  'entities.abilities.sporemender_form.name': 'Forma di Curatore delle Spore',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Consuma una cura periodica su un bersaglio amico per curarlo di {damage}. Le applicazioni di Cura delle Spore e Seconda Fioritura aggiungono Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura subito ogni alleato con le tue cure periodiche del 60% delle cure rimanenti. (Tratto distintivo di Ripristino)',
+  'entities.abilities.tactical_camo.description':
+    "Confonditi con l'ambiente: i nemici ti notano appena e ti muovi all'80% della velocità. Attaccare o subire danni interrompe Mimetismo Tattico. Usa di nuovo per uscire. (Sopravvivenza)",
+  'entities.abilities.tactical_camo.name': 'Mimetismo Tattico',
+  'entities.itemSets.grovespring.bonus2':
+    'Rapidità di Guarigione consuma prima la tua Cura delle Spore o Seconda Fioritura e cura il 25 per cento in più. I danni subiti non ritardano più il lancio degli incantesimi.',
+  'entities.items.pvp_skull_bag.name': 'Sacca dei Teschi',
+  'entities.items.pvp_trophy_skull.name': 'Teschio Trofeo',
+  'entities.letters.world_quest_reward.body':
+    "Le tue borse erano piene quando hai ottenuto questa ricompensa di missione mondiale, perciò i corvi l'hanno portata qui. Fai spazio e ritirala da qualsiasi pilastro dei corvi.\n\n- La Posta dei Corvi",
+  'entities.letters.world_quest_reward.sender': 'La Posta dei Corvi',
+  'entities.letters.world_quest_reward.subject': 'La tua ricompensa di missione mondiale',
+  'guide.classPage.formLine.form_sporemender':
+    'La forma curativa di Ripristino: pelle più resistente e cure più potenti a passo più lento, mantenendo tutti gli incantesimi e il mana.',
+  'guide.classPage.formName.form_sporemender': 'Forma di Curatore delle Spore',
+  'guide.economy.junkBodyFinal':
+    "Il bottino inutile si vende ancora a qualsiasi mercante con un negozio proprio: svuota le borse quando passi in città. La finestra del mercante ha anche un pulsante Vendi cianfrusaglie che vende tutti gli oggetti di qualità Scadente con un clic. Puoi anche gettare gli oggetti senza valore per fare spazio. Gli oggetti grigi non firmati venduti così non compaiono nell'elenco di riacquisto: controlla prima se volevi conservarne qualcuno.",
+  'guide.models.formSporemender': 'Forma di Curatore delle Spore',
+  'guide.settingsPage.ifClassicCombatText':
+    'Ripristina i semplici numeri di danno bianchi e oro pallido che salgono dritti. Lascia disattivato (impostazione predefinita) per numeri più marcati che si aprono sui lati, con bagliori per i colpi critici e insolitamente grandi.',
+  'guide.settingsPage.rowSpellEffects':
+    "Bagliori, scintille, proiettili ed esplosioni d'impatto degli incantesimi dei giocatori e dei loro famigli, inclusi i tuoi. Disattiva per uno schermo più tranquillo o qualche fotogramma in più nei grandi scontri di gruppo. Tutti gli incantesimi nemici restano visibili, come gli anelli di pericolo, i simboli sui bersagli storditi, impauriti o immobilizzati e ogni barra di lancio.",
+  'questUi.dialog.attuneHearthstone': 'Vincola qui la mia Pietra del Ritorno Alleata.',
+  'questUi.dialog.attuneHearthstoneAria':
+    'Vincola la tua Pietra del Ritorno Alleata a {hub} con {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'La tua Pietra del Ritorno Alleata non è vincolata. Parla con un quartiermastro alleato o usala in un centro alleato.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'La tua Pietra del Ritorno Alleata è ora vincolata a {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'La pietra del ritorno ti trasporta a {hub}.',
+  'hudChrome.factionRewards.itemCooldown':
+    "L'oggetto non è ancora pronto ({minutes} min rimanenti).",
+  'hudChrome.weekly.completedLastWeek': 'Completato la scorsa settimana',
+  'hudChrome.weekly.claimFirst': 'Riscatta prima',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} di reputazione della scorsa settimana ancora da riscuotere. Riscuotila per scegliere una nuova carica.',
+  'hudChrome.options.rawMouseInput': 'Input diretto del mouse',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Legge il movimento direttamente dal mouse mentre trascini per ruotare la visuale, ignorando la velocità e l’accelerazione del puntatore di sistema per una rotazione più stabile. Disattiva questa opzione per usare le impostazioni del mouse di sistema. Funziona solo con Blocca cursore durante la rotazione attivo e non è compatibile con tutti i browser o sistemi.',
+  'entities.items.infernal_quiver.name': 'Faretra infernale',
+  'graphicsPrompt.title': 'Scegli la grafica',
+  'graphicsPrompt.intro':
+    'Scegli una preimpostazione grafica per questo dispositivo. Quelle più basse offrono maggiore fluidità; quelle più alte, una grafica più ricca.',
+  'graphicsPrompt.autoDesc':
+    'Sceglie una preimpostazione adatta a questo dispositivo. Rilevata: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'La massima fluidità. Ideale per telefoni, tablet e sistemi grafici meno recenti o integrati.',
+  'graphicsPrompt.mediumDesc':
+    'Un equilibrio tra qualità visiva e prestazioni. Adatta alla maggior parte dei portatili.',
+  'graphicsPrompt.highDesc':
+    'Più dettagli e scenari più ricchi. Adatta a una scheda grafica dedicata.',
+  'graphicsPrompt.ultraDesc':
+    'La preimpostazione fissa visivamente più ricca. Adatta a una scheda grafica di fascia alta.',
+  'graphicsPrompt.changeLater':
+    'Puoi modificare questa scelta in qualsiasi momento in Opzioni, sotto Qualità grafica.',
+  'graphicsPrompt.confirm': 'Continua',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Trappola per Orsi',
+  'entities.abilities.bear_trap.description':
+    'Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min; solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva sanguina per {damage} danni fisici in 15 s ed è rallentato del 50% per 4 s. I danni aumentano con la Potenza d’Attacco a Distanza. Può essere attiva una sola Trappola per Orsi alla volta. Può coesistere con la tua Trappola Fauci di Gelo. Piazzare un’altra Trappola per Orsi sostituisce la precedente.',
+  'entities.abilities.scatterbolt.name': 'Ventaglio di Dardi',
+  'entities.abilities.scatterbolt.description':
+    'Spara una raffica di dardi in un cono di 90 gradi che si estende per 8 metri davanti a te, respingendo i nemici fino a una distanza massima di 20 metri da te. I nemici immuni alle respinte non subiscono effetti. Non infligge danni.',
+  'entities.abilities.phosphor_flask.name': 'Fiasca di Fosforo',
+  'entities.abilities.phosphor_flask.description':
+    "Un recipiente sigillato contenente una miscela chimica reattiva che esplode in fiamme incandescenti su un'area di 8 m per 3 s. I nemici che restano tra le fiamme subiscono {damage} danni da Fuoco ogni 0,5 s. Il danno aumenta con la potenza d'attacco a distanza.",
+  'entities.items.lychgate_buckler.name': 'Brocchiere del cancello del cimitero',
+  'entities.items.bastion_kite_shield.name': 'Scudo a goccia del bastione',
+  'entities.items.barrowfield_tower_shield.name': 'Scudo torre del Campo dei Tumuli',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barra delle risorse',
+  'hudChrome.options.hillBarOpacity': 'Opacità dello sfondo del Re della Collina',
+  'hudChrome.options.playerFrameResourceDetached': 'Separa barra delle risorse',
+  'hudChrome.options.playerFrameResourceHeight': 'Altezza della barra delle risorse',
+  'hudChrome.options.playerFrameResourceWidth': 'Larghezza della barra delle risorse',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Attiva Separa barra delle risorse nella scheda Riquadri: Modifica riquadri sbloccherà anche la barra delle risorse, permettendoti di posizionare mana, energia o rabbia separatamente dove preferisci. Larghezza della barra delle risorse e Altezza della barra delle risorse, nella stessa scheda, ne regolano le dimensioni. Modifica riquadri sblocca anche la barra del Re della Collina; Opacità dello sfondo del Re della Collina, nella stessa scheda, attenua il pannello mantenendo il testo ben leggibile.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

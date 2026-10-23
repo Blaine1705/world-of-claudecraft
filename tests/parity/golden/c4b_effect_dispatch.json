@@ -4908,7 +4908,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1023,
-      "state": "52c6678e",
+      "state": "5a312e66",
       "events": "14dd5408",
       "rng": {
         "draws": 893,
@@ -6179,11 +6179,11 @@
           "aiState": "chase",
           "auras": [
             {
-              "duration": 3,
+              "duration": 4,
               "id": "kidney_shot_stun",
               "kind": "stun",
               "name": "Low Blow",
-              "remaining": 3,
+              "remaining": 4,
               "school": "physical",
               "sourceId": 1013
             }
@@ -6245,7 +6245,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1024,
-      "state": "cec2ddd9",
+      "state": "a671db99",
       "events": "8ac9adea",
       "rng": {
         "draws": 894,
@@ -7553,11 +7553,11 @@
           "aiState": "chase",
           "auras": [
             {
-              "duration": 3,
+              "duration": 4,
               "id": "kidney_shot_stun",
               "kind": "stun",
               "name": "Low Blow",
-              "remaining": 3,
+              "remaining": 4,
               "school": "physical",
               "sourceId": 1013
             }
@@ -7670,7 +7670,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1025,
-      "state": "e3922014",
+      "state": "d6c2e5f4",
       "events": "3d306f29",
       "rng": {
         "draws": 894,
@@ -9008,11 +9008,11 @@
           "aiState": "chase",
           "auras": [
             {
-              "duration": 3,
+              "duration": 4,
               "id": "kidney_shot_stun",
               "kind": "stun",
               "name": "Low Blow",
-              "remaining": 3,
+              "remaining": 4,
               "school": "physical",
               "sourceId": 1013
             }
@@ -9166,8 +9166,8 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1025,
-      "state": "7978dd1d",
-      "events": "92c86cab",
+      "state": "209bf013",
+      "events": "2e6e1c1f",
       "rng": {
         "draws": 894,
         "digest": "56ec9ce1"
@@ -10147,7 +10147,7 @@
               "duration": 12,
               "id": "rejuvenation",
               "kind": "hot",
-              "name": "Wildbloom",
+              "name": "Sporemending",
               "remaining": 12,
               "school": "nature",
               "sourceId": 1015,
@@ -10506,11 +10506,11 @@
           "aiState": "chase",
           "auras": [
             {
-              "duration": 3,
+              "duration": 4,
               "id": "kidney_shot_stun",
               "kind": "stun",
               "name": "Low Blow",
-              "remaining": 3,
+              "remaining": 4,
               "school": "physical",
               "sourceId": 1013
             }
@@ -10664,7 +10664,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1025,
-      "state": "7978dd1d",
+      "state": "209bf013",
       "events": "741638a5",
       "rng": {
         "draws": 894,
@@ -11645,7 +11645,7 @@
               "duration": 12,
               "id": "rejuvenation",
               "kind": "hot",
-              "name": "Wildbloom",
+              "name": "Sporemending",
               "remaining": 12,
               "school": "nature",
               "sourceId": 1015,
@@ -12004,11 +12004,11 @@
           "aiState": "chase",
           "auras": [
             {
-              "duration": 3,
+              "duration": 4,
               "id": "kidney_shot_stun",
               "kind": "stun",
               "name": "Low Blow",
-              "remaining": 3,
+              "remaining": 4,
               "school": "physical",
               "sourceId": 1013
             }

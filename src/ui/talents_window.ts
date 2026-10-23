@@ -28,7 +28,7 @@ import { rovingTarget } from './roving_index';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { talentBodyMaxHeight } from './talent_body_fit';
-import { roleLabel, tTalent } from './talent_i18n';
+import { roleLabel, specBaselineDescription, tTalent } from './talent_i18n';
 import {
   type TalentSpecIconRef,
   talentIconDataUrl,
@@ -260,6 +260,12 @@ export class TalentsWindow {
           `</div>`;
       }
       html += `<div class="ts-det-mastery"><b>${esc(masteryName)}</b> - ${esc(masteryDescription)}</div>`;
+      // The hidden per-spec power (stat floor plus output multipliers): without this
+      // line two specs on the same gear differ for no visible reason.
+      const baseline = specBaselineDescription(spec);
+      if (baseline) {
+        html += `<div class="ts-det-mastery ts-det-baseline"><b>${esc(t('hudChrome.specPanel.specBonus'))}</b> - ${esc(baseline)}</div>`;
+      }
       if (info?.examples.length) {
         html += `<div class="ts-ex-block"><div class="ts-det-label">${esc(t('hudChrome.specPanel.exampleAbilities'))}</div><div class="ts-ex-list">`;
         for (const id of info.examples) {
@@ -300,7 +306,11 @@ export class TalentsWindow {
       for (const exEl of Array.from(panel.querySelectorAll<HTMLElement>('.ts-ex'))) {
         const id = exEl.dataset.ability ?? '';
         exEl.setAttribute('aria-label', signatureName(id));
-        this.deps.attachTooltip(exEl, () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)));
+        this.deps.attachTooltip(
+          exEl,
+          () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)),
+          () => true,
+        );
       }
       // Every panel gets a View talents button: it commits the spec if needed and
       // jumps to the Choices tab. The selected spec's button reads as primary.

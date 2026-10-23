@@ -83,7 +83,13 @@ const SECOND_PASS_RECORD_SHA256 =
   // by hand again, never a JSON round trip. No capture or asset was retaken.
   // PR #3898 adds the four painted elixirs to the hotbar-eligible set, advancing
   // the sealed hotbarItems census 81 -> 85 without retaking any captures.
-  'd1cbf7c3318b57e56869206c2d4ae1edefa13fa8edc8338d88e5b601c1f123eb';
+  // Groveheart's Sporemender Form (sporemender_form) advances the live ability
+  // census 408 -> 409, two lines substituted by hand, no capture retaken.
+  // Spore Burst (spore_burst) and the Nature's Boon passive (natures_boon)
+  // advance it 409 -> 411 the same way.
+  // Fieldcraft's Play Dead and Tactical Camo advance it 411 -> 413 the same way.
+  // Bear Trap, Scatterbolt and Phosphor Flask advance it 413 -> 416.
+  'b37dc011f28aae2d7b47f537d2c95787127242ee8971bd78ebf5c95e0c124f3d';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -381,7 +387,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // the release arm's two new abilities riding the v0.40.0 sync merge.
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
-        abilities: { live: 408, painted: 408 },
+        abilities: { live: 416, painted: 416 },
         // 76 at the first v0.42.0 sync: the release's one new hotbar item, the
         // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
         // the census and ships committed painted art, so painted moves with
@@ -489,7 +495,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       liveAbilityIds.length,
     );
     // Integration 45 paints the four previously parked abilities.
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(412);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(420);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',
@@ -526,11 +532,11 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // Their own paintings now ship in referral-reward-icons-v045-2026-10-22,
     // plus reins_nightwing_chimera, so all 138 live hotbar items are painted; none remain parked.
     // Wobbles the Slime's reins ship committed art (a render of the mount): 139.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(140);
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(253);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(140);
+    ).toHaveLength(253);
     expect([...pendingHotbarItemIds].sort(), 'ITEM_ART_PENDING hotbar items').toEqual([]);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

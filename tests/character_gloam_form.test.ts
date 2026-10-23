@@ -14,6 +14,7 @@
 //  - every clone goes with the form, a re-skin and the rig.
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { spiritVeilPaletteOf } from '../src/render/characters/ghost_veil';
 import {
   GLOAM_CUE_ENTER,
   GLOAM_CUE_HIDDEN,
@@ -219,7 +220,7 @@ describe('CharacterVisual in Gloamveil', () => {
     held.settle();
     visual.update(1 / 60, idleState(), true, false);
     for (const material of mounted(visual)) {
-      expect(material.userData.wocCharacterEffect).toBe('spirit');
+      expect(spiritVeilPaletteOf(material)).toBe('spirit');
     }
     visual.dispose();
   });
@@ -261,9 +262,9 @@ describe('CharacterVisual in Gloamveil', () => {
     visual.setShadowform(true);
     const settled = mounted(visual);
     expect(settled.every((m) => inForm(m) && m.transparent)).toBe(true);
-    visual.setGhost(true, 'stealth');
+    visual.setGhost(true, 'stealth-rogue');
     const ghost = mounted(visual);
-    for (const material of ghost) expect(material.userData.wocCharacterEffect).toBe('stealth');
+    for (const material of ghost) expect(spiritVeilPaletteOf(material)).toBe('stealth-rogue');
     // The form's own clones are kept for the way back, not minted again.
     visual.setGhost(false);
     expect(mounted(visual)).toEqual(settled);
@@ -354,7 +355,7 @@ describe('CharacterVisual in Gloamveil', () => {
     visual.update(1 / 60, idleState(), true, false);
     visual.setShadowform(true);
     visual.gloamCue();
-    for (const style of ['stealth', 'spirit'] as const) {
+    for (const style of ['stealth-rogue', 'spirit'] as const) {
       visual.setGhost(true, style);
       expect(visual.gloamCue()).toBe(GLOAM_CUE_HIDDEN);
       visual.setGhost(false);

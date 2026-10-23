@@ -42,10 +42,11 @@ export class GuildHallWireState extends LanceWireState {
   override applyQuestSelfSnapshot(
     self: Parameters<LanceWireState['applyQuestSelfSnapshot']>[0] & { gcon?: unknown },
     simTime?: unknown,
-  ): void {
-    super.applyQuestSelfSnapshot(self, simTime);
+  ): boolean {
+    const changed = super.applyQuestSelfSnapshot(self, simTime);
     // delta key: absent keeps the mirror
     if (self.gcon !== undefined) this.guildContracts = decodeGuildContractsWire(self.gcon);
+    return changed;
   }
 
   override resetQuestWorldWireState(): void {

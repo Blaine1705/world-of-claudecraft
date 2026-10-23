@@ -1853,7 +1853,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     ],
     xpReward: 4300,
     copperReward: 2200,
-    itemRewards: {},
+    itemRewards: { warrior: 'barrowfield_tower_shield' },
     minLevel: 18,
   },
   q_revenant_vanguard: {

@@ -148,6 +148,28 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "pvp_trophy_skull",
+      "name": "Trophy Skull",
+      "sourcePack": "project-authored (derived composition)",
+      "sourceFile": "Authored SVG trophy mount (vignette, wooden heater plaque, brass studs, crimson ribbon) composed with Sharp around a mirrored, scaled, feathered crop of public/ui/items/restless_skull.webp by scripts/generate_pvp_trophy_skull_icon.mjs; deterministic, no image model at this step",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "reference": "public/ui/items/restless_skull.webp (batch quest-objective-dedupe-zone-quest-items-2026-08-04, OpenAI gpt-image-2)",
+      "referenceRole": "skull subject crop inside the new trophy composition",
+      "shippingSha256": "c6b0806f392d85e5a0c48276eb4b0564191731ab6daedc3225a675ec7c883010"
+    },
+    {
+      "itemId": "pvp_skull_bag",
+      "name": "Skull Bag",
+      "sourcePack": "project-authored (derived composition)",
+      "sourceFile": "public/ui/items/burlap_reagent_pouch.webp darkened and warmed toward oxblood, with a scaled, feathered crop of public/ui/items/restless_skull.webp stitched on its front under an authored SVG crimson cord, composed with Sharp by scripts/generate_pvp_skull_bag_icon.mjs; deterministic, no image model at this step",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "reference": "public/ui/items/burlap_reagent_pouch.webp (batch bank-storage-painted-bags-2026-08-25) and public/ui/items/restless_skull.webp (batch quest-objective-dedupe-zone-quest-items-2026-08-04, OpenAI gpt-image-2)",
+      "referenceRole": "the sack body and the skull subject inside the new composition",
+      "shippingSha256": "f60693fa6df2a68ac4e291cd0e550b364ad1f6ee027c00c14f58446792b735c6"
+    },
+    {
       "itemId": "game_meat",
       "name": "Game Meat",
       "sourcePack": "woc_professions_art",
@@ -8488,6 +8510,24 @@
         "reins_lantern_hall_destrier"
       ],
       "commonPrompt": "Not a text-to-image prompt: an EEVEE still of public/models/mounts/lantern_hall_destrier.glb (Idle, frame 0), composed at 512 and converted to 128px by npm run assets:items."
+    },
+    {
+      "batchId": "quest-shield-icons-2026-10-23",
+      "source": "OpenAI built-in image generation, one painting per item and one framing edit per painting",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Eastbrook Buckler, Kingsbane Last Oath and Linen Pouch, inspected as house-style anchors",
+      "commonPrompt": "Opaque dark painted ground, warm top-left light, complete centered shield silhouette with safe padding, tactile materials, no text or frame. Exact per-item prompts and framing edit retained in provenance.",
+      "provenanceRecord": "docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json",
+      "itemIds": [
+        "lychgate_buckler",
+        "bastion_kite_shield",
+        "barrowfield_tower_shield"
+      ]
     }
   ]
 }

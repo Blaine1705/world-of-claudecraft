@@ -52,10 +52,11 @@ export const WARFARE_SHOP_SET_ORDER: readonly string[] = [
   'warfare_cinderweave', // cloth, caster
 ];
 
-/** Section keys for the three non-set sections. Set sections key on their set id,
+/** Section keys for the non-set sections. Set sections key on their set id,
  *  so every key in one view is unique and safe to build a focus key from. */
 export const WARFARE_SHOP_JEWELRY_KEY = 'jewelry';
 export const WARFARE_SHOP_WEAPONS_KEY = 'weapons';
+export const WARFARE_SHOP_GOODS_KEY = 'goods';
 export const WARFARE_SHOP_SEASON2_WEAPONS_KEY = 'season2_weapons';
 /** Direct buddy unlocks (kind 'buddy'), currently Horse at both honor vendors. Its own section rather than the jewelry
  *  fallback: a companion is not gear, carries no slot and no stats, and must
@@ -130,7 +131,7 @@ export interface WarfareShopSetSection {
 }
 
 export interface WarfareShopPlainSection {
-  kind: 'jewelry' | 'weapons' | 'companions';
+  kind: 'jewelry' | 'weapons' | 'companions' | 'goods';
   group: WarfareShopGroup;
   key: string;
   offers: WarfareShopOffer[];
@@ -254,6 +255,7 @@ export function buildWarfareVendorView(
   const jewelry: WarfareShopOffer[] = [];
   const weapons: WarfareShopOffer[] = [];
   const seasonWeapons: WarfareShopOffer[] = [];
+  const goods: WarfareShopOffer[] = [];
   const companions: WarfareShopOffer[] = [];
   for (const itemId of stock) {
     const item = items[itemId];
@@ -274,6 +276,10 @@ export function buildWarfareVendorView(
       else bySet.set(item.set, [offer]);
     } else if (item.kind === 'weapon') {
       weapons.push(offer);
+    } else if (!item.slot) {
+      // Nothing to wear (the World PvP Skull Bag): its own Goods section, so
+      // it never reads as jewelry.
+      goods.push(offer);
     } else {
       // Neck and rings: shared across role profiles, so they carry no set tag
       // and the only coherent grouping left is "jewelry".
@@ -353,6 +359,9 @@ export function buildWarfareVendorView(
       key: WARFARE_SHOP_WEAPONS_KEY,
       offers: weapons,
     });
+  }
+  if (goods.length > 0) {
+    sections.push({ kind: 'goods', group: 'entry', key: WARFARE_SHOP_GOODS_KEY, offers: goods });
   }
   // Last: the cosmetic row never pushes a gear section down the window.
   if (companions.length > 0) {

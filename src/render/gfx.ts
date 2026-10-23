@@ -2024,6 +2024,16 @@ export function firstRunGraphicsPreset(defaultAlreadyApplied: boolean): number |
   return detected === PRESET_MEDIUM ? null : detected;
 }
 
+/**
+ * The preset Auto resolves to on this device right now: the same static probe
+ * firstRunGraphicsPreset classifies with (memoized GPU name, memory, cores, touch), never the
+ * FPS governor. UI copy only (the first-login graphics prompt names it on its Auto option); an
+ * inconclusive device reads MEDIUM, which is also what Auto leaves it on.
+ */
+export function detectedDefaultGraphicsPreset(): number {
+  return resolveDefaultGraphicsPreset(runtimeHints());
+}
+
 export function tierFromHints(hints: GfxRuntimeHints, softwareGl: boolean): GfxTier {
   const forced = forcedTierFromSearch(hints.search);
   if (forced) return forced;

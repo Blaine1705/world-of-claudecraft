@@ -19,7 +19,12 @@
 // would double-count completion.
 
 import { HOARD_BASE_ITEM_IDS } from './hoard_loot';
-import { FURY_STOCK, WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from './pvp_honor';
+import {
+  FURY_STOCK,
+  WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
+  WORLD_PVP_GOODS_STOCK,
+} from './pvp_honor';
 import { SEASON2_STOCK } from './pvp_honor_season2';
 import {
   RIFT_EPIC_ITEM_IDS,
@@ -27,6 +32,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from './rift/items';
+import { VAULT_MATERIAL_POOL } from './treasure_maps';
 
 /** Top-level shelf ids (Overview is virtual UI, not a catalog shelf row). */
 export type ReliquaryShelfId = 'conquerors' | 'professions' | 'horizons';
@@ -113,7 +119,9 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  * - buried_hoard: src/sim/treasure_vault.ts payOne rolls one piece off the fallen
  *   keeper's table (content/hoard_loot.ts rollHoardBossDrop) when an entrant
  *   opens the hoard's reward chest. The piece is never on the keeper's own mob
- *   loot, so a boss hint would name a door that does not hold it.
+ *   loot, so a boss hint would name a door that does not hold it. The same
+ *   chest always pays a stack of one corpse-harvest specimen (VAULT_MATERIAL_POOL,
+ *   content/treasure_maps.ts, rolled by src/sim/rift/hoard_reward_roll.ts).
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
@@ -511,6 +519,15 @@ export const RELIQUARY_HORIZON_TITLES = [
   'feat_guild_writ_runner',
   'feat_guild_hallsworn',
   'feat_guild_of_lantern_hall',
+  // The sixth lifetime-XP rung (10,000,000 lifetime experience): Titan
+  // pages here per the locked titles-page rule.
+  'prog_titan',
+  // World PvP streak titles page here per the locked titles-page rule.
+  'pvp_flag_1h',
+  'pvp_flag_3h',
+  'pvp_flag_6h',
+  'pvp_flag_24h',
+  'pvp_flag_168h',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
@@ -653,13 +670,22 @@ function withProfessions(
   ids: readonly string[],
   professionById: Readonly<Record<string, string>>,
   fallback: ReliquarySourceHint,
-): RelicEntry[] {
+): (readonly [string, ReliquarySourceHint])[] {
   return ids.map((id) => {
     // Own-property read, same reasoning as setMembers below.
     const professionId = Object.hasOwn(professionById, id) ? professionById[id] : undefined;
     if (professionId) return [id, fromProfession(professionId)] as const;
     return [id, fallback] as const;
   });
+}
+
+/** Adds the Buried Hoard door to a specimen the hoard chest also pays. */
+function withHoardMaterialHint(
+  entry: readonly [string, ReliquarySourceHint],
+): readonly [string, ReliquarySourceHints] {
+  const [id, hint] = entry;
+  if (!VAULT_MATERIAL_POOL.includes(id)) return entry;
+  return [id, [hint, fromActivity('buried_hoard')]] as const;
 }
 
 // Epic set members, pinned to the same id lists as col_set_* deeds in
@@ -903,8 +929,8 @@ export const RELIQUARY_HEROIC_GEAR = {
     'scepter_of_the_deathless_court',
     'stormcallers_focus',
   ],
-  // Crucible of the Last Spring: the heroic-only weapon, shield and trinket
-  // appends.
+  // Crucible of the Last Spring: the heroic-only weapon, shield, offhand,
+  // quiver and trinket appends.
   // The sigil redemption tokens that share both bosses' heroic tables are
   // NOT catalogued (kind 'tool'): they are per-slot redemption currency the
   // Crucible Quartermaster consumes, not unique spoils, the same carve-out
@@ -929,6 +955,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'staff_of_the_last_spring',
     'orb_of_the_last_spring',
     'cinder_of_the_first_design',
+    'infernal_quiver',
     // The raid trinkets (content/trinkets.ts), heroic exclusives here and
     // Normal off-set drops too, so also on the Normal page.
     'forgefathers_temper',
@@ -1056,11 +1083,12 @@ const WARFARE_VENDOR_HINTS = [fromVendor('fury'), fromVendor('warmarshal_draven_
 // the partition and both floors are pinned in tests/reliquary_content.test.ts.
 // The two honor trinkets (WARFARE_TRINKET_STOCK) are set-less honor purchases
 // from the same two counters, so they close the armory after the kit's
-// jewelry and weapons.
+// jewelry and weapons, followed by the World PvP goods (the Skull Bag).
 const WARFARE_GALLERY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
 const WARFARE_ARMORY_ITEM_IDS = [
   ...FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined),
   ...WARFARE_TRINKET_STOCK,
+  ...WORLD_PVP_GOODS_STOCK,
 ];
 // Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
 // two quartermasters: its 27 spec sets and four weapons fill one page, in stock
@@ -1707,8 +1735,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // SPECIMEN_PROFESSIONS). The five pristine specimens come from corpse
     // harvest, which no gathering profession owns, so they name the
     // corpse_harvest activity, the same answer gather_event:perfect_specimen
-    // gives (one write site, src/sim/interaction.ts, awards the mark and these
-    // five items together). The CRAFTED FISHING ROD LADDER closes the angler's
+    // gives (src/sim/interaction.ts awards the mark and these five items
+    // together). All five are also the Buried Hoard chest's material stack
+    // (VAULT_MATERIAL_POOL), so they name buried_hoard as a second door. The
+    // CRAFTED FISHING ROD LADDER closes the angler's
     // chase, and since masterwrought Phase 11i that ladder is three rungs, not
     // two. Engineering crafts all three at the toolworks (ROD_RECIPES in
     // content/recipes.ts), so every one of them names the craft. What differs
@@ -1735,7 +1765,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
         RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
         SPECIMEN_PROFESSIONS,
         fromActivity('corpse_harvest'),
-      ),
+      ).map(withHoardMaterialHint),
       [
         'stormreel_fishing_rod',
         [fromProfession('engineering'), fromVendor('brother_halven_marsh')],
@@ -1981,7 +2011,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_warfare_armory',
     shelf: 'conquerors',
     name: 'Warfare Armory',
-    desc: 'Warfare jewelry and weapons purchased with hard-won honor.',
+    desc: 'Warfare jewelry, weapons and goods purchased with hard-won honor.',
     clearSource: { kind: 'none' },
     relics: items(...WARFARE_ARMORY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },

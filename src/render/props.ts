@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
 import { isBuiltinShapedWorld } from '../sim/builtin_shaped_world';
@@ -27,7 +26,7 @@ import {
 import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { activeWorldHasAuthoredTown } from './authored_town_gate';
 import { attachBiomeHaze } from './biome_haze_field';
@@ -487,7 +486,7 @@ export const MUDFIN_HUT_PROP_KEYS: Readonly<Record<MudfinHutModel, PropKey>> = {
   b: 'mudfinHutB',
 };
 
-const loadedProps = new Map<string, GLTF>();
+const loadedProps = new Map<string, LoadedGltf>();
 const propLoadTasks = new Map<string, Promise<void>>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
 

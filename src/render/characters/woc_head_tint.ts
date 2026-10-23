@@ -567,7 +567,7 @@ vWocHmSlot = ${WOC_HEAD_MERGE_SLOT_ATTRIBUTE};`,
       .replace('void main() {', `${MERGED_FRAGMENT_DECL}${HELPER_FUNCTIONS}void main() {`)
       .replace(
         '#include <map_fragment>',
-        `${MERGED_MAP_GLSL}\n${switchedOff('USE_MAP', '#include <map_fragment>')}`,
+        `${(mat as THREE.MeshBasicMaterial).isMeshBasicMaterial ? MERGED_MAP_GLSL.replace('totalEmissiveRadiance += wocEmi.rgb;', '') : MERGED_MAP_GLSL}\n${switchedOff('USE_MAP', '#include <map_fragment>')}`,
       )
       .replace(
         '#include <emissivemap_fragment>',
@@ -584,6 +584,35 @@ vWocHmSlot = ${WOC_HEAD_MERGE_SLOT_ATTRIBUTE};`,
       );
   };
   mat.customProgramCacheKey = () => `woc_head_tint|merged|${prevKey}`;
+}
+
+/** A merged head's depth sibling must discard the same one-sided slots as
+ * its colour pass. Share the live slot table; no albedo or lit shader hook. */
+export function reapplyWocHeadDepthToClone(source: THREE.Material, depth: THREE.Material): void {
+  const u = mergedUniformsOf.get(source);
+  if (!u?.oneSided) return;
+  const previous = depth.onBeforeCompile;
+  const key = depth.customProgramCacheKey();
+  depth.onBeforeCompile = (shader, renderer) => {
+    previous.call(depth, shader, renderer);
+    shader.uniforms.uWocHmSurf = u.surf;
+    shader.vertexShader = shader.vertexShader
+      .replace('void main() {', `${MERGED_VERTEX_DECL}void main() {`)
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>\nvWocHmSlot = ${WOC_HEAD_MERGE_SLOT_ATTRIBUTE};`,
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        'void main() {',
+        `varying float vWocHmSlot;\nuniform vec4 uWocHmSurf[${N}];\nvoid main() {`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        '#include <map_fragment>\nif (uWocHmSurf[int(vWocHmSlot + 0.5)].y > 0.5 && !gl_FrontFacing) discard;',
+      );
+  };
+  depth.customProgramCacheKey = () => `woc_head_depth|${key}`;
 }
 
 /** One slot's surface as its own material would have drawn it. */

@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ru_RU: Record<string, string> = {
+  'moderationHistory.actionAnnounce': 'Объявление для мира',
+  'moderationHistory.actionGmInvisible': 'Стал невидимым',
+  'moderationHistory.actionGmVisible': 'Стал видимым',
+  'moderationHistory.actionUnwatch': 'Удалён из списка наблюдения',
+  'moderationHistory.actionWatch': 'Добавлен в список наблюдения',
   'error.flagActiveExists': 'у этого аккаунта уже есть открытый флаг такого типа',
   'wealth.largeMovementsUnavailable':
     'крупные банковские операции не удалось загрузить (истекло время ожидания при чтении бухгалтерской книги); разбивка по золоту выше приведена полностью',

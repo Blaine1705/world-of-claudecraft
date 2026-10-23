@@ -9,8 +9,8 @@
     "acceptQuest -> finalizeQuestAccept -> onInventoryChangedForQuests",
     "turnInQuest -> removeItem -> onInventoryChangedForQuests (xp + copper)"
   ],
-  "draws": 0,
-  "drawDigest": "811c9dc5",
+  "draws": 1,
+  "drawDigest": "73de7678",
   "frames": [
     {
       "tick": 0,
@@ -895,8 +895,8 @@
       "state": "14e393f0",
       "events": "4d1f4d7c",
       "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
+        "draws": 1,
+        "digest": "73de7678"
       },
       "label": "quest-turned-in",
       "players": [
@@ -1070,8 +1070,8 @@
       "state": "de37e7d0",
       "events": "741638a5",
       "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
+        "draws": 1,
+        "digest": "73de7678"
       },
       "label": "final",
       "players": [

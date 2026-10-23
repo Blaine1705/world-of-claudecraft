@@ -21,9 +21,57 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { courierSlotFingerprint, courierSummon, updateCourier } from '../src/sim/courier';
+import { savedMaterialSlot } from '../src/sim/material_slot_load';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
 describe('live courier server wiring', () => {
+  it('returns an over-budget mixed-maker trip once without mutating the bank or quarantining', () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 71, 'Mixedcourier');
+    const sim = server.sim;
+    const player = sim.entities.get(session.pid)!;
+    player.pos = sim.groundPos(0, 0);
+    sim.setMembership(session.pid, 60);
+    const meta = sim.meta(session.pid)!;
+    meta.inventory = Array.from({ length: 7 }, (_, stack) => ({
+      itemId: 'minor_healing_potion',
+      count: 18,
+      materialSources: Array.from({ length: 18 }, (_, maker) => ({
+        source: { signer: `Maker${String(stack * 18 + maker).padStart(3, '0')}` },
+        count: 1,
+      })),
+    }));
+    const original = structuredClone(meta.inventory);
+    courierSummon(sim.ctx, session.pid);
+    sim.courierDispatch(
+      {
+        deposits: meta.inventory.map((slot, index) => ({
+          index,
+          fingerprint: courierSlotFingerprint(slot),
+        })),
+        withdrawals: [],
+      },
+      session.pid,
+    );
+    expect(meta.courier?.phase).toBe('outbound');
+    const state = meta.courier!;
+    const bankBefore = structuredClone(meta.bank.inventory);
+    // A full backpack on return exercises the same overflow custody as ordinary delivery.
+    meta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'wolf_fang', count: 20 }));
+    state.travelTicks = courierLegPlan(state.legDistance!).ticks - 1;
+    updateCourier(sim.ctx, meta, player);
+    expect(state.phase).toBe('returning');
+    expect(state.cargo).toEqual(original);
+    expect(meta.bank.inventory).toEqual(bankBefore);
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    expect(session.escrowQuarantined).toBe(false);
+    state.travelTicks = courierLegPlan(state.legDistance!).ticks - 1;
+    updateCourier(sim.ctx, meta, player);
+    expect(meta.courier).toBeUndefined();
+    expect(meta.inventory.slice(16)).toEqual(original);
+    updateCourier(sim.ctx, meta, player);
+    expect(meta.inventory.slice(16)).toEqual(original);
+  });
   it('grants, expires and renews Courier through the real online ability presentation', () => {
     const server = new GameServer();
     const socket = fakeWs();
@@ -87,7 +135,7 @@ describe('live courier server wiring', () => {
     state.travelTicks = courierLegPlan(state.legDistance!).ticks - 1;
     updateCourier(sim.ctx, meta, player);
     expect(state.phase).toBe('returning');
-    expect(state.cargo).toEqual([selected]);
+    expect(state.cargo).toEqual([savedMaterialSlot(selected)]);
     expect(meta.bank.inventory).toHaveLength(9999);
     expect(meta.bank.inventory[9998]).toEqual({
       itemId: 'baked_bread',

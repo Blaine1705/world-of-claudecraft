@@ -46,7 +46,6 @@
 // warm lights into the fire-light budget like the rest (content TAVERN_TERRACE_LIGHTS).
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
   TAVERN_CHANDELIER,
   TAVERN_FLOOR_Y,
@@ -60,6 +59,7 @@ import {
   tavernToWorld,
 } from '../sim/content/mirefen_tavern';
 import { TAVERN_TERRACE_LIGHTS } from '../sim/content/mirefen_tavern_grounds';
+import type { LoadedGltf } from './assets/loader';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { mediaAssetExists } from './assets/media';
 import { registerDeferredPreload } from './assets/preload';
@@ -110,7 +110,7 @@ import {
 
 const TAVERN_URL = '/models/props/mirefen_tavern.glb';
 
-let loaded: GLTF | null = null;
+let loaded: LoadedGltf | null = null;
 /** The file `loaded` was read from: the model, or one of its texture-tier files. */
 let loadedFile: string | null = null;
 /** The file last asked for (a load that lands after a newer ask is dropped, not adopted). */
@@ -203,7 +203,7 @@ const TAVERN_CAMERA_INTERIOR = mirefenTavernCameraInterior();
 /** Where the tavern stands: the prefetch reach and the fog cull are measured from here. */
 const ANCHOR = tavernToWorld(0, -6);
 
-function buildTemplate(gltf: GLTF, keep: readonly string[]): TavernTemplate {
+function buildTemplate(gltf: LoadedGltf, keep: readonly string[]): TavernTemplate {
   // loader cache results are immutable: read a clone
   const root = gltf.scene.clone(true);
   root.updateMatrixWorld(true);
@@ -592,7 +592,10 @@ export const mirefenTavernInternalsForTest = {
   dog: (): THREE.Group | null => dogGroup,
   smoke: (): TavernSmokeView | null => smoke,
   /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
-  setLoadedGltfForTest(gltf: GLTF | null, file: string | null = gltf ? TAVERN_URL : null): void {
+  setLoadedGltfForTest(
+    gltf: LoadedGltf | null,
+    file: string | null = gltf ? TAVERN_URL : null,
+  ): void {
     loaded = gltf;
     loadedFile = file;
     wantedFile = file;

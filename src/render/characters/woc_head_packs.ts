@@ -36,9 +36,9 @@
 // does, a body built directly (a preview) draws nothing until its whole look is
 // hung and the head goes live.
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { type GeometryLodLevel, geometryLodVariant } from '../assets/geometry_lod';
+import type { LoadedGltf } from '../assets/loader';
 import { loadGltf } from '../assets/loader';
 import { logAssetMissOnce } from './asset_miss_log';
 import { prepareWocArmor, type WocRigidTemplate, wocRigBindOf } from './woc_armor_bind';
@@ -74,7 +74,7 @@ export const WOC_HEAD_TINT_REF_KEY = 'wocHeadTintRef';
 const FILE_RETRY_MS = 8000;
 
 interface FileEntry {
-  gltf: GLTF | null;
+  gltf: LoadedGltf | null;
   loading: boolean;
   failedAt: number;
   /** The file's pieces prepared against its fit's rig (on the first hang). */
@@ -244,7 +244,7 @@ export function wocHeadAppearanceResident(
 }
 
 /** Test seam: install a parsed head file directly (no loader), or drop it (null). */
-export function setWocHeadFileForTest(url: string, gltf: GLTF | null): void {
+export function setWocHeadFileForTest(url: string, gltf: LoadedGltf | null): void {
   if (!gltf) {
     files.delete(url);
     return;

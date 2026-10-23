@@ -149,8 +149,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // item per five raiders per kill (two on the 10-player raid). Slot one is
     // the merged sigil partition (legging + helm), slot two the Normal-only
     // feet / ring partition; a heroic claim skips slot two (LootEntry.normalOnly)
-    // and the HEROIC_BOSS_LOOT exclusive slot (weapons, shields, and held
-    // offhands only) pays in its place, plus ONE guaranteed Robe sigil from its
+    // and the HEROIC_BOSS_LOOT exclusive slot (gear only: weapons, shields,
+    // offhands, and trinkets) pays in its place, plus ONE guaranteed Robe sigil from its
     // own heroic group (2026-09-11 re-cut), all at the same ilvl 35 (this raid
     // has NO heroic item-level layer).
     // Copper rides the raid-finale base on the Ignivar wiring. Re-cut

@@ -32,6 +32,7 @@ function view() {
     catVisual: null as ReturnType<typeof rig> | null,
     travelVisual: null as ReturnType<typeof rig> | null,
     metamorphVisual: null as ReturnType<typeof rig> | null,
+    sporemenderVisual: null as ReturnType<typeof rig> | null,
   };
 }
 
@@ -151,6 +152,7 @@ describe('a stale polymorph rig rebuild keeps the body standing in', () => {
       catVisual: null,
       travelVisual: null,
       metamorphVisual: null,
+      sporemenderVisual: null,
       formCompilePending: null,
     };
   }
@@ -193,6 +195,7 @@ describe('a stale polymorph rig rebuild keeps the body standing in', () => {
       v.catVisual,
       v.travelVisual,
       v.metamorphVisual,
+      v.sporemenderVisual,
       v.formCompilePending,
     );
     return resolvedCharacterForm(requested, ready);

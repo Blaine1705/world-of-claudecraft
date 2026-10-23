@@ -186,6 +186,8 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'lifetimeHonor',
   'honorArenaDaily',
   'worldPvp',
+  // The World PvP Skull Bag's stored skulls (src/sim/pvp/skull_bag.ts).
+  'skullBag',
   'prestigeRank',
   'unlockedMilestones',
   'restedXp',
@@ -200,6 +202,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'corpsePos',
   'resSickness',
   'unstuckSickness',
+  // Persisted buffs (src/sim/aura_persist.ts auraSaveFragment): bounded by
+  // MAX_PERSISTED_AURAS and absent while no buff is worn.
+  'auras',
   'equipment',
   'inventory',
   'bags',
@@ -1369,7 +1374,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     // put crafted copies into inventory, not equipment), so the clamp must
     // bite there too; the review round found an equipment-only first cut.
     if (!s1.inventory?.[0]) throw new Error('ceiling fixture has no inventory row');
-    s1.inventory[0].instance = { enchant: 'enchant_weapon_might', signer: overSigner };
+    // Current saves carry canonical source buckets. This arm models historical
+    // sourceless stock, whose legacy instance signer is sanitized on load;
+    // retaining the buckets would create a different, ambiguous source record.
+    s1.inventory[0] = {
+      itemId: 'roasted_boar',
+      count: 1,
+      instance: { enchant: 'enchant_weapon_might', signer: overSigner },
+    };
     // The SURVIVOR half of the bag arm: a legal maximum-length signer on
     // another bag row must come back byte-faithfully, or a clamp that simply
     // deleted every bag signer would pass the drop pins above.
@@ -1433,10 +1445,18 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(s2.equipmentInstance?.[keptSlot]?.signer).toBe(legalSigner);
     expect('signer' in (s2.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
-    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.signer).toBe(legalSigner);
+    expect(s2.inventory?.[bagSurvivorIndex]?.materialSources).toEqual([
+      { source: { signer: legalSigner }, count: 1 },
+    ]);
+    expect(s2.inventory?.[bagSurvivorIndex]?.instance?.enchant).toBe('enchant_weapon_might');
     expect('signer' in (s2.bank?.inventory?.[0]?.instance ?? {})).toBe(false);
     expect(s2.bank?.inventory?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
-    expect(s2.bank?.inventory?.[1]?.instance?.signer).toBe(legalSigner);
+    expect(s2.bank?.inventory?.[1]?.materialSources).toEqual([
+      { source: { signer: legalSigner }, count: 1 },
+    ]);
+    expect(s2.bank?.inventory?.[1]?.instance?.enchant).toBe('enchant_weapon_might');
+    expect(s2.bank?.inventory?.[0]?.materialSources).toEqual([{ source: {}, count: 1 }]);
+    expect(s2.vendorBuyback?.[0]?.materialSources).toEqual([{ source: {}, count: 1 }]);
     expect('signer' in (s2.vendorBuyback?.[0]?.instance ?? {})).toBe(false);
     expect(s2.vendorBuyback?.[0]?.instance?.enchant).toBe('enchant_weapon_might');
   });
@@ -1917,7 +1937,8 @@ function applyMeasuredMaterialCase(sim: Sim, shape: MaterialSourceCase): void {
   const bankSlots = BANK_BASE_SLOTS + BANK_PURCHASED_SLOTS_MAX + BANK_MAX_BONUS_SLOTS;
   meta.bank.inventory = Array.from({ length: bankSlots + BANK_BAG_SOCKETS * 24 }, () => stack(20));
   meta.vault.stock = {};
-  meta.vault.special = materialIds.map((id) => ({ ...stack(200), itemId: id }));
+  const perMaterial = vaultCapacityPerMaterial(meta.vault);
+  meta.vault.special = materialIds.map((id) => ({ ...stack(perMaterial), itemId: id }));
   meta.vendorBuyback = Array.from({ length: 12 }, () => stack(20));
 }
 
@@ -1961,14 +1982,16 @@ describe('whole-character material source composition matrix', () => {
       expect(second.vault?.stock).toEqual({});
       expect(second.inventory.every((slot) => slot.count === 20)).toBe(true);
       expect(second.bank?.inventory.every((slot) => slot.count === 20)).toBe(true);
-      expect(second.vault?.special?.every((slot) => slot.count === 200)).toBe(true);
+      const perMaterial = vaultCapacityPerMaterial({ upgrades: VAULT_UPGRADE_RUNGS });
+      expect(perMaterial).toBe(1000);
+      expect(second.vault?.special?.every((slot) => slot.count === perMaterial)).toBe(true);
 
       const expectedSources =
         shape === 'representative'
           ? 1
           : shape === 'varied'
             ? 5
-            : 112 * 20 + 228 * 20 + 12 * 20 + vaultMaterialIds().size * 200;
+            : 112 * 20 + 228 * 20 + 12 * 20 + vaultMaterialIds().size * perMaterial;
       expect(sourceCount(second)).toBe(expectedSources);
       process.stdout.write(
         `[professions-blob-material-sources] ${JSON.stringify({
@@ -1978,7 +2001,7 @@ describe('whole-character material source composition matrix', () => {
           warningBytes: CHARACTER_BLOB_WARN_BYTES,
           relationToWarning:
             materialSourceBytes(second) < CHARACTER_BLOB_WARN_BYTES ? 'below' : 'at-or-above',
-          physicalUnits: 112 * 20 + 228 * 20 + 12 * 20 + vaultMaterialIds().size * 200,
+          physicalUnits: 112 * 20 + 228 * 20 + 12 * 20 + vaultMaterialIds().size * perMaterial,
         })}\n`,
       );
     }
@@ -2012,10 +2035,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // +19 at the merge of the Staff of Changing's discovery id (PR 4281);
     // +26 with reins_nightwing_chimera.
     // 258,415 -> 258,437 with Wobbles the Slime's reins (+22, kept).
-    expect(baselineBytes).toBe(258736);
+    // Release merge adds 555 bytes, independently pinned by the content equation below:
+    // skull 42 + Titan 26 + PvP titles 138 + Hard maze 34 + skull bag 62
+    // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
+    expect(baselineBytes).toBe(259291);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    expect(bytes).toBe(267020);
+    expect(bytes).toBe(267575);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2286,7 +2312,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // integration merges. 249,958 with the Staff of Changing's discovery id
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeReferralBytes).toBe(250305);
+    expect(beforeReferralBytes).toBe(250860);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2312,11 +2338,30 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeMembershipBytes).toBe(250131);
+    expect(beforeMembershipBytes).toBe(250686);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
     ).toBe(174);
+
+    // Isolate this retune from all inherited content and identity changes.
+    const priorVault = structuredClone(s2);
+    if (!priorVault.vault) throw new Error('maximal fixture lacks its vault');
+    const stockRows = Object.keys(priorVault.vault.stock).length;
+    priorVault.vault.upgrades = 5;
+    for (const id of Object.keys(priorVault.vault.stock)) priorVault.vault.stock[id] = 200;
+    const vaultRetuneBytes = bytes - Buffer.byteLength(JSON.stringify(priorVault), 'utf8');
+    expect(vaultRetuneBytes).toBe(stockRows + 1);
+    expect(vaultRetuneBytes).toBe(119);
+    process.stdout.write(
+      `[professions-blob-compact-vault] ${JSON.stringify({
+        bytes,
+        stockRows,
+        vaultRetuneBytes,
+        warningBytes: CHARACTER_BLOB_WARN_BYTES,
+      })}\n`,
+    );
+
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
@@ -2418,6 +2463,29 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       },
     };
     const counterfactualBytes = Buffer.byteLength(JSON.stringify(withoutFieldKit), 'utf8');
+    // The five World PvP deed dates add only 138 bytes: three 27-byte rows,
+    // one 28-byte row and one 29-byte row. The timer is unarmed in this fixture.
+    const pvpTitleDeedIds = [
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
+    ] as const;
+    const withoutPvpTitleDeeds = JSON.parse(JSON.stringify(withoutFieldKit)) as CharacterState;
+    for (const id of pvpTitleDeedIds) {
+      expect(withoutFieldKit.deeds?.[id]).toBe('2026-08-08');
+      delete withoutPvpTitleDeeds.deeds?.[id];
+    }
+    expect(fieldBytes(withoutFieldKit, 'deeds') - fieldBytes(withoutPvpTitleDeeds, 'deeds')).toBe(
+      138,
+    );
+    expect(
+      counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutPvpTitleDeeds), 'utf8'),
+    ).toBe(138);
+    for (const key of Object.keys(withoutFieldKit) as (keyof CharacterState)[]) {
+      if (key !== 'deeds') expect(withoutPvpTitleDeeds[key], key).toEqual(withoutFieldKit[key]);
+    }
     expect(
       beforeReferralBytes - counterfactualBytes,
       'field_kit contributes exactly one array entry',
@@ -2760,7 +2828,37 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         18 +
         buddyCollectionBytes +
         // Lantern Hall deeds and discovered seal/reins ids.
-        281,
+        281 +
+        // Plus 42 for the World PvP trophy skull: `"pvp_trophy_skull",` in
+        // deedStats.itemsDiscovered (+19; the deedStats row below moves by the
+        // same 19) and, because the skull is a provenance-tracked material, its
+        // row in the Materials Vault stock this fixture fills to every
+        // material's ceiling (+23). MEASURED on this tree.
+        42 +
+        // Plus 26 for the sixth lifetime-XP rung: prog_titan in the deeds row
+        // (10 characters of id plus 16 bytes of quoting, colon, date and comma),
+        // earned by this maximal fixture. MEASURED (77,204 to 77,230).
+        26 +
+        // The five World PvP title dates, isolated above without any other field change.
+        138 +
+        // Plus 34 for the Hard wisp-maze deed row that this maximal fixture earns,
+        // measured on the merged v0.45 tree.
+        34 +
+        // Plus 62 for the World PvP Skull Bag (an honor purchase, so a Warfare
+        // armory relic): `"pvp_skull_bag",` in deedStats.itemsDiscovered (+16)
+        // and its reliquary.firstFind row (+46). MEASURED on this tree.
+        62 +
+        // The ten-rung vault raises the compact ceiling from 200 to 1000:
+        // one extra digit in each of 118 stock rows plus upgrades 5 to 10.
+        // This composes with every inherited content delta above.
+        119 +
+        // The Crucible hunter quiver adds 18 deedStats and 48 reliquary bytes.
+        66 +
+        // Plus 68 for the three leveling quest shields (content/quest_shields.ts):
+        // `"lychgate_buckler",` (+19), `"bastion_kite_shield",` (+22) and
+        // `"barrowfield_tower_shield",` (+27) in deedStats.itemsDiscovered. Quest
+        // rewards carry no Reliquary page, so no firstFind row. MEASURED.
+        68,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2809,7 +2907,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // undercounted the merged tree).
       // deeds 1,572 -> 1,808 with Lantern Hall (#4530), its deed rows (+236 of the +281
       // above), MEASURED on the merged tree.
-      deeds: 1808,
+      deeds: 2006,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
@@ -2822,8 +2920,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
       // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
       // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21436.
-      deedStats: 21436,
-      reliquary: 13954,
+      deedStats: 21557,
+      reliquary: 14048,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2871,7 +2969,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (247,117).
       // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
       // The sprite buddy's whistle id adds 18 (247,154).
-    ).toBe(247435);
+    ).toBe(247990);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2912,7 +3010,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (249,927).
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
       // reins_wobbles_slime adds 22 (249,994).
-    ).toBe(250293);
+    ).toBe(250848);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3058,8 +3156,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // RE-BASED for the sprite buddy: 250,146 bytes, +18 from its whistle id in
     // itemsDiscovered. Floor at measurement minus 380, edge at measurement plus
     // one: 249766..250147.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250047);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(250428);
+    // Release composition: 250,982 bytes excluding referral cards; retain the 381-byte band.
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250602);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(250983);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

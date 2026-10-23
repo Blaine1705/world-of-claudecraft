@@ -39,6 +39,8 @@ export interface CourierState {
   /** Remaining simulation seconds, so logout never advances custody. */
   retryRemaining: number;
 }
+/** True resolves arrival (including returning an unadmittable trip unchanged);
+ * false retries transient host pressure without moving either leg. */
 export type CourierBankExchange = (
   pid: number,
   deposit: () => void,

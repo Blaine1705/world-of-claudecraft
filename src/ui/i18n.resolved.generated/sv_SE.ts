@@ -561,6 +561,13 @@ export const sv_SE: EnTranslations = {
       "heroicClears": "{count} Heroisk",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Visa möjligt byte",
+      "lootFocus": "Bytesinriktning",
+      "allClassGear": "Alla klassers utrustning",
+      "specRole": "{name} ({role})",
+      "mixedRole": "{first} / {second}",
+      "lootFocusHelp": "Gäller endast oöppnade valv.",
+      "noFocusedLoot": "Inget lämpligt byte. Välj en annan inriktning.",
+      "rolledFocus": "Slumpat för: {focus}",
       "chooseTable": "Välj vilken tabell som ska rullas från",
       "selectAllTables": "Välj alla",
       "selectedTables": "{count} tabeller valda",
@@ -581,7 +588,9 @@ export const sv_SE: EnTranslations = {
         "worldOne": "{count} världsuppdrag slutfört",
         "worldMany": "{count} världsuppdrag slutförda",
         "pvpOne": "{count} bedömd match vunnen",
-        "pvpMany": "{count} bedömda matcher vunna"
+        "pvpMany": "{count} bedömda matcher vunna",
+        "pvpWinOne": "{count} PvP-seger",
+        "pvpWinMany": "{count} PvP-segrar"
       },
       "requiredTask": {
         "raidOne": "Rensa {count} raid-möte",
@@ -591,7 +600,9 @@ export const sv_SE: EnTranslations = {
         "worldOne": "Slutför {count} världsuppdrag",
         "worldMany": "Slutför {count} världsuppdrag",
         "pvpOne": "Vinna {count} bedömd match",
-        "pvpMany": "Vinna {count} bedömda matcher"
+        "pvpMany": "Vinna {count} bedömda matcher",
+        "pvpWinOne": "Vinn {count} PvP-seger",
+        "pvpWinMany": "Vinn {count} PvP-segrar"
       },
       "readyWeeks": "Oinsamlade veckor: {count}. Hävda den äldsta slutförda veckan först.",
       "claimLastWeek": "Hävda förra veckans belöning",
@@ -749,7 +760,13 @@ export const sv_SE: EnTranslations = {
       "departsIn": "Färjan till {dest} avgår om {time}",
       "castingOff": "Färjan till {dest} lämnar nu",
       "boardHint": "Stå på däcket när det seglar. Passagen är gratis.",
-      "sailing": "Seglande till {dest}"
+      "sailing": "Seglande till {dest}",
+      "portLabel": "Färja från {port} till {dest}",
+      "portTitle": "Färjeläget i {port}",
+      "destination": "Resmål: {dest}",
+      "boardNow": "Gå ombord nu",
+      "arrivesIn": "Färjan anländer om {time}",
+      "scheduleUnavailable": "Färjans tidtabell är inte tillgänglig."
     },
     "materialStackSelectionUnavailable": "Det materialvalet är inte längre tillgängligt.",
     "shardpike": {
@@ -851,6 +868,15 @@ export const sv_SE: EnTranslations = {
     "spectate": {
       "banner": "Åskådar {name}"
     },
+    "realmMotd": {
+      "line": "Dagens meddelande: {text}",
+      "updated": "Dagens meddelande har uppdaterats.",
+      "cleared": "Dagens meddelande har rensats.",
+      "none": "Inget meddelande för dagen har angetts.",
+      "usage": "Användning: /motd \"<meddelande>\" för att ange det, /motd clear för att ta bort det.",
+      "tooLong": "Dagens meddelande får innehålla högst {max} tecken.",
+      "saveFailed": "Dagens meddelande kunde inte sparas och försvinner vid en omstart."
+    },
     "readyCheck": {
       "title": "Klar kontroll",
       "close": "Stäng",
@@ -874,6 +900,11 @@ export const sv_SE: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Återuppstå vid liket",
+      "pvpResurrect": "PvP-återupplivning",
+      "pvpResurrectTitle": "Återuppstå på närmaste kyrkogård med full hälsa, utan en ny Väktartull.",
+      "pvpResurrectWaitButton": "PvP-återupplivning ({seconds})",
+      "pvpResurrectWaitNote": "Du kan använda PvP-återupplivning om {seconds}: du återuppstår på närmaste kyrkogård.",
+      "pvpResurrectReadyNote": "PvP-återupplivning är redo: du återuppstår på närmaste kyrkogård.",
       "resurrectAtHealer": "Den bleka väktaren (Väktartullen)",
       "ghostHint": "Springa till platsen för din död eller tala med Den bleka väktaren för att återupplivas",
       "spiritHealerAlive": "Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande.",
@@ -889,6 +920,9 @@ export const sv_SE: EnTranslations = {
       "keeperConfirmSparedBody": "Är du säker? Den bleka väktaren återupplivar dig här. Du är under nivå 10, så Väktartullen kommer inte att försvaga dig den här gången.",
       "healerConfirmAccept": "Återuppliva mig",
       "healerConfirmCancel": "Avbryt"
+    },
+    "graphicsRestore": {
+      "note": "Återställer grafik"
     },
     "wiki": {
       "confirmTitle": "Öppna wikin?",
@@ -2222,6 +2256,8 @@ export const sv_SE: EnTranslations = {
       "reportSent": "Rapport kopierad och skickad till chat",
       "reportNoData": "Ingen data registrerad.",
       "noDetailedData": "Ingen detaljerad data",
+      "detailHealSubtitle": "Effektivt: {effective} | Överläkning: {overheal} ({overhealPercent}) | Träffar: {hits} ({critPercent} krit.)",
+      "detailHitSubtitle": "Träffar: {hits} | Kritiska: {crits} ({critPercent}) | Snitt: {average} | Min/max: {min} / {max}",
       "noDeathEvents": "Inga händelser loggade före död",
       "killedBy": "Dödad av {killer} ({ability})",
       "lethalHit": "Dödande träff",
@@ -2502,6 +2538,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Besvärjelsers verktygstips vid hovring",
       "clickMoveLeft": "Vänsterklick",
       "clickMoveRight": "Högerklick",
       "version": "v{version} ({build})",
@@ -2547,11 +2584,14 @@ export const sv_SE: EnTranslations = {
       "interfaceModeDesktop": "Skrivbord",
       "interfaceModeTouch": "Pek",
       "interfaceModeNote": "Auto väljer skrivbords- eller pekkontroller utifrån din enhet. Välj Skrivbord för att tvinga fram tangentbord och mus (användbart på en surfplatta med tangentbord), eller Pek för skärmkontrollerna.",
+      "ambienceVolume": "Omgivningsvolym",
       "footstepSounds": "Fotstegsljud",
       "interfaceSounds": "Gränssnitts- och responsljud",
       "clickFeedback": "Klickmarkör",
       "lockCursorOnRotate": "Lås pekare under rotation",
       "keybindHelpLockCursorOnRotate": "Håller muspekaren inuti fönstret medan du drar för att rotera kameran, så att den inte kan nå skärmkanten eller flytta till en annan skärm. Stäng av om du föredrar en fri pekare.",
+      "rawMouseInput": "Obehandlad musinmatning",
+      "keybindHelpRawMouseInput": "Läser musrörelser direkt från enheten när du drar för att vrida kameran, utan systemets pekarhastighet och acceleration, för jämnare rotation. Stäng av för att använda systemets musinställningar. Fungerar bara när Lås pekare under rotation är på och stöds inte av alla webbläsare eller system.",
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "showPlaytime": "Visa tid spelad på karaktärsskärmen",
@@ -2617,6 +2657,7 @@ export const sv_SE: EnTranslations = {
       "confirmVendorSellNote": "Om du stänger av det här säljs föremål med ett enda klick utan bekräftelse, så en förskjuten väskplats skulle kunna sälja fel föremål.",
       "confirmVendorSellMinQuality": "Bekräfta försäljning från kvalitet",
       "confirmVendorSellMinQualityNote": "Artiklar under denna kvalitet säljs med ett enda klick; en felaktigt såld artikel kan fortfarande köpas tillbaka från säljaren.",
+      "confirmVendorSellMinQualityNoteGray": "Föremål under denna kvalitet säljs med ett enda klick. Ett föremål som säljs av misstag kan köpas tillbaka från handlaren, utom osignerade grå föremål.",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
@@ -2626,9 +2667,22 @@ export const sv_SE: EnTranslations = {
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
       "showTargetSwingTimer": "Visa målets svingtimer",
+      "enemyHighlightStyle": "Stil för fiendemarkering",
+      "enemyHighlightEdgeArrow": "Pil vid skärmkanten utanför kameravyn",
+      "enemyHighlightNameplate": "Stor inramad namnskylt för målet",
+      "enemyHighlightOverhead": "Svävande markör ovanför huvudet",
+      "enemyHighlightReticle": "Kraftigare fientligt hårkors",
+      "enemyHighlightDistance": "{yards} yard",
       "showPetFrame": "Visa ditt djur",
+      "playerFrameResourceDetached": "Koppla loss resursfältet",
+      "playerFrameResourceWidth": "Resursfältets bredd",
+      "playerFrameResourceHeight": "Resursfältets höjd",
+      "hillBarOpacity": "Bakgrundens opacitet för Kungens på kullen",
+      "pixelsValue": "{value} px",
       "showNameplateDots": "Visa mina prickar på namnskyltar",
       "nameplateDotScale": "Namnskylt Punktstorlek",
+      "showNameplateCooldowns": "Offensiv/defensiv bevakning",
+      "nameplateCooldownScale": "Storlek på offensiv/defensiv bevakning",
       "showTargetDots": "Visa målprickar",
       "showDefensivesTrack": "Visa defensiva nedkylningar",
       "showSelfBuffTrack": "Visa mina förstärkningar",
@@ -2637,7 +2691,9 @@ export const sv_SE: EnTranslations = {
       "showUtilityModes": "Inkludera smygande och reseformer",
       "showFriendlyTrack": "Visa mina förstärkningar på allierade",
       "showShieldTrack": "Visa mina sköldar",
+      "classicCombatText": "Klassisk stridstext",
       "waterRipples": "Vattenkrusningar (kölvatten)",
+      "spellEffects": "Besvärjelseeffekter",
       "actionCam": "Actionkamera",
       "actionCamShoulder": "Actionkamera Axel",
       "actionCamShoulderLeft": "Vänster {pct}",
@@ -2668,6 +2724,11 @@ export const sv_SE: EnTranslations = {
       "complexityMedium": "Medel",
       "complexityHigh": "Hög",
       "exampleAbilities": "Exempelförmågor",
+      "specBonus": "Specialiseringsbonus",
+      "healing": "läkning",
+      "absorption": "skadeabsorption",
+      "physicalAbilityDamage": "skada från närstrids- och avståndsförmågor",
+      "primaryHealingBonus": "Ökar den primära läkningen med {pct} efter övriga läkningsbonusar.",
       "viewTalents": "Visa talanger",
       "selectSpec": "Välj specialisering",
       "specUnlockBanner": "Specialisering upplåst!",
@@ -2991,11 +3052,15 @@ export const sv_SE: EnTranslations = {
       "iconSize": "Ikonstorlek",
       "iconPadding": "Ikonutfyllnad",
       "opacity": "Opacitet",
-      "visibility": "Synlighet",
-      "visAlways": "Alltid synlig",
       "visCombat": "I strid",
-      "visHidden": "Dold",
       "visHiddenHint": "En dold grupp spelar fortfarande ljud och tänder upp på ditt handlingsfält.",
+      "showWhile": "Visa under",
+      "showOutOfCombat": "Utanför strid",
+      "showIn": "Visa i",
+      "showInWorld": "Öppen värld",
+      "showInInstances": "Instansområden",
+      "placeHint": "Instanser omfattar fängelsehålor, räder, delves, revor, slagfält, arenan och alla andra instansindelade områden. Utanför de markerade platserna är gruppen dold och tyst.",
+      "groupOffHint": "Om ingen plats är markerad visas gruppen aldrig och spelar inga ljud.",
       "showTimer": "Visa timer",
       "positionX": "Horisontell position",
       "positionY": "Vertikal position",
@@ -3013,7 +3078,6 @@ export const sv_SE: EnTranslations = {
       "aurasTitle": "Proccar, motorer och buffa",
       "aurasHint": "Motorresurser och deras stackar, proccar och buffar som dina trollformler lägger på dig. Allt annat som inte är en trollformel själv.",
       "auraFallback": "Aura",
-      "onlyWhileActive": "Visa endast medan aktiv",
       "alertStacks": "Varning vid stackar",
       "alertStacksAny": "Vid förvärv",
       "alertStacksHint": "Knappen lyser, pulsar och pinglar när aurorn når det här många stackar. Vid förvärv betyder så snart den erhålls.",
@@ -3030,7 +3094,18 @@ export const sv_SE: EnTranslations = {
       "glowWhenReadyHint": "Ljusar upp och framhäver knappen medan trollformeln kan kastacas.",
       "hotbarGlow": "Handlingsfältglöd",
       "hotbarGlowHint": "Lyser också denna trollformel på ditt handlingsfält medan den är klar.",
-      "onlyWhenReady": "Visa endast när klar",
+      "showButtonWhen": "Visa knappen när",
+      "showReady": "Redo",
+      "showNotReady": "Inte redo",
+      "notReadyHint": "Inte redo betyder på nedkylning eller att förmågan inte kan användas just nu.",
+      "auraShowWhen": "Visa knappen när auran är",
+      "auraActive": "Aktiv",
+      "auraMissing": "Saknas",
+      "neverShownHint": "Om ingen av rutorna är markerad visas knappen aldrig, men dess ljud spelas ändå.",
+      "reminderHint": "Förstärkningspåminnelse: knappen lyser när denna aura saknas och döljs så snart du har den.",
+      "glowWhileMissing": "Lys upp när auran saknas",
+      "reminderGlowHint": "Lyser upp knappen, framhäver dess kant och får den att pulsera medan auran saknas.",
+      "reminderSoundHint": "Spelas när auran upphör.",
       "sound": "Klart ljud",
       "soundHint": "Spelar när trollformeln blir klar, eller när dess knapp ändras till en annan trollformel medan den är klar."
     },
@@ -3160,7 +3235,8 @@ export const sv_SE: EnTranslations = {
         "battlegroundAssist": "assisterat dödande slag",
         "worldKill": "världsdödande",
         "worldAssist": "världsdodade assisterad",
-        "hillHold": "håller berget"
+        "hillHold": "håller berget",
+        "worldQuest": "världsuppdrag"
       },
       "floatReasons": {
         "kill": "Dråp",
@@ -3170,6 +3246,11 @@ export const sv_SE: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Få permanenta titlar efter {thresholds} spelad tid med världs-PvP påslaget i den öppna världen eller i PvP-instanser. Utloggning, död, PvE-instanser och fristäder pausar tiden. Stänger du av det nollställs tiden.",
+      "rewardPaused": "Nuvarande PvP-svit: {time} spelad tid (pausad i en fristad)",
+      "rewardPausedDead": "Nuvarande PvP-svit: {time} spelad tid (pausad medan du är död)",
+      "rewardPausedInstance": "Nuvarande PvP-svit: {time} spelad tid (pausad i PvE-instanser)",
+      "rewardProgress": "Nuvarande PvP-svit: {time} spelad tid",
       "tab": "Världskamp",
       "title": "Världskamp",
       "blurb": "Höj din flagga för att slåss med andra flaggade spelare var som helst i den öppna världen. Besegra en och ta del av deras börse, plus Heder mot Krigsförskap. Slagfälten och Arenorna betalar fortfarande mer.",
@@ -3188,6 +3269,8 @@ export const sv_SE: EnTranslations = {
       "markLine": "Att attackera en ej flaggad spelare där höjer din egen flagga; att attackera en flaggad gör det aldrig.",
       "aidLine": "Att läka, skydda eller buffa en flaggad spelare i en världskamp höjer din flagga.",
       "stakeLine": "Förloraren betalar {cap} eller {percent} av sin börse, vilket är minst.",
+      "spoilsLine": "När ni båda har PvP-flaggan påslagen hamnar guldet från den dödande träffen på kroppen tillsammans med förlorarens skalle.",
+      "skullName": "{name}s skalle",
       "noStakeLine": "En ej flaggad spelare som dödas på free-for-all marken förlorar inget guld.",
       "noTakeLine": "En ej flaggad fighter tar inget guld heller: det flyttas bara mellan två flaggade spelare.",
       "honorLine": "{honor} Heder per seger, delad mellan alla som hjälpte.",
@@ -3217,6 +3300,8 @@ export const sv_SE: EnTranslations = {
       "countsHolding": "Innanför: du {yours}, rival {theirs}",
       "contestYou": "Tar kullen: {seconds} av {total}",
       "contestOther": "Förlorar kullen: {seconds} av {total}",
+      "contestYouPaused": "Pausad: {seconds} av {total}",
+      "contestOtherPaused": "Rivalens tid pausad: {seconds} av {total}",
       "contestNone": "Håll en majoritet innanför för {total} för att ta den",
       "inside": "Du är inom cirkeln",
       "distance": "{yards} yd till cirkeln",
@@ -3224,11 +3309,28 @@ export const sv_SE: EnTranslations = {
       "falls": "Faller om {minutes}",
       "standingRaid": "Rajdmedlemmar räknas inte: bara partier kan inneha kullen"
     },
+    "skullBag": {
+      "title": "Skallpåse",
+      "total": "Skallar: {count}",
+      "close": "Stäng skallpåsen",
+      "clickOpen": "Klicka för att öppna",
+      "notCarried": "Bär skallpåsen i dina väskor för att lägga in eller ta ut skallar.",
+      "empty": "Tom. När du bär påsen hamnar skallar som du plundrar direkt i den.",
+      "unrecorded": "Troféskalle",
+      "store": "Lägg in burna skallar ({count})",
+      "storeNone": "Inga skallar att lägga in",
+      "takeOne": "Ta 1",
+      "takeAll": "Ta alla",
+      "takeOneAria": "Ta 1: {item}",
+      "takeAllAria": "Ta alla: {item}",
+      "tooltip": "Rymmer obegränsat med troféskallar utan att ta upp väskutrymme. När du har den i dina väskor hamnar skallar som du plundrar direkt i den. Klicka på den i väskan för att lägga in eller ta ut skallar."
+    },
     "warfareShop": {
       "gossipOption": "Bläddra bland Krigföringsset",
       "gossipOptionAria": "Bläddra bland Krigföringssetbutiken som erbjuds av {name}",
       "jewelry": "Smycken",
       "weapons": "Vapen",
+      "goods": "Varor",
       "groupSeason2": "Krigsföring Säsong 2: Framfart",
       "groupEntry": "Krigsföring Säsong 1",
       "companions": "Companions",
@@ -3244,6 +3346,7 @@ export const sv_SE: EnTranslations = {
       "spell": "Trollformel",
       "defense": "Försvar",
       "ratings": "Betyg",
+      "gearScore": "Utrustningspoäng",
       "playtimeLabel": "Tid spelad",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Mindre än en minut",
@@ -3272,6 +3375,12 @@ export const sv_SE: EnTranslations = {
       "hint": "Hitta marken som denna karta visar, stå på X och använd kartan igen för att gräva. En begravd skatt öppnas för dig och ditt lag.",
       "upgradeNote": "Att omtecka det som en {rarity} karta tar {inks} kartografbläck (du håller {held}). Fraktionens quartermaster säljer det.",
       "upgradeMaxed": "Ingen kartograf kunde göra denna karta bättre.",
+      "inkPickerTitle": "Vilken karta vill du använda Kartografens bläck på?",
+      "inkPickerHeld": "Du har {held} Kartografens bläck.",
+      "inkPickerRead": "Följs just nu: dess kryss finns i {zone}. Krysset stannar på samma plats.",
+      "inkPickerUnread": "Oläst ({count} i din ägo)",
+      "inkPickerCost": "Rita om till {rarity}: {inks} bläck",
+      "inkPickerCancel": "Avbryt",
       "rarity": {
         "common": "Vanlig",
         "rare": "Sällsynt",
@@ -3287,7 +3396,7 @@ export const sv_SE: EnTranslations = {
       "delveMark": "Delve-märke",
       "wocToken": "WoC-token",
       "heroicMarkNote": "Heroiska dungeons . spenderas på heroisk kvartermästare",
-      "honorNote": "Slagfält och arena",
+      "honorNote": "Slagfält, arena och världsuppdrag",
       "delveMarkNote": "Genomförda grottvandringar",
       "wocTokenNote": "Kopplat plånbokssaldo",
       "walletNotLinked": "Ingen ansluten plånbok",
@@ -4008,6 +4117,8 @@ export const sv_SE: EnTranslations = {
       "resetDone": "Alla instanser har återställts.",
       "resetNone": "Du har inga instanser att återställa.",
       "resetOccupied": "Du kan inte återställa instanser medan någon fortfarande är kvar inuti.",
+      "queuedOccupied": "Svårighetsändringen köades eftersom någon eller någons kropp fortfarande är kvar där inne. Den träder i kraft när instanserna är tomma.",
+      "queuedCancelled": "Den köade svårighetsändringen avbröts eftersom gruppen eller ledaren ändrades.",
       "resetSameDifficulty": "Ändra fängelsehålans svårighetsgrad innan du återställer dessa instanser. Tomma instanser återställs automatiskt efter 5 minuter.",
       "resetLoot": "Du kan inte återställa instanser medan byte finns kvar inuti.",
       "resetConfirmTitle": "Återställ alla instanser?",
@@ -4027,6 +4138,7 @@ export const sv_SE: EnTranslations = {
       "dragEquipHint": "Dra till din karaktär för att utrusta",
       "dragDestroyHint": "Dra ut i världen för att förstöra",
       "reorderNeedsRecent": "Rensa filtret och sortera efter Nyliga för att ordna om dina väskor",
+      "reorderLocked": "Låsta föremål stannar på sin plats i väskan. Lås upp föremålet för att flytta det.",
       "itemAriaInstanced": "{item}, antal {count}, tillverkarmärkt kopia",
       "itemAriaEnchanted": "{item}, antal {count}, förtrollad kopia",
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
@@ -4436,7 +4548,7 @@ export const sv_SE: EnTranslations = {
       "elementalConvergencePrimed": "Din nästa besvärjelse från den andra elementarskolan ger Elementär konvergens",
       "hunterFerocity": "{stacks} Flockvildhet: ditt husdjur gör {pct}% mer skada",
       "cooldownCap": "{used} av {cap} sek nedkylningsreduktion använd i detta fönster",
-      "bruinRushWindow": "Vargform kostar ingen mana och håller fast målet för er Bruinrusning, vilket saktar ner det med {pct}% i {sec} sek",
+      "bruinRushWindow": "Kattform kostar ingen mana och håller fast målet för er Bruinrusning, vilket saktar ner det med {pct}% i {sec} sek",
       "funeralHarvestLock": "Funeral Harvest kan inte skapa ännu ett Själfragment än",
       "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
       "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
@@ -4490,7 +4602,7 @@ export const sv_SE: EnTranslations = {
       "duskEconomy": "Förmågor kostar {pct}% mindre energi",
       "moontide": "Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den",
       "oldBlood": "Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross",
-      "verdance": "Grönska {stacks}/{max}. Varje NY Vildblomning eller Andra blomningen du planterar ger 1. Vid {max} blir Snabb läkning Överblomning",
+      "verdance": "Grönska {stacks}/{max}. Varje Sporemending, Andra blomningen eller Vildläkning du kastar ger 1, och varje Grönska förkortar Vildläknings kasttid. Vid {max} blir Snabb läkning Överblomning",
       "freeExecute": "Din nästa kvalificerade avrättningsförmåga kostar ingenting",
       "resourceSap": "Återställer {value} av din nuvarande resurs var {interval}:e sek",
       "nextAttackCrit": "Din nästa attack blir garanterat en kritisk träff",
@@ -4607,6 +4719,7 @@ export const sv_SE: EnTranslations = {
       "formTravel": "Fleetform: förflyttningshastighet ökad med {pct}%",
       "formFireball": "Ember Form: rörelsehastigheten ökad med {pct}%; attacker och besvärjelser är inaktiverade",
       "formMoonkin": "Månugglaform: besvärjelseskada ökad med {pct}% och rustning ökad med {armorPct}%",
+      "formSporemender": "Sporläkarform: utförd läkning ökar med {pct}%, rustningen ökar med {armorPct}% och rörelsehastigheten minskar med {slowPct}%",
       "formShadow": "Dunkelslöja: skuggskada ökad med {pct}%",
       "resourceCount": "{value} av {max}",
       "formLich": "Soul Lance träffar även upp till {targets} närliggande fiender för {pct}% skada",
@@ -4695,6 +4808,7 @@ export const sv_SE: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "BV",
       "pvpTag": "PvP",
+      "bountyTag": "Skottpengar",
       "cheaterTag": "< Fuskare >",
       "pledgeTag": "Trogen {guild}",
       "npcRoleTag": "<{role}>",
@@ -4804,6 +4918,7 @@ export const sv_SE: EnTranslations = {
         "chat": "Chatt",
         "actionBarGroup": "Handlingsfält",
         "playerFrame": "Spelare",
+        "playerResource": "Resursfält",
         "targetFrame": "Mål",
         "partyFrames": "Grupp",
         "swingBar": "Autoattack",
@@ -4856,6 +4971,37 @@ export const sv_SE: EnTranslations = {
       "apply": "Tillämpa",
       "imported": "Snabbtangentsinställning importerad.",
       "wrongKind": "Den koden är en inställningsexport, inte en snabbtangentsinställning."
+    },
+    "keybindLayout": {
+      "title": "Tangentbordslayout",
+      "open": "Konvertera",
+      "from": "Snabbtangenter avsedda för",
+      "to": "Konvertera till",
+      "keepMovement": "Behåll rörelsetangenternas placering",
+      "keepMovementLocked": "Rörelsetangenterna behöll sin placering förra gången och gör därför det igen. Återställ standardinställningarna för att börja om.",
+      "help": "Varje snabbtangent flyttas till den tangent som skriver samma tecken i den nya layouten. Sifferraden stannar på samma plats. Tangentnamnen i listan anger QWERTY-positioner; tangentbordsöversikten visar din egen layout.",
+      "moves": "Snabbtangenter som flyttas: {count}",
+      "noChange": "Inga snabbtangenter ändras mellan dessa layouter.",
+      "apply": "Konvertera snabbtangenter",
+      "converted": "Snabbtangenter konverterades från {from} till {to}.",
+      "layouts": {
+        "qwertyUs": "QWERTY (amerikansk)",
+        "qwertyUk": "QWERTY (brittisk)",
+        "qwertzDe": "QWERTZ (tysk)",
+        "qwertzCh": "QWERTZ (schweizisk)",
+        "azertyFr": "AZERTY (fransk)",
+        "azertyBe": "AZERTY (belgisk)",
+        "qwertyEs": "QWERTY (spansk)",
+        "qwertyIt": "QWERTY (italiensk)",
+        "qwertyNordic": "QWERTY (svensk, finsk)",
+        "qwertyDa": "QWERTY (dansk)",
+        "qwertyNo": "QWERTY (norsk)",
+        "qwertyBr": "QWERTY (brasiliansk ABNT2)",
+        "qwertyPt": "QWERTY (portugisisk)",
+        "qwertyTr": "QWERTY (turkisk)",
+        "dvorak": "Dvorak-layout",
+        "colemak": "Colemak-layout"
+      }
     },
     "keyboardMap": {
       "title": "Tangentbordsöversikt",
@@ -4946,6 +5092,7 @@ export const sv_SE: EnTranslations = {
       "perfectedBadge": "Förfinad",
       "perfectingRank": "Förfining: rang {rank} av {ranks}",
       "materialSourceGatherer": "{count} × samlad av {name}",
+      "trophySkullSource": "{count} × Tagen från {name}",
       "materialSourceGathererSigned": "{count} × samlad av {name}, signerad av {signer}",
       "materialSourceUnrecorded": "{count} × ingen samlare registrerad",
       "materialSourceUnrecordedSigned": "{count} × ingen samlare registrerad, signerad av {name}",
@@ -6061,22 +6208,26 @@ export const sv_SE: EnTranslations = {
       "enchant_weapon_piston_drive": "Vapen Etching: Kolvdrift"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Dina träffande närstridsattacker kan ge 50 Styrka i 15 sekunder och hela dig för 200 hälsa. Läkningsmodifierare gäller. Varje träff har 1 % chans per 0,6 sekunder av den anfallande vapnets bashastighet. Ingen intern nedkylning. Båda händerna delar en förstärkning; varje utlösning förnyar den och den staplas aldrig. Distansattacker utlöser inte effekten. Vargform använder sin bashastighet på 1 sekund.",
-      "enchant_weapon_riftwalkers_grace": "Dina landade närstridattacker kan ge 60 smidighet och 2% snabbare närstridattacker i 15 sekunder. Varje träff rullar 1% per 0,6 sekunder av vapnets basvapenhastighet. Ingen intern cooldown. Båda händerna delar en buff; vilken trigger som helst förnyar den, och den staplas aldrig. Distansattacker löser inte denna effekt. Kattform använder istället dess 1 sekunds basvapenhastighet.",
+      "enchant_weapon_lastflame_zeal": "Dina närstridsattacker som träffar kan ge 50 Styrka i 15 sek. och hela dig för 200 hälsa. Modifieringar av helande gäller. Varje träff har 1% chans per 0,6 sek. av det träffande vapnets grundhastighet. Ingen intern nedkylning. Båda händerna delar en förstärkning; varje utlösning förnyar den och den kan inte staplas. Avståndsattacker utlöser inte effekten. I Kattform använder automatiska attacker tassarnas hastighet på 1 sek. Slag och avslutare i Kattform och Bruinform använder vapnets egen hastighet; Svepande klor gör en chanskontroll per användning, inte per mål.",
+      "enchant_weapon_riftwalkers_grace": "Dina närstridsattacker som träffar kan ge 60 Smidighet och 2% snabbare närstridsattacker i 15 sek. Varje träff har 1% chans per 0,6 sek. av det träffande vapnets grundhastighet. Ingen intern nedkylning. Båda händerna delar en förstärkning; varje utlösning förnyar den och den kan inte staplas. Avståndsattacker utlöser inte effekten. I Kattform använder automatiska attacker tassarnas hastighet på 1 sek. Slag och avslutare i Kattform och Bruinform använder vapnets egen hastighet; Svepande klor gör en chanskontroll per användning, inte per mål.",
       "enchant_weapon_dawnfire_etching": "Märker permanent ett vapen med 18 spellkraft. Spellkraft räknas också mot läkningskraft. En platt bonus; den skalas inte.",
       "enchant_weapon_dawns_benediction": "Märker permanent ett vapen med 34 läkningskraft. Läkningskraft ökar endast helande, aldrig spellskada. En platt bonus; den skalas inte.",
       "enchant_weapon_piston_drive": "Märker permanent ett tvåhandsvapen med 12 styrka och 25 kritiska slag. Kan inte tillämpas på ett enhandsväpen. En platt bonus; den skalas inte."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Din allierade hemsten är inte bunden. Tala med en allierad kvartermästare eller använd den vid en allierad knutpunkt.",
+      "hearthstoneBound": "Din allierade hemsten är nu bunden till {hub}.",
+      "hearthstoneTransport": "Hemstenen för dig till {hub}.",
+      "itemCooldown": "Föremålet är inte klart än ({minutes} min återstår).",
       "alliedHearthstoneUse": "Användning: Teleporterar dig till din inställda fraktionsnav. (10 sek kast, 15 min väntetid)",
       "alliedHearthstoneAttuned": "Inställd på: {hub}",
       "hub_none": "Ingen (använd nära en fraktionsnav för att ställa in)",
       "hub_rift_watch": "Driftvik (Riftvakten)",
       "hub_church_order": "Östbäcksdalen (Kyrkoorden)",
-      "hub_automatons": "Sydlig räckvidd (AutomatsmidjaN)",
+      "hub_automatons": "Wyrmwatch (Automater)",
       "riftGliderUse": "Användning: Fäller ut glidaren, saktar fallhastigheten för 30 sek. Landning eller skada avbryter effekten. (2 min väntetid)",
       "targetDummyUse": "Användning: Distribuerar en mekanisk måldumy i den öppna världen för 2 minuter för att träna stridsförmågor. (5 min väntetid)",
-      "battleStandardUse": "Användning: Plantera Vigda gryningens stridsfana för 5 minuter, ökar markant hälso- och manaregerering utanför strid för alla närliggande allierade. Att stanna nära den i 10 sekunder ger också Gryningens välsignelse (+5% till alla stats för 30 min). (5 min väntetid)",
+      "battleStandardUse": "Användning: placerar Vigda gryningens stridsfana i 5 min. Spelare utanför strid inom 15 yards återhämtar 10% mer hälsa, och manaanvändare återfår dessutom mana motsvarande 5% av sin Ande varannan sek. Stanna nära i 10 sek. för att få Gryningens välsignelse, som ökar Styrka, Smidighet, Uthållighet, Intellekt och Ande med 5% i 30 min. (5 min. nedkylning)",
       "shockBombUse": "Användning: Kastar en chockbomb upp till 30 meter, orsakar 120 till 160 naturskada för alla fiender inom 5 meter. (1 min väntetid)",
       "invisibilityUse": "Användning: Höljer dig i smyg för 6 sek. (2 min väntetid)",
       "armorKitUse": "Användning: Förstärker din bröstrustning, ökar rustning med 12 för 1 timme.",
@@ -6436,7 +6587,9 @@ export const sv_SE: EnTranslations = {
     },
     "pattern": {
       "teaches": "Användning: Lär dig tillverka {item}.",
-      "teachesEnchant": "Användning: Lär dig använda {enchant}."
+      "teachesEnchant": "Användning: Lär dig använda {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Upplösning: {name}",
@@ -7248,7 +7401,9 @@ export const sv_SE: EnTranslations = {
         "passage": "Passage"
       },
       "collapseHint": "Minimera kartsidobalken",
-      "expandHint": "Expandera kartsidobalken"
+      "expandHint": "Expandera kartsidobalken",
+      "resizeRailAria": "Kartans sidopanelsbredd",
+      "resizeRailHint": "Dra för att ändra storlek på kartans sidopanel. Dubbelklicka för att återställa."
     },
     "arenaGate": {
       "minLevelNote": "Kräver nivå {level}"
@@ -7533,6 +7688,8 @@ export const sv_SE: EnTranslations = {
       "choose": "Välj uppdrag",
       "inProgress": "Pågår ({count}/{required})",
       "completed": "Slutfört den här veckan",
+      "completedLastWeek": "Slutfört förra veckan",
+      "claimFirst": "Hämta först",
       "lockedThisWeek": "Låst den här veckan",
       "footerPick": "Du kan hålla ett veckouppdrag åt gången. Klicka på ett kort för att läsa villkoren.",
       "footerHeld": "Din veckouppgift är inställd. De övriga tre låses upp vid omstarten.",
@@ -7541,7 +7698,7 @@ export const sv_SE: EnTranslations = {
       "rewards": "Belöningar",
       "alsoReceive": "Du får också:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Öppnas till en Normal raidkläder för din klass (aldrig en setkläder), plus {count} x {item}.",
+      "cacheDesc": "Öppnas till ett Normalt raidplagg för din klass (aldrig ett setplagg från Ignivar), plus {count} x {item}.",
       "dialogNote": "Endast en veckouppgift kan vara aktiv. Det {reset}",
       "accept": "Acceptera",
       "decline": "Avslå",
@@ -7573,6 +7730,7 @@ export const sv_SE: EnTranslations = {
       },
       "commendHeading": "Utsändingens kommendation",
       "commendNote": "{amount} anseende till en välkommen jakt av ditt val, en gång i veckan.",
+      "commendCarriedNote": "{amount} anseende från förra veckan är ännu inte hämtat. Hämta det för att välja en ny laddning.",
       "commendClaimed": "Den här veckan kommendation gick till {faction}.",
       "commendRewardLine": "{amount} anseende med en valbar välkommen jakt",
       "chosen": "Veckouppdrag taget: {category}",
@@ -9016,7 +9174,7 @@ export const sv_SE: EnTranslations = {
       "mobileBody": "På en telefon eller surfplatta startar spelet dig på Low. Varje pekenhet landar där vid första starten, med flit, så att du kommer in i världen och spelar; höj den själv från Grafikpanelen när du vill. I en Android-webbläsare står hela stegen öppen för dig och ditt val sitter kvar. På iPhone och iPad kan du fortfarande välja de översta förinställningarna och de tar fäste så snart du trycker Tillämpa, men spelet sätter tillbaka dig på High nästa gång du startar, eftersom iOS kan avsluta fliken medan en så stor scen byggs. Den nedladdade appen är snävare ändå: dess lista över förinställningar slutar vid High och de enskilda systemrattarna är dolda, eftersom appen sköter dem själv.",
       "touchBody": "På en pekskärm får Grafikpanelen ett eget kort Pekkontroller: styrspakens storlek och dödzon, storlek på skärmknapparna, kontrollernas opacitet, en valfri kameraspak, en speglad layout för vänsterhänta och inverterad pekstyrd blick, så att skärmen formar sig efter dina händer i stället för tvärtom.",
       "audioTitle": "Ljud och språk",
-      "audioBody": "Alternativfönstret är inte bara pixlar. Ljud rymmer tre volymreglage, för ljudeffekter, musik och röst, plus en strömbrytare för musik och fyra brytare för de ljud som oftast tröttar ut: NPC-röster, fotsteg, gränssnittsljud och klickrespons. Fliken Allmänt i Gränssnittspanelen bär en språkväljare som lokaliserar om hela gränssnittet på fläcken, utan omladdning, och en temaväljare för fönstrens utstyrsel.",
+      "audioBody": "Alternativfönstret handlar också om ljud. Ljud har fyra volymreglage för effekter, omgivning, musik och röster, en musikströmbrytare och fyra brytare för ljud man ofta tröttnar på: NPC-röster, fotsteg, gränssnittsljud och klickrespons. Fliken Allmänt under Gränssnitt har ett språkval som omedelbart översätter hela gränssnittet utan omladdning och ett temaval för fönstren.",
       "autolootBody": "Föredrar du att inte klicka på varje lik? Automatisk plundring i förbifarten, på fliken Strid i Gränssnittspanelen och avstängd som standard, skopar upp bytet från dina egna byten medan du går förbi dem.",
       "panelsMoreBody": "De två panelerna den här sidan inte tar upp är värda en titt ändå. Auror är där du formar de stora larmen på skärmen som utlöses när en av dina klass-procar dyker upp: vilka som visas, deras storlek, färg, opacitet och var de sitter på skärmen. Prestandaöverlägget är avläsningen du slår på medan du finjusterar den här sidan, och sedan döljer igen.",
       "valueUltraOrInsane": "Ultra, eller Extrem om du vill ha allt",
@@ -9033,6 +9191,7 @@ export const sv_SE: EnTranslations = {
       "rowCameraSpeed": "Hur snabbt kameran svänger när du ser dig omkring med musen.",
       "rowTouchLookSpeed": "Samma sak för pekblicken, och den visas bara när du är på en pekskärm.",
       "rowFullscreen": "Fyller hela skärmen med spelet.",
+      "rowSpellEffects": "Glöd, gnistor, projektiler och träffexplosioner från besvärjelser som spelare och deras husdjur kastar, inklusive dina egna. Stäng av för en lugnare skärm eller några extra bildrutor i stora gruppstrider. Allt som fiender kastar syns fortfarande, liksom ringarna som visar områden du bör lämna, markörerna ovanför bedövade, skrämda eller rotade mål och alla kaststaplar.",
       "rowWaterRipples": "Kölvatten och krusningar som sprider sig bakom dig när du simmar. Avstängt som standard, och den enda vatteneffekten som kostar riktiga bildrutor; stänk och bubblor påverkas inte oavsett.",
       "rowOverflowXp": "Vid maxnivå, om ditt fält fortsätter fyllas med överflödeserfarenhet eller i stället visar den klassiska statiska texten för maxnivå.",
       "rowInterfaceMode": "Om du får skrivbordsgränssnittet eller pekkontrollerna på skärmen. Auto läser av din enhet, och du kan tvinga fram endera: en surfplatta med tangentbord kan ta skrivbordslayouten, och en pekskärmsbärbar kan ta pekkontrollerna.",
@@ -9067,7 +9226,7 @@ export const sv_SE: EnTranslations = {
       "ifPartyShowAuras": "Om buffar och debuffar visas på gruppramarna. Motsvarande brytare täcker resursfält, absorptioner, djur och om du själv syns i din egen grupplista.",
       "ifAurasOnPlayerFrame": "Lägger dina buffar och debuffar på din egen ram, utöver aurafältet.",
       "ifAuraBarBelowFrame": "Flyttar buffraden under din enhetsram i stället för ovanför den. Spelar bara roll när förstärkningar visas på spelarramen.",
-      "ifTargetAurasBelowFrame": "Hänger målramens buff- och debuff-band under ramen istället för ovanför den, den klassiska layouten. Av som standard, eftersom standardtargetgramen sitter direkt ovanför handlingsfältet; slå på det när du har flyttat ramen någonstans med plats under den.",
+      "ifTargetAurasBelowFrame": "Placerar målets rad med förstärkningar och försvagningar under målramen, under namn och hälsomätare, i stället för ovanför: den klassiska placeringen. I standardläget flyttas målramen, tillsammans med din besvärjelsemätare och dina slagtimers, en rad uppåt så att första effektraden går fri från handlingsfältet; en ram du har flyttat stannar där du satte den.",
       "ifAlwaysShowAllBuffs": "Visar alla aktiva förstärkningar även med grafikförinställningen Låg och kringgår den vanliga gränsen för förstärkningsikoner.",
       "ifShowAuraCaster": "Lägger till en Cast by-rad till varje buff/debuff-verktygstips, namngivning vem som tillämpade det. Praktiskt för att skilja flera trollformelskastarar av samma buff, som två paladiner's välsignelser.",
       "ifTargetOfTarget": "Visar vem ditt mål siktar på, det klassiska sättet att se om tanken fortfarande har aggro.",
@@ -9085,6 +9244,7 @@ export const sv_SE: EnTranslations = {
       "ifMouseoverCast": "Låter en läkning eller en vänlig besvärjelse landa på den gruppram du hovrar över, utan att byta mål.",
       "ifStickyTarget": "Behåller ditt nuvarande mål när du klickar på tom mark, i stället för att rensa det.",
       "ifFctScale": "Storleken på de skade- och läkningssiffror som flyter upp från ditt mål.",
+      "ifClassicCombatText": "Återställer de enkla vita och blekgula skadesiffrorna som stiger rakt uppåt. Låt inställningen vara avstängd (standard) för tydligare siffror som sprids åt sidorna och blossar upp vid kritiska och ovanligt stora träffar.",
       "ifExtraBars": "Visar ett andra handlingsfält, och ett tredje när det andra är på. Platserna går fortfarande att nå med sina tangentbindningar även när fälten är dolda.",
       "ifHideUnused": "Döljer tomma handlingsplatser så att bara knapparna du faktiskt använder ritas ut.",
       "ifLockBars": "Låser dina handlingsfält så att du inte råkar dra ut en förmåga ur en plats av misstag.",
@@ -9150,6 +9310,7 @@ export const sv_SE: EnTranslations = {
       "framesGovernedTalkingHead": "Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.",
       "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
+      "framesGovernedResourceAndHill": "Aktivera Koppla loss resursfältet på fliken Ramar så låser Redigera ramar även upp ditt resursfält. Då kan du placera mana, energi eller vrede separat var du vill. Resursfältets bredd och Resursfältets höjd på samma flik ändrar storleken. Redigera ramar låser även upp fältet för Kungens på kullen. Bakgrundens opacitet för Kungens på kullen på samma flik tonar ned panelen medan texten förblir tydlig.",
       "barsTitle": "Mätare, timer och stridstext",
       "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
       "aurasTitle": "Buffar och debuffar",
@@ -9511,18 +9672,20 @@ export const sv_SE: EnTranslations = {
       "formsHeading": "Formskiftning",
       "formsNote": "En druid slåss genom att byta form. De flesta av druidens förmågor hör till en enda form, så formen du befinner dig i avgör vad du kan kasta, och att skifta kostar lite mana. Du kan skifta in eller ut ur strid, så ofta du vill.",
       "formsAutoUnshift": "En läkning eller en skadetrollformel som kastas i skepnad tar dig ur den åt dig. Att lämna en skepnad på det sättet är gratis och förbrukar inte den globala nedkylningen, så en omedelbar trollformel går av i samma stund du trycker. Att skifta tillbaka är en vanlig förmåga och kostar fortfarande mana och din globala nedkylning.",
-      "formsMoonwing": "En Månlund-druid får en form till, Månugglaform, besvärjarformen en Balans-druid strider i. Det är den enda djurformen som behåller dina besvärjelser, och din trollstav fungerar bara i den eller i din vanliga besvärjarform.",
-      "formsWolfEngage": "En varg öppnar striden med Bruinrusning, skiftar genast till Vargform för att hålla fast målet, sluter avståndet med Utfall när den inte smyger och håller en fiende stilla med Nedtagning.",
+      "formsMoonwing": "En Balans-druid får ytterligare en form, Månugglaform, besvärjarformen som denna specialisering strider i. Liksom Återställnings Sporläkarform behåller den dina besvärjelser, och din trollstav fungerar bara i dessa två former eller din vanliga besvärjarform.",
+      "formsWolfEngage": "En katt öppnar striden med Bruinrusning, skiftar genast till Kattform för att hålla fast målet, sluter avståndet med Utfall när den inte smyger och håller en fiende stilla med Nedtagning.",
       "formLine": {
         "form_bear": "Tankformen: en tjock hud, Raseri i stället för mana, och extra hot så att fiender fortsätter slå på dig.",
         "form_cat": "Närstridsskadeformen: Energi och kombopoäng, precis som en Skurk, och betydligt mindre hot.",
-        "form_travel": "Reseformen: betydligt snabbare över mark, men inga andra förmågor förrän du skiftar ur."
+        "form_travel": "Reseformen: betydligt snabbare över mark, men inga andra förmågor förrän du skiftar ur.",
+        "form_sporemender": "Återställnings läkningsskepnad: tåligare hud och starkare läkning med långsammare steg, samtidigt som du behåller alla besvärjelser och din mana."
       },
       "mageEleSummon": "En Frost-besvärjelse som kallar elementaren till din sida och sätter den på ditt mål.",
       "formName": {
         "form_bear": "Bruinform",
         "form_cat": "Kattform",
-        "form_travel": "Fleetform"
+        "form_travel": "Fleetform",
+        "form_sporemender": "Sporläkarform"
       }
     },
     "classHook": {
@@ -10021,7 +10184,7 @@ export const sv_SE: EnTranslations = {
       "honorFinalNoteSoldBack": "Hedersköp är slutgiltiga. Återköpslistan innehåller bara det du har sålt: ett köp för mynt kan vanligen säljas tillbaka för sitt försäljningspris och hämtas tillbaka från listan om du ändrar dig igen, men krigföringsutrustning binds till själen i samma ögonblick som du köper den. Den kan därför aldrig handlas, skickas med post eller säljas tillbaka för något, och den hamnar aldrig på listan. Butiken ber dig bekräfta av den anledningen: läs föremålet innan du trycker.",
       "warfareHeading": "Krigföringsutrustning",
       "warfareBody": "Varje Krigföringsplagg bär Krigföringsanfallsvärdering och Krigföringsförsvarsvärdering, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare: i en duell, i arenan eller på slagfältet, där Anfallsvärdering lägger till skadan du vållar och Försvarsvärdering minskar skadan du tar, vardera upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså Krigföringsvärdering eller effekter som bara fungerar mot spelare, så en full uppsättning krigföringsutrustning är värdelös mot en fängelsehåleboss.",
-      "warfareBodyStatsStay": "Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster.",
+      "warfareBodyStatsStay": "Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster. Ett undantag fungerar överallt: två delar av vilket som helst av dessa set gör också att skada du tar inte längre fördröjer dina besvärjelser.",
       "warfareTradeBody": "Det är den medvetna avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålenivåerna: ett Krigföringsplagg bär aldrig de stridsvärden en episk fängelsehålepjäs i samma plats gör, och allt det faktiskt ger spenderas på andra spelare. Vill du hålla din egen i arenan, köp den. Vill du klara heroiska snabbare, förtjäna din utrustning i fängelsehålorna.",
       "warfareTradeBodyRatingSpent": "Det är den avsiktliga avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålornas nivåer: ett krigföringsföremål har aldrig de stridsvärden som en episk fängelsehåleutrustning på samma plats har, och krigföringsvärdet och setbonusarna det får i stället används helt mot andra spelare. Vill du hävda dig på arenan, köp den. Vill du klara hjältemodiga fängelsehålor snabbare, förtjäna din utrustning där.",
       "vanguardHeading": "Vanguard-utrustning: Warfare säsong 2",
@@ -10046,6 +10209,8 @@ export const sv_SE: EnTranslations = {
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "En gång var tredje timme, vid ett tillfälle ingen kan förutsäga, blir hela riket berättat att en kulle kommer att stiga i en av fritt-för-allt-zonerna om femton minuter, och cirkeln där det kommer att stå markeras på öppen mark. När den stiger står den i fyrtiofem minuter, sedan faller. Partiet med mest spelare som står innanför bestrid kullen, och efter en minut av obruten majoritet är kullen deras; en ensamspelare räknas som ett parti av en, men raid-medlemmar räknas inte alls. Medan ett parti håller kullen, tjänar var och en av dess medlemmar som står innanför Ära varje minut, och ju längre samma parti håller det, desto mer varje minut betalar: ett fullt parti som håller en omtvistet kulle för hela sin tid tjänar ungefär lika mycket som tre slagfält-segrar. När kullen byter händer startar de nya innehavarna räkningen från början. En stapel över fältet visar vem som håller det, dina nummer mot deras, och tävlingsklockan; /hill i chatten säger var den står.",
+      "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyFlat": "En gång var tredje timme får hela riket vid en oförutsägbar tidpunkt veta att en kulle dyker upp i en zon med fri strid om femton minuter. Dess cirkel markeras på öppen mark. Kullen står kvar i fyrtiofem minuter och försvinner sedan. Under tiden meddelas dess plats och grupperna med längst sammanlagd innehavstid var femte minut. Gruppen med flest spelare i cirkeln utmanar om kullen och tar den efter sammanlagt trettio sekunders numerärt övertag. En rivaliserande grupp pausar bara räknaren tills din grupp leder igen; den börjar om först när ingen levande medlem av din grupp finns kvar där inne. En ensam spelare räknas som en grupp på en person och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Varje medlem i gruppen som håller kullen och står i cirkeln får lika mycket Ära varje minut, oavsett hur länge gruppen hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar ungefär lika mycket som för tre segrar på slagfält. När kullen försvinner får alla som stått i cirkeln minst en minut under den ledande gruppens innehav och fortfarande tillhör gruppen en seger till PvP-raden i det veckovisa valvet, om gruppen med längst sammanlagd innehavstid hållit den i minst tio minuter. En stapel över fältet visar vem som håller den, antalet spelare på båda sidor och erövringsräknaren; /hill i chatten visar platsen.",
       "limitsBodyRaids": "Att besegra samma spelare igen och igen betalar mindre varje gång och snart ingenting, och din räkning mot den spelaren börjar bara igen ungefär en timme efter den första av dessa dödningar, så att läger en offer är aldrig värt väntan. Ett mål långt under din nivå betalar ingenting alls. Slagfält och Arenor kör sina egna regler medan du är inne i dem, och de betalar mer Ära än den öppna världen, så världens PvP är den långsammare vägen till samma leverantör. Raid tjänar ingenting från världsdödningar: en raid-medlem tar ingen Ära eller guld och krymper inte någon annans andel, så slå som ett parti för att bli betald."
     },
     "thornhollowPage": {
@@ -10223,6 +10388,7 @@ export const sv_SE: EnTranslations = {
       "formBear": "Bruinform",
       "formCat": "Kattform",
       "formTravel": "Fleetform",
+      "formSporemender": "Sporläkarform",
       "groupCreatures": "Varelser",
       "groupPets": "Häxmästardemoner",
       "pickerLabel": "Välj en modell att visa",
@@ -10656,8 +10822,8 @@ export const sv_SE: EnTranslations = {
         "commissionsHeading": "Bestellningar och Tillverkarens Band",
         "commissionsBody": "En beställning är ett hantverk skapat för någon. När ett vapen, en rustningspjäs eller ett hållet off-hand tillverkas (en dryck kan inte bära en band), kan hantverkaren flagga hantverket som en beställning: det färdiga stycket beter sig normalt i tillverkarens egna händer, men det ögonblick det byter händer i en handel binds det till personen som tog emot det. Det är Tillverkarens Band: köparen får sin pjäs, och pjäsen kan inte lämnas vidare eller säljas.\n\nBand är inte för evigt, bara dyra. En stationsmästare kan lösa upp ett bundet stycke när du står vid deras station (en mobil station erbjuder aldrig den tjänsten), mot en avgift satt av föremålets kvalitet: 25 silver ovanlig, 1 guld sällsynt, 4 guld episk, med en legendarisk som betalar den episka taxan och ett beställt vanligt stycke den ovanliga.\n\nAvgiften köper en ren tavla, inte ett botemedel: stycket är fortfarande en beställning, så det binds igen till vem som tar emot det i nästa handel, och allt annat om det, signatur, mästerverk och förtrollningar, förblir orört.",
         "provenanceHeading": "Signerat arbete",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; högerklicka på stapeln för hela listan (på touch, använd dess Källor-knapp). Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att hålla en signerad kopia av ett nödvändigt reagens vid bänken, vem som än signerade det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; högerklicka på stapeln för hela listan (på touch, använd dess Källor-knapp). Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att ha en signerad enhet av ett nödvändigt reagens, vem som än signerade det, i väskorna eller Materialvalvet där tillverkningen kan hämta det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.",
         "collectorsHeading": "Samlare, trofeer, och priset pa en historia",
         "collectorsBody": "Handlare är blinda för ursprung: ett signerat föremål säljs till ett NPC för exakt sitt ordinarie pris. Premiumet på en signatur finns bara mellan spelare, vilket är precis vad som gör det intressant: en stapel vindfallsmalm signerad av en berömd samlare, ett Primärsnitt från en lycklig insamling, ett mästerverk-svärd som namnger en hantverkare som sedan gått i pension, alla kostar vad någons minne säger att de är värda.\n\nBedrifternas bok lutar sig mot samma instinkt: Oskadd åder, Urgammalt hjärtved, Månlyst blomma, Ett perfekt exemplar och Glimmer av hopp är noll-ryktbarhetens samlarmärken som finns enbart för att bevisa att ett ögonblick hände dig. Behåll föremålet som förtjänade bedriften och du har kvittot. Inget av detta är styrka; ursprung köper inga egenskaper och vinner inga strider, det är spelets pappersspår av goda dagar.",
         "castPaceHeading": "Kasttid och guldslukaren",
@@ -10706,7 +10872,7 @@ export const sv_SE: EnTranslations = {
         "q3": "Vad är skillnaden mellan att plundra och skörda en kropp?",
         "a3": "Det är två skilda handlingar på samma kropp. Allt ett lik innehåller, mynt och fynd plus insamlingsbara komponenter, öppnas i samma fönster, men interagera-tangenten och Ta byte plockar bara det vanliga bytet, som följer normala bytesregler. Insamling är yrkessidan, som lossar material från kroppen själv, och sker först när du väljer Skörda i det fönstret.\n\nInsamling är först till kvarn, engångsbasis: varje kropp kan skördas exakt en gång, av vem som helst som gör anspråk på det först, inbegripet online-föregångare. Ditt Stadsfokus formar vad du får: när du står i ett stadscentrum kan du fördela 10 fokuspoäng över de komponenttyper du bryr dig om, och varje fokuserad komponent rullar en bättre nivå (var 5:e poäng ökar det ett steg, som mest två steg) och ger mer (10 procent per poäng). Ofokuserade komponenter försämras aldrig.",
         "q4": "Varfor är min Ironbark-stock signerad?",
-        "a4": "Du fick ett vindfall. Ungefär 1 skörd av 90 utlöser en sällsynt insamlingshändelse (urgammalt hjärtved på ett träd, en oskadd åder i malm, en månlyst blomma bland örter): den femdubblar utbytet, signerar varje enhet med ditt namn och kungör fyndet för hela zonen. Ett sällsynt eller bättre kvalitetsslag på en vanlig skörd signerar också utbytet.\n\nSignerade material är värda att spara eller sälja dyrt: att hålla vilken signerad kopia som helst av ett nödvändigt reagens vid bänken lägger till 2 procentenheter på mästerverkschansen. Kom bara ihåg att de bara staplas med identiskt signerade kopior, så de tar en egen väskplats.",
+        "a4": "Du har hittat en ovanligt rik skörd. Ungefär 1 av 90 skördar utlöser en sällsynt insamlingshändelse: uråldrig kärnved i träd, en orörd åder i malm eller en månlyst blomma bland örter. Utbytet femdubblas, varje enhet får ditt namn som signatur och fyndet annonseras i hela zonen. En vanlig skörd som får sällsynt eller bättre kvalitet signerar också utbytet.\n\nSignerade material är värda att behålla eller sälja dyrt: en signerad enhet av ett nödvändigt reagens i väskorna eller Materialvalvet, där tillverkningen kan hämta det, ger 2 procentenheter högre mästerverkschans. De kan dela en kompatibel stapel med osignerat material eller andra samlares och undertecknares enheter utan att tappa märken; varje källa och mängd sparas separat.",
         "q5": "Hur löser jag upp ett bestellt stycke, och vad kostar det?",
         "a5": "Gå till valfri hantverksstation med pjäsen i din väska och betala mästaren. Avgiften följer föremålets kvalitet: 25 silver för ett ovanligt stycke, 1 guld för ett sällsynt, 4 guld för ett episkt; ett legendariskt betalar den episka taxan, och ett beställt vanligt stycke betalar den ovanliga. Det måste vara en riktig station: en mobil station erbjuder aldrig tjänsten.\n\nAvgiften köper en ren tavla, inte ett botemedel: pjäsen förblir en beställning, så det binds igen till vem som tar emot det i nästa handel. Om flera bundna kopior delar en stapel lossas en kopia av och löses upp per betalning.",
         "q6": "Var lär jag mig recept, och vad kostar de?",
@@ -10742,6 +10908,7 @@ export const sv_SE: EnTranslations = {
       "buyingBody": "Tala med en köpman och välj att bläddra bland deras varor, så öppnas butiken med tre flikar: Bläddra, Sälj och Återköp. Bläddra rymmer allt de har i lager, ditt om du har råd. Sälj listar det i dina väskor som de betalar för, och att sälja en pjäs som bär sin egen slumpade kvalitet ber dig bekräfta först, så att en dyrbar kopia aldrig glider iväg av misstag. Om du gör dig av med något du ångrar håller fliken Återköp kvar dina senaste försäljningar så att du kan köpa tillbaka dem för myntet du fick.",
       "junkTitle": "Rensa bort skräp",
       "junkBody": "Byten du inte har någon nytta av går fortfarande att sälja till vilken handlare som helst, så töm dina väskor varje gång du passerar genom staden i stället för att låta dem fyllas. Handlarens Sälj-flik har till och med en enklicksknapp som säljer varenda småsak av Undermålig kvalitet på en gång. Helt värdelösa småsaker kan också kastas direkt för att göra plats.",
+      "junkBodyFinal": "Byte som du inte behöver kan fortfarande säljas till alla handlare som har en egen butik, så töm väskorna när du passerar en stad i stället för att låta dem bli fulla. I handlarens fönster finns till och med knappen Sälj skräp, som säljer alla föremål av usel kvalitet med ett klick. Helt värdelösa småsaker kan också kastas bort direkt för att skapa plats. Osignerade grå föremål som säljs på detta sätt hamnar inte i återköpslistan, så kontrollera att inget du vill behålla följer med innan du trycker.",
       "tradeTitle": "Handla med andra spelare",
       "tradeBody": "Du kan byta öga mot öga med vem som helst som står nära dig. Ni lägger båda föremål och mynt i ett delat fönster och bytet sker först när ni båda bekräftar det, så ingen sida kan bli lurad. Det är det enkla sättet att räcka en vän ett byte eller göra upp en affär.",
       "mailTitle": "Korpposten",
@@ -14748,6 +14915,10 @@ export const sv_SE: EnTranslations = {
     "selectClass": "Var god välj en klass.",
     "pickClass": "Välj en klass.",
     "returnToLogin": "Återgå till inloggning",
+    "searchUpdates": "Sök efter uppdateringar",
+    "noUpdateFound": "Ingen uppdatering hittades. Försök igen om en stund.",
+    "updateUnavailable": "Uppdatera via din spelbutik eller hämta den senaste klienten.",
+    "updateSearchFailed": "Det gick inte att söka efter uppdateringar. Försök igen.",
     "api": {
       "tooManyAttempts": "För många försök. Vänta en minut och försök igen.",
       "usernameShape": "Användarnamnet måste vara 3-24 tecken och använda bokstäver, siffror eller understreck.",
@@ -14979,6 +15150,17 @@ export const sv_SE: EnTranslations = {
     "androidOpenStep": "Öppna World of ClaudeCraft från den nya ikonen.",
     "otherStandaloneDetail": "Håll din enhet i liggande helskärm.",
     "otherInstallDetail": "Installera eller lägg till den här sidan på din Hemskärm för bästa mobila helskärmsupplevelse."
+  },
+  "graphicsPrompt": {
+    "title": "Välj dina grafikinställningar",
+    "intro": "Välj en grafikförinställning för den här enheten. Lägre förinställningar ger bättre flyt, högre ger rikare grafik.",
+    "autoDesc": "Väljer en förinställning som passar den här enheten. Identifierad: {preset}.",
+    "lowDesc": "Bäst flyt. Passar bäst för telefoner, surfplattor och äldre eller integrerade grafikkretsar.",
+    "mediumDesc": "En balans mellan grafik och prestanda. Passar de flesta bärbara datorer.",
+    "highDesc": "Fler detaljer och fylligare landskap. Passar ett dedikerat grafikkort.",
+    "ultraDesc": "Den visuellt rikaste fasta förinställningen. Passar ett avancerat grafikkort.",
+    "changeLater": "Du kan ändra detta när som helst i Alternativ, under Grafikkvalitet.",
+    "confirm": "Fortsätt"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Världen otillgänglig",
@@ -15627,6 +15809,7 @@ export const sv_SE: EnTranslations = {
       "passive": "Passiv",
       "defensive": "Defensiv",
       "aggressive": "Aggressiv",
+      "assist": "Assistans",
       "petAttackTitle": "Djurets anfall",
       "petAttackDesc": "Befall ditt djur att angripa ditt nuvarande fientliga mål.",
       "waterJetTitle": "Vattenstråle",
@@ -15640,10 +15823,11 @@ export const sv_SE: EnTranslations = {
       "healDemonDesc": "Förbruka mana för att kanalisera läkning in i din demon under 5 sekunder.",
       "healPetDesc": "Klicka och klicka sedan på mat i dina väskor för att mata och läka ditt djur under 5 sekunder.",
       "stanceTitle": "Djurets hållning",
-      "stanceDesc": "Klicka för att välja Passiv, Defensiv eller Aggressiv.",
+      "stanceDesc": "Klicka för att välja passiv, defensiv, aggressiv eller assistans.",
       "passiveDesc": "Angriper bara när du befaller det.",
       "defensiveDesc": "Angriper fiender som skadar dig eller ditt djur.",
       "aggressiveDesc": "Angriper närliggande fientliga motståndare.",
+      "assistDesc": "Angriper bara ditt nuvarande mål när du har använt en förmåga på det. Ignorerar fiender som angriper dig.",
       "rename": "Byt namn på djur",
       "revive": "Lappa ihop",
       "abandon": "Överge djur",
@@ -16088,6 +16272,8 @@ export const sv_SE: EnTranslations = {
       "clueTalkAria": "Fråga om ledtråden: {name}",
       "clueDeliver": "Överlämna {count} {item}.",
       "clueDeliverAria": "Överlämna {count} {item} till {name}",
+      "attuneHearthstone": "Bind min allierade hemsten här.",
+      "attuneHearthstoneAria": "Bind din allierade hemsten till {hub} hos {name}",
       "profIntroHint": "Se {name} angående \"{quest}\".",
       "nythraxisDeathlessKingWarning": "De tre relikerna berättar samma historia: Aldren stred för att försvara sin kung, Malric bröt dödens gräns, och Voss försökte hejda det som följde. Sigillet försvagas, och den övergivna kryptan är vägen nedåt.",
       "browseGoods": "Låt mig se dina varor.",
@@ -16129,6 +16315,7 @@ export const sv_SE: EnTranslations = {
       "activeStatus": "Aktivt världsuppdrag",
       "expiresIn": "Upphör om {time}",
       "mineOre": "Bryta kopparmalm",
+      "mineMaterial": "Bryt {name}",
       "recoverObject": "Återhämta {name}",
       "redirectLeyBeam": "Omdirigera ljusstralens",
       "matchConfections": "Matcha förtrollad godis",
@@ -16476,6 +16663,7 @@ export const sv_SE: EnTranslations = {
       "clueCasketOpened": "Kissan innehåller {money} och {items}.",
       "treasureMapEarned": "Alla världsuppdrag för dagen är klara: du hittade en {map}.",
       "treasureMapLost": "Alla världsuppdrag för dagen är klara, men dina väskor har ingen plats för skattkarta.",
+      "worldQuestRewardMailed": "Dina väskor är fulla. Din belöning skickades till brevlådan: {items}.",
       "treasureMapRead": "Du studerar {map}. X ligger någonstans i {zone}.",
       "treasureMapUpgraded": "Kartan är omtecknad i finare bläck: det är nu en {map}.",
       "treasureVaultOpened": "Marken ger vika. En begravd skatt ligger öppen framför dig.",
@@ -16668,7 +16856,8 @@ export const sv_SE: EnTranslations = {
       "sellQuantityCancel": "Avbryt",
       "sellJunk": "Sälj skräp",
       "sellJunkAria": "Sälj allt skräp för {price}",
-      "sellJunkHint": "Säljer varje grått föremål i dina väskor utom uppdragsföremål."
+      "sellJunkHint": "Säljer varje grått föremål i dina väskor utom uppdragsföremål.",
+      "sellJunkNoBuyback": "Osignerade grå föremål hamnar inte i återköpslistan, så försäljningen kan inte ångras."
     },
     "market": {
       "title": "Världsmarknaden",
@@ -16781,7 +16970,7 @@ export const sv_SE: EnTranslations = {
       "historyEmpty": "Ingen försäljning ännu. Föremål du säljer på världsmarknaden visas här.",
       "historyNote": "Din senaste försäljning på världsmarknaden.",
       "saleBuyer": "Sålt till {buyer}",
-      "saleOlder": "Plus {count} tidigare försäljningar, inräknade i totalen.",
+      "saleOlder": "Samt {count} tidigare försäljningar som inte visas.",
       "ordersTab": "Önskat",
       "ordersNote": "Lägg upp vad du vill och guldet hålls hos köpmannen. Listor på eller under ditt pris fylls omedelbar; resten väntar på en säljare. Köpmannen tar en {cut}% avgift från den som levererar. Du har {used}/{max} ordrar öppna.",
       "ordersListAria": "Öppna köpordrar",
@@ -16932,6 +17121,10 @@ export const sv_SE: EnTranslations = {
         "name": "Pilregn",
         "description": "Låter pilar regna över ett område på 8 m i 3 sek. Fiender i området tar {damage} Fysisk skada var 0.5 sek. Skadan ökar med anfallskraft på avstånd."
       },
+      "phosphor_flask": {
+        "name": "Fosforflaska",
+        "description": "Ett förseglat kärl med en reaktiv kemisk blandning som flammar upp i vitglödande eld över ett område på 8 m i 3 sek. Fiender som står i lågorna tar {damage} eldskada var 0,5 sek. Skadan ökar med distansattackkraft."
+      },
       "pack_command": {
         "name": "Flockbefallning",
         "description": "Befall ditt levande husdjur att slå för 36 till 48 fysisk skada. Skadan ökar med husdjurets attackkraft. En träff återställer 20 fokus och ger 1 Flockvildhet i 30 sek, upp till 3. Varje stapel ökar all skada ditt husdjur gör med 10%. Detta slag använder de staplar du hade före träffen."
@@ -16954,19 +17147,19 @@ export const sv_SE: EnTranslations = {
       },
       "bloodhook": {
         "name": "Blodkrok",
-        "description": "Storma mot en fiende och applicera Blodkrokssår som gör 34 fysisk grundskada plus 26% av din distansattackkraft över 12 sek i 4 pulser. (Fältkonstsignatur)"
+        "description": "Rusa mot en fiende och lägg ett sår med Blodkrok, som ger 34 fysisk grundskada plus 26% av din avståndsanfallskraft i 4 tick under 12 sek. Vid ankomst sänks målets hastighet med 30% i 3 sek. (Överlevnad)"
       },
       "shrapnel_charge": {
         "name": "Splitterladdning",
-        "description": "Träffar målet för 24 till 30 fysisk skada och upp till 4 andra fiender inom 6 meter för 13 till 17. De andra målen blöder också för 12 skada över 6 sek. Om huvudmålet bär ditt Blodkrokssår görs 1 sårpuls omedelbart. Direktskadan ökar med distansattackkraft."
+        "description": "Träffar en 10 meter lång kon framför dig. Ditt mål, eller den närmaste träffade fienden om målet är utanför konen, tar 24 till 30 fysisk skada. Alla andra fiender i konen tar 7 till 9 och blöder för 12 skada under 6 sek. Har huvudmålet ditt sår från Blodkrok, tar det genast 1 sårtick. En träff på en fiende ger 1 Jaktfart. Direkt skada ökar med avståndsanfallskraft."
       },
       "bloodtrail_assault": {
         "name": "Blodspårsanfall",
-        "description": "I 12 sek sprider Blodkroken ett sår med 60% styrka till upp till 2 närliggande fiender, Sårslitning befaller en husdjursattack på 18 skada, och Splitterladdningen får 2 meter, gör 25% mer grundskada på sitt huvudmål och utlöser 50% mer sårskada."
+        "description": "I 12 sek sprider Blodkrok ett sår med 60% styrka till högst 2 fiender inom 5 meter, Sårslitare beordrar ett husdjursanfall för 18 skada och Splitterladdning når 2 meter längre, ger 25% mer grundskada på huvudmålet och utlöser 50% mer sårskada. Utan levande husdjur återhämtas din Fokus också 100% snabbare."
       },
       "trailbreak": {
         "name": "Spårbrott",
-        "description": "Hoppa 12 meter bakåt. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek."
+        "description": "Hoppa 25 meter bakåt och bryt dig fri från rotfästningar och förflyttningssänkningar. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek."
       },
       "wildheart": {
         "name": "Vildhjärta",
@@ -16976,9 +17169,25 @@ export const sv_SE: EnTranslations = {
         "name": "Skalhud",
         "description": "Minskar skadan du tar med 60% i 8 sek, men hindrar attacker medan den är aktiv."
       },
+      "play_dead": {
+        "name": "Spela död",
+        "description": "Fall till marken och se död ut: din hälsa och ditt fokus visas som tomma för alla. Fiender glömmer dig, och fientliga spelare som har dig som mål tappar sitt mål. Att röra dig, attackera eller använda en annan förmåga avslutar den. Kastas den medan du rör dig har du 1 sek på dig att stanna innan rörelsen avslutar den. Kasta igen för att resa dig."
+      },
+      "tactical_camo": {
+        "name": "Taktiskt kamouflage",
+        "description": "Smält in i omgivningen: fiender lägger knappt märke till dig och du rör dig med 80% hastighet. Attacker eller skada avslutar Taktiskt kamouflage. Använd igen för att träda fram. (Fältkunskap)"
+      },
       "frostjaw_trap": {
         "name": "Frostkäftsfälla",
-        "description": "Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek."
+        "description": "Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek."
+      },
+      "bear_trap": {
+        "name": "Björnfälla",
+        "description": "Placera en fälla på den valda platsen. Den armeras efter 0,75 sek. och varar i 1 min.; bara du och din grupp kan se den. Den första fienden som utlöser den blöder för {damage} fysisk skada under 15 sek. och saktas ned med 50% i 4 sek. Skadan ökar med distansattackkraft. Endast en Björnfälla kan vara aktiv åt gången. Den kan vara aktiv samtidigt som din Frostkäftsfälla. Om du placerar en ny Björnfälla ersätter den den gamla."
+      },
+      "scatterbolt": {
+        "name": "Spridbult",
+        "description": "Avfyra en skur av armborstpilar i en 90 graders kon som når 8 yards framför dig och knuffar tillbaka fiender till högst 20 yards från dig. Fiender som är immuna mot tillbakaknuffning påverkas inte. Orsakar ingen skada."
       },
       "pack_rally": {
         "name": "Flocksamling",
@@ -17094,7 +17303,7 @@ export const sv_SE: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Massbarriär",
-        "description": "Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar 130 skada i 60 sek. (magikertalang)"
+        "description": "Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar {damage} skada i 15 sek. (magikertalang)"
       },
       "overload": {
         "name": "Överbelastning",
@@ -17231,7 +17440,7 @@ export const sv_SE: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Lågt slag",
-        "description": "Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek)."
+        "description": "Avslutande drag som bedövar målet i 2 sek plus 1 sek per kombopoäng (5 kombopoäng: 7 sek)."
       },
       "ambush": {
         "name": "Smygarens hugg",
@@ -17240,7 +17449,7 @@ export const sv_SE: EnTranslations = {
       },
       "stealth": {
         "name": "Skymningsslöja",
-        "description": "Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50% långsammare. Att attackera eller ta skada bryter Skymningsslöja. Kasta igen för att kliva ut.",
+        "description": "Döljer dig i skuggorna: fiender lägger knappt märke till dig, och du rör dig i full fart. Att attackera eller ta skada bryter Skymningsslöja. Kasta igen för att kliva ut.",
         "specNote_subtlety": "Varje öppnare du använder från Skymningsslöja lägger till 1 Skymningsförråd (max 3)."
       },
       "adrenaline_rush": {
@@ -17284,7 +17493,7 @@ export const sv_SE: EnTranslations = {
       },
       "vanish": {
         "name": "Rökförsvinnande",
-        "description": "Försvinn ur sikte och gå in i Duskveil även i strid. Du rör dig 50 % långsammare medan du är dold. Varar i upp till 10 sek."
+        "description": "Försvinn ur sikte och gå in i Duskveil även i strid. Du rör dig i full fart medan du är dold. Varar i upp till 10 sek."
       },
       "instant_poison": {
         "name": "Huggormens bett",
@@ -17517,11 +17726,11 @@ export const sv_SE: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Jaktfart",
-        "description": "Passiv: Rensarslaget ger 1 Jaktfart i 8 sek, upp till 3. Vid 3 staplar gör Sårslitning 45% mer slagskada och förbrukar staplarna. (Fältkonst)"
+        "description": "Passivt: Uppsprättande hugg och en Splitterladdning som träffar en fiende ger vardera 1 Jaktfart, upp till 3. Varar tills de används eller du lämnar strid, och varje laddning ökar rörelsehastigheten med 15%. Vid 3 laddningar ger Sårslitare 60% mer slagskada och förbrukar laddningarna. (Överlevnad)"
       },
       "fieldcraft_reentry": {
         "name": "Beväpnad återkomst",
-        "description": "Passiv: Spårbrott förnyar Jaktfarten och laddar ditt nästa Rensarslag eller Blodkrok i 12 sek. Rensarslaget gör 15% mer skada per stapel. Blodkroken gör 18 till 24 extra fysisk skada, ökad med 15% per stapel och av din distansattackkraft. Vid 3 staplar förbrukar endera attacken Jaktfarten. (Fältkonst)"
+        "description": "Passivt: Med Jaktfart förbereder Spårbrott ditt nästa Uppsprättande hugg eller Blodkrok i 12 sek. Uppsprättande hugg ger 15% mer skada per laddning. Blodkrok ger 18 till 24 extra fysisk skada, ökad med 15% per laddning och av avståndsanfallskraft. Vid 3 laddningar förbrukar vilket som helst av anfallen Jaktfart. (Överlevnad)"
       },
       "wing_clip": {
         "name": "Fjättrande hugg",
@@ -17533,7 +17742,7 @@ export const sv_SE: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Springarens skepnad",
-        "description": "Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 4 sek. (varje träff förnyar omtöckningen)"
+        "description": "Anta springarens skepnad och öka er förflyttningshastighet med 30% i 30 min. Medan den är aktiv omtöcknar skada er och halverar er förflyttningshastighet i 2 sek. (varje träff förnyar omtöckningen)"
       },
       "aimed_shot": {
         "name": "Långt drag",
@@ -17589,7 +17798,7 @@ export const sv_SE: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Åskreservoar",
-        "description": "Passiv: Bågblixten och Gaffelblixten ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)"
+        "description": "Passiv: Bågblixten, Gaffelblixten och Magma Burst ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)"
       },
       "lightning_overload": {
         "name": "Arc Overload",
@@ -17597,7 +17806,7 @@ export const sv_SE: EnTranslations = {
       },
       "lava_burst": {
         "name": "Magma Burst",
-        "description": "Orsakar {damage} eldskada. Träffar alltid kritiskt ett mål som brinner av din Glödstöt. Magma Surge: varje Glödstöt-tick har 20% chans att återställa denna nedräkning och göra din nästa Magma Burst inom 10 sec omedelbar. Skada ökar med Spellkraft. (Thundercall)"
+        "description": "Orsakar {damage} eldskada. En träff ger 1 Åska. Träffar alltid kritiskt ett mål som brinner av din Glödstöt. En kritisk träff gör ytterligare 24% av den normala skadan. Magma Surge: varje Glödstöt-tick har 20% chans att återställa denna nedräkning och göra din nästa Magma Burst inom 10 sec omedelbar. Skada ökar med Spellkraft. (Thundercall)"
       },
       "thunderstorm": {
         "name": "Stormbreak",
@@ -17621,7 +17830,7 @@ export const sv_SE: EnTranslations = {
       },
       "flame_shock": {
         "name": "Glödstöt",
-        "description": "Vållar {damage} Eldskada, sedan {overTime} Eldskada under 12 sek. Den första träffen ökar med Besvärjelsekraft."
+        "description": "Vållar {damage} Eldskada, sedan {overTime} Eldskada under {duration} sek. Den första träffen ökar med Besvärjelsekraft."
       },
       "flametongue_weapon": {
         "name": "Pyrobrandsvapen",
@@ -17754,7 +17963,8 @@ export const sv_SE: EnTranslations = {
       },
       "healing_touch": {
         "name": "Vildläkning",
-        "description": "Läker ett vänligt mål för {damage}."
+        "description": "Läker ett vänligt mål för {damage}.",
+        "specNote_restoration": "Varje fullbordad kastning ger 1 Grönska (max 3). Samlad Grönska förkortar denna kastning: 2,2 sek vid 1 Grönska, 1,9 sek vid 2 och 1,5 sek vid 3. Naturens gåva gör den omedelbar, gratis och 25 % starkare."
       },
       "mark_of_the_wild": {
         "name": "Vildvärn",
@@ -17770,9 +17980,9 @@ export const sv_SE: EnTranslations = {
         "description": "Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till {duration} sek per användning. Vid full Månflod blir Månfrö Månsvall."
       },
       "rejuvenation": {
-        "name": "Vildblomning",
+        "name": "Sporläkning",
         "description": "Läker målet för {damage} under 12 sek.",
-        "specNote_restoration": "Att plantera en NY blomning lägger till 1 Grönska (max 5). Vid 5 Grönska blir Snabb läkning Överblomning."
+        "specNote_restoration": "Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar. Vid 3 Grönska blir Snabb läkning Överblomning."
       },
       "thorns": {
         "name": "Törnvärn",
@@ -17784,12 +17994,12 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Du slår dubbelt så snabbt för halva skadan per slag, och varje slag bygger dubbelt så mycket raseri. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",
         "description": "En krossande attack som ökar närstridsskadan med {damage} och orsakar stort hot. Aktiveras vid ditt nästa slag. Endast i Bruinform.",
-        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa och återbetalar 15 raseri."
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Märgbräckare: ett slag för 78 till 96 skada med högt hot; under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri."
       },
       "growl": {
         "name": "Hota",
@@ -17801,12 +18011,17 @@ export const sv_SE: EnTranslations = {
       },
       "cat_form": {
         "name": "Kattform",
-        "description": "Förvandlar er till en varg: smidigheten stiger med er nivå, anfallskraft +8 plus 2 per nivå, era anfall använder energi och kombopoäng, och ni alstrar 29% mindre hot. Att skifta till vilken gestalt som helst ger Lunkande steg: 60% förflyttningshastighet i 3 sek, en gång var 20:e sek. Besvärj igen för att återgå till besvärjarskepnaden."
+        "description": "Förvandla dig till en katt: smidigheten stiger med nivån, anfallskraft +8 plus 2 per nivå, anfallen använder energi och kombopoäng, du rör dig 15% snabbare och alstrar 29% mindre hot. Varje formskifte ger Lunkande steg, en kort fartökning. Kasta igen för att återgå till besvärjarform."
       },
       "claw": {
         "name": "Rivklo",
         "description": "Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.",
         "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
+      },
+      "scratch": {
+        "name": "Klös",
+        "description": "Klös igenom närliggande mål inom 6 yards och ge vapenskada plus {damage}. Ger 1 kombopoäng per träffat mål. Avslöjar smygande fiender inom svepet. Endast i Kattform.",
+        "specNote_feral": "Varje träff ger 1 Gammalt Blod (högst 3)."
       },
       "ferocious_bite": {
         "name": "Blodsbett",
@@ -17820,8 +18035,8 @@ export const sv_SE: EnTranslations = {
       },
       "regrowth": {
         "name": "Andra blomningen",
-        "description": "Läker ett vänligt mål för {damage} och ytterligare en mängd under 21 sek.",
-        "specNote_restoration": "Att plantera en NY blomning lägger till 1 Grönska (max 5)."
+        "description": "Läker ett vänligt mål för {damage} och ytterligare en mängd under 15 sek. Om effekten varar hela sin tid läker den målet igen för samma mängd som den första läkningen.",
+        "specNote_restoration": "Varje kastning ger 1 Grönska (max 3), även när den förnyar en blomning som redan verkar."
       },
       "barkskin": {
         "name": "Ekhud",
@@ -17858,23 +18073,23 @@ export const sv_SE: EnTranslations = {
       },
       "hibernate": {
         "name": "Slummer",
-        "description": "Tvingar målet i en djup sömn i upp till 8 sek. All skada väcker det."
+        "description": "Tvingar målet till djup sömn i upp till 8 sek. All skada väcker det. Mot spelare varar varje upprepning inom 18 sek hälften så länge som den föregående och den fjärde misslyckas."
       },
       "dash": {
         "name": "Rusa",
-        "description": "Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i kattform."
+        "description": "Skifta till Kattform om du inte redan är i den och sprinta med 50% högre hastighet i 15 sek. Kan användas i alla former. Omedelbar och utlöser inte global återhämtning."
       },
       "pounce": {
         "name": "Smyghugg",
-        "description": "En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng. Endast i vargform. Utanför smyg är den här knappen Utfall."
+        "description": "En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng. Endast i kattform. Utanför smyg är den här knappen Utfall."
       },
       "lunge": {
         "name": "Utfall",
-        "description": "Kasta dig mot en fiende upp till 12 m bort, tillfoga 60% vapenskada och ge 1 kombopoäng. Endast i vargform."
+        "description": "Kasta dig mot en fiende upp till 12 m bort, tillfoga 60% vapenskada och ge 1 kombopoäng. Endast i kattform."
       },
       "hamstring_bite": {
         "name": "Nedtagning",
-        "description": "Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek). Endast i vargform."
+        "description": "Avslutande drag som bedövar målet i 1 sek plus 1 sek per kombopoäng (5 kombopoäng: 6 sek). Endast i kattform."
       },
       "insect_swarm": {
         "name": "Stickande svärm",
@@ -17886,7 +18101,7 @@ export const sv_SE: EnTranslations = {
       },
       "rip": {
         "name": "Blodsspricka",
-        "description": "Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Kattform.",
+        "description": "Avslutande attack som får målet att blöda varannan sekund i 24 sek: 72 skada plus 48 per förbrukad kombopoäng (5 poäng: {damage} totalt). Endast i Kattform.",
         "specNote_feral": "Det landade slaget lägger till 1 Gammalt Blod (max 3)."
       },
       "mortal_strike": {
@@ -18047,11 +18262,11 @@ export const sv_SE: EnTranslations = {
       },
       "cold_blood": {
         "name": "Kallt blod",
-        "description": "Fokuserar ditt dödliga uppsåt så att din nästa attack blir en kritisk träff. (Knifework-motorn)"
+        "description": "Fokuserar ditt dödliga uppsåt så att dina nästa 5 attacker blir kritiska träffar. (Knifework-motorn)"
       },
       "blade_flurry": {
         "name": "Klingflod",
-        "description": "Släpper lös en klingflod, vilket ökar attackhastigheten med 20% i 12 sek. (Thuggery-motorn)"
+        "description": "Släpper lös en klingflod, vilket ökar attackhastigheten med 20% i 30 sek. (Thuggery-motorn)"
       },
       "hemorrhage": {
         "name": "Blödning",
@@ -18091,7 +18306,8 @@ export const sv_SE: EnTranslations = {
       },
       "swiftmend": {
         "name": "Snabb läkning",
-        "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Plantering av Vildblomning och Andra blomningen lägger till Grönska; vid 5 Grönska blir denna knapp Överblomning, som skördar varje läkning över tid du äger på alla allierade och omedelbart läker dem för 60% av dess återstående läkning. (Groveheart-motorn)"
+        "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka dem för {damage}. Varje kastning av Sporemending, Andra blomningen och Vildläkning ger 1 Grönska; vid 3 Grönska blir denna knapp Överblomning, som omedelbart läker varje allierad som bär dina läkning över tid-effekter för 60% av vad de effekterna hade kvar. (Återställning-motorn)",
+        "specNote_restoration": "Förbrukar en läkningseffekt över tid på ett vänligt mål för att läka det för {damage}. Planteringar av Sporläkning och Andra blomningen ger Grönska; vid 5 Grönska blir knappen Överblomning, som omedelbart läker varje allierad med dina läkningseffekter över tid för 60% av deras återstående läkning. (signatur för Återställning)"
       },
       "moonlash": {
         "name": "Månsvall",
@@ -18107,7 +18323,7 @@ export const sv_SE: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Märgbräckare",
-        "description": "Förbrukar dina 3 Gammalt Blod för ett tungt slag med högt hot som ger {damage} skada. Under halv hälsa skyddar det dig i stället med en sköld på 18% av din maximala hälsa i 8 sek och återbetalar 15 raseri."
+        "description": "Förbrukar dina 3 Gammalt Blod för ett tungt slag med högt hot som ger {damage} skada. Under halv hälsa helar det dig i stället för 18% av din maximala hälsa och återbetalar 15 raseri."
       },
       "wildwake": {
         "name": "Vildväckelse",
@@ -18117,9 +18333,27 @@ export const sv_SE: EnTranslations = {
         "name": "Lundens uppvaknande",
         "description": "Kallar varje fallen medlem i din grupp eller räd, inom 40 meter och inom synhåll, tillbaka till din sida med 30% hälsa och mana. Kan inte kastas i strid. (Lundhjärta)"
       },
+      "sporemender_form": {
+        "name": "Sporläkarform",
+        "description": "Byt skepnad till en sporläkare: din utförda läkning ökar med 20% och din rustning med 40%, men din rörelsehastighet minskar med 20%. Alla besvärjelser från din kastarform kan fortfarande användas. Varar tills du byter skepnad igen. Varje skepnadsbyte ger Lunkande steg, en kort ökning av rörelsehastigheten. Använd igen för att återgå till kastarformen. (signatur för Återställning)"
+      },
+      "spore_burst": {
+        "name": "Sporutbrott",
+        "description": "Frammanar en sporfylld svamp i målområdet. Efter {duration} sek brister den och läker allierade för {healing} samt ger fiender inom 8 yards {damage} naturskada.",
+        "specNote_balance": "Vid 3 Månflod blir det 25% starkare och förbrukar din Månflod.",
+        "specNote_restoration": "Ger också Sporläkning till varje allierad som läks. Vid full Grönska blir det 25% starkare och förbrukar din Grönska."
+      },
+      "natures_boon": {
+        "name": "Naturens gåva",
+        "description": "Dina besvärjelser kan aktivera Naturens gåva i 10 sek: den angivna besvärjelsen blir gratis, 25% starkare och kan kastas i alla former. En ny aktivering förnyar varaktigheten.",
+        "specNote_feral": "Varje närstridsautoträff som träffar har 1 chans på 15 att aktivera den för Sporläkning, eller för Ekhud när du är i Bruinform.",
+        "specNote_balance": "Varje Vildbult eller Himlafall du kastar har 10% chans att aktivera den för Sporutbrott, högst en gång var 10:e sekund.",
+        "specNote_restoration": "Varje tick från dina läkningseffekter över tid har 10% chans att aktivera den för Sporutbrott, högst en gång var 10:e sekund."
+      },
       "overbloom": {
         "name": "Överblomning",
-        "description": "Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet."
+        "description": "Förbrukar 3 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Sporemending på målet.",
+        "specNote_restoration": "Förbrukar dina 5 Grönska: varje allierad med dina läkningseffekter över tid läks omedelbart med {buff}% av den läkning som återstod i effekterna, effekterna tas bort och målet får en ny Sporläkning."
       },
       "summon_imp": {
         "name": "Frammana Emberkin",
@@ -18191,7 +18425,7 @@ export const sv_SE: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Järnvilja",
-        "description": "Bit ihop och ignorera smärtan: förbrukar upp till 40 raseri (minst 20) för att absorbera {absorbPerRage} skada per förbrukad raseripoäng i upp till 10 sek. (Beskydd)"
+        "description": "Bit ihop och ignorera smärtan: en sköld absorberar skada motsvarande {damage}% av din maximala hälsa vid användning, i upp till {duration} sek. (Beskydd)"
       },
       "faultline": {
         "name": "Förkastningslinje",
@@ -18463,7 +18697,7 @@ export const sv_SE: EnTranslations = {
       },
       "multi_shot": {
         "name": "Splitterskott",
-        "description": "Avfyrar en salva mot målområdet och ger {damage} Fysisk skada till fiender inom 8 m. (jägartalang)"
+        "description": "Avfyrar en salva mot målområdet och ger {damage} Fysisk skada till fiender inom 8 yards. (jägartalang)"
       },
       "prayer_of_healing": {
         "name": "Körläkning",
@@ -18491,7 +18725,7 @@ export const sv_SE: EnTranslations = {
       },
       "shadowstep": {
         "name": "Skuggkliv",
-        "description": "Kliver genom skuggorna till ditt mål, vän eller fiende, utan att bryta Duskveil. (skurktalang)"
+        "description": "Kliver genom skuggorna till ditt mål, vän eller fiende, utan att bryta Duskveil. Lagrar upp till 2 laddningar. (skurktalang)"
       },
       "silence": {
         "name": "Tystnad",
@@ -18552,7 +18786,7 @@ export const sv_SE: EnTranslations = {
       },
       "typhoon": {
         "name": "Tyfon",
-        "description": "En vindstöt slår tillbaka alla fiender inom 8 m och omtöcknar dem, vilket minskar deras rörelsehastighet med 50 % i 4 sek."
+        "description": "En vindstöt kastar alla fiender inom 8 meter 15 meter bort från dig och omtöcknar dem så att de rör sig 50% långsammare i 4 sek. Fiendespelare kastas i en rak linje genom luften: över en kant fortsätter de och tar fallskada; ett dödligt fall räknas som ditt dödande."
       },
       "voidfeast": {
         "name": "Tomhetsmåltid",
@@ -18588,7 +18822,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_charge": {
         "name": "Bruinrusning",
-        "description": "Storma en fiende, generera 9 raseri och bedöva den i 1 sek. I 3 sek därefter är Vargform gratis och håller fast målet, vilket saktar ner det med 50% i 4 sek. 8-25 m räckvidd. Endast i Bruinform."
+        "description": "Storma en fiende, generera 9 raseri och bedöva den i 1 sek. I 3 sek därefter är Kattform gratis och håller fast målet, vilket saktar ner det med 50% i 4 sek. 8-25 m räckvidd. Endast i Bruinform."
       },
       "demoralizing_roar": {
         "name": "Fegt vrål",
@@ -18596,16 +18830,16 @@ export const sv_SE: EnTranslations = {
       },
       "prowl": {
         "name": "Smygjaga",
-        "description": "Gå i smyg medan du är i vargform. Kan inte användas i strid."
+        "description": "Gå i smyg medan du är i kattform. Kan inte användas i strid."
       },
       "rake": {
         "name": "Flå",
-        "description": "Flå fienden för vapenskada plus {damage} och orsaka blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.",
+        "description": "Flå fienden för vapenskada plus {damage} och orsaka {overTime} blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.",
         "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
       },
       "revive_pet": {
         "name": "Lappa ihop",
-        "description": "Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa."
+        "description": "Återställer 10 % av din levande följeslagares maximala hälsa varje sekund i 8 sek. Om följeslagaren är död återupplivas den i stället med 50 % hälsa."
       }
     },
     "items": {
@@ -22416,6 +22650,18 @@ export const sv_SE: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Förtroppen krigsstaff"
       },
+      "infernal_quiver": {
+        "name": "Helveteskoger"
+      },
+      "lychgate_buckler": {
+        "name": "Kyrkogårdsportens bucklare"
+      },
+      "bastion_kite_shield": {
+        "name": "Bastionens droppsköld"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Gravhögsfältets tornsköld"
+      },
       "brookwatch_robe": {
         "name": "Brookwatch Robe"
       },
@@ -24416,6 +24662,12 @@ export const sv_SE: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Sändebudets gömsle"
+      },
+      "pvp_trophy_skull": {
+        "name": "Troféskalle"
+      },
+      "pvp_skull_bag": {
+        "name": "Skallpåse"
       },
       "clue_scroll": {
         "name": "Ledtrådsrull"
@@ -29968,6 +30220,11 @@ export const sv_SE: EnTranslations = {
         "sender": "Ravenposten",
         "subject": "Din valvbelöning",
         "body": "Valvet rensades, men din andel samkades inte från kistan. Korparna har bragt det till dig här, med de varor och mynt du tjänade bifogade.\n\n- Ravenposten"
+      },
+      "world_quest_reward": {
+        "sender": "Korpposten",
+        "subject": "Din belöning för världsuppdraget",
+        "body": "Dina väskor var fulla när du fick denna belöning för ett världsuppdrag, så korparna har fört hit den åt dig i stället. Gör plats och hämta den vid valfri korppelare.\n\n- Korpposten"
       }
     },
     "itemSets": {
@@ -30084,7 +30341,7 @@ export const sv_SE: EnTranslations = {
       },
       "forgewall": {
         "name": "Smedjemurens aegis",
-        "bonus2": "Järnvilja omvandlar vrede till 5 absorption per poäng i stället för 4.",
+        "bonus2": "Järnviljas sköld absorberar 25% av din maximala hälsa i stället för 20%.",
         "bonus4": "Att kasta Sköldspricka minskar Järnviljas återstående väntetid med 2 sek."
       },
       "frostquench": {
@@ -30103,7 +30360,7 @@ export const sv_SE: EnTranslations = {
       },
       "grovespring": {
         "name": "Lundkällans dräkt",
-        "bonus2": "Snabbläkning förbrukar din egen Vildblomma eller Andra blomning först och helar 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus2": "Snabb läkning förbrukar din egen Sporläkning eller Andra blomningen först och läker 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Överblomning skördar 75 procent av dina återstående effekter och lagrar därefter 1 Grönska."
       },
       "hexthread": {
@@ -30196,77 +30453,77 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Starwarden Raiment",
-        "bonus2": "Gripande rotters kastningstid minskas med 0,5 sec.",
+        "bonus2": "Gripande rotters kastningstid minskas med 0,5 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Att kasta Gripande rötter låter dig kasta medan du rör dig och ökar din rörelse med 20 procent i 4 sec. Kan inte inträffa mer än en gång var 20 sec."
       },
       "vanguard_druid_feral": {
         "name": "Bloodmane Hide",
-        "bonus2": "Bruinrusningens nedräkning minskas med 3 sec.",
+        "bonus2": "Bruinrusningens nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Bruinrusning skyddar dig för 6 procent av din maximala hälsa i 6 sec."
       },
       "vanguard_druid_restoration": {
         "name": "Thistlebloom Vestment",
-        "bonus2": "Fleetmends nedräkning minskas med 1 sec.",
+        "bonus2": "Fleetmends nedräkning minskas med 1 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Fleetmend ökar också din rörelse med 30 procent i 3 sec."
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Packwarden Harness",
-        "bonus2": "Skakande skotts nedräkning minskas med 4 sec.",
+        "bonus2": "Skakande skotts nedräkning minskas med 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Skakande skott minskar Howling Rage återstående nedräkning med 1 sec."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Farsight Harness",
-        "bonus2": "Trailbreaks nedräkning minskas med 4 sec.",
+        "bonus2": "Trailbreaks nedräkning minskas med 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Trailbreak gör din nästa Långt drag inom 6 sec omedelbar. Kan inte inträffa mer än en gång var 15 sec."
       },
       "vanguard_hunter_survival": {
         "name": "Snaretooth Harness",
-        "bonus2": "Blodkroks nedräkning minskas med 3 sec.",
+        "bonus2": "Blodkroks nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Blodkrok ger 1 Jaktfart."
       },
       "vanguard_mage_arcane": {
         "name": "Hourbinder's Vestments",
-        "bonus2": "Temporal Barriers nedräkning minskas med 2 sec.",
+        "bonus2": "Temporal Barriers nedräkning minskas med 2 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Temporal Barrier ökar också den skyddade målgruppen rörelse med 20 procent i 3 sec."
       },
       "vanguard_mage_fire": {
         "name": "Emberlash Regalia",
-        "bonus2": "Cinderfall laddas om 3 sec snabbare.",
+        "bonus2": "Cinderfall laddas om 3 sec snabbare. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Att kasta Cinderfall minskar återstående nedräkning för Flammande barriär med 2 sec."
       },
       "vanguard_mage_frost": {
         "name": "Rimewarden Garb",
-        "bonus2": "Isbindningens nedräkning minskas med 2 sec.",
+        "bonus2": "Isbindningens nedräkning minskas med 2 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Att kasta Isbindning minskar återstående nedräkning för Fladdersteg med 5 sec."
       },
       "vanguard_paladin_holy": {
         "name": "Sunvigil Regalia",
-        "bonus2": "Life Covenants nedräkning minskas med 30 sec.",
+        "bonus2": "Life Covenants nedräkning minskas med 30 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Life Covenant skyddar också alliansen för 8 procent av deras maximala hälsa i 6 sec."
       },
       "vanguard_paladin_protection": {
         "name": "Shieldvow Bastion",
-        "bonus2": "Oath Chains nedräkning minskas med 2 sec.",
+        "bonus2": "Oath Chains nedräkning minskas med 2 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Fiender dragna av Oath Chain kastar besvärjelser 30 procent långsammare i 4 sec, och Oath Chain ger dig Solar Reprisal när det binder en fiende som kan dras."
       },
       "vanguard_paladin_retribution": {
         "name": "Lightbrand Warplate",
-        "bonus2": "Valkyr's Callings nedräkning minskas med 15 sec.",
+        "bonus2": "Valkyr's Callings nedräkning minskas med 15 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Valkyr's Calling återställer Final Edicts nedräkning, och din nästa Final Edict inom 6 sec från träff orsakar 15 procent mer skada."
       },
       "vanguard_priest_discipline": {
         "name": "Veilpsalm Raiment",
-        "bonus2": "Terror Canticles nedräkning minskas med 3 sec.",
+        "bonus2": "Terror Canticles nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "När din Psalm of Warding är fullt konsumerad, får den skyddade alliansen 20 procent rörelse i 3 sec. Kan inte inträffa mer än en gång var 8 sec."
       },
       "vanguard_priest_holy": {
         "name": "Gracewing Raiment",
-        "bonus2": "Veilsteps nedräkning minskas med 6 sec.",
+        "bonus2": "Veilsteps nedräkning minskas med 6 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Veilstep skyddar också dig för 8 procent av din maximala hälsa i 6 sec."
       },
       "vanguard_priest_shadow": {
         "name": "Duskhymn Regalia",
-        "bonus2": "Sorgens litania saktar också målsökningens rörelse ned med 30 procent medan du kanaliserar den.",
+        "bonus2": "Sorgens litania saktar också målsökningens rörelse ned med 30 procent medan du kanaliserar den. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Kalla Tithefiend skyddar också dig för 10 procent av din maximala hälsa i 8 sec."
       },
       "vanguard_rogue_assassination": {
@@ -30276,7 +30533,7 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Brawlmark Leathers",
-        "bonus2": "Swift Heels nedräkning minskas med 60 sec.",
+        "bonus2": "Swift Heels nedräkning minskas med 15 sec.",
         "bonus4": "Medan Swift Heels är aktiv, Wicked Slash och Haymaker ger 1 ytterligare combo-poäng."
       },
       "vanguard_rogue_subtlety": {
@@ -30286,32 +30543,32 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Tempestwrit Battlemail",
-        "bonus2": "Unleash Weapons nedräkning minskas med 3 sec.",
+        "bonus2": "Unleash Weapons nedräkning minskas med 3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Unleash Weapon låter dig kasta medan du rör dig och ökar din rörelse med 20 procent i 4 sec. Kan inte inträffa mer än en gång var 20 sec."
       },
       "vanguard_shaman_enhancement": {
         "name": "Galeborn Warmail",
-        "bonus2": "Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec.",
+        "bonus2": "Ancestral Strike saktar ned målsökningens rörelse med 30 procent i 4 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ancestral Strike minskar återstående nedräkning för Elemental Trance med 4 sec."
       },
       "vanguard_shaman_restoration": {
         "name": "Brineward Chainmail",
-        "bonus2": "Lagande vatten kastar 0,5 sec snabbare på en allierad under 50 procent hälsa.",
+        "bonus2": "Lagande vatten kastar 0,5 sec snabbare på en allierad under 50 procent hälsa. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Tidecall skyddar också sitt mål för 5 procent av din maximala hälsa i 6 sec."
       },
       "vanguard_warlock_affliction": {
         "name": "Dreadquill Vestments",
-        "bonus2": "Harrows kastningstid minskas med 0,3 sec.",
+        "bonus2": "Harrows kastningstid minskas med 0,3 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Förtär läker dig för 30 procent mer och kan kanaliseras medan du rör dig."
       },
       "vanguard_warlock_demonology": {
         "name": "Marrowbound Regalia",
-        "bonus2": "Bone Armors nedräkning minskas med 10 sec.",
+        "bonus2": "Bone Armors nedräkning minskas med 10 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Reaping Command minskar återstående nedräkning för Bone Armor med 2 sec."
       },
       "vanguard_warlock_destruction": {
         "name": "Slagcrown Vestments",
-        "bonus2": "Cinderhides nedräkning minskas med 30 sec.",
+        "bonus2": "Cinderhides nedräkning minskas med 30 sec. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Var andra Conflagrate gör din nästa Fördärvsbult inom 8 sec omedelbar."
       },
       "vanguard_warrior_arms": {
@@ -30336,31 +30593,31 @@ export const sv_SE: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Asksmygarens utrustning",
-        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus2": "Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
         "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Att döda en fientlig spelare ger Askesteg, vilket ökar förflyttningshastigheten med 40% i 6 sek."
       },
       "warfare_cinderweave": {
         "name": "Glödvävsregalier",
-        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus2": "Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
         "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Glödvakt, vilket absorberar 120 skada i 8 sek."
       },
       "warfare_furyforged": {
         "name": "Raserismidd stridsutrustning",
-        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus2": "Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
         "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Att döda en fientlig spelare ger Obruten ed, vilket absorberar 200 skada i 10 sek."
       },
       "warfare_stormbound": {
         "name": "Stormbunden skrud",
-        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus2": "Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
         "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Glödvakt, vilket absorberar 120 skada i 8 sek."
       },
       "warfare_thornhide": {
         "name": "Törnhudens dräkt",
-        "bonus2": "Ökar Krigföringsförsvar med 40.",
+        "bonus2": "Ökar Krigföringsförsvar med 40. Skada du tar fördröjer inte längre dina besvärjelser.",
         "bonus4": "Ökar Krigföringsanfall med 40, och kontroll som fientliga spelare lägger på er varar 15% kortare.",
         "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Törnvakt, vilket ökar chansen att undvika med 15% i 6 sek."
       },
