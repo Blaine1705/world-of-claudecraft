@@ -1,6 +1,6 @@
 // Ship the Blender-authored Mirefen tavern (scripts/assets/mirefen_tavern/): validate the
 // exported hierarchy, materials and root extras, stamp the source fingerprint, embed the
-// painted maps (textures.json: the Fenrire look of the painted town, tex/) at each texture
+// painted maps (textures.json: the painted town's Fenrire look, tex/) at each texture
 // tier, then prune, dedup and meshopt it into public/models/props/mirefen_tavern.glb and its
 // texture-tier files, mirefen_tavern.half.glb and mirefen_tavern.quarter.glb (the same model
 // with every map at half and at a quarter of its size; src/render/placed_texture_tier_core.ts
@@ -51,14 +51,18 @@ export const MIREFEN_TAVERN_ASSET = {
   inputs: [
     `${HERE}/mirefen_tavern_source.glb`,
     `${HERE}/build_tavern.py`,
-    `${HERE}/tavern_frame.py`,
-    `${HERE}/tavern_shell.py`,
-    `${HERE}/tavern_furnish.py`,
-    `${HERE}/tavern_facade.py`,
-    `${HERE}/tavern_jetty.py`,
-    `${HERE}/tavern_roofing.py`,
-    `${HERE}/tavern_weather.py`,
-    `${HERE}/tavern_grounds.py`,
+    `${HERE}/inn_kit.py`,
+    `${HERE}/inn_hall.py`,
+    `${HERE}/inn_roof.py`,
+    `${HERE}/inn_tower.py`,
+    `${HERE}/inn_wing.py`,
+    `${HERE}/inn_porch.py`,
+    `${HERE}/inn_interior.py`,
+    `${HERE}/inn_props.py`,
+    `${HERE}/props/props_data.json`,
+    `${HERE}/inn_furnish.py`,
+    `${HERE}/inn_lights.py`,
+    `${HERE}/inn_grounds.py`,
     `${HERE}/tavern_dog.py`,
     `${HERE}/tavern_texture.py`,
     `${HERE}/layout.json`,
@@ -101,6 +105,7 @@ export const MIREFEN_TAVERN_ASSET = {
     'TavernMetal',
     'TavernPlain',
     'TavernPlaster',
+    'TavernProps',
     'TavernRoof',
     'TavernStone',
     'TavernTimber',
@@ -154,9 +159,9 @@ async function textureTools() {
   return { sharp, Mode, toktx };
 }
 
-/** A colour map at `size`, as PNG. */
-async function colorMap(sharp, file, size) {
-  return sharp(file).resize(size, size, { kernel: 'lanczos3' }).png().toBuffer();
+/** A colour map `width` by `height`, as PNG. */
+async function colorMap(sharp, file, width, height) {
+  return sharp(file).resize(width, height, { kernel: 'lanczos3' }).png().toBuffer();
 }
 
 /** A normal map with its kit strength baked in (x and y scaled, renormalized), at `size`,
@@ -252,9 +257,19 @@ export async function buildMirefenTavern(tier = 'full', asset = MIREFEN_TAVERN_A
     if (!spec) continue;
     // its vertex colours sit under the headroom: the runtime multiplies them back
     material.setExtras({ ...material.getExtras(), vertexColourScale: VERTEX_COLOUR_SCALE });
+    // (a map's `scale`, [across, down], multiplies its tier's colour size: the props' atlas
+    // packs many maps)
+    const [sx, sy] = spec.scale ?? [1, 1];
     const color = doc
       .createTexture(`${name}_color`)
-      .setImage(await colorMap(sharp, path.join(root, HERE, spec.color), sizes.color))
+      .setImage(
+        await colorMap(
+          sharp,
+          path.join(root, HERE, spec.color),
+          sizes.color * sx,
+          sizes.color * sy,
+        ),
+      )
       .setMimeType('image/png');
     material.setBaseColorTexture(color);
     if (spec.normal) {
@@ -279,7 +294,8 @@ export async function buildMirefenTavern(tier = 'full', asset = MIREFEN_TAVERN_A
       const uv = prim.getAttribute('TEXCOORD_0');
       if (asset.painted.includes(name)) {
         if (!uv) throw new Error(`${mesh.getName()}: ${name} has no UVs`);
-        snapUvs(uv);
+        // (an atlas's UVs lie in [0, 1] and quantize as they are: a repeat's grid would move them)
+        if (!TEXTURES.materials[name].atlas) snapUvs(uv);
       } else if (uv) {
         prim.setAttribute('TEXCOORD_0', null);
       }

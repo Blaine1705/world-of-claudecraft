@@ -3,7 +3,7 @@ import path from 'node:path';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { authoredTownBuildingPlacements } from '../src/editor/feature_prop_placements';
 import { isPlacedBuildingAsset } from '../src/render/eastbrook_placed_building';
 import {
@@ -15,7 +15,7 @@ import {
 import { rotY } from '../src/sim/collider_shapes';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { ZONE2_PROPS } from '../src/sim/content/zone2';
-import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { BASE_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld, type Obb2 } from '../src/sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { JAIL_TERRAIN_EDITS } from '../src/sim/jail';
@@ -35,6 +35,9 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 const ROOT = path.join(__dirname, '..');
 const BUILDINGS = FENBRIDGE_LAYOUT.buildings;
 type Building = (typeof BUILDINGS)[number];
+
+beforeEach(() => setActiveWorldContent(BASE_WORLD));
+afterEach(() => setActiveWorldContent(null));
 
 interface BakedBox {
   x: number;
@@ -475,7 +478,7 @@ describe('walking into the walk-in Fenbridge buildings', () => {
   });
 
   it('walks a player from the street through each open door onto its floor', () => {
-    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', world: BASE_WORLD });
     const body = sim.player;
     const meta = sim.players.get(body.id);
     if (!meta) throw new Error('missing player meta');
@@ -520,7 +523,7 @@ describe('walking into the walk-in Fenbridge buildings', () => {
   it('leaves the floors of a Studio document to its own placements', () => {
     // Eastbrook and Highwatch stand their own walk-in floors beside these
     const fenbridgePaths = new Set(BUILDINGS.map((building) => building.assetId));
-    const builtIn = townWalkInPlacements(BUILTIN_WORLD).filter((placement) =>
+    const builtIn = townWalkInPlacements(BASE_WORLD).filter((placement) =>
       fenbridgePaths.has(placement.path),
     );
     expect(builtIn).toHaveLength(4);
@@ -697,7 +700,7 @@ describe('Fenbridge in Studio', () => {
     const hub = FENBRIDGE_LAYOUT.hub.center;
     const touchesTown = (road: readonly { x: number; z: number }[]) =>
       road.some((q) => Math.hypot(q.x - hub.x, q.z - hub.z) < 40);
-    const gameStreets = BUILTIN_WORLD.roads.filter(touchesTown);
+    const gameStreets = BASE_WORLD.roads.filter(touchesTown);
     expect(gameStreets.length).toBeGreaterThan(0);
     expect(REBUILD_MAP.content.roads.filter(touchesTown)).toEqual(gameStreets);
   });
@@ -721,7 +724,7 @@ describe('Fenbridge in Studio', () => {
       ),
     );
     expect(at).toEqual(pads.map((_, index) => after + index));
-    const builtIn = BUILTIN_WORLD.terrainEdits ?? [];
+    const builtIn = BASE_WORLD.terrainEdits ?? [];
     expect(builtIn.slice(after, after + pads.length)).toEqual([...pads]);
     // ...and no other stamp of the map reaches the town's ground, so the pads
     // have the last word there wherever they sit in the list

@@ -10918,6 +10918,10 @@ export const sv_SE: EnTranslations = {
     "appTitle": "Kartredigerare",
     "docTitle": "Kartredigerare - World of ClaudeCraft",
     "untitledMap": "Namnlös karta",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Kartmakare",
     "playtestBack": "Back to Editor",

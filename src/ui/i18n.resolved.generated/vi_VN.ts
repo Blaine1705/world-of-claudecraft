@@ -10918,6 +10918,10 @@ export const vi_VN: EnTranslations = {
     "appTitle": "Trình Chỉnh Sửa Bản Đồ",
     "docTitle": "Trình Chỉnh Sửa Bản Đồ - World of ClaudeCraft",
     "untitledMap": "Bản Đồ Chưa Đặt Tên",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Người Tạo Bản Đồ",
     "playtestBack": "Back to Editor",

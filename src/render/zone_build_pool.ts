@@ -236,7 +236,14 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
     // one. A throwing post here is treated like a throwing job post below.
     if (contentGeneration >= 0 && entry.generation !== contentGeneration) {
       try {
-        entry.worker.postMessage({ kind: 'content', generation: contentGeneration, content });
+        // The live world's NPC registry may be a proxy over native content.
+        // Materialize it at the worker boundary; the source stays live in this thread.
+        const snapshot = content ? { ...content, npcs: { ...content.npcs } } : null;
+        entry.worker.postMessage({
+          kind: 'content',
+          generation: contentGeneration,
+          content: snapshot,
+        });
         entry.generation = contentGeneration;
       } catch (error) {
         entry.busy = false;

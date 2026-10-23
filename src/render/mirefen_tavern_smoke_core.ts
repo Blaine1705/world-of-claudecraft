@@ -1,6 +1,7 @@
 // The Mirefen tavern's chimney smoke, the pure half (the painter is mirefen_tavern_smoke.ts): where
-// each puff of the two plumes is at a given moment (the river-stone chimney over the wall fire,
-// and the hearth's copper flue under its cap on the ridge), how big and how opaque. Three-, DOM-
+// each puff of the two plumes is at a given moment (the river-stone chimney climbing the right
+// gable over the wall fire, and the hearth's copper flue under its cowl by the ridge), how big
+// and how opaque. Three-, DOM-
 // and i18n-free, allocation-free, deterministic (no rng: a puff's wander comes from a stable hash
 // of its slot and its cycle).
 //
@@ -29,11 +30,15 @@ export interface TavernSmokeSource {
 
 const fire = TAVERN_PROPS.find((p) => p.kind === 'fireplace');
 
-/** The two plumes (build: tavern_shell.py's chimney pots, tavern_frame.py's flue cap). */
+/** The wall fire's chimney's two pots, up past the right gable's verge (build: inn_hall.py
+ *  _chimney_stack: its shaft half its reach out of the gable, its pots' mouths over SHAFT_TOP). */
+const CHIMNEY_MOUTH = { out: 0.93, y: 21.62 } as const;
+
+/** The two plumes (build: inn_hall.py's chimney pots, inn_roof.py's cowl over the flue). */
 export const TAVERN_SMOKE_SOURCES: readonly TavernSmokeSource[] = [
   {
-    x: TAVERN_HALL.x1 + 0.7,
-    y: TAVERN_HALL.eave + 5.3,
+    x: TAVERN_HALL.x1 + CHIMNEY_MOUTH.out,
+    y: CHIMNEY_MOUTH.y,
     z: fire?.z ?? 2.5,
     puffs: 22,
     life: 8,

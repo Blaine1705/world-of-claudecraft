@@ -23,9 +23,9 @@
 
 import * as THREE from 'three';
 import {
-  BUILTIN_WORLD,
   getActiveWorldContent,
   isBuiltinWorldActive,
+  isBuiltinWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
@@ -249,7 +249,7 @@ export function buildBladeGrassBand(
   const activeContent = getActiveWorldContent();
   const townExclusions = eastbrookGrassExclusions(
     activeContent.props.buildings,
-    activeContent === BUILTIN_WORLD,
+    isBuiltinWorldContent(activeContent),
     activeContent.services?.noticeboards ?? [],
   );
   const edgeTaperCtx = createGrassEdgeTaperContext(

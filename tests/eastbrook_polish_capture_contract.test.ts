@@ -731,9 +731,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  // Re-minted for the sprite buddy: renderer.ts attaches model VFX through
-  // template_model_vfx.ts (remint_polish_provenance.mjs; no capture was retaken).
-  '2571d70e440ffcbc1879b1fa2f42369f8c208568076c85687cb8a132a747749c';
+  // Re-minted after merging v045-integration: sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  'e6feea75c8398accd57d3d5c6ce1f956aec953402dc36466de2a3f98052119e6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

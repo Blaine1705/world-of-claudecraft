@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': '遊戲世界微調',
+  'editor.liveWorld.scope':
+    '遊戲世界：可編輯地形高度與塗色、道路、遊戲物件的位置及新增擺件。現有建築保持固定。使用「匯出」儲存修改以供審核。',
   'hudChrome.courier.inventory': '背包',
   'hudChrome.courier.bankTitle': '銀行',
   'hudChrome.courier.capacity': '{used} / {capacity} 欄位',
