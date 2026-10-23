@@ -1528,7 +1528,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/mounts/chimeglass_tortoise.glb": "/media/models/mounts/chimeglass_tortoise.3b0eb4332f63.glb",
   "models/mounts/cinderjaw_rex.glb": "/media/models/mounts/cinderjaw_rex.8281827c9cd5.glb",
   "models/mounts/claudian_wraith.glb": "/media/models/mounts/claudian_wraith.2ac78dc12ab2.glb",
-  "models/mounts/drakemaw_raptor.glb": "/media/models/mounts/drakemaw_raptor.44d00a10e348.glb",
+  "models/mounts/drakemaw_raptor.glb": "/media/models/mounts/drakemaw_raptor.c160cc876b16.glb",
   "models/mounts/dreadnought.glb": "/media/models/mounts/dreadnought.79abb4ac41b1.glb",
   "models/mounts/goblin_rocket_sled.glb": "/media/models/mounts/goblin_rocket_sled.0957ec5ff7bb.glb",
   "models/mounts/grag_bear.glb": "/media/models/mounts/grag_bear.767ddb38445d.glb",
