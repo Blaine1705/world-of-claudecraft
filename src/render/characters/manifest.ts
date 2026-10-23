@@ -3382,8 +3382,6 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 10,
     lazyPreload: true,
   },
-  // Compact fantasy tank. One wheel revolution per locomotion clip matches
-  // its authored tread cadence at the reference ground speeds below.
   // Wobbles the Slime: 4.0 tall, a touch over the horse, so the seat lands
   // about a body higher than a horse's. One hop per Walk/Run loop; the refs
   // pick a hop cadence that reads as bounding at mounted speed rather than
@@ -3401,6 +3399,8 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 11,
     lazyPreload: true,
   },
+  // Compact fantasy tank. One wheel revolution per locomotion clip matches
+  // its authored tread cadence at the reference ground speeds below.
   mount_terrorspark_groundshaker: {
     url: `${MOUNTS_DIR}/terrorspark_groundshaker.glb`,
     height: 2.8,
