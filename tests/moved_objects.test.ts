@@ -22,6 +22,7 @@ import {
 import {
   activeDungeonDoorPos,
   activeGatherNodes,
+  BASE_WORLD,
   BUILTIN_WORLD,
   DUNGEON_LIST,
   DUNGEONS,
@@ -170,8 +171,9 @@ describe('moved objects: the built-in world cannot drift', () => {
     expect(dungeonDoorPos(undefined, crypt)).toBe(crypt.doorPos);
   });
 
-  it('the built-in Sim and the active built-in world read the shipped tables', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+  it('the base world Sim and the active base world read the shipped tables', () => {
+    setActiveWorldContent(BASE_WORLD);
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: BASE_WORLD });
     expect(sim.farmPatches).toBe(FARM_PATCHES);
     expect(getActiveWorldContent().objectMoves).toBeUndefined();
     expect(gatherNodesInActiveWorld()).toBe(GATHER_NODES);

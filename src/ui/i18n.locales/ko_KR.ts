@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': '게임 월드 다듬기',
+  'editor.liveWorld.scope':
+    '게임 월드: 지형 높이와 페인트, 도로, 게임 오브젝트 위치, 추가한 소품을 편집할 수 있습니다. 기존 건물은 고정됩니다. 검토할 변경 사항은 내보내기로 저장하세요.',
   'hudChrome.courier.inventory': '소지품',
   'hudChrome.courier.bankTitle': '은행',
   'hudChrome.courier.capacity': '{used} / {capacity}칸',

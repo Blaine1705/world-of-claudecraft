@@ -10916,6 +10916,10 @@ export const ja_JP: EnTranslations = {
     "appTitle": "マップエディター",
     "docTitle": "マップエディター - World of ClaudeCraft",
     "untitledMap": "無題のマップ",
+    "liveWorld": {
+      "name": "ゲーム世界の調整",
+      "scope": "ゲーム世界：地形の高さと塗装、道路、ゲーム内オブジェクトの位置、追加した小物を編集できます。既存の建物は固定されています。「エクスポート」で変更を保存し、レビューに送ってください。"
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "マップ職人",
     "playtestBack": "Back to Editor",

@@ -731,7 +731,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  'f7e90ef6fdde5b42ff2a99f85e067c1216b240a6a0d78f5da4b2d30eeaac5fb2';
+  '05e79844eb3c4336cf13a2cccf14866cf2f54a295fd14145eed84f60d221a7ab';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

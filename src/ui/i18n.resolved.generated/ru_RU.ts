@@ -10916,6 +10916,10 @@ export const ru_RU: EnTranslations = {
     "appTitle": "Редактор карт",
     "docTitle": "Редактор карт - World of ClaudeCraft",
     "untitledMap": "Карта без названия",
+    "liveWorld": {
+      "name": "Правки игрового мира",
+      "scope": "Игровой мир: редактируйте высоту и окраску рельефа, дороги, позиции игровых объектов и добавленные декорации. Существующие здания закреплены. Сохраните правки для проверки кнопкой экспорта."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Картограф",
     "playtestBack": "Back to Editor",

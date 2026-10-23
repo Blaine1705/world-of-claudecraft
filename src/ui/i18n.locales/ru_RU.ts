@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': 'Правки игрового мира',
+  'editor.liveWorld.scope':
+    'Игровой мир: редактируйте высоту и окраску рельефа, дороги, позиции игровых объектов и добавленные декорации. Существующие здания закреплены. Сохраните правки для проверки кнопкой экспорта.',
   'hudChrome.courier.inventory': 'Инвентарь',
   'hudChrome.courier.bankTitle': 'Банк',
   'hudChrome.courier.capacity': '{used} / {capacity} ячеек',

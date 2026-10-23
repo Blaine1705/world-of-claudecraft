@@ -36,6 +36,7 @@ import {
   sanitizeCaveNode,
 } from './caves';
 import { type ClutterStamp, MAX_CLUTTER_STAMPS, sanitizeClutterStamp } from './city_clutter';
+import { type FenbridgeTouchup, sanitizeFenbridgeTouchup } from './fenbridge_touchup';
 import { sanitizeAssetFireEmitters } from './fire_effects';
 import { type FoliageParams, sanitizeFoliageParams } from './foliage_params';
 import type { GrassClearCircle } from './grass_clear';
@@ -633,6 +634,10 @@ export interface MapDocMeta {
    *  its slug and the git blob id of the file as it was opened (the base the
    *  push compares against). Absent on a map not opened from the repo. */
   basedOn?: MapDocBase;
+  /** Live overworld editing baseline, separate from standalone custom maps. */
+  overworldBase?: string;
+  /** The last published touch-up revision, to reject stale concurrent edits. */
+  overworldRevision?: string;
 }
 
 export interface MapDocBase {
@@ -742,6 +747,7 @@ export interface MapDoc {
   // (sim/moved_objects.ts). Ids never change; only positions do. The
   // projection carries it into WorldContent.objectMoves. Absent = none moved.
   objectMoves?: ObjectMoves;
+  fenbridgeTouchup?: FenbridgeTouchup;
   // v2 optional: caves/tunnels (the Caves tool). Each is a capsule-chain
   // centerline; sim + render share src/sim/caves.ts to derive the standalone
   // tube volume, the second ground sheet, and the mesh. Absent = none.
@@ -1577,6 +1583,14 @@ function sanitizeMeta(v: unknown): MapDocMeta {
     seed: Math.floor(num(m.seed, DEFAULT_SEED)),
     parentId: str(m.parentId, '').slice(0, 64),
     ...sanitizeMapBase(m.basedOn),
+    ...(typeof m.overworldBase === 'string' &&
+    /^[0-9a-f]+-[0-9a-f]+-[0-9a-f]+$/.test(m.overworldBase)
+      ? { overworldBase: m.overworldBase.slice(0, 64) }
+      : {}),
+    ...(typeof m.overworldRevision === 'string' &&
+    /^[0-9a-f]+-[0-9a-f]+-[0-9a-f]+$/.test(m.overworldRevision)
+      ? { overworldRevision: m.overworldRevision.slice(0, 64) }
+      : {}),
   };
 }
 
@@ -1989,6 +2003,8 @@ export function sanitizeMapDoc(raw: unknown): MapDoc | null {
   }
   const objectMoves = sanitizeObjectMoves(o.objectMoves, MAX_WORLD_COORD);
   if (objectMoves) doc.objectMoves = objectMoves;
+  const fenbridgeTouchup = sanitizeFenbridgeTouchup(o.fenbridgeTouchup);
+  if (fenbridgeTouchup) doc.fenbridgeTouchup = fenbridgeTouchup;
   const blockers = arr(o.blockers)
     .slice(0, MAX_BLOCKERS)
     .map(sanitizeBlocker)

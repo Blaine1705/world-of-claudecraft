@@ -1,9 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   eastbrookGrassExclusions,
   insideEastbrookGrassExclusion,
 } from '../src/render/foliage_core';
+import { BASE_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { distancePointToObb, FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+
+beforeEach(() => setActiveWorldContent(BASE_WORLD));
+afterEach(() => setActiveWorldContent(null));
 
 /** Points on the old palisade ring, every quarter yard, all the way round. */
 function oldRingSamples(): { x: number; z: number }[] {
