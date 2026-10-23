@@ -86,7 +86,7 @@ describe('Wobbles the Slime mount asset', () => {
           ch.getTargetNode()?.getName() ?? '',
           ch.getTargetPath() ?? '',
         );
-        first.forEach((x, i) => expect(x, `${clip} seam`).toBeCloseTo(last[i], 3));
+        for (const [i, x] of first.entries()) expect(x, `${clip} seam`).toBeCloseTo(last[i], 3);
       }
     }
     for (const [bone, path] of [
@@ -94,7 +94,9 @@ describe('Wobbles the Slime mount asset', () => {
       ['saddle', 'translation'],
     ]) {
       const held = ends('Jump', bone, path).last;
-      ends('Land', bone, path).first.forEach((x, i) => expect(x).toBeCloseTo(held[i], 3));
+      for (const [i, x] of ends('Land', bone, path).first.entries()) {
+        expect(x).toBeCloseTo(held[i], 3);
+      }
     }
   });
 

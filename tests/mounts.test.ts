@@ -110,7 +110,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 
 describe('mount catalog', () => {
   it('keeps the horse first and appends the two referral milestone mounts', () => {
-    expect(MOUNT_KEYS).toHaveLength(13);
+    // 14 with Wobbles the Slime (a developer mount).
+    expect(MOUNT_KEYS).toHaveLength(14);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');

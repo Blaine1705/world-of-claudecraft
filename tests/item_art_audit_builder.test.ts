@@ -881,11 +881,11 @@ describe('item-art audit builder', () => {
       // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
       // `--verify-only` on the merged tree.
       // Integration45: 141 new files plus repainted loot, measured by --verify-only.
-      catalogSha256: '3fb2b27d2554d7e788dc0cff70c0a79caa1c5d911371d5e02a5b6d07fe60eebf',
-      catalogBytes: 1192854,
+      catalogSha256: 'b15af77b62c38a59cd5aa46ba35c86e395b63a4cec4785966f42bc577d10283f',
+      catalogBytes: 1193377,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2181,
-      liveItemCount: 2210,
+      catalogCount: 2182,
+      liveItemCount: 2211,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -903,7 +903,7 @@ describe('item-art audit builder', () => {
         identity: 47,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '2f080865b1956197773aebc61d174ce33df6d62c5662f7a066cd77a50ff31868',
+      shippingCatalogSha256: '88b9dbae89ea8a548e3d40c1021f775c2e39428219fe43669f0b02dffeff0f04',
       machineChecksPassed: true,
       verdict: null,
     });
