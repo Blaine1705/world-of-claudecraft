@@ -3,7 +3,18 @@
 Two floating fire sprites (gold, coloured yellow, and teal) that share one
 buddy slot and turn green where they join, built procedurally in
 Blender from the sprite sheet (`sprites_sheet.png`, turnarounds in `concepts/`).
-Not in the game yet; see `INTEGRATION_PLAN.md`.
+In game as the buddy Flicker and Glimmer (key `sprites`, developer and admin
+grants only so far): `public/models/buddies/sprites.glb`, with live flames over
+the orbs drawn by `src/render/sprites_buddy_flame.ts`. What is still open is in
+`INTEGRATION_PLAN.md`.
+
+To refresh the game asset after a rebuild:
+
+```sh
+node docs/design/sprites-buddy/finish_buddy.mjs docs/design/sprites-buddy/sprites_buddy.glb public/models/buddies/sprites.glb
+node scripts/assets/compress_glb_textures.mjs public/models/buddies/sprites.glb
+node scripts/build_media_manifest.mjs generate
+```
 
 ## Files
 

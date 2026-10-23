@@ -469,7 +469,6 @@ import {
   syncIgnivarWaterConduitVisibility,
 } from './ignivar_conduit';
 import { ignivarBossFacingLocked } from './ignivar_encounter_core';
-import { attachIgnivarModelVfx } from './ignivar_model_vfx';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
 import { buildInitialSceneCompileUnits, entryCompileTail } from './initial_scene_compile_units';
@@ -841,6 +840,7 @@ import {
   drapeTargetConeOverlay,
   type TargetConeOverlay,
 } from './target_cone_overlay';
+import { attachTemplateModelVfx } from './template_model_vfx';
 import {
   syncTemporalHourglassVisual,
   TemporalHourglassGroundVisuals,
@@ -8168,7 +8168,7 @@ export class Renderer {
       // entity scale is applied to the whole group below, so it can update live
       // (Fiesta size buffs) and also scale lazily-built form visuals for free.
       group.add(visual.root);
-      if (e.templateId === IGNIVAR_BOSS_ID) attachIgnivarModelVfx(visual.root);
+      attachTemplateModelVfx(e.templateId, visual.root, () => this.reducedMotion());
       height = visual.height;
     }
 

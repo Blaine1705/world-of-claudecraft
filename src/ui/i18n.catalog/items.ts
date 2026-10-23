@@ -2899,6 +2899,7 @@ const ITEM_ENTITY_IDS = [
   // Buddy cosmetic charms (content/buddy_cosmetics.ts tokens).
   'charm_stag_acorn',
   'charm_stag_gilded',
+  'whistle_sprites',
   // Crucible raid professions (docs/prd/ignivar-raid-professions.md).
   'lastflame_core',
   'forgefathers_ember',
@@ -4388,6 +4389,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   whistle_emberfall_phoenix: 'Emberfall Phoenix Whistle',
   charm_stag_acorn: 'Acorn Crown Charm',
   charm_stag_gilded: 'Gilded Charm',
+  whistle_sprites: 'Flicker and Glimmer Whistle',
   // Crucible raid professions, English-appended like the waves above (the
   // maintainer fills every locale at release).
   lastflame_core: 'Core of the Last Flame',

@@ -5409,6 +5409,7 @@ export const ko_KR: EnTranslations = {
         "skeleton": "마른 뼈가 당신의 걸음에 맞춰 덜그럭거립니다.",
         "crystal_lich": "잔해에서 차가운 웅웅거림이 피어오르고, 그것이 당신을 지켜봅니다.",
         "forgemaw": "용광로의 열기가 아직 당신을 떠나지 않았습니다. 무언가가 그것과 함께 걸어 나왔습니다.",
+        "sprites": "작은 불꽃 두 개가 당신에게 옮겨붙었고, 꺼질 기미가 없다.",
         "crystal_tide": "바닷물 한 방울이 당신의 낚싯줄에서 떨어지기를 거부합니다.",
         "phantom": "당신 뒤의 공기가 조금 지나치게 고요합니다.",
         "emberfall_phoenix": "재에 묻은 불처럼 은근한 온기가 당신의 등 뒤에 내려앉습니다."
@@ -20700,6 +20701,9 @@ export const ko_KR: EnTranslations = {
       "charm_stag_gilded": {
         "name": "금박 부적"
       },
+      "whistle_sprites": {
+        "name": "깜빡이와 반짝이의 호루라기"
+      },
       "lastflame_core": {
         "name": "마지막 불꽃의 핵"
       },
@@ -25810,6 +25814,9 @@ export const ko_KR: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "용융의 화로아귀"
+      },
+      "buddy_sprites": {
+        "name": "깜빡이와 반짝이"
       },
       "buddy_crystal_tide": {
         "name": "수정 물결"

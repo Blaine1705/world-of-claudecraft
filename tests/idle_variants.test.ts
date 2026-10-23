@@ -190,6 +190,12 @@ describe('idle-breaker clips', () => {
         ...(def.clips.idleVariants ?? []).map((name) => durations.get(name) ?? 0),
       );
       expect(longest, `${key} has a zero-length idle variant`).toBeGreaterThan(0);
+      // A rig that holds every draw for its idle loop seam cannot re-fire over
+      // a live fidget whatever its cadence: a due draw also waits out the
+      // one-shot playing (the clock parks at zero), and the seam only comes
+      // round once the base idle is back. Its short cadence is how its fidgets
+      // chain (tests/idle_variant_shuffle.test.ts).
+      if (def.clips.idleVariantsOnLoopSeam) continue;
       expect(min, `${key}: fidget beat ${min}s vs longest clip ${longest}s`).toBeGreaterThan(
         longest,
       );

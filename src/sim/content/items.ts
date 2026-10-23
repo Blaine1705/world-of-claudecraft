@@ -748,6 +748,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     sellValue: 50_000, // 5g, the flat vendor price every whistle takes
   },
+  // The flame-sprite pair. No player-facing source yet: granted by /dev buddy
+  // and the admin grant only (docs/design/buddy-acquisition.md).
+  whistle_sprites: {
+    id: 'whistle_sprites',
+    name: 'Flicker and Glimmer Whistle',
+    kind: 'buddy',
+    buddy: 'sprites',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
   // The angler's companion: fished up anywhere at 0.5% a catch
   // (professions/fishing.ts). Rare, so it also rides the global rare tier's
   // 0.05% off a kill like the three vendor rares do.

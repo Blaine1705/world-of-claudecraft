@@ -1,5 +1,12 @@
 # Sprite buddy: integration plan
 
+Status: steps 1 and 2 are done (the asset, the `buddy_sprites` VisualDef with
+Run and the fidgets, the live flames), and step 3 apart from a player-facing
+source (the catalog, template, whistle, icon, portrait, names and tests are in;
+it is granted by `/dev buddy sprites` and the admin grant only). Still open: a
+ClipMap slot for Search, a hop state for Jump, and step 4, the runtime
+expression layer.
+
 Step 4 of the model pipeline guide (compress and wire into the game), plus a
 runtime expression layer so the faces react to the game instead of only playing
 what each clip has baked in.

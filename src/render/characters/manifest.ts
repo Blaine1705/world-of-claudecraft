@@ -261,6 +261,21 @@ export interface ClipMap {
    *  jitter, seconds of standing still. Absent = the shared 5 s beat (visual.ts
    *  IDLE_VARIANT_MIN), tuned for a mount that is meant to be always mid-fidget. */
   idleVariantCadence?: { everySec: number; jitterSec?: number };
+  /** Hold a due fidget until the base idle loop wraps, then fire it on the
+   *  seam. For a rig whose fidgets all START on the idle's first frame and
+   *  whose idle travels far from it mid-loop (the sprite pair merging), so a
+   *  fidget cutting in mid-loop would visibly pop. */
+  idleVariantsOnLoopSeam?: boolean;
+  /** Draw the `idleVariants` from a shuffle bag (anim_state.drawIdleVariant):
+   *  each plays once per round, in random order, never twice in a row. Absent
+   *  = an independent random pick each time. */
+  idleVariantsShuffled?: boolean;
+  /** Count the base `idle` itself as one of the pool: drawing it plays one
+   *  more idle loop instead of a fidget. With a short cadence and the loop
+   *  seam hold, fidgets chain straight into one another and the base idle is
+   *  just one entry among them (a rig whose base idle is itself a set piece,
+   *  the sprite pair merging, rather than a breather). */
+  idleVariantsIncludeIdle?: boolean;
   /** Clip substitutions while the hands hold a given loadout (weapon_loadout_core.ts):
    *  'twohand' = a two-hand weapon (held in one fist on the WOC bodies), 'single' = a one-hand
    *  weapon with an empty off hand (the free hand stays down), 'dual' = a weapon in each hand.
@@ -1057,6 +1072,24 @@ const animal = (attack: string[]): ClipMap => ({
 // in-place to this convention (see the buddy_* VISUALS entries below); run
 // and death alias Walk/Idle since a buddy never plays either.
 const BUDDY_CLIPS: ClipMap = { idle: 'Idle', walk: 'Walk', run: 'Walk', attack: [], death: 'Idle' };
+
+// Flicker and Glimmer, the flame-sprite pair (docs/design/sprites-buddy/): a
+// 6s Idle loop in which the two merge into one green sprite and split again,
+// plus five fidgets that each start and end on Idle's first frame. Standing
+// still, the six take turns evenly: a shuffle bag holds the five fidgets and
+// one Idle loop, each plays once per round in random order, never the same
+// twice in a row, and each starts on the Idle seam (fidgets chain straight
+// into one another), so nothing cuts the merge mid-way. Search has no ClipMap
+// slot yet; Jump is shipped for a later hop state.
+const SPRITES_BUDDY_CLIPS: ClipMap = {
+  ...BUDDY_CLIPS,
+  run: 'Run',
+  idleVariants: ['Idle_Nuzzle', 'Idle_Peekaboo', 'Idle_Dance', 'Idle_Doze', 'Idle_Leapfrog'],
+  idleVariantCadence: { everySec: 1, jitterSec: 0 },
+  idleVariantsOnLoopSeam: true,
+  idleVariantsShuffled: true,
+  idleVariantsIncludeIdle: true,
+};
 
 // Rideable mounts. The Tripo-lane rigs (bear, toad, griffin) ship clips baked
 // locally by scripts/bake_mount_gaits.mjs (the Tripo quadruped retarget was
@@ -3603,6 +3636,16 @@ export const VISUALS: Record<string, VisualDef> = {
     // The rig is authored facing -Z, so without this it heels the owner
     // back-to-front: chest toward the camera while its owner walks away.
     yaw: Math.PI,
+  },
+  // The flames are live, not in the GLB: sprites_buddy_flame.ts.
+  buddy_sprites: {
+    url: `${BUDDIES_DIR}/sprites.glb`,
+    // One orb's height. Its flame (sprites_buddy_flame.ts) reaches 2.1 orb
+    // heights tall, so 0.4 stands the pair about 1.45 world units high at the
+    // roster scale, among the other buddies (1.3 to 1.6).
+    height: 0.4,
+    clips: SPRITES_BUDDY_CLIPS,
+    authoredAtlas: true,
   },
   // Yumi, the Protect Yumi objective cat familiar (Meshy rig, scale baked by
   // scripts/_bake_meshy_scale.mjs, meshopt + 1024 webp). The GLB ships ONE
@@ -8019,6 +8062,7 @@ const MOB_KEYS: Record<string, string> = {
   buddy_sapling: 'buddy_sapling',
   buddy_crystal_lich: 'buddy_crystal_lich',
   buddy_forgemaw: 'buddy_forgemaw',
+  buddy_sprites: 'buddy_sprites',
   // Packlord Stampede guardians are transient local templates, not MOBS rows.
   // Give the three summoned beasts distinct existing bodies instead of the
   // generic humanoid bandit fallback.

@@ -1428,7 +1428,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  '05a6e4de9dbfd87d134bb056bae1cd96b249d661caa2654b3db178ba5581b5b9';
+  // Re-minted for the sprite buddy: renderer.ts attaches model VFX through
+  // template_model_vfx.ts (remint_polish_provenance.mjs; no capture was retaken).
+  '9821fb54a2190373ef72948feb8df36ed78f07aef4ddf772174d7f6cbee7a61e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1478,7 +1480,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  'f7e90ef6fdde5b42ff2a99f85e067c1216b240a6a0d78f5da4b2d30eeaac5fb2';
+  // Re-minted for the sprite buddy: renderer.ts attaches model VFX through
+  // template_model_vfx.ts (remint_polish_provenance.mjs; no capture was retaken).
+  '2571d70e440ffcbc1879b1fa2f42369f8c208568076c85687cb8a132a747749c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2881,7 +2885,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('5b6a3765c534210f9c26b884eabc190c32ca8d61b295bbeaff411e60544a1225');
+    ).toBe('9efcf3dd6277f72c786c2e9017b5a2b39038275b62307d0910c92afee6f9294a');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

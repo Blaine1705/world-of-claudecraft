@@ -440,6 +440,7 @@ const MOB_IDS = [
   'buddy_skeleton',
   'buddy_crystal_lich',
   'buddy_forgemaw',
+  'buddy_sprites',
   'buddy_crystal_tide',
   'buddy_phantom',
 ] as const;

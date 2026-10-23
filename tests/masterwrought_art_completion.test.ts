@@ -839,7 +839,8 @@ describe('Masterwrought art completion evidence', () => {
     // GLBs and the 2 stag charm re-tints of them, on the same integration: 2039.
     // + the membership Staff of Changing (membership-weapon-2026-10-14, PR 4281): 2040.
     // The icon backlog adds 135 Season 2 paintings, five referral rewards and the horse.
-    expect(currentOwnerIds).toHaveLength(2181);
+    // + the sprite buddy's whistle render: 2,182.
+    expect(currentOwnerIds).toHaveLength(2182);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1120,9 +1121,10 @@ describe('Masterwrought art completion evidence', () => {
         .filter(({ batchId }) => buddyBatchIds.includes(batchId))
         .flatMap(({ itemIds }) => itemIds),
     );
-    expect(buddyIds.size).toBe(34);
+    // 35 with the sprite buddy's whistle render.
+    expect(buddyIds.size).toBe(35);
     expect(datedIds.filter((id) => buddyIds.has(id))).toEqual([]);
-    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(34);
+    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(35);
 
     // Newly painted files add owners; replacements above only move existing owners.
     const backlogAdditiveBatchIds = [

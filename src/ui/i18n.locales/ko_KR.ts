@@ -19246,6 +19246,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '잉걸불 여우',
   'entities.mobs.buddy_emerald_wolf.name': '에메랄드 늑대',
   'entities.mobs.buddy_forgemaw.name': '용융의 화로아귀',
+  'entities.mobs.buddy_sprites.name': '깜빡이와 반짝이',
   'entities.mobs.buddy_frostfire.name': '서리불꽃',
   'entities.mobs.buddy_golden_sentinel.name': '황금 파수병',
   'entities.mobs.buddy_kekius.name': '케키우스',
@@ -19295,6 +19296,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '트리플 T의 호루라기',
   'entities.items.whistle_trollface.name': '트롤페이스의 호루라기',
   'entities.items.whistle_tuskhorn_boar.name': '엄니뿔 멧돼지의 호루라기',
+  'entities.items.whistle_sprites.name': '깜빡이와 반짝이의 호루라기',
   'hudChrome.buddyMenu.rename': '버디 이름 변경',
   'hudChrome.buddyMenu.nameLabel': '버디 이름',
   'hudChrome.buddyMenu.autolootEnable': '자동 전리품 켜기',
@@ -19466,6 +19468,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.skeleton': '마른 뼈가 당신의 걸음에 맞춰 덜그럭거립니다.',
   'hudChrome.collections.presence.crystal_lich':
     '잔해에서 차가운 웅웅거림이 피어오르고, 그것이 당신을 지켜봅니다.',
+  'hudChrome.collections.presence.sprites': '작은 불꽃 두 개가 당신에게 옮겨붙었고, 꺼질 기미가 없다.',
   'hudChrome.collections.presence.forgemaw':
     '용광로의 열기가 아직 당신을 떠나지 않았습니다. 무언가가 그것과 함께 걸어 나왔습니다.',
   'hudChrome.collections.presence.crystal_tide':

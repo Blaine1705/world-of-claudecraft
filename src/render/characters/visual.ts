@@ -48,10 +48,12 @@ import {
   clipSnapsIn,
   combatIdleClamps,
   desiredBaseState,
+  drawIdleVariant,
   drivesPose,
   gaitWindDownTimeScale,
   isStrafeState,
   locomotionTimeScale,
+  onIdleLoopSeam,
   pickProxyHeight,
   SUBMERGED_HEAD_FRACTION,
   scanAnimRepair,
@@ -1271,6 +1273,9 @@ export class CharacterVisual {
   private currentIsOneShot = false;
   /** Seconds until the next idle-breaker; -1 means "rearm on the next idle". */
   private idleVariantIn = -1;
+  /** The rest of this round of fidgets and the last one played (drawIdleVariant). */
+  private idleVariantBag: string[] = [];
+  private lastIdleVariant: string | null = null;
   /** The live one-shot is an idle-breaker, so leaving idle must cancel it. */
   private currentOneShotIsIdleVariant = false;
   /** Countdown to the next ClipMap.idleBeat fire; -1 = rearm on the idle edge. */
@@ -5722,9 +5727,29 @@ export class CharacterVisual {
     // Due, but something else is playing (very often the idle BEAT, which is a
     // one-shot too). Hold the draw rather than rearming: rearming here let the
     // beat reset this clock on every fire and the pool would never come up.
-    if (this.currentIsOneShot) return;
+    // A held draw parks the clock AT zero: left below it, the next frame's
+    // `< 0` unarmed check above re-armed it from scratch, so any hold (this
+    // one, or the loop seam's below, which always waits) dropped the fidget.
+    if (this.currentIsOneShot) {
+      this.idleVariantIn = 0;
+      return;
+    }
+    if (this.def.clips.idleVariantsOnLoopSeam) {
+      const idle = this.action(this.def.clips.idle);
+      if (idle && !onIdleLoopSeam(idle.time, idle.getClip().duration)) {
+        this.idleVariantIn = 0; // hold for the seam
+        return;
+      }
+    }
     this.idleVariantIn = this.nextIdleVariantIn();
-    const pick = variants[Math.floor(Math.random() * variants.length)];
+    const clips = this.def.clips;
+    const pool = clips.idleVariantsIncludeIdle ? [...variants, clips.idle] : variants;
+    const pick = clips.idleVariantsShuffled
+      ? drawIdleVariant(pool, this.idleVariantBag, this.lastIdleVariant)
+      : pool[Math.floor(Math.random() * pool.length)];
+    this.lastIdleVariant = pick;
+    // The base idle drawn as one of the pool: it simply plays one more loop.
+    if (pick === clips.idle) return;
     if (!this.action(pick)) return;
     this.playOneShot(pick, 1);
     this.currentOneShotIsIdleVariant = true;
@@ -5763,7 +5788,10 @@ export class CharacterVisual {
     }
     this.idleBeatIn -= dt;
     if (this.idleBeatIn > 0) return;
-    if (this.currentIsOneShot) return; // wait for the floor, keep the clock at 0
+    if (this.currentIsOneShot) {
+      this.idleBeatIn = 0; // wait for the floor, keep the clock at 0 (below it reads as unarmed)
+      return;
+    }
     this.idleBeatIn = arm();
     if (!this.action(beat.clip)) return;
     this.playOneShot(beat.clip, 1);

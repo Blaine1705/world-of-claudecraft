@@ -5409,6 +5409,7 @@ export const ja_JP: EnTranslations = {
         "skeleton": "乾いた骨があなたの歩みに合わせてかたかた鳴る。",
         "crystal_lich": "残骸から冷たいうなりが立ちのぼり、それがあなたを見ている。",
         "forgemaw": "炉の熱がまだあなたから離れない。何かがそれと共に歩き出た。",
+        "sprites": "小さな二つの炎があなたに燃え移り、消えそうにない。",
         "crystal_tide": "海のひとしずくが、あなたの釣り糸から落ちようとしない。",
         "phantom": "あなたの後ろの空気が、ほんの少し静かすぎる。",
         "emberfall_phoenix": "埋み火のような温もりが、あなたの背に落ち着く。"
@@ -20700,6 +20701,9 @@ export const ja_JP: EnTranslations = {
       "charm_stag_gilded": {
         "name": "金箔のお守り"
       },
+      "whistle_sprites": {
+        "name": "チラリとキラリの笛"
+      },
       "lastflame_core": {
         "name": "最後の炎の核"
       },
@@ -25810,6 +25814,9 @@ export const ja_JP: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "溶けたフォージモウ"
+      },
+      "buddy_sprites": {
+        "name": "チラリとキラリ"
       },
       "buddy_crystal_tide": {
         "name": "クリスタルタイド"

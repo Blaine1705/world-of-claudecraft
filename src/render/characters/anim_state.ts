@@ -601,6 +601,43 @@ export function shouldInterruptLanding(
  * caller is a per-entity per-frame path, and cloning the state to override one
  * flag allocated a fresh object every frame for every rig standing in a ford.
  */
+/** Width (seconds) of the window either side of a looping idle's wrap in which
+ *  a seam-held fidget may fire (ClipMap.idleVariantsOnLoopSeam). Wider than a
+ *  frame so a low frame rate cannot step over it. */
+export const IDLE_LOOP_SEAM_WINDOW = 0.12;
+
+/** True when a looping idle at `time` into a `duration`-second clip sits on its
+ *  loop seam, where its pose is its first frame. */
+export function onIdleLoopSeam(time: number, duration: number): boolean {
+  if (!(duration > 0)) return true;
+  const t = ((time % duration) + duration) % duration;
+  return t <= IDLE_LOOP_SEAM_WINDOW || duration - t <= IDLE_LOOP_SEAM_WINDOW;
+}
+
+/** The next fidget from a shuffle bag (ClipMap.idleVariantsShuffled): every
+ *  variant plays once, in a fresh random order, before any repeats, and a new
+ *  round never opens on the one that just played, so no fidget ever plays
+ *  twice in a row. `bag` is the caller's remaining round, consumed in place. */
+export function drawIdleVariant(
+  variants: readonly string[],
+  bag: string[],
+  last: string | null,
+  random: () => number = Math.random,
+): string {
+  if (bag.length === 0) {
+    bag.push(...variants);
+    for (let i = bag.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    if (bag.length > 1 && bag[0] === last) {
+      const j = 1 + Math.floor(random() * (bag.length - 1));
+      [bag[0], bag[j]] = [bag[j], bag[0]];
+    }
+  }
+  return bag.shift() as string;
+}
+
 export function desiredBaseState(
   s: AnimState,
   hasWalkBackClip: boolean,

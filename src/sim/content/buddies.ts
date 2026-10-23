@@ -18,7 +18,7 @@
 // imports and runs unchanged on the server, offline, and headless.
 // ---------------------------------------------------------------------------
 
-export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling';
+export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling' | 'sprites';
 
 // Historical whistle identities remain readable in existing bags and bank saves.
 // This type is only for item definitions; active ownership uses BuddyKey.
@@ -76,6 +76,10 @@ export const BUDDIES: Record<BuddyKey, BuddyDef> = {
     name: 'Forgemaw The Molten',
   },
   sapling: { key: 'sapling', name: 'Sapling' },
+  sprites: {
+    key: 'sprites',
+    name: 'Flicker and Glimmer',
+  },
 };
 
 // Retired Emberfall Phoenix tokens remain readable in old saves and retain their

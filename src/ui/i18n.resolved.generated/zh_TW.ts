@@ -5409,6 +5409,7 @@ export const zh_TW: EnTranslations = {
         "skeleton": "乾枯的骨頭隨著你的腳步喀喀作響。",
         "crystal_lich": "一陣寒冷的嗡鳴從殘骸中升起，它正注視著你。",
         "forgemaw": "熔爐的熱度還沒有離開你。有什麼東西隨之走了出來。",
+        "sprites": "兩簇小火苗沾上了你，而且不會熄滅。",
         "crystal_tide": "一滴海水拒絕從你的釣線上落下。",
         "phantom": "你身後的空氣靜得有些過分。",
         "emberfall_phoenix": "一股如同封火般的暖意落在你的背後。"
@@ -20700,6 +20701,9 @@ export const zh_TW: EnTranslations = {
       "charm_stag_gilded": {
         "name": "鍍金護符"
       },
+      "whistle_sprites": {
+        "name": "閃爍與微光的哨子"
+      },
       "lastflame_core": {
         "name": "末焰之核"
       },
@@ -25810,6 +25814,9 @@ export const zh_TW: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "熔顎·熔融者"
+      },
+      "buddy_sprites": {
+        "name": "閃爍與微光"
       },
       "buddy_crystal_tide": {
         "name": "水晶潮汐"

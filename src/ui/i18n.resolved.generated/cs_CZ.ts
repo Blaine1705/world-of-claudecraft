@@ -5409,6 +5409,7 @@ export const cs_CZ: EnTranslations = {
         "skeleton": "Dry bones rattle in step with yours.",
         "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
         "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
+        "sprites": "Two small flames have caught on you, and they are not going out.",
         "crystal_tide": "A drop of the sea refuses to fall from your line.",
         "phantom": "The air behind you is a shade too still.",
         "emberfall_phoenix": "A warmth like a banked fire settles at your back."
@@ -20700,6 +20701,9 @@ export const cs_CZ: EnTranslations = {
       "charm_stag_gilded": {
         "name": "Gilded Charm"
       },
+      "whistle_sprites": {
+        "name": "Flicker and Glimmer Whistle"
+      },
       "lastflame_core": {
         "name": "Jádro Posledního plamene"
       },
@@ -25810,6 +25814,9 @@ export const cs_CZ: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "Forgemaw The Molten"
+      },
+      "buddy_sprites": {
+        "name": "Flicker and Glimmer"
       },
       "buddy_crystal_tide": {
         "name": "Crystal Tide"

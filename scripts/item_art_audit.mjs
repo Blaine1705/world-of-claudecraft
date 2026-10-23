@@ -166,8 +166,10 @@ const build = await buildItemArtAudit({
     // + the membership Staff of Changing (PR 4281): 2040 / 2069, re-measured with
     // `--verify-only`.
     // Completed Season 2 painted armor leaves the pending ledger.
-    catalogCount: 2181,
-    liveItemCount: 2210,
+    // + the sprite buddy's whistle (rendered into the buddy whistle batch):
+    // 2182 / 2211, re-measured with `--verify-only`.
+    catalogCount: 2182,
+    liveItemCount: 2211,
     // Only the intentionally retired Phoenix token retains its procedural icon.
     pendingArtCount: 1,
     generatedHeroicDefinitions: 116,
