@@ -2387,6 +2387,7 @@ export const hudChromeStrings = {
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
+    name_wobbles_slime: 'Wobbles the Slime',
     name_nightwing_chimera: 'Nightwing Chimaera',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
@@ -2403,6 +2404,8 @@ export const hudChromeStrings = {
       'A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.',
     desc_rallycart_rxt: 'A pint-sized rally machine that provides enhanced travel speed.',
     desc_rallycart_skin: 'A tiny rally car with a mighty roar.',
+    desc_wobbles_slime:
+      'A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_referral_tank: 'Earned by completing a referral stamp card.',

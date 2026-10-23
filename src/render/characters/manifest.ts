@@ -678,6 +678,11 @@ export interface VisualDef {
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
   lazyPreload?: boolean;
+  /** Clips looped for the visual's whole life BESIDE the state clips (idle,
+   *  walk, jump, ...), on their own clock, so they never restart when the
+   *  state changes: Wobbles the Slime's drifting bubbles. Each must animate
+   *  only bones no state clip touches, or the two actions blend. */
+  ambientClips?: readonly string[];
   /** Post-load orientation fixups for weapon/prop nodes baked INTO a creature
    *  GLB at the wrong angle (some KayKit handslot weapons ship without the grip
    *  flip the standalone weapon files carry). Node name as authored in the GLB;
@@ -1106,6 +1111,21 @@ const MOUNT_RIGGED: ClipMap = {
   run: 'Run',
   attack: [],
   death: 'Death',
+};
+
+// Wobbles the Slime ships Idle / Walk / Run / Jump / Land (docs/design/slime-mount).
+// Naming `land` opts it into the held-jump treatment, like the tortoise: `Jump`
+// is the gather and spring, clamped on its airborne pose for the whole flight,
+// and `Land` is the touchdown splat. Neither carries a rise (the arc is the
+// game's). Death holds Idle: a ridden mount never plays one.
+const MOUNT_SLIME: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: [],
+  death: 'Idle',
+  jump: 'Jump',
+  land: 'Land',
 };
 
 // The Drakemaw Raptor's own rig and clips, built in Blender from scratch
@@ -3417,6 +3437,23 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_TORTOISE,
     walkRef: 3.6,
     runRef: 10,
+    lazyPreload: true,
+  },
+  // Wobbles the Slime: 4.0 tall, a touch over the horse, so the seat lands
+  // about a body higher than a horse's. One hop per Walk/Run loop; the refs
+  // pick a hop cadence that reads as bounding at mounted speed rather than
+  // matching any foot (it has none).
+  mount_wobbles_slime: {
+    url: `${MOUNTS_DIR}/wobbles_slime.glb`,
+    height: 4.0,
+    clips: MOUNT_SLIME,
+    // The bubbles drift on their own loop, never reset by a gait change.
+    ambientClips: ['Bubbles'],
+    // The tack is Tripo's baked texture (dark leather and navy): keep black
+    // black on the low tier rather than lifting it to a flat grey.
+    authoredAtlas: true,
+    walkRef: 2.5,
+    runRef: 11,
     lazyPreload: true,
   },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches

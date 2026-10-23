@@ -7522,6 +7522,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Wobbles the Slime"
+      },
+      {
+        "kind": "mount",
         "name": "Dreadspark Groundshaker"
       },
       {

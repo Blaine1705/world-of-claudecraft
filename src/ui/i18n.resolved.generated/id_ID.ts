@@ -2242,6 +2242,7 @@ export const id_ID: EnTranslations = {
       "name_lanternback_troll": "Grumbol si Punggung Lentera",
       "name_chimeglass_tortoise": "Tolliver si Kaca Cerobong Asap",
       "name_rickshaw_mount": "Becak Terikat Tulang",
+      "name_wobbles_slime": "Wobbles the Slime",
       "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
@@ -2253,6 +2254,7 @@ export const id_ID: EnTranslations = {
       "desc_goblin_rocket_sled": "Kereta luncur goblin yang sangat berlebihan dan berbahaya, didorong dua roket serta penilaian buruk yang luar biasa.",
       "desc_rallycart_rxt": "Mesin reli mungil yang meningkatkan kecepatan perjalanan.",
       "desc_rallycart_skin": "Mobil reli kecil dengan raungan dahsyat.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -20037,6 +20039,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Tali Lonceng Penjaga Jalan: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Kendali Terikat: Becak Terikat Tulang"

@@ -1545,6 +1545,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/mounts/terrorspark_groundshaker.glb": "/media/models/mounts/terrorspark_groundshaker.f8463280b384.glb",
   "models/mounts/thunderstrut_gobbler.glb": "/media/models/mounts/thunderstrut_gobbler.14c562c1e2d9.glb",
   "models/mounts/valorsteed.glb": "/media/models/mounts/valorsteed.d63c2617a090.glb",
+  "models/mounts/wobbles_slime.glb": "/media/models/mounts/wobbles_slime.e008f921a297.glb",
   "models/props/alchemy_cauldron.glb": "/media/models/props/alchemy_cauldron.cb2b179b77bd.glb",
   "models/props/anvil.glb": "/media/models/props/anvil.f2323d51ee6f.glb",
   "models/props/banker_chest.glb": "/media/models/props/banker_chest.b5bc6a5f7162.glb",

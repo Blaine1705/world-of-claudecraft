@@ -425,6 +425,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only mount (DEVELOPER_MOUNTS terms): /dev mounts or
+  // /dev give reins_wobbles_slime, soulbound until it has an acquisition path.
+  reins_wobbles_slime: {
+    id: 'reins_wobbles_slime',
+    name: 'Jelly Saddle: Wobbles',
+    kind: 'mount',
+    mount: 'wobbles_slime',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // The Rift Watch's Champion mount: sold by Quartermaster Vaelen in
   // Drifthaven behind Champion standing (content/faction_vendors.ts,
   // docs/design/factions.md). Priced at the classic epic-mount ratio, ten
