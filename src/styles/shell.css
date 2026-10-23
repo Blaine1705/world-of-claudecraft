@@ -9786,7 +9786,7 @@
 /* Character creation and the Redesign editor on a WOC body. Mounted by
    src/ui/woc_head_builder.ts into the same hosts as the modular customizer
    above. A AAA creator layout: a category menu on the left, the open
-   category's options in a panel beside it, a Randomize / Reset footer.
+   category's options in a panel beside it, a Randomize / Reset / Share footer.
    Tokens only, pinned at zero raw colour literals by
    tests/css_raw_color_ratchet.test.ts; swatch fills arrive as --whb-sw from
    the painter. Like the customizer rules, these live outside @layer shell so
@@ -9914,6 +9914,12 @@
   min-height: 0;
   padding: 10px 10px 8px;
   animation: whb-panel-in 180ms ease;
+}
+
+/* The tab panel and the Share region take turns in one grid cell: the class's
+   display would otherwise outrank the hidden attribute's. */
+.whb-panel[hidden] {
+  display: none;
 }
 
 @keyframes whb-panel-in {
@@ -10234,13 +10240,140 @@
   box-shadow: 0 0 12px var(--color-primary-glow);
 }
 
+/* The footer's Share button: gold (below, with Copy), with its glyph, on a row
+   of its own under Random and Reset, so the way to save and send a face reads
+   at a glance. Lit while the Share page is up. */
+.whb-foot-share {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.whb-foot-glyph {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+/* The Share page: the face code in a monospace box that is also where a code
+   is pasted, Copy / Import under it, then a status line. Coarse pointers get
+   the 16px input floor from base.css, so nothing here sets a smaller font on
+   the box there. */
+.whb-share-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.whb-share-code {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 104px;
+  padding: 8px 10px;
+  font-family: ui-monospace, Consolas, "Cascadia Mono", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-light);
+  background: var(--color-card-inset);
+  /* a text box's edge has to read against the panel (3:1), which the
+     showcase border colour does not on its own */
+  border: 1px solid color-mix(in srgb, var(--gold-dim) 60%, transparent);
+  border-radius: 6px;
+  resize: vertical;
+  /* the code is one long line of fields: wrap anywhere rather than scroll */
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  scrollbar-width: thin;
+}
+
+/* Copy and Import side by side while both labels fit, each on a row of its own
+   when they do not (a narrow panel, a long translation): a button is never
+   narrower than its label, and a row shares its spare width out. */
+.whb-share-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.whb-share-btn {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-family: var(--title-font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  background: var(--color-card-inset);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 6px;
+  cursor: var(--cursor-point);
+  transition:
+    color 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.whb-share-btn:hover {
+  border-color: color-mix(in srgb, var(--gold-dim) 70%, transparent);
+  background: color-mix(in srgb, var(--gold-dim) 12%, transparent);
+}
+
+/* Gold, the builder's call to action: the footer's Share button and Copy, the
+   Share page's main action. After both buttons' own rules, so it wins. */
+.whb-foot-share,
+.whb-share-copy {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--gold-dim) 26%, transparent),
+    color-mix(in srgb, var(--gold-dim) 8%, transparent)
+  );
+}
+
+.whb-foot-share:hover,
+.whb-foot-share.sel {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gold) 30%, transparent),
+    0 0 14px var(--color-primary-glow);
+}
+
+.whb-share-copy:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px var(--color-primary-glow);
+}
+
+.whb-share-status {
+  min-height: 18px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-success);
+}
+
+.whb-share-status.err {
+  color: var(--color-text-error);
+}
+
 .whb-cat:focus-visible,
 .whb-opt:focus-visible,
 .whb-match:focus-visible,
 .whb-custom-input:focus-visible,
 .whb-sw:focus-visible,
 .whb-slider:focus-visible,
-.whb-foot-btn:focus-visible {
+.whb-foot-btn:focus-visible,
+.whb-share-code:focus-visible,
+.whb-share-btn:focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
@@ -10255,7 +10388,8 @@
   .whb-match,
   .whb-custom,
   .whb-sw,
-  .whb-foot-btn {
+  .whb-foot-btn,
+  .whb-share-btn {
     transition: none;
   }
 }
@@ -10281,7 +10415,8 @@
   .whb-opt.sel,
   .whb-match.sel,
   .whb-custom.sel,
-  .whb-cat.sel {
+  .whb-cat.sel,
+  .whb-foot-share.sel {
     border-color: Highlight;
     outline: 2px solid Highlight;
     outline-offset: -2px;
@@ -10291,7 +10426,8 @@
   .whb-opt.sel:focus-visible,
   .whb-match.sel:focus-visible,
   .whb-cat.sel:focus-visible,
-  .whb-sw.sel:focus-visible {
+  .whb-sw.sel:focus-visible,
+  .whb-foot-share.sel:focus-visible {
     outline: 3px solid CanvasText;
     outline-offset: 2px;
   }
@@ -10311,7 +10447,8 @@
   .whb-opt,
   .whb-match,
   .whb-custom,
-  .whb-foot-btn {
+  .whb-foot-btn,
+  .whb-share-btn {
     min-height: 40px;
   }
   /* Touch: every swatch clears the 40px target floor, in even rows (the skin
@@ -10442,6 +10579,11 @@
   }
   .whb-opts {
     grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  }
+  /* the sheet's own cap above leaves a short landscape phone little room: the
+     code box scrolls inside itself so Copy and Import stay in view */
+  .whb-share-code {
+    max-height: 26dvh;
   }
 }
 

@@ -13,7 +13,16 @@
 // so a variant added there shows up here with no UI change. Facial hair has
 // no colour of its own: the renderer tints it with the hair colour, so one
 // Hair Color pick recolours hair and beard together.
+//
+// The Share page (the footer's Share button opens it in the panel) is the face
+// as one line of text, the face code (src/render/characters/design_code_core.ts):
+// copied out to save or send a face, pasted back in to load one.
 
+import {
+  type DesignCodeError,
+  decodeDesignCode,
+  encodeWocFaceCode,
+} from '../render/characters/design_code_core';
 import {
   clampWocBodyScale,
   DEFAULT_APPEARANCE,
@@ -32,7 +41,7 @@ import {
   type WocHeadType,
   wocHeadTypeForGender,
 } from '../render/characters/woc_head_catalog';
-import { formatNumber } from './i18n';
+import { formatNumber, type TranslationKey } from './i18n';
 import { rovingTarget } from './roving_index';
 
 /** The continuous face controls, each within its WOC_HEAD_MORPH_RANGE. */
@@ -93,17 +102,24 @@ export const WOC_BUILDER_CATEGORIES: readonly WocBuilderCategory[] = [
   'piercings',
 ];
 
-/** The label key of each category (auth.wocBuilder.cat.<id>). */
-export function categoryLabelKey(cat: WocBuilderCategory): string {
-  return `auth.wocBuilder.cat.${cat}`;
+/** What the panel beside the menu shows: a menu category, or the Share page.
+ *  Share is not a menu tab: the footer's Share button opens it, the one way in
+ *  every layout shows (an eleventh tab ran off the end of the docked menu). */
+export type WocBuilderPage = WocBuilderCategory | 'share';
+
+/** The label key of each page (auth.wocBuilder.cat.<id>). Share takes the
+ *  KayKit creator's Share tab label, the same word in every locale. */
+export function categoryLabelKey(page: WocBuilderPage): string {
+  return page === 'share' ? 'auth.shareTab' : `auth.wocBuilder.cat.${page}`;
 }
 
-/** Where the creation camera should sit while a category is open: the body
- *  pick shows the whole character, every other category edits the face. */
+/** Where the creation camera should sit while a page is open: the body pick
+ *  shows the whole character, every other page (Share included: it is the
+ *  face being shared or loaded) shows the face. */
 export type WocBuilderFocus = 'face' | 'body';
 
-export function focusForCategory(cat: WocBuilderCategory | null): WocBuilderFocus {
-  return cat === null || cat === 'bodyType' ? 'body' : 'face';
+export function focusForCategory(page: WocBuilderPage | null): WocBuilderFocus {
+  return page === null || page === 'bodyType' ? 'body' : 'face';
 }
 
 // --- palettes ----------------------------------------------------------------
@@ -408,9 +424,15 @@ export type WocBuilderSection =
       /** values marked under the track, evenly spaced, in the slider's units
        *  (read out like the value), so the scale and its middle are plain */
       readonly ticks?: readonly number[];
+    }
+  | {
+      readonly kind: 'share';
+      /** the face as a face code: what the box shows and Copy copies */
+      readonly code: string;
     };
 
 export type WocSliderSection = Extract<WocBuilderSection, { kind: 'slider' }>;
+export type WocShareSection = Extract<WocBuilderSection, { kind: 'share' }>;
 
 const SLOT_SECTION_LABEL: Readonly<Partial<Record<WocHeadSlot, string>>> = {
   nose: 'auth.wocBuilder.section.nose',
@@ -529,12 +551,9 @@ function swatchSection(
   };
 }
 
-/** The sections a category's panel shows for an appearance. */
-export function categorySections(
-  cat: WocBuilderCategory,
-  a: WocFaceAppearance,
-): WocBuilderSection[] {
-  switch (cat) {
+/** The sections a page's panel shows for an appearance. */
+export function categorySections(page: WocBuilderPage, a: WocFaceAppearance): WocBuilderSection[] {
+  switch (page) {
     case 'bodyType':
       return [
         {
@@ -591,7 +610,51 @@ export function categorySections(
           })),
         },
       ];
+    case 'share':
+      return [{ kind: 'share', code: faceCode(a) }];
   }
+}
+
+// --- the face code (the Share category) --------------------------------------
+
+/** A face as a face code (design_code_core.ts WOC_FACE_CODE_FIELDS): every
+ *  field this builder edits, nothing it does not. */
+export function faceCode(a: WocFaceAppearance): string {
+  return encodeWocFaceCode(a);
+}
+
+/** What pasting a code and pressing Import does: the face the code describes,
+ *  or why the paste is not one. `partial` means the code named something this
+ *  version does not know or a value off the catalog, which fell back. */
+export type WocFaceCodeImport =
+  | { readonly ok: true; readonly face: WocFaceAppearance; readonly partial: boolean }
+  | { readonly ok: false; readonly reason: DesignCodeError };
+
+/** Read a pasted face code (or a full design code: it is the same format) into
+ *  the face it describes. Import replaces the whole face, the body type and size
+ *  included, as loading a saved design should; a field the code leaves out
+ *  takes the default look's value, the code format's own rule. */
+export function importFaceCode(raw: string): WocFaceCodeImport {
+  const r = decodeDesignCode(raw);
+  if (!r.ok) return { ok: false, reason: r.reason };
+  return {
+    ok: true,
+    face: readFace(r.appearance),
+    partial: r.ignored.length > 0 || r.coerced.length > 0,
+  };
+}
+
+/** The status line's message key for each way a paste can fail. */
+export const FACE_CODE_ERROR_KEYS: Readonly<Record<DesignCodeError, TranslationKey>> = {
+  empty: 'auth.designCodeErrEmpty',
+  header: 'auth.designCodeErrHeader',
+  version: 'auth.designCodeErrVersion',
+  malformed: 'auth.designCodeErrMalformed',
+};
+
+/** The status line's message key after a successful import. */
+export function importedStatusKey(partial: boolean): TranslationKey {
+  return partial ? 'auth.designCodeImportedPartial' : 'auth.designCodeImported';
 }
 
 /** A slider's readout, through the locale's number formatter: "+20" / "-35" /
@@ -775,17 +838,15 @@ export function randomizeFace(a: WocFaceAppearance, rand: () => number): WocFace
 // --- the menu's own state -------------------------------------------------------
 
 export interface WocBuilderMenuState {
-  /** the open category (the panel beside the menu shows its options) */
-  readonly open: WocBuilderCategory;
+  /** the open page (the panel beside the menu shows a category's options, or
+   *  the Share page) */
+  readonly open: WocBuilderPage;
 }
 
 export const INITIAL_MENU: WocBuilderMenuState = { open: 'bodyType' };
 
-export function openCategory(
-  _s: WocBuilderMenuState,
-  cat: WocBuilderCategory,
-): WocBuilderMenuState {
-  return { open: cat };
+export function openCategory(_s: WocBuilderMenuState, page: WocBuilderPage): WocBuilderMenuState {
+  return { open: page };
 }
 
 /** Roving-focus movement through the menu (arrow keys, Home/End), through the
