@@ -137,7 +137,7 @@ plausibly covers means the table needs a new row in the same change.
 | `breath.ts` + `fatigue.ts` | the two water clocks, run per live player in the tick and NEVER overlapping: breath is the DEPTH clock (classic mirror-timer lungful; empty lungs drown at a steady fraction of max hp per second), fatigue is the open-sea DISTANCE clock (the Veiled Hollow's borderless sea: warning, short grace, then rising unavoidable damage until the swimmer turns back). Both draw no rng |
 | `climb.ts` | the ledge-climb MOVEMENT MODE (same family as Heroic Leap's flight and warrior Charge): while it runs it owns the body's position outright; the destination was validated BEFORE the climb started by the `physics/ledge.ts` grab query |
 | `social/party.ts` | the party/raid machine + `partyOf` |
-| `social/dungeon_finder.ts` | the Dungeon Finder (`docs/prd/dungeon-finder.md`): the automatic role queue plus the leader-run premade board; only FORMS groups (via `PartyMachine.formDungeonFinderGroup`), draws no rng; pinned by `tests/dungeon_finder.test.ts` |
+| `social/dungeon_finder.ts` | the Dungeon Finder (`docs/prd/dungeon-finder.md`): the automatic role queue and leader-run premade board form groups via `PartyMachine.formDungeonFinderGroup`; open expeditions recruit into running claims and explicit travel reuses the normal door preflight; draws no rng; pinned by `tests/dungeon_finder.test.ts` and `tests/dungeon_expeditions.test.ts` |
 | `social/duel.ts` + `social/arena.ts` | duels + ranked arena (Elo, matchmaking) |
 | `social/fiesta.ts` + `social/fiesta_bots.ts` | fiesta match logic + offline bots |
 | `social/yumi.ts` | Protect Yumi 3v3/5v5 maze mode (layout leaf `yumi_maze_layout.ts`) |

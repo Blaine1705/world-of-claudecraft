@@ -580,7 +580,8 @@ const MONOLITHS: MonolithRow[] = [
     // Heroic currency balance reads remove the old bag sum. Exact merged size.
     // Loot-quality craft receipt formatting moved to loot_quality_receipt.ts.
     // Exact merged coordinator size after the source extraction, zero slack.
-    ceiling: 17918,
+    // Groups extractions compose with the release extractions; measured after formatting.
+    ceiling: 17896,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1321,7 +1322,8 @@ const MONOLITHS: MonolithRow[] = [
     // Measured on the combined tree; neither parent's ceiling is raised.
     // Buyback save projection now joins the character_storage boundary.
     // LOWERED to the measured 11624 lines after canonical source save repair.
-    ceiling: 11624,
+    // Groups extractions compose with the release extractions; measured after formatting.
+    ceiling: 11542,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1839,7 +1841,8 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 9764 -> 9754 after composing GM tools: the live /who projection,
     // tick memo and current-viewer block filtering live in who_roster_host.ts.
     // Measured after biome; no budget raise from the older source pin.
-    ceiling: 9754,
+    // Groups extractions compose with the release extractions; measured after formatting.
+    ceiling: 9698,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2035,7 +2038,8 @@ const MONOLITHS: MonolithRow[] = [
     // measured with wc -l, zero slack.
     // Loot-quality craftResult projection moved to craft_result_mirror.ts.
     // Exact merged coordinator size after the source extraction, zero slack.
-    ceiling: 5321,
+    // Groups extractions compose with the release extractions; measured after formatting.
+    ceiling: 5318,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

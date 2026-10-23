@@ -657,6 +657,9 @@ const UI_PURE_CORES = [
   'src/ui/pvp_hostile_core.ts',
   'src/ui/pvp_risk_core.ts',
   'src/ui/dungeon_finder_view.ts',
+  'src/ui/dungeon_catalogue_view.ts',
+  'src/ui/dungeon_loot_preview_view.ts',
+  'src/ui/hud/expeditions/expedition_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
@@ -2698,6 +2701,9 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/hud/expeditions/finder_surfaces.ts',
+  'src/ui/hud/expeditions/expedition_controller.ts',
+  'src/ui/hud/expeditions/notification_sound.ts',
   // Mints the "restoring graphics" status line and toggles it on the context
   // restore hold's edges.
   'src/ui/graphics_restore_note_controller.ts',

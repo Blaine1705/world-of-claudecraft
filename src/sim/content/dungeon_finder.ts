@@ -14,8 +14,19 @@ import type { Role } from './talents';
 
 // Structured listing tags: the only "description" a premade listing carries.
 // Free-form listing text is deliberately unsupported (no moderation surface).
-export type FinderListingTag = 'first_run' | 'quest_run' | 'full_clear' | 'learning' | 'fast_run';
+// `guild_only` is not a purpose chip: it marks a Guild Party, whose every
+// member must share the leader's guild (enforced by the finder machine).
+export type FinderListingTag =
+  | 'first_run'
+  | 'quest_run'
+  | 'full_clear'
+  | 'learning'
+  | 'fast_run'
+  | 'guild_only';
 
+export const FINDER_GUILD_TAG: FinderListingTag = 'guild_only';
+
+// The purpose chips the create form offers (the Guild Party flag has its own toggle).
 export const FINDER_LISTING_TAGS: readonly FinderListingTag[] = [
   'first_run',
   'quest_run',
@@ -25,7 +36,7 @@ export const FINDER_LISTING_TAGS: readonly FinderListingTag[] = [
 ];
 
 export function isFinderListingTag(value: unknown): value is FinderListingTag {
-  return (FINDER_LISTING_TAGS as readonly unknown[]).includes(value);
+  return value === FINDER_GUILD_TAG || (FINDER_LISTING_TAGS as readonly unknown[]).includes(value);
 }
 
 // Stable slot order for deterministic role assignment and display.
@@ -35,11 +46,9 @@ export function isFinderRole(value: unknown): value is Role {
   return (FINDER_ROLE_ORDER as readonly unknown[]).includes(value);
 }
 
-// Below FIRST_TALENT_LEVEL there is no specialization, so finder roles come
-// from this fixed class-capability table. From the spec unlock (FIRST_TALENT_LEVEL) on, the selected role
-// must match the active specialization's role instead (see compatibleFinderRoles
-// in ../social/dungeon_finder.ts).
-export const FINDER_PRE_SPEC_ROLES: Record<Role, readonly PlayerClass[]> = {
+// Finder roles express the jobs a class can offer, at every level. Selecting
+// a role never changes or requires an active talent specialization.
+export const FINDER_CLASS_ROLES: Record<Role, readonly PlayerClass[]> = {
   tank: ['warrior', 'paladin', 'druid'],
   healer: ['paladin', 'priest', 'shaman', 'druid'],
   dps: ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'],

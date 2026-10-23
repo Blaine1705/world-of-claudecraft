@@ -1280,10 +1280,20 @@ const baseEnTable = {
   'dfinder.alreadyListing': 'You already lead a group listing.',
   'dfinder.noListing': 'You do not lead a group listing.',
   'dfinder.alreadyApplied': 'You already have a pending application.',
+  'dfinder.expeditionApplicationCap': 'You may have at most 5 pending expedition applications.',
   'dfinder.applyInParty': 'Leave your party before applying to a listing.',
   'dfinder.noRoom': 'That listing has no room for your roles.',
+  'dfinder.guildPartyNoGuild': 'You must be in a guild to create a Guild Party.',
+  'dfinder.guildPartyMembers': 'Every member of a Guild Party must be in your guild.',
+  'dfinder.guildPartyOnly': 'That group is a Guild Party for members of its guild only.',
+  'dfinder.advertOffline': 'Posting to Discord is only available in online play.',
+  'dfinder.advertCooldown': 'You posted your group recently. Please wait before posting again.',
   'dfinder.noApplication': 'You have no pending application.',
   'dfinder.playerUnavailable': 'That player is no longer available.',
+  'dfinder.expeditionOpenUnavailable':
+    'You must be inside an unfinished dungeon run to open recruitment.',
+  'dfinder.expeditionUnavailable': 'Your expedition is no longer available.',
+  'dfinder.expeditionTravelUnavailable': 'You cannot travel to your expedition right now.',
   'dfinder.queueJoined': 'You join the Dungeon Finder queue.',
   'dfinder.queueLeft': 'You leave the Dungeon Finder queue.',
   'dfinder.youLeftQueue': 'You left the Dungeon Finder queue.',
@@ -1292,6 +1302,9 @@ const baseEnTable = {
   'dfinder.assembled': 'Your Dungeon Finder group has assembled. Travel to the entrance together.',
   'dfinder.listingPublished': 'Your group listing is published.',
   'dfinder.appliedListingClosed': 'The group listing you applied to has closed.',
+  'dfinder.listingDifficultyChanged': 'Your group listing difficulty is updated.',
+  'dfinder.appliedListingDifficulty':
+    'The group you applied to changed its difficulty, so your application was withdrawn.',
   'dfinder.listingClosed': 'Your group listing is now closed.',
   'dfinder.applied': 'You apply to a group listing.',
   'dfinder.applicantApplies': '{name} applies to your group listing.',
@@ -7909,6 +7922,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Plündere die Leiche von {victim}, um deine Beute zu erhalten.",
 },
   zh_CN: {
+    'dfinder.expeditionOpenUnavailable': '必须身处尚未完成的地下城冒险中才能开放招募。',
+    'dfinder.expeditionUnavailable': '你的远征已不可用。',
+    'dfinder.expeditionTravelUnavailable': '你现在无法传送至自己的远征。',
+
     'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
     'aura.craftedMomentum': '匠造势能',
     'aura.craftedShelter': '匠造庇护',
@@ -8780,6 +8797,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.forfeitPaid': "退战赔偿已支付：来自{victim}的{money}。",
 },
   zh_TW: {
+    'dfinder.expeditionOpenUnavailable': '必須身處尚未完成的地城冒險中才能開放招募。',
+    'dfinder.expeditionUnavailable': '你的遠征已無法使用。',
+    'dfinder.expeditionTravelUnavailable': '你現在無法傳送至自己的遠征。',
+
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
     'aura.craftedMomentum': '匠造勢能',
     'aura.craftedShelter': '匠造庇護',
@@ -9651,6 +9672,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.forfeitPaid': "退戰賠償已支付：來自{victim}的{money}。",
 },
   ko_KR: {
+    'dfinder.expeditionOpenUnavailable': '모집을 시작하려면 완료하지 않은 던전 안에 있어야 합니다.',
+    'dfinder.expeditionUnavailable': '더 이상 원정에 참여할 수 없습니다.',
+    'dfinder.expeditionTravelUnavailable': '지금은 원정으로 이동할 수 없습니다.',
+
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
     'aura.craftedMomentum': '장인의 기세',
     'aura.craftedShelter': '장인의 피난처',
@@ -10562,6 +10587,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.forfeitPaid': "이탈 대가 지급: {victim}에게서 {money}.",
 },
   ja_JP: {
+    'dfinder.expeditionOpenUnavailable': '募集を開始するには、未完了のダンジョン内にいる必要があります。',
+    'dfinder.expeditionUnavailable': '遠征は利用できなくなりました。',
+    'dfinder.expeditionTravelUnavailable': '今は自分の遠征に移動できません。',
+
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
     'aura.craftedMomentum': '匠の勢い',
     'aura.craftedShelter': '匠の庇護',
@@ -12498,6 +12527,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'worldPvp.spoilsOnBody': "Saqueie o corpo de {victim} para pegar seus despojos.",
 },
   ru_RU: {
+    'dfinder.expeditionOpenUnavailable': 'Чтобы открыть набор, нужно находиться в незавершённом подземелье.',
+    'dfinder.expeditionUnavailable': 'Ваша экспедиция больше недоступна.',
+    'dfinder.expeditionTravelUnavailable': 'Сейчас нельзя переместиться к своей экспедиции.',
+
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
     'aura.craftedMomentum': 'Импульс мастера',
     'aura.craftedShelter': 'Укрытие мастера',
@@ -21082,7 +21115,7 @@ const RULES: Rule[] = [
   { re: /^The royal door is sealed to you\.$/, build: () => tRaidExtra('royalDoorSealed') },
   { re: /^You are locked to Nythraxis Raid Arena\.$/, build: () => tRaidExtra('locked') },
   {
-    re: /^Nythraxis is engaged — the royal door has sealed shut\.$/,
+    re: /^Nythraxis is engaged (?:\u2014|-) the royal door has sealed shut\.$/,
     build: () => tRaidExtra('engagedSealed'),
   },
   {

@@ -542,6 +542,10 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonFinderApply', kind: 'method' },
   { name: 'dungeonFinderApplyCancel', kind: 'method' },
   { name: 'dungeonFinderApplicationRespond', kind: 'method' },
+  { name: 'dungeonFinderExpeditionOpen', kind: 'method' },
+  { name: 'dungeonFinderExpeditionTravel', kind: 'method' },
+  { name: 'dungeonFinderExpeditionApply', kind: 'method' },
+  { name: 'dungeonFinderExpeditionConfigure', kind: 'method' },
   // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title/border
   // reads + the two cosmetic selection commands ---
   { name: 'deedsEarned', kind: 'data' },
@@ -953,9 +957,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Plus the World PvP Skull Bag's skullBagAction (+1 method): 428/127/301.
     // Plus PvP Resurrect's pvpResurrect (+1 method): 429/127/302.
     // Allied Hearthstone adds one data member and one method.
-    expect(IWORLD_MEMBERS.length).toBe(432);
+    expect(IWORLD_MEMBERS.length).toBe(436);
     expect(DATA_MEMBERS.length).toBe(129);
-    expect(METHOD_MEMBERS.length).toBe(303);
+    expect(METHOD_MEMBERS.length).toBe(307);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1099,6 +1103,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderApply',
       'dungeonFinderApplyCancel',
       'dungeonFinderBoard',
+      'dungeonFinderExpeditionApply',
+      'dungeonFinderExpeditionConfigure',
+      'dungeonFinderExpeditionOpen',
+      'dungeonFinderExpeditionTravel',
       'dungeonFinderInfo',
       'dungeonFinderListingClose',
       'dungeonFinderListingCreate',
@@ -1622,6 +1630,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderApplicationRespond',
       'dungeonFinderApply',
       'dungeonFinderApplyCancel',
+      'dungeonFinderExpeditionApply',
+      'dungeonFinderExpeditionConfigure',
+      'dungeonFinderExpeditionOpen',
+      'dungeonFinderExpeditionTravel',
       'dungeonFinderListingClose',
       'dungeonFinderListingCreate',
       'dungeonFinderQueueJoin',
@@ -2407,6 +2419,10 @@ const FACET_DUNGEON_FINDER = [
   'dungeonFinderApply',
   'dungeonFinderApplyCancel',
   'dungeonFinderApplicationRespond',
+  'dungeonFinderExpeditionOpen',
+  'dungeonFinderExpeditionTravel',
+  'dungeonFinderExpeditionApply',
+  'dungeonFinderExpeditionConfigure',
 ] as const satisfies readonly (keyof IWorldDungeonFinder)[];
 type _ExhaustDungeonFinder = AssertNever<
   Exclude<keyof IWorldDungeonFinder, (typeof FACET_DUNGEON_FINDER)[number]>
@@ -2662,8 +2678,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
     // Allied Hearthstone adds one data member and one method.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(432);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(432);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(436);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(436);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

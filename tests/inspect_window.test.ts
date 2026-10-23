@@ -555,12 +555,14 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     );
     const standing = root.querySelector('.inspect-standing-row');
     const standingItems = [...(standing?.children ?? [])];
-    expect(standingItems).toHaveLength(2);
+    expect(standingItems).toHaveLength(3);
     // W12: the standing pill adopts the shared chip and numeric primitives.
     expect(standingItems[0]?.className).toBe('inspect-meta ui-chip ui-num');
     expect(standingItems[0]?.textContent).toContain('60');
-    expect(standingItems[1]?.classList.contains('inspect-reliquary')).toBe(true);
-    expect(standingItems[1]?.textContent).toContain('300');
+    // Player Info names the specialization by default (none chosen here).
+    expect(standingItems[1]?.classList.contains('inspect-spec')).toBe(true);
+    expect(standingItems[2]?.classList.contains('inspect-reliquary')).toBe(true);
+    expect(standingItems[2]?.textContent).toContain('300');
     const rail = root.querySelector('.inspect-honor-rail');
     const honors = [...root.querySelectorAll('.inspect-holder')];
     expect(honors).toHaveLength(4);

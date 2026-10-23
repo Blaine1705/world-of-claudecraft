@@ -1157,10 +1157,10 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       // two extra library composites (+4) and the world-quests branch's vault
       // blooms (+11) compose to 112 at the release/v0.44.0 base merge. The vivid
       // combat text crit and big-hit glows (tokens.css --glow-fct-crit x2,
-      // --glow-fct-big, --glow-fct-big-crit) add 4 decorative blurs: 116. Their
+      // --glow-fct-big, --glow-fct-big-crit) add 4 decorative blurs: 117. Their
       // keyline (--fct-vivid-outline) is legibility and never rides the tier.
-      'the style graph owns 116 reviewed tier-shadow uses',
-    ).toHaveLength(116);
+      'the style graph owns 117 reviewed tier-shadow uses',
+    ).toHaveLength(117);
 
     for (const [name, body] of [
       [

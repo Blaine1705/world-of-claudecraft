@@ -512,4 +512,9 @@ something this file marks as restricted, ask first: tony@levystreet.com.
 
 Weekly Vault milestone illustrations (public/ui/weekly-vault/) are project-generated art made with OpenAI's built-in image generation for World of ClaudeCraft. Matching square front-face doors with antique-gold trim and corners, plus bronze empty, silver Normal, or gold Heroic center accents; completed doors remain closed with matching light glowing through their seams. Project asset, with the project only.
 
+Dungeon selection scenery (`public/ui/dungeon-scenes/`) is project-generated art
+made with OpenAI's built-in image generation for World of ClaudeCraft. The Sunken
+Bastion, Drowned Temple, Gravewyrm Sanctum and Wildheart Basin illustrations follow
+the project's dungeon settings, with no third-party reference images.
+
 Lychgate Buckler, Bastion Kite Shield and Barrowfield Tower Shield inventory icons are project-generated art made with OpenAI built-in image generation. [Prompts and provenance](docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json). Project asset, with the project only.
