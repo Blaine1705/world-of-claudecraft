@@ -1,4 +1,9 @@
-import { liveWorldPreview, newLiveWorldMap } from './live_world_core';
+import {
+  liveWorldCottagesChanged,
+  liveWorldPreview,
+  newLiveWorldMap,
+  refreshLiveWorldTerrain,
+} from './live_world_core';
 import { showLiveWorldNotice } from './live_world_notice';
 // The map-editor application coordinator. Thin by design: layout assembly,
 // tool state, the undo stack, and event routing live here; everything with a
@@ -6489,6 +6494,7 @@ export class EditorApp {
    * grid and the sim's terrain-edit spatial index are both stale.
    */
   private terrainEditsMutated(): void {
+    refreshLiveWorldTerrain(this.activeWorld, this.map);
     invalidateStaticColliders();
     invalidateTerrainEditIndex();
     // The zone-build workers mesh from a CLONE of the content, refreshed only
@@ -15761,6 +15767,10 @@ export class EditorApp {
   }
 
   private markDirty(): void {
+    if (liveWorldCottagesChanged(this.activeWorld, this.map)) {
+      this.terrainEditsMutated();
+      this.refreshTerrain(null);
+    }
     this.dirty = true;
     this.editGen.bump();
     this.topbar.setDirty(true);

@@ -2,7 +2,10 @@
 // of that content into a standalone Studio world. The compiler rejects edits it
 // cannot carry faithfully instead of retaining or dropping them silently.
 import { BASE_WORLD } from '../sim/data';
-import { applyFenbridgeTouchupToWorld } from '../sim/fenbridge_touchup';
+import {
+  applyFenbridgeTouchupToWorld,
+  resolveFenbridgeTerrainEdits,
+} from '../sim/fenbridge_touchup';
 import { MAP_DOC_VERSION, type MapDoc, sanitizeMapDoc } from '../sim/map_doc';
 import { materialFinishTextureRefs } from '../sim/material_finishes';
 import type { WorldContent } from '../sim/types';
@@ -117,7 +120,34 @@ export function liveWorldPreview(map: CustomMap): WorldContent {
   for (const key of DIRECT_LAYERS) {
     if (map[key] !== undefined) Object.assign(world, { [key]: map[key] });
   }
+  world.fenbridgeTouchup = liveFenbridgeTouchup(map);
   return applyFenbridgeTouchupToWorld(world);
+}
+
+/** Cottage placements are editable; their pads must follow the same UID. */
+function liveFenbridgeTouchup(map: CustomMap): CustomMap['fenbridgeTouchup'] {
+  const touchup = map.fenbridgeTouchup;
+  if (!touchup?.addedCottages) return touchup;
+  return {
+    ...touchup,
+    addedCottages: touchup.addedCottages.flatMap((cottage) => {
+      const placement = map.placements.find((p) => p.uid === cottage.uid);
+      return placement ? [{ ...cottage, x: placement.x, z: placement.z, rot: placement.rotY }] : [];
+    }),
+  };
+}
+
+/** A placement edit only rebuilds terrain when a cottage pad actually moves. */
+export function liveWorldCottagesChanged(world: WorldContent, map: CustomMap): boolean {
+  if (!map.meta.overworldBase || !map.fenbridgeTouchup?.addedCottages) return false;
+  return !equal(world.fenbridgeTouchup?.addedCottages, liveFenbridgeTouchup(map)?.addedCottages);
+}
+
+/** Rebind derived town pads after a stroke, erase, undo or redo. */
+export function refreshLiveWorldTerrain(world: WorldContent, map: CustomMap): void {
+  if (!map.meta.overworldBase) return;
+  world.fenbridgeTouchup = liveFenbridgeTouchup(map);
+  world.terrainEdits = resolveFenbridgeTerrainEdits(map.terrainEdits, world.fenbridgeTouchup);
 }
 
 export function compileLiveWorldDocument(raw: unknown): {
@@ -128,6 +158,7 @@ export function compileLiveWorldDocument(raw: unknown): {
   const input = typeof raw === 'string' ? JSON.parse(raw) : raw;
   const map = sanitizeMapDoc(input);
   if (!map) throw new Error('Invalid live-world document');
+  if (map.fenbridgeTouchup) map.fenbridgeTouchup = liveFenbridgeTouchup(map);
   for (const key of ['placements', 'terrainEdits'] as const) {
     if (!Array.isArray(input?.[key]) || input[key].length !== map[key].length) {
       throw new Error(`Invalid or truncated live-world layer: ${key}`);

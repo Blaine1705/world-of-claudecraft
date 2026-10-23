@@ -641,6 +641,34 @@ export function activeFenbridgeReachCovers(
   return false;
 }
 
+export function resolveFenbridgeTerrainEdits(
+  terrainEdits: WorldContent['terrainEdits'],
+  touchup?: FenbridgeTouchup,
+): WorldContent['terrainEdits'] {
+  if (!touchup) return terrainEdits;
+  const layout = resolveFenbridgeLayout(touchup);
+  if (terrainEdits && FENBRIDGE_LAYOUT.pads.length > 0) {
+    const firstPad = FENBRIDGE_LAYOUT.pads[0];
+    const start = terrainEdits.findIndex(
+      (s) =>
+        Math.abs(s.x - firstPad.x) < 1e-6 &&
+        Math.abs(s.z - firstPad.z) < 1e-6 &&
+        Math.abs(s.radius - firstPad.radius) < 1e-6 &&
+        s.delta === firstPad.delta &&
+        s.mode === firstPad.mode,
+    );
+    if (start >= 0) {
+      terrainEdits = [
+        ...terrainEdits.slice(0, start),
+        ...layout.pads.map((pad) => ({ ...pad })),
+        ...terrainEdits.slice(start + FENBRIDGE_LAYOUT.pads.length),
+      ];
+    }
+  }
+
+  return terrainEdits;
+}
+
 export function applyFenbridgeTouchupToWorld(world: WorldContent): WorldContent {
   if (!world.fenbridgeTouchup) return world;
   const layout = resolveFenbridgeLayout(world.fenbridgeTouchup);
@@ -776,25 +804,7 @@ export function applyFenbridgeTouchupToWorld(world: WorldContent): WorldContent 
     },
   });
 
-  let terrainEdits = world.terrainEdits;
-  if (terrainEdits && FENBRIDGE_LAYOUT.pads.length > 0) {
-    const firstPad = FENBRIDGE_LAYOUT.pads[0];
-    const start = terrainEdits.findIndex(
-      (s) =>
-        Math.abs(s.x - firstPad.x) < 1e-6 &&
-        Math.abs(s.z - firstPad.z) < 1e-6 &&
-        Math.abs(s.radius - firstPad.radius) < 1e-6 &&
-        s.delta === firstPad.delta &&
-        s.mode === firstPad.mode,
-    );
-    if (start >= 0) {
-      terrainEdits = [
-        ...terrainEdits.slice(0, start),
-        ...layout.pads.map((pad) => ({ ...pad })),
-        ...terrainEdits.slice(start + FENBRIDGE_LAYOUT.pads.length),
-      ];
-    }
-  }
+  const terrainEdits = resolveFenbridgeTerrainEdits(world.terrainEdits, world.fenbridgeTouchup);
 
   return {
     ...world,

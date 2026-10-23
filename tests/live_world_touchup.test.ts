@@ -7,9 +7,11 @@ import { customMapToWorldContent } from '../src/editor/custom_map';
 import {
   compileLiveWorldDocument,
   liveWorldBaseline,
+  liveWorldCottagesChanged,
   liveWorldPreview,
   newLiveWorldMap,
   publishedLiveWorldDocument,
+  refreshLiveWorldTerrain,
 } from '../src/editor/live_world_core';
 import { upgradeLoadedMap } from '../src/editor/map_load_upgrades';
 import { MOVABLE_OBJECTS } from '../src/editor/object_moves_core';
@@ -31,7 +33,7 @@ import { isResting } from '../src/sim/progression/xp';
 import { Sim } from '../src/sim/sim';
 import { traversalBand } from '../src/sim/traversal_band';
 import type { Entity } from '../src/sim/types';
-import { groundHeight, terrainHeight } from '../src/sim/world';
+import { groundHeight, invalidateTerrainEditIndex, terrainHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   applyWorldTouchup,
@@ -51,6 +53,58 @@ describe('live-world touch-up pipeline', () => {
     expect(worldTouchupIdentity(compiled.patch.changes)).toBe(
       worldTouchupIdentity(WORLD_TOUCHUP.changes),
     );
+  });
+
+  it('moves and removes cottage ground pads with their editable placements', () => {
+    const map = newLiveWorldMap('Cottage edits');
+    const preview = liveWorldPreview(map);
+    expect(liveWorldCottagesChanged(preview, map)).toBe(false);
+    const cottage = map.fenbridgeTouchup!.addedCottages![0];
+    const placement = map.placements.find((p) => p.uid === cottage.uid)!;
+    placement.x += 50;
+    placement.rotY += 0.5;
+    expect(liveWorldCottagesChanged(preview, map)).toBe(true);
+    refreshLiveWorldTerrain(preview, map);
+    expect(liveWorldCottagesChanged(preview, map)).toBe(false);
+    for (const world of [liveWorldPreview(map), compileLiveWorldDocument(map).world]) {
+      const moved = activeFenbridgeLayout(world).addedCottageBuildings!.find(
+        (b) => b.id === cottage.id,
+      )!;
+      expect(moved.placement.x).toBe(placement.x);
+      expect(moved.rotation).toBe(placement.rotY);
+    }
+    map.placements.splice(map.placements.indexOf(placement), 1);
+    for (const world of [liveWorldPreview(map), compileLiveWorldDocument(map).world]) {
+      expect(
+        activeFenbridgeLayout(world).addedCottageBuildings!.some((b) => b.id === cottage.id),
+      ).toBe(false);
+    }
+  });
+
+  it('refreshes sculpted terrain and undo/redo over relocated Fenbridge pads', () => {
+    const map = newLiveWorldMap('Live sculpt');
+    const world = liveWorldPreview(map);
+    setActiveWorldContent(world);
+    const x = 110,
+      z = 280;
+    const before = terrainHeight(x, z, WORLD_SEED);
+    const stamp = { x, z, radius: 5, delta: 3, falloff: 'flat' as const, mode: 'add' as const };
+    const refresh = () => {
+      refreshLiveWorldTerrain(world, map);
+      invalidateTerrainEditIndex();
+      return terrainHeight(x, z, WORLD_SEED);
+    };
+    map.terrainEdits.push(stamp);
+    const raised = refresh();
+    expect(raised).toBeCloseTo(before + 3, 8);
+    map.terrainEdits.pop();
+    expect(refresh()).toBe(before);
+    map.terrainEdits.push(stamp);
+    expect(refresh()).toBe(raised);
+    const compiled = compileLiveWorldDocument(map);
+    setActiveWorldContent(compiled.world);
+    invalidateTerrainEditIndex();
+    expect(terrainHeight(x, z, WORLD_SEED)).toBe(raised);
   });
   it('opens, upgrades, saves and exports without changing any native world data', () => {
     const map = liveWorldBaseline();

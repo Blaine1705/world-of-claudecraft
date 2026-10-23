@@ -88,12 +88,7 @@ describe('custom-map terrain seam', () => {
     expect(isBlocked(SEED, bank.position.x, bank.position.z, 0.4)).toBe(true);
     expect(isBlocked(SEED, fenbridgeInn.x, fenbridgeInn.z, 0.4)).toBe(true);
     expect(
-      isBlocked(
-        SEED,
-        fenLayout.civic.cistern.position.x,
-        fenLayout.civic.cistern.position.z,
-        0.4,
-      ),
+      isBlocked(SEED, fenLayout.civic.cistern.position.x, fenLayout.civic.cistern.position.z, 0.4),
     ).toBe(true);
     expect(
       isBlocked(
@@ -119,16 +114,11 @@ describe('custom-map terrain seam', () => {
     expect(isBlocked(SEED, fenbridgeInn.x, fenbridgeInn.z, 0.4)).toBe(false);
     expect(props.wells.some((well) => well.id === fenLayout.civic.cistern.id)).toBe(false);
     expect(
-      isBlocked(
-        SEED,
-        fenLayout.civic.cistern.position.x,
-        fenLayout.civic.cistern.position.z,
-        0.4,
-      ),
+      isBlocked(SEED, fenLayout.civic.cistern.position.x, fenLayout.civic.cistern.position.z, 0.4),
     ).toBe(false);
-    expect(
-      props.stalls.some((stall) => stall.id === fenLayout.civic.provisionStall.id),
-    ).toBe(false);
+    expect(props.stalls.some((stall) => stall.id === fenLayout.civic.provisionStall.id)).toBe(
+      false,
+    );
     expect(
       isBlocked(
         SEED,
