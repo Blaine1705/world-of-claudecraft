@@ -900,7 +900,12 @@ import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
-import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
+import {
+  mountStorePromoCard,
+  type StorePromoCardController,
+  storePromoLabels,
+  storePromoSlides,
+} from './store_promo_card';
 import { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { currentSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
@@ -6909,13 +6914,7 @@ export class Hud {
     // root accessible name and row labels, preserving the uncommitted draft
     // and exact focus (Intentional Gathering PR3).
     this.harvestPreferenceController.relocalize();
-    this.storePromoCard?.relocalize({
-      open: t('hudChrome.wocStore.title'),
-      close: t('hudChrome.wocStore.close'),
-      season: t('hudChrome.wocStore.seasonOne'),
-      title: t('hudChrome.wocStore.armoryTitle'),
-      cta: t('hudChrome.wocStore.title'),
-    });
+    this.storePromoCard?.relocalize(storePromoLabels());
     // The mount-race strip and controls gate on race id / phase / countdown
     // number, none of which move with the locale (tests/language_fanout_registry).
     this.mountRaceStrip.relocalize();
@@ -16808,15 +16807,12 @@ export class Hud {
     const host = document.getElementById('chatlog-wrap');
     if (!host) return;
     this.storePromoCard = mountStorePromoCard(host, {
-      labels: {
-        open: t('hudChrome.wocStore.title'),
-        close: t('hudChrome.wocStore.close'),
-        season: t('hudChrome.wocStore.seasonOne'),
-        title: t('hudChrome.wocStore.armoryTitle'),
-        cta: t('hudChrome.wocStore.title'),
-      },
+      slides: storePromoSlides({
+        openStore: () => this.openWocStore(),
+        openReferralCards: () => this.referralCards.open(),
+        membershipActive: () => this.sim.player?.membershipActive === true,
+      }),
       returnFocusTo: () => document.getElementById('daily-rewards-button'),
-      onOpenStore: () => this.openWocStore(),
       onDismiss: () => {
         this.storePromoCard = null;
       },

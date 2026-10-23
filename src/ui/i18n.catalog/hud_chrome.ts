@@ -738,6 +738,20 @@ export const hudChromeStrings = {
     collections: armoryCollectionStrings,
     skins: armorySkinStrings,
     seasonOne: 'Season 1',
+    // The rotating promo card above chat (src/ui/store_promo_card.ts). The
+    // Refer a Friend advert takes its title from the referralCards namespace.
+    membershipPromo: {
+      open: 'Membership in the WOC Store',
+      close: 'Close membership promotion',
+      eyebrow: 'Account perks',
+      title: 'Membership',
+      cta: 'Join now',
+    },
+    referralPromo: {
+      close: 'Close Refer a Friend promotion',
+      eyebrow: 'Adventure together',
+      cta: 'Invite friends',
+    },
     rarity: {
       uncommon: 'Uncommon',
       rare: 'Rare',

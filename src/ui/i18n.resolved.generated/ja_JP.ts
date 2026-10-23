@@ -1252,6 +1252,18 @@ export const ja_JP: EnTranslations = {
         }
       },
       "seasonOne": "シーズン1",
+      "membershipPromo": {
+        "open": "WOCストアのメンバーシップ",
+        "close": "メンバーシップの宣伝を閉じる",
+        "eyebrow": "アカウント特典",
+        "title": "メンバーシップ",
+        "cta": "今すぐ参加"
+      },
+      "referralPromo": {
+        "close": "フレンド招待の宣伝を閉じる",
+        "eyebrow": "一緒に冒険しよう",
+        "cta": "フレンドを招待"
+      },
       "rarity": {
         "uncommon": "アンコモン",
         "rare": "レア",
