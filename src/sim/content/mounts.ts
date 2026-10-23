@@ -24,7 +24,8 @@ export type MountKey =
   | 'drakemaw_raptor'
   | 'avian_strider'
   | 'lanternback_troll'
-  | 'terrorspark_groundshaker';
+  | 'terrorspark_groundshaker'
+  | 'nightwing_chimera';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -135,6 +136,12 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  nightwing_chimera: {
+    key: 'nightwing_chimera',
+    name: 'Nightwing Chimaera',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   referral_tank: {
     key: 'referral_tank',
     name: 'Friendship Tank',
@@ -162,7 +169,7 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = [];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = ['nightwing_chimera'];
 
 /** Paid annual-bundle mounts retain soulbound reins and outlive membership expiry. */
 export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];

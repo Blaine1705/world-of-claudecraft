@@ -2242,6 +2242,7 @@ export const tr_TR: EnTranslations = {
       "name_lanternback_troll": "Fener Sırtlı Grumbol",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kemikbağlı Çekçek",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
@@ -2259,6 +2260,7 @@ export const tr_TR: EnTranslations = {
       "desc_avian_strider": "Ağır pençeleri ve katlanmış kanatları her yolculuğu gürültülü bir koşuya çeviren yüksek atlı kuş.",
       "desc_mech_bird": "Kapanan servolarla koşan, kurma anahtarı hâlâ dönen, el yapımı, saat mekanizmalı bir savaş tavuğu.",
       "desc_lanternback_troll": "Omuzlarında demir bir taht taşıyan, her iki kolunda da yanan bir fırtına feneri taşıyan, fener yakanlar tarafından boyunduruğa alınan bir tepe trolü.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Üç nesildir karavanları geride bırakan, tuzla kaplı bir kaplumbağa. Tamirciler ona fırtına camından gözlük taktı ve boğazına bronz bir çan astı, böylece yol onu görmeden çok önce onu duyardı.",
       "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası."
     },
@@ -20020,6 +20022,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Yeşil Değişimci'nin Dizginleri"
+      },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
       },
       "reins_goblin_rocket_sled": {
         "name": "Kontak anahtarı: Goblin Roket Kızağı"

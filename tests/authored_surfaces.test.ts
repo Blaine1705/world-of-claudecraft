@@ -208,6 +208,7 @@ const AUTHORED_ATLAS_DEFS = [
   'form_foreman',
   'mount_avian_strider',
   'mount_lanternback_troll',
+  'mount_nightwing_chimera',
   // the Blender-built dungeon bosses and bodies: the Sunken Bastion's Vael,
   // Iron Cage, Drowned Anchor and Gaol Turnkey, and the Hollow Crypt's Lich
   // Bishop (Morthen); and the Bastion's sculpted drowned (the Revenant first)

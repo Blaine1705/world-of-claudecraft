@@ -880,14 +880,13 @@ describe('item-art audit builder', () => {
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
       // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
       // `--verify-only` on the merged tree.
-      // Integration45: 141 new files plus repainted loot, measured by --verify-only.
-      // 2182 / 2211 with the sprite buddy's whistle render, re-measured with
-      // `--verify-only`.
-      catalogSha256: 'a0ce3030090755dc5b6b26b2517a8b4e5070babc9b3ca1ebb460dfdea915449e',
-      catalogBytes: 1193375,
+      // Integration45: 141 new files plus repainted loot and Nightwing Chimaera, measured by --verify-only.
+      // + the sprite buddy's whistle render: 2183 / 2212, re-measured with --verify-only.
+      catalogSha256: '164816de40748bd433b9dd5a09e29cfe7809bfddcc078981e8ae00c31d014ae9',
+      catalogBytes: 1193916,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2182,
-      liveItemCount: 2211,
+      catalogCount: 2183,
+      liveItemCount: 2212,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -905,7 +904,7 @@ describe('item-art audit builder', () => {
         identity: 47,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '165b79f02fa24bc68f57d9d2454cddf064d196a3727fb9f5edc0157006f131e6',
+      shippingCatalogSha256: 'e4ee1a0887d556d1716f5f87946d272c0e850e2c95e18a3c37aefdb2e6067ade',
       machineChecksPassed: true,
       verdict: null,
     });

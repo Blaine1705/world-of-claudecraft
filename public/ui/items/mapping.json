@@ -274,6 +274,16 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "reins_nightwing_chimera",
+      "name": "Reins of the Nightwing Chimaera",
+      "sourcePack": "project-authored",
+      "sourceFile": "three-quarter Idle portrait render of the shipped mount model (public/models/mounts/nightwing_chimera.glb), background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)",
+      "sourceSha256": "fb95c68d3be39a0183581b3956b786b40d5188a9c3db921f507187970ce487f5",
+      "shippingSha256": "8cf7963937183614ce8203fa06cb0b73fb5fe5608f8b073f28e381bac133aa91"
+    },
+    {
       "itemId": "reins_lanternback_troll",
       "name": "Lamplighter's Yoke: Grumbol",
       "sourcePack": "woc_owner_supplied_art",

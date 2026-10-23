@@ -2242,6 +2242,7 @@ export const pt_BR: EnTranslations = {
       "name_lanternback_troll": "Grumbol, o Lanterna Dorso",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
       "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
@@ -2259,6 +2260,7 @@ export const pt_BR: EnTranslations = {
       "desc_avian_strider": "Uma ave de sela imponente, cujas garras pesadas e asas dobradas transformam toda jornada numa investida estrondosa.",
       "desc_mech_bird": "Uma galinha de guerra mecânica construída à mão que corre em servos em movimento, com a chave de corda ainda girando.",
       "desc_lanternback_troll": "Um troll das colinas quebrado no jugo por acendedores de lampiões, carregando um trono de ferro sobre os ombros com uma lanterna de tempestade acesa em cada braço.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
       "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada."
     },
@@ -20020,6 +20022,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Rédeas do Andarilho do Vale Viridiano"
+      },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
       },
       "reins_goblin_rocket_sled": {
         "name": "Chave de ignição: Trenó-foguete goblin"

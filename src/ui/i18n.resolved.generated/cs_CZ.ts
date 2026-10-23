@@ -2242,6 +2242,7 @@ export const cs_CZ: EnTranslations = {
       "name_lanternback_troll": "Grumbol Lanternback",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kostipoutaná rikša",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -2259,6 +2260,7 @@ export const cs_CZ: EnTranslations = {
       "desc_avian_strider": "Mohutný sedlový pták, jehož těžké spáry a složená křídla promění každou cestu v hřmící trysk.",
       "desc_mech_bird": "Ručně vyrobené strojové válečné kuře, které sprintuje na cvakací serva, natahovací klíč se stále otáčí.",
       "desc_lanternback_troll": "Horský troll, který lampáři zlomili do jha, nesl přes ramena železný trůn a na obou pažích hořela bouřková lucerna.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
       "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
     },
@@ -20020,6 +20022,9 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Otěže Smaragdového údolochodce"
+      },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
       },
       "reins_goblin_rocket_sled": {
         "name": "Klíček zapalování: Gobliní raketové saně"
