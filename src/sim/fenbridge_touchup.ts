@@ -229,11 +229,18 @@ export type ResolvedFenbridgeLayout = typeof FENBRIDGE_LAYOUT & {
 };
 
 const resolvedCache = new WeakMap<FenbridgeTouchup, ResolvedFenbridgeLayout>();
+let lastTouchupRef: FenbridgeTouchup | null = null;
+let lastResolvedLayout: ResolvedFenbridgeLayout | null = null;
 
 export function resolveFenbridgeLayout(touchup?: FenbridgeTouchup): ResolvedFenbridgeLayout {
   if (!touchup) return FENBRIDGE_LAYOUT;
+  if (touchup === lastTouchupRef && lastResolvedLayout) return lastResolvedLayout;
   const cached = resolvedCache.get(touchup);
-  if (cached) return cached;
+  if (cached) {
+    lastTouchupRef = touchup;
+    lastResolvedLayout = cached;
+    return cached;
+  }
 
   const byId = new Map((touchup.buildings ?? []).map((b) => [b.id, b]));
   const overrideFor = (id: string, fallback: PlacedTownBuilding) => {
@@ -533,6 +540,16 @@ export function resolveFenbridgeLayout(touchup?: FenbridgeTouchup): ResolvedFenb
     return { ...npc, position, facing };
   });
 
+  const tannerNpc = npcs.find((n) => n.id === 'tanner_hesk');
+  const tanneryStationPos = tannerNpc
+    ? { x: tannerNpc.position.x - 2, z: tannerNpc.position.z - 1.5 }
+    : FENBRIDGE_LAYOUT.services.stations[0].position;
+  const stations = FENBRIDGE_LAYOUT.services.stations.map((station) =>
+    station.id === 'station_fenbridge_tannery'
+      ? { ...station, position: tanneryStationPos }
+      : station,
+  );
+
   const resolved = deepFreeze({
     ...FENBRIDGE_LAYOUT,
     buildings,
@@ -579,11 +596,14 @@ export function resolveFenbridgeLayout(touchup?: FenbridgeTouchup): ResolvedFenb
         entrance: bank.sockets.entrance,
         teller: bank.sockets.teller,
       },
+      stations,
       npcs,
     },
   }) as unknown as ResolvedFenbridgeLayout;
 
   resolvedCache.set(touchup, resolved);
+  lastTouchupRef = touchup;
+  lastResolvedLayout = resolved;
   return resolved;
 }
 
@@ -606,6 +626,7 @@ export function activeFenbridgeReachCovers(
   pad: number,
   world?: WorldContent,
 ): boolean {
+  if (z < 200 - pad || z > 380 + pad || x < -80 - pad || x > 80 + pad) return false;
   const w = world ?? getBoundActiveWorld();
   if (!w?.fenbridgeTouchup) return false;
   const layout = resolveFenbridgeLayout(w.fenbridgeTouchup);
@@ -676,38 +697,84 @@ export function applyFenbridgeTouchupToWorld(world: WorldContent): WorldContent 
     board.position.x !== baseBoard.position.x ||
     board.position.z !== baseBoard.position.z ||
     board.rotation !== baseBoard.rotation;
+  const tanneryStation = layout.services.stations.find((s) => s.id === 'station_fenbridge_tannery');
+  const baseTanneryStation = FENBRIDGE_LAYOUT.services.stations[0];
+  const tanneryChanged =
+    tanneryStation !== undefined &&
+    (tanneryStation.position.x !== baseTanneryStation.position.x ||
+      tanneryStation.position.z !== baseTanneryStation.position.z);
   const services =
-    world.services && boardChanged
+    world.services && (boardChanged || tanneryChanged)
       ? {
           ...world.services,
-          musterBoards: world.services.musterBoards?.map((mb) =>
-            mb.id === board.id
-              ? {
-                  ...mb,
-                  x: board.position.x,
-                  z: board.position.z,
-                  rotation: board.rotation,
-                  frontStandingPoint: { ...board.frontStandingPoint },
-                }
-              : mb,
-          ),
+          ...(tanneryChanged && tanneryStation
+            ? {
+                stations: world.services.stations?.map((st) =>
+                  st.id === tanneryStation.id
+                    ? {
+                        ...st,
+                        pos: {
+                          x: tanneryStation.position.x,
+                          z: tanneryStation.position.z,
+                        },
+                      }
+                    : st,
+                ),
+              }
+            : {}),
+          ...(boardChanged
+            ? {
+                musterBoards: world.services.musterBoards?.map((mb) =>
+                  mb.id === board.id
+                    ? {
+                        ...mb,
+                        x: board.position.x,
+                        z: board.position.z,
+                        rotation: board.rotation,
+                        frontStandingPoint: { ...board.frontStandingPoint },
+                      }
+                    : mb,
+                ),
+              }
+            : {}),
         }
       : world.services;
 
-  const npcs = Object.fromEntries(
-    Object.entries(world.npcs).map(([id, def]) => {
-      const updated = npcsById[id];
-      if (!updated) return [id, def];
-      return [
-        id,
-        {
-          ...def,
-          pos: { x: updated.position.x, z: updated.position.z },
-          facing: updated.facing,
-        },
-      ];
-    }),
-  );
+  const baseNpcs = world.npcs;
+  const npcs = new Proxy(baseNpcs, {
+    get(target, prop, receiver) {
+      if (typeof prop === 'string') {
+        const updated = npcsById[prop];
+        const def = Reflect.get(target, prop, receiver);
+        if (updated && def) {
+          return {
+            ...def,
+            pos: { x: updated.position.x, z: updated.position.z },
+            facing: updated.facing,
+          };
+        }
+        return def;
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+    getOwnPropertyDescriptor(target, prop) {
+      const desc = Reflect.getOwnPropertyDescriptor(target, prop);
+      if (desc && typeof prop === 'string') {
+        const updated = npcsById[prop];
+        if (updated && desc.value) {
+          return {
+            ...desc,
+            value: {
+              ...desc.value,
+              pos: { x: updated.position.x, z: updated.position.z },
+              facing: updated.facing,
+            },
+          };
+        }
+      }
+      return desc;
+    },
+  });
 
   let terrainEdits = world.terrainEdits;
   if (terrainEdits && FENBRIDGE_LAYOUT.pads.length > 0) {

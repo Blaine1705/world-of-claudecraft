@@ -84,50 +84,59 @@ interface PlacementDeckBounds {
 
 const cache = new WeakMap<WorldContent, Map<number, RampTable>>();
 const placementDeckBoundsCache = new WeakMap<WorldContent, PlacementDeckBounds | null>();
+let lastDeckBoundsContent: WorldContent | null = null;
+let lastDeckBounds: PlacementDeckBounds | null = null;
 
 function nearPlacementDecks(content: WorldContent, x: number, z: number): boolean {
   if (!content.placements || content.placements.length === 0) return false;
-  let bounds = placementDeckBoundsCache.get(content);
-  if (bounds === undefined) {
-    let minX = Number.POSITIVE_INFINITY;
-    let maxX = Number.NEGATIVE_INFINITY;
-    let minZ = Number.POSITIVE_INFINITY;
-    let maxZ = Number.NEGATIVE_INFINITY;
-    for (const p of content.placements) {
-      if (!p.collideRadius || p.collideRadius <= 0) continue;
-      const s = p.scale > 0 ? p.scale : 1;
-      const scaleReach = Math.max(s * (p.scaleX ?? 1), s * (p.scaleZ ?? 1));
-      if (p.ramps && p.ramps.length > 0) {
-        for (const r of p.ramps) {
+  let bounds: PlacementDeckBounds | null | undefined;
+  if (content === lastDeckBoundsContent) {
+    bounds = lastDeckBounds;
+  } else {
+    bounds = placementDeckBoundsCache.get(content);
+    if (bounds === undefined) {
+      let minX = Number.POSITIVE_INFINITY;
+      let maxX = Number.NEGATIVE_INFINITY;
+      let minZ = Number.POSITIVE_INFINITY;
+      let maxZ = Number.NEGATIVE_INFINITY;
+      for (const p of content.placements) {
+        if (!p.collideRadius || p.collideRadius <= 0) continue;
+        const s = p.scale > 0 ? p.scale : 1;
+        const scaleReach = Math.max(s * (p.scaleX ?? 1), s * (p.scaleZ ?? 1));
+        if (p.ramps && p.ramps.length > 0) {
+          for (const r of p.ramps) {
+            const reach = scaleReach * (Math.hypot(r.x, r.z) + Math.hypot(r.hx, r.hz)) + 1;
+            minX = Math.min(minX, p.x - reach);
+            maxX = Math.max(maxX, p.x + reach);
+            minZ = Math.min(minZ, p.z - reach);
+            maxZ = Math.max(maxZ, p.z + reach);
+          }
+          continue;
+        }
+        const authored = authoredRampsForPath(p.path);
+        for (const r of authored) {
           const reach = scaleReach * (Math.hypot(r.x, r.z) + Math.hypot(r.hx, r.hz)) + 1;
           minX = Math.min(minX, p.x - reach);
           maxX = Math.max(maxX, p.x + reach);
           minZ = Math.min(minZ, p.z - reach);
           maxZ = Math.max(maxZ, p.z + reach);
         }
-        continue;
+        const m = authored.length === 0 && p.path ? /^\/models\/(.+)\.glb$/.exec(p.path) : null;
+        const ramp = m ? ASSET_RAMPS[m[1]] : undefined;
+        if (ramp) {
+          const reach =
+            scaleReach * (Math.hypot(ramp.cx, ramp.cz) + Math.hypot(ramp.hx, ramp.hz)) + 1;
+          minX = Math.min(minX, p.x - reach);
+          maxX = Math.max(maxX, p.x + reach);
+          minZ = Math.min(minZ, p.z - reach);
+          maxZ = Math.max(maxZ, p.z + reach);
+        }
       }
-      const authored = authoredRampsForPath(p.path);
-      for (const r of authored) {
-        const reach = scaleReach * (Math.hypot(r.x, r.z) + Math.hypot(r.hx, r.hz)) + 1;
-        minX = Math.min(minX, p.x - reach);
-        maxX = Math.max(maxX, p.x + reach);
-        minZ = Math.min(minZ, p.z - reach);
-        maxZ = Math.max(maxZ, p.z + reach);
-      }
-      const m = authored.length === 0 && p.path ? /^\/models\/(.+)\.glb$/.exec(p.path) : null;
-      const ramp = m ? ASSET_RAMPS[m[1]] : undefined;
-      if (ramp) {
-        const reach =
-          scaleReach * (Math.hypot(ramp.cx, ramp.cz) + Math.hypot(ramp.hx, ramp.hz)) + 1;
-        minX = Math.min(minX, p.x - reach);
-        maxX = Math.max(maxX, p.x + reach);
-        minZ = Math.min(minZ, p.z - reach);
-        maxZ = Math.max(maxZ, p.z + reach);
-      }
+      bounds = minX <= maxX ? { minX, maxX, minZ, maxZ } : null;
+      placementDeckBoundsCache.set(content, bounds);
     }
-    bounds = minX <= maxX ? { minX, maxX, minZ, maxZ } : null;
-    placementDeckBoundsCache.set(content, bounds);
+    lastDeckBoundsContent = content;
+    lastDeckBounds = bounds;
   }
   if (!bounds) return false;
   return x >= bounds.minX && x <= bounds.maxX && z >= bounds.minZ && z <= bounds.maxZ;
@@ -138,6 +147,10 @@ function nearPlacementDecks(content: WorldContent, x: number, z: number): boolea
 export function invalidatePlacementRamps(content: WorldContent): void {
   cache.delete(content);
   placementDeckBoundsCache.delete(content);
+  if (lastDeckBoundsContent === content) {
+    lastDeckBoundsContent = null;
+    lastDeckBounds = null;
+  }
   invalidateLadders(content);
 }
 

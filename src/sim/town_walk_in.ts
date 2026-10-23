@@ -14,6 +14,7 @@ import {
   type AuthoredTownBuildingRecord,
   authoredTownPromoted,
 } from './authored_town_registry';
+import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { activeFenbridgeBuildingById, activeFenbridgeLayout } from './fenbridge_touchup';
 import type { BuildingDef, PlacedAsset, WorldContent } from './types';
 
@@ -54,6 +55,12 @@ const WALK_IN_TOWNS: readonly WalkInTown[] = AUTHORED_TOWNS.flatMap((town) => {
   return [{ town, buildings, minX, maxX, minZ, maxZ }];
 });
 
+let lastFenWalkInLayout: object | null = null;
+let lastFenWalkInMinX = 0;
+let lastFenWalkInMaxX = -1;
+let lastFenWalkInMinZ = 0;
+let lastFenWalkInMaxZ = -1;
+
 /** Whether (x, z) lies where a walk-in town floor could stand: the cheap test
  *  that lets a world with no placements skip the deck table everywhere else. */
 export function nearTownWalkIn(x: number, z: number): boolean {
@@ -61,20 +68,33 @@ export function nearTownWalkIn(x: number, z: number): boolean {
     if (x >= walkIn.minX && x <= walkIn.maxX && z >= walkIn.minZ && z <= walkIn.maxZ) return true;
   }
   const fenLayout = activeFenbridgeLayout();
-  for (const building of fenLayout.buildings) {
-    if (building.walkIn !== true) continue;
-    const reach = building.reach;
-    const radius = Math.hypot(reach.halfWidth, reach.halfDepth) + 1;
-    if (
-      x >= reach.center.x - radius &&
-      x <= reach.center.x + radius &&
-      z >= reach.center.z - radius &&
-      z <= reach.center.z + radius
-    ) {
-      return true;
+  if (fenLayout === FENBRIDGE_LAYOUT) return false;
+  if (fenLayout !== lastFenWalkInLayout) {
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minZ = Number.POSITIVE_INFINITY;
+    let maxZ = Number.NEGATIVE_INFINITY;
+    for (const building of fenLayout.buildings) {
+      if (building.walkIn !== true) continue;
+      const reach = building.reach;
+      const radius = Math.hypot(reach.halfWidth, reach.halfDepth) + 1;
+      minX = Math.min(minX, reach.center.x - radius);
+      maxX = Math.max(maxX, reach.center.x + radius);
+      minZ = Math.min(minZ, reach.center.z - radius);
+      maxZ = Math.max(maxZ, reach.center.z + radius);
     }
+    lastFenWalkInLayout = fenLayout;
+    lastFenWalkInMinX = minX;
+    lastFenWalkInMaxX = maxX;
+    lastFenWalkInMinZ = minZ;
+    lastFenWalkInMaxZ = maxZ;
   }
-  return false;
+  return (
+    x >= lastFenWalkInMinX &&
+    x <= lastFenWalkInMaxX &&
+    z >= lastFenWalkInMinZ &&
+    z <= lastFenWalkInMaxZ
+  );
 }
 
 function sameNumber(a: number, b: number): boolean {

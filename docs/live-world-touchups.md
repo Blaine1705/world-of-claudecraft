@@ -119,8 +119,7 @@ reconstruction (5 relocated canonical Fenbridge buildings, 2 relocated civic
 props, 3 added north `tidehold/fenrire/house_a` cottages, 1 added streetlamp,
 12 added Fenbridge foliage trees, 8 Fenbridge farm-bed and gather-node moves,
 and 9 Fenbridge NPC horizontal stand moves) without importing whole-map terrain
-stamps or altering other zones. Calibrated overhead and ground-level verification
-captures are stored under `docs/screenshots/fenbridge-layout-reconstruction/`.
+stamps or altering other zones.
 
 ## Validation boundary
 
