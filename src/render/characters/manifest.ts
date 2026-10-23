@@ -1132,6 +1132,13 @@ const MOUNT_TORTOISE: ClipMap = {
   land: 'Land',
 };
 
+const MOUNT_CHIMERA: ClipMap = {
+  ...MOUNT_RIGGED,
+  idleVariants: ['Idle_Look'],
+  walkBack: 'WalkBackward',
+  jump: 'Jump',
+};
+
 // The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
 // clips on the 25-bone mixamorig core. Run reuses the walk cycle (the rigs
 // ship no separate sprint; visual timeScale matching covers the chase). The
@@ -3458,6 +3465,18 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_MECH_BIRD,
     walkRef: 5.2,
     runRef: 12.25,
+    lazyPreload: true,
+  },
+  // The Nightwing Chimaera: two-headed bipedal wyvern that perches on its two
+  // hind legs at rest (Idle / Idle_Look) and lifts into low-altitude flight
+  // when moving (Walk / Run / WalkBackward / Jump).
+  mount_nightwing_chimera: {
+    url: `${MOUNTS_DIR}/nightwing_chimera.glb`,
+    authoredAtlas: true,
+    height: 5.78,
+    clips: MOUNT_CHIMERA,
+    walkRef: 5.6,
+    runRef: 12.6,
     lazyPreload: true,
   },
   // Developer-only Halloween cart (image-to-glb static prop, no clips of its

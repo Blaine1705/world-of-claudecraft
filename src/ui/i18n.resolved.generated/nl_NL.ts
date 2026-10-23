@@ -2230,6 +2230,7 @@ export const nl_NL: EnTranslations = {
       "name_lanternback_troll": "Grumbol de Lantaarnrug",
       "name_chimeglass_tortoise": "Tolliver het klokkenspel",
       "name_rickshaw_mount": "Beengebonden Riksja",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -2247,6 +2248,7 @@ export const nl_NL: EnTranslations = {
       "desc_avian_strider": "Een imposant zadelvogel wiens zware klauwen en gevouwen vleugels elke reis in een donderend sprinten veranderen.",
       "desc_mech_bird": "Een met de hand gebouwde oorlogskip die sprint op klikkende servo's terwijl de opwindsleutel nog draait.",
       "desc_lanternback_troll": "Een heuveltrol die door lantaarnopstekers tot aan zijn juk werd gebroken, met een ijzeren troon op zijn schouders en een stormlantaarn die aan beide armen brandde.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Een zoutvlakteschildpad die drie generaties karavanen is ontlopen. Tinkers hebben een bril van stormglas voor hem geslepen en een bronzen bel om zijn keel gehangen, zodat de weg hem lang hoort voordat hij hem ziet.",
       "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
     },
@@ -20006,6 +20008,9 @@ export const nl_NL: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Teugels van de Groene Valestrider"
+      },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
       },
       "reins_goblin_rocket_sled": {
         "name": "Contactsleutel: Goblin-raketslee"

@@ -13930,6 +13930,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
   'hudChrome.mounts.name_avian_strider': 'ヴィリジアン・ヴェイルストライダー',
+  'hudChrome.mounts.name_nightwing_chimera': 'ナイトウィング・キマイラ',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    '古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -14933,6 +14936,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.items.reins_avian_strider.name': 'ヴィリジアン・ヴェイルストライダーの手綱',
+  'entities.items.reins_nightwing_chimera.name': 'ナイトウィング・キマイラの手綱',
   'entities.items.reins_lanternback_troll.name': '点灯人の軛：グルンボル',
   'entities.items.reins_chimeglass_tortoise.name': '道守の鈴帯：トリヴァー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',

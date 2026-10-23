@@ -838,8 +838,8 @@ describe('Masterwrought art completion evidence', () => {
     // + the account-wide buddies (PR 4240): 32 whistle icons rendered from the buddy
     // GLBs and the 2 stag charm re-tints of them, on the same integration: 2039.
     // + the membership Staff of Changing (membership-weapon-2026-10-14, PR 4281): 2040.
-    // The icon backlog adds 135 Season 2 paintings, five referral rewards and the horse.
-    expect(currentOwnerIds).toHaveLength(2181);
+    // The icon backlog adds 135 Season 2 paintings, five referral rewards, the horse, and Nightwing Chimaera.
+    expect(currentOwnerIds).toHaveLength(2182);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1173,6 +1173,7 @@ describe('Masterwrought art completion evidence', () => {
         // beyond the dated completion union, like the Field Kit.
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
+        id !== 'reins_nightwing_chimera' &&
         !season2WeaponIds.has(id) &&
         !hoardBranchIds.has(id) &&
         !questGearIds.has(id) &&

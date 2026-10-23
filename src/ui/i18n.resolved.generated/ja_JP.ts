@@ -2230,6 +2230,7 @@ export const ja_JP: EnTranslations = {
       "name_lanternback_troll": "ランタンバックのグルンボル",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
+      "name_nightwing_chimera": "ナイトウィング・キマイラ",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -2247,6 +2248,7 @@ export const ja_JP: EnTranslations = {
       "desc_avian_strider": "巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
+      "desc_nightwing_chimera": "古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
@@ -20006,6 +20008,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "ヴィリジアン・ヴェイルストライダーの手綱"
+      },
+      "reins_nightwing_chimera": {
+        "name": "ナイトウィング・キマイラの手綱"
       },
       "reins_goblin_rocket_sled": {
         "name": "ゴブリンロケットそりの始動キー"

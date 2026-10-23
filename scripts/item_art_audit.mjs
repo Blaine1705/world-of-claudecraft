@@ -165,9 +165,9 @@ const build = await buildItemArtAudit({
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
     // + the membership Staff of Changing (PR 4281): 2040 / 2069, re-measured with
     // `--verify-only`.
-    // Completed Season 2 painted armor leaves the pending ledger.
-    catalogCount: 2181,
-    liveItemCount: 2210,
+    // Completed Season 2 painted armor leaves the pending ledger, plus Nightwing Chimaera mount.
+    catalogCount: 2182,
+    liveItemCount: 2211,
     // Only the intentionally retired Phoenix token retains its procedural icon.
     pendingArtCount: 1,
     generatedHeroicDefinitions: 116,

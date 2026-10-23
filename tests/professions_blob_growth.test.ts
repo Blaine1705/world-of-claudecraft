@@ -2009,10 +2009,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(state.bank).toEqual(baseline.bank);
     const bytes = Buffer.byteLength(JSON.stringify(state));
     const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
-    // +19 at the merge of the Staff of Changing's discovery id (PR 4281).
-    expect(baselineBytes).toBe(258389);
+    // +19 at the merge of the Staff of Changing's discovery id (PR 4281);
+    // +26 with reins_nightwing_chimera.
+    expect(baselineBytes).toBe(258415);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(266673);
+    expect(bytes).toBe(266699);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2278,7 +2279,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Unchanged from there through the referral cards and the later v0.45.0
     // integration merges. 249,958 with the Staff of Changing's discovery id
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
-    expect(beforeReferralBytes).toBe(249958);
+    expect(beforeReferralBytes).toBe(249984);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2303,7 +2304,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     };
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
-    expect(beforeMembershipBytes).toBe(249784);
+    expect(beforeMembershipBytes).toBe(249810);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2489,6 +2490,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'reins_rallycart_rxt',
       'reins_goblin_rocket_sled',
       'reins_avian_strider',
+      'reins_nightwing_chimera',
     ] as const;
     function withoutDevMountReleaseContent(state: CharacterState): CharacterState {
       const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
@@ -2501,10 +2503,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const withoutDevMountRelease = withoutDevMountReleaseContent(withoutFieldKit);
     const devMountReleaseDelta =
       fieldBytes(withoutFieldKit, 'deedStats') - fieldBytes(withoutDevMountRelease, 'deedStats');
-    expect(devMountReleaseDelta).toBe(71);
+    expect(devMountReleaseDelta).toBe(97);
     expect(
       counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8'),
-    ).toBe(71);
+    ).toBe(97);
     // The Mirefen world boss (Balgath, the One-Eyed Foreman) and its quest
     // chain: the one content mover on this branch. Attributed exactly the way
     // withoutFieldKit, withoutBramblehideContent and withoutDevMountRelease
@@ -2666,8 +2668,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         183 +
         1548 +
         50 +
-        // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation.
-        71 +
+        // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation; 97 with reins_nightwing_chimera (+26).
+        97 +
         375 +
         358 +
         // Plus 17 at the weekly emissary rebase: the Emissary's Cache id in the
@@ -2888,8 +2890,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // (242,942 -> 249,042), MEASURED 2026-10 across its merge (the branch's
       // own +3,130 undercounted).
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (249,927).
-      // The Staff of Changing's discovery id adds 19 (249,946, PR 4281).
-    ).toBe(249946);
+      // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
+    ).toBe(249972);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3025,10 +3027,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // the head of the integration branch. Floor at measurement minus 380, edge
     // at measurement plus one: 249681..250062.
     // RE-BASED for the Staff of Changing (PR 4281): 250,080 bytes, exactly +19
-    // from its one discovery id, isolated above with membership. Same band:
-    // 249700..250081.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249700);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(250081);
+    // from its one discovery id, isolated above with membership.
+    // RE-BASED for the Nightwing Chimaera (reins_nightwing_chimera): 250,106 bytes,
+    // +26 from its discovery id, isolated above in DEV_MOUNT_RELEASE_ITEM_IDS.
+    // Same 381-byte band: 249726..250107.
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249726);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(250107);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
