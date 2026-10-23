@@ -324,13 +324,14 @@ def hop(t, length, air_from, height, land, squash_in, stretch, lag, follow, f, t
     leaves the ground. The top lags back on take-off and carries on forward
     when it lands. Earlier landings' jiggle carries over the loop seam."""
     p = (t / length) % 1.0
+    tm = t % length if length - t % length > 1e-6 else 0.0  # the last frame lands again, like the first
     a = max(0.0, (p - air_from) / (1 - air_from))
     up = height * 4 * a * (1 - a) if p > air_from else 0.0
-    sy = 1 - land * ring(t, f, tau, length)
+    sy = 1 - land * ring(tm, f, tau, length)
     sy -= squash_in * bump(p, air_from - 0.14, air_from + 0.02)
     if p > air_from:
         sy += stretch * math.sin(math.pi * a) * (1 - a) * 2.5
-    lean = tilt + follow * ring(t, f * 0.8, tau * 1.3, length, phase=0.0)
+    lean = tilt + follow * ring(tm, f * 0.8, tau * 1.3, length, phase=0.0)
     lean -= lag * bump(p, air_from - 0.02, air_from + 0.3 * (1 - air_from))
     side = 0.012 * math.sin(2 * math.pi * p)
     return pose(up=up, sy=sy, lean=lean, side=side)
@@ -369,7 +370,8 @@ JUMP_LEN = 0.6  # 18 frames: whole frames so it ends exactly on the held pose
 LAND_LEN = 0.6
 CROUCH, SPRING = 0.1, 0.08
 CROUCH_SY = 0.76
-AIR = dict(sy=1.1, lean=-0.04)  # the held airborne pose: Jump's last frame, Land's first
+LAUNCH = 0.07  # the extra upward stretch as it leaves the ground, peaking mid-spring
+AIR = dict(sy=1.12, lean=-0.04)  # the held airborne pose: Jump's last frame, Land's first
 YD_TO_MODEL = 6.607 / 4.0
 
 
@@ -384,6 +386,7 @@ def jump(t):
     x = t - CROUCH
     held = game_rise(CROUCH) * (1 - smooth(x / SPRING))  # snaps up to the arc
     sy = AIR["sy"] - (AIR["sy"] - CROUCH_SY) * math.exp(-x / 0.09) * math.cos(2 * math.pi * 3.2 * x)
+    sy += LAUNCH * bump(x, 0.0, 0.3)
     lean = AIR["lean"] - 0.07 * ring(x, 2.5, 0.12, phase=0.0)
     side = 0.025 * ring(x, 2.2, 0.12, phase=0.0)
     k = smooth((t - 0.4) / 0.2)  # lands exactly on the held pose
@@ -421,6 +424,11 @@ rig.animation_data_create()
 SEAT = Vector((0, 0, H))  # armature space, rest
 top_rest_inv = arm_data.bones["top"].matrix_local.inverted()
 saddle_rest = arm_data.bones["saddle"].matrix_local.copy()
+def key(bone, f):
+    for path in ("location", "rotation_quaternion", "scale"):
+        bone.keyframe_insert(path, frame=f)  # full TRS per bone, no stale values
+
+
 BUBBLE_BONES = [f"bubble_{i:02d}" for i in range(NB)]
 BODY_BONES = ["move", "squash", "base", "mid", "top", "saddle"]
 for clip, length, fn in CLIPS:
@@ -434,8 +442,7 @@ for clip, length, fn in CLIPS:
                 bb = pb[BUBBLE_BONES[i]]
                 bb.location = (d.x, d.z, -d.y)  # bone space: X right, Y up, Z front
                 bb.scale = (size, size, size)
-                for path in ("location", "rotation_quaternion", "scale"):
-                    bb.keyframe_insert(path, frame=f)
+                key(bb, f)
             continue
         p = fn(f / FPS)
         sxz = 1 / math.sqrt(p["sy"])
@@ -455,12 +462,17 @@ for clip, length, fn in CLIPS:
         pb["saddle"].matrix = Matrix.Translation(seat) @ turn @ Matrix.Translation(-SEAT) @ saddle_rest
         bpy.context.view_layer.update()
         for b in BODY_BONES:
-            for path in ("location", "rotation_quaternion", "scale"):
-                pb[b].keyframe_insert(path, frame=f)  # full TRS per bone, no stale values
+            key(pb[b], f)
     rig.animation_data.action = None
     track = rig.animation_data.nla_tracks.new()
     track.name = clip
     track.strips.new(clip, 0, action)
+    # Muted while the later clips bake: inserting a new clip's first key
+    # re-evaluates the rig, and live tracks would overwrite the pose just set,
+    # keying the previous clip's pose onto frame 0 (a pop at every loop seam).
+    track.mute = True
+for track in rig.animation_data.nla_tracks:
+    track.mute = False
 
 for b in pb:  # rest pose for the bind
     b.location, b.scale = (0, 0, 0), (1, 1, 1)

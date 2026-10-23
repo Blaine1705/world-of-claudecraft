@@ -12,7 +12,7 @@ import { VISUALS } from '../src/render/characters/manifest';
 // re-export that renames either breaks the mount with nothing else failing. The byte pin makes any
 // re-export a deliberate, reviewed change.
 const ASSET_PATH = path.join(__dirname, '..', 'public/models/mounts/wobbles_slime.glb');
-const EXPECTED_ASSET_SHA256 = 'bac206e61d3538ba1609e1d91749ece5b7d75a91166499487203f0d92ebae295';
+const EXPECTED_ASSET_SHA256 = 'e008f921a297238f6596579dc3a889edde267a31de6c5fc3b48a8e7ea90bcc21';
 const CLIP_SECONDS = { Idle: 6, Walk: 1, Run: 0.9, Jump: 0.6, Land: 0.6, Bubbles: 6 };
 
 async function readAsset() {
@@ -56,6 +56,45 @@ describe('Wobbles the Slime mount asset', () => {
       if (anim.getName() === 'Bubbles') continue;
       const targets = anim.listChannels().map((c) => c.getTargetNode()?.getName());
       expect(targets).toContain('saddle');
+    }
+  });
+
+  it('closes every looping clip on its first pose and lands from the held jump pose', async () => {
+    // A baked clip once keyed the previous clip's pose onto its first frame, a
+    // pop at every loop seam and at the start of Land.
+    const anims = new Map(
+      (await readAsset())
+        .getRoot()
+        .listAnimations()
+        .map((a) => [a.getName(), a]),
+    );
+    const ends = (clip: string, bone: string, path: string) => {
+      const ch = anims
+        .get(clip)
+        ?.listChannels()
+        .find((c) => c.getTargetNode()?.getName() === bone && c.getTargetPath() === path);
+      const out = ch?.getSampler()?.getOutput();
+      if (!out) throw new Error(`${clip} has no ${bone} ${path}`);
+      const v = Array.from(out.getArray() ?? []);
+      const n = out.getElementSize();
+      return { first: v.slice(0, n), last: v.slice(-n) };
+    };
+    for (const clip of ['Idle', 'Walk', 'Run', 'Bubbles']) {
+      for (const ch of anims.get(clip)?.listChannels() ?? []) {
+        const { first, last } = ends(
+          clip,
+          ch.getTargetNode()?.getName() ?? '',
+          ch.getTargetPath() ?? '',
+        );
+        first.forEach((x, i) => expect(x, `${clip} seam`).toBeCloseTo(last[i], 3));
+      }
+    }
+    for (const [bone, path] of [
+      ['squash', 'scale'],
+      ['saddle', 'translation'],
+    ]) {
+      const held = ends('Jump', bone, path).last;
+      ends('Land', bone, path).first.forEach((x, i) => expect(x).toBeCloseTo(held[i], 3));
     }
   });
 
