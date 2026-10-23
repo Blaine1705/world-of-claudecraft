@@ -1252,6 +1252,18 @@ export const ko_KR: EnTranslations = {
         }
       },
       "seasonOne": "시즌 1",
+      "membershipPromo": {
+        "open": "WOC 상점의 멤버십",
+        "close": "멤버십 홍보 닫기",
+        "eyebrow": "계정 혜택",
+        "title": "멤버십",
+        "cta": "지금 가입"
+      },
+      "referralPromo": {
+        "close": "친구 초대 홍보 닫기",
+        "eyebrow": "함께하는 모험",
+        "cta": "친구 초대하기"
+      },
       "rarity": {
         "uncommon": "고급",
         "rare": "희귀",

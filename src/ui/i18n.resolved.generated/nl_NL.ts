@@ -1252,6 +1252,18 @@ export const nl_NL: EnTranslations = {
         }
       },
       "seasonOne": "Seizoen 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Ongewoon",
         "rare": "Zeldzaam",

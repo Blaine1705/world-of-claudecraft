@@ -1252,6 +1252,18 @@ export const zh_CN: EnTranslations = {
         }
       },
       "seasonOne": "第一赛季",
+      "membershipPromo": {
+        "open": "WOC 商店中的会员",
+        "close": "关闭会员推广",
+        "eyebrow": "账号特权",
+        "title": "会员",
+        "cta": "立即加入"
+      },
+      "referralPromo": {
+        "close": "关闭推荐好友推广",
+        "eyebrow": "一起冒险",
+        "cta": "邀请好友"
+      },
       "rarity": {
         "uncommon": "优秀",
         "rare": "精良",
