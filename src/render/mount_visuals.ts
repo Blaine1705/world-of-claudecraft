@@ -251,6 +251,22 @@ const LENS_GLOW = {
   radius: LENS_GLOW_RADIUS,
 } as const;
 
+// The Drakemaw Raptor's rider rides its `Saddle` bone (scripts/assets/drakemaw_raptor/):
+// the saddle is rigid on the hips, and the hips bob through the sprint's two
+// flights a stride, pitch into the jump and drop into the landing, so a fixed
+// seat would leave the rider floating clear of the saddle or sunk into it. The
+// bone sits at the front of the saddle's dish, where the seat starts up toward
+// the pommel; the offset (model units, normScale 1, the model's own axes)
+// carries the rider's root back so the plain seated loop rests them on the flat
+// of the dish, a centimetre or two over the leather on either body
+// (tests/drakemaw_raptor_mount.test.ts pins the clearance). The spec's `seat`
+// and `seatFwd` restate where that root rides at the Idle's sizing frame, so
+// the nameplate, chat bubble and click box sit over the rider's real head, and
+// a missing bone falls back to the same seat. The old fixed seat (2.35 up, 0.1
+// toward the tail) left the rider 0.24 above the dish and 0.66 behind it,
+// perched on the cantle.
+const RAPTOR_SEAT: MountSeatSpec = { bone: 'Saddle', offset: [0, -0.2449, 0.1713] };
+
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // seat tuned to the authored horse model: its saddle sits forward of the
   // origin and lower than the old Tripo build, so the rider shifts toward the
@@ -279,10 +295,28 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
 
   terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
   referral_tank: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
-  referral_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
-  // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
-  // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
-  drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  referral_raptor: spec(
+    'mount_drakemaw_raptor',
+    2.06,
+    true,
+    undefined,
+    0.48,
+    null,
+    [],
+    RAPTOR_SEAT,
+  ),
+  // The Drakemaw Raptor: the rider sits the saddle's dish over its hips, behind
+  // the neck spines, in the plain seated loop (RAPTOR_SEAT).
+  drakemaw_raptor: spec(
+    'mount_drakemaw_raptor',
+    2.06,
+    true,
+    undefined,
+    0.48,
+    null,
+    [],
+    RAPTOR_SEAT,
+  ),
   // The authored saddle is over the hips. The mount ships at 120% of its
   // initial world fit, so the world-space socket offsets scale with it and
   // keep the rider on the same authored point of the saddle.
