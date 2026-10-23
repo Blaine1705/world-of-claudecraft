@@ -839,7 +839,8 @@ describe('Masterwrought art completion evidence', () => {
     // GLBs and the 2 stag charm re-tints of them, on the same integration: 2039.
     // + the membership Staff of Changing (membership-weapon-2026-10-14, PR 4281): 2040.
     // The icon backlog adds 135 Season 2 paintings, five referral rewards, the horse, and Nightwing Chimaera.
-    expect(currentOwnerIds).toHaveLength(2182);
+    // Wobbles the Slime's reins owner (outside the dated universe too): 2,183.
+    expect(currentOwnerIds).toHaveLength(2183);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1174,6 +1175,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
         id !== 'reins_nightwing_chimera' &&
+        // Wobbles the Slime's reins, additive the same way.
+        id !== 'reins_wobbles_slime' &&
         !season2WeaponIds.has(id) &&
         !hoardBranchIds.has(id) &&
         !questGearIds.has(id) &&

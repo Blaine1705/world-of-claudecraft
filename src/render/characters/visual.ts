@@ -1710,6 +1710,12 @@ export class CharacterVisual {
         idle.play();
         this.current = idle;
       }
+      // Ambient loops stay out of `actions`, so the state machine's stop() and
+      // crossfade sweeps never reach them; disposal's stopAllAction() does.
+      for (const name of this.def.ambientClips ?? []) {
+        const clip = prep.clips.get(name);
+        if (clip) this.mixer.clipAction(clip).play();
+      }
 
       // A WOC body's armor streams per set: the dressing adopts the files
       // assembleModel attached and wants the default kit until the first

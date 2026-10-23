@@ -881,11 +881,13 @@ describe('item-art audit builder', () => {
       // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
       // `--verify-only` on the merged tree.
       // Integration45: 141 new files plus repainted loot and Nightwing Chimaera, measured by --verify-only.
-      catalogSha256: 'a7b26833c0995989a3a0657a096b8ac5c09128bc602843f0de6e7f17b51a505b',
-      catalogBytes: 1193395,
+      // 2,183 owners / 2,212 live with Wobbles the Slime's reins, re-measured with
+      // `node scripts/item_art_audit.mjs --verify-only` (catalog +523 bytes).
+      catalogSha256: 'a6bf278b4b202c449f1d692c5dbba9f65cf5cff9f13bd036e010d6d64dab6b83',
+      catalogBytes: 1193918,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2182,
-      liveItemCount: 2211,
+      catalogCount: 2183,
+      liveItemCount: 2212,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -903,7 +905,7 @@ describe('item-art audit builder', () => {
         identity: 47,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '38fbaca7781cb14b5ba17ec030cf456104fe748724d28bdffa9d6f573220c406',
+      shippingCatalogSha256: 'aa6c4e915d92e3162fecc28348b788c3fc738eed11d2b9292c59fee349fcaeb0',
       machineChecksPassed: true,
       verdict: null,
     });

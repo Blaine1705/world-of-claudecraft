@@ -2242,6 +2242,7 @@ export const nl_NL: EnTranslations = {
       "name_lanternback_troll": "Grumbol de Lantaarnrug",
       "name_chimeglass_tortoise": "Tolliver het klokkenspel",
       "name_rickshaw_mount": "Beengebonden Riksja",
+      "name_wobbles_slime": "Wobbles the Slime",
       "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
@@ -2253,6 +2254,7 @@ export const nl_NL: EnTranslations = {
       "desc_goblin_rocket_sled": "Een gevaarlijk overgebouwde goblinslee, voortgestuwd door twee raketten en uitstekend slecht beoordelingsvermogen.",
       "desc_rallycart_rxt": "Een compacte rallymachine die de reissnelheid verhoogt.",
       "desc_rallycart_skin": "Een kleine rallyauto met een machtige brul.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -20035,6 +20037,9 @@ export const nl_NL: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Bellstrap van Roadwarden: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Gebonden teugels: Beengebonden Riksja"

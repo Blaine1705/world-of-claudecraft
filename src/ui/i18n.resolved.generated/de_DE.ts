@@ -2242,6 +2242,7 @@ export const de_DE: EnTranslations = {
       "name_lanternback_troll": "Grumbol der Laternenrücken",
       "name_chimeglass_tortoise": "Tolliver das Chimeglass",
       "name_rickshaw_mount": "Knochengebundene Rikscha",
+      "name_wobbles_slime": "Wobbles the Slime",
       "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
@@ -2253,6 +2254,7 @@ export const de_DE: EnTranslations = {
       "desc_goblin_rocket_sled": "Ein gefährlich überkonstruierter Goblinschlitten, angetrieben von zwei Raketen und hervorragend schlechtem Urteilsvermögen.",
       "desc_rallycart_rxt": "Eine handliche Rallyemaschine, die die Reisegeschwindigkeit erhöht.",
       "desc_rallycart_skin": "Ein winziges Rallyeauto mit mächtigem Dröhnen.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -20035,6 +20037,9 @@ export const de_DE: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Glockenriemen des Straßenwärters: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Gebundene Zügel: Knochengebundene Rikscha"

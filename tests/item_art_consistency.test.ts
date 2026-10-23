@@ -897,7 +897,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
     // The restored legacy whistle and charm definitions add 36 item ids.
     // All five referral rewards now own paintings; only the retired Phoenix remains pending.
-    expect(Object.keys(ITEMS)).toHaveLength(2212);
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
+    expect(Object.keys(ITEMS)).toHaveLength(2213);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1130,11 +1131,13 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
     // Buddy provenance contributes 34 additional owners.
     // Icon backlog adds 135 Season 2 armour icons, five referral icons, the Horse Whistle, and Nightwing Chimaera.
-    expect(new Set(currentOwnerIds).size).toBe(2182);
-    expect(shippingIds).toHaveLength(2182);
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,183.
+    expect(new Set(currentOwnerIds).size).toBe(2183);
+    expect(shippingIds).toHaveLength(2183);
     // The restored legacy whistle and charm definitions add 36 item ids.
     // All five referral rewards now own paintings; only the retired Phoenix remains pending.
-    expect(Object.keys(ITEMS)).toHaveLength(2212);
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
+    expect(Object.keys(ITEMS)).toHaveLength(2213);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1348,6 +1351,8 @@ describe('item-art consistency accepted-art provenance', () => {
         'emissary_cache',
         'reins_avian_strider',
         'reins_nightwing_chimera',
+        // Wobbles the Slime's reins (a render of the shipped mount model).
+        'reins_wobbles_slime',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1551,8 +1556,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     // 43 -> 44 at the weekly emissary: the Emissary's Cache chest; 45 with
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge);
-    // 46 with the Nightwing Chimaera's reins (reins_nightwing_chimera).
-    expect(mapping.entries).toHaveLength(46);
+    // 46 with the Nightwing Chimaera's reins (reins_nightwing_chimera); 47 with
+    // Wobbles the Slime's reins.
+    expect(mapping.entries).toHaveLength(47);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1662,8 +1668,9 @@ describe('item-art consistency accepted-art provenance', () => {
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005 + Nightwing Chimaera mount: 2182.
-    expect(allCurrentOwnerIds).toHaveLength(2182);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2182);
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount) adds one ordinary entry: 2,183.
+    expect(allCurrentOwnerIds).toHaveLength(2183);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2183);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1671,8 +1678,9 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      // 46 entries (the release's mapping entries + Nightwing Chimaera; the hoard batches own no entries).
-      entries: 46,
+      // 46 entries (the release's mapping entries + Nightwing Chimaera; the hoard batches own no entries),
+      // 47 with Wobbles the Slime's reins.
+      entries: 47,
       // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
@@ -1789,6 +1797,8 @@ describe('item-art consistency accepted-art provenance', () => {
         'emissary_cache',
         'reins_avian_strider',
         'reins_nightwing_chimera',
+        // Wobbles the Slime's reins (a render of the shipped mount model).
+        'reins_wobbles_slime',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1948,9 +1958,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    if (ownerIds.length !== 2182)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2182`);
-    if (fileIds.length !== 2182) violations.push(`shipping WebP count: ${fileIds.length} != 2182`);
+    // Wobbles the Slime's reins: 2,183.
+    if (ownerIds.length !== 2183)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2183`);
+    if (fileIds.length !== 2183) violations.push(`shipping WebP count: ${fileIds.length} != 2183`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -618,6 +618,15 @@ describe('procedural bob math', () => {
     expect(MOUNT_VISUAL_SPECS.valorsteed.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.stormfeather_griffin.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.terrorspark_groundshaker.fx).toBeNull();
+    expect(MOUNT_VISUAL_SPECS.wobbles_slime.fx).toBeNull();
+  });
+
+  it('seats the Wobbles rider on the saddle bone at the offset measured in Blender', () => {
+    // The jelly squashes and leans under the rider in every clip, so the seat
+    // rides the `saddle` bone; a typo here floats or sinks the rider.
+    const spec = MOUNT_VISUAL_SPECS.wobbles_slime;
+    expect(spec.seat).toBe(3.35);
+    expect(spec.seatBone).toEqual({ bone: 'saddle', offset: [0, 0.22, 0] });
   });
 
   it('pins the Nightwing Chimaera saddle socket, straddle pose, and flight/perch clips', () => {

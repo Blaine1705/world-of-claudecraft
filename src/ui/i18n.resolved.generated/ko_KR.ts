@@ -2242,6 +2242,7 @@ export const ko_KR: EnTranslations = {
       "name_lanternback_troll": "등불지기 그룸볼",
       "name_chimeglass_tortoise": "종유리의 톨리버",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
+      "name_wobbles_slime": "말랑이 슬라임",
       "name_nightwing_chimera": "밤날개 키메라",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
@@ -2253,6 +2254,7 @@ export const ko_KR: EnTranslations = {
       "desc_goblin_rocket_sled": "위험할 정도로 과하게 만들어진 고블린 썰매. 쌍발 로켓과 형편없는 판단력으로 내달린다.",
       "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
       "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
+      "desc_wobbles_slime": "안장을 얹도록 길들여진 커다란 파란 슬라임. 걷는 대신 통통 튀어 다니고, 기수 아래에서 말랑하게 흔들리며, 젤리 몸속으로 거품이 천천히 떠오른다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_referral_tank": "친구 초대 도장 카드를 완성하면 획득합니다.",
       "desc_referral_raptor": "첫 번째 연결된 친구가 도장 카드를 완성하도록 도우면 획득합니다.",
@@ -20035,6 +20037,9 @@ export const ko_KR: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "길지기의 종끈: 톨리버"
+      },
+      "reins_wobbles_slime": {
+        "name": "젤리 안장: 말랑이"
       },
       "reins_rickshaw_mount": {
         "name": "결속된 고삐: 뼈에 묶인 인력거"

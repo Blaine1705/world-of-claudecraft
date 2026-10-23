@@ -2640,6 +2640,7 @@ const ITEM_ENTITY_IDS = [
   'reins_rallycart_rxt',
   'reins_lanternback_troll',
   'reins_chimeglass_tortoise',
+  'reins_wobbles_slime',
   'reins_rickshaw_mount',
   'reins_drakemaw_raptor',
   'reins_mech_bird',
@@ -4065,6 +4066,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   reins_lanternback_troll: "Lamplighter's Yoke: Grumbol",
   reins_chimeglass_tortoise: "Roadwarden's Bellstrap: Tolliver",
   reins_rickshaw_mount: 'Bound Reins: Bonebound Rickshaw',
+  reins_wobbles_slime: 'Jelly Saddle: Wobbles',
   // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
   // folds them into the per-locale arrays.
   firebottle: 'Firebottle',

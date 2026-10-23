@@ -2242,6 +2242,7 @@ export const pt_BR: EnTranslations = {
       "name_lanternback_troll": "Grumbol, o Lanterna Dorso",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
       "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
+      "name_wobbles_slime": "Wobbles the Slime",
       "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
@@ -2253,6 +2254,7 @@ export const pt_BR: EnTranslations = {
       "desc_goblin_rocket_sled": "Um trenó goblin perigosamente superdimensionado, impulsionado por dois foguetes e por um péssimo julgamento excelente.",
       "desc_rallycart_rxt": "Uma máquina de rali em miniatura que aumenta a velocidade de viagem.",
       "desc_rallycart_skin": "Um carrinho de corrida minúsculo com um rugido poderoso.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -20035,6 +20037,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Cinta do Roadwarden: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Rédeas vinculadas: Riquixá de Ossos Vinculados"
