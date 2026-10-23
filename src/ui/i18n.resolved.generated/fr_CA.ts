@@ -1252,6 +1252,18 @@ export const fr_CA: EnTranslations = {
         }
       },
       "seasonOne": "Saison 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Inhabituel",
         "rare": "Rare",
@@ -2230,6 +2242,8 @@ export const fr_CA: EnTranslations = {
       "name_lanternback_troll": "Grumbol le Lanternback",
       "name_chimeglass_tortoise": "Tolliver le Chimeglass",
       "name_rickshaw_mount": "Rickshaw d'os liés",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
@@ -2240,6 +2254,7 @@ export const fr_CA: EnTranslations = {
       "desc_goblin_rocket_sled": "Une luge gobeline dangereusement surconstruite, propulsée par deux fusées et un excellent mauvais jugement.",
       "desc_rallycart_rxt": "Une petite machine de rallye qui augmente la vitesse de déplacement.",
       "desc_rallycart_skin": "Une minuscule voiture de rallye au rugissement puissant.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2247,6 +2262,7 @@ export const fr_CA: EnTranslations = {
       "desc_avian_strider": "Un oiseau de selle imposant dont les lourdes serres et les ailes repliées transforment chaque trajet en un sprint tonitruant.",
       "desc_mech_bird": "Un poulet de guerre mécanique construit à la main qui sprinte sur des servos qui claquent, la clé de remontage tournant toujours.",
       "desc_lanternback_troll": "Un troll des collines brisé jusqu'au joug par des allumeurs de réverbères, portant un trône de fer sur ses épaules avec une lanterne tempête allumée sur chaque bras.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Une tortue des salines qui a dépassé trois générations de caravanes. Les bricoleurs lui ont arraché des lunettes en verre tempête et lui ont accroché une cloche de bronze à la gorge, pour que la route l'entende bien avant de le voir.",
       "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course."
     },
@@ -10900,6 +10916,10 @@ export const fr_CA: EnTranslations = {
     "appTitle": "Éditeur de cartes",
     "docTitle": "Éditeur de cartes - World of ClaudeCraft",
     "untitledMap": "Carte sans titre",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Cartographe",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const fr_CA: EnTranslations = {
       "reins_avian_strider": {
         "name": "Rênes de l'Arpente-vallon viridien"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Clé de contact : luge-fusée gobeline"
       },
@@ -20018,6 +20041,9 @@ export const fr_CA: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Cloche de gardien de route: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Rênes liées : Rickshaw d'os liés"

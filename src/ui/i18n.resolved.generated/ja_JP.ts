@@ -1252,6 +1252,18 @@ export const ja_JP: EnTranslations = {
         }
       },
       "seasonOne": "シーズン1",
+      "membershipPromo": {
+        "open": "WOCストアのメンバーシップ",
+        "close": "メンバーシップの宣伝を閉じる",
+        "eyebrow": "アカウント特典",
+        "title": "メンバーシップ",
+        "cta": "今すぐ参加"
+      },
+      "referralPromo": {
+        "close": "フレンド招待の宣伝を閉じる",
+        "eyebrow": "一緒に冒険しよう",
+        "cta": "フレンドを招待"
+      },
       "rarity": {
         "uncommon": "アンコモン",
         "rare": "レア",
@@ -2230,6 +2242,8 @@ export const ja_JP: EnTranslations = {
       "name_lanternback_troll": "ランタンバックのグルンボル",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
+      "name_wobbles_slime": "スライムのプルプル",
+      "name_nightwing_chimera": "ナイトウィング・キマイラ",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -2240,6 +2254,7 @@ export const ja_JP: EnTranslations = {
       "desc_goblin_rocket_sled": "危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。",
       "desc_rallycart_rxt": "小型ながら本格的なラリーマシン。移動速度を高めてくれる。",
       "desc_rallycart_skin": "小さな車体から豪快なエンジン音を響かせるラリーカー。",
+      "desc_wobbles_slime": "鞍を着けられるよう馴らされた大きな青いスライム。歩く代わりに跳ねて進み、乗り手の下でぷるぷると揺れ、体の中を泡がゆっくり昇っていく。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_referral_tank": "招待スタンプカードを完成させると獲得できます。",
       "desc_referral_raptor": "最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。",
@@ -2247,6 +2262,7 @@ export const ja_JP: EnTranslations = {
       "desc_avian_strider": "巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
+      "desc_nightwing_chimera": "古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
@@ -10900,6 +10916,10 @@ export const ja_JP: EnTranslations = {
     "appTitle": "マップエディター",
     "docTitle": "マップエディター - World of ClaudeCraft",
     "untitledMap": "無題のマップ",
+    "liveWorld": {
+      "name": "ゲーム世界の調整",
+      "scope": "ゲーム世界：地形の高さと塗装、道路、ゲーム内オブジェクトの位置、追加した小物を編集できます。既存の建物は固定されています。「エクスポート」で変更を保存し、レビューに送ってください。"
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "マップ職人",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const ja_JP: EnTranslations = {
       "reins_avian_strider": {
         "name": "ヴィリジアン・ヴェイルストライダーの手綱"
       },
+      "reins_nightwing_chimera": {
+        "name": "ナイトウィング・キマイラの手綱"
+      },
       "reins_goblin_rocket_sled": {
         "name": "ゴブリンロケットそりの始動キー"
       },
@@ -20018,6 +20041,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "道守の鈴帯：トリヴァー"
+      },
+      "reins_wobbles_slime": {
+        "name": "ゼリーの鞍：プルプル"
       },
       "reins_rickshaw_mount": {
         "name": "縛りの手綱：骨縛りの人力車"

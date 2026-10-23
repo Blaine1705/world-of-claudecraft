@@ -1252,6 +1252,18 @@ export const id_ID: EnTranslations = {
         }
       },
       "seasonOne": "Musim 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Tidak Umum",
         "rare": "Langka",
@@ -2230,6 +2242,8 @@ export const id_ID: EnTranslations = {
       "name_lanternback_troll": "Grumbol si Punggung Lentera",
       "name_chimeglass_tortoise": "Tolliver si Kaca Cerobong Asap",
       "name_rickshaw_mount": "Becak Terikat Tulang",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
@@ -2240,6 +2254,7 @@ export const id_ID: EnTranslations = {
       "desc_goblin_rocket_sled": "Kereta luncur goblin yang sangat berlebihan dan berbahaya, didorong dua roket serta penilaian buruk yang luar biasa.",
       "desc_rallycart_rxt": "Mesin reli mungil yang meningkatkan kecepatan perjalanan.",
       "desc_rallycart_skin": "Mobil reli kecil dengan raungan dahsyat.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2247,6 +2262,7 @@ export const id_ID: EnTranslations = {
       "desc_avian_strider": "Seekor burung pelana menjulang tinggi dengan cakar berat dan sayap terlipat mengubah setiap perjalanan menjadi lari yang menggelegar.",
       "desc_mech_bird": "Ayam perang jarum jam buatan tangan yang berlari dengan kecepatan servo, kunci putaran masih berputar.",
       "desc_lanternback_troll": "Troll bukit dipatahkan oleh penyala lampu, membawa singgasana besi di bahunya dengan lentera badai menyala di kedua lengannya.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Kura-kura dataran garam yang telah melampaui tiga generasi karavan. Tinker memberinya kacamata dari kaca badai dan menggantungkan lonceng perunggu di tenggorokannya, sehingga jalan mendengarnya jauh sebelum jalan melihatnya.",
       "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang."
     },
@@ -10900,6 +10916,10 @@ export const id_ID: EnTranslations = {
     "appTitle": "Editor Peta",
     "docTitle": "Editor Peta - World of ClaudeCraft",
     "untitledMap": "Peta Tanpa Judul",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Pembuat Peta",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const id_ID: EnTranslations = {
       "reins_avian_strider": {
         "name": "Tali Kekang Pejalan Lembah Zamrud"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Kunci kontak: Kereta Luncur Roket Goblin"
       },
@@ -20018,6 +20041,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Tali Lonceng Penjaga Jalan: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Kendali Terikat: Becak Terikat Tulang"

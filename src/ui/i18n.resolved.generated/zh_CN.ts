@@ -1252,6 +1252,18 @@ export const zh_CN: EnTranslations = {
         }
       },
       "seasonOne": "第一赛季",
+      "membershipPromo": {
+        "open": "WOC 商店中的会员",
+        "close": "关闭会员推广",
+        "eyebrow": "账号特权",
+        "title": "会员",
+        "cta": "立即加入"
+      },
+      "referralPromo": {
+        "close": "关闭推荐好友推广",
+        "eyebrow": "一起冒险",
+        "cta": "邀请好友"
+      },
       "rarity": {
         "uncommon": "优秀",
         "rare": "精良",
@@ -2230,6 +2242,8 @@ export const zh_CN: EnTranslations = {
       "name_lanternback_troll": "提灯背者格伦博",
       "name_chimeglass_tortoise": "钟晶的托利弗",
       "name_rickshaw_mount": "白骨人力车",
+      "name_wobbles_slime": "晃晃史莱姆",
+      "name_nightwing_chimera": "夜翼奇美拉",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
@@ -2240,6 +2254,7 @@ export const zh_CN: EnTranslations = {
       "desc_goblin_rocket_sled": "一辆结构过剩到危险的哥布林雪橇，靠双发火箭和极差的判断力推进。",
       "desc_rallycart_rxt": "一辆小巧却地道的拉力赛车，能提升移动速度。",
       "desc_rallycart_skin": "一辆小巧的拉力赛车，轰鸣声却震天响。",
+      "desc_wobbles_slime": "一只被驯服上鞍的大蓝史莱姆。它不走路而是蹦跳，在骑手身下晃来晃去，体内还有气泡缓缓上浮。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
       "desc_referral_tank": "完成一张推荐集章卡后获得。",
       "desc_referral_raptor": "帮助你的首位绑定好友完成一张集章卡后获得。",
@@ -2247,6 +2262,7 @@ export const zh_CN: EnTranslations = {
       "desc_avian_strider": "高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。",
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
+      "desc_nightwing_chimera": "来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
       "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
     },
@@ -10900,6 +10916,10 @@ export const zh_CN: EnTranslations = {
     "appTitle": "地图编辑器",
     "docTitle": "地图编辑器 - World of ClaudeCraft",
     "untitledMap": "未命名地图",
+    "liveWorld": {
+      "name": "游戏世界微调",
+      "scope": "游戏世界：可编辑地形高度与涂色、道路、游戏对象的位置及新增摆件。现有建筑保持固定。使用“导出”保存修改以供审核。"
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "制图师",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const zh_CN: EnTranslations = {
       "reins_avian_strider": {
         "name": "苍翠谷行者的缰绳"
       },
+      "reins_nightwing_chimera": {
+        "name": "夜翼奇美拉的缰绳"
+      },
       "reins_goblin_rocket_sled": {
         "name": "哥布林火箭雪橇点火钥匙"
       },
@@ -20018,6 +20041,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "守道人的铃带：托利弗"
+      },
+      "reins_wobbles_slime": {
+        "name": "果冻鞍：晃晃"
       },
       "reins_rickshaw_mount": {
         "name": "白骨人力车缚绳"

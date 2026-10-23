@@ -738,6 +738,20 @@ export const hudChromeStrings = {
     collections: armoryCollectionStrings,
     skins: armorySkinStrings,
     seasonOne: 'Season 1',
+    // The rotating promo card above chat (src/ui/store_promo_card.ts). The
+    // Refer a Friend advert takes its title from the referralCards namespace.
+    membershipPromo: {
+      open: 'Membership in the WOC Store',
+      close: 'Close membership promotion',
+      eyebrow: 'Account perks',
+      title: 'Membership',
+      cta: 'Join now',
+    },
+    referralPromo: {
+      close: 'Close Refer a Friend promotion',
+      eyebrow: 'Adventure together',
+      cta: 'Invite friends',
+    },
     rarity: {
       uncommon: 'Uncommon',
       rare: 'Rare',
@@ -2373,6 +2387,8 @@ export const hudChromeStrings = {
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
+    name_wobbles_slime: 'Wobbles the Slime',
+    name_nightwing_chimera: 'Nightwing Chimaera',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -2388,6 +2404,8 @@ export const hudChromeStrings = {
       'A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.',
     desc_rallycart_rxt: 'A pint-sized rally machine that provides enhanced travel speed.',
     desc_rallycart_skin: 'A tiny rally car with a mighty roar.',
+    desc_wobbles_slime:
+      'A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_referral_tank: 'Earned by completing a referral stamp card.',
@@ -2400,6 +2418,8 @@ export const hudChromeStrings = {
       'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
     desc_lanternback_troll:
       'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
+    desc_nightwing_chimera:
+      'A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.',
     desc_chimeglass_tortoise:
       'A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.',
     desc_rickshaw_mount:

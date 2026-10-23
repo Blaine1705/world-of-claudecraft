@@ -1252,6 +1252,18 @@ export const nl_NL: EnTranslations = {
         }
       },
       "seasonOne": "Seizoen 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Ongewoon",
         "rare": "Zeldzaam",
@@ -2230,6 +2242,8 @@ export const nl_NL: EnTranslations = {
       "name_lanternback_troll": "Grumbol de Lantaarnrug",
       "name_chimeglass_tortoise": "Tolliver het klokkenspel",
       "name_rickshaw_mount": "Beengebonden Riksja",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -2240,6 +2254,7 @@ export const nl_NL: EnTranslations = {
       "desc_goblin_rocket_sled": "Een gevaarlijk overgebouwde goblinslee, voortgestuwd door twee raketten en uitstekend slecht beoordelingsvermogen.",
       "desc_rallycart_rxt": "Een compacte rallymachine die de reissnelheid verhoogt.",
       "desc_rallycart_skin": "Een kleine rallyauto met een machtige brul.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2247,6 +2262,7 @@ export const nl_NL: EnTranslations = {
       "desc_avian_strider": "Een imposant zadelvogel wiens zware klauwen en gevouwen vleugels elke reis in een donderend sprinten veranderen.",
       "desc_mech_bird": "Een met de hand gebouwde oorlogskip die sprint op klikkende servo's terwijl de opwindsleutel nog draait.",
       "desc_lanternback_troll": "Een heuveltrol die door lantaarnopstekers tot aan zijn juk werd gebroken, met een ijzeren troon op zijn schouders en een stormlantaarn die aan beide armen brandde.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Een zoutvlakteschildpad die drie generaties karavanen is ontlopen. Tinkers hebben een bril van stormglas voor hem geslepen en een bronzen bel om zijn keel gehangen, zodat de weg hem lang hoort voordat hij hem ziet.",
       "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
     },
@@ -10900,6 +10916,10 @@ export const nl_NL: EnTranslations = {
     "appTitle": "Kaarteditor",
     "docTitle": "Kaarteditor - World of ClaudeCraft",
     "untitledMap": "Naamloze kaart",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Kaartenmaker",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const nl_NL: EnTranslations = {
       "reins_avian_strider": {
         "name": "Teugels van de Groene Valestrider"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Contactsleutel: Goblin-raketslee"
       },
@@ -20018,6 +20041,9 @@ export const nl_NL: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Bellstrap van Roadwarden: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Gebonden teugels: Beengebonden Riksja"

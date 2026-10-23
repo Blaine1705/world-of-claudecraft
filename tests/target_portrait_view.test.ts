@@ -92,7 +92,7 @@ const CLASS_BODY_PORTRAITS = {
   apprentice_wren: [
     'player_mage_female',
     'models/chars/players/woc/base_female.glb',
-    'b8a71dfb5bdc2b745f3768f2d52fe203961622d3a9436ec904bed01f118f2a63',
+    '214cb9eef5047e6535303a90b2681dd327b17a5ed6bf8fd77d3592601a5b7619',
   ],
   castaway_navigator: [
     'player_rogue',

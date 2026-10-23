@@ -88,6 +88,12 @@ export interface MountRideSpec {
   /** Extra chest pitch ON TOP of the clip, positive = forward. Additive, so
    *  the torso keeps breathing with the seated loop. */
   lean?: number;
+  /** Optional left-side upper-arm target quaternion [x, y, z, w] (y and z
+   *  mirrored on the right arm), overriding the seated clip's flared elbows. */
+  upperArm?: readonly [number, number, number, number];
+  /** Optional left-side forearm target quaternion [x, y, z, w] (y and z
+   *  mirrored on the right arm), placing the hands on a saddle horn or pommel. */
+  lowerArm?: readonly [number, number, number, number];
 }
 
 /** A seat carried on the mount's own skeleton, for mounts whose saddle MOVES
@@ -251,6 +257,22 @@ const LENS_GLOW = {
   radius: LENS_GLOW_RADIUS,
 } as const;
 
+// The Drakemaw Raptor's rider rides its `Saddle` bone (scripts/assets/drakemaw_raptor/):
+// the saddle is rigid on the hips, and the hips bob through the sprint's two
+// flights a stride, pitch into the jump and drop into the landing, so a fixed
+// seat would leave the rider floating clear of the saddle or sunk into it. The
+// bone sits at the front of the saddle's dish, where the seat starts up toward
+// the pommel; the offset (model units, normScale 1, the model's own axes)
+// carries the rider's root back so the plain seated loop rests them on the flat
+// of the dish, a centimetre or two over the leather on either body
+// (tests/drakemaw_raptor_mount.test.ts pins the clearance). The spec's `seat`
+// and `seatFwd` restate where that root rides at the Idle's sizing frame, so
+// the nameplate, chat bubble and click box sit over the rider's real head, and
+// a missing bone falls back to the same seat. The old fixed seat (2.35 up, 0.1
+// toward the tail) left the rider 0.24 above the dish and 0.66 behind it,
+// perched on the cantle.
+const RAPTOR_SEAT: MountSeatSpec = { bone: 'Saddle', offset: [0, -0.2449, 0.1713] };
+
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // seat tuned to the authored horse model: its saddle sits forward of the
   // origin and lower than the old Tripo build, so the rider shifts toward the
@@ -279,10 +301,28 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
 
   terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
   referral_tank: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
-  referral_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
-  // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
-  // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
-  drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  referral_raptor: spec(
+    'mount_drakemaw_raptor',
+    2.06,
+    true,
+    undefined,
+    0.48,
+    null,
+    [],
+    RAPTOR_SEAT,
+  ),
+  // The Drakemaw Raptor: the rider sits the saddle's dish over its hips, behind
+  // the neck spines, in the plain seated loop (RAPTOR_SEAT).
+  drakemaw_raptor: spec(
+    'mount_drakemaw_raptor',
+    2.06,
+    true,
+    undefined,
+    0.48,
+    null,
+    [],
+    RAPTOR_SEAT,
+  ),
   // The authored saddle is over the hips. The mount ships at 120% of its
   // initial world fit, so the world-space socket offsets scale with it and
   // keep the rider on the same authored point of the saddle.
@@ -320,6 +360,46 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     // rider's root rides a hair above the pan so the sit pose's hips carry his
     // weight onto it.
     { bone: 'chair', offset: [0, 0.918, 0.25] },
+  ),
+  // Wobbles the Slime (docs/design/slime-mount). The jelly squashes, leans and
+  // hops under the rider in every clip, so the rider rides the `saddle` bone,
+  // which carries the seat rigidly over the wobble. Offset measured in Blender:
+  // the seat's low point sits 0.19 model units above the bone head, centred
+  // between pommel and cantle, and the rider's root rides a hair above it.
+  // `seat` is the fallback at the manifest height 4.0 (seat 5.53 of 6.61 model
+  // units). No slime trail: it hops, so a continuous smear behind it reads wrong.
+  wobbles_slime: spec('mount_wobbles_slime', 3.35, true, undefined, 0, null, [], {
+    bone: 'saddle',
+    offset: [0, 0.22, 0],
+  }),
+  // The Nightwing Chimaera: rider sits in the saddle nestled between the base
+  // of the two dragon necks. Anchoring to `saddle` carries the rider smoothly
+  // from the perched bipedal idle up into the airborne flight pose when moving.
+  // The WOC modular player body's thigh rest is a half-turn about Z (not X as on
+  // KayKit), and the thighs/shins are held nearly parallel (spread = pi - 0.032)
+  // and pitched forward (thigh = pi - 1.08) so both legs stay separated and run
+  // cleanly down the central channel between the two necks without colliding at
+  // the boots or clipping into the necks.
+  nightwing_chimera: spec(
+    'mount_nightwing_chimera',
+    3.61,
+    true,
+    undefined,
+    0.4,
+    null,
+    [],
+    { bone: 'saddle', offset: [0, -0.022, 0.068] },
+    {
+      ride: {
+        spread: 3.11,
+        thigh: 2.062,
+        knee: -1.02,
+        ankle: 0.85,
+        hips: -0.04,
+        upperArm: [0.3201, 0.1239, -0.6185, 0.7069],
+        lowerArm: [0.3042, 0.4618, 0.0173, 0.833],
+      },
+    },
   ),
 };
 

@@ -1252,6 +1252,18 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "seasonOne": "1. sezóna",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Neobvyklý",
         "rare": "Vzácný",
@@ -2230,6 +2242,8 @@ export const cs_CZ: EnTranslations = {
       "name_lanternback_troll": "Grumbol Lanternback",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kostipoutaná rikša",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -2240,6 +2254,7 @@ export const cs_CZ: EnTranslations = {
       "desc_goblin_rocket_sled": "Nebezpečně překonstruované gobliní saně poháněné dvěma raketami a skvěle špatným úsudkem.",
       "desc_rallycart_rxt": "Malý rallye stroj, který zvyšuje rychlost cestování.",
       "desc_rallycart_skin": "Drobné závodní auto s mohutným řevem.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2247,6 +2262,7 @@ export const cs_CZ: EnTranslations = {
       "desc_avian_strider": "Mohutný sedlový pták, jehož těžké spáry a složená křídla promění každou cestu v hřmící trysk.",
       "desc_mech_bird": "Ručně vyrobené strojové válečné kuře, které sprintuje na cvakací serva, natahovací klíč se stále otáčí.",
       "desc_lanternback_troll": "Horský troll, který lampáři zlomili do jha, nesl přes ramena železný trůn a na obou pažích hořela bouřková lucerna.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
       "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
     },
@@ -10900,6 +10916,10 @@ export const cs_CZ: EnTranslations = {
     "appTitle": "Editor map",
     "docTitle": "Editor map - World of ClaudeCraft",
     "untitledMap": "Nepojmenovaná mapa",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Tvůrce map",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const cs_CZ: EnTranslations = {
       "reins_avian_strider": {
         "name": "Otěže Smaragdového údolochodce"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Klíček zapalování: Gobliní raketové saně"
       },
@@ -20018,6 +20041,9 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Zvoncový postroj cestovní hlídky: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Spoutané otěže: Kostipoutaná rikša"

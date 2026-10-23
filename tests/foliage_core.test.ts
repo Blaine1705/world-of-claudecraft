@@ -83,7 +83,9 @@ describe('Eastbrook town grass exclusion', () => {
     // Re-pinned for the painted inn: the two stone flower tubs on the terrace's corners came
     // out of its grounds, taking their rectangles with them: 27 to 25.
     const painted = PAINTED_TOWNS.flatMap((town) => town.buildings);
-    expect(exclusions).toHaveLength(99 + tavernGroundsRects().length + 2 * painted.length);
+    // The 3 added north Fenbridge cottages (fenbridge_touchup.ts) also clear
+    // their reach and service apron (two rows each, six more: 99 to 105).
+    expect(exclusions).toHaveLength(105 + tavernGroundsRects().length + 2 * painted.length);
     expect(tavernGroundsRects().length).toBe(25);
     for (const building of [...HIGHWATCH_LAYOUT.buildings, ...painted]) {
       expect(exclusions.some((item) => item.id === building.id)).toBe(true);
@@ -475,7 +477,7 @@ describe('Eastbrook town grass exclusion', () => {
   it('wires the one-time active-world snapshot into streamed grass', () => {
     const source = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
     expect(source).toContain('const GRASS_BUILDING_PADDING = 0.35;');
-    expect(source).toContain('activeContent === BUILTIN_WORLD');
+    expect(source).toContain('isBuiltinWorldContent(activeContent)');
     expect(source).toContain('activeContent.services?.noticeboards ?? []');
     expect(source).toContain('insideGrassHubExclusion(activeContent.zones, x, z)');
     // The dressing-spot scatter moved verbatim out of foliage.ts into its own

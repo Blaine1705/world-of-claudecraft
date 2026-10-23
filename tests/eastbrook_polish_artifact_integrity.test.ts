@@ -1426,7 +1426,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the renderer and town runtime leaves moved. No capture was retaken.
   // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
   // the renderer leaf. No capture was retaken.
-  '920aa3e032b0536ec1b5a897bf484db6fb73cfe3643b4d4edc09e45effc4f439';
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  '7ad30cc0c036e18c9ed8aed4a975a6ed7584db2008898a80aab36308d2a8559b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1474,7 +1476,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the renderer and town runtime leaves moved. No capture was retaken.
   // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
   // the renderer leaf. No capture was retaken.
-  '495276bfb295d7b4150fb18c87798bbe052d1749ac95b284b8225fd181f754cd';
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  '05e79844eb3c4336cf13a2cccf14866cf2f54a295fd14145eed84f60d221a7ab';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2875,7 +2879,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
       // The Mirefen mudfin huts: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('354b97321e00f779893ec5c3e5dfc67e381c666ef26c96ac721c501932ec4302');
+      // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
+      // LAST again over the re-swept evidence. No capture was retaken.
+    ).toBe('00bb99fc91254731a8d6d3977fadc260d2b8669f4e9d75dc106006f3b10182e2');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

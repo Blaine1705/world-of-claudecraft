@@ -1252,6 +1252,18 @@ export const da_DK: EnTranslations = {
         }
       },
       "seasonOne": "Sæson 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Ualmindelig",
         "rare": "Sjælden",
@@ -2230,6 +2242,8 @@ export const da_DK: EnTranslations = {
       "name_lanternback_troll": "Lanternryggen Grumbol",
       "name_chimeglass_tortoise": "Tolliver kimeglasset",
       "name_rickshaw_mount": "Knogebundet Rickshaw",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
@@ -2240,6 +2254,7 @@ export const da_DK: EnTranslations = {
       "desc_goblin_rocket_sled": "En farligt overbygget goblinslæde, drevet af to raketter og fremragende dårlig dømmekraft.",
       "desc_rallycart_rxt": "En lille rallymaskine, der øger rejsehastigheden.",
       "desc_rallycart_skin": "En lille rallybil med et mægtigt brøl.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2247,6 +2262,7 @@ export const da_DK: EnTranslations = {
       "desc_avian_strider": "En høj sadelkloaksfugl, hvis tunge kløer og foldede vinger gør hver rejse til en tordnende sprint.",
       "desc_mech_bird": "En håndbygget urværks-krigskylling, der spurter på knækkende servoer, mens optræksnøglen stadig drejer.",
       "desc_lanternback_troll": "En bakketrold brækket til åget af lampetændere, der bar en jerntrone over sine skuldre med en stormlanterne brændende på begge arme.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "En salt-flad skildpadde, der har overgået tre generationer af campingvogne. Tindere knuste ham briller af stormglas og hængte en bronzeklokke i halsen på ham, så vejen hører ham længe før den ser ham.",
       "desc_rickshaw_mount": "En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring."
     },
@@ -10900,6 +10916,10 @@ export const da_DK: EnTranslations = {
     "appTitle": "Korteditor",
     "docTitle": "Korteditor - World of ClaudeCraft",
     "untitledMap": "Unavngivet kort",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Kortmager",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const da_DK: EnTranslations = {
       "reins_avian_strider": {
         "name": "Tøjler til Viridian Valestrider"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Tændingsnøgle: Goblin-raketslæde"
       },
@@ -20018,6 +20041,9 @@ export const da_DK: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Vejvagts klokkerem: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Bundne tøjler: Knogebundet Rickshaw"

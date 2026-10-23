@@ -43,7 +43,7 @@ export const WOC_SIT_ARM_POSE: Readonly<Record<WocFit, WocSitArmSpec>> = {
   female: {
     clav: [1, 5],
     raise: 36,
-    plane: 22,
+    plane: 18,
     twist: 12,
     elbow: 100,
     pronate: 58,

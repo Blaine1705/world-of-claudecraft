@@ -540,13 +540,16 @@ const MONOLITHS: MonolithRow[] = [
     // the Moonbridge banner) moved into log_event_route.ts logEventCue.
     // v0.45.0 integration: 18025 on the merged tree (wc -l); the lower of the two
     // parent pins (18054 and PR 4352's 18069) stands.
+    // LOWERED 18043 -> 18038: the promo card's advert list (Armory, membership,
+    // Refer a Friend) and its locale copy live in store_promo_card.ts storePromoSlides.
+    // wc -l, exact count.
     // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 18054 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
     // wc -l on the merged tree. Exact count.
-    ceiling: 18043,
+    ceiling: 18038,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

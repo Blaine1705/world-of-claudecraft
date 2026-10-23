@@ -185,30 +185,20 @@ describe('title relics resolve the deed crest', () => {
     expect(art).toEqual({ kind: 'crest', crestId: 'deed_col_reliquary_rank_2' });
   });
 
-  it('routes every title on the shelf to its per-deed crest, category fallback only while pinned art-pending', () => {
-    // A shelf title without committed art must be an enumerated DEED_ART_PENDING
-    // member (the docs/design/deeds.md "art can trail the deed" contract), never
-    // an unreviewed fallback; those route to their category crest until the
-    // commissioned painting lands. The Arcane Calligraphy gold title (world
-    // quests, still art-pending) and the Crucible flawless title today.
+  it('routes every title on the shelf to its committed per-deed crest', () => {
+    // The integration45 backlog paints the remaining seven shelf titles.
+    // Pin both routing and file presence so a missing file cannot pass on URL alone.
+    expect(RELIQUARY_HORIZON_TITLES.length).toBeGreaterThan(30);
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
-    // The three faction Champion titles (world quests, art-pending on the
-    // progression crest) follow them on the shelf, then the Clue Scroll
-    // Treasure Hunter title (art-pending on the exploration crest).
-    expect(pending, 'artless shelf titles must be the pinned art-pending set').toEqual([
-      'exp_arcane_calligraphy_gold',
-      'dgn_varkhul_flawless',
-      'prog_rift_watch_champion',
-      'prog_church_order_champion',
-      'prog_automatons_champion',
-      'exp_clue_ten_caskets',
-      // The Drowned Temple lore guide's Witness of the Choir (dungeon crest).
-      'dgn_drowned_temple_cantor',
-    ]);
-    for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);
+    expect(pending, 'every shelf title has accepted painted art').toEqual([]);
     for (const id of RELIQUARY_HORIZON_TITLES) {
-      const crestId = pending.includes(id) ? `deed_cat_${DEEDS[id].category}` : `deed_${id}`;
-      expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({ kind: 'crest', crestId });
+      expect(DEED_ART_PENDING.has(id), id).toBe(false);
+      expect(deedImageUrl(`deed_${id}`), id).toBe(`/ui/deeds/${id}.webp`);
+      expect(existsSync(join(REPO_ROOT, 'public/ui/deeds', `${id}.webp`)), id).toBe(true);
+      expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({
+        kind: 'crest',
+        crestId: `deed_${id}`,
+      });
     }
   });
 });
@@ -562,14 +552,19 @@ describe('unknown ids fall through to the caller fallback', () => {
     }
     // The completion wave left no catalogued relic on procedural art. Any
     // future growth is a deliberate exact-set edit here and in the debt ledger.
-    // Open wave: the 135 Warfare Season 2 armor pieces (Vanguard Gallery),
-    // parked on ITEM_ART_PENDING for the follow-up art pass.
-    const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(
-      [...procedural].sort(),
-      `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
-    ).toEqual([...season2Armor].sort());
-    expect(procedural).toHaveLength(135);
+      procedural,
+      `catalogued item relics with only procedural art:\n${procedural.join('\n')}`,
+    ).toEqual([]);
+    // All Season 2 pieces must remain on the shelf and resolve their own painting.
+    const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
+    expect(season2Armor).toHaveLength(135);
+    for (const itemId of season2Armor) {
+      expect(CATALOG_SLOTS).toContainEqual({ kind: 'item', id: itemId });
+      expect(ITEM_ART_PENDING.has(itemId), itemId).toBe(false);
+      expect(itemImageUrl(itemId), itemId).toBe(`/ui/items/${itemId}.webp`);
+      expect(existsSync(join(REPO_ROOT, 'public/ui/items', `${itemId}.webp`)), itemId).toBe(true);
+    }
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {

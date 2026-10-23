@@ -5,7 +5,7 @@ import { buildingCameraHeight } from '../sim/building_layout';
 import { isBuiltinShapedWorld } from '../sim/builtin_shaped_world';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
-import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
+import { getActiveWorldContent, isBuiltinWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
   DOCK_SECTION_SURFACE_Y,
@@ -1435,11 +1435,11 @@ export function buildProps(
   // their own LODs; ticked from update() below, never merged or ghosted
   const transportShips: TransportShipView[] = [];
   const activeContent = getActiveWorldContent();
-  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInWorld = isBuiltinWorldContent(activeContent);
   const builtInShaped = isBuiltinShapedWorld(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
-  // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
+  // (see authored_town_gate.ts). True for isBuiltinWorldContent, so the shipped path
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
@@ -3246,10 +3246,10 @@ export function collectBuildingImpostors(seed: number): {
   instances: BuildingImpostorInstance[];
 } {
   const activeContent = getActiveWorldContent();
-  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInWorld = isBuiltinWorldContent(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
-  // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
+  // (see authored_town_gate.ts). True for isBuiltinWorldContent, so the shipped path
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);

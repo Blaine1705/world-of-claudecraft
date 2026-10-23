@@ -50,13 +50,16 @@ import { isOccluderGhostMaterial } from '../src/render/occluder_ghost_variant_ke
 import { placedTownCameraInterior } from '../src/render/placed_town_interior_core';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
-import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { BASE_WORLD, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld } from '../src/sim/fenbridge_layout';
 import { terrainHeight } from '../src/sim/world';
 
 // This suite pins the BLENDED camera ghost (the transparent flip and its gate);
 // the dithered arm is pinned by tests/occluder_dither_fade.test.ts.
-beforeEach(() => setDitherFadeEnabledForTest(false));
+beforeEach(() => {
+  setDitherFadeEnabledForTest(false);
+  setActiveWorldContent(BASE_WORLD);
+});
 
 const ORIGINAL_GFX = {
   standardMaterials: GFX.standardMaterials,

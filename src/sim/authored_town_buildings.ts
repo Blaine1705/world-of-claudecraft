@@ -17,6 +17,7 @@ import {
 import type { Collider } from './collider_shapes';
 import { emitPlacementBoxes } from './colliders_authored/placement_colliders';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
+import { activeFenbridgeBuildingById } from './fenbridge_touchup';
 import { walkInPlacementFor } from './town_walk_in';
 import type { BuildingDef, PromotedScenery } from './types';
 import { terrainHeight } from './world';
@@ -39,6 +40,17 @@ export function placedBuildingAnnexes(
   building: BuildingDef,
 ): AuthoredTownBuildingRecord['annexes'] {
   if (building.id === undefined) return [];
+  const activeFen = activeFenbridgeBuildingById(building.id);
+  if (
+    activeFen &&
+    sameNumber(activeFen.position.x, building.x) &&
+    sameNumber(activeFen.position.z, building.z) &&
+    sameNumber(activeFen.nativeDimensions.width, building.w) &&
+    sameNumber(activeFen.nativeDimensions.depth, building.d) &&
+    sameNumber(activeFen.rotation, building.rot)
+  ) {
+    return activeFen.annexes;
+  }
   for (const candidate of AUTHORED_TOWN_BUILDINGS) {
     if (candidate.id !== building.id) continue;
     return sameNumber(candidate.position.x, building.x) &&
@@ -120,6 +132,10 @@ function matchesRecord(candidate: AuthoredTownBuildingRecord, building: Building
 
 /** True when this props record is an authored-town rebuild building. */
 export function isAuthoredTownBuildingDef(building: BuildingDef): boolean {
+  if (building.id !== undefined) {
+    const activeFen = activeFenbridgeBuildingById(building.id);
+    if (activeFen && matchesRecord(activeFen, building)) return true;
+  }
   return AUTHORED_TOWN_BUILDINGS.some((candidate) => matchesRecord(candidate, building));
 }
 
@@ -142,6 +158,12 @@ export function promotedTownBuildingStandsDown(
   return AUTHORED_TOWNS.some(
     (town) =>
       authoredTownPromoted(promoted, town) &&
-      town.buildings.some((candidate) => matchesRecord(candidate, building)),
+      (town.buildings.some((candidate) => matchesRecord(candidate, building)) ||
+        (town.id === 'fenbridge' &&
+          building.id !== undefined &&
+          (() => {
+            const activeFen = activeFenbridgeBuildingById(building.id);
+            return activeFen ? matchesRecord(activeFen, building) : false;
+          })())),
   );
 }

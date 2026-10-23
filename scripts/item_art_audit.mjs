@@ -165,14 +165,17 @@ const build = await buildItemArtAudit({
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
     // + the membership Staff of Changing (PR 4281): 2040 / 2069, re-measured with
     // `--verify-only`.
-    catalogCount: 2040,
-    liveItemCount: 2069,
-    // Five referral rewards reuse existing art until their own paintings land.
-    pendingArtCount: 142,
+    // Completed Season 2 painted armor leaves the pending ledger, plus Nightwing Chimaera mount.
+    // Wobbles the Slime's reins add one owner and one live definition.
+    catalogCount: 2183,
+    liveItemCount: 2212,
+    // Only the intentionally retired Phoenix token retains its procedural icon.
+    pendingArtCount: 1,
     generatedHeroicDefinitions: 116,
     heroicDefinitionsWithOwnWebp: 86,
     heroicWeaponArtAliases: 30,
-    sheetPageCount: 44,
+    // Completed Season 2 icons add pages to the grouped review sheets.
+    sheetPageCount: 47,
     groupCount: 28,
   },
 });

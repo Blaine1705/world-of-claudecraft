@@ -1252,6 +1252,18 @@ export const vi_VN: EnTranslations = {
         }
       },
       "seasonOne": "Mùa 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Không phổ biến",
         "rare": "Hiếm",
@@ -2230,6 +2242,8 @@ export const vi_VN: EnTranslations = {
       "name_lanternback_troll": "Grumbol Lưng Đèn",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
@@ -2240,6 +2254,7 @@ export const vi_VN: EnTranslations = {
       "desc_goblin_rocket_sled": "Một chiếc xe trượt goblin được chế tạo quá mức đến nguy hiểm, phóng đi nhờ hai tên lửa và óc phán đoán tồi một cách xuất sắc.",
       "desc_rallycart_rxt": "Một cỗ máy đua rally nhỏ gọn giúp tăng tốc độ di chuyển.",
       "desc_rallycart_skin": "Một chiếc xe đua nhỏ có tiếng gầm vang dội.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2247,6 +2262,7 @@ export const vi_VN: EnTranslations = {
       "desc_avian_strider": "Một chiếc yên ngựa trên chim cao lớn với vuốt nặng và cánh gấp lại biến mỗi hành trình thành một cuộc lao tới ầm ầm.",
       "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
       "desc_lanternback_troll": "Một con quỷ đồi bị những người đốt đèn bẻ gãy ách, vác một chiếc ngai sắt trên vai với một chiếc đèn bão đang cháy trên hai tay.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
       "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực."
     },
@@ -10900,6 +10916,10 @@ export const vi_VN: EnTranslations = {
     "appTitle": "Trình Chỉnh Sửa Bản Đồ",
     "docTitle": "Trình Chỉnh Sửa Bản Đồ - World of ClaudeCraft",
     "untitledMap": "Bản Đồ Chưa Đặt Tên",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Người Tạo Bản Đồ",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const vi_VN: EnTranslations = {
       "reins_avian_strider": {
         "name": "Dây Cương Bước Chim Xanh Valestrider"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Khóa khởi động: Xe trượt tên lửa goblin"
       },
@@ -20018,6 +20041,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Dây đeo chuông của Roadwarden: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Dây cương ràng buộc: Xe kéo Buộc Xương"

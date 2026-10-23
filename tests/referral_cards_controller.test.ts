@@ -102,7 +102,7 @@ describe('referral card controller', () => {
     expect(f.playReward).toHaveBeenCalledOnce();
     expect(popup.textContent).toContain('Friendship Satchel');
     expect(popup.textContent).toContain('Trailmate');
-    expect(popup.querySelector('img')?.getAttribute('src')).toContain('resonant_weave_bag.webp');
+    expect(popup.querySelector('img')?.getAttribute('src')).toBe('/ui/items/referral_satchel.webp');
     expect(popup.getAttribute('role')).toBe('dialog');
     expect(f.root.inert).toBe(true);
     expect(document.querySelector('.referral-celebration')!.contains(document.activeElement)).toBe(
@@ -403,7 +403,8 @@ describe('referral card controller', () => {
     f.card.participants[1].characterName = '<img src=x onerror=alert(1)>';
     f.controller.open();
     expect(f.root.textContent).toContain('<img src=x onerror=alert(1)>');
-    expect(f.root.querySelector('img')).toBeNull();
+    expect(f.root.querySelector('img[src="x"], [onerror]')).toBeNull();
+    expect(f.root.querySelector('img[src="/ui/items/referral_satchel.webp"]')).not.toBeNull();
     expect(f.root.querySelectorAll('.referral-stamp')).toHaveLength(5);
     expect(f.root.querySelectorAll('.referral-stamp [role="tooltip"]')).toHaveLength(5);
     expect(f.send).not.toHaveBeenCalled();

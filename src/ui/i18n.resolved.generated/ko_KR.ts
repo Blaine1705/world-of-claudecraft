@@ -1252,6 +1252,18 @@ export const ko_KR: EnTranslations = {
         }
       },
       "seasonOne": "시즌 1",
+      "membershipPromo": {
+        "open": "WOC 상점의 멤버십",
+        "close": "멤버십 홍보 닫기",
+        "eyebrow": "계정 혜택",
+        "title": "멤버십",
+        "cta": "지금 가입"
+      },
+      "referralPromo": {
+        "close": "친구 초대 홍보 닫기",
+        "eyebrow": "함께하는 모험",
+        "cta": "친구 초대하기"
+      },
       "rarity": {
         "uncommon": "고급",
         "rare": "희귀",
@@ -2230,6 +2242,8 @@ export const ko_KR: EnTranslations = {
       "name_lanternback_troll": "등불지기 그룸볼",
       "name_chimeglass_tortoise": "종유리의 톨리버",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
+      "name_wobbles_slime": "말랑이 슬라임",
+      "name_nightwing_chimera": "밤날개 키메라",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -2240,6 +2254,7 @@ export const ko_KR: EnTranslations = {
       "desc_goblin_rocket_sled": "위험할 정도로 과하게 만들어진 고블린 썰매. 쌍발 로켓과 형편없는 판단력으로 내달린다.",
       "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
       "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
+      "desc_wobbles_slime": "안장을 얹도록 길들여진 커다란 파란 슬라임. 걷는 대신 통통 튀어 다니고, 기수 아래에서 말랑하게 흔들리며, 젤리 몸속으로 거품이 천천히 떠오른다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_referral_tank": "친구 초대 도장 카드를 완성하면 획득합니다.",
       "desc_referral_raptor": "첫 번째 연결된 친구가 도장 카드를 완성하도록 도우면 획득합니다.",
@@ -2247,6 +2262,7 @@ export const ko_KR: EnTranslations = {
       "desc_avian_strider": "우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
       "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
+      "desc_nightwing_chimera": "고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.",
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
       "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다."
     },
@@ -10900,6 +10916,10 @@ export const ko_KR: EnTranslations = {
     "appTitle": "맵 편집기",
     "docTitle": "맵 편집기 - World of ClaudeCraft",
     "untitledMap": "제목 없는 맵",
+    "liveWorld": {
+      "name": "게임 월드 다듬기",
+      "scope": "게임 월드: 지형 높이와 페인트, 도로, 게임 오브젝트 위치, 추가한 소품을 편집할 수 있습니다. 기존 건물은 고정됩니다. 검토할 변경 사항은 내보내기로 저장하세요."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "지도제작자",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const ko_KR: EnTranslations = {
       "reins_avian_strider": {
         "name": "비리디안 베일스트라이더의 고삐"
       },
+      "reins_nightwing_chimera": {
+        "name": "밤날개 키메라의 고삐"
+      },
       "reins_goblin_rocket_sled": {
         "name": "고블린 로켓 썰매 시동 열쇠"
       },
@@ -20018,6 +20041,9 @@ export const ko_KR: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "길지기의 종끈: 톨리버"
+      },
+      "reins_wobbles_slime": {
+        "name": "젤리 안장: 말랑이"
       },
       "reins_rickshaw_mount": {
         "name": "결속된 고삐: 뼈에 묶인 인력거"

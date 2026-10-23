@@ -663,6 +663,11 @@ export interface VisualDef {
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
   lazyPreload?: boolean;
+  /** Clips looped for the visual's whole life BESIDE the state clips (idle,
+   *  walk, jump, ...), on their own clock, so they never restart when the
+   *  state changes: Wobbles the Slime's drifting bubbles. Each must animate
+   *  only bones no state clip touches, or the two actions blend. */
+  ambientClips?: readonly string[];
   /** Post-load orientation fixups for weapon/prop nodes baked INTO a creature
    *  GLB at the wrong angle (some KayKit handslot weapons ship without the grip
    *  flip the standalone weapon files carry). Node name as authored in the GLB;
@@ -1075,6 +1080,38 @@ const MOUNT_RIGGED: ClipMap = {
   death: 'Death',
 };
 
+// Wobbles the Slime ships Idle / Walk / Run / Jump / Land (docs/design/slime-mount).
+// Naming `land` opts it into the held-jump treatment, like the tortoise: `Jump`
+// is the gather and spring, clamped on its airborne pose for the whole flight,
+// and `Land` is the touchdown splat. Neither carries a rise (the arc is the
+// game's). Death holds Idle: a ridden mount never plays one.
+const MOUNT_SLIME: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: [],
+  death: 'Idle',
+  jump: 'Jump',
+  land: 'Land',
+};
+
+// The Drakemaw Raptor's own rig and clips, built in Blender from scratch
+// (scripts/assets/drakemaw_raptor/). WalkBack is a real backpedal: with no
+// walkBack clip a backpedal falls through to Run played FORWARD while the body
+// slides back. Naming `land` holds `Jump` on its last frame (the legs reaching
+// for the ground) for as long as it is airborne, then Land plays on a standing
+// touchdown (visual.ts isOnce). Death holds Idle: a ridden mount never plays one.
+const RAPTOR_MOUNT_RIGGED: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  walkBack: 'WalkBack',
+  jump: 'Jump',
+  land: 'Land',
+  attack: [],
+  death: 'Idle',
+};
+
 // The Viridian Valestrider is authored as a mount-specific four-clip rig. It
 // only runs forward, has a deliberate look-behind reverse gait, and carries
 // its own full-body jump. Death falls back to Idle because mounts never die
@@ -1130,6 +1167,13 @@ const MOUNT_TORTOISE: ClipMap = {
   // mount would still be held above the ground when it touches down.
   jump: 'Jump',
   land: 'Land',
+};
+
+const MOUNT_CHIMERA: ClipMap = {
+  ...MOUNT_RIGGED,
+  idleVariants: ['Idle_Look'],
+  walkBack: 'WalkBackward',
+  jump: 'Jump',
 };
 
 // The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
@@ -3362,6 +3406,23 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 10,
     lazyPreload: true,
   },
+  // Wobbles the Slime: 4.0 tall, a touch over the horse, so the seat lands
+  // about a body higher than a horse's. One hop per Walk/Run loop; the refs
+  // pick a hop cadence that reads as bounding at mounted speed rather than
+  // matching any foot (it has none).
+  mount_wobbles_slime: {
+    url: `${MOUNTS_DIR}/wobbles_slime.glb`,
+    height: 4.0,
+    clips: MOUNT_SLIME,
+    // The bubbles drift on their own loop, never reset by a gait change.
+    ambientClips: ['Bubbles'],
+    // The tack is Tripo's baked texture (dark leather and navy): keep black
+    // black on the low tier rather than lifting it to a flat grey.
+    authoredAtlas: true,
+    walkRef: 2.5,
+    runRef: 11,
+    lazyPreload: true,
+  },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
   mount_terrorspark_groundshaker: {
@@ -3372,30 +3433,29 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 4.4,
     lazyPreload: true,
   },
-  // The Drakemaw Raptor (broodlord legendary drop): saddle-broken Tripo biped,
-  // gait-baked by scripts/bake_mount_gaits.mjs like the bear/toad/griffin. The
-  // imported source clips drove Hip TRANSLATION half a model unit off the bind
-  // pose (baked-in root motion), which at this height threw the body clear of
-  // the saddle and lurched it every stride; the baker authors rotation-only
-  // keys plus a root Y bob, so that cannot recur. walkRef is MEASURED off the
-  // baked clip (tmp/dragonkin_gait_measure.mjs): walk 3.02 yd/s.
+  // The Drakemaw Raptor (also the Friendship Raptor's body): the Tripo mesh on a
+  // theropod rig with every clip authored in Blender from scratch
+  // (scripts/assets/drakemaw_raptor/, `node scripts/assets/drakemaw_raptor/build.mjs`).
+  // It is built one model yard per game yard and `height` is the Idle's own
+  // height on the frame the renderer sizes it by (0.5 s), so normScale is
+  // exactly 1 and every ref below is that clip's FOOT-LOCK speed: a planted ball
+  // slides back that many yards a second, so at timeScale 1 the planted foot
+  // stands still on the ground (tests/drakemaw_raptor_mount.test.ts pins all of
+  // it to the GLB). A rider moves at one speed, so the refs that matter are
+  // constants: forward RUN_SPEED 7 x (1 + 0.8) = 12.6, the sprint with two
+  // flights a stride at 2.2 strides/s (the legacy baked cycle never left the
+  // ground, so it had to choose between a frantic cadence and sliding feet), and
+  // backpedal 12.6 x BACKPEDAL_MULT 0.65 = 8.19; both play at exactly 1.0. Walk
+  // only shows below the run band (a heavy slow, a start), and its time scale
+  // max is raised so it holds the lock right up to the 5.2 yd/s run threshold.
   mount_drakemaw_raptor: {
     url: `${MOUNTS_DIR}/drakemaw_raptor.glb`,
-    height: 3.4,
-    clips: MOUNT_RIGGED,
-    walkRef: 3.0,
-    // runRef is deliberately the RIDDEN speed (RUN_SPEED 7 x +80% = 12.6), not
-    // the Run clip's measured 9.04 yd/s, so timeScale lands on exactly 1.0 and
-    // the clip plays at its authored 2.0 strides/sec (6.3 yd per bound).
-    // Foot-matching instead (runRef 9.04) gives timeScale 1.48 and a 2.96/sec
-    // cadence, which read as badly sped up on a 3.4 yd mount. That is the real
-    // tradeoff on this rig: under a perfect foot match, cadence is
-    // bodySpeed / (2 x stride x normScale) and so depends only on stride
-    // LENGTH, never on clip duration, which timeScale rescales away. Short legs
-    // therefore can only buy a calm cadence with slide. This costs 28%, well
-    // inside what the other baked mounts already ship (grag_bear's 3.58 yd/s
-    // natural against the same 12.6 leaves it sliding over half its travel).
+    height: 3.30239,
+    clips: RAPTOR_MOUNT_RIGGED,
+    walkRef: 2.6,
+    walkTimeScaleMax: 2.0,
     runRef: 12.6,
+    walkBackRef: 8.19,
     lazyPreload: true,
   },
   // Tall two-legged fantasy bird authored on its own avian skeleton. The
@@ -3458,6 +3518,18 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_MECH_BIRD,
     walkRef: 5.2,
     runRef: 12.25,
+    lazyPreload: true,
+  },
+  // The Nightwing Chimaera: two-headed bipedal wyvern that perches on its two
+  // hind legs at rest (Idle / Idle_Look) and lifts into low-altitude flight
+  // when moving (Walk / Run / WalkBackward / Jump).
+  mount_nightwing_chimera: {
+    url: `${MOUNTS_DIR}/nightwing_chimera.glb`,
+    authoredAtlas: true,
+    height: 5.78,
+    clips: MOUNT_CHIMERA,
+    walkRef: 5.6,
+    runRef: 12.6,
     lazyPreload: true,
   },
   // Developer-only Halloween cart (image-to-glb static prop, no clips of its

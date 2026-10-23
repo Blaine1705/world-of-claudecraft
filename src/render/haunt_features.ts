@@ -17,6 +17,7 @@ import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from '
 export interface HauntFeaturesView {
   group: THREE.Group;
   glowLights: THREE.PointLight[];
+  animated: THREE.Object3D[];
   update(time: number): void;
 }
 
@@ -198,6 +199,7 @@ export function buildHauntFeatures(
   return {
     group,
     glowLights,
+    animated: [...mists.map((m) => m.mesh), ...wisps.map((w) => w.sprite)],
     update(time: number): void {
       // the mist breathes and slowly slides; the ghost-lights wander their
       // little circuits like someone pacing a grave row

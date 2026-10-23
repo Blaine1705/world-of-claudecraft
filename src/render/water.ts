@@ -1424,6 +1424,7 @@ function buildPhongWater(): WaterView {
     sh.uniforms.uWocSky = { value: SKY_TINT };
     sh.uniforms.uWocSunCol = { value: SUN_COLOR };
     sh.uniforms.uWocSunDir = WATER_SUN_UNIFORM;
+    sh.uniforms.uDayNight = WATER_DAYNIGHT_UNIFORM;
     sh.uniforms.uWocWaterTime = WATER_TIME;
     sh.vertexShader = sh.vertexShader
       .replace(
@@ -1446,6 +1447,7 @@ function buildPhongWater(): WaterView {
         uniform vec3 uWocSky;
         uniform vec3 uWocSunCol;
         uniform vec3 uWocSunDir;
+        uniform vec3 uDayNight;
         uniform float uWocWaterTime;`,
       )
       .replace(
@@ -1467,7 +1469,7 @@ function buildPhongWater(): WaterView {
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
-        totalEmissiveRadiance += mix(uWocShallow, uWocDeep, wocDistW) * 0.22;
+        totalEmissiveRadiance += mix(uWocShallow, uWocDeep, wocDistW) * uDayNight * 0.22;
         vec3 wocWaveN = normalize(vec3(
           sin(vWocWaterWPos.x * 1.3 + uWocWaterTime * 2.2) * 0.08,
           1.0,
@@ -1475,7 +1477,7 @@ function buildPhongWater(): WaterView {
         ));
         vec3 wocRefl = reflect(-normalize(uWocSunDir), wocWaveN);
         float wocGlint = exp2(48.0 * log2(max(dot(wocRefl, wocV), 1e-8)));
-        totalEmissiveRadiance += uWocSunCol * wocGlint * 0.55;`,
+        totalEmissiveRadiance += uWocSunCol * uDayNight * wocGlint * 0.55;`,
       );
   };
   // low tier gets the same to-the-horizon apron by simply oversizing the

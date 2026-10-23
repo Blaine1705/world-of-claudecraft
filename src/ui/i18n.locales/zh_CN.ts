@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': '游戏世界微调',
+  'editor.liveWorld.scope':
+    '游戏世界：可编辑地形高度与涂色、道路、游戏对象的位置及新增摆件。现有建筑保持固定。使用“导出”保存修改以供审核。',
   'hudChrome.courier.inventory': '背包',
   'hudChrome.courier.bankTitle': '银行',
   'hudChrome.courier.capacity': '{used} / {capacity} 栏位',
@@ -2155,6 +2158,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'wallet.bagReconnect': '重新连接钱包',
   'hudChrome.wocStore.collectionLine': '{collection}系列',
   'hudChrome.wocStore.seasonOne': '第一赛季',
+  'hudChrome.wocStore.membershipPromo.open': 'WOC 商店中的会员',
+  'hudChrome.wocStore.membershipPromo.close': '关闭会员推广',
+  'hudChrome.wocStore.membershipPromo.eyebrow': '账号特权',
+  'hudChrome.wocStore.membershipPromo.title': '会员',
+  'hudChrome.wocStore.membershipPromo.cta': '立即加入',
+  'hudChrome.wocStore.referralPromo.close': '关闭推荐好友推广',
+  'hudChrome.wocStore.referralPromo.eyebrow': '一起冒险',
+  'hudChrome.wocStore.referralPromo.cta': '邀请好友',
   'hudChrome.wocStore.rarity.uncommon': '优秀',
   'hudChrome.wocStore.rarity.rare': '精良',
   'hudChrome.wocStore.rarity.epic': '史诗',
@@ -13271,6 +13282,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
   'hudChrome.mounts.name_avian_strider': '苍翠谷行者',
+  'hudChrome.mounts.name_nightwing_chimera': '夜翼奇美拉',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    '来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。',
   'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
   'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -13285,6 +13299,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
+  'hudChrome.mounts.name_wobbles_slime': '晃晃史莱姆',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '一只被驯服上鞍的大蓝史莱姆。它不走路而是蹦跳，在骑手身下晃来晃去，体内还有气泡缓缓上浮。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '骇雷撼地者',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力车',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
@@ -14218,8 +14235,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
+  'entities.items.reins_wobbles_slime.name': '果冻鞍：晃晃',
   'entities.items.reins_terrorspark_groundshaker.name': '骇雷撼地者点火钥匙',
   'entities.items.reins_avian_strider.name': '苍翠谷行者的缰绳',
+  'entities.items.reins_nightwing_chimera.name': '夜翼奇美拉的缰绳',
   'entities.items.reins_lanternback_troll.name': '点灯人之轭：格伦博',
   'entities.items.reins_chimeglass_tortoise.name': '守道人的铃带：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力车缚绳',

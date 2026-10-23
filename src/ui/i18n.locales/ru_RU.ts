@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': 'Правки игрового мира',
+  'editor.liveWorld.scope':
+    'Игровой мир: редактируйте высоту и окраску рельефа, дороги, позиции игровых объектов и добавленные декорации. Существующие здания закреплены. Сохраните правки для проверки кнопкой экспорта.',
   'hudChrome.courier.inventory': 'Инвентарь',
   'hudChrome.courier.bankTitle': 'Банк',
   'hudChrome.courier.capacity': '{used} / {capacity} ячеек',
@@ -2399,6 +2402,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Выкован из сырого метеоритного металла, пока кратер Mirefen ещё светился. Обломки, «слишком горячие для рук», стали космически-чёрными плечами с созвездиями, а вдоль ложа заключили расплавленно-золотое ядро. Арбалет не заряжают болтом — он создаёт его сам: стрелу звёздного пламени, выпущенную как приговор и падающую как его исполнение. Когда Highwatch боялся, что даже бессмертная корона Nythraxis — не худшее под горами, именно это оружие хотели видеть на стене. Цельтесь точно.',
   'hudChrome.wocStore.seasonOne': 'Сезон 1',
+  'hudChrome.wocStore.membershipPromo.open': 'Членство в магазине WOC',
+  'hudChrome.wocStore.membershipPromo.close': 'Закрыть рекламу членства',
+  'hudChrome.wocStore.membershipPromo.eyebrow': 'Преимущества аккаунта',
+  'hudChrome.wocStore.membershipPromo.title': 'Членство',
+  'hudChrome.wocStore.membershipPromo.cta': 'Вступить',
+  'hudChrome.wocStore.referralPromo.close': 'Закрыть рекламу «Пригласить друга»',
+  'hudChrome.wocStore.referralPromo.eyebrow': 'Приключения вместе',
+  'hudChrome.wocStore.referralPromo.cta': 'Пригласить друзей',
   'hudChrome.wocStore.rarity.uncommon': 'Необычный',
   'hudChrome.wocStore.rarity.rare': 'Редкий',
   'hudChrome.wocStore.rarity.epic': 'Эпический',
@@ -14151,6 +14162,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
   'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
   'hudChrome.mounts.name_avian_strider': 'Изумрудный Долиноход',
+  'hudChrome.mounts.name_nightwing_chimera': 'Ночнокрылая химера',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    'Двуглавая сумеречная виверна с древних ветвей: в покое стоит на когтистых задних лапах, а в движении парит над землёй на крыльях с тайными рунами.',
   'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
   'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -14165,6 +14179,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     'Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
+  'hudChrome.mounts.name_wobbles_slime': 'Слизень Трясунчик',
+  'hudChrome.mounts.desc_wobbles_slime':
+    'Большой синий слизень, приученный к седлу. Он не ходит, а прыгает, колышется под всадником, а сквозь его желе медленно поднимаются пузырьки.',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Ужасоискр, сотрясатель земли',
   'hudChrome.mounts.name_rickshaw_mount': 'Костяная рикша',
   'hudChrome.mounts.desc_valorsteed':
@@ -15178,8 +15195,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText':
     'Вы входите в холодные безмолвные залы Последнего оплота.',
+  'entities.items.reins_wobbles_slime.name': 'Желейное седло: Трясунчик',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Ужасоискра',
   'entities.items.reins_avian_strider.name': 'Поводья изумрудного долинохода',
+  'entities.items.reins_nightwing_chimera.name': 'Поводья ночнокрылой химеры',
   'entities.items.reins_lanternback_troll.name': 'Ярмо фонарщика: Грумбол',
   'entities.items.reins_chimeglass_tortoise.name': 'Колокольный ремень путеблюстителя: Толливер',
   'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',

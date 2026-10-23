@@ -1252,6 +1252,18 @@ export const pl_PL: EnTranslations = {
         }
       },
       "seasonOne": "Sezon 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Niezwykły",
         "rare": "Rzadki",
@@ -2230,6 +2242,8 @@ export const pl_PL: EnTranslations = {
       "name_lanternback_troll": "Grumbol Latarniowy Grzbiet",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Spętana Kośćmi Riksza",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
@@ -2240,6 +2254,7 @@ export const pl_PL: EnTranslations = {
       "desc_goblin_rocket_sled": "Niebezpiecznie przekombinowane goblińskie sanie, napędzane dwiema rakietami i znakomicie złym osądem.",
       "desc_rallycart_rxt": "Mała maszyna rajdowa, która zwiększa prędkość podróży.",
       "desc_rallycart_skin": "Mały samochód rajdowy o potężnym ryku.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2247,6 +2262,7 @@ export const pl_PL: EnTranslations = {
       "desc_avian_strider": "Wysoki ptak siodłowy, którego ciężkie pazury i złożone skrzydła zamieniają każdą podróż w dudniący spurt.",
       "desc_mech_bird": "Ręcznie zbudowany mechaniczny kurczak bojowy, który biegnie na pstrykających serwach, a nakręcany klucz wciąż się obraca.",
       "desc_lanternback_troll": "Hill troll złamany do jarzma przez latarników, niosący na ramionach żelazny tron z latarniami burzowymi płonącymi na obu ramionach.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Żółw solny, który wyprzedził trzy pokolenia przyczep kempingowych. Druciarze zmielili mu okulary ze szkła burzowego i zawiesili mu na szyi dzwonek z brązu, tak że droga usłyszy go na długo, zanim go zobaczy.",
       "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
     },
@@ -10900,6 +10916,10 @@ export const pl_PL: EnTranslations = {
     "appTitle": "Edytor map",
     "docTitle": "Edytor map - World of ClaudeCraft",
     "untitledMap": "Mapa bez nazwy",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Kartograf",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const pl_PL: EnTranslations = {
       "reins_avian_strider": {
         "name": "Wodze Zielonego Szybkobiegacza Ptaka"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Kluczyk zapłonu: Goblińskie sanie rakietowe"
       },
@@ -20018,6 +20041,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Pasek dzwonkowy Roadwardena: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Spętane lejce: Spętana Kośćmi Riksza"

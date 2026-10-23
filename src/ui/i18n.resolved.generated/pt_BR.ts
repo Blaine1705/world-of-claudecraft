@@ -1252,6 +1252,18 @@ export const pt_BR: EnTranslations = {
         }
       },
       "seasonOne": "Temporada 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Incomum",
         "rare": "Raro",
@@ -2230,6 +2242,8 @@ export const pt_BR: EnTranslations = {
       "name_lanternback_troll": "Grumbol, o Lanterna Dorso",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
       "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
@@ -2240,6 +2254,7 @@ export const pt_BR: EnTranslations = {
       "desc_goblin_rocket_sled": "Um trenó goblin perigosamente superdimensionado, impulsionado por dois foguetes e por um péssimo julgamento excelente.",
       "desc_rallycart_rxt": "Uma máquina de rali em miniatura que aumenta a velocidade de viagem.",
       "desc_rallycart_skin": "Um carrinho de corrida minúsculo com um rugido poderoso.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2247,6 +2262,7 @@ export const pt_BR: EnTranslations = {
       "desc_avian_strider": "Uma ave de sela imponente, cujas garras pesadas e asas dobradas transformam toda jornada numa investida estrondosa.",
       "desc_mech_bird": "Uma galinha de guerra mecânica construída à mão que corre em servos em movimento, com a chave de corda ainda girando.",
       "desc_lanternback_troll": "Um troll das colinas quebrado no jugo por acendedores de lampiões, carregando um trono de ferro sobre os ombros com uma lanterna de tempestade acesa em cada braço.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
       "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada."
     },
@@ -10900,6 +10916,10 @@ export const pt_BR: EnTranslations = {
     "appTitle": "Editor de Mapas",
     "docTitle": "Editor de Mapas - World of ClaudeCraft",
     "untitledMap": "Mapa sem Título",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Cartógrafo",
     "playtestBack": "Back to Editor",
@@ -20007,6 +20027,9 @@ export const pt_BR: EnTranslations = {
       "reins_avian_strider": {
         "name": "Rédeas do Andarilho do Vale Viridiano"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Chave de ignição: Trenó-foguete goblin"
       },
@@ -20018,6 +20041,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Cinta do Roadwarden: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Rédeas vinculadas: Riquixá de Ossos Vinculados"
