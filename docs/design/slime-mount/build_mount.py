@@ -2,9 +2,8 @@
 
 blender --background --python build_mount.py -- <slime_static.glb> <out.glb>
 
-The gold sprite mount's clip list plus a touchdown (docs/design/sprite-mount on
-feat/gold-sprite-mount): Idle, Walk, Run, Jump, Land at 30 fps, and a `saddle`
-bone the rider sits on. The slime sits on the ground in
+Idle, Walk, Run, Jump, Land at 30 fps, plus the ambient Bubbles loop, and a
+`saddle` bone the rider sits on. The slime sits on the ground in
 its idle (the sprite hovers) and hops to move, and everything jiggles.
 
 Rig: root -> move (translation, yaw) -> squash (scale, pivot on the ground so

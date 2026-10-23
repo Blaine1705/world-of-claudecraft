@@ -2671,7 +2671,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         1548 +
         50 +
         // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation.
-        // 71 -> 93 with Wobbles the Slime's reins (`"reins_wobbles_slime",`, 22 bytes).
+        // 71 -> 93: plus 22 for Wobbles the Slime's reins (`"reins_wobbles_slime",`),
+        // attributed here rather than measured by the isolation above.
         93 +
         375 +
         358 +

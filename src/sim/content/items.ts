@@ -425,7 +425,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
-  // Developer-only mount, same terms as the Groundshaker above: /dev mounts or
+  // Developer-only mount (DEVELOPER_MOUNTS terms): /dev mounts or
   // /dev give reins_wobbles_slime, soulbound until it has an acquisition path.
   reins_wobbles_slime: {
     id: 'reins_wobbles_slime',
@@ -434,6 +434,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     mount: 'wobbles_slime',
     quality: 'epic',
     soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },

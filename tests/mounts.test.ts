@@ -112,6 +112,9 @@ describe('mount catalog', () => {
   it('keeps the horse first and appends the two referral milestone mounts', () => {
     // 14 with Wobbles the Slime (a developer mount).
     expect(MOUNT_KEYS).toHaveLength(14);
+    // Pinned as a literal: the acquisition sweeps below iterate this list, so a
+    // mount dropped from it would silently lose its no-route checks.
+    expect(DEVELOPER_MOUNTS).toEqual(['wobbles_slime']);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');

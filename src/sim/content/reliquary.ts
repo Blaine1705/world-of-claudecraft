@@ -307,7 +307,8 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 //
 // Grumbol the Lanternback has no player acquisition path (DEVELOPER_MOUNTS,
 // content/mounts.ts): no live table awards its reins, so its absence here IS
-// the answer, and it stays hand-listed in SOURCE_PENDING_RULING. Paid mount
+// the answer, and it stays hand-listed in SOURCE_PENDING_RULING. Wobbles the
+// Slime is the same: a developer mount until its route is chosen. Paid mount
 // skins are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key

@@ -71,7 +71,10 @@ function stubGltf() {
   ]);
   return {
     scene,
-    animations: [...['Idle', 'Walk', 'Run', 'Attack', 'Hit', 'Death'].map(clip), ambient],
+    animations: [
+      ...['Idle', 'Walk', 'Run', 'Attack', 'Hit', 'Death', 'Jump', 'Land'].map(clip),
+      ambient,
+    ],
   };
 }
 
@@ -91,7 +94,13 @@ async function makeVisual(): Promise<CharacterVisual> {
   const { VISUALS } = await import('../src/render/characters/manifest');
   const def = VISUALS.mob_training_dummy;
   if (!def) throw new Error('training dummy visual missing from the manifest');
-  VISUALS.mob_training_dummy = { ...def, ambientClips: ['Ambient'] };
+  // Jump plus Land opts the rig into the held-jump path Wobbles uses: Jump
+  // clamps while airborne and Land plays as a one-shot on touchdown.
+  VISUALS.mob_training_dummy = {
+    ...def,
+    clips: { ...def.clips, jump: 'Jump', land: 'Land' },
+    ambientClips: ['Ambient'],
+  };
   const { preloadTrainingDummyAssets } = await import('../src/render/characters/assets');
   await preloadTrainingDummyAssets();
   const { createCharacterVisual } = await import('../src/render/characters/index');
@@ -118,7 +127,7 @@ describe('VisualDef.ambientClips', () => {
     expect((visual as unknown as MixerPeek).actions.has('Ambient')).toBe(false);
   });
 
-  it('keeps its own clock through idle, walk, run, jump and back', async () => {
+  it('keeps its own clock through idle, walk, run, jump, landing and back', async () => {
     const visual = await makeVisual();
     const action = ambientAction(visual);
     const states = [
@@ -126,6 +135,7 @@ describe('VisualDef.ambientClips', () => {
       anim({ moving: true, speed: 2 }),
       anim({ moving: true, running: true, speed: 7 }),
       anim({ moving: true, running: true, speed: 7, airborne: true }),
+      anim({ moving: true, running: true, speed: 7 }), // touchdown: the Land one-shot
       anim(),
     ];
     let frames = 0;

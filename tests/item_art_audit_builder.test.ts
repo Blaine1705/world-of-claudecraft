@@ -881,6 +881,8 @@ describe('item-art audit builder', () => {
       // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
       // `--verify-only` on the merged tree.
       // Integration45: 141 new files plus repainted loot, measured by --verify-only.
+      // 2,182 owners / 2,211 live with Wobbles the Slime's reins, re-measured with
+      // `node scripts/item_art_audit.mjs --verify-only` (catalog +523 bytes).
       catalogSha256: 'b15af77b62c38a59cd5aa46ba35c86e395b63a4cec4785966f42bc577d10283f',
       catalogBytes: 1193377,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',

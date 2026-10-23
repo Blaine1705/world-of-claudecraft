@@ -433,6 +433,38 @@ describe('character ClipMaps match the shipped GLBs', () => {
     );
   });
 
+  it('ships every ambient clip, keyed only on bones no state clip keys (VisualDef.ambientClips)', () => {
+    // An ambient clip loops beside the state clips at full weight (visual.ts), so a missing
+    // one fails as silently as any ClipMap name, and one that shares a bone with a state
+    // clip blends against the gait every frame.
+    const ambient = rigs.filter(([, def]) => (def.ambientClips ?? []).length > 0);
+    expect(ambient.map(([key]) => key)).toContain('mount_wobbles_slime');
+    for (const [key, def] of ambient) {
+      for (const standardMaterials of [true, false]) {
+        const loaded = loadedClipNames(def, standardMaterials, key);
+        for (const name of def.ambientClips ?? []) {
+          expect(loaded.has(name), `${key}: ambient clip ${name} is not in the GLB`).toBe(true);
+        }
+      }
+      const urls = [def.url, ...(def.animUrls ?? [])];
+      const targetsOf = (name: string): Set<string> => {
+        const out = new Set<string>();
+        for (const url of urls)
+          for (const node of clipTargetsOf(url).get(name) ?? []) out.add(node);
+        return out;
+      };
+      const stateBones = new Set(clipNamesOf(def).flatMap((name) => [...targetsOf(name)]));
+      expect(stateBones.size, `${key}: state clips key no bones`).toBeGreaterThan(0);
+      for (const name of def.ambientClips ?? []) {
+        expect(targetsOf(name).size, `${key}: ambient clip ${name} keys no bones`).toBeGreaterThan(
+          0,
+        );
+        const shared = [...targetsOf(name)].filter((node) => stateBones.has(node));
+        expect(shared, `${key}: ambient clip ${name} keys bones a state clip keys`).toEqual([]);
+      }
+    }
+  });
+
   it('checks every ClipMap field (a new field must join the gate)', () => {
     for (const [key, def] of rigs) {
       const unknown = Object.keys(def.clips).filter(

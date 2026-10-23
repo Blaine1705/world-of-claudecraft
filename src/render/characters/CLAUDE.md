@@ -860,6 +860,15 @@ one), drawn by that pipeline from the class body; no frame shows those files.
   (crossfade only when the outgoing action still drives the rig, else snap to
   full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
   backstop that re-drives the base pose after 3 starved frames.
+- **Ambient clips (`VisualDef.ambientClips`)** loop for the visual's whole life
+  BESIDE the state clips, on their own clock (Wobbles the Slime's bubbles), so a
+  gait or jump change never restarts them. `CharacterVisual` starts them once at
+  construction and keeps them OUT of `actions`, so crossfades, `stop()` sweeps,
+  gait time-scaling and the `scanAnimRepair` weight scan never see them (an
+  ambient action at weight 1 must not hide a starved base pose); only dispose's
+  `stopAllAction()` ends them. Each must key only bones no state clip keys, or
+  the two blend. Pinned in `tests/character_ambient_clips.test.ts` and, per
+  manifest def, `tests/character_clipmaps.test.ts`.
 
 ## The visual reuse pool (`visual_pool.ts` + `visual_pool_policy.ts` + `pooled_visual_lifecycle.ts`)
 `renderer.ts` routes non-player character visuals through a bounded,

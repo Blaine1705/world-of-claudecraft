@@ -3,18 +3,19 @@
 A big blue jelly slime with a saddle, blanket, girth straps and stirrups,
 built from `concept.webp` (top, side and front views). In game it is the
 mount `wobbles_slime` ("Wobbles the Slime"), developer-only for now
-(`DEVELOPER_MOUNTS`). It has the gold sprite mount's seat contract
-(`docs/design/sprite-mount` on `feat/gold-sprite-mount`) and its clips plus a
-touchdown, but it sits on the ground in its idle instead of hovering, hops to
-move, and jiggles.
+(`DEVELOPER_MOUNTS`). The rider sits on its `saddle` bone (`MountSeatSpec` in
+`src/render/mount_visuals.ts`), and it ships Idle, Walk, Run, Jump and Land
+plus an ambient Bubbles loop (`VisualDef.ambientClips`). It sits on the ground
+in its idle, hops to move, and jiggles.
 
 ## Files
 
-- `concept.webp`: the turnaround the model was built from.
+- `concept.webp`: the turnaround the model was built from, an AI-generated
+  concept supplied by the project owner.
 - `slime_tripo.glb`: the Tripo model, the source of the tack. Made with the
-  asset pipeline's multiview input (`prop --front --left --right` on
-  `feat/tripo-multiview`, `--face-limit 12000`) from the front view and the side
-  view and its mirror. Tripo calls the view from the viewer's left `--left`, so
+  Tripo multiview input (front, left and right views, a 12,000 face limit;
+  the multiview option is not in this branch's asset pipeline) from the front
+  view and the side view and its mirror. Tripo calls the view from the viewer's left `--left`, so
   the concept's side view, which faces right, went in as `--right`. Textures
   were shrunk to 1024 px WebP for the repo.
 - `assemble_mount.py`: the static mount. It finds the jelly by colour, grown
