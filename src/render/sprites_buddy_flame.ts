@@ -279,8 +279,13 @@ function stepFlames(state: SpritesBuddyFlameState, frame: number): void {
   const now = performance.now();
   let dt = (now - state.at) / 1000;
   state.at = now;
-  if (!(dt > 0) || dt > MAX_FRAME_GAP_S) {
-    for (const flame of state.flames) flame.motion.primed = false;
+  // A second render in the same tick under a coarse clock is not a step: skip
+  // it rather than re-priming, or a flame drawn twice a frame never leans.
+  if (!(dt > 0)) return;
+  if (dt > MAX_FRAME_GAP_S) {
+    // Back from out of the scene (or a hidden tab): start upright again rather
+    // than springing back from wherever it was leaning when it left.
+    for (const flame of state.flames) flame.motion = createSpriteFlameState();
     dt = 0;
   }
   if (!state.reducedMotion()) state.time += dt;
@@ -314,8 +319,13 @@ function stepFlames(state: SpritesBuddyFlameState, frame: number): void {
   }
 }
 
+/** Each flame mesh's rig state, kept off userData (a cycle there would break
+ *  any clone or toJSON of a live buddy root). */
+const FLAME_RIGS = new WeakMap<THREE.Object3D, SpritesBuddyFlameState>();
+
 function drawFlame(this: THREE.Mesh, renderer: THREE.WebGLRenderer): void {
-  stepFlames(this.userData.flameRig as SpritesBuddyFlameState, renderer.info.render.frame);
+  const rig = FLAME_RIGS.get(this);
+  if (rig) stepFlames(rig, renderer.info.render.frame);
   const values = this.userData.flameUniforms as FlameUniformValues;
   const material = this.material as THREE.ShaderMaterial;
   const u = material.uniforms;
@@ -357,7 +367,7 @@ export function attachSpritesBuddyFlame(
     const mesh = markRigFx(new THREE.Mesh(flameGeometry(), flameMaterial(orb)));
     mesh.name = `${FLAME_NAME}_${orb}`;
     mesh.userData.flameUniforms = values;
-    mesh.userData.flameRig = state;
+    FLAME_RIGS.set(mesh, state);
     mesh.onBeforeRender = drawFlame;
     // Never culled on the bind-pose bounds of a mesh whose top bends.
     mesh.frustumCulled = false;
@@ -366,9 +376,4 @@ export function attachSpritesBuddyFlame(
   for (const flame of state.flames) flame.bone.add(flame.mesh);
   root.userData[STATE_KEY] = state;
   return true;
-}
-
-/** Every flame material, for a warm-up pass to compile ahead of first sight. */
-export function spritesBuddyFlameMaterials(): THREE.Material[] {
-  return ORBS.map(flameMaterial);
 }

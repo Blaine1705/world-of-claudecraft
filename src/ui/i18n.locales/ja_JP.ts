@@ -19419,6 +19419,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'イーストブルック渓谷の生け垣から来た雌狐。冬枯れの茂みごしに覗く炭のように赤い毛からその名がついた。土地の罠師たちは何世代も前に子狐を狙うのをやめ、代わりに餌を置くようになった。',
   'hudChrome.collections.buddyLore.emerald_wolf':
     'レイスウッドの子狼。林床までほとんど届かない木漏れ日の下では、その毛は緑に見える。森が残していった孤児は、どれもウォーデンたちが育てる。',
+  'hudChrome.collections.buddyLore.sprites':
+    '金色とティール色、ふたつの小さな火の精。どちらが先頭か、いつまでも決まらない。近づきすぎると緑の炎ひとつに溶け合い、また笑いながら離れていく。',
   'hudChrome.collections.buddyLore.forgemaw':
     '最後の泉のるつぼで鍛えられ、ついに完成しなかったもの。槌の音がまだ響くうちにイグニヴァルの鋳場から歩み出た。見つけられるのはヒロイックの踏破だけだ。この溶けたものは自分を作った炉へ戻り続け、二度炎を生き延びた者について家まで来る。',
   'hudChrome.collections.buddyLore.frog':

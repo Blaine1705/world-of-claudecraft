@@ -592,15 +592,6 @@ export function shouldInterruptLanding(
   return s.moving || s.airborne || s.swimming;
 }
 
-/**
- * `hasWadeClip` defaults TRUE so the state machine's own rule (wading beats the
- * dry gait) is what a caller gets by default. A rig with no wade cycle passes
- * false: it must not enter the state at all, because `baseAction` would cover
- * the POSE with the dry walk while `locomotionTimeScale` still ran it at the
- * wade tempo. It is a parameter rather than a doctored `AnimState` because the
- * caller is a per-entity per-frame path, and cloning the state to override one
- * flag allocated a fresh object every frame for every rig standing in a ford.
- */
 /** Width (seconds) of the window either side of a looping idle's wrap in which
  *  a seam-held fidget may fire (ClipMap.idleVariantsOnLoopSeam). Wider than a
  *  frame so a low frame rate cannot step over it. */
@@ -638,6 +629,15 @@ export function drawIdleVariant(
   return bag.shift() as string;
 }
 
+/**
+ * `hasWadeClip` defaults TRUE so the state machine's own rule (wading beats the
+ * dry gait) is what a caller gets by default. A rig with no wade cycle passes
+ * false: it must not enter the state at all, because `baseAction` would cover
+ * the POSE with the dry walk while `locomotionTimeScale` still ran it at the
+ * wade tempo. It is a parameter rather than a doctored `AnimState` because the
+ * caller is a per-entity per-frame path, and cloning the state to override one
+ * flag allocated a fresh object every frame for every rig standing in a ford.
+ */
 export function desiredBaseState(
   s: AnimState,
   hasWalkBackClip: boolean,

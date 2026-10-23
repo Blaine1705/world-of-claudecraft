@@ -19378,6 +19378,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이스트브룩 골짜기의 산울타리에서 온 암여우로, 겨울 덤불 사이로 비치는 숯빛 붉은 털에서 이름을 얻었다. 그곳 사냥꾼들은 몇 세대 전에 새끼 잡기를 포기하고, 대신 먹이를 내놓기 시작했다.',
   'hudChrome.collections.buddyLore.emerald_wolf':
     '망령숲의 새끼 늑대로, 숲 바닥까지 거의 닿지 않는 잎새 사이 빛 아래에서는 털이 초록빛을 띤다. 숲이 남긴 고아는 어떤 것이든 관리인들이 거두어 기른다.',
+  'hudChrome.collections.buddyLore.sprites':
+    '금빛과 청록빛, 두 작은 불의 정령입니다. 누가 앞장설지 좀처럼 정하지 못합니다. 가까이 붙으면 하나의 초록 불꽃으로 합쳐졌다가, 웃으며 다시 갈라집니다.',
   'hudChrome.collections.buddyLore.forgemaw':
     '마지막 샘의 도가니에서 벼려졌으나 끝내 완성되지 못한 것으로, 망치질이 아직 이어지는 동안 이그니바르의 주조장을 제 발로 걸어 나왔다. 오직 영웅 난이도의 공략만이 그를 찾아낸다. 이 용융체는 자신을 만든 화로로 자꾸 돌아가고, 불길을 두 번 살아남은 자를 따라 집까지 온다.',
   'hudChrome.collections.buddyLore.frog':
@@ -19468,7 +19470,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.skeleton': '마른 뼈가 당신의 걸음에 맞춰 덜그럭거립니다.',
   'hudChrome.collections.presence.crystal_lich':
     '잔해에서 차가운 웅웅거림이 피어오르고, 그것이 당신을 지켜봅니다.',
-  'hudChrome.collections.presence.sprites': '작은 불꽃 두 개가 당신에게 옮겨붙었고, 꺼질 기미가 없다.',
+  'hudChrome.collections.presence.sprites':
+    '작은 불꽃 두 개가 당신에게 옮겨붙었고, 꺼질 기미가 없습니다.',
   'hudChrome.collections.presence.forgemaw':
     '용광로의 열기가 아직 당신을 떠나지 않았습니다. 무언가가 그것과 함께 걸어 나왔습니다.',
   'hudChrome.collections.presence.crystal_tide':

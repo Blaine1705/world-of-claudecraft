@@ -56,7 +56,7 @@ describe('account buddy persistence', () => {
     expect(ACCOUNT_BUDDIES_SCHEMA).toContain(
       'PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE',
     );
-    expect(ACCOUNT_BUDDIES_SCHEMA).toContain('cardinality(owned) <= 4');
+    expect(ACCOUNT_BUDDIES_SCHEMA).toContain('cardinality(owned) <= 5');
   });
 
   it('coalesces concurrent joins, projects legacy keys in SQL, and releases the flight after failure', async () => {
@@ -75,7 +75,7 @@ describe('account buddy persistence', () => {
     expect(sql).toContain('DELETE FROM character_buddy_grants');
     expect(sql).toContain('ON CONFLICT (account_id) DO UPDATE');
     expect(values[0]).toBe(7);
-    expect(values[1]).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sapling']);
+    expect(values[1]).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sapling', 'sprites']);
     reject(new Error('temporary'));
     await expect(first).rejects.toThrow('temporary');
     db.query.mockResolvedValueOnce({ rows: [{ owned: ['horse'] }] });

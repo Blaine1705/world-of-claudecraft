@@ -18502,6 +18502,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '出自東溪谷樹籬間的母狐，得名於冬日枯叢中透出的炭紅皮毛。那裡的獵人幾代之前就不再打幼崽的主意，改成替牠們留下食物。',
   'hudChrome.collections.buddyLore.emerald_wolf':
     '一隻怨靈林的幼狼，皮毛在幾乎照不到林底的樹冠餘光裡泛著綠色。守林人會把森林留下的每一隻孤兒養大。',
+  'hudChrome.collections.buddyLore.sprites':
+    '兩隻小小的火精，一金一青，總也說不好誰該打頭。靠得夠近時，它們會融成一團綠焰，隨後又笑著分開。',
   'hudChrome.collections.buddyLore.forgemaw':
     '在最後泉源熔爐中鍛造，卻始終沒有真正完工——錘聲未歇，牠便自己走出了伊格尼瓦的鑄場。只有英雄難度的下潛才能找到牠：這熔融之物總會回到造出牠的那座爐子，然後跟著兩度熬過烈火的人回家。',
   'hudChrome.collections.buddyLore.frog':

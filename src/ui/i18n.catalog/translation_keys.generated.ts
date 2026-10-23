@@ -13521,6 +13521,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.collections.buddyLore.skeleton'
   | 'hudChrome.collections.buddyLore.solbot'
   | 'hudChrome.collections.buddyLore.spider'
+  | 'hudChrome.collections.buddyLore.sprites'
   | 'hudChrome.collections.buddyLore.stag'
   | 'hudChrome.collections.buddyLore.tiger'
   | 'hudChrome.collections.buddyLore.triple_t'

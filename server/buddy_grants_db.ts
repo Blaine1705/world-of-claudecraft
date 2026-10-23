@@ -59,7 +59,7 @@ export async function takePendingBuddyGrants(characterId: number): Promise<Buddy
        INSERT INTO account_buddies AS current (account_id, owned)
        SELECT c.account_id, array_agg(DISTINCT g.buddy_key)
          FROM consumed g JOIN characters c ON c.id = $1
-        WHERE g.buddy_key = ANY(ARRAY['horse','crystal_lich','forgemaw']::text[])
+        WHERE g.buddy_key = ANY(ARRAY['horse','crystal_lich','forgemaw','sprites']::text[])
         GROUP BY c.account_id
        ON CONFLICT (account_id) DO UPDATE SET owned = ARRAY(
          SELECT DISTINCT key FROM unnest(current.owned || EXCLUDED.owned) AS key ORDER BY key)

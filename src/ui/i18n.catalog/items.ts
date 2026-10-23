@@ -2893,13 +2893,13 @@ const ITEM_ENTITY_IDS = [
   'whistle_skeleton',
   'whistle_crystal_lich',
   'whistle_forgemaw',
+  'whistle_sprites',
   'whistle_crystal_tide',
   'whistle_phantom',
   'whistle_emberfall_phoenix',
   // Buddy cosmetic charms (content/buddy_cosmetics.ts tokens).
   'charm_stag_acorn',
   'charm_stag_gilded',
-  'whistle_sprites',
   // Crucible raid professions (docs/prd/ignivar-raid-professions.md).
   'lastflame_core',
   'forgefathers_ember',
@@ -4384,12 +4384,12 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   whistle_skeleton: 'Skeleton Whistle',
   whistle_crystal_lich: 'Crystal Lich Whistle',
   whistle_forgemaw: 'Forgemaw The Molten Whistle',
+  whistle_sprites: 'Flicker and Glimmer Whistle',
   whistle_crystal_tide: 'Crystal Tide Whistle',
   whistle_phantom: 'Phantom Whistle',
   whistle_emberfall_phoenix: 'Emberfall Phoenix Whistle',
   charm_stag_acorn: 'Acorn Crown Charm',
   charm_stag_gilded: 'Gilded Charm',
-  whistle_sprites: 'Flicker and Glimmer Whistle',
   // Crucible raid professions, English-appended like the waves above (the
   // maintainer fills every locale at release).
   lastflame_core: 'Core of the Last Flame',
