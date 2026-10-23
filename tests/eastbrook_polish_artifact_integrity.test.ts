@@ -1430,7 +1430,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No capture was retaken.
   // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
-  'a8063e568657f31634562833e434f5ad6ddcb9873003a80954913b2c7d958291';
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '20ee36a96af467c98e047d1ba24b767c21acabffd3fc6a281317b63484d93519';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1482,7 +1484,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No capture was retaken.
   // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
-  'ed346f4bbd9126e4c809f44c17230950d39cb7e69afd37cbcd252b7208248448';
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '2f8e1f2970bd5e63bee1048daccd858af9ba34ca81faaf6dc657fde691a2ed52';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2885,7 +2889,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('2ceee6b40cf9345be5f582db48e6162b9c60deb7d63746ff0ee2f4ecd4c022f1');
+      // One-colour market canopies on the current integration base: recomputed
+      // from the swept evidence. No capture was retaken.
+    ).toBe('f0064ae7146b803966beec3bee8a2b11b9fc84eb36952569f3d9a357c7201dc8');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -733,7 +733,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No capture was retaken.
   // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
-  'ed346f4bbd9126e4c809f44c17230950d39cb7e69afd37cbcd252b7208248448';
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '2f8e1f2970bd5e63bee1048daccd858af9ba34ca81faaf6dc657fde691a2ed52';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
