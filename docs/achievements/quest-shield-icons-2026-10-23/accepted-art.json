@@ -50,14 +50,14 @@
     "reviewer": "Codex",
     "sizesInspected": [512, 128, 40, 28, 22],
     "additionalModes": ["28-grayscale", "64-circle"],
-    "sheetPath": "docs/screenshots/quest-shield-icons/size-review.png",
+    "sheetPath": "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/size-review.png",
     "verdict": "Accepted: distinct round, kite and tower silhouettes, complete centered subjects, tactile materials, warm top-left light, opaque painted grounds, no writing or baked frame. One framing edit per painting added safe padding.",
     "inGameReview": "Passed: all three quest reward icons on desktop and Lychgate Buckler on mobile, captured through the offline quest dialog as a paladin.",
     "inGameEvidence": [
-      "docs/screenshots/quest-shield-icons/in-game/01-quest-shield-rewards-eastbrook-desktop.png",
-      "docs/screenshots/quest-shield-icons/in-game/02-quest-shield-rewards-mirefen-desktop.png",
-      "docs/screenshots/quest-shield-icons/in-game/03-quest-shield-rewards-thornpeak-desktop.png",
-      "docs/screenshots/quest-shield-icons/in-game/04-quest-shield-rewards-eastbrook-mobile.png"
+      "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/01-quest-shield-rewards-eastbrook-desktop.png",
+      "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/02-quest-shield-rewards-mirefen-desktop.png",
+      "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/03-quest-shield-rewards-thornpeak-desktop.png",
+      "docs/screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/04-quest-shield-rewards-eastbrook-mobile.png"
     ]
   },
   "assets": [

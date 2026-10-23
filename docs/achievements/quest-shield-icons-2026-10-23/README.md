@@ -15,7 +15,7 @@ retains the exact generation and edit prompts, source and shipping hashes,
 reference roles, processing, and review results. Original PNGs and 512px masters
 remain in ignored `tmp/imagegen/quest-shields/`.
 
-[Size review](../../screenshots/quest-shield-icons/size-review.png): rows are
+[Size review](../../screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/size-review.png): rows are
 buckler, kite, tower; columns are 512, 128, 40, 28, 22, 28 grayscale, 64 circular.
 The three items now leave the art-pending ledger and resolve their own static URLs.
 Quest rewards, stats, held models, and localization remain unchanged.
@@ -26,10 +26,10 @@ The original PR's reward screenshots provide the procedural-icon baseline.
 
 | Quest | Before | Painted icon |
 | --- | --- | --- |
-| The Restless Dead | [Before](../../screenshots/quest-shields/after-eastbrook-desktop.png) | [After](../../screenshots/quest-shield-icons/in-game/01-quest-shield-rewards-eastbrook-desktop.png) |
-| The Sunken Bastion | [Before](../../screenshots/quest-shields/after-mirefen-desktop.png) | [After](../../screenshots/quest-shield-icons/in-game/02-quest-shield-rewards-mirefen-desktop.png) |
-| The Revenant Fields | [Before](../../screenshots/quest-shields/after-thornpeak-desktop.png) | [After](../../screenshots/quest-shield-icons/in-game/03-quest-shield-rewards-thornpeak-desktop.png) |
-| The Restless Dead (mobile) | [Before](../../screenshots/quest-shields/after-eastbrook-mobile.png) | [After](../../screenshots/quest-shield-icons/in-game/04-quest-shield-rewards-eastbrook-mobile.png) |
+| The Restless Dead | [Before](../../screenshots/quest-shields/after-eastbrook-desktop.png) | [After](../../screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/01-quest-shield-rewards-eastbrook-desktop.png) |
+| The Sunken Bastion | [Before](../../screenshots/quest-shields/after-mirefen-desktop.png) | [After](../../screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/02-quest-shield-rewards-mirefen-desktop.png) |
+| The Revenant Fields | [Before](../../screenshots/quest-shields/after-thornpeak-desktop.png) | [After](../../screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/03-quest-shield-rewards-thornpeak-desktop.png) |
+| The Restless Dead (mobile) | [Before](../../screenshots/quest-shields/after-eastbrook-mobile.png) | [After](../../screenshots/item-art-consistency-2026-08-09/quest-shield-icons-2026-10-23/in-game/04-quest-shield-rewards-eastbrook-mobile.png) |
 
 ## Validation
 
