@@ -16,6 +16,7 @@ import {
   purchaseAccountBuddy,
   readAccountBuddyBatch,
 } from '../../server/account_buddies_db';
+import { BUDDY_KEYS } from '../../src/sim/content/buddies';
 
 beforeEach(() => {
   db.query.mockReset();
@@ -59,6 +60,25 @@ describe('account buddy persistence', () => {
     expect(ACCOUNT_BUDDIES_SCHEMA).toContain('cardinality(owned) <= 5');
   });
 
+  it('keeps the account CHECK in step with the buddy catalog', () => {
+    // A new buddy that misses the CHECK breaks its online and admin grants at
+    // the database, not in a unit test; tie both copies of the key list and
+    // the cardinality to BUDDY_KEYS so the next one fails here instead.
+    const arrays = [
+      ...ACCOUNT_BUDDIES_SCHEMA.matchAll(
+        /cardinality\(owned\) <= (\d+) AND owned <@ ARRAY\[([^\]]*)\]/g,
+      ),
+    ];
+    expect(arrays).toHaveLength(2);
+    for (const [, cardinality, list] of arrays) {
+      expect(Number(cardinality)).toBe(BUDDY_KEYS.length);
+      expect(list.split(',').map((key) => key.trim().replace(/'/g, ''))).toEqual([...BUDDY_KEYS]);
+    }
+    // The one-time upgrade guard keys on the newest buddy, so a database
+    // still on the previous constraint widens once on boot.
+    expect(ACCOUNT_BUDDIES_SCHEMA).toContain(`NOT LIKE '%''${BUDDY_KEYS.at(-1)}''%'`);
+  });
+
   it('coalesces concurrent joins, projects legacy keys in SQL, and releases the flight after failure', async () => {
     let reject!: (reason: Error) => void;
     db.query.mockReturnValueOnce(
@@ -75,7 +95,7 @@ describe('account buddy persistence', () => {
     expect(sql).toContain('DELETE FROM character_buddy_grants');
     expect(sql).toContain('ON CONFLICT (account_id) DO UPDATE');
     expect(values[0]).toBe(7);
-    expect(values[1]).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sapling', 'sprites']);
+    expect(values[1]).toEqual([...BUDDY_KEYS]);
     reject(new Error('temporary'));
     await expect(first).rejects.toThrow('temporary');
     db.query.mockResolvedValueOnce({ rows: [{ owned: ['horse'] }] });
