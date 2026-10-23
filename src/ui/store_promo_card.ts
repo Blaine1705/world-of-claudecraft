@@ -102,6 +102,40 @@ export function storePromoLabels(): Record<
   };
 }
 
+export interface StorePromoSlideDeps {
+  openStore(): void;
+  openReferralCards(): void;
+  membershipActive(): boolean;
+}
+
+/** The adverts the card rotates through, in order, with the current locale's copy. */
+export function storePromoSlides(deps: StorePromoSlideDeps): StorePromoSlide[] {
+  const labels = storePromoLabels();
+  return [
+    {
+      id: 'armory',
+      image: '/ui/store/season-01-armory-promo.webp',
+      labels: labels.armory,
+      onOpen: deps.openStore,
+    },
+    {
+      // Membership is sold from the Store's subscription section, so this
+      // advert opens the Store too; members have nothing left to buy.
+      id: 'membership',
+      image: '/ui/store/membership-promo.webp',
+      labels: labels.membership,
+      onOpen: deps.openStore,
+      available: () => !deps.membershipActive(),
+    },
+    {
+      id: 'referral',
+      image: '/ui/store/referral-promo.webp',
+      labels: labels.referral,
+      onOpen: deps.openReferralCards,
+    },
+  ];
+}
+
 interface SlideView {
   slide: StorePromoSlide;
   layer: HTMLElement;

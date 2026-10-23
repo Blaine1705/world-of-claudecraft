@@ -904,6 +904,7 @@ import {
   mountStorePromoCard,
   type StorePromoCardController,
   storePromoLabels,
+  storePromoSlides,
 } from './store_promo_card';
 import { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { currentSubzone } from './subzone';
@@ -16805,31 +16806,12 @@ export class Hud {
     if (this.storePromoCard || !this.claudiumHooks) return;
     const host = document.getElementById('chatlog-wrap');
     if (!host) return;
-    const labels = storePromoLabels();
     this.storePromoCard = mountStorePromoCard(host, {
-      slides: [
-        {
-          id: 'armory',
-          image: '/ui/store/season-01-armory-promo.webp',
-          labels: labels.armory,
-          onOpen: () => this.openWocStore(),
-        },
-        {
-          // Membership is sold from the Store's subscription section, so this
-          // advert opens the Store too; members have nothing left to buy.
-          id: 'membership',
-          image: '/ui/store/membership-promo.webp',
-          labels: labels.membership,
-          onOpen: () => this.openWocStore(),
-          available: () => this.sim.player?.membershipActive !== true,
-        },
-        {
-          id: 'referral',
-          image: '/ui/store/referral-promo.webp',
-          labels: labels.referral,
-          onOpen: () => this.referralCards.open(),
-        },
-      ],
+      slides: storePromoSlides({
+        openStore: () => this.openWocStore(),
+        openReferralCards: () => this.referralCards.open(),
+        membershipActive: () => this.sim.player?.membershipActive === true,
+      }),
       returnFocusTo: () => document.getElementById('daily-rewards-button'),
       onDismiss: () => {
         this.storePromoCard = null;

@@ -9,6 +9,7 @@ import {
   shouldShowStorePromo,
   storePromoLabels,
   storePromoReservedHeight,
+  storePromoSlides,
 } from '../src/ui/store_promo_card';
 
 type FakeListener = (event: { preventDefault(): void; stopPropagation(): void }) => void;
@@ -354,6 +355,29 @@ describe('store promo card', () => {
     expect(labels.armory.title).toBe('The Armory');
     expect(labels.membership).toMatchObject({ title: 'Membership', cta: 'Join now' });
     expect(labels.referral).toMatchObject({ title: 'Refer a Friend', cta: 'Invite friends' });
+  });
+
+  it('routes each advert to its destination and hides membership from members', () => {
+    let member = false;
+    const deps = {
+      openStore: vi.fn(),
+      openReferralCards: vi.fn(),
+      membershipActive: () => member,
+    };
+    const slides = storePromoSlides(deps);
+    expect(slides.map((slide) => slide.id)).toEqual(['armory', 'membership', 'referral']);
+    expect(slides.map((slide) => slide.image)).toEqual([
+      '/ui/store/season-01-armory-promo.webp',
+      '/ui/store/membership-promo.webp',
+      '/ui/store/referral-promo.webp',
+    ]);
+    slides[1].onOpen();
+    slides[2].onOpen();
+    expect(deps.openStore).toHaveBeenCalledOnce();
+    expect(deps.openReferralCards).toHaveBeenCalledOnce();
+    expect(slides[1].available?.()).toBe(true);
+    member = true;
+    expect(slides[1].available?.()).toBe(false);
   });
 
   it('uses a comfortably sized close target on the promo card', () => {
