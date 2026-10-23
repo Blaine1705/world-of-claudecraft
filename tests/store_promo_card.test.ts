@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   mountStorePromoCard,
   nextStorePromoIndex,
+  STORE_PROMO_RETIRE_GUARD_MS,
   STORE_PROMO_ROTATE_MS,
   type StorePromoSlide,
   shouldShowStorePromo,
@@ -276,6 +277,7 @@ describe('store promo card', () => {
   });
 
   it('retires only the advert it closes or opens, removing the card after the last', () => {
+    vi.useFakeTimers();
     const { host, returnTarget } = fixture();
     const onReferral = vi.fn();
     const onDismiss = vi.fn();
@@ -290,10 +292,165 @@ describe('store promo card', () => {
     expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/referral-promo.webp');
     expect(onDismiss).not.toHaveBeenCalled();
 
+    vi.advanceTimersByTime(STORE_PROMO_RETIRE_GUARD_MS);
     host.querySelector('.store-promo-card-open')?.dispatch('click');
     expect(onReferral).toHaveBeenCalledOnce();
     expect(onDismiss).toHaveBeenCalledOnce();
     expect(host.querySelector('.store-promo-card')).toBeNull();
+  });
+
+  it('stays still while either the pointer or keyboard focus remains on the card', () => {
+    vi.useFakeTimers();
+    const { host, returnTarget } = fixture();
+    mountStorePromoCard(asHtml(host), {
+      slides: [armorySlide(), referralSlide()],
+      returnFocusTo: () => asHtml(returnTarget),
+      reducedMotion: () => false,
+    });
+    const card = host.querySelector('.store-promo-card');
+    const armory = '/ui/store/season-01-armory-promo.webp';
+
+    card?.dispatch('focusin');
+    card?.dispatch('mouseenter');
+    card?.dispatch('mouseleave');
+    vi.advanceTimersByTime(STORE_PROMO_ROTATE_MS * 2);
+    expect(activeSlide(host)?.querySelector('img')?.src).toBe(armory);
+
+    card?.dispatch('mouseenter');
+    card?.dispatch('focusout');
+    vi.advanceTimersByTime(STORE_PROMO_ROTATE_MS * 2);
+    expect(activeSlide(host)?.querySelector('img')?.src).toBe(armory);
+
+    card?.dispatch('mouseleave');
+    vi.advanceTimersByTime(STORE_PROMO_ROTATE_MS);
+    expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/referral-promo.webp');
+  });
+
+  it('keeps focus on close while adverts remain, then returns it to the chest', () => {
+    vi.useFakeTimers();
+    const { document, host, returnTarget } = fixture();
+    mountStorePromoCard(asHtml(host), {
+      slides: [armorySlide(), referralSlide()],
+      returnFocusTo: () => asHtml(returnTarget),
+    });
+    const close = host.querySelector('.store-promo-card-close');
+
+    close?.dispatch('click');
+    expect(document.activeElement).toBe(close);
+    expect(close?.getAttribute('aria-label')).toBe('Close Refer a Friend promotion');
+
+    vi.advanceTimersByTime(STORE_PROMO_RETIRE_GUARD_MS);
+    close?.dispatch('click');
+    expect(document.activeElement).toBe(returnTarget);
+    expect(host.querySelector('.store-promo-card')).toBeNull();
+  });
+
+  it('ignores a second click that lands inside the retire guard', () => {
+    vi.useFakeTimers();
+    const { host, returnTarget } = fixture();
+    const onDismiss = vi.fn();
+    mountStorePromoCard(asHtml(host), {
+      slides: [armorySlide(), referralSlide()],
+      returnFocusTo: () => asHtml(returnTarget),
+      onDismiss,
+    });
+    const close = host.querySelector('.store-promo-card-close');
+
+    close?.dispatch('click');
+    close?.dispatch('click');
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/referral-promo.webp');
+  });
+
+  it('does not rotate on its own under reduced motion', () => {
+    vi.useFakeTimers();
+    const { host, returnTarget } = fixture();
+    mountStorePromoCard(asHtml(host), {
+      slides: [armorySlide(), referralSlide()],
+      returnFocusTo: () => asHtml(returnTarget),
+      reducedMotion: () => true,
+    });
+
+    vi.advanceTimersByTime(STORE_PROMO_ROTATE_MS * 3);
+    expect(activeSlide(host)?.querySelector('img')?.src).toBe(
+      '/ui/store/season-01-armory-promo.webp',
+    );
+  });
+
+  it('drops the last advert once it stops being available', () => {
+    vi.useFakeTimers();
+    const { host, returnTarget } = fixture();
+    let member = false;
+    const onDismiss = vi.fn();
+    mountStorePromoCard(asHtml(host), {
+      slides: [
+        referralSlide(),
+        {
+          id: 'membership',
+          image: '/ui/store/membership-promo.webp',
+          labels: armoryLabels,
+          onOpen: vi.fn(),
+          available: () => !member,
+        },
+      ],
+      returnFocusTo: () => asHtml(returnTarget),
+      reducedMotion: () => true,
+      onDismiss,
+    });
+
+    // Close Refer a Friend, leaving membership as the only advert.
+    host.querySelector('.store-promo-card-close')?.dispatch('click');
+    expect(activeSlide(host)?.querySelector('img')?.src).toBe('/ui/store/membership-promo.webp');
+    member = true;
+    vi.advanceTimersByTime(STORE_PROMO_ROTATE_MS);
+    expect(onDismiss).toHaveBeenCalledOnce();
+    expect(host.querySelector('.store-promo-card')).toBeNull();
+  });
+
+  it('marks the dot of an advert that is not available as retired', () => {
+    const { host, returnTarget } = fixture();
+    mountStorePromoCard(asHtml(host), {
+      slides: [
+        armorySlide(),
+        {
+          id: 'membership',
+          image: '/ui/store/membership-promo.webp',
+          labels: armoryLabels,
+          onOpen: vi.fn(),
+          available: () => false,
+        },
+      ],
+      returnFocusTo: () => asHtml(returnTarget),
+    });
+    const dots = host.querySelector('.store-promo-card-dots')?.children ?? [];
+    expect(dots.map((dot) => dot.className)).toEqual([
+      'store-promo-card-dot is-active',
+      'store-promo-card-dot is-retired',
+    ]);
+  });
+
+  it('stops rotating once dismissed', () => {
+    vi.useFakeTimers();
+    const { host, returnTarget } = fixture();
+    const onDismiss = vi.fn();
+    const controller = mountStorePromoCard(asHtml(host), {
+      slides: [armorySlide(), referralSlide()],
+      returnFocusTo: () => asHtml(returnTarget),
+      onDismiss,
+    });
+
+    controller.dismiss();
+    controller.dismiss();
+    expect(vi.getTimerCount()).toBe(0);
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
+  it('wires every advert to its Hud destination and relocalizes with live copy', () => {
+    const hud = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain('openStore: () => this.openWocStore(),');
+    expect(hud).toContain('openReferralCards: () => this.referralCards.open(),');
+    expect(hud).toContain('membershipActive: () => this.sim.player?.membershipActive === true,');
+    expect(hud).toContain('this.storePromoCard?.relocalize(storePromoLabels());');
   });
 
   it('never shows an advert whose availability check fails', () => {

@@ -28,6 +28,8 @@ export interface StorePromoCardDeps {
   slides: readonly StorePromoSlide[];
   returnFocusTo(): HTMLElement | null;
   onDismiss?(): void;
+  /** Defaults to the prefers-reduced-motion media query. */
+  reducedMotion?(): boolean;
 }
 
 export interface StorePromoVisibilityInput {
@@ -45,6 +47,8 @@ const STORE_PROMO_ASPECT_WIDTH = 1000;
 export const STORE_PROMO_GAP_PX = 10;
 /** How long each advert holds before the card rotates to the next one. */
 export const STORE_PROMO_ROTATE_MS = 9000;
+/** Clicks this soon after a retire are ignored, so a double click retires one advert. */
+export const STORE_PROMO_RETIRE_GUARD_MS = 450;
 
 /** Visual height reserved above chat for the proportional promo plus its CSS gap. */
 export function storePromoReservedHeight(width: number, uiScale = 1): number {
@@ -207,9 +211,19 @@ export function mountStorePromoCard(
   const live = views.map(() => true);
   let current = -1;
   let dismissed = false;
-  let paused = false;
+  // Pointer and keyboard focus pause independently: either one still on the card
+  // keeps the advert still, so it never changes under a click or a screen reader.
+  let hovered = false;
+  let focused = false;
+  let guardUntil = 0;
   let timer: ReturnType<typeof setInterval> | null = null;
+  const reducedMotion =
+    deps.reducedMotion ??
+    (() =>
+      typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
+  const showable = (index: number): boolean =>
+    live[index] && (views[index].slide.available?.() ?? true);
   const stopTimer = (): void => {
     if (timer !== null) clearInterval(timer);
     timer = null;
@@ -231,7 +245,7 @@ export function mountStorePromoCard(
     views.forEach((view, i) => {
       const active = i === index;
       view.layer.className = `store-promo-card-slide${active ? ' is-active' : ''}`;
-      view.dot.className = `store-promo-card-dot${active ? ' is-active' : ''}${live[i] ? '' : ' is-retired'}`;
+      view.dot.className = `store-promo-card-dot${active ? ' is-active' : ''}${showable(i) ? '' : ' is-retired'}`;
     });
   };
   const advance = (): void => {
@@ -241,19 +255,27 @@ export function mountStorePromoCard(
       current,
     );
     if (next < 0) dismiss();
-    else if (next !== current) show(next);
+    else show(next);
+  };
+  // Under reduced motion the card never rotates on its own; the tick still drops
+  // an advert that stopped being available (membership bought elsewhere).
+  const tick = (): void => {
+    if (reducedMotion() && showable(current)) show(current);
+    else advance();
   };
   const startTimer = (): void => {
     stopTimer();
-    if (dismissed || paused || live.filter(Boolean).length < 2) return;
-    timer = setInterval(advance, STORE_PROMO_ROTATE_MS);
+    if (dismissed || hovered || focused) return;
+    timer = setInterval(tick, STORE_PROMO_ROTATE_MS);
   };
   /** Take the shown advert out of the rotation, then move on or remove the card. */
   const retireCurrent = (): void => {
     live[current] = false;
+    guardUntil = Date.now() + STORE_PROMO_RETIRE_GUARD_MS;
     advance();
     startTimer();
   };
+  const ignoreClick = (): boolean => dismissed || current < 0 || Date.now() < guardUntil;
   const relocalize = (labels: Readonly<Record<string, StorePromoCardLabels>>): void => {
     for (const view of views) {
       const next = labels[view.slide.id];
@@ -269,25 +291,23 @@ export function mountStorePromoCard(
   advance();
   startTimer();
 
-  // Hold the advert still while the pointer or keyboard focus is on the card, so
-  // it never changes under a click or a screen reader's announcement.
-  const pause = (): void => {
-    paused = true;
-    stopTimer();
-  };
-  const resume = (): void => {
-    paused = false;
+  const setHovered = (value: boolean) => (): void => {
+    hovered = value;
     startTimer();
   };
-  card.addEventListener('mouseenter', pause);
-  card.addEventListener('mouseleave', resume);
-  card.addEventListener('focusin', pause);
-  card.addEventListener('focusout', resume);
+  const setFocused = (value: boolean) => (): void => {
+    focused = value;
+    startTimer();
+  };
+  card.addEventListener('mouseenter', setHovered(true));
+  card.addEventListener('mouseleave', setHovered(false));
+  card.addEventListener('focusin', setFocused(true));
+  card.addEventListener('focusout', setFocused(false));
 
   open.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    if (dismissed || current < 0) return;
+    if (ignoreClick()) return;
     // Capture the permanent desktop chest as the destination's focus-return
     // target; the advert retires after opening and cannot safely be that target.
     deps.returnFocusTo()?.focus();
@@ -300,9 +320,12 @@ export function mountStorePromoCard(
   close.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    if (dismissed || current < 0) return;
-    deps.returnFocusTo()?.focus();
+    if (ignoreClick()) return;
     retireCurrent();
+    // While adverts remain, focus stays on this close button (it now names the
+    // next advert); once the card is gone, it returns to the permanent chest.
+    if (dismissed) deps.returnFocusTo()?.focus();
+    else close.focus();
   });
 
   return { dismiss, relocalize };

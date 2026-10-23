@@ -5969,6 +5969,15 @@
   .store-promo-card-dot.is-retired {
     display: none;
   }
+  @media (forced-colors: active) {
+    .store-promo-card-dot {
+      background: CanvasText;
+      forced-color-adjust: none;
+    }
+    .store-promo-card-dot.is-active {
+      background: Highlight;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .store-promo-card-slide,
     .store-promo-card-slide.is-active {
