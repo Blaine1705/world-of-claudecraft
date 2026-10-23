@@ -1528,6 +1528,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': 'Двуручный меч Хайвотча',
   'entities.items.highwatch_wallshield.name': 'Стенной щит Хайвотча',
   'entities.items.eastbrook_buckler.name': 'Истврукский баклер',
+  'entities.items.lychgate_buckler.name': 'Баклер кладбищенских врат',
+  'entities.items.bastion_kite_shield.name': 'Каплевидный щит бастиона',
+  'entities.items.barrowfield_tower_shield.name': 'Башенный щит Курганного поля',
   'entities.abilities.avatar.name': 'Аватара',
   'entities.abilities.bladestorm.name': 'Клинковая буря',
   'entities.abilities.battle_stance.description':
@@ -4953,7 +4956,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.collectEmpty': 'Ничего не ждет. Выручка и истекшие лоты собираются здесь.',
   'itemUi.market.collectNote': 'Выручка и возвращенные товары, которые Торговец хранит для вас.',
   'itemUi.market.saleProceeds': 'Выручка',
-  'itemUi.market.saleOlder': 'Ещё {count} более ранних продаж, включены в общую сумму.',
+  'itemUi.market.saleOlder': 'Ещё {count} более ранних продаж, не показанных в списке.',
   'itemUi.market.collectAll': 'Забрать все',
   'itemUi.market.history': 'История',
   'itemUi.market.historyEmpty':
@@ -20261,4 +20264,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Фосфорная колба',
   'entities.abilities.phosphor_flask.description':
     'Запечатанный сосуд с реактивной химической смесью, которая на 3 сек. вспыхивает раскалённым добела пламенем в области 8 м. Враги, стоящие в пламени, получают {damage} ед. урона от огня каждые 0,5 сек. Урон растёт с силой атаки в дальнем бою.',
+  'hudChrome.options.pixelsValue': '{value} пикс.',
 };

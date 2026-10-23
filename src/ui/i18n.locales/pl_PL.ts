@@ -5108,7 +5108,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Posiadane',
   'hudChrome.warfareShop.weapons': 'Broń',
   'itemUi.market.saleBuyer': 'Kupujący: {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} wcześniejszych sprzedaży, wliczonych w sumę.',
+  'itemUi.market.saleOlder': 'Oraz {count} wcześniejszych sprzedaży, których nie wyświetlono.',
   'itemUi.tooltip.maxStack': 'Maks. stos: {count}',
   'hud.system.deathRecapAbility': 'Zginąłeś. Zabity przez {ability}.',
   'hud.system.deathRecapDrowned': 'Zginąłeś. Utonąłeś.',
@@ -20217,4 +20217,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Fosforowa Kolba',
   'entities.abilities.phosphor_flask.description':
     'Zapieczętowane naczynie z reaktywną mieszanką chemiczną, która przez 3 s wybucha białym, rozżarzonym płomieniem na obszarze 8 m. Wrogowie stojący w płomieniach otrzymują {damage} obrażeń od ognia co 0,5 s. Obrażenia rosną z mocą ataku dystansowego.',
+  'entities.items.lychgate_buckler.name': 'Puklerz cmentarnej bramy',
+  'entities.items.bastion_kite_shield.name': 'Tarcza migdałowa bastionu',
+  'entities.items.barrowfield_tower_shield.name': 'Pawęż Kurhanowego Pola',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Pasek zasobów',
+  'hudChrome.options.hillBarOpacity': 'Krycie tła Władcy wzgórza',
+  'hudChrome.options.playerFrameResourceDetached': 'Odłącz pasek zasobów',
+  'hudChrome.options.playerFrameResourceHeight': 'Wysokość paska zasobów',
+  'hudChrome.options.playerFrameResourceWidth': 'Szerokość paska zasobów',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Włącz Odłącz pasek zasobów na karcie Ramki. Opcja Edytuj ramki odblokuje wtedy także pasek zasobów, dzięki czemu możesz umieścić manę, energię lub gniew osobno w dowolnym miejscu. Szerokość paska zasobów i Wysokość paska zasobów na tej samej karcie zmieniają jego rozmiar. Edytuj ramki odblokowuje także pasek Władcy wzgórza. Krycie tła Władcy wzgórza na tej karcie wygasza jego panel, zachowując czytelność tekstu.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

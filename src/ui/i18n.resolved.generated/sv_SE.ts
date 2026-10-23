@@ -2288,10 +2288,10 @@ export const sv_SE: EnTranslations = {
       "enemyHighlightReticle": "Kraftigare fientligt hårkors",
       "enemyHighlightDistance": "{yards} yard",
       "showPetFrame": "Visa ditt djur",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Koppla loss resursfältet",
+      "playerFrameResourceWidth": "Resursfältets bredd",
+      "playerFrameResourceHeight": "Resursfältets höjd",
+      "hillBarOpacity": "Bakgrundens opacitet för Kungens på kullen",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Visa mina prickar på namnskyltar",
       "nameplateDotScale": "Namnskylt Punktstorlek",
@@ -4409,7 +4409,7 @@ export const sv_SE: EnTranslations = {
         "chat": "Chatt",
         "actionBarGroup": "Handlingsfält",
         "playerFrame": "Spelare",
-        "playerResource": "Resource Bar",
+        "playerResource": "Resursfält",
         "targetFrame": "Mål",
         "partyFrames": "Grupp",
         "swingBar": "Autoattack",
@@ -7589,7 +7589,7 @@ export const sv_SE: EnTranslations = {
       "frameGroups": "{trackers} kan kombinera uppdrag, gärningar, spruckar, utgrävningar, insamlingsmål och Reliquary-spårning. {auras} kan kombinera Mål-prickar och sex auranspår. Aktivera endera grupp i Frames-inställningar, eller lämna det av för att flytta varje ram separat. {tot} inkluderar en resursstav. {focus} har tre oberoende förflyttbara mål: Shift+F1 genom Shift+F3 tilldelar dem; Ctrl+F1 genom Ctrl+F3 väljer dem. Dra skadans eller hotmätaren någonstans utanför dess knappar för att flytta det, och dra dess kanter för att ändra storleken på den, även medan ramar är låsta. Medan ramar är olåsta, Visa eller Dölj ramar har sin egen grupperade meny. Högerklicka en olåst ram för Återställ storlek eller Raminställningar. Interface > Ramar innehåller också Raminställningar och sammanfattningsbar Party Frame-alternativ. Lås Target of Target till Target håller dessa ramar tillsammans. Stäng av det för att flytta Target of Target separat; slå på det igen för att behålla det separata läget för senare. Tilldelade fokusramar döljer sina ställningskontroller; högerklicka och välj Unset Focus för att återställa dem. Mouseover-casting fungerar också på fokusramar.",
       "framesGovernedTalkingHead": "Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Aktivera Koppla loss resursfältet på fliken Ramar så låser Redigera ramar även upp ditt resursfält. Då kan du placera mana, energi eller vrede separat var du vill. Resursfältets bredd och Resursfältets höjd på samma flik ändrar storleken. Redigera ramar låser även upp fältet för Kungens på kullen. Bakgrundens opacitet för Kungens på kullen på samma flik tonar ned panelen medan texten förblir tydlig.",
       "barsTitle": "Mätare, timer och stridstext",
       "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
       "aurasTitle": "Buffar och debuffar",
@@ -13150,7 +13150,7 @@ export const sv_SE: EnTranslations = {
       "historyEmpty": "Ingen försäljning ännu. Föremål du säljer på världsmarknaden visas här.",
       "historyNote": "Din senaste försäljning på världsmarknaden.",
       "saleBuyer": "Sålt till {buyer}",
-      "saleOlder": "Plus {count} tidigare försäljningar, inräknade i totalen.",
+      "saleOlder": "Samt {count} tidigare försäljningar som inte visas.",
       "ordersTab": "Önskat",
       "ordersNote": "Lägg upp vad du vill och guldet hålls hos köpmannen. Listor på eller under ditt pris fylls omedelbar; resten väntar på en säljare. Köpmannen tar en {cut}% avgift från den som levererar. Du har {used}/{max} ordrar öppna.",
       "ordersListAria": "Öppna köpordrar",
@@ -18687,6 +18687,15 @@ export const sv_SE: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Helveteskoger"
+      },
+      "lychgate_buckler": {
+        "name": "Kyrkogårdsportens bucklare"
+      },
+      "bastion_kite_shield": {
+        "name": "Bastionens droppsköld"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Gravhögsfältets tornsköld"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

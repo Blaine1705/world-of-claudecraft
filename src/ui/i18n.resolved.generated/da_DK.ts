@@ -2288,10 +2288,10 @@ export const da_DK: EnTranslations = {
       "enemyHighlightReticle": "Kraftigere fjendtligt sigtekorn",
       "enemyHighlightDistance": "{yards} yards",
       "showPetFrame": "Vis dit kæledyr",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Frigør ressourcebjælke",
+      "playerFrameResourceWidth": "Ressourcebjælkens bredde",
+      "playerFrameResourceHeight": "Ressourcebjælkens højde",
+      "hillBarOpacity": "Baggrundens uigennemsigtighed for Bakkekonge",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Vis mine prikker på navneskiltene",
       "nameplateDotScale": "Navneskilt Prikstørrelse",
@@ -4409,7 +4409,7 @@ export const da_DK: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Handlingsbjælker",
         "playerFrame": "Spiller",
-        "playerResource": "Resource Bar",
+        "playerResource": "Ressourcebjælke",
         "targetFrame": "Mål",
         "partyFrames": "Gruppe",
         "swingBar": "Autoangreb",
@@ -7589,7 +7589,7 @@ export const da_DK: EnTranslations = {
       "frameGroups": "{trackers} kan kombinere opgaver, bedrifter, rifter, dykkelejer, indsamlings-mål og Relikvie-sporing. {auras} kan kombinere Target-prikker og de seks aura-spor. Aktiver hver gruppe i Frames-indstillinger, eller lad det være fra for at flytte hver ramme separat. {tot} inkluderer en ressource-bar. {focus} har tre uafhængigt flytbare mål: Shift+F1 til Shift+F3 tildeler dem; Ctrl+F1 til Ctrl+F3 vælger dem. Træk skade- eller trusselsmåleren hvor som helst uden for dets knapper for at flytte det, og træk dets kanter for at tilpasse størrelse, selv mens rammer er låst. Mens rammer er låst op, har Vis eller Skjul Rammer sin egen grupperet menu. Højreklik en låst op ramme for Nulstil størrelse eller Ramme-muligheder. Interface > Frames indeholder også Frames-indstillinger og sammenfoldelig Party Frame-muligheder. Lås Target af Target til Target holder disse rammer sammen. Slå det fra for at flytte Target af Target separat; at slå det tilbage på bevarer den separate position til senere. Tildelte fokus-rammer skjuler deres setup-kontroller; højreklik og vælg Usæt fokus for at genoprette dem. Mouseover-casting fungerer også på fokus-rammer.",
       "framesGovernedTalkingHead": "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Slå Frigør ressourcebjælke til på fanen Rammer. Så frigør Rediger rammer også din ressourcebjælke, så du kan placere mana, energi eller raseri separat, hvor du vil. Ressourcebjælkens bredde og Ressourcebjælkens højde på samme fane ændrer størrelsen. Rediger rammer frigør også Bakkekonge-bjælken. Baggrundens uigennemsigtighed for Bakkekonge på samme fane nedtoner panelet, mens teksten forbliver tydelig.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
       "aurasTitle": "Forstærkninger og svækkelser",
@@ -13150,7 +13150,7 @@ export const da_DK: EnTranslations = {
       "historyEmpty": "Ingen salg endnu. Varer du sælger på Verden Marked vises her.",
       "historyNote": "Dine seneste salg på Verden Marked.",
       "saleBuyer": "Solgt til {buyer}",
-      "saleOlder": "Plus {count} tidligere salg, medregnet i alt.",
+      "saleOlder": "Samt {count} tidligere salg, der ikke vises.",
       "ordersTab": "Ønsket",
       "ordersNote": "Opret hvad du vil have og guldet holdes hos handlende. Opføringer til eller under din pris fyldes med det samme; resten venter på en sælger. Handlende tager {cut}% gebyr fra den der leverer. Du har {used}/{max} ordrer åbne.",
       "ordersListAria": "Åbne købeordrer",
@@ -18687,6 +18687,15 @@ export const da_DK: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Helvedeskogger"
+      },
+      "lychgate_buckler": {
+        "name": "Kirkegårdslågens rundskjold"
+      },
+      "bastion_kite_shield": {
+        "name": "Bastionens normannerskjold"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Gravhøjsmarkens tårnskjold"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

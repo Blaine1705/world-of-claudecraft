@@ -2288,10 +2288,10 @@ export const pt_BR: EnTranslations = {
       "enemyHighlightReticle": "Retículo hostil mais forte",
       "enemyHighlightDistance": "{yards} jardas",
       "showPetFrame": "Mostrar seu mascote",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Separar barra de recursos",
+      "playerFrameResourceWidth": "Largura da barra de recursos",
+      "playerFrameResourceHeight": "Altura da barra de recursos",
+      "hillBarOpacity": "Opacidade do fundo do Rei da Colina",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Mostrar meus pontos nas placas de identificação",
       "nameplateDotScale": "Tamanho do ponto da placa de identificação",
@@ -4409,7 +4409,7 @@ export const pt_BR: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Barras de Ação",
         "playerFrame": "Jogador",
-        "playerResource": "Resource Bar",
+        "playerResource": "Barra de recursos",
         "targetFrame": "Alvo",
         "partyFrames": "Grupo",
         "swingBar": "Ataque Automático",
@@ -7589,7 +7589,7 @@ export const pt_BR: EnTranslations = {
       "frameGroups": "{trackers} podem combinar missões, feitos, fendas, incursões, metas de coleta e o rastreamento do Relicário. {auras} podem combinar os DoTs no alvo e as seis fileiras de auras. Ative qualquer um dos grupos em Configurações de Quadros, ou deixe desativado para mover cada quadro separadamente. {tot} inclui uma barra de recurso. {focus} tem três alvos que se movem de forma independente: Shift+F1 até Shift+F3 os atribui; Ctrl+F1 até Ctrl+F3 os seleciona. Arraste o medidor de dano ou de ameaça para fora dos seus botões para movê-lo, e arraste suas bordas para redimensioná-lo, mesmo com os quadros travados. Enquanto os quadros estão destravados, Mostrar ou Ocultar Quadros tem seu próprio menu agrupado. Clique com o botão direito em um quadro destravado para Redefinir tamanho ou Opções de Quadro. Interface > Quadros também contém Configurações de Quadros e as Opções de Quadros de Grupo, que podem ser recolhidas. Travar Alvo do Alvo ao Alvo mantém esses quadros juntos. Desative para mover o Alvo do Alvo separadamente; reativar preserva a posição separada para depois. Quadros de foco atribuídos escondem seus controles de configuração; clique com o botão direito e escolha Remover Foco para restaurá-los. A conjuração ao apontar também funciona nos quadros de foco.",
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Ative Separar barra de recursos na aba Quadros para que Editar Quadros também libere sua barra de recursos, permitindo posicionar mana, energia ou raiva separadamente onde quiser. Largura da barra de recursos e Altura da barra de recursos, na mesma aba, ajustam seu tamanho. Editar Quadros também libera a barra do Rei da Colina; Opacidade do fundo do Rei da Colina, nessa aba, esmaece o painel sem prejudicar a leitura do texto.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
       "aurasTitle": "Benefícios e penalidades",
@@ -13150,7 +13150,7 @@ export const pt_BR: EnTranslations = {
       "historyEmpty": "Nenhuma venda ainda. Itens que você vender no Mercado Mundial aparecem aqui.",
       "historyNote": "Suas vendas recentes no Mercado Mundial.",
       "saleBuyer": "Vendido para {buyer}",
-      "saleOlder": "Mais {count} vendas anteriores, incluídas no total.",
+      "saleOlder": "Mais {count} vendas anteriores não listadas.",
       "ordersTab": "Procurados",
       "ordersNote": "Publique o que você quer e o ouro fica retido com o Mercador. Listagens no seu preço ou abaixo dele são atendidas na hora; o restante espera por um vendedor. O Mercador cobra {cut}% de quem entregar. Você tem {used}/{max} pedidos abertos.",
       "ordersListAria": "Pedidos de compra abertos",
@@ -18687,6 +18687,15 @@ export const pt_BR: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Aljava infernal"
+      },
+      "lychgate_buckler": {
+        "name": "Broquel do portão do cemitério"
+      },
+      "bastion_kite_shield": {
+        "name": "Escudo de pipa do bastião"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Escudo torre do Campo dos Túmulos"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

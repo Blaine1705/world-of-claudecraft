@@ -5106,7 +5106,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Dimiliki',
   'hudChrome.warfareShop.weapons': 'Senjata',
   'itemUi.market.saleBuyer': 'Terjual kepada {buyer}',
-  'itemUi.market.saleOlder': 'Ditambah {count} penjualan sebelumnya, termasuk dalam total.',
+  'itemUi.market.saleOlder': 'Ditambah {count} penjualan sebelumnya yang tidak ditampilkan.',
   'itemUi.tooltip.maxStack': 'Tumpukan maks: {count}',
   'hud.system.deathRecapAbility': 'Kamu telah tewas. Tewas oleh {ability}.',
   'hud.system.deathRecapDrowned': 'Kamu telah tewas. Kamu tenggelam.',
@@ -20290,4 +20290,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Labu Fosfor',
   'entities.abilities.phosphor_flask.description':
     'Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh.',
+  'entities.items.lychgate_buckler.name': 'Perisai Bundar Gerbang Makam',
+  'entities.items.bastion_kite_shield.name': 'Perisai Layang Benteng',
+  'entities.items.barrowfield_tower_shield.name': 'Perisai Menara Padang Gundukan Makam',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Bilah sumber daya',
+  'hudChrome.options.hillBarOpacity': 'Opasitas latar Raja Bukit',
+  'hudChrome.options.playerFrameResourceDetached': 'Pisahkan bilah sumber daya',
+  'hudChrome.options.playerFrameResourceHeight': 'Tinggi bilah sumber daya',
+  'hudChrome.options.playerFrameResourceWidth': 'Lebar bilah sumber daya',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Aktifkan Pisahkan bilah sumber daya pada tab Bingkai agar Edit Bingkai juga membuka kunci bilah sumber dayamu, sehingga mana, energi, atau amarah dapat ditempatkan sendiri di mana saja. Lebar bilah sumber daya dan Tinggi bilah sumber daya pada tab yang sama mengatur ukurannya. Edit Bingkai juga membuka kunci bilah Raja Bukit. Opasitas latar Raja Bukit pada tab itu memudarkan panelnya tanpa mengurangi kejelasan teks.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

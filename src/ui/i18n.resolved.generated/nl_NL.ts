@@ -2288,10 +2288,10 @@ export const nl_NL: EnTranslations = {
       "enemyHighlightReticle": "Dikker vijandelijk richtkruis",
       "enemyHighlightDistance": "{yards} yard",
       "showPetFrame": "Je huisdier tonen",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Hulpbronnenbalk losmaken",
+      "playerFrameResourceWidth": "Breedte van de hulpbronnenbalk",
+      "playerFrameResourceHeight": "Hoogte van de hulpbronnenbalk",
+      "hillBarOpacity": "Achtergronddekking van Koning van de Heuvel",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Toon mijn punten op naamplaatjes",
       "nameplateDotScale": "Naamplaatje Puntgrootte",
@@ -4409,7 +4409,7 @@ export const nl_NL: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Actiebalken",
         "playerFrame": "Speler",
-        "playerResource": "Resource Bar",
+        "playerResource": "Hulpbronnenbalk",
         "targetFrame": "Doelwit",
         "partyFrames": "Groep",
         "swingBar": "Automatische Aanval",
@@ -7589,7 +7589,7 @@ export const nl_NL: EnTranslations = {
       "frameGroups": "{trackers} kunnen quests, daden, riften, delves, verzameldoelen en Reliquarium-tracking combineren. {auras} kunnen Target dots en de zes aura-paden combineren. Schakel beide groepen in via Frame-instellingen, of laat het uit om elk frame afzonderlijk te verplaatsen. {tot} bevat een bronnenbalk. {focus} heeft drie onafhankelijk verplaatsbare doelen: Shift+F1 tot Shift+F3 wijzen ze toe; Ctrl+F1 tot Ctrl+F3 selecteert ze. Sleep de schade- of bedreiging meter overal buiten de knoppen om het te verplaatsen, en sleep de randen om het grootte aan te passen, zelfs terwijl frames zijn vergrendeld. Terwijl frames ontgrendeld zijn, Show or Hide Frames heeft zijn eigen gegroepeerde menu. Rechtsklik op een ontgrendeld frame voor Grootte resetten of Frame-opties. Interface > Frames bevat ook Frame-instellingen en opvouwbare Partijframe-opties. Target van Target aan Target vergrendelen houdt die frames samen. Zet het uit om Target van Target afzonderlijk te verplaatsen; teruginschakelen bewaart de afzonderlijke positie voor later. Toegewezen focus frames verbergen hun instellingscontroles; rechtsklik en kies Instellen van Focus ontdoen om ze terug te krijgen. Mouseover-casting werkt ook op focus frames.",
       "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Schakel Hulpbronnenbalk losmaken in op het tabblad Frames. Frames Bewerken maakt dan ook je hulpbronnenbalk los, zodat je mana, energie of woede afzonderlijk overal kunt neerzetten. Breedte van de hulpbronnenbalk en Hoogte van de hulpbronnenbalk op hetzelfde tabblad bepalen het formaat. Frames Bewerken maakt ook de balk van Koning van de Heuvel los. Achtergronddekking van Koning van de Heuvel op dat tabblad vervaagt het paneel terwijl de tekst duidelijk leesbaar blijft.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
       "aurasTitle": "Buffs en debuffs",
@@ -13150,7 +13150,7 @@ export const nl_NL: EnTranslations = {
       "historyEmpty": "Nog geen verkopen. Voorwerpen die je op de Wereldmarkt verkoopt verschijnen hier.",
       "historyNote": "Je recente verkopen op de Wereldmarkt.",
       "saleBuyer": "Verkocht aan {buyer}",
-      "saleOlder": "Plus {count} eerdere verkopen, inbegrepen in het totaal.",
+      "saleOlder": "Plus {count} eerdere verkopen die niet worden weergegeven.",
       "ordersTab": "Gewenst",
       "ordersNote": "Plaats wat je wilt kopen en het goud wordt door de Koopman vastgehouden. Aanbiedingen op of onder jouw prijs worden onmiddellijk vervuld; de rest wacht op een verkoper. De Koopman neemt {cut}% van degene die aflevert. Je hebt {used}/{max} geopende bestellingen.",
       "ordersListAria": "Open inkoopbestellingen",
@@ -18687,6 +18687,15 @@ export const nl_NL: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Helse pijlkoker"
+      },
+      "lychgate_buckler": {
+        "name": "Beukelaar van de kerkhofpoort"
+      },
+      "bastion_kite_shield": {
+        "name": "Vliegerschild van het bastion"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Torenschild van het Grafheuvelveld"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

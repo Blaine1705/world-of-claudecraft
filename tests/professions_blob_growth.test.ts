@@ -2530,7 +2530,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // This composes with every inherited content delta above.
         119 +
         // The Crucible hunter quiver adds 18 deedStats and 48 reliquary bytes.
-        66,
+        66 +
+        // Plus 68 for the three leveling quest shields (content/quest_shields.ts):
+        // `"lychgate_buckler",` (+19), `"bastion_kite_shield",` (+22) and
+        // `"barrowfield_tower_shield",` (+27) in deedStats.itemsDiscovered. Quest
+        // rewards carry no Reliquary page, so no firstFind row. MEASURED.
+        68,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2579,10 +2584,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // +19 for the World PvP trophy skull id (attributed above).
       // +16 for the World PvP Skull Bag id (attributed above).
-      deedStats: 9480,
+      deedStats: 9548,
       // +46 for the World PvP Skull Bag's reliquary.firstFind row (attributed above).
       reliquary: 11595,
       // The Crucible hunter quiver composes +18 deedStats and +48 reliquary.
+      // Three quest shield ids add 68 deedStats bytes; no relic rows.
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2627,7 +2633,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // +62 for the World PvP Skull Bag (deedStats id and reliquary row), kept.
       // The ten-rung vault adds 119 bytes, retained by this counterfactual.
       // The Crucible hunter quiver adds 66 bytes, retained here.
-    ).toBe(232216);
+      // Three leveling quest shield ids add 68 bytes.
+    ).toBe(232284);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2662,7 +2669,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // +62 for the World PvP Skull Bag, which this baseline keeps.
       // The ten-rung vault adds 119 bytes, retained by this counterfactual.
       // The Crucible hunter quiver adds 66 bytes, retained here.
-    ).toBe(233835);
+      // Three leveling quest shield ids add 68 bytes.
+    ).toBe(233903);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2780,8 +2788,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // fixture: 118 stock rows gain a digit and upgrades changes 5 to 10.
     // Keep the same 381-byte band and the existing warning threshold.
     // Quiver +66 composes to 233,847 bytes, with the same 381-byte tracking band.
-    expect(bytes, reMint).toBeGreaterThan(233467);
-    expect(bytes, reMint).toBeLessThan(233848);
+    // Quest shields add 68 bytes, preserving the same 381-byte band.
+    expect(bytes, reMint).toBeGreaterThan(233535);
+    expect(bytes, reMint).toBeLessThan(233916);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

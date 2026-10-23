@@ -1498,6 +1498,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': '하이워치 대검',
   'entities.items.highwatch_wallshield.name': '하이워치 벽방패',
   'entities.items.eastbrook_buckler.name': '이스트브룩 버클러',
+  'entities.items.lychgate_buckler.name': '묘지문 버클러',
+  'entities.items.bastion_kite_shield.name': '요새 카이트 실드',
+  'entities.items.barrowfield_tower_shield.name': '고분 들판 타워 실드',
   'entities.abilities.avatar.name': '화신',
   'entities.abilities.avatar.description':
     '20초 동안 거상으로 변신하여 자신에게 걸린 모든 군중 제어 효과를 해제하고 입히는 피해가 20% 증가합니다.',
@@ -4862,7 +4865,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.',
   'itemUi.market.collectNote': '상인이 보관 중인 수익과 반환된 상품입니다.',
   'itemUi.market.saleProceeds': '판매 대금',
-  'itemUi.market.saleOlder': '이전 판매 {count}건이 더 있으며, 합계에 포함되어 있습니다.',
+  'itemUi.market.saleOlder': '목록에 표시되지 않은 이전 판매가 {count}건 더 있습니다.',
   'itemUi.market.collectAll': '모두 수령',
   'itemUi.market.history': '내역',
   'itemUi.market.historyEmpty':
@@ -19875,4 +19878,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': '인광 플라스크',
   'entities.abilities.phosphor_flask.description':
     '반응성 화학 혼합물을 담은 밀봉된 용기로, 8미터 지역에 3초 동안 백열하는 불길을 터뜨립니다. 불길 안에 서 있는 적은 0.5초마다 {damage}의 화염 피해를 입습니다. 피해량은 원거리 전투력에 따라 증가합니다.',
+  'hudChrome.options.pixelsValue': '{value}픽셀',
 };

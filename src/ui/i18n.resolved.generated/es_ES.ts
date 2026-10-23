@@ -2288,10 +2288,10 @@ export const es_ES: EnTranslations = {
       "enemyHighlightReticle": "Retícula hostil más gruesa",
       "enemyHighlightDistance": "{yards} yardas",
       "showPetFrame": "Mostrar tu mascota",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Separar barra de recursos",
+      "playerFrameResourceWidth": "Anchura de la barra de recursos",
+      "playerFrameResourceHeight": "Altura de la barra de recursos",
+      "hillBarOpacity": "Opacidad del fondo de El Rey de la Colina",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Mostrar mis puntos en las placas de identificación",
       "nameplateDotScale": "Tamaño del punto de la placa de identificación",
@@ -4409,7 +4409,7 @@ export const es_ES: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Barras de acción",
         "playerFrame": "Jugador",
-        "playerResource": "Resource Bar",
+        "playerResource": "Barra de recursos",
         "targetFrame": "Objetivo",
         "partyFrames": "Grupo",
         "swingBar": "Ataque automático",
@@ -7589,7 +7589,7 @@ export const es_ES: EnTranslations = {
       "frameGroups": "{trackers} puede combinar misiones, gestas, brechas, expediciones, objetivos de recolección y el seguimiento del Relicario. {auras} puede combinar los dots de objetivo y las seis franjas de auras. Activa cualquiera de los dos grupos en Configuración de marcos, o déjalo desactivado para mover cada marco por separado. {tot} incluye una barra de recurso. {focus} tiene tres objetivos que se mueven de forma independiente: Shift+F1 a Shift+F3 los asigna; Ctrl+F1 a Ctrl+F3 los selecciona. Arrastra el medidor de daño o de amenaza en cualquier punto fuera de sus botones para moverlo, y arrastra sus bordes para redimensionarlo, incluso con los marcos bloqueados. Mientras los marcos están desbloqueados, Mostrar u Ocultar Marcos tiene su propio menú agrupado. Haz clic derecho en un marco desbloqueado para Restablecer tamaño u Opciones de marco. Interfaz > Marcos también contiene Configuración de marcos y las Opciones de marco de grupo, que se pueden contraer. Vincular el objetivo de tu objetivo al objetivo mantiene esos marcos juntos. Desactívalo para mover el objetivo de tu objetivo por separado; volver a activarlo conserva esa posición aparte para más tarde. Los marcos de foco asignados ocultan sus controles de configuración; haz clic derecho y elige Quitar foco para restaurarlos. El lanzamiento al pasar el cursor también funciona en los marcos de foco.",
       "framesGovernedTalkingHead": "Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Activa Separar barra de recursos en la pestaña Marcos y Editar marcos también desbloqueará tu barra de recursos, para que puedas colocar el maná, la energía o la ira por separado en cualquier lugar; Anchura de la barra de recursos y Altura de la barra de recursos, en esa misma pestaña, ajustan su tamaño. Editar marcos también desbloquea la barra de El Rey de la Colina, y Opacidad del fondo de El Rey de la Colina, en esa pestaña, atenúa su panel sin reducir la claridad del texto.",
       "barsTitle": "Barras, temporizadores y texto de combate",
       "barsBody": "Tu barra de lanzamiento aparece en el centro de la pantalla, justo encima de tus barras de acción, cada vez que lanzas o canalizas, y muestra el nombre del hechizo y el tiempo restante. Tu objetivo tiene su propia barra de lanzamiento en su marco, para que puedas ver lo que viene y responder a ello.\n\nUna fina barra de golpe se sitúa bajo tu barra de lanzamiento y se llena entre los golpes de tu arma, para que un atacante cuerpo a cuerpo o a distancia pueda ver cuándo llega el próximo golpe automático.\n\nTu barra de experiencia ocupa el ancho completo bajo tus barras de acción, dividida en segmentos, con un tramo más claro que muestra la experiencia de descanso que tienes acumulada.\n\nNada bajo el agua y aparecerá una barra de aliento azul en la parte superior de la pantalla. Se vacía mientras tienes la cabeza sumergida, parpadea en rojo en cuanto se agota y empiezas a ahogarte, y se rellena rápido en cuanto sales a la superficie. Space te hace nadar hacia arriba, y la tecla Nadar hacia abajo, Ctrl de forma predeterminada, te lleva más profundo.\n\nEl daño y la sanación flotan hacia arriba sobre aquello que los recibió en forma de pequeños números, para que puedas leer un combate sin leer texto. La pestaña Combate de tu caja de chat conserva el registro escrito completo.",
       "aurasTitle": "Beneficios y perjuicios",
@@ -13150,7 +13150,7 @@ export const es_ES: EnTranslations = {
       "historyEmpty": "Todavía no hay ventas. Los objetos que vendas en el Mercado Mundial aparecerán aquí.",
       "historyNote": "Tus ventas recientes en el Mercado Mundial.",
       "saleBuyer": "Vendido a {buyer}",
-      "saleOlder": "Más {count} ventas anteriores, incluidas en el total.",
+      "saleOlder": "Más {count} ventas anteriores que no se muestran.",
       "ordersTab": "Solicitados",
       "ordersNote": "Publica lo que quieres y el oro queda retenido en el Mercader. Las publicaciones a tu precio o por debajo se completan al instante; el resto espera un vendedor. El Mercader se queda con una comisión del {cut}% de quien entregue. Tienes {used}/{max} pedidos abiertos.",
       "ordersListAria": "Pedidos de compra abiertos",
@@ -18687,6 +18687,15 @@ export const es_ES: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Carcaj infernal"
+      },
+      "lychgate_buckler": {
+        "name": "Broquel del portal del camposanto"
+      },
+      "bastion_kite_shield": {
+        "name": "Escudo cometa del bastión"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Escudo torre del Campo de Túmulos"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

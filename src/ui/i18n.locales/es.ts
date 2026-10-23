@@ -4929,7 +4929,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Adquirido',
   'hudChrome.warfareShop.weapons': 'Armas',
   'itemUi.market.saleBuyer': 'Vendido a {buyer}',
-  'itemUi.market.saleOlder': 'Más {count} ventas anteriores, incluidas en el total.',
+  'itemUi.market.saleOlder': 'Más {count} ventas anteriores que no se muestran.',
   'itemUi.tooltip.maxStack': 'Máximo por montón: {count}',
   'hud.system.deathRecapAbility': 'Has muerto. Te mató {ability}.',
   'hud.system.deathRecapDrowned': 'Has muerto. Te ahogaste.',
@@ -20478,4 +20478,15 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
   'entities.abilities.phosphor_flask.description':
     'Un recipiente sellado con una mezcla química reactiva que estalla en llamas al rojo blanco sobre un área de 8 m durante 3 s. Los enemigos que permanezcan en las llamas sufren {damage} de daño de Fuego cada 0,5 s. El daño aumenta con el poder de ataque a distancia.',
+  'entities.items.lychgate_buckler.name': 'Broquel del portal del camposanto',
+  'entities.items.bastion_kite_shield.name': 'Escudo cometa del bastión',
+  'entities.items.barrowfield_tower_shield.name': 'Escudo torre del Campo de Túmulos',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barra de recursos',
+  'hudChrome.options.hillBarOpacity': 'Opacidad del fondo de El Rey de la Colina',
+  'hudChrome.options.playerFrameResourceDetached': 'Separar barra de recursos',
+  'hudChrome.options.playerFrameResourceHeight': 'Altura de la barra de recursos',
+  'hudChrome.options.playerFrameResourceWidth': 'Anchura de la barra de recursos',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Activa Separar barra de recursos en la pestaña Marcos y Editar marcos también desbloqueará tu barra de recursos, para que puedas colocar el maná, la energía o la ira por separado en cualquier lugar; Anchura de la barra de recursos y Altura de la barra de recursos, en esa misma pestaña, ajustan su tamaño. Editar marcos también desbloquea la barra de El Rey de la Colina, y Opacidad del fondo de El Rey de la Colina, en esa pestaña, atenúa su panel sin reducir la claridad del texto.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

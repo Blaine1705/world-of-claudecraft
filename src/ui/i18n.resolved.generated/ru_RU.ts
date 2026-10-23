@@ -2292,7 +2292,7 @@ export const ru_RU: EnTranslations = {
       "playerFrameResourceWidth": "Ширина полосы ресурса",
       "playerFrameResourceHeight": "Высота полосы ресурса",
       "hillBarOpacity": "Прозрачность фона „Короля горы“",
-      "pixelsValue": "{value} px",
+      "pixelsValue": "{value} пикс.",
       "showNameplateDots": "Показывать мои эффекты на полосах имён",
       "nameplateDotScale": "Размер эффектов на полосах имён",
       "showNameplateCooldowns": "Отслеживание атаки/защиты",
@@ -13150,7 +13150,7 @@ export const ru_RU: EnTranslations = {
       "historyEmpty": "Пока нет продаж. Проданные на Мировом рынке товары появятся здесь.",
       "historyNote": "Ваши недавние продажи на Мировом рынке.",
       "saleBuyer": "Продано: {buyer}",
-      "saleOlder": "Ещё {count} более ранних продаж, включены в общую сумму.",
+      "saleOlder": "Ещё {count} более ранних продаж, не показанных в списке.",
       "ordersTab": "Куплю",
       "ordersNote": "Разместите заказ, и золото будет храниться у Торговца. Лоты по вашей цене или ниже исполняются сразу; остальные ждут продавца. Торговец берёт {cut}% с того, кто доставит товар. Открыто заказов: {used}/{max}.",
       "ordersListAria": "Открытые заказы на покупку",
@@ -18687,6 +18687,15 @@ export const ru_RU: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Инфернальный колчан"
+      },
+      "lychgate_buckler": {
+        "name": "Баклер кладбищенских врат"
+      },
+      "bastion_kite_shield": {
+        "name": "Каплевидный щит бастиона"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Башенный щит Курганного поля"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

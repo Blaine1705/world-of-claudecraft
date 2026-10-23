@@ -868,11 +868,11 @@ describe('item-art audit builder', () => {
       // with `--verify-only` on this tree.
       // 1466 / 1484 with the World PvP Skull Bag (pvp_skull_bag, PR #4284),
       // re-measured the same way on the merged candidate.
-      catalogSha256: 'e68706e2cddc711b74e54553bcf334701eacc7ec6396b9550ad0d7c2bc5ca6b7',
-      catalogBytes: 802296,
+      catalogSha256: 'd853da8dc8c74592113eb01b68154393df5e24bdbc70d57d99a69225c48b5865',
+      catalogBytes: 803912,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1466,
-      liveItemCount: 1484,
+      catalogCount: 1469,
+      liveItemCount: 1487,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -890,7 +890,7 @@ describe('item-art audit builder', () => {
         identity: 36,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'd3ece8a81af79fbbe5cb6a0c1c95cf9e8c5dea00cc9551f7f88ceeefd9f63862',
+      shippingCatalogSha256: '51138e8472c3e2065f42af31c66ca2aa7d5a297297bfea1b1824c399ad4efd40',
       machineChecksPassed: true,
       verdict: null,
     });

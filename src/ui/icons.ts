@@ -11,6 +11,7 @@
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
+import { QUEST_SHIELD_ART_PENDING_ITEM_IDS } from '../sim/content/quest_shields';
 import {
   BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
@@ -5569,6 +5570,9 @@ export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
+  // The three leveling quest shields (content/quest_shields.ts), owed by the
+  // next item-art pass.
+  ...QUEST_SHIELD_ART_PENDING_ITEM_IDS,
   // Warfare Season 2 armor: painted icons owned by a follow-up art pass; the
   // procedural icon stands in until then. The season weapons never park here:
   // an unpainted weapon already draws its procedural icon.

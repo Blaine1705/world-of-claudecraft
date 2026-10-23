@@ -5129,7 +5129,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'In bezit',
   'hudChrome.warfareShop.weapons': 'Wapens',
   'itemUi.market.saleBuyer': 'Verkocht aan {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} eerdere verkopen, inbegrepen in het totaal.',
+  'itemUi.market.saleOlder': 'Plus {count} eerdere verkopen die niet worden weergegeven.',
   'itemUi.tooltip.maxStack': 'Max. stapel: {count}',
   'hud.system.deathRecapAbility': 'Je bent gestorven. Gedood door {ability}.',
   'hud.system.deathRecapDrowned': 'Je bent gestorven. Je bent verdronken.',
@@ -20308,4 +20308,15 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Fosforfles',
   'entities.abilities.phosphor_flask.description':
     'Een verzegeld vat met een reactief chemisch mengsel dat 3 sec. lang uitbarst in witgloeiende vlammen over een gebied van 8 m. Vijanden in de vlammen krijgen elke 0,5 sec. {damage} Vuurschade. De schade stijgt met de afstandsaanvalskracht.',
+  'entities.items.lychgate_buckler.name': 'Beukelaar van de kerkhofpoort',
+  'entities.items.bastion_kite_shield.name': 'Vliegerschild van het bastion',
+  'entities.items.barrowfield_tower_shield.name': 'Torenschild van het Grafheuvelveld',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Hulpbronnenbalk',
+  'hudChrome.options.hillBarOpacity': 'Achtergronddekking van Koning van de Heuvel',
+  'hudChrome.options.playerFrameResourceDetached': 'Hulpbronnenbalk losmaken',
+  'hudChrome.options.playerFrameResourceHeight': 'Hoogte van de hulpbronnenbalk',
+  'hudChrome.options.playerFrameResourceWidth': 'Breedte van de hulpbronnenbalk',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Schakel Hulpbronnenbalk losmaken in op het tabblad Frames. Frames Bewerken maakt dan ook je hulpbronnenbalk los, zodat je mana, energie of woede afzonderlijk overal kunt neerzetten. Breedte van de hulpbronnenbalk en Hoogte van de hulpbronnenbalk op hetzelfde tabblad bepalen het formaat. Frames Bewerken maakt ook de balk van Koning van de Heuvel los. Achtergronddekking van Koning van de Heuvel op dat tabblad vervaagt het paneel terwijl de tekst duidelijk leesbaar blijft.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

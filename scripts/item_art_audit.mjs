@@ -149,9 +149,10 @@ const build = await buildItemArtAudit({
     // + the World PvP Skull Bag (pvp_skull_bag): 1466 / 1484.
     // The art-pending Crucible hunter quiver adds one definition and one debt row:
     // 1620 - 136 = 1484 art subjects, unchanged from 1619 - 135 before it.
-    catalogCount: 1466,
-    liveItemCount: 1484,
+    catalogCount: 1469,
+    liveItemCount: 1487,
     pendingArtCount: 136,
+    // Three painted quest shields add three subjects; quiver debt remains.
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,

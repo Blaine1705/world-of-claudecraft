@@ -5049,7 +5049,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Vlastněno',
   'hudChrome.warfareShop.weapons': 'Zbraně',
   'itemUi.market.saleBuyer': 'Prodáno hráči {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} dřívějších prodejů, zahrnuto v součtu.',
+  'itemUi.market.saleOlder': 'A dalších {count} dřívějších prodejů, které nejsou uvedeny.',
   'itemUi.tooltip.maxStack': 'Max. stack: {count}',
   'hud.system.deathRecapAbility': 'Tvá postava zemřela. Příčina: {ability}.',
   'hud.system.deathRecapDrowned': 'Tvá postava zemřela. Utopila se.',
@@ -19961,4 +19961,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Fosforová baňka',
   'entities.abilities.phosphor_flask.description':
     'Zapečetěná nádoba s reaktivní chemickou směsí, která na 3 s vzplane do běla rozžhaveným plamenem v oblasti 8 m. Nepřátelé stojící v plamenech utrpí každých 0,5 s {damage} ohnivého poškození. Poškození roste se silou útoku na dálku.',
+  'entities.items.lychgate_buckler.name': 'Pukléř hřbitovní brány',
+  'entities.items.bastion_kite_shield.name': 'Mandlový štít bašty',
+  'entities.items.barrowfield_tower_shield.name': 'Věžový štít Mohylového pole',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Lišta zdrojů',
+  'hudChrome.options.hillBarOpacity': 'Krytí pozadí Krále kopce',
+  'hudChrome.options.playerFrameResourceDetached': 'Oddělit lištu zdrojů',
+  'hudChrome.options.playerFrameResourceHeight': 'Výška lišty zdrojů',
+  'hudChrome.options.playerFrameResourceWidth': 'Šířka lišty zdrojů',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Zapni Oddělit lištu zdrojů na kartě Rámy. Volba Upravit rámečky pak uvolní i lištu zdrojů, takže manu, energii nebo zuřivost můžeš umístit samostatně kamkoli. Šířka lišty zdrojů a Výška lišty zdrojů na stejné kartě nastavují její velikost. Upravit rámečky uvolní také lištu Krále kopce. Krytí pozadí Krále kopce na stejné kartě zeslabí její panel, zatímco text zůstane dobře čitelný.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

@@ -3377,6 +3377,12 @@ const ITEM_ENTITY_IDS = [
   // the END under the append-only contract; resolves BY KEY. The name is
   // wordy English, so its M16 non-Latin fills land in the overlays.
   'infernal_quiver',
+  // The three leveling quest shields (content/quest_shields.ts), appended at the
+  // END under the append-only contract; resolve BY KEY. The names are wordy
+  // English, so their M16 non-Latin fills land in the overlays.
+  'lychgate_buckler',
+  'bastion_kite_shield',
+  'barrowfield_tower_shield',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -4313,6 +4319,9 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_fang_dagger: "Vanguard's Fang",
   vanguard_warstaff: "Vanguard's Warstaff",
   infernal_quiver: 'Infernal Quiver',
+  lychgate_buckler: 'Lychgate Buckler',
+  bastion_kite_shield: 'Bastion Kite Shield',
+  barrowfield_tower_shield: 'Barrowfield Tower Shield',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

@@ -9,155 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "es_ES": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "fr_FR": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "fr_CA": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "de_DE": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "zh_CN": [
-    "hudChrome.options.pixelsValue"
-  ],
-  "zh_TW": [
-    "hudChrome.options.pixelsValue"
-  ],
-  "ko_KR": [
-    "hudChrome.options.pixelsValue"
-  ],
-  "ja_JP": [
-    "hudChrome.options.pixelsValue"
-  ],
-  "pt_BR": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "ru_RU": [
-    "hudChrome.options.pixelsValue"
-  ],
-  "cs_CZ": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "nl_NL": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "pl_PL": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "id_ID": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "tr_TR": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "sv_SE": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "vi_VN": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ],
-  "da_DK": [
-    "guide.interfacePage.framesGovernedResourceAndHill",
-    "hudChrome.interfaceUnlock.frameNames.playerResource",
-    "hudChrome.options.hillBarOpacity",
-    "hudChrome.options.pixelsValue",
-    "hudChrome.options.playerFrameResourceDetached",
-    "hudChrome.options.playerFrameResourceHeight",
-    "hudChrome.options.playerFrameResourceWidth"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

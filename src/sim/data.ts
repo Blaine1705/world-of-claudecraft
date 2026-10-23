@@ -353,6 +353,7 @@ import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot'
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
+import { QUEST_SHIELD_ITEMS } from './content/quest_shields';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
@@ -426,6 +427,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WORLD_QUEST_ITEMS,
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
+  QUEST_SHIELD_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';

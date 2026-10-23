@@ -1242,6 +1242,10 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   votive_ward_of_the_deathless_court: 'shield_round', // Nythraxis gap-fill healer shield
   templar_dawn_shield: 'shield_square', // Church Order quartermaster's mail shield (faction_vendors.ts)
   varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
+  // The leveling quest shields (content/quest_shields.ts), one per starting zone.
+  lychgate_buckler: 'shield_round',
+  bastion_kite_shield: 'shield_badge', // the pointed heater silhouette reads as a kite shield
+  barrowfield_tower_shield: 'shield_square',
 };
 
 /** Held-model GLBs whose materials are AUTHORED surfaces: a Tripo or Blender

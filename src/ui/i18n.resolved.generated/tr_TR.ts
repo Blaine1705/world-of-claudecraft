@@ -2288,10 +2288,10 @@ export const tr_TR: EnTranslations = {
       "enemyHighlightReticle": "Daha kalın düşman nişangâhı",
       "enemyHighlightDistance": "{yards} yarda",
       "showPetFrame": "Yoldaşını Göster",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Kaynak Çubuğunu Ayır",
+      "playerFrameResourceWidth": "Kaynak Çubuğu Genişliği",
+      "playerFrameResourceHeight": "Kaynak Çubuğu Yüksekliği",
+      "hillBarOpacity": "Tepede Kral Arka Plan Opaklığı",
       "pixelsValue": "{value} px",
       "showNameplateDots": "İsim Plakalarındaki Noktalarımı Göster",
       "nameplateDotScale": "İsim Plakası Nokta Boyutu",
@@ -4409,7 +4409,7 @@ export const tr_TR: EnTranslations = {
         "chat": "Sohbet",
         "actionBarGroup": "Eylem Çubukları",
         "playerFrame": "Oyuncu",
-        "playerResource": "Resource Bar",
+        "playerResource": "Kaynak Çubuğu",
         "targetFrame": "Hedef",
         "partyFrames": "Grup",
         "swingBar": "Otomatik Saldırı",
@@ -7589,7 +7589,7 @@ export const tr_TR: EnTranslations = {
       "frameGroups": "{trackers} görevleri, işleri, riftleri, delveleri, toplama hedeflerini ve Hazine izlemesini birleştirebilir. {auras} Hedef noktalarını ve altı aura izini birleştirebilir. Her grubu Çerçeveler Ayarları'nda etkinleştirin ya da her çerçeveyi ayrı olarak taşımak için kapalı bırakın. {tot} kaynağı çubuğu içerir. {focus} üç bağımsız taşınabilir hedef içerir: Shift+F1 ile Shift+F3 tayin; Ctrl+F1 ile Ctrl+F3 seçin. Hasar ya da tehdit ölçüsünü düğmelerinin dışında herhangi bir yere sürükleyin ve taşınması için kenarlarını sürükleyin, çerçeveler kilitli iken de olsa. Çerçeveler kilitli değilken, Çerçeveleri Göster ya da Gizle kendi gruplanmış menüsü vardır. Kilitli olmayan çerçeve için sağ tıkla Sıfırla boyutu ya da Çerçeve Seçenekleri. Arabirim > Çerçeveler da Çerçeveler Ayarları ve daraltılabilir Puan Çerçevesi Seçenekleri içerir. Hedefin Hedefini Hedefe Kilitle, bu çerçeveleri birlikte tutar. Hedefin Hedefini ayrı olarak taşıyacak şekilde kapatın; geri açmak daha sonra için ayrı konumu saklar. Atanmış odak çerçeveleri kurulum denetimleri saklar; sağ tıkla ve Odak Ayarı'nı seç düzeltmek için. Mouseover dökme da odak çerçevelerde çalışır.",
       "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Çerçeveler sekmesinde Kaynak Çubuğunu Ayır seçeneğini açtığında Çerçeveleri Düzenle, kaynak çubuğunun kilidini de açar. Böylece mana, enerji veya öfke çubuğunu bağımsız olarak istediğin yere yerleştirebilirsin. Aynı sekmedeki Kaynak Çubuğu Genişliği ve Kaynak Çubuğu Yüksekliği boyutunu ayarlar. Çerçeveleri Düzenle, Tepede Kral çubuğunun kilidini de açar. Bu sekmedeki Tepede Kral Arka Plan Opaklığı, yazı net kalırken paneli saydamlaştırır.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
       "aurasTitle": "Takviyeler ve zayıflatmalar",
@@ -13150,7 +13150,7 @@ export const tr_TR: EnTranslations = {
       "historyEmpty": "Henüz satış yok. Dünya Pazarında sattığın eşyalar burada gösterilir.",
       "historyNote": "Dünya Pazarındaki son satışların.",
       "saleBuyer": "{buyer} kişisine satıldı",
-      "saleOlder": "Ayrıca {count} önceki satış, toplama dahildir.",
+      "saleOlder": "Ayrıca listelenmeyen {count} önceki satış.",
       "ordersTab": "İsteniyor",
       "ordersNote": "İstediğini yayınla ve altın Tüccarda tutulur. Fiyatında veya daha azında olan listeler hemen doldurulur; geri kalanı bir satıcı bekliyorsa kalır. Tüccâr teslim edenden {cut}% kesinti alır. {used}/{max} siparişin açık.",
       "ordersListAria": "Açık satın alma siparişleri",
@@ -18687,6 +18687,15 @@ export const tr_TR: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Cehennem Sadağı"
+      },
+      "lychgate_buckler": {
+        "name": "Mezarlık Kapısı Kalkanı"
+      },
+      "bastion_kite_shield": {
+        "name": "Tabyanın Uçurtma Kalkanı"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Höyük Ovası Kule Kalkanı"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

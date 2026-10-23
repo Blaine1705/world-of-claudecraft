@@ -2292,7 +2292,7 @@ export const zh_TW: EnTranslations = {
       "playerFrameResourceWidth": "資源條寬度",
       "playerFrameResourceHeight": "資源條高度",
       "hillBarOpacity": "山丘之王背景透明度",
-      "pixelsValue": "{value} px",
+      "pixelsValue": "{value} 像素",
       "showNameplateDots": "在名條上顯示我的減益",
       "nameplateDotScale": "名條減益圖示大小",
       "showNameplateCooldowns": "進攻/防禦追蹤器",
@@ -13150,7 +13150,7 @@ export const zh_TW: EnTranslations = {
       "historyEmpty": "尚無銷售記錄。你在世界市場出售的物品會顯示在這裡。",
       "historyNote": "你在世界市場的近期銷售記錄。",
       "saleBuyer": "售予 {buyer}",
-      "saleOlder": "另有 {count} 筆較早的交易，已計入總額。",
+      "saleOlder": "另有 {count} 筆較早的銷售未列出。",
       "ordersTab": "求購",
       "ordersNote": "發布你想要的物品，金幣會保管在商人處。價格等於或低於你出價的上架會立即成交；其餘則等待賣家出現。商人會向交付者收取 {cut}% 的抽成。你目前有 {used}/{max} 筆未結訂單。",
       "ordersListAria": "未結訂單列表",
@@ -18687,6 +18687,15 @@ export const zh_TW: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "煉獄箭袋"
+      },
+      "lychgate_buckler": {
+        "name": "停柩門小圓盾"
+      },
+      "bastion_kite_shield": {
+        "name": "堡壘鳶盾"
+      },
+      "barrowfield_tower_shield": {
+        "name": "古塚原塔盾"
       },
       "conjured_water4": {
         "name": "魔法泉水"

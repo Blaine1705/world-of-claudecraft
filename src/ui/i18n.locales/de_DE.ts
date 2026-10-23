@@ -5192,7 +5192,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Im Besitz',
   'hudChrome.warfareShop.weapons': 'Waffen',
   'itemUi.market.saleBuyer': 'Verkauft an {buyer}',
-  'itemUi.market.saleOlder': 'Zuzüglich {count} früherer Verkäufe, in der Summe enthalten.',
+  'itemUi.market.saleOlder': 'Dazu {count} frühere Verkäufe, die nicht aufgeführt sind.',
   'itemUi.tooltip.maxStack': 'Max. Stapel: {count}',
   'hud.system.deathRecapAbility': 'Ihr seid gestorben. Erschlagen durch {ability}.',
   'hud.system.deathRecapDrowned': 'Ihr seid gestorben. Ihr seid ertrunken.',
@@ -20493,4 +20493,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Phosphorflasche',
   'entities.abilities.phosphor_flask.description':
     'Ein versiegeltes Gefäß mit einer reaktiven Chemikalienmischung, die 3 Sek. lang über einen Bereich von 8 m in weißglühende Flammen aufgeht. Gegner in den Flammen erleiden alle 0,5 Sek. {damage} Feuerschaden. Der Schaden steigt mit der Distanzangriffskraft.',
+  'entities.items.lychgate_buckler.name': 'Faustschild des Friedhofstors',
+  'entities.items.bastion_kite_shield.name': 'Langspitzschild der Bastion',
+  'entities.items.barrowfield_tower_shield.name': 'Turmschild des Hügelgräberfelds',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Ressourcenleiste',
+  'hudChrome.options.hillBarOpacity': 'Hintergrunddeckkraft von König des Hügels',
+  'hudChrome.options.playerFrameResourceDetached': 'Ressourcenleiste abtrennen',
+  'hudChrome.options.playerFrameResourceHeight': 'Höhe der Ressourcenleiste',
+  'hudChrome.options.playerFrameResourceWidth': 'Breite der Ressourcenleiste',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Aktiviere Ressourcenleiste abtrennen im Reiter Rahmen. Dann gibt Rahmen bearbeiten auch deine Ressourcenleiste frei, sodass du Mana, Energie oder Wut unabhängig an einer beliebigen Stelle platzieren kannst. Breite der Ressourcenleiste und Höhe der Ressourcenleiste im selben Reiter passen ihre Größe an. Rahmen bearbeiten gibt auch die Leiste für König des Hügels frei. Hintergrunddeckkraft von König des Hügels im selben Reiter blendet deren Fläche aus, während der Text gut lesbar bleibt.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };
