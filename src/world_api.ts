@@ -270,7 +270,10 @@ export type { VehicleSession } from './world_api/vehicles';
 // mixed binaries must fail closed instead of restoring invisible walls.
 // 47 = Large Materials Vault snapshots stream in bounded, paced chunks.
 // Earlier clients cannot decode the transfer envelope and must fail closed.
-export const ONLINE_WORLD_LAYOUT_VERSION = 47 as const;
+// 48 = Withdraw #4297 and restore the preceding Wildheart gate collision.
+// Epoch 46 and 47 clients still predict the withdrawn stone-foot blockers;
+// reject them while preserving epoch 47's chunked vault envelope.
+export const ONLINE_WORLD_LAYOUT_VERSION = 48 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

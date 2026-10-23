@@ -656,14 +656,33 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     const gate = WILDHEART_FIELD_COLLIDER_SPECS.filter(
       (spec) => spec.kind === 'wildheart_jaguar_gate',
     );
-    // Three circles across each stone foot, measured at the rendered scale.
+    // Six chained posts (three per pylon): solid along each pylon's depth, but
+    // never wider than the visible pillar. The old two-fat-circles version put
+    // a ~4.7yd invisible ring around each ~2.5yd post and blocked the open
+    // grass beside the gate (live-playtest "invisible wall").
     expect(gate).toHaveLength(6);
-    for (const post of gate) expect(post.r).toBeLessThanOrEqual(0.94);
+    // Pin the restored pre-#4297 layout so a partial withdrawal cannot leave
+    // either the stone-foot positions or their smaller radii behind.
+    for (const [index, [dx, dz]] of [
+      [-12.5, -5],
+      [-12.5, -0.5],
+      [-12.5, 4],
+      [12.5, -5],
+      [12.5, -0.5],
+      [12.5, 4],
+    ].entries()) {
+      expect(gate[index].x).toBeCloseTo(dx * 1.1, 10);
+      expect(gate[index].z).toBeCloseTo(16 + dz * 1.1, 10);
+      expect(gate[index].r).toBeCloseTo(2.4 * 1.1, 10);
+    }
+    for (const post of gate) expect(post.r).toBeLessThanOrEqual(2.7);
     const origin = instanceOrigin(DUNGEONS.wildheart_basin.index, 0);
-    // Both flanks and the arch center remain open in every direction.
+    // Beside the east pylon (just past the pillar's push zone: post r 2.64 +
+    // body 0.5, the old fat circles blocked a player-sized body out past 19)
+    // and the arch center: a 1.2yd step in every direction must resolve
+    // without a collider push-back.
     for (const [sx, sz] of [
-      [-11, 17],
-      [11, 17],
+      [18.5, 17],
       [0, 16],
     ] as const) {
       for (let a = 0; a < 8; a++) {
