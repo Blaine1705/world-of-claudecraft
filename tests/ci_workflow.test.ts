@@ -367,6 +367,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-pledge-board/',
       '            /docs/screenshots/guild-social-v1/',
+      '            /docs/screenshots/highwatch-guild/',
       '            /docs/screenshots/harvest-button-refresh/',
       '            /docs/screenshots/hoard-arcane-icons-v045/',
       '            /docs/screenshots/hoard-brute-icons-v045/',

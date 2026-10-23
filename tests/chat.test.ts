@@ -1240,12 +1240,12 @@ describe('chat module (direct, no Sim)', () => {
     // no per-mount level gate).
     expect(sim.entities.get(pid)?.level).toBe(20);
     // 13 with the two referral reward mounts, 14 with the Nightwing Chimaera, 15 with
-    // Wobbles the Slime. Spelled as a literal on
+    // Wobbles the Slime, 16 with Lantern Hall. Spelled as a literal on
     // purpose rather than derived from MOUNT_KEYS.length: the row above already
     // proves ownership against the catalog, so deriving this one too would let a
     // catalog that silently lost a mount pass both.
     expect(
-      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 15 mount reins/.test(e.text)),
+      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 16 mount reins/.test(e.text)),
     ).toBe(true);
     // A second run is idempotent: everything already owned, nothing granted twice.
     sim.chat('/dev mounts', pid);

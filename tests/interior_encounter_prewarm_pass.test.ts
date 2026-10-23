@@ -496,7 +496,10 @@ describe('interior encounter prewarm pass (driven)', () => {
     rigs.fake = true;
     const host = fakeHost();
     startInteriorEncounterPrewarm('nythraxis', host);
+    // The catalog grows with every VFX skin, and its compile with it, past what one drain
+    // turns: drain on (a few drains at most) until the compile has caught up with the build.
     await drain();
+    for (let i = 0; i < 5 && host.compiled.length <= rigs.built.length; i++) await drain();
     expect(rigs.built.length).toBeGreaterThan(10);
     expect(host.compiled[0]).toBe(NYTHRAXIS_GRAVE_PREWARM_NAME);
     expect(host.compiled.slice(1).every((label) => label.startsWith('rig:player:'))).toBe(true);

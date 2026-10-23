@@ -1,3 +1,4 @@
+import { guildContractsView } from '../src/sim/guild_contracts';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -103,4 +104,27 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
   emit('wqrep', meta.worldQuestReplacements ?? {});
   emit('wkq', meta.weeklyQuest);
   emit('wkexp', sim.weeklyQuestResetAtMs);
+  // Lantern Hall's contracts: the week's board and this character's progress on it (every
+  // payment bumps wireRev, and a new week re-diffs the board on the next heavy pass).
+  emit('gcon', guildContractsView(sim, meta));
+}
+
+// force the next snapshot to carry quest state even when a quest command
+// changed nothing, so stale client UI converges back to the server's truth
+export function resyncQuests(session: {
+  lastSent: Record<string, string>;
+  selfHeavyDirty: boolean;
+}): void {
+  delete session.lastSent.qlog;
+  delete session.lastSent.qdone;
+  session.selfHeavyDirty = true; // ensure the gated heavy block re-runs next snapshot
+}
+
+export function resyncDelves(session: { lastSent: Record<string, string> }): void {
+  delete session.lastSent.drun;
+  delete session.lastSent.dcompanion;
+  delete session.lastSent.dmarks;
+  delete session.lastSent.dcomp;
+  delete session.lastSent.dclears;
+  delete session.lastSent.delveDaily;
 }

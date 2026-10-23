@@ -10,6 +10,7 @@ import { courierStrings } from './courier';
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 import { cosmeticsStrings } from './cosmetics';
+import { guildHallStrings } from './guild_hall';
 import { professionTrainerStrings } from './profession_trainers';
 import { weeklyRewardStrings } from './weekly_rewards';
 
@@ -60,6 +61,7 @@ export const hudChromeStrings = {
   },
   professionTrainers: professionTrainerStrings,
   weeklyRewards: weeklyRewardStrings,
+  guildHall: guildHallStrings,
   // The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
   // src/ui/hud/transport/):
   // the timetable panel near the docked ship and the sailing line aboard.
@@ -2385,6 +2387,7 @@ export const hudChromeStrings = {
     name_avian_strider: 'Viridian Valestrider',
     name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
+    name_lantern_hall_destrier: 'Lantern Hall Destrier',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
     name_wobbles_slime: 'Wobbles the Slime',
@@ -2418,6 +2421,8 @@ export const hudChromeStrings = {
       'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
     desc_lanternback_troll:
       'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
+    desc_lantern_hall_destrier:
+      "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
     desc_nightwing_chimera:
       'A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.',
     desc_chimeglass_tortoise:
@@ -9931,6 +9936,8 @@ export const hudChromeStrings = {
     // chest, never from the keeper's own loot, and at the tier the map buys.
     sourceActivityBuriedHoard:
       'Found in the reward chest of a Buried Hoard, the vault a treasure map leads to',
+    // Lantern Hall's horse and sword (src/sim/guild_quartermaster.ts): bought, not dropped.
+    sourceActivityLanternHall: "Bought for Lantern Seals from Lantern Hall's quartermaster",
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.

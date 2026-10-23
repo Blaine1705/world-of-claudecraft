@@ -1428,9 +1428,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  // Re-minted after merging v045-integration: sprite model VFX and live-world
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
-  '677e29fb9adb3ac4c7ef1d0b79207cb197c333176a3bb7ae5cff3318a0209ca9';
+  'a8063e568657f31634562833e434f5ad6ddcb9873003a80954913b2c7d958291';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1480,9 +1480,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  // Re-minted after merging v045-integration: sprite model VFX and live-world
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
-  'e6feea75c8398accd57d3d5c6ce1f956aec953402dc36466de2a3f98052119e6';
+  'ed346f4bbd9126e4c809f44c17230950d39cb7e69afd37cbcd252b7208248448';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2885,7 +2885,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('beafcd0b5c187b310ae30bb71f3503076ede2d8b089617980d2b796d9f0eaaab');
+    ).toBe('2ceee6b40cf9345be5f582db48e6162b9c60deb7d63746ff0ee2f4ecd4c022f1');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -7,13 +7,14 @@ import {
   TAVERN_WING,
   tavernToWorld,
 } from '../sim/content/mirefen_tavern';
-import { activeDungeonDoorPos, DUNGEONS } from '../sim/data';
+import { activeDungeonDoorPos, DUNGEONS, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import { activeFenbridgeLayout } from '../sim/fenbridge_touchup';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
 import { tavernGroundsRects } from '../sim/mirefen_tavern_grounds';
 import { PAINTED_TOWNS } from '../sim/painted_towns';
+import { distancePointToObb } from '../sim/placed_town_kit';
 import { SANCTUM_SEAL_GATE_DUNGEON_ID } from '../sim/sanctum_seal_gate';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 import {
@@ -70,9 +71,47 @@ export function insidePavedGrassExclusion(x: number, z: number): boolean {
   ) {
     return true;
   }
+  if (insideHighwatchGuildGround(x, z)) return true;
   // the Smith's Seal Gate: the frozen flags of its tunnel and lane
   const sanctum = DUNGEONS[SANCTUM_SEAL_GATE_DUNGEON_ID];
   return sanctum !== undefined && onSanctumSealGateFloor(activeDungeonDoorPos(sanctum), x, z, 0.2);
+}
+
+// The Highwatch adventurers' guild (sim/highwatch_layout.ts) is a walk-in house whose model
+// brings its own ground: its floors, porch and paved yard. The meadow must not grow through
+// any of it, so its whole reach is paving. Asked only while the active world stands the guild
+// where the layout does (its built-in record, or a Studio placement of its model at the same
+// anchor), cached per world.
+const GUILD = HIGHWATCH_LAYOUT.buildings.find((building) => building.id === 'highwatch_guild');
+const standsCache = new WeakMap<object, Map<string, boolean>>();
+
+function activeWorldStands(building: (typeof HIGHWATCH_LAYOUT.buildings)[number]): boolean {
+  const content = getActiveWorldContent();
+  let perWorld = standsCache.get(content);
+  if (!perWorld) {
+    perWorld = new Map();
+    standsCache.set(content, perWorld);
+  }
+  const cached = perWorld.get(building.id);
+  if (cached !== undefined) return cached;
+  const stands =
+    (content.props?.buildings ?? []).some((record) => record.id === building.id) ||
+    (content.placements ?? []).some(
+      (placement) =>
+        placement.path === building.assetId &&
+        Math.abs(placement.x - building.placement.x) < 1e-6 &&
+        Math.abs(placement.z - building.placement.z) < 1e-6,
+    );
+  perWorld.set(building.id, stands);
+  return stands;
+}
+
+/** True inside the Highwatch guild's reach (a quarter-turned box) while the active world
+ *  stands it. */
+export function insideHighwatchGuildGround(x: number, z: number): boolean {
+  if (!GUILD) return false;
+  if (distancePointToObb({ x, z }, GUILD.reach) > 0) return false;
+  return activeWorldStands(GUILD);
 }
 
 /** Hub and camp clearings for bushes/ferns, sourced from the active world only. */

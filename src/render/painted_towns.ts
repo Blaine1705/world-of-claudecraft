@@ -6,6 +6,7 @@
 // (buildPlacedTownViews), so a newly painted town needs no renderer edit.
 import { PAINTED_TOWNS } from '../sim/painted_towns';
 import type { BuildingDef } from '../sim/types';
+import type { IWorld } from '../world_api';
 import type { GfxSettings } from './gfx';
 import { buildHighwatchTownView } from './highwatch_town';
 import { createPlacedTownKit, type PlacedTownView } from './placed_town_buildings';
@@ -34,9 +35,14 @@ export function buildPaintedTownViews(seed: number): PlacedTownView[] {
 }
 
 /** Highwatch's view and every painted town's: the towns made only of placed
- *  painted buildings, which the renderer loops beside Eastbrook and Fenbridge. */
-export function buildPlacedTownViews(seed: number): PlacedTownView[] {
-  return [buildHighwatchTownView(seed), ...buildPaintedTownViews(seed)];
+ *  painted buildings, which the renderer loops beside Eastbrook and Fenbridge.
+ *  With the viewing `world`, Highwatch's guild trophy room follows the viewer's
+ *  dungeon clears (highwatch_town.ts). */
+export function buildPlacedTownViews(
+  seed: number,
+  world?: Pick<IWorld, 'deedStats'>,
+): PlacedTownView[] {
+  return [buildHighwatchTownView(seed, world), ...buildPaintedTownViews(seed)];
 }
 
 /** The painted buildings follow the profile's texture tier (the target's). */

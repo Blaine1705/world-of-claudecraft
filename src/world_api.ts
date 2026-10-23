@@ -973,6 +973,10 @@ export const COMMAND_NAMES = [
   'referralCards',
   // Sit on a piece of furniture by its seat id (IWorldSeating.sitOnSeat).
   'sit_seat',
+  // Lantern Hall's quartermaster: buy one cosmetic for Lantern Seals
+  // (IWorldQuests.buyGuildCosmetic; src/sim/guild_quartermaster.ts). Appended at the END
+  // because wire tokens are never reordered.
+  'guild_buy_cosmetic',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

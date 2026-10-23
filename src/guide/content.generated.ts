@@ -6233,6 +6233,51 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 10,
     "feat": false,
     "crest": "/ui/deeds/dgn_morthen_candlelight.webp"
+  },
+  {
+    "id": "dgn_guild_first_contract",
+    "name": "Writ Signed",
+    "category": "dungeon",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "dgn_guild_ten_contracts",
+    "name": "Regular at the Board",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_guild_fifty_contracts",
+    "name": "Contract Veteran",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "feat_guild_writ_runner",
+    "name": "Writ-Runner",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Writ-Runner"
+  },
+  {
+    "id": "feat_guild_hallsworn",
+    "name": "Hallsworn",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Hallsworn"
+  },
+  {
+    "id": "feat_guild_of_lantern_hall",
+    "name": "Of Lantern Hall",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "of Lantern Hall"
   }
 ];
 
@@ -7518,6 +7563,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Lantern Hall Destrier"
+      },
+      {
+        "kind": "mount",
         "name": "Grumbol the Lanternback"
       },
       {
@@ -7662,6 +7711,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "weapon_skin",
         "name": "Meteorlatch, the Sky's Last Judgment"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Blade of Lantern Hall"
       }
     ]
   },
@@ -7869,6 +7922,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Witness of the Choir"
+      },
+      {
+        "kind": "title",
+        "name": "Writ-Runner"
+      },
+      {
+        "kind": "title",
+        "name": "Hallsworn"
+      },
+      {
+        "kind": "title",
+        "name": "of Lantern Hall"
       }
     ]
   },

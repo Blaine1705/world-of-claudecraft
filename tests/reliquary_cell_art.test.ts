@@ -190,8 +190,22 @@ describe('title relics resolve the deed crest', () => {
     // Pin both routing and file presence so a missing file cannot pass on URL alone.
     expect(RELIQUARY_HORIZON_TITLES.length).toBeGreaterThan(30);
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
-    expect(pending, 'every shelf title has accepted painted art').toEqual([]);
-    for (const id of RELIQUARY_HORIZON_TITLES) {
+    // Every shelf title has accepted painted art but Lantern Hall's three bought titles,
+    // which ride their category crest until their paintings are commissioned.
+    expect(pending, 'artless shelf titles must be the pinned art-pending set').toEqual([
+      'feat_guild_writ_runner',
+      'feat_guild_hallsworn',
+      'feat_guild_of_lantern_hall',
+    ]);
+    for (const id of pending) {
+      expect(DEED_ART_PENDING.has(id), id).toBe(true);
+      // a pending title rides its category's crest
+      expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({
+        kind: 'crest',
+        crestId: `deed_cat_${DEEDS[id].category}`,
+      });
+    }
+    for (const id of RELIQUARY_HORIZON_TITLES.filter((title) => !pending.includes(title))) {
       expect(DEED_ART_PENDING.has(id), id).toBe(false);
       expect(deedImageUrl(`deed_${id}`), id).toBe(`/ui/deeds/${id}.webp`);
       expect(existsSync(join(REPO_ROOT, 'public/ui/deeds', `${id}.webp`)), id).toBe(true);

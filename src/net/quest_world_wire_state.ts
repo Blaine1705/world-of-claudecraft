@@ -36,6 +36,7 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_weekly_choose'; quest: string }
   | { cmd: 'world_quest_weekly_commend'; faction: string }
   | { cmd: 'clue_hunt_abandon' }
+  | { cmd: 'guild_buy_cosmetic'; offer: string }
   | { cmd: 'lance_brace' }
   | { cmd: 'lance_thrust' }
   | { cmd: 'lance_release' };
