@@ -57,16 +57,8 @@ export function dispatchDungeonFinderCommand(
           pid,
         );
       else if (value.kind === 'details' && validExpeditionDetails(value.details)) {
-        const listing = sim.dungeonFinderInfoFor(pid)?.myListing;
         const details = { purpose: value.details.purpose, note: value.details.note.trim() };
-        if (
-          listing &&
-          (listing.details?.purpose ?? 'clear') === details.purpose &&
-          (listing.details?.note ?? '') === details.note
-        )
-          break;
-        if (allowNote(details.note))
-          sim.dungeonFinderExpeditionConfigure({ kind: 'details', details }, pid);
+        sim.dungeonFinderExpeditionConfigure({ kind: 'details', details }, pid, allowNote);
       } else if (
         value.kind === 'available' &&
         typeof value.enabled === 'boolean' &&

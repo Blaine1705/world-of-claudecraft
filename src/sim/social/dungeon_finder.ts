@@ -22,6 +22,7 @@ import type {
   DungeonFinderInfo,
   DungeonFinderListingView,
   DungeonFinderProposalView,
+  ExpeditionSettings,
 } from '../../world_api/dungeon_finder';
 import {
   FINDER_ACTIVITIES,
@@ -76,6 +77,13 @@ import {
 import { changeQueueReward, loadQueueRewards } from './queue_rewards';
 
 export { finderLevelEligible } from './finder_recruitment';
+
+// Host-only note admission runs after the machine rejects unchanged details.
+export type FinderConfigureArgs = [
+  settings: ExpeditionSettings,
+  pid?: number,
+  allowNote?: (note: string) => boolean,
+];
 
 // Availability window before a proposal expires (whole seconds).
 export const FINDER_PROPOSAL_SECONDS = 30;
@@ -243,6 +251,7 @@ export class DungeonFinderMachine {
   private readonly proposals: FinderProposal[] = [];
   private readonly cooldownUntil = new Map<number, number>();
   private listings: FinderListing[] = [];
+  private readonly listingsByLeader = new Map<number, FinderListing>();
   private readonly applications = new FinderApplications();
   // Offline advert cooldowns (sim clock, keyed by player); online the server
   // owns them per account and never forwards an advertise command here.
@@ -293,7 +302,12 @@ export class DungeonFinderMachine {
   }
 
   private listingBy(leaderPid: number): FinderListing | null {
-    return this.listings.find((l) => l.leaderPid === leaderPid) ?? null;
+    return this.listingsByLeader.get(leaderPid) ?? null;
+  }
+
+  private addListing(listing: FinderListing): void {
+    this.listings.push(listing);
+    this.listingsByLeader.set(listing.leaderPid, listing);
   }
 
   private applicationsFor(listing: FinderListing) {
@@ -308,10 +322,7 @@ export class DungeonFinderMachine {
     if (this.dropApplication(pid)) this.bumpBoard();
   }
 
-  dungeonFinderExpeditionConfigure(
-    settings: import('../../world_api/dungeon_finder').ExpeditionSettings,
-    pid?: number,
-  ): void {
+  dungeonFinderExpeditionConfigure(...[settings, pid, allowNote]: FinderConfigureArgs): void {
     const r = this.ctx.resolve(pid);
     if (!r || r.meta.leaving) return;
     const id = r.meta.entityId;
@@ -326,7 +337,7 @@ export class DungeonFinderMachine {
       });
       if (!details) return;
       this.roleSelections.set(id, [settings.role]);
-      this.listings.push({
+      this.addListing({
         id: this.nextListingId++,
         activityId: settings.activityId,
         leaderPid: id,
@@ -342,14 +353,15 @@ export class DungeonFinderMachine {
         this.cancelApplication(id, settings.listingId);
     } else if (settings.kind === 'details') {
       const listing = this.listingBy(id);
-      if (!listing || !this.listingValid(listing) || !validExpeditionDetails(settings.details))
-        return;
+      if (!listing || !validExpeditionDetails(settings.details)) return;
       const details = { purpose: settings.details.purpose, note: settings.details.note.trim() };
       if (
         (listing.details?.purpose ?? 'clear') === details.purpose &&
         (listing.details?.note ?? '') === details.note
       )
         return;
+      if (allowNote && !allowNote(details.note)) return;
+      if (!this.listingValid(listing)) return;
       listing.details = details;
       this.bumpBoard();
     } else if (settings.kind === 'available') {
@@ -774,7 +786,7 @@ export class DungeonFinderMachine {
         return;
       }
     }
-    this.listings.push({
+    this.addListing({
       id: this.nextListingId++,
       activityId,
       leaderPid: id,
@@ -829,7 +841,7 @@ export class DungeonFinderMachine {
     const existing = this.listingBy(id);
     if (existing?.expeditionExitId === claim.exitId) return;
     if (existing) this.closeListing(existing, { notifyLeader: false });
-    this.listings.push({
+    this.addListing({
       id: this.nextListingId++,
       activityId: activity.id,
       leaderPid: id,
@@ -892,6 +904,7 @@ export class DungeonFinderMachine {
       if (listing.expeditionExitId !== undefined)
         this.social.outcome(app.pid, 'closed', this.ctx.players.get(listing.leaderPid)?.name ?? '');
     this.listings = this.listings.filter((l) => l.id !== listing.id);
+    this.listingsByLeader.delete(listing.leaderPid);
     for (const app of this.applicationsFor(listing)) {
       const pid = app.pid;
       this.dropApplication(pid, listing.id);

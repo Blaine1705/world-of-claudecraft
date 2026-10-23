@@ -4,13 +4,12 @@ import type { Sim } from '../src/sim/sim';
 import { bareClient } from './helpers/bare_client';
 
 describe('expedition wire commands', () => {
-  it('enforces the existing chat policy before publishing a group note', () => {
+  it('passes the host note policy to authoritative details admission', () => {
     const configure = vi.fn();
     const allowNote = vi.fn(() => false);
     dispatchDungeonFinderCommand(
       {
         dungeonFinderExpeditionConfigure: configure,
-        dungeonFinderInfoFor: () => null,
       } as unknown as Sim,
       7,
       {
@@ -19,8 +18,12 @@ describe('expedition wire commands', () => {
       },
       allowNote,
     );
-    expect(allowNote).toHaveBeenCalledWith('Blocked note');
-    expect(configure).not.toHaveBeenCalled();
+    expect(configure).toHaveBeenCalledExactlyOnceWith(
+      { kind: 'details', details: { purpose: 'clear', note: 'Blocked note' } },
+      7,
+      allowNote,
+    );
+    expect(allowNote).not.toHaveBeenCalled();
   });
   it('sends typed expedition settings and always dispatches as the authenticated player', () => {
     const client = bareClient(7);

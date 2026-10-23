@@ -15,7 +15,6 @@ import type {
   DailyRewardStatus,
   DelveCompanionInfo,
   DelveRunInfo,
-  ExpeditionSettings,
   GuildPledgeSettings,
   LockpickView,
   MountRaceView,
@@ -816,7 +815,7 @@ export { eloDelta } from './social/arena';
 import type { FinderListingTag } from './content/dungeon_finder';
 import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
 import { collectPartyInfo } from './party_frame_info';
-import { DungeonFinderMachine } from './social/dungeon_finder';
+import { DungeonFinderMachine, type FinderConfigureArgs } from './social/dungeon_finder';
 import { seedDungeonFinderDev } from './social/dungeon_finder_dev';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
@@ -9316,8 +9315,8 @@ export class Sim {
     this.dungeonFinder.dungeonFinderExpeditionApply(listingId, role, pid);
   }
 
-  dungeonFinderExpeditionConfigure(settings: ExpeditionSettings, pid?: number): void {
-    this.dungeonFinder.dungeonFinderExpeditionConfigure(settings, pid);
+  dungeonFinderExpeditionConfigure(...args: FinderConfigureArgs): void {
+    this.dungeonFinder.dungeonFinderExpeditionConfigure(...args);
   }
 
   seedDungeonFinderDev(

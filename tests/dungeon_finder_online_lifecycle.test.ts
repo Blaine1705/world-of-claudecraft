@@ -34,6 +34,8 @@ vi.mock('../server/sim_boot_config', async (importOriginal) => {
 
 import { GameServer } from '../server/game';
 import { type Role, TALENTS } from '../src/sim/content/talents';
+import { DungeonFinderMachine } from '../src/sim/social/dungeon_finder';
+import { FinderApplications } from '../src/sim/social/finder_applications';
 import type { PlayerClass } from '../src/sim/types';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
@@ -99,6 +101,36 @@ describe('Groups authoritative online lifecycle', () => {
     update(' New recruitment note ');
     expect(leader.session.chatRateViolations).toBe(violations);
     expect(server.sim.dungeonFinderBoardView()).toBe(acceptedBoard);
+  });
+
+  it('admits note edits without projecting applicants or scanning the realm listing book', () => {
+    const { server, connect } = harness();
+    const leader = connect('CheapNoteLeader', 'warrior', 'tank');
+    publish(leader, 'tank');
+    const machine = (server.sim as unknown as { dungeonFinder: DungeonFinderMachine })
+      .dungeonFinder;
+    const listings = (machine as unknown as { listings: unknown[] }).listings;
+    const projection = vi.spyOn(DungeonFinderMachine.prototype, 'buildInfoFor');
+    const scan = vi.spyOn(listings, 'find');
+    const applicants = vi.spyOn(FinderApplications.prototype, 'forListing');
+    leader.session.chatTokens = 1;
+    leader.session.chatLastRefill = Date.now() / 1000;
+    try {
+      for (const note of [' Raid recruitment ', 'Changed note', 'Rejected note', ' Changed note '])
+        leader.client.dungeonFinderExpeditionConfigure({
+          kind: 'details',
+          details: { purpose: 'relaxed', note },
+        });
+      expect(projection).not.toHaveBeenCalled();
+      expect(scan).not.toHaveBeenCalled();
+      expect(applicants).not.toHaveBeenCalled();
+      expect(leader.session.chatTokens).toBeLessThan(0.01);
+      expect(server.sim.dungeonFinderBoardView()[0]?.details?.note).toBe('Changed note');
+    } finally {
+      projection.mockRestore();
+      scan.mockRestore();
+      applicants.mockRestore();
+    }
   });
 
   it('allows muted players to publish an empty note while rejecting nonempty text', () => {
