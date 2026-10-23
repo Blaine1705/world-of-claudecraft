@@ -705,9 +705,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
 }> = [
   {
     file: 'hud/expeditions/expedition_controller.ts',
-    memos: ['lastWorld'],
+    memos: ['compatibilitySig', 'lastWorld', 'liveListingSig', 'soundedRequestSig'],
     reason:
-      'lastWorld tracks the bound IWorld identity and resets character-local notification history. lastSig gates bell labels; the relocalize arm above clears it and refreshes the label through the shared writers.',
+      'lastWorld tracks the bound IWorld identity and resets character-local notification history. compatibilitySig caches eligibility from level, roles, lockout ids and listing composition. liveListingSig and soundedRequestSig track listing and applicant ids to prune notification history. These memos contain no localized text. lastSig gates bell labels; the relocalize arm above clears it and refreshes the label through the shared writers.',
   },
   {
     file: 'hud/vehicle/forge_action_bar_controller.ts',
