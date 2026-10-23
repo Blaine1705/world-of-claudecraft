@@ -320,11 +320,14 @@ export const TOWN_BUILDING_NATURAL: Readonly<Record<string, NaturalSize>> = {
   'tidehold/fenrire/shop_b': { x: 13.6495, y: 18.7, z: 12.7017 },
   // Highwatch stands it in the Highwatch look (slate and granite): again
   // the same models re-baked, so the same sizes.
+  'tidehold/highwatch/bank': { x: 22.6067, y: 22.5005, z: 19.8387 },
   'tidehold/highwatch/tavern_b': { x: 30.262, y: 22.3513, z: 20.4279 },
   'tidehold/highwatch/hall': { x: 18.8515, y: 30.4998, z: 24.212 },
   'tidehold/highwatch/shop_a': { x: 13.004, y: 16.2797, z: 12.2001 },
   'tidehold/highwatch/house_c': { x: 12.7632, y: 19.5804, z: 16.2637 },
   'tidehold/highwatch/smithy': { x: 19.797, y: 12.7809, z: 11.6901 },
+  // ...and the adventurers' guild (scripts/assets/highwatch_guild/)
+  'tidehold/highwatch/guild': { x: 39.05, y: 35.45, z: 47.75 },
   // The town looks (the town texture library's maps, each building with its
   // own stained glass): the same models re-baked, so the same sizes.
   'tidehold/pantile/house_a': { x: 11.7628, y: 12.23, z: 9.8009 },

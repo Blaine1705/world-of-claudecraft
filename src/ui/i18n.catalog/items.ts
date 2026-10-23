@@ -85,14 +85,15 @@ const itemStringsEn = {
       membershipToken:
         'Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.',
       membershipAdaptive: 'Stats and armor adapt to your class and specialization.',
-      membershipScaling:
-        'Item level matches your level. At level 20, this armor perfects at item level 25.',
+      membershipWeaponAdaptive:
+        'Changes its weapon type, appearance and stats to suit your class and specialization while equipped.',
+      membershipScaling: 'Item level {level}. Always 5 item levels above your character level.',
       membershipPerfected: 'Perfected: item level {level}.',
       membershipFullSet:
         'Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.',
       membershipRequired:
-        'Armor stats and set benefits stop when membership expires and return when you renew.',
-      membershipDormant: 'Inactive: renew your membership to restore armor stats and set benefits.',
+        'Gear stats and set benefits stop when membership expires and return when you renew.',
+      membershipDormant: 'Inactive: renew your membership to restore gear stats and set benefits.',
       qualityKind: '{quality} {kind}',
       currentlyEquipped: 'Currently equipped',
       ifYouEquip: 'If you equip this',
@@ -2634,10 +2635,12 @@ const ITEM_ENTITY_IDS = [
   'artisans_eye',
   'reins_terrorspark_groundshaker',
   'reins_avian_strider',
+  'reins_nightwing_chimera',
   'reins_goblin_rocket_sled',
   'reins_rallycart_rxt',
   'reins_lanternback_troll',
   'reins_chimeglass_tortoise',
+  'reins_wobbles_slime',
   'reins_rickshaw_mount',
   'reins_drakemaw_raptor',
   'reins_mech_bird',
@@ -2892,6 +2895,7 @@ const ITEM_ENTITY_IDS = [
   'whistle_skeleton',
   'whistle_crystal_lich',
   'whistle_forgemaw',
+  'whistle_sprites',
   'whistle_crystal_tide',
   'whistle_phantom',
   'whistle_emberfall_phoenix',
@@ -4056,12 +4060,14 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
   reins_avian_strider: 'Reins of the Viridian Valestrider',
+  reins_nightwing_chimera: 'Reins of the Nightwing Chimaera',
   reins_goblin_rocket_sled: 'Ignition Key: Goblin Rocket Sled',
   reins_rallycart_rxt: 'Ignition Key: Rallycart RXT',
   reins_terrorspark_groundshaker: 'Ignition Key: Dreadspark Groundshaker',
   reins_lanternback_troll: "Lamplighter's Yoke: Grumbol",
   reins_chimeglass_tortoise: "Roadwarden's Bellstrap: Tolliver",
   reins_rickshaw_mount: 'Bound Reins: Bonebound Rickshaw',
+  reins_wobbles_slime: 'Jelly Saddle: Wobbles',
   // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
   // folds them into the per-locale arrays.
   firebottle: 'Firebottle',
@@ -4382,6 +4388,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   whistle_skeleton: 'Skeleton Whistle',
   whistle_crystal_lich: 'Crystal Lich Whistle',
   whistle_forgemaw: 'Forgemaw The Molten Whistle',
+  whistle_sprites: 'Flicker and Glimmer Whistle',
   whistle_crystal_tide: 'Crystal Tide Whistle',
   whistle_phantom: 'Phantom Whistle',
   whistle_emberfall_phoenix: 'Emberfall Phoenix Whistle',
@@ -5440,6 +5447,7 @@ function itemTranslations(names: readonly string[]): ItemEntityTranslations {
 function itemTranslationsEn(names: readonly string[]) {
   return {
     ...itemTranslations(names),
+    membership_staff: { name: 'Staff of Changing' },
     membership_token: { name: 'Membership Token (30 Days)' },
     referral_satchel: { name: 'Friendship Satchel' },
     referral_hollow_charm: { name: "Oathkeeper's Heart" },

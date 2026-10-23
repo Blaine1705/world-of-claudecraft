@@ -10,6 +10,7 @@ import { courierStrings } from './courier';
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 import { cosmeticsStrings } from './cosmetics';
+import { guildHallStrings } from './guild_hall';
 import { professionTrainerStrings } from './profession_trainers';
 import { weeklyRewardStrings } from './weekly_rewards';
 
@@ -60,6 +61,7 @@ export const hudChromeStrings = {
   },
   professionTrainers: professionTrainerStrings,
   weeklyRewards: weeklyRewardStrings,
+  guildHall: guildHallStrings,
   // The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
   // src/ui/hud/transport/):
   // the timetable panel near the docked ship and the sailing line aboard.
@@ -634,7 +636,7 @@ export const hudChromeStrings = {
       annualTerms:
         'Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.',
       annualMount:
-        'After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.',
+        'After payment, collect the soulbound Nightwing Chimaera reins by mail on the character that purchased this bundle. The mount remains yours after membership expires.',
       trialTerms:
         'Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.',
       startTrial: 'Start 7-day free trial',
@@ -650,10 +652,11 @@ export const hudChromeStrings = {
       benefitBank: "Access your other characters' banks at any banker.",
       benefitSlots: 'Unlock 10 additional character slots.',
       benefitArmour:
-        'Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.',
+        'Claim Rare soulbound armour and the Staff of Changing. Their stats adapt to your class and specialisation, always 5 item levels above your character level. Wear all 7 armour pieces for 20% more XP.',
+      benefitBag: 'Equip an extra bag in your membership bag slot.',
       benefitTax: 'Pay half the normal auction house tax.',
       benefitExpiry:
-        'When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.',
+        'When membership ends, additional character slots, gear benefits and the extra bag slot lock until renewal. Your bag and items stay safe, with excess items kept as overflow. Your base character slots remain playable.',
       tokenTerms:
         '{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.',
       tokenBuy: 'Buy membership token',
@@ -737,6 +740,20 @@ export const hudChromeStrings = {
     collections: armoryCollectionStrings,
     skins: armorySkinStrings,
     seasonOne: 'Season 1',
+    // The rotating promo card above chat (src/ui/store_promo_card.ts). The
+    // Refer a Friend advert takes its title from the referralCards namespace.
+    membershipPromo: {
+      open: 'Membership in the WOC Store',
+      close: 'Close membership promotion',
+      eyebrow: 'Account perks',
+      title: 'Membership',
+      cta: 'Join now',
+    },
+    referralPromo: {
+      close: 'Close Refer a Friend promotion',
+      eyebrow: 'Adventure together',
+      cta: 'Invite friends',
+    },
     rarity: {
       uncommon: 'Uncommon',
       rare: 'Rare',
@@ -1250,7 +1267,7 @@ export const hudChromeStrings = {
     guidanceOff: 'Turn guidance off',
     guidanceSetting: 'Eastbrook golden guidance',
     bellHomeNote:
-      'Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
+      'Back from the shore already? That was the ferry bell you rang. Its twin hangs right beside you on the quay: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
     // Ferryman Odo's island welcome, shown once for a character's first
     // arrival: the greeting ferry lands beside his pier.
     // Deliberately short (CX: the old note was a wall of text at the exact
@@ -2370,8 +2387,11 @@ export const hudChromeStrings = {
     name_avian_strider: 'Viridian Valestrider',
     name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
+    name_lantern_hall_destrier: 'Lantern Hall Destrier',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
+    name_wobbles_slime: 'Wobbles the Slime',
+    name_nightwing_chimera: 'Nightwing Chimaera',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -2387,9 +2407,11 @@ export const hudChromeStrings = {
       'A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.',
     desc_rallycart_rxt: 'A pint-sized rally machine that provides enhanced travel speed.',
     desc_rallycart_skin: 'A tiny rally car with a mighty roar.',
+    desc_wobbles_slime:
+      'A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
-    desc_referral_tank: 'Earned by completing a referral stamp card.',
+    desc_referral_tank: 'Former referral stamp card reward.',
     desc_referral_raptor: 'Earned by helping your first bound friend complete a stamp card.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
@@ -2399,6 +2421,10 @@ export const hudChromeStrings = {
       'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
     desc_lanternback_troll:
       'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
+    desc_lantern_hall_destrier:
+      "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
+    desc_nightwing_chimera:
+      'A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.',
     desc_chimeglass_tortoise:
       'A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.',
     desc_rickshaw_mount:
@@ -4853,6 +4879,10 @@ export const hudChromeStrings = {
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
   bags: {
+    membershipSlot: 'Membership bag slot',
+    membershipSlotLocked: 'Unlock this bag slot with a membership.',
+    membershipSlotHint:
+      'Equip one extra bag while your membership is active. Your bag and items stay safe when it expires.',
     // Right-click destroy affordance: rejected when the item is flagged noDiscard
     // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
     cannotDestroy: 'This item cannot be destroyed.',
@@ -5047,6 +5077,25 @@ export const hudChromeStrings = {
     collapseAbility: 'Collapse {ability}',
     abilityControlLabel: '{action}. {details}',
     tooltipMeta: '{phase} | {difficulty}',
+    // The five-player dungeon pages (src/ui/boss_journal/).
+    dungeonButton: 'Boss Guide: {dungeon}',
+    dungeonBossesLabel: 'Dungeon bosses',
+    dungeonSubtitle: '{dungeon} | {boss} | {difficulty}',
+    rankMiniboss: 'Miniboss',
+    rankFinal: 'Final boss',
+    defeated: 'Defeated',
+    browseBossDefeated: 'View {boss} (defeated)',
+    heroicHeading: 'What changes on Heroic',
+    tipsHeading: 'Role tips',
+    choicesHeading: 'Key choices',
+    choiceGain: 'You gain',
+    choiceRisk: 'You risk',
+    markHeroicOnly: 'Heroic only',
+    markHeroicChanged: 'Changed on Heroic',
+    damageCompare: 'Normal {normal} | Heroic {heroic}',
+    damageRange: '{min} to {max}',
+    finderOpen: 'Boss Guide',
+    finderOpenLabel: 'Open the boss guide for {boss}',
     ignivar: {
       overview:
         'Varkhul forged Ignivar as a herald, a living seal, and the key to the Inner Crucible. The encounter tests water-conduit control, precise movement, and fast priority damage.',
@@ -7109,15 +7158,28 @@ export const hudChromeStrings = {
     tabsAria: 'Bank tabs',
     personalTab: 'Personal',
     accountTab: 'Other characters',
-    accountArmour: 'Claim membership armour',
+    accountArmour: 'Claim membership gear',
     referralArmour: 'Claim friendship armour',
     accountMembership: "An active membership lets you access your other characters' banks here.",
     accountCharacters: 'Character banks',
     accountEmpty: 'Create another character to use their bank here.',
     accountSelect: 'Select a character to load their bank.',
     accountUnavailable: 'This bank is unavailable. Select the character again to refresh.',
-    accountDeposit: 'Your bags: deposit into this bank',
-    accountWithdraw: 'Selected bank: withdraw into your bags',
+    accountLoading: 'Loading your characters...',
+    accountOpening: "Opening {name}'s bank...",
+    accountOnline: '{name} is logged in. Log that character out to open their bank here.',
+    accountBusy: 'The bank is busy. Try again in a moment.',
+    accountNoFit: 'There is no room for that stack.',
+    accountStale: 'That stack changed before it could move. Try again.',
+    accountTooLarge: "{name}'s bank is too large to open from here. Log in as {name} to use it.",
+    accountRetry: 'Try again',
+    accountBankTitle: "{name}'s bank",
+    accountBagsTitle: 'Your bags',
+    accountSlots: '{used} / {total} slots',
+    accountWithdrawLead: 'Click an item to move it into your bags.',
+    accountDepositLead: "Click an item to send it to {name}'s bank.",
+    accountBankEmpty: 'This bank is empty.',
+    accountBagsEmpty: 'Your bags are empty.',
     accountDepositHint: 'Click to deposit this stack into the selected character bank.',
     accountWithdrawHint: 'Click to withdraw this stack into your bags.',
     accountBound: 'Soulbound, locked and quest items cannot move between characters.',
@@ -7314,6 +7376,7 @@ export const hudChromeStrings = {
       skeleton: 'Dry bones rattle in step with yours.',
       crystal_lich: 'A cold hum rises from the wreckage, and it is watching you.',
       forgemaw: 'The heat of the forge has not left you. Something walked out with it.',
+      sprites: 'Two small flames have caught on you, and they are not going out.',
       crystal_tide: 'A drop of the sea refuses to fall from your line.',
       phantom: 'The air behind you is a shade too still.',
       emberfall_phoenix: 'A warmth like a banked fire settles at your back.',
@@ -7427,6 +7490,8 @@ export const hudChromeStrings = {
         "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
       crystal_tide:
         'A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.',
+      sprites:
+        'Two small fire sprites, one gold and one teal, who never quite agree which of them is leading. Get close enough and they fold into one green flame, then spill apart again, laughing.',
       phantom:
         'A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.',
       emberfall_phoenix:
@@ -9871,6 +9936,8 @@ export const hudChromeStrings = {
     // chest, never from the keeper's own loot, and at the tier the map buys.
     sourceActivityBuriedHoard:
       'Found in the reward chest of a Buried Hoard, the vault a treasure map leads to',
+    // Lantern Hall's horse and sword (src/sim/guild_quartermaster.ts): bought, not dropped.
+    sourceActivityLanternHall: "Bought for Lantern Seals from Lantern Hall's quartermaster",
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.

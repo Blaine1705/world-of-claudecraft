@@ -419,7 +419,15 @@ describe('generated chunk geometry is stable', () => {
     // dense height atlas (tests/terrain_height_parity.test.ts, re-minted with it).
     // Re-minted after aligning BIOME_PALETTE.marsh with Eastbrook's vale meadow
     // palette (which blends across the z = 150..215 northern border strip).
-    expect(digestOf(inRect)).toBe('2be0339c90e8ea2f2a23f60bd344fbed');
+    // Re-minted for the six Stolen Supply Crates moving off the eastern
+    // hillside into the bandit camps: their ground-object calm pads leave the
+    // slope. Checked against the dense height atlas re-minted in the same
+    // commit: 13 points move, all within 17 yd of an old crate spot, by at
+    // most 2.7 yd. Measured on the merged tree, twice in separate processes.
+    // Re-minted for the freight yard and ferry bell moving to the quay. The
+    // dense height atlas changes at 74 of 167,188 samples, all within 5.93 yd
+    // of an old or new object position (maximum height delta 2.84 yd).
+    expect(digestOf(inRect)).toBe('3d621f9335e944b43575c00e60652941');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

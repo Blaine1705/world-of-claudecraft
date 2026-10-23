@@ -240,7 +240,10 @@ async function main() {
     });
     if (!booted) throw new Error('offline world did not boot');
     const chat = (c) => page.evaluate((cmd) => window.__game.world.chat(cmd), c);
-    for (const cmd of ['/dev level 20', '/dev god', '/dev sanctum enter']) {
+    // SHOT_PRE: extra chat commands after the entry, ";"-separated (tuning
+    // runs: `/dev sanctum kill trash` for an empty route).
+    const pre = (process.env.SHOT_PRE ?? '').split(';').filter(Boolean);
+    for (const cmd of ['/dev level 20', '/dev god', '/dev sanctum enter', ...pre]) {
       await chat(cmd);
       await sleep(1300);
     }

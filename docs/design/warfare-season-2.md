@@ -103,9 +103,11 @@ everywhere. These rules hold them together:
   sets (the sets are class-locked, so the shop shows only what the viewer can wear), then the
   season weapons the viewer can wield. The entry tier follows as its own group, unfiltered.
 - **Art:** the four weapons ship painted icons (the `warfare-season2-weapons-2026-09-25`
-  batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. The 135 armor
-  pieces sit on `ITEM_ART_PENDING` (pinned in `tests/item_icons.test.ts`) and draw their
-  procedural icon until a follow-up art pass paints them.
+  batch in `public/ui/items/mapping.json`) and held models on shipped GLBs. All 135 armor
+  pieces across the nine classes ship individual paintings from the
+  `warfare-season2-*-icons-2026-10-22` batches in `public/ui/items/mapping.json`.
+  `tests/item_icons.test.ts` verifies complete static coverage;
+  `tests/warfare_season2_icon_art.test.ts` pins every set and its accepted shipping hashes.
 - **Ids:** sets use a new prefix, `vanguard_<spec>`, so the existing `warfare_*` pins keep
   meaning the entry tier.
 
@@ -469,6 +471,8 @@ Implementation routes:
   - Route: DATA ProcDef. `trigger: { on: 'castNth', n: 1, abilities: ['stormstrike'] }`, `responses: [{ kind: 'cooldownRefund', ability: 'elemental_trance', seconds: 4 }]`.
   - Resolved: about 1 Ancestral Strike per 12 sec, so Trance comes back about every
     90 sec instead of 120 (Stormsurge resets add a little more; disclose).
+- **Stats:** the five Galeborn pieces carry Strength and Stamina, with the existing physical
+  stat budget unchanged (shaman attack power never reads Agility).
 - **PvE ceiling:** Warspirit Emberscale (2pc: Ancestral Strike advances cadence 3
   steps; 4pc: Ancestral Strike hits 30 percent harder). Ours adds zero damage: a slow
   (bosses largely ignore it) and more uptime on a defensive. Stonehearth Bastion

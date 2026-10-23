@@ -3,8 +3,10 @@ import {
   MEMBERSHIP_ARMOUR_SLOTS,
   MEMBERSHIP_DURATION_SECONDS,
   MEMBERSHIP_TOKEN_ID,
+  MEMBERSHIP_WEAPON_ID,
 } from '../src/sim/content/membership';
 import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
+import { SPEC_PRIMARY_STAT } from '../src/sim/content/spec_primary_stat';
 import { ITEMS } from '../src/sim/data';
 import { maxArmorTypeForClass } from '../src/sim/equipment_rules';
 import { checkStaminaModel, primaryStatBudget } from '../src/sim/item_budget';
@@ -23,10 +25,31 @@ function member(cls: PlayerClass = 'warrior') {
   return { sim, pid, meta };
 }
 
+describe('membership gear primary stats', () => {
+  it('raises attack power through the live stat derivation for every physical specialisation', () => {
+    // The per-spec primary itself is pinned in tests/spec_primary_stat.test.ts.
+    for (const [cls, specs] of Object.entries(SPEC_PRIMARY_STAT) as [
+      PlayerClass,
+      Record<string, string>,
+    ][]) {
+      for (const [spec, primary] of Object.entries(specs)) {
+        if (primary === 'int') continue;
+        const { sim, pid } = member(cls);
+        sim.setPlayerLevel(20, pid);
+        expect(sim.setSpec(spec, pid)).toBe(true);
+        const power = () => (cls === 'hunter' ? sim.player.rangedPower : sim.player.attackPower);
+        const worn = power();
+        for (const slot of MEMBERSHIP_ARMOUR_SLOTS) sim.unequipItem(slot, pid);
+        expect(worn - power(), `${cls}/${spec}`).toBeGreaterThan(0);
+      }
+    }
+  });
+});
+
 describe('membership armour', () => {
-  it('uses the normal stat budget for every class/spec and scales into item level 25 at 20', () => {
-    for (const level of [1, 7, 19, 20]) {
-      expect(membershipItemLevel(level)).toBe(level === 20 ? 25 : level);
+  it('uses the normal stat budget for every class/spec and stays rare and five item levels above every character level', () => {
+    for (const level of [1, 7, 19, 20, 25, 40]) {
+      expect(membershipItemLevel(level)).toBe(level + 5);
       for (const set of SEASON2_SETS) {
         for (const slot of MEMBERSHIP_ARMOUR_SLOTS) {
           const item = membershipArmourItem(
@@ -39,9 +62,10 @@ describe('membership armour', () => {
           expect(item.kind === 'armor' && item.armorType).toBe(
             maxArmorTypeForClass(set.cls as PlayerClass),
           );
+          expect(item.quality).toBe('rare');
           const check = checkStaminaModel(
             item.stats,
-            primaryStatBudget(membershipItemLevel(level), 'epic', slot),
+            primaryStatBudget(membershipItemLevel(level), 'rare', slot),
           );
           expect(check.meetsFloor).toBe(true);
           expect(check.onLine).toBe(true);
@@ -105,28 +129,49 @@ describe('membership armour', () => {
     expect(sim.player.stats.str).toBe(activeStr);
   });
 
-  it('claims within capacity and reclaims without duplicating banked, worn, or carried pieces', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+  it('overflows full bags and grants only pieces missing from every owned container', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
     const pid = sim.player.id;
     const meta = sim.players.get(pid)!;
     meta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'worn_sword', count: 1 }));
+    const rev = meta.wireRev;
     sim.setMembership(pid, 30);
-    expect(meta.inventory).toHaveLength(16);
-    expect(meta.inventory.some((slot) => slot.itemId.startsWith('membership_'))).toBe(false);
-    meta.inventory = [];
-    sim.claimMembershipArmour(pid);
-    const banked = meta.inventory.shift()!;
-    meta.bank.inventory.push(banked);
+    expect(meta.inventory).toHaveLength(24);
+    expect(meta.wireRev).toBeGreaterThan(rev);
+    const take = (id: string) =>
+      meta.inventory.splice(
+        meta.inventory.findIndex((s) => s.itemId === id),
+        1,
+      )[0];
+    meta.bank.inventory.push(take('membership_helmet'));
+    meta.courier = {
+      phase: 'waiting',
+      x: 0,
+      z: 0,
+      bankerId: null,
+      travelDistance: 0,
+      cargo: [take('membership_feet')],
+      withdrawals: [],
+      revision: 0,
+      retryRemaining: 0,
+    };
     sim.equipItem('membership_chest', pid);
-    sim.setMembership(pid, 60);
-    sim.claimMembershipArmour(pid);
+    for (let i = 0; i < 3; i++) sim.claimMembershipArmour(pid);
     const owned = [
       ...meta.inventory.map((s) => s.itemId),
       ...meta.bank.inventory.map((s) => s.itemId),
       ...Object.values(meta.equipment),
+      ...meta.courier.cargo.map((s) => s.itemId),
     ];
-    for (const slot of MEMBERSHIP_ARMOUR_SLOTS)
-      expect(owned.filter((id) => id === `membership_${slot}`)).toHaveLength(1);
+    for (const id of [
+      ...MEMBERSHIP_ARMOUR_SLOTS.map((slot) => `membership_${slot}`),
+      MEMBERSHIP_WEAPON_ID,
+    ])
+      expect(owned.filter((ownedId) => ownedId === id)).toHaveLength(1);
+    take('membership_gloves');
+    sim.claimMembershipArmour(pid);
+    expect(meta.inventory.filter((s) => s.itemId === 'membership_gloves')).toHaveLength(1);
+    expect(meta.inventory.filter((s) => s.itemId === MEMBERSHIP_WEAPON_ID)).toHaveLength(1);
   });
 
   it('does not restore or accept membership authority from a character blob', () => {

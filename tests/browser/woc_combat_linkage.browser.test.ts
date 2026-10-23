@@ -42,9 +42,9 @@ describe('combat animation linkage on the shipped WOC rigs', () => {
         name;
       try {
         for (const [ability, clip] of [
-          ['raptor_strike', '1H_Chop'],
-          ['mongoose_bite', '1H_Slash'],
-          ['wing_clip', '1H_Slash'],
+          ['raptor_strike', 'Woc_Attack_1H_0'],
+          ['mongoose_bite', 'Woc_Attack_1H_1'],
+          ['wing_clip', 'Woc_Attack_1H_1'],
         ]) {
           visual.playAttack(ability, false, 'melee');
           visual.update(0.1, idle, true);
@@ -72,7 +72,7 @@ describe('combat animation linkage on the shipped WOC rigs', () => {
         try {
           visual.playAttack(undefined, false, 'wand');
           visual.update(0.1, idle, true);
-          expect(current(visual).getClip().name).toBe('Cast_Shoot');
+          expect(current(visual).getClip().name).toBe('Woc_Cast_Shoot');
           expect(current(visual).getEffectiveWeight()).toBeGreaterThan(0);
           expect(current(visual).time).toBeGreaterThan(0);
         } finally {
@@ -82,15 +82,15 @@ describe('combat animation linkage on the shipped WOC rigs', () => {
     );
 
     it.each([
-      ['hunter', 'tame_beast'],
-      ['hunter', 'revive_pet'],
-      ['druid', 'tranquility'],
-    ])(`%s${fit}: %s uses a continuous casting gesture`, (cls, ability) => {
+      ['hunter', 'tame_beast', 'Woc_Channel_Directed'],
+      ['hunter', 'revive_pet', 'Woc_Cast_Omni'],
+      ['druid', 'tranquility', 'Woc_Cast_Omni'],
+    ])(`%s${fit}: %s uses a continuous casting gesture`, (cls, ability, expectedClip) => {
       const visual = new CharacterVisual(`player_${cls}${fit}`, 0xffffff);
       try {
         const state = { ...idle, casting: true, castingAbility: ability };
         for (let frame = 0; frame < 90; frame++) visual.update(1 / 60, state, true);
-        expect(current(visual).getClip().name).toBe('Cast_Loop');
+        expect(current(visual).getClip().name).toBe(expectedClip);
         expect(current(visual).paused).toBe(false);
         expect(current(visual).getEffectiveWeight()).toBeGreaterThan(0);
       } finally {

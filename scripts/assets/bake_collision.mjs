@@ -22,6 +22,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import * as esbuild from 'esbuild';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { isFoliageFieldCopyCatalogId } from './foliage_bark_decimation.mjs';
+import { isSceneryLodCopyCatalogId } from './scenery_lod_build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const MODELS_DIR = path.join(ROOT, 'public', 'models');
@@ -124,8 +125,9 @@ async function main() {
     // The world foliage field's decimated-bark copies are not placeable (the
     // catalogue drops them by the same predicate, scripts/gen_asset_catalog.mjs),
     // so nothing ever resolves a collision for them: an authored map places the
-    // full-detail original.
-    if (isFoliageFieldCopyCatalogId(id)) continue;
+    // full-detail original. The distant scenery `<model>_lod` copies are
+    // skipped for the same reason.
+    if (isFoliageFieldCopyCatalogId(id) || isSceneryLodCopyCatalogId(id)) continue;
     const category = bakeCategoryFor(id);
     if (category === 'none') {
       skipped.push(id);

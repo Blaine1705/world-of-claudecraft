@@ -23,7 +23,7 @@ describe('membership plan offers', () => {
       'Renews yearly',
       'once per account',
       'payment method is required',
-      'soulbound tank mount',
+      'soulbound Nightwing Chimaera reins',
     ])
       expect(html).toContain(text);
     expect(html).not.toContain('Claudium');

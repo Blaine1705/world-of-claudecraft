@@ -39,6 +39,7 @@ import { REALM_PROPS } from '../src/sim/content/realm';
 import { WRAITHWOOD_PROPS } from '../src/sim/content/wraithwood';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import type { MapPlacement } from '../src/sim/map_doc';
+import { MUDFIN_HUT_MODELS, MUDFIN_HUTS, mudfinHutAt } from '../src/sim/mudfin_huts';
 import { propPlacementRoll } from '../src/sim/prop_layout';
 import { terrainHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -214,8 +215,25 @@ describe('the families the editor drew too large', () => {
     const huts = placements.filter((p) => /^Mud hut \d+$/.test(p.name ?? ''));
     expect(huts).toHaveLength(props.mudHuts.length);
     expect(huts.length).toBeGreaterThan(0);
+    let mudfinCount = 0;
     for (const [i, hut] of huts.entries()) {
       const [x, z] = props.mudHuts[i];
+      // the Mirefen camp's painted mudfin huts: real-size GLBs drawn at scale 1
+      const mudfin = mudfinHutAt(x, z);
+      if (mudfin) {
+        mudfinCount++;
+        expect(hut.assetId).toBe(`props/mudfin_hut_${mudfin.model}`);
+        expect(huts.some((p) => p.name === `${hut.name} toadstools`)).toBe(false);
+        const size = await drawn(hut);
+        expect(size.y).toBeCloseTo(MUDFIN_HUT_MODELS[mudfin.model].height, 2);
+        // and it walls a Studio playtest exactly where the game's collider does
+        expect(hut.collisionMode).toBe('basic');
+        expect(hut.collideRadius).toBe(MUDFIN_HUT_MODELS[mudfin.model].radius);
+        expect(hut.x).toBeCloseTo(x, 6);
+        expect(hut.z).toBeCloseTo(z, 6);
+        continue;
+      }
+      expect(hut.assetId).toBe('props/mushroom_red');
       const box = await boundsOf('/models/props/mushroom_red.glb');
       const rawH = box.max[1] - box.min[1];
       const size = await drawn(hut);
@@ -224,6 +242,7 @@ describe('the families the editor drew too large', () => {
       expect(size.y).toBeLessThan(rawH * (10.5 + propPlacementRoll(x, z, 16) * 3) * 1.15);
       expect(size.y).toBeLessThan(4);
     }
+    expect(mudfinCount).toBe(MUDFIN_HUTS.length);
   });
 
   it('keeps every camp tent within the 3-yard footprint the game gives it', async () => {

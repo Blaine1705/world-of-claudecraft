@@ -151,6 +151,9 @@ export interface SpatialAudioSink {
     self: boolean,
     entityId: number,
   ): void;
+  /** The call a mount gives as it rears up (mount_rear_core.ts): `mount_neigh_<look>`, silent
+   *  for a mount with no take. Optional, so a host without one simply stays quiet. */
+  mountNeigh?(x: number, y: number, z: number, look: string, self: boolean): void;
   /** Warm a mount's summon take on the channel's START edge. */
   preloadMountSummon(mountKey: string): void;
   /** The standstill powered-on hum for a mount with a dedicated idle take

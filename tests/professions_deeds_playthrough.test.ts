@@ -340,8 +340,14 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Re-hunted for the Fenbridge rebuild (painted buildings, the open ring,
     // walk-in floors, re-threaded streets and lamps): colliders, roads and
     // walkable ground near the town are world-gen inputs, so the shared stream
-    // forks again; the koi now lands on session index 14.
-    expect(koiSession).toBe(14);
+    // forks again; the koi now lands on session index 14. Re-hunted for the
+    // Mirefen mudfin huts becoming solid walls (src/sim/mudfin_huts.ts): the
+    // camp murlocs' idle wander now settles on other ticks, so the shared
+    // stream forks again; the koi now lands on session index 18. Re-hunted for
+    // the wander fix around those huts (an idle pick inside a hut wall is
+    // skipped for one more pause, mob/locomotion.ts): the murlocs' wander draws
+    // move, so the shared stream forks again; the koi now lands on session index 3.
+    expect(koiSession).toBe(3);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -399,20 +405,23 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // named at the koi hunt above (195, 61, 132 to 45, 0, 14). The heartwood's
     // 0 was a real first-harvest hit of the 1-in-90 event, not a skipped hunt.
     // Re-recorded in order, one at a time, for the Fenbridge rebuild named at
-    // the koi hunt above (45, 0, 14 to 26, 44, 67).
+    // the koi hunt above (45, 0, 14 to 26, 44, 67). Re-recorded in order for
+    // the solid Mirefen mudfin huts named at the koi hunt above (26, 44, 67 to
+    // 17, 38, 48). Re-recorded in order for the wander fix around those huts
+    // named at the koi hunt above (17, 38, 48 to 25, 59, 7).
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 26 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 25 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 44,
+        hitAt: 59,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 67,
+        hitAt: 7,
       },
     ];
     for (const hunt of hunts) {
@@ -485,8 +494,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // feature/world-quests yields 9 (the moved hedge_knight camp, c43178a68c);
     // the four built dungeon entrances (named at the koi hunt above) yield 1;
     // the Fenbridge rebuild (named at the koi hunt above) yields 3; the grand
-    // painted towns and the Mirefen tavern (#4525) yield 5.
-    expect(hitAt).toBe(5);
+    // painted towns and the Mirefen tavern (#4525) yield 5; the solid Mirefen
+    // mudfin huts (named at the koi hunt above) yield 7; the wander fix around
+    // those huts (named at the koi hunt above) yields 0, a real first-harvest
+    // hit (hitAt starts at -1), not a skipped hunt.
+    expect(hitAt).toBe(0);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     // The signature rides materialSources, not instance.signer (the two are
     // mutually exclusive; corpse_harvest_grant.test.ts / corpse_harvest_sim.test.ts

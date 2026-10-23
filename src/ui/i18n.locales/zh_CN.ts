@@ -13,6 +13,33 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': '游戏世界微调',
+  'editor.liveWorld.scope':
+    '游戏世界：可编辑地形高度与涂色、道路、游戏对象的位置及新增摆件。现有建筑保持固定。使用“导出”保存修改以供审核。',
+  'hudChrome.courier.inventory': '背包',
+  'hudChrome.courier.bankTitle': '银行',
+  'hudChrome.courier.capacity': '{used} / {capacity} 栏位',
+  'hudChrome.courier.cargoSafe':
+    '送回的物品会在背包已满时存为溢出物品。送达后信使会消失，直到再次召唤。',
+  'entities.abilities.courier.description':
+    '召唤一头会飞的驴，在您的背包和最近的银行之间运送物品。去程和回程各需10秒。每次最多选择24组物品。送回的物品会溢出存入已满的背包，随后信使会消失，直到再次召唤。死亡或进入副本时，回程会暂停。开始新的配送需要会员资格。',
+  'itemUi.tooltip.membershipWeaponAdaptive': '装备时，武器类型、外观和属性会适配您的职业与专精。',
+  'itemUi.tooltip.membershipScaling': '物品等级{level}。始终比角色等级高5级。',
+  'itemUi.tooltip.membershipRequired': '会员到期后，装备属性和套装加成会停用，续订后恢复。',
+  'itemUi.tooltip.membershipDormant': '未激活：续订会员以恢复装备属性和套装加成。',
+  'entities.items.lantern_seal.name': '灯火印章',
+  'entities.items.reins_lantern_hall_destrier.name': '灯火大厅战马的缰绳',
+  'entities.items.membership_staff.name': '万变法杖',
+  'hudChrome.bags.membershipSlot': '会员背包栏位',
+  'hudChrome.bags.membershipSlotLocked': '开通会员以解锁此背包栏位。',
+  'hudChrome.bags.membershipSlotHint':
+    '会员有效期间可额外装备一个背包。会员到期后，背包和物品会安全保留。',
+  'hudChrome.wocStore.subscription.benefitBag': '可在会员背包栏位额外装备一个背包。',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    '领取稀有品质的灵魂绑定护甲和万变法杖。属性适配您的职业与专精，物品等级始终比角色等级高5级。装备全部7件护甲可多获得20%经验。',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    '会员到期后，额外角色栏位、装备加成和额外背包栏位会锁定，续订后恢复。背包和物品会安全保留，超出容量的物品以溢出形式保存。基础角色栏位仍可正常使用。',
+  'hudChrome.bank.accountArmour': '领取会员装备',
   'hudChrome.courier.title': '信使',
   'hudChrome.courier.close': '关闭信使',
   'hudChrome.courier.ready': '准备配送',
@@ -30,35 +57,40 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.instructions':
     '请选择整组物品。信使会先存入物品，再取出您指定的物品。任务物品无法寄送。',
   'hudChrome.courier.membership': '续订会员后即可开始新的配送。',
-  'hudChrome.courier.cargoSafe': '背包有空位前，信使会保管所携带的物品。',
   'hudChrome.courier.unavailable': '召唤信使以安排配送。',
   'entities.abilities.courier.name': '信使',
-  'entities.abilities.courier.description':
-    '召唤一头会飞的驴，在您的背包和最近的银行之间运送物品。飞行速度为普通跑步速度的250%。每次最多可选择24组物品。开始新的配送需要会员资格。',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '有效会员权益',
   'hudChrome.wocStore.subscription.benefitBank': '在任意银行员处访问您其他角色的银行。',
   'hudChrome.wocStore.subscription.benefitSlots': '额外解锁10个角色栏位。',
-  'hudChrome.wocStore.subscription.benefitArmour':
-    '领取属性适配您职业与专精的灵魂绑定护甲。护甲随角色等级成长，在20级时达到物品等级25。装备全套可多获得20%经验。',
   'hudChrome.wocStore.subscription.benefitTax': '拍卖行税费减半。',
-  'hudChrome.wocStore.subscription.benefitExpiry':
-    '会员到期后，额外栏位中的角色和护甲加成会锁定，续订后恢复。基础栏位中的角色仍可正常游玩。',
   'character.membershipRequired': '续订会员后即可使用此角色。',
   'character.membershipSlots': '开通会员以解锁角色栏位',
   'character.emptySlot': '可用角色栏位',
   'hudChrome.bank.accountTab': '其他角色',
-  'hudChrome.bank.accountArmour': '领取会员护甲',
   'hudChrome.bank.accountMembership': '会员有效期间，可在此访问您其他角色的银行。',
   'hudChrome.bank.accountCharacters': '角色银行',
   'hudChrome.bank.accountEmpty': '创建另一个角色后，即可在此使用该角色的银行。',
   'hudChrome.bank.accountSelect': '选择一个角色以加载其银行。',
   'hudChrome.bank.accountUnavailable': '此银行暂不可用。请重新选择该角色以刷新。',
-  'hudChrome.bank.accountDeposit': '您的背包：存入此银行',
-  'hudChrome.bank.accountWithdraw': '所选银行：取出到您的背包',
   'hudChrome.bank.accountDepositHint': '点击将此堆物品存入所选角色的银行。',
   'hudChrome.bank.accountWithdrawHint': '点击将此堆物品取出到您的背包。',
   'hudChrome.bank.accountBound': '灵魂绑定、已锁定及任务物品无法在角色间转移。',
+  'hudChrome.bank.accountLoading': '正在加载你的角色…',
+  'hudChrome.bank.accountOpening': '正在打开{name}的银行…',
+  'hudChrome.bank.accountOnline': '{name}正在游戏中。请让该角色下线后再在此打开其银行。',
+  'hudChrome.bank.accountBusy': '银行正忙，请稍后再试。',
+  'hudChrome.bank.accountNoFit': '没有空间放下这堆物品。',
+  'hudChrome.bank.accountStale': '这堆物品在移动前发生了变化，请重试。',
+  'hudChrome.bank.accountTooLarge': '{name}的银行过大，无法在此打开。请登录{name}使用。',
+  'hudChrome.bank.accountRetry': '重试',
+  'hudChrome.bank.accountBankTitle': '{name}的银行',
+  'hudChrome.bank.accountBagsTitle': '你的背包',
+  'hudChrome.bank.accountSlots': '{used} / {total} 格',
+  'hudChrome.bank.accountWithdrawLead': '点击物品将其移入你的背包。',
+  'hudChrome.bank.accountDepositLead': '点击物品将其送入{name}的银行。',
+  'hudChrome.bank.accountBankEmpty': '此银行是空的。',
+  'hudChrome.bank.accountBagsEmpty': '你的背包是空的。',
   'hudChrome.wocStore.subscription.tokenTitle': '可交易会员代币',
   'hudChrome.wocStore.subscription.tokenTerms':
     '一次支付{price}，获得30天会员代币。代币将邮寄给此角色，可兑换为会员时长，也可在拍卖行出售。',
@@ -70,13 +102,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipToken':
     '使用：消耗此代币，为您的账号增加{days}天会员时长。现有剩余时长会保留。兑换前可交易此代币或在拍卖行出售。',
   'itemUi.tooltip.membershipAdaptive': '属性和护甲会随您的职业与专精调整。',
-  'itemUi.tooltip.membershipScaling':
-    '物品等级与您的角色等级一致。达到20级时，此护甲会完善为物品等级25。',
   'itemUi.tooltip.membershipPerfected': '已完善：物品等级{level}。',
   'itemUi.tooltip.membershipFullSet':
     '装备全部{pieces}件会员护甲，经验获取量提高{percent}%。需要有效会员资格。',
-  'itemUi.tooltip.membershipRequired': '会员到期后，护甲属性和套装加成会停用，续订后恢复。',
-  'itemUi.tooltip.membershipDormant': '未激活：续订会员以恢复护甲属性和套装加成。',
   'entities.items.membership_token.name': '会员代币（30天）',
   'entities.items.membership_helmet.name': '会员头盔',
   'entities.items.membership_shoulder.name': '会员肩甲',
@@ -431,6 +459,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至尊激流裹手',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '在埋藏宝藏的奖励宝箱中找到，即藏宝图所指引的宝库',
+  'hudChrome.reliquary.sourceActivityLanternHall': '在灯火大厅的军需官处用灯火印章购买',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '风从东边的沙丘吹来，带着灰烬，而空荡荡的沙地不会吹出灰烬。驻军仓库的塞拉记着每一次巡逻。只要有人给她带点吃的，她就会开口。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -1348,6 +1377,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '盐骸护肩',
   'entities.items.saltwrack_pauldrons.name': '盐骸肩甲',
   'entities.items.saltwrack_epaulets.name': '盐骸肩饰',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '每周三份契约，每次重置时张贴。无需签字，也不收费：完成一份，印章就归你了。',
+  'entities.npcs.contract_clerk_tobias_wren.name': '托拜厄斯·雷恩',
+  'entities.npcs.contract_clerk_tobias_wren.title': '契约文书',
   'entities.npcs.glider_apprentice.name': '斯凯',
   'devCommand.actions.hillend.description': '让当前山丘立即回落。',
   'devCommand.actions.hillend.label': '结束山丘',
@@ -2132,6 +2165,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'wallet.bagReconnect': '重新连接钱包',
   'hudChrome.wocStore.collectionLine': '{collection}系列',
   'hudChrome.wocStore.seasonOne': '第一赛季',
+  'hudChrome.wocStore.membershipPromo.open': 'WOC 商店中的会员',
+  'hudChrome.wocStore.membershipPromo.close': '关闭会员推广',
+  'hudChrome.wocStore.membershipPromo.eyebrow': '账号特权',
+  'hudChrome.wocStore.membershipPromo.title': '会员',
+  'hudChrome.wocStore.membershipPromo.cta': '立即加入',
+  'hudChrome.wocStore.referralPromo.close': '关闭推荐好友推广',
+  'hudChrome.wocStore.referralPromo.eyebrow': '一起冒险',
+  'hudChrome.wocStore.referralPromo.cta': '邀请好友',
   'hudChrome.wocStore.rarity.uncommon': '优秀',
   'hudChrome.wocStore.rarity.rare': '精良',
   'hudChrome.wocStore.rarity.epic': '史诗',
@@ -2196,6 +2237,32 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': '余烬锻造',
   'hudChrome.wocStore.collections.hoarfrost': '白霜',
   'hudChrome.wocStore.collections.fallen_star': '陨星',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    '加里克·霍尔特不会把这把剑卖给陌生人。他只把它交给一周又一周履行灯火大厅契约的成员，每次都说同样的话：护手里的灯火取自大厅自己的炉膛，所以无论你把它带到哪里，大厅都与你同在。血槽里的火只是外观。重要的是承诺。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    '宽阔的钢制剑身，血槽中燃着灯火，镀金的护颊，护手中燃着一盏笼中提灯，蓝色皮革剑柄。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': '灯火大厅之剑',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火之刃',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '焦黑钢铁铸成的火焰波纹剑身，两侧刃口如出炉般炽热，熔融的裂缝在两面分叉蔓延，青铜火焰护手环绕一块燃烧的宝石，牛血色握柄。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '灯火大厅里有一座自大厅建成以来从未熄灭的炉膛，加里克·霍尔特发誓这把剑就是在它的炭火中淬火的。佩戴它的成员说，即使在最寒冷的守夜里，剑柄也依然温暖。刃口上的火焰只是外观。',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': '风暴浪峰',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '海蓝色的修长剑身，刃口如碎浪般明亮，风暴血槽中封着分叉的闪电，剑根上方是一道镀金的浪，一侧刃口生着鳍，镀金浪涛护手环绕一颗风暴珍珠。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    '一位为公会出海的船长从一场狂风中带回了这把剑，那场风暴折断了她的桅杆，让整艘船像钟一样鸣响。加里克只肯用印章出售它，并提醒每位买家，风暴来临前它会嗡嗡作响。闪电与海光只是外观。',
+  'hudChrome.wocStore.skins.rimelight_staff.name': '霜光法杖',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '苍白的杖身以银箍束紧，缠绕着发光的雾凇，杖顶的银爪在冰晶之冠中托着一颗巨大的寒光水晶，杖颈垂着冰柱。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '灯火大厅的冬季守望者曾手持这样的法杖行走在高路上，点亮杖顶，为迷失在雪中的旅人引路。加里克在架上留了一根，给印章有余的成员。寒霜与冷光只是外观。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '暮芯法杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '两股扭结的黑木以铁箍束紧，杖顶是一盏敞开的铁提灯，在两只卷曲的角之间燃着紫色的暮光火焰，灯底垂着晃动的锁链。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '大厅里的每一盏灯都明亮地燃烧，只有一盏例外。暮光之焰是为在夜里守护大厅而点燃的，别的灯发出光的地方，它发出影子；加里克亲自修剪它的灯芯。烟雾与紫色光辉只是外观。',
+  'hudChrome.wocStore.collections.lantern_hall': '灯火大厅',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公会印记武装剑',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '发蓝钢剑刃、青铜鱼尾形十字护手、青绿色染皮握柄，以及一枚小巧的公会钢印。',
@@ -6167,6 +6234,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '确定吗？灵魂医者会在此复活你。你还不到10级，所以这次复活后遗症不会削弱你。',
   'hudChrome.death.spiritHealerAlive': '灵魂医者只看护逝者。你仍是生者。',
   'hudChrome.death.ghostHint': '跑回你死亡的地点，或与灵魂医者交谈以复活',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '用印章换荣誉，朋友。我的货架上没有能磨利刀刃的东西，但高望的每座大厅都会知道你是在哪里赢得的。',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': '加里克·霍尔特',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': '公会军需官',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '在找队伍吗？这张地图上的每座墓穴、堡垒和神殿都在我的名单上。告诉我你要去哪儿。',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': '米拉·费尔韦瑟',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': '公会招募官',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '欢迎来到灯火大厅，{className}。托拜厄斯把本周的契约贴在告示板上，加里克用我们的印章换取值得佩戴的荣誉，米拉能为你找到前往山下任何一扇门的队伍。带回一件战利品，它就会挂在我身后的大厅里。',
+  'entities.npcs.guildmaster_hesper_dunmore.name': '赫斯珀·邓莫尔',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '灯火大厅会长',
   'entities.npcs.spirit_healer.name': '灵魂医者',
   'entities.npcs.spirit_healer.title': '亡者的守护者',
   'entities.npcs.spirit_healer.greeting':
@@ -10961,6 +11040,31 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'editor.push.kindObjectMove': '玩法对象',
   'editor.push.kindPaint': '绘制的格子',
   'editor.push.kindField': '地图设置',
+  'editor.push.kindRoad': '道路',
+  'editor.push.kindRoadEdit': '世界道路',
+  'editor.city.roadMode': '道路工具',
+  'editor.city.roadModeDraw': '绘制新道路',
+  'editor.city.roadModeEdit': '编辑道路',
+  'editor.city.roadEditHint':
+    '点击道路将其选中。拖动路点可移动它，拖动道路线可添加弯道，按 Delete 删除选中的路点。',
+  'editor.city.roadEditNone': '未选中道路。在视图中点击一条道路，或从下方列表中选择。',
+  'editor.city.roadEditing': '正在编辑：{name}',
+  'editor.city.roadWaypoints': '路点：{n}',
+  'editor.city.roadWaypointHeld': '已选中路点 {n}。',
+  'editor.city.roadDeletePoint': '删除路点',
+  'editor.city.roadRemove': '移除道路',
+  'editor.city.roadReset': '恢复默认',
+  'editor.city.roadRestore': '恢复',
+  'editor.city.roadSelect': '选择',
+  'editor.city.roadBuiltin': '世界道路 {n}',
+  'editor.city.roadBuiltinEdited': '{name}（已更改）',
+  'editor.city.roadBuiltinRemoved': '{name}（已移除）',
+  'editor.city.roadWorldList': '世界道路（{n}）',
+  'editor.city.roadBuiltinNote':
+    '世界道路是游戏自带的道路。更改只对这张地图生效，“恢复默认”会把道路恢复原样。',
+  'editor.city.roadPointTooShort': '道路至少需要两个路点。请改用“移除道路”。',
+  'editor.city.roadPointLimit': '这条道路的路点已达上限。',
+  'editor.city.roadRemoved': '道路已移除。撤销即可恢复。',
   'editor.push.close': '关闭',
   'editor.objectMove.edited': '已在此地图上更改。',
   'editor.objectMove.rotation': '旋转（度）',
@@ -13223,7 +13327,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
   'hudChrome.mounts.name_avian_strider': '苍翠谷行者',
+  'hudChrome.mounts.name_nightwing_chimera': '夜翼奇美拉',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    '来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。',
   'hudChrome.mounts.name_lanternback_troll': '提灯背者格伦博',
+  'hudChrome.mounts.name_lantern_hall_destrier': '灯火大厅战马',
   'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
@@ -13234,9 +13342,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。',
   'hudChrome.mounts.desc_lanternback_troll':
     '被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    '灯火大厅的战马，在公会的蓝色披布下披挂橡木与铁制马铠，鞍边摇曳的两盏风灯照亮归途。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
+  'hudChrome.mounts.name_wobbles_slime': '晃晃史莱姆',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '一只被驯服上鞍的大蓝史莱姆。它不走路而是蹦跳，在骑手身下晃来晃去，体内还有气泡缓缓上浮。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '骇雷撼地者',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力车',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
@@ -14170,8 +14283,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
+  'entities.items.reins_wobbles_slime.name': '果冻鞍：晃晃',
   'entities.items.reins_terrorspark_groundshaker.name': '骇雷撼地者点火钥匙',
   'entities.items.reins_avian_strider.name': '苍翠谷行者的缰绳',
+  'entities.items.reins_nightwing_chimera.name': '夜翼奇美拉的缰绳',
   'entities.items.reins_lanternback_troll.name': '点灯人之轭：格伦博',
   'entities.items.reins_chimeglass_tortoise.name': '守道人的铃带：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力车缚绳',
@@ -17432,7 +17547,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professionTrainers.mining': '采矿训练师',
   'hudChrome.professionTrainers.hobby': '爱好训练师',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
+    '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在你身旁的码头上：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     '刚下渡船吗？欢迎来到试炼之滨。看守塔姆就在你正前方的海滩上守着试炼跑道：走到他跟前，直到他的名字显示出来，然后按 F，或者用鼠标左键点击他，他的跑道会把你双腿该会的都教给你。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。',
   'hudChrome.tutorialGreeting.noteClose': '明白了',
@@ -17572,7 +17687,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人布琳',
   'entities.npcs.wayfarer_bryn.title': '港口向导',
   'entities.npcs.wayfarer_bryn.greeting':
-    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：鸦邮信箱旁的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。',
+    '东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：码头上的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。',
   'entities.npcs.instructor_maren.name': '教官玛伦',
   'entities.npcs.instructor_maren.title': '试炼导师',
   'entities.npcs.instructor_maren.greeting':
@@ -18307,6 +18422,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '余烬狐',
   'entities.mobs.buddy_emerald_wolf.name': '翡翠狼',
   'entities.mobs.buddy_forgemaw.name': '熔颚·熔融者',
+  'entities.mobs.buddy_sprites.name': '闪烁与微光',
   'entities.mobs.buddy_frostfire.name': '霜火',
   'entities.mobs.buddy_golden_sentinel.name': '黄金哨兵',
   'entities.mobs.buddy_kekius.name': '凯基乌斯',
@@ -18356,6 +18472,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '三重T的哨子',
   'entities.items.whistle_trollface.name': '巨魔脸的哨子',
   'entities.items.whistle_tuskhorn_boar.name': '獠角野猪的哨子',
+  'entities.items.whistle_sprites.name': '闪烁与微光的哨子',
   'hudChrome.buddyMenu.rename': '重命名伙伴',
   'hudChrome.buddyMenu.nameLabel': '伙伴名字',
   'hudChrome.buddyMenu.autolootEnable': '开启自动拾取',
@@ -18436,6 +18553,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '出自东溪谷树篱间的母狐，得名于冬日枯丛中透出的炭红皮毛。那里的猎人几代之前就不再打幼崽的主意，改成替它们留下食物。',
   'hudChrome.collections.buddyLore.emerald_wolf':
     '一只怨灵林的幼狼，皮毛在几乎照不到林底的树冠余光里泛着绿色。守林人会把森林留下的每一只孤儿养大。',
+  'hudChrome.collections.buddyLore.sprites':
+    '两只小小的火精，一金一青，总也说不好谁该打头。靠得够近时，它们会融成一团绿焰，随后又笑着分开。',
   'hudChrome.collections.buddyLore.forgemaw':
     '在最后泉源熔炉中锻造，却始终没有真正完工——锤声未歇，它便自己走出了伊格尼瓦的铸场。只有英雄难度的下潜才能找到它：这熔融之物总会回到造出它的那座炉子，然后跟着两度熬过烈火的人回家。',
   'hudChrome.collections.buddyLore.frog':
@@ -18515,6 +18634,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.raptor': '你脚跟后有敏捷的爪子在石头上嗒嗒作响。',
   'hudChrome.collections.presence.skeleton': '干枯的骨头随着你的脚步咔咔作响。',
   'hudChrome.collections.presence.crystal_lich': '一阵寒冷的嗡鸣从残骸中升起，它正注视着你。',
+  'hudChrome.collections.presence.sprites': '两簇小火苗沾上了你，而且不会熄灭。',
   'hudChrome.collections.presence.forgemaw': '熔炉的热度还没有离开你。有什么东西随之走了出来。',
   'hudChrome.collections.presence.crystal_tide': '一滴海水拒绝从你的钓线上落下。',
   'hudChrome.collections.presence.phantom': '你身后的空气静得有些过分。',
@@ -19876,7 +19996,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '每年以相同价格续订。通过Stripe使用法定货币付款。可在账单设置中取消。',
   'hudChrome.wocStore.subscription.annualMount':
-    '付款后，请使用购买礼包的角色从邮件中领取灵魂绑定的坦克坐骑钥匙。坦克暂时代替礼包坐骑。',
+    '付款后，请使用购买此礼包的角色通过邮件领取灵魂绑定的夜翼奇美拉缰绳。会员到期后，你仍将拥有这只坐骑。',
   'hudChrome.wocStore.subscription.trialTerms':
     '每个账户可免费试用一次，共{days}天。需要提供付款方式。除非取消，否则试用结束时将收取{price}。',
   'hudChrome.wocStore.subscription.startTrial': '开始7天免费试用',
@@ -19888,7 +20008,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.membership_annual_reward.sender': '鸦羽邮局',
   'entities.letters.membership_annual_reward.subject': '您的年度会员坐骑',
   'entities.letters.membership_annual_reward.body':
-    '您的年度会员付款已完成。坦克坐骑钥匙随信附上。请将钥匙保留在背包或银行中以拥有此坐骑。会员到期后它仍归您所有。需要骑术技能。',
+    '你的年度会员付款已完成。随信附上坐骑缰绳。将缰绳保存在背包或银行中即可拥有这只坐骑。会员到期后，它仍属于你。需要骑术。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     '此结账流程已结束，且没有待领取奖励。请重新选择会员方案，开始新的结账流程。',
   'itemUi.tooltip.referralFullSet':
@@ -20669,12 +20789,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'referralCards.rewards.fogbinder':
     '你的饰品进化，提高更多耐力，并获得主动效果：所有属性提高5点，持续15秒，冷却时间为2分钟。',
   'referralCards.rewards.gravewyrm': '免费坐骑训练。',
-  'referralCards.rewards.raid': '专属友谊坦克坐骑。',
+  'referralCards.rewards.raid': '晃晃史莱姆坐骑。',
   'referralCards.referrerRewards.1': '专属友谊迅猛龙坐骑。',
   'referralCards.referrerRewards.2': '20个银行栏位和5个角色栏位。',
   'referralCards.referrerRewards.3': '获得1,000 Claudium。',
   'referralCards.referrerRewards.4': '获得1,000 Claudium。',
-  'referralCards.referrerRewards.5': '小树苗伙伴。',
+  'referralCards.referrerRewards.5': '闪烁与微光伙伴。',
   'referralCards.reasons.notParticipant': '此账号不属于这对绑定好友。',
   'referralCards.reasons.staleRevision': '你的卡片已发生变化。请查看最新进度后重试。',
   'referralCards.reasons.invalidCharacters': '队伍中的角色不属于这对绑定好友。',
@@ -20709,10 +20829,1078 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': '绑定好友通过邀请链接建立关系。',
   'hudChrome.mounts.name_referral_tank': '友谊坦克',
   'hudChrome.mounts.name_referral_raptor': '友谊迅猛龙',
-  'hudChrome.mounts.desc_referral_tank': '完成一张推荐集章卡后获得。',
+  'hudChrome.mounts.desc_referral_tank': '以前的招募好友集章卡奖励。',
   'hudChrome.mounts.desc_referral_raptor': '帮助你的首位绑定好友完成一张集章卡后获得。',
   'apiError.character.referral_transfer_pending':
     '删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。',
   'apiError.character.referral_bond_pending':
     '一份推荐奖励会员契约正在发放给此角色。请在发放完成后再尝试删除此角色。',
+  'hudChrome.guildHall.title': '灯火大厅',
+  'hudChrome.guildHall.close': '关闭公会窗口',
+  'hudChrome.guildHall.tabsLabel': '灯火大厅分页',
+  'hudChrome.guildHall.tabs.contracts': '契约',
+  'hudChrome.guildHall.tabs.quartermaster': '军需官',
+  'hudChrome.guildHall.seals': '灯火印章：{count}',
+  'hudChrome.guildHall.resetIn': '{time}后发布新契约',
+  'hudChrome.guildHall.resetSoon': '下次每周重置时发布新契约',
+  'hudChrome.guildHall.contractsIntro':
+    '每周三份契约，王国中的每位冒险者看到的都一样。无需签署：完成其中一份，它的印章就会直接放进你的背包，每周一次。',
+  'hudChrome.guildHall.kinds.boss': '悬赏',
+  'hudChrome.guildHall.kinds.heroic': '英雄通关',
+  'hudChrome.guildHall.kinds.task': '执行',
+  'hudChrome.guildHall.goals.boss': '在{dungeon}击败{boss}，难度不限。',
+  'hudChrome.guildHall.goals.heroic': '以英雄难度通关{dungeon}：在英雄难度下击败{boss}。',
+  'hudChrome.guildHall.goals.task': '{task}（{dungeon}）',
+  'hudChrome.guildHall.contractLabel': '{kind}：{dungeon}',
+  'hudChrome.guildHall.done': '本周已完成',
+  'hudChrome.guildHall.open': '进行中',
+  'hudChrome.guildHall.lifetime': '已完成契约：{count}',
+  'hudChrome.guildHall.emptyBoard': '告示板正在重写。请在每周重置后再来。',
+  'hudChrome.guildHall.quartermasterIntro':
+    '加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔、公会之剑的外观和公会的战马。这里没有任何东西能让你在战斗中变得更强。',
+  'hudChrome.guildHall.titleOffer': '头衔：{title}',
+  'hudChrome.guildHall.titlePreview': '显示为{preview}',
+  'hudChrome.guildHall.buy': '购买',
+  'hudChrome.guildHall.owned': '已拥有',
+  'hudChrome.guildHall.needSeals': '还需{count}枚',
+  'hudChrome.guildHall.bought': '你购买了头衔{title}。请在功绩之书中选择它。',
+  'hudChrome.guildHall.refused.owned': '你已经拥有它了。',
+  'hudChrome.guildHall.refused.seals': '你的灯火印章不足。',
+  'hudChrome.guildHall.refused.bags': '你的背包已满。',
+  'hudChrome.guildHall.refused.riding': '先学会骑术，再购买坐骑。',
+  'hudChrome.guildHall.boughtSkin': '你购买了外观{skin}。请在外观窗口中应用它。',
+  'hudChrome.guildHall.boughtMount': '你购买了{mount}。它的缰绳在你的背包里。',
+  'hudChrome.guildHall.skinPreview':
+    '改变你所装备的剑的样子，适用于账号中的所有角色。仅为外观：没有属性。',
+  'hudChrome.guildHall.skinOffer': '剑的外观：{skin}',
+  'hudChrome.guildHall.mountPreview': '地面坐骑：骑乘时移动速度+{pct}%。需要骑术训练。',
+  'hudChrome.guildHall.mountOffer': '坐骑：{mount}',
+  'hudChrome.guildHall.refused.range': '站到军需官身边才能交易。',
+  'hudChrome.guildHall.reward.one': '{count}枚灯火印章',
+  'hudChrome.guildHall.reward.few': '{count}枚灯火印章',
+  'hudChrome.guildHall.reward.many': '{count}枚灯火印章',
+  'hudChrome.guildHall.reward.other': '{count}枚灯火印章',
+  'hudChrome.guildHall.contractDone.one': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.contractDone.few': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.contractDone.many': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.contractDone.other': '契约完成：{contract}。你获得了{count}枚灯火印章。',
+  'hudChrome.guildHall.signSubtitle': '冒险者公会',
+  'hudChrome.guildHall.board.noticesLabel': '本周契约',
+  'hudChrome.guildHall.board.weekProgress': '本周：已完成{done}/{total}份契约',
+  'hudChrome.guildHall.board.weekProgressAria': '本周已完成的契约',
+  'hudChrome.guildHall.board.cardProgress': '本周 {done}/{total}',
+  'hudChrome.guildHall.board.rewardLine': '奖励：{reward}',
+  'hudChrome.guildHall.board.stamp': '已盖印',
+  'hudChrome.guildHall.board.sealsTip':
+    '灯火印章由灯火大厅的每周契约发放，只能在军需官加里克·霍尔特处使用。它们与你绑定。',
+  'hudChrome.guildHall.shop.stockLabel': '加里克·霍尔特的货品',
+  'hudChrome.guildHall.shop.kindMount': '坐骑',
+  'hudChrome.guildHall.shop.kindSword': '剑的外观',
+  'hudChrome.guildHall.shop.mountHeading': '你骑在马鞍上',
+  'hudChrome.guildHall.shop.skinHeading': '握在你手中',
+  'hudChrome.guildHall.shop.stageLabel': '{name}的3D预览',
+  'hudChrome.guildHall.shop.stageUnavailable': '此设备无法显示3D预览。',
+  'hudChrome.guildHall.shop.mountHowTo':
+    '购买后，它的缰绳会放入你的背包。使用缰绳即可骑乘；只要你留着缰绳，这匹马就是你的。',
+  'hudChrome.guildHall.shop.mountOwned': '你已拥有这匹坐骑。它的缰绳在你的背包里。',
+  'hudChrome.guildHall.shop.skinHowTo':
+    '购买后，请在外观窗口中应用它。它适用于你账号中的所有角色。',
+  'hudChrome.guildHall.shop.skinOwned': '你已拥有此外观。请在外观窗口中应用它。',
+  'hudChrome.guildHall.shop.kindTitle': '头衔',
+  'hudChrome.guildHall.shop.plateHeading': '你的名牌',
+  'hudChrome.guildHall.shop.howTo': '购买后，在功绩之书中选择它，即可与你的名字一同显示。',
+  'hudChrome.guildHall.shop.cosmetic': '仅限外观：不改变任何属性。',
+  'hudChrome.guildHall.shop.price': '价格：{price}',
+  'hudChrome.guildHall.shop.have': '你拥有{count}',
+  'hudChrome.guildHall.shop.ownedLong': '你已拥有此头衔。可在功绩之书中选择。',
+  'hudChrome.guildHall.shop.short.one': '你还需要{count}枚灯火印章。',
+  'hudChrome.guildHall.shop.short.few': '你还需要{count}枚灯火印章。',
+  'hudChrome.guildHall.shop.short.many': '你还需要{count}枚灯火印章。',
+  'hudChrome.guildHall.shop.short.other': '你还需要{count}枚灯火印章。',
+  'hudChrome.raidBossGuide.dungeonButton': '首领指南：{dungeon}',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': '地下城首领',
+  'hudChrome.raidBossGuide.rankMiniboss': '小首领',
+  'hudChrome.raidBossGuide.rankFinal': '最终首领',
+  'hudChrome.raidBossGuide.defeated': '已击败',
+  'hudChrome.raidBossGuide.browseBossDefeated': '查看 {boss}（已击败）',
+  'hudChrome.raidBossGuide.heroicHeading': '英雄难度的变化',
+  'hudChrome.raidBossGuide.tipsHeading': '职责建议',
+  'hudChrome.raidBossGuide.choicesHeading': '关键抉择',
+  'hudChrome.raidBossGuide.choiceGain': '收益',
+  'hudChrome.raidBossGuide.choiceRisk': '风险',
+  'hudChrome.raidBossGuide.markHeroicOnly': '仅限英雄',
+  'hudChrome.raidBossGuide.markHeroicChanged': '英雄难度有变化',
+  'hudChrome.raidBossGuide.damageCompare': '普通 {normal} | 英雄 {heroic}',
+  'hudChrome.raidBossGuide.finderOpen': '首领指南',
+  'hudChrome.raidBossGuide.finderOpenLabel': '打开 {boss} 的首领指南',
+  'bossJournal.common.enrageName': '狂暴',
+  'bossJournal.common.phaseEnrageSummary': '生命值低于{health}时，首领进入狂暴状态，直至战斗结束。',
+  'bossJournal.common.enrageSummary':
+    '生命值低于{health}时，其近战攻击伤害提高{damage}，攻击速度加快{haste}，直至战斗结束。',
+  'bossJournal.common.enrageResponse':
+    '坦克和治疗者把防御与治疗冷却留到这个阶段。其他人全力输出，尽快结束战斗。',
+  'bossJournal.common.heroicHarder': '本页的每个技能造成的伤害是普通难度的{scale}倍。',
+  'bossJournal.sanctum.tusker.overview':
+    '一头房屋般巨大的巨牙兽拖着一架满载燃烧灵魂火盆的雪橇，在拖橇之路上来回奔走。它沿道路循环行走，并在你拉怪的地方卸下雪橇。生命值降到一半时雪橇会翻倒，在它身后洒出烈焰。',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    '开战就有两个带预警的攻击：正面横扫，以及沿标出路线的冲锋。',
+  'bossJournal.sanctum.tusker.phaseSpillName': '拖橇倾覆',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    '生命值降到{health}时，雪橇翻倒，魂火洒落在它身后。',
+  'bossJournal.sanctum.tusker.phaseEnrageName': '狂暴',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    '生命值低于{health}时，它会在本场战斗剩余时间内进入狂暴。',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    '每{every}秒读条{cast}秒，随后獠牙横扫其前方{arc}度的扇形，从身体向外延伸{range}码：造成{min}到{max}点伤害，并击退{push}码。',
+  'bossJournal.sanctum.tusker.sweepResponse': '坦克让它背对队伍。其他人从它的侧面或背后攻击。',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    '每{every}秒读条{cast}秒，朝最远的玩家标出一条{length}码的路线，随后沿路线冲锋：对路线内所有人造成{min}到{max}点伤害，并击倒{stun}秒。',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    '在读条结束前向侧面离开标出的路线。最远的玩家是目标，所以远程玩家要留出侧移的空间。',
+  'bossJournal.sanctum.tusker.spillName': '倾倒的火盆',
+  'bossJournal.sanctum.tusker.spillSummary':
+    '仅一次，在生命值{health}时：雪橇翻倒，{count}片魂火（半径{radius}码）在它身后燃烧{seconds}秒，对范围内所有人每秒造成{min}到{max}点伤害。',
+  'bossJournal.sanctum.tusker.spillResponse': '立刻走出火焰，并远离火堆作战。',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    '生命值低于{health}时，在本场战斗剩余时间内伤害提高{damage}。',
+  'bossJournal.sanctum.tusker.enrageResponse': '把治疗和防御冷却留到最后阶段，并尽快将它击杀。',
+  'bossJournal.sanctum.tusker.tipTank':
+    '让它背对队伍并保持不动，这样横扫扇形就不会扫到队友。每次獠牙横扫都会带来击退。',
+  'bossJournal.sanctum.tusker.tipHealer':
+    '獠牙横扫和践踏是伤害高峰。站在它的侧面，不要站在践踏瞄准的最远处，并为它在{health}以下的狂暴留一个冷却。',
+  'bossJournal.sanctum.tusker.tipDamage':
+    '从侧面或背后攻击。留意地面上标出的路线并走出去。生命值一半时，远离它身后的火焰。',
+  'bossJournal.sanctum.korgath.overview':
+    '铁匠的工头，被锁在四根封印石柱上。他身上每条尚存的锁链都会使他受到的伤害降低{perChain}，因此打破锁链能让他更容易被击杀。但你每打破一条锁链，他就会在本场战斗剩余时间内多解放一个攻击。',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    '他开战时被{chains}条锁链束缚，每根石柱一条。每根石柱旁的封印镣铐维系着它的锁链。',
+  'bossJournal.sanctum.korgath.phaseFreedName': '断裂的锁链',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    '每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击，即使锁链之后被重新铆合也一样。',
+  'bossJournal.sanctum.korgath.phaseEnrageName': '狂暴',
+  'bossJournal.sanctum.korgath.lockboundName': '锁缚',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    '每条完好的锁链使他受到的伤害降低{perChain}：四条全在时伤害降低{all}。',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    '打破锁链可加快击杀。先决定打破几条：每条也会解放一个攻击。',
+  'bossJournal.sanctum.korgath.shacklesName': '封印镣铐',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    '每根石柱脚下都有一个封印镣铐。在科加斯被拉怪前无法攻击镣铐。击杀一个镣铐会打破它的锁链。只要铁砧锁链还在，他就无法离开平台中心{leash}码的范围。',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    '输出者击杀你选择打破的锁链所对应的镣铐。与此同时，坦克把科加斯留在中心。',
+  'bossJournal.sanctum.korgath.strainSummary':
+    '只要还有锁链完好：每{every}秒读条{cast}秒，随后在每根锁链仍完好的石柱周围{radius}码的环形范围内爆发：造成{min}到{max}点伤害并击退。四条锁链全部打破后停止。',
+  'bossJournal.sanctum.korgath.strainResponse': '在读条结束前，远离每一根锁链完好的石柱。',
+  'bossJournal.sanctum.korgath.stompSummary':
+    '每{every}秒读条{cast}秒，随后在其身体外{radius}码形成一圈冲击：对圈内所有人造成{min}到{max}点伤害。',
+  'bossJournal.sanctum.korgath.stompResponse':
+    '远程玩家待在圈外。近战能躲就躲出去；治疗者为被击中的人补血。',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    '锁链断裂{delay}秒后，一名龙誓刺棒匠会从石柱后方爬过边缘，走向镣铐并引导重铆{channel}秒。若引导完成，锁链和一个新的镣铐会回归并恢复{perChain}的减伤，但已解放的攻击不会消失。',
+  'bossJournal.sanctum.korgath.rerivetResponse': '在引导结束前打断、眩晕或击杀刺棒匠。',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    '只剩一条锁链时，绷链每{every}秒触发一次，而不是每{base}秒。',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    '尽快打破最后一条锁链，或者做好每{every}秒离开它的石柱的准备。',
+  'bossJournal.sanctum.korgath.maulSummary':
+    '铁锤锁链断裂后：每{every}秒读条{cast}秒，随后在其面前{arc}度扇形、从身体向外{range}码的范围内劈砍，伤害为他近战攻击的{mult}倍。',
+  'bossJournal.sanctum.korgath.maulResponse': '只有坦克站在他正面。其他人在读条期间绕到他身后。',
+  'bossJournal.sanctum.korgath.flailSummary':
+    '铁钳锁链断裂后：每{every}秒读条{cast}秒，朝最远的非坦克玩家标出一条{length}码的路线，随后锁鞭击中路线内所有人：造成{min}到{max}点伤害。',
+  'bossJournal.sanctum.korgath.flailResponse': '在读条结束前向侧面离开路线。',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    '铁砧锁链断裂后：他可以离开平台中心。每{every}秒读条{cast}秒，朝最远的玩家标出一条{length}码的路线，随后沿路线冲锋：造成{min}到{max}点伤害并击退。',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    '离开路线。只要铁砧锁链还在，他就待在中心{leash}码内，不会冲锋。',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    '风箱锁链断裂后：每{every}秒读条{cast}秒，随后对所有人造成{min}到{max}点伤害，并将其推离他{push}码。',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    '它会命中整个队伍且无法躲避：治疗者在它落下前为所有人补满血。',
+  'bossJournal.sanctum.korgath.tipTank':
+    '把他留在中心，背对队伍。铁锤锁链断裂后，重锤弧斩会命中他面前的一切。在铁砧锁链断裂前，他无法离开中心{leash}码的范围。',
+  'bossJournal.sanctum.korgath.tipHealer':
+    '绷链、震颤践踏和每个已解放的攻击都很疼。每多留一条锁链，战斗就更久；每打破一条锁链，就多一个需要硬抗的攻击。',
+  'bossJournal.sanctum.korgath.tipDamage':
+    '击杀镣铐来打破你选择的锁链，然后集火科加斯。离开标出的路线，并远离仍有锁链的石柱。',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    '击杀镣铐来打破你选择的锁链，然后集火科加斯。在每个刺棒匠重铆结束前阻止它。离开标出的路线，并远离仍有锁链的石柱。',
+  'bossJournal.sanctum.korgath.choiceName': '你要打破几条锁链？',
+  'bossJournal.sanctum.korgath.choiceGain':
+    '每打破一条锁链，他的减伤就少{perChain}：从四条全在时的{all}，一路降到零。战斗会短得多。',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    '每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击。铁锤：重锤弧斩。铁钳：锁链鞭笞。铁砧：门槛冲锋，且他可以离开中心。风箱：工头的咆哮。',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    '每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击。铁锤：重锤弧斩。铁钳：锁链鞭笞。铁砧：门槛冲锋，且他可以离开中心。风箱：工头的咆哮。每条断裂的锁链还会引来一个刺棒匠去重铆。',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    '重铆：锁链断裂{delay}秒后，一名刺棒匠会试图修复它。打断、眩晕或击杀它。',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    '最后一环：只剩一条锁链时，绷链每{every}秒触发一次。',
+  'bossJournal.sanctum.velkhar.overview':
+    '维尔卡从三个融水池中唤起解冻的亡者。只有寒冷能让它们安息：在寒冰上被击杀的骨行者会永远死去，而在融水中被击杀的会再次复生并为他回血。',
+  'bossJournal.sanctum.velkhar.phaseVaultName': '仪式地窖',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    '骨行者不断从水池中爬出。生命值降到{wave1}和{wave2}时会额外涌出一波，每个水池各一只。',
+  'bossJournal.sanctum.velkhar.thawName': '苏醒之融',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    '每{every}秒，一个水池的火堆会轰然燃起，{warn}秒后有{count}只复生骨行者爬出。水池轮流发动。生命值降到{wave1}和{wave2}时，每个水池再爬出一只。',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    '坦克把它们聚在一起，拖到寒冰上。输出者在那里击杀它们。',
+  'bossJournal.sanctum.velkhar.heldName': '冰封不起',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    '在寒冰上被击杀的骨行者会被冰封：冻成雕像并保持死亡。在融水中被击杀的会沉入水中，{delay}秒后以{share}的生命值再次复生，并为维尔卡恢复其生命值的{heal}。',
+  'bossJournal.sanctum.velkhar.heldResponse': '只在寒冰上击杀骨行者：绝不要在水池或融水带上击杀。',
+  'bossJournal.sanctum.velkhar.graspName': '融尸之握',
+  'bossJournal.sanctum.velkhar.graspSummary': '站在融水中的骨行者造成的伤害提高{bonus}。',
+  'bossJournal.sanctum.velkhar.graspResponse': '坦克让骨行者远离水面。',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    '每{every}秒读条{cast}秒，从他身前朝一名非坦克玩家标出一条{width}码宽、直达地窖边缘的路线。随后对路线内所有人造成{min}到{max}点伤害，路线会化为融水并持续{seconds}秒。',
+  'bossJournal.sanctum.velkhar.trenchResponse': '离开路线。不要在它留下的融水带上击杀骨行者。',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    '每{every}秒读条{cast}秒，随后对所有人造成{min}到{max}点暗影伤害。',
+  'bossJournal.sanctum.velkhar.volleyResponse': '无法躲避：治疗者要让全队保持满血。',
+  'bossJournal.sanctum.velkhar.warmHandsName': '温热之手',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    '站着不动超过{still}秒的骨行者会在脚下融出一片半径{radius}码的融水坑，持续{seconds}秒。',
+  'bossJournal.sanctum.velkhar.warmHandsResponse': '让骨行者保持移动，绝不要在融水坑上击杀它们。',
+  'bossJournal.sanctum.velkhar.twiceWokenName': '二度苏醒',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    '再次复生的骨行者会以满生命值回归，且造成的伤害提高{bonus}。',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse': '不要让任何一只复生：全部在寒冰上击杀。',
+  'bossJournal.sanctum.velkhar.tipTank':
+    '接住每一只骨行者，拖到寒冰上，远离水池和融水带。在融水中它们的伤害会提高{bonus}。',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    '接住每一只骨行者，拖到寒冰上，远离水池和融水带。让它们保持移动：站着不动的会在脚下融出一片水坑。',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    '暗影箭雨每{every}秒命中所有人。融水中的骨行者伤害提高{bonus}，所以它们碰到水时要盯紧坦克。',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    '只在寒冰上击杀骨行者，然后回到维尔卡身边。离开魂火沟壑的路线。',
+  'bossJournal.sanctum.velkhar.choiceName': '亡者倒在何处？',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    '在寒冰上被击杀的骨行者会彻底消失：小怪更少，战斗更干净。',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    '在融水中被击杀的会再次复生，每次都为维尔卡恢复其生命值的{heal}。把它们拖到寒冰上要花时间，所以在集火前先规划好击杀地点。',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    '温热之手：站着不动超过{still}秒的骨行者会融出一片融水坑。',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    '二度苏醒：再次复生的骨行者会以满生命值回归，且造成的伤害提高{bonus}。',
+  'bossJournal.sanctum.korzul.overview':
+    '一场在冰封湖面上的巨龙之战，而他的烈焰不断击碎冰面。每一次吐息都会消耗冰面，而团队决定他的火焰瞄准何处，也就决定了失去哪块冰。冰面耗尽的巨龙会不停地吐息。',
+  'bossJournal.sanctum.korzul.phaseLakeName': '冰封湖面',
+  'bossJournal.sanctum.korzul.phaseLakeSummary': '他破冰而出，落在湖中央。他落地时战斗才正式开始。',
+  'bossJournal.sanctum.korzul.phaseFlightName': '飞行阶段',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    '生命值降到{first}和{second}时，他会起飞并在空中作战，直到再次坠落。',
+  'bossJournal.sanctum.korzul.phaseLastName': '最后阶段',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    '第二次飞行之后：他在地面上每{breath}秒施放一次坟墓吐息，每{gale}秒施放一次翼风。',
+  'bossJournal.sanctum.korzul.iceName': '破碎之冰',
+  'bossJournal.sanctum.korzul.iceSummary':
+    '湖面由多块冰板组成。他的火焰会使完好的冰板开裂，并击碎已开裂的冰板。开裂的冰板会在{refreeze}秒后重新冻结。碎裂的冰板就是开阔水域。',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    '湖面由多块冰板组成。他的火焰会使完好的冰板开裂，并击碎已开裂的冰板。深度淬火：英雄难度下，开裂的冰板不会重新冻结。碎裂的冰板就是开阔水域。',
+  'bossJournal.sanctum.korzul.iceResponse':
+    '有意识地消耗冰面：把他的火焰瞄向团队承受得起损失的冰板。',
+  'bossJournal.sanctum.korzul.waterName': '开阔水域',
+  'bossJournal.sanctum.korzul.waterSummary':
+    '站在开阔水域中会使你的移动速度降低{slow}，并每秒受到{perSecond}点伤害。',
+  'bossJournal.sanctum.korzul.waterResponse': '待在冰面上。如果被推入水中，立刻离开。',
+  'bossJournal.sanctum.korzul.breathSummary':
+    '每{every}秒沿坦克所在方向读条{cast}秒，随后喷出{arc}度的火焰扇形，从身体向外{range}码：对扇形内除坦克外的所有人造成{min}到{max}点伤害。扇形下最多{plates}块冰板燃烧，由近到远。',
+  'bossJournal.sanctum.korzul.breathResponse':
+    '只有坦克站在正面。坦克把吐息转向团队负担得起的冰面。',
+  'bossJournal.sanctum.korzul.tailSummary':
+    '每{every}秒读条{cast}秒，随后尾巴横扫其身后{arc}度、从身体向外{range}码的范围：造成{min}到{max}点伤害并击退。',
+  'bossJournal.sanctum.korzul.tailResponse': '绝不要站在他身后。从他的侧面攻击。',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    '每{every}秒一次，并在生命值{health}时再触发一次，他引导{duration}秒：在{radius}码内释放{pulses}次火焰脉冲，每次都比上一次更强（最后一次脉冲造成{min}到{max}点伤害）。第{crack}次脉冲使他脚下的冰板开裂，第{brk}次脉冲将其击碎：冰板碎裂时他被淬火，引导随即结束。',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    '离他{radius}码远。让他站在已开裂的冰板上，引导会在第{crack}次脉冲时结束。',
+  'bossJournal.sanctum.korzul.galeSummary': '读条{cast}秒，随后所有人被推离他{push}码。',
+  'bossJournal.sanctum.korzul.galeResponse': '别让身后是开阔水域，这样被推开时会落在冰面上。',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    '在空中，他会用巨龙之眼标记一名非坦克玩家，持续{eye}秒。标记结束时，他向该玩家所在的整块冰板倾泻烈焰：{warn}秒预警后，对冰板上所有人造成{min}到{max}点伤害，并使冰板燃烧。第一次飞行{roundsFirst}轮，第二次飞行{roundsSecond}轮。',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    '在空中，他会用巨龙之眼标记两名非坦克玩家，持续{eye}秒（双子之眼）。标记结束时，他向每名被标记玩家所在的整块冰板倾泻烈焰：{warn}秒预警后，对冰板上所有人造成{min}到{max}点伤害，并使冰板燃烧。第一次飞行{roundsFirst}轮，第二次飞行{roundsSecond}轮。',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    '被标记者：走到远离队伍的完好冰板上。其他人离开那块冰板。',
+  'bossJournal.sanctum.korzul.broodName': '脚下龙群',
+  'bossJournal.sanctum.korzul.broodSummary':
+    '他起飞时，每块碎裂的冰板都会爬出一名鳞卫，最多{max}名。',
+  'bossJournal.sanctum.korzul.broodResponse': '坦克接住它们，团队趁他在空中时将其击杀。',
+  'bossJournal.sanctum.korzul.descentSummary':
+    '每次飞行结束时，他会降落在人数最多的完好冰板上：{warn}秒的阴影预警后，对{radius}码内造成{min}到{max}点伤害并击退，那块冰板随即燃烧。',
+  'bossJournal.sanctum.korzul.descentResponse':
+    '聚在一块承受得起开裂的冰板上，然后在他落地前跑出阴影。',
+  'bossJournal.sanctum.korzul.flareName': '碎片闪耀',
+  'bossJournal.sanctum.korzul.flareSummary':
+    '第二次飞行之后碎片闪耀：他在地面上每{breath}秒施放一次坟墓吐息，每{gale}秒施放一次翼风。',
+  'bossJournal.sanctum.korzul.flareResponse': '吐息更频繁：规划好还剩哪些冰板可以消耗。',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    '如果所有冰板都已碎裂，他会悬停在开阔水域上方并不停地吐息。',
+  'bossJournal.sanctum.korzul.noIceResponse': '绝不要让冰面耗尽：那会导致团灭。',
+  'bossJournal.sanctum.korzul.tipTank':
+    '把坟墓吐息转向团队负担得起的冰面，绝不要横扫过团队。在墓场炼狱前把他移到已开裂的冰板上以缩短它。',
+  'bossJournal.sanctum.korzul.tipHealer':
+    '墓场炼狱的脉冲增长很快：确保所有人都离开。倾泻烈焰、坠击降落以及每次被击退落水都很疼。',
+  'bossJournal.sanctum.korzul.tipDamage':
+    '绝不要站在他的正面或背后。被巨龙之眼标记时，带着它走到远离队伍的完好冰板上。在飞行阶段击杀鳞卫。',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    '绝不要站在他的正面或背后。两名玩家会同时被巨龙之眼标记：各自带着它走到不同的、远离队伍的完好冰板上。在飞行阶段击杀鳞卫。',
+  'bossJournal.sanctum.korzul.choiceIceName': '你要消耗哪块冰？',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    '把他的吐息、倾泻烈焰和落点瞄向选定的冰板，湖面其余部分就能保持安全可站立。',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    '每块碎裂的冰板都是开阔水域，并且在他下次起飞时让一名鳞卫爬出（最多{max}名）。冰面耗尽后他会不停地吐息。',
+  'bossJournal.sanctum.korzul.choiceDouseName': '要浇灭炼狱吗？',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    '让他站在已开裂的冰板上，第{crack}次脉冲会将其击碎，他被淬火，墓场炼狱在最强的脉冲之前提前结束。',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    '那块冰板就永远消失了。若他站在完好的冰面上，引导会持续到第{brk}次脉冲，同样会击碎冰板。',
+  'bossJournal.sanctum.korzul.heroicDeepQuench': '深度淬火：开裂的冰板不会重新冻结。',
+  'bossJournal.sanctum.korzul.heroicTwinEyes': '双子之眼：巨龙之眼同时标记两名玩家。',
+  'bossJournal.wildheart.saurian.overview':
+    '一头房屋般巨大的战兽背着驮轿，在河流浅滩上来回巡行。必须击败它：只有它死后，藤蔓桥才会开启。它有两个带预警的攻击，半血时有一名治疗骑手加入，最后还会狂暴。',
+  'bossJournal.wildheart.saurian.phaseFordName': '河流浅滩',
+  'bossJournal.wildheart.saurian.phaseFordSummary':
+    '开战后，它交替使用身后的甩尾和身周的践踏。同一时间只有一个攻击。',
+  'bossJournal.wildheart.saurian.phaseHowdahName': '驮轿碎裂',
+  'bossJournal.wildheart.saurian.phaseHowdahSummary':
+    '生命值降到{health}时，驮轿碎裂，一名驮轿巫咒师跃下来治疗巨型蜥脚兽。',
+  'bossJournal.wildheart.saurian.phaseEnrageName': '狂暴',
+  'bossJournal.wildheart.saurian.phaseEnrageSummary':
+    '生命值低于{health}时，它在本场战斗剩余时间内狂暴。',
+  'bossJournal.wildheart.saurian.tailSummary':
+    '每{every}秒读条{cast}秒，随后甩尾横扫身后{arc}度的扇形，从身体中心向外{range}码：造成{min}到{max}点伤害，并击退{push}码。',
+  'bossJournal.wildheart.saurian.tailResponse': '绝不要站在它身后。从侧面攻击。',
+  'bossJournal.wildheart.saurian.stompSummary':
+    '每{every}秒读条{cast}秒，随后其中心{radius}码内的所有人受到{min}到{max}点伤害，并被击倒{stun}秒。',
+  'bossJournal.wildheart.saurian.stompResponse':
+    '能移动的人在读条结束前离开圆圈。坦克硬吃这一下；治疗者随后为坦克补血。',
+  'bossJournal.wildheart.saurian.riderName': '驮轿骑手',
+  'bossJournal.wildheart.saurian.riderSummary':
+    '仅一次，在生命值{health}时：一名驮轿巫咒师跳到巨型蜥脚兽身旁并与它并肩作战，用先祖树汁治疗它。',
+  'bossJournal.wildheart.saurian.riderResponse': '坦克接住骑手。输出者打断它的治疗，或先击杀它。',
+  'bossJournal.wildheart.saurian.sapSummary':
+    '骑手的治疗：每{every}秒读条{cast}秒，恢复巨型蜥脚兽最大生命值的{heal}。',
+  'bossJournal.wildheart.saurian.sapResponse': '每次都打断它，或击杀骑手。',
+  'bossJournal.wildheart.saurian.enrageSummary':
+    '生命值低于{health}时，它的一切攻击伤害提高{damage}：近战、甩尾和撼地践踏。',
+  'bossJournal.wildheart.saurian.tipTank':
+    '让它面朝远离队伍的方向，这样没人会站到它的尾巴后面。驮轿巫咒师一落地就接住它。',
+  'bossJournal.wildheart.saurian.tipHealer':
+    '撼地践踏会击倒附近所有人，所以每次之后都要为坦克补血。留一个冷却应对狂暴。',
+  'bossJournal.wildheart.saurian.tipDamage':
+    '站在它的侧面，避开甩尾扇形和践踏圈。半血时，打断先祖树汁或击杀骑手。',
+  'bossJournal.wildheart.saurian.choiceName': '先打骑手，还是先打巨型蜥脚兽？',
+  'bossJournal.wildheart.saurian.choiceGain':
+    '击杀骑手能永久终结它的治疗：每{every}秒一次的先祖树汁会恢复巨型蜥脚兽{heal}的生命值。',
+  'bossJournal.wildheart.saurian.choiceRisk':
+    '你击杀骑手时，巨型蜥脚兽仍会不停甩尾和践踏。若放着骑手不管，就必须有人打断每一次治疗。',
+  'bossJournal.wildheart.beast.overview':
+    '獠牙领主驯兽师和他的巨型美洲豹共用一条生命值，同生共死。两者靠近时坚韧得多，伤害也更高，所以坦克要把驯兽师拖开，而美洲豹会追猎一名被标记的玩家。',
+  'bossJournal.wildheart.beast.phasePitsName': '兽坑',
+  'bossJournal.wildheart.beast.phasePitsSummary':
+    '一场战斗，两具身体。它们的计时贯穿全程；没有生命值阶段。',
+  'bossJournal.wildheart.beast.bondSummary':
+    '驯兽师和美洲豹相距{reach}码以内时，两者受到的伤害降低{dr}，造成的伤害提高{damage}。',
+  'bossJournal.wildheart.beast.bondHeroicSummary':
+    '狂热羁绊：驯兽师和美洲豹相距{reach}码以内时，两者受到的伤害降低{dr}，造成的伤害提高{damage}。',
+  'bossJournal.wildheart.beast.bondResponse':
+    '坦克把驯兽师拖到离美洲豹超过{reach}码的地方并保持住。',
+  'bossJournal.wildheart.beast.sharedName': '共享生命',
+  'bossJournal.wildheart.beast.sharedSummary':
+    '两具身体共用一个生命池：任何一方受到的伤害等同计算，一方死亡时另一方也会死亡。',
+  'bossJournal.wildheart.beast.sharedResponse': '打最容易够到的那一个。切换目标不会有任何损失。',
+  'bossJournal.wildheart.beast.stalkName': '追猎',
+  'bossJournal.wildheart.beast.stalkSummary':
+    '美洲豹标记一名不是驯兽师坦克的玩家，追猎{seconds}秒，无视嘲讽。进入范围后每{biteEvery}秒撕咬一次，造成{min}到{max}点伤害，随后每{bleedEvery}秒流血{bleed}，持续{bleedSeconds}秒。然后它会选择新的猎物。',
+  'bossJournal.wildheart.beast.stalkResponse':
+    '被标记者：跑动，把美洲豹引离驯兽师。其他人对它减速、定身或击晕。',
+  'bossJournal.wildheart.beast.warySummary':
+    '每种控制（击晕、定身、减速）对美洲豹生效一次，随后该类控制在它身上失效{lockout}秒。瘫痪、恐惧和变形都算作击晕。',
+  'bossJournal.wildheart.beast.waryResponse':
+    '轮流使用：先定身，再减速，再击晕，而不是连用三个同类。',
+  'bossJournal.wildheart.beast.quakeSummary':
+    '每{every}秒读条{cast}秒，随后驯兽师{radius}码内的所有人受到{min}到{max}点伤害。',
+  'bossJournal.wildheart.beast.quakeResponse': '除坦克外，所有人远离驯兽师。',
+  'bossJournal.wildheart.beast.huntSummary':
+    '每{every}秒，两只野兽的攻击速度加快{haste}，持续{seconds}秒。',
+  'bossJournal.wildheart.beast.huntResponse':
+    '坦克和治疗者在此期间使用冷却；美洲豹的撕咬也会更快。',
+  'bossJournal.wildheart.beast.wardName': '厚皮护盾',
+  'bossJournal.wildheart.beast.wardSummary':
+    '每{every}秒，美洲豹获得一个能吸收{amount}点伤害的护盾，持续{seconds}秒。',
+  'bossJournal.wildheart.beast.wardResponse': '护盾存在时打驯兽师：生命池是共享的。',
+  'bossJournal.wildheart.beast.heelSummary':
+    '每{every}秒，美洲豹读条{cast}秒，随后跃回驯兽师身边，羁绊恢复。',
+  'bossJournal.wildheart.beast.heelResponse':
+    '在读条期间击晕、瘫痪或变形美洲豹即可打断。若美洲豹已对击晕警觉，则无效。',
+  'bossJournal.wildheart.beast.tipTank':
+    '立刻把驯兽师拉到离美洲豹超过{normal}码的地方并保持，让他背对队伍。',
+  'bossJournal.wildheart.beast.tipTankHeroic':
+    '立刻把驯兽师拉到离美洲豹超过{heroic}码的地方并保持。每次回来！之后再把他拖开。',
+  'bossJournal.wildheart.beast.tipHealer':
+    '盯着被追猎的目标：撕咬和流血来得很快，在狩猎召唤期间更快。',
+  'bossJournal.wildheart.beast.tipDamage':
+    '打最安全的那一个。被追猎时，把美洲豹引离驯兽师；否则轮流对它减速、定身和击晕。',
+  'bossJournal.wildheart.beast.tipDamageHeroic':
+    '打最安全的那一个。为每次回来！读条留好一个击晕，并轮流对美洲豹减速和定身。',
+  'bossJournal.wildheart.beast.choiceName': '现在控制美洲豹，还是留着？',
+  'bossJournal.wildheart.beast.choiceGain': '减速、定身和击晕能让美洲豹追不上猎物，也离开驯兽师。',
+  'bossJournal.wildheart.beast.choiceRisk':
+    '每种控制只生效一次，随后失效{lockout}秒，所以三个一起用光，下一次追猎就没得用了。',
+  'bossJournal.wildheart.beast.choiceRiskHeroic':
+    '每种控制只生效一次，随后失效{lockout}秒。击晕用得太早，就没有东西能打断下一次回来！了。',
+  'bossJournal.wildheart.beast.heroicBond': '狂热羁绊：兽群羁绊范围扩至{reach}码。',
+  'bossJournal.wildheart.beast.heroicHeel':
+    '回来！：除非读条期间被击晕，否则美洲豹会跃回驯兽师身边。厚皮护盾吸收{amount}点伤害。',
+  'bossJournal.wildheart.bloom.overview':
+    '一朵扎根的食人花向周围的沃土花圃撒下种荚。没有花粉的玩家要在种荚发芽前把它们踩平；已授粉的玩家必须远离，否则种荚会立刻发芽。',
+  'bossJournal.wildheart.bloom.phaseTerraceName': '垂泪瀑布',
+  'bossJournal.wildheart.bloom.phaseTerraceSummary':
+    '它从不移动。一个施法进行时，它的其他施法计时会暂停，所以列出的间隔是最短间隔。',
+  'bossJournal.wildheart.bloom.seedSummary':
+    '每{every}秒读条{cast}秒，随后落下{count}个种荚，每个沃土花圃一个。未授粉时踩上种荚会将其踩灭。无人理会的种荚会在{sprout}秒后长出荆棘幼芽。',
+  'bossJournal.wildheart.bloom.seedHeroicSummary':
+    '每{every}秒读条{cast}秒，随后落下{count}个种荚，每个沃土花圃一个。未授粉时踩上种荚会将其踩灭。钻地种子：无人理会的种荚会在{burrow}秒后钻入地下，一株荆棘幼芽在最近的玩家身旁破土而出。',
+  'bossJournal.wildheart.bloom.seedResponse':
+    '未授粉的玩家迅速踩过每个种荚。已授粉的玩家远离它们。',
+  'bossJournal.wildheart.bloom.pollinateName': '授粉',
+  'bossJournal.wildheart.bloom.pollinateSummary':
+    '每{every}秒，{count}名玩家被授粉，持续{seconds}秒。已授粉的玩家碰到种荚，会使其立刻发芽。',
+  'bossJournal.wildheart.bloom.pollinateHeroicSummary':
+    '每{every}秒，{count}名玩家被授粉，持续{seconds}秒。已授粉的玩家碰到种荚，会使其立刻发芽。花粉云：在已授粉玩家{cloudRadius}码内站立{cloudSeconds}秒，你也会被授粉。',
+  'bossJournal.wildheart.bloom.pollinateResponse':
+    '已授粉：效果结束前远离种荚，英雄难度下还要远离队友。',
+  'bossJournal.wildheart.bloom.sproutName': '荆棘幼芽',
+  'bossJournal.wildheart.bloom.sproutSummary':
+    '从发芽的种荚里长出的精英小怪，会攻击最近的玩家。噬花死亡时，幼芽会枯萎。',
+  'bossJournal.wildheart.bloom.sproutResponse': '坦克接住它，输出者击杀它。',
+  'bossJournal.wildheart.bloom.lashSummary':
+    '每{every}秒读条{cast}秒，朝一名玩家（尽量选非坦克）瞄准一条长{length}码、宽{width}码的通道：造成{min}到{max}点伤害，并定身{root}秒。',
+  'bossJournal.wildheart.bloom.lashResponse': '在读条结束前向侧面走出通道。',
+  'bossJournal.wildheart.bloom.gorgeSummary':
+    '每{every}秒对其目标读条{cast}秒，随后撕咬，造成其近战攻击{mult}倍的伤害，并附加消化：持续{seconds}秒，每秒{perSecond}点伤害。移动无法躲避。',
+  'bossJournal.wildheart.bloom.gorgeResponse': '坦克：为它使用防御冷却。治疗者负责应对消化伤害。',
+  'bossJournal.wildheart.bloom.spitName': '绽花喷吐',
+  'bossJournal.wildheart.bloom.spitSummary':
+    '如果目标离开它的攻击范围达{delay}秒，它每{every}秒喷吐一次，造成{min}到{max}点伤害。',
+  'bossJournal.wildheart.bloom.spitResponse': '坦克留在近战范围内。',
+  'bossJournal.wildheart.bloom.tipTank':
+    '留在近战范围：走开会招来绽花喷吐。每次吞噬都用一个冷却，并接住每只荆棘幼芽。',
+  'bossJournal.wildheart.bloom.tipHealer':
+    '吞噬是对坦克的重击，随后是消化。藤鞭会定身并伤害站在通道里的人。',
+  'bossJournal.wildheart.bloom.tipDamage':
+    '如果你没有被授粉，在攻击间隙踩灭种荚。走出藤鞭，并迅速击杀任何荆棘幼芽。',
+  'bossJournal.wildheart.bloom.choiceName': '谁来踩灭种子？',
+  'bossJournal.wildheart.bloom.choiceGain':
+    '每踩灭一个种荚，就少一只精英荆棘幼芽，战斗也能继续集中在花上。',
+  'bossJournal.wildheart.bloom.choiceRisk':
+    '跑向花圃会损失伤害和近战时间，而且已授粉的玩家碰到种荚会让它立刻发芽。',
+  'bossJournal.wildheart.bloom.heroicBurrow':
+    '钻地种子：无人触碰的种荚在{burrow}秒后钻入地下，幼芽在最近的玩家身旁破土而出。',
+  'bossJournal.wildheart.bloom.heroicCloud':
+    '花粉云：在已授粉玩家{cloudRadius}码内站立{cloudSeconds}秒，你也会被授粉。',
+  'bossJournal.wildheart.zulgar.overview':
+    '盆地的大祭司。节奏稳定的战斗，带有预警的圆环，直到他化为美洲豹之魂并追猎一名玩家。被追猎的玩家引他穿过点亮的太阳符文，符文会使他减速。',
+  'bossJournal.wildheart.zulgar.phaseShrineName': '神殿',
+  'bossJournal.wildheart.zulgar.phaseShrineSummary': '他在近战中战斗，并在自身周围释放脉冲圆环。',
+  'bossJournal.wildheart.zulgar.phaseHuntName': '狩猎之魂',
+  'bossJournal.wildheart.zulgar.phaseHuntSummary':
+    '生命值降到{first}和{second}时，他化为美洲豹之魂{seconds}秒，追逐一名被标记的玩家。',
+  'bossJournal.wildheart.zulgar.phaseEnrageName': '狂暴',
+  'bossJournal.wildheart.zulgar.pulseSummary':
+    '每{every}秒读条{cast}秒，随后对他{radius}码内的所有人爆发一次：造成{min}到{max}点伤害。',
+  'bossJournal.wildheart.zulgar.pulseResponse': '除坦克外，所有人在读条结束前离开圆圈。',
+  'bossJournal.wildheart.zulgar.roarName': '美洲豹咆哮',
+  'bossJournal.wildheart.zulgar.roarSummary':
+    '他的每次近战攻击有{chance}的几率将被击中的玩家击退{distance}码。',
+  'bossJournal.wildheart.zulgar.roarResponse': '坦克身后留出空地。',
+  'bossJournal.wildheart.zulgar.huntSummary':
+    '生命值降到{first}和{second}时：读条{cast}秒，随后{seconds}秒内他追猎一名被标记的玩家（猎物，旁人在场时绝不会是坦克）。他比玩家快{speed}，无视嘲讽，且不攻击。若追上猎物：造成{maul}点伤害并击晕{stun}秒，随后他选择新的猎物。被撕咬的玩家有{respite}秒的安全期。',
+  'bossJournal.wildheart.zulgar.huntHeroicSummary':
+    '生命值降到{first}和{second}时：读条{cast}秒，随后{seconds}秒内他追猎猎物。双重猎物：两名玩家被标记，他每{switchEvery}秒在两者之间切换。他比玩家快{speed}，无视嘲讽，且不攻击。若追上猎物：造成{maul}点伤害并击晕{stun}秒。',
+  'bossJournal.wildheart.zulgar.huntResponse':
+    '猎物：跑过点亮的太阳符文使他减速。其他人在他追猎期间对他减速、定身和击晕。',
+  'bossJournal.wildheart.zulgar.glyphName': '太阳符文',
+  'bossJournal.wildheart.zulgar.glyphSummary':
+    '{count}个符文环绕神殿。美洲豹之魂踏过点亮的符文时，会减速{slow}，持续{seconds}秒，该符文随后熄灭{dark}秒。追猎期间，减速和定身对他生效，击晕持续时间减半。',
+  'bossJournal.wildheart.zulgar.glyphResponse': '把符文分散使用：不要在第一次追猎就全部用掉。',
+  'bossJournal.wildheart.zulgar.ambushName': '猎手伏击',
+  'bossJournal.wildheart.zulgar.ambushSummary':
+    '每次追猎后他会隐匿{seconds}秒。一个半径{radius}码的圆圈标出最远的玩家，并给出{warn}秒预警，随后他落在那里：对圈内所有人造成{min}到{max}点伤害。',
+  'bossJournal.wildheart.zulgar.ambushResponse': '离开圆圈。',
+  'bossJournal.wildheart.zulgar.tipTank':
+    '为美洲豹咆哮在身后留出空地。追猎结束时他会回到你身边：做好接住他的准备。',
+  'bossJournal.wildheart.zulgar.tipHealer':
+    '荒野之心脉冲会打中留在圈内的人。撕咬是一次高额单体伤害：为猎物补血。',
+  'bossJournal.wildheart.zulgar.tipDamage':
+    '离开脉冲圈。追猎期间，对他减速、定身和击晕以保护猎物；如果你是猎物，就跑过点亮的符文。',
+  'bossJournal.wildheart.zulgar.tipDamageHeroic':
+    '离开脉冲圈。追猎期间，对他减速、定身和击晕以保护两名猎物。每次追猎后，离开伏击圆圈。',
+  'bossJournal.wildheart.zulgar.choiceName': '现在用掉一个符文，还是留着？',
+  'bossJournal.wildheart.zulgar.choiceGain':
+    '你每引他穿过一个点亮的符文，就会大幅减速他，为猎物争取时间。',
+  'bossJournal.wildheart.zulgar.choiceRisk':
+    '用过的符文会熄灭{dark}秒，而每次追猎持续{seconds}秒：一开始就全用完，追猎的末尾就没有符文可用了。',
+  'bossJournal.wildheart.zulgar.heroicTwinPrey':
+    '双重猎物：两名玩家被追猎；他每{switchEvery}秒切换一次。',
+  'bossJournal.wildheart.zulgar.heroicAmbush':
+    '伏击：每次追猎后，他会扑向最远玩家所在的{radius}码圆圈。',
+  'bossJournal.crypt.drake.overview':
+    '一头骨龙在送葬大道上空盘旋。从它下方走过，它就会落地迎战：正面喷火，身后甩尾，周身掀起翼风。',
+  'bossJournal.crypt.drake.phaseName': '送葬大道',
+  'bossJournal.crypt.drake.phaseSummary': '它在被拉到的地方落地，在地面作战。',
+  'bossJournal.crypt.drake.breathSummary':
+    '每{every}秒读条{cast}秒，随后向正前方{arc}度扇形、{range}码内喷出烈焰：造成{min}到{max}点伤害。读条期间它的朝向锁定。',
+  'bossJournal.crypt.drake.breathResponse': '只有坦克站在正面。其他人站在它的两侧。',
+  'bossJournal.crypt.drake.tailSummary':
+    '有人站在它身后时，每{every}秒读条{cast}秒，随后向身后{arc}度、{range}码的扇形横扫：造成{min}到{max}点伤害。',
+  'bossJournal.crypt.drake.tailResponse': '绝不要站在它身后。',
+  'bossJournal.crypt.drake.gustSummary':
+    '有人靠近时，每{every}秒读条{cast}秒，随后{radius}码内所有人受到{min}到{max}点伤害，并被击退{push}码。',
+  'bossJournal.crypt.drake.gustResponse': '做好被击退的准备，背后不要靠近边缘。',
+  'bossJournal.crypt.drake.embersName': '冢焰余烬',
+  'bossJournal.crypt.drake.embersSummary':
+    '每次吐息下方的地面会持续燃烧{seconds}秒：站在上面的人每秒受到{min}到{max}点伤害。',
+  'bossJournal.crypt.drake.embersResponse': '把骨龙带离燃烧的地面，并走出火场。',
+  'bossJournal.crypt.drake.tipTank': '让吐息朝向远离队伍的方向；英雄难度下，把它带离燃烧的地面。',
+  'bossJournal.crypt.drake.tipHealer': '吐息和翼风是伤害高峰。站在它的侧面。',
+  'bossJournal.crypt.drake.tipDamage': '从侧面攻击：不要站在正面，也不要站在背后。',
+  'bossJournal.crypt.drake.heroicEmbers': '冢焰余烬：每次吐息都会让地面燃烧{seconds}秒。',
+  'bossJournal.crypt.marrow.overview':
+    '一个复活的掘墓人，专为玩家量身定墓。每座坟墓都会保持敞开，使其中的人减速并灼烧，他敲响葬钟时每座坟墓都会爬出一具不宁骸骨。把坟墓挖在墓园边缘，并控制坟墓的数量。',
+  'bossJournal.crypt.marrow.phaseYardSummary': '他在被标记的玩家脚下挖坟，并向坦克挥舞铁铲。',
+  'bossJournal.crypt.marrow.phaseTollName': '葬礼丧钟',
+  'bossJournal.crypt.marrow.phaseTollSummary':
+    '生命值降到{first}和{second}时，他走向钟绳，敲响葬礼丧钟。',
+  'bossJournal.crypt.marrow.shovelSummary':
+    '每{every}秒读条{cast}秒，随后向他正前方{arc}度、{range}码的扇形挥铲，造成他近战攻击{mult}倍的伤害。被击中的人都会获得迷眼之土：移动速度降低{slow}，持续{seconds}秒。',
+  'bossJournal.crypt.marrow.shovelResponse': '只有坦克站在正面。坦克可以在读条时走开。',
+  'bossJournal.crypt.marrow.measureSummary':
+    '每{every}秒读条{cast}秒，标记一名玩家。{mark}秒后，坟墓在其脚下塌陷：{radius}码内所有人受到{min}到{max}点伤害。坟墓在整场战斗中保持敞开：在里面移动速度降低{slow}，每秒受到{dirt}点伤害。最多{cap}座坟墓；新坟出现时会填平最旧的一座。',
+  'bossJournal.crypt.marrow.measureResponse':
+    '被标记时：在坟墓打开前走到墓园边缘。绝不要站在敞开的坟墓里。',
+  'bossJournal.crypt.marrow.blowSummary':
+    '每{every}秒向坦克读条{cast}秒：一次近战打击，叠加一层使受到的伤害提高{vuln}的效果，最多{stacks}层（共{max}），持续{seconds}秒。',
+  'bossJournal.crypt.marrow.blowResponse': '坦克：层数上升时开减伤技能。治疗者盯紧坦克。',
+  'bossJournal.crypt.marrow.vigorName': '坟墓之力',
+  'bossJournal.crypt.marrow.vigorSummary': '他站在敞开的坟墓里时，攻击速度提高{haste}。',
+  'bossJournal.crypt.marrow.vigorResponse': '坦克别让他进坟墓。',
+  'bossJournal.crypt.marrow.unquietName': '不宁之土',
+  'bossJournal.crypt.marrow.unquietSummary':
+    '玩家在坟墓里停留{linger}秒，就会从中唤出一具不宁骸骨。该坟墓随后休眠{rest}秒。',
+  'bossJournal.crypt.marrow.unquietResponse': '立刻离开坟墓。',
+  'bossJournal.crypt.marrow.tollSummary':
+    '他走向钟绳，敲钟{ring}秒，行走和敲钟期间免疫伤害。随后每名玩家受到{min}到{max}点伤害，每座敞开的坟墓都会唤出一具不宁骸骨。',
+  'bossJournal.crypt.marrow.tollResponse':
+    '最后一声钟响前，治疗者把所有人补满。坦克接住不宁骸骨；输出者击杀它们。',
+  'bossJournal.crypt.marrow.tipTank': '让他背对队伍。每次葬礼丧钟后，接住所有不宁骸骨。',
+  'bossJournal.crypt.marrow.tipTankHeroic':
+    '让他背对队伍，并远离所有坟墓。掘墓人重击会叠层：层数上升时开减伤技能。',
+  'bossJournal.crypt.marrow.tipHealer':
+    '葬礼丧钟打击全队。坟墓会使其中的人减速并灼烧，所以要帮助被困在里面的人。',
+  'bossJournal.crypt.marrow.tipDamage':
+    '被标记时，把坟墓带到墓园边缘。每次丧钟后，先击杀不宁骸骨，再回到马罗身边。',
+  'bossJournal.crypt.marrow.choiceName': '坟墓挖在哪里？',
+  'bossJournal.crypt.marrow.choiceGain': '挖在墓园边缘的坟墓，让中间留出战斗和闪避的空间。',
+  'bossJournal.crypt.marrow.choiceRisk':
+    '任何位置上的每座敞开的坟墓，都会在下一次丧钟时唤出一具不宁骸骨，最多同时{cap}具。',
+  'bossJournal.crypt.marrow.choiceRiskHeroic':
+    '任何位置上的每座敞开的坟墓，都会在下一次丧钟时唤出一具不宁骸骨，最多同时{cap}具。英雄难度下，坦克附近的坟墓还会让马罗加速。',
+  'bossJournal.crypt.marrow.heroicBlow': '掘墓人重击：打击坦克，叠加使受到的伤害提高{vuln}的效果。',
+  'bossJournal.crypt.marrow.heroicVigor': '坟墓之力：在坟墓里时攻击速度提高{haste}。',
+  'bossJournal.crypt.marrow.heroicUnquiet': '不宁之土：在坟墓里停留{linger}秒会唤出一具不宁骸骨。',
+  'bossJournal.crypt.lady.overview':
+    '一位幽灵新娘，她的哀嚎会伤害每个没有被墓灯庇护的人。每盏墓灯只能庇护两名玩家，随后熄灭，所以队伍必须轮流使用。她还会把一名玩家举到空中，直到队伍对她造成足够的伤害，她才肯松手。',
+  'bossJournal.crypt.lady.phaseRavineName': '霜冻峡谷',
+  'bossJournal.crypt.lady.phaseRavineSummary':
+    '峡谷四周立着三盏墓灯。她经过的路径会变成光滑的冰面。',
+  'bossJournal.crypt.lady.phaseFreezeName': '新娘冰封',
+  'bossJournal.crypt.lady.phaseFreezeSummary':
+    '生命值降到{health}时，整个峡谷地面冻结，持续到战斗结束。',
+  'bossJournal.crypt.lady.lamentSummary':
+    '每{every}秒读条{cast}秒，随后对每名未被墓灯庇护的玩家造成{min}到{max}点伤害。每次受击都会叠加一层萦绕哀歌：每层使哀歌伤害提高{perStack}，持续{seconds}秒，最多{stacks}层。',
+  'bossJournal.crypt.lady.lamentResponse': '在读条结束前站进点亮的墓灯光芒中。',
+  'bossJournal.crypt.lady.lanternName': '墓灯',
+  'bossJournal.crypt.lady.lanternSummary':
+    '点亮的墓灯可以让{radius}码内最多{cap}名玩家免受哀歌伤害。庇护过任何人的墓灯会熄灭{dark}秒，所以下一次哀歌时它仍是暗的。',
+  'bossJournal.crypt.lady.lanternHeroicSummary':
+    '点亮的墓灯可以让{radius}码内最多{cap}名玩家免受哀歌伤害。庇护过任何人的墓灯会熄灭{dark}秒。英雄难度下，点亮的墓灯还会在{lit}秒后自行燃尽，并保持熄灭{gutter}秒。',
+  'bossJournal.crypt.lady.lanternResponse': '提前安排谁用哪盏墓灯，每次哀歌都轮换到一盏点亮的灯。',
+  'bossJournal.crypt.lady.embraceSummary':
+    '每{every}秒，她抓住一名非坦克玩家，把其举到空中并抓住不放。在{hold}秒内对她造成{share}的生命值伤害，她就会把人轻轻放下；否则她会把人摔下：造成{min}到{max}点伤害。',
+  'bossJournal.crypt.lady.embraceHeroicSummary':
+    '每{every}秒，她抓住{victims}名非坦克玩家，把他们举到空中并抓住不放。在{hold}秒内对她造成{share}的生命值伤害，她就会把人轻轻放下；否则她会把人摔下：造成{min}到{max}点伤害。',
+  'bossJournal.crypt.lady.embraceResponse':
+    '她一抓人，所有人立刻爆发输出。治疗者为被抓的玩家补血。',
+  'bossJournal.crypt.lady.rimeSummary':
+    '她漂过之处会留下光滑的冰面；每块持续{seconds}秒。在冰上你会滑行，转向缓慢。',
+  'bossJournal.crypt.lady.rimeResponse': '需要快速移动时，避开她的轨迹。',
+  'bossJournal.crypt.lady.freezeSummary':
+    '生命值降到{health}时，她读条{cast}秒，随后整个地面变成光滑的冰面，持续到战斗结束。这会打断正在读条的哀歌。',
+  'bossJournal.crypt.lady.freezeResponse': '提早行动：在冰上要花更久才能走到墓灯。',
+  'bossJournal.crypt.lady.tipTank': '让她留在中间，使每盏墓灯都在队伍够得到的范围内。',
+  'bossJournal.crypt.lady.tipHealer':
+    '未被庇护的玩家承受哀歌并叠层。被抓住的玩家在被她举起期间持续受伤。',
+  'bossJournal.crypt.lady.tipDamage': '她一抓人就爆发输出。每次哀歌都在点亮的墓灯之间轮换。',
+  'bossJournal.crypt.lady.choiceName': '谁来承受哀歌？',
+  'bossJournal.crypt.lady.choiceGain':
+    '三盏墓灯全部使用，每盏最多庇护{cap}名玩家，这次哀歌就没有人受伤。',
+  'bossJournal.crypt.lady.choiceRisk':
+    '用过的墓灯在下一次哀歌时仍是暗的，所以到时会有人受伤，而且每层萦绕哀歌会额外提高{perStack}伤害。',
+  'bossJournal.crypt.lady.heroicEmbrace': '冰封之拥同时抓住{victims}名玩家。',
+  'bossJournal.crypt.lady.heroicLanterns':
+    '点亮的墓灯会在{lit}秒后自行燃尽，并保持熄灭{gutter}秒。',
+  'bossJournal.crypt.ilvane.overview':
+    '一位唱诗班女指挥，由两名空洞唱诗者守护，只要它们活着，就会为她减伤。她的挽歌会伤害并沉默所有能看见她的人，所以要打断它，或躲到柱子后面。她还会弹奏骨管风琴，让一道道音符通道沿着唱诗楼袭来。',
+  'bossJournal.crypt.ilvane.phaseLoftName': '唱诗楼',
+  'bossJournal.crypt.ilvane.phaseLoftSummary': '她在唱诗楼上歌唱，身边有两名空洞唱诗者。',
+  'bossJournal.crypt.ilvane.phaseCrescendoName': '渐强',
+  'bossJournal.crypt.ilvane.phaseCrescendoSummary':
+    '生命值降到{health}时，她唱得更快，风琴会奏出第三波。',
+  'bossJournal.crypt.ilvane.harmonyName': '和声',
+  'bossJournal.crypt.ilvane.harmonySummary':
+    '每名存活的唱诗者使她受到的伤害降低{per}：两名都在时降低{both}。',
+  'bossJournal.crypt.ilvane.harmonyResponse': '先杀唱诗者。',
+  'bossJournal.crypt.ilvane.dirgeSummary':
+    '每{every}秒读条{cast}秒。读条完成时，所有能看见她的人受到{min}到{max}点伤害，并被沉默{silence}秒。被打断后，她{quiet}秒内不会再唱挽歌。',
+  'bossJournal.crypt.ilvane.dirgeResponse': '打断它，或在读条结束前躲到柱子后面脱离视线。',
+  'bossJournal.crypt.ilvane.organSummary':
+    '每{every}秒，她走到风琴前，沿唱诗楼奏出{waves}波音符通道。每条通道显示{gather}秒后爆发：造成{min}到{max}点伤害。',
+  'bossJournal.crypt.ilvane.organResponse': '先站在前几条通道之间，再走进已经爆发过的通道。',
+  'bossJournal.crypt.ilvane.encoreName': '安可',
+  'bossJournal.crypt.ilvane.encoreSummary':
+    '一名唱诗者倒下{seconds}秒而同伴仍站着时，它会以满生命值重新站起。',
+  'bossJournal.crypt.ilvane.encoreResponse': '两名唱诗者的死亡间隔不要超过{seconds}秒。',
+  'bossJournal.crypt.ilvane.unbrokenSummary': '每第{nth}首挽歌是不断之诗：无法被打断。',
+  'bossJournal.crypt.ilvane.unbrokenResponse': '为它躲到柱子后面。',
+  'bossJournal.crypt.ilvane.crescendoName': '渐强',
+  'bossJournal.crypt.ilvane.crescendoSummary':
+    '生命值低于{health}时，挽歌读条{cast}秒，每{every}秒一次，风琴奏出{waves}波。第三波会重复第一波的通道。',
+  'bossJournal.crypt.ilvane.crescendoResponse': '打断每一首挽歌，第三波时从第一波的通道里退出来。',
+  'bossJournal.crypt.ilvane.tipTank': '把唱诗者聚在一起以便快速击杀，然后接住伊尔凡。',
+  'bossJournal.crypt.ilvane.tipHealer': '唱完的挽歌也会沉默你：如果没人能打断，就躲到柱子后面。',
+  'bossJournal.crypt.ilvane.tipDamage': '先杀唱诗者，打断挽歌，躲开风琴通道。',
+  'bossJournal.crypt.ilvane.tipDamageHeroic':
+    '在{seconds}秒内击杀两名唱诗者，打断挽歌，并躲开每一次不断之诗。',
+  'bossJournal.crypt.ilvane.choiceName': '打断还是躲避？',
+  'bossJournal.crypt.ilvane.choiceGain': '打断会中止挽歌，并让她{quiet}秒内保持安静。',
+  'bossJournal.crypt.ilvane.choiceRisk':
+    '躲在柱子后面会损失输出时间。打断失败则会沉默并伤害视线内的所有人。',
+  'bossJournal.crypt.ilvane.heroicEncore': '安可：唱诗者倒下{seconds}秒而同伴仍活着时会重新站起。',
+  'bossJournal.crypt.ilvane.heroicUnbroken': '不断之诗：每第{nth}首挽歌无法被打断。',
+  'bossJournal.crypt.morthen.overview':
+    '一位巫妖主教，主持三幕仪式。第一幕他召唤灵魂强化自己；生命值降到{rite}时，他躲在结界后，直到队伍付出生命重燃四根蜡烛；降到{last}时，他挥舞巨大的镰刀。',
+  'bossJournal.crypt.morthen.phaseCallingName': '召唤',
+  'bossJournal.crypt.morthen.phaseCallingSummary': '他在周身释放暗影脉冲，并召唤灵魂喂养自己。',
+  'bossJournal.crypt.morthen.phaseRiteName': '不宁者仪式',
+  'bossJournal.crypt.morthen.phaseRiteSummary':
+    '生命值降到{health}时，他回到祭坛，在四根蜡烛全部重新燃起前免疫伤害。',
+  'bossJournal.crypt.morthen.phaseLastName': '终末仪式',
+  'bossJournal.crypt.morthen.phaseLastSummary':
+    '生命值降到{health}时，他提起镰刀，迎接战斗的终章。',
+  'bossJournal.crypt.morthen.pulseSummary':
+    '每{every}秒（终末仪式中为{everyLast}秒）读条{cast}秒，随后对{radius}码内所有人造成{min}到{max}点伤害。',
+  'bossJournal.crypt.morthen.pulseResponse':
+    '包括坦克在内的所有人，都要在读条结束前退到{radius}码外。',
+  'bossJournal.crypt.morthen.gravecallName': '唤墓',
+  'bossJournal.crypt.morthen.gravecallSummary':
+    '每{every}秒，一个缚魂从壁龛飘向他。若它抵达，他每层多造成{per}伤害（最多{stacks}层），并恢复{heal}的生命值。它接触到的第一名玩家会替他承受：造成{min}到{max}点伤害。',
+  'bossJournal.crypt.morthen.gravecallResponse': '让一名闲置的玩家站到每个灵魂的路径上。',
+  'bossJournal.crypt.morthen.graspName': '坟墓之握',
+  'bossJournal.crypt.morthen.graspSummary':
+    '每{every}秒，{count}名玩家脚下出现{radius}码的法环。{fuse}秒后鬼手破土而出：环内所有人被定身{root}秒，并受到{min}到{max}点伤害。',
+  'bossJournal.crypt.morthen.graspResponse': '立刻走出法环。',
+  'bossJournal.crypt.morthen.riteSummary':
+    '他变得免疫伤害，{candles}根蜡烛熄灭。{bones}具不宁骸骨爬出。墓穴寒意每秒打击所有人：{base}点伤害，每{chillEvery}秒提高{step}，没有上限。',
+  'bossJournal.crypt.morthen.riteResponse': '快速重燃全部四根蜡烛：寒意不会停止上升。',
+  'bossJournal.crypt.morthen.relightName': '重燃追思蜡烛',
+  'bossJournal.crypt.morthen.relightSummary':
+    '在蜡烛旁（{range}码内）引导{channel}秒来重燃它。点燃者损失{drain}的最大生命值。第四根点燃时，他被击晕{stun}秒，并多受到{vuln}伤害。',
+  'bossJournal.crypt.morthen.relightResponse': '把蜡烛分给生命值充裕的玩家，并在击晕期间爆发输出。',
+  'bossJournal.crypt.morthen.nameDeadSummary':
+    '蜡烛必须按名册上金色光束指示的顺序点燃。点错蜡烛会熄灭最后点燃的一根，并对点燃者造成{min}到{max}点伤害。',
+  'bossJournal.crypt.morthen.nameDeadResponse': '只点光束指向的蜡烛。',
+  'bossJournal.crypt.morthen.reapSummary':
+    '每{every}秒向坦克读条{cast}秒，随后向他正前方{arc}度、{range}码的扇形挥镰：造成{min}到{max}点伤害。',
+  'bossJournal.crypt.morthen.reapResponse': '只有坦克站在正面。坦克可以在读条时侧移。',
+  'bossJournal.crypt.morthen.tipTank': '让他背对队伍，并和其他人一起走出暗影脉冲。',
+  'bossJournal.crypt.morthen.tipHealer':
+    '每根蜡烛都会消耗点燃者大量生命值，而且墓穴寒意持续上升：优先治疗点燃者。',
+  'bossJournal.crypt.morthen.tipDamage': '用身体挡住缚魂，仪式中重燃蜡烛，在他昏迷时爆发输出。',
+  'bossJournal.crypt.morthen.tipDamageHeroic':
+    '用身体挡住缚魂，并躲开坟墓之握。仪式中沿着金色光束找到正确的蜡烛。',
+  'bossJournal.crypt.morthen.choiceCandleName': '派几个人点蜡烛？',
+  'bossJournal.crypt.morthen.choiceCandleGain':
+    '多名玩家同时重燃，能更快结束仪式，赶在墓穴寒意攀升之前。',
+  'bossJournal.crypt.morthen.choiceCandleRisk':
+    '每名点燃者每根蜡烛要付出{normal}的最大生命值，同时寒意持续上升。',
+  'bossJournal.crypt.morthen.choiceSoulName': '要不要挡住灵魂？',
+  'bossJournal.crypt.morthen.choiceSoulGain':
+    '被挡住的灵魂永远到不了他身边：没有伤害叠层，也没有治疗。',
+  'bossJournal.crypt.morthen.choiceSoulRisk':
+    '挡魂者承受灵魂的伤害。每个漏过的灵魂使他多造成{per}伤害，并为他恢复{heal}的生命值。',
+  'bossJournal.crypt.morthen.heroicNameDead': '点名亡者：蜡烛必须按名册显示的顺序点燃。',
+  'bossJournal.crypt.morthen.heroicGrasp': '坟墓之握：每一幕都会出现定身并造成伤害的法环。',
+  'bossJournal.crypt.morthen.heroicDrain': '每根蜡烛消耗点燃者{drain}的最大生命值。',
+  'bossJournal.crypt.wyrm.overview':
+    '莫森临终的仪式点燃了一座火葬堆，一条骨龙落入其中。它的战斗方式与骨堂骨龙相似，另有燃烧的扫射通道，以及一声会击退玩家、却让它暴露出来承受更多伤害的咆哮。',
+  'bossJournal.crypt.wyrm.phaseName': '唤龙火葬堆',
+  'bossJournal.crypt.wyrm.phaseSummary': '它从够不到的高处滑翔而来，伴着一团烈焰落入法环。',
+  'bossJournal.crypt.wyrm.strafeSummary':
+    '每{every}秒，它用{mark}秒标出一条穿过某名玩家的{width}码宽通道，随后喷洒火焰飞过：通道内所有人受到{min}到{max}点伤害。通道会持续燃烧{seconds}秒：每秒{burn}点伤害。',
+  'bossJournal.crypt.wyrm.strafeResponse': '向侧面走出标记的通道，并远离燃烧的地面。',
+  'bossJournal.crypt.wyrm.bellowSummary':
+    '每{every}秒读条{cast}秒，随后{radius}码内的人受到{min}到{max}点伤害，并被击退{push}码。之后{seconds}秒内，它多受到{vuln}伤害。',
+  'bossJournal.crypt.wyrm.bellowResponse': '别被击退到燃烧的通道里。在随后的窗口期交出爆发技能。',
+  'bossJournal.crypt.wyrm.knellSummary':
+    '每{every}秒，它飞到够不到的高处，向半个法环喷吐{breaths}次火焰。每个半区在着火前{mark}秒被标记：其中所有人受到{min}到{max}点伤害。',
+  'bossJournal.crypt.wyrm.knellResponse': '每次都跑向法环中未被标记的一半。',
+  'bossJournal.crypt.wyrm.tipTank': '让它背对队伍，并把它从燃烧的通道里转开。',
+  'bossJournal.crypt.wyrm.tipHealer': '火葬扫射和恐惧咆哮是伤害高峰；治疗被击退进燃烧通道的人。',
+  'bossJournal.crypt.wyrm.tipDamage': '走出标记的通道，每次恐惧咆哮后交出爆发技能。',
+  'bossJournal.crypt.wyrm.tipDamageHeroic': '走出标记的通道，燃烧丧钟期间每次都跑向安全的一半。',
+  'bossJournal.crypt.wyrm.heroicKnell': '燃烧丧钟：它升空，向半个法环喷吐{breaths}次火焰。',
+  'bossJournal.bastion.captain.overview':
+    '一名悬浮的幽灵船长在下层外堡的护城河上巡逻，不杀死他，吊桥就不会放下。他循环施放三种指向非坦克玩家的通道攻击，每一种都会在发动前画在地面上。',
+  'bossJournal.bastion.captain.phaseSummary':
+    '开战{first}秒后他发出第一招，随后依次是幽灵舷炮齐射、诅咒之锚和幻影登船，每招间隔{recovery}秒。每次出招时他都站在原地不动。',
+  'bossJournal.bastion.captain.broadsideSummary':
+    '{warn}秒预警后，{lanes}条长{length}码的平行通道同时开火：通道内的所有人受到{min}到{max}点伤害。',
+  'bossJournal.bastion.captain.broadsideResponse': '站在通道之间的空隙里。',
+  'bossJournal.bastion.captain.anchorSummary':
+    '{warn}秒预警后，一支诅咒之锚沿其通道向后拖拽{length}码，历时{seconds}秒，击中沿途所有人：{min}到{max}点伤害。',
+  'bossJournal.bastion.captain.anchorResponse': '在锚发动前离开通道。',
+  'bossJournal.bastion.captain.boardingSummary':
+    '{warn}秒预警后，{length}码通道内的所有人受到{min}到{max}点伤害，随后他沿通道冲刺。',
+  'bossJournal.bastion.captain.boardingResponse': '从通道旁让开。',
+  'bossJournal.bastion.captain.sailorsName': '缚骸水手',
+  'bossJournal.bastion.captain.sailorsSummary':
+    '生命值降到{first}和{second}时，各有{count}名缚骸水手加入战斗。水手死亡后不久会迸发灵魂能量。',
+  'bossJournal.bastion.captain.sailorsResponse': '坦克接住它们。远离刚死的水手。',
+  'bossJournal.bastion.captain.tipTank':
+    '让他原地不动，并接住缚骸水手。他的通道瞄准其他人，不会瞄准你。',
+  'bossJournal.bastion.captain.tipHealer': '幽灵舷炮齐射伤害最高：治疗站在通道里的人。',
+  'bossJournal.bastion.captain.tipDamage':
+    '盯紧地面：每个招式发动前都会画出来。站在舷炮齐射的空隙里。',
+  'bossJournal.bastion.olen.overview':
+    '一名堕落的圣骑士。他的咸水池会为他提供护盾，所以坦克要把他拖出水池；团队保持分散，这样他的回弹壁盾和宣判光柱只会击中一名玩家。生命值一半时他会跪下并免疫伤害，直到他的溺亡军士全部被杀。',
+  'bossJournal.bastion.olen.phaseBreachName': '破口堡垒',
+  'bossJournal.bastion.olen.phaseBreachSummary': '他一次只施放一个技能；施法期间他的计时器暂停。',
+  'bossJournal.bastion.olen.phaseOathName': '不破誓言',
+  'bossJournal.bastion.olen.phaseOathSummary':
+    '生命值降到{health}时，他跪下并免疫伤害，由溺亡军士替他作战。',
+  'bossJournal.bastion.olen.brineSummary':
+    '每{every}秒读条{cast}秒，随后在他脚下生成半径{radius}码的圣化咸水池，持续{seconds}秒：池中所有人每秒受到{perSecond}点伤害。他站在任意水池中时，受到的伤害降低{shield}。',
+  'bossJournal.bastion.olen.brineResponse': '坦克把他拖出水池。其他人也走出水池。',
+  'bossJournal.bastion.olen.bulwarkSummary':
+    '每{every}秒读条{cast}秒，目标是一名非坦克玩家。盾牌对其造成{min}到{max}点伤害，随后弹向{reach}码内最近的未被击中的玩家，最多{hits}名玩家。',
+  'bossJournal.bastion.olen.bulwarkResponse': '保持分散：与其他所有人相距超过{reach}码。',
+  'bossJournal.bastion.olen.sentenceSummary':
+    '每{every}秒读条{cast}秒，标记一名非坦克玩家。{seconds}秒后，无论他们身在何处，光柱都会落在其身上：{radius}码内所有人受到{min}到{max}点伤害。',
+  'bossJournal.bastion.olen.sentenceResponse': '被标记：在光柱落下前离开队伍。',
+  'bossJournal.bastion.olen.arcName': '收割之弧',
+  'bossJournal.bastion.olen.arcSummary':
+    '他的每次近战攻击，还会以该次挥击伤害的{share}打击坦克{radius}码内的其他所有玩家。',
+  'bossJournal.bastion.olen.arcResponse': '除了坦克，任何人都不要站在坦克{radius}码内。',
+  'bossJournal.bastion.olen.oathSummary':
+    '仅一次，在生命值{health}时：他跪下并引导最多{max}秒，免疫所有伤害，同时{count}名溺亡军士现身，攻击非坦克玩家。全部击杀后，他会昏迷{stun}秒，并在{vulnSeconds}秒内多受到{vuln}的伤害。',
+  'bossJournal.bastion.olen.oathResponse':
+    '坦克集中军士；所有人击杀它们，然后在奥伦昏迷时爆发输出。',
+  'bossJournal.bastion.olen.tipTank':
+    '把他拖出每一个咸水池。让队友远离你周围{radius}码，他的挥击会溅射到那里。',
+  'bossJournal.bastion.olen.tipHealer':
+    '玩家聚在一起时，回弹壁盾和潮汐宣判伤害最高。军士在低血量时会狂暴。',
+  'bossJournal.bastion.olen.tipDamage':
+    '保持分散，彼此相距超过{reach}码，并远离坦克。誓言阶段先击杀军士。',
+  'bossJournal.bastion.olen.choiceName': '集合还是分散？',
+  'bossJournal.bastion.olen.choiceGain':
+    '分散开来，回弹壁盾、潮汐宣判和收割之弧每次都只会击中一名玩家。',
+  'bossJournal.bastion.olen.choiceRisk':
+    '被击中玩家{reach}码内的所有人都会受到弹射，坦克{radius}码内的所有人会受到溅射。',
+  'bossJournal.bastion.olen.heroicChanges':
+    '咸水池半径为{radius}码，盾牌弹射至{hits}名玩家，宣判光柱为{sentence}码，现身的军士为{count}名。',
+  'bossJournal.bastion.turnkey.overview':
+    '牢狱钥匙官把玩家锁进铁笼。被关的玩家连按交互键挣脱，队友攻击铁笼可以加快进度。',
+  'bossJournal.bastion.turnkey.phaseName': '牢狱铁栅',
+  'bossJournal.bastion.turnkey.phaseSummary': '他按固定计时关押玩家，并在生命值一半时放出囚徒。',
+  'bossJournal.bastion.turnkey.cageSummary':
+    '每{every}秒读条{cast}秒，随后铁笼落在一名非坦克玩家身上，使其眩晕。铁笼有{hits}点耐久：被关者每按一次交互键破坏{press}，盟友每次攻击破坏{helper}，铁笼还会缓慢自行修复。{max}秒后铁笼会碾压被关者，造成其最大生命值{crush}的伤害。',
+  'bossJournal.bastion.turnkey.cageHeroicSummary':
+    '每{every}秒读条{cast}秒，随后铁笼落在{cages}名非坦克玩家身上。每个铁笼有{hits}点耐久：被关者每按一次交互键破坏{press}，盟友每次攻击破坏{helper}。笼内不断上涨的盐水每秒消耗生命值。{max}秒后铁笼会碾压，造成最大生命值{crush}的伤害。',
+  'bossJournal.bastion.turnkey.cageResponse': '被关住：快速连按交互键。其他人攻击铁笼将其打破。',
+  'bossJournal.bastion.turnkey.cellsName': '打开牢房',
+  'bossJournal.bastion.turnkey.cellsSummary':
+    '生命值降到{health}时，他放出{count}名戴镣囚徒。囚徒生命值降到四分之一时锁链崩断，他们退出战斗。',
+  'bossJournal.bastion.turnkey.cellsResponse': '把它们打到四分之一生命值；不需要击杀。',
+  'bossJournal.bastion.turnkey.tipTank': '控住他和囚徒；铁笼永远不会瞄准你。',
+  'bossJournal.bastion.turnkey.tipHealer': '给被关住的玩家补血：碾压造成的是其生命值的一定比例。',
+  'bossJournal.bastion.turnkey.tipDamage': '立刻切换到每个铁笼上，打到它破裂为止。',
+  'bossJournal.bastion.turnkey.heroicCages': '铁笼一次锁住{cages}名玩家。',
+  'bossJournal.bastion.turnkey.heroicFlood': '盐水涌入：被关住的玩家每秒损失生命值，直到被救出。',
+  'bossJournal.bastion.ossick.overview':
+    '狱卒用锚钩住一名玩家，并将其拖向溺亡深坑。被钩者要跑到点亮的系泊柱，或由团队砸断锁链。与此同时，另外两名玩家被锁在一起，必须靠近彼此。',
+  'bossJournal.bastion.ossick.phaseName': '溺亡庭院',
+  'bossJournal.bastion.ossick.phaseSummary':
+    '生命值降到{first}和{second}时，每次都有{count}名戴镣囚徒从牢房中出来。',
+  'bossJournal.bastion.ossick.anchorSummary':
+    '每{every}秒读条{cast}秒，随后一名非坦克玩家被钩住。{settle}秒后锁链将其拖向深坑。脱身方法：跑到距被钩处至少{run}码、点亮的系泊柱{reach}码以内（该柱熄灭{dark}秒），或由团队对锚造成{hits}次攻击。掉进深坑：损失最大生命值的{pit}并眩晕{stun}秒。',
+  'bossJournal.bastion.ossick.anchorHeroicSummary':
+    '每{every}秒读条{cast}秒，随后一名非坦克玩家被钩住；锚落地时会击中{crashRadius}码内的其他所有人，造成{min}到{max}点伤害。{settle}秒后锁链将其拖向深坑。脱身方法：至少{run}码外点亮的系泊柱，或对锚造成{hits}次攻击。掉进深坑：损失最大生命值的{pit}并眩晕{stun}秒。',
+  'bossJournal.bastion.ossick.anchorResponse': '被钩住：尽早跑向点亮的系泊柱。其他人攻击锚。',
+  'bossJournal.bastion.ossick.shackleSummary':
+    '每{every}秒读条{cast}秒，将两名玩家锁在一起，持续{seconds}秒。他们每相距超过{range}码一秒，双方都会受到{min}到{max}点伤害。',
+  'bossJournal.bastion.ossick.shackleResponse': '被锁住：与搭档保持在{range}码以内。',
+  'bossJournal.bastion.ossick.cudgelSummary':
+    '每{every}秒对坦克读条{cast}秒：造成其近战攻击{mult}倍的伤害，无视护甲，并使移动速度降低{slow}，持续{seconds}秒。',
+  'bossJournal.bastion.ossick.cudgelResponse': '坦克：使用冷却技能。治疗者预判这一击。',
+  'bossJournal.bastion.ossick.tipTank': '把他控在场地中央附近并接住囚徒。狱卒短棍无视你的护甲。',
+  'bossJournal.bastion.ossick.tipHealer': '留意被钩住和被锁住的玩家；深坑会夺走大量生命值。',
+  'bossJournal.bastion.ossick.tipDamage': '有人被钩住时立刻攻击锚。被锁住时与搭档保持靠近。',
+  'bossJournal.bastion.ossick.choiceName': '跑向系泊柱，还是砸断锁链？',
+  'bossJournal.bastion.ossick.choiceGain': '点亮的系泊柱只救出被钩住的玩家一人，团队可以继续输出。',
+  'bossJournal.bastion.ossick.choiceRisk':
+    '系泊柱必须至少在{run}码外，并会熄灭{dark}秒。锁链变短后，就没有系泊柱在够得着的范围内，只能砸断锁链。',
+  'bossJournal.bastion.ossick.heroicCrash': '锚坠：锚会击中被钩玩家{crashRadius}码内的所有人。',
+  'bossJournal.bastion.ossick.heroicChanges':
+    '锚需要{hits}次攻击才能砸断，被锁住的玩家必须保持在{range}码以内。',
+  'bossJournal.bastion.vael.overview':
+    '一个戴兜帽的收割者。他连续三次从某名玩家身后的暗影池中升起，用镰刀横扫其后背。生命值降到{first}和{second}时，他会藏身于一模一样的分身之间，同时圣咏伤害所有人；雾灯塔的光束会显示哪个身影是真身。',
+  'bossJournal.bastion.vael.phaseCrownName': '信标之冠',
+  'bossJournal.bastion.vael.phaseCrownSummary':
+    '玩家踩上王冠时他会从中升起。生命值降到{first}和{second}时，各有{count}名溺亡奴仆加入战斗。',
+  'bossJournal.bastion.vael.phaseVeilSummary':
+    '生命值降到{first}和{second}时，他会藏身于一模一样的分身之间。',
+  'bossJournal.bastion.vael.surgeSummary':
+    '读条{cast}秒，随后对其{radius}码内的所有人造成{min}到{max}点伤害。常规战斗中每{every}秒一次；生命值低于{below}时每{lastEvery}秒一次。',
+  'bossJournal.bastion.vael.surgeResponse': '远程玩家保持在{radius}码之外。',
+  'bossJournal.bastion.vael.crossingSummary':
+    '每{every}秒他穿行暗影，最多连续{chain}次，每次都在不同的玩家身后：其身后{behind}码处裂开一个水池，他从中升起，朝其方向横扫{range}码、{arc}度的扇形：{min}到{max}点伤害。',
+  'bossJournal.bastion.vael.crossingResponse':
+    '被死亡标记：向前走出横扫范围，或走到水池后面。其他人绝不要站在被标记玩家的正前方。',
+  'bossJournal.bastion.vael.graveName': '墓影',
+  'bossJournal.bastion.vael.graveSummary':
+    '每个暗影池存在{seconds}秒，灼烧{radius}码内的所有人，每秒{perSecond}点伤害。',
+  'bossJournal.bastion.vael.graveResponse': '远离旧的水池。',
+  'bossJournal.bastion.vael.veilSummary':
+    '他藏起身形，随后四个身影在王冠周围升起：维尔和三个雾影。四者齐唱溺亡圣咏，持续{seconds}秒，对所有人的伤害逐秒增加。雾灯塔的光束每{beam}秒扫过一次：真正的维尔会亮起。对其造成其生命值{share}的伤害即可打破雾幕：他会昏迷{stun}秒，并在{vulnSeconds}秒内多受到{vuln}的伤害。',
+  'bossJournal.bastion.vael.veilHeroicSummary':
+    '他藏起身形，随后四个身影在王冠周围升起：维尔和三个雾影，每{drift}秒向前挪动一个位置。四者齐唱溺亡圣咏，持续{seconds}秒。雾灯塔的光束会显示真正的维尔。对其造成其生命值{share}的伤害即可打破雾幕：昏迷{stun}秒，并在{vulnSeconds}秒内多受到{vuln}的伤害。',
+  'bossJournal.bastion.vael.veilResponse': '留意光束，然后所有人只攻击真正的维尔。',
+  'bossJournal.bastion.vael.fogburstName': '雾爆',
+  'bossJournal.bastion.vael.fogburstSummary':
+    '任何对雾影的攻击都会使其爆裂：其{radius}码内的玩家受到{min}到{max}点伤害并眩晕{stun}秒。',
+  'bossJournal.bastion.vael.fogburstHeroicSummary':
+    '任何对雾影的攻击都会使其爆裂：其{radius}码内的玩家受到{min}到{max}点伤害并眩晕{stun}秒，且在它原地升起一名溺亡奴仆。',
+  'bossJournal.bastion.vael.fogburstResponse': '不要攻击分身：等待光束。',
+  'bossJournal.bastion.vael.tipTank': '接住溺亡奴仆。雾幕期间，协助找出真正的维尔。',
+  'bossJournal.bastion.vael.tipHealer':
+    '溺亡圣咏会对所有人逐步加强，直到雾幕被打破。迷雾涌流会击中其{radius}码内的所有人。',
+  'bossJournal.bastion.vael.tipDamage':
+    '被死亡标记时，向前或走到水池后面。雾幕期间，只攻击光束照亮的身影。',
+  'bossJournal.bastion.vael.tipDamageHeroic':
+    '被死亡标记时，向前或走到水池后面，并避开旧的水池。雾幕期间，只攻击光束照亮的身影。',
+  'bossJournal.bastion.vael.choiceName': '等待光束，还是靠猜？',
+  'bossJournal.bastion.vael.choiceGain': '等待光束能让每次攻击都落在真正的维尔身上，更快打破雾幕。',
+  'bossJournal.bastion.vael.choiceRisk':
+    '雾幕每持续一秒，圣咏伤害就更高。猜错会打爆一个分身：其周围造成伤害并眩晕。',
+  'bossJournal.bastion.vael.choiceRiskHeroic':
+    '雾幕每持续一秒，圣咏伤害就更高。猜错会打爆一个分身，使其附近的玩家眩晕，并留下一名溺亡奴仆。',
+  'bossJournal.bastion.vael.heroicGrave': '墓影：每个暗影池持续燃烧{seconds}秒。',
+  'bossJournal.bastion.vael.heroicVeil':
+    '雾幕期间身影每{drift}秒挪动一次，被打爆的分身会留下一名溺亡奴仆。',
+  'bossJournal.temple.selthe.overview':
+    '唱诗母在她的水池中歌唱，从不移动，也不近战。她会标记玩家，施放需要集合分摊的合唱和需要独自承受的独唱，向一名玩家射出不断增强的咏叹调光束，并向庭院扫出一道波浪。她的箭和咏叹调都可以被打断。',
+  'bossJournal.temple.selthe.phaseName': '唱诗庭院',
+  'bossJournal.temple.selthe.phaseSummary':
+    '只有一个阶段，全靠计时。到期时若她正在读条，该机制会等读条结束后再触发。',
+  'bossJournal.temple.selthe.chorusName': '合唱',
+  'bossJournal.temple.selthe.chorusSummary':
+    '每{every}秒标记一名非坦克玩家，持续{mark}秒。标记结束时，{total}点伤害由其周围{radius}码内的所有人平摊。',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    '每{every}秒标记一名非坦克玩家，持续{mark}秒。标记结束时，{total}点伤害由其周围{radius}码内的所有人平摊。回响：{echo}秒后，同一地点再次爆发，对仍留在原地的每名玩家造成{echoDamage}点伤害，不再平摊。',
+  'bossJournal.temple.selthe.chorusResponse': '所有人集合到合唱目标身边，并在回响之前离开该地点。',
+  'bossJournal.temple.selthe.soloSummary':
+    '每次合唱{offset}秒后，另一名玩家被标记{mark}秒。标记结束时，被标记的玩家及其周围{radius}码内的所有人各受到{damage}点伤害。',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    '二重唱：独唱与合唱同时落在不同的玩家身上。标记结束时，被标记的玩家及其周围{radius}码内的所有人各受到{damage}点伤害，{echo}秒后该地点再次爆发。',
+  'bossJournal.temple.selthe.soloResponse': '独唱目标：远离所有人，然后离开该地点。',
+  'bossJournal.temple.selthe.songSummary':
+    '每{every}秒读条{cast}秒，随后对庭院内的每名玩家造成{min}到{max}点冰霜伤害。',
+  'bossJournal.temple.selthe.songResponse': '无法躲避：治疗者要时刻保持所有人满血。',
+  'bossJournal.temple.selthe.boltSummary':
+    '她的填充技能：向目标读条{cast}秒，造成相当于其近战攻击{mult}倍的冰霜伤害。任何一次打断之后，她在{quiet}秒内不会施放箭或咏叹调。',
+  'bossJournal.temple.selthe.boltResponse': '咏叹调不会来时，打断她的箭。',
+  'bossJournal.temple.selthe.ariaSummary':
+    '每{every}秒，她对一名非坦克玩家引导光束{channel}秒：共{pulses}次脉冲，对同一目标的伤害从{min}逐步增长到{max}。有玩家踏入光束时，由该玩家承受脉冲，增长重新开始。',
+  'bossJournal.temple.selthe.ariaResponse':
+    '打断它，躲到灯柱后面打断她的视线，或踏入光束分担伤害。',
+  'bossJournal.temple.selthe.surgeSummary':
+    '每{every}秒瞄准一名非坦克玩家读条{cast}秒，随后释放一道{arc}度、长{range}码的波浪：造成{min}到{max}点伤害，并击退{push}码。',
+  'bossJournal.temple.selthe.surgeResponse': '向侧面走出扇形范围。',
+  'bossJournal.temple.selthe.tipTank':
+    '站在她能看到你的位置，让她的箭都打向你；这里没有别的需要坦克处理的机制。',
+  'bossJournal.temple.selthe.tipHealer':
+    '海之歌每{every}秒打击所有人。留意咏叹调的目标，以及被合唱孤立的人。',
+  'bossJournal.temple.selthe.tipDamage': '合唱时集合，独唱时分散，打断咏叹调，并走出湖涌。',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    '合唱集合与独唱分散会同时发生，随后在回响之前离开两处地点。打断咏叹调。',
+  'bossJournal.temple.selthe.choiceName': '打断咏叹调，还是分担它？',
+  'bossJournal.temple.selthe.choiceGain':
+    '打断或灯柱能立刻终止光束。踏入光束则会让增长在你身上重新开始。',
+  'bossJournal.temple.selthe.choiceRisk':
+    '被打断的咏叹调也会让她的箭短暂沉默，但如果无人行动，完整的增长伤害会全部落在一名玩家身上。',
+  'bossJournal.temple.selthe.heroicDuet': '二重唱：合唱与独唱同时落在两名玩家身上。',
+  'bossJournal.temple.selthe.heroicEcho': '回响：每个标记在{echo}秒后于同一地点再次爆发。',
+  'bossJournal.temple.hydra.overview':
+    '三个头颅掌握三种元素，共享同一场战斗：冰、毒和水。倒下的头颅会把它的攻击交给下一个头颅，只要还有头颅存活，它就会在{regrow}秒后长回来。巨浪按计时席卷半个水池，两次巨浪之间，两个头颅会融合它们的吐息。',
+  'bossJournal.temple.hydra.phaseName': '九头蛇水池',
+  'bossJournal.temple.hydra.phaseSummary': '左侧头颅喷出冰霜，中间头颅喷吐毒液，右侧头颅释放水流。',
+  'bossJournal.temple.hydra.phaseComboName': '合体吐息',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    '每次巨浪{after}秒后，两个头颅会融合，顺序始终是冰封激流、毒液洋流、剧毒霜晶。',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    '每次巨浪{early}秒后和{after}秒后，两个头颅会融合，顺序是冰封激流、毒液洋流、剧毒霜晶。',
+  'bossJournal.temple.hydra.headsName': '三个头颅',
+  'bossJournal.temple.hydra.headsSummary':
+    '倒下的头颅会把元素传给下一个头颅，每有一个头颅倒下，所有存活的头颅造成的伤害就提高{enrage}。只要还有头颅存活，倒下的头颅会在{regrow}秒后以{share}的生命值长回来。',
+  'bossJournal.temple.hydra.headsResponse': '同时击倒三个头颅，并在{regrow}秒内结束战斗。',
+  'bossJournal.temple.hydra.breathSummary':
+    '每{every}秒瞄准一名非坦克玩家读条{cast}秒，随后喷出一道{arc}度、长{range}码的冰霜锥形吐息：造成{min}到{max}点伤害，并减速{slow}，持续{seconds}秒。',
+  'bossJournal.temple.hydra.breathResponse': '走出锥形范围。',
+  'bossJournal.temple.hydra.spitName': '毒液喷吐',
+  'bossJournal.temple.hydra.spitSummary':
+    '每{every}秒，最多{count}名不同玩家脚下的{radius}码毒池在{warn}秒后爆裂：造成{min}到{max}点伤害，随后毒液在原地灼烧{seconds}秒，每秒{perSecond}点。',
+  'bossJournal.temple.hydra.spitResponse': '先分散，再走出毒池。',
+  'bossJournal.temple.hydra.torrentSummary':
+    '每{every}秒读条{cast}秒，向一名非坦克玩家打出一条{length}码长的水流：造成{min}到{max}点伤害，并推开{push}码。',
+  'bossJournal.temple.hydra.torrentResponse': '向侧面走出水流。',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    '第一次在{first}秒，之后在上一道巨浪结束{every}秒后：读条{cast}秒，期间头颅受到的伤害降低{reduction}，随后一道巨浪席卷半个水池：造成{min}到{max}点伤害，并推开{push}码。',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    '第一次在{first}秒，之后在上一道巨浪结束{every}秒后：读条{cast}秒，期间头颅受到的伤害降低{reduction}，随后一道巨浪席卷半个水池：造成{min}到{max}点伤害并推开。回流：{backwash}秒后巨浪回卷另一半。',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    '移到另一半，躲到池边石柱后面，或躲到冰墙后面。头颅沉入水中时不要输出。',
+  'bossJournal.temple.hydra.frostlockSummary':
+    '向一名玩家打出一条水流：造成{min}到{max}点伤害，并冻结{stun}秒。它会留下一道持续{wall}秒的冰墙：站在墙后{lee}码以内可躲过下一道巨浪，巨浪会将冰墙击碎。',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    '向一名玩家打出一条水流：造成{min}到{max}点伤害，并冻结{stun}秒。它会留下一道冰墙：站在墙后可躲过下一道巨浪。冰墙碎裂时，墙周围{reach}码内的所有人受到{shardMin}到{shardMax}点伤害。',
+  'bossJournal.temple.hydra.frostlockResponse': '躲开水流，再把冰墙当作掩体来躲海啸。',
+  'bossJournal.temple.hydra.currentSummary':
+    '毒池膨胀到{radius}码，并从水池中心向外滑动{slide}码，每秒灼烧{perSecond}点。',
+  'bossJournal.temple.hydra.currentResponse': '让开滑动路径。',
+  'bossJournal.temple.hydra.rimeSummary':
+    '毒池冻结成晶体，{seconds}秒后爆裂：对{radius}码内造成{min}到{max}点伤害。',
+  'bossJournal.temple.hydra.rimeResponse': '在每块晶体爆裂前远离它们。',
+  'bossJournal.temple.hydra.tipTank': '抓住你够得到的头颅；它们的攻击会瞄准其他人。',
+  'bossJournal.temple.hydra.tipHealer':
+    '海啸和合体吐息是伤害高峰。每有一个头颅倒下，其余头颅就打得更痛。',
+  'bossJournal.temple.hydra.tipDamage':
+    '均匀分配伤害，让三个头颅在{regrow}秒内相继倒下。每次海啸期间停手。',
+  'bossJournal.temple.hydra.choiceName': '先杀哪个头颅？',
+  'bossJournal.temple.hydra.choiceGain':
+    '三个头颅同时倒下就结束战斗；只要它们倒下的时间相近，顺序都可以。',
+  'bossJournal.temple.hydra.choiceRisk':
+    '每个倒下的头颅都会让其余头颅多造成{enrage}的伤害，并在{regrow}秒后长回来，而最后剩下的头颅掌握所有元素。',
+  'bossJournal.temple.hydra.heroicChanges':
+    '长回来的头颅以{share}的生命值回归，每道巨浪都会引发回流。',
+  'bossJournal.temple.colossus.overview':
+    '一尊行走的玻璃巨人。在三个生命值节点，每名玩家都会得到一个追击自己的镜像；你无法伤害自己的镜像，而每个存活的镜像都会为巨像提供护盾。在此之间，还有水流、猛击，以及一层层碎裂的地面。',
+  'bossJournal.temple.colossus.phaseName': '棱镜露台',
+  'bossJournal.temple.colossus.phaseSummary': '每次读条它都会站定脚步，也绝不离开露台。',
+  'bossJournal.temple.colossus.phaseFlareName': '棱镜闪耀',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    '生命值降到{first}、{second}和{third}时，它会召唤潮镜倒影。',
+  'bossJournal.temple.colossus.lanceSummary':
+    '每{every}秒读条{cast}秒，向一名非坦克玩家打出一条{length}码长的水流：造成{min}到{max}点伤害。',
+  'bossJournal.temple.colossus.lanceResponse': '向侧面走出水流。',
+  'bossJournal.temple.colossus.slamSummary':
+    '每{every}秒读条{cast}秒，随后对{radius}码内造成{min}到{max}点伤害，并击退{push}码。',
+  'bossJournal.temple.colossus.slamResponse': '近战可以走出范围；治疗者负责保护坦克。',
+  'bossJournal.temple.colossus.fractureSummary':
+    '第一次在{first}秒，之后每{every}秒：地面裂成{slices}块，持续{rounds}轮。每一轮都有几块变红，并在{warn}秒后爆炸：造成{min}到{max}点伤害。中心区域每一轮都会爆炸。',
+  'bossJournal.temple.colossus.fractureResponse': '每一轮都走到一块安全的地面上，并远离中心。',
+  'bossJournal.temple.colossus.flareSummary':
+    '引导{cast}秒，随后每名玩家都会得到一个潮镜倒影，它拥有巨像{share}的生命值，并追击玩家。你无法伤害自己的倒影。',
+  'bossJournal.temple.colossus.flareResponse': '击杀彼此的倒影，绝不要打自己的。',
+  'bossJournal.temple.colossus.wardName': '棱镜护盾',
+  'bossJournal.temple.colossus.wardSummary':
+    '每个存活的倒影使巨像受到的伤害降低{per}，最多降低{cap}。',
+  'bossJournal.temple.colossus.wardResponse': '清掉倒影，再回到巨像身上。',
+  'bossJournal.temple.colossus.shatterName': '破碎之镜',
+  'bossJournal.temple.colossus.shatterSummary':
+    '倒影破碎时，其周围{radius}码内的所有人受到{damage}点伤害。',
+  'bossJournal.temple.colossus.shatterResponse': '不要站在即将死亡的倒影旁边。',
+  'bossJournal.temple.colossus.swapName': '镜像互换',
+  'bossJournal.temple.colossus.swapSummary':
+    '每{every}秒，倒影会互换主人，所以你能攻击哪个镜像会随之改变。',
+  'bossJournal.temple.colossus.swapResponse': '每次互换后，重新确认你能攻击哪个镜像。',
+  'bossJournal.temple.colossus.tipTank': '每次闪耀之后重新抓住巨像；它会一路追着目标走。',
+  'bossJournal.temple.colossus.tipHealer':
+    '倒影会攻击它们的主人。潮镜碎裂会惩罚留在红色地块上的人。',
+  'bossJournal.temple.colossus.tipDamage':
+    '每次闪耀时击杀队友的倒影，然后在碎裂阶段一块一块地移动。',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    '每次闪耀时击杀队友的倒影；互换之后重新确认。不要站在即将死亡的镜像旁边。',
+  'bossJournal.temple.colossus.choiceName': '先杀倒影，还是先打巨像？',
+  'bossJournal.temple.colossus.choiceGain': '击杀镜像可移除最多{cap}的减伤，并让它们不再追击。',
+  'bossJournal.temple.colossus.choiceRisk':
+    '打镜像的时间就是没打巨像的时间，而且在英雄难度下，每个镜像破碎时都会爆发。',
+  'bossJournal.temple.colossus.heroicShatter':
+    '破碎之镜：倒影破碎时，会伤害其周围{radius}码内的所有人。',
+  'bossJournal.temple.colossus.heroicSwap': '镜像互换：倒影每{every}秒互换一次主人。',
+  'bossJournal.temple.ysolei.overview':
+    '溺月化身会把所有人拉近并猛击，淹没半座岛屿，召唤月之孽生，并让月光之泪滚向她自己。最后，除非团队及时打破她的护盾，否则月亮将会坠落。',
+  'bossJournal.temple.ysolei.phaseAltarName': '月亮祭坛',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    '她绝不移动。她的攻击范围很长：近战要站在远离她中心的位置。',
+  'bossJournal.temple.ysolei.phaseTideName': '涨潮',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    '生命值降到{health}时，半座岛屿被淹没，之后洪水会切换到另一侧。',
+  'bossJournal.temple.ysolei.phaseMoonSummary': '生命值降到{health}时，她会召唤月亮坠落。',
+  'bossJournal.temple.ysolei.lunarSummary':
+    '每{every}秒读条{cast}秒，随后对她中心{radius}码内的所有人造成{min}到{max}点伤害。',
+  'bossJournal.temple.ysolei.lunarResponse':
+    '远程玩家待在范围外；近战始终在范围内，所以治疗者要保护他们。',
+  'bossJournal.temple.ysolei.undertowSummary':
+    '每{every}秒引导{seconds}秒，以每秒{pull}码的速度把所有人拉向她。随后是潮汐冲击：对{radius}码内造成{min}到{max}点伤害。',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    '每{every}秒引导{seconds}秒，把所有人拉向她。随后是潮汐冲击：对{radius}码内造成{min}到{max}点伤害。裂流：每名玩家站立的位置都会裂开一个水潭，持续{pool}秒，每秒灼烧{riptide}点。',
+  'bossJournal.temple.ysolei.undertowResponse':
+    '引导期间，所有人（包括近战）都要朝干燥的地面跑出去；洪水会使你减速。',
+  'bossJournal.temple.ysolei.tearsSummary':
+    '生命值降到{first}和{second}时，她会召唤{count}颗滚向她的月光之泪。月光之泪碰到玩家就会停下：造成{min}到{max}点伤害，每层月灼额外造成{bonus}，月灼持续{sear}秒。月光之泪若到达她身边，她在本场战斗中的伤害提高{swell}，并恢复{heal}的生命值。',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    '生命值降到{first}和{second}时，她会召唤{count}颗滚向她的月光之泪。月光之泪碰到玩家就会停下：造成{min}到{max}点伤害，每层月灼额外造成{bonus}，并留下倾泻月光，每秒灼烧{glow}点。月光之泪若到达她身边，她的伤害提高{swell}，并恢复{heal}的生命值。',
+  'bossJournal.temple.ysolei.tearsResponse':
+    '用身体挡住每一颗月光之泪，轮流承受，避免有人叠起月灼。',
+  'bossJournal.temple.ysolei.tideName': '涨潮',
+  'bossJournal.temple.ysolei.tideSummary':
+    '生命值降到{health}时，半座岛屿立刻被淹没。每{every}秒洪水切换一侧，切换前有{warn}秒的波光预警。在水中：每秒受到{perSecond}点伤害，并减速{slow}。',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    '生命值降到{health}时，半座岛屿立刻被淹没。每{every}秒洪水切换一侧。在水中：每秒受到{perSecond}点伤害，并减速{slow}。溺月：每{moonEvery}秒，一只月之孽生会从被淹没的一侧爬出来。',
+  'bossJournal.temple.ysolei.tideResponse': '待在干燥的一侧，另一侧泛起波光时就移动过去。',
+  'bossJournal.temple.ysolei.callSummary':
+    '生命值降到{first}和{second}时，她会召唤{count}只月之孽生。',
+  'bossJournal.temple.ysolei.callResponse': '坦克抓住它们，伤害输出击杀它们。',
+  'bossJournal.temple.ysolei.moonSummary':
+    '在相当于她{ward}生命值的护盾保护下读条{cast}秒。及时打破护盾：她会被眩晕{stun}秒，并多承受{vuln}的伤害。若护盾未破：对岛上所有人造成{min}到{max}点伤害，并且她在本场战斗剩余时间内多造成{might}的伤害。',
+  'bossJournal.temple.ysolei.moonResponse': '每名伤害输出都攻击她的护盾；治疗者为冲击做好准备。',
+  'bossJournal.temple.ysolei.tipTank': '抓住每一只月之孽生。和大家一起跑出暗流。',
+  'bossJournal.temple.ysolei.tipHealer':
+    '月潮每次读条都会打击近战。月光之泪会叠加月灼：治疗挡下月光之泪的人。',
+  'bossJournal.temple.ysolei.tipDamage':
+    '躲开每一次暗流，轮流挡月光之泪，击杀月之孽生，并在坠月时全力打掉护盾。',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    '躲开每一次暗流及其裂流水潭，轮流挡月光之泪，击杀月之孽生，并尽快打掉坠月的护盾。',
+  'bossJournal.temple.ysolei.choiceName': '挡住月光之泪，还是放它们过去？',
+  'bossJournal.temple.ysolei.choiceGain':
+    '被挡下的月光之泪永远到不了她身边：她不会获得{swell}的伤害加成，也不会恢复{heal}的生命值。',
+  'bossJournal.temple.ysolei.choiceRisk':
+    '挡泪的人承受伤害并获得一层月灼：下一颗打在他身上的月光之泪会多造成{bonus}。轮流来挡。',
+  'bossJournal.temple.ysolei.heroicRiptide': '裂流：每次暗流都会在玩家站立的位置留下燃烧的水潭。',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    '溺月：每{moonEvery}秒，一只月之孽生会从洪水中爬出来。',
+  'bossJournal.temple.ysolei.heroicTears': '每波{count}颗月光之泪，坠月的读条时间为{cast}秒。',
 };

@@ -133,6 +133,8 @@ function makeCtx() {
     },
     masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
+    graveyards: [],
+    playerStart: { x: 0, z: 0 },
     get cfg() {
       return cfg;
     },

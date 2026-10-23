@@ -254,14 +254,15 @@ describe('which items draw the field weapons', () => {
       axe_field_bronze: 4,
       staff_field_iron: 8,
       staff_field_steel: 7,
-      staff_field_bronze: 5,
+      staff_field_bronze: 6, // + the membership Staff of Changing (PR 4281)
       spear_field_iron: 4,
       wand_field_iron: 4,
       wand_field_steel: 3,
     });
     // 49 common and uncommon weapons, and the 42 rare ones; 53 rare on the v0.45.0
-    // integration with the five-dungeon rework's eleven (placeholder finishes).
-    expect(fieldItems.length).toBe(102);
+    // integration with the five-dungeon rework's eleven (placeholder finishes), and 54
+    // with the membership Staff of Changing (PR 4281).
+    expect(fieldItems.length).toBe(103);
   });
 
   it('only common, uncommon and rare weapons of the matching type draw one', () => {

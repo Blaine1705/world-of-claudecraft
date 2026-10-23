@@ -31,7 +31,7 @@ import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
-import { questMapLocation } from '../../quest_map_location_core';
+import { liveNpcPosLookup, questMapLocation } from '../../quest_map_location_core';
 import { QuestTrackingState, sharedQuestTracking } from '../../quest_tracking_core';
 import { svgIcon } from '../../ui_icons';
 import { referralQuestRows } from '../referral_cards/referral_cards_view';
@@ -337,7 +337,7 @@ export class QuestLogWindow {
     // same rule the atlas rail's Show Route uses. A quest with no resolvable
     // position (unknown content, no placed NPC) disables the control rather than
     // opening the map somewhere unrelated.
-    const location = questMapLocation(d.questId, this.deps.world().questLog);
+    const location = questMapLocation(d.questId, world.questLog, liveNpcPosLookup(world.entities));
     showMap.disabled = location === null;
     showMap.addEventListener('click', () => {
       if (location) this.deps.showOnMap(location.x, location.z);

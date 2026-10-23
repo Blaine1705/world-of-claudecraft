@@ -13,7 +13,13 @@ export function isGiantTree(item: SceneryPlacement): boolean {
 }
 
 export function isSceneryReplacementRoot(name: string): boolean {
-  return ['foliage', 'garden-features', 'jungle-features'].includes(name);
+  return [
+    'foliage',
+    'garden-features',
+    'jungle-features',
+    'haunt-features',
+    'realm-flora',
+  ].includes(name);
 }
 
 /** Collect before the source controller packs instances. Radius bounds the
@@ -81,6 +87,7 @@ export function collectSceneryPlacements(
     for (const child of root.children) {
       const instance = child as THREE.InstancedMesh;
       if (instance.isInstancedMesh) {
+        if (root.name === 'realm-flora') continue;
         const material = instance.material;
         if (Array.isArray(material)) continue;
         if (root.name === 'foliage' && !/^(Bark_|Leaves_|Rocks$)/.test(material.name)) continue;

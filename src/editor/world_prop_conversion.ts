@@ -43,7 +43,13 @@ import {
 import { isHighwatchRebuildBuilding } from '../render/highwatch_town';
 import { isPaintedTownRebuildBuilding } from '../render/painted_towns';
 import { PROP_NATURAL_SIZE } from '../render/prop_natural_size.generated';
-import { buildingAssetPick, HOUSE_HEIGHT, PROP_ASSET_DEFS, type PropKey } from '../render/props';
+import {
+  buildingAssetPick,
+  HOUSE_HEIGHT,
+  MUDFIN_HUT_PROP_KEYS,
+  PROP_ASSET_DEFS,
+  type PropKey,
+} from '../render/props';
 import { EVERGARDEN_PROPS } from '../sim/content/evergarden';
 import { PALMREACH_PROPS } from '../sim/content/palmreach';
 import { REALM_PROPS } from '../sim/content/realm';
@@ -55,6 +61,7 @@ import {
   dockSurfaceYAt,
 } from '../sim/dock_layout';
 import type { MapPlacement } from '../sim/map_doc';
+import { MUDFIN_HUT_MODELS, mudfinHutAt } from '../sim/mudfin_huts';
 import {
   CHAPEL_HALL,
   CHAPEL_TOWER,
@@ -535,6 +542,20 @@ export function worldMajorPropPlacements(
   );
   huts.forEach(([x, z], index) => {
     const hut = groupMatrix(x, ground(x, z), z);
+    // the Mirefen camp's painted mudfin huts (sim/mudfin_huts.ts), no toadstools
+    const mudfin = mudfinHutAt(x, z);
+    if (mudfin) {
+      const placement = add(MUDFIN_HUT_PROP_KEYS[mudfin.model], `Mud hut ${index + 1}`, hut, {
+        y: -0.08,
+        rot: mudfin.yaw,
+        scale: 1,
+      });
+      // the solid wall the game builds for this hut (mudHutCollider), not a
+      // generic circle guessed off the model's bounds
+      placement.collisionMode = 'basic';
+      placement.collideRadius = MUDFIN_HUT_MODELS[mudfin.model].radius;
+      return;
+    }
     const sxz = 13 + propRand(x, z, 15) * 3;
     const sy = 10.5 + propRand(x, z, 16) * 3;
     add('mushroomRed', `Mud hut ${index + 1}`, hut, {

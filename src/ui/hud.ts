@@ -62,7 +62,6 @@ import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
-import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
@@ -485,6 +484,7 @@ import { DungeonTrackerPainter } from './hud/dungeon/dungeon_tracker_painter';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
+import { GuildHallWindow } from './hud/guild_hall';
 import { buildHillBarView, HillBar } from './hud/hill';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
@@ -887,6 +887,7 @@ import {
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
+import { selfPreviewSubject, selfTryOnBody } from './self_preview_subject';
 import { localizeServerText } from './server_i18n';
 import {
   localizeAuthoredYellSpeakerName,
@@ -900,7 +901,12 @@ import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult, MODAL_PROMPT_SELECTOR } from './store_decision_prompt';
-import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
+import {
+  mountStorePromoCard,
+  type StorePromoCardController,
+  storePromoLabels,
+  storePromoSlides,
+} from './store_promo_card';
 import { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { currentSubzone } from './subzone';
 import { SwingTimerBars } from './swing_timer_bars';
@@ -954,7 +960,8 @@ import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
 import { requestWalletVerify } from './wallet_verify_request';
-import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
+import { weaponProcEffectText } from './weapon_proc_text';
+import { weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
 import { WeeklyQuestsWindow } from './weekly_quests_window';
 import { promptWikiVisit } from './wiki_link';
@@ -3638,6 +3645,9 @@ export class Hud {
       case 'weekly-quests-window':
         this.weeklyQuestsWindow.close();
         break;
+      case 'guild-hall-window':
+        this.guildHallWindow.close();
+        break;
       case 'calendar-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.calendarWindow.close();
@@ -5374,10 +5384,10 @@ export class Hud {
     ...this.windowFocus('#courier-window'),
     info: () => this.sim.courierInfo,
     inventory: () => this.sim.inventory,
+    inventoryCapacity: () => this.sim.bagCapacity,
     dispatch: (request) => this.sim.courierDispatch(request),
     closeOthers: () => this.closeOtherWindows('#courier-window'),
     hideTooltip: () => this.hideTooltip(),
-    onClosed: () => {},
   });
   // Book of Deeds window painter (deeds_view.ts core + deeds_window.ts
   // painter): the deed catalog browser and title picker over the IWorldDeeds
@@ -5564,6 +5574,15 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#weekly-quests-window'),
     ...this.windowFocus('#weekly-quests-window'),
   });
+  private readonly guildHallWindow = new GuildHallWindow({
+    root: () => $('#guild-hall-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#guild-hall-window'),
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    tryOnWeaponSkin: (stage, skinId) =>
+      this.mountCharPreview(stage, ...selfTryOnBody(this.sim), skinId),
+    ...this.windowFocus('#guild-hall-window'),
+  });
   // Ashen Coliseum window painter (arena_window_view.ts offline/live model +
   // arena_window.ts painter). It owns the selected bracket, the all-time-ladder
   // cache + fetch throttle, the render-skip signature, and focus-return; Hud
@@ -5585,6 +5604,8 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#dungeon-finder-window'),
     hideTooltip: () => this.hideTooltip(),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    hasBossGuide: RaidBossGuideWindow.hasJournal,
+    openBossGuide: (d, m, diff) => this.raidBossGuideWindow.openJournal(d, m, diff),
     ...this.windowFocus('#dungeon-finder-window'),
   });
 
@@ -5595,6 +5616,7 @@ export class Hud {
     attachTooltip: (element, html) => this.attachTooltip(element, html),
     hideTooltip: () => this.hideTooltip(),
     modelTouchQueue: () => previewTouchQueueOf(this.renderer),
+    dungeonRun: () => this.sim.dungeonRun,
     ...this.windowFocus('#raid-boss-guide-window'),
   });
 
@@ -6689,7 +6711,7 @@ export class Hud {
     if (!lines.length) return '';
     let html = '';
     for (const line of lines) {
-      const effect = line.effects.map((e) => this.procEffectText(e)).join(' ');
+      const effect = line.effects.map((e) => weaponProcEffectText(e)).join(' ');
       const triggerKey =
         // onMeleeHit is the legacy key id; its English reads the generic "Chance on
         // hit", correct for a weaponHit proc that fires on melee AND hunter ranged.
@@ -6706,38 +6728,6 @@ export class Hud {
       )}</div>`;
     }
     return html;
-  }
-
-  // One effect fragment (chain arc / attack slow / dot / hot) as localized text.
-  private procEffectText(e: WeaponProcEffectDesc): string {
-    const n = (v: number | undefined): string => formatNumber(v ?? 0, { maximumFractionDigits: 0 });
-    switch (e.kind) {
-      case 'chainArc':
-        return t('hudChrome.itemProc.chainArc', {
-          school: e.school ?? '',
-          name: e.name ?? '',
-          damage: n(e.damage),
-          jumps: n(e.jumps),
-        });
-      case 'attackSlow':
-        return t('hudChrome.itemProc.attackSlow', {
-          pct: n(e.slowPct),
-          duration: n(e.duration),
-        });
-      case 'dot':
-        return t('hudChrome.itemProc.dot', {
-          name: e.name ?? '',
-          school: e.school ?? '',
-          total: n(e.total),
-          duration: n(e.duration),
-        });
-      case 'hot':
-        return t('hudChrome.itemProc.hot', {
-          name: e.name ?? '',
-          total: n(e.total),
-          duration: n(e.duration),
-        });
-    }
   }
 
   // How many equipped pieces belong to the given set (read from IWorld.equipment
@@ -6902,17 +6892,12 @@ export class Hud {
     this.syncDailyRewardsSurfaceLabels();
     this.wocMarketWindow.relocalize();
     this.weeklyQuestsWindow.relocalize();
+    this.guildHallWindow.relocalize();
     // Self-gated on its own open check (root src/ui/CLAUDE.md); refreshes the
     // root accessible name and row labels, preserving the uncommitted draft
     // and exact focus (Intentional Gathering PR3).
     this.harvestPreferenceController.relocalize();
-    this.storePromoCard?.relocalize({
-      open: t('hudChrome.wocStore.title'),
-      close: t('hudChrome.wocStore.close'),
-      season: t('hudChrome.wocStore.seasonOne'),
-      title: t('hudChrome.wocStore.armoryTitle'),
-      cta: t('hudChrome.wocStore.title'),
-    });
+    this.storePromoCard?.relocalize(storePromoLabels());
     // The mount-race strip and controls gate on race id / phase / countdown
     // number, none of which move with the locale (tests/language_fanout_registry).
     this.mountRaceStrip.relocalize();
@@ -9631,6 +9616,7 @@ export class Hud {
     if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud && this.weeklyQuestsWindow.isOpen) this.weeklyQuestsWindow.refreshIfChanged();
+    if (slowHud && this.guildHallWindow.isOpen) this.guildHallWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
   }
@@ -16260,38 +16246,12 @@ export class Hud {
     cls: PlayerClass,
     skin: number,
     previewKey?: string,
+    tryOnSkinId: string | null = null,
   ): void {
-    const mainhand = this.sim.equipment.mainhand ?? null;
-    // The sheet shows the body the WORLD draws, read through the same look
-    // seam the portrait uses: the player's own face, hair and kit, including
-    // the helmet-visibility choice. A Combat Mech is a whole replacement body
-    // and wins over the authored look, matching createCharacterVisual's own
-    // precedence in-world (composing over it hid a purchased cosmetic).
-    const look = previewKey === 'player_mech' ? null : modularLookFor(this.sim.player);
-    const app = this.sim.player.modularAppearance;
-    this.mountSharedPreview(container, {
-      cls,
-      skin,
-      // A WOC body follows the creation pick and wears its head, colours, size; mech stays.
-      previewKey:
-        previewKey === 'player_mech' ? previewKey : (wocPreviewKey(cls, app) ?? previewKey),
-      wocAppearance: previewKey === 'player_mech' ? undefined : app,
-      look,
-      // A WOC body wears what the sheet's own slots hold, helm eye included.
-      wornEquipment: this.sim.equipment,
-      helmHidden: this.sim.player.helmHidden,
-      mainhand,
-      offhand: this.sim.equipment.offhand ?? null,
-      // The paperdoll wears the world's Armory skin: one shared rule (class + hands + loadout).
-      weaponSkinId: resolveActiveWeaponSkin(
-        cls,
-        mainhand,
-        this.sim.accountCosmetics.weaponSkinLoadout,
-        this.sim.player.skinCatalog ?? 'class',
-        this.sim.equipment.offhand ?? null,
-      ),
-      framing: 'sheet',
-    });
+    this.mountSharedPreview(
+      container,
+      selfPreviewSubject(this.sim, cls, skin, previewKey, tryOnSkinId),
+    );
   }
 
   /** Mount the shared turntable into the inspect stage showing the INSPECTED
@@ -16805,15 +16765,12 @@ export class Hud {
     const host = document.getElementById('chatlog-wrap');
     if (!host) return;
     this.storePromoCard = mountStorePromoCard(host, {
-      labels: {
-        open: t('hudChrome.wocStore.title'),
-        close: t('hudChrome.wocStore.close'),
-        season: t('hudChrome.wocStore.seasonOne'),
-        title: t('hudChrome.wocStore.armoryTitle'),
-        cta: t('hudChrome.wocStore.title'),
-      },
+      slides: storePromoSlides({
+        openStore: () => this.openWocStore(),
+        openReferralCards: () => this.referralCards.open(),
+        membershipActive: () => this.sim.player?.membershipActive === true,
+      }),
       returnFocusTo: () => document.getElementById('daily-rewards-button'),
-      onOpenStore: () => this.openWocStore(),
       onDismiss: () => {
         this.storePromoCard = null;
       },

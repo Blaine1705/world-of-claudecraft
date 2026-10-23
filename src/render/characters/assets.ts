@@ -138,6 +138,7 @@ import {
   wocVisibleParts,
 } from './woc_parts_core';
 import { bakeWocShadowStandIn } from './woc_shadow_stand_in';
+import { prepareWocSitClips } from './woc_sit_pose';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -215,6 +216,11 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   whittler_s_knife: 'VAR_DAGGER',
   winterbite: 'VAR_BOW',
   cinderbrand: 'VAR_SWORD',
+  lantern_hall_sword: 'VAR_SWORD',
+  hearthbrand: 'VAR_SWORD',
+  squallcrest: 'VAR_SWORD',
+  rimelight_staff: 'VAR_STAFF',
+  duskwick_staff: 'VAR_STAFF',
   emberbite: 'VAR_AXE',
   smoulderfall: 'VAR_HAMMER',
   ashspark_shiv: 'VAR_DAGGER',
@@ -3042,7 +3048,9 @@ export function prepareVisual(key: string): PreparedVisual {
   applyClipTrackDrops(clips, def.clipTrackDrops);
   applyClipPositionDrops(clips, def.clipPositionDrops);
   // These prepared gestures use KayKit axes and cannot bind to the WOC rig.
-  if (!def.wocCharacter) {
+  if (def.wocCharacter) {
+    prepareWocSitClips(def.wocCharacter.fit, clips, gltf.scene);
+  } else {
     prepareWarriorAbilityClips(key, clips, def.clips.attackByAbility);
     prepareWarriorActionFallbacks(key, clips, gltf.scene);
   }

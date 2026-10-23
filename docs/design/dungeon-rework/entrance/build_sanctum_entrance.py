@@ -3,29 +3,40 @@
   blender -b --factory-startup --python build_sanctum_entrance.py -- --out DIR
       [--terrain DIR] [--renders all|quick|beauty|maps|none]
 
-Two black stone pylons and a cracked lintel cut with the Smith's runes (a
-faint clean blue), the empty keystone socket, the two great chains (one
-hanging broken from its ring, one fallen in a frosted heap across the gate
-plaza), the rock-cut gate tunnel running back into the mountain, a small
-unlit Vigil cairn facing the gate, two clusters of old headstones by the
+Two battered pylons of the Smith's black ashlar on stepped plinths, each with
+a sunk relief of the Smith's tools (hammer and tongs over the anvil; the
+bellows and the flame over the anvil) and a column of incised runes glowing a
+faint clean blue; the lintel's two monoliths either side of the torn-out
+keystone, a rune frieze, a cornice on dentils, and a stepped crown whose seal
+disc and anvil capstone are split by the fissure the keystone left, the
+seal's cold light deep in the crack; frost and rime on every ledge, icicles
+off the cornice; the two great chains (one hanging broken from its ring, one
+fallen across the plaza into a frozen heap); the mountain's spur of cleaved
+slate with the tunnel bored through it; a small unlit Vigil cairn facing the
+gate, two clusters of old Vigil headstones on frozen grave mounds by the
 flanking ruin rings, the cult's debris (goad irons, a toppled brazier, a
-sledge with one broken runner), and a render-only tongue of blue glacier ice
-hanging in a notch of the ridge far overhead (Thornpeak side only).
+sledge with one broken runner), rubble and drifts where stone meets ground;
+and a render-only glacier icefall breaking down the ridge notch far overhead
+(Thornpeak side only, under the crest). The masses are signed-distance
+sculpts (sanctum_gate_sculpt.py).
 
 Run from the repo: --out tmp/asset_src/sanctum_seal_gate --terrain <dir of the
 probe's sanctum_heightgrid.json and sanctum_surroundings.json> (probe.mts beside
 this file writes them), then node scripts/assets/sanctum_seal_gate/build.mjs.
+Pass an ABSOLUTE --out when rendering (Blender resolves a relative render path
+against the saved .blend).
 
 Local game coords via ec.B(lx, lz, y): lx = x - 0 (+ WEST), lz = z - 858
 (+ NORTH), y = y - terrainHeight(0, 858). The gate faces SOUTH (the plaza and
-the road). Materials: KitStone (lit stone, iron, wood), KitGlow (unlit runes),
-KitIce (lit glacier ice and icicles).
+the road). Materials: KitStone (lit stone, iron, wood, snow), KitGlow (unlit
+runes and the seal's light), KitIce (lit glacier ice and icicles).
 
 Three GLBs share ONE origin, the door at its terrain height:
-  sanctum_seal_gate.glb        pylons, lintel, socket, runes, tunnel, chains
-  sanctum_seal_gate_props.glb  chain heap, headstones, cairn, cult debris,
-                               ground blend rubble
-  sanctum_seal_gate_ice.glb    the ice tongue and its notch (render only)
+  sanctum_seal_gate.glb        pylons, lintel and crown, runes, spur and
+                               tunnel, chains
+  sanctum_seal_gate_props.glb  chain heap, headstones and mounds, cairn, cult
+                               debris, rubble and drifts
+  sanctum_seal_gate_ice.glb    the icefall in the ridge notch (render only)
 """
 import json
 import math
@@ -42,6 +53,8 @@ sys.path.insert(0, os.path.join(HERE, '..', 'kit'))     # hckit.py (the pilot ki
 sys.path.insert(0, HERE)
 import entrance_common as ec  # noqa: E402
 import hckit  # noqa: E402
+import numpy as np  # noqa: E402
+import sanctum_gate_sculpt as sg  # noqa: E402
 from hckit import GLOW, STONE  # noqa: E402
 
 ICE = 2
@@ -113,7 +126,7 @@ MOUNTAIN = (0.6, 0.59, 0.58)       # the mountain's own rock (the terrain's rock
 MOUNTAIN_DARK = (0.44, 0.44, 0.45)
 RIME = (0.9, 0.95, 0.98)            # snow and rime white #EEF6FA
 FROST = (0.72, 0.8, 0.86)
-IRON = (0.227, 0.239, 0.259)        # old iron chain #3A3D42
+IRON = (0.3, 0.31, 0.33)            # old iron chain, frost-greyed
 IRON_DARK = (0.14, 0.145, 0.155)
 RUST = (0.34, 0.25, 0.19)
 RUNE = (0.353, 0.722, 1.0)          # the Smith's rune and ember blue #5AB8FF
@@ -127,6 +140,14 @@ WOOD = (0.36, 0.27, 0.19)
 WOOD_DARK = (0.24, 0.18, 0.13)
 SOOT = (0.08, 0.075, 0.075)
 VOID = (0.02, 0.022, 0.03)
+GRAVE_STONE = (0.5, 0.5, 0.52)       # weathered grey headstone granite
+GRAVE_STONE_DARK = (0.33, 0.34, 0.37)
+LICHEN = (0.36, 0.4, 0.32)
+SNOW_V = (0.88, 0.92, 0.96)
+SNOW_SHADE = (0.62, 0.7, 0.8)
+ASH = (0.16, 0.15, 0.15)
+EARTH = (0.46, 0.42, 0.37)           # frozen grave earth
+EARTH_DARK = (0.3, 0.27, 0.24)
 
 COLLIDERS = []
 FOOTINGS = []
@@ -206,19 +227,6 @@ def hexa(p, corners, color, mat=STONE, bevel=0.0):
     return faces
 
 
-def quad(p, corners, color, mat=STONE):
-    """One quad facing south (Blender +Y), corners in Blender space."""
-    before = set(p.bm.faces)
-    v = [p.bm.verts.new(Vector(c)) for c in corners]
-    f = p.bm.faces.new(v)
-    f.normal_update()
-    if f.normal.y < 0:
-        f.normal_flip()
-    faces = p._new_faces(before)
-    p._paint(faces, color, mat)
-    return faces
-
-
 def finish_keep_normals(p, mats, parent):
     """hckit's finish without its global normal recalculation: the lofted
     open rock surfaces are wound outward by construction, and the heuristic
@@ -240,138 +248,75 @@ def block(p, x0, x1, z0, z1, y0, y1, color, bevel=0.06, jitter=0.0):
     return hexa(p, c, color, bevel=bevel)
 
 
-def frost_top(p, x0, x1, z0, z1, y, color=RIME, th=0.06):
-    """Rime crusted on an upward face: a few drifted, irregular patches that
-    gather toward the edges, never a full white slab."""
-    rng = random.Random(int(abs(x0 * 131 + z0 * 71 + y * 17)) + 3)
-    w, d = x1 - x0, z1 - z0
-    n = max(2, int(w * d / 4.0))
-    for k in range(n):
-        px = x0 + w * (0.15 + 0.7 * rng.random())
-        pz = z0 + d * (0.15 + 0.7 * rng.random())
-        sx = min(w * 0.45, 0.5 + rng.random() * 0.9)
-        sz = min(d * 0.45, 0.4 + rng.random() * 0.8)
-        p.rock(B(px, pz, y + th * 0.25), (sx, sz, th * 2.2), color, jitter=0.35, subdivisions=0, flat_bottom=True)
-
-
-def icicles(p, x0, x1, lz, y, n, max_len=0.9, seed=0):
-    rng = random.Random(seed)
-    for i in range(n):
-        x = x0 + (x1 - x0) * (i + 0.2 + rng.random() * 0.6) / n
-        ln = max_len * (0.3 + rng.random() * 0.7)
-        r = 0.05 + rng.random() * 0.06
-        p.prism(B(x, lz + (rng.random() - 0.5) * 0.15, y), 5, r, 0.0001, -ln, ICE_WHITE, mat=ICE,
-                phase=rng.random())
-
-
-# ---- the Smith's runes ------------------------------------------------------------------
-# Each glyph is a set of strokes in a unit cell (u across, v up): a hammer, an
-# anvil, a chain link, a mountain, a binding knot, the quench (three falling
-# lines), the flame, the seal. Angular smith's marks, cut and lit from within.
-GLYPHS = [
-    [((0.5, 0.0), (0.5, 1.0)), ((0.5, 0.75), (0.85, 1.0)), ((0.5, 0.45), (0.85, 0.7)), ((0.5, 0.2), (0.18, 0.0))],
-    [((0.5, 0.0), (0.5, 1.0)), ((0.15, 0.55), (0.5, 0.85)), ((0.5, 0.85), (0.85, 0.55)), ((0.28, 0.12), (0.72, 0.3))],
-    [((0.5, 0.0), (0.5, 1.0)), ((0.5, 1.0), (0.85, 0.8)), ((0.85, 0.8), (0.5, 0.6)), ((0.5, 0.35), (0.18, 0.15))],
-    [((0.3, 0.0), (0.3, 1.0)), ((0.7, 0.0), (0.7, 1.0)), ((0.3, 0.85), (0.7, 0.55)), ((0.3, 0.45), (0.7, 0.15))],
-    [((0.5, 0.0), (0.5, 1.0)), ((0.5, 0.95), (0.15, 0.65)), ((0.15, 0.65), (0.5, 0.35)), ((0.5, 0.35), (0.85, 0.1))],
-    [((0.5, 0.0), (0.5, 1.0)), ((0.5, 0.9), (0.82, 0.75)), ((0.5, 0.6), (0.82, 0.45)), ((0.5, 0.3), (0.82, 0.15))],
-    [((0.35, 0.0), (0.35, 0.7)), ((0.35, 0.7), (0.68, 1.0)), ((0.35, 0.4), (0.75, 0.4)), ((0.75, 0.4), (0.75, 0.0))],
-    [((0.5, 0.0), (0.5, 1.0)), ((0.2, 0.32), (0.8, 0.72)), ((0.2, 0.72), (0.5, 0.52)), ((0.5, 1.0), (0.2, 0.86))],
-]
-
-
-def rune(p, glyph, cx, y0, size, face_lz, lit=True, depth=0.07, width=0.075):
-    """Cut one glyph into a south-facing face at local z face_lz: a dark
-    incised groove with the lit stroke set into it."""
-    for (u0, v0), (u1, v1) in GLYPHS[glyph % len(GLYPHS)]:
-        ax, ay = cx + (u0 - 0.5) * size, y0 + v0 * size
-        bx, by = cx + (u1 - 0.5) * size, y0 + v1 * size
-        ln = math.hypot(bx - ax, by - ay)
-        ang = math.atan2(by - ay, bx - ax)
-        # A stroke is two south-facing quads on the face: the dark incised
-        # groove and, just proud of it, the lit inlay (seen only from the front).
-        ux, uy = (bx - ax) / max(ln, 1e-6), (by - ay) / max(ln, 1e-6)
-        nx, ny = -uy, ux
-        for (ext, wid, off, col, mat) in ((width * 0.8, width * 0.85, 0.012, BLACK_DEEP, STONE),
-                                           (width * 0.2, width * 0.5, 0.026, RUNE if lit else RUNE_DIM,
-                                            GLOW if lit else STONE)):
-            pts = []
-            for (su, sv) in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
-                px = (ax if su < 0 else bx) + su * ux * ext + sv * nx * wid
-                py = (ay if su < 0 else by) + su * uy * ext + sv * ny * wid
-                pts.append(B(px, face_lz - off, py))
-            quad(p, pts, col, mat)
-
-
 # ================================================================ pylons and lintel
 RING_X = 2.95       # the anchor rings sit on the pylon faces beside the opening
 RING_Y = 9.6
 RING_LZ = SHAFT['z0'] - 0.75
-PANEL_X = 3.95      # the rune column's centre (|x|)
+STONE_DARK = (0.3, 0.3, 0.32)       # the Smith's black stone, as carved (lit, weathered)
+STONE_WORN = (0.52, 0.52, 0.54)     # its worn arrises
+STONE_DEEP = (0.04, 0.04, 0.05)     # the dark down every joint and channel
+RIME_V = (0.86, 0.91, 0.95)
+FROST_V = (0.58, 0.66, 0.74)
+PYLON_TRIS = 6400
+LINTEL_TRIS = 9200
+
+
+def tunnel_breath(P, N):
+    """How much of the tunnel's cold breath reaches a point of the gate: the
+    faces toward the lane and the mouth, low down, rime over first."""
+    lx, lz, y = P[:, 0], -P[:, 1], P[:, 2]
+    near = np.clip(1.0 - (np.abs(lx) - 2.0) / 2.2, 0.0, 1.0)
+    low = np.clip(1.0 - y / 6.5, 0.0, 1.0)
+    inward = np.clip(-np.sign(lx) * N[:, 0], 0.0, 1.0)
+    return near * low * (0.4 + 0.6 * inward) * (0.6 + 0.4 * np.clip((lz + 1.5) / 3.0, 0, 1))
+
+
+def pylon_icicles(p, s, rng):
+    """Icicles hanging from the capital's front and the outer brackets."""
+    for k in range(9):
+        x = s * rng.uniform(2.3, 5.1)
+        ln = rng.uniform(0.25, 1.0)
+        p.prism(B(x, -1.38 + rng.uniform(0, 0.12), 10.46 - 0.02), 5, rng.uniform(0.04, 0.09), 0.0001, -ln, ICE_WHITE,
+                mat=ICE, phase=rng.random())
+    for k in range(5):
+        x = s * rng.uniform(5.3, 6.1)
+        p.prism(B(x, rng.uniform(-0.8, 1.8), 9.93), 5, rng.uniform(0.04, 0.08), 0.0001, -rng.uniform(0.3, 0.8),
+                ICE_WHITE, mat=ICE, phase=rng.random())
 
 
 def pylons():
-    p = P('Pylons', weather=0.55, lichen=0.0)
+    p = P('Pylons', weather=0.0, lichen=0.0)
+    rng = random.Random(23)
     for s in (-1, 1):
         tag = 'w' if s > 0 else 'e'
-        # Plinth: two coursed footing rings of big blocks, buried into the rising
-        # ground behind (the back stands on about +0.7, the front on -0.05).
         x0, x1 = PLINTH['x0'], PLINTH['x1']
-        gx0, gx1 = (x0, x1) if s > 0 else (-x1, -x0)
-        cx = (gx0 + gx1) / 2
+        cx = s * (x0 + x1) / 2
         cz = (PLINTH['z0'] + PLINTH['z1']) / 2
-        g_lo = ground_min(cx, cz, (x1 - x0) / 2, (PLINTH['z1'] - PLINTH['z0']) / 2)
-        bottom = g_lo - 0.55
-        footing(f'plinth_{tag}', cx, cz, (x1 - x0) / 2, (PLINTH['z1'] - PLINTH['z0']) / 2, 0.0, bottom)
-        zs = [PLINTH['z0'], 0.15, 1.45, PLINTH['z1']]
-        for a, b in zip(zs, zs[1:]):
-            block(p, gx0, gx1, a + 0.01, b - 0.01, bottom, 0.62, p.vary(BLACK, 0.08), bevel=0.07)
-        xs = [gx0 + 0.1, cx + 0.2 * s, gx1 - 0.1]
-        for a, b in zip(xs, xs[1:]):
-            block(p, a + 0.01, b - 0.01, PLINTH['z0'] + 0.12, PLINTH['z1'] - 0.12, 0.62, PLINTH['top'],
-                  p.vary(BLACK, 0.07), bevel=0.08)
-        p.box(B(cx, PLINTH['z0'] + 0.05, 1.3), (gx1 - gx0 - 0.1, 0.32, 0.16), BLACK_EDGE, bevel=0.04)
-        frost_top(p, gx0 + 0.1, gx1 - 0.1, PLINTH['z0'] + 0.12, PLINTH['z1'] - 0.12, PLINTH['top'])
-        # Shaft: six courses of the Smith's black ashlar, the outer face battered.
-        y = SHAFT['y0']
-        heights = [1.55, 1.45, 1.5, 1.5, 1.45, 1.55]
-        sx0, sx1 = (SHAFT['x0'], SHAFT['x1']) if s > 0 else (-SHAFT['x1'], -SHAFT['x0'])
-        for k, h in enumerate(heights):
-            batter = 0.045 * k
-            ox0 = sx0 + (batter if s < 0 else 0)
-            ox1 = sx1 - (batter if s > 0 else 0)
-            split = (ox0 + ox1) / 2 + (0.45 if k % 2 else -0.45) * s
-            for a, b in ((ox0, split), (split, ox1)):
-                block(p, a + 0.012, b - 0.012, SHAFT['z0'], SHAFT['z1'], y + 0.012, y + h - 0.012,
-                      p.vary(BLACK, 0.07), bevel=0.07)
-            if k < 3:
-                frost_top(p, ox0 + 0.05, ox1 - 0.05, SHAFT['z0'] + 0.02, SHAFT['z1'] - 0.02, y + h - 0.004,
-                          FROST, th=0.03)
-            y += h
-        # Raised fillets framing the rune column on the south face.
-        pcx = PANEL_X * s
-        for fx in (-0.72, 0.72):
-            p.box(B(pcx + fx, SHAFT['z0'] - 0.06, 5.55), (0.16, 0.14, 7.1), BLACK_EDGE, bevel=0.03)
-        # The rune column: five glyphs; the lowest is dead under the rime.
-        for k in range(6):
-            rune(p, (k * 3 + (0 if s > 0 else 1)) % 8, pcx, 2.3 + k * 1.12, 0.78, SHAFT['z0'], lit=k >= 1)
-        # Capital: a heavy slab with corbel steps carrying the lintel overhang.
-        block(p, sx0 - 0.25, sx1 + 0.25, SHAFT['z0'] - 0.3, SHAFT['z1'] + 0.25, SHAFT['y1'], LINTEL['y0'],
-              p.vary(BLACK_EDGE, 0.05), bevel=0.08)
-        for (ext, y0, y1) in ((0.75, 8.9, 9.65), (1.45, 9.65, 10.4)):
-            ox = sx1 if s > 0 else sx0
-            a, b = (ox - 0.2, ox + ext) if s > 0 else (ox - ext, ox + 0.2)
-            block(p, a, b, SHAFT['z0'] + 0.15, SHAFT['z1'] - 0.15, y0, y1, p.vary(BLACK, 0.06), bevel=0.06)
-        # The chain anchor: a riveted iron plate, a projecting staple and the ring.
+        hw, hd = (x1 - x0) / 2, (PLINTH['z1'] - PLINTH['z0']) / 2
+        footing(f'plinth_{tag}', cx, cz, hw, hd, 0.0, ground_min(cx, cz, hw, hd) - 0.55)
+        # the sculpted plinth reaches the collider's front (lz -2.12): its
+        # burial is measured under the whole of it
+        lo = ground_min(cx, (-2.12 + PLINTH['z1']) / 2, hw, (PLINTH['z1'] + 2.12) / 2)
+        f, info = sg.pylon_field(s, {'bottom': lo - 0.55}, random.Random(5 + s))
+        paint = sg.stone_paint(f, STONE_DARK, STONE_WORN, STONE_DEEP, RIME_V, FROST_V, 13 + s, cold=tunnel_breath,
+                               shade=sg.panel_floor_shade(s))
+        sg.add_sculpt(p, f, 'pylon_' + tag, PYLON_TRIS, paint)
+        # the rune column's lit inlay; the lowest glyph is dead under the rime
+        for k, st in info['strokes']:
+            lit = k >= 1
+            sg.add_quads(p, sg.inlay_quads(info['frame'], st, 0.07, -0.035), RUNE if lit else RUNE_DIM,
+                         GLOW if lit else STONE)
+        # the chain anchor: a riveted iron plate on the face, the staple, the ring
         ax = RING_X * s
-        p.box(B(ax, SHAFT['z0'] - 0.07, RING_Y + 0.15), (1.05, 0.12, 1.25), IRON_DARK, bevel=0.03)
+        face = sg.shaft_front_lz(RING_Y)
+        p.box(B(ax, face - 0.05, RING_Y + 0.15), (1.05, 0.12, 1.25), IRON_DARK, bevel=0.03)
         for rx in (-0.36, 0.36):
             for ry in (-0.42, 0.42):
-                p.lathe(B(ax + rx, SHAFT['z0'] - 0.13, RING_Y + 0.15 + ry), [(0.07, 0), (0.06, 0.05), (0.0, 0.07)],
-                        5, IRON)
-        p.box(B(ax, (SHAFT['z0'] + RING_LZ) / 2, RING_Y + 0.12), (0.32, abs(RING_LZ - SHAFT['z0']) + 0.1, 0.24),
-              IRON_DARK, bevel=0.03)
+                p.lathe(B(ax + rx, face - 0.11, RING_Y + 0.15 + ry), [(0.07, 0), (0.06, 0.05), (0.0, 0.07)], 5, IRON)
+        p.box(B(ax, (face + RING_LZ) / 2, RING_Y + 0.12), (0.32, abs(RING_LZ - face) + 0.1, 0.24), IRON_DARK,
+              bevel=0.03)
         anchor_ring(p, ax, RING_LZ, RING_Y)
+        pylon_icicles(p, s, rng)
     for s, tag in ((-1, 'e'), (1, 'w')):
         x0, x1 = PLINTH['x0'], PLINTH['x1']
         z0 = RING_LZ - 0.55
@@ -392,149 +337,48 @@ def anchor_ring(p, cx, lz, y, r=0.62, bar=0.15):
 
 
 def lintel():
-    p = P('Lintel', weather=0.5, lichen=0.0)
-    L = LINTEL
-    for s in (-1, 1):
-        inner_b, inner_t = SOCKET['bot'], SOCKET['top']
-        x_out = L['x'] * s
-
-        def X(v, s=s):
-            return v * s
-        # One monolith per side, its inner end cut to the keystone's wedge.
-        c = [B(X(inner_b), L['z0'], L['y0']), B(x_out, L['z0'], L['y0']), B(x_out, L['z1'], L['y0']),
-             B(X(inner_b), L['z1'], L['y0']), B(X(inner_t), L['z0'], L['y1']), B(x_out, L['z0'], L['y1']),
-             B(x_out, L['z1'], L['y1']), B(X(inner_t), L['z1'], L['y1'])]
-        hexa(p, c, p.vary(BLACK, 0.05), bevel=0.09)
-        # The end faces: a chamfered boss.
-        p.box(B(x_out + 0.03 * s, (L['z0'] + L['z1']) / 2, (L['y0'] + L['y1']) / 2), (0.12, 2.6, 1.6),
-              BLACK_EDGE, bevel=0.04)
-        # Cornice: a projecting cap in two blocks per side, broken at the socket.
-        for a, b in ((inner_t + 0.25, 4.3), (4.3, L['x'] + 0.35)):
-            lo, hi = sorted((X(a), X(b)))
-            block(p, lo, hi, L['z0'] - 0.22, L['z1'] + 0.2, L['y1'], L['y1'] + 0.55, p.vary(BLACK_EDGE, 0.05),
-                  bevel=0.07)
-            frost_top(p, lo + 0.05, hi - 0.05, L['z0'] - 0.18, L['z1'] + 0.16, L['y1'] + 0.55)
-        # A soffit fillet under the lintel and the rune band across its face.
-        p.box(B(s * (inner_b + L['x']) / 2, L['z0'] + 0.25, L['y0'] - 0.08), (L['x'] - inner_b - 0.4, 0.5, 0.18),
-              BLACK_EDGE, bevel=0.03)
-        for k in range(4):
-            gx = s * (inner_t + 1.15 + k * 1.55)
-            # The glyph nearest the broken socket is dead: the seal is broken.
-            rune(p, (k * 5 + (2 if s > 0 else 6)) % 8, gx, L['y0'] + 0.65, 0.95, L['z0'], lit=k >= 1)
-        icicles(p, s * (inner_b + 0.3), s * (L['x'] - 0.4), L['z0'] + 0.35, L['y0'] - 0.18, 9, 1.1, seed=31 + s)
-    # The empty keystone socket: cracked faces, broken lips, shards still
-    # caught in it, and a crack running away across the lintel's face.
+    p = P('Lintel', weather=0.0, lichen=0.0)
     rng = random.Random(7)
+    f, info = sg.lintel_field(rng)
+    paint = sg.stone_paint(f, STONE_DARK, STONE_WORN, STONE_DEEP, RIME_V, FROST_V, 17)
+    sg.add_sculpt(p, f, 'lintel', LINTEL_TRIS, paint)
+    # the frieze's lit inlay: the glyph nearest the broken socket is dead
+    for (s, k, st) in info['strokes']:
+        lit = k >= 1
+        sg.add_quads(p, sg.inlay_quads(info['front'], st, 0.065, -0.1), RUNE if lit else RUNE_DIM,
+                     GLOW if lit else STONE)
+    # the seal's cold light, deep in the fissure and the torn socket: a
+    # faint blue seen through the crack, never a lamp
+    cap = info['cap']
+    fis = info['fissure']
+    quads = []
+    for (a, b) in zip(fis, fis[1:]):
+        wa, wb = a[2] * 0.55, b[2] * 0.55
+        quads.append([cap.at(a[0] - wa, a[1], -0.35), cap.at(a[0] + wa, a[1], -0.35),
+                      cap.at(b[0] + wb, b[1], -0.35), cap.at(b[0] - wb, b[1], -0.35)])
+    sg.add_quads(p, quads, SEAL_GLOW, GLOW)
+    sock = []
+    for (y0, y1, w0, w1, z) in ((10.95, 11.8, 0.42, 0.55, 1.2), (11.8, 12.6, 0.5, 0.36, 0.9), (12.6, 13.3, 0.4, 0.62,
+                                                                                                1.4)):
+        sock.append([B(w0, z, y0), B(-w0, z, y0), B(-w1, z, y1), B(w1, z, y1)])
+    sg.add_quads(p, [[np.array(tuple(v)) for v in q] for q in sock], SEAL_GLOW, GLOW)
+    # icicles along the cornice's front and under the torn socket
     for s in (-1, 1):
-        for k in range(4):
-            t = (k + 0.5) / 4
-            y = L['y0'] + (L['y1'] - L['y0']) * t
-            w = SOCKET['bot'] + (SOCKET['top'] - SOCKET['bot']) * t
-            p.box(B(s * (w + 0.04), L['z0'] + 0.5 + rng.random() * 1.8, y), (0.12, 0.5 + rng.random() * 0.6, 0.3),
-                  BLACK_DEEP, roll=s * 0.2)
-        for k in range(2):
-            y = L['y0'] + 0.3 + rng.random() * 1.8
-            p.rock(B(s * (SOCKET['bot'] + 0.15 + rng.random() * 0.2), L['z0'] + 0.3 + rng.random() * 2.0, y),
-                   (0.4, 0.35, 0.3), BLACK_EDGE, jitter=0.3, subdivisions=0)
-        x, y = SOCKET['bot'] * s, L['y0'] + 0.35
-        for k in range(6):
-            nx = x + s * (0.55 + rng.random() * 0.4)
-            ny = y + (rng.random() - 0.35) * 0.45
-            quad(p, [B(x, L['z0'] - 0.012, y - 0.04), B(nx, L['z0'] - 0.012, ny - 0.04),
-                     B(nx, L['z0'] - 0.012, ny + 0.04), B(x, L['z0'] - 0.012, y + 0.04)], VOID)
-            x, y = nx, ny
+        for k in range(12):
+            x = s * rng.uniform(1.7, 8.2)
+            p.prism(B(x, sg.CORNICE['z0'] + 0.08 + rng.uniform(0, 0.1), sg.CORNICE['y0'] - 0.24 - 0.02), 5,
+                    rng.uniform(0.04, 0.1), 0.0001, -rng.uniform(0.25, 1.15), ICE_WHITE, mat=ICE, phase=rng.random())
+        for k in range(5):
+            x = s * rng.uniform(0.85, 1.25)
+            p.prism(B(x, rng.uniform(-1.2, 0.6), 10.9), 5, rng.uniform(0.05, 0.09), 0.0001, -rng.uniform(0.4, 1.2),
+                    ICE_WHITE, mat=ICE, phase=rng.random())
     return p
 
 
+SEAL_GLOW = (0.22, 0.5, 0.82)       # the seal's light, dimmer than the runes
+
+
 # ================================================================ the rock-cut tunnel
-def _stations_fine(step=1.6):
-    out = []
-    for (a, b) in zip(STATIONS, STATIONS[1:]):
-        n = max(1, int(round((b[0] - a[0]) / step)))
-        for k in range(n):
-            t = k / n
-            lz = a[0] + (b[0] - a[0]) * t
-            W = a[1] + (b[1] - a[1]) * t
-            E = a[2] + (b[2] - a[2]) * t
-            top = a[3] + (b[3] - a[3]) * t
-            roof = None if a[4] is None or b[4] is None else a[4] + (b[4] - a[4]) * t
-            if a[4] is not None and b[4] is None:
-                roof = a[4] if k == 0 else None
-            out.append((lz, W, E, top, roof))
-    out.append(STATIONS[-1])
-    return out
-
-
-def _profile_outer(lz, W, E, top, n=34, seed=0.0):
-    pts = []
-    tame = min(1.0, 0.6 + max(0.0, lz - ROCK_FRONT) / 6.0)
-    for i in range(n + 1):
-        th = math.pi * (1 - i / n)            # pi (east, -x) .. 0 (west, +x)
-        c = math.cos(th)
-        half = W if c >= 0 else E
-        x = c * half
-        sn = max(0.0, math.sin(th))
-        base = gh(x, lz) - 0.9
-        # a crag, not a dome: steep flanks, a broken uneven crest
-        crest = top + (ec.fbm2(x * 0.22 + 7, lz * 0.22) - 0.5) * 4.0 * tame
-        y = base + (crest - base) * (sn ** 0.32)
-        nrm = Vector((c, 0.0, sn)).normalized()
-        d = (ec.fbm2(x * 0.3 + seed, lz * 0.3 + y * 0.2) - 0.5) * 2.2
-        d += (ec.fbm2(x * 1.1 - 3 + seed, lz * 1.1 + y * 0.8) - 0.5) * 0.7
-        # vertical ribs down the flanks
-        d += 0.45 * math.sin(lz * 1.3 + y * 0.35 + c * 2.0) * (1 - sn)
-        d *= tame
-        if 0 < i < n:
-            x += nrm.x * d
-            y += nrm.z * d
-            y = y - (y % 1.15) * 0.18          # strata ledges
-            if lz < 10.5:                      # never into the ruin rings
-                x = max(-(E + 0.3), min(W + 0.3, x))
-        pts.append((x, y))
-    return pts
-
-
-def _profile_inner(lz, floor_c, roof, m=18):
-    """The tunnel's cross-section: battered walls and a flattened cut vault."""
-    pts = []
-    for i in range(m + 1):
-        th = math.pi * (1 - i / m)
-        c = math.cos(th)
-        x = c * TUNNEL_HW
-        sn = math.sin(th)
-        fl = gh(x, lz) - 0.6
-        y = fl + (floor_c + roof - fl) * (sn ** 0.62)
-        if 0 < i < m:
-            jit = (ec.fbm2(x * 1.7 + lz * 0.9, y * 1.3) - 0.5) * 0.35
-            x += c * jit
-            y += sn * jit * 0.6
-        pts.append((x, y))
-    return pts
-
-
-def _stitch(bm, A, Bv):
-    """Triangulate the band between two open polylines of BMVerts (south facing
-    when A runs over B east to west)."""
-    la = [0.0]
-    for a, b in zip(A, A[1:]):
-        la.append(la[-1] + (a.co - b.co).length)
-    lb = [0.0]
-    for a, b in zip(Bv, Bv[1:]):
-        lb.append(lb[-1] + (a.co - b.co).length)
-    ta = [v / la[-1] for v in la]
-    tb = [v / lb[-1] for v in lb]
-    i = j = 0
-    faces = []
-    while i < len(A) - 1 or j < len(Bv) - 1:
-        if j >= len(Bv) - 1 or (i < len(A) - 1 and ta[i + 1] <= tb[j + 1]):
-            faces.append(bm.faces.new((A[i], A[i + 1], Bv[j])))
-            i += 1
-        else:
-            faces.append(bm.faces.new((A[i], Bv[j + 1], Bv[j])))
-            j += 1
-    return faces
-
-
 def floor_grid(p, step=0.9):
     bm = p.bm
     before = set(bm.faces)
@@ -570,61 +414,25 @@ def floor_grid(p, step=0.9):
             loop[p.col] = (*col, 1.0)
 
 
+SPUR_TRIS = 9000
+ICEFALL_TRIS = 8400
+
+
 def tunnel():
-    p = P('Tunnel', weather=0.9, lichen=0.12)
-    bm = p.bm
-    before = set(bm.faces)
-    outer_rings, inner_rings = [], []
-    for k, (lz, W, E, top, roof) in enumerate(_stations_fine()):
-        prof = _profile_outer(lz, W, E, top, seed=k * 0.37)
-        outer_rings.append([bm.verts.new(B(x, lz, y)) for (x, y) in prof])
-        if roof is not None:
-            floor_c = gh(0, lz)
-            inner_rings.append([bm.verts.new(B(x, lz, y)) for (x, y) in _profile_inner(lz, floor_c, roof)])
-    # Winding (Blender: X = lx, Y = -lz): the outer skin faces out of the rock,
-    # the inner skin faces into the tunnel.
-    for ra, rb in zip(outer_rings, outer_rings[1:]):
-        for i in range(len(ra) - 1):
-            bm.faces.new((ra[i], rb[i], rb[i + 1], ra[i + 1]))
-    for ra, rb in zip(inner_rings, inner_rings[1:]):
-        for i in range(len(ra) - 1):
-            bm.faces.new((ra[i], ra[i + 1], rb[i + 1], rb[i]))
-    _stitch(bm, outer_rings[0], inner_rings[0])
-    bm.faces.new(list(reversed(outer_rings[-1])))
-    tun_faces = [f for f in bm.faces if f not in before]
-    # new faces carry no normal until updated: the snow and crack tints read it
-    bm.normal_update()
-    for f in tun_faces:
-        f.material_index = STONE
-        for loop in f.loops:
-            co = loop.vert.co
-            lx, lz, y = co.x, -co.y, co.z
-            inside = abs(lx) < TUNNEL_HW + 0.6 and lz < TUNNEL_END + 0.5 and y < gh(0, lz) + 9.9
-            band = 0.86 + 0.14 * math.sin(y * 2.7 + ec.fbm2(lx * 0.5, lz * 0.5) * 3)
-            tone = 0.85 + 0.3 * ec.fbm2(lx * 0.25 + 4, y * 0.3 + lz * 0.15)
-            col = tuple(c * band * tone for c in (SLATE_DARK if inside else MOUNTAIN))
-            if not inside and f.normal.z < 0.2:
-                # cracks and overhangs read darker
-                col = tuple(c * (0.75 + 0.25 * max(0.0, f.normal.z + 0.8)) for c in col)
-            if inside:
-                # The cold breathing out of the mouth rimes the first yards; the
-                # depth swallows the rest.
-                depth = max(0.0, 1 - (lz - ROCK_FRONT) / 9.0)
-                fr = depth * max(0.0, 1 - (y - gh(lx, lz)) / 3.5) * 0.85
-                col = tuple(c * (1 - fr) + f_ * fr for c, f_ in zip(col, FROST))
-                dark = min(1.0, max(0.0, (lz - 5.0) / 12.0))
-                col = tuple(c * (1 - 0.8 * dark) for c in col)
-            else:
-                # snow lodged on the outcrop's upward ledges
-                up = max(0.0, f.normal.z)
-                snow = max(0.0, up - 0.55) * 1.8 * ec.fbm2(lx * 0.6, lz * 0.6 + y)
-                col = tuple(c * (1 - snow) + r * snow for c, r in zip(col, RIME))
-            loop[p.col] = (*col, 1.0)
-    # The tunnel's far end: the darkness the mist pours out of.
-    cap = bm.faces.new(inner_rings[-1])
-    p._paint([cap], VOID, STONE)
-    # Rock-cut reveal blocks lining the mouth's first yards (tool-dressed).
+    p = P('Tunnel', weather=0.0, lichen=0.0)
     rng = random.Random(3)
+    f, _ = sg.spur_field(GR, STATIONS, random.Random(11), tunnel_end=TUNNEL_END, rock_front=ROCK_FRONT)
+
+    def inside(Pv):
+        lx, lz, y = Pv[:, 0], -Pv[:, 1], Pv[:, 2]
+        return ((np.abs(lx) < 4.2) & (lz < 28.5) & ((lz > 2.3) | (y < 1.5)) & (y < 11.5 + 0.25 * lz))
+
+    def floor_y(Pv):
+        return np.array([gh(float(x), float(-y)) for (x, y) in Pv[:, :2]])
+
+    paint = sg.rock_paint(f, inside, MOUNTAIN, MOUNTAIN_DARK, SLATE_DARK, FROST, RIME, floor_fn=floor_y)
+    sg.add_sculpt(p, f, 'spur', SPUR_TRIS, paint)
+    # Rock-cut reveal blocks lining the mouth's first yards (tool-dressed).
     for s in (-1, 1):
         for k in range(3):
             lz0 = ROCK_FRONT + 0.2 + k * 1.6
@@ -676,8 +484,8 @@ def tunnel_colliders():
 
 
 # ================================================================ chains
-def chain_link(p, center, axis, side, length=1.75, width=1.05, bar=0.22, color=IRON, broken=False, sides=6,
-               n=14):
+def chain_link(p, center, axis, side, length=1.75, width=1.05, bar=0.22, color=IRON, broken=False, sides=7,
+               n=16):
     """One great link: a stadium loop swept in its own plane. axis is the link's
     long direction, side its width direction (Blender vectors). A broken link
     is open at the -axis end (the snapped end)."""
@@ -693,7 +501,8 @@ def chain_link(p, center, axis, side, length=1.75, width=1.05, bar=0.22, color=I
     if broken:
         h = n // 2
         pts = pts[h + 2:] + pts[1:h - 1]
-    p.sweep(pts, bar, bar, color, sides=sides, cap=broken)
+    for f in p.sweep(pts, bar, bar, color, sides=sides, cap=broken):
+        f.smooth = True
 
 
 PITCH = 1.34
@@ -764,14 +573,7 @@ def fallen_chain(p):
         side = axis.cross(Vector((0, 0, 1))).normalized()
         side = (side * math.cos(tilt) + Vector((0, 0, 1)) * math.sin(tilt)).normalized()
         chain_link(p, B(x, z, gh(x, z) + 0.22 + lift), axis, side, color=p.vary(IRON, 0.12))
-    for k in range(6):
-        a = rng.random() * math.tau
-        r = rng.random() * 1.1
-        x, z = hx + math.cos(a) * r, hz + math.sin(a) * r
-        p.rock(B(x, z, gh(x, z) + 0.05), (1.2 - r * 0.3, 1.0 - r * 0.3, 0.35 + (1.2 - r) * 0.35), RIME,
-               jitter=0.25, subdivisions=1, flat_bottom=True)
-    collider_circle('chain_heap', hx, hz, 1.7, g + 1.3, 'the fallen chain\'s frosted heap (standable)', stand=g + 1.1)
-    footing('chain_heap', hx, hz, 1.5, 1.5, 0.0, g - 0.05)
+    chain_heap(p, rng)
 
 
 def headstone(p, x, z, w, h, yaw, lean, seed, cross=False):
@@ -781,30 +583,84 @@ def headstone(p, x, z, w, h, yaw, lean, seed, cross=False):
     bury = 0.35
     bottom = lo - bury
     thick = 0.2 + rng.random() * 0.08
-    col = p.vary(GRAVE if rng.random() < 0.6 else GRAVE_DARK, 0.08)
     # Built at its own origin, bottom at 0: the stone's top stands h above the
     # HIGHEST ground under it, so on a slope it is sunk on the uphill side.
     hh = (hi - lo) + bury + h
     m = p.mark()
-    p.box((0, 0, hh / 2), (w, thick, hh), col, bevel=0.035)
-    if cross:
-        p.box((0, 0, hh + 0.42), (0.18, thick * 0.9, 0.9), col, bevel=0.03)
-        p.box((0, 0, hh + 0.55), (0.7, thick * 0.9, 0.17), col, bevel=0.03)
-        top = hh + 0.87
-    else:
-        p.prism((0, thick / 2, hh), 8, w / 2, w / 2, thick, col, axis=(0, -1, 0))
-        top = hh + w / 2
-    # The Vigil's mark, a worn open-eye chevron on the south face, and rime.
-    for r in (0.5, -0.5):
-        p.box((0, thick / 2 + 0.006, hh * 0.78), (w * 0.42, 0.02, 0.06), GRAVE_DARK, roll=r)
-    p.box((0, 0, top - 0.02), (w * 0.75 if not cross else 0.75, thick + 0.04, 0.05), RIME)
+    f, top = sg.headstone_field(rng, w, hh, thick, cross)
+    dark = rng.random() < 0.4
+    paint = sg.grave_paint(f, GRAVE_STONE_DARK if dark else GRAVE_STONE,
+                           tuple(c * 0.7 for c in (GRAVE_STONE_DARK if dark else GRAVE_STONE)), LICHEN, SNOW_V,
+                           seed)
+    sg.add_sculpt(p, f, 'grave', 220 if not cross else 260, paint)
     p.turn(m, Matrix.Translation(B(x, z, bottom)) @ Matrix.Rotation(yaw, 4, 'Z') @ Matrix.Rotation(lean, 4, 'X'))
     footing(f'headstone_{x:g}_{z:g}', x, z, w / 2, thick / 2, yaw, bottom)
     collider_obb(f'headstone_{x:g}_{z:g}', x, z, w / 2 + 0.05, 0.2, yaw, hi + h + 0.3, 'old Vigil headstone')
-    # a frosted grave mound in front (south) of each stone
+    # a snow-covered grave mound in front (south) of each stone, and a drift
+    # banked against the stone's back
     mx, mz = x - math.sin(yaw) * 1.15, z - math.cos(yaw) * 1.15
-    p.rock(B(mx, mz, gh(mx, mz) - 0.06), (w + 0.35, 1.6, 0.3), (0.31, 0.35, 0.27), jitter=0.2, subdivisions=1,
-           flat_bottom=True)
+    bx, bz = x + math.sin(yaw) * 0.32, z + math.cos(yaw) * 0.32
+    mf = sg.mound_field(GR, [(mx, mz, (w + 0.3) * 0.58, 0.95, 0.14, -yaw),
+                             (mx + 0.12, mz - 0.35, w * 0.42, 0.55, 0.1, -yaw),
+                             (bx, bz, w * 0.5, 0.26, 0.14, -yaw)], voxel=0.06)
+    sg.add_sculpt(p, mf, 'mound', 110, sg.earth_paint(mf, EARTH, EARTH_DARK, SNOW_V, seed + 1))
+
+
+def cairn(p):
+    """The Vigil cairn: a small unlit beacon of stacked stones facing the gate,
+    older than Highwatch remembers. A cold iron fire-basket on top, never lit."""
+    cx, cz = CAIRN
+    rng = random.Random(41)
+    lo = ground_min(cx, cz, 1.0, 1.0)
+    footing('cairn', cx, cz, 0.9, 0.9, 0.0, lo - 0.3)
+    f, y = sg.cairn_field(GR, cx, cz, rng)
+    paint = sg.stone_paint(f, SLATE_PALE, (0.55, 0.57, 0.6), (0.08, 0.08, 0.09), RIME_V, FROST_V, 41,
+                           snow_up=0.55)
+    sg.add_sculpt(p, f, 'cairn', 1300, paint)
+    for k in range(4):
+        a = math.tau * k / 4 + 0.4
+        bx, bz = cx + math.cos(a) * 0.32, cz + math.sin(a) * 0.32
+        p.sweep([B(bx, bz, y + 0.0), B(bx + math.cos(a) * 0.16, bz + math.sin(a) * 0.16, y + 0.8)], 0.04, 0.04,
+                IRON, sides=5)
+    ring = [B(cx + math.cos(math.tau * i / 16) * 0.5, cz + math.sin(math.tau * i / 16) * 0.5, y + 0.8)
+            for i in range(17)]
+    p.sweep(ring, 0.05, 0.05, IRON, sides=6, cap=False)
+    ring = [B(cx + math.cos(math.tau * i / 16) * 0.38, cz + math.sin(math.tau * i / 16) * 0.38, y + 0.4)
+            for i in range(17)]
+    p.sweep(ring, 0.035, 0.035, IRON_DARK, sides=5, cap=False)
+    # cold ash in the basket, snow over it
+    af = sg.Sculpt((cx - 0.8, -(cz + 0.8), y - 0.2), (cx + 0.8, -(cz - 0.8), y + 0.6), 0.05)
+    af.put('snow', sg.Ellipsoid(sg.G(cx, cz, y + 0.16), (0.36, 0.36, 0.13)), 0.05)
+    sg.add_sculpt(p, af, 'ash', 80, sg.snow_paint(af, SNOW_V, ASH, 43))
+    collider_circle('vigil_cairn', cx, cz, 1.05, y + 0.9, 'the Vigil cairn')
+
+
+def chain_heap(p, rng):
+    """The fallen chain's end, frozen into a heap of frost and old snow, the
+    links breaking out of it."""
+    hx, hz = HEAP
+    g = gh(hx, hz)
+    blobs = [(hx, hz, 1.45, 1.3, 0.62, 0.3)]
+    for k in range(5):
+        a = rng.random() * math.tau
+        r = rng.uniform(0.4, 1.0)
+        blobs.append((hx + math.cos(a) * r, hz + math.sin(a) * r, rng.uniform(0.5, 0.9), rng.uniform(0.4, 0.8),
+                      rng.uniform(0.35, 0.7), rng.random() * 3))
+    mf = sg.mound_field(GR, blobs, voxel=0.07, bury=0.3)
+    sg.add_sculpt(p, mf, 'heap', 700, sg.snow_paint(mf, SNOW_V, SNOW_SHADE, 19))
+    collider_circle('chain_heap', hx, hz, 1.7, g + 1.3, 'the fallen chain\'s frosted heap (standable)', stand=g + 1.1)
+    footing('chain_heap', hx, hz, 1.5, 1.5, 0.0, g - 0.05)
+
+
+def plinth_drifts(p):
+    """Snow banked against the pylons' plinths, the cairn's foot and the
+    outcrop's skirt by the gate: low drifts, walk-over (never over a shin)."""
+    blobs = []
+    for s in (-1, 1):
+        blobs += [(s * 3.9, -2.55, 1.5, 0.45, 0.26, 0.0), (s * 5.65, -0.4, 0.45, 1.4, 0.3, 0.0),
+                  (s * 5.6, 1.8, 0.55, 0.9, 0.34, 0.0)]
+    mf = sg.mound_field(GR, blobs, voxel=0.07, bury=0.25)
+    sg.add_sculpt(p, mf, 'drifts', 900, sg.snow_paint(mf, SNOW_V, SNOW_SHADE, 71))
 
 
 # The two graveyard clusters, by the flanking ruin rings (both kept): the
@@ -832,39 +688,6 @@ def graveyard(p):
 
 
 CAIRN = (-4.0, -16.5)
-
-
-def cairn(p):
-    """The Vigil cairn: a small unlit beacon of stacked stones facing the gate,
-    older than Highwatch remembers. A cold iron fire-basket on top, never lit."""
-    cx, cz = CAIRN
-    rng = random.Random(41)
-    lo = ground_min(cx, cz, 1.0, 1.0)
-    y = lo - 0.3
-    footing('cairn', cx, cz, 0.9, 0.9, 0.0, y)
-    for course, (r, h, n) in enumerate(((1.05, 0.55, 8), (0.88, 0.5, 7), (0.7, 0.45, 6), (0.5, 0.4, 5))):
-        for k in range(n):
-            a = math.tau * (k + rng.random() * 0.3) / n + course * 0.4
-            p.rock(B(cx + math.cos(a) * r * 0.62, cz + math.sin(a) * r * 0.62, y + h * 0.5),
-                   (r * 0.85, r * 0.7, h * 1.15), p.vary(SLATE_PALE if k % 3 else GRAVE, 0.1), jitter=0.22,
-                   subdivisions=1)
-        y += h * 0.92
-    p.rock(B(cx, cz, y + 0.1), (0.9, 0.9, 0.4), SLATE, jitter=0.2, subdivisions=1)
-    for k in range(4):
-        a = math.tau * k / 4 + 0.4
-        bx, bz = cx + math.cos(a) * 0.32, cz + math.sin(a) * 0.32
-        p.sweep([B(bx, bz, y + 0.2), B(bx + math.cos(a) * 0.16, bz + math.sin(a) * 0.16, y + 1.0)], 0.04, 0.04,
-                IRON, sides=5)
-    ring = [B(cx + math.cos(math.tau * i / 12) * 0.5, cz + math.sin(math.tau * i / 12) * 0.5, y + 1.0)
-            for i in range(13)]
-    p.sweep(ring, 0.05, 0.05, IRON, sides=5, cap=False)
-    p.rock(B(cx, cz, y + 0.45), (0.55, 0.55, 0.3), SOOT, jitter=0.3, subdivisions=1)
-    p.rock(B(cx, cz, y + 0.62), (0.45, 0.45, 0.12), RIME, jitter=0.3, subdivisions=0)
-    # A worn face-stone toward the gate with the Vigil's open eye.
-    p.box(B(cx, cz + 0.95, lo + 0.55), (0.75, 0.2, 1.1), GRAVE, bevel=0.04, pitch=0.12)
-    for r in (0.5, -0.5):
-        p.box(B(cx, cz + 1.07, lo + 0.75), (0.32, 0.02, 0.05), GRAVE_DARK, roll=r)
-    collider_circle('vigil_cairn', cx, cz, 1.05, y + 1.1, 'the Vigil cairn')
 
 
 GOADS = [(-7.8, -12.8, 0.4, 3.4, 0.0), (-11.0, -7.4, 1.7, 3.0, 0.0), (7.0, -10.9, 0.2, 3.2, 1.0),
@@ -955,22 +778,19 @@ def cult_debris(p):
 
 
 def ground_blend(p):
-    """Rubble and frosted scree where stone meets ground: at the plinths' feet,
-    along the outcrop's skirt and at the mountain's foot."""
+    """Split stones and frozen scree where stone meets ground: at the plinths'
+    feet, along the outcrop's skirt and at the mountain's foot; snow banked
+    against the plinths."""
     rng = random.Random(61)
     spots = []
     for s in (-1, 1):
-        spots += [(s * 5.5, -1.0, 0.7), (s * 5.45, 2.2, 0.8)]
+        spots += [(s * 5.75, -1.3, 0.7), (s * 5.7, 2.4, 0.8)]
     for (lz, W, E, top, roof) in STATIONS[2:9]:
-        spots += [(W + 0.2, lz + rng.random(), 1.1), (-E - 0.2, lz + rng.random(), 1.1)]
-    for (x, z, r) in spots:
-        for k in range(2):
-            ox = x + (rng.random() - 0.5) * r
-            oz = z + (rng.random() - 0.5) * r
-            sz = r * (0.6 + rng.random() * 0.6)
-            p.rock(B(ox, oz, gh(ox, oz) + sz * 0.1), (sz * 1.3, sz, sz * 0.55), p.vary(SLATE if k else SLATE_PALE, 0.1),
-                   jitter=0.3, subdivisions=1, flat_bottom=True)
-        p.rock(B(x, z, gh(x, z) + r * 0.3), (r * 0.9, r * 0.7, r * 0.14), RIME, jitter=0.25, subdivisions=0)
+        spots += [(W + 0.35, lz + rng.random(), 1.0), (-E - 0.35, lz + rng.random(), 1.0)]
+    f = sg.rubble_field(GR, spots, rng)
+    paint = sg.stone_paint(f, SLATE, SLATE_PALE, (0.07, 0.07, 0.08), RIME_V, FROST_V, 61, snow_up=0.5)
+    sg.add_sculpt(p, f, 'rubble', 2600, paint)
+    plinth_drifts(p)
 
 
 def props():
@@ -993,98 +813,51 @@ def blend_piece():
     return p
 
 
-# ================================================================ the ice tongue
-ICE_CX = -18.0
-ICE_LZ = (43.0, 53.0)
+# ================================================================ the icefall
+ICE_DEEP_V = (0.08, 0.26, 0.46)      # the deep core down a crevasse
+ICE_CLEAR_V = (0.36, 0.62, 0.8)      # clear glacier blue on the faces
+ICE_PALE_V = (0.66, 0.84, 0.93)      # thin ice at the arrises
+ICE_CRUST_V = (0.9, 0.94, 0.97)      # the old snow crust
 
 
 def ice_tongue():
-    """A tongue of blue glacier ice spilling through a notch in the ridge, high
-    on the Thornpeak (south) face, east of the gate: the Quench showing over
-    the rim. Its top stays well under the crest, so the ridge hides it from the
-    Veiled Hollow behind. Render only, no collider."""
+    """The glacier tongue breaking down the Thornpeak (south) face through a
+    notch of the ridge, east of the gate and high over it: the Quench showing
+    over the rim. Its top stays under the crest, so the ridge hides it from
+    the Veiled Hollow behind. Render only, no collider."""
     p = P('IceTongue', weather=0.0, lichen=0.0)
     rng = random.Random(77)
-    cx = ICE_CX
-    n_st = 14
-    stations = []
-    for k in range(n_st + 1):
-        lz = ICE_LZ[0] + (ICE_LZ[1] - ICE_LZ[0]) * k / n_st
-        stations.append((lz, gh(cx, lz)))
-    crest = max(gh(cx + dx, 56 + i) for i in range(16) for dx in (-6, 0, 6))
-    # The notch: two buttresses of the mountain's own rock flank the ice, cut
-    # as jagged slabs leaning back into the face.
-    for k in (3, 7, 10, 12, 14):
-        lz, y = stations[k]
-        t = k / n_st
-        w = 3.2 + 6.0 * t ** 1.6 - 0.6
-        for s in (-1, 1):
-            h = 5.0 + rng.random() * 3.0
-            # seated on its own column of the face and pushed into it, so a
-            # cheek never hangs off the snow as a loose boulder
-            rx = cx + s * (w + 1.4)
-            p.rock(B(rx, lz + 0.8, gh(rx, lz) - 0.2), (3.4 + rng.random(), 3.6, h),
-                   p.vary(MOUNTAIN, 0.08), jitter=0.28, subdivisions=1)
-    # The ice body: a broad sheet hugging the face, proud of it by 0.8 to 2.2
-    # yd and sunk 4 yd into it (the far terrain LOD drops detail on this face).
-    rings = []
-    bm = p.bm
-    before = set(bm.faces)
-    n = 12
-    for k, (lz, y) in enumerate(stations):
-        t = k / n_st
-        w = 3.2 + 6.0 * t ** 1.6
-        # proud at the snout, flattening into the face where it fills the notch
-        proud = 0.4 + 1.9 * math.sin(min(1.0, t * 1.15) * math.pi) ** 0.7 + (1.0 - t) * 0.6
-        ring = []
-        for i in range(n + 1):
-            a = math.pi * i / n
-            x = cx + math.cos(a) * w * (1 + (rng.random() - 0.5) * 0.1)
-            bulge = math.sin(a) ** 0.6
-            dz = -bulge * proud * (1 + (rng.random() - 0.5) * 0.2)
-            ring.append(bm.verts.new(B(x, lz + dz - 0.15, gh(x, lz) + 0.25 + bulge * 0.4)))
-        for i in range(n, -1, -1):
-            a = math.pi * i / n
-            x = cx + math.cos(a) * w * 0.9
-            ring.append(bm.verts.new(B(x, lz + 4.0, gh(x, lz) - 4.0)))
-        rings.append(ring)
-    for ra, rb in zip(rings, rings[1:]):
-        m = len(ra)
-        for i in range(m):
-            bm.faces.new((ra[i], ra[(i + 1) % m], rb[(i + 1) % m], rb[i]))
-    bm.faces.new(list(reversed(rings[0])))
-    bm.faces.new(rings[-1])
-    faces = [f for f in bm.faces if f not in before]
-    bmesh.ops.recalc_face_normals(bm, faces=faces)
-    top_lz, top_y = stations[-1]
-    for f in faces:
-        f.material_index = ICE
-        for loop in f.loops:
-            co = loop.vert.co
-            k = ec.fbm2(co.x * 0.4, co.z * 0.5)
-            # crevasse bands across the flow, deep blue in the cracks
-            band = max(0.0, math.sin(co.z * 1.25 + k * 3.0)) ** 3
-            col = tuple(a * (1 - band * 0.7) + b * band * 0.7 for a, b in zip(ICE_C, ICE_DEEP))
-            # old snow on the upper reach and on every upward face
-            snow = max(0.0, min(1.0, (co.z - (top_y - 12.0)) / 10.0))
-            if f.normal.z > 0.5:
-                snow = max(snow, 0.55)
-            col = tuple(a * (1 - snow * 0.75) + b * snow * 0.75 for a, b in zip(col, ICE_WHITE))
-            loop[p.col] = (*col, 1.0)
-    # Seracs breaking over the lip, and long icicle curtains under the snout.
-    for k in range(7):
-        x = cx + (rng.random() - 0.5) * 9.0
-        lz = top_lz - 1.0 - rng.random() * 2.5
-        p.prism(B(x, lz - 1.8, gh(x, lz) + 0.2), 5, 0.8 + rng.random() * 0.6, 0.2, 2.0 + rng.random() * 2.0,
-                ICE_WHITE, mat=ICE, phase=rng.random(), lean=(0.2, 0.6))
-    lz0, y0 = stations[0]
-    for k in range(11):
-        x = cx + (rng.random() - 0.5) * 3.6
-        p.prism(B(x, lz0 - 0.9 - rng.random() * 0.4, gh(x, lz0) + 0.4), 5, 0.2 + rng.random() * 0.22, 0.0001,
-                -(2.0 + rng.random() * 5.0), ICE_C, mat=ICE, phase=rng.random())
-    top_world = max(v.co.z for v in bm.verts)
-    return p, {'tongue_top_y': round(top_world, 2), 'crest_y': round(crest, 2), 'centre_lx': cx,
-               'lz_range': [stations[0][0], top_lz], 'snout_y': round(y0, 2)}
+    f, lips = sg.icefall_field(GR, rng)
+    paint = sg.ice_paint(f, ICE_DEEP_V, ICE_CLEAR_V, ICE_PALE_V, ICE_CRUST_V, MOUNTAIN, MOUNTAIN_DARK)
+
+    def mat_of(C):
+        return np.where(f.classify(C, default='ice') == 'rock', STONE, ICE)
+
+    sg.add_sculpt(p, f, 'icefall', ICEFALL_TRIS, paint, mat_of=mat_of)
+    # icicle fringes under every serac lip
+    for (c, w) in lips:
+        n = max(3, int(w * 1.6))
+        for k in range(n):
+            x = c[0] + (k + rng.uniform(0.2, 0.8)) / n * w - w / 2
+            p.prism((x, c[1] + rng.uniform(-0.2, 0.2), c[2]), 5, rng.uniform(0.12, 0.28), 0.0001,
+                    -rng.uniform(1.0, 3.6), ICE_PALE_V, mat=ICE, phase=rng.random())
+    zs = [v.co.z for v in p.bm.verts]
+    lx = [v.co.x for v in p.bm.verts]
+    # the ridge must hide it from the Veiled Hollow behind: no vertex may
+    # stand over the terrain anywhere north of it, up to the crest
+    proud = 0
+    worst = (0.0, None)
+    for v in list(p.bm.verts)[::7]:
+        x, lz, y = v.co.x, -v.co.y, v.co.z
+        ridge = max(gh(x, lz + d) for d in (2, 4, 6, 8, 10, 14))
+        if y > ridge:
+            proud += 1
+            if y - ridge > worst[0]:
+                worst = (round(y - ridge, 2), [round(x, 1), round(lz, 1), round(y, 1)])
+    crest = max(gh(sg.ICEFALL['cx'] + dx, 56 + i) for i in range(8) for dx in (-6, 0, 6))
+    return p, {'tongue_top_y': round(max(zs), 2), 'crest_y': round(crest, 2), 'centre_lx': sg.ICEFALL['cx'],
+               'lx_range': [round(min(lx), 2), round(max(lx), 2)], 'snout_lz': sg.ICEFALL['snout'],
+               'over_ridge_samples': proud, 'over_ridge_worst': worst}
 
 
 # ================================================================ VFX reference and main

@@ -15,6 +15,7 @@ import { setOceanShedRung } from './ocean/ocean_shed';
 import { paletteLabEnabled, setPaletteAoPass, setPaletteBloomPass } from './palette_lab';
 // The lab's runtime boots with the game composer only (never the guide/editor).
 import './palette_lab/palette_lab_boot';
+import './spell_lab/spell_lab_boot';
 import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';

@@ -1,4 +1,5 @@
-import { isBuiltinWorldActive } from './data';
+import { getActiveWorldContent, isBuiltinWorldActive } from './data';
+import { activeFenbridgeReachCovers } from './fenbridge_touchup';
 import { mirefenTavernCovers } from './mirefen_tavern_floor';
 import { mirefenTavernGroundsCovers } from './mirefen_tavern_grounds';
 import { PAINTED_TOWNS } from './painted_towns';
@@ -131,6 +132,13 @@ const EXCLUSIONS = [
   // Fenbridge's painted buildings stood grand (fenbridge_layout.ts): the tree
   // the apothecary's back corner now stands on, past the hub's scatter-free ring.
   { x: 20.594, z: 335.37 },
+  // The Highwatch adventurers' guild (highwatch_layout.ts) at the old stable yard: every
+  // tree and rock on its pad, its yard or under its eaves.
+  { x: 101.428, z: 679.908 },
+  { x: 103.913, z: 707.165 },
+  { x: 113.21, z: 715.414 },
+  { x: 127.18, z: 687.533 },
+  { x: 129.304, z: 692.734 },
 ];
 
 /** Scatter keeps this far off the Mirefen tavern's walls (a trunk, a canopy or a rock
@@ -139,16 +147,42 @@ const TAVERN_SCATTER_PAD = 3;
 /** ...and this far off its grounds (the forecourt, the stable, the pieces outside). */
 const TAVERN_GROUNDS_SCATTER_PAD = 1.5;
 
+const parsedDecorationExclusions = new WeakMap<
+  readonly string[],
+  readonly { x: number; z: number }[]
+>();
+
+function activeWorldExclusionPoints(): readonly { x: number; z: number }[] {
+  const keys = getActiveWorldContent().decorationExclusions;
+  if (!keys || keys.length === 0) return [];
+  const cached = parsedDecorationExclusions.get(keys);
+  if (cached) return cached;
+  const pts: { x: number; z: number }[] = [];
+  for (const key of keys) {
+    const parts = key.split(':');
+    if (parts.length < 3) continue;
+    const x = Number(parts[parts.length - 2]);
+    const z = Number(parts[parts.length - 1]);
+    if (Number.isFinite(x) && Number.isFinite(z)) pts.push({ x, z });
+  }
+  parsedDecorationExclusions.set(keys, pts);
+  return pts;
+}
+
 export function isExcludedDecoration(x: number, z: number): boolean {
   if (
     (mirefenTavernCovers(x, z, TAVERN_SCATTER_PAD) ||
-      mirefenTavernGroundsCovers(x, z, TAVERN_GROUNDS_SCATTER_PAD)) &&
+      mirefenTavernGroundsCovers(x, z, TAVERN_GROUNDS_SCATTER_PAD) ||
+      activeFenbridgeReachCovers(x, z, PAINTED_TOWN_SCATTER_PAD)) &&
     isBuiltinWorldActive()
   ) {
     return true;
   }
   // the painted towns clear their whole ground, not named points (sim/painted_towns/)
   if (paintedTownReachCovers(x, z, PAINTED_TOWN_SCATTER_PAD)) return true;
+  if (activeWorldExclusionPoints().some((point) => Math.hypot(x - point.x, z - point.z) < 0.25)) {
+    return true;
+  }
   return EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 1.2);
 }
 
@@ -173,6 +207,11 @@ const STREETLAMP_EXCLUSIONS = [
 ];
 
 export function isExcludedStreetlamp(x: number, z: number): boolean {
+  if (isBuiltinWorldActive() && activeFenbridgeReachCovers(x, z, PAINTED_TOWN_LAMP_PAD)) {
+    return true;
+  }
   if (paintedTownReachCovers(x, z, PAINTED_TOWN_LAMP_PAD)) return true;
+  const extraLamps = getActiveWorldContent().fenbridgeTouchup?.excludedStreetlamps;
+  if (extraLamps?.some((point) => Math.hypot(x - point.x, z - point.z) < 0.05)) return true;
   return STREETLAMP_EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 0.01);
 }

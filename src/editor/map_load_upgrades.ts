@@ -31,6 +31,10 @@ import {
 
 /** Upgrade a just-opened map in place, exactly as the editor opens it. */
 export function upgradeLoadedMap(map: CustomMap): void {
+  if (map.meta.overworldBase) {
+    ensureMapItemIdsFromContent(map);
+    return;
+  }
   const previous = getActiveWorldContent();
   setActiveWorldContent(customMapToWorldContent(map));
   try {

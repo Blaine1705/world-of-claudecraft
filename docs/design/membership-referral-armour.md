@@ -6,7 +6,7 @@ registration. The existing first referral wins. Legacy referrals are not
 retroactively eligible; their historical membership state is unknown.
 
 Every character on the referred account can claim the seven soulbound pieces.
-Initial admission grants missing pieces automatically. Full bags allow a partial grant.
+Initial admission grants missing pieces automatically, overflowing full bags.
 Stamp card menu (Refer a Friend) > Claim friendship armour is the manual recovery action for missing
 pieces, using `createFriendshipArmourClaim`. The shared bank only offers membership
 gear recovery. Referral-screen wiring lives on the integration branch alongside
@@ -50,7 +50,8 @@ are component fixtures, not multiplayer-world captures:
 | ![Desktop](../screenshots/referral-armour/stamp-menu-forced-1280x800.png) | ![Portrait](../screenshots/referral-armour/stamp-menu-forced-390x844.png) | ![Landscape](../screenshots/referral-armour/stamp-menu-forced-844x390.png) |
 
 The set uses the membership armour class/specialization budget, scales with the
-wearer's level, and perfects at level 20 into item level 25. The friend does not
+wearer's level, and is always Rare with item level equal to character level plus
+five. The friend does not
 need a membership. Stats remain available when the inviter's membership expires
 or the players leave their party. Existing account-deletion cascades still remove
 the referral relationship; this grant is not retained after inviter deletion.

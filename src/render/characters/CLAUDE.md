@@ -315,8 +315,10 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
 - WOC split character files (the player bodies, 2026-09-28): one base and one
   animation library per body fit, plus the hand-keyed library over it
   (`woc_keyed_animations.ts`: `players/woc_keyed/woc_<fit>.glb`, keyed on the same bind
-  pose by `scripts/assets/woc_keyed_anims/`, for the idle, gaits, swim, jump take-off,
-  death, four emotes and the white swings), and per armor set and fit a low file, a medium
+  pose by `scripts/assets/woc_keyed_anims/`, for the idle and combat stances, gaits,
+  swim, jump take-off, death, hit flinch, emotes, the white swings, and the ability
+  strikes, casts and channels each class routes in `manifest.ts`), and per armor set and
+  fit a low file, a medium
   file and a TOP file (`woc_armor_core.ts`: file names, the tier a character
   draws, the stand-in tier, the idle rule and its ledger; pure). Since 2026-10-03 the
   medium file carries every map of the set's one full layout at half its size and
@@ -858,6 +860,15 @@ one), drawn by that pipeline from the class body; no frame shows those files.
   (crossfade only when the outgoing action still drives the rig, else snap to
   full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
   backstop that re-drives the base pose after 3 starved frames.
+- **Ambient clips (`VisualDef.ambientClips`)** loop for the visual's whole life
+  BESIDE the state clips, on their own clock (Wobbles the Slime's bubbles), so a
+  gait or jump change never restarts them. `CharacterVisual` starts them once at
+  construction and keeps them OUT of `actions`, so crossfades, `stop()` sweeps,
+  gait time-scaling and the `scanAnimRepair` weight scan never see them (an
+  ambient action at weight 1 must not hide a starved base pose); only dispose's
+  `stopAllAction()` ends them. Each must key only bones no state clip keys, or
+  the two blend. Pinned in `tests/character_ambient_clips.test.ts` and, per
+  manifest def, `tests/character_clipmaps.test.ts`.
 
 ## The visual reuse pool (`visual_pool.ts` + `visual_pool_policy.ts` + `pooled_visual_lifecycle.ts`)
 `renderer.ts` routes non-player character visuals through a bounded,

@@ -74,6 +74,14 @@ body {
   overflow: hidden;
 }
 
+.ed-live-world-notice {
+  flex: none;
+  padding: 6px 12px;
+  background: var(--ed-panel-2);
+  border-bottom: 1px solid var(--ed-line);
+  color: var(--ed-muted);
+}
+
 /* ---- shared controls ------------------------------------------------------ */
 
 button {

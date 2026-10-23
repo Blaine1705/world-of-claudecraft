@@ -9673,6 +9673,14 @@
     width: calc(100% - 4px);
     height: calc(100% - 4px);
   }
+  .membership-bag-slot > svg {
+    width: 22px;
+    height: 22px;
+  }
+  .membership-bag-slot.membership-locked {
+    color: var(--color-text-muted);
+    filter: grayscale(1);
+  }
   .bag-socket.backpack {
     cursor: default;
   }
@@ -10407,19 +10415,73 @@
     overflow-x: auto;
     max-width: 100%;
   }
-  .account-bank-panel > .ui-btn {
+  .account-bank-panel .ui-btn {
     min-height: 40px;
   }
   .account-bank-tab {
     flex: none;
     min-height: 40px;
   }
-  .account-bank-panel h3 {
+  /* The selected bank and the player's bags as two framed sections, each
+     titled with whose items they hold, so a click's direction is never a guess. */
+  .account-bank-section {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+  }
+  .account-bank-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .account-bank-section h3 {
+    margin: 0;
+    font-family: var(--title-font);
     font-size: 13px;
-    margin: var(--spacing-sm) 0;
+    color: var(--gold-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .account-bank-count {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .account-bank-hint {
+    margin: 2px 0 var(--spacing-xs);
+    font-size: 11px;
+    color: var(--color-text-muted);
   }
   .account-bank-panel .bank-item:disabled {
     opacity: 0.5;
+  }
+  .account-bank-failure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  .account-bank-failure .account-bank-notice {
+    color: var(--color-text-error);
+  }
+  .account-bank-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .account-bank-note {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-align: center;
   }
   .bank-tab {
     flex: 1;
@@ -15279,6 +15341,13 @@
   .df-flag {
     margin-left: 6px;
     padding: 0 4px;
+  }
+  /* The encounter's boss guide page (src/ui/boss_journal/): opens the journal on it. */
+  .df-encounter-name .df-guide-btn {
+    margin-left: 8px;
+    padding: 2px 8px;
+    font-size: 11px;
+    vertical-align: middle;
   }
   .df-mechanics {
     margin: 4px 0;
@@ -21055,6 +21124,693 @@
   }
   .mail-send-btn:hover {
     filter: brightness(1.08);
+  }
+
+  /* ---------- lantern hall guild window ---------- */
+  /* Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts): two tabs over the
+     Highwatch slate blue. Contracts: a wooden notice board of pinned parchment notices, each
+     with its boss's portrait, the guild's wax seal, the week's counter and the reward.
+     Quartermaster: a vendor counter, item cards on the left and the selected card's detail
+     (the crest, the nameplate the title draws, the price against the bags) on the right. A
+     flex column under the base window shell; both bodies restack on a narrow window (the
+     container queries below), which is what a landscape phone gets. */
+  #guild-hall-window {
+    width: min(1040px, calc(100vw - 32px));
+    max-height: calc(var(--app-vh, 100vh) * 0.9 - 16px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden auto;
+    min-height: 0;
+    container-type: inline-size;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, var(--gh-amber-glow), transparent 60%),
+      linear-gradient(180deg, var(--gh-sheet-top), var(--gh-sheet-bottom));
+    border-color: var(--gh-edge);
+    color: var(--gh-ink);
+    padding: clamp(10px, 1.6cqw, 22px) clamp(12px, 2cqw, 26px);
+  }
+  #guild-hall-window .gh-title span:first-child {
+    font-size: clamp(18px, 3cqw, 30px);
+    letter-spacing: 0.03em;
+    color: var(--gh-amber);
+    text-shadow: 0 1px 0 var(--gh-shadow);
+  }
+  #guild-hall-window .gh-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  #guild-hall-window .gh-tab {
+    flex: 1 1 0;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    color: var(--gh-muted);
+    background: linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge);
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-tab[aria-selected="true"] {
+    color: var(--gh-amber);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-card));
+    box-shadow:
+      inset 0 -2px 0 var(--gh-amber),
+      0 0 14px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-tab:focus-visible,
+  #guild-hall-window .gh-btn:focus-visible,
+  #guild-hall-window .gh-item:focus-visible,
+  #guild-hall-window .gh-seals:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  #guild-hall-window .gh-sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 16px;
+    font-size: 14px;
+  }
+  #guild-hall-window .gh-seals {
+    min-height: 40px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: help;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 12px 3px 4px;
+    color: var(--gh-amber);
+    font-weight: 600;
+    background: var(--gh-chip-bg);
+    border: 1px solid var(--gh-edge);
+    border-radius: 999px;
+  }
+  #guild-hall-window .gh-seal-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+  }
+  #guild-hall-window .gh-reset,
+  #guild-hall-window .gh-intro,
+  #guild-hall-window .gh-empty {
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-intro {
+    font-size: 13px;
+    line-height: 1.45;
+    margin: 8px 0 12px;
+  }
+  #guild-hall-window .gh-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* The notice board: dark oak boards behind the pinned notices. */
+  #guild-hall-window .gh-board {
+    padding: 14px clamp(10px, 1.8cqw, 22px) 12px;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, var(--gh-wood-glow), transparent 70%),
+      repeating-linear-gradient(
+        180deg,
+        var(--gh-wood-1) 0 46px,
+        var(--gh-wood-seam) 46px 48px,
+        var(--gh-wood-2) 48px 94px,
+        var(--gh-wood-seam) 94px 96px
+      );
+    border: 3px solid var(--gh-frame);
+    box-shadow:
+      inset 0 0 0 1px var(--gh-edge),
+      inset 0 0 40px var(--gh-shadow),
+      0 6px 16px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-tally {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 12px;
+    margin: 0 0 14px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: var(--gh-gilt);
+    text-shadow: 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-pips {
+    display: inline-flex;
+    gap: 5px;
+  }
+  #guild-hall-window .gh-pip {
+    width: 26px;
+    height: 8px;
+    background: var(--gh-pip-empty);
+    border: 1px solid var(--gh-edge);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-pip-done {
+    background: linear-gradient(180deg, var(--gh-amber), var(--gh-edge));
+    box-shadow: 0 0 6px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  /* One notice: a sheet of aged parchment pinned at its head. */
+  #guild-hall-window .gh-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 24px 16px 18px;
+    color: var(--gh-paper-ink);
+    text-align: center;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 40%, var(--gh-paper-hi), transparent 75%),
+      radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, var(--gh-paper-burn) 100%),
+      linear-gradient(170deg, var(--gh-paper-1), var(--gh-paper-2));
+    border-radius: 3px 5px 4px 6px;
+    box-shadow:
+      inset 0 0 0 1px var(--gh-paper-edge),
+      0 10px 18px var(--gh-shadow),
+      0 2px 3px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-card:nth-child(3n + 1) {
+    transform: rotate(-0.6deg);
+  }
+  #guild-hall-window .gh-card:nth-child(3n + 3) {
+    transform: rotate(0.5deg);
+  }
+  #guild-hall-window .gh-pin {
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--gh-pin-hi), var(--gh-pin) 60%);
+    box-shadow: 1px 2px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-ribbon {
+    padding: 2px 14px;
+    color: var(--gh-ribbon-text);
+    background: var(--gh-kind-boss);
+    clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%);
+  }
+  #guild-hall-window .gh-card-heroic .gh-ribbon {
+    background: var(--gh-kind-heroic);
+  }
+  #guild-hall-window .gh-card-task .gh-ribbon {
+    background: var(--gh-kind-task);
+  }
+  #guild-hall-window .gh-kind {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  #guild-hall-window .gh-portrait {
+    width: 92px;
+    height: 92px;
+    margin-top: 4px;
+    padding: 3px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--gh-gilt), var(--gh-edge) 55%, var(--gh-frame));
+    box-shadow: 0 3px 8px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--gh-sheet-bottom);
+    box-shadow: inset 0 0 8px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-boss {
+    margin: 2px 0 0;
+    font-family: var(--title-font);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--gh-paper-ink);
+  }
+  #guild-hall-window .gh-dungeon {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-rule {
+    width: 70%;
+    height: 1px;
+    margin: 2px 0;
+    background: linear-gradient(90deg, transparent, var(--gh-paper-rule), transparent);
+  }
+  #guild-hall-window .gh-goal,
+  #guild-hall-window .gh-detail {
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+  }
+  #guild-hall-window .gh-detail {
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-progress {
+    width: 100%;
+    margin-top: auto;
+    padding-top: 6px;
+  }
+  #guild-hall-window .gh-progress-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-pips-card {
+    display: flex;
+    margin-top: 4px;
+  }
+  #guild-hall-window .gh-pips-card .gh-pip {
+    flex: 1 1 auto;
+    height: 9px;
+    background: var(--gh-paper-track);
+    border-color: var(--gh-paper-rule);
+  }
+  #guild-hall-window .gh-pips-card .gh-pip-done {
+    background: linear-gradient(180deg, var(--gh-done-bar), var(--gh-done-deep));
+    box-shadow: none;
+  }
+  #guild-hall-window .gh-card-done .gh-state {
+    color: var(--gh-done-deep);
+    font-weight: 700;
+  }
+  #guild-hall-window .gh-reward {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding-right: 36px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gh-paper-ink);
+  }
+  #guild-hall-window .gh-reward-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+  }
+  /* The guild's wax seal, pressed at the notice's foot: the crown while the contract is
+     open, a tick once it is done this week. */
+  #guild-hall-window .gh-wax {
+    position: absolute;
+    right: -10px;
+    bottom: -12px;
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    color: var(--gh-wax-deep);
+    border-radius: 47% 53% 50% 50% / 52% 48% 52% 48%;
+    background: radial-gradient(
+      circle at 38% 32%,
+      var(--gh-wax-hi),
+      var(--gh-wax) 55%,
+      var(--gh-wax-deep)
+    );
+    box-shadow:
+      inset 0 0 0 4px var(--gh-wax-rim),
+      1px 2px 3px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-wax .ui-icon {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 1px 0 var(--gh-wax-hi));
+  }
+  #guild-hall-window .gh-card-done .gh-wax {
+    color: var(--gh-wax-gilt);
+  }
+  /* The clerk's ink stamp across the notice's upper corner, clear of the boss's name. */
+  #guild-hall-window .gh-stamp {
+    position: absolute;
+    top: 50px;
+    right: 8px;
+    padding: 1px 8px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gh-stamp);
+    border: 3px double var(--gh-stamp);
+    border-radius: 4px;
+    transform: rotate(12deg);
+    pointer-events: none;
+  }
+  #guild-hall-window .gh-foot {
+    margin-top: 14px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--gh-gilt);
+    text-shadow: 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-empty {
+    text-align: center;
+    color: var(--gh-gilt);
+  }
+
+  /* The quartermaster's counter. */
+  #guild-hall-window .gh-shop {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 16px;
+    align-items: start;
+  }
+  #guild-hall-window .gh-stock {
+    display: grid;
+    gap: 10px;
+  }
+  #guild-hall-window .gh-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 72px;
+    padding: 8px 12px 8px 8px;
+    font-family: inherit;
+    color: var(--gh-ink);
+    text-align: start;
+    background: linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge-dim);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-item:hover {
+    border-color: var(--gh-edge);
+  }
+  #guild-hall-window .gh-item-selected {
+    border-color: var(--gh-amber);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-card));
+    box-shadow:
+      inset 0 0 0 1px var(--gh-amber),
+      0 0 16px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-slot {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    padding: 3px;
+    background: radial-gradient(circle at 50% 40%, var(--gh-card), var(--gh-sheet-bottom));
+    border: 2px solid var(--gh-edge);
+    border-radius: 6px;
+    box-shadow: inset 0 0 10px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  #guild-hall-window .gh-item-owned .gh-slot {
+    border-color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-item-short .gh-slot img {
+    filter: saturate(0.55) brightness(0.8);
+  }
+  #guild-hall-window .gh-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  #guild-hall-window .gh-item-kind {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-item-name {
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: var(--gh-title-ink);
+  }
+  #guild-hall-window .gh-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-tag-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+  #guild-hall-window .gh-chip {
+    padding: 3px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+  }
+  #guild-hall-window .gh-chip-owned {
+    color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-chip-ready {
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-chip-short {
+    color: var(--gh-short);
+  }
+  #guild-hall-window .gh-detail-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, var(--gh-amber-glow), transparent 70%),
+      linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge);
+    border-radius: 4px;
+    box-shadow: 0 8px 18px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-detail-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  #guild-hall-window .gh-slot-large {
+    width: 84px;
+    height: 84px;
+  }
+  #guild-hall-window .gh-detail-name {
+    margin: 2px 0 0;
+    font-family: var(--title-font);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gh-title-ink);
+  }
+  /* The nameplate preview: the name over a dusk sky, the title beside it, the way the
+     title draws over the player in the world. */
+  #guild-hall-window .gh-plate-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 10px 18px;
+    background:
+      radial-gradient(ellipse 60% 70% at 50% 100%, var(--gh-plate-glow), transparent 70%),
+      linear-gradient(180deg, var(--gh-plate-sky-1), var(--gh-plate-sky-2));
+    border: 1px solid var(--gh-edge-dim);
+    border-radius: 4px;
+  }
+  #guild-hall-window .gh-plate-heading {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-plate {
+    font-family: var(--title-font);
+    font-size: 20px;
+    text-align: center;
+    text-shadow:
+      0 0 3px var(--gh-shadow),
+      0 1px 1px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-plate-name {
+    color: var(--gh-plate-name);
+  }
+  #guild-hall-window .gh-plate-title {
+    color: var(--gh-plate-title);
+    white-space: pre-wrap;
+  }
+  /* The live 3D stage of the horse or a weapon appearance (guild_offer_stage_controller.ts): the same
+     dusk frame as the nameplate, with the preview canvas filling it. */
+  #guild-hall-window .gh-model-stage {
+    align-items: stretch;
+    padding: 10px 10px 12px;
+  }
+  #guild-hall-window .gh-model-stage .gh-plate-heading {
+    text-align: center;
+  }
+  #guild-hall-window .gh-stage-slot,
+  #guild-hall-window .gh-stage {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    border-radius: 3px;
+  }
+  #guild-hall-window .gh-stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #guild-hall-window .gh-stage-empty {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    margin: 0;
+    font-size: 13px;
+    text-align: center;
+    color: var(--gh-muted);
+  }
+  /* The reins and the Armory cards are paintings, not crests: they fill their slot. */
+  #guild-hall-window .gh-slot-item img,
+  #guild-hall-window .gh-slot-skin img {
+    object-fit: cover;
+    border-radius: 3px;
+  }
+  #guild-hall-window .gh-detail-summary {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-detail-text,
+  #guild-hall-window .gh-detail-note {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  #guild-hall-window .gh-detail-note {
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-buybar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gh-edge-dim);
+  }
+  #guild-hall-window .gh-buy-price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #guild-hall-window .gh-tag-large {
+    font-size: 20px;
+  }
+  #guild-hall-window .gh-tag-large .gh-tag-icon {
+    width: 28px;
+    height: 28px;
+  }
+  #guild-hall-window .gh-have {
+    font-size: 12px;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-btn {
+    min-width: 120px;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: var(--gh-ink);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-sheet-top));
+    border: 1px solid var(--gh-edge);
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-buy:enabled {
+    color: var(--gh-btn-ink);
+    background: linear-gradient(180deg, var(--gh-amber), var(--gh-edge));
+    box-shadow: 0 0 12px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-btn:disabled {
+    color: var(--gh-muted);
+    cursor: default;
+  }
+  #guild-hall-window .gh-detail-owned .gh-btn {
+    color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-short {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gh-short);
+  }
+  @container (max-width: 560px) {
+    #guild-hall-window .gh-cards {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    /* a narrow notice runs sideways: the portrait at its left, the words beside it */
+    #guild-hall-window .gh-card {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      column-gap: 12px;
+      row-gap: 3px;
+      align-items: start;
+      padding: 18px 14px 14px;
+      text-align: start;
+      transform: none;
+    }
+    #guild-hall-window .gh-card > :not(.gh-portrait, .gh-pin, .gh-wax, .gh-stamp) {
+      grid-column: 2;
+    }
+    #guild-hall-window .gh-ribbon {
+      justify-self: start;
+    }
+    #guild-hall-window .gh-portrait {
+      grid-column: 1;
+      grid-row: 1 / span 4;
+      width: 72px;
+      height: 72px;
+    }
+    #guild-hall-window .gh-rule {
+      display: none;
+    }
+    #guild-hall-window .gh-wax {
+      width: 40px;
+      height: 40px;
+    }
+    #guild-hall-window .gh-shop {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* Forced colors drop the gradients and tints that carry the selected tab, the selected
+     card and the done pips, so each keeps a system-color edge instead. */
+  @media (forced-colors: active) {
+    #guild-hall-window .gh-tab[aria-selected="true"],
+    #guild-hall-window .gh-item-selected {
+      border: 2px solid Highlight;
+    }
+    #guild-hall-window .gh-pip-done,
+    #guild-hall-window .gh-pips-card .gh-pip-done {
+      background: Highlight;
+    }
   }
 
   /* ---------- event calendar ---------- */
@@ -27464,42 +28220,135 @@
   }
   /* ---------- courier ---------- */
   #courier-window {
-    width: min(680px, 100%);
+    width: min(960px, 100%);
     max-height: calc(100dvh - 48px);
   }
   #courier-window .courier-columns {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr) 160px minmax(0, 1fr);
+    align-items: start;
     gap: 16px;
   }
-  #courier-window .courier-list {
+  #courier-window .courier-storage {
+    min-width: 0;
+  }
+  #courier-window .courier-storage-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #courier-window .courier-storage-head h3 {
+    margin: 0;
+  }
+  #courier-window .courier-storage-hint {
+    margin: 8px 0;
+  }
+  #courier-window .courier-grid {
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    max-height: 320px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px;
+  }
+  #courier-window .courier-grid .bank-item {
+    width: 100%;
+    min-height: 44px;
+  }
+  #courier-window .courier-item .item-icon {
+    width: 100%;
+    height: 100%;
+  }
+  #courier-window .courier-item[aria-pressed="true"] {
+    outline: 2px solid var(--color-gold);
+    outline-offset: -2px;
+  }
+  #courier-window .courier-item:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  #courier-window .courier-selected {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--color-keyline) 65%, transparent);
+    color: var(--color-gold);
+    pointer-events: none;
+  }
+  #courier-window .courier-selected .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+  @media (forced-colors: active) {
+    #courier-window .ui-win-title,
+    #courier-window .ui-win-body,
+    #courier-window .ui-muted,
+    #courier-window .ui-win-foot {
+      color: CanvasText;
+    }
+    #courier-window button {
+      color: ButtonText;
+      background: ButtonFace;
+    }
+    #courier-window .courier-item[aria-pressed="true"] {
+      outline-color: Highlight;
+    }
+    #courier-window .courier-selected {
+      color: HighlightText;
+      background: Highlight;
+      forced-color-adjust: none;
+    }
+  }
+  #courier-window .courier-companion {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    text-align: center;
+    align-self: center;
+    gap: 8px;
+    max-width: 200px;
+    margin: 0 auto;
   }
-  #courier-window .courier-item {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
+  #courier-window .courier-companion p {
+    margin: 0;
+  }
+  #courier-window .courier-portrait {
     width: 100%;
-    min-height: 40px;
-    height: auto;
-    text-align: start;
-    white-space: normal;
+    overflow: hidden;
+    border: 1px solid var(--color-gold);
+    border-radius: 50%;
+    aspect-ratio: 1;
+  }
+  #courier-window .courier-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  #courier-window .courier-emblem {
+    color: var(--color-gold);
+  }
+  #courier-window .courier-emblem .ui-icon {
+    width: 28px;
+    height: 28px;
   }
   #courier-window .courier-item-label {
     display: flex;
     align-items: center;
     gap: 8px;
     min-width: 0;
+    overflow-wrap: anywhere;
   }
   #courier-window .courier-item-label img {
     width: 32px;
     height: 32px;
     flex: none;
   }
-  #courier-window .courier-item span:first-child {
-    overflow-wrap: anywhere;
+  #courier-window .courier-cargo-icon {
+    width: 40px;
+    height: 40px;
+    flex: none;
   }
   #courier-window .courier-cargo {
     padding: 0;
@@ -27521,5 +28370,40 @@
   #courier-window .x-btn {
     min-height: 40px;
     min-width: 40px;
+  }
+  @media (max-height: 500px) and (min-width: 601px) {
+    #courier-window .courier-companion {
+      align-self: start;
+      gap: 4px;
+    }
+    #courier-window .courier-portrait {
+      width: 72px;
+    }
+    #courier-window .courier-emblem .ui-icon {
+      width: 20px;
+      height: 20px;
+    }
+    #courier-window .courier-grid {
+      max-height: 144px;
+    }
+  }
+  @media (max-width: 600px) {
+    #courier-window .courier-columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    #courier-window .courier-companion {
+      display: grid;
+      grid-template-columns: 72px auto;
+      justify-items: center;
+      max-width: none;
+      column-gap: 16px;
+    }
+    #courier-window .courier-portrait {
+      grid-row: 1 / 4;
+      width: 72px;
+    }
+    #courier-window .courier-grid {
+      max-height: 160px;
+    }
   }
 }

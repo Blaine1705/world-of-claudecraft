@@ -2,10 +2,8 @@
 // never establish entitlement, level, or specialisation.
 import {
   MEMBERSHIP_ARMOUR_SLOTS,
-  MEMBERSHIP_DEFAULT_PROFILE,
   MEMBERSHIP_ITEMS,
   MEMBERSHIP_PROFILES,
-  MEMBERSHIP_SPEC_PROFILE,
 } from './content/membership';
 import { SEASON2_ARMOR_FRACTION, SEASON2_ITEMS } from './content/pvp_honor_season2';
 import { REFERRAL_ITEMS } from './content/referral';
@@ -17,6 +15,8 @@ import {
   primaryStatBudget,
   SLOT_STAT_MULT,
 } from './item_budget';
+import { membershipProfile } from './membership_profile';
+import { membershipWeaponItem } from './membership_weapon';
 import type { ArmorItemDef, ItemDef, PlayerClass } from './types';
 
 export function isMembershipArmour(itemId: string): boolean {
@@ -35,7 +35,7 @@ function isArmourDefinition(item: ItemDef, matches: (id: string) => boolean): it
 }
 
 export function membershipItemLevel(level: number): number {
-  return level >= 20 ? 25 : Math.max(1, Math.floor(level));
+  return Math.max(1, Math.floor(level)) + 5;
 }
 
 export function membershipArmourItem(
@@ -45,7 +45,8 @@ export function membershipArmourItem(
   level: number,
   active: boolean,
 ): ItemDef {
-  if (!isArmourDefinition(item, isMembershipArmour)) return item;
+  if (!isArmourDefinition(item, isMembershipArmour))
+    return membershipWeaponItem(item, cls, spec, level, active);
   return scalingArmourItem(item, cls, spec, level, active);
 }
 
@@ -69,7 +70,7 @@ function scalingArmourItem(
 ): ItemDef {
   const armorType = maxArmorTypeForClass(cls);
   if (!active) return { ...item, armorType, stats: {}, spellPower: 0, healPower: 0 };
-  const profile = MEMBERSHIP_SPEC_PROFILE[`${cls}_${spec}`] ?? MEMBERSHIP_DEFAULT_PROFILE[cls];
+  const profile = membershipProfile(cls, spec);
   const ilvl = membershipItemLevel(level);
   const stats = normalizeToStaminaModel(
     MEMBERSHIP_PROFILES[profile],

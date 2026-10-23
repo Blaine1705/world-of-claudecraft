@@ -2009,9 +2009,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(state.bank).toEqual(baseline.bank);
     const bytes = Buffer.byteLength(JSON.stringify(state));
     const baselineBytes = Buffer.byteLength(JSON.stringify(baseline));
-    expect(baselineBytes).toBe(258370);
+    // +19 at the merge of the Staff of Changing's discovery id (PR 4281);
+    // +26 with reins_nightwing_chimera.
+    // 258,415 -> 258,437 with Wobbles the Slime's reins (+22, kept).
+    expect(baselineBytes).toBe(258736);
     expect(bytes - baselineBytes).toBe(8284);
-    expect(bytes).toBe(266654);
+    // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
+    expect(bytes).toBe(267020);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2221,7 +2225,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Attribute the stamp-card feature independently from the historical ledger:
     // twenty more bank slots, five discoverable item ids and the Sapling buddy. Mount relics reuse
     // an existing illuminated page and add no character-save key in this fixture.
-    const stampIds = new Set(Object.keys(REFERRAL_STAMP_ITEMS));
+    // Preserve this historical attribution: Wobbles already existed before its reins
+    // moved into the referral table, and Sapling remains owned after Sprites replaces it.
+    const stampIds = new Set(
+      Object.keys(REFERRAL_STAMP_ITEMS).filter((id) => id !== 'reins_wobbles_slime'),
+    );
     const beforeStampCards: CharacterState = {
       ...s2,
       buddies: {
@@ -2275,14 +2283,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // +829). 249,939 with the account-wide buddy merge 7bc9c74af57: +885, the
     // new buddies record (+179 with its key) and +706 of discoverable item ids.
     // Unchanged from there through the referral cards and the later v0.45.0
-    // integration merges.
-    expect(beforeReferralBytes).toBe(249939);
+    // integration merges. 249,958 with the Staff of Changing's discovery id
+    // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
+    // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
+    expect(beforeReferralBytes).toBe(250305);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
     ).toBe(122);
-    // Membership adds eight discoverable item ids and no character entitlement
-    // fields. Isolate the measured content-only growth from the settled save:
+    // Membership adds nine discoverable item ids (the eight pieces, then the
+    // Staff of Changing's 19 bytes, PR 4281) and no character entitlement
+    // fields; the byte history below predates the staff. Isolate the measured content-only growth from the settled save:
     // 233,360 -> 233,515 bytes, all 155 bytes in itemsDiscovered (241,608 ->
     // 241,763 with the quest gear, blues and role fill underneath; 242,799 -> 242,954 with
     // the Mirefen world-boss branch too; 249,784 -> 249,939 with the five-dungeon
@@ -2298,13 +2309,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         ),
       },
     };
-    expect(membershipIds.size).toBe(8);
+    expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
-    expect(beforeMembershipBytes).toBe(249784);
-    expect(beforeReferralBytes - beforeMembershipBytes).toBe(155);
+    // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
+    expect(beforeMembershipBytes).toBe(250131);
+    expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
-    ).toBe(155);
+    ).toBe(174);
     const reMint =
       'the whole-character band is a RE-MEASURE obligation, not a budget: ' +
       'record the measured value in the ledger above with what moved it, then re-base ' +
@@ -2486,6 +2498,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'reins_rallycart_rxt',
       'reins_goblin_rocket_sled',
       'reins_avian_strider',
+      'reins_nightwing_chimera',
+      'reins_wobbles_slime',
     ] as const;
     function withoutDevMountReleaseContent(state: CharacterState): CharacterState {
       const copy = JSON.parse(JSON.stringify(state)) as CharacterState;
@@ -2498,10 +2512,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     const withoutDevMountRelease = withoutDevMountReleaseContent(withoutFieldKit);
     const devMountReleaseDelta =
       fieldBytes(withoutFieldKit, 'deedStats') - fieldBytes(withoutDevMountRelease, 'deedStats');
-    expect(devMountReleaseDelta).toBe(71);
+    // 97 -> 119 with Wobbles the Slime's reins (`"reins_wobbles_slime",`, 22 bytes).
+    expect(devMountReleaseDelta).toBe(119);
     expect(
       counterfactualBytes - Buffer.byteLength(JSON.stringify(withoutDevMountRelease), 'utf8'),
-    ).toBe(71);
+    ).toBe(119);
     // The Mirefen world boss (Balgath, the One-Eyed Foreman) and its quest
     // chain: the one content mover on this branch. Attributed exactly the way
     // withoutFieldKit, withoutBramblehideContent and withoutDevMountRelease
@@ -2663,8 +2678,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         183 +
         1548 +
         50 +
-        // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation.
-        71 +
+        // 49 -> 71 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) in the dev-mount isolation; 97 with reins_nightwing_chimera (+26); 119 with
+        // reins_wobbles_slime (+22).
+        119 +
         375 +
         358 +
         // Plus 17 at the weekly emissary rebase: the Emissary's Cache id in the
@@ -2725,8 +2741,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // no Reliquary pages). Predicted from the literals BEFORE the run and
         // MEASURED equal (83,911 to 85,452).
         1541 +
-        // Membership's eight discoverable item ids, isolated from withoutReferral above.
-        155 +
+        // Membership's nine discoverable item ids (the eight pieces plus the Staff
+        // of Changing's 19 bytes, PR 4281), isolated from withoutReferral above.
+        174 +
         // Plus 6,100 at the five-dungeon rework (PR 4352) on the v0.45.0
         // integration, MEASURED 2026-10 across its merge (fc742198392 to
         // 106a086b617): deeds +829 (24 more deed rows, its encounter deeds and
@@ -2738,7 +2755,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         2453 +
         // Legacy whistle and charm discovery ids, plus the retained buddy collection.
         706 +
-        buddyCollectionBytes,
+        // Plus 18 for the sprite buddy's whistle id (`"whistle_sprites",`, id
+        // length + 3) in itemsDiscovered.
+        18 +
+        buddyCollectionBytes +
+        // Lantern Hall deeds and discovered seal/reins ids.
+        281,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2785,7 +2807,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // rework, lore guide deed included, MEASURED 2026-10 across its merge
       // (the +829 and +2,453 above; the branch's own +648 + 41 and +993
       // undercounted the merged tree).
-      deeds: 1572,
+      // deeds 1,572 -> 1,808 with Lantern Hall (#4530), its deed rows (+236 of the +281
+      // above), MEASURED on the merged tree.
+      deeds: 1808,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
@@ -2796,7 +2820,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Then -> 20,648 at the five-dungeon rework (PR 4352): the +2,818 above,
       // MEASURED across its merge (the branch's own +1,448 undercounted).
       // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
-      deedStats: 21354,
+      // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
+      // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21436.
+      deedStats: 21436,
       reliquary: 13954,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2843,7 +2869,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // (240,132 -> 246,232), MEASURED 2026-10 across its merge (the +829,
       // +2,818 and +2,453 attributed above; the branch's own +3,130 undercounted).
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (247,117).
-    ).toBe(247117);
+      // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
+      // The sprite buddy's whistle id adds 18 (247,154).
+    ).toBe(247435);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2882,7 +2910,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // (242,942 -> 249,042), MEASURED 2026-10 across its merge (the branch's
       // own +3,130 undercounted).
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (249,927).
-    ).toBe(249927);
+      // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
+      // reins_wobbles_slime adds 22 (249,994).
+    ).toBe(250293);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3017,8 +3047,19 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // container or ceiling changed shape, and nothing has moved it since through
     // the head of the integration branch. Floor at measurement minus 380, edge
     // at measurement plus one: 249681..250062.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249681);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(250062);
+    // RE-BASED for the Staff of Changing (PR 4281): 250,080 bytes, exactly +19
+    // from its one discovery id, isolated above with membership.
+    // RE-BASED for the Nightwing Chimaera (reins_nightwing_chimera): 250,106 bytes,
+    // +26 from its discovery id, isolated above in DEV_MOUNT_RELEASE_ITEM_IDS.
+    // Same 381-byte band: 249726..250107.
+    // RE-BASED for Wobbles the Slime (reins_wobbles_slime): 250,128 bytes, +22
+    // from its discovery id, isolated above in DEV_MOUNT_RELEASE_ITEM_IDS.
+    // Same 381-byte band: 249748..250129.
+    // RE-BASED for the sprite buddy: 250,146 bytes, +18 from its whistle id in
+    // itemsDiscovered. Floor at measurement minus 380, edge at measurement plus
+    // one: 249766..250147.
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250047);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(250428);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

@@ -412,8 +412,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     sellValue: 0,
   },
-  // Annual membership bundle reward, delivered only after verified payment.
-  // The tank is the placeholder mount. Its permanent reins stay soulbound.
+  // Retired annual placeholder: keep existing saved keys usable and soulbound.
   reins_terrorspark_groundshaker: {
     id: 'reins_terrorspark_groundshaker',
     name: 'Ignition Key: Dreadspark Groundshaker',
@@ -441,6 +440,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
     buyValue: 1_000_000, // 100 gold in copper
+  },
+  // Annual membership reward, delivered only after verified payment.
+  reins_nightwing_chimera: {
+    id: 'reins_nightwing_chimera',
+    name: 'Reins of the Nightwing Chimaera',
+    kind: 'mount',
+    mount: 'nightwing_chimera',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
   },
   // Active buddy whistles are soulbound grant tokens consumed on use.
   // Retired whistles and charms retain their original definitions so existing
@@ -744,6 +755,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Forgemaw The Molten Whistle',
     kind: 'buddy',
     buddy: 'forgemaw',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // The flame-sprite pair is unlocked directly by the fifth completed referral.
+  // This whistle remains the dev/admin token and reward artwork.
+  whistle_sprites: {
+    id: 'whistle_sprites',
+    name: 'Flicker and Glimmer Whistle',
+    kind: 'buddy',
+    buddy: 'sprites',
     soulbound: true,
     quality: 'epic',
     sellValue: 50_000, // 5g, the flat vendor price every whistle takes

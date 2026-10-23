@@ -351,6 +351,8 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'merecleaver',
       'moonwrack_stave',
       'turnkeys_shank',
+      // The membership Staff of Changing (membership-weapon-2026-10-14, PR 4281).
+      'membership_staff',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

@@ -274,10 +274,28 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "reins_nightwing_chimera",
+      "name": "Reins of the Nightwing Chimaera",
+      "sourcePack": "project-authored",
+      "sourceFile": "three-quarter Idle portrait render of the shipped mount model (public/models/mounts/nightwing_chimera.glb), background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)",
+      "sourceSha256": "fb95c68d3be39a0183581b3956b786b40d5188a9c3db921f507187970ce487f5",
+      "shippingSha256": "8cf7963937183614ce8203fa06cb0b73fb5fe5608f8b073f28e381bac133aa91"
+    },
+    {
       "itemId": "reins_lanternback_troll",
       "name": "Lamplighter's Yoke: Grumbol",
       "sourcePack": "woc_owner_supplied_art",
       "sourceFile": "troll icon 2.png (owner-supplied painted master, 624x624)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_wobbles_slime",
+      "name": "Jelly Saddle: Wobbles",
+      "sourcePack": "project-authored",
+      "sourceFile": "front three-quarter render of the shipped mount model (public/models/mounts/wobbles_slime.glb) in headless Blender, keyed onto an opaque dark vignette and downscaled to the 128px opaque woc-item-icon-v1 shipping format (docs/design/slime-mount/README.md)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -6859,85 +6877,6 @@
       ]
     },
     {
-      "batchId": "faction-vendor-icons-2026-09-16",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_vendor_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_vendor_icons.mjs.",
-      "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
-      "itemIds": [
-        "artificers_welding_cowl",
-        "automaton_cog_ring",
-        "champion_dawn_medallion",
-        "champion_forged_loop",
-        "champion_rift_band",
-        "clockwork_tinkers_pack",
-        "dawnkeeper_consecrated_mace",
-        "forgemaster_crag_cleaver",
-        "order_prayer_beads",
-        "rift_surveyors_satchel",
-        "rift_watchers_band",
-        "riftwalkers_tunic",
-        "riftwarden_voidblade",
-        "templar_dawn_shield",
-        "vestments_of_the_acolyte"
-      ]
-    },
-    {
-      "batchId": "faction-ladder-icons-2026-09-23",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_vendor_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_vendor_icons.mjs.",
-      "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
-      "itemIds": [
-        "acolytes_signet",
-        "champions_dawn_loop",
-        "cogwork_choker",
-        "cord_of_the_dawn",
-        "dawnkeepers_circle",
-        "dawnlit_slippers",
-        "forgemasters_girdle",
-        "forgemasters_sabatons",
-        "forgewall_gorget",
-        "formula_dawnfire_etching",
-        "formula_dawns_benediction",
-        "formula_piston_drive",
-        "formula_riftwalkers_grace",
-        "riftwalkers_cord",
-        "riftwalkers_treads",
-        "riftwardens_pendant",
-        "tidewatchers_locket"
-      ]
-    },
-    {
-      "batchId": "clue-scroll-icons-2026-09-17",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_clue_scroll_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of both items is the ITEMS_TO_GENERATE table in scripts/generate_clue_scroll_icons.mjs.",
-      "provenanceRecord": "docs/achievements/clue-scroll-icons-2026-09-17/",
-      "itemIds": [
-        "clue_scroll",
-        "treasure_casket"
-      ]
-    },
-    {
       "batchId": "warfare-season2-weapons-2026-09-25",
       "source": "OpenAI built-in image generation (gpt-image-1)",
       "owner": "World of ClaudeCraft",
@@ -6958,39 +6897,6 @@
       ]
     },
     {
-      "batchId": "faction-rewards-icons-2026-09-17",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_reward_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_reward_icons.mjs.",
-      "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
-      "itemIds": [
-        "allied_hearthstone",
-        "allied_vanguard_duffel",
-        "clockwork_shock_bomb",
-        "clockwork_target_dummy",
-        "dawn_battle_standard",
-        "dense_sharpening_stone",
-        "elixir_of_mana_regeneration",
-        "formula_enchant_feet_shadowstride",
-        "formula_enchant_gloves_forged_might",
-        "formula_enchant_offhand_spirit",
-        "pattern_reinforced_armor_kit",
-        "plans_dense_sharpening_stone",
-        "potion_of_invisibility",
-        "recipe_elixir_of_mana_regeneration",
-        "recipe_potion_of_invisibility",
-        "reinforced_armor_kit",
-        "rift_feather_glider",
-        "schematic_clockwork_shock_bomb"
-      ]
-    },
-    {
       "batchId": "buried-hoard-treasure-maps-2026-09-19",
       "source": "OpenAI built-in image generation, one dedicated generation per rarity; reviewed and normalized locally",
       "owner": "World of ClaudeCraft",
@@ -7008,117 +6914,6 @@
         "treasure_map_rare",
         "treasure_map_epic",
         "treasure_map_legendary"
-      ]
-    },
-    {
-      "batchId": "hoard-boss-loot-icons-2026-09-20",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_hoard_loot_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (a slot silhouette, the dropping boss palette and emblem, and a tier finish) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every icon is scripts/generate_hoard_loot_icons.mjs.",
-      "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
-      "itemIds": [
-        "band_mountains_weight",
-        "bone_studded_pauldrons",
-        "breastplate_tectonic_might",
-        "broodmother_chitin_cowl",
-        "chained_ember_choker",
-        "chalice_of_living_tides",
-        "cinder_stitched_robes",
-        "collapsar_band_of_nyxaris",
-        "coral_encrusted_girdle",
-        "cowl_of_event_horizon",
-        "earthshaker_warboots",
-        "ember_wrought_crown",
-        "frostbitten_rime_slippers",
-        "gale_strider_boots",
-        "glacier_hewn_bulwark",
-        "hauberk_tempest_gale",
-        "legendary_band_mountains_weight",
-        "legendary_bone_studded_pauldrons",
-        "legendary_breastplate_tectonic_might",
-        "legendary_broodmother_chitin_cowl",
-        "legendary_chained_ember_choker",
-        "legendary_chalice_of_living_tides",
-        "legendary_cinder_stitched_robes",
-        "legendary_collapsar_band_of_nyxaris",
-        "legendary_coral_encrusted_girdle",
-        "legendary_cowl_of_event_horizon",
-        "legendary_earthshaker_warboots",
-        "legendary_ember_wrought_crown",
-        "legendary_frostbitten_rime_slippers",
-        "legendary_gale_strider_boots",
-        "legendary_glacier_hewn_bulwark",
-        "legendary_hauberk_tempest_gale",
-        "legendary_legguards_of_the_ossuary",
-        "legendary_mantle_of_singularity",
-        "legendary_molten_clinker_girdle",
-        "legendary_monolithic_shoulderguards",
-        "legendary_orb_collapsing_void",
-        "legendary_ossuary_bone_crown",
-        "legendary_pendant_continuous_flow",
-        "legendary_permafrost_legguards",
-        "legendary_rime_crusted_grips",
-        "legendary_riptide_handwraps",
-        "legendary_seal_of_the_cryptwalker",
-        "legendary_silkstalker_woven_vest",
-        "legendary_spun_venom_spaulders",
-        "legendary_storm_tuned_buckler",
-        "legendary_tempest_strike_grips",
-        "legendary_venom_etched_waistcord",
-        "legguards_of_the_ossuary",
-        "mantle_of_singularity",
-        "molten_clinker_girdle",
-        "monolithic_shoulderguards",
-        "orb_collapsing_void",
-        "ossuary_bone_crown",
-        "pendant_continuous_flow",
-        "permafrost_legguards",
-        "rare_band_mountains_weight",
-        "rare_bone_studded_pauldrons",
-        "rare_breastplate_tectonic_might",
-        "rare_broodmother_chitin_cowl",
-        "rare_chained_ember_choker",
-        "rare_chalice_of_living_tides",
-        "rare_cinder_stitched_robes",
-        "rare_collapsar_band_of_nyxaris",
-        "rare_coral_encrusted_girdle",
-        "rare_cowl_of_event_horizon",
-        "rare_earthshaker_warboots",
-        "rare_ember_wrought_crown",
-        "rare_frostbitten_rime_slippers",
-        "rare_gale_strider_boots",
-        "rare_glacier_hewn_bulwark",
-        "rare_hauberk_tempest_gale",
-        "rare_legguards_of_the_ossuary",
-        "rare_mantle_of_singularity",
-        "rare_molten_clinker_girdle",
-        "rare_monolithic_shoulderguards",
-        "rare_orb_collapsing_void",
-        "rare_ossuary_bone_crown",
-        "rare_pendant_continuous_flow",
-        "rare_permafrost_legguards",
-        "rare_rime_crusted_grips",
-        "rare_riptide_handwraps",
-        "rare_seal_of_the_cryptwalker",
-        "rare_silkstalker_woven_vest",
-        "rare_spun_venom_spaulders",
-        "rare_storm_tuned_buckler",
-        "rare_tempest_strike_grips",
-        "rare_venom_etched_waistcord",
-        "rime_crusted_grips",
-        "riptide_handwraps",
-        "seal_of_the_cryptwalker",
-        "silkstalker_woven_vest",
-        "spun_venom_spaulders",
-        "storm_tuned_buckler",
-        "tempest_strike_grips",
-        "venom_etched_waistcord"
       ]
     },
     {
@@ -7528,6 +7323,24 @@
       ]
     },
     {
+      "batchId": "membership-weapon-2026-10-14",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "itemIds": [
+        "membership_staff"
+      ],
+      "styleReference": "public/ui/items/kingsbane_last_oath.webp (Style only: diagonal composition and safe padding); public/ui/items/eastbrook_buckler.webp (Style only: metal and wood material rendering); public/ui/items/arcanite_mining_pick.webp (Style only: restrained magical accent)",
+      "commonPrompt": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory icon. Paint an original Staff of Changing (membership_staff) for World of ClaudeCraft, contract woc-item-icon-v1. This is a NEW authored item, not an edit or duplicate of any reference. Subject: one complete magical staff with a dark midnight-blue wrapped shaft, brushed silver fittings, narrow antique-gold bands, and a distinctive faceted pale-blue crystal enclosed in two asymmetrical silver crescent prongs, suggesting a weapon that changes form. Clear substantial staff silhouette, full tip and pommel visible, diagonal from lower-left to upper-right, approximately 72 percent square fill and safe padding on every side. No additional weapons or objects. Input roles: Image 1 (kingsbane_last_oath) is STYLE ONLY for diagonal long-weapon composition and safe tip padding, do not copy its sword; Image 2 (eastbrook_buckler) is STYLE ONLY for brushed metal and tactile materials, do not copy its shield; Image 3 (arcanite_mining_pick) is STYLE ONLY for restrained magical accent, do not copy its pick or purple palette. Premium hand-painted classic dark-fantasy MMO inventory art with crisp focal edges, softer peripheral brushwork, tactile wood/leather/metal, warm top-left key light, cool deep bottom-right shadow. The background is a fully opaque charcoal, muted umber and midnight-navy painted vignette with restrained atmosphere and grounded contact shadow, no flat black void. Magical blue light remains confined to the crystal so it cannot erase the silhouette. Readable at 22, 28, 40, 128 pixels and in a 64px circular crop. Square 1024x1024 output. No text, letters, numbers, runes, pseudo-writing, signature, watermark, rarity border, frame, UI chrome, checkerboard, transparency, mannequin, person, hand, split sheet, collage, clipped tip or cropped base.",
+      "provenanceRecords": [
+        "docs/achievements/membership-weapon-2026-10-14/accepted-art.json"
+      ]
+    },
+    {
       "batchId": "quest-role-fill-icons-2026-10-07",
       "source": "OpenAI built-in image generation",
       "owner": "World of ClaudeCraft",
@@ -7716,211 +7529,6 @@
       ]
     },
     {
-      "batchId": "sunken-bastion-icons-2026-09-29",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_sunken_bastion_item_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_sunken_bastion_item_icons.mjs.",
-      "provenanceRecord": "docs/achievements/sunken-bastion-icons-2026-09-29/",
-      "itemIds": [
-        "knight_commanders_longsword",
-        "gaolers_chain_girdle",
-        "rusted_shackle_grips",
-        "drowned_wardens_mantle",
-        "gaolyard_cudgel",
-        "drowned_commanders_breastplate",
-        "gaolyard_striders",
-        "gaolers_iron_key",
-        "jailers_iron_gauntlets",
-        "turnkeys_keyring_belt",
-        "turnkeys_lantern_cowl"
-      ]
-    },
-    {
-      "batchId": "drowned-temple-icons-2026-09-30",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_drowned_temple_item_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_drowned_temple_item_icons.mjs.",
-      "provenanceRecord": "docs/achievements/drowned-temple-icons-2026-09-30/",
-      "itemIds": [
-        "conchplate_girdle",
-        "pale_chorus_leggings",
-        "refrain_silk_gloves",
-        "chorus_conch",
-        "heroic_chorus_conch",
-        "tideglass_pauldrons",
-        "moonburn_treads",
-        "prism_etched_cowl",
-        "tideglass_shiv",
-        "pale_chorus_vestment",
-        "tideglass_warmaul"
-      ]
-    },
-    {
-      "batchId": "wildheart-basin-icons-2026-10-02",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_wildheart_basin_item_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_wildheart_basin_item_icons.mjs.",
-      "provenanceRecord": "docs/achievements/wildheart-basin-icons-2026-10-02/",
-      "itemIds": [
-        "beastpit_warbelt",
-        "jaguar_hide_jerkin",
-        "hexbone_handwraps",
-        "rootbound_sabatons",
-        "pollen_dusted_leggings",
-        "bloomsilk_cowl",
-        "falls_blessed_staff",
-        "fanglords_hide_mantle",
-        "thornroot_greathelm",
-        "fanglords_whistle",
-        "gorgebloom_seedpod"
-      ]
-    },
-    {
-      "batchId": "gravewyrm-sanctum-icons-2026-10-03",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_gravewyrm_sanctum_item_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_gravewyrm_sanctum_item_icons.mjs.",
-      "provenanceRecord": "docs/achievements/gravewyrm-sanctum-icons-2026-10-03/",
-      "itemIds": [
-        "foremans_grips",
-        "serac_stride_boots",
-        "seal_rune_mantle",
-        "thawbound_legguards",
-        "pyre_tenders_hood",
-        "meltwater_cord",
-        "hammer_of_the_open_lock",
-        "vestments_of_the_waking_rite",
-        "foremans_last_link",
-        "phial_of_the_tithe",
-        "quenchwater_flask"
-      ]
-    },
-    {
-      "batchId": "hollow-crypt-icons-2026-10-03",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_hollow_crypt_item_icons.mjs); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art with a per-plate volume sheen and a soft paint-grain filter, over a three-stop radial ground, a paper-grain overlay) rasterized at the 512 master to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_hollow_crypt_item_icons.mjs.",
-      "provenanceRecord": "docs/achievements/hollow-crypt-icons-2026-10-03/",
-      "itemIds": [
-        "gravedirt_treads",
-        "bellrope_girdle",
-        "sextons_spadehaft",
-        "rimesilk_mantle",
-        "bonechill_carapace_vest",
-        "rimeweb_hunters_leggings",
-        "rimeweb_fang",
-        "cantors_cassock",
-        "choirward_leggings",
-        "choristers_gloves",
-        "cantors_hymnal",
-        "heroic_cantors_hymnal",
-        "gravecallers_vestments",
-        "unquiet_stalkers_hood",
-        "sextons_burial_spade",
-        "rimesilk_hood"
-      ]
-    },
-    {
-      "batchId": "lower-dungeon-blues-icons-2026-10-08",
-      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_hollow_crypt_item_icons.mjs CRYPT_BLUES, scripts/generate_sunken_bastion_item_icons.mjs BASTION_BLUES, scripts/generate_drowned_temple_item_icons.mjs TEMPLE_BLUES); no image model",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleContract": {
-        "id": "woc-item-icon-v1",
-        "document": "docs/design/item-icon-art-style.md"
-      },
-      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
-      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground, a paper-grain overlay; the Crypt's with its per-plate volume sheen and soft paint-grain filter) rasterized at the 512 master to an opaque 128x128 sRGB WebP. Each generated Heroic armour clone is its base composition under a deeper ground with a halo and extra glints (the heroic_chorus_conch recipe). The exact vector source of every item is the CRYPT_BLUES, BASTION_BLUES and TEMPLE_BLUES tables in the three dungeon generators.",
-      "provenanceRecord": "docs/achievements/lower-dungeon-blues-icons-2026-10-08/",
-      "itemIds": [
-        "spadeworn_gauntlets",
-        "gravedirt_grips",
-        "bellrope_mitts",
-        "rimewreath_coif",
-        "rime_laced_hood",
-        "lamenting_veil",
-        "choirward_pauldrons",
-        "choristers_spaulders",
-        "cantors_stole",
-        "knellbound_hauberk",
-        "candlewatch_jerkin",
-        "robe_of_the_unquiet_rite",
-        "gravecallers_rod",
-        "heroic_spadeworn_gauntlets",
-        "heroic_gravedirt_grips",
-        "heroic_bellrope_mitts",
-        "heroic_rimewreath_coif",
-        "heroic_rime_laced_hood",
-        "heroic_lamenting_veil",
-        "heroic_choirward_pauldrons",
-        "heroic_choristers_spaulders",
-        "heroic_cantors_stole",
-        "heroic_knellbound_hauberk",
-        "heroic_candlewatch_jerkin",
-        "heroic_robe_of_the_unquiet_rite",
-        "portcullis_girdle",
-        "cellwatch_belt",
-        "lanternwick_sash",
-        "turnkeys_shank",
-        "gaolyard_jerkin",
-        "brinewarden_robe",
-        "fogbinders_rod",
-        "heroic_portcullis_girdle",
-        "heroic_cellwatch_belt",
-        "heroic_lanternwick_sash",
-        "heroic_gaolyard_jerkin",
-        "heroic_brinewarden_robe",
-        "conchplate_sabatons",
-        "pale_chorus_slippers",
-        "tideglass_gauntlets",
-        "moonburn_grips",
-        "prism_etched_handwraps",
-        "mere_crested_helm",
-        "mereskin_hood",
-        "merewater_cowl",
-        "merecleaver",
-        "moonwrack_stave",
-        "heroic_conchplate_sabatons",
-        "heroic_pale_chorus_slippers",
-        "heroic_tideglass_gauntlets",
-        "heroic_moonburn_grips",
-        "heroic_prism_etched_handwraps",
-        "heroic_mere_crested_helm",
-        "heroic_mereskin_hood",
-        "heroic_merewater_cowl"
-      ]
-    },
-    {
       "batchId": "buddy-whistle-icons-2026-08-28",
       "source": "In-engine render of the committed buddy GLB models (scripts/assets/render_buddy_item_icons.mjs: public/models/buddies/*.glb, plus the shipped creature and skeleton rigs the beast and undead buddies reuse, tinted per species, through the asset-pipeline's shared hero-view preview renderer). Not composited onto the painted-icon radial vignette the rest of the catalog uses; the renderer's own dark-neutral clear color stands in for it.",
       "owner": "World of ClaudeCraft",
@@ -7958,6 +7566,7 @@
         "whistle_skeleton",
         "whistle_crystal_lich",
         "whistle_forgemaw",
+        "whistle_sprites",
         "whistle_crystal_tide",
         "whistle_phantom"
       ],
@@ -7975,6 +7584,910 @@
         "charm_stag_gilded"
       ],
       "commonPrompt": "Not a text-to-image prompt: the whistle_stag.webp still multiplied 50% toward the look's tint (acorn 0xb8863b, gilded 0xffd700), re-encoded at 128px."
+    },
+    {
+      "batchId": "warfare-season2-warrior-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Warrior Season 2 sets, each with five individually generated paintings. Bladewake: worn steel, aged brass and oxblood. Bloodmarch: blackened iron, hammered copper and crimson. Ironmarch: rounded reinforced blue-grey steel, silver edges and navy quilting. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-warrior-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_warrior_arms_helmet",
+        "vanguard_warrior_arms_shoulder",
+        "vanguard_warrior_arms_chest",
+        "vanguard_warrior_arms_legs",
+        "vanguard_warrior_arms_gloves",
+        "vanguard_warrior_fury_helmet",
+        "vanguard_warrior_fury_shoulder",
+        "vanguard_warrior_fury_chest",
+        "vanguard_warrior_fury_legs",
+        "vanguard_warrior_fury_gloves",
+        "vanguard_warrior_prot_helmet",
+        "vanguard_warrior_prot_shoulder",
+        "vanguard_warrior_prot_chest",
+        "vanguard_warrior_prot_legs",
+        "vanguard_warrior_prot_gloves"
+      ]
+    },
+    {
+      "batchId": "warfare-season2-paladin-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Paladin Season 2 sets, each with five individually generated paintings. Sunvigil: silver chainmail, gold and ivory. Shieldvow: reinforced steel, gold, blue quilting and azure gems. Lightbrand: angular steel and gold with burgundy backing. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-paladin-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_paladin_holy_helmet",
+        "vanguard_paladin_holy_shoulder",
+        "vanguard_paladin_holy_chest",
+        "vanguard_paladin_holy_legs",
+        "vanguard_paladin_holy_gloves",
+        "vanguard_paladin_protection_helmet",
+        "vanguard_paladin_protection_shoulder",
+        "vanguard_paladin_protection_chest",
+        "vanguard_paladin_protection_legs",
+        "vanguard_paladin_protection_gloves",
+        "vanguard_paladin_retribution_helmet",
+        "vanguard_paladin_retribution_shoulder",
+        "vanguard_paladin_retribution_chest",
+        "vanguard_paladin_retribution_legs",
+        "vanguard_paladin_retribution_gloves"
+      ]
+    },
+    {
+      "batchId": "warfare-season2-hunter-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Hunter Season 2 leather sets, each with five individually generated paintings. Packwarden: brown leather, tawny fur and ivory toggles. Farsight: fitted teal and slate leather, navy lining and pale seams. Snaretooth: rough olive and russet hide, dark straps and tooth fasteners. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-hunter-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_hunter_beast_mastery_helmet",
+        "vanguard_hunter_beast_mastery_shoulder",
+        "vanguard_hunter_beast_mastery_chest",
+        "vanguard_hunter_beast_mastery_legs",
+        "vanguard_hunter_beast_mastery_gloves",
+        "vanguard_hunter_marksmanship_helmet",
+        "vanguard_hunter_marksmanship_shoulder",
+        "vanguard_hunter_marksmanship_chest",
+        "vanguard_hunter_marksmanship_legs",
+        "vanguard_hunter_marksmanship_gloves",
+        "vanguard_hunter_survival_helmet",
+        "vanguard_hunter_survival_shoulder",
+        "vanguard_hunter_survival_chest",
+        "vanguard_hunter_survival_legs",
+        "vanguard_hunter_survival_gloves"
+      ]
+    },
+    {
+      "batchId": "warfare-season2-rogue-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Rogue leather sets. Nightcut: black and muted green fitted angular panels. Brawlmark: padded oxblood and brown leather with brass fasteners. Shadewalk: violet leather and indigo cloth with pewter clasps. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-rogue-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_rogue_assassination_helmet",
+        "vanguard_rogue_assassination_shoulder",
+        "vanguard_rogue_assassination_chest",
+        "vanguard_rogue_assassination_legs",
+        "vanguard_rogue_assassination_gloves",
+        "vanguard_rogue_combat_helmet",
+        "vanguard_rogue_combat_shoulder",
+        "vanguard_rogue_combat_chest",
+        "vanguard_rogue_combat_legs",
+        "vanguard_rogue_combat_gloves",
+        "vanguard_rogue_subtlety_helmet",
+        "vanguard_rogue_subtlety_shoulder",
+        "vanguard_rogue_subtlety_chest",
+        "vanguard_rogue_subtlety_legs",
+        "vanguard_rogue_subtlety_gloves"
+      ]
+    },
+    {
+      "batchId": "warfare-season2-priest-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Priest cloth sets. Veilpsalm: ivory and claret with brass trim. Gracewing: cream and mist-blue flowing fabric with pearl clasps. Duskhymn: aubergine and smoky plum with silver and amethyst clasps. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-priest-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_priest_discipline_helmet",
+        "vanguard_priest_discipline_shoulder",
+        "vanguard_priest_discipline_chest",
+        "vanguard_priest_discipline_legs",
+        "vanguard_priest_discipline_gloves",
+        "vanguard_priest_holy_helmet",
+        "vanguard_priest_holy_shoulder",
+        "vanguard_priest_holy_chest",
+        "vanguard_priest_holy_legs",
+        "vanguard_priest_holy_gloves",
+        "vanguard_priest_shadow_helmet",
+        "vanguard_priest_shadow_shoulder",
+        "vanguard_priest_shadow_chest",
+        "vanguard_priest_shadow_legs",
+        "vanguard_priest_shadow_gloves"
+      ]
+    },
+    {
+      "batchId": "warfare-season2-shaman-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Shaman mail sets. Tempestwrit: dark chainmail with indigo bindings and copper fittings. Galeborn: silver-grey mail with brown harness straps and teal ties. Brineward: fine sea-grey mail with sea-green textile panels and pearl clasps. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-shaman-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_shaman_elemental_helmet",
+        "vanguard_shaman_elemental_shoulder",
+        "vanguard_shaman_elemental_chest",
+        "vanguard_shaman_elemental_legs",
+        "vanguard_shaman_elemental_gloves",
+        "vanguard_shaman_enhancement_helmet",
+        "vanguard_shaman_enhancement_shoulder",
+        "vanguard_shaman_enhancement_chest",
+        "vanguard_shaman_enhancement_legs",
+        "vanguard_shaman_enhancement_gloves",
+        "vanguard_shaman_restoration_helmet",
+        "vanguard_shaman_restoration_shoulder",
+        "vanguard_shaman_restoration_chest",
+        "vanguard_shaman_restoration_legs",
+        "vanguard_shaman_restoration_gloves"
+      ]
+    },
+    {
+      "batchId": "warfare-season2-mage-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Mage cloth sets. Arcane: midnight blue and violet with gold piping and amber hourglass clasps. Fire: burnt orange and charcoal with copper-thread trim and garnets. Frost: slate-blue and ice-grey padded cloth with white fur edging. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-mage-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_mage_arcane_helmet",
+        "vanguard_mage_arcane_shoulder",
+        "vanguard_mage_arcane_chest",
+        "vanguard_mage_arcane_legs",
+        "vanguard_mage_arcane_gloves",
+        "vanguard_mage_fire_helmet",
+        "vanguard_mage_fire_shoulder",
+        "vanguard_mage_fire_chest",
+        "vanguard_mage_fire_legs",
+        "vanguard_mage_fire_gloves",
+        "vanguard_mage_frost_helmet",
+        "vanguard_mage_frost_shoulder",
+        "vanguard_mage_frost_chest",
+        "vanguard_mage_frost_legs",
+        "vanguard_mage_frost_gloves"
+      ]
+    },
+    {
+      "batchId": "warfare-season2-warlock-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Warlock cloth sets. Dreadquill: muted moss green and black cloth with silver quill trim. Marrowbound: burgundy and charcoal cloth with ivory bone fittings. Slagcrown: ash grey and black cloth with crimson lining and dark bronze. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-warlock-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_warlock_affliction_helmet",
+        "vanguard_warlock_affliction_shoulder",
+        "vanguard_warlock_affliction_chest",
+        "vanguard_warlock_affliction_legs",
+        "vanguard_warlock_affliction_gloves",
+        "vanguard_warlock_demonology_helmet",
+        "vanguard_warlock_demonology_shoulder",
+        "vanguard_warlock_demonology_chest",
+        "vanguard_warlock_demonology_legs",
+        "vanguard_warlock_demonology_gloves",
+        "vanguard_warlock_destruction_helmet",
+        "vanguard_warlock_destruction_shoulder",
+        "vanguard_warlock_destruction_chest",
+        "vanguard_warlock_destruction_legs",
+        "vanguard_warlock_destruction_gloves"
+      ]
+    },
+    {
+      "batchId": "warfare-season2-druid-icons-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "House-style review anchors: heroic_crownforged_dreadhelm.webp, eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually before generation; supplied as conversation context, not image-edit inputs.",
+      "commonPrompt": "Three coordinated Druid leather sets. Starwarden: indigo hide with silver crescents and ivory feathers. Bloodmane: russet hide with rust fur and ivory fang toggles. Thistlebloom: sage and tan leaf-shaped hide with small lavender thistles. Exact individual prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/warfare-season2-druid-icons-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "vanguard_druid_balance_helmet",
+        "vanguard_druid_balance_shoulder",
+        "vanguard_druid_balance_chest",
+        "vanguard_druid_balance_legs",
+        "vanguard_druid_balance_gloves",
+        "vanguard_druid_feral_helmet",
+        "vanguard_druid_feral_shoulder",
+        "vanguard_druid_feral_chest",
+        "vanguard_druid_feral_legs",
+        "vanguard_druid_feral_gloves",
+        "vanguard_druid_restoration_helmet",
+        "vanguard_druid_restoration_shoulder",
+        "vanguard_druid_restoration_chest",
+        "vanguard_druid_restoration_legs",
+        "vanguard_druid_restoration_gloves"
+      ]
+    },
+    {
+      "batchId": "horse-whistle-icon-v045-2026-10-22",
+      "source": "Project model render with the existing Guide browser renderer",
+      "owner": "World of ClaudeCraft",
+      "license": "Project render, project asset; underlying shipped model license retained (see CREDITS.md)",
+      "styleReference": "Shipped buddy models and existing whistle inventory renders",
+      "provenanceRecord": "docs/achievements/horse-whistle-icon-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "whistle_horse"
+      ],
+      "commonPrompt": "Rendered the exact shipped Tug horse GLB with the existing Guide model-still browser renderer, Idle at 0.6 sec, yaw -0.6, height 0.75, 512px canvas. Trimmed transparent margins, fitted the full horse inside 420px with 46px padding on an opaque #20242b background, then encoded 128px WebP quality 90. No generated or edited model, no text-to-image artwork."
+    },
+    {
+      "batchId": "referral-reward-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: referral_chest.webp, reins_drakemaw_raptor.webp and reins_terrorspark_groundshaker.webp. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Visually reviewed; not image-edit inputs.",
+      "commonPrompt": "Five separate paintings for the Friendship reward family: a saddled olive-gold raptor, navy satchel, quiet dark-green heart charm, awakened teal crystal heart charm, and purple-brass tank. Linked gold rings echo the existing Friendship armor. Exact prompts and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/referral-reward-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "reins_referral_raptor",
+        "referral_satchel",
+        "referral_hollow_charm",
+        "referral_fog_charm",
+        "reins_referral_tank"
+      ]
+    },
+    {
+      "batchId": "hoard-arcane-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former hoard SVG icons and src/sim/content/hoard_loot.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "Twelve individual paintings for the arcane hoard family: four authored objects in Tarnished, Epic and Sovereign tiers. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/hoard-arcane-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rare_collapsar_band_of_nyxaris",
+        "rare_orb_collapsing_void",
+        "rare_cowl_of_event_horizon",
+        "rare_mantle_of_singularity",
+        "collapsar_band_of_nyxaris",
+        "orb_collapsing_void",
+        "cowl_of_event_horizon",
+        "mantle_of_singularity",
+        "legendary_collapsar_band_of_nyxaris",
+        "legendary_orb_collapsing_void",
+        "legendary_cowl_of_event_horizon",
+        "legendary_mantle_of_singularity"
+      ]
+    },
+    {
+      "batchId": "hoard-frost-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former hoard SVG icons and src/sim/content/hoard_loot.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "Twelve individual paintings for the frost hoard family: four authored objects in Tarnished, Epic and Sovereign tiers. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/hoard-frost-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rare_glacier_hewn_bulwark",
+        "rare_permafrost_legguards",
+        "rare_frostbitten_rime_slippers",
+        "rare_rime_crusted_grips",
+        "glacier_hewn_bulwark",
+        "permafrost_legguards",
+        "frostbitten_rime_slippers",
+        "rime_crusted_grips",
+        "legendary_glacier_hewn_bulwark",
+        "legendary_permafrost_legguards",
+        "legendary_frostbitten_rime_slippers",
+        "legendary_rime_crusted_grips"
+      ]
+    },
+    {
+      "batchId": "hoard-ember-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former hoard SVG icons and src/sim/content/hoard_loot.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "Twelve individual paintings for the ember hoard family: four authored objects in Tarnished, Epic and Sovereign tiers. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/hoard-ember-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rare_ember_wrought_crown",
+        "rare_cinder_stitched_robes",
+        "rare_chained_ember_choker",
+        "rare_molten_clinker_girdle",
+        "ember_wrought_crown",
+        "cinder_stitched_robes",
+        "chained_ember_choker",
+        "molten_clinker_girdle",
+        "legendary_ember_wrought_crown",
+        "legendary_cinder_stitched_robes",
+        "legendary_chained_ember_choker",
+        "legendary_molten_clinker_girdle"
+      ]
+    },
+    {
+      "batchId": "hoard-storm-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former hoard SVG icons and src/sim/content/hoard_loot.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "Twelve individual paintings for the storm hoard family: four authored objects in Tarnished, Epic and Sovereign tiers. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/hoard-storm-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rare_storm_tuned_buckler",
+        "rare_hauberk_tempest_gale",
+        "rare_gale_strider_boots",
+        "rare_tempest_strike_grips",
+        "storm_tuned_buckler",
+        "hauberk_tempest_gale",
+        "gale_strider_boots",
+        "tempest_strike_grips",
+        "legendary_storm_tuned_buckler",
+        "legendary_hauberk_tempest_gale",
+        "legendary_gale_strider_boots",
+        "legendary_tempest_strike_grips"
+      ]
+    },
+    {
+      "batchId": "hoard-brute-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former hoard SVG icons and src/sim/content/hoard_loot.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "Twelve individual paintings for the brute hoard family: four authored objects in Tarnished, Epic and Sovereign tiers. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/hoard-brute-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rare_breastplate_tectonic_might",
+        "rare_band_mountains_weight",
+        "rare_monolithic_shoulderguards",
+        "rare_earthshaker_warboots",
+        "breastplate_tectonic_might",
+        "band_mountains_weight",
+        "monolithic_shoulderguards",
+        "earthshaker_warboots",
+        "legendary_breastplate_tectonic_might",
+        "legendary_band_mountains_weight",
+        "legendary_monolithic_shoulderguards",
+        "legendary_earthshaker_warboots"
+      ]
+    },
+    {
+      "batchId": "hoard-venom-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former hoard SVG icons and src/sim/content/hoard_loot.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "Twelve individual paintings for the venom hoard family: four authored objects in Tarnished, Epic and Sovereign tiers. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/hoard-venom-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rare_silkstalker_woven_vest",
+        "rare_spun_venom_spaulders",
+        "rare_broodmother_chitin_cowl",
+        "rare_venom_etched_waistcord",
+        "silkstalker_woven_vest",
+        "spun_venom_spaulders",
+        "broodmother_chitin_cowl",
+        "venom_etched_waistcord",
+        "legendary_silkstalker_woven_vest",
+        "legendary_spun_venom_spaulders",
+        "legendary_broodmother_chitin_cowl",
+        "legendary_venom_etched_waistcord"
+      ]
+    },
+    {
+      "batchId": "hoard-necro-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former hoard SVG icons and src/sim/content/hoard_loot.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "Twelve individual paintings for the necro hoard family: four authored objects in Tarnished, Epic and Sovereign tiers. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/hoard-necro-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rare_bone_studded_pauldrons",
+        "rare_legguards_of_the_ossuary",
+        "rare_seal_of_the_cryptwalker",
+        "rare_ossuary_bone_crown",
+        "bone_studded_pauldrons",
+        "legguards_of_the_ossuary",
+        "seal_of_the_cryptwalker",
+        "ossuary_bone_crown",
+        "legendary_bone_studded_pauldrons",
+        "legendary_legguards_of_the_ossuary",
+        "legendary_seal_of_the_cryptwalker",
+        "legendary_ossuary_bone_crown"
+      ]
+    },
+    {
+      "batchId": "hoard-tide-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former hoard SVG icons and src/sim/content/hoard_loot.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "Twelve individual paintings for the tide hoard family: four authored objects in Tarnished, Epic and Sovereign tiers. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/hoard-tide-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rare_chalice_of_living_tides",
+        "rare_pendant_continuous_flow",
+        "rare_coral_encrusted_girdle",
+        "rare_riptide_handwraps",
+        "chalice_of_living_tides",
+        "pendant_continuous_flow",
+        "coral_encrusted_girdle",
+        "riptide_handwraps",
+        "legendary_chalice_of_living_tides",
+        "legendary_pendant_continuous_flow",
+        "legendary_coral_encrusted_girdle",
+        "legendary_riptide_handwraps"
+      ]
+    },
+    {
+      "batchId": "faction-rift-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former faction SVG icons, scripts/generate_faction_vendor_icons.mjs and src/sim/content/faction_vendors.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "10 individual paintings for the rift faction vendor stock. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/faction-rift-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "rift_watchers_band",
+        "rift_surveyors_satchel",
+        "riftwalkers_tunic",
+        "riftwarden_voidblade",
+        "champion_rift_band",
+        "tidewatchers_locket",
+        "riftwalkers_cord",
+        "riftwalkers_treads",
+        "formula_riftwalkers_grace",
+        "riftwardens_pendant"
+      ]
+    },
+    {
+      "batchId": "faction-church-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former faction SVG icons, scripts/generate_faction_vendor_icons.mjs and src/sim/content/faction_vendors.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "12 individual paintings for the church faction vendor stock. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/faction-church-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "order_prayer_beads",
+        "vestments_of_the_acolyte",
+        "templar_dawn_shield",
+        "dawnkeeper_consecrated_mace",
+        "champion_dawn_medallion",
+        "acolytes_signet",
+        "cord_of_the_dawn",
+        "dawnlit_slippers",
+        "formula_dawnfire_etching",
+        "formula_dawns_benediction",
+        "champions_dawn_loop",
+        "dawnkeepers_circle"
+      ]
+    },
+    {
+      "batchId": "faction-automaton-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former faction SVG icons, scripts/generate_faction_vendor_icons.mjs and src/sim/content/faction_vendors.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "10 individual paintings for the automaton faction vendor stock. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/faction-automaton-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "automaton_cog_ring",
+        "clockwork_tinkers_pack",
+        "artificers_welding_cowl",
+        "forgemaster_crag_cleaver",
+        "champion_forged_loop",
+        "cogwork_choker",
+        "forgemasters_girdle",
+        "forgemasters_sabatons",
+        "formula_piston_drive",
+        "forgewall_gorget"
+      ]
+    },
+    {
+      "batchId": "clue-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_clue_scroll_icons.mjs or scripts/generate_faction_reward_icons.mjs, and canonical item definitions. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "2 individual paintings for the clue item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/clue-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "clue_scroll",
+        "treasure_casket"
+      ]
+    },
+    {
+      "batchId": "rewards-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_clue_scroll_icons.mjs or scripts/generate_faction_reward_icons.mjs, and canonical item definitions. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "18 individual paintings for the rewards item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/rewards-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "allied_hearthstone",
+        "allied_vanguard_duffel",
+        "rift_feather_glider",
+        "formula_enchant_feet_shadowstride",
+        "recipe_potion_of_invisibility",
+        "potion_of_invisibility",
+        "pattern_reinforced_armor_kit",
+        "reinforced_armor_kit",
+        "dawn_battle_standard",
+        "formula_enchant_offhand_spirit",
+        "recipe_elixir_of_mana_regeneration",
+        "elixir_of_mana_regeneration",
+        "clockwork_target_dummy",
+        "schematic_clockwork_shock_bomb",
+        "clockwork_shock_bomb",
+        "plans_dense_sharpening_stone",
+        "dense_sharpening_stone",
+        "formula_enchant_gloves_forged_might"
+      ]
+    },
+    {
+      "batchId": "dungeon-bastion-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_sunken_bastion_item_icons.mjs, and src/sim/content/sunken_bastion_items.ts and src/sim/content/trinkets.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "11 individual paintings for the bastion item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/dungeon-bastion-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "knight_commanders_longsword",
+        "gaolers_chain_girdle",
+        "rusted_shackle_grips",
+        "drowned_wardens_mantle",
+        "gaolyard_cudgel",
+        "drowned_commanders_breastplate",
+        "gaolyard_striders",
+        "gaolers_iron_key",
+        "jailers_iron_gauntlets",
+        "turnkeys_keyring_belt",
+        "turnkeys_lantern_cowl"
+      ]
+    },
+    {
+      "batchId": "dungeon-temple-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_drowned_temple_item_icons.mjs, src/sim/content/drowned_temple_items.ts and src/sim/content/trinkets.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "11 individual paintings for the temple item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/dungeon-temple-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "conchplate_girdle",
+        "pale_chorus_leggings",
+        "refrain_silk_gloves",
+        "chorus_conch",
+        "heroic_chorus_conch",
+        "tideglass_pauldrons",
+        "moonburn_treads",
+        "prism_etched_cowl",
+        "tideglass_shiv",
+        "pale_chorus_vestment",
+        "tideglass_warmaul"
+      ]
+    },
+    {
+      "batchId": "dungeon-wildheart-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_wildheart_basin_item_icons.mjs, src/sim/content/wildheart_items.ts and src/sim/content/trinkets.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "11 individual paintings for the wildheart item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/dungeon-wildheart-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "beastpit_warbelt",
+        "jaguar_hide_jerkin",
+        "hexbone_handwraps",
+        "rootbound_sabatons",
+        "pollen_dusted_leggings",
+        "bloomsilk_cowl",
+        "falls_blessed_staff",
+        "fanglords_hide_mantle",
+        "thornroot_greathelm",
+        "fanglords_whistle",
+        "gorgebloom_seedpod"
+      ]
+    },
+    {
+      "batchId": "dungeon-gravewyrm-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_gravewyrm_sanctum_item_icons.mjs, src/sim/content/gravewyrm_sanctum_items.ts and src/sim/content/trinkets.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "11 individual paintings for the gravewyrm item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/dungeon-gravewyrm-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "foremans_grips",
+        "serac_stride_boots",
+        "seal_rune_mantle",
+        "thawbound_legguards",
+        "pyre_tenders_hood",
+        "meltwater_cord",
+        "hammer_of_the_open_lock",
+        "vestments_of_the_waking_rite",
+        "foremans_last_link",
+        "phial_of_the_tithe",
+        "quenchwater_flask"
+      ]
+    },
+    {
+      "batchId": "dungeon-crypt-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_hollow_crypt_item_icons.mjs, src/sim/content/hollow_crypt_items.ts and src/sim/content/trinkets.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "16 individual paintings for the crypt item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/dungeon-crypt-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "gravedirt_treads",
+        "bellrope_girdle",
+        "sextons_spadehaft",
+        "rimesilk_mantle",
+        "bonechill_carapace_vest",
+        "rimeweb_hunters_leggings",
+        "rimeweb_fang",
+        "cantors_cassock",
+        "choirward_leggings",
+        "choristers_gloves",
+        "cantors_hymnal",
+        "heroic_cantors_hymnal",
+        "gravecallers_vestments",
+        "unquiet_stalkers_hood",
+        "sextons_burial_spade",
+        "rimesilk_hood"
+      ]
+    },
+    {
+      "batchId": "dungeon-bastion-blues-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_sunken_bastion_item_icons.mjs, src/sim/content/sunken_bastion_items.ts and src/sim/content/trinkets.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "12 individual paintings for the bastion-blues item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/dungeon-bastion-blues-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "portcullis_girdle",
+        "heroic_portcullis_girdle",
+        "cellwatch_belt",
+        "heroic_cellwatch_belt",
+        "lanternwick_sash",
+        "heroic_lanternwick_sash",
+        "turnkeys_shank",
+        "gaolyard_jerkin",
+        "heroic_gaolyard_jerkin",
+        "brinewarden_robe",
+        "heroic_brinewarden_robe",
+        "fogbinders_rod"
+      ]
+    },
+    {
+      "batchId": "dungeon-temple-blues-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_drowned_temple_item_icons.mjs, src/sim/content/drowned_temple_items.ts and src/sim/content/trinkets.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "18 individual paintings for the temple-blues item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/dungeon-temple-blues-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "conchplate_sabatons",
+        "heroic_conchplate_sabatons",
+        "pale_chorus_slippers",
+        "heroic_pale_chorus_slippers",
+        "tideglass_gauntlets",
+        "heroic_tideglass_gauntlets",
+        "moonburn_grips",
+        "heroic_moonburn_grips",
+        "prism_etched_handwraps",
+        "heroic_prism_etched_handwraps",
+        "mere_crested_helm",
+        "heroic_mere_crested_helm",
+        "mereskin_hood",
+        "heroic_mereskin_hood",
+        "merewater_cowl",
+        "heroic_merewater_cowl",
+        "merecleaver",
+        "moonwrack_stave"
+      ]
+    },
+    {
+      "batchId": "dungeon-crypt-blues-painted-icons-v045-2026-10-22",
+      "source": "OpenAI built-in image generation; one separate generation per authored item",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Subject identity: former SVG icons, scripts/generate_hollow_crypt_item_icons.mjs, src/sim/content/hollow_crypt_items.ts and src/sim/content/trinkets.ts. House style: eastbrook_buckler.webp and cinderweave_raiment.webp. Reviewed visually; not image-edit inputs.",
+      "commonPrompt": "25 individual paintings for the crypt-blues item family. Exact prompts, references and source/master/shipping hashes are in accepted-art.json.",
+      "provenanceRecord": "docs/achievements/dungeon-crypt-blues-painted-icons-v045-2026-10-22/accepted-art.json",
+      "itemIds": [
+        "spadeworn_gauntlets",
+        "heroic_spadeworn_gauntlets",
+        "gravedirt_grips",
+        "heroic_gravedirt_grips",
+        "bellrope_mitts",
+        "heroic_bellrope_mitts",
+        "rimewreath_coif",
+        "heroic_rimewreath_coif",
+        "rime_laced_hood",
+        "heroic_rime_laced_hood",
+        "lamenting_veil",
+        "heroic_lamenting_veil",
+        "choirward_pauldrons",
+        "heroic_choirward_pauldrons",
+        "choristers_spaulders",
+        "heroic_choristers_spaulders",
+        "cantors_stole",
+        "heroic_cantors_stole",
+        "knellbound_hauberk",
+        "heroic_knellbound_hauberk",
+        "candlewatch_jerkin",
+        "heroic_candlewatch_jerkin",
+        "robe_of_the_unquiet_rite",
+        "heroic_robe_of_the_unquiet_rite",
+        "gravecallers_rod"
+      ]
+    },
+    {
+      "batchId": "lantern-hall-seal-2026-10-16",
+      "source": "Deterministic Blender render of an original procedural model (scripts/assets/highwatch_guild/render_lantern_seal_icon.py: a gilded octagonal seal, a blue enamel field, Lantern Hall's lantern over two crossed swords). No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "the Heroic Mark's token icon (a metal seal on a dark vignette)",
+      "provenanceRecord": "scripts/assets/highwatch_guild/render_lantern_seal_icon.py",
+      "itemIds": [
+        "lantern_seal"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: an EEVEE still of the procedural seal, rendered at 128px."
+    },
+    {
+      "batchId": "lantern-hall-destrier-reins-2026-10-16",
+      "source": "Deterministic Blender render of the shipped mount model (scripts/assets/lantern_hall_steed/render_reins_icon.py: a three-quarter portrait of the barded head, the steel chanfron with the guild's lantern lit on the brow, the crinet and bridle) over a painted low-key ground (compose_icon.py). No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "the mount reins portraits (the mount's own head on a dark vignette)",
+      "provenanceRecord": "scripts/assets/lantern_hall_steed/render_reins_icon.py",
+      "itemIds": [
+        "reins_lantern_hall_destrier"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: an EEVEE still of public/models/mounts/lantern_hall_destrier.glb (Idle, frame 0), composed at 512 and converted to 128px by npm run assets:items."
     }
   ]
 }

@@ -3,11 +3,7 @@ import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import type { ReferralCardsAction, ReferralCardsSnapshot } from '../sim/referral_contract';
 import type { AccountBankInfo } from '../world_api/bank';
-import {
-  accountBankTransferPayload,
-  decodeAccountBankInfo,
-  selectAccountBankMirror,
-} from './account_bank_wire';
+import { AccountBankRequests, accountBankTransferPayload } from './account_bank_wire';
 import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { CharacterRequests } from './character_requests';
 import { applyCharacterRoster, type CharacterMembership } from './character_roster';
@@ -34,7 +30,6 @@ import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/
 import { applyAbilityCostTail, resolveAbilityChain } from '../sim/combat/ability_resolution';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
 import type { BuddyKey } from '../sim/content/buddies';
-import { FARM_PATCHES } from '../sim/content/farm_patches';
 import { type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -54,6 +49,7 @@ import {
   ALL_RECIPES,
   CLASSES,
   dungeonAt,
+  farmPatchesInActiveWorld,
   getActiveWorldContent,
   NPCS,
   resolveDelveShopOffers,
@@ -1242,6 +1238,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   bankInfo: BankInfo | null = null;
   courierInfo: CourierInfo | null = null;
   accountBankInfo: AccountBankInfo | null = null;
+  private readonly accountBankRequests = new AccountBankRequests();
   // --- IWorldBank: Materials Vault contents view, the per-material store beside
   // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
   // The payload is OWNER-ONLY and never rides the interest-scoped entity
@@ -1408,10 +1405,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // and reset null on reconnect hello (the harvestPreference/marketInfo
   // precedent) so a resume never shows a stale goal.
   gatheringGoal: GatheringGoalView | null = null;
-  // Static content read (the recipeList precedent below): the garden-bed
-  // geography ships with the client bundle like every other content table, so
-  // this needs no wire round-trip. See src/world_api/farming.ts.
-  farmPatches: readonly FarmPatchDef[] = FARM_PATCHES;
+  // The beds as the loaded world places them (data.ts), like the server's Sim.
+  get farmPatches(): readonly FarmPatchDef[] {
+    return farmPatchesInActiveWorld();
+  }
   // The viewer's own farm plots, one row per planted bed sorted by bed id,
   // mirrored from the `fplot` self-wire delta. Empty for every player with no
   // planted bed, which is the server's own default (the sim projects [] for an
@@ -2304,7 +2301,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     if (msg.t === 'account_bank') {
-      this.accountBankInfo = decodeAccountBankInfo(msg.info);
+      this.accountBankInfo = this.accountBankRequests.receive(msg.info, (id) =>
+        this.selectAccountBank(id),
+      );
       return;
     }
     if (msg.t === 'gbanklog') {
@@ -4584,12 +4583,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   claimMembershipArmour(): void {
     this.cmd({ cmd: 'membership_claim_armour' });
   }
-  requestAccountBanks(): void {
+  requestAccountBanks(openFirst = false): void {
+    if (!this.accountBankRequests.list(openFirst)) return;
     this.accountBankInfo = null;
     this.cmd({ cmd: 'account_bank_list' });
   }
   selectAccountBank(characterId: number): void {
-    this.accountBankInfo = selectAccountBankMirror(this.accountBankInfo, characterId);
+    this.accountBankInfo = this.accountBankRequests.select(this.accountBankInfo, characterId);
     this.cmd({ cmd: 'account_bank_select', characterId });
   }
   accountBankTransfer(...args: Parameters<typeof accountBankTransferPayload>): void {

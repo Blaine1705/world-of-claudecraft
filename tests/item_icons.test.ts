@@ -315,29 +315,28 @@ function missingPaintedWaveItemIds(): string[] {
 }
 
 describe('item webp icons', () => {
-  it('keeps the five referral placeholders on their existing art owners without copied files', () => {
-    expect(ITEM_ART_PLACEHOLDERS).toEqual({
-      referral_fog_charm: 'gleamstag_charm',
-      referral_hollow_charm: 'makers_charm',
-      referral_satchel: 'resonant_weave_bag',
-      reins_referral_raptor: 'reins_drakemaw_raptor',
-      reins_referral_tank: 'reins_terrorspark_groundshaker',
-    });
+  it('serves unique paintings for all five former referral aliases', () => {
+    expect(ITEM_ART_PLACEHOLDERS).toEqual({});
+    const ids = [
+      'referral_fog_charm',
+      'referral_hollow_charm',
+      'referral_satchel',
+      'reins_referral_raptor',
+      'reins_referral_tank',
+    ];
     const m = mapping();
     const owners = [
       ...m.entries.map((entry) => entry.itemId),
       ...(m.generatedBatches ?? []).flatMap((batch) => batch.itemIds),
     ];
-    for (const [id, source] of Object.entries(ITEM_ART_PLACEHOLDERS)) {
-      expect(ITEM_ART_PENDING.has(id), id).toBe(true);
-      expect(ITEM_ART_PENDING.has(source), source).toBe(false);
-      expect(existsSync(path.join(itemsDir, `${id}.webp`)), id).toBe(false);
-      expect(existsSync(path.join(itemsDir, `${source}.webp`)), source).toBe(true);
+    for (const id of ids) {
+      expect(ITEM_ART_PENDING.has(id), id).toBe(false);
+      expect(existsSync(path.join(itemsDir, `${id}.webp`)), id).toBe(true);
       expect(
-        owners.filter((owner) => owner === source),
-        source,
+        owners.filter((owner) => owner === id),
+        id,
       ).toHaveLength(1);
-      expect(iconDataUrl('item', id), id).toBe(`/ui/items/${source}.webp`);
+      expect(iconDataUrl('item', id), id).toBe(`/ui/items/${id}.webp`);
     }
   });
   it('has image-backed item ids wired (guards the fixture)', () => {
@@ -353,7 +352,8 @@ describe('item webp icons', () => {
     // 148 with the Mirefen world-boss branch's three held weapons, 149 with Balgath's
     // Craterglass Stave.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 163.
-    expect(WEAPON_IMAGE_IDS.size).toBe(163);
+    // + the membership Staff of Changing (PR 4281): 164.
+    expect(WEAPON_IMAGE_IDS.size).toBe(164);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -410,11 +410,13 @@ describe('item webp icons', () => {
     // NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS are each declared empty in
     // src/sim/content/ignivar_loot.ts / zone3.ts), so the ledger is back to the EMPTY
     // set: no artless item can hide behind an open wave, and the next commissioned wave
-    // re-pins its exact membership here when it stages. Open wave: the 135
-    // Warfare Season 2 armor pieces (content/pvp_honor_season2.ts), painted in a
-    // follow-up art pass.
+    // re-pins its exact membership here when it stages. All Season 2 armor now ships art.
     const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(season2Armor).toHaveLength(135);
+    for (const id of season2Armor) {
+      expect(ITEM_ART_PENDING.has(id), id).toBe(false);
+      expect(itemImageUrl(id), id).toBe(`/ui/items/${id}.webp`);
+    }
     // The Hollow Crypt rework's per-boss loot left the ledger when its wave
     // (hollow-crypt-icons-2026-10-03) painted every non-weapon piece and the
     // generated Heroic Hymnal: HOLLOW_CRYPT_ART_PENDING_ITEM_IDS is declared
@@ -422,18 +424,7 @@ describe('item webp icons', () => {
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual(
-      [
-        ...season2Armor,
-        'whistle_emberfall_phoenix',
-        'whistle_horse',
-        'referral_fog_charm',
-        'referral_hollow_charm',
-        'referral_satchel',
-        'reins_referral_raptor',
-        'reins_referral_tank',
-      ].sort(),
-    );
+    ).toEqual(['whistle_emberfall_phoenix']);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

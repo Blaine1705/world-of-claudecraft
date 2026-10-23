@@ -11,6 +11,7 @@ import {
   runLinkedProgramTouchLane,
 } from '../linked_program_touch_lane';
 import { shaderDebugRequested } from '../shader_debug_flag';
+import { attachTemplateModelVfx } from '../template_model_vfx';
 import {
   collectPrewarmTextures,
   uploadTexturesInSlices,
@@ -22,7 +23,13 @@ import {
   onCharacterAssetReady,
   preloadMechAssets,
 } from './assets';
-import { modularVisualKey, playerVisualKey, VISUALS, type WeaponLayoutOverride } from './manifest';
+import {
+  modularVisualKey,
+  playerVisualKey,
+  VISUALS,
+  type WeaponLayoutOverride,
+  weaponSkinModelUrl,
+} from './manifest';
 import {
   type ArmorLoadout,
   type ModularAppearance,
@@ -162,6 +169,12 @@ const PREVIEW_ANIM_STATE = {
 };
 
 const LIVE_PREVIEW_X = 0;
+
+/** The turntable's reduced-motion read for model effects that animate on their
+ *  own (the sprite buddy's flame flicker): the OS setting, read live. */
+function previewPrefersReducedMotion(): boolean {
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
 export class CharacterPreview {
   private container: HTMLElement;
@@ -358,7 +371,10 @@ export class CharacterPreview {
     this.setupResizeObserver();
 
     // 8. Retry a build whose body file was still streaming when it was asked for.
-    this.unsubscribeAssetReady = onCharacterAssetReady(() => this.retryPendingBuild());
+    this.unsubscribeAssetReady = onCharacterAssetReady((url) => {
+      this.retryPendingBuild();
+      this.refreshLateWeaponSkin(url);
+    });
 
     // 9. Start loop
     this.animate();
@@ -398,6 +414,18 @@ export class CharacterPreview {
     if (dress && 'equipped' in dress)
       this.currentVisual.setWocEquipment(dress.equipped, dress.helmHidden);
     else if (dress) this.currentVisual.setWocDefaultEquipment(dress.helmHidden);
+  }
+
+  /** A worn skin whose GLB landed after the skin was set (a try-on of a skin never streamed
+   *  this session): dress it now, and re-arm the open gate so its materials link and upload
+   *  before they draw. */
+  private refreshLateWeaponSkin(url: string): void {
+    const skinId = this.currentWeaponSkinId;
+    if (this.destroyed || !skinId || !this.currentVisual) return;
+    if (weaponSkinModelUrl(skinId) !== url) return;
+    this.currentVisual.refreshWeaponSkin();
+    this.openGate.forgetLinked();
+    this.armOpen(null);
   }
 
   /** Hand a WOC body the look its modular head (and body size) draws, for a
@@ -715,6 +743,9 @@ export class CharacterPreview {
       this.armorDetail = detail;
       this.currentVisualSig = nextSig;
       this.characterGroup.add(this.currentVisual.root);
+      // A buddy's visual key is its template id, so the turntable shows the same
+      // model effects the world does (the sprite pair's live flames).
+      attachTemplateModelVfx(visualKey, this.currentVisual.root, previewPrefersReducedMotion);
       const visual = this.currentVisual;
       // a WOC body is born wearing the head look and size last handed in (no-op
       // elsewhere)
@@ -745,6 +776,11 @@ export class CharacterPreview {
    *  setClass/setVisualKey rebuilds like the body skin. */
   setWeaponSkin(weaponSkinId: string | null): void {
     if (this.destroyed) return;
+    // A new skin brings materials (its GLB, its weapon VFX) the linked signature does not
+    // name (it keys the body and the held item ids), so a same-type swap would read as
+    // already linked: forget it, and the next mount's armOpen links and uploads them under
+    // the gate before they draw (Lantern Hall's try-on clicks through skins).
+    if (weaponSkinId !== this.currentWeaponSkinId) this.openGate.forgetLinked();
     this.currentWeaponSkinId = weaponSkinId;
     this.currentVisual?.setWeaponSkin(weaponSkinId);
   }

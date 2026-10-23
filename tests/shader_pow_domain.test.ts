@@ -144,6 +144,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/battleground_lantern_fx.ts': 1,
   'src/render/battleground_rune_vfx.ts': 3,
   'src/render/battleground_ward.ts': 1,
+  'src/render/sprites_buddy_flame.ts': 1,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
   // Authored Warrior materials are part of the same fail-closed domain scan.
   'src/render/ability_vfx/baked_impact_layers.ts': 1,
@@ -210,7 +211,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/drowned_temple/temple_tsunami_fx.ts': 3,
   'src/render/floor_telegraph/telegraph_material.ts': 1,
   'src/render/gravewyrm_sanctum/sanctum_air.ts': 2,
-  'src/render/gravewyrm_sanctum/sanctum_face.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_face.ts': 3,
   'src/render/gravewyrm_sanctum/sanctum_fire.ts': 2,
   'src/render/gravewyrm_sanctum/sanctum_lake.ts': 3,
   'src/render/gravewyrm_sanctum/sanctum_sky.ts': 3,
@@ -282,7 +283,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   // max(x, 0.0) (sprite key bumped to v3) and the ghost discharge's collar
   // Gaussian above took abs(), in the change that listed them here
   'src/render/drowned_temple_entrance.ts': 8,
-  'src/render/sunken_bastion_entrance.ts': 7,
+  'src/render/sunken_bastion_entrance.ts': 6,
   'src/render/wildheart_basin_entrance.ts': 6,
   'src/render/material_finishes.ts': 1,
 };

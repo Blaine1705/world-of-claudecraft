@@ -366,8 +366,8 @@
   "sourceManifests": [
     {
       "path": "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
-      "acceptedSha256": "829d8b1190c66180f088e8aa82c1c31547714db7ec061ed1ecf3c9a3d841f7e8",
-      "acceptedBytes": 463455
+      "acceptedSha256": "635af305c81e8bbfc7e18820a66cdfd323653244207263bbe1849c2791392002",
+      "acceptedBytes": 463463
     }
   ],
   "assets": [
@@ -2131,8 +2131,8 @@
       "kind": "mobPortrait",
       "id": "castaway_navigator",
       "runtimeUrl": "/ui/mobs/castaway_navigator.webp",
-      "acceptedSha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed",
-      "acceptedBytes": 2236,
+      "acceptedSha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174",
+      "acceptedBytes": 2384,
       "origin": "deterministic-rerender"
     },
     {
@@ -2171,16 +2171,16 @@
       "kind": "mobPortrait",
       "id": "fisher_bram",
       "runtimeUrl": "/ui/mobs/fisher_bram.webp",
-      "acceptedSha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed",
-      "acceptedBytes": 2236,
+      "acceptedSha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174",
+      "acceptedBytes": 2384,
       "origin": "deterministic-rerender"
     },
     {
       "kind": "mobPortrait",
       "id": "gravedigger_mosley",
       "runtimeUrl": "/ui/mobs/gravedigger_mosley.webp",
-      "acceptedSha256": "eb9ccc442c173d7beb4db9caef45ad22e0747c5cbb60bfe5b9189fa6240dd9ed",
-      "acceptedBytes": 2236,
+      "acceptedSha256": "c127c40950d933c91beb7f93e05faac80244fd91436771fc6f17bba186ec7174",
+      "acceptedBytes": 2384,
       "origin": "deterministic-rerender"
     },
     {
@@ -2227,8 +2227,8 @@
       "kind": "mobPortrait",
       "id": "the_wreck_warden",
       "runtimeUrl": "/ui/mobs/the_wreck_warden.webp",
-      "acceptedSha256": "efb3530eb49d47990b6fb9a4ffab3fc749fe384023461fe2f3cf76e8d056f1b0",
-      "acceptedBytes": 2262,
+      "acceptedSha256": "d1bded0afd369ba8ce10b6326d74dde877dd3ddb0b02a6ec5df533cc01f937f8",
+      "acceptedBytes": 2510,
       "origin": "deterministic-rerender"
     },
     {

@@ -149,6 +149,11 @@ export const editorStrings = {
   // Browser tab title. Hyphen separator (not a dash character).
   docTitle: 'ClaudeCraft Studio - World of ClaudeCraft',
   untitledMap: 'Untitled Map',
+  liveWorld: {
+    name: 'Live world touch-ups',
+    scope:
+      'Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review.',
+  },
   flatMapName: 'Flat World',
   // The offline character name a playtest boots with.
   playtestPlayerName: 'Mapmaker',
@@ -763,6 +768,29 @@ export const editorStrings = {
     roadAuthored: 'Road {n}',
     roadHint:
       'Roads blend into the terrain like the built-in world roads and flatten bumps beneath them.',
+    roadMode: 'Roads tool',
+    roadModeDraw: 'Draw a new road',
+    roadModeEdit: 'Edit roads',
+    roadEditHint:
+      'Click a road to select it. Drag a waypoint to move it, drag the road line to add a bend, and press Delete to remove the held waypoint.',
+    roadEditNone: 'No road selected. Click one in the view or pick it from a list below.',
+    roadEditing: 'Editing: {name}',
+    roadWaypoints: 'Waypoints: {n}',
+    roadWaypointHeld: 'Waypoint {n} selected.',
+    roadDeletePoint: 'Delete waypoint',
+    roadRemove: 'Remove road',
+    roadReset: 'Reset to default',
+    roadRestore: 'Restore',
+    roadSelect: 'Select',
+    roadBuiltin: 'World road {n}',
+    roadBuiltinEdited: '{name} (changed)',
+    roadBuiltinRemoved: '{name} (removed)',
+    roadWorldList: 'World roads ({n})',
+    roadBuiltinNote:
+      "World roads are the game's own roads. Changes apply to this map only, and Reset puts the road back.",
+    roadPointTooShort: 'A road needs at least two waypoints. Use Remove road instead.',
+    roadPointLimit: 'This road already has as many waypoints as it can hold.',
+    roadRemoved: 'Road removed. Undo brings it back.',
     prefabSave: 'Save selection as prefab',
     prefabName: 'Prefab name',
     prefabSaved: 'Prefab saved: {name}',
@@ -855,6 +883,8 @@ export const editorStrings = {
     kindObjectMove: 'Gameplay object',
     kindPaint: 'Painted cells',
     kindField: 'Map setting',
+    kindRoad: 'Road',
+    kindRoadEdit: 'World road',
     close: 'Close',
   },
 

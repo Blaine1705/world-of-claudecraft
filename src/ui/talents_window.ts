@@ -5,6 +5,7 @@
 // local allocation. Offline Sim reflects those commands synchronously; the
 // delayed repaint covers the later authoritative ClientWorld snapshot.
 
+import { SPEC_PRIMARY_STAT } from '../sim/content/spec_primary_stat';
 import {
   exportBuild,
   importBuild,
@@ -242,8 +243,9 @@ export class TalentsWindow {
         `<div class="ts-panel-head">${specIconHtml(talentSpecIconRef(spec))}` +
         `<div class="ts-panel-title"><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(spec.role)}</div></div></div>` +
         `<div class="ts-det-desc">${esc(specDescription)}</div>`;
-      if (info) {
-        const statLabel = t(`itemUi.stats.${info.primaryStat}` as TranslationKey);
+      const primaryStat = SPEC_PRIMARY_STAT[spec.class]?.[spec.id];
+      if (info && primaryStat) {
+        const statLabel = t(`itemUi.stats.${primaryStat}` as TranslationKey);
         const cxKey = (
           info.complexity === 'low'
             ? 'hudChrome.specPanel.complexityLow'

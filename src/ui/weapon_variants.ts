@@ -29,6 +29,7 @@
 //
 // Every weapon item draws one of these sets: no item draws a kit model any more.
 export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
+  membership_staff: 'staff_field_bronze', // Rare: Staff of Changing (held look follows its form)
   // ---- swords ------------------------------------------------------------------
   worn_sword: 'sword_starter', // the warrior's starting sword
   eastbrook_arming_sword: 'sword_field_steel',

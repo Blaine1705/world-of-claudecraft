@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPCS,
 } from '../src/sim/content/world_quest_investigation';
-import { BUILTIN_WORLD, GATHER_NODES, QUESTS, setActiveWorldContent, ZONES } from '../src/sim/data';
+import { BASE_WORLD, GATHER_NODES, QUESTS, setActiveWorldContent, ZONES } from '../src/sim/data';
 import { isExcludedDecoration, isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import { FENBRIDGE_BUILDINGS_BY_ID, FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
@@ -32,6 +32,9 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SEED = WORLD_SEED;
 const ROOT = path.join(__dirname, '..');
+
+beforeEach(() => setActiveWorldContent(BASE_WORLD));
+afterEach(() => setActiveWorldContent(null));
 const BUILDINGS = FENBRIDGE_LAYOUT.buildings;
 type Building = (typeof BUILDINGS)[number];
 
@@ -315,7 +318,7 @@ describe('the grand Fenbridge buildings', () => {
   });
 
   it('levels each building on its own pad across its whole reach', () => {
-    const edits = BUILTIN_WORLD.terrainEdits ?? [];
+    const edits = BASE_WORLD.terrainEdits ?? [];
     const pads = FENBRIDGE_LAYOUT.pads;
     expect(pads.length).toBeGreaterThan(0);
     // stamped by the built-in world, apron and pad in the layout's order...
@@ -388,7 +391,7 @@ describe('the grand Fenbridge buildings', () => {
     expect(isExcludedDecoration(20.594, 335.37)).toBe(true);
     const bounds = { minX: -60, maxX: 60, minZ: 245, maxZ: 365 };
     for (const [name, world, seed] of [
-      ['built-in', null, SEED],
+      ['built-in', BASE_WORLD, SEED],
       ['Studio', loadPublishedMap(), MAP_SEED],
     ] as const) {
       setActiveWorldContent(world);
@@ -440,11 +443,16 @@ describe('living in the grand Fenbridge', () => {
     const position = { x: warden.placement.x, z: warden.placement.z };
     expect(distancePointToObb(position, warden.footprint)).toBe(0);
     expect(isBlocked(SEED, position.x, position.z, 0.5)).toBe(true);
-    const source = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const source = new Sim({ seed: SEED, playerClass: 'warrior', world: BASE_WORLD });
     const state = source.serializeCharacter(source.playerId);
     if (!state) throw new Error('no persisted-position fixture');
     const loadAt = () => {
-      const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+      const sim = new Sim({
+        seed: SEED,
+        playerClass: 'warrior',
+        noPlayer: true,
+        world: BASE_WORLD,
+      });
       const pid = sim.addPlayer('warrior', 'Saved', {
         state: { ...structuredClone(state), pos: { ...position } },
       });

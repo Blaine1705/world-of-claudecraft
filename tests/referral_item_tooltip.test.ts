@@ -47,7 +47,8 @@ describe('friendship armour tooltips', () => {
     expect(html).toContain('Their membership must be active');
     expect(html).not.toContain('renew your membership');
     expect(html).toContain(
-      t('hudChrome.options.itemLevelLine', { level: itemNumber(level < 20 ? level : 25) }),
+      // Friendship armour is always five item levels above its wearer (PR 4281).
+      t('hudChrome.options.itemLevelLine', { level: itemNumber(level + 5) }),
     );
   });
 

@@ -1424,9 +1424,15 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for the painted towns merged over the art style integration tip:
   // the renderer and town runtime leaves moved. No capture was retaken.
-  // Re-minted for the one-colour market stall canopies: the town runtime leaf
-  // moved. No capture was retaken.
-  '697528c01efe60c8cf97350a450dd01f5a04c73619063fdbcb68807d4fb9b6c0';
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '20ee36a96af467c98e047d1ba24b767c21acabffd3fc6a281317b63484d93519';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1472,9 +1478,15 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
   // Re-minted for the painted towns merged over the art style integration tip:
   // the renderer and town runtime leaves moved. No capture was retaken.
-  // Re-minted for the one-colour market stall canopies: the town runtime leaf
-  // moved. No capture was retaken.
-  'f93c15814a853326ac45d00ce026e1d91a7bdccb569e17c72fa5921b1afa3342';
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '2f8e1f2970bd5e63bee1048daccd858af9ba34ca81faaf6dc657fde691a2ed52';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2873,9 +2885,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
-      // The one-colour market stall canopies: recomputed LAST again over the
-      // re-swept evidence. No capture was retaken.
-    ).toBe('9feda46152b8dbb806b216c96b000d267c464ef7c18e5a3e2ef758e2102667e3');
+      // The Mirefen mudfin huts: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+      // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
+      // LAST again over the re-swept evidence. No capture was retaken.
+      // One-colour market canopies on the current integration base: recomputed
+      // from the swept evidence. No capture was retaken.
+    ).toBe('f0064ae7146b803966beec3bee8a2b11b9fc84eb36952569f3d9a357c7201dc8');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
