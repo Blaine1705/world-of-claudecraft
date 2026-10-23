@@ -299,13 +299,15 @@ describe('which items draw the field weapons', () => {
       const key = keyOf(itemWeaponModelUrl(item.id));
       expect(isFieldKey(key), `${item.id} (rare) draws ${key}`).toBe(true);
     }
-    // the rare shields: the walls take the heater, the buckler the starting buckler
+    // The release quest shields retain their authored round/kite/tower silhouettes.
+    // Other rare shields use the field heater or starting buckler.
     expect(
       rares
         .filter((item) => isShieldItem(item))
         .map((item) => [item.id, keyOf(itemOffhandModelUrl(item.id))])
         .sort(),
     ).toEqual([
+      ['barrowfield_tower_shield', 'shield_square'],
       ['pearlward_aegis', SHIELD_KEY],
       ['rare_glacier_hewn_bulwark', SHIELD_KEY],
       ['rare_storm_tuned_buckler', 'shield_starter'],
@@ -320,9 +322,13 @@ describe('which items draw the field weapons', () => {
     }
     const shields = plain.filter((item) => isShieldItem(item));
     expect(shields.map((item) => item.id).sort()).toEqual([
+      'bastion_kite_shield',
       'eastbrook_buckler',
       'highwatch_wallshield',
+      'lychgate_buckler',
     ]);
+    expect(keyOf(itemOffhandModelUrl('lychgate_buckler'))).toBe('shield_round');
+    expect(keyOf(itemOffhandModelUrl('bastion_kite_shield'))).toBe('shield_badge');
     expect(keyOf(itemOffhandModelUrl('eastbrook_buckler'))).toBe('shield_starter');
     expect(keyOf(itemOffhandModelUrl('highwatch_wallshield'))).toBe(SHIELD_KEY);
   });
