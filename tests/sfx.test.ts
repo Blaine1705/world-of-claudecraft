@@ -45,7 +45,12 @@ interface FakeSource {
 const MOUNT_AUDIO_KEYS: readonly string[] = [...MOUNT_KEYS, ...MOUNT_SKIN_IDS];
 // Wobbles the Slime (a developer mount) borrows the footfall too until a
 // bespoke squelch is generated for it.
-const FOOTFALL_MOUNTS = new Set(['lanternback_troll', 'chimeglass_tortoise', 'wobbles_slime']);
+const FOOTFALL_MOUNTS = new Set([
+  'lanternback_troll',
+  'chimeglass_tortoise',
+  'nightwing_chimera',
+  'wobbles_slime',
+]);
 // A mount with a continuous loop (the rickshaw's mount_loop_ cue) gets no
 // per-stride one-shot either: mountRun no-ops for it by design (see its own
 // comment in sfx.ts), checking the real SFX_CLIPS catalog for a mount_loop_*

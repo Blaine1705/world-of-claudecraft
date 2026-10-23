@@ -7530,6 +7530,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Nightwing Chimaera"
+      },
+      {
+        "kind": "mount",
         "name": "Friendship Raptor"
       },
       {

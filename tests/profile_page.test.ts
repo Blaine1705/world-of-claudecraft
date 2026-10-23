@@ -201,9 +201,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // Craterglass Stave and five trinkets (+13).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529.
     // 531 with the referral stamp cards (642100fe8aa): the referral_raptor and
-    // referral_tank reward mounts take two slots on the Horizons mounts page.
-    // 532 with Wobbles the Slime's Horizons mounts slot.
-    expect(catalogTotal).toBe(532);
+    // referral_tank reward mounts take two slots on the Horizons mounts page;
+    // 532 with nightwing_chimera on Horizons mounts; 533 with wobbles_slime.
+    expect(catalogTotal).toBe(533);
     // The Warfare Season 2 Vanguard Gallery is class-personal and sits outside
     // completion, so it moves nothing here.
   });

@@ -2243,6 +2243,7 @@ export const es_ES: EnTranslations = {
       "name_chimeglass_tortoise": "Tolliver el timbre de cristal",
       "name_rickshaw_mount": "Rickshaw Atahuesos",
       "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
@@ -2261,6 +2262,7 @@ export const es_ES: EnTranslations = {
       "desc_avian_strider": "Un ave de monta imponente cuyas pesadas garras y alas plegadas convierten cada viaje en una carrera atronadora.",
       "desc_mech_bird": "Un pollo de guerra mecánico hecho a mano que corre con servos chasqueantes y la llave de cuerda sigue girando.",
       "desc_lanternback_troll": "Un troll de las colinas sometido al yugo de los faroleros, que lleva un trono de hierro sobre los hombros y una linterna de tormenta encendida en cada brazo.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Una tortuga salada que ha dejado atrás a tres generaciones de caravanas. Los caldereros le quitaron las gafas de cristal de tormenta y le colgaron una campana de bronce en el cuello, de modo que la carretera le oye mucho antes de verlo.",
       "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera."
     },
@@ -20020,6 +20022,9 @@ export const es_ES: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "Riendas del Corcel Esmeralda del Valle"
+      },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
       },
       "reins_goblin_rocket_sled": {
         "name": "Llave de encendido: Trineo cohete goblin"

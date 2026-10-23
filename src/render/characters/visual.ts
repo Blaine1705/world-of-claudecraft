@@ -2686,6 +2686,29 @@ export class CharacterVisual {
       }
       if (this.climbTorsoBone) this.climbTorsoBone.rotation.x += spec.lean * k;
     }
+    if (spec.upperArm || spec.lowerArm) {
+      if (this.climbArmBones === undefined) {
+        this.climbArmBones = CLIMB_ARM_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+      }
+      if (this.climbForearmBones === undefined) {
+        this.climbForearmBones = CLIMB_FOREARM_BONES.map(
+          (n) => this.model.getObjectByName(n) ?? null,
+        );
+      }
+      for (let i = 0; i < this.climbArmBones.length; i++) {
+        const side = i === 0 ? 1 : -1;
+        const ua = this.climbArmBones[i];
+        if (ua && spec.upperArm) {
+          const [qx, qy, qz, qw] = spec.upperArm;
+          ua.quaternion.slerp(rideQuat.set(qx, side * qy, side * qz, qw), k);
+        }
+        const la = this.climbForearmBones[i];
+        if (la && spec.lowerArm) {
+          const [qx, qy, qz, qw] = spec.lowerArm;
+          la.quaternion.slerp(rideQuat.set(qx, side * qy, side * qz, qw), k);
+        }
+      }
+    }
   }
 
   /** Ease the extra arm raise in toward the swap moment and back out after it;

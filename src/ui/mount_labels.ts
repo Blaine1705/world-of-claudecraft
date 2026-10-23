@@ -24,6 +24,7 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   lanternback_troll: 'hudChrome.mounts.name_lanternback_troll',
   wobbles_slime: 'hudChrome.mounts.name_wobbles_slime',
   terrorspark_groundshaker: 'hudChrome.mounts.name_terrorspark_groundshaker',
+  nightwing_chimera: 'hudChrome.mounts.name_nightwing_chimera',
   referral_tank: 'hudChrome.mounts.name_referral_tank',
   referral_raptor: 'hudChrome.mounts.name_referral_raptor',
 };
@@ -41,6 +42,7 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   lanternback_troll: 'hudChrome.mounts.desc_lanternback_troll',
   wobbles_slime: 'hudChrome.mounts.desc_wobbles_slime',
   terrorspark_groundshaker: 'hudChrome.mounts.desc_terrorspark_groundshaker',
+  nightwing_chimera: 'hudChrome.mounts.desc_nightwing_chimera',
   referral_tank: 'hudChrome.mounts.desc_referral_tank',
   referral_raptor: 'hudChrome.mounts.desc_referral_raptor',
 };

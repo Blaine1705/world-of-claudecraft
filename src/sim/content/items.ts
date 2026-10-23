@@ -455,6 +455,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     buyValue: 1_000_000, // 100 gold in copper
   },
+  reins_nightwing_chimera: {
+    id: 'reins_nightwing_chimera',
+    name: 'Reins of the Nightwing Chimaera',
+    kind: 'mount',
+    mount: 'nightwing_chimera',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // Active buddy whistles are soulbound grant tokens consumed on use.
   // Retired whistles and charms retain their original definitions so existing
   // bag/bank saves keep their identities and inventory rules. Token use checks
