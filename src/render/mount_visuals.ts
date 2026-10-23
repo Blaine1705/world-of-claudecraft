@@ -327,8 +327,8 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // the seat's low point sits 0.19 model units above the bone head, centred
   // between pommel and cantle, and the rider's root rides a hair above it.
   // `seat` is the fallback at the manifest height 4.0 (seat 5.53 of 6.61 model
-  // units). The snail's slime trail suits a slime too.
-  wobbles_slime: spec('mount_wobbles_slime', 3.35, true, undefined, 0, 'slime', [], {
+  // units). No slime trail: it hops, so a continuous smear behind it reads wrong.
+  wobbles_slime: spec('mount_wobbles_slime', 3.35, true, undefined, 0, null, [], {
     bone: 'saddle',
     offset: [0, 0.22, 0],
   }),

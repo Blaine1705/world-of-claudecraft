@@ -611,5 +611,6 @@ describe('procedural bob math', () => {
     expect(MOUNT_VISUAL_SPECS.valorsteed.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.stormfeather_griffin.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.terrorspark_groundshaker.fx).toBeNull();
+    expect(MOUNT_VISUAL_SPECS.wobbles_slime.fx).toBeNull();
   });
 });
