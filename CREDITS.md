@@ -475,6 +475,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Confection Cascade polished gold hardware mounts (`public/ui/minigames/*-v7.webp`) | World of ClaudeCraft | Project art edited with OpenAI built-in image generation using the v6 hardware, optimized to WebP; [provenance and exact prompts](docs/screenshots/confection-cascade-v7/hardware-provenance.md) | Project asset | With the project only |
 | Generated prop model (nythraxis_bone_spike) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (nythraxis_binding_cage) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Buddy model, animations, faces and whistle icon (Flicker and Glimmer, the flame-sprite pair, `public/models/buddies/sprites.glb`) | World of ClaudeCraft | Built procedurally in Blender by the scripts in `docs/design/sprites-buddy/` (spheres with painted gradient textures, a baked bone rig with 10 clips, face meshes with 9 morph targets), from the sprite sheet and turnarounds kept there; finished by `docs/design/sprites-buddy/finish_buddy.mjs` and `scripts/assets/compress_glb_textures.mjs`; whistle icon rendered by `scripts/assets/render_buddy_item_icons.mjs`. Its flames are drawn live in game (`src/render/sprites_buddy_flame.ts`), not shipped as art. | Project asset | With the project only |
 | Generated prop model (windrider_glider_flight) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated creature model + animations (balgath_foreman) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
 | Generated creature model + animations (balgath_cyclops) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset | With the project only |
@@ -493,7 +494,7 @@ Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.
 
-Buddy portraits (`public/ui/portraits/buddy_{horse,crystal_lich,forgemaw}.webp`)
+Buddy portraits (`public/ui/portraits/buddy_{horse,crystal_lich,forgemaw,sprites}.webp`)
 are local renders of the existing shipped buddy models, using their canonical
 visual definitions and idle poses through `scripts/render_buddy_portraits.mjs`.
 The shared backdrop comes from `scripts/lib/mob_portrait_background.mjs`.

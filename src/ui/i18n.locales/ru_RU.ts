@@ -19628,6 +19628,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': 'Тлеющая лисица',
   'entities.mobs.buddy_emerald_wolf.name': 'Изумрудный волк',
   'entities.mobs.buddy_forgemaw.name': 'Горнилозев Расплавленный',
+  'entities.mobs.buddy_sprites.name': 'Мерцай и Искорка',
   'entities.mobs.buddy_frostfire.name': 'Ледяное пламя',
   'entities.mobs.buddy_golden_sentinel.name': 'Золотой страж',
   'entities.mobs.buddy_kekius.name': 'Кекиус',
@@ -19677,6 +19678,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': 'Свисток: Тройное Т',
   'entities.items.whistle_trollface.name': 'Свисток: Тролльфейс',
   'entities.items.whistle_tuskhorn_boar.name': 'Свисток: Клыкорогий вепрь',
+  'entities.items.whistle_sprites.name': 'Свисток: Мерцай и Искорка',
   'hudChrome.buddyMenu.rename': 'Переименовать спутника',
   'hudChrome.buddyMenu.nameLabel': 'Имя спутника',
   'hudChrome.buddyMenu.autolootEnable': 'Включить автосбор',
@@ -19758,6 +19760,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Лисица из живых изгородей Истврукской долины, названная за угольно-красную шубу, что просвечивает сквозь зимний подлесок. Тамошние звероловы махнули рукой на её выводки поколения назад и вместо этого начали оставлять им еду.',
   'hudChrome.collections.buddyLore.emerald_wolf':
     'Волчонок из Призрачной Чащи; в свете крон, что почти не достаёт до земли, его шерсть кажется зелёной. Стражи выхаживают всех сирот, которых оставляет лес.',
+  'hudChrome.collections.buddyLore.sprites':
+    'Два маленьких огненных духа, золотой и бирюзовый, которые никак не решат, кто из них главный. Сблизившись, они сливаются в одно зелёное пламя и со смехом разлетаются снова.',
   'hudChrome.collections.buddyLore.forgemaw':
     'Выкованный в Горниле Последнего Источника и так и не законченный, он вышел из литейной Игнивара, пока молоты ещё били. Найти его можно только в героическом спуске: расплавленное создание всё возвращается в горн, что его сделал, и уходит домой за тем, кто выжил в огне дважды.',
   'hudChrome.collections.buddyLore.frog':
@@ -19844,6 +19848,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.skeleton': 'Сухие кости гремят в такт вашим шагам.',
   'hudChrome.collections.presence.crystal_lich':
     'Из обломков поднимается холодный гул, и он смотрит на вас.',
+  'hudChrome.collections.presence.sprites':
+    'К вам пристали два маленьких огонька, и гаснуть они не собираются.',
   'hudChrome.collections.presence.forgemaw': 'Жар кузни не оставил вас. Что-то вышло вместе с ним.',
   'hudChrome.collections.presence.crystal_tide': 'Капля моря отказывается сорваться с вашей лески.',
   'hudChrome.collections.presence.phantom': 'Воздух позади вас чуть слишком неподвижен.',

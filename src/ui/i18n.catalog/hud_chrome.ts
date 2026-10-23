@@ -7371,6 +7371,7 @@ export const hudChromeStrings = {
       skeleton: 'Dry bones rattle in step with yours.',
       crystal_lich: 'A cold hum rises from the wreckage, and it is watching you.',
       forgemaw: 'The heat of the forge has not left you. Something walked out with it.',
+      sprites: 'Two small flames have caught on you, and they are not going out.',
       crystal_tide: 'A drop of the sea refuses to fall from your line.',
       phantom: 'The air behind you is a shade too still.',
       emberfall_phoenix: 'A warmth like a banked fire settles at your back.',
@@ -7484,6 +7485,8 @@ export const hudChromeStrings = {
         "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
       crystal_tide:
         'A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.',
+      sprites:
+        'Two small fire sprites, one gold and one teal, who never quite agree which of them is leading. Get close enough and they fold into one green flame, then spill apart again, laughing.',
       phantom:
         'A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.',
       emberfall_phoenix:

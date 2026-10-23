@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS account_buddies (
   account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
   owned TEXT[] NOT NULL DEFAULT '{}',
   CONSTRAINT account_buddies_active_keys CHECK (
-    cardinality(owned) <= 4 AND owned <@ ARRAY['horse','crystal_lich','forgemaw','sapling']::text[])
+    cardinality(owned) <= 5 AND owned <@ ARRAY['horse','crystal_lich','forgemaw','sapling','sprites']::text[])
 );
 -- CREATE IF NOT EXISTS does not widen existing CHECKs. The new predicate is a
 -- superset of the old one, so existing validated rows already satisfy it.
@@ -23,10 +23,10 @@ DO $account_buddies_active_keys_upgrade$ BEGIN
     SELECT 1 FROM pg_constraint
      WHERE conrelid = 'account_buddies'::regclass
        AND conname = 'account_buddies_active_keys'
-       AND pg_get_constraintdef(oid) NOT LIKE '%''sapling''%') THEN
+       AND pg_get_constraintdef(oid) NOT LIKE '%''sprites''%') THEN
     ALTER TABLE account_buddies DROP CONSTRAINT account_buddies_active_keys;
     ALTER TABLE account_buddies ADD CONSTRAINT account_buddies_active_keys CHECK (
-      cardinality(owned) <= 4 AND owned <@ ARRAY['horse','crystal_lich','forgemaw','sapling']::text[])
+      cardinality(owned) <= 5 AND owned <@ ARRAY['horse','crystal_lich','forgemaw','sapling','sprites']::text[])
       NOT VALID;
   END IF;
 END $account_buddies_active_keys_upgrade$;`;
@@ -74,7 +74,7 @@ async function migrateAndLoadAccountBuddies(accountId: number): Promise<BuddyKey
      ON CONFLICT (account_id) DO UPDATE SET owned = ARRAY(
        SELECT DISTINCT key FROM unnest(current.owned || EXCLUDED.owned) AS key ORDER BY key)
      RETURNING owned`,
-    [accountId, ['horse', 'crystal_lich', 'forgemaw', 'sapling']],
+    [accountId, ['horse', 'crystal_lich', 'forgemaw', 'sapling', 'sprites']],
   );
   return normalizeAccountBuddies(result.rows[0]?.owned);
 }

@@ -167,8 +167,9 @@ const build = await buildItemArtAudit({
     // `--verify-only`.
     // Completed Season 2 painted armor leaves the pending ledger, plus Nightwing Chimaera mount.
     // Wobbles the Slime's reins add one owner and one live definition.
-    catalogCount: 2183,
-    liveItemCount: 2212,
+    // + the sprite buddy's whistle render: 2184 / 2213.
+    catalogCount: 2184,
+    liveItemCount: 2213,
     // Only the intentionally retired Phoenix token retains its procedural icon.
     pendingArtCount: 1,
     generatedHeroicDefinitions: 116,

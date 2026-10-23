@@ -19298,6 +19298,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '燃えさし狐',
   'entities.mobs.buddy_emerald_wolf.name': 'エメラルドウルフ',
   'entities.mobs.buddy_forgemaw.name': '溶けたフォージモウ',
+  'entities.mobs.buddy_sprites.name': 'チラリとキラリ',
   'entities.mobs.buddy_frostfire.name': 'フロストファイア',
   'entities.mobs.buddy_golden_sentinel.name': '黄金の歩哨',
   'entities.mobs.buddy_kekius.name': 'ケキウス',
@@ -19347,6 +19348,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': 'トリプルTの笛',
   'entities.items.whistle_trollface.name': 'トロールフェイスの笛',
   'entities.items.whistle_tuskhorn_boar.name': 'タスクホーン・ボアの笛',
+  'entities.items.whistle_sprites.name': 'チラリとキラリの笛',
   'hudChrome.buddyMenu.rename': 'バディの名前を変更',
   'hudChrome.buddyMenu.nameLabel': 'バディの名前',
   'hudChrome.buddyMenu.autolootEnable': '自動収集を有効化',
@@ -19428,6 +19430,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'イーストブルック渓谷の生け垣から来た雌狐。冬枯れの茂みごしに覗く炭のように赤い毛からその名がついた。土地の罠師たちは何世代も前に子狐を狙うのをやめ、代わりに餌を置くようになった。',
   'hudChrome.collections.buddyLore.emerald_wolf':
     'レイスウッドの子狼。林床までほとんど届かない木漏れ日の下では、その毛は緑に見える。森が残していった孤児は、どれもウォーデンたちが育てる。',
+  'hudChrome.collections.buddyLore.sprites':
+    '金色とティール色、ふたつの小さな火の精。どちらが先頭か、いつまでも決まらない。近づきすぎると緑の炎ひとつに溶け合い、また笑いながら離れていく。',
   'hudChrome.collections.buddyLore.forgemaw':
     '最後の泉のるつぼで鍛えられ、ついに完成しなかったもの。槌の音がまだ響くうちにイグニヴァルの鋳場から歩み出た。見つけられるのはヒロイックの踏破だけだ。この溶けたものは自分を作った炉へ戻り続け、二度炎を生き延びた者について家まで来る。',
   'hudChrome.collections.buddyLore.frog':
@@ -19516,6 +19520,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.skeleton': '乾いた骨があなたの歩みに合わせてかたかた鳴る。',
   'hudChrome.collections.presence.crystal_lich':
     '残骸から冷たいうなりが立ちのぼり、それがあなたを見ている。',
+  'hudChrome.collections.presence.sprites': '小さな二つの炎があなたに燃え移り、消えそうにない。',
   'hudChrome.collections.presence.forgemaw':
     '炉の熱がまだあなたから離れない。何かがそれと共に歩き出た。',
   'hudChrome.collections.presence.crystal_tide':

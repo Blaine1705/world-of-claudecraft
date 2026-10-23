@@ -1428,7 +1428,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  '7ad30cc0c036e18c9ed8aed4a975a6ed7584db2008898a80aab36308d2a8559b';
+  // Re-minted after merging v045-integration: sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  '677e29fb9adb3ac4c7ef1d0b79207cb197c333176a3bb7ae5cff3318a0209ca9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1478,7 +1480,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  '05e79844eb3c4336cf13a2cccf14866cf2f54a295fd14145eed84f60d221a7ab';
+  // Re-minted after merging v045-integration: sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  'e6feea75c8398accd57d3d5c6ce1f956aec953402dc36466de2a3f98052119e6';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2881,7 +2885,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('00bb99fc91254731a8d6d3977fadc260d2b8669f4e9d75dc106006f3b10182e2');
+    ).toBe('beafcd0b5c187b310ae30bb71f3503076ede2d8b089617980d2b796d9f0eaaab');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

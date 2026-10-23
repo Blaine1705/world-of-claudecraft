@@ -126,6 +126,8 @@ const LEGACY_POLISHED_HELD_MODELS = new Set([
 /** The creature and mount defs whose authored atlas showed the low-tier film. */
 const AUTHORED_ATLAS_DEFS = [
   'buddy_sapling',
+  // The sprite buddy: Blender-painted orb gradients.
+  'buddy_sprites',
   'form_cat',
   // The one authored PLAYER body: the WOC warrior (woc_warrior.glb, its own
   // baked Tripo atlases on the artist's rig, never a KayKit palette), which the

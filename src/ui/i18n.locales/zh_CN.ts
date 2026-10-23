@@ -18374,6 +18374,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '余烬狐',
   'entities.mobs.buddy_emerald_wolf.name': '翡翠狼',
   'entities.mobs.buddy_forgemaw.name': '熔颚·熔融者',
+  'entities.mobs.buddy_sprites.name': '闪烁与微光',
   'entities.mobs.buddy_frostfire.name': '霜火',
   'entities.mobs.buddy_golden_sentinel.name': '黄金哨兵',
   'entities.mobs.buddy_kekius.name': '凯基乌斯',
@@ -18423,6 +18424,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '三重T的哨子',
   'entities.items.whistle_trollface.name': '巨魔脸的哨子',
   'entities.items.whistle_tuskhorn_boar.name': '獠角野猪的哨子',
+  'entities.items.whistle_sprites.name': '闪烁与微光的哨子',
   'hudChrome.buddyMenu.rename': '重命名伙伴',
   'hudChrome.buddyMenu.nameLabel': '伙伴名字',
   'hudChrome.buddyMenu.autolootEnable': '开启自动拾取',
@@ -18503,6 +18505,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '出自东溪谷树篱间的母狐，得名于冬日枯丛中透出的炭红皮毛。那里的猎人几代之前就不再打幼崽的主意，改成替它们留下食物。',
   'hudChrome.collections.buddyLore.emerald_wolf':
     '一只怨灵林的幼狼，皮毛在几乎照不到林底的树冠余光里泛着绿色。守林人会把森林留下的每一只孤儿养大。',
+  'hudChrome.collections.buddyLore.sprites':
+    '两只小小的火精，一金一青，总也说不好谁该打头。靠得够近时，它们会融成一团绿焰，随后又笑着分开。',
   'hudChrome.collections.buddyLore.forgemaw':
     '在最后泉源熔炉中锻造，却始终没有真正完工——锤声未歇，它便自己走出了伊格尼瓦的铸场。只有英雄难度的下潜才能找到它：这熔融之物总会回到造出它的那座炉子，然后跟着两度熬过烈火的人回家。',
   'hudChrome.collections.buddyLore.frog':
@@ -18582,6 +18586,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.raptor': '你脚跟后有敏捷的爪子在石头上嗒嗒作响。',
   'hudChrome.collections.presence.skeleton': '干枯的骨头随着你的脚步咔咔作响。',
   'hudChrome.collections.presence.crystal_lich': '一阵寒冷的嗡鸣从残骸中升起，它正注视着你。',
+  'hudChrome.collections.presence.sprites': '两簇小火苗沾上了你，而且不会熄灭。',
   'hudChrome.collections.presence.forgemaw': '熔炉的热度还没有离开你。有什么东西随之走了出来。',
   'hudChrome.collections.presence.crystal_tide': '一滴海水拒绝从你的钓线上落下。',
   'hudChrome.collections.presence.phantom': '你身后的空气静得有些过分。',

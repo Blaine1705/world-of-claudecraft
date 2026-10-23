@@ -233,6 +233,10 @@ const NON_CLIP_FIELDS = new Set<keyof ClipMap>([
   // (null = no gesture).
   'contacts',
   'idleVariantCadence',
+  // The sprite buddy's idle-pool scheduling flags (booleans).
+  'idleVariantsOnLoopSeam',
+  'idleVariantsShuffled',
+  'idleVariantsIncludeIdle',
   'shoutEmote',
 ]);
 
@@ -331,6 +335,9 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'clipSplits',
   'idleVariants',
   'idleVariantCadence',
+  'idleVariantsOnLoopSeam',
+  'idleVariantsShuffled',
+  'idleVariantsIncludeIdle',
   'idleBeat',
   'loadoutSwaps',
   'stowPlaysWhole',

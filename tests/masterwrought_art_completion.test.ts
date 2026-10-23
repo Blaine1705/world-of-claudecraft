@@ -840,7 +840,8 @@ describe('Masterwrought art completion evidence', () => {
     // + the membership Staff of Changing (membership-weapon-2026-10-14, PR 4281): 2040.
     // The icon backlog adds 135 Season 2 paintings, five referral rewards, the horse, and Nightwing Chimaera.
     // Wobbles the Slime's reins owner (outside the dated universe too): 2,183.
-    expect(currentOwnerIds).toHaveLength(2183);
+    // + the sprite buddy's whistle render: 2,184.
+    expect(currentOwnerIds).toHaveLength(2184);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1121,9 +1122,10 @@ describe('Masterwrought art completion evidence', () => {
         .filter(({ batchId }) => buddyBatchIds.includes(batchId))
         .flatMap(({ itemIds }) => itemIds),
     );
-    expect(buddyIds.size).toBe(34);
+    // 35 with the sprite buddy's whistle render.
+    expect(buddyIds.size).toBe(35);
     expect(datedIds.filter((id) => buddyIds.has(id))).toEqual([]);
-    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(34);
+    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(35);
 
     // Newly painted files add owners; replacements above only move existing owners.
     const backlogAdditiveBatchIds = [

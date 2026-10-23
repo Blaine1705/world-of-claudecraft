@@ -1440,6 +1440,7 @@ const RENDER_PURE_CORES = [
   'src/render/cut_cavity_core.ts',
   'src/render/grass_edge_taper_core.ts',
   'src/render/grass_interaction_core.ts',
+  'src/render/sprites_buddy_flame_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
