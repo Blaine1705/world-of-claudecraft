@@ -1155,11 +1155,12 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       // ring, streak, star and wide-ray blooms here, all box-shadow or
       // drop-shadow scaled by the tier, never a blur. Base 97; the release's
       // two extra library composites (+4) and the world-quests branch's vault
-      // blooms (+11) compose to 112 at the release/v0.44.0 base merge.
-      // Groups category selection adds one decorative bloom; its inset
-      // selection underline and text remain visible at every graphics tier.
-      'the style graph owns 113 reviewed tier-shadow uses',
-    ).toHaveLength(113);
+      // blooms (+11) compose to 112 at the release/v0.44.0 base merge. The vivid
+      // combat text crit and big-hit glows (tokens.css --glow-fct-crit x2,
+      // --glow-fct-big, --glow-fct-big-crit) add 4 decorative blurs: 117. Their
+      // keyline (--fct-vivid-outline) is legibility and never rides the tier.
+      'the style graph owns 117 reviewed tier-shadow uses',
+    ).toHaveLength(117);
 
     for (const [name, body] of [
       [

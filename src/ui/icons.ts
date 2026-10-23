@@ -11,6 +11,7 @@
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
+import { QUEST_SHIELD_ART_PENDING_ITEM_IDS } from '../sim/content/quest_shields';
 import {
   BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
@@ -2911,7 +2912,12 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   trailbreak: r('storm', 'leafGreen', ['boot', { p: 'arrow', ...TR }], ['motion', 'arcs']),
   wildheart: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow', 'sparkle']),
   shellskin: r('earth', 'earthBrown', ['shield', { p: 'pelt', ...BR }], ['crack']),
+  tactical_camo: r('nature', 'leafGreen', ['eye', { p: 'pelt', ...BR }], ['glow']),
+  play_dead: r('shadow', 'bone', [{ p: 'skull', ...BIG }], ['glow']),
   frostjaw_trap: r('frost', 'ice', ['fang', { p: 'tendrils', ...BR }], ['arcs', 'glow']),
+  bear_trap: r('steel', 'blood', ['fang', { p: 'claw_slash', ...BR }], ['drips']),
+  scatterbolt: r('steel', 'ember', ['bow', { p: 'arrow', ...TR }], ['motion', 'sparkle']),
+  phosphor_flask: r('fire', 'ember', ['potion', { p: 'flame', ...BR }], ['glow', 'sparkle']),
   cold_focus: r('frost', 'steel', ['eye', { p: 'crosshair', ...BR }], ['sparkle']),
   bloodhook: r('blood', 'steel', ['fang', { p: 'tendrils', ...TR }], ['motion', 'drips']),
   hunting_momentum: r('fury', 'blood', ['boot', { p: 'fang', ...TR }], ['motion', 'glow']),
@@ -3252,6 +3258,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),
   rake: r('nature', 'leafGreen', ['claw_slash'], ['drips']),
   claw: r('nature', 'leafGreen', ['claw_slash'], ['motion']),
+  scratch: r('nature', 'leafGreen', ['claw_slash', { p: 'paw', ...BR }], ['arcs']),
   ferocious_bite: r('blood', 'blood', ['fang'], ['drips']),
   swipe: r('earth', 'earthBrown', ['claw_slash'], ['arcs']),
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
@@ -3279,6 +3286,15 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
   conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
+  // Groveheart's Sporemender Form: the healer's cross inside the druid leaf
+  // (procedural fallback; owner-provided painted art ships beside it).
+  sporemender_form: r('nature', 'leafGreen', ['leaf', { p: 'cross', ...BR }], ['sparkle']),
+  // Spore Burst: a bursting sun of spores over the druid leaf (procedural
+  // fallback; the painted art ships beside it).
+  spore_burst: r('nature', 'leafGreen', ['sunburst', { p: 'leaf', ...BR }], ['sparkle', 'glow']),
+  // Nature's Boon passive: the druid leaf held in a warm glow (procedural
+  // fallback; the painted art ships beside it).
+  natures_boon: r('nature', 'leafGreen', ['leaf'], ['glow', 'sparkle']),
   feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
   swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
   // Groveheart resurrections: the in-combat single rez (a heart bursting back
@@ -4523,7 +4539,12 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'trailbreak',
   'wildheart',
   'shellskin',
+  'play_dead',
+  'tactical_camo',
   'frostjaw_trap',
+  'bear_trap',
+  'scatterbolt',
+  'phosphor_flask',
   'cold_focus',
   'bloodhook',
   'hunting_momentum',
@@ -4890,6 +4911,9 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'typhoon',
   'wildwake',
   'grove_awakening',
+  'sporemender_form',
+  'spore_burst',
+  'natures_boon',
   // hunter
   'aspect_of_the_wild',
   'bestial_wrath',
@@ -4975,6 +4999,8 @@ export const ABILITY_ART_PENDING = new Set<string>([
   // Wildfang kit pass 2: the VFX and art retune owns the final paintings.
   'lunge',
   'hamstring_bite',
+  // Scratch, the Cat Form sweep builder: its procedural glyph until the painting ships.
+  'scratch',
   // Buried Hoards: the Clockwork Shock Bomb's thrown cast draws its glyph until
   // its skill painting ships (the item itself already ships painted art).
   'clockwork_shock_bomb',
@@ -5536,13 +5562,17 @@ for (const item of Object.values(ITEMS)) {
 export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 
 // Explicit development-only item-art debt ledger. The Masterwrought completion wave
-// cleared the Ignivar raid's 81 feature entries (content/ignivar_loot.ts), so that spread
-// is currently empty; it stays in the union below as the canonical seam for future parked
-// raid art. Tests reject both unenumerated debt and stale entries after art lands.
+// cleared the Ignivar raid's 81 feature entries (content/ignivar_loot.ts); that spread
+// now parks only the later Crucible hunter quiver, and stays in the union below as the
+// canonical seam for parked raid art. Tests reject both unenumerated debt and stale
+// entries after art lands.
 export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
+  // The three leveling quest shields (content/quest_shields.ts), owed by the
+  // next item-art pass.
+  ...QUEST_SHIELD_ART_PENDING_ITEM_IDS,
   // Warfare Season 2 armor: painted icons owned by a follow-up art pass; the
   // procedural icon stands in until then. The season weapons never park here:
   // an unpainted weapon already draws its procedural icon.
@@ -5608,6 +5638,16 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'cmb_coinsack_caught',
   // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
   'exp_harbor_to_harbor',
+  // The sixth lifetime-XP rung (prog_titan): procedural progression crest until commissioned.
+  'prog_titan',
+  // World PvP streak titles use the PvP category crest until commissioned.
+  'pvp_flag_1h',
+  'pvp_flag_3h',
+  'pvp_flag_6h',
+  'pvp_flag_24h',
+  'pvp_flag_168h',
+  // The Hard wisp maze clear: exploration category crest pending art.
+  'exp_wisp_maze_hard',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

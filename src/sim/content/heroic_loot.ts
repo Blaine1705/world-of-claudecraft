@@ -1024,7 +1024,9 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // inside the shield share (the two epic shields split the rest evenly). The
     // held offhands came over from Varkhul's Normal off-set partition; the two
     // raid trinkets (content/trinkets.ts, item level 35) are appended at 0.12
-    // each with every other non-legendary row scaled down together. Every
+    // each with every other non-legendary row scaled down together. The hunter
+    // quiver is appended at the group's tail and shares the held-offhand 0.075
+    // in equal thirds with the orb and the cinder, so no other share moves. Every
     // weight is chosen so the group sums to EXACTLY 1 in floating point in this
     // row order (tests/ignivar_loot.test.ts pins it with toBe(1)).
     { itemId: 'bulwark_of_the_inner_crucible', chance: 0.177, rollGroup: 'varkhul_h_exclusive' },
@@ -1033,10 +1035,11 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'heart_of_the_end_greatblade', chance: 0.1045, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'forgefire_spire', chance: 0.098, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'staff_of_the_last_spring', chance: 0.0985, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'orb_of_the_last_spring', chance: 0.0375, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'cinder_of_the_first_design', chance: 0.0375, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'orb_of_the_last_spring', chance: 0.025, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'cinder_of_the_first_design', chance: 0.025, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'forgefathers_temper', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'heart_of_the_crucible', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'infernal_quiver', chance: 0.025, rollGroup: 'varkhul_h_exclusive' },
     // The Robe sigil, one guaranteed per Heroic kill (see Ignivar above).
     { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'varkhul_h_robe' },
     { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'varkhul_h_robe' },

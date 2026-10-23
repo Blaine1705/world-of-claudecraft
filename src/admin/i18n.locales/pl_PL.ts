@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const pl_PL: Record<string, string> = {
+  'moderationHistory.actionAnnounce': 'Ogłoszenie w krainie',
+  'moderationHistory.actionGmInvisible': 'Stał się niewidoczny',
+  'moderationHistory.actionGmVisible': 'Stał się widoczny',
+  'moderationHistory.actionUnwatch': 'Usunięto z listy obserwowanych',
+  'moderationHistory.actionWatch': 'Dodano do listy obserwowanych',
   'error.flagActiveExists': 'to konto ma już otwarte oznaczenie tego rodzaju',
   'wealth.largeMovementsUnavailable':
     'nie udało się wczytać dużych ruchów bankowych (upłynął limit czasu odczytu rejestru); powyższe zestawienie złota jest kompletne',

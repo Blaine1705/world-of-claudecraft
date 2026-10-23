@@ -235,6 +235,12 @@ export const hudChromeStrings = {
     castingOff: 'The ferry to {dest} is casting off',
     boardHint: 'Stand on its deck when it sails. The crossing is free.',
     sailing: 'Sailing to {dest}',
+    portLabel: '{port} ferry to {dest}',
+    portTitle: '{port} ferry port',
+    destination: 'Destination: {dest}',
+    boardNow: 'Board now',
+    arrivesIn: 'Ferry arrives in {time}',
+    scheduleUnavailable: 'Ferry timetable unavailable.',
   },
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
   vehicle: {
@@ -311,6 +317,18 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  // The realm message of the day (/motd, server/realm_motd.ts): the chat line
+  // every player sees at login and whenever an admin changes it ({text} is the
+  // admin's message, spliced verbatim), plus the admin's command feedback.
+  realmMotd: {
+    line: 'Message of the day: {text}',
+    updated: 'Message of the day updated.',
+    cleared: 'Message of the day cleared.',
+    none: 'No message of the day is set.',
+    usage: 'Usage: /motd "<message>" to set it, /motd clear to remove it.',
+    tooLong: 'The message of the day is limited to {max} characters.',
+    saveFailed: 'The message of the day could not be saved and will not survive a restart.',
+  },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {
@@ -339,6 +357,17 @@ export const hudChromeStrings = {
   // ghost-state additions shown once the spirit has been released.
   death: {
     resurrectAtCorpse: 'Resurrect at Corpse',
+    // The death screen's PvP Resurrect button (src/sim/pvp/pvp_resurrect.ts): shown
+    // only after a death a hostile player had a hand in, outside instances.
+    pvpResurrect: 'PvP Resurrect',
+    pvpResurrectTitle:
+      "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
+    // The button and the panel line while the PvP Resurrect wait runs, then once it
+    // is over ({seconds} is a durationText value from PVP_RESURRECT_WAIT_SECONDS).
+    pvpResurrectWaitButton: 'PvP Resurrect ({seconds})',
+    pvpResurrectWaitNote:
+      'You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.',
+    pvpResurrectReadyNote: 'PvP Resurrect is ready: you will rise at the nearest graveyard.',
     // RETIRED in place: the ghost prompt's Pale Keeper button is gone (the ghost
     // talks to the Keeper instead). The key stays, already filled in all 20
     // locales, per the hud.core.mobileTarget retired-but-translated precedent.
@@ -373,6 +402,13 @@ export const hudChromeStrings = {
       "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
+  },
+  // The note over the 3D view while a WebGL context restore holds the world
+  // draw (src/ui/graphics_restore_note_controller.ts): the browser lost and
+  // gave back the graphics context, and the visible scene is being prepared
+  // again. A status line, not a warning: the HUD stays live under it.
+  graphicsRestore: {
+    note: 'Restoring graphics',
   },
   // Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray). The
   // button label reuses nav.wiki; these are the confirm dialog's strings
@@ -2168,6 +2204,13 @@ export const hudChromeStrings = {
     reportSent: 'Report copied and sent to chat',
     reportNoData: 'No data recorded.',
     noDetailedData: 'No detailed data',
+    // The ability drill-down subtitle. Effective is the healing that landed;
+    // the overheal percent is its share of total output (effective + overheal).
+    // Wordy (M16): the five non-Latin fills land in this same change.
+    detailHealSubtitle:
+      'Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)',
+    detailHitSubtitle:
+      'Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}',
     noDeathEvents: 'No events logged before death',
     killedBy: 'Killed by {killer} ({ability})',
     lethalHit: 'Lethal Hit',
@@ -2593,6 +2636,7 @@ export const hudChromeStrings = {
     },
   },
   options: {
+    spellTooltipOnHover: 'Spell Tooltips on Hover',
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
     // Running client version + build id, shown as small secondary text at the foot
@@ -2654,6 +2698,9 @@ export const hudChromeStrings = {
     interfaceModeTouch: 'Touch',
     interfaceModeNote:
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
+    // Audio panel slider for the environment bus (wind, birds, rain, water,
+    // dungeon air, campfires, forges), separate from the Sound Effects slider.
+    ambienceVolume: 'Ambience Volume',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
     // Audio panel toggle for the discrete interface and feedback cues (loot, level,
@@ -2669,6 +2716,11 @@ export const hudChromeStrings = {
     lockCursorOnRotate: 'Lock Cursor While Rotating',
     keybindHelpLockCursorOnRotate:
       'Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.',
+    // Keybind panel toggle: request the camera-drag pointer lock with raw
+    // (unadjusted) mouse input. On by default.
+    rawMouseInput: 'Raw Mouse Input',
+    keybindHelpRawMouseInput:
+      'Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
     // Interface panel twin of the character sheet's privacy eye: the same
@@ -2829,6 +2881,12 @@ export const hudChromeStrings = {
     confirmVendorSellMinQuality: 'Confirm Sales From Quality',
     confirmVendorSellMinQualityNote:
       'Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.',
+    // Successor of confirmVendorSellMinQualityNote, which now has no consumer
+    // and keeps its reviewed overlay rows: plain gray junk no longer records a
+    // buyback row (items.ts skipsVendorBuyback), so the old promise was false
+    // for exactly the items this threshold always sells instantly.
+    confirmVendorSellMinQualityNoteGray:
+      'Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off
@@ -2857,11 +2915,32 @@ export const hudChromeStrings = {
     // target-of-target's) own melee/ranged swing timer, under the target
     // frame. Independent of showTargetOfTarget (the portrait mini-frame).
     showTargetSwingTimer: 'Show Target Swing Timer',
+    // Interface > Combat: the "Style of Enemy Highlight" group heading and its
+    // four independent checkboxes (all off by default, any mix allowed), each
+    // adding one cue for a hostile current target.
+    enemyHighlightStyle: 'Style of Enemy Highlight',
+    enemyHighlightEdgeArrow: 'Screen-Edge Arrow Off-Camera',
+    enemyHighlightNameplate: 'Big Framed Target Nameplate',
+    enemyHighlightOverhead: 'Floating Marker Overhead',
+    enemyHighlightReticle: 'Heavier Hostile Reticle',
+    // The distance printed beside the screen-edge arrow, in yards.
+    enemyHighlightDistance: '{yards} yd',
     // Interface panel toggle for the pet health strip under the player frame (on by
     // default; it only appears while you actually have a pet). Phrased from the
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY
     // for the M16 guard.
     showPetFrame: 'Show Your Pet',
+    // Interface > Frames toggle (off by default): lifts the player's resource bar
+    // (mana, energy, rage) out of the player frame into a frame of its own. The
+    // two sliders under it size that frame and show only while it is detached.
+    playerFrameResourceDetached: 'Detach Resource Bar',
+    playerFrameResourceWidth: 'Resource Bar Width',
+    playerFrameResourceHeight: 'Resource Bar Height',
+    // Interface > Frames slider: how solid the King of the Hill bar's panel is
+    // behind its text (the text itself never fades).
+    hillBarOpacity: 'King of the Hill Background Opacity',
+    // A pixel-size slider readout, e.g. "232 px".
+    pixelsValue: '{value} px',
     // Interface > Combat toggles (both on by default) for the two dot-tracking
     // surfaces. Both show only the LOCAL player's OWN debuffs, on every class:
     // the icon row on an enemy's nameplate, and the standalone Target dots frame
@@ -2872,6 +2951,13 @@ export const hudChromeStrings = {
     // (plate-native) to 300%. Wordy (M16): the five non-Latin fills land in this
     // same change.
     nameplateDotScale: 'Nameplate Dot Size',
+    // Interface > Combat (on by default), beside the dot tracker: the enemy
+    // offensive/defensive tracker, a hostile player's tracked cooldowns (the PvP
+    // medallion once used, defensives, offensives) as an icon row above their name,
+    // plus its size slider. Wordy (M16): the five non-Latin fills land in this same
+    // change.
+    showNameplateCooldowns: 'Offensive/Defensive Tracker',
+    nameplateCooldownScale: 'Offensive/Defensive Tracker Size',
     showTargetDots: 'Show Target Dots',
     // Interface > Combat rows for the six aura tracks. All wordy (M16): the five
     // non-Latin fills land in this same change.
@@ -2882,11 +2968,18 @@ export const hudChromeStrings = {
     showUtilityModes: 'Include Stealth and Travel Modes',
     showFriendlyTrack: 'Show My Buffs on Allies',
     showShieldTrack: 'Show My Shields',
+    // Interface > Combat opt-out of the vivid floating combat text (school colours,
+    // fan-out, crit and big-hit emphasis) back to the classic white and gold.
+    classicCombatText: 'Classic Combat Text',
     // Graphics-panel opt-in (default off) for the interactive wake/ripple
     // simulation on water surfaces; bubbles and splash particles do not key
     // off it. It sits in the Display card beside Weather because it costs
     // GPU passes, not because it is a comfort toggle.
     waterRipples: 'Water Ripples (Wakes)',
+    // Graphics-panel switch (default on) for the spell visual effects that
+    // players and their pets cast in the 3D world. Off keeps everything an
+    // enemy casts, area telegraph rings, crowd-control bands and cast bars.
+    spellEffects: 'Spell Effects',
     // Camera card opt-in (default off): the over-the-shoulder Action Cam, plus
     // the shoulder slider (full left .. center .. full right) that only shows
     // while it is on. The slider readout: {pct} is a formatted percent.
@@ -2943,6 +3036,13 @@ export const hudChromeStrings = {
     complexityMedium: 'Medium',
     complexityHigh: 'High',
     exampleAbilities: 'Example abilities',
+    // Label for what a spec gets just for being picked (spec_baselines.ts plus
+    // spec_output_tuning.ts), which otherwise never surfaces anywhere.
+    specBonus: 'Specialization bonus',
+    healing: 'healing',
+    absorption: 'absorption',
+    physicalAbilityDamage: 'melee and ranged ability damage',
+    primaryHealingBonus: 'Increases primary healing by {pct} after other healing bonuses.',
     viewTalents: 'View talents',
     selectSpec: 'Select specialization',
     specUnlockBanner: 'Specialization Unlocked!',
@@ -3321,11 +3421,16 @@ export const hudChromeStrings = {
     iconSize: 'Icon Size',
     iconPadding: 'Icon Padding',
     opacity: 'Opacity',
-    visibility: 'Visibility',
-    visAlways: 'Always Visible',
     visCombat: 'In Combat',
-    visHidden: 'Hidden',
     visHiddenHint: 'A hidden group still plays its sounds and lights your action bar.',
+    showWhile: 'Show While',
+    showOutOfCombat: 'Out of Combat',
+    showIn: 'Show In',
+    showInWorld: 'Open World',
+    showInInstances: 'Instances',
+    placeHint:
+      'Instances are dungeons, raids, delves, rifts, battlegrounds, the arena and any other instanced area. Outside the places you tick, the group is hidden and silent.',
+    groupOffHint: 'With no place ticked, this group never shows and never plays its sounds.',
     showTimer: 'Show Timer',
     positionX: 'Horizontal Position',
     positionY: 'Vertical Position',
@@ -3346,7 +3451,6 @@ export const hudChromeStrings = {
     aurasHint:
       'Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.',
     auraFallback: 'Aura',
-    onlyWhileActive: 'Only Show While Active',
     alertStacks: 'Alert at Stacks',
     alertStacksAny: 'On gain',
     alertStacksHint:
@@ -3364,7 +3468,19 @@ export const hudChromeStrings = {
     glowWhenReadyHint: 'Brightens and outlines the button while the spell can be cast.',
     hotbarGlow: 'Hotbar Glow',
     hotbarGlowHint: 'Also lights this spell on your action bar while it is ready.',
-    onlyWhenReady: 'Only Show When Ready',
+    showButtonWhen: 'Show Button When',
+    showReady: 'Ready',
+    showNotReady: 'Not Ready',
+    notReadyHint: 'Not ready means on cooldown, or not usable right now.',
+    auraShowWhen: 'Show Button While the Aura Is',
+    auraActive: 'Active',
+    auraMissing: 'Missing',
+    neverShownHint: 'With neither ticked, the button never shows, but its sound still plays.',
+    reminderHint:
+      'Buff reminder: the button lights up while this aura is missing and hides once you have it.',
+    glowWhileMissing: 'Light Up While Missing',
+    reminderGlowHint: 'Brightens, outlines and pulses the button while the aura is missing.',
+    reminderSoundHint: 'Plays when the aura drops off.',
     sound: 'Ready Sound',
     soundHint:
       'Plays when the spell becomes ready, or when its button changes into another spell while ready.',
@@ -3516,6 +3632,8 @@ export const hudChromeStrings = {
       worldKill: 'world kill',
       worldAssist: 'world kill assisted',
       hillHold: 'holding the hill',
+      // The day's Honor world quests (src/sim/world_quest_honor_slots.ts).
+      worldQuest: 'world quest',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.
@@ -3531,6 +3649,12 @@ export const hudChromeStrings = {
   // number is a resolved value from src/sim/pvp/world_pvp_rules.ts, never a
   // literal in the copy, so a retune never strands the text.
   worldPvp: {
+    rewardTitles:
+      'Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.',
+    rewardPaused: 'Current PvP streak: {time} played (paused in a sanctuary)',
+    rewardPausedDead: 'Current PvP streak: {time} played (paused while dead)',
+    rewardPausedInstance: 'Current PvP streak: {time} played (paused inside PvE instances)',
+    rewardProgress: 'Current PvP streak: {time} played',
     tab: 'World PvP',
     title: 'World PvP',
     blurb:
@@ -3561,6 +3685,11 @@ export const hudChromeStrings = {
       'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
     aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
     stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
+    spoilsLine:
+      "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+    // One looted trophy skull (src/sim/pvp/world_pvp_spoils.ts): {name} is the
+    // defeated player's name, carried on the copy.
+    skullName: "{name}'s Skull",
     noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
     noTakeLine:
       'An unflagged fighter takes no gold either: it only moves between two flagged players.',
@@ -3595,12 +3724,41 @@ export const hudChromeStrings = {
     countsHolding: 'Inside: you {yours}, rival {theirs}',
     contestYou: 'Taking the hill: {seconds} of {total}',
     contestOther: 'Losing the hill: {seconds} of {total}',
+    // The clock while its group is inside but not leading (src/sim/pvp/hill_rules.ts
+    // hillProgressStep): a rival only pauses a capture, it never resets it. Short,
+    // so the line fits the one-line track; the counts row above names the rival.
+    contestYouPaused: 'Paused: {seconds} of {total}',
+    contestOtherPaused: 'Rival paused: {seconds} of {total}',
     contestNone: 'Hold a majority inside for {total} to take it',
     inside: 'You are inside the circle',
     distance: '{yards} yd to the circle',
     rises: 'Rises in {minutes}',
     falls: 'Falls in {minutes}',
     standingRaid: 'Raid members do not count: only parties can hold the hill',
+  },
+  // The World PvP Skull Bag (src/sim/pvp/skull_bag.ts): the sub-inventory pane
+  // docked in the bags window (src/ui/hud/skull_bag/), its bag hint and its
+  // item tooltip line.
+  skullBag: {
+    title: 'Skull Bag',
+    // {count} is the number of skulls held.
+    total: 'Skulls: {count}',
+    close: 'Close the Skull Bag',
+    clickOpen: 'Click to open',
+    notCarried: 'Carry the Skull Bag in your bags to store or take skulls.',
+    empty: 'Empty. While you carry the bag, skulls you loot go straight in.',
+    // A row of skulls whose victim was never recorded.
+    unrecorded: 'Trophy Skull',
+    // {count} is the number of plain skulls carried in the bags.
+    store: 'Store carried skulls ({count})',
+    storeNone: 'No skulls to store',
+    takeOne: 'Take 1',
+    takeAll: 'Take all',
+    // {item} is the row's skull name ("Bet's Skull" or "Trophy Skull").
+    takeOneAria: 'Take 1: {item}',
+    takeAllAria: 'Take all: {item}',
+    tooltip:
+      'Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls.',
   },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
@@ -3616,6 +3774,8 @@ export const hudChromeStrings = {
     gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
+    // Honor goods with nothing to wear (the World PvP Skull Bag).
+    goods: 'Goods',
     // Group headings: Warfare Season 2 (the viewer's class sets and weapons)
     // listed above the Season 1 entry tier (warfare_vendor_window.ts).
     groupSeason2: 'Warfare Season 2: Vanguard',
@@ -3644,6 +3804,9 @@ export const hudChromeStrings = {
     spell: 'Spell',
     defense: 'Defense',
     ratings: 'Ratings',
+    // The average item level of the worn gear (gear_score_view.ts), shown above
+    // the Offense panel and under the inspect window's model stage.
+    gearScore: 'Gearscore',
     // The lifetime "Time Played" line at the foot of the sheet (the same
     // running total the /playtime chat command reports). The value composes
     // the two coarsest units from the plurals.playtime* fragments through
@@ -3687,6 +3850,12 @@ export const hudChromeStrings = {
     upgradeNote:
       "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
     upgradeMaxed: 'No cartographer could better this map.',
+    inkPickerTitle: "Use Cartographer's Ink on which map?",
+    inkPickerHeld: "You hold {held} Cartographer's Ink.",
+    inkPickerRead: 'Being followed: its X lies in {zone}. The X stays put.',
+    inkPickerUnread: 'Unread ({count} held)',
+    inkPickerCost: 'Redraw to {rarity}: {inks} ink',
+    inkPickerCancel: 'Cancel',
     rarity: {
       common: 'Common',
       rare: 'Rare',
@@ -3702,7 +3871,9 @@ export const hudChromeStrings = {
     delveMark: 'Delve Mark',
     wocToken: 'WoC Token',
     heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
-    honorNote: 'Battlegrounds and the arena',
+    // Every Honor source a player can reach, the day's Honor world quests
+    // included (src/sim/world_quest_honor_slots.ts).
+    honorNote: 'Battlegrounds, the arena, and world quests',
     delveMarkNote: 'Delves completed',
     wocTokenNote: 'Linked wallet balance',
     walletNotLinked: 'No wallet linked',
@@ -4779,6 +4950,9 @@ export const hudChromeStrings = {
     resetDone: 'All instances have been reset.',
     resetNone: 'You have no instances to reset.',
     resetOccupied: 'You cannot reset instances while someone is still inside.',
+    queuedOccupied:
+      'Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.',
+    queuedCancelled: 'Queued difficulty change cancelled because the party or leader changed.',
     resetSameDifficulty:
       'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
     resetLoot: 'You cannot reset instances while loot remains inside.',
@@ -4814,6 +4988,9 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
+    // Refusal when a drag would move a locked stack, or drop onto one: a locked
+    // item is pinned to its bag slot (src/sim/inventory_order.ts isCellPinned).
+    reorderLocked: 'Locked items stay in their bag slot. Unlock it to move it.',
     // Accessible-name arm of the instanced-slot corner marker: the
     // visual tab is aria-hidden, so the per-copy flag rides the cell's label
     // (the tooltip on focus stays the detail surface).
@@ -5426,7 +5603,7 @@ export const hudChromeStrings = {
     oldBlood:
       'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:
-      'Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom',
+      "Verdance {stacks}/{max}. Each Sporemending, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
     freeExecute: 'Your next eligible execute ability costs nothing',
     resourceSap: 'Restores {value} of your current resource every {interval} sec',
     nextAttackCrit: 'Your next attack is guaranteed to critically strike',
@@ -5566,6 +5743,8 @@ export const hudChromeStrings = {
     formFireball: 'Ember Form: movement speed increased by {pct}%; attacks and spells are disabled',
     formMoonkin:
       'Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%',
+    formSporemender:
+      'Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%',
     formShadow: 'Gloamveil Form: Shadow damage increased by {pct}%',
     resourceCount: '{value} of {max}',
     formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',
@@ -5711,6 +5890,10 @@ export const hudChromeStrings = {
     afkTag: 'AFK',
     // The World PvP flag tag, same bracket convention as afkTag.
     pvpTag: 'PvP',
+    // The World PvP bounty tag (src/sim/pvp/world_pvp_bounty.ts), same bracket
+    // convention: the non-colour read of the blood-red bounty name tag. Wordy
+    // (M16), so the five non-Latin fills ship in this same change.
+    bountyTag: 'Bounty',
     // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
     // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
     // afkTag the brackets are part of the VALUE, so a locale that punctuates a
@@ -5904,6 +6087,7 @@ export const hudChromeStrings = {
       // aria labels (Your Hero / Your Mark / Your Band), which read as riddles
       // in an arrangement mode.
       playerFrame: 'Player',
+      playerResource: 'Resource Bar',
       targetFrame: 'Target',
       partyFrames: 'Party',
       // The auto-attack swing timer (#swingbar), hidden outside combat like
@@ -6005,6 +6189,48 @@ export const hudChromeStrings = {
     apply: 'Apply',
     imported: 'Hotkey setup imported.',
     wrongKind: 'That code is a settings export, not a hotkey setup.',
+  },
+  // The Key Bindings panel's keyboard-layout converter
+  // (keybind_layout_convert_rows.ts over keyboard_layout_convert_core.ts):
+  // moves every hotkey to the key that prints the same character on another
+  // layout. QWERTY, QWERTZ, AZERTY, Dvorak and Colemak are layout names; the
+  // wordy rows (M16) get their five non-Latin fills in this same change.
+  keybindLayout: {
+    title: 'Keyboard Layout',
+    open: 'Convert',
+    from: 'Hotkeys made for',
+    to: 'Convert to',
+    // The six move and turn actions (the WASD and QE keys); every other hotkey converts.
+    keepMovement: 'Keep movement keys in place',
+    // Shown when the last conversion kept movement in place: those keys are
+    // still on their earlier positions, so they stay put again.
+    keepMovementLocked:
+      'Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.',
+    help: 'Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.',
+    // {count} is how many hotkeys land on a different key.
+    moves: 'Hotkeys that will move: {count}',
+    noChange: 'No hotkeys change between these layouts.',
+    apply: 'Convert Hotkeys',
+    // {from} and {to} are layout names from layouts.* below.
+    converted: 'Hotkeys converted from {from} to {to}.',
+    layouts: {
+      qwertyUs: 'QWERTY (US)',
+      qwertyUk: 'QWERTY (UK)',
+      qwertzDe: 'QWERTZ (German)',
+      qwertzCh: 'QWERTZ (Swiss)',
+      azertyFr: 'AZERTY (French)',
+      azertyBe: 'AZERTY (Belgian)',
+      qwertyEs: 'QWERTY (Spanish)',
+      qwertyIt: 'QWERTY (Italian)',
+      qwertyNordic: 'QWERTY (Swedish, Finnish)',
+      qwertyDa: 'QWERTY (Danish)',
+      qwertyNo: 'QWERTY (Norwegian)',
+      qwertyBr: 'QWERTY (Brazilian ABNT2)',
+      qwertyPt: 'QWERTY (Portuguese)',
+      qwertyTr: 'QWERTY (Turkish)',
+      dvorak: 'Dvorak',
+      colemak: 'Colemak',
+    },
   },
   // The Key Bindings panel's keyboard overview (src/ui/keyboard_map.ts): a live
   // keyboard with every key in use coloured by category and captioned with its
@@ -6177,6 +6403,8 @@ export const hudChromeStrings = {
     // so it says so plainly and names the signer AS the signer instead of
     // inventing an attribution for units nobody recorded.
     materialSourceGatherer: '{count} × Collected by {name}',
+    // A World PvP trophy skull stack's provenance row: {name} is the victim.
+    trophySkullSource: '{count} × Taken from {name}',
     materialSourceGathererSigned: '{count} × Collected by {name}, signed by {signer}',
     materialSourceUnrecorded: '{count} × No gatherer recorded',
     materialSourceUnrecordedSigned: '{count} × No gatherer recorded, signed by {name}',
@@ -7772,9 +8000,9 @@ export const hudChromeStrings = {
   },
   enchantDescription: {
     enchant_weapon_lastflame_zeal:
-      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
     enchant_weapon_riftwalkers_grace:
-      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
     enchant_weapon_dawnfire_etching:
       'Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.',
     enchant_weapon_dawns_benediction:
@@ -7783,19 +8011,24 @@ export const hudChromeStrings = {
       'Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale.',
   },
   factionRewards: {
+    hearthstoneUnattuned:
+      'Your Allied Hearthstone is not attuned. Speak with an allied quartermaster or use it in an allied hub.',
+    hearthstoneBound: 'Your Allied Hearthstone is now attuned to {hub}.',
+    hearthstoneTransport: 'The hearthstone transports you to {hub}.',
+    itemCooldown: 'That item is not ready yet ({minutes} min remaining).',
     alliedHearthstoneUse:
       'Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)',
     alliedHearthstoneAttuned: 'Attuned to: {hub}',
     hub_none: 'None (Use near a faction hub to attune)',
     hub_rift_watch: 'Drifthaven (The Rift Watch)',
     hub_church_order: 'Eastbrook Vale (The Church Order)',
-    hub_automatons: 'South Reach (The Automaton Foundry)',
+    hub_automatons: 'Wyrmwatch (The Automatons)',
     riftGliderUse:
       'Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)',
     targetDummyUse:
       'Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)',
     battleStandardUse:
-      'Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)',
+      'Use: Plants the Consecrated Dawn Battle Standard for 5 min. Players out of combat within 15 yards of it regenerate 10% more health, and mana users also restore mana equal to 5% of their Spirit, every 2 sec. Staying near it for 10 sec grants Blessing of the Dawn, increasing Strength, Agility, Stamina, Intellect, and Spirit by 5% for 30 min. (5 min cooldown)',
     shockBombUse:
       'Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)',
     invisibilityUse: 'Use: Shrouds you in stealth for 6 sec. (2 min cooldown)',
@@ -8547,6 +8780,11 @@ export const hudChromeStrings = {
   pattern: {
     teaches: 'Use: Teaches you how to craft {item}.',
     teachesEnchant: 'Use: Teaches you how to apply {enchant}.',
+    // The materials line under each taught product: {label} is the crafting
+    // window's own crafting.reagentsNeeded ("Requires:") and {list} a
+    // formatList of reagent entries, so neither gets a second wording.
+    reagents: '{label} {list}',
+    reagent: '{name} x{count}',
   },
   // Maker's Bond unbind service window + result lines (Professions 2.0):
   // the station master's second gossip service beside training.
@@ -9165,6 +9403,8 @@ export const hudChromeStrings = {
       "Awarded to every member of the party that wins a ranked Rift's first clear",
     // The Buried Hoard pieces (content/hoard_loot.ts): rolled from the reward
     // chest, never from the keeper's own loot, and at the tier the map buys.
+    // Also the second source of the corpse-harvest specimens the same chest
+    // pays (VAULT_MATERIAL_POOL, content/treasure_maps.ts).
     sourceActivityBuriedHoard:
       'Found in the reward chest of a Buried Hoard, the vault a treasure map leads to',
     // The aria label folds the lines through formatList (Intl.ListFormat), so
@@ -9460,6 +9700,10 @@ export const hudChromeStrings = {
     // hudChrome.deeds.collapseHint / expandHint).
     collapseHint: 'Collapse map sidebar',
     expandHint: 'Expand map sidebar',
+    // The divider between the sidebar and the map (map_rail_resize_controller.ts):
+    // its accessible name, and the hover hint saying how to use it.
+    resizeRailAria: 'Map sidebar width',
+    resizeRailHint: 'Drag to resize the map sidebar. Double-click to reset.',
   },
   // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
   // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note
@@ -9921,6 +10165,8 @@ export const hudChromeStrings = {
     choose: 'Choose quest',
     inProgress: 'In progress ({count}/{required})',
     completed: 'Completed this week',
+    completedLastWeek: 'Completed last week',
+    claimFirst: 'Claim first',
     lockedThisWeek: 'Locked this week',
     footerPick: 'You may hold one weekly charge at a time. Pick a card to read its terms.',
     footerHeld: 'Your charge for the week is set. The other three unlock at the reset.',
@@ -9930,7 +10176,7 @@ export const hudChromeStrings = {
     alsoReceive: 'You will also receive:',
     tally: '{count} / {required}',
     cacheDesc:
-      'Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.',
+      'Opens into one Normal raid piece for your class (never an Ignivar tier-set piece), plus {count} x {item}.',
     dialogNote: 'Only one weekly charge can be active. It {reset}',
     accept: 'Accept',
     decline: 'Decline',
@@ -9964,6 +10210,8 @@ export const hudChromeStrings = {
     // claimed from the window once the charge is finished.
     commendHeading: "Emissary's commendation",
     commendNote: '{amount} standing to one faction of your choice, once a week.',
+    commendCarriedNote:
+      '{amount} standing from last week, still unclaimed. Claim it to choose a new charge.',
     commendClaimed: "This week's commendation went to the {faction}.",
     commendRewardLine: '{amount} standing with a faction of your choice',
     // Chat and banner lines for the emissary's events.

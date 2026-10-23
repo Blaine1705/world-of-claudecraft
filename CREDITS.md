@@ -92,6 +92,9 @@ than free, so ask before you rely on it.
 
 | Assets | Author | Source | License | Redistribution |
 |---|---|---|---|---|
+| Hunter Bear Trap and Phosphor Flask ability icons (`public/ui/skills/hunter/bear_trap.webp`, `phosphor_flask.webp`) | World of ClaudeCraft | Original art generated with OpenAI built-in image generation for PR #4488 (the flask was approved as the Molotov Cocktail painting); ownership and shipping hashes recorded in the Hunter `mapping.json` | Project asset, rights reserved | **No, permission required** |
+| Hunter Play Dead and Tactical Camo ability icons (`public/ui/skills/hunter/`) | World of ClaudeCraft | Original art generated with OpenAI built-in image generation for PR #4488; ownership and shipping hashes recorded in the Hunter `mapping.json` | Project asset, rights reserved | **No, permission required** |
+| Hunter Scatterbolt ability icon (`public/ui/skills/hunter/scatterbolt.webp`) | World of ClaudeCraft | Original crossbow and explosion art generated with OpenAI built-in image generation for PR #4488; prompt and provenance recorded in the Hunter `mapping.json`; Shrapnel Charge keeps its earlier painting | Project asset, rights reserved | **No, permission required** |
 | Character models + animations (knight, mage, rogue, barbarian, hooded rogue), weapons/shields | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 | Yes |
 | Skeleton character models + animations, bone weapons | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0 | CC0 1.0 | Yes |
 | Skeleton minion rig + FREE-tier animations (rebuilt as skeleton_minion_free.glb, backing the Bonebound Rickshaw's skel_rickshaw_puller; see scripts/assets/rebuild_kaykit_skeletons_free.mjs) | Kay Lousberg (KayKit) | KayKit_Skeletons_1.1_FREE (kaylousberg.itch.io) | CC0 1.0 | Yes |
@@ -392,6 +395,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (nythraxis_bone_spike) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (nythraxis_binding_cage) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (windrider_glider_flight) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated creature model + animations (sporemender_form) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline from owner-provided concept art (Tripo AI image-to-image T-pose redraw, 3D model, auto-rig and preset retargets; weights and arm pose post-processed) | Project asset | With the project only |
 
 Crucible profession collection equipment, manuals, and enchant formula paintings are project-generated art, made with OpenAI's built-in image generation for World of ClaudeCraft. Provenance: `docs/achievements/crucible-professions-2026-09-05/`. Project asset, with the project only.
 
@@ -415,6 +419,7 @@ MIT License covering the source code.
 If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
 | Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |
+| Generated prop model (spore_burster) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D image-to-model from a project concept; cap spots baked into the texture locally) | Project asset | With the project only |
 
 ### Orbital Lightning
 
@@ -511,3 +516,5 @@ Dungeon selection scenery (`public/ui/dungeon-scenes/`) is project-generated art
 made with OpenAI's built-in image generation for World of ClaudeCraft. The Sunken
 Bastion, Drowned Temple, Gravewyrm Sanctum and Wildheart Basin illustrations follow
 the project's dungeon settings, with no third-party reference images.
+
+Lychgate Buckler, Bastion Kite Shield and Barrowfield Tower Shield inventory icons are project-generated art made with OpenAI built-in image generation. [Prompts and provenance](docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json). Project asset, with the project only.

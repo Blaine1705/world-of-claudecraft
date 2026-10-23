@@ -41,6 +41,7 @@ import {
   HONOR_QUARTERMASTER_STOCK,
   WARFARE_ITEMS,
   WARFARE_TRINKET_STOCK,
+  WORLD_PVP_GOODS_STOCK,
 } from '../src/sim/content/pvp_honor';
 import {
   isCataloguedRelicItem,
@@ -73,6 +74,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
+import { VAULT_MATERIAL_POOL } from '../src/sim/content/treasure_maps';
 import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   ALL_RECIPES,
@@ -471,7 +473,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
-    expect(full).toEqual({ owned: 495, total: 495 });
+    // the sixth lifetime-XP rung's Titan title joins the titles page: 496.
+    // The five World PvP title relics bring it to 501.
+    // The World PvP Skull Bag closes the Warfare armory: 496.
+    // Composed together, the Skull Bag adds one more Warfare armory relic: 502.
+    expect(full).toEqual({ owned: 503, total: 503 });
+    // The Crucible hunter quiver adds one Varkhul Heroic relic: 503.
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -504,7 +511,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
-    expect(character).toEqual({ owned: 466, total: 466 });
+    // 467 with the sixth lifetime-XP rung's Titan title slot. 472 with the
+    // five World PvP title slots.
+    // 467 with the World PvP Skull Bag (a character-scoped item on the Warfare armory).
+    // Composed together, the Skull Bag adds one more character-scoped item: 473.
+    expect(character).toEqual({ owned: 474, total: 474 });
+    // The hunter quiver adds one character-scoped relic: 474.
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -568,7 +580,12 @@ describe('Reliquary Conqueror catalog structure', () => {
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
       // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
-    ).toBe(682);
+      // +1 the sixth lifetime-XP rung's Titan title on horizons_titles: 683.
+      // +5 World PvP title slots on horizons_titles: 688.
+      // +1 for the World PvP Skull Bag on the Warfare armory: 683.
+      // Composed together: 689.
+      // The hunter quiver adds one Varkhul Heroic slot: 690.
+    ).toBe(690);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -803,7 +820,9 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the five Crucible raid trinkets (each on its boss's Normal and
     // Heroic page, one id each): 350.
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(521);
+    // +1: the World PvP Skull Bag (the Warfare armory): 522.
+    // The Crucible hunter quiver adds another item id: 523.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(523);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1552,21 +1571,26 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     // ashstalker, cinderweave, thornhide, helmet to feet within each), NOT
     // the shop window's armor-class re-sort (WARFARE_SHOP_SET_ORDER stays a
     // display concern).
-    // The two honor trinkets (WARFARE_TRINKET_STOCK) close the armory: they
-    // are set-less honor purchases from the same counters, outside FURY_STOCK.
+    // The two honor trinkets (WARFARE_TRINKET_STOCK) and the World PvP goods
+    // (WORLD_PVP_GOODS_STOCK, the Skull Bag) close the armory: they are set-less
+    // honor purchases from the same counters, outside FURY_STOCK.
     const setTagged = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
     const setless = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
     expect(itemRelicIds(gallery)).toEqual(setTagged);
-    expect(itemRelicIds(armory)).toEqual([...setless, ...WARFARE_TRINKET_STOCK]);
+    expect(itemRelicIds(armory)).toEqual([
+      ...setless,
+      ...WARFARE_TRINKET_STOCK,
+      ...WORLD_PVP_GOODS_STOCK,
+    ]);
     // Warfare Season 2 has its own Vanguard gallery page, so the two Warfare
     // pages partition the entry tier plus the trinkets, not the whole counter.
     expect([...itemRelicIds(gallery), ...itemRelicIds(armory)].sort()).toEqual(
-      [...FURY_STOCK, ...WARFARE_TRINKET_STOCK].sort(),
+      [...FURY_STOCK, ...WARFARE_TRINKET_STOCK, ...WORLD_PVP_GOODS_STOCK].sort(),
     );
     // Snug vacuity floors (a defs edit that dropped the set tags would
     // otherwise drain the gallery into the armory with the union still green).
     expect(itemRelicIds(gallery).length).toBe(35);
-    expect(itemRelicIds(armory).length).toBe(14);
+    expect(itemRelicIds(armory).length).toBe(15);
     // The kit half really is the five Warfare families at seven pieces each,
     // pinned against the item_sets.ts set ids (the partition's other axis).
     const byKit = new Map<string, number>();
@@ -2840,8 +2864,9 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   rift_first_clear: RIFT_GEAR_ITEM_IDS,
   // Derived from the live piece list: treasure_vault.ts payOne rolls one piece
   // (at the tier the map buys, each tier discovering its piece through
-  // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
-  buried_hoard: HOARD_BASE_ITEM_IDS,
+  // ItemDef.relicOf) when an entrant opens a hoard's reward chest. The same
+  // chest always pays one corpse-harvest specimen stack (rift/hoard_reward_roll.ts).
+  buried_hoard: [...HOARD_BASE_ITEM_IDS, ...VAULT_MATERIAL_POOL],
 };
 
 /**
@@ -3178,10 +3203,11 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // professions + farming, whose golden-harvest cell landed at masterwrought
   // Phase 18.
   professions_field_notes: 5,
-  // 7 = corpse_harvest + the four gathering professions with a jackpot slot
+  // 8 = corpse_harvest + the four gathering professions with a jackpot slot
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
-  // their Litany board keeper (Phase 21).
-  professions_specimens: 7,
+  // their Litany board keeper (Phase 21) + buried_hoard, whose reward chest
+  // pays the five corpse-harvest specimens.
+  professions_specimens: 8,
   professions_crucible: 3,
   professions_forgebreaker: 1,
   // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
@@ -3195,8 +3221,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
   // Crucible raid's flawless title + the three faction standing Champion
-  // titles + the Clue Scroll Treasure Hunter title.
-  horizons_titles: 49,
+  // titles + the Clue Scroll Treasure Hunter title + the sixth lifetime-XP
+  // rung's Titan title + the five World PvP titles.
+  horizons_titles: 55,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
@@ -3945,6 +3972,19 @@ describe('Reliquary source hints resolve against live content', () => {
     // reach the write site; alone, both sides here read the same array.
     expect([...(bySlotKind.get('rift_first_clear:item') ?? [])].sort()).toEqual(
       [...RIFT_GEAR_ITEM_IDS].sort(),
+    );
+    // The Buried Hoard ITEM slots are EXACTLY the hoard pieces plus the five
+    // specimens its reward chest pays, spelled literally so a hint that leaks
+    // onto any other relic fails here.
+    expect([...(bySlotKind.get('buried_hoard:item') ?? [])].sort()).toEqual(
+      [
+        ...HOARD_BASE_ITEM_IDS,
+        'pristine_hide',
+        'pristine_silk',
+        'pristine_venom_gland',
+        'pristine_claw',
+        'prime_cut',
+      ].sort(),
     );
     // Vacuity floor: five specimens, the two marks, and the three bands.
     expect(checked).toBeGreaterThanOrEqual(10);

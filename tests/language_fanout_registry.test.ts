@@ -415,6 +415,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'capacity, purchased and bonus slot counts, the next expansion cost, the stored slots (both panes ride ONE sig, the guild arm and the activity log key appended). render() carries no self-gate, so the arm rebuilds',
   },
   {
+    file: 'hud/skull_bag/skull_bag_pane_controller.ts',
+    memos: ['lastSignature'],
+    answer: 'this.renderBags',
+    why: 'the Skull Bag pane is mounted only inside the open bags window; the bags language arm rebuilds that window, remounts the pane, resets lastSignature, and repaints the title, row labels, aria labels and buttons in the new locale',
+  },
+  {
     file: 'calendar_window.ts',
     memos: ['lastSig'],
     answer: 'this.calendarWindow.relocalize',
@@ -482,9 +488,15 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud/quest/quest_dialog_controller.ts',
-    memos: ['investigationSig', 'lastClueRowSig', 'lastGossipRowSig', 'lastIntroHintVisible'],
+    memos: [
+      'investigationSig',
+      'lastClueRowSig',
+      'lastGossipRowSig',
+      'lastHearthRowFaction',
+      'lastIntroHintVisible',
+    ],
     answer: 'this.questDialog.relocalize',
-    why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it)',
+    why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch), and the world-quest investigation signature (clue ids and accusation state, never text), and the Clue Scroll row signature (step kind, item id and count from clue_step_row.ts, never text; relocalize re-renders the gossip list past it), and the Allied Hearthstone attune row latch (a faction id from hearthstone_attune_row_core.ts, never text; relocalize re-renders the gossip list past it)',
   },
   {
     file: 'hud/rift/rift_floor_tracker_controller.ts',
@@ -631,6 +643,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastPetBarSig'],
     answer: 'this.relocalizeCoordinatorMemos',
     why: "the pet action bar signature: pet id, primary or secondary, owner class, mode id, two cooldown signatures of integer seconds and autocast flags, plus two booleans. Past the gate the bar's DOM is rebuilt from scratch and every button caption and both tooltip halves are fresh t() calls. Cleared to the empty string, which no real signature can equal",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastInstanceDifficulty', 'lastInstanceDungeonId'],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: 'the instance difficulty badge signature: dungeon id plus normal/heroic state. Both fields are text-independent, but past the gate the badge title and aria-label resolve dungeonDisplayName() and hudChrome.finder.*. Cleared to null so the next HUD update rewrites the labels in the active language even if the player remains in the same instance',
   },
   {
     file: 'hud.ts',
@@ -1415,6 +1433,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       lastMailUnread: { value: '-1', why: 'mailIndicatorView clamps the count at 0' },
       lastLootSettingsSig: { value: "''", why: 'every real sig carries / separators' },
       lastPetBarSig: { value: "''", why: 'every real sig starts with the pet id and a colon' },
+      lastInstanceDifficulty: {
+        value: 'this.lastInstanceDungeonId = null',
+        why: 'the chained assignment leaves both fields null',
+      },
+      lastInstanceDungeonId: { value: 'null', why: 'dungeon id is a string or null' },
       lastCompassFacing: { value: 'Number.NaN', why: 'facing is a float; NaN never equals itself' },
       lastCompassHeading: { value: "''", why: 'a heading is one of the eight rose ids' },
     };

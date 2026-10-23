@@ -581,6 +581,13 @@ export const it_IT: EnTranslations = {
       "heroicClears": "{count} Eroico",
       "normalClears": "{count} Normale",
       "viewPossibleLoot": "Visualizza il bottino possibile",
+      "lootFocus": "Preferenza del bottino",
+      "allClassGear": "Equipaggiamento di tutte le classi",
+      "specRole": "{name} ({role})",
+      "mixedRole": "{first} / {second}",
+      "lootFocusHelp": "Vale solo per i forzieri non ancora aperti.",
+      "noFocusedLoot": "Nessun bottino idoneo. Scegli un'altra preferenza.",
+      "rolledFocus": "Estratto per: {focus}",
       "chooseTable": "Seleziona da quale tabella estrarre",
       "selectAllTables": "Seleziona tutto",
       "selectedTables": "{count} tabelle selezionate",
@@ -601,7 +608,9 @@ export const it_IT: EnTranslations = {
         "worldOne": "{count} missione mondiale completata",
         "worldMany": "{count} missioni mondiali completate",
         "pvpOne": "{count} incontro classificato vinto",
-        "pvpMany": "{count} incontri classificati vinti"
+        "pvpMany": "{count} incontri classificati vinti",
+        "pvpWinOne": "{count} vittoria PvP",
+        "pvpWinMany": "{count} vittorie PvP"
       },
       "requiredTask": {
         "raidOne": "Supera {count} scontro d'incursione",
@@ -611,7 +620,9 @@ export const it_IT: EnTranslations = {
         "worldOne": "Completa {count} missione mondiale",
         "worldMany": "Completa {count} missioni mondiali",
         "pvpOne": "Vinci {count} incontro classificato",
-        "pvpMany": "Vinci {count} incontri classificati"
+        "pvpMany": "Vinci {count} incontri classificati",
+        "pvpWinOne": "Ottieni {count} vittoria PvP",
+        "pvpWinMany": "Ottieni {count} vittorie PvP"
       },
       "readyWeeks": "Settimane non ritirate: {count}. Ritira prima la settimana completata più vecchia.",
       "claimLastWeek": "Ritira la ricompensa della settimana scorsa",
@@ -673,7 +684,13 @@ export const it_IT: EnTranslations = {
       "departsIn": "Il traghetto per {dest} parte tra {time}",
       "castingOff": "Il traghetto per {dest} sta salpando",
       "boardHint": "Sali sul suo ponte quando salpa. La traversata è gratuita.",
-      "sailing": "In navigazione verso {dest}"
+      "sailing": "In navigazione verso {dest}",
+      "portLabel": "Traghetto da {port} a {dest}",
+      "portTitle": "Imbarcadero di {port}",
+      "destination": "Destinazione: {dest}",
+      "boardNow": "Sali ora",
+      "arrivesIn": "Il traghetto arriva tra {time}",
+      "scheduleUnavailable": "Orari del traghetto non disponibili."
     },
     "materialStackSelectionUnavailable": "Quella selezione di materiali non è più disponibile.",
     "vehicle": {
@@ -733,6 +750,15 @@ export const it_IT: EnTranslations = {
     "spectate": {
       "banner": "Stai osservando {name}"
     },
+    "realmMotd": {
+      "line": "Messaggio del giorno: {text}",
+      "updated": "Messaggio del giorno aggiornato.",
+      "cleared": "Messaggio del giorno cancellato.",
+      "none": "Nessun messaggio del giorno impostato.",
+      "usage": "Uso: /motd \"<messaggio>\" per impostarlo, /motd clear per cancellarlo.",
+      "tooLong": "Il messaggio del giorno è limitato a {max} caratteri.",
+      "saveFailed": "Impossibile salvare il messaggio del giorno: andrà perso al riavvio."
+    },
     "readyCheck": {
       "title": "Controllo pronto",
       "close": "Vicino",
@@ -756,6 +782,11 @@ export const it_IT: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
+      "pvpResurrect": "Resurrezione PvP",
+      "pvpResurrectTitle": "Risorgi al cimitero più vicino con salute piena, senza un nuovo Tributo del Custode.",
+      "pvpResurrectWaitButton": "Resurrezione PvP ({seconds})",
+      "pvpResurrectWaitNote": "Potrai risorgere in PvP tra {seconds}: risorgerai al cimitero più vicino.",
+      "pvpResurrectReadyNote": "Resurrezione PvP pronta: risorgerai al cimitero più vicino.",
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",
       "ghostHint": "Corri fino al luogo della tua morte oppure parla con il Custode Pallido per rivivere",
       "spiritHealerAlive": "Il Custode Pallido veglia sui morti. Tu sei ancora tra i vivi.",
@@ -771,6 +802,9 @@ export const it_IT: EnTranslations = {
       "keeperConfirmSparedBody": "Sei sicuro? Il Custode Pallido ti farà rivivere qui. Sei sotto il livello 10, quindi il Mal di resurrezione non ti indebolirà questa volta.",
       "healerConfirmAccept": "Ravvivami",
       "healerConfirmCancel": "Annulla"
+    },
+    "graphicsRestore": {
+      "note": "Ripristino della grafica"
     },
     "wiki": {
       "confirmTitle": "Aprire la Wiki?",
@@ -2016,6 +2050,8 @@ export const it_IT: EnTranslations = {
       "reportSent": "Rapporto copiato e inviato in chat",
       "reportNoData": "Nessun dato registrato.",
       "noDetailedData": "Nessun dato dettagliato",
+      "detailHealSubtitle": "Effettive: {effective} | Sovracura: {overheal} ({overhealPercent}) | Colpi: {hits} ({critPercent} crit.)",
+      "detailHitSubtitle": "Colpi: {hits} | Critici: {crits} ({critPercent}) | Media: {average} | Min/max: {min} / {max}",
       "noDeathEvents": "Nessun evento registrato prima della morte",
       "killedBy": "Ucciso da {killer} ({ability})",
       "lethalHit": "Colpo letale",
@@ -2282,6 +2318,7 @@ export const it_IT: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Descrizioni degli incantesimi al passaggio del cursore",
       "clickMoveLeft": "Clic sinistro",
       "clickMoveRight": "Clic destro",
       "version": "v{version} ({build})",
@@ -2327,11 +2364,14 @@ export const it_IT: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto sceglie i controlli Desktop o Touch in base al tuo dispositivo. Scegli Desktop per forzare tastiera e mouse (utile su un tablet con tastiera), oppure Touch per i controlli a schermo.",
+      "ambienceVolume": "Volume ambiente",
       "footstepSounds": "Suoni dei passi",
       "interfaceSounds": "Suoni dell'interfaccia e di risposta",
       "clickFeedback": "Indicatore di clic",
       "lockCursorOnRotate": "Blocca cursore durante la rotazione",
       "keybindHelpLockCursorOnRotate": "Mantiene il cursore del mouse dentro la finestra mentre trascini per ruotare la telecamera, così non può raggiungere il bordo dello schermo o passare a un altro monitor. Disattiva l'opzione se preferisci un cursore libero.",
+      "rawMouseInput": "Input diretto del mouse",
+      "keybindHelpRawMouseInput": "Legge il movimento direttamente dal mouse mentre trascini per ruotare la visuale, ignorando la velocità e l’accelerazione del puntatore di sistema per una rotazione più stabile. Disattiva questa opzione per usare le impostazioni del mouse di sistema. Funziona solo con Blocca cursore durante la rotazione attivo e non è compatibile con tutti i browser o sistemi.",
       "showWalletOnCharacterScreen": "Mostra portafoglio nella schermata personaggi",
       "showWalletOnPlayerCard": "Mostra portafoglio nella scheda giocatore",
       "showPlaytime": "Mostra tempo di gioco nella schermata personaggi",
@@ -2394,6 +2434,7 @@ export const it_IT: EnTranslations = {
       "confirmVendorSellNote": "Disattivandolo, gli oggetti vengono venduti con un solo clic e senza conferma, quindi uno slot della borsa spostato potrebbe far vendere l'oggetto sbagliato.",
       "confirmVendorSellMinQuality": "Conferma le vendite dalla qualità",
       "confirmVendorSellMinQualityNote": "Gli articoli di qualità inferiore a questa vengono venduti con un solo clic; un articolo venduto erroneamente può ancora essere riacquistato dal venditore.",
+      "confirmVendorSellMinQualityNoteGray": "Gli oggetti sotto questa qualità si vendono con un clic. Puoi ricomprare quelli venduti per errore, tranne gli oggetti grigi non firmati.",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
@@ -2403,9 +2444,22 @@ export const it_IT: EnTranslations = {
       "lockActionBars": "Blocca le barre azione",
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
       "showTargetSwingTimer": "Mostra timer degli attacchi del bersaglio",
+      "enemyHighlightStyle": "Stile di evidenziazione dei nemici",
+      "enemyHighlightEdgeArrow": "Freccia al bordo dello schermo fuori dall'inquadratura",
+      "enemyHighlightNameplate": "Targhetta bersaglio grande con cornice",
+      "enemyHighlightOverhead": "Indicatore fluttuante sopra la testa",
+      "enemyHighlightReticle": "Reticolo ostile più marcato",
+      "enemyHighlightDistance": "{yards} iarde",
       "showPetFrame": "Mostra il tuo famiglio",
+      "playerFrameResourceDetached": "Separa barra delle risorse",
+      "playerFrameResourceWidth": "Larghezza della barra delle risorse",
+      "playerFrameResourceHeight": "Altezza della barra delle risorse",
+      "hillBarOpacity": "Opacità dello sfondo del Re della Collina",
+      "pixelsValue": "{value} px",
       "showNameplateDots": "Mostra i miei punti sulle targhette",
       "nameplateDotScale": "Dimensione punto targhetta",
+      "showNameplateCooldowns": "Monitor offensivo/difensivo",
+      "nameplateCooldownScale": "Dimensione monitor offensivo/difensivo",
       "showTargetDots": "Mostra punti target",
       "showDefensivesTrack": "Mostra ricariche difensive",
       "showSelfBuffTrack": "Mostra i miei benefici",
@@ -2414,7 +2468,9 @@ export const it_IT: EnTranslations = {
       "showUtilityModes": "Includi modalità furtività e viaggio",
       "showFriendlyTrack": "Mostra i miei benefici sugli alleati",
       "showShieldTrack": "Mostra i miei scudi",
+      "classicCombatText": "Testo di combattimento classico",
       "waterRipples": "Increspature dell'acqua (scie)",
+      "spellEffects": "Effetti degli incantesimi",
       "actionCam": "Telecamera d'Azione",
       "actionCamShoulder": "Spalla della Telecamera d'Azione",
       "actionCamShoulderLeft": "Sinistra {pct}",
@@ -2445,6 +2501,11 @@ export const it_IT: EnTranslations = {
       "complexityMedium": "Media",
       "complexityHigh": "Alta",
       "exampleAbilities": "Abilità di esempio",
+      "specBonus": "Bonus di specializzazione",
+      "healing": "guarigione",
+      "absorption": "assorbimento dei danni",
+      "physicalAbilityDamage": "danni delle abilità in mischia e a distanza",
+      "primaryHealingBonus": "Aumenta le cure primarie del {pct} dopo gli altri bonus alle cure.",
       "viewTalents": "Visualizza talenti",
       "selectSpec": "Seleziona specializzazione",
       "specUnlockBanner": "Specializzazione sbloccata!",
@@ -2768,11 +2829,15 @@ export const it_IT: EnTranslations = {
       "iconSize": "Dimensione icone",
       "iconPadding": "Spaziatura interna icone",
       "opacity": "Opacità",
-      "visibility": "Visibilità",
-      "visAlways": "Sempre visibile",
       "visCombat": "In combattimento",
-      "visHidden": "Nascosta",
       "visHiddenHint": "Un gruppo nascosto continua comunque a riprodurre i suoi suoni e a illuminare la tua barra delle azioni.",
+      "showWhile": "Mostra durante",
+      "showOutOfCombat": "Fuori dal combattimento",
+      "showIn": "Mostra in",
+      "showInWorld": "Mondo aperto",
+      "showInInstances": "Aree istanziate",
+      "placeHint": "Le istanze comprendono spedizioni, incursioni di gruppo, incursioni, squarci, campi di battaglia, l'arena e ogni altra area istanziata. Fuori dai luoghi selezionati, il gruppo resta nascosto e silenzioso.",
+      "groupOffHint": "Se non selezioni alcun luogo, questo gruppo non appare mai e non riproduce suoni.",
       "showTimer": "Mostra timer",
       "positionX": "Posizione orizzontale",
       "positionY": "Posizione verticale",
@@ -2790,7 +2855,6 @@ export const it_IT: EnTranslations = {
       "aurasTitle": "Proc, Risorse e Potenziamenti",
       "aurasHint": "Risorse di classe e i loro accumuli, i proc, e i potenziamenti che i tuoi incantesimi applicano su di te. Anche qualsiasi altra cosa sia stata applicata su di te compare qui.",
       "auraFallback": "Aura",
-      "onlyWhileActive": "Mostra solo quando attivo",
       "alertStacks": "Avvisa agli accumuli",
       "alertStacksAny": "Alla comparsa",
       "alertStacksHint": "Il pulsante si illumina, pulsa ed emette un suono quando l'aura raggiunge questo numero di accumuli. \"Alla comparsa\" significa non appena appare.",
@@ -2807,7 +2871,18 @@ export const it_IT: EnTranslations = {
       "glowWhenReadyHint": "Illumina e delinea il pulsante mentre l'incantesimo può essere lanciato.",
       "hotbarGlow": "Bagliore sulla barra azioni",
       "hotbarGlowHint": "Illumina anche questo incantesimo sulla tua barra delle azioni mentre è pronto.",
-      "onlyWhenReady": "Mostra solo quando pronto",
+      "showButtonWhen": "Mostra pulsante quando",
+      "showReady": "Pronto",
+      "showNotReady": "Non pronto",
+      "notReadyHint": "Non pronto significa in recupero o non utilizzabile al momento.",
+      "auraShowWhen": "Mostra pulsante quando l'aura è",
+      "auraActive": "Attiva",
+      "auraMissing": "Assente",
+      "neverShownHint": "Se nessuna delle due opzioni è selezionata, il pulsante non appare mai, ma il suo suono viene comunque riprodotto.",
+      "reminderHint": "Promemoria beneficio: il pulsante si illumina quando questa aura è assente e si nasconde appena la ottieni.",
+      "glowWhileMissing": "Illumina se assente",
+      "reminderGlowHint": "Illumina, contorna e fa pulsare il pulsante quando l'aura è assente.",
+      "reminderSoundHint": "Riproduce il suono quando l'aura svanisce.",
       "sound": "Suono di pronto",
       "soundHint": "Suona quando l'incantesimo diventa pronto, o quando il suo pulsante cambia in un altro incantesimo mentre è pronto."
     },
@@ -2937,7 +3012,8 @@ export const it_IT: EnTranslations = {
         "battlegroundAssist": "assistenza al colpo di grazia",
         "worldKill": "uccisione in PvP Mondiale",
         "worldAssist": "assistenza a un'uccisione in PvP Mondiale",
-        "hillHold": "controllo della collina"
+        "hillHold": "controllo della collina",
+        "worldQuest": "missione mondiale"
       },
       "floatReasons": {
         "kill": "Uccisione",
@@ -2947,6 +3023,11 @@ export const it_IT: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Ottieni titoli permanenti dopo {thresholds} di gioco con PvP mondiale attivo nel mondo aperto o nelle istanze PvP. Disconnessione, morte, istanze PvE e santuari sospendono il timer. Disattivarlo lo azzera.",
+      "rewardPaused": "Serie PvP attuale: {time} di gioco (in pausa in un santuario)",
+      "rewardPausedDead": "Serie PvP attuale: {time} di gioco (in pausa durante la morte)",
+      "rewardPausedInstance": "Serie PvP attuale: {time} di gioco (in pausa nelle istanze PvE)",
+      "rewardProgress": "Serie PvP attuale: {time} di gioco",
       "tab": "PvP Mondiale",
       "title": "PvP Mondiale",
       "blurb": "Alza la tua bandiera per combattere altri giocatori contrassegnati ovunque nel mondo aperto. Sconfiggine uno e prendi una quota della sua borsa, più Onore per l'equipaggiamento da Guerra. I campi di battaglia e le arene pagano comunque di più.",
@@ -2965,6 +3046,8 @@ export const it_IT: EnTranslations = {
       "markLine": "Attaccare lì un giocatore senza bandiera alza la tua; attaccarne uno contrassegnato non lo fa mai.",
       "aidLine": "Curare, proteggere o potenziare un giocatore contrassegnato in uno scontro nel mondo alza la tua bandiera.",
       "stakeLine": "Il perdente paga {cap} o il {percent} della sua borsa, qualunque sia minore.",
+      "spoilsLine": "Se siete entrambi contrassegnati, l'oro del colpo mortale cade sul corpo insieme al teschio dello sconfitto.",
+      "skullName": "Teschio di {name}",
       "noStakeLine": "Un giocatore senza bandiera ucciso in terreno a tutti contro tutti non perde oro.",
       "noTakeLine": "Anche un combattente senza bandiera non prende oro: si sposta solo tra due giocatori contrassegnati.",
       "honorLine": "{honor} Onore per uccisione, diviso tra chiunque abbia aiutato.",
@@ -2994,6 +3077,8 @@ export const it_IT: EnTranslations = {
       "countsHolding": "Dentro: tu {yours}, rivale {theirs}",
       "contestYou": "Stai conquistando la collina: {seconds} di {total}",
       "contestOther": "Stai perdendo la collina: {seconds} di {total}",
+      "contestYouPaused": "In pausa: {seconds} su {total}",
+      "contestOtherPaused": "Rivale in pausa: {seconds} su {total}",
       "contestNone": "Mantieni la maggioranza all'interno per {total} per conquistarla",
       "inside": "Sei dentro il cerchio",
       "distance": "{yards} m al cerchio",
@@ -3001,11 +3086,28 @@ export const it_IT: EnTranslations = {
       "falls": "Cade tra {minutes}",
       "standingRaid": "I membri di un'incursione non contano: solo i gruppi possono detenere la collina"
     },
+    "skullBag": {
+      "title": "Sacca dei Teschi",
+      "total": "Teschi: {count}",
+      "close": "Chiudi la Sacca dei Teschi",
+      "clickOpen": "Fai clic per aprire",
+      "notCarried": "Tieni la Sacca dei Teschi nelle borse per depositare o prelevare teschi.",
+      "empty": "Vuota. Finché porti la sacca, i teschi raccolti vi entrano direttamente.",
+      "unrecorded": "Teschio Trofeo",
+      "store": "Deposita i teschi trasportati ({count})",
+      "storeNone": "Nessun teschio da depositare",
+      "takeOne": "Preleva 1",
+      "takeAll": "Preleva tutti",
+      "takeOneAria": "Preleva 1: {item}",
+      "takeAllAria": "Preleva tutti: {item}",
+      "tooltip": "Contiene un numero illimitato di Teschi Trofeo senza occupare spazio nelle borse. Finché è nelle borse, i teschi raccolti vi entrano direttamente. Fai clic sulla sacca per depositare o prelevare teschi."
+    },
     "warfareShop": {
       "gossipOption": "Sfoglia i Set da Guerra",
       "gossipOptionAria": "Sfoglia il negozio di set da Guerra offerto da {name}",
       "jewelry": "Gioielli",
       "weapons": "Armi",
+      "goods": "Merci",
       "groupSeason2": "Stagione di Guerra 2: Avanguardia",
       "groupEntry": "Stagione di Guerra 1",
       "owned": "Posseduto",
@@ -3018,6 +3120,7 @@ export const it_IT: EnTranslations = {
       "spell": "Magia",
       "defense": "Difesa",
       "ratings": "Valutazioni",
+      "gearScore": "Punteggio equipaggiamento",
       "playtimeLabel": "Tempo di gioco",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Meno di un minuto",
@@ -3046,6 +3149,12 @@ export const it_IT: EnTranslations = {
       "hint": "Trova il terreno che questa mappa mostra, stai in piedi sulla X, e usa la mappa di nuovo per scavare. Un tesoro sepolto si apre per te e il tuo gruppo.",
       "upgradeNote": "Ridisegnarla come una mappa {rarity} richiede {inks} Inchiostri del Cartografo (ne possiedi {held}). I quartiermaster della fazione li vendono.",
       "upgradeMaxed": "Nessun cartografo potrebbe migliorare questa mappa.",
+      "inkPickerTitle": "Su quale mappa vuoi usare l'Inchiostro del Cartografo?",
+      "inkPickerHeld": "Possiedi {held} di Inchiostro del Cartografo.",
+      "inkPickerRead": "In corso: la sua X è in {zone}. La X resta ferma.",
+      "inkPickerUnread": "Non letta ({count} possedute)",
+      "inkPickerCost": "Ridisegna in {rarity}: {inks} inchiostro",
+      "inkPickerCancel": "Annulla",
       "rarity": {
         "common": "Comune",
         "rare": "Raro",
@@ -3061,7 +3170,7 @@ export const it_IT: EnTranslations = {
       "delveMark": "Marchio dell'Incursione",
       "wocToken": "WoC Token",
       "heroicMarkNote": "Dungeon eroici . spendi dal quartiermastro eroico",
-      "honorNote": "Campi di battaglia e arena",
+      "honorNote": "Campi di battaglia, arena e missioni mondiali",
       "delveMarkNote": "Incursioni completate",
       "wocTokenNote": "Saldo del portafoglio collegato",
       "walletNotLinked": "Nessun portafoglio collegato",
@@ -3762,6 +3871,8 @@ export const it_IT: EnTranslations = {
       "resetDone": "Tutte le istanze sono state reimpostate.",
       "resetNone": "Non hai istanze da reimpostare.",
       "resetOccupied": "Non puoi reimpostare le istanze mentre c'è ancora qualcuno all'interno.",
+      "queuedOccupied": "Cambio di difficoltà in attesa perché qualcuno o il suo cadavere è ancora dentro. Verrà applicato quando le istanze saranno vuote.",
+      "queuedCancelled": "Cambio di difficoltà in attesa annullato perché il gruppo o il capogruppo è cambiato.",
       "resetSameDifficulty": "Cambia la difficoltà del dungeon prima di reimpostare queste istanze. Le istanze vuote si reimpostano automaticamente dopo 5 minuti.",
       "resetLoot": "Non puoi reimpostare le istanze mentre c'è ancora del bottino all'interno.",
       "resetConfirmTitle": "Reimpostare tutte le istanze?",
@@ -3778,6 +3889,7 @@ export const it_IT: EnTranslations = {
       "dragEquipHint": "Trascina sul personaggio per equipaggiare",
       "dragDestroyHint": "Trascina nel mondo per distruggere",
       "reorderNeedsRecent": "Rimuovi il filtro e ordina per Recenti per riorganizzare le borse",
+      "reorderLocked": "Gli oggetti bloccati restano nel loro scomparto. Sbloccali per spostarli.",
       "itemAriaInstanced": "{item}, quantita {count}, copia con marchio del creatore",
       "itemAriaEnchanted": "{item}, quantita {count}, copia incantata",
       "itemAriaBound": "{item}, quantita {count}, copia vincolata",
@@ -4111,7 +4223,7 @@ export const it_IT: EnTranslations = {
       "elementalConvergencePrimed": "Il prossimo incantesimo dall'altra scuola elementale concede Convergenza Elementale",
       "hunterFerocity": "{stacks} Ferocia del Branco: il tuo famiglio infligge il {pct}% di danni in più",
       "cooldownCap": "{used} di {cap} sec di riduzione del tempo di recupero usati in questa finestra",
-      "bruinRushWindow": "La Forma del Lupo non costa mana e blocca il bersaglio della vostra Carica di Bruin, rallentandolo del {pct}% per {sec} sec",
+      "bruinRushWindow": "La Forma del Gatto non costa mana e blocca il bersaglio della vostra Carica di Bruin, rallentandolo del {pct}% per {sec} sec",
       "funeralHarvestLock": "Funeral Harvest non può ancora creare un altro Frammento d'Anima",
       "leadenHexLock": "Maleficio Plum beo non può ancora radicare di nuovo questo bersaglio",
       "forbiddenReflectionReady": "Il tuo prossimo tempo di recupero idoneo dello Stregone può essere lanciato di nuovo",
@@ -4163,7 +4275,7 @@ export const it_IT: EnTranslations = {
       "duskEconomy": "Le abilità costano il {pct}% di energia in meno",
       "moontide": "Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono",
       "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Gatto e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
-      "verdance": "Verzura {stacks}/{max}. Ogni nuova Fioritura Selvaggia o Seconda Fioritura che pianti aggiunge 1. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
+      "verdance": "Verzura {stacks}/{max}. Ogni Cura delle Spore, Seconda Fioritura o Rammendo Selvaggio che lanci aggiunge 1, e ogni Verzura accorcia il lancio di Rammendo Selvaggio. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
       "freeExecute": "La tua prossima abilità di esecuzione idonea non costa nulla",
       "resourceSap": "Ripristina {value} della tua risorsa attuale ogni {interval} sec",
       "nextAttackCrit": "Il tuo prossimo attacco è garantito come colpo critico",
@@ -4265,6 +4377,7 @@ export const it_IT: EnTranslations = {
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "formFireball": "Forma Brace: velocità di movimento aumentata del {pct}%; attacchi e incantesimi disabilitati",
       "formMoonkin": "Forma di Lunagufo: danni degli incantesimi aumentati del {pct}% e armatura aumentata del {armorPct}%",
+      "formSporemender": "Forma di Curatore delle Spore: cure aumentate del {pct}%, armatura aumentata del {armorPct}% e velocità di movimento ridotta del {slowPct}%",
       "formShadow": "Forma d'Ombra: danni da Ombra aumentati del {pct}%",
       "resourceCount": "{value} su {max}",
       "formLich": "Soul Lance colpisce anche fino a {targets} nemici vicini per il {pct}% dei danni",
@@ -4351,6 +4464,7 @@ export const it_IT: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "pvpTag": "PvP",
+      "bountyTag": "Taglia",
       "cheaterTag": "< Baro >",
       "pledgeTag": "Giuramento a {guild}",
       "npcRoleTag": "<{role}>",
@@ -4458,6 +4572,7 @@ export const it_IT: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Barre delle azioni",
         "playerFrame": "Giocatore",
+        "playerResource": "Barra delle risorse",
         "targetFrame": "Bersaglio",
         "partyFrames": "Gruppo",
         "swingBar": "Attacco automatico",
@@ -4509,6 +4624,37 @@ export const it_IT: EnTranslations = {
       "apply": "Applica",
       "imported": "Configurazione tasti rapidi importata.",
       "wrongKind": "Quel codice è un'esportazione delle impostazioni, non una configurazione dei tasti rapidi."
+    },
+    "keybindLayout": {
+      "title": "Disposizione della tastiera",
+      "open": "Converti",
+      "from": "Scorciatoie create per",
+      "to": "Converti in",
+      "keepMovement": "Mantieni fermi i tasti di movimento",
+      "keepMovementLocked": "I tasti di movimento sono rimasti fermi l'ultima volta, quindi resteranno fermi anche stavolta. Ripristina i valori predefiniti per ricominciare.",
+      "help": "Ogni scorciatoia passa al tasto che scrive lo stesso carattere nella nuova disposizione. La fila dei numeri resta al suo posto. I nomi in questo elenco indicano posizioni QWERTY; la panoramica della tastiera mostra la tua disposizione.",
+      "moves": "Scorciatoie che si sposteranno: {count}",
+      "noChange": "Nessuna scorciatoia cambia tra queste disposizioni.",
+      "apply": "Converti scorciatoie",
+      "converted": "Scorciatoie convertite da {from} a {to}.",
+      "layouts": {
+        "qwertyUs": "QWERTY (Stati Uniti)",
+        "qwertyUk": "QWERTY (Regno Unito)",
+        "qwertzDe": "QWERTZ (tedesca)",
+        "qwertzCh": "QWERTZ (svizzera)",
+        "azertyFr": "AZERTY (francese)",
+        "azertyBe": "AZERTY (belga)",
+        "qwertyEs": "QWERTY (spagnola)",
+        "qwertyIt": "QWERTY (italiana)",
+        "qwertyNordic": "QWERTY (svedese, finlandese)",
+        "qwertyDa": "QWERTY (danese)",
+        "qwertyNo": "QWERTY (norvegese)",
+        "qwertyBr": "QWERTY (brasiliana ABNT2)",
+        "qwertyPt": "QWERTY (portoghese)",
+        "qwertyTr": "QWERTY (turca)",
+        "dvorak": "Disposizione Dvorak",
+        "colemak": "Disposizione Colemak"
+      }
     },
     "keyboardMap": {
       "title": "Panoramica tastiera",
@@ -4599,6 +4745,7 @@ export const it_IT: EnTranslations = {
       "perfectedBadge": "Perfezionato",
       "perfectingRank": "Perfezionamento: grado {rank} di {ranks}",
       "materialSourceGatherer": "{count} × Raccolto da {name}",
+      "trophySkullSource": "{count} × Preso da {name}",
       "materialSourceGathererSigned": "{count} × Raccolto da {name}, firmato da {signer}",
       "materialSourceUnrecorded": "{count} × Raccoglitore non registrato",
       "materialSourceUnrecordedSigned": "{count} × Raccoglitore non registrato, firmato da {name}",
@@ -5502,22 +5649,26 @@ export const it_IT: EnTranslations = {
       "enchant_weapon_piston_drive": "Incisione dell'arma: Propulsione a Pistone"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "I tuoi attacchi in mischia che colpiscono possono concedere 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori di cura. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano l’effetto. Forma di Lupo usa invece la sua velocità base di 1 s.",
-      "enchant_weapon_riftwalkers_grace": "I tuoi attacchi in mischia che colpiscono possono concedere 60 Agilità e il 2% di velocità d'attacco in mischia in più per 15 s. Ogni colpo ha una probabilità dell'1% per ogni 0,6 s della velocità base dell'arma che colpisce. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano questo effetto. Forma del Gatto usa invece la sua velocità base di attacco di 1 s.",
+      "enchant_weapon_lastflame_zeal": "I tuoi attacchi in mischia andati a segno possono conferire 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori alle cure. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma che colpisce. Nessun recupero interno. Le due mani condividono un solo beneficio: ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non lo attivano. In Forma del Gatto, gli attacchi automatici usano invece la velocità delle zampe di 1 s. Colpi e mosse finali in Forma del Gatto e Forma di Bruin usano la velocità propria dell’arma; Artigli Falcianti effettua un tiro per utilizzo, non per bersaglio.",
+      "enchant_weapon_riftwalkers_grace": "I tuoi attacchi in mischia andati a segno possono conferire 60 Agilità e attacchi in mischia più rapidi del 2% per 15 s. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma che colpisce. Nessun recupero interno. Le due mani condividono un solo beneficio: ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non lo attivano. In Forma del Gatto, gli attacchi automatici usano invece la velocità delle zampe di 1 s. Colpi e mosse finali in Forma del Gatto e Forma di Bruin usano la velocità propria dell’arma; Artigli Falcianti effettua un tiro per utilizzo, non per bersaglio.",
       "enchant_weapon_dawnfire_etching": "Incide permanentemente un'arma con 18 Potere Magico. Il Potere Magico conta anche ai fini del Potere di Guarigione. Un bonus fisso: non scala.",
       "enchant_weapon_dawns_benediction": "Incide permanentemente un'arma con 34 Potere di Guarigione. Il Potere di Guarigione aumenta solo le cure, mai il danno degli incantesimi. Un bonus fisso: non scala.",
       "enchant_weapon_piston_drive": "Incide permanentemente un'arma a due mani con 12 Forza e 25 Indice di Critico. Non può essere applicato a un'arma a una mano. Un bonus fisso: non scala."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "La tua Pietra del Ritorno Alleata non è vincolata. Parla con un quartiermastro alleato o usala in un centro alleato.",
+      "hearthstoneBound": "La tua Pietra del Ritorno Alleata è ora vincolata a {hub}.",
+      "hearthstoneTransport": "La pietra del ritorno ti trasporta a {hub}.",
+      "itemCooldown": "L'oggetto non è ancora pronto ({minutes} min rimanenti).",
       "alliedHearthstoneUse": "Uso: Ti teletrasporta al tuo fulcro fazione sintonizzato. (10 sec di lancio, 15 min di recupero)",
       "alliedHearthstoneAttuned": "Sintonizzato a: {hub}",
       "hub_none": "Nessuno (Usalo vicino a un fulcro fazione per sintonizzarti)",
       "hub_rift_watch": "Drifthaven (La Guardia dei Rifti)",
       "hub_church_order": "Valle di Eastbrook (L'Ordine della Chiesa)",
-      "hub_automatons": "South Reach (La Fonderia Automa)",
+      "hub_automatons": "Wyrmwatch (Automi)",
       "riftGliderUse": "Uso: Dispone il deltaplano, rallentando la caduta per 30 sec. L'atterraggio o il danno cancella l'effetto. (2 min di recupero)",
       "targetDummyUse": "Uso: Dispone un bersaglio meccanico nel mondo aperto per 2 minuti per praticare le abilità di combattimento. (5 min di recupero)",
-      "battleStandardUse": "Uso: Pianta lo Stendardo di Battaglia della Consecrated Dawn per 5 minuti, aumentando significativamente la rigenerazione della salute e della mana fuori dal combattimento per tutti gli alleati vicini. Rimanere vicino ad esso per 10 secondi concede anche la Benedizione dell'Alba (+5% a tutte le statistiche per 30 min). (5 min di recupero)",
+      "battleStandardUse": "Uso: pianta lo Stendardo da Battaglia dell’Alba Consacrata per 5 min. I giocatori fuori dal combattimento entro 15 iarde rigenerano il 10% di salute in più; chi usa mana recupera inoltre mana pari al 5% del proprio Spirito ogni 2 s. Restare vicino per 10 s conferisce Benedizione dell’Alba, aumentando Forza, Agilità, Tempra, Intelletto e Spirito del 5% per 30 min. (Recupero: 5 min)",
       "shockBombUse": "Uso: Lancia una bomba a shock fino a 30 yard, infliggendo 120 a 160 danni da Natura a tutti i nemici entro 5 yard. (1 min di recupero)",
       "invisibilityUse": "Uso: Ti avvolge nell'invisibilità per 6 sec. (2 min di recupero)",
       "armorKitUse": "Uso: Rinforza la tua armatura al petto, aumentando l'Armatura di 12 per 1 ora.",
@@ -5877,7 +6028,9 @@ export const it_IT: EnTranslations = {
     },
     "pattern": {
       "teaches": "Uso: ti insegna a creare {item}.",
-      "teachesEnchant": "Uso: ti insegna ad applicare {enchant}."
+      "teachesEnchant": "Uso: ti insegna ad applicare {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Scioglimento: {name}",
@@ -6534,7 +6687,9 @@ export const it_IT: EnTranslations = {
         "passage": "Passaggio"
       },
       "collapseHint": "Comprimi la barra laterale della mappa",
-      "expandHint": "Espandi la barra laterale della mappa"
+      "expandHint": "Espandi la barra laterale della mappa",
+      "resizeRailAria": "Larghezza della barra laterale della mappa",
+      "resizeRailHint": "Trascina per ridimensionare la barra laterale della mappa. Fai doppio clic per reimpostare."
     },
     "arenaGate": {
       "minLevelNote": "Richiede il livello {level}"
@@ -6819,6 +6974,8 @@ export const it_IT: EnTranslations = {
       "choose": "Scegli missione",
       "inProgress": "In corso ({count}/{required})",
       "completed": "Completata questa settimana",
+      "completedLastWeek": "Completato la scorsa settimana",
+      "claimFirst": "Riscatta prima",
       "lockedThisWeek": "Bloccato questa settimana",
       "footerPick": "Puoi tenere un solo incarico settimanale alla volta. Scegli una carta per leggerne i termini.",
       "footerHeld": "Il tuo incarico per la settimana è impostato. Gli altri tre si sbloccano al ripristino.",
@@ -6827,7 +6984,7 @@ export const it_IT: EnTranslations = {
       "rewards": "Ricompense",
       "alsoReceive": "Riceverai anche:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set), più {count} x {item}.",
+      "cacheDesc": "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set di Ignivar), più {count} x {item}.",
       "dialogNote": "Solo un incarico settimanale può essere attivo. {reset}",
       "accept": "Accetta",
       "decline": "Rifiuta",
@@ -6859,6 +7016,7 @@ export const it_IT: EnTranslations = {
       },
       "commendHeading": "Elogio dell'Emissario",
       "commendNote": "{amount} di reputazione con una fazione a tua scelta, una volta a settimana.",
+      "commendCarriedNote": "{amount} di reputazione della scorsa settimana ancora da riscuotere. Riscuotila per scegliere una nuova carica.",
       "commendClaimed": "L'elogio di questa settimana è andato alla fazione: {faction}.",
       "commendRewardLine": "{amount} di reputazione con una fazione a tua scelta",
       "chosen": "Missione settimanale presa: {category}",
@@ -7514,7 +7672,7 @@ export const it_IT: EnTranslations = {
       "mobileBody": "Su telefono o tablet il gioco ti fa partire da Low. Ogni dispositivo tattile atterra lì al primo avvio, di proposito, così entri nel mondo e giochi; alzalo tu stesso dal pannello Grafica quando vuoi. In un browser Android l'intera scala ti è aperta e la tua scelta resta. Su iPhone e iPad puoi comunque scegliere i preset più alti e prendono effetto appena premi Applica, ma il gioco ti riporta a High al prossimo avvio, perché iOS può chiudere la scheda mentre viene costruita una scena così grande. L'app scaricata è ancora più stretta: la sua lista di preset si ferma a High e le singole manopole di sistema sono nascoste, perché l'app le gestisce da sé.",
       "touchBody": "Su uno schermo tattile il pannello Grafica guadagna una scheda Comandi touch tutta sua: dimensione e zona morta del joystick, dimensione dei pulsanti a schermo, opacità dei comandi, uno stick della telecamera opzionale, una disposizione speculare per mancini e la visuale tattile invertita, così lo schermo si adatta alle tue mani anziché il contrario.",
       "audioTitle": "Suono e lingua",
-      "audioBody": "La finestra delle opzioni non è fatta solo di pixel. Audio raccoglie tre cursori del volume, per effetti sonori, musica e voce, più un interruttore per la musica e quattro interruttori per i suoni che stancano prima: voci dei PNG, passi, suoni dell'interfaccia e riscontro al clic. La linguetta Generale del pannello Interfaccia porta un selettore di lingua che rilocalizza l'intera interfaccia all'istante, senza ricaricare, e un selettore di tema per l'aspetto delle finestre.",
+      "audioBody": "Le opzioni non riguardano solo la grafica. Audio offre quattro cursori del volume per effetti, ambiente, musica e voci, un interruttore per la musica e quattro per i suoni che più spesso stancano: voci dei PNG, passi, suoni dell’interfaccia e risposta ai clic. La scheda Generale del pannello Interfaccia contiene un selettore della lingua che traduce subito tutta l’interfaccia senza ricaricare e un selettore del tema delle finestre.",
       "autolootBody": "Preferisci non cliccare ogni cadavere? Il saccheggio automatico di passaggio, nella linguetta Combattimento del pannello Interfaccia e disattivato per impostazione predefinita, raccoglie il bottino delle tue uccisioni mentre ci passi accanto.",
       "panelsMoreBody": "I due pannelli che questa pagina non elenca meritano comunque un'occhiata. Aure è dove modelli i grandi avvisi a schermo che scattano quando arriva uno dei proc della tua classe: quali mostrare, la loro dimensione, il colore, l'opacità e dove si collocano sullo schermo. Sovrapposizione prestazioni è la lettura che attivi mentre ottimizzi questa pagina, per poi nasconderla di nuovo.",
       "valueUltraOrInsane": "Ultra, oppure Estrema se vuoi tutto al massimo",
@@ -7531,6 +7689,7 @@ export const it_IT: EnTranslations = {
       "rowCameraSpeed": "Quanto rapidamente ruota la telecamera quando ti guardi attorno con il mouse.",
       "rowTouchLookSpeed": "La stessa cosa per la visuale a scorrimento, e appare solo quando sei su un touchscreen.",
       "rowFullscreen": "Riempie l'intero schermo con il gioco.",
+      "rowSpellEffects": "Bagliori, scintille, proiettili ed esplosioni d'impatto degli incantesimi dei giocatori e dei loro famigli, inclusi i tuoi. Disattiva per uno schermo più tranquillo o qualche fotogramma in più nei grandi scontri di gruppo. Tutti gli incantesimi nemici restano visibili, come gli anelli di pericolo, i simboli sui bersagli storditi, impauriti o immobilizzati e ogni barra di lancio.",
       "rowWaterRipples": "Scie e increspature che si allargano dietro di te mentre nuoti. Disattivate di default, ed è l'unico effetto dell'acqua che costa davvero fotogrammi; spruzzi e bolle non ne risentono in ogni caso.",
       "rowOverflowXp": "Al livello massimo, se la tua barra continua a riempirsi con l'esperienza eccedente oppure mostra invece il classico testo statico di livello massimo.",
       "rowInterfaceMode": "Se ottieni l'interfaccia desktop o i controlli touch a schermo. Auto legge il tuo dispositivo, ma puoi forzare entrambi: un tablet con tastiera può usare il layout desktop, e un laptop touchscreen può usare i controlli touch.",
@@ -7565,7 +7724,7 @@ export const it_IT: EnTranslations = {
       "ifPartyShowAuras": "Se buff e debuff compaiono sui riquadri del gruppo. Interruttori corrispondenti coprono le barre risorsa, gli assorbimenti, i famigli e se compari nella tua stessa lista del gruppo.",
       "ifAurasOnPlayerFrame": "Mette i tuoi buff e debuff sul tuo riquadro del giocatore oltre che sulla barra delle aure.",
       "ifAuraBarBelowFrame": "Sposta la riga dei buff sotto il tuo riquadro unità invece che sopra. Conta solo quando i buff sono sul riquadro del giocatore.",
-      "ifTargetAurasBelowFrame": "Colloca la striscia di potenziamenti e indebolimenti del riquadro bersaglio sotto il riquadro invece che sopra, la disposizione classica. Disattivata di default, poiché il riquadro bersaglio predefinito si trova appena sopra la barra delle azioni; attivala una volta spostato il riquadro in un punto con spazio sottostante.",
+      "ifTargetAurasBelowFrame": "Colloca la fila di benefici e penalità del bersaglio sotto il suo riquadro, sotto nome e barra della salute, anziché sopra: la disposizione classica. Nella posizione predefinita, il riquadro del bersaglio, insieme alla tua barra di lancio e ai timer degli attacchi, sale di una fila per lasciare la prima riga libera dalla barra delle azioni; un riquadro spostato rimane dove lo hai messo.",
       "ifAlwaysShowAllBuffs": "Mostra ogni potenziamento attivo anche con il profilo grafico Basso, ignorando il normale limite di icone dei potenziamenti.",
       "ifShowAuraCaster": "Aggiunge una riga \"Lanciato da\" a ogni descrizione di potenziamento/indebolimento, indicando chi lo ha applicato. Utile per distinguere più lanciatori dello stesso potenziamento, come le Benedizioni di due paladini.",
       "ifTargetOfTarget": "Mostra chi sta bersagliando il tuo bersaglio, il modo classico per capire se il tank ha ancora la minaccia.",
@@ -7583,6 +7742,7 @@ export const it_IT: EnTranslations = {
       "ifMouseoverCast": "Permette a una cura o a un incantesimo amico di colpire il riquadro del gruppo su cui passi il mouse, senza cambiare il tuo bersaglio.",
       "ifStickyTarget": "Mantiene il tuo bersaglio attuale quando fai clic su terreno vuoto, invece di rimuoverlo.",
       "ifFctScale": "La dimensione dei numeri di danno e cura che fluttuano dal tuo bersaglio.",
+      "ifClassicCombatText": "Ripristina i semplici numeri di danno bianchi e oro pallido che salgono dritti. Lascia disattivato (impostazione predefinita) per numeri più marcati che si aprono sui lati, con bagliori per i colpi critici e insolitamente grandi.",
       "ifExtraBars": "Rivela una seconda fila della barra delle azioni, e una terza una volta attivata la seconda. Gli slot restano raggiungibili tramite i loro tasti assegnati anche quando le file sono nascoste.",
       "ifHideUnused": "Nasconde gli slot azione vuoti così vengono disegnati solo i pulsanti che usi davvero.",
       "ifLockBars": "Blocca le tue barre così non puoi trascinare per sbaglio un'abilità fuori da uno slot.",
@@ -7647,6 +7807,7 @@ export const it_IT: EnTranslations = {
       "frameGroups": "{trackers} può unire missioni, imprese, squarci, esplorazioni, obiettivi di raccolta e il tracciamento del Reliquiario. {auras} può unire i tic sul bersaglio e le sei tracce delle aure. Attiva l'uno o l'altro gruppo in Impostazioni Riquadri, oppure lascialo disattivato per spostare ogni riquadro separatamente. {tot} include una barra delle risorse. {focus} ha tre bersagli spostabili in modo indipendente: da Maiusc+F1 a Maiusc+F3 li assegna; da Ctrl+F1 a Ctrl+F3 li seleziona. Trascina il misuratore di danno o minaccia in un punto qualsiasi al di fuori dei suoi pulsanti per spostarlo, e trascina i suoi bordi per ridimensionarlo, anche mentre i riquadri sono bloccati. Mentre i riquadri sono sbloccati, Mostra o Nascondi Riquadri ha un proprio menu raggruppato. Fai clic destro su un riquadro sbloccato per Ripristina dimensione o Opzioni Riquadro. Interfaccia > Riquadri contiene anche Impostazioni Riquadri e le Opzioni Riquadro Gruppo a comparsa. Blocca Bersaglio del Bersaglio al Bersaglio mantiene uniti quei riquadri. Disattivalo per spostare Bersaglio del Bersaglio separatamente; riattivarlo conserva la posizione separata per dopo. I riquadri focus assegnati nascondono i loro controlli di impostazione; fai clic destro e scegli Rimuovi Focus per ripristinarli. Il lancio al passaggio del mouse funziona anche sui riquadri focus.",
       "framesGovernedTalkingHead": "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
+      "framesGovernedResourceAndHill": "Attiva Separa barra delle risorse nella scheda Riquadri: Modifica riquadri sbloccherà anche la barra delle risorse, permettendoti di posizionare mana, energia o rabbia separatamente dove preferisci. Larghezza della barra delle risorse e Altezza della barra delle risorse, nella stessa scheda, ne regolano le dimensioni. Modifica riquadri sblocca anche la barra del Re della Collina; Opacità dello sfondo del Re della Collina, nella stessa scheda, attenua il pannello mantenendo il testo ben leggibile.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
       "aurasTitle": "Potenziamenti e indebolimenti",
@@ -8007,18 +8168,20 @@ export const it_IT: EnTranslations = {
       "formsHeading": "Trasformazioni",
       "formsNote": "Un druido combatte cambiando forma. La maggior parte delle abilità del druido appartiene a una forma specifica, quindi la forma in cui ti trovi decide cosa puoi lanciare, e trasformarti costa un po' di mana. Puoi trasformarti dentro o fuori dal combattimento, tutte le volte che vuoi.",
       "formsAutoUnshift": "Una cura o un incantesimo di danno lanciato in forma ti fa uscire da solo. Lasciare una forma in questo modo è gratuito e non consuma il recupero globale, quindi un incantesimo istantaneo parte nel momento in cui lo premi. Rientrare in forma è un'abilità normale e costa comunque mana e il tuo recupero globale.",
-      "formsMoonwing": "Un druido di Equilibrio ottiene una forma in più, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. È l'unica forma animale che conserva i tuoi incantesimi, e la tua bacchetta funziona solo con essa o con la tua normale forma da incantatore.",
-      "formsWolfEngage": "Un lupo apre lo scontro con Carica di Bruin, passa subito in Forma del Lupo per bloccare il bersaglio, chiude la distanza con Balzo quando non è in furtività e ferma un nemico con Atterramento.",
+      "formsMoonwing": "Un druido di Equilibrio ottiene un’altra forma, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. Come la Forma di Curatore delle Spore di Ripristino, conserva i tuoi incantesimi; la bacchetta funziona solo in queste due forme o nella tua normale forma da incantatore.",
+      "formsWolfEngage": "Un gatto apre lo scontro con Carica di Bruin, passa subito in Forma del Gatto per bloccare il bersaglio, chiude la distanza con Balzo quando non è in furtività e ferma un nemico con Atterramento.",
       "formLine": {
         "form_bear": "La forma da tank: una pelle spessa, rabbia al posto del mana, e minaccia extra così i nemici continuano ad attaccarti.",
         "form_cat": "La forma da danno in mischia: energia e punti combo, come un ladro, e molta meno minaccia.",
-        "form_travel": "La forma da viaggio: molto più veloce sul terreno, ma nessun'altra abilità finché non ne esci."
+        "form_travel": "La forma da viaggio: molto più veloce sul terreno, ma nessun'altra abilità finché non ne esci.",
+        "form_sporemender": "La forma curativa di Ripristino: pelle più resistente e cure più potenti a passo più lento, mantenendo tutti gli incantesimi e il mana."
       },
       "mageEleSummon": "Un incantesimo di Gelo che richiama l'elementale al tuo fianco e lo indirizza contro il tuo bersaglio.",
       "formName": {
         "form_bear": "Forma di Bruin",
         "form_cat": "Forma del Gatto",
-        "form_travel": "Forma di Fleet"
+        "form_travel": "Forma di Fleet",
+        "form_sporemender": "Forma di Curatore delle Spore"
       }
     },
     "classHook": {
@@ -8517,7 +8680,7 @@ export const it_IT: EnTranslations = {
       "honorFinalNoteSoldBack": "Gli acquisti con Onore sono definitivi. La lista di ricompra contiene solo ciò che hai venduto: un acquisto in monete di solito può essere rivenduto al suo prezzo e recuperato dalla lista se cambi di nuovo idea, ma l’equipaggiamento da Guerra si vincola all’anima nel momento dell’acquisto, quindi non può essere scambiato, spedito o rivenduto e non raggiunge mai quella lista. Il negozio chiede conferma per questo motivo: leggi il pezzo prima di premere.",
       "warfareHeading": "Equipaggiamento da Guerra",
       "warfareBody": "Ogni pezzo da Guerra porta un Indice di Attacco GUERRA e un Indice di Difesa GUERRA, e questi due indici non hanno alcun effetto contro i mostri. Si applicano solo quando combatti un altro giocatore, in duello, in arena o sul campo di battaglia, dove l'Attacco aumenta il danno che infliggi e la Difesa riduce il danno che subisci, ciascuno fino al proprio tetto massimo. Ogni famiglia di armature è anche un set, e i suoi bonus di set sono a loro volta indici GUERRA o effetti che funzionano solo contro i giocatori, quindi un kit da onore completo non vale nulla contro un boss di dungeon.",
-      "warfareBodyStatsStay": "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra.",
+      "warfareBodyStatsStay": "Ogni pezzo da Guerra porta Valutazione Offensiva da Guerra e Valutazione Difensiva da Guerra, e queste due statistiche non fanno nulla contro i mostri. Si applicano solo quando combatti contro un altro giocatore, in duello, nell’arena o nel campo di battaglia: l’Offensiva aumenta i danni inflitti e la Difensiva riduce i danni subiti, ciascuna fino al proprio limite. Ogni famiglia di armature è anche un completo, e i suoi bonus sono allo stesso modo valutazioni o effetti da Guerra che funzionano solo contro i giocatori, quindi i bonus di un completo d’onore non contano contro un boss di dungeon. I pezzi conservano comunque le statistiche normali, l’armatura e i danni dell’arma, che funzionano ovunque; contro un mostro si spengono solo le valutazioni e i bonus del completo da Guerra. Un'eccezione funziona ovunque: due pezzi di uno qualsiasi di questi set fanno anche sì che i danni subiti non ritardino più il lancio degli incantesimi.",
       "warfareTradeBody": "Questo è lo scambio voluto. L'equipaggiamento da Guerra è costruito per combattere altri giocatori, non come scorciatoia per saltare i livelli dei dungeon: un pezzo da Guerra non porta mai gli indici di combattimento di un epico da dungeon nello stesso slot, e tutto ciò che offre si spende su altri giocatori. Se vuoi tenere testa in arena, compralo. Se vuoi completare le eroiche più in fretta, guadagnati l'equipaggiamento nei dungeon.",
       "warfareTradeBodyRatingSpent": "È questo lo scambio voluto. L’equipaggiamento da Guerra serve a combattere i giocatori, non a saltare i livelli dei dungeon: un pezzo da Guerra non porta mai le valutazioni di combattimento che avrebbe un epico da dungeon nello stesso slot, e la valutazione da Guerra e i bonus del completo che porta sono spesi interamente contro altri giocatori. Se vuoi reggere nell’arena, compralo. Se vuoi superare più velocemente le modalità eroiche, guadagna l’equipaggiamento nei dungeon.",
       "vanguardHeading": "Equipaggiamento dell'Avanguardia: Guerra Stagione 2",
@@ -8542,6 +8705,8 @@ export const it_IT: EnTranslations = {
       "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Una volta ogni tre ore, in un momento che nessuno può prevedere, l'intero reame viene avvisato che una collina sorgerà in una delle zone a tutti contro tutti tra quindici minuti, e il cerchio dove si ergerà è segnato su terreno aperto. Quando sorge resta in piedi per quarantacinque minuti, poi cade. Il gruppo con più giocatori al suo interno contende la collina, e dopo un minuto di maggioranza ininterrotta la collina è sua; un giocatore solitario conta come un gruppo di uno, ma i membri di un'incursione non contano affatto. Mentre un gruppo tiene la collina, ciascuno dei suoi membri al suo interno guadagna Onore ogni minuto, e più a lungo lo stesso gruppo la tiene, più paga ogni minuto: un gruppo completo che tiene una collina incontrastata per l'intera durata guadagna quanto circa tre vittorie in campo di battaglia. Quando la collina cambia mano, i nuovi detentori ricominciano il conteggio da capo. Una barra sopra il campo mostra chi la controlla, i tuoi numeri contro i loro, e il tempo della contesa; /hill in chat indica dove si trova.",
+      "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyFlat": "Ogni tre ore, in un momento imprevedibile, tutto il reame viene avvisato che tra quindici minuti apparirà una collina in una delle zone di combattimento libero, e il suo cerchio viene segnato su terreno aperto. Rimane per quarantacinque minuti, poi scompare. Nel frattempo, ogni cinque minuti vengono annunciate la posizione e le classifiche dei gruppi con il maggior tempo totale di controllo. Il gruppo con più giocatori nel cerchio contende la collina e la conquista dopo trenta secondi complessivi di superiorità numerica. L'arrivo di un gruppo rivale mette solo in pausa il conteggio finché il tuo gruppo non torna in vantaggio; il conteggio riparte da zero solo se nel cerchio non resta alcun membro vivo del tuo gruppo. Un giocatore solo conta come un gruppo di una persona e conserva la collina quando forma un gruppo, ma i membri delle incursioni non contano affatto. Ogni membro del gruppo che controlla la collina e si trova nel cerchio riceve la stessa quantità di Onore ogni minuto, indipendentemente dalla durata del controllo. Un gruppo completo che la tiene indisturbato per tutta la sua durata guadagna circa quanto tre vittorie nei campi di battaglia. Quando scompare, se il gruppo con il maggior controllo totale ha accumulato almeno dieci minuti, chiunque sia rimasto nel cerchio almeno un minuto durante il controllo di quel gruppo e ne faccia ancora parte ottiene una vittoria per la riga PvP del Forziere Settimanale. Una barra sopra il campo mostra chi la controlla, i giocatori dei due schieramenti e il conteggio di conquista; /hill in chat indica dove si trova.",
       "limitsBodyRaids": "Sconfiggere lo stesso giocatore più e più volte paga sempre meno e presto nulla, e il tuo conteggio contro quel giocatore riparte da capo solo circa un'ora dopo la prima di quelle uccisioni, quindi appostarsi su una singola vittima non vale mai l'attesa. Un bersaglio molto al di sotto del tuo livello non paga assolutamente nulla. I Campi di Battaglia e i Colossei seguono le proprie regole mentre sei al loro interno, e pagano più Onore del mondo aperto, quindi il PvP mondiale è la strada più lenta verso lo stesso mercante. Le incursioni non guadagnano nulla dalle uccisioni nel mondo: un membro di un'incursione non riceve Onore né monete e non riduce la quota di nessun altro, quindi combatti in gruppo per essere pagato."
     },
     "thornhollowPage": {
@@ -8719,6 +8884,7 @@ export const it_IT: EnTranslations = {
       "formBear": "Forma di Bruin",
       "formCat": "Forma del Gatto",
       "formTravel": "Forma di Fleet",
+      "formSporemender": "Forma di Curatore delle Spore",
       "groupCreatures": "Creature",
       "groupPets": "Demoni dello Stregone",
       "pickerLabel": "Scegli un modello da visualizzare",
@@ -9152,8 +9318,8 @@ export const it_IT: EnTranslations = {
         "commissionsHeading": "Commissioni e il Vincolo dell'Artigiano",
         "commissionsBody": "Una commissione e una lavorazione fatta per qualcuno. Quando si forgia un'arma, un pezzo d'armatura o un oggetto tenuto fuori mano (una pozione non puo portare un vincolo), l'artigiano puo contrassegnare la lavorazione come commissione: il pezzo finito si comporta normalmente tra le mani del creatore, ma nel momento in cui cambia mani in uno scambio si vincola alla persona che lo ha ricevuto. Questo e il Vincolo dell'Artigiano: il compratore ottiene il suo pezzo, e il pezzo non puo essere ceduto o rivenduto.\n\nI vincoli non sono eterni, solo costosi. Qualsiasi maestro di stazione sciolgliera un pezzo vincolato mentre sei presso la sua stazione (una stazione mobile non offre mai il servizio), per una tariffa fissata dalla qualita dell'oggetto: 25 argento per il non comune, 1 oro per il raro, 4 oro per l'epico, con il leggendario che paga la tariffa dell'epico e un pezzo comune commissionato quella del non comune.\n\nLa tariffa compra una lavagna pulita, non una cura: il pezzo e ancora una commissione, quindi si vincola di nuovo a chiunque lo riceva nel successivo scambio, e tutto il resto, firma, capolavoro e incanti, sopravvive intatto.",
         "provenanceHeading": "Lavoro firmato",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Alcuni oggetti portano un nome. Le righe della provenienza di un materiale indicano chi ha raccolto ogni gruppo di unità, mentre un marchio separato firmato da identifica l’eventuale firmatario premium. I due fatti sono indipendenti: un materiale raccolto normalmente registra il raccoglitore senza ottenere una firma, mentre una scorta firmata ereditata può indicare il firmatario dichiarando onestamente che non è stato registrato alcun raccoglitore. Un pezzo finito indica invece chi lo ha fabbricato. Questi dati viaggiano con l’oggetto attraverso scambi, banca, posta, Mercato Globale e perfino il riacquisto dal venditore, senza mai svanire.\n\nLa raccolta firma automaticamente il lavoro migliore: ogni raccolto che ottiene raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intero bottino di cinque unità. Un raccolto da cadavere con tiro fortunato firma la resa quando la famiglia non ha un esemplare da offrire; quando ce l’ha, mantiene la resa normale e crea accanto l’esemplare intatto firmato. L’artigianato firma allo stesso modo: ogni copia di un’uscita rara o superiore crea una copia firmata, e un capolavoro firma sempre qualunque sia la sua qualità, così la versione migliore di ogni pezzo indica sempre il suo creatore. La firma di un materiale ordinario viaggia con le unità e non si perde solo perché una pila compatibile contiene già un altro raccoglitore o firmatario. Un esemplare intatto distinto è un oggetto separato e richiede spazio; se non può entrare, la resa ordinaria del cadavere resta ma l’esemplare viene perso.\n\nGli oggetti finiti mantengono un’identità rigida, quindi due copie si fondono solo quando ogni marchio coincide esattamente: stesso oggetto, stesso firmatario, stesse statistiche del capolavoro, stesso incantamento e stesso vincolo. I materiali compatibili condividono uno slot fra raccoglitori e firmatari, mantenendo però un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; fai clic destro sulla pila per l’elenco completo (su touch, usa il suo pulsante Fonti). Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.\n\nLe firme ricompensano gli artigiani: tenere al banco una copia firmata di un reagente necessario, da chiunque sia stata firmata, aggiunge 2 punti percentuali alla probabilità di capolavoro; tenere un reagente firmato da te riduce di uno la quantità richiesta di quel reagente, mai sotto uno, salvo che il reagente sia marcato come non scontabile; i nuclei da incursione mantengono sempre il costo pieno. Il tuo lavoro raro o superiore firmato continua persino a insegnarti, oggi solo tramite le pozioni fabbricate: bevi una bevanda rara che hai preparato e firmato e un piccolo rivolo di competenza torna alla professione che l’ha creata, purché sia una delle tue professioni principali attive. Vale davvero solo per il ramo delle pozioni: un elisir, una pergamena o una fiasca d’apice non ti insegna nulla, per quanto finemente sia stata firmata.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Alcuni oggetti portano un nome. Le righe della provenienza di un materiale indicano chi ha raccolto ogni gruppo di unità, mentre un marchio separato firmato da identifica l’eventuale firmatario premium. I due fatti sono indipendenti: un materiale raccolto normalmente registra il raccoglitore senza ottenere una firma, mentre una scorta firmata ereditata può indicare il firmatario dichiarando onestamente che non è stato registrato alcun raccoglitore. Un pezzo finito indica invece chi lo ha fabbricato. Questi dati viaggiano con l’oggetto attraverso scambi, banca, posta, Mercato Globale e perfino il riacquisto dal venditore, senza mai svanire.\n\nLa raccolta firma automaticamente il lavoro migliore: ogni raccolto che ottiene raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intero bottino di cinque unità. Un raccolto da cadavere con tiro fortunato firma la resa quando la famiglia non ha un esemplare da offrire; quando ce l’ha, mantiene la resa normale e crea accanto l’esemplare intatto firmato. L’artigianato firma allo stesso modo: ogni copia di un’uscita rara o superiore crea una copia firmata, e un capolavoro firma sempre qualunque sia la sua qualità, così la versione migliore di ogni pezzo indica sempre il suo creatore. La firma di un materiale ordinario viaggia con le unità e non si perde solo perché una pila compatibile contiene già un altro raccoglitore o firmatario. Un esemplare intatto distinto è un oggetto separato e richiede spazio; se non può entrare, la resa ordinaria del cadavere resta ma l’esemplare viene perso.\n\nGli oggetti finiti mantengono un’identità rigida, quindi due copie si fondono solo quando ogni marchio coincide esattamente: stesso oggetto, stesso firmatario, stesse statistiche del capolavoro, stesso incantamento e stesso vincolo. I materiali compatibili condividono uno slot fra raccoglitori e firmatari, mantenendo però un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; fai clic destro sulla pila per l’elenco completo (su touch, usa il suo pulsante Fonti). Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.\n\nLe firme ricompensano gli artigiani: possedere una copia firmata di un reagente necessario, da chiunque sia stata firmata, nelle borse o nel Caveau dei Materiali dove la lavorazione può attingervi, aggiunge 2 punti percentuali alla probabilità di capolavoro; tenere un reagente firmato da te riduce di uno la quantità richiesta di quel reagente, mai sotto uno, salvo che il reagente sia marcato come non scontabile; i nuclei da incursione mantengono sempre il costo pieno. Il tuo lavoro raro o superiore firmato continua persino a insegnarti, oggi solo tramite le pozioni fabbricate: bevi una bevanda rara che hai preparato e firmato e un piccolo rivolo di competenza torna alla professione che l’ha creata, purché sia una delle tue professioni principali attive. Vale davvero solo per il ramo delle pozioni: un elisir, una pergamena o una fiasca d’apice non ti insegna nulla, per quanto finemente sia stata firmata.",
         "collectorsHeading": "Collezionisti, trofei, e il prezzo di una storia",
         "collectorsBody": "I venditori sono ciechi alla provenienza: un oggetto firmato si vende a un PNG esattamente al suo prezzo normale. Il sovrapprezzo di una firma esiste solo tra i giocatori, il che e precisamente cio che lo rende interessante: una pila di minerale fortunato firmata da un celebre raccoglitore, un Taglio Pregiato da un raccolto fortunato, una lama da capolavoro che porta il nome di un artigiano ormai ritirato, valgono tutti cio che la memoria di qualcuno dice che valgano.\n\nIl Libro delle Imprese segue lo stesso istinto: Filone Intatto, Cuore di Legno Antico, Fiore di Luna, Un Esemplare Perfetto, e Barlume di Speranza sono segni da collezionista a zero Fama che esistono solo per provare che un momento e accaduto a te. Conserva l'oggetto che ha guadagnato l'impresa e tieni la ricevuta. Nulla di tutto questo e potere; la provenienza non compra statistiche e non vince battaglie, e il registro cartaceo del gioco dei giorni felici.",
         "castPaceHeading": "Tempo di lancio e pozzo dell'oro",
@@ -9202,7 +9368,7 @@ export const it_IT: EnTranslations = {
         "q3": "Qual e la differenza tra saccheggiare e raccogliere una carcassa?",
         "a3": "Sono due azioni distinte sullo stesso corpo. Tutto cio che una carcassa contiene, monete e drop piu eventuali componenti raccoglibili, si apre nella stessa finestra, ma il tasto interagisci e Prendi il bottino raccolgono solo il bottino ordinario, che segue le normali regole di saccheggio. La raccolta e il lato delle professioni, che strappa i materiali dalla carcassa stessa, e avviene solo quando scegli Raccogli in quella finestra.\n\nLa raccolta e chi prima arriva, uso singolo: ogni carcassa puo essere raccolta esattamente una volta, da chiunque la rivendichi per primo, anche online. Il tuo Focus della Citta determina cosa ottieni: mentre sei in un hub cittadino puoi distribuire 10 punti di focus tra i tipi di componenti che ti interessano, e ogni componente focalizzato tira un livello migliore (ogni 5 punti lo fa avanzare di un gradino, al massimo due gradini) e produce di piu (10 percento per punto). I componenti non focalizzati non vengono mai peggiorati.",
         "q4": "Perche il mio Tronco di corteccia di ferro e firmato?",
-        "a4": "Hai avuto un colpo di fortuna. Circa 1 raccolto su 90 innesca un evento di raccolta raro (antico cuore di legno su un albero, un filone intatto nel minerale, un fiore lunare tra le erbe): moltiplica per cinque la resa, firma ogni unità con il tuo nome e annuncia il ritrovamento all'intera zona. Anche un tiro di rarità raro o superiore su un raccolto ordinario firma la resa.\n\nI materiali firmati vanno tenuti o venduti cari: avere al banco una qualsiasi copia firmata di un reagente richiesto aggiunge 2 punti percentuali alla probabilità di capolavoro. Ricorda soltanto che si impilano unicamente con copie firmate in modo identico, quindi occupano uno slot della borsa tutto loro.",
+        "a4": "Hai trovato una raccolta eccezionale. Circa 1 raccolta su 90 attiva un evento raro: durame antico negli alberi, una vena intatta nei minerali o una fioritura lunare nelle erbe. Moltiplica per cinque la resa, firma ogni unità con il tuo nome e annuncia il ritrovamento all’intera zona. Anche un normale raccolto di qualità rara o superiore riceve la firma su tutta la resa.\n\nConviene conservare i materiali firmati o venderli cari: possedere una copia firmata di un reagente necessario nelle borse o nella Caveau dei Materiali, dove la lavorazione può attingervi, aggiunge 2 punti percentuali alla probabilità di capolavoro. Possono condividere una pila compatibile con materiali non firmati o unità di altri raccoglitori e firmatari senza perdere alcun marchio; ogni origine e quantità rimane registrata separatamente.",
         "q5": "Come sciolgo un pezzo commissionato, e quanto costa?",
         "a5": "Vai a qualsiasi stazione di lavorazione con il pezzo nelle borse e paga il maestro. La tariffa segue la qualita dell'oggetto: 25 argento per un pezzo non comune, 1 oro per un raro, 4 oro per un epico; un leggendario paga la tariffa dell'epico, e un pezzo comune commissionato paga quella del non comune. Deve essere una vera stazione: una stazione mobile non offre mai il servizio.\n\nLa tariffa compra una lavagna pulita, non una cura: il pezzo rimane una commissione, quindi si vincola di nuovo a chiunque lo riceva nel successivo scambio. Se piu copie vincolate condividono una pila, una copia viene staccata e svincolata per ogni pagamento.",
         "q6": "Dove imparo le ricette, e quanto costano?",
@@ -9238,6 +9404,7 @@ export const it_IT: EnTranslations = {
       "buyingBody": "Parla con un mercante e scegli di sfogliare la sua merce, e il suo negozio si apre con tre schede: Sfoglia, Vendi e Riacquisto. Sfoglia contiene tutto ciò che tiene in magazzino, tuo se puoi permettertelo. Vendi elenca ciò che nelle tue borse è disposto a pagare, e vendere un pezzo che porta una propria qualità sorteggiata ti chiede prima conferma, così un esemplare pregiato non ti sfugge mai per errore. Se ti separi da qualcosa di cui ti penti, la scheda Riacquisto conserva le tue vendite recenti così puoi ricomprarle per le monete che ti sono state pagate.",
       "junkTitle": "Liberarsi delle cianfrusaglie",
       "junkBody": "Anche gli oggetti che non ti servono si vendono a qualunque venditore, perciò svuota le borse ogni volta che passi per la città invece di lasciarle riempire. La scheda Vendi del venditore tiene persino un pulsante che con un solo clic vende in blocco ogni cianfrusaglia di qualità Scadente. Le cianfrusaglie davvero senza valore possono anche essere scartate del tutto per far spazio.",
+      "junkBodyFinal": "Il bottino inutile si vende ancora a qualsiasi mercante con un negozio proprio: svuota le borse quando passi in città. La finestra del mercante ha anche un pulsante Vendi cianfrusaglie che vende tutti gli oggetti di qualità Scadente con un clic. Puoi anche gettare gli oggetti senza valore per fare spazio. Gli oggetti grigi non firmati venduti così non compaiono nell'elenco di riacquisto: controlla prima se volevi conservarne qualcuno.",
       "tradeTitle": "Scambiare con altri giocatori",
       "tradeBody": "Puoi scambiare faccia a faccia con chiunque ti stia vicino. Entrambi mettete oggetti e monete in una finestra condivisa e lo scambio avviene solo dopo che entrambi lo confermate, così nessuno dei due può essere ingannato. È il modo semplice per passare un bottino a un amico o concludere un accordo.",
       "mailTitle": "La Posta del Corvo",
@@ -11326,6 +11493,10 @@ export const it_IT: EnTranslations = {
     "selectClass": "Seleziona una classe.",
     "pickClass": "Scegli una classe.",
     "returnToLogin": "Torna all'accesso",
+    "searchUpdates": "Cerca aggiornamenti",
+    "noUpdateFound": "Nessun aggiornamento trovato. Riprova tra poco.",
+    "updateUnavailable": "Aggiorna dal tuo negozio di giochi o scarica il client più recente.",
+    "updateSearchFailed": "Impossibile verificare gli aggiornamenti. Riprova.",
     "api": {
       "tooManyAttempts": "Troppi tentativi. Attendi un minuto e riprova.",
       "usernameShape": "Il nome utente deve avere 3-24 caratteri e usare lettere, cifre o trattino basso.",
@@ -11553,6 +11724,17 @@ export const it_IT: EnTranslations = {
     "androidOpenStep": "Apri World of ClaudeCraft dalla nuova icona.",
     "otherStandaloneDetail": "Mantieni il dispositivo in schermo intero orizzontale.",
     "otherInstallDetail": "Installa o aggiungi questa pagina alla schermata Home per la migliore esperienza mobile a schermo intero."
+  },
+  "graphicsPrompt": {
+    "title": "Scegli la grafica",
+    "intro": "Scegli una preimpostazione grafica per questo dispositivo. Quelle più basse offrono maggiore fluidità; quelle più alte, una grafica più ricca.",
+    "autoDesc": "Sceglie una preimpostazione adatta a questo dispositivo. Rilevata: {preset}.",
+    "lowDesc": "La massima fluidità. Ideale per telefoni, tablet e sistemi grafici meno recenti o integrati.",
+    "mediumDesc": "Un equilibrio tra qualità visiva e prestazioni. Adatta alla maggior parte dei portatili.",
+    "highDesc": "Più dettagli e scenari più ricchi. Adatta a una scheda grafica dedicata.",
+    "ultraDesc": "La preimpostazione fissa visivamente più ricca. Adatta a una scheda grafica di fascia alta.",
+    "changeLater": "Puoi modificare questa scelta in qualsiasi momento in Opzioni, sotto Qualità grafica.",
+    "confirm": "Continua"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft - Mondo non disponibile",
@@ -12200,6 +12382,7 @@ export const it_IT: EnTranslations = {
       "passive": "Passiva",
       "defensive": "Difensiva",
       "aggressive": "Aggressiva",
+      "assist": "Assistenza",
       "petAttackTitle": "Attacco mascotte",
       "petAttackDesc": "Ordina alla tua mascotte di attaccare il tuo attuale bersaglio ostile.",
       "waterJetTitle": "Getto d'Acqua",
@@ -12213,10 +12396,11 @@ export const it_IT: EnTranslations = {
       "healDemonDesc": "Spendi mana per canalizzare cure nel tuo demone per 5 secondi.",
       "healPetDesc": "Clicca, poi clicca del cibo nelle borse per nutrire e curare la mascotte per 5 secondi.",
       "stanceTitle": "Posizione mascotte",
-      "stanceDesc": "Clicca per scegliere Passiva, Difensiva o Aggressiva.",
+      "stanceDesc": "Clicca per scegliere Passiva, Difensiva, Aggressiva o Assistenza.",
       "passiveDesc": "Attacca solo quando glielo ordini.",
       "defensiveDesc": "Attacca i nemici che feriscono te o la tua mascotte.",
       "aggressiveDesc": "Attacca i nemici ostili vicini.",
+      "assistDesc": "Attacca solo il tuo bersaglio attuale, dopo che hai usato un'abilità su di esso. Ignora i nemici che ti attaccano.",
       "rename": "Rinomina mascotte",
       "revive": "Rattoppare",
       "abandon": "Abbandona mascotte",
@@ -12503,6 +12687,8 @@ export const it_IT: EnTranslations = {
       "clueTalkAria": "Chiedi dell'indizio: {name}",
       "clueDeliver": "Consegna {count} {item}.",
       "clueDeliverAria": "Consegna {count} {item} a {name}",
+      "attuneHearthstone": "Vincola qui la mia Pietra del Ritorno Alleata.",
+      "attuneHearthstoneAria": "Vincola la tua Pietra del Ritorno Alleata a {hub} con {name}",
       "profIntroHint": "Vai da {name} per \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Le tre reliquie raccontano la stessa storia: Aldren combatté per difendere il suo re, Malric spezzò il confine della morte e Voss tentò di fermare ciò che seguì. Il sigillo si indebolisce, e la cripta abbandonata è la via verso il basso.",
       "browseGoods": "Fammi vedere la tua merce.",
@@ -12542,6 +12728,7 @@ export const it_IT: EnTranslations = {
       "activeStatus": "Missione mondiale attiva",
       "expiresIn": "Scade tra {time}",
       "mineOre": "Estrai minerale di rame",
+      "mineMaterial": "Estrai {name}",
       "recoverObject": "Recupera {name}",
       "redirectLeyBeam": "Reindirizza il fascio ley",
       "matchConfections": "Abbina i dolciumi incantati",
@@ -12889,6 +13076,7 @@ export const it_IT: EnTranslations = {
       "clueCasketOpened": "Il cofanetto contiene {money} e {items}.",
       "treasureMapEarned": "Tutte le missioni mondiali del giorno sono completate: hai trovato una {map}.",
       "treasureMapLost": "Tutte le missioni mondiali del giorno sono completate, ma la tua borsa non ha spazio per la mappa del tesoro.",
+      "worldQuestRewardMailed": "Le borse sono piene. La ricompensa è stata inviata alla tua casella postale: {items}.",
       "treasureMapRead": "Studi la {map}. La X si trova da qualche parte in {zone}.",
       "treasureMapUpgraded": "La mappa è ridisegnata con inchiostro più fine: è ora una {map}.",
       "treasureVaultOpened": "Il terreno cede. Un tesoro sepolto si apre davanti a te.",
@@ -13066,7 +13254,8 @@ export const it_IT: EnTranslations = {
       "sellQuantityCancel": "Annulla",
       "sellJunk": "Vendi cianfrusaglie",
       "sellJunkAria": "Vendi tutte le cianfrusaglie per {price}",
-      "sellJunkHint": "Vende tutti gli oggetti grigi nelle borse tranne gli oggetti di missione."
+      "sellJunkHint": "Vende tutti gli oggetti grigi nelle borse tranne gli oggetti di missione.",
+      "sellJunkNoBuyback": "Gli oggetti grigi non firmati non compaiono nell'elenco di riacquisto: venderli è irreversibile."
     },
     "market": {
       "title": "Mercato Mondiale",
@@ -13179,7 +13368,7 @@ export const it_IT: EnTranslations = {
       "historyEmpty": "Ancora nessuna vendita. Gli oggetti che vendi sul Mercato Mondiale compaiono qui.",
       "historyNote": "Le tue vendite recenti sul Mercato Mondiale.",
       "saleBuyer": "Venduto a {buyer}",
-      "saleOlder": "Più {count} vendite precedenti, incluse nel totale.",
+      "saleOlder": "Più {count} vendite precedenti non elencate.",
       "ordersTab": "Richiesti",
       "ordersNote": "Pubblica ciò che vuoi e l'oro viene trattenuto dal Mercante. Le inserzioni al tuo prezzo o sotto vengono evase subito; il resto attende un venditore. Il Mercante trattiene una percentuale del {cut}% da chi consegna. Hai {used}/{max} ordini aperti.",
       "ordersListAria": "Ordini di acquisto aperti",
@@ -13326,6 +13515,10 @@ export const it_IT: EnTranslations = {
         "name": "Scarica di Frecce",
         "description": "Fa piovere frecce su un'area di 8 m per 3 sec. I nemici nell'area subiscono {damage} danni Fisici ogni 0.5 sec. Il danno aumenta con la potenza d'attacco a distanza."
       },
+      "phosphor_flask": {
+        "name": "Fiasca di Fosforo",
+        "description": "Un recipiente sigillato contenente una miscela chimica reattiva che esplode in fiamme incandescenti su un'area di 8 m per 3 s. I nemici che restano tra le fiamme subiscono {damage} danni da Fuoco ogni 0,5 s. Il danno aumenta con la potenza d'attacco a distanza."
+      },
       "pack_command": {
         "name": "Comando del Branco",
         "description": "Ordina al tuo famiglio vivo di colpire per 36-48 danni Fisici. I danni aumentano con la potenza d'attacco del famiglio. Un colpo a segno recupera 20 concentrazione e concede 1 Ferocia del Branco per 30 s, fino a 3. Ogni accumulo aumenta del 10% tutti i danni inflitti dal tuo famiglio. Questo colpo usa gli accumuli che avevi prima dell'impatto."
@@ -13348,19 +13541,19 @@ export const it_IT: EnTranslations = {
       },
       "bloodhook": {
         "name": "Uncino Sanguinario",
-        "description": "Carica verso un nemico e applica Ferita da Uncino Sanguinario, infliggendo 34 danni Fisici base più il 26% della tua potenza d'attacco a distanza in 12 s con 4 impulsi. (Distintivo di Arte del Campo)"
+        "description": "Carica un nemico e applica una ferita di Uncino Sanguinario, infliggendo 34 danni fisici base più il 26% della tua potenza d'attacco a distanza in 4 impulsi in 12 s. All'arrivo rallenta il bersaglio del 30% per 3 s. (Tratto distintivo di Sopravvivenza)"
       },
       "shrapnel_charge": {
         "name": "Carica a Frammentazione",
-        "description": "Colpisci il bersaglio per 24-30 danni Fisici e fino ad altri 4 nemici entro 6 metri per 13-17. Gli altri bersagli sanguinano anche per 12 danni in 6 s. Se il bersaglio principale ha la tua Ferita da Uncino Sanguinario, infligge subito 1 impulso di ferita. I danni diretti aumentano con la potenza d'attacco a distanza."
+        "description": "Colpisce un cono di 10 m davanti a te. Il tuo bersaglio, o il nemico colpito più vicino se il bersaglio è fuori dal cono, subisce da 24 a 30 danni fisici. Gli altri nemici nel cono subiscono da 7 a 9 danni e sanguinano per 12 danni in 6 s. Se il bersaglio principale ha la tua ferita di Uncino Sanguinario, subisce subito 1 impulso della ferita. Colpire un nemico fornisce 1 Slancio di Caccia. I danni diretti aumentano con la potenza d'attacco a distanza."
       },
       "bloodtrail_assault": {
         "name": "Assalto della Scia di Sangue",
-        "description": "Per 12 s l'Uncino Sanguinario propaga una ferita al 60% di potenza fino a 2 nemici vicini, Squarciaferite comanda un attacco del famiglio da 18 danni, e la Carica a Frammentazione guadagna 2 metri, infligge il 25% di danni base in più al bersaglio principale e attiva il 50% di danni da ferita in più."
+        "description": "Per 12 s, Uncino Sanguinario diffonde una ferita al 60% della potenza a un massimo di 2 nemici entro 5 m, Squarciaferite ordina un attacco del famiglio da 18 danni e Carica a Frammentazione arriva 2 m più lontano, infligge il 25% di danni base in più al bersaglio principale e attiva il 50% di danni da ferita in più. Senza un famiglio vivo, la tua Concentrazione si rigenera anche il 100% più rapidamente."
       },
       "trailbreak": {
         "name": "Rompipista",
-        "description": "Balza 12 metri all'indietro. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s."
+        "description": "Balza 25 metri all'indietro e liberati da immobilizzazioni e rallentamenti. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s."
       },
       "wildheart": {
         "name": "Cuore Selvaggio",
@@ -13370,9 +13563,25 @@ export const it_IT: EnTranslations = {
         "name": "Pelle di Corazza",
         "description": "Riduce i danni subiti del 60% per 8 s, ma impedisce di attaccare mentre è attiva."
       },
+      "play_dead": {
+        "name": "Fingere la morte",
+        "description": "Cadi a terra e fingiti morto: la tua salute e la tua concentrazione risultano vuote per tutti. I nemici si dimenticano di te, e i giocatori nemici che ti hanno come bersaglio lo perdono. Muoverti, attaccare o usare un'altra abilità lo interrompe. Se lo lanci mentre ti muovi, hai 1 s per fermarti prima che il movimento lo interrompa. Lancialo di nuovo per rialzarti."
+      },
+      "tactical_camo": {
+        "name": "Mimetismo Tattico",
+        "description": "Confonditi con l'ambiente: i nemici ti notano appena e ti muovi all'80% della velocità. Attaccare o subire danni interrompe Mimetismo Tattico. Usa di nuovo per uscire. (Sopravvivenza)"
+      },
       "frostjaw_trap": {
         "name": "Trappola Fauci di Gelo",
-        "description": "Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s."
+        "description": "Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s."
+      },
+      "bear_trap": {
+        "name": "Trappola per Orsi",
+        "description": "Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min; solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva sanguina per {damage} danni fisici in 15 s ed è rallentato del 50% per 4 s. I danni aumentano con la Potenza d’Attacco a Distanza. Può essere attiva una sola Trappola per Orsi alla volta. Può coesistere con la tua Trappola Fauci di Gelo. Piazzare un’altra Trappola per Orsi sostituisce la precedente."
+      },
+      "scatterbolt": {
+        "name": "Ventaglio di Dardi",
+        "description": "Spara una raffica di dardi in un cono di 90 gradi che si estende per 8 metri davanti a te, respingendo i nemici fino a una distanza massima di 20 metri da te. I nemici immuni alle respinte non subiscono effetti. Non infligge danni."
       },
       "pack_rally": {
         "name": "Adunata del Branco",
@@ -13488,7 +13697,7 @@ export const it_IT: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Barriera di massa",
-        "description": "Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe 130 danni per 60 s. (Talento del mago)"
+        "description": "Protegge te e fino a 4 alleati vicini entro 30 m; ogni scudo assorbe {damage} danni per 15 s. (Talento del mago)"
       },
       "overload": {
         "name": "Sovraccarico",
@@ -13625,7 +13834,7 @@ export const it_IT: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Colpo Basso",
-        "description": "Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec)."
+        "description": "Mossa finale che stordisce il bersaglio per 2 sec più 1 sec per punto combo (5 punti combo: 7 sec)."
       },
       "ambush": {
         "name": "Colpo dell'Agguato",
@@ -13634,7 +13843,7 @@ export const it_IT: EnTranslations = {
       },
       "stealth": {
         "name": "Velo Crepuscolare",
-        "description": "Ti nasconde nell'ombra: i nemici a stento ti notano, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
+        "description": "Ti nasconde nell'ombra: i nemici a stento ti notano e ti muovi a piena velocità. Attaccare o subire danni interrompe il Velo Crepuscolare. Rilancia per uscirne.",
         "specNote_subtlety": "Ogni apertura furtiva che usi dal Velo Crepuscolare aggiunge 1 Caligine (massimo 3)."
       },
       "adrenaline_rush": {
@@ -13678,7 +13887,7 @@ export const it_IT: EnTranslations = {
       },
       "vanish": {
         "name": "Foschia Evanescente",
-        "description": "Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec."
+        "description": "Scompari dalla vista, entrando in Duskveil anche in combattimento. Ti muovi a piena velocità mentre sei nascosto. Dura fino a 10 sec."
       },
       "instant_poison": {
         "name": "Morso della Vipera",
@@ -13911,11 +14120,11 @@ export const it_IT: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Slancio di Caccia",
-        "description": "Passiva: il Colpo Sventratore concede 1 Slancio di Caccia per 8 s, fino a 3. A 3 accumuli, Squarciaferite infligge il 45% di danni da colpo in più e consuma gli accumuli. (Arte del Campo)"
+        "description": "Passivo: Colpo Sventratore e una Carica a Frammentazione che colpisce un nemico forniscono ciascuno 1 Slancio di Caccia, fino a 3. Dura fino al consumo o all'uscita dal combattimento; ogni accumulo aumenta del 15% la velocità. Con 3 accumuli, Squarciaferite infligge il 60% di danni da colpo in più e li consuma. (Sopravvivenza)"
       },
       "fieldcraft_reentry": {
         "name": "Rientro Armato",
-        "description": "Passiva: Rompipista rinnova lo Slancio di Caccia e prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Il Colpo Sventratore infligge il 15% di danni in più per accumulo. L'Uncino Sanguinario infligge da 18 a 24 danni Fisici aggiuntivi, aumentati del 15% per accumulo e dalla tua potenza d'attacco a distanza. A 3 accumuli, uno dei due attacchi consuma lo Slancio di Caccia. (Arte del Campo)"
+        "description": "Passivo: con Slancio di Caccia, Rompipista prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Colpo Sventratore infligge il 15% di danni in più per accumulo. Uncino Sanguinario infligge da 18 a 24 danni fisici aggiuntivi, aumentati del 15% per accumulo e dalla potenza d'attacco a distanza. Con 3 accumuli, uno qualunque dei due attacchi consuma Slancio di Caccia. (Sopravvivenza)"
       },
       "wing_clip": {
         "name": "Fendente Immobilizzante",
@@ -13927,7 +14136,7 @@ export const it_IT: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Sembianze del Corsiero",
-        "description": "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 4 sec (ogni colpo rinnova lo stordimento)."
+        "description": "Assumete l'aspetto del corsiero e aumentate la vostra velocità di movimento del 30% per 30 min. Mentre è attivo, subire danni vi frastorna, dimezzando la vostra velocità di movimento per 2 sec (ogni colpo rinnova lo stordimento)."
       },
       "aimed_shot": {
         "name": "Tiro Teso",
@@ -13983,7 +14192,7 @@ export const it_IT: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Riserva di Tuono",
-        "description": "Passiva: il Dardo Folgorante e il Fulmine Biforcuto concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)"
+        "description": "Passiva: il Dardo Folgorante, il Fulmine Biforcuto e lo Scoppio di Magma concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)"
       },
       "lightning_overload": {
         "name": "Sovraccarico Folgorante",
@@ -13991,7 +14200,7 @@ export const it_IT: EnTranslations = {
       },
       "lava_burst": {
         "name": "Scoppio di Magma",
-        "description": "Infligge {damage} danni da Fuoco. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)"
+        "description": "Infligge {damage} danni da Fuoco. Un colpo a segno concede 1 Tuono. Va sempre a segno come colpo critico su un bersaglio che sta bruciando per la tua Scossa di Braci. Un colpo critico infligge un ulteriore 24% dei danni normali. Ondata di Magma: ogni tick di Scossa di Braci ha il 20% di probabilità di azzerare questo tempo di recupero e rendere istantaneo il tuo prossimo Scoppio di Magma entro 10 sec. Il danno aumenta con il Potere Magico. (Richiamo del Tuono)"
       },
       "thunderstorm": {
         "name": "Frangitempesta",
@@ -14015,7 +14224,7 @@ export const it_IT: EnTranslations = {
       },
       "flame_shock": {
         "name": "Scossa di Braci",
-        "description": "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di 12 sec. Il colpo iniziale aumenta con il Potere Magico."
+        "description": "Infligge {damage} danni da Fuoco, poi {overTime} danni da Fuoco nell'arco di {duration} sec. Il colpo iniziale aumenta con il Potere Magico."
       },
       "flametongue_weapon": {
         "name": "Arma Marchiofuoco",
@@ -14148,7 +14357,8 @@ export const it_IT: EnTranslations = {
       },
       "healing_touch": {
         "name": "Rammendo Selvaggio",
-        "description": "Cura un bersaglio alleato di {damage}."
+        "description": "Cura un bersaglio alleato di {damage}.",
+        "specNote_restoration": "Ogni lancio completato aggiunge 1 Verzura (massimo 3). La Verzura accumulata accorcia questo lancio: 2,2 s con 1 Verzura, 1,9 s con 2 e 1,5 s con 3. Favore della Natura lo rende istantaneo, gratuito e più forte del 25%."
       },
       "mark_of_the_wild": {
         "name": "Custodia Selvaggia",
@@ -14164,9 +14374,9 @@ export const it_IT: EnTranslations = {
         "description": "Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a {duration} sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare."
       },
       "rejuvenation": {
-        "name": "Fioritura Selvaggia",
+        "name": "Cura delle Spore",
         "description": "Cura il bersaglio di {damage} in 12 s.",
-        "specNote_restoration": "Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5). A 5 Verzura, Rapidità di Guarigione diventa Sovrafioritura."
+        "specNote_restoration": "Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva. A 3 Verzura, Rapidità di Guarigione diventa Sovrafioritura."
       },
       "thorns": {
         "name": "Guardia di Rovi",
@@ -14178,12 +14388,12 @@ export const it_IT: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma di Bruin",
-        "description": "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore."
+        "description": "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Colpisci il doppio più velocemente con metà danni per colpo, e ogni colpo genera il doppio della rabbia. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore."
       },
       "maul": {
         "name": "Frantumaossa",
         "description": "Un attacco lacerante che aumenta i danni in mischia di {damage} e causa un'elevata quantità di minaccia. Si attiva al tuo prossimo colpo. Solo Forma di Bruin.",
-        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti protegge invece con uno scudo pari al 18% della tua salute massima e rimborsa 15 rabbia."
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Spezzamidollo: un colpo da 78 a 96 danni ad alta minaccia; sotto metà salute ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia."
       },
       "growl": {
         "name": "Intimidazione",
@@ -14195,12 +14405,17 @@ export const it_IT: EnTranslations = {
       },
       "cat_form": {
         "name": "Forma del Gatto",
-        "description": "Vi trasforma in lupo: l'agilità sale con il vostro livello, potenza d'attacco +8 più 2 per livello, i vostri attacchi usano energia e punti combo, e generate il 29% di minaccia in meno. Passare a qualsiasi forma concede Passo leggero: il 60% di velocità di movimento per 3 sec, una volta ogni 20 sec. Lanciate di nuovo per tornare alla forma da incantatore."
+        "description": "Trasformati in gatto: l'agilità sale con il livello, la potenza d'attacco aumenta di 8 più 2 per livello, gli attacchi usano energia e punti combo, ti muovi il 15% più velocemente e generi il 29% di minaccia in meno. Ogni cambio di forma concede Passo leggero, un breve aumento di velocità. Usa di nuovo per tornare alla forma da incantatore."
       },
       "claw": {
         "name": "Artiglio Lacerante",
         "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Gatto.",
         "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
+      },
+      "scratch": {
+        "name": "Graffio",
+        "description": "Graffia i bersagli vicini entro 6 m, infliggendo danni dell'arma più {damage}. Fornisce 1 punto combo per bersaglio colpito. Rivela i nemici furtivi nell'area spazzata. Solo in Forma Felina.",
+        "specNote_feral": "Ogni colpo riuscito aggiunge 1 Sangue Antico (massimo 3)."
       },
       "ferocious_bite": {
         "name": "Morso Cruento",
@@ -14214,8 +14429,8 @@ export const it_IT: EnTranslations = {
       },
       "regrowth": {
         "name": "Seconda Fioritura",
-        "description": "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 21 s.",
-        "specNote_restoration": "Piantare una NUOVA fioritura aggiunge 1 Verzura (massimo 5)."
+        "description": "Cura un bersaglio amico di {damage} e di un importo aggiuntivo in 15 s. Se l'effetto dura per tutta la sua durata, cura di nuovo il bersaglio della stessa quantità della cura iniziale.",
+        "specNote_restoration": "Ogni lancio aggiunge 1 Verzura (massimo 3), anche quando rinnova una fioritura già attiva."
       },
       "barkskin": {
         "name": "Scorza di Quercia",
@@ -14252,23 +14467,23 @@ export const it_IT: EnTranslations = {
       },
       "hibernate": {
         "name": "Sopore",
-        "description": "Costringe il bersaglio in un sonno profondo per un massimo di 8 sec. Qualsiasi danno lo risveglia."
+        "description": "Costringe il bersaglio a un sonno profondo per un massimo di 8 s. Qualsiasi danno lo sveglia. Contro i giocatori ogni ripetizione entro 18 s dura la metà della precedente e la quarta fallisce."
       },
       "dash": {
         "name": "Scatto",
-        "description": "Scatta in avanti, aumentando la velocità di movimento del 50% per 15 sec. Solo Forma del Gatto."
+        "description": "Assumi Forma del Gatto se necessario, poi scatta con il 50% di velocità in più per 15 s. Utilizzabile in ogni forma. Istantaneo e non attiva il tempo di recupero globale."
       },
       "pounce": {
         "name": "Colpo Strisciante",
-        "description": "Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Lupo. Fuori dalla furtività questo pulsante è Balzo."
+        "description": "Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Gatto. Fuori dalla furtività questo pulsante è Balzo."
       },
       "lunge": {
         "name": "Balzo",
-        "description": "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Lupo."
+        "description": "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Gatto."
       },
       "hamstring_bite": {
         "name": "Atterramento",
-        "description": "Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec). Solo in Forma del Lupo."
+        "description": "Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec). Solo in Forma del Gatto."
       },
       "insect_swarm": {
         "name": "Sciame Pungente",
@@ -14280,7 +14495,7 @@ export const it_IT: EnTranslations = {
       },
       "rip": {
         "name": "Faglia Sanguigna",
-        "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Gatto.",
+        "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 s per 24 s: 72 danni più 48 per punto combo consumato (5 punti: {damage} totali). Solo in Forma del Gatto.",
         "specNote_feral": "Il colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "mortal_strike": {
@@ -14441,11 +14656,11 @@ export const it_IT: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangue Freddo",
-        "description": "Concentra il tuo istinto omicida così che il tuo prossimo attacco sia un colpo critico. (firma Knifework)"
+        "description": "Concentra il tuo istinto omicida così che i tuoi prossimi 5 attacchi siano colpi critici. (firma Knifework)"
       },
       "blade_flurry": {
         "name": "Vortice di Lame",
-        "description": "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 12 sec. (firma Thuggery)"
+        "description": "Scatena una raffica di lame, aumentando la velocità d'attacco del 20% per 30 sec. (firma Thuggery)"
       },
       "hemorrhage": {
         "name": "Emorragia",
@@ -14485,7 +14700,8 @@ export const it_IT: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
-        "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Piantare Fioritura Selvaggia e Seconda Fioritura aggiunge Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)"
+        "description": "Consuma una cura nel tempo su un bersaglio amico per curarlo di {damage}. Ogni lancio di Cura delle Spore, Seconda Fioritura e Rammendo Selvaggio aggiunge 1 Verzura; a 3 Verzura questo pulsante diventa Sovrafioritura, che cura istantaneamente ogni alleato che porta le tue cure nel tempo per il 60% di quanto restava di quegli effetti. (firma Groveheart)",
+        "specNote_restoration": "Consuma una cura periodica su un bersaglio amico per curarlo di {damage}. Le applicazioni di Cura delle Spore e Seconda Fioritura aggiungono Verzura; a 5 Verzura questo pulsante diventa Sovrafioritura, che cura subito ogni alleato con le tue cure periodiche del 60% delle cure rimanenti. (Tratto distintivo di Ripristino)"
       },
       "moonlash": {
         "name": "Ondata Lunare",
@@ -14501,7 +14717,7 @@ export const it_IT: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Spezzamidollo",
-        "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia."
+        "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti cura invece del 18% della tua salute massima e rimborsa 15 rabbia."
       },
       "wildwake": {
         "name": "Risveglio Selvaggio",
@@ -14511,9 +14727,27 @@ export const it_IT: EnTranslations = {
         "name": "Risveglio del Bosco",
         "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Groveheart)"
       },
+      "sporemender_form": {
+        "name": "Forma di Curatore delle Spore",
+        "description": "Assumi la forma di un Curatore delle Spore: cure aumentate del 20% e armatura del 40%, ma velocità di movimento ridotta del 20%. Tutti gli incantesimi della forma da incantatore restano disponibili. Dura finché non cambi forma. Ogni trasformazione fornisce Passo leggero, un breve aumento di velocità. Usa di nuovo per tornare alla forma da incantatore. (Tratto distintivo di Ripristino)"
+      },
+      "spore_burst": {
+        "name": "Esplosione di Spore",
+        "description": "Evoca un fungo esplosivo nella zona bersaglio. Dopo {duration} s esplode, curando gli alleati di {healing} e infliggendo {damage} danni da Natura ai nemici entro 8 m.",
+        "specNote_balance": "Con 3 di Marea Lunare è più potente del 25% e consuma la tua Marea Lunare.",
+        "specNote_restoration": "Applica anche Cura delle Spore a ogni alleato curato. Con Verzura pieno è più potente del 25% e consuma il tuo Verzura."
+      },
+      "natures_boon": {
+        "name": "Favore della Natura",
+        "description": "I tuoi incantesimi possono attivare Favore della Natura per 10 s: l'incantesimo indicato diventa gratuito, più potente del 25% e utilizzabile in ogni forma. Una nuova attivazione rinnova la durata.",
+        "specNote_feral": "Ogni attacco automatico in mischia riuscito ha 1 probabilità su 15 di attivarlo per Cura delle Spore, o per Scorza di Quercia in Forma di Bruin.",
+        "specNote_balance": "Ogni Dardo Silvano o Caduta Celeste che lanci ha il 10% di probabilità di attivarlo per Esplosione di Spore, al massimo una volta ogni 10 s.",
+        "specNote_restoration": "Ogni impulso dei tuoi effetti di cura periodica ha il 10% di probabilità di attivarlo per Esplosione di Spore, al massimo una volta ogni 10 s."
+      },
       "overbloom": {
         "name": "Sovrafioritura",
-        "description": "Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio."
+        "description": "Consuma 3 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Cura delle Spore fresca sul bersaglio.",
+        "specNote_restoration": "Consuma i tuoi 5 punti di Verzura: ogni alleato con i tuoi effetti di cura periodica riceve subito il {buff}% delle cure rimanenti, gli effetti vengono rimossi e il bersaglio riceve una nuova Cura delle Spore."
       },
       "summon_imp": {
         "name": "Evoca Emberkin",
@@ -14585,7 +14819,7 @@ export const it_IT: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Fermezza di Ferro",
-        "description": "Stringi i denti e ignora il dolore: consuma fino a 40 rabbia (minimo 20) per assorbire {absorbPerRage} danni per ogni punto di rabbia speso, per un massimo di 10 s. (Protezione)"
+        "description": "Stringi i denti e ignora il dolore: uno scudo assorbe danni pari al {damage}% della tua salute massima al momento del lancio, per un massimo di {duration} s. (Protezione)"
       },
       "faultline": {
         "name": "Faglia",
@@ -14857,7 +15091,7 @@ export const it_IT: EnTranslations = {
       },
       "multi_shot": {
         "name": "Tiro Sdoppiato",
-        "description": "Scaglia una raffica sull’area bersaglio, infliggendo {damage} danni fisici ai nemici entro un raggio di 8 m. (talento del Cacciatore)"
+        "description": "Scaglia una salva sull’area bersaglio, infliggendo {damage} danni fisici ai nemici entro 8 iarde. (talento del Cacciatore)"
       },
       "prayer_of_healing": {
         "name": "Cura del Coro",
@@ -14885,7 +15119,7 @@ export const it_IT: EnTranslations = {
       },
       "shadowstep": {
         "name": "Scivolo d’Ombra",
-        "description": "Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. (talento del Ladro)"
+        "description": "Avanzi attraverso le ombre verso il tuo bersaglio, amico o nemico, senza interrompere il Velo Crepuscolare. Accumula fino a 2 cariche. (talento del Ladro)"
       },
       "silence": {
         "name": "Silenzio",
@@ -14946,7 +15180,7 @@ export const it_IT: EnTranslations = {
       },
       "typhoon": {
         "name": "Tifone",
-        "description": "Una raffica di vento respinge tutti i nemici entro 8 m e li frastorna, riducendone del 50% la velocità di movimento per 4 s."
+        "description": "Una raffica scaglia tutti i nemici entro 8 m a 15 m da te e li frastorna, rallentandoli del 50% per 4 s. I giocatori nemici volano in linea retta: oltre un bordo continuano il volo e subiscono danni da caduta; una caduta mortale conta come tua uccisione."
       },
       "voidfeast": {
         "name": "Banchetto del Vuoto",
@@ -14982,7 +15216,7 @@ export const it_IT: EnTranslations = {
       },
       "bear_charge": {
         "name": "Carica di Bruin",
-        "description": "Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Per i 3 sec successivi, la Forma del Lupo è gratuita e blocca il bersaglio, rallentandolo del 50% per 4 sec. Gittata di 7-23 metri. Solo in Forma di Bruin."
+        "description": "Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Per i 3 sec successivi, la Forma del Gatto è gratuita e blocca il bersaglio, rallentandolo del 50% per 4 sec. Gittata di 7-23 metri. Solo in Forma di Bruin."
       },
       "demoralizing_roar": {
         "name": "Ruggito Codardo",
@@ -14990,16 +15224,16 @@ export const it_IT: EnTranslations = {
       },
       "prowl": {
         "name": "Appostamento",
-        "description": "Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento."
+        "description": "Entra in furtività mentre sei in Forma del Gatto. Non utilizzabile in combattimento."
       },
       "rake": {
         "name": "Scarnificare",
-        "description": "Scarnifica il nemico per danni dell'arma più {damage} e causa danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
+        "description": "Scarnifica il nemico per danni dell'arma più {damage} e causa {overTime} danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
         "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "revive_pet": {
         "name": "Rattoppare",
-        "description": "Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute."
+        "description": "Ripristina il 10% della salute massima del tuo compagno vivo ogni secondo per 8 sec. Se è morto, lo rianima con il 50% della salute."
       }
     },
     "items": {
@@ -18669,6 +18903,18 @@ export const it_IT: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Bastone da Guerra dell'Avanguardia"
       },
+      "infernal_quiver": {
+        "name": "Faretra infernale"
+      },
+      "lychgate_buckler": {
+        "name": "Brocchiere del cancello del cimitero"
+      },
+      "bastion_kite_shield": {
+        "name": "Scudo a goccia del bastione"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Scudo torre del Campo dei Tumuli"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },
@@ -19151,6 +19397,12 @@ export const it_IT: EnTranslations = {
       },
       "emissary_cache": {
         "name": "Riserva dell'Emissario"
+      },
+      "pvp_trophy_skull": {
+        "name": "Teschio Trofeo"
+      },
+      "pvp_skull_bag": {
+        "name": "Sacca dei Teschi"
       },
       "clue_scroll": {
         "name": "Pergamena Indizio"
@@ -24164,6 +24416,11 @@ export const it_IT: EnTranslations = {
         "sender": "Il Servizio del Corvo",
         "subject": "La tua ricompensa da volta",
         "body": "La volta è stata sgomberata, ma la tua parte non è stata riscossa dal forziere. I corvi te l'hanno portata qui, insieme alle merci e alle monete che hai guadagnato.\n\n- Il Servizio del Corvo"
+      },
+      "world_quest_reward": {
+        "sender": "La Posta dei Corvi",
+        "subject": "La tua ricompensa di missione mondiale",
+        "body": "Le tue borse erano piene quando hai ottenuto questa ricompensa di missione mondiale, perciò i corvi l'hanno portata qui. Fai spazio e ritirala da qualsiasi pilastro dei corvi.\n\n- La Posta dei Corvi"
       }
     },
     "itemSets": {
@@ -24280,7 +24537,7 @@ export const it_IT: EnTranslations = {
       },
       "forgewall": {
         "name": "Egida della Muraglia della Forgia",
-        "bonus2": "Risolutezza Ferrea converte la rabbia in 5 assorbimento per punto invece di 4.",
+        "bonus2": "Lo scudo di Risolutezza Ferrea assorbe il 25% della tua salute massima invece del 20%.",
         "bonus4": "Lanciare Spacca-scudo riduce di 2 s il tempo di recupero rimanente di Risolutezza Ferrea."
       },
       "frostquench": {
@@ -24299,8 +24556,8 @@ export const it_IT: EnTranslations = {
       },
       "grovespring": {
         "name": "Paramento Grovespring",
-        "bonus2": "Cura Rapida consuma prima la tua Fioritura Selvatica o Seconda Fioritura e cura il 25 percento in più. I danni subiti non ritardano più il lancio degli incantesimi.",
-        "bonus4": "Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Rigoglio."
+        "bonus2": "Rapidità di Guarigione consuma prima la tua Cura delle Spore o Seconda Fioritura e cura il 25 per cento in più. I danni subiti non ritardano più il lancio degli incantesimi.",
+        "bonus4": "Sovrafioritura raccoglie il 75 percento degli effetti rimanenti e conserva 1 Verzura."
       },
       "hexthread": {
         "name": "Sudario Hexthread",
@@ -24392,77 +24649,77 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Paramenti Guardiastelle",
-        "bonus2": "Il tempo di lancio di Radici Avvinghianti è ridotto di 0,5 sec.",
+        "bonus2": "Il tempo di lancio di Radici Avvinghianti è ridotto di 0,5 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Lanciare Radici Avvinghianti ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec."
       },
       "vanguard_druid_feral": {
         "name": "Pelle Sanguicriniera",
-        "bonus2": "Il tempo di recupero di Carica di Bruin è ridotto di 3 sec.",
+        "bonus2": "Il tempo di recupero di Carica di Bruin è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Carica di Bruin ti protegge con uno scudo pari al 6 percento della tua salute massima per 6 sec."
       },
       "vanguard_druid_restoration": {
         "name": "Veste Cardofiore",
-        "bonus2": "Il tempo di recupero di Rapidità di Guarigione è ridotto di 1 sec.",
+        "bonus2": "Il tempo di recupero di Rapidità di Guarigione è ridotto di 1 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Rapidità di Guarigione aumenta inoltre la tua velocità di movimento del 30 percento per 3 sec."
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Finimenti Guardiabranco",
-        "bonus2": "Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec.",
+        "bonus2": "Il tempo di recupero di Tiro Scuotente è ridotto di 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Tiro Scuotente riduce di 1 sec il tempo di recupero rimanente di Ira Bestiale."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Finimenti Vistalontana",
-        "bonus2": "Il tempo di recupero di Rompipista è ridotto di 4 sec.",
+        "bonus2": "Il tempo di recupero di Rompipista è ridotto di 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Rompipista rende istantaneo il tuo prossimo Tiro Teso lanciato entro 6 sec. Non può verificarsi più di una volta ogni 15 sec."
       },
       "vanguard_hunter_survival": {
         "name": "Finimenti Dentetrappola",
-        "bonus2": "Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec.",
+        "bonus2": "Il tempo di recupero di Uncino Sanguinario è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Uncino Sanguinario concede 1 Slancio di Caccia."
       },
       "vanguard_mage_arcane": {
         "name": "Vesti Legatempo",
-        "bonus2": "Il tempo di recupero di Barriera Temporale è ridotto di 2 sec.",
+        "bonus2": "Il tempo di recupero di Barriera Temporale è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Barriera Temporale aumenta inoltre del 20 percento la velocità di movimento del bersaglio protetto per 3 sec."
       },
       "vanguard_mage_fire": {
         "name": "Paramenti Sferzabraci",
-        "bonus2": "Pioggia di Braci si ricarica 3 sec più in fretta.",
+        "bonus2": "Pioggia di Braci si ricarica 3 sec più in fretta. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Lanciare Pioggia di Braci riduce di 2 sec il tempo di recupero rimanente di Barriera Ardente."
       },
       "vanguard_mage_frost": {
         "name": "Tenuta Guardiabrina",
-        "bonus2": "Il tempo di recupero di Vincolo di Ghiaccio è ridotto di 2 sec.",
+        "bonus2": "Il tempo di recupero di Vincolo di Ghiaccio è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Lanciare Vincolo di Ghiaccio riduce di 5 sec il tempo di recupero rimanente di Passo Furtivo."
       },
       "vanguard_paladin_holy": {
         "name": "Paramenti Vegliasole",
-        "bonus2": "Il tempo di recupero di Patto della Vita è ridotto di 30 sec.",
+        "bonus2": "Il tempo di recupero di Patto della Vita è ridotto di 30 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Patto della Vita protegge inoltre l'alleato con uno scudo pari all'8 percento della sua salute massima per 6 sec."
       },
       "vanguard_paladin_protection": {
         "name": "Baluardo Giuroscudo",
-        "bonus2": "Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec.",
+        "bonus2": "Il tempo di recupero di Catena del Giuramento è ridotto di 2 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "I nemici trascinati da Catena del Giuramento lanciano incantesimi il 30 percento più lentamente per 4 sec, e Catena del Giuramento ti concede Rappresaglia Solare quando vincola un nemico che può essere trascinato."
       },
       "vanguard_paladin_retribution": {
         "name": "Piastre di Guerra Marchioluce",
-        "bonus2": "Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec.",
+        "bonus2": "Il tempo di recupero di Richiamo della Valchiria è ridotto di 15 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Richiamo della Valchiria azzera il tempo di recupero di Editto Finale, e il tuo prossimo Editto Finale lanciato entro 6 sec dal colpo infligge il 15 percento di danni in più."
       },
       "vanguard_priest_discipline": {
         "name": "Paramenti Salmovelo",
-        "bonus2": "Il tempo di recupero di Urlo Psichico è ridotto di 3 sec.",
+        "bonus2": "Il tempo di recupero di Urlo Psichico è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Quando il tuo Salmo di Protezione viene consumato del tutto, l'alleato protetto ottiene il 20 percento di velocità di movimento in più per 3 sec. Non può verificarsi più di una volta ogni 8 sec."
       },
       "vanguard_priest_holy": {
         "name": "Paramenti Alagrazia",
-        "bonus2": "Il tempo di recupero di Passo del Velo è ridotto di 6 sec.",
+        "bonus2": "Il tempo di recupero di Passo del Velo è ridotto di 6 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Passo del Velo ti protegge inoltre con uno scudo pari all'8 percento della tua salute massima per 6 sec."
       },
       "vanguard_priest_shadow": {
         "name": "Paramenti Innocrepuscolo",
-        "bonus2": "Litania della Sventura rallenta inoltre il movimento del bersaglio del 30 percento mentre la canalizzi.",
+        "bonus2": "Litania della Sventura rallenta inoltre il movimento del bersaglio del 30 percento mentre la canalizzi. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Evoca Demone della Decima ti protegge inoltre con uno scudo pari al 10 percento della tua salute massima per 8 sec."
       },
       "vanguard_rogue_assassination": {
@@ -24472,7 +24729,7 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Cuoio Marchiorissa",
-        "bonus2": "Il tempo di recupero di Calcagni Veloci è ridotto di 60 sec.",
+        "bonus2": "Il tempo di recupero di Calcagni Veloci è ridotto di 15 sec.",
         "bonus4": "Mentre Calcagni Veloci è attivo, Fendente Malvagio e Colpo al Corpo concedono 1 punto combo aggiuntivo."
       },
       "vanguard_rogue_subtlety": {
@@ -24482,32 +24739,32 @@ export const it_IT: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Maglia da Battaglia Editempesta",
-        "bonus2": "Il tempo di recupero di Scatena l'Arma è ridotto di 3 sec.",
+        "bonus2": "Il tempo di recupero di Scatena l'Arma è ridotto di 3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Scatena l'Arma ti permette di lanciare incantesimi in movimento e aumenta la tua velocità di movimento del 20 percento per 4 sec. Non può verificarsi più di una volta ogni 20 sec."
       },
       "vanguard_shaman_enhancement": {
         "name": "Maglia di Guerra Ventonato",
-        "bonus2": "Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec.",
+        "bonus2": "Colpo Ancestrale rallenta la velocità di movimento del bersaglio del 30 percento per 4 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Colpo Ancestrale riduce di 4 sec il tempo di recupero rimanente di Elemental Trance."
       },
       "vanguard_shaman_restoration": {
         "name": "Cotta di Maglia Guardiasalmastra",
-        "bonus2": "Acque Risananti si lancia 0,5 sec più in fretta su un alleato sotto il 50 percento di salute.",
+        "bonus2": "Acque Risananti si lancia 0,5 sec più in fretta su un alleato sotto il 50 percento di salute. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Richiamo della Marea protegge inoltre il suo bersaglio con uno scudo pari al 5 percento della tua salute massima per 6 sec."
       },
       "vanguard_warlock_affliction": {
         "name": "Vesti Pennaterrore",
-        "bonus2": "Il tempo di lancio di Tormento è ridotto di 0,3 sec.",
+        "bonus2": "Il tempo di lancio di Tormento è ridotto di 0,3 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Divorare ti cura il 30 percento in più e può essere canalizzato in movimento."
       },
       "vanguard_warlock_demonology": {
         "name": "Paramenti Legamidollo",
-        "bonus2": "Il tempo di recupero di Bone Armor è ridotto di 10 sec.",
+        "bonus2": "Il tempo di recupero di Bone Armor è ridotto di 10 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Reaping Command riduce di 2 sec il tempo di recupero rimanente di Bone Armor."
       },
       "vanguard_warlock_destruction": {
         "name": "Vesti Coronascoria",
-        "bonus2": "Il tempo di recupero di Cinderhide è ridotto di 30 sec.",
+        "bonus2": "Il tempo di recupero di Cinderhide è ridotto di 30 sec. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Ogni secondo lancio di Conflagrazione rende istantaneo il tuo prossimo Dardo della Rovina lanciato entro 8 sec."
       },
       "vanguard_warrior_arms": {
@@ -24532,31 +24789,31 @@ export const it_IT: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Kit Braccacenere",
-        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus2": "Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
         "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Passo di Cenere, aumentando la velocità di movimento del 40% per 6 sec."
       },
       "warfare_cinderweave": {
         "name": "Paramenti Braciotessuti",
-        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus2": "Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
         "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Brace, assorbendo 120 danni per 8 sec."
       },
       "warfare_furyforged": {
         "name": "Armatura da Battaglia Forgiafuria",
-        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus2": "Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
         "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. Uccidere un giocatore ostile concede Giuramento Infranto, assorbendo 200 danni per 10 sec."
       },
       "warfare_stormbound": {
         "name": "Paramenti Legatempesta",
-        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus2": "Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
         "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Brace, assorbendo 120 danni per 8 sec."
       },
       "warfare_thornhide": {
         "name": "Abito di Pelle di Spine",
-        "bonus2": "Aumenta di 40 la Difesa da Guerra.",
+        "bonus2": "Aumenta di 40 la Difesa da Guerra. I danni subiti non ritardano più il lancio degli incantesimi.",
         "bonus4": "Aumenta di 40 l'Attacco da Guerra, e il controllo lanciato su di voi da giocatori ostili dura il 15% in meno.",
         "bonus7": "Aumenta di 80 l'Attacco e la Difesa da Guerra. I vostri incantesimi hanno il 15% di probabilità di concedere Guardia di Spine, aumentando la schivata del 15% per 6 sec."
       },

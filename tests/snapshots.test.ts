@@ -76,6 +76,7 @@ import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS, WORLD_QUESTS } from '../src/sim/data';
 import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createGroundObject, createMob } from '../src/sim/entity';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
@@ -1263,7 +1264,7 @@ describe('combat ratings over the wire', () => {
 });
 
 // The static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
-// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) used to ride the unconditional
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff) used to ride the unconditional
 // base self object every tick for every player, unlike every other heavy field
 // on the same record. They now go through the same `maybe(...)` delta gate
 // (server/game.ts), so an unchanged value elides from the wire entirely; the
@@ -1287,6 +1288,7 @@ describe('static combat-rating/progression scalars ride the delta gate', () => {
     'prk',
     'copper',
     'ddiff',
+    'adiff',
   ] as const;
 
   it('rides the first snapshot, elides once quiet, and resends only the field that actually moved', () => {
@@ -2651,6 +2653,24 @@ describe('dungeon difficulty wire', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.dungeonDifficulty()).toBe('heroic');
+  });
+
+  it('ships active instance difficulty separately from the selected preference', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hero');
+    expect(enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid)).toBe(true);
+    server.sim.setDungeonDifficulty('heroic', session.pid);
+
+    broadcast(server);
+
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ddiff).toBe('heroic');
+    expect(snap.self.adiff).toBe('normal');
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.dungeonDifficulty()).toBe('heroic');
+    expect(client.activeDungeonDifficulty()).toBe('normal');
   });
 
   it('dispatches set_dungeon_difficulty through the wire and rejects invalid values', () => {
@@ -5396,6 +5416,30 @@ describe('delve self-state mirrors over the wire', () => {
     expect(client.companionState?.companionId).toBe('companion_tessa');
   });
 
+  it('mirrors the Heroic Marks balance to the client and delta-omits an unchanged one', () => {
+    broadcast(server);
+    fc.sent.length = 0;
+    server.sim.addItem('heroic_mark', 6, session.pid);
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.hmarks).toBe(6);
+    const client = bareClient(session.pid);
+    // A marks move no longer echoes through the bags, so the mirror itself must
+    // raise the inventory-changed repaint (quartermaster and Currencies tab).
+    (client as any).invChanged = false;
+    (client as any).applySnapshot(snap);
+    expect(client.heroicMarks).toBe(6);
+    expect((client as any).invChanged).toBe(true);
+    fc.sent.length = 0;
+    broadcast(server);
+    const quiet = lastSnap(fc.sent);
+    expect(quiet.self.hmarks).toBeUndefined();
+    (client as any).invChanged = false;
+    (client as any).applySnapshot(quiet);
+    expect(client.heroicMarks).toBe(6);
+    expect((client as any).invChanged).toBe(false);
+  });
+
   it('mirrors delveMarks + delveClears + delveDaily to the client when they change', () => {
     enterDelveOnServer();
     broadcast(server);
@@ -5675,8 +5719,8 @@ describe('online mount command and race-event transport', () => {
 // look changes), and `wba` reuses one realm-wide world-boss liveness fragment
 // across every viewer in the broadcast pass. The count is the union of the
 // release's realm-readout keys, the procedural-dungeon branch's rift delta keys,
-// and the 16 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
-// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present self
+// and the 17 static combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/
+// crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff) moved off the always-present self
 // record and behind this same delta gate, since they change far less often than
 // the reconciliation-critical fields (resource, gcd, swing, combo, target...)
 // that stay unconditional.
@@ -5685,6 +5729,8 @@ const ALL_DELTA_KEYS = [
   'acct',
   'achg',
   'achr',
+  'adiff',
+  'ahs',
   'ap',
   'app',
   'arena',
@@ -5736,6 +5782,7 @@ const ALL_DELTA_KEYS = [
   'hbl',
   'hill',
   'hirat',
+  'hmarks',
   'honor',
   'hpref',
   'hpw',
@@ -5764,6 +5811,8 @@ const ALL_DELTA_KEYS = [
   'prk',
   'prof',
   'ptime',
+  'pvr',
+  'pvrw',
   'qdone',
   'qlog',
   'reliq',
@@ -5772,6 +5821,7 @@ const ALL_DELTA_KEYS = [
   'salv',
   'scb',
   'sh',
+  'skb',
   'sp',
   'stats',
   'tal',
@@ -5832,6 +5882,8 @@ const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app' && key !==
 const TERSE_TO_IWORLD: Record<string, string> = {
   aborder: 'activeBorder',
   achg: 'abilityCharges',
+  adiff: 'activeDungeonDifficulty',
+  ahs: 'alliedHearthstoneAttunement',
   ap: 'attackPower',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
@@ -5873,6 +5925,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   guildBank: 'guildBankInfo',
   hill: 'hillInfo',
   hirat: 'hitRating',
+  hmarks: 'heroicMarks',
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
   inv: 'inventory',
@@ -5898,6 +5951,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   prk: 'prestigeRank',
   prof: 'professionsState',
   ptime: 'playtimeSeconds',
+  pvr: 'pvpResurrect',
+  pvrw: 'pvpResurrectWait',
   qdone: 'questsDone',
   qlog: 'questLog',
   res: 'resource',
@@ -6052,6 +6107,7 @@ function dirtyEveryDeltaField(): {
   meta.clueHunt = { huntId: CLUE_HUNTS[0].id, step: 1 };
   meta.factionCurrencies = { rift_watch: 17, church_order: 29, automatons: 41 };
   meta.treasureMap = { rarity: 'epic', siteId: TREASURE_SITES[0].id, seed: 78123 };
+  meta.alliedHearthstoneAttunement = 'automatons';
   server.sim.worldQuestExpiresAtMs = FAR_FUTURE_MS;
   meta.worldQuestLog.set('wq_eastbrook_bandits', {
     questId: 'wq_eastbrook_bandits',
@@ -6066,12 +6122,19 @@ function dirtyEveryDeltaField(): {
   // World PvP: the wpvp self readout (meta) and the pvp entity bit (entity).
   meta.worldPvp = { flagged: true, disarmAt: null, kills: 2, deaths: 1 };
   sim.entities.get(lp)!.pvpFlag = true;
+  // World PvP bounty: the bty entity bit (server/entity_status_wire.ts).
+  sim.entities.get(lp)!.bounty = true;
+  // The World PvP Skull Bag: stored skulls (the bag itself banked, so the
+  // inventory mirror below stays as pinned), so the change-gated skb key rides
+  // the first snapshot and merges into worldPvpInfo.
+  meta.skullBag = [{ source: { gatherer: { kind: 'character', id: 77, name: 'Bet' } }, count: 3 }];
   // King of the Hill: a hill stands (in a free-for-all zone the leader is not
   // in), so the hill self readout rides the snapshot.
   spawnHillNow(sim.ctx);
   meta.restedXp = 222;
   meta.prestigeRank = 3;
   meta.delveMarks = 7;
+  meta.heroicMarks = 9;
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0, farming: 0 };
@@ -6521,6 +6584,7 @@ describe('full self-state snapshot delta fixture', () => {
 
     expect(client.factionCurrencies).toEqual({ rift_watch: 17, church_order: 29, automatons: 41 });
     expect(client.treasureMap).toEqual({ rarity: 'epic', siteId: TREASURE_SITES[0].id });
+    expect(client.alliedHearthstoneAttunement).toBe('automatons');
     expect(lastSnap(fc.sent).self.tmap).not.toHaveProperty('seed');
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
@@ -6554,8 +6618,15 @@ describe('full self-state snapshot delta fixture', () => {
       deaths: 1,
       zone: 'contested', // the fixture leader stands on contested ground
       enabled: true,
+      // skb -> worldPvpInfo.skullBag (merged by social_self_wire.ts)
+      skullBag: {
+        owned: false,
+        total: 3,
+        sources: [{ source: { gatherer: { kind: 'character', id: 77, name: 'Bet' } }, count: 3 }],
+      },
     });
     expect(client.player.pvpFlag).toBe(true);
+    expect(client.player.bounty).toBe(true); // bty -> e.bounty (entity_status_wire.ts)
     // hill -> hillInfo (social_self_wire.ts): the standing hill from the
     // leader's seat (outside its zone, so the live fields are zero; the
     // fixture leader is ungrouped, so counts as a group of one).
@@ -6629,14 +6700,14 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     // vault -> vaultInfo: the owner-only Materials Vault clone survives whole,
-    // both derived numbers included (rung 2 of the 40-per-rung ladder, priced
+    // both derived numbers included (rung 2 of the 100-per-rung ladder, priced
     // from the rung-2 literal in src/sim/materials_vault.ts).
     expect(client.vaultInfo).toEqual({
       stock: { copper_ore: 7 },
       special: [],
       upgrades: 2,
-      perMaterialCap: 80,
-      nextUpgradeCost: 100000,
+      perMaterialCap: 200,
+      nextUpgradeCost: 70000,
     });
     // cvault -> craftVaultStock: this harness player is inside a delve run
     // (see the seeding comment), so the gated null is all that can arrive
@@ -6689,6 +6760,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.delveRun).not.toBeNull(); // drun -> delveRun
     expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
     expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
+    expect(client.heroicMarks).toBe(9); // hmarks -> heroicMarks
     expect(client.companionUpgrades).toEqual({ companion_tessa: 2 }); // dcomp -> companionUpgrades
     expect(client.gatheringProficiency).toEqual({
       mining: 6,
@@ -7087,6 +7159,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.vaultInfo).toBe(vaultRef);
     expect(client.markerFor(memberPid)).toBe(3);
     expect(client.delveMarks).toBe(7);
+    expect(client.heroicMarks).toBe(9);
     expect(client.honor).toBe(321);
     expect(client.lifetimeHonor).toBe(654);
     expect(client.companionState?.companionId).toBe('companion_tessa');
@@ -7151,13 +7224,13 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 113 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 117 unique keys in sorted order', () => {
     // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
     // combat-rating/progression scalars (ap/sp/sh/crit/dodge/blk/bval/crat/
-    // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
+    // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff) moved off the always-present
     // self record and behind this same delta gate, for 83, then +1 reliq
     // (Reliquary Phase 3 sparse blob), +1 aborder (the Book of Deeds nameplate
     // border echo, atitle's sibling), and +1 `app` (the release's authored
@@ -7208,9 +7281,14 @@ describe('delta-key contract pins (anti-drift)', () => {
     // base merge, for 109.
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
-    // release/v0.44.0 base merge, for 111.
-    expect(ALL_DELTA_KEYS).toHaveLength(113);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(113);
+    // release/v0.44.0 base merge, for 111. (The keys reaching 113 landed
+    // without a note here.) The World PvP Skull Bag's change-gated skb
+    // (server/world_pvp_wire.ts) makes 115. PvP Resurrect's pvr and wait pvrw
+    // make 117.
+    // Allied Hearthstone's bound-hub key ahs adds one delta field.
+    expect(ALL_DELTA_KEYS).toHaveLength(119);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(119);
+    // hmarks adds the Heroic Marks balance alongside the current release keys.
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7356,9 +7434,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
     // for 65, this branch's commission order board key corder
     // (issue #1298) for 66, and the character sheet's lifetime played-time
-    // key ptime for 67, then the 16 static combat-rating/progression scalars
-    // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
-    // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
+    // key ptime for 67, then the 17 static combat-rating/progression scalars
+    // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff)
+    // for 84, then reliq (Reliquary Phase 3 sparse blob) for 85, the nameplate
     // border echo aborder for 85, and the authored modular look `app` for 86.
     // The Vale Cup retirement then removes sport/vcup/vcupb, for 83, and the
     // healPower seam adds the derived Healing Power scalar hpw for 84. Bank
@@ -7380,7 +7458,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    expect(scraped.size).toBe(113);
+    // The World PvP Skull Bag's change-gated skb (server/world_pvp_wire.ts) makes 115.
+    // PvP Resurrect's pvr and its wait pvrw make 117.
+    // Allied Hearthstone's bound-hub key ahs adds one delta field.
+    expect(scraped.size).toBe(119);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -8164,6 +8245,84 @@ describe('aura decode fast-path guards (composition edge cases)', () => {
 });
 
 describe('entity-anchored world event scoping', () => {
+  it('delivers duel victories across the local zone but not into another zone', () => {
+    const server = new GameServer();
+    const winnerSocket = fakeWs();
+    const sameSocket = fakeWs();
+    const otherSocket = fakeWs();
+    const spectatorSocket = fakeWs();
+    const winner = joinServer(server, winnerSocket, 1, 'Winner');
+    const same = joinServer(server, sameSocket, 2, 'Samezone');
+    const other = joinServer(server, otherSocket, 3, 'Otherzone');
+    const spectator = joinServer(server, spectatorSocket, 4, 'Spectator');
+    server.sim.entities.get(winner.pid)!.pos.z = 175;
+    server.sim.entities.get(same.pid)!.pos.z = -175; // far beyond EVENT_RADIUS
+    server.sim.entities.get(other.pid)!.pos.z = 185; // near, but over the zone edge
+    server.sim.entities.get(spectator.pid)!.pos.z = 185;
+    spectator.spectating = {
+      characterId: winner.characterId,
+      name: 'Winner',
+    };
+    winnerSocket.sent.length = 0;
+    sameSocket.sent.length = 0;
+    otherSocket.sent.length = 0;
+    spectatorSocket.sent.length = 0;
+
+    (server as any).routeEvents([
+      {
+        type: 'duelEnd',
+        winnerName: 'Winner',
+        loserName: 'Loser',
+        winnerPid: winner.pid,
+        loserPid: -1,
+        zoneId: 'eastbrook_vale',
+      },
+    ]);
+    const victories = (socket: ReturnType<typeof fakeWs>) =>
+      socket.sent
+        .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
+        .filter((ev: { type: string }) => ev.type === 'duelEnd');
+    expect(victories(winnerSocket)).toHaveLength(1);
+    expect(victories(sameSocket)).toHaveLength(1);
+    expect(victories(otherSocket)).toHaveLength(0);
+    expect(victories(spectatorSocket)).toHaveLength(1);
+  });
+
+  it('keeps an instanced duel victory with its participants', () => {
+    const server = new GameServer();
+    const winnerSocket = fakeWs();
+    const loserSocket = fakeWs();
+    const bystanderSocket = fakeWs();
+    const winner = joinServer(server, winnerSocket, 1, 'Winner');
+    const loser = joinServer(server, loserSocket, 2, 'Loser');
+    const bystander = joinServer(server, bystanderSocket, 3, 'Bystander');
+    for (const pid of [winner.pid, loser.pid, bystander.pid]) {
+      server.sim.entities.get(pid)!.pos.x = 100_900;
+    }
+    winnerSocket.sent.length = 0;
+    loserSocket.sent.length = 0;
+    bystanderSocket.sent.length = 0;
+
+    (server as any).routeEvents([
+      {
+        type: 'duelEnd',
+        winnerName: 'Winner',
+        loserName: 'Loser',
+        winnerPid: winner.pid,
+        loserPid: loser.pid,
+        zoneId: null,
+      },
+    ]);
+    const gotVictory = (socket: ReturnType<typeof fakeWs>) =>
+      socket.sent.some(
+        (msg) =>
+          msg.t === 'events' && msg.list.some((ev: { type: string }) => ev.type === 'duelEnd'),
+      );
+    expect(gotVictory(winnerSocket)).toBe(true);
+    expect(gotVictory(loserSocket)).toBe(true);
+    expect(gotVictory(bystanderSocket)).toBe(false);
+  });
+
   it('delivers delveRitePulse to sessions near its entityId anchor and not to far ones', () => {
     // The rite pulse is a world event with no pid; eventAnchor must resolve its
     // entityId to the shrine position and interest-scope delivery (EVENT_RADIUS).
@@ -10240,4 +10399,46 @@ describe('mount skin identity round trip', () => {
       now.mockRestore();
     }
   });
+});
+
+describe('World PvP played-time pause wire round-trip', () => {
+  it.each(['dead', 'instance'] as const)(
+    'mirrors nonzero progress and the %s pause from the authoritative snapshot',
+    (pause) => {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const session = joinServer(server, fc, 101, 'Flagbearer');
+      const sim = server.sim;
+      sim.setPlayerLevel(20, session.pid);
+      const player = sim.entities.get(session.pid)!;
+      player.pos = { x: 60, y: terrainHeight(60, 700, sim.cfg.seed), z: 700 };
+      player.prevPos = { ...player.pos };
+      sim.setWorldPvpFlag(true, session.pid);
+      expect(sim.players.get(session.pid)!.worldPvp!.flagged).toBe(true);
+      sim.players.get(session.pid)!.worldPvp!.rewardTicks = 73 * 60 * 20 + 19;
+      const client = bareClient(session.pid);
+      if (pause === 'dead') player.dead = true;
+      else expect(sim.enterDungeon('hollow_crypt', session.pid)).toBe(true);
+      broadcast(server);
+      const snap = lastSnap(fc.sent);
+      expect(snap.self.wpvp).toMatchObject({
+        flagged: true,
+        rewardSeconds: 4380,
+        rewardPause: pause,
+      });
+      (client as unknown as SnapshotApplier).applySnapshot(snap);
+      expect(client.worldPvpInfo).toEqual(snap.self.wpvp);
+      expect(client.worldPvpInfo).toMatchObject({ rewardSeconds: 4380, rewardPause: pause });
+
+      // A later delta clears the paused state without losing the played clock.
+      player.dead = false;
+      player.pos = { x: 60, y: terrainHeight(60, 700, sim.cfg.seed), z: 700 };
+      sim.tickCount += 10; // The existing wpvp wire cadence is twice a second.
+      broadcast(server);
+      const resumed = lastSnap(fc.sent);
+      expect(resumed.self.wpvp).toMatchObject({ rewardSeconds: 4380, rewardPause: null });
+      (client as unknown as SnapshotApplier).applySnapshot(resumed);
+      expect(client.worldPvpInfo).toEqual(resumed.self.wpvp);
+    },
+  );
 });

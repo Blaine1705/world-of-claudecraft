@@ -1236,4 +1236,38 @@ export const table: DeedLocaleTable = {
     name: 'Tertangkap Saat Berbuat Buruk',
     desc: 'Tangkap Penari Mata Uang dalam Harta Karun Terkubur sebelum dia kabur dengan emas.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Lebih Terang dari Bayangan',
+    desc: 'Rebut kembali kantong koin yang dicuri dan keluar dari labirin Evergarden pada tingkat Hard.',
+  },
+  prog_titan: {
+    name: 'Raksasa',
+    desc: 'Dapatkan total 10.000.000 pengalaman seumur hidup.',
+    title: 'Raksasa',
+  },
+  pvp_flag_1h: {
+    name: 'Berani',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 1 jam waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
+    title: 'Berani',
+  },
+  pvp_flag_3h: {
+    name: 'Pembangkang',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 3 jam waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
+    title: 'Pembangkang',
+  },
+  pvp_flag_6h: {
+    name: 'Tak Gentar',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 6 jam waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
+    title: 'Tak Gentar',
+  },
+  pvp_flag_24h: {
+    name: 'Tak Tergoyahkan',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 24 jam waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
+    title: 'Tak Tergoyahkan',
+  },
+  pvp_flag_168h: {
+    name: 'Tak Tertaklukkan',
+    desc: 'Pertahankan PvP Dunia tetap aktif selama 7 hari waktu bermain ketika masih hidup di dunia terbuka atau pertandingan PvP. Suaka, instans PvE, kematian, dan keluar menjeda kemajuan; menonaktifkannya mengatur ulang kemajuan. Gelar yang diperoleh bersifat permanen.',
+    title: 'Tak Tertaklukkan',
+  },
 };

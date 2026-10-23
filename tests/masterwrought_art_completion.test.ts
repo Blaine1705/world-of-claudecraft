@@ -824,7 +824,10 @@ describe('Masterwrought art completion evidence', () => {
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
     // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
     // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
-    expect(currentOwnerIds).toHaveLength(1464);
+    // + the World PvP trophy skull (pvp_trophy_skull), likewise outside it.
+    // + the World PvP Skull Bag (pvp_skull_bag), likewise outside it.
+    // + the three painted leveling quest shields, likewise outside it.
+    expect(currentOwnerIds).toHaveLength(1469);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -959,11 +962,32 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => hoardBranchIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => hoardBranchIds.has(id))).toHaveLength(119);
 
-    // Strip all six later additive waves (Crucible professions, the Field Kit, the
+    // The leveling quest shields are a distinct later batch. Pin its exact ids
+    // and provenance before subtracting them from the historical completion set.
+    const questShieldBatches = mapping.generatedBatches.filter(
+      ({ batchId }) => batchId === 'quest-shield-icons-2026-10-23',
+    );
+    expect(questShieldBatches).toHaveLength(1);
+    const questShieldProvenance =
+      'docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json';
+    expect(questShieldBatches[0]).toMatchObject({ provenanceRecord: questShieldProvenance });
+    const questShieldIds = new Set(questShieldBatches[0].itemIds);
+    expect(sorted(questShieldIds)).toEqual([
+      'barrowfield_tower_shield',
+      'bastion_kite_shield',
+      'lychgate_buckler',
+    ]);
+    expect(questShieldBatches[0].itemIds).toHaveLength(3);
+    const questShieldArt = readJson<{ assets: Array<{ id: string }> }>(questShieldProvenance);
+    expect(sorted(questShieldArt.assets.map(({ id }) => id))).toEqual(sorted(questShieldIds));
+    expect(datedIds.filter((id) => questShieldIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => questShieldIds.has(id))).toHaveLength(3);
+
+    // Strip the later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
     // faction quartermaster, and Clue Scroll batches, and the Buried Hoards
-    // branch's three batches)
+    // branch's three batches, and the leveling quest shields)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -984,8 +1008,12 @@ describe('Masterwrought art completion evidence', () => {
         // beyond the dated completion union, like the Field Kit.
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
+        // The World PvP trophy skull, additive the same way.
+        id !== 'pvp_trophy_skull' &&
+        id !== 'pvp_skull_bag' &&
         !season2WeaponIds.has(id) &&
-        !hoardBranchIds.has(id),
+        !hoardBranchIds.has(id) &&
+        !questShieldIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

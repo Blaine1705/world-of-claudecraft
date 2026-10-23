@@ -1240,6 +1240,40 @@ export const table: DeedLocaleTable = {
     name: 'Atrapada con las manos en la masa',
     desc: 'Atrapa una Rata de Bolsa de Monedas en un Tesoro Enterrado antes de que escape con el oro.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Mas brillante que las sombras',
+    desc: 'Recupera las bolsas de monedas robadas y escapa del laberinto de Evergarden en dificultad Hard.',
+  },
+  prog_titan: {
+    name: 'Titán',
+    desc: 'Gana 10.000.000 de experiencia a lo largo de tu vida.',
+    title: 'Titán',
+  },
+  pvp_flag_1h: {
+    name: 'Audaz',
+    desc: 'Mantén JcJ del mundo activado durante 1 hora de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    title: 'Audaz',
+  },
+  pvp_flag_3h: {
+    name: 'Desafiante',
+    desc: 'Mantén JcJ del mundo activado durante 3 horas de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    title: 'Desafiante',
+  },
+  pvp_flag_6h: {
+    name: 'Intrépido',
+    desc: 'Mantén JcJ del mundo activado durante 6 horas de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    title: 'Intrépido',
+  },
+  pvp_flag_24h: {
+    name: 'Inquebrantable',
+    desc: 'Mantén JcJ del mundo activado durante 24 horas de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    title: 'Inquebrantable',
+  },
+  pvp_flag_168h: {
+    name: 'Indomable',
+    desc: 'Mantén JcJ del mundo activado durante 7 días de juego mientras estés vivo en el mundo abierto o en una partida JcJ. Los santuarios, las instancias JcE, la muerte y la desconexión pausan el progreso; desactivarlo lo reinicia. Los títulos obtenidos son permanentes.',
+    title: 'Indomable',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

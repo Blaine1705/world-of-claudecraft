@@ -26,6 +26,7 @@ import type {
 } from '../sim/types';
 import { buildPaperdollView, type PaperdollView } from './char_view';
 import { borderAccent, deedBorderSlug } from './deed_border_view';
+import { gearScore } from './gear_score_view';
 
 /** Class color as a CSS hex string (mirrors hud.ts classCss): the inspect stage
  *  border / glow / haze take the inspected player's class color. */
@@ -133,6 +134,9 @@ export interface InspectViewModel {
   /** The Reliquary standing line, or null when there is none to show. */
   curator: InspectCuratorModel | null;
   gear: PaperdollView;
+  /** The average worn item level (gear_score_view.ts), or null when nothing
+   *  worn has one. */
+  gearScore: number | null;
   skin: number;
   skinCatalog: SkinCatalog;
 }
@@ -293,11 +297,13 @@ export function buildInspectView(
   const curatorBadge: InspectCuratorBadgeModel | null =
     rank >= CURATOR_SIGIL_MIN_RANK ? { rank } : null;
 
+  const gear = buildPaperdollView(input.equippedItems, items, input.equippedInstances);
   return {
     header,
     badges: { holder, discord, dev, curator: curatorBadge },
     curator,
-    gear: buildPaperdollView(input.equippedItems, items, input.equippedInstances),
+    gear,
+    gearScore: gearScore(gear),
     skin: input.skin,
     skinCatalog: input.skinCatalog,
   };

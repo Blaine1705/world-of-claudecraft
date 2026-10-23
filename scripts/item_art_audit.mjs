@@ -145,9 +145,14 @@ const build = await buildItemArtAudit({
     // feature/buried-hoards: the release's faction ladder, trinket slot and
     // Warfare Season 2 compose with the hoard paintings: 1464 / 1482, with the
     // release's 135 pending rows (trinkets and Season 2), on 36 sheet pages.
-    catalogCount: 1464,
-    liveItemCount: 1482,
-    pendingArtCount: 135,
+    // + the World PvP trophy skull (pvp_trophy_skull): 1465 / 1483.
+    // + the World PvP Skull Bag (pvp_skull_bag): 1466 / 1484.
+    // The art-pending Crucible hunter quiver adds one definition and one debt row:
+    // 1620 - 136 = 1484 art subjects, unchanged from 1619 - 135 before it.
+    catalogCount: 1469,
+    liveItemCount: 1487,
+    pendingArtCount: 136,
+    // Three painted quest shields add three subjects; quiver debt remains.
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,

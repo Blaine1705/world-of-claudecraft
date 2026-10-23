@@ -7,6 +7,11 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ja_JP: Record<string, string> = {
+  'moderationHistory.actionAnnounce': 'レルム全体への告知',
+  'moderationHistory.actionGmInvisible': '不可視状態になった',
+  'moderationHistory.actionGmVisible': '可視状態になった',
+  'moderationHistory.actionUnwatch': '監視リストから削除',
+  'moderationHistory.actionWatch': '監視リストに追加',
   'error.flagActiveExists': 'このアカウントには、その種類の未処理のフラグがすでにあります。',
   'wealth.largeMovementsUnavailable':
     '大規模な銀行の動きを読み込めませんでした（台帳の読み取りがタイムアウトしました）。上記の金の内訳は完全です。',

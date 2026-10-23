@@ -1,3 +1,4 @@
+import { assertHeroicMarksGrantsFit } from '../heroic_marks';
 // The Ravenpost: the in-game mail system. A new system module behind SimContext
 // (the market.ts shape): this class OWNS the shared mail book, the mail-id
 // counter, and the mailbox entity ids; the inventory hub (addItem/removeItem/
@@ -39,13 +40,12 @@ import {
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
 import { removeSellUnitsFromInventory, removeVendorSellUnits } from '../items';
-import { isMaterialItemId } from '../material_ids';
 import { rekeyMaterialSignature } from '../material_signatures';
 import { validateMaterialSlotSourcesOnLoad } from '../material_slot_load';
-
 import { WYRMFALL_CORE_ITEM_ID } from '../professions/masterwrought_materials';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { isStackProvenanceItemId } from '../stack_provenance_ids';
 import {
   cloneInvSlot,
   dist2d,
@@ -614,10 +614,10 @@ export class PostOffice {
           this.result(meta.entityId, 'noMailBound');
           return;
         }
-        if (!isMaterialItemId(s.itemId)) {
+        if (!isStackProvenanceItemId(s.itemId)) {
           instancedWanted.push({ itemId: s.itemId, instance: s.instance, count });
         }
-      } else if (!isMaterialItemId(s.itemId)) {
+      } else if (!isStackProvenanceItemId(s.itemId)) {
         wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
       }
     }
@@ -801,6 +801,7 @@ export class PostOffice {
       this.result(meta.entityId, 'letterGone');
       return;
     }
+    assertHeroicMarksGrantsFit(meta, m.items);
     // Escrow in the expiry sense (sub-silver coin alone does not count): the
     // clock write at the tail keys on this, the coin grant below on any coin.
     const hadAttachments = mailHoldsEscrow(m);

@@ -1,10 +1,4 @@
-import type { MaterialComposition } from '../sim/material_sources';
-import type { MaterialStackSelection } from '../sim/material_stack_selection';
-import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { activeRaidLockouts, activeRiftBossDeathZones, riftMs } from './dungeon_mirror_views';
-import { materialStorageTransferPayload } from './material_storage_command';
-import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
-
 // Online play: REST auth client + WebSocket world mirror.
 
 import { App } from '@capacitor/app';
@@ -20,7 +14,7 @@ import {
 import { type AccountEarner, type AccountLedger, freshAccountLedger } from '../sim/account_ledger';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
-import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
+import { allocRiftCollisionToken } from '../sim/colliders';
 import { applyAbilityCostTail, resolveAbilityChain } from '../sim/combat/ability_resolution';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
 import { FARM_PATCHES } from '../sim/content/farm_patches';
@@ -53,12 +47,13 @@ import type { NamedSlotTarget } from '../sim/item_copy_ref';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
+import type { MaterialComposition } from '../sim/material_sources';
+import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
-import type { MaterialRarity } from '../sim/professions/gathering';
 import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import type { PerfectingSwapRequest } from '../sim/professions/perfecting_swap';
 import type { TownFocusPendingView } from '../sim/professions/town_focus_pending';
@@ -72,7 +67,6 @@ import {
   pageCompletion,
   RELIQUARY_PAGES_BY_ID,
 } from '../sim/reliquary';
-import { riftFloorColliders } from '../sim/rift/rift_gen';
 import type { ResolvedAbility } from '../sim/sim';
 import {
   cloneItemInstancePayload,
@@ -108,6 +102,7 @@ import {
   type ActiveNythraxisGraveEruption,
   type ActiveNythraxisGraveFlame,
   type ActiveNythraxisGravefire,
+  type ActiveSporeBurst,
   type ActiveTemporalHourglass,
   type ActiveVarkhulAnvilMeteorWarning,
   type ActiveVarkhulAssembly,
@@ -196,6 +191,7 @@ import type {
 } from '../world_api/professions';
 import { buildClientAbilityPresentation } from './ability_presentation';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
+import { resolveInitialActionBarLayout } from './action_bar_restore';
 import { ActionBarLayoutUploader } from './action_bar_upload';
 import { anchorFields } from './anchor_fields';
 import { apiErrorFromBody } from './api_error';
@@ -209,6 +205,7 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import { applySelfCombatScalars } from './combat_scalar_wire';
+import { craftResultViewFromEvent } from './craft_result_mirror';
 import { decodeMobileStationCrafts, EMPTY_MST_CRAFTS } from './crafting_wire';
 import {
   type DesktopWalletBrowserAction,
@@ -219,15 +216,23 @@ import { pruneMissingEntities } from './despawn_grace';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import { decodeEntityFlairWire } from './entity_flair_wire';
 import { reanchorDecision } from './entity_reanchor';
+import { applyEntityStatusWire } from './entity_status_wire';
 import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './guild_board_wire';
 import { decodeGuildRoster } from './guild_roster_wire';
 import { foldInputAck } from './input_ack';
-import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import {
+  INPUT_SEND_TIMER_INTERVAL_MS,
+  type InputSendMode,
+  inputFacingsMatch,
+  inputFlushGateOpen,
+  type PendingTransientInput,
+} from './input_send_cadence';
 import { inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
+import { bagSocketPayload, materialStorageTransferPayload } from './material_storage_command';
 import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
@@ -235,6 +240,7 @@ import {
 } from './mount_race_wire';
 import {
   encodeAnalogMoveInput,
+  flushMovementFrameV2Outbox,
   type MovementFrameV2,
   MovementFrameV2Outbox,
   trackPendingInputSequence,
@@ -243,6 +249,7 @@ import {
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { applyPeerMajorCooldownWire } from './peer_major_cooldown_wire';
 import { perfectingCommand } from './perfecting_command';
 import {
   perfectingInfoForMirror,
@@ -253,6 +260,7 @@ import { decodePlayerIdentityWire } from './player_identity_wire';
 import { applyProfessionsSelfMirror } from './professions_self_mirror';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { type RiftStateEvent, swapMirroredRiftFloor } from './rift_floor_mirror';
 import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
 import {
@@ -268,6 +276,7 @@ import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './targ
 import { applyFerryWire, applyTransportSnapshot, clientFerryView } from './transport_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
+import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 import { whoRosterFromFrame } from './who_frame_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
@@ -278,17 +287,6 @@ export { buildWebSocketAuthMessage } from './world_auth_message';
 // individual fields as they are consumed; this alias keeps the decoder local.
 // biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
 type LooseJson = any;
-
-type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
-
-const inputFacingsMatch = (a: number, b: number): boolean =>
-  Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;
-
-interface PendingTransientInput {
-  jump: boolean;
-  turnLeft: boolean;
-  turnRight: boolean;
-}
 
 // ---------------------------------------------------------------------------
 // REST
@@ -1242,6 +1240,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // field (pet state lives on the owned-mob entity wire). ---
   partyInfo: PartyInfo | null = null;
   private selectedDungeonDifficulty: DungeonDifficulty = 'normal';
+  private activeInstanceDungeonDifficulty: DungeonDifficulty | null = null;
   // --- IWorldTrade: active trade-window state, mirrored from the snapshot self
   // (`s.trade`, delta-omitted). ---
   tradeInfo: TradeInfo | null = null;
@@ -1676,6 +1675,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   activeVarkhulAssemblies: ActiveVarkhulAssembly[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   activeConsecrations: ActiveConsecration[] = [];
+  activeSporeBursts: ActiveSporeBurst[] = [];
   private counterfangWindowDeadlineMs = 0;
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
@@ -1710,9 +1710,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private movementFrameOutbox: MovementFrameV2Outbox | undefined;
   onMovementWireNegotiated: ((version: 1 | 2, now: number) => void) | null = null;
   onMovementWireNeutral: ((now: number) => boolean) | null = null;
-  // No initializer on purpose: bare ClientWorld test fixtures skip field
-  // initializers, and the lazy accessor below keeps that construction idiom
-  // equivalent to a real instance.
+  // Bare ClientWorld test fixtures skip field initializers.
   private pendingTransientInput: PendingTransientInput | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
@@ -1928,11 +1926,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // mirroring a floor would otherwise strand that region under a token
     // nothing queries again once this ClientWorld is dropped, on every close/
     // logout/reconnect-exhausted path that reaches here.
-    if (this.riftFloor) {
-      clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
-    }
-    // Clear the descriptor too; late riftState frames after teardown are ignored below.
-    this.riftFloor = null;
+    // Clears the descriptor too; late riftState frames after teardown are ignored below.
+    this.riftFloor = swapMirroredRiftFloor(this.riftCollisionToken, this.riftFloor, null);
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
     if (typeof document !== 'undefined') {
@@ -1948,13 +1943,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.nativeLifecycleHandle = undefined;
     }
   }
-
   close(): void {
     this.endSession();
     this.ws.onclose = null;
     this.ws.close();
   }
-
   // Signal a deliberate logout to the server so it skips linkdead grace and
   // calls leave() immediately. Must be called before a page reload so the
   // character is properly removed from the world instead of being held
@@ -2050,24 +2043,24 @@ export class ClientWorld extends ReconWireState implements IWorld {
 
   private sendMovementTimerTick(now = performance.now()): void {
     if (this.movementWireVersion !== 2) return void this.sendInput(now);
-    const firstSeq = this.inputSeq + 1;
-    const result = this.movementFrameOutbox?.flush(
+    this.flushMovementWireOutbox(now);
+  }
+
+  private flushMovementWireOutbox(now = performance.now(), bypassBackpressure = false): void {
+    this.inputSeq = flushMovementFrameV2Outbox(
+      this.movementFrameOutbox,
       this.ws,
       this.movementWireIsOpen(),
       this.inputSeq,
+      this.pendingInputSeqSentAt,
+      now,
+      bypassBackpressure,
     );
-    if (!result) return;
-    this.inputSeq = result.lastSeq;
-    trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
   }
 
-  /** Send unconditional neutral input before an in-place renderer transition. */
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
     this.mouselookFacing = null;
-    // On an open socket the forced path admits exactly one neutral frame
-    // despite a saturated browser buffer. The accepted neutral frame consumes
-    // any pre-pause engagement intent without putting it on the wire.
     if (this.movementWireVersion === 2) {
       return this.onMovementWireNeutral?.(now) ?? false;
     }
@@ -2297,6 +2290,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
         this.spectateFacingPending = this.spectating !== null || this.spectateExitPending;
+        // no floor until resumeSession resends ours: the old stream may have ended unseen
+        this.mirrorRiftFloor(null);
         this.spectating = null;
         this.spectateExitPending = false;
         this.cfg.playerClass = this.ownPlayerClass;
@@ -2319,6 +2314,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // Same idea for a corpse-harvest-info query issued just before the drop.
         this.worldInteractionRequests?.resetQuery();
         this.resetQuestWorldWireState();
+        applyBankSelfWire(this, { vault: null });
         this.onReconnected?.();
       }
       this.connected = true;
@@ -2337,12 +2333,16 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (!this.spectateExitPending) this.spectating = msg.name as string;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
+      // a different pid's riftState stream routes here from now on; the server
+      // follows this frame with the new view's live floor, if any
+      this.mirrorRiftFloor(null);
       // the spectate swap changes whose record the self-decode writes; a hold
       // armed for the previous identity must not shadow the new one's target
       this.pendingTargetEcho = null;
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
       this.resetReconWireState();
+      applyBankSelfWire(this, { vault: null });
       if (this.spectateExitPending) {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
@@ -2891,29 +2891,26 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.leaping = !!w.lp;
       applyFerryWire(e, w.fry, snap ? -1 : entAlpha); // a passenger's deck spot
-      e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
-      e.pvpFlag = !!w.pvp; // /pvp flag bit: nameplate + target-frame hostility colour
+      applyEntityStatusWire(e, w); // the /afk, /pvp and bounty display bits
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;
       e.forcedTargetId = w.ft ?? null;
       e.forcedTargetTimer = w.ftm ?? 0;
-      // Another entity's selected target (players/bots; mobs use aggro above). Powers
-      // the target-of-target frame for a player target. For the SELF record this is
-      // re-set authoritatively from `s.target` in the self-decode below (same value),
-      // and both writes route through the pending-target echo guard (countStale
-      // false here: the self-decode owns the budget decrement).
+      // Another entity's selected target (players/bots; mobs use aggro above): the ToT frame
+      // for a player target. The SELF record is re-set authoritatively from `s.target` in the
+      // self-decode below (same value); both writes route through the pending-target echo
+      // guard (countStale false here: the self-decode owns the budget decrement).
       if (w.id === this.playerId) this.applySelfTargetFromServer(e, w.tgt ?? null, false);
       else e.targetId = w.tgt ?? null;
       e.tappedById = w.tap ?? null;
       // corpse harvest claim: unconditional so a record without hcb (unclaimed,
       // or a respawn that cleared the claim) resets any stale mirrored pid
       e.harvestClaimedBy = typeof w.hcb === 'number' ? w.hcb : null;
-      // loot owner-lock lapse: flag present means lapsed (mirror as already
-      // counted down), absent means the lock still holds or never started;
-      // unconditional so a respawned record resets any stale lapse (same
-      // contract as hcb above). The server owns the countdown; the client only
-      // ever needs the boolean.
+      // loot owner-lock lapse: flag present means lapsed (mirror as already counted down),
+      // absent means the lock still holds or never started; unconditional so a respawned
+      // record resets any stale lapse (same contract as hcb above). The server owns the
+      // countdown; the client only ever needs the boolean.
       e.lootFfaTimer = w.ffa ? 0 : Infinity;
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
@@ -2927,14 +2924,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // updates the existing Map in place: no per-entity Map churn at 20 Hz
       e.threat.clear();
       if (w.thr) for (const [tid, tv] of w.thr as [number, number][]) e.threat.set(tid, tv);
-      // The aura family decodes in its own sibling (src/net/aura_wire_decode.ts):
-      // the deadline-vs-remaining clock, the in-place fast path that keeps a
-      // steady aura set allocation-free at 20 Hz, and every presence-only
-      // marker's absent-means-cleared handling live there, in ONE place rather
-      // than duplicated across the update and rebuild paths.
+      // The aura family decodes in its own sibling (src/net/aura_wire_decode.ts): the
+      // deadline-vs-remaining clock, the in-place fast path that keeps a steady aura set
+      // allocation-free at 20 Hz, and every presence-only marker's absent-means-cleared
+      // handling live there, in ONE place rather than duplicated across both paths.
       const wireAuras = (Array.isArray(w.auras) ? w.auras : []) as ClientWireAura[];
       if (snapshotCarriesAuras(timerWire, w.auras)) {
         e.auras = applyAuraWire(e.auras, wireAuras, timerWire);
+        applyPeerMajorCooldownWire(e, w.mcd, w.id === this.playerId); // spent enemy cooldowns
       }
       e.loot = w.lootList ?? null;
       return e;
@@ -2985,9 +2982,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.savedMana = typeof s.sm === 'number' ? s.sm : 0;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
-      // corpse position while a ghost (null once resurrected). Delta-guarded: kept
-      // unchanged when the server omits it; drives the corpse marker + resurrect button.
-      if (s.corpse !== undefined) e.corpsePos = s.corpse ?? null;
       if (timerWire.mode === 'stable' && timerWire.time !== null && s.cds !== undefined) {
         if (this.stableCooldownSchedules === undefined) this.stableCooldownSchedules = new Map();
         this.stableCooldownSchedules.clear();
@@ -3202,7 +3196,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
       }
-      this.applyQuestSelfSnapshot(s, timerWire.time);
+      if (this.applyQuestSelfSnapshot(s, timerWire.time)) this.invChanged = true;
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
       // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the
@@ -3218,6 +3212,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
+      if (s.adiff === 'normal' || s.adiff === 'heroic')
+        this.activeInstanceDungeonDifficulty = s.adiff;
+      else if (s.adiff === null) this.activeInstanceDungeonDifficulty = null;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       const restoreSessionPreferences = this.spectateExitPending;
       const arena = s.arena !== undefined ? s.arena : this.arenaInfo;
@@ -3250,13 +3247,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // market / mail / world PvP self-decode (W0a-covered, delta-omitted): the
       // sibling module owns the cohort and its adopt-by-reference contract. ---
       applySocialSelfWire(this, s);
-      // The four owner-only bank/vault self keys (`bank`, `vault`, `cvault`,
-      // `bpsl`): all delta-omitted, strictly decoded and applied by the sibling
-      // module, where the delta contract, the by-reference adoption rationale,
-      // and each key's malformed policy (vault clears, the rest retain) live.
+      // Owner-only storage and Weekly Vault mirrors share the delta decoder.
       applyBankSelfWire(this, s);
-      if (s.weeklyRewards !== undefined)
-        this.weeklyRewardInfo = decodeWeeklyRewardInfo(s.weeklyRewards);
       applyGuildBankSelfWire(this, s, () => this.guildBankLogMirror.reset());
       // --- IWorldDeeds / IWorldReliquary / account-ledger self-decode
       // (`deeds`/`dstats`/`reliq`/`acct` heavy-gated, `renown`/`atitle`/
@@ -3439,6 +3431,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'stopattack' });
   }
   unstuck(): void {
+    if (this.movementWireVersion === 2) this.flushMovementWireOutbox(performance.now(), true);
     this.cmd({ cmd: 'unstuck' });
   }
   releaseSpirit(): void {
@@ -3449,6 +3442,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   resurrectAtSpiritHealer(): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'resurrect_healer' });
+  }
+  pvpResurrect(): void {
+    this.cmd({ cmd: 'pvp_resurrect' });
   }
   respondToResurrection(accept: boolean): void {
     this.cmd({ cmd: 'resurrect_respond', accept });
@@ -3652,15 +3648,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   equipBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
     // `socket` is the BAG BAR socket, so `slot` stays free for the bag index.
-    if (target === undefined) this.cmd({ cmd: 'equip_bag', item: itemId, socket });
-    else this.cmd({ cmd: 'equip_bag', item: itemId, socket, slot: target.slotIndex });
+    this.cmd({ cmd: 'equip_bag', ...bagSocketPayload(itemId, socket, target) });
   }
   unequipBag(socket: number): void {
     this.cmd({ cmd: 'unequip_bag', socket });
   }
-  useItem(itemId: string, target?: { slotIndex: number }): void {
-    if (target === undefined) this.cmd({ cmd: 'use', item: itemId });
-    else this.cmd({ cmd: 'use', item: itemId, slot: target.slotIndex });
+  useItem(itemId: string, target?: Parameters<IWorld['useItem']>[1]): void {
+    this.cmd({ cmd: 'use', item: itemId, slot: target?.slotIndex, inkMap: target?.inkMap });
   }
   discardItem(itemId: string, count?: number, target?: NamedSlotTarget): void {
     if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });
@@ -4200,7 +4194,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   healPet(): void {
     this.cmd({ cmd: 'pet_heal' });
   }
-  setPetMode(mode: 'passive' | 'defensive' | 'aggressive'): void {
+  setPetMode(mode: Parameters<IWorld['setPetMode']>[0]): void {
     this.cmd({ cmd: 'pet_mode', mode });
   }
   // --- IWorldParty: party/raid commands + raid-target markers (terse wire strings;
@@ -4307,9 +4301,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   bgFlagAction(): void {
     this.cmd({ cmd: 'bg_flag' });
   }
-  // --- IWorldWorldPvp: raise/lower the /pvp flag (worldPvpInfo is a snapshot read). ---
+  // --- IWorldWorldPvp: the /pvp flag + the Skull Bag (worldPvpInfo is a snapshot read). ---
   setWorldPvpFlag(enabled: boolean): void {
     this.cmd({ cmd: 'pvp_flag', on: enabled });
+  }
+  skullBagAction(action: import('../world_api').SkullBagAction): void {
+    this.cmd({ cmd: 'skull_bag', ...action });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---
@@ -4659,8 +4656,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'bank_unlock_socket' });
   }
   bankSocketBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
-    if (target === undefined) this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket });
-    else this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket, slot: target.slotIndex });
+    this.cmd({ cmd: 'bank_socket_bag', ...bagSocketPayload(itemId, socket, target) });
   }
   bankUnsocketBag(socket: number): void {
     this.cmd({ cmd: 'bank_unsocket_bag', socket });
@@ -4684,6 +4680,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   openWeeklyReward(choice: string, table?: string | readonly string[]): void {
     sendWeekly(this.weeklyRewardInfo, choice, 'open', (m) => this.cmd(m), table);
+  }
+  setWeeklyLootSpec(spec: string | null): void {
+    this.cmd({ cmd: 'weekly_loot_spec', spec });
   }
   vaultBuyUpgrade(): void {
     this.cmd({ cmd: 'vault_buy_upgrade' });
@@ -4860,6 +4859,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   dungeonDifficulty(): DungeonDifficulty {
     return this.selectedDungeonDifficulty ?? 'normal';
   }
+  activeDungeonDifficulty(): DungeonDifficulty | null {
+    return this.activeInstanceDungeonDifficulty ?? null;
+  }
   setDungeonDifficulty(difficulty: DungeonDifficulty): void {
     this.selectedDungeonDifficulty = difficulty;
     this.cmd({ cmd: 'set_dungeon_difficulty', difficulty });
@@ -4934,50 +4936,20 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private applyRiftStateEvent(ev: SimEvent): void {
     if (ev.type !== 'riftState') return;
     if (this.sessionEnded) return;
-    // Mirror the server's floor collision lifecycle (spawnRiftFloor /
-    // freeRiftFloorEntities in src/sim/rift/runs.ts): the previously mirrored
-    // floor's region is always cleared before a new one is registered, whether
-    // this event is a descent (a new floor replacing the old one) or a real
-    // exit (no new floor to replace it with).
-    if (this.riftFloor) {
-      clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
-    }
-    this.riftFloor = ev.active
-      ? {
-          eventId: ev.eventId,
-          instanceId: ev.instanceId,
-          seed: ev.seed,
-          baseLevel: ev.baseLevel,
-          floorIndex: ev.floorIndex,
-          floorCount: ev.floorCount,
-          origin: ev.origin,
-          contentId: ev.contentId,
-          contentHash: ev.contentHash,
-          upgrade: ev.upgrade,
-          name: ev.name,
-          themeName: ev.themeName,
-          tier: ev.tier,
-        }
-      : null;
-    if (this.riftFloor) {
-      setRiftRegion(
-        this.riftCollisionToken,
-        this.riftFloor.origin.x,
-        this.riftFloor.origin.z,
-        riftFloorColliders(
-          this.riftFloor.seed,
-          this.riftFloor.baseLevel,
-          this.riftFloor.floorIndex,
-          this.riftFloor.upgrade,
-        ),
-      );
-    }
-    this.riftEventExpiresAtMs = ev.active ? ev.expiresAtMs : null;
+    this.mirrorRiftFloor(ev);
+  }
+
+  // `ev` null resets the mirror: the riftState stream changed owner (a spectate
+  // frame, or a reconnect; rift_floor_mirror.ts).
+  private mirrorRiftFloor(ev: RiftStateEvent | null): void {
+    this.riftFloor = swapMirroredRiftFloor(this.riftCollisionToken, this.riftFloor, ev);
+    this.riftEventExpiresAtMs = ev?.active ? ev.expiresAtMs : null;
     // Clear death zones on rift exit so stale rings from a previous run never
     // bleed into a new one. Mid-run cancellations (boss death, evade, floor
     // descent) arrive as riftDeathZoneClear events instead: descent keeps
     // riftState active, so this arm never sees them.
-    if (!ev.active) this.activeBossDeathZones = [];
+    if (!ev?.active) this.activeBossDeathZones = [];
+    if (!ev) this.hoardBossCueMirror?.clear();
   }
 
   // Mirror a spawned lethal boss death zone so riftBossDeathZones() returns
@@ -5011,15 +4983,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
 
   private applyCraftResultEvent(ev: SimEvent): void {
     if (ev.type !== 'craftResult') return;
-    this.lastCraftResult = {
-      ok: ev.ok,
-      recipeId: ev.recipeId,
-      itemId: ev.itemId,
-      count: ev.count,
-      quality: ev.quality as MaterialRarity | undefined,
-      masterwork: ev.masterwork,
-      reason: ev.reason,
-    };
+    this.lastCraftResult = craftResultViewFromEvent(ev);
   }
   // A successful recovery is intentionally shorter than the normal large-delta
   // snapshot snap threshold. Mirror its authoritative event immediately so an

@@ -33,14 +33,14 @@
 // qr-19-qprofintro-overflow-grant; the resulting over-capacity bag is visible,
 // since the bag counter paints used over capacity.
 //
-// An honest MATERIAL takes a second path through this module, in both
+// Materials and stackable consumables take a source-aware path, in both
 // directions: grants (countFit/addStacked, and canAddItem/canGrantCopies/
 // canGrantItemInstance/fitsAll routed through them) answer from
 // material_stack_packing.ts, and spends (removeStacked/consumeOneScratch) from
 // material_inventory_take.ts. So differently signed and unrecorded units share
 // real stack room, every landed stack carries its exact per-source composition,
 // and spending takes unrecorded material before premium. Membership is the
-// material_ids.ts registry; non-materials keep the legacy paths unchanged.
+// stack_provenance_ids.ts registry. Material-only capacity still uses material_ids.ts.
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
@@ -53,13 +53,14 @@ import {
   totalPoolCapacity,
 } from './bag_pools';
 import { ITEMS } from './data';
+import { isCurrencyGrantId } from './heroic_marks';
 import {
   consumeSelectedInventorySlot,
   newestMatchingSlot,
   selectedInventorySlot,
 } from './item_copy_ref';
 import { canStackInstancePayloads, isChargeBearingPayload } from './item_instance_merge';
-import { isMaterialItemId, materialItemIds } from './material_ids';
+import { isMaterialItemId } from './material_ids';
 import {
   applyMaterialInventoryTake,
   type MaterialTakePlan,
@@ -72,6 +73,7 @@ import type { MaterialStackSlot } from './material_stack';
 import { materialStackFit, planMaterialStackAdd } from './material_stack_packing';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId, stackProvenanceItemIds } from './stack_provenance_ids';
 import {
   cloneItemInstancePayload,
   type InvSlot,
@@ -146,7 +148,7 @@ export function bagCapacity(bags: readonly (string | null)[]): number {
 // The two shared leaves own every rule; this module only adapts them to the
 // bags signatures. Membership comes from the existing registry, never a second
 // classification, and the legacy paths below stay byte for byte for everything
-// that is not a material.
+// outside the source-accounting registry.
 
 /** Dev-channel only, never player-visible: a caller handed the bags material
  *  data the shared model refuses to read. Thrown BEFORE any slot is written. */
@@ -156,8 +158,8 @@ const MATERIAL_TAKE_REFUSED = 'bags: material inventory take refused the spend';
 /** True when this operation is the material arm's business. A non-positive
  *  count stays on the legacy path so its established result (a zero fit, the
  *  `true` its all-or-nothing wrappers answer, a no-op removal) is unchanged. */
-const isMaterialOperation = (itemId: string, count: number): boolean =>
-  count > 0 && isMaterialItemId(itemId);
+const isSourceOperation = (itemId: string, count: number): boolean =>
+  count > 0 && isStackProvenanceItemId(itemId);
 
 /** The incoming stack, assembled from the identity arguments a caller already
  *  passes. Absent fields stay absent: an explicitly `undefined` payload must
@@ -200,10 +202,14 @@ export function countFit(
   craftedRecipeId?: string,
   materialSources?: MaterialComposition,
 ): number {
+  // A currency id (Heroic Marks) credits a PlayerMeta counter at the hub, never
+  // a slot, so every capacity gate sees it fit whole (heroic_marks.ts). Only a
+  // plain grant: a payload-bearing copy takes the instanced path and a slot.
+  if (!instance && isCurrencyGrantId(itemId)) return count;
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   const freeSlots = freePoolSlots(inventory, pools, itemId, isMaterialItemId);
-  if (isMaterialOperation(itemId, count)) {
+  if (isSourceOperation(itemId, count)) {
     // Materials answer through the shared packing core, so differently signed
     // and unrecorded units share the room they really have, a separated block
     // is never a target, and malformed provenance refuses rather than reading
@@ -211,7 +217,7 @@ export function countFit(
     const fit = materialStackFit({
       inventory,
       incoming: materialIncoming(itemId, count, instance, craftedRecipeId, materialSources),
-      materialIds: materialItemIds(),
+      materialIds: stackProvenanceItemIds(),
       stackSize: stack,
       maxNewSlots: freeSlots,
     });
@@ -319,6 +325,7 @@ export function fitsAll(
       a.materialSources,
     );
     if (fit < a.count) return false;
+    if (!a.instance && isCurrencyGrantId(a.itemId)) continue; // a counter credit, no slot
     addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId, a.materialSources);
   }
   return true;
@@ -366,7 +373,7 @@ export function addStacked(
 ): void {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
-  if (isMaterialOperation(itemId, count)) {
+  if (isSourceOperation(itemId, count)) {
     const incoming = materialIncoming(itemId, count, instance, craftedRecipeId, materialSources);
     addMaterialStacked(inventory, incoming, stack);
     return;
@@ -415,7 +422,7 @@ function addMaterialStacked(
   const plan = planMaterialStackAdd({
     inventory,
     incoming,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     stackSize,
     maxNewSlots: incoming.count,
   });
@@ -446,7 +453,7 @@ export function countStacked(inventory: readonly InvSlot[], itemId: string): num
  *  prefer-plain hand-in with consumeOneScratch below. A MATERIAL routes through
  *  the shared take planner instead (removeMaterialStacked). */
 export function removeStacked(inventory: InvSlot[], itemId: string, count: number): void {
-  if (isMaterialOperation(itemId, count)) {
+  if (isSourceOperation(itemId, count)) {
     removeMaterialStacked(inventory, itemId, count);
     return;
   }
@@ -472,7 +479,7 @@ function removeMaterialStacked(inventory: InvSlot[], itemId: string, count: numb
     inventory,
     itemId,
     count,
-    materialIds: materialItemIds(),
+    materialIds: stackProvenanceItemIds(),
     allowPartial: true,
   });
   if (!plan.ok) throw new Error(MATERIAL_TAKE_REFUSED);
@@ -508,7 +515,8 @@ export function consumeOneScratch(
   itemId: string,
   excludeInstance?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload | undefined {
-  if (isMaterialItemId(itemId)) return consumeOneMaterialScratch(scratch, itemId, excludeInstance);
+  if (isStackProvenanceItemId(itemId))
+    return consumeOneMaterialScratch(scratch, itemId, excludeInstance);
   const passes: ((s: InvSlot) => boolean)[] = [
     (s) => !s.instance,
     (s) => !!s.instance && !excludeInstance?.(s.instance),
@@ -563,7 +571,7 @@ function consumeOneMaterialScratch(
       inventory: scratch,
       itemId,
       count: 1,
-      materialIds: materialItemIds(),
+      materialIds: stackProvenanceItemIds(),
       eligibleSource,
     });
     if (!plan.ok) {

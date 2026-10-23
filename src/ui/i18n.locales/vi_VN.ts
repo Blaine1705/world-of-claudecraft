@@ -2,6 +2,49 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Thưởng chuyên môn',
+  'hudChrome.specPanel.healing': 'hồi máu',
+  'hudChrome.specPanel.absorption': 'hấp thụ sát thương',
+  'hudChrome.specPanel.physicalAbilityDamage': 'sát thương kỹ năng cận chiến và tầm xa',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Tăng lượng hồi máu chính thêm {pct} sau khi áp dụng các mức thưởng hồi máu khác.',
+  'hud.pet.assist': 'Hỗ trợ',
+  'hud.pet.assistDesc':
+    'Chỉ tấn công mục tiêu hiện tại sau khi bạn dùng kỹ năng lên mục tiêu đó. Bỏ qua kẻ địch tấn công bạn.',
+  'hudChrome.cooldownManager.auraActive': 'Đang có',
+  'hudChrome.cooldownManager.auraMissing': 'Đang thiếu',
+  'hudChrome.cooldownManager.auraShowWhen': 'Hiện nút khi hào quang',
+  'hudChrome.cooldownManager.glowWhileMissing': 'Phát sáng khi thiếu',
+  'hudChrome.cooldownManager.groupOffHint':
+    'Nếu không chọn địa điểm nào, nhóm này sẽ không bao giờ hiện hoặc phát âm thanh.',
+  'hudChrome.cooldownManager.neverShownHint':
+    'Nếu không chọn cả hai ô, nút sẽ không bao giờ hiện nhưng vẫn phát âm thanh.',
+  'hudChrome.cooldownManager.notReadyHint':
+    'Chưa sẵn sàng nghĩa là đang hồi chiêu hoặc hiện không thể sử dụng.',
+  'hudChrome.cooldownManager.placeHint':
+    'Phụ bản bao gồm ngục tối, đột kích, hang sâu, rạn nứt, chiến trường, đấu trường và mọi khu vực có phiên riêng khác. Ngoài các địa điểm đã chọn, nhóm sẽ bị ẩn và không phát âm thanh.',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'Làm nút sáng lên, nổi viền và nhấp nháy khi thiếu hào quang.',
+  'hudChrome.cooldownManager.reminderHint':
+    'Nhắc hiệu ứng có lợi: nút sáng lên khi thiếu hào quang này và ẩn đi khi bạn có nó.',
+  'hudChrome.cooldownManager.reminderSoundHint': 'Phát khi hào quang kết thúc.',
+  'hudChrome.cooldownManager.showButtonWhen': 'Hiện nút khi',
+  'hudChrome.cooldownManager.showIn': 'Hiện trong',
+  'hudChrome.cooldownManager.showInInstances': 'Khu vực phụ bản',
+  'hudChrome.cooldownManager.showInWorld': 'Thế giới mở',
+  'hudChrome.cooldownManager.showNotReady': 'Chưa sẵn sàng',
+  'hudChrome.cooldownManager.showOutOfCombat': 'Ngoài giao tranh',
+  'hudChrome.cooldownManager.showReady': 'Sẵn sàng',
+  'hudChrome.cooldownManager.showWhile': 'Hiện khi',
+  'hudChrome.options.enemyHighlightDistance': '{yards} thước Anh',
+  'hudChrome.options.enemyHighlightEdgeArrow': 'Mũi tên ở rìa màn hình khi ngoài khung hình',
+  'hudChrome.options.enemyHighlightNameplate': 'Bảng tên mục tiêu lớn có khung',
+  'hudChrome.options.enemyHighlightOverhead': 'Dấu nổi trên đầu',
+  'hudChrome.options.enemyHighlightReticle': 'Tâm ngắm địch đậm hơn',
+  'hudChrome.options.enemyHighlightStyle': 'Kiểu làm nổi bật kẻ địch',
+  'hudChrome.options.nameplateCooldownScale': 'Kích thước theo dõi tấn công/phòng thủ',
+  'hudChrome.options.showNameplateCooldowns': 'Theo dõi tấn công/phòng thủ',
+  'hud.pet.stanceDesc': 'Bấm để chọn Thụ Động, Phòng Thủ, Hung Hãn hoặc Hỗ trợ.',
   'abilityUi.actionBar.cooldownMinutes': '{minutes}p',
   'abilityUi.cast.hoard_cast_bat_dive': 'Lao Xuống',
   'abilityUi.cast.hoard_cast_bat_dive_aim': 'Lao Xuống Sâu',
@@ -46,8 +89,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.alliedHearthstoneAttuned': 'Điều Chỉnh Để: {hub}',
   'hudChrome.factionRewards.alliedHearthstoneUse': 'Về Nhà Vùng Lửa Đồng Minh',
   'hudChrome.factionRewards.armorKitUse': 'Sử Dụng Bộ Giáp',
-  'hudChrome.factionRewards.battleStandardUse': 'Giương Cờ Chiến Đấu',
-  'hudChrome.factionRewards.hub_automatons': 'Nam Cảnh (Xưởng Đúc Tự Động)',
+  'hudChrome.factionRewards.battleStandardUse':
+    'Sử dụng: Cắm Cờ Chiến Đấu Bình Minh Thánh Hiến trong 5 phút. Người chơi ngoài giao tranh trong vòng 15 yard hồi thêm 10% máu; người dùng năng lượng cũng hồi năng lượng bằng 5% Tinh thần mỗi 2 giây. Đứng gần trong 10 giây ban Phúc Lành Bình Minh, tăng Sức mạnh, Nhanh nhẹn, Thể lực, Trí tuệ và Tinh thần thêm 5% trong 30 phút. (Hồi chiêu 5 phút)',
+  'hudChrome.factionRewards.hub_automatons': 'Wyrmwatch (Tự Động)',
   'hudChrome.factionRewards.hub_church_order': 'Thung Lũng Đông Khê (Dòng Nhà Thờ)',
   'hudChrome.factionRewards.hub_none': 'Không có (Dùng gần trung tâm phe để liên kết)',
   'hudChrome.factionRewards.hub_rift_watch': 'Drifthaven (Kỳ Canh Vết Nứt)',
@@ -388,6 +432,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultSearchNoMatch':
     'Không có vật liệu trong kho của bạn phù hợp với tìm kiếm của bạn.',
   'hudChrome.charSheet.ratings': 'Xếp Hạng',
+  'hudChrome.charSheet.gearScore': 'Điểm trang bị',
   'hudChrome.charSheet.spell': 'Phép',
   'hudChrome.charSidebar.character': 'Nhân Vật',
   'hudChrome.charSidebar.currencies': 'Tiền Tệ',
@@ -447,8 +492,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notDisplayed': 'Không Hiển Thị',
   'hudChrome.cooldownManager.notInGroupHint': 'Đặt phép này vào một nhóm để hiển thị nút của nó.',
   'hudChrome.cooldownManager.notKnown': '{spell} (chưa biết)',
-  'hudChrome.cooldownManager.onlyWhenReady': 'Chỉ Hiển Thị Khi Sẵn Sàng',
-  'hudChrome.cooldownManager.onlyWhileActive': 'Chỉ Hiển Thị Khi Hoạt Động',
   'hudChrome.cooldownManager.opacity': 'Độ Trong Suốt',
   'hudChrome.cooldownManager.orientation': 'Hướng',
   'hudChrome.cooldownManager.otherSpells': 'Các Phép Khác',
@@ -472,12 +515,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Kéo phép vào một nhóm, hoặc chọn nó để chọn nhóm và cảnh báo của nó. Một nút theo phép của nó khi nó thay đổi thành một cái khác, và sáng lên khi nó làm.',
   'hudChrome.cooldownManager.trackedTitle': 'Phép Được Theo Dõi',
   'hudChrome.cooldownManager.vertical': 'Dọc',
-  'hudChrome.cooldownManager.visAlways': 'Luôn Visible',
   'hudChrome.cooldownManager.visCombat': 'Trong Chiến Đấu',
-  'hudChrome.cooldownManager.visHidden': 'Ẩn',
   'hudChrome.cooldownManager.visHiddenHint':
     'Nhóm ẩn vẫn phát âm thanh và chiếu sáng thanh tác vụ của bạn.',
-  'hudChrome.cooldownManager.visibility': 'Tầm Nhìn',
   'hudChrome.crafting.mobileStationTitle': '{station} của {name}',
   'hudChrome.currencies.activities': 'Hoạt Động',
   'hudChrome.currencies.delveMark': 'Dấu Khai Quật',
@@ -486,7 +526,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.factions': 'Phe Phái',
   'hudChrome.currencies.heroicMarkNote': 'Hầm Ngục Anh Hùng - tiêu tại quản lý hậu cần Anh Hùng',
   'hudChrome.currencies.honor': 'Danh Dự',
-  'hudChrome.currencies.honorNote': 'Chiến Trường và Đấu Trường',
+  'hudChrome.currencies.honorNote': 'Chiến Trường, Đấu Trường và Nhiệm Vụ Thế Giới',
   'hudChrome.currencies.intro':
     'Không có cái nào chiếm chỗ túi. Tiền xu vẫn ở túi của bạn như mọi khi.',
   'hudChrome.currencies.lifetime': 'Trọn Đời {amount}',
@@ -515,7 +555,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantDescription.enchant_weapon_piston_drive':
     'Khắc vĩnh viễn một vũ khí hai tay với 12 Sức Mạnh và 25 Chỉ Số Đòn Chí Mạng. Không thể áp dụng cho vũ khí một tay. Một tấn công cố định; nó không tăng theo cấp độ.',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    'Các cuộc tấn công cận chiến đáp của bạn có thể trao 60 Nhẫn Ngoại và 2% tấn công cận chiến nhanh hơn trong 15 giây. Mỗi đòn cuộn 1% trên 0.6 giây tốc độ cơ sở của vũ khí tấn công. Không có thời gian chờ nội bộ. Cả hai tay chia sẻ một bổ sung; kích hoạt nào cũng làm mới nó, và nó không bao giờ chồng chất. Các cuộc tấn công từ xa không kích hoạt hiệu ứng này. Dạng Mèo sử dụng tốc độ swing cơ sở 1 giây thay thế.',
+    'Các đòn cận chiến đánh trúng của bạn có thể tăng 60 Nhanh nhẹn và tăng tốc độ tấn công cận chiến 2% trong 15 giây. Mỗi lần trúng đòn có xác suất 1% cho mỗi 0,6 giây tốc độ cơ bản của vũ khí ra đòn. Không có hồi chiêu nội bộ. Hai tay dùng chung một hiệu ứng; mỗi lần kích hoạt sẽ làm mới và hiệu ứng không cộng dồn. Đòn đánh tầm xa không kích hoạt hiệu ứng này. Trong Hình Mèo, đòn đánh tự động dùng tốc độ chân 1 giây. Đòn đánh và đòn kết liễu trong Hình Mèo và Hình Bruin dùng tốc độ của chính vũ khí; Vuốt Quét Ngang chỉ xét một lần mỗi lần dùng, không phải mỗi mục tiêu.',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Khắc Vũ Khí: Lửa Bình Minh',
   'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Khắc Vũ Khí: Phước Lành Bình Minh',
   'hudChrome.enchantName.enchant_weapon_piston_drive': 'Khắc Vũ Khí: Ổ Piston',
@@ -1080,7 +1120,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Bạn cũng sẽ nhận được:',
   'hudChrome.weekly.anyDifficulty': 'Bất kỳ độ khó nào',
   'hudChrome.weekly.cacheDesc':
-    'Mở thành một mảnh trang phục Cấp độ Bình thường cho lớp của bạn (không bao giờ là mảnh trang phục phân tầng), cộng với {count} x {item}.',
+    'Mở thành một mảnh trang phục Cấp độ Bình thường cho lớp của bạn (không bao giờ là mảnh trang phục phân tầng của Ignivar), cộng với {count} x {item}.',
   'hudChrome.weekly.choose': 'Chọn nhiệm vụ',
   'hudChrome.weekly.chosen': 'Nhiệm vụ hàng tuần đã chọn: {category}',
   'hudChrome.weekly.close': 'Đóng nhiệm vụ hàng tuần',
@@ -1638,6 +1678,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3VictoryTitle': 'Chiến thắng ngọt',
   'questUi.worldQuest.matchConfections': 'Xếp bánh ngọt được mê hoặc',
   'questUi.worldQuest.mineOre': 'Khai thác đồng',
+  'questUi.worldQuest.mineMaterial': 'Khai thác {name}',
   'questUi.worldQuest.practiceRewards':
     'Tập luyện: chơi lại mà không kiếm thêm tiền xu, kinh nghiệm, hoặc phần thưởng.',
   'questUi.worldQuest.puzzleBeamReach': 'Tinh thể đạt được: {count}',
@@ -1845,7 +1886,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Công bố một gò đất ngay bây giờ; nó nâng lên sau cảnh báo đầy đủ.',
   'devCommand.actions.hillwarn.label': 'Thời Gian Chờ Gò Đất',
   'entities.abilities.lava_burst.description':
-    'Gây {damage} sát thương Lửa. Luôn đánh bại một lần quan trọng một mục tiêu cháy với Giật Tàn Lửa của bạn. Magma Surge: mỗi khắc Giật Tàn Lửa có cơ hội 20% để đặt lại cooldown này và làm cho Magma Burst tiếp theo của bạn trong vòng 10 giây tức thời. Sát thương tăng với Sức Mạnh Phép. (Thundercall)',
+    'Gây {damage} sát thương Lửa. Một cú trúng ban 1 Sấm. Luôn đánh bại một lần quan trọng một mục tiêu cháy với Giật Tàn Lửa của bạn. Đòn chí mạng gây thêm 24% sát thương thông thường. Magma Surge: mỗi khắc Giật Tàn Lửa có cơ hội 20% để đặt lại cooldown này và làm cho Magma Burst tiếp theo của bạn trong vòng 10 giây tức thời. Sát thương tăng với Sức Mạnh Phép. (Thundercall)',
   'entities.abilities.lava_burst.name': 'Magma Burst',
   'entities.abilities.lightning_overload.description':
     'Thụ Động: Arc Bolt và Skybranch có cơ hội 20% để Quá Tải, tấn công mục tiêu đầu tiên của chúng lại với 50% sát thương gây ra và cấp 1 Sấm Sét. (Thundercall)',
@@ -1854,63 +1895,76 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Gọi một tiếng sấm sét xuống, gây {damage} sát thương Tự Nhiên tới các kẻ thù trong vòng 10 yard và làm chậm họ 50% trong 5 giây. Hồi phục 8% Mana tối đa của bạn. Sát thương tăng với Sức Mạnh Phép. (Thundercall)',
   'entities.abilities.thunderstorm.name': 'Stormbreak',
   'entities.itemSets.vanguard_druid_balance.bonus2':
-    'Thời gian truyền tải Rễ Siết Chặt giảm 0,5 giây.',
+    'Thời gian truyền tải Rễ Siết Chặt giảm 0,5 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     'Truyền tải Rễ Siết Chặt cho phép bạn truyền tải khi đang di chuyển và tăng tốc độ di chuyển của bạn 20 phần trăm trong 4 giây. Không thể xảy ra nhiều hơn một lần mỗi 20 giây.',
   'entities.itemSets.vanguard_druid_balance.name': 'Starwarden Raiment',
-  'entities.itemSets.vanguard_druid_feral.bonus2': 'Cooldown Cú Lao Bruin giảm 3 giây.',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    'Cooldown Cú Lao Bruin giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     'Cú Lao Bruin bảo vệ bạn với 6 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_druid_feral.name': 'Bloodmane Hide',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': 'Cooldown Fleetmend giảm 1 giây.',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    'Cooldown Fleetmend giảm 1 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_druid_restoration.bonus4':
     'Fleetmend cũng tăng tốc độ di chuyển của bạn 30 phần trăm trong 3 giây.',
   'entities.itemSets.vanguard_druid_restoration.name': 'Thistlebloom Vestment',
-  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2': 'Cooldown Bắn Rúng Động giảm 4 giây.',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    'Cooldown Bắn Rúng Động giảm 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     'Bắn Rúng Động giảm cooldown còn lại của Cơn Thịnh Nộ Dã Thú 1 giây.',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'Packwarden Harness',
-  'entities.itemSets.vanguard_hunter_marksmanship.bonus2': 'Cooldown Trailbreak giảm 4 giây.',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    'Cooldown Trailbreak giảm 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     'Trailbreak làm cho Kéo Cung Dài tiếp theo của bạn trong vòng 6 giây tức thời. Không thể xảy ra nhiều hơn một lần mỗi 15 giây.',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'Farsight Harness',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': 'Cooldown Móc Máu giảm 3 giây.',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    'Cooldown Móc Máu giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_hunter_survival.bonus4': 'Móc Máu cấp 1 Đà Săn.',
   'entities.itemSets.vanguard_hunter_survival.name': 'Snaretooth Harness',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': 'Cooldown Lá Chắn Thời Gian giảm 2 giây.',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    'Cooldown Lá Chắn Thời Gian giảm 2 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     'Lá Chắn Thời Gian cũng tăng tốc độ di chuyển của mục tiêu được bảo vệ 20 phần trăm trong 3 giây.',
   'entities.itemSets.vanguard_mage_arcane.name': "Hourbinder's Vestments",
-  'entities.itemSets.vanguard_mage_fire.bonus2': 'Mưa Tàn Lửa nạp lại 3 giây nhanh hơn.',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    'Mưa Tàn Lửa nạp lại 3 giây nhanh hơn. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     'Truyền tải Mưa Tàn Lửa giảm cooldown còn lại của Lá Chắn Rực Lửa 2 giây.',
   'entities.itemSets.vanguard_mage_fire.name': 'Emberlash Regalia',
-  'entities.itemSets.vanguard_mage_frost.bonus2': 'Cooldown Trói Băng giảm 2 giây.',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    'Cooldown Trói Băng giảm 2 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     'Truyền tải Trói Băng giảm cooldown còn lại của Bước Chớp Nhoáng 5 giây.',
   'entities.itemSets.vanguard_mage_frost.name': 'Rimewarden Garb',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': 'Cooldown Giao Ước Sinh Mệnh giảm 30 giây.',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    'Cooldown Giao Ước Sinh Mệnh giảm 30 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     'Giao Ước Sinh Mệnh cũng bảo vệ đồng minh với 8 phần trăm sức khỏe tối đa của họ trong 6 giây.',
   'entities.itemSets.vanguard_paladin_holy.name': 'Sunvigil Regalia',
-  'entities.itemSets.vanguard_paladin_protection.bonus2': 'Cooldown Oath Chain giảm 2 giây.',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    'Cooldown Oath Chain giảm 2 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     'Kẻ thù được kéo bởi Oath Chain truyền tải phép chậm hơn 30 phần trăm trong 4 giây, và Oath Chain cấp cho bạn Trả Lại Mặt Trời khi nó buộc một kẻ thù có thể được kéo.',
   'entities.itemSets.vanguard_paladin_protection.name': 'Shieldvow Bastion',
-  'entities.itemSets.vanguard_paladin_retribution.bonus2': 'Cooldown Gọi Valkyrie giảm 15 giây.',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    'Cooldown Gọi Valkyrie giảm 15 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     'Gọi Valkyrie đặt lại cooldown của Sắc Lệnh Cuối, và Sắc Lệnh Cuối tiếp theo của bạn trong vòng 6 giây gây 15 phần trăm sát thương nhiều hơn.',
   'entities.itemSets.vanguard_paladin_retribution.name': 'Lightbrand Warplate',
-  'entities.itemSets.vanguard_priest_discipline.bonus2': 'Cooldown Terror Canticle giảm 3 giây.',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    'Cooldown Terror Canticle giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     'Khi Psalm of Warding của bạn được sử dụng hết, đồng minh được bảo vệ có tốc độ di chuyển 20 phần trăm trong 3 giây. Không thể xảy ra nhiều hơn một lần mỗi 8 giây.',
   'entities.itemSets.vanguard_priest_discipline.name': 'Veilpsalm Raiment',
-  'entities.itemSets.vanguard_priest_holy.bonus2': 'Cooldown Veilstep giảm 6 giây.',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    'Cooldown Veilstep giảm 6 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_priest_holy.bonus4':
     'Veilstep cũng bảo vệ bạn với 8 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_priest_holy.name': 'Gracewing Raiment',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    'Kinh Cầu Thống Khổ cũng làm chậm di chuyển của mục tiêu 30 phần trăm trong khi bạn truyền tải nó.',
+    'Kinh Cầu Thống Khổ cũng làm chậm di chuyển của mục tiêu 30 phần trăm trong khi bạn truyền tải nó. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     'Gọi Tithefiend cũng bảo vệ bạn với 10 phần trăm sức khỏe tối đa của bạn trong 8 giây.',
   'entities.itemSets.vanguard_priest_shadow.name': 'Duskhymn Regalia',
@@ -1919,7 +1973,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     'Đòn Chơi Xấu cũng làm cho cuộc tấn công tiếp theo của bạn trong vòng 6 giây là một cú đánh chí mạng.',
   'entities.itemSets.vanguard_rogue_assassination.name': 'Nightcut Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Cooldown Swift Heels giảm 60 giây.',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': 'Cooldown Swift Heels giảm 15 giây.',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     'Trong khi Swift Heels hoạt động, Wicked Slash và Haymaker cấp 1 điểm combo bổ sung.',
   'entities.itemSets.vanguard_rogue_combat.name': 'Brawlmark Leathers',
@@ -1927,30 +1981,33 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_subtlety.bonus4':
     'Thụi Bụng cấp 2 điểm combo bổ sung khi được sử dụng từ Smokefade.',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'Shadewalk Leathers',
-  'entities.itemSets.vanguard_shaman_elemental.bonus2': 'Cooldown Unleash Weapon giảm 3 giây.',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    'Cooldown Unleash Weapon giảm 3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     'Unleash Weapon cho phép bạn truyền tải khi đang di chuyển và tăng tốc độ di chuyển của bạn 20 phần trăm trong 4 giây. Không thể xảy ra nhiều hơn một lần mỗi 20 giây.',
   'entities.itemSets.vanguard_shaman_elemental.name': 'Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    'Ancestral Strike làm chậm tốc độ di chuyển của mục tiêu 30 phần trăm trong 4 giây.',
+    'Ancestral Strike làm chậm tốc độ di chuyển của mục tiêu 30 phần trăm trong 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     'Ancestral Strike giảm cooldown còn lại của Xuất Thần Nguyên Tố 4 giây.',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    'Dòng Nước Hàn Gắn truyền tải 0,5 giây nhanh hơn trên một đồng minh dưới 50 phần trăm sức khỏe.',
+    'Dòng Nước Hàn Gắn truyền tải 0,5 giây nhanh hơn trên một đồng minh dưới 50 phần trăm sức khỏe. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     'Tidecall cũng bảo vệ mục tiêu của nó với 5 phần trăm sức khỏe tối đa của bạn trong 6 giây.',
   'entities.itemSets.vanguard_shaman_restoration.name': 'Brineward Chainmail',
   'entities.itemSets.vanguard_warlock_affliction.bonus2':
-    'Thời gian truyền tải Giày Vò giảm 0,3 giây.',
+    'Thời gian truyền tải Giày Vò giảm 0,3 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     'Nuốt Chửng chữa lành bạn 30 phần trăm nhiều hơn và có thể được truyền tải khi di chuyển.',
   'entities.itemSets.vanguard_warlock_affliction.name': 'Dreadquill Vestments',
-  'entities.itemSets.vanguard_warlock_demonology.bonus2': 'Cooldown Giáp Xương giảm 10 giây.',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    'Cooldown Giáp Xương giảm 10 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     'Reaping Command giảm cooldown còn lại của Giáp Xương 2 giây.',
   'entities.itemSets.vanguard_warlock_demonology.name': 'Marrowbound Regalia',
-  'entities.itemSets.vanguard_warlock_destruction.bonus2': 'Cooldown Da Than Hồng giảm 30 giây.',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    'Cooldown Da Than Hồng giảm 30 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     'Cứ hai lần Bùng Cháy làm cho Tia Hủy Diệt tiếp theo của bạn trong vòng 8 giây tức thời.',
   'entities.itemSets.vanguard_warlock_destruction.name': 'Slagcrown Vestments',
@@ -2344,7 +2401,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAuraCaster':
     "Thêm một dòng 'Cast by' vào mỗi mẹo buff/debuff, đặt tên cho ai áp dụng nó. Tiện dụng để phân biệt các phép sủa khác nhau của cùng một mệnh, như hai phước phúc của các paladin.",
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'Treo dải buff và debuff của khung mục tiêu bên dưới khung thay vì ở trên nó, bố cục cổ điển. Tắt theo mặc định, vì khung mục tiêu kho vừa ở ngay phía trên thanh hành động; bật nó khi bạn đã di chuyển khung đến một nơi có phòng bên dưới nó.',
+    'Đặt hàng hiệu ứng có lợi và bất lợi của mục tiêu bên dưới khung, dưới tên và thanh máu, thay vì bên trên: bố cục cổ điển. Ở vị trí mặc định, khung mục tiêu cùng thanh niệm phép và bộ đếm đòn đánh của bạn sẽ nâng lên một hàng để hàng hiệu ứng đầu tiên không che thanh hành động; khung đã được bạn di chuyển vẫn ở nguyên chỗ bạn đặt.',
   'guide.settingsPage.rowFrameRateCap':
     'Một trần trên bao nhiêu hình ảnh trò chơi vẽ mỗi giây. Một máy tính không thể theo kịp màn hình của nó hạ cánh trên một nhịp độ không đều; một 30 ổn định trông mượt hơn như vậy, giảm một nửa công việc, và giữ cho máy tính mát hơn. Hiển thị có nghĩa là không có giới hạn.',
   'guide.stats.warfareBodyPets':
@@ -3436,9 +3493,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Hình Thần Tốc',
   'guide.classPage.formsHeading': 'Biến Hình',
   'guide.classPage.formsMoonwing':
-    'Một Druid Moongrove có thêm một hình dạng nữa, Dạng Cú Mặt Trăng, hình dạng pháp thuật mà một Druid Cân Bằng chiến đấu trong đó. Đây là hình thú duy nhất giữ lại các phép của bạn, và đũa phép của bạn chỉ dùng được trong hình đó hoặc trong hình pháp sư bình thường.',
+    'Druid Cân Bằng có thêm Dạng Cú Mặt Trăng, dạng thi triển phép mà chuyên môn này dùng khi chiến đấu. Giống Hình Thể Chữa Lành Bào Tử của Phục Hồi, dạng này giữ nguyên các phép của bạn; đũa phép chỉ hoạt động trong hai dạng này hoặc dạng thi triển phép thông thường.',
   'guide.classPage.formsWolfEngage':
-    'Sói mở màn trận đấu bằng Cú Lao Bruin, lập tức chuyển sang Hình Sói để ghim mục tiêu, thu hẹp khoảng cách bằng Lao Vồ khi không ẩn thân, và giữ chân kẻ địch bằng Quật Ngã.',
+    'Sói mở màn trận đấu bằng Cú Lao Bruin, lập tức chuyển sang Hình Mèo để ghim mục tiêu, thu hẹp khoảng cách bằng Lao Vồ khi không ẩn thân, và giữ chân kẻ địch bằng Quật Ngã.',
   'guide.classPage.formsNote':
     'Druid chiến đấu bằng cách đổi hình dạng. Hầu hết kỹ năng của Druid thuộc về một hình dạng riêng, nên hình bạn đang mang quyết định bạn có thể thi triển gì, và việc đổi hình tốn một chút mana. Bạn có thể đổi hình trong hoặc ngoài chiến đấu, bao nhiêu lần tùy thích.',
   'guide.classPage.mageEleHeading': 'Nguyên Tố Nước',
@@ -4671,31 +4728,36 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'auth.style': 'Kiểu Dáng',
   'editor.status.campCapReached':
     'Đã đạt giới hạn Trại Quái ({max}). Trại mới không được thêm vào.',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_ashstalker.bonus7':
     'Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Hạ một người chơi thù địch ban Bước Tro, tăng tốc độ di chuyển thêm 40% trong 6 giây.',
   'entities.itemSets.warfare_ashstalker.name': 'Bộ Ashstalker',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_cinderweave.bonus7':
     'Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Phép của bạn có 15% cơ hội ban Hộ Vệ Than Hồng, hấp thụ 120 sát thương trong 8 giây.',
   'entities.itemSets.warfare_cinderweave.name': 'Lễ Phục Cinderweave',
-  'entities.itemSets.warfare_furyforged.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_furyforged.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_furyforged.bonus7':
     'Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Hạ một người chơi thù địch ban Lời Thề Không Vỡ, hấp thụ 200 sát thương trong 10 giây.',
   'entities.itemSets.warfare_furyforged.name': 'Bộ Chiến Furyforged',
-  'entities.itemSets.warfare_stormbound.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_stormbound.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Phép của bạn có 15% cơ hội ban Hộ Vệ Than Hồng, hấp thụ 120 sát thương trong 8 giây.',
   'entities.itemSets.warfare_stormbound.name': 'Áo Lễ Stormbound',
-  'entities.itemSets.warfare_thornhide.bonus2': 'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40.',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'Tăng Điểm Phòng Thủ Chiến Tranh thêm 40. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.warfare_thornhide.bonus4':
     'Tăng Điểm Tấn Công Chiến Tranh thêm 40, và khống chế do người chơi thù địch giáng lên bạn kéo dài ngắn hơn 15%.',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -5012,7 +5074,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Sở Hữu',
   'hudChrome.warfareShop.weapons': 'Vũ Khí',
   'itemUi.market.saleBuyer': 'Đã bán cho {buyer}',
-  'itemUi.market.saleOlder': 'Cộng thêm {count} lượt bán trước đó, đã được tính vào tổng.',
+  'itemUi.market.saleOlder': 'Cộng thêm {count} lượt bán trước đó không được liệt kê.',
   'itemUi.tooltip.maxStack': 'Chồng tối đa: {count}',
   'hud.system.deathRecapAbility': 'Bạn đã chết. Bị hạ gục bởi {ability}.',
   'hud.system.deathRecapDrowned': 'Bạn đã chết. Bạn đã chết đuối.',
@@ -6152,7 +6214,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một tiếng thét kinh hoàng khiến tối đa 5 kẻ địch trong 8 m bỏ chạy vì sợ hãi trong 4 giây. Sát thương có thể phá vỡ hiệu ứng.',
   'entities.abilities.intimidating_shout.name': 'Tiếng Hét Uy Hiếp',
   'entities.abilities.iron_resolve.description':
-    'Nghiến răng chịu đau: tiêu hao tối đa 40 nộ khí (tối thiểu 20) để hấp thụ {absorbPerRage} sát thương cho mỗi điểm nộ khí đã dùng, kéo dài tối đa 10 giây. (Hộ Vệ)',
+    'Nghiến răng chịu đau: một lá chắn hấp thụ sát thương bằng {damage}% máu tối đa của bạn khi thi triển, kéo dài tối đa {duration} giây. (Hộ Vệ)',
   'entities.abilities.iron_resolve.name': 'Ý Chí Sắt Đá',
   'entities.abilities.measured_fury.description':
     'Cơn thịnh nộ chừng mực giúp bạn chi tiêu khôn ngoan hơn: các kỹ năng của bạn tốn ít hơn 10% nộ khí. (nhánh Vũ Khí)',
@@ -6271,7 +6333,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một phát bắn hoang dại làm mục tiêu mất phương hướng trong {duration} giây. Bất kỳ sát thương nào cũng phá hiệu ứng.',
   'entities.abilities.typhoon.name': 'Cuồng Phong',
   'entities.abilities.typhoon.description':
-    'Một luồng gió đẩy lùi mọi kẻ địch trong phạm vi 8 m và làm chúng choáng váng, giảm 50% tốc độ di chuyển trong 4 giây.',
+    'Luồng gió hất mọi địch trong 8 mét ra xa bạn 15 mét và làm chúng choáng váng, giảm tốc độ 50% trong 4 giây. Người chơi địch bị hất lên không trung theo đường thẳng: qua mép vực vẫn tiếp tục bay và chịu sát thương rơi; ngã chết được tính là bạn hạ gục.',
   'entities.abilities.voidfeast.name': 'Yến Tiệc Hư Không',
   'entities.abilities.voidfeast.description':
     'Nuốt một hiệu ứng phép thuật (hiệu ứng có lợi từ kẻ địch hoặc có hại từ đồng minh) và hồi cho bạn 6% máu tối đa.',
@@ -7812,7 +7874,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bắn mục tiêu, gây {damage} sát thương Bí Thuật. Sát thương tăng theo sức tấn công tầm xa.',
   'entities.abilities.arcane_shot.name': 'Bắn Tà Ác',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Khoác lên lốt tuấn mã, tăng tốc độ di chuyển của bạn thêm 30% trong 30 phút. Trong khi hiệu ứng còn hoạt động, nhận sát thương sẽ khiến bạn choáng váng, giảm một nửa tốc độ di chuyển trong 4 giây (mỗi đòn trúng làm mới hiệu ứng choáng váng này).',
+    'Khoác lên lốt tuấn mã, tăng tốc độ di chuyển của bạn thêm 30% trong 30 phút. Trong khi hiệu ứng còn hoạt động, nhận sát thương sẽ khiến bạn choáng váng, giảm một nửa tốc độ di chuyển trong 2 giây (mỗi đòn trúng làm mới hiệu ứng choáng váng này).',
   'entities.abilities.aspect_of_the_cheetah.name': 'Lốt Tuấn Mã',
   'entities.abilities.aspect_of_the_hawk.description':
     'Khoác lên lốt diều hâu, tăng sức tấn công của bạn thêm {buff} trong 30 phút.',
@@ -7831,10 +7893,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một tiếng hô làm tăng {buff}% sức mạnh tấn công của tất cả thành viên tổ đội trong 30 phút.',
   'entities.abilities.battle_shout.name': 'Tiếng Gầm Thép',
   'entities.abilities.bear_charge.description':
-    'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Trong 3 giây sau đó, Hình Sói miễn phí và ghim mục tiêu, làm chậm nó 50% trong 4 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form.',
+    'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Trong 3 giây sau đó, Hình Mèo miễn phí và ghim mục tiêu, làm chậm nó 50% trong 4 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.bear_charge.name': 'Cú Lao Bruin',
   'entities.abilities.bear_form.description':
-    'Biến hình thành gấu: giáp +110%, máu tối đa +30%, tăng mạnh sức mạnh tấn công, các đòn đánh của bạn tích Thịnh Nộ và tạo ra 30% thù hận nhiều hơn. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn. Thi triển lại để trở về hình dạng thi triển phép.',
+    'Biến hình thành gấu: giáp +110%, máu tối đa +30%, tăng mạnh sức mạnh tấn công, các đòn đánh của bạn tích Thịnh Nộ và tạo ra 30% thù hận nhiều hơn. Bạn đánh nhanh gấp đôi với một nửa sát thương mỗi đòn, và mỗi đòn tích gấp đôi Thịnh Nộ. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn. Thi triển lại để trở về hình dạng thi triển phép.',
   'entities.abilities.bear_form.name': 'Hình Bruin',
   'entities.abilities.berserker_rage.description':
     'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
@@ -7851,7 +7913,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tấn công tức thời trong cơn cuồng huyết gây 60% sát thương vũ khí cộng thêm {damage}. (Tuyệt chiêu Cuồng Nộ)',
   'entities.abilities.bloodthirst.name': 'Trích Huyết',
   'entities.abilities.cat_form.description':
-    'Biến bạn thành sói: nhanh nhẹn tăng theo cấp của bạn, sức tấn công +8 cộng 2 mỗi cấp, các đòn của bạn dùng năng lượng và điểm combo, và bạn tạo ra ít hơn 29% mối đe dọa. Biến thành bất kỳ hình dạng nào sẽ ban Sải bước: 60% tốc độ di chuyển trong 3 giây, mỗi 20 giây một lần. Niệm lại để trở về hình dạng pháp sư.',
+    'Biến thành mèo: nhanh nhẹn tăng theo cấp, sức tấn công +8 cộng 2 mỗi cấp, đòn đánh dùng năng lượng và điểm liên kích, di chuyển nhanh hơn 15% và gây ít hơn 29% đe dọa. Đổi sang mọi hình thể cho Sải bước, tăng tốc trong chốc lát. Dùng lại để về hình thể niệm phép.',
   'entities.abilities.cat_form.name': 'Hình Mèo',
   'entities.abilities.charge.description':
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước.',
@@ -7883,7 +7945,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nguyền rủa mục tiêu bằng thống khổ: gây {damage} sát thương Bóng Tối trong 24 giây.',
   'entities.abilities.curse_of_agony.name': 'Tà Chú Thống Khổ',
   'entities.abilities.dash.description':
-    'Chạy nhanh về phía trước, tăng tốc độ di chuyển 50% trong 15 giây. Chỉ trong Hình Mèo.',
+    'Chuyển sang Hình Mèo nếu chưa ở hình này, rồi chạy nhanh hơn 50% trong 15 giây. Dùng được ở mọi hình thể. Tức thì và không kích hoạt hồi chiêu chung.',
   'entities.abilities.dash.name': 'Lao Nhanh',
   'entities.abilities.deadly_poison.description':
     'Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến cộng thêm một lớp độc lên mục tiêu, tối đa 5, và làm mới thời lượng 12 giây. Mỗi lớp gây {damage} sát thương tự nhiên mỗi 2 giây.',
@@ -7955,7 +8017,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Gọi một vụ nổ lửa xuống khu vực mục tiêu, gây {damage} sát thương Lửa cho kẻ địch trong vụ nổ.',
   'entities.abilities.flame_shock.description':
-    'Gây {damage} sát thương Hỏa, rồi {overTime} sát thương Hỏa trong 12 giây. Cú trúng đầu tiên tăng theo Sức Mạnh Phép Thuật.',
+    'Gây {damage} sát thương Hỏa, rồi {overTime} sát thương Hỏa trong {duration} giây. Cú trúng đầu tiên tăng theo Sức Mạnh Phép Thuật.',
   'entities.abilities.flame_shock.name': 'Giật Tàn Lửa',
   'entities.abilities.flametongue_weapon.description':
     'Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương Hỏa.',
@@ -8000,6 +8062,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
   'entities.abilities.heal.name': 'Lời Nguyện Trang Nghiêm',
   'entities.abilities.healing_touch.description': 'Trị liệu cho đồng minh {damage} máu.',
+  'entities.abilities.healing_touch.specNote_restoration':
+    'Mỗi lần thi triển hoàn tất thêm 1 Sắc Xanh (tối đa 3). Sắc Xanh tích lũy rút ngắn thời gian thi triển phép này: 2,2 giây ở 1 Sắc Xanh, 1,9 giây ở 2 và 1,5 giây ở 3. Ân Huệ Tự Nhiên khiến phép này thi triển tức thì, miễn phí và mạnh hơn 25%.',
   'entities.abilities.healing_touch.name': 'Hàn Gắn Hoang Dã',
   'entities.abilities.healing_wave.description':
     'Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật. Phục Hồi: cất 50% lượng hồi đầy đủ trước khi hồi thừa thành Dòng Chữa Lành trong 12 giây, tối đa 30% máu tối đa của mục tiêu.',
@@ -8008,7 +8072,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một đòn đánh mạnh tăng sát thương cận chiến thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn.',
   'entities.abilities.heroic_strike.name': 'Đòn Cướp Phá',
   'entities.abilities.hibernate.description':
-    'Buộc mục tiêu chìm vào giấc ngủ sâu trong tối đa 8 giây. Mọi sát thương sẽ đánh thức nó.',
+    'Khiến mục tiêu ngủ sâu tối đa 8 giây. Mọi sát thương sẽ đánh thức. Với người chơi, mỗi lần lặp lại trong 18 giây kéo dài bằng một nửa lần trước, và lần thứ tư thất bại.',
   'entities.abilities.hibernate.name': 'Giấc Ngủ Sâu',
   'entities.abilities.holy_light.description':
     'Hồi nhanh {damage} máu cho một mục tiêu đồng minh. Việc hồi máu tạo ra 1 Sùng Tín, kể cả khi chưa có chuyên môn. Cộng Hưởng Rực Rỡ hoặc Đòn Đáp Mặt Trời khiến phép này thành tức thì.',
@@ -8067,13 +8131,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Biến kẻ địch thành một con cóc trong tối đa {duration} giây. Con cóc đi lang thang và hồi máu rất nhanh. Mọi sát thương sẽ phá vỡ hiệu ứng. Chỉ với quái thú và nhân hình.',
   'entities.abilities.polymorph.name': 'Mê Hoặc',
   'entities.abilities.pounce.description':
-    'Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói. Khi không ẩn thân, nút này là Lao Vồ.',
+    'Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Mèo. Khi không ẩn thân, nút này là Lao Vồ.',
   'entities.abilities.pounce.name': 'Đòn Lẻn Vồ',
   'entities.abilities.lunge.description':
-    'Lao vào kẻ địch cách xa tới 12 thước, gây 60% sát thương vũ khí và nhận 1 điểm combo. Chỉ dùng được ở Hình Sói.',
+    'Lao vào kẻ địch cách xa tới 12 thước, gây 60% sát thương vũ khí và nhận 1 điểm combo. Chỉ dùng được ở Hình Mèo.',
   'entities.abilities.lunge.name': 'Lao Vồ',
   'entities.abilities.hamstring_bite.description':
-    'Chiêu kết liễu làm choáng mục tiêu trong 1 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 6 giây). Chỉ dùng được ở Hình Sói.',
+    'Chiêu kết liễu làm choáng mục tiêu trong 1 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 6 giây). Chỉ dùng được ở Hình Mèo.',
   'entities.abilities.hamstring_bite.name': 'Quật Ngã',
   'entities.abilities.power_word_fortitude.description':
     'Tăng Thể Lực của mọi thành viên trong nhóm thêm {buff}% trong 30 phút.',
@@ -8082,7 +8146,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Khiên chắn cho một mục tiêu đồng minh, hấp thụ {damage} sát thương trong 30 giây. Kỷ Luật còn liên kết mục tiêu ấy với sát thương Thần Thánh của bạn trong 30 giây.',
   'entities.abilities.power_word_shield.name': 'Thánh Thi Hộ Mệnh',
   'entities.abilities.prowl.description':
-    'Vào trạng thái ẩn thân khi ở Hình Sói. Không thể dùng trong chiến đấu.',
+    'Vào trạng thái ẩn thân khi ở Hình Mèo. Không thể dùng trong chiến đấu.',
   'entities.abilities.prowl.name': 'Rình Rập',
   'entities.abilities.pyroblast.description':
     'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
@@ -8095,7 +8159,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đánh một đòn bằng 10% sát thương vũ khí cộng {damage}. Một cú trúng hồi 15 Tập Trung và ban 1 Đà Săn. Sát thương tăng theo sức tấn công thông qua sát thương vũ khí.',
   'entities.abilities.raptor_strike.name': 'Đòn Moi Ruột',
   'entities.abilities.regrowth.name': 'Nở Hoa Lần Hai',
-  'entities.abilities.rejuvenation.name': 'Hoa Nở Hoang Dã',
   'entities.abilities.renew.description':
     'Hồi {damage} máu cho mục tiêu trong 15 giây, mỗi 3 giây một lần. Lượng hồi tăng theo Sức Mạnh Phép Thuật.',
   'entities.abilities.renew.name': 'Ân Điển Vương Vấn',
@@ -8103,7 +8166,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bao bọc bạn và nhóm của bạn trong năng lượng thánh cho đến khi chết hoặc bị thay thế. Kẻ địch đánh cận chiến một đồng minh chịu ảnh hưởng sẽ nhận {buff} sát thương Thánh, và đồng minh chịu ảnh hưởng gây thêm {buff} sát thương Thánh bằng đòn đánh tự động.',
   'entities.abilities.retribution_aura.name': 'Hào Quang Báo Đền',
   'entities.abilities.revive_pet.description':
-    'Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu.',
+    'Hồi 10% máu tối đa cho bạn đồng hành còn sống mỗi giây trong 8 giây. Nếu bạn đồng hành đã chết, hồi sinh nó với 50% máu.',
   'entities.abilities.revive_pet.name': 'Băng Bó',
   'entities.abilities.righteous_fury.description':
     'Bị động tăng 30% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin.',
@@ -8197,7 +8260,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Biến hình ngay lập tức thành Hình Thần Tốc nhanh nhẹn, tăng tốc độ di chuyển 40% và loại bỏ các hiệu ứng trói chân và làm chậm có thể phá vỡ. Bạn không thể dùng kỹ năng khác khi đang biến hình, nhưng có thể biến hình dù đang hay không đang chiến đấu, lý tưởng để chạy trốn. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn.',
   'entities.abilities.travel_form.name': 'Hình Thần Tốc',
   'entities.abilities.vanish.description':
-    'Biến mất khỏi tầm nhìn, đi vào Duskveil ngay cả trong chiến đấu. Bạn di chuyển chậm hơn 50% khi ẩn nấp. Kéo dài tối đa 10 giây.',
+    'Biến mất khỏi tầm nhìn, đi vào Duskveil ngay cả trong chiến đấu. Bạn di chuyển với tốc độ tối đa khi ẩn nấp. Kéo dài tối đa 10 giây.',
   'entities.abilities.whirlwind.description':
     'Xoay theo một vòng cung chết chóc, đánh tất cả kẻ địch lân cận gây {damage}. (Tài năng Cuồng Nộ)',
   'entities.abilities.whirlwind.name': 'Vòng Xoáy Lưỡi Kiếm',
@@ -11892,7 +11955,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.pet.renameConfirm': 'Đổi Tên',
   'hud.pet.renameLabel': 'Chọn một tên mới cho thú.',
   'hud.pet.revive': 'Băng Bó',
-  'hud.pet.stanceDesc': 'Bấm để chọn Thụ Động, Phòng Thủ, hoặc Hung Hãn.',
   'hud.pet.stanceTitle': 'Thế Đứng Của Thú',
   'hud.pet.taunt': 'Khiêu Khích',
   'hud.prompts.acceptDuel': 'Chấp Nhận Đấu Tay Đôi',
@@ -14017,7 +14079,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.search.typeAbility': 'Kỹ Năng',
   'guide.search.typeDeed': 'Kỳ Công',
   'guide.settingsPage.audioBody':
-    'Cửa sổ tùy chọn không chỉ toàn điểm ảnh. Âm Thanh giữ ba thanh trượt âm lượng, cho hiệu ứng âm thanh, nhạc và giọng nói, cùng một công tắc bật tắt nhạc và bốn công tắc cho những âm thanh dễ gây chán nhất: giọng NPC, tiếng bước chân, âm thanh giao diện và phản hồi khi nhấp. Thẻ Chung của bảng Giao diện mang một bộ chọn ngôn ngữ, dịch lại toàn bộ giao diện ngay tại chỗ, không cần tải lại, và một bộ chọn chủ đề cho lớp áo cửa sổ.',
+    'Cửa sổ tùy chọn còn điều chỉnh âm thanh. Mục Âm thanh có bốn thanh âm lượng cho hiệu ứng, môi trường, nhạc và giọng nói, một công tắc nhạc và bốn công tắc cho những âm thanh thường gây mệt mỏi: giọng NPC, bước chân, âm giao diện và phản hồi nhấp chuột. Thẻ Chung trong bảng Giao diện có mục chọn ngôn ngữ để dịch toàn bộ giao diện ngay lập tức mà không cần tải lại, cùng mục chọn chủ đề trang trí cửa sổ.',
   'guide.settingsPage.audioTitle': 'Âm thanh và ngôn ngữ',
   'guide.settingsPage.autolootBody':
     'Không muốn nhấp vào từng xác? Tự Động Nhặt Khi Đi Ngang, nằm ở thẻ Chiến Đấu của bảng Giao diện và tắt theo mặc định, hốt chiến lợi phẩm từ những kẻ chính bạn hạ gục khi bạn đi ngang qua chúng.',
@@ -14531,7 +14593,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Dồn phép trong 3 giây, gây {damage} sát thương Bóng Tối mỗi giây lên kẻ địch trong 8 m quanh khu vực mục tiêu. Sát thương tăng theo Sức Mạnh Phép Thuật. (Thiên phú tu sĩ)',
   'entities.abilities.multi_shot.description':
-    'Bắn một loạt tên vào khu vực mục tiêu, gây {damage} sát thương Vật lý lên kẻ địch trong bán kính 8 m. (thiên phú Thợ săn)',
+    'Bắn một loạt tên vào khu vực mục tiêu, gây {damage} sát thương Vật lý lên kẻ địch trong vòng 8 yard. (thiên phú Thợ săn)',
   'entities.abilities.prayer_of_healing.description':
     'Hồi {damage} máu cho đồng minh trong 30 m. Lượng hồi tăng theo Sức Mạnh Phép Thuật. (Thần Thánh)',
   'entities.abilities.preparation.description':
@@ -14541,7 +14603,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     'Làm kẻ địch trong 8 m khiếp sợ tối đa 4 giây. Sát thương có thể phá vỡ hiệu ứng.',
   'entities.abilities.shadowstep.description':
-    'Bước xuyên bóng tối đến mục tiêu của bạn, dù là đồng minh hay kẻ địch, mà không phá vỡ Duskveil. (thiên phú Đạo tặc)',
+    'Bước xuyên bóng tối đến mục tiêu của bạn, dù là đồng minh hay kẻ địch, mà không phá vỡ Duskveil. Tích trữ tối đa 2 lượt dùng. (thiên phú Đạo tặc)',
   'entities.abilities.silence.description':
     'Khiến mục tiêu câm lặng trong 4 giây. (thiên phú Tu sĩ)',
   'entities.abilities.tranquility.description':
@@ -14568,7 +14630,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nội tại: đòn chí mạng từ phép của bạn đốt mục tiêu với 30% sát thương đã gây ra trong 6 giây và có thể cộng dồn. (tinh thông Lửa)',
   'entities.abilities.mass_barrier.name': 'Lá Chắn Hàng Loạt',
   'entities.abilities.mass_barrier.description':
-    'Che chắn cho bạn và tối đa 4 đồng minh ở gần trong phạm vi 30 m; mỗi lá chắn hấp thụ 130 sát thương trong 60 giây. (tài năng pháp sư)',
+    'Che chắn cho bạn và tối đa 4 đồng minh ở gần trong phạm vi 30 m; mỗi lá chắn hấp thụ {damage} sát thương trong 15 giây. (tài năng pháp sư)',
   'entities.abilities.overload.name': 'Quá Tải',
   'entities.abilities.overload.description':
     'Phép tiếp theo của bạn được khuếch đại 40% nhưng tốn thêm 50% mana. Kéo dài 10 giây. (tài năng pháp sư)',
@@ -15855,17 +15917,17 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_beast.name': 'Thả Thú Dữ',
   'entities.abilities.wildheart.name': 'Tim Hoang Dã',
   'entities.abilities.bloodhook.description':
-    'Lao tới kẻ địch và gây Vết Thương Móc Máu, gây 34 sát thương Vật Lý cơ bản cộng 26% sức tấn công tầm xa của bạn trong 12 giây qua 4 nhịp. (Dấu ấn Dã Chiến)',
+    'Lao tới kẻ địch và gây vết thương từ Móc Máu, gây 34 sát thương Vật Lý cơ bản cộng 26% Sức Mạnh Tấn Công Tầm Xa qua 4 nhịp trong 12 giây. Khi tới nơi, làm chậm mục tiêu 30% trong 3 giây. (Sinh Tồn)',
   'entities.abilities.bloodtrail_assault.description':
-    'Trong 12 giây, Móc Máu lan một vết thương ở 60% sức mạnh sang tối đa 2 kẻ địch gần đó, Xé Thương ra lệnh cho thú nuôi tấn công gây 18 sát thương, và Đạn Mảnh tăng 2 mét, gây thêm 25% sát thương cơ bản lên mục tiêu chính và kích hoạt thêm 50% sát thương vết thương.',
+    'Trong 12 giây, Móc Máu lan vết thương với 60% sức mạnh tới tối đa 2 địch trong 5 mét, Xé Vết Thương ra lệnh thú cưng tấn công gây 18 sát thương và Đạn Mảnh vươn xa thêm 2 mét, gây thêm 25% sát thương cơ bản lên mục tiêu chính và kích hoạt thêm 50% sát thương vết thương. Khi không có thú cưng còn sống, Tập Trung cũng hồi nhanh hơn 100%.',
   'entities.abilities.cold_focus.description':
     'Trong 12 giây, Phát Bắn Điềm Tĩnh hồi thêm 50% tập trung, còn Kéo Dài tốn ít hơn 25% và niệm nhanh hơn 30%. (Dấu ấn Nhãn Băng)',
   'entities.abilities.fieldcraft_reentry.description':
-    'Bị động: Cắt Dấu làm mới Đà Săn và nạp sẵn Đòn Mổ Bụng hoặc Móc Máu kế tiếp trong 12 giây. Đòn Mổ Bụng gây thêm 15% sát thương mỗi lớp. Móc Máu gây thêm 18 đến 24 sát thương Vật Lý, tăng 15% mỗi lớp và theo sức tấn công tầm xa của bạn. Ở 3 lớp, một trong hai đòn sẽ tiêu Đà Săn. (Dã Chiến)',
+    'Bị động: Khi có Đà Săn, Cắt Dấu chuẩn bị Đòn Moi Ruột hoặc Móc Máu kế tiếp trong 12 giây. Đòn Moi Ruột gây thêm 15% sát thương mỗi cộng dồn. Móc Máu gây thêm 18 đến 24 sát thương Vật Lý, tăng 15% mỗi cộng dồn và theo Sức Mạnh Tấn Công Tầm Xa. Khi có 3 cộng dồn, một trong hai đòn tiêu hao Đà Săn. (Sinh Tồn)',
   'entities.abilities.frostjaw_trap.description':
-    'Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
+    'Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
   'entities.abilities.hunting_momentum.description':
-    'Bị động: Đòn Mổ Bụng ban 1 Đà Săn trong 8 giây, tối đa 3. Ở 3 lớp, Xé Thương gây thêm 45% sát thương đòn đánh và tiêu hết các lớp. (Dã Chiến)',
+    'Bị động: Đòn Moi Ruột và Đạn Mảnh đánh trúng địch mỗi kỹ năng cho 1 Đà Săn, tối đa 3. Kéo dài đến khi tiêu hao hoặc rời giao tranh; mỗi cộng dồn tăng 15% tốc độ di chuyển. Khi có 3 cộng dồn, Xé Vết Thương gây thêm 60% sát thương đòn đánh và tiêu hao cộng dồn. (Sinh Tồn)',
   'entities.abilities.measured_shot.description':
     'Bắn mục tiêu gây {damage} sát thương Vật Lý. Một phát trúng hồi 20 tập trung. Sát thương tăng theo sức tấn công tầm xa.',
   'entities.abilities.pack_command.description':
@@ -15875,11 +15937,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shellskin.description':
     'Giảm 60% sát thương phải chịu trong 8 giây, nhưng ngăn bạn tấn công khi còn hiệu lực.',
   'entities.abilities.shrapnel_charge.description':
-    'Đánh trúng mục tiêu gây 24 đến 30 sát thương Vật Lý và tối đa 4 kẻ địch khác trong 6 mét gây 13 đến 17. Các mục tiêu khác cũng chảy máu 12 sát thương trong 6 giây. Nếu mục tiêu chính mang Vết Thương Móc Máu của bạn, gây ngay 1 nhịp vết thương. Sát thương trực tiếp tăng theo sức tấn công tầm xa.',
+    'Tấn công hình nón dài 10 mét phía trước. Mục tiêu của bạn, hoặc kẻ địch trúng đòn gần nhất nếu mục tiêu ở ngoài hình nón, chịu 24 đến 30 sát thương Vật Lý. Mọi địch khác trong hình nón chịu 7 đến 9 sát thương và chảy máu 12 sát thương trong 6 giây. Nếu mục tiêu chính có vết thương từ Móc Máu của bạn, gây ngay 1 nhịp sát thương vết thương. Đánh trúng địch cho 1 Đà Săn. Sát thương trực tiếp tăng theo Sức Mạnh Tấn Công Tầm Xa.',
   'entities.abilities.stampede.description':
     'Triệu 3 con thú trong 12 giây. Mỗi con tấn công mỗi 2 giây gây {damage} sát thương Vật Lý. Sát thương hiển thị bao gồm 8% sức tấn công tầm xa của bạn trước các thưởng sát thương thú nuôi. Các con thú khóa Hung Tính Bầy Đàn khi được triệu, nhận thêm 10% sát thương mỗi lớp. Khi Bầy Xéo đang hồi chiêu, các Lệnh Bầy Đàn thành công có 20% cơ hội đặt lại, chắc chắn sau 5 lần thất bại. Nó không thể đặt lại khi các con thú còn hoạt động. (Chúa Tể Bầy Đàn)',
   'entities.abilities.trailbreak.description':
-    'Nhảy lùi 12 mét. Nếu bạn có Đà Săn, nó được làm mới và nạp sẵn Tái Nhập trong 12 giây.',
+    'Nhảy lùi 25 mét và thoát khỏi hiệu ứng trói chân cùng làm chậm di chuyển. Nếu bạn có Đà Săn, nó được làm mới và nạp sẵn Tái Nhập trong 12 giây.',
   'entities.abilities.unleash_beast.description':
     'Tiêu 3 Hung Tính Bầy Đàn sau khi thú nuôi của bạn đánh gây 83 đến 105 sát thương Vật Lý và chấn động mọi kẻ địch trong 6 mét gây 26 đến 34. Đòn đánh và chấn động dùng trọn thưởng sát thương thú nuôi 30% của Hung Tính Bầy Đàn và tăng theo sức tấn công của thú nuôi. Trong 8 giây sau đó, thú nuôi gây thêm 25% sát thương, tấn công nhanh hơn 35% và khiến Bắn Tà Ác chém lan tới 2 kẻ địch gần đó.',
   'entities.abilities.wildheart.description': 'Tức thời hồi 30% máu tối đa của bạn.',
@@ -15906,7 +15968,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.description':
     'Bị động: khi Đòn Tổ Tiên đang hồi chiêu, việc tiêu một Điềm Bão có 25% cơ hội đặt lại nó. Nếu 3 cơ hội đầu thất bại, lần thứ 4 luôn đặt lại. (Chiến Hồn)',
   'entities.abilities.thunder_reservoir.description':
-    'Bị động: Tia Hồ Quang và Sét Rẽ Nhánh ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)',
+    'Bị động: Tia Hồ Quang, Sét Rẽ Nhánh và Magma Burst ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)',
   'entities.abilities.tidecall.description':
     'Hồi máu cho một mục tiêu đồng minh {damage}. Lượng hồi tăng theo sức mạnh phép thuật. Cộng toàn bộ lượng hồi trước phần hồi thừa vào Dòng Chữa Lành, tối đa 30% lượng máu tối đa của mục tiêu.',
   'entities.abilities.unleash_weapon.description':
@@ -15978,7 +16040,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
   'entities.abilities.marrowbreak.name': 'Đoạn Tủy',
   'entities.abilities.marrowbreak.description':
-    'Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó tạo lá chắn bằng 18% máu tối đa của bạn trong 8 giây và hoàn lại 15 nộ.',
+    'Tiêu 3 Huyết Cổ của bạn cho một đòn đánh nặng, uy hiếp cao gây {damage} sát thương. Dưới nửa máu, thay vào đó hồi cho bạn 18% máu tối đa và hoàn lại 15 nộ.',
   'entities.abilities.moonlash.name': 'Nguyệt Trào',
   'entities.abilities.moonlash.description':
     'Tiêu 3 Triều Nguyệt của bạn cho một đòn đánh nặng gây {damage} sát thương Bí Thuật: lựa chọn sát thương. Vệt Dương cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một.',
@@ -15987,7 +16049,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt của bạn 6 giây, tối đa {duration} giây mỗi lần. Khi Triều Nguyệt đầy, Nguyệt Chủng trở thành Nguyệt Trào.',
   'entities.abilities.overbloom.name': 'Mãn Khai',
   'entities.abilities.overbloom.description':
-    'Tiêu 5 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Hoa Nở Hoang Dã mới lên mục tiêu.',
+    'Tiêu 3 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với {buff}% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Chữa Lành Bào Tử mới lên mục tiêu.',
   'entities.abilities.redharvest.name': 'Thu Hoạch Đỏ',
   'entities.abilities.redharvest.description':
     'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn.',
@@ -16001,7 +16063,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Huyết Cổ {stacks}/{max}. Đòn trúng từ Vuốt Xé, Lóc Xé, Vết Nứt Máu, Cắn Xé Máu, Vuốt Quét Ngang và Nghiền Xương mỗi lần cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin',
   'hudChrome.auraEffect.verdance':
-    'Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần gieo Hoa Nở Hoang Dã hoặc Nở Hoa Lần Hai MỚI cộng 1. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai',
+    'Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai hoặc Hàn Gắn Hoang Dã cộng 1, và mỗi tầng rút ngắn thời gian thi triển Hàn Gắn Hoang Dã. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai',
   'hudChrome.continentMap.levels': 'Cấp {min} đến {max}',
   'hudChrome.continentMap.summary': 'Bản đồ thế giới. Chọn một vùng để mở bản đồ của vùng đó.',
   'hudChrome.continentMap.title': 'Bản Đồ Thế Giới',
@@ -16385,7 +16447,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.backstab.specNote_assassination':
     'Mỗi đòn đánh trúng thêm 1 Nghi Thức Độc (tối đa 6) và hoàn lại 15 năng lượng. Ở 6 Nghi Thức Độc, Giấc Ngủ Vùi Đất trở thành Xé Độc (gây toàn bộ sát thương chảy máu còn lại của bạn cùng lúc).',
   'entities.abilities.blade_flurry.description':
-    'Tung ra một loạt đao, tăng tốc độ đánh 20% trong 12 giây. (động cơ Thuggery)',
+    'Tung ra một loạt đao, tăng tốc độ đánh 20% trong 30 giây. (động cơ Thuggery)',
   'entities.abilities.bone_armor.description':
     'Bọc quanh bạn một lớp xương, hấp thụ sát thương bằng 20% máu tối đa của bạn.',
   'entities.abilities.bone_armor.name': 'Giáp Xương',
@@ -16400,7 +16462,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.',
   'entities.abilities.claw.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
   'entities.abilities.cold_blood.description':
-    'Tập trung sát ý để đòn tấn công tiếp theo của bạn chắc chắn chí mạng. (động cơ Knifework)',
+    'Tập trung sát ý để 5 đòn tấn công tiếp theo của bạn chắc chắn chí mạng. (động cơ Knifework)',
   'entities.abilities.corpse_explosion.description':
     'Hy sinh một Pháp Sư Xương trước tiên, sau đó đến một Chiến Binh Xương, và chỉ hy sinh một Cánh Mộ như phương án cuối cùng. Trong số các bản trùng lặp, nó chọn con có thời lượng còn lại thấp nhất, rồi đến con yếu nhất, để gây {damage} sát thương Bóng Tối tại vị trí đã chọn.',
   'entities.abilities.corpse_explosion.name': 'Nổ Xác',
@@ -16451,7 +16513,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Giáng sự phán xét lên Ác Nhãn chính của bạn trong 15 giây, cấp 40 Kết Án và 3 Sợi Định Mệnh, kích hoạt Chiếm Hữu, nhân đôi Kết Án tạo ra qua Mắt Nguyền chính, và tăng 20% sát thương của Phán Quyết. Phán Quyết đầu tiên hoàn lại 50 Kết Án.',
   'entities.abilities.hour_of_judgment.name': 'Giờ Phán Xét',
   'entities.abilities.kidney_shot.description':
-    'Chiêu kết liễu làm choáng mục tiêu trong 1 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 6 giây).',
+    'Chiêu kết liễu làm choáng mục tiêu trong 2 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 7 giây).',
   'entities.abilities.litany_of_guilt.description':
     'Nguyền rủa Ác Nhãn chính của bạn trong 6 giây. Mỗi lần nhận Kết Án sẽ giải phóng một đợt sóng gây sát thương cho tối đa 2 kẻ địch khác trong bán kính 8 thước, tối đa một lần mỗi giây. Cấp 2 kéo dài hiệu ứng này lên 8 giây và 4 kẻ địch.',
   'entities.abilities.litany_of_guilt.name': 'Kinh Cầu Tội Lỗi',
@@ -16461,7 +16523,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.description':
     'Một đòn tấn công nghiền nát làm tăng sát thương cận chiến thêm {damage} và gây lượng thù hận lớn. Kích hoạt ở đòn đánh kế tiếp của bạn. Chỉ dùng được ở Hình Bruin.',
   'entities.abilities.maul.specNote_feral':
-    'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó khiên cho bạn 18% máu tối đa và hoàn lại 15 nộ khí.',
+    'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó hồi cho bạn 18% máu tối đa và hoàn lại 15 nộ khí.',
   'entities.abilities.moonfire.description':
     'Thiêu đốt kẻ địch bằng lửa trăng gây {damage} sát thương Bí Thuật cộng thêm sát thương theo thời gian.',
   'entities.abilities.moonfire.specNote_balance':
@@ -16488,20 +16550,20 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiêu hao 1 Mảnh Linh Hồn để thêm một Chiến Binh Xương thường trực vào Quân Đoàn 2 chỗ của bạn. Chỉ một con có thể phục vụ bạn. Nó chém lan sang kẻ địch gần đó gây 45% sát thương mỗi 6 giây, và Mệnh Lệnh Gặt Hái ghim mục tiêu của nó bằng hiệu ứng làm chậm 40% trong 4 giây.',
   'entities.abilities.raise_skeletal_warrior.name': 'Triệu Hồi Chiến Binh Xương',
   'entities.abilities.rake.description':
-    'Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 18 giây. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.',
+    'Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây {overTime} sát thương chảy máu trong 18 giây. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.',
   'entities.abilities.rake.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
   'entities.abilities.reaping_command.description':
     'Tiêu hao 2 Mảnh Linh Hồn để ra lệnh cho mọi thuộc hạ Bất Tử đồng loạt tấn công. Vệ Mộ khiêu khích và gồng mình, Chiến Binh ghim chặt, Pháp Sư Xương phơi bày phòng ngự phép, và Cánh Mộ xé toạc mọi kẻ địch bị đánh trúng.',
   'entities.abilities.reaping_command.name': 'Mệnh Lệnh Gặt Hái',
   'entities.abilities.regrowth.description':
-    'Hồi máu cho mục tiêu đồng minh {damage} và thêm một lượng hồi máu nữa trong 21 giây.',
+    'Hồi máu cho mục tiêu đồng minh {damage} và thêm một lượng hồi máu nữa trong 15 giây. Nếu hiệu ứng kéo dài hết thời gian, nó hồi máu cho mục tiêu thêm một lần bằng lượng hồi máu ban đầu.',
   'entities.abilities.regrowth.specNote_restoration':
-    'Gieo một chồi hoa MỚI sẽ thêm 1 Sắc Xanh (tối đa 5).',
+    'Mỗi lần thi triển thêm 1 Sắc Xanh (tối đa 3), kể cả khi làm mới một chồi hoa đang còn hiệu lực.',
   'entities.abilities.rejuvenation.description': 'Hồi máu cho mục tiêu {damage} trong 12 giây.',
   'entities.abilities.rejuvenation.specNote_restoration':
-    'Gieo một chồi hoa MỚI sẽ thêm 1 Sắc Xanh (tối đa 5). Ở 5 Sắc Xanh, Hồi Phục Nhanh trở thành Mãn Khai.',
+    'Mỗi lần thi triển thêm 1 Sắc Xanh (tối đa 3), kể cả khi làm mới một chồi hoa đang còn hiệu lực. Ở 3 Sắc Xanh, Hồi Phục Nhanh trở thành Mãn Khai.',
   'entities.abilities.rip.description':
-    'Đòn kết liễu khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 36 sát thương cộng 24 cho mỗi điểm tổ hợp đã dùng (5 điểm tổ hợp: tổng {damage}). Chỉ trong Hình Mèo.',
+    'Đòn kết thúc khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 72 sát thương cộng 48 mỗi điểm liên kích tiêu hao (5 điểm: tổng {damage}). Chỉ ở Hình Mèo.',
   'entities.abilities.rip.specNote_feral': 'Đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
   'entities.abilities.ruinous_brand.description':
     'Đóng dấu một kẻ địch trong 15 giây. 3 phép trực tiếp tiếp theo của bạn sẽ vọng lại 25% sát thương lên kẻ địch bị đóng dấu, hoặc sao chép 50% sát thương vào nó khi được thi triển lên mục tiêu khác. Tiếng vọng của Tia Hủy Diệt cũng được tính là đòn chí mạng, nhưng không nhân thêm hệ số sát thương chí mạng khác.',
@@ -16538,11 +16600,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance':
     'Ở Dạng Cú Mặt Trăng, mỗi lần thi triển hoàn tất thêm 1 Triều Nguyệt (tối đa 3). Ở 3 Triều Nguyệt, nút này trở thành Vệt Dương: một đòn đánh tức thời gây 80 đến 100 sát thương Thiên Nhiên cộng thêm 45 sát thương thiêu đốt trong 9 giây, hồi 35 mana và tiêu hết cả 3.',
   'entities.abilities.stealth.description':
-    'Ẩn giấu bạn trong bóng tối: kẻ địch hầu như không nhận ra bạn, nhưng bạn di chuyển chậm hơn 50%. Tấn công hoặc nhận sát thương sẽ phá vỡ Màn Chạng Vạng. Thi triển lại để bước ra.',
+    'Ẩn giấu bạn trong bóng tối: kẻ địch hầu như không nhận ra bạn và bạn di chuyển với tốc độ tối đa. Tấn công hoặc nhận sát thương sẽ phá vỡ Màn Chạng Vạng. Thi triển lại để bước ra.',
   'entities.abilities.stealth.specNote_subtlety':
     'Mỗi đòn mở màn bạn dùng từ Màn Chạng Vạng thêm 1 U Ám (tối đa 3).',
   'entities.abilities.swiftmend.description':
-    'Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Gieo Hoa Nở Hoang Dã và Nở Hoa Lần Hai sẽ thêm Sắc Xanh; ở 5 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)',
+    'Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage} máu. Mỗi lần thi triển Chữa Lành Bào Tử, Nở Hoa Lần Hai và Hàn Gắn Hoang Dã thêm 1 Sắc Xanh; ở 3 Sắc Xanh, nút này trở thành Mãn Khai, hồi máu tức thời cho mọi đồng minh đang mang hiệu ứng hồi máu theo thời gian của bạn bằng 60% lượng còn lại của các hiệu ứng đó. (động cơ Groveheart)',
   'entities.abilities.swipe.description':
     'Quét vuốt qua kẻ địch gần đó gây {damage} sát thương. Gây thêm thù hận. Chỉ dùng được ở Hình Bruin.',
   'entities.abilities.swipe.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3).',
@@ -16617,7 +16679,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cooldownCap':
     '{used} trên {cap} giây giảm thời gian hồi chiêu đã dùng trong khung này',
   'hudChrome.auraEffect.bruinRushWindow':
-    'Hình Sói không tốn mana và ghim mục tiêu Cú Lao Bruin của bạn, làm chậm nó {pct}% trong {sec} giây',
+    'Hình Mèo không tốn mana và ghim mục tiêu Cú Lao Bruin của bạn, làm chậm nó {pct}% trong {sec} giây',
   'hudChrome.auraEffect.desolation':
     '{charges} tầng: Tia Hủy Diệt tiếp theo của bạn thi triển nhanh hơn {castPct}%, hoặc Mưa Lửa tiếp theo của bạn đổ xuống ngay lập tức',
   'hudChrome.auraEffect.duskfireClaim': 'Cái chết cấp {value} Wrack',
@@ -16980,7 +17042,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Đó là hai hành động riêng biệt trên cùng một cái xác. Mọi thứ xác mang theo, tiền vàng và đồ rơi cùng với các thành phần có thể thu hoạch, mở ra trong cùng một cửa sổ, nhưng phím tương tác và Nhặt Chiến Lợi Phẩm chỉ lấy phần chiến lợi phẩm thông thường, vốn theo các quy tắc loot thông thường. Thu hoạch là phía nghề nghiệp, tước nguyên liệu từ chính cái xác, và chỉ xảy ra khi bạn chọn Thu Hoạch trong cửa sổ đó.\n\nThu hoạch là người đến trước, dùng một lần: mỗi xác chỉ có thể được thu hoạch đúng một lần, bởi người đầu tiên đến nhận, có mặt trực tuyến hay không. Trọng Tâm Thị Trấn của bạn quyết định những gì bạn nhận được: khi đứng trong trung tâm thị trấn, bạn có thể phân bổ 10 điểm trọng tâm cho các loại thành phần bạn quan tâm, và mỗi thành phần được trọng tâm nhận được bậc tốt hơn (cứ 5 điểm tăng một bậc, tối đa hai bậc) và nhiều hơn (10 phần trăm mỗi điểm). Các thành phần không được trọng tâm không bao giờ bị làm tệ đi.',
   'guide.profPages.faq.a4':
-    'Bạn vừa trúng một vụ hời. Khoảng 1 trong 90 lần thu hoạch kích hoạt một sự kiện thu thập hiếm (lõi cây cổ đại trên cây, mạch nguyên sơ trong quặng, bông hoa nở dưới ánh trăng trong thảo dược): nó nhân sản lượng lên năm lần, đóng dấu tên bạn lên từng đơn vị, và loan báo phát hiện đó cho cả khu vực. Một lần tung phẩm chất hiếm trở lên ở lần thu hoạch thường cũng đóng dấu vào sản lượng.\n\nNguyên liệu có dấu thợ đáng giữ lại hoặc bán đắt: cầm bất kỳ bản có dấu thợ nào của một nguyên liệu đang cần khi đứng ở bàn chế tác sẽ cộng thêm 2 điểm phần trăm vào tỉ lệ kiệt tác. Chỉ cần nhớ rằng chúng chỉ xếp chồng với những bản có dấu thợ giống hệt, nên chúng giữ ô túi riêng của mình.',
+    'Bạn tìm được một mẻ thu hoạch lớn. Khoảng 1 trong 90 lần thu hoạch kích hoạt sự kiện thu thập hiếm: lõi gỗ cổ đại trong cây, mạch quặng nguyên sơ hoặc hoa tắm ánh trăng trong thảo dược. Sản lượng tăng gấp năm, từng đơn vị được ký tên bạn và phát hiện được thông báo khắp khu vực. Lần thu hoạch bình thường đạt chất lượng hiếm trở lên cũng ký tên toàn bộ sản lượng.\n\nNguyên liệu có chữ ký đáng để giữ hoặc bán giá cao: giữ bất kỳ đơn vị có chữ ký của nguyên liệu cần thiết trong túi hoặc Kho Nguyên Liệu, tại nơi chế tác có thể lấy dùng, sẽ cộng 2 điểm phần trăm vào tỉ lệ kiệt tác. Chúng có thể chung chồng tương thích với nguyên liệu không ký hoặc của người thu thập và người ký khác mà không mất dấu; mỗi nguồn và số lượng được lưu riêng.',
   'guide.profPages.faq.a5':
     'Đến bất kỳ bàn chế tác nào với món đồ trong túi và trả tiền cho chủ bàn. Phí theo phẩm chất vật phẩm: 25 bạc cho đồ khác thường, 1 vàng cho đồ hiếm, 4 vàng cho đồ sử thi; huyền thoại trả theo giá sử thi, và đồ phổ thông ủy thác trả theo giá khác thường. Phải là bàn thật: bàn di động không bao giờ cung cấp dịch vụ này.\n\nPhí mua lấy tờ giấy trắng, không phải thuốc chữa: món đồ vẫn là ủy thác, nên nó ràng buộc lại với bất kỳ ai nhận nó trong lần giao dịch tiếp theo. Nếu nhiều bản đã ràng buộc chia sẻ một ngăn xếp, một bản được bóc ra và tháo giao kèo mỗi lần trả phí.',
   'guide.profPages.faq.a8':
@@ -17697,7 +17759,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Khi Psalm of Warding được tiêu thụ hoàn toàn, Scouring Hymn tiếp theo trong 10 giây sẽ được thi triển ngay lập tức. Không thể xảy ra thường xuyên hơn một lần mỗi 15 giây.',
   'entities.itemSets.emberscreed.name': 'Lễ Phục Tín Điều Tàn Than',
   'entities.itemSets.forgewall.bonus2':
-    'Iron Resolve chuyển hóa cơn giận với 5 điểm hấp thụ mỗi điểm thay vì 4.',
+    'Lá chắn của Iron Resolve hấp thụ 25% máu tối đa của bạn thay vì 20%.',
   'entities.itemSets.forgewall.bonus4':
     'Thi triển Shieldcrack giảm 2 giây thời gian hồi còn lại của Iron Resolve.',
   'entities.itemSets.forgewall.name': 'Khiên Aegis Thành Rèn',
@@ -17710,8 +17772,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.gravebrand.bonus4':
     'Các đòn hợp xướng của Reaping Command gây thêm 25% sát thương.',
   'entities.itemSets.gravebrand.name': 'Lễ Phục Dấu Mộ',
-  'entities.itemSets.grovespring.bonus2':
-    'Hồi Phục Nhanh ưu tiên tiêu thụ Wildbloom hoặc Second Bloom của bạn trước và hồi thêm 25% máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.',
   'entities.itemSets.grovespring.bonus4':
     'Overbloom thu hoạch 75% các hiệu ứng còn lại của bạn và tích trữ 1 Verdance sau đó.',
   'entities.itemSets.grovespring.name': 'Phục Trang Suối Rừng',
@@ -18500,7 +18560,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Theo dõi {count} lần chế tạo {name} làm mục tiêu thu thập',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Các đòn đánh cận chiến trúng đích có thể tăng 50 Sức mạnh trong 15 giây và hồi 200 máu cho bạn. Áp dụng các hiệu chỉnh hồi phục. Mỗi đòn có xác suất 1% cho mỗi 0,6 giây tốc độ cơ bản của vũ khí ra đòn. Không có hồi chiêu nội tại. Cả hai tay dùng chung một buff; mọi lần kích hoạt đều làm mới buff này và nó không bao giờ cộng dồn. Đòn đánh tầm xa không kích hoạt hiệu ứng này. Dạng Sói thay vào đó dùng tốc độ vung cơ bản 1 giây.',
+    'Các đòn cận chiến đánh trúng của bạn có thể tăng 50 Sức mạnh trong 15 giây và hồi cho bạn 200 máu. Áp dụng các hệ số điều chỉnh hồi máu. Mỗi lần trúng đòn có xác suất 1% cho mỗi 0,6 giây tốc độ cơ bản của vũ khí ra đòn. Không có hồi chiêu nội bộ. Hai tay dùng chung một hiệu ứng; mỗi lần kích hoạt sẽ làm mới và hiệu ứng không cộng dồn. Đòn đánh tầm xa không kích hoạt hiệu ứng này. Trong Hình Mèo, đòn đánh tự động dùng tốc độ chân 1 giây. Đòn đánh và đòn kết liễu trong Hình Mèo và Hình Bruin dùng tốc độ của chính vũ khí; Vuốt Quét Ngang chỉ xét một lần mỗi lần dùng, không phải mỗi mục tiêu.',
   'hudChrome.enchantName.enchant_chest_armor': 'Khắc Ngực: Gia cố',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Khắc Ngực: Sức bền Cường hóa',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Khắc Ngực: Sức bền Lấp lánh',
@@ -19376,7 +19436,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'Thắng trận xếp hạng nhận Danh Dự, tiền tệ PvP. Một trận thua chơi đến hết vẫn nhận phần nhỏ hơn, hòa cũng vậy, nên thứ thực sự mất khi thua chỉ là điểm xếp hạng. Danh Dự thưởng cho những trận đấu thực sự: đánh bại cùng một đối thủ hoặc đội lần nữa trong cùng ngày không nhận thêm gì, thua họ lần nữa cũng vậy. Trong ngày thắng nhiều, giai đoạn đầu nhận đủ thưởng, sau đó thưởng mỗi trận thắng giảm một nửa, rồi giảm thêm một nửa khi thắng nhiều hơn nữa và giữ ở mức đó. Đối thủ bỏ cuộc vẫn làm thay đổi điểm xếp hạng nhưng không cho Danh Dự. Ngày được tính theo máy chủ: chuyển ngày vào giờ đặt lại mỗi đêm, cùng mốc xóa mọi giới hạn hằng ngày.',
   'guide.arenaPage.warfareBodyStatsStay':
-    'Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái.',
+    'Mọi món Chiến Trận đều có Điểm Tấn Công Chiến Trận và Điểm Phòng Thủ Chiến Trận; hai chỉ số này hoàn toàn không tác dụng với quái vật. Chúng chỉ áp dụng khi đánh người chơi khác trong đấu tay đôi, đấu trường hoặc chiến trường: Tấn Công tăng sát thương gây ra, Phòng Thủ giảm sát thương nhận vào, mỗi loại có giới hạn riêng. Mỗi dòng giáp cũng là một bộ; thưởng bộ cũng là điểm Chiến Trận hoặc hiệu ứng chỉ tác dụng với người chơi, nên thưởng của cả bộ Danh Dự không có tác dụng với trùm phó bản. Bản thân các món vẫn có chỉ số thường, giáp và sát thương vũ khí hoạt động ở mọi nơi; chỉ điểm Chiến Trận và thưởng bộ ngừng tác dụng khi đánh quái. Có một ngoại lệ hoạt động ở mọi nơi: hai món của bất kỳ bộ nào trong số này còn khiến sát thương phải chịu không làm chậm việc thi triển phép nữa.',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'Đó là sự đánh đổi có chủ đích. Trang bị Chiến Trận dành cho việc đấu với người chơi, không phải đường tắt vượt các bậc phó bản: một món Chiến Trận không có những điểm chỉ số chiến đấu mà món sử thi phó bản cùng ô có; thay vào đó, điểm Chiến Trận và thưởng bộ của nó được dành hoàn toàn cho đối thủ là người chơi. Muốn đứng vững trong đấu trường thì hãy mua. Muốn vượt phó bản anh hùng nhanh hơn thì hãy kiếm trang bị trong phó bản.',
   'guide.controls.harvestJournal': 'Nhật Ký Thu Hoạch',
@@ -19474,7 +19534,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Cách tiền di chuyển qua các nghề: phí và nơi tiêu tiền chính xác, thứ thật sự bán được, quy tắc Chợ Thế Giới, đơn việc, ủy thác và vị trí của các bộ sưu tập do raid tài trợ bên cạnh chế tác thường.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Một số vật phẩm mang một cái tên. Các dòng nguồn của một nguyên liệu cho biết ai đã thu thập từng nhóm đơn vị, còn một dấu ký-tên-bởi riêng biệt xác định người ký tên cao cấp nếu có. Hai thông tin này độc lập với nhau: nguyên liệu thu thập thông thường ghi lại người thu thập mà không có chữ ký, còn hàng có chữ ký từ trước có thể nêu tên người ký trong khi thành thật báo rằng không có người thu thập được ghi lại. Một vật phẩm hoàn chỉnh thì lại cho biết ai đã chế tác ra nó. Những ghi nhận này theo vật phẩm qua các giao dịch, ngân hàng, thư tín, Chợ Thế Giới, và cả khi bán lại cho người bán, và không bao giờ mờ đi.\n\nViệc thu thập tự động ký tên cho thành quả tốt nhất của nó: bất kỳ lần thu hoạch nào ra kết quả hiếm hoặc tốt hơn sẽ đến kèm chữ ký, và các phát hiện hiếm sẽ ký cho toàn bộ phần thu hoạch dồi dào gấp năm của chúng. Kết quả may mắn từ việc thu hoạch xác sẽ ký cho sản lượng của nó ở những họ không có mẫu vật để cho, và ở những họ có, sản lượng vẫn giữ bình thường còn mẫu vật nguyên vẹn có chữ ký được tạo thêm bên cạnh. Việc chế tác cũng ký theo cùng cách: mọi bản của một sản phẩm hiếm hoặc tốt hơn được tạo ra đều có chữ ký, và một kiệt tác luôn có chữ ký bất kể phẩm chất của nó, vì vậy phiên bản tinh xảo nhất của bất kỳ vật phẩm nào luôn nêu tên người tạo ra nó. Chữ ký của một nguyên liệu thông thường gắn liền với chính các đơn vị đó và không thể mất đi chỉ vì một chồng tương thích đã chứa người thu thập hay người ký khác. Một mẫu vật nguyên vẹn riêng biệt là một vật phẩm tách biệt và vẫn cần chỗ trống; nếu không đủ chỗ, sản lượng xác thông thường vẫn còn nhưng mẫu vật sẽ mất.\n\nVật phẩm hoàn chỉnh giữ một danh tính nghiêm ngặt duy nhất, nên hai bản chỉ gộp lại khi mọi dấu hiệu trùng khớp hoàn toàn: cùng vật phẩm, cùng người ký, cùng chỉ số kiệt tác, cùng phù chú, cùng ràng buộc. Nguyên liệu tương thích chia sẻ một ô trống giữa các người thu thập và người ký khác nhau trong khi vẫn giữ số lượng riêng cho từng nguồn. Chú giải khi rê chuột tổng hợp các nguồn; nhấp phải vào chồng đồ để xem danh sách đầy đủ (trên thiết bị chạm, dùng nút Nguồn của nó). Tách theo người thu thập giữ các chồng đó riêng biệt trong túi đồ của bạn, và sắp xếp sẽ tôn trọng lựa chọn đó. Nguyên liệu được chuyển có thể gộp bình thường với nguyên liệu của người nhận.\n\nChữ ký đền đáp lại cho người chế tác: giữ bất kỳ bản có chữ ký của một nguyên liệu cần thiết tại bàn chế tác, bất kể ai đã ký, sẽ cộng thêm 2 điểm phần trăm tỉ lệ kiệt tác, và giữ một nguyên liệu do chính tay bạn ký sẽ giảm số lượng cần của nguyên liệu đó đi một (không bao giờ dưới một), trừ khi nguyên liệu đó được đánh dấu không thể giảm số lượng; các nguyên liệu lõi raid luôn giữ nguyên chi phí đầy đủ. Chính tác phẩm hiếm hoặc tốt hơn mà bạn ký còn tiếp tục dạy lại cho bạn, hiện tại chỉ qua các loại dược phẩm chế tác: uống một dược phẩm hiếm bạn đã pha chế và ký tên, và một luồng kỹ năng nhỏ sẽ chảy ngược lại nghề đã tạo ra nó, miễn là nghề đó là một trong các nghề chính đang hoạt động của bạn. Đây thực sự chỉ là nhánh dược phẩm và không gì khác, vì vậy một eliksir, một cuộn giấy, hay một bình tinh túy sẽ không dạy lại gì cho bạn cho dù nó được ký tên tinh xảo đến đâu.',
+    'Một số vật phẩm mang một cái tên. Các dòng nguồn của một nguyên liệu cho biết ai đã thu thập từng nhóm đơn vị, còn một dấu ký-tên-bởi riêng biệt xác định người ký tên cao cấp nếu có. Hai thông tin này độc lập với nhau: nguyên liệu thu thập thông thường ghi lại người thu thập mà không có chữ ký, còn hàng có chữ ký từ trước có thể nêu tên người ký trong khi thành thật báo rằng không có người thu thập được ghi lại. Một vật phẩm hoàn chỉnh thì lại cho biết ai đã chế tác ra nó. Những ghi nhận này theo vật phẩm qua các giao dịch, ngân hàng, thư tín, Chợ Thế Giới, và cả khi bán lại cho người bán, và không bao giờ mờ đi.\n\nViệc thu thập tự động ký tên cho thành quả tốt nhất của nó: bất kỳ lần thu hoạch nào ra kết quả hiếm hoặc tốt hơn sẽ đến kèm chữ ký, và các phát hiện hiếm sẽ ký cho toàn bộ phần thu hoạch dồi dào gấp năm của chúng. Kết quả may mắn từ việc thu hoạch xác sẽ ký cho sản lượng của nó ở những họ không có mẫu vật để cho, và ở những họ có, sản lượng vẫn giữ bình thường còn mẫu vật nguyên vẹn có chữ ký được tạo thêm bên cạnh. Việc chế tác cũng ký theo cùng cách: mọi bản của một sản phẩm hiếm hoặc tốt hơn được tạo ra đều có chữ ký, và một kiệt tác luôn có chữ ký bất kể phẩm chất của nó, vì vậy phiên bản tinh xảo nhất của bất kỳ vật phẩm nào luôn nêu tên người tạo ra nó. Chữ ký của một nguyên liệu thông thường gắn liền với chính các đơn vị đó và không thể mất đi chỉ vì một chồng tương thích đã chứa người thu thập hay người ký khác. Một mẫu vật nguyên vẹn riêng biệt là một vật phẩm tách biệt và vẫn cần chỗ trống; nếu không đủ chỗ, sản lượng xác thông thường vẫn còn nhưng mẫu vật sẽ mất.\n\nVật phẩm hoàn chỉnh giữ một danh tính nghiêm ngặt duy nhất, nên hai bản chỉ gộp lại khi mọi dấu hiệu trùng khớp hoàn toàn: cùng vật phẩm, cùng người ký, cùng chỉ số kiệt tác, cùng phù chú, cùng ràng buộc. Nguyên liệu tương thích chia sẻ một ô trống giữa các người thu thập và người ký khác nhau trong khi vẫn giữ số lượng riêng cho từng nguồn. Chú giải khi rê chuột tổng hợp các nguồn; nhấp phải vào chồng đồ để xem danh sách đầy đủ (trên thiết bị chạm, dùng nút Nguồn của nó). Tách theo người thu thập giữ các chồng đó riêng biệt trong túi đồ của bạn, và sắp xếp sẽ tôn trọng lựa chọn đó. Nguyên liệu được chuyển có thể gộp bình thường với nguyên liệu của người nhận.\n\nChữ ký đền đáp lại cho người chế tác: giữ bất kỳ đơn vị có chữ ký của nguyên liệu cần thiết, bất kể ai đã ký, trong túi hoặc Kho Nguyên Liệu tại nơi chế tác có thể lấy dùng, sẽ cộng thêm 2 điểm phần trăm tỉ lệ kiệt tác, và giữ một nguyên liệu do chính tay bạn ký sẽ giảm số lượng cần của nguyên liệu đó đi một (không bao giờ dưới một), trừ khi nguyên liệu đó được đánh dấu không thể giảm số lượng; các nguyên liệu lõi raid luôn giữ nguyên chi phí đầy đủ. Chính tác phẩm hiếm hoặc tốt hơn mà bạn ký còn tiếp tục dạy lại cho bạn, hiện tại chỉ qua các loại dược phẩm chế tác: uống một dược phẩm hiếm bạn đã pha chế và ký tên, và một luồng kỹ năng nhỏ sẽ chảy ngược lại nghề đã tạo ra nó, miễn là nghề đó là một trong các nghề chính đang hoạt động của bạn. Đây thực sự chỉ là nhánh dược phẩm và không gì khác, vì vậy một eliksir, một cuộn giấy, hay một bình tinh túy sẽ không dạy lại gì cho bạn cho dù nó được ký tên tinh xảo đến đâu.',
   'guide.profPages.effectFeast':
     'Bày một bữa tiệc để người khác ăn, mỗi người một phần: {servings} phần, kéo dài {minutes} phút.',
   'guide.profPages.effectFeastServing': 'Mỗi phần hồi {amount} máu trong {seconds} giây.',
@@ -19845,4 +19905,243 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
   'guide.interfacePage.framesGovernedUnitTooltip':
     'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
+  'hudChrome.meters.detailHealSubtitle':
+    'Hiệu quả: {effective} | Hồi dư: {overheal} ({overhealPercent}) | Lượt: {hits} ({critPercent} chí mạng)',
+  'hudChrome.meters.detailHitSubtitle':
+    'Lượt: {hits} | Chí mạng: {crits} ({critPercent}) | Trung bình: {average} | Nhỏ/lớn nhất: {min} / {max}',
+  'hudChrome.options.ambienceVolume': 'Âm lượng môi trường',
+  'hudChrome.mapAtlas.resizeRailAria': 'Chiều rộng thanh bên bản đồ',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'Kéo để đổi kích thước thanh bên bản đồ. Nhấp đúp để đặt lại.',
+  'guide.worldPvpPage.hillBodyFlat':
+    'Cứ mỗi ba giờ, vào một thời điểm không thể đoán trước, toàn cõi được thông báo rằng một ngọn đồi sẽ xuất hiện tại một vùng tự do giao chiến sau mười lăm phút, và vòng tròn của nó được đánh dấu trên đất trống. Đồi tồn tại bốn mươi lăm phút rồi biến mất. Trong thời gian đó, cứ năm phút lại thông báo vị trí và các nhóm có tổng thời gian chiếm giữ lâu nhất. Nhóm có nhiều người chơi đứng trong vòng tròn nhất tranh giành đồi và chiếm được sau tổng cộng ba mươi giây hơn quân số. Nhóm đối thủ bước vào chỉ tạm dừng bộ đếm cho đến khi nhóm bạn lại dẫn đầu; bộ đếm chỉ bắt đầu lại nếu không còn thành viên nào của nhóm bạn sống trong vòng tròn. Người chơi đơn lẻ được tính là nhóm một người và giữ nguyên quyền kiểm soát đồi khi lập nhóm, nhưng thành viên tổ đội đột kích hoàn toàn không được tính. Mỗi thành viên của nhóm đang giữ đồi đứng trong vòng tròn nhận cùng một lượng Danh Dự mỗi phút, bất kể đã giữ đồi bao lâu. Một nhóm đủ người giữ đồi không bị tranh chấp suốt thời gian tồn tại nhận xấp xỉ ba trận thắng chiến trường. Khi đồi biến mất, nếu nhóm có tổng thời gian giữ lâu nhất đã giữ ít nhất mười phút, mọi người đã đứng trong vòng tròn ít nhất một phút trong thời gian nhóm đó giữ đồi và vẫn thuộc nhóm đó đều nhận một trận thắng cho hàng PvP của Kho Tuần. Thanh phía trên bãi đấu hiển thị bên đang giữ, quân số hai bên và bộ đếm chiếm giữ; nhập /hill trong trò chuyện để biết vị trí.',
+  'errors.noUpdateFound': 'Không tìm thấy bản cập nhật. Hãy thử lại sau ít phút.',
+  'errors.searchUpdates': 'Tìm bản cập nhật',
+  'errors.updateSearchFailed': 'Không thể kiểm tra bản cập nhật. Vui lòng thử lại.',
+  'errors.updateUnavailable': 'Cập nhật qua cửa hàng trò chơi hoặc tải bản ứng dụng mới nhất.',
+  'hudChrome.auraEffect.formSporemender':
+    'Hình Thể Chữa Lành Bào Tử: tăng {pct}% lượng hồi máu, tăng {armorPct}% giáp và giảm {slowPct}% tốc độ di chuyển',
+  'hudChrome.bags.reorderLocked':
+    'Vật phẩm bị khóa giữ nguyên ô trong túi. Mở khóa để di chuyển chúng.',
+  'hudChrome.death.pvpResurrect': 'Hồi sinh PvP',
+  'hudChrome.death.pvpResurrectReadyNote':
+    'Hồi sinh PvP đã sẵn sàng: bạn sẽ sống lại tại nghĩa địa gần nhất.',
+  'hudChrome.death.pvpResurrectTitle':
+    'Sống lại tại nghĩa địa gần nhất với đầy máu, không nhận thêm Gánh Nặng Người Giữ.',
+  'hudChrome.death.pvpResurrectWaitButton': 'Hồi sinh PvP ({seconds})',
+  'hudChrome.death.pvpResurrectWaitNote':
+    'Bạn có thể hồi sinh PvP sau {seconds}: bạn sẽ sống lại tại nghĩa địa gần nhất.',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'Đã hủy đổi độ khó đang chờ vì nhóm hoặc trưởng nhóm thay đổi.',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'Đổi độ khó được xếp hàng vì vẫn còn người hoặc thi thể bên trong. Sẽ áp dụng khi các phụ bản trống.',
+  'hudChrome.ferry.arrivesIn': 'Phà đến sau {time}',
+  'hudChrome.ferry.boardNow': 'Lên phà ngay',
+  'hudChrome.ferry.destination': 'Điểm đến: {dest}',
+  'hudChrome.ferry.portLabel': 'Phà từ {port} đến {dest}',
+  'hudChrome.ferry.portTitle': 'Bến phà {port}',
+  'hudChrome.ferry.scheduleUnavailable': 'Không có lịch phà.',
+  'hudChrome.graphicsRestore.note': 'Đang khôi phục đồ họa',
+  'hudChrome.hill.contestOtherPaused': 'Đối thủ tạm dừng: {seconds}/{total}',
+  'hudChrome.hill.contestYouPaused': 'Tạm dừng: {seconds}/{total}',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × Lấy từ {name}',
+  'hudChrome.keybindLayout.apply': 'Chuyển đổi phím tắt',
+  'hudChrome.keybindLayout.converted': 'Đã chuyển phím tắt từ {from} sang {to}.',
+  'hudChrome.keybindLayout.from': 'Phím tắt dành cho',
+  'hudChrome.keybindLayout.help':
+    'Mỗi phím tắt chuyển sang phím gõ cùng ký tự trên bố cục mới. Hàng số giữ nguyên vị trí. Tên phím trong danh sách là vị trí QWERTY; sơ đồ bàn phím hiển thị bố cục của bạn.',
+  'hudChrome.keybindLayout.keepMovement': 'Giữ nguyên vị trí phím di chuyển',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    'Lần trước phím di chuyển đã được giữ nguyên nên lần này cũng vậy. Khôi phục mặc định để bắt đầu lại.',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY (Bỉ)',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY (Pháp)',
+  'hudChrome.keybindLayout.layouts.colemak': 'Bố cục Colemak',
+  'hudChrome.keybindLayout.layouts.dvorak': 'Bố cục Dvorak',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY (Brasil ABNT2)',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY (Đan Mạch)',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY (Tây Ban Nha)',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY (Ý)',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY (Na Uy)',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY (Thụy Điển, Phần Lan)',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY (Bồ Đào Nha)',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY (Thổ Nhĩ Kỳ)',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY (Vương quốc Anh)',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY (Hoa Kỳ)',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ (Thụy Sĩ)',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ (Đức)',
+  'hudChrome.keybindLayout.moves': 'Số phím tắt sẽ di chuyển: {count}',
+  'hudChrome.keybindLayout.noChange': 'Không có phím tắt nào thay đổi giữa hai bố cục này.',
+  'hudChrome.keybindLayout.open': 'Chuyển đổi',
+  'hudChrome.keybindLayout.title': 'Bố cục bàn phím',
+  'hudChrome.keybindLayout.to': 'Chuyển sang',
+  'hudChrome.nameplate.bountyTag': 'Truy nã',
+  'hudChrome.options.classicCombatText': 'Chữ chiến đấu cổ điển',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'Vật phẩm dưới phẩm chất này được bán bằng một lần nhấp. Có thể mua lại vật phẩm bán nhầm, trừ vật phẩm xám không có chữ ký.',
+  'hudChrome.options.spellEffects': 'Hiệu ứng phép',
+  'hudChrome.options.spellTooltipOnHover': 'Chú giải phép khi trỏ chuột',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.realmMotd.cleared': 'Đã xóa thông điệp trong ngày.',
+  'hudChrome.realmMotd.line': 'Thông điệp trong ngày: {text}',
+  'hudChrome.realmMotd.none': 'Chưa đặt thông điệp trong ngày.',
+  'hudChrome.realmMotd.saveFailed':
+    'Không thể lưu thông điệp trong ngày; thông điệp sẽ mất khi khởi động lại.',
+  'hudChrome.realmMotd.tooLong': 'Thông điệp trong ngày có tối đa {max} ký tự.',
+  'hudChrome.realmMotd.updated': 'Đã cập nhật thông điệp trong ngày.',
+  'hudChrome.realmMotd.usage': 'Cách dùng: /motd "<thông điệp>" để đặt, /motd clear để xóa.',
+  'hudChrome.skullBag.clickOpen': 'Nhấp để mở',
+  'hudChrome.skullBag.close': 'Đóng Túi Đầu Lâu',
+  'hudChrome.skullBag.empty': 'Trống. Khi bạn mang túi, đầu lâu nhặt được sẽ vào thẳng trong túi.',
+  'hudChrome.skullBag.notCarried': 'Mang Túi Đầu Lâu trong hành trang để cất hoặc lấy đầu lâu.',
+  'hudChrome.skullBag.store': 'Cất đầu lâu đang mang ({count})',
+  'hudChrome.skullBag.storeNone': 'Không có đầu lâu để cất',
+  'hudChrome.skullBag.takeAll': 'Lấy tất cả',
+  'hudChrome.skullBag.takeAllAria': 'Lấy tất cả: {item}',
+  'hudChrome.skullBag.takeOne': 'Lấy 1',
+  'hudChrome.skullBag.takeOneAria': 'Lấy 1: {item}',
+  'hudChrome.skullBag.title': 'Túi Đầu Lâu',
+  'hudChrome.skullBag.tooltip':
+    'Chứa không giới hạn Đầu Lâu Chiến Lợi Phẩm mà không tốn ô túi. Khi nằm trong hành trang, đầu lâu nhặt được sẽ vào thẳng túi này. Nhấp vào túi để cất hoặc lấy đầu lâu.',
+  'hudChrome.skullBag.total': 'Đầu lâu: {count}',
+  'hudChrome.skullBag.unrecorded': 'Đầu Lâu Chiến Lợi Phẩm',
+  'hudChrome.treasureMap.inkPickerCancel': 'Hủy',
+  'hudChrome.treasureMap.inkPickerCost': 'Vẽ lại thành {rarity}: {inks} mực',
+  'hudChrome.treasureMap.inkPickerHeld': 'Bạn có {held} Mực Người Vẽ Bản Đồ.',
+  'hudChrome.treasureMap.inkPickerRead':
+    'Đang lần theo: dấu X nằm tại {zone}. Dấu X giữ nguyên vị trí.',
+  'hudChrome.treasureMap.inkPickerTitle': 'Dùng Mực Người Vẽ Bản Đồ lên bản đồ nào?',
+  'hudChrome.treasureMap.inkPickerUnread': 'Chưa đọc (đang có {count})',
+  'hudChrome.warfare.reasons.worldQuest': 'nhiệm vụ thế giới',
+  'hudChrome.warfareShop.goods': 'Hàng hóa',
+  'hudChrome.weeklyRewards.allClassGear': 'Trang bị mọi lớp',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': '{count} trận thắng PvP',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': '{count} trận thắng PvP',
+  'hudChrome.weeklyRewards.lootFocus': 'Ưu tiên chiến lợi phẩm',
+  'hudChrome.weeklyRewards.lootFocusHelp': 'Chỉ áp dụng cho rương chưa mở.',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    'Không có chiến lợi phẩm phù hợp. Hãy chọn ưu tiên khác.',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'Giành {count} trận thắng PvP',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'Giành {count} trận thắng PvP',
+  'hudChrome.weeklyRewards.rolledFocus': 'Đã quay cho: {focus}',
+  'hudChrome.weeklyRewards.specRole': '{name} ({role})',
+  'hudChrome.worldPvp.rewardPaused':
+    'Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong thánh địa)',
+  'hudChrome.worldPvp.rewardPausedDead': 'Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng khi chết)',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    'Chuỗi PvP hiện tại: đã chơi {time} (tạm dừng trong phụ bản PvE)',
+  'hudChrome.worldPvp.rewardProgress': 'Chuỗi PvP hiện tại: đã chơi {time}',
+  'hudChrome.worldPvp.rewardTitles':
+    'Nhận danh hiệu vĩnh viễn sau {thresholds} thời gian chơi với PvP Thế Giới bật trong thế giới mở hoặc phụ bản PvP. Đăng xuất, chết, phụ bản PvE và thánh địa tạm dừng bộ đếm. Tắt PvP sẽ đặt lại bộ đếm.',
+  'hudChrome.worldPvp.skullName': 'Đầu lâu của {name}',
+  'hudChrome.worldPvp.spoilsLine':
+    'Khi cả hai cùng bật cờ, vàng từ đòn kết liễu rơi trên thi thể cùng đầu lâu của người thua.',
+  'itemUi.vendor.sellJunkNoBuyback':
+    'Vật phẩm xám không có chữ ký không vào danh sách mua lại, nên không thể hoàn tác việc bán.',
+  'questUi.logs.worldQuestRewardMailed':
+    'Túi của bạn đã đầy. Phần thưởng được gửi đến hộp thư: {items}.',
+  'entities.abilities.natures_boon.description':
+    'Phép của bạn có thể kích hoạt Ân Huệ Tự Nhiên trong 10 giây: phép được chỉ định trở nên miễn phí, mạnh hơn 25% và dùng được ở mọi hình thể. Kích hoạt mới làm mới thời gian hiệu lực.',
+  'entities.abilities.natures_boon.name': 'Ân Huệ Tự Nhiên',
+  'entities.abilities.natures_boon.specNote_balance':
+    'Mỗi lần dùng Tia Hoang Dã hoặc Thiên Giáng có 10% cơ hội kích hoạt cho Bùng Nổ Bào Tử, tối đa một lần mỗi 10 giây.',
+  'entities.abilities.natures_boon.specNote_feral':
+    'Mỗi đòn đánh thường cận chiến trúng đích có 1/15 cơ hội kích hoạt cho Chữa Lành Bào Tử, hoặc cho Da Sồi khi ở Hình Bruin.',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'Mỗi nhịp hồi máu theo thời gian của bạn có 10% cơ hội kích hoạt cho Bùng Nổ Bào Tử, tối đa một lần mỗi 10 giây.',
+  'entities.abilities.overbloom.specNote_restoration':
+    'Tiêu hao 5 Sắc Xanh: mỗi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn được hồi ngay {buff}% lượng hồi máu còn lại, các hiệu ứng bị xóa và mục tiêu nhận Chữa Lành Bào Tử mới.',
+  'entities.abilities.play_dead.description':
+    'Ngã xuống đất và trông như đã chết: sinh lực và Tập Trung của bạn hiển thị trống rỗng với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang nhắm vào bạn mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc hiệu ứng. Nếu thi triển khi đang di chuyển, bạn có 1 giây để dừng lại trước khi việc di chuyển kết thúc hiệu ứng. Thi triển lại để đứng dậy.',
+  'entities.abilities.play_dead.name': 'Giả Chết',
+  'entities.abilities.rejuvenation.name': 'Chữa Lành Bào Tử',
+  'entities.abilities.scratch.description':
+    'Cào qua các mục tiêu gần trong 6 mét, gây sát thương vũ khí cộng {damage}. Nhận 1 điểm liên kích cho mỗi mục tiêu trúng đòn. Làm lộ kẻ địch tàng hình trong vùng quét. Chỉ dùng ở Hình Mèo.',
+  'entities.abilities.scratch.name': 'Cào',
+  'entities.abilities.scratch.specNote_feral': 'Mỗi đòn trúng thêm 1 Huyết Cổ (tối đa 3).',
+  'entities.abilities.spore_burst.description':
+    'Triệu hồi nấm bùng nổ tại vùng mục tiêu. Sau {duration} giây, nấm nổ, hồi {healing} máu cho đồng minh và gây {damage} sát thương Thiên Nhiên lên địch trong 8 mét.',
+  'entities.abilities.spore_burst.name': 'Bùng Nổ Bào Tử',
+  'entities.abilities.spore_burst.specNote_balance':
+    'Khi có 3 Triều Nguyệt, mạnh hơn 25% và tiêu hao Triều Nguyệt.',
+  'entities.abilities.spore_burst.specNote_restoration':
+    'Cũng áp dụng Chữa Lành Bào Tử cho mỗi đồng minh được hồi máu. Khi Sắc Xanh đầy, mạnh hơn 25% và tiêu hao Sắc Xanh.',
+  'entities.abilities.sporemender_form.description':
+    'Biến thành Thể Chữa Lành Bào Tử, tăng 20% lượng hồi máu và 40% giáp nhưng giảm 20% tốc độ di chuyển. Mọi phép ở hình thể niệm phép vẫn dùng được. Kéo dài đến khi đổi hình thể. Đổi sang bất kỳ hình thể nào cũng cho Sải bước, tăng tốc trong chốc lát. Dùng lại để về hình thể niệm phép. (Đặc trưng của Phục Hồi)',
+  'entities.abilities.sporemender_form.name': 'Hình Thể Chữa Lành Bào Tử',
+  'entities.abilities.swiftmend.specNote_restoration':
+    'Tiêu hao một hiệu ứng hồi máu theo thời gian trên đồng minh để hồi {damage} máu. Áp dụng Chữa Lành Bào Tử và Nở Hoa Lần Hai tăng Sắc Xanh; khi có 5 Sắc Xanh, nút này thành Mãn Khai, lập tức hồi cho mọi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn 60% lượng hồi máu còn lại. (Đặc trưng của Phục Hồi)',
+  'entities.abilities.tactical_camo.description':
+    'Hòa vào môi trường: kẻ địch gần như không nhận thấy bạn, và bạn di chuyển với 80% tốc độ. Tấn công hoặc nhận sát thương phá Ngụy Trang Chiến Thuật. Dùng lại để thoát ra. (Sinh Tồn)',
+  'entities.abilities.tactical_camo.name': 'Ngụy Trang Chiến Thuật',
+  'entities.itemSets.grovespring.bonus2':
+    'Hồi Phục Nhanh ưu tiên tiêu hao Chữa Lành Bào Tử hoặc Nở Hoa Lần Hai của bạn và hồi thêm 25 phần trăm. Sát thương nhận vào không còn làm chậm việc niệm phép.',
+  'entities.items.pvp_skull_bag.name': 'Túi Đầu Lâu',
+  'entities.items.pvp_trophy_skull.name': 'Đầu Lâu Chiến Lợi Phẩm',
+  'entities.letters.world_quest_reward.body':
+    'Túi đã đầy khi bạn nhận phần thưởng nhiệm vụ thế giới này, nên đàn quạ mang nó đến đây. Dọn chỗ và nhận phần thưởng tại bất kỳ trụ quạ nào.\n\n- Bưu Điện Quạ',
+  'entities.letters.world_quest_reward.sender': 'Bưu Điện Quạ',
+  'entities.letters.world_quest_reward.subject': 'Phần thưởng nhiệm vụ thế giới của bạn',
+  'guide.classPage.formLine.form_sporemender':
+    'Hình thể chữa lành của Phục Hồi: da bền hơn, hồi máu mạnh hơn và bước đi chậm hơn, vẫn giữ mọi phép cùng năng lượng.',
+  'guide.classPage.formName.form_sporemender': 'Hình Thể Chữa Lành Bào Tử',
+  'guide.economy.junkBodyFinal':
+    'Chiến lợi phẩm không cần đến vẫn có thể bán cho thương nhân có cửa hàng riêng, nên hãy dọn túi mỗi lần qua thành phố. Cửa sổ thương nhân có nút Bán Đồ Rác để bán mọi vật phẩm phẩm chất Kém bằng một lần nhấp. Bạn cũng có thể vứt đồ vô giá trị để lấy chỗ. Vật phẩm xám không có chữ ký bán theo cách này không vào danh sách mua lại, nên hãy kiểm tra xem có món nào muốn giữ trước khi nhấn.',
+  'guide.models.formSporemender': 'Hình Thể Chữa Lành Bào Tử',
+  'guide.settingsPage.ifClassicCombatText':
+    'Khôi phục các số sát thương trắng và vàng nhạt đơn giản bay thẳng lên. Để tắt (mặc định) nếu muốn số nổi bật hơn tỏa sang hai bên, lóe sáng khi chí mạng hoặc gây sát thương rất lớn.',
+  'guide.settingsPage.rowSpellEffects':
+    'Ánh sáng, tia lửa, đạn phép và vụ nổ khi chạm mục tiêu từ phép của người chơi và thú cưng, kể cả của bạn. Tắt để màn hình dịu hơn hoặc tăng vài khung hình trong trận chiến nhóm lớn. Mọi phép của địch vẫn hiển thị, cùng các vòng cảnh báo vùng nguy hiểm, dấu trên mục tiêu bị choáng, sợ hãi hoặc trói chân và mọi thanh niệm phép.',
+  'questUi.dialog.attuneHearthstone': 'Liên kết Đá Hồi Hương Đồng Minh của tôi tại đây.',
+  'questUi.dialog.attuneHearthstoneAria': 'Liên kết Đá Hồi Hương Đồng Minh với {hub} qua {name}',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    'Đá Hồi Hương Đồng Minh của bạn chưa được liên kết. Hãy nói chuyện với quân nhu đồng minh hoặc dùng đá tại trung tâm đồng minh.',
+  'hudChrome.factionRewards.hearthstoneBound':
+    'Đá Hồi Hương Đồng Minh của bạn đã liên kết với {hub}.',
+  'hudChrome.factionRewards.hearthstoneTransport': 'Đá hồi hương đưa bạn đến {hub}.',
+  'hudChrome.factionRewards.itemCooldown': 'Vật phẩm chưa sẵn sàng (còn {minutes} phút).',
+  'hudChrome.weekly.completedLastWeek': 'Đã hoàn thành tuần trước',
+  'hudChrome.weekly.claimFirst': 'Nhận trước',
+  'hudChrome.weekly.commendCarriedNote':
+    '{amount} danh vọng từ tuần trước vẫn chưa nhận. Nhận để chọn lượt nạp mới.',
+  'hudChrome.options.rawMouseInput': 'Dữ Liệu Chuột Trực Tiếp',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'Đọc chuyển động trực tiếp từ chuột khi bạn kéo để xoay camera, bỏ qua tốc độ và gia tốc con trỏ của hệ thống để xoay ổn định hơn. Tắt để dùng cài đặt chuột của hệ thống. Chỉ hoạt động khi bật Khóa Con Trỏ Khi Xoay và không được hỗ trợ trên mọi trình duyệt hoặc hệ thống.',
+  'entities.items.infernal_quiver.name': 'Ống Tên Địa Ngục',
+  'graphicsPrompt.title': 'Chọn Cài Đặt Đồ Họa',
+  'graphicsPrompt.intro':
+    'Chọn một cấu hình đồ họa có sẵn cho thiết bị này. Cấu hình thấp hơn chạy mượt hơn; cấu hình cao hơn cho hình ảnh phong phú hơn.',
+  'graphicsPrompt.autoDesc': 'Chọn cấu hình phù hợp với thiết bị này. Đã phát hiện: {preset}.',
+  'graphicsPrompt.lowDesc':
+    'Hiệu năng mượt nhất. Phù hợp nhất với điện thoại, máy tính bảng và bộ xử lý đồ họa cũ hoặc tích hợp.',
+  'graphicsPrompt.mediumDesc':
+    'Cân bằng giữa hình ảnh và hiệu năng. Phù hợp với hầu hết máy tính xách tay.',
+  'graphicsPrompt.highDesc': 'Nhiều chi tiết và cảnh vật đầy đặn hơn. Phù hợp với card đồ họa rời.',
+  'graphicsPrompt.ultraDesc':
+    'Cấu hình cố định có hình ảnh phong phú nhất. Phù hợp với card đồ họa cao cấp.',
+  'graphicsPrompt.changeLater':
+    'Bạn có thể thay đổi bất cứ lúc nào trong Tùy Chọn, ở mục Chất Lượng Đồ Họa.',
+  'graphicsPrompt.confirm': 'Tiếp Tục',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Bẫy Gấu',
+  'entities.abilities.bear_trap.description':
+    'Đặt bẫy tại vị trí đã chọn. Bẫy kích hoạt sau 0,75 giây và tồn tại 1 phút; chỉ bạn và nhóm của bạn nhìn thấy. Kẻ địch đầu tiên giẫm bẫy bị chảy máu, chịu {damage} sát thương Vật lý trong 15 giây và bị làm chậm 50% trong 4 giây. Sát thương tăng theo Sức mạnh Công kích Tầm xa. Mỗi lúc chỉ có thể kích hoạt một Bẫy Gấu. Bẫy này có thể tồn tại cùng Bẫy Hàm Băng của bạn. Đặt Bẫy Gấu mới sẽ thay thế bẫy trước đó.',
+  'entities.abilities.scatterbolt.name': 'Tên Nỏ Tán Xạ',
+  'entities.abilities.scatterbolt.description':
+    'Bắn một loạt tên trong hình nón 90 độ, vươn xa 8 thước phía trước, đẩy lùi kẻ địch ra xa bạn tối đa 20 thước. Kẻ địch miễn nhiễm đẩy lùi không bị ảnh hưởng. Không gây sát thương.',
+  'entities.abilities.phosphor_flask.name': 'Bình Phốt Pho',
+  'entities.abilities.phosphor_flask.description':
+    'Một chiếc bình kín chứa hỗn hợp hóa chất phản ứng, bùng lên thành ngọn lửa trắng nóng rực trên một khu vực 8 mét trong 3 giây. Kẻ địch đứng trong lửa chịu {damage} sát thương Lửa mỗi 0.5 giây. Sát thương tăng theo sức tấn công tầm xa.',
+  'entities.items.lychgate_buckler.name': 'Khiên Tròn Cổng Nghĩa Trang',
+  'entities.items.bastion_kite_shield.name': 'Khiên Cánh Diều Pháo Đài',
+  'entities.items.barrowfield_tower_shield.name': 'Khiên Tháp Cánh Đồng Gò Mộ',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Thanh tài nguyên',
+  'hudChrome.options.hillBarOpacity': 'Độ đục nền Vua của Đồi',
+  'hudChrome.options.playerFrameResourceDetached': 'Tách thanh tài nguyên',
+  'hudChrome.options.playerFrameResourceHeight': 'Chiều cao thanh tài nguyên',
+  'hudChrome.options.playerFrameResourceWidth': 'Chiều rộng thanh tài nguyên',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Bật Tách thanh tài nguyên trong thẻ Khung để Chỉnh Sửa Khung cũng mở khóa thanh tài nguyên, cho phép đặt thanh năng lượng phép, năng lượng hoặc nộ riêng ở bất kỳ đâu. Chiều rộng thanh tài nguyên và Chiều cao thanh tài nguyên trong cùng thẻ sẽ điều chỉnh kích thước của thanh. Chỉnh Sửa Khung cũng mở khóa thanh Vua của Đồi. Độ đục nền Vua của Đồi trong thẻ đó làm mờ nền bảng trong khi chữ vẫn rõ ràng.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

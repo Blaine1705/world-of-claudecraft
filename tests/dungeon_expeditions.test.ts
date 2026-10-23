@@ -499,6 +499,33 @@ function setupRaidFamily() {
 }
 
 describe('open multi-room raid expeditions', () => {
+  it('admits a recruit into the explicit run despite a return route to another difficulty', () => {
+    const { sim, leader, helper, inner, listing } = setupRaidFamily();
+    const formerLeader = addPlayer(sim, 'FormerLeader');
+    sim.setPlayerLevel(20, formerLeader);
+    sim.setDungeonDifficulty('heroic', formerLeader);
+    expect(enterDungeon(context(sim), inner.dungeonId, formerLeader, true)).toBe(true);
+    const oldClaim = sim.instances.find(
+      (claim) => claim.dungeonId === inner.dungeonId && claim.partyKey === `solo:${formerLeader}`,
+    )!;
+    expect(oldClaim).toBeDefined();
+    for (const id of oldClaim.mobIds) sim.entities.get(id)!.dead = true;
+    oldClaim.raidReturnKeys.add(`entity:${helper}`);
+    sim.players.get(helper)!.raidLockouts.set(heroicLockoutId(inner.dungeonId), 999999999);
+    const before = sim.serializeCharacter(helper);
+    const position = { ...sim.entities.get(helper)!.pos };
+
+    sim.dungeonFinderExpeditionApply(listing.id, 'dps', helper);
+    expect(sim.dungeonFinderInfoFor(helper)?.myApplication?.listingId).toBe(listing.id);
+    expect(sim.serializeCharacter(helper)).toEqual(before);
+    expect(sim.entities.get(helper)!.pos).toEqual(position);
+    sim.dungeonFinderApplicationRespond(helper, true, leader);
+    expect(sim.partyOf(helper)?.leader).toBe(leader);
+    sim.dungeonFinderExpeditionTravel(helper);
+    expect(sim.instanceClaimIdAt(sim.entities.get(helper)!.pos)).toBe(inner.exitId);
+    expect(oldClaim.enteredBy.has(helper)).toBe(false);
+  });
+
   it('combines actual encounter deaths across owned rooms and preserves both claims on first-helper promotion', () => {
     const { sim, leader, helper, arena, inner, listing } = setupRaidFamily();
     const boss = arena.mobIds

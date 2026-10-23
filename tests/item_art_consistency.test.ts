@@ -853,7 +853,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
     // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // The World PvP trophy skull (pvp_trophy_skull, world_pvp_spoils.ts): 1,618.
+    // The World PvP Skull Bag (pvp_skull_bag, pvp/skull_bag.ts): 1,619.
+    expect(Object.keys(ITEMS)).toHaveLength(1623);
+    // The art-pending Crucible hunter quiver adds one live item, with no mapping owner.
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1017,9 +1020,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
     // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
-    expect(new Set(currentOwnerIds).size).toBe(1464);
-    expect(shippingIds).toHaveLength(1464);
-    expect(Object.keys(ITEMS)).toHaveLength(1617);
+    // + the World PvP trophy skull (pvp_trophy_skull): 1465 owners, 1618 items.
+    // + the World PvP Skull Bag (pvp_skull_bag): 1466 owners, 1619 items.
+    expect(new Set(currentOwnerIds).size).toBe(1469);
+    expect(shippingIds).toHaveLength(1469);
+    expect(Object.keys(ITEMS)).toHaveLength(1623);
+    // The art-pending Crucible hunter quiver adds one live item, with no mapping owner.
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1176,11 +1182,18 @@ describe('item-art consistency accepted-art provenance', () => {
         // The weekly emissary's cache chest, additive the same way.
         'emissary_cache',
         'reins_avian_strider',
+        // The World PvP trophy skull (pvp_trophy_skull), additive the same way.
+        'pvp_trophy_skull',
+        // The World PvP Skull Bag (pvp_skull_bag), additive the same way.
+        'pvp_skull_bag',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
         'vanguard_fang_dagger',
         'vanguard_warstaff',
+        'lychgate_buckler',
+        'bastion_kite_shield',
+        'barrowfield_tower_shield',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1333,8 +1346,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     // 43 -> 44 at the weekly emissary: the Emissary's Cache chest; 45 with
-    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge).
-    expect(mapping.entries).toHaveLength(45);
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge);
+    // 46 with the World PvP trophy skull (pvp_trophy_skull); 47 with the
+    // World PvP Skull Bag (pvp_skull_bag).
+    expect(mapping.entries).toHaveLength(47);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1349,7 +1364,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // its batch (faction-ladder-icons-2026-09-23) = 36. The trinket slot's icon batch
     // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
     // batch (warfare-season2-weapons-2026-09-25) = 38.
-    expect(mapping.generatedBatches).toHaveLength(41);
+    expect(mapping.generatedBatches).toHaveLength(42);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1419,13 +1434,14 @@ describe('item-art consistency accepted-art provenance', () => {
     // Season 2's weapon batch adds 4: 815. The Buried Hoards branch's three
     // batches (18 faction reward paintings, 5 treasure-map family, 96 hoard boss
     // loot) add 119 at the 2026-09-28 release merge: 934.
-    expect(priorGeneratedIds).toHaveLength(934);
+    // The three quest shield paintings join the current owners.
+    expect(priorGeneratedIds).toHaveLength(937);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1464);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1464);
+    expect(allCurrentOwnerIds).toHaveLength(1469);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1469);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1433,13 +1449,16 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      // 45 entries (the release's mapping entries; the hoard batches own no entries).
-      entries: 45,
+      // 45 entries (the release's mapping entries; the hoard batches own no entries)
+      // + the World PvP trophy skull's own entry = 46.
+      // + the World PvP Skull Bag's own entry = 47.
+      entries: 47,
       // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
       // + the Buried Hoards branch's 119 paintings (three batches) = 934.
-      priorGenerated: 934,
+      // + the three quest shield paintings.
+      priorGenerated: 937,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1517,6 +1536,7 @@ describe('item-art consistency accepted-art provenance', () => {
                 'faction-rewards-icons-2026-09-17',
                 'buried-hoard-treasure-maps-2026-09-19',
                 'hoard-boss-loot-icons-2026-09-20',
+                'quest-shield-icons-2026-10-23',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1528,6 +1548,10 @@ describe('item-art consistency accepted-art provenance', () => {
         // beyond the historical chain like the Field Kit.
         'emissary_cache',
         'reins_avian_strider',
+        // The World PvP trophy skull (pvp_trophy_skull), additive the same way.
+        'pvp_trophy_skull',
+        // The World PvP Skull Bag (pvp_skull_bag), additive the same way.
+        'pvp_skull_bag',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1666,10 +1690,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464.
-    if (ownerIds.length !== 1464)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1464`);
-    if (fileIds.length !== 1464) violations.push(`shipping WebP count: ${fileIds.length} != 1464`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the World PvP trophy skull (pvp_trophy_skull) = 1465. Plus the World PvP Skull Bag (pvp_skull_bag) = 1466.
+    if (ownerIds.length !== 1469)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1469`);
+    if (fileIds.length !== 1469) violations.push(`shipping WebP count: ${fileIds.length} != 1469`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

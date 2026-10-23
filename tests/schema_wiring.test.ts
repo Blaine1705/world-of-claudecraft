@@ -96,7 +96,7 @@ const h = vi.hoisted(() => {
     // refusal arm instead of leaving it unexercised.
     if (String(sql).includes('woc.material_source_writer')) {
       return Promise.resolve({
-        rows: [{ capability: state.announcesWriterCapability ? '1' : null }],
+        rows: [{ capability: state.announcesWriterCapability ? '2' : null }],
         rowCount: 1,
       });
     }
@@ -325,6 +325,16 @@ describe('ensureSchema wires every schema module at boot', () => {
     const probeIndex = h.calls.findIndex((sql) => sql.includes('woc.material_source_writer'));
     expect(probeIndex).toBeGreaterThanOrEqual(0);
     expect(probeIndex).toBeLessThan(guardIndex);
+    const refreshIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE OR REPLACE FUNCTION woc_material_source_writer_guard'),
+    );
+    const lockIndex = h.calls.findIndex((sql) => sql.includes('pg_advisory_xact_lock'));
+    const coreIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS characters'),
+    );
+    expect(refreshIndex).toBeGreaterThan(lockIndex);
+    expect(refreshIndex).toBeGreaterThan(probeIndex);
+    expect(refreshIndex).toBeLessThan(coreIndex);
   });
 
   it('REFUSES to boot when this process does not announce the writer capability', async () => {
@@ -751,6 +761,25 @@ describe('ensureSchema wires every schema module at boot', () => {
     await ensureSchema();
     const applied = h.calls.join('\n');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS realm_builder_honours');
+  });
+
+  it('applies the realm message of the day schema after the core accounts table', async () => {
+    // REALM_MOTD_SCHEMA (server/realm_motd_db.ts) backs the admin /motd. The
+    // live-server suite fakes the pool, so without this pin deleting the
+    // ensureSchema line in server/db.ts would fail nowhere until the first
+    // /motd threw "relation does not exist". set_by references accounts(id).
+    await ensureSchema();
+    const motdAt = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS realm_motd'),
+    );
+    const accountsAt = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS accounts'),
+    );
+    expect(motdAt).toBeGreaterThan(-1);
+    expect(h.calls[motdAt]).toContain('CREATE TABLE IF NOT EXISTS realm_motd_changes');
+    expect(accountsAt).toBeGreaterThan(-1);
+    expect(motdAt).toBeGreaterThan(accountsAt);
+    expect(h.calls.indexOf('COMMIT')).toBeGreaterThan(motdAt);
   });
 
   it('applies the $WOC Exchange schema (listings plus a dependent table)', async () => {

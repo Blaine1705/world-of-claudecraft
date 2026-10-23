@@ -1322,4 +1322,38 @@ export const table: DeedLocaleTable = {
     name: 'Apanhado em Flagrante',
     desc: 'Capture um Corredor Bolsa-de-moedas em um Tesouro Enterrado antes que escape com o ouro.',
   },
+  exp_wisp_maze_hard: {
+    name: 'Mais brilhante que as sombras',
+    desc: 'Recupere as bolsas de moedas roubadas e escape do labirinto de Evergarden no modo Hard.',
+  },
+  prog_titan: {
+    name: 'Titã',
+    desc: 'Obtenha 10.000.000 de experiência ao longo da vida.',
+    title: 'Titã',
+  },
+  pvp_flag_1h: {
+    name: 'Ousado',
+    desc: 'Mantenha o JxJ mundial ativo por 1 hora de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
+    title: 'Ousado',
+  },
+  pvp_flag_3h: {
+    name: 'Desafiador',
+    desc: 'Mantenha o JxJ mundial ativo por 3 horas de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
+    title: 'Desafiador',
+  },
+  pvp_flag_6h: {
+    name: 'Destemido',
+    desc: 'Mantenha o JxJ mundial ativo por 6 horas de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
+    title: 'Destemido',
+  },
+  pvp_flag_24h: {
+    name: 'Inabalável',
+    desc: 'Mantenha o JxJ mundial ativo por 24 horas de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
+    title: 'Inabalável',
+  },
+  pvp_flag_168h: {
+    name: 'Indomável',
+    desc: 'Mantenha o JxJ mundial ativo por 7 dias de jogo enquanto estiver vivo no mundo aberto ou em uma partida JxJ. Santuários, instâncias JxA, morte e desconexão pausam o progresso; desativar reinicia o contador. Os títulos conquistados são permanentes.',
+    title: 'Indomável',
+  },
 };
