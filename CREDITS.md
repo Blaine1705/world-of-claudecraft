@@ -646,4 +646,9 @@ Horse Whistle (`public/ui/items/whistle_horse.webp`) is a render of the shipped 
 horse model using the Guide model-still renderer. Underlying model licensing is
 unchanged. Processing, source and shipping hashes: `docs/achievements/horse-whistle-icon-v045-2026-10-22/accepted-art.json`.
 
+Dungeon selection scenery (`public/ui/dungeon-scenes/`) is project-generated art
+made with OpenAI's built-in image generation for World of ClaudeCraft. The Sunken
+Bastion, Drowned Temple, Gravewyrm Sanctum and Wildheart Basin illustrations follow
+the project's dungeon settings, with no third-party reference images.
+
 Lychgate Buckler, Bastion Kite Shield and Barrowfield Tower Shield inventory icons are project-generated art made with OpenAI built-in image generation. [Prompts and provenance](docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json). Project asset, with the project only.

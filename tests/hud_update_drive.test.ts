@@ -1138,6 +1138,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the dungeon finder window; an unchanged sig still ticks its 1 Hz clock text',
   },
   {
+    call: 'this.finderSurfaces.expeditions.render',
+    band: 'medium',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/expeditions/expedition_controller.ts',
+      proof: 'if (sig === this.lastSig) {',
+    },
+    why: 'signature-gated bell, entry choice and open expedition cards; no work on identical polls',
+  },
+  {
     call: 'this.dungeonFinderProposalPopup.render',
     band: 'medium',
     gate: 'this.dungeonFinderProposalPopup.isOpen',
@@ -1955,7 +1967,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 54, chrome: 100, none: 21 });
+    ).toEqual({ window: 55, chrome: 100, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1980,7 +1992,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // refreshing instead of only closing.
       // The courier window owns both revision and content signature guards.
       // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
-      module: 31,
+      module: 32,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -2045,6 +2057,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud/woc_trade/woc_trade_controller.ts: if (sig === this.lastTradeSig) return;',
         'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
+        'hud/expeditions/expedition_controller.ts: if (sig === this.lastSig) {',
         // The corpse popup's own latch. `force` is the relocalize arm, which
         // rebuilds through the same guard past a signature a locale switch
         // cannot move, so the flag is part of the line the pin looks for.

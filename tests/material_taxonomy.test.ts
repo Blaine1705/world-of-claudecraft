@@ -934,8 +934,8 @@ describe('no src/sim importer (presentation-only taxonomy scope)', () => {
     // that lost recursion cannot clear 300), AND the sweep must have reached
     // the two biggest nested directories by name.
     expect(scanned.length).toBeGreaterThan(300);
-    expect(scanned.some((f) => f.includes(`${join(simRoot, 'professions')}${sep}`))).toBe(true);
-    expect(scanned.some((f) => f.includes(`${join(simRoot, 'content')}${sep}`))).toBe(true);
+    expect(scanned.some((f) => f.startsWith(`${join(simRoot, 'professions')}${sep}`))).toBe(true);
+    expect(scanned.some((f) => f.startsWith(`${join(simRoot, 'content')}${sep}`))).toBe(true);
     expect(symlinked).toEqual([]);
     for (const guard of guards) {
       expect(scanned, guard.moduleSelf).toContain(guard.moduleSelf);

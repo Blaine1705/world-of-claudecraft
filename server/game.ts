@@ -28,7 +28,6 @@ import {
   zoneAt,
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
-import { parseRelayCommand } from '../src/sim/discord_relay';
 import { gmHiddenFrom } from '../src/sim/gm_presence';
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import { parseItemCopyAnchor } from '../src/sim/item_copy_anchor';
@@ -182,6 +181,7 @@ import {
   persistCheaterMark,
   refreshCheaterMark,
 } from './cheater_mark_runtime';
+import { CommunityRelay } from './community_relay';
 import { dispatchPetRename } from './companion_rename';
 import {
   cancelCorpseHarvestCastOnDisconnect,
@@ -240,10 +240,9 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { observeQueuePops, queuedPidsOf, queuePopDepsFor } from './discord_queue_pops';
-import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
-import { dispatchDungeonFinderCommand } from './dungeon_finder_commands';
+import { DF_WIRE_INTERVAL_TICKS, dispatchDungeonFinderCommand } from './dungeon_finder_commands';
 import { appendRunSelfWire } from './dungeon_run_wire';
 import { formatDuration } from './duration';
 import {
@@ -361,7 +360,7 @@ import {
   resetMobScanCaptureAccumulators,
   routeSightCaptureTotals,
 } from './mob_scan_tick_stats';
-import { parseModerationChatCommand } from './moderation_commands';
+import { JAILED_BLOCKED_COMMANDS, parseModerationChatCommand } from './moderation_commands';
 import {
   forceCharacterRename,
   moderateAccount,
@@ -725,12 +724,6 @@ const BG_WIRE_RESET_EVENTS = new Set([
 // whole match instead (bgRespawnRefreshPids), the shape the bgKill events
 // already have because the sim emits one copy per member.
 const BG_RESPAWN_EVENT = 'respawn';
-// Dungeon Finder personal readout cadence: the `df` payload carries
-// whole-second clocks (queue wait, proposal countdown), so 2 Hz keeps the
-// window live without re-serializing it at 20 Hz. The shared `dfb` board rides
-// the same cadence and only re-sends when a listing actually changes.
-const DF_WIRE_HZ = 2;
-const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
 // World Market browse readout cadence: the browse view (a filter + page over the
 // whole listing book) is the most expensive per-viewer read in selfWireJson and
 // carries no sub-second clock, so 4 Hz caps the rebuild rate; the viewer's OWN
@@ -882,17 +875,6 @@ const LANE_DROP_CAUSE = {
   chat: 'lane_chat',
   name_screen: 'lane_name_screen',
 } as const satisfies Record<MsgLane, WsDropCause>;
-const JAILED_BLOCKED_COMMANDS = new Set<string>([
-  'arena_queue',
-  'bg_queue',
-  'enter_dungeon',
-  'enter_crypt',
-  'enter_delve',
-  'duel_req',
-  'duel_accept',
-  'unstuck',
-  'card_queue_join',
-]);
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
 // read is served from the woc_balance.ts cache (CACHE_TTL_MS), which is the real
 // freshness floor; keeping this loop at/under that TTL means a token change shows
@@ -904,7 +886,6 @@ const HOLDER_TIER_REFRESH_MS = 60_000;
 const PLAYTIME_GRANT_MS = 5 * 60_000;
 const PLAYTIME_POINTS = 10;
 const DAILY_REWARD_ACTIVITY_MS = 60_000;
-const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 
 export interface ClientSession
   extends MovementInputSessionState,
@@ -1527,7 +1508,12 @@ export class GameServer {
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
   private dailyRewardActivityInterval: NodeJS.Timeout | null = null;
-  private relayCooldown = new Map<number, number>(); // accountId -> last "!" relay post (ms)
+  private readonly relay = new CommunityRelay({
+    entity: (pid) => this.sim.entities.get(pid),
+    broadcastSystem: (text) => this.broadcastSystem(text),
+    error: (s, text) =>
+      this.send(s as ClientSession, { t: 'events', list: [{ type: 'error', text }] }),
+  });
   // Queue-pop Discord DMs (server/discord_queue_pops.ts): the observer's deps, bound once.
   private queuePopDeps = queuePopDepsFor((pid) => this.clients.get(pid), REALM);
   // pids whose holder tier was forced via the dev /woctier command — the chain
@@ -2909,45 +2895,6 @@ export class GameServer {
   /** The chat flair of the session at `pid`, read from the SESSION, never an entity. */
   private chatFlairForPid(pid: number): ChatSenderFlair | undefined {
     return this.clients.get(pid)?.chatFlair;
-  }
-
-  // Intercept a leading "!" community command in chat (lfg/wts/...): broadcast it
-  // in-world and hand it to the bot for Discord cross-post. Returns true when it
-  // consumed the line (so it is not sent as normal chat).
-  private handleRelayCommand(session: ClientSession, text: string): boolean {
-    const parsed = parseRelayCommand(text);
-    if (!parsed) return false; // unknown "!word" -> treat as normal chat
-    const now = Date.now();
-    if (now - (this.relayCooldown.get(session.accountId) ?? 0) < RELAY_COOLDOWN_MS) return true;
-    this.relayCooldown.set(session.accountId, now);
-    const { command, message } = parsed;
-    const e = this.sim.entities.get(session.pid);
-    const cls = e ? e.templateId.charAt(0).toUpperCase() + e.templateId.slice(1) : '';
-    const zone = e
-      ? e.dungeonId
-        ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId)
-        : zoneAt(e.pos.x, e.pos.z).name
-      : REALM;
-    // In-game: a system broadcast everyone sees (variable-routed; S3 guard skips it).
-    this.broadcastSystem(`[${command.tag}] ${session.name}: ${message || command.label}`);
-    // Out-of-game: hand off to the bot, which posts a rich embed with a Respond button.
-    enqueueRelay({
-      commandId: command.id,
-      tag: command.tag,
-      label: command.label,
-      color: command.color,
-      accountId: session.accountId,
-      characterName: session.name,
-      level: e?.level ?? 1,
-      className: cls,
-      realm: REALM,
-      zone,
-      message,
-      profileUrl: REALM_PUBLIC_ORIGIN
-        ? `${REALM_PUBLIC_ORIGIN}/c/${encodeURIComponent(session.name)}`
-        : null,
-    });
-    return true;
   }
 
   // Update one player's holder-tier flair from their linked wallet's $WOC
@@ -6831,7 +6778,7 @@ export class GameServer {
         if (this.enforceChatPolicy(session, text)) break;
         // "!" community commands (lfg/wts/...): broadcast in-world + cross-post to
         // Discord, then stop (not normal chat).
-        if (text.startsWith('!') && this.handleRelayCommand(session, text)) break;
+        if (text.startsWith('!') && this.relay.handleRelayCommand(session, text)) break;
         if (configuredGeneral && generalCandidate) {
           this.admitGeneralChat(
             session,
@@ -7271,8 +7218,6 @@ export class GameServer {
         sim.forfeitCardDuel(pid);
         break;
 
-      // Dungeon Finder (docs/prd/dungeon-finder.md): the bodies and their
-      // frame guards live in server/dungeon_finder_commands.ts.
       case 'df_roles':
       case 'df_queue':
       case 'df_queue_leave':
@@ -7282,7 +7227,27 @@ export class GameServer {
       case 'df_apply':
       case 'df_apply_cancel':
       case 'df_app_respond':
-        dispatchDungeonFinderCommand(sim, msg, pid);
+      case 'df_expedition_open':
+      case 'df_expedition_travel':
+      case 'df_expedition_apply':
+      case 'df_expedition_configure':
+        dispatchDungeonFinderCommand(
+          sim,
+          pid,
+          msg,
+          (s) => this.consumeChatToken(session) && (!s || !this.enforceChatPolicy(session, s)),
+          (target) =>
+            this.relay.advertise(
+              session,
+              target,
+              sim.dungeonFinderInfoFor(pid)?.myListing?.advertText,
+              {
+                allowed: (text) =>
+                  !this.isChatMuted(session) && !this.enforceChatPolicy(session, text),
+                postGeneral: (text, delivered) => this.postGeneralAdvert(session, text, delivered),
+              },
+            ),
+        );
         break;
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)
@@ -8445,7 +8410,13 @@ export class GameServer {
     // offsets, and the memo only collapses same-tick evaluations.
     if (this.sim.tickCount - session.lastDfWireTick >= DF_WIRE_INTERVAL_TICKS) {
       session.lastDfWireTick = this.sim.tickCount;
-      maybe('df', this.sim.dungeonFinderInfoFor(anchorSession.pid));
+      maybe(
+        'df',
+        this.relay.withAdvertCooldowns(
+          this.sim.dungeonFinderInfoFor(anchorSession.pid),
+          anchorSession.accountId,
+        ),
+      );
       maybeRaw(
         'dfb',
         realmReadoutJson(this.dfBoardReadout, this.sim.tickCount, () =>
@@ -9342,8 +9313,21 @@ export class GameServer {
     session.rememberedChat = value;
   }
 
-  private logChat(session: ClientSession, sent: import('../src/sim/sim').SentChat | null): void {
-    if (!sent) return;
+  // A Groups-window advert into General (after the relay's mute/policy gate):
+  // it reserves an ordinary chat token, then takes the same quota-aware route a
+  // typed line does. Sequence -1 never matches, so it never moves the sticky
+  // channel; `delivered` fires only when the line is actually sent.
+  private postGeneralAdvert(session: ClientSession, text: string, delivered: () => void): void {
+    if (!this.consumeChatToken(session)) return;
+    const line = `/general ${text}`;
+    const general = classifyOnlineGeneralChat(line, session.rememberedChat.channel);
+    if (general && session.generalChatRateLimit !== null)
+      this.admitGeneralChat(session, general.canonicalText, -1, delivered);
+    else if (this.logChat(session, this.sim.chat(line, session.pid))) delivered();
+  }
+
+  private logChat(session: ClientSession, sent: import('../src/sim/sim').SentChat | null): boolean {
+    if (!sent) return false;
     gameMetricsCounters().chatMessage();
     this.chatLog.log({
       accountId: session.accountId,
@@ -9352,12 +9336,14 @@ export class GameServer {
       channel: sent.channel,
       message: sent.message,
     });
+    return true;
   }
 
   private admitGeneralChat(
     session: ClientSession,
     canonicalText: string,
     channelSequence: number,
+    delivered?: () => void,
   ): void {
     // Capture the whole authority context before the await. A reconnect
     // changes ws, a leave changes membership, and any newer channel selection
@@ -9380,7 +9366,7 @@ export class GameServer {
           if (sent && session.chatChannelSequence === channelSequence) {
             this.rememberChatChannel(session, { channel: 'general' });
           }
-          this.logChat(session, sent);
+          if (this.logChat(session, sent)) delivered?.();
         },
         notify: (event) => this.send(session, { t: 'events', list: [event] }),
         recordOutcome: (outcome) => gameMetricsCounters().generalChatQuota(outcome),

@@ -391,12 +391,15 @@ export type {
 } from './world_api/duel_arena';
 export type {
   DungeonFinderApplicantView,
+  DungeonFinderApplicationView,
   DungeonFinderBoard,
+  DungeonFinderExpeditionView,
   DungeonFinderInfo,
   DungeonFinderListingView,
   DungeonFinderMyListingView,
   DungeonFinderProposalView,
   DungeonFinderQueueView,
+  ExpeditionSettings,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
 export type {
@@ -972,6 +975,10 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  'df_expedition_open',
+  'df_expedition_travel',
+  'df_expedition_apply',
+  'df_expedition_configure',
   'weekly_loot_spec',
   // World PvP Skull Bag: store or take trophy skulls (IWorldWorldPvp.skullBagAction).
   'skull_bag',
@@ -1382,6 +1389,10 @@ export const COMMAND_FACETS = {
   df_apply: 'IWorldDungeonFinder',
   df_apply_cancel: 'IWorldDungeonFinder',
   df_app_respond: 'IWorldDungeonFinder',
+  df_expedition_open: 'IWorldDungeonFinder',
+  df_expedition_travel: 'IWorldDungeonFinder',
+  df_expedition_apply: 'IWorldDungeonFinder',
+  df_expedition_configure: 'IWorldDungeonFinder',
   // IWorldDeeds: the Book of Deeds cosmetic selections, title and nameplate
   // border (snake_case wire strings, by design).
   // deedsEarned/deedStats/renown/activeTitle/activeBorder are snapshot reads

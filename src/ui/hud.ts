@@ -131,7 +131,6 @@ import {
 import { maxBuyCount } from '../sim/vendor_buy_stack';
 import type { SubscriptionStoreHooks } from '../subscription_contract';
 import {
-  type CharacterProfile,
   type DailyRewardStatus,
   type IWorld,
   isOverheadEmoteId,
@@ -283,8 +282,6 @@ import { bindDialogKeyActivation } from './dialog_key_activation';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { duelEndFeedback } from './duel_end_feedback';
-import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
-import { DungeonFinderWindow } from './dungeon_finder_window';
 import { dungeonMapLocal } from './dungeon_map_view';
 import { emoteIconUrl } from './emote_icons';
 import { DEFAULT_EMOTE_WHEEL, EMOTE_WHEEL_LIMIT } from './emote_wheel_defaults';
@@ -497,6 +494,7 @@ import { RiteController } from './hud/delve/rite_controller';
 import { DungeonPrompts, fctAvoidanceText, wardHitText } from './hud/dungeon';
 import { applyDungeonGuideSpeech } from './hud/dungeon/dungeon_guide_speech';
 import { DungeonTrackerPainter } from './hud/dungeon/dungeon_tracker_painter';
+import { createFinderSurfaces } from './hud/expeditions';
 import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
@@ -2660,6 +2658,7 @@ export class Hud {
       hasQuest: (questId) => this.sim.questLog.has(questId),
       showError: (text) => this.showError(text),
       openWhoTab: (filter) => this.socialWindow.openWhoTab(filter),
+      openGroupFinder: () => this.dungeonFinderWindow.open(),
       afterTabShown: (pane) => {
         window.requestAnimationFrame(() => this.chatFollow.scrollToBottomIfPinned(pane));
       },
@@ -3245,18 +3244,6 @@ export class Hud {
     emoteBtn.addEventListener('click', (ev) => {
       ev.preventDefault();
       this.toggleEmoteWheel();
-    });
-    const musicBtn = $('#mm-music');
-    const styleMusicBtn = () => {
-      // keep the note clearly readable when off (a plain tan, not gold) — the
-      // slash, not dimming, signals "muted"
-      musicBtn.classList.toggle('mm-on', music.enabled);
-      musicBtn.classList.toggle('mm-muted', !music.enabled);
-    };
-    styleMusicBtn();
-    musicBtn.addEventListener('click', () => {
-      music.setEnabled(!music.enabled);
-      styleMusicBtn();
     });
     const startZone = zoneAt(sim.player.pos.x, sim.player.pos.z);
     const startZoneName = zoneDisplayName(startZone.id);
@@ -5657,17 +5644,27 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#arena-window'),
     ...this.windowFocus('#arena-window'),
   });
-  private readonly dungeonFinderWindow = new DungeonFinderWindow({
-    ...this.presentationBag,
-    root: () => $('#dungeon-finder-window'),
+
+  private readonly finderSurfaces = createFinderSurfaces({
+    presentation: this.presentationBag,
+    writers: this.writerFacet,
+    root: (selector) => $(selector),
+    focus: (selector) => this.windowFocus(selector),
     world: () => this.sim,
-    closeOthers: () => this.closeOtherWindows('#dungeon-finder-window'),
+    closeOthers: (selector) => this.closeOtherWindows(selector),
     hideTooltip: () => this.hideTooltip(),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
     hasBossGuide: RaidBossGuideWindow.hasJournal,
     openBossGuide: (d, m, diff) => this.raidBossGuideWindow.openJournal(d, m, diff),
-    ...this.windowFocus('#dungeon-finder-window'),
+    openFinder: () => this.toggleDungeonFinder(),
+    maskPlayerText: (note) => this.maskChat(note),
+    // An applicant in view gets the live card; anyone else their finder snapshot.
+    inspectPlayer: (pid, profile) =>
+      this.sim.entities.get(pid)?.kind === 'player'
+        ? this.openInspect(pid)
+        : this.inspectWindow.openRemote(profile),
   });
+  private readonly dungeonFinderWindow = this.finderSurfaces.window;
 
   private readonly raidBossGuideWindow = new RaidBossGuideWindow({
     root: () => $('#raid-boss-guide-window'),
@@ -5680,10 +5677,7 @@ export class Hud {
     ...this.windowFocus('#raid-boss-guide-window'),
   });
 
-  private readonly dungeonFinderProposalPopup = new DungeonFinderProposalPopup({
-    root: () => $('#dfinder-proposal-popup'),
-    world: () => this.sim,
-  });
+  private readonly dungeonFinderProposalPopup = this.finderSurfaces.proposal;
   // The Thornhollow Fields queue-pop prompt, the same shape one tab over:
   // opened by the bgProposed SimEvent, self-closing when the offer resolves,
   // and outside the PvP window so answering never requires opening it.
@@ -6913,6 +6907,7 @@ export class Hud {
     this.bgScoreboard.relocalize();
     this.hillBar.relocalize();
     this.dungeonFinderWindow.relocalize();
+    this.finderSurfaces.expeditions.relocalize();
     this.dungeonFinderProposalPopup.relocalize();
     this.bgProposalPopup.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
@@ -9262,6 +9257,7 @@ export class Hud {
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
+      this.finderSurfaces.expeditions.render();
       if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if (this.bgProposalPopup.isOpen) this.bgProposalPopup.render();
       // Auto-open the Card Duel window the instant a queued match starts (a
@@ -10276,9 +10272,7 @@ export class Hud {
     this.arenaWindow.openTab('ravenrift');
   }
 
-  toggleDungeonFinder(): void {
-    this.dungeonFinderWindow.toggle();
-  }
+  readonly toggleDungeonFinder = (): void => this.dungeonFinderWindow.toggle();
 
   toggleCardDuel(): void {
     this.cardDuelWindow.toggle();
@@ -13888,7 +13882,6 @@ export class Hud {
   // filter defaults on; turning it off in Options shows the raw text the server
   // sent. Slurs are blocked server-side and never reach this path.
   private maskChat(text: string): string {
-    if (this.profanityWords.length === 0) return text;
     if (!(this.optionsHooks?.settings.get('filterProfanity') ?? true)) return text;
     return maskProfanity(text, this.profanityWords);
   }
@@ -17100,23 +17093,6 @@ export class Hud {
 
   /** Inspect another player: a profile window with their portrait, name, level
    *  and class — rendered locally from their entity's class + skin. */
-  /**
-   * The out-of-range Player Info card: the same #inspect-window, painted from the
-   * public character sheet. Deliberately thinner than openInspect: no worn gear,
-   * no wallet balance, no Discord/GitHub identity. Those live on the per-entity
-   * wire and stay proximity-gated, so standing next to someone still shows you
-   * strictly more than looking their name up from chat.
-   */
-  private openRemoteProfile(profile: CharacterProfile): void {
-    this.inspectWindow.openRemote({
-      name: profile.name,
-      level: profile.level,
-      cls: profile.cls as PlayerClass,
-      skin: profile.skin,
-      guild: profile.guild,
-    });
-  }
-
   openInspect(pid: number): void {
     const e = this.sim.entities.get(pid);
     if (e?.kind !== 'player') return;
@@ -17381,7 +17357,8 @@ export class Hud {
         this.showError(t('hudChrome.playerMenu.profileUnavailable', { name }));
         return;
       }
-      this.openRemoteProfile(profile);
+      // Thinner than openInspect: no gear or identity flair, which stay proximity-gated.
+      this.inspectWindow.openProfile(profile);
     });
   }
 
@@ -17788,6 +17765,7 @@ export class Hud {
       this.closeManagedWindow(top);
       return true;
     }
+    if (this.finderSurfaces?.expeditions.close()) return true;
     // Nothing else open: Escape leaves the on-bar key-binding mode (a pending
     // capture never reaches here; Input.onKeyDown cancels it first).
     if (this.actionBarBind?.active) {

@@ -5684,8 +5684,6 @@
     gap: 0;
   }
   .micro-btn {
-    width: 34px;
-    height: 30px;
     cursor: var(--cursor-point);
     font-weight: bold;
     position: relative;
@@ -5783,29 +5781,6 @@
   /* Zero is empty text, not a rendered 0: one elided write per badge hides it. */
   .micro-btn .mm-badge:empty {
     display: none;
-  }
-  /* music button: a bigger note with a small diagonal slash when audio is off */
-  #mm-music .ui-icon {
-    width: 22px;
-    height: 22px;
-  }
-  /* Music on is the note's own gold, not the launcher's open-window ring: the
-     ring stays reserved for "this button's window is open". */
-  #mm-music.mm-on {
-    color: var(--gold);
-  }
-  .micro-btn.mm-muted::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 17px;
-    height: 2px;
-    border-radius: var(--radius-2xs);
-    background: var(--color-text-light);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-keyline) 70%, transparent);
-    transform: translate(-50%, -50%) rotate(-45deg);
-    pointer-events: none;
   }
   @media (prefers-reduced-motion: reduce) {
     .micro-btn.has-points,
@@ -9498,8 +9473,6 @@
   /* The tray plate stays fixed dark on every preset: it floats over the world,
      not over a themed panel, so its ink is fixed too (see the chip below). */
   .community-link {
-    width: 34px;
-    height: 30px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -16617,5 +16590,86 @@
 @layer components {
   #chatlog-wrap.frame-user-hidden {
     display: none !important;
+  }
+}
+
+@layer components {
+  /* ---------- open expeditions ---------- */
+
+  .expedition-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #expedition-bell {
+    position: relative;
+  }
+  #expedition-bell .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  #expedition-bell.expedition-bell-alert {
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  #expedition-bell[data-finish="bronze"] {
+    color: var(--color-queue-bell-bronze);
+  }
+  #expedition-bell[data-finish="silver"] {
+    color: var(--color-queue-bell-silver);
+  }
+  #expedition-bell[data-finish="gold"] {
+    color: var(--color-queue-bell-gold);
+  }
+
+  .expedition-details {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .expedition-details label {
+    display: grid;
+    gap: 4px;
+  }
+  .expedition-details .ui-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .expedition-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    cursor: pointer;
+  }
+  .expedition-check input {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .expedition-note {
+    overflow-wrap: anywhere;
+  }
+
+  .expedition-progress {
+    width: 100%;
+    height: 8px;
+    accent-color: var(--color-primary);
+  }
+
+  @media (forced-colors: active) {
+    .expedition-progress {
+      accent-color: Highlight;
+    }
+  }
+
+  .expedition-actions {
+    flex-wrap: wrap;
+  }
+
+  .expedition-actions .ui-btn {
+    min-height: 40px;
   }
 }

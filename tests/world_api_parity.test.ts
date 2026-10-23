@@ -574,6 +574,10 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonFinderApply', kind: 'method' },
   { name: 'dungeonFinderApplyCancel', kind: 'method' },
   { name: 'dungeonFinderApplicationRespond', kind: 'method' },
+  { name: 'dungeonFinderExpeditionOpen', kind: 'method' },
+  { name: 'dungeonFinderExpeditionTravel', kind: 'method' },
+  { name: 'dungeonFinderExpeditionApply', kind: 'method' },
+  { name: 'dungeonFinderExpeditionConfigure', kind: 'method' },
   // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title/border
   // reads + the two cosmetic selection commands ---
   { name: 'deedsEarned', kind: 'data' },
@@ -1000,9 +1004,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // sitOnSeat (method) on feature/mirefen-tavern: 426/127/299 on its own,
     // 451/133/318 merged into the v0.45.0 integration.
     // Lantern Hall's guildContracts (data) and buyGuildCosmetic (method): 453/134/319.
-    expect(IWORLD_MEMBERS.length).toBe(461);
+    expect(IWORLD_MEMBERS.length).toBe(465);
     expect(DATA_MEMBERS.length).toBe(137);
-    expect(METHOD_MEMBERS.length).toBe(324);
+    expect(METHOD_MEMBERS.length).toBe(328);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1048,8 +1052,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeVarkhulCinderFires',
       'activeVarkhulCinderOrbProjectiles',
       'activeVarkhulForgestormWarnings',
-      'answerDungeonGuide',
       'alliedHearthstoneAttunement',
+      'answerDungeonGuide',
       'applyEnchant',
       'applyTalents',
       'archetypeTitle',
@@ -1153,6 +1157,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderApply',
       'dungeonFinderApplyCancel',
       'dungeonFinderBoard',
+      'dungeonFinderExpeditionApply',
+      'dungeonFinderExpeditionConfigure',
+      'dungeonFinderExpeditionOpen',
+      'dungeonFinderExpeditionTravel',
       'dungeonFinderInfo',
       'dungeonFinderListingClose',
       'dungeonFinderListingCreate',
@@ -1711,6 +1719,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderApplicationRespond',
       'dungeonFinderApply',
       'dungeonFinderApplyCancel',
+      'dungeonFinderExpeditionApply',
+      'dungeonFinderExpeditionConfigure',
+      'dungeonFinderExpeditionOpen',
+      'dungeonFinderExpeditionTravel',
       'dungeonFinderListingClose',
       'dungeonFinderListingCreate',
       'dungeonFinderQueueJoin',
@@ -2552,6 +2564,10 @@ const FACET_DUNGEON_FINDER = [
   'dungeonFinderApply',
   'dungeonFinderApplyCancel',
   'dungeonFinderApplicationRespond',
+  'dungeonFinderExpeditionOpen',
+  'dungeonFinderExpeditionTravel',
+  'dungeonFinderExpeditionApply',
+  'dungeonFinderExpeditionConfigure',
 ] as const satisfies readonly (keyof IWorldDungeonFinder)[];
 type _ExhaustDungeonFinder = AssertNever<
   Exclude<keyof IWorldDungeonFinder, (typeof FACET_DUNGEON_FINDER)[number]>
@@ -2820,8 +2836,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // the dungeon objectives tracker's dungeonRun (one data member); the tavern
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(461);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(461);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(465);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(465);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

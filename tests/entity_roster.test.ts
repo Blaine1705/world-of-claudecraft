@@ -289,6 +289,7 @@ function makeCtx() {
     riftOpenTreasure: vi.fn(),
     resetDungeonInstances: vi.fn(),
     inheritDungeonResetLocks: vi.fn(),
+    onDungeonFinderPartyJoined: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),

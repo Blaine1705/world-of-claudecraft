@@ -1800,13 +1800,21 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'duel.ts',
       'duel_zone.ts',
       'dungeon_finder.ts',
+      'dungeon_finder_dev.ts',
+      'expedition_social.ts',
       'fiesta.ts',
       'fiesta_bots.ts',
       'map_objective_bots.ts',
       'map_objectives_hooks.ts',
       'map_objectives_run.ts',
+      'finder_advert.ts',
+      'finder_applications.ts',
+      'finder_guild.ts',
+      'finder_listing_edit.ts',
+      'finder_recruitment.ts',
       'party.ts',
       'pull_timer.ts',
+      'queue_rewards.ts',
       'ready_check.ts',
       'trade.ts',
       'trade_offer_sources.ts',
@@ -2326,6 +2334,18 @@ describe('vendor sell log line localizes the item name for both a single item an
         const out = harness().localizeLootText('Sold Copper Ore for 4c.');
         expect(out, lang).toBe(expected);
       }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('localizes both current and legacy royal-door denial punctuation', () => {
+    try {
+      setLanguage('es');
+      const current = 'Nythraxis is engaged - the royal door has sealed shut.';
+      const legacy = 'Nythraxis is engaged \u2014 the royal door has sealed shut.';
+      expect(localizeSimText(current)).not.toBe(current);
+      expect(localizeSimText(current)).toBe(localizeSimText(legacy));
     } finally {
       setLanguage('en');
     }

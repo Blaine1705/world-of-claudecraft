@@ -152,7 +152,7 @@ plausibly covers means the table needs a new row in the same change.
 | `environment_damage.ts` | the per-player environmental damage step the tick calls: the breath clock first, then damaging fluid pools (Studio `fluid/<kind>` placements resolved by `fluid_volumes.ts`; a once-per-second flat DPS plus a fraction of max HP). The built-in world has no fluid volumes, so the fluid arm is a no-op there and draws rng only through `dealDamage` on a fluid map. Pinned by `tests/fluid_volumes.test.ts` |
 | `climb.ts` | the ledge-climb MOVEMENT MODE (same family as Heroic Leap's flight and warrior Charge): while it runs it owns the body's position outright; the destination was validated BEFORE the climb started by the `physics/ledge.ts` grab query |
 | `social/party.ts` | the party/raid machine + `partyOf` |
-| `social/dungeon_finder.ts` | the Dungeon Finder (`docs/prd/dungeon-finder.md`): the automatic role queue plus the leader-run premade board; only FORMS groups (via `PartyMachine.formDungeonFinderGroup`), draws no rng; pinned by `tests/dungeon_finder.test.ts` |
+| `social/dungeon_finder.ts` | the Dungeon Finder (`docs/prd/dungeon-finder.md`): the automatic role queue and leader-run premade board form groups via `PartyMachine.formDungeonFinderGroup`; open expeditions recruit into running claims and explicit travel reuses the normal door preflight; draws no rng; pinned by `tests/dungeon_finder.test.ts` and `tests/dungeon_expeditions.test.ts` |
 | `social/duel.ts` + `social/arena.ts` | duels + ranked arena (Elo, matchmaking) |
 | `social/fiesta.ts` + `social/fiesta_bots.ts` | fiesta match logic + offline bots |
 | `social/yumi.ts` | Protect Yumi 3v3/5v5 maze mode (layout leaf `yumi_maze_layout.ts`) |
