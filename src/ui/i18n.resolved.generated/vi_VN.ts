@@ -1374,6 +1374,18 @@ export const vi_VN: EnTranslations = {
         }
       },
       "seasonOne": "Mùa 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Không phổ biến",
         "rare": "Hiếm",
@@ -2353,6 +2365,8 @@ export const vi_VN: EnTranslations = {
       "name_lantern_hall_destrier": "Lantern Hall Destrier",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
@@ -2363,6 +2377,7 @@ export const vi_VN: EnTranslations = {
       "desc_goblin_rocket_sled": "Một chiếc xe trượt goblin được chế tạo quá mức đến nguy hiểm, phóng đi nhờ hai tên lửa và óc phán đoán tồi một cách xuất sắc.",
       "desc_rallycart_rxt": "Một cỗ máy đua rally nhỏ gọn giúp tăng tốc độ di chuyển.",
       "desc_rallycart_skin": "Một chiếc xe đua nhỏ có tiếng gầm vang dội.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2371,6 +2386,7 @@ export const vi_VN: EnTranslations = {
       "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
       "desc_lanternback_troll": "Một con quỷ đồi bị những người đốt đèn bẻ gãy ách, vác một chiếc ngai sắt trên vai với một chiếc đèn bão đang cháy trên hai tay.",
       "desc_lantern_hall_destrier": "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
       "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực."
     },
@@ -5521,6 +5537,7 @@ export const vi_VN: EnTranslations = {
         "skeleton": "Dry bones rattle in step with yours.",
         "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
         "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
+        "sprites": "Two small flames have caught on you, and they are not going out.",
         "crystal_tide": "A drop of the sea refuses to fall from your line.",
         "phantom": "The air behind you is a shade too still.",
         "emberfall_phoenix": "A warmth like a banked fire settles at your back."
@@ -5600,6 +5617,7 @@ export const vi_VN: EnTranslations = {
         "crystal_lich": "A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.",
         "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
         "crystal_tide": "A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.",
+        "sprites": "Two small fire sprites, one gold and one teal, who never quite agree which of them is leading. Get close enough and they fold into one green flame, then spill apart again, laughing.",
         "phantom": "A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.",
         "emberfall_phoenix": "It burns down to an ember every autumn and comes back up out of its own ash by spring, which is the whole of what anyone can tell you about it. Nobody has ever found a nest, and nobody has ever caught one twice."
       },
@@ -11025,6 +11043,10 @@ export const vi_VN: EnTranslations = {
     "appTitle": "Trình Chỉnh Sửa Bản Đồ",
     "docTitle": "Trình Chỉnh Sửa Bản Đồ - World of ClaudeCraft",
     "untitledMap": "Bản Đồ Chưa Đặt Tên",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Người Tạo Bản Đồ",
     "playtestBack": "Back to Editor",
@@ -20132,6 +20154,9 @@ export const vi_VN: EnTranslations = {
       "reins_avian_strider": {
         "name": "Dây Cương Bước Chim Xanh Valestrider"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Khóa khởi động: Xe trượt tên lửa goblin"
       },
@@ -20143,6 +20168,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Dây đeo chuông của Roadwarden: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Dây cương ràng buộc: Xe kéo Buộc Xương"
@@ -20797,6 +20825,9 @@ export const vi_VN: EnTranslations = {
       },
       "whistle_forgemaw": {
         "name": "Forgemaw The Molten Whistle"
+      },
+      "whistle_sprites": {
+        "name": "Flicker and Glimmer Whistle"
       },
       "whistle_crystal_tide": {
         "name": "Crystal Tide Whistle"
@@ -25929,6 +25960,9 @@ export const vi_VN: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "Forgemaw The Molten"
+      },
+      "buddy_sprites": {
+        "name": "Flicker and Glimmer"
       },
       "buddy_crystal_tide": {
         "name": "Crystal Tide"

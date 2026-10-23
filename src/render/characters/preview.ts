@@ -11,6 +11,7 @@ import {
   runLinkedProgramTouchLane,
 } from '../linked_program_touch_lane';
 import { shaderDebugRequested } from '../shader_debug_flag';
+import { attachTemplateModelVfx } from '../template_model_vfx';
 import {
   collectPrewarmTextures,
   uploadTexturesInSlices,
@@ -168,6 +169,12 @@ const PREVIEW_ANIM_STATE = {
 };
 
 const LIVE_PREVIEW_X = 0;
+
+/** The turntable's reduced-motion read for model effects that animate on their
+ *  own (the sprite buddy's flame flicker): the OS setting, read live. */
+function previewPrefersReducedMotion(): boolean {
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
 export class CharacterPreview {
   private container: HTMLElement;
@@ -736,6 +743,9 @@ export class CharacterPreview {
       this.armorDetail = detail;
       this.currentVisualSig = nextSig;
       this.characterGroup.add(this.currentVisual.root);
+      // A buddy's visual key is its template id, so the turntable shows the same
+      // model effects the world does (the sprite pair's live flames).
+      attachTemplateModelVfx(visualKey, this.currentVisual.root, previewPrefersReducedMotion);
       const visual = this.currentVisual;
       // a WOC body is born wearing the head look and size last handed in (no-op
       // elsewhere)

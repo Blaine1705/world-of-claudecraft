@@ -667,6 +667,8 @@ describe('every point-light producer is a carrier source', () => {
       'render/placed_assets.ts: sparks',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
+      // The sprite buddy's flame meshes step and upload their own uniforms.
+      'render/sprites_buddy_flame.ts: mesh',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
       // the idle sweep or to Vael's lamp yaw, never a scene.
       'render/sunken_bastion/bastion_beacon.ts: mesh',

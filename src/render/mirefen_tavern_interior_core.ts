@@ -72,7 +72,7 @@ const RACK_GAPS: readonly (readonly [number, number])[] = racks
   .flatMap((r, i, all) => (i + 1 < all.length ? [[r[1] + 0.1, all[i + 1][0] - 0.1] as const] : []))
   .filter(([a, b]) => b - a > 1);
 
-// the arch's segmental head (tavern_shell.py hall_back): springing at 3.9, crowned at its
+// the arch's segmental head (inn_hall.py back): springing at 3.9, crowned at its
 // height; the second box is the head's chord half a yard under the crown
 const ARCH_SPRING = 3.9;
 const archMid = (TAVERN_ARCH.x0 + TAVERN_ARCH.x1) / 2;

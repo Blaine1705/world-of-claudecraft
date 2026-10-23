@@ -3,7 +3,7 @@ import { isBlocked } from '../src/sim/colliders';
 import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
-import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+import { activeFenbridgeLayout } from '../src/sim/fenbridge_touchup';
 import { sanitizeMapDoc } from '../src/sim/map_doc';
 import type { WorldContent } from '../src/sim/types';
 import { biomeAt, terrainHeight, WATER_LEVEL, waterLevel, zoneBiomeAt } from '../src/sim/world';
@@ -67,7 +67,8 @@ describe('custom-map terrain seam', () => {
 
   it('keeps generic exterior collision while removing specialized built-in town layouts', () => {
     const bank = EASTBROOK_LAYOUT.buildings.find((building) => building.id === 'eastbrook_bank');
-    const authoredFenbridgeInn = FENBRIDGE_LAYOUT.buildings.find(
+    const fenLayout = activeFenbridgeLayout();
+    const authoredFenbridgeInn = fenLayout.buildings.find(
       (building) => building.id === 'fenbridge_crooked_reed_inn',
     );
     const fenbridgeInn = BUILTIN_WORLD.props.buildings.find(
@@ -78,8 +79,8 @@ describe('custom-map terrain seam', () => {
       id: 'fenbridge_crooked_reed_inn',
       // the painted tavern on the main street, stood grand (fenbridge_layout.ts)
       assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
-      x: 13.55,
-      z: 298,
+      x: authoredFenbridgeInn?.position.x,
+      z: authoredFenbridgeInn?.position.z,
     });
     if (!bank || !fenbridgeInn) return;
 
@@ -87,18 +88,13 @@ describe('custom-map terrain seam', () => {
     expect(isBlocked(SEED, bank.position.x, bank.position.z, 0.4)).toBe(true);
     expect(isBlocked(SEED, fenbridgeInn.x, fenbridgeInn.z, 0.4)).toBe(true);
     expect(
-      isBlocked(
-        SEED,
-        FENBRIDGE_LAYOUT.civic.cistern.position.x,
-        FENBRIDGE_LAYOUT.civic.cistern.position.z,
-        0.4,
-      ),
+      isBlocked(SEED, fenLayout.civic.cistern.position.x, fenLayout.civic.cistern.position.z, 0.4),
     ).toBe(true);
     expect(
       isBlocked(
         SEED,
-        FENBRIDGE_LAYOUT.civic.provisionStall.position.x,
-        FENBRIDGE_LAYOUT.civic.provisionStall.position.z,
+        fenLayout.civic.provisionStall.position.x,
+        fenLayout.civic.provisionStall.position.z,
         0.4,
       ),
     ).toBe(true);
@@ -116,23 +112,18 @@ describe('custom-map terrain seam', () => {
     expect(isBlocked(SEED, bank.position.x, bank.position.z, 0.4)).toBe(false);
     expect(props.buildings.some((building) => building.id === fenbridgeInn.id)).toBe(false);
     expect(isBlocked(SEED, fenbridgeInn.x, fenbridgeInn.z, 0.4)).toBe(false);
-    expect(props.wells.some((well) => well.id === FENBRIDGE_LAYOUT.civic.cistern.id)).toBe(false);
+    expect(props.wells.some((well) => well.id === fenLayout.civic.cistern.id)).toBe(false);
+    expect(
+      isBlocked(SEED, fenLayout.civic.cistern.position.x, fenLayout.civic.cistern.position.z, 0.4),
+    ).toBe(false);
+    expect(props.stalls.some((stall) => stall.id === fenLayout.civic.provisionStall.id)).toBe(
+      false,
+    );
     expect(
       isBlocked(
         SEED,
-        FENBRIDGE_LAYOUT.civic.cistern.position.x,
-        FENBRIDGE_LAYOUT.civic.cistern.position.z,
-        0.4,
-      ),
-    ).toBe(false);
-    expect(
-      props.stalls.some((stall) => stall.id === FENBRIDGE_LAYOUT.civic.provisionStall.id),
-    ).toBe(false);
-    expect(
-      isBlocked(
-        SEED,
-        FENBRIDGE_LAYOUT.civic.provisionStall.position.x,
-        FENBRIDGE_LAYOUT.civic.provisionStall.position.z,
+        fenLayout.civic.provisionStall.position.x,
+        fenLayout.civic.provisionStall.position.z,
         0.4,
       ),
     ).toBe(false);
@@ -150,7 +141,7 @@ describe('custom-map terrain seam', () => {
       services: undefined,
     };
     setActiveWorldContent(customWorld);
-    const board = FENBRIDGE_LAYOUT.civic.musterBoard;
+    const board = activeFenbridgeLayout().civic.musterBoard;
     expect(customWorld.services?.musterBoards).toBeUndefined();
     expect(isBlocked(20_061, board.position.x, board.position.z, 0.2)).toBe(false);
   });

@@ -880,14 +880,15 @@ describe('item-art audit builder', () => {
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
       // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
       // `--verify-only` on the merged tree.
-      // Integration45: 141 new files plus repainted loot, measured by --verify-only.
-      // + Lantern Hall's seal and its destrier's reins (PR 4530): 2183 / 2212, re-measured with
-      // `--verify-only` on the merged tree.
-      catalogSha256: 'af7a3168e3d6efada5c1811b6d4d76004cce2680fcc5bdc5b35631431280e2fc',
-      catalogBytes: 1193908,
+      // Integration45: 141 new files plus repainted loot and Nightwing Chimaera, measured by --verify-only.
+      // 2,183 owners / 2,212 live with Wobbles the Slime's reins, re-measured with
+      // `node scripts/item_art_audit.mjs --verify-only` (catalog +523 bytes).
+      // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
+      catalogSha256: '85fc9b38e745436b8d44d304f6d30beb0c5a0505be41b1c7af48d8c91268626b',
+      catalogBytes: 1195493,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2183,
-      liveItemCount: 2212,
+      catalogCount: 2186,
+      liveItemCount: 2215,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -905,7 +906,7 @@ describe('item-art audit builder', () => {
         identity: 47,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '6ab73c1a1c48ee4f366399ed1c6994c2584379df9580a7bc16313980da3d09fa',
+      shippingCatalogSha256: '5444cf816ed44b7389988fd4be65a860cb803cb196e44cfdcfa0f0f63cfcde23',
       machineChecksPassed: true,
       verdict: null,
     });

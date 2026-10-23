@@ -425,6 +425,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only mount (DEVELOPER_MOUNTS terms): /dev mounts or
+  // /dev give reins_wobbles_slime, soulbound until it has an acquisition path.
+  reins_wobbles_slime: {
+    id: 'reins_wobbles_slime',
+    name: 'Jelly Saddle: Wobbles',
+    kind: 'mount',
+    mount: 'wobbles_slime',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // The Rift Watch's Champion mount: sold by Quartermaster Vaelen in
   // Drifthaven behind Champion standing (content/faction_vendors.ts,
   // docs/design/factions.md). Priced at the classic epic-mount ratio, ten
@@ -441,6 +454,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
     buyValue: 1_000_000, // 100 gold in copper
+  },
+  reins_nightwing_chimera: {
+    id: 'reins_nightwing_chimera',
+    name: 'Reins of the Nightwing Chimaera',
+    kind: 'mount',
+    mount: 'nightwing_chimera',
+    quality: 'epic',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
   },
   // Active buddy whistles are soulbound grant tokens consumed on use.
   // Retired whistles and charms retain their original definitions so existing
@@ -744,6 +768,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Forgemaw The Molten Whistle',
     kind: 'buddy',
     buddy: 'forgemaw',
+    soulbound: true,
+    quality: 'epic',
+    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
+  },
+  // The flame-sprite pair. No player-facing source yet: granted by /dev buddy
+  // and the admin grant only (docs/design/buddy-acquisition.md).
+  whistle_sprites: {
+    id: 'whistle_sprites',
+    name: 'Flicker and Glimmer Whistle',
+    kind: 'buddy',
+    buddy: 'sprites',
     soulbound: true,
     quality: 'epic',
     sellValue: 50_000, // 5g, the flat vendor price every whistle takes

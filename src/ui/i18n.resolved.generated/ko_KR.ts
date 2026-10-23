@@ -1374,6 +1374,18 @@ export const ko_KR: EnTranslations = {
         }
       },
       "seasonOne": "시즌 1",
+      "membershipPromo": {
+        "open": "WOC 상점의 멤버십",
+        "close": "멤버십 홍보 닫기",
+        "eyebrow": "계정 혜택",
+        "title": "멤버십",
+        "cta": "지금 가입"
+      },
+      "referralPromo": {
+        "close": "친구 초대 홍보 닫기",
+        "eyebrow": "함께하는 모험",
+        "cta": "친구 초대하기"
+      },
       "rarity": {
         "uncommon": "고급",
         "rare": "희귀",
@@ -2353,6 +2365,8 @@ export const ko_KR: EnTranslations = {
       "name_lantern_hall_destrier": "등불 회관 군마",
       "name_chimeglass_tortoise": "종유리의 톨리버",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
+      "name_wobbles_slime": "말랑이 슬라임",
+      "name_nightwing_chimera": "밤날개 키메라",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -2363,6 +2377,7 @@ export const ko_KR: EnTranslations = {
       "desc_goblin_rocket_sled": "위험할 정도로 과하게 만들어진 고블린 썰매. 쌍발 로켓과 형편없는 판단력으로 내달린다.",
       "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
       "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
+      "desc_wobbles_slime": "안장을 얹도록 길들여진 커다란 파란 슬라임. 걷는 대신 통통 튀어 다니고, 기수 아래에서 말랑하게 흔들리며, 젤리 몸속으로 거품이 천천히 떠오른다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_referral_tank": "친구 초대 도장 카드를 완성하면 획득합니다.",
       "desc_referral_raptor": "첫 번째 연결된 친구가 도장 카드를 완성하도록 도우면 획득합니다.",
@@ -2371,6 +2386,7 @@ export const ko_KR: EnTranslations = {
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
       "desc_lanternback_troll": "점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.",
       "desc_lantern_hall_destrier": "등불 회관의 군마. 길드의 푸른 천 아래 참나무와 쇠로 된 마갑을 두르고, 안장에서 흔들리는 두 개의 폭풍 등불이 귀갓길을 밝힌다.",
+      "desc_nightwing_chimera": "고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.",
       "desc_chimeglass_tortoise": "소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.",
       "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다."
     },
@@ -5521,6 +5537,7 @@ export const ko_KR: EnTranslations = {
         "skeleton": "마른 뼈가 당신의 걸음에 맞춰 덜그럭거립니다.",
         "crystal_lich": "잔해에서 차가운 웅웅거림이 피어오르고, 그것이 당신을 지켜봅니다.",
         "forgemaw": "용광로의 열기가 아직 당신을 떠나지 않았습니다. 무언가가 그것과 함께 걸어 나왔습니다.",
+        "sprites": "작은 불꽃 두 개가 당신에게 옮겨붙었고, 꺼질 기미가 없습니다.",
         "crystal_tide": "바닷물 한 방울이 당신의 낚싯줄에서 떨어지기를 거부합니다.",
         "phantom": "당신 뒤의 공기가 조금 지나치게 고요합니다.",
         "emberfall_phoenix": "재에 묻은 불처럼 은근한 온기가 당신의 등 뒤에 내려앉습니다."
@@ -5600,6 +5617,7 @@ export const ko_KR: EnTranslations = {
         "crystal_lich": "나이트락시스 자신의 파편으로, 그를 빚어낸 냉기를 아직도 웅웅 울리며 품고 있다. 공격대의 잔해에서 자신을 끄집어낸 자를 따르지만, 그 일을 아직 용서하지는 않았다.",
         "forgemaw": "마지막 샘의 도가니에서 벼려졌으나 끝내 완성되지 못한 것으로, 망치질이 아직 이어지는 동안 이그니바르의 주조장을 제 발로 걸어 나왔다. 오직 영웅 난이도의 공략만이 그를 찾아낸다. 이 용융체는 자신을 만든 화로로 자꾸 돌아가고, 불길을 두 번 살아남은 자를 따라 집까지 온다.",
         "crystal_tide": "자기 몫의 바다유리 방울을 타고 다니는 조수 정령으로, 이스트브룩 골짜기부터 먼바다 해안까지 저녁거리를 낚던 낚시꾼들이 잔잔한 물에서 건져 올렸다. 자신이 딸려 올라온 물을 그대로 지니고 다니며, 돌아가라는 말은 듣지 않는다.",
+        "sprites": "금빛과 청록빛, 두 작은 불의 정령입니다. 누가 앞장설지 좀처럼 정하지 못합니다. 가까이 붙으면 하나의 초록 불꽃으로 합쳐졌다가, 웃으며 다시 갈라집니다.",
         "phantom": "망령숲의 고분에서 나온 손바닥만 한 유령으로, 온통 천뿐이고 뼈는 없다. 분명히 닫아둔 배낭 안에 나타나서는 함께 있고 싶다는 이유로 눌러앉는다. 무엇을 원하는지 아무도 알아내지 못했고, 누군가를 겁주려 한 적은 한 번도 없다.",
         "emberfall_phoenix": "가을마다 타들어가 한 점 잉걸불이 되었다가, 봄이면 제 재에서 다시 솟아오른다. 누구에게 물어도 할 수 있는 말은 그것이 전부다. 둥지를 찾아낸 사람도 없고, 같은 개체를 두 번 붙잡은 사람도 없다."
       },
@@ -11025,6 +11043,10 @@ export const ko_KR: EnTranslations = {
     "appTitle": "맵 편집기",
     "docTitle": "맵 편집기 - World of ClaudeCraft",
     "untitledMap": "제목 없는 맵",
+    "liveWorld": {
+      "name": "게임 월드 다듬기",
+      "scope": "게임 월드: 지형 높이와 페인트, 도로, 게임 오브젝트 위치, 추가한 소품을 편집할 수 있습니다. 기존 건물은 고정됩니다. 검토할 변경 사항은 내보내기로 저장하세요."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "지도제작자",
     "playtestBack": "Back to Editor",
@@ -20132,6 +20154,9 @@ export const ko_KR: EnTranslations = {
       "reins_avian_strider": {
         "name": "비리디안 베일스트라이더의 고삐"
       },
+      "reins_nightwing_chimera": {
+        "name": "밤날개 키메라의 고삐"
+      },
       "reins_goblin_rocket_sled": {
         "name": "고블린 로켓 썰매 시동 열쇠"
       },
@@ -20143,6 +20168,9 @@ export const ko_KR: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "길지기의 종끈: 톨리버"
+      },
+      "reins_wobbles_slime": {
+        "name": "젤리 안장: 말랑이"
       },
       "reins_rickshaw_mount": {
         "name": "결속된 고삐: 뼈에 묶인 인력거"
@@ -20797,6 +20825,9 @@ export const ko_KR: EnTranslations = {
       },
       "whistle_forgemaw": {
         "name": "용융의 화로아귀의 호루라기"
+      },
+      "whistle_sprites": {
+        "name": "깜빡이와 반짝이의 호루라기"
       },
       "whistle_crystal_tide": {
         "name": "수정 물결의 호루라기"
@@ -25929,6 +25960,9 @@ export const ko_KR: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "용융의 화로아귀"
+      },
+      "buddy_sprites": {
+        "name": "깜빡이와 반짝이"
       },
       "buddy_crystal_tide": {
         "name": "수정 물결"

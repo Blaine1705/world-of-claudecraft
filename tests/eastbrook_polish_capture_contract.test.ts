@@ -731,9 +731,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  // Re-minted for Lantern Hall (the Highwatch adventurers' guild, #4530) merged onto the
-  // v0.45.0 integration: the renderer leaf moved. No capture was retaken.
-  '7695f6ab10b10e91b521133d8d6a56704f9533cb7a54b526b53ffc24407763b1';
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  'ed346f4bbd9126e4c809f44c17230950d39cb7e69afd37cbcd252b7208248448';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -240,8 +240,8 @@ describe('the account port decides the sword on a server', () => {
   it("the server hands the quartermaster the ACTING session's ledger, never the sim mirror", () => {
     // a wire-layer default would fall back to the realm-wide ctx.accountCosmetics
     const game = readFileSync(join(__dirname, '..', 'server', 'game.ts'), 'utf8');
-    expect(game).toContain(
-      'questWire.dispatchWorldQuestWire(sim, msg, pid, this.cosmetics.ledger(session))',
+    expect(game).toMatch(
+      /this\.cosmetics\.ledger\(session, \(offer\) => \{\s*void this\.guildWeapons\.start\(session, offer\);\s*\}\)/,
     );
   });
 
@@ -253,7 +253,7 @@ describe('the account port decides the sword on a server', () => {
     expect(sealsLeft()).toBe(40);
   });
 
-  it("the server's port owns the skin on the session at once and mirrors it durably", async () => {
+  it('refuses synchronous account grants without the atomic purchase coordinator', async () => {
     persistSkin.mockResolvedValue({
       ...EMPTY_LIVE_ACCOUNT_COSMETICS,
       weaponSkinIds: [LANTERN_HALL_SWORD_SKIN_ID],
@@ -274,15 +274,12 @@ describe('the account port decides the sword on a server', () => {
     expect(port.ownsWeaponSkin(LANTERN_HALL_SWORD_SKIN_ID)).toBe(false);
     expect(port.grantWeaponSkin('not_a_skin')).toBe(false);
     expect(persistSkin).not.toHaveBeenCalled();
-    expect(port.grantWeaponSkin(LANTERN_HALL_SWORD_SKIN_ID)).toBe(true);
-    // both characters on the account own it before the write lands: a double click is refused
-    expect(sessions.map((x) => x.accountCosmetics.weaponSkinIds)).toEqual([
-      [LANTERN_HALL_SWORD_SKIN_ID],
-      [LANTERN_HALL_SWORD_SKIN_ID],
-    ]);
-    expect(service.ledger(sessions[1]).ownsWeaponSkin(LANTERN_HALL_SWORD_SKIN_ID)).toBe(true);
-    expect(persistSkin).toHaveBeenCalledWith(7, [LANTERN_HALL_SWORD_SKIN_ID]);
+    expect(port.grantWeaponSkin(LANTERN_HALL_SWORD_SKIN_ID)).toBe(false);
+    // Ownership cannot precede the transaction that saves its character seal charge.
+    expect(sessions.map((x) => x.accountCosmetics.weaponSkinIds)).toEqual([[], []]);
+    expect(service.ledger(sessions[1]).ownsWeaponSkin(LANTERN_HALL_SWORD_SKIN_ID)).toBe(false);
+    expect(persistSkin).not.toHaveBeenCalled();
     for (let i = 0; i < 6; i++) await Promise.resolve();
-    expect(sessions[0].accountCosmetics.weaponSkinIds).toEqual([LANTERN_HALL_SWORD_SKIN_ID]);
+    expect(sessions[0].accountCosmetics.weaponSkinIds).toEqual([]);
   });
 });

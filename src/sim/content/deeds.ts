@@ -2866,7 +2866,9 @@ export const DEEDS: Record<string, DeedDef> = {
   // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
   // growing catalog, the feat_book_complete class, and the flag is what
   // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Two catalog slots are
-  // owner-pended today (reins_lanternback_troll, reins_terrorspark_groundshaker;
+  // owner-pended today (reins_lanternback_troll, reins_wobbles_slime;
+  // reins_terrorspark_groundshaker left when the annual membership bundle
+  // began granting it;
   // masterwork:engineering was the third until masterwrought Phase 11o's
   // stats-bearing copperlens_ocular made the mark earnable, 2026-08-25, and
   // reins_drakemaw_raptor left the list when the Mirefen world boss took it),

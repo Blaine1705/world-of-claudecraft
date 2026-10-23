@@ -1451,6 +1451,7 @@ const RENDER_PURE_CORES = [
   'src/render/cut_cavity_core.ts',
   'src/render/grass_edge_taper_core.ts',
   'src/render/grass_interaction_core.ts',
+  'src/render/sprites_buddy_flame_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -3092,6 +3093,9 @@ const UI_DOM_MODULES = [
   // coverage is the deliberate one this file's own header describes.
   'src/ui/daily_rewards_spin_controller.ts',
   'src/ui/store_subscription.ts',
+  // The rotating promo card above chat: it owns its DOM, a rotation interval,
+  // a retire-guard clock read and the prefers-reduced-motion query.
+  'src/ui/store_promo_card.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',

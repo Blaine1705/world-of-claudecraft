@@ -7571,7 +7571,15 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Wobbles the Slime"
+      },
+      {
+        "kind": "mount",
         "name": "Dreadspark Groundshaker"
+      },
+      {
+        "kind": "mount",
+        "name": "Nightwing Chimaera"
       },
       {
         "kind": "mount",

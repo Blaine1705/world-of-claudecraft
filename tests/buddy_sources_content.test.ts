@@ -20,6 +20,7 @@ describe('buddy tokens: soulbound, consumed on use, never loot', () => {
       'whistle_forgemaw',
       'whistle_horse',
       'whistle_sapling',
+      'whistle_sprites',
     ]);
   });
 

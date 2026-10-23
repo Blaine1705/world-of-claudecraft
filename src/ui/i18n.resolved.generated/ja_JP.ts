@@ -1374,6 +1374,18 @@ export const ja_JP: EnTranslations = {
         }
       },
       "seasonOne": "シーズン1",
+      "membershipPromo": {
+        "open": "WOCストアのメンバーシップ",
+        "close": "メンバーシップの宣伝を閉じる",
+        "eyebrow": "アカウント特典",
+        "title": "メンバーシップ",
+        "cta": "今すぐ参加"
+      },
+      "referralPromo": {
+        "close": "フレンド招待の宣伝を閉じる",
+        "eyebrow": "一緒に冒険しよう",
+        "cta": "フレンドを招待"
+      },
       "rarity": {
         "uncommon": "アンコモン",
         "rare": "レア",
@@ -2353,6 +2365,8 @@ export const ja_JP: EnTranslations = {
       "name_lantern_hall_destrier": "燈火の館の軍馬",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
+      "name_wobbles_slime": "スライムのプルプル",
+      "name_nightwing_chimera": "ナイトウィング・キマイラ",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -2363,6 +2377,7 @@ export const ja_JP: EnTranslations = {
       "desc_goblin_rocket_sled": "危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。",
       "desc_rallycart_rxt": "小型ながら本格的なラリーマシン。移動速度を高めてくれる。",
       "desc_rallycart_skin": "小さな車体から豪快なエンジン音を響かせるラリーカー。",
+      "desc_wobbles_slime": "鞍を着けられるよう馴らされた大きな青いスライム。歩く代わりに跳ねて進み、乗り手の下でぷるぷると揺れ、体の中を泡がゆっくり昇っていく。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_referral_tank": "招待スタンプカードを完成させると獲得できます。",
       "desc_referral_raptor": "最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。",
@@ -2371,6 +2386,7 @@ export const ja_JP: EnTranslations = {
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
       "desc_lantern_hall_destrier": "燈火の館の軍馬。ギルドの青の下に樫と鉄の馬鎧をまとい、鞍から揺れる二つの嵐灯が帰り道を照らす。",
+      "desc_nightwing_chimera": "古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
@@ -5521,6 +5537,7 @@ export const ja_JP: EnTranslations = {
         "skeleton": "乾いた骨があなたの歩みに合わせてかたかた鳴る。",
         "crystal_lich": "残骸から冷たいうなりが立ちのぼり、それがあなたを見ている。",
         "forgemaw": "炉の熱がまだあなたから離れない。何かがそれと共に歩き出た。",
+        "sprites": "小さな二つの炎があなたに燃え移り、消えそうにない。",
         "crystal_tide": "海のひとしずくが、あなたの釣り糸から落ちようとしない。",
         "phantom": "あなたの後ろの空気が、ほんの少し静かすぎる。",
         "emberfall_phoenix": "埋み火のような温もりが、あなたの背に落ち着く。"
@@ -5600,6 +5617,7 @@ export const ja_JP: EnTranslations = {
         "crystal_lich": "ナイスラクシスそのものの破片で、今なおそれを形づくった冷気を帯びて震えている。レイドの残骸から引き出した者に従うが、そのことをまだ許してはいない。",
         "forgemaw": "最後の泉のるつぼで鍛えられ、ついに完成しなかったもの。槌の音がまだ響くうちにイグニヴァルの鋳場から歩み出た。見つけられるのはヒロイックの踏破だけだ。この溶けたものは自分を作った炉へ戻り続け、二度炎を生き延びた者について家まで来る。",
         "crystal_tide": "自分のシーグラスの雫に乗る潮の精。イーストブルック渓谷から遠つ岸まで、夕飯を釣るつもりだった釣り人が静かな水から引き上げた。上がってきた時の水を離さず、戻れと言われても聞かない。",
+        "sprites": "金色とティール色、ふたつの小さな火の精。どちらが先頭か、いつまでも決まらない。近づきすぎると緑の炎ひとつに溶け合い、また笑いながら離れていく。",
         "phantom": "レイスウッドの塚から出た手のひらほどの亡霊。布ばかりで骨はない。閉じたはずの荷袋の中に現れ、人恋しさから居着いてしまう。何を求めているのかは誰にも分からず、これまで一度も誰かを脅かそうとしたことがない。",
         "emberfall_phoenix": "秋ごとに燃え尽きて一粒の燃えさしとなり、春には自らの灰から立ち上がってくる。誰に訊いても言えるのはそれだけだ。巣を見つけた者はおらず、同じ個体を二度捕らえた者もいない。"
       },
@@ -11025,6 +11043,10 @@ export const ja_JP: EnTranslations = {
     "appTitle": "マップエディター",
     "docTitle": "マップエディター - World of ClaudeCraft",
     "untitledMap": "無題のマップ",
+    "liveWorld": {
+      "name": "ゲーム世界の調整",
+      "scope": "ゲーム世界：地形の高さと塗装、道路、ゲーム内オブジェクトの位置、追加した小物を編集できます。既存の建物は固定されています。「エクスポート」で変更を保存し、レビューに送ってください。"
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "マップ職人",
     "playtestBack": "Back to Editor",
@@ -20132,6 +20154,9 @@ export const ja_JP: EnTranslations = {
       "reins_avian_strider": {
         "name": "ヴィリジアン・ヴェイルストライダーの手綱"
       },
+      "reins_nightwing_chimera": {
+        "name": "ナイトウィング・キマイラの手綱"
+      },
       "reins_goblin_rocket_sled": {
         "name": "ゴブリンロケットそりの始動キー"
       },
@@ -20143,6 +20168,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "道守の鈴帯：トリヴァー"
+      },
+      "reins_wobbles_slime": {
+        "name": "ゼリーの鞍：プルプル"
       },
       "reins_rickshaw_mount": {
         "name": "縛りの手綱：骨縛りの人力車"
@@ -20797,6 +20825,9 @@ export const ja_JP: EnTranslations = {
       },
       "whistle_forgemaw": {
         "name": "溶けたフォージモウの笛"
+      },
+      "whistle_sprites": {
+        "name": "チラリとキラリの笛"
       },
       "whistle_crystal_tide": {
         "name": "クリスタルタイドの笛"
@@ -25929,6 +25960,9 @@ export const ja_JP: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "溶けたフォージモウ"
+      },
+      "buddy_sprites": {
+        "name": "チラリとキラリ"
       },
       "buddy_crystal_tide": {
         "name": "クリスタルタイド"

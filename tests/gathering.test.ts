@@ -389,8 +389,9 @@ describe('isHarvestableCorpse', () => {
     // The three retained cosmetic companions (buddy_horse, buddy_crystal_lich,
     // buddy_forgemaw; the account-wide buddy merge 7bc9c74af57) add untagged
     // templates: 298. Plus buddy_sapling, the Sapling companion the referral
-    // stamp cards (642100fe8aa) brought back to the roster: 299.
-    expect(untagged).toHaveLength(299);
+    // stamp cards (642100fe8aa) brought back to the roster: 299. Plus
+    // buddy_sprites, the flame-sprite pair (Flicker and Glimmer): 300.
+    expect(untagged).toHaveLength(300);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

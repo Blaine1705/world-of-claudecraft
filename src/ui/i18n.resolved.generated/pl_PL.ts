@@ -1374,6 +1374,18 @@ export const pl_PL: EnTranslations = {
         }
       },
       "seasonOne": "Sezon 1",
+      "membershipPromo": {
+        "open": "Membership in the WOC Store",
+        "close": "Close membership promotion",
+        "eyebrow": "Account perks",
+        "title": "Membership",
+        "cta": "Join now"
+      },
+      "referralPromo": {
+        "close": "Close Refer a Friend promotion",
+        "eyebrow": "Adventure together",
+        "cta": "Invite friends"
+      },
       "rarity": {
         "uncommon": "Niezwykły",
         "rare": "Rzadki",
@@ -2353,6 +2365,8 @@ export const pl_PL: EnTranslations = {
       "name_lantern_hall_destrier": "Lantern Hall Destrier",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Spętana Kośćmi Riksza",
+      "name_wobbles_slime": "Wobbles the Slime",
+      "name_nightwing_chimera": "Nightwing Chimaera",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
@@ -2363,6 +2377,7 @@ export const pl_PL: EnTranslations = {
       "desc_goblin_rocket_sled": "Niebezpiecznie przekombinowane goblińskie sanie, napędzane dwiema rakietami i znakomicie złym osądem.",
       "desc_rallycart_rxt": "Mała maszyna rajdowa, która zwiększa prędkość podróży.",
       "desc_rallycart_skin": "Mały samochód rajdowy o potężnym ryku.",
+      "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_referral_tank": "Earned by completing a referral stamp card.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
@@ -2371,6 +2386,7 @@ export const pl_PL: EnTranslations = {
       "desc_mech_bird": "Ręcznie zbudowany mechaniczny kurczak bojowy, który biegnie na pstrykających serwach, a nakręcany klucz wciąż się obraca.",
       "desc_lanternback_troll": "Hill troll złamany do jarzma przez latarników, niosący na ramionach żelazny tron z latarniami burzowymi płonącymi na obu ramionach.",
       "desc_lantern_hall_destrier": "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
+      "desc_nightwing_chimera": "A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.",
       "desc_chimeglass_tortoise": "Żółw solny, który wyprzedził trzy pokolenia przyczep kempingowych. Druciarze zmielili mu okulary ze szkła burzowego i zawiesili mu na szyi dzwonek z brązu, tak że droga usłyszy go na długo, zanim go zobaczy.",
       "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
     },
@@ -5521,6 +5537,7 @@ export const pl_PL: EnTranslations = {
         "skeleton": "Dry bones rattle in step with yours.",
         "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
         "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
+        "sprites": "Two small flames have caught on you, and they are not going out.",
         "crystal_tide": "A drop of the sea refuses to fall from your line.",
         "phantom": "The air behind you is a shade too still.",
         "emberfall_phoenix": "A warmth like a banked fire settles at your back."
@@ -5600,6 +5617,7 @@ export const pl_PL: EnTranslations = {
         "crystal_lich": "A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.",
         "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
         "crystal_tide": "A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.",
+        "sprites": "Two small fire sprites, one gold and one teal, who never quite agree which of them is leading. Get close enough and they fold into one green flame, then spill apart again, laughing.",
         "phantom": "A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.",
         "emberfall_phoenix": "It burns down to an ember every autumn and comes back up out of its own ash by spring, which is the whole of what anyone can tell you about it. Nobody has ever found a nest, and nobody has ever caught one twice."
       },
@@ -11025,6 +11043,10 @@ export const pl_PL: EnTranslations = {
     "appTitle": "Edytor map",
     "docTitle": "Edytor map - World of ClaudeCraft",
     "untitledMap": "Mapa bez nazwy",
+    "liveWorld": {
+      "name": "Live world touch-ups",
+      "scope": "Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review."
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "Kartograf",
     "playtestBack": "Back to Editor",
@@ -20132,6 +20154,9 @@ export const pl_PL: EnTranslations = {
       "reins_avian_strider": {
         "name": "Wodze Zielonego Szybkobiegacza Ptaka"
       },
+      "reins_nightwing_chimera": {
+        "name": "Reins of the Nightwing Chimaera"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Kluczyk zapłonu: Goblińskie sanie rakietowe"
       },
@@ -20143,6 +20168,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Pasek dzwonkowy Roadwardena: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Jelly Saddle: Wobbles"
       },
       "reins_rickshaw_mount": {
         "name": "Spętane lejce: Spętana Kośćmi Riksza"
@@ -20797,6 +20825,9 @@ export const pl_PL: EnTranslations = {
       },
       "whistle_forgemaw": {
         "name": "Forgemaw The Molten Whistle"
+      },
+      "whistle_sprites": {
+        "name": "Flicker and Glimmer Whistle"
       },
       "whistle_crystal_tide": {
         "name": "Crystal Tide Whistle"
@@ -25929,6 +25960,9 @@ export const pl_PL: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "Forgemaw The Molten"
+      },
+      "buddy_sprites": {
+        "name": "Flicker and Glimmer"
       },
       "buddy_crystal_tide": {
         "name": "Crystal Tide"

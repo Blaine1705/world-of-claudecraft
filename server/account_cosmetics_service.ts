@@ -121,41 +121,16 @@ export class AccountCosmeticsService {
       .catch((err) => console.error('failed to save account mech chroma:', err));
   }
 
-  /** An earned weapon skin (Lantern Hall's quartermaster): owned on the session at once, so a
-   *  second purchase in the same breath is refused as owned, then mirrored into the
-   *  rollback-safe account_weapon_cosmetics row (an additive union the store reconciliation
-   *  never removes from), the same shape as noteMechChroma. */
-  noteWeaponSkin(session: CosmeticsSession, skinId: string): void {
-    const current = session.accountCosmetics;
-    if (!current.weaponSkinIds.includes(skinId)) {
-      this.updateLive(session.accountId, {
-        ...current,
-        weaponSkinIds: [...current.weaponSkinIds, skinId],
-      });
-    }
-    void grantAccountWeaponSkins(session.accountId, [skinId])
-      .then((cosmetics) => {
-        // a grant changes ownership, never the weapon loadout edited meanwhile
-        const live = this.byAccount.get(session.accountId);
-        this.updateLive(
-          session.accountId,
-          live ? { ...cosmetics, weaponSkinLoadout: live.weaponSkinLoadout } : cosmetics,
-        );
-      })
-      .catch((err) => console.error('failed to save earned weapon skin:', err));
-  }
-
-  /** Lantern Hall's quartermaster's view of the acting session's account ledger
-   *  (src/sim/guild_quartermaster.ts GuildAccountPort): ownership read from THIS session's
-   *  cosmetics, never the realm-wide sim mirror, and the grant through noteWeaponSkin. */
-  ledger(session: CosmeticsSession): GuildAccountPort {
+  /** Ownership is session-scoped. Online purchases must commit the character charge
+   * and account grant together; this synchronous port can never grant a skin. */
+  ledger(
+    session: CosmeticsSession,
+    purchaseWeaponSkin?: (offerId: string) => void,
+  ): GuildAccountPort {
     return {
       ownsWeaponSkin: (skinId) => session.accountCosmetics.weaponSkinIds.includes(skinId),
-      grantWeaponSkin: (skinId) => {
-        if (!isGrantableWeaponSkin(skinId)) return false;
-        this.noteWeaponSkin(session, skinId);
-        return true;
-      },
+      grantWeaponSkin: () => false,
+      purchaseWeaponSkin,
     };
   }
 

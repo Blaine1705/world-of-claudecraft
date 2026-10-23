@@ -540,24 +540,17 @@ const MONOLITHS: MonolithRow[] = [
     // the Moonbridge banner) moved into log_event_route.ts logEventCue.
     // v0.45.0 integration: 18025 on the merged tree (wc -l); the lower of the two
     // parent pins (18054 and PR 4352's 18069) stands.
+    // LOWERED 18043 -> 18038: the promo card's advert list (Armory, membership,
+    // Refer a Friend) and its locale copy live in store_promo_card.ts storePromoSlides.
+    // wc -l, exact count.
     // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 18054 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
     // wc -l on the merged tree. Exact count.
-    // LOWERED to 18021 by Lantern Hall's guild window, merged over the v0.45.0 integration:
-    // the tooltip's weapon-proc effect text moved to weapon_proc_text.ts, paying for the
-    // window's wiring. wc -l on the merged tree, exact count.
-    // LOWERED 18021 -> 17997 by the quartermaster's 3D try-on: the self sheet's preview
-    // subject moved to self_preview_subject.ts, paying for the try-on's wiring. wc -l, exact.
-    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
-    // (46f0679547): both parent pins for the record, the integration 18043 and the guild
-    // 17997. The integration's own three lines since the guild's base (the Dungeon Finder's
-    // two boss guide hooks and the boss guide's dungeon run read) compose with the guild's
-    // extractions to 18000 by wc -l on the merged tree: 3 over the guild pin, under the
-    // integration pin, inherited rather than authored. Exact count, zero slack.
-    ceiling: 18000,
+    // Combined guild extractions and integration changes, measured with wc -l.
+    ceiling: 17996,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1845,7 +1838,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
     // on the merged tree. Exact count.
-    ceiling: 9758,
+    // Guild purchase wiring is paid for by moving quest/delve resync to quest_snapshot_wire.
+    // Measured after formatting: 9751, below both merged parent ceilings.
+    ceiling: 9751,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

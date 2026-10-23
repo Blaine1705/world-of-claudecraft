@@ -469,7 +469,6 @@ import {
   syncIgnivarWaterConduitVisibility,
 } from './ignivar_conduit';
 import { ignivarBossFacingLocked } from './ignivar_encounter_core';
-import { attachIgnivarModelVfx } from './ignivar_model_vfx';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
 import { buildInitialSceneCompileUnits, entryCompileTail } from './initial_scene_compile_units';
@@ -841,6 +840,7 @@ import {
   drapeTargetConeOverlay,
   type TargetConeOverlay,
 } from './target_cone_overlay';
+import { attachTemplateModelVfx } from './template_model_vfx';
 import {
   syncTemporalHourglassVisual,
   TemporalHourglassGroundVisuals,
@@ -2613,7 +2613,7 @@ export class Renderer {
     // treeline to the fog wall, the same distance treatment procedural
     // foliage gets. The editor viewport still boots without them
     // (viewport.ts clears the set): no sprites there, full asset range.
-    const farMirrorPlacements = this.sim.cfg.world?.placements;
+    const farMirrorPlacements = (this.sim.cfg.world ?? getActiveWorldContent()).placements;
     setFoliageFarPlacements(
       farMirrorPlacements && farMirrorPlacements.length > 0
         ? farFoliageDecorations(farMirrorPlacements, (x, z) => biomeAt(x, z))
@@ -2768,7 +2768,7 @@ export class Renderer {
     // async and pops in; absent for the built-in world. The view supports live
     // editing (add/move/remove/reSeat), reached through the editor-only
     // `placedAssets` getter below; the shipped game only ever builds it here.
-    const placements = this.sim.cfg.world?.placements;
+    const placements = (this.sim.cfg.world ?? getActiveWorldContent()).placements;
     if (placements && placements.length > 0) {
       // Residency streaming is DORMANT (no streamAround): it coincided with a
       // reported frame-rate regression, so game hosts build the full set at
@@ -8156,7 +8156,7 @@ export class Renderer {
       // entity scale is applied to the whole group below, so it can update live
       // (Fiesta size buffs) and also scale lazily-built form visuals for free.
       group.add(visual.root);
-      if (e.templateId === IGNIVAR_BOSS_ID) attachIgnivarModelVfx(visual.root);
+      attachTemplateModelVfx(e.templateId, visual.root, () => this.reducedMotion());
       height = visual.height;
     }
 

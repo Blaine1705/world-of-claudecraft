@@ -897,8 +897,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
     // The restored legacy whistle and charm definitions add 36 item ids.
     // All five referral rewards now own paintings; only the retired Phoenix remains pending.
-    // +2: Lantern Hall's Lantern Seal and its horse's reins (each its own rendered batch and owner).
-    expect(Object.keys(ITEMS)).toHaveLength(2213);
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
+    // + the sprite buddy's whistle (whistle_sprites): 2,214.
+    expect(Object.keys(ITEMS)).toHaveLength(2216);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1130,14 +1131,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // integration: 1,890 owners over 2,043 items.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
     // Buddy provenance contributes 34 additional owners.
-    // Icon backlog adds 135 Season 2 armour icons, five referral icons and the Horse Whistle.
-    // + Lantern Hall's seal and its destrier's reins (PR 4530): 2183.
-    expect(new Set(currentOwnerIds).size).toBe(2183);
-    expect(shippingIds).toHaveLength(2183);
+    // Icon backlog adds 135 Season 2 armour icons, five referral icons, the Horse Whistle, and Nightwing Chimaera.
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,183.
+    // + the sprite buddy's whistle: 2,184 owners / 2,214 items.
+    expect(new Set(currentOwnerIds).size).toBe(2186);
+    expect(shippingIds).toHaveLength(2186);
     // The restored legacy whistle and charm definitions add 36 item ids.
     // All five referral rewards now own paintings; only the retired Phoenix remains pending.
-    // +2: Lantern Hall's seal and reins.
-    expect(Object.keys(ITEMS)).toHaveLength(2213);
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
+    expect(Object.keys(ITEMS)).toHaveLength(2216);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1162,7 +1164,8 @@ describe('item-art consistency accepted-art provenance', () => {
           ].includes(batchId),
       )
       .flatMap(({ itemIds }) => itemIds);
-    expect(releaseBatchIds).toHaveLength(59);
+    // 60 with the sprite buddy's whistle render in the whistle batch.
+    expect(releaseBatchIds).toHaveLength(60);
     // The world-quest branch's two batches are additive beyond the dated chain
     // as well (release/v0.43.0 merge into feature/world-quests).
     const worldQuestBatchIds = mapping.generatedBatches
@@ -1350,6 +1353,9 @@ describe('item-art consistency accepted-art provenance', () => {
         // The weekly emissary's cache chest, additive the same way.
         'emissary_cache',
         'reins_avian_strider',
+        'reins_nightwing_chimera',
+        // Wobbles the Slime's reins (a render of the shipped mount model).
+        'reins_wobbles_slime',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1556,8 +1562,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     // 43 -> 44 at the weekly emissary: the Emissary's Cache chest; 45 with
-    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge).
-    expect(mapping.entries).toHaveLength(45);
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge);
+    // 46 with the Nightwing Chimaera's reins (reins_nightwing_chimera); 47 with
+    // Wobbles the Slime's reins.
+    expect(mapping.entries).toHaveLength(47);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1660,17 +1668,19 @@ describe('item-art consistency accepted-art provenance', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
     // Buddy batches add 34 owner ids to the integration inventory. The membership
     // Staff of Changing batch (PR 4281) adds one: 1510.
-    // Backlog adds 141 files; replacements preserve the remaining owner count. Lantern Hall's
-    // seal and its horse's reins add two: 1653.
-    expect(priorGeneratedIds).toHaveLength(1653);
+    // Backlog adds 141 files; replacements preserve the remaining owner count.
+    // + the sprite buddy's whistle render (buddy-whistle-icons batch): 1,652.
+    expect(priorGeneratedIds).toHaveLength(1654);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
-    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    expect(allCurrentOwnerIds).toHaveLength(2183);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2183);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005 + Nightwing Chimaera mount: 2182.
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount) adds one ordinary entry: 2,183.
+    // + the sprite buddy's whistle render: 2,184.
+    expect(allCurrentOwnerIds).toHaveLength(2186);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2186);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1678,8 +1688,9 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      // 45 entries (the release's mapping entries; the hoard batches own no entries).
-      entries: 45,
+      // 46 entries (the release's mapping entries + Nightwing Chimaera; the hoard batches own no entries),
+      // 47 with Wobbles the Slime's reins.
+      entries: 47,
       // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
@@ -1691,7 +1702,7 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the Mirefen world-boss branch's 15 = 1360.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
       // Plus 34 restored buddy provenance owners, and the membership staff: 1510.
-      priorGenerated: 1653, // +1 Lantern Hall's seal, +1 its horse's reins
+      priorGenerated: 1654,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1745,7 +1756,8 @@ describe('item-art consistency accepted-art provenance', () => {
           ['buddy-whistle-icons-2026-08-28', 'buddy-charm-icons-2026-09-09'].includes(batchId),
       )
       .flatMap(({ itemIds }) => itemIds);
-    expect(buddyBatchIdsForCatalog).toHaveLength(34);
+    // 35 with the sprite buddy's whistle render in the whistle batch.
+    expect(buddyBatchIdsForCatalog).toHaveLength(35);
     expect(
       sorted([
         ...historicalVerdict.visualVerdict.passIds.filter(
@@ -1799,6 +1811,9 @@ describe('item-art consistency accepted-art provenance', () => {
         // beyond the historical chain like the Field Kit.
         'emissary_cache',
         'reins_avian_strider',
+        'reins_nightwing_chimera',
+        // Wobbles the Slime's reins (a render of the shipped mount model).
+        'reins_wobbles_slime',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1958,9 +1973,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    if (ownerIds.length !== 2183)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2183`);
-    if (fileIds.length !== 2183) violations.push(`shipping WebP count: ${fileIds.length} != 2183`);
+    // Wobbles the Slime's reins: 2,183.
+    if (ownerIds.length !== 2186)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2186`);
+    if (fileIds.length !== 2186) violations.push(`shipping WebP count: ${fileIds.length} != 2186`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': 'ゲーム世界の調整',
+  'editor.liveWorld.scope':
+    'ゲーム世界：地形の高さと塗装、道路、ゲーム内オブジェクトの位置、追加した小物を編集できます。既存の建物は固定されています。「エクスポート」で変更を保存し、レビューに送ってください。',
   'hudChrome.courier.inventory': '所持品',
   'hudChrome.courier.bankTitle': '銀行',
   'hudChrome.courier.capacity': '{used} / {capacity} スロット',
@@ -2401,6 +2404,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Mirefenのクレーターがまだ輝いていた頃、生の隕鉄から鍛えられた。「熱すぎて持てない」残骸を叩き、星座を刻んだ宇宙黒の弓部とし、台木に沿って溶融金の核を封じた。ボルトをつがえるのではなく召喚する。宣告のように放たれ、その終わりのように着弾する星火の矢だ。Nythraxisの不死の王冠すら峰の下で最悪のものではないとHighwatchが恐れたとき、城壁に望んだ武器がこれだった。狙いを違えるな。',
   'hudChrome.wocStore.seasonOne': 'シーズン1',
+  'hudChrome.wocStore.membershipPromo.open': 'WOCストアのメンバーシップ',
+  'hudChrome.wocStore.membershipPromo.close': 'メンバーシップの宣伝を閉じる',
+  'hudChrome.wocStore.membershipPromo.eyebrow': 'アカウント特典',
+  'hudChrome.wocStore.membershipPromo.title': 'メンバーシップ',
+  'hudChrome.wocStore.membershipPromo.cta': '今すぐ参加',
+  'hudChrome.wocStore.referralPromo.close': 'フレンド招待の宣伝を閉じる',
+  'hudChrome.wocStore.referralPromo.eyebrow': '一緒に冒険しよう',
+  'hudChrome.wocStore.referralPromo.cta': 'フレンドを招待',
   'hudChrome.wocStore.rarity.uncommon': 'アンコモン',
   'hudChrome.wocStore.rarity.rare': 'レア',
   'hudChrome.wocStore.rarity.epic': 'エピック',
@@ -13975,6 +13986,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
   'hudChrome.mounts.name_avian_strider': 'ヴィリジアン・ヴェイルストライダー',
+  'hudChrome.mounts.name_nightwing_chimera': 'ナイトウィング・キマイラ',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    '古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
   'hudChrome.mounts.name_lantern_hall_destrier': '燈火の館の軍馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
@@ -13992,6 +14006,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
+  'hudChrome.mounts.name_wobbles_slime': 'スライムのプルプル',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '鞍を着けられるよう馴らされた大きな青いスライム。歩く代わりに跳ねて進み、乗り手の下でぷるぷると揺れ、体の中を泡がゆっくり昇っていく。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのドレッドスパーク',
   'hudChrome.mounts.name_rickshaw_mount': '骨縛りの人力車',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
@@ -14979,8 +14996,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
+  'entities.items.reins_wobbles_slime.name': 'ゼリーの鞍：プルプル',
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.items.reins_avian_strider.name': 'ヴィリジアン・ヴェイルストライダーの手綱',
+  'entities.items.reins_nightwing_chimera.name': 'ナイトウィング・キマイラの手綱',
   'entities.items.reins_lanternback_troll.name': '点灯人の軛：グルンボル',
   'entities.items.reins_chimeglass_tortoise.name': '道守の鈴帯：トリヴァー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
@@ -19327,6 +19346,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '燃えさし狐',
   'entities.mobs.buddy_emerald_wolf.name': 'エメラルドウルフ',
   'entities.mobs.buddy_forgemaw.name': '溶けたフォージモウ',
+  'entities.mobs.buddy_sprites.name': 'チラリとキラリ',
   'entities.mobs.buddy_frostfire.name': 'フロストファイア',
   'entities.mobs.buddy_golden_sentinel.name': '黄金の歩哨',
   'entities.mobs.buddy_kekius.name': 'ケキウス',
@@ -19376,6 +19396,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': 'トリプルTの笛',
   'entities.items.whistle_trollface.name': 'トロールフェイスの笛',
   'entities.items.whistle_tuskhorn_boar.name': 'タスクホーン・ボアの笛',
+  'entities.items.whistle_sprites.name': 'チラリとキラリの笛',
   'hudChrome.buddyMenu.rename': 'バディの名前を変更',
   'hudChrome.buddyMenu.nameLabel': 'バディの名前',
   'hudChrome.buddyMenu.autolootEnable': '自動収集を有効化',
@@ -19457,6 +19478,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'イーストブルック渓谷の生け垣から来た雌狐。冬枯れの茂みごしに覗く炭のように赤い毛からその名がついた。土地の罠師たちは何世代も前に子狐を狙うのをやめ、代わりに餌を置くようになった。',
   'hudChrome.collections.buddyLore.emerald_wolf':
     'レイスウッドの子狼。林床までほとんど届かない木漏れ日の下では、その毛は緑に見える。森が残していった孤児は、どれもウォーデンたちが育てる。',
+  'hudChrome.collections.buddyLore.sprites':
+    '金色とティール色、ふたつの小さな火の精。どちらが先頭か、いつまでも決まらない。近づきすぎると緑の炎ひとつに溶け合い、また笑いながら離れていく。',
   'hudChrome.collections.buddyLore.forgemaw':
     '最後の泉のるつぼで鍛えられ、ついに完成しなかったもの。槌の音がまだ響くうちにイグニヴァルの鋳場から歩み出た。見つけられるのはヒロイックの踏破だけだ。この溶けたものは自分を作った炉へ戻り続け、二度炎を生き延びた者について家まで来る。',
   'hudChrome.collections.buddyLore.frog':
@@ -19545,6 +19568,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.skeleton': '乾いた骨があなたの歩みに合わせてかたかた鳴る。',
   'hudChrome.collections.presence.crystal_lich':
     '残骸から冷たいうなりが立ちのぼり、それがあなたを見ている。',
+  'hudChrome.collections.presence.sprites': '小さな二つの炎があなたに燃え移り、消えそうにない。',
   'hudChrome.collections.presence.forgemaw':
     '炉の熱がまだあなたから離れない。何かがそれと共に歩き出た。',
   'hudChrome.collections.presence.crystal_tide':

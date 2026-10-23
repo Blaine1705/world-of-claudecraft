@@ -33,7 +33,7 @@ import { type Collider, rotY } from '../src/sim/collider_shapes';
 import { emitPlacementBoxes } from '../src/sim/colliders_authored/placement_colliders';
 import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
-import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+import { activeFenbridgeLayout } from '../src/sim/fenbridge_touchup';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { distancePointToObb, localToWorld } from '../src/sim/placed_town_kit';
 import { placementRampFloorAt } from '../src/sim/placement_ramps';
@@ -63,7 +63,7 @@ interface TownBuilding extends PlacedTownInteriorBuilding {
 /** The built-in towns that stand painted buildings, with their records. */
 const TOWN_BUILDINGS: readonly (readonly [string, readonly TownBuilding[]])[] = [
   ['Eastbrook', EASTBROOK_LAYOUT.buildings],
-  ['Fenbridge', FENBRIDGE_LAYOUT.buildings],
+  ['Fenbridge', activeFenbridgeLayout().buildings],
   ['Highwatch', HIGHWATCH_LAYOUT.buildings],
 ];
 

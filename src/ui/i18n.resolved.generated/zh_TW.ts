@@ -1374,6 +1374,18 @@ export const zh_TW: EnTranslations = {
         }
       },
       "seasonOne": "第一賽季",
+      "membershipPromo": {
+        "open": "WOC 商店中的會員",
+        "close": "關閉會員推廣",
+        "eyebrow": "帳號特權",
+        "title": "會員",
+        "cta": "立即加入"
+      },
+      "referralPromo": {
+        "close": "關閉推薦好友推廣",
+        "eyebrow": "一起冒險",
+        "cta": "邀請好友"
+      },
       "rarity": {
         "uncommon": "優秀",
         "rare": "精良",
@@ -2353,6 +2365,8 @@ export const zh_TW: EnTranslations = {
       "name_lantern_hall_destrier": "燈火大廳戰馬",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
       "name_rickshaw_mount": "白骨人力車",
+      "name_wobbles_slime": "晃晃史萊姆",
+      "name_nightwing_chimera": "夜翼奇美拉",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
@@ -2363,6 +2377,7 @@ export const zh_TW: EnTranslations = {
       "desc_goblin_rocket_sled": "一輛結構過剩到危險的哥布林雪橇，靠雙發火箭和極差的判斷力推進。",
       "desc_rallycart_rxt": "一輛小巧卻道地的拉力賽車，能提升移動速度。",
       "desc_rallycart_skin": "一輛小巧的拉力賽車，轟鳴聲卻震天響。",
+      "desc_wobbles_slime": "一隻被馴服上鞍的大藍史萊姆。牠不走路而是蹦跳，在騎手身下晃來晃去，體內還有氣泡緩緩上浮。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
       "desc_referral_tank": "完成一張推薦集章卡後獲得。",
       "desc_referral_raptor": "幫助你的首位綁定好友完成一張集章卡後獲得。",
@@ -2371,6 +2386,7 @@ export const zh_TW: EnTranslations = {
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
       "desc_lanternback_troll": "被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。",
       "desc_lantern_hall_destrier": "燈火大廳的戰馬，在公會的藍色披布下披掛橡木與鐵製馬鎧，鞍邊搖曳的兩盞風燈照亮歸途。",
+      "desc_nightwing_chimera": "來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
       "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。"
     },
@@ -5521,6 +5537,7 @@ export const zh_TW: EnTranslations = {
         "skeleton": "乾枯的骨頭隨著你的腳步喀喀作響。",
         "crystal_lich": "一陣寒冷的嗡鳴從殘骸中升起，它正注視著你。",
         "forgemaw": "熔爐的熱度還沒有離開你。有什麼東西隨之走了出來。",
+        "sprites": "兩簇小火苗沾上了你，而且不會熄滅。",
         "crystal_tide": "一滴海水拒絕從你的釣線上落下。",
         "phantom": "你身後的空氣靜得有些過分。",
         "emberfall_phoenix": "一股如同封火般的暖意落在你的背後。"
@@ -5600,6 +5617,7 @@ export const zh_TW: EnTranslations = {
         "crystal_lich": "尼思拉克西斯本體的一枚碎片，至今仍鳴響著塑成牠的那股寒意。誰把牠從團隊副本的殘骸裡拽出來，牠就聽誰的——而且始終沒有原諒那個人。",
         "forgemaw": "在最後泉源熔爐中鍛造，卻始終沒有真正完工——錘聲未歇，牠便自己走出了伊格尼瓦的鑄場。只有英雄難度的下潛才能找到牠：這熔融之物總會回到造出牠的那座爐子，然後跟著兩度熬過烈火的人回家。",
         "crystal_tide": "一隻乘著自己那滴海玻璃的潮汐精靈，被從東溪谷到遠岸只想釣頓晚飯的漁人從靜水裡勾了上來。牠把撈起牠的那捧水一直帶在身邊，怎麼勸也不肯回去。",
+        "sprites": "兩隻小小的火精，一金一青，總也說不好誰該打頭。靠得夠近時，它們會融成一團綠焰，隨後又笑著分開。",
         "phantom": "來自怨靈林古塚的巴掌大幽魂，只有一層布、沒有骨頭，會出現在一個明明合好的背包裡，然後為了作伴留下來。沒人弄清牠想要什麼，而牠一次也沒試過嚇唬誰。",
         "emberfall_phoenix": "每逢秋天牠便燃盡成一粒餘燼，到了春天又從自己的灰裡重新升起——關於牠，誰也說不出更多了。從沒有人找到過牠的巢，也從沒有人捉到過同一隻兩次。"
       },
@@ -11025,6 +11043,10 @@ export const zh_TW: EnTranslations = {
     "appTitle": "地圖編輯器",
     "docTitle": "地圖編輯器 - World of ClaudeCraft",
     "untitledMap": "未命名地圖",
+    "liveWorld": {
+      "name": "遊戲世界微調",
+      "scope": "遊戲世界：可編輯地形高度與塗色、道路、遊戲物件的位置及新增擺件。現有建築保持固定。使用「匯出」儲存修改以供審核。"
+    },
     "flatMapName": "Flat World",
     "playtestPlayerName": "製圖師",
     "playtestBack": "Back to Editor",
@@ -20132,6 +20154,9 @@ export const zh_TW: EnTranslations = {
       "reins_avian_strider": {
         "name": "蒼翠谷行者的韁繩"
       },
+      "reins_nightwing_chimera": {
+        "name": "夜翼奇美拉的韁繩"
+      },
       "reins_goblin_rocket_sled": {
         "name": "哥布林火箭雪橇點火鑰匙"
       },
@@ -20143,6 +20168,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "守道人的鈴帶：托利弗"
+      },
+      "reins_wobbles_slime": {
+        "name": "果凍鞍：晃晃"
       },
       "reins_rickshaw_mount": {
         "name": "白骨人力車縛繩"
@@ -20797,6 +20825,9 @@ export const zh_TW: EnTranslations = {
       },
       "whistle_forgemaw": {
         "name": "熔顎·熔融者的哨子"
+      },
+      "whistle_sprites": {
+        "name": "閃爍與微光的哨子"
       },
       "whistle_crystal_tide": {
         "name": "水晶潮汐的哨子"
@@ -25929,6 +25960,9 @@ export const zh_TW: EnTranslations = {
       },
       "buddy_forgemaw": {
         "name": "熔顎·熔融者"
+      },
+      "buddy_sprites": {
+        "name": "閃爍與微光"
       },
       "buddy_crystal_tide": {
         "name": "水晶潮汐"

@@ -11985,6 +11985,8 @@ export type MapPresentationMode =
   | 'yumiMaze';
 
 export interface WorldContent {
+  /** Editor preview of the live overworld: retain release terrain, scenery and movement rules. */
+  liveWorldPreview?: true;
   zones: ZoneDef[];
   camps: CampDef[];
   npcs: Record<string, NpcDef>;
@@ -12143,6 +12145,9 @@ export interface WorldContent {
   // resolves through sim/moved_objects.ts with the built-in row as the
   // fallback. Frozen; absent for the built-in world.
   objectMoves?: ObjectMoves;
+  // Declarative Fenbridge town layout touch-ups (moved painted buildings,
+  // civic props, NPCs, and added cottage pads).
+  fenbridgeTouchup?: import('./fenbridge_touchup').FenbridgeTouchup;
 }
 
 /**

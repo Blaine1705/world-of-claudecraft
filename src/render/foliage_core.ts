@@ -10,6 +10,7 @@ import {
 import { activeDungeonDoorPos, DUNGEONS, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
+import { activeFenbridgeLayout } from '../sim/fenbridge_touchup';
 import { HIGHWATCH_LAYOUT } from '../sim/highwatch_layout';
 import { tavernGroundsRects } from '../sim/mirefen_tavern_grounds';
 import { PAINTED_TOWNS } from '../sim/painted_towns';
@@ -215,7 +216,8 @@ export function eastbrookGrassExclusions(
       exclusions.push(layoutObb(wall.id, wall.footprint));
     }
 
-    for (const building of FENBRIDGE_LAYOUT.buildings) {
+    const fenbridge = activeFenbridgeLayout();
+    for (const building of [...fenbridge.buildings, ...(fenbridge.addedCottageBuildings ?? [])]) {
       // A painted building clears its whole reach (porch, stair, awning), not
       // only its wall box, as Eastbrook's do.
       exclusions.push(layoutObb(building.id, building.reach));
@@ -227,7 +229,7 @@ export function eastbrookGrassExclusions(
         radius: 1.5,
       });
     }
-    const cistern = FENBRIDGE_LAYOUT.civic.cistern;
+    const cistern = fenbridge.civic.cistern;
     exclusions.push({
       kind: 'circle',
       id: cistern.id,
@@ -236,51 +238,45 @@ export function eastbrookGrassExclusions(
       radius: cistern.radius,
     });
     exclusions.push(
-      layoutObb(
-        FENBRIDGE_LAYOUT.civic.provisionStall.id,
-        FENBRIDGE_LAYOUT.civic.provisionStall.footprint,
-      ),
+      layoutObb(fenbridge.civic.provisionStall.id, fenbridge.civic.provisionStall.footprint),
     );
     for (const [id, point] of [
       [
-        `${FENBRIDGE_LAYOUT.civic.provisionStall.id}:customerApron`,
-        FENBRIDGE_LAYOUT.civic.provisionStall.customerStandingPoint,
+        `${fenbridge.civic.provisionStall.id}:customerApron`,
+        fenbridge.civic.provisionStall.customerStandingPoint,
       ],
       [
-        `${FENBRIDGE_LAYOUT.civic.provisionStall.id}:vendorApron`,
-        FENBRIDGE_LAYOUT.civic.provisionStall.vendorStandingPoint,
+        `${fenbridge.civic.provisionStall.id}:vendorApron`,
+        fenbridge.civic.provisionStall.vendorStandingPoint,
       ],
       [
-        `${FENBRIDGE_LAYOUT.services.bank.teller.id}:serviceApron`,
-        FENBRIDGE_LAYOUT.services.bank.teller.standingPoint,
+        `${fenbridge.services.bank.teller.id}:serviceApron`,
+        fenbridge.services.bank.teller.standingPoint,
       ],
       [
         'fenbridge_lantern_chapel_archive:serviceApron',
-        FENBRIDGE_LAYOUT.services.npcs.find((npc) => npc.id === 'chronicler_osric_fenn')?.position,
+        fenbridge.services.npcs.find((npc) => npc.id === 'chronicler_osric_fenn')?.position,
       ],
       [
-        `${FENBRIDGE_LAYOUT.services.stations[0].id}:serviceApron`,
-        FENBRIDGE_LAYOUT.services.stations[0].position,
+        `${fenbridge.services.stations[0].id}:serviceApron`,
+        fenbridge.services.stations[0].position,
       ],
       [
-        `${FENBRIDGE_LAYOUT.services.mailbox.id}:serviceApron`,
-        FENBRIDGE_LAYOUT.services.mailbox.frontStandingPoint,
+        `${fenbridge.services.mailbox.id}:serviceApron`,
+        fenbridge.services.mailbox.frontStandingPoint,
       ],
     ] as const) {
       if (!point) continue;
       exclusions.push({ kind: 'circle', id, x: point.x, z: point.z, radius: 1.2 });
     }
     exclusions.push(
-      layoutObb(
-        FENBRIDGE_LAYOUT.civic.musterBoard.id,
-        FENBRIDGE_LAYOUT.civic.musterBoard.footprint,
-      ),
+      layoutObb(fenbridge.civic.musterBoard.id, fenbridge.civic.musterBoard.footprint),
     );
     exclusions.push({
       kind: 'circle',
-      id: `${FENBRIDGE_LAYOUT.civic.musterBoard.id}:serviceApron`,
-      x: FENBRIDGE_LAYOUT.civic.musterBoard.frontStandingPoint.x,
-      z: FENBRIDGE_LAYOUT.civic.musterBoard.frontStandingPoint.z,
+      id: `${fenbridge.civic.musterBoard.id}:serviceApron`,
+      x: fenbridge.civic.musterBoard.frontStandingPoint.x,
+      z: fenbridge.civic.musterBoard.frontStandingPoint.z,
       radius: 1.2,
     });
     // Fenbridge stands open: grass grows up to the town on every side, with no

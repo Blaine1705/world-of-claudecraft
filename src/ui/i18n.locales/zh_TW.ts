@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': '遊戲世界微調',
+  'editor.liveWorld.scope':
+    '遊戲世界：可編輯地形高度與塗色、道路、遊戲物件的位置及新增擺件。現有建築保持固定。使用「匯出」儲存修改以供審核。',
   'hudChrome.courier.inventory': '背包',
   'hudChrome.courier.bankTitle': '銀行',
   'hudChrome.courier.capacity': '{used} / {capacity} 欄位',
@@ -2162,6 +2165,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'wallet.bagReconnect': '重新連接錢包',
   'hudChrome.wocStore.collectionLine': '{collection}系列',
   'hudChrome.wocStore.seasonOne': '第一賽季',
+  'hudChrome.wocStore.membershipPromo.open': 'WOC 商店中的會員',
+  'hudChrome.wocStore.membershipPromo.close': '關閉會員推廣',
+  'hudChrome.wocStore.membershipPromo.eyebrow': '帳號特權',
+  'hudChrome.wocStore.membershipPromo.title': '會員',
+  'hudChrome.wocStore.membershipPromo.cta': '立即加入',
+  'hudChrome.wocStore.referralPromo.close': '關閉推薦好友推廣',
+  'hudChrome.wocStore.referralPromo.eyebrow': '一起冒險',
+  'hudChrome.wocStore.referralPromo.cta': '邀請好友',
   'hudChrome.wocStore.rarity.uncommon': '優秀',
   'hudChrome.wocStore.rarity.rare': '精良',
   'hudChrome.wocStore.rarity.epic': '史詩',
@@ -13316,6 +13327,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': '凌天風暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龍喉迅猛龍',
   'hudChrome.mounts.name_avian_strider': '蒼翠谷行者',
+  'hudChrome.mounts.name_nightwing_chimera': '夜翼奇美拉',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    '來自古木枝頭的雙頭暮光飛龍，駐足時以利爪後肢佇立，行進時展動奧術銘紋雙翼掠地翱翔。',
   'hudChrome.mounts.name_lanternback_troll': '提燈背者格倫博',
   'hudChrome.mounts.name_lantern_hall_destrier': '燈火大廳戰馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘晶的托利弗',
@@ -13333,6 +13347,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
+  'hudChrome.mounts.name_wobbles_slime': '晃晃史萊姆',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '一隻被馴服上鞍的大藍史萊姆。牠不走路而是蹦跳，在騎手身下晃來晃去，體內還有氣泡緩緩上浮。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '駭雷撼地者',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力車',
   'hudChrome.mounts.desc_valorsteed': '一匹堅韌穩健的駿馬，可提升旅行速度。',
@@ -14269,8 +14286,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後的堡壘',
   'entities.items.last_keep_signet.name': '最後的堡壘印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
+  'entities.items.reins_wobbles_slime.name': '果凍鞍：晃晃',
   'entities.items.reins_terrorspark_groundshaker.name': '駭雷撼地者點火鑰匙',
   'entities.items.reins_avian_strider.name': '蒼翠谷行者的韁繩',
+  'entities.items.reins_nightwing_chimera.name': '夜翼奇美拉的韁繩',
   'entities.items.reins_lanternback_troll.name': '點燈人之軛：格倫博',
   'entities.items.reins_chimeglass_tortoise.name': '守道人的鈴帶：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力車縛繩',
@@ -18411,6 +18430,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '餘燼狐',
   'entities.mobs.buddy_emerald_wolf.name': '翡翠狼',
   'entities.mobs.buddy_forgemaw.name': '熔顎·熔融者',
+  'entities.mobs.buddy_sprites.name': '閃爍與微光',
   'entities.mobs.buddy_frostfire.name': '霜火',
   'entities.mobs.buddy_golden_sentinel.name': '黃金哨兵',
   'entities.mobs.buddy_kekius.name': '凱基烏斯',
@@ -18460,6 +18480,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '三重T的哨子',
   'entities.items.whistle_trollface.name': '巨魔臉的哨子',
   'entities.items.whistle_tuskhorn_boar.name': '獠角野豬的哨子',
+  'entities.items.whistle_sprites.name': '閃爍與微光的哨子',
   'hudChrome.buddyMenu.rename': '重新命名夥伴',
   'hudChrome.buddyMenu.nameLabel': '夥伴名稱',
   'hudChrome.buddyMenu.autolootEnable': '開啟自動拾取',
@@ -18540,6 +18561,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '出自東溪谷樹籬間的母狐，得名於冬日枯叢中透出的炭紅皮毛。那裡的獵人幾代之前就不再打幼崽的主意，改成替牠們留下食物。',
   'hudChrome.collections.buddyLore.emerald_wolf':
     '一隻怨靈林的幼狼，皮毛在幾乎照不到林底的樹冠餘光裡泛著綠色。守林人會把森林留下的每一隻孤兒養大。',
+  'hudChrome.collections.buddyLore.sprites':
+    '兩隻小小的火精，一金一青，總也說不好誰該打頭。靠得夠近時，它們會融成一團綠焰，隨後又笑著分開。',
   'hudChrome.collections.buddyLore.forgemaw':
     '在最後泉源熔爐中鍛造，卻始終沒有真正完工——錘聲未歇，牠便自己走出了伊格尼瓦的鑄場。只有英雄難度的下潛才能找到牠：這熔融之物總會回到造出牠的那座爐子，然後跟著兩度熬過烈火的人回家。',
   'hudChrome.collections.buddyLore.frog':
@@ -18619,6 +18642,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.raptor': '你腳跟後有敏捷的爪子在石頭上嗒嗒作響。',
   'hudChrome.collections.presence.skeleton': '乾枯的骨頭隨著你的腳步喀喀作響。',
   'hudChrome.collections.presence.crystal_lich': '一陣寒冷的嗡鳴從殘骸中升起，它正注視著你。',
+  'hudChrome.collections.presence.sprites': '兩簇小火苗沾上了你，而且不會熄滅。',
   'hudChrome.collections.presence.forgemaw': '熔爐的熱度還沒有離開你。有什麼東西隨之走了出來。',
   'hudChrome.collections.presence.crystal_tide': '一滴海水拒絕從你的釣線上落下。',
   'hudChrome.collections.presence.phantom': '你身後的空氣靜得有些過分。',

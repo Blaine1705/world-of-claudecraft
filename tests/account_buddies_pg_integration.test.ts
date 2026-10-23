@@ -74,7 +74,11 @@ if (target) target.pathname = `/${database}`;
     expect(upgraded.convalidated).toBe(false);
     await pool.query(ACCOUNT_BUDDIES_SCHEMA);
     expect((await constraint()).rows[0]).toEqual(upgraded);
-    for (const owned of [['unknown'], ['horse', 'horse', 'horse', 'horse', 'horse']]) {
+    // The widened row holds all five active buddies.
+    await pool.query(
+      "UPDATE account_buddies SET owned = ARRAY['horse','crystal_lich','forgemaw','sapling','sprites'] WHERE account_id=1",
+    );
+    for (const owned of [['unknown'], ['horse', 'horse', 'horse', 'horse', 'horse', 'horse']]) {
       await expect(
         pool.query('UPDATE account_buddies SET owned=$1 WHERE account_id=1', [owned]),
       ).rejects.toMatchObject({ code: '23514' });

@@ -61,6 +61,7 @@
         "docs/perf/hitch/gate.json",
         "scripts/assets/highwatch_guild/props/props_data.json",
         "scripts/assets/mirefen_tavern/layout.json",
+        "scripts/assets/mirefen_tavern/props/props_data.json",
         "scripts/assets/wickharbor_harbor/layout.json",
         "scripts/assets/wickharbor_wharf/layout.json",
         "scripts/assets/woc_character/export_split.json",

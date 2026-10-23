@@ -74,12 +74,13 @@ describe('mount visual specs cover the sim catalog', () => {
       chimeglass_tortoise: ['lens', 'saddle'],
       // the destrier rides its saddle bone through the gallop instead of a fixed lift
       lantern_hall_destrier: ['lantern_l', 'lantern_r', 'saddle'],
+      nightwing_chimera: ['saddle'],
     } as const;
     for (const [key, expectedBones] of Object.entries(expected)) {
       const spec =
         key === 'chimeglass_tortoise'
           ? MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise
-          : MOUNT_VISUAL_SPECS[key as 'lanternback_troll' | 'lantern_hall_destrier'];
+          : MOUNT_VISUAL_SPECS[key as keyof typeof MOUNT_VISUAL_SPECS];
       const requested = new Set([
         ...(spec.seatBone ? [spec.seatBone.bone] : []),
         ...spec.lamps.map((lamp) => lamp.bone),
@@ -212,6 +213,10 @@ function ridePoseHarness(): {
   const model = new THREE.Group();
   const bones = new Map<string, THREE.Object3D>();
   for (const name of [
+    'upperarml',
+    'upperarmr',
+    'lowerarml',
+    'lowerarmr',
     'upperlegl',
     'upperlegr',
     'lowerlegl',
@@ -232,6 +237,8 @@ function ridePoseHarness(): {
     rideBlend: 0,
     climbOn: false,
     climbBlend: 0,
+    climbArmBones: undefined,
+    climbForearmBones: undefined,
     climbLegBones: undefined,
     climbShinBones: undefined,
     rideFootBones: undefined,
@@ -681,5 +688,72 @@ describe('procedural bob math', () => {
     expect(MOUNT_VISUAL_SPECS.stormfeather_griffin.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.terrorspark_groundshaker.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.lantern_hall_destrier.fx).toBe('embers');
+    expect(MOUNT_VISUAL_SPECS.wobbles_slime.fx).toBeNull();
+  });
+
+  it('seats the Wobbles rider on the saddle bone at the offset measured in Blender', () => {
+    // The jelly squashes and leans under the rider in every clip, so the seat
+    // rides the `saddle` bone; a typo here floats or sinks the rider.
+    const spec = MOUNT_VISUAL_SPECS.wobbles_slime;
+    expect(spec.seat).toBe(3.35);
+    expect(spec.seatBone).toEqual({ bone: 'saddle', offset: [0, 0.22, 0] });
+  });
+
+  it('pins the Nightwing Chimaera saddle socket, straddle pose, and flight/perch clips', () => {
+    const spec = MOUNT_VISUAL_SPECS.nightwing_chimera;
+    const def = VISUALS.mount_nightwing_chimera;
+    expect(spec).toMatchObject({
+      visualKey: 'mount_nightwing_chimera',
+      seat: 3.61,
+      seatFwd: 0.4,
+      rigged: true,
+      bobAmp: 0,
+      fx: null,
+      seatBone: { bone: 'saddle', offset: [0, -0.022, 0.068] },
+      ride: {
+        spread: 3.11,
+        thigh: 2.062,
+        knee: -1.02,
+        ankle: 0.85,
+        hips: -0.04,
+        upperArm: [0.3201, 0.1239, -0.6185, 0.7069],
+        lowerArm: [0.3042, 0.4618, 0.0173, 0.833],
+      },
+    });
+    expect(def).toMatchObject({
+      url: 'models/mounts/nightwing_chimera.glb',
+      authoredAtlas: true,
+      height: 5.78,
+      walkRef: 5.6,
+      runRef: 12.6,
+      lazyPreload: true,
+      clips: {
+        idle: 'Idle',
+        idleVariants: ['Idle_Look'],
+        walk: 'Walk',
+        run: 'Run',
+        walkBack: 'WalkBackward',
+        jump: 'Jump',
+        attack: [],
+        death: 'Death',
+      },
+    });
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
+
+    const { visual, bones } = ridePoseHarness();
+    visual.setRidePose(spec.ride);
+    visual.applyRidePose(0.125);
+    const ual = boneNamed(bones, 'upperarml').quaternion;
+    const uar = boneNamed(bones, 'upperarmr').quaternion;
+    expect(ual.x).toBeCloseTo(uar.x, 12);
+    expect(ual.y).toBeCloseTo(-uar.y, 12);
+    expect(ual.z).toBeCloseTo(-uar.z, 12);
+    expect(ual.w).toBeCloseTo(uar.w, 12);
+    const lal = boneNamed(bones, 'lowerarml').quaternion;
+    const lar = boneNamed(bones, 'lowerarmr').quaternion;
+    expect(lal.x).toBeCloseTo(lar.x, 12);
+    expect(lal.y).toBeCloseTo(-lar.y, 12);
+    expect(lal.z).toBeCloseTo(-lar.z, 12);
+    expect(lal.w).toBeCloseTo(lar.w, 12);
   });
 });

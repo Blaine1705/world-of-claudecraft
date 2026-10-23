@@ -1428,11 +1428,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  // Re-minted for Lantern Hall (the Highwatch adventurers' guild, #4530) merged onto the
-  // v0.45.0 integration: the renderer leaf moved (the placed town views take the world for the
-  // guild's trophy room, and the guild's mount and weapon appearance hooks). No capture was
-  // retaken.
-  'e0a864ec92605a9f94c435a24b07580838e59b213d2125f34e499dec1f602623';
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  'a8063e568657f31634562833e434f5ad6ddcb9873003a80954913b2c7d958291';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1482,9 +1480,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  // Re-minted for Lantern Hall (#4530) merged onto the v0.45.0 integration: the renderer leaf
-  // moved. No capture was retaken.
-  '7695f6ab10b10e91b521133d8d6a56704f9533cb7a54b526b53ffc24407763b1';
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  'ed346f4bbd9126e4c809f44c17230950d39cb7e69afd37cbcd252b7208248448';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2887,9 +2885,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-      // Lantern Hall (#4530) merged onto the v0.45.0 integration: recomputed LAST
-      // again over the re-swept evidence. No capture was retaken.
-    ).toBe('925cd404b2e50cd590065f80ec22aec1a638e3a8ba65bb08e036974dacbe3c1a');
+    ).toBe('2ceee6b40cf9345be5f582db48e6162b9c60deb7d63746ff0ee2f4ecd4c022f1');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

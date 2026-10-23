@@ -24,7 +24,9 @@ export type MountKey =
   | 'drakemaw_raptor'
   | 'avian_strider'
   | 'lanternback_troll'
+  | 'wobbles_slime'
   | 'terrorspark_groundshaker'
+  | 'nightwing_chimera'
   | 'lantern_hall_destrier';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
@@ -139,9 +141,25 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // A big blue jelly slime broken to the saddle: it hops rather than walks,
+  // jiggles under the rider, and carries bubbles drifting up through its body.
+  // Developer-only for now (DEVELOPER_MOUNTS below) while its acquisition path
+  // is decided.
+  wobbles_slime: {
+    key: 'wobbles_slime',
+    name: 'Wobbles the Slime',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
     name: 'Dreadspark Groundshaker',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  nightwing_chimera: {
+    key: 'nightwing_chimera',
+    name: 'Nightwing Chimaera',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
@@ -172,7 +190,7 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = [];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = ['wobbles_slime', 'nightwing_chimera'];
 
 /** Paid annual-bundle mounts retain soulbound reins and outlive membership expiry. */
 export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];

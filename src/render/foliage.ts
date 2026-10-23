@@ -3,10 +3,10 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { STABLE_PADDOCK } from '../sim/content/mounts';
 import {
-  BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
   getActiveWorldContent,
   isBuiltinWorldActive,
+  isBuiltinWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
@@ -2567,7 +2567,7 @@ function buildGrassRing(
   const activeContent = getActiveWorldContent();
   const townExclusions = eastbrookGrassExclusions(
     activeContent.props.buildings,
-    activeContent === BUILTIN_WORLD,
+    isBuiltinWorldContent(activeContent),
     activeContent.services?.noticeboards ?? [],
   );
   const edgeTaperCtx = createWorldGrassEdgeTaperContext(

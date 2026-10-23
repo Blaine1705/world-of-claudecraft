@@ -14,6 +14,8 @@ import {
   type AuthoredTownBuildingRecord,
   authoredTownPromoted,
 } from './authored_town_registry';
+import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { activeFenbridgeBuildingById, activeFenbridgeLayout } from './fenbridge_touchup';
 import type { BuildingDef, PlacedAsset, WorldContent } from './types';
 
 /** The height a placed model is normalized to by its largest dimension: a
@@ -53,27 +55,78 @@ const WALK_IN_TOWNS: readonly WalkInTown[] = AUTHORED_TOWNS.flatMap((town) => {
   return [{ town, buildings, minX, maxX, minZ, maxZ }];
 });
 
+let lastFenWalkInLayout: object | null = null;
+let lastFenWalkInMinX = 0;
+let lastFenWalkInMaxX = -1;
+let lastFenWalkInMinZ = 0;
+let lastFenWalkInMaxZ = -1;
+
 /** Whether (x, z) lies where a walk-in town floor could stand: the cheap test
  *  that lets a world with no placements skip the deck table everywhere else. */
 export function nearTownWalkIn(x: number, z: number): boolean {
   for (const walkIn of WALK_IN_TOWNS) {
     if (x >= walkIn.minX && x <= walkIn.maxX && z >= walkIn.minZ && z <= walkIn.maxZ) return true;
   }
-  return false;
+  const fenLayout = activeFenbridgeLayout();
+  if (fenLayout === FENBRIDGE_LAYOUT) return false;
+  if (fenLayout !== lastFenWalkInLayout) {
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minZ = Number.POSITIVE_INFINITY;
+    let maxZ = Number.NEGATIVE_INFINITY;
+    for (const building of fenLayout.buildings) {
+      if (building.walkIn !== true) continue;
+      const reach = building.reach;
+      const radius = Math.hypot(reach.halfWidth, reach.halfDepth) + 1;
+      minX = Math.min(minX, reach.center.x - radius);
+      maxX = Math.max(maxX, reach.center.x + radius);
+      minZ = Math.min(minZ, reach.center.z - radius);
+      maxZ = Math.max(maxZ, reach.center.z + radius);
+    }
+    lastFenWalkInLayout = fenLayout;
+    lastFenWalkInMinX = minX;
+    lastFenWalkInMaxX = maxX;
+    lastFenWalkInMinZ = minZ;
+    lastFenWalkInMaxZ = maxZ;
+  }
+  return (
+    x >= lastFenWalkInMinX &&
+    x <= lastFenWalkInMaxX &&
+    z >= lastFenWalkInMinZ &&
+    z <= lastFenWalkInMaxZ
+  );
 }
 
 function sameNumber(a: number, b: number): boolean {
   return Math.abs(a - b) < EPSILON;
 }
 
+function matchesRecord(record: AuthoredTownBuildingRecord, building: BuildingDef): boolean {
+  return (
+    sameNumber(record.position.x, building.x) &&
+    sameNumber(record.position.z, building.z) &&
+    sameNumber(record.nativeDimensions.width, building.w) &&
+    sameNumber(record.nativeDimensions.depth, building.d) &&
+    sameNumber(record.rotation, building.rot)
+  );
+}
+
 /** The walk-in record a props record stands for, with its town, or null. */
 function walkInRecordFor(
   building: BuildingDef,
+  content?: WorldContent,
 ): { town: AuthoredTown; record: AuthoredTownBuildingRecord } | null {
   if (building.id === undefined) return null;
   for (const walkIn of WALK_IN_TOWNS) {
     const record = walkIn.buildings.find((candidate) => candidate.id === building.id);
-    if (record) return { town: walkIn.town, record };
+    if (!record) continue;
+    if (walkIn.town.id === 'fenbridge') {
+      const active = activeFenbridgeBuildingById(building.id, content);
+      if (active && matchesRecord(active, building)) {
+        return { town: walkIn.town, record: active };
+      }
+    }
+    return { town: walkIn.town, record };
   }
   return null;
 }
@@ -84,17 +137,14 @@ function walkInRecordFor(
  * walls and floor are authored around the layout's own anchor, so it falls
  * back to one sealed box rather than leaving invisible walls behind.
  */
-export function walkInPlacementFor(building: BuildingDef): PlacedAsset | null {
-  const found = walkInRecordFor(building);
+export function walkInPlacementFor(
+  building: BuildingDef,
+  content?: WorldContent,
+): PlacedAsset | null {
+  const found = walkInRecordFor(building, content);
   if (!found) return null;
   const { record } = found;
-  if (
-    !sameNumber(record.position.x, building.x) ||
-    !sameNumber(record.position.z, building.z) ||
-    !sameNumber(record.nativeDimensions.width, building.w) ||
-    !sameNumber(record.nativeDimensions.depth, building.d) ||
-    !sameNumber(record.rotation, building.rot)
-  ) {
+  if (!matchesRecord(record, building)) {
     return null;
   }
   const placement = record.placement;
@@ -119,9 +169,9 @@ export function walkInPlacementFor(building: BuildingDef): PlacedAsset | null {
 export function townWalkInPlacements(content: WorldContent): PlacedAsset[] {
   const out: PlacedAsset[] = [];
   for (const building of content.props?.buildings ?? []) {
-    const found = walkInRecordFor(building);
+    const found = walkInRecordFor(building, content);
     if (!found || authoredTownPromoted(content.promotedScenery, found.town)) continue;
-    const placement = walkInPlacementFor(building);
+    const placement = walkInPlacementFor(building, content);
     if (placement) out.push(placement);
   }
   return out;

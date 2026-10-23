@@ -9,7 +9,12 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
-import { BUILTIN_WORLD, farmPatchesInActiveWorld, setActiveWorldContent } from '../src/sim/data';
+import {
+  BASE_WORLD,
+  BUILTIN_WORLD,
+  farmPatchesInActiveWorld,
+  setActiveWorldContent,
+} from '../src/sim/data';
 import { PUBLISHED_MAPS } from '../src/sim/maps/index.generated';
 import { freezeObjectMoves, objectMoveKey, parseObjectMoveKey } from '../src/sim/moved_objects';
 import { Sim } from '../src/sim/sim';
@@ -22,8 +27,9 @@ const bedRows = (patches: readonly { beds: readonly { id: string }[] }[]) =>
 afterEach(() => setActiveWorldContent(null));
 
 describe('farm patches: Sim and ClientWorld agree on a moved world', () => {
-  it('both serve the shipped table itself on the built-in world', () => {
-    const sim = new Sim({ seed: 3, playerClass: 'warrior', noPlayer: true });
+  it('both serve the shipped table itself on the base world', () => {
+    setActiveWorldContent(BASE_WORLD);
+    const sim = new Sim({ seed: 3, playerClass: 'warrior', noPlayer: true, world: BASE_WORLD });
     expect(sim.farmPatches).toBe(FARM_PATCHES);
     expect(bareClient(1).farmPatches).toBe(FARM_PATCHES);
     expect(farmPatchesInActiveWorld()).toBe(FARM_PATCHES);

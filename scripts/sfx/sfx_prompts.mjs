@@ -134,6 +134,8 @@ export const SFX = [
   // (foot_<surface>) through Sfx.mountRun's fallback branch. A mount is opted
   // into that fallback purely by the ABSENCE of its key here, so adding one
   // back is all it takes to give either of them a bespoke stride again.
+  // Wobbles the Slime (developer mount) borrows the footfall the same way
+  // until a bespoke squelch is generated for it.
   {
     key: 'mount_run_goblin_rocket_sled_start',
     custom: true,

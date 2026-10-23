@@ -82,9 +82,13 @@ describe('Eastbrook town grass exclusion', () => {
     // count follows the town list rather than a re-pin per town.
     // Re-pinned 2026-10 for the Highwatch adventurers' guild at the old stable yard: one
     // more placed building, its reach and its door apron: 2 more, 101 plus the grounds.
+    // Re-pinned for the painted inn: the two stone flower tubs on the terrace's corners came
+    // out of its grounds, taking their rectangles with them: 27 to 25.
     const painted = PAINTED_TOWNS.flatMap((town) => town.buildings);
-    expect(exclusions).toHaveLength(101 + tavernGroundsRects().length + 2 * painted.length);
-    expect(tavernGroundsRects().length).toBe(27);
+    // The 3 added north Fenbridge cottages (fenbridge_touchup.ts) also clear
+    // their reach and service apron (two rows each, six more: 99 to 105; Lantern Hall adds two more).
+    expect(exclusions).toHaveLength(107 + tavernGroundsRects().length + 2 * painted.length);
+    expect(tavernGroundsRects().length).toBe(25);
     for (const building of [...HIGHWATCH_LAYOUT.buildings, ...painted]) {
       expect(exclusions.some((item) => item.id === building.id)).toBe(true);
       expect(exclusions.some((item) => item.id === `${building.id}:serviceApron`)).toBe(true);
@@ -475,7 +479,7 @@ describe('Eastbrook town grass exclusion', () => {
   it('wires the one-time active-world snapshot into streamed grass', () => {
     const source = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
     expect(source).toContain('const GRASS_BUILDING_PADDING = 0.35;');
-    expect(source).toContain('activeContent === BUILTIN_WORLD');
+    expect(source).toContain('isBuiltinWorldContent(activeContent)');
     expect(source).toContain('activeContent.services?.noticeboards ?? []');
     expect(source).toContain('insideGrassHubExclusion(activeContent.zones, x, z)');
     // The dressing-spot scatter moved verbatim out of foliage.ts into its own

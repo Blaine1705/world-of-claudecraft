@@ -13,6 +13,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': '게임 월드 다듬기',
+  'editor.liveWorld.scope':
+    '게임 월드: 지형 높이와 페인트, 도로, 게임 오브젝트 위치, 추가한 소품을 편집할 수 있습니다. 기존 건물은 고정됩니다. 검토할 변경 사항은 내보내기로 저장하세요.',
   'hudChrome.courier.inventory': '소지품',
   'hudChrome.courier.bankTitle': '은행',
   'hudChrome.courier.capacity': '{used} / {capacity}칸',
@@ -2399,6 +2402,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     '미어펜 분화구가 아직 빛날 때 “손댈 수 없을 만큼 뜨거웠던” 잔해인 순수한 운석 별 금속을 벼려 만들었습니다. 망치로 두드려 별자리가 새겨진 우주처럼 검은 활대를 만들고, 대목을 따라 용융 금빛 핵을 가두었습니다. 화살을 메는 대신 별불의 화살을 불러냅니다. 판결처럼 날아가 이야기 하나의 끝처럼 꽂힙니다. 하이워치가 니스락시스의 죽지 않는 왕관조차 봉우리 아래 최악의 것이 아닐 수 있다고 두려워했을 때, 성벽 위에 두고 싶어 했던 무기입니다. 조준을 신중히 하십시오.',
   'hudChrome.wocStore.seasonOne': '시즌 1',
+  'hudChrome.wocStore.membershipPromo.open': 'WOC 상점의 멤버십',
+  'hudChrome.wocStore.membershipPromo.close': '멤버십 홍보 닫기',
+  'hudChrome.wocStore.membershipPromo.eyebrow': '계정 혜택',
+  'hudChrome.wocStore.membershipPromo.title': '멤버십',
+  'hudChrome.wocStore.membershipPromo.cta': '지금 가입',
+  'hudChrome.wocStore.referralPromo.close': '친구 초대 홍보 닫기',
+  'hudChrome.wocStore.referralPromo.eyebrow': '함께하는 모험',
+  'hudChrome.wocStore.referralPromo.cta': '친구 초대하기',
   'hudChrome.wocStore.rarity.uncommon': '고급',
   'hudChrome.wocStore.rarity.rare': '희귀',
   'hudChrome.wocStore.rarity.epic': '영웅',
@@ -13934,6 +13945,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
   'hudChrome.mounts.name_drakemaw_raptor': '화산구 랩터',
   'hudChrome.mounts.name_avian_strider': '비리디안 베일스트라이더',
+  'hudChrome.mounts.name_nightwing_chimera': '밤날개 키메라',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    '고대의 나뭇가지에서 내려온 쌍두 황혼 와이번으로, 멈추면 발톱 달린 뒷다리로 서고 움직이면 비전 문양이 새겨진 날개로 지면 위를 활공한다.',
   'hudChrome.mounts.name_lanternback_troll': '등불지기 그룸볼',
   'hudChrome.mounts.name_lantern_hall_destrier': '등불 회관 군마',
   'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
@@ -13951,6 +13965,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
+  'hudChrome.mounts.name_wobbles_slime': '말랑이 슬라임',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '안장을 얹도록 길들여진 커다란 파란 슬라임. 걷는 대신 통통 튀어 다니고, 기수 아래에서 말랑하게 흔들리며, 젤리 몸속으로 거품이 천천히 떠오른다.',
   'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 드레드스파크',
   'hudChrome.mounts.name_rickshaw_mount': '뼈에 묶인 인력거',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
@@ -14941,8 +14958,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
+  'entities.items.reins_wobbles_slime.name': '젤리 안장: 말랑이',
   'entities.items.reins_terrorspark_groundshaker.name': '드레드스파크 시동 열쇠',
   'entities.items.reins_avian_strider.name': '비리디안 베일스트라이더의 고삐',
+  'entities.items.reins_nightwing_chimera.name': '밤날개 키메라의 고삐',
   'entities.items.reins_lanternback_troll.name': '점등인의 멍에: 그룸볼',
   'entities.items.reins_chimeglass_tortoise.name': '길지기의 종끈: 톨리버',
   'entities.items.reins_rickshaw_mount.name': '결속된 고삐: 뼈에 묶인 인력거',
@@ -19286,6 +19305,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '잉걸불 여우',
   'entities.mobs.buddy_emerald_wolf.name': '에메랄드 늑대',
   'entities.mobs.buddy_forgemaw.name': '용융의 화로아귀',
+  'entities.mobs.buddy_sprites.name': '깜빡이와 반짝이',
   'entities.mobs.buddy_frostfire.name': '서리불꽃',
   'entities.mobs.buddy_golden_sentinel.name': '황금 파수병',
   'entities.mobs.buddy_kekius.name': '케키우스',
@@ -19335,6 +19355,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': '트리플 T의 호루라기',
   'entities.items.whistle_trollface.name': '트롤페이스의 호루라기',
   'entities.items.whistle_tuskhorn_boar.name': '엄니뿔 멧돼지의 호루라기',
+  'entities.items.whistle_sprites.name': '깜빡이와 반짝이의 호루라기',
   'hudChrome.buddyMenu.rename': '버디 이름 변경',
   'hudChrome.buddyMenu.nameLabel': '버디 이름',
   'hudChrome.buddyMenu.autolootEnable': '자동 전리품 켜기',
@@ -19416,6 +19437,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이스트브룩 골짜기의 산울타리에서 온 암여우로, 겨울 덤불 사이로 비치는 숯빛 붉은 털에서 이름을 얻었다. 그곳 사냥꾼들은 몇 세대 전에 새끼 잡기를 포기하고, 대신 먹이를 내놓기 시작했다.',
   'hudChrome.collections.buddyLore.emerald_wolf':
     '망령숲의 새끼 늑대로, 숲 바닥까지 거의 닿지 않는 잎새 사이 빛 아래에서는 털이 초록빛을 띤다. 숲이 남긴 고아는 어떤 것이든 관리인들이 거두어 기른다.',
+  'hudChrome.collections.buddyLore.sprites':
+    '금빛과 청록빛, 두 작은 불의 정령입니다. 누가 앞장설지 좀처럼 정하지 못합니다. 가까이 붙으면 하나의 초록 불꽃으로 합쳐졌다가, 웃으며 다시 갈라집니다.',
   'hudChrome.collections.buddyLore.forgemaw':
     '마지막 샘의 도가니에서 벼려졌으나 끝내 완성되지 못한 것으로, 망치질이 아직 이어지는 동안 이그니바르의 주조장을 제 발로 걸어 나왔다. 오직 영웅 난이도의 공략만이 그를 찾아낸다. 이 용융체는 자신을 만든 화로로 자꾸 돌아가고, 불길을 두 번 살아남은 자를 따라 집까지 온다.',
   'hudChrome.collections.buddyLore.frog':
@@ -19506,6 +19529,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.skeleton': '마른 뼈가 당신의 걸음에 맞춰 덜그럭거립니다.',
   'hudChrome.collections.presence.crystal_lich':
     '잔해에서 차가운 웅웅거림이 피어오르고, 그것이 당신을 지켜봅니다.',
+  'hudChrome.collections.presence.sprites':
+    '작은 불꽃 두 개가 당신에게 옮겨붙었고, 꺼질 기미가 없습니다.',
   'hudChrome.collections.presence.forgemaw':
     '용광로의 열기가 아직 당신을 떠나지 않았습니다. 무언가가 그것과 함께 걸어 나왔습니다.',
   'hudChrome.collections.presence.crystal_tide':

@@ -50,18 +50,11 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
-import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
-import {
-  catalogCharacterCompletion,
-  curatorRankFromOwned,
-  reliquaryWireJson,
-  selfRelicKeys,
-  syncAccountRelicGrants,
-} from '../src/sim/reliquary';
+import { selfRelicKeys, syncAccountRelicGrants } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import { riftStateEventFor } from '../src/sim/rift/runs';
@@ -317,6 +310,7 @@ import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
 import { dispatchGuildRankCommand } from './guild_rank_cmd';
 import { buyGuildRosterPageAtomic } from './guild_roster_page_db';
 import { guildRosterTransport } from './guild_roster_transport';
+import { GuildWeaponPurchases } from './guild_weapon_purchase';
 import { heavySelfMarkOnAccept, heavySelfMarkOnReceipt, isHeavySelfEvent } from './heavy_self';
 import { type HotbarLayoutState, HotbarLayoutStore, hotbarLayoutState } from './hotbar_layout';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
@@ -435,7 +429,6 @@ import {
 } from './buddy_wire';
 import {
   type EntityWireCache,
-  type EntityWireVariantCache,
   type EntityWireView,
   emptyWireVariant,
   fullEntityJson,
@@ -1426,7 +1419,21 @@ export class GameServer {
   private readonly cosmetics = new AccountCosmeticsService({
     sim: () => this.sim,
     sessions: () => this.clients.values(),
-    resyncQuests: (session) => this.resyncQuests(session as ClientSession),
+    resyncQuests: (session) => questSnap.resyncQuests(session as ClientSession),
+  });
+  private readonly guildWeapons = new GuildWeaponPurchases({
+    sim: () => this.sim,
+    session: (id) => this.sessionByCharacterId(id),
+    queue: {
+      enqueueCancellable: (id, signal, job) =>
+        this.characterSaveQueues.enqueueCancellable(id, signal, job),
+    },
+    capture: (id) => this.serializeCharacterForPersist(id),
+    conflict: (id) => this.hasCharacterOnlySaveConflict(id),
+    acknowledge: (save) => this.acknowledgeCharacterSaveEffects(save),
+    quarantine: (s) =>
+      this.escrowSessionLost(s.pid, s.characterId, 'ambiguous', 'guild weapon purchase'),
+    cosmetics: this.cosmetics,
   });
   private readonly ledger = new AccountLedgerService({
     sim: () => this.sim,
@@ -6182,7 +6189,14 @@ export class GameServer {
     // The world-quest-only family (puzzles, minigames, cloak, accusations,
     // explicit-difficulty starts) is owned by server/quest_command_wire.ts.
     if (questWire.isWorldQuestWireCommand(command))
-      return void questWire.dispatchWorldQuestWire(sim, msg, pid, this.cosmetics.ledger(session));
+      return void questWire.dispatchWorldQuestWire(
+        sim,
+        msg,
+        pid,
+        this.cosmetics.ledger(session, (offer) => {
+          void this.guildWeapons.start(session, offer);
+        }),
+      );
     switch (command) {
       case 'courier_dispatch':
         courierWire.dispatchCourierCommand(sim, msg, pid);
@@ -6297,7 +6311,7 @@ export class GameServer {
         this.sendCommandOutcome(session, msg, objectCmds.pickupCommandOutcome(sim, msg, pid));
         break;
       case 'accept':
-        if (questWire.acceptQuestWire(sim, msg, pid)) this.resyncQuests(session);
+        if (questWire.acceptQuestWire(sim, msg, pid)) questSnap.resyncQuests(session);
         break;
       case 'turnin':
         if (typeof msg.quest === 'string') {
@@ -6315,14 +6329,14 @@ export class GameServer {
               this.cosmetics.noteQuestComplete(session, msg.quest);
             }
           }
-          this.resyncQuests(session);
+          questSnap.resyncQuests(session);
         }
         break;
       case 'abandon':
-        if (questWire.abandonQuestWire(sim, msg, pid)) this.resyncQuests(session);
+        if (questWire.abandonQuestWire(sim, msg, pid)) questSnap.resyncQuests(session);
         break;
       case 'qlinkaccept':
-        if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);
+        if (questWire.acceptLinkedQuestWire(sim, msg, pid)) questSnap.resyncQuests(session);
         break;
       case 'equip':
         if (typeof msg.item === 'string') {
@@ -7660,7 +7674,7 @@ export class GameServer {
           if (!beforeDone && afterDone && msg.quest === ALDRIC_METEOR_QUEST_ID) {
             this.cosmetics.noteQuestComplete(session, msg.quest);
           }
-          this.resyncQuests(session);
+          questSnap.resyncQuests(session);
         }
         break;
       }
@@ -7672,7 +7686,7 @@ export class GameServer {
           if (!beforeDone && afterDone) {
             this.cosmetics.noteQuestComplete(session, ALDRIC_METEOR_QUEST_ID);
           }
-          this.resyncQuests(session);
+          questSnap.resyncQuests(session);
         }
         break;
       }
@@ -7728,14 +7742,14 @@ export class GameServer {
         if (!e || !delve || e.dead) break;
         if (Math.hypot(e.pos.x - delve.doorPos.x, e.pos.z - delve.doorPos.z) > 12) break;
         sim.enterDelve(msg.delveId, msg.tierId, pid);
-        this.resyncDelves(session);
+        questSnap.resyncDelves(session);
         break;
       }
       case 'leave_delve': {
         const e = sim.entities.get(pid);
         if (!e || !sim.delveRunForPlayer(pid)) break;
         sim.leaveDelve(pid);
-        this.resyncDelves(session);
+        questSnap.resyncDelves(session);
         break;
       }
       case 'delve_interact': {
@@ -7771,7 +7785,7 @@ export class GameServer {
         // Geo-gate to the board NPC (at the delve door), like enter_delve.
         if (Math.hypot(e.pos.x - delve.doorPos.x, e.pos.z - delve.doorPos.z) > 12) break;
         sim.delveBuyShopItem(msg.delveId, msg.itemId, pid);
-        this.resyncDelves(session);
+        questSnap.resyncDelves(session);
         break;
       }
       case 'lockpick_engage': {
@@ -9698,23 +9712,6 @@ export class GameServer {
     for (const session of this.clients.values()) {
       this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
     }
-  }
-
-  // force the next snapshot to carry quest state even when a quest command
-  // changed nothing, so stale client UI converges back to the server's truth
-  private resyncQuests(session: ClientSession): void {
-    delete session.lastSent.qlog;
-    delete session.lastSent.qdone;
-    session.selfHeavyDirty = true; // ensure the gated heavy block re-runs next snapshot
-  }
-
-  private resyncDelves(session: ClientSession): void {
-    delete session.lastSent.drun;
-    delete session.lastSent.dcompanion;
-    delete session.lastSent.dmarks;
-    delete session.lastSent.dcomp;
-    delete session.lastSent.dclears;
-    delete session.lastSent.delveDaily;
   }
 
   private send(session: ClientSession, obj: unknown): void {

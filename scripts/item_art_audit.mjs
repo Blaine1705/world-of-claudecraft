@@ -165,11 +165,11 @@ const build = await buildItemArtAudit({
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
     // + the membership Staff of Changing (PR 4281): 2040 / 2069, re-measured with
     // `--verify-only`.
-    // Completed Season 2 painted armor leaves the pending ledger.
-    // + Lantern Hall's seal and its destrier's reins (PR 4530): 2183 / 2212,
-    // re-measured with `--verify-only` on the merged tree.
-    catalogCount: 2183,
-    liveItemCount: 2212,
+    // Completed Season 2 painted armor leaves the pending ledger, plus Nightwing Chimaera mount.
+    // Wobbles the Slime's reins add one owner and one live definition.
+    // + the sprite whistle and Lantern Hall seal/reins: 2186 owners / 2215 live items.
+    catalogCount: 2186,
+    liveItemCount: 2215,
     // Only the intentionally retired Phoenix token retains its procedural icon.
     pendingArtCount: 1,
     generatedHeroicDefinitions: 116,

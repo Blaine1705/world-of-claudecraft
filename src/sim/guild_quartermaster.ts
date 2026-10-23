@@ -38,6 +38,8 @@ import type { Entity, GuildCosmeticRefusal } from './types';
  *  realm-wide ctx.accountCosmetics, which no server ownership decision may read). */
 export interface GuildAccountPort {
   ownsWeaponSkin(skinId: string): boolean;
+  /** Online hosts reserve and persist the charge in their character-save FIFO. */
+  purchaseWeaponSkin?(offerId: string): void;
   /** Grant the skin to the account. Returns false when it could not be granted, in which case
    *  the seals are kept. */
   grantWeaponSkin(skinId: string): boolean;
@@ -144,9 +146,37 @@ export function buyGuildCosmetic(
       return;
     }
   }
+  if (offer.kind === 'weaponSkin' && account.purchaseWeaponSkin) {
+    account.purchaseWeaponSkin(offerId);
+    return;
+  }
   if (!grantOffer(ctx, meta, offer, account)) return;
   ctx.removeItem(LANTERN_SEAL_ITEM_ID, offer.seals, meta.entityId);
   ctx.emit({ type: 'guildCosmeticBought', offerId, pid: meta.entityId });
+}
+
+/** Reserve an online purchase inside the save FIFO. Reuse every ordinary purchase gate,
+ * but publish neither ownership nor success until the host commits both durable writes. */
+export function reserveGuildWeaponSkin(
+  ctx: SimContext,
+  offerId: string,
+  pid: number,
+  ownsWeaponSkin: (skinId: string) => boolean,
+): Extract<GuildQuartermasterOffer, { kind: 'weaponSkin' }> | null {
+  if (!Object.hasOwn(GUILD_QUARTERMASTER_STOCK_BY_ID, offerId)) return null;
+  const offer = GUILD_QUARTERMASTER_STOCK_BY_ID[offerId];
+  if (offer.kind !== 'weaponSkin') return null;
+  let valid = false;
+  buyGuildCosmetic(ctx, offerId, pid, {
+    ownsWeaponSkin,
+    grantWeaponSkin: () => {
+      valid = true;
+      return false;
+    },
+  });
+  if (!valid) return null;
+  ctx.removeItem(LANTERN_SEAL_ITEM_ID, offer.seals, pid);
+  return offer;
 }
 
 function grantOffer(

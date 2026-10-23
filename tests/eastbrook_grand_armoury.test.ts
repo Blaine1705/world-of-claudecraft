@@ -41,6 +41,7 @@ import {
   FENBRIDGE_LAYOUT,
   localToWorld,
 } from '../src/sim/fenbridge_layout';
+import { activeFenbridgeBuildingById } from '../src/sim/fenbridge_touchup';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -329,19 +330,33 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
       buildingContainsPoint(fenbridgeInn, outsideRestPoint.x, outsideRestPoint.z, restPadding),
     ).toBe(false);
 
+    const activeInn = activeFenbridgeBuildingById('fenbridge_crooked_reed_inn') ?? authoredInn;
+    const activeRestPoint = localToWorld(
+      activeInn.position,
+      activeInn.rotation,
+      activeInn.sockets.entrance.localPosition.x,
+      -(activeInn.nativeDimensions.depth / 2 + restPadding - 0.25),
+    );
+    const activeOutsideRestPoint = localToWorld(
+      activeInn.position,
+      activeInn.rotation,
+      activeInn.sockets.entrance.localPosition.x,
+      -(activeInn.nativeDimensions.depth / 2 + restPadding + 0.25),
+    );
+
     const player = {
       inCombat: false,
       pos: {
-        x: restPoint.x,
-        y: terrainHeight(restPoint.x, restPoint.z, SEED),
-        z: restPoint.z,
+        x: activeRestPoint.x,
+        y: terrainHeight(activeRestPoint.x, activeRestPoint.z, SEED),
+        z: activeRestPoint.z,
       },
     } as Entity;
     expect(isResting(player)).toBe(true);
     player.pos = {
-      x: outsideRestPoint.x,
-      y: terrainHeight(outsideRestPoint.x, outsideRestPoint.z, SEED),
-      z: outsideRestPoint.z,
+      x: activeOutsideRestPoint.x,
+      y: terrainHeight(activeOutsideRestPoint.x, activeOutsideRestPoint.z, SEED),
+      z: activeOutsideRestPoint.z,
     };
     expect(isResting(player)).toBe(false);
   });
