@@ -5045,7 +5045,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Ejet',
   'hudChrome.warfareShop.weapons': 'Våben',
   'itemUi.market.saleBuyer': 'Solgt til {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} tidligere salg, medregnet i alt.',
+  'itemUi.market.saleOlder': 'Samt {count} tidligere salg, der ikke vises.',
   'itemUi.tooltip.maxStack': 'Maks. antal i stak: {count}',
   'hud.system.deathRecapAbility': 'Du er død. Dræbt af {ability}.',
   'hud.system.deathRecapDrowned': 'Du er død. Du druknede.',
@@ -20044,4 +20044,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Fosforflaske',
   'entities.abilities.phosphor_flask.description':
     'En forseglet beholder med en reaktiv kemisk blanding, der bryder ud i hvidglødende flammer over et område på 8 m i 3 sek. Fjender, der står i flammerne, tager {damage} Ildskade hvert 0,5 sek. Skaden stiger med afstandsangrebskraft.',
+  'entities.items.lychgate_buckler.name': 'Kirkegårdslågens rundskjold',
+  'entities.items.bastion_kite_shield.name': 'Bastionens normannerskjold',
+  'entities.items.barrowfield_tower_shield.name': 'Gravhøjsmarkens tårnskjold',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Ressourcebjælke',
+  'hudChrome.options.hillBarOpacity': 'Baggrundens uigennemsigtighed for Bakkekonge',
+  'hudChrome.options.playerFrameResourceDetached': 'Frigør ressourcebjælke',
+  'hudChrome.options.playerFrameResourceHeight': 'Ressourcebjælkens højde',
+  'hudChrome.options.playerFrameResourceWidth': 'Ressourcebjælkens bredde',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Slå Frigør ressourcebjælke til på fanen Rammer. Så frigør Rediger rammer også din ressourcebjælke, så du kan placere mana, energi eller raseri separat, hvor du vil. Ressourcebjælkens bredde og Ressourcebjælkens højde på samme fane ændrer størrelsen. Rediger rammer frigør også Bakkekonge-bjælken. Baggrundens uigennemsigtighed for Bakkekonge på samme fane nedtoner panelet, mens teksten forbliver tydelig.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

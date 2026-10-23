@@ -2292,7 +2292,7 @@ export const ko_KR: EnTranslations = {
       "playerFrameResourceWidth": "자원 바 너비",
       "playerFrameResourceHeight": "자원 바 높이",
       "hillBarOpacity": "언덕의 왕 배경 투명도",
-      "pixelsValue": "{value} px",
+      "pixelsValue": "{value}픽셀",
       "showNameplateDots": "이름표에 내 디버프 표시",
       "nameplateDotScale": "이름표 디버프 아이콘 크기",
       "showNameplateCooldowns": "공격/방어 추적기",
@@ -13150,7 +13150,7 @@ export const ko_KR: EnTranslations = {
       "historyEmpty": "아직 판매 내역이 없습니다. 세계 시장에서 판매한 아이템이 여기에 표시됩니다.",
       "historyNote": "세계 시장에서의 최근 판매 내역입니다.",
       "saleBuyer": "{buyer}에게 판매",
-      "saleOlder": "이전 판매 {count}건이 더 있으며, 합계에 포함되어 있습니다.",
+      "saleOlder": "목록에 표시되지 않은 이전 판매가 {count}건 더 있습니다.",
       "ordersTab": "주문",
       "ordersNote": "원하는 것을 등록하면 골드가 상인에게 보관됩니다. 가격 이하의 판매 등록은 즉시 채워지고, 나머지는 판매자를 기다립니다. 상인은 납품하는 쪽에서 {cut}%의 수수료를 가져갑니다. 현재 {used}/{max}개의 주문이 열려 있습니다.",
       "ordersListAria": "열린 구매 주문",
@@ -18687,6 +18687,15 @@ export const ko_KR: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "업화 화살통"
+      },
+      "lychgate_buckler": {
+        "name": "묘지문 버클러"
+      },
+      "bastion_kite_shield": {
+        "name": "요새 카이트 실드"
+      },
+      "barrowfield_tower_shield": {
+        "name": "고분 들판 타워 실드"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

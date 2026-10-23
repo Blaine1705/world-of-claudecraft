@@ -18688,6 +18688,15 @@ export const en_XA: EnTranslations = {
       "infernal_quiver": {
         "name": "[Íñƒéŕñáļ Ɋúíʋéŕ]"
       },
+      "lychgate_buckler": {
+        "name": "[Ļýçĥĝáţé Ɓúçķļéŕ]"
+      },
+      "bastion_kite_shield": {
+        "name": "[Ɓášţíóñ Ķíţé Šĥíéļð]"
+      },
+      "barrowfield_tower_shield": {
+        "name": "[Ɓáŕŕóŵƒíéļð Ţóŵéŕ Šĥíéļð]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

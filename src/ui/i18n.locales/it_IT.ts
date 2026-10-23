@@ -5192,7 +5192,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Posseduto',
   'hudChrome.warfareShop.weapons': 'Armi',
   'itemUi.market.saleBuyer': 'Venduto a {buyer}',
-  'itemUi.market.saleOlder': 'Più {count} vendite precedenti, incluse nel totale.',
+  'itemUi.market.saleOlder': 'Più {count} vendite precedenti non elencate.',
   'itemUi.tooltip.maxStack': 'Pila massima: {count}',
   'hud.system.deathRecapAbility': 'Sei morto. Ucciso da {ability}.',
   'hud.system.deathRecapDrowned': 'Sei morto. Sei annegato.',
@@ -20464,4 +20464,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Fiasca di Fosforo',
   'entities.abilities.phosphor_flask.description':
     "Un recipiente sigillato contenente una miscela chimica reattiva che esplode in fiamme incandescenti su un'area di 8 m per 3 s. I nemici che restano tra le fiamme subiscono {damage} danni da Fuoco ogni 0,5 s. Il danno aumenta con la potenza d'attacco a distanza.",
+  'entities.items.lychgate_buckler.name': 'Brocchiere del cancello del cimitero',
+  'entities.items.bastion_kite_shield.name': 'Scudo a goccia del bastione',
+  'entities.items.barrowfield_tower_shield.name': 'Scudo torre del Campo dei Tumuli',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barra delle risorse',
+  'hudChrome.options.hillBarOpacity': 'Opacità dello sfondo del Re della Collina',
+  'hudChrome.options.playerFrameResourceDetached': 'Separa barra delle risorse',
+  'hudChrome.options.playerFrameResourceHeight': 'Altezza della barra delle risorse',
+  'hudChrome.options.playerFrameResourceWidth': 'Larghezza della barra delle risorse',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Attiva Separa barra delle risorse nella scheda Riquadri: Modifica riquadri sbloccherà anche la barra delle risorse, permettendoti di posizionare mana, energia o rabbia separatamente dove preferisci. Larghezza della barra delle risorse e Altezza della barra delle risorse, nella stessa scheda, ne regolano le dimensioni. Modifica riquadri sblocca anche la barra del Re della Collina; Opacità dello sfondo del Re della Collina, nella stessa scheda, attenua il pannello mantenendo il testo ben leggibile.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

@@ -1218,7 +1218,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     ],
     xpReward: 700,
     copperReward: 260,
-    itemRewards: {},
+    itemRewards: { warrior: 'lychgate_buckler' },
     minLevel: 5,
   },
   q_supplies: {

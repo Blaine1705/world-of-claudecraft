@@ -5255,7 +5255,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Possédé',
   'hudChrome.warfareShop.weapons': 'Armes',
   'itemUi.market.saleBuyer': 'Vendu à {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} ventes antérieures, incluses dans le total.',
+  'itemUi.market.saleOlder': 'Plus {count} ventes antérieures non affichées.',
   'itemUi.tooltip.maxStack': 'Pile maximale : {count}',
   'hud.system.deathRecapAbility': 'Vous êtes mort. Tué par {ability}.',
   'hud.system.deathRecapDrowned': 'Vous êtes mort. Vous vous êtes noyé.',
@@ -20556,4 +20556,15 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Fiole de phosphore',
   'entities.abilities.phosphor_flask.description':
     "Un récipient scellé contenant un mélange chimique réactif qui s'embrase en flammes chauffées à blanc sur une zone de 8 m pendant 3 s. Les ennemis qui se tiennent dans les flammes subissent {damage} points de dégâts de Feu toutes les 0,5 s. Les dégâts augmentent avec la puissance d'attaque à distance.",
+  'entities.items.lychgate_buckler.name': 'Rondache du portail du cimetière',
+  'entities.items.bastion_kite_shield.name': 'Écu du bastion',
+  'entities.items.barrowfield_tower_shield.name': 'Pavois du Champ des Tertres',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barre de ressource',
+  'hudChrome.options.hillBarOpacity': 'Opacité du fond du Roi de la colline',
+  'hudChrome.options.playerFrameResourceDetached': 'Détacher la barre de ressource',
+  'hudChrome.options.playerFrameResourceHeight': 'Hauteur de la barre de ressource',
+  'hudChrome.options.playerFrameResourceWidth': 'Largeur de la barre de ressource',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Activez Détacher la barre de ressource dans l’onglet Cadres pour que Modifier les cadres déverrouille aussi votre barre de ressource : votre mana, votre énergie ou votre rage peut ainsi être placé séparément, où vous le souhaitez. Largeur de la barre de ressource et Hauteur de la barre de ressource, dans ce même onglet, règlent sa taille. Modifier les cadres déverrouille aussi la barre du Roi de la colline ; Opacité du fond du Roi de la colline, dans cet onglet, estompe son panneau sans nuire à la lisibilité du texte.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

@@ -5047,7 +5047,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Ägd',
   'hudChrome.warfareShop.weapons': 'Vapen',
   'itemUi.market.saleBuyer': 'Sålt till {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} tidigare försäljningar, inräknade i totalen.',
+  'itemUi.market.saleOlder': 'Samt {count} tidigare försäljningar som inte visas.',
   'itemUi.tooltip.maxStack': 'Maxstapel: {count}',
   'hud.system.deathRecapAbility': 'Du har dött. Dräpt av {ability}.',
   'hud.system.deathRecapDrowned': 'Du har dött. Du drunknade.',
@@ -20061,4 +20061,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Fosforflaska',
   'entities.abilities.phosphor_flask.description':
     'Ett förseglat kärl med en reaktiv kemisk blandning som flammar upp i vitglödande eld över ett område på 8 m i 3 sek. Fiender som står i lågorna tar {damage} eldskada var 0,5 sek. Skadan ökar med distansattackkraft.',
+  'entities.items.lychgate_buckler.name': 'Kyrkogårdsportens bucklare',
+  'entities.items.bastion_kite_shield.name': 'Bastionens droppsköld',
+  'entities.items.barrowfield_tower_shield.name': 'Gravhögsfältets tornsköld',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Resursfält',
+  'hudChrome.options.hillBarOpacity': 'Bakgrundens opacitet för Kungens på kullen',
+  'hudChrome.options.playerFrameResourceDetached': 'Koppla loss resursfältet',
+  'hudChrome.options.playerFrameResourceHeight': 'Resursfältets höjd',
+  'hudChrome.options.playerFrameResourceWidth': 'Resursfältets bredd',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Aktivera Koppla loss resursfältet på fliken Ramar så låser Redigera ramar även upp ditt resursfält. Då kan du placera mana, energi eller vrede separat var du vill. Resursfältets bredd och Resursfältets höjd på samma flik ändrar storleken. Redigera ramar låser även upp fältet för Kungens på kullen. Bakgrundens opacitet för Kungens på kullen på samma flik tonar ned panelen medan texten förblir tydlig.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

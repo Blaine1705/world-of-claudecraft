@@ -2288,10 +2288,10 @@ export const pl_PL: EnTranslations = {
       "enemyHighlightReticle": "Grubszy celownik wrogiego celu",
       "enemyHighlightDistance": "{yards} jardów",
       "showPetFrame": "Pokaż swoje zwierzę",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Odłącz pasek zasobów",
+      "playerFrameResourceWidth": "Szerokość paska zasobów",
+      "playerFrameResourceHeight": "Wysokość paska zasobów",
+      "hillBarOpacity": "Krycie tła Władcy wzgórza",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Pokaż moje kropki na tabliczkach znamionowych",
       "nameplateDotScale": "Rozmiar kropki na tabliczce znamionowej",
@@ -4409,7 +4409,7 @@ export const pl_PL: EnTranslations = {
         "chat": "Czat",
         "actionBarGroup": "Paski akcji",
         "playerFrame": "Gracz",
-        "playerResource": "Resource Bar",
+        "playerResource": "Pasek zasobów",
         "targetFrame": "Cel",
         "partyFrames": "Drużyna",
         "swingBar": "Automatyczny atak",
@@ -7589,7 +7589,7 @@ export const pl_PL: EnTranslations = {
       "frameGroups": "{trackers} mogą łączyć zadania, czyny, rozdarcia, nurkowania, cele zbierania i śledzenie Relikwarii. {auras} mogą łączyć znaki celu i sześć ścieżek aury. Włącz każdą grupę w Ustawieniach Ramek lub pozostaw ją wyłączoną, aby przenosić każdą ramkę osobno. {tot} zawiera pasek zasobów. {focus} ma trzy niezależnie ruchome cele: Shift+F1 do Shift+F3 je przypisuje; Ctrl+F1 do Ctrl+F3 je wybiera. Przeciągnij miernik obrażeń lub zagrożenia gdzieś poza jego przyciski, aby go przenieść, i przeciągnij jego krawędzie, aby zmienić jego rozmiar, nawet gdy ramki są zablokowane. Gdy ramki są odblokowane, Pokaż lub Ukryj Ramki ma własne zgrupowane menu. Kliknij prawym przyciskiem myszy na odblokowaną ramkę, aby wybrać Resetuj rozmiar lub Opcje Ramki. Interfejs > Ramki zawiera również Ustawienia Ramek i zwijalne Opcje Ramki Drużyny. Zablokuj Cel Celu do Celu, aby utrzymać te ramki razem. Wyłącz, aby przenieść Cel Celu osobno; włączenie ponownie zachowuje osobne stanowisko na później. Przypisane ramki ostrości ukrywają ich kontrolki konfiguracji; kliknij prawym przyciskiem myszy i wybierz Ustaw Focus, aby je przywrócić. Rzucanie na myszkę również działa na ramkach ostrości.",
       "framesGovernedTalkingHead": "Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Włącz Odłącz pasek zasobów na karcie Ramki. Opcja Edytuj ramki odblokuje wtedy także pasek zasobów, dzięki czemu możesz umieścić manę, energię lub gniew osobno w dowolnym miejscu. Szerokość paska zasobów i Wysokość paska zasobów na tej samej karcie zmieniają jego rozmiar. Edytuj ramki odblokowuje także pasek Władcy wzgórza. Krycie tła Władcy wzgórza na tej karcie wygasza jego panel, zachowując czytelność tekstu.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",
       "aurasTitle": "Wzmocnienia i osłabienia",
@@ -13150,7 +13150,7 @@ export const pl_PL: EnTranslations = {
       "historyEmpty": "Brak sprzedaży. Przedmioty sprzedane na Giełdzie Światowej pojawią się tutaj.",
       "historyNote": "Twoje ostatnie sprzedaże na Giełdzie Światowej.",
       "saleBuyer": "Kupujący: {buyer}",
-      "saleOlder": "Plus {count} wcześniejszych sprzedaży, wliczonych w sumę.",
+      "saleOlder": "Oraz {count} wcześniejszych sprzedaży, których nie wyświetlono.",
       "ordersTab": "Szukane",
       "ordersNote": "Opublikuj to, czego chcesz, a złoto zostanie zatrzymane u Kupca. Oferty po Twojej cenie lub poniżej są realizowane natychmiast; reszta czeka na sprzedającego. Kupeć pobiera {cut}% opłatę od tego, kto dostarczy towary. Masz otwartych {used}/{max} zamówień.",
       "ordersListAria": "Otwarte zamówienia kupna",
@@ -18687,6 +18687,15 @@ export const pl_PL: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Piekielny kołczan"
+      },
+      "lychgate_buckler": {
+        "name": "Puklerz cmentarnej bramy"
+      },
+      "bastion_kite_shield": {
+        "name": "Tarcza migdałowa bastionu"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Pawęż Kurhanowego Pola"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

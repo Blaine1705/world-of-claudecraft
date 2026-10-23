@@ -2288,10 +2288,10 @@ export const it_IT: EnTranslations = {
       "enemyHighlightReticle": "Reticolo ostile più marcato",
       "enemyHighlightDistance": "{yards} iarde",
       "showPetFrame": "Mostra il tuo famiglio",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Separa barra delle risorse",
+      "playerFrameResourceWidth": "Larghezza della barra delle risorse",
+      "playerFrameResourceHeight": "Altezza della barra delle risorse",
+      "hillBarOpacity": "Opacità dello sfondo del Re della Collina",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Mostra i miei punti sulle targhette",
       "nameplateDotScale": "Dimensione punto targhetta",
@@ -4409,7 +4409,7 @@ export const it_IT: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Barre delle azioni",
         "playerFrame": "Giocatore",
-        "playerResource": "Resource Bar",
+        "playerResource": "Barra delle risorse",
         "targetFrame": "Bersaglio",
         "partyFrames": "Gruppo",
         "swingBar": "Attacco automatico",
@@ -7589,7 +7589,7 @@ export const it_IT: EnTranslations = {
       "frameGroups": "{trackers} può unire missioni, imprese, squarci, esplorazioni, obiettivi di raccolta e il tracciamento del Reliquiario. {auras} può unire i tic sul bersaglio e le sei tracce delle aure. Attiva l'uno o l'altro gruppo in Impostazioni Riquadri, oppure lascialo disattivato per spostare ogni riquadro separatamente. {tot} include una barra delle risorse. {focus} ha tre bersagli spostabili in modo indipendente: da Maiusc+F1 a Maiusc+F3 li assegna; da Ctrl+F1 a Ctrl+F3 li seleziona. Trascina il misuratore di danno o minaccia in un punto qualsiasi al di fuori dei suoi pulsanti per spostarlo, e trascina i suoi bordi per ridimensionarlo, anche mentre i riquadri sono bloccati. Mentre i riquadri sono sbloccati, Mostra o Nascondi Riquadri ha un proprio menu raggruppato. Fai clic destro su un riquadro sbloccato per Ripristina dimensione o Opzioni Riquadro. Interfaccia > Riquadri contiene anche Impostazioni Riquadri e le Opzioni Riquadro Gruppo a comparsa. Blocca Bersaglio del Bersaglio al Bersaglio mantiene uniti quei riquadri. Disattivalo per spostare Bersaglio del Bersaglio separatamente; riattivarlo conserva la posizione separata per dopo. I riquadri focus assegnati nascondono i loro controlli di impostazione; fai clic destro e scegli Rimuovi Focus per ripristinarli. Il lancio al passaggio del mouse funziona anche sui riquadri focus.",
       "framesGovernedTalkingHead": "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Attiva Separa barra delle risorse nella scheda Riquadri: Modifica riquadri sbloccherà anche la barra delle risorse, permettendoti di posizionare mana, energia o rabbia separatamente dove preferisci. Larghezza della barra delle risorse e Altezza della barra delle risorse, nella stessa scheda, ne regolano le dimensioni. Modifica riquadri sblocca anche la barra del Re della Collina; Opacità dello sfondo del Re della Collina, nella stessa scheda, attenua il pannello mantenendo il testo ben leggibile.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
       "aurasTitle": "Potenziamenti e indebolimenti",
@@ -13150,7 +13150,7 @@ export const it_IT: EnTranslations = {
       "historyEmpty": "Ancora nessuna vendita. Gli oggetti che vendi sul Mercato Mondiale compaiono qui.",
       "historyNote": "Le tue vendite recenti sul Mercato Mondiale.",
       "saleBuyer": "Venduto a {buyer}",
-      "saleOlder": "Più {count} vendite precedenti, incluse nel totale.",
+      "saleOlder": "Più {count} vendite precedenti non elencate.",
       "ordersTab": "Richiesti",
       "ordersNote": "Pubblica ciò che vuoi e l'oro viene trattenuto dal Mercante. Le inserzioni al tuo prezzo o sotto vengono evase subito; il resto attende un venditore. Il Mercante trattiene una percentuale del {cut}% da chi consegna. Hai {used}/{max} ordini aperti.",
       "ordersListAria": "Ordini di acquisto aperti",
@@ -18687,6 +18687,15 @@ export const it_IT: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Faretra infernale"
+      },
+      "lychgate_buckler": {
+        "name": "Brocchiere del cancello del cimitero"
+      },
+      "bastion_kite_shield": {
+        "name": "Scudo a goccia del bastione"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Scudo torre del Campo dei Tumuli"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

@@ -2288,10 +2288,10 @@ export const cs_CZ: EnTranslations = {
       "enemyHighlightReticle": "Výraznější zaměřovač nepřítele",
       "enemyHighlightDistance": "{yards} yardů",
       "showPetFrame": "Zobrazit tvého mazlíčka",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Oddělit lištu zdrojů",
+      "playerFrameResourceWidth": "Šířka lišty zdrojů",
+      "playerFrameResourceHeight": "Výška lišty zdrojů",
+      "hillBarOpacity": "Krytí pozadí Krále kopce",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Zobrazit moje tečky na jmenovkách",
       "nameplateDotScale": "Velikost bodu na jmenovce",
@@ -4409,7 +4409,7 @@ export const cs_CZ: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Akční lišty",
         "playerFrame": "Hráč",
-        "playerResource": "Resource Bar",
+        "playerResource": "Lišta zdrojů",
         "targetFrame": "Cíl",
         "partyFrames": "Skupina",
         "swingBar": "Automatický útok",
@@ -7589,7 +7589,7 @@ export const cs_CZ: EnTranslations = {
       "frameGroups": "{trackers} umí sloučit úkoly, skutky, trhliny, výpravy, sběračské cíle a sledování Relikviáře. {auras} umí sloučit tečky na cíli a šest stop aur. Kteroukoli skupinu zapneš v Nastavení rámů, nebo ji necháš vypnutou, abys mohl(a) přesouvat každý rám zvlášť. {tot} obsahuje i lištu zdroje. {focus} má tři nezávisle přesouvatelné cíle: Shift+F1 až Shift+F3 je přiřadí, Ctrl+F1 až Ctrl+F3 je vybere. Přetažením měřiče poškození nebo hrozby kamkoli mimo jeho tlačítka ho přesuneš, a tažením za jeho okraje ho zvětšíš nebo zmenšíš, i když jsou rámy zamčené. Dokud jsou rámy odemčené, má Zobrazit nebo skrýt rámy vlastní seskupenou nabídku. Klikni pravým tlačítkem na odemčený rám pro Resetovat velikost nebo Možnosti rámu. Rozhraní > Rámy obsahuje i Nastavení rámů a rozbalitelné Možnosti rámů skupiny. Uzamknout Cíl cíle k Cíli udrží tyto rámy pohromadě. Vypni to, abys mohl(a) přesunout Cíl cíle zvlášť; opětovné zapnutí zachová tu oddělenou pozici na později. Přiřazené rámy zaměření skrývají své ovládací prvky nastavení; klikni pravým tlačítkem a zvol Zrušit zaměření, abys je obnovil(a). Najetí myší pro sesílání funguje i na rámech zaměření.",
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Zapni Oddělit lištu zdrojů na kartě Rámy. Volba Upravit rámečky pak uvolní i lištu zdrojů, takže manu, energii nebo zuřivost můžeš umístit samostatně kamkoli. Šířka lišty zdrojů a Výška lišty zdrojů na stejné kartě nastavují její velikost. Upravit rámečky uvolní také lištu Krále kopce. Krytí pozadí Krále kopce na stejné kartě zeslabí její panel, zatímco text zůstane dobře čitelný.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
       "aurasTitle": "Buffy a debuffy",
@@ -13150,7 +13150,7 @@ export const cs_CZ: EnTranslations = {
       "historyEmpty": "Zatím žádné prodeje. Předměty, které prodáš na Světovém trhu, se objeví tady.",
       "historyNote": "Tvé nedávné prodeje na Světovém trhu.",
       "saleBuyer": "Prodáno hráči {buyer}",
-      "saleOlder": "Plus {count} dřívějších prodejů, zahrnuto v součtu.",
+      "saleOlder": "A dalších {count} dřívějších prodejů, které nejsou uvedeny.",
       "ordersTab": "Poptávka",
       "ordersNote": "Zadej, co chceš, a zlato se uloží u Kupce. Nabídky na tvé ceně nebo pod ní se splní okamžitě; ostatní čekají na prodejce. Kupec si strhne {cut}% od toho, kdo doručí. Máš otevřeno {used}/{max} objednávek.",
       "ordersListAria": "Otevřené nákupní objednávky",
@@ -18687,6 +18687,15 @@ export const cs_CZ: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Pekelný toulec"
+      },
+      "lychgate_buckler": {
+        "name": "Pukléř hřbitovní brány"
+      },
+      "bastion_kite_shield": {
+        "name": "Mandlový štít bašty"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Věžový štít Mohylového pole"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

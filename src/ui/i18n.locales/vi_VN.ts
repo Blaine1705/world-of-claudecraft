@@ -5074,7 +5074,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Sở Hữu',
   'hudChrome.warfareShop.weapons': 'Vũ Khí',
   'itemUi.market.saleBuyer': 'Đã bán cho {buyer}',
-  'itemUi.market.saleOlder': 'Cộng thêm {count} lượt bán trước đó, đã được tính vào tổng.',
+  'itemUi.market.saleOlder': 'Cộng thêm {count} lượt bán trước đó không được liệt kê.',
   'itemUi.tooltip.maxStack': 'Chồng tối đa: {count}',
   'hud.system.deathRecapAbility': 'Bạn đã chết. Bị hạ gục bởi {ability}.',
   'hud.system.deathRecapDrowned': 'Bạn đã chết. Bạn đã chết đuối.',
@@ -20133,4 +20133,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Bình Phốt Pho',
   'entities.abilities.phosphor_flask.description':
     'Một chiếc bình kín chứa hỗn hợp hóa chất phản ứng, bùng lên thành ngọn lửa trắng nóng rực trên một khu vực 8 mét trong 3 giây. Kẻ địch đứng trong lửa chịu {damage} sát thương Lửa mỗi 0.5 giây. Sát thương tăng theo sức tấn công tầm xa.',
+  'entities.items.lychgate_buckler.name': 'Khiên Tròn Cổng Nghĩa Trang',
+  'entities.items.bastion_kite_shield.name': 'Khiên Cánh Diều Pháo Đài',
+  'entities.items.barrowfield_tower_shield.name': 'Khiên Tháp Cánh Đồng Gò Mộ',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Thanh tài nguyên',
+  'hudChrome.options.hillBarOpacity': 'Độ đục nền Vua của Đồi',
+  'hudChrome.options.playerFrameResourceDetached': 'Tách thanh tài nguyên',
+  'hudChrome.options.playerFrameResourceHeight': 'Chiều cao thanh tài nguyên',
+  'hudChrome.options.playerFrameResourceWidth': 'Chiều rộng thanh tài nguyên',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Bật Tách thanh tài nguyên trong thẻ Khung để Chỉnh Sửa Khung cũng mở khóa thanh tài nguyên, cho phép đặt thanh năng lượng phép, năng lượng hoặc nộ riêng ở bất kỳ đâu. Chiều rộng thanh tài nguyên và Chiều cao thanh tài nguyên trong cùng thẻ sẽ điều chỉnh kích thước của thanh. Chỉnh Sửa Khung cũng mở khóa thanh Vua của Đồi. Độ đục nền Vua của Đồi trong thẻ đó làm mờ nền bảng trong khi chữ vẫn rõ ràng.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

@@ -13150,7 +13150,7 @@ export const ja_JP: EnTranslations = {
       "historyEmpty": "まだ売却はありません。ワールドマーケットで売却したアイテムがここに表示されます。",
       "historyNote": "ワールドマーケットでの最近の売却記録です。",
       "saleBuyer": "{buyer}に売却",
-      "saleOlder": "ほかに {count} 件の以前の売却があり、合計に含まれています。",
+      "saleOlder": "ほかに、表示されていない以前の売却が {count} 件あります。",
       "ordersTab": "募集",
       "ordersNote": "欲しいものを注文すると、ゴールドは商人が預かります。指定した価格以下の出品はすぐに成立し、それ以外は売り手を待ちます。納品した側から商人が{cut}%を受け取ります。注文枠 {used}/{max} を使用中です。",
       "ordersListAria": "受付中の買い注文",
@@ -18687,6 +18687,15 @@ export const ja_JP: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "業火の矢筒"
+      },
+      "lychgate_buckler": {
+        "name": "墓門のバックラー"
+      },
+      "bastion_kite_shield": {
+        "name": "砦のカイトシールド"
+      },
+      "barrowfield_tower_shield": {
+        "name": "塚野のタワーシールド"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

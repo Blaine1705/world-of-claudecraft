@@ -5029,7 +5029,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Sahip',
   'hudChrome.warfareShop.weapons': 'Silahlar',
   'itemUi.market.saleBuyer': '{buyer} kişisine satıldı',
-  'itemUi.market.saleOlder': 'Ayrıca {count} önceki satış, toplama dahildir.',
+  'itemUi.market.saleOlder': 'Ayrıca listelenmeyen {count} önceki satış.',
   'itemUi.tooltip.maxStack': 'Azami yığın: {count}',
   'hud.system.deathRecapAbility': 'Öldün. {ability} tarafından öldürüldün.',
   'hud.system.deathRecapDrowned': 'Öldün. Boğuldun.',
@@ -20051,4 +20051,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Fosfor Şişesi',
   'entities.abilities.phosphor_flask.description':
     "Reaktif bir kimyasal karışım taşıyan mühürlü bir kap, 8 metrelik bir alanda 3 sn boyunca akkor beyaz alevlerle patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar menzilli saldırı gücüyle artar.",
+  'entities.items.lychgate_buckler.name': 'Mezarlık Kapısı Kalkanı',
+  'entities.items.bastion_kite_shield.name': 'Tabyanın Uçurtma Kalkanı',
+  'entities.items.barrowfield_tower_shield.name': 'Höyük Ovası Kule Kalkanı',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Kaynak Çubuğu',
+  'hudChrome.options.hillBarOpacity': 'Tepede Kral Arka Plan Opaklığı',
+  'hudChrome.options.playerFrameResourceDetached': 'Kaynak Çubuğunu Ayır',
+  'hudChrome.options.playerFrameResourceHeight': 'Kaynak Çubuğu Yüksekliği',
+  'hudChrome.options.playerFrameResourceWidth': 'Kaynak Çubuğu Genişliği',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Çerçeveler sekmesinde Kaynak Çubuğunu Ayır seçeneğini açtığında Çerçeveleri Düzenle, kaynak çubuğunun kilidini de açar. Böylece mana, enerji veya öfke çubuğunu bağımsız olarak istediğin yere yerleştirebilirsin. Aynı sekmedeki Kaynak Çubuğu Genişliği ve Kaynak Çubuğu Yüksekliği boyutunu ayarlar. Çerçeveleri Düzenle, Tepede Kral çubuğunun kilidini de açar. Bu sekmedeki Tepede Kral Arka Plan Opaklığı, yazı net kalırken paneli saydamlaştırır.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

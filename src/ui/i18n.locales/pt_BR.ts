@@ -5146,7 +5146,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Possuído',
   'hudChrome.warfareShop.weapons': 'Armas',
   'itemUi.market.saleBuyer': 'Vendido para {buyer}',
-  'itemUi.market.saleOlder': 'Mais {count} vendas anteriores, incluídas no total.',
+  'itemUi.market.saleOlder': 'Mais {count} vendas anteriores não listadas.',
   'itemUi.tooltip.maxStack': 'Pilha máxima: {count}',
   'hud.system.deathRecapAbility': 'Você morreu. Morto por {ability}.',
   'hud.system.deathRecapDrowned': 'Você morreu. Você se afogou.',
@@ -20315,4 +20315,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
   'entities.abilities.phosphor_flask.description':
     'Um recipiente selado com uma mistura química reativa que irrompe em chamas incandescentes sobre uma área de 8 m por 3 s. Os inimigos nas chamas sofrem {damage} de dano de Fogo a cada 0,5 s. O dano aumenta com o poder de ataque à distância.',
+  'entities.items.lychgate_buckler.name': 'Broquel do portão do cemitério',
+  'entities.items.bastion_kite_shield.name': 'Escudo de pipa do bastião',
+  'entities.items.barrowfield_tower_shield.name': 'Escudo torre do Campo dos Túmulos',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barra de recursos',
+  'hudChrome.options.hillBarOpacity': 'Opacidade do fundo do Rei da Colina',
+  'hudChrome.options.playerFrameResourceDetached': 'Separar barra de recursos',
+  'hudChrome.options.playerFrameResourceHeight': 'Altura da barra de recursos',
+  'hudChrome.options.playerFrameResourceWidth': 'Largura da barra de recursos',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Ative Separar barra de recursos na aba Quadros para que Editar Quadros também libere sua barra de recursos, permitindo posicionar mana, energia ou raiva separadamente onde quiser. Largura da barra de recursos e Altura da barra de recursos, na mesma aba, ajustam seu tamanho. Editar Quadros também libera a barra do Rei da Colina; Opacidade do fundo do Rei da Colina, nessa aba, esmaece o painel sem prejudicar a leitura do texto.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

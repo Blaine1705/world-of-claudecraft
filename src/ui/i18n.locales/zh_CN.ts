@@ -1448,6 +1448,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': '高望巨剑',
   'entities.items.highwatch_wallshield.name': '高望壁盾',
   'entities.items.eastbrook_buckler.name': '东溪小圆盾',
+  'entities.items.lychgate_buckler.name': '停柩门小圆盾',
+  'entities.items.bastion_kite_shield.name': '堡垒鸢盾',
+  'entities.items.barrowfield_tower_shield.name': '古冢原塔盾',
   'entities.abilities.avatar.name': '战争化身',
   'entities.abilities.avatar.description':
     '化身为巨像，持续 20 秒，解除你身上的所有控制效果，并使你造成的伤害提高 20%。',
@@ -4683,7 +4686,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.collectEmpty': '没有待领取内容。销售收益和过期上架会在这里领取。',
   'itemUi.market.collectNote': '商人为你保管的收益和退回货物。',
   'itemUi.market.saleProceeds': '销售收益',
-  'itemUi.market.saleOlder': '另有 {count} 笔较早的交易，已计入总额。',
+  'itemUi.market.saleOlder': '另有 {count} 笔较早的销售未列出。',
   'itemUi.market.collectAll': '全部领取',
   'itemUi.market.history': '历史记录',
   'itemUi.market.historyEmpty': '暂无销售记录。你在世界市场出售的物品会显示在这里。',
@@ -18913,4 +18916,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': '磷火瓶',
   'entities.abilities.phosphor_flask.description':
     '一个密封容器，装有活性化学混合物，会在 8 码范围内爆发出白热火焰，持续 3 秒。站在火焰中的敌人每 0.5 秒受到 {damage} 点火焰伤害。伤害随远程攻击强度提升。',
+  'hudChrome.options.pixelsValue': '{value} 像素',
 };

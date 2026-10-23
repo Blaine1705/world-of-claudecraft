@@ -2288,10 +2288,10 @@ export const de_DE: EnTranslations = {
       "enemyHighlightReticle": "Kräftigeres feindliches Fadenkreuz",
       "enemyHighlightDistance": "{yards} Yards",
       "showPetFrame": "Euren Begleiter anzeigen",
-      "playerFrameResourceDetached": "Detach Resource Bar",
-      "playerFrameResourceWidth": "Resource Bar Width",
-      "playerFrameResourceHeight": "Resource Bar Height",
-      "hillBarOpacity": "King of the Hill Background Opacity",
+      "playerFrameResourceDetached": "Ressourcenleiste abtrennen",
+      "playerFrameResourceWidth": "Breite der Ressourcenleiste",
+      "playerFrameResourceHeight": "Höhe der Ressourcenleiste",
+      "hillBarOpacity": "Hintergrunddeckkraft von König des Hügels",
       "pixelsValue": "{value} px",
       "showNameplateDots": "Zeigen Sie meine Punkte auf Namensschildern",
       "nameplateDotScale": "Punktgröße des Typenschilds",
@@ -4409,7 +4409,7 @@ export const de_DE: EnTranslations = {
         "chat": "Chat",
         "actionBarGroup": "Aktionsleisten",
         "playerFrame": "Spieler",
-        "playerResource": "Resource Bar",
+        "playerResource": "Ressourcenleiste",
         "targetFrame": "Ziel",
         "partyFrames": "Gruppe",
         "swingBar": "Automatischer Angriff",
@@ -7589,7 +7589,7 @@ export const de_DE: EnTranslations = {
       "frameGroups": "{trackers} kann Quests, Taten, Risse, Tiefgänge, Sammelziele und Reliquiar-Verfolgung zusammenfassen. {auras} kann Ziel-Effekte über Zeit und die sechs Auraspuren zusammenfassen. Aktiviere eine der beiden Gruppen in den Rahmeneinstellungen, oder lass sie aus, um jeden Rahmen einzeln zu bewegen. {tot} enthält eine Ressourcenleiste. {focus} hat drei unabhängig bewegliche Ziele: Umschalt+F1 bis Umschalt+F3 weist sie zu; Strg+F1 bis Strg+F3 wählt sie aus. Ziehe den Schadens- oder Bedrohungsmesser irgendwo außerhalb seiner Schaltflächen, um ihn zu bewegen, und ziehe an seinen Rändern, um ihn in der Größe zu ändern, selbst während die Rahmen gesperrt sind. Solange die Rahmen entsperrt sind, hat Rahmen anzeigen oder ausblenden sein eigenes gruppiertes Menü. Rechtsklicke auf einen entsperrten Rahmen für Größe zurücksetzen oder Rahmenoptionen. Unter Interface > Rahmen findest du außerdem die Rahmeneinstellungen und die einklappbaren Gruppenrahmen-Optionen. Ziel des Ziels an Ziel binden hält diese Rahmen zusammen. Schalte es aus, um Ziel des Ziels getrennt zu bewegen; schaltest du es wieder ein, bleibt die getrennte Position für später erhalten. Zugewiesene Fokus-Rahmen blenden ihre Einrichtungssteuerung aus; rechtsklicke und wähle Fokus aufheben, um sie wiederherzustellen. Zaubern per Mauszeiger funktioniert auch auf Fokus-Rahmen.",
       "framesGovernedTalkingHead": "Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedResourceAndHill": "Turn on Detach Resource Bar in the Frames tab and Edit Frames also loosens your resource bar, so your mana, energy, or rage can sit anywhere on its own; Resource Bar Width and Resource Bar Height on the same tab size it. Edit Frames loosens the King of the Hill bar too, and King of the Hill Background Opacity on that tab fades its panel while the text stays clear.",
+      "framesGovernedResourceAndHill": "Aktiviere Ressourcenleiste abtrennen im Reiter Rahmen. Dann gibt Rahmen bearbeiten auch deine Ressourcenleiste frei, sodass du Mana, Energie oder Wut unabhängig an einer beliebigen Stelle platzieren kannst. Breite der Ressourcenleiste und Höhe der Ressourcenleiste im selben Reiter passen ihre Größe an. Rahmen bearbeiten gibt auch die Leiste für König des Hügels frei. Hintergrunddeckkraft von König des Hügels im selben Reiter blendet deren Fläche aus, während der Text gut lesbar bleibt.",
       "barsTitle": "Leisten, Timer und Kampftext",
       "barsBody": "Deine Zauberleiste erscheint in der Mitte des Bildschirms, direkt über deinen Aktionsleisten, sobald du zauberst oder kanalisierst, und zeigt den Namen des Zaubers sowie die verbleibende Zeit. Dein Ziel bekommt eine eigene Zauberleiste auf seinem Fenster, sodass du siehst, was kommt, und darauf reagieren kannst.\n\nEine dünne Schwungleiste liegt unter deiner Zauberleiste und füllt sich zwischen deinen Waffenschwüngen, sodass ein Nah- oder Fernkämpfer sehen kann, wann der nächste automatische Treffer landet.\n\nDeine Erfahrungsleiste läuft über die volle Breite unter deinen Aktionsleisten, in Segmente unterteilt, mit einem helleren Abschnitt, der die ausgeruhte Erfahrung zeigt, die du angesammelt hast.\n\nSchwimme unter Wasser, und am oberen Bildschirmrand erscheint eine blaue Atemleiste. Sie leert sich, während dein Kopf unter Wasser ist, blinkt rot auf, sobald sie aufgebraucht ist und du zu ertrinken beginnst, und füllt sich schnell wieder, sobald du auftauchst. Die Leertaste lässt dich nach oben schwimmen, und die Taste zum Abtauchen, standardmäßig Strg, bringt dich tiefer.\n\nSchaden und Heilung schweben als kleine Zahlen über dem auf, was sie getroffen haben, sodass du einen Kampf lesen kannst, ohne Text lesen zu müssen. Der Kampf-Reiter in deinem Chatfenster führt das vollständige schriftliche Protokoll.",
       "aurasTitle": "Stärkungs- und Schwächungszauber",
@@ -13150,7 +13150,7 @@ export const de_DE: EnTranslations = {
       "historyEmpty": "Noch keine Verkäufe. Gegenstände, die Ihr auf dem Weltmarkt verkauft, erscheinen hier.",
       "historyNote": "Eure jüngsten Verkäufe auf dem Weltmarkt.",
       "saleBuyer": "Verkauft an {buyer}",
-      "saleOlder": "Zuzüglich {count} früherer Verkäufe, in der Summe enthalten.",
+      "saleOlder": "Dazu {count} frühere Verkäufe, die nicht aufgeführt sind.",
       "ordersTab": "Gewünscht",
       "ordersNote": "Gebt auf, was Ihr wollt, und das Gold wird beim Händler hinterlegt. Angebote zu oder unter Eurem Preis werden sofort erfüllt, der Rest wartet auf einen Verkäufer. Der Händler nimmt {cut}% von dem, wer liefert. Ihr habt {used}/{max} Aufträge offen.",
       "ordersListAria": "Offene Kaufaufträge",
@@ -18687,6 +18687,15 @@ export const de_DE: EnTranslations = {
       },
       "infernal_quiver": {
         "name": "Höllenköcher"
+      },
+      "lychgate_buckler": {
+        "name": "Faustschild des Friedhofstors"
+      },
+      "bastion_kite_shield": {
+        "name": "Langspitzschild der Bastion"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Turmschild des Hügelgräberfelds"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

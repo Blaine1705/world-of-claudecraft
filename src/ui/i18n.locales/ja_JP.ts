@@ -1504,6 +1504,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': 'ハイウォッチの大剣',
   'entities.items.highwatch_wallshield.name': 'ハイウォッチの壁盾',
   'entities.items.eastbrook_buckler.name': 'イーストブルックのバックラー',
+  'entities.items.lychgate_buckler.name': '墓門のバックラー',
+  'entities.items.bastion_kite_shield.name': '砦のカイトシールド',
+  'entities.items.barrowfield_tower_shield.name': '塚野のタワーシールド',
   'entities.abilities.avatar.name': '化身',
   'entities.abilities.avatar.description':
     '20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。',
@@ -4896,7 +4899,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '待機中のものはありません。売上と期限切れの出品はここで受け取ります。',
   'itemUi.market.collectNote': '商人が預かっている売上と返却品です。',
   'itemUi.market.saleProceeds': '売上',
-  'itemUi.market.saleOlder': 'ほかに {count} 件の以前の売却があり、合計に含まれています。',
+  'itemUi.market.saleOlder': 'ほかに、表示されていない以前の売却が {count} 件あります。',
   'itemUi.market.collectAll': 'すべて受け取る',
   'itemUi.market.history': '履歴',
   'itemUi.market.historyEmpty':
@@ -19902,4 +19905,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.phosphor_flask.name': '燐火フラスコ',
   'entities.abilities.phosphor_flask.description':
     '反応性の化学混合物を封じた容器で、8ヤードの範囲に3秒間、白熱の炎を噴き上げます。炎の中にいる敵は0.5秒ごとに{damage}の火炎ダメージを受けます。ダメージは遠隔攻撃力とともに上がります。',
+  'hudChrome.options.pixelsValue': '{value} px',
 };
