@@ -60,9 +60,10 @@ describe('the tavern chimney smoke', () => {
   it('streams two plumes from the chimney and the hearth flue, over the roof', () => {
     expect(TAVERN_SMOKE_SOURCES).toHaveLength(2);
     expect(TAVERN_SMOKE_PUFFS).toBe(TAVERN_SMOKE_SOURCES[0].puffs + TAVERN_SMOKE_SOURCES[1].puffs);
-    // the river-stone chimney outside the north wall, over the eaves; the flue over the ridge
+    // the river-stone chimney up the outside of the right gable, out past its verge to the
+    // ridge's height; the flue by the ridge
     expect(TAVERN_SMOKE_SOURCES[0].x).toBeGreaterThan(TAVERN_HALL.x1);
-    expect(TAVERN_SMOKE_SOURCES[0].y).toBeGreaterThan(TAVERN_HALL.eave + 4);
+    expect(TAVERN_SMOKE_SOURCES[0].y).toBeGreaterThan(TAVERN_HALL.ridge - 0.5);
     expect(TAVERN_SMOKE_SOURCES[1].y).toBeGreaterThan(TAVERN_HOOD.flueTop);
     for (let i = 0; i < TAVERN_SMOKE_PUFFS; i++) {
       for (const t of [0, 3.3, 17.9, 120]) {

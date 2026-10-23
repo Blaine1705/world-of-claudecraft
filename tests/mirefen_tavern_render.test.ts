@@ -262,10 +262,11 @@ describe('mirefen tavern painter', () => {
           return;
         }
         // the painted town's map (the loader names it after its image), a normal map on the
-        // standard tier only, and the UVs it is laid on
+        // standard tier only (the cloth and the props' atlas wear none), and the UVs it is laid on
         expect(mat.map.name, mesh.name).toMatch(/^Tavern[A-Za-z]+_color$/);
         painted.add(mat.map.name);
-        expect(!!mat.normalMap, mesh.name).toBe(standard && mat.map.name !== 'TavernCloth_color');
+        const unbumped = ['TavernCloth_color', 'TavernProps_color'].includes(mat.map.name);
+        expect(!!mat.normalMap, mesh.name).toBe(standard && !unbumped);
         if (mat.normalMap) {
           expect(mat.normalMap.name).toBe(mat.map.name.replace('_color', '_normal'));
           // the loader's normal scale for a mesh without tangents (y flipped), kept
@@ -284,6 +285,7 @@ describe('mirefen tavern painter', () => {
         'TavernDressed_color',
         'TavernFloor_color',
         'TavernPlaster_color',
+        'TavernProps_color',
         'TavernRoof_color',
         'TavernStone_color',
         'TavernTimber_color',
@@ -351,7 +353,7 @@ describe('mirefen tavern painter', () => {
       true,
     );
     step(eye(0, 10), at(0, 16, 20), 240);
-    // outdoors: the gable over the door, between the camera and the look point, ghosts (it
+    // outdoors: the cross gable over the door, between the camera and the look point, ghosts (it
     // would stay whole if the shell still took the look point for indoors)
     expect(part('HallWallFront').alpha).toBe(OCCLUDER_FADE_ALPHA);
     // back inside by the clamp's verdict: the outer shell holds
