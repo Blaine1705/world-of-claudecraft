@@ -14,6 +14,8 @@ import {
   weaponTypeForItem,
 } from '../src/sim/content/weapon_skin_rules';
 import {
+  RESERVED_WEAPON_SKIN_IDS,
+  STORE_WEAPON_SKIN_LIST,
   WEAPON_SKIN_COLLECTIONS,
   WEAPON_SKIN_LIST,
   WEAPON_SKINS,
@@ -28,7 +30,27 @@ const ROOT = join(__dirname, '..');
 
 describe('season 1 weapon skin catalog', () => {
   it('ships exactly the 29 paid skins: 7 per collection plus the Fallen Star encore', () => {
-    expect(WEAPON_SKIN_LIST.length).toBe(29);
+    expect(STORE_WEAPON_SKIN_LIST.length).toBe(29);
+    // plus five skins the store never sells: Lantern Hall's earned blade, and four elemental arms
+    // reserved for a future raid (obtainable nowhere yet), outside the store's collections
+    expect(WEAPON_SKIN_LIST.length).toBe(34);
+    expect(WEAPON_SKIN_LIST.filter((s) => s.earnedFrom).map((s) => s.id)).toEqual([
+      'lantern_hall_sword',
+      'hearthbrand_sword',
+      'squallcrest_sword',
+      'rimelight_staff',
+      'duskwick_staff',
+    ]);
+    expect(
+      WEAPON_SKIN_LIST.filter((s) => s.earnedFrom === 'lantern_hall').map((s) => s.id),
+    ).toEqual(['lantern_hall_sword']);
+    expect(RESERVED_WEAPON_SKIN_IDS).toEqual([
+      'hearthbrand_sword',
+      'squallcrest_sword',
+      'rimelight_staff',
+      'duskwick_staff',
+    ]);
+    expect(WEAPON_SKIN_COLLECTIONS).not.toContain('lantern_hall');
     for (const collection of WEAPON_SKIN_COLLECTIONS) {
       const inCollection = WEAPON_SKIN_LIST.filter((s) => s.collection === collection);
       expect(inCollection.length, collection).toBe(collection === 'fallen_star' ? 8 : 7);

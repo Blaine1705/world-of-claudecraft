@@ -164,6 +164,8 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.lanceTrial = null;
   c.lanceRestRemaining = 0;
   c.lanceGuidance = null;
+  // Lantern Hall's board mirror (src/net/guild_hall_wire_state.ts): the empty board.
+  c.guildContracts = { week: '', offered: [], done: [], lifetime: 0 };
   c.delveMarks = 0;
   c.companionUpgrades = {};
   c.craftSkills = emptyCraftSkills();

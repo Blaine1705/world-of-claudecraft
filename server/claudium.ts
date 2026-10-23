@@ -17,7 +17,7 @@ import type * as http from 'node:http';
 import { MEMBERSHIP_TOKEN_SKU } from '../src/membership_token_contract';
 import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { isKnownStorageSkuId } from '../src/sim/content/storage_charters';
-import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import { isGrantableWeaponSkin } from '../src/sim/content/weapon_skins';
 import { GAME_SUBSCRIPTION_PLAN, GAME_SUBSCRIPTION_PRICE } from '../src/subscription_contract';
 import {
   type ClaudiumNativeRail,
@@ -118,7 +118,8 @@ function parseSpendKind(value: unknown): 'cosmetic' | 'skin' | 'item' | 'storage
 }
 
 function isKnownWeaponSkinId(itemId: string): boolean {
-  return Object.hasOwn(WEAPON_SKINS, itemId);
+  // a skin reserved for a future raid is no SKU, even if the service ever listed one
+  return isGrantableWeaponSkin(itemId);
 }
 
 function claudiumMutationAction(req: http.IncomingMessage): ClaudiumMutationAction | null {

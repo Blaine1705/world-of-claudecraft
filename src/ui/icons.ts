@@ -5853,8 +5853,17 @@ const DEED_CREST_PREFIX = 'deed_';
 // Exhaustive live-deed art debt ledger. Accepted paintings are removed as each batch
 // lands; remaining rows retain their deliberate procedural category fallback.
 // Insertion order mirrors DEED_ORDER because the deed-art gate derives its exact debt in order.
-// Integration 45 completed all 57 formerly pending paintings.
-export const DEED_ART_PENDING: ReadonlySet<string> = new Set();
+// Integration 45 completed all 57 formerly pending paintings. Lantern Hall's contract
+// milestones and the quartermaster's three titles came after it: the category crest until their
+// paintings are commissioned.
+export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  'dgn_guild_first_contract',
+  'dgn_guild_ten_contracts',
+  'dgn_guild_fifty_contracts',
+  'feat_guild_writ_runner',
+  'feat_guild_hallsworn',
+  'feat_guild_of_lantern_hall',
+]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;

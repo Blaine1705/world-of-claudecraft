@@ -549,7 +549,8 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
     // wc -l on the merged tree. Exact count.
-    ceiling: 18038,
+    // Combined guild extractions and integration changes, measured with wc -l.
+    ceiling: 17996,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1048,7 +1049,16 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12405 -> 12400 with the torched mudfin hut fire: the burn cue's two
     // inline bursts moved into hut_fire_fx.ts (the particle cloud owns and ticks it),
     // leaving a one-line hand-off plus the light-pool hook. Same headroom as before.
-    ceiling: 12400,
+    // LOWERED 12405 -> 12381 at the merge of feature/lantern-hall-steed into
+    // feature/highwatch-adventurers-guild: Lantern Hall's steed and sword folded the three
+    // fiesta wrappers into one per-frame call (one host instead of three), net of the
+    // weapon-skin swing trail's one-line hook (weapon_skin_trail_core.ts). wc -l on the
+    // merged tree. Exact count.
+    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
+    // (46f0679547): both parent pins for the record, the integration 12400 and the guild
+    // 12381; the two sides' extractions compose to 12354 by wc -l on the merged tree.
+    // Exact count.
+    ceiling: 12354,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1291,7 +1301,14 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 11587 by /unstuck on custom maps: the world's graveyards and
     // player start became ctx views spirit.ts defaults to, so both
     // releasePlayerSpirit call sites dropped their explicit arguments. Exact count.
-    ceiling: 11587,
+    // LOWERED to 11582 by Lantern Hall, merged over the v0.45.0 integration: the quest half
+    // of a plain NPC talk moved to quests/npc_quest_talk.ts, paying for the guild's talk
+    // route and two IWorld members. wc -l on the merged tree, exact count.
+    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
+    // (46f0679547): both parent pins for the record, the integration 11587 and the guild
+    // 11582; the two sides' extractions compose to 11578 by wc -l on the merged tree.
+    // Exact count.
+    ceiling: 11578,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1821,7 +1838,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
     // on the merged tree. Exact count.
-    ceiling: 9758,
+    // Guild purchase wiring is paid for by moving quest/delve resync to quest_snapshot_wire.
+    // Measured after formatting: 9751, below both merged parent ceilings.
+    ceiling: 9751,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

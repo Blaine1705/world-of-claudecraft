@@ -74,7 +74,11 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
-import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
+import {
+  RESERVED_WEAPON_SKIN_IDS,
+  WEAPON_SKIN_LIST,
+  WEAPON_SKINS,
+} from '../src/sim/content/weapon_skins';
 import {
   ALL_RECIPES,
   CAMPS,
@@ -485,8 +489,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Stave and five trinkets on the same page: 495 + 13 = 508.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 558.
     // Two referral reward mounts and nightwing_chimera join Horizons. Wobbles the
-    // Slime (a developer mount, pending its route) takes one more slot: 562.
-    expect(full).toEqual({ owned: 562, total: 562 });
+    // Slime (a developer mount, pending its route) takes one more slot: 567.
+    expect(full).toEqual({ owned: 567, total: 567 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
@@ -521,9 +525,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     // 466 + 13 with the Mirefen world boss page's relics, staff and trinkets: 479.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 529;
-    // 532 with the two referral reward mounts and nightwing_chimera; 533 with
+    // 532 with the two referral reward mounts and nightwing_chimera; 537 with
     // Wobbles the Slime's character-scoped mount slot.
-    expect(character).toEqual({ owned: 533, total: 533 });
+    expect(character).toEqual({ owned: 537, total: 537 });
     // The Warfare Season 2 page is class-personal, outside completion.
   });
 
@@ -589,7 +593,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(749); // plus two referral reward mounts, nightwing_chimera and wobbles_slime
+    ).toBe(754); // plus two referral reward mounts, nightwing_chimera and wobbles_slime
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2670,11 +2674,15 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('weapon skin page lists every live Armory skin exactly once', () => {
+  it('weapon skin page lists every obtainable Armory skin exactly once', () => {
     const page = RELIQUARY_PAGES_BY_ID.horizons_weapon_skins;
     const ids = page.relics.filter((r) => r.kind === 'weapon_skin').map((r) => r.skinId);
     expect(ids).toEqual([...RELIQUARY_HORIZON_WEAPON_SKINS]);
-    const live = WEAPON_SKIN_LIST.map((s) => s.id).sort();
+    // every skin but the ones reserved for a future raid (obtainable nowhere yet, so no row)
+    expect(RESERVED_WEAPON_SKIN_IDS.length).toBeGreaterThan(0);
+    const live = WEAPON_SKIN_LIST.filter((s) => !RESERVED_WEAPON_SKIN_IDS.includes(s.id))
+      .map((s) => s.id)
+      .sort();
     expect([...ids].sort()).toEqual(live);
     for (const id of ids) {
       expect(WEAPON_SKINS[id], id).toBeDefined();
@@ -2940,6 +2948,16 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
   buried_hoard: HOARD_BASE_ITEM_IDS,
   referral_cards: ['reins_referral_raptor', 'reins_referral_tank'],
+  // src/sim/guild_quartermaster.ts grants the guild's reins, its account-wide blade and its four
+  // account-wide elemental arms
+  lantern_hall_quartermaster: [
+    'reins_lantern_hall_destrier',
+    'lantern_hall_sword',
+    'hearthbrand_sword',
+    'squallcrest_sword',
+    'rimelight_staff',
+    'duskwick_staff',
+  ],
 };
 
 /**
@@ -3023,7 +3041,12 @@ const ROUTE_MAPS = (() => {
     }
   }
   // The account storefront: one route, every live Armory skin.
-  const storeSkinIds = new Set<string>(Object.keys(WEAPON_SKINS));
+  // the store sells every skin but the earned ones (WeaponSkinDef.earnedFrom)
+  const storeSkinIds = new Set<string>(
+    Object.values(WEAPON_SKINS)
+      .filter((skin) => !skin.earnedFrom)
+      .map((skin) => skin.id),
+  );
   // The activity write sites, inverted to slot -> activities.
   const activitiesBySlot = new Map<string, string[]>();
   for (const [activityId, slotIds] of Object.entries(ACTIVITY_AWARDS)) {
@@ -3304,15 +3327,18 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // (the Viridian Valestrider's Champion reins, content/faction_vendors.ts) +
   // the WOC Store's annual membership tank reward; the one pending-ruling
   // absence resolves to nothing.
-  horizons_mounts: 14, // plus the referral-card reward activity
-  horizons_weapon_skins: 1,
+  // plus the referral-card reward activity, plus Lantern Hall's quartermaster (the guild's
+  // horse, sold for Lantern Seals)
+  horizons_mounts: 15,
+  // the account storefront, plus Lantern Hall's quartermaster for the guild's earned blade
+  horizons_weapon_skins: 2,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
   // Crucible raid's flawless title + the three faction standing Champion
   // titles + the Clue Scroll Treasure Hunter title + the Drowned Temple lore
   // guide's Witness of the Choir.
-  horizons_titles: 50,
+  horizons_titles: 53, // +3 Lantern Hall's quartermaster titles
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
@@ -3371,11 +3397,11 @@ const KNOWN_MULTI_SOURCE_PAGES = [
   'professions_field_notes',
   'professions_specimens',
   // Horizons titles: one deed per title. Mounts: several heroic bosses and
-  // three rift ranks plus Marla. Weapon skins are the one Horizons page with a
-  // single source (the account storefront), which is why they are absent here
-  // and pinned at 1 in EXPECTED_DISTINCT_SOURCES instead.
+  // three rift ranks plus Marla. Weapon skins: the account storefront for the 29 store skins
+  // and Lantern Hall's quartermaster for the guild's earned blade.
   'horizons_titles',
   'horizons_mounts',
+  'horizons_weapon_skins',
   // The Rift page spans every themed environment's mobs plus two rank doors:
   // the widest conquerors page there is. (Its first-clear activity door left
   // with the bands; horizons_riftbound is single-source and pinned at 1 in
@@ -3956,6 +3982,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'rift_first_clear',
       'buried_hoard',
       'referral_cards',
+      'lantern_hall_quartermaster',
     ]);
   });
 
@@ -4297,11 +4324,25 @@ describe('Reliquary source hint coverage', () => {
     expect(RELIQUARY_PROFESSION_MARKS.masterworkByCraft).toContain('masterwork:engineering');
     // And the skins page really is fully answered now, which is the half of the
     // executed ruling this row can no longer show.
-    expect(RELIQUARY_HORIZON_WEAPON_SKINS.length).toBe(29);
-    expect(RELIQUARY_PAGES_BY_ID.horizons_weapon_skins.sourceDefault).toEqual({
-      sourceKind: 'store',
-      sourceId: RELIQUARY_STORE_SOURCE_ID,
-    });
+    // 29 store skins plus Lantern Hall's earned blade, each row naming its own door (the four
+    // elemental arms are reserved for a future raid and have no row)
+    expect(RELIQUARY_HORIZON_WEAPON_SKINS.length).toBe(30);
+    // two doors now, so no page default: every row names its own
+    expect(RELIQUARY_PAGES_BY_ID.horizons_weapon_skins.sourceDefault).toBeUndefined();
+    const skins = RELIQUARY_PAGES_BY_ID.horizons_weapon_skins;
+    const row = (id: string) => {
+      const relic = skins.relics.find((r) => r.kind === 'weapon_skin' && r.skinId === id);
+      if (!relic) throw new Error(`no ${id} row`);
+      return reliquaryRelicSource(skins, relic);
+    };
+    expect(row('cinderbrand_sword')).toEqual([
+      { sourceKind: 'store', sourceId: RELIQUARY_STORE_SOURCE_ID },
+    ]);
+    expect(row('lantern_hall_sword')).toEqual([
+      { sourceKind: 'activity', sourceId: 'lantern_hall_quartermaster' },
+    ]);
+    // the reserved elemental arms have no row, so no door to name
+    for (const id of RESERVED_WEAPON_SKIN_IDS) expect(() => row(id), id).toThrow(/no .* row/);
   });
 
   it('multi-source pages give every relic its OWN hint (no inherited stragglers)', () => {
@@ -4835,6 +4876,7 @@ describe('Reliquary source hint coverage', () => {
         'mount x rift',
         'mount x store',
         // weapon_skin: the account storefront, page-wide.
+        'weapon_skin x activity',
         'weapon_skin x store',
         // title: the deed that grants it, always.
         'title x deed',
@@ -4859,8 +4901,9 @@ describe('Reliquary source hint coverage', () => {
     // Forgebreaker's one Weaponcrafting door); update
     // deliberately with the authoring.
     // The Mirefen world boss page adds one default (16); the five-dungeon rework's
-    // heroic pages and the Hollow Crypt normal page drop six (PR 4352): 10.
-    expect(defaults).toBe(10);
+    // heroic pages and the Hollow Crypt normal page drop six (PR 4352): 10. The skins page
+    // dropped its storefront default when Lantern Hall's blade gave it a second door: 9.
+    expect(defaults).toBe(9);
   });
 });
 

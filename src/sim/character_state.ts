@@ -138,6 +138,9 @@ export interface CharacterState extends ReferralRewardState {
     vaultAttemptSeq?: number;
     vaultGuestCycle?: string;
     vaultGuestPayouts?: number;
+    // Lantern Hall's weekly contracts (src/sim/guild_contracts.ts), written only once the
+    // character has done one: the week last read, its done list, and the lifetime count.
+    guildContracts?: { week: string; done: string[]; lifetime: number };
   };
   // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
   factions?: Partial<Record<string, number>>;

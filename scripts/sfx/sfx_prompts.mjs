@@ -244,6 +244,17 @@ export const SFX = [
     custom: true,
   },
   {
+    // The Lantern Hall Destrier's whinny as it rears on its hind legs (a standing jump while
+    // mounted, src/render/mount_rear_core.ts): two takes generated with the ElevenLabs Sound
+    // Effects API (eleven_text_to_sound_v2, 2026-10-16) and picked by the maintainer, prompt
+    // "A powerful heavy war horse rearing up and letting out a loud, proud whinny neigh, with a
+    // short snort at the end, realistic recording, close, no music, no voices, about 2 seconds".
+    // Stored as custom masters so a paid regeneration never replaces the picked takes; the
+    // variant pool rotates them with a no-repeat bias.
+    key: 'mount_neigh_lantern_hall_destrier',
+    custom: true,
+  },
+  {
     // The Viridian Valestrider's summon call: an authored bird cry played once
     // when the 1.5s summon channel completes and the mount appears.
     // Sfx.mountSummon resolves `mount_summon_<key>` per mount and stays silent

@@ -70,7 +70,7 @@ export const BAKED_MAP_BG = {
   "galecrest": {
     "w": 587,
     "h": 694,
-    "rowHash": "9e0f3e3c"
+    "rowHash": "70f3e4f4"
   },
   "farshore_isle": {
     "w": 480,

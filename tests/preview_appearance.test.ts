@@ -368,6 +368,8 @@ describe('CharacterPreview.setVisualKey: the weapon-skin rebuild contract', () =
     state.currentVisual = null;
     state.closeupCache = new Map();
     state.characterGroup = { add: vi.fn(), remove: vi.fn(), rotation: { y: 1 } };
+    // the constructor always builds the open gate (a skin change forgets its linked sig)
+    state.openGate = createPreviewOpenGate();
     return preview;
   }
 

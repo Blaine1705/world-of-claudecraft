@@ -526,11 +526,11 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // Their own paintings now ship in referral-reward-icons-v045-2026-10-22,
     // plus reins_nightwing_chimera, so all 138 live hotbar items are painted; none remain parked.
     // Wobbles the Slime's reins ship committed art (a render of the mount): 139.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(139);
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(140);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(139);
+    ).toHaveLength(140);
     expect([...pendingHotbarItemIds].sort(), 'ITEM_ART_PENDING hotbar items').toEqual([]);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),

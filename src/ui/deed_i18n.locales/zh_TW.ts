@@ -948,4 +948,31 @@ export const table: DeedLocaleTable = {
     name: '人贓俱獲',
     desc: '在埋藏的寶藏中擊殺錢袋竄賊，在牠帶著金幣逃脫前。',
   },
+  dgn_guild_first_contract: {
+    name: '契約已簽',
+    desc: '完成一份燈火大廳的每週地下城契約。',
+  },
+  dgn_guild_ten_contracts: {
+    name: '告示板常客',
+    desc: '完成10份燈火大廳的每週地下城契約。',
+  },
+  dgn_guild_fifty_contracts: {
+    name: '契約老手',
+    desc: '完成50份燈火大廳的每週地下城契約。',
+  },
+  feat_guild_writ_runner: {
+    name: '令狀信使',
+    desc: '以6枚燈火印章從燈火大廳軍需官加里克·霍爾特處購得。',
+    title: '令狀信使',
+  },
+  feat_guild_hallsworn: {
+    name: '大廳誓約者',
+    desc: '以14枚燈火印章從燈火大廳軍需官加里克·霍爾特處購得。',
+    title: '大廳誓約者',
+  },
+  feat_guild_of_lantern_hall: {
+    name: '燈火大廳之人',
+    desc: '以24枚燈火印章從燈火大廳軍需官加里克·霍爾特處購得。',
+    title: '燈火大廳之人',
+  },
 };

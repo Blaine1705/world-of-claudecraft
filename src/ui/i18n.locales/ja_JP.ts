@@ -31,6 +31,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'メンバーシップが切れると装備の能力値とセット効果が停止し、更新すると復活します。',
   'itemUi.tooltip.membershipDormant':
     '無効：メンバーシップを更新すると装備の能力値とセット効果が復活します。',
+  'entities.items.lantern_seal.name': '燈火の印章',
+  'entities.items.reins_lantern_hall_destrier.name': '燈火の館の軍馬の手綱',
   'entities.items.membership_staff.name': '変化の杖',
   'hudChrome.bags.membershipSlot': 'メンバーシップバッグ枠',
   'hudChrome.bags.membershipSlotLocked': 'メンバーシップでこのバッグ枠を解放。',
@@ -474,6 +476,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至高の離岸流の手巻き',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '宝の地図が導く「埋もれた財宝」の報酬の宝箱から手に入る',
+  'hudChrome.reliquary.sourceActivityLanternHall': '燈火の館の補給係から燈火の印章で購入',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '風は東の砂丘から灰を運んできた。何もない砂から灰は飛んでこない。駐屯地の倉庫のセラが巡回をすべて記録している。誰かが食べ物を持っていけば話してくれるだろう。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -1577,6 +1580,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '塩の難破のショルダーガード',
   'entities.items.saltwrack_pauldrons.name': '塩の難破の肩甲',
   'entities.items.saltwrack_epaulets.name': '塩の難破のエポレット',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '契約は週に三件、更新のたびに貼り出す。署名も手数料もいらない。やり遂げれば印章はあなたのものだ。',
+  'entities.npcs.contract_clerk_tobias_wren.name': 'トバイアス・レン',
+  'entities.npcs.contract_clerk_tobias_wren.title': '契約係',
   'entities.npcs.glider_apprentice.name': 'スカイ',
   'guide.arenaPage.vanguardBody':
     'ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ二人の補給官が元の階層に加えて販売し続けます。元の階層も販売終了にはなりません。どのスペックにも頭、肩、胸、脚、手の五部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる三つのセットだけが並び、続けて装備できるヴァンガードの武器が並びます。ヴァンガードの部位は元の階層と同じウォーフェアレーティングを、より高いアイテムレベルで備えており、各セットには2点と4点でスペックのアビリティの一つを変化させる二つのボーナスがあります。元のセットと違い、それらのボーナスはモンスター相手を含めどこでも機能しますが、対プレイヤー戦向けに作られているため、レイド内ではレイドセットの方が依然として優れた選択です。',
@@ -2225,6 +2232,32 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': '残り火鍛造',
   'hudChrome.wocStore.collections.hoarfrost': '白霜',
   'hudChrome.wocStore.collections.fallen_star': '墜星',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    'ギャリック・ホルトはこの剣を見知らぬ者には売らない。週ごとに燈火の館の契約を果たしてきた者にだけ渡し、そのたびに同じ言葉を添える。鍔のランタンは館の炉から灯したもの、どこへ持って行こうと館が共にある、と。樋の炎は見た目にすぎない。大切なのは約束だ。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    '樋に灯火の炎を宿した幅広の鋼の刃、金の鍔飾り、鍔に灯る籠入りのランタン、青い革の柄。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火の館の剣',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火の剣',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '鍛冶の熱を帯びた両刃と、両面を枝分かれして走る溶けた継ぎ目を持つ、黒ずんだ鋼の炎形の刃。燃える石を囲む青銅の炎の鍔、牛血色の柄。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '燈火の館には、館が建って以来一度も消えたことのない炉がある。ギャリック・ホルトは、この刃はその熾火で焼き入れされたと言い張る。これを携える者たちは、どれほど寒い夜番でも柄は温かいままだと言う。刃に沿う炎は見た目にすぎない。',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': '嵐波の剣',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '砕ける波のように輝く刃縁を持つ海青色の長い刃。枝分かれした稲妻を宿す嵐の溝、刃元を越える金の波、片側の刃縁に沿うひれ、嵐の真珠を囲む金の砕け波の鍔。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    'ギルドのために航海したある船長が、帆柱を奪い船を鐘のように鳴り響かせた嵐からこの刃を持ち帰った。ギャリックは印章と引き換えにしか売らず、買う者には必ず、嵐の前にはうなるぞと忠告する。稲妻と海の光は見た目にすぎない。',
+  'hudChrome.wocStore.skins.rimelight_staff.name': '霧氷灯の杖',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '銀で締められ、光る霧氷が巻きつく淡い柄。頂には氷の破片の冠の中で冷たい光の大きな結晶をつかむ銀の爪があり、襟からはつららが垂れる。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '燈火の館の冬の見張りは、このような杖を携えて高い街道を歩き、雪に迷う旅人のために頂を灯した。ギャリックは印章に余裕のある者のために一本を棚に置いている。霜とその冷たい光は見た目にすぎない。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '黄昏灯芯の杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '鉄で締められた二本のねじれた黒い木の柄。頂には二本の巻いた角の間で紫の黄昏の炎を燃やす吹き抜けの鉄のランタンがあり、その底から鎖が揺れる。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '館のランタンはどれも明るく燃える、ただ一つを除いて。黄昏の炎は夜の館を守るために灯されたもので、ほかのランタンが光を放つところで影を放つ。ギャリックはその芯を自ら切りそろえる。煙と紫の輝きは見た目にすぎない。',
+  'hudChrome.wocStore.collections.lantern_hall': '燈火の館',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'ギルドマーク・アーミングソード',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '青焼き鋼の刀身、青銅の魚尾型クロスガード、青緑に染めた革巻きの柄、小さく刻印されたギルドの紋章。',
@@ -6439,6 +6472,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
   'hudChrome.death.ghostHint': '死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '印章と栄誉の交換だ、友よ。俺の棚に刃を研ぐものはないが、ハイウォッチ中の館があんたがどこで手に入れたか知ることになる。',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': 'ギャリック・ホルト',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': 'ギルドの補給係',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '仲間を探してる？この地図にある墓所も砦も神殿も、みんな私のリストに名前があるわ。どこへ行くのか教えて。',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': 'ミラ・フェアウェザー',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': 'ギルドの募集係',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '燈火の館へようこそ、{className}。今週の契約はトバイアスが掲示板に貼っている。ギャリックは我らの印章を身につける価値のある栄誉と交換し、ミラは山の下のどの扉へ向かう仲間でも見つけてくれる。戦利品を持ち帰れば、私の後ろの広間に飾られるだろう。',
+  'entities.npcs.guildmaster_hesper_dunmore.name': 'ヘスパー・ダンモア',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '燈火の館のギルドマスター',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':
@@ -13945,6 +13990,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_nightwing_chimera':
     '古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
+  'hudChrome.mounts.name_lantern_hall_destrier': '燈火の館の軍馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
@@ -13955,6 +14001,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。',
   'hudChrome.mounts.desc_lanternback_troll':
     '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    '燈火の館の軍馬。ギルドの青の下に樫と鉄の馬鎧をまとい、鞍から揺れる二つの嵐灯が帰り道を照らす。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
@@ -21861,6 +21909,92 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。',
   'apiError.character.referral_bond_pending':
     '招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。',
+  'hudChrome.guildHall.title': '燈火の館',
+  'hudChrome.guildHall.close': 'ギルドのウィンドウを閉じる',
+  'hudChrome.guildHall.tabsLabel': '燈火の館の項目',
+  'hudChrome.guildHall.tabs.contracts': '契約',
+  'hudChrome.guildHall.tabs.quartermaster': '補給係',
+  'hudChrome.guildHall.seals': '燈火の印章：{count}',
+  'hudChrome.guildHall.resetIn': '新しい契約まで{time}',
+  'hudChrome.guildHall.resetSoon': '新しい契約は次の週次リセットで',
+  'hudChrome.guildHall.contractsIntro':
+    '契約は週に三件、王国のすべての冒険者に同じものが貼り出される。署名は不要：やり遂げれば、その印章は週に一度ずつ直接バッグに届く。',
+  'hudChrome.guildHall.kinds.boss': '討伐依頼',
+  'hudChrome.guildHall.kinds.heroic': 'ヒロイック踏破',
+  'hudChrome.guildHall.kinds.task': '遂行',
+  'hudChrome.guildHall.goals.boss': '{dungeon}で{boss}を倒す（難易度は問わない）。',
+  'hudChrome.guildHall.goals.heroic':
+    'ヒロイックで{dungeon}を踏破する：ヒロイック難易度で{boss}を倒す。',
+  'hudChrome.guildHall.goals.task': '{task}（{dungeon}）',
+  'hudChrome.guildHall.contractLabel': '{kind}：{dungeon}',
+  'hudChrome.guildHall.done': '今週は達成済み',
+  'hudChrome.guildHall.open': '未達成',
+  'hudChrome.guildHall.lifetime': '達成した契約：{count}',
+  'hudChrome.guildHall.emptyBoard': '掲示板は書き換え中だ。週次リセットの後にまた来てほしい。',
+  'hudChrome.guildHall.quartermasterIntro':
+    'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの剣の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。',
+  'hudChrome.guildHall.titleOffer': '称号：{title}',
+  'hudChrome.guildHall.titlePreview': '表示：{preview}',
+  'hudChrome.guildHall.buy': '購入',
+  'hudChrome.guildHall.owned': '所持済み',
+  'hudChrome.guildHall.needSeals': 'あと{count}個必要',
+  'hudChrome.guildHall.bought': '称号「{title}」を購入した。功績の書で選択できる。',
+  'hudChrome.guildHall.refused.owned': 'それはすでに所持している。',
+  'hudChrome.guildHall.refused.seals': '燈火の印章が足りない。',
+  'hudChrome.guildHall.refused.bags': 'バッグがいっぱいだ。',
+  'hudChrome.guildHall.refused.riding': 'マウントを買う前に騎乗を学ぶこと。',
+  'hudChrome.guildHall.boughtSkin':
+    '外見「{skin}」を購入した。コスメティックのウィンドウから適用できる。',
+  'hudChrome.guildHall.boughtMount': '{mount}を購入した。手綱はバッグの中にある。',
+  'hudChrome.guildHall.skinPreview':
+    '装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
+  'hudChrome.guildHall.skinOffer': '剣の外見：{skin}',
+  'hudChrome.guildHall.mountPreview': '地上マウント：騎乗中の移動速度+{pct}%。騎乗訓練が必要。',
+  'hudChrome.guildHall.mountOffer': 'マウント：{mount}',
+  'hudChrome.guildHall.refused.range': '取引するには補給係のそばに立つこと。',
+  'hudChrome.guildHall.reward.one': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.few': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.many': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.other': '燈火の印章{count}個',
+  'hudChrome.guildHall.contractDone.one': '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.few': '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.many':
+    '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.other':
+    '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.signSubtitle': '冒険者ギルド',
+  'hudChrome.guildHall.board.noticesLabel': '今週の契約',
+  'hudChrome.guildHall.board.weekProgress': '今週：契約{total}件中{done}件を達成',
+  'hudChrome.guildHall.board.weekProgressAria': '今週達成した契約',
+  'hudChrome.guildHall.board.cardProgress': '今週 {done}/{total}',
+  'hudChrome.guildHall.board.rewardLine': '報酬：{reward}',
+  'hudChrome.guildHall.board.stamp': '封印済み',
+  'hudChrome.guildHall.board.sealsTip':
+    '燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。',
+  'hudChrome.guildHall.shop.stockLabel': 'ギャリック・ホルトの品揃え',
+  'hudChrome.guildHall.shop.kindMount': 'マウント',
+  'hudChrome.guildHall.shop.kindSword': '剣の外見',
+  'hudChrome.guildHall.shop.mountHeading': '鞍にまたがるあなた',
+  'hudChrome.guildHall.shop.skinHeading': 'あなたの手に',
+  'hudChrome.guildHall.shop.stageLabel': '{name}の3Dプレビュー',
+  'hudChrome.guildHall.shop.stageUnavailable': 'この端末では3Dプレビューを表示できない。',
+  'hudChrome.guildHall.shop.mountHowTo':
+    '購入すると手綱がバッグに入る。手綱を使えば騎乗でき、手綱を持っている限りこの馬はあなたのものだ。',
+  'hudChrome.guildHall.shop.mountOwned': 'このマウントは所持済みだ。手綱はバッグの中にある。',
+  'hudChrome.guildHall.shop.skinHowTo':
+    '購入後、外見ウィンドウで適用する。アカウントのすべてのキャラクターで使える。',
+  'hudChrome.guildHall.shop.skinOwned': 'この外見は所持済みだ。外見ウィンドウで適用できる。',
+  'hudChrome.guildHall.shop.kindTitle': '称号',
+  'hudChrome.guildHall.shop.plateHeading': 'あなたのネームプレート',
+  'hudChrome.guildHall.shop.howTo': '購入後、功績の書で選ぶと名前と一緒に表示される。',
+  'hudChrome.guildHall.shop.cosmetic': '見た目のみ：能力値は変わらない。',
+  'hudChrome.guildHall.shop.price': '価格：{price}',
+  'hudChrome.guildHall.shop.have': '所持：{count}',
+  'hudChrome.guildHall.shop.ownedLong': 'この称号は所持済みだ。功績の書で選択できる。',
+  'hudChrome.guildHall.shop.short.one': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.few': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.many': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.other': '燈火の印章があと{count}個必要だ。',
   'hudChrome.raidBossGuide.dungeonButton': 'ボス攻略: {dungeon}',
   'hudChrome.raidBossGuide.dungeonBossesLabel': 'ダンジョンのボス',
   'hudChrome.raidBossGuide.rankMiniboss': 'ミニボス',

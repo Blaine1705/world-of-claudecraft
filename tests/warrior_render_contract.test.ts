@@ -135,6 +135,9 @@ describe('winning Warrior attack animation routing', () => {
         views: new Map([[7, {}]]),
         activeVisual: () => visual,
         attackTriggerCount: 0,
+        // a swing first looks up its wearer's weapon skin for a trail
+        // (weapon_skin_trail_core.ts); one not in the world wears none
+        sim: { entities: new Map() },
       });
 
       renderer.triggerAttack(7, abilityId, false, 'melee');

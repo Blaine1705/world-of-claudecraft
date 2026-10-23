@@ -2012,10 +2012,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // +19 at the merge of the Staff of Changing's discovery id (PR 4281);
     // +26 with reins_nightwing_chimera.
     // 258,415 -> 258,437 with Wobbles the Slime's reins (+22, kept).
-    expect(baselineBytes).toBe(258455);
+    expect(baselineBytes).toBe(258736);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    expect(bytes).toBe(266739);
+    expect(bytes).toBe(267020);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2282,7 +2282,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // integration merges. 249,958 with the Staff of Changing's discovery id
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeReferralBytes).toBe(250024);
+    expect(beforeReferralBytes).toBe(250305);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2308,7 +2308,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeMembershipBytes).toBe(249850);
+    expect(beforeMembershipBytes).toBe(250131);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2754,7 +2754,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Plus 18 for the sprite buddy's whistle id (`"whistle_sprites",`, id
         // length + 3) in itemsDiscovered.
         18 +
-        buddyCollectionBytes,
+        buddyCollectionBytes +
+        // Lantern Hall deeds and discovered seal/reins ids.
+        281,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2801,7 +2803,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // rework, lore guide deed included, MEASURED 2026-10 across its merge
       // (the +829 and +2,453 above; the branch's own +648 + 41 and +993
       // undercounted the merged tree).
-      deeds: 1572,
+      // deeds 1,572 -> 1,808 with Lantern Hall (#4530), its deed rows (+236 of the +281
+      // above), MEASURED on the merged tree.
+      deeds: 1808,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
       // deedStats 9,427 -> 14,446 at the choose-one leveling quest gear: its
@@ -2813,8 +2817,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // MEASURED across its merge (the branch's own +1,448 undercounted).
       // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
       // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
-      // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21391.
-      deedStats: 21391,
+      // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21436.
+      deedStats: 21436,
       reliquary: 13954,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2863,7 +2867,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (247,117).
       // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
       // The sprite buddy's whistle id adds 18 (247,154).
-    ).toBe(247154);
+    ).toBe(247435);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2904,7 +2908,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (249,927).
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
       // reins_wobbles_slime adds 22 (249,994).
-    ).toBe(250012);
+    ).toBe(250293);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3050,8 +3054,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // RE-BASED for the sprite buddy: 250,146 bytes, +18 from its whistle id in
     // itemsDiscovered. Floor at measurement minus 380, edge at measurement plus
     // one: 249766..250147.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249766);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(250147);
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250047);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(250428);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

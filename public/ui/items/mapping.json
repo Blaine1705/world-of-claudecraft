@@ -8464,6 +8464,30 @@
         "heroic_robe_of_the_unquiet_rite",
         "gravecallers_rod"
       ]
+    },
+    {
+      "batchId": "lantern-hall-seal-2026-10-16",
+      "source": "Deterministic Blender render of an original procedural model (scripts/assets/highwatch_guild/render_lantern_seal_icon.py: a gilded octagonal seal, a blue enamel field, Lantern Hall's lantern over two crossed swords). No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "the Heroic Mark's token icon (a metal seal on a dark vignette)",
+      "provenanceRecord": "scripts/assets/highwatch_guild/render_lantern_seal_icon.py",
+      "itemIds": [
+        "lantern_seal"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: an EEVEE still of the procedural seal, rendered at 128px."
+    },
+    {
+      "batchId": "lantern-hall-destrier-reins-2026-10-16",
+      "source": "Deterministic Blender render of the shipped mount model (scripts/assets/lantern_hall_steed/render_reins_icon.py: a three-quarter portrait of the barded head, the steel chanfron with the guild's lantern lit on the brow, the crinet and bridle) over a painted low-key ground (compose_icon.py). No text-to-image generation, no reference art.",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "the mount reins portraits (the mount's own head on a dark vignette)",
+      "provenanceRecord": "scripts/assets/lantern_hall_steed/render_reins_icon.py",
+      "itemIds": [
+        "reins_lantern_hall_destrier"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: an EEVEE still of public/models/mounts/lantern_hall_destrier.glb (Idle, frame 0), composed at 512 and converted to 128px by npm run assets:items."
     }
   ]
 }

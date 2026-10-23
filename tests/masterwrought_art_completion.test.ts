@@ -841,7 +841,7 @@ describe('Masterwrought art completion evidence', () => {
     // The icon backlog adds 135 Season 2 paintings, five referral rewards, the horse, and Nightwing Chimaera.
     // Wobbles the Slime's reins owner (outside the dated universe too): 2,183.
     // + the sprite buddy's whistle render: 2,184.
-    expect(currentOwnerIds).toHaveLength(2184);
+    expect(currentOwnerIds).toHaveLength(2186);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1151,6 +1151,20 @@ describe('Masterwrought art completion evidence', () => {
     expect(backlogAdditiveIds.size).toBe(141);
     expect(datedIds.filter((id) => backlogAdditiveIds.has(id))).toEqual([]);
 
+    // Lantern Hall (PR 4530): its seal and its destrier's reins, two more additive
+    // batches on the v0.45.0 integration, pinned by identity like the waves above.
+    const lanternHallBatchIds: readonly (string | undefined)[] = [
+      'lantern-hall-seal-2026-10-16',
+      'lantern-hall-destrier-reins-2026-10-16',
+    ];
+    const lanternHallIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => lanternHallBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect([...lanternHallIds].sort()).toEqual(['lantern_seal', 'reins_lantern_hall_destrier']);
+    expect(datedIds.filter((id) => lanternHallIds.has(id))).toEqual([]);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
@@ -1189,7 +1203,8 @@ describe('Masterwrought art completion evidence', () => {
         !musterIds.has(id) &&
         !dungeonReworkIds.has(id) &&
         !buddyIds.has(id) &&
-        !backlogAdditiveIds.has(id),
+        !backlogAdditiveIds.has(id) &&
+        !lanternHallIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

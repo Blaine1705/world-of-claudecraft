@@ -190,13 +190,24 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     }
   });
 
-  it('keeps the historical audit sealed while all 346 current deeds have paintings', () => {
+  it("keeps the historical audit sealed while every current deed but Lantern Hall's six has its painting", () => {
     // Historical manifests and their shipping hashes stay pinned above. The
-    // integration45 backlog adds the last 57 crests in separate accepted batches.
-    expect([...DEED_ART_PENDING]).toEqual([]);
-    expect(DEED_ORDER).toHaveLength(346);
+    // integration45 backlog adds the last 57 crests in separate accepted batches; Lantern
+    // Hall's three contract milestones and three quartermaster titles came after it, on the
+    // pending ledger until their paintings are commissioned.
+    expect([...DEED_ART_PENDING]).toEqual([
+      'dgn_guild_first_contract',
+      'dgn_guild_ten_contracts',
+      'dgn_guild_fifty_contracts',
+      'feat_guild_writ_runner',
+      'feat_guild_hallsworn',
+      'feat_guild_of_lantern_hall',
+    ]);
+    expect(DEED_ORDER).toHaveLength(352);
     expect(DEED_IMAGE_IDS.size).toBe(346);
-    expect(sorted(DEED_IMAGE_IDS)).toEqual(sorted(DEED_ORDER));
+    expect(sorted(DEED_IMAGE_IDS)).toEqual(
+      sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),
+    );
 
     const guideById = new Map(GUIDE_DEEDS.map((deed) => [deed.id, deed]));
     for (const id of RELIQUARY_DEED_IDS) {

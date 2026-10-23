@@ -51,6 +51,7 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
+import { highwatchGuildFlames, highwatchGuildLights } from './highwatch_guild_lights';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
 import { hutSmokePrewarmParts } from './hut_smoke';
 import {
@@ -1781,6 +1782,25 @@ export function buildProps(
     }
   } else {
     clearHarborHouseShell();
+  }
+  // ...and the Highwatch adventurers' guild's hearths, lamps and belfry lantern
+  // (render/highwatch_guild_lights.ts), lit like a campfire: root-level, world-positioned,
+  // in the fire-light budget
+  if (highwatchTown) {
+    for (const light of highwatchGuildLights(seed)) {
+      group.add(light);
+      fireLights.push(light);
+    }
+    for (const fire of highwatchGuildFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
+      group.add(fire.holder);
+      flames.push(fire.flame);
+      keepLiveMeshes.add(fire.flame);
+      noShadow.add(fire.flame);
+      if (fire.core) {
+        keepLiveMeshes.add(fire.core);
+        noShadow.add(fire.core);
+      }
+    }
   }
   // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
   // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
