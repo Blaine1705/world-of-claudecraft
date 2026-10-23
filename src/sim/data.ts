@@ -1402,7 +1402,14 @@ function computeWorldXBounds(z: number): Readonly<{ min: number; max: number }> 
       max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
     }
   }
-  return Object.freeze({ min, max });
+  // Seed double-valued fields before freezing: integer rows and the infinite
+  // fallback otherwise share a changing numeric representation that can make
+  // V8 repeatedly deoptimize terrainHeightUnpadded at its bounds.max read.
+  // Assign the original results unchanged (including non-finite values).
+  const bounds = { min: Number.NaN, max: Number.NaN };
+  bounds.min = min;
+  bounds.max = max;
+  return Object.freeze(bounds);
 }
 
 interface WorldXBoundsIndex {

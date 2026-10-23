@@ -98,6 +98,7 @@ import { createGroundObject, createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { farmPatchesFor } from '../src/sim/moved_objects';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { spawnHillNow } from '../src/sim/pvp';
@@ -5333,7 +5334,7 @@ describe('farm plot wire (fplot)', () => {
     g.window = { setInterval: () => 0, clearInterval: () => undefined };
     try {
       const w = new ClientWorld('farm-statics-probe', 1, 'warrior', 'http://localhost');
-      expect(w.farmPatches).toBe(FARM_PATCHES);
+      expect(w.farmPatches).toBe(farmPatchesFor(BUILTIN_WORLD.objectMoves, FARM_PATCHES));
       expect(w.myFarmPlots).toEqual([]);
     } finally {
       g.WebSocket = prevWebSocket;

@@ -1,7 +1,7 @@
 {
   "version": 2,
   "meta": {
-    "id": "live-40783-c1eeae18-24c1ae08-157d-d45ee847-f6b28d97",
+    "id": "live-40783-c1eeae18-24c1ae08-157d-421e9565-e4972e75",
     "name": "Live world",
     "description": "",
     "createdAt": 0,
@@ -9,7 +9,7 @@
     "seed": 20061,
     "parentId": "",
     "overworldBase": "40783-c1eeae18-24c1ae08",
-    "overworldRevision": "157d-d45ee847-f6b28d97"
+    "overworldRevision": "157d-421e9565-e4972e75"
   },
   "content": {
     "zones": [
@@ -17745,8 +17745,8 @@
       },
       {
         "id": "farmer_teasel",
-        "x": -28.243072340930894,
-        "z": 319.5520825402818,
+        "x": -27.243072340930894,
+        "z": 322.0520825402818,
         "facing": 0.7853981633974483
       }
     ],
