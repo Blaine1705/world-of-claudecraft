@@ -39,6 +39,7 @@ import {
   farRenderedCellHeight,
   farVertexClearance,
 } from './far_surface_core';
+import { groundPaletteFor, groundPaletteVersion } from './ground_palette_override_core';
 import { islandHorizonHaze, islandIsolationActive } from './island_isolation_core';
 import { clamp01 } from './num_clamp';
 import {
@@ -446,6 +447,24 @@ const zoneFarPalettes: FarPalette[] = ZONES.map((zn) => {
   };
 });
 
+// Palette-lab overrides (ground_palette_override_core.ts), re-read only when
+// the override table moved: the vista keeps repainting with the near ground.
+let zoneFarPaletteVersion = groundPaletteVersion();
+function syncZoneFarPalettes(): void {
+  const v = groundPaletteVersion();
+  if (v === zoneFarPaletteVersion) return;
+  zoneFarPaletteVersion = v;
+  for (let i = 0; i < ZONES.length; i++) {
+    const p = groundPaletteFor(ZONES[i].id, ZONES[i].biome);
+    const pal = zoneFarPalettes[i];
+    pal.grass = srgbHexToLinear(p.grass);
+    pal.grassDark = srgbHexToLinear(p.grassDark);
+    pal.grassYellow = srgbHexToLinear(p.grassYellow);
+    pal.dirt = srgbHexToLinear(p.dirt);
+    pal.sand = srgbHexToLinear(p.sand);
+  }
+}
+
 const TONE = {
   dirtDark: srgbHexToLinear(TERRAIN_TONES.dirtDark),
   rock: srgbHexToLinear(TERRAIN_TONES.rock),
@@ -517,6 +536,7 @@ function farPaletteAt(x: number, z: number): FarPalette {
     copy3(out.sand, pal.sand);
     return out;
   }
+  syncZoneFarPalettes();
   const first = stripPalette(STRIP_ZONES[0]);
   copy3(out.grass, first.grass);
   copy3(out.grassDark, first.grassDark);
@@ -656,11 +676,12 @@ export function farGroundColor(
     }
   }
 
-  // marsh mud: pull the ground toward dark wet earth where the marsh blends in
+  // marsh mud: keep only a subtle warm-earth hint so distant marsh hills hold
+  // the vale meadow green
   const marshW = biomeWeightAt('marsh', x, z);
   if (marshW > 0) {
-    lerp3(out, TONE.dirtDark, marshW * 0.45);
-    grassW *= 1 - marshW * 0.45;
+    lerp3(out, TONE.dirtDark, marshW * 0.08);
+    grassW *= 1 - marshW * 0.08;
   }
 
   // far forest mass: clumped canopy paint over gentle, dry, low ground

@@ -1,9 +1,10 @@
 // The Seal Gate's shipping GLBs (scripts/assets/sanctum_seal_gate/build.mjs,
 // authored by docs/design/dungeon-rework/entrance/build_sanctum_entrance.py):
 // exact bytes, the live authoring fingerprint, the media manifest rows, the
-// Blender nodes and materials the runtime keys on, and the open-world budget
-// (docs: LORE_Y_ENTRADAS section 8, about 9,000 triangles and 150 KB for the
-// main piece, vertex colour only, no textures).
+// Blender nodes and materials the runtime keys on, and the set piece's
+// open-world budget: the three GLBs together at most 62,000 triangles and
+// 1,230,000 bytes (the Wildheart entrance's ceiling), vertex colour only, no
+// textures.
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -22,24 +23,28 @@ const ROOT = path.join(__dirname, '..');
 
 const PINS: Record<string, { sha: string; bytes: number; triangles: number; maxBytes: number }> = {
   'public/models/props/sanctum_seal_gate.glb': {
-    sha: '9471577a536cff08546d973772efa1574c8bdd22ae2954dec5fe285f66c1ad24',
-    bytes: 140812,
-    triangles: 8504,
-    maxBytes: 150 * 1024,
+    sha: '3b5d07ab0adad7bbd65b0d219edb16931501280705692b81a5aaf6526db981b3',
+    bytes: 231376,
+    triangles: 34656,
+    maxBytes: 600 * 1024,
   },
   'public/models/props/sanctum_seal_gate_props.glb': {
-    sha: '8ef3420bf4e30ae52d54a86283e7a1305bcb0f73a04f05bf3dbc31946258a202',
-    bytes: 135988,
-    triangles: 7742,
-    maxBytes: 150 * 1024,
+    sha: '3d1231fdd49182140bb447df9487a1fb004d7ebf5c5d7dcfdb5505574cd07564',
+    bytes: 174740,
+    triangles: 14726,
+    maxBytes: 400 * 1024,
   },
   'public/models/props/sanctum_seal_gate_ice.glb': {
-    sha: '1af7a36268c99827c0c15cf1ee62757cfbdb68e8efcdaae33a88badac5a1ba5f',
-    bytes: 25340,
-    triangles: 1231,
-    maxBytes: 40 * 1024,
+    sha: 'b502616fd9128591602a13b12dbd9d5226e7fcb9f9710f233fbc317fdd09a5ea',
+    bytes: 64384,
+    triangles: 9563,
+    maxBytes: 200 * 1024,
   },
 };
+
+/** The whole set piece's open-world ceiling (the Wildheart entrance's). */
+const SET_PIECE_MAX_TRIANGLES = 62000;
+const SET_PIECE_MAX_BYTES = 1230000;
 
 describe('the Seal Gate shipping assets', () => {
   it('the runtime preloads exactly the three shipped GLBs', () => {
@@ -93,7 +98,18 @@ describe('the Seal Gate shipping assets', () => {
     });
   }
 
-  it('the main gate stays inside the open-world budget', () => {
-    expect(PINS['public/models/props/sanctum_seal_gate.glb'].triangles).toBeLessThanOrEqual(9000);
+  it('the three GLBs together stay inside the set piece budget', () => {
+    const pins = Object.values(PINS);
+    const triangles = pins.reduce((sum, pin) => sum + pin.triangles, 0);
+    const bytes = SANCTUM_SEAL_GATE_ASSETS.reduce(
+      (sum, asset) => sum + readFileSync(path.join(ROOT, asset.target)).length,
+      0,
+    );
+    expect(triangles).toBeLessThanOrEqual(SET_PIECE_MAX_TRIANGLES);
+    expect(bytes).toBeLessThanOrEqual(SET_PIECE_MAX_BYTES);
+    // the gate itself carries the most detail; the far icefall the least of the masses
+    expect(PINS['public/models/props/sanctum_seal_gate.glb'].triangles).toBeGreaterThan(
+      PINS['public/models/props/sanctum_seal_gate_ice.glb'].triangles,
+    );
   });
 });

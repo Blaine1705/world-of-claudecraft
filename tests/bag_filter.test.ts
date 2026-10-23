@@ -689,6 +689,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'whistle_skeleton',
     'whistle_solbot',
     'whistle_spider',
+    'whistle_sprites',
     'whistle_stag',
     'whistle_tiger',
     'whistle_triple_t',

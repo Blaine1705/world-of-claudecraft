@@ -407,6 +407,7 @@ describe('the density model covers the shipped world', () => {
       'bastion_drowned_anchor',
       'bastion_gaol_cage',
       'crypt_bone_pile',
+      'crypt_remembrance_candle',
       'dragonkin_egg',
       'hoard_abyssal_tentacle',
       'hoard_bloat_cap',
@@ -416,6 +417,11 @@ describe('the density model covers the shipped world', () => {
       'hoard_coinsack_scurrier',
       'hoard_healing_tide_totem',
       'hoard_silk_cocoon',
+      'muster_chaplain',
+      'muster_drillmaster',
+      'muster_effigy',
+      'muster_footman',
+      'muster_sergeant',
       'nythraxis_bone_spike',
       'rime_egg_sac',
       'sanctum_shackle_anvil',
@@ -454,7 +460,13 @@ describe('the density model covers the shipped world', () => {
     // Sprout (encounters/wildheart_basin/gorgebloom.ts) and the Drowned
     // Temple's Tideglass Reflections (encounters/drowned_temple/tideglass_colossus.ts),
     // and the Hollow Crypt trash pass's Stirring Bones (a fallen Ossuary
-    // Warrior's bone pile, laid by mob/trash_kit/crypt_kit.ts).
+    // Warrior's bone pile, laid by mob/trash_kit/crypt_kit.ts), plus the
+    // Hollow Crypt's Remembrance Candle (Morthen's rite, 04d15bb863f, in the
+    // same rework). The Mirefen world boss (PR 4259, merged at e2c3a155551)
+    // adds five more that no camp places: Balgath's muster squads (footman,
+    // chaplain, sergeant, drillmaster; content/mirefen_muster.ts posts them at
+    // the command camp and warpath pickets) and muster_effigy, the Straw
+    // Foreman drill dummy.
     //
     // spider_egg is the second, and it is deliberately NOT added to the
     // dense-by-design exemption: the Broodmother clutch sits in ordinary Widow

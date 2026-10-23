@@ -38,6 +38,7 @@ import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
 import { prepareMirefenTavernAssets, resetMirefenTavernCaches } from '../mirefen_tavern';
 import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '../noticeboard';
+import { preparePaintedTownProfileAssets, resetPaintedTownProfileCaches } from '../painted_towns';
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
@@ -79,6 +80,7 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareEastbrookTownProfileAssets(target),
       prepareFenbridgeTownProfileAssets(target),
       prepareHighwatchTownProfileAssets(target),
+      preparePaintedTownProfileAssets(target),
       prepareEastbrookGrandArmouryProfileAssets(),
       prepareMailboxProfileAssets(),
       prepareNoticeboardProfileAssets(),
@@ -103,6 +105,7 @@ const RESETTERS = [
   ['eastbrook_town', resetEastbrookTownProfileCaches],
   ['fenbridge_town', resetFenbridgeTownProfileCaches],
   ['highwatch_town', resetHighwatchTownProfileCaches],
+  ['painted_towns', resetPaintedTownProfileCaches],
   ['banker_chest', resetBankerChestProfileCaches],
   ['mailbox', resetMailboxProfileCaches],
   ['noticeboard', resetNoticeboardProfileCaches],

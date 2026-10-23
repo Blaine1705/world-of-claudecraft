@@ -1007,7 +1007,9 @@ describe('delve interactables and affixes', () => {
       for (const id of run.affixes) expect(DELVE_IMPLEMENTED_AFFIXES.has(id)).toBe(true);
       expect(run.affixes.length).toBe(1); // Heroic affixCount = 1
     }
-  });
+    // Sixty Sim builds: 7 s locally, 10.9 s on a green CI shard and past the
+    // 20 s default on loaded shard runners (v0.45.0 integration world).
+  }, 60_000);
 
   it('Deacon Vandric enrages on Heroic but not on Normal (PRD §7.4)', () => {
     for (const tier of ['normal', 'heroic'] as const) {

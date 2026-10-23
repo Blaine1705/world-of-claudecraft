@@ -5,13 +5,14 @@ import { buildingCameraHeight } from '../sim/building_layout';
 import { isBuiltinShapedWorld } from '../sim/builtin_shaped_world';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
-import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
+import { getActiveWorldContent, isBuiltinWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
   DOCK_SECTION_SURFACE_Y,
   dockSurfaceLine,
   dockSurfaceYAt,
 } from '../sim/dock_layout';
+import { MUDFIN_HUT_MODELS, type MudfinHutModel, mudfinHutAt } from '../sim/mudfin_huts';
 import {
   CHAPEL_HALL,
   CHAPEL_TOWER,
@@ -50,14 +51,9 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
-import { buildHighwatchManorLane, highwatchManorLanePrewarmPart } from './highwatch_manor_lane';
-import { highwatchManorFlames, highwatchManorLights } from './highwatch_manor_lights';
-import {
-  buildHighwatchManorSmoke,
-  highwatchManorSmokePrewarmPart,
-  type ManorSmokeView,
-} from './highwatch_manor_smoke';
+import { highwatchGuildFlames, highwatchGuildLights } from './highwatch_guild_lights';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
+import { hutSmokePrewarmParts } from './hut_smoke';
 import {
   type KitSurfaceFamily,
   kitHasUvSurfaceRouting,
@@ -81,6 +77,7 @@ import {
   prefetchOccluderFadeWithin,
 } from './occluder_fade';
 import { occluderFadesDisabled } from './occluder_fade_core';
+import { isPaintedTownRebuildBuilding } from './painted_towns';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 import {
   newPropCullPass,
@@ -91,6 +88,12 @@ import {
   updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryClutterFar,
+  sceneryStructureFar,
+} from './scenery_detail';
 import { shipWakePrewarmParts } from './ship_wake';
 import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
 import { buildScheduledShips, type FerryViewSource } from './transport_ferry_ships';
@@ -230,6 +233,10 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   rockLargeF: { url: '/models/props/rock_large_f.glb', kit: 'minerock' },
   mushroomRed: { url: '/models/props/mushroom_red.glb', kit: 'shroom' },
   mushroomTan: { url: '/models/props/mushroom_tan.glb', kit: 'shroom' },
+  // The Mirefen mudfin huts (src/sim/mudfin_huts.ts): the art lead's painted
+  // Tripo3D huts, baked real size by scripts/assets/build_mudfin_huts.mjs.
+  mudfinHutA: { url: '/models/props/mudfin_hut_a.glb', kit: 'mudfin' },
+  mudfinHutB: { url: '/models/props/mudfin_hut_b.glb', kit: 'mudfin' },
   column: { url: '/models/props/column.glb', kit: 'nature' },
   columnBroken: { url: '/models/props/column_broken.glb', kit: 'nature' },
   statueHead: { url: '/models/props/statue_head.glb', kit: 'nature' },
@@ -473,6 +480,13 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
 
 export type PropKey = keyof typeof PROP_ASSET_DEFS;
 
+/** The prop each mudfin hut model draws (sim/mudfin_huts.ts); the editor's
+ *  world prop conversion mirrors the placement. */
+export const MUDFIN_HUT_PROP_KEYS: Readonly<Record<MudfinHutModel, PropKey>> = {
+  a: 'mudfinHutA',
+  b: 'mudfinHutB',
+};
+
 const loadedProps = new Map<string, GLTF>();
 const propLoadTasks = new Map<string, Promise<void>>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
@@ -502,6 +516,9 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'tentSmall',
   'rockLargeD',
   'mushroomRed',
+  // solid walls (mudfin_huts.ts), so every tier draws what blocks
+  'mudfinHutA',
+  'mudfinHutB',
   'column',
   'columnBroken',
   'dockPlatform',
@@ -1068,8 +1085,9 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
   // (transport_ship.ts), and so do the berths' route markers
   // (harbor_route_markers.ts), the Wyrmwatch cliff harbor (wyrmwatch_harbor.ts), the
   // Wickharbor ferry wharf (wickharbor_wharf.ts), the rest of Wickharbor's harbor
-  // (wickharbor_harbor.ts) and the Mirefen tavern (mirefen_tavern.ts): one twin per
-  // distinct program, shadow variant included
+  // (wickharbor_harbor.ts) and the Mirefen tavern (mirefen_tavern.ts), and a torched
+  // mudfin hut's smoke plume (hut_smoke.ts, the tavern chimney's program, warmed even
+  // where no tavern is built): one twin per distinct program, shadow variant included
   for (const part of [
     ...transportShipPrewarmParts(),
     ...harborRouteMarkerPrewarmParts(),
@@ -1077,8 +1095,7 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     ...wickharborWharfPrewarmParts(),
     ...wickharborHarborPrewarmParts(),
     ...mirefenTavernPrewarmParts(),
-    highwatchManorSmokePrewarmPart(),
-    highwatchManorLanePrewarmPart(),
+    ...hutSmokePrewarmParts(),
   ]) {
     const mesh = new THREE.Mesh(part.geometry, part.material);
     mesh.castShadow = true;
@@ -1418,17 +1435,17 @@ export function buildProps(
   // moored transport ships (render/transport_ship.ts): live, idle-animated,
   // their own LODs; ticked from update() below, never merged or ghosted
   const transportShips: TransportShipView[] = [];
-  let manorSmoke: ManorSmokeView | null = null;
   const activeContent = getActiveWorldContent();
-  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInWorld = isBuiltinWorldContent(activeContent);
   const builtInShaped = isBuiltinShapedWorld(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
-  // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
+  // (see authored_town_gate.ts). True for isBuiltinWorldContent, so the shipped path
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
   const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
+  const paintedTowns = activeWorldHasAuthoredTown(isPaintedTownRebuildBuilding);
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
@@ -1588,6 +1605,7 @@ export function buildProps(
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
     if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
+    if (paintedTowns && isPaintedTownRebuildBuilding(b)) continue;
     // roof Y mirrors the camera collider height in colliders.ts, through the
     // same shared helper, so an authored per-building height override cannot
     // leave the hideable top and the camera top disagreeing.
@@ -1765,23 +1783,15 @@ export function buildProps(
   } else {
     clearHarborHouseShell();
   }
-  // ...and the Highwatch manor's hearth, range and lamps (render/highwatch_manor_lights.ts),
-  // lit like a campfire: root-level, world-positioned, in the fire-light budget
+  // ...and the Highwatch adventurers' guild's hearths, lamps and belfry lantern
+  // (render/highwatch_guild_lights.ts), lit like a campfire: root-level, world-positioned,
+  // in the fire-light budget
   if (highwatchTown) {
-    for (const light of highwatchManorLights(seed)) {
+    for (const light of highwatchGuildLights(seed)) {
       group.add(light);
       fireLights.push(light);
     }
-    // ...its lane from the Sanctum road to the garden gate (paving, not a road record)
-    const lane = buildHighwatchManorLane(seed);
-    group.add(lane);
-    keepFromMerge.add(lane);
-    // ...and its kitchen chimney's smoke (cosmetic: the painter draws none on the low tier)
-    manorSmoke = buildHighwatchManorSmoke(seed);
-    group.add(manorSmoke.mesh);
-    keepFromMerge.add(manorSmoke.mesh);
-    noShadow.add(manorSmoke.mesh);
-    for (const fire of highwatchManorFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
+    for (const fire of highwatchGuildFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
       group.add(fire.holder);
       flames.push(fire.flame);
       keepLiveMeshes.add(fire.flame);
@@ -2104,6 +2114,18 @@ export function buildProps(
   );
   for (const [x, z] of getActiveWorldContent().props.mudHuts) {
     const y = ground(x, z);
+    // The Mirefen camp stands the painted mudfin huts at the size, turn and
+    // wall the shared table gives the colliders too (sim/mudfin_huts.ts).
+    const mudfin = mudfinHutAt(x, z);
+    if (mudfin) {
+      const spec = MUDFIN_HUT_MODELS[mudfin.model];
+      const hut = new THREE.Group();
+      addParts(hut, MUDFIN_HUT_PROP_KEYS[mudfin.model], { y: -0.08, rot: mudfin.yaw, scale: 1 });
+      hut.position.set(x, y, z);
+      group.add(shadowed(hut));
+      registerHideable(hut, circleFootprint(x, z, spec.radius, y + spec.height, spec.radius + 0.6));
+      continue;
+    }
     const g = new THREE.Group();
     const sxz = 13 + propRand(x, z, 15) * 3;
     const sy = 10.5 + propRand(x, z, 16) * 3;
@@ -2720,6 +2742,7 @@ export function buildProps(
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
   const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
+  prepareSceneryDetailRoot(group);
   const cullPass = newPropCullPass();
   let revealGate: RevealGateCore | null = null;
   let bandRevealGate: RevealGateCore | null = null;
@@ -2749,26 +2772,48 @@ export function buildProps(
       dt: number,
       reducedMotion = false,
     ): void {
-      const fogFarSq = fogFar * fogFar;
+      const lowCull = isLowSceneryCullActive(fogFar);
+      const clutterFar = sceneryClutterFar(fogFar);
+      const clutterFarSq = clutterFar * clutterFar;
+      const structureFar = sceneryStructureFar(fogFar);
+      const cullX = lowCull ? eyeX : camX;
+      const cullZ = lowCull ? eyeZ : camZ;
       scheduledShips?.sync(dt);
-      manorSmoke?.update(camX, camZ, dt);
       for (let i = 0; i < transportShips.length; i++) {
-        transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
+        transportShips[i].update(
+          camX,
+          camY,
+          camZ,
+          eyeX,
+          eyeY,
+          eyeZ,
+          structureFar,
+          dt,
+          reducedMotion,
+        );
       }
-      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
-      updateMirefenTavernShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
+      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, structureFar);
+      updateMirefenTavernShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, structureFar);
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent
       // priority and, on a frame where several bands escape at once, nearest
       // to the camera first.
-      updatePropCullables(cullables, camX, camZ, fogFar, fogFarSq, bandRevealGate, cullPass);
+      updatePropCullables(
+        cullables,
+        cullX,
+        cullZ,
+        clutterFar,
+        clutterFarSq,
+        bandRevealGate,
+        cullPass,
+      );
       // Far-cell swap first (prop_cell_core): distant cells draw their merged
       // bake and suppress the members' individual baked meshes; near cells
       // (where the ghost fade can fire) draw the individuals while the bake
       // stays as the shadow-only caster. Pixel-identical both ways.
       for (const cell of farCells) {
-        updatePropCell(cell, camX, camZ, fogFar, undefined, revealGate);
+        updatePropCell(cell, cullX, cullZ, structureFar, undefined, revealGate);
       }
       // Deliberately NO first-sight reveal gate here (unlike the bands): tried
       // and reverted. Gating each hideable's first fog reveal put 116 keys and
@@ -2780,9 +2825,9 @@ export function buildProps(
       // a handful of keys with the proven bake as the stand-in).
       for (let i = 0; i < hideables.length; i++) {
         const h = hideables[i];
-        const dx = camX - h.x,
-          dz = camZ - h.z;
-        const reach = fogFar + h.cull;
+        const dx = cullX - h.x,
+          dz = cullZ - h.z;
+        const reach = structureFar + h.cull;
         if (dx * dx + dz * dz >= reach * reach) {
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
@@ -3221,14 +3266,15 @@ export function collectBuildingImpostors(seed: number): {
   instances: BuildingImpostorInstance[];
 } {
   const activeContent = getActiveWorldContent();
-  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInWorld = isBuiltinWorldContent(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
-  // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
+  // (see authored_town_gate.ts). True for isBuiltinWorldContent, so the shipped path
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
   const highwatchTown = activeWorldHasAuthoredTown(isHighwatchRebuildBuilding);
+  const paintedTowns = activeWorldHasAuthoredTown(isPaintedTownRebuildBuilding);
   const used = new Map<string, PropAsset>();
   const instances: BuildingImpostorInstance[] = [];
   const use = (key: PropKey): PropAsset => {
@@ -3242,6 +3288,7 @@ export function collectBuildingImpostors(seed: number): {
     if (eastbrookTown && isEastbrookRebuildBuilding(b)) continue;
     if (fenbridgeTown && isFenbridgeRebuildBuilding(b)) continue;
     if (highwatchTown && isHighwatchRebuildBuilding(b)) continue;
+    if (paintedTowns && isPaintedTownRebuildBuilding(b)) continue;
     const y = terrainHeight(b.x, b.z, seed);
     if (b.kind === 'chapel') {
       const tower = use('bellTower');

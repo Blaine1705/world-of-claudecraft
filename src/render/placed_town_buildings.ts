@@ -42,6 +42,11 @@ import { createPlacedTownInteriors } from './placed_town_interiors';
 import { activeWorldPromoted } from './promoted_scenery_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
+  isLowSceneryCullActive,
+  prepareSceneryDetailRoot,
+  sceneryStructureFar,
+} from './scenery_detail';
+import {
   newTownPiecewiseReveal,
   orderTownRootsNearestFirst,
   townPiecewiseRevealInto,
@@ -70,6 +75,10 @@ export interface PlacedTownSpec {
   /** The promoted-scenery family a document sets when it owns these
    *  buildings as its own placements (sim/authored_town_registry.ts). */
   readonly promotedBy: keyof PromotedScenery;
+  /** A town's own additions to one of its models, built fresh for each view (in the model's
+   *  frame): they join the building before its materials convert, so they fade, cull and
+   *  reveal with it (Highwatch's guild sign, highwatch_guild_sign.ts). */
+  readonly decorate?: (buildingId: string) => readonly THREE.Object3D[];
 }
 
 export interface PlacedTownView {
@@ -107,6 +116,8 @@ export interface PlacedTownDrawStats {
 interface BuildingHideTarget extends FenbridgeBuildingVisibilityTarget {
   group: THREE.Group;
   materials: OccluderFadeMat[];
+  interiors: THREE.Object3D[];
+  interiorsVisible: boolean;
   hidden: boolean;
   alpha: number;
 }
@@ -263,7 +274,13 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
     for (const building of buildings) {
       const source = sources.get(building.assetId);
       if (!source) throw new Error(`${spec.town} town building is missing: ${building.assetId}`);
-      const built = buildPlacedTownBuilding(spec.town, building, source, groundAt);
+      const built = buildPlacedTownBuilding(
+        spec.town,
+        building,
+        source,
+        groundAt,
+        spec.decorate?.(building.id),
+      );
       built.group.userData.placementId = building.id;
       // its rooms go to the indoor camera (placed_town_interiors.ts), and its doors to the
       // fade: a player stepping in sees in through one (fenbridge_town_visibility_core.ts)
@@ -273,6 +290,8 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
       hideTargets.push({
         group: built.group,
         materials: built.mats,
+        interiors: built.interiors,
+        interiorsVisible: true,
         hidden: false,
         alpha: 1,
         x: building.position.x,
@@ -292,6 +311,7 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
     group.userData.buildingIds = buildings.map((building) => building.id);
     group.userData.buildingFadeTargetCount = hideTargets.length;
     group.userData.drawStats = placedTownDrawStats(group);
+    for (const root of roots) prepareSceneryDetailRoot(root);
 
     // Every root is a building, anchored at its own footprint, so each can
     // take the reach floor (town_reveal_core.ts).
@@ -339,10 +359,21 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
         if (hideTargets.length === 0) return;
         lastCamX = camX;
         lastCamZ = camZ;
-        const hubDx = camX - spec.hub.center.x;
-        const hubDz = camZ - spec.hub.center.z;
+        const lowCull = isLowSceneryCullActive(fogFar);
+        const structureFar = sceneryStructureFar(fogFar);
+        const cullX = lowCull ? eyeX : camX;
+        const cullZ = lowCull ? eyeZ : camZ;
+        const hubDx = cullX - spec.hub.center.x;
+        const hubDz = cullZ - spec.hub.center.z;
         const reveal = townStaticReveal(
-          fenbridgeFogVisible(camX, camZ, spec.hub.center.x, spec.hub.center.z, fogFar, cullRadius),
+          fenbridgeFogVisible(
+            cullX,
+            cullZ,
+            spec.hub.center.x,
+            spec.hub.center.z,
+            structureFar,
+            cullRadius,
+          ),
           revealed,
           hubDx * hubDx + hubDz * hubDz,
           cullRadius,
@@ -365,11 +396,26 @@ export function createPlacedTownKit(spec: PlacedTownSpec) {
             eyeX,
             eyeY,
             eyeZ,
-            fogFar,
+            structureFar,
+            cullX,
+            cullZ,
           );
           target.group.visible =
             visibilityPlan.visible && townRootVisible(reveal, piecewise, index);
           if (!visibilityPlan.visible) continue;
+          const bDx = cullX - target.x;
+          const bDz = cullZ - target.z;
+          const interiorReach = target.cullRadius + 6;
+          const showInteriors =
+            !lowCull ||
+            visibilityPlan.hidden ||
+            bDx * bDx + bDz * bDz <= interiorReach * interiorReach;
+          if (target.interiorsVisible !== showInteriors) {
+            target.interiorsVisible = showInteriors;
+            for (let i = 0; i < target.interiors.length; i++) {
+              target.interiors[i].visible = showInteriors;
+            }
+          }
           prefetchOccluderFadeWithin(target.materials, target.x, target.z, camX, camZ);
           target.hidden = visibilityPlan.hidden;
           target.alpha = advanceOccluderFade(

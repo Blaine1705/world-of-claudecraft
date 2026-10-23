@@ -312,6 +312,8 @@ function makeFakeHost() {
     players: new Map(),
     masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
+    graveyards: [],
+    playerStart: { x: 0, z: 0 },
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),

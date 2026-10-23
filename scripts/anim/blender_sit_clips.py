@@ -116,7 +116,7 @@ SEAT_LIFT = 0.007
 FRONT_EDGE_Z = 0.11
 # The relaxed pose's backrest plane (yards behind the anchor). A seated chibi torso (and a
 # helmet) reaches about 0.5 yd behind its hip joints while upright, so a nearer plane would
-# cut through the body; this is the tavern chair's back (tavern_furnish.py chair(), r 0.45)
+# cut through the body; this is the tavern chair's back (inn_furnish.py chair(), r 0.45)
 # once its anchor sits FRONT_EDGE_Z behind the seat's front edge.
 BACKREST_Z = -0.65
 # The relaxed pose leans to this short of the plane: its head turns and breathing then

@@ -177,7 +177,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "fe31b191",
+      "state": "af980fef",
       "events": "a0080528",
       "rng": {
         "draws": 0,
@@ -299,7 +299,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.404439,
+          "fallStartY": 0.823304,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -315,9 +315,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -74,
-            "y": 0.404439,
-            "z": -82
+            "x": -61,
+            "y": 0.823304,
+            "z": -68
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -348,7 +348,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "c8c2d6db",
+      "state": "7f85c589",
       "events": "f0f8e452",
       "rng": {
         "draws": 0,
@@ -480,7 +480,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.341865,
+          "fallStartY": 2.444294,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -496,9 +496,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -63,
-            "y": 0.341865,
-            "z": -90
+            "x": -55,
+            "y": 2.444294,
+            "z": -75
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -529,7 +529,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "872fd8a0",
+      "state": "3b1636e7",
       "events": "f634704f",
       "rng": {
         "draws": 0,
@@ -624,7 +624,7 @@
               {
                 "count": 1,
                 "creditedObjects": [
-                  "0@-63.0,-90.0"
+                  "0@-55.0,-75.0"
                 ],
                 "questId": "wq_eastbrook_bandits",
                 "state": "active"
@@ -657,7 +657,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.242759,
+          "fallStartY": -1.210314,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -673,9 +673,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -80,
-            "y": 0.242759,
-            "z": -82
+            "x": -78,
+            "y": -1.210314,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -706,7 +706,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "5fc07402",
+      "state": "c9b2430b",
       "events": "feb7a057",
       "rng": {
         "draws": 0,
@@ -856,7 +856,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 0.242759,
+          "fallStartY": -1.210314,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -872,9 +872,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -80,
-            "y": 0.242759,
-            "z": -82
+            "x": -78,
+            "y": -1.210314,
+            "z": -57
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -905,7 +905,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "dae078ba",
+      "state": "d6a0753a",
       "events": "c2e2c32e",
       "rng": {
         "draws": 0,
@@ -1083,7 +1083,7 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": -0.10816,
+          "fallStartY": 2.468919,
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
@@ -1100,7 +1100,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -325,
-            "y": -0.10816,
+            "y": 2.468919,
             "z": 820
           },
           "potionCooldownUntil": -1,

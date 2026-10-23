@@ -1,41 +1,215 @@
 @layer components {
   /* ---------- referral stamp cards ---------- */
   #referral-cards-window {
-    width: 760px;
+    container: referral-window / inline-size;
+    width: 1080px;
     max-width: calc(var(--app-vw, 100vw) / var(--window-scale) - var(--spacing-lg));
-    max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - var(--spacing-lg));
+    max-height: calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale) - var(--spacing-lg));
+    --window-pad: var(--spacing-lg);
+    /* The ranking ledger's fixed violet palette, composed through library tokens. */
+    --panel-base: var(--color-ranking-ground);
+    --panel-bg:
+      radial-gradient(
+        ellipse 60% 40% at 50% 0%,
+        color-mix(in srgb, var(--color-ranking-ground-glow) 18%, transparent),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        var(--color-ranking-ground-top),
+        var(--color-ranking-ground) 40%,
+        var(--color-ranking-ground-deep)
+      );
+    --panel-bg-strong: linear-gradient(
+      180deg,
+      var(--color-ranking-control),
+      var(--color-ranking-well)
+    );
+    --socket-fill: linear-gradient(160deg, var(--color-ranking-control), var(--color-ranking-well));
+    --border: var(--color-gold-700);
+    --color-panel-hi: var(--color-ranking-ground-top);
+    --color-accent: var(--color-gold-300);
+    --color-text-light: var(--color-ranking-text);
+    --color-text-secondary: var(--color-ranking-text-soft);
+    --color-text-muted: var(--color-ranking-text-muted);
+    --color-text-faint: var(--color-ranking-text-muted);
+    --color-bg-input: var(--color-ranking-well);
+    --color-card-hi: var(--color-ranking-ground-top);
+    --color-card-lo: var(--color-ranking-well);
+    --color-control-border: var(--color-ranking-control-border);
+    --color-border-showcase: color-mix(
+      in srgb,
+      var(--color-gold-700) 55%,
+      var(--color-ranking-control-border)
+    );
+    --color-border-focus: var(--color-ranking-emphasis);
+    --color-focus: var(--color-ranking-emphasis);
+    --gold-dim: var(--color-gold-700);
   }
 
   #referral-cards-window[hidden] {
     display: none;
   }
 
-  #referral-cards-window > .ui-win-head > div {
+  /* The subtitle belongs to the header's flow, not the shared single-line height. */
+  #referral-cards-window > .ui-win-head {
+    height: auto;
+    min-height: 88px;
+    padding-block: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+
+  #referral-cards-window > .ui-win-head::after {
+    content: "";
+    position: absolute;
+    inset: auto var(--window-pad) 0;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--color-gold-500), transparent);
+  }
+
+  #referral-cards-window > .ui-win-head > .referral-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
     flex: 1;
     min-width: 0;
   }
 
+  .referral-heading-copy {
+    min-width: 0;
+  }
+
+  #referral-cards-window .ui-win-title {
+    font-size: 24px;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    margin: 0;
+  }
+
+  #referral-cards-window .ui-win-sub {
+    margin: var(--spacing-xs) 0 0;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
   #referral-cards-window .ui-x-btn {
+    flex: none;
     min-width: 40px;
     min-height: 40px;
   }
 
-  .referral-body,
+  .referral-emblem,
+  .referral-pair-emblem,
+  .referral-empty-art {
+    display: grid;
+    place-items: center;
+    flex: none;
+    color: var(--color-accent);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-card);
+    background: var(--socket-fill);
+    box-shadow: var(--shadow-socket);
+  }
+
+  .referral-emblem {
+    width: 52px;
+    height: 52px;
+  }
+
+  .referral-emblem svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .referral-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: start;
+    gap: var(--spacing-lg);
+  }
+
+  .referral-main,
+  .referral-sidebar,
   .referral-card,
-  .referral-invite {
+  .referral-invite,
+  .referral-referrer {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
     min-width: 0;
   }
 
-  .referral-body > section + section {
-    border-top: 1px solid var(--color-border-showcase);
-    padding-top: var(--spacing-md);
+  .referral-main,
+  .referral-sidebar {
+    gap: var(--spacing-lg);
+  }
+
+  .referral-main {
+    container: referral-main / inline-size;
+  }
+
+  .referral-sidebar {
+    padding-left: var(--spacing-lg);
+    border-left: 1px solid var(--color-border-showcase);
+  }
+
+  .referral-card,
+  .referral-invite,
+  .referral-referrer {
+    padding: var(--spacing-md);
+  }
+
+  .referral-card,
+  .referral-invite,
+  .referral-referrer,
+  .referral-stamp,
+  .referral-tier,
+  .referral-empty {
+    position: relative;
+  }
+
+  /* Decorative inset bevels leave the shared card primitive and hit areas intact. */
+  .referral-card::before,
+  .referral-invite::before,
+  .referral-referrer::before,
+  .referral-stamp::before,
+  .referral-tier::before,
+  .referral-empty::before {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border: 1px solid var(--referral-frame-rim, var(--color-keyline));
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-ranking-emphasis) 12%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, var(--color-keyline) 65%, transparent);
+  }
+
+  .referral-card::after,
+  .referral-invite::after,
+  .referral-referrer::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, var(--color-gold-500), transparent) top left / 20px 1px no-repeat,
+      linear-gradient(180deg, var(--color-gold-500), transparent) top left / 1px 20px no-repeat,
+      linear-gradient(270deg, var(--color-gold-500), transparent) top right / 20px 1px no-repeat,
+      linear-gradient(180deg, var(--color-gold-500), transparent) top right / 1px 20px no-repeat,
+      linear-gradient(90deg, var(--color-gold-700), transparent) bottom left / 16px 1px no-repeat,
+      linear-gradient(0deg, var(--color-gold-700), transparent) bottom left / 1px 16px no-repeat,
+      linear-gradient(270deg, var(--color-gold-700), transparent) bottom right / 16px 1px no-repeat,
+      linear-gradient(0deg, var(--color-gold-700), transparent) bottom right / 1px 16px no-repeat;
   }
 
   .referral-card-heading,
-  .referral-actions {
+  .referral-actions,
+  .referral-pages {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -43,27 +217,101 @@
     gap: var(--spacing-sm);
   }
 
-  .referral-card-heading h3 {
-    overflow-wrap: anywhere;
+  .referral-card-heading {
+    flex-wrap: nowrap;
+  }
+
+  .referral-card-identity,
+  .referral-section-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
     min-width: 0;
+  }
+
+  .referral-card-identity > div {
+    min-width: 0;
+  }
+
+  .referral-pair-emblem {
+    width: 40px;
+    height: 40px;
+  }
+
+  .referral-pair-emblem svg,
+  .referral-section-heading > svg {
+    width: 24px;
+    height: 24px;
+    flex: none;
+    color: var(--color-accent);
+  }
+
+  .referral-card-heading h3,
+  .referral-section-heading h3,
+  .referral-referrer h3 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .referral-card-identity p {
+    margin: var(--spacing-xs) 0 0;
+    color: var(--color-text-muted);
+  }
+
+  .referral-card-intro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding-block: var(--spacing-sm);
+    border-block: 1px solid var(--color-border-showcase);
+  }
+
+  .referral-card-intro > p {
     flex: 1;
+    min-width: 0;
+    margin: 0;
+    line-height: 1.45;
+  }
+
+  .referral-progress {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    align-items: flex-end;
+    gap: var(--spacing-2xs);
+  }
+
+  .referral-progress strong {
+    color: var(--color-accent);
+    font: 600 24px / 1.1 var(--font-display);
+  }
+
+  .referral-progress small {
+    color: var(--color-text-muted);
+    font-size: 12px;
   }
 
   .referral-stamps,
   .referral-tiers {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: var(--spacing-sm);
     list-style: none;
     padding: 0;
     margin: 0;
   }
 
-  .referral-stamp,
-  .referral-tier {
+  .referral-stamps {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .referral-stamp {
     position: relative;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm);
     min-width: 0;
@@ -72,11 +320,13 @@
   }
 
   .referral-stamp-inspect {
+    position: relative;
     display: flex;
     align-items: center;
     flex-direction: column;
     gap: var(--spacing-sm);
     width: 100%;
+    min-width: 40px;
     min-height: 40px;
     padding: 0;
     border: 0;
@@ -86,15 +336,88 @@
     cursor: help;
   }
 
-  .referral-stamp-mark {
+  .referral-stamp-art,
+  .referral-tier-art {
     display: grid;
     place-items: center;
-    width: calc(var(--socket-size) + var(--spacing-sm));
-    height: calc(var(--socket-size) + var(--spacing-sm));
-    border: 1px dashed var(--color-control-border);
+    position: relative;
+    flex: none;
+    overflow: hidden;
+    width: 72px;
+    height: 72px;
+    max-width: 100%;
+    border: 1px solid var(--color-control-border);
+    border-radius: var(--radius-socket);
+    background: var(--socket-fill);
+    box-shadow: var(--shadow-socket);
+  }
+
+  .referral-stamp-art {
+    width: 84px;
+    height: 84px;
+    background:
+      radial-gradient(
+        circle at 50% 40%,
+        color-mix(in srgb, var(--color-ranking-selected) 20%, transparent),
+        transparent 72%
+      ),
+      var(--socket-fill);
+  }
+
+  .referral-stamp:not(.is-earned) .referral-stamp-art > img,
+  .referral-tier:not(.is-awarded) .referral-tier-art > img {
+    opacity: 0.8;
+    filter: saturate(0.75);
+  }
+
+  .referral-stamp.is-ready {
+    --color-card-hi: color-mix(in srgb, var(--color-gold-700) 18%, var(--color-ranking-ground-top));
+    --referral-frame-rim: var(--color-gold-700);
+  }
+
+  .referral-stamp.is-ready::before {
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--color-gold-300) 24%, transparent),
+      0 0 calc(14px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-gold-500) 20%, transparent);
+  }
+
+  .referral-stamp.is-ready .referral-stamp-art {
+    box-shadow:
+      var(--shadow-socket),
+      0 0 calc(16px * var(--fx-shadow, 1))
+      color-mix(in srgb, var(--color-gold-500) 16%, transparent);
+  }
+
+  .referral-stamp-art > img,
+  .referral-tier-art > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .referral-stamp-art > svg,
+  .referral-tier-art > svg {
+    width: 60%;
+    height: 60%;
+    color: var(--color-accent);
+  }
+
+  .referral-stamp-mark {
+    position: absolute;
+    top: calc(-1 * var(--spacing-xs));
+    right: 0;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--color-control-border);
     border-radius: var(--radius-pill);
     color: var(--color-accent);
-    font-family: var(--font-display);
+    background: var(--panel-base);
+    font: 600 13px / 1 var(--font-display);
+    box-shadow: var(--shadow-lift);
   }
 
   .referral-stamp-mark svg {
@@ -103,19 +426,163 @@
     fill: currentColor;
   }
 
+  .referral-stamp.is-earned .referral-stamp-art,
+  .referral-tier.is-awarded .referral-tier-art,
   .referral-stamp.is-earned .referral-stamp-mark {
-    border-style: solid;
+    border-color: var(--color-accent);
+  }
+
+  .referral-stamp.is-redeemed .referral-stamp-art,
+  .referral-tier.is-awarded .referral-tier-art {
+    border-color: var(--color-gold-700);
+  }
+
+  .referral-stamp.is-redeemed .referral-stamp-mark {
+    color: var(--color-text-success);
+    border-color: var(--color-gold-700);
+    box-shadow:
+      inset 0 0 0 2px var(--color-ranking-ground-deep),
+      0 0 0 1px var(--color-gold-900);
+    transform: rotate(-8deg);
+  }
+
+  .referral-stamp-name {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .referral-stamp-status {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .referral-stamp.is-redeemed .referral-stamp-status,
+  .referral-tier.is-awarded .referral-tier-copy > :last-child {
+    color: var(--color-text-success);
   }
 
   .referral-stamp > .ui-btn {
     white-space: normal;
     height: auto;
+    min-width: 40px;
     min-height: 40px;
     margin-top: auto;
   }
 
+  .referral-stamp > .ui-muted {
+    font-size: 12px;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .referral-fallback,
+  .referral-invite-intro,
+  .referral-invite > p,
+  .referral-referrer > p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .referral-card-actions {
+    justify-content: flex-start;
+    padding-top: var(--spacing-sm);
+  }
+
+  .referral-actions .ui-btn,
+  .referral-pages .ui-btn {
+    min-width: 40px;
+    min-height: 40px;
+    white-space: normal;
+    height: auto;
+  }
+
+  .referral-pages {
+    justify-content: center;
+  }
+
+  .referral-tier {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    min-width: 0;
+  }
+
+  .referral-tier-art {
+    width: 60px;
+    height: 60px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .referral-stamp,
+    .referral-tier {
+      transition: transform calc(var(--dur-fast) * var(--motion-scale, 1));
+    }
+
+    .referral-stamp:hover,
+    .referral-tier:hover {
+      --referral-frame-rim: var(--color-ranking-emphasis);
+      transform: translateY(calc(-1px * var(--motion-scale, 1)));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .referral-stamp,
+    .referral-tier,
+    .referral-stamp:hover,
+    .referral-tier:hover {
+      transition: none;
+      transform: none;
+    }
+  }
+
+  .referral-tier-copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .referral-tier-copy > :last-child {
+    font-size: 12px;
+  }
+
+  .referral-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    min-height: 280px;
+    padding: var(--spacing-lg);
+    text-align: center;
+  }
+
+  .referral-empty-art {
+    width: 88px;
+    height: 88px;
+  }
+
+  .referral-empty-art svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .referral-empty > p {
+    max-width: 360px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
   .referral-lock-wrap {
     position: relative;
+    flex: none;
   }
 
   .referral-lock {
@@ -133,6 +600,11 @@
     max-width: 70vw;
     padding: var(--spacing-sm);
     text-align: start;
+  }
+
+  /* Keep reward details over their artwork, inside the focused control's scroll area. */
+  .referral-stamp > .referral-reward {
+    top: var(--spacing-sm);
   }
 
   .referral-stamp:nth-last-child(-n + 2) .referral-reward,
@@ -157,6 +629,7 @@
     display: block;
     width: 100%;
     margin-top: var(--spacing-xs);
+    min-height: 40px;
   }
 
   .referral-reward-ready {
@@ -192,11 +665,48 @@
     height: auto;
     max-width: none;
     max-height: none;
+    --window-pad: var(--spacing-md);
   }
 
-  @media (max-width: 600px) {
-    .referral-stamps,
-    .referral-tiers {
+  body.mobile-touch .referral-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.mobile-touch .referral-sidebar {
+    padding-left: 0;
+    padding-top: var(--spacing-lg);
+    border-left: 0;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+
+  @media (max-width: 1000px) {
+    .referral-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .referral-sidebar {
+      padding-left: 0;
+      padding-top: var(--spacing-lg);
+      border-left: 0;
+      border-top: 1px solid var(--color-border-showcase);
+    }
+  }
+
+  @container referral-window (max-width: 940px) {
+    .referral-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .referral-sidebar {
+      padding-left: 0;
+      padding-top: var(--spacing-lg);
+      border-left: 0;
+      border-top: 1px solid var(--color-border-showcase);
+    }
+  }
+
+  @container referral-main (max-width: 500px) {
+    .referral-stamps {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -211,10 +721,72 @@
     }
   }
 
-  @media (pointer: coarse) {
-    .referral-actions .ui-btn {
-      min-height: 40px;
-      min-width: 40px;
+  @media (max-width: 600px) {
+    #referral-cards-window > .ui-win-head {
+      min-height: 80px;
+      padding-block: var(--spacing-sm);
+      gap: var(--spacing-sm);
+    }
+
+    #referral-cards-window > .ui-win-head > .referral-heading {
+      gap: var(--spacing-sm);
+    }
+
+    #referral-cards-window .ui-win-title {
+      font-size: 20px;
+    }
+
+    .referral-emblem {
+      width: 40px;
+      height: 40px;
+    }
+
+    .referral-emblem svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  @media (max-height: 500px) and (orientation: landscape) {
+    body.mobile-touch #referral-cards-window > .ui-win-head {
+      min-height: 64px;
+      padding-block: var(--spacing-sm);
+    }
+
+    body.mobile-touch #referral-cards-window .ui-win-title {
+      font-size: 20px;
+    }
+
+    body.mobile-touch #referral-cards-window .ui-win-sub {
+      font-size: 12px;
+    }
+
+    body.mobile-touch .referral-emblem {
+      width: 40px;
+      height: 40px;
+    }
+
+    body.mobile-touch .referral-card {
+      gap: var(--spacing-sm);
+    }
+
+    body.mobile-touch .referral-card-intro > p {
+      font-size: 13px;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .referral-emblem,
+    .referral-pair-emblem,
+    .referral-empty-art,
+    .referral-stamp-art,
+    .referral-tier-art,
+    .referral-stamp-mark {
+      border-color: ButtonText;
+    }
+
+    .referral-stamp-inspect:focus-visible {
+      outline-color: Highlight;
     }
   }
 

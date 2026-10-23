@@ -131,12 +131,21 @@ describe('ability icons', () => {
     // release/v0.44.0 merge into feature/buried-hoards).
     // 476: plus the Mirefen world boss's Shardpike bar verbs (lance_brace,
     // lance_thrust, lance_release), at the release/v0.45.0 merge.
-    expect(ids).toHaveLength(476);
+    // 477: plus the membership Courier glyph (parked in ABILITY_ART_PENDING until
+    // its skill painting ships), at the v0.45.0 integration.
+    // 511: plus the Gravewyrm Sanctum dungeon boss guide mechanic recipes
+    // (dgn_sanctum_*, src/ui/boss_journal/dungeons/gravewyrm_sanctum.ts).
+    // 536: plus the Wildheart Basin boss guide recipes (dgn_wildheart_*).
+    // 567: plus the Hollow Crypt boss guide recipes (dgn_crypt_*).
+    // 586: plus the Sunken Bastion boss guide recipes (dgn_bastion_*).
+    // 614: plus the Drowned Temple boss guide recipes (dgn_temple_*).
+    expect(ids).toHaveLength(614);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    // Re-minted over the merged ABILITY_RECIPES literal (release/v0.45.0 merge).
-    expect(hash).toBe('94c1895e54a18a8c965c92e499d148476185ade4dbd5b140e31af16b3f2ff202');
+    // Re-minted over the merged ABILITY_RECIPES literal (v0.45.0 integration: + courier;
+    // then + the five-player dungeon boss guide recipes).
+    expect(hash).toBe('8d0cec74a2b0669120a3657c5b53fb7e8cd33e8e7431950c3b172296177809c1');
   });
 });

@@ -508,7 +508,9 @@ describe('Mirefen tavern: walking it (the real movement kernel)', () => {
       [-12, 5, -25, 5, 0], // the left wall
       [12, 12, 12, 25, 0], // the front wall beside the door
       [-7, -11, -7, -25, 0], // the back wall between the stage and the arch
-      [13.5, 5.5, 25, 5.5, 0], // the right wall
+      // the right wall, between the firewood by the wall fire (standable) and the square
+      // table's chair
+      [13.5, 7.4, 25, 7.4, 0],
       [9.5, -10.5, 9.5, -25, TAVERN_BAR_PLATFORM.lift], // the kitchen hatch behind the bar
       [nx0, nz0, nx1, nz1, 0], // the nook's wall toward the wing
       [T.x, T.z, T.x - 12, T.z - 4, 0], // the nook's back, over its bench

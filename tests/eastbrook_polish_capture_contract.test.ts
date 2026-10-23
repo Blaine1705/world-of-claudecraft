@@ -725,7 +725,15 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  '0b41d509e319b55d9626a4730bb1d57a7db02bbcb430509750bad08b81c949f9';
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  'ed346f4bbd9126e4c809f44c17230950d39cb7e69afd37cbcd252b7208248448';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

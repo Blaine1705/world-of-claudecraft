@@ -768,6 +768,12 @@ describe('weaponStowedOverlay', () => {
     expect(weaponStowedOverlay(true, false, true)).toBe(true);
   });
 
+  it('forces the sheathed pose while sitting, regardless of the sim bit', () => {
+    expect(weaponStowedOverlay(false, false, false, true)).toBe(true);
+    expect(weaponStowedOverlay(true, false, false, true)).toBe(true);
+    expect(weaponStowedOverlay(false, false, false, false)).toBe(false);
+  });
+
   it('is only ever an overlay: it never reports drawn when any input says stowed', () => {
     expect(weaponStowedOverlay(true, true, true)).toBe(true);
     // Swimming and mounted can never both be true in the live sim (mounting

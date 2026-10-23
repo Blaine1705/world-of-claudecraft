@@ -13,6 +13,38 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'editor.liveWorld.name': 'ゲーム世界の調整',
+  'editor.liveWorld.scope':
+    'ゲーム世界：地形の高さと塗装、道路、ゲーム内オブジェクトの位置、追加した小物を編集できます。既存の建物は固定されています。「エクスポート」で変更を保存し、レビューに送ってください。',
+  'hudChrome.courier.inventory': '所持品',
+  'hudChrome.courier.bankTitle': '銀行',
+  'hudChrome.courier.capacity': '{used} / {capacity} スロット',
+  'hudChrome.courier.cargoSafe':
+    'バッグが満杯の場合、返却品は超過分として保管されます。配達後、再召喚するまでクーリエは姿を消します。',
+  'entities.abilities.courier.description':
+    '空飛ぶロバを召喚し、バッグと最寄りの銀行の間でアイテムを運びます。銀行まで10秒、帰りも10秒かかります。1回につき最大24スタックを選択できます。返却品は満杯のバッグにも超過分として入り、クーリエは再召喚するまで姿を消します。死亡中やインスタンス内では帰路が一時停止します。新しい配達にはメンバーシップが必要です。',
+  'itemUi.tooltip.membershipWeaponAdaptive':
+    '装備中はクラスと専門分野に合わせて武器の種類、外見、能力値が変化します。',
+  'itemUi.tooltip.membershipScaling':
+    'アイテムレベル{level}。常にキャラクターレベルより5高くなります。',
+  'itemUi.tooltip.membershipRequired':
+    'メンバーシップが切れると装備の能力値とセット効果が停止し、更新すると復活します。',
+  'itemUi.tooltip.membershipDormant':
+    '無効：メンバーシップを更新すると装備の能力値とセット効果が復活します。',
+  'entities.items.lantern_seal.name': '燈火の印章',
+  'entities.items.reins_lantern_hall_destrier.name': '燈火の館の軍馬の手綱',
+  'entities.items.membership_staff.name': '変化の杖',
+  'hudChrome.bags.membershipSlot': 'メンバーシップバッグ枠',
+  'hudChrome.bags.membershipSlotLocked': 'メンバーシップでこのバッグ枠を解放。',
+  'hudChrome.bags.membershipSlotHint':
+    'メンバーシップ有効中はバッグを1個追加で装備できます。期限が切れてもバッグとアイテムは安全に保管されます。',
+  'hudChrome.wocStore.subscription.benefitBag':
+    'メンバーシップバッグ枠にバッグを1個追加で装備できます。',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    'レア品質のソウルバウンド防具と変化の杖を受け取れます。能力値はクラスと専門分野に適応し、アイテムレベルは常にキャラクターレベルより5高くなります。防具7部位をすべて装備すると経験値が20%増加します。',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    'メンバーシップが切れると追加キャラクター枠、装備の効果、追加バッグ枠は更新までロックされます。バッグとアイテムは安全に保管され、容量超過分も保持されます。基本キャラクター枠は引き続き利用できます。',
+  'hudChrome.bank.accountArmour': 'メンバーシップ装備を受け取る',
   'hudChrome.courier.title': '配達員',
   'hudChrome.courier.close': '配達員を閉じる',
   'hudChrome.courier.ready': '配達の準備完了',
@@ -30,26 +62,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.instructions':
     'スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。',
   'hudChrome.courier.membership': '次の配達にはメンバーシップの更新が必要です。',
-  'hudChrome.courier.cargoSafe': 'バッグに空きができるまで、配達員がアイテムを保管します。',
   'hudChrome.courier.unavailable': '配達員を召喚して配達を計画しましょう。',
   'entities.abilities.courier.name': '配達員',
-  'entities.abilities.courier.description':
-    '空飛ぶロバを召喚し、バッグと最寄りの銀行の間で荷物を運びます。通常の走行速度の250%で飛びます。1回につき最大24スタックを選択できます。新しい配達にはメンバーシップが必要です。',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '有効なメンバーシップの特典',
   'hudChrome.wocStore.subscription.benefitBank':
     'どの銀行員からでも、ほかのキャラクターの銀行を利用できます。',
   'hudChrome.wocStore.subscription.benefitSlots': 'キャラクター枠を10個追加で解放します。',
-  'hudChrome.wocStore.subscription.benefitArmour':
-    'クラスと専門化に合った能力値を持つ魂縛の防具を受け取れます。レベルに合わせて成長し、レベル20でアイテムレベル25になります。全身に装備すると獲得経験値が20%増加します。',
   'hudChrome.wocStore.subscription.benefitTax': 'オークションの通常の手数料が半額になります。',
-  'hudChrome.wocStore.subscription.benefitExpiry':
-    'メンバーシップが切れると、追加枠のキャラクターと防具の特典は更新するまで利用できなくなります。基本枠のキャラクターは引き続き遊べます。',
   'character.membershipRequired': 'このキャラクターで遊ぶにはメンバーシップを更新してください。',
   'character.membershipSlots': 'メンバーシップでキャラクター枠を解放',
   'character.emptySlot': '利用可能なキャラクター枠',
   'hudChrome.bank.accountTab': 'ほかのキャラクター',
-  'hudChrome.bank.accountArmour': 'メンバーシップ防具を受け取る',
   'hudChrome.bank.accountMembership':
     'メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。',
   'hudChrome.bank.accountCharacters': 'キャラクターの銀行',
@@ -57,14 +81,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountSelect': 'キャラクターを選んで銀行を読み込んでください。',
   'hudChrome.bank.accountUnavailable':
     'この銀行は利用できません。キャラクターを選び直して更新してください。',
-  'hudChrome.bank.accountDeposit': '自分のバッグ：この銀行に預ける',
-  'hudChrome.bank.accountWithdraw': '選択中の銀行：自分のバッグに引き出す',
   'hudChrome.bank.accountDepositHint':
     'クリックすると、このスタックを選択中のキャラクターの銀行に預けます。',
   'hudChrome.bank.accountWithdrawHint':
     'クリックすると、このスタックを自分のバッグに引き出します。',
   'hudChrome.bank.accountBound':
     '魂縛、ロック済み、クエスト用のアイテムはキャラクター間で移動できません。',
+  'hudChrome.bank.accountLoading': 'キャラクターを読み込んでいます…',
+  'hudChrome.bank.accountOpening': '{name}の銀行を開いています…',
+  'hudChrome.bank.accountOnline':
+    '{name}はログイン中です。そのキャラクターをログアウトすると、ここで銀行を開けます。',
+  'hudChrome.bank.accountBusy': '銀行が混み合っています。少し待ってからもう一度お試しください。',
+  'hudChrome.bank.accountNoFit': 'そのスタックを入れる空きがありません。',
+  'hudChrome.bank.accountStale': '移動する前にスタックが変化しました。もう一度お試しください。',
+  'hudChrome.bank.accountTooLarge':
+    '{name}の銀行は大きすぎるため、ここでは開けません。{name}でログインして利用してください。',
+  'hudChrome.bank.accountRetry': 'もう一度試す',
+  'hudChrome.bank.accountBankTitle': '{name}の銀行',
+  'hudChrome.bank.accountBagsTitle': '自分のバッグ',
+  'hudChrome.bank.accountSlots': '{used} / {total} スロット',
+  'hudChrome.bank.accountWithdrawLead': 'アイテムをクリックすると自分のバッグに移します。',
+  'hudChrome.bank.accountDepositLead': 'アイテムをクリックすると{name}の銀行に送ります。',
+  'hudChrome.bank.accountBankEmpty': 'この銀行は空です。',
+  'hudChrome.bank.accountBagsEmpty': 'バッグは空です。',
   'hudChrome.wocStore.subscription.tokenTitle': '取引可能なメンバーシップトークン',
   'hudChrome.wocStore.subscription.tokenTerms':
     '{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。',
@@ -76,15 +115,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipToken':
     '使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。',
   'itemUi.tooltip.membershipAdaptive': '能力値と防具の種類がクラスと専門化に合わせて変わります。',
-  'itemUi.tooltip.membershipScaling':
-    'アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。',
   'itemUi.tooltip.membershipPerfected': '完成：アイテムレベル{level}。',
   'itemUi.tooltip.membershipFullSet':
     'メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。',
-  'itemUi.tooltip.membershipRequired':
-    'メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。',
-  'itemUi.tooltip.membershipDormant':
-    '無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。',
   'entities.items.membership_token.name': 'メンバーシップトークン（30日）',
   'entities.items.membership_helmet.name': 'メンバーシップの兜',
   'entities.items.membership_shoulder.name': 'メンバーシップの肩当て',
@@ -443,6 +476,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至高の離岸流の手巻き',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '宝の地図が導く「埋もれた財宝」の報酬の宝箱から手に入る',
+  'hudChrome.reliquary.sourceActivityLanternHall': '燈火の館の補給係から燈火の印章で購入',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '風は東の砂丘から灰を運んできた。何もない砂から灰は飛んでこない。駐屯地の倉庫のセラが巡回をすべて記録している。誰かが食べ物を持っていけば話してくれるだろう。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -1546,6 +1580,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '塩の難破のショルダーガード',
   'entities.items.saltwrack_pauldrons.name': '塩の難破の肩甲',
   'entities.items.saltwrack_epaulets.name': '塩の難破のエポレット',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '契約は週に三件、更新のたびに貼り出す。署名も手数料もいらない。やり遂げれば印章はあなたのものだ。',
+  'entities.npcs.contract_clerk_tobias_wren.name': 'トバイアス・レン',
+  'entities.npcs.contract_clerk_tobias_wren.title': '契約係',
   'entities.npcs.glider_apprentice.name': 'スカイ',
   'guide.arenaPage.vanguardBody':
     'ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ二人の補給官が元の階層に加えて販売し続けます。元の階層も販売終了にはなりません。どのスペックにも頭、肩、胸、脚、手の五部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる三つのセットだけが並び、続けて装備できるヴァンガードの武器が並びます。ヴァンガードの部位は元の階層と同じウォーフェアレーティングを、より高いアイテムレベルで備えており、各セットには2点と4点でスペックのアビリティの一つを変化させる二つのボーナスがあります。元のセットと違い、それらのボーナスはモンスター相手を含めどこでも機能しますが、対プレイヤー戦向けに作られているため、レイド内ではレイドセットの方が依然として優れた選択です。',
@@ -2194,6 +2232,32 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': '残り火鍛造',
   'hudChrome.wocStore.collections.hoarfrost': '白霜',
   'hudChrome.wocStore.collections.fallen_star': '墜星',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    'ギャリック・ホルトはこの剣を見知らぬ者には売らない。週ごとに燈火の館の契約を果たしてきた者にだけ渡し、そのたびに同じ言葉を添える。鍔のランタンは館の炉から灯したもの、どこへ持って行こうと館が共にある、と。樋の炎は見た目にすぎない。大切なのは約束だ。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    '樋に灯火の炎を宿した幅広の鋼の刃、金の鍔飾り、鍔に灯る籠入りのランタン、青い革の柄。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火の館の剣',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火の剣',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '鍛冶の熱を帯びた両刃と、両面を枝分かれして走る溶けた継ぎ目を持つ、黒ずんだ鋼の炎形の刃。燃える石を囲む青銅の炎の鍔、牛血色の柄。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '燈火の館には、館が建って以来一度も消えたことのない炉がある。ギャリック・ホルトは、この刃はその熾火で焼き入れされたと言い張る。これを携える者たちは、どれほど寒い夜番でも柄は温かいままだと言う。刃に沿う炎は見た目にすぎない。',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': '嵐波の剣',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '砕ける波のように輝く刃縁を持つ海青色の長い刃。枝分かれした稲妻を宿す嵐の溝、刃元を越える金の波、片側の刃縁に沿うひれ、嵐の真珠を囲む金の砕け波の鍔。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    'ギルドのために航海したある船長が、帆柱を奪い船を鐘のように鳴り響かせた嵐からこの刃を持ち帰った。ギャリックは印章と引き換えにしか売らず、買う者には必ず、嵐の前にはうなるぞと忠告する。稲妻と海の光は見た目にすぎない。',
+  'hudChrome.wocStore.skins.rimelight_staff.name': '霧氷灯の杖',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '銀で締められ、光る霧氷が巻きつく淡い柄。頂には氷の破片の冠の中で冷たい光の大きな結晶をつかむ銀の爪があり、襟からはつららが垂れる。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '燈火の館の冬の見張りは、このような杖を携えて高い街道を歩き、雪に迷う旅人のために頂を灯した。ギャリックは印章に余裕のある者のために一本を棚に置いている。霜とその冷たい光は見た目にすぎない。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '黄昏灯芯の杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '鉄で締められた二本のねじれた黒い木の柄。頂には二本の巻いた角の間で紫の黄昏の炎を燃やす吹き抜けの鉄のランタンがあり、その底から鎖が揺れる。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '館のランタンはどれも明るく燃える、ただ一つを除いて。黄昏の炎は夜の館を守るために灯されたもので、ほかのランタンが光を放つところで影を放つ。ギャリックはその芯を自ら切りそろえる。煙と紫の輝きは見た目にすぎない。',
+  'hudChrome.wocStore.collections.lantern_hall': '燈火の館',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'ギルドマーク・アーミングソード',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '青焼き鋼の刀身、青銅の魚尾型クロスガード、青緑に染めた革巻きの柄、小さく刻印されたギルドの紋章。',
@@ -2340,6 +2404,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Mirefenのクレーターがまだ輝いていた頃、生の隕鉄から鍛えられた。「熱すぎて持てない」残骸を叩き、星座を刻んだ宇宙黒の弓部とし、台木に沿って溶融金の核を封じた。ボルトをつがえるのではなく召喚する。宣告のように放たれ、その終わりのように着弾する星火の矢だ。Nythraxisの不死の王冠すら峰の下で最悪のものではないとHighwatchが恐れたとき、城壁に望んだ武器がこれだった。狙いを違えるな。',
   'hudChrome.wocStore.seasonOne': 'シーズン1',
+  'hudChrome.wocStore.membershipPromo.open': 'WOCストアのメンバーシップ',
+  'hudChrome.wocStore.membershipPromo.close': 'メンバーシップの宣伝を閉じる',
+  'hudChrome.wocStore.membershipPromo.eyebrow': 'アカウント特典',
+  'hudChrome.wocStore.membershipPromo.title': 'メンバーシップ',
+  'hudChrome.wocStore.membershipPromo.cta': '今すぐ参加',
+  'hudChrome.wocStore.referralPromo.close': 'フレンド招待の宣伝を閉じる',
+  'hudChrome.wocStore.referralPromo.eyebrow': '一緒に冒険しよう',
+  'hudChrome.wocStore.referralPromo.cta': 'フレンドを招待',
   'hudChrome.wocStore.rarity.uncommon': 'アンコモン',
   'hudChrome.wocStore.rarity.rare': 'レア',
   'hudChrome.wocStore.rarity.epic': 'エピック',
@@ -6400,14 +6472,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
   'hudChrome.death.ghostHint': '死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '印章と栄誉の交換だ、友よ。俺の棚に刃を研ぐものはないが、ハイウォッチ中の館があんたがどこで手に入れたか知ることになる。',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': 'ギャリック・ホルト',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': 'ギルドの補給係',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '仲間を探してる？この地図にある墓所も砦も神殿も、みんな私のリストに名前があるわ。どこへ行くのか教えて。',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': 'ミラ・フェアウェザー',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': 'ギルドの募集係',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '燈火の館へようこそ、{className}。今週の契約はトバイアスが掲示板に貼っている。ギャリックは我らの印章を身につける価値のある栄誉と交換し、ミラは山の下のどの扉へ向かう仲間でも見つけてくれる。戦利品を持ち帰れば、私の後ろの広間に飾られるだろう。',
+  'entities.npcs.guildmaster_hesper_dunmore.name': 'ヘスパー・ダンモア',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '燈火の館のギルドマスター',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':
     '安らかに、魂よ。亡骸に戻すことはできるが、戻る道のりで弱ってしまうだろう。',
-  'entities.npcs.steward_ansel_hale.greeting':
-    '館へようこそ、{className}。炉辺で温まっていくといい。絨毯に気をつけて、上座の卓には触れぬように。広場の者が家路を見失わぬよう、灯籠は夜通し灯している。',
-  'entities.npcs.steward_ansel_hale.name': 'アンセル・ヘイル',
-  'entities.npcs.steward_ansel_hale.title': '館の家令',
   'entities.npcs.the_merchant.name': '商人',
   'entities.npcs.the_merchant.title': '世界市場の守り手',
   'entities.npcs.the_merchant.greeting':
@@ -11372,6 +11452,67 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.biome.clearConfirm': 'このマップの塗られたバイオームのマスをすべて削除しますか？',
   'editor.flatten.hint': '平坦化は、ドラッグ開始時のカーソル下の高さに地面をならします。',
   'editor.flatten.hardEdge': 'ハードエッジ',
+  'editor.topbar.pushMapChanges': 'リポジトリのマップに変更をプッシュ',
+  'editor.topbar.pushMapChangesTitle':
+    'このリポジトリのマップを開いてから行った変更だけを現在のリポジトリのファイルに適用し、他の人のプッシュは残します。',
+  'editor.push.notLinked':
+    'このマップはリポジトリのマップから開かれていないため、プッシュ先がありません。先に「開く」の収録マップから開いてください。',
+  'editor.push.baseMissing':
+    '編集を始めたときのバージョンが見つかりません。リポジトリのマップを開き直して、変更をやり直してください。',
+  'editor.push.repoMissing': 'このコピーの元になったリポジトリのマップがありません。',
+  'editor.push.missingIds':
+    'リポジトリのマップに、IDのないアイテムやIDが重複したアイテムがあるため、変更を照合できません。',
+  'editor.push.nothing': 'プッシュするものがありません。開いてからこのコピーに変更はありません。',
+  'editor.push.done':
+    '{slug} に {count} 件の変更をプッシュしました。エディターには統合後のマップが表示されています。',
+  'editor.push.withUpgrades':
+    '編集の一部が、マップを開いたときにエディターが追加した項目に対するものだったため、その更新も保存しました。',
+  'editor.push.overwriteTitle': '新しいリポジトリの変更を上書きしますか？',
+  'editor.push.overwriteBody':
+    'このリポジトリのマップを開いた後に、誰かが変更をプッシュしました。公開するとファイル全体が置き換わり、その変更は失われます。残すには「リポジトリのマップに変更をプッシュ」を使ってください。',
+  'editor.push.conflictsTitle': 'プッシュ不可：変更の衝突',
+  'editor.push.conflictsBody':
+    'あなたの変更のうち {count} 件が、このマップを開いた後にプッシュされた変更と衝突しています。何も書き込まれていません。「開く」からリポジトリのマップを開き直し、次の変更をやり直してください：',
+  'editor.push.conflictRow': '{kind} {id}：{reason}',
+  'editor.push.conflictsMore': 'ほか {count} 件。',
+  'editor.push.reasonBoth': 'あなたと他の人の両方が変更しました',
+  'editor.push.reasonDeleted': '一方が削除し、もう一方が変更しました',
+  'editor.push.reasonOverlap': '地形のストロークが新しいストロークと重なっています',
+  'editor.push.kindPlacement': 'アセット',
+  'editor.push.kindTerrain': '地形のストローク',
+  'editor.push.kindGrassClear': '草の除去範囲',
+  'editor.push.kindNpc': 'NPC',
+  'editor.push.kindObjectMove': 'ゲームプレイオブジェクト',
+  'editor.push.kindPaint': '塗ったセル',
+  'editor.push.kindField': 'マップ設定',
+  'editor.push.kindRoad': '道路',
+  'editor.push.kindRoadEdit': 'ワールドの道路',
+  'editor.city.roadMode': '道路ツール',
+  'editor.city.roadModeDraw': '新しい道路を描く',
+  'editor.city.roadModeEdit': '道路を編集',
+  'editor.city.roadEditHint':
+    '道路をクリックして選択します。経由点をドラッグすると移動し、道路の線をドラッグすると曲がり角を追加します。Delete キーで選択中の経由点を削除します。',
+  'editor.city.roadEditNone':
+    '道路が選択されていません。ビューでクリックするか、下のリストから選んでください。',
+  'editor.city.roadEditing': '編集中：{name}',
+  'editor.city.roadWaypoints': '経由点：{n}',
+  'editor.city.roadWaypointHeld': '経由点 {n} を選択中。',
+  'editor.city.roadDeletePoint': '経由点を削除',
+  'editor.city.roadRemove': '道路を削除',
+  'editor.city.roadReset': '初期状態に戻す',
+  'editor.city.roadRestore': '復元',
+  'editor.city.roadSelect': '選択',
+  'editor.city.roadBuiltin': 'ワールドの道路 {n}',
+  'editor.city.roadBuiltinEdited': '{name}（変更済み）',
+  'editor.city.roadBuiltinRemoved': '{name}（削除済み）',
+  'editor.city.roadWorldList': 'ワールドの道路（{n}）',
+  'editor.city.roadBuiltinNote':
+    'ワールドの道路はゲーム本来の道路です。変更はこのマップにのみ適用され、「初期状態に戻す」で道路が元に戻ります。',
+  'editor.city.roadPointTooShort':
+    '道路には経由点が2つ以上必要です。代わりに「道路を削除」を使ってください。',
+  'editor.city.roadPointLimit': 'この道路にはこれ以上経由点を追加できません。',
+  'editor.city.roadRemoved': '道路を削除しました。元に戻すで復元できます。',
+  'editor.push.close': '閉じる',
   'editor.objectMove.edited': 'このマップで変更済みです。',
   'editor.objectMove.rotation': '回転（度）',
   'editor.objectMove.size': 'サイズ',
@@ -13845,7 +13986,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
   'hudChrome.mounts.name_avian_strider': 'ヴィリジアン・ヴェイルストライダー',
+  'hudChrome.mounts.name_nightwing_chimera': 'ナイトウィング・キマイラ',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    '古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
+  'hudChrome.mounts.name_lantern_hall_destrier': '燈火の館の軍馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
@@ -13856,9 +14001,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。',
   'hudChrome.mounts.desc_lanternback_troll':
     '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    '燈火の館の軍馬。ギルドの青の下に樫と鉄の馬鎧をまとい、鞍から揺れる二つの嵐灯が帰り道を照らす。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
+  'hudChrome.mounts.name_wobbles_slime': 'スライムのプルプル',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '鞍を着けられるよう馴らされた大きな青いスライム。歩く代わりに跳ねて進み、乗り手の下でぷるぷると揺れ、体の中を泡がゆっくり昇っていく。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのドレッドスパーク',
   'hudChrome.mounts.name_rickshaw_mount': '骨縛りの人力車',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
@@ -14846,8 +14996,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
+  'entities.items.reins_wobbles_slime.name': 'ゼリーの鞍：プルプル',
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.items.reins_avian_strider.name': 'ヴィリジアン・ヴェイルストライダーの手綱',
+  'entities.items.reins_nightwing_chimera.name': 'ナイトウィング・キマイラの手綱',
   'entities.items.reins_lanternback_troll.name': '点灯人の軛：グルンボル',
   'entities.items.reins_chimeglass_tortoise.name': '道守の鈴帯：トリヴァー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
@@ -18275,7 +18427,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professionTrainers.mining': '採鉱のトレーナー',
   'hudChrome.professionTrainers.hobby': '趣味のトレーナー',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
+    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそば、波止場に掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、そのレーンが体の動かし方を全部教えてくれる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
@@ -18420,7 +18572,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
   'entities.npcs.wayfarer_bryn.title': '港の案内人',
   'entities.npcs.wayfarer_bryn.greeting':
-    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。レイヴンポストの郵便柱のそばの渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。波止場の渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
   'entities.npcs.instructor_maren.name': '教官マレン',
   'entities.npcs.instructor_maren.title': '修練の師',
   'entities.npcs.instructor_maren.greeting':
@@ -19194,6 +19346,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '燃えさし狐',
   'entities.mobs.buddy_emerald_wolf.name': 'エメラルドウルフ',
   'entities.mobs.buddy_forgemaw.name': '溶けたフォージモウ',
+  'entities.mobs.buddy_sprites.name': 'チラリとキラリ',
   'entities.mobs.buddy_frostfire.name': 'フロストファイア',
   'entities.mobs.buddy_golden_sentinel.name': '黄金の歩哨',
   'entities.mobs.buddy_kekius.name': 'ケキウス',
@@ -19243,6 +19396,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.whistle_triple_t.name': 'トリプルTの笛',
   'entities.items.whistle_trollface.name': 'トロールフェイスの笛',
   'entities.items.whistle_tuskhorn_boar.name': 'タスクホーン・ボアの笛',
+  'entities.items.whistle_sprites.name': 'チラリとキラリの笛',
+  'hudChrome.buddyMenu.rename': 'バディの名前を変更',
+  'hudChrome.buddyMenu.nameLabel': 'バディの名前',
   'hudChrome.buddyMenu.autolootEnable': '自動収集を有効化',
   'hudChrome.buddyMenu.autolootDisable': '自動収集を無効化',
   'hudChrome.buddyMenu.autolootHint':
@@ -19322,6 +19478,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'イーストブルック渓谷の生け垣から来た雌狐。冬枯れの茂みごしに覗く炭のように赤い毛からその名がついた。土地の罠師たちは何世代も前に子狐を狙うのをやめ、代わりに餌を置くようになった。',
   'hudChrome.collections.buddyLore.emerald_wolf':
     'レイスウッドの子狼。林床までほとんど届かない木漏れ日の下では、その毛は緑に見える。森が残していった孤児は、どれもウォーデンたちが育てる。',
+  'hudChrome.collections.buddyLore.sprites':
+    '金色とティール色、ふたつの小さな火の精。どちらが先頭か、いつまでも決まらない。近づきすぎると緑の炎ひとつに溶け合い、また笑いながら離れていく。',
   'hudChrome.collections.buddyLore.forgemaw':
     '最後の泉のるつぼで鍛えられ、ついに完成しなかったもの。槌の音がまだ響くうちにイグニヴァルの鋳場から歩み出た。見つけられるのはヒロイックの踏破だけだ。この溶けたものは自分を作った炉へ戻り続け、二度炎を生き延びた者について家まで来る。',
   'hudChrome.collections.buddyLore.frog':
@@ -19410,6 +19568,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.skeleton': '乾いた骨があなたの歩みに合わせてかたかた鳴る。',
   'hudChrome.collections.presence.crystal_lich':
     '残骸から冷たいうなりが立ちのぼり、それがあなたを見ている。',
+  'hudChrome.collections.presence.sprites': '小さな二つの炎があなたに燃え移り、消えそうにない。',
   'hudChrome.collections.presence.forgemaw':
     '炉の熱がまだあなたから離れない。何かがそれと共に歩き出た。',
   'hudChrome.collections.presence.crystal_tide':
@@ -20015,6 +20174,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': 'マウント',
   'hudChrome.cosmetics.tabSkins': 'スキン',
   'hudChrome.cosmetics.tabMech': 'メカ',
+  'hudChrome.cosmetics.buddyActive': '召喚中',
+  'hudChrome.cosmetics.buddyDrag': 'アクションバーへドラッグ',
   'hudChrome.cosmetics.legend':
     'アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。',
   'hudChrome.cosmetics.scopeAccount': 'アカウント',
@@ -20850,7 +21011,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。',
   'hudChrome.wocStore.subscription.annualMount':
-    '支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。',
+    '支払い後、購入したキャラクターで郵便から魂に縛られたナイトウィング・キマイラの手綱を受け取れます。メンバーシップが終了しても騎乗動物は所有できます。',
   'hudChrome.wocStore.subscription.trialTerms':
     '1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。',
   'hudChrome.wocStore.subscription.startTrial': '7日間の無料体験を開始',
@@ -20862,7 +21023,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.membership_annual_reward.sender': 'レイヴンポスト',
   'entities.letters.membership_annual_reward.subject': '年間メンバーシップの騎乗動物',
   'entities.letters.membership_annual_reward.body':
-    '年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
+    '年間メンバーシップの支払いが完了しました。騎乗動物の手綱を同封しました。所有するには手綱をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。',
   'itemUi.tooltip.referralFullSet':
@@ -21497,7 +21658,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.crypt.tolling':
     '鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。',
   'hudChrome.auraEffect.crypt.embraced':
-    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
+    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%（ヒロイックでは{shareHeroic}%）を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
   'hudChrome.auraEffect.crypt.lament':
     '花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。',
   'hudChrome.auraEffect.crypt.lingering':
@@ -21694,12 +21855,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'referralCards.rewards.fogbinder':
     '装飾品が進化してスタミナがさらに増加し、使用効果を得ます。全能力値が15秒間5上昇し、再使用まで2分かかります。',
   'referralCards.rewards.gravewyrm': '無料の騎乗訓練。',
-  'referralCards.rewards.raid': '限定の友情タンクマウント。',
+  'referralCards.rewards.raid': 'スライムのプルプルの騎乗動物。',
   'referralCards.referrerRewards.1': '限定の友情ラプターマウント。',
   'referralCards.referrerRewards.2': '銀行スロット20枠とキャラクタースロット5枠。',
   'referralCards.referrerRewards.3': 'Claudiumを1,000。',
   'referralCards.referrerRewards.4': 'Claudiumを1,000。',
-  'referralCards.referrerRewards.5': '若木の仲間。',
+  'referralCards.referrerRewards.5': '仲間のチラリとキラリ。',
   'referralCards.reasons.notParticipant':
     'このアカウントはこの絆のフレンド関係に含まれていません。',
   'referralCards.reasons.staleRevision':
@@ -21741,11 +21902,1161 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': '絆のフレンドは招待リンクで結ばれています。',
   'hudChrome.mounts.name_referral_tank': '友情タンク',
   'hudChrome.mounts.name_referral_raptor': '友情ラプター',
-  'hudChrome.mounts.desc_referral_tank': '招待スタンプカードを完成させると獲得できます。',
+  'hudChrome.mounts.desc_referral_tank': '以前の友達招待スタンプカードの報酬。',
   'hudChrome.mounts.desc_referral_raptor':
     '最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。',
   'apiError.character.referral_transfer_pending':
     'このキャラクターを削除する前に、未固定のスタンプカードをすべて別のキャラクターへ移してください。',
   'apiError.character.referral_bond_pending':
     '招待報酬のメンバーシップ債券をこのキャラクターに配布しています。配布が完了してから、もう一度削除をお試しください。',
+  'hudChrome.guildHall.title': '燈火の館',
+  'hudChrome.guildHall.close': 'ギルドのウィンドウを閉じる',
+  'hudChrome.guildHall.tabsLabel': '燈火の館の項目',
+  'hudChrome.guildHall.tabs.contracts': '契約',
+  'hudChrome.guildHall.tabs.quartermaster': '補給係',
+  'hudChrome.guildHall.seals': '燈火の印章：{count}',
+  'hudChrome.guildHall.resetIn': '新しい契約まで{time}',
+  'hudChrome.guildHall.resetSoon': '新しい契約は次の週次リセットで',
+  'hudChrome.guildHall.contractsIntro':
+    '契約は週に三件、王国のすべての冒険者に同じものが貼り出される。署名は不要：やり遂げれば、その印章は週に一度ずつ直接バッグに届く。',
+  'hudChrome.guildHall.kinds.boss': '討伐依頼',
+  'hudChrome.guildHall.kinds.heroic': 'ヒロイック踏破',
+  'hudChrome.guildHall.kinds.task': '遂行',
+  'hudChrome.guildHall.goals.boss': '{dungeon}で{boss}を倒す（難易度は問わない）。',
+  'hudChrome.guildHall.goals.heroic':
+    'ヒロイックで{dungeon}を踏破する：ヒロイック難易度で{boss}を倒す。',
+  'hudChrome.guildHall.goals.task': '{task}（{dungeon}）',
+  'hudChrome.guildHall.contractLabel': '{kind}：{dungeon}',
+  'hudChrome.guildHall.done': '今週は達成済み',
+  'hudChrome.guildHall.open': '未達成',
+  'hudChrome.guildHall.lifetime': '達成した契約：{count}',
+  'hudChrome.guildHall.emptyBoard': '掲示板は書き換え中だ。週次リセットの後にまた来てほしい。',
+  'hudChrome.guildHall.quartermasterIntro':
+    'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの剣の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。',
+  'hudChrome.guildHall.titleOffer': '称号：{title}',
+  'hudChrome.guildHall.titlePreview': '表示：{preview}',
+  'hudChrome.guildHall.buy': '購入',
+  'hudChrome.guildHall.owned': '所持済み',
+  'hudChrome.guildHall.needSeals': 'あと{count}個必要',
+  'hudChrome.guildHall.bought': '称号「{title}」を購入した。功績の書で選択できる。',
+  'hudChrome.guildHall.refused.owned': 'それはすでに所持している。',
+  'hudChrome.guildHall.refused.seals': '燈火の印章が足りない。',
+  'hudChrome.guildHall.refused.bags': 'バッグがいっぱいだ。',
+  'hudChrome.guildHall.refused.riding': 'マウントを買う前に騎乗を学ぶこと。',
+  'hudChrome.guildHall.boughtSkin':
+    '外見「{skin}」を購入した。コスメティックのウィンドウから適用できる。',
+  'hudChrome.guildHall.boughtMount': '{mount}を購入した。手綱はバッグの中にある。',
+  'hudChrome.guildHall.skinPreview':
+    '装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
+  'hudChrome.guildHall.skinOffer': '剣の外見：{skin}',
+  'hudChrome.guildHall.mountPreview': '地上マウント：騎乗中の移動速度+{pct}%。騎乗訓練が必要。',
+  'hudChrome.guildHall.mountOffer': 'マウント：{mount}',
+  'hudChrome.guildHall.refused.range': '取引するには補給係のそばに立つこと。',
+  'hudChrome.guildHall.reward.one': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.few': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.many': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.other': '燈火の印章{count}個',
+  'hudChrome.guildHall.contractDone.one': '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.few': '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.many':
+    '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.other':
+    '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.signSubtitle': '冒険者ギルド',
+  'hudChrome.guildHall.board.noticesLabel': '今週の契約',
+  'hudChrome.guildHall.board.weekProgress': '今週：契約{total}件中{done}件を達成',
+  'hudChrome.guildHall.board.weekProgressAria': '今週達成した契約',
+  'hudChrome.guildHall.board.cardProgress': '今週 {done}/{total}',
+  'hudChrome.guildHall.board.rewardLine': '報酬：{reward}',
+  'hudChrome.guildHall.board.stamp': '封印済み',
+  'hudChrome.guildHall.board.sealsTip':
+    '燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。',
+  'hudChrome.guildHall.shop.stockLabel': 'ギャリック・ホルトの品揃え',
+  'hudChrome.guildHall.shop.kindMount': 'マウント',
+  'hudChrome.guildHall.shop.kindSword': '剣の外見',
+  'hudChrome.guildHall.shop.mountHeading': '鞍にまたがるあなた',
+  'hudChrome.guildHall.shop.skinHeading': 'あなたの手に',
+  'hudChrome.guildHall.shop.stageLabel': '{name}の3Dプレビュー',
+  'hudChrome.guildHall.shop.stageUnavailable': 'この端末では3Dプレビューを表示できない。',
+  'hudChrome.guildHall.shop.mountHowTo':
+    '購入すると手綱がバッグに入る。手綱を使えば騎乗でき、手綱を持っている限りこの馬はあなたのものだ。',
+  'hudChrome.guildHall.shop.mountOwned': 'このマウントは所持済みだ。手綱はバッグの中にある。',
+  'hudChrome.guildHall.shop.skinHowTo':
+    '購入後、外見ウィンドウで適用する。アカウントのすべてのキャラクターで使える。',
+  'hudChrome.guildHall.shop.skinOwned': 'この外見は所持済みだ。外見ウィンドウで適用できる。',
+  'hudChrome.guildHall.shop.kindTitle': '称号',
+  'hudChrome.guildHall.shop.plateHeading': 'あなたのネームプレート',
+  'hudChrome.guildHall.shop.howTo': '購入後、功績の書で選ぶと名前と一緒に表示される。',
+  'hudChrome.guildHall.shop.cosmetic': '見た目のみ：能力値は変わらない。',
+  'hudChrome.guildHall.shop.price': '価格：{price}',
+  'hudChrome.guildHall.shop.have': '所持：{count}',
+  'hudChrome.guildHall.shop.ownedLong': 'この称号は所持済みだ。功績の書で選択できる。',
+  'hudChrome.guildHall.shop.short.one': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.few': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.many': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.other': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.raidBossGuide.dungeonButton': 'ボス攻略: {dungeon}',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': 'ダンジョンのボス',
+  'hudChrome.raidBossGuide.rankMiniboss': 'ミニボス',
+  'hudChrome.raidBossGuide.rankFinal': '最終ボス',
+  'hudChrome.raidBossGuide.defeated': '撃破済み',
+  'hudChrome.raidBossGuide.browseBossDefeated': '{boss}を表示(撃破済み)',
+  'hudChrome.raidBossGuide.heroicHeading': '英雄での変更点',
+  'hudChrome.raidBossGuide.tipsHeading': 'ロール別のコツ',
+  'hudChrome.raidBossGuide.choicesHeading': '重要な選択',
+  'hudChrome.raidBossGuide.choiceGain': '得られるもの',
+  'hudChrome.raidBossGuide.choiceRisk': '負うリスク',
+  'hudChrome.raidBossGuide.markHeroicOnly': '英雄のみ',
+  'hudChrome.raidBossGuide.markHeroicChanged': '英雄で変更',
+  'hudChrome.raidBossGuide.damageCompare': '通常 {normal} | 英雄 {heroic}',
+  'hudChrome.raidBossGuide.finderOpen': 'ボス攻略',
+  'hudChrome.raidBossGuide.finderOpenLabel': '{boss}のボス攻略を開く',
+  'bossJournal.common.enrageName': '激昂',
+  'bossJournal.common.phaseEnrageSummary': '体力が{health}を下回ると、ボスは戦闘終了まで激昂する。',
+  'bossJournal.common.enrageSummary':
+    '体力が{health}を下回ると、戦闘終了まで近接攻撃のダメージが{damage}増加し、攻撃速度が{haste}上昇する。',
+  'bossJournal.common.enrageResponse':
+    'タンクとヒーラーは防御とヒールのクールダウンをこの段階用に温存。それ以外の全員はダメージを集中して早く終わらせよう。',
+  'bossJournal.common.heroicHarder':
+    'このページのすべてのアビリティは、通常の{scale}倍の威力になる。',
+  'bossJournal.sanctum.tusker.overview':
+    '家ほどもある巨牙獣が、燃える魂の火鉢を載せたそりを引いてそり道を行き来する。道を周回し、引き寄せた場所でそりを切り離す。体力が半分になるとそりが倒れ、背後に炎をぶちまける。',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    '開始時から予兆のある攻撃が2つ。正面への薙ぎ払いと、描かれた線に沿った突進。',
+  'bossJournal.sanctum.tusker.phaseSpillName': 'そりの転倒',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    '体力が{health}になるとそりが倒れ、背後に魂火がこぼれる。',
+  'bossJournal.sanctum.tusker.phaseEnrageName': '激昂',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    '体力が{health}を下回ると、戦闘が終わるまで激昂する。',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、牙で正面{arc}度の扇形を、体から{range}ヤード先まで薙ぎ払う。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.sanctum.tusker.sweepResponse':
+    'タンクは群れに背を向けさせて保持する。それ以外は側面か背後から攻撃。',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、その線に沿って突進する。線内の全員に{min}〜{max}ダメージと{stun}秒のノックダウン。',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    '詠唱が終わる前に、描かれた線から横へ避けること。最も遠い者が標的なので、遠隔は横へ動く余裕を残しておく。',
+  'bossJournal.sanctum.tusker.spillName': 'こぼれた火鉢',
+  'bossJournal.sanctum.tusker.spillSummary':
+    '体力が{health}になった時に1度だけ。そりが倒れ、{count}つの魂火の炎({radius}ヤード)が背後で{seconds}秒間燃え、中にいる者に毎秒{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.tusker.spillResponse': 'すぐに炎から出て、炎の跡から離れて戦う。',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    '体力が{health}を下回ると、戦闘が終わるまで与ダメージが{damage}増える。',
+  'bossJournal.sanctum.tusker.enrageResponse':
+    'ヒールと防御のクールダウンを最後の局面に温存し、早く倒しきろう。',
+  'bossJournal.sanctum.tusker.tipTank':
+    '群れに背を向けさせたまま動かず保持し、薙ぎ払いの扇形が味方に向かないようにする。牙薙ぎのたびにノックバックがある。',
+  'bossJournal.sanctum.tusker.tipHealer':
+    '牙薙ぎと踏みつぶしがダメージのピーク。踏みつぶしが狙う最遠の端ではなく側面に立ち、体力が{health}を下回る激昂に備えてクールダウンを残しておく。',
+  'bossJournal.sanctum.tusker.tipDamage':
+    '側面か背後から攻撃。足元の描かれた線に注意して、そこから出る。体力が半分になったら、背後の炎から離れる。',
+  'bossJournal.sanctum.korgath.overview':
+    '鍛冶師の親方は、4本の封印の柱に鎖でつながれている。残っている鎖1本ごとに被ダメージが{perChain}減るので、鎖を断つほど倒しやすくなる。だが鎖を断つたびに、戦闘が終わるまで彼の攻撃が1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    '開始時は{chains}本の鎖で、各柱に1本ずつ縛られている。各柱の封印の枷が、その鎖を保っている。',
+  'bossJournal.sanctum.korgath.phaseFreedName': '断たれた鎖',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    '鎖を1本断つごとに、のちに鎖が再び鋲で留められても、戦闘が終わるまで攻撃が1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.phaseEnrageName': '激昂',
+  'bossJournal.sanctum.korgath.lockboundName': '鎖縛り',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    '無傷の鎖1本ごとに被ダメージが{perChain}減る。4本すべてが保たれている間は{all}減。',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    '鎖を断てば討伐が早まる。まず何本断つか決めること。1本ごとに攻撃も1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.shacklesName': '封印の枷',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    '各柱の根元に封印の枷が立つ。コルガスを引き寄せるまで枷は攻撃できない。1つ倒すとその鎖が断たれる。金床の鎖が保たれている間、彼はテラス中央から{leash}ヤード以上離れられない。',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    'ダメージ役は、断つと決めた鎖の枷を倒す。その間、タンクはコルガスを中央に保つ。',
+  'bossJournal.sanctum.korgath.strainSummary':
+    '鎖が1本でも保たれている間、{every}秒ごとに{cast}秒の詠唱の後、鎖がまだ保たれている各柱の周囲{radius}ヤードの円環に爆発が起こる。{min}〜{max}ダメージとノックバック。4本すべて断つと止まる。',
+  'bossJournal.sanctum.korgath.strainResponse':
+    '詠唱が終わる前に、鎖が無傷の柱すべてから離れること。',
+  'bossJournal.sanctum.korgath.stompSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、体から{radius}ヤード先までの円環が発生し、内側の全員に{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.korgath.stompResponse':
+    '遠隔は円環の外にいる。近接は可能なら外へ出る。ヒーラーは被弾者を回復する。',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    '鎖が断たれて{delay}秒後、竜誓団の突き棒鍛冶が柱の裏の縁を乗り越えて枷まで歩き、{channel}秒間「再鋲打ち」を詠唱し続ける。完了すると鎖と新しい枷が戻り、{perChain}の被ダメージ軽減も復活するが、解き放たれた攻撃は残る。',
+  'bossJournal.sanctum.korgath.rerivetResponse':
+    '詠唱が終わる前に、突き棒鍛冶を中断、スタン、または倒すこと。',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    '鎖がちょうど1本残っている間、鎖の引き締めは{base}秒ごとではなく{every}秒ごとに来る。',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    '最後の鎖を素早く断つか、{every}秒ごとにその柱から離れる準備をしておく。',
+  'bossJournal.sanctum.korgath.maulSummary':
+    '大槌の鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱の後、正面{arc}度、体から{range}ヤード先までを薙ぎ払う。近接攻撃の{mult}倍のダメージ。',
+  'bossJournal.sanctum.korgath.maulResponse':
+    '正面に立つのはタンクだけ。それ以外は詠唱中に彼の背後へ回る。',
+  'bossJournal.sanctum.korgath.flailSummary':
+    '火ばさみの鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱で、タンク以外の最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、鞭が線内の全員を打つ。{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.korgath.flailResponse': '詠唱が終わる前に、線から横へ避けること。',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    '金床の鎖が断たれている場合、彼はテラス中央から離れられる。{every}秒ごとに{cast}秒の詠唱で、最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、その線に沿って突進する。{min}〜{max}ダメージとノックバック。',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    '線から出ること。金床の鎖が保たれている間、彼は中央から{leash}ヤード以内にとどまり、突進しない。',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    'ふいごの鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱の後、全員に{min}〜{max}ダメージを与え、彼から{push}ヤード突き飛ばす。',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    '全員に当たり回避できない。ヒーラーは着弾前に全員を回復しておく。',
+  'bossJournal.sanctum.korgath.tipTank':
+    '彼を中央で、群れに背を向けさせて保持する。大槌の鎖が断たれたら、大槌の弧撃が正面のすべてに当たる。金床の鎖が断たれるまで、彼は中央から{leash}ヤード以上離れられない。',
+  'bossJournal.sanctum.korgath.tipHealer':
+    '鎖の引き締め、震える踏みつけ、そして解き放たれた攻撃はどれも強烈。鎖が残るほど戦闘は長引き、断つほど耐えるべき攻撃が増える。',
+  'bossJournal.sanctum.korgath.tipDamage':
+    '枷を倒して決めた鎖を断ち、コルガスに火力を集中する。描かれた線から出て、鎖が保たれている柱から離れること。',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    '枷を倒して決めた鎖を断ち、コルガスに火力を集中する。再鋲打ちが終わる前に突き棒鍛冶をすべて止める。描かれた線から出て、鎖が保たれている柱から離れること。',
+  'bossJournal.sanctum.korgath.choiceName': '鎖を何本断つ?',
+  'bossJournal.sanctum.korgath.choiceGain':
+    '鎖を1本断つごとに被ダメージ軽減が{perChain}ずつ消える。4本すべてが保たれている時の{all}から、最後にはゼロに。戦闘が大幅に短くなる。',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    '鎖を1本断つごとに、戦闘が終わるまで攻撃が1つ解き放たれる。大槌: 大槌の弧撃。火ばさみ: 鎖の鞭打ち。金床: 境界の突進、そして中央から離れられるようになる。ふいご: 親方の咆哮。',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    '鎖を1本断つごとに、戦闘が終わるまで攻撃が1つ解き放たれる。大槌: 大槌の弧撃。火ばさみ: 鎖の鞭打ち。金床: 境界の突進、そして中央から離れられるようになる。ふいご: 親方の咆哮。さらに、断たれた鎖ごとに突き棒鍛冶が再び鋲で留めに来る。',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    '再鋲打ち: 鎖が断たれて{delay}秒後、突き棒鍛冶が鎖の復元を試みる。中断、スタン、または倒すこと。',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    '最後の鎖: 鎖が1本残ると、鎖の引き締めが{every}秒ごとに来る。',
+  'bossJournal.sanctum.velkhar.overview':
+    'ヴェルカーは、3つの融水の池から解凍された死者を甦らせる。彼らを鎮めるのは冷たさだけ。乾いた氷の上で倒された骨歩きは死んだままだが、融水の中で倒されると再び起き上がり、彼を回復する。',
+  'bossJournal.sanctum.velkhar.phaseVaultName': '儀式の間',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    '骨歩きが次々と池から這い上がってくる。体力が{wave1}と{wave2}になると追加の波が現れ、各池から1体ずつ。',
+  'bossJournal.sanctum.velkhar.thawName': '目覚めの雪解け',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    '{every}秒ごとに、いずれかの池の火葬壇が燃え上がり、{warn}秒後に{count}体の甦った骨歩きが這い上がる。池は順番に使われる。体力が{wave1}と{wave2}になると、各池からさらに1体ずつ這い上がる。',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    'タンクは敵を集めて乾いた氷の上へ引く。ダメージ役はそこで倒す。',
+  'bossJournal.sanctum.velkhar.heldName': '封じと不滅',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    '乾いた氷の上で倒された骨歩きは封じられ、像のように凍りついて死んだままになる。融水の中で倒されたものは沈み、{delay}秒後に体力{share}で再び起き上がり、ヴェルカーの体力を{heal}回復する。',
+  'bossJournal.sanctum.velkhar.heldResponse':
+    '骨歩きは必ず乾いた氷の上でだけ倒すこと。池の中や融水の帯の上では倒さない。',
+  'bossJournal.sanctum.velkhar.graspName': '解凍された者の握り',
+  'bossJournal.sanctum.velkhar.graspSummary': '融水の中に立つ骨歩きは、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.velkhar.graspResponse': 'タンクは骨歩きを水から遠ざけておく。',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、彼からタンク以外のプレイヤーに向けて、間の縁まで幅{width}ヤードの線を描く。線内の全員に{min}〜{max}ダメージを与え、線は{seconds}秒間融水のまま残る。',
+  'bossJournal.sanctum.velkhar.trenchResponse':
+    '線から出ること。残った融水の帯の上で骨歩きを倒さない。',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、全員に{min}〜{max}の闇ダメージ。',
+  'bossJournal.sanctum.velkhar.volleyResponse': '回避できない。ヒーラーは全員の体力を保っておく。',
+  'bossJournal.sanctum.velkhar.warmHandsName': '温かな手',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    '{still}秒間立ち止まった骨歩きは、足元に半径{radius}ヤードの融水の水たまりを{seconds}秒間作り出す。',
+  'bossJournal.sanctum.velkhar.warmHandsResponse':
+    '骨歩きを動かし続け、水たまりの上でとどめを刺さないこと。',
+  'bossJournal.sanctum.velkhar.twiceWokenName': '二度目の目覚め',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    '再び起き上がった骨歩きは体力全快で戻り、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse':
+    '1体も起き上がらせないこと。すべて乾いた氷の上で倒す。',
+  'bossJournal.sanctum.velkhar.tipTank':
+    'すべての骨歩きを引きつけ、池や融水の帯から離れた乾いた氷の上へ引く。融水の中では攻撃が{bonus}強くなる。',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    'すべての骨歩きを引きつけ、池や融水の帯から離れた乾いた氷の上へ引く。動かし続けること。立ち止まったものは足元に水たまりを作る。',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    '影の斉射は{every}秒ごとに全員に当たる。融水の中の骨歩きは{bonus}強く攻撃するので、水に入ったらタンクの体力に注意。',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    '骨歩きは乾いた氷の上でだけ倒し、その後ヴェルカーへ戻る。魂火の溝の線から出ること。',
+  'bossJournal.sanctum.velkhar.choiceName': '死者をどこで倒す?',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    '乾いた氷の上で倒された骨歩きは完全に消える。敵が減り、戦闘がすっきりする。',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    '融水の中で倒すと再び起き上がり、そのたびにヴェルカーの体力を{heal}回復する。乾いた氷へ引くには時間がかかるので、攻撃を始める前に倒す場所を決めておこう。',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    '温かな手: {still}秒間立ち止まった骨歩きは融水の水たまりを作る。',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    '二度目の目覚め: 再び起き上がった骨歩きは体力全快で戻り、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.korzul.overview':
+    '彼の炎が絶えず砕く凍った湖上での竜との戦い。ブレスのたびに氷が失われ、炎の向きは群れが決めるので、どの氷を失うかも群れ次第。氷を失った竜は、間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.phaseLakeName': '凍った湖',
+  'bossJournal.sanctum.korzul.phaseLakeSummary':
+    '彼は氷を突き破って現れ、湖の中央に降り立つ。着地した時から戦闘が始まる。',
+  'bossJournal.sanctum.korzul.phaseFlightName': '飛翔',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    '体力が{first}と{second}になると飛び立ち、墜落してくるまで空中から戦う。',
+  'bossJournal.sanctum.korzul.phaseLastName': '最後の局面',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    '2度目の飛翔の後: 地上で{breath}秒ごとに墓所のブレス、{gale}秒ごとに翼の烈風。',
+  'bossJournal.sanctum.korzul.iceName': '砕ける氷',
+  'bossJournal.sanctum.korzul.iceSummary':
+    '湖は氷板でできている。彼の炎は無傷の氷板にひびを入れ、ひびの入った氷板を砕く。ひびの入った氷板は{refreeze}秒後に再び凍る。砕けた氷板は開けた水面になる。',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    '湖は氷板でできている。彼の炎は無傷の氷板にひびを入れ、ひびの入った氷板を砕く。深き焼き入れ: 英雄ではひびの入った氷板は二度と凍らない。砕けた氷板は開けた水面になる。',
+  'bossJournal.sanctum.korzul.iceResponse':
+    '氷は意図して使うこと。群れが失ってもよい氷板に彼の炎を向ける。',
+  'bossJournal.sanctum.korzul.waterName': '開けた水面',
+  'bossJournal.sanctum.korzul.waterSummary':
+    '開けた水面に立つと、移動速度が{slow}低下し、毎秒{perSecond}ダメージを受ける。',
+  'bossJournal.sanctum.korzul.waterResponse':
+    '氷の上にとどまる。突き飛ばされて水に入ったら、すぐに出ること。',
+  'bossJournal.sanctum.korzul.breathSummary':
+    '{every}秒ごとに、タンクの方向へ{cast}秒の詠唱の後、体から{range}ヤード先まで{arc}度の炎の扇形を放つ。タンク以外の範囲内の全員に{min}〜{max}ダメージ。扇形の下にある氷板は最大{plates}枚、近い順に燃える。',
+  'bossJournal.sanctum.korzul.breathResponse':
+    '正面に立つのはタンクだけ。タンクはブレスを、群れが失ってもよい氷へ向ける。',
+  'bossJournal.sanctum.korzul.tailSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、背後{arc}度、体から{range}ヤード先まで尾で薙ぎ払う。{min}〜{max}ダメージとノックバック。',
+  'bossJournal.sanctum.korzul.tailResponse': '背後には絶対に立たない。側面から攻撃する。',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    '{every}秒ごと、および体力が{health}の時に1度、{duration}秒間チャネリングし、半径{radius}ヤード以内に{pulses}回の炎の脈動を放つ。脈動は回を追うごとに強まる(最後の脈動は{min}〜{max})。{crack}回目の脈動で足元の氷板にひびが入り、{brk}回目で砕ける。砕けると彼は鎮火され、チャネリングが終わる。',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    '彼から{radius}ヤード離れること。ひびの入った氷板の上で始めさせれば、{crack}回目の脈動でチャネリングが終わる。',
+  'bossJournal.sanctum.korzul.galeSummary':
+    '{cast}秒の詠唱の後、全員が彼から{push}ヤード押し出される。',
+  'bossJournal.sanctum.korzul.galeResponse':
+    '背後の開けた水面を避けておき、押し出された先が氷になるようにする。',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    '空中でタンク以外のプレイヤー1人に{eye}秒間「ワームの眼」の印を付ける。印が消えると、そのプレイヤーのいる氷板全体に「降り注ぐ炎」を浴びせる。{warn}秒の予兆の後、氷板上の全員に{min}〜{max}ダメージを与え、氷板が燃える。1度目の飛翔で{roundsFirst}回、2度目で{roundsSecond}回。',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    '空中でタンク以外のプレイヤー2人に{eye}秒間「ワームの眼」の印を付ける(双つの眼)。印が消えると、印を受けた各プレイヤーのいる氷板全体に「降り注ぐ炎」を浴びせる。{warn}秒の予兆の後、氷板上の全員に{min}〜{max}ダメージを与え、氷板が燃える。1度目の飛翔で{roundsFirst}回、2度目で{roundsSecond}回。',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    '印を受けたら、群れから離れた無傷の氷板へ向かう。それ以外の全員はその氷板から離れる。',
+  'bossJournal.sanctum.korzul.broodName': '地の底からの竜群',
+  'bossJournal.sanctum.korzul.broodSummary':
+    '彼が飛び立つと、砕けた氷板ごとにスケイルガードが這い上がる。最大{max}体。',
+  'bossJournal.sanctum.korzul.broodResponse':
+    'タンクが敵を引きつけ、彼が空中にいる間に群れで倒す。',
+  'bossJournal.sanctum.korzul.descentSummary':
+    '各飛翔の終わりに、最も多くのプレイヤーがいる無傷の氷板へ着地する。{warn}秒の影の予兆の後、半径{radius}ヤード以内に{min}〜{max}ダメージとノックバック、その氷板は燃える。',
+  'bossJournal.sanctum.korzul.descentResponse':
+    '失ってもよい氷板に集まり、彼が着地する前に影から走り出ること。',
+  'bossJournal.sanctum.korzul.flareName': '欠片の閃光',
+  'bossJournal.sanctum.korzul.flareSummary':
+    '2度目の飛翔の後、欠片が閃光を放つ。地上で{breath}秒ごとに墓所のブレス、{gale}秒ごとに翼の烈風。',
+  'bossJournal.sanctum.korzul.flareResponse':
+    'ブレスの間隔が短くなる。残りのどの氷板を使うか計画しておくこと。',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    '氷板がすべて砕けると、彼は開けた水面の上に滞空し、間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.noIceResponse': '氷を切らしてはならない。全滅で戦闘が終わる。',
+  'bossJournal.sanctum.korzul.tipTank':
+    '墓所のブレスは群れの方ではなく、失ってもよい氷へ向ける。墓場のインフェルノの前に彼をひびの入った氷板へ移動させ、短く終わらせる。',
+  'bossJournal.sanctum.korzul.tipHealer':
+    '墓場のインフェルノの脈動は急速に強まる。全員が離れたか確認すること。降り注ぐ炎、墜落着地、水へのノックバックはどれも大ダメージ。',
+  'bossJournal.sanctum.korzul.tipDamage':
+    '彼の正面にも背後にも立たない。ワームの眼を受けたら、群れから離れた無傷の氷板へ向かう。飛翔中にスケイルガードを倒す。',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    '彼の正面にも背後にも立たない。ワームの眼は2人に同時に付く。それぞれ別の、群れから離れた無傷の氷板へ向かうこと。飛翔中にスケイルガードを倒す。',
+  'bossJournal.sanctum.korzul.choiceIceName': 'どの氷を使う?',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    'ブレス、降り注ぐ炎、着地を選んだ氷板へ向ければ、湖の残りは安全に立てるまま保たれる。',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    '砕けた氷板はすべて開けた水面になり、次の飛翔でそれぞれからスケイルガードが這い上がる(最大{max}体)。氷がなくなると、彼は間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.choiceDouseName': 'インフェルノを鎮火する?',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    'ひびの入った氷板の上に彼がいれば、{crack}回目の脈動でそれが砕け、彼は鎮火され、墓場のインフェルノは最も強い脈動の前に早く終わる。',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    'その氷板は永久に失われる。無傷の氷の上に置いたままだと、チャネリングは{brk}回目の脈動まで続き、結局は氷板が砕ける。',
+  'bossJournal.sanctum.korzul.heroicDeepQuench': '深き焼き入れ: ひびの入った氷板は二度と凍らない。',
+  'bossJournal.sanctum.korzul.heroicTwinEyes': '双つの眼: ワームの眼が同時に2人に付く。',
+  'bossJournal.wildheart.saurian.overview':
+    '輿を背負った家ほどもある戦獣が、川の浅瀬を周回している。避けて通ることはできない：蔓の橋は、こいつを倒して初めて開く。予告付きの攻撃が2種類、体力半分で現れる回復役の騎手、そして終盤の激昂。',
+  'bossJournal.wildheart.saurian.phaseFordName': '川の浅瀬',
+  'bossJournal.wildheart.saurian.phaseFordSummary':
+    '戦闘開始から、背後への尾の薙ぎ払いと周囲への踏みつけを交互に使う。同時に使う攻撃は1つだけ。',
+  'bossJournal.wildheart.saurian.phaseHowdahName': '輿の崩壊',
+  'bossJournal.wildheart.saurian.phaseHowdahSummary':
+    '体力が{health}になると輿が砕け、輿の呪術師が飛び降りてグレート・サウリアンを回復する。',
+  'bossJournal.wildheart.saurian.phaseEnrageName': '激昂',
+  'bossJournal.wildheart.saurian.phaseEnrageSummary':
+    '体力が{health}を下回ると、戦闘終了まで激昂する。',
+  'bossJournal.wildheart.saurian.tailSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、尾で背後{arc}度の扇形を、体の中心から{range}ヤード先まで薙ぎ払う。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.wildheart.saurian.tailResponse': '背後には絶対に立たない。側面から攻撃する。',
+  'bossJournal.wildheart.saurian.stompSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中心から{radius}ヤード以内の全員が{min}〜{max}ダメージを受け、{stun}秒間倒される。',
+  'bossJournal.wildheart.saurian.stompResponse':
+    '動ける者は詠唱が終わる前に円の外へ出る。タンクは耐え、ヒーラーはその後タンクを回復する。',
+  'bossJournal.wildheart.saurian.riderName': '輿の騎手',
+  'bossJournal.wildheart.saurian.riderSummary':
+    '一度だけ、体力が{health}の時：輿の呪術師がグレート・サウリアンの傍に飛び降りて共に戦い、祖霊の樹液で回復する。',
+  'bossJournal.wildheart.saurian.riderResponse':
+    'タンクが騎手を引き受ける。DPSは回復を妨害するか、先に倒す。',
+  'bossJournal.wildheart.saurian.sapSummary':
+    '騎手の回復：{every}秒ごとに{cast}秒の詠唱で、グレート・サウリアンの最大体力の{heal}を回復する。',
+  'bossJournal.wildheart.saurian.sapResponse': '毎回妨害するか、騎手を倒す。',
+  'bossJournal.wildheart.saurian.enrageSummary':
+    '体力が{health}を下回ると、近接攻撃、尾の薙ぎ払い、大地を揺るがす踏みつけのすべてのダメージが{damage}増加する。',
+  'bossJournal.wildheart.saurian.tipTank':
+    '群れに背を向けさせ、誰も尾の後ろに回らないようにする。輿の呪術師は着地した瞬間に引き受ける。',
+  'bossJournal.wildheart.saurian.tipHealer':
+    '大地を揺るがす踏みつけは周囲の全員を倒すので、毎回その後にタンクを回復する。激昂用にクールダウンを残す。',
+  'bossJournal.wildheart.saurian.tipDamage':
+    '側面に立ち、尾の扇形と踏みつけの円から外れる。体力半分で、祖霊の樹液を妨害するか騎手を倒す。',
+  'bossJournal.wildheart.saurian.choiceName': '騎手が先か、グレート・サウリアンが先か？',
+  'bossJournal.wildheart.saurian.choiceGain':
+    '騎手を倒せば回復は完全に止まる：祖霊の樹液は{every}秒ごとにグレート・サウリアンの{heal}を回復する。',
+  'bossJournal.wildheart.saurian.choiceRisk':
+    '騎手を倒している間も、グレート・サウリアンは薙ぎ払いと踏みつけを続ける。騎手を放置するなら、誰かが毎回の回復を妨害しなければならない。',
+  'bossJournal.wildheart.beast.overview':
+    '牙王の獣使いと大ジャガーは体力を共有し、同時に倒れる。近くにいると遥かに頑丈になり、攻撃も重くなる。タンクは獣使いを引き離し、ジャガーは印を付けた者を狩る。',
+  'bossJournal.wildheart.beast.phasePitsName': '獣穴',
+  'bossJournal.wildheart.beast.phasePitsSummary':
+    '1つの戦闘、2つの体。タイマーは戦闘中ずっと動き続ける。体力による局面はない。',
+  'bossJournal.wildheart.beast.bondSummary':
+    '獣使いとジャガーが{reach}ヤード以内にいる間、両者とも被ダメージが{dr}減少し、与ダメージが{damage}増加する。',
+  'bossJournal.wildheart.beast.bondHeroicSummary':
+    '狂乱の絆：獣使いとジャガーが{reach}ヤード以内にいる間、両者とも被ダメージが{dr}減少し、与ダメージが{damage}増加する。',
+  'bossJournal.wildheart.beast.bondResponse':
+    'タンクは獣使いをジャガーから{reach}ヤードより遠くへ引き離し、そこで保持する。',
+  'bossJournal.wildheart.beast.sharedName': '体力共有',
+  'bossJournal.wildheart.beast.sharedSummary':
+    '2体は1つの体力を共有する：どちらへのダメージも同じに数えられ、片方が倒れるともう片方も倒れる。',
+  'bossJournal.wildheart.beast.sharedResponse':
+    '最も安全に届く方を攻撃する。ターゲットを切り替えても損はない。',
+  'bossJournal.wildheart.beast.stalkName': '忍び狩り',
+  'bossJournal.wildheart.beast.stalkSummary':
+    'ジャガーは主人のタンクではない者に印を付け、{seconds}秒間、挑発を無視して狩る。射程内では{biteEvery}秒ごとに噛みつき、{min}〜{max}ダメージ、その後{bleedEvery}秒ごとに{bleed}の出血が{bleedSeconds}秒続く。その後、新たな獲物を選ぶ。',
+  'bossJournal.wildheart.beast.stalkResponse':
+    '印を付けられたら：走って、ジャガーを獣使いから引き離す。他の者は鈍足・拘束・スタンで止める。',
+  'bossJournal.wildheart.beast.warySummary':
+    '各種の行動阻害（スタン、拘束、鈍足）はジャガーに一度だけ効き、その後その種類は{lockout}秒間効かなくなる。行動不能、恐怖、変異はスタン扱い。',
+  'bossJournal.wildheart.beast.waryResponse':
+    '順番に使う：拘束、鈍足、スタンを1回ずつ。同じ種類を3回続けない。',
+  'bossJournal.wildheart.beast.quakeSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、獣使いから{radius}ヤード以内の全員が{min}〜{max}ダメージを受ける。',
+  'bossJournal.wildheart.beast.quakeResponse': 'タンク以外は獣使いから離れる。',
+  'bossJournal.wildheart.beast.huntSummary':
+    '{every}秒ごとに、2体とも{seconds}秒間、攻撃速度が{haste}上昇する。',
+  'bossJournal.wildheart.beast.huntResponse':
+    'タンクとヒーラーはこの間クールダウンを使う。ジャガーの噛みつきも速くなる。',
+  'bossJournal.wildheart.beast.wardName': 'シックハイドウォード',
+  'bossJournal.wildheart.beast.wardSummary':
+    '{every}秒ごとに、ジャガーが{amount}ダメージを吸収するシールドを{seconds}秒間得る。',
+  'bossJournal.wildheart.beast.wardResponse':
+    'シールドがある間は獣使いを攻撃する：体力は共有されている。',
+  'bossJournal.wildheart.beast.heelSummary':
+    '{every}秒ごとに、ジャガーが{cast}秒の詠唱の後、獣使いの元へ跳び戻り、絆が復活する。',
+  'bossJournal.wildheart.beast.heelResponse':
+    '詠唱中にジャガーをスタン、行動不能、変異にすれば中断できる。ジャガーがすでにスタンを警戒している場合は効かない。',
+  'bossJournal.wildheart.beast.tipTank':
+    '獣使いをジャガーから一気に{normal}ヤードより遠くへ引き離して保持し、群れに背を向けさせる。',
+  'bossJournal.wildheart.beast.tipTankHeroic':
+    '獣使いをジャガーから一気に{heroic}ヤードより遠くへ引き離して保持する。戻れ！のたびに再び引き離す。',
+  'bossJournal.wildheart.beast.tipHealer':
+    '忍び狩りの標的に注意：噛みつきと出血は速く入り、コール・オブ・ザ・ハント中はさらに速い。',
+  'bossJournal.wildheart.beast.tipDamage':
+    '最も安全な方を攻撃する。狙われたらジャガーを獣使いから引き離す。それ以外は鈍足・拘束・スタンを順番に使う。',
+  'bossJournal.wildheart.beast.tipDamageHeroic':
+    '最も安全な方を攻撃する。戻れ！の詠唱ごとにスタンを用意し、ジャガーに鈍足と拘束を順番に使う。',
+  'bossJournal.wildheart.beast.choiceName': 'ジャガーを今止めるか、取っておくか？',
+  'bossJournal.wildheart.beast.choiceGain':
+    '鈍足・拘束・スタンで、ジャガーを獲物からも獣使いからも遠ざけておける。',
+  'bossJournal.wildheart.beast.choiceRisk':
+    '各種の阻害は一度だけ効き、その後{lockout}秒間効かなくなる。3つ同時に使い切ると、次の狩りに使えるものが残らない。',
+  'bossJournal.wildheart.beast.choiceRiskHeroic':
+    '各種の阻害は一度だけ効き、その後{lockout}秒間効かなくなる。スタンを早く使うと、次の戻れ！を止められなくなる。',
+  'bossJournal.wildheart.beast.heroicBond': '狂乱の絆：群れの絆の範囲が{reach}ヤードになる。',
+  'bossJournal.wildheart.beast.heroicHeel':
+    '戻れ！：詠唱中にスタンが入らなければ、ジャガーは獣使いの元へ跳び戻る。シックハイドウォードは{amount}を吸収する。',
+  'bossJournal.wildheart.bloom.overview':
+    '根を張った人喰い花が、周囲の腐葉土の花壇に種莢を降らせる。花粉のない者は芽吹く前に莢を踏み潰す。受粉した者は莢に近づいてはならない。触れると莢はすぐに芽吹く。',
+  'bossJournal.wildheart.bloom.phaseTerraceName': '涙の滝',
+  'bossJournal.wildheart.bloom.phaseTerraceSummary':
+    '決して動かない。別の詠唱中はタイマーが止まるため、記載の間隔は最短のものになる。',
+  'bossJournal.wildheart.bloom.seedSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、{count}個の種莢が各腐葉土の花壇に1つずつ落ちる。受粉していない状態で莢を踏むと潰せる。放置された莢は{sprout}秒後に茨の芽になる。',
+  'bossJournal.wildheart.bloom.seedHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、{count}個の種莢が各腐葉土の花壇に1つずつ落ちる。受粉していない状態で莢を踏むと潰せる。潜る種：放置された莢は{burrow}秒後に地中へ潜り、最も近い者の傍に茨の芽が現れる。',
+  'bossJournal.wildheart.bloom.seedResponse':
+    '受粉していない者はすべての莢を素早く踏んで回る。受粉した者は近づかない。',
+  'bossJournal.wildheart.bloom.pollinateName': '受粉',
+  'bossJournal.wildheart.bloom.pollinateSummary':
+    '{every}秒ごとに、{count}人が{seconds}秒間受粉する。受粉した者が莢に触れると、莢はすぐに芽吹く。',
+  'bossJournal.wildheart.bloom.pollinateHeroicSummary':
+    '{every}秒ごとに、{count}人が{seconds}秒間受粉する。受粉した者が莢に触れると、莢はすぐに芽吹く。花粉の雲：受粉した者の{cloudRadius}ヤード以内に{cloudSeconds}秒間立っていると、あなたも受粉する。',
+  'bossJournal.wildheart.bloom.pollinateResponse':
+    '受粉したら：効果が切れるまで莢に近づかない。ヒロイックでは味方からも離れる。',
+  'bossJournal.wildheart.bloom.sproutName': '茨の芽',
+  'bossJournal.wildheart.bloom.sproutSummary':
+    '芽吹いた莢から育つエリートの雑魚で、最も近い者を攻撃する。ゴージブルームが倒れると枯れる。',
+  'bossJournal.wildheart.bloom.sproutResponse': 'タンクが引き受け、DPSが倒す。',
+  'bossJournal.wildheart.bloom.lashSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、長さ{length}ヤード、幅{width}ヤードの帯をプレイヤー（可能ならタンク以外）に向ける：{min}〜{max}ダメージと{root}秒の拘束。',
+  'bossJournal.wildheart.bloom.lashResponse': '詠唱が終わる前に横へ動いて帯から出る。',
+  'bossJournal.wildheart.bloom.gorgeSummary':
+    '{every}秒ごとに標的へ{cast}秒の詠唱の後、近接攻撃の{mult}倍の噛みつきと消化：{seconds}秒間、毎秒{perSecond}ダメージ。移動では避けられない。',
+  'bossJournal.wildheart.bloom.gorgeResponse':
+    'タンク：これには防御クールダウンを使う。ヒーラーは消化ダメージをカバーする。',
+  'bossJournal.wildheart.bloom.spitName': '花の唾吐き',
+  'bossJournal.wildheart.bloom.spitSummary':
+    '標的が{delay}秒間射程外にいると、{every}秒ごとに唾を吐き、{min}〜{max}ダメージを与える。',
+  'bossJournal.wildheart.bloom.spitResponse': 'タンクは近接範囲に留まる。',
+  'bossJournal.wildheart.bloom.tipTank':
+    '近接範囲に留まる：離れると花の唾吐きを受ける。貪り食いのたびにクールダウンを使い、茨の芽はすべて引き受ける。',
+  'bossJournal.wildheart.bloom.tipHealer':
+    '貪り食いはタンクへの大ダメージで、その後に消化が続く。蔓の鞭は帯の中にいる者を拘束して傷つける。',
+  'bossJournal.wildheart.bloom.tipDamage':
+    '受粉していなければ、攻撃の合間に莢を踏み潰す。蔓の鞭から出て、茨の芽は素早く倒す。',
+  'bossJournal.wildheart.bloom.choiceName': '誰が種を踏み潰す？',
+  'bossJournal.wildheart.bloom.choiceGain':
+    '莢を潰すたびにエリートの茨の芽が1体減り、戦闘は花に集中できる。',
+  'bossJournal.wildheart.bloom.choiceRisk':
+    '花壇へ走るとダメージと近接の時間を失う。受粉した者が莢に触れると、すぐに芽吹いてしまう。',
+  'bossJournal.wildheart.bloom.heroicBurrow':
+    '潜る種：触れられなかった莢は{burrow}秒後に地中へ潜り、最も近い者の傍に芽が現れる。',
+  'bossJournal.wildheart.bloom.heroicCloud':
+    '花粉の雲：受粉した者の{cloudRadius}ヤード以内に{cloudSeconds}秒間立っていると、あなたも受粉する。',
+  'bossJournal.wildheart.zulgar.overview':
+    '盆地の大司祭。予告付きの円がある安定した戦いだが、ジャガーの霊に変じて1人を狩り始める。狩られる者は、点灯した太陽紋の上を通って誘導し、彼を鈍足にする。',
+  'bossJournal.wildheart.zulgar.phaseShrineName': '祭壇',
+  'bossJournal.wildheart.zulgar.phaseShrineSummary': '近接で戦い、自身の周囲に円状の脈動を放つ。',
+  'bossJournal.wildheart.zulgar.phaseHuntName': '狩りの魂',
+  'bossJournal.wildheart.zulgar.phaseHuntSummary':
+    '体力が{first}と{second}になると、{seconds}秒間ジャガーの霊となり、印を付けた者を追う。',
+  'bossJournal.wildheart.zulgar.phaseEnrageName': '激昂',
+  'bossJournal.wildheart.zulgar.pulseSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、彼から{radius}ヤード以内の全員に一撃：{min}〜{max}ダメージ。',
+  'bossJournal.wildheart.zulgar.pulseResponse': 'タンク以外は詠唱が終わる前に円から出る。',
+  'bossJournal.wildheart.zulgar.roarName': 'ジャガーロア',
+  'bossJournal.wildheart.zulgar.roarSummary':
+    '近接攻撃が当たるたび、{chance}の確率で相手を{distance}ヤードノックバックさせる。',
+  'bossJournal.wildheart.zulgar.roarResponse': 'タンクは背後に空間を確保する。',
+  'bossJournal.wildheart.zulgar.huntSummary':
+    '体力が{first}と{second}の時：{cast}秒の詠唱の後、{seconds}秒間、印を付けた1人（獲物。他にいる限りタンクにはならない）を狩る。移動速度はプレイヤーより{speed}速く、挑発を無視し、攻撃しない。獲物に追いつくと：{maul}ダメージと{stun}秒のスタン。その後、新たな獲物を選ぶ。引き裂かれた者は{respite}秒間安全。',
+  'bossJournal.wildheart.zulgar.huntHeroicSummary':
+    '体力が{first}と{second}の時：{cast}秒の詠唱の後、{seconds}秒間、獲物を狩る。双つの獲物：2人に印が付き、{switchEvery}秒ごとに標的を切り替える。移動速度はプレイヤーより{speed}速く、挑発を無視し、攻撃しない。獲物に追いつくと：{maul}ダメージと{stun}秒のスタン。',
+  'bossJournal.wildheart.zulgar.huntResponse':
+    '獲物：点灯した太陽紋の上を走って彼を鈍足にする。他の者は狩りの間、鈍足・拘束・スタンで止める。',
+  'bossJournal.wildheart.zulgar.glyphName': '太陽紋',
+  'bossJournal.wildheart.zulgar.glyphSummary':
+    '{count}個の紋が祭壇を囲む。ジャガーの霊が点灯した紋を越えると{seconds}秒間{slow}鈍足になり、その紋は{dark}秒間消灯する。狩りの間、鈍足と拘束は効き、スタンの持続は半分になる。',
+  'bossJournal.wildheart.zulgar.glyphResponse': '紋は分けて使う：最初の狩りで使い切らない。',
+  'bossJournal.wildheart.zulgar.ambushName': '狩人の待ち伏せ',
+  'bossJournal.wildheart.zulgar.ambushSummary':
+    '狩りのたびに{seconds}秒間姿を消す。最も遠い者に半径{radius}ヤードの円が示され、{warn}秒の予告の後、彼がそこに降り立つ：円内の全員が{min}〜{max}ダメージ。',
+  'bossJournal.wildheart.zulgar.ambushResponse': '円から出る。',
+  'bossJournal.wildheart.zulgar.tipTank':
+    'ジャガーロアに備えて背後に空間を確保する。狩りが終わると彼はあなたの元へ戻る：引き受ける準備をしておく。',
+  'bossJournal.wildheart.zulgar.tipHealer':
+    'ワイルドハートの脈動は円に残った者に当たる。引き裂きは大きな単発ダメージ：獲物を回復する。',
+  'bossJournal.wildheart.zulgar.tipDamage':
+    '脈動の円から出る。狩りの間は鈍足・拘束・スタンで獲物を守り、自分が獲物なら点灯した紋の上を走る。',
+  'bossJournal.wildheart.zulgar.tipDamageHeroic':
+    '脈動の円から出る。狩りの間は鈍足・拘束・スタンで2人の獲物を守る。狩りのたびに、待ち伏せの円から出る。',
+  'bossJournal.wildheart.zulgar.choiceName': '紋を今使うか、取っておくか？',
+  'bossJournal.wildheart.zulgar.choiceGain':
+    '点灯した紋を通らせるたびに彼は大きく鈍足になり、獲物の時間を稼げる。',
+  'bossJournal.wildheart.zulgar.choiceRisk':
+    '使った紋は{dark}秒間消灯したままで、狩りは{seconds}秒続く：最初に使い切ると、狩りの終盤に使える紋が残らない。',
+  'bossJournal.wildheart.zulgar.heroicTwinPrey':
+    '双つの獲物：2人が狩られる。{switchEvery}秒ごとに標的を切り替える。',
+  'bossJournal.wildheart.zulgar.heroicAmbush':
+    '待ち伏せ：狩りのたびに、最も遠い者の半径{radius}ヤードの円へ飛びかかる。',
+  'bossJournal.crypt.drake.overview':
+    '骨の竜が葬列の道の高空を旋回している。その下を通ると降りてきて戦う。正面には炎の吐息、背後には尾の一撃、周囲には翼の突風。',
+  'bossJournal.crypt.drake.phaseName': '葬列の道',
+  'bossJournal.crypt.drake.phaseSummary': '引き寄せられた場所に降り立ち、地上で戦う。',
+  'bossJournal.crypt.drake.breathSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、正面{arc}度の扇形、{range}ヤード先まで炎を吐く：{min}〜{max}ダメージ。詠唱中は向きが固定される。',
+  'bossJournal.crypt.drake.breathResponse': '正面に立つのはタンクだけ。それ以外は側面にいること。',
+  'bossJournal.crypt.drake.tailSummary':
+    '背後に誰かがいる間、{every}秒ごとに{cast}秒の詠唱の後、背後{arc}度の扇形、{range}ヤードを薙ぎ払う：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.drake.tailResponse': '背後には絶対に立たない。',
+  'bossJournal.crypt.drake.gustSummary':
+    '誰かが近くにいる間、{every}秒ごとに{cast}秒の詠唱の後、{radius}ヤード以内の全員に{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.crypt.drake.gustResponse': 'ノックバックに備え、足場の端に背を向けないこと。',
+  'bossJournal.crypt.drake.embersName': '塚炎の残り火',
+  'bossJournal.crypt.drake.embersSummary':
+    '吐息のたびに足元が{seconds}秒間燃え続ける：上にいる者に毎秒{min}〜{max}ダメージ。',
+  'bossJournal.crypt.drake.embersResponse':
+    '竜を燃える地面から引き離し、自分も燃える地面から出ること。',
+  'bossJournal.crypt.drake.tipTank':
+    '吐息が群れと逆を向くように回し、ヒロイックでは燃える地面から竜を動かす。',
+  'bossJournal.crypt.drake.tipHealer': '吐息と翼の突風がダメージのピーク。側面に立つこと。',
+  'bossJournal.crypt.drake.tipDamage': '側面から攻撃する。正面にも背後にも立たない。',
+  'bossJournal.crypt.drake.heroicEmbers': '塚炎の残り火：吐息のたびに地面が{seconds}秒間燃える。',
+  'bossJournal.crypt.marrow.overview':
+    '蘇った墓掘りが、プレイヤーの墓を採寸する。墓はどれも開いたままで、中の者を鈍らせて焼く。彼が埋葬の鐘を鳴らすと、墓ごとに安らがぬ骨が這い出る。墓は墓地の端に掘らせ、数を抑えること。',
+  'bossJournal.crypt.marrow.phaseYardSummary':
+    '印を付けたプレイヤーの足元に墓を掘り、タンクにシャベルを振るう。',
+  'bossJournal.crypt.marrow.phaseTollName': '埋葬の鐘',
+  'bossJournal.crypt.marrow.phaseTollSummary':
+    '体力が{first}と{second}になると、鐘の綱へ歩み寄り、埋葬の鐘を鳴らす。',
+  'bossJournal.crypt.marrow.shovelSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、正面{arc}度の扇形、{range}ヤード先までシャベルを振るい、近接攻撃の{mult}倍のダメージ。命中した全員に目に入った土が付く：移動速度が{slow}低下、{seconds}秒。',
+  'bossJournal.crypt.marrow.shovelResponse':
+    '正面に立つのはタンクだけ。タンクは詠唱中に外れてもよい。',
+  'bossJournal.crypt.marrow.measureSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、プレイヤー1人に印を付ける。{mark}秒後、その足元で墓が崩れる：{radius}ヤード以内の全員に{min}〜{max}ダメージ。墓は戦闘中ずっと開いたままで、中にいると移動速度が{slow}低下し、毎秒{dirt}ダメージを受ける。墓は最大{cap}つ。新しい墓ができると最も古い墓が埋まる。',
+  'bossJournal.crypt.marrow.measureResponse':
+    '印を付けられたら、墓が開く前に墓地の端へ歩くこと。開いた墓の中には絶対に立たない。',
+  'bossJournal.crypt.marrow.blowSummary':
+    '{every}秒ごとに、タンクへ{cast}秒の詠唱：近接攻撃で、被ダメージ{vuln}上昇のスタックが1つ増える。最大{stacks}スタック（{max}）、{seconds}秒。',
+  'bossJournal.crypt.marrow.blowResponse':
+    'タンク：スタックが増えたらクールダウンを使う。ヒーラーはタンクを注視。',
+  'bossJournal.crypt.marrow.vigorName': '墓の活力',
+  'bossJournal.crypt.marrow.vigorSummary':
+    '開いた墓の中に立っている間、攻撃速度が{haste}上昇する。',
+  'bossJournal.crypt.marrow.vigorResponse': 'タンクは彼を墓に入れない。',
+  'bossJournal.crypt.marrow.unquietName': '安らがぬ大地',
+  'bossJournal.crypt.marrow.unquietSummary':
+    '墓の中に{linger}秒留まったプレイヤーがいると、その墓から安らがぬ骨が這い出る。その墓は{rest}秒間休眠する。',
+  'bossJournal.crypt.marrow.unquietResponse': '墓からはすぐ出ること。',
+  'bossJournal.crypt.marrow.tollSummary':
+    '綱へ歩み寄り、{ring}秒間鐘を鳴らす。歩いている間も鳴らしている間もダメージ無効。その後、全員に{min}〜{max}ダメージ、開いた墓ごとに安らがぬ骨が這い出る。',
+  'bossJournal.crypt.marrow.tollResponse':
+    'ヒーラーは最後の一打の前に全員を回復。タンクは安らがぬ骨を引き受け、ダメージ役が倒す。',
+  'bossJournal.crypt.marrow.tipTank':
+    '彼を群れから背けて保持する。埋葬の鐘のあとは、安らがぬ骨をすべて引き受ける。',
+  'bossJournal.crypt.marrow.tipTankHeroic':
+    '彼を群れから背けて保持し、どの墓にも入れない。墓掘りの一撃はスタックする：増えたらクールダウンを使う。',
+  'bossJournal.crypt.marrow.tipHealer':
+    '埋葬の鐘は全員に当たる。墓は中の者を鈍らせて焼くので、はまった者を助けること。',
+  'bossJournal.crypt.marrow.tipDamage':
+    '印を付けられたら、墓を墓地の端まで運ぶ。鐘のたびに安らがぬ骨を倒してから、マロウに戻る。',
+  'bossJournal.crypt.marrow.choiceName': '墓をどこに作らせる?',
+  'bossJournal.crypt.marrow.choiceGain':
+    '墓地の端に掘らせた墓は、中央を戦いと回避の場所として空けておける。',
+  'bossJournal.crypt.marrow.choiceRisk':
+    '場所を問わず、開いた墓のすべてが次の鐘で安らがぬ骨を呼び出す。同時に最大{cap}体。',
+  'bossJournal.crypt.marrow.choiceRiskHeroic':
+    '場所を問わず、開いた墓のすべてが次の鐘で安らがぬ骨を呼び出す。同時に最大{cap}体。ヒロイックでは、タンクの近くの墓がマロウも加速させる。',
+  'bossJournal.crypt.marrow.heroicBlow':
+    '墓掘りの一撃：タンクへの攻撃で、被ダメージ{vuln}上昇がスタックする。',
+  'bossJournal.crypt.marrow.heroicVigor': '墓の活力：墓の中では攻撃速度が{haste}上昇する。',
+  'bossJournal.crypt.marrow.heroicUnquiet':
+    '安らがぬ大地：墓に{linger}秒いると安らがぬ骨が這い出る。',
+  'bossJournal.crypt.lady.overview':
+    '幽霊の花嫁。墓のランタンに守られていない者全員を、慟哭で傷つける。ランタン1つが守れるのは2人までで、守ると消えるので、交代で使う必要がある。さらに、パーティが十分に焼くまで、プレイヤー1人を宙に掲げて離さない。',
+  'bossJournal.crypt.lady.phaseRavineName': '霜の峡谷',
+  'bossJournal.crypt.lady.phaseRavineSummary':
+    '峡谷の周りに墓のランタンが3つ立っている。彼女の通った跡はすべりやすい氷になる。',
+  'bossJournal.crypt.lady.phaseFreezeName': '花嫁の凍結',
+  'bossJournal.crypt.lady.phaseFreezeSummary':
+    '体力が{health}になると、峡谷の床全体が戦闘終了まで凍りつく。',
+  'bossJournal.crypt.lady.lamentSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、ランタンに守られていない全員に{min}〜{max}ダメージ。命中のたびに哀歌の名残が1スタック増える：1スタックごとに哀歌のダメージが{perStack}増加、{seconds}秒、最大{stacks}スタック。',
+  'bossJournal.crypt.lady.lamentResponse': '詠唱が終わる前に、灯ったランタンの光の中に立つ。',
+  'bossJournal.crypt.lady.lanternName': '墓のランタン',
+  'bossJournal.crypt.lady.lanternSummary':
+    '灯ったランタンは、{radius}ヤード以内の最大{cap}人を哀歌から守る。誰かを守ったランタンは{dark}秒間消えるので、次の哀歌でもまだ暗い。',
+  'bossJournal.crypt.lady.lanternHeroicSummary':
+    '灯ったランタンは、{radius}ヤード以内の最大{cap}人を哀歌から守る。誰かを守ったランタンは{dark}秒間消える。ヒロイックでは、灯ったランタンも{lit}秒後に自然に燃え尽き、{gutter}秒間暗いままになる。',
+  'bossJournal.crypt.lady.lanternResponse':
+    '誰がどのランタンを使うか決めておき、哀歌ごとに灯ったランタンへ交代する。',
+  'bossJournal.crypt.lady.embraceSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人を捕らえて宙に掲げ、離さない。{hold}秒以内に彼女の体力の{share}を削れば静かに降ろす。さもなくば落とす：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.lady.embraceHeroicSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー{victims}人を捕らえて宙に掲げ、離さない。{hold}秒以内に彼女の体力の{share}を削れば静かに降ろす。さもなくば落とす：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.lady.embraceResponse':
+    '誰かが捕まったら、全員ですぐにバーストを叩き込む。ヒーラーは捕まった者を回復。',
+  'bossJournal.crypt.lady.rimeSummary':
+    '漂った跡にすべりやすい氷を残す。1つにつき{seconds}秒間続く。氷の上では滑り、旋回が遅くなる。',
+  'bossJournal.crypt.lady.rimeResponse': '素早く動く必要がある時は、彼女の軌跡を避ける。',
+  'bossJournal.crypt.lady.freezeSummary':
+    '体力が{health}になると{cast}秒の詠唱の後、床全体が戦闘終了まですべりやすい氷になる。詠唱中の哀歌は打ち消される。',
+  'bossJournal.crypt.lady.freezeResponse': '早めに動く：氷の上ではランタンまで時間がかかる。',
+  'bossJournal.crypt.lady.tipTank': '彼女を中央付近に保ち、全員がどのランタンにも届くようにする。',
+  'bossJournal.crypt.lady.tipHealer':
+    '守られていない者は哀歌を受けてスタックが増える。掲げられた者は、掲げられている間ダメージを受け続ける。',
+  'bossJournal.crypt.lady.tipDamage':
+    '誰かが捕まった瞬間にバースト。哀歌ごとに、灯ったランタンの間を交代する。',
+  'bossJournal.crypt.lady.choiceName': '誰が哀歌を受ける?',
+  'bossJournal.crypt.lady.choiceGain':
+    '3つすべてのランタンを使えば、それぞれ最大{cap}人を守れるので、この哀歌は誰も受けない。',
+  'bossJournal.crypt.lady.choiceRisk':
+    '使ったランタンは次の哀歌でも暗いままなので、その時は誰かが受ける。哀歌の名残は1スタックごとにダメージが{perStack}増える。',
+  'bossJournal.crypt.lady.heroicEmbrace': '凍てつく抱擁は{victims}人を同時に捕らえる。',
+  'bossJournal.crypt.lady.heroicLanterns':
+    '灯ったランタンは{lit}秒後に自然に燃え尽き、{gutter}秒間暗いままになる。',
+  'bossJournal.crypt.ilvane.overview':
+    '聖歌隊長。2人の虚ろの聖歌隊員が生きている間、彼女のダメージを減らす。彼女の挽歌は、姿が見える全員を傷つけて沈黙させるので、中断するか柱の陰に隠れること。骨のオルガンも奏で、音符の筋を聖歌隊席に走らせる。',
+  'bossJournal.crypt.ilvane.phaseLoftName': '聖歌隊席',
+  'bossJournal.crypt.ilvane.phaseLoftSummary': '2人の虚ろの聖歌隊員を従え、聖歌隊席から歌う。',
+  'bossJournal.crypt.ilvane.phaseCrescendoName': 'クレッシェンド',
+  'bossJournal.crypt.ilvane.phaseCrescendoSummary':
+    '体力が{health}になると歌が速くなり、オルガンが3波目を奏でる。',
+  'bossJournal.crypt.ilvane.harmonyName': '調和',
+  'bossJournal.crypt.ilvane.harmonySummary':
+    '生きている聖歌隊員1人ごとに、彼女の受けるダメージが{per}減る：2人とも立っていれば{both}。',
+  'bossJournal.crypt.ilvane.harmonyResponse': '聖歌隊員を先に倒すこと。',
+  'bossJournal.crypt.ilvane.dirgeSummary':
+    '{every}秒ごとに{cast}秒の詠唱。完了すると、彼女の姿が見える全員に{min}〜{max}ダメージと{silence}秒の沈黙。中断された後は{quiet}秒間、挽歌を歌わない。',
+  'bossJournal.crypt.ilvane.dirgeResponse': '中断するか、詠唱が終わる前に柱の陰で視線を切ること。',
+  'bossJournal.crypt.ilvane.organSummary':
+    '{every}秒ごとにオルガンへ歩み寄り、音符の筋を{waves}波、聖歌隊席に走らせる。筋は{gather}秒間表示された後に炸裂する：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.ilvane.organResponse':
+    '最初の筋と筋の間に立ち、すでに炸裂した筋の中へ入ること。',
+  'bossJournal.crypt.ilvane.encoreName': 'アンコール',
+  'bossJournal.crypt.ilvane.encoreSummary':
+    'もう1人が立っている間に{seconds}秒倒れていた聖歌隊員は、全快で再び起き上がる。',
+  'bossJournal.crypt.ilvane.encoreResponse': '聖歌隊員2人を、{seconds}秒以内の間隔で倒すこと。',
+  'bossJournal.crypt.ilvane.unbrokenSummary': '{nth}回目ごとの挽歌は途切れぬ詩節：中断できない。',
+  'bossJournal.crypt.ilvane.unbrokenResponse': 'その時は柱の陰に隠れること。',
+  'bossJournal.crypt.ilvane.crescendoName': 'クレッシェンド',
+  'bossJournal.crypt.ilvane.crescendoSummary':
+    '体力が{health}を下回ると、挽歌の詠唱は{cast}秒になり{every}秒ごとに来て、オルガンは{waves}波を奏でる。3波目は1波目の筋を再び使う。',
+  'bossJournal.crypt.ilvane.crescendoResponse':
+    '挽歌はすべて中断し、3波目では最初の筋から外れること。',
+  'bossJournal.crypt.ilvane.tipTank':
+    '聖歌隊員をまとめて保持し、素早く倒せるようにしてから、イルヴェインを引き受ける。',
+  'bossJournal.crypt.ilvane.tipHealer':
+    '完了した挽歌は自分も沈黙させる：誰も中断できないなら柱の陰に隠れる。',
+  'bossJournal.crypt.ilvane.tipDamage': '聖歌隊員を先に倒し、挽歌を中断し、オルガンの筋を避ける。',
+  'bossJournal.crypt.ilvane.tipDamageHeroic':
+    '聖歌隊員2人を{seconds}秒以内の間隔で倒し、挽歌を中断し、途切れぬ詩節はすべて隠れてやり過ごす。',
+  'bossJournal.crypt.ilvane.choiceName': '中断する? 隠れる?',
+  'bossJournal.crypt.ilvane.choiceGain': '中断すれば挽歌が止まり、彼女は{quiet}秒間静かになる。',
+  'bossJournal.crypt.ilvane.choiceRisk':
+    '柱の陰に隠れると攻撃の時間が減る。中断を外すと、視界内の全員が沈黙してダメージを受ける。',
+  'bossJournal.crypt.ilvane.heroicEncore':
+    'アンコール：もう1人が生きている間に{seconds}秒倒れていた聖歌隊員は再び起き上がる。',
+  'bossJournal.crypt.ilvane.heroicUnbroken': '途切れぬ詩節：{nth}回目ごとの挽歌は中断できない。',
+  'bossJournal.crypt.morthen.overview':
+    '三幕の儀式を執り行うリッチの司教。第一幕では魂を呼んで自らを強化する。体力が{rite}になると結界の陰に隠れ、パーティが体力を払って4本のろうそくを灯し直すまで出てこない。体力が{last}になると巨大な大鎌を振るう。',
+  'bossJournal.crypt.morthen.phaseCallingName': '呼び声',
+  'bossJournal.crypt.morthen.phaseCallingSummary':
+    '周囲に闇の脈動を放ち、魂を呼んで自らに糧を与える。',
+  'bossJournal.crypt.morthen.phaseRiteName': '安らがぬ者の儀式',
+  'bossJournal.crypt.morthen.phaseRiteSummary':
+    '体力が{health}になると祭壇に戻り、4本のろうそくがすべて再び灯るまでダメージを受けなくなる。',
+  'bossJournal.crypt.morthen.phaseLastName': '終の儀式',
+  'bossJournal.crypt.morthen.phaseLastSummary':
+    '体力が{health}になると、戦いの終幕に向けて大鎌を構える。',
+  'bossJournal.crypt.morthen.pulseSummary':
+    '{every}秒ごと（終の儀式では{everyLast}秒ごと）に{cast}秒の詠唱の後、{radius}ヤード以内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.crypt.morthen.pulseResponse':
+    'タンクも含め全員が、詠唱が終わる前に{radius}ヤードの外へ出る。',
+  'bossJournal.crypt.morthen.gravecallName': '墓呼び',
+  'bossJournal.crypt.morthen.gravecallSummary':
+    '{every}秒ごとに、縛られし魂が壁龕から彼に向かって漂う。届くと、スタックごとに与えるダメージが{per}増え（最大{stacks}スタック）、体力を{heal}回復する。最初に触れたプレイヤーが代わりに受け止める：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.morthen.gravecallResponse': '手の空いたプレイヤーが、魂ごとに進路へ入る。',
+  'bossJournal.crypt.morthen.graspName': '墓の掌握',
+  'bossJournal.crypt.morthen.graspSummary':
+    '{every}秒ごとに、{count}人の足元に半径{radius}ヤードの輪が現れる。{fuse}秒後に手が噴き出す：内側の全員が{root}秒間移動不能になり、{min}〜{max}ダメージを受ける。',
+  'bossJournal.crypt.morthen.graspResponse': 'すぐに輪から出ること。',
+  'bossJournal.crypt.morthen.riteSummary':
+    'ダメージ無効になり、{candles}本のろうそくが消える。安らがぬ骨が{bones}体這い出る。墓の冷気が毎秒全員に当たる：{base}ダメージで、{chillEvery}秒ごとに{step}ずつ増え、上限はない。',
+  'bossJournal.crypt.morthen.riteResponse': '4本のろうそくを素早く灯し直す：冷気は増え続ける。',
+  'bossJournal.crypt.morthen.relightName': '追憶のろうそくを灯し直す',
+  'bossJournal.crypt.morthen.relightSummary':
+    'ろうそくの近く（{range}ヤード以内）で{channel}秒詠唱して灯し直す。灯す者は最大体力の{drain}を失う。4本目が灯ると、彼は{stun}秒間スタンし、受けるダメージが{vuln}増える。',
+  'bossJournal.crypt.morthen.relightResponse':
+    '体力に余裕のある者にろうそくを割り振り、スタン中にバーストを叩き込む。',
+  'bossJournal.crypt.morthen.nameDeadSummary':
+    'ろうそくは、台帳から伸びる金色の光線が示す順に灯すこと。違うろうそくを灯すと、最後に灯したろうそくが消え、灯した者に{min}〜{max}のダメージ。',
+  'bossJournal.crypt.morthen.nameDeadResponse': '光線が指すろうそくだけを灯す。',
+  'bossJournal.crypt.morthen.reapSummary':
+    '{every}秒ごとに、タンクへ{cast}秒の詠唱の後、正面{arc}度の扇形、{range}ヤード先まで大鎌を薙ぎ払う：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.morthen.reapResponse':
+    '正面に立つのはタンクだけ。タンクは詠唱中に横へ外れてよい。',
+  'bossJournal.crypt.morthen.tipTank':
+    '彼を群れから背けて保持し、全員と一緒にシャドウパルスから出る。',
+  'bossJournal.crypt.morthen.tipHealer':
+    'ろうそく1本ごとに、灯す者の体力が大きく削られ、墓の冷気も増え続ける：灯す者を優先して回復。',
+  'bossJournal.crypt.morthen.tipDamage':
+    '縛られし魂を体で止め、儀式ではろうそくを灯し直し、スタン中にバーストを叩き込む。',
+  'bossJournal.crypt.morthen.tipDamageHeroic':
+    '縛られし魂を体で止め、墓の掌握を避ける。儀式では金色の光線に従って正しいろうそくを灯す。',
+  'bossJournal.crypt.morthen.choiceCandleName': '何人で灯す?',
+  'bossJournal.crypt.morthen.choiceCandleGain':
+    '複数人で同時に灯し直せば、墓の冷気が強まる前に儀式が早く終わる。',
+  'bossJournal.crypt.morthen.choiceCandleRisk':
+    '灯す者はろうそく1本につき最大体力の{normal}を払い、その間も冷気は増え続ける。',
+  'bossJournal.crypt.morthen.choiceSoulName': '魂を止める?',
+  'bossJournal.crypt.morthen.choiceSoulGain':
+    '止めた魂は彼に届かない：ダメージのスタックも回復もなし。',
+  'bossJournal.crypt.morthen.choiceSoulRisk':
+    '止めた者が魂のダメージを受ける。通した魂は1つごとに彼のダメージを{per}増やし、彼を{heal}回復させる。',
+  'bossJournal.crypt.morthen.heroicNameDead':
+    '死者の名を呼べ：ろうそくは、台帳が示す順に灯すこと。',
+  'bossJournal.crypt.morthen.heroicGrasp': '墓の掌握：移動不能とダメージの輪が、どの幕でも現れる。',
+  'bossJournal.crypt.morthen.heroicDrain':
+    'ろうそく1本につき、灯す者の最大体力の{drain}を消費する。',
+  'bossJournal.crypt.wyrm.overview':
+    'モーセンの断末魔の儀式が火葬壇に火を灯し、骨の竜がそこへ降り立つ。納骨堂の骨竜と同じように戦うが、さらに燃える掃射の筋と、プレイヤーを吹き飛ばす代わりに自らが隙を晒す咆哮がある。',
+  'bossJournal.crypt.wyrm.phaseName': '竜呼びの火葬壇',
+  'bossJournal.crypt.wyrm.phaseSummary':
+    '手の届かない高みから滑空し、炎の爆発とともに環の中へ降り立つ。',
+  'bossJournal.crypt.wyrm.strafeSummary':
+    '{every}秒ごとに、プレイヤー1人を通る幅{width}ヤードの筋を{mark}秒間示し、その上を炎を撒きながら飛ぶ：筋の中の全員に{min}〜{max}ダメージ。筋は{seconds}秒間燃え続ける：毎秒{burn}ダメージ。',
+  'bossJournal.crypt.wyrm.strafeResponse': '示された筋から横へ出て、燃える地面にも入らない。',
+  'bossJournal.crypt.wyrm.bellowSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、{radius}ヤード以内に{min}〜{max}ダメージと{push}ヤードのノックバック。その後{seconds}秒間、受けるダメージが{vuln}増える。',
+  'bossJournal.crypt.wyrm.bellowResponse':
+    '燃える筋へ吹き飛ばされないこと。その後の隙にクールダウンを使う。',
+  'bossJournal.crypt.wyrm.knellSummary':
+    '{every}秒ごとに手の届かない高みへ飛び上がり、環の半分に炎を{breaths}回吐く。炎の{mark}秒前に、その半分が示される：中の全員に{min}〜{max}ダメージ。',
+  'bossJournal.crypt.wyrm.knellResponse': '毎回、示されていない側の半分へ走る。',
+  'bossJournal.crypt.wyrm.tipTank': '群れと逆を向かせ、燃える筋から外へ回す。',
+  'bossJournal.crypt.wyrm.tipHealer':
+    '火葬の掃射と恐怖の咆哮がダメージのピーク。燃える筋に吹き飛ばされた者を回復する。',
+  'bossJournal.crypt.wyrm.tipDamage': '示された筋から出て、恐怖の咆哮のたびにクールダウンを使う。',
+  'bossJournal.crypt.wyrm.tipDamageHeroic':
+    '示された筋から出て、燃える弔鐘の間は毎回安全な半分へ走る。',
+  'bossJournal.crypt.wyrm.heroicKnell': '燃える弔鐘：飛び上がり、環の半分に炎を{breaths}回吐く。',
+  'bossJournal.bastion.captain.overview':
+    '浮遊する幽霊船長が下層外郭の堀を巡回しており、彼を倒すまで跳ね橋は上がったままだ。タンク以外のプレイヤーを狙う3種のレーン攻撃を順に繰り出し、どれも発動前に床へ描かれる。',
+  'bossJournal.bastion.captain.phaseSummary':
+    '最初の技はプル後{first}秒で始まり、幽霊船の一斉砲撃、呪いの錨、幻影の斬り込みの順に{recovery}秒間隔で続く。各技の間、彼は動かない。',
+  'bossJournal.bastion.captain.broadsideSummary':
+    '{warn}秒の予告の後、長さ{length}ヤードの平行レーン{lanes}本が一斉に発射される。レーン内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.captain.broadsideResponse': 'レーンとレーンの間の隙間に立つ。',
+  'bossJournal.bastion.captain.anchorSummary':
+    '{warn}秒の予告の後、呪いの錨がレーンに沿って{length}ヤード後方へ{seconds}秒かけて引き戻され、通り道の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.captain.anchorResponse': '発動前にレーンから出る。',
+  'bossJournal.bastion.captain.boardingSummary':
+    '{warn}秒の予告の後、長さ{length}ヤードのレーン内の全員に{min}〜{max}ダメージを与え、彼がそのレーンに沿って突進する。',
+  'bossJournal.bastion.captain.boardingResponse': 'レーンの横へ避ける。',
+  'bossJournal.bastion.captain.sailorsName': '難破船に縛られた船員',
+  'bossJournal.bastion.captain.sailorsSummary':
+    '体力が{first}と{second}になると、難破船に縛られた船員が{count}体ずつ戦闘に加わる。船員は倒れた直後に魂のエネルギーで爆発する。',
+  'bossJournal.bastion.captain.sailorsResponse':
+    'タンクが引き受ける。倒れたばかりの船員から離れる。',
+  'bossJournal.bastion.captain.tipTank':
+    '彼を動かさず、難破船に縛られた船員を引き受ける。レーンはほかの者を狙い、あなたは狙われない。',
+  'bossJournal.bastion.captain.tipHealer':
+    '幽霊船の一斉砲撃が最も痛い。レーンに立っていた者を回復する。',
+  'bossJournal.bastion.captain.tipDamage':
+    '床を見る。どの技も発動前に描かれる。一斉砲撃の隙間に立つ。',
+  'bossJournal.bastion.olen.overview':
+    '堕ちたパラディンの騎士。聖なる潮水の溜まりが彼を守るので、タンクは彼を溜まりから引き出す。パーティーは散開し、跳ね返る大盾と宣告の柱が1人にしか当たらないようにする。体力が半分になると跪いて無敵になり、溺れた軍曹が全滅するまで続く。',
+  'bossJournal.bastion.olen.phaseBreachName': '破られた砦',
+  'bossJournal.bastion.olen.phaseBreachSummary':
+    '技は一度に一つずつ詠唱し、詠唱中はタイマーが止まる。',
+  'bossJournal.bastion.olen.phaseOathName': '不壊の誓い',
+  'bossJournal.bastion.olen.phaseOathSummary':
+    '体力が{health}になると跪いて無敵になり、溺れた軍曹が代わりに戦う。',
+  'bossJournal.bastion.olen.brineSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、足元に半径{radius}ヤードの聖なる潮水の溜まりを{seconds}秒間作り、中にいる者に毎秒{perSecond}ダメージ。彼がいずれかの溜まりに立っている間は受けるダメージが{shield}減る。',
+  'bossJournal.bastion.olen.brineResponse':
+    'タンクが彼を溜まりから引き出す。ほかの全員も溜まりから出る。',
+  'bossJournal.bastion.olen.bulwarkSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーを狙う。大盾は{min}〜{max}ダメージを与え、{reach}ヤード以内で最も近い未被弾のプレイヤーへ跳ね返り、最大{hits}人に当たる。',
+  'bossJournal.bastion.olen.bulwarkResponse': '散開する：ほかの全員から{reach}ヤード以上離れる。',
+  'bossJournal.bastion.olen.sentenceSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに印を付ける。{seconds}秒後、どこにいても柱が落ち、{radius}ヤード以内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.olen.sentenceResponse': '印を受けたら、柱が落ちる前にパーティーから離れる。',
+  'bossJournal.bastion.olen.arcName': '刈り取りの弧',
+  'bossJournal.bastion.olen.arcSummary':
+    '彼の近接攻撃は、タンクから{radius}ヤード以内にいるほかの全プレイヤーにも、その一撃の{share}で当たる。',
+  'bossJournal.bastion.olen.arcResponse': 'タンクの{radius}ヤード以内にはタンク以外誰も立たない。',
+  'bossJournal.bastion.olen.oathSummary':
+    '体力が{health}になった時に1度だけ：跪いて最大{max}秒詠唱し、ダメージを受けない。その間に溺れた軍曹が{count}体現れ、タンク以外のプレイヤーを攻撃する。全員倒すと彼は{stun}秒気絶し、{vulnSeconds}秒間受けるダメージが{vuln}増える。',
+  'bossJournal.bastion.olen.oathResponse':
+    'タンクが軍曹を集め、全員で倒し、気絶中のオレンに火力を集中する。',
+  'bossJournal.bastion.olen.tipTank':
+    '彼をすべての潮水の溜まりから引き出す。彼の薙ぎ払いが飛び散る、自分の周囲{radius}ヤードにパーティーを入れない。',
+  'bossJournal.bastion.olen.tipHealer':
+    '跳ね返る大盾と潮の宣告は、プレイヤーが固まっているほど痛い。軍曹は低体力で激昂する。',
+  'bossJournal.bastion.olen.tipDamage':
+    '散開して互いに{reach}ヤード以上離れ、タンクからも離れる。誓いの段階では軍曹を先に倒す。',
+  'bossJournal.bastion.olen.choiceName': '固まる？散る？',
+  'bossJournal.bastion.olen.choiceGain':
+    '散開すれば、跳ね返る大盾、潮の宣告、刈り取りの弧はそれぞれ1人にしか当たらない。',
+  'bossJournal.bastion.olen.choiceRisk':
+    '被弾者から{reach}ヤード以内の者は跳ね返りを受け、タンクから{radius}ヤード以内の者は飛び散りを受ける。',
+  'bossJournal.bastion.olen.heroicChanges':
+    '潮水の溜まりは{radius}ヤード、大盾は{hits}人に跳ね返り、宣告の柱は{sentence}ヤード、現れる軍曹は{count}体。',
+  'bossJournal.bastion.turnkey.overview':
+    '牢の鍵番はプレイヤーを鉄の檻に閉じ込める。囚われた者はインタラクトキーを連打して脱出し、仲間は檻を攻撃して後押しできる。',
+  'bossJournal.bastion.turnkey.phaseName': '牢の鉄格子',
+  'bossJournal.bastion.turnkey.phaseSummary':
+    '一定間隔で檻に閉じ込め、体力が半分になると囚人を解き放つ。',
+  'bossJournal.bastion.turnkey.cageSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤーに檻が落ち、気絶させる。檻の耐久は{hits}：囚われた者はインタラクトキーを押すたびに{press}、味方は攻撃のたびに{helper}壊し、檻はゆっくり修復される。{max}秒経つと檻が囚われた者を押し潰し、最大体力の{crush}のダメージ。',
+  'bossJournal.bastion.turnkey.cageHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー{cages}人に檻が落ちる。各檻の耐久は{hits}：囚われた者はインタラクトキーを押すたびに{press}、味方は攻撃のたびに{helper}壊す。檻の中では上昇する塩水が毎秒体力を奪う。{max}秒経つと檻が押し潰し、最大体力の{crush}のダメージ。',
+  'bossJournal.bastion.turnkey.cageResponse':
+    '檻に入ったら：インタラクトキーを素早く連打。ほかの全員は檻を攻撃して壊す。',
+  'bossJournal.bastion.turnkey.cellsName': '房を開け放つ',
+  'bossJournal.bastion.turnkey.cellsSummary':
+    '体力が{health}になると、枷の囚人{count}体を解き放つ。体力が4分の1になると鎖が切れ、戦闘から離脱する。',
+  'bossJournal.bastion.turnkey.cellsResponse': '体力を4分の1まで削る。倒す必要はない。',
+  'bossJournal.bastion.turnkey.tipTank': '彼と囚人を引き受ける。檻があなたを狙うことはない。',
+  'bossJournal.bastion.turnkey.tipHealer':
+    '檻に入った者を回復しておく：押し潰しは体力の割合ダメージ。',
+  'bossJournal.bastion.turnkey.tipDamage': 'すべての檻を即座に狙い、壊れるまで攻撃する。',
+  'bossJournal.bastion.turnkey.heroicCages': '鉄の檻は一度に{cages}人を閉じ込める。',
+  'bossJournal.bastion.turnkey.heroicFlood':
+    '塩水の洪水：檻に入った者は、解放されるまで毎秒体力を失う。',
+  'bossJournal.bastion.ossick.overview':
+    '牢番は錨でプレイヤーを引っ掛け、溺死の穴へ巻き寄せる。引っ掛けられた者は灯った係留柱まで走るか、パーティーで鎖を断つ。その間、別の2人が鎖でつながれ、離れずにいなければならない。',
+  'bossJournal.bastion.ossick.phaseName': '溺れの中庭',
+  'bossJournal.bastion.ossick.phaseSummary':
+    '体力が{first}と{second}になるたびに、枷の囚人{count}体が牢から出てくる。',
+  'bossJournal.bastion.ossick.anchorSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー1人が引っ掛けられる。{settle}秒後、鎖が穴へ巻き寄せる。脱出：引っ掛けられた地点から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入る（その柱は{dark}秒間消える）か、パーティーが錨に{hits}回攻撃を当てる。穴に到達：最大体力の{pit}のダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.ossick.anchorHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー1人が引っ掛けられ、錨の着地で{crashRadius}ヤード以内のほかの全員に{min}〜{max}ダメージ。{settle}秒後、鎖が穴へ巻き寄せる。脱出：{run}ヤード以上離れた灯った係留柱か、錨への{hits}回の攻撃。穴に到達：最大体力の{pit}のダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.ossick.anchorResponse':
+    '引っ掛けられたら：早めに灯った係留柱へ走る。ほかの全員は錨を攻撃。',
+  'bossJournal.bastion.ossick.shackleSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、2人を{seconds}秒間鎖でつなぐ。{range}ヤードより離れて立っている間、毎秒2人とも{min}〜{max}ダメージ。',
+  'bossJournal.bastion.ossick.shackleResponse':
+    '鎖につながれたら：相方から{range}ヤード以内にいる。',
+  'bossJournal.bastion.ossick.cudgelSummary':
+    '{every}秒ごとに{cast}秒の詠唱でタンクを狙う：近接攻撃の{mult}倍のダメージ、防具無視、{seconds}秒間移動速度が{slow}低下。',
+  'bossJournal.bastion.ossick.cudgelResponse':
+    'タンク：クールダウンを使う。ヒーラーは一撃に備える。',
+  'bossJournal.bastion.ossick.tipTank':
+    '彼を中央付近で保持し、囚人を引き受ける。牢番の棍棒はあなたの防具を無視する。',
+  'bossJournal.bastion.ossick.tipHealer':
+    '引っ掛けられた者と鎖でつながれた者に注意。穴は体力の大きな割合を奪う。',
+  'bossJournal.bastion.ossick.tipDamage':
+    '誰かが引っ掛けられた瞬間に錨を攻撃。鎖でつながれたら相方の近くにいる。',
+  'bossJournal.bastion.ossick.choiceName': '柱へ走る？鎖を断つ？',
+  'bossJournal.bastion.ossick.choiceGain':
+    '灯った係留柱なら引っ掛けられた1人だけが解放され、パーティーは攻撃を続けられる。',
+  'bossJournal.bastion.ossick.choiceRisk':
+    '係留柱は{run}ヤード以上離れている必要があり、{dark}秒間消える。鎖が短くなると届く柱がなくなり、断つしかない。',
+  'bossJournal.bastion.ossick.heroicCrash':
+    '錨の墜落：錨は引っ掛けられた者から{crashRadius}ヤード以内の全員に当たる。',
+  'bossJournal.bastion.ossick.heroicChanges':
+    '錨を断つには{hits}回の攻撃が必要で、鎖でつながれた者は{range}ヤード以内にいなければならない。',
+  'bossJournal.bastion.vael.overview':
+    'フードを被った死神。3回連続でプレイヤーの背後の影の溜まりから現れ、鎌でその背中を薙ぐ。体力が{first}と{second}になると、そっくりの分身に紛れ、聖歌が全員を傷つける。霧灯台の光線が本物の姿を示す。',
+  'bossJournal.bastion.vael.phaseCrownName': '灯標の冠',
+  'bossJournal.bastion.vael.phaseCrownSummary':
+    'プレイヤーが冠に踏み込むと彼が現れる。体力が{first}と{second}になると、溺れた下僕が{count}体ずつ戦闘に加わる。',
+  'bossJournal.bastion.vael.phaseVeilSummary':
+    '体力が{first}と{second}になると、そっくりの分身に紛れる。',
+  'bossJournal.bastion.vael.surgeSummary':
+    '{cast}秒の詠唱の後、彼から{radius}ヤード以内の全員に{min}〜{max}ダメージ。通常は{every}秒ごと、体力が{below}を下回ると{lastEvery}秒ごと。',
+  'bossJournal.bastion.vael.surgeResponse': '遠隔は{radius}ヤードより外にいる。',
+  'bossJournal.bastion.vael.crossingSummary':
+    '{every}秒ごとに影を渡り、最大{chain}回連続で、毎回別のプレイヤーの背後に出る：背後{behind}ヤードに溜まりが開き、彼が現れ、その方向へ{range}ヤード、{arc}度の扇形を薙ぐ：{min}〜{max}ダメージ。',
+  'bossJournal.bastion.vael.crossingResponse':
+    '死の刻印を受けたら：前へ動いて薙ぎ払いから出るか、溜まりの後ろへ回る。ほかの者は印を受けた者の前に立たない。',
+  'bossJournal.bastion.vael.graveName': '墓の影',
+  'bossJournal.bastion.vael.graveSummary':
+    '影の溜まりは{seconds}秒間残り、{radius}ヤード以内の全員を毎秒{perSecond}ダメージで焼く。',
+  'bossJournal.bastion.vael.graveResponse': '古い溜まりに入らない。',
+  'bossJournal.bastion.vael.veilSummary':
+    '彼は姿を隠し、冠の周りに四つの姿が現れる：ヴァエルと3体の霧の影。四つとも{seconds}秒間溺れの聖歌を歌い、毎秒ごとに全員への被害が増す。霧灯台の光線が{beam}秒ごとに走査し、本物のヴァエルが光る。彼の体力の{share}を削るとヴェールが破れ、{stun}秒気絶し、{vulnSeconds}秒間受けるダメージが{vuln}増える。',
+  'bossJournal.bastion.vael.veilHeroicSummary':
+    '彼は姿を隠し、冠の周りに四つの姿が現れる：ヴァエルと3体の霧の影が{drift}秒ごとに1つずつ位置をずらす。四つとも{seconds}秒間溺れの聖歌を歌う。霧灯台の光線が本物のヴァエルを示す。彼の体力の{share}を削るとヴェールが破れ、{stun}秒の気絶と{vulnSeconds}秒間の被ダメージ{vuln}増加。',
+  'bossJournal.bastion.vael.veilResponse': '光線を見て、全員が本物のヴァエルだけを攻撃する。',
+  'bossJournal.bastion.vael.fogburstName': '霧の爆裂',
+  'bossJournal.bastion.vael.fogburstSummary':
+    '霧の影への攻撃は何であれそれを破裂させ、{radius}ヤード以内のプレイヤーに{min}〜{max}ダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.vael.fogburstHeroicSummary':
+    '霧の影への攻撃は何であれそれを破裂させ、{radius}ヤード以内のプレイヤーに{min}〜{max}ダメージと{stun}秒の気絶を与え、その場に溺れた下僕が現れる。',
+  'bossJournal.bastion.vael.fogburstResponse': '分身を攻撃しない：光線を待つ。',
+  'bossJournal.bastion.vael.tipTank':
+    '溺れた下僕を引き受ける。ヴェールの間は本物のヴァエル探しを手伝う。',
+  'bossJournal.bastion.vael.tipHealer':
+    '溺れの聖歌はヴェールが破れるまで全員に強まり続ける。霧の奔流は彼から{radius}ヤード以内の全員に当たる。',
+  'bossJournal.bastion.vael.tipDamage':
+    '死の刻印を受けたら、前へ動くか溜まりの後ろへ回る。ヴェールの間は、光線が照らす姿だけを攻撃する。',
+  'bossJournal.bastion.vael.tipDamageHeroic':
+    '死の刻印を受けたら、前へ動くか溜まりの後ろへ回り、古い溜まりも避ける。ヴェールの間は、光線が照らす姿だけを攻撃する。',
+  'bossJournal.bastion.vael.choiceName': '光線を待つ？当てずっぽう？',
+  'bossJournal.bastion.vael.choiceGain':
+    '光線を待てば全ての攻撃が本物のヴァエルに当たり、ヴェールが早く破れる。',
+  'bossJournal.bastion.vael.choiceRisk':
+    'ヴェールの間は毎秒聖歌の被害が増す。外すと分身が破裂し、周囲にダメージと気絶。',
+  'bossJournal.bastion.vael.choiceRiskHeroic':
+    'ヴェールの間は毎秒聖歌の被害が増す。外すと分身が破裂し、近くのプレイヤーを気絶させて溺れた下僕を残す。',
+  'bossJournal.bastion.vael.heroicGrave': '墓の影：影の溜まりはそれぞれ{seconds}秒間燃え続ける。',
+  'bossJournal.bastion.vael.heroicVeil':
+    'ヴェールの間、姿は{drift}秒ごとに位置をずらし、破裂した分身は溺れた下僕を残す。',
+  'bossJournal.temple.selthe.overview':
+    '聖歌母は池の中から歌い、動かず、近接攻撃もしない。プレイヤーに印をつけて、全員で分け合う合唱と、1人で受ける独唱を起こし、1人に向けて高まるアリアのビームを放ち、中庭に波を送る。矢もアリアも中断できる。',
+  'bossJournal.temple.selthe.phaseName': '聖歌の中庭',
+  'bossJournal.temple.selthe.phaseSummary':
+    'フェーズは1つで、すべてタイマー式。詠唱中に発動時刻が来た技は、詠唱が終わるまで待つ。',
+  'bossJournal.temple.selthe.chorusName': '合唱',
+  'bossJournal.temple.selthe.chorusSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人が{mark}秒間マークされる。終了時、そのプレイヤーの周囲{radius}ヤード以内の全員で{total}ダメージを等分する。',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人が{mark}秒間マークされる。終了時、そのプレイヤーの周囲{radius}ヤード以内の全員で{total}ダメージを等分する。反響: {echo}秒後に同じ場所がもう一度爆発し、残っている各プレイヤーに{echoDamage}を与える。こちらは分割されない。',
+  'bossJournal.temple.selthe.chorusResponse':
+    '全員で合唱の対象に集まり、反響の前にその場所を離れる。',
+  'bossJournal.temple.selthe.soloSummary':
+    '各合唱の{offset}秒後に、別のプレイヤー1人が{mark}秒間マークされる。終了時、マークされたプレイヤーと周囲{radius}ヤード以内の全員が{damage}ダメージを受ける。',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    '二重唱: 独唱が合唱と同時に、別のプレイヤーに発動する。終了時、マークされたプレイヤーと周囲{radius}ヤード以内の全員が{damage}を受け、{echo}秒後にその場所がもう一度爆発する。',
+  'bossJournal.temple.selthe.soloResponse': '独唱の対象は、全員から離れてから、その場所を離れる。',
+  'bossJournal.temple.selthe.songSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中庭の全プレイヤーに{min}〜{max}の冷気ダメージ。',
+  'bossJournal.temple.selthe.songResponse':
+    '避けられない。ヒーラーは全員の体力を常に満たしておく。',
+  'bossJournal.temple.selthe.boltSummary':
+    '通常攻撃にあたる技。{cast}秒の詠唱で、ターゲットに近接攻撃の{mult}倍の冷気ダメージを与える。中断された後は、{quiet}秒間、矢もアリアも使わない。',
+  'bossJournal.temple.selthe.boltResponse': 'アリアが来ない間に矢を中断する。',
+  'bossJournal.temple.selthe.ariaSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人に向けて{channel}秒間ビームを放つ。{pulses}回の脈動が、同じ相手に{min}から{max}まで増えていく。ビームに踏み込んだプレイヤーが脈動を代わりに受け、増加は最初からやり直しになる。',
+  'bossJournal.temple.selthe.ariaResponse':
+    '中断するか、灯りの柱の陰で射線を切るか、ビームに踏み込んで分け合う。',
+  'bossJournal.temple.selthe.surgeSummary':
+    '{every}秒ごとに、タンク以外のプレイヤーを狙って{cast}秒の詠唱の後、{arc}度、長さ{range}ヤードの波を放つ。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.temple.selthe.surgeResponse': '横へ動いて扇形から出る。',
+  'bossJournal.temple.selthe.tipTank':
+    '彼女から見える位置に立ち、矢を自分に向けさせる。ここでタンクが処理すべき技はほかにない。',
+  'bossJournal.temple.selthe.tipHealer':
+    '海の歌は{every}秒ごとに全員に当たる。アリアの対象と、合唱で孤立した人に注意。',
+  'bossJournal.temple.selthe.tipDamage':
+    '合唱では集まり、独唱では散り、アリアを中断し、湖の大波から出る。',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    '合唱での集合と独唱での散開が同時に来る。反響の前に両方の場所を離れる。アリアを中断する。',
+  'bossJournal.temple.selthe.choiceName': 'アリアを中断するか、受け止めるか?',
+  'bossJournal.temple.selthe.choiceGain':
+    '中断か柱で、ビームはすぐに止まる。ビームに踏み込むと、増加は自分の上で最初からやり直しになる。',
+  'bossJournal.temple.selthe.choiceRisk':
+    'アリアを中断すると矢もしばらく止まるが、誰も動かなければ、増加しきった脈動が1人に集中する。',
+  'bossJournal.temple.selthe.heroicDuet': '二重唱: 合唱と独唱が、2人に同時に発動する。',
+  'bossJournal.temple.selthe.heroicEcho':
+    '反響: 各マークが{echo}秒後に同じ場所でもう一度爆発する。',
+  'bossJournal.temple.hydra.overview':
+    '3つの首が3つの属性、氷、毒、水を持ち、1つの戦闘を共有する。倒れた首は攻撃を次の首に引き継ぎ、ほかの首が生きている間は{regrow}秒後に生え戻る。大波がタイマーで池の半分を洗い、波の合間には2つの首がブレスを合体させる。',
+  'bossJournal.temple.hydra.phaseName': 'ヒュドラの池',
+  'bossJournal.temple.hydra.phaseSummary':
+    '左の首は氷を吐き、中央の首は毒を吐きかけ、右の首は水を放つ。',
+  'bossJournal.temple.hydra.phaseComboName': '合体ブレス',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    '各波の{after}秒後に2つの首が合体する。順番は常に、凍てつく激流、毒の潮流、毒の霧氷。',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    '各波の{early}秒後と{after}秒後に2つの首が合体する。順番は、凍てつく激流、毒の潮流、毒の霧氷。',
+  'bossJournal.temple.hydra.headsName': '三つの首',
+  'bossJournal.temple.hydra.headsSummary':
+    '倒れた首は属性を次の首に渡し、生きている首は倒れた首1本につき与ダメージが{enrage}増える。ほかの首が生きている間、倒れた首は{regrow}秒後に体力{share}で生え戻る。',
+  'bossJournal.temple.hydra.headsResponse': '3本を同時に倒し、{regrow}秒以内に仕留める。',
+  'bossJournal.temple.hydra.breathSummary':
+    '{every}秒ごとに、タンク以外のプレイヤーを狙って{cast}秒の詠唱の後、{arc}度、長さ{range}ヤードの氷の円錐を吐く。{min}〜{max}ダメージと、{seconds}秒間の{slow}の移動速度低下。',
+  'bossJournal.temple.hydra.breathResponse': '円錐から出る。',
+  'bossJournal.temple.hydra.spitName': '毒の吐きかけ',
+  'bossJournal.temple.hydra.spitSummary':
+    '{every}秒ごとに、別々のプレイヤーの足元にある半径{radius}ヤードの毒の池が最大{count}個、{warn}秒後に破裂する。{min}〜{max}ダメージの後、その場で{seconds}秒間、毎秒{perSecond}の毒が燃える。',
+  'bossJournal.temple.hydra.spitResponse': '散開してから、池の外へ出る。',
+  'bossJournal.temple.hydra.torrentSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに向けて長さ{length}ヤードの水流を放つ。{min}〜{max}ダメージと{push}ヤードの押し出し。',
+  'bossJournal.temple.hydra.torrentResponse': '横へ動いて水流から出る。',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    '最初は{first}秒、以降は前の波が終わってから{every}秒後。{cast}秒の詠唱の間、首の被ダメージが{reduction}減り、その後、波が池の半分を襲う。{min}〜{max}ダメージと{push}ヤードの押し出し。',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    '最初は{first}秒、以降は前の波が終わってから{every}秒後。{cast}秒の詠唱の間、首の被ダメージが{reduction}減り、その後、波が池の半分を襲う。{min}〜{max}ダメージと押し出し。返し波: {backwash}秒後に、もう半分を波が洗う。',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    'もう半分へ移るか、縁の柱の陰か、氷の壁の陰に入る。首が水中にいる間は攻撃しない。',
+  'bossJournal.temple.hydra.frostlockSummary':
+    'プレイヤーに向けた水流。{min}〜{max}ダメージと{stun}秒の凍結。{wall}秒間残る氷の壁を作る。壁の後ろ{lee}ヤード以内に立てば次の波を防げるが、波は壁を砕く。',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    'プレイヤーに向けた水流。{min}〜{max}ダメージと{stun}秒の凍結。氷の壁を残し、壁の後ろに立てば次の波を防げる。壁が砕けると、壁の周囲{reach}ヤード以内の全員が{shardMin}〜{shardMax}を受ける。',
+  'bossJournal.temple.hydra.frostlockResponse': '水流をかわし、その後、氷の壁を津波の遮蔽に使う。',
+  'bossJournal.temple.hydra.currentSummary':
+    '毒の池が半径{radius}ヤードに広がり、池の中心から外へ{slide}ヤード滑り、毎秒{perSecond}で燃える。',
+  'bossJournal.temple.hydra.currentResponse': '滑る進路から脇へ避ける。',
+  'bossJournal.temple.hydra.rimeSummary':
+    '毒の池が結晶に凍り、{seconds}秒後に破裂する。半径{radius}ヤード以内に{min}〜{max}ダメージ。',
+  'bossJournal.temple.hydra.rimeResponse': '破裂する前に、すべての結晶から離れる。',
+  'bossJournal.temple.hydra.tipTank': '届く首を押さえる。首の攻撃は、ほかの者を狙う。',
+  'bossJournal.temple.hydra.tipHealer':
+    '津波と合体ブレスがダメージのピーク。倒れた首が増えるほど、ほかの首は痛くなる。',
+  'bossJournal.temple.hydra.tipDamage':
+    'ダメージを均等に分け、3本が{regrow}秒以内に倒れるようにする。津波の間は攻撃を止める。',
+  'bossJournal.temple.hydra.choiceName': 'どの首を先に倒す?',
+  'bossJournal.temple.hydra.choiceGain':
+    '3本を同時に倒せば戦闘は終わる。近いタイミングで倒れるなら、順番は問わない。',
+  'bossJournal.temple.hydra.choiceRisk':
+    '倒れた首1本ごとに、ほかの首の与ダメージが{enrage}増え、{regrow}秒後に生え戻る。最後に残った首はすべての属性を使う。',
+  'bossJournal.temple.hydra.heroicChanges': '生え戻った首は体力{share}で戻り、各波は返し波を伴う。',
+  'bossJournal.temple.colossus.overview':
+    '歩くガラスの巨人。体力の節目3か所で、全プレイヤーに自分を追う鏡像が与えられる。自分の鏡像は攻撃できず、生きている鏡像1体ごとに巨像を守る盾になる。その合間には、水流、叩きつけ、1片ずつ砕ける床が襲う。',
+  'bossJournal.temple.colossus.phaseName': 'プリズムのテラス',
+  'bossJournal.temple.colossus.phaseSummary': '詠唱のたびに足を止め、テラスからは決して離れない。',
+  'bossJournal.temple.colossus.phaseFlareName': 'プリズムの閃光',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    '体力が{first}、{second}、{third}になると、潮硝子の映し身を召喚する。',
+  'bossJournal.temple.colossus.lanceSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに向けて長さ{length}ヤードの水流を放つ。{min}〜{max}ダメージ。',
+  'bossJournal.temple.colossus.lanceResponse': '横へ動いて水流から出る。',
+  'bossJournal.temple.colossus.slamSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、半径{radius}ヤード以内に{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.temple.colossus.slamResponse': '近接は範囲から出られる。ヒーラーはタンクを支える。',
+  'bossJournal.temple.colossus.fractureSummary':
+    '最初は{first}秒、以降は{every}秒ごと。床が{slices}片に割れ、{rounds}ラウンド続く。各ラウンドで数片が赤く光り、{warn}秒後に爆発する。{min}〜{max}ダメージ。中央は毎ラウンド爆発する。',
+  'bossJournal.temple.colossus.fractureResponse':
+    '毎ラウンド、安全な床片へ移り、中央には入らない。',
+  'bossJournal.temple.colossus.flareSummary':
+    '{cast}秒のチャネリングの後、全プレイヤーが、巨像の体力{share}を持つ潮硝子の映し身を1体ずつ受け取り、追われる。自分の映し身は攻撃できない。',
+  'bossJournal.temple.colossus.flareResponse': '互いの映し身を倒す。自分のは決して攻撃しない。',
+  'bossJournal.temple.colossus.wardName': 'プリズムの護り',
+  'bossJournal.temple.colossus.wardSummary':
+    '生きている映し身1体ごとに、巨像の被ダメージが{per}減る。上限は{cap}。',
+  'bossJournal.temple.colossus.wardResponse': '映し身を片づけてから、巨像に戻る。',
+  'bossJournal.temple.colossus.shatterName': '砕けるガラス',
+  'bossJournal.temple.colossus.shatterSummary':
+    '映し身が砕けると、その周囲{radius}ヤード以内の全員が{damage}ダメージを受ける。',
+  'bossJournal.temple.colossus.shatterResponse': 'もうすぐ倒れる映し身のそばに立たない。',
+  'bossJournal.temple.colossus.swapName': '入れ替わる像',
+  'bossJournal.temple.colossus.swapSummary':
+    '{every}秒ごとに映し身の持ち主が入れ替わり、どの像を攻撃できるかが変わる。',
+  'bossJournal.temple.colossus.swapResponse': '入れ替わるたびに、攻撃できる像を確かめ直す。',
+  'bossJournal.temple.colossus.tipTank':
+    '閃光のたびに巨像を取り直す。巨像はターゲットを追って歩く。',
+  'bossJournal.temple.colossus.tipHealer':
+    '映し身は持ち主を攻撃する。潮硝子の亀裂は、赤い床片に残った者を罰する。',
+  'bossJournal.temple.colossus.tipDamage':
+    '閃光のたびに仲間の映し身を倒し、亀裂では1片ずつ移動する。',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    '閃光のたびに仲間の映し身を倒す。入れ替わったら確かめ直す。倒れかけの像のそばに立たない。',
+  'bossJournal.temple.colossus.choiceName': '映し身を倒すか、巨像を倒すか?',
+  'bossJournal.temple.colossus.choiceGain':
+    '像を倒せば、最大{cap}のダメージ軽減がなくなり、追われることもなくなる。',
+  'bossJournal.temple.colossus.choiceRisk':
+    '像に費やした時間は巨像を攻撃できない時間になり、ヒロイックでは像が砕けるたびに爆発する。',
+  'bossJournal.temple.colossus.heroicShatter':
+    '砕けるガラス: 映し身が砕けると、周囲{radius}ヤード以内の全員が傷つく。',
+  'bossJournal.temple.colossus.heroicSwap':
+    '入れ替わる像: 映し身の持ち主が{every}秒ごとに入れ替わる。',
+  'bossJournal.temple.ysolei.overview':
+    '溺月の化身は、全員を引き寄せて叩きつけ、島の半分を水没させ、月の落とし子を呼び、月光の涙を自分に向けて転がす。最後は、グループが間に合って護りを破らない限り、月が落ちる。',
+  'bossJournal.temple.ysolei.phaseAltarName': '月の祭壇',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    '動かない。リーチが長く、近接は中心から離れて立つ。',
+  'bossJournal.temple.ysolei.phaseTideName': '満ち潮',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    '体力が{health}になると島の半分が水没し、以後、水没する側が入れ替わる。',
+  'bossJournal.temple.ysolei.phaseMoonSummary': '体力が{health}になると、月を呼び落とす。',
+  'bossJournal.temple.ysolei.lunarSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中心から半径{radius}ヤード以内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.temple.ysolei.lunarResponse':
+    '遠隔は範囲の外にいる。近接は常に範囲内なので、ヒーラーが支える。',
+  'bossJournal.temple.ysolei.undertowSummary':
+    '{every}秒ごとに{seconds}秒間チャネリングし、全員を毎秒{pull}ヤードで自分へ引き寄せる。その後、潮の激突: 半径{radius}ヤード以内に{min}〜{max}ダメージ。',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    '{every}秒ごとに{seconds}秒間チャネリングし、全員を自分へ引き寄せる。その後、潮の激突: 半径{radius}ヤード以内に{min}〜{max}ダメージ。離岸流: 各プレイヤーが立っていた場所に池が開き、{pool}秒間、毎秒{riptide}で燃える。',
+  'bossJournal.temple.ysolei.undertowResponse':
+    'チャネリング中は、近接も含め全員が乾いた地面へ走って出る。水没した場所では動きが遅くなる。',
+  'bossJournal.temple.ysolei.tearsSummary':
+    '体力が{first}と{second}になると、自分へ転がる月光の涙を{count}個呼ぶ。涙はプレイヤーに触れると止まる。{min}〜{max}ダメージに加え、月焼けのスタックごとに{bonus}が上乗せされる。月焼けは{sear}秒続く。涙が彼女に届くと、戦闘中の与ダメージが{swell}増え、体力が{heal}回復する。',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    '体力が{first}と{second}になると、自分へ転がる月光の涙を{count}個呼ぶ。涙はプレイヤーに触れると止まる。{min}〜{max}ダメージに加え、月焼けのスタックごとに{bonus}が上乗せされ、毎秒{glow}で燃えるこぼれた月光が残る。涙が彼女に届くと、与ダメージが{swell}増え、体力が{heal}回復する。',
+  'bossJournal.temple.ysolei.tearsResponse':
+    'すべての涙を体で受け止め、交代で受けて、誰も月焼けを重ねないようにする。',
+  'bossJournal.temple.ysolei.tideName': '満ち潮',
+  'bossJournal.temple.ysolei.tideSummary':
+    '体力が{health}になると、島の半分が一度に水没する。{every}秒ごとに水没する側が入れ替わり、その前に{warn}秒間水面がきらめく。水中では毎秒{perSecond}のダメージと{slow}の移動速度低下。',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    '体力が{health}になると、島の半分が一度に水没する。{every}秒ごとに水没する側が入れ替わる。水中では毎秒{perSecond}のダメージと{slow}の移動速度低下。溺れた月: {moonEvery}秒ごとに、水没した側から月の落とし子が這い上がる。',
+  'bossJournal.temple.ysolei.tideResponse': '乾いた側に留まり、反対側がきらめいたら移動する。',
+  'bossJournal.temple.ysolei.callSummary':
+    '体力が{first}と{second}になると、月の落とし子を{count}体呼ぶ。',
+  'bossJournal.temple.ysolei.callResponse': 'タンクが引き受け、ダメージ役が倒す。',
+  'bossJournal.temple.ysolei.moonSummary':
+    '体力の{ward}分の護りに守られた{cast}秒の詠唱。間に合って護りを破ると、{stun}秒スタンし、被ダメージが{vuln}増える。護りが残った場合は、島にいる全員に{min}〜{max}ダメージを与え、以後の戦闘中、与ダメージが{might}増える。',
+  'bossJournal.temple.ysolei.moonResponse':
+    'ダメージ役は全員で護りを攻撃し、ヒーラーは衝撃に備える。',
+  'bossJournal.temple.ysolei.tipTank':
+    '月の落とし子をすべて引き受ける。全員と一緒に引き潮から走り出る。',
+  'bossJournal.temple.ysolei.tipHealer':
+    '月の潮は詠唱のたびに近接に当たる。涙は月焼けを重ねる。涙を止めた人を回復する。',
+  'bossJournal.temple.ysolei.tipDamage':
+    '引き潮からは必ず走り出て、交代で涙を止め、月の落とし子を倒し、落ちる月の護りを削りきる。',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    '引き潮とその離岸流の池から必ず走り出て、交代で涙を止め、月の落とし子を倒し、落ちる月の護りを素早く削りきる。',
+  'bossJournal.temple.ysolei.choiceName': '涙を止めるか、通すか?',
+  'bossJournal.temple.ysolei.choiceGain':
+    '止めた涙は彼女に届かない。与ダメージ{swell}の強化も、{heal}の回復もない。',
+  'bossJournal.temple.ysolei.choiceRisk':
+    '止めた人はダメージと月焼け1スタックを受け、次にその人に当たる涙は{bonus}強くなる。交代で止めること。',
+  'bossJournal.temple.ysolei.heroicRiptide':
+    '離岸流: 引き潮のたびに、プレイヤーが立っていた場所に燃える池が残る。',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    '溺れた月: {moonEvery}秒ごとに、洪水の中から月の落とし子が這い上がる。',
+  'bossJournal.temple.ysolei.heroicTears': '1波につき涙{count}個。落ちる月の詠唱は{cast}秒続く。',
 };

@@ -109,6 +109,7 @@ const BUDDY_LORE: Readonly<Record<string, TranslationKey>> = {
   horse: 'hudChrome.collections.buddyLore.horse',
   crystal_lich: 'hudChrome.collections.buddyLore.crystal_lich',
   forgemaw: 'hudChrome.collections.buddyLore.forgemaw',
+  sprites: 'hudChrome.collections.buddyLore.sprites',
 };
 
 /** The authored text of one set bonus tier, through the same entity key the

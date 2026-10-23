@@ -9,9 +9,10 @@
 //   npx vite --port 5183
 //   GAME_URL=http://localhost:5183 SHOTS_DIR=tmp/tavern GPU=1 node scripts/mirefen_tavern_shot.mjs
 //
-// GRAPHICS_PRESET picks the preset (1 low, 2 medium, 3 high, the default, 4 ultra). ONLY limits
-// the run to a comma list of shot names; PREFIX and SUFFIX wrap every file name. WALKS=1 adds
-// the walks in and out (WALKS_ONLY=1 takes only those).
+// GPU=1 draws on the GPU (ANGLE over D3D11 on Windows, over Metal on macOS) rather than
+// SwiftShader. GRAPHICS_PRESET picks the preset (1 low, 2 medium, 3 high, the default, 4 ultra).
+// ONLY limits the run to a comma list of shot names; PREFIX and SUFFIX wrap every file name.
+// WALKS=1 adds the walks in and out (WALKS_ONLY=1 takes only those).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -40,7 +41,11 @@ const browser = await puppeteer.launch({
   args: [
     `--window-size=${WIDTH},${HEIGHT}`,
     ...(GPU
-      ? ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist']
+      ? [
+          `--use-angle=${process.platform === 'darwin' ? 'metal' : 'd3d11'}`,
+          '--enable-gpu',
+          '--ignore-gpu-blocklist',
+        ]
       : ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']),
   ],
   defaultViewport: { width: WIDTH, height: HEIGHT },

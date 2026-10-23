@@ -62,7 +62,9 @@ async function load(tier: Tier) {
   const { buildWater, hasWaterShaderAssets } = await import('../src/render/water');
   const { UnderwaterView: View } = await import('../src/render/underwater');
   await Promise.resolve();
-  expect(hasWaterShaderAssets()).toBe(tier !== 'low');
+  // The shader water reads no image asset; GFX.standardMaterials alone picks
+  // it (the low tier draws the Phong plane, which has no underside).
+  expect(hasWaterShaderAssets()).toBe(true);
   return { water: buildWater(SEED), view: new View(tier === 'low') };
 }
 

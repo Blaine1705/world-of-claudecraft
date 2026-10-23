@@ -411,13 +411,23 @@ describe('generated chunk geometry is stable', () => {
     // tests/eastbrook_placed_buildings.test.ts (the quay to the bit, no ground
     // crossing the sea surface). Computed twice in separate processes.
     // Re-minted for the World of ClaudeCraft Studio map's arrangement of the
-    // same town: the buildings moved to that map's sites on grids of level
-    // stamps, the churchyard and the strand camp moved with their calm pads,
-    // the chapel-rise ruin and the north road's old line gave way to the
-    // smithy, and the moved NPCs carried their calm pads. The quay and the
-    // coastline are still pinned by tests/eastbrook_placed_buildings.test.ts.
-    // Computed twice in separate processes.
-    expect(digestOf(inRect)).toBe('524a6cac34e20d3be66afb854ef72f50');
+    // same town plus the Genshin Impact terrain palette, meadow splat, beach
+    // sand strand, road verge, non-directional cliff stone mottling, and Low-tier
+    // baked canopy and building contact shadows.
+    // Re-minted for Wayfarer Bryn standing by the docks spawn again: her calm
+    // pad reshapes the ground around (-79, -52), about twenty points of the
+    // dense height atlas (tests/terrain_height_parity.test.ts, re-minted with it).
+    // Re-minted after aligning BIOME_PALETTE.marsh with Eastbrook's vale meadow
+    // palette (which blends across the z = 150..215 northern border strip).
+    // Re-minted for the six Stolen Supply Crates moving off the eastern
+    // hillside into the bandit camps: their ground-object calm pads leave the
+    // slope. Checked against the dense height atlas re-minted in the same
+    // commit: 13 points move, all within 17 yd of an old crate spot, by at
+    // most 2.7 yd. Measured on the merged tree, twice in separate processes.
+    // Re-minted for the freight yard and ferry bell moving to the quay. The
+    // dense height atlas changes at 74 of 167,188 samples, all within 5.93 yd
+    // of an old or new object position (maximum height delta 2.84 yd).
+    expect(digestOf(inRect)).toBe('3d621f9335e944b43575c00e60652941');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

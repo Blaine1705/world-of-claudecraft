@@ -17,6 +17,7 @@ import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from '
 export interface HauntFeaturesView {
   group: THREE.Group;
   glowLights: THREE.PointLight[];
+  animated: THREE.Object3D[];
   update(time: number): void;
 }
 
@@ -26,7 +27,7 @@ const WOOD_ZMAX = 1820;
 // The giant trees are the Eldershine's twisted-elder model (realm_flora
 // already preloads the same URL, so the loader cache makes this free),
 // cloned per greatTrees record and darkened into haunted silhouettes.
-const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+const GREAT_TREE_URL = '/models/foliage/twisted_1_lod.glb';
 let greatTreeScene: THREE.Group | null = null;
 registerDeferredPreload(() =>
   loadGltf(GREAT_TREE_URL).then((gltf) => {
@@ -198,6 +199,7 @@ export function buildHauntFeatures(
   return {
     group,
     glowLights,
+    animated: [...mists.map((m) => m.mesh), ...wisps.map((w) => w.sprite)],
     update(time: number): void {
       // the mist breathes and slowly slides; the ghost-lights wander their
       // little circuits like someone pacing a grave row

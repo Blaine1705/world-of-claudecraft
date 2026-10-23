@@ -11,6 +11,7 @@ import {
   membershipItemLevel,
   referralArmourItem,
 } from '../sim/membership_armour';
+import { isMembershipWeapon } from '../sim/membership_weapon';
 import type { ItemDef, ItemInstancePayload, PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { esc } from './esc';
@@ -53,7 +54,7 @@ export function membershipTooltipInstance(
 ): ItemInstancePayload | undefined {
   const active = wearer.membershipActive === true;
   const referralInviterName = wearer.referralInviterName;
-  return (isMembershipArmour(item.id) && !active) ||
+  return ((isMembershipArmour(item.id) || isMembershipWeapon(item.id)) && !active) ||
     (isReferralArmour(item.id) && !referralInviterName)
     ? undefined
     : instance;
@@ -63,10 +64,11 @@ export function membershipTooltipEquipment(
   world: MembershipTooltipWorld & Pick<IWorld, 'equipment' | 'equipmentInstances'>,
 ): { equipment: IWorld['equipment']; instances: IWorld['equipmentInstances'] } {
   const instances = { ...world.equipmentInstances };
-  for (const slot of MEMBERSHIP_ARMOUR_SLOTS) {
+  for (const slot of [...MEMBERSHIP_ARMOUR_SLOTS, 'mainhand', 'offhand'] as const) {
     const id = world.equipment[slot] ?? '';
     if (
-      (isMembershipArmour(id) && world.player.membershipActive !== true) ||
+      ((isMembershipArmour(id) || isMembershipWeapon(id)) &&
+        world.player.membershipActive !== true) ||
       (isReferralArmour(id) && !world.player.referralInviterName)
     )
       delete instances[slot];
@@ -88,23 +90,31 @@ export function membershipItemTooltipLines(
     )}</div>`;
   }
   const referral = isReferralArmour(item.id);
-  if (!isMembershipArmour(item.id) && !referral) return '';
+  if (!isMembershipArmour(item.id) && !isMembershipWeapon(item.id) && !referral) return '';
   const line = (text: string, css = 'tt-desc'): string => `<div class="${css}">${esc(text)}</div>`;
   return (
-    line(t('itemUi.tooltip.membershipAdaptive')) +
     line(
-      t(level >= 20 ? 'itemUi.tooltip.membershipPerfected' : 'itemUi.tooltip.membershipScaling', {
+      t(
+        isMembershipWeapon(item.id)
+          ? 'itemUi.tooltip.membershipWeaponAdaptive'
+          : 'itemUi.tooltip.membershipAdaptive',
+      ),
+    ) +
+    line(
+      t('itemUi.tooltip.membershipScaling', {
         level: itemNumber(membershipItemLevel(level)),
       }),
       'tt-sub',
     ) +
-    line(
-      t(referral ? 'itemUi.tooltip.referralFullSet' : 'itemUi.tooltip.membershipFullSet', {
-        member: referralInviterName ?? t('itemUi.tooltip.referralInviter'),
-        pieces: itemNumber(MEMBERSHIP_ARMOUR_SLOTS.length),
-        percent: itemNumber((MEMBERSHIP_XP_MULTIPLIER - 1) * 100),
-      }),
-    ) +
+    (isMembershipWeapon(item.id)
+      ? ''
+      : line(
+          t(referral ? 'itemUi.tooltip.referralFullSet' : 'itemUi.tooltip.membershipFullSet', {
+            member: referralInviterName ?? t('itemUi.tooltip.referralInviter'),
+            pieces: itemNumber(MEMBERSHIP_ARMOUR_SLOTS.length),
+            percent: itemNumber((MEMBERSHIP_XP_MULTIPLIER - 1) * 100),
+          }),
+        )) +
     (referral
       ? line(
           t(

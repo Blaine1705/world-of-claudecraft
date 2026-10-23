@@ -20,7 +20,7 @@ import {
   BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
-  GATHER_NODES,
+  gatherNodesInActiveWorld,
   instanceOrigin,
   NPCS,
   setActiveWorldContent,
@@ -249,7 +249,7 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
     let ore = 0;
     let wood = 0;
     let herb = 0;
-    for (const node of GATHER_NODES) {
+    for (const node of gatherNodesInActiveWorld()) {
       const body = GATHER_NODE_BODIES[node.type];
       if (!body) {
         expect(node.type).toBe('herb');
@@ -383,54 +383,62 @@ describe('rebuild market stall (flat canopy at the authored height)', () => {
 });
 
 describe('chapel flows', () => {
-  // Re-anchored to Icemantle's chapel (Frostveil): the v0.31 civic rebuild
-  // replaced the Eastbrook chapel with a kit GLB (full-height OBB), and the
-  // Highwatch rebuild replaced the zone3 one with a painted building; the
-  // composed tower-plus-hall physics now lives wherever the legacy
-  // procedural chapel still stands.
+  // The legacy procedural chapel (a 'chapel' record with no assetId) is COMPOSED:
+  // a full-height bell tower behind a squat, standable entry hall (colliders.ts).
+  // The rebuilds replaced every one the built-in world stood (the Eastbrook civic
+  // kit, Highwatch, then the painted towns of sim/painted_towns/), so the flow
+  // stands its own fixture chapel, the walls fixture's way: the record Icemantle's
+  // plaza last carried, at its old spot, size and turn, on ground checked open.
   const rot = -2;
   const cx = -18;
   const cz = 1570;
   const fx = Math.sin(rot);
   const fz = Math.cos(rot);
+  const chapel = { kind: 'chapel' as const, x: cx, z: cz, w: 5, d: 7, rot };
 
   it('climb the hall roof, walk into the tower face (blocked), fall off a side', () => {
-    const chapel = BUILTIN_WORLD.props.buildings.find(
-      (b) => b.kind === 'chapel' && !b.assetId && b.x === cx && b.z === cz,
-    );
-    // a rebuild that replaces this chapel moves the flow to another procedural one
-    expect(chapel, 'the procedural chapel this flow stands on').toMatchObject({ rot, w: 5, d: 7 });
-    const sim = makeSim();
-    const startX = cx + fx * (3.5 + 1.7);
-    const startZ = cz + fz * (3.5 + 1.7);
-    teleport(sim, startX, startZ, Math.atan2(cx - startX, cz - startZ));
-    const p = sim.player;
-    let onRoof = false;
-    for (let i = 0; i < 120 && !onRoof; i++) {
-      hold(sim, { forward: true, jump: true }, 1);
-      const g = groundHeight(p.pos.x, p.pos.z, SEED);
-      if (p.onGround && p.pos.y - g > CHAPEL_HALL_ROOF_EAVE - 0.1) onRoof = true;
+    expect(isBlocked(SEED, cx, cz, 4.5), 'open ground for the fixture chapel').toBe(false);
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      props: { ...BUILTIN_WORLD.props, buildings: [...BUILTIN_WORLD.props.buildings, chapel] },
+    });
+    try {
+      const sim = makeSim();
+      const startX = cx + fx * (3.5 + 1.7);
+      const startZ = cz + fz * (3.5 + 1.7);
+      teleport(sim, startX, startZ, Math.atan2(cx - startX, cz - startZ));
+      const p = sim.player;
+      let onRoof = false;
+      for (let i = 0; i < 120 && !onRoof; i++) {
+        hold(sim, { forward: true, jump: true }, 1);
+        const g = groundHeight(p.pos.x, p.pos.z, SEED);
+        if (p.onGround && p.pos.y - g > CHAPEL_HALL_ROOF_EAVE - 0.1) onRoof = true;
+      }
+      expect(onRoof).toBe(true);
+      // Walk toward the tower: must stop against it, never pass or climb it.
+      hold(sim, { forward: true }, 40);
+      const gAfter = groundHeight(p.pos.x, p.pos.z, SEED);
+      expect(p.pos.y - gAfter).toBeLessThanOrEqual(CHAPEL_HALL_ROOF_TOP + 0.05);
+      expect(p.onGround).toBe(true);
+      // Head back and off the front: clean landing, no fall damage.
+      p.facing = Math.atan2(fx, fz);
+      const hpBefore = p.hp;
+      hold(sim, { forward: true }, 50);
+      expect(p.hp).toBe(hpBefore);
+      expect(p.onGround).toBe(true);
+      expect(p.pos.y - groundHeight(p.pos.x, p.pos.z, SEED)).toBeLessThan(0.1);
+    } finally {
+      setActiveWorldContent(null);
     }
-    expect(onRoof).toBe(true);
-    // Walk toward the tower: must stop against it, never pass or climb it.
-    hold(sim, { forward: true }, 40);
-    const gAfter = groundHeight(p.pos.x, p.pos.z, SEED);
-    expect(p.pos.y - gAfter).toBeLessThanOrEqual(CHAPEL_HALL_ROOF_TOP + 0.05);
-    expect(p.onGround).toBe(true);
-    // Head back and off the front: clean landing, no fall damage.
-    p.facing = Math.atan2(fx, fz);
-    const hpBefore = p.hp;
-    hold(sim, { forward: true }, 50);
-    expect(p.hp).toBe(hpBefore);
-    expect(p.onGround).toBe(true);
-    expect(p.pos.y - groundHeight(p.pos.x, p.pos.z, SEED)).toBeLessThan(0.1);
   });
 });
 
 // Generic gabled market stand (no assetId) keeps the sloped-canopy physics
 // pinned. The old Fenbridge (-5, 310.5) stand was replaced by the rebuild
-// provision stall GLB, so this suite uses an open-field zone2 stand instead.
-const LEGACY_STALL = { x: -365, z: 359, rot: 0.5 };
+// provision stall GLB, so this suite uses Bridgemere's stand instead, re-pinned
+// 2026-10 to the forecourt where the painted rebuild moved it (the island inn
+// covers its old spot).
+const LEGACY_STALL = { x: -370, z: 349.5, rot: 0.5 };
 // local +Z (eave approach) in the stall yaw convention.
 const LEGACY_STALL_APPROACH = {
   x: Math.sin(LEGACY_STALL.rot),
@@ -506,8 +514,9 @@ describe('dock flows', () => {
 describe('abilities x collision', () => {
   it('Vaulting Charge onto the stall canopy seats on the sampled gable, and off again', () => {
     const sim = makeSim();
-    const approachX = LEGACY_STALL.x + LEGACY_STALL_APPROACH.x * 5.5;
-    const approachZ = LEGACY_STALL.z + LEGACY_STALL_APPROACH.z * 5.5;
+    // 4 yd out: open street (Bridgemere's inn step stands 5.5 yd out this side)
+    const approachX = LEGACY_STALL.x + LEGACY_STALL_APPROACH.x * 4;
+    const approachZ = LEGACY_STALL.z + LEGACY_STALL_APPROACH.z * 4;
     teleport(
       sim,
       approachX,

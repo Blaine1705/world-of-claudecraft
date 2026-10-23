@@ -15,6 +15,7 @@ import {
   isFenbridgeRebuildWell,
 } from '../render/fenbridge_town';
 import { isHighwatchRebuildBuilding } from '../render/highwatch_town';
+import { isPaintedTownRebuildBuilding } from '../render/painted_towns';
 import { PROP_NATURAL_SIZE } from '../render/prop_natural_size.generated';
 import { PROP_ASSET_DEFS } from '../render/props';
 import { STREETLAMP_FIXTURE } from '../render/streetlamp_fixture.generated';
@@ -220,7 +221,8 @@ export function legacyWorldMajorPropPlacements(
     if (
       isEastbrookRebuildBuilding(building) ||
       isFenbridgeRebuildBuilding(building) ||
-      isHighwatchRebuildBuilding(building)
+      isHighwatchRebuildBuilding(building) ||
+      isPaintedTownRebuildBuilding(building)
     ) {
       continue;
     }
@@ -801,7 +803,8 @@ function authoredTownProps(
       (b) =>
         isEastbrookRebuildBuilding(b) ||
         isFenbridgeRebuildBuilding(b) ||
-        isHighwatchRebuildBuilding(b),
+        isHighwatchRebuildBuilding(b) ||
+        isPaintedTownRebuildBuilding(b),
     ),
     wells: props.wells.filter((w) => isEastbrookRebuildWell(w) || isFenbridgeRebuildWell(w)),
     stalls: props.stalls.filter((s) => isEastbrookRebuildStall(s) || isFenbridgeRebuildStall(s)),

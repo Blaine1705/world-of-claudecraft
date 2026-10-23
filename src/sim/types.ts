@@ -9287,6 +9287,15 @@ export type SimEvent = { pid?: number } & (
   | { type: 'worldQuestWeeklyChosen'; questId: string }
   | { type: 'worldQuestWeeklyProgress'; questId: string; count: number; required: number }
   | { type: 'worldQuestWeeklyDone'; questId: string }
+  // Lantern Hall, the Highwatch adventurers' guild (src/sim/guild_contracts.ts,
+  // src/sim/guild_quartermaster.ts, src/sim/highwatch_guild.ts): a resident opens the guild
+  // window on a tab or the Dungeon Finder; a contract paid its seals; a cosmetic was bought
+  // or refused. All personal (pid); the client owns every visible string.
+  | { type: 'guildHallOpen'; tab: 'contracts' | 'quartermaster' }
+  | { type: 'guildRecruiterOpen' }
+  | { type: 'guildContractDone'; contractId: string; seals: number }
+  | { type: 'guildCosmeticBought'; offerId: string }
+  | { type: 'guildCosmeticRefused'; offerId: string; reason: GuildCosmeticRefusal }
   /** A big on-screen line for a shared world-quest moment (the client owns the
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
@@ -11110,6 +11119,10 @@ export interface HeightStamp {
   noiseSize?: number;
   noiseSeed?: number;
   noiseRough?: number;
+  /** A Studio map's permanent id for this stamp, so a change-only push can
+   *  tell which stamps an edit added or erased (editor/map_merge_core.ts).
+   *  The terrain ignores it; the game-ready projection drops it. */
+  id?: string;
 }
 
 // A freely placed GLB model the editor drops onto the world. Rendered by the
@@ -11832,8 +11845,8 @@ export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
 // and reserved 1_000_000_x singleton ids (the Vale Cup groundskeeper, FURY in
 // Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, the
-// Wyrmwatch harbormaster, the Eastbrook vault keeper, the Highwatch manor
-// steward, practice dummies, the Mirefen innkeeper; each id
+// Wyrmwatch harbormaster, the Eastbrook vault keeper, practice dummies, the Mirefen
+// innkeeper; each id
 // is taken ONCE, tests/reserved_singleton_entity_ids.test.ts pins the band). A singleton NPC takes a reserved id AND
 // `dynamic: true` so the generic world-init loop skips it: that loop allocates
 // ids by iterating the merged NPC table in insertion order, so a plain
@@ -11972,6 +11985,8 @@ export type MapPresentationMode =
   | 'yumiMaze';
 
 export interface WorldContent {
+  /** Editor preview of the live overworld: retain release terrain, scenery and movement rules. */
+  liveWorldPreview?: true;
   zones: ZoneDef[];
   camps: CampDef[];
   npcs: Record<string, NpcDef>;
@@ -12130,6 +12145,9 @@ export interface WorldContent {
   // resolves through sim/moved_objects.ts with the built-in row as the
   // fallback. Frozen; absent for the built-in world.
   objectMoves?: ObjectMoves;
+  // Declarative Fenbridge town layout touch-ups (moved painted buildings,
+  // civic props, NPCs, and added cottage pads).
+  fenbridgeTouchup?: import('./fenbridge_touchup').FenbridgeTouchup;
 }
 
 /**
@@ -12194,6 +12212,11 @@ export interface PromotedScenery {
    *  before Highwatch was rebuilt carries authoredTowns and none of these
    *  placements, so it keeps the town-drawn buildings. */
   highwatchTown?: boolean;
+  /** The painted towns' rebuild BUILDINGS (sim/painted_towns/, every town
+   *  after Highwatch): the town views' building loops, the record colliders
+   *  and the walk-in floors stand down. One family for all of them (they
+   *  arrived together), its own for the vault's reason. */
+  paintedTowns?: boolean;
 }
 
 /** The resolved storage price tables every sim price read consumes: bank slot
@@ -13480,3 +13503,8 @@ export interface VehicleSession {
   origin: Vec3;
   encounter: CannonEncounterState;
 }
+
+/** Why Lantern Hall's quartermaster refused a purchase (src/sim/guild_quartermaster.ts): out of
+ *  reach, already owned, short of seals, the horse's reins to a rider who cannot ride yet, or
+ *  no bag room for the reins. The client owns every visible string. */
+export type GuildCosmeticRefusal = 'owned' | 'seals' | 'range' | 'riding' | 'bags';

@@ -14,6 +14,8 @@ import {
   weaponTypeForItem,
 } from '../src/sim/content/weapon_skin_rules';
 import {
+  RESERVED_WEAPON_SKIN_IDS,
+  STORE_WEAPON_SKIN_LIST,
   WEAPON_SKIN_COLLECTIONS,
   WEAPON_SKIN_LIST,
   WEAPON_SKINS,
@@ -28,7 +30,27 @@ const ROOT = join(__dirname, '..');
 
 describe('season 1 weapon skin catalog', () => {
   it('ships exactly the 29 paid skins: 7 per collection plus the Fallen Star encore', () => {
-    expect(WEAPON_SKIN_LIST.length).toBe(29);
+    expect(STORE_WEAPON_SKIN_LIST.length).toBe(29);
+    // plus five skins the store never sells: Lantern Hall's earned blade, and four elemental arms
+    // reserved for a future raid (obtainable nowhere yet), outside the store's collections
+    expect(WEAPON_SKIN_LIST.length).toBe(34);
+    expect(WEAPON_SKIN_LIST.filter((s) => s.earnedFrom).map((s) => s.id)).toEqual([
+      'lantern_hall_sword',
+      'hearthbrand_sword',
+      'squallcrest_sword',
+      'rimelight_staff',
+      'duskwick_staff',
+    ]);
+    expect(
+      WEAPON_SKIN_LIST.filter((s) => s.earnedFrom === 'lantern_hall').map((s) => s.id),
+    ).toEqual(['lantern_hall_sword']);
+    expect(RESERVED_WEAPON_SKIN_IDS).toEqual([
+      'hearthbrand_sword',
+      'squallcrest_sword',
+      'rimelight_staff',
+      'duskwick_staff',
+    ]);
+    expect(WEAPON_SKIN_COLLECTIONS).not.toContain('lantern_hall');
     for (const collection of WEAPON_SKIN_COLLECTIONS) {
       const inCollection = WEAPON_SKIN_LIST.filter((s) => s.collection === collection);
       expect(inCollection.length, collection).toBe(collection === 'fallen_star' ? 8 : 7);
@@ -808,6 +830,10 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
           // blade clips its melee overrides name, and the bow donor's draw.
           animations: [
             'Ranged_Shoot',
+            'Woc_Attack_Rifle',
+            'Woc_Attack_1H_0',
+            'Woc_Attack_1H_1',
+            'Woc_Attack_1H_Stab',
             '1H_Chop',
             '1H_Slash',
             'Cast_Raise',
@@ -849,7 +875,9 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // No skin displayed: the authored ability override plays (the release
     // half the WOC hunter mints from its shot clip, ClipMap.clipSplits).
     visual.playAttack('aimed_shot');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Ranged_Shoot#release');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe(
+      'Woc_Attack_Rifle#release',
+    );
 
     // A bow skin displayed: the same ability call must fall back to the
     // draw clip instead, not the crossbow-shoulder ability pose.
@@ -857,12 +885,12 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     visual.playAttack('aimed_shot');
     expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Bow_Draw_Shot');
 
-    // A melee ability (range 0) keeps its bespoke Hunter_Melee_* swing even
+    // A melee ability (range 0) keeps its bespoke melee swing even
     // with the same bow skin displayed: the bow substitution is a RANGED-only
     // precedence, since a displayed bow never changes how a melee hit is
     // thrown (second review round on PR #2958).
     visual.playAttack('raptor_strike');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('1H_Chop');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Woc_Attack_1H_0');
 
     // A self-buff aspect toggle (range-agnostic, no swing) must never play the
     // draw-shot attack with the same bow skin displayed (Rubsey's OSSBrain

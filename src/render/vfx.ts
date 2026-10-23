@@ -10,6 +10,14 @@ import {
 import { GFX } from './gfx';
 import { type GloamCompileGate, GloamField } from './gloam_field';
 import {
+  type HutFireBody,
+  type HutFireKind,
+  type HutFireParticle,
+  sampleHutFireParticle,
+} from './hut_fire_core';
+import { HutFireFx } from './hut_fire_fx';
+import { buildHutSmoke, type HutSmokeView, hutSmokeEnabled } from './hut_smoke';
+import {
   type IgnivarJudgmentFireSample,
   ignivarJudgmentFireAllowsSmoke,
   ignivarJudgmentFireInitialCount,
@@ -23,6 +31,7 @@ import {
   LEGENDARY_REGALIA_RATE_PER_SEC,
 } from './legendary_regalia_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
+import { SwimWakeVfx } from './swim_wake_vfx';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import { bubbleBeamMaterialOptions } from './vfx_basic_materials';
 import {
@@ -388,12 +397,36 @@ export class Vfx {
   // no Color objects.
   private fwCols: THREE.Color[] = [];
   private fwFlash = new THREE.Color();
+  // scratch colours for the per-frame mount embers (spawn copies the colour, so reuse is safe)
+  private emberSpark = new THREE.Color();
+  private emberFlame = new THREE.Color();
   private rocketExhaustSide = 0;
   private quality = 1;
   /** Gloamveil's pool and dark smoke, which an additive cloud cannot draw. The
    *  renderer reports its wearers and closes its frame (gloam_field.ts). */
   readonly gloam: GloamField;
+  /** Torched mudfin huts burning (hut_fire_fx.ts): the renderer hands it the
+   *  `worldObjectBurning` events and update() ticks it. */
+  readonly hutFires: HutFireFx;
+  /** Their lit smoke plumes (hut_smoke.ts), which an additive cloud cannot draw;
+   *  null on the low effects tier. */
+  private readonly hutSmoke: HutSmokeView | null;
+  private readonly hutFireParticle: HutFireParticle = {
+    x: 0,
+    y: 0,
+    z: 0,
+    vx: 0,
+    vy: 0,
+    vz: 0,
+    color: 0,
+    size: 0,
+    life: 0,
+    gravity: 0,
+    sprite: 'flame',
+    spin: 0,
+  };
   private paladinSpellFx: PaladinSpellVfxController;
+  private swimWakeVfx: SwimWakeVfx;
   private disposed = false;
   private ignivarJudgmentFireSourceId = -1;
   private ignivarJudgmentFireAccumulator = 0;
@@ -596,6 +629,10 @@ export class Vfx {
       groundY,
       compileGate,
     );
+    this.swimWakeVfx = new SwimWakeVfx(scene);
+    this.hutSmoke = hutSmokeEnabled() ? buildHutSmoke() : null;
+    if (this.hutSmoke) scene.add(this.hutSmoke.mesh);
+    this.hutFires = new HutFireFx(this, groundY, this.hutSmoke);
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
@@ -718,6 +755,31 @@ export class Vfx {
     }
   }
 
+  /** A torched mudfin hut's fire (hut_fire_fx.ts): `rate` particles a second
+   *  of one kind, sampled over the hut by hut_fire_core.ts. Frame-rate
+   *  independent and scaled by the quality level, like the steady auras. */
+  hutFire(kind: HutFireKind, body: HutFireBody, rate: number, dt: number): void {
+    const p = this.hutFireParticle;
+    const count = this.emitCount(rate, dt);
+    for (let i = 0; i < count; i++) {
+      sampleHutFireParticle(kind, body, Math.random, p);
+      this.spawn(
+        p.x,
+        p.y,
+        p.z,
+        p.vx,
+        p.vy,
+        p.vz,
+        p.color,
+        p.size,
+        p.life,
+        p.gravity,
+        SPR[p.sprite],
+        p.spin,
+      );
+    }
+  }
+
   prewarm(at: THREE.Vector3): void {
     const sprites = Object.values(SPR);
     for (let i = 0; i < sprites.length; i++) {
@@ -748,6 +810,8 @@ export class Vfx {
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
     this.gloam.clear();
+    this.hutFires.clear();
+    this.swimWakeVfx.clear();
     this.life.fill(0);
     this.size.fill(0);
     this.alphaAttr.fill(0);
@@ -767,6 +831,8 @@ export class Vfx {
     this.disposed = true;
     this.drainLifeVfx.dispose();
     this.gloam.dispose();
+    this.swimWakeVfx.dispose();
+    this.hutSmoke?.dispose();
     this.points.removeFromParent();
     const material = this.points.material as THREE.ShaderMaterial;
     const atlas = material.uniforms.uAtlas?.value;
@@ -912,6 +978,9 @@ export class Vfx {
   prepareDraw(camera: THREE.Camera): void {
     if (this.disposed) return;
     this.packRenderCloud(camera);
+    // the hut smoke plumes face this frame's camera (hut_smoke.ts)
+    const eye = camera.matrixWorld.elements;
+    this.hutFires.prepareDraw(eye[12], eye[14]);
   }
 
   private drainParticleSprite(kind: DrainLifeParticleKind): number {
@@ -1622,13 +1691,14 @@ export class Vfx {
   waterSplash(x: number, y: number, z: number, radius = 0.45, strength = 1): void {
     const safeRadius = Math.min(1.4, Math.max(0.2, radius));
     const safeStrength = Math.min(1.5, Math.max(0.25, strength));
+    this.swimWakeVfx.spawnSplashRing(x, y, z, safeRadius, safeStrength);
     const requestedDrops = Math.min(8, Math.max(3, Math.round(3 + safeStrength * 3)));
     const dropCount = this.scaledCount(requestedDrops);
     for (let i = 0; i < dropCount; i++) {
       const angle = Math.random() * Math.PI * 2;
       const offset = Math.sqrt(Math.random()) * safeRadius * 0.32;
       const outward = (0.55 + Math.random() * 0.9) * (0.7 + safeStrength * 0.45);
-      const upward = (1.2 + Math.random() * 1.4) * (0.65 + safeStrength * 0.35);
+      const upward = (1.1 + Math.random() * 1.2) * (0.65 + safeStrength * 0.35);
       this.spawn(
         x + Math.cos(angle) * offset,
         y + 0.025,
@@ -1636,29 +1706,13 @@ export class Vfx {
         Math.cos(angle) * outward,
         upward,
         Math.sin(angle) * outward,
-        i % 3 === 0 ? 0xc8e6e8 : 0x78b9c2,
-        0.1 + Math.random() * 0.075,
-        0.34 + Math.random() * 0.2,
+        i % 2 === 0 ? 0xe8fcff : 0x8ae4f2,
+        0.065 + Math.random() * 0.045,
+        0.28 + Math.random() * 0.16,
         7.5,
-        SPR.glowSoft,
+        SPR.glowCore,
       );
     }
-
-    // One tiny foam flash gives the droplets a readable point of impact.
-    this.spawn(
-      x,
-      y + 0.035,
-      z,
-      0,
-      0.12,
-      0,
-      0x68aeb8,
-      0.17 + safeRadius * 0.28,
-      0.12,
-      0,
-      SPR.glowSoft,
-      0,
-    );
   }
 
   /** Directional, low-arc spray for a character crossing the waterline. */
@@ -1676,6 +1730,7 @@ export class Vfx {
     // as they always did, the extra headroom only ever carries impact weight.
     const safeRadius = Math.min(2.2, Math.max(0.25, radius));
     const safeStrength = Math.min(2.6, Math.max(0.35, strength));
+    this.swimWakeVfx.spawnSplashRing(x, y, z, safeRadius, safeStrength);
     const directionLength = Math.max(Math.hypot(dirX, dirZ), 0.0001);
     const forwardX = dirX / directionLength;
     const forwardZ = dirZ / directionLength;
@@ -1685,8 +1740,8 @@ export class Vfx {
     // steeper slope so a plunge reads as a burst, not a slightly-busy wade.
     const dropCount = this.scaledCount(
       Math.min(
-        26,
-        Math.max(7, Math.round(7 + safeStrength * 3 + Math.max(0, safeStrength - 1.5) * 8)),
+        18,
+        Math.max(5, Math.round(5 + safeStrength * 2 + Math.max(0, safeStrength - 1.5) * 6)),
       ),
     );
     for (let i = 0; i < dropCount; i++) {
@@ -1700,60 +1755,48 @@ export class Vfx {
         y + 0.025,
         z + sideZ * spread + forwardZ * forward,
         sideX * lateralSpeed + forwardX * forwardSpeed,
-        (1.35 + Math.random() * 1.55) * (0.75 + safeStrength * 0.25),
+        (1.15 + Math.random() * 1.25) * (0.75 + safeStrength * 0.25),
         sideZ * lateralSpeed + forwardZ * forwardSpeed,
-        i % 4 === 0 ? 0xb9dadd : 0x6faeb7,
-        0.16 + Math.random() * 0.11,
-        0.4 + Math.random() * 0.2,
-        7.2,
-        SPR.glowSoft,
+        i % 2 === 0 ? 0xf0fdff : 0x8ce6f4,
+        0.075 + Math.random() * 0.05,
+        0.32 + Math.random() * 0.16,
+        7.4,
+        SPR.glowCore,
       );
     }
-    this.spawn(
-      x,
-      y + 0.03,
-      z,
-      forwardX * 0.18,
-      0.08,
-      forwardZ * 0.18,
-      0x6aaeb6,
-      0.24 + safeRadius * 0.34,
-      0.15,
-      0,
-      SPR.glowSoft,
-      0,
-    );
   }
 
   /**
-   * One beat of a surface swimmer's kick: a small churn of droplets thrown up
-   * and back off the feet. Deliberately a fraction of characterWaterSplash —
-   * this fires several times a second for as long as somebody is swimming, so
-   * it stays at a handful of particles with no ring flash.
+   * One beat of a surface swimmer's breaststroke: horizontal Genshin V-wake
+   * foam ribbons and concentric broken anime ripple rings on the water plane,
+   * accented by a few tiny water-skimming micro-droplets.
    *
    * Submerged swimmers never call this: under the surface there is no water
    * line to break, and the stroke leaves no VFX at all.
    */
   swimKickSplash(x: number, y: number, z: number, dirX: number, dirZ: number, strength = 1): void {
     const safe = Math.min(1.4, Math.max(0.3, strength));
+    this.swimWakeVfx.spawnStroke(x, y, z, dirX, dirZ, safe);
     const length = Math.max(Math.hypot(dirX, dirZ), 0.0001);
     const backX = -dirX / length;
     const backZ = -dirZ / length;
-    const drops = this.scaledCount(Math.round(3 + safe * 2));
+    const sideX = -backZ;
+    const sideZ = backX;
+    const drops = this.scaledCount(4);
     for (let i = 0; i < drops; i++) {
-      const side = Math.random() * 2 - 1;
+      const side = (i % 2 === 0 ? 1 : -1) * (0.32 + Math.random() * 0.35);
       this.spawn(
-        x + backZ * side * 0.22,
-        y + 0.02,
-        z - backX * side * 0.22,
-        backX * (0.5 + Math.random() * 0.7) * safe + backZ * side * 0.5,
-        (0.9 + Math.random() * 1.1) * safe,
-        backZ * (0.5 + Math.random() * 0.7) * safe - backX * side * 0.5,
-        i % 3 === 0 ? 0xcfe7ea : 0x7fb8c0,
-        0.1 + Math.random() * 0.07,
-        0.26 + Math.random() * 0.14,
-        6.4,
-        SPR.glowSoft,
+        x + sideX * side * 0.45 - backX * 0.08,
+        y + 0.035,
+        z + sideZ * side * 0.45 - backZ * 0.08,
+        backX * (0.55 + Math.random() * 0.5) * safe + sideX * side * 0.65,
+        (0.85 + Math.random() * 0.65) * safe,
+        backZ * (0.55 + Math.random() * 0.5) * safe + sideZ * side * 0.65,
+        i % 2 === 0 ? 0xf2feff : 0x8ee8f6,
+        0.065 + Math.random() * 0.03,
+        0.24 + Math.random() * 0.12,
+        6.8,
+        SPR.glowCore,
       );
     }
   }
@@ -1925,9 +1968,13 @@ export class Vfx {
   /** A quick yellow-orange shimmer ringing a rider as a mount is summoned (and on
    *  a dismount/live swap): tighter and shorter-lived than levelUpPillar so it
    *  reads as a conjure sparkle, not a level-up. Fired on the mountKey-change edge. */
-  mountSummonGlow(targetId: number): void {
+  mountSummonGlow(targetId: number, summonFx: 'shimmer' | 'lanternBurst' = 'shimmer'): void {
     const at = this.anchor(targetId, 0);
     if (!at) return;
+    if (summonFx === 'lanternBurst') {
+      this.mountLanternBurst(at);
+      return;
+    }
     const cream = new THREE.Color(0xffe0a0).multiplyScalar(hdr(1.8));
     const amber = new THREE.Color(0xffb347).multiplyScalar(hdr(1.8));
     const ember = new THREE.Color(0xff9a3c).multiplyScalar(hdr(1.8));
@@ -1946,6 +1993,142 @@ export class Vfx {
         0.75 + Math.random() * 0.3,
         -1,
         i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+  }
+
+  /** Lantern Hall's destrier arriving: the lanterns flare all at once. A hot flash at the
+   *  rider, a ring of sparks thrown out along the ground, a column of embers and warm light
+   *  climbing the rider, and slow cinders settling after. Louder than the shared shimmer on
+   *  purpose (the mount carries its own fire); every count goes through scaledCount, so a
+   *  low graphics tier sheds it first. */
+  private mountLanternBurst(at: THREE.Vector3): void {
+    const white = new THREE.Color(0xfff1d0).multiplyScalar(hdr(2.6));
+    const hot = new THREE.Color(0xffb45e).multiplyScalar(hdr(2.2));
+    const amber = new THREE.Color(0xff8a2a).multiplyScalar(hdr(2.0));
+    const coal = new THREE.Color(0xff5210).multiplyScalar(hdr(1.8));
+    // the flare: stacked flashes, a tight white core over a wide amber bloom, and a low warm
+    // wash over the ground the horse lands on (its lanterns flare with it: mount_lamps.ts)
+    this.spawn(at.x, at.y + 1.6, at.z, 0, 0.4, 0, white, 3.8, 0.4, 0, SPR.flash);
+    this.spawn(at.x, at.y + 1.3, at.z, 0, 0.2, 0, amber, 8, 0.75, 0, SPR.glowSoft);
+    this.spawn(at.x, at.y + 0.3, at.z, 0, 0, 0, hot, 7, 0.9, 0, SPR.glowSoft);
+    // a ring of flame licks round the hooves, rising as they fade
+    for (let i = 0, n = this.scaledCount(16); i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      this.spawn(
+        at.x + Math.sin(a) * 1.2,
+        at.y + 0.2,
+        at.z + Math.cos(a) * 1.2,
+        Math.sin(a) * 0.8,
+        1.6 + Math.random() * 0.8,
+        Math.cos(a) * 0.8,
+        i % 2 ? amber : hot,
+        0.9 + Math.random() * 0.4,
+        0.55 + Math.random() * 0.2,
+        -0.4,
+        SPR.flame,
+      );
+    }
+    // the ground ring: sparks thrown outward low along the ground, falling
+    for (let i = 0, n = this.scaledCount(60); i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + Math.random() * 0.2;
+      const speed = 4.5 + Math.random() * 2.5;
+      this.spawn(
+        at.x + Math.sin(a) * 0.4,
+        at.y + 0.15,
+        at.z + Math.cos(a) * 0.4,
+        Math.sin(a) * speed,
+        1.2 + Math.random() * 1.6,
+        Math.cos(a) * speed,
+        i % 2 ? hot : amber,
+        0.3 + Math.random() * 0.15,
+        0.45 + Math.random() * 0.25,
+        7,
+        SPR.sparkBurst,
+      );
+    }
+    // the column: embers and flame licks climbing the rider and horse
+    for (let i = 0, n = this.scaledCount(80); i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.3 + Math.random() * 1.1;
+      const flame = i % 4 === 0;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 1.4,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.4,
+        2.4 + Math.random() * 2.6,
+        Math.cos(a) * 0.4,
+        flame ? amber : i % 3 === 0 ? coal : hot,
+        flame ? 0.7 + Math.random() * 0.4 : 0.22 + Math.random() * 0.16,
+        flame ? 0.5 + Math.random() * 0.3 : 0.9 + Math.random() * 0.6,
+        flame ? -0.5 : -1.2,
+        flame ? SPR.flame : i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    // the settle: slow cinders drifting down after the flare
+    for (let i = 0, n = this.scaledCount(26); i < n; i++) {
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 2.4,
+        at.y + 2.4 + Math.random() * 1.2,
+        at.z + (Math.random() - 0.5) * 2.4,
+        (Math.random() - 0.5) * 0.3,
+        0.2,
+        (Math.random() - 0.5) * 0.3,
+        coal,
+        0.16 + Math.random() * 0.1,
+        1.6 + Math.random() * 0.8,
+        0.6,
+        SPR.glowSoft,
+      );
+    }
+  }
+
+  /** Sparks struck off a hoof (Lantern Hall's destrier at a gallop, mount_embers.ts): hot
+   *  points kicked up and back that fall fast, now and then a brief flame puff. */
+  mountHoofSparks(at: THREE.Vector3, ratePerSec: number, dt: number): void {
+    const n = this.emitCount(ratePerSec, dt);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const lateral = 0.8 + Math.random() * 1.8;
+      const puff = Math.random() < 0.22;
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 0.15,
+        at.y + 0.05,
+        at.z + (Math.random() - 0.5) * 0.15,
+        Math.sin(a) * lateral,
+        puff ? 0.7 : 2 + Math.random() * 2.6,
+        Math.cos(a) * lateral,
+        puff
+          ? this.emberFlame.setHex(0xff8a2a).multiplyScalar(hdr(1.7))
+          : this.emberSpark
+              .setHex(Math.random() < 0.5 ? 0xffc070 : 0xff7a1e)
+              .multiplyScalar(hdr(2.2)),
+        puff ? 0.55 + Math.random() * 0.25 : 0.18 + Math.random() * 0.13,
+        puff ? 0.32 : 0.4 + Math.random() * 0.35,
+        puff ? -0.6 : 9,
+        puff ? SPR.firePuff : SPR.sparkBurst,
+      );
+    }
+  }
+
+  /** Cinders shaken out of a carried lantern: they rise, wander and fade; at speed they
+   *  stream back behind the glass because the lantern itself is moving on. */
+  mountLanternCinders(at: THREE.Vector3, ratePerSec: number, dt: number, moving: boolean): void {
+    const n = this.emitCount(ratePerSec, dt);
+    for (let i = 0; i < n; i++) {
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 0.12,
+        at.y + 0.08,
+        at.z + (Math.random() - 0.5) * 0.12,
+        (Math.random() - 0.5) * 0.5,
+        (moving ? 0.5 : 0.8) + Math.random() * 0.6,
+        (Math.random() - 0.5) * 0.5,
+        this.emberSpark.setHex(Math.random() < 0.6 ? 0xffa040 : 0xffd27a).multiplyScalar(hdr(2.2)),
+        0.11 + Math.random() * 0.09,
+        0.9 + Math.random() * 0.8,
+        -0.4,
+        Math.random() < 0.3 ? SPR.star : SPR.sparkle,
       );
     }
   }
@@ -2656,6 +2839,7 @@ export class Vfx {
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
     this.drainLifeVfx.update(dt, reducedMotion);
+    this.hutFires.update(dt, reducedMotion);
 
     for (let i = this.pendingBursts.length - 1; i >= 0; i--) {
       const pending = this.pendingBursts[i];
@@ -2893,5 +3077,6 @@ export class Vfx {
     }
     this.activeCount = write;
     this.paladinSpellFx.update(dt);
+    this.swimWakeVfx.update(dt);
   }
 }

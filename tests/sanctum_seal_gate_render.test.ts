@@ -14,6 +14,7 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
+import { insidePavedGrassExclusion } from '../src/render/foliage_core';
 import { gfxInternalsForTest, sharedUniforms } from '../src/render/gfx';
 import { MIST_GATE_PROGRAM_CACHE_KEY } from '../src/render/ignivar_mist_gate';
 import {
@@ -25,6 +26,7 @@ import {
   type LinearRgb,
   linearLuma,
   type MistPose,
+  onSanctumSealGateFloor,
   rimeFanAlpha,
   rimeFanVertex,
   SANCTUM_GLACIER_ICE,
@@ -47,8 +49,14 @@ import {
 } from '../src/render/sanctum_seal_gate_surface';
 import { DUNGEONS } from '../src/sim/data';
 import { terrainHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SEED = 42;
+/** The icefall's reach off the face (the thickest serac, measured to the
+ *  nearest rock) and its root's depth under the slope (the build seats it
+ *  3 yd under the probe's terrain). */
+const ICEFALL_MAX_PROUD = 4.5;
+const ICEFALL_MAX_SUNK = 4.5;
 
 describe('the cold mist plan', () => {
   it('thins the puffs by the static effects tier, never to zero', () => {
@@ -419,7 +427,11 @@ describe('the mountain surface materials', () => {
     const iceShader = compileHook(ice, 'standard');
     const g = SANCTUM_GLACIER_ICE;
     expect(iceShader.fragmentShader).toContain(g.deep.map((v) => v.toFixed(4)).join(', '));
-    expect(iceShader.fragmentShader).toContain(g.stepHeight.toFixed(4));
+    // the sculpt's paint picks the part by its luminance: the core, the pale
+    // arrises and the snow crust thresholds are the core's own
+    for (const v of [g.deepLo, g.deepHi, g.paleLo, g.paleHi, g.snowLo, g.snowHi]) {
+      expect(iceShader.fragmentShader).toContain(v.toFixed(4));
+    }
     expect(iceShader.fragmentShader).toContain('roughnessFactor = mix(');
   });
 
@@ -447,5 +459,93 @@ describe('the mountain surface materials', () => {
       restore();
       sealGateSurfaceInternalsForTest.reset();
     }
+  });
+});
+
+describe('the frozen flags and the icefall on the real mountain', () => {
+  it('the tunnel floor and the lane between the pylons grow no grass, the plaza keeps its meadow', () => {
+    const door = DUNGEONS.gravewyrm_sanctum.doorPos;
+    expect(onSanctumSealGateFloor(door, door.x, door.z + 10)).toBe(true);
+    expect(onSanctumSealGateFloor(door, door.x + 3.5, door.z + 27)).toBe(true);
+    expect(onSanctumSealGateFloor(door, door.x - 1.8, door.z - 1.5)).toBe(true);
+    expect(onSanctumSealGateFloor(door, door.x, door.z - 6)).toBe(false);
+    expect(onSanctumSealGateFloor(door, door.x + 6, door.z + 10)).toBe(false);
+    expect(onSanctumSealGateFloor(door, door.x, door.z + 30)).toBe(false);
+    // the live consumer the blade carpet and the card tufts both read
+    expect(insidePavedGrassExclusion(door.x, door.z + 12)).toBe(true);
+    expect(insidePavedGrassExclusion(door.x, door.z - 8)).toBe(false);
+    expect(insidePavedGrassExclusion(door.x + 9, door.z + 4)).toBe(false);
+  });
+
+  it('the mouth film veils the tunnel dark instead of glowing white by day', () => {
+    const f = SANCTUM_MIST_FILM;
+    const luma = (hex: number) =>
+      linearLuma([((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255]);
+    expect(f.hazeOpacity).toBeLessThan(0.5);
+    expect(luma(f.hazeColor)).toBeLessThan(0.5);
+    // the additive breath only ever adds a little light
+    expect(f.breathOpacity).toBeLessThan(f.hazeOpacity);
+    expect(SANCTUM_MIST_FLOW.opacity).toBeLessThanOrEqual(0.22);
+  });
+
+  it('the icefall grows out of the Thornpeak face and stays under the ridge behind it', async () => {
+    await MeshoptDecoder.ready;
+    const doc = await new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
+      .readBinary(
+        readFileSync(path.join(__dirname, '..', 'public/models/props/sanctum_seal_gate_ice.glb')),
+      );
+    const node = doc
+      .getRoot()
+      .listNodes()
+      .find((n) => n.getName() === 'Entrance_IceTongue');
+    if (!node) throw new Error('Entrance_IceTongue missing from the ice GLB');
+    const door = DUNGEONS.gravewyrm_sanctum.doorPos;
+    const base = terrainHeight(door.x, door.z, WORLD_SEED);
+    const t = node.getTranslation();
+    const sc = node.getScale();
+    const p: number[] = [];
+    let checked = 0;
+    let worstOverRidge = -Infinity;
+    let worstFloat = -Infinity;
+    let worstSunk = -Infinity;
+    for (const prim of node.getMesh()?.listPrimitives() ?? []) {
+      const pos = prim.getAttribute('POSITION');
+      if (!pos) continue;
+      for (let i = 0; i < pos.getCount(); i += 5) {
+        pos.getElement(i, p);
+        const x = door.x + p[0] * sc[0] + t[0];
+        const y = base + p[1] * sc[1] + t[1];
+        const z = door.z + p[2] * sc[2] + t[2];
+        const ground = terrainHeight(x, z, WORLD_SEED);
+        let ridge = -Infinity;
+        for (const d of [2, 4, 6, 8, 10, 14]) {
+          ridge = Math.max(ridge, terrainHeight(x, z + d, WORLD_SEED));
+        }
+        worstOverRidge = Math.max(worstOverRidge, y - ridge);
+        worstSunk = Math.max(worstSunk, ground - y);
+        if (y > ground) {
+          // the true distance to the face (on a cliff an overhang stands far
+          // over the ground straight below it and still touches the rock)
+          let near = y - ground;
+          for (let dx = -4; dx <= 4; dx += 1) {
+            for (let dz = -4; dz <= 4; dz += 1) {
+              const g = terrainHeight(x + dx, z + dz, WORLD_SEED);
+              near = Math.min(near, Math.hypot(dx, dz, Math.max(0, y - g)));
+            }
+          }
+          worstFloat = Math.max(worstFloat, near);
+        }
+        checked++;
+      }
+    }
+    expect(checked).toBeGreaterThan(500);
+    // the ridge hides it from the Veiled Hollow behind
+    expect(worstOverRidge, 'a vertex shows over the ridge').toBeLessThan(0.3);
+    // nothing hangs off the face: the thickest serac stands a few yards out
+    expect(worstFloat, 'a vertex floats off the face').toBeLessThan(ICEFALL_MAX_PROUD);
+    // and its root never dives deeper than the sculpt's seat
+    expect(worstSunk, 'a vertex is buried past the seat').toBeLessThan(ICEFALL_MAX_SUNK);
   });
 });

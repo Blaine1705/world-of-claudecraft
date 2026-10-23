@@ -19,6 +19,7 @@
 
 import type { WorldContent } from '../sim/types';
 import type { CavityMeshArrays } from './cut_cavity_core';
+import { groundPaletteOverrideTable, groundPaletteVersion } from './ground_palette_override_core';
 import type { ChunkGeometryArrays } from './terrain_chunk_build';
 import { createVoxelIdentityRegistry } from './voxel_identity_core';
 import type {
@@ -235,7 +236,14 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
     // one. A throwing post here is treated like a throwing job post below.
     if (contentGeneration >= 0 && entry.generation !== contentGeneration) {
       try {
-        entry.worker.postMessage({ kind: 'content', generation: contentGeneration, content });
+        // The live world's NPC registry may be a proxy over native content.
+        // Materialize it at the worker boundary; the source stays live in this thread.
+        const snapshot = content ? { ...content, npcs: { ...content.npcs } } : null;
+        entry.worker.postMessage({
+          kind: 'content',
+          generation: contentGeneration,
+          content: snapshot,
+        });
         entry.generation = contentGeneration;
       } catch (error) {
         entry.busy = false;
@@ -268,7 +276,15 @@ export function createZoneBuildPool(): ZoneBuildPool | null {
       content = next;
     },
     async buildChunk(job, opts): Promise<ChunkGeometryArrays | null> {
-      const response = await submit({ ...job, kind: 'chunk' }, undefined, opts?.urgent === true);
+      // Palette-lab ground overrides ride the job once any were ever set (a
+      // normal session never sets one, so its jobs stay byte-identical).
+      const palette =
+        groundPaletteVersion() > 0 ? { groundPalette: groundPaletteOverrideTable() } : {};
+      const response = await submit(
+        { ...job, ...palette, kind: 'chunk' },
+        undefined,
+        opts?.urgent === true,
+      );
       if (!response?.ok || response.kind !== 'chunk') return null;
       return {
         positions: response.positions,

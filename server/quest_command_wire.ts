@@ -1,3 +1,4 @@
+import type { GuildAccountPort } from '../src/sim/guild_quartermaster';
 import type { Sim } from '../src/sim/sim';
 import { isActivityChoice } from '../src/sim/world_quest_activity';
 
@@ -90,6 +91,20 @@ export function commendWeeklyQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
   sim.commendWeeklyQuest(msg.faction, pid);
 }
 
+/** Lantern Hall's quartermaster: one cosmetic for Lantern Seals (the sim re-validates all). The
+ *  account port is the acting session's (server/account_cosmetics_service.ts ledger): an
+ *  earned weapon skin is account state the realm-wide sim mirror must never decide. */
+export function buyGuildCosmeticWire(
+  sim: Sim,
+  msg: QuestWireMessage,
+  pid: number,
+  account?: GuildAccountPort,
+): void {
+  const offer = (msg as unknown as { offer?: unknown }).offer;
+  if (typeof offer !== 'string' || offer.length > 64) return;
+  sim.buyGuildCosmetic(offer, pid, account);
+}
+
 /** The world-quest-only command family; game.ts routes every member here. */
 const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_glider_boost',
@@ -104,6 +119,8 @@ const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_weekly_choose',
   'world_quest_weekly_commend',
   'clue_hunt_abandon',
+  // Lantern Hall (the weekly guild contracts' quartermaster) rides the same owner family
+  'guild_buy_cosmetic',
 ] as const;
 export type WorldQuestWireCommand = (typeof WORLD_QUEST_WIRE_COMMANDS)[number];
 const WORLD_QUEST_WIRE_COMMAND_SET: ReadonlySet<unknown> = new Set(WORLD_QUEST_WIRE_COMMANDS);
@@ -114,7 +131,14 @@ export function isWorldQuestWireCommand(cmd: unknown): cmd is WorldQuestWireComm
 }
 
 /** Route the world-quest-only command family outside the server monolith. */
-export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+/** `account` is the acting session's ledger port (game.ts passes the cosmetics service's
+ *  ledger); only the quartermaster's purchase reads it. */
+export function dispatchWorldQuestWire(
+  sim: Sim,
+  msg: QuestWireMessage,
+  pid: number,
+  account?: GuildAccountPort,
+): void {
   switch (msg.cmd) {
     case 'world_quest_start':
       startWorldQuestActivityWire(sim, msg, pid);
@@ -148,6 +172,9 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
       break;
     case 'world_quest_accuse':
       accuseWorldQuestSuspectWire(sim, msg, pid);
+      break;
+    case 'guild_buy_cosmetic':
+      buyGuildCosmeticWire(sim, msg, pid, account);
       break;
     case 'clue_hunt_abandon':
       sim.abandonClueHunt(pid);

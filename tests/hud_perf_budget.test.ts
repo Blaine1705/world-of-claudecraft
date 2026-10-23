@@ -1146,8 +1146,9 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // cost with one of each too. Interleaving a read BETWEEN the writes is what
   // would make this thrash, and nothing here does.)
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 6 }, driverAllow: {} },
-  // Preserve the single courier body scroll offset only across a changed render.
-  { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // Preserve the courier body and its two storage grids' scroll offsets (one
+  // read and one write each) only across a changed render, never per frame.
+  { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
   // The Hunting pane keeps the catalog list's scroll offset across its full
   // innerHTML repaint (one read before the rebuild, one write after), so a row
   // click two screens down never snaps the player back to the top.

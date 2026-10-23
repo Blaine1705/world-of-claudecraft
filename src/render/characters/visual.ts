@@ -48,10 +48,12 @@ import {
   clipSnapsIn,
   combatIdleClamps,
   desiredBaseState,
+  drawIdleVariant,
   drivesPose,
   gaitWindDownTimeScale,
   isStrafeState,
   locomotionTimeScale,
+  onIdleLoopSeam,
   pickProxyHeight,
   SUBMERGED_HEAD_FRACTION,
   scanAnimRepair,
@@ -134,11 +136,13 @@ import {
 } from './paladin_bastion_sweep_clip';
 import { PaladinBastionSweepFx } from './paladin_bastion_sweep_fx';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { aimBone, reinArmDirections, rideLegDirections } from './ride_pose';
 import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
 import { type SeatClipPhase, seatClip } from './seat_clips';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
 import { shardpikeProp } from './shardpike_prop';
+import { SHARDPIKE_THROW_CLIP } from './shardpike_throw_clip';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -154,7 +158,13 @@ import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { stoneboundShellStyle } from './stonebound_shell_core';
-import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
+import {
+  createStowTransition,
+  forceStow,
+  requestStow,
+  syncSittingStow,
+  tickStow,
+} from './stow_transition';
 import { auraHeldClip, stunIdleClip } from './stun_idle_core';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { createTurnInPlaceState, stepTurnInPlace } from './turn_in_place_core';
@@ -347,22 +357,19 @@ const CLIMB_BLEND_RATE = 14;
  *  folded into the climb's arrays. Names are the three.js-sanitized KayKit
  *  Rig_Medium ones (the GLB spells them `upperleg.l`; the loader drops the dot). */
 const RIDE_FOOT_BONES = ['footl', 'footr'] as const;
+/** Arm chains the reins take up: left upper, left fore, right upper, right fore. */
+const RIDE_ARM_BONES = ['upperarml', 'lowerarml', 'upperarmr', 'lowerarmr'] as const;
 const RIDE_HIP_BONE = 'hips';
 /** Blend in/out rate for the straddle (1/s): a mount summon should settle the
  *  rider's legs over the same beat the mount fades in on, not snap them. */
 const RIDE_BLEND_RATE = 8;
-const AXIS_X = /* @__PURE__ */ new THREE.Vector3(1, 0, 0);
-const AXIS_Z = /* @__PURE__ */ new THREE.Vector3(0, 0, 1);
-/** The leg bones' rest orientation: a half turn about X, which is what points
- *  their local +Y (down the limb) at the model's DOWN. Every ride-pose thigh
- *  target is built off it. */
-const RIDE_LEG_REST = /* @__PURE__ */ new THREE.Quaternion().setFromAxisAngle(
-  new THREE.Vector3(1, 0, 0),
-  Math.PI,
-);
 // Scratch, so the per-frame pose allocates nothing.
 const rideQuat = /* @__PURE__ */ new THREE.Quaternion();
 const rideSwing = /* @__PURE__ */ new THREE.Quaternion();
+const RIDE_IDENTITY = /* @__PURE__ */ new THREE.Quaternion();
+const rideDirA = /* @__PURE__ */ new THREE.Vector3();
+const rideDirB = /* @__PURE__ */ new THREE.Vector3();
+const rideDirC = /* @__PURE__ */ new THREE.Vector3();
 /** Fallback local clock for the pose envelope, used only when no sim phase
  *  arrives (an older server); normally the pose tracks the climb's real,
  *  height-scaled progress via setClimbing's phase. */
@@ -1264,6 +1271,9 @@ export class CharacterVisual {
   private currentIsOneShot = false;
   /** Seconds until the next idle-breaker; -1 means "rearm on the next idle". */
   private idleVariantIn = -1;
+  /** The rest of this round of fidgets and the last one played (drawIdleVariant). */
+  private idleVariantBag: string[] = [];
+  private lastIdleVariant: string | null = null;
   /** The live one-shot is an idle-breaker, so leaving idle must cancel it. */
   private currentOneShotIsIdleVariant = false;
   /** Countdown to the next ClipMap.idleBeat fire; -1 = rearm on the idle edge. */
@@ -1307,6 +1317,8 @@ export class CharacterVisual {
   private wasDead = false;
   /** previous frame's airborne flag, for the touchdown edge (see ClipMap.land) */
   private wasAirborne = false;
+  /** previous frame's swimming flag, so water entry/exit snaps stow without a gesture */
+  private wasSwimming = false;
   /** Was the body moving at takeoff? See the ClipMap's jumpMoving. */
   private jumpWhileMoving = false;
   private initialized = false;
@@ -1379,6 +1391,9 @@ export class CharacterVisual {
   // dropping them.
   private rideSpec: MountRideSpec | null = null;
   private rideBlend = 0;
+  /** How far the arms have taken up the reins (ride_pose.ts), eased like the legs. */
+  private rideArmBlend = 0;
+  private rideArmBones: (THREE.Object3D | null)[] | undefined;
   private rideFootBones: (THREE.Object3D | null)[] | undefined;
   private rideHipBone: THREE.Object3D | null | undefined;
   private spinAngle = 0;
@@ -1649,8 +1664,17 @@ export class CharacterVisual {
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
+      // Signature_* is the warrior rigs' convention; every other player rig binds
+      // only the Shardpike throw prepareShardpikeThrowClip mints for it, never a
+      // same-named clip some other GLB happens to ship.
+      const warriorRig =
+        key === 'player_warrior' ||
+        key === 'player_warrior_female' ||
+        key === 'player_warrior_modular';
       const signatureClips = key.startsWith('player_')
-        ? Array.from(prep.clips.keys()).filter((n) => n.startsWith('Signature_'))
+        ? Array.from(prep.clips.keys()).filter((n) =>
+            warriorRig ? n.startsWith('Signature_') : n === SHARDPIKE_THROW_CLIP,
+          )
         : [];
       for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES, ...signatureClips]) {
         const clip = prep.clips.get(name);
@@ -1664,9 +1688,11 @@ export class CharacterVisual {
       const split = prep.def.clips.dualWieldSplit;
       if (dual && dualClip && split !== undefined && split > 0 && split < dualClip.duration) {
         const names = dualWieldHalfNames(dual);
-        const [main, off] = sharedClipSplit(dualClip, split, names);
-        this.actions.set(names[0], this.mixer.clipAction(main));
-        this.actions.set(names[1], this.mixer.clipAction(off));
+        if (!this.actions.has(names[0]) || !this.actions.has(names[1])) {
+          const [main, off] = sharedClipSplit(dualClip, split, names);
+          this.actions.set(names[0], this.mixer.clipAction(main));
+          this.actions.set(names[1], this.mixer.clipAction(off));
+        }
       }
       // Hold-and-release clips (ClipMap.clipSplits): the same cut, under the
       // rig's own names, for a cast that holds one half and plays the other.
@@ -1689,6 +1715,12 @@ export class CharacterVisual {
       if (idle) {
         idle.play();
         this.current = idle;
+      }
+      // Ambient loops stay out of `actions`, so the state machine's stop() and
+      // crossfade sweeps never reach them; disposal's stopAllAction() does.
+      for (const name of this.def.ambientClips ?? []) {
+        const clip = prep.clips.get(name);
+        if (clip) this.mixer.clipAction(clip).play();
       }
 
       // A WOC body's armor streams per set: the dressing adopts the files
@@ -1823,10 +1855,24 @@ export class CharacterVisual {
     // Deferred sheathe swap: lands at the gesture's windup peak (see
     // setWeaponStowed), where the clip is also cut so the chop's downswing never
     // plays. Ticks even when `animate` is false so a throttled rig still settles.
-    const stowTick = tickStow(this.stow, dt);
-    if (stowTick !== 'none') {
-      if (stowTick === 'swap') this.applyStowSwap();
-      this.endStowGesture();
+    // Entering water cuts straight to swimming: snap any pending stow swap at once
+    // and drop the sheathe (or any land one-shot) so it never holds up the stroke.
+    const enteringWater = s.swimming && !this.wasSwimming;
+    this.wasSwimming = s.swimming;
+    let swimInterruptedOneShot = false;
+    if (s.swimming) {
+      this.stowLift.t = -1;
+      if (this.currentIsOneShot && (enteringWater || this.isStowOneShot())) {
+        this.cancelOneShot();
+        swimInterruptedOneShot = true;
+      }
+      if (forceStow(this.stow, this.stow.target)) this.applyStowSwap(false);
+    } else {
+      const stowTick = tickStow(this.stow, dt);
+      if (stowTick !== 'none') {
+        if (stowTick === 'swap') this.applyStowSwap();
+        this.endStowGesture();
+      }
     }
 
     // death is a level sim-side, edge-trigger the clip locally
@@ -1876,6 +1922,11 @@ export class CharacterVisual {
     this.stunIdle = stunIdle;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
+      const sittingStow = s.sitting || desired === 'sit' || desired === 'sitUp';
+      if (sittingStow && !this.stow.sitting && this.currentIsOneShot && this.isStowOneShot()) {
+        this.cancelOneShot();
+        this.stowLift.t = -1;
+      }
       const baseChanged = desired !== this.baseState;
       const previousBase = this.baseState;
       // the seated states play in the seat's anchor space (render/seated_pose.ts)
@@ -1948,7 +1999,11 @@ export class CharacterVisual {
         this.currentOneShotIsEmote = false;
         this.fadeTo(this.baseAction(), 0.12, false);
       } else if (
-        (baseChanged || rushChanged || auraIdleChanged || stunIdleChanged) &&
+        (baseChanged ||
+          swimInterruptedOneShot ||
+          rushChanged ||
+          auraIdleChanged ||
+          stunIdleChanged) &&
         !this.currentIsOneShot
       ) {
         // a cast clip frozen at its hold point must never stay paused through
@@ -1960,7 +2015,6 @@ export class CharacterVisual {
           this.fadeTo(this.baseAction(), CUT_FADE, false);
         } else if (previousBase !== 'cast' || !this.beginCastExitPlayOut()) {
           this.fadeTo(this.baseAction(), this.baseTransitionFade(desired, previousBase), false);
-          this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
         }
       } else if (
         desired === 'cast' &&
@@ -1978,6 +2032,10 @@ export class CharacterVisual {
         if (want && this.current !== want && this.current !== this.seatAction('down')) {
           this.fadeTo(want, 0.4, false);
         }
+      }
+      if (syncSittingStow(this.stow, sittingStow)) {
+        this.stowLift.t = -1;
+        this.applyStowSwap(false);
       }
       this.tickIdleBeat(dt, desired);
       this.tickIdleVariant(dt, desired);
@@ -2588,8 +2646,13 @@ export class CharacterVisual {
     const spec = this.rideSpec;
     const target = spec && !this.climbOn && this.climbBlend <= 0 ? 1 : 0;
     this.rideBlend += (target - this.rideBlend) * Math.min(1, dt * RIDE_BLEND_RATE);
+    // the reins yield to anything the arms are playing: a swing, a cast, an emote
+    const armsFree = spec?.reins && !this.currentIsOneShot && this.baseState !== 'cast' ? 1 : 0;
+    this.rideArmBlend +=
+      (armsFree * target - this.rideArmBlend) * Math.min(1, dt * RIDE_BLEND_RATE);
     if (this.rideBlend < 1e-3) {
       this.rideBlend = 0;
+      this.rideArmBlend = 0;
       return;
     }
     if (!spec) return;
@@ -2606,21 +2669,28 @@ export class CharacterVisual {
       this.rideHipBone = this.model.getObjectByName(RIDE_HIP_BONE) ?? null;
     }
     const k = this.rideBlend;
+    // Each bone is AIMED (characters/ride_pose.ts): turned the shortest way from where the
+    // seated clip points it onto the direction the spec asks, in the pelvis frame. Absolute
+    // rotations built off one rig's rest twisted the WOC bodies' legs a half turn, which is
+    // what hinged their knees forward and turned their feet backwards.
     for (let i = 0; i < this.climbLegBones.length; i++) {
       const side = i === 0 ? 1 : -1;
+      rideLegDirections(spec, side, rideDirA, rideDirB, rideDirC);
       const thigh = this.climbLegBones[i];
       if (thigh) {
-        rideQuat
-          .setFromAxisAngle(AXIS_Z, side * spec.spread)
-          .multiply(rideSwing.setFromAxisAngle(AXIS_X, -spec.thigh))
-          .multiply(RIDE_LEG_REST);
+        aimBone(rideQuat.copy(thigh.quaternion), RIDE_IDENTITY, rideDirA);
         thigh.quaternion.slerp(rideQuat, k);
       }
       const shin = this.climbShinBones[i];
-      if (shin) shin.quaternion.slerp(rideQuat.setFromAxisAngle(AXIS_X, spec.knee), k);
+      if (shin && thigh) {
+        aimBone(rideQuat.copy(shin.quaternion), thigh.quaternion, rideDirB);
+        shin.quaternion.slerp(rideQuat, k);
+      }
       const foot = this.rideFootBones[i];
-      if (foot && spec.ankle !== undefined) {
-        foot.quaternion.slerp(rideQuat.setFromAxisAngle(AXIS_X, spec.ankle), k);
+      if (foot && shin && thigh && spec.ankle !== undefined) {
+        rideSwing.copy(thigh.quaternion).multiply(shin.quaternion);
+        aimBone(rideQuat.copy(foot.quaternion), rideSwing, rideDirC);
+        foot.quaternion.slerp(rideQuat, k);
       }
     }
     // The pelvis is an override too (the seated lounge leans it back); the
@@ -2633,6 +2703,60 @@ export class CharacterVisual {
         this.climbTorsoBone = this.model.getObjectByName(CLIMB_TORSO_BONE) ?? null;
       }
       if (this.climbTorsoBone) this.climbTorsoBone.rotation.x += spec.lean * k;
+    }
+    if (spec.upperArm || spec.lowerArm) {
+      if (this.climbArmBones === undefined) {
+        this.climbArmBones = CLIMB_ARM_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+      }
+      if (this.climbForearmBones === undefined) {
+        this.climbForearmBones = CLIMB_FOREARM_BONES.map(
+          (n) => this.model.getObjectByName(n) ?? null,
+        );
+      }
+      for (let i = 0; i < this.climbArmBones.length; i++) {
+        const side = i === 0 ? 1 : -1;
+        const ua = this.climbArmBones[i];
+        if (ua && spec.upperArm) {
+          const [qx, qy, qz, qw] = spec.upperArm;
+          ua.quaternion.slerp(rideQuat.set(qx, side * qy, side * qz, qw), k);
+        }
+        const la = this.climbForearmBones[i];
+        if (la && spec.lowerArm) {
+          const [qx, qy, qz, qw] = spec.lowerArm;
+          la.quaternion.slerp(rideQuat.set(qx, side * qy, side * qz, qw), k);
+        }
+      }
+    }
+    if (this.rideArmBlend > 1e-3 && this.rideHipBone) this.applyRideReins(this.rideArmBlend);
+  }
+
+  /** Both hands on the reins: the upper arms and forearms aimed (ride_pose.ts) so the fists
+   *  meet low over the pommel. The arms hang off the spine, so each upper arm's parent frame
+   *  is composed up from the pelvis through the bones the clip has just posed. */
+  private applyRideReins(k: number): void {
+    const hips = this.rideHipBone;
+    if (!hips) return;
+    if (this.rideArmBones === undefined) {
+      this.rideArmBones = RIDE_ARM_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+    }
+    for (let i = 0; i < 2; i++) {
+      const upper = this.rideArmBones[i * 2];
+      const fore = this.rideArmBones[i * 2 + 1];
+      if (!upper || !fore) continue;
+      // the upper arm's parent frame in the pelvis frame: the local turns between them
+      rideSwing.identity();
+      let p = upper.parent;
+      while (p && p !== hips) {
+        rideSwing.premultiply(p.quaternion);
+        p = p.parent;
+      }
+      if (p !== hips) continue;
+      reinArmDirections(i === 0 ? 1 : -1, rideDirA, rideDirB);
+      aimBone(rideQuat.copy(upper.quaternion), rideSwing, rideDirA);
+      upper.quaternion.slerp(rideQuat, k);
+      rideSwing.multiply(upper.quaternion);
+      aimBone(rideQuat.copy(fore.quaternion), rideSwing, rideDirB);
+      fore.quaternion.slerp(rideQuat, k);
     }
   }
 
@@ -2769,7 +2893,7 @@ export class CharacterVisual {
     // Spellcast_Raise) keeps its authored clip automatically
     // (tests/weapon_skins.test.ts).
     const rawOverride = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
-    const overrideIsRanged = rawOverride !== undefined && /Shot|Shoot/.test(rawOverride);
+    const overrideIsRanged = rawOverride !== undefined && /Shot|Shoot|Rifle|Bow/.test(rawOverride);
     // Light the fist BEFORE the clip choice, so an ability that declares a glow gets one
     // even on a rig whose authored clip is missing: the telegraph is the load-bearing half
     // of a slam, and it must not depend on the animation having been baked.
@@ -3613,6 +3737,7 @@ export class CharacterVisual {
   resetForReuse(): void {
     this.turnState.seeded = false;
     this.entranceFor = undefined;
+    this.wasSwimming = false;
     if (this.glowPulse?.reset() && !this.disposed) this.applyVisualMaterials();
   }
 
@@ -4803,7 +4928,7 @@ export class CharacterVisual {
     }
     const clip = this.def.clips.stow;
     const gesture = clip ? this.action(clip) : null;
-    if (!this.initialized || this.deadLock || !gesture) {
+    if (!this.initialized || this.deadLock || this.wasSwimming || !gesture) {
       if (forceStow(this.stow, stowed)) this.applyStowSwap();
       return;
     }
@@ -4820,6 +4945,28 @@ export class CharacterVisual {
         this.stowLift.dur = swapDelay * 2;
       }
     }
+  }
+
+  private isStowOneShot(): boolean {
+    const clip = this.def.clips.stow;
+    if (!clip || !this.current) return false;
+    return this.current.getClip().name === clip;
+  }
+
+  /** Cancel the active one-shot immediately, unwinding a same-frame trigger back
+   *  to the action that was driving the pose before it started. */
+  private cancelOneShot(): void {
+    if (this.oneShotAt === this.mixer.time) {
+      this.current?.stop();
+      this.oneShotFrom?.stopFading();
+      this.current = this.oneShotFrom;
+    }
+    this.currentIsOneShot = false;
+    this.currentOneShotIsAttack = false;
+    this.currentOneShotIsEmote = false;
+    this.currentOneShotIsIdleVariant = false;
+    this.currentOneShotIsLanding = false;
+    this.currentOneShotIsCastExit = false;
   }
 
   /** Cut the stow gesture at its windup peak: hand back to base so the chop
@@ -4839,8 +4986,8 @@ export class CharacterVisual {
    *  the transition just landed on, keeping the applied weapon skin, then run the
    *  shared re-attach tail (materials, caster snapshot, skin VFX rebuilt on the
    *  new payloads). Mixer state is untouched. */
-  private applyStowSwap(): void {
-    this.refreshLoadout();
+  private applyStowSwap(fadeBase = true): void {
+    this.refreshLoadout(fadeBase);
     // The swap lands mid-gesture, long after the renderer's stow diff returned,
     // so the rig it rebuilds (and the skin VFX point light hanging off it) can
     // only be reconciled into the light budget on a later frame: raise an edge
@@ -5135,7 +5282,7 @@ export class CharacterVisual {
     // The outgoing clip keeps playing through a crossfade, so any real fade
     // here spins the wheels on after the throttle is released.
     if (this.def.cutToIdle && next === 'idle') return CUT_FADE;
-    return FADE;
+    return from !== undefined ? waterFade(from, next) : FADE;
   }
 
   private effectMaterial<T extends THREE.Material | THREE.Material[]>(material: T): T {
@@ -5293,7 +5440,7 @@ export class CharacterVisual {
   /** Re-pick the loadout clip set (weapon_loadout_core.ts) after the hands' contents change:
    *  a mainhand or offhand swap, or the sheathe landing. A rig standing in a base state
    *  crossfades onto its new variant (the base machine only re-resolves on a state change). */
-  private refreshLoadout(): void {
+  private refreshLoadout(fadeBase = true): void {
     const swaps = this.def.clips.loadoutSwaps;
     if (!swaps) return;
     const attach = this.def.attach ?? [];
@@ -5311,7 +5458,7 @@ export class CharacterVisual {
     const next = loadout ? (swaps[loadout] ?? null) : null;
     if (next === this.loadoutSwap) return;
     this.loadoutSwap = next;
-    if (this.initialized && !this.deadLock && !this.currentIsOneShot) {
+    if (fadeBase && this.initialized && !this.deadLock && !this.currentIsOneShot) {
       const base = this.baseAction();
       if (base && base !== this.current) this.fadeTo(base, 0.2, false);
     }
@@ -5653,9 +5800,29 @@ export class CharacterVisual {
     // Due, but something else is playing (very often the idle BEAT, which is a
     // one-shot too). Hold the draw rather than rearming: rearming here let the
     // beat reset this clock on every fire and the pool would never come up.
-    if (this.currentIsOneShot) return;
+    // A held draw parks the clock AT zero: left below it, the next frame's
+    // `< 0` unarmed check above re-armed it from scratch, so any hold (this
+    // one, or the loop seam's below, which always waits) dropped the fidget.
+    if (this.currentIsOneShot) {
+      this.idleVariantIn = 0;
+      return;
+    }
+    if (this.def.clips.idleVariantsOnLoopSeam) {
+      const idle = this.action(this.def.clips.idle);
+      if (idle && !onIdleLoopSeam(idle.time, idle.getClip().duration)) {
+        this.idleVariantIn = 0; // hold for the seam
+        return;
+      }
+    }
     this.idleVariantIn = this.nextIdleVariantIn();
-    const pick = variants[Math.floor(Math.random() * variants.length)];
+    const clips = this.def.clips;
+    const pool = clips.idleVariantsIncludeIdle ? [...variants, clips.idle] : variants;
+    const pick = clips.idleVariantsShuffled
+      ? drawIdleVariant(pool, this.idleVariantBag, this.lastIdleVariant)
+      : pool[Math.floor(Math.random() * pool.length)];
+    this.lastIdleVariant = pick;
+    // The base idle drawn as one of the pool: it simply plays one more loop.
+    if (pick === clips.idle) return;
     if (!this.action(pick)) return;
     this.playOneShot(pick, 1);
     this.currentOneShotIsIdleVariant = true;
@@ -5694,7 +5861,10 @@ export class CharacterVisual {
     }
     this.idleBeatIn -= dt;
     if (this.idleBeatIn > 0) return;
-    if (this.currentIsOneShot) return; // wait for the floor, keep the clock at 0
+    if (this.currentIsOneShot) {
+      this.idleBeatIn = 0; // wait for the floor, keep the clock at 0 (below it reads as unarmed)
+      return;
+    }
     this.idleBeatIn = arm();
     if (!this.action(beat.clip)) return;
     this.playOneShot(beat.clip, 1);
@@ -5814,6 +5984,15 @@ export class CharacterVisual {
   private wakeAction(): THREE.AnimationAction | null {
     const clip = this.def.clips.wake;
     return clip ? this.action(clip) : null;
+  }
+
+  /** Hand a running flourish back to the base state over `fade` seconds (a mount's rear
+   *  broken off by its rider moving away); a no-op when no flourish is playing. */
+  endFlourish(fade: number): void {
+    const clip = this.def.clips.flourish;
+    if (!clip || !this.currentIsOneShot || this.current?.getClip().name !== clip) return;
+    this.currentIsOneShot = false;
+    this.fadeTo(this.baseAction(), fade, false);
   }
 
   /** One-shot the flourish clip (skeleton awaken / boss taunt / the dragonkin

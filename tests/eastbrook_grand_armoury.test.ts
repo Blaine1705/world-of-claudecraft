@@ -1,13 +1,14 @@
 // Eastbrook Grand Armoury contract, round 4: the armoury is RETIRED from
-// built-in placement. The KayKit barracks and a watch tower garrison its Wolf
-// Run lot at (17.5, -5.5) as zone1 decorProps, while the armoury GLB, its
-// exporter, and the render adapter stay shipped for custom worlds that place
-// the landmark themselves. Provenance note: the authored landmark data lives
+// built-in placement. The KayKit barracks and a watch tower garrisoned its
+// Wolf Run lot at (17.5, -5.5) as zone1 decorProps until the genshin artstyle
+// merge (8bff2cec638) cleared them, so the lot now stands empty, while the
+// armoury GLB, its exporter, and the render adapter stay shipped for custom
+// worlds that place the landmark themselves. Provenance note: the authored landmark data lives
 // on in src/sim/building_layout.ts (EASTBROOK_GRAND_ARMOURY: nativeBounds
 // 13 x 16.35 x 9, lot (17.5, -5.5) rot -PI/2, foundationDepth 1.35, shipped
 // asset /models/props/eastbrook_grand_armoury.glb); the old lot-ratio pins
-// retired with the placement. These tests pin the retirement, the garrison
-// colliders that replaced the lot, and the still-shipping adapter seam.
+// retired with the placement. These tests pin the retirement, the cleared
+// garrison lot, and the still-shipping adapter seam.
 
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
@@ -28,7 +29,6 @@ import {
 } from '../src/sim/building_layout';
 import {
   bankerChestSpots,
-  colliderInternalsForTest,
   isBlocked,
   pathCrossesFence,
   resolveMovement,
@@ -41,6 +41,7 @@ import {
   FENBRIDGE_LAYOUT,
   localToWorld,
 } from '../src/sim/fenbridge_layout';
+import { activeFenbridgeBuildingById } from '../src/sim/fenbridge_touchup';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -78,12 +79,12 @@ const BARRACKS_FRONT = { x: 12, z: -5.5 } as const;
 
 afterEach(() => setActiveWorldContent(null));
 
+// The Wolf Run garrison decor prop for `key`, or undefined when the lot holds
+// none (the garrison was cleared, so the retirement case asserts absence).
 function garrisonDecorProp(key: string) {
-  const prop = (ZONE1_PROPS.decorProps ?? []).find(
+  return (ZONE1_PROPS.decorProps ?? []).find(
     (candidate) => candidate.key === key && candidate.x > 0 && candidate.z > -30,
   );
-  if (!prop) throw new Error(`missing Wolf Run garrison decor prop ${key}`);
-  return prop;
 }
 
 // Returns where the follower actually stopped (within 0.2 yd of `to`), so a
@@ -197,58 +198,16 @@ describe('Eastbrook Grand Armoury retirement (round 4)', () => {
     ]);
   });
 
-  it('pins the KayKit barracks and watch tower garrison on the freed Wolf Run lot', () => {
-    expect(garrisonDecorProp('hexBarracks')).toEqual({
-      key: 'hexBarracks',
-      x: 17.5,
-      z: -5.5,
-      rot: -1.5707963267948966,
-      scale: 6.5,
-      r: 5.2,
-      h: 11,
-      hw: 4.7,
-      hd: 4.5,
-    });
-    expect(garrisonDecorProp('hexWatchtower')).toEqual({
-      key: 'hexWatchtower',
-      x: 27,
-      z: -13,
-      rot: 2.2,
-      scale: 6.5,
-      r: 2.4,
-      h: 12,
-    });
+  it('clears the KayKit barracks and watch tower garrison from the Wolf Run lot', () => {
+    expect(garrisonDecorProp('hexBarracks')).toBeUndefined();
+    expect(garrisonDecorProp('hexWatchtower')).toBeUndefined();
   });
 
-  it('collides the garrison as the authored box and circle with visual-height tops', () => {
-    const colliders = colliderInternalsForTest.staticWorldColliders(SEED);
-    const barracks = colliders.find(
-      (collider) =>
-        collider.type === 'obb' && collider.x === BARRACKS_LOT.x && collider.z === BARRACKS_LOT.z,
-    );
-    expect(barracks).toMatchObject({
-      type: 'obb',
-      hw: 4.7,
-      hd: 4.5,
-      rot: -1.5707963267948966,
-      cameraTopY: terrainHeight(BARRACKS_LOT.x, BARRACKS_LOT.z, SEED) + 11,
-    });
-    const watchtower = colliders.find(
-      (collider) => collider.type === 'circle' && collider.x === 27 && collider.z === -13,
-    );
-    expect(watchtower).toMatchObject({
-      type: 'circle',
-      r: 2.4,
-      cameraTopY: terrainHeight(27, -13, SEED) + 12,
-    });
-
-    // The lot center blocks (the barracks stands there), the approach front
-    // keeps the route body radius clear of the facade, and ground the old
-    // armoury footprint walled off past the barracks box is walkable again.
-    expect(isBlocked(SEED, BARRACKS_LOT.x, BARRACKS_LOT.z, 0)).toBe(true);
+  it('leaves the Wolf Run garrison lot unblocked', () => {
+    expect(isBlocked(SEED, BARRACKS_LOT.x, BARRACKS_LOT.z, 0.5)).toBe(false);
     expect(isBlocked(SEED, BARRACKS_FRONT.x, BARRACKS_FRONT.z, 0.8)).toBe(false);
     expect(isBlocked(SEED, 13.5, -11, 0.5)).toBe(false);
-    expect(isBlocked(SEED, 27, -13, 0.5)).toBe(true);
+    expect(isBlocked(SEED, 27, -13, 0.5)).toBe(false);
   });
 
   it('grants no rest anywhere on the garrison lot', () => {
@@ -371,19 +330,33 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
       buildingContainsPoint(fenbridgeInn, outsideRestPoint.x, outsideRestPoint.z, restPadding),
     ).toBe(false);
 
+    const activeInn = activeFenbridgeBuildingById('fenbridge_crooked_reed_inn') ?? authoredInn;
+    const activeRestPoint = localToWorld(
+      activeInn.position,
+      activeInn.rotation,
+      activeInn.sockets.entrance.localPosition.x,
+      -(activeInn.nativeDimensions.depth / 2 + restPadding - 0.25),
+    );
+    const activeOutsideRestPoint = localToWorld(
+      activeInn.position,
+      activeInn.rotation,
+      activeInn.sockets.entrance.localPosition.x,
+      -(activeInn.nativeDimensions.depth / 2 + restPadding + 0.25),
+    );
+
     const player = {
       inCombat: false,
       pos: {
-        x: restPoint.x,
-        y: terrainHeight(restPoint.x, restPoint.z, SEED),
-        z: restPoint.z,
+        x: activeRestPoint.x,
+        y: terrainHeight(activeRestPoint.x, activeRestPoint.z, SEED),
+        z: activeRestPoint.z,
       },
     } as Entity;
     expect(isResting(player)).toBe(true);
     player.pos = {
-      x: outsideRestPoint.x,
-      y: terrainHeight(outsideRestPoint.x, outsideRestPoint.z, SEED),
-      z: outsideRestPoint.z,
+      x: activeOutsideRestPoint.x,
+      y: terrainHeight(activeOutsideRestPoint.x, activeOutsideRestPoint.z, SEED),
+      z: activeOutsideRestPoint.z,
     };
     expect(isResting(player)).toBe(false);
   });
@@ -588,10 +561,17 @@ describe('Eastbrook Grand Armoury render seam (custom-world adapter)', () => {
     // pre-round-6 envelope, so the minimum and the skirt depth return to the
     // values they carried before the camp and POI moves. The entrance sample
     // and the placement height never moved through either round.
+    // Re-pinned 2026-10 for the garrison clearance in the genshin artstyle
+    // merge (8bff2cec638, landed via e10ecc2aef8): the hexBarracks and
+    // hexWatchtower decorProps left zone1, and those rows fed the
+    // seed-162 world-gen under this lot (restoring only those two rows on the
+    // same tree restores 5.559724942256701 and 0.977169449218473), so the
+    // envelope minimum fell and the skirt deepened. The entrance sample and the
+    // placement height did not move.
     expect(alternatePlacement.entranceGroundY).toBeCloseTo(7.886894391475175, 8);
-    expect(alternatePlacement.minGroundY).toBeCloseTo(5.559724942256701, 8);
+    expect(alternatePlacement.minGroundY).toBeCloseTo(5.363468776143649, 8);
     expect(alternatePlacement.y).toBeCloseTo(6.536894391475174, 8);
-    expect(alternatePlacement.foundationSkirtDepth).toBeCloseTo(0.977169449218473, 8);
+    expect(alternatePlacement.foundationSkirtDepth).toBeCloseTo(1.1734256153315252, 8);
 
     const group = new THREE.Group();
     const stone = new THREE.MeshStandardMaterial({ vertexColors: true });

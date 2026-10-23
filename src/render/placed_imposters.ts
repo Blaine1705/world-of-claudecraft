@@ -26,6 +26,7 @@ import * as THREE from 'three';
 import { SlotTable } from './placed_batch_core';
 import type { BatchSub } from './placed_batches';
 import { PLACED_FADE_ATTRIBUTE, PLACED_FADE_DITHER_GLSL } from './placed_fade';
+import { spriteQuadRayDistance } from './placed_sprite_pick_core';
 
 export const IMPOSTER_VIEWS = 8;
 /** The default cell: foliage. The town's buildings bake at 128 (a wall's
@@ -218,6 +219,38 @@ export class PlacedImposters {
     this.mesh.visible = this.slots.count > 0;
     this.markDirty();
     return true;
+  }
+
+  /** The placement id drawn at a live slot (0..instanceCount-1). */
+  idAt(slot: number): number {
+    return this.slots.idAt(slot);
+  }
+
+  /**
+   * Distance along `ray` to the billboard the shader draws at `slot`, turned to
+   * face an eye at (`eyeX`, `eyeZ`), or -1 on a miss. three's raycast only sees
+   * the base quad, so editor picking asks each sprite here instead (what counts
+   * as a hit: placed_sprite_pick_core.ts). Reads the uploaded seat and size, so
+   * the test is against exactly what is drawn. Allocation-free.
+   */
+  rayDistance(slot: number, ray: THREE.Ray, eyeX: number, eyeZ: number): number {
+    if (slot < 0 || slot >= this.slots.count) return -1;
+    const s = slot * 4;
+    return spriteQuadRayDistance(
+      this.seat[s],
+      this.seat[s + 1],
+      this.seat[s + 2],
+      this.size[slot * 2],
+      this.size[slot * 2 + 1],
+      eyeX,
+      eyeZ,
+      ray.origin.x,
+      ray.origin.y,
+      ray.origin.z,
+      ray.direction.x,
+      ray.direction.y,
+      ray.direction.z,
+    );
   }
 
   setFade(id: number, fade: number): void {

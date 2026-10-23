@@ -61,6 +61,7 @@ import {
 import { isEscortNpcTemplate } from '../escort';
 import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
 import { isPinnedInPlace, releasePin } from '../instances/instance_combat_hold';
+import { insideMudfinHutWall } from '../mudfin_huts';
 import { NYTHRAXIS_BONE_SPIKE_ID, pinNythraxisBoneSpike } from '../nythraxis_bone_spike';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { isBuddyMob, updateBuddyMob } from '../pet/buddy_ai';
@@ -704,11 +705,17 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         } else {
           const ang = rng.range(0, Math.PI * 2);
           const r = rng.range(MIN_WANDER_RADIUS, MAX_WANDER_RADIUS);
-          mob.wanderTarget = ctx.groundPos(
-            mob.spawnPos.x + Math.sin(ang) * r,
-            mob.spawnPos.z + Math.cos(ang) * r,
-          );
-          mob.wanderTimer = 30;
+          const pickX = mob.spawnPos.x + Math.sin(ang) * r;
+          const pickZ = mob.spawnPos.z + Math.cos(ang) * r;
+          if (insideMudfinHutWall(pickX, pickZ, PLAYER_BODY_RADIUS)) {
+            // A pick inside a solid mudfin hut can never be reached, so walking to it
+            // held the mob at the wall for the whole timeout (sim/mudfin_huts.ts):
+            // stay put for one more pause instead, still inside the wander ring.
+            mob.wanderTimer = wanderPause(rng, mob, 3, 10);
+          } else {
+            mob.wanderTarget = ctx.groundPos(pickX, pickZ);
+            mob.wanderTimer = 30;
+          }
         }
       }
       if (mob.wanderTarget) {

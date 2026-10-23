@@ -26,6 +26,7 @@ export const BUDDY_ICON_BATCH = [
   { itemId: 'whistle_horse', glb: 'public/models/buddies/horse.glb' },
   { itemId: 'whistle_crystal_lich', glb: 'public/models/buddies/crystal_lich.glb' },
   { itemId: 'whistle_forgemaw', glb: 'public/models/buddies/forgemaw.glb' },
+  { itemId: 'whistle_sprites', glb: 'public/models/buddies/sprites.glb' },
 ];
 
 /** True when a GLB declares the KTX2 texture extension, which the preview

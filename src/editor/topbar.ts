@@ -56,6 +56,8 @@ export interface TopbarDeps {
   onRegionExport(): void;
   /** Publish the open map into the local repo as game content (dev only). */
   onPublishMap(): void;
+  /** Push only this copy's changes into the repo map it was opened from. */
+  onPushMapChanges(): void;
   /** Uninstall this map from the local game, restoring the standard world. */
   onUnpublishMap(): void;
   onViewMode(mode: '3d' | '2d'): void;
@@ -105,6 +107,7 @@ export class Topbar {
   private readonly hitboxBtn: HTMLButtonElement;
   private readonly regionExportBtn: HTMLButtonElement;
   private publishBtn!: HTMLButtonElement;
+  private pushBtn!: HTMLButtonElement;
   private unpublishBtn!: HTMLButtonElement;
   private moreBtn!: HTMLButtonElement;
   private moreMenu!: HTMLElement;
@@ -329,6 +332,15 @@ export class Topbar {
       ),
     );
     this.publishBtn.style.display = 'none';
+    this.pushBtn = item(
+      button(
+        t('editor.topbar.pushMapChanges'),
+        deps.onPushMapChanges,
+        'ed-push-map-changes',
+        t('editor.topbar.pushMapChangesTitle'),
+      ),
+    );
+    this.pushBtn.style.display = 'none';
     this.unpublishBtn = item(
       button(
         t('editor.topbar.unpublishMap'),
@@ -659,6 +671,7 @@ export class Topbar {
   /** Show Publish to Game only on the dev server (the endpoint is dev-only). */
   setPublishEnabled(available: boolean): void {
     this.publishBtn.style.display = available ? '' : 'none';
+    this.pushBtn.style.display = available ? '' : 'none';
     this.unpublishBtn.style.display = available ? '' : 'none';
   }
 

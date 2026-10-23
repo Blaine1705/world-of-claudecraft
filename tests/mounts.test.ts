@@ -110,12 +110,15 @@ function ride(sim: Sim, pid: number, key: string): void {
 
 describe('mount catalog', () => {
   it('keeps the horse first and appends the two referral milestone mounts', () => {
-    expect(MOUNT_KEYS).toHaveLength(13);
+    // Existing mount identities remain stable, including the retired tanks and guild destrier.
+    expect(MOUNT_KEYS).toHaveLength(16);
+    // Pinned as a literal: the acquisition sweeps below iterate this list, so a
+    // mount dropped from it would silently lose its no-route checks.
+    expect(DEVELOPER_MOUNTS).toEqual(['terrorspark_groundshaker', 'referral_tank']);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');
-    // Every developer-only mount is a real catalog key, and the tank keeps the
-    // tail so a new PLAYER-facing mount always lands above it.
+    // Every developer-only mount remains a real catalog key.
     for (const key of DEVELOPER_MOUNTS) expect(MOUNT_KEYS).toContain(key);
   });
 
@@ -133,7 +136,9 @@ describe('mount catalog', () => {
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
     expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
+    expect(spec('nightwing_chimera')).toEqual(['epic', 0.8]);
     expect(spec('drakemaw_raptor')).toEqual(['epic', 0.8]);
+    expect(spec('lantern_hall_destrier')).toEqual(['uncommon', 0.7]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -287,6 +292,24 @@ describe('mount reins items (the collection: owning the item is owning the mount
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
       if (key === 'avian_strider') continue; // the Rift Watch Champion purchase, pinned above
+      if (key === 'lantern_hall_destrier') {
+        // Lantern Hall's seal purchase (content/guild_contracts.ts, tests/guild_steed_and_sword):
+        // ONE door, so it rides no mob table, no heroic boss and no rift pool.
+        const reins = mountItemId(key)!;
+        for (const mob of Object.values(MOBS))
+          expect(
+            mob.loot.some((l) => l.itemId === reins),
+            `${reins} on ${mob.id}`,
+          ).toBe(false);
+        for (const rows of Object.values(HEROIC_BOSS_LOOT))
+          expect(
+            rows.some((l) => l.itemId === reins),
+            `${reins} heroic`,
+          ).toBe(false);
+        for (const pool of [RIFT_EPIC_MOUNT_REINS, RIFT_BLUE_MOUNT_REINS, RIFT_GREEN_MOUNT_REINS])
+          expect(pool as readonly string[]).not.toContain(reins);
+        continue;
+      }
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
       if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts
@@ -823,22 +846,20 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     }
   });
 
-  it('the annual reward tank stays refused by the exchange pipes (still soulbound)', () => {
-    expect(guildBankPipeRefusal({ itemId: 'reins_terrorspark_groundshaker', count: 1 })).not.toBe(
-      null,
-    );
+  it('the annual reward Chimaera stays refused by the exchange pipes (still soulbound)', () => {
+    expect(guildBankPipeRefusal({ itemId: 'reins_nightwing_chimera', count: 1 })).not.toBe(null);
   });
 
-  it('the annual tank remains owned and rideable after membership expires', () => {
+  it('the annual Chimaera remains owned and rideable after membership expires', () => {
     const sim = makeWorld();
     const pid = join(sim);
-    sim.addItem('reins_terrorspark_groundshaker', 1, pid);
+    sim.addItem('reins_nightwing_chimera', 1, pid);
     sim.setMembership(pid, 30);
     sim.setMembership(pid, 0);
-    expect(mountOwned(sim.players.get(pid)!, 'terrorspark_groundshaker')).toBe(true);
-    summonMountItem(sim.ctx, pid, 'terrorspark_groundshaker');
+    expect(mountOwned(sim.players.get(pid)!, 'nightwing_chimera')).toBe(true);
+    summonMountItem(sim.ctx, pid, 'nightwing_chimera');
     finishTransition(sim, pid);
-    expect(sim.entities.get(pid)!.mountKey).toBe('terrorspark_groundshaker');
+    expect(sim.entities.get(pid)!.mountKey).toBe('nightwing_chimera');
   });
 
   it('vendor sell still refuses reins (noVendorSell: sellValue 0 protects the collection)', () => {

@@ -18,7 +18,7 @@
 // imports and runs unchanged on the server, offline, and headless.
 // ---------------------------------------------------------------------------
 
-export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling';
+export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling' | 'sprites';
 
 // Historical whistle identities remain readable in existing bags and bank saves.
 // This type is only for item definitions; active ownership uses BuddyKey.
@@ -76,19 +76,16 @@ export const BUDDIES: Record<BuddyKey, BuddyDef> = {
     name: 'Forgemaw The Molten',
   },
   sapling: { key: 'sapling', name: 'Sapling' },
+  sprites: {
+    key: 'sprites',
+    name: 'Flicker and Glimmer',
+  },
 };
 
-// Enumerated art debt (the src/ui/icons.ts ITEM_ART_PENDING ledger): the
-// Emberfall Phoenix and Horse whistles have no committed icon yet. Their icons
-// render from the buddy GLB like every other whistle (scripts/assets/
-// render_buddy_item_icons.mjs), but that lane needs KTX-Software's `ktx` on
-// PATH to decompress the roster's models first, which the machines that
-// authored these two did not have. Empty this list in the same change that
-// commits the renders; tests/item_icons.test.ts pins the membership.
-export const BUDDY_ART_PENDING_ITEM_IDS: readonly string[] = [
-  'whistle_emberfall_phoenix',
-  'whistle_horse',
-];
+// Retired Emberfall Phoenix tokens remain readable in old saves and retain their
+// procedural icon. The companion has no live model or acquisition source; see
+// docs/achievements/icon-backlog-v045/retired-phoenix-disposition.md.
+export const BUDDY_ART_PENDING_ITEM_IDS: readonly string[] = ['whistle_emberfall_phoenix'];
 
 /** Catalog order: declaration order. */
 export const BUDDY_KEYS = Object.keys(BUDDIES) as readonly BuddyKey[];

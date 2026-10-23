@@ -117,12 +117,14 @@ export function nearestOverworldGraveyard(
 // to the overworld graveyard nearest the instance door (never inside the instance): the
 // ghost runs its spirit back to the door and re-enters to resurrect where it arrives, so
 // no Spirit Healer stands inside an instance. Outdoors it is the nearest overworld
-// graveyard to where the body fell.
+// graveyard to where the body fell. The yards are the running world's own
+// (ctx.graveyards, else ctx.playerStart), so release and both /unstuck outcomes
+// land at the same graveyard on a custom map as on the built-in one.
 function ghostGraveyard(
   ctx: SimContext,
   p: Entity,
-  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
-  fallback: { x: number; z: number } = PLAYER_START,
+  graveyards: readonly { x: number; z: number }[] = ctx.graveyards,
+  fallback: { x: number; z: number } = ctx.playerStart,
 ): { x: number; z: number } {
   // Thornhollow Fields keeps the classic release: the spirit rises in its own
   // team's keep graveyard plot and waits there for the wave, never walking out
@@ -175,8 +177,8 @@ function ghostGraveyard(
 export function releasePlayerSpirit(
   ctx: SimContext,
   pid?: number,
-  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
-  fallback: { x: number; z: number } = PLAYER_START,
+  graveyards: readonly { x: number; z: number }[] = ctx.graveyards,
+  fallback: { x: number; z: number } = ctx.playerStart,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -301,8 +303,8 @@ function releaseAtNearestGraveyard(
   ctx: SimContext,
   meta: PlayerMeta,
   p: Entity,
-  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
-  fallback: { x: number; z: number } = PLAYER_START,
+  graveyards: readonly { x: number; z: number }[],
+  fallback: { x: number; z: number },
 ): void {
   // Resolve the graveyard before moving the entity out of its instance band.
   const gy = ghostGraveyard(ctx, p, graveyards, fallback);

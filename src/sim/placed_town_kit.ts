@@ -239,3 +239,82 @@ export function scalePlacedTownMeasurements<T extends PlacedTownMeasurements>(
 export function placedTownSeat(scale: number, frontClearance: number): PlacedTownSeat {
   return { scale, lift: -(scale + 0.05), frontClearance };
 }
+
+/** One level stamp of a town's pads, before its falloff and mode are set. */
+export interface TownPadStamp {
+  x: number;
+  z: number;
+  radius: number;
+  delta: number;
+  hardness: number;
+  gx?: number;
+  gz?: number;
+}
+
+/**
+ * Level ground under a building: a grid of `columns` by `rows` stamps along
+ * its reach's own axes, each a hard disc over its cell that tapers `taper`
+ * yards past the cell's corner, so the level ground hugs the walls instead of
+ * spilling across the square (Highwatch's pads, sim/highwatch_layout.ts).
+ */
+export function padsAlong(
+  building: { readonly reach: Obb2 },
+  height: number,
+  columns: number,
+  rows: number,
+  taper: number,
+): TownPadStamp[] {
+  const reach = building.reach;
+  const cellWidth = (reach.halfWidth * 2) / columns;
+  const cellDepth = (reach.halfDepth * 2) / rows;
+  const core = Math.hypot(cellWidth / 2, cellDepth / 2);
+  const radius = core + taper;
+  const pads: TownPadStamp[] = [];
+  for (let column = 0; column < columns; column++) {
+    for (let row = 0; row < rows; row++) {
+      const center = localToWorld(
+        reach.center,
+        reach.rotation,
+        -reach.halfWidth + cellWidth * (column + 0.5),
+        -reach.halfDepth + cellDepth * (row + 0.5),
+      );
+      pads.push({ x: center.x, z: center.z, radius, delta: height, hardness: core / radius });
+    }
+  }
+  return pads;
+}
+
+/** One building's ground in a town's pads: the height its reach is levelled
+ *  to, the grid of stamps over it, the pad's short taper and the apron's wide one. */
+export interface TownGround {
+  readonly building: { readonly reach: Obb2 };
+  readonly height: number;
+  readonly columns: number;
+  readonly rows: number;
+  readonly taper: number;
+  readonly apron: number;
+}
+
+/**
+ * A town's level pads, laid the way Highwatch lays them: every building's wide
+ * soft APRON first (the hill eases down to it, and the fill out from it, at a
+ * walkable grade), then the caller's `between` stamps (a square re-levelled, a
+ * lane graded between two heights), then every building's own pad with its
+ * short taper, so each reach ends exactly level whatever the aprons left under
+ * it, then the `after` stamps (ground a pad must not carry away). Smooth level
+ * stamps, ready for the built-in world's terrain edits.
+ */
+export function levelTownPads(
+  ground: readonly TownGround[],
+  stamps: {
+    readonly between?: readonly TownPadStamp[];
+    readonly after?: readonly TownPadStamp[];
+  } = {},
+) {
+  return [
+    ...ground.flatMap((g) => padsAlong(g.building, g.height, g.columns, g.rows, g.apron)),
+    ...(stamps.between ?? []),
+    ...ground.flatMap((g) => padsAlong(g.building, g.height, g.columns, g.rows, g.taper)),
+    ...(stamps.after ?? []),
+  ].map((pad) => ({ ...pad, falloff: 'smooth' as const, mode: 'level' as const }));
+}

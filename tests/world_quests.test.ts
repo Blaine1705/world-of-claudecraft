@@ -494,12 +494,12 @@ describe('world quest content', () => {
       noPlayer: true,
     });
     const pickupPositions = [
-      { x: -63, z: -90 },
-      { x: -66, z: -94 },
-      { x: -70, z: -89 },
-      { x: -77, z: -94 },
-      { x: -86, z: -90 },
-      { x: -68, z: -78 },
+      { x: -55, z: -75 },
+      { x: -44, z: -79 },
+      { x: -58, z: -70 },
+      { x: -62, z: -65 },
+      { x: -50, z: -78 },
+      { x: -67, z: -62 },
     ];
     const pickups = [...sim.entities.values()].filter(
       (entity) => entity.objectItemId === objective.pickupObjectItemId,
@@ -510,7 +510,7 @@ describe('world quest content', () => {
     expect(pickups.map((pickup) => ({ x: pickup.pos.x, z: pickup.pos.z }))).toEqual(
       pickupPositions,
     );
-    expect(destination?.pos).toMatchObject({ x: -80, z: -82 });
+    expect(destination?.pos).toMatchObject({ x: -78, z: -57 });
     if (!destination) throw new Error('Missing freight wagon');
 
     for (const object of [...pickups, destination]) {

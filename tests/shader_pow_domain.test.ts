@@ -124,6 +124,17 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     anchor: /slot\.progress = easeOutQuart\(t\)/,
     why: 'uProgress is written from JS from slot.progress, which is easeOutQuart(min(1, age / dur)), never above 1',
   },
+  {
+    file: 'src/render/drowned_temple_entrance.ts',
+    base: 'smoothstep(0.72, 1.0, fr)',
+    sites: 1,
+    // smoothstep clamps its interpolant to [0, 1] and returns t * t * (3 - 2t),
+    // a product of non-negative factors, so it is never below zero. The bound
+    // only holds while the edges are ordered literals (GLSL leaves a reversed
+    // or equal pair undefined), so the anchor pins the literal pair at the site.
+    anchor: /pow\(smoothstep\(0\.72, 1\.0, fr\), 2\.0\)/,
+    why: 'the moon-ring pool glow: smoothstep with ordered literal edges is clamped to [0, 1]',
+  },
 ];
 
 /** Every file that currently holds at least one pow(), and how many. Pinned as a
@@ -133,6 +144,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/battleground_lantern_fx.ts': 1,
   'src/render/battleground_rune_vfx.ts': 3,
   'src/render/battleground_ward.ts': 1,
+  'src/render/sprites_buddy_flame.ts': 1,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
   // Authored Warrior materials are part of the same fail-closed domain scan.
   'src/render/ability_vfx/baked_impact_layers.ts': 1,
@@ -168,12 +180,16 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ignivar_model_vfx.ts': 1,
   'src/render/nythraxis_soft_fire.ts': 1,
   'src/render/pbr_fragment_shader.ts': 1,
-  'src/render/post_output_grade.ts': 1,
+  // the palette lab's rim light and gradient sky arm (`?palette=on` only;
+  // both bases clamped with saturate), and the grade's palette arm beside its
+  // shipped curve
+  'src/render/palette_lab/lab_lighting.ts': 1,
+  'src/render/palette_lab/palette_sky.ts': 1,
+  'src/render/post_output_grade.ts': 2,
   // the monument's beam falloff, lantern-halo core and ember climb/core
   // (bases clamped with clamp(x, 0, 1) or max(x, 0))
   'src/render/realm_builder_monument_fx.ts': 5,
   'src/render/sky.ts': 1,
-  'src/render/water.ts': 1,
   'src/render/weapon_vfx.ts': 4,
   'src/render/worn_stone.ts': 1,
   // the five-dungeon rework's interiors, skies, water and boss fx, plus the
@@ -195,7 +211,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/drowned_temple/temple_tsunami_fx.ts': 3,
   'src/render/floor_telegraph/telegraph_material.ts': 1,
   'src/render/gravewyrm_sanctum/sanctum_air.ts': 2,
-  'src/render/gravewyrm_sanctum/sanctum_face.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_face.ts': 3,
   'src/render/gravewyrm_sanctum/sanctum_fire.ts': 2,
   'src/render/gravewyrm_sanctum/sanctum_lake.ts': 3,
   'src/render/gravewyrm_sanctum/sanctum_sky.ts': 3,
@@ -259,6 +275,17 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/temple_water_shader.ts': 1,
   'src/render/triplanar_maps.ts': 1,
   'src/render/wall_finishes.ts': 1,
+  // the three dungeon entrances' shaft, film, fresnel and flame shaders
+  // (41da06f9a7d, a38282db9f6 and their integration merge 7848da76b21) and the
+  // Studio's per-part material finishes (37a8a730640): every base is a clamp,
+  // max(x, 0.0) or abs(), except the moon-ring pool's smoothstep (a
+  // PROVEN_SAFE_BASES row); the Jaguar Maw flame tongue's 1.0 - v took
+  // max(x, 0.0) (sprite key bumped to v3) and the ghost discharge's collar
+  // Gaussian above took abs(), in the change that listed them here
+  'src/render/drowned_temple_entrance.ts': 8,
+  'src/render/sunken_bastion_entrance.ts': 6,
+  'src/render/wildheart_basin_entrance.ts': 6,
+  'src/render/material_finishes.ts': 1,
 };
 
 // Generated locale bundles are megabytes of prose with no shader in them; a

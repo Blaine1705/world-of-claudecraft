@@ -167,7 +167,6 @@ describe('live graphics profile architecture', () => {
 
     const directDeferredProfiles = [
       ['terrain.ts', 'prepareTerrainProfileAssets'],
-      ['water.ts', 'prepareWaterProfileAssets'],
       ['detail_normals.ts', 'prepareStoneDetailProfileAssets'],
       ['worn_stone.ts', 'prepareSurfaceDetailProfileAssets'],
       ['canopy_detail.ts', 'prepareCanopyDetailProfileAssets'],
@@ -284,6 +283,8 @@ const UI_PURE_CORES = [
   'src/ui/leaderboard_podium_html.ts',
   'src/ui/leaderboard_board_html.ts',
   'src/ui/weekly_quests_view.ts',
+  'src/ui/hud/guild_hall/guild_hall_view.ts',
+  'src/ui/hud/guild_hall/guild_quartermaster_view.ts',
   'src/ui/world_quest_wisp_maze_view.ts',
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
@@ -381,6 +382,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
   'src/ui/raid_boss_guide_view.ts',
+  'src/ui/boss_journal/journal_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/restart_strip_core.ts',
   'src/ui/playtime_view.ts',
@@ -622,6 +624,7 @@ const UI_PURE_CORES = [
   'src/ui/char_stats_view.ts',
   // The live world -> stat-sheet model bridge (extracted from Hud.statModel).
   'src/ui/char_stat_model_core.ts',
+  'src/ui/worn_item_definition_core.ts',
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
@@ -841,6 +844,14 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
+  'src/render/mount_embers_core.ts',
+  // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)
+  'src/render/mount_rear_core.ts',
+  // the per-skin swing trail lookup (renderer.ts triggerAttack)
+  'src/render/weapon_skin_trail_core.ts',
+  // the ambient motes' fade around the local player (motes.ts)
+  'src/render/motes_keepout_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
@@ -850,10 +861,7 @@ const RENDER_PURE_CORES = [
   'src/render/chase_camera_floor_core.ts',
   // the air of a walk-in placed town building (its rooms and doors) for the indoor camera
   'src/render/placed_town_interior_core.ts',
-  // the Highwatch manor's chimney smoke: each puff's place, size and opacity at a moment
-  'src/render/highwatch_manor_smoke_core.ts',
-  // the Highwatch manor's lane: its paving's rectangle and flags, road to gate
-  'src/render/highwatch_manor_lane_core.ts',
+  'src/render/highwatch_guild_trophies_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
@@ -976,6 +984,8 @@ const RENDER_PURE_CORES = [
   'src/render/gravewyrm_sanctum/sanctum_story_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_chains_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_kit_plan_core.ts',
+  // The interior AAA pass's placement plan (the second kit, zone by zone).
+  'src/render/gravewyrm_sanctum/sanctum_interior_plan_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_gates_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_lake_core.ts',
   'src/render/gravewyrm_sanctum/sanctum_fire_core.ts',
@@ -1157,11 +1167,15 @@ const RENDER_PURE_CORES = [
   'src/render/entry_detail_horizon_core.ts',
   'src/render/gather_batch_reach_core.ts',
   'src/render/zone_feature_cells_core.ts',
+  'src/render/scenery_geometry_lod_core.ts',
+  'src/render/scenery_detail_core.ts',
+  'src/render/scenery_bands/policy_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/quest_beacon_core.ts',
   'src/render/coach_trail_core.ts',
   'src/render/eastbrook_wolves_guidance_core.ts',
+  'src/render/wolf_hunt_area_core.ts',
   'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
@@ -1213,6 +1227,16 @@ const RENDER_PURE_CORES = [
   'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
+  // Palette lab (?palette=on dev tool): per-zone ground overrides the terrain
+  // caches re-read, and the zone-look model, display solver and export.
+  'src/render/ground_palette_override_core.ts',
+  'src/render/meadow_fullness_core.ts',
+  'src/render/palette_lab/zone_look_core.ts',
+  'src/render/spell_lab/spell_lab_catalog_core.ts',
+  'src/render/ocean/ocean_spectrum_core.ts',
+  'src/render/ocean/ocean_foam_core.ts',
+  'src/render/ocean/water_character_core.ts',
+  'src/render/ocean/water_liveness_core.ts',
   'src/render/battleground_core.ts',
   'src/render/battleground_fx_core.ts',
   'src/render/battleground_lantern_fx_core.ts',
@@ -1283,6 +1307,11 @@ const RENDER_PURE_CORES = [
   'src/render/ignivar_encounter_core.ts',
   'src/render/varkhul_encounter_core.ts',
   'src/render/ignivar_judgment_fire_core.ts',
+  // A torched mudfin hut's fire: the ten-second flame and smoke timeline and
+  // the particle sampler over the hut (randomness passed in).
+  'src/render/hut_fire_core.ts',
+  // ...and its lit smoke plume: how much smoke, where each puff is (hashed, no rng).
+  'src/render/hut_smoke_core.ts',
   'src/render/stations_core.ts',
   'src/render/mobile_stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
@@ -1300,6 +1329,9 @@ const RENDER_PURE_CORES = [
   'src/render/point_light_shader_core.ts',
   'src/render/point_light_carriers_core.ts',
   'src/render/final_color_nan_guard_core.ts',
+  // The opt-in cel-shading R&D look (`?cel=on`): URL parse + the toon ramp
+  // patch over three's directional light loop.
+  'src/render/cel_shading_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
@@ -1362,7 +1394,6 @@ const RENDER_PURE_CORES = [
   'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
   'src/render/water_coverage_core.ts',
-  'src/render/water_wave_core.ts',
   'src/render/weather_field_core.ts',
   'src/render/water_flora_core.ts',
   'src/render/water_flora_shader_core.ts',
@@ -1412,11 +1443,15 @@ const RENDER_PURE_CORES = [
   'src/render/authored_map/zone_atmosphere_core.ts',
   'src/render/authored_map/zone_residency_core.ts',
   'src/render/placed_batch_core.ts',
+  'src/render/placed_sprite_pick_core.ts',
   'src/render/placed_texture_tier_core.ts',
   'src/render/city_clutter_core.ts',
   'src/render/terrain_cut_clip_core.ts',
   'src/render/terrain_cut_rim_core.ts',
   'src/render/cut_cavity_core.ts',
+  'src/render/grass_edge_taper_core.ts',
+  'src/render/grass_interaction_core.ts',
+  'src/render/sprites_buddy_flame_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -2998,6 +3033,7 @@ const UI_DOM_MODULES = [
   'src/ui/mount_inspect_controller.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
+  'src/ui/membership_bag_socket.ts',
   'src/ui/bank_buy_prompt.ts',
   'src/ui/bank_quantity_prompt.ts',
   'src/ui/bank_status_line.ts',
@@ -3010,6 +3046,8 @@ const UI_DOM_MODULES = [
   'src/ui/calendar_window.ts',
   'src/ui/hud/action_bar/action_bar_bind_banner.ts',
   'src/ui/weekly_quests_window.ts',
+  'src/ui/hud/guild_hall/guild_hall_window.ts',
+  'src/ui/hud/guild_hall/guild_offer_stage_controller.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
@@ -3055,6 +3093,9 @@ const UI_DOM_MODULES = [
   // coverage is the deliberate one this file's own header describes.
   'src/ui/daily_rewards_spin_controller.ts',
   'src/ui/store_subscription.ts',
+  // The rotating promo card above chat: it owns its DOM, a rotation interval,
+  // a retire-guard clock read and the prefers-reduced-motion query.
+  'src/ui/store_promo_card.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',

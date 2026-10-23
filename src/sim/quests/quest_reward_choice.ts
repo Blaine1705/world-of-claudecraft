@@ -40,8 +40,8 @@ type StatWeights = Partial<Record<'str' | 'agi' | 'int' | 'spi', number>>;
 // levels 12 and 20, 2026-10-06): an enhancement shaman gained +19.7 DPS from
 // Strength and +6.2 from Agility, a feral cat +23.7 from Strength and nothing
 // from Agility, every caster spec only from Intellect. Healers weigh Spirit for
-// regen. The dev kit's role weights (content/dev_kit_roles.ts) are not used:
-// they read enhancement and feral as Agility specs.
+// regen. Each spec's leading stat matches SPEC_PRIMARY_STAT
+// (content/spec_primary_stat.ts), pinned by tests/spec_primary_stat.test.ts.
 const STR_MELEE: StatWeights = { str: 1, agi: 0.15 };
 const STR_HYBRID: StatWeights = { str: 1, agi: 0.4, int: 0.4 };
 const AGI_MELEE: StatWeights = { agi: 1, str: 0.8 };

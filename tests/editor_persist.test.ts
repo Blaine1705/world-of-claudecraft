@@ -39,6 +39,23 @@ describe('CustomMap build + projection', () => {
     expect(w.terrainEdits).toHaveLength(1);
   });
 
+  it("projects each zone's graveyard point as the world's respawn graveyards", () => {
+    const map = newCustomMap('M', 'id', 0);
+    map.content.zones[0].graveyard = { x: 12.5, z: -7 };
+    const w = customMapToWorldContent(map);
+    const graveyards = w.services?.graveyards ?? [];
+    expect(graveyards).toHaveLength(map.content.zones.length);
+    expect(graveyards[0]).toEqual({
+      id: `gy_${map.content.zones[0].id}`,
+      name: map.content.zones[0].name,
+      x: 12.5,
+      z: -7,
+    });
+    // Only the map's own points: no built-in graveyard and no other built-in service.
+    expect(graveyards.map((g) => g.id)).not.toContain('gy_eastbrook');
+    expect(Object.keys(w.services ?? {})).toEqual(['graveyards']);
+  });
+
   // Studio keeps the authored towns' (Eastbrook Vale, Fenbridge, Highwatch) buildings,
   // wells, stalls and fences on a custom map (commit 1c426ac1ba,
   // custom_world_props.ts clonePropsKeepingAuthoredTowns): with those records
@@ -149,9 +166,9 @@ describe('CustomMap build + projection', () => {
       id: 'fenbridge_crooked_reed_inn',
       // the painted tavern on the main street, stood grand (fenbridge_layout.ts)
       assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
-      x: 13.55,
-      z: 298,
     });
+    expect(fenbridgeInn?.x).toBeCloseTo(21.403452673548912, 6);
+    expect(fenbridgeInn?.z).toBeCloseTo(297.9037795860382, 6);
     expect(highwatchForge).toBeDefined();
     expect(templeCampfire).toBeDefined();
     expect(world.props.mines).toContainEqual(exteriorValeMine);

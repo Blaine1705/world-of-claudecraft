@@ -2866,7 +2866,9 @@ export const DEEDS: Record<string, DeedDef> = {
   // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
   // growing catalog, the feat_book_complete class, and the flag is what
   // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Two catalog slots are
-  // owner-pended today (reins_lanternback_troll, reins_terrorspark_groundshaker;
+  // owner-pended today (reins_lanternback_troll, reins_wobbles_slime;
+  // reins_terrorspark_groundshaker left when the annual membership bundle
+  // began granting it;
   // masterwork:engineering was the third until masterwrought Phase 11o's
   // stats-bearing copperlens_ocular made the mark earnable, 2026-08-25, and
   // reins_drakemaw_raptor left the list when the Mirefen world boss took it),
@@ -3863,6 +3865,65 @@ export const DEEDS: Record<string, DeedDef> = {
     category: 'dungeon',
     renown: 10,
     trigger: { kind: 'manual' },
+  },
+  // Lantern Hall, the Highwatch adventurers' guild (src/sim/guild_contracts.ts and
+  // src/sim/guild_quartermaster.ts), appended at the END. The three contract milestones are
+  // granted when a character's lifetime contract count reaches them; the three feats are the
+  // titles Garrick Holt sells for Lantern Seals. Every
+  // one cosmetic; the feats score nothing and sit outside the Book's completion (rule 2).
+  dgn_guild_first_contract: {
+    id: 'dgn_guild_first_contract',
+    name: 'Writ Signed',
+    desc: "Complete one of Lantern Hall's weekly dungeon contracts.",
+    category: 'dungeon',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  dgn_guild_ten_contracts: {
+    id: 'dgn_guild_ten_contracts',
+    name: 'Regular at the Board',
+    desc: "Complete 10 of Lantern Hall's weekly dungeon contracts.",
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_guild_fifty_contracts: {
+    id: 'dgn_guild_fifty_contracts',
+    name: 'Contract Veteran',
+    desc: "Complete 50 of Lantern Hall's weekly dungeon contracts.",
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'manual' },
+  },
+  feat_guild_writ_runner: {
+    id: 'feat_guild_writ_runner',
+    name: 'Writ-Runner',
+    desc: "Bought from Garrick Holt, Lantern Hall's quartermaster, for 6 Lantern Seals.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Writ-Runner' },
+    feat: true,
+  },
+  feat_guild_hallsworn: {
+    id: 'feat_guild_hallsworn',
+    name: 'Hallsworn',
+    desc: "Bought from Garrick Holt, Lantern Hall's quartermaster, for 14 Lantern Seals.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Hallsworn' },
+    feat: true,
+  },
+  feat_guild_of_lantern_hall: {
+    id: 'feat_guild_of_lantern_hall',
+    name: 'Of Lantern Hall',
+    desc: "Bought from Garrick Holt, Lantern Hall's quartermaster, for 24 Lantern Seals.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'of Lantern Hall' },
+    feat: true,
   },
 };
 

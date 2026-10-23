@@ -27,9 +27,11 @@
 //               swap every dev kit and DPS fixture onto faction stock)
 // Each faction serves one role family across its whole ladder (the three
 // factions progress in parallel, so every character walks all three):
-//   Rift Watch    Agility (rogue, hunter, feral, enhancement)
+//   Rift Watch    Agility (rogue, hunter)
 //   Church Order  casters and healers
-//   Automatons    Strength and the stamina line (warrior, paladin, shaman)
+//   Automatons    Strength and the stamina line (warrior, paladin, enhancement
+//                 shaman; feral druids wear its jewelry and two-hander, since
+//                 Feral is a Strength spec: content/spec_primary_stat.ts)
 // Budgets are COPIED from the live raid and heroic tables, never invented:
 // jewelry mirrors content/ignivar_loot.ts IGNIVAR_JEWELRY_ITEMS (one 25
 // rating, 15 to 16 primary) and content/heroic_vendor.ts; waist and feet
@@ -53,6 +55,7 @@
 
 import type { FactionId, StandingTier } from '../factions';
 import { STANDING_THRESHOLDS } from '../factions';
+import { DRIFTHAVEN_NPC_PLACEMENTS_BY_ID } from '../painted_towns';
 import type { ItemDef, NpcDef } from '../types';
 
 export interface FactionVendorGate {
@@ -937,13 +940,15 @@ export const FACTION_VENDOR_STOCK: Readonly<Record<FactionId, readonly string[]>
 
 /** The 3 Faction Quartermasters and the World Quest Taskmaster. */
 export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
-  // Rift Watch Quartermaster: Drifthaven (palmreach)
+  // Rift Watch Quartermaster: Drifthaven (palmreach). He keeps the counter of
+  // the provisioner's shop on the square's east side, looking out at the
+  // square (sim/painted_towns/drifthaven.ts).
   npc_rift_watch_quartermaster: {
     id: 'npc_rift_watch_quartermaster',
     name: 'Quartermaster Vaelen',
     title: 'Rift Watch Provisioner',
-    pos: { x: -302, z: 812 },
-    facing: 0.8,
+    pos: { ...DRIFTHAVEN_NPC_PLACEMENTS_BY_ID.npc_rift_watch_quartermaster.position },
+    facing: DRIFTHAVEN_NPC_PLACEMENTS_BY_ID.npc_rift_watch_quartermaster.facing,
     color: 0x4a7a9a,
     questIds: [],
     greeting:

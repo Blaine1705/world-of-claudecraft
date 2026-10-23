@@ -382,9 +382,16 @@ describe('isHarvestableCorpse', () => {
     // the release already carries: 216.
     // The Mirefen world-boss branch adds six untagged templates (the boss, three muster
     // soldiers, the drillmaster and the Straw Foreman effigy): 222.
-    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 293.
-    // The three retained cosmetic companions add untagged templates.
-    expect(untagged).toHaveLength(296);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 295,
+    // seventy-three new untagged templates across the reworked dungeons
+    // (re-counted 2026-10 off the merged MOBS at 106a086b617: the 293 first
+    // written here undercounted by two).
+    // The three retained cosmetic companions (buddy_horse, buddy_crystal_lich,
+    // buddy_forgemaw; the account-wide buddy merge 7bc9c74af57) add untagged
+    // templates: 298. Plus buddy_sapling, the Sapling companion the referral
+    // stamp cards (642100fe8aa) brought back to the roster: 299. Plus
+    // buddy_sprites, the flame-sprite pair (Flicker and Glimmer): 300.
+    expect(untagged).toHaveLength(300);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

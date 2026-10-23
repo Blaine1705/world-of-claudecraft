@@ -190,119 +190,21 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     }
   });
 
-  it('keeps the historical audit sealed while the current ledger reaches 288 painted deeds', () => {
-    // The audit's own claim is historical: the 271 deeds live at the v0.36
-    // audit are ALL painted, the six Masterwrought jewelcrafting and
-    // inscription milestone deeds (phases 05 and 06) each shipped their
-    // crest in the change that authored them, and the farming phase
-    // committed the prog_farming_100 crest. The later Masterwrought art wave
-    // paints ten more live rows and records the replacement separately, while
-    // the historical v0.36 evidence remains untouched. The release-owned
-    // additions and the personal hammer quest remain on the current pending ledger.
+  it("keeps the historical audit sealed while every current deed but Lantern Hall's six has its painting", () => {
+    // Historical manifests and their shipping hashes stay pinned above. The
+    // integration45 backlog adds the last 57 crests in separate accepted batches; Lantern
+    // Hall's three contract milestones and three quartermaster titles came after it, on the
+    // pending ledger until their paintings are commissioned.
     expect([...DEED_ART_PENDING]).toEqual([
-      'exp_the_last_keep',
-      'exp_dawnhold_castle',
-      // The release's bank socket ladder pair (Bank Storage phase 06),
-      // appended at the v0.41.0 release-batch sync in DEED_ORDER position.
-      'soc_strongbox_outfitter',
-      'soc_four_bags_deep',
-      // The release's Proving Shore graduation deed, appended at the
-      // release/v0.41.0 sync behind this branch's tail (DEED_ORDER position).
-      'prog_ready_for_an_adventure',
-      // The release's Crucible of the Last Spring raid block (five 'dungeon'
-      // deeds), appended at the v0.41.0 Crucible sync behind this branch's
-      // tail (DEED_ORDER position); each rides the deed_cat_dungeon crest
-      // until its commissioned art lands (docs/achievements/icon-brief.md).
-      'dgn_ignivar',
-      'dgn_ignivar_heroic',
-      'dgn_varkhul',
-      'dgn_varkhul_heroic',
-      'dgn_varkhul_flawless',
-      // The personal hammer quest ships with the explicit category-crest fallback.
-      'hid_forgebreaker',
-      'exp_arcane_calligraphy',
-      'exp_arcane_calligraphy_gold',
-      'exp_forge_helper',
-      'exp_last_barricade',
-      'exp_borrowed_face',
-      'exp_windrider_slalom',
-      'exp_duskweave_dispatches',
-      'exp_wisp_maze',
-      // The faction standing ladder (feature/world-quests, wq-reputation merge):
-      // the three Trusted and three Champion deeds plus the all-factions
-      // Champion ride their category crest until commissioned art lands
-      // (docs/achievements/icon-brief.md). RE-PINNED on the quests integration
-      // branch; the source branch had appended them to DEED_ART_PENDING
-      // without extending this ledger.
-      'prog_rift_watch_trusted',
-      'prog_church_order_trusted',
-      'prog_automatons_trusted',
-      'prog_rift_watch_champion',
-      'prog_church_order_champion',
-      'prog_automatons_champion',
-      'prog_faction_champion_all',
-      // The Clue Scroll casket deeds (feature/clue-scrolls) ride their
-      // category crest the same way.
-      'exp_clue_first_casket',
-      'exp_clue_ten_caskets',
-      // The Buried Hoards Coinsack catch rides the deed_cat_combat crest the same way.
-      'cmb_coinsack_caught',
-      // The release's Eastbrook ferry round trip rides the deed_cat_exploration crest
-      // until its commissioned art lands (docs/design/deeds.md, Icons).
-      'exp_harbor_to_harbor',
-      // The Mirefen world boss's own combat pair, appended at the DEED_ORDER
-      // tail by the world-boss forward-port; both ride the deed_cat_combat
-      // crest until their commissioned art lands.
-      'cmb_balgath',
-      'cmb_balgath_ten',
-      // The muster's pike drill deed, on the same combat crest.
-      'cmb_point_taken',
-      // The five-dungeon rework's encounter deeds ride the deed_cat_dungeon
-      // crest the same way until their paintings are commissioned.
-      'dgn_olen_buttress',
-      'dgn_ossick_moored',
-      'dgn_vael_beacon',
-      'dgn_turretback',
-      'dgn_selthe_pitch',
-      'dgn_colossus_mirror',
-      'dgn_ysolei_high_and_dry',
-      'dgn_mere_hydra',
-      'dgn_crypt_knellwyrm',
-      'dgn_turnkey_cage',
-      'dgn_beastmaster_apart',
-      'dgn_gorgebloom_clean',
-      'dgn_zulgar_uncaught',
-      'dgn_great_saurian',
-      'dgn_korgath_all_chains',
-      'dgn_korgath_still_bound',
-      'dgn_velkhar_cold',
-      'dgn_korzul_thin_ice',
-      'dgn_sledge_tusker',
-      // The Drowned Temple lore guide's deed rides the dungeon crest too.
-      'dgn_drowned_temple_cantor',
-      // The Hollow Crypt wing bosses' encounter deeds.
-      'dgn_marrow_tidy',
-      'dgn_lady_nobody_hanging',
-      'dgn_ilvane_hush',
-      // Morthen the Gravecaller's Rite.
-      'dgn_morthen_candlelight',
+      'dgn_guild_first_contract',
+      'dgn_guild_ten_contracts',
+      'dgn_guild_fifty_contracts',
+      'feat_guild_writ_runner',
+      'feat_guild_hallsworn',
+      'feat_guild_of_lantern_hall',
     ]);
-    // RE-PINNED at the Mirefen world-boss forward-port onto release/v0.44.0:
-    // 302 live (counted directly off the resolved src/sim/content/deeds.ts
-    // DEEDS table, matching the same pin in tests/deed_icons.test.ts and
-    // tests/deed_i18n.test.ts) - 11 explicitly pending = 289 painted.
-    // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
-    // 317 on the quests integration branch: plus the seven faction standing
-    // deeds and the two Clue Scroll casket deeds, all nine on the pending
-    // ledger above, so the painted count holds at 289.
-    // 318 with the release's ferry round trip, the pending ledger's last row,
-    // so the painted count still holds at 289. 319 with the Buried Hoards Coinsack
-    // catch (2026-09-28 merge), also pending: still 289 painted. 322 with the
-    // Mirefen world-boss branch's three combat deeds, all pending.
-    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
-    expect(DEED_ORDER).toHaveLength(346);
-    expect(DEED_IMAGE_IDS.size).toBe(289);
-    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
+    expect(DEED_ORDER).toHaveLength(352);
+    expect(DEED_IMAGE_IDS.size).toBe(346);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),
     );

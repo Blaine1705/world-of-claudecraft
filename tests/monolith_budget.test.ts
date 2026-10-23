@@ -540,13 +540,17 @@ const MONOLITHS: MonolithRow[] = [
     // the Moonbridge banner) moved into log_event_route.ts logEventCue.
     // v0.45.0 integration: 18025 on the merged tree (wc -l); the lower of the two
     // parent pins (18054 and PR 4352's 18069) stands.
+    // LOWERED 18043 -> 18038: the promo card's advert list (Armory, membership,
+    // Refer a Friend) and its locale copy live in store_promo_card.ts storePromoSlides.
+    // wc -l, exact count.
     // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 18054 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
     // wc -l on the merged tree. Exact count.
-    ceiling: 18043,
+    // Combined guild extractions and integration changes, measured with wc -l.
+    ceiling: 17996,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1042,7 +1046,19 @@ const MONOLITHS: MonolithRow[] = [
     // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
     // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
     // merged tree. Exact count.
-    ceiling: 12393,
+    // LOWERED 12405 -> 12400 with the torched mudfin hut fire: the burn cue's two
+    // inline bursts moved into hut_fire_fx.ts (the particle cloud owns and ticks it),
+    // leaving a one-line hand-off plus the light-pool hook. Same headroom as before.
+    // LOWERED 12405 -> 12381 at the merge of feature/lantern-hall-steed into
+    // feature/highwatch-adventurers-guild: Lantern Hall's steed and sword folded the three
+    // fiesta wrappers into one per-frame call (one host instead of three), net of the
+    // weapon-skin swing trail's one-line hook (weapon_skin_trail_core.ts). wc -l on the
+    // merged tree. Exact count.
+    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
+    // (46f0679547): both parent pins for the record, the integration 12400 and the guild
+    // 12381; the two sides' extractions compose to 12354 by wc -l on the merged tree.
+    // Exact count.
+    ceiling: 12354,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1282,7 +1298,17 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
     // (bound straight into the context and the motion deps), paying for the sitOnSeat and
     // resting delegates. Exact count.
-    ceiling: 11594,
+    // LOWERED to 11587 by /unstuck on custom maps: the world's graveyards and
+    // player start became ctx views spirit.ts defaults to, so both
+    // releasePlayerSpirit call sites dropped their explicit arguments. Exact count.
+    // LOWERED to 11582 by Lantern Hall, merged over the v0.45.0 integration: the quest half
+    // of a plain NPC talk moved to quests/npc_quest_talk.ts, paying for the guild's talk
+    // route and two IWorld members. wc -l on the merged tree, exact count.
+    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
+    // (46f0679547): both parent pins for the record, the integration 11587 and the guild
+    // 11582; the two sides' extractions compose to 11578 by wc -l on the merged tree.
+    // Exact count.
+    ceiling: 11578,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1535,7 +1561,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 10958 -> 10924 at the integration merge of #4525 (grand painted towns +
     // the Mirefen tavern): the world hover cursor and its tooltip moved whole into
     // src/game/hover_cursor.ts, paying for the tavern's seat wiring. wc -l. Exact count.
-    ceiling: 10924,
+    // Re-pinned at the merge of origin/feature/v045-integration (tip 43f0cfd0c04) into
+    // feature/genshin-artstyle: both parents' non-overlapping additions compose to 10934
+    // (wc -l < src/main.ts). Exact merged count, zero slack.
+    ceiling: 10934,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1809,7 +1838,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
     // on the merged tree. Exact count.
-    ceiling: 9758,
+    // Guild purchase wiring is paid for by moving quest/delve resync to quest_snapshot_wire.
+    // Measured after formatting: 9751, below both merged parent ceilings.
+    ceiling: 9751,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2275,7 +2306,10 @@ const MONOLITHS: MonolithRow[] = [
     // Merge of the four dungeon entrances (#4478): both parents' additions combine
     // (ours is the paved causeway import), exact merged count, within the
     // release/v0.45.0 ceiling the branch was held to.
-    ceiling: 3864,
+    // v0.45 integration sync at 78c350c8d55 into cel-shading-rnd:
+    // parent pins 3996 and 3864; combined existing wiring,
+    // exact merged count with no new coordinator behavior or slack.
+    ceiling: 3867,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -2373,7 +2407,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 2327 -> 2288 with the open Fenbridge: the palisade's
     // full-height wall arm and the gate-arch jamb block retired with the
     // ring. wc -l. Exact count.
-    ceiling: 2288,
+    // LOWERED 2288 -> 2281 with the Mirefen mudfin huts: the mud hut collider
+    // moved to mudfin_huts.ts mudHutCollider, beside the table the renderer
+    // draws the huts from. wc -l. Exact count.
+    ceiling: 2281,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

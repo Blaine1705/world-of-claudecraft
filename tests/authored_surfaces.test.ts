@@ -98,7 +98,6 @@ const LEGACY_UNFLAGGED_DEFS = new Set([
   'mount_chimeglass_tortoise',
   'mount_drakemaw_raptor',
   'mount_grag_bear',
-  'mount_lanternback_troll',
   'mount_rickshaw_mount',
   'mount_shadowjump_toad',
   'mount_stalkglider_snail',
@@ -127,6 +126,8 @@ const LEGACY_POLISHED_HELD_MODELS = new Set([
 /** The creature and mount defs whose authored atlas showed the low-tier film. */
 const AUTHORED_ATLAS_DEFS = [
   'buddy_sapling',
+  // The sprite buddy: Blender-painted orb gradients.
+  'buddy_sprites',
   'form_cat',
   // The one authored PLAYER body: the WOC warrior (woc_warrior.glb, its own
   // baked Tripo atlases on the artist's rig, never a KayKit palette), which the
@@ -206,6 +207,9 @@ const AUTHORED_ATLAS_DEFS = [
   // The Knucklebone of Balgath's Shape of the Foreman: his own authored stone body.
   'form_foreman',
   'mount_avian_strider',
+  'mount_lanternback_troll',
+  'mount_nightwing_chimera',
+  'mount_wobbles_slime',
   // the Blender-built dungeon bosses and bodies: the Sunken Bastion's Vael,
   // Iron Cage, Drowned Anchor and Gaol Turnkey, and the Hollow Crypt's Lich
   // Bishop (Morthen); and the Bastion's sculpted drowned (the Revenant first)

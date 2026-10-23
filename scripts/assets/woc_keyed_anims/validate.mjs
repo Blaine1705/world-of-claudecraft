@@ -40,7 +40,10 @@ for (const fit of ['male', 'female']) {
     action.clampWhenFinished = true;
     action.play();
     const intent = CATALOG[clip.name];
-    const melee = intent.family === 'attack' && !['bow', 'rifle', 'thrown'].includes(intent.weapon);
+    const melee =
+      intent.family === 'attack' &&
+      intent.autoattack &&
+      !['bow', 'rifle', 'thrown'].includes(intent.weapon);
     const sides = intent.dual === 'pair' ? ['r', 'l'] : [intent.side];
     const previous = {},
       peaks = {},

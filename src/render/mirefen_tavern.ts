@@ -405,9 +405,11 @@ export interface TavernFlameSpot {
   depthZ?: number;
 }
 
-/** Where the live flames burn: three tongues over the round hearth's logs and three in the
- *  wall fireplace's mouth (mirefen_tavern_wall_fire_core.ts; props.ts builds them with the
- *  campfires' flame, so they flicker and throw embers like any campfire). */
+/** Where the live flames burn: three tongues over the round hearth's logs, a cooking fire's,
+ *  licking round the cauldron hung over them on its tripod (scripts/assets/mirefen_tavern/
+ *  inn_props.py CAULDRON), and three in the wall fireplace's mouth
+ *  (mirefen_tavern_wall_fire_core.ts; props.ts builds them with the campfires' flame, so they
+ *  flicker and throw embers like any campfire). */
 export const MIREFEN_TAVERN_FLAMES: readonly TavernFlameSpot[] = (() => {
   const at = (lx: number, ly: number, lz: number, scale: number, depthZ?: number) => {
     const w = tavernToWorld(lx, lz);
@@ -415,9 +417,9 @@ export const MIREFEN_TAVERN_FLAMES: readonly TavernFlameSpot[] = (() => {
   };
   const base = -TAVERN_PIT.depth + 0.5;
   return [
-    at(TAVERN_PIT.x, base, TAVERN_PIT.z, 2.1),
-    at(TAVERN_PIT.x + 0.45, base, TAVERN_PIT.z + 0.25, 1.4),
-    at(TAVERN_PIT.x - 0.4, base, TAVERN_PIT.z - 0.3, 1.5),
+    at(TAVERN_PIT.x, base, TAVERN_PIT.z, 1.4),
+    at(TAVERN_PIT.x + 0.45, base, TAVERN_PIT.z + 0.25, 1.0),
+    at(TAVERN_PIT.x - 0.4, base, TAVERN_PIT.z - 0.3, 1.05),
     // the local x axis (across the mouth's depth) is the world z axis (TAVERN_YAW)
     ...TAVERN_WALL_FIRE_FLAMES.map((f) => at(f.x, f.y, f.z, f.scale, f.depth)),
   ];

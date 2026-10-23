@@ -122,6 +122,9 @@ export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'buried_hoard',
   // src/sim/referral_rewards.ts grants the completed-card and inviter reins.
   'referral_cards',
+  // Lantern Hall's quartermaster (src/sim/guild_quartermaster.ts) sells the guild's horse and
+  // sword for Lantern Seals: a seal counter, not a vendorItems shop, so not a vendor hint.
+  'lantern_hall_quartermaster',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -276,8 +279,11 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'thunderstrut_gobbler',
   'drakemaw_raptor',
   'avian_strider',
+  'lantern_hall_destrier',
   'lanternback_troll',
+  'wobbles_slime',
   'terrorspark_groundshaker',
+  'nightwing_chimera',
   'referral_raptor',
   'referral_tank',
 ] as const;
@@ -299,15 +305,16 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // table as an ungrouped 1% personal drop (content/zone2.ts), the "dedicated
 // world boss" the 2026-08-04 owner call held them back for.
 //
-// Dreadspark Groundshaker is the annual membership bundle's paid mount reward.
+// Nightwing Chimaera is the annual membership bundle's paid mount reward.
 //
 // The Viridian Valestrider is the Rift Watch quartermaster's Champion row
 // (content/faction_vendors.ts).
 //
-// Grumbol the Lanternback has no player acquisition path (DEVELOPER_MOUNTS,
-// content/mounts.ts): no live table awards its reins, so its absence here IS
-// the answer, and it stays hand-listed in SOURCE_PENDING_RULING. Paid mount
-// skins are deliberately absent here.
+// The Lantern Hall Destrier is Garrick Holt's 40-seal row (content/guild_contracts.ts), an
+// activity door because the guild's counter is not a vendorItems shop.
+//
+// The retired tank placeholders have no new acquisition path. Saved reins
+// remain usable. Paid mount skins are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -320,9 +327,10 @@ const MOUNT_SOURCES: Readonly<
   // never encodes meaning in the shape).
   valorsteed: fromVendor('stablemaster_marla'),
   avian_strider: fromVendor('npc_rift_watch_quartermaster'),
-  terrorspark_groundshaker: fromStore(),
+  lantern_hall_destrier: fromActivity('lantern_hall_quartermaster'),
+  nightwing_chimera: fromStore(),
   referral_raptor: fromActivity('referral_cards'),
-  referral_tank: fromActivity('referral_cards'),
+  wobbles_slime: fromActivity('referral_cards'),
   stormfeather_griffin: [
     fromBoss('morthen'),
     fromBoss('nythraxis_scourge_of_thornpeak'),
@@ -391,7 +399,29 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
   'emberwish_wand',
   'encore_bow',
   'meteorlatch_crossbow',
+  'lantern_hall_sword',
+  // The four elemental arms (hearthbrand_sword, squallcrest_sword, rimelight_staff,
+  // duskwick_staff) are reserved for a future raid and obtainable nowhere yet, so they get no
+  // Reliquary row until that raid ships them.
 ] as const;
+
+// The skins NOT sold by the store (WeaponSkinDef.earnedFrom), each naming where it is earned.
+// With them the page has two doors, so every row names its own (the store's rows the store),
+// never leaning on the page default for a door it does not have.
+const WEAPON_SKIN_SOURCES: Readonly<
+  Partial<Record<(typeof RELIQUARY_HORIZON_WEAPON_SKINS)[number], ReliquarySourceHints>>
+> = {
+  lantern_hall_sword: fromActivity('lantern_hall_quartermaster'),
+};
+
+function weaponSkinEntries(
+  ids: readonly (typeof RELIQUARY_HORIZON_WEAPON_SKINS)[number][],
+): RelicEntry[] {
+  return ids.map((id) => {
+    const earned = Object.hasOwn(WEAPON_SKIN_SOURCES, id) ? WEAPON_SKIN_SOURCES[id] : undefined;
+    return [id, earned ?? fromStore()] as const;
+  });
+}
 
 // Hidden deeds NEVER enter the Reliquary, not even as a masked or locked slot:
 // a hidden deed's existence is itself the secret, so a placeholder row would
@@ -476,6 +506,11 @@ export const RELIQUARY_HORIZON_TITLES = [
   'exp_clue_ten_caskets',
   // The Drowned Temple lore guide's The Last Verse: Witness of the Choir.
   'dgn_drowned_temple_cantor',
+  // Lantern Hall's quartermaster (guild_contracts.ts): the three titles bought with
+  // Lantern Seals from the guild's weekly dungeon contracts.
+  'feat_guild_writ_runner',
+  'feat_guild_hallsworn',
+  'feat_guild_of_lantern_hall',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
@@ -1755,9 +1790,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // That is an account-level storefront rather than a boss, zone, profession,
     // deed, or in-world vendor NPC, and the 'store' kind now names it. One
     // storefront awards every skin on the page, which is exactly the condition
-    // a page default is for, so the default carries all 29 rows.
-    sourceDefault: fromStore(),
-    relics: weaponSkins(...RELIQUARY_HORIZON_WEAPON_SKINS),
+    // a page default was for. Lantern Hall's earned blade gave the page a second door, so every
+    // row now names its own (weaponSkinEntries): the store rows the store, the guild's blade the
+    // guild's quartermaster.
+    relics: weaponSkins(...weaponSkinEntries(RELIQUARY_HORIZON_WEAPON_SKINS)),
   },
   {
     id: 'horizons_titles',

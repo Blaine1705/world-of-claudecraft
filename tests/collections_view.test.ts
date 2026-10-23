@@ -102,13 +102,14 @@ describe('collections view model', () => {
     expect(seen).toEqual(ordered);
   });
 
-  it('lists the four buddies together in stable rarity order', () => {
+  it('lists the five buddies together in stable rarity order', () => {
     const view = buildCollectionsView(EMPTY);
     expect(view.buddies.map((row) => row.key).sort()).toEqual([
       'crystal_lich',
       'forgemaw',
       'horse',
       'sapling',
+      'sprites',
     ]);
     const ranks = view.buddies.map((row) => rarityRank(row.quality));
     expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
