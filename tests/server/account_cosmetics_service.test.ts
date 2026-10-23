@@ -54,10 +54,16 @@ describe('weapon skins reserved for a future raid', () => {
     const ledger = service.ledger(sessions[0] as never);
     for (const id of RESERVED_WEAPON_SKIN_IDS) expect(ledger.grantWeaponSkin(id), id).toBe(false);
     expect(sessions[0].accountCosmetics.weaponSkinIds).toEqual([]);
-    // the guild's own blade still grants
-    persistWeapon.mockReturnValue(new Promise(() => {}));
-    expect(ledger.grantWeaponSkin('lantern_hall_sword')).toBe(true);
-    expect(persistWeapon).toHaveBeenCalledExactlyOnceWith(7, ['lantern_hall_sword']);
+    // Even an allowed earned skin must go through the atomic character/account
+    // purchase coordinator; a synchronous grant cannot safely charge seals.
+    expect(ledger.grantWeaponSkin('lantern_hall_sword')).toBe(false);
+    expect(persistWeapon).not.toHaveBeenCalled();
+    const purchase = vi.fn();
+    const onlineLedger = service.ledger(sessions[0], purchase);
+    onlineLedger.purchaseWeaponSkin?.('weapon_skin_lantern_hall_sword');
+    expect(purchase).toHaveBeenCalledExactlyOnceWith('weapon_skin_lantern_hall_sword');
+    expect(sessions.map((s) => s.accountCosmetics.weaponSkinIds)).toEqual([[], []]);
+    expect(persistWeapon).not.toHaveBeenCalled();
   });
 });
 

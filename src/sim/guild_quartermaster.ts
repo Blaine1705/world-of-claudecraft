@@ -10,8 +10,9 @@
 //    performs the grant.
 //
 // Server-authoritative like the Heroic Quartermaster (instances/heroic_vendor.ts): the client
-// only sends intent; everything re-validates here. The reward is granted FIRST and the seals
-// leave the bags only once it has landed, so a refused or failed grant never eats seals.
+// only sends intent; everything re-validates here. Synchronous rewards land before seals
+// leave the bags. Online account rewards reserve seals in the host's save FIFO and commit
+// the character charge and account grant together before publishing success.
 // Refusals are structured events (the client owns every visible string). Draws no rng.
 
 import { DEEDS } from './content/deeds';
