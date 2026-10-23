@@ -122,6 +122,9 @@ describe('referral card controller', () => {
     f.controller.open();
     expect(f.root.innerHTML).toContain('/ui/items/reins_wobbles_slime.webp');
     expect(f.root.textContent).toContain('Wobbles the Slime mount.');
+    expect(f.root.textContent).toContain('Flicker and Glimmer buddy companions.');
+    expect(f.root.innerHTML).toContain('/ui/items/whistle_sprites.webp');
+    expect(f.root.innerHTML).not.toContain('whistle_sapling');
     expect(f.root.innerHTML).not.toContain('reins_referral_tank');
     f.root.querySelector<HTMLButtonElement>('[data-milestone="raid"]')!.click();
     f.card.participants[0].redeemed = 31;

@@ -105,7 +105,7 @@ export const ko_KR: EnTranslations = {
       "2": "은행 슬롯 20칸과 캐릭터 슬롯 5칸.",
       "3": "Claudium 1,000개.",
       "4": "Claudium 1,000개.",
-      "5": "어린 나무 동료."
+      "5": "깜빡이와 반짝이 동료."
     },
     "reasons": {
       "notParticipant": "이 계정은 해당 친구 연결에 속하지 않습니다.",

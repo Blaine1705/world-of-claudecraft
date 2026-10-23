@@ -1,4 +1,7 @@
-import { REFERRAL_SLIME_REINS } from '../../../sim/content/referral_rewards';
+import {
+  REFERRAL_BUDDY_WHISTLE,
+  REFERRAL_SLIME_REINS,
+} from '../../../sim/content/referral_rewards';
 import type { ReferralMilestone } from '../../../sim/referral_cards';
 import { esc } from '../../esc';
 import { focusKeyAttr } from '../../focus_restore';
@@ -39,7 +42,13 @@ export function referralCardsHtml(
   const cards = snapshot.links.map((link) => cardHtml(link, snapshot, animated)).join('');
   const pages = `<nav class="referral-actions referral-pages" aria-label="${esc(referralText('pages'))}">${button('first-page', 'firstPage', referralText('firstPage'))}${snapshot.nextCursor != null ? button('next-page', 'nextPage', referralText('nextPage')) : ''}</nav>`;
   const invite = `<section class="referral-invite ui-card ui-card-tile"><div class="referral-section-heading">${svgIcon('mail')}<h3 class="ui-h">${esc(referralText('inviteTitle'))}</h3></div><p class="referral-invite-intro">${esc(referralText('inviteHelp'))}</p>${snapshot.inviteUrl ? `<label>${esc(referralText('inviteLabel'))}<input class="ui-input referral-link" readonly value="${esc(snapshot.inviteUrl)}"${focusKeyAttr('invite-url')}></label>` : `<p class="ui-muted">${esc(referralText('inviteUnavailable'))}</p>`}<p class="ui-muted">${esc(referralText('membership'))}</p></section>`;
-  const tierArt = ['reins_referral_raptor', undefined, undefined, undefined, 'whistle_sapling'];
+  const tierArt = [
+    'reins_referral_raptor',
+    undefined,
+    undefined,
+    undefined,
+    REFERRAL_BUDDY_WHISTLE,
+  ];
   const tierIcons: UiIconName[] = ['mount', 'chest', 'market', 'market', 'sprout'];
   const tiers = [1, 2, 3, 4, 5]
     .map(

@@ -759,8 +759,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     sellValue: 50_000, // 5g, the flat vendor price every whistle takes
   },
-  // The flame-sprite pair. No player-facing source yet: granted by /dev buddy
-  // and the admin grant only (docs/design/buddy-acquisition.md).
+  // The flame-sprite pair is unlocked directly by the fifth completed referral.
+  // This whistle remains the dev/admin token and reward artwork.
   whistle_sprites: {
     id: 'whistle_sprites',
     name: 'Flicker and Glimmer Whistle',

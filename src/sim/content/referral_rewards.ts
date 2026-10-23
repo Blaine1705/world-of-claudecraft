@@ -1,4 +1,8 @@
 import type { ItemDef } from '../types';
+import type { BuddyKey } from './buddies';
+
+export const REFERRAL_BUDDY = 'sprites' satisfies BuddyKey;
+export const REFERRAL_BUDDY_WHISTLE = 'whistle_sprites';
 
 export const REFERRAL_TITLE = 'referral_trailmate';
 export const REFERRAL_BAG = 'referral_satchel';

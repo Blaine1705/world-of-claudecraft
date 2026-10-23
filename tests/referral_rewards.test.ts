@@ -182,16 +182,27 @@ describe('referral reward transactions', () => {
     expect(MOUNTS.wobbles_slime.moveSpeedPct).toBe(MOUNTS.referral_raptor.moveSpeedPct);
   });
 
-  it('grants inviter tiers once, with a distinct raptor and restored Sapling ownership', () => {
+  it('grants inviter tiers once, with a distinct raptor and Flicker and Glimmer ownership', () => {
     const first = grantReferralInviterReward(blank(), 1);
     expect(first.inventory.map((i) => i.itemId)).toEqual(['reins_referral_raptor']);
     expect(ITEMS[REFERRAL_RAPTOR_REINS]).toMatchObject({ kind: 'mount', mount: 'referral_raptor' });
     expect(MOUNT_VISUAL_SPECS.referral_raptor).toEqual(MOUNT_VISUAL_SPECS.drakemaw_raptor);
     expect(grantReferralInviterReward(first, 4)).toBe(first);
+    expect(first.buddies).toBeUndefined();
     const fifth = grantReferralInviterReward(first, 5);
-    expect(fifth.buddies?.owned).toEqual(['sapling']);
-    expect(BUDDIES.sapling).toBeDefined();
+    expect(fifth.buddies?.owned).toEqual(['sprites']);
+    expect(BUDDIES.sprites.name).toBe('Flicker and Glimmer');
     expect(grantReferralInviterReward(fifth, 10)).toBe(fifth);
+  });
+});
+
+describe('referral buddy ownership', () => {
+  it('preserves other owned buddies and does not duplicate the paired sprites', () => {
+    const state = blank();
+    state.buddies = { owned: ['horse', 'sapling', 'sprites'] };
+    const granted = grantReferralInviterReward(state, 5);
+    expect(granted.buddies?.owned).toEqual(['horse', 'sapling', 'sprites']);
+    expect(grantReferralInviterReward(granted, 5)).toBe(granted);
   });
 });
 

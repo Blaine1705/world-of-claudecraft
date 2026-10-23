@@ -105,7 +105,7 @@ export const ja_JP: EnTranslations = {
       "2": "銀行スロット20枠とキャラクタースロット5枠。",
       "3": "Claudiumを1,000。",
       "4": "Claudiumを1,000。",
-      "5": "若木の仲間。"
+      "5": "仲間のチラリとキラリ。"
     },
     "reasons": {
       "notParticipant": "このアカウントはこの絆のフレンド関係に含まれていません。",

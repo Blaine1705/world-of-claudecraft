@@ -22222,7 +22222,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'referralCards.referrerRewards.2': '20 ячеек банка и 5 слотов персонажей.',
   'referralCards.referrerRewards.3': 'Награда: 1 000 Claudium.',
   'referralCards.referrerRewards.4': 'Награда: 1 000 Claudium.',
-  'referralCards.referrerRewards.5': 'Спутник Деревце.',
+  'referralCards.referrerRewards.5': 'Спутники Мерцай и Искорка.',
   'referralCards.reasons.notParticipant': 'Этот аккаунт не участвует в данной связи друзей.',
   'referralCards.reasons.staleRevision':
     'Карточка изменилась. Проверьте текущий прогресс и повторите попытку.',

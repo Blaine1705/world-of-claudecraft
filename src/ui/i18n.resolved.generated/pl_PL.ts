@@ -105,7 +105,7 @@ export const pl_PL: EnTranslations = {
       "2": "20 bank slots and 5 character slots.",
       "3": "1,000 Claudium.",
       "4": "1,000 Claudium.",
-      "5": "A Sapling buddy companion."
+      "5": "Flicker and Glimmer buddy companions."
     },
     "reasons": {
       "notParticipant": "This account is not part of this bound-friend link.",

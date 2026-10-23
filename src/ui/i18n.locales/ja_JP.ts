@@ -21812,7 +21812,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'referralCards.referrerRewards.2': '銀行スロット20枠とキャラクタースロット5枠。',
   'referralCards.referrerRewards.3': 'Claudiumを1,000。',
   'referralCards.referrerRewards.4': 'Claudiumを1,000。',
-  'referralCards.referrerRewards.5': '若木の仲間。',
+  'referralCards.referrerRewards.5': '仲間のチラリとキラリ。',
   'referralCards.reasons.notParticipant':
     'このアカウントはこの絆のフレンド関係に含まれていません。',
   'referralCards.reasons.staleRevision':

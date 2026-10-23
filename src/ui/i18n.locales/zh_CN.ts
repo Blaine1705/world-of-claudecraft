@@ -20746,7 +20746,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'referralCards.referrerRewards.2': '20个银行栏位和5个角色栏位。',
   'referralCards.referrerRewards.3': '获得1,000 Claudium。',
   'referralCards.referrerRewards.4': '获得1,000 Claudium。',
-  'referralCards.referrerRewards.5': '小树苗伙伴。',
+  'referralCards.referrerRewards.5': '闪烁与微光伙伴。',
   'referralCards.reasons.notParticipant': '此账号不属于这对绑定好友。',
   'referralCards.reasons.staleRevision': '你的卡片已发生变化。请查看最新进度后重试。',
   'referralCards.reasons.invalidCharacters': '队伍中的角色不属于这对绑定好友。',

@@ -105,7 +105,7 @@ export const zh_CN: EnTranslations = {
       "2": "20个银行栏位和5个角色栏位。",
       "3": "获得1,000 Claudium。",
       "4": "获得1,000 Claudium。",
-      "5": "小树苗伙伴。"
+      "5": "闪烁与微光伙伴。"
     },
     "reasons": {
       "notParticipant": "此账号不属于这对绑定好友。",

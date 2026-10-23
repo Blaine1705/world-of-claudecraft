@@ -21808,7 +21808,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'referralCards.referrerRewards.2': '은행 슬롯 20칸과 캐릭터 슬롯 5칸.',
   'referralCards.referrerRewards.3': 'Claudium 1,000개.',
   'referralCards.referrerRewards.4': 'Claudium 1,000개.',
-  'referralCards.referrerRewards.5': '어린 나무 동료.',
+  'referralCards.referrerRewards.5': '깜빡이와 반짝이 동료.',
   'referralCards.reasons.notParticipant': '이 계정은 해당 친구 연결에 속하지 않습니다.',
   'referralCards.reasons.staleRevision':
     '카드가 변경되었습니다. 최신 진행 상황을 확인하고 다시 시도하세요.',
