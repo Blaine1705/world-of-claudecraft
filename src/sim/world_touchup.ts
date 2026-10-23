@@ -1,3 +1,5 @@
+import { applyFenbridgeTouchupToWorld } from './fenbridge_touchup';
+import { freezeObjectMoves } from './moved_objects';
 import type { WorldContent } from './types';
 
 /** Reviewable spatial layers only. Gameplay tables and native scenery stay owned by code. */
@@ -11,6 +13,7 @@ export type WorldTouchupChanges = Partial<
     | 'grassClear'
     | 'decorationExclusions'
     | 'objectMoves'
+    | 'fenbridgeTouchup'
     | 'roads'
     | 'placements'
   >
@@ -60,5 +63,11 @@ export function applyWorldTouchup(base: WorldContent, patch: WorldTouchup): Worl
     throw new Error('Live-world patch baseline changed. Rebase and review the map edits.');
   }
   if (Object.keys(patch.changes).length === 0) return base;
-  return { ...base, ...patch.changes };
+  const next: WorldContent = { ...base, ...patch.changes };
+  if (next.objectMoves) {
+    const frozen = freezeObjectMoves(next.objectMoves);
+    if (frozen) next.objectMoves = frozen;
+    else delete next.objectMoves;
+  }
+  return applyFenbridgeTouchupToWorld(next);
 }

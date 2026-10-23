@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { getActiveWorldContent } from '../sim/data';
 import { FENBRIDGE_BUILDINGS_BY_ID, FENBRIDGE_LAYOUT, localToWorld } from '../sim/fenbridge_layout';
+import { activeFenbridgeLayout } from '../sim/fenbridge_touchup';
 import {
   forEachSegmentFootprintSample,
   type PitchedSegmentPlacement,
@@ -534,9 +535,10 @@ function microPlacements() {
   // (promotedScenery.authoredTownDressing) draws the cistern, the stall and
   // the muster board itself.
   if (activeWorldPromoted('authoredTownDressing')) return [];
-  const cistern = FENBRIDGE_LAYOUT.civic.cistern;
-  const stall = FENBRIDGE_LAYOUT.civic.provisionStall;
-  const board = FENBRIDGE_LAYOUT.civic.musterBoard;
+  const layout = activeFenbridgeLayout();
+  const cistern = layout.civic.cistern;
+  const stall = layout.civic.provisionStall;
+  const board = layout.civic.musterBoard;
   return [
     {
       id: cistern.id,
@@ -803,6 +805,7 @@ function lineSegments(name: string, vertices: number[], color: number): THREE.Li
 }
 
 function buildCaptureOverlay(groundAt: GroundAt): THREE.Group {
+  const layout = activeFenbridgeLayout();
   const overlay = new THREE.Group();
   overlay.name = OVERLAY_NAME;
   overlay.visible = false;
@@ -810,13 +813,13 @@ function buildCaptureOverlay(groundAt: GroundAt): THREE.Group {
 
   const colliderRecords: Array<Record<string, unknown>> = [];
   const colliderVertices: number[] = [];
-  for (const building of FENBRIDGE_LAYOUT.buildings) {
+  for (const building of layout.buildings) {
     for (const box of [building.footprint, ...building.annexes]) {
       colliderRecords.push({ kind: 'obb', ...box });
       addObbOutline(colliderVertices, box, groundAt);
     }
   }
-  const cistern = FENBRIDGE_LAYOUT.civic.cistern;
+  const cistern = layout.civic.cistern;
   colliderRecords.push({
     id: cistern.id,
     kind: 'circle',
@@ -831,7 +834,7 @@ function buildCaptureOverlay(groundAt: GroundAt): THREE.Group {
     cistern.radius,
     groundAt,
   );
-  const stallFootprint = FENBRIDGE_LAYOUT.civic.provisionStall.footprint;
+  const stallFootprint = layout.civic.provisionStall.footprint;
   colliderRecords.push({ kind: 'obb', ...stallFootprint });
   addObbOutline(colliderVertices, stallFootprint, groundAt);
   for (const board of musterBoards) {
@@ -847,14 +850,14 @@ function buildCaptureOverlay(groundAt: GroundAt): THREE.Group {
   }
   overlay.add(lineSegments('fenbridgeCaptureColliderLines', colliderVertices, 0xff4b4b));
 
-  const routeRecords = FENBRIDGE_LAYOUT.roads.map((road) => ({
+  const routeRecords = layout.roads.map((road) => ({
     id: road.id,
     gateId: road.gateId,
     halfWidth: road.halfWidth,
     points: road.points,
   }));
   const routeVertices: number[] = [];
-  for (const road of FENBRIDGE_LAYOUT.roads) {
+  for (const road of layout.roads) {
     for (let index = 0; index < road.points.length - 1; index++) {
       const first = road.points[index];
       const second = road.points[index + 1];
@@ -870,43 +873,45 @@ function buildCaptureOverlay(groundAt: GroundAt): THREE.Group {
   }
   overlay.add(lineSegments('fenbridgeCaptureRouteLines', routeVertices, 0x33f0dc));
 
+  const restBuilding =
+    layout.buildings.find((b) => b.id === layout.services.rest.buildingId) ??
+    FENBRIDGE_BUILDINGS_BY_ID[layout.services.rest.buildingId];
   const serviceRecords = [
-    ...FENBRIDGE_LAYOUT.services.npcs.map((npc) => ({
+    ...layout.services.npcs.map((npc) => ({
       id: npc.id,
       kind: 'npc',
       position: npc.position,
       anchorId: npc.anchorId,
     })),
-    ...FENBRIDGE_LAYOUT.services.stations.map((station) => ({
+    ...layout.services.stations.map((station) => ({
       id: station.id,
       kind: 'station',
       position: station.position,
     })),
-    ...FENBRIDGE_LAYOUT.repeated.musterOrders.map((order) => ({
+    ...layout.repeated.musterOrders.map((order) => ({
       id: order.id,
       kind: 'quest-object',
       position: order.position,
     })),
     {
-      id: FENBRIDGE_LAYOUT.services.bank.teller.id,
+      id: layout.services.bank.teller.id,
       kind: 'bank-teller',
-      position: FENBRIDGE_LAYOUT.services.bank.teller.standingPoint,
+      position: layout.services.bank.teller.standingPoint,
     },
     {
-      id: FENBRIDGE_LAYOUT.services.mailbox.id,
+      id: layout.services.mailbox.id,
       kind: 'mailbox',
-      position: FENBRIDGE_LAYOUT.services.mailbox.position,
+      position: layout.services.mailbox.position,
     },
     {
-      id: FENBRIDGE_LAYOUT.services.graveyard.id,
+      id: layout.services.graveyard.id,
       kind: 'graveyard',
-      position: FENBRIDGE_LAYOUT.services.graveyard.position,
+      position: layout.services.graveyard.position,
     },
     {
-      id: FENBRIDGE_LAYOUT.services.rest.id,
+      id: layout.services.rest.id,
       kind: 'rest',
-      position:
-        FENBRIDGE_BUILDINGS_BY_ID[FENBRIDGE_LAYOUT.services.rest.buildingId].frontStandingPoint,
+      position: restBuilding.frontStandingPoint,
     },
     ...musterBoards.map((board) => ({
       id: board.id,
@@ -1031,11 +1036,13 @@ function buildFromTemplates(
     };
   }
 
+  const layout = activeFenbridgeLayout();
+  const townCullRadius = placedTownCullRadius(layout, TOWN_CULL_MARGIN_YD);
   const hideTargets: BuildingHideTarget[] = [];
   const buildingGroups: THREE.Object3D[] = [];
   // The document may own the town's BUILDINGS as placements (the
   // promoted-scenery contract): only the building loop stands down.
-  const fenBuildingList = activeWorldPromoted('authoredTowns') ? [] : FENBRIDGE_LAYOUT.buildings;
+  const fenBuildingList = activeWorldPromoted('authoredTowns') ? [] : layout.buildings;
   for (const building of fenBuildingList) {
     const template = templates.get(building.assetId);
     if (!template?.raw) {
@@ -1204,7 +1211,7 @@ function buildFromTemplates(
         FENBRIDGE_LAYOUT.hub.center.x,
         FENBRIDGE_LAYOUT.hub.center.z,
         clutterFar,
-        TOWN_CULL_RADIUS,
+        townCullRadius,
       );
       const reveal = townStaticReveal(
         fenbridgeFogVisible(
@@ -1213,11 +1220,11 @@ function buildFromTemplates(
           FENBRIDGE_LAYOUT.hub.center.x,
           FENBRIDGE_LAYOUT.hub.center.z,
           structureFar,
-          TOWN_CULL_RADIUS,
+          townCullRadius,
         ),
         staticRevealed,
         hubDx * hubDx + hubDz * hubDz,
-        TOWN_CULL_RADIUS,
+        townCullRadius,
         revealGate,
         STATIC_REVEAL_KEY,
       );

@@ -1439,7 +1439,7 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
   // planned before any post stands, so nothing self-blocks. A plan computed
   // against a world that already carries lamps (as colliders or as promoted
   // placements) drops nearly every site to its own clearance probe.
-  if (content === BUILTIN_WORLD) builtinLampPlanBySeed.set(seed, styled);
+  if (isBuiltinWorldContent(content)) builtinLampPlanBySeed.set(seed, styled);
   return styled;
 }
 
@@ -1455,7 +1455,7 @@ const builtinLampPlanBySeed = new Map<number, PlacedStreetlamp[]>();
 export function builtinStreetlampPlan(seed: number): readonly PlacedStreetlamp[] | null {
   const cached = builtinLampPlanBySeed.get(seed);
   if (cached) return cached;
-  if (getActiveWorldContent() !== BUILTIN_WORLD) return null;
+  if (!isBuiltinWorldContent(getActiveWorldContent())) return null;
   return streetlampPlacements(seed);
 }
 

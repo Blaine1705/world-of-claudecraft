@@ -8,21 +8,30 @@ import {
   compileLiveWorldDocument,
   liveWorldBaseline,
   liveWorldPreview,
+  newLiveWorldMap,
   publishedLiveWorldDocument,
 } from '../src/editor/live_world_core';
 import { upgradeLoadedMap } from '../src/editor/map_load_upgrades';
 import { MOVABLE_OBJECTS } from '../src/editor/object_moves_core';
 import { parseMap, serializeMap } from '../src/editor/persist';
-import { colliderInternalsForTest, isBlocked } from '../src/sim/colliders';
+import { bankerChestSpots, colliderInternalsForTest, isBlocked } from '../src/sim/colliders';
 import {
   authoredMapActive,
   BASE_WORLD,
+  BUILTIN_WORLD,
+  farmPatchesInActiveWorld,
+  gatherNodesInActiveWorld,
   isBuiltinWorldActive,
   setActiveWorldContent,
   studioContentActive,
 } from '../src/sim/data';
+import { FENBRIDGE_LAYOUT, localToWorld } from '../src/sim/fenbridge_layout';
+import { activeFenbridgeLayout } from '../src/sim/fenbridge_touchup';
+import { isResting } from '../src/sim/progression/xp';
+import { Sim } from '../src/sim/sim';
 import { traversalBand } from '../src/sim/traversal_band';
-import { groundHeight } from '../src/sim/world';
+import type { Entity } from '../src/sim/types';
+import { groundHeight, terrainHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   applyWorldTouchup,
@@ -232,5 +241,165 @@ describe('live-world touch-up pipeline', () => {
       ),
     ).toThrow(/baseline changed/);
     expect(applyWorldTouchup(BASE_WORLD, { version: 1, base: null, changes: {} })).toBe(BASE_WORLD);
+  });
+
+  it('reconstructs the authoritative Fenbridge layout in BUILTIN_WORLD and round-trips through Studio', () => {
+    setActiveWorldContent(null); // active world is BUILTIN_WORLD
+    const layout = activeFenbridgeLayout(BUILTIN_WORLD);
+    expect(layout).not.toBe(FENBRIDGE_LAYOUT);
+
+    // 1. All 5 moved Fenbridge buildings match Candidate B coordinates and rotations.
+    expect(
+      layout.buildings.map((b) => [
+        b.id,
+        Number(b.placement.x.toFixed(4)),
+        Number(b.placement.z.toFixed(4)),
+        Number(b.placement.rotation.toFixed(4)),
+      ]),
+    ).toEqual([
+      ['fenbridge_warden_gatehouse', 10.2731, 265.9471, 1.9373],
+      ['fenbridge_crooked_reed_inn', 21.4035, 297.9038, 1.5708],
+      ['fenbridge_lantern_chapel', -23.9464, 300.279, -1.6057],
+      ['fenbridge_moonwort_apothecary', 15.9752, 328.6336, 0.7679],
+      ['fenbridge_gilded_strongbox', -47.2492, 333.499, -1.5708],
+    ]);
+    for (const building of layout.buildings) {
+      const prop = BUILTIN_WORLD.props.buildings.find((b) => b.id === building.id);
+      expect(prop, building.id).toMatchObject({
+        x: building.position.x,
+        z: building.position.z,
+        rot: building.rotation,
+      });
+    }
+
+    // 2. Civic props match Candidate B (cistern and stall moved, muster board preserved).
+    expect(layout.civic.cistern.position.x).toBeCloseTo(0.12354486560667244, 9);
+    expect(layout.civic.cistern.position.z).toBeCloseTo(300.5201133200771, 9);
+    expect(layout.civic.provisionStall.position.x).toBeCloseTo(-7.210512234363641, 9);
+    expect(layout.civic.provisionStall.position.z).toBeCloseTo(287.6055964057244, 9);
+    expect(layout.civic.provisionStall.rotation).toBeCloseTo(-2.4783675378319483, 9);
+    expect(layout.civic.musterBoard.position).toEqual({ x: -6, z: 278 });
+    expect(
+      BUILTIN_WORLD.props.wells.find((w) => w.id === 'fenbridge_mirelight_cistern'),
+    ).toMatchObject({
+      x: layout.civic.cistern.position.x,
+      z: layout.civic.cistern.position.z,
+    });
+    expect(
+      BUILTIN_WORLD.props.stalls.find((s) => s.id === 'fenbridge_provision_stall'),
+    ).toMatchObject({
+      x: layout.civic.provisionStall.position.x,
+      z: layout.civic.provisionStall.position.z,
+      rot: layout.civic.provisionStall.rotation,
+    });
+
+    // 3. Added north cottages, Streetlamp 17, and 12 Fenbridge foliage placements exist and level terrain.
+    const placements = WORLD_TOUCHUP.changes.placements ?? [];
+    expect(placements).toHaveLength(16);
+    const sourceCottages = (WORLD_TOUCHUP_SOURCE?.placements ?? []).filter(
+      (p) => p.assetId === 'tidehold/fenrire/house_a' && p.z > 340,
+    );
+    expect(sourceCottages.map((p) => p.uid)).toEqual([
+      'd4a2522da25a',
+      'a1f743dc0b53',
+      '97310fe05757',
+    ]);
+    const northCottages = placements.filter(
+      (p) => p.path === '/models/tidehold/fenrire/house_a.glb',
+    );
+    expect(northCottages).toHaveLength(3);
+    for (const cottage of northCottages) {
+      expect(terrainHeight(cottage.x, cottage.z, WORLD_SEED)).toBeCloseTo(1.2, 2);
+      expect(isBlocked(WORLD_SEED, cottage.x, cottage.z, 0.5)).toBe(true);
+    }
+
+    // 4. All 9 Fenbridge NPCs stand unblocked at Candidate B coordinates; weaver_ottilie stays in Eastbrook.
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
+    for (const npc of layout.services.npcs) {
+      expect(BUILTIN_WORLD.npcs[npc.id].pos).toEqual(npc.position);
+      const standing = { y: groundHeight(npc.position.x, npc.position.z, WORLD_SEED), lift: 0 };
+      expect(
+        isBlocked(
+          WORLD_SEED,
+          npc.position.x,
+          npc.position.z,
+          npc.bodyRadius,
+          false,
+          undefined,
+          0,
+          standing,
+        ),
+        npc.id,
+      ).toBe(false);
+      const entity = [...sim.entities.values()].find(
+        (e) => e.kind === 'npc' && e.templateId === npc.id,
+      );
+      expect(entity?.pos.x, npc.id).toBeCloseTo(npc.position.x, 6);
+      expect(entity?.pos.z, npc.id).toBeCloseTo(npc.position.z, 6);
+    }
+    expect(BUILTIN_WORLD.npcs.weaver_ottilie.pos).toEqual({ x: -20.5, z: -117.5 });
+
+    // 5. Petra Vell's banker chest and Crooked Reed Inn rest area follow the moved buildings.
+    const petra = layout.services.npcs.find((n) => n.id === 'bursar_petra_vell');
+    if (!petra) throw new Error('Expected bursar_petra_vell in active Fenbridge layout');
+    const chest = bankerChestSpots(WORLD_SEED).find(
+      (spot) =>
+        Math.abs(spot.anchorX - petra.position.x) < 1e-6 &&
+        Math.abs(spot.anchorZ - petra.position.z) < 1e-6,
+    );
+    if (!chest) throw new Error('Expected Petra Vell banker chest spot');
+    expect(isBlocked(WORLD_SEED, chest.x, chest.z, 0.5)).toBe(true);
+
+    const inn = layout.buildings.find((b) => b.id === 'fenbridge_crooked_reed_inn');
+    if (!inn) throw new Error('Expected fenbridge_crooked_reed_inn in active Fenbridge layout');
+    const entityAt = (pt: { x: number; z: number }) =>
+      ({
+        inCombat: false,
+        pos: { x: pt.x, y: terrainHeight(pt.x, pt.z, WORLD_SEED), z: pt.z },
+      }) as Entity;
+    expect(isResting(entityAt(inn.position))).toBe(true);
+    // Vacated west edge of old inn (x=13.55, halfDepth=7.2 -> x=6.35..20.75; new inn starts at x=14.2035)
+    expect(isResting(entityAt({ x: 8, z: 298 }))).toBe(false);
+    expect(isBlocked(WORLD_SEED, 8, 298, 0.5)).toBe(false);
+    // Vacated old strongbox (-12.3, 325.3) is open ground in BUILTIN_WORLD
+    expect(isBlocked(WORLD_SEED, -12.3, 325.3, 0.5)).toBe(false);
+
+    // 6. Walk-in doorways and raised interior floor decks work at the relocated buildings.
+    for (const building of layout.buildings.filter((b) => b.walkIn)) {
+      const door = building.sockets.entrance.localPosition;
+      const inside = localToWorld(
+        building.placement,
+        building.placement.rotation,
+        door.x,
+        door.z + 2,
+      );
+      const rise =
+        groundHeight(inside.x, inside.z, WORLD_SEED) -
+        terrainHeight(inside.x, inside.z, WORLD_SEED);
+      expect(rise, `${building.id} raised floor`).toBeGreaterThan(0.25);
+      const standing = { y: groundHeight(inside.x, inside.z, WORLD_SEED), lift: 0 };
+      expect(
+        isBlocked(WORLD_SEED, inside.x, inside.z, 0.5, false, undefined, 0, standing),
+        `${building.id} interior passable`,
+      ).toBe(false);
+    }
+
+    // 7. Moved Mirefen gather nodes and farm beds apply in BUILTIN_WORLD.
+    const movedWood3 = gatherNodesInActiveWorld().find((n) => n.id === 'wood_mirefen_3');
+    if (!movedWood3) throw new Error('Expected wood_mirefen_3 in active world');
+    expect(movedWood3.pos.x).toBeCloseTo(-28.655306607051592, 6);
+    expect(movedWood3.pos.z).toBeCloseTo(366.6594938238977, 6);
+    const mirefenPatch = farmPatchesInActiveWorld().find((p) => p.id === 'patch_mirefen');
+    const bed1 = mirefenPatch?.beds.find((b) => b.id === 'bed_mirefen_1');
+    if (!bed1) throw new Error('Expected bed_mirefen_1 in patch_mirefen');
+    expect(bed1.x).toBeCloseTo(-23.47787353436417, 6);
+    expect(bed1.z).toBeCloseTo(327.8430006215338, 6);
+
+    // 8. Round-trip through Studio's newLiveWorldMap -> compileLiveWorldDocument preserves the touch-up.
+    const liveMap = newLiveWorldMap('Live World Touch-Up');
+    const roundTrip = compileLiveWorldDocument(liveMap);
+    expect(worldTouchupIdentity(roundTrip.patch.changes)).toBe(
+      worldTouchupIdentity(WORLD_TOUCHUP.changes),
+    );
   });
 });

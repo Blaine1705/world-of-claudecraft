@@ -2,6 +2,7 @@
 // of that content into a standalone Studio world. The compiler rejects edits it
 // cannot carry faithfully instead of retaining or dropping them silently.
 import { BASE_WORLD } from '../sim/data';
+import { applyFenbridgeTouchupToWorld } from '../sim/fenbridge_touchup';
 import { MAP_DOC_VERSION, type MapDoc, sanitizeMapDoc } from '../sim/map_doc';
 import { materialFinishTextureRefs } from '../sim/material_finishes';
 import type { WorldContent } from '../sim/types';
@@ -27,6 +28,7 @@ const DIRECT_LAYERS = [
   'grassClear',
   'decorationExclusions',
   'objectMoves',
+  'fenbridgeTouchup',
 ] as const;
 const EDITABLE_KEYS = new Set<string>([
   'meta',
@@ -115,7 +117,7 @@ export function liveWorldPreview(map: CustomMap): WorldContent {
   for (const key of DIRECT_LAYERS) {
     if (map[key] !== undefined) Object.assign(world, { [key]: map[key] });
   }
-  return world;
+  return applyFenbridgeTouchupToWorld(world);
 }
 
 export function compileLiveWorldDocument(raw: unknown): {

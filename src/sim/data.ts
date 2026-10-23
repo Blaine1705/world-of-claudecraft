@@ -2,6 +2,7 @@ import { MEMBERSHIP_ITEMS } from './content/membership';
 import { REFERRAL_ITEMS } from './content/referral';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
+import { bindFenbridgeActiveWorldGetter } from './fenbridge_touchup';
 import { applyWorldTouchup } from './world_touchup';
 import { WORLD_TOUCHUP } from './world_touchup.generated';
 // Content merge layer. Actual game content lives in sim/content/* — one
@@ -1115,6 +1116,8 @@ export function getActiveWorldContent(): WorldContent {
   return activeWorld;
 }
 
+bindFenbridgeActiveWorldGetter(getActiveWorldContent);
+
 export function getContentGeneration(): number {
   return contentGeneration;
 }
@@ -1134,7 +1137,7 @@ export function isBuiltinWorldActive(): boolean {
 }
 
 export function isBuiltinWorldContent(world: WorldContent): boolean {
-  return world === BUILTIN_WORLD || world.liveWorldPreview === true;
+  return world === BUILTIN_WORLD || world === BASE_WORLD || world.liveWorldPreview === true;
 }
 
 // Swap in a custom world (editor play-test) or restore the built-in (pass nothing).
@@ -1198,7 +1201,7 @@ export function authoredMapActive(): boolean {
 function isAuthoredMapContent(world: WorldContent): boolean {
   return (
     world.presentationMode !== undefined ||
-    world.placements !== undefined ||
+    (world.placements !== undefined && world.placements !== BUILTIN_WORLD.placements) ||
     (world.colliderVolumes?.length ?? 0) > 0 ||
     (world.caves?.length ?? 0) > 0 ||
     (world.holes?.length ?? 0) > 0

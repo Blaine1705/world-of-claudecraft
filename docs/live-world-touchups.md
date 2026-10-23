@@ -35,13 +35,34 @@ standalone map, return to the live-world URL before editing the integration map.
 - Native road edits/removals and added roads.
 - The editor's existing movable gameplay objects: farm beds, practice dummies,
   gather nodes and dungeon doors. Their stable IDs are preserved.
-- Added props from the shipped asset library, including their collision settings.
-  These added props can be moved and deleted. Moving a ground-attached prop keeps
-  it attached unless its placement is explicitly detached.
+- Added props and supplemental buildings from the shipped asset library, including
+  their collision settings. These added placements can be moved and deleted. Moving
+  a ground-attached prop keeps it attached unless its placement is explicitly
+  detached. For added Fenbridge cottages (`tidehold/fenrire/house_a`), terrain
+  level pads and foliage exclusion zones are generated automatically from their
+  active placement transforms.
+- Bounded Fenbridge town layout touch-ups (`fenbridgeTouchup`):
+  - The 5 canonical Fenbridge buildings (`fenbridge_warden_gatehouse`,
+    `fenbridge_crooked_reed_inn`, `fenbridge_lantern_chapel`,
+    `fenbridge_moonwort_apothecary`, `fenbridge_gilded_strongbox`) and 3 native
+    civic props (`well_fenbridge_cistern`, `stall_fenbridge_provisions`,
+    `fenbridge_muster_board`) carry stable `fenbridgeNativeKey` bindings in the
+    live-world editor document (`createLiveWorldEditorMap`).
+  - Moving or rotating those native Fenbridge entries in the live editor compiles
+    into `WORLD_TOUCHUP.fenbridgeTouchup.buildingMoves` and `civicPropMoves`
+    without duplicating native geometry or colliders.
+  - One authoritative runtime transform seam (`getActiveFenbridgeLayout()` and
+    `getActiveFenbridgeCivicProps()`) updates `FenbridgeTownView` rendering,
+    compound and walk-in wall colliders, interior floor bounds, porch/step ramps,
+    level terrain pads (`1.2` elevation aprons), and foliage/grass exclusions.
+  - Relocated Fenbridge NPC stands round-trip via `fenbridgeNpcMoves` on the
+    live-world map document into `WORLD_TOUCHUP.fenbridgeTouchup.npcMoves`,
+    updating only horizontal `(x, z)` positions for allowlisted Fenbridge NPCs
+    while preserving all NPC IDs, roles, quests, dialogue, and shop inventories.
 
-Native buildings remain in their existing renderer and collider systems. This
-first pass does not move or remove those buildings, change NPC/camp/zone tables,
-change global water/weather/caves, or ship browser-local uploads and imported
+Other zones' native buildings remain fixed in their existing renderer and collider
+systems. The pipeline does not delete native buildings, alter non-Fenbridge NPC/camp/zone
+tables, change global water/weather/caves, or ship browser-local uploads and imported
 textures. Such edits are rejected on export, not silently dropped. Markers remain
 editor annotations. There is no standalone Publish action for a live-world map.
 
@@ -91,12 +112,20 @@ file from before the latest published edit is intentionally rejected.
 
 For an isolated fixture, `export ... --out-dir tmp/my-fixture` writes the two
 files under that directory and leaves the checkout's normal game unchanged.
-An unchanged baseline export has zero changed layers. This branch ships an empty
-artifact, so adopting the tool itself does not reshape the integration map.
+An unchanged baseline export (`createBaselineLiveWorldEditorMap()`) has zero
+changed layers. The checked-in `data/world_touchup/current.map.json` and
+`src/sim/world_touchup.generated.ts` carry the selective Fenbridge town layout
+reconstruction (5 relocated canonical Fenbridge buildings, 2 relocated civic
+props, 3 added north `tidehold/fenrire/house_a` cottages, 1 added streetlamp,
+12 added Fenbridge foliage trees, 8 Fenbridge farm-bed and gather-node moves,
+and 9 Fenbridge NPC horizontal stand moves) without importing whole-map terrain
+stamps or altering other zones. Calibrated overhead and ground-level verification
+captures are stored under `docs/screenshots/fenbridge-layout-reconstruction/`.
 
 ## Validation boundary
 
 The pipeline has focused no-op, terrain, road, gameplay-object, prop-collision,
-provenance and Node CLI regression tests. These do not establish visual correctness
-for every location in the world. Each authored touch-up still needs a game review.
-Use a desktop for this first editor handoff; mobile editor operation is unverified.
+Fenbridge building/civic/NPC relocation, walk-in doorway, provenance and Node CLI
+regression tests. These do not establish visual correctness for every location in
+the world. Each authored touch-up still needs a game review. Use a desktop for
+this editor handoff; mobile editor operation is unverified.
