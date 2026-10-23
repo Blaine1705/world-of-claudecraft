@@ -16,7 +16,7 @@ are cleared when loaded.
 | Tug, the Warhorse | Purchase directly from FURY (Eastbrook Vale) or Warmarshal Draven Kole (Highwatch) | 100,000 honor (placeholder price) |
 | Crystal Lich | Defeat Nythraxis, Scourge of Thornpeak | 0.5% normal, 1% heroic |
 | Forgemaw The Molten | Defeat Ignivar or Varkhul in the heroic Crucible | 1% from either boss; no normal-mode drop |
-| Flicker and Glimmer | None yet: developer and admin grants only | Not obtainable in normal play |
+| Flicker and Glimmer | Help five referred friends complete their referral stamp cards | Guaranteed account-wide unlock |
 
 The rates in `src/sim/content/buddy_sources.ts` are design placeholders marked
 CALIBRATE. Rolls are independent per eligible player, using the nearby kill-credit
@@ -28,6 +28,10 @@ Tug, the Warhorse is sold in the honor vendors' Companions section. Paying immed
 collects, reveals and summons Tug, the Warhorse through the same grant used by raid reveals.
 No item enters the inventory and full bags do not block the purchase. Owned or
 already-pending companions cannot be purchased again. Honor purchases are final. There are no companion deed rewards in the active tables.
+
+Flicker and Glimmer replace the former Sapling reward at the fifth completed friend.
+Already-earned tier-five entitlements also project the pair on login; existing Sapling
+ownership is preserved. No new item or inventory space is required.
 
 ## Buddy icons and names
 

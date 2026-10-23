@@ -115,6 +115,28 @@ describe('referral card controller', () => {
     expect(f.send.mock.calls.filter(([a]) => a.type === 'redeem')).toHaveLength(1);
   });
 
+  it('shows Wobbles artwork and celebrates the actual card-completion item', () => {
+    const f = setup();
+    f.card.participants[0].credited = 31;
+    f.card.participants[0].redeemed = 15;
+    f.controller.open();
+    expect(f.root.innerHTML).toContain('/ui/items/reins_wobbles_slime.webp');
+    expect(f.root.textContent).toContain('Wobbles the Slime mount.');
+    expect(f.root.textContent).toContain('Flicker and Glimmer buddy companions.');
+    expect(f.root.innerHTML).toContain('/ui/items/whistle_sprites.webp');
+    expect(f.root.innerHTML).not.toContain('whistle_sapling');
+    expect(f.root.innerHTML).not.toContain('reins_referral_tank');
+    f.root.querySelector<HTMLButtonElement>('[data-milestone="raid"]')!.click();
+    f.card.participants[0].redeemed = 31;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 2 });
+    const popup = document.querySelector<HTMLElement>('.referral-celebration')!;
+    expect(popup.textContent).toContain('Jelly Saddle: Wobbles');
+    expect(popup.querySelector('img')?.getAttribute('src')).toBe(
+      '/ui/items/reins_wobbles_slime.webp',
+    );
+  });
+
   it('defers celebration until consent is answered and keeps Escape inside the popup', () => {
     const f = setup();
     f.card.participants[0].credited = 1;

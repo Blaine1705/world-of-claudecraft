@@ -636,7 +636,7 @@ export const hudChromeStrings = {
       annualTerms:
         'Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.',
       annualMount:
-        'After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.',
+        'After payment, collect the soulbound Nightwing Chimaera reins by mail on the character that purchased this bundle. The mount remains yours after membership expires.',
       trialTerms:
         'Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.',
       startTrial: 'Start 7-day free trial',
@@ -2411,7 +2411,7 @@ export const hudChromeStrings = {
       'A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
-    desc_referral_tank: 'Earned by completing a referral stamp card.',
+    desc_referral_tank: 'Former referral stamp card reward.',
     desc_referral_raptor: 'Earned by helping your first bound friend complete a stamp card.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',

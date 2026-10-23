@@ -97,14 +97,14 @@ export const referralCardStrings = {
     fogbinder:
       'Your trinket evolves, gaining more Stamina and an active effect: +5 to all stats for 15 seconds, with a 2 minute cooldown.',
     gravewyrm: 'Free mount training.',
-    raid: 'The exclusive Friendship Tank mount.',
+    raid: 'Wobbles the Slime mount.',
   },
   referrerRewards: {
     1: 'The exclusive Friendship Raptor mount.',
     2: '20 bank slots and 5 character slots.',
     3: '1,000 Claudium.',
     4: '1,000 Claudium.',
-    5: 'A Sapling buddy companion.',
+    5: 'Flicker and Glimmer buddy companions.',
   },
   reasons: {
     notParticipant: 'This account is not part of this bound-friend link.',

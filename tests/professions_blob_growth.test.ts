@@ -2225,7 +2225,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Attribute the stamp-card feature independently from the historical ledger:
     // twenty more bank slots, five discoverable item ids and the Sapling buddy. Mount relics reuse
     // an existing illuminated page and add no character-save key in this fixture.
-    const stampIds = new Set(Object.keys(REFERRAL_STAMP_ITEMS));
+    // Preserve this historical attribution: Wobbles already existed before its reins
+    // moved into the referral table, and Sapling remains owned after Sprites replaces it.
+    const stampIds = new Set(
+      Object.keys(REFERRAL_STAMP_ITEMS).filter((id) => id !== 'reins_wobbles_slime'),
+    );
     const beforeStampCards: CharacterState = {
       ...s2,
       buddies: {

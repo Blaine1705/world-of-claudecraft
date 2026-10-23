@@ -1,4 +1,5 @@
 import { applyBankBonusStamp } from '../src/sim/bank';
+import { REFERRAL_BUDDY } from '../src/sim/content/referral_rewards';
 import type { ReferralCardsAction } from '../src/sim/referral_contract';
 import { referralParticipants } from '../src/sim/referral_evidence';
 import {
@@ -230,7 +231,7 @@ export class ReferralGameAdapter {
       if (mask & 16)
         this.host.sim.syncBuddyOwnershipFor(session.pid, [
           ...this.host.sim.ownedBuddiesFor(session.pid),
-          'sapling',
+          REFERRAL_BUDDY,
         ]);
     }
     this.host.observeCost(performance.now() - started);

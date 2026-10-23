@@ -21391,7 +21391,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     'Ежегодное продление по той же цене. Оплата обычной валютой через Stripe. Отмена в настройках платежей.',
   'hudChrome.wocStore.subscription.annualMount':
-    'После оплаты получите привязанный к персонажу ключ от танка по почте на персонаже, купившем набор. Танк временно заменяет ездовое животное набора.',
+    'После оплаты заберите по почте персональные поводья Ночнокрылой химеры на персонаже, купившем этот комплект. Верховое животное останется у вас после окончания подписки.',
   'hudChrome.wocStore.subscription.trialTerms':
     'Бесплатный пробный период на {days} дней доступен один раз на аккаунт. Требуется способ оплаты. Если не отменить подписку, по окончании будет списано {price}.',
   'hudChrome.wocStore.subscription.startTrial': 'Начать пробные 7 дней',
@@ -21404,7 +21404,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.membership_annual_reward.sender': 'Воронья почта',
   'entities.letters.membership_annual_reward.subject': 'Транспорт годового членства',
   'entities.letters.membership_annual_reward.body':
-    'Годовое членство оплачено. Ключ от танка приложен к письму. Храните ключ в сумке или банке, чтобы владеть транспортом. Он останется вашим после окончания членства. Требуется навык верховой езды.',
+    'Оплата годовой подписки завершена. К письму приложены поводья верхового животного. Храните поводья в сумках или банке, чтобы владеть им. Оно останется у вас после окончания подписки. Требуется навык верховой езды.',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'Это оформление завершено, неполученных наград нет. Выберите план членства ещё раз, чтобы начать новое оформление.',
   'itemUi.tooltip.referralFullSet':
@@ -22266,12 +22266,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'referralCards.rewards.fogbinder':
     'Аксессуар улучшается: даёт больше выносливости и активный эффект, повышающий все характеристики на 5 на 15 секунд. Перезарядка: 2 минуты.',
   'referralCards.rewards.gravewyrm': 'Бесплатное обучение верховой езде.',
-  'referralCards.rewards.raid': 'Эксклюзивный ездовой танк дружбы.',
+  'referralCards.rewards.raid': 'Ездовой слизень Трясунчик.',
   'referralCards.referrerRewards.1': 'Эксклюзивный ездовой раптор дружбы.',
   'referralCards.referrerRewards.2': '20 ячеек банка и 5 слотов персонажей.',
   'referralCards.referrerRewards.3': 'Награда: 1 000 Claudium.',
   'referralCards.referrerRewards.4': 'Награда: 1 000 Claudium.',
-  'referralCards.referrerRewards.5': 'Спутник Деревце.',
+  'referralCards.referrerRewards.5': 'Спутники Мерцай и Искорка.',
   'referralCards.reasons.notParticipant': 'Этот аккаунт не участвует в данной связи друзей.',
   'referralCards.reasons.staleRevision':
     'Карточка изменилась. Проверьте текущий прогресс и повторите попытку.',
@@ -22313,7 +22313,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': 'Связанные друзья объединены приглашением по реферальной ссылке.',
   'hudChrome.mounts.name_referral_tank': 'Танк дружбы',
   'hudChrome.mounts.name_referral_raptor': 'Раптор дружбы',
-  'hudChrome.mounts.desc_referral_tank': 'Награда за завершение реферальной карточки с отметками.',
+  'hudChrome.mounts.desc_referral_tank': 'Прежняя награда за заполнение карты приглашения друзей.',
   'hudChrome.mounts.desc_referral_raptor':
     'Награда за помощь первому связанному другу в завершении карточки с отметками.',
   'apiError.character.referral_transfer_pending':

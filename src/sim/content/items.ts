@@ -412,26 +412,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     sellValue: 0,
   },
-  // Annual membership bundle reward, delivered only after verified payment.
-  // The tank is the placeholder mount. Its permanent reins stay soulbound.
+  // Retired annual placeholder: keep existing saved keys usable and soulbound.
   reins_terrorspark_groundshaker: {
     id: 'reins_terrorspark_groundshaker',
     name: 'Ignition Key: Dreadspark Groundshaker',
     kind: 'mount',
     mount: 'terrorspark_groundshaker',
-    quality: 'epic',
-    soulbound: true,
-    noVendorSell: true,
-    noDiscard: true,
-    sellValue: 0,
-  },
-  // Developer-only mount (DEVELOPER_MOUNTS terms): /dev mounts or
-  // /dev give reins_wobbles_slime, soulbound until it has an acquisition path.
-  reins_wobbles_slime: {
-    id: 'reins_wobbles_slime',
-    name: 'Jelly Saddle: Wobbles',
-    kind: 'mount',
-    mount: 'wobbles_slime',
     quality: 'epic',
     soulbound: true,
     noVendorSell: true,
@@ -455,6 +441,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     buyValue: 1_000_000, // 100 gold in copper
   },
+  // Annual membership reward, delivered only after verified payment.
   reins_nightwing_chimera: {
     id: 'reins_nightwing_chimera',
     name: 'Reins of the Nightwing Chimaera',
@@ -772,8 +759,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     sellValue: 50_000, // 5g, the flat vendor price every whistle takes
   },
-  // The flame-sprite pair. No player-facing source yet: granted by /dev buddy
-  // and the admin grant only (docs/design/buddy-acquisition.md).
+  // The flame-sprite pair is unlocked directly by the fifth completed referral.
+  // This whistle remains the dev/admin token and reward artwork.
   whistle_sprites: {
     id: 'whistle_sprites',
     name: 'Flicker and Glimmer Whistle',

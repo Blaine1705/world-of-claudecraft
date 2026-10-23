@@ -215,6 +215,7 @@ describe('the REAL catalog applies collectible transfer policy', () => {
     expect(blocked.map((i) => i.id).sort()).toEqual([
       'reins_referral_raptor',
       'reins_referral_tank',
+      'reins_wobbles_slime',
     ]);
     for (const item of blocked) {
       expect(item.soulbound).toBe(true);

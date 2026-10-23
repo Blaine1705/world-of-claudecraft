@@ -2947,7 +2947,7 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // (at the tier the map buys, each tier discovering its piece through
   // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
   buried_hoard: HOARD_BASE_ITEM_IDS,
-  referral_cards: ['reins_referral_raptor', 'reins_referral_tank'],
+  referral_cards: ['reins_referral_raptor', 'reins_wobbles_slime'],
   // src/sim/guild_quartermaster.ts grants the guild's reins, its account-wide blade and its four
   // account-wide elemental arms
   lantern_hall_quartermaster: [
@@ -3146,7 +3146,7 @@ function judgeSlotRoutes(
   }
   if (
     (relicKind === 'weapon_skin' && ROUTE_MAPS.storeSkinIds.has(slotId)) ||
-    (relicKind === 'mount' && slotId === 'terrorspark_groundshaker')
+    (relicKind === 'mount' && slotId === 'nightwing_chimera')
   ) {
     judge('store', `store:${RELIQUARY_STORE_SOURCE_ID}`, names('store', RELIQUARY_STORE_SOURCE_ID));
   }
@@ -3185,16 +3185,15 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // Mirefen world boss's table (content/zone2.ts, the "dedicated world boss"
   // the 2026-08-04 owner call held them back for), so its Horizons slot names
   // that door (MOUNT_SOURCES in content/reliquary.ts).
-  // terrorspark_groundshaker left this list when the annual membership
-  // bundle began granting its soulbound reins through the WOC Store.
+  // The annual and referral tank placeholders have no new source; their
+  // saved reins remain valid. Chimaera and Wobbles now fill those reward slots.
   // lanternback_troll: DEVELOPER_MOUNTS, dev-grant only, deliberately absent
   // from vendors, quests, mob loot, heroic loot, and the rift reins pools (see
   // the def comments in content/mounts.ts).
   // avian_strider left this list when the Rift Watch quartermaster's Champion
   // row gave it a route (content/faction_vendors.ts), and drakemaw_raptor when
   // Balgath's table did (MOUNT_SOURCES hints both).
-  // wobbles_slime: DEVELOPER_MOUNTS while its acquisition path is decided.
-  horizons_mounts: ['lanternback_troll', 'nightwing_chimera', 'wobbles_slime'],
+  horizons_mounts: ['lanternback_troll', 'referral_tank', 'terrorspark_groundshaker'],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3325,7 +3324,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // 13 = the four heroic bosses + the raid + Marla + rift A/B/S + the Mirefen
   // world boss, whose reins joined his table, + the Rift Watch quartermaster
   // (the Viridian Valestrider's Champion reins, content/faction_vendors.ts) +
-  // the WOC Store's annual membership tank reward; the one pending-ruling
+  // the WOC Store's annual membership Chimaera reward; the one pending-ruling
   // absence resolves to nothing.
   // plus the referral-card reward activity, plus Lantern Hall's quartermaster (the guild's
   // horse, sold for Lantern Seals)
@@ -4022,8 +4021,8 @@ describe('Reliquary source hints resolve against live content', () => {
       for (const hint of reliquaryRelicSource(page, relic)) {
         if (hint.sourceKind !== 'store') continue;
         checked += 1;
-        if (relic.kind === 'mount' && slotId === 'terrorspark_groundshaker') {
-          expect(ITEMS.reins_terrorspark_groundshaker).toMatchObject({
+        if (relic.kind === 'mount' && slotId === 'nightwing_chimera') {
+          expect(ITEMS.reins_nightwing_chimera).toMatchObject({
             kind: 'mount',
             mount: slotId,
             soulbound: true,
@@ -4085,7 +4084,7 @@ describe('Reliquary source hints resolve against live content', () => {
     // literally (interaction.ts and professions/crafting.ts respectively).
     expect(bySlotKind.get('corpse_harvest:mark')).toEqual(['gather_event:perfect_specimen']);
     expect(bySlotKind.get('masterwork_craft:mark')).toEqual(['masterwork:first']);
-    expect(bySlotKind.get('referral_cards:mount')).toEqual(['referral_raptor', 'referral_tank']);
+    expect(bySlotKind.get('referral_cards:mount')).toEqual(['wobbles_slime', 'referral_raptor']);
     // The rift first-clear ITEM slots are EXACTLY the live Riftbound band
     // array, the same bidirectional regime as the corpse-harvest specimens
     // above. The array itself is bound to the independent mint literals by
@@ -4313,8 +4312,8 @@ describe('Reliquary source hint coverage', () => {
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'lanternback_troll',
-      'nightwing_chimera',
-      'wobbles_slime',
+      'referral_tank',
+      'terrorspark_groundshaker',
     ]);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {

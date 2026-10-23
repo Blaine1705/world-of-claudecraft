@@ -98,14 +98,14 @@ export const ko_KR: EnTranslations = {
       "hollow": "체력을 높이고 생명력이 낮을 때 자동으로 보호막을 생성하는 장신구.",
       "fogbinder": "장신구가 진화하여 체력이 더 증가하고 사용 효과를 얻습니다. 15초 동안 모든 능력치가 5 증가하며 재사용 대기시간은 2분입니다.",
       "gravewyrm": "무료 탈것 훈련.",
-      "raid": "전용 우정 전차 탈것."
+      "raid": "말랑이 슬라임 탈것."
     },
     "referrerRewards": {
       "1": "전용 우정 랩터 탈것.",
       "2": "은행 슬롯 20칸과 캐릭터 슬롯 5칸.",
       "3": "Claudium 1,000개.",
       "4": "Claudium 1,000개.",
-      "5": "어린 나무 동료."
+      "5": "깜빡이와 반짝이 동료."
     },
     "reasons": {
       "notParticipant": "이 계정은 해당 친구 연결에 속하지 않습니다.",
@@ -1113,7 +1113,7 @@ export const ko_KR: EnTranslations = {
         "annualTitle": "12개월 멤버십 묶음",
         "annualPrice": "12개월 이용료 {price} 선불",
         "annualTerms": "같은 가격으로 매년 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.",
-        "annualMount": "결제 후 구매한 캐릭터로 우편에서 영혼 귀속 전차 탈것 열쇠를 받으세요. 전차는 묶음 탈것의 임시 모델입니다.",
+        "annualMount": "결제 후 이 묶음을 구매한 캐릭터의 우편으로 귀속된 밤날개 키메라 고삐를 받으세요. 멤버십이 만료되어도 탈것은 계속 소유합니다.",
         "trialTerms": "계정당 한 번 {days}일간 무료로 체험하세요. 결제 수단 등록이 필요합니다. 취소하지 않으면 체험 종료 시 {price}가 청구됩니다.",
         "startTrial": "7일 무료 체험 시작",
         "resumeCheckout": "결제 계속하기",
@@ -2379,7 +2379,7 @@ export const ko_KR: EnTranslations = {
       "desc_rallycart_skin": "작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.",
       "desc_wobbles_slime": "안장을 얹도록 길들여진 커다란 파란 슬라임. 걷는 대신 통통 튀어 다니고, 기수 아래에서 말랑하게 흔들리며, 젤리 몸속으로 거품이 천천히 떠오른다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
-      "desc_referral_tank": "친구 초대 도장 카드를 완성하면 획득합니다.",
+      "desc_referral_tank": "이전 친구 초대 도장 카드 보상.",
       "desc_referral_raptor": "첫 번째 연결된 친구가 도장 카드를 완성하도록 도우면 획득합니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
       "desc_avian_strider": "우뚝 솟은 탈것 조류로, 육중한 발톱과 접은 날개가 모든 여정을 천둥 같은 질주로 바꾼다.",
@@ -29952,7 +29952,7 @@ export const ko_KR: EnTranslations = {
       "membership_annual_reward": {
         "sender": "까마귀 우편",
         "subject": "연간 멤버십 탈것",
-        "body": "연간 멤버십 결제가 완료되었습니다. 전차 탈것 열쇠가 동봉되어 있습니다. 탈것을 소유하려면 열쇠를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 소유권은 유지됩니다. 타기 기술이 필요합니다."
+        "body": "연간 멤버십 결제가 완료되었습니다. 탈것 고삐가 동봉되어 있습니다. 탈것을 소유하려면 고삐를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 계속 소유합니다. 탈것 타기 기술이 필요합니다."
       },
       "woc_market_return": {
         "sender": "거래소 중개인",

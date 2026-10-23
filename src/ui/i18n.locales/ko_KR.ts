@@ -20997,7 +20997,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '같은 가격으로 매년 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.',
   'hudChrome.wocStore.subscription.annualMount':
-    '결제 후 구매한 캐릭터로 우편에서 영혼 귀속 전차 탈것 열쇠를 받으세요. 전차는 묶음 탈것의 임시 모델입니다.',
+    '결제 후 이 묶음을 구매한 캐릭터의 우편으로 귀속된 밤날개 키메라 고삐를 받으세요. 멤버십이 만료되어도 탈것은 계속 소유합니다.',
   'hudChrome.wocStore.subscription.trialTerms':
     '계정당 한 번 {days}일간 무료로 체험하세요. 결제 수단 등록이 필요합니다. 취소하지 않으면 체험 종료 시 {price}가 청구됩니다.',
   'hudChrome.wocStore.subscription.startTrial': '7일 무료 체험 시작',
@@ -21009,7 +21009,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.membership_annual_reward.sender': '까마귀 우편',
   'entities.letters.membership_annual_reward.subject': '연간 멤버십 탈것',
   'entities.letters.membership_annual_reward.body':
-    '연간 멤버십 결제가 완료되었습니다. 전차 탈것 열쇠가 동봉되어 있습니다. 탈것을 소유하려면 열쇠를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 소유권은 유지됩니다. 타기 기술이 필요합니다.',
+    '연간 멤버십 결제가 완료되었습니다. 탈것 고삐가 동봉되어 있습니다. 탈것을 소유하려면 고삐를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 계속 소유합니다. 탈것 타기 기술이 필요합니다.',
   'hudChrome.wocStore.subscription.checkoutClosed':
     '이 결제는 종료되었으며 미수령 보상이 없습니다. 멤버십 요금제를 다시 선택하여 새 결제를 시작하세요.',
   'itemUi.tooltip.referralFullSet':
@@ -21851,12 +21851,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'referralCards.rewards.fogbinder':
     '장신구가 진화하여 체력이 더 증가하고 사용 효과를 얻습니다. 15초 동안 모든 능력치가 5 증가하며 재사용 대기시간은 2분입니다.',
   'referralCards.rewards.gravewyrm': '무료 탈것 훈련.',
-  'referralCards.rewards.raid': '전용 우정 전차 탈것.',
+  'referralCards.rewards.raid': '말랑이 슬라임 탈것.',
   'referralCards.referrerRewards.1': '전용 우정 랩터 탈것.',
   'referralCards.referrerRewards.2': '은행 슬롯 20칸과 캐릭터 슬롯 5칸.',
   'referralCards.referrerRewards.3': 'Claudium 1,000개.',
   'referralCards.referrerRewards.4': 'Claudium 1,000개.',
-  'referralCards.referrerRewards.5': '어린 나무 동료.',
+  'referralCards.referrerRewards.5': '깜빡이와 반짝이 동료.',
   'referralCards.reasons.notParticipant': '이 계정은 해당 친구 연결에 속하지 않습니다.',
   'referralCards.reasons.staleRevision':
     '카드가 변경되었습니다. 최신 진행 상황을 확인하고 다시 시도하세요.',
@@ -21896,7 +21896,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': '연결된 친구는 초대 링크를 통해 연결됩니다.',
   'hudChrome.mounts.name_referral_tank': '우정 전차',
   'hudChrome.mounts.name_referral_raptor': '우정 랩터',
-  'hudChrome.mounts.desc_referral_tank': '친구 초대 도장 카드를 완성하면 획득합니다.',
+  'hudChrome.mounts.desc_referral_tank': '이전 친구 초대 도장 카드 보상.',
   'hudChrome.mounts.desc_referral_raptor':
     '첫 번째 연결된 친구가 도장 카드를 완성하도록 도우면 획득합니다.',
   'apiError.character.referral_transfer_pending':
