@@ -278,6 +278,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'avian_strider',
   'lanternback_troll',
   'terrorspark_groundshaker',
+  'nightwing_chimera',
   'referral_raptor',
   'referral_tank',
 ] as const;

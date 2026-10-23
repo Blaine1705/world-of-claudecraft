@@ -88,6 +88,12 @@ export interface MountRideSpec {
   /** Extra chest pitch ON TOP of the clip, positive = forward. Additive, so
    *  the torso keeps breathing with the seated loop. */
   lean?: number;
+  /** Optional left-side upper-arm target quaternion [x, y, z, w] (y and z
+   *  mirrored on the right arm), overriding the seated clip's flared elbows. */
+  upperArm?: readonly [number, number, number, number];
+  /** Optional left-side forearm target quaternion [x, y, z, w] (y and z
+   *  mirrored on the right arm), placing the hands on a saddle horn or pommel. */
+  lowerArm?: readonly [number, number, number, number];
 }
 
 /** A seat carried on the mount's own skeleton, for mounts whose saddle MOVES
@@ -354,6 +360,35 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     // rider's root rides a hair above the pan so the sit pose's hips carry his
     // weight onto it.
     { bone: 'chair', offset: [0, 0.918, 0.25] },
+  ),
+  // The Nightwing Chimaera: rider sits in the saddle nestled between the base
+  // of the two dragon necks. Anchoring to `saddle` carries the rider smoothly
+  // from the perched bipedal idle up into the airborne flight pose when moving.
+  // The WOC modular player body's thigh rest is a half-turn about Z (not X as on
+  // KayKit), and the thighs/shins are held nearly parallel (spread = pi - 0.032)
+  // and pitched forward (thigh = pi - 1.08) so both legs stay separated and run
+  // cleanly down the central channel between the two necks without colliding at
+  // the boots or clipping into the necks.
+  nightwing_chimera: spec(
+    'mount_nightwing_chimera',
+    3.61,
+    true,
+    undefined,
+    0.4,
+    null,
+    [],
+    { bone: 'saddle', offset: [0, -0.022, 0.068] },
+    {
+      ride: {
+        spread: 3.11,
+        thigh: 2.062,
+        knee: -1.02,
+        ankle: 0.85,
+        hips: -0.04,
+        upperArm: [0.3201, 0.1239, -0.6185, 0.7069],
+        lowerArm: [0.3042, 0.4618, 0.0173, 0.833],
+      },
+    },
   ),
 };
 

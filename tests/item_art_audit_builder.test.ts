@@ -880,12 +880,12 @@ describe('item-art audit builder', () => {
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
       // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
       // `--verify-only` on the merged tree.
-      // Integration45: 141 new files plus repainted loot, measured by --verify-only.
-      catalogSha256: '3fb2b27d2554d7e788dc0cff70c0a79caa1c5d911371d5e02a5b6d07fe60eebf',
-      catalogBytes: 1192854,
+      // Integration45: 141 new files plus repainted loot and Nightwing Chimaera, measured by --verify-only.
+      catalogSha256: 'a7b26833c0995989a3a0657a096b8ac5c09128bc602843f0de6e7f17b51a505b',
+      catalogBytes: 1193395,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2181,
-      liveItemCount: 2210,
+      catalogCount: 2182,
+      liveItemCount: 2211,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -903,7 +903,7 @@ describe('item-art audit builder', () => {
         identity: 47,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '2f080865b1956197773aebc61d174ce33df6d62c5662f7a066cd77a50ff31868',
+      shippingCatalogSha256: '38fbaca7781cb14b5ba17ec030cf456104fe748724d28bdffa9d6f573220c406',
       machineChecksPassed: true,
       verdict: null,
     });

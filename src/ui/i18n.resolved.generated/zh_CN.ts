@@ -2242,6 +2242,7 @@ export const zh_CN: EnTranslations = {
       "name_lanternback_troll": "提灯背者格伦博",
       "name_chimeglass_tortoise": "钟晶的托利弗",
       "name_rickshaw_mount": "白骨人力车",
+      "name_nightwing_chimera": "夜翼奇美拉",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
@@ -2259,6 +2260,7 @@ export const zh_CN: EnTranslations = {
       "desc_avian_strider": "高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。",
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
+      "desc_nightwing_chimera": "来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
       "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
     },
@@ -20018,6 +20020,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_avian_strider": {
         "name": "苍翠谷行者的缰绳"
+      },
+      "reins_nightwing_chimera": {
+        "name": "夜翼奇美拉的缰绳"
       },
       "reins_goblin_rocket_sled": {
         "name": "哥布林火箭雪橇点火钥匙"

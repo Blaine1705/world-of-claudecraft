@@ -524,12 +524,12 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // + the referral stamp-card rewards on the same integration (referral_fog_charm,
     // referral_hollow_charm, reins_referral_raptor, reins_referral_tank): 137 live.
     // Their own paintings now ship in referral-reward-icons-v045-2026-10-22,
-    // so all 137 live hotbar items are painted; none remain parked.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(137);
+    // plus reins_nightwing_chimera, so all 138 live hotbar items are painted; none remain parked.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(138);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(137);
+    ).toHaveLength(138);
     expect([...pendingHotbarItemIds].sort(), 'ITEM_ART_PENDING hotbar items').toEqual([]);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
