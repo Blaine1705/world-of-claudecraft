@@ -19948,7 +19948,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '每年以相同价格续订。通过Stripe使用法定货币付款。可在账单设置中取消。',
   'hudChrome.wocStore.subscription.annualMount':
-    '付款后，请使用购买礼包的角色从邮件中领取灵魂绑定的坦克坐骑钥匙。坦克暂时代替礼包坐骑。',
+    '付款后，请使用购买此礼包的角色通过邮件领取灵魂绑定的夜翼奇美拉缰绳。会员到期后，你仍将拥有这只坐骑。',
   'hudChrome.wocStore.subscription.trialTerms':
     '每个账户可免费试用一次，共{days}天。需要提供付款方式。除非取消，否则试用结束时将收取{price}。',
   'hudChrome.wocStore.subscription.startTrial': '开始7天免费试用',
@@ -19960,7 +19960,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.membership_annual_reward.sender': '鸦羽邮局',
   'entities.letters.membership_annual_reward.subject': '您的年度会员坐骑',
   'entities.letters.membership_annual_reward.body':
-    '您的年度会员付款已完成。坦克坐骑钥匙随信附上。请将钥匙保留在背包或银行中以拥有此坐骑。会员到期后它仍归您所有。需要骑术技能。',
+    '你的年度会员付款已完成。随信附上坐骑缰绳。将缰绳保存在背包或银行中即可拥有这只坐骑。会员到期后，它仍属于你。需要骑术。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     '此结账流程已结束，且没有待领取奖励。请重新选择会员方案，开始新的结账流程。',
   'itemUi.tooltip.referralFullSet':
@@ -20741,7 +20741,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'referralCards.rewards.fogbinder':
     '你的饰品进化，提高更多耐力，并获得主动效果：所有属性提高5点，持续15秒，冷却时间为2分钟。',
   'referralCards.rewards.gravewyrm': '免费坐骑训练。',
-  'referralCards.rewards.raid': '专属友谊坦克坐骑。',
+  'referralCards.rewards.raid': '晃晃史莱姆坐骑。',
   'referralCards.referrerRewards.1': '专属友谊迅猛龙坐骑。',
   'referralCards.referrerRewards.2': '20个银行栏位和5个角色栏位。',
   'referralCards.referrerRewards.3': '获得1,000 Claudium。',
@@ -20781,7 +20781,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': '绑定好友通过邀请链接建立关系。',
   'hudChrome.mounts.name_referral_tank': '友谊坦克',
   'hudChrome.mounts.name_referral_raptor': '友谊迅猛龙',
-  'hudChrome.mounts.desc_referral_tank': '完成一张推荐集章卡后获得。',
+  'hudChrome.mounts.desc_referral_tank': '以前的招募好友集章卡奖励。',
   'hudChrome.mounts.desc_referral_raptor': '帮助你的首位绑定好友完成一张集章卡后获得。',
   'apiError.character.referral_transfer_pending':
     '删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。',

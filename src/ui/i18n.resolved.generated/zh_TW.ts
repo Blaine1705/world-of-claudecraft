@@ -98,7 +98,7 @@ export const zh_TW: EnTranslations = {
       "hollow": "一件提高耐力的飾品，並在你生命值較低時被動產生護盾。",
       "fogbinder": "你的飾品進化，提高更多耐力，並獲得主動效果：所有屬性提高5點，持續15秒，冷卻時間為2分鐘。",
       "gravewyrm": "免費坐騎訓練。",
-      "raid": "專屬友誼坦克坐騎。"
+      "raid": "晃晃史萊姆坐騎。"
     },
     "referrerRewards": {
       "1": "專屬友誼迅猛龍坐騎。",
@@ -1017,7 +1017,7 @@ export const zh_TW: EnTranslations = {
         "annualTitle": "12個月會員禮包",
         "annualPrice": "12個月共{price}，一次付清",
         "annualTerms": "每年以相同價格續訂。透過Stripe使用法定貨幣付款。可在帳單設定中取消。",
-        "annualMount": "付款後，請使用購買禮包的角色從郵件中領取靈魂綁定的坦克坐騎鑰匙。坦克暫時代替禮包坐騎。",
+        "annualMount": "付款後，請使用購買此禮包的角色透過郵件領取靈魂綁定的夜翼奇美拉韁繩。會員到期後，你仍將擁有這隻坐騎。",
         "trialTerms": "每個帳號可免費試用一次，共{days}天。需要提供付款方式。除非取消，否則試用結束時將收取{price}。",
         "startTrial": "開始7天免費試用",
         "resumeCheckout": "繼續結帳",
@@ -2256,7 +2256,7 @@ export const zh_TW: EnTranslations = {
       "desc_rallycart_skin": "一輛小巧的拉力賽車，轟鳴聲卻震天響。",
       "desc_wobbles_slime": "一隻被馴服上鞍的大藍史萊姆。牠不走路而是蹦跳，在騎手身下晃來晃去，體內還有氣泡緩緩上浮。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
-      "desc_referral_tank": "完成一張推薦集章卡後獲得。",
+      "desc_referral_tank": "以前的招募好友集章卡獎勵。",
       "desc_referral_raptor": "幫助你的首位綁定好友完成一張集章卡後獲得。",
       "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
       "desc_avian_strider": "高大的坐騎巨鳥，粗壯的利爪與收攏的雙翼讓每一段旅程都化作雷鳴般的疾馳。",
@@ -29801,7 +29801,7 @@ export const zh_TW: EnTranslations = {
       "membership_annual_reward": {
         "sender": "鴉羽郵局",
         "subject": "您的年度會員坐騎",
-        "body": "您的年度會員付款已完成。坦克坐騎鑰匙隨信附上。請將鑰匙保留在背包或銀行中以擁有此坐騎。會員到期後它仍歸您所有。需要騎術技能。"
+        "body": "你的年度會員付款已完成。隨信附上坐騎韁繩。將韁繩保存在背包或銀行中即可擁有這隻坐騎。會員到期後，牠仍屬於你。需要騎術。"
       },
       "woc_market_return": {
         "sender": "交易所經紀人",

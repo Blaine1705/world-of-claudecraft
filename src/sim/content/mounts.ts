@@ -85,10 +85,10 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Paid cosmetic looks are MOUNT SKINS (content/mount_skins.ts), worn over
-  // whatever mount the character rides. The annual reward tank below is
+  // whatever mount the character rides. The annual reward Chimaera below is
   // the one paid mount item; it shares the existing epic travel speed.
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears,
-  // the Lanternback Troll from Treasure Caskets. The Dreadspark Groundshaker
+  // the Lanternback Troll from Treasure Caskets. The Nightwing Chimaera
   // is the annual membership bundle reward. It retains its catalog position.
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
@@ -133,8 +133,7 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   },
   // A big blue jelly slime broken to the saddle: it hops rather than walks,
   // jiggles under the rider, and carries bubbles drifting up through its body.
-  // Developer-only for now (DEVELOPER_MOUNTS below) while its acquisition path
-  // is decided.
+  // Earned by completing a recruit-a-friend stamp card.
   wobbles_slime: {
     key: 'wobbles_slime',
     name: 'Wobbles the Slime',
@@ -180,12 +179,12 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = ['wobbles_slime', 'nightwing_chimera'];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker', 'referral_tank'];
 
 /** Paid annual-bundle mounts retain soulbound reins and outlive membership expiry. */
-export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];
+export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['nightwing_chimera'];
 /** Card and inviter milestones, delivered only by the committed referral reward transaction. */
-export const REFERRAL_REWARD_MOUNTS: readonly MountKey[] = ['referral_tank', 'referral_raptor'];
+export const REFERRAL_REWARD_MOUNTS: readonly MountKey[] = ['wobbles_slime', 'referral_raptor'];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
 export function isDeveloperMount(key: string): boolean {

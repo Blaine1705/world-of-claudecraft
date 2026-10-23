@@ -85,7 +85,7 @@ describe.skipIf(!url)('membership token delivery (real Postgres)', () => {
       ),
     ).rejects.toThrow('character missing');
   });
-  it('annual reward retries create one permanent soulbound tank parcel and cannot cross token identity', async () => {
+  it('annual reward retries create one permanent soulbound Chimaera parcel and cannot cross token identity', async () => {
     const recipient = { characterId: 13, name: 'Alice' };
     const receipt = 'annual-receipt-race-123456';
     const result = await Promise.all([
@@ -95,7 +95,7 @@ describe.skipIf(!url)('membership token delivery (real Postgres)', () => {
     expect(result.filter(Boolean)).toHaveLength(1);
     expect(result.find(Boolean)).toMatchObject({
       letter: 'membership_annual',
-      items: [{ itemId: 'reins_terrorspark_groundshaker', count: 1 }],
+      items: [{ itemId: 'reins_nightwing_chimera', count: 1 }],
     });
     await expect(persistMembershipTokenDelivery(7, recipient, receipt, db)).rejects.toThrow(
       'identity mismatch',

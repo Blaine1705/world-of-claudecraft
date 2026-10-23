@@ -98,7 +98,7 @@ export const zh_CN: EnTranslations = {
       "hollow": "一件提高耐力的饰品，并在你生命值较低时被动生成护盾。",
       "fogbinder": "你的饰品进化，提高更多耐力，并获得主动效果：所有属性提高5点，持续15秒，冷却时间为2分钟。",
       "gravewyrm": "免费坐骑训练。",
-      "raid": "专属友谊坦克坐骑。"
+      "raid": "晃晃史莱姆坐骑。"
     },
     "referrerRewards": {
       "1": "专属友谊迅猛龙坐骑。",
@@ -1017,7 +1017,7 @@ export const zh_CN: EnTranslations = {
         "annualTitle": "12个月会员礼包",
         "annualPrice": "12个月共{price}，一次付清",
         "annualTerms": "每年以相同价格续订。通过Stripe使用法定货币付款。可在账单设置中取消。",
-        "annualMount": "付款后，请使用购买礼包的角色从邮件中领取灵魂绑定的坦克坐骑钥匙。坦克暂时代替礼包坐骑。",
+        "annualMount": "付款后，请使用购买此礼包的角色通过邮件领取灵魂绑定的夜翼奇美拉缰绳。会员到期后，你仍将拥有这只坐骑。",
         "trialTerms": "每个账户可免费试用一次，共{days}天。需要提供付款方式。除非取消，否则试用结束时将收取{price}。",
         "startTrial": "开始7天免费试用",
         "resumeCheckout": "继续结账",
@@ -2256,7 +2256,7 @@ export const zh_CN: EnTranslations = {
       "desc_rallycart_skin": "一辆小巧的拉力赛车，轰鸣声却震天响。",
       "desc_wobbles_slime": "一只被驯服上鞍的大蓝史莱姆。它不走路而是蹦跳，在骑手身下晃来晃去，体内还有气泡缓缓上浮。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
-      "desc_referral_tank": "完成一张推荐集章卡后获得。",
+      "desc_referral_tank": "以前的招募好友集章卡奖励。",
       "desc_referral_raptor": "帮助你的首位绑定好友完成一张集章卡后获得。",
       "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
       "desc_avian_strider": "高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。",
@@ -29801,7 +29801,7 @@ export const zh_CN: EnTranslations = {
       "membership_annual_reward": {
         "sender": "鸦羽邮局",
         "subject": "您的年度会员坐骑",
-        "body": "您的年度会员付款已完成。坦克坐骑钥匙随信附上。请将钥匙保留在背包或银行中以拥有此坐骑。会员到期后它仍归您所有。需要骑术技能。"
+        "body": "你的年度会员付款已完成。随信附上坐骑缰绳。将缰绳保存在背包或银行中即可拥有这只坐骑。会员到期后，它仍属于你。需要骑术。"
       },
       "woc_market_return": {
         "sender": "交易所经纪人",

@@ -20963,7 +20963,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。',
   'hudChrome.wocStore.subscription.annualMount':
-    '支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。',
+    '支払い後、購入したキャラクターで郵便から魂に縛られたナイトウィング・キマイラの手綱を受け取れます。メンバーシップが終了しても騎乗動物は所有できます。',
   'hudChrome.wocStore.subscription.trialTerms':
     '1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。',
   'hudChrome.wocStore.subscription.startTrial': '7日間の無料体験を開始',
@@ -20975,7 +20975,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.membership_annual_reward.sender': 'レイヴンポスト',
   'entities.letters.membership_annual_reward.subject': '年間メンバーシップの騎乗動物',
   'entities.letters.membership_annual_reward.body':
-    '年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
+    '年間メンバーシップの支払いが完了しました。騎乗動物の手綱を同封しました。所有するには手綱をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。',
   'itemUi.tooltip.referralFullSet':
@@ -21807,7 +21807,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'referralCards.rewards.fogbinder':
     '装飾品が進化してスタミナがさらに増加し、使用効果を得ます。全能力値が15秒間5上昇し、再使用まで2分かかります。',
   'referralCards.rewards.gravewyrm': '無料の騎乗訓練。',
-  'referralCards.rewards.raid': '限定の友情タンクマウント。',
+  'referralCards.rewards.raid': 'スライムのプルプルの騎乗動物。',
   'referralCards.referrerRewards.1': '限定の友情ラプターマウント。',
   'referralCards.referrerRewards.2': '銀行スロット20枠とキャラクタースロット5枠。',
   'referralCards.referrerRewards.3': 'Claudiumを1,000。',
@@ -21854,7 +21854,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': '絆のフレンドは招待リンクで結ばれています。',
   'hudChrome.mounts.name_referral_tank': '友情タンク',
   'hudChrome.mounts.name_referral_raptor': '友情ラプター',
-  'hudChrome.mounts.desc_referral_tank': '招待スタンプカードを完成させると獲得できます。',
+  'hudChrome.mounts.desc_referral_tank': '以前の友達招待スタンプカードの報酬。',
   'hudChrome.mounts.desc_referral_raptor':
     '最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。',
   'apiError.character.referral_transfer_pending':

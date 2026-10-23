@@ -8,7 +8,7 @@ import {
   REFERRAL_FOG_TRINKET,
   REFERRAL_HOLLOW_TRINKET,
   REFERRAL_RAPTOR_REINS,
-  REFERRAL_TANK_REINS,
+  REFERRAL_SLIME_REINS,
   REFERRAL_TITLE,
 } from './content/referral_rewards';
 import { isMaterialItemId } from './material_ids';
@@ -157,7 +157,7 @@ export function grantReferralReward(
       next.mountTrainingFeePaid = true;
       break;
     case 'raid':
-      give(next, { itemId: REFERRAL_TANK_REINS, count: 1 });
+      give(next, { itemId: REFERRAL_SLIME_REINS, count: 1 });
       break;
   }
   putReceipt(next, linkId, redeemed | bit);

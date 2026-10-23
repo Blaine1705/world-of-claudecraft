@@ -1,3 +1,4 @@
+import { REFERRAL_SLIME_REINS } from '../../../sim/content/referral_rewards';
 import type { ReferralMilestone } from '../../../sim/referral_cards';
 import { esc } from '../../esc';
 import { focusKeyAttr } from '../../focus_restore';
@@ -19,7 +20,7 @@ const STAMP_ART: Partial<Record<ReferralMilestone, string>> = {
   tutorial: 'referral_satchel',
   hollow: 'referral_hollow_charm',
   fogbinder: 'referral_fog_charm',
-  raid: 'reins_referral_tank',
+  raid: REFERRAL_SLIME_REINS,
 };
 
 function rewardArt(itemId: string | undefined, fallback: UiIconName): string {

@@ -4,7 +4,7 @@ export const REFERRAL_TITLE = 'referral_trailmate';
 export const REFERRAL_BAG = 'referral_satchel';
 export const REFERRAL_HOLLOW_TRINKET = 'referral_hollow_charm';
 export const REFERRAL_FOG_TRINKET = 'referral_fog_charm';
-export const REFERRAL_TANK_REINS = 'reins_referral_tank';
+export const REFERRAL_SLIME_REINS = 'reins_wobbles_slime';
 export const REFERRAL_RAPTOR_REINS = 'reins_referral_raptor';
 export const REFERRAL_REWARD_SOURCE_BOSSES: Readonly<Record<string, string>> = {
   [REFERRAL_HOLLOW_TRINKET]: 'morthen',
@@ -22,6 +22,14 @@ const protectedReward = {
 } as const;
 
 export const REFERRAL_STAMP_ITEMS: Record<string, ItemDef> = {
+  [REFERRAL_SLIME_REINS]: {
+    id: REFERRAL_SLIME_REINS,
+    name: 'Jelly Saddle: Wobbles',
+    kind: 'mount',
+    mount: 'wobbles_slime',
+    quality: 'epic',
+    ...protectedReward,
+  },
   [REFERRAL_RAPTOR_REINS]: {
     id: REFERRAL_RAPTOR_REINS,
     name: 'Friendship Raptor Reins',
@@ -57,8 +65,9 @@ export const REFERRAL_STAMP_ITEMS: Record<string, ItemDef> = {
     stats: { sta: 5 },
     ...protectedReward,
   },
-  [REFERRAL_TANK_REINS]: {
-    id: REFERRAL_TANK_REINS,
+  // Retained for saved copies of the former card-completion reward.
+  reins_referral_tank: {
+    id: 'reins_referral_tank',
     name: 'Friendship Tank Reins',
     kind: 'mount',
     mount: 'referral_tank',

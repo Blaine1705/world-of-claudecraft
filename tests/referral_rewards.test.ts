@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { MOUNT_VISUAL_SPECS } from '../src/render/mount_visuals';
 import type { CharacterState } from '../src/sim/character_state';
 import { onTrinketDamage } from '../src/sim/combat/trinkets';
 import { BUDDIES } from '../src/sim/content/buddies';
@@ -8,8 +9,8 @@ import {
   REFERRAL_FOG_TRINKET,
   REFERRAL_HOLLOW_TRINKET,
   REFERRAL_RAPTOR_REINS,
+  REFERRAL_SLIME_REINS,
   REFERRAL_STAMP_ITEMS,
-  REFERRAL_TANK_REINS,
   REFERRAL_TITLE,
 } from '../src/sim/content/referral_rewards';
 import { TRINKET_AURA, trinketCooldownKey } from '../src/sim/content/trinkets';
@@ -173,13 +174,19 @@ describe('referral reward transactions', () => {
     state = grantReferralReward(state, 1, 'gravewyrm');
     expect(state).toMatchObject({ ridingTrained: true, mountTrainingFeePaid: true, copper: 0 });
     state = grantReferralReward(state, 1, 'raid');
-    expect(state.inventory.some((i) => i.itemId === REFERRAL_TANK_REINS)).toBe(true);
-    expect(MOUNTS.referral_tank.moveSpeedPct).toBe(MOUNTS.terrorspark_groundshaker.moveSpeedPct);
+    expect(REFERRAL_SLIME_REINS).toBe('reins_wobbles_slime');
+    expect(state.inventory.some((i) => i.itemId === REFERRAL_SLIME_REINS)).toBe(true);
+    expect(ITEMS[REFERRAL_SLIME_REINS]).toMatchObject({ kind: 'mount', mount: 'wobbles_slime' });
+    expect(grantReferralReward(state, 1, 'raid')).toBe(state);
+    expect(state.inventory.some((i) => i.itemId === 'reins_referral_tank')).toBe(false);
+    expect(MOUNTS.wobbles_slime.moveSpeedPct).toBe(MOUNTS.referral_raptor.moveSpeedPct);
   });
 
   it('grants inviter tiers once, with a distinct raptor and restored Sapling ownership', () => {
     const first = grantReferralInviterReward(blank(), 1);
-    expect(first.inventory.map((i) => i.itemId)).toEqual([REFERRAL_RAPTOR_REINS]);
+    expect(first.inventory.map((i) => i.itemId)).toEqual(['reins_referral_raptor']);
+    expect(ITEMS[REFERRAL_RAPTOR_REINS]).toMatchObject({ kind: 'mount', mount: 'referral_raptor' });
+    expect(MOUNT_VISUAL_SPECS.referral_raptor).toEqual(MOUNT_VISUAL_SPECS.drakemaw_raptor);
     expect(grantReferralInviterReward(first, 4)).toBe(first);
     const fifth = grantReferralInviterReward(first, 5);
     expect(fifth.buddies?.owned).toEqual(['sapling']);
@@ -189,6 +196,15 @@ describe('referral reward transactions', () => {
 });
 
 describe('live referral reward behavior', () => {
+  it('keeps the old tank and receipt valid without awarding a second completion mount', () => {
+    const state = blank();
+    state.referralRewards = { '1': { redeemed: 31 } };
+    state.inventory = [{ itemId: 'reins_referral_tank', count: 1 }];
+    expect(grantReferralReward(state, 1, 'raid')).toBe(state);
+    const { sim, pid } = simWith(state);
+    expect(sim.serializeCharacter(pid)!.inventory).toEqual(state.inventory);
+    expect(ITEMS.reins_referral_tank).toMatchObject({ kind: 'mount', mount: 'referral_tank' });
+  });
   it('persists receipts and exact trinket provenance and permits the earned title after loading', () => {
     const { sim, pid, meta, player } = simWith(hollow());
     sim.setActiveTitle(REFERRAL_TITLE, pid);

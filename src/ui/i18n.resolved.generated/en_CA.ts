@@ -98,7 +98,7 @@ export const en_CA: EnTranslations = {
       "hollow": "A trinket that grants Stamina and a passive shield when your health is low.",
       "fogbinder": "Your trinket evolves, gaining more Stamina and an active effect: +5 to all stats for 15 seconds, with a 2 minute cooldown.",
       "gravewyrm": "Free mount training.",
-      "raid": "The exclusive Friendship Tank mount."
+      "raid": "Wobbles the Slime mount."
     },
     "referrerRewards": {
       "1": "The exclusive Friendship Raptor mount.",
@@ -1017,7 +1017,7 @@ export const en_CA: EnTranslations = {
         "annualTitle": "12-month membership bundle",
         "annualPrice": "{price} for 12 months, paid upfront",
         "annualTerms": "Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.",
-        "annualMount": "After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.",
+        "annualMount": "After payment, collect the soulbound Nightwing Chimaera reins by mail on the character that purchased this bundle. The mount remains yours after membership expires.",
         "trialTerms": "Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.",
         "startTrial": "Start 7-day free trial",
         "resumeCheckout": "Resume checkout",
@@ -2256,7 +2256,7 @@ export const en_CA: EnTranslations = {
       "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
       "desc_wobbles_slime": "A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.",
       "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
-      "desc_referral_tank": "Earned by completing a referral stamp card.",
+      "desc_referral_tank": "Former referral stamp card reward.",
       "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
       "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.",
       "desc_avian_strider": "A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.",
@@ -29801,7 +29801,7 @@ export const en_CA: EnTranslations = {
       "membership_annual_reward": {
         "sender": "The Ravenpost",
         "subject": "Your annual membership mount",
-        "body": "Your annual membership payment is complete. Your tank mount key is enclosed. Keep the key in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required."
+        "body": "Your annual membership payment is complete. Your mount reins are enclosed. Keep the reins in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required."
       },
       "woc_market_return": {
         "sender": "The Exchange Broker",

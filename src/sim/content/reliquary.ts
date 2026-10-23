@@ -301,16 +301,13 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // table as an ungrouped 1% personal drop (content/zone2.ts), the "dedicated
 // world boss" the 2026-08-04 owner call held them back for.
 //
-// Dreadspark Groundshaker is the annual membership bundle's paid mount reward.
+// Nightwing Chimaera is the annual membership bundle's paid mount reward.
 //
 // The Viridian Valestrider is the Rift Watch quartermaster's Champion row
 // (content/faction_vendors.ts).
 //
-// Grumbol the Lanternback has no player acquisition path (DEVELOPER_MOUNTS,
-// content/mounts.ts): no live table awards its reins, so its absence here IS
-// the answer, and it stays hand-listed in SOURCE_PENDING_RULING. Wobbles the
-// Slime is the same: a developer mount until its route is chosen. Paid mount
-// skins are deliberately absent here.
+// The retired tank placeholders have no new acquisition path. Saved reins
+// remain usable. Paid mount skins are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -323,9 +320,9 @@ const MOUNT_SOURCES: Readonly<
   // never encodes meaning in the shape).
   valorsteed: fromVendor('stablemaster_marla'),
   avian_strider: fromVendor('npc_rift_watch_quartermaster'),
-  terrorspark_groundshaker: fromStore(),
+  nightwing_chimera: fromStore(),
   referral_raptor: fromActivity('referral_cards'),
-  referral_tank: fromActivity('referral_cards'),
+  wobbles_slime: fromActivity('referral_cards'),
   stormfeather_griffin: [
     fromBoss('morthen'),
     fromBoss('nythraxis_scourge_of_thornpeak'),
