@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const vi_VN: Record<string, string> = {
+  'error.buddyGrantFailed': 'Không thể cấp bạn đồng hành.',
+  'error.characterAlreadyHasThat': 'Nhân vật đó đã có bạn đồng hành hoặc diện mạo này.',
+  'moderationHistory.actionGrantBuddy': 'Đã cấp bạn đồng hành',
+  'moderationHistory.actionAnnounce': 'Thông báo toàn cõi',
+  'moderationHistory.actionGmInvisible': 'Đã trở nên vô hình',
+  'moderationHistory.actionGmVisible': 'Đã hiện hình',
+  'moderationHistory.actionUnwatch': 'Đã xóa khỏi danh sách theo dõi',
+  'moderationHistory.actionWatch': 'Đã thêm vào danh sách theo dõi',
   'error.flagActiveExists': 'Tài khoản này đã có một đánh dấu đang mở thuộc loại đó.',
   'wealth.largeMovementsUnavailable':
     'Không thể tải các khoản chuyển ngân hàng lớn (việc đọc sổ cái đã hết thời gian chờ). Bảng chi tiết vàng ở trên vẫn đầy đủ.',

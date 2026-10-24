@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const fr_FR: Record<string, string> = {
+  'error.buddyGrantFailed': 'L’attribution du compagnon a échoué.',
+  'error.characterAlreadyHasThat': 'Ce personnage possède déjà ce compagnon ou cette apparence.',
+  'moderationHistory.actionGrantBuddy': 'Compagnon attribué',
+  'moderationHistory.actionAnnounce': 'Annonce du royaume',
+  'moderationHistory.actionGmInvisible': 'Est devenu invisible',
+  'moderationHistory.actionGmVisible': 'Est devenu visible',
+  'moderationHistory.actionUnwatch': 'Retiré de la liste de surveillance',
+  'moderationHistory.actionWatch': 'Ajouté à la liste de surveillance',
   'error.flagActiveExists': 'ce compte a déjà un drapeau ouvert de ce type',
   'wealth.largeMovementsUnavailable':
     "les grands mouvements bancaires n'ont pas pu être chargés (la lecture du grand livre a expiré), le détail de l'or ci-dessus est complet",

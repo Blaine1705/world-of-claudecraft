@@ -50,6 +50,12 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   unjail: 'moderationHistory.actionUnjail',
   spectate: 'moderationHistory.actionSpectate',
   unspectate: 'moderationHistory.actionUnspectate',
+  // In-game GM tools: audited, never punitive, so they stay neutral.
+  watch: 'moderationHistory.actionWatch',
+  unwatch: 'moderationHistory.actionUnwatch',
+  gm_invisible: 'moderationHistory.actionGmInvisible',
+  gm_visible: 'moderationHistory.actionGmVisible',
+  announce: 'moderationHistory.actionAnnounce',
   suspend: 'moderationHistory.actionSuspend',
   unsuspend: 'moderationHistory.actionUnsuspend',
   ban: 'moderationHistory.actionBan',
@@ -75,6 +81,8 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   restore_item: 'moderationHistory.actionRestoreItem',
   restore_slot: 'moderationHistory.actionRestoreSlot',
   clear_item_name: 'moderationHistory.actionClearItemName',
+  // The seasonal buddy grant (server/buddy_wire.ts): value minted, never punitive.
+  grant_buddy: 'moderationHistory.actionGrantBuddy',
   cheater_mark: 'moderationHistory.actionCheaterMark',
   cheater_mark_lift: 'moderationHistory.actionCheaterMarkLift',
   // Realm-scoped rather than account-scoped: written by the guild backoffice into

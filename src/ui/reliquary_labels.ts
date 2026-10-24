@@ -193,6 +193,8 @@ const ACTIVITY_SOURCE_KEYS: Readonly<Record<string, TranslationKey>> = {
   masterwork_craft: 'hudChrome.reliquary.sourceActivityMasterworkCraft',
   rift_first_clear: 'hudChrome.reliquary.sourceActivityRiftFirstClear',
   buried_hoard: 'hudChrome.reliquary.sourceActivityBuriedHoard',
+  referral_cards: 'referralCards.title',
+  lantern_hall_quartermaster: 'hudChrome.reliquary.sourceActivityLanternHall',
   weekly_vault_pvp: 'hudChrome.reliquary.sourceActivityWeeklyVaultPvp',
 };
 
