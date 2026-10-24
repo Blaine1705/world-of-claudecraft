@@ -158,6 +158,7 @@ describe('i18n whole-catalog completeness', () => {
     const BRAND_ALLOW = new Set([
       'footer.copyright', // "{year} World of ClaudeCraft" - brand
       'footer.githubLink', // repository URL
+      'footer.levyStreet', // "Levy Street" - studio brand (footer backlink)
       'fiesta.bracket', // "Fiesta" event brand
       'serverUnavailable.logoAlt', // "World of ClaudeCraft" logo alt text - brand
       'guide.brand', // "World of ClaudeCraft" - brand (Guide)

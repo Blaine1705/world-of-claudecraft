@@ -10337,6 +10337,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'CƯỜNG HÓA!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Tham Gia Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Dự Án Mã Nguồn Mở',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Sách trắng',

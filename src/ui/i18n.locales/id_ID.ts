@@ -10351,6 +10351,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'AUGMEN!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Gabung Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Proyek Sumber Terbuka',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Whitepaper',

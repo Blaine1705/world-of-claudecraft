@@ -9405,6 +9405,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'FORSTÆRKNINGER!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Bliv medlem af Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Open Source-projekt',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Whitepaper',

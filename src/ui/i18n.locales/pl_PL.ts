@@ -9695,6 +9695,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'ULEPSZENIA!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Dołącz do Discorda',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Projekt open source',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Biała księga',

@@ -10052,7 +10052,8 @@ export const nl_NL: EnTranslations = {
     "whitepaper": "Whitepaper",
     "terms": "Servicevoorwaarden",
     "privacy": "Privacybeleid",
-    "discordLabel": "Word lid van de Discord"
+    "discordLabel": "Word lid van de Discord",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Taal laden...",

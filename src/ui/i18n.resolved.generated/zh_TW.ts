@@ -10052,7 +10052,8 @@ export const zh_TW: EnTranslations = {
     "whitepaper": "白皮書",
     "terms": "服務條款",
     "privacy": "隱私權政策",
-    "discordLabel": "加入Discord社區"
+    "discordLabel": "加入Discord社區",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "正在載入語言...",

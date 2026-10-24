@@ -10052,7 +10052,8 @@ export const tr_TR: EnTranslations = {
     "whitepaper": "Teknik Doküman",
     "terms": "Hizmet Koşulları",
     "privacy": "Gizlilik Politikası",
-    "discordLabel": "Discord'a Katıl"
+    "discordLabel": "Discord'a Katıl",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Dil yükleniyor...",

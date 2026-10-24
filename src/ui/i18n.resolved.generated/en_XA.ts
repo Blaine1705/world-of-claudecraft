@@ -10052,7 +10052,8 @@ export const en_XA: EnTranslations = {
     "whitepaper": "[Ŵĥíţéþáþéŕ]",
     "terms": "[Ţéŕɱš óƒ Šéŕʋíçé]",
     "privacy": "[Þŕíʋáçý Þóļíçý]",
-    "discordLabel": "[Ĵóíñ ţĥé Ðíšçóŕð]"
+    "discordLabel": "[Ĵóíñ ţĥé Ðíšçóŕð]",
+    "levyStreet": "[Ļéʋý Šţŕééţ]"
   },
   "settings": {
     "languageLoading": "[Ļóáðíñĝ ļáñĝúáĝé...]",

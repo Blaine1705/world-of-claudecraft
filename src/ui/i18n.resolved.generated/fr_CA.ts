@@ -10052,7 +10052,8 @@ export const fr_CA: EnTranslations = {
     "whitepaper": "Livre blanc",
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialité",
-    "discordLabel": "Rejoindre le Discord"
+    "discordLabel": "Rejoindre le Discord",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Chargement de la langue...",

@@ -314,6 +314,8 @@ export const en = {
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
     discordLabel: 'Join the Discord',
+    // Studio name on the footer link to levystreet.com; a brand, kept verbatim in every locale.
+    levyStreet: 'Levy Street',
   },
   settings: {
     languageLoading: 'Loading language...',

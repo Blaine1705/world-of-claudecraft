@@ -3455,6 +3455,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'footer.terms': '服务条款',
   'footer.privacy': '隐私政策',
   'footer.discordLabel': '加入Discord社区',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': '高分排行榜',
   'highscores.desc': '追踪这个世界中最伟大的英雄，并对比你的游戏进度。',
   'wiki.title': '游戏百科与指南',

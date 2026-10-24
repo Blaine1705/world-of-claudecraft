@@ -10052,7 +10052,8 @@ export const ja_JP: EnTranslations = {
     "whitepaper": "ホワイトペーパー",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
-    "discordLabel": "Discordに参加する"
+    "discordLabel": "Discordに参加する",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "言語を読み込んでいます...",

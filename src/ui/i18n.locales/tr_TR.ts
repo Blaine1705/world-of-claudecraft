@@ -10222,6 +10222,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'GÜÇLENDİRMELER!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': "Discord'a Katıl",
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Açık Kaynak Proje',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Teknik Doküman',

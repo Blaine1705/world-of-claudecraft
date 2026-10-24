@@ -10052,7 +10052,8 @@ export const sv_SE: EnTranslations = {
     "whitepaper": "Whitepaper",
     "terms": "Användarvillkor",
     "privacy": "Integritetspolicy",
-    "discordLabel": "Gå med i Discord"
+    "discordLabel": "Gå med i Discord",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Laddar språk...",

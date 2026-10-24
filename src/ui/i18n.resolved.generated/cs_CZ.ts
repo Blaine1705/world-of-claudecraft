@@ -10052,7 +10052,8 @@ export const cs_CZ: EnTranslations = {
     "whitepaper": "Whitepaper",
     "terms": "Podmínky služby",
     "privacy": "Zásady ochrany soukromí",
-    "discordLabel": "Připojit se na Discord"
+    "discordLabel": "Připojit se na Discord",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Načítá se jazyk...",

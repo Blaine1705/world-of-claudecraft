@@ -10052,7 +10052,8 @@ export const ru_RU: EnTranslations = {
     "whitepaper": "Белая книга",
     "terms": "Условия использования",
     "privacy": "Политика конфиденциальности",
-    "discordLabel": "Присоединиться к Discord"
+    "discordLabel": "Присоединиться к Discord",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Загрузка языка...",

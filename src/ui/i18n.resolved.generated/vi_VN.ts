@@ -10052,7 +10052,8 @@ export const vi_VN: EnTranslations = {
     "whitepaper": "Sách trắng",
     "terms": "Điều Khoản Dịch Vụ",
     "privacy": "Chính Sách Bảo Mật",
-    "discordLabel": "Tham Gia Discord"
+    "discordLabel": "Tham Gia Discord",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Đang tải ngôn ngữ...",
