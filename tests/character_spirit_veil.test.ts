@@ -90,8 +90,7 @@ function stubGltf(url: string) {
   handL.name = 'handslotl';
   root.add(head, handR, handL);
   const bones = [root, head, handR, handL];
-  // The composed body's merged skin shape (mapped, 14 targets) and the
-  // head-cut decal's (17 targets): both tuples of the pinned family.
+  // The legacy composed skin has 14 face targets, its decal 17.
   const body = skinned(
     'body',
     new THREE.MeshStandardMaterial({ map: MAP }),
@@ -136,15 +135,21 @@ async function makePriest(linked: boolean): Promise<Harness> {
     loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
     releaseGltf: vi.fn(),
   }));
-  const { charactersReady } = await import('../src/render/characters/assets');
-  await charactersReady();
+  const gfx = await import('../src/render/gfx');
+  gfx.gfxInternalsForTest.overrideSettings({ tier: 'high' });
+  const { VISUALS } = await import('../src/render/characters/manifest');
+  // A fixed legacy rig fixture: its synthetic nodes are not a modular part library.
+  VISUALS.veil_fixture = { ...VISUALS.player_priest_modular, modular: false, lazyPreload: false };
+  const assets = await import('../src/render/characters/assets');
+  await assets.charactersReady();
   const { CharacterVisual } = await import('../src/render/characters/visual');
   const veil = await import('../src/render/characters/ghost_veil');
   const family = await import('../src/render/characters/spirit_veil_family_core');
   veil.resetSpiritVeilLedger();
   if (linked) for (const key of family.SPIRIT_VEIL_FAMILY_KEYS) veil.noteSpiritVeilTupleLinked(key);
-  const visual = new CharacterVisual('player_priest', 0xffffff, 0);
-  visual.update(FRAME, anim(), true);
+  // Keep the legacy rig coverage; WOC layer/group coverage is in spirit_veil_woc.
+  const visual = new CharacterVisual('veil_fixture', 0xffffff, 0);
+  for (let frame = 0; frame < 3; frame++) visual.update(FRAME, anim(), true);
   const gateCalls: GateCall[] = [];
   // The form adornments (form_adornments.ts) hold their first mount behind the
   // same gate; they are rig FX, not an effect swap, so they settle at once.
@@ -236,7 +241,8 @@ describe('the spirit veil on a released spirit', () => {
     const farSibling = farMesh.children.find((c) => c.name === 'spirit_veil_depth') as THREE.Mesh;
     expect(farSibling).toBeDefined();
     expect((farSibling as THREE.SkinnedMesh).isSkinnedMesh).not.toBe(true);
-    expect(farSibling.material).toBe(veil.spiritVeilDepthMaterial('depth:r:0'));
+    for (const material of [farSibling.material].flat())
+      expect(material).toBe(veil.spiritVeilDepthMaterial('depth:r:0'));
     // the skinned sibling shares the body's skeleton and its live morphs
     const bodySibling = body.children.find(
       (c) => c.name === 'spirit_veil_depth',
@@ -732,37 +738,29 @@ describe('Moonkin and Soul Rend wear the veil', () => {
   });
 });
 
-describe('Shadowform is an opaque tint on the source programs, not a veil', () => {
+describe('Gloam uses a source-program stand-in until its transparent set links', () => {
   it('tints every rig material on a program-preserving clone, never staged, keeping shadow, glow and a tinted halo', async () => {
     const { visual, veil, gateCalls } = await makePriest(false);
-    const { SHADOWFORM_TINT, SHADOWFORM_EMISSIVE, SHADOWFORM_EMISSIVE_INTENSITY } = await import(
-      '../src/render/characters/shadowform_tint'
-    );
-    // today's colours, pinned as the literals the old twin used
-    expect(SHADOWFORM_TINT).toBe(0x5a2a8f);
-    expect(SHADOWFORM_EMISSIVE).toBe(0x2a0a4a);
-    expect(SHADOWFORM_EMISSIVE_INTENSITY).toBe(0.4);
     const body = named(visual, 'body');
     const halo = named(visual, 'class_halo');
     const living = new Map(rigMeshes(visual).map((mesh) => [mesh, single(mesh)]));
     const { light, shell, update } = weaponSkinHandle(visual);
     visual.setShadowform(true);
-    // nothing is linked in this harness, and nothing needs to be
-    expect(gateCalls).toHaveLength(0);
+    // The immediate stand-in draws with the source programs while its final set links.
+    expect(gateCalls).toHaveLength(1);
     for (const [mesh, source] of living) {
       const worn = single(mesh) as THREE.MeshStandardMaterial;
       expect(worn, mesh.name).not.toBe(source);
       expect(veil.spiritVeilPassOf(worn), mesh.name).toBeNull();
       expect(worn.transparent, mesh.name).toBe(source.transparent);
       expect(worn.customProgramCacheKey(), mesh.name).toBe(source.customProgramCacheKey());
-      expect(worn.color.getHex(), mesh.name).toBe(SHADOWFORM_TINT);
+      if (mesh !== halo)
+        expect(worn.color.getHex(), mesh.name).toBe(
+          (source as THREE.MeshStandardMaterial).color.getHex(),
+        );
       expect(worn.opacity, mesh.name).toBe(source.opacity);
     }
-    const bodyWorn = single(body) as THREE.MeshStandardMaterial;
-    expect(bodyWorn.emissive.getHex()).toBe(SHADOWFORM_EMISSIVE);
-    expect(bodyWorn.emissiveIntensity).toBeGreaterThanOrEqual(0.4);
     expect(halo.visible).toBe(true);
-    expect((single(halo) as THREE.MeshBasicMaterial).color.getHex()).toBe(SHADOWFORM_TINT);
     expect(depthSiblings(visual)).toHaveLength(0);
     expect(body.castShadow).toBe(true);
     expect(shell.visible).toBe(true);
@@ -776,7 +774,7 @@ describe('Shadowform is an opaque tint on the source programs, not a veil', () =
   });
 });
 
-describe('no effect state reaches a lit transparent twin', () => {
+describe('veil states never reach a lit transparent twin; only gated Gloam does', () => {
   type Toggle = { name: string; on(v: CharacterVisual): void };
   const TOGGLES: Toggle[] = [
     ...(
@@ -824,6 +822,10 @@ describe('no effect state reaches a lit transparent twin', () => {
         worn.forEach((material, i) => {
           checked++;
           if (veil.spiritVeilPassOf(material) !== null) return;
+          if (material.userData.wocCharacterEffect === 'shadowform') {
+            expect(label).toContain('shadowform');
+            return;
+          }
           expect(material.transparent, `${label} ${mesh.name}`).toBe(sources[i].transparent);
         });
       }

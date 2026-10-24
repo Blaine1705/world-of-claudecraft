@@ -183,6 +183,21 @@ describe('no src/ module reads the GLTFParser of a loaded GLB', () => {
         expect(code.split(DROP).length - 1, 'the loader drops the parser exactly once').toBe(1);
         code = code.replace(DROP, '');
       }
+      // This registered afterRoot plugin consumes parser data during loading,
+      // before loader.ts drops it. Only these exact accesses are sanctioned.
+      if (file === 'render/assets/woc_lod_plugin.ts') {
+        for (const access of [
+          'parser.associations.get(mesh)',
+          "parser.getDependency('accessor', at)",
+        ]) {
+          expect(code.split(access).length - 1).toBe(1);
+          code = code.replace(access, 'PARSER_LOAD_HOOK');
+        }
+        expect(code).toContain('afterRoot: (result: GLTF) => attachWocLod(parser, result)');
+        expect(readFileSync(path.join(ROOT, 'src', LOADER), 'utf8')).toContain(
+          'assembled.register(wocLodPlugin)',
+        );
+      }
       for (const pattern of PARSER_READS) {
         if (pattern.test(code)) offenders.push(`${file} matches ${pattern}`);
       }

@@ -175,6 +175,9 @@ describe('materialProfessionHintText', () => {
     // sentence, which names no craft) and exactly one consumer. This is the
     // counterpart pin for the === 'enchanting' comparison in
     // hasSupersedingPurposeHint: dropping it would silently blank this line.
+    // (The buddy charm recipe that briefly made Leatherworking a second
+    // consumer left with the account-wide buddy rework: BUDDY_CHARM_RECIPES
+    // in content/recipes.ts is empty since 1896839827c.)
     expect(materialProfessionHintText('fine_ironbark_log')).toBe('Used by Weaponcrafting.');
   });
 

@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonificación de especialización',
+  'hudChrome.specPanel.healing': 'sanación',
+  'hudChrome.specPanel.absorption': 'absorción de daño',
+  'hudChrome.specPanel.physicalAbilityDamage': 'daño de habilidades cuerpo a cuerpo y a distancia',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Aumenta la sanación principal un {pct} después de las demás bonificaciones de sanación.',
   'hud.pet.assist': 'Asistir',
   'hud.pet.assistDesc':
     'Solo ataca a tu objetivo actual después de que uses una habilidad sobre él. Ignora a los enemigos que te atacan.',
@@ -1007,7 +1013,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'También recibirás:',
   'hudChrome.weekly.anyDifficulty': 'Cualquier dificultad',
   'hudChrome.weekly.cacheDesc':
-    'Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango), más {count} x {item}.',
+    'Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango de Ignivar), más {count} x {item}.',
   'hudChrome.weekly.choose': 'Elegir misión',
   'hudChrome.weekly.chosen': 'Misión semanal aceptada: {category}',
   'hudChrome.weekly.close': 'Cerrar misiones semanales',
@@ -4923,7 +4929,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Adquirido',
   'hudChrome.warfareShop.weapons': 'Armas',
   'itemUi.market.saleBuyer': 'Vendido a {buyer}',
-  'itemUi.market.saleOlder': 'Más {count} ventas anteriores, incluidas en el total.',
+  'itemUi.market.saleOlder': 'Más {count} ventas anteriores que no se muestran.',
   'itemUi.tooltip.maxStack': 'Máximo por montón: {count}',
   'hud.system.deathRecapAbility': 'Has muerto. Te mató {ability}.',
   'hud.system.deathRecapDrowned': 'Has muerto. Te ahogaste.',
@@ -6014,6 +6020,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Cazadores de sangre fria con su propio silbido y mordisco, bien distintos de las bestias de sangre caliente.',
   'guide.family.reptile.name': 'Reptilidos',
   'hudChrome.auraEffect.damageReduction': 'Reduce el dano recibido en un {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Dormido hasta el amanecer. No puede ser atacado y no despertará por nadie.',
   'hudChrome.auraEffect.guardianWard':
     'El siguiente golpe enemigo letal te restaura al {pct}% de salud en su lugar',
   'hudChrome.bags.dragDestroyHint': 'Arrastra fuera del inventario para destruir',
@@ -7807,6 +7815,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Términos de Servicio',
   'footer.privacy': 'Política de Privacidad',
   'footer.discordLabel': 'Únete al Discord',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Clasificaciones de Puntuación',
   'highscores.desc': 'Sigue a los campeones más grandes del mundo y compara tu progreso.',
   'wiki.title': 'Wiki y Guía del Juego',
@@ -10484,6 +10493,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Túmulos trol',
   'entities.zones.mirefen_marsh.pois.6.label': 'Campamento Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'El Bastión Sumergido',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Dominio del Túmulo',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Cráter de la Estrella Caída',
   'entities.zones.thornpeak_heights.name': 'Alturas de Thornpeak',
   'entities.zones.thornpeak_heights.welcome':
     'La capitana Thessaly sostiene el muro de Highwatch a duras penas.',
@@ -11217,7 +11228,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, el Pico Despierto',
   'entities.mobs.thunzharr_stormling.name': 'Elemental de tormenta despierto',
   'entities.mobs.stable_horse.name': 'Caballo de establo',
-  'hudChrome.worldBoss.spawn': '¡{name} se alza sobre las Alturas de Thornpeak!',
+  'hudChrome.worldBoss.spawn': '¡{name} se alza sobre {zone}!',
+  'hudChrome.worldBoss.wake': '¡{name} despierta sobre {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} duerme hasta el amanecer.',
   'entities.items.stormcallers_spaulders.name': 'Bufas de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadón Bonewrought',
   'entities.items.direfang_greatblade.name': 'Gran hoja Direfang',
@@ -15450,6 +15463,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Manto de espino crepuscular',
   'entities.items.fenbark_leggings.name': 'Leotardos de corteza del pantano',
   'entities.items.fenshadow_maul.name': 'Mazo sombra del pantano',
+  'entities.items.skerrits_shardpike.name': 'Pica de Fragmentos de Skerrit',
+  'entities.items.foremans_barrowmaul.name': 'Mazo Tumular del Capataz',
+  'entities.items.barrowhide_pauldrons.name': 'Hombreras Tumulares',
+  'entities.items.mirestone_stride.name': 'Zancada de Piedracieno',
+  'entities.items.foremans_wage_band.name': 'Anillo de paga del Capataz',
+  'entities.items.mirelight_locket.name': 'Relicario de luz de ciénaga',
+  'entities.items.fenwright_grips.name': 'Manoplas del Artesano del Pantano',
   'entities.items.fenwarden_sabatons.name': 'Escarpes del guardián del pantano',
   'entities.items.gravewyrm_thornmaul.name': 'Mazo de espino del Gravewyrm',
   'entities.items.grovewardens_grips.name': 'Empuñaduras del guardián del bosque',
@@ -16490,7 +16510,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasivo: Con Ímpetu de Caza, Quiebrasendas prepara tu siguiente Golpe Destripador o Garfio Sangriento durante 12 s. Golpe Destripador inflige un 15% más de daño por acumulación. Garfio Sangriento inflige de 18 a 24 de daño físico adicional, aumentado un 15% por acumulación y por el poder de ataque a distancia. Con 3 acumulaciones, cualquiera de los dos consume Ímpetu de Caza. (Supervivencia)',
   'entities.abilities.frostjaw_trap.description':
-    'Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo pueden verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Pasivo: Golpe Destripador y una Carga de Metralla que alcance a un enemigo otorgan 1 de Ímpetu de Caza cada uno, hasta 3. Dura hasta gastarse o salir de combate, y cada acumulación aumenta tu velocidad un 15%. Con 3 acumulaciones, Desgarro Cruento inflige un 60% más de daño de golpe y las consume. (Supervivencia)',
   'entities.abilities.measured_shot.description':
@@ -20391,7 +20411,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'entities.abilities.overbloom.specNote_restoration':
     'Consume tus 5 de Verdor: cada aliado con tus efectos de sanación periódica recibe al instante un {buff}% de la sanación que les quedaba, se eliminan los efectos y el objetivo recibe un nuevo Remiendo de Esporas.',
   'entities.abilities.play_dead.description':
-    'Cae al suelo y finge estar muerto: todos ven tu salud y tu Enfoque vacíos. Los enemigos te olvidan y los jugadores enemigos que te seleccionaban pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Vuelve a usarlo para levantarte.',
+    'Cae al suelo y finge estar muerto: tu salud y tu concentración se muestran vacías para todos. Los enemigos se olvidan de ti, y los jugadores enemigos que te tienen como objetivo pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Si lo lanzas en movimiento, tienes 1 s para detenerte antes de que el movimiento lo termine. Vuelve a lanzarlo para levantarte.',
   'entities.abilities.play_dead.name': 'Hacerse el muerto',
   'entities.abilities.rejuvenation.name': 'Remiendo de Esporas',
   'entities.abilities.scratch.description':
@@ -20462,4 +20482,25 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'El ajuste fijo con mayor calidad visual. Adecuado para una tarjeta gráfica de gama alta.',
   'graphicsPrompt.changeLater': 'Puedes cambiarlo cuando quieras en Opciones, en Calidad gráfica.',
   'graphicsPrompt.confirm': 'Continuar',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Trampa para Osos',
+  'entities.abilities.bear_trap.description':
+    'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min; solo tú y tu grupo pueden verla. El primer enemigo que la active sangra por {damage} de daño Físico durante 15 s y queda ralentizado un 50% durante 4 s. El daño aumenta con el poder de ataque a distancia. Solo puede haber una Trampa para Osos activa a la vez. Puede coexistir con tu Trampa Fauces de Escarcha. Colocar otra Trampa para Osos reemplaza la anterior.',
+  'entities.abilities.scatterbolt.name': 'Ráfaga de Virotes',
+  'entities.abilities.scatterbolt.description':
+    'Dispara una ráfaga de virotes en un cono de 90 grados que alcanza 8 metros frente a ti y repele a los enemigos hasta dejarlos a una distancia de hasta 20 metros de ti. Los enemigos inmunes a la repulsión no se ven afectados. No inflige daño.',
+  'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
+  'entities.abilities.phosphor_flask.description':
+    'Un recipiente sellado con una mezcla química reactiva que estalla en llamas al rojo blanco sobre un área de 8 m durante 3 s. Los enemigos que permanezcan en las llamas sufren {damage} de daño de Fuego cada 0,5 s. El daño aumenta con el poder de ataque a distancia.',
+  'entities.items.lychgate_buckler.name': 'Broquel del portal del camposanto',
+  'entities.items.bastion_kite_shield.name': 'Escudo cometa del bastión',
+  'entities.items.barrowfield_tower_shield.name': 'Escudo torre del Campo de Túmulos',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barra de recursos',
+  'hudChrome.options.hillBarOpacity': 'Opacidad del fondo de El Rey de la Colina',
+  'hudChrome.options.playerFrameResourceDetached': 'Separar barra de recursos',
+  'hudChrome.options.playerFrameResourceHeight': 'Altura de la barra de recursos',
+  'hudChrome.options.playerFrameResourceWidth': 'Anchura de la barra de recursos',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Activa Separar barra de recursos en la pestaña Marcos y Editar marcos también desbloqueará tu barra de recursos, para que puedas colocar el maná, la energía o la ira por separado en cualquier lugar; Anchura de la barra de recursos y Altura de la barra de recursos, en esa misma pestaña, ajustan su tamaño. Editar marcos también desbloquea la barra de El Rey de la Colina, y Opacidad del fondo de El Rey de la Colina, en esa pestaña, atenúa su panel sin reducir la claridad del texto.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

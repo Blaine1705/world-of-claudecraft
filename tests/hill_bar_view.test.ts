@@ -5,7 +5,11 @@
 // per-second value through the elided writers, the tone classes chosen from
 // the union, the mount attributes, the language switch), plus the ring's pure
 // core and the sim matcher rows for the hill's lines.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { applyFrameGeometrySetting } from '../src/game/frame_geometry_settings';
+import { SETTING_RANGES } from '../src/game/settings';
 import {
   HILL_COLOR_OTHERS,
   HILL_COLOR_UNHELD,
@@ -28,8 +32,10 @@ import {
   hillRiseLine,
   hillWarningLine,
 } from '../src/sim/pvp/hill';
+import { frameSettingRelated } from '../src/ui/frame_menu_core';
 import { buildHillBarView, HillBar, hillEdgeDistance, hillRivalCount } from '../src/ui/hud/hill';
 import { setLanguage } from '../src/ui/i18n';
+import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { localizeSimText } from '../src/ui/sim_i18n';
 import type { HillInfo } from '../src/world_api';
@@ -333,6 +339,78 @@ describe('HillBar (the painter)', () => {
     expect(root.style.display).toBe('block');
     bar.dispose();
     expect(layer.querySelector('#hill-bar')).toBeNull();
+  });
+
+  it('adopts the static #hill-bar frame and paints its body, so mover chrome survives', () => {
+    const { layer, bar } = harness();
+    // The shipped markup: a governed frame (the hillBar HUD_FRAME_SPECS row)
+    // whose root carries the mover chrome beside the painted body.
+    layer.innerHTML =
+      '<div id="hill-bar" role="status" aria-live="polite"><div id="hill-body"></div></div>';
+    const root = layer.querySelector('#hill-bar') as HTMLElement;
+    // The registry mover's real chrome on a governed frame is its resize grip.
+    const chrome = document.createElement('button');
+    chrome.className = 'mf-resize-grip';
+    root.appendChild(chrome);
+    bar.update(buildHillBarView(info(), { x: 360, z: 1540 }));
+    expect(layer.querySelectorAll('#hill-bar')).toHaveLength(1);
+    const body = root.querySelector('#hill-body') as HTMLElement;
+    expect(body.querySelector('.hill-held')?.textContent).toBe('Nobody holds the hill');
+    // A sig change rebuilds the skeleton inside the body only.
+    bar.update(buildHillBarView(info({ phase: 'warning' }), { x: 360, z: 1540 }));
+    expect(body.textContent).toContain('The hill has not risen yet');
+    expect(chrome.isConnected).toBe(true);
+    // Disposing leaves the document's frame in place, emptied and hidden.
+    bar.dispose();
+    expect(layer.querySelector('#hill-bar')).toBe(root);
+    expect(body.childElementCount).toBe(0);
+    expect(root.style.display).toBe('none');
+  });
+});
+
+describe('the King of the Hill frame row', () => {
+  it('is governed by the editor and opens its backdrop option from the frame menu', () => {
+    expect(HUD_FRAME_SPECS.find((row) => row.id === 'hillBar')).toMatchObject({
+      elementId: 'hill-bar',
+      detachToUiRoot: false,
+      labelKey: 'hudChrome.hill.title',
+    });
+    expect(frameSettingRelated('hillBar', 'hillBarOpacity')).toBe(true);
+    expect(frameSettingRelated('hillBar', 'chatOpacity')).toBe(false);
+    // Stock is the solid panel, so nothing changes until a player asks.
+    expect(SETTING_RANGES.hillBarOpacity).toEqual({ min: 0, max: 1, def: 1 });
+    const vars: Record<string, string> = {};
+    const style = {
+      setProperty: (name: string, value: string) => {
+        vars[name] = value;
+      },
+    };
+    expect(applyFrameGeometrySetting(style, 'hillBarOpacity', 0.4)).toBe(true);
+    expect(vars).toEqual({ '--hill-bar-opacity': '0.4' });
+  });
+
+  it('fades only the backdrop layer, and steps below the editor toolbar while arranging', () => {
+    const read = (f: string) =>
+      readFileSync(join(import.meta.dirname, '..', 'src', 'styles', f), 'utf8');
+    const block = (css: string, selector: string) => {
+      const at = css.indexOf(`${selector} {`);
+      expect(at, `${selector} rule`).toBeGreaterThan(-1);
+      return css.slice(at, css.indexOf('}', at));
+    };
+    const components = read('components.css');
+    // The stock panel moved onto ::before unchanged; the root keeps no fill of
+    // its own (the text must never fade with the opacity).
+    const backdrop = block(components, '#hill-bar::before');
+    expect(backdrop).toContain('background: var(--panel-bg-strong)');
+    expect(backdrop).toContain('border: 1px solid var(--color-bg-field-edge)');
+    expect(backdrop).toContain('opacity: var(--hill-bar-opacity, 1)');
+    expect(block(components, '#hill-bar')).not.toContain('background:');
+    expect(
+      block(
+        read('hud.css'),
+        'body.interface-unlocked #hill-bar.tf-unlocked:not(.hud-frame-detached)',
+      ),
+    ).toContain('top: 64px');
   });
 });
 

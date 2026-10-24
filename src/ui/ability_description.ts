@@ -21,6 +21,7 @@ import {
 } from '../sim/types';
 import {
   type AbilityScaling,
+  abilityBearTrapBleedTotal,
   abilityBuffValue,
   abilityDamageBonus,
   abilityDurationValue,
@@ -138,6 +139,8 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
             perCombo: formatAbilityNumber(primary.perCombo),
           }) + suffix(primary)
         );
+      case 'hunterBearTrap':
+        return formatAbilityNumber(abilityBearTrapBleedTotal(primary, scaling));
       case 'hunterBloodhook':
         return (
           formatAbilityNumber(primary.bleedTotal * (primary.damageMult ?? 1)) + suffix(primary)

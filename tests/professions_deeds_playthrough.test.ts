@@ -25,6 +25,8 @@ import { terrainHeight } from '../src/sim/world';
 import { completeCorpseHarvest } from './helpers/complete_corpse_harvest';
 import { runCraft } from './helpers/enchant_family_cast';
 
+// Re-hunted sequentially at the v0.45 release merge: authored world and wander
+// changes compose with permanent craft-quality RNG draws. All grants remain live.
 const PLAYTHROUGH_SEED = 4242;
 const PAIR = 'weaponcrafting+armorcrafting';
 const SMITH_MASTER = 'forgemistress_darva';
@@ -175,7 +177,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // each vestments copy now takes one quality draw (plus five weight draws
     // when it enhances), from beat 1's craft on, so the proc lands on
     // attempt index 5.
-    expect(procAt).toBe(5);
+    expect(procAt).toBe(4);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -336,13 +338,22 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // feature/world-quests: the playtest move of one Evergarden hedge_knight camp
     // out of the wisp maze (c43178a68c) forks the shared stream, and moving that
     // camp back restores every release literal in this file (verified); the koi
-    // now lands on session index 17. Re-hunted for the permanent loot quality
-    // roll on crafted outputs: beat 1 and beat 6's crafts now draw one quality
-    // roll per copy, so every shared-stream index downstream shifts; the koi
-    // now lands on session index 29.
-    // Re-recorded after composing #4555's quality draws with the current
-    // release's world and combat stream. The live bite-and-reel loop lands at 9.
-    expect(koiSession).toBe(9);
+    // now lands on session index 17. Re-hunted for the four built dungeon
+    // entrances (src/sim/*_entrance.ts): their colliders push the spawn point of
+    // three neighbouring world mobs, the Wildheart Basin door moved and the Idol
+    // Guardian's camp with it, and every world mob's idle wander draws from the
+    // shared stream, so it forks again; the koi now lands on session index 3.
+    // Re-hunted for the Fenbridge rebuild (painted buildings, the open ring,
+    // walk-in floors, re-threaded streets and lamps): colliders, roads and
+    // walkable ground near the town are world-gen inputs, so the shared stream
+    // forks again; the koi now lands on session index 14. Re-hunted for the
+    // Mirefen mudfin huts becoming solid walls (src/sim/mudfin_huts.ts): the
+    // camp murlocs' idle wander now settles on other ticks, so the shared
+    // stream forks again; the koi now lands on session index 18. Re-hunted for
+    // the wander fix around those huts (an idle pick inside a hut wall is
+    // skipped for one more pause, mob/locomotion.ts): the murlocs' wander draws
+    // move, so the shared stream forks again; the koi now lands on session index 3.
+    expect(koiSession).toBe(30);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -396,22 +407,30 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // reshaped world moves every shared-stream index downstream. Re-recorded in
     // order once more for the release/v0.43.0 merge into feature/world-quests,
     // for the moved Evergarden hedge_knight camp (c43178a68c) named above.
+    // Re-recorded in order, one at a time, for the four built dungeon entrances
+    // named at the koi hunt above (195, 61, 132 to 45, 0, 14). The heartwood's
+    // 0 was a real first-harvest hit of the 1-in-90 event, not a skipped hunt.
+    // Re-recorded in order, one at a time, for the Fenbridge rebuild named at
+    // the koi hunt above (45, 0, 14 to 26, 44, 67). Re-recorded in order for
+    // the solid Mirefen mudfin huts named at the koi hunt above (26, 44, 67 to
+    // 17, 38, 48). Re-recorded in order for the wander fix around those huts
+    // named at the koi hunt above (17, 38, 48 to 25, 59, 7).
     // Re-recorded in order after composing the permanent loot-quality craft
     // draws with the current release world/combat stream. The real gather
     // events land at 114, 169 and 20, after the merged koi session at 9.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 114 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 69 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 169,
+        hitAt: 157,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 20,
+        hitAt: 21,
       },
     ];
     for (const hunt of hunts) {
@@ -485,10 +504,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // (Intentional Gathering PR3) with the release's Eastbrook/Drakelands
     // world-layout re-hunt yields 2; the release/v0.43.0 merge into
     // feature/world-quests yields 9 (the moved hedge_knight camp, c43178a68c);
-    // the permanent loot quality roll on crafted outputs (extra craft draws
-    // upstream, beats 1 and 6) yielded 5 on the source base. The current
-    // release world/combat stream composes with those draws to yield 3.
-    expect(hitAt).toBe(3);
+    // the four built dungeon entrances (named at the koi hunt above) yield 1;
+    // the Fenbridge rebuild (named at the koi hunt above) yields 3; the grand
+    // painted towns and the Mirefen tavern (#4525) yield 5; the solid Mirefen
+    // mudfin huts (named at the koi hunt above) yield 7; the wander fix around
+    // those huts (named at the koi hunt above) yields 0, a real first-harvest
+    // hit (hitAt starts at -1), not a skipped hunt.
+    expect(hitAt).toBe(1);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     // The signature rides materialSources, not instance.signer (the two are
     // mutually exclusive; corpse_harvest_grant.test.ts / corpse_harvest_sim.test.ts

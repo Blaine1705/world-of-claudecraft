@@ -48,6 +48,7 @@ import {
 } from './data';
 import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
+import { dungeonDoorPos } from './moved_objects';
 import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import { pvpResurrectBarred, pvpResurrectReady } from './pvp/pvp_resurrect';
@@ -66,6 +67,7 @@ import { reviveFacing } from './revive_facing';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { BgMatch } from './social/battleground';
+import { settleTeleportArrival } from './teleport_arrival';
 import { creditDeathLesson } from './tutorial/death_lesson';
 import { dist2d, type Entity, emptyMoveInput, type Vec3 } from './types';
 
@@ -116,14 +118,16 @@ export function nearestOverworldGraveyard(
 
 // The graveyard a released spirit appears at. A dungeon/raid death sends the spirit OUT
 // to the overworld graveyard nearest the instance door (never inside the instance): the
-// ghost runs its spirit back to the door and re-enters to resurrect at the entrance, so
+// ghost runs its spirit back to the door and re-enters to resurrect where it arrives, so
 // no Spirit Healer stands inside an instance. Outdoors it is the nearest overworld
-// graveyard to where the body fell.
+// graveyard to where the body fell. The yards are the running world's own
+// (ctx.graveyards, else ctx.playerStart), so release and both /unstuck outcomes
+// land at the same graveyard on a custom map as on the built-in one.
 function ghostGraveyard(
   ctx: SimContext,
   p: Entity,
-  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
-  fallback: { x: number; z: number } = PLAYER_START,
+  graveyards: readonly { x: number; z: number }[] = ctx.graveyards,
+  fallback: { x: number; z: number } = ctx.playerStart,
 ): { x: number; z: number } {
   // Thornhollow Fields keeps the classic release: the spirit rises in its own
   // team's keep graveyard plot and waits there for the wave, never walking out
@@ -133,7 +137,8 @@ function ghostGraveyard(
   if (bgMatch) return bgGraveyardSpot(bgMatch, p.id);
   const dungeon = dungeonAt(p.pos.x);
   if (dungeon) {
-    return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z, graveyards, fallback);
+    const door = dungeonDoorPos(ctx.objectMoves, dungeon);
+    return nearestOverworldGraveyard(door.x, door.z, graveyards, fallback);
   }
   const delve = ctx.delveRunForPlayer(p.id);
   if (delve && isDelvePos(p.pos.x)) {
@@ -193,8 +198,8 @@ function graveyardForMove(
 export function releasePlayerSpirit(
   ctx: SimContext,
   pid?: number,
-  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
-  fallback: { x: number; z: number } = PLAYER_START,
+  graveyards: readonly { x: number; z: number }[] = ctx.graveyards,
+  fallback: { x: number; z: number } = ctx.playerStart,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -319,8 +324,8 @@ function releaseAtNearestGraveyard(
   ctx: SimContext,
   meta: PlayerMeta,
   p: Entity,
-  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
-  fallback: { x: number; z: number } = PLAYER_START,
+  graveyards: readonly { x: number; z: number }[],
+  fallback: { x: number; z: number },
 ): void {
   // A body holding World PvP spoils hands them over before it becomes a ghost:
   // the killer gets what they had not looted yet (world_pvp_spoils.ts).
@@ -432,8 +437,9 @@ export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean 
 }
 
 // Resurrect a ghost that ran its spirit back and re-entered its instance: penalty-free,
-// at the entry it just crossed. Re-entering IS the corpse run under the instance death
-// model (no Spirit Healer inside an instance), so it carries no Resurrection Sickness.
+// at `pos`, where the door set it down (the entrance, or a cleared boss arena:
+// instances/dungeon_checkpoints.ts). Re-entering IS the corpse run under the instance
+// death model (no Spirit Healer inside an instance), so it carries no Resurrection Sickness.
 // Called from enterDungeon when a ghost walks back through the door.
 export function resurrectOnInstanceReentry(
   ctx: SimContext,
@@ -531,6 +537,12 @@ function reviveAt(
   ctx.rebucket(p);
   p.facing = heading.facing;
   p.prevFacing = heading.prevFacing;
+  // Land settled, as the release above does: a ghost that accepts a revive mid-plunge
+  // must not hand its fall arc and fall origin to the body, or the next motion tick
+  // lands it with the ghost's whole drop as fall damage.
+  p.vx = 0;
+  p.vz = 0;
+  settleTeleportArrival(p);
   // As with the release above: a held movement key at the moment the revive lands must
   // not carry over, or the freshly-revived body immediately walks off in whatever
   // direction was last held (this is what made revived players drift with no input).

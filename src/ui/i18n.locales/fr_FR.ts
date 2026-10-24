@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus de spécialisation',
+  'hudChrome.specPanel.healing': 'soins',
+  'hudChrome.specPanel.absorption': 'absorption de dégâts',
+  'hudChrome.specPanel.physicalAbilityDamage': 'dégâts des techniques de mêlée et à distance',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Augmente les soins principaux de {pct} après les autres bonus de soins.',
   'hud.pet.assist': 'Assistance',
   'hud.pet.assistDesc':
     "N'attaque que votre cible actuelle, une fois que vous avez utilisé une technique sur elle. Ignore les ennemis qui vous attaquent.",
@@ -1165,7 +1171,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Vous recevrez aussi :',
   'hudChrome.weekly.anyDifficulty': 'Toute difficulté',
   'hudChrome.weekly.cacheDesc':
-    "S'ouvre sur une pièce de raid Normal pour votre classe (jamais une pièce d'ensemble), plus {count} x {item}.",
+    "S'ouvre sur une pièce de raid Normal pour votre classe (jamais une pièce d'ensemble d'Ignivar), plus {count} x {item}.",
   'hudChrome.weekly.choose': 'Choisir la quête',
   'hudChrome.weekly.chosen': 'Quête hebdomadaire prise : {category}',
   'hudChrome.weekly.close': 'Fermer les quêtes hebdomadaires',
@@ -5249,7 +5255,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Possédé',
   'hudChrome.warfareShop.weapons': 'Armes',
   'itemUi.market.saleBuyer': 'Vendu à {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} ventes antérieures, incluses dans le total.',
+  'itemUi.market.saleOlder': 'Plus {count} ventes antérieures non affichées.',
   'itemUi.tooltip.maxStack': 'Pile maximale : {count}',
   'hud.system.deathRecapAbility': 'Vous êtes mort. Tué par {ability}.',
   'hud.system.deathRecapDrowned': 'Vous êtes mort. Vous vous êtes noyé.',
@@ -6303,6 +6309,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Des chasseurs à sang froid dotés d'un sifflement et d'un claquement qui leur sont propres, distincts des créatures à sang chaud.",
   'guide.family.reptile.name': 'Reptiles',
   'hudChrome.auraEffect.damageReduction': 'Réduit tous les dégâts subis de {pct} %',
+  'hudChrome.auraEffect.slumber':
+    "Endormi jusqu'à l'aube. Ne peut pas être attaqué et ne s'éveillera pour personne.",
   'hudChrome.auraEffect.guardianWard':
     'Le prochain coup ennemi fatal vous restaure à {pct} % de vos points de vie à la place',
   'hudChrome.bags.dragDestroyHint': 'Faites glisser dans le monde pour détruire',
@@ -8556,6 +8564,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'footer.terms': "Conditions d'utilisation",
   'footer.privacy': 'Politique de confidentialité',
   'footer.discordLabel': 'Rejoindre le Discord',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Tableau des classements',
   'highscores.desc': 'Suivez les plus grands champions du monde et comparez votre progression.',
   'wiki.title': 'Wiki et guide du jeu',
@@ -11198,6 +11207,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Tertres trolls',
   'entities.zones.mirefen_marsh.pois.6.label': 'Campement Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'Le Bastion englouti',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Le Domaine des Tertres',
+  'entities.zones.mirefen_marsh.pois.9.label': "Cratère de l'Étoile tombée",
   'entities.zones.thornpeak_heights.name': 'Hauteurs de Thornpeak',
   'entities.zones.thornpeak_heights.welcome':
     'La capitaine Thessaly tient le mur de Highwatch, à peine.',
@@ -11839,7 +11850,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, le Pic Éveillé',
   'entities.mobs.thunzharr_stormling.name': 'Élémentaire de tempête éveillé',
   'entities.mobs.stable_horse.name': "Cheval d'écurie",
-  'hudChrome.worldBoss.spawn': '{name} se dresse sur les Hauteurs de Thornpeak !',
+  'hudChrome.worldBoss.spawn': '{name} se dresse au-dessus de {zone} !',
+  'hudChrome.worldBoss.wake': "{name} s'éveille au-dessus de {zone} !",
+  'hudChrome.worldBoss.sleep': "{name} dort jusqu'à l'aube.",
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadon Bonewrought',
   'entities.items.direfang_greatblade.name': 'Grande lame de Direfang',
@@ -15759,6 +15772,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Manteau des épines du crépuscule',
   'entities.items.fenbark_leggings.name': 'Jambières en écorce des marais',
   'entities.items.fenshadow_maul.name': 'Marteau des ombres des marais',
+  'entities.items.skerrits_shardpike.name': 'Pique-éclat de Skerrit',
+  'entities.items.foremans_barrowmaul.name': 'Maillet Tumulaire du Contremaître',
+  'entities.items.barrowhide_pauldrons.name': 'Spallières Tumulaires',
+  'entities.items.mirestone_stride.name': 'Foulée de Pierrebourbe',
+  'entities.items.foremans_wage_band.name': 'Anneau de paie du Contremaître',
+  'entities.items.mirelight_locket.name': 'Médaillon de lueur des marais',
+  'entities.items.fenwright_grips.name': 'Poignes du bâtisseur des marais',
   'entities.items.fenwarden_sabatons.name': 'Solerets du gardien des marais',
   'entities.items.gravewyrm_thornmaul.name': 'Marteau épineux du Gravewyrm',
   'entities.items.grovewardens_grips.name': 'Gantelets du gardien du bosquet',
@@ -16715,7 +16735,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     "Passif : avec Élan de chasse, Brise-piste prépare votre prochaine Frappe éventrante ou Croc sanglant pendant 12 s. Frappe éventrante inflige 15% de dégâts supplémentaires par charge. Croc sanglant inflige 18 à 24 dégâts physiques supplémentaires, augmentés de 15% par charge et par la puissance d'attaque à distance. À 3 charges, l'une ou l'autre attaque consomme Élan de chasse. (Survie)",
   'entities.abilities.frostjaw_trap.description':
-    "Pose un piège sur l'ennemi sélectionné ou à vos pieds. Il s'arme après 0,75 s et dure 30 s. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s.",
+    "Pose un piège à l'emplacement sélectionné. Il s'arme après 0,75 s et dure 1 min, et seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s.",
   'entities.abilities.hunting_momentum.description':
     "Passif : Frappe éventrante et une Charge à fragmentation qui touche un ennemi accordent chacun 1 Élan de chasse, jusqu'à 3. Dure jusqu'à consommation ou sortie du combat ; chaque charge augmente votre vitesse de déplacement de 15%. À 3 charges, Déchirure inflige 60% de dégâts de frappe supplémentaires et consomme les charges. (Survie)",
   'entities.abilities.measured_shot.description':
@@ -20466,7 +20486,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     "Dépense vos 5 points de Verdoyance : chaque allié portant vos soins sur la durée reçoit instantanément {buff}% des soins qu'il leur restait, les effets sont retirés et la cible reçoit un nouveau Soin de spores.",
   'entities.abilities.play_dead.description':
-    "Tombez au sol en feignant la mort : votre santé et votre Focalisation apparaissent vides à tous. Les ennemis vous oublient et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité met fin à l'effet. Relancez pour vous relever.",
+    "Tombez au sol et faites le mort : vos points de vie et votre concentration s'affichent comme vides pour tout le monde. Les ennemis vous oublient, et les joueurs ennemis qui vous ciblent perdent leur cible. Se déplacer, attaquer ou utiliser une autre capacité y met fin. Si vous l'incantez en mouvement, vous avez 1 s pour vous arrêter avant que le déplacement n'y mette fin. Relancez pour vous relever.",
   'entities.abilities.play_dead.name': 'Feindre la mort',
   'entities.abilities.rejuvenation.name': 'Soin de spores',
   'entities.abilities.scratch.description':
@@ -20540,4 +20560,25 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Vous pouvez modifier ce choix à tout moment dans Options, sous Qualité graphique.',
   'graphicsPrompt.confirm': 'Continuer',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Piège à ours',
+  'entities.abilities.bear_trap.description':
+    'Pose un piège à l’emplacement choisi. Il s’arme après 0,75 s et dure 1 min ; seuls vous et votre groupe pouvez le voir. Le premier ennemi qui le déclenche subit un saignement infligeant {damage} points de dégâts physiques en 15 s et est ralenti de 50% pendant 4 s. Les dégâts augmentent avec la puissance d’attaque à distance. Un seul Piège à ours peut être actif à la fois. Il peut coexister avec votre Piège Mâchegivre. Poser un autre Piège à ours remplace le précédent.',
+  'entities.abilities.scatterbolt.name': 'Gerbe de carreaux',
+  'entities.abilities.scatterbolt.description':
+    'Tire une volée de carreaux dans un cône de 90 degrés d’une portée de 8 mètres devant vous, repoussant les ennemis jusqu’à une distance maximale de 20 mètres de vous. Les ennemis insensibles aux effets de recul ne sont pas affectés. N’inflige aucun dégât.',
+  'entities.abilities.phosphor_flask.name': 'Fiole de phosphore',
+  'entities.abilities.phosphor_flask.description':
+    "Un récipient scellé contenant un mélange chimique réactif qui s'embrase en flammes chauffées à blanc sur une zone de 8 m pendant 3 s. Les ennemis qui se tiennent dans les flammes subissent {damage} points de dégâts de Feu toutes les 0,5 s. Les dégâts augmentent avec la puissance d'attaque à distance.",
+  'entities.items.lychgate_buckler.name': 'Rondache du portail du cimetière',
+  'entities.items.bastion_kite_shield.name': 'Écu du bastion',
+  'entities.items.barrowfield_tower_shield.name': 'Pavois du Champ des Tertres',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barre de ressource',
+  'hudChrome.options.hillBarOpacity': 'Opacité du fond du Roi de la colline',
+  'hudChrome.options.playerFrameResourceDetached': 'Détacher la barre de ressource',
+  'hudChrome.options.playerFrameResourceHeight': 'Hauteur de la barre de ressource',
+  'hudChrome.options.playerFrameResourceWidth': 'Largeur de la barre de ressource',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Activez Détacher la barre de ressource dans l’onglet Cadres pour que Modifier les cadres déverrouille aussi votre barre de ressource : votre mana, votre énergie ou votre rage peut ainsi être placé séparément, où vous le souhaitez. Largeur de la barre de ressource et Hauteur de la barre de ressource, dans ce même onglet, règlent sa taille. Modifier les cadres déverrouille aussi la barre du Roi de la colline ; Opacité du fond du Roi de la colline, dans cet onglet, estompe son panneau sans nuire à la lisibilité du texte.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

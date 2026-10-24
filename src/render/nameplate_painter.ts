@@ -10,6 +10,7 @@ import { isPlayingDead } from '../sim/combat/hunter_play_dead';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
+import { isBuddyMob } from '../sim/pet/buddy_ai';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
 import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
@@ -24,6 +25,7 @@ import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
 import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
+import { entityDisplayName } from '../ui/entity_display_core';
 import { tEntity } from '../ui/entity_i18n';
 import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
@@ -39,6 +41,7 @@ import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 import { castBarState } from './cast_bar';
 import { anyCharacterRigDrawing, entityHasNoBody } from './entity_gate_stand_in_core';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
+import { interiorHidesNameplate } from './interior_camera';
 import {
   createNameplateCanvasState,
   type NameplateCanvasState,
@@ -55,6 +58,7 @@ import {
   nameplateDotsInto,
 } from './nameplate_dots_core';
 import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
+import { nameplateSubRowsLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import {
   type NameplatePickCandidate,
@@ -191,6 +195,7 @@ export interface NameplatePainterDeps {
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
   showPlayerNameplates: () => boolean;
+  showPetNames: () => boolean;
   /** The nameplate dot row's SIZE, with 0 meaning off: the showNameplateDots
    *  toggle and the nameplateDotScale slider fold into this one number at the
    *  settings site. A player preference, never a graphics tier. Defaults to the
@@ -227,6 +232,7 @@ export class NameplatePainter {
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
+  private readonly showPetNames: () => boolean;
   private readonly nameplateDotScale: () => number;
   private readonly nameplateCooldownScale: () => number;
   private readonly isHostilePlayer: (e: Entity) => boolean;
@@ -292,6 +298,7 @@ export class NameplatePainter {
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
+    this.showPetNames = deps.showPetNames;
     this.nameplateDotScale = deps.nameplateDotScale ?? nameplateDotScaleSetting;
     this.nameplateCooldownScale = deps.nameplateCooldownScale ?? nameplateCooldownScaleSetting;
     this.isHostilePlayer = deps.isHostilePlayer;
@@ -317,6 +324,7 @@ export class NameplatePainter {
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
+    const showPetNames = this.showPetNames();
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
     if (fullPass) this.questMarkerCtx = null;
@@ -374,6 +382,7 @@ export class NameplatePainter {
         showNameplates,
         showOwnNameplate,
         showPlayerNameplates,
+        showPetNames,
         standIn,
       );
       if (plan.hidden) continue;
@@ -381,6 +390,11 @@ export class NameplatePainter {
       this.tmpV.copy(view.group.position);
       this.tmpV.y += plan.anchorYOffset;
       if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) continue;
+      // indoors (a walk-in interior holds the player), a plate outside shows only through a
+      // doorway, never through the walls; the unit frame of a selected target is untouched
+      // (tested after the cheap frustum check, so only on-screen plates pay for the walk)
+      const p = view.group.position;
+      if (interiorHidesNameplate(this.camera, p.x, p.y, p.z, this.tmpV.y)) continue;
       this.tmpV.project(this.camera);
       if (this.tmpV.z < -1 || this.tmpV.z > 1) continue;
       const screenX = (this.tmpV.x * 0.5 + 0.5) * width;
@@ -889,8 +903,9 @@ export class NameplatePainter {
     const elite = !!template?.elite;
     const boss = !!template?.boss;
     state.friendlyPet = isFriendlyPet(entity, this.world.entities, this.isHostilePlayer);
-    const mobName =
-      entity.ownerId !== null
+    const mobName = isBuddyMob(entity)
+      ? entityDisplayName(entity)
+      : entity.ownerId !== null
         ? (localizeSimAuraName(entity.name) ?? entity.name)
         : mobDisplayName(entity.templateId);
     state.name = entity.dead ? t('worldContent.corpseName', { name: mobName }) : mobName;
@@ -901,7 +916,7 @@ export class NameplatePainter {
           level: formatNumber(entity.level, NAMEPLATE_LEVEL_NUMBER_OPTIONS),
         });
     state.levelColor = mobNameColor(entity.level - player.level, entity.dead, state.friendlyPet);
-    state.hpVisible = !entity.dead;
+    state.hpVisible = !entity.dead && !plan.noHealthBar;
     // What this body still offers THIS viewer, never the bare lootable flag: a
     // harvest-only body keeps `lootable` true through its grace window, and a
     // stranger's owner-locked kill is lootable for someone else. Ordinary loot

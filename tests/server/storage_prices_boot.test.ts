@@ -104,7 +104,15 @@ describe('the STORAGE_PRICES boot chain, executed end to end', () => {
     // dropped the journal wiring must not compile); this test has no journal,
     // so it says so with the exported inert constant.
     const { inertVaultConsumptionAdmission } = await import('../../src/sim/sim_context');
-    const cfg = buildRealmSimConfig(undefined, inertVaultConsumptionAdmission);
+    const cfg = buildRealmSimConfig(
+      undefined,
+      inertVaultConsumptionAdmission,
+      (_pid, deposit, withdraw) => {
+        deposit();
+        withdraw();
+        return true;
+      },
+    );
     expect(cfg.storagePrices).toStrictEqual({
       vaultUpgrades: [333, 40000, 70000, 120000, 200000, 320000, 500000, 750000, 1100000, 1600000],
     });

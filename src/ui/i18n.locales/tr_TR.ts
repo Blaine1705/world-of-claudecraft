@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Uzmanlık bonusu',
+  'hudChrome.specPanel.healing': 'iyileştirme',
+  'hudChrome.specPanel.absorption': 'hasar soğurma',
+  'hudChrome.specPanel.physicalAbilityDamage': 'yakın ve uzak mesafe yetenek hasarı',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Diğer iyileştirme bonusları uygulandıktan sonra birincil iyileştirmeyi {pct} artırır.',
   'hud.pet.assist': 'Yardım',
   'hud.pet.assistDesc':
     'Yalnızca mevcut hedefine bir yetenek kullandıktan sonra o hedefe saldırır. Sana saldıran düşmanları görmezden gelir.',
@@ -1113,7 +1119,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Ayrıca alacaksın:',
   'hudChrome.weekly.anyDifficulty': 'Herhangi bir zorluk',
   'hudChrome.weekly.cacheDesc':
-    'Sınıfın için bir Normal baskın parçası (asla tier-set parçası değil) artı {count} x {item} açılır.',
+    'Sınıfın için bir Normal baskın parçası (asla Ignivar tier-set parçası değil) artı {count} x {item} açılır.',
   'hudChrome.weekly.choose': 'Görevi seç',
   'hudChrome.weekly.chosen': 'Haftalık görev seçildi: {category}',
   'hudChrome.weekly.close': 'Haftalık görevleri kapat',
@@ -5023,7 +5029,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Sahip',
   'hudChrome.warfareShop.weapons': 'Silahlar',
   'itemUi.market.saleBuyer': '{buyer} kişisine satıldı',
-  'itemUi.market.saleOlder': 'Ayrıca {count} önceki satış, toplama dahildir.',
+  'itemUi.market.saleOlder': 'Ayrıca listelenmeyen {count} önceki satış.',
   'itemUi.tooltip.maxStack': 'Azami yığın: {count}',
   'hud.system.deathRecapAbility': 'Öldün. {ability} tarafından öldürüldün.',
   'hud.system.deathRecapDrowned': 'Öldün. Boğuldun.',
@@ -5937,6 +5943,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.damageReduction': 'Alınan tüm hasarı {pct}% azaltır',
   'hudChrome.auraEffect.guardianWard':
     "Seni öldürecek bir sonraki düşman darbesi engellenir ve yerine canın {pct}%'e geri döner",
+  'hudChrome.auraEffect.slumber': 'Şafağa kadar uyuyor. Saldırılamaz ve kimse için uyanmaz.',
   'hudChrome.bags.dragDestroyHint': 'Yok etmek için dünyaya sürükle',
   'hudChrome.bags.dragEquipHint': 'Kuşanmak için karakterinin üzerine sürükle',
   'hudChrome.bags.reorderNeedsRecent':
@@ -7263,7 +7270,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'g',
   'hudChrome.unitFrame.durationUnitHours': 'sa',
   'hudChrome.unitFrame.durationUnitMinutes': 'dk',
-  'hudChrome.worldBoss.spawn': "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!",
+  'hudChrome.worldBoss.spawn': '{name}, {zone} üzerinde yükseliyor!',
+  'hudChrome.worldBoss.wake': '{name}, {zone} üzerinde uyanıyor!',
+  'hudChrome.worldBoss.sleep': '{name} şafağa kadar uyuyor.',
   'itemUi.kind.bag': 'Çanta',
   'itemUi.tooltip.bagSlots': '{slots} Yuvalı Çanta',
   'itemUi.tooltip.bagSlotsMaterials': '{slots} Yuvalı Malzeme Çantası',
@@ -9965,6 +9974,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trol Höyükleri',
   'entities.zones.mirefen_marsh.pois.6.label': 'Mezar Çağıran Kampı',
   'entities.zones.mirefen_marsh.pois.7.label': 'Batık Kale',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Höyük Sahası',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Yıldız Düşüşü Krateri',
   'entities.zones.mirefen_marsh.welcome': "Bataklık Köprüsü kapısında Muhafız Fenwick'e rapor ver.",
   'entities.zones.thornpeak_heights.name': 'Dikenzirve Tepeleri',
   'entities.zones.thornpeak_heights.pois.0.label': 'Yüksek Gözcü',
@@ -10216,6 +10227,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'GÜÇLENDİRMELER!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': "Discord'a Katıl",
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Açık Kaynak Proje',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Teknik Doküman',
@@ -15057,6 +15069,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Alacadiken Pelerini',
   'entities.items.fenbark_leggings.name': 'Bataklık Kabuğu Tozlukları',
   'entities.items.fenshadow_maul.name': 'Bataklık Gölgesi Balyozu',
+  'entities.items.skerrits_shardpike.name': 'Skerrit’in Kıymık Kargısı',
+  'entities.items.foremans_barrowmaul.name': 'Ustabaşının Höyük Balyozu',
+  'entities.items.barrowhide_pauldrons.name': 'Höyük Omuzlukları',
+  'entities.items.mirestone_stride.name': 'Bataklıktaşı Adımı',
+  'entities.items.foremans_wage_band.name': 'Ustabaşının Ücret Yüzüğü',
+  'entities.items.mirelight_locket.name': 'Bataklık Işığı Madalyonu',
+  'entities.items.fenwright_grips.name': 'Bataklık Ustası Eldivenleri',
   'entities.items.fenwarden_sabatons.name': 'Bataklık Bekçisi Sabatonu',
   'entities.items.gravewyrm_thornmaul.name': 'Mezarejderi Diken Balyozu',
   'entities.items.grovewardens_grips.name': 'Koruluk Bekçisinin Eldivenleri',
@@ -16030,7 +16049,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasif: Av İvmesi varken İz Kırma sonraki Deşen Darbe veya Kanlı Çengel yeteneğini 12 sn için hazırlar. Deşen Darbe yük başına %15 daha fazla hasar verir. Kanlı Çengel, yük başına %15 ve Menzilli Saldırı Gücüyle artan 18 ila 24 ek Fiziksel hasar verir. 3 yükte her iki saldırıdan biri Av İvmesi yüklerini tüketir. (Hayatta Kalma)',
   'entities.abilities.frostjaw_trap.description':
-    'Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar.',
+    'Seçili konuma bir tuzak yerleştirir. 0,75 sn sonra kurulur, 1 dakika sürer ve onu yalnızca sen ve grubun görebilir. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar.',
   'entities.abilities.hunting_momentum.description':
     'Pasif: Deşen Darbe ve bir düşmana isabet eden Şarapnel Yükü birer Av İvmesi verir, en fazla 3. Harcanana veya savaştan çıkana kadar sürer ve her yük hareket hızını %15 artırır. 3 yükte Yara Yırtışı %60 daha fazla darbe hasarı verir ve yükleri tüketir. (Hayatta Kalma)',
   'entities.abilities.measured_shot.description':
@@ -19971,7 +19990,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     '5 Yeşilliğini harcar: zamana yayılan iyileştirme etkilerini taşıyan her müttefik, bu etkilerin kalan iyileştirmesinin %{buff} kadarıyla anında iyileştirilir; etkiler kaldırılır ve hedefe yeni bir Spor Şifası uygulanır.',
   'entities.abilities.play_dead.description':
-    'Yere düş ve ölü taklidi yap: canın ve Odak değerin herkese boş görünür. Düşmanlar seni unutur ve seni hedefleyen düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak etkiyi sona erdirir. Kalkmak için tekrar kullan.',
+    'Yere düşer ve ölü taklidi yaparsın: canın ve Odağın herkese boş görünür. Düşmanlar seni unutur ve seni hedef alan düşman oyuncular hedeflerini kaybeder. Hareket etmek, saldırmak veya başka bir yetenek kullanmak bunu sonlandırır. Hareket ederken kullanırsan durmak için 1 sn süren olur, yoksa hareket bunu sonlandırır. Ayağa kalkmak için tekrar kullan.',
   'entities.abilities.play_dead.name': 'Ölü Taklidi',
   'entities.abilities.rejuvenation.name': 'Spor Şifası',
   'entities.abilities.scratch.description':
@@ -20035,4 +20054,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Bunu istediğin zaman Seçenekler içindeki Grafik Kalitesi bölümünden değiştirebilirsin.',
   'graphicsPrompt.confirm': 'Devam Et',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Ayı Kapanı',
+  'entities.abilities.bear_trap.description':
+    'Seçilen konuma bir kapan kurar. 0,75 sn sonra hazır olur ve 1 dk sürer; yalnızca sen ve grubun görebilirsiniz. İlk tetikleyen düşman 15 sn boyunca kanayarak {damage} Fiziksel hasar alır ve 4 sn boyunca %50 yavaşlar. Hasar, Menzilli Saldırı Gücü ile artar. Aynı anda yalnızca bir Ayı Kapanı etkin olabilir. Buzçene Tuzağın ile aynı anda kurulabilir. Yeni bir Ayı Kapanı kurmak öncekinin yerini alır.',
+  'entities.abilities.scatterbolt.name': 'Saçma Oku',
+  'entities.abilities.scatterbolt.description':
+    'Önündeki 8 yardalık, 90 derecelik koni içine bir ok yağmuru ateşleyerek düşmanları senden en fazla 20 yarda uzağa geri iter. Geri itmeye bağışık düşmanlar etkilenmez. Hasar vermez.',
+  'entities.abilities.phosphor_flask.name': 'Fosfor Şişesi',
+  'entities.abilities.phosphor_flask.description':
+    "Reaktif bir kimyasal karışım taşıyan mühürlü bir kap, 8 metrelik bir alanda 3 sn boyunca akkor beyaz alevlerle patlar. Alevlerin içinde duran düşmanlar her 0,5 sn'de {damage} Ateş hasarı alır. Hasar menzilli saldırı gücüyle artar.",
+  'entities.items.lychgate_buckler.name': 'Mezarlık Kapısı Kalkanı',
+  'entities.items.bastion_kite_shield.name': 'Tabyanın Uçurtma Kalkanı',
+  'entities.items.barrowfield_tower_shield.name': 'Höyük Ovası Kule Kalkanı',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Kaynak Çubuğu',
+  'hudChrome.options.hillBarOpacity': 'Tepede Kral Arka Plan Opaklığı',
+  'hudChrome.options.playerFrameResourceDetached': 'Kaynak Çubuğunu Ayır',
+  'hudChrome.options.playerFrameResourceHeight': 'Kaynak Çubuğu Yüksekliği',
+  'hudChrome.options.playerFrameResourceWidth': 'Kaynak Çubuğu Genişliği',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Çerçeveler sekmesinde Kaynak Çubuğunu Ayır seçeneğini açtığında Çerçeveleri Düzenle, kaynak çubuğunun kilidini de açar. Böylece mana, enerji veya öfke çubuğunu bağımsız olarak istediğin yere yerleştirebilirsin. Aynı sekmedeki Kaynak Çubuğu Genişliği ve Kaynak Çubuğu Yüksekliği boyutunu ayarlar. Çerçeveleri Düzenle, Tepede Kral çubuğunun kilidini de açar. Bu sekmedeki Tepede Kral Arka Plan Opaklığı, yazı net kalırken paneli saydamlaştırır.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

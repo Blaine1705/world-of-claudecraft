@@ -1141,4 +1141,31 @@ export const table: DeedLocaleTable = {
     desc: 'オープンワールドまたはPvP戦で生存中、ワールドPvPを有効にして合計7日プレイする。聖域、PvEインスタンス、死亡、ログアウト中は進行が止まり、無効にするとリセットされる。獲得した称号は永久に残る。',
     title: '不撓の者',
   },
+  dgn_guild_first_contract: {
+    name: '契約成立',
+    desc: '燈火の館の週替わりダンジョン契約を1件達成する。',
+  },
+  dgn_guild_ten_contracts: {
+    name: '掲示板の常連',
+    desc: '燈火の館の週替わりダンジョン契約を10件達成する。',
+  },
+  dgn_guild_fifty_contracts: {
+    name: '契約の古強者',
+    desc: '燈火の館の週替わりダンジョン契約を50件達成する。',
+  },
+  feat_guild_writ_runner: {
+    name: '令状運び',
+    desc: '燈火の館の補給係ギャリック・ホルトから燈火の印章6個で購入した。',
+    title: '令状運び',
+  },
+  feat_guild_hallsworn: {
+    name: '館の誓約者',
+    desc: '燈火の館の補給係ギャリック・ホルトから燈火の印章14個で購入した。',
+    title: '館の誓約者',
+  },
+  feat_guild_of_lantern_hall: {
+    name: '燈火の館の者',
+    desc: '燈火の館の補給係ギャリック・ホルトから燈火の印章24個で購入した。',
+    title: '燈火の館の者',
+  },
 };

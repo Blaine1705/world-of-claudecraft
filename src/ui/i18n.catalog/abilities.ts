@@ -1,3 +1,5 @@
+import { COURIER_ABILITY } from '../../sim/content/courier';
+
 // i18n source catalog - Abilities + class ability names (English values).
 // Part of src/ui/i18n.catalog/; assembled into `en` by ./index.ts.
 // Translations live in src/ui/i18n.locales/<lang>.ts, never here.
@@ -132,6 +134,7 @@ function abilityTranslations(
 const classAbilityNamesEn = {
   entities: {
     abilities: abilityTranslations([
+      [COURIER_ABILITY.id, COURIER_ABILITY.name, COURIER_ABILITY.description],
       // The Vale Cup sport kit (docs/prd/vale-cup.md).
       ['sport_kick', 'Kick', 'Knock the ball along the ground toward the aim point.'],
       [
@@ -171,6 +174,11 @@ const classAbilityNamesEn = {
         'volley',
         'Volley',
         'Rain arrows over an 8-yard area for 3 sec. Enemies in the area take {damage} Physical damage every 0.5 sec. Damage increases with Ranged Attack Power.',
+      ],
+      [
+        'phosphor_flask',
+        'Phosphor Flask',
+        'A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take {damage} Fire damage every 0.5 sec. Damage increases with Ranged Attack Power.',
       ],
       [
         'pack_command',
@@ -229,7 +237,7 @@ const classAbilityNamesEn = {
       [
         'play_dead',
         'Play Dead',
-        'Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast again to get up.',
+        'Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up.',
       ],
       [
         'tactical_camo',
@@ -239,7 +247,17 @@ const classAbilityNamesEn = {
       [
         'frostjaw_trap',
         'Frostjaw Trap',
-        'Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+        'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+      ],
+      [
+        'bear_trap',
+        'Bear Trap',
+        'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it bleeds for {damage} Physical damage over 15 sec and is slowed by 50% for 4 sec. Damage increases with Ranged Attack Power. Only one Bear Trap can be active at a time. Placing another replaces it. It can coexist with your Frostjaw Trap.',
+      ],
+      [
+        'scatterbolt',
+        'Scatterbolt',
+        'Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Knockback-immune enemies are unaffected. Deals no damage.',
       ],
       [
         'pack_rally',

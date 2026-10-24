@@ -250,19 +250,25 @@ describe('a transparent character effect swaps in only once its programs are lin
     visual.dispose();
   });
 
-  it('never stages the Shadowform tint: it keeps every source program', async () => {
+  it('shows the Gloamveil stand-in immediately and gates its transparent program', async () => {
     const visual = await makeVisual();
     const gateCalls: GateCall[] = [];
     visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
     const opaque = rigMaterials(visual);
     visual.setShadowform(true);
-    expect(gateCalls).toHaveLength(0);
+    expect(gateCalls).toHaveLength(1);
     const tinted = rigMaterials(visual);
     expect(tinted).not.toEqual(opaque);
     tinted.forEach((material, i) => {
       expect(material.transparent).toBe(opaque[i].transparent);
       expect(material.customProgramCacheKey()).toBe(opaque[i].customProgramCacheKey());
     });
+    gateCalls[0].settle();
+    expect(rigMaterials(visual)).toEqual(tinted);
+    visual.update(FRAME, anim(), true);
+    const settled = rigMaterials(visual);
+    expect(settled).not.toEqual(tinted);
+    expect(settled.every((material) => material.transparent && material.depthWrite)).toBe(true);
     visual.setShadowform(false);
     expect(rigMaterials(visual)).toEqual(opaque);
     visual.dispose();
@@ -361,6 +367,42 @@ describe('a transparent character effect swaps in only once its programs are lin
     const gateCalls: GateCall[] = [];
     visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
     expect(scratchOf(visual)).toBeNull();
+    visual.dispose();
+  });
+
+  it('plans a swap still in flight again when the gate is replaced under it', async () => {
+    // guards: a swap dropped with its gate and never planned again left the rig in the
+    // materials of the state it had left (an opaque body under stealth) until some
+    // unrelated edge happened to sweep the rig
+    const visual = await makeVisual();
+    const first: GateCall[] = [];
+    const second: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => first.push({ target, settle: onSettled }));
+    visual.setGhost(true);
+    expect(first).toHaveLength(1);
+    expect(rigIsTranslucent(visual)).toBe(false);
+    // the gate is replaced (a pooled body handed out again) with the link in flight
+    visual.setFarBakeGate((target, onSettled) => second.push({ target, settle: onSettled }));
+    // the old scratch is gone, and the SAME swap waits behind the new gate
+    expect(first[0].target.parent).toBeNull();
+    expect(second).toHaveLength(1);
+    expect(scratchOf(visual)).toBe(second[0].target);
+    expect(second[0].target).not.toBe(first[0].target);
+    // the old gate's late settle commits nothing
+    first[0].settle();
+    visual.update(FRAME, anim(), true);
+    expect(rigIsTranslucent(visual)).toBe(false);
+    // the new gate's does, on the per-frame path
+    second[0].settle();
+    expect(rigIsTranslucent(visual)).toBe(false);
+    visual.update(FRAME, anim(), true);
+    expect(rigIsTranslucent(visual)).toBe(true);
+    expect(scratchOf(visual)).toBeNull();
+    // nothing in flight: a new gate plans nothing
+    const third: GateCall[] = [];
+    visual.setFarBakeGate((target, onSettled) => third.push({ target, settle: onSettled }));
+    expect(third).toHaveLength(0);
+    expect(rigIsTranslucent(visual)).toBe(true);
     visual.dispose();
   });
 

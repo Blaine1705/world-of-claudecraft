@@ -601,7 +601,7 @@
   /* UI chrome icons: shared glyph-sizing primitives (siblings of the .x-btn /
      .panel chrome above). Relocated from index.html's inline <style>: these are
      base-tier glyph styling, and keeping them in
-     @layer base lets component overrides (e.g. #mm-music .ui-icon) win as intended.
+     @layer base lets component overrides (e.g. #expedition-bell .ui-icon) win as intended.
      They had been left inline-unlayered, which would have inverted those overrides. */
   /* ---------- UI chrome icons (inline SVG from ui_icons.ts, tinted via currentColor) ---------- */
   .ui-icon {

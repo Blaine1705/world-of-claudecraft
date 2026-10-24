@@ -11,6 +11,126 @@
 import type { EnTranslations } from '../i18n.catalog';
 
 export const zh_CN: EnTranslations = {
+  "referralCards": {
+    "title": "推荐好友",
+    "subtitle": "携手冒险，收集印章。",
+    "close": "关闭推荐好友",
+    "launcher": "集章卡",
+    "pages": "集章卡分页",
+    "firstPage": "首页",
+    "nextPage": "更多卡片",
+    "trailmateTitle": "旅途伙伴",
+    "friendshipAura": "友谊",
+    "protectiveCharm": "守护护符",
+    "bankBonus": "已完成的集章卡",
+    "bankBonusHelp": "帮助两名绑定好友完成集章卡，即可永久解锁20个银行栏位。",
+    "friendshipUse": "使你的力量、敏捷、耐力、智力和精神提高{stats}，持续{duration}秒。",
+    "readyCount": "集章卡：{count}份奖励可领取",
+    "loading": "正在连接你的推荐集章卡...",
+    "empty": "邀请一位新玩家，一起开始你们的第一张集章卡。",
+    "inviteTitle": "邀请好友",
+    "inviteHelp": "在好友创建账号前，将此链接分享给他们。只有通过你的链接创建的新账号才能成为绑定好友。",
+    "inviteLabel": "你的邀请链接",
+    "inviteUnavailable": "你的邀请链接暂不可用。",
+    "membership": "当绑定好友首次购买会员时，你将获得一份会员契约。",
+    "cardBetween": "{you}与{friend}",
+    "yourCard": "{name}的集章卡",
+    "unassigned": "尚未选择角色",
+    "start": "开始集章卡",
+    "startPrompt": "要与{friend}一起开始集章卡吗？双方都必须接受。每个角色都必须低于5级，且尚未完成新手岛的最终任务。",
+    "accept": "接受",
+    "decline": "拒绝",
+    "declinePrompt": "确定要拒绝吗？只要两个角色仍符合要求，之后仍可从集章卡菜单开始。",
+    "declineConfirmed": "尚未开始此卡片。只要两个角色仍符合要求，就能从集章卡菜单开始。",
+    "waiting": "正在等待绑定好友接受。",
+    "cancel": "取消",
+    "okay": "确定",
+    "understand": "是，我明白",
+    "confirmLock": "是，锁定此卡片",
+    "lockFirst": "领取缚雾者印章奖励后，此卡片将永久锁定给{name}。你将无法再将此卡片及其奖励转移给其他角色。你明白吗？",
+    "lockSecond": "确定吗？领取缚雾者奖励，并将此卡片永久锁定给{name}。",
+    "locked": "此卡片已锁定给{name}，无法再转移。",
+    "unlocked": "在领取缚雾者印章奖励前，可以将此卡片转移给其他符合条件的角色。领取该奖励后，卡片将永久锁定给此角色。",
+    "move": "将卡片转移至此角色",
+    "movePrompt": "将你的卡片从{oldName}转移至{newName}吗？卡片进度和所有通过此卡片获得的奖励都会转移。这些奖励将从{oldName}处移除。",
+    "confirmMove": "是，转移我的卡片",
+    "summon": "召唤绑定好友",
+    "summonPrompt": "{friend}想将你召唤到他们所在的位置。接受召唤吗？",
+    "summonHelp": "将绑定好友召唤到你所在的位置。每30分钟可以召唤一次。",
+    "summonCooldown": "召唤还需{minutes}分{seconds}秒",
+    "reward": "奖励：{reward}",
+    "earned": "已获得",
+    "redeemed": "已领取",
+    "emptyStamp": "尚未获得",
+    "stamping": "正在为卡片盖章...",
+    "redeem": "领取奖励",
+    "previous": "请先领取之前印章的奖励。",
+    "playTogether": "与此卡片上的角色组队完成里程碑。",
+    "fallback": "已经独自完成了里程碑任务？与你的好友重新组队即可获得新手岛印章。之后的任务印章需要一起通关对应地下城。",
+    "questGroup": "集章卡任务",
+    "questWithFriend": "与{friend}一起完成{quest}",
+    "browseCards": "浏览全部集章卡分页",
+    "nextQuest": "集章卡：{quest}",
+    "questIndicator": "此任务可推进你的下一个集章卡奖励。",
+    "completion": "恭喜！{friend}在你的帮助下完成了集章卡。",
+    "openInvites": "打开推荐好友",
+    "referrerTitle": "你帮助的好友",
+    "referrerCount": "{count}位好友已完成",
+    "friendTier": "已帮助好友：{count}",
+    "awarded": "已发放",
+    "pending": "尚未发放",
+    "celebration": {
+      "earned": "冒险有回报",
+      "title": "奖励已领取！",
+      "titleReward": "已解锁头衔：{title}",
+      "together": "与{friend}共同赢得。",
+      "continue": "继续冒险"
+    },
+    "milestones": {
+      "tutorial": "新手岛最终任务",
+      "hollow": "进入空洞",
+      "fogbinder": "缚雾者",
+      "gravewyrm": "墓龙科祖尔",
+      "raid": "击败你的首个团队首领"
+    },
+    "rewards": {
+      "tutorial": "一个独有头衔和一个最高容量背包，绑定至你的角色。",
+      "hollow": "一件提高耐力的饰品，并在你生命值较低时被动生成护盾。",
+      "fogbinder": "你的饰品进化，提高更多耐力，并获得主动效果：所有属性提高5点，持续15秒，冷却时间为2分钟。",
+      "gravewyrm": "免费坐骑训练。",
+      "raid": "晃晃史莱姆坐骑。"
+    },
+    "referrerRewards": {
+      "1": "专属友谊迅猛龙坐骑。",
+      "2": "20个银行栏位和5个角色栏位。",
+      "3": "获得1,000 Claudium。",
+      "4": "获得1,000 Claudium。",
+      "5": "闪烁与微光伙伴。"
+    },
+    "reasons": {
+      "notParticipant": "此账号不属于这对绑定好友。",
+      "staleRevision": "你的卡片已发生变化。请查看最新进度后重试。",
+      "invalidCharacters": "队伍中的角色不属于这对绑定好友。",
+      "notTogether": "双方绑定好友必须在同一队伍中。",
+      "levelTooHigh": "新集章卡的角色必须低于5级。",
+      "tutorialCompleted": "有角色已经完成了新手岛的最终任务。",
+      "alreadyStarted": "这对好友已经有卡片了。每对绑定好友只能有一张有效卡片。",
+      "notPending": "没有等待回应的卡片邀请。",
+      "declinePending": "你的绑定好友正在决定是否拒绝此卡片。",
+      "declineNotConfirmed": "请先确认拒绝，再结束此次邀请。",
+      "notActive": "请先一起开始卡片，再领取奖励。",
+      "wrongCharacter": "请使用卡片上列出的角色，或将尚未锁定的卡片转移至符合条件的角色。",
+      "locked": "此卡片已锁定给其角色，无法转移。",
+      "sameCharacter": "此卡片已经属于此角色。",
+      "invalidMilestone": "该印章不属于此卡片。",
+      "notEarned": "请先一起完成此里程碑，再领取奖励。",
+      "alreadyRedeemed": "此奖励已经领取。",
+      "previousRewardRequired": "请先领取之前印章的奖励。",
+      "confirmationRequired": "领取缚雾者奖励前，请先阅读卡片锁定警告。",
+      "newAccountsOnly": "只有通过推荐链接创建新账号时，才能成为绑定好友。已有账号无法绑定。",
+      "unavailable": "暂时无法执行此操作，请稍后重试。"
+    }
+  },
   "meta": {
     "builtOn": "构建于 {date}"
   },
@@ -347,6 +467,192 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "courier": {
+      "title": "信使",
+      "close": "关闭信使",
+      "ready": "准备配送",
+      "outbound": "正在飞往银行",
+      "returning": "正带着物品返回",
+      "waiting": "等待归还物品",
+      "bags": "存入银行",
+      "bank": "从银行取出",
+      "inventory": "背包",
+      "bankTitle": "银行",
+      "capacity": "{used} / {capacity} 栏位",
+      "cargo": "信使背包",
+      "empty": "没有物品",
+      "send": "派出信使",
+      "selected": "已选 {count} / {limit} 组",
+      "select": "选择{item}，{count}",
+      "selectedItem": "取消选择{item}，{count}",
+      "instructions": "请选择整组物品。信使会先存入物品，再取出您指定的物品。任务物品无法寄送。",
+      "membership": "续订会员后即可开始新的配送。",
+      "cargoSafe": "送回的物品会在背包已满时存为溢出物品。送达后信使会消失，直到再次召唤。",
+      "unavailable": "召唤信使以安排配送。"
+    },
+    "adventureGuide": {
+      "title": "冒险指南",
+      "eyebrow": "远征手册",
+      "intro": "探索世界，了解敌人，选择你的下一场冒险。",
+      "dungeons": "地下城",
+      "raids": "团队副本",
+      "delves": "地下探险",
+      "search": "搜索冒险",
+      "eligible": "适合我的等级",
+      "catalogueCount": "{count}项冒险",
+      "catalogueCountPlural": {
+        "one": "{count}项冒险",
+        "other": "{count}项冒险"
+      },
+      "empty": "没有符合这些筛选条件的冒险。",
+      "reset": "清除筛选",
+      "delve": "地下探险",
+      "delveTravel": "从地下探险入口进入。在当地告示板选择层级；不支持自动匹配。",
+      "dungeonTravel": "查看下方的首领战介绍，然后选择队伍或前往入口。",
+      "raidTravel": "集合团队，查看首领战介绍，并在进入前检查你的副本锁定状态。",
+      "soloTravel": "单人冒险。前往入口即可开始。",
+      "browseOnly": "前往入口",
+      "findGroup": "寻找队伍",
+      "inspectLoot": "战利品预览",
+      "lootClass": "职业",
+      "lootSpec": "专精",
+      "allSpecs": "所有专精",
+      "lootHint": "显示可用且属性适合所选专精的装备。通用奖励仍会显示。掉落几率按完整掉落列表计算。",
+      "lootEmpty": "没有适合此职业和专精的装备。",
+      "fullTableRoll": "从完整掉落列表中获得一件物品",
+      "encountersCount": "{count}场首领战",
+      "tiers": "可选层级：{tiers}"
+    },
+    "expeditions": {
+      "bell": "打开队伍：{count}条通知",
+      "bellCount": {
+        "one": "打开队伍：{count}条通知",
+        "other": "打开队伍：{count}条通知"
+      },
+      "alerts": "提醒",
+      "groups": "队伍",
+      "rewards": "奖励",
+      "sections": "远征栏目",
+      "noAlerts": "没有需要你处理的远征提醒。",
+      "findGroup": "寻找队伍",
+      "recruitPlayers": "招募玩家",
+      "recruitIntro": "选择地下城和队伍目标。检查招募信息后再发布。",
+      "recruitDungeon": "地下城",
+      "recruitDifficulty": "难度",
+      "recruitPreview": "招募预览",
+      "recruitPublish": "发布队伍",
+      "recruitPublishing": "正在发布你的队伍...",
+      "recruitBeforeEntry": "你可以在进入地下城前招募。发布队伍不会传送队员。",
+      "recruitUnconfirmed": "你的招募信息尚未确认。请检查连接或聊天消息，然后重试。",
+      "recruitLoading": "正在加载招募选项...",
+      "recruitAlreadyOpen": "你已经开放招募。请前往管理队伍。",
+      "recruitExistingRun": "你已有一场远征。请在“你的队伍”中管理招募。",
+      "recruitLeaveQueue": "发布自己的队伍前，请先退出匹配队列。",
+      "recruitFinishProposal": "发布队伍前，请先回应匹配邀请。",
+      "recruitCancelRequests": "发布自己的队伍前，请先撤回待处理的入队申请。",
+      "recruitNoActivities": "没有地下城能容纳你当前等级的队伍。",
+      "recruitNoRoles": "你的角色没有可用的兼容职责。",
+      "recruitInvalidNote": "备注最多120个字符，且不能包含控制字符。",
+      "manageRecruitment": "管理招募",
+      "formingGroup": "组队中",
+      "groupGathering": "你的队伍正在集结。准备好后在地下城入口集合。",
+      "groupChooseDungeon": "为你的队伍选择地下城，然后招募缺少的队员。",
+      "waitForLeader": "队长可以选择地下城并开放招募。",
+      "recruitmentNext": "招募已开放。准备好后，让队伍在地下城入口集合。",
+      "findGroupNext": "你尚未加入队伍。寻找队伍即可开始远征。",
+      "awaitingReply": "正在等待{count}支队伍回复。",
+      "requestSent": "申请已发送。正在等待队长回应。",
+      "readyToTravel": "你的队伍已准备就绪。准备好后即可前往地下城。",
+      "groupRecruiting": "你的远征正在进行中。招募已开放。",
+      "groupInProgress": "你的远征正在进行中。",
+      "title": "开放的远征",
+      "entryTitle": "单人挑战还是开放队伍？",
+      "entryBody": "现在开始。你随时都可以开放队伍。",
+      "solo": "单人挑战",
+      "open": "开放队伍",
+      "closeRecruitment": "关闭招募",
+      "travel": "前往队伍",
+      "request": "{name}希望以{role}职责加入。",
+      "level": "等级{level}",
+      "accept": "接受",
+      "decline": "拒绝",
+      "acceptPlayer": "接受玩家",
+      "declinePlayer": "拒绝玩家",
+      "chooseRole": "你的职责",
+      "send": "发送申请",
+      "confirmRequest": "确认申请",
+      "chooseRoleAction": "选择职责",
+      "cancel": "取消",
+      "pending": "申请待处理",
+      "join": "申请加入",
+      "leader": "队长：{name}",
+      "members": "{current}/{total}名玩家",
+      "progress": "已击败{defeated}/{total}名首领",
+      "needed": "建议职责：{roles}",
+      "close": "关闭",
+      "empty": "目前没有开放的远征。",
+      "finder": "打开地下城查找器",
+      "groupsCount": "开放队伍：{count}",
+      "requestsCount": "入队申请：{count}",
+      "yourGroup": "你的队伍",
+      "otherGroups": "其他队伍",
+      "manageGroup": "你的远征及入队申请",
+      "browseGroups": "选择要帮助的队伍",
+      "noCurrentGroup": "你尚未参加远征。",
+      "noCurrentGroupHint": "进入地下城或申请加入队伍。",
+      "recruitmentOpen": "招募已开放",
+      "recruitmentClosed": "招募已关闭",
+      "groupRoster": "队伍成员",
+      "noRequests": "没有待处理的入队申请。",
+      "requestsCombat": "有申请等待处理。请在战斗结束后查看。",
+      "expires": "{time}后过期",
+      "waiting": "正在等待{name}回应。",
+      "outcomeAccepted": "{name}接受了你的申请。准备好后点击“前往队伍”。",
+      "outcomeDeclined": "{name}拒绝了你的申请。",
+      "outcomeExpired": "你的申请已过期。你可以重新申请。",
+      "outcomeCancelled": "你已取消申请。",
+      "outcomeClosed": "该队伍已不再接受你的申请。",
+      "editDetails": "编辑队伍详情",
+      "purpose": "队伍目标",
+      "purposeFirstTime": "首次挑战",
+      "purposeRelaxed": "休闲通关",
+      "purposeClear": "完成地下城",
+      "purposeNeedsHelp": "需要帮助",
+      "note": "简短备注（可选，最多120个字符）",
+      "saveDetails": "保存详情",
+      "available": "愿意提供帮助",
+      "stopHelping": "停止援助提醒",
+      "helperRoles": "你提供的职责",
+      "helperOn": "援助提醒已开启。你仍可自行选择加入哪支队伍。",
+      "helperPaused": "组队、排队或有待处理申请时，援助提醒会暂停。",
+      "helperFound": "有{count}支适合的队伍正在寻求帮助。",
+      "viewGroups": "查看队伍",
+      "sound": "出现新队伍或新申请时播放提示音",
+      "shop": "排队积分商店",
+      "backToGroups": "返回队伍",
+      "shopIntro": "每次援助都有回报",
+      "shopDescription": "使用帮助其他玩家完成远征所获得的积分。",
+      "shopCollection": "铃铛收藏",
+      "shopOwned": "已收藏",
+      "shopLocked": "可解锁",
+      "shopRules": "如何获得积分",
+      "pendingRequests": "你的待处理申请：{count}/5",
+      "multiApplyHint": "最多可向五支队伍申请。加入其中一支后会撤回其他申请。",
+      "multiApplyLimit": "你已有五个待处理申请。取消一个后才能申请其他队伍。",
+      "points": "排队积分：{count}",
+      "dailyPoints": "今日已获得：{earned}/{cap}",
+      "rewardRules": "援助者每击败一名符合条件的首领获得5积分，完成地下城另获10积分，均在通关时发放。对每名首领造成的有效伤害、提供的有效治疗或承受的有效伤害需达到其生命值的至少1%，才可获得对应奖励。每个地下城难度的每名首领和通关奖励每天各限领取一次，每日最多60积分。仅加入队伍或在入口等待不会获得积分。",
+      "rewardScope": "铃铛外观是此角色的永久装饰，不影响游戏玩法。",
+      "bronze": "青铜铃铛",
+      "silver": "白银铃铛",
+      "gold": "黄金铃铛",
+      "price": "{count}排队积分",
+      "buy": "购买并装备",
+      "equip": "装备",
+      "equipped": "已装备",
+      "defaultBell": "使用默认铃铛",
+      "dismiss": "忽略"
+    },
     "framePresets": {
       "apply": "应用",
       "pickerLabel": "框架预设：{name}",
@@ -516,6 +822,102 @@ export const zh_CN: EnTranslations = {
         "pvp": "战争装备"
       }
     },
+    "guildHall": {
+      "title": "灯火大厅",
+      "signSubtitle": "冒险者公会",
+      "close": "关闭公会窗口",
+      "tabsLabel": "灯火大厅分页",
+      "tabs": {
+        "contracts": "契约",
+        "quartermaster": "军需官"
+      },
+      "seals": "灯火印章：{count}",
+      "resetIn": "{time}后发布新契约",
+      "resetSoon": "下次每周重置时发布新契约",
+      "contractsIntro": "每周三份契约，王国中的每位冒险者看到的都一样。无需签署：完成其中一份，它的印章就会直接放进你的背包，每周一次。",
+      "kinds": {
+        "boss": "悬赏",
+        "heroic": "英雄通关",
+        "task": "执行"
+      },
+      "goals": {
+        "boss": "在{dungeon}击败{boss}，难度不限。",
+        "heroic": "以英雄难度通关{dungeon}：在英雄难度下击败{boss}。",
+        "task": "{task}（{dungeon}）"
+      },
+      "contractLabel": "{kind}：{dungeon}",
+      "reward": {
+        "one": "{count}枚灯火印章",
+        "few": "{count}枚灯火印章",
+        "many": "{count}枚灯火印章",
+        "other": "{count}枚灯火印章"
+      },
+      "done": "本周已完成",
+      "open": "进行中",
+      "lifetime": "已完成契约：{count}",
+      "emptyBoard": "告示板正在重写。请在每周重置后再来。",
+      "quartermasterIntro": "加里克只用灯火印章换取荣誉：可在功绩之书中佩戴的头衔、公会之剑的外观和公会的战马。这里没有任何东西能让你在战斗中变得更强。",
+      "titleOffer": "头衔：{title}",
+      "titlePreview": "显示为{preview}",
+      "mountOffer": "坐骑：{mount}",
+      "mountPreview": "地面坐骑：骑乘时移动速度+{pct}%。需要骑术训练。",
+      "skinOffer": "剑的外观：{skin}",
+      "skinPreview": "改变你所装备的剑的样子，适用于账号中的所有角色。仅为外观：没有属性。",
+      "buy": "购买",
+      "owned": "已拥有",
+      "needSeals": "还需{count}枚",
+      "bought": "你购买了头衔{title}。请在功绩之书中选择它。",
+      "boughtMount": "你购买了{mount}。它的缰绳在你的背包里。",
+      "boughtSkin": "你购买了外观{skin}。请在外观窗口中应用它。",
+      "refused": {
+        "owned": "你已经拥有它了。",
+        "seals": "你的灯火印章不足。",
+        "range": "站到军需官身边才能交易。",
+        "riding": "先学会骑术，再购买坐骑。",
+        "bags": "你的背包已满。"
+      },
+      "board": {
+        "noticesLabel": "本周契约",
+        "weekProgress": "本周：已完成{done}/{total}份契约",
+        "weekProgressAria": "本周已完成的契约",
+        "cardProgress": "本周 {done}/{total}",
+        "rewardLine": "奖励：{reward}",
+        "stamp": "已盖印",
+        "sealsTip": "灯火印章由灯火大厅的每周契约发放，只能在军需官加里克·霍尔特处使用。它们与你绑定。"
+      },
+      "shop": {
+        "stockLabel": "加里克·霍尔特的货品",
+        "kindTitle": "头衔",
+        "kindMount": "坐骑",
+        "kindSword": "剑的外观",
+        "plateHeading": "你的名牌",
+        "mountHeading": "你骑在马鞍上",
+        "skinHeading": "握在你手中",
+        "stageLabel": "{name}的3D预览",
+        "stageUnavailable": "此设备无法显示3D预览。",
+        "mountHowTo": "购买后，它的缰绳会放入你的背包。使用缰绳即可骑乘；只要你留着缰绳，这匹马就是你的。",
+        "mountOwned": "你已拥有这匹坐骑。它的缰绳在你的背包里。",
+        "skinHowTo": "购买后，请在外观窗口中应用它。它适用于你账号中的所有角色。",
+        "skinOwned": "你已拥有此外观。请在外观窗口中应用它。",
+        "howTo": "购买后，在功绩之书中选择它，即可与你的名字一同显示。",
+        "cosmetic": "仅限外观：不改变任何属性。",
+        "price": "价格：{price}",
+        "have": "你拥有{count}",
+        "ownedLong": "你已拥有此头衔。可在功绩之书中选择。",
+        "short": {
+          "one": "你还需要{count}枚灯火印章。",
+          "few": "你还需要{count}枚灯火印章。",
+          "many": "你还需要{count}枚灯火印章。",
+          "other": "你还需要{count}枚灯火印章。"
+        }
+      },
+      "contractDone": {
+        "one": "契约完成：{contract}。你获得了{count}枚灯火印章。",
+        "few": "契约完成：{contract}。你获得了{count}枚灯火印章。",
+        "many": "契约完成：{contract}。你获得了{count}枚灯火印章。",
+        "other": "契约完成：{contract}。你获得了{count}枚灯火印章。"
+      }
+    },
     "ferry": {
       "regionLabel": "渡船时刻表",
       "departsIn": "前往{dest}的渡船将在{time}后起航",
@@ -530,6 +932,48 @@ export const zh_CN: EnTranslations = {
       "scheduleUnavailable": "渡船时刻表暂不可用。"
     },
     "materialStackSelectionUnavailable": "该素材选择已失效。",
+    "shardpike": {
+      "braceLabel": "架起碎晶长矛",
+      "braceTooltip": "将矛尾插入地面，矛尖朝上。你的横移键就是平衡杆：光束会自行漂移，他每次砸地都会把它踢偏。让它离开两端轨道并保持 {set} 秒即可架稳长矛。需要坚实的地面，且不能在坐骑上。",
+      "thrustLabel": "冢琉璃突刺",
+      "thrustTooltip": "将架稳的长矛刺入眼中，造成 {damage} 点伤害。没有任何东西能加成它：等级、攻击强度、长矛本身都不行。它会使工头失明并剥离石冢之皮，让泥沼中其他所有武器终于能咬进去。只有架稳的长矛才能送出这一击，射程 {reach} 码，窗口持续 {seconds} 秒。",
+      "braceTooltipLean": "将矛尾抵地，矛尖上举。用横移键或转向键倾斜，或按住横梁上方的两个按键：横梁会自行偏移，他每落下一击都会把它震歪。让它远离两端{set}秒，长矛即告架稳。需要坚实的地面，且不能在坐骑上。",
+      "releaseLabel": "放下碎晶长矛",
+      "releaseTooltip": "把长矛收起。中途放弃没有惩罚：你失去的是架势，不是这次机会，{rest} 秒后即可重新架起。",
+      "whyResting": "你刚刚放下了长矛。等图标上的计时走完。",
+      "whyAlreadyCouched": "长矛已经架起。重新架矛前先把它放下。",
+      "whyNotSet": "长矛尚未架稳。先架起它并稳住。",
+      "whyNothingCouched": "没有可放下的：长矛并未架起。",
+      "beamLabel": "碎晶长矛平衡",
+      "beamStatus": "长矛平衡 {balance}，架稳 {set}%。",
+      "beamDanger": "长矛平衡 {balance}，即将脱手。",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "用横移键稳住长矛",
+      "promptCatchIt": "接住，长矛快要倒了",
+      "promptEyeOut": "眼睛已经瞎了，还有 {seconds} 秒：全力打他",
+      "promptSealed": "他的眼睛闭上了。{seconds} 秒后重新睁开",
+      "promptResetting": "正在重新架矛，{seconds} 秒",
+      "promptCloser": "靠近工头，还差 {yards} 码",
+      "promptBrace": "架起碎晶长矛，然后稳住它",
+      "promptFindBoss": "斯克里特的碎晶长矛：用它戳瞎工头的眼睛",
+      "promptFindBossMuster": "征召军的碎晶长矛：用它戳瞎工头的眼睛",
+      "promptTakePike": "按 {key} 或点击武器架，取一把碎晶长矛",
+      "promptTakePikeClick": "点击武器架，取一把碎晶长矛",
+      "promptTakePikeTap": "轻触武器架，取一把碎晶长矛",
+      "promptPikeLevelCap": "征召营只把长矛借给 {level} 级及以下的新兵",
+      "promptHoldSteadyLean": "稳住长矛：用{left}和{right}倾斜",
+      "leanLeft": "向左倾斜",
+      "leanRight": "向右倾斜",
+      "leanLeftKey": "向左倾斜（{key}）",
+      "leanRightKey": "向右倾斜（{key}）",
+      "promptTally": "{count} put out",
+      "promptLabel": "碎晶长矛指示",
+      "blindBanner": "BARROWHIDE BROKEN",
+      "effigyBanner": "已致盲！现在全团一起狠狠地打",
+      "promptStrikeLantern": "现在刺灯笼，{seconds} 秒",
+      "promptLanternOut": "灯笼灭了，还有 {seconds} 秒：用你自己的武器打它",
+      "promptCloserEffigy": "靠近稻草工头，还差 {yards} 码"
+    },
     "vehicle": {
       "title": "北望哨火炮",
       "objective": "守卫北望哨",
@@ -860,6 +1304,51 @@ export const zh_CN: EnTranslations = {
       }
     },
     "wocStore": {
+      "subscription": {
+        "title": "游戏订阅",
+        "monthlyTitle": "月度会员",
+        "annualTitle": "12个月会员礼包",
+        "annualPrice": "12个月共{price}，一次付清",
+        "annualTerms": "每年以相同价格续订。通过Stripe使用法定货币付款。可在账单设置中取消。",
+        "annualMount": "付款后，请使用购买此礼包的角色通过邮件领取灵魂绑定的夜翼奇美拉缰绳。会员到期后，你仍将拥有这只坐骑。",
+        "trialTerms": "每个账户可免费试用一次，共{days}天。需要提供付款方式。除非取消，否则试用结束时将收取{price}。",
+        "startTrial": "开始7天免费试用",
+        "resumeCheckout": "继续结账",
+        "checkoutClosed": "此结账流程已结束，且没有待领取奖励。请重新选择会员方案，开始新的结账流程。",
+        "annualClaim": "领取礼包坐骑",
+        "annualPending": "付款后，请返回购买礼包的角色领取坐骑。如果付款正在处理或仍在试用期，请在付费成功后重试。",
+        "annualDelivered": "礼包坐骑钥匙已通过邮件送达。",
+        "tokenTitle": "可交易会员代币",
+        "benefitsTitle": "有效会员权益",
+        "benefitBank": "在任意银行员处访问您其他角色的银行。",
+        "benefitSlots": "额外解锁10个角色栏位。",
+        "benefitArmour": "领取稀有品质的灵魂绑定护甲和万变法杖。属性适配您的职业与专精，物品等级始终比角色等级高5级。装备全部7件护甲可多获得20%经验。",
+        "benefitBag": "可在会员背包栏位额外装备一个背包。",
+        "benefitTax": "拍卖行税费减半。",
+        "benefitExpiry": "会员到期后，额外角色栏位、装备加成和额外背包栏位会锁定，续订后恢复。背包和物品会安全保留，超出容量的物品以溢出形式保存。基础角色栏位仍可正常使用。",
+        "tokenTerms": "一次支付{price}，获得30天会员代币。代币将邮寄给此角色，可兑换为会员时长，也可在拍卖行出售。",
+        "tokenBuy": "购买会员代币",
+        "tokenClaim": "领取已购买的代币",
+        "tokenPending": "付款后请返回此角色领取代币。若付款仍在处理中，请稍后重试。",
+        "tokenDelivered": "您的代币已通过邮件送达。",
+        "price": "每月 {price}",
+        "terms": "每月自动续费。通过 Stripe 使用法定货币付款。可在账单设置中取消。",
+        "subscribe": "订阅",
+        "manage": "管理订阅",
+        "ending": "将在当前账单周期结束时取消",
+        "error": "无法打开账单页面。请允许弹出窗口后重试。",
+        "status": {
+          "none": "未订阅",
+          "incomplete": "付款未完成",
+          "incomplete_expired": "结账已过期",
+          "trialing": "试用中",
+          "active": "有效",
+          "past_due": "付款逾期",
+          "canceled": "已取消",
+          "unpaid": "未付款",
+          "paused": "已暂停"
+        }
+      },
       "title": "WOC 商店",
       "close": "关闭 WOC 商店",
       "tabsLabel": "WOC 商店分区",
@@ -906,9 +1395,35 @@ export const zh_CN: EnTranslations = {
         "guildmark": "公会印记",
         "emberwrought": "余烬锻造",
         "hoarfrost": "白霜",
-        "fallen_star": "陨星"
+        "fallen_star": "陨星",
+        "lantern_hall": "灯火大厅"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "灯火大厅之剑",
+          "look": "宽阔的钢制剑身，血槽中燃着灯火，镀金的护颊，护手中燃着一盏笼中提灯，蓝色皮革剑柄。",
+          "lore": "加里克·霍尔特不会把这把剑卖给陌生人。他只把它交给一周又一周履行灯火大厅契约的成员，每次都说同样的话：护手里的灯火取自大厅自己的炉膛，所以无论你把它带到哪里，大厅都与你同在。血槽里的火只是外观。重要的是承诺。"
+        },
+        "hearthbrand_sword": {
+          "name": "炉火之刃",
+          "look": "焦黑钢铁铸成的火焰波纹剑身，两侧刃口如出炉般炽热，熔融的裂缝在两面分叉蔓延，青铜火焰护手环绕一块燃烧的宝石，牛血色握柄。",
+          "lore": "灯火大厅里有一座自大厅建成以来从未熄灭的炉膛，加里克·霍尔特发誓这把剑就是在它的炭火中淬火的。佩戴它的成员说，即使在最寒冷的守夜里，剑柄也依然温暖。刃口上的火焰只是外观。"
+        },
+        "squallcrest_sword": {
+          "name": "风暴浪峰",
+          "look": "海蓝色的修长剑身，刃口如碎浪般明亮，风暴血槽中封着分叉的闪电，剑根上方是一道镀金的浪，一侧刃口生着鳍，镀金浪涛护手环绕一颗风暴珍珠。",
+          "lore": "一位为公会出海的船长从一场狂风中带回了这把剑，那场风暴折断了她的桅杆，让整艘船像钟一样鸣响。加里克只肯用印章出售它，并提醒每位买家，风暴来临前它会嗡嗡作响。闪电与海光只是外观。"
+        },
+        "rimelight_staff": {
+          "name": "霜光法杖",
+          "look": "苍白的杖身以银箍束紧，缠绕着发光的雾凇，杖顶的银爪在冰晶之冠中托着一颗巨大的寒光水晶，杖颈垂着冰柱。",
+          "lore": "灯火大厅的冬季守望者曾手持这样的法杖行走在高路上，点亮杖顶，为迷失在雪中的旅人引路。加里克在架上留了一根，给印章有余的成员。寒霜与冷光只是外观。"
+        },
+        "duskwick_staff": {
+          "name": "暮芯法杖",
+          "look": "两股扭结的黑木以铁箍束紧，杖顶是一盏敞开的铁提灯，在两只卷曲的角之间燃着紫色的暮光火焰，灯底垂着晃动的锁链。",
+          "lore": "大厅里的每一盏灯都明亮地燃烧，只有一盏例外。暮光之焰是为在夜里守护大厅而点燃的，别的灯发出光的地方，它发出影子；加里克亲自修剪它的灯芯。烟雾与紫色光辉只是外观。"
+        },
         "guildmark_arming_sword": {
           "name": "公会印记武装剑",
           "look": "发蓝钢剑刃、青铜鱼尾形十字护手、青绿色染皮握柄，以及一枚小巧的公会钢印。",
@@ -1056,6 +1571,18 @@ export const zh_CN: EnTranslations = {
         }
       },
       "seasonOne": "第一赛季",
+      "membershipPromo": {
+        "open": "WOC 商店中的会员",
+        "close": "关闭会员推广",
+        "eyebrow": "账号特权",
+        "title": "会员",
+        "cta": "立即加入"
+      },
+      "referralPromo": {
+        "close": "关闭推荐好友推广",
+        "eyebrow": "一起冒险",
+        "cta": "邀请好友"
+      },
       "rarity": {
         "uncommon": "优秀",
         "rare": "精良",
@@ -1239,7 +1766,8 @@ export const zh_CN: EnTranslations = {
       "drowning": "溺水！"
     },
     "rest": {
-      "resting": "休息中"
+      "resting": "休息中",
+      "restArea": "休息中：你正处于休息区，会在这里获得休息经验。"
     },
     "paladin": {
       "devotion": "虔诚",
@@ -1345,7 +1873,7 @@ export const zh_CN: EnTranslations = {
       "guidanceOn": "开启引导",
       "guidanceOff": "关闭引导",
       "guidanceSetting": "东溪金色引导",
-      "bellHomeNote": "这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。",
+      "bellHomeNote": "这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在你身旁的码头上：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。",
       "islandArrivalNote": "刚下渡船吗？欢迎来到试炼之滨。看守塔姆就在你正前方的海滩上守着试炼跑道：走到他跟前，直到他的名字显示出来，然后按 F，或者用鼠标左键点击他，他的跑道会把你双腿该会的都教给你。等你准备离开时，敲响立在我码头旁的那口铃，渡航就会送你回东溪镇。",
       "noteClose": "明白了"
     },
@@ -1696,6 +2224,10 @@ export const zh_CN: EnTranslations = {
       "replayAction": "再练一次",
       "replayTarget": "再次将它设为目标"
     },
+    "dungeonTracker": {
+      "heroicTitle": "{name} ({difficulty})",
+      "complete": "已完成"
+    },
     "riftTracker": {
       "title": "裂隙",
       "hoardTitle": "埋藏的宝藏",
@@ -2023,12 +2555,17 @@ export const zh_CN: EnTranslations = {
       "name_goblin_rocket_sled": "哥布林火箭雪橇",
       "name_rallycart_rxt": "拉力卡丁车 RXT",
       "name_terrorspark_groundshaker": "骇雷撼地者",
+      "name_referral_tank": "友谊坦克",
+      "name_referral_raptor": "友谊迅猛龙",
       "name_drakemaw_raptor": "龙喉迅猛龙",
       "name_avian_strider": "苍翠谷行者",
       "name_mech_bird": "发条机械鸟",
       "name_lanternback_troll": "提灯背者格伦博",
+      "name_lantern_hall_destrier": "灯火大厅战马",
       "name_chimeglass_tortoise": "钟晶的托利弗",
       "name_rickshaw_mount": "白骨人力车",
+      "name_wobbles_slime": "晃晃史莱姆",
+      "name_nightwing_chimera": "夜翼奇美拉",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
@@ -2039,11 +2576,16 @@ export const zh_CN: EnTranslations = {
       "desc_goblin_rocket_sled": "一辆结构过剩到危险的哥布林雪橇，靠双发火箭和极差的判断力推进。",
       "desc_rallycart_rxt": "一辆小巧却地道的拉力赛车，能提升移动速度。",
       "desc_rallycart_skin": "一辆小巧的拉力赛车，轰鸣声却震天响。",
+      "desc_wobbles_slime": "一只被驯服上鞍的大蓝史莱姆。它不走路而是蹦跳，在骑手身下晃来晃去，体内还有气泡缓缓上浮。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
+      "desc_referral_tank": "以前的招募好友集章卡奖励。",
+      "desc_referral_raptor": "帮助你的首位绑定好友完成一张集章卡后获得。",
       "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
       "desc_avian_strider": "高大的坐骑巨鸟，粗壮的利爪与收拢的双翼让每一段旅程都化作雷鸣般的疾驰。",
       "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
       "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
+      "desc_lantern_hall_destrier": "灯火大厅的战马，在公会的蓝色披布下披挂橡木与铁制马铠，鞍边摇曳的两盏风灯照亮归途。",
+      "desc_nightwing_chimera": "来自古木枝头的双头暮光飞龙，驻足时以利爪后肢伫立，行进时展动奥术铭纹双翼掠地翱翔。",
       "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
       "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
     },
@@ -2116,6 +2658,10 @@ export const zh_CN: EnTranslations = {
       "flagTakenLog": "{name}夺走了{team}的旗帜!",
       "flagDroppedLog": "{team}的旗帜掉落了。",
       "flagReturnedLog": "{team}的旗帜已归还。",
+      "flagDroppedByLog": "{name} dropped the {team} flag.",
+      "flagReturnedByLog": "{name} returned the {team} flag.",
+      "flagNameCrimson": "Crimson Flag",
+      "flagNameAzure": "Azure Flag",
       "dropFlagConfirmTitle": "丢下旗帜？",
       "dropFlagConfirmBody": "你正携带敌方旗帜。丢下后旗帜会留在地上，双方都可以拾取。",
       "dropFlagConfirmAccept": "丢下旗帜",
@@ -2248,6 +2794,7 @@ export const zh_CN: EnTranslations = {
       "showDevBadges": "显示开发者徽章",
       "showOwnNameplate": "显示我的姓名板",
       "showPlayerNameplates": "显示玩家姓名板",
+      "showPetNames": "显示宠物名称",
       "uiScale": "界面缩放",
       "playerFrameScale": "玩家框缩放",
       "targetFrameScale": "目标框缩放",
@@ -2265,6 +2812,8 @@ export const zh_CN: EnTranslations = {
       "groundReticle": "地面瞄准指示圈",
       "mouseoverCast": "队伍头像上鼠标悬停施法",
       "stickyTarget": "点击地面时保留目标",
+      "showDungeonHints": "地下城机制提示",
+      "showDungeonHintsNote": "显示提示面板，说明地下城机制以及应对方法。关闭后只隐藏这些提示：地面警示、施法条和减益效果仍会显示。需要你操作的提示始终显示：需要挣脱的牢笼、需要打断的锁链、可以使用的物体。",
       "showItemLevel": "显示物品等级",
       "showReliquaryTracker": "显示圣物库追踪器",
       "confirmVendorSell": "出售前确认",
@@ -2288,6 +2837,11 @@ export const zh_CN: EnTranslations = {
       "enemyHighlightReticle": "加粗的敌对目标光圈",
       "enemyHighlightDistance": "{yards} 码",
       "showPetFrame": "显示你的宠物",
+      "playerFrameResourceDetached": "分离资源条",
+      "playerFrameResourceWidth": "资源条宽度",
+      "playerFrameResourceHeight": "资源条高度",
+      "hillBarOpacity": "山丘之王背景不透明度",
+      "pixelsValue": "{value} 像素",
       "showNameplateDots": "在姓名板上显示我的减益",
       "nameplateDotScale": "姓名板减益图标大小",
       "showNameplateCooldowns": "进攻/防御追踪器",
@@ -2333,6 +2887,11 @@ export const zh_CN: EnTranslations = {
       "complexityMedium": "中等",
       "complexityHigh": "高",
       "exampleAbilities": "示例技能",
+      "specBonus": "专精加成",
+      "healing": "治疗量",
+      "absorption": "伤害吸收量",
+      "physicalAbilityDamage": "近战和远程技能伤害",
+      "primaryHealingBonus": "在其他治疗加成结算后，主要治疗量提高{pct}。",
       "viewTalents": "查看天赋",
       "selectSpec": "选择专精",
       "specUnlockBanner": "专精已解锁！",
@@ -2937,6 +3496,9 @@ export const zh_CN: EnTranslations = {
       "goods": "货物",
       "groupSeason2": "战争赛季 2：先锋",
       "groupEntry": "战争赛季 1",
+      "companions": "伙伴",
+      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
+      "companionOwnedAria": "{item}, already collected or awaiting reveal",
       "owned": "已拥有",
       "buyAria": "以 {honor} 购买 {item}",
       "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
@@ -3211,8 +3773,10 @@ export const zh_CN: EnTranslations = {
         "storm": "你每施放一个法术便增加一层充能，最多 {max} 层。充能持续 {duration} 秒，每获得一层便会刷新。",
         "heat": "你的近战和远程武器每次命中增加一层热量，最多 {max} 层。热量持续 {duration} 秒，每获得一层便会刷新。",
         "ignite": "你的近战和远程武器暴击会点燃目标，每 {every} 秒造成 {tick} 点火焰伤害，持续 {duration} 秒。新的暴击会刷新该效果。伤害随攻击强度或远程攻击强度中较高者提高。",
-        "guardHeat": "你每招架、躲闪或格挡一次攻击，便增加一层热量，最多 {max} 层。热量持续 {duration} 秒，每获得一层便会刷新。"
+        "guardHeat": "你每招架、躲闪或格挡一次攻击，便增加一层热量，最多 {max} 层。热量持续 {duration} 秒，每获得一层便会刷新。",
+        "stoneHeart": "受到致命一击时，你改为化作石像{statue}秒：不受伤害，无法移动或行动，随后以{restore}点生命值（最大生命值的{restorePct}%）恢复。每{icd}只能触发一次。决斗和竞技场比赛中不会触发，这些战斗在致命一击时结束。"
       },
+      "range": "{min} to {max}",
       "use": {
         "retaliate": "在 {duration} 秒内，直接击中你的敌人会受到相当于该次攻击令你损失生命值 {pct}% 的物理伤害。周期性伤害不会触发此效果。",
         "anchor": "在 {duration} 秒内，受到的伤害降低 {reduction}%，但移动速度变为 {speed}%。移除你身上的昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械和失去行动能力效果，并在持续期间无视新的此类效果和击退。",
@@ -3231,7 +3795,17 @@ export const zh_CN: EnTranslations = {
         "kindlingOrb": "在你身旁召唤一颗余烬宝珠，持续 {duration} 秒。你每对敌人施放一个法术，它便向该敌人射出一道火焰弹，造成 {damage} 点火焰伤害。伤害随法术强度提高。",
         "pierce": "在 {duration} 秒内，你的自动攻击、射击和物理技能（流血除外）命中还会打击距离你的目标最近的、{reach} 码内的一个敌人，造成所造成伤害的 {share}%。",
         "lantern": "在你脚下放置一盏提灯，持续 {duration} 秒。任何人对提灯 {radius} 码内的你或队伍成员施放的直接治疗，还会以该治疗量的 {share}% 治疗灯光中受伤最重的另一名队伍成员。",
-        "heartNova": "消耗所有热量释放一道火焰新星，对 {radius} 码内的每个敌人每层热量造成 {perHeat} 点火焰伤害（{maxHeat} 层时为 {max} 点），并嘲讽其命中的每个生物。伤害随攻击强度提高。需要至少一层热量。"
+        "shackle": "用锁链将 {range} 码内的目标束缚在原地，持续 {duration} 秒。免疫控制的生物（例如首领）改为移动速度降低 {slow}%，除非它也免疫减速。",
+        "spiritPack": "召唤一只灵魂美洲豹在你身边战斗，持续{duration}秒。它会奔向你的目标，每{every}秒撕咬一次，造成{min}到{max}点物理伤害，并会转而攻击你选中的其他敌人。若你没有选中敌人，它会攻击{range}码内离你最近的敌人。伤害随攻击强度或远程攻击强度（取较高者）提高，在召唤时确定。需要{range}码内的敌对目标。",
+        "seedburst": "在{range}码内的目标身上种下一颗种子。{delay}秒后，种子在目标所在处（或其死亡处）爆裂，对{radius}码内的每个敌人造成{damage}点自然伤害；若目标先行死亡，伤害提高{bonus}%（{empowered}）。伤害随法术强度提高，在种下时确定。若你在种子爆裂前死亡，种子会枯萎。",
+        "tether": "用锁链将你与{range}码内的一名友方玩家相连，持续{duration}秒。本应伤及其生命值的伤害中有{share}%改由你承受。你死亡时提前结束。需要以你之外的友方玩家为目标。",
+        "harvest": "在{duration}秒内，每有一个敌对生物在你{radius}码内死亡，就为你恢复{pct}%的最大生命值（{health}）和{pct}%的最大法力值。",
+        "quench": "在{duration}秒内，你接下来的{hits}次近战或远程武器命中额外造成{damage}点冰霜伤害。最后一次命中还会淬火目标，使其攻击速度降低{slow}%，持续{slowDuration}秒。效果结束时未用完的命中次数会失效。伤害随攻击强度或远程攻击强度中较高者提高。",
+        "heartNova": "消耗所有热量释放一道火焰新星，对 {radius} 码内的每个敌人每层热量造成 {perHeat} 点火焰伤害（{maxHeat} 层时为 {max} 点），并嘲讽其命中的每个生物。伤害随攻击强度提高。需要至少一层热量。",
+        "foremanShape": "化身工头之形，持续{duration}秒：你变成独眼巨人，以拳头作战，保留所有技能及其伤害。护甲提高{armorPct}%，且无法被击退。会使你解除坐骑。",
+        "musterStandard": "在脚下插下征召军旗。{duration}秒内，{soldiers}名征召士兵跟随在你身边，并与你的目标进行近战，每人每{every}秒造成{damage}点物理伤害。他们只攻击你的目标，且只在目标已进入战斗时出手。每人拥有你最大生命值的{hpPct}%。落后你超过{leash}码时，他们会立即回到你身边。军旗倒下或你死亡时，他们会离开。伤害随攻击强度或远程攻击强度中较高者提高，在插旗时确定。",
+        "gutteredGlare": "引导{duration}秒：一道{length}码长的光束从你面朝的方向射出，每{every}秒对路径上最多{max}个敌人造成{tick}点奥术伤害（整个引导期间对每个敌人共{total}点）。转身即可横扫光束；移动或施法会使其结束。伤害随法术强度提高。",
+        "grapnel": "用钩索钩住{range}码内你能看见的一名小队或团队成员，将其从空中拉到你身边，并在其落地时为其恢复{heal}点生命值。无法拉动敌人，也无法拉动在载具中、在船上、化作石像或被无法打破的效果控制的盟友。治疗量随治疗强度提高。"
       }
     },
     "questShare": {
@@ -3680,6 +4254,14 @@ export const zh_CN: EnTranslations = {
       "watchYouTube": "在 YouTube 观看",
       "streamerBadgeTitle": "认证主播"
     },
+    "buddyMenu": {
+      "rename": "重命名伙伴",
+      "nameLabel": "伙伴名字",
+      "autolootEnable": "开启自动拾取",
+      "autolootDisable": "关闭自动拾取",
+      "autolootHint": "你的伙伴会去拾取 30 码内属于你自己的尸体上的战利品。",
+      "cancel": "取消"
+    },
     "lootSettings": {
       "title": "拾取设置",
       "close": "关闭拾取设置",
@@ -3711,6 +4293,9 @@ export const zh_CN: EnTranslations = {
       "entryMismatchHeroic": "此副本的难度为英雄。使用“重置所有副本”以开始全新的普通难度副本。"
     },
     "bags": {
+      "membershipSlot": "会员背包栏位",
+      "membershipSlotLocked": "开通会员以解锁此背包栏位。",
+      "membershipSlotHint": "会员有效期间可额外装备一个背包。会员到期后，背包和物品会安全保留。",
       "cannotDestroy": "该物品无法销毁。",
       "rightClickDestroy": "右键单击以销毁",
       "dragEquipHint": "拖到角色身上以装备",
@@ -3835,6 +4420,24 @@ export const zh_CN: EnTranslations = {
       "collapseAbility": "收起{ability}",
       "abilityControlLabel": "{action}。{details}",
       "tooltipMeta": "{phase} | {difficulty}",
+      "dungeonButton": "首领指南：{dungeon}",
+      "dungeonBossesLabel": "地下城首领",
+      "dungeonSubtitle": "{dungeon} | {boss} | {difficulty}",
+      "rankMiniboss": "小首领",
+      "rankFinal": "最终首领",
+      "defeated": "已击败",
+      "browseBossDefeated": "查看 {boss}（已击败）",
+      "heroicHeading": "英雄难度的变化",
+      "tipsHeading": "职责建议",
+      "choicesHeading": "关键抉择",
+      "choiceGain": "收益",
+      "choiceRisk": "风险",
+      "markHeroicOnly": "仅限英雄",
+      "markHeroicChanged": "英雄难度有变化",
+      "damageCompare": "普通 {normal} | 英雄 {heroic}",
+      "damageRange": "{min} to {max}",
+      "finderOpen": "首领指南",
+      "finderOpenLabel": "打开 {boss} 的首领指南",
       "ignivar": {
         "overview": "瓦尔库尔将伊格尼瓦铸造成先驱、活体封印和通往内层坩埚的钥匙。这场战斗考验水渠控制、精确走位和快速集火优先目标。",
         "phaseOpeningName": "先驱苏醒",
@@ -4008,6 +4611,64 @@ export const zh_CN: EnTranslations = {
       }
     },
     "auraEffect": {
+      "wildheart": {
+        "packBond": "伙伴靠近时受到的伤害降低{pct}%。将驯兽师和他的美洲豹拉开即可打破羁绊。",
+        "packBondFury": "伙伴靠近时造成的伤害提高{pct}%。",
+        "stalked": "巨型美洲豹在追猎你，且无视嘲讽。每次撕咬造成{min}到{max}点物理伤害（英雄难度{heroicMin}到{heroicMax}点）并造成流血。把它引离它的主人。",
+        "waryStuns": "它已被击晕过一次。在此效果结束前，后续的击晕都会失效。",
+        "waryRoots": "它已被定身过一次。在此效果结束前，后续的定身都会失效。",
+        "warySlows": "它已被减速过一次。在此效果结束前，后续的减速都会失效。",
+        "pollinated": "触碰种荚会使其立刻长出荆棘幼芽。远离种子，让未授粉的玩家去踩碎它们；无人触碰的种荚会在{seconds}秒后发芽（英雄难度下它会在{heroic}秒后钻入地下，在最近的玩家身旁破土而出）。",
+        "prey": "祖尔加在追猎你。引他踏过点亮的太阳符文，使他减速{slow}%。若被他追上，你会被撕咬，受到{damage}点伤害（英雄难度{heroic}点）并被击倒{stun}秒。",
+        "avatar": "移动速度提高{pct}%，追猎它的猎物。减速和定身可以生效，击晕的持续时间减半。",
+        "vanished": "隐匿且免疫伤害。他即将扑向最远的玩家。"
+      },
+      "bastion": {
+        "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}点自然伤害，最多持续{seconds}秒。打断或击晕潮缚侍僧即可挣脱。",
+        "halberdWall": "另一名溺亡守望者在{radius}码内时，受到的伤害降低{pct}%。把它们分开。",
+        "fogShroud": "站在雾堤中时，受到的伤害降低{pct}%。把它拖出雾中。",
+        "carrionGlut": "吞噬死者（{stacks}/{max}层）：每层使灵魂释放的范围扩大{radius}码，伤害提高{pct}%。",
+        "snappedFetters": "它的锁链已断。它不再战斗，无法被伤害，并很快离开。",
+        "anchored": "被锁在溺亡之锚上：你可以移动，但无法远离绞盘，它会把你绞向溺亡深坑。走到距被钩住处至少{run}码的点亮系泊柱{reach}码以内即可系住锁链（该柱熄灭{dark}秒），或者让队友用{links}次攻击砸断锁链（英雄难度{linksHeroic}次）。掉进深坑会损失{pit}%的最大生命值（英雄难度{pitHeroic}%）。"
+      },
+      "crypt": {
+        "carrionEye": "战斗中的所有乌鸦都会追猎你，持续{seconds}秒。跑向你的坦克，让队伍一起消灭鸦群。",
+        "graniteSkin": "受到的伤害降低{pct}%，石层每{every}秒增厚一次，最多{max}层。击晕会将其击碎，使其在{seconds}秒内受到的伤害提高{cracked}%。",
+        "measured": "此效果结束时，一座敞开的坟墓会在你所站之处塌陷：对{radius}码内的所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。坟墓会在整场战斗中保留，所以把印记带到墓园边缘，远离队伍。",
+        "graveDirt": "站在敞开的坟墓中：移动速度降低{slow}%，每秒受到{damage}点暗影伤害（英雄难度{heroic}点）。英雄难度下，在坟墓中停留{linger}秒会唤起一具不安之骨。离开坟墓。",
+        "dirtInEyes": "移动速度降低{pct}%。一铲坟土会击中司事马罗身前的所有人：站到他身后。",
+        "blow": "受到的伤害提高{pct}%：每层{per}%，当前{stacks}/{max}层。每次掘墓人重击都会增加一层，并将持续时间重置为{seconds}秒。",
+        "graveVigor": "站在敞开的坟墓中时攻击速度提高{pct}%。别让他待在坟墓里。",
+        "tolling": "他大步走向钟绳并敲响葬钟时免疫伤害。钟声结束时，丧钟对所有人造成{min}到{max}点暗影伤害（英雄难度{heroicMin}到{heroicMax}点），并且每座敞开的坟墓都会爬出一具不安之骨。",
+        "embraced": "被夫人举在半空：无法行动，每秒受到{tick}点冰霜伤害（英雄难度{tickHeroic}点）。如果你的队伍打掉她{share}%的最大生命值（英雄难度{shareHeroic}%），她会把你轻轻放下；如果她在高处抓住你{hold}秒，就会把你扔到冰面上，造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。",
+        "lament": "新娘的哀歌结束时，对所有不在点亮的墓灯{radius}码内的人造成{min}到{max}点冰霜伤害（英雄难度{heroicMin}到{heroicMax}点）。每盏灯只庇护离它最近的{cap}名玩家，然后熄灭并错过下一次哀歌。",
+        "lingering": "你承受的下一次新娘的哀歌伤害提高{pct}%：每层{per}%，最多{max}层。下一次请在墓灯光芒中承受。",
+        "slippery": "在光滑的冰面上：你的速度每秒最多改变{grip}码/秒，所以起步缓慢，停下时会继续滑行，转向时会甩出大弧线。离开冰面就能重新站稳。",
+        "harmony": "受到的伤害降低{pct}%：她每有一名存活的唱诗者就降低{per}%。先杀死唱诗者。",
+        "crescendo": "唱得更快：空洞挽歌只需{cast}秒（原为{castNormal}秒），每{every}秒一次（原为{everyNormal}秒），骨管风琴会奏出{waves}波音符（原为{wavesNormal}波）。",
+        "gorged": "造成的伤害提高{pct}%：每个抵达他身边的缚魂提高{per}%，当前{stacks}/{max}层，持续到战斗结束。每个抵达的灵魂还会为他恢复{heal}%的最大生命值。站到灵魂的路径上，就能由你代为承受。",
+        "unquietWard": "他在祭坛引导不宁者仪式时免疫伤害：已重燃{lit}/{total}根追思蜡烛。重燃一根需要引导{channel}秒，期间每秒吸取点燃者{drain}%的最大生命值（英雄难度{drainHeroic}%）；受到攻击不会打断，移动或昏迷会打断。最后一根蜡烛会击碎结界。英雄难度下，须按名册点出的顺序点燃：点错蜡烛会熄灭最后点燃的那根，并对点燃者造成{wrongMin}到{wrongMax}点暗影伤害。",
+        "riteBroken": "昏迷：破碎的结界让他{seconds}秒内无法行动。",
+        "shatteredWard": "{seconds}秒内受到的伤害提高{pct}%：重燃的蜡烛击碎了他的结界。现在就打出最强的攻击。",
+        "graveChill": "不宁者仪式持续期间，每秒受到{bite}点暗影伤害（英雄难度{biteHeroic}点），每{every}秒提高{step}点（英雄难度{stepHeroic}点）。重燃追思蜡烛来终结它。",
+        "graspMark": "{fuse}秒后，你脚下的法环中会伸出鬼手：法环落下处{radius}码内的所有人被定身{root}秒，并受到{min}到{max}点暗影伤害。离开法环。",
+        "graspRoot": "被坟墓之手抓住：{seconds}秒内无法移动。",
+        "knellAirborne": "在仪式之环上空飞行，无法触及。它会标记半个法环{mark}秒，然后向那一半倾泻幽魂之火：对其中所有人造成{min}到{max}点火焰伤害。每次飞行焚烧{breaths}个半区，然后降落。"
+      },
+      "sanctum": {
+        "lockbound": "受到的伤害降低{pct}%：每条仍然完好的锁链提供{per}%。打破一个封印镣铐即可让其锁链脱落。",
+        "enrage": "造成的伤害提高{pct}%。",
+        "grasp": "站在融水中，造成的伤害提高{pct}%。如果它死在融水中，会沉下并在{seconds}秒后再次复生；在寒冰上击杀它才能让它不再起来。",
+        "twiceWoken": "从融水中再次复生，造成的伤害提高{pct}%。",
+        "doused": "他脚下的冰板碎裂，淬火之水扑灭了他的墓场炼狱。",
+        "airborne": "身在空中，无法被攻击。他会以坠击降落落在站人最多的冰板上，对{radius}码内的所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点）。",
+        "wyrmsEye": "此效果结束时，科祖尔会向你所在的整块冰板倾泻俯冲烈焰：对其上所有人造成{min}到{max}点伤害（英雄难度{heroicMin}到{heroicMax}点），冰板开裂，若已开裂则碎裂。站在完好的冰面上，远离队伍。",
+        "quenchWater": "身处开阔的淬火之水：移动速度降低{slow}%，每秒受到{damage}点灼烧伤害（英雄难度{heroic}点）。游向任意冰板或岸边。",
+        "shardFlare": "心之碎片闪耀：墓穴吐息每{breath}秒一次，振翼狂风每{gale}秒一次。",
+        "branded": "每{interval}秒造成{value}点{school}伤害，持续{seconds}秒。踏入融水池可立即将其浇灭。",
+        "creepingRime": "移动速度降低{pct}%，每层{per}%。每次霜凇吐息都会叠加一层并将持续时间重置为{seconds}秒。叠到{max}层时你会被冻结（冰封）{freeze}秒，并清除所有层数。",
+        "icedOver": "被蔓延霜凇冻结：无法移动或行动。"
+      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -4052,6 +4713,8 @@ export const zh_CN: EnTranslations = {
       "cooldownCap": "此时间窗已使用 {used}/{cap} 秒冷却缩减",
       "bruinRushWindow": "豹形态无需法力，并钉制你的巨熊冲锋目标，使其减速 {pct}%，持续 {sec} 秒",
       "funeralHarvestLock": "葬礼收割暂时无法再次生成灵魂碎片",
+      "effigyPlankHide": "挡掉每次攻击的 {pct}%，直到碎晶长矛的突刺熄灭它眼中的灯笼",
+      "effigyLanternOut": "对你而言，稻草工头的灯笼已经熄灭：你和你宠物的攻击无视其木板之皮，全额命中",
       "leadenHexLock": "铅沉妖术暂时无法再次定身此目标",
       "forbiddenReflectionReady": "下一个符合条件的术士冷却技能可再次施放",
       "forbiddenReflectionLock": "禁忌映像暂时无法再次准备",
@@ -4108,8 +4771,8 @@ export const zh_CN: EnTranslations = {
       "nextAttackCrit": "下一次攻击必定暴击",
       "healEcho": "生命值低于 {threshold}% 时恢复 {value} 点生命值",
       "trinket": {
-        "lastStandCooldown": "堡垒徽印的最后堡垒护盾已被使用。在此效果结束前，生命值低于 {threshold}% 时无法再次触发。",
-        "lastBastion": "吸收 {value} 点伤害。你在生命值低于 {threshold}% 时受到伤害，堡垒徽印为你升起了此护盾。",
+        "lastStandCooldown": "你的防护护盾已经触发。在此效果结束前，生命值低于{threshold}%时受到伤害也无法再次生成护盾。",
+        "lastBastion": "吸收{value}点伤害。你在生命值低于{threshold}%时受到伤害，触发了饰品的护盾。",
         "retaliate": "直接击中你的敌人会受到相当于该次攻击令你损失生命值 {pct}% 的物理伤害。周期性伤害不会触发此效果。",
         "moored": "你受到的伤害降低 {reduction}%，但移动速度变为 {speed}%。你无视昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械、失去行动能力效果和击退。",
         "hourglassStored": "储存了来自你过量治疗的 {stored} 点治疗量。使用愈者沙漏可将其转化为护盾，施加于 {range} 码内生命值百分比最低的队伍成员（包括你自己）。",
@@ -4130,6 +4793,16 @@ export const zh_CN: EnTranslations = {
         "riftGuard": "你受到的伤害降低 {pct}%。",
         "sprint": "移动速度提高 {pct}%。不与其他速度提高效果叠加。",
         "brand": "受到的治疗效果降低 {pct}%。",
+        "shackle": "被锁链束缚：无法移动。",
+        "shackleSlow": "锁链缠身：移动速度降低 {pct}%。",
+        "spiritPack": "一只灵魂美洲豹在你身边战斗，每{every}秒撕咬你的目标一次，造成{min}到{max}点物理伤害。",
+        "seedburst": "噬花的种子。此效果结束时爆裂，对{radius}码内的每个敌人造成{damage}点自然伤害；若此敌人在此之前死亡，伤害提高{bonus}%（{empowered}）。",
+        "tether": "被工头的最后一环锁住：本应伤及你生命值的伤害中有{pct}%改由锁住你的人承受。",
+        "tetherLink": "你承受被锁住的盟友本应受到的伤害的{pct}%。",
+        "harvest": "每有一个敌对生物在你{radius}码内死亡，就为你恢复{pct}%的最大生命值和法力值。",
+        "quench": "你接下来的{stacks}次武器命中额外造成{damage}点冰霜伤害。最后一次命中使目标的攻击速度降低{slow}%。",
+        "quenchOther": "接下来的{stacks}次武器命中造成额外冰霜伤害。最后一次命中使目标的攻击速度降低{slow}%。",
+        "quenched": "攻击速度降低 {pct}%。",
         "forgeHeat": "热量：{stacks}/{max}。使用熔铸之父的淬火会消耗所有热量，使其武器火焰伤害提高 {pct}%。",
         "tempered": "你的近战和远程武器命中额外造成 {damage} 点火焰伤害（消耗的热量使其提高 {pct}%）。每次致命一击延长 {killExtend} 秒，总计最多 {maxDuration} 秒。",
         "temperedOther": "近战和远程武器命中额外造成火焰伤害，消耗的热量使其提高 {pct}%。伤害随攻击强度或远程攻击强度中较高者提高。",
@@ -4138,6 +4811,10 @@ export const zh_CN: EnTranslations = {
         "moltenIgnite": "每 {every} 秒造成 {damage} 点火焰伤害。新的武器暴击会刷新该效果。",
         "pierce": "你的自动攻击、射击和物理技能（流血除外）命中还会打击距离你的目标最近的、{reach} 码内的一个敌人，造成所造成伤害的 {pct}%。",
         "lantern": "任何人对提灯 {radius} 码内的你或队伍成员施放的直接治疗，还会以该治疗量的 {pct}% 治疗灯光中受伤最重的另一名队伍成员。",
+        "foremanShape": "你就是工头：护甲提高{armorPct}%，免疫击退。",
+        "musterStandard": "你的征召军旗已插下。士兵们跟随你，并与你的目标作战。",
+        "gutteredGlare": "光束每{every}秒对路径上的敌人造成{tick}点奥术伤害。移动或施法会使其结束。",
+        "stoneStatue": "已化作石像：免疫伤害且无法行动。你将以最大生命值的{pct}%恢复。",
         "crucibleHeat": "热量：{stacks}/{max}。使用熔炉之心可消耗所有热量释放一道火焰新星，对 {radius} 码内的每个敌人造成 {damage} 点火焰伤害，并嘲讽其命中的每个生物。",
         "crucibleHeatOther": "热量：{stacks}/{max}。熔炉之心会消耗所有热量在 {radius} 码内释放一道火焰新星，每层热量都会提高火焰伤害，并嘲讽其命中的每个生物。"
       },
@@ -4173,6 +4850,7 @@ export const zh_CN: EnTranslations = {
       "dodge": "躲闪几率提高 {pct}%",
       "dodgeReduce": "躲闪几率降低 {pct}%",
       "damageReduction": "受到的所有伤害降低 {pct}%",
+      "slumber": "沉睡至黎明。无法被攻击，任何人都无法将其唤醒。",
       "guardianWard": "下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%",
       "armorFlat": "护甲降低 {value}",
       "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
@@ -4250,7 +4928,9 @@ export const zh_CN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}在荆峰高地崛起！"
+      "spawn": "{name}在{zone}上空崛起！",
+      "wake": "{name}在{zone}上空苏醒！",
+      "sleep": "{name}沉睡至黎明。"
     },
     "auth": {
       "appleLoginCta": "通过 Apple 继续",
@@ -4315,7 +4995,8 @@ export const zh_CN: EnTranslations = {
         "foodVendor": "食物和饮料商人",
         "potionVendor": "药水商人",
         "stableMaster": "马厩管理员",
-        "generalGoods": "杂货商人"
+        "generalGoods": "杂货商人",
+        "innkeeper": "旅店老板"
       }
     },
     "mobTooltip": {
@@ -4395,10 +5076,12 @@ export const zh_CN: EnTranslations = {
         "menu": "菜单",
         "minimap": "小地图",
         "stanceBar": "姿态栏",
+        "shardpikeBar": "碎晶长矛栏",
         "xpBar": "经验条",
         "chat": "聊天",
         "actionBarGroup": "动作条组",
         "playerFrame": "玩家",
+        "playerResource": "资源条",
         "targetFrame": "目标",
         "partyFrames": "队伍",
         "swingBar": "自动攻击",
@@ -4412,6 +5095,7 @@ export const zh_CN: EnTranslations = {
         "deedTracker": "功绩追踪器",
         "delveTracker": "探秘追踪器",
         "riftTracker": "裂隙追踪器",
+        "dungeonTracker": "地下城追踪器",
         "swingBarOffhand": "副手",
         "unitTooltip": "提示框"
       },
@@ -5016,6 +5700,32 @@ export const zh_CN: EnTranslations = {
       "vaultCannotDeposit": "无法存入材料仓库",
       "tabsAria": "银行标签页",
       "personalTab": "个人",
+      "accountTab": "其他角色",
+      "accountArmour": "领取会员装备",
+      "referralArmour": "领取友谊护甲",
+      "accountMembership": "会员有效期间，可在此访问您其他角色的银行。",
+      "accountCharacters": "角色银行",
+      "accountEmpty": "创建另一个角色后，即可在此使用该角色的银行。",
+      "accountSelect": "选择一个角色以加载其银行。",
+      "accountUnavailable": "此银行暂不可用。请重新选择该角色以刷新。",
+      "accountLoading": "正在加载你的角色…",
+      "accountOpening": "正在打开{name}的银行…",
+      "accountOnline": "{name}正在游戏中。请让该角色下线后再在此打开其银行。",
+      "accountBusy": "银行正忙，请稍后再试。",
+      "accountNoFit": "没有空间放下这堆物品。",
+      "accountStale": "这堆物品在移动前发生了变化，请重试。",
+      "accountTooLarge": "{name}的银行过大，无法在此打开。请登录{name}使用。",
+      "accountRetry": "重试",
+      "accountBankTitle": "{name}的银行",
+      "accountBagsTitle": "你的背包",
+      "accountSlots": "{used} / {total} 格",
+      "accountWithdrawLead": "点击物品将其移入你的背包。",
+      "accountDepositLead": "点击物品将其送入{name}的银行。",
+      "accountBankEmpty": "此银行是空的。",
+      "accountBagsEmpty": "你的背包是空的。",
+      "accountDepositHint": "点击将此堆物品存入所选角色的银行。",
+      "accountWithdrawHint": "点击将此堆物品取出到您的背包。",
+      "accountBound": "灵魂绑定、已锁定及任务物品无法在角色间转移。",
       "guildTab": "公会",
       "guildCapacityAria": "公会银行格已用：{used}/{total}",
       "guildEmpty": "公会银行是空的。",
@@ -5085,6 +5795,192 @@ export const zh_CN: EnTranslations = {
       "logOpenBank": "{actor} 花费 {amount} 开启了公会银行",
       "logCharterFee": "{actor} 支付了 {amount} 的公会创建费用",
       "logAdminPurge": "管理员移除了 {count} 个 {item}"
+    },
+    "collections": {
+      "title": "狩猎",
+      "close": "关闭狩猎",
+      "keybindLabel": "狩猎",
+      "launcherTitle": "狩猎：伙伴、坐骑与套装",
+      "tabs": {
+        "buddies": "伙伴",
+        "mounts": "坐骑",
+        "sets": "Item Sets"
+      },
+      "state": {
+        "owned": "已收集",
+        "notOwned": "未收集",
+        "unavailable": "尚无法获得",
+        "pending": "有什么在跟着你"
+      },
+      "presenceDefault": "你感觉到有什么在注视着你。",
+      "revealed": "{name}决定跟随你。",
+      "cosmeticUnlocked": "{name}的新外观：{look}。",
+      "presence": {
+        "ember_fox": "有个温暖的小东西正轻手轻脚地跟在你身后。",
+        "moss_hare": "泥炭里的一阵窸窣声与你的脚步保持着同步。",
+        "frog": "你每走一步，就有一声湿漉漉的蛙鸣回应。",
+        "crimson_claw_crab": "视线之外有什么东西咔嗒作响地爬来爬去。",
+        "golden_sentinel": "草丛中有一抹微弱的金光在注视着你。",
+        "nightfang": "无声的脚爪在你看不见的地方尾随。",
+        "tuskhorn_boar": "一声哼鼻、一记跺脚：有个倔强的家伙正跟着你。",
+        "emerald_wolf": "灌木丛中一双绿眼睛眨了眨，然后跟了上来。",
+        "tiger": "你的视野边缘有条纹在晃动。",
+        "cate_coin": "你听到一枚不属于你的硬币发出微弱的响声。",
+        "alon": "你感到被注视着，还被默默地赞许着。",
+        "trollface": "在你身后的某处，有什么东西正咧嘴笑着。",
+        "ansem": "关于门与黑暗的低语跟随着你。",
+        "triple_t": "本该只有一个脚步声的地方，响起了三个。",
+        "kekius": "一声压抑的笑声沿着路尾随着你。",
+        "solbot": "一阵轻柔的滴答声与你的步伐合拍。",
+        "frostfire": "蒸汽与寒霜在你身后盘旋。",
+        "rocky": "你身后的碎石在没有风的情况下移动了。",
+        "proud_grunt": "你身后某处，一只军靴跺脚立正。",
+        "loot_goblin": "有什么东西正小声数着你的钱币。",
+        "penny_goldspark": "不属于你的口袋里，小工具叮当作响。",
+        "stag": "一道长着鹿角的影子横过你的路。",
+        "alpaca": "有个毛茸茸、不慌不忙的家伙决定跟你走。",
+        "horse": "身后某处，马蹄正踏着从容而耐心的节拍。",
+        "sapling": "细小的树根在你身后轻快地踏过，拨动了落叶。",
+        "bull": "一声低沉的喘息扬起了你身后的尘土。",
+        "spider": "一缕蛛丝拂过你的肩膀。",
+        "raptor": "你脚跟后有敏捷的爪子在石头上嗒嗒作响。",
+        "skeleton": "干枯的骨头随着你的脚步咔咔作响。",
+        "crystal_lich": "一阵寒冷的嗡鸣从残骸中升起，它正注视着你。",
+        "forgemaw": "熔炉的热度还没有离开你。有什么东西随之走了出来。",
+        "sprites": "两簇小火苗沾上了你，而且不会熄灭。",
+        "crystal_tide": "一滴海水拒绝从你的钓线上落下。",
+        "phantom": "你身后的空气静得有些过分。",
+        "emberfall_phoenix": "一股如同封火般的暖意落在你的背后。"
+      },
+      "cosmetic": {
+        "crystal_lich_frostbound": "霜缚",
+        "crystal_lich_voltaic": "雷光",
+        "forgemaw_ashen": "灰烬",
+        "forgemaw_whitehot": "白热",
+        "stag_acorn": "橡果之冠",
+        "stag_gilded": "镀金",
+        "moss_hare_verdant": "青翠",
+        "proud_grunt_warlord": "战争领主",
+        "frog_sapphire": "蓝宝石蛙"
+      },
+      "actions": {
+        "summon": "召唤",
+        "dismiss": "解散",
+        "wear": "穿戴",
+        "remove": "卸下"
+      },
+      "looks": {
+        "title": "外观",
+        "unlocked": "已解锁",
+        "locked": "未解锁",
+        "worn": "穿戴中",
+        "none": "这个伙伴还没有可用的外观"
+      },
+      "source": {
+        "bossLabel": "首领宠物",
+        "bossDrop": "{mob}（{location}），每次击杀每位玩家{chance}%",
+        "bossDropWithHeroic": "{mob}（{location}），每位玩家{chance}%，英雄难度{heroicChance}%",
+        "bossDropHeroicOnly": "{mob}（{location}），仅限英雄难度，每位玩家{chance}%",
+        "rollNote": "每位玩家单独掷骰；不会有人因队友而失去机会。",
+        "deedLabel": "获取途径",
+        "deed": "功绩：{deed}",
+        "challengeLabel": "挑战",
+        "challengeSpeed": "在开怪后{seconds}秒内击败{mob}",
+        "challengeDps": "在整场战斗中对{mob}保持每秒{dps}点伤害",
+        "craftLabel": "制作",
+        "craft": "{item}（{profession}配方）",
+        "grantLabel": "颁发",
+        "grantOnly": "赛季奖励：每月天梯与最高战斗记录奖励",
+        "tokenLabel": "凭证",
+        "token": "{item}，使用一次即可让伙伴跟随"
+      },
+      "buddyLore": {
+        "ember_fox": "出自东溪谷树篱间的母狐，得名于冬日枯丛中透出的炭红皮毛。那里的猎人几代之前就不再打幼崽的主意，改成替它们留下食物。",
+        "moss_hare": "柳泽沼地的野兔，一辈子卧在湿泥炭里，长出了一身绿毛。沼泽的草药师视它们为吉兆，绝不肯把落在门前的赶走。",
+        "frog": "泥沼湿地把它们养得肥壮而无忧无虑，整夜在苇丛里高歌。沼泽向导都赌咒说，船上载着一只就绝不会搁浅。",
+        "crimson_claw_crab": "远岸的潮间蟹，离水许久之后钳子依旧通红。当年码头工人常让它们在跳板上赛跑赌钱。",
+        "golden_sentinel": "琥珀秋境的守望甲虫，被自己长大的那片树脂镀成了金色。这名字比树脂更古老：早在有人想到装取树液之前，就已有某种哨兵守着那些林子了。",
+        "nightfang": "夜绽花野的年轻猎手，即便以同类的标准衡量也安静得出奇。它跟着人只为作伴，猎物从不比飞蛾更大。",
+        "tuskhorn_boar": "荆峰高地的种，被牧人刻意育成短腿，图的是一头拱不倒篱笆的野猪。脾气倒是原封不动地留下来了。",
+        "emerald_wolf": "一只怨灵林的幼狼，皮毛在几乎照不到林底的树冠余光里泛着绿色。守林人会把森林留下的每一只孤儿养大。",
+        "tiger": "一身棕榈湾的斑纹，长在一头从没见过棕榈湾的兽身上：自从旧日兽苑关闭，这一支血脉便一直圈养至今。它只听哨声，此外什么也不应。",
+        "cate_coin": "一只猫，绝不肯离开自己屁股底下那枚钱币，也从没人见它吃过东西。东溪谷的商人至今还在争论：这两者到底哪一个才是宠物。",
+        "alon": "一位旅人的吉祥物，来自任何地图都不肯承认的道路，总在计划出岔子的地方现身。它看着，它点头，然后什么忙也不帮。",
+        "trollface": "怨灵林放出来、又不肯收回去的一张咧嘴笑脸。每一次试图描述它的尝试，都以描述者自己笑场放弃告终。",
+        "ansem": "它谈论门扉与黑暗，再问就不肯多说了。夜绽花野的信徒声称它属于他们；可每逢他们举行仪式，它就溜走了。",
+        "triple_t": "某样东西的三份，或是同一样东西重复三遍。各家说法互相矛盾，而这生物又从不肯老实待着让人数清。",
+        "kekius": "一位来历不明的欢笑同伴，被疾风崖的赛马场收作吉祥物。发誓靠它转运的马厩换了四家，它还在。",
+        "solbot": "一具以阳光为食的小型自动机，从龙裔荒原的火山灰里半埋着挖出来时仍在走动。造它的作坊没在外壳上留下任何印记。",
+        "frostfire": "生于霜幕之境一处温泉涌出冰原的地方，它始终没弄明白自己属于哪一半。冷天里冒着热气，暖处又直打哆嗦。",
+        "rocky": "荆峰高地碎石坡上的石壳爬行者，行动迟缓，且彻底心无挂碍。矿工养着它们，是因为它们总在塌方前一瞬静止不动。",
+        "proud_grunt": "战备仓库的一名老兵，敬礼保住了，军衔丢了。战帅德拉文·科尔会把这样一位交给任何一个荣誉足以懂得那代价的士兵。",
+        "loot_goblin": "它跟着每一个身上带着英雄徽记的人，却一次也没被抓到偷东西。军需官维克斯坚称，这压根说明不了任何问题。",
+        "penny_goldspark": "一位侏儒工匠的学徒，按小时收费，而且每一枚铜板都物有所值。护甲匠霍德当年为抵一笔债收下了她，如今谁揣着一千金，他就把这份差事卖给谁。",
+        "stag": "常青园的血脉，由守林人昔日骑乘的巨鹿一代代选育而来。有人抬手，它仍会低下头——那是比这头鹿本身更古老的习惯。",
+        "alpaca": "疾风崖的牧群养它们既为羊毛，也为脾气：暴风雨里没有比它更镇定的。这一只每趟旅程恰好会朝一个人吐口水。",
+        "horse": "东溪谷矮马血统，为果园小径特意培育得矮小，也从没人告诉它自己不是战马。它在你肩旁保持步调，谁曾喂过它一个苹果，它就会跟谁走。",
+        "sapling": "一株树皮上带着笑容、紫色眼睛里满是好奇的小树。无论你走到哪里，它都会迈着树根，欢快地摇摇摆摆跟上。",
+        "bull": "一头狗一般大的东溪谷公牛，这也是唯一让人肯把它养在屋里的理由。可脾气并没跟着一起缩小。",
+        "spider": "怨灵林的织网者，巴掌大小，会把任何装着它的背包重新布置一遍。那些蛛丝比它替换掉的线还结实。",
+        "raptor": "龙裔荒原的雏龙种，还没学会自己能跑多快就被转手卖掉。每一位新主人都被叮嘱要喂饱它，而没有一个需要被叮嘱第二遍。",
+        "skeleton": "它从怨灵林的古冢里爬出来，掸了掸自己身上的土，从此就跟着人走。这副骨头当初是谁的，至今没人查清。",
+        "crystal_lich": "尼思拉克西斯本体的一枚碎片，至今仍鸣响着塑成它的那股寒意。谁把它从团队副本的残骸里拽出来，它就听谁的——而且始终没有原谅那个人。",
+        "forgemaw": "在最后泉源熔炉中锻造，却始终没有真正完工——锤声未歇，它便自己走出了伊格尼瓦的铸场。只有英雄难度的下潜才能找到它：这熔融之物总会回到造出它的那座炉子，然后跟着两度熬过烈火的人回家。",
+        "crystal_tide": "一只乘着自己那滴海玻璃的潮汐精灵，被从东溪谷到远岸只想钓顿晚饭的渔人从静水里勾了上来。它把捞起它的那捧水一直带在身边，怎么劝也不肯回去。",
+        "sprites": "两只小小的火精，一金一青，总也说不好谁该打头。靠得够近时，它们会融成一团绿焰，随后又笑着分开。",
+        "phantom": "来自怨灵林古冢的巴掌大幽魂，只有一层布、没有骨头，会出现在一个明明合好的背包里，然后为了作伴留下来。没人弄清它想要什么，而它一次也没试过吓唬谁。",
+        "emberfall_phoenix": "每逢秋天它便燃尽成一粒余烬，到了春天又从自己的灰里重新升起——关于它，谁也说不出更多了。从没有人找到过它的巢，也从没有人捉到过同一只两次。"
+      },
+      "petKind": {
+        "beast": "野兽",
+        "elemental": "元素生物",
+        "humanoid": "人型生物",
+        "undead": "亡灵",
+        "celebrity": "名流"
+      },
+      "armor": {
+        "cloth": "布甲",
+        "mail": "Mail",
+        "leather": "皮甲"
+      },
+      "stat": {
+        "intellect": "智力",
+        "agility": "敏捷",
+        "strength": "力量",
+        "mixed": "混合"
+      },
+      "set": {
+        "owned": "{total} 件中已收集 {owned} 件",
+        "itemLevel": "装等 {level}",
+        "bonusLabel": "{pieces} 件套"
+      },
+      "detail": {
+        "dropLabel": "掉落自",
+        "vendorLabel": "Sold by",
+        "bindLabel": "绑定",
+        "sellLabel": "商人收购价",
+        "marketLabel": "世界市场",
+        "exchangeLabel": "$WOC 交易所",
+        "setLabel": "已收集",
+        "drop": "{mob}（{location}），每次击杀 {chance}%",
+        "heroicDrop": "{mob}（{location}），仅限英雄难度，每次击杀 {chance}%",
+        "dropWithHeroic": "{mob}（{location}），每次击杀 {chance}%，英雄难度 {heroicChance}%",
+        "globalDrop": "任意敌人，每次击杀 {chance}%，同稀有度 {count} 件中的一件",
+        "fishingDrop": "任意水域钓鱼，每次上钩 {chance}%",
+        "vendor": "{npc} ({location}) for {price}",
+        "honorPrice": "{amount} 荣誉",
+        "marksPrice": "{amount} 英雄徽记",
+        "noSource": "游戏中尚无获取途径",
+        "noItem": "尚无物品可以获得",
+        "tradeable": "可交易",
+        "soulbound": "灵魂绑定",
+        "noSell": "无法出售",
+        "marketAtMerchant": "在商人处查看",
+        "marketChecking": "查询中…",
+        "marketNone": "无上架",
+        "exchangeNone": "无上架",
+        "exchangeUnavailable": "此客户端不支持"
+      }
     },
     "calendar": {
       "title": "活动日历",
@@ -6009,6 +6905,12 @@ export const zh_CN: EnTranslations = {
       "acceptedWait": "等待其他人确认..."
     },
     "finder": {
+      "groups": "队伍",
+      "dungeonGuide": "地下城指南",
+      "backToGroups": "返回队伍",
+      "createGroup": "创建队伍",
+      "cancelCreate": "取消",
+      "activeQueue": "你的队列",
       "title": "地下城查找器",
       "close": "关闭",
       "back": "返回",
@@ -6050,6 +6952,9 @@ export const zh_CN: EnTranslations = {
       "blockedLevel": "仅限等级 {min} 至 {max}",
       "blockedSpec": "需要选择专精",
       "yourRoles": "你的职责",
+      "yourRole": "你的职责",
+      "createQueueLocked": "发布前请先退出匹配。",
+      "noCreateActivities": "此类别没有符合条件的活动。",
       "needsSpec": "选择一个专精才能使用地下城查找器。",
       "leaderNote": "只有队长才能为队伍排队。",
       "chooseActivities": "选择活动",
@@ -6089,12 +6994,90 @@ export const zh_CN: EnTranslations = {
       "tagFullClear": "全通",
       "tagLearning": "欢迎新手",
       "tagFastRun": "速通",
+      "tagGuildOnly": "公会队伍",
+      "guildPartyToggle": "公会队伍",
+      "guildPartyHint": "仅限{guild}的成员申请。",
+      "guildPartyNeedsGuild": "加入公会后才能创建公会队伍。",
+      "guildPartyNote": "公会队伍只接受队长所在公会的成员。",
+      "guildPartyBadge": "仅限{guild}",
+      "guildPartyLocked": "仅限公会成员",
+      "filterContent": "内容",
+      "filterAll": "全部内容",
+      "filterDungeons": "地下城",
+      "filterRaids": "团队副本",
+      "filterEmpty": "没有符合此筛选条件的招募。",
+      "postHeading": "宣传你的队伍",
+      "postGeneral": "发布到综合频道",
+      "postDiscord": "发布到Discord",
+      "postReadyIn": "{minutes}分钟后可用",
+      "postDiscordOffline": "仅限在线游戏",
+      "inspect": "查看",
+      "inspectApplicantAria": "查看{name}",
+      "partyHeading": "带上你的队伍",
+      "partyNote": "你的队伍会加入这个团队。为每位成员选择职责，或保留其自己的职责。",
+      "partyRolesHeading": "队伍职责",
+      "partyRolesNote": "为每位成员选择职责，或保留其自己的职责。",
+      "partyRoleOwn": "由其自选",
+      "partyRoleAria": "{name}的职责",
+      "partyMemberMeta": "{level}级{cls}",
+      "difficultyHeading": "难度",
+      "showGuide": "显示攻略",
+      "hideGuide": "隐藏攻略",
+      "levelUnavailable": "超出你的等级范围",
+      "guideUnavailable": "此场首领战暂无详细攻略。",
+      "guide": {
+        "pulse": "定期对首领附近的玩家造成伤害。远程输出和治疗者可以保持距离以减少受到的伤害。治疗者应准备为近战范围内的玩家恢复生命值。",
+        "cleave": "近战攻击也会伤害当前目标附近的其他玩家。与坦克保持距离；仅站在首领身后无法躲避这种溅射伤害。",
+        "adds": "战斗过程中会有援军到来。坦克应在它们接近治疗者前接住它们。输出者应协助清理，避免队伍同时应对多波敌人。",
+        "enrage": "生命值较低时，首领的攻击速度和伤害都会提高。将防御和治疗大招留到最后阶段，并在处理其他机制的同时结束战斗。",
+        "stomp": "周期性的重踏会伤害附近玩家并使其短暂昏迷。治疗者和远程玩家应保持距离。重踏前确保坦克生命值充足，因为附近队友在昏迷期间可能无法行动。",
+        "inferno": "首领停止移动和攻击，持续引导威力递增的火焰脉冲。引导开始后立即远离首领，结束后再返回。在火焰范围内分散站位无法保护你。",
+        "mending": "定期治疗附近受伤的盟友，包括施法者自身。集中攻击治疗者，避免将更多敌人引入其治疗范围。这是瞬发效果，无法通过打断施法来阻止。",
+        "manaBurn": "命中的近战攻击可能吸取使用法力的目标的法力值。不要让首领攻击治疗者和其他脆弱的施法者。使用怒气和能量的角色不会因该效果损失资源。",
+        "mortalWound": "近战命中可能降低目标受到的治疗效果。伤口持续期间使用防御技能；治疗者需要投入更多治疗才能恢复相同的生命值。",
+        "bleed": "近战命中可能造成流血，持续伤害受害者。即使敌人更换目标，也要关注受伤的玩家，并在流血期间为其恢复生命值。",
+        "haste": "定期提高附近盟友的攻击速度。避免在兽王附近引来额外的敌群；多个敌人获得此效果时，准备好防御技能。",
+        "ward": "定期为附近盟友提供吸收伤害的护盾。全队集中攻击同一目标，击破护盾并在下一次护盾出现前将其击败，避免将伤害分散到整群敌人身上。",
+        "knockback": "近战命中可能击退目标。为坦克身后留出安全空间，避免站在尚未交战的敌人附近，并准备在被击退后重新进入近战范围。"
+      },
       "mech": {
         "shadow_pulse": "暗影脉冲（周期性范围伤害）",
+        "crypt_shovelful": "一铲坟土（每11秒他向身前8码锥形区域扬起坟土：造成他普通攻击1.5倍的伤害，并使移动速度降低50%，持续6秒，所以站到他身后）",
+        "crypt_measured_for_the_grave": "量身定墓（每15秒他标记一名非坦克玩家；4秒后脚下塌出一座敞开的坟墓，普通难度下对3码内造成42到52点伤害，坑会在整场战斗中保留：在其中每秒受到9点伤害且移动速度降低40%，所以把坟墓留在墓园边缘）",
+        "crypt_burial_toll": "葬礼丧钟（生命值降到66%和33%时，他大步走向钟绳，免疫伤害，摇钟3秒：普通难度下对所有人造成30到38点暗影伤害，并且每座敞开的坟墓都会爬出一具不安之骨）",
+        "crypt_marrow_heroic": "英雄：掘墓人重击，每9秒打击坦克（每层使其受到的伤害提高6%，持续20秒，最多6层）；坟墓之力（他站在坟墓里时攻击速度提高30%）；不宁之土（任何人在坟墓里停留2秒，就会在那里爬出一具不安之骨）",
+        "crypt_brides_lament": "新娘的哀歌（每22秒一次3秒的哀嚎：普通难度下对所有不在点亮的墓灯光芒中的人造成60到75点冰霜伤害，你已承受的每层萦绕哀歌再提高一半。每盏灯最多庇护两名玩家，庇护过任何人后会熄灭28秒，所以分散开轮流使用）",
+        "crypt_frozen_embrace": "冰封之拥（每30秒她抓住一名非坦克玩家，带着对方升到空中5码高，每秒造成6点冰霜伤害：在8秒内打掉她6%的生命值她就会把人放下，否则她会把人扔下，普通难度下造成150到180点伤害）",
+        "crypt_rime_path": "霜径（她飘过的地方会留下光滑的白霜，持续25秒：在上面你加速缓慢，停下或转向时会继续滑行）",
+        "crypt_bridal_freeze": "新娘冰封（生命值降到一半时，整个峡谷地面都会冻结：在战斗剩余时间里都是光滑的冰面）",
+        "crypt_lady_heroic": "英雄：每盏点亮的墓灯在30秒后也会自行熄灭10秒，冰封之拥会同时抓住两名玩家",
+        "crypt_dirge_of_the_hollow": "空洞挽歌（每16秒一首可打断的2.5秒歌曲：如果她唱完，普通难度下对45码内所有能看见她的人造成105到125点暗影伤害并沉默4秒，所以打断它或躲到唱诗柱后面）",
+        "crypt_harmony": "和声（每名存活的唱诗者都使她受到的伤害降低30%：先杀唱诗者）",
+        "crypt_bone_organ": "骨管风琴（每26秒她弹奏骨管风琴：两波暗影音符沿着唱诗楼的通道爆发，普通难度下通道内造成100到115点伤害，第二波会填满第一波的空隙）",
+        "crypt_crescendo": "渐强（生命值低于30%时，她的挽歌只需1.8秒且每11秒一次，风琴还会多奏一波）",
+        "crypt_ilvane_heroic": "英雄：安可（一名唱诗者倒下10秒而另一名仍站着时，它会再次站起，所以同时杀掉它们）以及不断之诗（每第三首挽歌无法被打断：躲开它）",
+        "crypt_morthen_shadow_pulse": "暗影脉冲（每12秒施法2秒，然后在普通难度下对他周围12码内所有人造成24到30点暗影伤害，所以要走开；在他的终末仪式中每9秒一次）",
+        "crypt_gravecall": "唤墓（每15秒，一个缚魂从下一个石棺壁龛飘向他；抵达后他获得饱食亡者，每个灵魂使他造成的伤害提高10%，最多10层，并恢复3%的生命值。挡在路径上的玩家会代为承受：普通难度下12到16点暗影伤害）",
+        "crypt_rite_of_the_unquiet": "不宁者仪式（生命值降到65%时，他回到祭坛，在不宁结界中免疫伤害，同时墓穴寒意每秒对所有人造成3点暗影伤害，每5秒提高1点，还有2具不安之骨从壁龛中爬出。重燃4根追思蜡烛：每根需要引导4秒，每秒吸取点燃者6%的最大生命值，受到攻击不会打断，移动或昏迷会打断。最后一根蜡烛会打破仪式：他昏迷8秒，受到的伤害提高25%）",
+        "crypt_reap_the_unquiet": "收割不宁者（生命值低于35%时灵魂停止出现；每14秒施法2秒后挥动镰刀：普通难度下对他前方14码、120度扇形内的所有人造成55到65点暗影伤害。此后暗影脉冲每9秒一次）",
+        "crypt_morthen_heroic": "英雄难度：点名亡者（名册点出蜡烛的顺序：点错蜡烛会熄灭最后点燃的那根，并对点燃者造成252到288点暗影伤害，每次重燃每秒吸取8%），坟墓之握（每16秒2名玩家脚下出现4码法环；1.5秒后鬼手破土而出：定身3秒并造成162到198点暗影伤害），以及丧钟巨龙的燃烧丧钟（它飞上天空，标记半个法环4.5秒，然后向那一半倾泻幽魂之火，造成1,000到1,120点火焰伤害，每次飞行3个半区）",
         "reaping_arc": "收割之弧（正面顺劈）",
+        "hallowed_brine": "圣化咸水（半径9码的暗色圣水池，英雄难度10码：池中每秒受到18点伤害，英雄难度26点，他站在池中时受到的伤害降低40%，把他拖出去）",
+        "rebounding_bulwark": "回弹壁盾（盾牌弹向上一个被击中者10码内最近的玩家，最多3人，英雄4人：散开）",
+        "tide_sentence": "潮汐宣判（标记5秒后，光柱击中被标记者6码内的所有人，英雄8码：远离队伍承受）",
+        "unbroken_oath": "不破誓言（仅一次，生命值降到一半时他在泡泡中无敌跪下，最多60秒：击杀他的士兵打破它，随后他昏迷4秒并在10秒内受到的伤害提高20%）",
+        "fog_veil": "雾幕（四个身影，只有一个是真的：灯塔光束会让真正维尔的提灯骤亮）",
         "mist_surge": "迷雾涌动（周期性范围伤害）",
         "summons_adds": "召唤增援",
         "lunar_tide": "月潮（周期性范围伤害）",
+        "chorus_and_solo": "合唱与独唱（一个标记集合分摊，另一个标记分散）",
+        "tideglass_reflections": "潮镜倒影（击杀彼此的镜像）",
+        "hydra_three_elements": "三重元素（左侧头颅喷出18码的冰霜锥形吐息，使你减速70%，持续4秒；中间头颅向最多3名玩家脚下喷吐毒液，1.5秒后爆裂，并在落点灼烧6秒；右侧头颅沿一条26码长的直线射出激流，将你击退8码：每一种都要走出去。一个头颅倒下后，仍然存活的头颅会接手它的攻击）",
+        "hydra_tsunami": "海啸（头颅沉入水中4.5秒，期间受到的伤害降低75%，一道巨浪席卷水池的一半，下一次换另一半：普通难度下造成160到190点冰霜伤害并把你推开10码。跑到另一半，或站到池边石柱后面；英雄难度下，巨浪会在3.5秒后回卷另一半。第一次海啸在开战24秒后到来，之后每一次都在上一次过去40秒后到来）",
+        "hydra_combined_breath": "合体吐息（两次海啸之间，头颅会融合它们的两种攻击，顺序始终相同：冰封激流把直线上的所有人冻结2秒，并留下一道可以为你挡住下一道巨浪的冰墙；毒液洋流让毒池向外滑动；剧毒霜晶把毒池冻成晶体，4秒后爆裂。普通难度下两次海啸之间一次，英雄难度两次）",
+        "hydra_regrowth": "再生（只要还有另一个头颅活着，倒下的头颅会在20秒后以一半生命值长回来，每个倒下的头颅还会使其余头颅造成的伤害提高15%：让三个头颅在相近的时间内倒下）",
+        "rising_tide": "涨潮（半座岛被淹没，移动到干燥的一侧）",
+        "undertow": "暗流（将所有人拉近，在冲击前跑开）",
         "enrage": "低血量时狂怒",
         "shuddering_stomp": "震颤践踏（范围眩晕）",
         "grave_inferno": "墓场炼狱（引导火焰AoE，保持分散）",
@@ -6120,6 +7103,9 @@ export const zh_CN: EnTranslations = {
         "deathless_court": "不死王庭（仅英雄难度，不死之怒后王庭众魂会苏醒）",
         "bloodmane_rend": "血鬃撕裂（流血，注意目标切换）",
         "tusk_sweep": "獠牙横扫（正面顺劈）",
+        "grave_breath": "坟墓吐息（正面火焰锥形，会使覆盖的冰面开裂）",
+        "plate_floor": "碎冰（他的火焰会使湖面冰板开裂并沉没，远离开阔水面）",
+        "wyrm_flights": "飞行阶段（70%和40%时：带着巨龙之眼走到完好的冰面上，在他应降落的地方集合）",
         "ancestral_sap": "祖灵汁液（治疗其盟友）",
         "call_of_the_hunt": "狩猎召唤（加速附近盟友）",
         "thickhide_ward": "厚皮护盾（护盾附近盟友）",
@@ -6143,8 +7129,172 @@ export const zh_CN: EnTranslations = {
         "forgestorm": "熔炉风暴（坠落的陨石圈，移出）",
         "shared_pyre": "共享柴堆（集合圈，分摊伤害）",
         "anvils_decree": "铁砧法令（三次全团锤击，用治疗撑过）",
-        "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）"
+        "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）",
+        "iron_cage": "铁笼（连按交互键挣脱，队友可以砸开铁栏）",
+        "drowned_anchor": "溺亡之锚（受害者会被绞向深坑：跑到点亮的系泊柱3码以内即可系住锁链，该柱随后熄灭30秒；或者用12次攻击砸断锁链，英雄难度16次）",
+        "shackle_pair": "双人镣铐（被锁在一起的两名玩家必须靠在一起）",
+        "reaper_behind": "穿影（连续三次从玩家身后升起，人数足够时每次都是不同的人：离开镰刀的弧线）",
+        "pack_bond": "兽群羁绊（两者相邻时伤害减半：将它们拉开15码）",
+        "stalk": "潜行追猎（美洲豹追猎被标记的玩家，从不追坦克；单人时它追你：风筝它，减速、定身、击晕它）",
+        "shared_health": "共享生命（同一血池：攻击最安全的那个）",
+        "heel_frenzied_bond": "回来！与狂热羁绊（美洲豹跃回主人身边，羁绊范围扩至20码）",
+        "seed_rain": "种子雨（未授粉的玩家在种子发芽前踩碎它们）",
+        "pollinate": "授粉（金色的玩家远离种子，否则它们会立刻发芽）",
+        "vine_lash": "藤鞭（离开荆棘通道，否则会被定身）",
+        "gorge": "吞噬（对坦克的重咬和毒素）",
+        "burrowing_seeds": "钻地种子与花粉云（种子6秒后在玩家身旁破土，金色会传染）",
+        "spirit_of_the_hunt": "狩猎之魂（猎物引着化身穿过点亮的太阳符文；被撕咬的玩家获得逃跑的先机）",
+        "twin_prey_ambush": "双重猎物与伏击（两个猎物，随后扑向最远的玩家）",
+        "seal_shackles": "封印镣铐（每打断一条锁链，他受到的伤害提高20%，并解放他的一种攻击）",
+        "chain_strain": "绷链（远离每根锁链仍完好的柱子）",
+        "korgath_stomp": "震颤践踏（离开他周围的圆环）",
+        "rerivet_last_link": "重铆与最后一环（打断重新铆上锁链的刺棒匠；只剩一条锁链时，每10秒绷链一次）",
+        "waking_thaw": "苏醒融冰（亡者从融冰池中爬出）",
+        "unquenched_held": "封存或未熄（在寒冰上击杀亡者，切勿在融水中）",
+        "soulfire_trench": "魂火沟壑（一道魂火，随后留下一条融水带）",
+        "shadow_volley": "暗影箭雨（对所有人造成暗影伤害）",
+        "warm_hands_twice_woken": "温热之手与二度苏醒（仅限英雄难度，让亡者保持移动；复起者会更强）"
       }
+    },
+    "bastionCage": {
+      "title": "你被关进了铁笼！",
+      "promptKey": "连按 {key} 挣脱",
+      "promptNoKey": "连按交互键挣脱",
+      "promptClick": "连续单击这里挣脱",
+      "promptTap": "连续点击这里挣脱",
+      "buttonAria": "从铁笼中挣脱",
+      "progressAria": "挣脱进度：{pct}"
+    },
+    "bastionChain": {
+      "anchoredTitle": "被溺亡之锚锁住了！",
+      "anchoredLine": "跑到点亮的系泊柱系住锁链，或者在绞盘把你拖进深坑之前让队友砸断锁链",
+      "allyTitle": "砸断锁链！",
+      "allyLine": "{name} 正被拖向深坑：攻击溺亡之锚，或帮助其跑到点亮的系泊柱",
+      "shackledTitle": "与 {name} 锁在一起",
+      "shackledLine": "彼此保持在 {range} 码以内（当前相距 {dist} 码）",
+      "strainedLine": "离得太远！锁链会伤害你们两人：靠近到 {range} 码以内",
+      "brokenAria": "锁链破损：{pct}",
+      "reachAria": "锁链绷紧：{pct}",
+      "linksLeft": "剩余锁链环：{count}/{total}",
+      "linkRule": "每次击中锚，无论伤害多少，都会断开一环",
+      "linksTarget": "锁链环 {count}/{total}",
+      "linkBroken": "断开一环！"
+    },
+    "bastionAlert": {
+      "sentencedTitle": "宣判落在你身上！",
+      "sentencedLine": "光柱会击中你身边的所有人：远离队伍",
+      "brineTitle": "你站在圣化咸水中！",
+      "brineLine": "它每秒都在灼烧你：离开水池",
+      "reapedTitle": "死亡在你身后升起！",
+      "reapedLine": "离开镰刀的弧线：向前，或向两侧",
+      "veilTitle": "雾幕",
+      "veilLine": "注意灯塔的光束：提灯骤亮的那个才是真正的维尔",
+      "realTitle": "光束找到了他！",
+      "realLine": "这是真正的维尔：攻击他以打破雾幕",
+      "shadeTitle": "空洞的幻影",
+      "shadeLine": "光穿透了它：别管它，去找光束照亮的那个",
+      "timeAria": "剩余{seconds}秒"
+    },
+    "wildheartAlert": {
+      "preyTitle": "你是猎物！",
+      "preyLine": "祖尔加在追猎你：引他穿过点亮的太阳符文",
+      "preyWaitLine": "他正在追另一个猎物：做好准备，他会切换",
+      "stalkedTitle": "被追猎！",
+      "stalkedLine": "美洲豹在追猎你：把它引离它的主人",
+      "pollinatedTitle": "已授粉！",
+      "pollinatedLine": "远离种子：你的触碰会让它们发芽",
+      "bondTitle": "兽群羁绊",
+      "bondLine": "在一起时它们伤害减半：把它们拉开",
+      "timeAria": "剩余{seconds}秒"
+    },
+    "sanctumAlert": {
+      "quenchTitle": "身陷淬火之水！",
+      "quenchLine": "它会灼烧并减速你：游向最近的冰面或岸边",
+      "plungeTitle": "俯冲烈焰！",
+      "plungeLine": "你脚下的整块冰板即将燃烧：立刻离开",
+      "descentTitle": "坠击降落！",
+      "descentLine": "他就落在这里：离开他的阴影",
+      "eyeTitle": "巨龙之眼盯上了你！",
+      "eyeLine": "印记结束时你所在的冰板会燃烧：待在完好的冰面上，远离队伍",
+      "eyeCrackedLine": "你站在开裂的冰面上：在印记结束前走到完好的冰板上",
+      "flailTitle": "锁链连枷！",
+      "flailLine": "锁链会沿着标出的路线抽下：离开那条线",
+      "chargeTitle": "门槛冲锋！",
+      "chargeLine": "他会沿路线冲锋：离开路线，远离边缘",
+      "trenchTitle": "魂火沟壑！",
+      "trenchLine": "魂火会切开这条路线并留下融水：离开它",
+      "strainTitle": "绷链！",
+      "strainLine": "完好的石柱即将爆发：远离它们",
+      "infernoTitle": "墓场炼狱！",
+      "infernoLine": "每次脉冲都更猛烈：离开他的范围",
+      "stompTitle": "震颤践踏！",
+      "stompLine": "在他的脚落下前远离他",
+      "breathTitle": "墓穴吐息！",
+      "breathLine": "你站在吐息锥形范围内：向侧面躲开",
+      "maulTitle": "重锤横扫！",
+      "maulLine": "他会横扫面前的一切：绕到他身后",
+      "tailTitle": "尾击横扫！",
+      "tailLine": "你站在他身后：在尾巴扫来前离开",
+      "meltwaterTitle": "身处融水",
+      "meltwaterLine": "你的骸骨行者站在融水中：把它拖到寒冰上",
+      "meltwaterTargetLine": "你的目标若死在融水中会再次复生：等它到寒冰上",
+      "crackedTitle": "开裂的冰面",
+      "crackedLine": "这里的火焰会击碎这块冰板：别让他的火焰落在这里",
+      "flightTitle": "科祖尔腾空而起",
+      "flightLine": "聚集在完好的冰面上决定他的落点，然后散开",
+      "lockboundTitle": "锁缚",
+      "lockboundLine": "{chains}条锁链仍在：他受到的伤害降低{pct}%。打破封印镣铐来解除它。",
+      "timeAria": "剩余{seconds}秒",
+      "brandedTitle": "烙印！",
+      "brandedLine": "烙印会一直灼烧到结束：到融水池里将它浇灭",
+      "rimeTitle": "蔓延霜凇！",
+      "rimeLine": "蔓延霜凇 {stacks}/{max}：离开幼龙的吐息",
+      "slabTitle": "冰块",
+      "slabLine": "坚冰：它会阻挡视线。躲到它后面，避开施法者的法术"
+    },
+    "cryptAlert": {
+      "measuredTitle": "量身定墓！",
+      "measuredLine": "计时条走完时，坟墓会在你脚下塌陷：把它带到墓园边缘",
+      "embracedTitle": "冰封之拥！",
+      "embracedLine": "她把你举在半空：你的队伍必须伤害她，她才会把你放下",
+      "lamentTitle": "新娘的哀歌！",
+      "lamentShelteredLine": "你站在点亮的墓灯光芒中，灯下还有你的位置：保持不动",
+      "lamentOpenLine": "在哀嚎落下前进入点亮的墓灯光芒中：每盏灯两人",
+      "graveTitle": "你在敞开的坟墓里！",
+      "graveLine": "坟土会灼烧你并让你减速：离开坟墓",
+      "tollTitle": "葬礼丧钟！",
+      "tollLine": "他摇钟时无法受到伤害：准备承受丧钟和它唤起的亡者",
+      "harmonyTitle": "和声",
+      "harmonyLine": "她的唱诗者使她受到的伤害降低{pct}%：先杀死它们",
+      "knellTitle": "燃烧丧钟！",
+      "knellLine": "计时条耗尽时，幽魂之火会倾泻到法环的这一半：去另一半",
+      "graspTitle": "坟墓之握！",
+      "graspLine": "鬼手会从这个法环中伸出，抓住站在里面的人：离开",
+      "reapTitle": "收割不宁者！",
+      "reapLine": "他的镰刀横扫面前的地面：绕到他身后",
+      "riteTitle": "不宁者仪式",
+      "riteLine": "重燃追思蜡烛以击碎他的结界：已点燃{lit}/{total}",
+      "riteNamedLine": "只重燃名册接下来点出的蜡烛：已点燃{lit}/{total}",
+      "soulTitle": "缚魂",
+      "soulLine": "一个灵魂正飘向莫森：站到它的路径上，在它喂饱他之前接住它",
+      "timeAria": "剩余{seconds}秒"
+    },
+    "kitUse": {
+      "toppleLine": "把它踢倒在敌群上：洒出的火焰会灼烧它们",
+      "toppleKey": "把{name}推倒在它们身上",
+      "toppleTap": "点击这里把{name}推倒在它们身上",
+      "toppleClick": "单击这里把{name}推倒在它们身上",
+      "toppleFar": "靠近到{range}码内才能把它踢倒",
+      "toppleAria": "推倒{name}",
+      "usingLine": "保持不动：受到攻击、移动或昏迷都会打断它",
+      "relightLine": "引导时每秒吸取你的生命值：受到攻击不会打断，移动或昏迷会打断",
+      "relightKey": "重燃{name}",
+      "relightTap": "点击这里重燃{name}",
+      "relightClick": "单击这里重燃{name}",
+      "relightFar": "靠近到{range}码内才能重燃它",
+      "relightAria": "重燃{name}",
+      "relightUsingLine": "在它吸取你时保持不动：受到攻击不会打断，移动或昏迷会打断",
+      "timeAria": "剩余{seconds}秒"
     },
     "cosmetics": {
       "title": "外观",
@@ -6153,6 +7303,8 @@ export const zh_CN: EnTranslations = {
       "tabMounts": "坐骑",
       "tabSkins": "皮肤",
       "tabMech": "机甲",
+      "buddyActive": "已召唤",
+      "buddyDrag": "拖到动作条上",
       "legend": "账号：所有角色共享。角色：仅此角色。",
       "scopeAccount": "账号",
       "scopeCharacter": "角色",
@@ -6275,6 +7427,7 @@ export const zh_CN: EnTranslations = {
       "sourceActivityMasterworkCraft": "制作杰作时获得",
       "sourceActivityRiftFirstClear": "授予率先通关分级裂隙的队伍全体成员",
       "sourceActivityBuriedHoard": "在埋藏宝藏的奖励宝箱中找到，即藏宝图所指引的宝库",
+      "sourceActivityLanternHall": "在灯火大厅的军需官处用灯火印章购买",
       "cellMissingSourceAria": "{name}，尚未获得，{source}",
       "cellOwnedClearsAria": "{name}，已收录，首次获得于第 {count} 次通关",
       "searchPlaceholder": "搜索圣物",
@@ -6365,7 +7518,7 @@ export const zh_CN: EnTranslations = {
       "watchFull": "追踪列表已满（最多 {cap} 项）",
       "watchAria": "在界面追踪器中追踪{name}",
       "unwatchAria": "停止追踪{name}",
-      "cosmeticsSection": "头衔与边框",
+      "cosmeticsSection": "头衔、边框与伙伴",
       "titlesSection": "头衔",
       "titlesAria": "选择要展示的头衔",
       "titlesNone": "无头衔",
@@ -6373,6 +7526,14 @@ export const zh_CN: EnTranslations = {
       "bordersSection": "边框",
       "bordersNone": "无边框",
       "bordersEmpty": "获得带边框的功绩后即可解锁此栏。",
+      "buddiesSection": "伙伴",
+      "buddiesNone": "无伙伴",
+      "buddiesEmpty": "收集一个伙伴，即可从此处召唤。",
+      "buddyDragHint": "拖到你的动作条上",
+      "looksSection": "伙伴外观",
+      "looksNone": "原本外观",
+      "looksNoBuddy": "召唤一个伙伴后在此选择它的外观。",
+      "looksEmpty": "这个伙伴还没有解锁任何外观。",
       "unlockedBanner": "达成功绩：{name}",
       "unlockedTitleHint": "获得新头衔：{title}。可在功绩之书中选用。",
       "unlockedBorderHint": "获得新边框：{name}。可在功绩之书中佩戴。",
@@ -6755,7 +7916,7 @@ export const zh_CN: EnTranslations = {
       "rewards": "奖励",
       "alsoReceive": "你还将获得：",
       "tally": "{count} / {required}",
-      "cacheDesc": "开启后获得一件你职业可用的普通团队副本装备（不含套装），外加{count}个{item}。",
+      "cacheDesc": "开启后获得一件你职业可用的普通团队副本装备（不含伊格尼瓦套装），外加{count}个{item}。",
       "dialogNote": "同一时间只能有一项每周委托生效。它{reset}",
       "accept": "接受",
       "decline": "拒绝",
@@ -6858,6 +8019,8 @@ export const zh_CN: EnTranslations = {
       "delete_confirm": "输入角色名称以确认删除。",
       "storage_purchase_open": "此储物空间购买必须完成或解决后，才能删除该角色。",
       "delete_busy": "服务器繁忙，请稍后再尝试删除该角色。",
+      "referral_transfer_pending": "删除此角色前，请先将所有尚未锁定的集章卡转移至其他角色。",
+      "referral_bond_pending": "一份推荐奖励会员契约正在发放给此角色。请在发放完成后再尝试删除此角色。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一个会话接管。",
       "rename_required": "此角色必须先改名才能进入世界。",
@@ -7093,6 +8256,792 @@ export const zh_CN: EnTranslations = {
       "reply": {
         "0": "像样的堆肥，花床有救了。老磨坊主离开前埋了些东西。他的磨坊还在花园最远的角落里转着。去它旁边站一站吧。",
         "2": "原来是磨坊把你一路送到了海岸路上。灯塔还藏着最后一个秘密：在它西北方，就在小路旁，草皮被切开又铺了回去。就在那里挖。"
+      }
+    }
+  },
+  "dungeonGuide": {
+    "drownedTemple": {
+      "greet": {
+        "1": "我曾是苍白唱诗班里最年轻的声音。仪式那夜，我没有喝，我逃了。从那以后，每逢满月，我都听见他们在水下歌唱。我必须在死前亲眼见到她。让我跟在你们身后吧。我不会战斗，也不会拖累你们。",
+        "2": "每逢满月我都来到这扇门前，每逢满月我的勇气都会溃散。今夜不会。唱诗班正在歌唱，而逃走的那个人是我。带我下去见她吧，我不会碍事。"
+      },
+      "row": {
+        "join": "跟我们一起走吧。",
+        "decline": "我们自己去。"
+      },
+      "joined": "你们先走，我就在后面。",
+      "singing": "让我唱吧。走吧，安心地走。",
+      "accept": {
+        "1": "谢谢你们。我会跟在后面，绝不碍事。",
+        "2": "那么我终于要下去了。往前走吧，我跟得上。"
+      },
+      "decline": "我明白。我会像从前一样，在这上面聆听。",
+      "heroicWater": "今夜水涨得很高，比我见过的任何时候都高。她快要醒了。",
+      "memory": {
+        "votaries": "岸边那些溺亡者，是在门关上之后走进去的。带走他们的不是月亮，只是湖水。",
+        "rubbing": "守潮者读到了我刻在岸边岩石上的字。“它只是沉睡。”那是我在第二天早上刻下的。"
+      },
+      "area": {
+        "steps": "朝圣者阶梯。那一夜我一步三级地往上跑，一次也没有回头。",
+        "causeway": {
+          "1": "仪式之夜，月光铺在这条堤道上，像第二条路。",
+          "2": "看看这水。它仍记得如何托住月亮。"
+        },
+        "colonnade": "潮汐柱廊。我们两两并肩走过这里，唱着升起之节。",
+        "veil": "那道帷幕后面就是唱诗庭院。我从小时候起就再没踏进去过。",
+        "terraces": "潮池。见习生们把它们打扫干净，喂养住在里面的小小发光生灵。",
+        "falls": "瀑布后面，水声会淹没一切人声。我逃练习的时候就躲在这里。",
+        "pool": "月之池。他们跪在池边，用贝壳饮水。我却举不起我的那只。",
+        "prismStair": "棱镜阶梯。我们在月出时登上它，去唤醒那块巨大的玻璃。",
+        "moonbridge": {
+          "1": "一座月光之桥。长老们说，只有虔诚的人才能走过去。",
+          "2": "我从来都不虔诚。好吧，看看它撑不撑得住我。"
+        },
+        "altarLanding": "我当年就站在这里。就是这里。我在这里转身逃走。"
+      },
+      "sight": {
+        "pilgrim": "岸边村庄的朝圣者。每年春天他们都把神龛背在背上。如今他们要永远背着它了。",
+        "acolyte": "那些见习生。我曾在她们身旁学认字。如今她们在睡梦中歌唱，永远不会醒来。",
+        "templeguard": "阶梯的守卫。他们发誓守护神殿，直到月亮落下。月亮从未落下。",
+        "snapper": "我们曾用那样的贝壳喝月之水。我的那只掉在了阶梯上。",
+        "siren": "那个声音。她曾在唱诗班里站在我身旁歌唱。她现在还是会早半拍进来。",
+        "lurker": "孩子们常在浅滩用网捞这些东西。那时它们只有拇指大，会发光。",
+        "tidewisp": "那就是月之水本身，我们本该喝下的那一口。别让它碰到你们。",
+        "sentinel": "门边水池里的月鳐。我们还是见习生时，在月出时喂它们珍珠。如今它们守着这些门，把我们的珍珠当作心脏。",
+        "eel": "泻湖里的鳗鱼。见习生们会在黄昏喂它们面包。它们靠我们的圣歌养得肥肥的。",
+        "reflection": "它让你们看见湖水会把你们变成什么。打碎它！",
+        "moonspawn": "那些从来不是我的族人。它们是她的，只由月光造成。"
+      },
+      "selthe": {
+        "pre": {
+          "1": "塞尔瑟嬷嬷。她教我用腹部呼吸。她教会我们所有人如何溺水而不死。",
+          "2": "唱诗母塞尔瑟。我会的每一个音，都是她教给我的。原谅我，嬷嬷。"
+        },
+        "post": {
+          "1": "她安静了。我在唱诗班的那些年里，她从来没有安静过一次。",
+          "2": "安息吧，嬷嬷。你说得对，我始终撑不住长音。"
+        }
+      },
+      "hydra": {
+        "pre": "池中的大蛇。我小时候它只有一个头，还会从我们手里吃东西。",
+        "post": "听。瀑布底下，他们还在歌唱。现在更近了。"
+      },
+      "colossus": {
+        "pre": "那座巨大的棱镜。我们对着它歌唱，想要捕住月亮。我从不知道它能站起来。",
+        "post": "玻璃碎了。如今再没有什么能捕住月亮了，除了她。"
+      },
+      "ysolei": {
+        "pre": "她就在那里。我这一生都在问，她究竟是女神还是怪物。让我看看吧。",
+        "preHeroic": "在这样的夜晚，整个唱诗班都会与她一同歌唱。大家都要撑住。"
+      },
+      "farewell": {
+        "answer": "她两者都不是。她只是水中的月亮，而跪下的是我们自己。",
+        "verse": "仪式还有最后一节，让歌者得以安睡的那一节。我从没唱过。",
+        "stay": "他们已经等得够久了。我会留下，现在就为他们唱。",
+        "goodbye": {
+          "1": "回到夜色中去吧。如果你们在满月时听见歌声，那只是我。",
+          "2": "谢谢你们把一个老懦夫带到他歌声的尽头。走吧。"
+        },
+        "emote": "{name}在祭坛上方扬声歌唱，泻湖归于平静。"
+      },
+      "wipe": "起来。求你们了。别再把我一个人留在这下面。",
+      "catchUp": "我的腿是老了，可这里的每一级台阶我都认得。我在这儿。"
+    }
+  },
+  "bossJournal": {
+    "common": {
+      "enrageName": "狂暴",
+      "phaseEnrageSummary": "生命值低于{health}时，首领进入狂暴状态，直至战斗结束。",
+      "enrageSummary": "生命值低于{health}时，其近战攻击伤害提高{damage}，攻击速度加快{haste}，直至战斗结束。",
+      "enrageResponse": "坦克和治疗者把防御与治疗冷却留到这个阶段。其他人全力输出，尽快结束战斗。",
+      "heroicHarder": "本页的每个技能造成的伤害是普通难度的{scale}倍。"
+    },
+    "wildheart": {
+      "saurian": {
+        "overview": "一头房屋般巨大的战兽背着驮轿，在河流浅滩上来回巡行。必须击败它：只有它死后，藤蔓桥才会开启。它有两个带预警的攻击，半血时有一名治疗骑手加入，最后还会狂暴。",
+        "phaseFordName": "河流浅滩",
+        "phaseFordSummary": "开战后，它交替使用身后的甩尾和身周的践踏。同一时间只有一个攻击。",
+        "phaseHowdahName": "驮轿碎裂",
+        "phaseHowdahSummary": "生命值降到{health}时，驮轿碎裂，一名驮轿巫咒师跃下来治疗巨型蜥脚兽。",
+        "phaseEnrageName": "狂暴",
+        "phaseEnrageSummary": "生命值低于{health}时，它在本场战斗剩余时间内狂暴。",
+        "tailSummary": "每{every}秒读条{cast}秒，随后甩尾横扫身后{arc}度的扇形，从身体中心向外{range}码：造成{min}到{max}点伤害，并击退{push}码。",
+        "tailResponse": "绝不要站在它身后。从侧面攻击。",
+        "stompSummary": "每{every}秒读条{cast}秒，随后其中心{radius}码内的所有人受到{min}到{max}点伤害，并被击倒{stun}秒。",
+        "stompResponse": "能移动的人在读条结束前离开圆圈。坦克硬吃这一下；治疗者随后为坦克补血。",
+        "riderName": "驮轿骑手",
+        "riderSummary": "仅一次，在生命值{health}时：一名驮轿巫咒师跳到巨型蜥脚兽身旁并与它并肩作战，用先祖树汁治疗它。",
+        "riderResponse": "坦克接住骑手。输出者打断它的治疗，或先击杀它。",
+        "sapSummary": "骑手的治疗：每{every}秒读条{cast}秒，恢复巨型蜥脚兽最大生命值的{heal}。",
+        "sapResponse": "每次都打断它，或击杀骑手。",
+        "enrageSummary": "生命值低于{health}时，它的一切攻击伤害提高{damage}：近战、甩尾和撼地践踏。",
+        "tipTank": "让它面朝远离队伍的方向，这样没人会站到它的尾巴后面。驮轿巫咒师一落地就接住它。",
+        "tipHealer": "撼地践踏会击倒附近所有人，所以每次之后都要为坦克补血。留一个冷却应对狂暴。",
+        "tipDamage": "站在它的侧面，避开甩尾扇形和践踏圈。半血时，打断先祖树汁或击杀骑手。",
+        "choiceName": "先打骑手，还是先打巨型蜥脚兽？",
+        "choiceGain": "击杀骑手能永久终结它的治疗：每{every}秒一次的先祖树汁会恢复巨型蜥脚兽{heal}的生命值。",
+        "choiceRisk": "你击杀骑手时，巨型蜥脚兽仍会不停甩尾和践踏。若放着骑手不管，就必须有人打断每一次治疗。"
+      },
+      "beast": {
+        "overview": "獠牙领主驯兽师和他的巨型美洲豹共用一条生命值，同生共死。两者靠近时坚韧得多，伤害也更高，所以坦克要把驯兽师拖开，而美洲豹会追猎一名被标记的玩家。",
+        "phasePitsName": "兽坑",
+        "phasePitsSummary": "一场战斗，两具身体。它们的计时贯穿全程；没有生命值阶段。",
+        "bondName": "Pack Bond",
+        "bondSummary": "驯兽师和美洲豹相距{reach}码以内时，两者受到的伤害降低{dr}，造成的伤害提高{damage}。",
+        "bondHeroicSummary": "狂热羁绊：驯兽师和美洲豹相距{reach}码以内时，两者受到的伤害降低{dr}，造成的伤害提高{damage}。",
+        "bondResponse": "坦克把驯兽师拖到离美洲豹超过{reach}码的地方并保持住。",
+        "sharedName": "共享生命",
+        "sharedSummary": "两具身体共用一个生命池：任何一方受到的伤害等同计算，一方死亡时另一方也会死亡。",
+        "sharedResponse": "打最容易够到的那一个。切换目标不会有任何损失。",
+        "stalkName": "追猎",
+        "stalkSummary": "美洲豹标记一名不是驯兽师坦克的玩家，追猎{seconds}秒，无视嘲讽。进入范围后每{biteEvery}秒撕咬一次，造成{min}到{max}点伤害，随后每{bleedEvery}秒流血{bleed}，持续{bleedSeconds}秒。然后它会选择新的猎物。",
+        "stalkResponse": "被标记者：跑动，把美洲豹引离驯兽师。其他人对它减速、定身或击晕。",
+        "waryName": "Wary",
+        "warySummary": "每种控制（击晕、定身、减速）对美洲豹生效一次，随后该类控制在它身上失效{lockout}秒。瘫痪、恐惧和变形都算作击晕。",
+        "waryResponse": "轮流使用：先定身，再减速，再击晕，而不是连用三个同类。",
+        "quakeSummary": "每{every}秒读条{cast}秒，随后驯兽师{radius}码内的所有人受到{min}到{max}点伤害。",
+        "quakeResponse": "除坦克外，所有人远离驯兽师。",
+        "huntName": "Call of the Hunt",
+        "huntSummary": "每{every}秒，两只野兽的攻击速度加快{haste}，持续{seconds}秒。",
+        "huntResponse": "坦克和治疗者在此期间使用冷却；美洲豹的撕咬也会更快。",
+        "wardName": "厚皮护盾",
+        "wardSummary": "每{every}秒，美洲豹获得一个能吸收{amount}点伤害的护盾，持续{seconds}秒。",
+        "wardResponse": "护盾存在时打驯兽师：生命池是共享的。",
+        "heelSummary": "每{every}秒，美洲豹读条{cast}秒，随后跃回驯兽师身边，羁绊恢复。",
+        "heelResponse": "在读条期间击晕、瘫痪或变形美洲豹即可打断。若美洲豹已对击晕警觉，则无效。",
+        "tipTank": "立刻把驯兽师拉到离美洲豹超过{normal}码的地方并保持，让他背对队伍。",
+        "tipTankHeroic": "立刻把驯兽师拉到离美洲豹超过{heroic}码的地方并保持。每次回来！之后再把他拖开。",
+        "tipHealer": "盯着被追猎的目标：撕咬和流血来得很快，在狩猎召唤期间更快。",
+        "tipDamage": "打最安全的那一个。被追猎时，把美洲豹引离驯兽师；否则轮流对它减速、定身和击晕。",
+        "tipDamageHeroic": "打最安全的那一个。为每次回来！读条留好一个击晕，并轮流对美洲豹减速和定身。",
+        "choiceName": "现在控制美洲豹，还是留着？",
+        "choiceGain": "减速、定身和击晕能让美洲豹追不上猎物，也离开驯兽师。",
+        "choiceRisk": "每种控制只生效一次，随后失效{lockout}秒，所以三个一起用光，下一次追猎就没得用了。",
+        "choiceRiskHeroic": "每种控制只生效一次，随后失效{lockout}秒。击晕用得太早，就没有东西能打断下一次回来！了。",
+        "heroicBond": "狂热羁绊：兽群羁绊范围扩至{reach}码。",
+        "heroicHeel": "回来！：除非读条期间被击晕，否则美洲豹会跃回驯兽师身边。厚皮护盾吸收{amount}点伤害。"
+      },
+      "bloom": {
+        "overview": "一朵扎根的食人花向周围的沃土花圃撒下种荚。没有花粉的玩家要在种荚发芽前把它们踩平；已授粉的玩家必须远离，否则种荚会立刻发芽。",
+        "phaseTerraceName": "垂泪瀑布",
+        "phaseTerraceSummary": "它从不移动。一个施法进行时，它的其他施法计时会暂停，所以列出的间隔是最短间隔。",
+        "seedSummary": "每{every}秒读条{cast}秒，随后落下{count}个种荚，每个沃土花圃一个。未授粉时踩上种荚会将其踩灭。无人理会的种荚会在{sprout}秒后长出荆棘幼芽。",
+        "seedHeroicSummary": "每{every}秒读条{cast}秒，随后落下{count}个种荚，每个沃土花圃一个。未授粉时踩上种荚会将其踩灭。钻地种子：无人理会的种荚会在{burrow}秒后钻入地下，一株荆棘幼芽在最近的玩家身旁破土而出。",
+        "seedResponse": "未授粉的玩家迅速踩过每个种荚。已授粉的玩家远离它们。",
+        "pollinateName": "授粉",
+        "pollinateSummary": "每{every}秒，{count}名玩家被授粉，持续{seconds}秒。已授粉的玩家碰到种荚，会使其立刻发芽。",
+        "pollinateHeroicSummary": "每{every}秒，{count}名玩家被授粉，持续{seconds}秒。已授粉的玩家碰到种荚，会使其立刻发芽。花粉云：在已授粉玩家{cloudRadius}码内站立{cloudSeconds}秒，你也会被授粉。",
+        "pollinateResponse": "已授粉：效果结束前远离种荚，英雄难度下还要远离队友。",
+        "sproutName": "荆棘幼芽",
+        "sproutSummary": "从发芽的种荚里长出的精英小怪，会攻击最近的玩家。噬花死亡时，幼芽会枯萎。",
+        "sproutResponse": "坦克接住它，输出者击杀它。",
+        "lashSummary": "每{every}秒读条{cast}秒，朝一名玩家（尽量选非坦克）瞄准一条长{length}码、宽{width}码的通道：造成{min}到{max}点伤害，并定身{root}秒。",
+        "lashResponse": "在读条结束前向侧面走出通道。",
+        "gorgeSummary": "每{every}秒对其目标读条{cast}秒，随后撕咬，造成其近战攻击{mult}倍的伤害，并附加消化：持续{seconds}秒，每秒{perSecond}点伤害。移动无法躲避。",
+        "gorgeResponse": "坦克：为它使用防御冷却。治疗者负责应对消化伤害。",
+        "spitName": "绽花喷吐",
+        "spitSummary": "如果目标离开它的攻击范围达{delay}秒，它每{every}秒喷吐一次，造成{min}到{max}点伤害。",
+        "spitResponse": "坦克留在近战范围内。",
+        "tipTank": "留在近战范围：走开会招来绽花喷吐。每次吞噬都用一个冷却，并接住每只荆棘幼芽。",
+        "tipHealer": "吞噬是对坦克的重击，随后是消化。藤鞭会定身并伤害站在通道里的人。",
+        "tipDamage": "如果你没有被授粉，在攻击间隙踩灭种荚。走出藤鞭，并迅速击杀任何荆棘幼芽。",
+        "choiceName": "谁来踩灭种子？",
+        "choiceGain": "每踩灭一个种荚，就少一只精英荆棘幼芽，战斗也能继续集中在花上。",
+        "choiceRisk": "跑向花圃会损失伤害和近战时间，而且已授粉的玩家碰到种荚会让它立刻发芽。",
+        "heroicBurrow": "钻地种子：无人触碰的种荚在{burrow}秒后钻入地下，幼芽在最近的玩家身旁破土而出。",
+        "heroicCloud": "花粉云：在已授粉玩家{cloudRadius}码内站立{cloudSeconds}秒，你也会被授粉。"
+      },
+      "zulgar": {
+        "overview": "盆地的大祭司。节奏稳定的战斗，带有预警的圆环，直到他化为美洲豹之魂并追猎一名玩家。被追猎的玩家引他穿过点亮的太阳符文，符文会使他减速。",
+        "phaseShrineName": "神殿",
+        "phaseShrineSummary": "他在近战中战斗，并在自身周围释放脉冲圆环。",
+        "phaseHuntName": "狩猎之魂",
+        "phaseHuntSummary": "生命值降到{first}和{second}时，他化为美洲豹之魂{seconds}秒，追逐一名被标记的玩家。",
+        "phaseEnrageName": "狂暴",
+        "pulseSummary": "每{every}秒读条{cast}秒，随后对他{radius}码内的所有人爆发一次：造成{min}到{max}点伤害。",
+        "pulseResponse": "除坦克外，所有人在读条结束前离开圆圈。",
+        "roarName": "美洲豹咆哮",
+        "roarSummary": "他的每次近战攻击有{chance}的几率将被击中的玩家击退{distance}码。",
+        "roarResponse": "坦克身后留出空地。",
+        "huntSummary": "生命值降到{first}和{second}时：读条{cast}秒，随后{seconds}秒内他追猎一名被标记的玩家（猎物，旁人在场时绝不会是坦克）。他比玩家快{speed}，无视嘲讽，且不攻击。若追上猎物：造成{maul}点伤害并击晕{stun}秒，随后他选择新的猎物。被撕咬的玩家有{respite}秒的安全期。",
+        "huntHeroicSummary": "生命值降到{first}和{second}时：读条{cast}秒，随后{seconds}秒内他追猎猎物。双重猎物：两名玩家被标记，他每{switchEvery}秒在两者之间切换。他比玩家快{speed}，无视嘲讽，且不攻击。若追上猎物：造成{maul}点伤害并击晕{stun}秒。",
+        "huntResponse": "猎物：跑过点亮的太阳符文使他减速。其他人在他追猎期间对他减速、定身和击晕。",
+        "glyphName": "太阳符文",
+        "glyphSummary": "{count}个符文环绕神殿。美洲豹之魂踏过点亮的符文时，会减速{slow}，持续{seconds}秒，该符文随后熄灭{dark}秒。追猎期间，减速和定身对他生效，击晕持续时间减半。",
+        "glyphResponse": "把符文分散使用：不要在第一次追猎就全部用掉。",
+        "ambushName": "猎手伏击",
+        "ambushSummary": "每次追猎后他会隐匿{seconds}秒。一个半径{radius}码的圆圈标出最远的玩家，并给出{warn}秒预警，随后他落在那里：对圈内所有人造成{min}到{max}点伤害。",
+        "ambushResponse": "离开圆圈。",
+        "tipTank": "为美洲豹咆哮在身后留出空地。追猎结束时他会回到你身边：做好接住他的准备。",
+        "tipHealer": "荒野之心脉冲会打中留在圈内的人。撕咬是一次高额单体伤害：为猎物补血。",
+        "tipDamage": "离开脉冲圈。追猎期间，对他减速、定身和击晕以保护猎物；如果你是猎物，就跑过点亮的符文。",
+        "tipDamageHeroic": "离开脉冲圈。追猎期间，对他减速、定身和击晕以保护两名猎物。每次追猎后，离开伏击圆圈。",
+        "choiceName": "现在用掉一个符文，还是留着？",
+        "choiceGain": "你每引他穿过一个点亮的符文，就会大幅减速他，为猎物争取时间。",
+        "choiceRisk": "用过的符文会熄灭{dark}秒，而每次追猎持续{seconds}秒：一开始就全用完，追猎的末尾就没有符文可用了。",
+        "heroicTwinPrey": "双重猎物：两名玩家被追猎；他每{switchEvery}秒切换一次。",
+        "heroicAmbush": "伏击：每次追猎后，他会扑向最远玩家所在的{radius}码圆圈。"
+      }
+    },
+    "crypt": {
+      "drake": {
+        "overview": "一头骨龙在送葬大道上空盘旋。从它下方走过，它就会落地迎战：正面喷火，身后甩尾，周身掀起翼风。",
+        "phaseName": "送葬大道",
+        "phaseSummary": "它在被拉到的地方落地，在地面作战。",
+        "breathSummary": "每{every}秒读条{cast}秒，随后向正前方{arc}度扇形、{range}码内喷出烈焰：造成{min}到{max}点伤害。读条期间它的朝向锁定。",
+        "breathResponse": "只有坦克站在正面。其他人站在它的两侧。",
+        "tailSummary": "有人站在它身后时，每{every}秒读条{cast}秒，随后向身后{arc}度、{range}码的扇形横扫：造成{min}到{max}点伤害。",
+        "tailResponse": "绝不要站在它身后。",
+        "gustSummary": "有人靠近时，每{every}秒读条{cast}秒，随后{radius}码内所有人受到{min}到{max}点伤害，并被击退{push}码。",
+        "gustResponse": "做好被击退的准备，背后不要靠近边缘。",
+        "embersName": "冢焰余烬",
+        "embersSummary": "每次吐息下方的地面会持续燃烧{seconds}秒：站在上面的人每秒受到{min}到{max}点伤害。",
+        "embersResponse": "把骨龙带离燃烧的地面，并走出火场。",
+        "tipTank": "让吐息朝向远离队伍的方向；英雄难度下，把它带离燃烧的地面。",
+        "tipHealer": "吐息和翼风是伤害高峰。站在它的侧面。",
+        "tipDamage": "从侧面攻击：不要站在正面，也不要站在背后。",
+        "heroicEmbers": "冢焰余烬：每次吐息都会让地面燃烧{seconds}秒。"
+      },
+      "marrow": {
+        "overview": "一个复活的掘墓人，专为玩家量身定墓。每座坟墓都会保持敞开，使其中的人减速并灼烧，他敲响葬钟时每座坟墓都会爬出一具不宁骸骨。把坟墓挖在墓园边缘，并控制坟墓的数量。",
+        "phaseYardName": "The Bell Yard",
+        "phaseYardSummary": "他在被标记的玩家脚下挖坟，并向坦克挥舞铁铲。",
+        "phaseTollName": "葬礼丧钟",
+        "phaseTollSummary": "生命值降到{first}和{second}时，他走向钟绳，敲响葬礼丧钟。",
+        "shovelSummary": "每{every}秒读条{cast}秒，随后向他正前方{arc}度、{range}码的扇形挥铲，造成他近战攻击{mult}倍的伤害。被击中的人都会获得迷眼之土：移动速度降低{slow}，持续{seconds}秒。",
+        "shovelResponse": "只有坦克站在正面。坦克可以在读条时走开。",
+        "measureSummary": "每{every}秒读条{cast}秒，标记一名玩家。{mark}秒后，坟墓在其脚下塌陷：{radius}码内所有人受到{min}到{max}点伤害。坟墓在整场战斗中保持敞开：在里面移动速度降低{slow}，每秒受到{dirt}点伤害。最多{cap}座坟墓；新坟出现时会填平最旧的一座。",
+        "measureResponse": "被标记时：在坟墓打开前走到墓园边缘。绝不要站在敞开的坟墓里。",
+        "blowSummary": "每{every}秒向坦克读条{cast}秒：一次近战打击，叠加一层使受到的伤害提高{vuln}的效果，最多{stacks}层（共{max}），持续{seconds}秒。",
+        "blowResponse": "坦克：层数上升时开减伤技能。治疗者盯紧坦克。",
+        "vigorName": "坟墓之力",
+        "vigorSummary": "他站在敞开的坟墓里时，攻击速度提高{haste}。",
+        "vigorResponse": "坦克别让他进坟墓。",
+        "unquietName": "不宁之土",
+        "unquietSummary": "玩家在坟墓里停留{linger}秒，就会从中唤出一具不宁骸骨。该坟墓随后休眠{rest}秒。",
+        "unquietResponse": "立刻离开坟墓。",
+        "tollSummary": "他走向钟绳，敲钟{ring}秒，行走和敲钟期间免疫伤害。随后每名玩家受到{min}到{max}点伤害，每座敞开的坟墓都会唤出一具不宁骸骨。",
+        "tollResponse": "最后一声钟响前，治疗者把所有人补满。坦克接住不宁骸骨；输出者击杀它们。",
+        "tipTank": "让他背对队伍。每次葬礼丧钟后，接住所有不宁骸骨。",
+        "tipTankHeroic": "让他背对队伍，并远离所有坟墓。掘墓人重击会叠层：层数上升时开减伤技能。",
+        "tipHealer": "葬礼丧钟打击全队。坟墓会使其中的人减速并灼烧，所以要帮助被困在里面的人。",
+        "tipDamage": "被标记时，把坟墓带到墓园边缘。每次丧钟后，先击杀不宁骸骨，再回到马罗身边。",
+        "choiceName": "坟墓挖在哪里？",
+        "choiceGain": "挖在墓园边缘的坟墓，让中间留出战斗和闪避的空间。",
+        "choiceRisk": "任何位置上的每座敞开的坟墓，都会在下一次丧钟时唤出一具不宁骸骨，最多同时{cap}具。",
+        "choiceRiskHeroic": "任何位置上的每座敞开的坟墓，都会在下一次丧钟时唤出一具不宁骸骨，最多同时{cap}具。英雄难度下，坦克附近的坟墓还会让马罗加速。",
+        "heroicBlow": "掘墓人重击：打击坦克，叠加使受到的伤害提高{vuln}的效果。",
+        "heroicVigor": "坟墓之力：在坟墓里时攻击速度提高{haste}。",
+        "heroicUnquiet": "不宁之土：在坟墓里停留{linger}秒会唤出一具不宁骸骨。"
+      },
+      "lady": {
+        "overview": "一位幽灵新娘，她的哀嚎会伤害每个没有被墓灯庇护的人。每盏墓灯只能庇护两名玩家，随后熄灭，所以队伍必须轮流使用。她还会把一名玩家举到空中，直到队伍对她造成足够的伤害，她才肯松手。",
+        "phaseRavineName": "霜冻峡谷",
+        "phaseRavineSummary": "峡谷四周立着三盏墓灯。她经过的路径会变成光滑的冰面。",
+        "phaseFreezeName": "新娘冰封",
+        "phaseFreezeSummary": "生命值降到{health}时，整个峡谷地面冻结，持续到战斗结束。",
+        "lamentSummary": "每{every}秒读条{cast}秒，随后对每名未被墓灯庇护的玩家造成{min}到{max}点伤害。每次受击都会叠加一层萦绕哀歌：每层使哀歌伤害提高{perStack}，持续{seconds}秒，最多{stacks}层。",
+        "lamentResponse": "在读条结束前站进点亮的墓灯光芒中。",
+        "lanternName": "墓灯",
+        "lanternSummary": "点亮的墓灯可以让{radius}码内最多{cap}名玩家免受哀歌伤害。庇护过任何人的墓灯会熄灭{dark}秒，所以下一次哀歌时它仍是暗的。",
+        "lanternHeroicSummary": "点亮的墓灯可以让{radius}码内最多{cap}名玩家免受哀歌伤害。庇护过任何人的墓灯会熄灭{dark}秒。英雄难度下，点亮的墓灯还会在{lit}秒后自行燃尽，并保持熄灭{gutter}秒。",
+        "lanternResponse": "提前安排谁用哪盏墓灯，每次哀歌都轮换到一盏点亮的灯。",
+        "embraceSummary": "每{every}秒，她抓住一名非坦克玩家，把其举到空中并抓住不放。在{hold}秒内对她造成{share}的生命值伤害，她就会把人轻轻放下；否则她会把人摔下：造成{min}到{max}点伤害。",
+        "embraceHeroicSummary": "每{every}秒，她抓住{victims}名非坦克玩家，把他们举到空中并抓住不放。在{hold}秒内对她造成{share}的生命值伤害，她就会把人轻轻放下；否则她会把人摔下：造成{min}到{max}点伤害。",
+        "embraceResponse": "她一抓人，所有人立刻爆发输出。治疗者为被抓的玩家补血。",
+        "rimeName": "Rime Path",
+        "rimeSummary": "她漂过之处会留下光滑的冰面；每块持续{seconds}秒。在冰上你会滑行，转向缓慢。",
+        "rimeResponse": "需要快速移动时，避开她的轨迹。",
+        "freezeSummary": "生命值降到{health}时，她读条{cast}秒，随后整个地面变成光滑的冰面，持续到战斗结束。这会打断正在读条的哀歌。",
+        "freezeResponse": "提早行动：在冰上要花更久才能走到墓灯。",
+        "tipTank": "让她留在中间，使每盏墓灯都在队伍够得到的范围内。",
+        "tipHealer": "未被庇护的玩家承受哀歌并叠层。被抓住的玩家在被她举起期间持续受伤。",
+        "tipDamage": "她一抓人就爆发输出。每次哀歌都在点亮的墓灯之间轮换。",
+        "choiceName": "谁来承受哀歌？",
+        "choiceGain": "三盏墓灯全部使用，每盏最多庇护{cap}名玩家，这次哀歌就没有人受伤。",
+        "choiceRisk": "用过的墓灯在下一次哀歌时仍是暗的，所以到时会有人受伤，而且每层萦绕哀歌会额外提高{perStack}伤害。",
+        "heroicEmbrace": "冰封之拥同时抓住{victims}名玩家。",
+        "heroicLanterns": "点亮的墓灯会在{lit}秒后自行燃尽，并保持熄灭{gutter}秒。"
+      },
+      "ilvane": {
+        "overview": "一位唱诗班女指挥，由两名空洞唱诗者守护，只要它们活着，就会为她减伤。她的挽歌会伤害并沉默所有能看见她的人，所以要打断它，或躲到柱子后面。她还会弹奏骨管风琴，让一道道音符通道沿着唱诗楼袭来。",
+        "phaseLoftName": "唱诗楼",
+        "phaseLoftSummary": "她在唱诗楼上歌唱，身边有两名空洞唱诗者。",
+        "phaseCrescendoName": "渐强",
+        "phaseCrescendoSummary": "生命值降到{health}时，她唱得更快，风琴会奏出第三波。",
+        "harmonyName": "和声",
+        "harmonySummary": "每名存活的唱诗者使她受到的伤害降低{per}：两名都在时降低{both}。",
+        "harmonyResponse": "先杀唱诗者。",
+        "dirgeSummary": "每{every}秒读条{cast}秒。读条完成时，所有能看见她的人受到{min}到{max}点伤害，并被沉默{silence}秒。被打断后，她{quiet}秒内不会再唱挽歌。",
+        "dirgeResponse": "打断它，或在读条结束前躲到柱子后面脱离视线。",
+        "organSummary": "每{every}秒，她走到风琴前，沿唱诗楼奏出{waves}波音符通道。每条通道显示{gather}秒后爆发：造成{min}到{max}点伤害。",
+        "organResponse": "先站在前几条通道之间，再走进已经爆发过的通道。",
+        "encoreName": "安可",
+        "encoreSummary": "一名唱诗者倒下{seconds}秒而同伴仍站着时，它会以满生命值重新站起。",
+        "encoreResponse": "两名唱诗者的死亡间隔不要超过{seconds}秒。",
+        "unbrokenSummary": "每第{nth}首挽歌是不断之诗：无法被打断。",
+        "unbrokenResponse": "为它躲到柱子后面。",
+        "crescendoName": "渐强",
+        "crescendoSummary": "生命值低于{health}时，挽歌读条{cast}秒，每{every}秒一次，风琴奏出{waves}波。第三波会重复第一波的通道。",
+        "crescendoResponse": "打断每一首挽歌，第三波时从第一波的通道里退出来。",
+        "tipTank": "把唱诗者聚在一起以便快速击杀，然后接住伊尔凡。",
+        "tipHealer": "唱完的挽歌也会沉默你：如果没人能打断，就躲到柱子后面。",
+        "tipDamage": "先杀唱诗者，打断挽歌，躲开风琴通道。",
+        "tipDamageHeroic": "在{seconds}秒内击杀两名唱诗者，打断挽歌，并躲开每一次不断之诗。",
+        "choiceName": "打断还是躲避？",
+        "choiceGain": "打断会中止挽歌，并让她{quiet}秒内保持安静。",
+        "choiceRisk": "躲在柱子后面会损失输出时间。打断失败则会沉默并伤害视线内的所有人。",
+        "heroicEncore": "安可：唱诗者倒下{seconds}秒而同伴仍活着时会重新站起。",
+        "heroicUnbroken": "不断之诗：每第{nth}首挽歌无法被打断。"
+      },
+      "morthen": {
+        "overview": "一位巫妖主教，主持三幕仪式。第一幕他召唤灵魂强化自己；生命值降到{rite}时，他躲在结界后，直到队伍付出生命重燃四根蜡烛；降到{last}时，他挥舞巨大的镰刀。",
+        "phaseCallingName": "召唤",
+        "phaseCallingSummary": "他在周身释放暗影脉冲，并召唤灵魂喂养自己。",
+        "phaseRiteName": "不宁者仪式",
+        "phaseRiteSummary": "生命值降到{health}时，他回到祭坛，在四根蜡烛全部重新燃起前免疫伤害。",
+        "phaseLastName": "终末仪式",
+        "phaseLastSummary": "生命值降到{health}时，他提起镰刀，迎接战斗的终章。",
+        "pulseSummary": "每{every}秒（终末仪式中为{everyLast}秒）读条{cast}秒，随后对{radius}码内所有人造成{min}到{max}点伤害。",
+        "pulseResponse": "包括坦克在内的所有人，都要在读条结束前退到{radius}码外。",
+        "gravecallName": "唤墓",
+        "gravecallSummary": "每{every}秒，一个缚魂从壁龛飘向他。若它抵达，他每层多造成{per}伤害（最多{stacks}层），并恢复{heal}的生命值。它接触到的第一名玩家会替他承受：造成{min}到{max}点伤害。",
+        "gravecallResponse": "让一名闲置的玩家站到每个灵魂的路径上。",
+        "graspName": "坟墓之握",
+        "graspSummary": "每{every}秒，{count}名玩家脚下出现{radius}码的法环。{fuse}秒后鬼手破土而出：环内所有人被定身{root}秒，并受到{min}到{max}点伤害。",
+        "graspResponse": "立刻走出法环。",
+        "riteSummary": "他变得免疫伤害，{candles}根蜡烛熄灭。{bones}具不宁骸骨爬出。墓穴寒意每秒打击所有人：{base}点伤害，每{chillEvery}秒提高{step}，没有上限。",
+        "riteResponse": "快速重燃全部四根蜡烛：寒意不会停止上升。",
+        "relightName": "重燃追思蜡烛",
+        "relightSummary": "在蜡烛旁（{range}码内）引导{channel}秒来重燃它。点燃者损失{drain}的最大生命值。第四根点燃时，他被击晕{stun}秒，并多受到{vuln}伤害。",
+        "relightResponse": "把蜡烛分给生命值充裕的玩家，并在击晕期间爆发输出。",
+        "nameDeadName": "Name the Dead",
+        "nameDeadSummary": "蜡烛必须按名册上金色光束指示的顺序点燃。点错蜡烛会熄灭最后点燃的一根，并对点燃者造成{min}到{max}点伤害。",
+        "nameDeadResponse": "只点光束指向的蜡烛。",
+        "reapSummary": "每{every}秒向坦克读条{cast}秒，随后向他正前方{arc}度、{range}码的扇形挥镰：造成{min}到{max}点伤害。",
+        "reapResponse": "只有坦克站在正面。坦克可以在读条时侧移。",
+        "tipTank": "让他背对队伍，并和其他人一起走出暗影脉冲。",
+        "tipHealer": "每根蜡烛都会消耗点燃者大量生命值，而且墓穴寒意持续上升：优先治疗点燃者。",
+        "tipDamage": "用身体挡住缚魂，仪式中重燃蜡烛，在他昏迷时爆发输出。",
+        "tipDamageHeroic": "用身体挡住缚魂，并躲开坟墓之握。仪式中沿着金色光束找到正确的蜡烛。",
+        "choiceCandleName": "派几个人点蜡烛？",
+        "choiceCandleGain": "多名玩家同时重燃，能更快结束仪式，赶在墓穴寒意攀升之前。",
+        "choiceCandleRisk": "每名点燃者每根蜡烛要付出{normal}的最大生命值，同时寒意持续上升。",
+        "choiceSoulName": "要不要挡住灵魂？",
+        "choiceSoulGain": "被挡住的灵魂永远到不了他身边：没有伤害叠层，也没有治疗。",
+        "choiceSoulRisk": "挡魂者承受灵魂的伤害。每个漏过的灵魂使他多造成{per}伤害，并为他恢复{heal}的生命值。",
+        "heroicNameDead": "点名亡者：蜡烛必须按名册显示的顺序点燃。",
+        "heroicGrasp": "坟墓之握：每一幕都会出现定身并造成伤害的法环。",
+        "heroicDrain": "每根蜡烛消耗点燃者{drain}的最大生命值。"
+      },
+      "wyrm": {
+        "overview": "莫森临终的仪式点燃了一座火葬堆，一条骨龙落入其中。它的战斗方式与骨堂骨龙相似，另有燃烧的扫射通道，以及一声会击退玩家、却让它暴露出来承受更多伤害的咆哮。",
+        "phaseName": "唤龙火葬堆",
+        "phaseSummary": "它从够不到的高处滑翔而来，伴着一团烈焰落入法环。",
+        "strafeSummary": "每{every}秒，它用{mark}秒标出一条穿过某名玩家的{width}码宽通道，随后喷洒火焰飞过：通道内所有人受到{min}到{max}点伤害。通道会持续燃烧{seconds}秒：每秒{burn}点伤害。",
+        "strafeResponse": "向侧面走出标记的通道，并远离燃烧的地面。",
+        "bellowSummary": "每{every}秒读条{cast}秒，随后{radius}码内的人受到{min}到{max}点伤害，并被击退{push}码。之后{seconds}秒内，它多受到{vuln}伤害。",
+        "bellowResponse": "别被击退到燃烧的通道里。在随后的窗口期交出爆发技能。",
+        "knellSummary": "每{every}秒，它飞到够不到的高处，向半个法环喷吐{breaths}次火焰。每个半区在着火前{mark}秒被标记：其中所有人受到{min}到{max}点伤害。",
+        "knellResponse": "每次都跑向法环中未被标记的一半。",
+        "tipTank": "让它背对队伍，并把它从燃烧的通道里转开。",
+        "tipHealer": "火葬扫射和恐惧咆哮是伤害高峰；治疗被击退进燃烧通道的人。",
+        "tipDamage": "走出标记的通道，每次恐惧咆哮后交出爆发技能。",
+        "tipDamageHeroic": "走出标记的通道，燃烧丧钟期间每次都跑向安全的一半。",
+        "heroicKnell": "燃烧丧钟：它升空，向半个法环喷吐{breaths}次火焰。"
+      }
+    },
+    "bastion": {
+      "captain": {
+        "overview": "一名悬浮的幽灵船长在下层外堡的护城河上巡逻，不杀死他，吊桥就不会放下。他循环施放三种指向非坦克玩家的通道攻击，每一种都会在发动前画在地面上。",
+        "phaseName": "The Moat",
+        "phaseSummary": "开战{first}秒后他发出第一招，随后依次是幽灵舷炮齐射、诅咒之锚和幻影登船，每招间隔{recovery}秒。每次出招时他都站在原地不动。",
+        "broadsideSummary": "{warn}秒预警后，{lanes}条长{length}码的平行通道同时开火：通道内的所有人受到{min}到{max}点伤害。",
+        "broadsideResponse": "站在通道之间的空隙里。",
+        "anchorSummary": "{warn}秒预警后，一支诅咒之锚沿其通道向后拖拽{length}码，历时{seconds}秒，击中沿途所有人：{min}到{max}点伤害。",
+        "anchorResponse": "在锚发动前离开通道。",
+        "boardingSummary": "{warn}秒预警后，{length}码通道内的所有人受到{min}到{max}点伤害，随后他沿通道冲刺。",
+        "boardingResponse": "从通道旁让开。",
+        "sailorsName": "缚骸水手",
+        "sailorsSummary": "生命值降到{first}和{second}时，各有{count}名缚骸水手加入战斗。水手死亡后不久会迸发灵魂能量。",
+        "sailorsResponse": "坦克接住它们。远离刚死的水手。",
+        "tipTank": "让他原地不动，并接住缚骸水手。他的通道瞄准其他人，不会瞄准你。",
+        "tipHealer": "幽灵舷炮齐射伤害最高：治疗站在通道里的人。",
+        "tipDamage": "盯紧地面：每个招式发动前都会画出来。站在舷炮齐射的空隙里。"
+      },
+      "olen": {
+        "overview": "一名堕落的圣骑士。他的咸水池会为他提供护盾，所以坦克要把他拖出水池；团队保持分散，这样他的回弹壁盾和宣判光柱只会击中一名玩家。生命值一半时他会跪下并免疫伤害，直到他的溺亡军士全部被杀。",
+        "phaseBreachName": "破口堡垒",
+        "phaseBreachSummary": "他一次只施放一个技能；施法期间他的计时器暂停。",
+        "phaseOathName": "不破誓言",
+        "phaseOathSummary": "生命值降到{health}时，他跪下并免疫伤害，由溺亡军士替他作战。",
+        "brineSummary": "每{every}秒读条{cast}秒，随后在他脚下生成半径{radius}码的圣化咸水池，持续{seconds}秒：池中所有人每秒受到{perSecond}点伤害。他站在任意水池中时，受到的伤害降低{shield}。",
+        "brineResponse": "坦克把他拖出水池。其他人也走出水池。",
+        "bulwarkSummary": "每{every}秒读条{cast}秒，目标是一名非坦克玩家。盾牌对其造成{min}到{max}点伤害，随后弹向{reach}码内最近的未被击中的玩家，最多{hits}名玩家。",
+        "bulwarkResponse": "保持分散：与其他所有人相距超过{reach}码。",
+        "sentenceSummary": "每{every}秒读条{cast}秒，标记一名非坦克玩家。{seconds}秒后，无论他们身在何处，光柱都会落在其身上：{radius}码内所有人受到{min}到{max}点伤害。",
+        "sentenceResponse": "被标记：在光柱落下前离开队伍。",
+        "arcName": "收割之弧",
+        "arcSummary": "他的每次近战攻击，还会以该次挥击伤害的{share}打击坦克{radius}码内的其他所有玩家。",
+        "arcResponse": "除了坦克，任何人都不要站在坦克{radius}码内。",
+        "oathSummary": "仅一次，在生命值{health}时：他跪下并引导最多{max}秒，免疫所有伤害，同时{count}名溺亡军士现身，攻击非坦克玩家。全部击杀后，他会昏迷{stun}秒，并在{vulnSeconds}秒内多受到{vuln}的伤害。",
+        "oathResponse": "坦克集中军士；所有人击杀它们，然后在奥伦昏迷时爆发输出。",
+        "tipTank": "把他拖出每一个咸水池。让队友远离你周围{radius}码，他的挥击会溅射到那里。",
+        "tipHealer": "玩家聚在一起时，回弹壁盾和潮汐宣判伤害最高。军士在低血量时会狂暴。",
+        "tipDamage": "保持分散，彼此相距超过{reach}码，并远离坦克。誓言阶段先击杀军士。",
+        "choiceName": "集合还是分散？",
+        "choiceGain": "分散开来，回弹壁盾、潮汐宣判和收割之弧每次都只会击中一名玩家。",
+        "choiceRisk": "被击中玩家{reach}码内的所有人都会受到弹射，坦克{radius}码内的所有人会受到溅射。",
+        "heroicChanges": "咸水池半径为{radius}码，盾牌弹射至{hits}名玩家，宣判光柱为{sentence}码，现身的军士为{count}名。"
+      },
+      "turnkey": {
+        "overview": "牢狱钥匙官把玩家锁进铁笼。被关的玩家连按交互键挣脱，队友攻击铁笼可以加快进度。",
+        "phaseName": "牢狱铁栅",
+        "phaseSummary": "他按固定计时关押玩家，并在生命值一半时放出囚徒。",
+        "cageSummary": "每{every}秒读条{cast}秒，随后铁笼落在一名非坦克玩家身上，使其眩晕。铁笼有{hits}点耐久：被关者每按一次交互键破坏{press}，盟友每次攻击破坏{helper}，铁笼还会缓慢自行修复。{max}秒后铁笼会碾压被关者，造成其最大生命值{crush}的伤害。",
+        "cageHeroicSummary": "每{every}秒读条{cast}秒，随后铁笼落在{cages}名非坦克玩家身上。每个铁笼有{hits}点耐久：被关者每按一次交互键破坏{press}，盟友每次攻击破坏{helper}。笼内不断上涨的盐水每秒消耗生命值。{max}秒后铁笼会碾压，造成最大生命值{crush}的伤害。",
+        "cageResponse": "被关住：快速连按交互键。其他人攻击铁笼将其打破。",
+        "cellsName": "打开牢房",
+        "cellsSummary": "生命值降到{health}时，他放出{count}名戴镣囚徒。囚徒生命值降到四分之一时锁链崩断，他们退出战斗。",
+        "cellsResponse": "把它们打到四分之一生命值；不需要击杀。",
+        "tipTank": "控住他和囚徒；铁笼永远不会瞄准你。",
+        "tipHealer": "给被关住的玩家补血：碾压造成的是其生命值的一定比例。",
+        "tipDamage": "立刻切换到每个铁笼上，打到它破裂为止。",
+        "heroicCages": "铁笼一次锁住{cages}名玩家。",
+        "heroicFlood": "盐水涌入：被关住的玩家每秒损失生命值，直到被救出。"
+      },
+      "ossick": {
+        "overview": "狱卒用锚钩住一名玩家，并将其拖向溺亡深坑。被钩者要跑到点亮的系泊柱，或由团队砸断锁链。与此同时，另外两名玩家被锁在一起，必须靠近彼此。",
+        "phaseName": "溺亡庭院",
+        "phaseSummary": "生命值降到{first}和{second}时，每次都有{count}名戴镣囚徒从牢房中出来。",
+        "anchorSummary": "每{every}秒读条{cast}秒，随后一名非坦克玩家被钩住。{settle}秒后锁链将其拖向深坑。脱身方法：跑到距被钩处至少{run}码、点亮的系泊柱{reach}码以内（该柱熄灭{dark}秒），或由团队对锚造成{hits}次攻击。掉进深坑：损失最大生命值的{pit}并眩晕{stun}秒。",
+        "anchorHeroicSummary": "每{every}秒读条{cast}秒，随后一名非坦克玩家被钩住；锚落地时会击中{crashRadius}码内的其他所有人，造成{min}到{max}点伤害。{settle}秒后锁链将其拖向深坑。脱身方法：至少{run}码外点亮的系泊柱，或对锚造成{hits}次攻击。掉进深坑：损失最大生命值的{pit}并眩晕{stun}秒。",
+        "anchorResponse": "被钩住：尽早跑向点亮的系泊柱。其他人攻击锚。",
+        "shackleSummary": "每{every}秒读条{cast}秒，将两名玩家锁在一起，持续{seconds}秒。他们每相距超过{range}码一秒，双方都会受到{min}到{max}点伤害。",
+        "shackleResponse": "被锁住：与搭档保持在{range}码以内。",
+        "cudgelSummary": "每{every}秒对坦克读条{cast}秒：造成其近战攻击{mult}倍的伤害，无视护甲，并使移动速度降低{slow}，持续{seconds}秒。",
+        "cudgelResponse": "坦克：使用冷却技能。治疗者预判这一击。",
+        "tipTank": "把他控在场地中央附近并接住囚徒。狱卒短棍无视你的护甲。",
+        "tipHealer": "留意被钩住和被锁住的玩家；深坑会夺走大量生命值。",
+        "tipDamage": "有人被钩住时立刻攻击锚。被锁住时与搭档保持靠近。",
+        "choiceName": "跑向系泊柱，还是砸断锁链？",
+        "choiceGain": "点亮的系泊柱只救出被钩住的玩家一人，团队可以继续输出。",
+        "choiceRisk": "系泊柱必须至少在{run}码外，并会熄灭{dark}秒。锁链变短后，就没有系泊柱在够得着的范围内，只能砸断锁链。",
+        "heroicCrash": "锚坠：锚会击中被钩玩家{crashRadius}码内的所有人。",
+        "heroicChanges": "锚需要{hits}次攻击才能砸断，被锁住的玩家必须保持在{range}码以内。"
+      },
+      "vael": {
+        "overview": "一个戴兜帽的收割者。他连续三次从某名玩家身后的暗影池中升起，用镰刀横扫其后背。生命值降到{first}和{second}时，他会藏身于一模一样的分身之间，同时圣咏伤害所有人；雾灯塔的光束会显示哪个身影是真身。",
+        "phaseCrownName": "信标之冠",
+        "phaseCrownSummary": "玩家踩上王冠时他会从中升起。生命值降到{first}和{second}时，各有{count}名溺亡奴仆加入战斗。",
+        "phaseVeilName": "Fog Veil",
+        "phaseVeilSummary": "生命值降到{first}和{second}时，他会藏身于一模一样的分身之间。",
+        "surgeSummary": "读条{cast}秒，随后对其{radius}码内的所有人造成{min}到{max}点伤害。常规战斗中每{every}秒一次；生命值低于{below}时每{lastEvery}秒一次。",
+        "surgeResponse": "远程玩家保持在{radius}码之外。",
+        "crossingSummary": "每{every}秒他穿行暗影，最多连续{chain}次，每次都在不同的玩家身后：其身后{behind}码处裂开一个水池，他从中升起，朝其方向横扫{range}码、{arc}度的扇形：{min}到{max}点伤害。",
+        "crossingResponse": "被死亡标记：向前走出横扫范围，或走到水池后面。其他人绝不要站在被标记玩家的正前方。",
+        "graveName": "墓影",
+        "graveSummary": "每个暗影池存在{seconds}秒，灼烧{radius}码内的所有人，每秒{perSecond}点伤害。",
+        "graveResponse": "远离旧的水池。",
+        "veilSummary": "他藏起身形，随后四个身影在王冠周围升起：维尔和三个雾影。四者齐唱溺亡圣咏，持续{seconds}秒，对所有人的伤害逐秒增加。雾灯塔的光束每{beam}秒扫过一次：真正的维尔会亮起。对其造成其生命值{share}的伤害即可打破雾幕：他会昏迷{stun}秒，并在{vulnSeconds}秒内多受到{vuln}的伤害。",
+        "veilHeroicSummary": "他藏起身形，随后四个身影在王冠周围升起：维尔和三个雾影，每{drift}秒向前挪动一个位置。四者齐唱溺亡圣咏，持续{seconds}秒。雾灯塔的光束会显示真正的维尔。对其造成其生命值{share}的伤害即可打破雾幕：昏迷{stun}秒，并在{vulnSeconds}秒内多受到{vuln}的伤害。",
+        "veilResponse": "留意光束，然后所有人只攻击真正的维尔。",
+        "fogburstName": "雾爆",
+        "fogburstSummary": "任何对雾影的攻击都会使其爆裂：其{radius}码内的玩家受到{min}到{max}点伤害并眩晕{stun}秒。",
+        "fogburstHeroicSummary": "任何对雾影的攻击都会使其爆裂：其{radius}码内的玩家受到{min}到{max}点伤害并眩晕{stun}秒，且在它原地升起一名溺亡奴仆。",
+        "fogburstResponse": "不要攻击分身：等待光束。",
+        "tipTank": "接住溺亡奴仆。雾幕期间，协助找出真正的维尔。",
+        "tipHealer": "溺亡圣咏会对所有人逐步加强，直到雾幕被打破。迷雾涌流会击中其{radius}码内的所有人。",
+        "tipDamage": "被死亡标记时，向前或走到水池后面。雾幕期间，只攻击光束照亮的身影。",
+        "tipDamageHeroic": "被死亡标记时，向前或走到水池后面，并避开旧的水池。雾幕期间，只攻击光束照亮的身影。",
+        "choiceName": "等待光束，还是靠猜？",
+        "choiceGain": "等待光束能让每次攻击都落在真正的维尔身上，更快打破雾幕。",
+        "choiceRisk": "雾幕每持续一秒，圣咏伤害就更高。猜错会打爆一个分身：其周围造成伤害并眩晕。",
+        "choiceRiskHeroic": "雾幕每持续一秒，圣咏伤害就更高。猜错会打爆一个分身，使其附近的玩家眩晕，并留下一名溺亡奴仆。",
+        "heroicGrave": "墓影：每个暗影池持续燃烧{seconds}秒。",
+        "heroicVeil": "雾幕期间身影每{drift}秒挪动一次，被打爆的分身会留下一名溺亡奴仆。"
+      }
+    },
+    "temple": {
+      "selthe": {
+        "overview": "唱诗母在她的水池中歌唱，从不移动，也不近战。她会标记玩家，施放需要集合分摊的合唱和需要独自承受的独唱，向一名玩家射出不断增强的咏叹调光束，并向庭院扫出一道波浪。她的箭和咏叹调都可以被打断。",
+        "phaseName": "唱诗庭院",
+        "phaseSummary": "只有一个阶段，全靠计时。到期时若她正在读条，该机制会等读条结束后再触发。",
+        "chorusName": "合唱",
+        "chorusSummary": "每{every}秒标记一名非坦克玩家，持续{mark}秒。标记结束时，{total}点伤害由其周围{radius}码内的所有人平摊。",
+        "chorusHeroicSummary": "每{every}秒标记一名非坦克玩家，持续{mark}秒。标记结束时，{total}点伤害由其周围{radius}码内的所有人平摊。回响：{echo}秒后，同一地点再次爆发，对仍留在原地的每名玩家造成{echoDamage}点伤害，不再平摊。",
+        "chorusResponse": "所有人集合到合唱目标身边，并在回响之前离开该地点。",
+        "soloName": "Solo",
+        "soloSummary": "每次合唱{offset}秒后，另一名玩家被标记{mark}秒。标记结束时，被标记的玩家及其周围{radius}码内的所有人各受到{damage}点伤害。",
+        "soloHeroicSummary": "二重唱：独唱与合唱同时落在不同的玩家身上。标记结束时，被标记的玩家及其周围{radius}码内的所有人各受到{damage}点伤害，{echo}秒后该地点再次爆发。",
+        "soloResponse": "独唱目标：远离所有人，然后离开该地点。",
+        "songSummary": "每{every}秒读条{cast}秒，随后对庭院内的每名玩家造成{min}到{max}点冰霜伤害。",
+        "songResponse": "无法躲避：治疗者要时刻保持所有人满血。",
+        "boltSummary": "她的填充技能：向目标读条{cast}秒，造成相当于其近战攻击{mult}倍的冰霜伤害。任何一次打断之后，她在{quiet}秒内不会施放箭或咏叹调。",
+        "boltResponse": "咏叹调不会来时，打断她的箭。",
+        "ariaSummary": "每{every}秒，她对一名非坦克玩家引导光束{channel}秒：共{pulses}次脉冲，对同一目标的伤害从{min}逐步增长到{max}。有玩家踏入光束时，由该玩家承受脉冲，增长重新开始。",
+        "ariaResponse": "打断它，躲到灯柱后面打断她的视线，或踏入光束分担伤害。",
+        "surgeSummary": "每{every}秒瞄准一名非坦克玩家读条{cast}秒，随后释放一道{arc}度、长{range}码的波浪：造成{min}到{max}点伤害，并击退{push}码。",
+        "surgeResponse": "向侧面走出扇形范围。",
+        "tipTank": "站在她能看到你的位置，让她的箭都打向你；这里没有别的需要坦克处理的机制。",
+        "tipHealer": "海之歌每{every}秒打击所有人。留意咏叹调的目标，以及被合唱孤立的人。",
+        "tipDamage": "合唱时集合，独唱时分散，打断咏叹调，并走出湖涌。",
+        "tipDamageHeroic": "合唱集合与独唱分散会同时发生，随后在回响之前离开两处地点。打断咏叹调。",
+        "choiceName": "打断咏叹调，还是分担它？",
+        "choiceGain": "打断或灯柱能立刻终止光束。踏入光束则会让增长在你身上重新开始。",
+        "choiceRisk": "被打断的咏叹调也会让她的箭短暂沉默，但如果无人行动，完整的增长伤害会全部落在一名玩家身上。",
+        "heroicDuet": "二重唱：合唱与独唱同时落在两名玩家身上。",
+        "heroicEcho": "回响：每个标记在{echo}秒后于同一地点再次爆发。"
+      },
+      "hydra": {
+        "overview": "三个头颅掌握三种元素，共享同一场战斗：冰、毒和水。倒下的头颅会把它的攻击交给下一个头颅，只要还有头颅存活，它就会在{regrow}秒后长回来。巨浪按计时席卷半个水池，两次巨浪之间，两个头颅会融合它们的吐息。",
+        "phaseName": "九头蛇水池",
+        "phaseSummary": "左侧头颅喷出冰霜，中间头颅喷吐毒液，右侧头颅释放水流。",
+        "phaseComboName": "合体吐息",
+        "phaseComboSummary": "每次巨浪{after}秒后，两个头颅会融合，顺序始终是冰封激流、毒液洋流、剧毒霜晶。",
+        "phaseComboHeroicSummary": "每次巨浪{early}秒后和{after}秒后，两个头颅会融合，顺序是冰封激流、毒液洋流、剧毒霜晶。",
+        "headsName": "三个头颅",
+        "headsSummary": "倒下的头颅会把元素传给下一个头颅，每有一个头颅倒下，所有存活的头颅造成的伤害就提高{enrage}。只要还有头颅存活，倒下的头颅会在{regrow}秒后以{share}的生命值长回来。",
+        "headsResponse": "同时击倒三个头颅，并在{regrow}秒内结束战斗。",
+        "breathSummary": "每{every}秒瞄准一名非坦克玩家读条{cast}秒，随后喷出一道{arc}度、长{range}码的冰霜锥形吐息：造成{min}到{max}点伤害，并减速{slow}，持续{seconds}秒。",
+        "breathResponse": "走出锥形范围。",
+        "spitName": "毒液喷吐",
+        "spitSummary": "每{every}秒，最多{count}名不同玩家脚下的{radius}码毒池在{warn}秒后爆裂：造成{min}到{max}点伤害，随后毒液在原地灼烧{seconds}秒，每秒{perSecond}点。",
+        "spitResponse": "先分散，再走出毒池。",
+        "torrentSummary": "每{every}秒读条{cast}秒，向一名非坦克玩家打出一条{length}码长的水流：造成{min}到{max}点伤害，并推开{push}码。",
+        "torrentResponse": "向侧面走出水流。",
+        "tsunamiSummary": "第一次在{first}秒，之后在上一道巨浪结束{every}秒后：读条{cast}秒，期间头颅受到的伤害降低{reduction}，随后一道巨浪席卷半个水池：造成{min}到{max}点伤害，并推开{push}码。",
+        "tsunamiHeroicSummary": "第一次在{first}秒，之后在上一道巨浪结束{every}秒后：读条{cast}秒，期间头颅受到的伤害降低{reduction}，随后一道巨浪席卷半个水池：造成{min}到{max}点伤害并推开。回流：{backwash}秒后巨浪回卷另一半。",
+        "tsunamiResponse": "移到另一半，躲到池边石柱后面，或躲到冰墙后面。头颅沉入水中时不要输出。",
+        "frostlockSummary": "向一名玩家打出一条水流：造成{min}到{max}点伤害，并冻结{stun}秒。它会留下一道持续{wall}秒的冰墙：站在墙后{lee}码以内可躲过下一道巨浪，巨浪会将冰墙击碎。",
+        "frostlockHeroicSummary": "向一名玩家打出一条水流：造成{min}到{max}点伤害，并冻结{stun}秒。它会留下一道冰墙：站在墙后可躲过下一道巨浪。冰墙碎裂时，墙周围{reach}码内的所有人受到{shardMin}到{shardMax}点伤害。",
+        "frostlockResponse": "躲开水流，再把冰墙当作掩体来躲海啸。",
+        "currentSummary": "毒池膨胀到{radius}码，并从水池中心向外滑动{slide}码，每秒灼烧{perSecond}点。",
+        "currentResponse": "让开滑动路径。",
+        "rimeSummary": "毒池冻结成晶体，{seconds}秒后爆裂：对{radius}码内造成{min}到{max}点伤害。",
+        "rimeResponse": "在每块晶体爆裂前远离它们。",
+        "tipTank": "抓住你够得到的头颅；它们的攻击会瞄准其他人。",
+        "tipHealer": "海啸和合体吐息是伤害高峰。每有一个头颅倒下，其余头颅就打得更痛。",
+        "tipDamage": "均匀分配伤害，让三个头颅在{regrow}秒内相继倒下。每次海啸期间停手。",
+        "choiceName": "先杀哪个头颅？",
+        "choiceGain": "三个头颅同时倒下就结束战斗；只要它们倒下的时间相近，顺序都可以。",
+        "choiceRisk": "每个倒下的头颅都会让其余头颅多造成{enrage}的伤害，并在{regrow}秒后长回来，而最后剩下的头颅掌握所有元素。",
+        "heroicChanges": "长回来的头颅以{share}的生命值回归，每道巨浪都会引发回流。"
+      },
+      "colossus": {
+        "overview": "一尊行走的玻璃巨人。在三个生命值节点，每名玩家都会得到一个追击自己的镜像；你无法伤害自己的镜像，而每个存活的镜像都会为巨像提供护盾。在此之间，还有水流、猛击，以及一层层碎裂的地面。",
+        "phaseName": "棱镜露台",
+        "phaseSummary": "每次读条它都会站定脚步，也绝不离开露台。",
+        "phaseFlareName": "棱镜闪耀",
+        "phaseFlareSummary": "生命值降到{first}、{second}和{third}时，它会召唤潮镜倒影。",
+        "lanceSummary": "每{every}秒读条{cast}秒，向一名非坦克玩家打出一条{length}码长的水流：造成{min}到{max}点伤害。",
+        "lanceResponse": "向侧面走出水流。",
+        "slamSummary": "每{every}秒读条{cast}秒，随后对{radius}码内造成{min}到{max}点伤害，并击退{push}码。",
+        "slamResponse": "近战可以走出范围；治疗者负责保护坦克。",
+        "fractureSummary": "第一次在{first}秒，之后每{every}秒：地面裂成{slices}块，持续{rounds}轮。每一轮都有几块变红，并在{warn}秒后爆炸：造成{min}到{max}点伤害。中心区域每一轮都会爆炸。",
+        "fractureResponse": "每一轮都走到一块安全的地面上，并远离中心。",
+        "flareSummary": "引导{cast}秒，随后每名玩家都会得到一个潮镜倒影，它拥有巨像{share}的生命值，并追击玩家。你无法伤害自己的倒影。",
+        "flareResponse": "击杀彼此的倒影，绝不要打自己的。",
+        "wardName": "棱镜护盾",
+        "wardSummary": "每个存活的倒影使巨像受到的伤害降低{per}，最多降低{cap}。",
+        "wardResponse": "清掉倒影，再回到巨像身上。",
+        "shatterName": "破碎之镜",
+        "shatterSummary": "倒影破碎时，其周围{radius}码内的所有人受到{damage}点伤害。",
+        "shatterResponse": "不要站在即将死亡的倒影旁边。",
+        "swapName": "镜像互换",
+        "swapSummary": "每{every}秒，倒影会互换主人，所以你能攻击哪个镜像会随之改变。",
+        "swapResponse": "每次互换后，重新确认你能攻击哪个镜像。",
+        "tipTank": "每次闪耀之后重新抓住巨像；它会一路追着目标走。",
+        "tipHealer": "倒影会攻击它们的主人。潮镜碎裂会惩罚留在红色地块上的人。",
+        "tipDamage": "每次闪耀时击杀队友的倒影，然后在碎裂阶段一块一块地移动。",
+        "tipDamageHeroic": "每次闪耀时击杀队友的倒影；互换之后重新确认。不要站在即将死亡的镜像旁边。",
+        "choiceName": "先杀倒影，还是先打巨像？",
+        "choiceGain": "击杀镜像可移除最多{cap}的减伤，并让它们不再追击。",
+        "choiceRisk": "打镜像的时间就是没打巨像的时间，而且在英雄难度下，每个镜像破碎时都会爆发。",
+        "heroicShatter": "破碎之镜：倒影破碎时，会伤害其周围{radius}码内的所有人。",
+        "heroicSwap": "镜像互换：倒影每{every}秒互换一次主人。"
+      },
+      "ysolei": {
+        "overview": "溺月化身会把所有人拉近并猛击，淹没半座岛屿，召唤月之孽生，并让月光之泪滚向她自己。最后，除非团队及时打破她的护盾，否则月亮将会坠落。",
+        "phaseAltarName": "月亮祭坛",
+        "phaseAltarSummary": "她绝不移动。她的攻击范围很长：近战要站在远离她中心的位置。",
+        "phaseTideName": "涨潮",
+        "phaseTideSummary": "生命值降到{health}时，半座岛屿被淹没，之后洪水会切换到另一侧。",
+        "phaseMoonName": "The Full Moon",
+        "phaseMoonSummary": "生命值降到{health}时，她会召唤月亮坠落。",
+        "lunarSummary": "每{every}秒读条{cast}秒，随后对她中心{radius}码内的所有人造成{min}到{max}点伤害。",
+        "lunarResponse": "远程玩家待在范围外；近战始终在范围内，所以治疗者要保护他们。",
+        "undertowSummary": "每{every}秒引导{seconds}秒，以每秒{pull}码的速度把所有人拉向她。随后是潮汐冲击：对{radius}码内造成{min}到{max}点伤害。",
+        "undertowHeroicSummary": "每{every}秒引导{seconds}秒，把所有人拉向她。随后是潮汐冲击：对{radius}码内造成{min}到{max}点伤害。裂流：每名玩家站立的位置都会裂开一个水潭，持续{pool}秒，每秒灼烧{riptide}点。",
+        "undertowResponse": "引导期间，所有人（包括近战）都要朝干燥的地面跑出去；洪水会使你减速。",
+        "tearsSummary": "生命值降到{first}和{second}时，她会召唤{count}颗滚向她的月光之泪。月光之泪碰到玩家就会停下：造成{min}到{max}点伤害，每层月灼额外造成{bonus}，月灼持续{sear}秒。月光之泪若到达她身边，她在本场战斗中的伤害提高{swell}，并恢复{heal}的生命值。",
+        "tearsHeroicSummary": "生命值降到{first}和{second}时，她会召唤{count}颗滚向她的月光之泪。月光之泪碰到玩家就会停下：造成{min}到{max}点伤害，每层月灼额外造成{bonus}，并留下倾泻月光，每秒灼烧{glow}点。月光之泪若到达她身边，她的伤害提高{swell}，并恢复{heal}的生命值。",
+        "tearsResponse": "用身体挡住每一颗月光之泪，轮流承受，避免有人叠起月灼。",
+        "tideName": "涨潮",
+        "tideSummary": "生命值降到{health}时，半座岛屿立刻被淹没。每{every}秒洪水切换一侧，切换前有{warn}秒的波光预警。在水中：每秒受到{perSecond}点伤害，并减速{slow}。",
+        "tideHeroicSummary": "生命值降到{health}时，半座岛屿立刻被淹没。每{every}秒洪水切换一侧。在水中：每秒受到{perSecond}点伤害，并减速{slow}。溺月：每{moonEvery}秒，一只月之孽生会从被淹没的一侧爬出来。",
+        "tideResponse": "待在干燥的一侧，另一侧泛起波光时就移动过去。",
+        "callSummary": "生命值降到{first}和{second}时，她会召唤{count}只月之孽生。",
+        "callResponse": "坦克抓住它们，伤害输出击杀它们。",
+        "moonSummary": "在相当于她{ward}生命值的护盾保护下读条{cast}秒。及时打破护盾：她会被眩晕{stun}秒，并多承受{vuln}的伤害。若护盾未破：对岛上所有人造成{min}到{max}点伤害，并且她在本场战斗剩余时间内多造成{might}的伤害。",
+        "moonResponse": "每名伤害输出都攻击她的护盾；治疗者为冲击做好准备。",
+        "tipTank": "抓住每一只月之孽生。和大家一起跑出暗流。",
+        "tipHealer": "月潮每次读条都会打击近战。月光之泪会叠加月灼：治疗挡下月光之泪的人。",
+        "tipDamage": "躲开每一次暗流，轮流挡月光之泪，击杀月之孽生，并在坠月时全力打掉护盾。",
+        "tipDamageHeroic": "躲开每一次暗流及其裂流水潭，轮流挡月光之泪，击杀月之孽生，并尽快打掉坠月的护盾。",
+        "choiceName": "挡住月光之泪，还是放它们过去？",
+        "choiceGain": "被挡下的月光之泪永远到不了她身边：她不会获得{swell}的伤害加成，也不会恢复{heal}的生命值。",
+        "choiceRisk": "挡泪的人承受伤害并获得一层月灼：下一颗打在他身上的月光之泪会多造成{bonus}。轮流来挡。",
+        "heroicRiptide": "裂流：每次暗流都会在玩家站立的位置留下燃烧的水潭。",
+        "heroicDrownedMoon": "溺月：每{moonEvery}秒，一只月之孽生会从洪水中爬出来。",
+        "heroicTears": "每波{count}颗月光之泪，坠月的读条时间为{cast}秒。"
+      }
+    },
+    "sanctum": {
+      "tusker": {
+        "overview": "一头房屋般巨大的巨牙兽拖着一架满载燃烧灵魂火盆的雪橇，在拖橇之路上来回奔走。它沿道路循环行走，并在你拉怪的地方卸下雪橇。生命值降到一半时雪橇会翻倒，在它身后洒出烈焰。",
+        "phaseRoadName": "On the Road",
+        "phaseRoadSummary": "开战就有两个带预警的攻击：正面横扫，以及沿标出路线的冲锋。",
+        "phaseSpillName": "拖橇倾覆",
+        "phaseSpillSummary": "生命值降到{health}时，雪橇翻倒，魂火洒落在它身后。",
+        "phaseEnrageName": "狂暴",
+        "phaseEnrageSummary": "生命值低于{health}时，它会在本场战斗剩余时间内进入狂暴。",
+        "sweepSummary": "每{every}秒读条{cast}秒，随后獠牙横扫其前方{arc}度的扇形，从身体向外延伸{range}码：造成{min}到{max}点伤害，并击退{push}码。",
+        "sweepResponse": "坦克让它背对队伍。其他人从它的侧面或背后攻击。",
+        "trampleSummary": "每{every}秒读条{cast}秒，朝最远的玩家标出一条{length}码的路线，随后沿路线冲锋：对路线内所有人造成{min}到{max}点伤害，并击倒{stun}秒。",
+        "trampleResponse": "在读条结束前向侧面离开标出的路线。最远的玩家是目标，所以远程玩家要留出侧移的空间。",
+        "spillName": "倾倒的火盆",
+        "spillSummary": "仅一次，在生命值{health}时：雪橇翻倒，{count}片魂火（半径{radius}码）在它身后燃烧{seconds}秒，对范围内所有人每秒造成{min}到{max}点伤害。",
+        "spillResponse": "立刻走出火焰，并远离火堆作战。",
+        "enrageSummary": "生命值低于{health}时，在本场战斗剩余时间内伤害提高{damage}。",
+        "enrageResponse": "把治疗和防御冷却留到最后阶段，并尽快将它击杀。",
+        "tipTank": "让它背对队伍并保持不动，这样横扫扇形就不会扫到队友。每次獠牙横扫都会带来击退。",
+        "tipHealer": "獠牙横扫和践踏是伤害高峰。站在它的侧面，不要站在践踏瞄准的最远处，并为它在{health}以下的狂暴留一个冷却。",
+        "tipDamage": "从侧面或背后攻击。留意地面上标出的路线并走出去。生命值一半时，远离它身后的火焰。"
+      },
+      "korgath": {
+        "overview": "铁匠的工头，被锁在四根封印石柱上。他身上每条尚存的锁链都会使他受到的伤害降低{perChain}，因此打破锁链能让他更容易被击杀。但你每打破一条锁链，他就会在本场战斗剩余时间内多解放一个攻击。",
+        "phaseLockName": "The Lock",
+        "phaseLockSummary": "他开战时被{chains}条锁链束缚，每根石柱一条。每根石柱旁的封印镣铐维系着它的锁链。",
+        "phaseFreedName": "断裂的锁链",
+        "phaseFreedSummary": "每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击，即使锁链之后被重新铆合也一样。",
+        "phaseEnrageName": "狂暴",
+        "lockboundName": "锁缚",
+        "lockboundSummary": "每条完好的锁链使他受到的伤害降低{perChain}：四条全在时伤害降低{all}。",
+        "lockboundResponse": "打破锁链可加快击杀。先决定打破几条：每条也会解放一个攻击。",
+        "shacklesName": "封印镣铐",
+        "shacklesSummary": "每根石柱脚下都有一个封印镣铐。在科加斯被拉怪前无法攻击镣铐。击杀一个镣铐会打破它的锁链。只要铁砧锁链还在，他就无法离开平台中心{leash}码的范围。",
+        "shacklesResponse": "输出者击杀你选择打破的锁链所对应的镣铐。与此同时，坦克把科加斯留在中心。",
+        "strainSummary": "只要还有锁链完好：每{every}秒读条{cast}秒，随后在每根锁链仍完好的石柱周围{radius}码的环形范围内爆发：造成{min}到{max}点伤害并击退。四条锁链全部打破后停止。",
+        "strainResponse": "在读条结束前，远离每一根锁链完好的石柱。",
+        "stompSummary": "每{every}秒读条{cast}秒，随后在其身体外{radius}码形成一圈冲击：对圈内所有人造成{min}到{max}点伤害。",
+        "stompResponse": "远程玩家待在圈外。近战能躲就躲出去；治疗者为被击中的人补血。",
+        "rerivetSummary": "锁链断裂{delay}秒后，一名龙誓刺棒匠会从石柱后方爬过边缘，走向镣铐并引导重铆{channel}秒。若引导完成，锁链和一个新的镣铐会回归并恢复{perChain}的减伤，但已解放的攻击不会消失。",
+        "rerivetResponse": "在引导结束前打断、眩晕或击杀刺棒匠。",
+        "lastLinkName": "Last Link",
+        "lastLinkSummary": "只剩一条锁链时，绷链每{every}秒触发一次，而不是每{base}秒。",
+        "lastLinkResponse": "尽快打破最后一条锁链，或者做好每{every}秒离开它的石柱的准备。",
+        "maulSummary": "铁锤锁链断裂后：每{every}秒读条{cast}秒，随后在其面前{arc}度扇形、从身体向外{range}码的范围内劈砍，伤害为他近战攻击的{mult}倍。",
+        "maulResponse": "只有坦克站在他正面。其他人在读条期间绕到他身后。",
+        "flailSummary": "铁钳锁链断裂后：每{every}秒读条{cast}秒，朝最远的非坦克玩家标出一条{length}码的路线，随后锁鞭击中路线内所有人：造成{min}到{max}点伤害。",
+        "flailResponse": "在读条结束前向侧面离开路线。",
+        "chargeSummary": "铁砧锁链断裂后：他可以离开平台中心。每{every}秒读条{cast}秒，朝最远的玩家标出一条{length}码的路线，随后沿路线冲锋：造成{min}到{max}点伤害并击退。",
+        "chargeResponse": "离开路线。只要铁砧锁链还在，他就待在中心{leash}码内，不会冲锋。",
+        "bellowSummary": "风箱锁链断裂后：每{every}秒读条{cast}秒，随后对所有人造成{min}到{max}点伤害，并将其推离他{push}码。",
+        "bellowResponse": "它会命中整个队伍且无法躲避：治疗者在它落下前为所有人补满血。",
+        "tipTank": "把他留在中心，背对队伍。铁锤锁链断裂后，重锤弧斩会命中他面前的一切。在铁砧锁链断裂前，他无法离开中心{leash}码的范围。",
+        "tipHealer": "绷链、震颤践踏和每个已解放的攻击都很疼。每多留一条锁链，战斗就更久；每打破一条锁链，就多一个需要硬抗的攻击。",
+        "tipDamage": "击杀镣铐来打破你选择的锁链，然后集火科加斯。离开标出的路线，并远离仍有锁链的石柱。",
+        "tipDamageHeroic": "击杀镣铐来打破你选择的锁链，然后集火科加斯。在每个刺棒匠重铆结束前阻止它。离开标出的路线，并远离仍有锁链的石柱。",
+        "choiceName": "你要打破几条锁链？",
+        "choiceGain": "每打破一条锁链，他的减伤就少{perChain}：从四条全在时的{all}，一路降到零。战斗会短得多。",
+        "choiceRisk": "每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击。铁锤：重锤弧斩。铁钳：锁链鞭笞。铁砧：门槛冲锋，且他可以离开中心。风箱：工头的咆哮。",
+        "choiceRiskHeroic": "每打破一条锁链，就会在本次战斗剩余时间内解放一个攻击。铁锤：重锤弧斩。铁钳：锁链鞭笞。铁砧：门槛冲锋，且他可以离开中心。风箱：工头的咆哮。每条断裂的锁链还会引来一个刺棒匠去重铆。",
+        "heroicRerivet": "重铆：锁链断裂{delay}秒后，一名刺棒匠会试图修复它。打断、眩晕或击杀它。",
+        "heroicLastLink": "最后一环：只剩一条锁链时，绷链每{every}秒触发一次。"
+      },
+      "velkhar": {
+        "overview": "维尔卡从三个融水池中唤起解冻的亡者。只有寒冷能让它们安息：在寒冰上被击杀的骨行者会永远死去，而在融水中被击杀的会再次复生并为他回血。",
+        "phaseVaultName": "仪式地窖",
+        "phaseVaultSummary": "骨行者不断从水池中爬出。生命值降到{wave1}和{wave2}时会额外涌出一波，每个水池各一只。",
+        "thawName": "苏醒之融",
+        "thawSummary": "每{every}秒，一个水池的火堆会轰然燃起，{warn}秒后有{count}只复生骨行者爬出。水池轮流发动。生命值降到{wave1}和{wave2}时，每个水池再爬出一只。",
+        "thawResponse": "坦克把它们聚在一起，拖到寒冰上。输出者在那里击杀它们。",
+        "heldName": "冰封不起",
+        "heldSummary": "在寒冰上被击杀的骨行者会被冰封：冻成雕像并保持死亡。在融水中被击杀的会沉入水中，{delay}秒后以{share}的生命值再次复生，并为维尔卡恢复其生命值的{heal}。",
+        "heldResponse": "只在寒冰上击杀骨行者：绝不要在水池或融水带上击杀。",
+        "graspName": "融尸之握",
+        "graspSummary": "站在融水中的骨行者造成的伤害提高{bonus}。",
+        "graspResponse": "坦克让骨行者远离水面。",
+        "trenchSummary": "每{every}秒读条{cast}秒，从他身前朝一名非坦克玩家标出一条{width}码宽、直达地窖边缘的路线。随后对路线内所有人造成{min}到{max}点伤害，路线会化为融水并持续{seconds}秒。",
+        "trenchResponse": "离开路线。不要在它留下的融水带上击杀骨行者。",
+        "volleySummary": "每{every}秒读条{cast}秒，随后对所有人造成{min}到{max}点暗影伤害。",
+        "volleyResponse": "无法躲避：治疗者要让全队保持满血。",
+        "warmHandsName": "温热之手",
+        "warmHandsSummary": "站着不动超过{still}秒的骨行者会在脚下融出一片半径{radius}码的融水坑，持续{seconds}秒。",
+        "warmHandsResponse": "让骨行者保持移动，绝不要在融水坑上击杀它们。",
+        "twiceWokenName": "二度苏醒",
+        "twiceWokenSummary": "再次复生的骨行者会以满生命值回归，且造成的伤害提高{bonus}。",
+        "twiceWokenResponse": "不要让任何一只复生：全部在寒冰上击杀。",
+        "tipTank": "接住每一只骨行者，拖到寒冰上，远离水池和融水带。在融水中它们的伤害会提高{bonus}。",
+        "tipTankHeroic": "接住每一只骨行者，拖到寒冰上，远离水池和融水带。让它们保持移动：站着不动的会在脚下融出一片水坑。",
+        "tipHealer": "暗影箭雨每{every}秒命中所有人。融水中的骨行者伤害提高{bonus}，所以它们碰到水时要盯紧坦克。",
+        "tipDamage": "只在寒冰上击杀骨行者，然后回到维尔卡身边。离开魂火沟壑的路线。",
+        "choiceName": "亡者倒在何处？",
+        "choiceGain": "在寒冰上被击杀的骨行者会彻底消失：小怪更少，战斗更干净。",
+        "choiceRisk": "在融水中被击杀的会再次复生，每次都为维尔卡恢复其生命值的{heal}。把它们拖到寒冰上要花时间，所以在集火前先规划好击杀地点。",
+        "heroicWarmHands": "温热之手：站着不动超过{still}秒的骨行者会融出一片融水坑。",
+        "heroicTwiceWoken": "二度苏醒：再次复生的骨行者会以满生命值回归，且造成的伤害提高{bonus}。"
+      },
+      "korzul": {
+        "overview": "一场在冰封湖面上的巨龙之战，而他的烈焰不断击碎冰面。每一次吐息都会消耗冰面，而团队决定他的火焰瞄准何处，也就决定了失去哪块冰。冰面耗尽的巨龙会不停地吐息。",
+        "phaseLakeName": "冰封湖面",
+        "phaseLakeSummary": "他破冰而出，落在湖中央。他落地时战斗才正式开始。",
+        "phaseFlightName": "飞行阶段",
+        "phaseFlightSummary": "生命值降到{first}和{second}时，他会起飞并在空中作战，直到再次坠落。",
+        "phaseLastName": "最后阶段",
+        "phaseLastSummary": "第二次飞行之后：他在地面上每{breath}秒施放一次坟墓吐息，每{gale}秒施放一次翼风。",
+        "iceName": "破碎之冰",
+        "iceSummary": "湖面由多块冰板组成。他的火焰会使完好的冰板开裂，并击碎已开裂的冰板。开裂的冰板会在{refreeze}秒后重新冻结。碎裂的冰板就是开阔水域。",
+        "iceHeroicSummary": "湖面由多块冰板组成。他的火焰会使完好的冰板开裂，并击碎已开裂的冰板。深度淬火：英雄难度下，开裂的冰板不会重新冻结。碎裂的冰板就是开阔水域。",
+        "iceResponse": "有意识地消耗冰面：把他的火焰瞄向团队承受得起损失的冰板。",
+        "waterName": "开阔水域",
+        "waterSummary": "站在开阔水域中会使你的移动速度降低{slow}，并每秒受到{perSecond}点伤害。",
+        "waterResponse": "待在冰面上。如果被推入水中，立刻离开。",
+        "breathSummary": "每{every}秒沿坦克所在方向读条{cast}秒，随后喷出{arc}度的火焰扇形，从身体向外{range}码：对扇形内除坦克外的所有人造成{min}到{max}点伤害。扇形下最多{plates}块冰板燃烧，由近到远。",
+        "breathResponse": "只有坦克站在正面。坦克把吐息转向团队负担得起的冰面。",
+        "tailSummary": "每{every}秒读条{cast}秒，随后尾巴横扫其身后{arc}度、从身体向外{range}码的范围：造成{min}到{max}点伤害并击退。",
+        "tailResponse": "绝不要站在他身后。从他的侧面攻击。",
+        "infernoSummary": "每{every}秒一次，并在生命值{health}时再触发一次，他引导{duration}秒：在{radius}码内释放{pulses}次火焰脉冲，每次都比上一次更强（最后一次脉冲造成{min}到{max}点伤害）。第{crack}次脉冲使他脚下的冰板开裂，第{brk}次脉冲将其击碎：冰板碎裂时他被淬火，引导随即结束。",
+        "infernoResponse": "离他{radius}码远。让他站在已开裂的冰板上，引导会在第{crack}次脉冲时结束。",
+        "galeSummary": "读条{cast}秒，随后所有人被推离他{push}码。",
+        "galeResponse": "别让身后是开阔水域，这样被推开时会落在冰面上。",
+        "plungeSummary": "在空中，他会用巨龙之眼标记一名非坦克玩家，持续{eye}秒。标记结束时，他向该玩家所在的整块冰板倾泻烈焰：{warn}秒预警后，对冰板上所有人造成{min}到{max}点伤害，并使冰板燃烧。第一次飞行{roundsFirst}轮，第二次飞行{roundsSecond}轮。",
+        "plungeHeroicSummary": "在空中，他会用巨龙之眼标记两名非坦克玩家，持续{eye}秒（双子之眼）。标记结束时，他向每名被标记玩家所在的整块冰板倾泻烈焰：{warn}秒预警后，对冰板上所有人造成{min}到{max}点伤害，并使冰板燃烧。第一次飞行{roundsFirst}轮，第二次飞行{roundsSecond}轮。",
+        "plungeResponse": "被标记者：走到远离队伍的完好冰板上。其他人离开那块冰板。",
+        "broodName": "脚下龙群",
+        "broodSummary": "他起飞时，每块碎裂的冰板都会爬出一名鳞卫，最多{max}名。",
+        "broodResponse": "坦克接住它们，团队趁他在空中时将其击杀。",
+        "descentSummary": "每次飞行结束时，他会降落在人数最多的完好冰板上：{warn}秒的阴影预警后，对{radius}码内造成{min}到{max}点伤害并击退，那块冰板随即燃烧。",
+        "descentResponse": "聚在一块承受得起开裂的冰板上，然后在他落地前跑出阴影。",
+        "flareName": "碎片闪耀",
+        "flareSummary": "第二次飞行之后碎片闪耀：他在地面上每{breath}秒施放一次坟墓吐息，每{gale}秒施放一次翼风。",
+        "flareResponse": "吐息更频繁：规划好还剩哪些冰板可以消耗。",
+        "noIceName": "No Ice Left",
+        "noIceSummary": "如果所有冰板都已碎裂，他会悬停在开阔水域上方并不停地吐息。",
+        "noIceResponse": "绝不要让冰面耗尽：那会导致团灭。",
+        "tipTank": "把坟墓吐息转向团队负担得起的冰面，绝不要横扫过团队。在墓场炼狱前把他移到已开裂的冰板上以缩短它。",
+        "tipHealer": "墓场炼狱的脉冲增长很快：确保所有人都离开。倾泻烈焰、坠击降落以及每次被击退落水都很疼。",
+        "tipDamage": "绝不要站在他的正面或背后。被巨龙之眼标记时，带着它走到远离队伍的完好冰板上。在飞行阶段击杀鳞卫。",
+        "tipDamageHeroic": "绝不要站在他的正面或背后。两名玩家会同时被巨龙之眼标记：各自带着它走到不同的、远离队伍的完好冰板上。在飞行阶段击杀鳞卫。",
+        "choiceIceName": "你要消耗哪块冰？",
+        "choiceIceGain": "把他的吐息、倾泻烈焰和落点瞄向选定的冰板，湖面其余部分就能保持安全可站立。",
+        "choiceIceRisk": "每块碎裂的冰板都是开阔水域，并且在他下次起飞时让一名鳞卫爬出（最多{max}名）。冰面耗尽后他会不停地吐息。",
+        "choiceDouseName": "要浇灭炼狱吗？",
+        "choiceDouseGain": "让他站在已开裂的冰板上，第{crack}次脉冲会将其击碎，他被淬火，墓场炼狱在最强的脉冲之前提前结束。",
+        "choiceDouseRisk": "那块冰板就永远消失了。若他站在完好的冰面上，引导会持续到第{brk}次脉冲，同样会击碎冰板。",
+        "heroicDeepQuench": "深度淬火：开裂的冰板不会重新冻结。",
+        "heroicTwinEyes": "双子之眼：巨龙之眼同时标记两名玩家。"
       }
     }
   },
@@ -7577,7 +9526,9 @@ export const zh_CN: EnTranslations = {
       "framesGovernedAuraTracks": "“编辑框体”还会松开六条可选的光环轨道，前提是你已在同一“界面”选项的“战斗”页中开启它们：“我的增益”轨道、“防御性冷却”轨道、“我的护盾”轨道、“攻击性冷却”轨道、“移动与潜行”轨道，以及“我给队友的增益”轨道。所有轨道默认关闭，松开期间每一条都挂着自己的名牌。",
       "frameGroups": "{trackers}可合并任务、功绩、裂隙、地下探索、采集目标和圣物匣追踪。{auras}可合并目标持续伤害和六种光环追踪。在框体设置中分别开启合并，关闭则可单独移动。{tot}有资源条。{focus}的三个目标可以独立移动：Shift+F1至F3设置，Ctrl+F1至F3选中。伤害和威胁统计即使在框体锁定时，也可拖动按钮以外的区域移动，拖动边缘调整大小。解锁后，独立的框体显示菜单按组控制显示。右键框体可重置大小或打开相关设置。界面中的框体页也包含通用设置和可折叠的队伍设置。关闭“将目标的目标锁定到目标”可独立移动它，重新开启仍保留独立位置。设置焦点后，设置按钮和说明会隐藏。右键选择“清除焦点”可恢复默认状态。鼠标悬停施法同样适用于焦点框体。",
       "framesGovernedTalkingHead": "“编辑框体”也会解锁对话面板：当某个 NPC 不在你的视野内时，它承载该 NPC 说出的台词；处于解锁状态时它会显示自己的名称标签。",
+      "framesGovernedShardpike": "“编辑框体”也会解锁碎晶长矛栏：这一小排任务道具动作只在你携带碎晶长矛时才会出现在动作条旁；处于解锁状态时它会显示自己的名称标签，因此你可以在战斗开始前就把它摆好，而不必临阵调整。",
       "framesGovernedUnitTooltip": "“编辑框体”也会解锁提示框框体，也就是鼠标所停留对象的信息卡出现的位置：生物的等级与种类，或其他玩家的头衔、公会、等级与职业，以及专精和对应定位。把它拖到任意位置，信息卡就会从那里朝远离屏幕最近边缘的方向展开。在“框体设置”的“显示或隐藏框体”中取消勾选“提示框”，即可完全隐藏这张信息卡。",
+      "framesGovernedResourceAndHill": "在“头像框”标签页中开启“分离资源条”后，“编辑框体”也会解锁你的资源条，让你的法力、能量或怒气可以单独放在任意位置；同一标签页中的“资源条宽度”和“资源条高度”可调整它的大小。“编辑框体”也会解锁山丘之王条，同一标签页中的“山丘之王背景不透明度”可淡化它的面板，而文字保持清晰。",
       "barsTitle": "各类条、计时与战斗文字",
       "barsBody": "你施法或引导时，施法条会出现在屏幕中央、动作条正上方，并带着法术的名称与剩余时间。你的目标在它自己的框体上也有一条施法条，好让你看清接下来会发生什么并作出应对。\n\n施法条下方是一条细细的挥击条，它在你两次武器挥击之间填充，让近战或远程攻击者看清下一次自动攻击何时落下。\n\n你的经验条横贯动作条下方的整个宽度，被刻成一段一段，其中较亮的一截表示你已经存下的休息经验。\n\n潜入水下时，屏幕顶部会出现一条蓝色的呼吸条。头没在水里时它会一直下降，耗尽后会闪红并让你开始溺水，而你一浮出水面它就迅速回满。空格键让你上浮，下潜键（默认为 Ctrl）带你潜得更深。\n\n伤害与治疗会以小小的数字从命中之处向上飘起，让你不必读文字也能看懂一场战斗。聊天框里的“战斗”标签页保留着完整的文字记录。",
       "aurasTitle": "增益与减益",
@@ -7591,6 +9542,7 @@ export const zh_CN: EnTranslations = {
       "mapBodyZoneFirst": "M 打开世界地图，直接落在你所站的区域上，上面有你自己的箭头、你周围的兴趣点、带着标记的任务发布者和你的任务目标所在的地带、制作站、邮箱、告示板和菜畦、地下城入口，还有这个区域里的每一处采集资源点，它们在重新生长期间显示为灰色，你的工具不够格时则带上标记。你的队伍也会显示在上面。右键点击地图，或按下它的“世界地图”按钮，视野便拉远到整块大陆，每个区域都连同名称一起画出，点击某个区域即可打开那个区域的地图。走进探秘、地下城、裂隙或城堡，地图会切换成你所在之处的平面图；荆谷原野战场则有自己专属的战场地图。\n\n右侧、小地图下方，一叠追踪器让你不必打开任何窗口就能盯住手头的事：你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你从制作中置顶的配方、你所在的探秘，以及你正在参与的任何裂隙。想把屏幕空间要回来时，任务追踪器可以折叠。",
       "gatheringGoalTrackerBody": "在制作窗口追踪一个配方，或在委托公告栏追踪一个委托后，采集目标追踪器就会加入这个堆栈：它会显示你正在追踪的配方或委托、你要收集的数量，以及你随身携带和仓库中的材料能满足多少。追踪会替换你当前的目标，清除则会明确取消它；两者都不会改变你的采集偏好。",
       "hubPracticeTrackerBody": "在 Eastbrook 枢纽附近，一旦你开始那里的引导式练习课程，练习追踪器就会加入这个堆栈：它会让你时刻看到自己对练习假人的最佳战绩。课程进行中时，它旁边的指导条会引导你完成当前步骤，从打开伤害统计到比较第二轮成绩。",
+      "dungeonTrackerBody": "在小队地下城内，地下城追踪器会占据堆栈的顶部：一块写有地下城名称的铭牌（英雄难度时会标注“英雄”），带有一条随进度填充的进度条，下方按路线遇到的顺序列出该地下城的每个首领，在其倒下之前都计为 0 / 1。战斗分为两幕的首领会保持未完成状态，直到整场战斗结束，因此只有在整次挑战完成时列表才会显示为完成。你离开时追踪器也会随之消失，“编辑框体”会像对待其他追踪器一样松开它，并显示它自己的名称标签。",
       "chatTitle": "聊天框",
       "chatBody": "屏幕左下角。按回车开始输入，再按一次回车发送。\n\n有两个标签页始终在那里：“聊天”，是你身边所说一切的合并记录；以及“战斗”，是你这场战斗的文字记录。加号按钮可以添加更多，每个频道一个：说话、大喊、队伍、综合、世界、寻求组队、公会和官员，另外还有一个密语标签页，把你发出和收到的每一条密语都聚在一处。在某个频道标签页里输入，就会直接发往那个频道，不必再重打命令。\n\n整个聊天框可以拖到别的位置，也可以调整大小，而且它会记住你把它留在了哪里。",
       "keyWindowsTitle": "用按键打开的窗口",
@@ -8335,8 +10287,8 @@ export const zh_CN: EnTranslations = {
       "hollowBody": "一座被盗墓的教堂地穴，新逝的死者拒绝安息。这是新队伍面临的第一场真正考验。",
       "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
-      "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
-      "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔顶端看看是谁在等待。",
+      "sanctumBody": "隐藏在棘峰高处的一座冰川，一条巨龙被封冻在冰中，邪教正焚烧窃取的灵魂将它解冻。从高山隘口一路下行，穿过冰塔、铁匠断裂的锁链与邪教的火堆，直到冰川脚下的冰封湖面。",
+      "wildheartBody": "藏在沉没神像背后的隐秘丛林火山口，四周悬崖环绕，瀑布轰鸣。涉过河流浅滩，穿越狩猎台地与瀑布，走过殖民地废墟，攀上巨大石雕美洲豹头下的阶梯神殿。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -9338,12 +11290,156 @@ export const zh_CN: EnTranslations = {
     }
   },
   "editor": {
+    "picking": {
+      "target": "目标：{name}",
+      "choose": "选择重叠资源（{count}）",
+      "chooser": "选择指针下的资源",
+      "front": "最前方",
+      "behind": "位于其他资源后方",
+      "close": "关闭",
+      "keyboard": "使用上一个/下一个或方向键比较。按 Enter 选择，按 Escape 关闭。",
+      "hint": "再次点击可切换重叠物件，也可从此列表中选择。",
+      "asset": "资源 {number}",
+      "overlapAt": "{name} 处的重叠资源",
+      "previous": "上一个",
+      "next": "下一个",
+      "position": "第 {current} 个，共 {count} 个",
+      "details": "物件 {number} · 第 {level} 层 · 高度 {height}",
+      "ungroupedDetails": "物件 {number} · 高度 {height}",
+      "hideAbove": "隐藏所选楼层以上的楼层",
+      "allFloors": "所有楼层均可见",
+      "filteredFloors": "第 {level} 层以上的楼层已隐藏"
+    },
+    "quickActions": {
+      "title": "已选资产",
+      "move": "移动",
+      "frame": "居中查看",
+      "remove": "移除",
+      "count": "已选 {count} 个"
+    },
+    "buildMode": {
+      "materialNames": {
+        "WardenStone": "光滑石材",
+        "Cliff001": "Red Cliff",
+        "Cliff002": "Mossy Crag",
+        "Cliff003": "Craggy Rock",
+        "Cliff004": "Weathered Bluff",
+        "Rock052": "Rugged Stone",
+        "Rock053": "Ironrock",
+        "Rock054": "Sandstone Face",
+        "Rock055": "Rust Rock",
+        "Rock029": "Weathered Rock",
+        "Rock035": "Layered Stone",
+        "Rock051": "Granite",
+        "Rock056": "Meadow Stones",
+        "Rock057": "Veined Darkstone",
+        "Cliff005": "Strata Cliff",
+        "Cliff006": "Sunbaked Cliff",
+        "Concrete034": "Cast Concrete",
+        "Marble012": "Veined Marble",
+        "Bricks076C": "Mossy Brick",
+        "Gravel024": "Gravel",
+        "PavingStones046": "Paving Stones",
+        "Cobblestone001": "Cobbled Road",
+        "Cobblestone002": "Old Cobblestone",
+        "Tiles001": "Lichen Flagstones",
+        "Tiles002": "Slate Pavers",
+        "PavingStones131": "Mossy Setts",
+        "Metal032": "Brushed Steel",
+        "Metal034": "Painted Steel",
+        "Rust004": "Rusted Iron",
+        "Roots001": "Tangled Roots",
+        "Roots002": "Living Roots",
+        "Wood001": "Oak Planks",
+        "Wood002": "Pine Planks",
+        "Wood003": "Weathered Bark",
+        "Wood004": "Mossy Bark",
+        "Plaster001": "Lime Plaster"
+      },
+      "title": "Build a building",
+      "modeWall": "Walls",
+      "modeRoom": "Rooms",
+      "modeFloor": "Floors",
+      "modeObject": "Objects",
+      "modeFinish": "Wall finishes",
+      "building": "Building",
+      "buildingNumber": "Building {number}",
+      "noBuilding": "New building",
+      "newBuilding": "New building",
+      "levels": "Building floors",
+      "groundFloor": "Ground floor",
+      "floorNumber": "Floor {number}",
+      "addLevel": "Add floor",
+      "hideAbove": "Hide higher floors",
+      "settings": "Grid and foundation",
+      "gridSize": "Grid spacing",
+      "gridOff": "Off",
+      "gridCell": "{size} yards",
+      "floorHeight": "Floor height (yards)",
+      "baseY": "Foundation height (yards)",
+      "autoBase": "Set by first placement",
+      "foundationLocked": "Foundation settings are fixed after building starts.",
+      "wallSource": "Wall type",
+      "bareWall": "Bare wall",
+      "chosenAsset": "Chosen asset",
+      "thickness": "Wall thickness (yards)",
+      "pickAsset": "Choose asset",
+      "selectedAsset": "Asset: {name}",
+      "noAsset": "Choose an asset from the browser.",
+      "selectExisting": "Select an existing piece",
+      "wallHint": "Drag to draw a straight wall.",
+      "diagonal": "斜墙",
+      "diagonalHint": "在网格点之间拖动，以任意角度绘制墙体。",
+      "roomHint": "Drag a rectangle to create a room with walls and a floor.",
+      "floorHint": "Drag a rectangle to add a floor on this level.",
+      "objectHint": "Place objects on the selected floor.",
+      "finishHint": "Choose a finish, then click a wall to paint it.",
+      "finishTexture": "Wall texture",
+      "bareFinish": "Original surface",
+      "importTexture": "Import texture",
+      "importingTexture": "Importing texture...",
+      "finishTile": "Texture repeat (yards)",
+      "finishSide": "Paint side",
+      "sideClicked": "Clicked side",
+      "sideFront": "Front",
+      "sideBack": "Back",
+      "sideBoth": "Both sides",
+      "finishRun": "Apply to connected walls",
+      "rotateLeft": "Rotate left",
+      "rotateRight": "Rotate right",
+      "smaller": "Smaller",
+      "larger": "Larger",
+      "fineRotation": "Fine rotation (15°)",
+      "transformReadout": "Rotation: {degrees}° | Size: {scale}x",
+      "transformEmpty": "Choose an asset to rotate or resize.",
+      "transformShortcuts": "Rotate: , and . | Resize: [ and ]",
+      "undo": "Undo",
+      "redo": "Redo",
+      "transformControls": "Asset controls",
+      "chooseWall": "Choose a wall asset and wait for its preview, or select Bare wall.",
+      "chooseAsset": "Choose an asset first.",
+      "choosePaintWall": "Click a building wall or a wall asset.",
+      "capacity": "This build is too large. Draw a smaller section or remove unused pieces.",
+      "invalid": "This wall or room could not fit. Adjust the grid or choose another piece.",
+      "importFailed": "Texture import failed. Use a PNG, JPG or WebP under 8 MB, up to 8192 pixels per side.",
+      "bare": "Original surface",
+      "importedTexture": "Imported texture {number}"
+    },
     "appTitle": "地图编辑器",
     "docTitle": "地图编辑器 - World of ClaudeCraft",
     "untitledMap": "未命名地图",
+    "liveWorld": {
+      "name": "游戏世界微调",
+      "scope": "游戏世界：可编辑地形高度与涂色、道路、游戏对象的位置及新增摆件。现有建筑保持固定。使用“导出”保存修改以供审核。"
+    },
+    "flatMapName": "Flat World",
     "playtestPlayerName": "制图师",
+    "playtestBack": "Back to Editor",
+    "playtestBackTitle": "Return to the map editor (your map was saved when the playtest launched)",
     "topbar": {
       "label": "编辑器操作",
+      "dungeon": "Dungeon",
+      "dungeonTitle": "Edit an authored dungeon interior layout",
       "mapNameLabel": "地图名称",
       "dirty": "有未保存的更改",
       "dirtyDot": "此地图有未保存的更改",
@@ -9354,6 +11450,8 @@ export const zh_CN: EnTranslations = {
       "neverSaved": "尚未保存",
       "new": "新建",
       "newTitle": "基于内置世界新建一张地图",
+      "newFlat": "Blank Map",
+      "newFlatTitle": "Start a brand-new blank map with none of the base game content, at a size you choose",
       "open": "打开",
       "openTitle": "打开已保存的地图（浏览器或服务器）",
       "save": "保存",
@@ -9370,17 +11468,51 @@ export const zh_CN: EnTranslations = {
       "uploadAsset": "上传资源",
       "uploadAssetTitle": "上传 GLB 模型（最大 8 MiB）以便放置到你的地图中",
       "uploadAssetDisabledTitle": "请先在游戏中登录再上传资源",
+      "importModel": "Import Model",
+      "importModelTitle": "Load a .glb or .gltf model from this computer and place it, fully offline (kept for this session)",
       "playtest": "试玩",
       "playtestTitle": "在此地图上启动游戏（离线，包含当前编辑）",
       "viewLabel": "视图模式",
+      "workspace": "View",
+      "workspaceTitle": "View, map, preview, and workspace modes",
       "view3d": "3D",
       "view3dTitle": "在渲染后的世界中编辑",
       "view2d": "2D",
       "view2dTitle": "在俯视示意图上编辑",
+      "projectionPerspective": "Perspective",
+      "projectionOrthographic": "Orthographic",
+      "projectionTitle": "Toggle perspective/orthographic projection (Numpad 5)",
+      "axisGimbal": "Camera gimbal",
+      "axisGimbalTitle": "Show or hide the camera orientation gimbal",
+      "minimap": "Minimap",
+      "minimapTitle": "Toggle the corner minimap (top-down view that follows the camera)",
+      "music": "Music",
+      "musicTitle": "Play the soundtrack for the area under the camera (the music area's track, else the map track, else the zone's own cue). Fly around and it follows you.",
+      "mapWindow": "Map",
+      "mapWindowTitle": "Open the map of the current zone (with a button for the full world)",
+      "preview": "Preview",
+      "previewTitle": "See the map as it looks in-game: hides editor-only overlays (collider boxes, music areas, markers, rings, gizmos)",
+      "hitboxes": "Hitboxes",
+      "hitboxesTitle": "Show the collision shapes the game actually blocks with (blue = authored in Collision Master, red = auto-baked boxes)",
+      "zoneIsolateOff": "Full Build",
+      "zoneIsolateOn": "Zone: {zone}",
+      "zoneIsolateTitle": "Full Build ⇄ Zone: isolate the camera’s zone, everything outside it unloads until you switch back. View only; the map itself never changes.",
+      "fullBuildPreview": "Full Build Preview",
+      "fullBuildPreviewTitle": "Stream every zone of this map into the viewport (may take a while)",
+      "fullBuildProgress": "Building zones: {done}/{total}",
+      "fullBuildDone": "All {total} zones resident.",
+      "publishMap": "Publish to Game",
+      "pushMapChanges": "推送改动到仓库地图",
+      "pushMapChangesTitle": "只把你打开此仓库地图后所做的改动应用到当前的仓库文件上，保留其他人的推送。",
+      "publishMapTitle": "Write this map into the local repo as real game content (data/maps + src/sim/maps); boot it with ?map=<slug>",
+      "unpublishMap": "Remove from Game",
+      "unpublishMapTitle": "Uninstall this map from the local game: deletes the files Publish wrote and restores the standard ClaudeCraft world",
       "undoCount": "撤销：{count}",
       "undoCountTitle": "可撤销 {count} 步（Ctrl+Z 撤销，Ctrl+Y 重做）",
       "autosave": "自动保存",
       "autosaveTitle": "有未保存的更改时自动保存地图。保存失败时会自动关闭。",
+      "presetPrompt": "Ask about presets on Lock In",
+      "presetPromptTitle": "After a Collision Master Lock In, ask whether to also save the boxes as a hitbox preset on this device. Turn this back on if you ticked \"Don't ask again\".",
       "undo": "撤销",
       "undoTitle": "撤销上一次更改（Ctrl+Z）",
       "redo": "重做",
@@ -9390,34 +11522,593 @@ export const zh_CN: EnTranslations = {
       "signIn": "登录",
       "signInTitle": "在新标签页中打开游戏登录界面",
       "help": "帮助",
-      "helpTitle": "编辑器指南：工具、快捷键与教程"
+      "helpTitle": "编辑器指南：工具、快捷键与教程",
+      "more": "More",
+      "moreTitle": "More actions: Save As, autosave, fork, import/export, upload",
+      "primaryTools": "Primary transform tools",
+      "settings": "Settings",
+      "settingsTitle": "Graphics and sound settings (shared with playtest)",
+      "worldLink": "Link to World",
+      "worldLinkTitle": "Place this map inside the base game world: drag its outline onto the world map, and playtest embeds it there with the base game running around it",
+      "generateTerrain": "Generate Terrain",
+      "generateTerrainTitle": "Generate this map’s terrain from a region of the base game world: drag the outline over the world map to pick which part of the old layout to use",
+      "evenBuildings": "Even Out Buildings",
+      "evenBuildingsTitle": "Fix buildings that were stretched sideways to fill their plot: each one keeps its height and its footprint area, but its width and depth are made equal so it stops looking squashed",
+      "evenBuildingsDone": "Evened out {count} buildings.",
+      "evenBuildingsNone": "No squashed buildings found."
+    },
+    "genTerrain": {
+      "title": "Generate Terrain",
+      "hint": "Pick which part of the old world layout this map’s terrain generates from: drag the gold rectangle over the region you want. Its hills, lakes, and coastlines become your map’s base terrain, you can sculpt on top of it afterwards. Generating replaces your current sculpt edits, and your map stays its own separate space.",
+      "dragHint": "Drag the gold rectangle over the terrain to copy. The dot marks your spawn point.",
+      "status": "Sampling the world layout around ({x}, {z}).",
+      "save": "Generate",
+      "clear": "Flatten Map",
+      "generated": "Terrain generated from the world layout around ({x}, {z}).",
+      "cleared": "Terrain source cleared: the map is a flat slate again."
+    },
+    "worldLink": {
+      "title": "Link to World",
+      "hint": "Drag your map’s outline to where it should sit in the base game world. Playtest stamps your map’s terrain, placements, and spawns right there, with the world’s own mobs, NPCs, and quests running around it. You can also place it in the open sea beyond the old world’s edges: your map rises there as new land. Your editing space stays exactly as it is; only playtest uses the link.",
+      "statusLinked": "Linked: your map’s origin sits at ({x}, {z}) in the world.",
+      "statusUnlinked": "Standalone: this map playtests as its own separate space.",
+      "dragHint": "Drag the gold rectangle to position your map. The dot marks your spawn point.",
+      "save": "Save Link",
+      "unlink": "Unlink",
+      "cancel": "Cancel",
+      "linked": "Map linked to the world at ({x}, {z}).",
+      "unlinked": "Map unlinked: it playtests standalone again.",
+      "standaloneOnly": "Only standalone authored maps can link to the world (open a Blank Map or import one first)."
+    },
+    "settings": {
+      "title": "Settings",
+      "hint": "Graphics and sound for the editor and playtest. These are the same settings the game uses, saved in this browser.",
+      "graphicsTitle": "Graphics quality",
+      "graphicsLow": "Low",
+      "graphicsMedium": "Medium",
+      "graphicsHigh": "High",
+      "graphicsUltra": "Ultra",
+      "graphicsHint": "Applies to the next playtest, and to the editor after a reload.",
+      "applyGraphics": "Reload editor to apply",
+      "soundTitle": "Sound",
+      "sfxVolume": "Effects volume",
+      "musicVolume": "Music volume",
+      "music": "Play music",
+      "close": "Close"
+    },
+    "fluid": {
+      "title": "Fluid Pool",
+      "hint": "Pick a fluid and click the ground to place a pool. Use the transform tools to move it, stretch its footprint, and slide the surface down into a dip.",
+      "selHint": "The gizmo scales the pool footprint (X/Z) and the Y arrow slides the surface height. Damage ticks once per second on anyone in the fluid.",
+      "kind": {
+        "lava": "Lava",
+        "acid": "Acid",
+        "spectral": "Spectral Fluid",
+        "water": "Still Water"
+      },
+      "hue": "Hue",
+      "light": "Lightness",
+      "dps": "Damage per second",
+      "surfaceOffset": "Surface height",
+      "fxBubbles": "Bubbles",
+      "fxSmoke": "Smoke",
+      "fxHaze": "Haze",
+      "fxLight": "Glow light",
+      "resetPreset": "Reset to preset"
+    },
+    "tunnel": {
+      "needExit": "Entrance placed. Keep clicking to lay the path (the last point is the exit), then hit Generate.",
+      "generate": "Generate cave ({count} ready)",
+      "tooShort": "The rig points are too close together - spread them at least a few yards apart.",
+      "modeDig": "Dig cave",
+      "modeCarve": "Carve",
+      "modeHole": "Cut hole",
+      "modePatch": "Patch hole",
+      "modeRemesh": "Remesh",
+      "modeSculpt": "Dig brush",
+      "modeFill": "Fill brush",
+      "modeSmooth": "Smooth",
+      "smoothHint": "Drag along a dug edge to SMOOTH it: each pass raises the Blend of every cut and fill under the brush, so creases and lumps along a dig stroke melt into one rounded surface. One undo step per stroke.",
+      "ghostTitle": "Pending cut",
+      "ghostHint": "The blue ghost is the solid the cut will remove. Drag it into place (click or hold anywhere on the ground), tune its size, shape and depth below, then press \"Lock in cut\" (or Enter) to commit it - or Cancel / Escape to discard it. Nothing is removed until you commit.",
+      "ghostConfirm": "Lock in cut",
+      "ghostLockHint": "Enter locks the cut in, Escape discards it. Tools 2-4 move, turn and scale the ghost first.",
+      "ghostCancel": "Cancel",
+      "carveHint": "Click the ground to spawn a blue GHOST of the solid, drag it into place and tune it, then press \"Lock in cut\" (or Enter) to carve a REAL room or tunnel out of the rock: the solid has a walkable floor, rock walls and a ceiling, and it re-meshes the ground around it. A ball makes a chamber, a pitched capsule bored into a hillside a tunnel, a box a hall - and raise Blend so neighbouring carves melt together into one clean cave. Walk in through any face that breaks the surface.",
+      "carveList": "Carves",
+      "carveLabel": "Carve {n}",
+      "carveDelete": "Delete carve",
+      "cutDepth": "Depth",
+      "sculptHint": "Drag across a carve wall, floor or ceiling to DIG rock away, like a clay brush: each pass carves a blended channel at the stamp size (set by the brush radius). Drag on open ground to gouge into the surface. One undo step per stroke.",
+      "fillHint": "Click the ground to drop an ERASE BOX, size it with the sliders or the gizmo (any width, length and height), then press \"Erase caves\" (or Enter): every carve, hole and dug volume inside the box is removed, and a carve the box only partly covers is filled back to solid rock where it is covered. One undo step.",
+      "eraseTitle": "Erase box",
+      "eraseGhostHint": "The box stands where you clicked; click again to move it. Everything cave-like inside it goes when you confirm.",
+      "eraseHalf": "Half width (yd)",
+      "eraseConfirm": "Erase caves",
+      "eraseDone": "Erased {n} cave record(s) inside the box",
+      "eraseNothing": "No caves inside the box",
+      "remeshHint": "Click to paint a DETAIL region (brush radius wide): every carve it touches re-meshes at the chosen cell size - finer OR coarser than the default. Spend fine topology exactly where a cave needs to read clean; turn the cell up to thin out a carve that costs too much. Finer cells cost more triangles.",
+      "remeshCell": "Detail (cell yards)",
+      "remeshAllTitle": "Remesh all caves",
+      "remeshAllHint": "One cell size for every carve and dug volume on the map: larger cells mean far fewer triangles. Applies to the whole map at once and re-meshes it; the regions below can still refine or coarsen single spots on top of it.",
+      "remeshGlobal": "Cave mesh detail (cell yards)",
+      "remeshAll": "Remesh all caves",
+      "remeshRegionsTitle": "Detail regions (brush)",
+      "remeshList": "Detail regions",
+      "remeshLabel": "Region {n} ({r} yd, {cell} yd cells)",
+      "remeshDelete": "Delete region",
+      "holeHint": "Click the ground to spawn a blue GHOST of the cut, drag it into place, then press \"Cut into the ground\" to punch it straight through the terrain mesh. The ground stops existing there and the mesh grows a rock rim around the opening, so line a cave mouth up underneath and you can walk or drop in. Pick the shape first: a ball, an oriented box for a slot or a doorway, or a capsule for an arch. Resize or delete any committed cut below; undo removes the last one.",
+      "holeList": "Cuts",
+      "holeLabel": "Cut {n}",
+      "holeRadius": "Radius",
+      "holeDelete": "Delete cut",
+      "cutBrush": "Next cut",
+      "cutShape": {
+        "sphere": "Ball",
+        "box": "Box",
+        "capsule": "Capsule",
+        "voxel": "Dug rock",
+        "tube": "Cave mouth (from the bore)"
+      },
+      "cutLength": "Length",
+      "cutHeight": "Height",
+      "cutYaw": "Turn",
+      "cutPitch": "Tilt",
+      "cutBlend": "Blend",
+      "cutWarp": "Undulation",
+      "digAlphaLabel": "Brush alpha",
+      "digAlpha": {
+        "round": "Round",
+        "halfmoon": "Half moon",
+        "ragged": "Ragged",
+        "crescent": "Crescent"
+      },
+      "digNoise": "Edge noise",
+      "digCell": "Dig detail (cell yards)",
+      "digCellHint": "Strokes bake straight into the map as one rock volume at this cell size (finer costs more memory and triangles). The cell is fixed once the first stroke lands.",
+      "digClear": "Clear dug rock",
+      "digVolumeFull": "The dug rock volume is as large as a map can hold; clear it or dig closer to what is already dug.",
+      "digCellCoarsened": "Dig detail set to {cell} yd for this brush size (a finer cell would not fit the volume budget).",
+      "cutWarpScale": "Undulation size",
+      "cutTaper": "Taper",
+      "cutWobble": "Wobble",
+      "cutWobbleLen": "Wobble length",
+      "cutBend": "Bend",
+      "cutArch": "Arch",
+      "ghostGizmoHint": "Press 2, 3 or 4 (Move, Rotate, Scale) to drag the ghost with the gizmo, then come back to the Caves tool to cut.",
+      "autoMouth": "Carve its own mouth",
+      "autoMouthHint": "The tube cuts the ground wherever it breaches the surface, so you no longer line a hole up with the mouth by hand. Buried stretches cut nothing, and ground under a stretch standing above the surface is left alone.",
+      "mouthBlend": "Mouth blend",
+      "patchHint": "Click the ground to lay a patch (brush radius wide, same shapes as a cut) that FILLS the ground back in wherever cuts overlap it - use it to trim the blank parts around each cut. A patch always beats the cuts it touches. Resize or delete any patch below; undo removes the last one.",
+      "patchList": "Patches",
+      "patchLabel": "Patch {n}",
+      "patchDelete": "Delete patch",
+      "listTitle": "Caves",
+      "caveLabel": "Cave {n} ({nodes} points)",
+      "width": "Width",
+      "height": "Interior height",
+      "variance": "Variance",
+      "floorVariance": "Floor bumps",
+      "stalactites": "Stalactites",
+      "stalagmites": "Stalagmites",
+      "spikeSize": "Formation size",
+      "startOpen": "Entrance open",
+      "endOpen": "Exit open",
+      "selectCave": "Select whole cave",
+      "noRig": "This cave has no rig nodes to grab - lay a new cave instead.",
+      "reverse": "Swap entrance/exit",
+      "delete": "Delete cave",
+      "texture": "Interior texture",
+      "texDefault": "Granite (default)",
+      "guideHint": "Blue nodes joined by a dotted line are your cave model (visible in every tool). Move a node with the Move tool, raise or sink it with the Y arrow, and scale it to widen the cave there - the tube re-generates live and ALWAYS keeps exactly the size you set. Green ball = entrance, red arrow = exit.",
+      "hint": "Click the ground to drop the ENTRANCE node, keep clicking to lay blue waypoints (the last one is the exit), then press Generate. The cave is a standalone tube built only from your nodes - the surrounding terrain never squishes or reshapes it. Turn on \"Carve its own mouth\" and the tube opens the ground wherever it breaches the surface; otherwise use Cut hole mode and slide the tube into place with Select whole cave + the Move tool."
+    },
+    "foliage": {
+      "kind": "Plant",
+      "kinds": {
+        "tree": "Tree",
+        "bush": "Bush",
+        "grass": "Grass clump",
+        "fern": "Fern",
+        "vine": "Vine"
+      },
+      "preset": "Starting point",
+      "presets": {
+        "bushRound": "Round bush",
+        "bushBerry": "Berry bush",
+        "bushDry": "Dry scrub",
+        "grassTuft": "Tuft",
+        "grassMeadow": "Meadow clump",
+        "fernForest": "Forest fern",
+        "vineHanging": "Hanging vine"
+      },
+      "footprint": "Spread",
+      "plantHeight": "Height",
+      "splay": "Splay",
+      "clumps": "Blade clumps",
+      "strands": "Strands",
+      "hang": "Hang",
+      "bake": "Keep as an asset",
+      "bakeHint": "Writes the plant to public/models/generated as a GLB, so it stops being a recipe and becomes an ordinary catalogue asset: it batches with the others, takes a collision bake, and can be placed on any map. Its settings ride along inside the file, so you can re-open and re-bake it later. Needs the dev server.",
+      "bakePrompt": "Name this plant",
+      "baked": "Kept as {id}. Re-run the asset catalogue to see it in the browser.",
+      "bakeFailed": "Could not keep the plant: {reason}"
+    },
+    "tree": {
+      "title": "Tree Generator",
+      "hint": "Click the ground to grow a tree there. Everything below shapes the NEXT tree; select a placed tree with the Select tool to reshape it live.",
+      "preset": "Preset",
+      "presetHint": "A starting point for the biome. Every setting stays editable afterwards.",
+      "openStudio": "Edit in Tree Studio",
+      "openStudioHint": "Opens the tree on its own in an empty scene, so you can shape it without a village in the way. Keep it when you are done and it becomes the tool default.",
+      "studioMapName": "Tree Studio",
+      "studioBanner": "Tree Studio",
+      "studioHint": "Shape the tree here, then keep it as the tool default or discard it. The map you came from is waiting.",
+      "studioKeep": "Use this tree",
+      "studioDiscard": "Discard",
+      "studioKept": "Tree Studio settings are now the tool default.",
+      "randomize": "New seed",
+      "randomizeHint": "Rerolls the branch growth and leaf scatter without changing any setting.",
+      "copyToTool": "Use as tool default",
+      "trunkSection": "Trunk",
+      "trunk": "Foundation",
+      "girth": "Girth",
+      "heightScale": "Trunk height",
+      "bark": "Bark texture",
+      "barkTile": "Bark tile (yd)",
+      "branchSection": "Branches",
+      "branches": "Per limb",
+      "branchDepth": "Levels",
+      "branchLen": "Length",
+      "branchAngle": "Spread",
+      "branchDroop": "Droop",
+      "branchTwist": "Gnarl",
+      "branchTaper": "Taper",
+      "canopySection": "Canopy volumes",
+      "canopyHint": "The leaves only ever go inside these spheres. Pick a shape to lay them out, then tune the spread and size - or edit a single sphere below to sculpt the crown by hand.",
+      "shape": "Shape",
+      "volumeCount": "Spheres",
+      "volumeSpread": "Spread",
+      "volumeRise": "Height",
+      "volumeScale": "Sphere size",
+      "volumeJitter": "Jitter",
+      "showVolumes": "Show spheres",
+      "editVolumes": "Edit spheres",
+      "resetVolumes": "Back to preset shape",
+      "volumeLabel": "Sphere {n}",
+      "volumeX": "X",
+      "volumeY": "Y",
+      "volumeZ": "Z",
+      "volumeR": "Radius",
+      "volumeSy": "Stretch",
+      "addVolume": "Add sphere",
+      "removeVolume": "Remove",
+      "leafSection": "Leaves",
+      "leafSet": "Leaf art",
+      "leaves": "Count",
+      "leafSize": "Size",
+      "leafSizeVar": "Size variation",
+      "leafOrient": "Orientation",
+      "leafFill": "Fill",
+      "leafFillHint": "0 hangs the leaves on the shell of each sphere; 1 fills it solid.",
+      "leafDroop": "Droop",
+      "leafJitter": "Rotation jitter",
+      "leafClump": "Clumping",
+      "leafBranchBias": "Pull to branches",
+      "leafTint": "Tint",
+      "leafTintVar": "Colour variation",
+      "leafGlow": "Glow",
+      "leafCross": "Crossed cards",
+      "leafCrossHint": "Two quads per leaf instead of one: twice the cost, a canopy with real depth.",
+      "windSection": "Wind and collision",
+      "sway": "Sway",
+      "collide": "Trunk hitbox",
+      "collideHint": "Radius of the trunk collider, as a multiple of its own girth. 0 lets players walk through.",
+      "stats": "{leaves} leaves, {branches} branches, {height} yd tall",
+      "orient": {
+        "volume": "Follow canopy",
+        "up": "Upright",
+        "out": "Outward",
+        "droop": "Drooping",
+        "random": "Random",
+        "billboard": "Face camera"
+      },
+      "shapeName": {
+        "sockets": "On the limbs",
+        "sphere": "Ball",
+        "dome": "Dome",
+        "cone": "Cone",
+        "umbrella": "Umbrella",
+        "column": "Column",
+        "weeping": "Weeping"
+      }
+    },
+    "rock": {
+      "title": "Rock Generator",
+      "hint": "Click the ground to grow a procedural boulder there. The sliders below shape the NEXT rock; select a placed rock with the Select tool to reshape it live. Use the gizmo to stretch rocks into slabs and cliff plates.",
+      "chainMode": "Bridge / ridge mode",
+      "chainHint": "Click to lay blue points; Generate lofts ONE merged solid body through them (spanning dips in a straight line) plus walkable tops, so the chain works as a bridge or ridge. The points stay after Generate: move or scale one with the gizmos and the body follows.",
+      "chainCount": "{count} points laid",
+      "generateChain": "Generate rock ridge",
+      "clearChain": "Clear points",
+      "chainTooShort": "Lay at least two points first.",
+      "size": "Size",
+      "noise": "Noise amount",
+      "detail": "Feature detail",
+      "sharp": "Sharpness",
+      "height": "Height",
+      "depth": "Embed depth",
+      "jag": "Jaggedness",
+      "texture": "Texture",
+      "baseTex": "Base texture",
+      "texStone": "Stone",
+      "texSandstone": "Sandstone",
+      "texBare": "Bare (tintable)",
+      "reroll": "Re-roll shape",
+      "selTitle": "Generated Rock",
+      "walkable": "Walkable top"
     },
     "tool": {
+      "building": "Build mode",
       "listLabel": "编辑器工具",
       "keyHint": "{name}（{key}）",
       "select": "选择",
+      "move": "Move",
+      "rotate": "Rotate",
+      "scale": "Scale",
       "raise": "抬升",
       "lower": "下压",
       "smooth": "平滑",
       "flatten": "压平",
+      "slope": "斜坡",
+      "pond": "池塘",
+      "tunnel": "Caves",
+      "rock": "Rock Gen",
+      "build": "Build Model",
+      "fluid": "Fluid Pool",
       "paint": "绘制生态",
+      "eyedropper": "Eyedropper",
+      "decal": "Decal",
       "water": "水面",
       "place": "放置资源",
+      "foliage": "Paint Foliage",
+      "clutter": "Paint Clutter",
+      "meshFix": "Mesh Fix",
+      "tree": "Tree Generator",
+      "grassClear": "Remove Grass",
       "blocker": "空气墙",
+      "collider": "Collider",
       "camp": "营地",
+      "entity": "Move NPCs and Mobs",
       "spawn": "出生点",
+      "zone": "Zone",
+      "light": "Point Light",
+      "music": "Music",
+      "sound": "Point Sound",
       "region": "区域",
-      "erase": "擦除"
+      "erase": "擦除",
+      "city": "City Build"
+    },
+    "toolGroup": {
+      "terrain": "Terrain",
+      "assets": "Assets",
+      "world": "World",
+      "effects": "Effects"
+    },
+    "eyedropperTool": {
+      "empty": "Nothing painted here, click a painted texture to pick it."
+    },
+    "build": {
+      "entered": "Editing model, add shapes, apply a texture, toggle collision, then Done.",
+      "newHint": "Click the map to start a new model, or select one to edit it.",
+      "banner": "Building Model",
+      "bannerHint": "Add shapes and edit vertices/edges/faces with the modeling bar.",
+      "done": "Done",
+      "editModel": "Edit Model",
+      "panelTitle": "Built Model",
+      "shapes": "{n} shapes",
+      "texture": "Surface texture",
+      "material": "Material",
+      "materialMany": "Material controls apply to all {n} selected built models.",
+      "materialHint": "Library materials are projected onto the shape in the shader (no stretching on stairs, slopes or curves) and tint with hue, saturation and light.",
+      "hue": "Hue",
+      "saturation": "Saturation",
+      "light": "Light",
+      "resetLook": "Reset material tint",
+      "bare": "Plain (no texture)",
+      "tileSize": "Texture scale",
+      "tileSizeUnit": "yd / tile",
+      "collision": "Use mesh as collision",
+      "collisionHint": "The player is blocked where the model is solid. Walkable shapes (green) become ramps.",
+      "walkableTip": "Tip: use the modeling bar’s Walkable toggle to make a shape a ramp."
+    },
+    "city": {
+      "title": "City Build",
+      "tabKit": "Kit",
+      "tabWalls": "Walls",
+      "tabRoads": "Roads",
+      "tabPrefabs": "Prefabs",
+      "tabRoutes": "Routes",
+      "settings": "Build settings",
+      "gridSize": "Grid size",
+      "gridOff": "Off",
+      "rotSnap": "Rotation snap",
+      "snapHint": "Grid snapping applies to wall nodes, Kit placement, and prefab stamps.",
+      "kitPick": "Choose asset",
+      "kitChosen": "Placing: {name}",
+      "kitNone": "Pick an asset from the browser, then click the map to place it on the grid.",
+      "kitRotate": "Rotate (R)",
+      "kitScale": "Piece scale",
+      "kitTileSnap": "Connect tiles",
+      "kitTileHint": "Connect tiles snaps each piece to its own size and to the FIRST tile’s height, so floors join edge to edge and stay flat across bumpy ground. Esc or picking a new asset starts a fresh level; turn it off to use the world grid.",
+      "kitGhostBlocked": "Blocked: overlapping a placed asset.",
+      "wallStyle": "Wall style",
+      "wallDraw": "Draw wall",
+      "wallDrawing": "Click to add corners on the visible grid. Double-click a node or press Enter to finish. Backspace or Delete removes the last node; Esc cancels.",
+      "wallFinish": "Finish wall",
+      "wallCancel": "Cancel",
+      "wallUndoPoint": "Undo point",
+      "wallNodes": "{n} wall nodes placed.",
+      "wallPostEvery": "Post spacing",
+      "wallPostsOff": "No posts",
+      "wallScale": "Wall scale",
+      "wallHeight": "Height",
+      "wallThickness": "Thickness",
+      "wallClosed": "Close the loop",
+      "wallWalkTop": "Walkable top",
+      "wallStairs": "Stairs up",
+      "wallWalkHint": "Walkable top puts a patrol deck along the wall so players can walk it in playtest; Stairs up adds a staircase from the ground to the deck at each end (or beside a closed loop).",
+      "wallPlaced": "Wall run placed ({n} pieces).",
+      "wallBuildFailed": "The wall assets could not be generated. Your path is still available.",
+      "wallTooShort": "Draw at least two points to build a wall.",
+      "wallLiveEdit": "The controls above update your most recent wall live.",
+      "wallEditHint": "Select any wall piece to make that run active. Return to Walls to reshape it, or press Delete in Select to remove the whole run.",
+      "wallGateHint": "Gate segments are skipped so the wall leaves an opening.",
+      "styleStone": "Stone Wall",
+      "styleCastle": "Castle Wall",
+      "styleWoodFence": "Wood Fence",
+      "styleMetalFence": "Metal Fence",
+      "styleCastleFence": "Castle Fence",
+      "styleHexWall": "Hex Wall",
+      "roadType": "Road type",
+      "roadTypeRoad": "Road",
+      "roadTypePath": "Footpath",
+      "roadDraw": "Draw road",
+      "roadDrawing": "Click to add waypoints. Enter or double-click finishes, Esc cancels.",
+      "roadFinish": "Finish road",
+      "roadCancel": "Cancel",
+      "roadPlaced": "Road placed.",
+      "roadTooShort": "Draw at least two points to build a road.",
+      "roadLimit": "This map already has the maximum number of roads.",
+      "roadList": "Roads on this map",
+      "roadDelete": "Delete",
+      "roadLegacy": "Built-in road",
+      "roadAuthored": "Road {n}",
+      "roadHint": "Roads blend into the terrain like the built-in world roads and flatten bumps beneath them.",
+      "roadMode": "道路工具",
+      "roadModeDraw": "绘制新道路",
+      "roadModeEdit": "编辑道路",
+      "roadEditHint": "点击道路将其选中。拖动路点可移动它，拖动道路线可添加弯道，按 Delete 删除选中的路点。",
+      "roadEditNone": "未选中道路。在视图中点击一条道路，或从下方列表中选择。",
+      "roadEditing": "正在编辑：{name}",
+      "roadWaypoints": "路点：{n}",
+      "roadWaypointHeld": "已选中路点 {n}。",
+      "roadDeletePoint": "删除路点",
+      "roadRemove": "移除道路",
+      "roadReset": "恢复默认",
+      "roadRestore": "恢复",
+      "roadSelect": "选择",
+      "roadBuiltin": "世界道路 {n}",
+      "roadBuiltinEdited": "{name}（已更改）",
+      "roadBuiltinRemoved": "{name}（已移除）",
+      "roadWorldList": "世界道路（{n}）",
+      "roadBuiltinNote": "世界道路是游戏自带的道路。更改只对这张地图生效，“恢复默认”会把道路恢复原样。",
+      "roadPointTooShort": "道路至少需要两个路点。请改用“移除道路”。",
+      "roadPointLimit": "这条道路的路点已达上限。",
+      "roadRemoved": "道路已移除。撤销即可恢复。",
+      "prefabSave": "Save selection as prefab",
+      "prefabName": "Prefab name",
+      "prefabSaved": "Prefab saved: {name}",
+      "prefabNone": "No prefabs yet. Select some placed assets and save them as a prefab.",
+      "prefabStamp": "Stamp",
+      "prefabDelete": "Delete",
+      "prefabStamped": "Prefab stamped ({n} pieces).",
+      "prefabNeedSelection": "Select one or more placed assets first (Shift+click or marquee).",
+      "prefabCount": "{n} pieces",
+      "routePick": "Click an NPC to edit its route.",
+      "routeEditing": "Route for {name}: click the map to add waypoints.",
+      "routeAddHint": "Each click adds a waypoint. Enter finishes, Esc stops editing.",
+      "routeMode": "Traversal",
+      "routeModeLoop": "Loop",
+      "routeModePingPong": "Ping-pong",
+      "routeSpeed": "Walk speed",
+      "routeWait": "Wait at waypoints",
+      "routeWaitUnit": "seconds",
+      "routeFinish": "Save route",
+      "routeClear": "Clear route",
+      "routeSaved": "Route saved ({n} waypoints).",
+      "routeCleared": "Route cleared.",
+      "routeNoNpc": "No NPC selected. Click an NPC in the viewport first.",
+      "routeCount": "{n} waypoints"
     },
     "inspector": {
-      "label": "工具选项"
+      "label": "工具选项",
+      "toolTab": "Tools",
+      "cameraTab": "Camera",
+      "lightingTab": "Lighting",
+      "sceneTab": "Scene"
+    },
+    "scene": {
+      "title": "Scene Collection",
+      "hint": "Every placed object. Click to select, double-click a name to rename.",
+      "none": "No objects placed yet.",
+      "count": "{n} objects",
+      "pinTitle": "Focus the camera on this object and select it",
+      "hideTitle": "Hide this object in the editor (it still exists in the map)",
+      "showTitle": "Show this object again",
+      "hiddenBadge": "hidden",
+      "renameLabel": "Object name",
+      "residentBadge": "resident",
+      "isolateTitle": "Isolate {zone}: unload everything outside this zone (view only)",
+      "zoneStream": "Stream the zones near the camera",
+      "zoneStreamHint": "Keep the {count} zones nearest the camera loaded, and swap the whole set when you fly clear of them.",
+      "zoneStreamAt": "Streaming {zone} ({count} zones). Fly clear of them to load the next set.",
+      "zoneStreamLocked": "Locked on {zone}. Unlock to follow the camera again.",
+      "zoneStreamOn": "Streaming {zone} — {count} zones resident, everything else unloaded.",
+      "streamGuide": "Show the resident perimeter",
+      "streamGuideHint": "Draws light red walls where the loaded zones end, so the edge of what is streamed is visible instead of guessed.",
+      "zoneLockTitle": "Lock this zone loaded: stay here until you unlock, whatever the camera does",
+      "zoneUnlockTitle": "Unlock: follow the camera into the next zone again"
+    },
+    "push": {
+      "notLinked": "此地图不是从仓库地图打开的，没有可推送的目标。请先从“打开”中的内置地图打开一个。",
+      "baseMissing": "你开始编辑时的版本已不可用。请重新打开仓库地图并重做你的改动。",
+      "repoMissing": "此副本来源的仓库地图已不存在。",
+      "missingIds": "仓库地图中有物件缺少编号或编号重复，因此无法匹配你的改动。",
+      "nothing": "没有可推送的内容：打开后此副本没有任何改动。",
+      "done": "已向 {slug} 推送 {count} 处改动。编辑器现在显示合并后的地图。",
+      "withUpgrades": "你的某处编辑涉及编辑器在打开地图时添加的项目，因此相关升级也一并保存了。",
+      "overwriteTitle": "要覆盖较新的仓库改动吗？",
+      "overwriteBody": "在你打开此仓库地图后，有人推送了改动。发布会替换整个文件并丢弃这些改动。请使用“推送改动到仓库地图”来保留它们。",
+      "conflictsTitle": "推送被拒绝：改动冲突",
+      "conflictsBody": "你的 {count} 处改动与打开地图后推送的改动冲突。没有写入任何内容。请从“打开”重新打开仓库地图，然后重做以下改动：",
+      "conflictRow": "{kind} {id}：{reason}",
+      "conflictsMore": "还有 {count} 处。",
+      "reasonBoth": "你和其他人都修改了它",
+      "reasonDeleted": "一方删除了它，另一方修改了它",
+      "reasonOverlap": "你的地形笔触与较新的笔触重叠",
+      "kindPlacement": "资源",
+      "kindTerrain": "地形笔触",
+      "kindGrassClear": "草地清除区",
+      "kindNpc": "NPC",
+      "kindObjectMove": "玩法对象",
+      "kindPaint": "绘制的格子",
+      "kindField": "地图设置",
+      "kindRoad": "道路",
+      "kindRoadEdit": "世界道路",
+      "close": "关闭"
+    },
+    "publish": {
+      "failed": "Publish blocked: {error}",
+      "noDevServer": "Publishing writes into the project, so it needs the local dev server (npm run dev).",
+      "rejected": "Publish rejected: {error}",
+      "done": "Published. Boot it at /index.html?map={slug}, commit the generated files to ship.",
+      "removeTitle": "Remove this map from the game?",
+      "removeConfirm": "Deletes the published files for \"{slug}\" (data/maps + src/sim/maps) and restores the standard ClaudeCraft world. Your map in the editor is not touched, and you can publish it again at any time.",
+      "removed": "Removed \"{slug}\" from the game. The standard ClaudeCraft world is back.",
+      "removedNothing": "Nothing to remove: \"{slug}\" was not published to this repo."
     },
     "brush": {
       "title": "笔刷",
+      "shape": "笔刷形状",
+      "circle": "圆形",
+      "square": "正方形",
       "size": "笔刷大小",
       "strength": "强度",
       "sizeHint": "快捷键：[ 和 ] 调整笔刷大小；Shift+[ 和 Shift+] 调整强度。",
-      "editCount": "地形编辑数：{count} / {max}"
+      "editCount": "地形编辑数：{count} / {max}",
+      "reapplyWater": "Re-apply water",
+      "reapplyWaterTitle": "Rebuild the water from the current terrain. Strokes already refresh the water they touch; use this for anything left over, like a basin dug where the map had no water at all."
     },
     "biome": {
       "title": "生态",
@@ -9431,18 +12122,330 @@ export const zh_CN: EnTranslations = {
       "cave": "洞穴",
       "erase": "擦除绘制",
       "hint": "绘制的格子会覆盖区域生态，改变地形形状与颜色。",
+      "hue": "Hue",
+      "light": "Light/Dark",
+      "saveSwatch": "Save tint as swatch",
+      "saveSwatchTitle": "Keep this hue/light version as its own swatch, so the tint can be reused after the sliders move on",
+      "swatchSaved": "Saved swatch \"{name}\".",
+      "removeSwatch": "Remove swatch",
+      "removeSwatchTitle": "Delete this custom swatch from the map. Terrain painted with it reverts to the base biome look.",
+      "swatchRemoved": "Removed swatch \"{name}\".",
+      "customHint": "Custom swatches color the ground only (terrain shape keeps the zone biome) and save with the map.",
+      "customFull": "Swatch limit reached ({max}).",
+      "textureSlotsFull": "Only {max} textured swatches render per map; extra ones show their flat color. Retire an unused texture to free a slot.",
+      "textureSlots": "Texture slots: {used} / {max} used · {free} free",
+      "textureSlotsTitle": "Each distinct texture on this map uses one of {max} slots. Snow textures ride the terrain snow layer and use none. Removing a texture swatch frees its slot.",
+      "textureSlotsOver": "Over the limit by {over}: the most recently added textures paint as flat color. Remove a texture swatch to free a slot.",
+      "importTexture": "Import texture swatch",
+      "importTextureTitle": "Pick an image file: painting with the new swatch tiles it over the ground (stored in this browser; other machines see its average color)",
+      "builtinGroup": "Texture library",
+      "builtinTitle": "Built-in ground textures that ship with the editor: picking one adds it to this map as a swatch (available on every machine)",
+      "tileSize": "Texture tile size (yd)",
+      "depth": "Surface depth",
+      "variation": "Variation",
+      "variationHint": "Breaks up the repeating grid by sampling the texture a second time through a rotated frame. 0% is the plain tiling and costs nothing; higher values cost one extra texture read wherever this swatch is painted. Surface depth shades the texture's own crevices from its ambient-occlusion map, which stops painted ground reading flat; it is priced the same way.",
+      "importTextureFailed": "Could not read that image.",
+      "autoRetexture": "Auto-Retexture Map",
+      "autoRetextureHint": "One click: repaints the whole map with fitting builtin textures by elevation, slope, water, zone and paths, sand in deserts and on beaches, cliffs on steep faces, varied grass and dirt, cobble in towns and on roads. Fully editable after: repaint anything with the brush.",
+      "autoRetextureDone": "Retextured {count} cells. Repaint any of it with the brush.",
       "clear": "清除全部生态绘制",
-      "clearConfirm": "移除此地图上所有已绘制的生态格子？"
+      "clearConfirm": "移除此地图上所有已绘制的生态格子？",
+      "hardness": "Brush hardness",
+      "edgeSoftness": "Edge softness",
+      "edgeDetail": "Edge detail",
+      "edgeHint": "How the boundary between two painted textures looks, across the whole map. A soft brush stores its rim as scattered single cells (one cell can only hold one texture), and the paint grid is a quarter of a yard, so with both of these at 0 a boundary is a hard line with speckle along it, whatever the hardness slider says. Edge softness widens the blend so that scatter reads as the gradual fade it stands for; Edge detail wanders the boundary with fine noise so it interlocks like real ground instead of following the grid. Both are free, no extra texture reads, but a wide softness blurs painted detail narrower than itself.",
+      "bucket": "Fill (replace texture)",
+      "bucketTitle": "Arm the bucket, then click the ground: every cell painted with the clicked texture switches to the selected swatch",
+      "bucketArmedHint": "Bucket armed: click the ground to replace the clicked texture map-wide.",
+      "bucketDone": "Replaced {count} painted cells.",
+      "pickTexture": "Pick the texture to paint",
+      "galleryTitle": "Choose a ground texture",
+      "galleryHint": "Browse every texture, then Lock In the one you want to paint with.",
+      "galleryLockIn": "Lock In",
+      "galleryCurrent": "Current",
+      "groupBiomes": "Biomes",
+      "groupSwatches": "Your swatches",
+      "galleryCount": "{n} textures",
+      "alphaTitle": "Brush alpha",
+      "alphaNone": "None",
+      "alphaImport": "Import alpha",
+      "alphaImportTitle": "Load a grayscale image as a brush mask: white paints, black masks out (kept in this browser)",
+      "alphaImportFailed": "Could not read that image as a brush alpha.",
+      "alphaRemove": "Remove this imported alpha",
+      "autoTitle": "Auto textures",
+      "autoSlopeRock": "Rock on steep slopes",
+      "autoScree": "Rock rubble on cliffs (high graphics)",
+      "autoSnowCaps": "Snow-capped peaks",
+      "autoRim": "Mountains at the map edge",
+      "autoShoreSand": "Sand near the water",
+      "autoAllOff": "Paint only (turn all off)",
+      "autoAllOffTitle": "Switch every automatic rule off so nothing re-textures the ground by slope, height or shoreline. Your paint is then the only thing on it.",
+      "autoHint": "Automatic texturing rules, applied UNDER your paint: while one is on it keeps re-tinting the ground it owns, so a cliff you have painted goes back to rock. Uncheck one to remove it map-wide. New maps start with all of these off."
+    },
+    "map": {
+      "zoneTitle": "Zone map",
+      "worldTitle": "World map",
+      "showWorld": "Show full world",
+      "showZone": "Show this zone",
+      "usePainted": "Use painted map",
+      "useLiveTerrain": "Use live terrain",
+      "pinHint": "Click the map to place a teleport pin.",
+      "teleportToPin": "Teleport to pin",
+      "close": "Close"
+    },
+    "zoneTool": {
+      "title": "Named Locations",
+      "hint": "Drag a box on the ground, then name it: standing inside shows that name as the location in playtest.",
+      "namePrompt": "Location name",
+      "none": "No named locations yet.",
+      "deleteTitle": "Remove this location",
+      "hideBoxes": "Hide area boxes"
+    },
+    "objectMove": {
+      "title": "游戏物件",
+      "kindFarmBed": "农田苗床",
+      "kindPracticeDummy": "训练假人",
+      "kindGatherNode": "采集点",
+      "kindDungeonDoor": "地下城入口",
+      "position": "位置：{x}, {z}",
+      "moved": "已在此地图中移动。",
+      "original": "位于原始位置。",
+      "hint": "拖动它，或用方向键微调。移动只作用于此地图，物件保持原有身份，因此已保存的进度仍能找到它。",
+      "reset": "重置到原始位置",
+      "edited": "已在此地图上更改。",
+      "rotation": "旋转（度）",
+      "size": "大小",
+      "resetAll": "恢复原样",
+      "delete": "从此地图删除",
+      "deleteHint": "仅从此地图删除。之后可在已删除对象列表中恢复。",
+      "doorDeleteHint": "删除地下城入口门会移除其在此地图上的地表入口。",
+      "dummyDeleteHint": "黑尔的练习课程会用到这些假人：删除其中一个后，此地图上对应的课程将无法完成。",
+      "doorFixed": "地下城入口门可以移动或删除，但不能旋转或缩放。",
+      "deletedTitle": "已删除的玩法对象",
+      "deletedHint": "已从此地图删除。恢复后会回到原来的位置。",
+      "deletedRow": "{kind}：{name}",
+      "restore": "恢复",
+      "restoredLater": "已恢复。地图重新加载后会显示在视图中。"
+    },
+    "lightTool": {
+      "title": "Point Lights",
+      "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
+      "none": "No lights yet.",
+      "color": "Color",
+      "intensity": "Intensity",
+      "range": "Range (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this light",
+      "capReached": "Light limit reached ({max}).",
+      "lightN": "Light {num}",
+      "selectTitle": "Select this light in the world (bulb badge enlarges; Delete removes it)"
+    },
+    "soundTool": {
+      "title": "Point Sounds",
+      "hint": "Click the ground to drop a looping sound emitter, then pick a clip and set its max volume and radius. The falloff sphere shows how far it carries; it plays spatially in playtest.",
+      "none": "No point sounds yet.",
+      "clip": "Sound effect",
+      "volume": "Max volume",
+      "radius": "Radius (yd)",
+      "height": "Height (yd)",
+      "deleteTitle": "Remove this sound",
+      "capReached": "Point sound limit reached ({max}).",
+      "soundN": "Sound {num}",
+      "selectTitle": "Select this sound in the world (badge enlarges; Delete removes it)"
+    },
+    "decalTool": {
+      "title": "Decals",
+      "hint": "Pick a decal, then click the ground to stamp it. Stamps drape over the terrain and only load when the camera is near, so a map can carry plenty. Click a stamp to select it; Delete removes it.",
+      "none": "No decals stamped yet.",
+      "library": "Decal library",
+      "libraryTitle": "Built-in decals that ship with the editor (original CC0 art). Pick one, then click the ground to stamp it.",
+      "importDecal": "Import decal image",
+      "importTitle": "Pick a PNG/WebP with transparency: it becomes a stampable decal (stored in this browser, and packed into map bundles)",
+      "imported": "Imported",
+      "importFailed": "Could not read that image.",
+      "importedDecal": "Imported \"{name}\".",
+      "size": "Size (yd)",
+      "rotation": "Rotation",
+      "aspect": "Stretch",
+      "opacity": "Opacity",
+      "glow": "Glow",
+      "tint": "Tint",
+      "sortOrder": "Draw over",
+      "randomRotate": "Random rotation per stamp",
+      "stamped": "Stamped \"{name}\".",
+      "removed": "Removed decal.",
+      "capReached": "Decal limit reached ({max}).",
+      "decalN": "Decal {num}",
+      "deleteTitle": "Remove this decal",
+      "selectTitle": "Select this decal in the world (Delete removes it)",
+      "pickFirst": "Pick a decal from the library first.",
+      "catArcane": "Arcane",
+      "catBurn": "Burns",
+      "catDamage": "Damage",
+      "catGore": "Gore",
+      "catNature": "Nature",
+      "catTracks": "Tracks",
+      "catMarker": "Markers"
+    },
+    "markerTool": {
+      "title": "AI Markers",
+      "hint": "Editor-only notes for AI quest/event generation (\"quest giver here\", \"chest here\"). Never shown in playtest.",
+      "place": "Place markers instead of moving the spawn",
+      "kind": "Marker type",
+      "npc": "NPC",
+      "object": "Interactable object",
+      "none": "No markers yet.",
+      "defaultName": "{kind} {num}",
+      "deleteTitle": "Remove this marker",
+      "capReached": "Marker limit reached ({max})."
+    },
+    "appearance": {
+      "title": "Appearance (shader)",
+      "tint": "Tint color",
+      "opacity": "Opacity",
+      "glow": "Glow color",
+      "glowStrength": "Glow strength",
+      "fire": "Fire effect (animated flame)",
+      "reset": "Reset appearance",
+      "hint": "Renders the same in playtest: tint recolors, opacity fades (ghosts), glow adds emissive light."
+    },
+    "fire": {
+      "title": "Asset fire effects",
+      "hint": "Add independent procedural fire sources, select one, then use the Move gizmo in the viewport to place it precisely on the model.",
+      "legacy": "Legacy single flame",
+      "customize": "Open full controls",
+      "add": "+ Add fire emitter",
+      "removeAll": "Remove all fire",
+      "emitter": "Fire {count}",
+      "preset": "Effect preset",
+      "enabled": "Emitter enabled",
+      "anchor": "Attach to",
+      "anchorBase": "Model base",
+      "anchorCenter": "Model center",
+      "anchorTop": "Model top",
+      "position": "Position",
+      "positionX": "Local X (yd)",
+      "positionY": "Local Y (yd)",
+      "positionZ": "Local Z (yd)",
+      "flameShape": "Flame shape",
+      "scale": "Overall scale",
+      "width": "Flame width",
+      "height": "Flame height",
+      "layers": "Flame layers",
+      "intensity": "Shader intensity",
+      "opacity": "Flame opacity",
+      "light": "Glow light",
+      "glow": "Glow intensity",
+      "glowRange": "Glow radius (yd)",
+      "smoke": "Smoke",
+      "smokeAmount": "Smoke amount",
+      "smokeScale": "Smoke scale",
+      "smokeRise": "Smoke rise",
+      "colorMotion": "Color & motion",
+      "hue": "Fire hue",
+      "saturation": "Saturation",
+      "speed": "Animation speed",
+      "turbulence": "Turbulence",
+      "flicker": "Flicker",
+      "embers": "Flying embers",
+      "blend": "Blend mode",
+      "blendAdditive": "Additive glow",
+      "blendAlpha": "Natural alpha",
+      "duplicate": "Duplicate emitter",
+      "remove": "Remove emitter",
+      "style": {
+        "torch": "Torch",
+        "bonfire": "Bonfire",
+        "wildfire": "Wildfire",
+        "soulfire": "Soul fire",
+        "embers": "Ember bed"
+      }
+    },
+    "sculpt": {
+      "hint": "Drag to raise the ground; tick the box to carve downward instead.",
+      "shapeTitle": "Brush Shape",
+      "hardness": "Brush hardness",
+      "alphaTitle": "Sculpt alpha",
+      "alphaNone": "Round",
+      "alphaHint": "Alphas shape the actual terrain surface and stay identical in editor and playtest.",
+      "lower": "Lower instead of raise",
+      "grab": "Grab / pull (snake hook)",
+      "grabHint": "Press to grab the ground under the brush, then drag and the terrain follows your cursor in any direction - up lifts it, down shoves it in, sideways slides it across the map, like pulling clay. One grab is one undo step. Brush size sets how wide a chunk you pull.",
+      "shiftHint": "Hold Shift while dragging to do the opposite (raise becomes lower, and back).",
+      "autoTex": "Auto texture by angle",
+      "autoTexHint": "Each stroke repaints the sculpted area by ground angle: one texture below the threshold, another above it (instant cliffs).",
+      "autoTexAngle": "Steep from (degrees)",
+      "autoTexFlat": "Flat ground texture",
+      "autoTexSteep": "Steep ground texture",
+      "autoTexNone": "Leave as is"
+    },
+    "materials": {
+      "title": "材质",
+      "hint": "为此模型的每个部分选择纹理。纹理按世界空间平铺，不使用模型UV，并随地图保存。",
+      "loading": "模型仍在加载。稍后再次选中它即可编辑材质。",
+      "original": "原始",
+      "texture": "纹理",
+      "tile": "纹理比例（每块码数）",
+      "color": "Tint",
+      "reset": "恢复原始"
     },
     "flatten": {
+      "style": {
+        "smooth": "Smooth",
+        "sharpen": "Sharpen",
+        "noise": "Noise",
+        "terrace": "Terrace"
+      },
+      "styleHint": {
+        "smooth": "Averages the ground under the brush - repeated passes melt bumps away.",
+        "sharpen": "The inverse of Smooth: ridges crest harder and gullies bite deeper with each pass.",
+        "noise": "Paints natural undulation across the whole brush: layered swells and dips with finer detail on top. One stroke keeps one pattern, so dragging builds rolling ground; stroke again to layer new detail.",
+        "terrace": "Pulls slopes into stepped ledges. Brush strength sets the step height."
+      },
+      "noiseSize": "Bump size (yards)",
+      "noiseRough": "Roughness",
+      "noiseHint": "Small bumps with high roughness read as rocky, broken ground; big bumps with low roughness roll like meadow hills. Brush strength sets how tall they stand.",
       "hint": "压平会将地面拉平到拖动开始时光标下的高度。",
-      "hardEdge": "硬边缘"
+      "hardEdge": "硬边缘",
+      "smoothMode": "Smooth instead of flatten",
+      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
+      "levelTitle": "目标高度（码）",
+      "levelPlaceholder": "拖动起点",
+      "levelClear": "清除",
+      "levelHint": "每次拖动都会把地面压平到这个高度。右键点击地面可选取其他高度。",
+      "levelHintNone": "右键点击地面锁定该处高度，然后在任意位置拖动即可压平到该高度。留空时，每次拖动压平到起点的高度。",
+      "levelPicked": "已锁定高度：{height} 码。"
+    },
+    "slope": {
+      "hint": "右键点击斜坡起点处的地面。然后在终点处按下并沿路径拖动：地面会在两个高度之间平滑过渡成坡道。",
+      "start": "起点高度：{height} 码",
+      "noStart": "尚未设置起点。右键点击地面即可设置。",
+      "clearStart": "清除起点",
+      "needStart": "请先右键点击地面，设置斜坡的起点。",
+      "startPicked": "斜坡起点已设为 {height} 码。"
+    },
+    "pond": {
+      "title": "创建池塘",
+      "add": "添加池塘",
+      "radius": "池塘半径",
+      "depth": "池塘深度",
+      "hint": "点击地面即可挖出圆形池塘并注水。圆圈包含缓坡岸边。撤销会同时移除水面和凹地。",
+      "invalid": "无法在此处挖池塘。请选择其他位置。"
     },
     "water": {
       "title": "水面高度",
       "level": "水面高度",
       "hint": "设置全图水面高度，范围 {min} 到 {max} 码。",
-      "reset": "重置为内置高度"
+      "reset": "重置为内置高度",
+      "tintTitle": "Water tint",
+      "hue": "Hue",
+      "light": "Lightness",
+      "tintReset": "Reset tint",
+      "waterfallTitle": "Waterfalls",
+      "placeWaterfall": "Place waterfall",
+      "placeWaterfallTitle": "Arm the Place tool with an animated waterfall (click a cliff to drop it)",
+      "waterfallLabel": "Waterfall",
+      "waterfallHint": "An animated falling-water sheet with a foam pool. Scale it up a cliff with S or the gizmo; stretch just the height with the Y scale handle."
     },
     "place": {
       "title": "放置资源",
@@ -9453,6 +12456,102 @@ export const zh_CN: EnTranslations = {
       "chosen": "正在放置：{name}",
       "none": "先在下方浏览器中选择一个资源，然后点击地面放置。"
     },
+    "collider": {
+      "title": "Collision Volumes",
+      "hint": "Pick a shape, then click the ground to drop it. Use Move, Rotate, and Scale (or the sliders below) to shape it.",
+      "shapeLabel": "Collider shape",
+      "box": "Box collider",
+      "sphere": "Sphere collider",
+      "plane": "Floor plane",
+      "wall": "Wall plane",
+      "width": "Width",
+      "height": "Height",
+      "depth": "Depth",
+      "diameter": "Diameter",
+      "floorOffset": "Floor height offset",
+      "sizeHint": "Dimensions are yards at scale 1; the Scale tool multiplies them.",
+      "playtestNote": "Volumes show green in the editor and are invisible in playtest: boxes and spheres block movement, floor planes raise the walkable ground.",
+      "hideVolumes": "Hide collision volumes",
+      "hideVolumesHint": "Hides the green volume overlays in the viewport (they still block in playtest)."
+    },
+    "foliageTool": {
+      "title": "Foliage Brush",
+      "hint": "Drag across the ground to scatter the enabled foliage inside the brush; each stroke is one undo step. Use Erase to remove pieces.",
+      "ambientTitle": "Existing map foliage",
+      "ambientHint": "Built-in trees and rocks are procedural and cannot be selected. Point the camera at an area, then convert this zone (recommended), the nearest batch, or the whole map.",
+      "makeZoneEditable": "Make THIS zone editable",
+      "makeZoneEditableHint": "Converts every tree and rock in the zone the camera is over into editable placements, the performance-safe way to edit a far area, one region at a time.",
+      "makeAmbientEditable": "Make nearby foliage editable",
+      "makeAllAmbientEditable": "Make ALL foliage editable",
+      "ambientAllHint": "Converting the whole map turns thousands of trees and rocks into individual placements, which uses more memory than the zone or batch options.",
+      "ambientEditableHint": "Ambient foliage is off. Every foliage piece painted with this brush can be selected, moved, rotated, scaled, or erased.",
+      "ambientConverted": "Made the {count} nearest foliage pieces editable.",
+      "ambientConvertedAll": "All ambient foliage ({count} pieces) is now editable.",
+      "ambientPartial": "Converted {count} pieces; raise the limit or convert again for the rest.",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "grass": "Grass (animated)",
+      "grassHue": "Grass hue",
+      "grassLight": "Grass lightness",
+      "grassClump": "Clump size (strands)",
+      "grassPreview": "The color new grass will paint with",
+      "ferns": "Ferns and mushrooms",
+      "bushes": "Bushes",
+      "trees": "Trees",
+      "rocks": "Rocks",
+      "collide": "New foliage blocks movement",
+      "noneSelected": "Enable at least one foliage group to paint.",
+      "customTitle": "Custom brush asset",
+      "customHint": "Scatter your own asset instead of the built-in sets. Pick any model from the browser below, then brush as usual.",
+      "customPick": "Pick from asset browser",
+      "customChosen": "Brushing: {name}",
+      "customClear": "Back to built-in foliage",
+      "customNeedsPick": "Open the asset browser and pick an asset for the custom brush first."
+    },
+    "meshFixTool": {
+      "title": "Mesh Fix",
+      "hint": "Wireframe is on while this tool is active. Drag over the stretched terrain polys draped across a cave mouth (from outside or from inside the cave) to REMOVE them; every poly centred under the brush stops drawing. Draw-only: the ground you walk on is unchanged. One undo step per stroke.",
+      "restore": "Restore mode (bring removed polys back under the brush)",
+      "nudgeHint": "To MOVE a stretched poly instead of removing it, use Raise or Lower with a very small brush on its vertices.",
+      "count": "{n} removed spots",
+      "clear": "Restore everything",
+      "capReached": "Mesh Fix is full ({max} spots). Restore some before removing more.",
+      "miss": "Aim at the terrain mesh: nothing was under the cursor.",
+      "vertexMode": "Vertices mode (select and move single vertices)",
+      "vertexHint": "Every terrain vertex near the cursor shows as a small square; selected ones turn yellow. Click one to select it, drag a box to take several, Shift+click or Shift+drag to add, Ctrl/Cmd+click to toggle, Alt+click to drop. Then DRAG a selected vertex to move it up or down. Draw-only: the ground you walk on is unchanged.",
+      "vertexCount": "{sel} selected, {n} vertices moved",
+      "vertexReset": "Reset selected vertices",
+      "vertexClearSel": "Clear selection",
+      "vertexClearAll": "Reset every moved vertex"
+    },
+    "clutterTool": {
+      "title": "Clutter Brush",
+      "hint": "Drag across the ground to scatter the enabled clutter inside the brush; each stroke is one undo step. Pieces never block movement.",
+      "tierNote": "Clutter shows in game on High graphics and up; lower tiers skip it at no cost.",
+      "erase": "Erase mode (lift painted clutter under the brush)",
+      "density": "Density",
+      "minScale": "Min size",
+      "maxScale": "Max size",
+      "clumps": "Clumps (0 = even spread)",
+      "kindsTitle": "Clutter kinds",
+      "kinds": {
+        "tile_broken": "Cracked paving slabs",
+        "tile_shards": "Tile shards",
+        "pebbles": "Pebbles",
+        "stones": "Loose stones",
+        "letter": "Dropped letters",
+        "paper_scraps": "Crumpled paper",
+        "leaves": "Fallen leaves",
+        "straw": "Straw",
+        "splinters": "Wood splinters",
+        "pot_shards": "Broken pottery"
+      },
+      "noneSelected": "Enable at least one clutter kind to paint.",
+      "count": "{count} clutter stamps painted",
+      "clearAll": "Remove all painted clutter",
+      "capReached": "Clutter limit reached ({max} stamps); erase some to paint more."
+    },
     "blockerTool": {
       "title": "空气墙",
       "hint": "沿地面拖动即可绘制一堵玩家无法穿过或跳过的隐形墙。松开即放置；短于半码的墙会被丢弃。",
@@ -9460,6 +12559,7 @@ export const zh_CN: EnTranslations = {
     },
     "camp": {
       "title": "怪物营地",
+      "chooseMob": "Choose a mob model",
       "mob": "怪物",
       "count": "数量",
       "radius": "半径",
@@ -9467,12 +12567,140 @@ export const zh_CN: EnTranslations = {
       "hint": "点击空地新建营地，或点击已有营地进行编辑。",
       "playtestNote": "怪物只在试玩中出现，编辑器视图中不会出现。",
       "selected": "营地：{mob}",
-      "none": "未选中营地。"
+      "none": "未选中营地。",
+      "catalogMeta": "{family} | Level {min}-{max}",
+      "statFamily": "Family: {value}",
+      "statAggro": "Aggro: {value} yd",
+      "statScale": "Scale: {value}",
+      "overrideLevels": "Override template levels",
+      "levelMin": "Minimum level",
+      "levelMax": "Maximum level",
+      "aiNotesPlaceholder": "Describe behavior, patrol logic, encounter pacing, or dialogue cues for the AI.",
+      "questNotesPlaceholder": "Explain how this camp should support objectives, rewards, or quest progression.",
+      "tagElite": "Elite",
+      "tagRare": "Rare",
+      "tagBoss": "Boss",
+      "tagCaster": "Caster",
+      "tagSupport": "Support",
+      "tagSummoner": "Summoner",
+      "tagEnrage": "Berserk",
+      "tagSwimmer": "Swimmer",
+      "tagStationary": "Fixed"
+    },
+    "authoring": {
+      "browseAll": "Browse all",
+      "search": "Search all models...",
+      "searchLabel": "Search catalog",
+      "filterLabel": "Filter catalog group",
+      "allGroups": "All",
+      "defaults": "Defaults",
+      "noResults": "No matching entries.",
+      "showing": "Showing {shown} of {total}. Refine the search to see the rest.",
+      "resultCount": "{count} entries",
+      "aiBrief": "AI and Quest Brief",
+      "aiNotes": "AI direction",
+      "questNotes": "Quest-building notes",
+      "vfxTitle": "Ambient VFX",
+      "vfxPreset": "Preset",
+      "vfxNone": "None",
+      "vfxArcane": "Arcane motes",
+      "vfxFire": "Fire embers",
+      "vfxFrost": "Frost shimmer",
+      "vfxHoly": "Holy glow",
+      "vfxNature": "Nature wisps",
+      "vfxShadow": "Shadow motes",
+      "vfxIntensity": "VFX intensity",
+      "vfxHint": "Pooled particles keep the effect lightweight in the editor and playtest."
+    },
+    "entityTool": {
+      "title": "NPCs and Mobs",
+      "hint": "Select an NPC to configure its rig, role, VFX, and AI brief. Select a mob to set its type, levels, stat modifiers, patrol, and respawn.",
+      "selected": "Selected: {name}",
+      "none": "Click a mob or NPC in the map view to select it.",
+      "facing": "Facing",
+      "oneMob": "1 mob",
+      "manyMobs": "{count} mobs",
+      "name": "Display name",
+      "titleField": "Title",
+      "role": "Story role",
+      "rolePlaceholder": "Quest giver, merchant, guard, trainer...",
+      "characterModel": "Rigged character",
+      "placeNpc": "Place NPC",
+      "chooseNpcModel": "Choose a character model",
+      "placeNpcHint": "{name} is ready. Click the terrain to place this NPC.",
+      "cancelPlacement": "Cancel placement",
+      "automaticModel": "Automatic template rig",
+      "automaticModelHint": "Use the character assigned by this NPC template.",
+      "aiNotesPlaceholder": "Describe personality, dialogue tone, schedules, reactions, and interaction rules.",
+      "questNotesPlaceholder": "Leave instructions for future AI-authored quests, objectives, and story beats.",
+      "categoryNpc": "NPCs",
+      "categoryPlayer": "Player rigs",
+      "categoryHumanoid": "Humanoids",
+      "categoryCreature": "Creatures",
+      "categoryForm": "Forms"
+    },
+    "mobTool": {
+      "hint": "Click a mob in the map view to edit its type, levels, stats, patrol, and respawn.",
+      "typeHeader": "Mob: {name}",
+      "typeHeaderMany": "Mob: {name} ({count} selected)",
+      "type": "Mob type",
+      "mixedType": "Mixed types",
+      "statLevels": "Template levels {min}-{max}",
+      "mixedHint": "The selected mobs differ. Values shown are the first one; edits apply to all of them.",
+      "overrideLevels": "Override level range",
+      "levelDefaultHint": "Using the template level range for this mob.",
+      "statsTitle": "Stat modifiers",
+      "statsHint": "Multipliers on the level-derived stats. Above 1 is a bonus, below 1 a penalty. Click a value to type an exact number.",
+      "statHealth": "Health",
+      "statDamage": "Damage",
+      "statArmor": "Armor",
+      "statMoveSpeed": "Move speed",
+      "statAttackSpeed": "Swing time",
+      "statScale": "Size",
+      "statDefault": "{value}x default",
+      "statBonus": "{value}x (+{percent}%)",
+      "statPenalty": "{value}x (-{percent}%)",
+      "statsReset": "Reset modifiers",
+      "respawnTitle": "Respawn",
+      "respawnDefault": "Default respawn speed",
+      "respawnDefaultHint": "Using the realm default for this mob (rares and bosses take longer).",
+      "respawnSeconds": "Respawn after",
+      "seconds": "{value}s",
+      "patrolTitle": "Patrol",
+      "patrolNone": "This mob wanders near its spawn point. Set a patrol to walk it along a path.",
+      "patrolNoneNpc": "This character stands where you placed it. Set a patrol to walk it along a path.",
+      "patrolSet": "Set patrol route",
+      "patrolEdit": "Edit patrol route",
+      "patrolClear": "Clear patrol",
+      "patrolPickHint": "Click the map to drop each waypoint in order. Double-click the last one, or press Enter, to finish.",
+      "patrolDraftPoints": "Waypoints placed: {count}",
+      "patrolPoints": "Patrolling {count} waypoints",
+      "patrolMode": "At the end of the path",
+      "patrolLoop": "Loop back to the start",
+      "patrolPingpong": "Turn around and walk back",
+      "patrolSpeed": "Walk speed",
+      "patrolWait": "Pause at each waypoint",
+      "patrolWaitHint": "The pause is stamped on every waypoint you place from now on.",
+      "patrolFinish": "Finish route",
+      "patrolUndoPoint": "Remove last point",
+      "patrolCancel": "Cancel",
+      "patrolNeedPoints": "Place at least two waypoints before finishing the route.",
+      "patrolFull": "A patrol route holds at most {max} waypoints.",
+      "patrolSaved": "Patrol set: {count} waypoints.",
+      "patrolRemoved": "Patrol cleared.",
+      "yardsPerSecond": "{value} yd/s",
+      "delete": "Delete mob",
+      "deleteMany": "Delete {count} mobs",
+      "deleted": "Deleted {count} mobs.",
+      "deleteNpc": "Delete character",
+      "deleteManyNpcs": "Delete {count} characters",
+      "deletedNpcs": "Deleted {count} characters."
     },
     "spawn": {
       "title": "出生点",
       "hint": "点击地面设置试玩时玩家的出生位置。",
       "position": "出生点：{x}，{z}",
+      "area": "Spawn area: {width} x {height} yd",
       "unset": "使用内置的起始位置。",
       "clear": "清除出生点"
     },
@@ -9492,12 +12720,31 @@ export const zh_CN: EnTranslations = {
       "hint": "点击已放置的资源可移除它；点击雕刻过的地面可移除光标下最新的印记。",
       "blockerHint": "在空气墙附近点击会改为移除该墙。"
     },
+    "grassClearTool": {
+      "title": "Remove Grass",
+      "hint": "Click or drag to scrub away the procedural meadow grass, including the grass baked into the built-in world. Use a large brush to clear a wide area in one stroke.",
+      "restore": "Restore all grass"
+    },
     "selection": {
       "title": "选中项",
+      "heightOffset": "高度偏移（码）",
+      "heightStep": "步长（码）",
+      "raiseAsset": "升高",
+      "lowerAsset": "降低",
+      "heightHint": "使用负偏移量可将资产沉入基准位置下方。",
       "none": "未选中任何内容。使用“选择”工具点击已放置的资源。",
+      "squareCollision": "Square collision (follows rotation)",
       "asset": "资源：{name}",
       "x": "X",
+      "y": "Y",
       "z": "Z",
+      "multiCount": "{count} assets selected",
+      "selectAllOfAsset": "Select all of this asset ({count})",
+      "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
+      "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
+      "setGround": "贴合地面",
+      "setGroundTitle": "让所选资源重新落在其下方的地形上，取消悬浮或抬高",
+      "snapGround": "移动时贴合地面",
       "rotation": "旋转",
       "scale": "缩放",
       "collide": "阻挡移动",
@@ -9505,12 +12752,73 @@ export const zh_CN: EnTranslations = {
       "radiusAuto": "自动",
       "radiusAutoTitle": "将碰撞半径重置为跟随资源缩放",
       "radiusHint": "“自动”根据资源缩放推导碰撞半径；拖动滑块可覆盖它。",
+      "collisionBaked": "Blocking with the baked model shape ({count} boxes hugging the mesh). Drag the radius slider to override with a simple circle; Auto restores the baked shape.",
+      "collisionCustom": "Custom footprint (circle/square) - overrides the baked model shape. Press Auto to restore it.",
       "footprints": "显示碰撞范围",
+      "sway": "Wind sway",
+      "swayHint": "Sways this asset in the wind. On by default for plants. Applies to EVERY placement of this asset on the map, not just the selected one.",
+      "collisionTitle": "Collision",
+      "collisionType": "Collision type",
+      "collisionTypeBaked": "Baked hitboxes",
+      "collisionTypeBasic": "Basic (radius)",
+      "collisionTypeMesh": "True collision (heavy)",
+      "collisionTypeNone": "No collision",
+      "collisionEdited": "Custom hitboxes ({count} boxes). The sim blocks with exactly these.",
+      "hitboxEdit": "Edit hitboxes",
+      "hitboxDone": "Done editing",
+      "hitboxAdd": "Add hitbox",
+      "hitboxDelete": "Delete selected",
+      "hitboxReset": "Reset to baked",
+      "hitboxSelected": "{count} hitboxes selected",
+      "hitboxHint": "Click a hitbox to select it; Ctrl/Shift+click selects several. Use the Move, Rotate, and Scale tools (or the gizmo) to shape them like any other object. Delete removes the selected boxes; Esc leaves edit mode.",
+      "hitboxCap": "Hitbox limit reached ({max} per asset).",
+      "hitboxSavePreset": "Save as preset",
+      "hitboxClearPreset": "Clear saved preset",
+      "hitboxPresetSaved": "Hitbox preset saved for {name}. New placements copy these boxes.",
+      "hitboxPresetCleared": "Hitbox preset cleared.",
+      "hitboxPresetHint": "Presets live on this device: every future placement of this asset spawns with the saved hitboxes.",
+      "meshBaking": "Baking true collision from the model mesh...",
+      "meshBakeDone": "True collision ready ({count} boxes).",
+      "meshBakeFailed": "Could not bake true collision for this asset.",
+      "meshReady": "True collision active: a dense box set hugging the real model mesh.",
+      "meshHint": "True collision rebuilds the hitboxes from the actual model mesh (many small boxes). Expensive - keep it for edge cases; it bakes once per asset when selected.",
+      "collisionCopyAll": "Copy collision to all {name} ({count})",
+      "collisionCopyAllHint": "Gives every other {name} on the map the same collision type and shape, sized to each copy so a small one never gets a giant footprint.",
+      "collisionCopyConfirmTitle": "Copy collision to all {name}?",
+      "collisionCopyConfirmBody": "All {count} other {name} on the map take this collision type and shape, each sized to its own scale (a small copy gets a small footprint, never this one), replacing their own. Ctrl+Z reverts the whole copy.",
+      "collisionCopyConfirm": "Copy to all",
+      "collisionCopied": "Copied collision to {count} {name}.",
+      "scaleAllTitle": "Scale all copies",
+      "scaleMin": "Scale min",
+      "scaleMax": "Scale max",
+      "scaleAllButton": "Scale all {name} ({count})",
+      "scaleAllHint": "Rolls a random scale between min and max onto every copy of this asset (set min and max equal for a uniform scale).",
+      "scaleAllConfirmTitle": "Scale all {name}?",
+      "scaleAllConfirmBody": "Every one of the {count} {name} on the map (this one included) gets a random scale between {min} and {max}, replacing its current scale. Ctrl+Z reverts it.",
+      "scaleAllConfirm": "Scale all",
+      "scaleAllDone": "Scaled {count} {name}.",
       "duplicate": "复制一份",
       "delete": "删除",
+      "pieces": "Edit pieces ({count})",
+      "piecesHint": "Splits this Blender-built building into its kit pieces and shell, each its own placement to move, rotate, scale or delete. Ctrl+Z puts the building back together.",
+      "piecesDone": "Split into {count} pieces.",
+      "piecesCap": "Not enough placement room to split this building.",
+      "combine": "Combine ({count})",
+      "combineHint": "Joins the selection into one object. The pieces of a split building become the building again; anything else is grouped, so it picks, drags and deletes as one.",
+      "combineRejoined": "Joined back into {name}.",
+      "combineGrouped": "Grouped {count} placements.",
+      "combineNeedsTwo": "Select at least two placements to combine.",
+      "ungroup": "Ungroup ({count})",
+      "ungroupDone": "Ungrouped {count} placements.",
       "deleteHint": "删除会移除选中项；Ctrl+Z 可恢复。",
       "moveHint": "移动：在 3D 视图中沿地面拖动资产，或用方向键微调（0.5 码，按住 Shift 为 2 码）。",
       "wheelHint": "Shift+滚轮旋转资产，Alt+滚轮缩放资产，Ctrl+D 复制资产。"
+    },
+    "transform": {
+      "moveHint": "Drag a gizmo arrow to move along that axis, or the yellow square to move freely. Arrow keys nudge.",
+      "rotateHint": "Drag a gizmo ring to rotate around that axis. Shift+scroll also rotates in 15 degree steps.",
+      "scaleHint": "Drag a gizmo axis handle to stretch that axis, or the yellow center cube to scale uniformly.",
+      "pickHint": "Click an asset to select it; the gizmo appears on the selection."
     },
     "marker": {
       "title": "标记",
@@ -9548,13 +12856,47 @@ export const zh_CN: EnTranslations = {
       "searchPlaceholder": "搜索资源...",
       "empty": "没有匹配的资源。",
       "uploadedTab": "已上传",
+      "importedTab": "Imported",
+      "importedEmpty": "No imported models this session. Use Import Model to load a .glb or .gltf from this computer.",
+      "removeImported": "Remove imported model (this session only)",
       "uploadedEmpty": "还没有上传的资源。使用“上传资源”添加 GLB 模型（最大 8 MiB）。",
       "uploadedSignIn": "在游戏中登录后即可上传并放置你自己的 GLB 模型。",
       "uploadedLoadFailed": "无法加载你上传的资源。",
       "deleteAsset": "删除已上传的资源",
       "deleteAssetConfirm": "删除已上传的资源“{name}”？使用它的地图将丢失该模型。",
       "pick": "放置{name}",
+      "collisionMaster": "Collision Master: author this asset’s default collision",
       "categoryTab": "{category}（{count}）",
+      "resizeHandle": "Drag to resize the asset browser",
+      "allTab": "All ({count})",
+      "favouritesTab": "Favourites ({count})",
+      "recentsTab": "Recent",
+      "favouritesEmpty": "No favourites yet. Click the star on any asset to keep it here.",
+      "recentsEmpty": "Nothing placed yet in this browser. Assets you place appear here.",
+      "favouriteAdd": "Add {name} to favourites",
+      "favouriteRemove": "Remove {name} from favourites",
+      "subcategoryAll": "All ({count})",
+      "subcategoryTab": "{name} ({count})",
+      "collision": {
+        "baked": "Collision: baked boxes (auto-generated shape)",
+        "authored": "Collision: authored in Collision Master",
+        "none": "Collision: none, placements block only by their soft circle, if any"
+      },
+      "subcategory": {
+        "buildings": "Buildings",
+        "props": "Props",
+        "nature": "Nature",
+        "environment": "Environment",
+        "structure": "Structure",
+        "furniture": "Furniture",
+        "containers": "Containers",
+        "lighting": "Lighting",
+        "decor": "Decor",
+        "other": "Other",
+        "enemies": "Enemies",
+        "players": "Players",
+        "modular": "Modular"
+      },
       "category": {
         "biome": "生态",
         "chars": "角色",
@@ -9568,6 +12910,113 @@ export const zh_CN: EnTranslations = {
         "weapons": "武器"
       }
     },
+    "collisionMaster": {
+      "title": "Collision Master",
+      "mapName": "Collision Master: {name}",
+      "assetLabel": "Authoring default collision for {name}.",
+      "hint": "Build this asset’s collision with the Selection panel below: pick the collision type, edit boxes with the gizmo (move / rotate / scale), add or delete boxes. Lock In saves it to the project as the asset’s default everywhere.",
+      "fromBake": "From bake",
+      "fromBakeTitle": "Start from the asset’s auto-baked voxel boxes",
+      "fittedBox": "Fitted box",
+      "fittedBoxTitle": "Start from one box fitted around the whole asset",
+      "singleBox": "Single box",
+      "singleBoxTitle": "Start from one plain box at the asset’s base",
+      "fromCylinder": "Start from cylinder",
+      "fromCylinderTitle": "Start from one editable cylinder around the asset base",
+      "fromClear": "Start from clear",
+      "fromClearTitle": "Remove every collision shape and begin with an empty scene",
+      "polySnap": "Poly snap brush",
+      "polySnapHint": "Drag across the model’s surface to lay a collision plane that hugs the geometry: the drag start/end set its length and yaw, the sampled heights its vertical band. Great for walls, roofs, and ramps.",
+      "devOnly": "Lock In writes to the project files, so it needs the local dev server (npm run dev).",
+      "lockIn": "Lock In",
+      "lockInTitle": "Save as this asset’s default collision (writes to the project) and return to your map",
+      "cancel": "Back to map",
+      "catalogOnly": "Collision Master works on catalogue assets. Imported models keep their import bake.",
+      "adopted": "Updated {count} placement(s) already in this map to use the collision you just authored.",
+      "copyEmpty": "No collision volumes to copy.",
+      "copied": "Copied {n} collision volume(s), paste with Ctrl+V (works across assets).",
+      "pasted": "Pasted {n} collision volume(s).",
+      "saveFailed": "Could not save your map before opening Collision Master.",
+      "stashOnly": "Browser storage is blocked, so the map is held in memory: you will return to it from Collision Master, but export it if you want a durable copy.",
+      "noBoxes": "No collision boxes to lock in. Add at least one box, or pick Basic/None.",
+      "meshUnsupported": "True Mesh is a per-map bake and cannot be a project default. Pick Baked, Basic, or None.",
+      "saveEndpointFailed": "Saving the default failed: {error}",
+      "saveUnreachable": "Could not reach the save endpoint (is the dev server running?). Your collision was downloaded as a file so nothing is lost; start \"npm run dev\" and Lock In again, or merge the file into data/asset_collision_overrides.json.",
+      "locked": "Locked in: {name} now uses this collision everywhere.",
+      "presetPromptTitle": "Save as preset too?",
+      "presetPromptBody": "Lock In already made this the default collision for {name} across the whole project, and every copy in your map now uses it. A preset goes one step further on this device only: each NEW placement of {name} spawns carrying these boxes as its own editable hitboxes, so you can tweak them per copy with Edit Hitboxes. Not needed for the collision to work.",
+      "presetPromptYes": "Save preset",
+      "presetPromptNo": "No thanks",
+      "presetPromptDontAsk": "Don't ask again (turn it back on under More > \"Ask about presets on Lock In\")",
+      "barLabel": "Collision modeling tools",
+      "modeObject": "Object",
+      "modeObjectTitle": "Object mode (Tab): move / rotate / scale whole volumes with the gizmo",
+      "modeVertex": "Vertex",
+      "modeVertexTitle": "Vertex select (Z): click a vertex and the gizmo moves ONLY that vertex; Ctrl+drag lassos several",
+      "modeEdge": "Edge",
+      "modeEdgeTitle": "Edge select (V): click an edge and the gizmo moves / rotates / scales its two vertices",
+      "modeFace": "Face",
+      "modeFaceTitle": "Face select (C): click a face and the gizmo moves / rotates / scales that face locally",
+      "addMenu": "Add",
+      "addMenuTitle": "Add a collision primitive: real triangulated solids (a cylinder is a true cylinder mesh)",
+      "primBox": "Box",
+      "primPlane": "Plane",
+      "primCylinder": "Cylinder",
+      "primSphere": "Sphere",
+      "primWedge": "Ramp",
+      "primTitle": "Add a {name} primitive to the collision set",
+      "polySnapShort": "Poly Snap",
+      "polyBuildShort": "Poly Build",
+      "polyBuildHint": "Poly Build: click-drag a face of the model to extrude it outward and hand-build shapes. Toggle off to orbit/select again.",
+      "polyBuildFail": "This model is at its detail limit, cannot extrude any further.",
+      "sculptTitle": "Dynamic mesh sculpt brush",
+      "sculptSettings": "Sculpt settings",
+      "sculptOff": "Sculpt: Off",
+      "sculptGrab": "Sculpt: Grab",
+      "sculptInflate": "Sculpt: Inflate",
+      "sculptDeflate": "Sculpt: Deflate",
+      "sculptSmooth": "Sculpt: Smooth",
+      "sculptPinch": "Sculpt: Pinch",
+      "sculptCrease": "Sculpt: Crease",
+      "sculptRelax": "Sculpt: Relax",
+      "sculptRadius": "Radius",
+      "sculptStrength": "Strength",
+      "sculptDetail": "Detail",
+      "dyntopo": "Dyntopo",
+      "dyntopoTitle": "Dynamic topology locally splits long edges and safely collapses short edges around the sculpt brush.",
+      "symmetry": "Symmetry",
+      "symmetryHint": "Mirror each sculpt stroke across the selected local X, Y, and Z axes.",
+      "loopCut": "Loop Cut",
+      "loopCutTitle": "Insert an edge loop: in Edge mode, pick an edge, then Loop Cut adds a parallel ring of edges around the shape (drag the new loop to slide it).",
+      "loopCutFail": "Pick a box edge in Edge mode first, loop cut needs a quad edge (not a cap/sphere).",
+      "weld": "Weld",
+      "weldTitle": "Merge the selected vertices at their center.",
+      "subdivide": "Subdivide",
+      "subdivideTitle": "Split every triangle into four shared-edge triangles for more modeling detail.",
+      "inset": "Inset",
+      "insetTitle": "Inset the selected face and create a connected border ring.",
+      "fill": "Fill",
+      "fillTitle": "Fill three or more selected boundary vertices with a new face.",
+      "mirror": "Mirror X",
+      "mirrorTitle": "Append a mirrored copy of the selected volume across its local X axis.",
+      "topologyFail": "That topology operation cannot be applied to the current selection.",
+      "rampToggle": "Walkable",
+      "rampToggleTitle": "Walkable ramp: the selected volume raises the walkable ground along its slope (the player walks up it) instead of blocking. Ramp primitives start walkable.",
+      "duplicate": "Dup",
+      "duplicateTitle": "Duplicate the selected boxes",
+      "delete": "Del",
+      "deleteTitle": "Delete the selected boxes",
+      "openFromSelection": "Collision Master",
+      "openFromSelectionTitle": "Author this asset’s DEFAULT collision in the Collision Master scene (saves to the project; your map auto-saves and you return here)",
+      "heroTitle": "Collision Master",
+      "heroStatus": "Asset collision: {mode}"
+    },
+    "importModel": {
+      "notModel": "Pick a .glb or .gltf file.",
+      "tooLarge": "That file is over the 64 MiB import limit.",
+      "imported": "Imported \"{name}\". It is kept for this session; re-import it after a reload.",
+      "failed": "Could not read that model file."
+    },
     "upload": {
       "notGlb": "请选择一个 .glb 文件。",
       "tooLarge": "该文件超过 8 MiB 上限。",
@@ -9579,15 +13028,21 @@ export const zh_CN: EnTranslations = {
     "openDrawer": {
       "title": "打开地图",
       "close": "关闭",
+      "tabShipped": "Shipped Maps",
       "tabLocal": "此浏览器",
       "tabMine": "我的服务器地图",
       "tabPublic": "公开地图",
       "colName": "名称",
+      "colType": "Type",
       "colUpdated": "更新时间",
       "colStatus": "状态",
       "statusPublic": "公开",
       "statusPrivate": "私有",
       "open": "打开",
+      "openCopy": "Open Copy",
+      "typePublished": "Published to Game ({slug})",
+      "typeShippedPublished": "{group} · your published version",
+      "publishedUnreadable": "Could not read the published map \"{slug}\" from the dev server.",
       "fork": "派生",
       "publish": "发布",
       "unpublish": "取消发布",
@@ -9610,24 +13065,43 @@ export const zh_CN: EnTranslations = {
       "savedServer": "已将“{name}”保存到服务器（v{version}）。",
       "savedLocalOnly": "已将“{name}”保存到此浏览器。登录后可在线保存。",
       "saveFailedLocal": "本地保存失败（存储被阻止）。",
+      "openFailedLocal": "That save could not be read (corrupt or truncated). Its file may still import via More > Import if you exported a copy.",
       "opened": "已打开“{name}”。",
+      "waterReapplied": "Water rebuilt from the current terrain.",
+      "shippedMapOpened": "Opened an editable copy of \"{name}\".",
+      "publishedMapOpened": "Opened your published \"{name}\": this is the version the game ships for that map.",
       "imported": "已导入“{name}”。",
       "importFailed": "导入已取消，或该文件不是有效的地图。",
+      "importMissingDeps": "{count} model/texture/skybox file(s) are missing, so parts of the map are blank. Re-import the .wocmap.zip bundle to include them.",
       "exported": "已下载“{name}”。",
+      "bundleExported": "Exported \"{name}\" with its models, textures, and skybox. Import the .wocmap.zip (not a loose .json) on the other computer.",
+      "exportBlockedMissingDeps": "Export blocked: {count} referenced model, texture, or skybox file(s) are missing from this browser. Restore them before exporting so the engine receives a complete map.",
+      "exportBlockedInvalid": "Export blocked because the map did not pass the engine compatibility check. Save a copy and review the latest edits before trying again.",
       "newMap": "已基于内置世界新建地图。",
+      "newFlatMap": "Blank map started.",
       "forked": "已派生为“{name}”。你现在编辑的是自己的副本。",
       "published": "地图已发布。任何人都可以找到并派生它。",
       "unpublished": "地图已取消发布。",
       "deleted": "地图已删除。",
       "assetPlacedFirst": "请先在浏览器中选择一个资源。",
       "loading3d": "正在加载世界...",
+      "loading3dAssets": "Loading assets...",
+      "loading3dEngine": "Starting the engine...",
+      "loading3dZone": "Building the world...",
       "playtestLaunch": "正在启动试玩...",
       "playtestFailed": "无法启动试玩（存储被阻止）。",
       "draftSaved": "草稿已自动保存。",
       "draftRestored": "已恢复自动保存的草稿。",
       "autosaveFailed": "自动保存失败（浏览器存储已满或被禁用）。请导出地图以保留备份。",
       "terrainCapReached": "已达到地形编辑上限（{max}）。多余的雕刻印记未被添加。",
+      "caveCapReached": "Cave limit reached ({max}). Delete or undo a cave first.",
+      "holeCapReached": "Hole limit reached ({max}). Delete or undo a hole first.",
       "placementCapReached": "已达到放置上限（{max}）。多余的资源未被添加。",
+      "entityCapReached": "The map entity limit was reached. Some copied NPCs or mobs were not pasted.",
+      "selectionCopied": "Copied {count} selected item(s).",
+      "selectionPasted": "Pasted {count} item(s).",
+      "selectionNothingToCopy": "Select an asset, NPC, or mob before copying.",
+      "selectionNothingToPaste": "Copy an asset, NPC, or mob before pasting.",
       "blockerCapReached": "已达到空气墙上限（{max}）。新墙未被添加。",
       "campCapReached": "已达到营地上限（{max}）。新营地未被添加。",
       "autosaveOff": "自动保存已关闭：{reason} 请手动保存后再重新开启。"
@@ -9645,6 +13119,17 @@ export const zh_CN: EnTranslations = {
     "prompt": {
       "saveAsTitle": "另存为",
       "nameLabel": "新地图名称"
+    },
+    "newMap": {
+      "title": "New Map",
+      "hint": "Pick a preset or set the size in yards. The map is bounded: terrain rim walls and invisible perimeter blockers keep playtest inside it.",
+      "width": "Width (yards)",
+      "height": "Height (yards)",
+      "scale": "Scale multiplier",
+      "interior": "Interior (60 x 60)",
+      "zone": "Zone (240 x 360)",
+      "openWorld": "Open World (360 x 1080)",
+      "create": "Create"
     },
     "serverError": {
       "invalid_map_name": "该地图名称不可用。请使用字母、数字、空格、撇号或连字符。",
@@ -9668,6 +13153,168 @@ export const zh_CN: EnTranslations = {
       "timeout": "服务器响应超时。请重试。",
       "unknown": "与服务器通信时出了点问题。"
     },
+    "lighting": {
+      "title": "Lighting",
+      "presetLabel": "Lighting preset",
+      "day": "Day",
+      "overcast": "Overcast",
+      "dusk": "Dusk",
+      "night": "Night",
+      "customHint": "Custom lighting (edited from a preset).",
+      "sun": "Sun intensity",
+      "ambient": "Ambient intensity",
+      "environment": "Sky ambience",
+      "azimuth": "Sun direction",
+      "elevation": "Sun height",
+      "nightFloor": "Night brightness",
+      "nightFloorHint": "How much daylight the deepest night keeps. 0 is the shipped night; around 0.35 stays readable and cool instead of murky.",
+      "caveLight": "Cave brightness",
+      "caveLightHint": "How dark carved cave walls go with depth. 0 is the shipped cave dark; around 0.4 keeps a big cavern readable by torchlight.",
+      "sunColor": "Sun color",
+      "skyColor": "Sky tint",
+      "hint": "Map lighting is saved and used by both the editor and playtest.",
+      "skyboxTitle": "Skybox",
+      "skyboxDefault": "Default sky",
+      "skybox_toon_day": "Toon Blue Sky",
+      "skybox_vale_day": "Vale Day HDR",
+      "skybox_marsh_overcast": "Marsh Overcast HDR",
+      "skybox_peaks_dawn": "Peaks Dawn HDR",
+      "skybox_hollow_dusk": "Hollow Dusk HDR",
+      "skybox_amber_sunset": "Amber Sunset HDR",
+      "skybox_ember_storm": "Ember Storm HDR",
+      "skybox_frost_twilight": "Frost Twilight HDR",
+      "skybox_fen_day": "Fen Day HDR",
+      "skybox_night": "Night HDR",
+      "skybox_nightbloom_dream": "Nightbloom Dream HDR",
+      "skybox_wraithwood_gloom": "Wraithwood Gloom HDR",
+      "skybox_vale_backdrop": "Vale Painted Backdrop",
+      "skybox_marsh_backdrop": "Marsh Painted Backdrop",
+      "skybox_peaks_backdrop": "Peaks Painted Backdrop",
+      "skybox_space_galaxy": "Space Galaxy",
+      "skyboxUpload": "Upload skybox...",
+      "skyboxCustomActive": "Custom skybox active.",
+      "skyboxHint": "Pick a bundled sky or upload a panoramic (equirectangular) image. Saved with the map - playtest shows it in-game.",
+      "skyboxImported": "Skybox imported.",
+      "skyboxImportFailed": "Could not import that image.",
+      "skyboxTooLarge": "Skybox image is too large (max 24 MB).",
+      "skyboxMissing": "That skybox is not stored in this browser anymore.",
+      "birdsTitle": "Birds",
+      "birds": "Birds in the sky",
+      "birdCount": "How many",
+      "birdFormation": "Fly in V formation",
+      "worldSpeedTitle": "World Speed",
+      "worldSpeed": "Animation speed",
+      "worldSpeedHint": "Speeds up or slows every ambient motion (water, fire, foliage sway, birds, weather). Cosmetic only; it never changes playtest gameplay or timing.",
+      "worldSpeedReset": "Reset to normal speed",
+      "zoneTitle": "Zone atmosphere",
+      "zoneHint": "Choose a zone, then give it its own lighting, skybox, and ambience speed.",
+      "zoneSelect": "Zone to edit",
+      "zoneReset": "Use map atmosphere"
+    },
+    "music": {
+      "title": "Music",
+      "hint": "Pick the soundtrack for the whole map, or drag boxes to give areas their own track. Playtest switches as you cross them.",
+      "zoneTrack": "Map track",
+      "default": "Auto (biome theme)",
+      "areasTitle": "Music areas",
+      "areaTrack": "Track for new areas",
+      "rowTrack": "Track for this area",
+      "dragHint": "Drag a box on the ground to add an area with the track above. Click an area to select it (Delete removes it). Smaller areas win where they overlap.",
+      "none": "No music areas yet.",
+      "areaN": "Area {num}",
+      "selectArea": "Select this area in the world (its box highlights; Delete removes it)",
+      "removeArea": "Remove this music area",
+      "areaCap": "Music area limit reached ({max}).",
+      "previewZone": "Now playing: {zone}",
+      "previewOff": "Area music stopped.",
+      "previewDisabled": "Music is switched off in Settings.",
+      "track": {
+        "town_eastbrook": "Town: Eastbrook (warm pastoral)",
+        "town_fenbridge": "Town: Fenbridge (old medieval)",
+        "town_highwatch": "Town: Highwatch (brisk march)",
+        "town_goldcrest": "Town: Goldcrest Harbor (trading port)",
+        "vale": "Vale (playful meadow)",
+        "vale_legacy": "Vale legacy (original theme)",
+        "marsh": "Marsh (croaky swamp)",
+        "peaks": "Peaks (heroic folk)",
+        "dungeon_hollow_crypt": "Dungeon: Hollow Crypt (skeletal dance)",
+        "dungeon_sunken_bastion": "Dungeon: Sunken Bastion (flooded fortress)",
+        "dungeon_gravewyrm_sanctum": "Dungeon: Gravewyrm Sanctum (boss route)"
+      }
+    },
+    "weather": {
+      "title": "Weather",
+      "showSnowfall": "显示降雪",
+      "snowfallHint": "此设置仅用于工作室预览，并保存在此浏览器中。",
+      "zoneTitle": "Weather in this zone",
+      "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
+      "auto": "Auto",
+      "clear": "Clear",
+      "rain": "Rain",
+      "snow": "Snow",
+      "blizzard": "Blizzard",
+      "sparkle": "Golden sparkles",
+      "intensity": "Intensity",
+      "cloudCover": "Cloud cover",
+      "cloudHeight": "Cloud height (yd)",
+      "cloudHint": "Low clouds hug the terrain and read as rolling ground fog.",
+      "aurora": "Aurora",
+      "auroraHint": "Curtains hang high over the camera wherever it goes: brightest at night, faint by day.",
+      "scheduleTitle": "Dynamic weather",
+      "scheduleWins": "A schedule is running: it overrides the fixed weather above.",
+      "stepMode": "Weather for this step",
+      "stepMinutes": "Minutes this step lasts",
+      "minutesShort": "min",
+      "removeStep": "Remove this step",
+      "addStep": "Add step",
+      "addStepTitle": "Cycle through the steps in order, each holding for its minutes, then repeat",
+      "scheduleHint": "Steps loop in order (Rain 5 min, then Clear 10 min, ...). Saves with the map and runs in playtest."
+    },
+    "camera": {
+      "title": "Camera",
+      "axisWidget": "Camera axis views",
+      "snapPositiveX": "View from positive X",
+      "snapNegativeX": "View from negative X",
+      "snapPositiveY": "View from above",
+      "snapNegativeY": "View from below",
+      "snapPositiveZ": "View from positive Z",
+      "snapNegativeZ": "View from negative Z",
+      "focus": "Focus selection (.)",
+      "focusTitle": "Move the orbit pivot onto the selected object so the camera revolves around it; with nothing selected, frame the whole map",
+      "freeFly": "Free-Fly (Shift+F)",
+      "freeFlyHint": "WASD moves, Q/E goes up and down, dragging looks around like first person, and the wheel sets the speed.",
+      "invertPan": "Invert camera",
+      "showBoundary": "Show map boundary walls",
+      "showPlayer": "Show playtest player",
+      "wireframe": "Wireframe mode",
+      "xray": "Transparent X-ray mode",
+      "speedTitle": "Movement speeds",
+      "moveSpeed": "WASD move speed",
+      "lookSpeed": "Mouse look speed",
+      "panSpeed": "Pan speed",
+      "speedHint": "How fast the viewport camera flies, looks, and pans. Editor only. In Free-Fly the mouse wheel is the throttle: it changes this move speed instead of zooming.",
+      "flySpeedSet": "Fly speed {value}x",
+      "resetSpeeds": "Reset speeds",
+      "perfTitle": "Performance overlay",
+      "perfShow": "Show overlay in the viewport",
+      "perfHint": "A live readout pinned to the viewport corner while you edit.",
+      "perfFps": "FPS",
+      "perfFrameMs": "Frame time (ms)",
+      "perfAssets": "Placed assets",
+      "perfTris": "Scene polygons",
+      "perfSelTris": "Selected polygons",
+      "perfTerrain": "Terrain edits",
+      "perfStreaming": "Terrain streaming",
+      "perfCoords": "World (x, z)",
+      "assetViewTitle": "Asset view distance",
+      "assetViewDistance": "Placed assets fade out at",
+      "assetViewMax": "As far as the fog",
+      "assetViewHint": "How far placed decor renders before it fades out and stops drawing, to save performance. Lower it to cull distant assets sooner; raise it to see farther. Saved with the map, so playtest matches.",
+      "visibilityTitle": "Terrain visibility",
+      "visibilityDistance": "Visible terrain distance",
+      "loadingHaze": "Loading haze",
+      "visibilityHint": "Original-detail terrain streams near the camera. Haze hides each zone until it is ready. Higher distances use more GPU and memory."
+    },
     "hints": {
       "nav3d": "拖动旋转视角，滚轮缩放。按住拖动时，WASD 飞行，Q/E 调整高度。",
       "nav2d": "拖动平移，滚轮缩放。"
@@ -9682,14 +13329,24 @@ export const zh_CN: EnTranslations = {
       "close": "关闭",
       "tool": {
         "select": "选中已放置的资产以移动、旋转和缩放；点击 2D 标记可进行编辑。",
+        "move": "Move the selected asset with the 3-axis gizmo arrows.",
+        "rotate": "Rotate the selected asset with the gizmo rings.",
+        "scale": "Scale the selected asset with the gizmo handles, per axis or uniformly.",
         "raise": "抬高笔刷下方的地形。",
         "lower": "降低笔刷下方的地形。",
         "smooth": "将起伏平滑到局部平均高度。",
         "flatten": "将地面推平到拖动起点的高度。",
+        "slope": "右键点击设置起点高度，然后从另一个高度拖动，铺出平滑的斜坡。",
+        "pond": "点击即可挖出拥有独立水面的池塘。",
         "paint": "在区域默认地表上涂刷生态群系。",
         "water": "设置全图水面高度。",
         "place": "将目录资产或上传的资产放置到地面上。",
+        "foliage": "Brush-paint grass, bushes, trees, and rocks with size variation.",
+        "clutter": "Brush-paint ground clutter (broken tiles, pebbles, letters, leaves) that renders on High graphics and up.",
+        "meshfix": "Remove stretched leftover terrain polys around a cut or cave mouth, or restore them. Wireframe turns on while the tool is active.",
+        "tree": "Grow a fully customizable tree: trunk, branches, canopy volumes and leaves.",
         "blocker": "拖动绘制在试玩中阻挡移动的隐形墙。",
+        "collider": "Drop box, sphere, or floor-plane collision volumes, invisible in playtest.",
         "camp": "添加并编辑在试玩中刷新的怪物营地。",
         "spawn": "设置试玩时玩家的落点。",
         "region": "框选地形和资产以复制粘贴。",
@@ -9701,6 +13358,7 @@ export const zh_CN: EnTranslations = {
         "undo": "Ctrl+Z 撤销上一步；Ctrl+Y 或 Ctrl+Shift+Z 重做。",
         "save": "Ctrl+S 保存地图。",
         "duplicate": "Ctrl+D 复制选中的资产。",
+        "multiSelect": "Shift+click adds or removes assets. In the NPC and Mob tool, Ctrl+click selects multiple entities.",
         "nudge": "方向键将选中的资产微调 0.5 码；按住 Shift 为 2 码。",
         "wheel": "Shift+滚轮旋转选中的资产；Alt+滚轮缩放。",
         "delete": "Delete 移除选中的资产或营地。",
@@ -9760,6 +13418,54 @@ export const zh_CN: EnTranslations = {
       "stage": "地图视口",
       "toasts": "编辑器通知",
       "dialog": "编辑器对话框"
+    },
+    "dungeon": {
+      "title": "Dungeon layout",
+      "collapse": "Fold",
+      "expand": "Expand",
+      "exit": "Back to map",
+      "hint": "Click selects (again cycles overlaps). Drag moves. Arrows nudge, Delete removes, Ctrl+Z undoes. Shift-drag pans, middle-drag orbits.",
+      "none": "Nothing selected. Click an outline on the floor plan.",
+      "addRoom": "Add room",
+      "addDoor": "Add door",
+      "addBarrier": "Add barrier",
+      "addOpening": "Add opening",
+      "addDecor": "Add decor",
+      "delete": "Delete",
+      "validate": "Validate",
+      "save": "Save to source",
+      "saved": "Layout written to src/sim/dungeon_layout.ts (dev server)",
+      "saveFailed": "Dev save endpoint unavailable; downloaded the layout instead",
+      "unsaved": "Unsaved layout changes",
+      "noIssues": "No issues found",
+      "kind": {
+        "room": "Room",
+        "door": "Door",
+        "barrier": "Barrier",
+        "opening": "Visual opening",
+        "decor": "Decor",
+        "dais": "Boss dais"
+      },
+      "field": {
+        "id": "Id",
+        "key": "Model",
+        "style": "Style",
+        "x0": "West edge (x0)",
+        "x1": "East edge (x1)",
+        "z0": "Near edge (z0)",
+        "z1": "Far edge (z1)",
+        "x": "X",
+        "z": "Z",
+        "y": "Height offset",
+        "yaw": "Yaw (radians)",
+        "hw": "Half width",
+        "hd": "Half depth",
+        "r": "Collision radius",
+        "scale": "Scale",
+        "scaleX": "Scale X",
+        "scaleZ": "Scale Z",
+        "innerScale": "Inner scale"
+      }
     }
   },
   "skinEvent": {
@@ -9822,7 +13528,8 @@ export const zh_CN: EnTranslations = {
     "whitepaper": "白皮书",
     "terms": "服务条款",
     "privacy": "隐私政策",
-    "discordLabel": "加入Discord社区"
+    "discordLabel": "加入Discord社区",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "正在加载语言...",
@@ -9902,10 +13609,174 @@ export const zh_CN: EnTranslations = {
     "realm": "服务器",
     "newCharacter": "新建角色",
     "appearance": "外观",
+    "modelLoading": "正在加载角色...",
+    "previewPinchHint": "双指缩放",
     "customize": "自定义",
     "body": "体型",
     "genderMale": "男性",
     "genderFemale": "女性",
+    "bodyTypeA": "Type A",
+    "bodyTypeB": "Type B",
+    "wocHead": {
+      "hair": {
+        "swept": "侧梳",
+        "long": "Long",
+        "mohawk": "莫西干头",
+        "quiff": "短飞机头",
+        "undercut": "铲青",
+        "topknot": "头顶发髻",
+        "shoulder": "齐肩发",
+        "bald": "Bald",
+        "waves": "波浪卷",
+        "ponytail": "高马尾",
+        "braid": "辫子",
+        "bob": "Bob",
+        "crown": "皇冠辫",
+        "twins": "双辫",
+        "curls": "卷发盘头"
+      },
+      "beard": {
+        "none": "无胡须",
+        "moustache": "上唇胡",
+        "handlebar": "翘八字胡",
+        "goatee": "山羊胡",
+        "chin": "下巴胡",
+        "boxed": "短络腮胡",
+        "long": "长胡须",
+        "chops": "络腮鬓角",
+        "chinstrap": "下颌线胡"
+      },
+      "nose": {
+        "default": "经典",
+        "broad": "宽鼻",
+        "aquiline": "鹰钩鼻",
+        "button": "小翘鼻",
+        "soft": "Soft"
+      },
+      "mouth": {
+        "default": "经典",
+        "full": "Full",
+        "smirk": "坏笑",
+        "relaxed": "放松",
+        "cupids_bow": "丘比特唇",
+        "narrow": "窄唇",
+        "thin": "Thin",
+        "rounded": "圆唇"
+      },
+      "brows": {
+        "default": "经典",
+        "slim": "Slim",
+        "arched": "弯眉",
+        "soft": "Soft",
+        "straight": "平眉",
+        "relaxed": "舒展眉",
+        "soft_arch": "Soft Arch",
+        "rounded": "圆眉"
+      },
+      "ears": {
+        "default": "经典",
+        "large": "大耳",
+        "pointed": "尖耳",
+        "round": "圆耳"
+      },
+      "eyes": {
+        "default": "经典",
+        "almond": "杏眼",
+        "hooded": "内双眼"
+      }
+    },
+    "wocBuilder": {
+      "cat": {
+        "bodyType": "Body Type",
+        "skinTone": "Skin Tone",
+        "face": "Face",
+        "eyesBrows": "眼睛与眉毛",
+        "eyeColor": "瞳色",
+        "hairstyle": "发型",
+        "facialHair": "胡须",
+        "hairColor": "发色",
+        "browColor": "眉色",
+        "piercings": "穿孔饰品"
+      },
+      "section": {
+        "hair": "发型",
+        "nose": "Nose",
+        "mouth": "Lips",
+        "brows": "眉形",
+        "ears": "Ears",
+        "eyes": "眼型"
+      },
+      "slider": {
+        "eyeSpacing": "眼距",
+        "eyeSize": "Eye Size",
+        "eyeTilt": "Eye Tilt",
+        "browHeight": "眉毛高度",
+        "chinWidth": "下巴宽度",
+        "bodyScale": "Body Size"
+      },
+      "bodyGlyph": {
+        "a": "A",
+        "b": "B"
+      },
+      "piercing": {
+        "none": "None",
+        "lobes": "耳垂",
+        "ears": "Full Ears",
+        "brow": "Brow",
+        "nose": "鼻翼钉",
+        "septum": "鼻中隔",
+        "lip": "Lip",
+        "full": "Full Set"
+      },
+      "skin": {
+        "porcelain": "瓷白",
+        "ivory": "象牙白",
+        "rose": "Rose",
+        "peach": "蜜桃",
+        "fair": "Fair",
+        "beige": "米色",
+        "sand": "Sand",
+        "honey": "蜂蜜",
+        "olive": "橄榄",
+        "caramel": "焦糖",
+        "tan": "Tan",
+        "bronze": "古铜",
+        "chestnut": "栗褐",
+        "umber": "棕褐",
+        "mahogany": "红木",
+        "ebony": "乌木"
+      },
+      "eye": {
+        "brown": "棕色",
+        "darkBrown": "深棕色",
+        "hazel": "榛色",
+        "amber": "琥珀色",
+        "green": "绿色",
+        "teal": "Teal",
+        "blue": "Blue",
+        "paleBlue": "Pale Blue",
+        "grey": "Grey",
+        "violet": "紫罗兰色"
+      },
+      "hairColor": {
+        "platinum": "铂金色",
+        "blonde": "浅金色",
+        "golden": "金黄色",
+        "copper": "铜色",
+        "red": "Red",
+        "auburn": "赤褐色",
+        "lightBrown": "浅棕色",
+        "brown": "棕色",
+        "darkBrown": "深棕色",
+        "black": "黑色",
+        "silver": "银色",
+        "white": "白色"
+      },
+      "matchHair": "匹配发色",
+      "resetDefault": "恢复默认",
+      "customColorAria": "选择自定义颜色",
+      "customSkinAria": "选择自定义肤色"
+    },
     "hair": "发型",
     "brows": "眉毛",
     "skinTone": "肤色",
@@ -11377,6 +15248,9 @@ export const zh_CN: EnTranslations = {
   "character": {
     "loading": "正在加载...",
     "noneYet": "还没有角色。请在下方创建一个。",
+    "membershipRequired": "续订会员后即可使用此角色。",
+    "membershipSlots": "开通会员以解锁角色栏位",
+    "emptySlot": "可用角色栏位",
     "levelClass": "{level} 级 {className}",
     "inWorld": "在世界中",
     "takeOver": "接管",
@@ -11386,6 +15260,7 @@ export const zh_CN: EnTranslations = {
     "lockoutRaids": "团队副本",
     "lockoutDungeons": "地下城",
     "lockoutWorldBosses": "世界首领",
+    "lockoutWeeklyQuests": "每周任务",
     "takeOverConfirm": "这将使该角色从另一个会话断开并切换到此处。是否继续？",
     "renameRequired": "需要改名",
     "delete": "删除",
@@ -11981,6 +15856,7 @@ export const zh_CN: EnTranslations = {
       "deathRecapCauterized": "你已经死亡。灼烧术的烈焰吞噬了你。",
       "respawn": "你再次感到精力恢复、身体完整。",
       "respawnKeeperToll": "灵魂医者复活了你，但你因此变得虚弱：在复活后遗症消退之前，你的所有属性都会被削弱。",
+      "moonbridgeBanner": "月之桥已成",
       "ignoringChat": "已屏蔽来自 {name} 的聊天。",
       "noLongerIgnoring": "不再屏蔽 {name}。",
       "playerNotNearby": "该玩家不在附近。",
@@ -12186,6 +16062,10 @@ export const zh_CN: EnTranslations = {
     "social": {
       "title": "社交",
       "friendsTab": "好友",
+      "friendFirstPage": "首页",
+      "friendNextPage": "下一页",
+      "boundFriend": "绑定好友",
+      "boundFriendLink": "绑定好友通过邀请链接建立关系。",
       "guildTab": "公会",
       "ignoreTab": "忽略",
       "leaveParty": "离开队伍",
@@ -12413,7 +16293,161 @@ export const zh_CN: EnTranslations = {
       "hoard_cast_screech": "震耳尖啸",
       "hoard_cast_mimic_bite": "贪婪撕咬",
       "hoard_cast_mimic_leap": "碾压跳跃",
-      "hoard_cast_coin_spit": "诅咒金币"
+      "hoard_cast_coin_spit": "诅咒金币",
+      "crypt_grave_bolt": "墓穴之箭",
+      "crypt_raise_bones": "唤起骸骨",
+      "crypt_murder_call": "鸦群召唤",
+      "crypt_stone_shriek": "石之尖啸",
+      "crypt_grave_cleave": "墓穴横扫",
+      "crypt_barrowflame_breath": "冢焰吐息",
+      "crypt_tail_lash": "尾鞭",
+      "crypt_wing_gust": "翼风",
+      "crypt_grave_rupture": "墓穴崩裂",
+      "crypt_carrion_eye": "腐鸦之眼",
+      "crypt_marrow_crush": "碎髓重击",
+      "crypt_rimesilk_spit": "霜丝喷吐",
+      "crypt_gravespark_volley": "墓火齐射",
+      "crypt_morthen_rite_wakes": "仪式苏醒",
+      "crypt_morthen_rise": "唤墓者升起",
+      "crypt_morthen_proclaim": "墓之宣告",
+      "crypt_morthen_descend": "降临",
+      "crypt_knellwyrm_arrive": "自天而降",
+      "crypt_knellwyrm_pyre_strafe": "火葬扫射",
+      "crypt_knellwyrm_strafe_run": "俯冲扫射",
+      "crypt_knellwyrm_dread_bellow": "恐惧咆哮",
+      "crypt_marrow_shovelful": "一铲坟土",
+      "crypt_marrow_measure": "量身定墓",
+      "crypt_marrow_burial_toll": "葬礼丧钟",
+      "crypt_marrow_gravediggers_blow": "掘墓人重击",
+      "crypt_lady_brides_lament": "新娘的哀歌",
+      "crypt_lady_frozen_embrace": "冰封之拥",
+      "crypt_lady_embrace_hold": "冰封之拥",
+      "crypt_lady_bridal_freeze": "新娘冰封",
+      "crypt_ilvane_dirge": "空洞挽歌",
+      "crypt_ilvane_unbroken_dirge": "不断之诗",
+      "crypt_ilvane_bone_organ": "骨管风琴",
+      "crypt_morthen_shadow_pulse": "暗影脉冲",
+      "crypt_morthen_rite_of_the_unquiet": "不宁者仪式",
+      "crypt_morthen_reap_the_unquiet": "收割不宁者",
+      "kituse_crypt_relight_candle": "重燃蜡烛",
+      "crypt_knellwyrm_knell_rise": "燃烧丧钟",
+      "crypt_knellwyrm_knell_mark": "燃烧丧钟",
+      "crypt_knellwyrm_knell_breath": "燃烧丧钟",
+      "crypt_knellwyrm_knell_land": "燃烧丧钟",
+      "bastion_brine_mend": "盐水愈合",
+      "bastion_fog_ward": "雾之护佑",
+      "bastion_halberd_sweep": "戟之横扫",
+      "bastion_piercing_bolt": "穿刺弩矢",
+      "bastion_claw_sweep": "巨钳横扫",
+      "bastion_shell_slam": "壳塔重击",
+      "ghost_captain_broadside": "幽灵舷炮齐射",
+      "ghost_captain_anchor": "诅咒之锚",
+      "ghost_captain_boarding": "幻影登船",
+      "bastion_boathook": "船钩拖拽",
+      "bastion_fog_bank": "雾堤",
+      "bastion_brine_column": "盐水之柱",
+      "bastion_loose_on_my_mark": "听我号令放箭",
+      "bastion_oathbound_charge": "誓约冲锋",
+      "bastion_gaolers_cudgel": "狱卒短棍",
+      "bastion_mist_surge": "迷雾涌流",
+      "bastion_drowning_hymn": "溺亡圣咏",
+      "bastion_iron_cage": "铁笼",
+      "bastion_drowned_anchor_cast": "溺亡之锚",
+      "bastion_shackle_pair": "双人镣铐",
+      "bastion_shadowstep": "穿影",
+      "bastion_reaping_scythe": "收割之镰",
+      "bastion_veil_rise": "雾幕",
+      "bastion_veil_gather": "雾气聚拢",
+      "bastion_vael_rise": "死亡升起",
+      "bastion_vael_sink": "没入雾中",
+      "bastion_hallowed_brine": "圣化咸水",
+      "bastion_rebounding_bulwark": "回弹壁盾",
+      "bastion_tide_sentence": "潮汐宣判",
+      "bastion_oath_kneel": "不破誓言",
+      "bastion_oath_vigil": "不破誓言",
+      "temple_lullaby": "摇篮曲",
+      "cantor_last_verse": "最后一节",
+      "temple_call_the_tide": "潮汐召唤",
+      "temple_static_coil": "静电盘绕",
+      "temple_snapper_snap": "猛咬",
+      "temple_trident_sweep": "三叉戟横扫",
+      "temple_sea_song": "海之歌",
+      "temple_tidal_slap": "潮汐掌击",
+      "temple_tide_breath": "冰冻吐息",
+      "temple_moonlight_lance": "月光长枪",
+      "temple_prism_flare": "棱镜闪耀",
+      "temple_resonant_slam": "共鸣猛击",
+      "temple_moonwater_bolt": "月水箭",
+      "temple_drowning_aria": "溺亡咏叹调",
+      "temple_mere_surge": "湖涌",
+      "temple_tideglass_fracture": "潮镜碎裂",
+      "temple_undertow": "暗流",
+      "temple_lunar_tide": "月潮",
+      "temple_skewering_trident": "穿刺三叉戟",
+      "temple_pale_mending": "苍白愈合",
+      "temple_glimmer_venom": "微光毒液",
+      "temple_pearl_slam": "潮汐振翼",
+      "temple_lightning_spit": "闪电喷吐",
+      "temple_crushing_torrent": "碾压激流",
+      "temple_hydra_tsunami": "海啸",
+      "temple_ysolei_call": "月裔召唤",
+      "temple_ysolei_wrath": "溺亡之怒",
+      "temple_frostlocked_torrent": "冰封激流",
+      "temple_venom_current": "毒液洋流",
+      "temple_toxic_rime": "剧毒霜晶",
+      "temple_beckoning_moon": "唤月",
+      "temple_falling_moon": "坠月",
+      "temple_prism_glare": "棱镜凝视",
+      "temple_arcing_spark": "弧光火花",
+      "temple_call_of_the_shallows": "浅滩的呼唤",
+      "wildheart_ancestral_sap": "先祖树汁",
+      "wildheart_plant_totem": "安置图腾",
+      "wildheart_entangling_lash": "缠绕鞭笞",
+      "wildheart_saurian_tail_swipe": "甩尾",
+      "wildheart_saurian_stomp": "撼地践踏",
+      "wildheart_quarry_mark": "猎物印记",
+      "wildheart_war_roar": "战争咆哮",
+      "wildheart_toad_hex": "蟾蜍妖术",
+      "wildheart_rattling_dread": "骨鸣恐惧",
+      "wildheart_snaring_tongue": "套索之舌",
+      "wildheart_beast_pit_quake": "兽坑震荡",
+      "wildheart_jaguar_heel": "回来！",
+      "wildheart_gorgebloom_seed_rain": "种子雨",
+      "wildheart_gorgebloom_vine_lash": "藤鞭",
+      "wildheart_gorgebloom_gorge": "吞噬",
+      "wildheart_zulgar_pulse": "荒野之心脉冲",
+      "wildheart_zulgar_spirit_hunt": "狩猎之魂",
+      "sanctum_cinder_breath": "余烬吐息",
+      "sanctum_warming_rite": "回暖仪式",
+      "sanctum_goad": "驱策",
+      "sanctum_plant_brazier": "放置灵魂火盆",
+      "sanctum_ice_block_toss": "投掷冰块",
+      "sanctum_tusker_tusk_sweep": "獠牙横扫",
+      "sanctum_tusker_trample": "践踏",
+      "sanctum_thaw_the_held": "Thaw the Held",
+      "sanctum_counterweight_lash": "配重尾鞭",
+      "sanctum_branding_iron": "烙铁",
+      "sanctum_rime_breath": "霜凇吐息",
+      "kituse_sanctum_topple_brazier": "推倒火盆",
+      "trash_demo_nova": "Test Nova",
+      "trash_demo_nova_unstoppable": "Test Nova",
+      "trash_demo_walker": "Test Orb",
+      "sanctum_korgath_maul_arc": "重锤弧斩",
+      "sanctum_korgath_chain_flail": "锁链鞭笞",
+      "sanctum_korgath_threshold_charge": "门槛冲锋",
+      "sanctum_korgath_foremans_bellow": "工头的咆哮",
+      "sanctum_korgath_strain": "绷链",
+      "sanctum_korgath_stomp": "震颤践踏",
+      "sanctum_goadsmith_rerivet": "重铆",
+      "sanctum_velkhar_soulfire_trench": "魂火沟壑",
+      "sanctum_velkhar_shadow_volley": "暗影箭雨",
+      "sanctum_korzul_break_free": "破冰而出",
+      "sanctum_korzul_grave_breath": "坟墓吐息",
+      "sanctum_korzul_tail_sweep": "尾扫",
+      "sanctum_korzul_grave_inferno": "墓场炼狱",
+      "sanctum_korzul_wing_gale": "翼风",
+      "sanctum_korzul_plunging_fire": "倾泻烈焰",
+      "sanctum_korzul_crashing_descent": "坠击降落"
     }
   },
   "questUi": {
@@ -12483,6 +16517,8 @@ export const zh_CN: EnTranslations = {
       "rewards": "奖励",
       "xpReward": "{xp} 点经验",
       "itemReward": "物品奖励：",
+      "chooseReward": "选择你的奖励：",
+      "rewardChoices": "你将能够选择以下奖励之一：",
       "objectiveProgress": "{label}：{current}/{total}",
       "requiresLevel": "需要等级 {level}"
     },
@@ -12862,6 +16898,7 @@ export const zh_CN: EnTranslations = {
       "incomplete": "该任务尚未完成。",
       "giverMissing": "该任务发布者不在附近。",
       "turnInMissing": "该任务交付点不在附近。",
+      "rewardNotOffered": "该奖励未提供。",
       "tooFar": "距离太远。",
       "escortAway": "你要护送的人现在不在原处，稍后就会回来。"
     }
@@ -12913,7 +16950,9 @@ export const zh_CN: EnTranslations = {
       "flask": "药壶",
       "scroll": "卷轴",
       "bag": "背包",
-      "mount": "坐骑"
+      "mount": "坐骑",
+      "buddy": "伙伴",
+      "buddyCosmetic": "伙伴外观"
     },
     "stats": {
       "armor": "护甲",
@@ -12929,6 +16968,18 @@ export const zh_CN: EnTranslations = {
       "parry": "招架"
     },
     "tooltip": {
+      "referralFullSet": "穿戴全部{pieces}件友谊护甲，与{member}组队时获得额外{percent}%经验。邀请人的会员资格必须有效。",
+      "referralInviter": "邀请你的会员",
+      "referralRetained": "即使未与邀请人组队，护甲属性仍会随等级提升。",
+      "referralDormant": "未激活：此账号尚未通过会员邀请获得友谊护甲。",
+      "membershipToken": "使用：消耗此代币，为您的账号增加{days}天会员时长。现有剩余时长会保留。兑换前可交易此代币或在拍卖行出售。",
+      "membershipAdaptive": "属性和护甲会随您的职业与专精调整。",
+      "membershipWeaponAdaptive": "装备时，武器类型、外观和属性会适配您的职业与专精。",
+      "membershipScaling": "物品等级{level}。始终比角色等级高5级。",
+      "membershipPerfected": "已完善：物品等级{level}。",
+      "membershipFullSet": "装备全部{pieces}件会员护甲，经验获取量提高{percent}%。需要有效会员资格。",
+      "membershipRequired": "会员到期后，装备属性和套装加成会停用，续订后恢复。",
+      "membershipDormant": "未激活：续订会员以恢复装备属性和套装加成。",
       "qualityKind": "{quality}{kind}",
       "currentlyEquipped": "当前装备",
       "ifYouEquip": "装备后",
@@ -13138,7 +17189,7 @@ export const zh_CN: EnTranslations = {
       "historyEmpty": "暂无销售记录。你在世界市场出售的物品会显示在这里。",
       "historyNote": "你在世界市场的近期销售记录。",
       "saleBuyer": "售予{buyer}",
-      "saleOlder": "另有 {count} 笔较早的交易，已计入总额。",
+      "saleOlder": "另有 {count} 笔较早的销售未列出。",
       "ordersTab": "求购",
       "ordersNote": "发布你想要的物品，金币会托管在商人处。价格等于或低于你出价的上架物品会立即成交；其余的则等待卖家。商人会从交货者那里抽取 {cut}% 的费用。你目前有 {used}/{max} 个订单待处理。",
       "ordersListAria": "待处理的求购订单",
@@ -13229,6 +17280,10 @@ export const zh_CN: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "courier": {
+        "name": "信使",
+        "description": "召唤一头会飞的驴，在您的背包和最近的银行之间运送物品。去程和回程各需10秒。每次最多选择24组物品。送回的物品会溢出存入已满的背包，随后信使会消失，直到再次召唤。死亡或进入副本时，回程会暂停。开始新的配送需要会员资格。"
+      },
       "sport_kick": {
         "name": "踢球",
         "description": "沿地面把球踢向瞄准点。"
@@ -13285,6 +17340,10 @@ export const zh_CN: EnTranslations = {
         "name": "乱射",
         "description": "向一片 8 米的区域降下箭雨，持续 3 秒。区域内的敌人每 0.5 秒受到 {damage} 点物理伤害。伤害随远程攻击强度提升。"
       },
+      "phosphor_flask": {
+        "name": "磷火瓶",
+        "description": "一个密封容器，装有活性化学混合物，会在 8 码范围内爆发出白热火焰，持续 3 秒。站在火焰中的敌人每 0.5 秒受到 {damage} 点火焰伤害。伤害随远程攻击强度提升。"
+      },
       "pack_command": {
         "name": "兽群号令",
         "description": "命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。"
@@ -13331,7 +17390,7 @@ export const zh_CN: EnTranslations = {
       },
       "play_dead": {
         "name": "装死",
-        "description": "倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。再次施放即可起身。"
+        "description": "倒地装死：所有人看到你的生命值和集中值都为空。敌人会遗忘你，正以你为目标的敌方玩家会失去目标。移动、攻击或使用其他技能都会结束装死。若在移动中施放，你有 1 秒时间停下，否则移动会结束装死。再次施放即可起身。"
       },
       "tactical_camo": {
         "name": "战术伪装",
@@ -13339,7 +17398,15 @@ export const zh_CN: EnTranslations = {
       },
       "frostjaw_trap": {
         "name": "霜颚陷阱",
-        "description": "在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。"
+        "description": "在选定位置放置一个陷阱。陷阱在 0.75 秒后启动，持续 1 分钟，只有你和你的小队能看见。第一个触发陷阱的敌人会被定身 3 秒，4 码内的敌人会被减速 50%，持续 4 秒。"
+      },
+      "bear_trap": {
+        "name": "捕熊陷阱",
+        "description": "在选定位置放置陷阱。0.75秒后就绪，持续1分钟，仅你和你的小队可见。首个触发的敌人会流血，在15秒内受到{damage}点物理伤害，并被减速50%，持续4秒。伤害随远程攻击强度提高。同时只能有一个捕熊陷阱生效，可与你的霜颚陷阱同时存在。放置新的捕熊陷阱会替换原来的陷阱。"
+      },
+      "scatterbolt": {
+        "name": "散射弩箭",
+        "description": "向前方8码、90度的锥形区域散射弩箭，将敌人击退至距你最多20码的位置。免疫击退的敌人不受影响。不造成伤害。"
       },
       "pack_rally": {
         "name": "兽群集结",
@@ -16039,6 +20106,30 @@ export const zh_CN: EnTranslations = {
       "fenshadow_maul": {
         "name": "沼影重锤"
       },
+      "foremans_barrowmaul": {
+        "name": "工头的冢锤"
+      },
+      "skerrits_shardpike": {
+        "name": "斯克里特的碎晶长矛"
+      },
+      "loomshard_eye": {
+        "name": "冢琉璃之眼"
+      },
+      "barrowhide_pauldrons": {
+        "name": "古冢护肩"
+      },
+      "mirestone_stride": {
+        "name": "沼石步履"
+      },
+      "foremans_wage_band": {
+        "name": "工头的工钱指环"
+      },
+      "mirelight_locket": {
+        "name": "沼光吊坠"
+      },
+      "fenwright_grips": {
+        "name": "沼泽工匠握手"
+      },
       "wildgrove_cinch": {
         "name": "野林束带"
       },
@@ -16516,6 +20607,9 @@ export const zh_CN: EnTranslations = {
       "reins_avian_strider": {
         "name": "苍翠谷行者的缰绳"
       },
+      "reins_nightwing_chimera": {
+        "name": "夜翼奇美拉的缰绳"
+      },
       "reins_goblin_rocket_sled": {
         "name": "哥布林火箭雪橇点火钥匙"
       },
@@ -16527,6 +20621,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "守道人的铃带：托利弗"
+      },
+      "reins_wobbles_slime": {
+        "name": "果冻鞍：晃晃"
       },
       "reins_rickshaw_mount": {
         "name": "白骨人力车缚绳"
@@ -17088,6 +21185,117 @@ export const zh_CN: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "往生石"
+      },
+      "whistle_ember_fox": {
+        "name": "余烬狐的哨子"
+      },
+      "whistle_moss_hare": {
+        "name": "苔藓野兔的哨子"
+      },
+      "whistle_frog": {
+        "name": "青蛙的哨子"
+      },
+      "whistle_crimson_claw_crab": {
+        "name": "赤钳蟹的哨子"
+      },
+      "whistle_golden_sentinel": {
+        "name": "黄金哨兵的哨子"
+      },
+      "whistle_nightfang": {
+        "name": "夜牙的哨子"
+      },
+      "whistle_tuskhorn_boar": {
+        "name": "獠角野猪的哨子"
+      },
+      "whistle_emerald_wolf": {
+        "name": "翡翠狼的哨子"
+      },
+      "whistle_tiger": {
+        "name": "猛虎的哨子"
+      },
+      "whistle_cate_coin": {
+        "name": "钱币猫的哨子"
+      },
+      "whistle_alon": {
+        "name": "阿隆的哨子"
+      },
+      "whistle_trollface": {
+        "name": "巨魔脸的哨子"
+      },
+      "whistle_ansem": {
+        "name": "安塞姆的哨子"
+      },
+      "whistle_triple_t": {
+        "name": "三重T的哨子"
+      },
+      "whistle_kekius": {
+        "name": "凯基乌斯的哨子"
+      },
+      "whistle_solbot": {
+        "name": "索尔机偶的哨子"
+      },
+      "whistle_frostfire": {
+        "name": "霜火的哨子"
+      },
+      "whistle_rocky": {
+        "name": "岩仔的哨子"
+      },
+      "whistle_proud_grunt": {
+        "name": "骄傲步兵的哨子"
+      },
+      "whistle_loot_goblin": {
+        "name": "战利品哥布林的哨子"
+      },
+      "whistle_penny_goldspark": {
+        "name": "潘妮·金火花的哨子"
+      },
+      "whistle_stag": {
+        "name": "雄鹿的哨子"
+      },
+      "whistle_alpaca": {
+        "name": "羊驼的哨子"
+      },
+      "whistle_horse": {
+        "name": "马的哨子"
+      },
+      "whistle_sapling": {
+        "name": "小树苗的哨子"
+      },
+      "whistle_bull": {
+        "name": "公牛的哨子"
+      },
+      "whistle_spider": {
+        "name": "蜘蛛的哨子"
+      },
+      "whistle_raptor": {
+        "name": "迅猛龙的哨子"
+      },
+      "whistle_skeleton": {
+        "name": "骷髅的哨子"
+      },
+      "whistle_crystal_lich": {
+        "name": "水晶巫妖的哨子"
+      },
+      "whistle_forgemaw": {
+        "name": "熔颚·熔融者的哨子"
+      },
+      "whistle_sprites": {
+        "name": "闪烁与微光的哨子"
+      },
+      "whistle_crystal_tide": {
+        "name": "水晶潮汐的哨子"
+      },
+      "whistle_phantom": {
+        "name": "幻魂的哨子"
+      },
+      "whistle_emberfall_phoenix": {
+        "name": "烬落凤凰的哨子"
+      },
+      "charm_stag_acorn": {
+        "name": "橡果之冠护符"
+      },
+      "charm_stag_gilded": {
+        "name": "镀金护符"
       },
       "lastflame_core": {
         "name": "末焰之核"
@@ -18664,6 +22872,1533 @@ export const zh_CN: EnTranslations = {
       "infernal_quiver": {
         "name": "炼狱箭袋"
       },
+      "lychgate_buckler": {
+        "name": "停柩门小圆盾"
+      },
+      "bastion_kite_shield": {
+        "name": "堡垒鸢盾"
+      },
+      "barrowfield_tower_shield": {
+        "name": "古冢原塔盾"
+      },
+      "brookwatch_robe": {
+        "name": "溪卫长袍"
+      },
+      "brookwatch_leggings": {
+        "name": "溪卫腿甲衣"
+      },
+      "brookwatch_slippers": {
+        "name": "溪卫软靴"
+      },
+      "brookwatch_hood": {
+        "name": "溪卫兜帽"
+      },
+      "brookwatch_gloves": {
+        "name": "溪卫手套"
+      },
+      "brookwatch_mantle": {
+        "name": "溪卫披肩"
+      },
+      "brookwatch_sash": {
+        "name": "溪卫束带"
+      },
+      "brookwatch_jerkin": {
+        "name": "溪卫皮甲"
+      },
+      "brookwatch_breeches": {
+        "name": "溪卫及膝裤"
+      },
+      "brookwatch_boots": {
+        "name": "溪卫靴子"
+      },
+      "brookwatch_cap": {
+        "name": "溪卫便帽"
+      },
+      "brookwatch_grips": {
+        "name": "溪卫掌套"
+      },
+      "brookwatch_shoulderpads": {
+        "name": "溪卫肩垫"
+      },
+      "brookwatch_belt": {
+        "name": "溪卫腰带"
+      },
+      "brookwatch_hauberk": {
+        "name": "溪卫锁衣"
+      },
+      "brookwatch_legguards": {
+        "name": "溪卫腿护"
+      },
+      "brookwatch_sabatons": {
+        "name": "溪卫甲靴"
+      },
+      "brookwatch_helm": {
+        "name": "溪卫头盔"
+      },
+      "brookwatch_gauntlets": {
+        "name": "溪卫甲手"
+      },
+      "brookwatch_pauldrons": {
+        "name": "溪卫肩甲"
+      },
+      "brookwatch_girdle": {
+        "name": "溪卫腰饰"
+      },
+      "brookwatch_chainmail": {
+        "name": "溪卫锁甲"
+      },
+      "brookwatch_chausses": {
+        "name": "溪卫腿甲"
+      },
+      "brookwatch_greaves": {
+        "name": "溪卫胫甲"
+      },
+      "brookwatch_coif": {
+        "name": "溪卫头罩"
+      },
+      "brookwatch_handguards": {
+        "name": "溪卫护手"
+      },
+      "brookwatch_spaulders": {
+        "name": "溪卫肩铠"
+      },
+      "brookwatch_cord": {
+        "name": "溪卫腰绳"
+      },
+      "hedgerow_robe": {
+        "name": "树篱长袍"
+      },
+      "hedgerow_leggings": {
+        "name": "树篱腿甲衣"
+      },
+      "hedgerow_slippers": {
+        "name": "树篱软靴"
+      },
+      "hedgerow_hood": {
+        "name": "树篱兜帽"
+      },
+      "hedgerow_gloves": {
+        "name": "树篱手套"
+      },
+      "hedgerow_mantle": {
+        "name": "树篱披肩"
+      },
+      "hedgerow_sash": {
+        "name": "树篱束带"
+      },
+      "hedgerow_jerkin": {
+        "name": "树篱皮甲"
+      },
+      "hedgerow_breeches": {
+        "name": "树篱及膝裤"
+      },
+      "hedgerow_boots": {
+        "name": "树篱靴子"
+      },
+      "hedgerow_cap": {
+        "name": "树篱便帽"
+      },
+      "hedgerow_grips": {
+        "name": "树篱掌套"
+      },
+      "hedgerow_shoulderpads": {
+        "name": "树篱肩垫"
+      },
+      "hedgerow_belt": {
+        "name": "树篱腰带"
+      },
+      "hedgerow_hauberk": {
+        "name": "树篱锁衣"
+      },
+      "hedgerow_legguards": {
+        "name": "树篱腿护"
+      },
+      "hedgerow_sabatons": {
+        "name": "树篱甲靴"
+      },
+      "hedgerow_helm": {
+        "name": "树篱头盔"
+      },
+      "hedgerow_gauntlets": {
+        "name": "树篱甲手"
+      },
+      "hedgerow_pauldrons": {
+        "name": "树篱肩甲"
+      },
+      "hedgerow_girdle": {
+        "name": "树篱腰饰"
+      },
+      "hedgerow_chainmail": {
+        "name": "树篱锁甲"
+      },
+      "hedgerow_chausses": {
+        "name": "树篱腿甲"
+      },
+      "hedgerow_greaves": {
+        "name": "树篱胫甲"
+      },
+      "hedgerow_coif": {
+        "name": "树篱头罩"
+      },
+      "hedgerow_handguards": {
+        "name": "树篱护手"
+      },
+      "hedgerow_spaulders": {
+        "name": "树篱肩铠"
+      },
+      "hedgerow_cord": {
+        "name": "树篱腰绳"
+      },
+      "bogwalker_robe": {
+        "name": "沼行长袍"
+      },
+      "bogwalker_leggings": {
+        "name": "沼行腿甲衣"
+      },
+      "bogwalker_slippers": {
+        "name": "沼行软靴"
+      },
+      "bogwalker_hood": {
+        "name": "沼行兜帽"
+      },
+      "bogwalker_gloves": {
+        "name": "沼行手套"
+      },
+      "bogwalker_mantle": {
+        "name": "沼行披肩"
+      },
+      "bogwalker_sash": {
+        "name": "沼行束带"
+      },
+      "bogwalker_jerkin": {
+        "name": "沼行皮甲"
+      },
+      "bogwalker_breeches": {
+        "name": "沼行及膝裤"
+      },
+      "bogwalker_boots": {
+        "name": "沼行靴子"
+      },
+      "bogwalker_cap": {
+        "name": "沼行便帽"
+      },
+      "bogwalker_grips": {
+        "name": "沼行掌套"
+      },
+      "bogwalker_shoulderpads": {
+        "name": "沼行肩垫"
+      },
+      "bogwalker_belt": {
+        "name": "沼行腰带"
+      },
+      "bogwalker_hauberk": {
+        "name": "沼行锁衣"
+      },
+      "bogwalker_legguards": {
+        "name": "沼行腿护"
+      },
+      "bogwalker_sabatons": {
+        "name": "沼行甲靴"
+      },
+      "bogwalker_helm": {
+        "name": "沼行头盔"
+      },
+      "bogwalker_gauntlets": {
+        "name": "沼行甲手"
+      },
+      "bogwalker_pauldrons": {
+        "name": "沼行肩甲"
+      },
+      "bogwalker_girdle": {
+        "name": "沼行腰饰"
+      },
+      "bogwalker_chainmail": {
+        "name": "沼行锁甲"
+      },
+      "bogwalker_chausses": {
+        "name": "沼行腿甲"
+      },
+      "bogwalker_greaves": {
+        "name": "沼行胫甲"
+      },
+      "bogwalker_coif": {
+        "name": "沼行头罩"
+      },
+      "bogwalker_handguards": {
+        "name": "沼行护手"
+      },
+      "bogwalker_spaulders": {
+        "name": "沼行肩铠"
+      },
+      "bogwalker_cord": {
+        "name": "沼行腰绳"
+      },
+      "thornspire_robe": {
+        "name": "棘尖长袍"
+      },
+      "thornspire_leggings": {
+        "name": "棘尖腿甲衣"
+      },
+      "thornspire_slippers": {
+        "name": "棘尖软靴"
+      },
+      "thornspire_hood": {
+        "name": "棘尖兜帽"
+      },
+      "thornspire_gloves": {
+        "name": "棘尖手套"
+      },
+      "thornspire_mantle": {
+        "name": "棘尖披肩"
+      },
+      "thornspire_sash": {
+        "name": "棘尖束带"
+      },
+      "thornspire_jerkin": {
+        "name": "棘尖皮甲"
+      },
+      "thornspire_breeches": {
+        "name": "棘尖及膝裤"
+      },
+      "thornspire_boots": {
+        "name": "棘尖靴子"
+      },
+      "thornspire_cap": {
+        "name": "棘尖便帽"
+      },
+      "thornspire_grips": {
+        "name": "棘尖掌套"
+      },
+      "thornspire_shoulderpads": {
+        "name": "棘尖肩垫"
+      },
+      "thornspire_belt": {
+        "name": "棘尖腰带"
+      },
+      "thornspire_hauberk": {
+        "name": "棘尖锁衣"
+      },
+      "thornspire_legguards": {
+        "name": "棘尖腿护"
+      },
+      "thornspire_sabatons": {
+        "name": "棘尖甲靴"
+      },
+      "thornspire_helm": {
+        "name": "棘尖头盔"
+      },
+      "thornspire_gauntlets": {
+        "name": "棘尖甲手"
+      },
+      "thornspire_pauldrons": {
+        "name": "棘尖肩甲"
+      },
+      "thornspire_girdle": {
+        "name": "棘尖腰饰"
+      },
+      "thornspire_chainmail": {
+        "name": "棘尖锁甲"
+      },
+      "thornspire_chausses": {
+        "name": "棘尖腿甲"
+      },
+      "thornspire_greaves": {
+        "name": "棘尖胫甲"
+      },
+      "thornspire_coif": {
+        "name": "棘尖头罩"
+      },
+      "thornspire_handguards": {
+        "name": "棘尖护手"
+      },
+      "thornspire_spaulders": {
+        "name": "棘尖肩铠"
+      },
+      "thornspire_cord": {
+        "name": "棘尖腰绳"
+      },
+      "hollowveil_robe": {
+        "name": "空幕长袍"
+      },
+      "hollowveil_leggings": {
+        "name": "空幕腿甲衣"
+      },
+      "hollowveil_slippers": {
+        "name": "空幕软靴"
+      },
+      "hollowveil_hood": {
+        "name": "空幕兜帽"
+      },
+      "hollowveil_gloves": {
+        "name": "空幕手套"
+      },
+      "hollowveil_mantle": {
+        "name": "空幕披肩"
+      },
+      "hollowveil_sash": {
+        "name": "空幕束带"
+      },
+      "hollowveil_jerkin": {
+        "name": "空幕皮甲"
+      },
+      "hollowveil_breeches": {
+        "name": "空幕及膝裤"
+      },
+      "hollowveil_boots": {
+        "name": "空幕靴子"
+      },
+      "hollowveil_cap": {
+        "name": "空幕便帽"
+      },
+      "hollowveil_grips": {
+        "name": "空幕掌套"
+      },
+      "hollowveil_shoulderpads": {
+        "name": "空幕肩垫"
+      },
+      "hollowveil_belt": {
+        "name": "空幕腰带"
+      },
+      "hollowveil_hauberk": {
+        "name": "空幕锁衣"
+      },
+      "hollowveil_legguards": {
+        "name": "空幕腿护"
+      },
+      "hollowveil_sabatons": {
+        "name": "空幕甲靴"
+      },
+      "hollowveil_helm": {
+        "name": "空幕头盔"
+      },
+      "hollowveil_gauntlets": {
+        "name": "空幕甲手"
+      },
+      "hollowveil_pauldrons": {
+        "name": "空幕肩甲"
+      },
+      "hollowveil_girdle": {
+        "name": "空幕腰饰"
+      },
+      "hollowveil_chainmail": {
+        "name": "空幕锁甲"
+      },
+      "hollowveil_chausses": {
+        "name": "空幕腿甲"
+      },
+      "hollowveil_greaves": {
+        "name": "空幕胫甲"
+      },
+      "hollowveil_coif": {
+        "name": "空幕头罩"
+      },
+      "hollowveil_handguards": {
+        "name": "空幕护手"
+      },
+      "hollowveil_spaulders": {
+        "name": "空幕肩铠"
+      },
+      "hollowveil_cord": {
+        "name": "空幕腰绳"
+      },
+      "trailwarden_robe": {
+        "name": "径卫长袍"
+      },
+      "trailwarden_leggings": {
+        "name": "径卫腿甲衣"
+      },
+      "trailwarden_slippers": {
+        "name": "径卫软靴"
+      },
+      "trailwarden_hood": {
+        "name": "径卫兜帽"
+      },
+      "trailwarden_gloves": {
+        "name": "径卫手套"
+      },
+      "trailwarden_mantle": {
+        "name": "径卫披肩"
+      },
+      "trailwarden_sash": {
+        "name": "径卫束带"
+      },
+      "trailwarden_jerkin": {
+        "name": "径卫皮甲"
+      },
+      "trailwarden_breeches": {
+        "name": "径卫及膝裤"
+      },
+      "trailwarden_boots": {
+        "name": "径卫靴子"
+      },
+      "trailwarden_cap": {
+        "name": "径卫便帽"
+      },
+      "trailwarden_grips": {
+        "name": "径卫掌套"
+      },
+      "trailwarden_shoulderpads": {
+        "name": "径卫肩垫"
+      },
+      "trailwarden_belt": {
+        "name": "径卫腰带"
+      },
+      "trailwarden_hauberk": {
+        "name": "径卫锁衣"
+      },
+      "trailwarden_legguards": {
+        "name": "径卫腿护"
+      },
+      "trailwarden_sabatons": {
+        "name": "径卫甲靴"
+      },
+      "trailwarden_helm": {
+        "name": "径卫头盔"
+      },
+      "trailwarden_gauntlets": {
+        "name": "径卫甲手"
+      },
+      "trailwarden_pauldrons": {
+        "name": "径卫肩甲"
+      },
+      "trailwarden_girdle": {
+        "name": "径卫腰饰"
+      },
+      "trailwarden_chainmail": {
+        "name": "径卫锁甲"
+      },
+      "trailwarden_chausses": {
+        "name": "径卫腿甲"
+      },
+      "trailwarden_greaves": {
+        "name": "径卫胫甲"
+      },
+      "trailwarden_coif": {
+        "name": "径卫头罩"
+      },
+      "trailwarden_handguards": {
+        "name": "径卫护手"
+      },
+      "trailwarden_spaulders": {
+        "name": "径卫肩铠"
+      },
+      "trailwarden_cord": {
+        "name": "径卫腰绳"
+      },
+      "highgale_robe": {
+        "name": "高风长袍"
+      },
+      "highgale_leggings": {
+        "name": "高风腿甲衣"
+      },
+      "highgale_slippers": {
+        "name": "高风软靴"
+      },
+      "highgale_hood": {
+        "name": "高风兜帽"
+      },
+      "highgale_gloves": {
+        "name": "高风手套"
+      },
+      "highgale_mantle": {
+        "name": "高风披肩"
+      },
+      "highgale_sash": {
+        "name": "高风束带"
+      },
+      "highgale_jerkin": {
+        "name": "高风皮甲"
+      },
+      "highgale_breeches": {
+        "name": "高风及膝裤"
+      },
+      "highgale_boots": {
+        "name": "高风靴子"
+      },
+      "highgale_cap": {
+        "name": "高风便帽"
+      },
+      "highgale_grips": {
+        "name": "高风掌套"
+      },
+      "highgale_shoulderpads": {
+        "name": "高风肩垫"
+      },
+      "highgale_belt": {
+        "name": "高风腰带"
+      },
+      "highgale_hauberk": {
+        "name": "高风锁衣"
+      },
+      "highgale_legguards": {
+        "name": "高风腿护"
+      },
+      "highgale_sabatons": {
+        "name": "高风甲靴"
+      },
+      "highgale_helm": {
+        "name": "高风头盔"
+      },
+      "highgale_gauntlets": {
+        "name": "高风甲手"
+      },
+      "highgale_pauldrons": {
+        "name": "高风肩甲"
+      },
+      "highgale_girdle": {
+        "name": "高风腰饰"
+      },
+      "highgale_chainmail": {
+        "name": "高风锁甲"
+      },
+      "highgale_chausses": {
+        "name": "高风腿甲"
+      },
+      "highgale_greaves": {
+        "name": "高风胫甲"
+      },
+      "brookwatch_tunic": {
+        "name": "溪卫短衣"
+      },
+      "brookwatch_legwraps": {
+        "name": "溪卫绑腿"
+      },
+      "brookwatch_treads": {
+        "name": "溪卫踏靴"
+      },
+      "brookwatch_headguard": {
+        "name": "溪卫护头"
+      },
+      "brookwatch_handwraps": {
+        "name": "溪卫裹手"
+      },
+      "brookwatch_shoulderguards": {
+        "name": "溪卫护肩"
+      },
+      "brookwatch_waistguard": {
+        "name": "溪卫护腰"
+      },
+      "hedgerow_tunic": {
+        "name": "树篱短衣"
+      },
+      "hedgerow_legwraps": {
+        "name": "树篱绑腿"
+      },
+      "hedgerow_treads": {
+        "name": "树篱踏靴"
+      },
+      "hedgerow_headguard": {
+        "name": "树篱护头"
+      },
+      "hedgerow_handwraps": {
+        "name": "树篱裹手"
+      },
+      "hedgerow_shoulderguards": {
+        "name": "树篱护肩"
+      },
+      "hedgerow_waistguard": {
+        "name": "树篱护腰"
+      },
+      "bogwalker_tunic": {
+        "name": "沼行短衣"
+      },
+      "bogwalker_legwraps": {
+        "name": "沼行绑腿"
+      },
+      "bogwalker_treads": {
+        "name": "沼行踏靴"
+      },
+      "bogwalker_headguard": {
+        "name": "沼行护头"
+      },
+      "bogwalker_handwraps": {
+        "name": "沼行裹手"
+      },
+      "bogwalker_shoulderguards": {
+        "name": "沼行护肩"
+      },
+      "bogwalker_waistguard": {
+        "name": "沼行护腰"
+      },
+      "thornspire_tunic": {
+        "name": "棘尖短衣"
+      },
+      "thornspire_legwraps": {
+        "name": "棘尖绑腿"
+      },
+      "thornspire_treads": {
+        "name": "棘尖踏靴"
+      },
+      "thornspire_headguard": {
+        "name": "棘尖护头"
+      },
+      "thornspire_handwraps": {
+        "name": "棘尖裹手"
+      },
+      "thornspire_shoulderguards": {
+        "name": "棘尖护肩"
+      },
+      "thornspire_waistguard": {
+        "name": "棘尖护腰"
+      },
+      "hollowveil_tunic": {
+        "name": "空幕短衣"
+      },
+      "hollowveil_legwraps": {
+        "name": "空幕绑腿"
+      },
+      "hollowveil_treads": {
+        "name": "空幕踏靴"
+      },
+      "hollowveil_headguard": {
+        "name": "空幕护头"
+      },
+      "hollowveil_handwraps": {
+        "name": "空幕裹手"
+      },
+      "hollowveil_shoulderguards": {
+        "name": "空幕护肩"
+      },
+      "hollowveil_waistguard": {
+        "name": "空幕护腰"
+      },
+      "trailwarden_tunic": {
+        "name": "径卫短衣"
+      },
+      "trailwarden_legwraps": {
+        "name": "径卫绑腿"
+      },
+      "trailwarden_treads": {
+        "name": "径卫踏靴"
+      },
+      "trailwarden_headguard": {
+        "name": "径卫护头"
+      },
+      "trailwarden_handwraps": {
+        "name": "径卫裹手"
+      },
+      "trailwarden_shoulderguards": {
+        "name": "径卫护肩"
+      },
+      "trailwarden_waistguard": {
+        "name": "径卫护腰"
+      },
+      "highgale_tunic": {
+        "name": "高风短衣"
+      },
+      "highgale_legwraps": {
+        "name": "高风绑腿"
+      },
+      "highgale_treads": {
+        "name": "高风踏靴"
+      },
+      "highgale_headguard": {
+        "name": "高风护头"
+      },
+      "highgale_handwraps": {
+        "name": "高风裹手"
+      },
+      "highgale_shoulderguards": {
+        "name": "高风护肩"
+      },
+      "highgale_waistguard": {
+        "name": "高风护腰"
+      },
+      "highgale_coif": {
+        "name": "高风头罩"
+      },
+      "highgale_handguards": {
+        "name": "高风护手"
+      },
+      "highgale_spaulders": {
+        "name": "高风肩铠"
+      },
+      "highgale_cord": {
+        "name": "高风腰绳"
+      },
+      "breakwater_mantle": {
+        "name": "防波披肩"
+      },
+      "breakwater_shoulderpads": {
+        "name": "防波肩垫"
+      },
+      "breakwater_spaulders": {
+        "name": "防波肩铠"
+      },
+      "gravebell_treads": {
+        "name": "墓钟踏靴"
+      },
+      "gravebell_greaves": {
+        "name": "墓钟胫甲"
+      },
+      "cryptbound_tunic": {
+        "name": "墓缚短衣"
+      },
+      "cryptbound_chainmail": {
+        "name": "墓缚锁甲"
+      },
+      "oathbroken_leggings": {
+        "name": "背誓腿甲衣"
+      },
+      "oathbroken_breeches": {
+        "name": "背誓及膝裤"
+      },
+      "oathbroken_legwraps": {
+        "name": "背誓绑腿"
+      },
+      "oathbroken_legguards": {
+        "name": "背誓腿护"
+      },
+      "oathbroken_chausses": {
+        "name": "背誓腿甲"
+      },
+      "seamist_legwraps": {
+        "name": "海雾绑腿"
+      },
+      "seamist_chausses": {
+        "name": "海雾腿甲"
+      },
+      "warmonger_treads": {
+        "name": "战狂踏靴"
+      },
+      "warmonger_greaves": {
+        "name": "战狂胫甲"
+      },
+      "sparkglass_leggings": {
+        "name": "火花晶腿甲衣"
+      },
+      "sparkglass_breeches": {
+        "name": "火花晶及膝裤"
+      },
+      "sparkglass_legwraps": {
+        "name": "火花晶绑腿"
+      },
+      "sparkglass_legguards": {
+        "name": "火花晶腿护"
+      },
+      "sparkglass_chausses": {
+        "name": "火花晶腿甲"
+      },
+      "stillhymn_treads": {
+        "name": "寂咏踏靴"
+      },
+      "stillhymn_greaves": {
+        "name": "寂咏胫甲"
+      },
+      "pearlglow_headguard": {
+        "name": "珠辉护头"
+      },
+      "pearlglow_coif": {
+        "name": "珠辉头罩"
+      },
+      "sealkeeper_gloves": {
+        "name": "守印手套"
+      },
+      "sealkeeper_grips": {
+        "name": "守印掌套"
+      },
+      "sealkeeper_handwraps": {
+        "name": "守印裹手"
+      },
+      "sealkeeper_gauntlets": {
+        "name": "守印甲手"
+      },
+      "sealkeeper_handguards": {
+        "name": "守印护手"
+      },
+      "fetterbound_leggings": {
+        "name": "镣缚腿甲衣"
+      },
+      "fetterbound_breeches": {
+        "name": "镣缚及膝裤"
+      },
+      "fetterbound_legwraps": {
+        "name": "镣缚绑腿"
+      },
+      "fetterbound_legguards": {
+        "name": "镣缚腿护"
+      },
+      "fetterbound_chausses": {
+        "name": "镣缚腿甲"
+      },
+      "shroudcaller_tunic": {
+        "name": "唤殓短衣"
+      },
+      "shroudcaller_chainmail": {
+        "name": "唤殓锁甲"
+      },
+      "wyrmshadow_tunic": {
+        "name": "龙影短衣"
+      },
+      "wyrmshadow_chainmail": {
+        "name": "龙影锁甲"
+      },
+      "cinderbrood_shoulderpads": {
+        "name": "烬巢肩垫"
+      },
+      "cinderbrood_shoulderguards": {
+        "name": "烬巢护肩"
+      },
+      "cinderbrood_pauldrons": {
+        "name": "烬巢肩甲"
+      },
+      "hoarfrost_mantle": {
+        "name": "白霜披肩"
+      },
+      "hoarfrost_shoulderpads": {
+        "name": "白霜肩垫"
+      },
+      "hoarfrost_spaulders": {
+        "name": "白霜肩铠"
+      },
+      "blackmere_mantle": {
+        "name": "黑沼披肩"
+      },
+      "blackmere_shoulderpads": {
+        "name": "黑沼肩垫"
+      },
+      "blackmere_shoulderguards": {
+        "name": "黑沼护肩"
+      },
+      "blackmere_pauldrons": {
+        "name": "黑沼肩甲"
+      },
+      "blackmere_spaulders": {
+        "name": "黑沼肩铠"
+      },
+      "reedhush_mantle": {
+        "name": "苇寂披肩"
+      },
+      "reedhush_shoulderpads": {
+        "name": "苇寂肩垫"
+      },
+      "reedhush_shoulderguards": {
+        "name": "苇寂护肩"
+      },
+      "reedhush_pauldrons": {
+        "name": "苇寂肩甲"
+      },
+      "reedhush_spaulders": {
+        "name": "苇寂肩铠"
+      },
+      "cairnking_mantle": {
+        "name": "冢王披肩"
+      },
+      "cairnking_shoulderpads": {
+        "name": "冢王肩垫"
+      },
+      "cairnking_shoulderguards": {
+        "name": "冢王护肩"
+      },
+      "cairnking_pauldrons": {
+        "name": "冢王肩甲"
+      },
+      "cairnking_spaulders": {
+        "name": "冢王肩铠"
+      },
+      "palehunt_mantle": {
+        "name": "苍猎披肩"
+      },
+      "palehunt_shoulderpads": {
+        "name": "苍猎肩垫"
+      },
+      "palehunt_shoulderguards": {
+        "name": "苍猎护肩"
+      },
+      "palehunt_pauldrons": {
+        "name": "苍猎肩甲"
+      },
+      "palehunt_spaulders": {
+        "name": "苍猎肩铠"
+      },
+      "jadeshrine_mantle": {
+        "name": "玉祠披肩"
+      },
+      "jadeshrine_shoulderpads": {
+        "name": "玉祠肩垫"
+      },
+      "jadeshrine_shoulderguards": {
+        "name": "玉祠护肩"
+      },
+      "jadeshrine_pauldrons": {
+        "name": "玉祠肩甲"
+      },
+      "jadeshrine_spaulders": {
+        "name": "玉祠肩铠"
+      },
+      "gildhedge_mantle": {
+        "name": "金篱披肩"
+      },
+      "gildhedge_shoulderpads": {
+        "name": "金篱肩垫"
+      },
+      "gildhedge_spaulders": {
+        "name": "金篱肩铠"
+      },
+      "saltwrack_mantle": {
+        "name": "盐骸披肩"
+      },
+      "saltwrack_shoulderpads": {
+        "name": "盐骸肩垫"
+      },
+      "saltwrack_spaulders": {
+        "name": "盐骸肩铠"
+      },
+      "brookwatch_vest": {
+        "name": "溪卫背心"
+      },
+      "brookwatch_trousers": {
+        "name": "溪卫长裤"
+      },
+      "brookwatch_moccasins": {
+        "name": "溪卫鹿皮鞋"
+      },
+      "brookwatch_cowl": {
+        "name": "溪卫风帽"
+      },
+      "brookwatch_mitts": {
+        "name": "溪卫露指手套"
+      },
+      "brookwatch_epaulets": {
+        "name": "溪卫肩饰"
+      },
+      "brookwatch_cinch": {
+        "name": "溪卫束腰"
+      },
+      "hedgerow_vest": {
+        "name": "树篱背心"
+      },
+      "hedgerow_trousers": {
+        "name": "树篱长裤"
+      },
+      "hedgerow_moccasins": {
+        "name": "树篱鹿皮鞋"
+      },
+      "hedgerow_cowl": {
+        "name": "树篱风帽"
+      },
+      "hedgerow_mitts": {
+        "name": "树篱露指手套"
+      },
+      "hedgerow_epaulets": {
+        "name": "树篱肩饰"
+      },
+      "hedgerow_cinch": {
+        "name": "树篱束腰"
+      },
+      "bogwalker_vest": {
+        "name": "沼行背心"
+      },
+      "bogwalker_trousers": {
+        "name": "沼行长裤"
+      },
+      "bogwalker_moccasins": {
+        "name": "沼行鹿皮鞋"
+      },
+      "bogwalker_cowl": {
+        "name": "沼行风帽"
+      },
+      "bogwalker_mitts": {
+        "name": "沼行露指手套"
+      },
+      "bogwalker_epaulets": {
+        "name": "沼行肩饰"
+      },
+      "bogwalker_cinch": {
+        "name": "沼行束腰"
+      },
+      "thornspire_vest": {
+        "name": "棘尖背心"
+      },
+      "thornspire_trousers": {
+        "name": "棘尖长裤"
+      },
+      "thornspire_moccasins": {
+        "name": "棘尖鹿皮鞋"
+      },
+      "thornspire_cowl": {
+        "name": "棘尖风帽"
+      },
+      "thornspire_mitts": {
+        "name": "棘尖露指手套"
+      },
+      "thornspire_epaulets": {
+        "name": "棘尖肩饰"
+      },
+      "thornspire_cinch": {
+        "name": "棘尖束腰"
+      },
+      "hollowveil_vest": {
+        "name": "空幕背心"
+      },
+      "hollowveil_trousers": {
+        "name": "空幕长裤"
+      },
+      "hollowveil_moccasins": {
+        "name": "空幕鹿皮鞋"
+      },
+      "hollowveil_cowl": {
+        "name": "空幕风帽"
+      },
+      "hollowveil_mitts": {
+        "name": "空幕露指手套"
+      },
+      "hollowveil_epaulets": {
+        "name": "空幕肩饰"
+      },
+      "hollowveil_cinch": {
+        "name": "空幕束腰"
+      },
+      "trailwarden_vest": {
+        "name": "径卫背心"
+      },
+      "trailwarden_trousers": {
+        "name": "径卫长裤"
+      },
+      "trailwarden_moccasins": {
+        "name": "径卫鹿皮鞋"
+      },
+      "trailwarden_cowl": {
+        "name": "径卫风帽"
+      },
+      "trailwarden_mitts": {
+        "name": "径卫露指手套"
+      },
+      "trailwarden_epaulets": {
+        "name": "径卫肩饰"
+      },
+      "trailwarden_cinch": {
+        "name": "径卫束腰"
+      },
+      "highgale_vest": {
+        "name": "高风背心"
+      },
+      "highgale_trousers": {
+        "name": "高风长裤"
+      },
+      "highgale_moccasins": {
+        "name": "高风鹿皮鞋"
+      },
+      "highgale_cowl": {
+        "name": "高风风帽"
+      },
+      "highgale_mitts": {
+        "name": "高风露指手套"
+      },
+      "highgale_epaulets": {
+        "name": "高风肩饰"
+      },
+      "highgale_cinch": {
+        "name": "高风束腰"
+      },
+      "breakwater_shoulderguards": {
+        "name": "防波护肩"
+      },
+      "breakwater_pauldrons": {
+        "name": "防波肩甲"
+      },
+      "breakwater_epaulets": {
+        "name": "防波肩饰"
+      },
+      "gravebell_moccasins": {
+        "name": "墓钟鹿皮鞋"
+      },
+      "oathbroken_trousers": {
+        "name": "背誓长裤"
+      },
+      "sparkglass_trousers": {
+        "name": "火花晶长裤"
+      },
+      "stillhymn_moccasins": {
+        "name": "寂咏鹿皮鞋"
+      },
+      "sealkeeper_mitts": {
+        "name": "守印露指手套"
+      },
+      "fetterbound_trousers": {
+        "name": "镣缚长裤"
+      },
+      "wyrmshadow_vest": {
+        "name": "龙影背心"
+      },
+      "cinderbrood_spaulders": {
+        "name": "烬巢肩铠"
+      },
+      "cinderbrood_epaulets": {
+        "name": "烬巢肩饰"
+      },
+      "hoarfrost_shoulderguards": {
+        "name": "白霜护肩"
+      },
+      "hoarfrost_pauldrons": {
+        "name": "白霜肩甲"
+      },
+      "hoarfrost_epaulets": {
+        "name": "白霜肩饰"
+      },
+      "blackmere_epaulets": {
+        "name": "黑沼肩饰"
+      },
+      "reedhush_epaulets": {
+        "name": "苇寂肩饰"
+      },
+      "cairnking_epaulets": {
+        "name": "冢王肩饰"
+      },
+      "palehunt_epaulets": {
+        "name": "苍猎肩饰"
+      },
+      "jadeshrine_epaulets": {
+        "name": "玉祠肩饰"
+      },
+      "gildhedge_shoulderguards": {
+        "name": "金篱护肩"
+      },
+      "gildhedge_pauldrons": {
+        "name": "金篱肩甲"
+      },
+      "gildhedge_epaulets": {
+        "name": "金篱肩饰"
+      },
+      "saltwrack_shoulderguards": {
+        "name": "盐骸护肩"
+      },
+      "saltwrack_pauldrons": {
+        "name": "盐骸肩甲"
+      },
+      "saltwrack_epaulets": {
+        "name": "盐骸肩饰"
+      },
+      "muster_shardpike": {
+        "name": "征召碎晶长矛"
+      },
+      "knucklebone_of_balgath": {
+        "name": "巴尔加斯的指节骨"
+      },
+      "muster_standard": {
+        "name": "征召军旗"
+      },
+      "guttered_eye": {
+        "name": "残烬之眼"
+      },
+      "barrowstone_heart": {
+        "name": "冢石之心"
+      },
+      "muster_grapnel": {
+        "name": "征召钩索"
+      },
+      "craterglass_stave": {
+        "name": "陨坑琉璃法杖"
+      },
+      "gravedirt_treads": {
+        "name": "墓土踏靴"
+      },
+      "bellrope_girdle": {
+        "name": "钟绳腰带"
+      },
+      "sextons_spadehaft": {
+        "name": "司事的锹柄"
+      },
+      "rimesilk_mantle": {
+        "name": "霜丝肩衣"
+      },
+      "bonechill_carapace_vest": {
+        "name": "骨寒锁甲"
+      },
+      "rimeweb_hunters_leggings": {
+        "name": "缀霜护腿"
+      },
+      "rimeweb_fang": {
+        "name": "新娘的冰锥"
+      },
+      "cantors_cassock": {
+        "name": "领唱者的法衣"
+      },
+      "choirward_leggings": {
+        "name": "圣咏守卫护腿"
+      },
+      "choristers_gloves": {
+        "name": "唱诗者的手套"
+      },
+      "cantors_hymnal": {
+        "name": "领唱者的圣咏集"
+      },
+      "gravecallers_vestments": {
+        "name": "唤墓者的祭袍"
+      },
+      "unquiet_stalkers_hood": {
+        "name": "不安潜行者兜帽"
+      },
+      "sextons_burial_spade": {
+        "name": "司事的葬铲"
+      },
+      "rimesilk_hood": {
+        "name": "霜丝兜帽"
+      },
+      "knight_commanders_longsword": {
+        "name": "骑士指挥官长剑"
+      },
+      "gaolers_chain_girdle": {
+        "name": "狱卒锁链腰带"
+      },
+      "rusted_shackle_grips": {
+        "name": "锈蚀镣铐护手"
+      },
+      "drowned_wardens_mantle": {
+        "name": "溺亡看守披肩"
+      },
+      "gaolyard_cudgel": {
+        "name": "狱庭短棍"
+      },
+      "drowned_commanders_breastplate": {
+        "name": "溺亡指挥官胸甲"
+      },
+      "gaolyard_striders": {
+        "name": "狱庭长靴"
+      },
+      "jailers_iron_gauntlets": {
+        "name": "狱卒的铁护手"
+      },
+      "turnkeys_keyring_belt": {
+        "name": "牢头的钥匙腰带"
+      },
+      "turnkeys_lantern_cowl": {
+        "name": "牢头的提灯兜帽"
+      },
+      "conchplate_girdle": {
+        "name": "螺甲腰带"
+      },
+      "pale_chorus_leggings": {
+        "name": "苍白合唱护腿"
+      },
+      "refrain_silk_gloves": {
+        "name": "叠句丝手套"
+      },
+      "chorus_conch": {
+        "name": "合唱海螺"
+      },
+      "tideglass_pauldrons": {
+        "name": "潮镜肩铠"
+      },
+      "moonburn_treads": {
+        "name": "月灼便靴"
+      },
+      "prism_etched_cowl": {
+        "name": "棱镜蚀刻兜帽"
+      },
+      "tideglass_shiv": {
+        "name": "潮镜匕首"
+      },
+      "pale_chorus_vestment": {
+        "name": "苍白合唱法衣"
+      },
+      "tideglass_warmaul": {
+        "name": "潮镜战槌"
+      },
+      "beastpit_warbelt": {
+        "name": "兽坑战腰带"
+      },
+      "jaguar_hide_jerkin": {
+        "name": "美洲豹皮短上衣"
+      },
+      "hexbone_handwraps": {
+        "name": "咒骨裹手"
+      },
+      "rootbound_sabatons": {
+        "name": "缚根铁靴"
+      },
+      "pollen_dusted_leggings": {
+        "name": "沾满花粉的护腿"
+      },
+      "bloomsilk_cowl": {
+        "name": "花绸兜帽"
+      },
+      "falls_blessed_staff": {
+        "name": "瀑布祝福法杖"
+      },
+      "fanglords_hide_mantle": {
+        "name": "獠牙领主的兽皮肩甲"
+      },
+      "thornroot_greathelm": {
+        "name": "荆冠巨盔"
+      },
+      "foremans_grips": {
+        "name": "工头护手"
+      },
+      "serac_stride_boots": {
+        "name": "冰塔跋涉长靴"
+      },
+      "seal_rune_mantle": {
+        "name": "封印符文披肩"
+      },
+      "thawbound_legguards": {
+        "name": "融缚护腿"
+      },
+      "pyre_tenders_hood": {
+        "name": "守柴人兜帽"
+      },
+      "meltwater_cord": {
+        "name": "融水束带"
+      },
+      "hammer_of_the_open_lock": {
+        "name": "开锁之锤"
+      },
+      "vestments_of_the_waking_rite": {
+        "name": "苏醒仪式法衣"
+      },
+      "spadeworn_gauntlets": {
+        "name": "锹磨铁护手"
+      },
+      "gravedirt_grips": {
+        "name": "墓土护手"
+      },
+      "bellrope_mitts": {
+        "name": "钟绳手套"
+      },
+      "rimewreath_coif": {
+        "name": "霜冠锁帽"
+      },
+      "rime_laced_hood": {
+        "name": "缀霜兜帽"
+      },
+      "lamenting_veil": {
+        "name": "哀悼面纱"
+      },
+      "choirward_pauldrons": {
+        "name": "圣咏守卫肩铠"
+      },
+      "choristers_spaulders": {
+        "name": "唱诗者的肩甲"
+      },
+      "cantors_stole": {
+        "name": "领唱者的圣带"
+      },
+      "knellbound_hauberk": {
+        "name": "丧钟缚锁甲"
+      },
+      "candlewatch_jerkin": {
+        "name": "守烛皮甲"
+      },
+      "robe_of_the_unquiet_rite": {
+        "name": "不安仪式长袍"
+      },
+      "gravecallers_rod": {
+        "name": "唤墓者的短杖"
+      },
+      "portcullis_girdle": {
+        "name": "闸门腰带"
+      },
+      "cellwatch_belt": {
+        "name": "守牢腰带"
+      },
+      "lanternwick_sash": {
+        "name": "灯芯饰带"
+      },
+      "turnkeys_shank": {
+        "name": "牢头的私刃"
+      },
+      "gaolyard_jerkin": {
+        "name": "狱庭皮甲"
+      },
+      "brinewarden_robe": {
+        "name": "咸潮看守长袍"
+      },
+      "fogbinders_rod": {
+        "name": "缚雾者短杖"
+      },
+      "conchplate_sabatons": {
+        "name": "螺甲战靴"
+      },
+      "pale_chorus_slippers": {
+        "name": "苍白合唱便鞋"
+      },
+      "tideglass_gauntlets": {
+        "name": "潮镜铁护手"
+      },
+      "moonburn_grips": {
+        "name": "月灼护手"
+      },
+      "prism_etched_handwraps": {
+        "name": "棱镜蚀刻裹手"
+      },
+      "mere_crested_helm": {
+        "name": "湖冠头盔"
+      },
+      "mereskin_hood": {
+        "name": "湖蛇皮兜帽"
+      },
+      "merewater_cowl": {
+        "name": "湖水兜帽"
+      },
+      "merecleaver": {
+        "name": "断湖巨斧"
+      },
+      "moonwrack_stave": {
+        "name": "月殇法杖"
+      },
+      "membership_staff": {
+        "name": "万变法杖"
+      },
+      "membership_token": {
+        "name": "会员代币（30天）"
+      },
+      "referral_satchel": {
+        "name": "友谊挎包"
+      },
+      "referral_hollow_charm": {
+        "name": "守誓者之心"
+      },
+      "referral_fog_charm": {
+        "name": "觉醒的守誓者之心"
+      },
+      "reins_referral_tank": {
+        "name": "友谊坦克缰绳"
+      },
+      "reins_referral_raptor": {
+        "name": "友谊迅猛龙缰绳"
+      },
+      "referral_helmet": {
+        "name": "友谊头盔"
+      },
+      "referral_shoulder": {
+        "name": "友谊肩甲"
+      },
+      "referral_chest": {
+        "name": "友谊胸甲"
+      },
+      "referral_waist": {
+        "name": "友谊腰带"
+      },
+      "referral_legs": {
+        "name": "友谊腿甲"
+      },
+      "referral_gloves": {
+        "name": "友谊护手"
+      },
+      "referral_feet": {
+        "name": "友谊战靴"
+      },
+      "membership_helmet": {
+        "name": "会员头盔"
+      },
+      "membership_shoulder": {
+        "name": "会员肩甲"
+      },
+      "membership_chest": {
+        "name": "会员胸甲"
+      },
+      "membership_waist": {
+        "name": "会员腰带"
+      },
+      "membership_legs": {
+        "name": "会员腿甲"
+      },
+      "membership_gloves": {
+        "name": "会员护手"
+      },
+      "membership_feet": {
+        "name": "会员战靴"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -19162,6 +24897,12 @@ export const zh_CN: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽记"
       },
+      "lantern_seal": {
+        "name": "灯火印章"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "灯火大厅战马的缰绳"
+      },
       "wyrmfall_core": {
         "name": "坠龙核心"
       },
@@ -19525,6 +25266,24 @@ export const zh_CN: EnTranslations = {
       "heart_of_the_crucible": {
         "name": "熔炉之心"
       },
+      "gaolers_iron_key": {
+        "name": "狱卒铁钥匙"
+      },
+      "fanglords_whistle": {
+        "name": "獠牙领主的哨子"
+      },
+      "gorgebloom_seedpod": {
+        "name": "噬花种荚"
+      },
+      "foremans_last_link": {
+        "name": "工头的最后一环"
+      },
+      "phial_of_the_tithe": {
+        "name": "什一税之瓶"
+      },
+      "quenchwater_flask": {
+        "name": "淬火水瓶"
+      },
       "rift_watchers_band": {
         "name": "裂隙守望者指环"
       },
@@ -19659,6 +25418,9 @@ export const zh_CN: EnTranslations = {
       "restless_bones": {
         "name": "不宁骸骨"
       },
+      "marrow_restless_bones": {
+        "name": "不宁骸骨"
+      },
       "gorrak": {
         "name": "无情者戈拉克"
       },
@@ -19776,6 +25538,75 @@ export const zh_CN: EnTranslations = {
       "morthen": {
         "name": "唤墓者莫森"
       },
+      "ossuary_sentinel": {
+        "name": "骨堂哨兵"
+      },
+      "hollow_gravedigger": {
+        "name": "空洞掘墓人"
+      },
+      "rime_egg_sac": {
+        "name": "霜卵囊"
+      },
+      "rimeweb_hatchling": {
+        "name": "霜网幼蛛"
+      },
+      "rimeweb_spinner": {
+        "name": "霜网织丝蛛"
+      },
+      "candlewright_acolyte": {
+        "name": "烛匠侍僧"
+      },
+      "hollow_chorister": {
+        "name": "空洞唱诗者"
+      },
+      "bound_soul": {
+        "name": "缚魂"
+      },
+      "rimeweb": {
+        "name": "寒骨夫人"
+      },
+      "cantor_ilvane": {
+        "name": "领唱者伊尔凡"
+      },
+      "crypt_ossuary_warrior": {
+        "name": "骨堂战士"
+      },
+      "crypt_gravecaller_adept": {
+        "name": "唤墓者学徒"
+      },
+      "crypt_ossuary_cutthroat": {
+        "name": "骨堂割喉者"
+      },
+      "crypt_gravecaller_necromancer": {
+        "name": "唤墓者死灵法师"
+      },
+      "crypt_bone_minion": {
+        "name": "骸骨仆从"
+      },
+      "crypt_bone_brute": {
+        "name": "骸骨蛮兵"
+      },
+      "crypt_bone_pile": {
+        "name": "蠢动的骸骨"
+      },
+      "crypt_chapel_gargoyle": {
+        "name": "礼拜堂石像鬼"
+      },
+      "crypt_crow_caller": {
+        "name": "唤鸦者"
+      },
+      "crypt_carrion_crow": {
+        "name": "食腐乌鸦"
+      },
+      "crypt_ossuary_drake": {
+        "name": "骨堂骨龙"
+      },
+      "crypt_knellwyrm": {
+        "name": "丧钟巨龙"
+      },
+      "crypt_remembrance_candle": {
+        "name": "追思蜡烛"
+      },
       "bastion_revenant": {
         "name": "堡垒亡魂"
       },
@@ -19790,6 +25621,102 @@ export const zh_CN: EnTranslations = {
       },
       "vael_the_mistcaller": {
         "name": "缚雾者维尔"
+      },
+      "drowned_watchman": {
+        "name": "溺亡守望者"
+      },
+      "fogbound_arbalest": {
+        "name": "缚雾弩手"
+      },
+      "barnacle_crawler": {
+        "name": "缚骸水手"
+      },
+      "bastion_warhound": {
+        "name": "堡垒战犬"
+      },
+      "mistweaver": {
+        "name": "雾之吟唱者"
+      },
+      "drowned_sergeant": {
+        "name": "溺亡军士"
+      },
+      "shackled_prisoner": {
+        "name": "戴镣囚徒"
+      },
+      "gaol_turnkey": {
+        "name": "牢狱钥匙官"
+      },
+      "turretback_hermit": {
+        "name": "海难船长"
+      },
+      "vael_fog_shade": {
+        "name": "缚雾者维尔"
+      },
+      "gaoler_ossick": {
+        "name": "狱卒奥西克"
+      },
+      "bastion_gaol_cage": {
+        "name": "铁笼"
+      },
+      "bastion_drowned_anchor": {
+        "name": "溺亡之锚"
+      },
+      "lagoon_snapper": {
+        "name": "泻湖鳄龟"
+      },
+      "ice_wraith": {
+        "name": "寒冰怨灵"
+      },
+      "moonlit_siren": {
+        "name": "月光塞壬"
+      },
+      "tidewisp": {
+        "name": "潮汐精魂"
+      },
+      "drowned_pilgrim": {
+        "name": "溺亡朝圣者"
+      },
+      "mere_hydra_head_left": {
+        "name": "湖泊九头蛇"
+      },
+      "mere_hydra_head_center": {
+        "name": "湖泊九头蛇"
+      },
+      "mere_hydra_head_right": {
+        "name": "湖泊九头蛇"
+      },
+      "tideglass_colossus": {
+        "name": "潮镜巨像"
+      },
+      "tideglass_reflection": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_warrior": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_paladin": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_hunter": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_rogue": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_priest": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_shaman": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_mage": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_warlock": {
+        "name": "潮镜倒影"
+      },
+      "tideglass_reflection_druid": {
+        "name": "潮镜倒影"
       },
       "sanctum_boneguard": {
         "name": "圣所骨卫"
@@ -19944,8 +25871,26 @@ export const zh_CN: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "桑扎尔，觉醒之峰"
       },
+      "balgath_cyclops": {
+        "name": "巴尔加斯，独眼工头"
+      },
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
+      },
+      "muster_footman": {
+        "name": "征召步兵"
+      },
+      "muster_chaplain": {
+        "name": "征召随军牧师"
+      },
+      "muster_sergeant": {
+        "name": "征召军士"
+      },
+      "muster_drillmaster": {
+        "name": "征召操练官"
+      },
+      "muster_effigy": {
+        "name": "稻草工头"
       },
       "stable_horse": {
         "name": "厩马"
@@ -20319,8 +26264,182 @@ export const zh_CN: EnTranslations = {
       "wildheart_beastmaster": {
         "name": "獠牙领主驯兽师"
       },
+      "sunbone_totem_binder": {
+        "name": "日骨图腾缚灵者"
+      },
+      "sunbone_totem": {
+        "name": "日骨图腾"
+      },
+      "sunbone_dread_totem": {
+        "name": "日骨恐惧图腾"
+      },
+      "basin_raptor": {
+        "name": "盆地迅猛龙"
+      },
+      "spore_toad": {
+        "name": "孢子蟾蜍"
+      },
+      "vine_lasher": {
+        "name": "乱藤鞭者"
+      },
+      "great_saurian": {
+        "name": "巨型蜥脚兽"
+      },
+      "howdah_hexcaller": {
+        "name": "驮轿巫咒师"
+      },
+      "fanglord_jaguar": {
+        "name": "獠牙领主的巨型美洲豹"
+      },
+      "the_gorgebloom": {
+        "name": "噬花"
+      },
       "wildheart_high_priest": {
         "name": "盆地之声祖尔加"
+      },
+      "broodsworn_thawcaller": {
+        "name": "龙誓融冰召唤者"
+      },
+      "broodsworn_goadsmith": {
+        "name": "龙誓刺棒匠"
+      },
+      "broodsworn_pyre_tender": {
+        "name": "龙誓柴堆看守"
+      },
+      "soul_brazier": {
+        "name": "灵魂火盆"
+      },
+      "rime_whelp": {
+        "name": "霜凇幼龙"
+      },
+      "ogre_sledge_hauler": {
+        "name": "食人魔拉橇工"
+      },
+      "glacier_splinter": {
+        "name": "冰川碎片"
+      },
+      "sledge_tusker": {
+        "name": "拖橇巨牙兽"
+      },
+      "sanctum_shackle_hammer": {
+        "name": "铁锤镣铐"
+      },
+      "sanctum_shackle_tongs": {
+        "name": "铁钳镣铐"
+      },
+      "sanctum_shackle_anvil": {
+        "name": "铁砧镣铐"
+      },
+      "sanctum_shackle_bellows": {
+        "name": "风箱镣铐"
+      },
+      "thorn_sprout": {
+        "name": "荆棘幼芽"
+      },
+      "buddy_ember_fox": {
+        "name": "余烬狐"
+      },
+      "buddy_emberfall_phoenix": {
+        "name": "烬落凤凰"
+      },
+      "buddy_moss_hare": {
+        "name": "Moss Hare"
+      },
+      "buddy_frog": {
+        "name": "Frog"
+      },
+      "buddy_crimson_claw_crab": {
+        "name": "赤钳蟹"
+      },
+      "buddy_golden_sentinel": {
+        "name": "黄金哨兵"
+      },
+      "buddy_nightfang": {
+        "name": "夜牙"
+      },
+      "buddy_tuskhorn_boar": {
+        "name": "獠角野猪"
+      },
+      "buddy_emerald_wolf": {
+        "name": "翡翠狼"
+      },
+      "buddy_tiger": {
+        "name": "猛虎"
+      },
+      "buddy_cate_coin": {
+        "name": "Cate Coin"
+      },
+      "buddy_alon": {
+        "name": "Alon"
+      },
+      "buddy_trollface": {
+        "name": "巨魔脸"
+      },
+      "buddy_ansem": {
+        "name": "安塞姆"
+      },
+      "buddy_triple_t": {
+        "name": "三重T"
+      },
+      "buddy_kekius": {
+        "name": "凯基乌斯"
+      },
+      "buddy_solbot": {
+        "name": "索尔机偶"
+      },
+      "buddy_frostfire": {
+        "name": "霜火"
+      },
+      "buddy_rocky": {
+        "name": "岩仔"
+      },
+      "buddy_proud_grunt": {
+        "name": "骄傲的步兵"
+      },
+      "buddy_loot_goblin": {
+        "name": "战利品哥布林"
+      },
+      "buddy_penny_goldspark": {
+        "name": "潘妮·金火花"
+      },
+      "buddy_stag": {
+        "name": "Stag"
+      },
+      "buddy_alpaca": {
+        "name": "羊驼"
+      },
+      "buddy_horse": {
+        "name": "马"
+      },
+      "buddy_sapling": {
+        "name": "小树苗"
+      },
+      "buddy_bull": {
+        "name": "Bull"
+      },
+      "buddy_spider": {
+        "name": "蜘蛛"
+      },
+      "buddy_raptor": {
+        "name": "迅猛龙"
+      },
+      "buddy_skeleton": {
+        "name": "骷髅"
+      },
+      "buddy_crystal_lich": {
+        "name": "水晶巫妖"
+      },
+      "buddy_forgemaw": {
+        "name": "熔颚·熔融者"
+      },
+      "buddy_sprites": {
+        "name": "闪烁与微光"
+      },
+      "buddy_crystal_tide": {
+        "name": "水晶潮汐"
+      },
+      "buddy_phantom": {
+        "name": "幻魂"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"
@@ -20404,7 +26523,7 @@ export const zh_CN: EnTranslations = {
         "name": "苍白唱诗侍僧"
       },
       "pearlguard_sentinel": {
-        "name": "珍珠卫哨兵"
+        "name": "月幔鳐"
       },
       "sethrael_palecoil": {
         "name": "苍盘者瑟斯雷尔"
@@ -20594,6 +26713,16 @@ export const zh_CN: EnTranslations = {
         "name": "芬威克守望者",
         "title": "芬桥守望者",
         "greeting": "在门口停下，{className}。芦苇后面的沼泽会替我们杀人。"
+      },
+      "socketwright_skerrit": {
+        "name": "马本·斯克里特",
+        "title": "镶嵌匠",
+        "greeting": "四十年前我磨好那颗眼珠，把它嵌进他的眼窝，一天工钱都没拿到。你想让工头吃点苦头，{className}？那就冲着我的手艺去。"
+      },
+      "muster_commander": {
+        "name": "征召指挥官",
+        "title": "芬桥征召军",
+        "greeting": "先长矛，{className}，再所有人。这就是全部，也是这座营地活到现在的原因。"
       },
       "brother_aldric_fen": {
         "name": "奥德里克修士",
@@ -20814,6 +26943,31 @@ export const zh_CN: EnTranslations = {
         "name": "港务长塔姆辛",
         "title": "望龙哨码头看守",
         "greeting": "从码头进来暖暖手吧。停在我们码头的船沿着漫长的东岸北上驶往烛港，再原路返回。在遥远的西边，另一艘渡船往返于东溪与夜绽花野之间。墙上的地图画着这两条航线。攀登望龙哨之前，先在火边歇一歇吧。"
+      },
+      "innkeeper_maudie": {
+        "name": "莫迪·塔普赖特",
+        "title": "旅店老板",
+        "greeting": "快从湿气里进来吧，朋友，下到火边时当心台阶。水壶正烧着，长凳是暖的，楼上的房间也干爽。从芬桥来的旅人都发誓说沼泽路白天很太平，可天黑以后没人敢走。坐一会儿，歇歇脚吧。"
+      },
+      "patron_amos_eelby": {
+        "name": "埃莫斯·伊尔比",
+        "title": "捕鳗人",
+        "greeting": "拉条长凳坐下吧，{className}。格丽塞尔这人硬说芬桥底下的大鳗鱼是瞎编的。我可亲手摸到过它两回。两回！滑得跟收税官似的，差不多有这条长凳那么长。"
+      },
+      "patron_grissel_sedgeworth": {
+        "name": "格丽塞尔·塞奇沃斯",
+        "title": "泥炭工",
+        "greeting": "别理埃莫斯。我挖了四十年泥炭，从这片沼泽里挖出来的怪东西比他钓的鳗鱼还多：靴子、骨头，还有一顶头盔，里头那颗脑袋到现在还一脸发愁。烤烤火吧，火不要钱。"
+      },
+      "patron_ned_oxley": {
+        "name": "内德·奥克斯利",
+        "title": "赶牲人",
+        "greeting": "我沿着堤道赶了四十头牛，还没到芬桥就有两头陷进了泥沼。这条路上从不让人失望的，只有莫迪的麦酒。你的酒自己付钱。"
+      },
+      "patron_hester_quillby": {
+        "name": "赫丝特·奎尔比",
+        "title": "制图师",
+        "greeting": "我买过的每一张这片沼泽的地图，不出一季就不准了。水会挪动小路，小路又会挪动水。所以我自己画，趁墨迹未干，就坐在这儿干爽的地方。"
       },
       "reeve_ottoline": {
         "name": "镇务官奥托琳",
@@ -21040,6 +27194,26 @@ export const zh_CN: EnTranslations = {
         "title": "药坊大师",
         "greeting": "量两次，倒一次，{className}。药坊里容不得洒掉的药剂。"
       },
+      "guildmaster_hesper_dunmore": {
+        "name": "赫斯珀·邓莫尔",
+        "title": "灯火大厅会长",
+        "greeting": "欢迎来到灯火大厅，{className}。托拜厄斯把本周的契约贴在告示板上，加里克用我们的印章换取值得佩戴的荣誉，米拉能为你找到前往山下任何一扇门的队伍。带回一件战利品，它就会挂在我身后的大厅里。"
+      },
+      "contract_clerk_tobias_wren": {
+        "name": "托拜厄斯·雷恩",
+        "title": "契约文书",
+        "greeting": "每周三份契约，每次重置时张贴。无需签字，也不收费：完成一份，印章就归你了。"
+      },
+      "guild_quartermaster_garrick_holt": {
+        "name": "加里克·霍尔特",
+        "title": "公会军需官",
+        "greeting": "用印章换荣誉，朋友。我的货架上没有能磨利刀刃的东西，但高望的每座大厅都会知道你是在哪里赢得的。"
+      },
+      "guild_recruiter_mira_fairweather": {
+        "name": "米拉·费尔韦瑟",
+        "title": "公会招募官",
+        "greeting": "在找队伍吗？这张地图上的每座墓穴、堡垒和神殿都在我的名单上。告诉我你要去哪儿。"
+      },
       "farmer_jessica": {
         "name": "农妇杰西卡",
         "title": "菜园管事",
@@ -21063,7 +27237,7 @@ export const zh_CN: EnTranslations = {
       "wayfarer_bryn": {
         "name": "旅人布琳",
         "title": "港口向导",
-        "greeting": "东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：鸦邮信箱旁的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。"
+        "greeting": "东溪谷来者不拒，朋友。而对脚下还不稳的人来说，总还有试炼之滨：码头上的渡船铃一年到头随时送你过去，岛上那口孪生铃再送你回家。"
       },
       "instructor_maren": {
         "name": "教官玛伦",
@@ -21109,6 +27283,11 @@ export const zh_CN: EnTranslations = {
         "name": "操练官黑尔",
         "title": "码头陪练师",
         "greeting": "我身后那具假人从不还手，也永远打不倒，{className}。真正重要的是账目：你的伤害统计会记下你落在它身上的每一击。把它设为目标，打开伤害统计窗口，剩下的交给我来教你。"
+      },
+      "cantor_laverock": {
+        "name": "拉弗洛克",
+        "title": "苍白唱诗班最后的领唱",
+        "greeting": "我曾是苍白唱诗班里最年轻的声音。仪式那夜，我没有喝，我逃了。从那以后，每逢满月，我都听见他们在水下歌唱。我必须在死前亲眼见到她。让我跟在你们身后吧。我不会战斗，也不会拖累你们。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -21333,6 +27512,52 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "芬桥集结令"
+          }
+        }
+      },
+      "q_muster_summons": {
+        "title": "征召令",
+        "text": "我能抽出的每一杆长矛都在星陨坑周围扎了营，{playerName}，就为了围住从坑里走出来的那东西。征召指挥官守在俯瞰火山坑的南坡营地，在这里的东南方。去向指挥官报到。你会听到我们怎么对付他，好好听着，因为没听的人都躺在芦苇里了。",
+        "completion": "芬威克派来的？很好。听着，这话我只说一遍，而他一句都不会说。巴尔加斯沿着我们的哨站巡行：坑沿、西边的平地、南坡、西南坑沿上的缺口，然后再绕一圈，他停下的每一个哨站都会被夷平。钢铁伤不了他。他的皮会把刀刃弹开，只会砍他的团队最后只会累死。他唯一的弱点是眼睛。一杆撑稳的长矛刺穿冢琉璃就能让他失明，而他失明时皮会剥落：那时全团一起打他，狠狠地打。之后皮会重新合上，我们等下一次机会。先长矛，{playerName}，再所有人。兵器架只把长矛借给19级及以下的新兵：年轻人刺瞎他的眼睛，老兵们抓住这个窗口。",
+        "objectives": {
+          "0": {
+            "label": "向征召指挥官报到"
+          }
+        }
+      },
+      "q_muster_pike_drill": {
+        "title": "长矛先行",
+        "text": "说话不值钱，长矛可值钱。从我旁边的兵器架上拿一杆碎晶长矛，然后去营地西头找稻草工头：小伙子们用木板和稻草扎的，只有真家伙一半大，眼睛的位置放着一盏灯笼。架起长矛，操练官砸地的时候也要稳住矛尖，因为真家伙晃得更厉害。等你手臂笃定了，就把矛尖刺进灯笼。他的木板会掉下来：然后用你自己的武器打他，{playerName}，感受一下差别。兵器架只把长矛借给19级及以下的新兵。",
+        "completion": "感觉到打进去了吧？在真家伙身上，那是全团挥砍的十四口气，然后他的皮又会合上。记住这一课。工头会来考你的。",
+        "objectives": {
+          "0": {
+            "label": "从征召兵器架上取下碎晶长矛"
+          },
+          "1": {
+            "label": "熄灭稻草工头的灯笼"
+          },
+          "2": {
+            "label": "木板脱落时命中的攻击"
+          }
+        }
+      },
+      "q_muster_trophy": {
+        "title": "工头的碎块",
+        "text": "他每周都会重新站起来，我们每周都会再把他打倒。这需要一支团队，而征召军单凭自己凑不齐。去找下一支讨伐巴尔加斯的团队，帮忙把他打倒，{playerName}。砍他也好，保护砍他的人也好，治疗他们也好：每一双与他作战的手都算数。等他倒下，回来向我报告。征召军每击倒他一次都付钱。",
+        "completion": "又倒下了，而且你就在那场战斗里。今晚芬桥就会收到我的报告。离家这么远，钱袋很薄，但这是你的。等他再站起来就回来。",
+        "objectives": {
+          "0": {
+            "label": "击败巴尔加斯"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "镶嵌匠的欠账",
+        "text": "冢琉璃是我亲手嵌进那眼窝的：磨好透镜，安放到位，楔紧对齐。冢主们一个铜板都没付过我，如今我的手艺却在泥沼里四处踏平一切。拿走我的碎晶长矛。矛尾插地，稳住矛尖，需要多久就撑多久，等你手臂笃定了，就把它送进那只眼睛。他披的那层皮与那块晶石相连，{playerName}：戳瞎他，泥沼里的每一把刀刃终于都能咬进去。",
+        "completion": "你感觉到它松了，是吧？四十年的利息，从那眼窝里付清了。长矛归你了，朋友。他会复原的，他总是会，所以你什么时候想再来收账都行。",
+        "objectives": {
+          "0": {
+            "label": "戳瞎工头的眼睛"
           }
         }
       },
@@ -23517,6 +29742,12 @@ export const zh_CN: EnTranslations = {
           },
           "7": {
             "label": "沉没堡垒"
+          },
+          "8": {
+            "label": "冢丘领地"
+          },
+          "9": {
+            "label": "星陨坑"
           }
         }
       },
@@ -23874,6 +30105,39 @@ export const zh_CN: EnTranslations = {
             "label": "试炼跑道"
           }
         }
+      },
+      "goldcrest_harbor": {
+        "name": "Goldcrest Harbor",
+        "welcome": "Goldcrest Harbor, seat of the World Market. Every road, tide and ledger in the realm meets here.",
+        "pois": {
+          "0": {
+            "label": "The Grand Gate"
+          },
+          "1": {
+            "label": "Grand Plaza"
+          },
+          "2": {
+            "label": "The Goldcrest Exchange"
+          },
+          "3": {
+            "label": "Market Ward"
+          },
+          "4": {
+            "label": "Harbor Ward"
+          },
+          "5": {
+            "label": "Highcrown Citadel"
+          },
+          "6": {
+            "label": "The Lightspire"
+          },
+          "7": {
+            "label": "The Gold Light"
+          },
+          "8": {
+            "label": "The Golden Span"
+          }
+        }
       }
     },
     "dungeons": {
@@ -23929,7 +30193,7 @@ export const zh_CN: EnTranslations = {
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",
-        "enterText": "温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。",
+        "enterText": "你穿过神像巨口，踏上高悬于盆地之上的岩架。瀑布自崖顶轰然而下，而在远处下方，某个庞然大物正涉过浅滩。",
         "leaveText": "你从石牙之下穿回棕榈之境的阳光中。"
       },
       "the_last_keep": {
@@ -24150,6 +30414,16 @@ export const zh_CN: EnTranslations = {
         "sender": "交易所经纪人",
         "subject": "你的交易所购得之物",
         "body": "交易已结清，货物归你所有。随信的包裹装着你所购买的那一件物品：自挂单之时起，它便由交易所托管，直到你的付款结清为止。\n\n这笔交易的记录已存入交易所账册。\n\n- 交易所经纪人"
+      },
+      "membership_token_delivery": {
+        "sender": "渡鸦邮驿",
+        "subject": "您的会员代币",
+        "body": "您购买的代币已随信附上。兑换可为账号增加30天会员时长，也可与其他冒险者交易。"
+      },
+      "membership_annual_reward": {
+        "sender": "鸦羽邮局",
+        "subject": "您的年度会员坐骑",
+        "body": "你的年度会员付款已完成。随信附上坐骑缰绳。将缰绳保存在背包或银行中即可拥有这只坐骑。会员到期后，它仍属于你。需要骑术。"
       },
       "woc_market_return": {
         "sender": "交易所经纪人",
@@ -24605,6 +30879,7 @@ export const zh_CN: EnTranslations = {
     "mailboxName": "邮箱",
     "noticeboardName": "告示板",
     "farmPatchName": "菜畦",
-    "realmBuilderMonumentName": "王国建造者纪念碑"
+    "realmBuilderMonumentName": "王国建造者纪念碑",
+    "musterRackName": "征召兵器架"
   }
 };

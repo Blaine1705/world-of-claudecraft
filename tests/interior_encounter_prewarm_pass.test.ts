@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { characterFormAssetKey } from '../src/render/characters/form_visual_selection_core';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { runContextRestoreResets } from '../src/render/context_restore_registry';
 import { activateGfxProfile, GFX, getActiveGfxProfile } from '../src/render/gfx';
@@ -16,6 +17,7 @@ import { collectObjectTextures } from '../src/render/material_texture_slots';
 import { NYTHRAXIS_GRAVE_PREWARM_NAME } from '../src/render/nythraxis_grave_flame_visual';
 import { MOBS } from '../src/sim/data';
 import { VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
+import { WILDHEART_TOADED } from '../src/sim/mob/trash_kit/wildheart_cast_ids';
 import type { Entity } from '../src/sim/types';
 import { buildVarkhulPrewarmSetRoots } from './helpers/varkhul_prewarm_set';
 
@@ -30,6 +32,8 @@ const rigs = vi.hoisted(() => ({
     templateId: string;
     color: number;
     scale: number;
+    formKey: string | undefined;
+    auras: Array<{ kind: string; id?: string }>;
     disposed: number;
     root: unknown;
   }>,
@@ -40,7 +44,7 @@ vi.mock('../src/render/characters', async (importOriginal) => {
     ...actual,
     createCharacterVisual: (...args: Parameters<typeof actual.createCharacterVisual>) => {
       if (!rigs.fake) return actual.createCharacterVisual(...args);
-      const [entity] = args;
+      const [entity, formKey] = args;
       const root = new THREE.Group();
       root.name = `rig:${entity.kind}:${entity.templateId}`;
       root.add(new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial()));
@@ -49,6 +53,8 @@ vi.mock('../src/render/characters', async (importOriginal) => {
         templateId: entity.templateId,
         color: entity.color,
         scale: entity.scale,
+        formKey,
+        auras: [...(entity.auras ?? [])],
         disposed: 0,
         root,
       };
@@ -339,12 +345,64 @@ describe('interior encounter prewarm pass (driven)', () => {
     }
   });
 
+  it('stages the Toad Hex form through the polymorph slot factory at the basin, once', async () => {
+    // The live hex builds the polymorph slot with createCharacterVisual(e,
+    // 'form_sheep') on a body wearing the Toad Hex; the twin must ask the same
+    // way so characterFormAssetKey lands on the same tinted form_toad rig.
+    rigs.fake = true;
+    const host = fakeHost();
+    host.prewarmEntity = ((kind: string, templateId: string, color: number, scale: number) => ({
+      kind,
+      templateId,
+      color,
+      scale,
+      auras: [],
+    })) as unknown as typeof host.prewarmEntity;
+    startInteriorEncounterPrewarm('wildheart', host);
+    await drain();
+
+    expect(rigs.built).toHaveLength(1);
+    const toad = rigs.built[0];
+    expect(toad).toMatchObject({ kind: 'player', formKey: 'form_sheep' });
+    expect(toad.auras).toEqual([
+      expect.objectContaining({ kind: 'polymorph', id: WILDHEART_TOADED }),
+    ]);
+    expect(characterFormAssetKey('form_sheep', toad.auras)).toBe('form_toad');
+    expect(host.compiled).toEqual([`rig:player:${toad.templateId}`]);
+    // Held past its compile, hidden and detached, never disposed.
+    const rig = toad.root as THREE.Object3D;
+    expect(rig.parent).toBeNull();
+    expect(rig.visible).toBe(false);
+
+    startInteriorEncounterPrewarm('wildheart', host);
+    await drain();
+    expect(rigs.built).toHaveLength(1);
+    expect(toad.disposed).toBe(0);
+  });
+
+  it('skips the toad form on a constrained device', async () => {
+    rigs.fake = true;
+    const was = getActiveGfxProfile();
+    activateGfxProfile({ ...was, settings: { ...was.settings, constrainedMemory: true } });
+    try {
+      const host = fakeHost();
+      startInteriorEncounterPrewarm('wildheart', host);
+      await drain();
+      expect(rigs.built).toEqual([]);
+      expect(host.compiled).toEqual([]);
+    } finally {
+      activateGfxProfile(was);
+    }
+  });
+
   it('compiles and retains the Nythraxis floor visuals, and builds no character rig', async () => {
     // Soul Rend draws the spirit veil, whose family the boot manifest links, so
     // the crypt stages its floor telegraphs alone: no class or skin catalog.
     rigs.fake = true;
     const host = fakeHost();
     startInteriorEncounterPrewarm('nythraxis', host);
+    // The catalog grows with every VFX skin, and its compile with it, past what one drain
+    // turns: drain on (a few drains at most) until the compile has caught up with the build.
     await drain();
     expect(rigs.built).toEqual([]);
     expect(host.compiled).toEqual([NYTHRAXIS_GRAVE_PREWARM_NAME]);

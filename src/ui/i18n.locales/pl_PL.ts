@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Premia specjalizacji',
+  'hudChrome.specPanel.healing': 'leczenie',
+  'hudChrome.specPanel.absorption': 'pochłanianie obrażeń',
+  'hudChrome.specPanel.physicalAbilityDamage': 'obrażenia umiejętności wręcz i dystansowych',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Zwiększa podstawowe leczenie o {pct} po uwzględnieniu pozostałych premii do leczenia.',
   'hud.pet.assist': 'Wsparcie',
   'hud.pet.assistDesc':
     'Atakuje tylko twój bieżący cel, gdy użyjesz na nim zdolności. Ignoruje wrogów, którzy cię atakują.',
@@ -1129,7 +1135,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Otrzymasz także:',
   'hudChrome.weekly.anyDifficulty': 'Dowolna trudność',
   'hudChrome.weekly.cacheDesc':
-    'Otwiera się na jeden kawałek ze zwykłego rajdu dla twojej klasy (nigdy kawałek zestawu tier), plus {count} x {item}.',
+    'Otwiera się na jeden kawałek ze zwykłego rajdu dla twojej klasy (nigdy kawałek zestawu tier Ignivara), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Wybierz zadanie',
   'hudChrome.weekly.chosen': 'Tygodniowe zadanie wzięte: {category}',
   'hudChrome.weekly.close': 'Zamknij tygodniowe zadania',
@@ -5102,7 +5108,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Posiadane',
   'hudChrome.warfareShop.weapons': 'Broń',
   'itemUi.market.saleBuyer': 'Kupujący: {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} wcześniejszych sprzedaży, wliczonych w sumę.',
+  'itemUi.market.saleOlder': 'Oraz {count} wcześniejszych sprzedaży, których nie wyświetlono.',
   'itemUi.tooltip.maxStack': 'Maks. stos: {count}',
   'hud.system.deathRecapAbility': 'Zginąłeś. Zabity przez {ability}.',
   'hud.system.deathRecapDrowned': 'Zginąłeś. Utonąłeś.',
@@ -6127,6 +6133,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zimnokrwiste drapieżniki o własnym syczeniu i kłapaniu, odmienne od ciepłokrwistych bestii.',
   'guide.family.reptile.name': 'Gady',
   'hudChrome.auraEffect.damageReduction': 'Zmniejsza wszelkie otrzymywane obrażenia o {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Śpi do świtu. Nie można go zaatakować i nie obudzi się dla nikogo.',
   'hudChrome.auraEffect.guardianWard':
     'Kolejny śmiertelny cios wroga zamiast tego przywraca cię do {pct}% zdrowia',
   'hudChrome.bags.dragDestroyHint': 'Przeciągnij poza okno, aby zniszczyć',
@@ -6554,6 +6562,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Peleryna Zmierzczokolca',
   'entities.items.fenbark_leggings.name': 'Nogawice Bagiennej Kory',
   'entities.items.fenshadow_maul.name': 'Obuch Bagiennego Cienia',
+  'entities.items.skerrits_shardpike.name': 'Odłamkowa Pika Skerrita',
+  'entities.items.foremans_barrowmaul.name': 'Kurhanowy Młot Sztygara',
+  'entities.items.barrowhide_pauldrons.name': 'Kurhanowe Naramienniki',
+  'entities.items.mirestone_stride.name': 'Krok Bagiennego Kamienia',
+  'entities.items.foremans_wage_band.name': 'Pierścień zapłaty Brygadzisty',
+  'entities.items.mirelight_locket.name': 'Medalion Bagiennego Blasku',
+  'entities.items.fenwright_grips.name': 'Chwyty Bagiennego Rzemieślnika',
   'entities.items.fenwarden_sabatons.name': 'Sabatony Strażnika Bagnisk',
   'entities.items.gravescale_girdle.name': 'Pas z grobowej łuski',
   'entities.items.gravewyrm_claws.name': 'Szpony grobowego żmija',
@@ -7380,7 +7395,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 'h',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} powstaje nad Wyżynami Ciernistego Szczytu!',
+  'hudChrome.worldBoss.spawn': '{name} wznosi się nad {zone}!',
+  'hudChrome.worldBoss.wake': '{name} budzi się nad {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} śpi do świtu.',
   'itemUi.kind.bag': 'Torba',
   'itemUi.tooltip.bagSlots': 'Torba z {slots} miejscami',
   'itemUi.tooltip.bagSlotsMaterials': 'Torba na surowce z {slots} miejscami',
@@ -9431,6 +9448,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Kurhany Trolli',
   'entities.zones.mirefen_marsh.pois.6.label': 'Obozowisko Grobowych Przyzywaczy',
   'entities.zones.mirefen_marsh.pois.7.label': 'Zatopiony Bastion',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Włości Kurhanu',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Krater Spadającej Gwiazdy',
   'entities.zones.mirefen_marsh.welcome':
     'Zamelduj się u Strażnika Fenwicka przy bramie Mostu na Trzęsawisku.',
   'entities.zones.thornpeak_heights.name': 'Wyżyny Ciernistego Szczytu',
@@ -9689,6 +9708,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'ULEPSZENIA!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Dołącz do Discorda',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Projekt open source',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Biała księga',
@@ -16149,7 +16169,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasywnie: Z Rozpęd Łowów zdolność Zerwanie Tropu przygotowuje twój następny Patroszące uderzenie lub Krwawy Hak na 12 s. Patroszące uderzenie zadaje o 15% więcej obrażeń na ładunek. Krwawy Hak zadaje dodatkowe 18 do 24 obrażeń fizycznych, zwiększone o 15% na ładunek i mocą ataku dystansowego. Przy 3 ładunkach każdy z tych ataków zużywa Rozpęd Łowów. (Przetrwanie)',
   'entities.abilities.frostjaw_trap.description':
-    'Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s.',
+    'Umieszcza pułapkę w wybranym miejscu. Uzbraja się po 0,75 s, trwa 1 minutę i widzisz ją tylko ty i twoja drużyna. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Pasywnie: Patroszące uderzenie i Ładunek Odłamkowy trafiający wroga dają po 1 Rozpęd Łowów, do 3. Trwa do zużycia lub wyjścia z walki; każdy ładunek zwiększa szybkość ruchu o 15%. Przy 3 ładunkach Rozdarcie ran zadaje o 60% więcej obrażeń uderzenia i zużywa ładunki. (Przetrwanie)',
   'entities.abilities.measured_shot.description':
@@ -20127,7 +20147,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Zużywa twoje 5 punktów Zieleni: każdy sojusznik z twoimi efektami leczenia w czasie natychmiast odzyskuje {buff}% leczenia, które im pozostało. Efekty są usuwane, a cel otrzymuje nowe Zarodnikowe gojenie.',
   'entities.abilities.play_dead.description':
-    'Padnij na ziemię i udawaj martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie zapominają o tobie, a wrodzy gracze, którzy cię namierzyli, tracą cel. Ruch, atak lub użycie innej zdolności kończy ten stan. Użyj ponownie, aby wstać.',
+    'Padasz na ziemię i udajesz martwego: wszyscy widzą twoje zdrowie i skupienie jako puste. Wrogowie o tobie zapominają, a wrodzy gracze, którzy mają cię w celu, tracą cel. Ruch, atak lub użycie innej umiejętności kończy efekt. Jeśli użyjesz jej w ruchu, masz 1 s na zatrzymanie się, zanim ruch ją przerwie. Użyj ponownie, aby wstać.',
   'entities.abilities.play_dead.name': 'Udawanie martwego',
   'entities.abilities.rejuvenation.name': 'Zarodnikowe gojenie',
   'entities.abilities.scratch.description':
@@ -20201,4 +20221,25 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Możesz to zmienić w dowolnej chwili w Opcjach, w sekcji Jakość grafiki.',
   'graphicsPrompt.confirm': 'Kontynuuj',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Pułapka na Niedźwiedzie',
+  'entities.abilities.bear_trap.description':
+    'Zastaw pułapkę w wybranym miejscu. Uzbraja się po 0,75 sek. i utrzymuje przez 1 min; widzisz ją tylko ty i twoja grupa. Pierwszy wróg, który ją uruchomi, krwawi, otrzymując {damage} obrażeń fizycznych w ciągu 15 sek., i zostaje spowolniony o 50% na 4 sek. Obrażenia rosną wraz z siłą ataku dystansowego. Jednocześnie może być aktywna tylko jedna Pułapka na Niedźwiedzie. Może współistnieć z twoją Pułapką Mroźnej Paszczy. Zastawienie kolejnej Pułapki na Niedźwiedzie zastępuje poprzednią.',
+  'entities.abilities.scatterbolt.name': 'Rozpryskowy Bełt',
+  'entities.abilities.scatterbolt.description':
+    'Wystrzel grad bełtów w stożku o kącie 90 stopni i zasięgu 8 jardów przed tobą, odrzucając wrogów na odległość do 20 jardów od ciebie. Wrogowie odporni na odrzucenie pozostają niewzruszeni. Nie zadaje obrażeń.',
+  'entities.abilities.phosphor_flask.name': 'Fosforowa Kolba',
+  'entities.abilities.phosphor_flask.description':
+    'Zapieczętowane naczynie z reaktywną mieszanką chemiczną, która przez 3 s wybucha białym, rozżarzonym płomieniem na obszarze 8 m. Wrogowie stojący w płomieniach otrzymują {damage} obrażeń od ognia co 0,5 s. Obrażenia rosną z mocą ataku dystansowego.',
+  'entities.items.lychgate_buckler.name': 'Puklerz cmentarnej bramy',
+  'entities.items.bastion_kite_shield.name': 'Tarcza migdałowa bastionu',
+  'entities.items.barrowfield_tower_shield.name': 'Pawęż Kurhanowego Pola',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Pasek zasobów',
+  'hudChrome.options.hillBarOpacity': 'Krycie tła Władcy wzgórza',
+  'hudChrome.options.playerFrameResourceDetached': 'Odłącz pasek zasobów',
+  'hudChrome.options.playerFrameResourceHeight': 'Wysokość paska zasobów',
+  'hudChrome.options.playerFrameResourceWidth': 'Szerokość paska zasobów',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Włącz Odłącz pasek zasobów na karcie Ramki. Opcja Edytuj ramki odblokuje wtedy także pasek zasobów, dzięki czemu możesz umieścić manę, energię lub gniew osobno w dowolnym miejscu. Szerokość paska zasobów i Wysokość paska zasobów na tej samej karcie zmieniają jego rozmiar. Edytuj ramki odblokowuje także pasek Władcy wzgórza. Krycie tła Władcy wzgórza na tej karcie wygasza jego panel, zachowując czytelność tekstu.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

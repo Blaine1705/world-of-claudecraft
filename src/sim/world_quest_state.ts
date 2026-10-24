@@ -15,6 +15,11 @@ import {
   sanitizeFactionReputation,
 } from './factions';
 import { type PersonalGliderRecords, sanitizeGliderRecords } from './glider_personal_records';
+import {
+  type GuildContractProgress,
+  sanitizeGuildContractProgress,
+  savedGuildContractProgress,
+} from './guild_contracts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -58,6 +63,8 @@ export interface WorldQuestPlayerState {
   worldQuestReplacements: Record<string, string>;
   /** The weekly emissary's pick (src/sim/weekly_quests.ts); null while none is taken. */
   weeklyQuest: WeeklyQuestProgress | null;
+  /** Lantern Hall's weekly contracts (src/sim/guild_contracts.ts); null until the first. */
+  guildContracts: GuildContractProgress | null;
   /**
    * Clue Scrolls (src/sim/clue_scrolls.ts). The active hunt cursor (null when
    * none); the world-quest cycle that already paid a scroll ('' when none);
@@ -101,6 +108,7 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     worldQuestRerollCycle: '',
     worldQuestReplacements: {},
     weeklyQuest: null,
+    guildContracts: null,
     clueHunt: null,
     clueScrollCycle: '',
     clueCasketsOpened: 0,
@@ -159,6 +167,9 @@ export function restoreWorldQuestState(
   // by design; sanitizeClueHunt says the same); the step is clamped to the
   // hunt's length. The paid-cycle mark is kept whatever cycle it names: a
   // stale one simply never matches the current cycle again.
+  // Lantern Hall's contracts ride the same blob, restored whatever the board holds (a past
+  // week's done list rolls over on first read; the lifetime count is what persists).
+  meta.guildContracts = sanitizeGuildContractProgress(saved?.guildContracts);
   meta.clueHunt = sanitizeClueHunt(saved?.clueHunt);
   meta.clueScrollCycle = sanitizeWorldQuestCycle(saved?.clueScrollCycle);
   meta.clueCasketsOpened = sanitizeClueCasketsOpened(saved?.clueCasketsOpened);
@@ -221,6 +232,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasVaultAttempt = meta.vaultAttempt !== null && meta.vaultAttempt !== undefined;
   const hasVaultAttemptSeq = meta.vaultAttemptSeq > 0;
   const hasVaultGuest = (meta.vaultGuestPayouts ?? 0) > 0 && !!meta.vaultGuestCycle;
+  const guildContracts = savedGuildContractProgress(meta);
   const hearth = sanitizeAlliedHearthstoneAttunement(meta.alliedHearthstoneAttunement);
   if (
     !meta.worldQuestCycle &&
@@ -236,6 +248,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasVaultAttempt &&
     !hasVaultAttemptSeq &&
     !hasVaultGuest &&
+    !guildContracts &&
     !hearth
   ) {
     return weeklyPart;
@@ -296,6 +309,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(hasClueHunt && meta.clueHunt ? { clueHunt: { ...meta.clueHunt } } : {}),
       ...(hasClueCycle ? { clueScrollCycle: meta.clueScrollCycle } : {}),
       ...(hasCaskets ? { clueCasketsOpened: meta.clueCasketsOpened } : {}),
+      ...(guildContracts ? { guildContracts } : {}),
       ...(hasTreasureMap && meta.treasureMap ? { treasureMap: { ...meta.treasureMap } } : {}),
       ...(hasVaultAttempt && meta.vaultAttempt ? { vaultAttempt: { ...meta.vaultAttempt } } : {}),
       ...(hasVaultAttemptSeq ? { vaultAttemptSeq: meta.vaultAttemptSeq } : {}),

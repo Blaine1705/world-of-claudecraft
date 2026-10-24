@@ -1,6 +1,23 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { startGhostCaptainMove } from '../src/sim/encounters/sunken_bastion/ghost_captain';
+import {
+  GHOST_BROADSIDE_FIRE,
+  GHOST_BROADSIDE_LANE,
+  GHOST_BROADSIDE_SHIP,
+  GHOST_CAPTAIN_BROADSIDE,
+  GHOST_CAPTAIN_ID,
+} from '../src/sim/encounters/sunken_bastion/ghost_captain_ids';
+import {
+  boss as bastionBoss,
+  fight as bastionFight,
+  engage as engageBastion,
+  live as liveBastion,
+  put as putBastion,
+  run as runBastion,
+  tick as tickBastion,
+} from './helpers/bastion_fight';
 import { completeCraftCast } from './helpers/enchant_family_cast';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -53,8 +70,10 @@ import {
 } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
+import { MembershipGameServices } from '../server/membership_game_services';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
+import { ReferralGameAdapter } from '../server/referral_game_adapter';
 import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
@@ -80,6 +99,7 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { farmPatchesFor } from '../src/sim/moved_objects';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { spawnHillNow } from '../src/sim/pvp';
@@ -100,6 +120,7 @@ import {
 } from '../src/sim/varkhul_shared_pyre';
 import { terrainHeight } from '../src/sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
+import { spawnWorldBoss } from '../src/sim/world_boss_spawn';
 import { onMobKilledForWorldQuests, worldQuestCycleForResetDay } from '../src/sim/world_quests';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -2995,6 +3016,15 @@ describe('legendary celebration events reach the client (phase 13)', () => {
 
 describe('autosaves', () => {
   beforeEach(() => {
+    // Join-time social, referral and membership reads share this gate too.
+    // Their own suites cover admission; isolate them here so these exact
+    // permit counts measure only the real save producers and FIFO ordering.
+    vi.spyOn(
+      GameServer.prototype as unknown as { initSocial(): Promise<void> },
+      'initSocial',
+    ).mockResolvedValue();
+    vi.spyOn(ReferralGameAdapter.prototype, 'attach').mockImplementation(() => {});
+    vi.spyOn(MembershipGameServices.prototype, 'onJoin').mockImplementation(() => {});
     vi.mocked(saveCharacterState).mockReset();
     vi.mocked(saveCharacterState).mockResolvedValue(true);
     vi.mocked(saveCharacterAndGuildBankState).mockReset();
@@ -3008,6 +3038,7 @@ describe('autosaves', () => {
     vi.mocked(saveMailPartitions).mockReset();
     vi.mocked(saveMailPartitions).mockResolvedValue();
   });
+  afterEach(() => vi.restoreAllMocks());
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
     const server = new GameServer();
@@ -5323,7 +5354,7 @@ describe('farm plot wire (fplot)', () => {
     g.window = { setInterval: () => 0, clearInterval: () => undefined };
     try {
       const w = new ClientWorld('farm-statics-probe', 1, 'warrior', 'http://localhost');
-      expect(w.farmPatches).toBe(FARM_PATCHES);
+      expect(w.farmPatches).toBe(farmPatchesFor(BUILTIN_WORLD.objectMoves, FARM_PATCHES));
       expect(w.myFarmPlots).toEqual([]);
     } finally {
       g.WebSocket = prevWebSocket;
@@ -5741,6 +5772,8 @@ const ALL_DELTA_KEYS = [
   'bg',
   'blk',
   'bpsl',
+  'budOwn',
+  'budPend',
   'buyback',
   'bval',
   'cardDuel',
@@ -5751,6 +5784,10 @@ const ALL_DELTA_KEYS = [
   'corder',
   'corpse',
   'cosmetics',
+  'courier',
+  'courierData',
+  'courierLegTicks',
+  'courierTravelTicks',
   'cprof',
   'crat',
   'crit',
@@ -5765,6 +5802,7 @@ const ALL_DELTA_KEYS = [
   'denc',
   'df',
   'dfb',
+  'dgrun',
   'dmarks',
   'dodge',
   'drun',
@@ -5776,6 +5814,7 @@ const ALL_DELTA_KEYS = [
   'fac',
   'facCur',
   'fplot',
+  'gcon',
   'ggoal',
   'gprof',
   'guildBank',
@@ -5788,8 +5827,11 @@ const ALL_DELTA_KEYS = [
   'hpw',
   'hrat',
   'inv',
+  'lance',
+  'lguide',
   'lhonor',
   'lockouts',
+  'lrest',
   'lroll',
   'lrollg',
   'lxp',
@@ -5797,6 +5839,7 @@ const ALL_DELTA_KEYS = [
   'mailU',
   'market',
   'marks',
+  'mbr',
   'milestones',
   'mktU',
   'mloot',
@@ -5890,6 +5933,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   bags: 'bags',
   bank: 'bankInfo',
   blk: 'blockChance',
+  budOwn: 'ownedBuddies',
+  budPend: 'pendingBuddies',
   buyback: 'vendorBuyback',
   bval: 'blockValue',
   cbt: 'inCombat',
@@ -5897,6 +5942,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   cluh: 'clueHunt',
   corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
+  courier: 'courierInfo',
+  courierData: 'courierInfo',
+  courierLegTicks: 'courierInfo',
+  courierTravelTicks: 'courierInfo',
   cprof: 'craftingIdentity',
   crat: 'critRating',
   crit: 'critChance',
@@ -5909,6 +5958,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   denc: 'lastDisenchantResult',
   df: 'dungeonFinderInfo',
   dfb: 'dungeonFinderBoard',
+  dgrun: 'dungeonRun',
   dmarks: 'delveMarks',
   dodge: 'dodgeChance',
   drun: 'delveRun',
@@ -5929,8 +5979,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
   inv: 'inventory',
+  lance: 'lanceTrial',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
+  lrest: 'lanceRestRemaining',
   lroll: 'lootRollPrompts',
   lrollg: 'lootRollGroup',
   lxp: 'lifetimeXp',
@@ -6032,6 +6084,13 @@ function dirtyEveryDeltaField(): {
   // so the fixture flags it the way the sim's engaged pass would.
   p.inCombat = true;
 
+  // The Shardpike trial (lance + lrest): pike in hand, brace live, rest stamp set.
+  // Brace FIRST (the verb refuses while resting), then stamp the rest window.
+  meta.equipment.mainhand = 'skerrits_shardpike';
+  p.onGround = true;
+  sim.lanceBrace(lp);
+  meta.lanceRestUntil = sim.time + 3;
+
   // Poke the encoder's exact sources for the mutually-exclusive cases.
   const run = sim.delveRunForPlayer(lp) as any;
   run.companion = { companionId: 'companion_tessa', entityId: mp };
@@ -6056,6 +6115,23 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // Pose, optional elapsed ticks and revision-gated custody recombine into one owner mirror.
+  meta.courier = {
+    phase: 'returning',
+    travelTicks: 77,
+    // A long route caps the leg at fifteen seconds (300 ticks).
+    legDistance: 10000,
+    legStartX: 0,
+    legStartZ: 0,
+    travelDistance: 8,
+    x: 17,
+    z: 29,
+    bankerId: null,
+    cargo: [{ itemId: 'wolf_fang', count: 3 }],
+    withdrawals: [],
+    revision: 7,
+    retryRemaining: 0,
+  };
   // `vault`: vaultInfoFor shares the bank's proximity gate (the bursar relocated
   // above covers it), so only the contents need dirtying. Stocked AND upgraded,
   // because a locked empty vault still encodes as a non-null all-zero object:
@@ -6392,7 +6468,8 @@ function dirtyEveryDeltaField(): {
   // Realm-wide world-boss liveness (`wba`), intentionally separate from the
   // viewer's personal loot lockout. Spawn through the real Sim primitive while
   // leaving the scheduler clocks alone so the rest of this codec fixture stays still.
-  (sim as any).worldBossEntityIds[0] = (sim as any).spawnWorldBoss(WORLD_BOSSES[0]);
+  // (the primitive lives in src/sim/world_boss_spawn.ts behind the SimContext seam).
+  (sim as any).worldBossEntityIds[0] = spawnWorldBoss((sim as any).ctx, WORLD_BOSSES[0]);
 
   return { server, fc, leader, memberPid: mp };
 }
@@ -6419,7 +6496,9 @@ describe('world-boss realm liveness snapshot', () => {
     fc.sent.length = 0;
     broadcast(server);
     snap = lastSnap(fc.sent);
-    expect(snap.self.wba).toEqual([bossId]);
+    // The Mirefen boss (Balgath) keeps his own dawn clock and may be up in the same
+    // tick, so the pin is on THIS boss's membership, not the whole list.
+    expect(snap.self.wba).toContain(bossId);
     (client as any).applySnapshot(snap);
     expect(client.worldBossActive(bossId)).toBe(true);
     expect(client.raidLockouts().map((lockout) => lockout.id)).toContain(
@@ -6432,7 +6511,7 @@ describe('world-boss realm liveness snapshot', () => {
     fc.sent.length = 0;
     broadcast(server);
     snap = lastSnap(fc.sent);
-    expect(snap.self.wba).toEqual([]);
+    expect(snap.self.wba).not.toContain(bossId);
     (client as any).applySnapshot(snap);
     expect(client.worldBossActive(bossId)).toBe(false);
   });
@@ -6568,8 +6647,12 @@ describe('full self-state snapshot delta fixture', () => {
       // design. Its non-null arrival (and the by-reference mirror) is pinned
       // in tests/vault_wire.test.ts instead.
       // This fixture stands at a different banker; the weekly keeper gate stays closed.
-      if (key === 'cvault' || key === 'weeklyRewards') {
-        expect(snap.self[key], 'self.cvault must arrive as the explicit gated null').toBeNull();
+      // dgrun is position-exclusive with drun the same way: the dungeon run is
+      // read off the claim the player STANDS in, and this player stands in a
+      // delve, so the fresh session's first value is the explicit null. Its
+      // non-null arrival is pinned in tests/server/dungeon_run_wire.test.ts.
+      if (key === 'cvault' || key === 'weeklyRewards' || key === 'dgrun') {
+        expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();
         continue;
       }
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
@@ -6699,6 +6782,17 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    expect(client.courierInfo).toMatchObject({
+      phase: 'returning',
+      x: 17,
+      z: 29,
+      bankerId: null,
+      cargo: [{ itemId: 'wolf_fang', count: 3 }],
+      withdrawals: [],
+      revision: 7,
+      bankSlots: [],
+    });
+    expect(client.courierInfo).not.toHaveProperty('retryRemaining');
     // vault -> vaultInfo: the owner-only Materials Vault clone survives whole,
     // both derived numbers included (rung 2 of the 100-per-rung ladder, priced
     // from the rung-2 literal in src/sim/materials_vault.ts).
@@ -6985,6 +7079,23 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.mountKey).toBe('valorsteed');
   });
 
+  it('round-trips the active buddy identity mirror (bud) like mnt', () => {
+    // Entity.buddyKey (wire `bud`, identityFields in server/entity_identity_wire.ts) is the
+    // "which buddy is out" mirror every client reads for HUD/UI identity; the
+    // buddy's own body renders through its real owned mob entity, never off
+    // this field, but the field itself must still round-trip like every
+    // other identity mirror (skin, mountKey).
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    server.sim.entities.get(leader.pid)!.buddyKey = 'horse';
+    broadcast(server);
+    const snapshot = lastSnap(fc.sent);
+    expect(snapshot.self.bud).toBe('horse');
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snapshot);
+    expect(client.player.buddyKey).toBe('horse');
+  });
+
   it('flips mst to null when the mobile station expires (server-side tick-domain check)', () => {
     // The expiry arm of the mst self-delta: activeMobileStationCraftsFor
     // resolves active-vs-expired against the SERVER sim's own tickCount, so
@@ -7114,6 +7225,74 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.activeMobileStationCrafts).toBe(EMPTY_MST_CRAFTS);
   });
 
+  it('round-trips courier pose updates without resending custody and clears both on removal', () => {
+    const { server, fc, leader } = dirtyEveryDeltaField();
+    const client = bareClient(leader.pid);
+    broadcast(server);
+    const initial = lastSnap(fc.sent);
+    expect(initial.self.courier).toEqual({
+      phase: 'returning',
+      x: 17,
+      z: 29,
+      bankerId: null,
+      travelDistance: 8,
+      remainingDistance: 0,
+      inventoryRevision: 0,
+    });
+    expect(initial.self.courierData).toMatchObject({
+      cargo: [{ itemId: 'wolf_fang', count: 3 }],
+      revision: 7,
+    });
+    expect(initial.self.courierTravelTicks).toBe(77);
+    expect(initial.self.courierLegTicks).toBe(300);
+    expect(initial.self.courierData).not.toHaveProperty('x');
+    expect(initial.self.courierData).not.toHaveProperty('travelDistance');
+    expect(initial.self.courierData).not.toHaveProperty('remainingDistance');
+    expect(
+      initial.ents.every(
+        (entry: Record<string, unknown>) =>
+          !('courier' in entry) &&
+          !('courierData' in entry) &&
+          !('courierTravelTicks' in entry) &&
+          !('courierLegTicks' in entry),
+      ),
+    ).toBe(true);
+    (client as any).applySnapshot(initial);
+    const cargo = client.courierInfo!.cargo;
+    const meta = server.sim.meta(leader.pid)!;
+    meta.courier!.x = 41;
+    meta.courier!.travelTicks = 78;
+    fc.sent.length = 0;
+    broadcast(server);
+    const moved = lastSnap(fc.sent);
+    expect(moved.self.courier).toEqual({
+      phase: 'returning',
+      x: 41,
+      z: 29,
+      bankerId: null,
+      travelDistance: 8,
+      remainingDistance: 0,
+      inventoryRevision: 0,
+    });
+    expect(moved.self.courierTravelTicks).toBe(78);
+    expect(moved.self).not.toHaveProperty('courierData');
+    (client as any).applySnapshot(moved);
+    expect(client.courierInfo!.x).toBe(41);
+    expect(client.courierInfo!.travelTicks).toBe(78);
+    expect(client.courierInfo!.legTicks).toBe(300);
+    expect(client.courierInfo!.cargo).toBe(cargo);
+    meta.courier = undefined;
+    fc.sent.length = 0;
+    broadcast(server);
+    const ended = lastSnap(fc.sent);
+    expect(ended.self.courier).toBeNull();
+    expect(ended.self.courierData).toBeNull();
+    expect(ended.self.courierTravelTicks).toBeNull();
+    expect(ended.self.courierLegTicks).toBeNull();
+    (client as any).applySnapshot(ended);
+    expect(client.courierInfo).toBeNull();
+  });
+
   it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
     const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
     broadcast(server);
@@ -7128,6 +7307,7 @@ describe('full self-state snapshot delta fixture', () => {
     const partyRef = client.partyInfo;
     const delveRunRef = client.delveRun;
     const vaultRef = client.vaultInfo;
+    const courierRef = client.courierInfo;
 
     // a second broadcast with NO intervening sim.tick() and no state mutation: the
     // maybe() closure sees byte-identical JSON for every registered key and omits every one
@@ -7157,6 +7337,7 @@ describe('full self-state snapshot delta fixture', () => {
     // an omitted `vault` must leave an open vault window's mirror alone, not
     // reset it to null (the omission-is-unchanged half of the delta contract)
     expect(client.vaultInfo).toBe(vaultRef);
+    expect(client.courierInfo).toBe(courierRef);
     expect(client.markerFor(memberPid)).toBe(3);
     expect(client.delveMarks).toBe(7);
     expect(client.heroicMarks).toBe(9);
@@ -7224,8 +7405,10 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 117 unique keys in sorted order', () => {
-    // 109 plus the release batch's pending Town Focus and Spell Crit core keys.
+  it('ALL_DELTA_KEYS contains exactly 125 unique keys in sorted order', () => {
+    // 109 plus the release batch's pending Town Focus and Spell Crit core keys (113),
+    // plus the courier's three keys and the Shardpike trial's lance, lrest and lguide (119).
+    // +2: the courier's courierTravelTicks and courierLegTicks (PR 4281), for 124.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -7233,7 +7416,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff/adiff) moved off the always-present
     // self record and behind this same delta gate, for 83, then +1 reliq
     // (Reliquary Phase 3 sparse blob), +1 aborder (the Book of Deeds nameplate
-    // border echo, atitle's sibling), and +1 `app` (the release's authored
+    // border echo, atitle's sibling), +2 lance/lrest (the Shardpike trial's
+    // self view + rest cooldown), and +1 `app` (the release's authored
     // modular look, which cannot come from the entity list because the
     // broadcast loop skips the viewer's own entity, and which is heavy and
     // immutable so it rides this channel instead of re-serializing per tick),
@@ -7281,14 +7465,15 @@ describe('delta-key contract pins (anti-drift)', () => {
     // base merge, for 109.
     // The release batch's pending Town Focus and the Spell Crit sheet cell's
     // shared crit core scb (server/self_scalar_wire.ts), at the third
-    // release/v0.44.0 base merge, for 111. (The keys reaching 113 landed
-    // without a note here.) The World PvP Skull Bag's change-gated skb
-    // (server/world_pvp_wire.ts) makes 115. PvP Resurrect's pvr and wait pvrw
-    // make 117.
-    // Allied Hearthstone's bound-hub key ahs adds one delta field.
-    expect(ALL_DELTA_KEYS).toHaveLength(119);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(119);
-    // hmarks adds the Heroic Marks balance alongside the current release keys.
+    // release/v0.44.0 base merge, for 111.
+    // Courier adds its small pose and separately revision-gated custody data.
+    // The Mirefen world-boss branch's Shardpike self keys (lance, lrest, lguide): 119.
+    // The buddy collection adds budOwn and budPend to the integration keys.
+    // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
+    // +2: the courier's courierTravelTicks and courierLegTicks leg timing (PR 4281), for 124.
+    // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 125.
+    expect(ALL_DELTA_KEYS).toHaveLength(131);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(131);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7410,6 +7595,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('bpsl')).toBe(true);
     expect(scraped.has('vault')).toBe(true);
     expect(scraped.has('cvault')).toBe(true);
+    expect(scraped.has('courier')).toBe(true);
+    expect(scraped.has('courierData')).toBe(true);
+    expect(scraped.has('courierTravelTicks')).toBe(true);
+    expect(scraped.has('courierLegTicks')).toBe(true);
     // ...and the narrowing really narrows. A member `emit` is not a delta call,
     // and asserting it on a synthetic source keeps the claim honest even while
     // neither emitter file happens to contain one.
@@ -7458,10 +7647,12 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
     // The World PvP readout wpvp and the King of the Hill readout hill make 109.
     // The release batch's pending Town Focus and Spell Crit core keys make 111.
-    // The World PvP Skull Bag's change-gated skb (server/world_pvp_wire.ts) makes 115.
-    // PvP Resurrect's pvr and its wait pvrw make 117.
-    // Allied Hearthstone's bound-hub key ahs adds one delta field.
-    expect(scraped.size).toBe(119);
+    // The courier's keys and the Shardpike trial's lance, lrest and lguide self emits make 119.
+    // The buddy collection adds budOwn and budPend.
+    // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
+    // The courier's courierTravelTicks and courierLegTicks make 124.
+    // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 125.
+    expect(scraped.size).toBe(131);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7540,6 +7731,10 @@ describe('delta-key contract pins (anti-drift)', () => {
       // The farming own-plot delta: the wire key and the IWorld name share no
       // stem, so a typo on either side would decode onto nothing at all.
       fplot: 'myFarmPlots',
+      courier: 'courierInfo',
+      courierData: 'courierInfo',
+      courierLegTicks: 'courierInfo',
+      courierTravelTicks: 'courierInfo',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);
@@ -8605,6 +8800,50 @@ describe('Consecration snapshot parity', () => {
         rem: 6.5,
       }),
     ]);
+  });
+});
+
+describe('Shipwreck Captain actionable object snapshots', () => {
+  it('round-trips real warning and impact stages with continuous ship clocks', () => {
+    const f = bastionFight('normal', 0, new Set([GHOST_CAPTAIN_ID]));
+    const captain = bastionBoss(f, GHOST_CAPTAIN_ID);
+    putBastion(f, captain, 57, 130);
+    putBastion(f, f.tank, 57, 127);
+    engageBastion(f, captain);
+    tickBastion(f);
+    expect(startGhostCaptainMove(f.sim.ctx, f.inst, captain, 'broadside')).toBe(true);
+    const lanes = liveBastion(f, GHOST_BROADSIDE_LANE);
+    const ship = liveBastion(f, GHOST_BROADSIDE_SHIP)[0];
+    expect(lanes).toHaveLength(5);
+    const client = bareClient(f.tank.id);
+    const apply = () =>
+      (client as unknown as SnapshotApplier).applySnapshot({
+        t: 'snap',
+        ents: JSON.parse(JSON.stringify([...lanes, ship].map((e) => wireEntity(e)))),
+      });
+    apply();
+    expect(client.entities.get(lanes[0].id)).toMatchObject({
+      templateId: GHOST_BROADSIDE_LANE,
+      castingAbility: GHOST_CAPTAIN_BROADSIDE,
+      castTotal: 2.4,
+      castRemaining: 2.4,
+      scale: 28,
+    });
+    expect(client.entities.get(ship.id)).toMatchObject({ castTotal: 3, castRemaining: 3 });
+    runBastion(f, 2.5);
+    expect(lanes[0].templateId).toBe(GHOST_BROADSIDE_FIRE);
+    apply();
+    expect(client.entities.get(lanes[0].id)).toMatchObject({
+      templateId: GHOST_BROADSIDE_FIRE,
+      castingAbility: GHOST_CAPTAIN_BROADSIDE,
+      castTotal: 0.6,
+      castRemaining: 0.5,
+    });
+    expect(client.entities.get(ship.id)).toMatchObject({
+      templateId: GHOST_BROADSIDE_SHIP,
+      castTotal: 3,
+      castRemaining: 0.5,
+    });
   });
 });
 

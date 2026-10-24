@@ -203,6 +203,8 @@ const TREE_ALLOWANCES: ReadonlyArray<[file: string, value: number, anchor: strin
   ['src/render/scene_census_core.ts', 1000000, 'const M = 1000000'],
   // A render megapixel unit, not money.
   ['src/render/post_pixel_budget_core.ts', 1000000, 'MEGAPIXEL'],
+  // The Studio Rock tool's seed modulus (rock_gen.ts, twice): a hash range, not money.
+  ['src/render/rock_gen.ts', 100000, 'params.rockSeed ?? 0) % 100000'],
   // The WIRE-BOUNDARY cap on a client-declared cost, not a price and not from
   // any price table: it mirrors STORAGE_MAX_EXPECTED_COST_CLAUDIUM
   // (server/storage_purchases.ts), which is deliberately far ABOVE every real

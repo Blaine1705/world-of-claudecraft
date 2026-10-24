@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus di specializzazione',
+  'hudChrome.specPanel.healing': 'guarigione',
+  'hudChrome.specPanel.absorption': 'assorbimento dei danni',
+  'hudChrome.specPanel.physicalAbilityDamage': 'danni delle abilità in mischia e a distanza',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Aumenta le cure primarie del {pct} dopo gli altri bonus alle cure.',
   'hud.pet.assist': 'Assistenza',
   'hud.pet.assistDesc':
     "Attacca solo il tuo bersaglio attuale, dopo che hai usato un'abilità su di esso. Ignora i nemici che ti attaccano.",
@@ -1313,7 +1319,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Riceverai anche:',
   'hudChrome.weekly.anyDifficulty': 'Qualsiasi difficoltà',
   'hudChrome.weekly.cacheDesc':
-    "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set), più {count} x {item}.",
+    "Si apre in un pezzo d'incursione Normale per la tua classe (mai un pezzo di set di Ignivar), più {count} x {item}.",
   'hudChrome.weekly.choose': 'Scegli missione',
   'hudChrome.weekly.chosen': 'Missione settimanale presa: {category}',
   'hudChrome.weekly.close': 'Chiudi le missioni settimanali',
@@ -5186,7 +5192,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Posseduto',
   'hudChrome.warfareShop.weapons': 'Armi',
   'itemUi.market.saleBuyer': 'Venduto a {buyer}',
-  'itemUi.market.saleOlder': 'Più {count} vendite precedenti, incluse nel totale.',
+  'itemUi.market.saleOlder': 'Più {count} vendite precedenti non elencate.',
   'itemUi.tooltip.maxStack': 'Pila massima: {count}',
   'hud.system.deathRecapAbility': 'Sei morto. Ucciso da {ability}.',
   'hud.system.deathRecapDrowned': 'Sei morto. Sei annegato.',
@@ -6200,6 +6206,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Cacciatori a sangue freddo con un sibilo e uno scatto tutti loro, ben distinti dalle bestie a sangue caldo.',
   'guide.family.reptile.name': 'Rettili',
   'hudChrome.auraEffect.damageReduction': 'Riduce tutti i danni subiti del {pct}%',
+  'hudChrome.auraEffect.slumber':
+    "Dorme fino all'alba. Non può essere attaccato e non si sveglierà per nessuno.",
   'hudChrome.auraEffect.guardianWard':
     'Il prossimo colpo nemico letale ti ripristina al {pct}% della salute',
   'hudChrome.bags.dragDestroyHint': 'Trascina nel mondo per distruggere',
@@ -8005,6 +8013,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Termini di servizio',
   'footer.privacy': 'Informativa sulla privacy',
   'footer.discordLabel': 'Entra nel Discord',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Classifica dei punteggi più alti',
   'highscores.desc': 'Segui i più grandi campioni del mondo e confronta i tuoi progressi.',
   'wiki.title': 'Wiki e guida del gioco',
@@ -10622,6 +10631,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Tumuli troll',
   'entities.zones.mirefen_marsh.pois.6.label': 'Campo Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'Il Bastione Sommerso',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Dominio dei Tumuli',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Cratere della Stella Caduta',
   'entities.zones.thornpeak_heights.name': 'Alture di Thornpeak',
   'entities.zones.thornpeak_heights.welcome':
     'Il capitano Thessaly tiene a stento il muro di Highwatch.',
@@ -11131,7 +11142,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, il Picco Risvegliato',
   'entities.mobs.thunzharr_stormling.name': 'Elementale di tempesta ridestato',
   'entities.mobs.stable_horse.name': 'Cavallo da stalla',
-  'hudChrome.worldBoss.spawn': '{name} si erge sulle Alture di Thornpeak!',
+  'hudChrome.worldBoss.spawn': '{name} si erge su {zone}!',
+  'hudChrome.worldBoss.wake': '{name} si sveglia su {zone}!',
+  'hudChrome.worldBoss.sleep': "{name} dorme fino all'alba.",
   'entities.items.stormcallers_spaulders.name': 'Spallacci Galecall',
   'entities.items.bonewrought_greatsword.name': 'Spadone Bonewrought',
   'entities.items.direfang_greatblade.name': 'Gran lama Direfang',
@@ -15443,6 +15456,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Mantello di Crepuspina',
   'entities.items.fenbark_leggings.name': 'Gambali di Corteciamarcita',
   'entities.items.fenshadow_maul.name': "Maglio dell'Ombra Paludosa",
+  'entities.items.skerrits_shardpike.name': 'Picca di Schegge di Skerrit',
+  'entities.items.foremans_barrowmaul.name': 'Mazza Tumulare del Caposquadra',
+  'entities.items.barrowhide_pauldrons.name': 'Spallacci Tumulari',
+  'entities.items.mirestone_stride.name': 'Passo di Pietrafanghiglia',
+  'entities.items.foremans_wage_band.name': 'Anello della paga del Caposquadra',
+  'entities.items.mirelight_locket.name': 'Medaglione della luce di palude',
+  'entities.items.fenwright_grips.name': "Guanti dell'Artigiano di Palude",
   'entities.items.fenwarden_sabatons.name': 'Sabatons del Guardiano delle Paludi',
   'entities.items.gravewyrm_thornmaul.name': 'Maglio Spinoso del Wyrm della Tomba',
   'entities.items.grovewardens_grips.name': 'Guanti del Custode del Boschetto',
@@ -16371,7 +16391,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     "Passivo: con Slancio di Caccia, Rompipista prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Colpo Sventratore infligge il 15% di danni in più per accumulo. Uncino Sanguinario infligge da 18 a 24 danni fisici aggiuntivi, aumentati del 15% per accumulo e dalla potenza d'attacco a distanza. Con 3 accumuli, uno qualunque dei due attacchi consuma Slancio di Caccia. (Sopravvivenza)",
   'entities.abilities.frostjaw_trap.description':
-    'Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
+    'Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min, e solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
   'entities.abilities.hunting_momentum.description':
     "Passivo: Colpo Sventratore e una Carica a Frammentazione che colpisce un nemico forniscono ciascuno 1 Slancio di Caccia, fino a 3. Dura fino al consumo o all'uscita dal combattimento; ogni accumulo aumenta del 15% la velocità. Con 3 accumuli, Squarciaferite infligge il 60% di danni da colpo in più e li consuma. (Sopravvivenza)",
   'entities.abilities.measured_shot.description':
@@ -20373,7 +20393,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Consuma i tuoi 5 punti di Verzura: ogni alleato con i tuoi effetti di cura periodica riceve subito il {buff}% delle cure rimanenti, gli effetti vengono rimossi e il bersaglio riceve una nuova Cura delle Spore.',
   'entities.abilities.play_dead.description':
-    "Cadi a terra e fingi di essere morto: tutti vedono salute e Concentrazione vuote. I nemici ti dimenticano e i giocatori nemici che ti selezionano perdono il bersaglio. Muoversi, attaccare o usare un'altra abilità termina l'effetto. Usa di nuovo per rialzarti.",
+    "Cadi a terra e fingiti morto: la tua salute e la tua concentrazione risultano vuote per tutti. I nemici si dimenticano di te, e i giocatori nemici che ti hanno come bersaglio lo perdono. Muoverti, attaccare o usare un'altra abilità lo interrompe. Se lo lanci mentre ti muovi, hai 1 s per fermarti prima che il movimento lo interrompa. Lancialo di nuovo per rialzarti.",
   'entities.abilities.play_dead.name': 'Fingere la morte',
   'entities.abilities.rejuvenation.name': 'Cura delle Spore',
   'entities.abilities.scratch.description':
@@ -20448,4 +20468,25 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Puoi modificare questa scelta in qualsiasi momento in Opzioni, sotto Qualità grafica.',
   'graphicsPrompt.confirm': 'Continua',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Trappola per Orsi',
+  'entities.abilities.bear_trap.description':
+    'Piazza una trappola nel punto selezionato. Si arma dopo 0,75 s e dura 1 min; solo tu e il tuo gruppo potete vederla. Il primo nemico che la attiva sanguina per {damage} danni fisici in 15 s ed è rallentato del 50% per 4 s. I danni aumentano con la Potenza d’Attacco a Distanza. Può essere attiva una sola Trappola per Orsi alla volta. Può coesistere con la tua Trappola Fauci di Gelo. Piazzare un’altra Trappola per Orsi sostituisce la precedente.',
+  'entities.abilities.scatterbolt.name': 'Ventaglio di Dardi',
+  'entities.abilities.scatterbolt.description':
+    'Spara una raffica di dardi in un cono di 90 gradi che si estende per 8 metri davanti a te, respingendo i nemici fino a una distanza massima di 20 metri da te. I nemici immuni alle respinte non subiscono effetti. Non infligge danni.',
+  'entities.abilities.phosphor_flask.name': 'Fiasca di Fosforo',
+  'entities.abilities.phosphor_flask.description':
+    "Un recipiente sigillato contenente una miscela chimica reattiva che esplode in fiamme incandescenti su un'area di 8 m per 3 s. I nemici che restano tra le fiamme subiscono {damage} danni da Fuoco ogni 0,5 s. Il danno aumenta con la potenza d'attacco a distanza.",
+  'entities.items.lychgate_buckler.name': 'Brocchiere del cancello del cimitero',
+  'entities.items.bastion_kite_shield.name': 'Scudo a goccia del bastione',
+  'entities.items.barrowfield_tower_shield.name': 'Scudo torre del Campo dei Tumuli',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barra delle risorse',
+  'hudChrome.options.hillBarOpacity': 'Opacità dello sfondo del Re della Collina',
+  'hudChrome.options.playerFrameResourceDetached': 'Separa barra delle risorse',
+  'hudChrome.options.playerFrameResourceHeight': 'Altezza della barra delle risorse',
+  'hudChrome.options.playerFrameResourceWidth': 'Larghezza della barra delle risorse',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Attiva Separa barra delle risorse nella scheda Riquadri: Modifica riquadri sbloccherà anche la barra delle risorse, permettendoti di posizionare mana, energia o rabbia separatamente dove preferisci. Larghezza della barra delle risorse e Altezza della barra delle risorse, nella stessa scheda, ne regolano le dimensioni. Modifica riquadri sblocca anche la barra del Re della Collina; Opacità dello sfondo del Re della Collina, nella stessa scheda, attenua il pannello mantenendo il testo ben leggibile.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

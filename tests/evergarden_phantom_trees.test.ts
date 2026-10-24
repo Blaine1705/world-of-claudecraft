@@ -16,12 +16,12 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 describe('Evergarden phantom scatter', () => {
   it('lets a player walk the lawn beside the Hedgewick house (the reported wall)', () => {
-    // x = 322 runs north past hexHomeA (328, 838, r 5.2) a yard clear of its
-    // collider; a hidden pine trunk at (322.48, 841.82) used to close it.
+    // The painted green house now occupies the old reported x = 322 path.
+    // x = 310 runs along its west lawn, clear of the visible house collider.
     let maxDeflection = 0;
     for (let z = 834; z <= 848; z += 0.2) {
-      const pos = resolvePosition(WORLD_SEED, 322, z, PLAYER_BODY_RADIUS);
-      maxDeflection = Math.max(maxDeflection, Math.hypot(pos.x - 322, pos.z - z));
+      const pos = resolvePosition(WORLD_SEED, 310, z, PLAYER_BODY_RADIUS);
+      maxDeflection = Math.max(maxDeflection, Math.hypot(pos.x - 310, pos.z - z));
     }
     expect(maxDeflection).toBe(0);
   });
@@ -29,15 +29,15 @@ describe('Evergarden phantom scatter', () => {
   it('walks a live player straight past the house on the real movement kernel', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     const p = sim.player;
-    p.pos.x = 322;
+    p.pos.x = 310;
     p.pos.z = 834;
-    p.pos.y = terrainHeight(322, 834, WORLD_SEED);
+    p.pos.y = terrainHeight(310, 834, WORLD_SEED);
     p.prevPos = { ...p.pos };
     p.facing = 0; // due north (+z)
     sim.moveInput.forward = true;
     for (let i = 0; i < 20 * 4 && p.pos.z < 846; i++) sim.tick();
     expect(p.pos.z).toBeGreaterThan(846);
-    expect(Math.abs(p.pos.x - 322)).toBeLessThan(0.05);
+    expect(Math.abs(p.pos.x - 310)).toBeLessThan(0.05);
   });
 
   it('generates no garden pine and nothing within the parterre margin', () => {

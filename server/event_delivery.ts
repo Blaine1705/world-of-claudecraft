@@ -44,6 +44,13 @@ export function shouldDeliverCombatEventToViewer(
   // An absorb credit is healing-shaped (shielder -> shielded): same scope.
   if (ev.type === 'absorb')
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
+  // A hidden hunter trap's placement and armed shimmer: only its owner and the
+  // owner's group may learn where it lies, so enemy players walk into it blind.
+  if (ev.type === 'spellfxAt' && ev.concealedFromHostiles) {
+    if (ev.sourceId === undefined) return false;
+    const owner = principalOf(ev.sourceId, ownerOf);
+    return owner === viewerPid || viewerParty?.members.includes(owner) === true;
+  }
   return true;
 }
 

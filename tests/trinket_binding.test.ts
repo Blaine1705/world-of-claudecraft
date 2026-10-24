@@ -4,22 +4,23 @@ import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 
 const PVP_TRINKETS = ['medallion_of_defiance', 'duelists_brand'];
+const BOUND_TRINKETS = [...PVP_TRINKETS, 'referral_hollow_charm', 'referral_fog_charm'];
 const trinkets = Object.values(ITEMS).filter((item) => item.slot === 'trinket');
 
 describe('trinket soulbinding', () => {
-  it('binds only the two PvP vendor trinkets in the merged item catalog', () => {
+  it('binds the PvP vendor and referral trinkets in the merged item catalog', () => {
     expect(WARFARE_TRINKET_STOCK).toEqual(PVP_TRINKETS);
-    expect(trinkets).toHaveLength(18);
+    expect(trinkets).toHaveLength(31);
     expect(
       trinkets
         .filter((item) => item.soulbound)
         .map((item) => item.id)
         .sort(),
-    ).toEqual([...PVP_TRINKETS].sort());
+    ).toEqual([...BOUND_TRINKETS].sort());
   });
 
   it.each(trinkets)(
-    '$id can be listed on the World Market only when it is not PvP gear',
+    '$id can be listed on the World Market only when it is not bound reward gear',
     (item) => {
       const sim = new Sim({ seed: 42, playerClass: 'warrior' });
       const merchant = [...sim.entities.values()].find(
@@ -32,7 +33,7 @@ describe('trinket soulbinding', () => {
 
       sim.marketList(item.id, 1, 100);
 
-      const bound = PVP_TRINKETS.includes(item.id);
+      const bound = BOUND_TRINKETS.includes(item.id);
       expect(
         sim.marketListings.some((listing) => !listing.house && listing.itemId === item.id),
       ).toBe(!bound);

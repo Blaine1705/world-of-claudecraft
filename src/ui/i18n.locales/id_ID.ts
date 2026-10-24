@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus spesialisasi',
+  'hudChrome.specPanel.healing': 'pemulihan',
+  'hudChrome.specPanel.absorption': 'penyerapan kerusakan',
+  'hudChrome.specPanel.physicalAbilityDamage': 'kerusakan kemampuan jarak dekat dan jarak jauh',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Meningkatkan pemulihan utama sebesar {pct} setelah bonus pemulihan lainnya diterapkan.',
   'hud.pet.assist': 'Bantu',
   'hud.pet.assistDesc':
     'Hanya menyerang targetmu saat ini setelah kamu menggunakan kemampuan padanya. Mengabaikan musuh yang menyerangmu.',
@@ -1130,7 +1136,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Kamu juga akan menerima:',
   'hudChrome.weekly.anyDifficulty': 'Kesulitan apa pun',
   'hudChrome.weekly.cacheDesc':
-    'Membuka satu potongan serangan Normal untuk kelasmu (tidak pernah potongan set tingkat), plus {count} x {item}.',
+    'Membuka satu potongan serangan Normal untuk kelasmu (tidak pernah potongan set tingkat Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Pilih misi',
   'hudChrome.weekly.chosen': 'Misi mingguan diambil: {category}',
   'hudChrome.weekly.close': 'Tutup misi mingguan',
@@ -5100,7 +5106,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Dimiliki',
   'hudChrome.warfareShop.weapons': 'Senjata',
   'itemUi.market.saleBuyer': 'Terjual kepada {buyer}',
-  'itemUi.market.saleOlder': 'Ditambah {count} penjualan sebelumnya, termasuk dalam total.',
+  'itemUi.market.saleOlder': 'Ditambah {count} penjualan sebelumnya yang tidak ditampilkan.',
   'itemUi.tooltip.maxStack': 'Tumpukan maks: {count}',
   'hud.system.deathRecapAbility': 'Kamu telah tewas. Tewas oleh {ability}.',
   'hud.system.deathRecapDrowned': 'Kamu telah tewas. Kamu tenggelam.',
@@ -6019,6 +6025,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pemburu berdarah dingin dengan desis dan cakitan khas mereka sendiri, berbeda dari hewan berdarah panas.',
   'guide.family.reptile.name': 'Reptil',
   'hudChrome.auraEffect.damageReduction': 'Mengurangi semua kerusakan yang diterima sebesar {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Tertidur hingga fajar. Tidak dapat diserang dan tidak akan bangun untuk siapa pun.',
   'hudChrome.auraEffect.guardianWard':
     'Serangan musuh mematikan berikutnya memulihkanmu menjadi {pct}% kesehatan',
   'hudChrome.bags.dragDestroyHint': 'Seret ke dunia untuk menghancurkan',
@@ -7344,7 +7352,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'h',
   'hudChrome.unitFrame.durationUnitHours': 'j',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} bangkit di atas Dataran Tinggi Thornpeak!',
+  'hudChrome.worldBoss.spawn': '{name} bangkit di atas {zone}!',
+  'hudChrome.worldBoss.wake': '{name} terbangun di atas {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} tertidur hingga fajar.',
   'itemUi.kind.bag': 'Tas',
   'itemUi.tooltip.bagSlots': 'Tas {slots} Slot',
   'itemUi.tooltip.bagSlotsMaterials': 'Tas Bahan {slots} Slot',
@@ -10091,6 +10101,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Gundukan Troll',
   'entities.zones.mirefen_marsh.pois.6.label': 'Perkemahan Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'Benteng Karam',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Wilayah Gundukan',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Kawah Bintang Jatuh',
   'entities.zones.mirefen_marsh.welcome': 'Lapor pada Warden Fenwick di gerbang Jembatan Rawa.',
   'entities.zones.thornpeak_heights.name': 'Dataran Tinggi Thornpeak',
   'entities.zones.thornpeak_heights.pois.0.label': 'Menara Pengawas',
@@ -10345,6 +10357,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'AUGMEN!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Gabung Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Proyek Sumber Terbuka',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Whitepaper',
@@ -15086,6 +15099,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Mantel Duri Senja',
   'entities.items.fenbark_leggings.name': 'Celana Kulit Pohon Rawa',
   'entities.items.fenshadow_maul.name': 'Gada Bayangan Rawa',
+  'entities.items.skerrits_shardpike.name': 'Tombak Serpih Skerrit',
+  'entities.items.foremans_barrowmaul.name': 'Godam Gundukan Sang Mandor',
+  'entities.items.barrowhide_pauldrons.name': 'Bahuan Gundukan',
+  'entities.items.mirestone_stride.name': 'Langkah Batu Rawa',
+  'entities.items.foremans_wage_band.name': 'Cincin Upah Mandor',
+  'entities.items.mirelight_locket.name': 'Liontin Cahaya Rawa',
+  'entities.items.fenwright_grips.name': 'Genggaman Tukang Rawa',
   'entities.items.fenwarden_sabatons.name': 'Sabaton Penjaga Rawa',
   'entities.items.gravewyrm_thornmaul.name': 'Gada Duri Wyrm Kubur',
   'entities.items.grovewardens_grips.name': 'Sarung Tangan Penjaga Rumpun',
@@ -16037,7 +16057,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasif: Dengan Momentum Berburu, Putus Jejak menyiapkan Serangan Cabik Perut atau Kait Darah berikutnya selama 12 dtk. Serangan Cabik Perut memberikan 15% kerusakan tambahan per tumpukan. Kait Darah memberikan tambahan 18 hingga 24 kerusakan Fisik, ditingkatkan 15% per tumpukan dan oleh Daya Serang Jarak Jauh. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Bertahan Hidup)',
   'entities.abilities.frostjaw_trap.description':
-    'Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
+    'Menempatkan jerat di lokasi terpilih. Ia aktif setelah 0,75 dtk dan bertahan 1 menit, dan hanya kamu dan kelompokmu yang dapat melihatnya. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk.',
   'entities.abilities.hunting_momentum.description':
     'Pasif: Serangan Cabik Perut dan Muatan Serpihan yang mengenai musuh masing-masing memberi 1 Momentum Berburu, maksimal 3. Bertahan hingga dihabiskan atau kamu keluar dari pertempuran; setiap tumpukan meningkatkan kecepatan gerak sebesar 15%. Pada 3 tumpukan, Robekan Luka memberikan 60% kerusakan serangan lebih besar dan menghabiskan tumpukan. (Bertahan Hidup)',
   'entities.abilities.measured_shot.description':
@@ -20203,7 +20223,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Menghabiskan 5 Kehijauanmu: setiap sekutu dengan efek penyembuhan berkalamu langsung dipulihkan sebesar {buff}% sisa penyembuhannya, efek tersebut dihapus, dan target mendapat Pemulihan Spora baru.',
   'entities.abilities.play_dead.description':
-    'Jatuhkan diri dan pura-pura mati: kesehatan dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target. Bergerak, menyerang, atau memakai kemampuan lain mengakhirinya. Gunakan lagi untuk bangkit.',
+    'Menjatuhkan diri ke tanah dan tampak mati: nyawa dan Fokusmu terlihat kosong bagi semua orang. Musuh melupakanmu, dan pemain musuh yang menargetkanmu kehilangan target mereka. Bergerak, menyerang, atau menggunakan kemampuan lain mengakhirinya. Jika digunakan saat bergerak, kamu punya 1 dtk untuk berhenti sebelum gerakan mengakhirinya. Gunakan lagi untuk bangun.',
   'entities.abilities.play_dead.name': 'Pura-pura Mati',
   'entities.abilities.rejuvenation.name': 'Pemulihan Spora',
   'entities.abilities.scratch.description':
@@ -20274,4 +20294,25 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Preset tetap dengan tampilan paling kaya. Cocok untuk kartu grafis kelas atas.',
   'graphicsPrompt.changeLater': 'Kamu bisa mengubahnya kapan saja di Opsi, pada Kualitas Grafik.',
   'graphicsPrompt.confirm': 'Lanjutkan',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Jerat Beruang',
+  'entities.abilities.bear_trap.description':
+    'Pasang jerat di lokasi pilihan. Jerat siap setelah 0,75 detik dan bertahan 1 menit; hanya kamu dan grupmu yang bisa melihatnya. Musuh pertama yang memicunya mengalami pendarahan sebesar {damage} kerusakan Fisik selama 15 detik dan diperlambat 50% selama 4 detik. Kerusakan meningkat seiring Daya Serang Jarak Jauh. Hanya satu Jerat Beruang yang dapat aktif pada satu waktu. Jerat ini dapat aktif bersamaan dengan Jerat Rahang Bekumu. Memasang Jerat Beruang baru menggantikan yang sebelumnya.',
+  'entities.abilities.scatterbolt.name': 'Panah Sebar',
+  'entities.abilities.scatterbolt.description':
+    'Tembakkan hujan anak panah dalam kerucut 90 derajat sejauh 8 yard di depanmu, memukul mundur musuh hingga berjarak paling jauh 20 yard darimu. Musuh yang kebal terhadap pukulan mundur tidak terpengaruh. Tidak menimbulkan kerusakan.',
+  'entities.abilities.phosphor_flask.name': 'Labu Fosfor',
+  'entities.abilities.phosphor_flask.description':
+    'Bejana tersegel berisi campuran kimia reaktif yang meledak menjadi api putih membara di area 8 meter selama 3 dtk. Musuh yang berdiri di dalam api menerima {damage} kerusakan Api setiap 0,5 dtk. Kerusakan meningkat dengan kekuatan serang jarak jauh.',
+  'entities.items.lychgate_buckler.name': 'Perisai Bundar Gerbang Makam',
+  'entities.items.bastion_kite_shield.name': 'Perisai Layang Benteng',
+  'entities.items.barrowfield_tower_shield.name': 'Perisai Menara Padang Gundukan Makam',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Bilah sumber daya',
+  'hudChrome.options.hillBarOpacity': 'Opasitas latar Raja Bukit',
+  'hudChrome.options.playerFrameResourceDetached': 'Pisahkan bilah sumber daya',
+  'hudChrome.options.playerFrameResourceHeight': 'Tinggi bilah sumber daya',
+  'hudChrome.options.playerFrameResourceWidth': 'Lebar bilah sumber daya',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Aktifkan Pisahkan bilah sumber daya pada tab Bingkai agar Edit Bingkai juga membuka kunci bilah sumber dayamu, sehingga mana, energi, atau amarah dapat ditempatkan sendiri di mana saja. Lebar bilah sumber daya dan Tinggi bilah sumber daya pada tab yang sama mengatur ukurannya. Edit Bingkai juga membuka kunci bilah Raja Bukit. Opasitas latar Raja Bukit pada tab itu memudarkan panelnya tanpa mengurangi kejelasan teks.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

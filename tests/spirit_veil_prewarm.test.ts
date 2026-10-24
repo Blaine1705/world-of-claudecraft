@@ -111,8 +111,14 @@ describe('the family stand-ins', () => {
       expect(spiritVeilPassOf(material), key).toBe(tuple.pass);
       if (tuple.pass === 'depth') {
         // the very material every live sibling of that shape wears
-        expect(material).toBe(spiritVeilDepthMaterial(spiritVeilShapeKey(mesh)));
-        expect(spiritVeilShapeKey(mesh)).toBe(key);
+        if (!tuple.woc) {
+          expect(material).toBe(spiritVeilDepthMaterial(spiritVeilShapeKey(mesh)));
+          expect(spiritVeilShapeKey(mesh)).toBe(key);
+        } else {
+          // Merged heads share live slot visibility with their own depth material.
+          expect(material.customProgramCacheKey()).toContain('woc');
+          expect(key).toBe(`${spiritVeilShapeKey(mesh)}!woc-${tuple.woc}`);
+        }
       } else {
         expect(spiritVeilKeysFor(material, mesh)?.[0], key).toBe(key);
       }

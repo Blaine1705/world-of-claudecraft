@@ -412,6 +412,24 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
 });
 
 describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
+  it.each([2, 20])(
+    'a Hunter at %s yards emits the ranged animation signal without a dead zone',
+    (distance) => {
+      const { sim, p, meta } = makeSim('hunter', 12);
+      spawnDummy(sim, p, 1, distance);
+      p.autoAttack = true;
+      p.swingTimer = 0;
+      const events = capture(sim);
+      updatePlayerAutoAttack(sim.ctx, p, meta);
+      const melee = events.filter((event) => event.type === 'damage' && event.sourceId === p.id);
+      const shots = events.filter(
+        (event) => event.type === 'spellfx' && event.attackAnimation === 'ranged-shot',
+      );
+      expect(shots).toHaveLength(1);
+      expect(melee).toHaveLength(0);
+    },
+  );
+
   it('a hunter at range takes the ranged branch (Auto Shot), arming ranged-speed cadence', () => {
     const { sim, p, meta } = makeSim('hunter', 12);
     spawnDummy(sim, p, 8, 20); // beyond the 8yd dead zone, within 35

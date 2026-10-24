@@ -1,4 +1,5 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
+import { courierSummon } from '../courier';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
@@ -37,6 +38,7 @@ import { completeAlliedHearthstoneCast } from '../content/faction_rewards';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { instanceInfoAt } from '../instances/dungeons';
+import { completeKitUse, validateKitUse } from '../mob/trash_kit/encounter_use';
 import { forceDismount } from '../mounts';
 import { canActivateDivineAscension, hasDevotion, spendDevotion } from '../paladin_devotion';
 import { notePetAssistCast } from '../pet/pet_assist';
@@ -76,6 +78,7 @@ import {
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   isFormAuraKind,
+  isKitUseCast,
   isNonSpellCast,
   MELEE_ARC,
   MELEE_RANGE,
@@ -280,6 +283,15 @@ export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'shield_slam',
 ]);
 
+// Position spells whose no-aim press (a bare keybind, the RL env) lands on the
+// selected hostile instead of the caster's feet.
+const SELECTED_HOSTILE_AIM_FALLBACK = new Set([
+  'earthquake',
+  'earthbind',
+  'frostjaw_trap',
+  'bear_trap',
+]);
+
 function isStasisToggle(ability: AbilityDef): boolean {
   return ability.effects.some((effect) => effect.type === 'selfBuff' && effect.kind === 'stasis');
 }
@@ -300,6 +312,10 @@ function shellskinBlocksAbility(entity: Entity, meta: PlayerMeta, ability: Abili
       'hunterBloodhook',
       'hunterShrapnel',
       'frostjawTrap',
+      // Volley and Phosphor Flask are instant ground zones since PR 4488.
+      'groundAoE',
+      'hunterBearTrap',
+      'hunterScatterbolt',
     ].includes(effect.type),
   );
 }
@@ -583,6 +599,12 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     cancelCast(ctx, p);
     return;
   }
+  // A trash-engine use (mob/trash_kit/encounter_use.ts, G3): the same full
+  // per-tick recheck (the body still standing, still in reach).
+  if (isKitUseCast(p.castingAbility) && !validateKitUse(ctx, p)) {
+    cancelCast(ctx, p);
+    return;
+  }
   if (activeCast && p.channeling) syncPaladinAegisProtection(ctx, p, activeCast);
   p.castRemaining -= DT;
 
@@ -689,6 +711,11 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // arms' own comment on the pattern).
     if (castId === CORPSE_HARVEST_CAST_ID) {
       completeCorpseHarvestCast(ctx, p, meta);
+      return;
+    }
+    // A trash-engine use (G3): same route-then-return shape.
+    if (isKitUseCast(castId)) {
+      completeKitUse(ctx, p, castId ?? '', p.castTargetId);
       return;
     }
     // Craft cast completion: same non-spell route as gather. castStop success
@@ -1171,6 +1198,10 @@ export function castAbility(
       p.queuedCastTargetId = castTargetId;
     }
     return; // an earlier press stays silent, classic spams this
+  }
+  if (abilityId === 'courier') {
+    courierSummon(ctx, p.id);
+    return;
   }
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // sharedCooldownIds generalizes the release's shaman-shock special case (it
@@ -1760,11 +1791,12 @@ export function castAbility(
         return;
       }
     } else {
-      // Faultwake's keybind default is the selected hostile; other position
-      // spells retain the canonical at-feet fallback. Clamp the selected point
-      // through the same authoritative range rule as explicit ground input.
+      // Faultwake's (and the hunter traps') keybind default is the selected
+      // hostile; other position spells retain the canonical at-feet fallback.
+      // Clamp the selected point through the same authoritative range rule as
+      // explicit ground input.
       const selected =
-        (ability.id === 'earthquake' || ability.id === 'earthbind') && p.targetId !== null
+        SELECTED_HOSTILE_AIM_FALLBACK.has(ability.id) && p.targetId !== null
           ? (ctx.entities.get(p.targetId) ?? null)
           : null;
       const fallback =

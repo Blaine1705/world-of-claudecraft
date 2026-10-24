@@ -441,6 +441,7 @@ async function loaderOn(
     GLTFLoader: class {
       setMeshoptDecoder(): void {}
       setKTX2Loader(): void {}
+      register(): void {}
       load(_url: string, onLoad: (g: unknown) => void): void {
         onLoad(gltfFor());
       }

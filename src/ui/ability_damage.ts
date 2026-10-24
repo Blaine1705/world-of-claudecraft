@@ -18,6 +18,7 @@
 // tests/ability_damage.test.ts and tests/v042_balance_tooltips.test.ts;
 // hud.ts is the thin consumer.
 import type { AbilityOutputScaling } from '../sim/ability_output_scaling';
+import { hunterTrapBleedAmounts } from '../sim/combat/hunter_trap_bleed';
 import { benisonPrayerHealingMultiplier } from '../sim/combat/priest/benison_dawnweave';
 import type { ResolvedAbility } from '../sim/sim';
 import {
@@ -182,6 +183,19 @@ export function abilityDamageBonus(
   }
 }
 
+/** Bear Trap's complete rounded bleed, from the same tick rounding as combat.
+ *  Its custom effect snapshots Ranged AP directly rather than spell coefficients. */
+export function abilityBearTrapBleedTotal(
+  effect: Extract<AbilityEffect, { type: 'hunterBearTrap' }>,
+  scaling?: AbilityScaling,
+): number {
+  return hunterTrapBleedAmounts({
+    total: effect.bleedTotal + (scaling?.rangedPower ?? 0) * effect.rangedPowerCoeff,
+    duration: effect.bleedDuration,
+    interval: effect.bleedInterval,
+  }).total;
+}
+
 /** The v0.42 primary-healing spec factor (Spiritmend, Sunmender, Groveheart;
  *  `res.outputScaling.primaryHealing`, matching primary_healing.ts's
  *  `scalePrimaryHealing`) folded onto the COMPLETE base-plus-power heal or
@@ -286,6 +300,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'faerieFire' ||
       eff.type === 'lifeTap' ||
       eff.type === 'hunterBloodhook' ||
+      eff.type === 'hunterBearTrap' ||
       eff.type === 'hunterStampede' ||
       eff.type === 'afflictionLitany',
   );

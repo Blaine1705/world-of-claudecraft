@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Thưởng chuyên môn',
+  'hudChrome.specPanel.healing': 'hồi máu',
+  'hudChrome.specPanel.absorption': 'hấp thụ sát thương',
+  'hudChrome.specPanel.physicalAbilityDamage': 'sát thương kỹ năng cận chiến và tầm xa',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Tăng lượng hồi máu chính thêm {pct} sau khi áp dụng các mức thưởng hồi máu khác.',
   'hud.pet.assist': 'Hỗ trợ',
   'hud.pet.assistDesc':
     'Chỉ tấn công mục tiêu hiện tại sau khi bạn dùng kỹ năng lên mục tiêu đó. Bỏ qua kẻ địch tấn công bạn.',
@@ -1114,7 +1120,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Bạn cũng sẽ nhận được:',
   'hudChrome.weekly.anyDifficulty': 'Bất kỳ độ khó nào',
   'hudChrome.weekly.cacheDesc':
-    'Mở thành một mảnh trang phục Cấp độ Bình thường cho lớp của bạn (không bao giờ là mảnh trang phục phân tầng), cộng với {count} x {item}.',
+    'Mở thành một mảnh trang phục Cấp độ Bình thường cho lớp của bạn (không bao giờ là mảnh trang phục phân tầng của Ignivar), cộng với {count} x {item}.',
   'hudChrome.weekly.choose': 'Chọn nhiệm vụ',
   'hudChrome.weekly.chosen': 'Nhiệm vụ hàng tuần đã chọn: {category}',
   'hudChrome.weekly.close': 'Đóng nhiệm vụ hàng tuần',
@@ -5068,7 +5074,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Sở Hữu',
   'hudChrome.warfareShop.weapons': 'Vũ Khí',
   'itemUi.market.saleBuyer': 'Đã bán cho {buyer}',
-  'itemUi.market.saleOlder': 'Cộng thêm {count} lượt bán trước đó, đã được tính vào tổng.',
+  'itemUi.market.saleOlder': 'Cộng thêm {count} lượt bán trước đó không được liệt kê.',
   'itemUi.tooltip.maxStack': 'Chồng tối đa: {count}',
   'hud.system.deathRecapAbility': 'Bạn đã chết. Bị hạ gục bởi {ability}.',
   'hud.system.deathRecapDrowned': 'Bạn đã chết. Bạn đã chết đuối.',
@@ -5983,6 +5989,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng.',
   'guide.family.reptile.name': 'Bò Sát',
   'hudChrome.auraEffect.damageReduction': 'Giảm {pct}% toàn bộ sát thương nhận vào',
+  'hudChrome.auraEffect.slumber':
+    'Ngủ đến bình minh. Không thể bị tấn công và sẽ không thức giấc vì bất kỳ ai.',
   'hudChrome.auraEffect.guardianWard':
     'Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu',
   'hudChrome.bags.dragDestroyHint': 'Kéo ra ngoài thế giới để hủy bỏ',
@@ -7362,7 +7370,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'ng',
   'hudChrome.unitFrame.durationUnitHours': 'g',
   'hudChrome.unitFrame.durationUnitMinutes': 'ph',
-  'hudChrome.worldBoss.spawn': '{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!',
+  'hudChrome.worldBoss.spawn': '{name} trỗi dậy trên {zone}!',
+  'hudChrome.worldBoss.wake': '{name} thức giấc trên {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} ngủ đến bình minh.',
   'itemUi.kind.bag': 'Túi',
   'itemUi.tooltip.bagSlots': 'Túi {slots} Ô',
   'itemUi.tooltip.bagSlotsMaterials': 'Túi Nguyên Liệu {slots} Ô',
@@ -10077,6 +10087,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Gò Mộ Troll',
   'entities.zones.mirefen_marsh.pois.6.label': 'Doanh Trại Triệu Mộ',
   'entities.zones.mirefen_marsh.pois.7.label': 'Pháo Đài Chìm',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Lãnh Địa Gò Mộ',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Hố Sao Rơi',
   'entities.zones.mirefen_marsh.welcome': 'Hãy trình diện Hộ Vệ Fenwick tại cổng Cầu Đầm.',
   'entities.zones.thornpeak_heights.name': 'Cao Nguyên Đỉnh Gai',
   'entities.zones.thornpeak_heights.pois.0.label': 'Vọng Đài Cao',
@@ -10331,6 +10343,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'CƯỜNG HÓA!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Tham Gia Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Dự Án Mã Nguồn Mở',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Sách trắng',
@@ -14992,6 +15005,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Áo Choàng Gai Hoàng Hôn',
   'entities.items.fenbark_leggings.name': 'Giáp Chân Vỏ Đầm Lầy',
   'entities.items.fenshadow_maul.name': 'Búa Bóng Đầm Lầy',
+  'entities.items.skerrits_shardpike.name': 'Giáo Mảnh của Skerrit',
+  'entities.items.foremans_barrowmaul.name': 'Búa Gò Mộ của Đốc Công',
+  'entities.items.barrowhide_pauldrons.name': 'Giáp Vai Gò Mộ',
+  'entities.items.mirestone_stride.name': 'Bước Đá Đầm Lầy',
+  'entities.items.foremans_wage_band.name': 'Nhẫn Tiền Công của Đốc Công',
+  'entities.items.mirelight_locket.name': 'Mặt Dây Ánh Đầm Lầy',
+  'entities.items.fenwright_grips.name': 'Bao Tay Thợ Đầm Lầy',
   'entities.items.fenwarden_sabatons.name': 'Giáp Chân Vệ Đầm Lầy',
   'entities.items.gravewyrm_thornmaul.name': 'Búa Gai Mộ Long',
   'entities.items.grovewardens_grips.name': 'Găng Vệ Rừng',
@@ -15919,7 +15939,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Bị động: Khi có Đà Săn, Cắt Dấu chuẩn bị Đòn Moi Ruột hoặc Móc Máu kế tiếp trong 12 giây. Đòn Moi Ruột gây thêm 15% sát thương mỗi cộng dồn. Móc Máu gây thêm 18 đến 24 sát thương Vật Lý, tăng 15% mỗi cộng dồn và theo Sức Mạnh Tấn Công Tầm Xa. Khi có 3 cộng dồn, một trong hai đòn tiêu hao Đà Săn. (Sinh Tồn)',
   'entities.abilities.frostjaw_trap.description':
-    'Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
+    'Đặt bẫy tại vị trí được chọn. Bẫy kích hoạt sau 0.75 giây và tồn tại 1 phút, và chỉ bạn cùng nhóm của bạn nhìn thấy được. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
   'entities.abilities.hunting_momentum.description':
     'Bị động: Đòn Moi Ruột và Đạn Mảnh đánh trúng địch mỗi kỹ năng cho 1 Đà Săn, tối đa 3. Kéo dài đến khi tiêu hao hoặc rời giao tranh; mỗi cộng dồn tăng 15% tốc độ di chuyển. Khi có 3 cộng dồn, Xé Vết Thương gây thêm 60% sát thương đòn đánh và tiêu hao cộng dồn. (Sinh Tồn)',
   'entities.abilities.measured_shot.description':
@@ -20047,7 +20067,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Tiêu hao 5 Sắc Xanh: mỗi đồng minh mang hiệu ứng hồi máu theo thời gian của bạn được hồi ngay {buff}% lượng hồi máu còn lại, các hiệu ứng bị xóa và mục tiêu nhận Chữa Lành Bào Tử mới.',
   'entities.abilities.play_dead.description':
-    'Ngã xuống đất giả chết: máu và Tập Trung của bạn hiển thị trống với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang chọn bạn sẽ mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc. Dùng lại để đứng dậy.',
+    'Ngã xuống đất và trông như đã chết: sinh lực và Tập Trung của bạn hiển thị trống rỗng với mọi người. Kẻ địch quên bạn, và người chơi đối địch đang nhắm vào bạn mất mục tiêu. Di chuyển, tấn công hoặc dùng kỹ năng khác sẽ kết thúc hiệu ứng. Nếu thi triển khi đang di chuyển, bạn có 1 giây để dừng lại trước khi việc di chuyển kết thúc hiệu ứng. Thi triển lại để đứng dậy.',
   'entities.abilities.play_dead.name': 'Giả Chết',
   'entities.abilities.rejuvenation.name': 'Chữa Lành Bào Tử',
   'entities.abilities.scratch.description':
@@ -20117,4 +20137,25 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Bạn có thể thay đổi bất cứ lúc nào trong Tùy Chọn, ở mục Chất Lượng Đồ Họa.',
   'graphicsPrompt.confirm': 'Tiếp Tục',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Bẫy Gấu',
+  'entities.abilities.bear_trap.description':
+    'Đặt bẫy tại vị trí đã chọn. Bẫy kích hoạt sau 0,75 giây và tồn tại 1 phút; chỉ bạn và nhóm của bạn nhìn thấy. Kẻ địch đầu tiên giẫm bẫy bị chảy máu, chịu {damage} sát thương Vật lý trong 15 giây và bị làm chậm 50% trong 4 giây. Sát thương tăng theo Sức mạnh Công kích Tầm xa. Mỗi lúc chỉ có thể kích hoạt một Bẫy Gấu. Bẫy này có thể tồn tại cùng Bẫy Hàm Băng của bạn. Đặt Bẫy Gấu mới sẽ thay thế bẫy trước đó.',
+  'entities.abilities.scatterbolt.name': 'Tên Nỏ Tán Xạ',
+  'entities.abilities.scatterbolt.description':
+    'Bắn một loạt tên trong hình nón 90 độ, vươn xa 8 thước phía trước, đẩy lùi kẻ địch ra xa bạn tối đa 20 thước. Kẻ địch miễn nhiễm đẩy lùi không bị ảnh hưởng. Không gây sát thương.',
+  'entities.abilities.phosphor_flask.name': 'Bình Phốt Pho',
+  'entities.abilities.phosphor_flask.description':
+    'Một chiếc bình kín chứa hỗn hợp hóa chất phản ứng, bùng lên thành ngọn lửa trắng nóng rực trên một khu vực 8 mét trong 3 giây. Kẻ địch đứng trong lửa chịu {damage} sát thương Lửa mỗi 0.5 giây. Sát thương tăng theo sức tấn công tầm xa.',
+  'entities.items.lychgate_buckler.name': 'Khiên Tròn Cổng Nghĩa Trang',
+  'entities.items.bastion_kite_shield.name': 'Khiên Cánh Diều Pháo Đài',
+  'entities.items.barrowfield_tower_shield.name': 'Khiên Tháp Cánh Đồng Gò Mộ',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Thanh tài nguyên',
+  'hudChrome.options.hillBarOpacity': 'Độ đục nền Vua của Đồi',
+  'hudChrome.options.playerFrameResourceDetached': 'Tách thanh tài nguyên',
+  'hudChrome.options.playerFrameResourceHeight': 'Chiều cao thanh tài nguyên',
+  'hudChrome.options.playerFrameResourceWidth': 'Chiều rộng thanh tài nguyên',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Bật Tách thanh tài nguyên trong thẻ Khung để Chỉnh Sửa Khung cũng mở khóa thanh tài nguyên, cho phép đặt thanh năng lượng phép, năng lượng hoặc nộ riêng ở bất kỳ đâu. Chiều rộng thanh tài nguyên và Chiều cao thanh tài nguyên trong cùng thẻ sẽ điều chỉnh kích thước của thanh. Chỉnh Sửa Khung cũng mở khóa thanh Vua của Đồi. Độ đục nền Vua của Đồi trong thẻ đó làm mờ nền bảng trong khi chữ vẫn rõ ràng.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

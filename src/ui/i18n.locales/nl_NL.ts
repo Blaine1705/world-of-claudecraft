@@ -2,6 +2,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Specialisatiebonus',
+  'hudChrome.specPanel.healing': 'genezing',
+  'hudChrome.specPanel.absorption': 'schadeabsorptie',
+  'hudChrome.specPanel.physicalAbilityDamage':
+    'schade van vaardigheden voor nabij- en afstandsgevechten',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Verhoogt de primaire genezing met {pct} nadat andere genezingsbonussen zijn toegepast.',
   'hud.pet.assist': 'Assisteren',
   'hud.pet.assistDesc':
     'Valt alleen je huidige doelwit aan nadat je er een vaardigheid op hebt gebruikt. Negeert vijanden die jou aanvallen.',
@@ -1131,7 +1138,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Je krijgt ook:',
   'hudChrome.weekly.anyDifficulty': 'Willekeurige moeilijkheidsgraad',
   'hudChrome.weekly.cacheDesc':
-    'Opent naar één Normaal raid-item voor je klas (nooit een setpiece), plus {count} x {item}.',
+    'Opent naar één Normaal raid-item voor je klas (nooit een setpiece van Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Kies quest',
   'hudChrome.weekly.chosen': 'Weeklijkse quest genomen: {category}',
   'hudChrome.weekly.close': 'Sluit weekelijkse quests',
@@ -5122,7 +5129,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'In bezit',
   'hudChrome.warfareShop.weapons': 'Wapens',
   'itemUi.market.saleBuyer': 'Verkocht aan {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} eerdere verkopen, inbegrepen in het totaal.',
+  'itemUi.market.saleOlder': 'Plus {count} eerdere verkopen die niet worden weergegeven.',
   'itemUi.tooltip.maxStack': 'Max. stapel: {count}',
   'hud.system.deathRecapAbility': 'Je bent gestorven. Gedood door {ability}.',
   'hud.system.deathRecapDrowned': 'Je bent gestorven. Je bent verdronken.',
@@ -6141,6 +6148,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Koudbloedige jagers met een eigen sis en snap, onderscheiden van de warmbloedige dieren.',
   'guide.family.reptile.name': 'Reptielen',
   'hudChrome.auraEffect.damageReduction': 'Vermindert alle schade die je oploopt met {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Slaapt tot de dageraad. Kan niet worden aangevallen en wordt voor niemand wakker.',
   'hudChrome.auraEffect.guardianWard':
     'De volgende dodelijke vijandelijke treffer herstelt je in plaats daarvan naar {pct}% gezondheid',
   'hudChrome.bags.dragDestroyHint': 'Sleep naar buiten in de wereld om te vernietigen',
@@ -6581,6 +6590,13 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Schemeringsdoorn-Mantel',
   'entities.items.fenbark_leggings.name': 'Moeraskors-Beenstukken',
   'entities.items.fenshadow_maul.name': 'Moeraschaduw-Knuppel',
+  'entities.items.skerrits_shardpike.name': 'Skerrits Splinterpiek',
+  'entities.items.foremans_barrowmaul.name': 'Grafheuvelhamer van de Opzichter',
+  'entities.items.barrowhide_pauldrons.name': 'Grafheuvelschouderstukken',
+  'entities.items.mirestone_stride.name': 'Moersteentred',
+  'entities.items.foremans_wage_band.name': 'Loonring van de Voorman',
+  'entities.items.mirelight_locket.name': 'Moeraslicht-medaillon',
+  'entities.items.fenwright_grips.name': 'Grepen van de Moerasbouwer',
   'entities.items.fenwarden_sabatons.name': 'Moeraswacht-Sloffen',
   'entities.items.gravescale_girdle.name': 'Grafschub-Gordel',
   'entities.items.gravewyrm_claws.name': 'Grafwurm-Klauwen',
@@ -7434,7 +7450,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 'u',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} verrijst boven Doorntop-Hoogten!',
+  'hudChrome.worldBoss.spawn': '{name} verrijst boven {zone}!',
+  'hudChrome.worldBoss.wake': '{name} ontwaakt boven {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} slaapt tot de dageraad.',
   'itemUi.kind.bag': 'Tas',
   'itemUi.tooltip.bagSlots': 'Tas met {slots} vakken',
   'itemUi.tooltip.bagSlotsMaterials': 'Materialentas met {slots} vakken',
@@ -9510,6 +9528,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollenheuvels',
   'entities.zones.mirefen_marsh.pois.6.label': 'Grafroeper-Kampement',
   'entities.zones.mirefen_marsh.pois.7.label': 'Het Verzonken Bastion',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Grafheuvelgebied',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Sterrenvalkrater',
   'entities.zones.mirefen_marsh.welcome': 'Meld je bij Wachter Fenwick bij de poort van Veenbrug.',
   'entities.zones.thornpeak_heights.name': 'Doorntop-Hoogten',
   'entities.zones.thornpeak_heights.pois.0.label': 'Hoogwacht',
@@ -9658,6 +9678,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'AUGMENTS!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Word lid van de Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Opensourceproject',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Whitepaper',
@@ -15911,7 +15932,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passief: met Jachtvaart bereidt Spoorbreuk je volgende Ontweiende Slag of Bloedhaak voor 12 sec voor. Ontweiende Slag doet 15% meer schade per stapel. Bloedhaak doet 18 tot 24 extra fysieke schade, verhoogd met 15% per stapel en door afstandsaanvalskracht. Bij 3 stapels verbruikt elk van deze aanvallen Jachtvaart. (Overleving)',
   'entities.abilities.frostjaw_trap.description':
-    'Plaatst een val bij de gekozen vijand of aan je voeten. Hij scherpt na 0,75 sec. en duurt 30 sec. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd.',
+    'Plaatst een val op de gekozen locatie. Hij scherpt na 0,75 sec. en duurt 1 min, en alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd.',
   'entities.abilities.hunting_momentum.description':
     'Passief: Ontweiende Slag en een Scherflading die een vijand raakt geven elk 1 Jachtvaart, tot 3. Blijft tot verbruik of tot je het gevecht verlaat; elke stapel verhoogt je snelheid met 15%. Bij 3 stapels brengt Wondscheur 60% meer slagschade toe en verbruikt de stapels. (Overleving)',
   'entities.abilities.measured_shot.description':
@@ -20217,7 +20238,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Verbruikt je 5 Groenkracht: elke bondgenoot met jouw genezing over tijd wordt direct genezen voor {buff}% van hun resterende genezing, de effecten verdwijnen en het doel krijgt een nieuwe Sporenheling.',
   'entities.abilities.play_dead.description':
-    'Val op de grond en doe alsof je dood bent: je gezondheid en Focus lijken voor iedereen leeg. Vijanden vergeten je en vijandelijke spelers die je geselecteerd hebben verliezen hun doel. Bewegen, aanvallen of een andere vaardigheid gebruiken beëindigt dit. Werp opnieuw om op te staan.',
+    'Valt op de grond en lijkt dood: je gezondheid en focus worden voor iedereen als leeg weergegeven. Vijanden vergeten je, en vijandelijke spelers die je als doelwit hebben, verliezen hun doelwit. Bewegen, aanvallen of een andere vaardigheid gebruiken beëindigt het. Gebruik je het tijdens het bewegen, dan heb je 1 sec. om stil te staan voordat bewegen het beëindigt. Gebruik het opnieuw om op te staan.',
   'entities.abilities.play_dead.name': 'Dood spelen',
   'entities.abilities.rejuvenation.name': 'Sporenheling',
   'entities.abilities.scratch.description':
@@ -20291,4 +20312,25 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Je kunt dit op elk moment wijzigen in Opties, onder Beeldkwaliteit.',
   'graphicsPrompt.confirm': 'Doorgaan',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Berenval',
+  'entities.abilities.bear_trap.description':
+    'Plaats een val op de gekozen locatie. Hij wordt na 0,75 sec. actief en blijft 1 min. liggen; alleen jij en je groep kunnen hem zien. De eerste vijand die hem activeert, bloedt voor {damage} fysieke schade over 15 sec. en wordt 4 sec. lang met 50% vertraagd. De schade neemt toe met afstandsaanvalskracht. Er kan maar één Berenval tegelijk actief zijn. Deze kan tegelijk met je Vorstkaakval bestaan. Een nieuwe Berenval vervangt de vorige.',
+  'entities.abilities.scatterbolt.name': 'Strooischicht',
+  'entities.abilities.scatterbolt.description':
+    'Vuur een salvo kruisboogpijlen af in een kegel van 90 graden die 8 meter voor je uit reikt en duw vijanden terug tot maximaal 20 meter van je vandaan. Vijanden die immuun zijn voor terugduwen worden niet beïnvloed. Richt geen schade aan.',
+  'entities.abilities.phosphor_flask.name': 'Fosforfles',
+  'entities.abilities.phosphor_flask.description':
+    'Een verzegeld vat met een reactief chemisch mengsel dat 3 sec. lang uitbarst in witgloeiende vlammen over een gebied van 8 m. Vijanden in de vlammen krijgen elke 0,5 sec. {damage} Vuurschade. De schade stijgt met de afstandsaanvalskracht.',
+  'entities.items.lychgate_buckler.name': 'Beukelaar van de kerkhofpoort',
+  'entities.items.bastion_kite_shield.name': 'Vliegerschild van het bastion',
+  'entities.items.barrowfield_tower_shield.name': 'Torenschild van het Grafheuvelveld',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Hulpbronnenbalk',
+  'hudChrome.options.hillBarOpacity': 'Achtergronddekking van Koning van de Heuvel',
+  'hudChrome.options.playerFrameResourceDetached': 'Hulpbronnenbalk losmaken',
+  'hudChrome.options.playerFrameResourceHeight': 'Hoogte van de hulpbronnenbalk',
+  'hudChrome.options.playerFrameResourceWidth': 'Breedte van de hulpbronnenbalk',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Schakel Hulpbronnenbalk losmaken in op het tabblad Frames. Frames Bewerken maakt dan ook je hulpbronnenbalk los, zodat je mana, energie of woede afzonderlijk overal kunt neerzetten. Breedte van de hulpbronnenbalk en Hoogte van de hulpbronnenbalk op hetzelfde tabblad bepalen het formaat. Frames Bewerken maakt ook de balk van Koning van de Heuvel los. Achtergronddekking van Koning van de Heuvel op dat tabblad vervaagt het paneel terwijl de tekst duidelijk leesbaar blijft.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

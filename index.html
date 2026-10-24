@@ -381,6 +381,7 @@
       <span class="ctm-arrow ctm-s"></span>
       <span class="ctm-arrow ctm-w"></span>
     </div>
+    <div id="hill-bar" role="status" aria-live="polite"><div id="hill-body"></div></div>
     <div id="talking-head" class="talking-head ui-panel-strong" hidden role="status" data-i18n-aria="hudChrome.talkingHead.label" aria-label="Dialogue">
       <div class="portrait-wrap ui-portrait-wrap th-portrait-wrap"><div class="portrait ui-portrait"><canvas class="th-portrait" width="54" height="54"></canvas></div></div>
       <div class="th-body"><div class="th-name ui-h"></div><div class="th-text"></div></div>
@@ -519,6 +520,7 @@
     </nav>
 
     <div id="right-tracker-stack" class="ui-outline">
+      <div id="dungeon-tracker" role="group"></div>
       <div id="quest-tracker"><div id="qt-body"></div></div>
       <div id="deed-tracker"></div>
       <div id="reliquary-tracker"></div>
@@ -570,7 +572,7 @@
               <div class="combat-flash ui-combat-badge" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" data-crest-fallback-id="status_combat" data-crest-fallback-size="32" alt="" aria-hidden="true" /></div>
               <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
-            <div class="uf-bars">
+            <div class="uf-bars" id="pf-bars">
               <div class="uf-name-header deed-heraldry-plaque ui-ribbon" id="pf-name-header">
                 <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
                   <path id="pf-heraldry-pattern-motif"></path>
@@ -580,11 +582,16 @@
               </div>
               <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
               <div class="bar hp ui-bevel"><div class="bar-fill ui-bevel-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-hp-text"></div></div>
-              <div class="bar mana ui-bevel ui-bevel--res" id="pf-resource"><div class="bar-fill ui-bevel-fill" id="pf-res"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
+              <div id="pf-resource-frame" class="pf-resource-frame"><div class="bar mana ui-bevel ui-bevel--res" id="pf-resource"><div class="bar-fill ui-bevel-fill" id="pf-res"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div></div>
             </div>
           </div>
           <div id="stancebar"></div>
             <div id="petbar" class="panel"></div>
+            <!-- The Shardpike bar: a second action bar that appears only while the quest
+                 pike is in hand (src/ui/hud/shardpike/). Empty here; the painter builds
+                 its buttons on the first visible frame, so a session that never takes the
+                 quest carries no extra chrome. -->
+            <div id="shardpike-bar" class="panel" style="display: none"></div>
           <div id="actionbar-group">
             <div id="actionbar3" class="panel"></div>
             <div id="actionbar2" class="panel"></div>
@@ -749,11 +756,13 @@
     <div id="rift-forge-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel ui-window"></div>
     <div id="weekly-quests-window" class="window panel"></div>
+    <div id="guild-hall-window" class="window panel"></div>
     <div id="claudium-window" class="window panel ui-window"></div>
     <div id="market-window" class="window panel ui-window"></div>
     <div id="woc-market-window" class="window panel ui-window"></div>
     <div id="mailbox-window" class="window panel ui-window"></div>
     <div id="bank-window" class="window panel ui-window"></div>
+    <div id="courier-window" class="window panel ui-window"></div>
     <div id="deeds-window" class="window panel ui-window"></div>
     <div id="reliquary-window" class="window panel ui-window"></div>
     <div id="loot-explorer-window" class="window panel"></div>
@@ -794,7 +803,7 @@
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind ui-keycap">k</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind ui-keycap">x</span></button>
-        <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
+        <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="expedition-bell" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Groups" aria-label="Groups" aria-controls="dungeon-finder-window" aria-haspopup="dialog" data-icon="bell"></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind ui-keycap">o</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind ui-keycap">u</span></button>
         <button type="button" class="micro-btn ui-icon-btn ui-icon-btn--micro" id="mm-wiki" data-i18n-title="nav.wiki" data-i18n-aria="nav.wiki" title="Wiki" aria-label="Wiki" data-icon="wiki"></button>
@@ -818,6 +827,7 @@
     </div>
     <div id="low-health-vignette"></div>
     <div id="subzone-banner" class="ui-cin"></div>
+    <div id="shardpike-prompt"></div>
 
     <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <div class="death-panel ui-panel-strong">
@@ -1904,6 +1914,7 @@
         <a href="https://worldofclaudecraft.com/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.whitepaper">Whitepaper</a>
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
         <a href="/privacy" class="footer-link" data-i18n="footer.privacy">Privacy Policy</a>
+        <a href="https://levystreet.com" class="footer-link" target="_blank" rel="noopener" data-i18n="footer.levyStreet">Levy Street</a>
       </div>
       <div class="footer-lang-row">
         <div class="language-selector">
@@ -2149,6 +2160,19 @@
     </div>
   </div>
 
+  <!-- Dev-only offscreen frame pump, opt-in with ?headless=1. An agent-driven
+       browser pane renders the page hidden, and Chrome then throttles rAF and
+       never fires requestIdleCallback, so the shader prewarm never finishes and
+       world entry hangs. This must install BEFORE any game module runs, hence a
+       separate module script above the entry: module scripts execute in
+       document order, and the top-level await here holds main.ts until the
+       pump is in place. No-ops in production (see headless_pump.ts). -->
+  <script type="module">
+    if (new URLSearchParams(location.search).has('headless')) {
+      const m = await import('/src/dev/headless_pump.ts');
+      m.installHeadlessPump();
+    }
+  </script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

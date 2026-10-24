@@ -23,6 +23,7 @@ import {
   type SupportedLanguage,
   t,
 } from './i18n';
+import { type BaselineEffectLabels, describeSpecBaseline } from './spec_baseline_description';
 import { TALENT_NEW, TALENT_NEW_TITLE_OVERRIDES } from './talent_i18n.newlocales';
 import { RETAINED_ROW_DESCRIPTION_OVERRIDES } from './talent_i18n.row_description_overrides';
 import { RETAINED_ROW_TITLE_OVERRIDES } from './talent_i18n.row_title_overrides';
@@ -11070,6 +11071,7 @@ function effectDescription(
   effect: TalentEffect | undefined,
   maxRank: number,
   lang: SupportedLanguage,
+  baselineLabels?: BaselineEffectLabels,
 ): string {
   if (!effect) return localeText[lang].noEffect;
   const text = localeText[lang];
@@ -11149,7 +11151,9 @@ function effectDescription(
     if (NON_DISPLAY_GLOBALS.has(key)) continue;
     // Fail closed here too: a global key missing from both NON_DISPLAY_GLOBALS and
     // statLabels must never surface as "Increases undefined by 70%".
-    const label: string | undefined = text.statLabels[key as DisplayGlobalKey];
+    const label: string | undefined =
+      (key === 'meleeDmgPct' ? baselineLabels?.physical : undefined) ??
+      text.statLabels[key as DisplayGlobalKey];
     if (label === undefined) continue;
     parts.push(text.increase(label, formatPercent(value, lang), perRank));
   }
@@ -11190,7 +11194,7 @@ function effectDescription(
       const target =
         mod.ability === 'life_tap'
           ? `${name} ${t('classDetails.labels.resource')}`
-          : `${name} ${text.statLabels.damage}`;
+          : `${name} ${baselineLabels?.abilityOutput.get(mod.ability) ?? text.statLabels.damage}`;
       parts.push(text.increase(target, formatPercent(mod.dmgPct, lang), perRank));
     }
     if (mod.flatDmg)
@@ -11263,6 +11267,20 @@ function effectDescription(
   if (effect.proc) parts.push(procDescription(effect.proc, lang, text));
 
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
+}
+
+// Everything a spec gets just for being picked, generated from the data in every
+// locale so the card can never drift from the live numbers: the always-on
+// baseline (spec_baselines.ts) plus the spec_output_tuning.ts multipliers, which
+// never reach the character sheet. Null when the spec has neither.
+export function specBaselineDescription(spec: SpecDef): string | null {
+  const lang = getLanguage();
+  return describeSpecBaseline(
+    spec,
+    localeText[lang],
+    (effect, labels) => effectDescription(effect, 1, lang, labels),
+    (value) => formatPercent(value, lang),
+  );
 }
 
 function className(id: PlayerClass): string {

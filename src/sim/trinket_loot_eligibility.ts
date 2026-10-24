@@ -24,6 +24,18 @@ const USE_ROLE: Record<TrinketUse['kind'], LootRole> = {
   pierce: 'physical',
   lantern: 'healer',
   heartNova: 'utility',
+  friendship: 'utility',
+  shackle: 'utility',
+  spiritPack: 'physical',
+  seedburst: 'caster',
+  tether: 'utility',
+  harvest: 'utility',
+  quench: 'physical',
+  foremanShape: 'utility',
+  musterStandard: 'physical',
+  gutteredGlare: 'caster',
+  grapnel: 'healer',
+  passiveOnly: 'utility',
 };
 
 /** Effects can carry a role even when the item's only stat is Spirit or Stamina. */

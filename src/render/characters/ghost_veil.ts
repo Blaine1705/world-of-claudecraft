@@ -1,3 +1,5 @@
+import { carrySpiritVeilWoc, spiritVeilWocLayer } from './spirit_veil_woc';
+import { reapplyWocHeadDepthToClone, wocHeadMergedTintOf } from './woc_head_tint';
 // The spirit veil: how every translucent character look is drawn, a released
 // spirit (a dead player, `e.ghost`) first, then each user in its palette
 // (spirit_veil_palette_core.ts).
@@ -310,7 +312,12 @@ export function createSpiritVeilMaterial(
     uVeilTime: veilTime,
     ...paletteUniforms(palette),
     // A decal already carries its colour on `color`, and has no dye.
-    uVeilSrcColor: { value: !decal && src.color ? src.color.clone() : new THREE.Color(0xffffff) },
+    uVeilSrcColor: {
+      value:
+        !decal && !spiritVeilWocLayer(source) && src.color
+          ? src.color.clone()
+          : new THREE.Color(0xffffff),
+    },
     ...(decal ? UNDYED : sourceDye(source)),
   };
   mat.onBeforeCompile = (shader) => veilColorHook(shader, uniforms);
@@ -320,6 +327,7 @@ export function createSpiritVeilMaterial(
   // inputs) keys the variant the living rig linked.
   mat.shadowSide = source.shadowSide ?? CASTER_SIDE[source.side];
   mat.customProgramCacheKey = decal ? decalProgramKey : colorProgramKey;
+  carrySpiritVeilWoc(source, mat);
   mat.userData[SPIRIT_VEIL_PASS_KEY] = decal ? 'decal' : 'color';
   mat.userData[PALETTE_KEY] = palette;
   return mat;
@@ -332,10 +340,32 @@ const depthMaterials = new Map<string, THREE.MeshBasicMaterial>();
  *  ghost of that shape and palette draws it, and the boot stand-in holds the
  *  program they all share. A small polygon offset keeps the colour pass's
  *  LessEqual test robust across the two programs. */
+const wocDepthMaterials = new WeakMap<THREE.Material, THREE.MeshBasicMaterial>();
+
 export function spiritVeilDepthMaterial(
   depthKey: string,
   palette: SpiritVeilPalette = 'spirit',
+  source?: THREE.Material,
 ): THREE.MeshBasicMaterial {
+  if (source && wocHeadMergedTintOf(source)?.oneSided) {
+    let depth = wocDepthMaterials.get(source);
+    if (!depth) {
+      const base = spiritVeilDepthMaterial(depthKey, palette);
+      depth = base.clone();
+      depth.onBeforeCompile = base.onBeforeCompile;
+      depth.customProgramCacheKey = base.customProgramCacheKey;
+      reapplyWocHeadDepthToClone(source, depth);
+      wocDepthMaterials.set(source, depth);
+      const ownedDepth = depth;
+      const disposeDepth = () => {
+        ownedDepth.dispose();
+        wocDepthMaterials.delete(source);
+        source.removeEventListener('dispose', disposeDepth);
+      };
+      source.addEventListener('dispose', disposeDepth);
+    }
+    return depth;
+  }
   const cacheKey = `${palette}|${depthKey}`;
   let mat = depthMaterials.get(cacheKey);
   if (!mat) {
@@ -374,8 +404,12 @@ export function spiritVeilKeysFor(material: THREE.Material, mesh: THREE.Object3D
   if (pass !== 'color' && pass !== 'decal') return null;
   const shape: SpiritVeilShape = spiritVeilShapeOf(mesh as THREE.Mesh);
   const map = (material as SourceMaterial).map ?? null;
-  const keys = [spiritVeilTupleKey(pass, shape, map !== null, map?.channel ?? 0)];
-  if (pass === 'color') keys.push(spiritVeilTupleKey('depth', shape, false));
+  const layer = spiritVeilWocLayer(material);
+  const keys = [spiritVeilTupleKey(pass, shape, map !== null, map?.channel ?? 0, layer)];
+  if (pass === 'color')
+    keys.push(
+      spiritVeilTupleKey('depth', shape, false, 0, layer === 'merged-one' ? layer : undefined),
+    );
   return keys;
 }
 
@@ -480,12 +514,32 @@ export function installSpiritVeil(
 const DEPTH_SIBLING_NAME = 'spirit_veil_depth';
 
 /** The pre-pass of a veiled body: its shape, its colour pass's palette. */
-function depthMaterialFor(body: THREE.Mesh): THREE.MeshBasicMaterial {
-  const mat = Array.isArray(body.material) ? body.material[0] : body.material;
-  return spiritVeilDepthMaterial(
-    spiritVeilShapeKey(body),
-    (mat && spiritVeilPaletteOf(mat)) ?? 'spirit',
-  );
+const groupedDepthMaterials = new WeakMap<
+  THREE.Mesh,
+  {
+    shape: string;
+    sources: THREE.Material[];
+    depths: THREE.MeshBasicMaterial[];
+  }
+>();
+
+function depthMaterialFor(body: THREE.Mesh): THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] {
+  const shape = spiritVeilShapeKey(body);
+  const depthFor = (mat: THREE.Material) =>
+    spiritVeilDepthMaterial(shape, spiritVeilPaletteOf(mat) ?? 'spirit', mat);
+  if (!Array.isArray(body.material)) return depthFor(body.material);
+  const materials = body.material;
+  const cached = groupedDepthMaterials.get(body);
+  if (
+    cached?.shape === shape &&
+    cached.sources.length === materials.length &&
+    cached.sources.every((source, index) => source === materials[index])
+  )
+    return cached.depths;
+  // Preserve geometry group indices: the body and merged head have different discard hooks.
+  const depths = materials.map(depthFor);
+  groupedDepthMaterials.set(body, { shape, sources: [...materials], depths });
+  return depths;
 }
 
 function buildDepthSibling(body: THREE.Mesh): THREE.Mesh {

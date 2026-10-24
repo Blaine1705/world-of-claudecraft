@@ -109,6 +109,58 @@ const FERAL_LOADOUT = {
 // Measured identically on the integration tip and on the faction ladder
 // branch (PR 4169). Moongrove (5982/225/5983/7) and Bruin (3060/139/
 // 10541.4575/4) stayed inside their bands and keep their anchors.
+// RE-MEASURED 2026-10-13 for all three arms, at the four built dungeon
+// entrances (src/sim/*_entrance.ts). No druid, combat or tuning code moved:
+// the entrances' colliders push the spawn point of three neighbouring world
+// mobs, the Wildheart Basin door moved and the Idol Guardian's camp with it,
+// and every world mob's idle wander draws from the shared stream, so this
+// seed's whole trace re-rolls. Moongrove 5956/212/5957/7 to 5637/273/5638/7
+// (only the wolf's incoming left its old band), wildfang 5315/201/6228.5225/8
+// to 6126/172/7178.609/10 (off the low eight-payoff trace it had sat on since
+// 2026-09-20), bruin 3082/131/10651.925/4 to 2721/142/8804.0075/4. Each new
+// row is an ordinary trace of the same rotation on this tree, read against
+// the neighbouring seeds: moongrove 5329 to 6004 damage and 208 to 285
+// incoming over seeds 42421 to 42436 (payoffs 7 on every one); wildfang 5962
+// to 7419 damage, 168 to 266 incoming and 10 or 12 payoffs over 42421 to
+// 42428; bruin 2309 to 3240 damage, 96 to 161 incoming and 3 or 4 payoffs
+// over the same eight. The matrix test below, whose bands are design bands
+// rather than measurements, still holds on this tree. BAND stays 0.08.
+// RE-MEASURED 2026-10-15 for all three arms and the tank probe's two incoming
+// figures, at the Fenbridge rebuild (src/sim/fenbridge_layout.ts: the painted
+// buildings, the open ring, the walk-in floors, the re-threaded streets and
+// lamps). No druid, combat or tuning code moved: the town's colliders and
+// walkable ground are world-gen inputs and every world mob's idle wander draws
+// from the shared stream, so this seed's whole trace re-rolls. Moongrove
+// 5637/273/5638/7 to 5455/251/5456/7, wildfang 6126/172/7178.609/10 to
+// 6558/197/7684.697/10, bruin 2721/142/8804.0075/4 to 2891/159/9807.33125/4.
+// The neighbouring seeds on this tree: moongrove 5557 to 6068 damage and 193
+// to 285 incoming over 42421 to 42436 (payoffs 7 on every one); wildfang 6120
+// to 7439 damage, 191 to 278 incoming and 10 or 12 payoffs over 42421 to
+// 42428; bruin 2309 to 3075 damage, 96 to 160 incoming and 3 or 4 payoffs over
+// the same eight. The tank probe at 42920 re-rolls the same way: wolf incoming
+// 220 to 262, bear 143 to 157 (40 percent less, inside the 30 to 42 percent
+// bounds); its threat product and Marrowbreak snap stayed in band.
+// RE-MEASURED 2026-10-20 for all three arms and the tank probe's two incoming
+// figures, when the Mirefen mudfin huts became solid walls
+// (src/sim/mudfin_huts.ts). No druid, combat or tuning code moved: the camp
+// murlocs' idle wander now settles on other ticks, so this seed's whole trace
+// re-rolls again. Moongrove 5455/251/5456/7 to 5492/241/5493/7, wildfang
+// 6558/197/7684.697/10 to 6389/213/7486.7135/10, bruin 2891/159/9807.33125/4
+// to 2765/162/9243.19625/4. The neighbouring seeds on this tree: moongrove 5346
+// to 6045 damage and 190 to 277 incoming over 42421 to 42436 (payoffs 7 on
+// every one); wildfang 5868 to 7233 damage, 216 to 262 incoming and 10 or 12
+// payoffs over 42421 to 42428; bruin 2687 to 3082 damage, 112 to 163 incoming
+// and 4 payoffs over the same eight. The tank probe at 42920 re-rolls the same
+// way: wolf incoming 262 to 212, bear 157 to 126 (41 percent less, inside the
+// 30 to 42 percent bounds); its threat product and Marrowbreak snap stayed in
+// band.
+// RE-MEASURED 2026-10-21 for the tank probe's two incoming figures, at the
+// wander fix around those huts (an idle pick inside a hut wall is skipped for
+// one more pause, mob/locomotion.ts). No druid, combat or tuning code moved:
+// the murlocs' wander draws fork the shared stream again. Wolf incoming 212 to
+// 216, bear 126 to 139 (36 percent less, inside the 30 to 42 percent bounds);
+// its threat product (214.5) and Marrowbreak snap (1012.44) stayed in band, and
+// all three live-mob arms stayed inside their bands, so they are unchanged.
 // RE-MEASURED 2026-10-12 for the moongrove arm only: the reference picker
 // (src/sim/dev/bis_gear.ts) stopped handing non-healer specs Healing Power
 // pieces, so the balance druid swaps the Grovespring healer set and healer
@@ -118,17 +170,16 @@ const FERAL_LOADOUT = {
 // RE-MEASURED 2026-10-14 after the v0.45 integration stack: moongrove kept
 // its damage/threat/payoff trace, while incoming settled back to 214.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 6115, incomingDamage: 214, threat: 6116, payoffs: 7 },
-  wildfang: { damage: 5315, incomingDamage: 201, threat: 6228.5225, payoffs: 8 },
-  // Re-measured for the Groveheart rework pass 2 Bruin cadence: twice the swings
-  // at half the damage each and double white-swing rage. White damage is
-  // unchanged; the extra rage buys more Bonecrush and Marrowbreak (was 3082
-  // damage, 131 incoming, 10651.925 threat, 4 payoffs).
-  bruin: { damage: 3467, incomingDamage: 151, threat: 12282.66125, payoffs: 6 },
+  // Release merge: the caster picker excludes healer gear; Bruin gains its new
+  // double-swing/rage cadence. Authored-world wander also changes shared RNG.
+  // Re-measured at 42420 with the unchanged 8% bands and exact payoff counts.
+  moongrove: { damage: 6839, incomingDamage: 237, threat: 6840, payoffs: 7 },
+  wildfang: { damage: 6389, incomingDamage: 213, threat: 7486.7135, payoffs: 10 },
+  bruin: { damage: 3254, incomingDamage: 159, threat: 12206.51375, payoffs: 6 },
 } as const;
 const BRUIN_TANK_MEASURED = {
-  wolfIncomingDamage: 220,
-  bruinIncomingDamage: 143,
+  wolfIncomingDamage: 216,
+  bruinIncomingDamage: 139,
   bruinMitigationPct: 0.35,
   bruinThreatFrom100Damage: 214.5,
   marrowbreakSnapThreat: 990.99,
@@ -184,7 +235,10 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     // 12 profile x capstone combos over a 123s window: ~90-105s solo. In the
     // long-sims lane (workers=2) two heavy suites share the runner, roughly
     // doubling wall time (run 31288946173 killed this at 150s mid-matrix).
-  }, 420_000);
+    // On the v0.45.0 integration world it measured 362s on a green lane run
+    // (39322453017) and passed 420s on a slower runner (39338836719), so it
+    // takes the single-test cap.
+  }, 480_000);
 
   it('the live-mob and Bruin fixtures wear the pinned reference loadout', () => {
     // Identity first: every band below is conditioned on this gear, and the
@@ -233,7 +287,10 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     expect(result.head).toBe('test-head');
     expect(result.bruinIncomingDamage).toBeLessThan(result.wolfIncomingDamage);
     // The two incoming figures and the mitigation they imply are banded on
-    // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less):
+    // the 2026-09-08 measurement (wolf 220, bear 143, 35 percent less),
+    // re-measured 2026-10-15 for the Fenbridge rebuild (wolf 262, bear 157)
+    // and 2026-10-20 for the solid Mirefen mudfin huts (wolf 212, bear 126),
+    // then 2026-10-21 for the wander fix around them (wolf 216, bear 139):
     // the drift the audit read (bear +12 percent) reds on the bear figure.
     const [wolfLo, wolfHi] = within(BRUIN_TANK_MEASURED.wolfIncomingDamage);
     expect(result.wolfIncomingDamage).toBeGreaterThanOrEqual(wolfLo);

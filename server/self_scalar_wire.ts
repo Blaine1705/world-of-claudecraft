@@ -37,6 +37,7 @@ export const SELF_SCALAR_KEYS = [
   'ddiff',
   'adiff',
   'cbt',
+  'mbr',
   'corpse',
   'pvr',
   'pvrw',
@@ -82,6 +83,7 @@ export function emitSelfScalarKeys(
   // traded a blow. A 0/1 bit rather than a boolean: it flips at most a few
   // times per fight, so the delta elision keeps it off the wire between flips.
   emit('cbt', p.inCombat ? 1 : 0);
+  emit('mbr', p.membershipActive === true);
   // Where the player's corpse lies while their spirit is a ghost (null otherwise).
   // Delta-guarded: ships on death-release and clears on resurrect. The client
   // draws the corpse marker and gates the resurrect-at-corpse button on it.

@@ -259,7 +259,7 @@ describe('click-to-move math (#95)', () => {
     it('turns online by the real frame time and offline by the sim step', () => {
       expect(section('const resolved = resolveMove(', ');')).toContain('frameDt,');
       expect(section('const { mi, facing } = resolveMove(', ');')).toContain('DT,');
-      expect(section('function resolveMove(', 'function partyMemberIds(')).toContain(
+      expect(section('function resolveMove(', 'const updateHoverCursor =')).toContain(
         'clickMoveTurn(fromFacing, step.facing, stepSeconds)',
       );
     });

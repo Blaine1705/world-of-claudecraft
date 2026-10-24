@@ -1,3 +1,5 @@
+import { WOC_HEAD_SLOTS, wocHeadTintRole } from '../src/render/characters/woc_head_catalog';
+import { wocHeadSlotUrls } from '../src/render/characters/woc_head_stream_core';
 // @vitest-environment happy-dom
 // The spirit veil family against the shipped catalogue: every shape a released
 // spirit can draw maps to a tuple of the pinned family, and the family holds
@@ -29,7 +31,7 @@
 // underclothing carry no morph target, the body is drawn under every loadout)
 // are asserted, so a mixed loadout keys like the full sets that span it.
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
@@ -68,12 +70,13 @@ import {
   MODULAR_HEAD_NODES,
   modularMergePartition,
 } from '../src/render/characters/modular_name_facts_core';
-import { NPC_LOOKS, npcLookFor, npcModularKeyFor } from '../src/render/characters/npc_looks';
+import { NPC_LOOKS, npcLookFor } from '../src/render/characters/npc_looks';
 import { mergeSkinnedParts } from '../src/render/characters/rig_merge';
 import {
   SPIRIT_VEIL_FAMILY_KEYS,
   type SpiritVeilPass,
   type SpiritVeilShape,
+  type SpiritVeilWocLayer,
   spiritVeilTupleKey,
 } from '../src/render/characters/spirit_veil_family_core';
 import { MOBS } from '../src/sim/data';
@@ -176,7 +179,10 @@ function partKeys(url: string, part: Part): string[] {
   };
   // A transparent source takes the decal variant (ghost_veil.ts).
   const pass: SpiritVeilPass = material?.alphaMode === 'BLEND' ? 'decal' : 'color';
-  const keys = [spiritVeilTupleKey(pass, shape, texture !== undefined)];
+  const role = url.includes('/woc/head_type_') ? wocHeadTintRole(material?.name ?? '') : null;
+  const woc =
+    role === 'skin' || role === 'eye' || role === 'hair' || role === 'brow' ? role : undefined;
+  const keys = [spiritVeilTupleKey(pass, shape, texture !== undefined, 0, woc)];
   if (pass === 'color') keys.push(spiritVeilTupleKey('depth', shape, false));
   return keys;
 }
@@ -248,6 +254,12 @@ function looks(): { app: ModularAppearance; worn: ArmorLoadout }[] {
 
 function playerRigUrls(): string[] {
   const urls = new Set<string>();
+  // Streamed armor is absent from VisualDef.url: census every shipped tier too.
+  const armorDirectory = 'models/chars/players/woc/armor';
+  for (const name of readdirSync(publicPath(armorDirectory))) {
+    // *_top.glb carries texture mip levels, never a drawable armor mesh.
+    if (name.endsWith('.glb') && !name.endsWith('_top.glb')) urls.add(`${armorDirectory}/${name}`);
+  }
   for (const [key, def] of Object.entries(VISUALS)) {
     if (!key.startsWith('player_') || def.modular) continue;
     for (const url of [def.url, ...(def.attach ?? []).map((a) => a.url)]) {
@@ -293,14 +305,16 @@ function formRigUrls(): string[] {
 
 /** The keeper's composed look, as npc_looks.ts authors it, plus its props. */
 function keeperParts(): { url: string; part: Part }[] {
-  const look = NPC_LOOKS[KEEPER];
-  const out = composedParts(normalizeAppearance(look.app), look.worn).map((part) => ({
-    url: MODULAR_URL,
-    part,
-  }));
-  for (const attach of VISUALS[npcModularKeyFor(KEEPER)].attach ?? []) {
-    for (const part of allParts(attach.url)) out.push({ url: attach.url, part });
-  }
+  const key = visualKeyFor({ kind: 'npc', templateId: KEEPER } as Entity);
+  const def = VISUALS[key];
+  const urls = new Set([
+    def.url,
+    ...(def.attach ?? []).map((a) => a.url),
+    ...(['a', 'b'] as const).flatMap((type) =>
+      WOC_HEAD_SLOTS.flatMap((slot) => wocHeadSlotUrls(type, slot)),
+    ),
+  ]);
+  const out = [...urls].flatMap((url) => allParts(url).map((part) => ({ url, part })));
   return out;
 }
 
@@ -379,6 +393,34 @@ function census(): Map<string, string> {
     for (const part of allParts(url)) add(partKeys(url, part), part.where);
   }
   for (const { url, part } of keeperParts()) add(partKeys(url, part), `${KEEPER} ${part.where}`);
+  // The body atlas tint, retained on its far bake; every head tint role and
+  // both merged sidedness modes can also be retained on rigid baked geometry.
+  const far: SpiritVeilShape = {
+    skinned: false,
+    morphTargets: 0,
+    morphPositions: false,
+    morphNormals: false,
+    morphColors: false,
+    normals: true,
+    positions: true,
+    instanced: false,
+    batched: false,
+  };
+  for (const woc of [
+    'skin',
+    'eye',
+    'hair',
+    'brow',
+    'skin_suit',
+    'merged-one',
+    'merged-both',
+  ] as const)
+    add([spiritVeilTupleKey('color', far, true, 0, woc)], `WOC far ${woc}`);
+  add(
+    [spiritVeilTupleKey('color', { ...far, skinned: true }, true, 0, 'skin_suit')],
+    'WOC body atlas',
+  );
+  add([spiritVeilTupleKey('depth', far, false, 0, 'merged-one')], 'WOC far one-sided head');
   return needed;
 }
 

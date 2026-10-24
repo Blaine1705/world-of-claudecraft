@@ -39,7 +39,9 @@ import { SpiritVeilRig, spiritVeilPassOf } from '../src/render/characters/ghost_
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
 import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual } from '../src/render/characters/visual';
+import { WocAtlasSwap } from '../src/render/characters/woc_atlas_swap';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
+import { landWocBodies } from './helpers/woc_streamed';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 
@@ -289,8 +291,15 @@ describe('far-LOD wiring (source pins)', () => {
     expect(composed).toContain('assembleModular(def, look, null, null, { skipDecals: true })');
     // The fixed-rig bake's modular throwaway (prepareVisual) takes the same arm:
     // the default look wears a scalp decal, minted and dropped per key otherwise.
+    // (It attaches no streamed WOC armor either: the bake throws the temp away. And a WOC
+    // body bakes its far geometry level, woc_lod_core.ts.)
     const fixed = fnBody('src/render/characters/assets.ts', 'export function prepareVisual(');
-    expect(fixed).toContain('assembleModel(def, null, null, null, { skipDecals: true })');
+    const callAt = fixed.indexOf('assembleModel(def, null, null, null, {');
+    expect(callAt).toBeGreaterThan(-1);
+    const call = fixed.slice(callAt, fixed.indexOf('})', callAt));
+    expect(call).toContain('skipDecals: true');
+    expect(call).toContain('wocArmor: []');
+    expect(call).toContain('wocLod: WOC_FAR_BAKE_LOD');
     const attach = fnBody('src/render/characters/assets.ts', 'export function attachFaceDecals(');
     expect(attach.indexOf('if (opts?.skipDecals) return;')).toBeGreaterThan(-1);
     expect(attach.indexOf('if (opts?.skipDecals) return;')).toBeLessThan(attach.indexOf('headOf('));
@@ -322,6 +331,7 @@ describe('far-LOD wiring (source pins)', () => {
 
   it('retries a pending bake from the per-frame update', () => {
     const body = fnBody('src/render/characters/visual.ts', '  update(dt: number');
+    // a far body only: nothing bakes for the shadow plan's sake
     expect(body).toContain('this.farBakePending && this.far && !this.farBakeTried');
     expect(body).toContain('this.attemptComposedFar()');
   });
@@ -378,6 +388,7 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
     const fake: any = Object.create(CharacterVisual.prototype);
     Object.assign(fake, {
       farBakeTried: false,
+      wocAtlas: new WocAtlasSwap(),
       look: { app: {}, worn: {} },
       key: 'test_key',
       model: new THREE.Group(),
@@ -514,6 +525,7 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
     const fake: any = Object.create(CharacterVisual.prototype);
     Object.assign(fake, {
       farBakeTried: false,
+      wocAtlas: new WocAtlasSwap(),
       farBakePending: false,
       look: { app: {}, worn: {} },
       key: 'test_key',
@@ -645,6 +657,9 @@ describe('peekModularFarBake and modularFarBake', () => {
     }));
     const assetsModule = (await import('../src/render/characters/assets')) as AssetsModule;
     await assetsModule.charactersReady();
+    // The part library left the boot preload when the world's NPCs stopped composing
+    // from it (its def is lazyPreload): ask for it the way a host does and let it land.
+    await landWocBodies(assetsModule, [MODULAR_WARRIOR_KEY]);
     return assetsModule;
   }
 

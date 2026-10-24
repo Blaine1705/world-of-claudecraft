@@ -65,7 +65,7 @@ export function withGraphicsDraft<K extends string>(
 /** How a slider's readout is formatted; the painter maps this to a formatter. */
 // 'shoulder' reads a -1..1 offset as "Left 60%" / "Center" / "Right 100%"
 // (actionCamShoulderReadout below resolves which key and percent).
-export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'shoulder';
+export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'shoulder' | 'pixels';
 
 /** The Action Cam shoulder slider's readout: which label key, and the
  *  magnitude as a 0..1 fraction for the percent formatter. */
@@ -990,6 +990,35 @@ const TARGET_HIGHLIGHT_ROWS: readonly (readonly [string, TranslationKey])[] = [
 const tag = (category: InterfaceTab, controls: OptionsControl[]): OptionsControl[] =>
   controls.map((c): OptionsControl => ({ ...c, category }));
 
+/** The Detach Resource Bar toggle plus, while it is on, its two size sliders;
+ *  nothing on the touch HUD, where the mover never applies a seat. */
+function resourceBarRows(s: OptionsSettingsSource, env?: OptionsEnv): OptionsControl[] {
+  if (env?.touch) return [];
+  const rows: OptionsControl[] = [
+    boolToggle(s, 'playerFrameResourceDetached', 'hudChrome.options.playerFrameResourceDetached', {
+      rerender: true,
+    }),
+  ];
+  if (s.bool('playerFrameResourceDetached'))
+    rows.push(
+      slider(
+        s,
+        'playerFrameResourceWidth',
+        'hudChrome.options.playerFrameResourceWidth',
+        'pixels',
+        1,
+      ),
+      slider(
+        s,
+        'playerFrameResourceHeight',
+        'hudChrome.options.playerFrameResourceHeight',
+        'pixels',
+        1,
+      ),
+    );
+  return rows;
+}
+
 export function buildInterfaceControls(
   s: OptionsSettingsSource,
   env?: OptionsEnv,
@@ -1018,6 +1047,7 @@ export function buildInterfaceControls(
     boolToggle(s, 'showReliquaryTracker', 'hudChrome.options.showReliquaryTracker'),
     boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
     boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
+    boolToggle(s, 'showPetNames', 'hudChrome.options.showPetNames'),
     boolToggle(s, 'confirmVendorSell', 'hudChrome.options.confirmVendorSell'),
     note('hudChrome.options.confirmVendorSellNote'),
     choice(
@@ -1070,6 +1100,14 @@ export function buildInterfaceControls(
         { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
       ]),
       boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
+      // Detach Resource Bar lifts mana / energy / rage into a frame of its own;
+      // its size rows exist only while it is detached (docked, the bar takes
+      // the player frame's geometry), so the toggle re-renders the panel. The
+      // touch HUD owns its own layout (frame editing is desktop-only), so it
+      // offers none of the three rows.
+      ...resourceBarRows(s, env),
+      // The King of the Hill bar's backdrop; its text stays solid.
+      slider(s, 'hillBarOpacity', 'hudChrome.options.hillBarOpacity'),
       choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
@@ -1102,6 +1140,10 @@ export function buildInterfaceControls(
     ]),
     ...tag('combat', [
       boolToggle(s, 'eastbrookGuidance', 'hudChrome.tutorialGreeting.guidanceSetting'),
+      // The advisory dungeon alerts (the tip panel over the action bar). The
+      // note names what stays on screen whatever this is set to.
+      boolToggle(s, 'showDungeonHints', 'hudChrome.options.showDungeonHints'),
+      note('hudChrome.options.showDungeonHintsNote'),
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
       boolToggle(
         s,

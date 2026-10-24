@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Spezialisierungsbonus',
+  'hudChrome.specPanel.healing': 'Heilung',
+  'hudChrome.specPanel.absorption': 'Schadensabsorption',
+  'hudChrome.specPanel.physicalAbilityDamage': 'Schaden von Nahkampf- und Fernkampffähigkeiten',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Erhöht die primäre Heilung nach allen anderen Heilungsboni um {pct}.',
   'hud.pet.assist': 'Unterstützen',
   'hud.pet.assistDesc':
     'Greift nur dein aktuelles Ziel an, sobald du eine Fähigkeit darauf wirkst. Ignoriert Gegner, die dich angreifen.',
@@ -1236,7 +1242,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Du erhältst außerdem:',
   'hudChrome.weekly.anyDifficulty': 'Beliebiger Schwierigkeitsgrad',
   'hudChrome.weekly.cacheDesc':
-    'Öffnet sich zu einem Normal-Schlachtzugsteil für deine Klasse (nie ein Set-Teil), plus {count} x {item}.',
+    'Öffnet sich zu einem Normal-Schlachtzugsteil für deine Klasse (nie ein Set-Teil von Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Quest wählen',
   'hudChrome.weekly.chosen': 'Wochenquest angenommen: {category}',
   'hudChrome.weekly.close': 'Wochenquests schließen',
@@ -5186,7 +5192,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Im Besitz',
   'hudChrome.warfareShop.weapons': 'Waffen',
   'itemUi.market.saleBuyer': 'Verkauft an {buyer}',
-  'itemUi.market.saleOlder': 'Zuzüglich {count} früherer Verkäufe, in der Summe enthalten.',
+  'itemUi.market.saleOlder': 'Dazu {count} frühere Verkäufe, die nicht aufgeführt sind.',
   'itemUi.tooltip.maxStack': 'Max. Stapel: {count}',
   'hud.system.deathRecapAbility': 'Ihr seid gestorben. Erschlagen durch {ability}.',
   'hud.system.deathRecapDrowned': 'Ihr seid gestorben. Ihr seid ertrunken.',
@@ -6188,6 +6194,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Kaltblutige Jaeger mit ihrem ganz eigenen Zischen und Schnappen, deutlich verschieden von den warmblutigen Bestien.',
   'guide.family.reptile.name': 'Reptilien',
   'hudChrome.auraEffect.damageReduction': 'Verringert allen erlittenen Schaden um {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Schläft bis zur Dämmerung. Kann nicht angegriffen werden und erwacht für niemanden.',
   'hudChrome.auraEffect.guardianWard':
     'Der naechste todliche Feindtreffer stellt stattdessen {pct}% deiner Gesundheit wieder her',
   'hudChrome.bags.dragDestroyHint': 'In die Welt ziehen, um zu vernichten',
@@ -6626,6 +6634,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Dornendämmer-Umhang',
   'entities.items.fenbark_leggings.name': 'Moorrinden-Beinkleider',
   'entities.items.fenshadow_maul.name': 'Moorschatten-Streitkolben',
+  'entities.items.skerrits_shardpike.name': 'Skerrits Splitterpike',
+  'entities.items.foremans_barrowmaul.name': 'Hügelgrabhammer des Vorarbeiters',
+  'entities.items.barrowhide_pauldrons.name': 'Hügelgrab-Schulterstücke',
+  'entities.items.mirestone_stride.name': 'Moorsteinschritt',
+  'entities.items.foremans_wage_band.name': 'Lohnring des Vorarbeiters',
+  'entities.items.mirelight_locket.name': 'Sumpflicht-Medaillon',
+  'entities.items.fenwright_grips.name': 'Griffe des Moorbauers',
   'entities.items.fenwarden_sabatons.name': 'Moorwächter-Sabatons',
   'entities.items.gravewyrm_thornmaul.name': 'Grabwyrm-Dornstreitkolben',
   'entities.items.grovewardens_grips.name': 'Griffe des Hainhüters',
@@ -8038,6 +8053,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Nutzungsbedingungen',
   'footer.privacy': 'Datenschutzerklärung',
   'footer.discordLabel': 'Tritt dem Discord bei',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Bestenliste',
   'highscores.desc': 'Verfolge die größten Champions der Welt und vergleiche deinen Fortschritt.',
   'wiki.title': 'Spiel-Wiki und Guides',
@@ -10651,6 +10667,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollhügel',
   'entities.zones.mirefen_marsh.pois.6.label': 'Gravecaller-Lager',
   'entities.zones.mirefen_marsh.pois.7.label': 'Die versunkene Bastion',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Hügelgrab-Revier',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Sternenfall-Krater',
   'entities.zones.thornpeak_heights.name': 'Thornpeak-Höhen',
   'entities.zones.thornpeak_heights.welcome':
     'Hauptmann Thessaly hält die Mauer von Highwatch, gerade so.',
@@ -11133,7 +11151,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, der Erwachende Gipfel',
   'entities.mobs.thunzharr_stormling.name': 'Geweckter Sturmling',
   'entities.mobs.stable_horse.name': 'Stallpferd',
-  'hudChrome.worldBoss.spawn': '{name} erhebt sich über den Thornpeak-Höhen!',
+  'hudChrome.worldBoss.spawn': '{name} erhebt sich über {zone}!',
+  'hudChrome.worldBoss.wake': '{name} erwacht über {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} schläft bis zur Dämmerung.',
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Großschwert',
   'entities.items.direfang_greatblade.name': 'Direfang-Großklinge',
@@ -15080,7 +15100,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passiv: Mit Jagdschwung bereitet Pfadbruch deinen nächsten Ausweidender Hieb oder Bluthaken für 12 Sek. vor. Ausweidender Hieb verursacht pro Stufe 15% mehr Schaden. Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% je Stufe und durch Distanzangriffskraft. Bei 3 Stufen verbraucht jeder dieser Angriffe Jagdschwung. (Überleben)',
   'entities.abilities.frostjaw_trap.description':
-    'Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
+    'Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min., und nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
   'entities.abilities.hunting_momentum.description':
     'Passiv: Ausweidender Hieb und eine Splitterladung, die einen Gegner trifft, gewähren jeweils 1 Jagdschwung, bis zu 3. Hält bis zum Verbrauch oder bis du den Kampf verlässt; jede Stufe erhöht dein Bewegungstempo um 15%. Bei 3 Stufen verursacht Wundriss 60% mehr Schlagschaden und verbraucht die Stufen. (Überleben)',
   'entities.abilities.measured_shot.description':
@@ -20402,7 +20422,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Verbraucht deine 5 Grünkraft: Jeder Verbündete mit deinen Heilung-über-Zeit-Effekten wird sofort um {buff}% ihrer verbleibenden Heilung geheilt, die Effekte werden entfernt und das Ziel erhält eine neue Sporenheilung.',
   'entities.abilities.play_dead.description':
-    'Lass dich zu Boden fallen und stelle dich tot: Allen werden deine Gesundheit und dein Fokus als leer angezeigt. Gegner vergessen dich, und gegnerische Spieler verlieren dich als Ziel. Bewegung, Angriff oder eine andere Fähigkeit beendet dies. Erneut wirken, um aufzustehen.',
+    'Lässt Euch zu Boden fallen und tot erscheinen: Eure Gesundheit und Euer Fokus werden für alle als leer angezeigt. Gegner vergessen Euch, und gegnerische Spieler, die Euch anvisieren, verlieren ihr Ziel. Bewegen, Angreifen oder der Einsatz einer anderen Fähigkeit beendet den Effekt. Wirkt Ihr es in Bewegung, habt Ihr 1 Sek. Zeit, anzuhalten, bevor die Bewegung es beendet. Erneut wirken, um aufzustehen.',
   'entities.abilities.play_dead.name': 'Totstellen',
   'entities.abilities.rejuvenation.name': 'Sporenheilung',
   'entities.abilities.scratch.description':
@@ -20477,4 +20497,25 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Du kannst dies jederzeit in den Optionen unter Grafikqualität ändern.',
   'graphicsPrompt.confirm': 'Weiter',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Bärenfalle',
+  'entities.abilities.bear_trap.description':
+    'Legt eine Falle am gewählten Ort. Sie schärft sich nach 0,75 Sek. und hält 1 Min.; nur Ihr und Eure Gruppe könnt sie sehen. Der erste Gegner, der sie auslöst, erleidet durch Blutung {damage} physischen Schaden über 15 Sek. und wird 4 Sek. lang um 50% verlangsamt. Der Schaden steigt mit der Distanzangriffskraft. Es kann jeweils nur eine Bärenfalle aktiv sein. Sie kann gleichzeitig mit Eurer Frostkieferfalle bestehen. Eine neue Bärenfalle ersetzt Eure vorherige.',
+  'entities.abilities.scatterbolt.name': 'Streubolzen',
+  'entities.abilities.scatterbolt.description':
+    'Feuert einen Bolzenhagel in einem 90-Grad-Kegel mit 8 Metern Reichweite vor Euch ab und stößt Gegner bis auf 20 Meter Entfernung von Euch zurück. Gegen Rückstoß immune Gegner sind nicht betroffen. Verursacht keinen Schaden.',
+  'entities.abilities.phosphor_flask.name': 'Phosphorflasche',
+  'entities.abilities.phosphor_flask.description':
+    'Ein versiegeltes Gefäß mit einer reaktiven Chemikalienmischung, die 3 Sek. lang über einen Bereich von 8 m in weißglühende Flammen aufgeht. Gegner in den Flammen erleiden alle 0,5 Sek. {damage} Feuerschaden. Der Schaden steigt mit der Distanzangriffskraft.',
+  'entities.items.lychgate_buckler.name': 'Faustschild des Friedhofstors',
+  'entities.items.bastion_kite_shield.name': 'Langspitzschild der Bastion',
+  'entities.items.barrowfield_tower_shield.name': 'Turmschild des Hügelgräberfelds',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Ressourcenleiste',
+  'hudChrome.options.hillBarOpacity': 'Hintergrunddeckkraft von König des Hügels',
+  'hudChrome.options.playerFrameResourceDetached': 'Ressourcenleiste abtrennen',
+  'hudChrome.options.playerFrameResourceHeight': 'Höhe der Ressourcenleiste',
+  'hudChrome.options.playerFrameResourceWidth': 'Breite der Ressourcenleiste',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Aktiviere Ressourcenleiste abtrennen im Reiter Rahmen. Dann gibt Rahmen bearbeiten auch deine Ressourcenleiste frei, sodass du Mana, Energie oder Wut unabhängig an einer beliebigen Stelle platzieren kannst. Breite der Ressourcenleiste und Höhe der Ressourcenleiste im selben Reiter passen ihre Größe an. Rahmen bearbeiten gibt auch die Leiste für König des Hügels frei. Hintergrunddeckkraft von König des Hügels im selben Reiter blendet deren Fläche aus, während der Text gut lesbar bleibt.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

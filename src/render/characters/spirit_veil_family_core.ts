@@ -26,6 +26,14 @@
  *  pre-pass, `color` the blended body, `decal` the alpha-preserving variant
  *  a transparent face decal wears over the veiled head. */
 export type SpiritVeilPass = 'depth' | 'color' | 'decal';
+export type SpiritVeilWocLayer =
+  | 'skin'
+  | 'skin_suit'
+  | 'eye'
+  | 'hair'
+  | 'brow'
+  | 'merged-one'
+  | 'merged-both';
 
 /** The object facts three re-derives a veil program from. */
 export interface SpiritVeilShape {
@@ -77,6 +85,7 @@ export function spiritVeilShapeOf(object: SpiritVeilShapeObject): SpiritVeilShap
 /** One program of the family, in its canonical form (normals and positions
  *  present, position morphs only, no instancing or batching). */
 export interface SpiritVeilTuple {
+  woc?: SpiritVeilWocLayer;
   pass: SpiritVeilPass;
   skinned: boolean;
   /** The colour arms only: the depth pass carries no map. */
@@ -96,6 +105,7 @@ export function spiritVeilTupleKey(
   shape: SpiritVeilShape,
   map: boolean,
   mapChannel = 0,
+  woc?: SpiritVeilWocLayer,
 ): string {
   const mapped = pass !== 'depth' && map;
   let key = `${pass}:${shape.skinned ? 's' : 'r'}${mapped ? '+map' : ''}:${shape.morphTargets}`;
@@ -107,12 +117,13 @@ export function spiritVeilTupleKey(
   if (shape.morphColors) key += '!morphcolor';
   if (shape.instanced) key += '!instanced';
   if (shape.batched) key += '!batched';
+  if (woc) key += `!woc-${woc}`;
   return key;
 }
 
 /** The key of a canonical tuple. */
 export function spiritVeilKeyOfTuple(tuple: SpiritVeilTuple): string {
-  return spiritVeilTupleKey(tuple.pass, canonicalShape(tuple), tuple.map);
+  return spiritVeilTupleKey(tuple.pass, canonicalShape(tuple), tuple.map, 0, tuple.woc);
 }
 
 function canonicalShape(tuple: SpiritVeilTuple): SpiritVeilShape {
@@ -132,13 +143,17 @@ function canonicalShape(tuple: SpiritVeilTuple): SpiritVeilShape {
 /** The canonical tuple a key names, or null when the key carries a flag no
  *  stand-in reproduces (or is not a veil key at all). */
 export function spiritVeilTupleOfKey(key: string): SpiritVeilTuple | null {
-  const match = /^(depth|color|decal):([sr])(\+map)?:(\d+)$/.exec(key);
+  const match =
+    /^(depth|color|decal):([sr])(\+map)?:(\d+)(?:!woc-(skin|skin_suit|eye|hair|brow|merged-one|merged-both))?$/.exec(
+      key,
+    );
   if (!match) return null;
   const tuple: SpiritVeilTuple = {
     pass: match[1] as SpiritVeilPass,
     skinned: match[2] === 's',
     map: match[3] !== undefined,
     morphTargets: Number(match[4]),
+    ...(match[5] ? { woc: match[5] as SpiritVeilWocLayer } : {}),
   };
   return spiritVeilKeyOfTuple(tuple) === key ? tuple : null;
 }
@@ -167,6 +182,55 @@ export const SPIRIT_VEIL_FAMILY: readonly SpiritVeilTuple[] = [
     (morphTargets): SpiritVeilTuple => ({ pass: 'depth', skinned: true, map: false, morphTargets }),
   ),
   { pass: 'depth', skinned: false, map: false, morphTargets: 0 },
+  // WOC bodies and their baked far surfaces carry the same live tint layer;
+  // rigid head pieces carry the four head roles, and merged far heads two sides.
+  ...(['skin', 'skin_suit', 'eye', 'hair', 'brow'] as const).flatMap((woc) =>
+    (woc === 'skin_suit' ? [false, true] : [false]).map(
+      (skinned): SpiritVeilTuple => ({ pass: 'color', skinned, map: true, morphTargets: 0, woc }),
+    ),
+  ),
+  // Split WOC heads retain their authored rigid position morphs. These rows
+  // are derived independently from every shipped head file by the census.
+  ...[1, 3, 4, 5, 6, 9].map(
+    (morphTargets): SpiritVeilTuple => ({
+      pass: 'depth',
+      skinned: false,
+      map: false,
+      morphTargets,
+    }),
+  ),
+  ...[1, 4].map(
+    (morphTargets): SpiritVeilTuple => ({
+      pass: 'color',
+      skinned: false,
+      map: false,
+      morphTargets,
+    }),
+  ),
+  ...[1, 3, 4, 5, 6, 9].map(
+    (morphTargets): SpiritVeilTuple => ({
+      pass: 'color',
+      skinned: false,
+      map: true,
+      morphTargets,
+      woc: 'skin',
+    }),
+  ),
+  ...[1, 4].map(
+    (morphTargets): SpiritVeilTuple => ({
+      pass: 'color',
+      skinned: false,
+      map: true,
+      morphTargets,
+      woc: 'hair',
+    }),
+  ),
+  { pass: 'color', skinned: false, map: true, morphTargets: 4, woc: 'eye' },
+  { pass: 'color', skinned: false, map: true, morphTargets: 4, woc: 'brow' },
+  ...(['merged-one', 'merged-both'] as const).map(
+    (woc): SpiritVeilTuple => ({ pass: 'color', skinned: false, map: true, morphTargets: 0, woc }),
+  ),
+  { pass: 'depth', skinned: false, map: false, morphTargets: 0, woc: 'merged-one' },
 ];
 
 export const SPIRIT_VEIL_FAMILY_KEYS: ReadonlySet<string> = new Set(

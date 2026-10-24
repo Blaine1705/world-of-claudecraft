@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bônus de especialização',
+  'hudChrome.specPanel.healing': 'cura',
+  'hudChrome.specPanel.absorption': 'absorção de dano',
+  'hudChrome.specPanel.physicalAbilityDamage': 'dano de habilidades corpo a corpo e à distância',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Aumenta a cura primária em {pct} após os outros bônus de cura.',
   'hud.pet.assist': 'Assistir',
   'hud.pet.assistDesc':
     'Ataca apenas seu alvo atual depois que você usa uma habilidade nele. Ignora inimigos que atacam você.',
@@ -1152,7 +1158,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Você também receberá:',
   'hudChrome.weekly.anyDifficulty': 'Qualquer dificuldade',
   'hudChrome.weekly.cacheDesc':
-    'Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto), além de {count} x {item}.',
+    'Abre-se em uma peça de raide Normal para sua classe (nunca uma peça de conjunto do Ignivar), além de {count} x {item}.',
   'hudChrome.weekly.choose': 'Escolher missão',
   'hudChrome.weekly.chosen': 'Missão semanal aceita: {category}',
   'hudChrome.weekly.close': 'Fechar missões semanais',
@@ -5140,7 +5146,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Possuído',
   'hudChrome.warfareShop.weapons': 'Armas',
   'itemUi.market.saleBuyer': 'Vendido para {buyer}',
-  'itemUi.market.saleOlder': 'Mais {count} vendas anteriores, incluídas no total.',
+  'itemUi.market.saleOlder': 'Mais {count} vendas anteriores não listadas.',
   'itemUi.tooltip.maxStack': 'Pilha máxima: {count}',
   'hud.system.deathRecapAbility': 'Você morreu. Morto por {ability}.',
   'hud.system.deathRecapDrowned': 'Você morreu. Você se afogou.',
@@ -6145,6 +6151,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Caçadores de sangue frio com seu próprio silvo e bote, distintos das criaturas de sangue quente.',
   'guide.family.reptile.name': 'Répteis',
   'hudChrome.auraEffect.damageReduction': 'Reduz em {pct}% o dano recebido',
+  'hudChrome.auraEffect.slumber':
+    'Adormecido até o amanhecer. Não pode ser atacado e não acordará por ninguém.',
   'hudChrome.auraEffect.guardianWard':
     'O próximo golpe inimigo letal restaura sua vida para {pct}% em vez de matar',
   'hudChrome.bags.dragDestroyHint': 'Arraste para fora do inventário para destruir',
@@ -7925,6 +7933,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Termos de serviço',
   'footer.privacy': 'Política de privacidade',
   'footer.discordLabel': 'Juntar-se ao Discord',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Tabela de recordes',
   'highscores.desc': 'Acompanhe os maiores campeões do mundo e compare o seu progresso.',
   'wiki.title': 'Wiki e guia do jogo',
@@ -10538,6 +10547,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Túmulos troll',
   'entities.zones.mirefen_marsh.pois.6.label': 'Acampamento Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'O Bastião Submerso',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Domínio dos Túmulos',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Cratera da Estrela Cadente',
   'entities.zones.thornpeak_heights.name': 'Alturas de Thornpeak',
   'entities.zones.thornpeak_heights.welcome': 'A capitã Thessaly mal segura o muro de Highwatch.',
   'entities.zones.thornpeak_heights.pois.0.label': 'Highwatch',
@@ -11021,7 +11032,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, o Pico Desperto',
   'entities.mobs.thunzharr_stormling.name': 'Elemental de tormenta desperto',
   'entities.mobs.stable_horse.name': 'Cavalo de estábulo',
-  'hudChrome.worldBoss.spawn': '{name} ergue-se sobre as Alturas de Thornpeak!',
+  'hudChrome.worldBoss.spawn': '{name} se ergue sobre {zone}!',
+  'hudChrome.worldBoss.wake': '{name} despertou sobre {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} dorme até o amanhecer.',
   'entities.items.stormcallers_spaulders.name': 'Espaldares Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadão Bonewrought',
   'entities.items.direfang_greatblade.name': 'Grande lâmina Direfang',
@@ -15277,6 +15290,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Manto Espinho do Crepúsculo',
   'entities.items.fenbark_leggings.name': 'Perneiras Casca do Pântano',
   'entities.items.fenshadow_maul.name': 'Martelo da Sombra do Brejo',
+  'entities.items.skerrits_shardpike.name': 'Pique de Estilhaços de Skerrit',
+  'entities.items.foremans_barrowmaul.name': 'Malho Tumular do Capataz',
+  'entities.items.barrowhide_pauldrons.name': 'Ombreiras Tumulares',
+  'entities.items.mirestone_stride.name': 'Passada de Pedralodo',
+  'entities.items.foremans_wage_band.name': 'Anel do Salário do Capataz',
+  'entities.items.mirelight_locket.name': 'Medalhão da Luz do Pântano',
+  'entities.items.fenwright_grips.name': 'Manoplas do Artesão do Pântano',
   'entities.items.fenwarden_sabatons.name': 'Sabatões do Guardião do Brejo',
   'entities.items.gravewyrm_thornmaul.name': 'Martelo Espinhoso do Verme Tumular',
   'entities.items.grovewardens_grips.name': 'Manoplas do Guardião do Bosque',
@@ -16274,7 +16294,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passivo: com Ímpeto de Caça, Quebra-Trilha prepara seu próximo Golpe Estripador ou Gancho Sangrento por 12 s. Golpe Estripador causa 15% mais dano por acúmulo. Gancho Sangrento causa de 18 a 24 de dano físico adicional, aumentado em 15% por acúmulo e por Poder de Ataque à Distância. Com 3 acúmulos, qualquer um dos ataques consome Ímpeto de Caça. (Sobrevivência)',
   'entities.abilities.frostjaw_trap.description':
-    'Posiciona uma armadilha no inimigo selecionado ou aos seus pés. Ela arma após 0,75 s e dura 30 s. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s.',
+    'Posiciona uma armadilha no local selecionado. Ela arma após 0,75 s e dura 1 min, e só você e seu grupo podem vê-la. O primeiro inimigo que a acionar fica enraizado por 3 s, e inimigos a até 4 metros são lentificados em 50% por 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Passivo: Golpe Estripador e uma Carga de Estilhaços que acerte um inimigo concedem 1 de Ímpeto de Caça cada, até 3. Dura até ser gasto ou você sair de combate; cada acúmulo aumenta sua velocidade em 15%. Com 3 acúmulos, Rasga-Feridas causa 60% mais dano de golpe e os consome. (Sobrevivência)',
   'entities.abilities.measured_shot.description':
@@ -20224,7 +20244,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Consome seus 5 de Verdor: cada aliado com seus efeitos de cura ao longo do tempo recebe instantaneamente {buff}% da cura restante, os efeitos são removidos e o alvo recebe uma nova Cura de Esporos.',
   'entities.abilities.play_dead.description':
-    'Caia no chão e finja estar morto: sua vida e seu Foco aparecem vazios para todos. Inimigos esquecem você e jogadores inimigos que miram em você perdem o alvo. Mover-se, atacar ou usar outra habilidade encerra o efeito. Use de novo para levantar.',
+    'Cai no chão e finge estar morto: sua vida e seu foco aparecem vazios para todos. Os inimigos se esquecem de você, e jogadores inimigos que têm você como alvo perdem o alvo. Mover-se, atacar ou usar outra habilidade encerra o efeito. Se lançado em movimento, você tem 1 s para parar antes que o movimento o encerre. Lançar de novo faz você se levantar.',
   'entities.abilities.play_dead.name': 'Fingir de morto',
   'entities.abilities.rejuvenation.name': 'Cura de Esporos',
   'entities.abilities.scratch.description':
@@ -20299,4 +20319,25 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Você pode alterar isso a qualquer momento em Opções, em Qualidade gráfica.',
   'graphicsPrompt.confirm': 'Continuar',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Armadilha de Urso',
+  'entities.abilities.bear_trap.description':
+    'Coloca uma armadilha no local selecionado. Ela se arma após 0,75 s e dura 1 min; apenas você e seu grupo podem vê-la. O primeiro inimigo que a ativar sofre sangramento de {damage} de dano Físico ao longo de 15 s e fica 50% mais lento por 4 s. O dano aumenta com o Poder de Ataque à Distância. Apenas uma Armadilha de Urso pode ficar ativa por vez. Ela pode coexistir com sua Armadilha Presa Gélida. Colocar outra Armadilha de Urso substitui a anterior.',
+  'entities.abilities.scatterbolt.name': 'Leque de Virotes',
+  'entities.abilities.scatterbolt.description':
+    'Dispara uma chuva de virotes em um cone de 90 graus que alcança 8 metros à sua frente, repelindo os inimigos até uma distância máxima de 20 metros de você. Inimigos imunes a repulsão não são afetados. Não causa dano.',
+  'entities.abilities.phosphor_flask.name': 'Frasco de Fósforo',
+  'entities.abilities.phosphor_flask.description':
+    'Um recipiente selado com uma mistura química reativa que irrompe em chamas incandescentes sobre uma área de 8 m por 3 s. Os inimigos nas chamas sofrem {damage} de dano de Fogo a cada 0,5 s. O dano aumenta com o poder de ataque à distância.',
+  'entities.items.lychgate_buckler.name': 'Broquel do portão do cemitério',
+  'entities.items.bastion_kite_shield.name': 'Escudo de pipa do bastião',
+  'entities.items.barrowfield_tower_shield.name': 'Escudo torre do Campo dos Túmulos',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Barra de recursos',
+  'hudChrome.options.hillBarOpacity': 'Opacidade do fundo do Rei da Colina',
+  'hudChrome.options.playerFrameResourceDetached': 'Separar barra de recursos',
+  'hudChrome.options.playerFrameResourceHeight': 'Altura da barra de recursos',
+  'hudChrome.options.playerFrameResourceWidth': 'Largura da barra de recursos',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Ative Separar barra de recursos na aba Quadros para que Editar Quadros também libere sua barra de recursos, permitindo posicionar mana, energia ou raiva separadamente onde quiser. Largura da barra de recursos e Altura da barra de recursos, na mesma aba, ajustam seu tamanho. Editar Quadros também libera a barra do Rei da Colina; Opacidade do fundo do Rei da Colina, nessa aba, esmaece o painel sem prejudicar a leitura do texto.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

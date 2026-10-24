@@ -87,7 +87,7 @@ describe('World PvP XP bonus', () => {
     grantXp(sim.ctx, -10, meta);
     expect(meta.lifetimeXp).toBe(before);
   });
-  it('preserves ossbrain faction reputation without an extra PvP multiplier', () => {
+  it('preserves faction reputation without an extra PvP multiplier', () => {
     const { sim, pid, meta } = fixture(MAX_LEVEL);
     sim.setWorldPvpFlag(true, pid);
     expect(awardFactionReputation(meta, 'rift_watch', 100, MAX_LEVEL).gained).toBe(100);

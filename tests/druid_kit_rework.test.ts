@@ -19,8 +19,8 @@ const SEED = 7;
 // No camps, NPCs or ground objects: every terrain field stays BUILTIN_WORLD's,
 // and nothing wanders into the throw line.
 const QUIET_WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
-// Open, level, contested ground (tests/world_pvp.test.ts OPEN_GROUND).
-const OPEN = { x: 60, z: 700 };
+// Open, level, contested ground, clear of the merged Highwatch terrain pads.
+const OPEN = { x: 70, z: 690 };
 const NO_SCALING = { spellPower: 0, healPower: 0, rangedPower: 0, attackPower: 0 };
 
 type Internals = {

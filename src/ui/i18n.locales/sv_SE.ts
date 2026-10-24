@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Specialiseringsbonus',
+  'hudChrome.specPanel.healing': 'läkning',
+  'hudChrome.specPanel.absorption': 'skadeabsorption',
+  'hudChrome.specPanel.physicalAbilityDamage': 'skada från närstrids- och avståndsförmågor',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Ökar den primära läkningen med {pct} efter övriga läkningsbonusar.',
   'hud.pet.assist': 'Assistans',
   'hud.pet.assistDesc':
     'Angriper bara ditt nuvarande mål när du har använt en förmåga på det. Ignorerar fiender som angriper dig.',
@@ -1113,7 +1119,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Du får också:',
   'hudChrome.weekly.anyDifficulty': 'Vilken svårighetsgrad som helst',
   'hudChrome.weekly.cacheDesc':
-    'Öppnas till en Normal raidkläder för din klass (aldrig en setkläder), plus {count} x {item}.',
+    'Öppnas till ett Normalt raidplagg för din klass (aldrig ett setplagg från Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Välj uppdrag',
   'hudChrome.weekly.chosen': 'Veckouppdrag taget: {category}',
   'hudChrome.weekly.close': 'Stäng veckoupdrag',
@@ -5041,7 +5047,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Ägd',
   'hudChrome.warfareShop.weapons': 'Vapen',
   'itemUi.market.saleBuyer': 'Sålt till {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} tidigare försäljningar, inräknade i totalen.',
+  'itemUi.market.saleOlder': 'Samt {count} tidigare försäljningar som inte visas.',
   'itemUi.tooltip.maxStack': 'Maxstapel: {count}',
   'hud.system.deathRecapAbility': 'Du har dött. Dräpt av {ability}.',
   'hud.system.deathRecapDrowned': 'Du har dött. Du drunknade.',
@@ -6005,6 +6011,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Kallblodiga jägare med ett eget väsande och ett snäppande bett, skilda från de varmblodiga djuren.',
   'guide.family.reptile.name': 'Reptiler',
   'hudChrome.auraEffect.damageReduction': 'Minskar all inkommande skada med {pct}%',
+  'hudChrome.auraEffect.slumber':
+    'Sover till gryningen. Kan inte anfallas och vaknar inte för någon.',
   'hudChrome.auraEffect.guardianWard':
     'Nästa dödliga fiendeträff återger dig {pct}% av dina livspunkter i stället',
   'hudChrome.bags.dragDestroyHint': 'Dra ut i världen för att förstöra',
@@ -7169,7 +7177,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 't',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} reser sig över Törntoppshöjderna!',
+  'hudChrome.worldBoss.spawn': '{name} reser sig över {zone}!',
+  'hudChrome.worldBoss.wake': '{name} vaknar över {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} sover till gryningen.',
   'itemUi.kind.bag': 'Väska',
   'itemUi.tooltip.bagSlots': 'Väska med {slots} platser',
   'itemUi.tooltip.bagSlotsMaterials': 'Materialväska med {slots} platser',
@@ -8265,6 +8275,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenmist_robe.name': 'Kärrdimmsrock',
   'entities.items.fenreed_staff.name': 'Kärrvasstav',
   'entities.items.fenshadow_maul.name': 'Kärrskuggans stridsklubba',
+  'entities.items.skerrits_shardpike.name': 'Skerrits Skärvpik',
+  'entities.items.foremans_barrowmaul.name': 'Förmannens Gravhögshammare',
+  'entities.items.barrowhide_pauldrons.name': 'Gravhögsaxelskydd',
+  'entities.items.mirestone_stride.name': 'Myrstenssteg',
+  'entities.items.foremans_wage_band.name': 'Förmannens Lönering',
+  'entities.items.mirelight_locket.name': 'Kärrljusmedaljong',
+  'entities.items.fenwright_grips.name': 'Kärrbyggarens Grepp',
   'entities.items.fenwarden_sabatons.name': 'Kärrväktarens sabatoner',
   'entities.items.fenwalker_boots.name': 'Kärrvandrarstövlar',
   'entities.items.footpad_jerkin.name': 'Ficktjuvsväst',
@@ -9262,6 +9279,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollhögarna',
   'entities.zones.mirefen_marsh.pois.6.label': 'Gravkallarlägret',
   'entities.zones.mirefen_marsh.pois.7.label': 'Den sjunkna bastionen',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Gravhögsområdet',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Stjärnfallskratern',
   'entities.zones.mirefen_marsh.welcome': 'Anmäl dig hos väktare Fenwick vid Kärrbrons port.',
   'entities.zones.thornpeak_heights.name': 'Törntoppshöjderna',
   'entities.zones.thornpeak_heights.pois.0.label': 'Högvakten',
@@ -9511,6 +9530,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'FÖRSTÄRKNINGAR!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Gå med i Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Projekt med öppen källkod',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Whitepaper',
@@ -16023,7 +16043,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passivt: Med Jaktfart förbereder Spårbrott ditt nästa Uppsprättande hugg eller Blodkrok i 12 sek. Uppsprättande hugg ger 15% mer skada per laddning. Blodkrok ger 18 till 24 extra fysisk skada, ökad med 15% per laddning och av avståndsanfallskraft. Vid 3 laddningar förbrukar vilket som helst av anfallen Jaktfart. (Överlevnad)',
   'entities.abilities.frostjaw_trap.description':
-    'Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
+    'Placera en fälla på den valda platsen. Den osäkras efter 0,75 sek och varar 1 min, och bara du och din grupp kan se den. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
   'entities.abilities.hunting_momentum.description':
     'Passivt: Uppsprättande hugg och en Splitterladdning som träffar en fiende ger vardera 1 Jaktfart, upp till 3. Varar tills de används eller du lämnar strid, och varje laddning ökar rörelsehastigheten med 15%. Vid 3 laddningar ger Sårslitare 60% mer slagskada och förbrukar laddningarna. (Överlevnad)',
   'entities.abilities.measured_shot.description':
@@ -19981,7 +20001,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Förbrukar dina 5 Grönska: varje allierad med dina läkningseffekter över tid läks omedelbart med {buff}% av den läkning som återstod i effekterna, effekterna tas bort och målet får en ny Sporläkning.',
   'entities.abilities.play_dead.description':
-    'Fall till marken och spela död: din hälsa och ditt Fokus ser tomma ut för alla. Fiender glömmer dig, och fiendespelare som har dig som mål förlorar sitt mål. Rörelse, attacker eller andra förmågor avslutar effekten. Använd igen för att resa dig.',
+    'Fall till marken och se död ut: din hälsa och ditt fokus visas som tomma för alla. Fiender glömmer dig, och fientliga spelare som har dig som mål tappar sitt mål. Att röra dig, attackera eller använda en annan förmåga avslutar den. Kastas den medan du rör dig har du 1 sek på dig att stanna innan rörelsen avslutar den. Kasta igen för att resa dig.',
   'entities.abilities.play_dead.name': 'Spela död',
   'entities.abilities.rejuvenation.name': 'Sporläkning',
   'entities.abilities.scratch.description':
@@ -20045,4 +20065,25 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Du kan ändra detta när som helst i Alternativ, under Grafikkvalitet.',
   'graphicsPrompt.confirm': 'Fortsätt',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Björnfälla',
+  'entities.abilities.bear_trap.description':
+    'Placera en fälla på den valda platsen. Den armeras efter 0,75 sek. och varar i 1 min.; bara du och din grupp kan se den. Den första fienden som utlöser den blöder för {damage} fysisk skada under 15 sek. och saktas ned med 50% i 4 sek. Skadan ökar med distansattackkraft. Endast en Björnfälla kan vara aktiv åt gången. Den kan vara aktiv samtidigt som din Frostkäftsfälla. Om du placerar en ny Björnfälla ersätter den den gamla.',
+  'entities.abilities.scatterbolt.name': 'Spridbult',
+  'entities.abilities.scatterbolt.description':
+    'Avfyra en skur av armborstpilar i en 90 graders kon som når 8 yards framför dig och knuffar tillbaka fiender till högst 20 yards från dig. Fiender som är immuna mot tillbakaknuffning påverkas inte. Orsakar ingen skada.',
+  'entities.abilities.phosphor_flask.name': 'Fosforflaska',
+  'entities.abilities.phosphor_flask.description':
+    'Ett förseglat kärl med en reaktiv kemisk blandning som flammar upp i vitglödande eld över ett område på 8 m i 3 sek. Fiender som står i lågorna tar {damage} eldskada var 0,5 sek. Skadan ökar med distansattackkraft.',
+  'entities.items.lychgate_buckler.name': 'Kyrkogårdsportens bucklare',
+  'entities.items.bastion_kite_shield.name': 'Bastionens droppsköld',
+  'entities.items.barrowfield_tower_shield.name': 'Gravhögsfältets tornsköld',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Resursfält',
+  'hudChrome.options.hillBarOpacity': 'Bakgrundens opacitet för Kungens på kullen',
+  'hudChrome.options.playerFrameResourceDetached': 'Koppla loss resursfältet',
+  'hudChrome.options.playerFrameResourceHeight': 'Resursfältets höjd',
+  'hudChrome.options.playerFrameResourceWidth': 'Resursfältets bredd',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Aktivera Koppla loss resursfältet på fliken Ramar så låser Redigera ramar även upp ditt resursfält. Då kan du placera mana, energi eller vrede separat var du vill. Resursfältets bredd och Resursfältets höjd på samma flik ändrar storleken. Redigera ramar låser även upp fältet för Kungens på kullen. Bakgrundens opacitet för Kungens på kullen på samma flik tonar ned panelen medan texten förblir tydlig.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

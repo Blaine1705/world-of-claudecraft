@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Bonus specializace',
+  'hudChrome.specPanel.healing': 'léčení',
+  'hudChrome.specPanel.absorption': 'pohlcení poškození',
+  'hudChrome.specPanel.physicalAbilityDamage': 'poškození schopností na blízko i na dálku',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Zvyšuje hlavní léčení o {pct} po započtení ostatních bonusů k léčení.',
   'hud.pet.assist': 'Podpora',
   'hud.pet.assistDesc':
     'Útočí pouze na tvůj aktuální cíl poté, co na něj použiješ schopnost. Ignoruje nepřátele, kteří na tebe útočí.',
@@ -1116,7 +1122,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Navíc obdržíš:',
   'hudChrome.weekly.anyDifficulty': 'Libovolná obtížnost',
   'hudChrome.weekly.cacheDesc':
-    'Otevře jeden kus raidové výbavy v normální obtížnosti pro tvou třídu (nikdy sadový kus), plus {count}x {item}.',
+    'Otevře jeden kus raidové výbavy v normální obtížnosti pro tvou třídu (nikdy kus Ignivarovy sady), plus {count}x {item}.',
   'hudChrome.weekly.choose': 'Vybrat úkol',
   'hudChrome.weekly.chosen': 'Přijat týdenní úkol: {category}',
   'hudChrome.weekly.close': 'Zavřít týdenní úkoly',
@@ -5043,7 +5049,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Vlastněno',
   'hudChrome.warfareShop.weapons': 'Zbraně',
   'itemUi.market.saleBuyer': 'Prodáno hráči {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} dřívějších prodejů, zahrnuto v součtu.',
+  'itemUi.market.saleOlder': 'A dalších {count} dřívějších prodejů, které nejsou uvedeny.',
   'itemUi.tooltip.maxStack': 'Max. stack: {count}',
   'hud.system.deathRecapAbility': 'Tvá postava zemřela. Příčina: {ability}.',
   'hud.system.deathRecapDrowned': 'Tvá postava zemřela. Utopila se.',
@@ -5964,6 +5970,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Studenokrevní lovci s vlastním syčením a lupem čelistí, odlišní od teplokrevných bestií.',
   'guide.family.reptile.name': 'Plazi',
   'hudChrome.auraEffect.damageReduction': 'Snižuje veškeré utrpěné poškození o {pct} %',
+  'hudChrome.auraEffect.slumber':
+    'Spí až do úsvitu. Nelze na něj zaútočit a pro nikoho se neprobudí.',
   'hudChrome.auraEffect.guardianWard':
     'Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %',
   'hudChrome.bags.dragDestroyHint': 'Přetáhni do světa a předmět bude zničen',
@@ -6368,6 +6376,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.duskthorn_mantle.name': 'Plášť soumračného trnu',
   'entities.items.fenbark_leggings.name': 'Nohavice z bahenní kůry',
   'entities.items.fenshadow_maul.name': 'Palice bahenního stínu',
+  'entities.items.skerrits_shardpike.name': 'Skerritova střepová píka',
+  'entities.items.foremans_barrowmaul.name': 'Předákovo mohylové kladivo',
+  'entities.items.barrowhide_pauldrons.name': 'Mohylové nárameníky',
+  'entities.items.mirestone_stride.name': 'Bahnokamenný krok',
+  'entities.items.foremans_wage_band.name': 'Prsten předákovy mzdy',
+  'entities.items.mirelight_locket.name': 'Medailon bažinného světla',
+  'entities.items.fenwright_grips.name': 'Rukavice bažinného řemeslníka',
   'entities.items.fenwarden_sabatons.name': 'Sabatony strážce bažin',
   'entities.items.gravescale_girdle.name': 'Pás z hrobových šupin',
   'entities.items.gravewyrm_claws.name': 'Spáry Hrobodraka',
@@ -6528,6 +6543,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'nav.wiki': 'Wiki',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Připojit se na Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Open-source projekt',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.privacy': 'Zásady ochrany soukromí',
@@ -9831,7 +9847,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talents.defaultBuildName': 'Sestava {n}',
   'hudChrome.tips.joinChannels':
     'Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem.',
-  'hudChrome.worldBoss.spawn': '{name} povstává nad Thornpeak Heights!',
+  'hudChrome.worldBoss.spawn': '{name} povstává nad {zone}!',
+  'hudChrome.worldBoss.wake': '{name} se probouzí nad {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} spí až do úsvitu.',
   'editor.a11y.dialog': 'Dialog editoru',
   'editor.a11y.stage': 'Zobrazení mapy',
   'editor.a11y.toasts': 'Oznámení editoru',
@@ -11154,6 +11172,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollí mohyly',
   'entities.zones.mirefen_marsh.pois.6.label': 'Tábor Hrobovolajících',
   'entities.zones.mirefen_marsh.pois.7.label': 'Potopená bašta',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Mohylové panství',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Kráter padlé hvězdy',
   'entities.zones.mirefen_marsh.welcome': 'Ohlas se u strážce Fenwicka u brány Fenbridge.',
   'entities.zones.thornpeak_heights.name': 'Thornpeakské výšiny',
   'entities.zones.thornpeak_heights.pois.0.label': 'Highwatch',
@@ -15944,7 +15964,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Pasivně: S Lovecký spád připraví Zlom stopy na 12 s tvůj další Párací úder nebo Krvavý hák. Párací úder udělí o 15% vyšší poškození za navrstvení. Krvavý hák udělí dalších 18 až 24 fyzického poškození, zvýšeného o 15% za navrstvení a útočnou silou na dálku. Při 3 navrstveních kterýkoli z útoků spotřebuje Lovecký spád. (Znalost terénu)',
   'entities.abilities.frostjaw_trap.description':
-    'Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s.',
+    'Umísti past na vybrané místo. Aktivuje se po 0,75 s, trvá 1 minutu a vidíš ji jen ty a tvá skupina. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s.',
   'entities.abilities.hunting_momentum.description':
     'Pasivně: Párací úder a Střepinová nálož, která zasáhne nepřítele, přidají každá 1 Lovecký spád, až do 3. Trvá do spotřebování nebo opuštění boje a každé navrstvení zvýší rychlost pohybu o 15%. Při 3 navrstveních udělí Rvoucí rána o 60% vyšší poškození úderu a spotřebuje je. (Znalost terénu)',
   'entities.abilities.measured_shot.description':
@@ -19873,7 +19893,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Spotřebuje tvých 5 bodů Zeleně: každý spojenec s tvými průběžnými léčivými účinky se okamžitě vyléčí o {buff} % léčení, které jim zbývalo. Účinky se odstraní a cíl získá nové Výtrusové hojení.',
   'entities.abilities.play_dead.description':
-    'Padni na zem a předstírej smrt: všem se tvé zdraví a soustředění zobrazí jako prázdné. Nepřátelé na tebe zapomenou a nepřátelští hráči, kteří tě mají zaměřeného, ztratí cíl. Pohyb, útok nebo jiná schopnost účinek ukončí. Dalším sesláním vstaneš.',
+    'Padni k zemi a předstírej smrt: tvé zdraví a Soustředění se všem zobrazují jako prázdné. Nepřátelé na tebe zapomenou a nepřátelští hráči, kteří tě mají v cíli, o cíl přijdou. Pohyb, útok nebo použití jiné schopnosti efekt ukončí. Pokud ji sešleš v pohybu, máš 1 s na zastavení, než ji pohyb ukončí. Opětovným sesláním vstaneš.',
   'entities.abilities.play_dead.name': 'Předstírání smrti',
   'entities.abilities.rejuvenation.name': 'Výtrusové hojení',
   'entities.abilities.scratch.description':
@@ -19945,4 +19965,25 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'graphicsPrompt.changeLater':
     'Tuto volbu můžeš kdykoli změnit v Nastavení v části Kvalita grafiky.',
   'graphicsPrompt.confirm': 'Pokračovat',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Medvědí past',
+  'entities.abilities.bear_trap.description':
+    'Položí past na vybrané místo. Aktivuje se po 0,75 s a vydrží 1 minutu; vidíš ji jen ty a tvoje skupina. První nepřítel, který ji spustí, krvácením utrpí {damage} fyzického poškození během 15 s a je na 4 s zpomalen o 50 %. Poškození roste se silou útoku na dálku. Současně může být aktivní jen jedna Medvědí past. Může být položena zároveň s tvou Pastí mrazivé čelisti. Položení další Medvědí pasti nahradí tu předchozí.',
+  'entities.abilities.scatterbolt.name': 'Rozptylná šipka',
+  'entities.abilities.scatterbolt.description':
+    'Vystřelí salvu šipek do kužele o úhlu 90 stupňů a dosahu 8 yardů před tebou a odrazí nepřátele až do vzdálenosti 20 yardů od tebe. Nepřátele imunní vůči odražení neovlivní. Nezpůsobuje poškození.',
+  'entities.abilities.phosphor_flask.name': 'Fosforová baňka',
+  'entities.abilities.phosphor_flask.description':
+    'Zapečetěná nádoba s reaktivní chemickou směsí, která na 3 s vzplane do běla rozžhaveným plamenem v oblasti 8 m. Nepřátelé stojící v plamenech utrpí každých 0,5 s {damage} ohnivého poškození. Poškození roste se silou útoku na dálku.',
+  'entities.items.lychgate_buckler.name': 'Pukléř hřbitovní brány',
+  'entities.items.bastion_kite_shield.name': 'Mandlový štít bašty',
+  'entities.items.barrowfield_tower_shield.name': 'Věžový štít Mohylového pole',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Lišta zdrojů',
+  'hudChrome.options.hillBarOpacity': 'Krytí pozadí Krále kopce',
+  'hudChrome.options.playerFrameResourceDetached': 'Oddělit lištu zdrojů',
+  'hudChrome.options.playerFrameResourceHeight': 'Výška lišty zdrojů',
+  'hudChrome.options.playerFrameResourceWidth': 'Šířka lišty zdrojů',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Zapni Oddělit lištu zdrojů na kartě Rámy. Volba Upravit rámečky pak uvolní i lištu zdrojů, takže manu, energii nebo zuřivost můžeš umístit samostatně kamkoli. Šířka lišty zdrojů a Výška lišty zdrojů na stejné kartě nastavují její velikost. Upravit rámečky uvolní také lištu Krále kopce. Krytí pozadí Krále kopce na stejné kartě zeslabí její panel, zatímco text zůstane dobře čitelný.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };

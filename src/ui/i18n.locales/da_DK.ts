@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.specPanel.specBonus': 'Specialiseringsbonus',
+  'hudChrome.specPanel.healing': 'heling',
+  'hudChrome.specPanel.absorption': 'skadeabsorbering',
+  'hudChrome.specPanel.physicalAbilityDamage': 'skade fra nærkamps- og afstandsevner',
+  'hudChrome.specPanel.primaryHealingBonus':
+    'Øger den primære heling med {pct}, efter at andre helingsbonusser er anvendt.',
   'hud.pet.assist': 'Assistance',
   'hud.pet.assistDesc':
     'Angriber kun dit aktuelle mål, når du har brugt en evne på det. Ignorerer fjender, der angriber dig.',
@@ -1117,7 +1123,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'Du vil også modtage:',
   'hudChrome.weekly.anyDifficulty': 'Enhver sværhedsgrad',
   'hudChrome.weekly.cacheDesc':
-    'Åbner til ét Normalt raid-stykke for din klasse (aldrig et tier-set-stykke), plus {count} x {item}.',
+    'Åbner til ét Normalt raid-stykke for din klasse (aldrig et tier-set-stykke fra Ignivar), plus {count} x {item}.',
   'hudChrome.weekly.choose': 'Vælg quest',
   'hudChrome.weekly.chosen': 'Ugentlig quest taget: {category}',
   'hudChrome.weekly.close': 'Luk ugentlige quester',
@@ -5039,7 +5045,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.owned': 'Ejet',
   'hudChrome.warfareShop.weapons': 'Våben',
   'itemUi.market.saleBuyer': 'Solgt til {buyer}',
-  'itemUi.market.saleOlder': 'Plus {count} tidligere salg, medregnet i alt.',
+  'itemUi.market.saleOlder': 'Samt {count} tidligere salg, der ikke vises.',
   'itemUi.tooltip.maxStack': 'Maks. antal i stak: {count}',
   'hud.system.deathRecapAbility': 'Du er død. Dræbt af {ability}.',
   'hud.system.deathRecapDrowned': 'Du er død. Du druknede.',
@@ -5998,6 +6004,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Koldblodede jægere med en hvislen og et snap, der er helt deres egne, og som adskiller sig fra de varmblodede dyr.',
   'guide.family.reptile.name': 'Krybdyr',
   'hudChrome.auraEffect.damageReduction': 'Reducerer al skade modtaget med {pct}%',
+  'hudChrome.auraEffect.slumber': 'Sover til daggry. Kan ikke angribes og vågner ikke for nogen.',
   'hudChrome.auraEffect.guardianWard':
     'Det næste dødelige fjendtlige slag genopretter dig til {pct}% helbred i stedet',
   'hudChrome.bags.dragDestroyHint': 'Træk ud i verden for at ødelægge',
@@ -7168,7 +7175,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 't',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} rejser sig over Tornetop Højder!',
+  'hudChrome.worldBoss.spawn': '{name} rejser sig over {zone}!',
+  'hudChrome.worldBoss.wake': '{name} vågner over {zone}!',
+  'hudChrome.worldBoss.sleep': '{name} sover til daggry.',
   'itemUi.kind.bag': 'Taske',
   'itemUi.tooltip.bagSlots': 'Taske med {slots} pladser',
   'itemUi.tooltip.bagSlotsMaterials': 'Materialetaske med {slots} pladser',
@@ -8264,6 +8273,13 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenmist_robe.name': 'Kærtåge-Kåbe',
   'entities.items.fenreed_staff.name': 'Kærsiv-Stav',
   'entities.items.fenshadow_maul.name': 'Kærskygge-Hammer',
+  'entities.items.skerrits_shardpike.name': 'Skerrits Skårspyd',
+  'entities.items.foremans_barrowmaul.name': 'Formandens Gravhøjshammer',
+  'entities.items.barrowhide_pauldrons.name': 'Gravhøjsskulderværn',
+  'entities.items.mirestone_stride.name': 'Mosestensskridt',
+  'entities.items.foremans_wage_band.name': 'Formandens Lønring',
+  'entities.items.mirelight_locket.name': 'Sumplys-medaljon',
+  'entities.items.fenwright_grips.name': 'Mosebyggerens Greb',
   'entities.items.fenwalker_boots.name': 'Kærvandrer-Støvler',
   'entities.items.fenwarden_sabatons.name': 'Kærvogter-Jernstøvler',
   'entities.items.footpad_jerkin.name': 'Lommetyvens Vams',
@@ -9252,6 +9268,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Troldehøjene',
   'entities.zones.mirefen_marsh.pois.6.label': 'Gravkaldernes Lejr',
   'entities.zones.mirefen_marsh.pois.7.label': 'Den Sunkne Bastion',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Gravhøjsområdet',
+  'entities.zones.mirefen_marsh.pois.9.label': 'Stjernefaldskrateret',
   'entities.zones.mirefen_marsh.welcome': 'Meld dig til Vogter Fenwick ved Sumpbroens port.',
   'entities.zones.thornpeak_heights.name': 'Tornetop Højder',
   'entities.zones.thornpeak_heights.pois.0.label': 'Højvagten',
@@ -9399,6 +9417,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.wave': 'FORSTÆRKNINGER!',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.discordLabel': 'Bliv medlem af Discord',
+  'footer.levyStreet': 'Levy Street',
   'footer.githubLabel': 'Open Source-projekt',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Whitepaper',
@@ -15703,7 +15722,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fieldcraft_reentry.description':
     'Passiv: Med Jagtfart gør Sporbrud dit næste Sprættende Slag eller Blodkrog klar i 12 sek. Sprættende Slag gør 15% mere skade pr. stak. Blodkrog gør 18 til 24 ekstra fysisk skade, øget med 15% pr. stak og af afstandsangrebsstyrke. Ved 3 stakke bruger et af angrebene Jagtfart. (Overlevelse)',
   'entities.abilities.frostjaw_trap.description':
-    'Placer en fælde ved den valgte fjende eller ved dine fødder. Den armeres efter 0,75 sek. og varer 30 sek. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek.',
+    'Placer en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer 1 min, og kun du og din gruppe kan se den. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek.',
   'entities.abilities.hunting_momentum.description':
     'Passiv: Sprættende Slag og en Splintladning, der rammer en fjende, giver hver 1 Jagtfart, op til 3. Varer, indtil de bruges eller du forlader kamp, og hver stak øger bevægelseshastigheden med 15%. Ved 3 stakke gør Sårflænger 60% mere slagskade og bruger stakkene. (Overlevelse)',
   'entities.abilities.measured_shot.description':
@@ -19957,7 +19976,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.specNote_restoration':
     'Bruger dine 5 Grønske: hver allieret med dine heling-over-tid-effekter heles straks for {buff}% af den heling, effekterne havde tilbage. Effekterne fjernes, og målet får en ny Sporeheling.',
   'entities.abilities.play_dead.description':
-    'Fald til jorden og spil død: dit helbred og fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller en anden evne afslutter det. Kast igen for at rejse dig.',
+    'Fald til jorden og se død ud: din sundhed og dit fokus vises som tomme for alle. Fjender glemmer dig, og fjendtlige spillere, der har dig som mål, mister deres mål. Bevægelse, angreb eller brug af en anden evne afslutter den. Kastes den, mens du bevæger dig, har du 1 sek. til at stoppe, før bevægelsen afslutter den. Kast igen for at rejse dig.',
   'entities.abilities.play_dead.name': 'Spil død',
   'entities.abilities.rejuvenation.name': 'Sporeheling',
   'entities.abilities.scratch.description':
@@ -20028,4 +20047,25 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Den visuelt rigeste faste forudindstilling. Passer til et grafikkort i topklassen.',
   'graphicsPrompt.changeLater': 'Du kan altid ændre dette i Indstillinger under Grafikkvalitet.',
   'graphicsPrompt.confirm': 'Fortsæt',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'Bjørnefælde',
+  'entities.abilities.bear_trap.description':
+    'Læg en fælde på det valgte sted. Den armeres efter 0,75 sek. og varer i 1 min.; kun du og din gruppe kan se den. Den første fjende, der udløser den, bløder for {damage} fysisk skade over 15 sek. og bremses med 50% i 4 sek. Skaden stiger med angrebskraft på afstand. Kun én Bjørnefælde kan være aktiv ad gangen. Den kan være aktiv samtidig med din Frostkæbefælde. Hvis du lægger en ny Bjørnefælde, erstatter den den gamle.',
+  'entities.abilities.scatterbolt.name': 'Spredebolt',
+  'entities.abilities.scatterbolt.description':
+    'Affyr en byge af armbrøstpile i en 90 graders kegle, der rækker 8 yards foran dig, og skub fjender tilbage til op til 20 yards fra dig. Fjender, der er immune over for tilbageskub, påvirkes ikke. Giver ingen skade.',
+  'entities.abilities.phosphor_flask.name': 'Fosforflaske',
+  'entities.abilities.phosphor_flask.description':
+    'En forseglet beholder med en reaktiv kemisk blanding, der bryder ud i hvidglødende flammer over et område på 8 m i 3 sek. Fjender, der står i flammerne, tager {damage} Ildskade hvert 0,5 sek. Skaden stiger med afstandsangrebskraft.',
+  'entities.items.lychgate_buckler.name': 'Kirkegårdslågens rundskjold',
+  'entities.items.bastion_kite_shield.name': 'Bastionens normannerskjold',
+  'entities.items.barrowfield_tower_shield.name': 'Gravhøjsmarkens tårnskjold',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'Ressourcebjælke',
+  'hudChrome.options.hillBarOpacity': 'Baggrundens uigennemsigtighed for Bakkekonge',
+  'hudChrome.options.playerFrameResourceDetached': 'Frigør ressourcebjælke',
+  'hudChrome.options.playerFrameResourceHeight': 'Ressourcebjælkens højde',
+  'hudChrome.options.playerFrameResourceWidth': 'Ressourcebjælkens bredde',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    'Slå Frigør ressourcebjælke til på fanen Rammer. Så frigør Rediger rammer også din ressourcebjælke, så du kan placere mana, energi eller raseri separat, hvor du vil. Ressourcebjælkens bredde og Ressourcebjælkens højde på samme fane ændrer størrelsen. Rediger rammer frigør også Bakkekonge-bjælken. Baggrundens uigennemsigtighed for Bakkekonge på samme fane nedtoner panelet, mens teksten forbliver tydelig.',
+  'hudChrome.options.pixelsValue': '{value} px',
 };
