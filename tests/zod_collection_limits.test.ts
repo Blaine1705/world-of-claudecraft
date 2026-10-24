@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import type { z as Zod } from 'zod';
+import type { z as Zod, ZodTypeAny } from 'zod';
 
 const require = createRequire(import.meta.url);
 
@@ -33,7 +33,7 @@ for (const consumer of ['@reown/appkit-wallet', 'chromium-bidi']) {
               visits++;
               return value;
             }, z.string());
-            const collection =
+            const collection: ZodTypeAny =
               constraint === 'array.max'
                 ? z.array(element).max(2, 'too many')
                 : constraint === 'array.length'
