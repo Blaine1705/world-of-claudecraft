@@ -4290,6 +4290,7 @@ export const es_ES: EnTranslations = {
       "resetConfirmBody": "Esto abandona las instancias vacías de la dificultad seleccionada anteriormente. El botín sin reclamar impedirá el restablecimiento.",
       "resetConfirm": "Restablecer instancias",
       "resetCooldown": "Las instancias solo se pueden restablecer una vez cada 5 minutos.",
+      "resetAlreadyFresh": "Tus instancias ya están como nuevas. Nadie ha entrado en ellas desde el último reinicio.",
       "resetUsage": "Usa /dungeon reset para abandonar tus instancias vacías después de cambiar la dificultad.",
       "entryMismatchNormal": "Esta instancia está configurada en dificultad Normal. Usa Restablecer todas las instancias para iniciar una nueva partida Heroica.",
       "entryMismatchHeroic": "Esta instancia está configurada en dificultad Heroica. Usa Restablecer todas las instancias para iniciar una nueva partida Normal."

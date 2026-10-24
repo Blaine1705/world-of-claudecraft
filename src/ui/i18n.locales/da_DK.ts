@@ -6549,6 +6549,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Du kan ikke nulstille instanser, mens nogen stadig er derinde.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Skift fangekældersværhedsgrad, før du nulstiller disse instanser. Tomme instanser nulstilles automatisk efter 5 minutter.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Dine instanser er allerede nulstillet. Ingen har været inde i dem siden sidste nulstilling.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Brug /dungeon reset til at forlade dine tomme instanser efter at have ændret sværhedsgrad.',
   'hudChrome.dungeonDifficulty.resetLoot':

@@ -4290,6 +4290,7 @@ export const da_DK: EnTranslations = {
       "resetConfirmBody": "Dette forlader tomme instanser fra din tidligere valgte sværhedsgrad. Uhentet bytte forhindrer nulstillingen.",
       "resetConfirm": "Nulstil instanser",
       "resetCooldown": "Instanser kan kun nulstilles én gang hvert 5. minut.",
+      "resetAlreadyFresh": "Dine instanser er allerede nulstillet. Ingen har været inde i dem siden sidste nulstilling.",
       "resetUsage": "Brug /dungeon reset til at forlade dine tomme instanser efter at have ændret sværhedsgrad.",
       "entryMismatchNormal": "Denne instans er indstillet til Normal sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Heroisk gennemspilning.",
       "entryMismatchHeroic": "Denne instans er indstillet til Heroisk sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Normal gennemspilning."

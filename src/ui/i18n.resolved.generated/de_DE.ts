@@ -4290,6 +4290,7 @@ export const de_DE: EnTranslations = {
       "resetConfirmBody": "Dadurch werden leere Instanzen deiner zuvor gewählten Schwierigkeit aufgegeben. Nicht beanspruchte Beute verhindert das Zurücksetzen.",
       "resetConfirm": "Instanzen zurücksetzen",
       "resetCooldown": "Instanzen können nur einmal alle 5 Minuten zurückgesetzt werden.",
+      "resetAlreadyFresh": "Deine Instanzen sind bereits frisch. Seit dem letzten Zurücksetzen hat sie niemand betreten.",
       "resetUsage": "Verwende /dungeon reset, um deine leeren Instanzen nach einer Schwierigkeitsänderung aufzugeben.",
       "entryMismatchNormal": "Diese Instanz ist auf die Schwierigkeit Normal eingestellt. Verwende Alle Instanzen zurücksetzen, um einen neuen heroischen Durchlauf zu starten.",
       "entryMismatchHeroic": "Diese Instanz ist auf die Schwierigkeit Heroisch eingestellt. Verwende Alle Instanzen zurücksetzen, um einen neuen normalen Durchlauf zu starten."

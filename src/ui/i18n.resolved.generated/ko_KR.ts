@@ -4290,6 +4290,7 @@ export const ko_KR: EnTranslations = {
       "resetConfirmBody": "이전에 선택한 난이도의 빈 인스턴스를 포기합니다. 획득하지 않은 전리품이 있으면 초기화할 수 없습니다.",
       "resetConfirm": "인스턴스 초기화",
       "resetCooldown": "인스턴스는 5분마다 한 번만 초기화할 수 있습니다.",
+      "resetAlreadyFresh": "인스턴스가 이미 초기화된 상태입니다. 마지막 초기화 이후 아무도 입장하지 않았습니다.",
       "resetUsage": "난이도를 변경한 후 /dungeon reset 으로 빈 인스턴스를 포기할 수 있습니다.",
       "entryMismatchNormal": "이 인스턴스는 일반 난이도로 설정되어 있습니다. 영웅 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요.",
       "entryMismatchHeroic": "이 인스턴스는 영웅 난이도로 설정되어 있습니다. 일반 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요."

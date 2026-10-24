@@ -6806,6 +6806,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Du kannst Instanzen nicht zurücksetzen, solange sich noch jemand darin befindet.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Ändere die Dungeon-Schwierigkeit, bevor du diese Instanzen zurücksetzt. Leere Instanzen werden nach 5 Minuten automatisch zurückgesetzt.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Deine Instanzen sind bereits frisch. Seit dem letzten Zurücksetzen hat sie niemand betreten.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Verwende /dungeon reset, um deine leeren Instanzen nach einer Schwierigkeitsänderung aufzugeben.',
   'hudChrome.dungeonDifficulty.resetLoot':

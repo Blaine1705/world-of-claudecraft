@@ -4290,6 +4290,7 @@ export const pl_PL: EnTranslations = {
       "resetConfirmBody": "Spowoduje to porzucenie pustych instancji z poprzednio wybranego poziomu trudności. Nieodebrany łup uniemożliwi reset.",
       "resetConfirm": "Zresetuj instancje",
       "resetCooldown": "Instancje można resetować tylko raz na 5 minut.",
+      "resetAlreadyFresh": "Twoje instancje są już odświeżone. Nikt do nich nie wszedł od ostatniego resetu.",
       "resetUsage": "Po zmianie trudności użyj /dungeon reset, aby porzucić puste instancje.",
       "entryMismatchNormal": "Ta instancja ma ustawioną normalną trudność. Użyj opcji Zresetuj wszystkie instancje, aby rozpocząć nowy heroiczny przebieg.",
       "entryMismatchHeroic": "Ta instancja ma ustawioną heroiczną trudność. Użyj opcji Zresetuj wszystkie instancje, aby rozpocząć nowy normalny przebieg."

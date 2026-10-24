@@ -591,9 +591,27 @@ describe('dungeons: heroic difficulty', () => {
       ),
     ).toBe(true);
 
-    // A second same-difficulty reset inside the window is refused, so the
-    // button is not a zero-downtime Normal boss respawn loop.
+    // Nobody has entered the replacement yet, so it is already fresh: a second
+    // press neither rebuilds it nor moves the cooldown.
     const freshClaimId = inst.exitId;
+    const freshAvailableAt = inst.resetAvailableAt;
+    sim.resetDungeonInstances(pid);
+    expect(inst.exitId).toBe(freshClaimId);
+    expect(inst.resetAvailableAt).toBe(freshAvailableAt);
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === pid &&
+          event.text ===
+            'Your instances are already fresh. Nobody has entered them since they were last reset.',
+      ),
+    ).toBe(true);
+
+    // Once the run is used, a reset inside the window is refused, so the
+    // button is not a zero-downtime Normal boss respawn loop.
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    leaveDungeon(sim.ctx, pid);
     sim.resetDungeonInstances(pid);
     expect(inst.exitId).toBe(freshClaimId);
     expect(
@@ -687,6 +705,98 @@ describe('dungeons: heroic difficulty', () => {
     sim.resetDungeonInstances(leader);
     expect(inst.exitId).not.toBe(claimId);
     expect(inst.difficulty).toBe('normal');
+  });
+
+  it('lets a cleared Normal run start fresh once, then holds the cooldown', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Clearer', { characterId: 100 });
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+    const claimId = inst.exitId;
+    const boss = mobInInstance(sim, inst, 'morthen');
+    (sim as any).dealDamage(
+      sim.entities.get(pid),
+      boss,
+      boss.hp + 1000,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    expect(boss.dead).toBe(true);
+    // The kill binds the clearer to this claim (no reforming into a second run).
+    expect(sim.dungeonResetLocks.get('char:100:hollow_crypt')).toEqual({
+      availableAt: Number.POSITIVE_INFINITY,
+      claimId,
+    });
+    boss.lootable = false;
+    leaveDungeon(sim.ctx, pid);
+
+    sim.resetDungeonInstances(pid);
+
+    expect(inst.exitId).not.toBe(claimId);
+    expect(inst.difficulty).toBe('normal');
+    expect(mobInInstance(sim, inst, 'morthen').dead).toBe(false);
+    expect(sim.dungeonResetLocks.get('char:100:hollow_crypt')).toEqual({
+      availableAt: sim.time + INSTANCE_EMPTY_TIMEOUT,
+      claimId: inst.exitId,
+    });
+  });
+
+  it('refuses a same-difficulty reset while a released corpse still lies inside', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'CorpseLead', { characterId: 101 });
+    const member = sim.addPlayer('priest', 'FallenMember', { characterId: 102 });
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    enterDungeon(sim.ctx, 'hollow_crypt', member);
+    const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+    const claimId = inst.exitId;
+    const ghost = sim.entities.get(member) as AnyEntity;
+    (sim as any).handleDeath(ghost, mobInInstance(sim, inst, 'morthen'));
+    sim.releaseSpirit(member);
+    expect(ghost.ghost).toBe(true);
+    expect(sim.instanceSlotAt(ghost.pos)).toBeNull();
+    leaveDungeon(sim.ctx, leader);
+
+    sim.drainEvents();
+    sim.resetDungeonInstances(leader);
+
+    expect(inst.exitId).toBe(claimId);
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === leader &&
+          event.text === 'You cannot reset instances while someone is still inside.',
+      ),
+    ).toBe(true);
+  });
+
+  it('refuses a same-difficulty reset from a party member who is not the leader', () => {
+    const sim = makeSim();
+    const leader = sim.addPlayer('warrior', 'TrueLead', { characterId: 103 });
+    const member = sim.addPlayer('priest', 'NotLead', { characterId: 104 });
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+    const claimId = inst.exitId;
+    leaveDungeon(sim.ctx, leader);
+
+    sim.drainEvents();
+    sim.resetDungeonInstances(member);
+
+    expect(inst.exitId).toBe(claimId);
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (event) =>
+          event.type === 'error' &&
+          event.pid === member &&
+          event.text === 'You are not the party leader.',
+      ),
+    ).toBe(true);
   });
 
   it('never resets a claim when the difficulty selected is the one it already uses', () => {
@@ -3129,8 +3239,10 @@ describe('dungeons: raid lockout gate', () => {
     expect(claim.resetAvailableAt).toBe(sim.time + INSTANCE_EMPTY_TIMEOUT);
 
     // Without a kill there is no raid lockout to throttle trash respawns, so
-    // the rebuild pays the cooldown like a five-man claim.
+    // once the fresh run is used the rebuild pays the cooldown like a five-man.
     const freshClaimId = claim.exitId;
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
     sim.drainEvents();
     sim.resetDungeonInstances(leader);
     expect(claim.exitId).toBe(freshClaimId);
@@ -3139,6 +3251,28 @@ describe('dungeons: raid lockout gate', () => {
         (event) => event.text === 'Instances can only be reset once every 5 minutes.',
       ),
     ).toBe(true);
+  });
+
+  it('a Reset pressed right after a raid tier switch charges no cooldown, so the raid can switch back', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
+    const claim = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+
+    sim.setDungeonDifficulty('heroic', leader);
+    const heroicClaimId = claim.exitId;
+    expect(claim.difficulty).toBe('heroic');
+    // The door and chat prompts say "Reset"; the switch already gave a fresh
+    // run, so the press is a no-op rather than a cooldown-charging rebuild.
+    sim.resetDungeonInstances(leader);
+    expect(claim.exitId).toBe(heroicClaimId);
+    expect(claim.resetAvailableAt).toBe(0);
+    expect(sim.dungeonResetLocks.size).toBe(0);
+
+    sim.setDungeonDifficulty('normal', leader);
+    expect(claim.difficulty).toBe('normal');
+    expect(claim.exitId).not.toBe(heroicClaimId);
   });
 
   it('tells a raid member entering a claim at the other difficulty how to transition, same as a standard dungeon', () => {

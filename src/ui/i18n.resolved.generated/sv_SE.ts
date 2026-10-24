@@ -4290,6 +4290,7 @@ export const sv_SE: EnTranslations = {
       "resetConfirmBody": "Detta överger tomma instanser från din tidigare valda svårighetsgrad. Outhämtat byte förhindrar återställningen.",
       "resetConfirm": "Återställ instanser",
       "resetCooldown": "Instanser kan bara återställas en gång var 5:e minut.",
+      "resetAlreadyFresh": "Dina instanser är redan nollställda. Ingen har gått in i dem sedan den senaste återställningen.",
       "resetUsage": "Använd /dungeon reset för att överge dina tomma instanser efter att du har ändrat svårighetsgraden.",
       "entryMismatchNormal": "Den här instansen är inställd på Normal svårighetsgrad. Använd Återställ alla instanser för att starta en ny Heroisk omgång.",
       "entryMismatchHeroic": "Den här instansen är inställd på Heroisk svårighetsgrad. Använd Återställ alla instanser för att starta en ny Normal omgång."

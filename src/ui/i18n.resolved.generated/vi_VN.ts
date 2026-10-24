@@ -4290,6 +4290,7 @@ export const vi_VN: EnTranslations = {
       "resetConfirmBody": "Thao tác này sẽ từ bỏ các phụ bản trống thuộc độ khó bạn đã chọn trước đó. Chiến lợi phẩm chưa nhận sẽ ngăn việc đặt lại.",
       "resetConfirm": "Đặt Lại Phụ Bản",
       "resetCooldown": "Chỉ có thể đặt lại phụ bản một lần mỗi 5 phút.",
+      "resetAlreadyFresh": "Các phó bản của bạn đã được làm mới. Chưa ai vào kể từ lần đặt lại gần nhất.",
       "resetUsage": "Dùng /dungeon reset để từ bỏ các phụ bản trống sau khi đổi độ khó.",
       "entryMismatchNormal": "Phụ bản này được đặt ở độ khó Thường. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Anh Hùng mới.",
       "entryMismatchHeroic": "Phụ bản này được đặt ở độ khó Anh Hùng. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Thường mới."

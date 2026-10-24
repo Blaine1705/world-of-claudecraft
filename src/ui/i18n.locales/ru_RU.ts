@@ -5329,6 +5329,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ожидающая смена сложности отменена, поскольку изменились группа или её лидер.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh': 'Ваши подземелья уже обновлены. С последнего сброса в них никто не входил.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'После смены сложности используйте /dungeon reset, чтобы отказаться от пустых подземелий.',
   'hudChrome.dungeonDifficulty.resetLoot':

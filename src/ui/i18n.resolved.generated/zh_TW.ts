@@ -4290,6 +4290,7 @@ export const zh_TW: EnTranslations = {
       "resetConfirmBody": "此操作會放棄先前所選難度下的空置副本。若有未拾取的戰利品，則無法重置。",
       "resetConfirm": "重置副本",
       "resetCooldown": "每5分鐘只能重置一次副本。",
+      "resetAlreadyFresh": "你的副本已經是全新的。自上次重置以來沒有人進入過。",
       "resetUsage": "切換難度後，使用 /dungeon reset 放棄你的空置地城副本。",
       "entryMismatchNormal": "此地城副本的難度為普通。使用「重置所有地城副本」以開始全新的英雄難度副本。",
       "entryMismatchHeroic": "此地城副本的難度為英雄。使用「重置所有地城副本」以開始全新的普通難度副本。"

@@ -5210,7 +5210,9 @@ export const hudChromeStrings = {
       'This abandons your empty instances so the next run starts fresh at your selected difficulty. Lockouts are not changed. Anyone still inside, or unclaimed loot, will prevent the reset.',
     resetConfirm: 'Reset Instances',
     resetCooldown: 'Instances can only be reset once every 5 minutes.',
-    resetUsage: 'Use /dungeon reset to abandon your empty instances after changing difficulty.',
+    resetAlreadyFresh:
+      'Your instances are already fresh. Nobody has entered them since they were last reset.',
+    resetUsage: 'Use /dungeon reset to abandon your empty instances and start them fresh.',
     entryMismatchNormal:
       'This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.',
     entryMismatchHeroic:

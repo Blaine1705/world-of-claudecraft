@@ -6587,6 +6587,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'No puedes restablecer instancias mientras alguien siga dentro.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Cambia la dificultad de la mazmorra antes de restablecer estas instancias. Las instancias vacías se restablecen solas después de 5 minutos.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Tus instancias ya están como nuevas. Nadie ha entrado en ellas desde el último reinicio.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Usa /dungeon reset para abandonar tus instancias vacías después de cambiar la dificultad.',
   'hudChrome.dungeonDifficulty.resetLoot':

@@ -4290,6 +4290,7 @@ export const id_ID: EnTranslations = {
       "resetConfirmBody": "Tindakan ini meninggalkan instans kosong dari kesulitan yang sebelumnya dipilih. Jarahan yang belum diambil akan mencegah reset.",
       "resetConfirm": "Reset Instans",
       "resetCooldown": "Instans hanya dapat direset sekali setiap 5 menit.",
+      "resetAlreadyFresh": "Instance kamu sudah segar. Belum ada yang masuk sejak reset terakhir.",
       "resetUsage": "Gunakan /dungeon reset untuk meninggalkan instans kosong setelah mengubah kesulitan.",
       "entryMismatchNormal": "Instans ini diatur ke kesulitan Normal. Gunakan Reset Semua Instans untuk memulai perjalanan Heroik baru.",
       "entryMismatchHeroic": "Instans ini diatur ke kesulitan Heroik. Gunakan Reset Semua Instans untuk memulai perjalanan Normal baru."

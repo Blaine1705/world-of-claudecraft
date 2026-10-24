@@ -4290,6 +4290,7 @@ export const cs_CZ: EnTranslations = {
       "resetConfirmBody": "Tím opustíš prázdné instance z dříve vybrané obtížnosti. Nevyzvednutá kořist zabrání resetování.",
       "resetConfirm": "Resetovat instance",
       "resetCooldown": "Instance lze resetovat pouze jednou za 5 minut.",
+      "resetAlreadyFresh": "Vaše instance jsou již obnovené. Od posledního resetu do nich nikdo nevstoupil.",
       "resetUsage": "Po změně obtížnosti použij /dungeon reset k opuštění prázdných instancí.",
       "entryMismatchNormal": "Tato instance je nastavena na normální obtížnost. Použij Resetovat všechny instance a začni nový hrdinský průchod.",
       "entryMismatchHeroic": "Tato instance je nastavena na hrdinskou obtížnost. Použij Resetovat všechny instance a začni nový normální průchod."

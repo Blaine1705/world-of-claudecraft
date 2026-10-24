@@ -1254,21 +1254,25 @@ export function resetDungeonInstances(
     if (!options.quiet) ctx.error(r.meta.entityId, 'You have no instances to reset.');
     return { status: 'noClaims' };
   }
-  // The explicit reset may rebuild a claim at its CURRENT difficulty. That is not
-  // a zero-downtime farming loop (the v0.26 durable key stopped relog respawning
-  // Normal bosses): every same-difficulty replacement pays the five-minute
-  // cooldown below, and heroic and raid lockouts are read, never moved, so a
-  // locked tier still refuses the reset. A difficulty selection only transitions:
-  // it resets the claims whose difficulty differs from the new selection.
+  // The explicit reset may rebuild a claim at its CURRENT difficulty, so a group
+  // can run a cleared dungeon again without touching the difficulty toggle. It is
+  // rate-limited, not free: the rebuild stamps the five-minute cooldown below (raid
+  // rooms included, see reset_cooldown_policy.ts), so the NEXT reset waits, and
+  // heroic and raid lockouts are read, never moved, so a locked tier still refuses
+  // it. A claim nobody has entered since it was made is already fresh; rebuilding it
+  // again would only charge the cooldown (the "change difficulty, then Reset" flow
+  // the door and chat prompts describe), so the explicit reset leaves it alone. A
+  // difficulty selection (`transitionOnly`) resets only the claims whose difficulty
+  // differs from the new selection, never a matching one.
   const selected = ctx.dungeonDifficulty(r.meta.entityId);
   // Compare against the per-dungeon CLAMPED difficulty (what the replacement
   // claim below would actually use), so a dungeon without a heroic mode never
   // reads as a transition.
-  const directlyResettable = options.transitionOnly
-    ? owned.filter(
-        (inst) => inst.difficulty !== claimDifficultyForDungeon(inst.dungeonId, selected),
-      )
-    : owned;
+  const directlyResettable = owned.filter(
+    (inst) =>
+      inst.difficulty !== claimDifficultyForDungeon(inst.dungeonId, selected) ||
+      (!options.transitionOnly && inst.enteredBy.size > 0),
+  );
   const resettableSet = new Set(directlyResettable);
   if (directlyResettable.some((inst) => isIgnivarRaidRoom(inst.dungeonId))) {
     for (const inst of owned) {
@@ -1280,7 +1284,9 @@ export function resetDungeonInstances(
     if (!options.quiet)
       ctx.error(
         r.meta.entityId,
-        'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
+        options.transitionOnly
+          ? 'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.'
+          : 'Your instances are already fresh. Nobody has entered them since they were last reset.',
       );
     return { status: 'unchanged' };
   }

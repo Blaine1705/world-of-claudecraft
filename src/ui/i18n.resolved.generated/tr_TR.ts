@@ -4290,6 +4290,7 @@ export const tr_TR: EnTranslations = {
       "resetConfirmBody": "Bu işlem, daha önce seçtiğin zorluktaki boş örneklerden vazgeçer. Alınmamış ganimet sıfırlamayı engeller.",
       "resetConfirm": "Örnekleri Sıfırla",
       "resetCooldown": "Örnekler yalnızca 5 dakikada bir sıfırlanabilir.",
+      "resetAlreadyFresh": "Zindanların zaten sıfırlanmış durumda. Son sıfırlamadan beri kimse girmedi.",
       "resetUsage": "Zorluğu değiştirdikten sonra boş örneklerinden vazgeçmek için /dungeon reset kullan.",
       "entryMismatchNormal": "Bu örnek Normal zorluğa ayarlı. Yeni bir Kahramanca koşu başlatmak için Tüm Örnekleri Sıfırla seçeneğini kullan.",
       "entryMismatchHeroic": "Bu örnek Kahramanca zorluğa ayarlı. Yeni bir Normal koşu başlatmak için Tüm Örnekleri Sıfırla seçeneğini kullan."
