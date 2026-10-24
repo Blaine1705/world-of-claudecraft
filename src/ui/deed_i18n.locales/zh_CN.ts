@@ -969,4 +969,31 @@ export const table: DeedLocaleTable = {
     desc: '在存活且位于开放世界或PvP比赛时，保持世界PvP开启，累计游玩7天。庇护所、PvE副本、死亡和下线都会暂停进度；关闭世界PvP会重置进度。获得的头衔永久保留。',
     title: '不败者',
   },
+  dgn_guild_first_contract: {
+    name: '契约已签',
+    desc: '完成一份灯火大厅的每周地下城契约。',
+  },
+  dgn_guild_ten_contracts: {
+    name: '告示板常客',
+    desc: '完成10份灯火大厅的每周地下城契约。',
+  },
+  dgn_guild_fifty_contracts: {
+    name: '契约老手',
+    desc: '完成50份灯火大厅的每周地下城契约。',
+  },
+  feat_guild_writ_runner: {
+    name: '令状信使',
+    desc: '以6枚灯火印章从灯火大厅军需官加里克·霍尔特处购得。',
+    title: '令状信使',
+  },
+  feat_guild_hallsworn: {
+    name: '大厅誓约者',
+    desc: '以14枚灯火印章从灯火大厅军需官加里克·霍尔特处购得。',
+    title: '大厅誓约者',
+  },
+  feat_guild_of_lantern_hall: {
+    name: '灯火大厅之人',
+    desc: '以24枚灯火印章从灯火大厅军需官加里克·霍尔特处购得。',
+    title: '灯火大厅之人',
+  },
 };

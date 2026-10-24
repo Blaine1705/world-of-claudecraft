@@ -25,6 +25,7 @@ import {
 } from '../src/render/characters/manifest';
 import {
   characterStreamPlan,
+  dungeonCharacterBodyUrls,
   isStreamedBodyUrl,
   type RiftBodyDemand,
   type RiftBodyLaneHost,
@@ -36,9 +37,10 @@ import {
   riftOnlyVisualKeys,
   riftTemplateIds,
 } from '../src/render/characters/rift_body_stream_core';
+import { BUDDY_MOBS } from '../src/sim/content/buddy_mobs';
 import { HOARD_MOBS, RIFT_MOBS } from '../src/sim/content/rift/mobs';
 import { HOARD_MIN_LEVEL } from '../src/sim/content/treasure_maps';
-import { MOBS, NPCS, RIFT_X_MIN } from '../src/sim/data';
+import { DUNGEON_LIST, MOBS, NPCS, RIFT_X_MIN } from '../src/sim/data';
 import { RIFT_MIN_LEVEL } from '../src/sim/rift/portals';
 import { RIFT_RANK_BASE_LEVEL } from '../src/sim/rift/ranks';
 import { generateRiftFloor, riftFloorCount } from '../src/sim/rift/rift_gen';
@@ -250,16 +252,39 @@ describe('the two lanes follow what each kind of content spawns', () => {
 describe('the stream plan per profile', () => {
   it('keeps every non-iOS profile exactly as before: bodies gated, skins on demand', () => {
     expect(other.postEntry).toEqual([]);
+    expect(other.onDemand).toEqual([]);
     expect(other.rift).toEqual([]);
     expect(other.hoard).toEqual([]);
     expect(other.streamed).toEqual(preload.filter((url) => skins.has(url)));
   });
 
-  it('streams every iOS body exactly once, in one of the three lanes', () => {
+  it('assigns every iOS body exactly once to a stream or demand lane', () => {
     expect(ios.streamed).toEqual(preload.filter((url) => skins.has(url) || isStreamedBodyUrl(url)));
-    const all = [...ios.postEntry, ...ios.rift, ...ios.hoard];
+    const all = [...ios.postEntry, ...ios.rift, ...ios.hoard, ...ios.onDemand];
     expect(all.sort()).toEqual([...bodies].sort());
     expect(new Set(all).size).toBe(all.length);
+  });
+
+  it('defers dungeon actors while keeping shared overworld bodies at entry', () => {
+    expect(ios.onDemand).toContain(VISUALS[mobKey('raised_bonewalker')].url);
+    expect(dungeonCharacterBodyUrls('gravewyrm_sanctum')).toContain(
+      VISUALS[mobKey('raised_bonewalker')].url,
+    );
+    expect(dungeonCharacterBodyUrls('drowned_temple')).toContain(VISUALS[mobKey('moonspawn')].url);
+    expect(ios.postEntry).toContain(VISUALS[mobKey('balgath_cyclops')].url);
+    expect(dungeonCharacterBodyUrls('arena')).toEqual([]);
+  });
+
+  it('gives every deferred combat body an arrival preparation destination', () => {
+    const destinations = new Set(
+      DUNGEON_LIST.flatMap((dungeon) => dungeonCharacterBodyUrls(dungeon.interior)),
+    );
+    const buddies = new Set(Object.keys(BUDDY_MOBS).flatMap((id) => defUrls(VISUALS[mobKey(id)])));
+    expect(ios.onDemand.filter((url) => !buddies.has(url) && !destinations.has(url))).toEqual([]);
+    // These imperative encounter summons are not in the arrival inventory.
+    // Keep them ready in core until their owners supply a preload destination.
+    expect(ios.postEntry.some((url) => url.endsWith('/ignivar_ashcaller.glb'))).toBe(true);
+    expect(ios.postEntry.some((url) => url.endsWith('/cinder_artificer.glb'))).toBe(true);
   });
 
   it('keeps the iOS post-entry creature stream under its on-disk budget', () => {

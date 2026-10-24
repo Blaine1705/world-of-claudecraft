@@ -1,5 +1,6 @@
 // Emit-only encounter guidance. Raid tactics and tuning stay in the existing journal.
 import type { DungeonDifficulty } from '../sim/types';
+import { DUNGEON_JOURNALS, dungeonJournalSourceFor } from './boss_journal/registry';
 import type { FinderEncounterViewModel } from './dungeon_finder_view';
 import { esc } from './esc';
 import { formatNumber, type InterpolationValues, type TranslationKey, t } from './i18n';
@@ -47,7 +48,10 @@ const DUNGEON_RESPONSES = {
 
 // The raid journal owns a template-key type; adapt it at the localization
 // boundary just as raid_boss_guide_window.ts does.
-function raidText(key: RaidBossGuideTextKey, values?: InterpolationValues): string {
+function raidText(
+  key: RaidBossGuideTextKey | TranslationKey,
+  values?: InterpolationValues,
+): string {
   return t(key as TranslationKey, values);
 }
 
@@ -61,7 +65,9 @@ function formattedValues(
       key,
       formatNumber(
         value,
-        percentValues.includes(key) ? { style: 'percent', maximumFractionDigits: 0 } : undefined,
+        percentValues.includes(key)
+          ? { style: 'percent', maximumFractionDigits: 0 }
+          : { maximumFractionDigits: 1 },
       ),
     ]),
   );
@@ -73,10 +79,21 @@ export function encounterGuideHtml(
   difficulty: DungeonDifficulty,
 ): string {
   const boss = RAID_BOSSES[encounter.mobId];
-  if (boss) {
-    const guide = raidBossGuideView(boss, difficulty);
+  const dungeon = DUNGEON_JOURNALS.find((entry) =>
+    entry.bosses.some((entry) => entry.mobId === encounter.mobId),
+  );
+  const guide = boss
+    ? raidBossGuideView(boss, difficulty)
+    : dungeon
+      ? dungeonJournalSourceFor(dungeon.dungeonId)?.view(encounter.mobId, difficulty)
+      : null;
+  if (guide) {
+    const overviewValues =
+      'overviewValues' in guide
+        ? formattedValues(guide.overviewValues, guide.overviewPercentValues)
+        : undefined;
     return (
-      `<p class="df-encounter-guide-intro">${esc(raidText(guide.overviewKey))}</p>` +
+      `<p class="df-encounter-guide-intro">${esc(raidText(guide.overviewKey, overviewValues))}</p>` +
       guide.phases
         .map((phase) => {
           const values = formattedValues(phase.values, phase.percentValues);

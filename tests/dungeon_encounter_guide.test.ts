@@ -41,20 +41,29 @@ describe('catalogue encounter guide', () => {
     );
   });
 
-  it('does not offer false frontal or spread counterplay for radial dungeon damage', () => {
-    expect(markup('knight_commander_olen', ['reaping_arc']).textContent).toContain(
+  it('keeps accurate counterplay for legacy mechanics without a dedicated journal', () => {
+    expect(markup('legacy_boss', ['reaping_arc']).textContent).toContain(
       'standing behind the boss alone does not prevent this splash damage',
     );
-    expect(markup('korzul_the_gravewyrm', ['grave_inferno']).textContent).toContain(
+    expect(markup('legacy_boss', ['grave_inferno']).textContent).toContain(
       'Spreading out inside the fire does not protect you',
     );
-    expect(markup('corrupted_priest_malric', ['profane_mending']).textContent).toContain(
+    expect(markup('legacy_boss', ['profane_mending']).textContent).toContain(
       'not a cast to interrupt',
     );
   });
 
+  it('uses the reworked dungeon journal and its difficulty-specific mechanics', () => {
+    const normal = markup('sexton_marrow');
+    const heroic = markup('sexton_marrow', [], 'heroic');
+    expect(normal.textContent).toContain('Shovelful');
+    expect(normal.textContent).not.toContain("Gravedigger's Blow");
+    expect(heroic.textContent).toContain("Gravedigger's Blow");
+    expect(heroic.textContent).not.toMatch(/bossJournal\.|\{[a-zA-Z]+\}/);
+  });
+
   it('does not invent mechanics for encounters with no authored strategy', () => {
-    const root = markup('sexton_marrow');
+    const root = markup('unregistered_boss');
     expect(root.textContent).toBe(t('hudChrome.finder.guideUnavailable'));
     expect(root.querySelector('.df-encounter-guide-mechanic')).toBeNull();
   });

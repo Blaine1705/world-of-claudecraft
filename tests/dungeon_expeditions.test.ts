@@ -239,7 +239,7 @@ describe('open dungeon expeditions through the real Sim', () => {
     context(sim).dropEntity(boss.id);
     expect(sim.dungeonFinderInfoFor(leader)?.expedition).toMatchObject({
       bossesDefeated: 1,
-      bossesTotal: 2,
+      bossesTotal: 4,
     });
     const final = claim.mobIds
       .map((id) => sim.entities.get(id))

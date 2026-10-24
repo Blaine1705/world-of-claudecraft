@@ -466,13 +466,18 @@ describe('two-pool wiring at the migrated sim command boundaries', () => {
     // budget plus the socketed bag list). Pinning the definition's composition
     // AND both consuming functions is what separates the real split from a
     // revert that re-flattens the budget while keeping the helper name.
+    // Re-anchored for the membership bank courier (5769f2a2596, PR 4281): the
+    // projection body moved into personalBankInfoFor (the courier custody read
+    // shares it), and bankInfoFor keeps only the banker-proximity gate and
+    // delegates, so the split is pinned where it now lives plus the delegation.
     const bank = sourceOf('src/sim/bank.ts');
     expect(occurrences(bank, 'generalOnlyPools(')).toBe(0);
     expect(fnBody(bank, 'bankPools')).toContain(
       'poolCapacityOf(bankCapacity(bank), bank.socketBags)',
     );
     expect(occurrences(fnBody(bank, 'bankDeposit'), 'bankPools(meta.bank)')).toBe(1);
-    expect(occurrences(fnBody(bank, 'bankInfoFor'), 'bankPools(bank)')).toBe(1);
+    expect(occurrences(fnBody(bank, 'personalBankInfoFor'), 'bankPools(bank)')).toBe(1);
+    expect(fnBody(bank, 'bankInfoFor')).toContain('return personalBankInfoFor(ctx, pid);');
   });
 
   it('the guild bank passes its OWN budget through generalOnlyPools, never the bags', () => {

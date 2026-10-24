@@ -14,7 +14,7 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "f617305c56804f5164e6cdc33260dc9b87335373ce22bb2a096b40f7df313ada",
+    "fingerprint": "945dede1c8da05e5d151720e4cda4766c8500f4ec143bed763b68426bb3d0648",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
@@ -22,7 +22,7 @@
       },
       "authoritativeLayout": {
         "path": "src/sim/eastbrook_layout.ts",
-        "sha256": "c623148ca0e359a9cd417c976042cda37c84d8027c09636dc817e8b909522176"
+        "sha256": "98885f13aaf1d54463724480b87b586ad2b9d51e71b45223b6aeaa5c61fda64b"
       },
       "civicShader": {
         "path": "src/render/realm_builder_monument_fx.ts",
@@ -31,7 +31,7 @@
       "runtimeRender": {
         "town": {
           "path": "src/render/eastbrook_town.ts",
-          "sha256": "79e1b78a266ed9a755b3628663ac8785f03ab72ce9c2101f3e77009d7e58367b"
+          "sha256": "ef4c4574ef06ba22c2ff4a98a2cc2ccfeef5ab64177a17ef6e5fe03a159d4171"
         },
         "mailbox": {
           "path": "src/render/mailbox.ts",
@@ -43,11 +43,11 @@
         },
         "renderer": {
           "path": "src/render/renderer.ts",
-          "sha256": "61a87ab374ff5da00197059cff4793d03f74216661002cd51225eaa0f12ea912"
+          "sha256": "85cad01486e256b7ca517f828d6ae8e165baf9d0742d6e3f1548e63e84fab34a"
         },
         "entityGroundSample": {
           "path": "src/render/entity_ground_sample.ts",
-          "sha256": "d8dd13ae4257ba7e08670c555daa3e039c78ebf506ecaee70f87ced64066f91a"
+          "sha256": "e3a8681920489377dc3b0be2f38923a0d9221684c6015fedbb1521b8707fb671"
         },
         "entityGroundSampleCore": {
           "path": "src/render/entity_ground_sample_core.ts",
@@ -55,7 +55,7 @@
         },
         "entityViewPolicy": {
           "path": "src/render/entity_view_policy_core.ts",
-          "sha256": "cff13be62577df0035da8059c6a35f58a89b58543c2de69830b7e1b46ddc67ad"
+          "sha256": "e659f19583e585ffe3038661fe8f286966223d2a1ea5b74e284e344aa936db3d"
         },
         "viewPriorityPolicy": {
           "path": "src/render/prewarm_policy.ts",
@@ -80,7 +80,7 @@
       },
       "captureContract": {
         "id": "polish-v2",
-        "sha256": "b40d0c03d3bfc794501bed1a5f797f9c15aa0d417b033c09d3a18be07592d8c5"
+        "sha256": "d0629cfcfedc9e235b14bdb5950badb1ec88ab082d8ffb94ed2018b75b34903e"
       }
     }
   },

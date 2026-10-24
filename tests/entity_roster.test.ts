@@ -18,6 +18,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
+import { freshMusterArmy } from '../src/sim/mirefen_muster';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import type { PendingProjectile } from '../src/sim/projectile_travel';
 import { Rng } from '../src/sim/rng';
@@ -133,6 +134,8 @@ function makeCtx() {
     },
     masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
+    graveyards: [],
+    playerStart: { x: 0, z: 0 },
     get cfg() {
       return cfg;
     },
@@ -274,6 +277,7 @@ function makeCtx() {
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
     weeklyRaidResetMs: vi.fn((nowMs: number) => nowMs),
+    dayNightPhase: vi.fn(() => null),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     instanceClaimIdAt: vi.fn(() => null),
@@ -314,6 +318,7 @@ function makeCtx() {
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],
+    musterArmy: freshMusterArmy(),
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),

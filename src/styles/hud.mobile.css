@@ -3844,6 +3844,41 @@
   body.mobile-touch #raid-boss-guide-window .rbg-ability-detail p {
     font-size: 10px;
   }
+  /* Dungeon pages: four or five bosses ride one horizontal strip instead of a
+     two-column grid, so the journal keeps its height on a landscape phone. */
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon .rbg-boss-tab {
+    flex: 0 0 auto;
+    width: 150px;
+    scroll-snap-align: start;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-tip-grid,
+  body.mobile-touch #raid-boss-guide-window .rbg-choice-sides {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-tip p,
+  body.mobile-touch #raid-boss-guide-window .rbg-choice p,
+  body.mobile-touch #raid-boss-guide-window .rbg-heroic ul,
+  body.mobile-touch #raid-boss-guide-window .rbg-ability-summary {
+    font-size: 10px;
+  }
+  body.mobile-touch
+    #raid-boss-guide-window
+    .rbg-boss-nav-dungeon
+    ~ .rbg-journal
+    .rbg-ability-toggle {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-boss-nav-dungeon ~ .rbg-journal .rbg-badges {
+    grid-column: 2;
+    padding-bottom: 4px;
+  }
   /* One anchor for both strips: the column (hud.css #aura-stack) owns the
      buff-to-debuff clearance, so the two `top` offsets that used to set it are
      gone. The old pair put the debuff row 36px under the buff row while a buff
@@ -4130,6 +4165,16 @@
      quest grew it down into the action ring. Desktop keeps it untouched, and the
      other trackers in #right-tracker-stack are unaffected. */
   body.mobile-touch #quest-tracker {
+    display: none;
+  }
+  /* The dungeon objectives tracker follows it for the same reason, and harder:
+     its seat at the top of this stack sits directly on the action ring on a
+     landscape phone, and a plate there would cover buttons a player fights
+     with. On touch the run is a PAGE of #quest-strip instead (the dungeon as
+     the title, each boss a counted line: dungeonStripQuest in
+     src/ui/hud/dungeon/dungeon_tracker_view.ts), so nothing is lost and the
+     stack keeps its phone footprint. */
+  body.mobile-touch #dungeon-tracker {
     display: none;
   }
   body.mobile-touch #meters-window {
@@ -4759,6 +4804,7 @@
   body.mobile-touch #quest-dialog,
   body.mobile-touch #calendar-window,
   body.mobile-touch #weekly-quests-window,
+  body.mobile-touch #guild-hall-window,
   body.mobile-touch #crafting-window,
   body.mobile-touch #mailbox-window,
   body.mobile-touch #emote-editor,
@@ -5596,6 +5642,58 @@
   body.mobile-touch #weekly-quests-window .wk-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     flex: 0 0 auto;
+  }
+  /* Lantern Hall on a phone: a compact board (a smaller portrait, a tighter sheet). On a
+     landscape phone the notices stay side by side and the quartermaster's detail keeps
+     beside its stock; only a window under 560px restacks them (components.css container
+     query), so the whole board and counter show with a short scroll. */
+  body.mobile-touch #guild-hall-window .gh-intro {
+    margin: 4px 0 8px;
+  }
+  body.mobile-touch #guild-hall-window .gh-board {
+    padding: 10px 8px 8px;
+  }
+  body.mobile-touch #guild-hall-window .gh-tally {
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+  body.mobile-touch #guild-hall-window .gh-cards {
+    gap: 10px;
+  }
+  body.mobile-touch #guild-hall-window .gh-card {
+    padding: 20px 10px 14px;
+    gap: 4px;
+  }
+  body.mobile-touch #guild-hall-window .gh-portrait {
+    width: 60px;
+    height: 60px;
+  }
+  body.mobile-touch #guild-hall-window .gh-boss {
+    font-size: 15px;
+  }
+  body.mobile-touch #guild-hall-window .gh-goal,
+  body.mobile-touch #guild-hall-window .gh-detail {
+    font-size: 12px;
+  }
+  body.mobile-touch #guild-hall-window .gh-wax {
+    width: 40px;
+    height: 40px;
+  }
+  body.mobile-touch #guild-hall-window .gh-slot-large {
+    width: 60px;
+    height: 60px;
+  }
+  body.mobile-touch #guild-hall-window .gh-detail-pane {
+    padding: 12px;
+    gap: 8px;
+  }
+  body.mobile-touch #guild-hall-window .gh-item {
+    min-height: 64px;
+  }
+  /* the phone's 3D stage: short enough that the buy bar stays in reach under it */
+  body.mobile-touch #guild-hall-window .gh-stage-slot,
+  body.mobile-touch #guild-hall-window .gh-stage {
+    height: 180px;
   }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */
@@ -7486,6 +7584,25 @@
     body.mobile-touch #cosmetics-window .cos-tab {
       min-height: 40px;
     }
+  }
+  body.mobile-touch #collections-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    /* Both opposing edges are pinned, so the edge pin IS the height on touch:
+       a desktop height on this window would otherwise over-constrain the box
+       and the browser would drop `bottom`. */
+    height: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
   }
   body.mobile-touch #reliquary-window {
     position: fixed;
@@ -10561,5 +10678,19 @@
   }
   body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-detail {
     font-size: 16px;
+  }
+  body.mobile-touch #courier-window {
+    left: 8px;
+    right: 8px;
+    top: max(8px, env(safe-area-inset-top));
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    transform: none;
+  }
+  @media (max-width: 500px) {
+    body.mobile-touch #courier-window .courier-columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 }

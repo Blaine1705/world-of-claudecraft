@@ -114,6 +114,10 @@ export interface AbilityVfxDeps {
   vfx: AbilityVfxPrimitives;
   // The gallery-ported primitive engine (rings, ribbons, decals, overlays).
   fx: AbilityVfxFx;
+  // The Shardpike throw's own presentation (it lives on the engine for update and
+  // dispose, but is asked here as a dep so a spellfx cue never touches the engine
+  // before the cast gate has had its say). Optional for tests.
+  shardpikeThrow?: { handleEvent(ev: AbilityVfxSpellfxEvent): boolean };
   // The renderer's entity anchor (same closure Vfx homes on): world position at
   // a height fraction, or null when the entity has no view yet.
   anchor: (id: number, heightFrac: number) => VfxPoint | null;
@@ -726,6 +730,7 @@ export class AbilityVfx {
   }
 
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
+    if (this.deps.shardpikeThrow?.handleEvent(ev)) return true;
     // Physical Warrior ticks are wounds. The wire's tick companion has no
     // ability label, so preserve its recipient cue without an ivory magic puff.
     if (ev.fx === 'tick' && ev.school === 'physical' && this.deps.isWarrior?.(ev.sourceId)) {
@@ -794,7 +799,16 @@ export class AbilityVfx {
       else return false;
     }
     const spec = abilityVfxSpecFor(appearance);
-    if (!spec) return false;
+    if (!spec) {
+      // A newly linked class ability may have no gallery entry yet. Its
+      // authored completion still owns the rig; ordinary tick cues do not.
+      if (
+        ev.attackAnimation !== 'ranged-shot' &&
+        (ev.fx === 'selfCast' || ev.fx === 'projectile' || ev.fx === 'heavyBolt')
+      )
+        this.releaseGesture(ev.sourceId, ability);
+      return false;
+    }
     // Claimed and drawn as nothing: the generic arm would link cold too. Two
     // reads survive the refusal, for the same reason the point-anchored ring
     // survives it in handleSpellfxAt below, and neither costs a cast program.
@@ -828,7 +842,7 @@ export class AbilityVfx {
       if (!full?.physical && !claimsSelfCastVfx(arch, targeted, !!full, !!full?.spirit)) {
         // A listed pure-DoT completion (Rip on the cat rig) still owns its
         // authored finisher; every other DoT keeps its no-gesture completion.
-        if (ownsDotCompletionGesture(arch, ability)) {
+        if (ownsDotCompletionGesture(arch, ability) || ability === 'startle_shot') {
           this.releaseGesture(ev.sourceId, ability);
         }
         return false;
@@ -1948,9 +1962,9 @@ export class AbilityVfx {
         const full = abilityVfxFullSpecFor(e.castingAbility);
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
-        // Preserve armour and skin detail throughout the cast. Physical
-        // channels carry weapon motion, never an emissive whole-body wash.
-        glowStrength = full?.physical ? 0 : 1.2 * (full?.power ?? 1);
+        // Preserve armour and skin detail throughout casts. Only morph form
+        // transitions tint the character body; offensive and normal spells do not.
+        glowStrength = full?.buff?.style === 'morph' ? 1.2 * (full?.power ?? 1) : 0;
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
         const windupStarted = fx.windup(

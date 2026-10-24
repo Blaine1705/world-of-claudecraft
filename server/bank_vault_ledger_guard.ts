@@ -56,6 +56,7 @@ import type { BankLedgerGuildEffectInput } from './bank_ledger_outbox';
 import type { BankLedgerRow } from './db';
 
 export type BankVaultLedgerCommand =
+  | 'courier_dispatch'
   | 'bank_deposit'
   | 'bank_withdraw'
   | 'bank_buy_slots'
@@ -136,6 +137,7 @@ export function resolveBankVaultLedgerMaxAccountStates(
 }
 
 const COMMAND_MAX_ROWS = Object.freeze({
+  courier_dispatch: 24,
   bank_deposit: 1,
   bank_withdraw: 1,
   bank_buy_slots: 1,

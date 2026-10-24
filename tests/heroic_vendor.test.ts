@@ -92,6 +92,8 @@ describe('heroic vendor stock: item-level and budget pins', () => {
         `${offer.itemId} is neither gear, a material, a pattern nor a seed`,
       ).toContain(ITEMS[offer.itemId]?.kind);
     }
+    // The Loot Goblin whistle row left with the account-wide buddy rework
+    // (1896839827c, merged at 7bc9c74af57), so the count is back to 29.
     expect(nonGear.length, 'one core plus twenty patterns plus eight seeds').toBe(29);
     for (const offer of gearOffers) {
       const item = ITEMS[offer.itemId];
@@ -108,6 +110,20 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       // Lodestone is also tradable; only PvP vendor trinkets bind.
       expect(item.soulbound, offer.itemId).toBeUndefined();
     }
+  });
+
+  it('no longer sells the retired Loot Goblin companion', () => {
+    // The account-wide buddy rework (1896839827c, merged at 7bc9c74af57)
+    // retired loot_goblin (archived-features/buddies-and-cosmetics/
+    // retired-buddies.json) and took its 100-mark whistle row off this stock.
+    // The whistle item def stays so old inventories still resolve; it carries
+    // no slot, so the item-level index skips it either way.
+    expect(HEROIC_VENDOR_STOCK.some((o) => o.itemId === 'whistle_loot_goblin')).toBe(false);
+    expect(HEROIC_VENDOR_STOCK.some((o) => ITEMS[o.itemId]?.kind === 'buddy')).toBe(false);
+    const item = ITEMS.whistle_loot_goblin;
+    expect(item.kind).toBe('buddy');
+    expect(item.slot).toBeUndefined();
+    expect(itemLevel(item)).toBeUndefined();
   });
 
   it('sells the Wyrmfall Core catch-up row at the ring price point', () => {

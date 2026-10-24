@@ -2,8 +2,11 @@
 // links programs on idle GPU slots; the built visuals are kept alive without
 // dispose because three drops a program when its last material is disposed.
 import * as THREE from 'three';
-import { MOBS } from '../sim/data';
+import { CLASSES, MOBS } from '../sim/data';
+import { FOG_SHADE_ID } from '../sim/encounters/sunken_bastion/ids';
 import { VARKHUL_BOSS_ID } from '../sim/ignivar_raid_ids';
+import { WILDHEART_TOADED } from '../sim/mob/trash_kit/wildheart_cast_ids';
+import type { Aura } from '../sim/types';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { type CharacterVisual, createCharacterVisual } from './characters';
 import { registerContextRestoreReset } from './context_restore_registry';
@@ -48,6 +51,9 @@ const staleKeepAliveHosts = new WeakSet<object>();
 const activeInteriorByHost = new WeakMap<object, string>();
 const IDLE_MS = 250;
 const TEXTURE_BATCH = 2;
+// Whose body wears the staged toad: a form rig is the same model whatever the
+// class, so any class resolves the same `form_toad` programs.
+const TOAD_FORM_HOST_CLASS = 'warrior';
 
 /** The host reports every interior change here, including leaving one (null):
  *  a stale value would keep relinking encounter visuals after the player left. */
@@ -172,10 +178,55 @@ async function runInteriorEncounterPrewarm(
     place(visual);
   };
 
-  // Each visual is a few ms of pure CPU. Built in one loop they all land on
-  // the frame that attaches the interior (measured: a >150ms stall at arena
-  // entry), so the build drains across idle slots exactly like the compile
-  // below.
+  // A Fog Shade wearing the ghost treatment: the same factory, entity shape
+  // and setGhost path as the live shade, so the same transparent program keys.
+  const buildVaelShadeGhost = (): void => {
+    const template = MOBS[FOG_SHADE_ID];
+    if (!template) return;
+    const entity = host.prewarmEntity('mob', template.id, template.color, template.scale);
+    const visual = createCharacterVisual(entity);
+    if (!visual) return;
+    visual.setGhost(true);
+    keepAlive.push(visual);
+    place(visual);
+  };
+
+  // A hexed player's toad: the polymorph slot's own factory call
+  // (buildFormVisual asks createCharacterVisual for 'form_sheep'), on an entity
+  // wearing the Toad Hex, so characterFormAssetKey resolves the same tinted
+  // `form_toad` rig and program keys the live hex builds. Constrained devices
+  // skip it like Varkhul's rig: a creature body held for the session, and the
+  // live polymorph gate keeps the base body standing in there.
+  const buildToadForm = (): void => {
+    if (GFX.constrainedMemory) return;
+    const entity = host.prewarmEntity(
+      'player',
+      TOAD_FORM_HOST_CLASS,
+      CLASSES[TOAD_FORM_HOST_CLASS]?.color ?? 0xffffff,
+      1,
+    );
+    entity.auras = [
+      {
+        id: WILDHEART_TOADED,
+        name: WILDHEART_TOADED,
+        kind: 'polymorph',
+        remaining: 1,
+        duration: 1,
+        value: 0,
+        sourceId: -1,
+        school: 'nature',
+      } satisfies Aura,
+    ];
+    const visual = createCharacterVisual(entity, 'form_sheep');
+    if (!visual) return;
+    keepAlive.push(visual);
+    place(visual);
+  };
+
+  // Each catalog rig is a skinned clone plus a full material clone pass, a few
+  // ms of pure CPU. Built in one loop the whole catalog lands on the frame that
+  // attaches the interior (measured: a >150ms stall at arena entry), so the
+  // build drains across idle slots exactly like the compile below.
   const units: Array<() => void> = [
     // Nythraxis's eruption, flame patches, Gravefire strip, and Binding Sigil:
     // actionable floor visuals built lazily by per-frame encounter sync, so
@@ -191,6 +242,8 @@ async function runInteriorEncounterPrewarm(
           },
         ]
       : []),
+    ...(spec.vaelShadeGhost ? [buildVaelShadeGhost] : []),
+    ...(spec.wildheartToadForm ? [buildToadForm] : []),
     ...(spec.varkhulVisuals
       ? [
           buildVarkhulRig,

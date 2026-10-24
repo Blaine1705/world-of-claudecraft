@@ -95,6 +95,10 @@ export interface DungeonFinderWindowDeps extends PainterHostPresentation {
   // Close the finder, open the world map, and ping the given overworld point
   // (the activity entrance). Never teleports.
   showOnMap(x: number, z: number): void;
+  // The dungeon's boss guide page for one encounter, when the dungeon ships one
+  // (raid_boss_guide_window.ts openJournal). Absent: no guide buttons.
+  hasBossGuide?(dungeonId: string, mobId: string): boolean;
+  openBossGuide?(dungeonId: string, mobId: string, difficulty: DungeonDifficulty): void;
   // Open Player Info for a group applicant: the live card when they are in
   // view, else the applicant snapshot (class, spec, worn gear).
   inspectPlayer?(pid: number, profile: InspectRemoteProfile): void;
@@ -483,6 +487,15 @@ export class DungeonFinderWindow {
       audio.click();
       rerender();
     });
+    for (const btn of el.querySelectorAll<HTMLButtonElement>('[data-bossguide]')) {
+      btn.addEventListener('click', () => {
+        const detail = view.detail;
+        const mobId = btn.dataset.bossguide;
+        if (!detail || !mobId || !this.deps.openBossGuide) return;
+        audio.click();
+        this.deps.openBossGuide(detail.dungeonId, mobId, detail.difficulty);
+      });
+    }
     el.querySelector('[data-showmap]')?.addEventListener('click', () => {
       const detail = view.detail;
       if (!detail) return;
@@ -834,7 +847,9 @@ export class DungeonFinderWindow {
     const encounters =
       `<div class="df-sub">${esc(t('hudChrome.finder.encounters'))}</div>` +
       d.encounters
-        .map((e) => this.encounterHtml(filterEncounterLoot(e, selection), d.difficulty))
+        .map((e) =>
+          this.encounterHtml(filterEncounterLoot(e, selection), d.difficulty, d.dungeonId),
+        )
         .join('');
     const travelKey =
       d.kind === 'delve'
@@ -856,8 +871,17 @@ export class DungeonFinderWindow {
     return `<div class="df-detail-hero">${catalogueHeroArtHtml(d)}<div class="df-detail-hero-copy">${head}${intro}${group}</div></div>${meta}${tiers}${lootPreviewControlsHtml(selection)}${encounters}`;
   }
 
-  private encounterHtml(e: FinderEncounterViewModel, difficulty: DungeonDifficulty): string {
+  private encounterHtml(
+    e: FinderEncounterViewModel,
+    difficulty: DungeonDifficulty,
+    dungeonId: string,
+  ): string {
     const name = tEntity({ kind: 'mob', id: e.mobId, field: 'name' });
+    const journalButton = this.deps.hasBossGuide?.(dungeonId, e.mobId)
+      ? `<button type="button" class="btn df-guide-btn ui-btn" data-bossguide="${esc(e.mobId)}" aria-label="${esc(
+          t('hudChrome.raidBossGuide.finderOpenLabel', { boss: name }),
+        )}">${esc(t('hudChrome.raidBossGuide.finderOpen'))}</button>`
+      : '';
     const flags = [
       e.final ? t('hudChrome.finder.finalBoss') : null,
       e.summoned ? t('hudChrome.finder.summoned') : null,
@@ -902,7 +926,7 @@ export class DungeonFinderWindow {
       (e.portraitUrl
         ? `<img class="df-portrait" src="${esc(e.portraitUrl)}" width="64" height="64" loading="lazy" decoding="async" alt="">`
         : `<span class="df-portrait df-glyph">${svgIcon('skull')}</span>`) +
-      `<div class="df-encounter-body"><div class="df-encounter-name">${esc(name)}${flags}</div>` +
+      `<div class="df-encounter-body"><div class="df-encounter-name">${esc(name)}${flags}${journalButton}</div>` +
       guide +
       `<div class="df-loot">${lootSections || `<p class="df-note">${esc(t('hudChrome.adventureGuide.lootEmpty'))}</p>`}${money}</div></div></div>`
     );

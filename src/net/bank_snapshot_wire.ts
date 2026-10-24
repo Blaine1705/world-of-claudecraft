@@ -106,8 +106,15 @@ function isBonusSource(value: unknown): value is BankBonusSource {
  *  field by field. Explicit null is the away-from-banker gate closure and
  *  passes through; undefined means malformed and tells the caller to RETAIN
  *  its prior mirror (the cvault/bpsl policy). A valid record is adopted by
- *  reference so an own `__proto__` row anywhere inside it stays inert data. */
-export function decodeBankInfoWire(value: unknown): BankInfo | null | undefined {
+ *  reference so an own `__proto__` row anywhere inside it stays inert data.
+ *
+ *  `unpriced` decodes another character's bank (membershipBankView): nothing
+ *  can be bought from that view, so both prices must be null instead of
+ *  following the purchase ladder. */
+export function decodeBankInfoWire(
+  value: unknown,
+  { unpriced = false }: { unpriced?: boolean } = {},
+): BankInfo | null | undefined {
   if (value === null) return null;
   if (!isRecord(value)) return rejectBankFrame('not a plain record');
   const unknownKey = Object.keys(value).find((key) => !BANK_KEYS.has(key));
@@ -123,7 +130,7 @@ export function decodeBankInfoWire(value: unknown): BankInfo | null | undefined 
   if (!isSafeCount(value.bonusSlots, true)) return rejectBankFrame('bonusSlots');
   // Null exactly at the top of the ladder, a price below it (bankInfoFor's
   // resolved table is length-stable under overrides by construction).
-  if (purchased >= BANK_PURCHASED_SLOTS_MAX) {
+  if (purchased >= BANK_PURCHASED_SLOTS_MAX || unpriced) {
     if (value.nextExpansionCost !== null) return rejectBankFrame('nextExpansionCost');
   } else if (!isSafeCount(value.nextExpansionCost, true)) {
     return rejectBankFrame('nextExpansionCost');
@@ -140,7 +147,7 @@ export function decodeBankInfoWire(value: unknown): BankInfo | null | undefined 
   ) {
     return rejectBankFrame('socketsUnlocked/socketBags');
   }
-  if (value.socketsUnlocked >= BANK_BAG_SOCKETS) {
+  if (value.socketsUnlocked >= BANK_BAG_SOCKETS || unpriced) {
     if (value.nextSocketCost !== null) return rejectBankFrame('nextSocketCost');
   } else if (!isSafeCount(value.nextSocketCost, true)) {
     return rejectBankFrame('nextSocketCost');

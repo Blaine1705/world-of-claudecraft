@@ -1,5 +1,7 @@
 import { endPlayDead } from './combat/hunter_play_dead';
+import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { gliderActionsLocked } from './glider_action_lock';
+import { membershipWeaponShape } from './membership_weapon';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { useCartographersInk, useTreasureMap } from './treasure_vault';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
@@ -29,6 +31,7 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
+import { useBuddyToken } from './buddies';
 import { openTreasureCasket } from './clue_casket';
 import { useClueScroll } from './clue_scrolls';
 import { isWornTrinket, onTrinketEquipped, useWornTrinket } from './combat/trinkets';
@@ -123,6 +126,7 @@ import {
   isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
+import { buyBuddyOffer } from './vendor_buddy_purchase';
 import {
   bulkBuyQuantity,
   buyPurchaseTotals,
@@ -243,7 +247,8 @@ function canReturnEquippedItemToBags(
  *  routed between hands from the committed spec. Exported so auto_equip.ts
  *  compares a grant against the copy this resolver would actually displace. */
 export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
-  const def = ITEMS[itemId];
+  const base = ITEMS[itemId];
+  const def = base ? membershipWeaponShape(base, meta.cls, meta.talents.spec) : undefined;
   if (!def?.slot) return null;
   if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
 
@@ -252,7 +257,8 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
   if (hand === 'mainhand') return 'mainhand';
   if (hand === 'twohand') {
     if (!canDualWieldTwoHand(meta.cls, spec)) return 'mainhand';
-    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const baseMainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const mainhand = baseMainhand ? membershipWeaponShape(baseMainhand, meta.cls, spec) : undefined;
     if (
       mainhand?.kind === 'weapon' &&
       weaponHand(mainhand) === 'twohand' &&
@@ -267,7 +273,8 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
   if (!canDualWield(meta.cls, spec)) return 'mainhand';
   if (!canEquipItemInSlot(meta.cls, def, 'offhand', spec)) return 'mainhand';
 
-  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const baseMainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const mainhand = baseMainhand ? membershipWeaponShape(baseMainhand, meta.cls, spec) : undefined;
   if (
     !canDualWieldTwoHand(meta.cls, spec) &&
     mainhand?.kind === 'weapon' &&
@@ -814,7 +821,18 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   if (!offhandId) return;
   const def = ITEMS[offhandId];
   if (!def) return;
-  if (canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
+  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const conflict =
+    mainhand &&
+    displacedSlotForEquip(
+      mainhand,
+      'mainhand',
+      meta.equipment,
+      (id) => ITEMS[id],
+      meta.cls,
+      meta.talents.spec,
+    );
+  if (!conflict && canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
 
   const instance = meta.equipmentInstance?.offhand;
   delete meta.equipment.offhand;
@@ -913,6 +931,8 @@ export function useItem(
   endPlayDead(ctx, r.e);
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
+  // Redemption is a durable account operation owned by the online host.
+  if (itemId === MEMBERSHIP_TOKEN_ID) return;
   if (
     meta.vehicle ||
     wispMazeActionsLocked(meta.worldQuestLog) ||
@@ -1375,6 +1395,13 @@ export function useItem(
     // first. Reins are never consumed: mountOwned() derives ownership from holding
     // the item, so removing it here would delete the mount.
     summonMountItem(ctx, meta.entityId, def.mount);
+  } else if (def.kind === 'buddy') {
+    // A whistle is a grant TOKEN: using it attaches the companion to the
+    // character and consumes the token (a duplicate is refused unconsumed).
+    // Summoning an owned buddy is a Cosmetics-window command, not an item use.
+    useBuddyToken(ctx, meta.entityId, itemId);
+  } else if (def.kind === 'buddy_cosmetic') {
+    // Historical cosmetic tokens remain readable but are no longer usable.
   } else if (def.kind === 'recipe') {
     // A pattern teaches the recipe it names and is spent doing so.
     // useRecipePatternItem owns every gate and the consume; it sits here, below
@@ -1589,6 +1616,7 @@ export function buyItem(
     ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
+  if (buyBuddyOffer(ctx, meta.entityId, def, copperCost, honorCost)) return;
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;

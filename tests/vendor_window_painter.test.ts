@@ -1226,9 +1226,11 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     // Anchored to itemTooltip's own body like the renderVendor pin above: an
     // unscoped whole-file toContain is satisfied by the same expression in an
     // unrelated method, and the slice is comment-stripped so a line of prose
-    // quoting the call cannot stand in for the call itself.
+    // quoting the call cannot stand in for the call itself. The signature
+    // gained inspectedWearer with the membership account benefits
+    // (6ffc9e3e3ca, PR 4281); the guarded slot line is unchanged.
     const itemTooltipStart = anchor(
-      "private itemTooltip(\n    item: ItemDef,\n    compare: boolean | 'embedded' | 'noset' = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n  ): string {",
+      "private itemTooltip(\n    item: ItemDef,\n    compare: boolean | 'embedded' | 'noset' = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n    inspectedWearer?: MembershipTooltipWearer,\n  ): string {",
     );
     const itemProcBlockStart = anchor('private itemProcBlock(item: ItemDef): string {');
     expect(itemProcBlockStart).toBeGreaterThan(itemTooltipStart);

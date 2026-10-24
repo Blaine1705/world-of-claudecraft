@@ -1,3 +1,4 @@
+import type { ReferralRewardState } from './referral_reward_state';
 // Persisted character and pet save shapes. This is a type-only leaf: hosts may
 // describe JSONB state without evaluating the simulation coordinator or any
 // gameplay module. New fields remain optional unless every historical save can
@@ -5,8 +6,10 @@
 
 import type { SavedAura } from './aura_persist';
 import type { SavedBankState } from './bank';
+import type { SavedBuddyCollection } from './buddies';
 import type { SavedLoadout, TalentAllocation } from './content/talents';
 import type { SavedCooldowns } from './cooldown_persist';
+import type { CourierState } from './courier';
 import type { SavedDeedStats } from './deeds';
 import type { PlayerEquipment } from './entity';
 import type { JailState } from './jail';
@@ -37,7 +40,7 @@ import type { WeeklyRewardState } from './weekly_rewards';
 // Persistable character state (stored as JSONB server-side). The arena fields
 // are optional so characters saved before the Ashen Coliseum existed load
 // cleanly (addPlayer falls back to the unranked defaults).
-export interface CharacterState {
+export interface CharacterState extends ReferralRewardState {
   queueRewards?: import('./social/queue_rewards').QueueRewardsState;
   // Production content migration revision. Revision 1 is the v0.26 all-class
   // Talents V2 migration; revision 2 is the v0.29 Hunter redesign repick.
@@ -99,12 +102,16 @@ export interface CharacterState {
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
   bags?: (string | null)[];
+  /** Equipped member bag, retained without capacity while membership is inactive. */
+  membershipBag?: string;
   // Per-character bank (JSONB; optional so pre-bank saves load cleanly, defaulting
   // to an empty bank with no purchased/bonus slots). sanitizeBankState is the one
   // load path (never destroys items; tolerates an over-capacity inventory). The
   // SavedBankState socket fields are optional and written only once a socket is
   // unlocked, so pre-socket and zero-socket saves stay byte-equal.
   bank?: SavedBankState;
+  /** Forward-only cargo custody. Do not roll back to a binary that drops it. */
+  courier?: CourierState;
   // Per-character Materials Vault (JSONB; optional so pre-vault saves load cleanly,
   // defaulting to the empty locked vault). sanitizeVaultState is the one load path
   // (never destroys stock; tolerates an over-capacity count).
@@ -137,6 +144,9 @@ export interface CharacterState {
     vaultAttemptSeq?: number;
     vaultGuestCycle?: string;
     vaultGuestPayouts?: number;
+    // Lantern Hall's weekly contracts (src/sim/guild_contracts.ts), written only once the
+    // character has done one: the week last read, its done list, and the lifetime count.
+    guildContracts?: { week: string; done: string[]; lifetime: number };
     // The Allied Hearthstone's bound hub (a FactionId), written only when bound.
     alliedHearthstone?: string;
   };
@@ -386,6 +396,12 @@ export interface CharacterState {
   // The Reliquary (JSONB; optional, written only when non-empty so pre-system
   // saves load cleanly and stay byte-equal until the system engages).
   reliquary?: SavedReliquaryState;
+  // The buddy collection (src/sim/buddies.ts): owned companions, unlocked
+  // cosmetics, the worn look per buddy, pending boss-roll wins, and the last
+  // summoned key. Optional, written only when non-empty so pre-buddy saves
+  // load cleanly and stay byte-equal. Ids are re-validated against the
+  // catalog on load (a removed companion loads as absent).
+  buddies?: SavedBuddyCollection;
   // The durable OFFLINE/HEADLESS material-gatherer identity (src/sim/material_gatherer.ts).
   // Optional and written ONLY by a host that has one, so an online character's
   // blob and every pre-feature save stay byte-equal: the server re-supplies an

@@ -18,6 +18,7 @@ import { cheaterTagLabel } from './cheater_tag';
 import { deedTargetBorderSlug } from './deed_border_view';
 import type { TitledNameDecoration } from './deed_i18n';
 import { entityDisplayName } from './entity_display_core';
+import { wardHealthText } from './hud/dungeon/gaol_chain_view';
 import { type HealthTextMode, unitFrameCurrentMaxText, unitFrameHealthText } from './hud_frames';
 import { t } from './i18n';
 import type { UnitFrameDescriptor } from './unit_frame';
@@ -52,7 +53,9 @@ export function fillTargetHealthText(
   healthMode: HealthTextMode,
 ): void {
   const dead = shownAsDead(target);
-  d.hpText = dead ? t('hud.core.dead') : unitFrameHealthText(target.hp, target.maxHp, healthMode);
+  d.hpText = dead
+    ? t('hud.core.dead')
+    : (wardHealthText(target) ?? unitFrameHealthText(target.hp, target.maxHp, healthMode));
   d.showAbsorbText = !dead && healthMode !== 0;
 }
 

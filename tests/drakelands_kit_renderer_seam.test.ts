@@ -35,7 +35,8 @@ describe('renderer Drakelands kit seam', () => {
     const awaitAt = prepare.indexOf('if (kitLoad) await kitLoad;');
     const buildAt = prepare.indexOf('this.ensureZoneFeatures(zone);');
     const preparedAt = prepare.indexOf('this.preparedZones.add(zone.id);');
-    expect(awaitAt).toBeGreaterThan(terrainAt);
+    expect(awaitAt).toBeGreaterThan(0);
+    expect(terrainAt).toBeGreaterThan(buildAt);
     expect(buildAt).toBeGreaterThan(awaitAt);
     expect(preparedAt).toBeGreaterThan(buildAt);
     // Nothing swallows a failed load between the await and the zone's
@@ -65,14 +66,15 @@ describe('renderer Drakelands kit seam', () => {
     const recheckAt = body.indexOf(
       'const kitHolds = drakelandsKitRecheck(zones, cameraX, cameraZ, horizon, this.visibleZoneCheck);',
     );
-    const nearAt = body.indexOf(
-      'const near = zonesWithinStreamingHorizon(zones, cameraX, cameraZ, horizon, forwardX, forwardZ);',
-    );
+    const nearAt = body.indexOf('this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(');
     expect(guardAt).toBeGreaterThan(-1);
     expect(zonesAt).toBeGreaterThan(guardAt);
     expect(recheckAt).toBeGreaterThan(zonesAt);
     // Same zones and the same horizon as the prepare queue it leads.
     expect(nearAt).toBeGreaterThan(recheckAt);
+    expect(body.slice(nearAt)).toMatch(
+      /zonesWithinStreamingHorizon\(\s*zones,\s*cameraX,\s*cameraZ,\s*horizon,\s*forwardX,\s*forwardZ,/,
+    );
     expect(source.match(/drakelandsKitRecheck\(/g)?.length).toBe(1);
   });
 
@@ -84,11 +86,13 @@ describe('renderer Drakelands kit seam', () => {
       'private queueVisibleZonePrepares(horizon: number): void {',
       '\n  private evictFarZoneIfConstrained(',
     );
-    const queue = body.slice(body.indexOf('this.visibleZonePrepareQueue = near.filter('));
+    const queue = body.slice(
+      body.indexOf('this.visibleZonePrepareQueue = zonesWithinStreamingHorizon('),
+    );
     expect(queue).toContain('!this.preparedZones.has(zone.id) &&');
     expect(queue).toContain('!this.pendingZonePrepares.has(zone.id) &&');
-    expect(queue).toContain('!kitHolds(zone.biome),');
-    expect(queue.indexOf('!kitHolds(zone.biome),')).toBeLessThan(
+    expect(queue).toContain('!kitHolds(zone.biome) &&');
+    expect(queue.indexOf('!kitHolds(zone.biome) &&')).toBeLessThan(
       queue.indexOf('this.pumpVisibleZonePrepareQueue();'),
     );
   });

@@ -119,6 +119,7 @@ describe('target highlight painter hostility', () => {
         threat: false,
         comboPips: 0,
         nameOnly: false,
+        noHealthBar: false,
       } satisfies NameplatePlan;
       painter.updateDynamicState(state, target, player, plan, false);
       expect(state.cooldowns.count).toBe(kind === 'player' && expected ? 1 : 0);
@@ -162,6 +163,7 @@ describe('target highlight painter hostility', () => {
       threat: false,
       comboPips: 0,
       nameOnly: false,
+      noHealthBar: false,
     } satisfies NameplatePlan;
     painter.updateDynamicState(state, target, player, plan, false);
     expect([state.emphasis, state.overheadMarker]).toEqual([false, false]);
@@ -187,6 +189,7 @@ describe('target highlight painter hostility', () => {
       threat: false,
       comboPips: 0,
       nameOnly: false,
+      noHealthBar: false,
     };
     painter.updateDynamicState(state, target, player, plan, false);
     expect(state.cooldowns.count).toBe(1);
@@ -230,6 +233,7 @@ describe('target highlight painter hostility', () => {
         threat: false,
         comboPips: 0,
         nameOnly: false,
+        noHealthBar: false,
       } satisfies NameplatePlan;
       painter.updateDynamicState(state, target, player, plan, false);
       expect(state.cooldowns.slots[0].active).toBe(true);

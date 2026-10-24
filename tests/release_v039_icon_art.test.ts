@@ -494,15 +494,15 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(416);
+    // Integration 45 paints the four previously parked abilities.
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(420);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',
     ).toEqual([]);
-    expect(aggregate.runtimeClosure.abilities).toEqual({
-      live: liveAbilityIds.length,
-      painted: paintedAbilityIds.size,
-    });
+    // Fieldcraft and druid reworks expand the painted production census by eight.
+    expect(paintedAbilityIds.size).toBe(420);
+    expect(aggregate.runtimeClosure.abilities).toEqual({ live: 416, painted: 416 });
 
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(
       liveHotbarItemIds.length,
@@ -525,14 +525,20 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // The Buried Hoards quartermaster consumables (the 2026-09-28 release/v0.44.0
     // merge into feature/buried-hoards: potion_of_invisibility and
     // elixir_of_mana_regeneration) ship committed painted art: 122.
-    // All usable consumables and recipes now join the production hotbar set,
-    // adding 113 painted identities without changing the sealed v0.39 record.
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(235);
+    // Balgath's five trinkets join the same way (the Barrowstone Heart too: its slot
+    // shows the statue's internal cooldown), painted in balgath-loot-icons-2026-09-28: 127.
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 133.
+    // + the referral stamp-card rewards on the same integration (referral_fog_charm,
+    // referral_hollow_charm, reins_referral_raptor, reins_referral_tank): 137 live.
+    // Their own paintings now ship in referral-reward-icons-v045-2026-10-22,
+    // plus reins_nightwing_chimera, so all 138 live hotbar items are painted; none remain parked.
+    // Wobbles the Slime's reins ship committed art (a render of the mount): 139.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(253);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(235);
-    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
+    ).toHaveLength(253);
+    expect([...pendingHotbarItemIds].sort(), 'ITEM_ART_PENDING hotbar items').toEqual([]);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
       'no pending hotbar item ships committed art (a stale ITEM_ART_PENDING entry)',

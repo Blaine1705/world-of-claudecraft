@@ -71,6 +71,7 @@ import { materialSourceUnitPayload } from './material_inventory_units';
 import type { MaterialComposition, MaterialSource } from './material_sources';
 import type { MaterialStackSlot } from './material_stack';
 import { materialStackFit, planMaterialStackAdd } from './material_stack_packing';
+import { BAG_SOCKETS, MEMBERSHIP_BAG_SOCKET } from './membership_bag_slot';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { isStackProvenanceItemId, stackProvenanceItemIds } from './stack_provenance_ids';
@@ -84,7 +85,7 @@ import {
 /** Slots in the always-present backpack every character owns. */
 export const BACKPACK_SLOTS = 16;
 /** Number of equippable bag sockets next to the backpack. */
-export const BAG_SOCKETS = 4;
+export { BAG_SOCKETS } from './membership_bag_slot';
 /** Default stack cap for stackable kinds (consumables, junk, quest drops). */
 /** The default carried stack size, exported for the surfaces that step a
  *  quantity by "one bag stack" (the material source picker, the vault's
@@ -670,8 +671,11 @@ export function migrationBagsFor(usedSlots: number): string[] {
   return granted;
 }
 
-const inRange = (socket: number): boolean =>
-  Number.isInteger(socket) && socket >= 0 && socket < BAG_SOCKETS;
+const inRange = (socket: number, meta: PlayerMeta, time: number): boolean =>
+  Number.isInteger(socket) &&
+  socket >= 0 &&
+  (socket < BAG_SOCKETS ||
+    (socket === MEMBERSHIP_BAG_SOCKET && (meta.membershipExpiresAt ?? 0) > time));
 
 /** Equip a bag item into a socket (first empty when omitted). Equipping onto an
  *  occupied socket swaps: the old bag returns to the slot the new one freed, so
@@ -702,7 +706,7 @@ export function equipBag(
     ctx.error(meta.entityId, 'All your bag slots are full.');
     return;
   }
-  if (!inRange(target)) return;
+  if (!inRange(target, meta, ctx.time)) return;
   if (def.unique && meta.bags.some((b, i) => i !== target && b === itemId)) {
     ctx.error(meta.entityId, 'You can only equip one of those.');
     return;
@@ -770,6 +774,7 @@ export function equipBag(
 
   if (old) addStacked(meta.inventory, old, 1);
   meta.bags[target] = itemId;
+  if (target === MEMBERSHIP_BAG_SOCKET) meta.membershipBag = itemId;
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
@@ -781,7 +786,7 @@ export function unequipBag(ctx: SimContext, socket: number, pid?: number): void 
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
-  if (!inRange(socket)) return;
+  if (!inRange(socket, meta, ctx.time)) return;
   const itemId = meta.bags[socket];
   if (!itemId) return;
   const newBags = meta.bags.slice();
@@ -791,6 +796,7 @@ export function unequipBag(ctx: SimContext, socket: number, pid?: number): void 
     return;
   }
   meta.bags[socket] = null;
+  if (socket === MEMBERSHIP_BAG_SOCKET) delete meta.membershipBag;
   addStacked(meta.inventory, itemId, 1);
   ctx.onInventoryChangedForQuests(meta);
   const def = ITEMS[itemId];

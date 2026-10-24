@@ -40,14 +40,20 @@ function twinWriters(root: string): { offenders: string[]; scanned: number; clon
   return { offenders, scanned, cloners };
 }
 
-describe('no character module mints a lit transparent twin', () => {
-  it('finds no hook clone flipped transparent anywhere under src/render/characters', () => {
+describe('only Gloam mints its gated lit transparent clone', () => {
+  it('finds only the two Gloam factories in the sole transparent-clone module', () => {
     const { offenders, scanned, cloners } = twinWriters(CHARACTERS);
     // the vacuity floor: a real tree, with the modules that do clone rig
     // materials (the Shadowform tint, the surface response, the visual)
     expect(scanned).toBeGreaterThan(80);
     expect(cloners).toBeGreaterThanOrEqual(3);
-    expect(offenders).toEqual([]);
+    // Gloam's approved sun-shaft pass is gated behind an opaque stand-in.
+    expect(offenders).toEqual(['effect_materials.ts']);
+    const factories = stripComments(readFileSync(join(CHARACTERS, 'effect_materials.ts'), 'utf8'));
+    expect([...factories.matchAll(/export function (\w+)/g)].map((m) => m[1])).toEqual([
+      'createShadowformEffectMaterial',
+      'createShadowformStandInMaterial',
+    ]);
   });
 
   it('reads nested directories, and catches a flip in one', () => {

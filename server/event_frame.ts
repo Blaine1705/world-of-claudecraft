@@ -25,6 +25,7 @@ import type { SimEvent } from '../src/sim/types';
 // (server/discord_pvp_feed.ts, server/discord_hill_feed.ts).
 // None is a player-rendered event. Keep ordinary ticks allocation-free.
 const SERVER_ONLY_EVENT_TYPES: ReadonlySet<SimEvent['type']> = new Set([
+  'referralEvidence',
   'vaultCraftConsume',
   'lootRollAwarded',
   'worldPvpKill',

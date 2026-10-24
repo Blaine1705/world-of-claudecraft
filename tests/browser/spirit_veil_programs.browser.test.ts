@@ -23,6 +23,7 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { assetsReady } from '../../src/render/assets/preload';
 import type { AnimState } from '../../src/render/characters/anim_state';
 import { attachArmorDye } from '../../src/render/characters/armor_dye';
+import * as characterAssets from '../../src/render/characters/assets';
 import {
   createSpiritVeilMaterial,
   installSpiritVeil,
@@ -30,10 +31,10 @@ import {
   SPIRIT_VEIL_LOOK,
   SpiritVeilRig,
   spiritVeilDepthMaterial,
+  spiritVeilKeysFor,
   spiritVeilPaletteOf,
   spiritVeilPassOf,
 } from '../../src/render/characters/ghost_veil';
-import { buildGloamveilStandIn } from '../../src/render/characters/gloamveil_veil';
 import {
   DEFAULT_APPEARANCE,
   fullSet,
@@ -47,19 +48,25 @@ import { mergeSkinnedParts } from '../../src/render/characters/rig_merge';
 import {
   SPIRIT_VEIL_FAMILY,
   type SpiritVeilTuple,
+  spiritVeilKeyOfTuple,
 } from '../../src/render/characters/spirit_veil_family_core';
 import {
   SPIRIT_VEIL_PALETTES,
   SPIRIT_VEIL_POLICY,
   type SpiritVeilPalette,
 } from '../../src/render/characters/spirit_veil_palette_core';
+import { attachSpiritVeilWocStandIn } from '../../src/render/characters/spirit_veil_woc';
 import { buildStubbleDecal } from '../../src/render/characters/stubble';
 import { CharacterVisual, type FarBakeGate } from '../../src/render/characters/visual';
+import * as wocDressing from '../../src/render/characters/woc_armor_dressing';
+import * as wocHeads from '../../src/render/characters/woc_head_packs';
+import { wocHeadMergedTintOf } from '../../src/render/characters/woc_head_tint';
 import { type CompileArmHost, linkColorPrograms } from '../../src/render/compile_arms';
 import { compileTargetPrepared } from '../../src/render/compile_target_readiness';
 import { gfxInternalsForTest } from '../../src/render/gfx';
 import { settleProgramVariants } from '../../src/render/program_variant_settle';
 import { spiritVeilFamilyPrewarmEntry } from '../../src/render/spirit_veil_prewarm';
+import { landWocBodies, landWocFiles } from '../helpers/woc_streamed';
 
 const SIZE = 96;
 
@@ -180,6 +187,14 @@ function livePart(tuple: SpiritVeilTuple, x: number): THREE.Mesh {
     transparent: tuple.pass === 'decal',
     depthWrite: tuple.pass !== 'decal',
   });
+  if (tuple.woc) {
+    attachSpiritVeilWocStandIn(source, tuple.woc);
+    if (tuple.woc.startsWith('merged-'))
+      geometry.setAttribute(
+        'aWocHmSlot',
+        new THREE.Float32BufferAttribute(new Float32Array(count), 1),
+      );
+  }
   let mesh: THREE.Mesh;
   if (tuple.skinned) {
     geometry.setAttribute(
@@ -199,6 +214,8 @@ function livePart(tuple: SpiritVeilTuple, x: number): THREE.Mesh {
   }
   if (tuple.morphTargets > 0) mesh.updateMorphTargets();
   mesh.position.x = x;
+  // Every tuple must reach the driver, including rows beyond the camera bounds.
+  mesh.frustumCulled = false;
   return mesh;
 }
 
@@ -236,15 +253,22 @@ describe('the veil family on a real driver', () => {
       const before = w.programs();
 
       const ghost = new THREE.Group();
-      SPIRIT_VEIL_FAMILY.filter((tuple) => tuple.pass !== 'depth').forEach((tuple, i) => {
+      const tuples = SPIRIT_VEIL_FAMILY.filter((tuple) => tuple.pass !== 'depth');
+      tuples.forEach((tuple, i) => {
         ghost.add(livePart(tuple, (i - 7) * 0.35));
       });
       w.scene.add(ghost);
       const rig = new SpiritVeilRig();
-      veil(ghost, rig);
+      const parts = veil(ghost, rig);
       w.draw();
       w.draw();
       expect(w.programs()).toBe(before);
+      for (const [index, mesh] of parts.entries()) {
+        const material = mesh.material as THREE.Material;
+        expect(spiritVeilKeysFor(material, mesh)?.[0]).toBe(spiritVeilKeyOfTuple(tuples[index]));
+        const properties = w.renderer.properties.get(material) as { currentProgram?: unknown };
+        expect(properties.currentProgram).toBeDefined();
+      }
 
       // Control: a shape outside the family does link, so the count above is
       // the harness seeing nothing, not the harness seeing nothing at all.
@@ -430,6 +454,11 @@ const IDLE: AnimState = {
 describe('a death on a real CharacterVisual', () => {
   beforeAll(async () => {
     await assetsReady();
+    await landWocBodies(characterAssets, [
+      'player_paladin_modular',
+      'player_druid_modular',
+      'player_warrior_modular',
+    ]);
   }, 60_000);
 
   for (const offscreen of [false, true]) {
@@ -936,6 +965,11 @@ describe('the veil palettes on a real driver', () => {
 describe('every veil trigger on a real CharacterVisual', () => {
   beforeAll(async () => {
     await assetsReady();
+    await landWocBodies(characterAssets, [
+      'player_paladin_modular',
+      'player_druid_modular',
+      'player_warrior_modular',
+    ]);
   }, 60_000);
 
   for (const standardMaterials of [false, true]) {
@@ -996,7 +1030,7 @@ describe('every veil trigger on a real CharacterVisual', () => {
           // The Moonwing and Gloamveil adornments mount with their forms; the
           // boot manifest links their kits through these same stand-ins
           // (ABILITY_MATERIAL_SOURCES), so the count below is the body's.
-          const standIns = [buildMoonwingStandIn(), buildGloamveilStandIn()];
+          const standIns = [buildMoonwingStandIn()];
           for (const standIn of standIns) {
             standIn.position.set(0, 1, 0);
             w.scene.add(standIn);
@@ -1041,13 +1075,32 @@ describe('every veil trigger on a real CharacterVisual', () => {
           visual.setSoulRend(false);
           w.draw();
           expect(w.programs()).toBe(before);
-          // Shadowform is no veil: an opaque tint on the rig's own programs
+          // Gloam keeps its lit tint and blends after sunshafts. Its first mount
+          // waits on the effect gate while the source-program stand-in draws.
+          const gates: { target: THREE.Object3D; settle: Parameters<FarBakeGate>[1] }[] = [];
+          visual.setFarBakeGate((target, settle) => gates.push({ target, settle }));
           visual.setShadowform(true);
+          expect(gates).toHaveLength(1);
+          w.draw();
+          expect(w.programs(), 'Gloam pending').toBe(before);
+          const scratch = gates[0].target;
+          await linkColorPrograms(w.arms, scratch, false);
+          const materials: THREE.Material[] = [];
+          scratch.traverse((object) => {
+            const mesh = object as THREE.Mesh;
+            if (mesh.isMesh) materials.push(...[mesh.material].flat());
+          });
+          expect(
+            (await settleProgramVariants(w.renderer.properties, materials, { fired: false }))
+              .settled,
+          ).toBe(true);
+          const linked = w.programs();
+          gates[0].settle(() => compileTargetPrepared(w.renderer.properties, scratch));
           w.draw();
           w.draw();
           expect(worn()).toEqual(new Set([null]));
           expect(casters().length).toBeGreaterThan(3);
-          expect(w.programs(), 'shadowform').toBe(before);
+          expect(w.programs(), 'Gloam mounted').toBe(linked);
           visual.setShadowform(false);
         } finally {
           restoreGfx();
@@ -1057,9 +1110,55 @@ describe('every veil trigger on a real CharacterVisual', () => {
   }
 });
 
+describe('the veil on shipped WOC bodies and grouped far heads', () => {
+  beforeAll(async () => {
+    await characterAssets.charactersReady();
+    await landWocFiles(characterAssets, wocDressing, wocHeads, [
+      'player_priest',
+      'player_priest_female',
+    ]);
+  }, 90_000);
+
+  for (const key of ['player_priest', 'player_priest_female']) {
+    it(`veils the near and far head without linking live programs: ${key}`, async () => {
+      const w = world(false);
+      w.camera.position.set(0, 1, 4);
+      w.camera.lookAt(0, 1, 0);
+      const visual = new CharacterVisual(key, 0xffffff);
+      disposers.push(() => visual.dispose());
+      visual.setWocHeadLook(null);
+      visual.update(1 / 60, IDLE, true);
+      visual.setFar(true);
+      visual.setFar(false);
+      w.scene.add(visual.root);
+      w.draw();
+      await linkFamily(w);
+      const before = w.programs();
+      visual.setGhost(true, 'march');
+      w.draw();
+      expect(w.programs(), 'near veil').toBe(before);
+      visual.setFar(true);
+      const far = visual.root.getObjectByName('character_far_mesh') as THREE.Mesh;
+      expect(far).toBeDefined();
+      expect(far.visible).toBe(true);
+      const materials = [far.material].flat();
+      expect(materials.some((material) => wocHeadMergedTintOf(material))).toBe(true);
+      const depth = far.getObjectByName('spirit_veil_depth') as THREE.Mesh;
+      expect([depth.material].flat()).toHaveLength(materials.length);
+      w.draw();
+      expect(w.programs(), 'far veil').toBe(before);
+    });
+  }
+});
+
 describe('an unproven effect swap on a real CharacterVisual', () => {
   beforeAll(async () => {
     await assetsReady();
+    await landWocBodies(characterAssets, [
+      'player_paladin_modular',
+      'player_druid_modular',
+      'player_warrior_modular',
+    ]);
   }, 60_000);
 
   it('links no surface response program live while its gate settles without a proof', async () => {

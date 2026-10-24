@@ -136,6 +136,7 @@ function harness(targets: Entity[], isHostilePlayer: (e: Entity) => boolean = ()
     showNameplates: () => true,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
+    showPetNames: () => true,
     showPlayerNameplates: () => true,
     nameplateDotScale: () => 0,
     isHostilePlayer,

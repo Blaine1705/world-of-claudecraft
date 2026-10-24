@@ -44,6 +44,8 @@ import {
   spiritVeilKeyOfTuple,
   spiritVeilTupleOfKey,
 } from './characters/spirit_veil_family_core';
+import { attachSpiritVeilWocStandIn } from './characters/spirit_veil_woc';
+import { WOC_HEAD_MERGE_SLOT_ATTRIBUTE } from './characters/woc_head_merge_core';
 import { type CompileArmHost, linkColorPrograms } from './compile_arms';
 import { registerContextRestoreReset } from './context_restore_registry';
 import { markProgramsReadyUnder } from './linked_program_readiness';
@@ -87,15 +89,22 @@ export function buildSpiritVeilStandIn(tuple: SpiritVeilTuple): THREE.Mesh {
     );
     geometry.morphTargetsRelative = true;
   }
+  const source = new THREE.MeshBasicMaterial({
+    map: tuple.map ? standInSourceMap() : null,
+    transparent: tuple.pass === 'decal',
+  });
+  if (tuple.woc) {
+    attachSpiritVeilWocStandIn(source, tuple.woc);
+    if (tuple.woc.startsWith('merged'))
+      geometry.setAttribute(
+        WOC_HEAD_MERGE_SLOT_ATTRIBUTE,
+        new THREE.Float32BufferAttribute([0, 0, 0], 1),
+      );
+  }
   const material =
     tuple.pass === 'depth'
-      ? spiritVeilDepthMaterial(key)
-      : createSpiritVeilMaterial(
-          new THREE.MeshBasicMaterial({
-            map: tuple.map ? standInSourceMap() : null,
-            transparent: tuple.pass === 'decal',
-          }),
-        );
+      ? spiritVeilDepthMaterial(key, 'spirit', source)
+      : createSpiritVeilMaterial(source);
   const mesh = tuple.skinned
     ? new THREE.SkinnedMesh(geometry, material)
     : new THREE.Mesh(geometry, material);

@@ -135,6 +135,9 @@ function harness(
     showNameplates: () => showNameplates,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
+    // Buddy nameplates are off by default (the "Show Pet Names" option), and
+    // this integration drives players and mobs, so the default answers here.
+    showPetNames: () => false,
     showPlayerNameplates: () => true,
     nameplateDotScale: () => dotScale,
     isHostilePlayer: () => false,

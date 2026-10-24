@@ -293,6 +293,14 @@ export const SETTING_RANGES = {
 export const BOOL_SETTINGS = {
   // Optional mainland directions, independent of quest tracking and graphics quality.
   eastbrookGuidance: { def: true },
+  // on by default: the ADVISORY dungeon alerts, the tip panel over the action
+  // bar that names a mechanic and says what to do about it (the encounter
+  // alert family, src/ui/hud/dungeon/dungeon_prompt_policy_core.ts). Off hides only
+  // those tips. The prompts a player presses or steers by (the Iron Cage
+  // escape, Gaoler Ossick's chain alert, the use prompt) are not governed by
+  // it. A player-chosen interface preference, never a graphics-tier knob: no
+  // preset, effects profile or governor reads or writes it.
+  showDungeonHints: { def: true },
   // Icon flow of the standalone buff/debuff rows (the Frames Settings menu in
   // edit mode). Off = the stock right-to-left growth (the rows anchor beside
   // the minimap and fill toward the screen centre); on = left to right, via
@@ -534,6 +542,13 @@ export const BOOL_SETTINGS = {
   // decluttering crowded hubs on short mobile viewports. Purely a local display
   // preference; mob nameplates and unit frames are unaffected.
   showPlayerNameplates: { def: true },
+  // off by default: a cosmetic buddy follower (src/sim/content/buddy_mobs.ts)
+  // has no health worth bar-ing (1 hp) and cannot be attacked, so its plate
+  // stays hidden regardless of the general mob nameplate toggle above unless
+  // this is on, in which case it shows the buddy's name only, never a health
+  // bar (src/render/nameplate_view.ts's isBuddyPet branch,
+  // nameplate_painter.ts's hpVisible suppression).
+  showPetNames: { def: false },
   // on by default: draw the LOCAL player's own debuffs as a small icon row on an
   // enemy's overhead nameplate, between the name row and the health bar, each with
   // a cooldown swipe and a countdown. Only YOUR debuffs, on mobs only; the group's
@@ -664,14 +679,9 @@ export const BOOL_SETTINGS = {
   // disturbs the deliberate slot layout the extra rows exist for (arranging buffs
   // and consumables); the slots stay in place and keybind-reachable either way.
   hideUnusedActionSlots: { def: false },
-  // OFF by default: the interactive water wake/ripple height-field
+  // ON by default: the interactive water wake/ripple height-field
   // (render/water_simulation.ts) that swimmers, waders and splashes disturb.
-  // Purely decorative — bubbles, splash particles and the scrolling water
-  // normal maps are all independent of it — and measured-cheap (2 passes over
-  // a <=128x128 field), but it is the one water effect that runs extra GPU
-  // passes per frame, so the player who wants the quietest water gets it as
-  // an opt-in rather than an opt-out.
-  waterRipples: { def: false },
+  waterRipples: { def: true },
   // on by default: the spell visual effects players and their pets cast in
   // the 3D world (cast glows, projectiles, impacts, lingers, buff orbits and
   // shells). Off is a preference for a calmer or cheaper screen that never

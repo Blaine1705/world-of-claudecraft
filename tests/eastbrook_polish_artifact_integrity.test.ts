@@ -717,6 +717,10 @@ const ACCEPTED_POLISH_V2_MATCHED_CAPTURE_VIEWS: readonly CaptureViewContract[] =
 // refinement round 4 (the armoury retired from placement and the matched view
 // aims at the barracks garrison on its lot); every other matched view still
 // shares its live framing with the frozen records.
+// Re-aimed 2026-10 for the Tidehold rebuild: six placed buildings replaced the
+// eleven kit shells and face local -Z. Its live re-aims (bank-and-chest,
+// smithy-and-forge, inn-and-kitchens, chapel-and-weaving, apothecary-lin) were
+// all members already, so the set and the frozen literals are unchanged.
 const HARBOR_MOVED_VIEW_NAMES: ReadonlySet<string> = new Set([
   'armoury-relation',
   'bank-and-chest',
@@ -1373,6 +1377,8 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
+  // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 merge into the WebGL context restore. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1395,38 +1401,42 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the integrated WebGL context restore, spirit-veil, and
-  // trinket relics merge: the merged renderer and view-priority leaves match
-  // no parent. No capture was retaken.
-  // Re-minted after formatting the merged renderer helper: same content path,
-  // new renderer bytes. No capture was retaken.
-  // Re-minted after compressing that helper for the monolith ratchet: same
-  // content path, new renderer bytes. No capture was retaken.
-  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
-  // noticeboard.ts). No capture was retaken.
-  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
-  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
-  // one tree. No capture was retaken.
-  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
-  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
-  // was retaken.
-  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
-  // moves the renderer leaf and extracts world cue spell gating. No capture
-  // was retaken.
-  // Re-minted for the v0.45 release batch after entity-view policy moved.
+  // Courier integration reseals only renderer provenance, preserving captured measurements.
+  // Re-minted after composing buddy rendering into the v0.45.0 integration.
+  // Existing captures and measurements remain unchanged.
+  // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
+  // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
+  // on the merged tree, no capture was retaken).
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for the painted Tidehold buildings in the built-in town: the
+  // authoritative layout and the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
+  // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
+  // integration (town dressing + gameplay objects over #4507). No capture was retaken.
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4258 (the Mirefen tavern) over #4516 (grand Highwatch):
+  // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
+  // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
+  // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
-  // carries the dungeon/arena static interior retry tracker beside the batch's
-  // spirit-veil and Spell Effects imports. No capture was retaken.
-  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
-  // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.
-  // Re-minted for the Sporemender rework: the renderer leaf moved the spores onto a character-effect flag (form or Wildbloom HoT). No capture was retaken.
-  // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
-  // Re-minted for the v0.45 release batch after the merged Eastbrook runtime
-  // inputs settled. No capture was retaken.
-  '4460d4f53ce79e6fb8dab21efb6cced00f0b00df7fa09c2ce8eee1cb278775ef';
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '9faa06dd7d54d9266fd7aae16a0a07f6b86090b45062f81c4846d1e7aa76147f';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
+  // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
+  // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1448,37 +1458,36 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
   // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
   // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  // Re-minted for the integrated WebGL context restore, spirit-veil, and
-  // trinket relics merge: the merged renderer and view-priority leaves match
-  // no parent. No capture was retaken.
-  // Re-minted after formatting the merged renderer helper: same content path,
-  // new renderer bytes. No capture was retaken.
-  // Re-minted after compressing that helper for the monolith ratchet: same
-  // content path, new renderer bytes. No capture was retaken.
-  // Re-minted for the GLTF parser release (the LoadedGltf type swap in mailbox.ts and
-  // noticeboard.ts). No capture was retaken.
-  // Re-minted for the integrated v0.45 batch plus GLTF parser release: the
-  // merged renderer, view-priority, mailbox, and noticeboard leaves compose in
-  // one tree. No capture was retaken.
-  // Re-minted for PR #4282 on top of that integrated v0.45 batch: the
-  // Drakelands kit lane moves renderer and zone-streaming leaves. No capture
-  // was retaken.
-  // Re-minted for PR #4279 on top of the v0.45 candidate: Spell Effects
-  // moves the renderer leaf and extracts world cue spell gating. No capture
-  // was retaken.
-  // Re-minted for the v0.45 release batch after entity-view policy moved.
+  // Re-minted at the v0.45.0 integration (membership integration + the Mirefen world-boss
+  // branch + the character pack + the five-dungeon rework; remint_polish_provenance.mjs
+  // on the merged tree, no capture was retaken).
+  // Re-minted at the v0.45.0 integration merge of #4479 head f0af7aa5f4
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for merging #4466 (Gloamveil) and #4470 (dungeon playtest fixes) into the v0.45.0 integration: both moved the renderer leaf. No capture was retaken.
+  // Re-minted at the v0.45.0 integration merge of #4479 head 670ca2a1e7
+  // (remint_polish_provenance.mjs on the merged tree, no capture was retaken).
+  // Re-minted for the painted Tidehold buildings in the built-in town: the
+  // authoritative layout and the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4507 (Highwatch painted town) into the v0.45.0 integration: it moved the renderer leaf. No capture was retaken.
+  // Re-minted for the Studio movable-objects branch's merge with the v0.45.0
+  // integration (town dressing + gameplay objects over #4507). No capture was retaken.
+  // Re-minted for the walk-in Eastbrook buildings: the authoritative layout and
+  // the town runtime leaf moved. No capture was retaken.
+  // Re-minted for merging #4258 (the Mirefen tavern) over #4516 (grand Highwatch):
+  // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
+  // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
+  // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  // Re-minted for PR #4379 on top of that v0.45 batch: the renderer leaf now
-  // carries the dungeon/arena static interior retry tracker beside the batch's
-  // spirit-veil and Spell Effects imports. No capture was retaken.
-  // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  // Re-minted for Sporemender Form: the renderer leaf gained the Sporemender form-rig slot and the form-slot loops. No capture was retaken.
-  // Re-minted for the Sporemender spores: the renderer leaf gained the Sporemender particle-aura call. No capture was retaken.
-  // Re-minted for the Sporemender rework: the renderer leaf moved the spores onto a character-effect flag (form or Wildbloom HoT). No capture was retaken.
-  // Re-minted for the spore drift split: the renderer leaf picks the form or the sparser HoT drift through characterSporeAura. No capture was retaken.
-  // Re-minted for the v0.45 release batch after the merged Eastbrook runtime
-  // inputs settled. No capture was retaken.
-  'f617305c56804f5164e6cdc33260dc9b87335373ce22bb2a096b40f7df313ada';
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '945dede1c8da05e5d151720e4cda4766c8500f4ec143bed763b68426bb3d0648';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2861,42 +2870,29 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // release/v0.44.0 base merge into PR 4193: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-      // Integrated WebGL context restore, spirit-veil, and trinket relics merge:
-      // recomputed LAST again over the re-swept evidence. No capture was retaken.
-      // Formatter-only renderer helper wrap after the integrated merge:
-      // recomputed LAST again over the re-swept evidence. No capture was retaken.
-      // Helper compression for the monolith ratchet: recomputed LAST again
+      // v0.45.0 integration (membership integration + the Mirefen world-boss branch
+      // + the character pack + the five-dungeon rework): recomputed LAST again over the
+      // re-swept evidence. No
+      // capture was retaken.
+      // Merging #4466 and #4470 into the v0.45.0 integration: recomputed LAST again
       // over the re-swept evidence. No capture was retaken.
-      // GLTF parser release (LoadedGltf type swap): recomputed LAST again over the
-      // re-swept evidence. No capture was retaken.
-      // Integrated v0.45 batch plus GLTF parser release: recomputed LAST again
+      // The painted Tidehold buildings in the built-in town: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+      // Merging #4507 into the v0.45.0 integration: recomputed LAST again
       // over the re-swept evidence. No capture was retaken.
-      // PR #4282 Drakelands kit lane on top of that integrated v0.45 batch:
-      // recomputed LAST again over the re-swept evidence. No capture was
-      // retaken.
-      // PR #4279 Spell Effects option on top of the v0.45 candidate:
-      // recomputed LAST again over the re-swept evidence. No capture was
-      // retaken.
-      // v0.45 release batch entity-view policy move: recomputed LAST over the
+      // The Studio movable-objects merge with the v0.45.0 integration:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+      // The walk-in Eastbrook buildings: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-      // PR #4379 dungeon/arena static interior retry merge on top of the v0.45
-      // batch: recomputed LAST over the re-swept evidence. No capture was
-      // retaken.
-      // Frame Rate Limit: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // devalue audit floor: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Sporemender Form: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Sporemender spores: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Sporemender rework: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // Spore drift split: recomputed LAST again over the re-swept evidence. No
-      // capture was retaken.
-      // v0.45 release batch settle: recomputed LAST again over the re-swept
+      // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
+      // over the re-swept evidence, then again for the towns preview. No capture was retaken.
+      // The Mirefen mudfin huts: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('2316c998863312c89bd9ec35fe799e9dcf9343c70bf47d75d90700df01468b1d');
+      // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
+      // LAST again over the re-swept evidence. No capture was retaken.
+      // One-colour market canopies on the current integration base: recomputed
+      // from the swept evidence. No capture was retaken.
+    ).toBe('f6e4080d8676f6a202f47d4c4a10777ab129aa73e6d2e068b3aeff0bf518a80d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -3,6 +3,7 @@ import { isBlocked } from '../src/sim/colliders';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { spawnOpenWorldMob } from '../src/sim/mob/open_world_tuning';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
@@ -81,7 +82,8 @@ describe('the world quest champion encore', () => {
 
   it('raises a promoted champion at completion and pays every participant when it falls', () => {
     const sim = armed();
-    const meta = sim.meta(sim.playerId)!;
+    const meta = sim.meta(sim.playerId);
+    if (!meta) throw new Error('player meta fixture');
     const quest = WORLD_QUESTS_BY_ID[QUEST_ID];
     killTargets(sim, quest.count);
     expect(meta.worldQuestLog.get(QUEST_ID)?.state).toBe('completed');
@@ -91,6 +93,8 @@ describe('the world quest champion encore', () => {
     expect(mob.templateId).toBe(quest.objective.targetMobId);
     expect(mob.level).toBeGreaterThanOrEqual(quest.minLevel + TUNING.levelAboveQuest);
     expect(mob.scale).toBe(TUNING.scale);
+    const baseTuned = spawnOpenWorldMob(0, MOBS[mob.templateId], mob.level, { x: 0, y: 0, z: 0 });
+    expect(mob.maxHp).toBe(Math.round(baseTuned.maxHp * TUNING.healthMultiplier));
     expect(mob.summonedAdd).toBe(true);
     expect(mob.runScoped).toBe(true);
     const site = worldQuestChampionSite(quest);
@@ -98,13 +102,19 @@ describe('the world quest champion encore', () => {
     expect(mob.hostile).toBe(true);
     // A second completion while it lives never stacks a second champion.
     const before = sim.entities.size;
-    meta.worldQuestLog.get(QUEST_ID)!.state = 'active';
-    meta.worldQuestLog.get(QUEST_ID)!.count = quest.count - 1;
+    const entry = meta.worldQuestLog.get(QUEST_ID);
+    if (!entry) throw new Error('world quest entry fixture');
+    entry.state = 'active';
+    entry.count = quest.count - 1;
     killTargets(sim, 1);
     expect(sim.entities.size).toBe(before);
     // Two participants (the player and a pretend second player's pet owner) both get paid.
     const copperBefore = meta.copper;
     addThreat(mob, sim.playerId, 10);
+    // One tick of the fight puts the player on the champion's list. Its idle scan does not
+    // pull first: proximity aggro needs a line of sight (mob/aggro_sight.ts), and on this
+    // seed the champion's spawn has none to the player's spot.
+    sim.tick();
     sim.player.targetId = mob.id;
     sim.chat('/dev killtarget');
     sim.tick();
@@ -177,9 +187,10 @@ describe('the world quest champion encore', () => {
     const sim = armed();
     const quest = WORLD_QUESTS_BY_ID[QUEST_ID];
     killTargets(sim, quest.count);
-    const mob = champion(sim)!;
+    const mob = champion(sim);
     expect(mob).toBeDefined();
-    const state = worldQuestChampionState(sim.ctx, QUEST_ID)!;
+    const state = worldQuestChampionState(sim.ctx, QUEST_ID);
+    if (!mob || !state) throw new Error('champion state fixture');
     // Everyone has left the site when the lifetime runs out.
     sim.player.pos = sim.groundPos(quest.area.x + 400, quest.area.z + 400);
     sim.player.prevPos = { ...sim.player.pos };
@@ -187,6 +198,20 @@ describe('the world quest champion encore', () => {
     sim.tick();
     expect(sim.entities.has(mob.id)).toBe(false);
     expect(worldQuestChampionState(sim.ctx, QUEST_ID)).toBeUndefined();
+  });
+
+  it('scales the level-7 Sableweb Lurker champion to twice a tuned spider rather than 1850 HP', () => {
+    const sim = new Sim({ seed: 31, playerClass: 'warrior', devCommands: true });
+    const meta = sim.meta(sim.playerId);
+    if (!meta) throw new Error('player meta fixture');
+    const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_spiders;
+    expect(summonWorldQuestChampion(sim.ctx, quest, meta)).toBe(true);
+    const state = worldQuestChampionState(sim.ctx, quest.id);
+    const mob = state ? sim.entities.get(state.mobId) : undefined;
+    expect(mob).toBeDefined();
+    expect(mob?.templateId).toBe('webwood_spider');
+    expect(mob?.level).toBe(7);
+    expect(mob?.maxHp).toBe(740);
   });
 
   it('never promotes a training dummy into a site champion', () => {

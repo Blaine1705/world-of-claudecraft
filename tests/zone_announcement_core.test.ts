@@ -66,3 +66,16 @@ describe('zone announcements during a ferry voyage', () => {
     expect(core.update('departure', 'passing', player)).toBe(false);
   });
 });
+
+it('keeps authored named areas silent aboard and resolves them after docking', () => {
+  const player = { pos: { x: 12, y: 0, z: 34 }, ferryRiding: true } as Entity;
+  const areas = [{ name: 'Lantern Hall', minX: 10, maxX: 14, minZ: 30, maxZ: 40 }];
+  const core = new ZoneAnnouncementCore();
+  expect(core.subzoneHit(player, false, [], areas, null)).toBeNull();
+  player.ferryRiding = false;
+  expect(core.subzoneHit(player, false, [], areas, null)).toEqual({
+    label: 'Lantern Hall',
+    poiIndex: -1,
+  });
+  expect(core.subzoneHit(player, true, [], areas, null)).toBeNull();
+});

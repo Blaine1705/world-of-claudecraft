@@ -17,6 +17,7 @@
 import type { Aura, Entity } from '../sim/types';
 import type { SpiritVeilPalette } from './characters/spirit_veil_palette_core';
 import { shouldRenderStealthGhost } from './stealth';
+import { bastionShadeGhosted } from './sunken_bastion/bastion_shade_ghost_core';
 
 export type CharacterGhostLook = SpiritVeilPalette;
 
@@ -37,7 +38,7 @@ export function characterGhostLook(
   ghostWolf: boolean,
   veilbound: 'march' | 'mark' | 'none',
 ): CharacterGhostLook | null {
-  if (e.ghost) return 'spirit';
+  if (e.ghost || bastionShadeGhosted(e)) return 'spirit';
   if (shouldRenderStealthGhost(viewerId, e) && !ghostWolf) return stealthVeilPalette(e.auras);
   if (ghostWolf) return 'wolf';
   if (veilbound === 'march') return 'march';

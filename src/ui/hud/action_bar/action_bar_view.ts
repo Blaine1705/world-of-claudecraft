@@ -279,6 +279,7 @@ export interface ActionBarPlayerInput {
    *  dagger requirements read the worn gear, never the sim-only weapon stat. */
   level?: number;
   equippedItems?: Partial<Record<EquipSlot, string>>;
+  membershipActive?: boolean;
   /** The player's worn auras: the free-cost proc read (Battle Trance /
    *  next_cast_free) that drives the slot glow and usable state, the kill-window
    *  gate, and the next-cast empowerment read. Both worlds expose the live aura
@@ -523,7 +524,7 @@ export function actionBarCooldownRemaining(
  * slot stays lit rather than guessing.
  */
 export function secondaryRequirementsMet(
-  world: Pick<ActionBarWorldInput, 'player' | 'target'>,
+  world: Pick<ActionBarWorldInput, 'player' | 'target' | 'playerClass' | 'paladinSpec'>,
   ability: ActionBarAbility,
 ): boolean {
   const { player, target } = world;
@@ -542,7 +543,13 @@ export function secondaryRequirementsMet(
     if (def.requiresShield && !shieldEquipped(worn)) return false;
     if (
       effectsRequireDagger(ability.effects ?? def.effects) &&
-      !wieldsDagger(worn, player.level ?? 1)
+      !wieldsDagger(
+        worn,
+        player.level ?? 1,
+        world.playerClass ?? undefined,
+        world.paladinSpec,
+        player.membershipActive,
+      )
     ) {
       return false;
     }

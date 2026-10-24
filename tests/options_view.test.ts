@@ -902,6 +902,7 @@ const GENERAL_KEYS = [
   'showReliquaryTracker',
   'showOwnNameplate',
   'showPlayerNameplates',
+  'showPetNames',
   'confirmVendorSell',
   'note:hudChrome.options.confirmVendorSellNote',
   'confirmVendorSellMinQuality',
@@ -936,6 +937,9 @@ const FRAMES_KEYS = [
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
   'eastbrookGuidance',
+  // The advisory dungeon alerts' switch, with the note that names what stays.
+  'showDungeonHints',
+  'note:hudChrome.options.showDungeonHintsNote',
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',
   'showAttackButton',
@@ -1092,6 +1096,8 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
         category: 'general',
       },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
+      // The Combat tab's one note (the dungeon hints toggle), unconditional.
+      { control: 'note', textKey: 'hudChrome.options.showDungeonHintsNote', category: 'combat' },
       {
         control: 'note',
         textKey: 'hudChrome.options.enemyHighlightStyle',

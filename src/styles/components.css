@@ -13,6 +13,10 @@
    practice. */
 
 @layer components {
+  .friendship-armour-claim {
+    min-height: 40px;
+  }
+
   /* ---------- delve board ---------- */
   #delve-board {
     width: 360px;
@@ -924,6 +928,52 @@
   }
   .qd-reward-name {
     font-size: 12px;
+  }
+  /* Choose-one quest rewards: one card per offered piece. In the turn-in
+     dialog each card is a radio button (the harvest-preference radio look);
+     in the quest log and on the accept step they are a static preview. */
+  .qd-reward-choice-heading {
+    display: block;
+    margin-top: var(--spacing-sm);
+  }
+  .qd-reward-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+  }
+  .qd-reward-choice {
+    margin-top: 0;
+    min-height: 40px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    text-align: left;
+    font: inherit;
+  }
+  /* Icon and name stay on one line (the name wraps within its column); beats
+     the generic reward-row wrap below on specificity. */
+  .qd-reward-row.qd-reward-choice {
+    flex-wrap: nowrap;
+  }
+  button.qd-reward-choice {
+    cursor: var(--cursor-point);
+  }
+  button.qd-reward-choice:hover {
+    border-color: var(--color-accent);
+  }
+  .qd-reward-choice:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .qd-reward-choice[aria-checked="true"] {
+    border-color: var(--color-accent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--panel-base));
+  }
+  @media (forced-colors: active) {
+    .qd-reward-choice[aria-checked="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
   }
   .qd-list-item {
     display: block;
@@ -2830,6 +2880,10 @@
     overflow-y: auto;
     padding-right: var(--spacing-xs);
   }
+  .ql-detail-body:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   .ql-detail-actions {
     display: flex;
     justify-content: flex-end;
@@ -3911,6 +3965,10 @@
     border-color: #8d7138;
     box-shadow: 0 24px 80px rgb(0 0 0 / 72%);
   }
+  .membership-token-card .ui-btn {
+    min-height: 40px;
+  }
+
   .woc-store-tabs {
     display: flex;
     gap: 2px;
@@ -4024,6 +4082,13 @@
     padding: 9px 12px;
     color: var(--color-accent);
     background: var(--color-primary-glow);
+  }
+  [data-subscription-section] .ui-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  [data-subscription-section] p {
+    margin-block: var(--spacing-sm);
   }
   .woc-store-balance {
     z-index: 1;
@@ -9718,6 +9783,14 @@
     width: calc(100% - 4px);
     height: calc(100% - 4px);
   }
+  .membership-bag-slot > svg {
+    width: 22px;
+    height: 22px;
+  }
+  .membership-bag-slot.membership-locked {
+    color: var(--color-text-muted);
+    filter: grayscale(1);
+  }
   .bag-socket.backpack {
     cursor: default;
   }
@@ -10516,6 +10589,78 @@
     gap: 4px;
     margin: 6px 0 2px;
     flex: none;
+  }
+  .account-bank-panel .bank-tabs {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .account-bank-panel .ui-btn {
+    min-height: 40px;
+  }
+  .account-bank-tab {
+    flex: none;
+    min-height: 40px;
+  }
+  /* The selected bank and the player's bags as two framed sections, each
+     titled with whose items they hold, so a click's direction is never a guess. */
+  .account-bank-section {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+  }
+  .account-bank-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .account-bank-section h3 {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--gold-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .account-bank-count {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .account-bank-hint {
+    margin: 2px 0 var(--spacing-xs);
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .account-bank-panel .bank-item:disabled {
+    opacity: 0.5;
+  }
+  .account-bank-failure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  .account-bank-failure .account-bank-notice {
+    color: var(--color-text-error);
+  }
+  .account-bank-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .account-bank-note {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-align: center;
   }
   .bank-tab {
     flex: 1;
@@ -11673,6 +11818,37 @@
     align-items: center;
     gap: 8px;
   }
+  /* The buddy shelf: the whistle still as the option's icon, the drag grip
+     for the action bar. */
+  .deeds-buddies .deed-title-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .deed-buddy-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid var(--color-deed-buddy-icon-border);
+    flex: 0 0 auto;
+  }
+  .deed-buddy-icon-empty {
+    background: linear-gradient(160deg, var(--color-card-hi), var(--color-card-lo));
+  }
+  .deed-buddy-drag {
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: var(--color-text-muted);
+    border-radius: 4px;
+  }
+  .deed-buddy-drag:hover {
+    color: var(--color-deed-banner-text);
+  }
   .deed-border-swatch {
     flex: none;
     display: inline-flex;
@@ -11959,8 +12135,10 @@
   .cos-tabs {
     flex: none;
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
     min-height: 48px;
+    height: auto;
     border-bottom: 1px solid var(--color-border-default);
     margin-bottom: var(--spacing-md);
   }
@@ -12055,6 +12233,16 @@
     align-items: center;
     gap: var(--spacing-xs);
     font-size: 12px;
+  }
+  .cos-buddy-icon {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    object-fit: contain;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+    user-select: none;
   }
   .cos-scope {
     padding: 4px 8px;
@@ -15765,6 +15953,13 @@
     margin-left: 6px;
     padding: 0 4px;
   }
+  /* The encounter's boss guide page (src/ui/boss_journal/): opens the journal on it. */
+  .df-encounter-name .df-guide-btn {
+    margin-left: 8px;
+    padding: 2px 8px;
+    font-size: 11px;
+    vertical-align: middle;
+  }
   .df-encounter-guide {
     margin: 12px 0 16px;
   }
@@ -17472,6 +17667,210 @@
     }
   }
 
+  /* ---------- Collections (buddies, mounts, item sets) ---------- */
+  #collections-window {
+    width: 620px;
+    --window-pad: 14px;
+  }
+  .col-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 8px 0 10px;
+  }
+  .col-tab {
+    flex: 1;
+    font-family: var(--title-font);
+    font-size: 12px;
+    padding: 5px 4px;
+    color: var(--color-text-muted);
+    background: linear-gradient(var(--color-collections-tab-hi), var(--color-collections-tab-lo));
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .col-tab.active {
+    color: var(--gold);
+    background: linear-gradient(
+      var(--color-collections-tab-on-hi),
+      var(--color-collections-tab-on-lo)
+    );
+  }
+  /* Readability pass (owner request): every word in this window is white and
+     bold. The item-quality tints the rows carry (q-common through q-epic) read
+     too dark against the panel to scan a long catalog by, so inside this window
+     the quality classes lose the color argument and the text wins it. Scoped to
+     #collections-window, so the same q-* classes keep their tints everywhere
+     else in the HUD. */
+  #collections-window,
+  #collections-window .col-row-name,
+  #collections-window .col-row-state,
+  #collections-window .col-detail-name,
+  #collections-window .col-line-label,
+  #collections-window .col-line-value,
+  #collections-window .col-note,
+  #collections-window .col-tab {
+    color: var(--color-white);
+    font-weight: 700;
+  }
+  /* Two panes: the catalog list scrolls, the detail pane holds the preview. */
+  .col-body {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .col-list {
+    flex: 1 1 46%;
+    max-height: 620px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .col-detail {
+    flex: 1 1 54%;
+    max-height: 620px;
+    overflow-y: auto;
+  }
+  .col-row {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 3px 5px;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .col-row.active {
+    border-color: var(--color-border-showcase);
+    background: var(--color-collections-row-active);
+  }
+  /* An entry nothing in the game grants yet: still listed, visibly dimmed. */
+  .col-row.col-locked {
+    opacity: 0.55;
+  }
+  /* The buddy pane's summon/dismiss command: the shared
+     button chrome at the pane's own rhythm. */
+  .col-action {
+    margin: 6px 0 4px;
+    padding: 4px 12px;
+    min-height: 40px;
+  }
+  .col-row-name {
+    flex: 1;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  .col-row-state {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .col-group-head {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 11px;
+    margin: 10px 0 3px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    padding-bottom: 2px;
+  }
+  /* The shared turntable's canvas is appended here by Hud.mountSharedPreview. */
+  /* The idle turntable, at double the height it shipped at (owner request):
+     a buddy rig is small in frame, and the pane is the only place a player
+     ever sees one up close. */
+  .col-preview {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    margin-bottom: 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .col-detail-name {
+    font-family: var(--title-font);
+    font-size: 14px;
+    margin: 0 0 6px;
+  }
+  /* The companion blurb: flavour, so it reads quieter than the derived facts
+     under it and never competes with them for the eye. */
+  .col-lore {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--color-collections-lore);
+  }
+  .col-line {
+    display: flex;
+    gap: 8px;
+    margin: 2px 0;
+    font-size: 11px;
+  }
+  .col-line-label {
+    flex: 0 0 96px;
+    color: var(--color-text-muted);
+  }
+  .col-line-value {
+    flex: 1;
+  }
+  .col-note {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .col-pieces {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  /* A piece the player already owns: green tick beside the name and a green
+     ring on the icon, so a set can be read at a glance without counting. */
+  .col-piece.col-owned .item-icon {
+    outline: 2px solid var(--color-collections-owned);
+    outline-offset: -2px;
+    border-radius: 3px;
+  }
+  .col-tick {
+    color: var(--color-collections-owned);
+    margin-right: 4px;
+    font-weight: 700;
+  }
+  /* Item level rides the name line, dimmer than the name it qualifies. */
+  .col-ilvl {
+    color: var(--color-collections-ilvl);
+    font-size: 10px;
+    font-weight: 400;
+  }
+  /* A set bonus the player has the pieces for reads live, the rest sit muted,
+     matching how the item tooltip lights a met tier. */
+  .col-bonus .col-line-value {
+    opacity: 0.6;
+  }
+  .col-bonus-live .col-line-value {
+    opacity: 1;
+    color: var(--color-collections-owned);
+  }
+  .col-piece {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 8px;
+    padding: 6px 0;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  .col-piece .col-line,
+  .col-piece .col-note {
+    grid-column: 2;
+  }
+  /* An entry with no committed item art: an empty cell at icon size, never a
+     broken image. */
+  .col-noart {
+    display: inline-block;
+    background: var(--color-collections-art-empty);
+  }
+
   /* ---------- Ashen Coliseum (arena) ---------- */
   #arena-window {
     width: min(760px, calc(100vw - 40px));
@@ -18322,6 +18721,682 @@
     gap: 6px;
     font-size: 12px;
     line-height: 1.35;
+  }
+
+  /* ---------- Dungeon prompts' shared slot (the Iron Cage, the chains, the encounter alerts) ---------- */
+  /* The three encounter prompts share one slot, clear of the WHOLE bottom
+     stack: it sits a gap above the cast bar (which already rides above the
+     action rows, the player frame and the swing timers) and lifts with it
+     when a third action row shows. They used to sit at 190px, over the player
+     frame and the stacked action rows. On touch they float above the action
+     ring's arc instead. */
+  #bastion-cage-escape,
+  #bastion-chain-alert,
+  #bastion-alert,
+  #wildheart-alert,
+  #sanctum-alert,
+  #crypt-alert,
+  #kit-use-prompt {
+    bottom: calc(260px + var(--castbar-h) + 14px);
+  }
+  body.show-actionbar3 #bastion-cage-escape,
+  body.show-actionbar3 #bastion-chain-alert,
+  body.show-actionbar3 #bastion-alert,
+  body.show-actionbar3 #wildheart-alert,
+  body.show-actionbar3 #sanctum-alert,
+  body.show-actionbar3 #crypt-alert,
+  body.show-actionbar3 #kit-use-prompt {
+    bottom: calc(312px + var(--castbar-h) + 14px);
+  }
+  body.mobile-touch #bastion-cage-escape,
+  body.mobile-touch #bastion-chain-alert,
+  body.mobile-touch #bastion-alert,
+  body.mobile-touch #wildheart-alert,
+  body.mobile-touch #sanctum-alert,
+  body.mobile-touch #crypt-alert,
+  body.mobile-touch #kit-use-prompt {
+    bottom: 56%;
+  }
+
+  /* ---------- Iron Cage escape (the Gaol Turnkey's button-mash prompt) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/cage_escape_painter.ts while the local
+     player is locked in the Iron Cage, centred low over the action bar. The
+     whole panel is a button (a tap or a click is an escape press, the same
+     command the interact key sends), composed from the library panel, keycap
+     and bar. The state is carried by text as well as the fill. */
+  #bastion-cage-escape {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 320px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
+    user-select: none;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-cage-escape .bce-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-hostile);
+  }
+  #bastion-cage-escape .bce-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  #bastion-cage-escape .bce-key {
+    font-size: 16px;
+    font-weight: 700;
+    animation: bce-press 0.3s ease-in-out infinite alternate;
+  }
+  #bastion-cage-escape .bce-bar {
+    --bar-h: 16px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-cage-escape .bce-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-cage-escape.is-near .bce-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @keyframes bce-throb {
+    from {
+      box-shadow: 0 0 6px color-mix(in srgb, var(--color-hostile) 40%, transparent);
+    }
+    to {
+      box-shadow: 0 0 22px color-mix(in srgb, var(--color-hostile) 80%, transparent);
+    }
+  }
+  @keyframes bce-press {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(2px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-cage-escape,
+    #bastion-cage-escape .bce-key {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-cage-escape {
+    min-width: min(420px, calc(100vw - 32px));
+    padding: 16px 20px 18px;
+  }
+  body.mobile-touch #bastion-cage-escape .bce-title {
+    font-size: 22px;
+  }
+  body.mobile-touch #bastion-cage-escape .bce-bar {
+    --bar-h: 22px;
+  }
+
+  /* ---------- Gaoler Ossick's chain alert (the Drowned Anchor, the Shackle Pair) ---------- */
+  /* Self-mounted by src/ui/hud/dungeon/gaol_chain_painter.ts in the Iron Cage
+     prompt's slot (the two never share a fight), shown while a chain asks
+     something of the local player. The kind classes come from the pure view;
+     the state is carried by the text too, so colour is never the only cue. */
+  #bastion-chain-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 6px 16px 8px;
+    pointer-events: none;
+    text-align: center;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #bastion-chain-alert .bca-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #bastion-chain-alert .bca-line {
+    font-size: 13px;
+  }
+  /* The Drowned Anchor's links left: the number the whole group plays to. */
+  #bastion-chain-alert .bca-count {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-light);
+  }
+  #bastion-chain-alert .bca-hint {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  #bastion-chain-alert .bca-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-chain-alert .bca-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-chain-alert.is-anchored,
+  #bastion-chain-alert.is-strained {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-chain-alert.is-anchored .bca-title,
+  #bastion-chain-alert.is-strained .bca-title {
+    color: var(--color-hostile);
+  }
+  #bastion-chain-alert.is-strained .bca-fill {
+    --bar-color: var(--color-hostile);
+  }
+  #bastion-chain-alert.is-anchored .bca-fill,
+  #bastion-chain-alert.is-ally .bca-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-chain-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-chain-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Sunken Bastion's crown alert (Vael's scythe, the Fog Veil) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/bastion_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: the
+     scythe behind you throbs in the hostile tone, the veil's rule sits in the
+     beacon's warm gold, a hollow shade in its fog green. Never tier-gated
+     (graphics fairness). */
+  #bastion-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #bastion-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #bastion-alert .fa-line {
+    font-size: 14px;
+  }
+  #bastion-alert .fa-hint {
+    display: none;
+  }
+  #bastion-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #bastion-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #bastion-alert.is-reaped,
+  #bastion-alert.is-sentenced,
+  #bastion-alert.is-brine {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #bastion-alert.is-reaped .fa-title,
+  #bastion-alert.is-reaped .fa-fill,
+  #bastion-alert.is-sentenced .fa-title,
+  #bastion-alert.is-sentenced .fa-fill,
+  #bastion-alert.is-brine .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #bastion-alert.is-veil-real {
+    animation: bce-throb 0.6s ease-in-out infinite alternate;
+  }
+  #bastion-alert.is-veil-shade {
+    border-color: var(--color-debuff-nature);
+  }
+  #bastion-alert.is-veil-shade .fa-title {
+    color: var(--color-debuff-nature);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bastion-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #bastion-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Wildheart Basin's alert (the Prey, the Stalk, the pollen, the bond) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/wildheart_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too. */
+  #wildheart-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #wildheart-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #wildheart-alert .fa-line {
+    font-size: 14px;
+  }
+  #wildheart-alert .fa-hint {
+    display: none;
+  }
+  #wildheart-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #wildheart-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #wildheart-alert.is-prey,
+  #wildheart-alert.is-stalked {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #wildheart-alert.is-prey .fa-title,
+  #wildheart-alert.is-stalked .fa-title,
+  #wildheart-alert.is-prey .fa-fill,
+  #wildheart-alert.is-stalked .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #wildheart-alert.is-pollinated {
+    border-color: var(--color-energy);
+  }
+  #wildheart-alert.is-pollinated .fa-title,
+  #wildheart-alert.is-pollinated .fa-fill {
+    color: var(--color-energy);
+    --bar-color: var(--color-energy);
+  }
+  #wildheart-alert.is-bonded {
+    border-color: var(--color-debuff-nature);
+  }
+  #wildheart-alert.is-bonded .fa-title {
+    color: var(--color-debuff-nature);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #wildheart-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #wildheart-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/sanctum_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: a strike
+     to dodge throbs in the hostile tone, a floor to read sits in frost, the
+     Lockbound readout in gold. Never tier-gated (graphics fairness). */
+  #sanctum-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #sanctum-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #sanctum-alert .fa-line {
+    font-size: 14px;
+  }
+  #sanctum-alert .fa-hint {
+    display: none;
+  }
+  #sanctum-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #sanctum-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #sanctum-alert.is-quench,
+  #sanctum-alert.is-plunge,
+  #sanctum-alert.is-descent,
+  #sanctum-alert.is-eye,
+  #sanctum-alert.is-eye-cracked,
+  #sanctum-alert.is-flail,
+  #sanctum-alert.is-charge,
+  #sanctum-alert.is-trench,
+  #sanctum-alert.is-strain,
+  #sanctum-alert.is-inferno,
+  #sanctum-alert.is-stomp,
+  #sanctum-alert.is-breath,
+  #sanctum-alert.is-maul,
+  #sanctum-alert.is-tail,
+  #sanctum-alert.is-branded {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #sanctum-alert.is-quench .fa-title,
+  #sanctum-alert.is-plunge .fa-title,
+  #sanctum-alert.is-descent .fa-title,
+  #sanctum-alert.is-eye .fa-title,
+  #sanctum-alert.is-eye-cracked .fa-title,
+  #sanctum-alert.is-flail .fa-title,
+  #sanctum-alert.is-charge .fa-title,
+  #sanctum-alert.is-trench .fa-title,
+  #sanctum-alert.is-strain .fa-title,
+  #sanctum-alert.is-inferno .fa-title,
+  #sanctum-alert.is-stomp .fa-title,
+  #sanctum-alert.is-breath .fa-title,
+  #sanctum-alert.is-maul .fa-title,
+  #sanctum-alert.is-tail .fa-title,
+  #sanctum-alert.is-branded .fa-title,
+  #sanctum-alert.is-quench .fa-fill,
+  #sanctum-alert.is-plunge .fa-fill,
+  #sanctum-alert.is-descent .fa-fill,
+  #sanctum-alert.is-eye .fa-fill,
+  #sanctum-alert.is-eye-cracked .fa-fill,
+  #sanctum-alert.is-flail .fa-fill,
+  #sanctum-alert.is-charge .fa-fill,
+  #sanctum-alert.is-trench .fa-fill,
+  #sanctum-alert.is-strain .fa-fill,
+  #sanctum-alert.is-inferno .fa-fill,
+  #sanctum-alert.is-stomp .fa-fill,
+  #sanctum-alert.is-breath .fa-fill,
+  #sanctum-alert.is-maul .fa-fill,
+  #sanctum-alert.is-tail .fa-fill,
+  #sanctum-alert.is-branded .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #sanctum-alert.is-meltwater,
+  #sanctum-alert.is-meltwater-target,
+  #sanctum-alert.is-cracked,
+  #sanctum-alert.is-flight,
+  #sanctum-alert.is-rime {
+    border-color: var(--color-debuff-frost);
+  }
+  #sanctum-alert.is-meltwater .fa-title,
+  #sanctum-alert.is-meltwater-target .fa-title,
+  #sanctum-alert.is-cracked .fa-title,
+  #sanctum-alert.is-flight .fa-title,
+  #sanctum-alert.is-rime .fa-title,
+  #sanctum-alert.is-meltwater .fa-fill,
+  #sanctum-alert.is-meltwater-target .fa-fill,
+  #sanctum-alert.is-cracked .fa-fill,
+  #sanctum-alert.is-flight .fa-fill,
+  #sanctum-alert.is-rime .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  /* The Ice Slab's cover hint: calm, never a warning (it is shelter). */
+  #sanctum-alert.is-slab {
+    border-color: var(--color-friendly);
+  }
+  #sanctum-alert.is-slab .fa-title,
+  #sanctum-alert.is-slab .fa-fill {
+    color: var(--color-friendly);
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #sanctum-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #sanctum-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Hollow Crypt's alert (the grave mark, the Embrace, the Lament, the Open Grave, Morthen's Rite Ring) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/crypt_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: a mark
+     or a grave to leave throbs in the hostile tone, being held and the
+     Lament's call to the light sit in frost, a sheltered player stays calm in
+     the friendly tone, the target readouts in gold. Never tier-gated
+     (graphics fairness). */
+  #crypt-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #crypt-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #crypt-alert .fa-line {
+    font-size: 14px;
+  }
+  #crypt-alert .fa-hint {
+    display: none;
+  }
+  #crypt-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #crypt-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  /* Morthen's Rite Ring and the Burning Knell: the strikes to leave (the
+     marked half, a Grasp ring, the Reap's arc) throb in the hostile tone too;
+     the Rite's candle count and a Bound Soul on its way stay in gold. */
+  #crypt-alert.is-measured,
+  #crypt-alert.is-grave,
+  #crypt-alert.is-knell,
+  #crypt-alert.is-grasp,
+  #crypt-alert.is-reap {
+    border-color: var(--color-hostile);
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #crypt-alert.is-measured .fa-title,
+  #crypt-alert.is-measured .fa-fill,
+  #crypt-alert.is-knell .fa-title,
+  #crypt-alert.is-knell .fa-fill,
+  #crypt-alert.is-grasp .fa-title,
+  #crypt-alert.is-grasp .fa-fill,
+  #crypt-alert.is-reap .fa-title,
+  #crypt-alert.is-reap .fa-fill,
+  #crypt-alert.is-grave .fa-title {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #crypt-alert.is-embraced,
+  #crypt-alert.is-lament-open {
+    border-color: var(--color-debuff-frost);
+  }
+  #crypt-alert.is-lament-open {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #crypt-alert.is-embraced .fa-title,
+  #crypt-alert.is-embraced .fa-fill,
+  #crypt-alert.is-lament-open .fa-title,
+  #crypt-alert.is-lament-open .fa-fill {
+    color: var(--color-debuff-frost);
+    --bar-color: var(--color-debuff-frost);
+  }
+  #crypt-alert.is-lament-sheltered {
+    border-color: var(--color-friendly);
+  }
+  #crypt-alert.is-lament-sheltered .fa-title,
+  #crypt-alert.is-lament-sheltered .fa-fill {
+    color: var(--color-friendly);
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #crypt-alert {
+      animation: none;
+    }
+    #crypt-alert .fa-fill {
+      transition: none;
+    }
+  }
+  body.mobile-touch #crypt-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The trash engine's use prompt (a Soul Brazier to topple) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from
+     src/ui/hud/dungeon/kit_use_prompt_view.ts, in the dungeon prompts' shared
+     slot (it yields the slot to every other prompt). In the use's reach the
+     whole panel is a button (a tap or a click targets the body and interacts,
+     like the interact key); a little farther out, or while the player's own
+     use runs, it ignores the pointer. The state is carried by the text too:
+     the keycap and the press line, the step-closer line, the use's own bar.
+     Never tier-gated (graphics fairness). */
+  #kit-use-prompt {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 320px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #kit-use-prompt.is-pressable {
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+  #kit-use-prompt .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #kit-use-prompt .fa-line {
+    font-size: 14px;
+  }
+  #kit-use-prompt .fa-hint {
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  #kit-use-prompt .fa-key {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  #kit-use-prompt .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #kit-use-prompt .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #kit-use-prompt.is-use {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #kit-use-prompt.is-use-far {
+    border-color: var(--color-border-default);
+  }
+  #kit-use-prompt.is-using .fa-fill {
+    --bar-color: var(--color-friendly);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #kit-use-prompt {
+      animation: none;
+    }
+    #kit-use-prompt .fa-fill {
+      transition: none;
+    }
+  }
+  body.mobile-touch #kit-use-prompt {
+    min-width: min(420px, calc(100vw - 32px));
+    padding: 16px 20px 18px;
+  }
+  body.mobile-touch #kit-use-prompt .fa-hint {
+    font-size: 17px;
   }
 
   /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */
@@ -22092,6 +23167,693 @@
   }
   .mail-send-btn:hover {
     filter: brightness(1.08);
+  }
+
+  /* ---------- lantern hall guild window ---------- */
+  /* Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts): two tabs over the
+     Highwatch slate blue. Contracts: a wooden notice board of pinned parchment notices, each
+     with its boss's portrait, the guild's wax seal, the week's counter and the reward.
+     Quartermaster: a vendor counter, item cards on the left and the selected card's detail
+     (the crest, the nameplate the title draws, the price against the bags) on the right. A
+     flex column under the base window shell; both bodies restack on a narrow window (the
+     container queries below), which is what a landscape phone gets. */
+  #guild-hall-window {
+    width: min(1040px, calc(100vw - 32px));
+    max-height: calc(var(--app-vh, 100vh) * 0.9 - 16px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden auto;
+    min-height: 0;
+    container-type: inline-size;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, var(--gh-amber-glow), transparent 60%),
+      linear-gradient(180deg, var(--gh-sheet-top), var(--gh-sheet-bottom));
+    border-color: var(--gh-edge);
+    color: var(--gh-ink);
+    padding: clamp(10px, 1.6cqw, 22px) clamp(12px, 2cqw, 26px);
+  }
+  #guild-hall-window .gh-title span:first-child {
+    font-size: clamp(18px, 3cqw, 30px);
+    letter-spacing: 0.03em;
+    color: var(--gh-amber);
+    text-shadow: 0 1px 0 var(--gh-shadow);
+  }
+  #guild-hall-window .gh-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  #guild-hall-window .gh-tab {
+    flex: 1 1 0;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    color: var(--gh-muted);
+    background: linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge);
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-tab[aria-selected="true"] {
+    color: var(--gh-amber);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-card));
+    box-shadow:
+      inset 0 -2px 0 var(--gh-amber),
+      0 0 14px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-tab:focus-visible,
+  #guild-hall-window .gh-btn:focus-visible,
+  #guild-hall-window .gh-item:focus-visible,
+  #guild-hall-window .gh-seals:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  #guild-hall-window .gh-sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 16px;
+    font-size: 14px;
+  }
+  #guild-hall-window .gh-seals {
+    min-height: 40px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: help;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 12px 3px 4px;
+    color: var(--gh-amber);
+    font-weight: 600;
+    background: var(--gh-chip-bg);
+    border: 1px solid var(--gh-edge);
+    border-radius: 999px;
+  }
+  #guild-hall-window .gh-seal-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+  }
+  #guild-hall-window .gh-reset,
+  #guild-hall-window .gh-intro,
+  #guild-hall-window .gh-empty {
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-intro {
+    font-size: 13px;
+    line-height: 1.45;
+    margin: 8px 0 12px;
+  }
+  #guild-hall-window .gh-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* The notice board: dark oak boards behind the pinned notices. */
+  #guild-hall-window .gh-board {
+    padding: 14px clamp(10px, 1.8cqw, 22px) 12px;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, var(--gh-wood-glow), transparent 70%),
+      repeating-linear-gradient(
+        180deg,
+        var(--gh-wood-1) 0 46px,
+        var(--gh-wood-seam) 46px 48px,
+        var(--gh-wood-2) 48px 94px,
+        var(--gh-wood-seam) 94px 96px
+      );
+    border: 3px solid var(--gh-frame);
+    box-shadow:
+      inset 0 0 0 1px var(--gh-edge),
+      inset 0 0 40px var(--gh-shadow),
+      0 6px 16px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-tally {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 12px;
+    margin: 0 0 14px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: var(--gh-gilt);
+    text-shadow: 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-pips {
+    display: inline-flex;
+    gap: 5px;
+  }
+  #guild-hall-window .gh-pip {
+    width: 26px;
+    height: 8px;
+    background: var(--gh-pip-empty);
+    border: 1px solid var(--gh-edge);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-pip-done {
+    background: linear-gradient(180deg, var(--gh-amber), var(--gh-edge));
+    box-shadow: 0 0 6px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  /* One notice: a sheet of aged parchment pinned at its head. */
+  #guild-hall-window .gh-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 24px 16px 18px;
+    color: var(--gh-paper-ink);
+    text-align: center;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 40%, var(--gh-paper-hi), transparent 75%),
+      radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, var(--gh-paper-burn) 100%),
+      linear-gradient(170deg, var(--gh-paper-1), var(--gh-paper-2));
+    border-radius: 3px 5px 4px 6px;
+    box-shadow:
+      inset 0 0 0 1px var(--gh-paper-edge),
+      0 10px 18px var(--gh-shadow),
+      0 2px 3px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-card:nth-child(3n + 1) {
+    transform: rotate(-0.6deg);
+  }
+  #guild-hall-window .gh-card:nth-child(3n + 3) {
+    transform: rotate(0.5deg);
+  }
+  #guild-hall-window .gh-pin {
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--gh-pin-hi), var(--gh-pin) 60%);
+    box-shadow: 1px 2px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-ribbon {
+    padding: 2px 14px;
+    color: var(--gh-ribbon-text);
+    background: var(--gh-kind-boss);
+    clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%);
+  }
+  #guild-hall-window .gh-card-heroic .gh-ribbon {
+    background: var(--gh-kind-heroic);
+  }
+  #guild-hall-window .gh-card-task .gh-ribbon {
+    background: var(--gh-kind-task);
+  }
+  #guild-hall-window .gh-kind {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  #guild-hall-window .gh-portrait {
+    width: 92px;
+    height: 92px;
+    margin-top: 4px;
+    padding: 3px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--gh-gilt), var(--gh-edge) 55%, var(--gh-frame));
+    box-shadow: 0 3px 8px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--gh-sheet-bottom);
+    box-shadow: inset 0 0 8px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-boss {
+    margin: 2px 0 0;
+    font-family: var(--title-font);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--gh-paper-ink);
+  }
+  #guild-hall-window .gh-dungeon {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-rule {
+    width: 70%;
+    height: 1px;
+    margin: 2px 0;
+    background: linear-gradient(90deg, transparent, var(--gh-paper-rule), transparent);
+  }
+  #guild-hall-window .gh-goal,
+  #guild-hall-window .gh-detail {
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+  }
+  #guild-hall-window .gh-detail {
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-progress {
+    width: 100%;
+    margin-top: auto;
+    padding-top: 6px;
+  }
+  #guild-hall-window .gh-progress-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--gh-paper-muted);
+  }
+  #guild-hall-window .gh-pips-card {
+    display: flex;
+    margin-top: 4px;
+  }
+  #guild-hall-window .gh-pips-card .gh-pip {
+    flex: 1 1 auto;
+    height: 9px;
+    background: var(--gh-paper-track);
+    border-color: var(--gh-paper-rule);
+  }
+  #guild-hall-window .gh-pips-card .gh-pip-done {
+    background: linear-gradient(180deg, var(--gh-done-bar), var(--gh-done-deep));
+    box-shadow: none;
+  }
+  #guild-hall-window .gh-card-done .gh-state {
+    color: var(--gh-done-deep);
+    font-weight: 700;
+  }
+  #guild-hall-window .gh-reward {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding-right: 36px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gh-paper-ink);
+  }
+  #guild-hall-window .gh-reward-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+  }
+  /* The guild's wax seal, pressed at the notice's foot: the crown while the contract is
+     open, a tick once it is done this week. */
+  #guild-hall-window .gh-wax {
+    position: absolute;
+    right: -10px;
+    bottom: -12px;
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    color: var(--gh-wax-deep);
+    border-radius: 47% 53% 50% 50% / 52% 48% 52% 48%;
+    background: radial-gradient(
+      circle at 38% 32%,
+      var(--gh-wax-hi),
+      var(--gh-wax) 55%,
+      var(--gh-wax-deep)
+    );
+    box-shadow:
+      inset 0 0 0 4px var(--gh-wax-rim),
+      1px 2px 3px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-wax .ui-icon {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 1px 0 var(--gh-wax-hi));
+  }
+  #guild-hall-window .gh-card-done .gh-wax {
+    color: var(--gh-wax-gilt);
+  }
+  /* The clerk's ink stamp across the notice's upper corner, clear of the boss's name. */
+  #guild-hall-window .gh-stamp {
+    position: absolute;
+    top: 50px;
+    right: 8px;
+    padding: 1px 8px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gh-stamp);
+    border: 3px double var(--gh-stamp);
+    border-radius: 4px;
+    transform: rotate(12deg);
+    pointer-events: none;
+  }
+  #guild-hall-window .gh-foot {
+    margin-top: 14px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--gh-gilt);
+    text-shadow: 0 1px 2px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-empty {
+    text-align: center;
+    color: var(--gh-gilt);
+  }
+
+  /* The quartermaster's counter. */
+  #guild-hall-window .gh-shop {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 16px;
+    align-items: start;
+  }
+  #guild-hall-window .gh-stock {
+    display: grid;
+    gap: 10px;
+  }
+  #guild-hall-window .gh-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 72px;
+    padding: 8px 12px 8px 8px;
+    font-family: inherit;
+    color: var(--gh-ink);
+    text-align: start;
+    background: linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge-dim);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-item:hover {
+    border-color: var(--gh-edge);
+  }
+  #guild-hall-window .gh-item-selected {
+    border-color: var(--gh-amber);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-card));
+    box-shadow:
+      inset 0 0 0 1px var(--gh-amber),
+      0 0 16px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-slot {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    padding: 3px;
+    background: radial-gradient(circle at 50% 40%, var(--gh-card), var(--gh-sheet-bottom));
+    border: 2px solid var(--gh-edge);
+    border-radius: 6px;
+    box-shadow: inset 0 0 10px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  #guild-hall-window .gh-item-owned .gh-slot {
+    border-color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-item-short .gh-slot img {
+    filter: saturate(0.55) brightness(0.8);
+  }
+  #guild-hall-window .gh-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  #guild-hall-window .gh-item-kind {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-item-name {
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: var(--gh-title-ink);
+  }
+  #guild-hall-window .gh-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-tag-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+  #guild-hall-window .gh-chip {
+    padding: 3px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+  }
+  #guild-hall-window .gh-chip-owned {
+    color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-chip-ready {
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-chip-short {
+    color: var(--gh-short);
+  }
+  #guild-hall-window .gh-detail-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, var(--gh-amber-glow), transparent 70%),
+      linear-gradient(180deg, var(--gh-card), var(--gh-sheet-bottom));
+    border: 1px solid var(--gh-edge);
+    border-radius: 4px;
+    box-shadow: 0 8px 18px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-detail-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  #guild-hall-window .gh-slot-large {
+    width: 84px;
+    height: 84px;
+  }
+  #guild-hall-window .gh-detail-name {
+    margin: 2px 0 0;
+    font-family: var(--title-font);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gh-title-ink);
+  }
+  /* The nameplate preview: the name over a dusk sky, the title beside it, the way the
+     title draws over the player in the world. */
+  #guild-hall-window .gh-plate-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 10px 18px;
+    background:
+      radial-gradient(ellipse 60% 70% at 50% 100%, var(--gh-plate-glow), transparent 70%),
+      linear-gradient(180deg, var(--gh-plate-sky-1), var(--gh-plate-sky-2));
+    border: 1px solid var(--gh-edge-dim);
+    border-radius: 4px;
+  }
+  #guild-hall-window .gh-plate-heading {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-plate {
+    font-family: var(--title-font);
+    font-size: 20px;
+    text-align: center;
+    text-shadow:
+      0 0 3px var(--gh-shadow),
+      0 1px 1px var(--gh-shadow);
+  }
+  #guild-hall-window .gh-plate-name {
+    color: var(--gh-plate-name);
+  }
+  #guild-hall-window .gh-plate-title {
+    color: var(--gh-plate-title);
+    white-space: pre-wrap;
+  }
+  /* The live 3D stage of the horse or a weapon appearance (guild_offer_stage_controller.ts): the same
+     dusk frame as the nameplate, with the preview canvas filling it. */
+  #guild-hall-window .gh-model-stage {
+    align-items: stretch;
+    padding: 10px 10px 12px;
+  }
+  #guild-hall-window .gh-model-stage .gh-plate-heading {
+    text-align: center;
+  }
+  #guild-hall-window .gh-stage-slot,
+  #guild-hall-window .gh-stage {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    border-radius: 3px;
+  }
+  #guild-hall-window .gh-stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #guild-hall-window .gh-stage-empty {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    margin: 0;
+    font-size: 13px;
+    text-align: center;
+    color: var(--gh-muted);
+  }
+  /* The reins and the Armory cards are paintings, not crests: they fill their slot. */
+  #guild-hall-window .gh-slot-item img,
+  #guild-hall-window .gh-slot-skin img {
+    object-fit: cover;
+    border-radius: 3px;
+  }
+  #guild-hall-window .gh-detail-summary {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--gh-amber);
+  }
+  #guild-hall-window .gh-detail-text,
+  #guild-hall-window .gh-detail-note {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  #guild-hall-window .gh-detail-note {
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-buybar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gh-edge-dim);
+  }
+  #guild-hall-window .gh-buy-price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #guild-hall-window .gh-tag-large {
+    font-size: 20px;
+  }
+  #guild-hall-window .gh-tag-large .gh-tag-icon {
+    width: 28px;
+    height: 28px;
+  }
+  #guild-hall-window .gh-have {
+    font-size: 12px;
+    color: var(--gh-muted);
+  }
+  #guild-hall-window .gh-btn {
+    min-width: 120px;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    color: var(--gh-ink);
+    background: linear-gradient(180deg, var(--gh-tab-lit), var(--gh-sheet-top));
+    border: 1px solid var(--gh-edge);
+    cursor: var(--cursor-point);
+  }
+  #guild-hall-window .gh-buy:enabled {
+    color: var(--gh-btn-ink);
+    background: linear-gradient(180deg, var(--gh-amber), var(--gh-edge));
+    box-shadow: 0 0 12px var(--gh-amber-glow);
+  }
+  #guild-hall-window .gh-btn:disabled {
+    color: var(--gh-muted);
+    cursor: default;
+  }
+  #guild-hall-window .gh-detail-owned .gh-btn {
+    color: var(--gh-done-text);
+  }
+  #guild-hall-window .gh-short {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gh-short);
+  }
+  @container (max-width: 560px) {
+    #guild-hall-window .gh-cards {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    /* a narrow notice runs sideways: the portrait at its left, the words beside it */
+    #guild-hall-window .gh-card {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      column-gap: 12px;
+      row-gap: 3px;
+      align-items: start;
+      padding: 18px 14px 14px;
+      text-align: start;
+      transform: none;
+    }
+    #guild-hall-window .gh-card > :not(.gh-portrait, .gh-pin, .gh-wax, .gh-stamp) {
+      grid-column: 2;
+    }
+    #guild-hall-window .gh-ribbon {
+      justify-self: start;
+    }
+    #guild-hall-window .gh-portrait {
+      grid-column: 1;
+      grid-row: 1 / span 4;
+      width: 72px;
+      height: 72px;
+    }
+    #guild-hall-window .gh-rule {
+      display: none;
+    }
+    #guild-hall-window .gh-wax {
+      width: 40px;
+      height: 40px;
+    }
+    #guild-hall-window .gh-shop {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* Forced colors drop the gradients and tints that carry the selected tab, the selected
+     card and the done pips, so each keeps a system-color edge instead. */
+  @media (forced-colors: active) {
+    #guild-hall-window .gh-tab[aria-selected="true"],
+    #guild-hall-window .gh-item-selected {
+      border: 2px solid Highlight;
+    }
+    #guild-hall-window .gh-pip-done,
+    #guild-hall-window .gh-pips-card .gh-pip-done {
+      background: Highlight;
+    }
   }
 
   /* ---------- event calendar ---------- */
@@ -28580,5 +30342,193 @@
   }
   .frame-preset-loadouts .tal-lo-item {
     min-height: 40px;
+  }
+  /* ---------- courier ---------- */
+  #courier-window {
+    width: min(960px, 100%);
+    max-height: calc(100dvh - 48px);
+  }
+  #courier-window .courier-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 160px minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+  }
+  #courier-window .courier-storage {
+    min-width: 0;
+  }
+  #courier-window .courier-storage-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  #courier-window .courier-storage-head h3 {
+    margin: 0;
+  }
+  #courier-window .courier-storage-hint {
+    margin: 8px 0;
+  }
+  #courier-window .courier-grid {
+    grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+    max-height: 320px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px;
+  }
+  #courier-window .courier-grid .bank-item {
+    width: 100%;
+    min-height: 44px;
+  }
+  #courier-window .courier-item .item-icon {
+    width: 100%;
+    height: 100%;
+  }
+  #courier-window .courier-item[aria-pressed="true"] {
+    outline: 2px solid var(--color-gold);
+    outline-offset: -2px;
+  }
+  #courier-window .courier-item:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  #courier-window .courier-selected {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--color-keyline) 65%, transparent);
+    color: var(--color-gold);
+    pointer-events: none;
+  }
+  #courier-window .courier-selected .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+  @media (forced-colors: active) {
+    #courier-window .ui-win-title,
+    #courier-window .ui-win-body,
+    #courier-window .ui-muted,
+    #courier-window .ui-win-foot {
+      color: CanvasText;
+    }
+    #courier-window button {
+      color: ButtonText;
+      background: ButtonFace;
+    }
+    #courier-window .courier-item[aria-pressed="true"] {
+      outline-color: Highlight;
+    }
+    #courier-window .courier-selected {
+      color: HighlightText;
+      background: Highlight;
+      forced-color-adjust: none;
+    }
+  }
+  #courier-window .courier-companion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    align-self: center;
+    gap: 8px;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  #courier-window .courier-companion p {
+    margin: 0;
+  }
+  #courier-window .courier-portrait {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--color-gold);
+    border-radius: 50%;
+    aspect-ratio: 1;
+  }
+  #courier-window .courier-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  #courier-window .courier-emblem {
+    color: var(--color-gold);
+  }
+  #courier-window .courier-emblem .ui-icon {
+    width: 28px;
+    height: 28px;
+  }
+  #courier-window .courier-item-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  #courier-window .courier-item-label img {
+    width: 32px;
+    height: 32px;
+    flex: none;
+  }
+  #courier-window .courier-cargo-icon {
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+  #courier-window .courier-cargo {
+    padding: 0;
+    list-style: none;
+  }
+  #courier-window .courier-cargo li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #courier-window .ui-win-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  #courier-window .courier-send,
+  #courier-window .x-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  @media (max-height: 500px) and (min-width: 601px) {
+    #courier-window .courier-companion {
+      align-self: start;
+      gap: 4px;
+    }
+    #courier-window .courier-portrait {
+      width: 72px;
+    }
+    #courier-window .courier-emblem .ui-icon {
+      width: 20px;
+      height: 20px;
+    }
+    #courier-window .courier-grid {
+      max-height: 144px;
+    }
+  }
+  @media (max-width: 600px) {
+    #courier-window .courier-columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    #courier-window .courier-companion {
+      display: grid;
+      grid-template-columns: 72px auto;
+      justify-items: center;
+      max-width: none;
+      column-gap: 16px;
+    }
+    #courier-window .courier-portrait {
+      grid-row: 1 / 4;
+      width: 72px;
+    }
+    #courier-window .courier-grid {
+      max-height: 160px;
+    }
   }
 }

@@ -20,10 +20,11 @@ import {
   type FinderActivityKind,
   type FinderListingTag,
   finderActivity,
+  finderEncounterBodyIds,
 } from '../sim/content/dungeon_finder';
 import { HEROIC_BOSS_LOOT } from '../sim/content/heroic_loot';
 import type { Role } from '../sim/content/talents';
-import { DELVE_LIST, DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
+import { activeDungeonDoorPos, DELVE_LIST, DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
 import { lootEntryRollsOnClaim } from '../sim/loot/loot_difficulty_gate';
 import { compatibleFinderRoles } from '../sim/social/dungeon_finder';
 import type { FinderAdvertCooldownView } from '../sim/social/finder_advert';
@@ -372,9 +373,12 @@ function buildEncounters(
     // Mirror the roller's difficulty gate: a heroic activity never previews a
     // Normal-only row, because the heroic kill never rolls it.
     const heroicClaim = activity.difficulty === 'heroic';
-    const loot = (mob.loot ?? []).filter(
-      (e) => !e.questId && lootEntryRollsOnClaim(e, heroicClaim),
-    );
+    // A boss of several bodies (the Mere Hydra's three heads) pays every
+    // body's table once per kill, so the one preview adds them up.
+    const bodyIds = finderEncounterBodyIds(enc);
+    const loot = bodyIds
+      .flatMap((bodyId) => MOBS[bodyId]?.loot ?? [])
+      .filter((e) => !e.questId && lootEntryRollsOnClaim(e, heroicClaim));
     const { groups, singles } = lootGroups(loot);
     let copper = 0;
     // Mirror the roller's money arm: a heroic activity's finale pays the
@@ -385,7 +389,7 @@ function buildEncounters(
       if (e.copper)
         copper += heroicFinale && e.heroicCopper !== undefined ? e.heroicCopper : e.copper;
     const heroicLoot = heroicClaim
-      ? lootGroups(HEROIC_BOSS_LOOT[enc.mobId] ?? [])
+      ? lootGroups(bodyIds.flatMap((bodyId) => HEROIC_BOSS_LOOT[bodyId] ?? []))
       : { groups: [], singles: [] };
     // Mirror the roller's heroic-append gate exactly: a heroic claim rolls
     // HEROIC_BOSS_LOOT for ANY encounter that has a table, finale or not
@@ -431,7 +435,8 @@ function buildDetail(
   level: number,
   lockouts: RaidLockout[],
 ): FinderActivityDetailView {
-  const door = DUNGEONS[activity.entranceDungeonId]?.doorPos ?? { x: 0, z: 0 };
+  const entrance = DUNGEONS[activity.entranceDungeonId];
+  const door = entrance ? activeDungeonDoorPos(entrance) : { x: 0, z: 0 };
   const tuning = HEROIC_DUNGEON_TUNING[activity.dungeonId];
   const blocked = blockReasonFor(activity, level);
   return {

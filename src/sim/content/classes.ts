@@ -24,6 +24,7 @@ import {
   TEMPORAL_ECHO_DURATION_SECONDS,
   TEMPORAL_ECHO_SINGLE_CONVERSION,
 } from './chronomancy_tuning';
+import { COURIER_ABILITY } from './courier';
 import {
   CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE,
   GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
@@ -649,6 +650,7 @@ export const PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF = 0.1;
 export const MAGE_MASS_BARRIER_SPELL_POWER_COEFF = 0.25;
 
 export const ABILITIES: Record<string, AbilityDef> = {
+  courier: COURIER_ABILITY,
   ...PALADIN_CORE_ABILITIES,
   // ====================== WARRIOR ======================
   heroic_strike: {

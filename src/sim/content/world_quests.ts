@@ -121,7 +121,10 @@ export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
     ambushes: [
       { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 5, radius: 6 },
       { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 5, radius: 7 },
-      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 8 },
+      // radius 7, not 8: at 8 the fourth bandit lands against the painted
+      // smithy's north wall, 0.15 yd of clearance (spawns are not collision
+      // checked); at 7 every spawn has at least 0.95 yd
+      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 7 },
     ],
     creditRadius: 35,
     respawnSeconds: 30,
@@ -310,15 +313,16 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'eastbrook_freight_crate',
     name: 'Eastbrook Freight Crate',
-    // Six separate loads across the dry freight yard, off the road and within
+    // Six separate loads along the town side of the quay road (north-east of
+    // it, toward the quay cottage and the inn), clear of the road and within
     // the world-quest ring. Keep the first stable id for existing sessions.
     positions: [
-      { x: -63, z: -90 },
-      { x: -66, z: -94 },
-      { x: -70, z: -89 },
-      { x: -76, z: -95 },
-      { x: -86, z: -90 },
-      { x: -68, z: -78 },
+      { x: -55, z: -75 },
+      { x: -44, z: -79 },
+      { x: -58, z: -70 },
+      { x: -62, z: -65 },
+      { x: -50, z: -78 },
+      { x: -67, z: -62 },
     ],
     entityIds: [
       2_147_100_003, 2_147_100_005, 2_147_100_006, 2_147_100_007, 2_147_100_008, 2_147_100_009,
@@ -327,7 +331,7 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'eastbrook_freight_wagon',
     name: 'Eastbrook Freight Wagon',
-    positions: [{ x: -80, z: -82 }],
+    positions: [{ x: -78, z: -57 }],
     entityIds: [2_147_100_004],
   },
   {
@@ -477,7 +481,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_eastbrook_bandits',
     zoneId: 'eastbrook_vale',
     minLevel: WORLD_QUEST_MIN_LEVEL,
-    area: { x: -74, z: -82, radius: 20 },
+    area: { x: -61, z: -68, radius: 26 },
     objective: {
       type: 'delivery',
       pickupObjectItemId: 'eastbrook_freight_crate',
@@ -555,6 +559,8 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     zoneId: 'willowfen',
     minLevel: 19,
     area: { x: -370, z: 355, radius: 108 },
+    // Clear of Bridgemere's painted building footprint.
+    championAt: { x: -362, z: 372 },
     objective: { type: 'gather', nodeType: 'ore' },
     count: 3,
   },

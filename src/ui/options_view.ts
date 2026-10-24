@@ -1047,6 +1047,7 @@ export function buildInterfaceControls(
     boolToggle(s, 'showReliquaryTracker', 'hudChrome.options.showReliquaryTracker'),
     boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
     boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
+    boolToggle(s, 'showPetNames', 'hudChrome.options.showPetNames'),
     boolToggle(s, 'confirmVendorSell', 'hudChrome.options.confirmVendorSell'),
     note('hudChrome.options.confirmVendorSellNote'),
     choice(
@@ -1139,6 +1140,10 @@ export function buildInterfaceControls(
     ]),
     ...tag('combat', [
       boolToggle(s, 'eastbrookGuidance', 'hudChrome.tutorialGreeting.guidanceSetting'),
+      // The advisory dungeon alerts (the tip panel over the action bar). The
+      // note names what stays on screen whatever this is set to.
+      boolToggle(s, 'showDungeonHints', 'hudChrome.options.showDungeonHints'),
+      note('hudChrome.options.showDungeonHintsNote'),
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
       boolToggle(
         s,

@@ -27,9 +27,11 @@
 //               swap every dev kit and DPS fixture onto faction stock)
 // Each faction serves one role family across its whole ladder (the three
 // factions progress in parallel, so every character walks all three):
-//   Rift Watch    Agility (rogue, hunter, feral, enhancement)
+//   Rift Watch    Agility (rogue, hunter)
 //   Church Order  casters and healers
-//   Automatons    Strength and the stamina line (warrior, paladin, shaman)
+//   Automatons    Strength and the stamina line (warrior, paladin, enhancement
+//                 shaman; feral druids wear its jewelry and two-hander, since
+//                 Feral is a Strength spec: content/spec_primary_stat.ts)
 // Budgets are COPIED from the live raid and heroic tables, never invented:
 // jewelry mirrors content/ignivar_loot.ts IGNIVAR_JEWELRY_ITEMS (one 25
 // rating, 15 to 16 primary) and content/heroic_vendor.ts; waist and feet
@@ -53,6 +55,7 @@
 
 import type { FactionId, StandingTier } from '../factions';
 import { STANDING_THRESHOLDS } from '../factions';
+import { DRIFTHAVEN_NPC_PLACEMENTS_BY_ID } from '../painted_towns';
 import type { ItemDef, NpcDef } from '../types';
 
 export interface FactionVendorGate {
@@ -939,13 +942,15 @@ export const FACTION_VENDOR_STOCK: Readonly<Record<FactionId, readonly string[]>
 
 /** The 3 Faction Quartermasters and the World Quest Taskmaster. */
 export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
-  // Rift Watch Quartermaster: Drifthaven (palmreach)
+  // Rift Watch Quartermaster: Drifthaven (palmreach). He keeps the counter of
+  // the provisioner's shop on the square's east side, looking out at the
+  // square (sim/painted_towns/drifthaven.ts).
   npc_rift_watch_quartermaster: {
     id: 'npc_rift_watch_quartermaster',
     name: 'Quartermaster Vaelen',
     title: 'Rift Watch Provisioner',
-    pos: { x: -302, z: 812 },
-    facing: 0.8,
+    pos: { ...DRIFTHAVEN_NPC_PLACEMENTS_BY_ID.npc_rift_watch_quartermaster.position },
+    facing: DRIFTHAVEN_NPC_PLACEMENTS_BY_ID.npc_rift_watch_quartermaster.facing,
     color: 0x4a7a9a,
     questIds: [],
     greeting:
@@ -953,13 +958,16 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     vendorItems: [...FACTION_VENDOR_STOCK.rift_watch],
   },
 
-  // Church Order Quartermaster: Eastbrook Vale chapel (eastbrook_vale)
+  // Church Order Quartermaster: Eastbrook Vale chapel (eastbrook_vale). She
+  // follows the chapel (to the rise west of the square in the Tidehold
+  // rebuild) and stands at the foot of its steps three strides from Brother
+  // Aldric, toward the bell tower, looking out of its door.
   npc_church_order_quartermaster: {
     id: 'npc_church_order_quartermaster',
     name: 'Templar Althea',
     title: 'Church Order Quartermaster',
-    pos: { x: 8, z: -80 },
-    facing: 3.14,
+    pos: { x: 13.29, z: -112.84 },
+    facing: -0.96,
     color: 0xecd57a,
     questIds: [],
     greeting:
@@ -981,12 +989,13 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     vendorItems: [...FACTION_VENDOR_STOCK.automatons],
   },
 
-  // World Quest Taskmaster: Eastbrook Vale central hub
+  // World Quest Taskmaster: Eastbrook Vale central hub, on the square's west
+  // side by the civic link road
   npc_wq_taskmaster: {
     id: 'npc_wq_taskmaster',
     name: 'Taskmaster Kaelen',
     title: 'World Quest Taskmaster',
-    pos: { x: -5, z: -95 },
+    pos: { x: -2.8, z: -96 },
     facing: -2.1,
     color: 0x8a6a50,
     questIds: [],
@@ -1009,7 +1018,14 @@ export const FACTION_HUB_LANDINGS: Readonly<
     }
   >
 > = Object.freeze({
-  church_order: Object.freeze({ x: 8, y: 0, z: -80, facing: 3.14, name: 'Eastbrook Vale' }),
+  // before the Eastbrook chapel's door, looking out of it toward the square
+  church_order: Object.freeze({
+    x: 12.55,
+    y: 0,
+    z: -108.66,
+    facing: -0.96,
+    name: 'Eastbrook Vale',
+  }),
   rift_watch: Object.freeze({ x: -302, y: 0, z: 812, facing: 0.8, name: 'Drifthaven' }),
   automatons: Object.freeze({ x: 402, y: 0, z: 1912, facing: -0.4, name: 'Wyrmwatch' }),
 });

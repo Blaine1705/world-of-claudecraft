@@ -241,6 +241,7 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'guardian_core',
   'harvest_feast',
   'last_keep_signet',
+  'membership_token',
   // The World PvP Skull Bag is a carried sub-inventory, kind-junk by the bag
   // taxonomy, not a crafting material.
   'pvp_skull_bag',

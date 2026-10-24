@@ -1,4 +1,5 @@
 import { audio } from '../../../game/audio';
+import type { DungeonDifficulty } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { DungeonFinderProposalPopup } from '../../dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from '../../dungeon_finder_window';
@@ -17,6 +18,8 @@ interface FinderSurfaceHost {
   openFinder(): void;
   maskPlayerText(note: string): string;
   inspectPlayer(pid: number, profile: InspectRemoteProfile): void;
+  hasBossGuide?(dungeonId: string, mobId: string): boolean;
+  openBossGuide?(dungeonId: string, mobId: string, difficulty: DungeonDifficulty): void;
   presentation: PainterHostPresentation;
   writers: PainterHostWriters;
 }
@@ -32,6 +35,8 @@ export function createFinderSurfaces(host: FinderSurfaceHost) {
     showOnMap: host.showOnMap,
     maskPlayerText: host.maskPlayerText,
     inspectPlayer: host.inspectPlayer,
+    hasBossGuide: host.hasBossGuide,
+    openBossGuide: host.openBossGuide,
     ...host.focus('#dungeon-finder-window'),
   });
   return {
