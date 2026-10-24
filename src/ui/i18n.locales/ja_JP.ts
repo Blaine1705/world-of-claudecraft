@@ -8502,6 +8502,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.petEatsFoodOnly': 'ペットは食べ物しか食べられません。',
   'mode.play': 'プレイ',
   'mode.playAria': 'World of ClaudeCraftをプレイ',
+  'mode.playLoading': '読み込み中',
+  'mode.playStarting': '起動中',
   'mode.serverAria': 'ワールドを選択：オンラインまたはオフライン',
   'mode.serverLabel': 'ワールドを選択',
   'mode.serverOffline': 'オフライン',

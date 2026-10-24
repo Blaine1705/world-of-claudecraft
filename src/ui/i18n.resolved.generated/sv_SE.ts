@@ -13582,6 +13582,8 @@ export const sv_SE: EnTranslations = {
     "serverOffline": "Offline",
     "play": "Spela",
     "playAria": "Spela World of ClaudeCraft",
+    "playLoading": "Loading",
+    "playStarting": "Starting",
     "serverLabel": "Välj din värld",
     "serverAria": "Välj värld: Online eller Offline",
     "serverOfflineSub": "Direkt lokal värld"

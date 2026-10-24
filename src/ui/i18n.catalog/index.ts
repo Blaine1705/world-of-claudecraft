@@ -380,6 +380,9 @@ export const en = {
     serverOffline: 'Offline',
     play: 'Play',
     playAria: 'Play World of ClaudeCraft',
+    // The Play button while a first visit's game client downloads, then boots.
+    playLoading: 'Loading',
+    playStarting: 'Starting',
     serverLabel: 'Choose your world',
     serverAria: 'Select world: Online or Offline',
     serverOfflineSub: 'Instant local world',

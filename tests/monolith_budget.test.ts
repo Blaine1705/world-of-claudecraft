@@ -1564,7 +1564,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the merge of origin/feature/v045-integration (tip 43f0cfd0c04) into
     // feature/genshin-artstyle: both parents' non-overlapping additions compose to 10934
     // (wc -l < src/main.ts). Exact merged count, zero slack.
-    ceiling: 10934,
+    // Landing-first integration extracts the project counter and community tracking.
+    // Re-pin the combined release entrypoint at its measured size, with zero slack.
+    ceiling: 10785,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

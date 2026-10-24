@@ -8188,6 +8188,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.pet.petEatsFoodOnly': '你的寵物只能吃食物。',
   'mode.play': '開始遊戲',
   'mode.playAria': '遊玩 World of ClaudeCraft',
+  'mode.playLoading': '載入中',
+  'mode.playStarting': '正在啟動',
   'mode.serverAria': '選擇世界：線上或離線',
   'mode.serverLabel': '選擇你的世界',
   'mode.serverOffline': '離線',

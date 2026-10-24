@@ -13582,6 +13582,8 @@ export const cs_CZ: EnTranslations = {
     "serverOffline": "Offline",
     "play": "Hrát",
     "playAria": "Hrát World of ClaudeCraft",
+    "playLoading": "Loading",
+    "playStarting": "Starting",
     "serverLabel": "Vyber si svět",
     "serverAria": "Vybrat svět: online nebo offline",
     "serverOfflineSub": "Okamžitý lokální svět"

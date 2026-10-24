@@ -13582,6 +13582,8 @@ export const ko_KR: EnTranslations = {
     "serverOffline": "오프라인",
     "play": "플레이",
     "playAria": "World of ClaudeCraft 플레이",
+    "playLoading": "불러오는 중",
+    "playStarting": "시작하는 중",
     "serverLabel": "월드를 선택하세요",
     "serverAria": "월드 선택: 온라인 또는 오프라인",
     "serverOfflineSub": "즉시 시작하는 로컬 세상"
