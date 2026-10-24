@@ -7,6 +7,10 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const sv_SE: Record<string, string> = {
+  'error.buddyGrantFailed': 'Det gick inte att tilldela följeslagaren.',
+  'error.characterAlreadyHasThat':
+    'Den karaktären har redan den följeslagaren eller det utseendet.',
+  'moderationHistory.actionGrantBuddy': 'Följeslagare tilldelad',
   'moderationHistory.actionAnnounce': 'Rikesmeddelande',
   'moderationHistory.actionGmInvisible': 'Blev osynlig',
   'moderationHistory.actionGmVisible': 'Blev synlig',

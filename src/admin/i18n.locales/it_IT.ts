@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const it_IT: Record<string, string> = {
+  'error.buddyGrantFailed': 'Impossibile assegnare il compagno.',
+  'error.characterAlreadyHasThat': 'Quel personaggio possiede già quel compagno o aspetto.',
+  'moderationHistory.actionGrantBuddy': 'Compagno assegnato',
   'moderationHistory.actionAnnounce': 'Annuncio del reame',
   'moderationHistory.actionGmInvisible': 'Diventato invisibile',
   'moderationHistory.actionGmVisible': 'Diventato visibile',

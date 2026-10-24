@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ko_KR: Record<string, string> = {
+  'error.buddyGrantFailed': '동료를 지급하지 못했습니다.',
+  'error.characterAlreadyHasThat': '해당 캐릭터는 이미 해당 동료 또는 외형을 보유하고 있습니다.',
+  'moderationHistory.actionGrantBuddy': '동료 지급됨',
   'moderationHistory.actionAnnounce': '서버 전체 공지',
   'moderationHistory.actionGmInvisible': '투명 상태로 전환',
   'moderationHistory.actionGmVisible': '표시 상태로 전환',

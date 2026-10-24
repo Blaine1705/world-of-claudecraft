@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const fr_FR: Record<string, string> = {
+  'error.buddyGrantFailed': 'L’attribution du compagnon a échoué.',
+  'error.characterAlreadyHasThat': 'Ce personnage possède déjà ce compagnon ou cette apparence.',
+  'moderationHistory.actionGrantBuddy': 'Compagnon attribué',
   'moderationHistory.actionAnnounce': 'Annonce du royaume',
   'moderationHistory.actionGmInvisible': 'Est devenu invisible',
   'moderationHistory.actionGmVisible': 'Est devenu visible',

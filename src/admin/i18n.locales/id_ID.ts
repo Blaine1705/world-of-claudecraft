@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const id_ID: Record<string, string> = {
+  'error.buddyGrantFailed': 'Gagal memberikan pendamping.',
+  'error.characterAlreadyHasThat': 'Karakter itu sudah memiliki pendamping atau tampilan tersebut.',
+  'moderationHistory.actionGrantBuddy': 'Pendamping diberikan',
   'moderationHistory.actionAnnounce': 'Pengumuman realm',
   'moderationHistory.actionGmInvisible': 'Menjadi tak terlihat',
   'moderationHistory.actionGmVisible': 'Menjadi terlihat',

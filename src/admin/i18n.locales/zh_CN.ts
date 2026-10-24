@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const zh_CN: Record<string, string> = {
+  'error.buddyGrantFailed': '伙伴发放失败。',
+  'error.characterAlreadyHasThat': '该角色已拥有该伙伴或外观。',
+  'moderationHistory.actionGrantBuddy': '已发放伙伴',
   'moderationHistory.actionAnnounce': '服务器公告',
   'moderationHistory.actionGmInvisible': '已隐身',
   'moderationHistory.actionGmVisible': '已现身',

@@ -7,6 +7,10 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const de_DE: Record<string, string> = {
+  'error.buddyGrantFailed': 'Der Begleiter konnte nicht vergeben werden.',
+  'error.characterAlreadyHasThat':
+    'Dieser Charakter besitzt diesen Begleiter oder dieses Aussehen bereits.',
+  'moderationHistory.actionGrantBuddy': 'Begleiter vergeben',
   'moderationHistory.actionAnnounce': 'Realm-Ankündigung',
   'moderationHistory.actionGmInvisible': 'Unsichtbar geworden',
   'moderationHistory.actionGmVisible': 'Sichtbar geworden',

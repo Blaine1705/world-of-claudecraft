@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const nl_NL: Record<string, string> = {
+  'error.buddyGrantFailed': 'Het toekennen van de metgezel is mislukt.',
+  'error.characterAlreadyHasThat': 'Dat personage heeft die metgezel of dat uiterlijk al.',
+  'moderationHistory.actionGrantBuddy': 'Metgezel toegekend',
   'moderationHistory.actionAnnounce': 'Realmaankondiging',
   'moderationHistory.actionGmInvisible': 'Onzichtbaar geworden',
   'moderationHistory.actionGmVisible': 'Zichtbaar geworden',
