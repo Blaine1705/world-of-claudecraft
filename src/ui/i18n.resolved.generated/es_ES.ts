@@ -7447,6 +7447,7 @@ export const es_ES: EnTranslations = {
       "sourceActivityRiftFirstClear": "Se otorga a todos los miembros del grupo que logra la primera conquista de una Brecha clasificada",
       "sourceActivityBuriedHoard": "Se encuentra en el cofre de recompensa de un tesoro enterrado, la cámara a la que lleva un mapa del tesoro",
       "sourceActivityLanternHall": "Se compra con sellos del farol al intendente del Salón del Farol",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, aún sin encontrar, {source}",
       "cellOwnedClearsAria": "{name}, catalogada, encontrada por primera vez en la conquista {count}",
       "searchPlaceholder": "Buscar reliquias",

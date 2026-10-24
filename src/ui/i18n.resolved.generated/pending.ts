@@ -23,6 +23,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "es_ES": [
@@ -39,6 +40,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "fr_FR": [
@@ -55,6 +57,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "fr_CA": [
@@ -71,6 +74,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "en_CA": [],
@@ -88,6 +92,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "de_DE": [
@@ -104,6 +109,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "zh_CN": [],
@@ -124,6 +130,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "ru_RU": [],
@@ -141,6 +148,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "nl_NL": [
@@ -157,6 +165,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "pl_PL": [
@@ -173,6 +182,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "id_ID": [
@@ -189,6 +199,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "tr_TR": [
@@ -205,6 +216,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "sv_SE": [
@@ -221,6 +233,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "vi_VN": [
@@ -237,6 +250,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ],
   "da_DK": [
@@ -253,6 +267,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.itemHistoryEarlierHidden.many",
     "hudChrome.plurals.itemHistoryEarlierHidden.one",
     "hudChrome.plurals.itemHistoryEarlierHidden.other",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.errors.orderTrackedItem"
   ]
 };

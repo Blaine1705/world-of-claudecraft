@@ -7447,6 +7447,7 @@ export const pl_PL: EnTranslations = {
       "sourceActivityRiftFirstClear": "Przyznawana każdemu członkowi drużyny, która zdobędzie pierwsze przejście rankingowej Szczeliny",
       "sourceActivityBuriedHoard": "Znaleziono w skrzyni nagrody Zakopanych Skarbów, skarbcu do którego prowadzi mapa skarbu",
       "sourceActivityLanternHall": "Kupione za Pieczęcie Latarni u kwatermistrza Sali Latarni",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, jeszcze nieznaleziona, {source}",
       "cellOwnedClearsAria": "{name}, skatalogowana, znaleziona po raz pierwszy przy przejściu {count}",
       "searchPlaceholder": "Szukaj relikwii",
