@@ -5207,7 +5207,7 @@ export const hudChromeStrings = {
     resetLoot: 'You cannot reset instances while loot remains inside.',
     resetConfirmTitle: 'Reset All Instances?',
     resetConfirmBody:
-      'This abandons empty instances from your previously selected difficulty. Unclaimed loot will prevent the reset.',
+      'This abandons your empty instances so the next run starts fresh at your selected difficulty. Lockouts are not changed. Anyone still inside, or unclaimed loot, will prevent the reset.',
     resetConfirm: 'Reset Instances',
     resetCooldown: 'Instances can only be reset once every 5 minutes.',
     resetUsage: 'Use /dungeon reset to abandon your empty instances after changing difficulty.',

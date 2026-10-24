@@ -51,7 +51,7 @@ export function setDungeonDifficulty(
   }
   // Retry even when the preference already matches: an earlier reset may have
   // failed while the old claim stayed live.
-  const result = resetDungeonInstances(ctx, id, { quiet: true });
+  const result = resetDungeonInstances(ctx, id, { quiet: true, transitionOnly: true });
   if (result.status !== 'blocked') {
     applied(ctx, id, difficulty);
     return;
@@ -107,7 +107,11 @@ export function retryPendingDifficultyChanges(ctx: SimContext): void {
     }
   }
   for (const [pid, request] of ctx.pendingDifficultyChanges) {
-    const result = resetDungeonInstances(ctx, pid, { quiet: true, occupied });
+    const result = resetDungeonInstances(ctx, pid, {
+      quiet: true,
+      occupied,
+      transitionOnly: true,
+    });
     if (result.status !== 'blocked') {
       ctx.pendingDifficultyChanges.delete(pid);
       applied(ctx, pid, request.difficulty);
