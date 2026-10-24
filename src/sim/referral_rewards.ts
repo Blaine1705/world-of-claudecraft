@@ -13,6 +13,7 @@ import {
   REFERRAL_TITLE,
 } from './content/referral_rewards';
 import { isMaterialItemId } from './material_ids';
+import { savedMaterialSlot } from './material_slot_load';
 import { REFERRAL_MILESTONES, type ReferralMilestone } from './referral_cards';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type EquipSlot, type InvSlot } from './types';
@@ -243,7 +244,8 @@ export function applyReferralRewardState(
   const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
   // Passive loot may arrive during the database await even when commands are fenced.
   // Never overwrite it. The host quarantines/reloads on false after a committed write.
-  if (changed('inventory') && !same(meta.inventory, before.inventory)) return false;
+  if (changed('inventory') && !same(meta.inventory.map(savedMaterialSlot), before.inventory))
+    return false;
   if (changed('equipment') && !same(meta.equipment, before.equipment)) return false;
   if (
     (changed('equipmentInstance') || changed('equipment')) &&

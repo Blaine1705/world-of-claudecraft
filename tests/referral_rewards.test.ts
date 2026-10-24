@@ -304,7 +304,17 @@ describe('live referral reward behavior', () => {
 
   it('projects only reward domains and refuses a stale inventory instead of overwriting passive loot', () => {
     const { sim, pid, meta, player } = simWith(blank());
+    meta.inventory.push({
+      itemId: 'minor_healing_potion',
+      count: 3,
+      instance: { signer: 'Ana' },
+    });
     const before = sim.serializeCharacter(pid)!;
+    expect(before.inventory[0]).toEqual({
+      itemId: 'minor_healing_potion',
+      count: 3,
+      materialSources: [{ source: { signer: 'Ana' }, count: 3 }],
+    });
     const after = grantReferralReward(before, 1, 'tutorial');
     const hp = player.hp;
     expect(applyReferralRewardState(sim.ctx, pid, before, after)).toBe(true);
@@ -314,4 +324,21 @@ describe('live referral reward behavior', () => {
     expect(applyReferralRewardState(sim.ctx, pid, after, next)).toBe(false);
     expect(meta.inventory.some((i) => i.itemId === 'forest_pelt')).toBe(true);
   });
+
+  it.each(['count', 'signer'])(
+    'refuses a concurrent material %s change during reward projection',
+    (field) => {
+      const { sim, pid, meta } = simWith(blank());
+      const slot = { itemId: 'minor_healing_potion', count: 3, instance: { signer: 'Ana' } };
+      meta.inventory.push(slot);
+      const before = sim.serializeCharacter(pid)!;
+      const after = grantReferralReward(before, 1, 'tutorial');
+      if (field === 'count') slot.count++;
+      else slot.instance.signer = 'Bru';
+      const live = structuredClone(meta.inventory);
+      expect(applyReferralRewardState(sim.ctx, pid, before, after)).toBe(false);
+      expect(meta.inventory).toEqual(live);
+      expect(meta.referralRewards).toBeUndefined();
+    },
+  );
 });
