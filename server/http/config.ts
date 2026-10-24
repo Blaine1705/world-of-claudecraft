@@ -258,8 +258,8 @@ const DEFAULT_WORLD_QUEST_SCORES_RETENTION_DAYS = 365;
 // eligible craft, far below ftue_events' per-character burst.
 const DEFAULT_CRAFT_ROLL_EVENTS_RETENTION_DAYS = 365;
 // item_ledger answers "who has held this legendary" for copies that live as
-// long as the realm; the intake is bounded by epic/legendary drop rates (a
-// few rows per player per week at most), so three years stays small.
+// long as the realm. Transfers and modifications also add rows, so retention
+// bounds their lifetime while item_ledger.ts bounds the pending write queue.
 const DEFAULT_ITEM_LEDGER_RETENTION_DAYS = 1095;
 const DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS = 180;
 // Abandon rows are dead once outside every cooldown window (an hour); 30 days
