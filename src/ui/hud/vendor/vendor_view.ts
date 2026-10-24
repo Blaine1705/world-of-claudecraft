@@ -179,12 +179,14 @@ export function buildVendorView(
     const quantity = vendorStackSize(item);
     const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency);
     const factionGate = resolveFactionVendorRowGate(itemId, balances.factions);
-    const factionMarks = factionGate.requirement?.factionId
-      ? {
-          factionId: factionGate.requirement.factionId,
-          amount: factionGate.requirement.currencyCost,
-        }
-      : undefined;
+    const rowFactionId = factionGate.requirement?.factionId ?? balances.vendorFactionId;
+    const factionMarks =
+      rowFactionId && factionGate.requirement?.currencyCost
+        ? {
+            factionId: rowFactionId,
+            amount: factionGate.requirement.currencyCost,
+          }
+        : undefined;
     const price: VendorPrice = {
       copper: item.teachesRiding
         ? ridingTrainingFee(ridingTier)

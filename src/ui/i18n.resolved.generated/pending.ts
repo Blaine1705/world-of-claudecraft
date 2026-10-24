@@ -22,6 +22,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -44,6 +45,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -66,6 +68,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -88,6 +91,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -111,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -133,6 +138,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -142,10 +148,18 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.guildHall.mountPreview"
+  ],
+  "zh_TW": [
+    "hudChrome.guildHall.mountPreview"
+  ],
+  "ko_KR": [
+    "hudChrome.guildHall.mountPreview"
+  ],
+  "ja_JP": [
+    "hudChrome.guildHall.mountPreview"
+  ],
   "pt_BR": [
     "guide.mountsPage.firstBody",
     "guide.mountsPage.goodsBody",
@@ -159,6 +173,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -168,7 +183,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.guildHall.mountPreview"
+  ],
   "cs_CZ": [
     "guide.mountsPage.firstBody",
     "guide.mountsPage.goodsBody",
@@ -182,6 +199,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -204,6 +222,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -226,6 +245,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -248,6 +268,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -270,6 +291,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -292,6 +314,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -314,6 +337,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",
@@ -336,6 +360,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.cosmetics.mountsIntro",
     "hudChrome.cosmetics.mountsNoMount",
     "hudChrome.cosmetics.notCollected",
+    "hudChrome.guildHall.mountPreview",
     "hudChrome.mountTraining.ownedMountPrompt",
     "hudChrome.mounts.desc_grag_bear",
     "hudChrome.mounts.desc_stalkglider_snail",

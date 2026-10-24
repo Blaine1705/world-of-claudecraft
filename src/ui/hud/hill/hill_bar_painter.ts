@@ -3,7 +3,8 @@
 // that shows while the local player stands in the hill's zone. While the hill
 // is announced: the title and the zone, "not yet risen", the distance to the
 // marked circle and when it rises. Once risen: who holds the hill, "you N vs
-// them M", the contest clock as a fill bar, the distance and when it falls.
+// them M", the contest clock as a fill bar (saying so when it is paused by a
+// rival), the distance and when it falls.
 // Either way a note says so when the viewer does not count (a raid member). The skeleton is rebuilt in ONE innerHTML write when
 // the structural sig changes (a new hill, the rise, a holder or challenger
 // change, crossing the circle's edge); every
@@ -11,6 +12,11 @@
 // writes nothing. The tone (yours / theirs / unheld) is a class chosen from
 // the union, never interpolated from the wire, and the state is carried by
 // text as well as colour.
+//
+// The root is the STATIC #hill-bar in both entry documents, a governed frame
+// (the hillBar HUD_FRAME_SPECS row: move, resize, hide), so the skeleton is
+// painted into its inner #hill-body and the mover chrome beside it survives
+// every rebuild. A host without the markup (a test layer) gets one minted.
 
 import { durationText } from '../../duration_text';
 import { zoneDisplayName } from '../../entity_i18n';
@@ -37,6 +43,10 @@ interface Slots {
 
 export class HillBar {
   private root: HTMLElement | null = null;
+  /** The paint target inside the root (#hill-body). */
+  private body: HTMLElement | null = null;
+  /** Whether this painter minted the root (so dispose may remove it). */
+  private minted = false;
   private slots: Slots | null = null;
   private lastSig = '';
   private lastView: HillBarLive | null = null;
@@ -52,10 +62,10 @@ export class HillBar {
       return;
     }
     const root = this.ensureRoot();
-    if (!root) return;
+    if (!root || !this.body) return;
     if (view.sig !== this.lastSig) {
       this.lastSig = view.sig;
-      this.build(root, view);
+      this.build(this.body, view);
     }
     this.lastView = view;
     w.setDisplay(root, 'block');
@@ -63,6 +73,7 @@ export class HillBar {
     w.toggleClass(root, 'is-other', view.holder === 'other');
     w.toggleClass(root, 'is-contested', view.challenger !== 'none');
     w.toggleClass(root, 'is-you-contesting', view.challenger === 'you');
+    w.toggleClass(root, 'is-paused', view.contestPaused);
     this.paintValues(view);
   }
 
@@ -73,8 +84,16 @@ export class HillBar {
   }
 
   dispose(): void {
-    this.root?.remove();
+    // The static root belongs to the document (and the frame registry that
+    // governs it): only a minted one is removed; the static one is emptied.
+    if (this.minted) this.root?.remove();
+    else if (this.root) {
+      this.body?.replaceChildren();
+      this.deps.writers.setDisplay(this.root, 'none');
+    }
     this.root = null;
+    this.body = null;
+    this.minted = false;
     this.slots = null;
     this.lastSig = '';
     this.lastView = null;
@@ -84,12 +103,23 @@ export class HillBar {
     if (this.root) return this.root;
     const layer = this.deps.layer();
     if (!layer) return null;
-    const el = document.createElement('div');
-    el.id = 'hill-bar';
-    el.setAttribute('role', 'status');
-    el.setAttribute('aria-live', 'polite');
-    layer.appendChild(el);
+    let el = layer.querySelector<HTMLElement>('#hill-bar');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'hill-bar';
+      el.setAttribute('role', 'status');
+      el.setAttribute('aria-live', 'polite');
+      layer.appendChild(el);
+      this.minted = true;
+    }
+    let body = el.querySelector<HTMLElement>('#hill-body');
+    if (!body) {
+      body = document.createElement('div');
+      body.id = 'hill-body';
+      el.prepend(body);
+    }
     this.root = el;
+    this.body = body;
     return el;
   }
 
@@ -170,8 +200,16 @@ function heldText(view: HillBarLive): string {
 function contestText(view: HillBarLive): string {
   const seconds = durationText(view.contest);
   const total = durationText(view.capture);
-  if (view.challenger === 'you') return t('hudChrome.hill.contestYou', { seconds, total });
-  if (view.challenger === 'other') return t('hudChrome.hill.contestOther', { seconds, total });
+  if (view.challenger === 'you') {
+    return view.contestPaused
+      ? t('hudChrome.hill.contestYouPaused', { seconds, total })
+      : t('hudChrome.hill.contestYou', { seconds, total });
+  }
+  if (view.challenger === 'other') {
+    return view.contestPaused
+      ? t('hudChrome.hill.contestOtherPaused', { seconds, total })
+      : t('hudChrome.hill.contestOther', { seconds, total });
+  }
   return t('hudChrome.hill.contestNone', { total });
 }
 

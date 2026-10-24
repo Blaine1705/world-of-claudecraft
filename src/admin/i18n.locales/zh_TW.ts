@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const zh_TW: Record<string, string> = {
+  'error.buddyGrantFailed': '夥伴發放失敗。',
+  'error.characterAlreadyHasThat': '該角色已擁有該夥伴或外觀。',
+  'moderationHistory.actionGrantBuddy': '已發放夥伴',
+  'moderationHistory.actionAnnounce': '伺服器公告',
+  'moderationHistory.actionGmInvisible': '已隱身',
+  'moderationHistory.actionGmVisible': '已現身',
+  'moderationHistory.actionUnwatch': '已從觀察名單移除',
+  'moderationHistory.actionWatch': '已加入觀察名單',
   'error.flagActiveExists': '這個帳號已經有一筆同類型的未結案標記。',
   'wealth.largeMovementsUnavailable':
     '無法載入大額銀行異動紀錄（帳本讀取逾時）；上方的金幣明細仍完整無缺。',

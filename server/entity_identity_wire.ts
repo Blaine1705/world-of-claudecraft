@@ -1,3 +1,5 @@
+// Identity projection shared by full snapshots and cached entity records.
+
 import { hasStreamerLink } from '../src/sim/account_flair';
 import type { Entity } from '../src/sim/types';
 import { equippedInstanceWire } from './equipped_instance_wire';
@@ -15,6 +17,8 @@ export function identityFields(e: Entity): Record<string, unknown> {
   // made the appended self delta overwrite the live riding state in JSON.
   if (e.mountKey) out.mnt = e.mountKey;
   if (e.kind === 'player') out.mntTier = e.ridingTier;
+  if (e.buddyKey) out.bud = e.buddyKey;
+  if (e.buddyAutoloot) out.budal = true;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
@@ -23,8 +27,8 @@ export function identityFields(e: Entity): Record<string, unknown> {
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
   if (e.kind === 'player') {
-    // The authored modular look (`app`) is NOT built here. It is ~0.6 KB for a
-    // default look (1489 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
+    // The authored modular look (`app`) is NOT built here. It is ~0.9 KB for a
+    // default look (2154 bytes at its hard bound, APPEARANCE_MAX_WIRE_BYTES)
     // and changes at most once a session, and everything in this record is
     // JSON.stringify'd once per entity per TICK (wireCacheFor), so composing it
     // into the object would re-serialize half a kilobyte 20 times a second per
@@ -97,6 +101,7 @@ export function identityFields(e: Entity): Record<string, unknown> {
   if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
   writePlayerIdentityWire(e, out); // guild, pledge, guild tier, deed title/border, spec
   if (e.dungeonId) out.dgn = e.dungeonId;
+  if (e.guideState) out.gds = e.guideState; // a dungeon guide's offer (src/sim/dungeon_guide)
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.vaultRarity) out.vr = e.vaultRarity; // buried-hoard rarity (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;
