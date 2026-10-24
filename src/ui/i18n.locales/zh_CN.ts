@@ -23091,6 +23091,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '改变你所装备的剑的样子，适用于账号中的所有角色。仅为外观：没有属性。',
   'hudChrome.guildHall.skinOffer': '剑的外观：{skin}',
   'hudChrome.guildHall.mountOffer': '坐骑：{mount}',
+  'hudChrome.guildHall.mountPreview': '账号内所有角色通用的坐骑外观。移动速度由你的骑术训练决定。',
   'hudChrome.guildHall.refused.range': '站到军需官身边才能交易。',
   'hudChrome.guildHall.reward.one': '{count}枚灯火印章',
   'hudChrome.guildHall.reward.few': '{count}枚灯火印章',

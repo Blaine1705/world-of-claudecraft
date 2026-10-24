@@ -22535,6 +22535,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '장착한 검의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.',
   'hudChrome.guildHall.skinOffer': '검 외형: {skin}',
   'hudChrome.guildHall.mountOffer': '탈것: {mount}',
+  'hudChrome.guildHall.mountPreview':
+    '계정의 모든 캐릭터가 쓰는 탈것 외형입니다. 이동 속도는 기승 훈련으로 정해집니다.',
   'hudChrome.guildHall.refused.range': '거래하려면 보급관 곁에 서세요.',
   'hudChrome.guildHall.reward.one': '등불 인장 {count}개',
   'hudChrome.guildHall.reward.few': '등불 인장 {count}개',

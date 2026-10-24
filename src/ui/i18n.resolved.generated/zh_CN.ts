@@ -862,7 +862,7 @@ export const zh_CN: EnTranslations = {
       "titleOffer": "头衔：{title}",
       "titlePreview": "显示为{preview}",
       "mountOffer": "坐骑：{mount}",
-      "mountPreview": "Mount appearance for every character on your account. Your riding training sets your speed.",
+      "mountPreview": "账号内所有角色通用的坐骑外观。移动速度由你的骑术训练决定。",
       "skinOffer": "剑的外观：{skin}",
       "skinPreview": "改变你所装备的剑的样子，适用于账号中的所有角色。仅为外观：没有属性。",
       "buy": "购买",

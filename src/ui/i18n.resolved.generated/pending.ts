@@ -148,18 +148,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
   ],
-  "zh_CN": [
-    "hudChrome.guildHall.mountPreview"
-  ],
-  "zh_TW": [
-    "hudChrome.guildHall.mountPreview"
-  ],
-  "ko_KR": [
-    "hudChrome.guildHall.mountPreview"
-  ],
-  "ja_JP": [
-    "hudChrome.guildHall.mountPreview"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "guide.mountsPage.firstBody",
     "guide.mountsPage.goodsBody",
@@ -183,9 +175,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
   ],
-  "ru_RU": [
-    "hudChrome.guildHall.mountPreview"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "guide.mountsPage.firstBody",
     "guide.mountsPage.goodsBody",

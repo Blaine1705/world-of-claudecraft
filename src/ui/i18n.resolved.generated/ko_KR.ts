@@ -862,7 +862,7 @@ export const ko_KR: EnTranslations = {
       "titleOffer": "칭호: {title}",
       "titlePreview": "표시: {preview}",
       "mountOffer": "탈것: {mount}",
-      "mountPreview": "Mount appearance for every character on your account. Your riding training sets your speed.",
+      "mountPreview": "계정의 모든 캐릭터가 쓰는 탈것 외형입니다. 이동 속도는 기승 훈련으로 정해집니다.",
       "skinOffer": "검 외형: {skin}",
       "skinPreview": "장착한 검의 모습을 바꿉니다. 계정의 모든 캐릭터에 적용됩니다. 외형 전용: 능력치 없음.",
       "buy": "구매",

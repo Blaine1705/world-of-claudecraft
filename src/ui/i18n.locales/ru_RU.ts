@@ -24752,6 +24752,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Меняет облик надетого меча у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.',
   'hudChrome.guildHall.skinOffer': 'Облик меча: {skin}',
   'hudChrome.guildHall.mountOffer': 'Скакун: {mount}',
+  'hudChrome.guildHall.mountPreview':
+    'Облик скакуна для всех персонажей вашей учётной записи. Скорость зависит от обучения верховой езде.',
   'hudChrome.guildHall.refused.range': 'Чтобы торговать, встаньте рядом с интендантом.',
   'hudChrome.guildHall.reward.one': '{count} печать Фонаря',
   'hudChrome.guildHall.reward.few': '{count} печати Фонаря',

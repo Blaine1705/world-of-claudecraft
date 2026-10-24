@@ -6798,7 +6798,7 @@ describe('full self-state snapshot delta fixture', () => {
       bankerId: null,
       cargo: [{ itemId: 'wolf_fang', count: 3 }],
       withdrawals: [],
-      revision: 7,
+      revision: 8, // 7 plus the fixture's one bankWireRev bump
       bankSlots: [],
     });
     expect(client.courierInfo).not.toHaveProperty('retryRemaining');
@@ -7335,11 +7335,11 @@ describe('full self-state snapshot delta fixture', () => {
       bankerId: null,
       travelDistance: 8,
       remainingDistance: 0,
-      inventoryRevision: 0,
+      inventoryRevision: 1, // the fixture bumps wireRev once for the mount cache
     });
     expect(initial.self.courierData).toMatchObject({
       cargo: [{ itemId: 'wolf_fang', count: 3 }],
-      revision: 7,
+      revision: 8,
     });
     expect(initial.self.courierTravelTicks).toBe(77);
     expect(initial.self.courierLegTicks).toBe(300);
@@ -7370,7 +7370,7 @@ describe('full self-state snapshot delta fixture', () => {
       bankerId: null,
       travelDistance: 8,
       remainingDistance: 0,
-      inventoryRevision: 0,
+      inventoryRevision: 1,
     });
     expect(moved.self.courierTravelTicks).toBe(78);
     expect(moved.self).not.toHaveProperty('courierData');

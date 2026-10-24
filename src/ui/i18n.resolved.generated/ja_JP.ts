@@ -862,7 +862,7 @@ export const ja_JP: EnTranslations = {
       "titleOffer": "称号：{title}",
       "titlePreview": "表示：{preview}",
       "mountOffer": "マウント：{mount}",
-      "mountPreview": "Mount appearance for every character on your account. Your riding training sets your speed.",
+      "mountPreview": "アカウントの全キャラクターで使えるマウントの外見。移動速度は騎乗訓練で決まります。",
       "skinOffer": "剣の外見：{skin}",
       "skinPreview": "装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。",
       "buy": "購入",

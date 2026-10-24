@@ -862,7 +862,7 @@ export const ru_RU: EnTranslations = {
       "titleOffer": "Звание: {title}",
       "titlePreview": "Отображается как {preview}",
       "mountOffer": "Скакун: {mount}",
-      "mountPreview": "Mount appearance for every character on your account. Your riding training sets your speed.",
+      "mountPreview": "Облик скакуна для всех персонажей вашей учётной записи. Скорость зависит от обучения верховой езде.",
       "skinOffer": "Облик меча: {skin}",
       "skinPreview": "Меняет облик надетого меча у всех персонажей вашей учётной записи. Только внешний вид, без характеристик.",
       "buy": "Купить",

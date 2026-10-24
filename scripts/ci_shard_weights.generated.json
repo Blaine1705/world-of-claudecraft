@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 5773,
-    "harvestedFiles": 3942,
+    "files": 5772,
+    "harvestedFiles": 3941,
     "carried": {
       "tests/_debug_i18n.test.ts": {
         "ms": 101,

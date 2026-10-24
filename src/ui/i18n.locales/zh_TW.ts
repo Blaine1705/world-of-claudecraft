@@ -23108,6 +23108,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '改變你所裝備的劍的樣子，適用於帳號中的所有角色。僅為外觀：沒有屬性。',
   'hudChrome.guildHall.skinOffer': '劍的外觀：{skin}',
   'hudChrome.guildHall.mountOffer': '坐騎：{mount}',
+  'hudChrome.guildHall.mountPreview': '帳號內所有角色通用的坐騎外觀。移動速度由你的騎術訓練決定。',
   'hudChrome.guildHall.refused.range': '站到軍需官身邊才能交易。',
   'hudChrome.guildHall.reward.one': '{count}枚燈火印章',
   'hudChrome.guildHall.reward.few': '{count}枚燈火印章',

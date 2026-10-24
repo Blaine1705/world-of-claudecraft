@@ -22562,6 +22562,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
   'hudChrome.guildHall.skinOffer': '剣の外見：{skin}',
   'hudChrome.guildHall.mountOffer': 'マウント：{mount}',
+  'hudChrome.guildHall.mountPreview':
+    'アカウントの全キャラクターで使えるマウントの外見。移動速度は騎乗訓練で決まります。',
   'hudChrome.guildHall.refused.range': '取引するには補給係のそばに立つこと。',
   'hudChrome.guildHall.reward.one': '燈火の印章{count}個',
   'hudChrome.guildHall.reward.few': '燈火の印章{count}個',
