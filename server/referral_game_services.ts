@@ -6,6 +6,7 @@ import {
   type ReferralCardEvent,
   type ReferralCardState,
   type ReferralCharacter,
+  referralCharacterCanStart,
   referralStartError,
   transitionReferralCard,
 } from '../src/sim/referral_cards';
@@ -758,13 +759,7 @@ export class ReferralGameServices {
               this.replace({ ...row, card: result.result.state });
             }
           }
-          if (evidence.kind === 'party' && !links.length) {
-            for (const p of evidence.participants) {
-              const session = this.host.sessionForAccount(p.accountId);
-              if (session && this.valid(session))
-                this.notice(session, { type: 'reason', reason: 'newAccountsOnly' });
-            }
-          }
+          if (evidence.kind === 'party' && evidence.invited) this.explainUnbound(evidence, links);
           return true;
         },
         duringShutdown,
@@ -802,6 +797,29 @@ export class ReferralGameServices {
       ? Math.min(...this.pendingSince.values())
       : 0;
     referralDiagnostics.evidenceParked = this.retryAfter.size;
+  }
+  /** An accepted invite between new characters who could start a card together, but
+   * whose accounts are not bound friends, explains why no card started. Ordinary
+   * parties, leaves and finder groups stay silent. */
+  private explainUnbound(evidence: ReferralEvidence, links: readonly StoredReferral[]): void {
+    const eligible = evidence.participants.filter(
+      (p) => p.partyId !== null && referralCharacterCanStart(p),
+    );
+    const bound = (a: number, b: number) =>
+      links.some(
+        (row) =>
+          row.card.participants.some((p) => p.accountId === a) &&
+          row.card.participants.some((p) => p.accountId === b),
+      );
+    for (const p of eligible) {
+      const partners = eligible.filter(
+        (q) => q.accountId !== p.accountId && q.partyId === p.partyId,
+      );
+      if (!partners.length || partners.some((q) => bound(p.accountId, q.accountId))) continue;
+      const session = this.host.sessionForAccount(p.accountId, p.characterId);
+      if (session && this.valid(session))
+        this.notice(session, { type: 'reason', reason: 'newAccountsOnly' });
+    }
   }
   private async party(
     row: StoredReferral,
