@@ -5800,8 +5800,7 @@ export const ko_KR: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "버디",
-        "sets": "아이템 세트"
+        "buddies": "버디"
       },
       "state": {
         "owned": "수집함",
@@ -5851,13 +5850,6 @@ export const ko_KR: EnTranslations = {
       "actions": {
         "summon": "소환",
         "dismiss": "해제"
-      },
-      "armor": {
-        "mail": "사슬 방어구"
-      },
-      "detail": {
-        "vendor": "{npc} ({location}), 가격: {price}",
-        "vendorLabel": "판매자"
       }
     },
     "calendar": {
@@ -21066,117 +21058,6 @@ export const ko_KR: EnTranslations = {
       "ps_passing_stone": {
         "name": "안식의 돌"
       },
-      "whistle_ember_fox": {
-        "name": "잉걸불 여우의 호루라기"
-      },
-      "whistle_moss_hare": {
-        "name": "이끼 산토끼의 호루라기"
-      },
-      "whistle_frog": {
-        "name": "개구리의 호루라기"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "진홍 집게 게의 호루라기"
-      },
-      "whistle_golden_sentinel": {
-        "name": "황금 파수병의 호루라기"
-      },
-      "whistle_nightfang": {
-        "name": "밤엄니의 호루라기"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "엄니뿔 멧돼지의 호루라기"
-      },
-      "whistle_emerald_wolf": {
-        "name": "에메랄드 늑대의 호루라기"
-      },
-      "whistle_tiger": {
-        "name": "호랑이의 호루라기"
-      },
-      "whistle_cate_coin": {
-        "name": "케이트 코인의 호루라기"
-      },
-      "whistle_alon": {
-        "name": "알론의 호루라기"
-      },
-      "whistle_trollface": {
-        "name": "트롤페이스의 호루라기"
-      },
-      "whistle_ansem": {
-        "name": "안셈의 호루라기"
-      },
-      "whistle_triple_t": {
-        "name": "트리플 T의 호루라기"
-      },
-      "whistle_kekius": {
-        "name": "케키우스의 호루라기"
-      },
-      "whistle_solbot": {
-        "name": "솔봇의 호루라기"
-      },
-      "whistle_frostfire": {
-        "name": "서리불꽃의 호루라기"
-      },
-      "whistle_rocky": {
-        "name": "로키의 호루라기"
-      },
-      "whistle_proud_grunt": {
-        "name": "자랑스러운 병졸의 호루라기"
-      },
-      "whistle_loot_goblin": {
-        "name": "전리품 고블린의 호루라기"
-      },
-      "whistle_penny_goldspark": {
-        "name": "페니 골드스파크의 호루라기"
-      },
-      "whistle_stag": {
-        "name": "수사슴의 호루라기"
-      },
-      "whistle_alpaca": {
-        "name": "알파카의 호루라기"
-      },
-      "whistle_horse": {
-        "name": "말의 호루라기"
-      },
-      "whistle_sapling": {
-        "name": "어린 나무의 호루라기"
-      },
-      "whistle_bull": {
-        "name": "황소의 호루라기"
-      },
-      "whistle_spider": {
-        "name": "거미의 호루라기"
-      },
-      "whistle_raptor": {
-        "name": "랩터의 호루라기"
-      },
-      "whistle_skeleton": {
-        "name": "해골의 호루라기"
-      },
-      "whistle_crystal_lich": {
-        "name": "수정 리치의 호루라기"
-      },
-      "whistle_forgemaw": {
-        "name": "용융의 화로아귀의 호루라기"
-      },
-      "whistle_sprites": {
-        "name": "깜빡이와 반짝이의 호루라기"
-      },
-      "whistle_crystal_tide": {
-        "name": "수정 물결의 호루라기"
-      },
-      "whistle_phantom": {
-        "name": "팬텀의 호루라기"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "잿불낙하 불사조의 호루라기"
-      },
-      "charm_stag_acorn": {
-        "name": "도토리 왕관 부적"
-      },
-      "charm_stag_gilded": {
-        "name": "금박 부적"
-      },
       "lastflame_core": {
         "name": "마지막 불꽃의 핵"
       },
@@ -26290,9 +26171,6 @@ export const ko_KR: EnTranslations = {
       },
       "buddy_horse": {
         "name": "말"
-      },
-      "buddy_sapling": {
-        "name": "어린 나무"
       },
       "buddy_bull": {
         "name": "황소"

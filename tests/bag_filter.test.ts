@@ -659,11 +659,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'travelers_knapsack',
     'warspice_feast',
     'wayfarers_backpack',
-    'whistle_crystal_lich',
-    'whistle_forgemaw',
-    'whistle_horse',
-    'whistle_sapling',
-    'whistle_sprites',
     'wolfhide_satchel',
   ] as const;
 

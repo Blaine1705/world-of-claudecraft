@@ -11,18 +11,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureGuide.delves': 'Hang Sâu',
   'hudChrome.bank.accountBagsEmpty': 'Túi của bạn đang trống.',
   'hudChrome.bank.accountRetry': 'Thử lại',
-  'hudChrome.collections.actions.remove': 'Loại Bỏ',
   'hudChrome.collections.actions.summon': 'Triệu Hồi',
-  'hudChrome.collections.actions.wear': 'Mặc',
-  'hudChrome.collections.armor.leather': 'Da',
-  'hudChrome.collections.detail.honorPrice': 'Danh dự {amount}',
-  'hudChrome.collections.detail.soulbound': 'Ràng Buộc Linh Hồn',
-  'hudChrome.collections.petKind.beast': 'Mãnh Thú',
-  'hudChrome.collections.petKind.elemental': 'Nguyên Tố',
-  'hudChrome.collections.petKind.humanoid': 'Nhân Hình',
-  'hudChrome.collections.petKind.undead': 'Tử Linh',
-  'hudChrome.collections.stat.agility': 'Nhanh Nhẹn',
-  'hudChrome.collections.stat.intellect': 'Trí Tuệ',
   'hudChrome.courier.bankTitle': 'Ngân Hàng',
   'hudChrome.courier.empty': 'Không có vật phẩm',
   'hudChrome.courier.inventory': 'Túi Đồ',
@@ -20315,15 +20304,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.flagNameAzure': 'Cờ Thiên Thanh',
   'hudChrome.bg.flagNameCrimson': 'Cờ Đỏ Thẫm',
   'hudChrome.bg.flagReturnedByLog': '{name} đã trả lại cờ {team}.',
-  'hudChrome.collections.armor.mail': 'Giáp Xích',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Băng Trói',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Tướng Quân',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Mạ Vàng',
-  'hudChrome.collections.detail.exchangeLabel': 'Sàn Giao Dịch $WOC',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) bán với giá {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Người Bán',
-  'hudChrome.collections.looks.worn': 'Đang mặc',
-  'hudChrome.collections.tabs.sets': 'Bộ Trang Bị',
   'hudChrome.dungeonTracker.complete': 'Hoàn Thành',
   'hudChrome.dungeonTracker.heroicTitle': '{name} ({difficulty})',
   'hudChrome.expeditions.leader': 'Do {name} Dẫn Dắt',
@@ -21117,7 +21097,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'editor.tunnel.cutDepth': 'Chiều Sâu',
   'editor.tunnel.cutShape.box': 'Hộp',
   'editor.tunnel.width': 'Chiều Rộng',
-  'hudChrome.collections.stat.strength': 'Cường Độ',
   'editor.collisionMaster.rampToggleTitle':
     'Dốc đi được: vùng đã chọn nâng mặt đất đi được theo độ dốc của nó (người chơi bước lên) thay vì chặn. Hình dốc mặc định đi được ngay.',
   'editor.collisionMaster.saveEndpointFailed': 'Lưu mặc định thất bại: {error}',
@@ -22528,115 +22507,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.buddyMenu.nameLabel': 'Tên Bạn Đồng Hành',
   'hudChrome.buddyMenu.rename': 'Đổi Tên Bạn Đồng Hành',
   'hudChrome.collections.actions.dismiss': 'Cho Về',
-  'hudChrome.collections.armor.cloth': 'Vải',
-  'hudChrome.collections.buddyLore.alon':
-    'Linh vật của một lữ khách từ con đường không bản đồ nào chịu ghi nhận, cứ xuất hiện khi kế hoạch đang đổ bể. Nó quan sát, tán thành, và tuyệt nhiên không giúp gì.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'Các đàn gia súc Galecrest nuôi chúng lấy len và vì tính khí: không gì bình thản hơn trong bão. Con này sẽ nhổ đúng vào một người mỗi chuyến đi.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Nó nói về cửa và bóng tối, rồi nhất quyết không nói thêm về cả hai. Giáo đồ Nightbloom nhận nó là của họ; mỗi khi họ làm lễ, nó lại đi lang thang mất.',
-  'hudChrome.collections.buddyLore.bull':
-    'Một con bò đực vùng thung lũng chỉ to bằng chó, lý do duy nhất khiến người ta đồng ý nuôi trong nhà. Tính khí chẳng thu nhỏ theo cơ thể.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'Con mèo không chịu rời đồng xu nó ngồi trên, và chưa ai từng thấy nó ăn. Thương nhân Eastbrook vẫn cãi nhau xem trong hai thứ đó, thứ nào mới là thú cưng.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'Một con cua thủy triều Farshore có càng vẫn đỏ rất lâu sau khi rời nước. Thợ bến tàu từng cho chúng đua trên ván để cá cược.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'Một mảnh của chính Nythraxis, vẫn ngân lên cái lạnh đã tạo hình nó. Nó nghe lời người kéo nó khỏi tàn tích trận đột kích, và chưa hề tha thứ cho họ vì việc đó.',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    'Một tinh linh triều cưỡi giọt thủy tinh biển riêng, bị các cần thủ từ thung lũng đến Farshore câu lên khi đang kiếm bữa tối trong nước lặng. Nó giữ lại nước đã theo mình lên, và không ai thuyết phục nổi nó quay về.',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'Một con cáo cái từ hàng giậu Thung Lũng Eastbrook, mang tên bộ lông đỏ than nổi qua bụi cây mùa đông. Những người bẫy thú đã bỏ bắt cáo con từ nhiều đời trước, thay bằng để thức ăn ngoài trời.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Mỗi mùa thu nó cháy còn một tàn lửa, rồi mùa xuân lại trỗi từ tro của chính mình; đó là tất cả những gì người ta biết. Chưa ai tìm thấy tổ, và chưa ai bắt được một con hai lần.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Một sói con Wraithwood, lông ánh xanh trong ánh sáng tán rừng hiếm khi chạm sàn rừng. Các hộ vệ nuôi những con mồ côi mà rừng để lại.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    'Được rèn trong Lò Luyện Suối Cuối nhưng chưa hoàn thiện, nó bước khỏi xưởng đúc Ignivar khi búa vẫn đang nện. Chỉ cuộc xuống sâu Anh Hùng mới tìm thấy nó: sinh vật nóng chảy cứ quay về lò rèn đã tạo ra mình, rồi theo về nhà bất cứ ai sống sót qua lửa hai lần.',
-  'hudChrome.collections.buddyLore.frog':
-    'Đầm Lầy Mirefen nuôi chúng béo tròn, vô lo, hát suốt đêm trong bãi sậy. Người dẫn đường đầm lầy thề rằng thuyền chở một con sẽ chẳng bao giờ mắc cạn.',
-  'hudChrome.collections.buddyLore.frostfire':
-    'Sinh ra ở Frostveil Reach, nơi suối nóng xuyên qua bãi băng, nó chưa bao giờ quyết định mình thuộc nửa nào. Nó bốc hơi trong khí lạnh và run rẩy trong khí ấm.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'Một bọ gác của Amberfall, dát vàng bởi nhựa cây nó lớn lên trong đó. Tên gọi còn cổ hơn lớp nhựa: lính gác cùng loại đã trông các lùm cây từ lâu trước khi người ta nghĩ tới việc đóng chai nhựa.',
-  'hudChrome.collections.buddyLore.horse':
-    'Dòng ngựa con thung lũng, được lai nhỏ để đi lối vườn cây mà chưa từng được bảo mình không phải chiến mã. Nó theo sát vai bạn, và sẽ đi theo bất cứ ai từng cho nó một quả táo.',
-  'hudChrome.collections.buddyLore.kekius':
-    'Bạn đồng hành hay cười, gốc gác không rõ, được các sân đua Galecrest nhận làm bùa may. Nó đã sống lâu hơn bốn chuồng ngựa từng tin vào nó.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Nó theo bất kỳ ai mang Dấu Ấn Anh Hùng, và chưa từng bị bắt quả tang ăn cắp. Quân nhu Vex khẳng định điều đó chẳng chứng minh được gì.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'Thỏ Willowfen, lông xanh vì cả đời nằm trong than bùn ướt. Người hái thuốc đầm lầy coi chúng là điềm lành, không cho ai đuổi khỏi bậc cửa.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'Một thợ săn Nightbloom trẻ, lặng lẽ ngay cả so với đồng loại. Nó theo chỉ để có bạn, chẳng săn thứ gì to hơn bướm đêm.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'Học việc của một thợ máy gnome, tính tiền theo giờ và đáng từng đồng xu. Thợ Giáp Hode nhận cô để trả nợ, giờ bán thỏa thuận đó cho bất cứ ai có một nghìn vàng.',
-  'hudChrome.collections.buddyLore.phantom':
-    'Một bóng ma cỡ lòng bàn tay từ các mộ gò Wraithwood, chỉ có tấm vải, không có xương, xuất hiện trong túi đã đóng rồi ở lại cho có bạn. Chưa ai biết nó muốn gì, và nó chưa từng cố dọa ai.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Cựu binh từ kho Chiến Tranh, còn giữ động tác chào nhưng mất quân hàm. Thống Chế Draven Kole trao một con cho người lính có đủ danh dự để hiểu cái giá đó.',
-  'hudChrome.collections.buddyLore.raptor':
-    'Dòng con non Drakelands, được bán trước khi biết mình chạy nhanh đến đâu. Chủ mới nào cũng được dặn cho ăn đầy đủ, chẳng ai cần nghe lần hai.',
-  'hudChrome.collections.buddyLore.rocky':
-    'Một sinh vật bò vỏ đá từ sườn đá vụn Thornpeak, chậm rãi và hoàn toàn thản nhiên. Thợ mỏ nuôi chúng vì chúng bất động ngay trước lúc sụp lở.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Cây non có nụ cười trên vỏ và ánh nhìn tím tò mò. Rễ đưa nó lạch bạch vui vẻ tới bất cứ đâu bạn lang thang.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Nó chui lên từ mộ gò Wraithwood, phủi bụi, rồi theo người ta từ đó. Chưa ai xác định xương này từng thuộc về ai.',
-  'hudChrome.collections.buddyLore.solbot':
-    'Một máy tự động nhỏ chạy bằng nắng, được đào lên khi nửa thân còn vùi trong tro Drakelands, vẫn tích tắc. Xưởng nào tạo nó cũng không để dấu trên vỏ.',
-  'hudChrome.collections.buddyLore.spider':
-    'Một nhện dệt Wraithwood cỡ lòng bàn tay, trang trí lại mọi chiếc túi chở nó. Tơ còn bền hơn sợi chỉ nó thay thế.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Hai tinh linh lửa nhỏ, một vàng và một xanh ngọc, chẳng bao giờ thống nhất ai dẫn đầu. Đến đủ gần, chúng nhập thành ngọn lửa xanh lá rồi lại tách ra, cười vang.',
-  'hudChrome.collections.buddyLore.stag':
-    'Dòng máu Evergarden, lai nhỏ từ những con hươu lớn mà hộ vệ từng cưỡi. Nó vẫn cúi đầu khi thấy bàn tay giơ lên, một thói quen còn xưa hơn chính con vật.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Vằn Palmreach trên con vật chưa từng thấy Palmreach: dòng này được nuôi nhốt từ khi các vườn thú cũ đóng cửa. Nó chỉ nghe tiếng huýt sáo, không gì khác.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Ba thứ gì đó, hoặc một thứ lặp ba lần. Lời kể mâu thuẫn, còn sinh vật chẳng chịu đứng yên đủ lâu để đếm.',
-  'hudChrome.collections.buddyLore.trollface':
-    'Một thứ cười toe do Wraithwood đẩy ra và không chịu nhận lại. Ai thử tả nó cuối cùng cũng bật cười rồi bỏ cuộc.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Dòng Thornpeak, được mục đồng lai chân ngắn vì muốn con lợn rừng không phá nổi hàng rào. Dù vậy nó vẫn giữ nguyên tính khí.',
-  'hudChrome.collections.close': 'Đóng Săn Tìm',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Điện Áp',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Tro Xám',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Nóng Trắng',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Ếch Lam Ngọc',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Xanh Tươi',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Vương Miện Hạt Sồi',
-  'hudChrome.collections.cosmeticUnlocked': 'Diện mạo mới cho {name}: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Ràng Buộc',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% mỗi lần hạ',
-  'hudChrome.collections.detail.dropLabel': 'Rơi Từ',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% mỗi lần hạ, {heroicChance}% ở Anh Hùng',
-  'hudChrome.collections.detail.exchangeNone': 'Không Có Tin Rao',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Không Khả Dụng Trên Ứng Dụng Này',
-  'hudChrome.collections.detail.fishingDrop': 'Câu ở bất kỳ đâu, {chance}% mỗi lần bắt',
-  'hudChrome.collections.detail.globalDrop':
-    'Mọi kẻ địch, {chance}% mỗi lần hạ, một trong {count} vật phẩm ở độ hiếm này',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), chỉ Anh Hùng, {chance}% mỗi lần hạ',
-  'hudChrome.collections.detail.marketAtMerchant': 'Hiển Thị Tại Thương Nhân',
-  'hudChrome.collections.detail.marketChecking': 'Đang kiểm tra...',
-  'hudChrome.collections.detail.marketLabel': 'Chợ Thế Giới',
-  'hudChrome.collections.detail.marketNone': 'Không Có Tin Rao',
-  'hudChrome.collections.detail.marksPrice': '{amount} Dấu Ấn Anh Hùng',
-  'hudChrome.collections.detail.noItem': 'Chưa Có Vật Phẩm Nào Trao Thứ Này',
-  'hudChrome.collections.detail.noSell': 'Không Thể Bán',
-  'hudChrome.collections.detail.noSource': 'Chưa Có Nguồn Trong Trò Chơi',
-  'hudChrome.collections.detail.sellLabel': 'Người Bán Trả',
-  'hudChrome.collections.detail.setLabel': 'Đã Sưu Tầm',
-  'hudChrome.collections.detail.tradeable': 'Giao Dịch Được',
-  'hudChrome.collections.keybindLabel': 'Săn Tìm',
-  'hudChrome.collections.launcherTitle': 'Săn Tìm: bạn đồng hành, thú cưỡi và bộ trang bị',
-  'hudChrome.collections.looks.locked': 'Đã Khóa',
-  'hudChrome.collections.looks.none': 'Chưa có diện mạo được tạo cho bạn đồng hành này',
-  'hudChrome.collections.looks.title': 'Diện Mạo',
-  'hudChrome.collections.looks.unlocked': 'Đã Mở Khóa',
-  'hudChrome.collections.petKind.celebrity': 'Người Nổi Tiếng',
   'hudChrome.collections.presence.alon': 'Bạn cảm thấy mình được quan sát, và âm thầm tán thành.',
   'hudChrome.collections.presence.alpaca': 'Một thứ phủ len, thong thả đã quyết định đi cùng.',
   'hudChrome.collections.presence.ansem': 'Tiếng thì thầm về cửa và bóng tối theo bạn.',
@@ -22655,7 +22525,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.forgemaw':
     'Sức nóng lò rèn chưa rời bạn. Có thứ đã bước ra cùng nó.',
   'hudChrome.collections.state.owned': 'Đã Sưu Tầm',
-  'hudChrome.collections.title': 'Săn Tìm',
   'hudChrome.cryptAlert.timeAria': 'Còn {seconds} giây',
   'hudChrome.expeditions.cancel': 'Hủy',
   'hudChrome.expeditions.dismiss': 'Cho Về',
@@ -22698,37 +22567,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một tiếng khịt và giậm chân: có thứ bướng bỉnh theo bạn.',
   'hudChrome.collections.presenceDefault': 'Bạn cảm thấy có thứ hiện diện đang nhìn mình.',
   'hudChrome.collections.revealed': '{name} đã quyết định theo bạn.',
-  'hudChrome.collections.set.bonusLabel': '{pieces} món',
-  'hudChrome.collections.set.itemLevel': 'Cấp vật phẩm {level}',
-  'hudChrome.collections.set.owned': '{owned}/{total} món',
-  'hudChrome.collections.source.bossDrop': '{mob} ({location}), {chance}% mỗi người mỗi lần hạ',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), chỉ Anh Hùng, {chance}% mỗi người',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% mỗi người, {heroicChance}% ở Anh Hùng',
-  'hudChrome.collections.source.bossLabel': 'Thú Cưng Từ Trùm',
-  'hudChrome.collections.source.challengeDps':
-    'Gây {dps} sát thương mỗi giây lên {mob} tính suốt trận',
-  'hudChrome.collections.source.challengeLabel': 'Thử Thách',
-  'hudChrome.collections.source.challengeSpeed':
-    'Hạ {mob} trong {seconds} giây từ khi bắt đầu giao chiến',
-  'hudChrome.collections.source.craft': '{item} (công thức {profession})',
-  'hudChrome.collections.source.craftLabel': 'Chế Tạo',
-  'hudChrome.collections.source.deed': 'Công trạng {deed}',
-  'hudChrome.collections.source.deedLabel': 'Đạt Bằng',
-  'hudChrome.collections.source.grantLabel': 'Được Trao',
-  'hudChrome.collections.source.grantOnly':
-    'Phần thưởng mùa: bảng xếp hạng hằng tháng và phần thưởng bản ghi chiến đấu hàng đầu',
-  'hudChrome.collections.source.rollNote':
-    'Mỗi người chơi rút riêng; không ai mất lượt rút vì thành viên nhóm.',
-  'hudChrome.collections.source.token': '{item}, dùng một lần để gắn bạn đồng hành',
-  'hudChrome.collections.source.tokenLabel': 'Vật Đổi',
-  'hudChrome.collections.stat.mixed': 'Lai',
   'hudChrome.collections.state.notOwned': 'Chưa Sưu Tầm',
   'hudChrome.collections.state.pending': 'Có Thứ Đang Theo Bạn',
   'hudChrome.collections.state.unavailable': 'Chưa Thể Nhận',
   'hudChrome.collections.tabs.buddies': 'Bạn Đồng Hành',
-  'hudChrome.collections.tabs.mounts': 'Thú Cưỡi',
   'hudChrome.cosmetics.buddyActive': 'Đã Triệu Hồi',
   'hudChrome.cosmetics.buddyDrag': 'Kéo Vào Thanh Hành Động',
   'hudChrome.courier.bags': 'Gửi Tới Ngân Hàng',
@@ -25212,11 +25054,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.vestments_of_the_waking_rite.name': 'Lễ Phục Nghi Lễ Thức Tỉnh',
   'entities.items.warmonger_greaves.name': 'Giáp Ống Chân Kẻ Hiếu Chiến',
   'entities.items.warmonger_treads.name': 'Giày Bước Kẻ Hiếu Chiến',
-  'entities.items.whistle_crystal_lich.name': 'Còi Lich Pha Lê',
-  'entities.items.whistle_forgemaw.name': 'Còi Hàm Lò Nóng Chảy',
-  'entities.items.whistle_horse.name': 'Còi Ngựa',
-  'entities.items.whistle_sapling.name': 'Còi Cây Non',
-  'entities.items.whistle_sprites.name': 'Còi Chập Chờn Và Lung Linh',
   'entities.items.wyrmshadow_chainmail.name': 'Áo Giáp Xích Bóng Rồng',
   'entities.items.wyrmshadow_tunic.name': 'Áo Chẽn Bóng Rồng',
   'entities.items.wyrmshadow_vest.name': 'Áo Gi-lê Bóng Rồng',
@@ -25255,7 +25092,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_proud_grunt.name': 'Binh Nhì Kiêu Hãnh',
   'entities.mobs.buddy_raptor.name': 'Khủng Long Raptor',
   'entities.mobs.buddy_rocky.name': 'Đá Nhỏ',
-  'entities.mobs.buddy_sapling.name': 'Cây Non',
   'entities.mobs.buddy_skeleton.name': 'Bộ Xương',
   'entities.mobs.buddy_solbot.name': 'Rô-bốt Mặt Trời',
   'entities.mobs.buddy_sprites.name': 'Chập Chờn Và Lung Linh',

@@ -1679,10 +1679,7 @@ export interface MountItemDef extends BaseItemDef {
   weapon?: never;
 }
 
-// A buddy WHISTLE: the item record of one active companion. Never in a bag
-// and never usable: every buddy is granted straight into the per-character
-// collection, and a vendor offer for a whistle grants the buddy instead of
-// the item (src/sim/vendor_buddy_purchase.ts).
+// Historical item shape only. No buddy items exist in the live catalog.
 export interface BuddyItemDef extends BaseItemDef {
   kind: 'buddy';
   buddy: BuddyKey;

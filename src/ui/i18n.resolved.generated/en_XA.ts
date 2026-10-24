@@ -21058,117 +21058,6 @@ export const en_XA: EnTranslations = {
       "ps_passing_stone": {
         "name": "[Þáššíñĝ Šţóñé]"
       },
-      "whistle_ember_fox": {
-        "name": "[Éɱƀéŕ Ƒóẋ Ŵĥíšţļé]"
-      },
-      "whistle_moss_hare": {
-        "name": "[Ɱóšš Ĥáŕé Ŵĥíšţļé]"
-      },
-      "whistle_frog": {
-        "name": "[Ƒŕóĝ Ŵĥíšţļé]"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "[Çŕíɱšóñ Çļáŵ Çŕáƀ Ŵĥíšţļé]"
-      },
-      "whistle_golden_sentinel": {
-        "name": "[Ĝóļðéñ Šéñţíñéļ Ŵĥíšţļé]"
-      },
-      "whistle_nightfang": {
-        "name": "[Ñíĝĥţƒáñĝ Ŵĥíšţļé]"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "[Ţúšķĥóŕñ Ɓóáŕ Ŵĥíšţļé]"
-      },
-      "whistle_emerald_wolf": {
-        "name": "[Éɱéŕáļð Ŵóļƒ Ŵĥíšţļé]"
-      },
-      "whistle_tiger": {
-        "name": "[Ţíĝéŕ Ŵĥíšţļé]"
-      },
-      "whistle_cate_coin": {
-        "name": "[Çáţé Çóíñ Ŵĥíšţļé]"
-      },
-      "whistle_alon": {
-        "name": "[Áļóñ Ŵĥíšţļé]"
-      },
-      "whistle_trollface": {
-        "name": "[Ţŕóļļƒáçé Ŵĥíšţļé]"
-      },
-      "whistle_ansem": {
-        "name": "[Áñšéɱ Ŵĥíšţļé]"
-      },
-      "whistle_triple_t": {
-        "name": "[Ţŕíþļé Ţ Ŵĥíšţļé]"
-      },
-      "whistle_kekius": {
-        "name": "[Ķéķíúš Ŵĥíšţļé]"
-      },
-      "whistle_solbot": {
-        "name": "[Šóļƀóţ Ŵĥíšţļé]"
-      },
-      "whistle_frostfire": {
-        "name": "[Ƒŕóšţƒíŕé Ŵĥíšţļé]"
-      },
-      "whistle_rocky": {
-        "name": "[Ŕóçķý Ŵĥíšţļé]"
-      },
-      "whistle_proud_grunt": {
-        "name": "[Þŕóúð Ĝŕúñţ Ŵĥíšţļé]"
-      },
-      "whistle_loot_goblin": {
-        "name": "[Ļóóţ Ĝóƀļíñ Ŵĥíšţļé]"
-      },
-      "whistle_penny_goldspark": {
-        "name": "[Þéññý Ĝóļðšþáŕķ Ŵĥíšţļé]"
-      },
-      "whistle_stag": {
-        "name": "[Šţáĝ Ŵĥíšţļé]"
-      },
-      "whistle_alpaca": {
-        "name": "[Áļþáçá Ŵĥíšţļé]"
-      },
-      "whistle_horse": {
-        "name": "[Ĥóŕšé Ŵĥíšţļé]"
-      },
-      "whistle_sapling": {
-        "name": "[Šáþļíñĝ Ŵĥíšţļé]"
-      },
-      "whistle_bull": {
-        "name": "[Ɓúļļ Ŵĥíšţļé]"
-      },
-      "whistle_spider": {
-        "name": "[Šþíðéŕ Ŵĥíšţļé]"
-      },
-      "whistle_raptor": {
-        "name": "[Ŕáþţóŕ Ŵĥíšţļé]"
-      },
-      "whistle_skeleton": {
-        "name": "[Šķéļéţóñ Ŵĥíšţļé]"
-      },
-      "whistle_crystal_lich": {
-        "name": "[Çŕýšţáļ Ļíçĥ Ŵĥíšţļé]"
-      },
-      "whistle_forgemaw": {
-        "name": "[Ƒóŕĝéɱáŵ Ţĥé Ɱóļţéñ Ŵĥíšţļé]"
-      },
-      "whistle_sprites": {
-        "name": "[Ƒļíçķéŕ áñð Ĝļíɱɱéŕ Ŵĥíšţļé]"
-      },
-      "whistle_crystal_tide": {
-        "name": "[Çŕýšţáļ Ţíðé Ŵĥíšţļé]"
-      },
-      "whistle_phantom": {
-        "name": "[Þĥáñţóɱ Ŵĥíšţļé]"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "[Éɱƀéŕƒáļļ Þĥóéñíẋ Ŵĥíšţļé]"
-      },
-      "charm_stag_acorn": {
-        "name": "[Áçóŕñ Çŕóŵñ Çĥáŕɱ]"
-      },
-      "charm_stag_gilded": {
-        "name": "[Ĝíļðéð Çĥáŕɱ]"
-      },
       "lastflame_core": {
         "name": "[Çóŕé óƒ ţĥé Ļášţ Ƒļáɱé]"
       },
@@ -26282,9 +26171,6 @@ export const en_XA: EnTranslations = {
       },
       "buddy_horse": {
         "name": "[Ţúĝ, ţĥé Ŵáŕĥóŕšé]"
-      },
-      "buddy_sapling": {
-        "name": "[Šáþļíñĝ]"
       },
       "buddy_bull": {
         "name": "[Ɓúļļ]"

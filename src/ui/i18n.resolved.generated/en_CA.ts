@@ -21058,117 +21058,6 @@ export const en_CA: EnTranslations = {
       "ps_passing_stone": {
         "name": "Passing Stone"
       },
-      "whistle_ember_fox": {
-        "name": "Ember Fox Whistle"
-      },
-      "whistle_moss_hare": {
-        "name": "Moss Hare Whistle"
-      },
-      "whistle_frog": {
-        "name": "Frog Whistle"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Crimson Claw Crab Whistle"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Golden Sentinel Whistle"
-      },
-      "whistle_nightfang": {
-        "name": "Nightfang Whistle"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Tuskhorn Boar Whistle"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Emerald Wolf Whistle"
-      },
-      "whistle_tiger": {
-        "name": "Tiger Whistle"
-      },
-      "whistle_cate_coin": {
-        "name": "Cate Coin Whistle"
-      },
-      "whistle_alon": {
-        "name": "Alon Whistle"
-      },
-      "whistle_trollface": {
-        "name": "Trollface Whistle"
-      },
-      "whistle_ansem": {
-        "name": "Ansem Whistle"
-      },
-      "whistle_triple_t": {
-        "name": "Triple T Whistle"
-      },
-      "whistle_kekius": {
-        "name": "Kekius Whistle"
-      },
-      "whistle_solbot": {
-        "name": "Solbot Whistle"
-      },
-      "whistle_frostfire": {
-        "name": "Frostfire Whistle"
-      },
-      "whistle_rocky": {
-        "name": "Rocky Whistle"
-      },
-      "whistle_proud_grunt": {
-        "name": "Proud Grunt Whistle"
-      },
-      "whistle_loot_goblin": {
-        "name": "Loot Goblin Whistle"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Penny Goldspark Whistle"
-      },
-      "whistle_stag": {
-        "name": "Stag Whistle"
-      },
-      "whistle_alpaca": {
-        "name": "Alpaca Whistle"
-      },
-      "whistle_horse": {
-        "name": "Horse Whistle"
-      },
-      "whistle_sapling": {
-        "name": "Sapling Whistle"
-      },
-      "whistle_bull": {
-        "name": "Bull Whistle"
-      },
-      "whistle_spider": {
-        "name": "Spider Whistle"
-      },
-      "whistle_raptor": {
-        "name": "Raptor Whistle"
-      },
-      "whistle_skeleton": {
-        "name": "Skeleton Whistle"
-      },
-      "whistle_crystal_lich": {
-        "name": "Crystal Lich Whistle"
-      },
-      "whistle_forgemaw": {
-        "name": "Forgemaw The Molten Whistle"
-      },
-      "whistle_sprites": {
-        "name": "Flicker and Glimmer Whistle"
-      },
-      "whistle_crystal_tide": {
-        "name": "Crystal Tide Whistle"
-      },
-      "whistle_phantom": {
-        "name": "Phantom Whistle"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Emberfall Phoenix Whistle"
-      },
-      "charm_stag_acorn": {
-        "name": "Acorn Crown Charm"
-      },
-      "charm_stag_gilded": {
-        "name": "Gilded Charm"
-      },
       "lastflame_core": {
         "name": "Core of the Last Flame"
       },
@@ -26282,9 +26171,6 @@ export const en_CA: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, the Warhorse"
-      },
-      "buddy_sapling": {
-        "name": "Sapling"
       },
       "buddy_bull": {
         "name": "Bull"

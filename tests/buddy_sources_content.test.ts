@@ -1,7 +1,7 @@
 // The owner plan (2026-09-09) as content invariants: buddies are never bag
 // loot, never a gold vendor row, and every source the tables name resolves.
 import { describe, expect, it } from 'vitest';
-import { BUDDY_KEYS, buddyDef } from '../src/sim/content/buddies';
+import { BUDDY_KEYS } from '../src/sim/content/buddies';
 import { BUDDY_BOSS_DROPS, BUDDY_DEED_REWARDS } from '../src/sim/content/buddy_sources';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
@@ -12,70 +12,22 @@ import type { ItemDef } from '../src/sim/types';
 const whistles: ItemDef[] = Object.values(ITEMS).filter((item) => item.kind === 'buddy');
 const charms: ItemDef[] = Object.values(ITEMS).filter((item) => item.kind === 'buddy_cosmetic');
 
-describe('buddy whistles: soulbound, never loot', () => {
-  it('has a whistle for every buddy, so the sweeps below are not vacuous', () => {
-    const active = whistles.filter((item) => item.kind === 'buddy' && buddyDef(item.buddy));
-    expect(active.map((item) => item.id).sort()).toEqual([
-      'whistle_crystal_lich',
-      'whistle_forgemaw',
-      'whistle_horse',
-      'whistle_sapling',
-      'whistle_sprites',
-    ]);
+describe('companions have no inventory items', () => {
+  it('has no whistle or charm definitions', () => {
+    expect(whistles).toEqual([]);
+    expect(charms).toEqual([]);
   });
-
-  it('binds every whistle and every charm', () => {
-    for (const item of [...whistles, ...charms]) {
-      expect(item.soulbound, `${item.id} soulbound`).toBe(true);
-    }
-  });
-
-  it('keeps the flat 5g vendor value so an unwanted duplicate is bag space back', () => {
-    for (const item of [...whistles, ...charms]) {
-      expect(item.noDiscard, `${item.id} noDiscard`).toBeUndefined();
-      if ((item.priceHonor ?? 0) > 0) {
-        // Honor purchases are final (the Warfare doctrine): the honor whistle
-        // sells back for nothing and the vendor refuses it.
-        expect(item.sellValue, `${item.id} sellValue`).toBe(0);
-        expect(item.noVendorSell, `${item.id} noVendorSell`).toBe(true);
-        continue;
-      }
-      expect(item.sellValue, `${item.id} sellValue`).toBe(50_000);
-      expect(item.noVendorSell, `${item.id} noVendorSell`).toBeUndefined();
-    }
-  });
-
-  it('lists no whistle on any mob loot table, normal or heroic', () => {
-    const ids = new Set(whistles.map((item) => item.id));
-    for (const mob of Object.values(MOBS)) {
-      for (const row of mob.loot ?? []) {
-        expect(ids.has(row.itemId ?? ''), `${mob.id} drops ${row.itemId}`).toBe(false);
-      }
-    }
-    for (const [bossId, rows] of Object.entries(HEROIC_BOSS_LOOT)) {
-      for (const row of rows) {
-        expect(ids.has(row.itemId ?? ''), `${bossId} heroic drops ${row.itemId}`).toBe(false);
-      }
-    }
-  });
-
-  it('sells only Horse through the two honor vendors', () => {
-    const vendorTokens: string[] = [];
-    for (const npc of Object.values(NPCS)) {
-      for (const itemId of npc.vendorItems ?? []) {
-        const item = ITEMS[itemId];
-        if (item?.kind === 'buddy' || item?.kind === 'buddy_cosmetic')
-          vendorTokens.push(`${npc.id}:${itemId}`);
-      }
-    }
-    expect(vendorTokens.sort()).toEqual([
-      'fury:whistle_horse',
-      'warmarshal_draven_kole:whistle_horse',
-    ]);
-    const marks = HEROIC_VENDOR_STOCK.filter((o) =>
-      ['buddy', 'buddy_cosmetic'].includes(ITEMS[o.itemId]?.kind),
+  it('has no companion items in loot, vendor stock or recipes', () => {
+    const ids = [
+      ...Object.values(MOBS).flatMap((mob) => (mob.loot ?? []).map((row) => row.itemId)),
+      ...Object.values(HEROIC_BOSS_LOOT).flatMap((rows) => rows.map((row) => row.itemId)),
+      ...Object.values(NPCS).flatMap((npc) => npc.vendorItems ?? []),
+      ...HEROIC_VENDOR_STOCK.map((row) => row.itemId),
+      ...ALL_RECIPES.map((row) => row.resultItemId),
+    ];
+    expect(ids.filter((id) => id?.startsWith('whistle_') || id?.startsWith('charm_stag_'))).toEqual(
+      [],
     );
-    expect(marks).toEqual([]);
   });
 });
 

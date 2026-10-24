@@ -5800,9 +5800,7 @@ export const fr_CA: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "Compagnons",
-        "mounts": "Montures",
-        "sets": "Ensembles d'objets"
+        "buddies": "Compagnons"
       },
       "state": {
         "owned": "Collectionné",
@@ -5851,138 +5849,8 @@ export const fr_CA: EnTranslations = {
       },
       "actions": {
         "summon": "Invoquer",
-        "dismiss": "Renvoyer",
-        "wear": "Équiper",
-        "remove": "Retirer"
-      },
-      "armor": {
-        "cloth": "Tissu",
-        "leather": "Cuir",
-        "mail": "Mailles"
-      },
-      "detail": {
-        "honorPrice": "{amount} points d’honneur",
-        "exchangeLabel": "Bourse $WOC",
-        "bindLabel": "Liaison",
-        "drop": "{mob} ({location}), {chance}% par victime",
-        "dropLabel": "Butin de",
-        "dropWithHeroic": "{mob} ({location}), {chance}% par victime, {heroicChance}% en héroïque",
-        "exchangeNone": "Aucune offre",
-        "exchangeUnavailable": "Indisponible sur ce client",
-        "fishingDrop": "Pêche partout, {chance}% par prise",
-        "globalDrop": "Tout ennemi, {chance}% par victime, un parmi {count} de cette rareté",
-        "heroicDrop": "{mob} ({location}), héroïque uniquement, {chance}% par victime",
-        "marketAtMerchant": "Affiché chez le Marchand",
-        "marketChecking": "Vérification...",
-        "marketLabel": "Marché mondial",
-        "marketNone": "Aucune offre",
-        "marksPrice": "{amount} Marques héroïques",
-        "noItem": "Aucun objet ne l'accorde encore",
-        "noSell": "Ne peut pas être vendu",
-        "noSource": "Aucune source dans le jeu pour le moment",
-        "sellLabel": "Prix de vente au marchand",
-        "setLabel": "Collectionné",
-        "soulbound": "Lié à l'âme",
-        "tradeable": "Échangeable",
-        "vendor": "{npc} ({location}) pour {price}",
-        "vendorLabel": "Vendu par"
-      },
-      "petKind": {
-        "beast": "Bêtes",
-        "elemental": "Élémentaires",
-        "humanoid": "Humanoïdes",
-        "undead": "Morts-vivants",
-        "celebrity": "Célébrités"
-      },
-      "stat": {
-        "agility": "Agilité",
-        "intellect": "Intelligence",
-        "strength": "Force",
-        "mixed": "Hybride"
-      },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Étreinte du givre",
-        "proud_grunt_warlord": "Seigneur de guerre",
-        "stag_gilded": "Doré",
-        "crystal_lich_voltaic": "Voltaïque",
-        "forgemaw_ashen": "Cendré",
-        "forgemaw_whitehot": "Chauffé à blanc",
-        "frog_sapphire": "Grenouille saphir",
-        "moss_hare_verdant": "Verdoyant",
-        "stag_acorn": "Couronne de glands"
-      },
-      "looks": {
-        "locked": "Verrouillé",
-        "none": "Aucune apparence créée pour ce compagnon pour le moment",
-        "title": "Apparences",
-        "unlocked": "Débloqué",
-        "worn": "Porté"
-      },
-      "buddyLore": {
-        "alon": "La mascotte d'un voyageur venu d'une route qu'aucune carte n'admet, qui apparaît partout où un plan tourne mal. Elle observe, elle approuve, et elle n'apporte absolument aucune aide.",
-        "alpaca": "Les troupeaux de la Crête du Vent les élèvent pour leur laine et leur tempérament : rien ne reste plus calme dans une tempête. Celui-ci crache sur une personne, exactement une, à chaque voyage.",
-        "ansem": "Il parle de portes et de ténèbres, et refuse d'en dire davantage sur l'une ou l'autre. Les sectateurs de la Fleur de Nuit le revendiquent ; il s'en va dès qu'ils célèbrent un rite.",
-        "bull": "Un taureau du Val de la taille d'un chien, seule raison pour laquelle on a accepté d'en garder un à l'intérieur. Son caractère, lui, n'a pas rétréci.",
-        "cate_coin": "Un chat qui refuse de quitter la pièce sur laquelle il est assis et que personne n'a jamais vu manger. Les marchands d'Eastbrook débattent encore pour savoir lequel des deux est l'animal de compagnie.",
-        "crimson_claw_crab": "Un crabe des marées du Rivage Lointain dont la pince reste rouge longtemps après sa sortie de l'eau. Les dockers les faisaient autrefois courir sur les planches pour quelques pièces.",
-        "crystal_lich": "Un éclat de Nythraxis lui-même, vibrant encore du froid qui l'a façonné. Il obéit à la personne qui l'a tiré des décombres du raid, et ne le lui a pas pardonné.",
-        "crystal_tide": "Un esprit des marées chevauchant sa propre goutte de verre marin, pêché dans les eaux calmes par des pêcheurs du Val au Rivage Lointain qui cherchaient leur dîner. Il garde l'eau dans laquelle il a été remonté et refuse qu'on le convainque d'y retourner.",
-        "ember_fox": "Une renarde des haies du Val d'Eastbrook, nommée pour son pelage rouge braise visible à travers les broussailles d'hiver. Les trappeurs du coin ont renoncé aux petits il y a des générations et se sont mis à leur laisser de la nourriture.",
-        "emberfall_phoenix": "Chaque automne, il se consume jusqu'à n'être qu'une braise et renaît de ses propres cendres au printemps : voilà tout ce que l'on peut en dire. Personne n'a jamais trouvé de nid, ni réussi à en attraper un deux fois.",
-        "emerald_wolf": "Un louveteau du Bois des Spectres, au pelage verdi par la lumière de la canopée qui atteint à peine le sol. Les gardiens élèvent les orphelins que le bois laisse derrière lui.",
-        "forgemaw": "Forgé dans le Creuset de la Dernière Source sans jamais être tout à fait achevé, il a quitté la fonderie d'Ignivar alors que les marteaux frappaient encore. Seule la descente héroïque permet de le trouver : cette créature de métal fondu revient sans cesse à la forge qui l'a créée et suit chez elle la personne qui survit deux fois au feu.",
-        "frog": "Le Marais de Mirefen les fait grandir grasses et insouciantes, chantant toute la nuit dans les roseaux. Les guides du marais jurent qu'un bateau qui en transporte une ne s'échoue jamais.",
-        "frostfire": "Né dans le Voile de Givre, là où une source chaude perce la banquise, il n'a jamais choisi à laquelle des deux moitiés il appartient. Il fume dans l'air froid et frissonne dans l'air chaud.",
-        "golden_sentinel": "Un scarabée de guet de la Chute d'Ambre, doré par la résine dans laquelle il a grandi. Son nom est plus ancien que la résine : des sentinelles de ce genre gardaient ces bosquets bien avant que l'on songe à mettre la sève en bouteille.",
-        "horse": "Un poney du Val, élevé petit pour les allées des vergers, à qui l'on n'a jamais dit qu'il n'était pas un destrier. Il suit à votre épaule et accompagne quiconque lui a un jour donné une pomme.",
-        "kekius": "Un compagnon rieur d'origine incertaine, adopté comme porte-bonheur par les écuries de course de la Crête du Vent. Il a survécu à quatre écuries qui ne juraient que par lui.",
-        "loot_goblin": "Il suit quiconque porte des Marques héroïques et n'a jamais été pris à voler. L'Intendant Vex soutient que cela ne prouve strictement rien.",
-        "moss_hare": "Un lièvre du Marais des Saules, à la fourrure verdie par une vie passée dans la tourbe humide. Les herboristes du marais y voient un porte-bonheur et refusent qu'on en chasse un du pas d'une porte.",
-        "nightfang": "Un jeune chasseur de la Fleur de Nuit, silencieux même selon les critères de son espèce. Il suit pour la compagnie et ne chasse rien de plus gros qu'un papillon de nuit.",
-        "penny_goldspark": "L'apprentie d'un bricoleur gnome, payée à l'heure et qui vaut chaque pièce de cuivre. L'Armurier Hode l'a prise à son service pour régler une dette et propose désormais cet arrangement à quiconque possède mille pièces d'or.",
-        "phantom": "Un petit fantôme des tertres du Bois des Spectres, de la taille d'une paume, tout en drap et sans os, qui apparaît dans un sac pourtant fermé et reste pour la compagnie. Personne n'a compris ce qu'il veut, et il n'a jamais tenté d'effrayer qui que ce soit.",
-        "proud_grunt": "Un vétéran des réserves de Guerre qui a gardé le salut et perdu le grade. Le Maréchal de guerre Draven Kole en confie un à tout soldat assez honorable pour en comprendre le prix.",
-        "raptor": "Un jeune raptor des Terres du Dragon, vendu avant d'apprendre à quelle vitesse il peut courir. On recommande à chaque nouveau propriétaire de bien le nourrir, et aucun n'a besoin qu'on le lui répète.",
-        "rocky": "Un rampant à carapace de pierre des éboulis de Thornpeak, lent et parfaitement imperturbable. Les mineurs les gardent parce qu'ils s'immobilisent un instant avant un effondrement.",
-        "sapling": "Un jeune arbre dont l'écorce sourit et dont le regard violet est curieux. Ses racines le portent d'un dandinement joyeux partout où vous allez.",
-        "skeleton": "Il est sorti des tertres du Bois des Spectres, s'est épousseté, et suit les gens depuis. Personne n'a établi à qui appartenaient ces os.",
-        "solbot": "Un petit automate nourri de soleil, déterré à demi enfoui dans les cendres des Terres du Dragon et qui fonctionne encore. L'atelier qui l'a construit n'a laissé aucune marque sur son boîtier.",
-        "spider": "Une tisseuse du Bois des Spectres, de la taille d'une paume, qui redécore tout sac où on la transporte. Sa toile est plus solide que le fil qu'elle remplace.",
-        "sprites": "Deux petits esprits du feu, l'un doré et l'autre bleu-vert, qui ne s'accordent jamais vraiment sur celui qui mène. Approchez assez et ils se fondent en une flamme verte, puis se séparent à nouveau en riant.",
-        "stag": "Une lignée du Jardin Éternel, issue des grands cerfs que montaient autrefois les gardiens. Il baisse encore la tête devant une main levée, par une habitude plus ancienne que lui.",
-        "tiger": "Des rayures de la Baie des Palmes sur un animal qui n'y est jamais allé : la lignée est élevée en captivité depuis la fermeture des anciennes ménageries. Il répond à un sifflement, et à rien d'autre.",
-        "triple_t": "Trois exemplaires d'une chose, ou une seule chose en trois exemplaires. Les récits se contredisent, et la créature ne tient pas assez en place pour qu'on puisse la compter.",
-        "trollface": "Une créature grimaçante que le Bois des Spectres a rejetée et refusé de reprendre. Toute tentative de la décrire se termine par un éclat de rire et un abandon.",
-        "tuskhorn_boar": "Une lignée de Thornpeak, élevée courte sur pattes par des bergers qui voulaient un sanglier incapable d'abattre une clôture. Il a tout de même gardé son sale caractère."
-      },
-      "close": "Fermer la chasse",
-      "cosmeticUnlocked": "Nouvelle apparence pour {name} : {look}.",
-      "keybindLabel": "Chasse",
-      "launcherTitle": "Chasse : compagnons, montures et ensembles d'objets",
-      "set": {
-        "bonusLabel": "{pieces} pièces",
-        "itemLevel": "Niveau d'objet {level}",
-        "owned": "{owned} pièces sur {total}"
-      },
-      "source": {
-        "bossDrop": "{mob} ({location}), {chance}% par joueur et par victime",
-        "bossDropHeroicOnly": "{mob} ({location}), héroïque uniquement, {chance}% par joueur",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% par joueur, {heroicChance}% en héroïque",
-        "bossLabel": "Compagnon de boss",
-        "challengeDps": "Infligez {dps} points de dégâts par seconde à {mob} sur l'ensemble du combat",
-        "challengeLabel": "Défi",
-        "challengeSpeed": "Vainquez {mob} dans les {seconds} secondes suivant le début du combat",
-        "craft": "{item} (recette de {profession})",
-        "craftLabel": "Fabriqué",
-        "deed": "Le haut fait {deed}",
-        "deedLabel": "Obtenu grâce à",
-        "grantLabel": "Décerné",
-        "grantOnly": "Récompense saisonnière : classement mensuel et récompenses des meilleurs relevés de combat",
-        "rollNote": "Chaque joueur effectue un tirage séparé ; personne ne perd de tirage au profit d'un membre du groupe.",
-        "token": "{item}, utilisé une fois pour attacher le compagnon",
-        "tokenLabel": "Jeton"
-      },
-      "title": "Chasse"
+        "dismiss": "Renvoyer"
+      }
     },
     "calendar": {
       "title": "Calendrier des événements",
@@ -21190,117 +21058,6 @@ export const fr_CA: EnTranslations = {
       "ps_passing_stone": {
         "name": "Pierre de trépas"
       },
-      "whistle_ember_fox": {
-        "name": "Sifflet de renard de braise"
-      },
-      "whistle_moss_hare": {
-        "name": "Sifflet de lièvre de mousse"
-      },
-      "whistle_frog": {
-        "name": "Sifflet de grenouille"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Sifflet de crabe à pince cramoisie"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Sifflet de sentinelle dorée"
-      },
-      "whistle_nightfang": {
-        "name": "Sifflet de Croc-de-nuit"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Sifflet de sanglier Corne-défense"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Sifflet de loup émeraude"
-      },
-      "whistle_tiger": {
-        "name": "Sifflet de tigre"
-      },
-      "whistle_cate_coin": {
-        "name": "Sifflet de Cate Coin"
-      },
-      "whistle_alon": {
-        "name": "Sifflet d'Alon"
-      },
-      "whistle_trollface": {
-        "name": "Sifflet de Trollface"
-      },
-      "whistle_ansem": {
-        "name": "Sifflet d'Ansem"
-      },
-      "whistle_triple_t": {
-        "name": "Sifflet de Triple T"
-      },
-      "whistle_kekius": {
-        "name": "Sifflet de Kekius"
-      },
-      "whistle_solbot": {
-        "name": "Sifflet de Solbot"
-      },
-      "whistle_frostfire": {
-        "name": "Sifflet de Feu-de-givre"
-      },
-      "whistle_rocky": {
-        "name": "Sifflet de Rocky"
-      },
-      "whistle_proud_grunt": {
-        "name": "Sifflet de soldat fier"
-      },
-      "whistle_loot_goblin": {
-        "name": "Sifflet de gobelin du butin"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Sifflet de Penny Goldspark"
-      },
-      "whistle_stag": {
-        "name": "Sifflet de cerf"
-      },
-      "whistle_alpaca": {
-        "name": "Sifflet d'alpaga"
-      },
-      "whistle_horse": {
-        "name": "Sifflet de cheval"
-      },
-      "whistle_sapling": {
-        "name": "Sifflet d'arbrisseau"
-      },
-      "whistle_bull": {
-        "name": "Sifflet de taureau"
-      },
-      "whistle_spider": {
-        "name": "Sifflet d'araignée"
-      },
-      "whistle_raptor": {
-        "name": "Sifflet de raptor"
-      },
-      "whistle_skeleton": {
-        "name": "Sifflet de squelette"
-      },
-      "whistle_crystal_lich": {
-        "name": "Sifflet de liche de cristal"
-      },
-      "whistle_forgemaw": {
-        "name": "Sifflet de Gueuleforge le Fondu"
-      },
-      "whistle_sprites": {
-        "name": "Sifflet de Flammèche et Lueur"
-      },
-      "whistle_crystal_tide": {
-        "name": "Sifflet de marée cristalline"
-      },
-      "whistle_phantom": {
-        "name": "Sifflet de fantôme"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Sifflet de phénix de la Chute des braises"
-      },
-      "charm_stag_acorn": {
-        "name": "Charme de la Couronne de glands"
-      },
-      "charm_stag_gilded": {
-        "name": "Charme doré"
-      },
       "lastflame_core": {
         "name": "Cœur de la Dernière Flamme"
       },
@@ -26414,9 +26171,6 @@ export const fr_CA: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, le cheval de guerre"
-      },
-      "buddy_sapling": {
-        "name": "Arbrisseau"
       },
       "buddy_bull": {
         "name": "Taureau"

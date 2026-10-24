@@ -13,19 +13,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBagsEmpty': 'Je tassen zijn leeg.',
   'hudChrome.bank.accountRetry': 'Probeer opnieuw',
   'hudChrome.buddyMenu.cancel': 'Annuleren',
-  'hudChrome.collections.actions.remove': 'Verwijderen',
   'hudChrome.collections.actions.summon': 'Oproepen',
-  'hudChrome.collections.actions.wear': 'Aandoen',
-  'hudChrome.collections.armor.cloth': 'Stof',
-  'hudChrome.collections.armor.leather': 'Leer',
-  'hudChrome.collections.armor.mail': 'Maliën',
-  'hudChrome.collections.detail.honorPrice': '{amount} Eer',
-  'hudChrome.collections.petKind.beast': 'Beesten',
-  'hudChrome.collections.petKind.elemental': 'Elementalen',
-  'hudChrome.collections.petKind.humanoid': 'Mensachtigen',
-  'hudChrome.collections.petKind.undead': 'Ondoden',
-  'hudChrome.collections.stat.agility': 'Behendigheid',
-  'hudChrome.collections.tabs.mounts': 'Rijdieren',
   'hudChrome.courier.empty': 'Geen voorwerpen',
   'hudChrome.courier.inventory': 'Inventaris',
   'hudChrome.expeditions.cancel': 'Annuleren',
@@ -20475,12 +20463,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'auth.wocHead.mouth.thin': 'Dun',
   'auth.wocHead.nose.default': 'Klassiek',
   'auth.wocHead.nose.soft': 'Zacht',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Vorstgreep',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Krijgsheer',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Verguld',
-  'hudChrome.collections.detail.exchangeLabel': '$WOC-beurs',
-  'hudChrome.collections.looks.locked': 'Vergrendeld',
-  'hudChrome.collections.looks.worn': 'Gedragen',
   'hudChrome.dungeonTracker.complete': 'Voltooid',
   'hudChrome.guildHall.done': 'Voltooid deze week',
   'hudChrome.guildHall.kinds.boss': 'Premie',
@@ -22533,11 +22515,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.vestments_of_the_waking_rite.name': 'Gewaden van het Ontwakende Ritueel',
   'entities.items.warmonger_greaves.name': 'Oorlogsstokersbeenschenen',
   'entities.items.warmonger_treads.name': 'Oorlogsstokersschoenen',
-  'entities.items.whistle_crystal_lich.name': 'Kristallichfluitje',
-  'entities.items.whistle_forgemaw.name': 'Fluitje van Smeedmuil de Gesmoltene',
-  'entities.items.whistle_horse.name': 'Paardenfluitje',
-  'entities.items.whistle_sapling.name': 'Jongeboomfluitje',
-  'entities.items.whistle_sprites.name': 'Fluitje van Flicker en Glimmer',
   'entities.items.wyrmshadow_chainmail.name': 'Drakenschaduwmaliën',
   'entities.items.wyrmshadow_tunic.name': 'Drakenschaduwtuniek',
   'entities.items.wyrmshadow_vest.name': 'Drakenschaduwvest',
@@ -22582,7 +22559,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_proud_grunt.name': 'Trotse strijder',
   'entities.mobs.buddy_raptor.name': 'Raptor',
   'entities.mobs.buddy_rocky.name': 'Rocky',
-  'entities.mobs.buddy_sapling.name': 'Jonge boom',
   'entities.mobs.buddy_skeleton.name': 'Skelet',
   'entities.mobs.buddy_solbot.name': 'Solbot',
   'entities.mobs.buddy_sprites.name': 'Flicker en Glimmer',
@@ -23006,116 +22982,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.buddyMenu.nameLabel': 'Naam van metgezel',
   'hudChrome.buddyMenu.rename': 'Metgezel hernoemen',
   'hudChrome.collections.actions.dismiss': 'Wegsturen',
-  'hudChrome.collections.buddyLore.alon':
-    'Een reizigersmascotte van een weg die op geen kaart staat. Hij verschijnt overal waar plannen mislopen. Hij kijkt toe, keurt het goed en helpt helemaal nergens bij.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'De kuddes van Windkam worden gehouden om hun wol en hun aard: niets blijft kalmer in een storm. Deze spuugt tijdens elke reis naar precies één persoon.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Hij spreekt over deuren en duisternis, maar wil over geen van beide meer kwijt. De Nachtbloesem-sekteleden eisen hem op, maar hij dwaalt weg zodra ze een ritueel houden.',
-  'hudChrome.collections.buddyLore.bull':
-    'Een stier uit de vallei ter grootte van een hond. Alleen daarom wilde iemand hem binnen houden. Zijn temperament is niet meegekrompen.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'Een kat die niet gescheiden wil worden van de munt waarop hij zit en die niemand ooit heeft zien eten. De kooplieden van Eastbrook twisten nog steeds over wie van de twee het huisdier is.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'Een getijdenkrab uit Verrekust wiens klauw nog lang rood blijft nadat hij uit het water komt. Havenarbeiders lieten ze vroeger over de planken racen om geld.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'Een splinter van Nythraxis zelf, nog steeds zoemend van de kou die hem vormde. Hij gehoorzaamt degene die hem uit het puin van de overval haalde en heeft het diegene nog niet vergeven.',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    'Een getijdengeestje dat op zijn eigen druppel zeeglas rijdt. Vissers van de vallei tot Verrekust haalden hem uit stil water terwijl ze avondeten vingen. Hij bewaart het water waaruit hij opkwam en laat zich niet overhalen terug te gaan.',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'Een moervos uit de heggen van Oostbeekdal, vernoemd naar de koolrode vacht die door het winterstruikgewas schijnt. De pelsjagers gaven de jongen generaties geleden op en zetten sindsdien liever voedsel neer.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Elke herfst brandt hij terug tot een sintel en in de lente herrijst hij uit zijn eigen as. Meer kan niemand je vertellen. Niemand vond ooit een nest en niemand ving er ooit tweemaal één.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Een pup uit Schimmenwoud, met een groene vacht in het bladerlicht dat de bosbodem nooit helemaal bereikt. De wachters brengen de wezen groot die het bos achterlaat.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    'Gesmeed in de Smeltkroes van de Laatste Bron en nooit helemaal voltooid. Hij liep Ignivars gieterij uit terwijl de hamers nog vielen. Je vindt hem alleen tijdens de heroïsche afdaling: het gesmolten wezen keert steeds terug naar de smidse die hem maakte en volgt degene naar huis die het vuur tweemaal overleeft.',
-  'hudChrome.collections.buddyLore.frog':
-    "Slijkveenmoeras brengt ze vet en onbezorgd groot. Ze zingen de hele nacht in de rietvelden. De moerasgidsen zweren dat een boot met zo'n kikker nooit vastloopt.",
-  'hudChrome.collections.buddyLore.frostfire':
-    'Geboren in Vorstsluier, waar een warmwaterbron door het ijsveld breekt. Hij heeft nooit gekozen bij welke helft hij hoort. In koude lucht stoomt hij en in warme lucht rilt hij.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'Een wachtkever uit Amberval, verguld door de hars waarin hij opgroeide. De naam is ouder dan de hars: zulke wachters bewaakten die bosjes lang voordat iemand het sap in flessen dacht te doen.',
-  'hudChrome.collections.buddyLore.horse':
-    'Een valleipony, klein gefokt voor de boomgaardpaden en nooit verteld dat hij geen oorlogspaard is. Hij loopt naast je mee en volgt iedereen die hem ooit een appel gaf.',
-  'hudChrome.collections.buddyLore.kekius':
-    'Een lachende metgezel van onduidelijke oorsprong, door de renstallen van Windkam geadopteerd als geluksbrenger. Hij heeft vier stallen overleefd die bij hem zwoeren.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Hij volgt iedereen met Heroïsche Merktekens en is nog nooit op diefstal betrapt. Kwartiermeester Vex houdt vol dat dit helemaal niets bewijst.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'De haas uit Wilgenveen, groenvachtig na een leven in natte turf. Kruidenkundigen uit het veen vinden ze geluksbrengers en laten ze niet van een drempel jagen.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'Een jonge jager uit Nachtbloesem, zelfs naar de maatstaven van zijn soort stil. Hij volgt je voor het gezelschap en jaagt op niets groters dan een mot.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'Een leerling van een gnomenknutselaar die per uur rekent en elk koperstuk waard is. Wapensmid Hode nam haar aan om een schuld te vereffenen en verkoopt de regeling nu aan iedereen met duizend goud.',
-  'hudChrome.collections.buddyLore.phantom':
-    'Een handgroot spook uit de grafheuvels van Schimmenwoud, alleen laken en geen botten. Hij verschijnt in een gesloten tas en blijft voor het gezelschap. Niemand weet wat hij wil en hij heeft nog nooit iemand proberen te laten schrikken.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Een veteraan van de oorlogsvoorraden die zijn saluut behield en zijn rang verloor. Oorlogsmaarschalk Draven Kole geeft er één aan elke soldaat met genoeg eer om te begrijpen wat dat kost.',
-  'hudChrome.collections.buddyLore.raptor':
-    'Een jong uit de Drakenlanden, doorverkocht voordat het leert hoe hard het kan rennen. Elke nieuwe eigenaar krijgt te horen dat het goed gevoerd moet worden. Niemand hoeft dat tweemaal te horen.',
-  'hudChrome.collections.buddyLore.rocky':
-    'Een kruiper met een stenen schild uit het puin van Doorntop, traag en volkomen onbezorgd. Mijnwerkers houden ze omdat ze vlak voor een instorting even stil worden.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Een jong boompje met een glimlach in zijn schors en een nieuwsgierige paarse blik. Zijn wortels dragen hem vrolijk waggelend mee, waar je ook heen gaat.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Hij kwam uit de grafheuvels van Schimmenwoud omhoog, klopte het stof af en volgt sindsdien mensen. Van wie de botten waren, weet nog niemand.',
-  'hudChrome.collections.buddyLore.solbot':
-    'Een kleine, door zonlicht gevoede automaat, half begraven uit de as van de Drakenlanden opgegraven en nog steeds tikkend. De werkplaats die hem bouwde liet nergens op de behuizing een merk achter.',
-  'hudChrome.collections.buddyLore.spider':
-    'Een handgrote wever uit Schimmenwoud die elke tas waarin hij wordt gedragen opnieuw inricht. Het web is sterker dan de draad die het vervangt.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Twee kleine vuurgeestjes, één goud en één blauwgroen, die het nooit eens worden over wie leidt. Van dichtbij vouwen ze samen tot één groene vlam en vallen daarna lachend weer uiteen.',
-  'hudChrome.collections.buddyLore.stag':
-    'Een bloedlijn uit Eeuwigtuin, klein gefokt uit de grote herten waarop de wachters ooit reden. Hij buigt nog steeds zijn hoofd voor een opgeheven hand, uit een gewoonte ouder dan het dier zelf.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Palmreik-strepen op een dier dat Palmreik nooit zag. De bloedlijn wordt in gevangenschap gehouden sinds de oude menagerieën sloten. Hij luistert naar een fluitje en nergens anders naar.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Drie van iets, of één ding driemaal. De verhalen spreken elkaar tegen en het wezen blijft niet lang genoeg stil om geteld te worden.',
-  'hudChrome.collections.buddyLore.trollface':
-    'Een grijnzend ding dat Schimmenwoud naar buiten stuurde en niet terug wilde nemen. Elke poging het te beschrijven eindigt met een lachende verteller die het opgeeft.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Een ras uit Doorntop, met korte poten gefokt door herders die een ever wilden dat geen hek kon slopen. Het temperament bleef hetzelfde.',
-  'hudChrome.collections.close': 'Jacht sluiten',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Elektrisch',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Asgrauw',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Witgloeiend',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Saffierkikker',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Groenbloeiend',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Eikelkroon',
-  'hudChrome.collections.cosmeticUnlocked': 'Nieuw uiterlijk voor {name}: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Binding',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% per overwinning',
-  'hudChrome.collections.detail.dropLabel': 'Afkomstig van',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% per overwinning, {heroicChance}% op Heroïsch',
-  'hudChrome.collections.detail.exchangeNone': 'Geen aanbiedingen',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Niet beschikbaar op deze client',
-  'hudChrome.collections.detail.fishingDrop': 'Overal vissen, {chance}% per vangst',
-  'hudChrome.collections.detail.globalDrop':
-    'Elke vijand, {chance}% per overwinning, één van {count} op deze zeldzaamheid',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), alleen Heroïsch, {chance}% per overwinning',
-  'hudChrome.collections.detail.marketAtMerchant': 'Getoond bij de handelaar',
-  'hudChrome.collections.detail.marketChecking': 'Controleren...',
-  'hudChrome.collections.detail.marketLabel': 'Wereldmarkt',
-  'hudChrome.collections.detail.marketNone': 'Geen aanbiedingen',
-  'hudChrome.collections.detail.marksPrice': '{amount} Heroïsche Merktekens',
-  'hudChrome.collections.detail.noItem': 'Nog geen voorwerp dat dit verleent',
-  'hudChrome.collections.detail.noSell': 'Kan niet worden verkocht',
-  'hudChrome.collections.detail.noSource': 'Nog geen bron in het spel',
-  'hudChrome.collections.detail.sellLabel': 'Handelaar betaalt',
-  'hudChrome.collections.detail.setLabel': 'Verzameld',
-  'hudChrome.collections.detail.soulbound': 'Zielsgebonden',
-  'hudChrome.collections.detail.tradeable': 'Verhandelbaar',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) voor {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Verkocht door',
-  'hudChrome.collections.keybindLabel': 'Jacht',
-  'hudChrome.collections.launcherTitle': 'Jacht: metgezellen, rijdieren en uitrustingssets',
-  'hudChrome.collections.looks.none': 'Nog geen uiterlijken gemaakt voor deze metgezel',
-  'hudChrome.collections.looks.title': 'Uiterlijken',
-  'hudChrome.collections.looks.unlocked': 'Ontgrendeld',
-  'hudChrome.collections.petKind.celebrity': 'Beroemdheden',
   'hudChrome.collections.presence.alon': 'Je voelt je bekeken en stilletjes goedgekeurd.',
   'hudChrome.collections.presence.alpaca': 'Iets wolligs zonder haast heeft besloten mee te gaan.',
   'hudChrome.collections.presence.ansem': 'Een gefluister van deuren en duisternis volgt je.',
@@ -23165,42 +23031,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.tuskhorn_boar': 'Een snuif en een stamp: iets koppigs volgt je.',
   'hudChrome.collections.presenceDefault': 'Je voelt dat een aanwezigheid naar je kijkt.',
   'hudChrome.collections.revealed': '{name} heeft besloten je te volgen.',
-  'hudChrome.collections.set.bonusLabel': '{pieces} delen',
-  'hudChrome.collections.set.itemLevel': 'Voorwerpniveau {level}',
-  'hudChrome.collections.set.owned': '{owned} van {total} delen',
-  'hudChrome.collections.source.bossDrop':
-    '{mob} ({location}), {chance}% per speler per overwinning',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), alleen Heroïsch, {chance}% per speler',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% per speler, {heroicChance}% op Heroïsch',
-  'hudChrome.collections.source.bossLabel': 'Bazenhuisdier',
-  'hudChrome.collections.source.challengeDps':
-    'Doe gedurende het gevecht {dps} schade per seconde aan {mob}',
-  'hudChrome.collections.source.challengeLabel': 'Uitdaging',
-  'hudChrome.collections.source.challengeSpeed':
-    'Versla {mob} binnen {seconds} seconden na het begin van het gevecht',
-  'hudChrome.collections.source.craft': '{item} (recept voor {profession})',
-  'hudChrome.collections.source.craftLabel': 'Vervaardigd',
-  'hudChrome.collections.source.deed': 'De daad {deed}',
-  'hudChrome.collections.source.deedLabel': 'Verdiend met',
-  'hudChrome.collections.source.grantLabel': 'Toegekend',
-  'hudChrome.collections.source.grantOnly':
-    'Seizoensbeloning: de maandranglijst en beloningen voor beste gevechtsverslagen',
-  'hudChrome.collections.source.rollNote':
-    'Elke speler werpt apart. Niemand verliest een worp aan een groepslid.',
-  'hudChrome.collections.source.token': '{item}, eenmaal gebruikt om de metgezel te verbinden',
-  'hudChrome.collections.source.tokenLabel': 'Munt',
-  'hudChrome.collections.stat.intellect': 'Intelligentie',
-  'hudChrome.collections.stat.mixed': 'Gemengd',
-  'hudChrome.collections.stat.strength': 'Kracht',
   'hudChrome.collections.state.notOwned': 'Niet verzameld',
   'hudChrome.collections.state.owned': 'Verzameld',
   'hudChrome.collections.state.pending': 'Een aanwezigheid volgt je',
   'hudChrome.collections.state.unavailable': 'Nog niet verkrijgbaar',
   'hudChrome.collections.tabs.buddies': 'Metgezellen',
-  'hudChrome.collections.tabs.sets': 'Uitrustingssets',
-  'hudChrome.collections.title': 'Jacht',
   'hudChrome.cosmetics.buddyActive': 'Opgeroepen',
   'hudChrome.cosmetics.buddyDrag': 'Sleep naar actiebalk',
   'hudChrome.courier.bags': 'Naar bank sturen',

@@ -5800,9 +5800,7 @@ export const pt_BR: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "Companheiros",
-        "mounts": "Montarias",
-        "sets": "Conjuntos de itens"
+        "buddies": "Companheiros"
       },
       "state": {
         "owned": "Coletado",
@@ -5851,138 +5849,8 @@ export const pt_BR: EnTranslations = {
       },
       "actions": {
         "summon": "Invocar",
-        "dismiss": "Dispensar",
-        "remove": "Remover",
-        "wear": "Equipar"
-      },
-      "armor": {
-        "leather": "Couro",
-        "cloth": "Tecido",
-        "mail": "Malha"
-      },
-      "detail": {
-        "honorPrice": "{amount} de Honra",
-        "soulbound": "Vinculado à alma",
-        "bindLabel": "Vinculação",
-        "dropLabel": "Obtido de",
-        "exchangeLabel": "Bolsa de $WOC",
-        "exchangeNone": "Nenhum anúncio",
-        "exchangeUnavailable": "Indisponível neste cliente",
-        "marketAtMerchant": "Exibido no mercador",
-        "marketChecking": "Verificando...",
-        "marketLabel": "Mercado Mundial",
-        "marketNone": "Nenhum anúncio",
-        "marksPrice": "{amount} marcas heroicas",
-        "noItem": "Nenhum item concede isto ainda",
-        "noSell": "Não pode ser vendido",
-        "noSource": "Ainda sem fonte no jogo",
-        "sellLabel": "O vendedor paga",
-        "setLabel": "Coletado",
-        "tradeable": "Negociável",
-        "vendor": "{npc} ({location}) por {price}",
-        "vendorLabel": "Vendido por",
-        "drop": "{mob} ({location}), {chance}% por morte",
-        "dropWithHeroic": "{mob} ({location}), {chance}% por morte, {heroicChance}% no heroico",
-        "fishingDrop": "Pesca em qualquer lugar, {chance}% por captura",
-        "globalDrop": "Qualquer inimigo, {chance}% por morte, um de {count} nesta raridade",
-        "heroicDrop": "{mob} ({location}), somente no heroico, {chance}% por morte"
-      },
-      "petKind": {
-        "beast": "Feras",
-        "elemental": "Elementais",
-        "humanoid": "Humanoides",
-        "undead": "Mortos-vivos",
-        "celebrity": "Celebridades"
-      },
-      "stat": {
-        "agility": "Agilidade",
-        "intellect": "Intelecto",
-        "strength": "Força",
-        "mixed": "Híbrido"
-      },
-      "close": "Fechar caçada",
-      "cosmetic": {
-        "crystal_lich_frostbound": "Preso ao gelo",
-        "crystal_lich_voltaic": "Voltaico",
-        "forgemaw_ashen": "Acinzentado",
-        "forgemaw_whitehot": "Branco incandescente",
-        "frog_sapphire": "Sapo Safira",
-        "moss_hare_verdant": "Verdejante",
-        "proud_grunt_warlord": "Senhor da Guerra",
-        "stag_acorn": "Coroa de Bolotas",
-        "stag_gilded": "Dourado"
-      },
-      "cosmeticUnlocked": "Nova aparência para {name}: {look}.",
-      "keybindLabel": "Caçada",
-      "looks": {
-        "locked": "Bloqueado",
-        "title": "Aparências",
-        "unlocked": "Desbloqueado",
-        "worn": "Equipado",
-        "none": "Ainda não há aparências criadas para este companheiro"
-      },
-      "set": {
-        "bonusLabel": "{pieces} peças",
-        "itemLevel": "Nível de item {level}",
-        "owned": "{owned} de {total} peças"
-      },
-      "title": "Caçada",
-      "source": {
-        "bossLabel": "Mascote de chefe",
-        "challengeLabel": "Desafio",
-        "craft": "{item} (receita de {profession})",
-        "craftLabel": "Fabricado",
-        "deed": "O feito {deed}",
-        "deedLabel": "Obtido por",
-        "grantLabel": "Concedido",
-        "tokenLabel": "Ficha",
-        "bossDrop": "{mob} ({location}), {chance}% por jogador por morte",
-        "bossDropHeroicOnly": "{mob} ({location}), somente no heroico, {chance}% por jogador",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% por jogador, {heroicChance}% no heroico",
-        "challengeDps": "Cause {dps} de dano por segundo a {mob} ao longo da luta",
-        "challengeSpeed": "Derrote {mob} em até {seconds} segundos após iniciar a luta",
-        "grantOnly": "Prêmio sazonal: classificação mensal e recompensas dos melhores registros de combate",
-        "rollNote": "Cada jogador faz sua própria rolagem; ninguém perde para um membro do grupo.",
-        "token": "{item}, usado uma vez para vincular o companheiro"
-      },
-      "buddyLore": {
-        "alon": "Um mascote de viajante vindo de uma estrada que nenhum mapa admite existir, aparecendo onde um plano vai mal. Observa, aprova e não oferece ajuda alguma.",
-        "alpaca": "Os rebanhos de Galecrest os mantêm pela lã e pelo temperamento: nada fica mais calmo numa tempestade. Este cuspirá em exatamente uma pessoa por viagem.",
-        "ansem": "Fala de portas e de escuridão e não aceita aprofundar nenhum dos assuntos. Os cultistas de Nightbloom o reivindicam; ele vai embora sempre que fazem um rito.",
-        "bull": "Um touro do Vale do tamanho de um cachorro, a única razão pela qual alguém aceitou mantê-lo dentro de casa. O temperamento não diminuiu com o resto.",
-        "cate_coin": "Um gato que não se separa da moeda onde se senta e que ninguém jamais viu comer. Os mercadores de Eastbrook ainda discutem qual dos dois é o mascote.",
-        "crimson_claw_crab": "Um caranguejo de maré de Farshore cuja garra continua vermelha muito depois de sair da água. As equipes do cais costumavam apostar moedas em corridas deles sobre as tábuas.",
-        "crystal_lich": "Um estilhaço do próprio Nythraxis, ainda zumbindo com o frio que o moldou. Obedece a quem o tirou dos destroços da raide e não perdoou essa pessoa por isso.",
-        "crystal_tide": "Um espírito de maré que monta sua própria gota de vidro marinho, fisgado de água parada por pescadores do Vale a Farshore que buscavam o jantar. Conserva a água de onde saiu e não aceita voltar.",
-        "ember_fox": "Uma raposa das sebes do Vale de Eastbrook, nomeada pela pelagem vermelha como brasa que aparece no mato do inverno. Os caçadores desistiram dos filhotes há gerações e passaram a deixar comida.",
-        "emberfall_phoenix": "Queima até virar brasa a cada outono e renasce das próprias cinzas na primavera; isso é tudo que se pode dizer sobre ela. Ninguém jamais achou um ninho e ninguém capturou a mesma duas vezes.",
-        "emerald_wolf": "Um filhote de Wraithwood, com pelagem verde à luz das copas que nunca chega por completo ao chão da floresta. Os guardiões criam os órfãos que a mata deixa para trás.",
-        "forgemaw": "Forjado no Crisol da Última Fonte e nunca inteiramente terminado, saiu da fundição de Ignivar enquanto os martelos ainda caíam. Só a descida heroica o encontra: a criatura fundida sempre volta à forja que a fez e segue para casa quem sobrevive ao fogo duas vezes.",
-        "frog": "O Pântano de Mirefen os cria gordos e tranquilos, cantando a noite toda nos juncais. Os guias juram que um barco levando um nunca encalha.",
-        "frostfire": "Nasceu nos Confins de Frostveil onde uma fonte quente emerge pelo campo de gelo e nunca decidiu a qual metade pertence. Solta vapor no ar frio e treme no quente.",
-        "golden_sentinel": "Um besouro sentinela de Amberfall, dourado pela resina onde cresceu. O nome é mais antigo que a resina: sentinelas de algum tipo guardavam aqueles bosques muito antes de alguém pensar em engarrafar a seiva.",
-        "horse": "Linhagem de pônei do Vale, criada pequena para os caminhos dos pomares e nunca avisada de que não é cavalo de guerra. Acompanha seu passo ao lado e segue qualquer um que já tenha lhe dado uma maçã.",
-        "kekius": "Um companheiro risonho de origem incerta, adotado pelos campos de corrida de Galecrest como amuleto. Sobreviveu a quatro estábulos que juravam pela sorte dele.",
-        "loot_goblin": "Segue qualquer um que carregue marcas heroicas e nunca foi pego roubando. O Intendente Vex afirma que isso não prova absolutamente nada.",
-        "moss_hare": "A lebre de Willowfen, de pelo verde por uma vida deitada em turfa molhada. Os herboristas do brejo a consideram de sorte e não deixam ninguém enxotá-la de uma porta.",
-        "nightfang": "Um jovem caçador de Nightbloom, silencioso mesmo para os padrões da espécie. Segue pela companhia e não caça nada maior que uma mariposa.",
-        "penny_goldspark": "Uma aprendiz de inventora gnoma que cobra por hora e vale cada cobre. O armeiro Hode a contratou para quitar uma dívida e agora vende o acordo a quem tiver mil moedas de ouro.",
-        "phantom": "Um fantasma do tamanho da palma da mão vindo dos túmulos de Wraithwood, todo lençol e nada de ossos, que aparece numa mochila fechada e fica pela companhia. Ninguém sabe o que quer, e nunca tentou assustar ninguém.",
-        "proud_grunt": "Um veterano das lojas de Warfare que manteve a continência e perdeu a patente. O Marechal de Guerra Draven Kole entrega um a qualquer soldado com honra suficiente para saber o preço disso.",
-        "raptor": "Linhagem de filhote de Drakelands, vendida antes de aprender a velocidade que alcança. Todo novo dono é avisado para mantê-lo alimentado, e ninguém precisa ouvir duas vezes.",
-        "rocky": "Um rastejante de casco de pedra das encostas pedregosas de Thornpeak, lento e totalmente despreocupado. Os mineiros os mantêm porque param de se mover um instante antes de um desabamento.",
-        "sapling": "Uma árvore jovem com um sorriso na casca e um olhar roxo curioso. As raízes a levam num andar alegre e bamboleante por onde você for.",
-        "skeleton": "Saiu dos túmulos de Wraithwood, tirou o pó e desde então segue as pessoas. Ninguém estabeleceu de quem eram esses ossos.",
-        "solbot": "Um pequeno autômato alimentado pelo sol, desenterrado das cinzas de Drakelands, onde estava meio enterrado, e ainda funcionando. A oficina que o fez não deixou marca alguma na carcaça.",
-        "spider": "Uma tecelã de Wraithwood do tamanho da palma da mão, que redecora qualquer mochila onde é carregada. A teia é mais resistente que o fio que substitui.",
-        "sprites": "Dois pequenos espíritos de fogo, um dourado e outro verde-azulado, que nunca concordam sobre quem lidera. Quando chegam perto, viram uma chama verde e depois se separam de novo, rindo.",
-        "stag": "Linhagem de Evergarden, reduzida por criação a partir dos grandes cervos que os guardiões montavam. Ainda abaixa a cabeça diante de uma mão erguida, por um hábito mais velho que o animal.",
-        "tiger": "Listras de Palmreach num animal que nunca viu Palmreach: a linhagem é mantida em cativeiro desde que os antigos zoológicos fecharam. Responde a um apito e a nada mais.",
-        "triple_t": "Três de alguma coisa ou uma coisa três vezes. Os relatos discordam, e a criatura não fica quieta o bastante para ser contada.",
-        "trollface": "Uma coisa sorridente que Wraithwood expulsou e se recusou a receber de volta. Toda tentativa de descrevê-la acaba com a pessoa rindo e desistindo.",
-        "tuskhorn_boar": "Linhagem de Thornpeak, criada com pernas curtas por pastores que queriam um javali incapaz de derrubar uma cerca. Conservou o temperamento mesmo assim."
-      },
-      "launcherTitle": "Caçada: companheiros, montarias e conjuntos de itens"
+        "dismiss": "Dispensar"
+      }
     },
     "calendar": {
       "title": "Calendário de Eventos",
@@ -21190,117 +21058,6 @@ export const pt_BR: EnTranslations = {
       "ps_passing_stone": {
         "name": "Pedra de Passagem"
       },
-      "whistle_ember_fox": {
-        "name": "Apito de raposa de brasas"
-      },
-      "whistle_moss_hare": {
-        "name": "Apito de lebre de musgo"
-      },
-      "whistle_frog": {
-        "name": "Apito de sapo"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Apito de caranguejo de garra carmesim"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Apito de sentinela dourado"
-      },
-      "whistle_nightfang": {
-        "name": "Apito de Presa Noturna"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Apito de javali Presa Cornuda"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Apito de lobo esmeralda"
-      },
-      "whistle_tiger": {
-        "name": "Apito de tigre"
-      },
-      "whistle_cate_coin": {
-        "name": "Apito de Cate Coin"
-      },
-      "whistle_alon": {
-        "name": "Apito de Alon"
-      },
-      "whistle_trollface": {
-        "name": "Apito de Trollface"
-      },
-      "whistle_ansem": {
-        "name": "Apito de Ansem"
-      },
-      "whistle_triple_t": {
-        "name": "Apito de Triple T"
-      },
-      "whistle_kekius": {
-        "name": "Apito de Kekius"
-      },
-      "whistle_solbot": {
-        "name": "Apito de Solbot"
-      },
-      "whistle_frostfire": {
-        "name": "Apito de fogo-gelo"
-      },
-      "whistle_rocky": {
-        "name": "Apito de Rocky"
-      },
-      "whistle_proud_grunt": {
-        "name": "Apito de bruto orgulhoso"
-      },
-      "whistle_loot_goblin": {
-        "name": "Apito de goblin do saque"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Apito de Penny Centelha Dourada"
-      },
-      "whistle_stag": {
-        "name": "Apito de cervo"
-      },
-      "whistle_alpaca": {
-        "name": "Apito de alpaca"
-      },
-      "whistle_horse": {
-        "name": "Apito de cavalo"
-      },
-      "whistle_sapling": {
-        "name": "Apito de broto"
-      },
-      "whistle_bull": {
-        "name": "Apito de touro"
-      },
-      "whistle_spider": {
-        "name": "Apito de aranha"
-      },
-      "whistle_raptor": {
-        "name": "Apito de raptor"
-      },
-      "whistle_skeleton": {
-        "name": "Apito de esqueleto"
-      },
-      "whistle_crystal_lich": {
-        "name": "Apito de lich de cristal"
-      },
-      "whistle_forgemaw": {
-        "name": "Apito de Bocaforja, o Fundido"
-      },
-      "whistle_sprites": {
-        "name": "Apito de Cintila e Brilha"
-      },
-      "whistle_crystal_tide": {
-        "name": "Apito de maré de cristal"
-      },
-      "whistle_phantom": {
-        "name": "Apito de fantasma"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Apito de fênix de chuva de brasas"
-      },
-      "charm_stag_acorn": {
-        "name": "Amuleto da coroa de bolotas"
-      },
-      "charm_stag_gilded": {
-        "name": "Amuleto dourado"
-      },
       "lastflame_core": {
         "name": "Núcleo da Última Chama"
       },
@@ -26414,9 +26171,6 @@ export const pt_BR: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, o Cavalo de Guerra"
-      },
-      "buddy_sapling": {
-        "name": "Broto"
       },
       "buddy_bull": {
         "name": "Touro"

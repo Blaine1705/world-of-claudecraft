@@ -5800,9 +5800,7 @@ export const nl_NL: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "Metgezellen",
-        "mounts": "Rijdieren",
-        "sets": "Uitrustingssets"
+        "buddies": "Metgezellen"
       },
       "state": {
         "owned": "Verzameld",
@@ -5851,138 +5849,8 @@ export const nl_NL: EnTranslations = {
       },
       "actions": {
         "summon": "Oproepen",
-        "dismiss": "Wegsturen",
-        "remove": "Verwijderen",
-        "wear": "Aandoen"
-      },
-      "armor": {
-        "cloth": "Stof",
-        "leather": "Leer",
-        "mail": "Maliën"
-      },
-      "detail": {
-        "honorPrice": "{amount} Eer",
-        "exchangeLabel": "$WOC-beurs",
-        "bindLabel": "Binding",
-        "drop": "{mob} ({location}), {chance}% per overwinning",
-        "dropLabel": "Afkomstig van",
-        "dropWithHeroic": "{mob} ({location}), {chance}% per overwinning, {heroicChance}% op Heroïsch",
-        "exchangeNone": "Geen aanbiedingen",
-        "exchangeUnavailable": "Niet beschikbaar op deze client",
-        "fishingDrop": "Overal vissen, {chance}% per vangst",
-        "globalDrop": "Elke vijand, {chance}% per overwinning, één van {count} op deze zeldzaamheid",
-        "heroicDrop": "{mob} ({location}), alleen Heroïsch, {chance}% per overwinning",
-        "marketAtMerchant": "Getoond bij de handelaar",
-        "marketChecking": "Controleren...",
-        "marketLabel": "Wereldmarkt",
-        "marketNone": "Geen aanbiedingen",
-        "marksPrice": "{amount} Heroïsche Merktekens",
-        "noItem": "Nog geen voorwerp dat dit verleent",
-        "noSell": "Kan niet worden verkocht",
-        "noSource": "Nog geen bron in het spel",
-        "sellLabel": "Handelaar betaalt",
-        "setLabel": "Verzameld",
-        "soulbound": "Zielsgebonden",
-        "tradeable": "Verhandelbaar",
-        "vendor": "{npc} ({location}) voor {price}",
-        "vendorLabel": "Verkocht door"
-      },
-      "petKind": {
-        "beast": "Beesten",
-        "elemental": "Elementalen",
-        "humanoid": "Mensachtigen",
-        "undead": "Ondoden",
-        "celebrity": "Beroemdheden"
-      },
-      "stat": {
-        "agility": "Behendigheid",
-        "intellect": "Intelligentie",
-        "mixed": "Gemengd",
-        "strength": "Kracht"
-      },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Vorstgreep",
-        "proud_grunt_warlord": "Krijgsheer",
-        "stag_gilded": "Verguld",
-        "crystal_lich_voltaic": "Elektrisch",
-        "forgemaw_ashen": "Asgrauw",
-        "forgemaw_whitehot": "Witgloeiend",
-        "frog_sapphire": "Saffierkikker",
-        "moss_hare_verdant": "Groenbloeiend",
-        "stag_acorn": "Eikelkroon"
-      },
-      "looks": {
-        "locked": "Vergrendeld",
-        "worn": "Gedragen",
-        "none": "Nog geen uiterlijken gemaakt voor deze metgezel",
-        "title": "Uiterlijken",
-        "unlocked": "Ontgrendeld"
-      },
-      "buddyLore": {
-        "alon": "Een reizigersmascotte van een weg die op geen kaart staat. Hij verschijnt overal waar plannen mislopen. Hij kijkt toe, keurt het goed en helpt helemaal nergens bij.",
-        "alpaca": "De kuddes van Windkam worden gehouden om hun wol en hun aard: niets blijft kalmer in een storm. Deze spuugt tijdens elke reis naar precies één persoon.",
-        "ansem": "Hij spreekt over deuren en duisternis, maar wil over geen van beide meer kwijt. De Nachtbloesem-sekteleden eisen hem op, maar hij dwaalt weg zodra ze een ritueel houden.",
-        "bull": "Een stier uit de vallei ter grootte van een hond. Alleen daarom wilde iemand hem binnen houden. Zijn temperament is niet meegekrompen.",
-        "cate_coin": "Een kat die niet gescheiden wil worden van de munt waarop hij zit en die niemand ooit heeft zien eten. De kooplieden van Eastbrook twisten nog steeds over wie van de twee het huisdier is.",
-        "crimson_claw_crab": "Een getijdenkrab uit Verrekust wiens klauw nog lang rood blijft nadat hij uit het water komt. Havenarbeiders lieten ze vroeger over de planken racen om geld.",
-        "crystal_lich": "Een splinter van Nythraxis zelf, nog steeds zoemend van de kou die hem vormde. Hij gehoorzaamt degene die hem uit het puin van de overval haalde en heeft het diegene nog niet vergeven.",
-        "crystal_tide": "Een getijdengeestje dat op zijn eigen druppel zeeglas rijdt. Vissers van de vallei tot Verrekust haalden hem uit stil water terwijl ze avondeten vingen. Hij bewaart het water waaruit hij opkwam en laat zich niet overhalen terug te gaan.",
-        "ember_fox": "Een moervos uit de heggen van Oostbeekdal, vernoemd naar de koolrode vacht die door het winterstruikgewas schijnt. De pelsjagers gaven de jongen generaties geleden op en zetten sindsdien liever voedsel neer.",
-        "emberfall_phoenix": "Elke herfst brandt hij terug tot een sintel en in de lente herrijst hij uit zijn eigen as. Meer kan niemand je vertellen. Niemand vond ooit een nest en niemand ving er ooit tweemaal één.",
-        "emerald_wolf": "Een pup uit Schimmenwoud, met een groene vacht in het bladerlicht dat de bosbodem nooit helemaal bereikt. De wachters brengen de wezen groot die het bos achterlaat.",
-        "forgemaw": "Gesmeed in de Smeltkroes van de Laatste Bron en nooit helemaal voltooid. Hij liep Ignivars gieterij uit terwijl de hamers nog vielen. Je vindt hem alleen tijdens de heroïsche afdaling: het gesmolten wezen keert steeds terug naar de smidse die hem maakte en volgt degene naar huis die het vuur tweemaal overleeft.",
-        "frog": "Slijkveenmoeras brengt ze vet en onbezorgd groot. Ze zingen de hele nacht in de rietvelden. De moerasgidsen zweren dat een boot met zo'n kikker nooit vastloopt.",
-        "frostfire": "Geboren in Vorstsluier, waar een warmwaterbron door het ijsveld breekt. Hij heeft nooit gekozen bij welke helft hij hoort. In koude lucht stoomt hij en in warme lucht rilt hij.",
-        "golden_sentinel": "Een wachtkever uit Amberval, verguld door de hars waarin hij opgroeide. De naam is ouder dan de hars: zulke wachters bewaakten die bosjes lang voordat iemand het sap in flessen dacht te doen.",
-        "horse": "Een valleipony, klein gefokt voor de boomgaardpaden en nooit verteld dat hij geen oorlogspaard is. Hij loopt naast je mee en volgt iedereen die hem ooit een appel gaf.",
-        "kekius": "Een lachende metgezel van onduidelijke oorsprong, door de renstallen van Windkam geadopteerd als geluksbrenger. Hij heeft vier stallen overleefd die bij hem zwoeren.",
-        "loot_goblin": "Hij volgt iedereen met Heroïsche Merktekens en is nog nooit op diefstal betrapt. Kwartiermeester Vex houdt vol dat dit helemaal niets bewijst.",
-        "moss_hare": "De haas uit Wilgenveen, groenvachtig na een leven in natte turf. Kruidenkundigen uit het veen vinden ze geluksbrengers en laten ze niet van een drempel jagen.",
-        "nightfang": "Een jonge jager uit Nachtbloesem, zelfs naar de maatstaven van zijn soort stil. Hij volgt je voor het gezelschap en jaagt op niets groters dan een mot.",
-        "penny_goldspark": "Een leerling van een gnomenknutselaar die per uur rekent en elk koperstuk waard is. Wapensmid Hode nam haar aan om een schuld te vereffenen en verkoopt de regeling nu aan iedereen met duizend goud.",
-        "phantom": "Een handgroot spook uit de grafheuvels van Schimmenwoud, alleen laken en geen botten. Hij verschijnt in een gesloten tas en blijft voor het gezelschap. Niemand weet wat hij wil en hij heeft nog nooit iemand proberen te laten schrikken.",
-        "proud_grunt": "Een veteraan van de oorlogsvoorraden die zijn saluut behield en zijn rang verloor. Oorlogsmaarschalk Draven Kole geeft er één aan elke soldaat met genoeg eer om te begrijpen wat dat kost.",
-        "raptor": "Een jong uit de Drakenlanden, doorverkocht voordat het leert hoe hard het kan rennen. Elke nieuwe eigenaar krijgt te horen dat het goed gevoerd moet worden. Niemand hoeft dat tweemaal te horen.",
-        "rocky": "Een kruiper met een stenen schild uit het puin van Doorntop, traag en volkomen onbezorgd. Mijnwerkers houden ze omdat ze vlak voor een instorting even stil worden.",
-        "sapling": "Een jong boompje met een glimlach in zijn schors en een nieuwsgierige paarse blik. Zijn wortels dragen hem vrolijk waggelend mee, waar je ook heen gaat.",
-        "skeleton": "Hij kwam uit de grafheuvels van Schimmenwoud omhoog, klopte het stof af en volgt sindsdien mensen. Van wie de botten waren, weet nog niemand.",
-        "solbot": "Een kleine, door zonlicht gevoede automaat, half begraven uit de as van de Drakenlanden opgegraven en nog steeds tikkend. De werkplaats die hem bouwde liet nergens op de behuizing een merk achter.",
-        "spider": "Een handgrote wever uit Schimmenwoud die elke tas waarin hij wordt gedragen opnieuw inricht. Het web is sterker dan de draad die het vervangt.",
-        "sprites": "Twee kleine vuurgeestjes, één goud en één blauwgroen, die het nooit eens worden over wie leidt. Van dichtbij vouwen ze samen tot één groene vlam en vallen daarna lachend weer uiteen.",
-        "stag": "Een bloedlijn uit Eeuwigtuin, klein gefokt uit de grote herten waarop de wachters ooit reden. Hij buigt nog steeds zijn hoofd voor een opgeheven hand, uit een gewoonte ouder dan het dier zelf.",
-        "tiger": "Palmreik-strepen op een dier dat Palmreik nooit zag. De bloedlijn wordt in gevangenschap gehouden sinds de oude menagerieën sloten. Hij luistert naar een fluitje en nergens anders naar.",
-        "triple_t": "Drie van iets, of één ding driemaal. De verhalen spreken elkaar tegen en het wezen blijft niet lang genoeg stil om geteld te worden.",
-        "trollface": "Een grijnzend ding dat Schimmenwoud naar buiten stuurde en niet terug wilde nemen. Elke poging het te beschrijven eindigt met een lachende verteller die het opgeeft.",
-        "tuskhorn_boar": "Een ras uit Doorntop, met korte poten gefokt door herders die een ever wilden dat geen hek kon slopen. Het temperament bleef hetzelfde."
-      },
-      "close": "Jacht sluiten",
-      "cosmeticUnlocked": "Nieuw uiterlijk voor {name}: {look}.",
-      "keybindLabel": "Jacht",
-      "launcherTitle": "Jacht: metgezellen, rijdieren en uitrustingssets",
-      "set": {
-        "bonusLabel": "{pieces} delen",
-        "itemLevel": "Voorwerpniveau {level}",
-        "owned": "{owned} van {total} delen"
-      },
-      "source": {
-        "bossDrop": "{mob} ({location}), {chance}% per speler per overwinning",
-        "bossDropHeroicOnly": "{mob} ({location}), alleen Heroïsch, {chance}% per speler",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% per speler, {heroicChance}% op Heroïsch",
-        "bossLabel": "Bazenhuisdier",
-        "challengeDps": "Doe gedurende het gevecht {dps} schade per seconde aan {mob}",
-        "challengeLabel": "Uitdaging",
-        "challengeSpeed": "Versla {mob} binnen {seconds} seconden na het begin van het gevecht",
-        "craft": "{item} (recept voor {profession})",
-        "craftLabel": "Vervaardigd",
-        "deed": "De daad {deed}",
-        "deedLabel": "Verdiend met",
-        "grantLabel": "Toegekend",
-        "grantOnly": "Seizoensbeloning: de maandranglijst en beloningen voor beste gevechtsverslagen",
-        "rollNote": "Elke speler werpt apart. Niemand verliest een worp aan een groepslid.",
-        "token": "{item}, eenmaal gebruikt om de metgezel te verbinden",
-        "tokenLabel": "Munt"
-      },
-      "title": "Jacht"
+        "dismiss": "Wegsturen"
+      }
     },
     "calendar": {
       "title": "Evenementenkalender",
@@ -21190,117 +21058,6 @@ export const nl_NL: EnTranslations = {
       "ps_passing_stone": {
         "name": "Doorgangssteen"
       },
-      "whistle_ember_fox": {
-        "name": "Sintelvosfluitje"
-      },
-      "whistle_moss_hare": {
-        "name": "Moshaasfluitje"
-      },
-      "whistle_frog": {
-        "name": "Kikkerfluitje"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Karmozijnklauwkrabfluitje"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Goudenwachterfluitje"
-      },
-      "whistle_nightfang": {
-        "name": "Nachttandfluitje"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Slagtandhoorneverfluitje"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Smaragdwolffluitje"
-      },
-      "whistle_tiger": {
-        "name": "Tijgerfluitje"
-      },
-      "whistle_cate_coin": {
-        "name": "Cate Coin-fluitje"
-      },
-      "whistle_alon": {
-        "name": "Alon-fluitje"
-      },
-      "whistle_trollface": {
-        "name": "Trollface-fluitje"
-      },
-      "whistle_ansem": {
-        "name": "Ansem-fluitje"
-      },
-      "whistle_triple_t": {
-        "name": "Triple T-fluitje"
-      },
-      "whistle_kekius": {
-        "name": "Kekius-fluitje"
-      },
-      "whistle_solbot": {
-        "name": "Solbot-fluitje"
-      },
-      "whistle_frostfire": {
-        "name": "Vorstvuurfluitje"
-      },
-      "whistle_rocky": {
-        "name": "Rocky-fluitje"
-      },
-      "whistle_proud_grunt": {
-        "name": "Trotsestrijderfluitje"
-      },
-      "whistle_loot_goblin": {
-        "name": "Buitkoboldfluitje"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Penny Goldspark-fluitje"
-      },
-      "whistle_stag": {
-        "name": "Hertenfluitje"
-      },
-      "whistle_alpaca": {
-        "name": "Alpacafluitje"
-      },
-      "whistle_horse": {
-        "name": "Paardenfluitje"
-      },
-      "whistle_sapling": {
-        "name": "Jongeboomfluitje"
-      },
-      "whistle_bull": {
-        "name": "Stierenfluitje"
-      },
-      "whistle_spider": {
-        "name": "Spinnenfluitje"
-      },
-      "whistle_raptor": {
-        "name": "Raptorfluitje"
-      },
-      "whistle_skeleton": {
-        "name": "Skeletfluitje"
-      },
-      "whistle_crystal_lich": {
-        "name": "Kristallichfluitje"
-      },
-      "whistle_forgemaw": {
-        "name": "Fluitje van Smeedmuil de Gesmoltene"
-      },
-      "whistle_sprites": {
-        "name": "Fluitje van Flicker en Glimmer"
-      },
-      "whistle_crystal_tide": {
-        "name": "Kristalgetijfluitje"
-      },
-      "whistle_phantom": {
-        "name": "Spookfluitje"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Sintelvalfeniksfluitje"
-      },
-      "charm_stag_acorn": {
-        "name": "Eikelkroonamulet"
-      },
-      "charm_stag_gilded": {
-        "name": "Verguld amulet"
-      },
       "lastflame_core": {
         "name": "Kern van de Laatste Vlam"
       },
@@ -26414,9 +26171,6 @@ export const nl_NL: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, het Oorlogspaard"
-      },
-      "buddy_sapling": {
-        "name": "Jonge boom"
       },
       "buddy_bull": {
         "name": "Stier"

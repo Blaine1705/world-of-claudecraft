@@ -71,7 +71,6 @@ export const BUDDY_MOBS: Record<string, MobTemplate> = {
     'elemental',
     0xffffff,
   ),
-  [buddyTemplateId('sapling')]: buddyTemplate('sapling', 'Sapling', 'elemental', 0xffffff),
   [buddyTemplateId('sprites')]: buddyTemplate(
     'sprites',
     'Flicker and Glimmer',

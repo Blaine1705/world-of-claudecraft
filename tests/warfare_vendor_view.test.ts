@@ -437,14 +437,19 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
         pendingBuddies: () => (state === 'pending' ? ['horse'] : []),
       };
       const model = warfareShopViewer(world);
-      const view = buildWarfareVendorView(['whistle_horse'], ITEMS, ITEM_SETS, model);
+      const view = buildWarfareVendorView([], ITEMS, ITEM_SETS, { ...model, warfareVendor: true });
       expect(model.acquiredBuddyKeys.has('horse')).toBe(true);
       expect(view.sections[0].offers[0]).toMatchObject({ owned: true, affordable: true });
     },
   );
 
   it('lists the honor counter companions last, in their own group after the entry tier', () => {
-    const view = buildWarfareVendorView(HONOR_VENDOR_STOCK, ITEMS, ITEM_SETS, viewer());
+    const view = buildWarfareVendorView(
+      HONOR_VENDOR_STOCK,
+      ITEMS,
+      ITEM_SETS,
+      viewer({ warfareVendor: true }),
+    );
     const last = view.sections[view.sections.length - 1];
     expect(last).toMatchObject({
       kind: 'companions',
@@ -452,18 +457,18 @@ describe('warfareShopViewer: the IWorld derivation, identical in both worlds', (
       key: WARFARE_SHOP_COMPANIONS_KEY,
     });
     expect(last.offers.length).toBeGreaterThan(0);
-    for (const o of last.offers) expect(o.item.kind, o.itemId).toBe('buddy');
+    for (const o of last.offers) expect(o.item.kind, o.itemId).toBe('companion');
     // The only companions-group section, and no companion leaks into a gear group.
     expect(view.sections.filter((s) => s.group === 'companions')).toEqual([last]);
     for (const s of view.sections.slice(0, -1)) {
       expect(s.group, s.key).not.toBe('companions');
-      for (const o of s.offers) expect(o.item.kind, o.itemId).not.toBe('buddy');
+      for (const o of s.offers) expect(o.item.kind, o.itemId).not.toBe('companion');
     }
   });
 
   it('does not mistake a legacy whistle in a bag for a permanent buddy unlock', () => {
     const model = viewer({ ownedItemIds: new Set(['whistle_horse']) });
-    const view = buildWarfareVendorView(['whistle_horse'], ITEMS, ITEM_SETS, model);
+    const view = buildWarfareVendorView([], ITEMS, ITEM_SETS, { ...model, warfareVendor: true });
     expect(view.sections[0].offers[0].owned).toBe(false);
   });
 

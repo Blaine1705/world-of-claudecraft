@@ -5800,9 +5800,7 @@ export const cs_CZ: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "Společníci",
-        "mounts": "Jezdecká zvířata",
-        "sets": "Sady předmětů"
+        "buddies": "Společníci"
       },
       "state": {
         "owned": "Získáno",
@@ -5851,137 +5849,7 @@ export const cs_CZ: EnTranslations = {
       },
       "actions": {
         "summon": "Přivolat",
-        "dismiss": "Zavřít",
-        "wear": "Nosit",
-        "remove": "Odebrat"
-      },
-      "armor": {
-        "cloth": "Látka",
-        "leather": "Kůže",
-        "mail": "Kroužková zbroj"
-      },
-      "detail": {
-        "honorPrice": "{amount} cti",
-        "bindLabel": "Vázání",
-        "drop": "{mob} ({location}), {chance}% za zabití",
-        "dropLabel": "Padá z",
-        "dropWithHeroic": "{mob} ({location}), {chance}% za zabití, {heroicChance}% na hrdinskou",
-        "exchangeLabel": "Burza $WOC",
-        "exchangeNone": "Žádné nabídky",
-        "exchangeUnavailable": "Nedostupné v tomto klientu",
-        "fishingDrop": "Rybolov kdekoli, {chance}% za úlovek",
-        "globalDrop": "Libovolný nepřítel, {chance}% za zabití, jeden z {count} v této vzácnosti",
-        "heroicDrop": "{mob} ({location}), jen hrdinská obtížnost, {chance}% za zabití",
-        "marketAtMerchant": "Zobrazeno u Obchodníka",
-        "marketChecking": "Kontrola...",
-        "marketLabel": "Světový trh",
-        "marketNone": "Žádné nabídky",
-        "marksPrice": "{amount} hrdinských značek",
-        "noItem": "Žádný předmět to zatím neposkytuje",
-        "noSell": "Nelze prodat",
-        "noSource": "Zatím žádný zdroj ve hře",
-        "sellLabel": "Obchodník zaplatí",
-        "setLabel": "Získáno",
-        "tradeable": "Obchodovatelné",
-        "vendor": "{npc} ({location}) za {price}",
-        "vendorLabel": "Prodává",
-        "soulbound": "Vázáno na duši"
-      },
-      "petKind": {
-        "beast": "Šelmy",
-        "elemental": "Elementálové",
-        "humanoid": "Humanoidi",
-        "undead": "Nemrtví",
-        "celebrity": "Slavné osobnosti"
-      },
-      "stat": {
-        "agility": "Obratnost",
-        "intellect": "Intelekt",
-        "strength": "Síla",
-        "mixed": "Smíšené"
-      },
-      "source": {
-        "grantLabel": "Uděleno",
-        "bossDrop": "{mob} ({location}), {chance}% na hráče za zabití",
-        "bossDropHeroicOnly": "{mob} ({location}), jen hrdinská obtížnost, {chance}% na hráče",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% na hráče, {heroicChance}% na hrdinskou",
-        "bossLabel": "Společník z hlavního nepřítele",
-        "challengeDps": "Způsobuj cíli {mob} po celý boj {dps} poškození za sekundu",
-        "challengeLabel": "Výzva",
-        "challengeSpeed": "Poraz cíl {mob} do {seconds} sekund od zahájení boje",
-        "craft": "{item} (recept povolání {profession})",
-        "craftLabel": "Vyrobeno",
-        "deed": "Skutek {deed}",
-        "deedLabel": "Získáno za",
-        "grantOnly": "Sezónní odměna: měsíční žebříček a odměny za nejlepší bojové záznamy",
-        "rollNote": "Každý hráč hází zvlášť. Nikdo neprohraje hod kvůli členovi družiny.",
-        "token": "{item}, jednorázově použitý k připojení společníka",
-        "tokenLabel": "Žeton"
-      },
-      "close": "Zavřít lov",
-      "cosmetic": {
-        "crystal_lich_frostbound": "Spoutaný mrazem",
-        "crystal_lich_voltaic": "Bleskový",
-        "forgemaw_ashen": "Popelavý",
-        "forgemaw_whitehot": "Rozžhavený doběla",
-        "frog_sapphire": "Safírová žába",
-        "moss_hare_verdant": "Zelenající se",
-        "proud_grunt_warlord": "Válečný pán",
-        "stag_acorn": "Žaludová koruna",
-        "stag_gilded": "Zlacený"
-      },
-      "cosmeticUnlocked": "Nový vzhled pro {name}: {look}.",
-      "keybindLabel": "Lov",
-      "launcherTitle": "Lov: společníci, jízdní zvířata a sady předmětů",
-      "looks": {
-        "locked": "Uzamčeno",
-        "none": "Pro tohoto společníka zatím nejsou vytvořeny vzhledy",
-        "title": "Vzhledy",
-        "unlocked": "Odemčeno",
-        "worn": "Nošeno"
-      },
-      "set": {
-        "bonusLabel": "Díly: {pieces}",
-        "itemLevel": "úroveň předmětu {level}",
-        "owned": "{owned} z {total} dílů"
-      },
-      "title": "Lov",
-      "buddyLore": {
-        "alon": "Cestovatelský maskot ze silnice, kterou žádná mapa nepřizná. Objevuje se všude, kde plán nevychází. Pozoruje, schvaluje a nenabízí vůbec žádnou pomoc.",
-        "alpaca": "Stáda z Vichrného hřebene je chovají pro vlnu i povahu: v bouři není nic klidnějšího. Tahle za každou cestu plivne přesně na jednoho člověka.",
-        "ansem": "Mluví o dveřích a temnotě, ale k ničemu dalšímu se přimět nedá. Kultisté Nočního květu ji prohlašují za svou. Při každém jejich obřadu se zatoulá pryč.",
-        "bull": "Býk z údolí velký jako pes. Jen díky tomu vůbec někdo souhlasil s jeho chovem doma. Povaha se spolu se zbytkem nezmenšila.",
-        "cate_coin": "Kočka, která se nehne od mince pod sebou a kterou nikdo nikdy neviděl jíst. Eastbrookští kupci se stále přou, kdo z těch dvou je vlastně mazlíček.",
-        "crimson_claw_crab": "Přílivový krab ze Vzdáleného pobřeží, jehož klepeto zůstává rudé ještě dlouho po opuštění vody. Přístavní dělníci je kdysi nechávali závodit po prknech o mince.",
-        "crystal_lich": "Úlomek samotného Nythraxise, stále rozechvělý chladem, který ho utvářel. Poslouchá toho, kdo ho vytáhl z trosek raidu, a dodnes mu to neodpustil.",
-        "crystal_tide": "Přílivový skřítek, který se vozí na vlastní kapce mořského skla. Rybáři od údolí po Vzdálené pobřeží ho vytáhli z klidné vody při lovu večeře. Vodu, z níž vzešel, si nechává a k návratu ho nikdo nepřemluví.",
-        "ember_fox": "Liška z živých plotů Eastbrookského údolí, pojmenovaná po uhlově rudé srsti prosvítající zimním křovím. Zdejší lovci to s mláďaty vzdali před mnoha pokoleními a začali jim raději nechávat jídlo.",
-        "emberfall_phoenix": "Každý podzim shoří na uhlík a na jaře znovu povstane z vlastního popela. Víc o ní nikdo neví. Nikdo nikdy nenašel hnízdo a nikdo žádnou nechytil dvakrát.",
-        "emerald_wolf": "Mládě z Přízračného lesa, jehož srst zelená ve světle korun, které nikdy docela nedosáhne k zemi. Strážci vychovávají všechny sirotky, které za sebou les zanechá.",
-        "forgemaw": "Byl ukován v Kelímku posledního jara a nikdy zcela dokončen. Z Ignivarovy slévárny odešel, když ještě dopadala kladiva. Najdeš ho jen při hrdinském sestupu: roztavený tvor se stále vrací ke své výhni a domů následuje toho, kdo oheň přežije dvakrát.",
-        "frog": "V Mirefenském močálu vyrůstají vykrmené a bezstarostné a celé noci zpívají z rákosin. Průvodci přísahají, že loď s jednou na palubě nikdy neuvázne.",
-        "frostfire": "Narodil se v Kraji Mrazivého závoje, kde horký pramen proráží ledové pole, a nikdy si nevybral, ke které polovině patří. V chladném vzduchu se z něj kouří a v teplém se třese.",
-        "golden_sentinel": "Hlídací brouk z Jantarového pádu, pozlacený pryskyřicí, v níž vyrůstal. Jméno je starší než pryskyřice: takoví strážci hlídali háje dlouho předtím, než někoho napadlo stáčet mízu do lahví.",
-        "horse": "Poník z údolí, vyšlechtěný drobný do sadových uliček, jemuž nikdo neřekl, že není válečný oř. Drží s tebou krok a půjde za každým, kdo mu jednou dal jablko.",
-        "kekius": "Rozesmátý společník nejasného původu, jehož si závodiště Vichrného hřebene osvojila jako talisman. Přežil už čtyři stáje, které na něj přísahaly.",
-        "loot_goblin": "Následuje každého, kdo nosí Hrdinské značky, a nikdo ho dosud nepřistihl při krádeži. Zásobovač Vex tvrdí, že to vůbec nic nedokazuje.",
-        "moss_hare": "Zajíc z Vrbové bažiny, se srstí zezelenalou po životě ve vlhké rašelině. Bažinní bylinkáři ho považují za šťastné znamení a nedovolí ho odehnat z prahu.",
-        "nightfang": "Mladý lovec Nočního květu, tichý i na poměry svého druhu. Následuje tě pro společnost a neloví nic většího než můru.",
-        "penny_goldspark": "Učednice gnómského kutila, která si účtuje za hodinu a stojí za každý měďák. Zbrojíř Hode ji přijal na splacení dluhu a teď tuto dohodu prodá každému, kdo má tisíc zlatých.",
-        "phantom": "Přízrak velikosti dlaně z mohyl Přízračného lesa, samé prostěradlo a žádné kosti. Objeví se v zavřeném batohu a zůstane kvůli společnosti. Nikdo nepřišel na to, co chce, a ještě nikdy se nikoho nepokusil vystrašit.",
-        "proud_grunt": "Veterán válečných skladů, jemuž zůstal pozdrav a zmizela hodnost. Válečný maršál Draven Kole ho předá každému vojákovi s dostatkem cti, aby znal její cenu.",
-        "raptor": "Mládě z Dračích zemí, prodané dřív, než zjistí, jak rychle umí běhat. Každému novému majiteli řeknou, ať ho dobře krmí. Nikomu to nemusí říkat dvakrát.",
-        "rocky": "Kamenným krunýřem krytý lezoun z thornpeakských sutí, pomalý a naprosto klidný. Horníci je chovají, protože chvíli před závalem znehybní.",
-        "sapling": "Mladý strom s úsměvem v kůře a zvědavým fialovým pohledem. Kořeny ho nesou veselým kolébáním všude, kam se vydáš.",
-        "skeleton": "Vylezl z mohyl Přízračného lesa, oprášil se a od té doby chodí za lidmi. Nikdo nezjistil, komu ty kosti patřily.",
-        "solbot": "Malý sluncem poháněný automat, vykopaný napůl pohřbený v popelu Dračích zemí, který stále tiká. Dílna, jež ho postavila, na pouzdře nezanechala žádnou značku.",
-        "spider": "Pavouk z Přízračného lesa velký jako dlaň, který přestaví každý batoh, v němž ho neseš. Pavučina je pevnější než vlákno, které nahrazuje.",
-        "sprites": "Dva malí ohniví skřítci, zlatý a tyrkysový, kteří se nikdy úplně neshodnou, kdo vede. Když se přiblížíš, spojí se v jediný zelený plamen, pak se znovu se smíchem rozletí.",
-        "stag": "Rod z Věčné zahrady, vyšlechtěný z velkých jelenů, na nichž kdysi jezdili strážci. Před zvednutou rukou stále sklání hlavu ze zvyku staršího než sám tvor.",
-        "tiger": "Pruhy Palmového kraje na zvířeti, které ho nikdy nevidělo: rod je držen v zajetí od zavření starých zvěřinců. Poslouchá píšťalku a nic jiného.",
-        "triple_t": "Tři kusy něčeho, nebo jedna věc třikrát. Svědectví se rozcházejí a tvor nevydrží v klidu dost dlouho, aby šel spočítat.",
-        "trollface": "Šklebící se tvor, kterého Přízračný les vyvrhl a nechtěl zpět. Každý pokus o popis končí smíchem a rezignací vypravěče.",
-        "tuskhorn_boar": "Thornpeakský chov, jemuž pastýři zkrátili nohy, protože chtěli kance, který nezboří plot. Povahu si přesto ponechal."
+        "dismiss": "Zavřít"
       }
     },
     "calendar": {
@@ -21190,117 +21058,6 @@ export const cs_CZ: EnTranslations = {
       "ps_passing_stone": {
         "name": "Kámen přechodu"
       },
-      "whistle_ember_fox": {
-        "name": "Píšťalka Žhavé lišky"
-      },
-      "whistle_moss_hare": {
-        "name": "Píšťalka Mechového zajíce"
-      },
-      "whistle_frog": {
-        "name": "Píšťalka žáby"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Píšťalka Kraba karmínového klepeta"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Píšťalka Zlatého strážce"
-      },
-      "whistle_nightfang": {
-        "name": "Píšťalka Nočního tesáku"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Píšťalka Kance Tesákoroha"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Píšťalka Smaragdového vlka"
-      },
-      "whistle_tiger": {
-        "name": "Píšťalka tygra"
-      },
-      "whistle_cate_coin": {
-        "name": "Píšťalka Cate Coin"
-      },
-      "whistle_alon": {
-        "name": "Alonova píšťalka"
-      },
-      "whistle_trollface": {
-        "name": "Píšťalka Trollface"
-      },
-      "whistle_ansem": {
-        "name": "Ansemova píšťalka"
-      },
-      "whistle_triple_t": {
-        "name": "Píšťalka Triple T"
-      },
-      "whistle_kekius": {
-        "name": "Kekiova píšťalka"
-      },
-      "whistle_solbot": {
-        "name": "Solbotova píšťalka"
-      },
-      "whistle_frostfire": {
-        "name": "Píšťalka Mrazivého ohně"
-      },
-      "whistle_rocky": {
-        "name": "Píšťalka Skalníka"
-      },
-      "whistle_proud_grunt": {
-        "name": "Píšťalka Hrdého pěšáka"
-      },
-      "whistle_loot_goblin": {
-        "name": "Píšťalka Goblina kořisti"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Píšťalka Penny Goldspark"
-      },
-      "whistle_stag": {
-        "name": "Píšťalka jelena"
-      },
-      "whistle_alpaca": {
-        "name": "Píšťalka alpaky"
-      },
-      "whistle_horse": {
-        "name": "Píšťalka koně"
-      },
-      "whistle_sapling": {
-        "name": "Píšťalka stromku"
-      },
-      "whistle_bull": {
-        "name": "Píšťalka býka"
-      },
-      "whistle_spider": {
-        "name": "Píšťalka pavouka"
-      },
-      "whistle_raptor": {
-        "name": "Píšťalka raptora"
-      },
-      "whistle_skeleton": {
-        "name": "Píšťalka kostlivce"
-      },
-      "whistle_crystal_lich": {
-        "name": "Píšťalka Křišťálového licha"
-      },
-      "whistle_forgemaw": {
-        "name": "Píšťalka Výhňotlama Roztaveného"
-      },
-      "whistle_sprites": {
-        "name": "Píšťalka Mihotala a Třpytala"
-      },
-      "whistle_crystal_tide": {
-        "name": "Píšťalka Křišťálového přílivu"
-      },
-      "whistle_phantom": {
-        "name": "Píšťalka přízraku"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Píšťalka Fénixe Popelopádu"
-      },
-      "charm_stag_acorn": {
-        "name": "Amulet Žaludové koruny"
-      },
-      "charm_stag_gilded": {
-        "name": "Zlacený amulet"
-      },
       "lastflame_core": {
         "name": "Jádro Posledního plamene"
       },
@@ -26414,9 +26171,6 @@ export const cs_CZ: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, Válečný kůň"
-      },
-      "buddy_sapling": {
-        "name": "Stromek"
       },
       "buddy_bull": {
         "name": "Býk"

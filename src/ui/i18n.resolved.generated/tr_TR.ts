@@ -5800,9 +5800,7 @@ export const tr_TR: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "Yoldaşlar",
-        "mounts": "Binekler",
-        "sets": "Eşya Setleri"
+        "buddies": "Yoldaşlar"
       },
       "state": {
         "owned": "Toplandı",
@@ -5851,137 +5849,7 @@ export const tr_TR: EnTranslations = {
       },
       "actions": {
         "summon": "Çağır",
-        "dismiss": "Kapat",
-        "remove": "Kaldır",
-        "wear": "Giy"
-      },
-      "armor": {
-        "cloth": "Kumaş",
-        "leather": "Deri",
-        "mail": "Zincir Zırh"
-      },
-      "detail": {
-        "honorPrice": "{amount} Onur",
-        "soulbound": "Ruha Bağlı",
-        "bindLabel": "Bağlanma",
-        "drop": "{mob} ({location}), öldürme başına %{chance}",
-        "dropLabel": "Şundan düşer",
-        "dropWithHeroic": "{mob} ({location}), öldürme başına %{chance}, Kahramanca'da %{heroicChance}",
-        "exchangeLabel": "$WOC Borsası",
-        "exchangeNone": "İlan yok",
-        "exchangeUnavailable": "Bu istemcide kullanılamıyor",
-        "fishingDrop": "Her yerde balıkçılık, av başına %{chance}",
-        "globalDrop": "Her düşman, öldürme başına %{chance}, bu nadirlikteki {count} seçenekten biri",
-        "heroicDrop": "{mob} ({location}), yalnızca Kahramanca, öldürme başına %{chance}",
-        "marketAtMerchant": "Tüccarda gösterilir",
-        "marketChecking": "Kontrol ediliyor...",
-        "marketLabel": "Dünya Pazarı",
-        "marketNone": "İlan yok",
-        "marksPrice": "{amount} Kahramanlık Nişanı",
-        "noItem": "Henüz bunu veren eşya yok",
-        "noSell": "Satılamaz",
-        "noSource": "Henüz oyunda kaynak yok",
-        "sellLabel": "Satıcının ödediği",
-        "setLabel": "Toplandı",
-        "tradeable": "Takas edilebilir",
-        "vendor": "{npc} ({location}), {price} karşılığında",
-        "vendorLabel": "Satan"
-      },
-      "petKind": {
-        "beast": "Canavarlar",
-        "elemental": "Elementaller",
-        "humanoid": "İnsansılar",
-        "undead": "Hortlaklar",
-        "celebrity": "Ünlüler"
-      },
-      "stat": {
-        "agility": "Çeviklik",
-        "intellect": "Zeka",
-        "strength": "Güç",
-        "mixed": "Karma"
-      },
-      "source": {
-        "grantLabel": "Verildi",
-        "bossDrop": "{mob} ({location}), öldürme başına oyuncu başına %{chance}",
-        "bossDropHeroicOnly": "{mob} ({location}), yalnızca Kahramanca, oyuncu başına %{chance}",
-        "bossDropWithHeroic": "{mob} ({location}), oyuncu başına %{chance}, Kahramanca'da %{heroicChance}",
-        "bossLabel": "Baş düşman yoldaşı",
-        "challengeDps": "Savaş boyunca {mob} hedefine saniyede {dps} hasar ver",
-        "challengeLabel": "Meydan okuma",
-        "challengeSpeed": "{mob} hedefini çekişten sonraki {seconds} saniyede yen",
-        "craft": "{item} ({profession} tarifi)",
-        "craftLabel": "Üretildi",
-        "deed": "{deed} yiğitliği",
-        "deedLabel": "Şununla kazanılır",
-        "grantOnly": "Sezonluk ödül: aylık sıralama ve en iyi analiz ödülleri",
-        "rollNote": "Her oyuncu ayrı zar atar; kimse grup üyesi yüzünden zar kaybetmez.",
-        "token": "{item}, yoldaşı bağlamak için bir kez kullanılır",
-        "tokenLabel": "Jeton"
-      },
-      "close": "Avcılığı kapat",
-      "cosmetic": {
-        "crystal_lich_frostbound": "Buza Bağlı",
-        "crystal_lich_voltaic": "Elektrikli",
-        "forgemaw_ashen": "Küllü",
-        "forgemaw_whitehot": "Akkor",
-        "frog_sapphire": "Safir Kurbağa",
-        "moss_hare_verdant": "Yemyeşil",
-        "proud_grunt_warlord": "Savaş Lordu",
-        "stag_acorn": "Palamut Tacı",
-        "stag_gilded": "Yaldızlı"
-      },
-      "cosmeticUnlocked": "{name} için yeni görünüm: {look}.",
-      "keybindLabel": "Avcılık",
-      "launcherTitle": "Avcılık: yoldaşlar, binekler ve eşya setleri",
-      "looks": {
-        "locked": "Kilitli",
-        "none": "Bu yoldaş için henüz görünüm hazırlanmamış",
-        "title": "Görünümler",
-        "unlocked": "Açıldı",
-        "worn": "Kuşanılmış"
-      },
-      "set": {
-        "bonusLabel": "{pieces} parça",
-        "itemLevel": "eşya seviyesi {level}",
-        "owned": "{total} parçadan {owned}"
-      },
-      "title": "Avcılık",
-      "buddyLore": {
-        "alon": "Hiçbir haritanın kabul etmediği yoldan gelen yolcu maskotu; planların ters gittiği her yerde belirir. İzler, onaylar ve hiçbir yardım sunmaz.",
-        "alpaca": "Fırtına Sırtı sürücüleri onları yünleri ve huyları için besler: fırtınada hiçbir şey daha sakin kalmaz. Bu, yolculuk başına tam bir kişiye tükürür.",
-        "ansem": "Kapılardan ve karanlıktan söz eder, ikisini de açmaz. Gece Çiçeği tarikatçıları onun kendilerine ait olduğunu söyler; ne zaman ayin yapsalar uzaklaşır.",
-        "bull": "Köpek boyunda Vadi boğası; birinin evde beslemeyi kabul etmesinin tek nedeni de bu. Huyu geri kalanıyla birlikte küçülmedi.",
-        "cate_coin": "Üzerine oturduğu paradan ayrılmayan, kimsenin yemek yerken görmediği bir kedi. Eastbrook tüccarları ikisinden hangisinin evcil hayvan olduğunu hâlâ tartışır.",
-        "crimson_claw_crab": "Sudan çıktıktan çok sonra bile kıskacı kırmızı kalan Uzak Kıyı gelgit yengeci. İskele ekipleri eskiden tahtalar boyunca para karşılığı yarıştırırdı.",
-        "crystal_lich": "Nythraxis'in kendisinden bir kıymık; onu şekillendiren soğukla hâlâ uğuldar. Baskın enkazından çıkarana itaat eder ve bunun için onu affetmemiştir.",
-        "crystal_tide": "Kendi deniz camı damlasına binen gelgit perisi; Vadi'den Uzak Kıyı'ya kadar akşam yemeği tutan balıkçılar durgun sudan çıkarır. Çıktığı suyu korur ve geri dönmeye ikna olmaz.",
-        "ember_fox": "Doğudere Vadisi çitlerinden dişi tilki; kış çalılığında görünen köz kızılı kürkünden adını alır. Oradaki avcılar nesiller önce yavruları yakalamaktan vazgeçip yiyecek bırakmaya başladı.",
-        "emberfall_phoenix": "Her sonbaharda köze kadar yanar, ilkbaharda kendi külünden yeniden çıkar; hakkında söylenebilenin tamamı bu. Kimse yuvasını bulmadı, kimse birini iki kez yakalamadı.",
-        "emerald_wolf": "Orman zeminine tam ulaşmayan taç ışığında kürkü yeşil görünen Hayalet Ormanı yavrusu. Muhafızlar ormanın geride bıraktığı yetimleri büyütür.",
-        "forgemaw": "Son Pınar Potasında dövülmüş, asla tam bitirilmemiştir; çekiçler hâlâ inerken Ignivar'ın dökümhanesinden yürüyüp çıktı. Yalnızca Kahramanca inişte bulunur: erimiş şey onu yapan ocağa dönüp durur ve ateşten iki kez sağ çıkanın peşinden eve gider.",
-        "frog": "Mirefen Bataklığı onları şişman, tasasız, bütün gece sazlıklardan şarkı söyler hâlde yetiştirir. Bataklık rehberleri, birini taşıyan teknenin asla karaya oturmadığına yemin eder.",
-        "frostfire": "Kırağı Diyarında sıcak pınarın buz alanını yardığı yerde doğmuştur; hangi yarıya ait olduğuna hiç karar vermedi. Soğuk havada buhar çıkarır, sıcakta titrer.",
-        "golden_sentinel": "Büyüdüğü reçineyle yaldızlanmış Kehribar Vadisi bekçi böceği. Adı reçineden eskidir: bir tür nöbetçi, biri özsuyu şişelemeyi düşünmeden çok önce bu koruları beklerdi.",
-        "horse": "Meyve bahçesi yolları için küçük yetiştirilen Vadi midillisi; savaş atı olmadığı hiç söylenmemiş. Omzunda adım tutar ve bir kez elma veren herkesi izler.",
-        "kekius": "Kökeni belirsiz gülen yoldaş, Fırtına Sırtı yarış ahırları tarafından uğur diye benimsenmiş. Ona inanan dört ahırdan uzun yaşadı.",
-        "loot_goblin": "Kahramanlık Nişanı taşıyan herkesi izler ve bir kez bile çalarken yakalanmamıştır. Levazım Subayı Vex bunun hiçbir şeyi kanıtlamadığını söyler.",
-        "moss_hare": "Ömrünü ıslak turbada geçirip kürkü yeşillenen Söğüt Bataklığı tavşanı. Bataklık otacıları onları uğurlu sayar, kapı eşiğinden kovdurmaz.",
-        "nightfang": "Kendi türüne göre bile sessiz genç Gece Çiçeği avcısı. Arkadaşlık için izler, güveden büyük bir şey avlamaz.",
-        "penny_goldspark": "Saatlik ücret alan, her bakırına değen cüce tamirci çırağı. Zırhçı Hode borç kapatmak için onu işe aldı; şimdi anlaşmayı bin altını olana satar.",
-        "phantom": "Hayalet Ormanı mezarlarından avuç boyunda hayalet; tamamen çarşaf, hiç kemik yok. Kapalı çantada belirip arkadaşlık için kalır. Ne istediğini kimse çözemedi; hiç kimseyi korkutmayı da denemedi.",
-        "proud_grunt": "Selamını koruyup rütbesini kaybetmiş Savaş stokları gazisi. Savaş Mareşali Draven Kole, bunun bedelini anlayacak kadar onurlu her askere birini verir.",
-        "raptor": "Ne kadar hızlı koşabileceğini öğrenmeden satılan Ejder Toprakları yavrusu. Her yeni sahibine tok tutması söylenir; kimseye iki kez söylemek gerekmez.",
-        "rocky": "Dikenzirve molozlarından taş kabuklu sürüngen; yavaş ve tamamen tasasız. Madenciler, çökmeden hemen önce hareketsiz kalmaları için besler.",
-        "sapling": "Kabuğunda gülümsemesi, meraklı mor bakışı olan genç ağaç. Nereye gidersen kökleri onu neşeli paytak adımlarla taşır.",
-        "skeleton": "Hayalet Ormanı mezarlarından çıktı, tozunu silkti ve o zamandan beri insanları izliyor. Kemiklerin kime ait olduğunu kimse belirleyemedi.",
-        "solbot": "Ejder Toprakları külünden yarı gömülü çıkarılan, hâlâ tıkırdayan küçük güneşle beslenen otomat. Onu yapan atölye kasasının hiçbir yerine işaret bırakmamış.",
-        "spider": "Taşındığı her çantayı yeniden süsleyen avuç boyunda Hayalet Ormanı dokumacısı. Ağı, yerini aldığı iplikten güçlüdür.",
-        "sprites": "Biri altın, biri petrol mavisi iki küçük ateş perisi; kimin önde olduğunda anlaşamazlar. Yeterince yaklaşınca tek yeşil alevde birleşip gülerek yeniden ayrılırlar.",
-        "stag": "Muhafızların bir zamanlar bindiği büyük geyiklerden küçültülerek yetiştirilmiş Sonsuz Bahçe soyu. Hayvandan eski alışkanlıkla, kaldırılan ele hâlâ başını eğer.",
-        "tiger": "Palmiye Kıyısını hiç görmemiş hayvanda Palmiye Kıyısı çizgileri: eski hayvanat bahçeleri kapandığından beri soy esarette tutulur. Yalnızca düdüğe yanıt verir.",
-        "triple_t": "Bir şeyden üç tane veya üç kez bir şey. Anlatılar uyuşmaz; yaratık sayılacak kadar uzun süre yerinde durmaz.",
-        "trollface": "Hayalet Ormanının dışarı atıp geri almadığı sırıtan şey. Onu tarif etmeye çalışan herkes gülerek vazgeçer.",
-        "tuskhorn_boar": "Çit deviremeyen domuz isteyen çobanların kısa bacaklı yetiştirdiği Dikenzirve soyu. Yine de huyunu korudu."
+        "dismiss": "Kapat"
       }
     },
     "calendar": {
@@ -21190,117 +21058,6 @@ export const tr_TR: EnTranslations = {
       "ps_passing_stone": {
         "name": "Geçiş Taşı"
       },
-      "whistle_ember_fox": {
-        "name": "Köz Tilkisi Düdüğü"
-      },
-      "whistle_moss_hare": {
-        "name": "Yosun Tavşanı Düdüğü"
-      },
-      "whistle_frog": {
-        "name": "Kurbağa Düdüğü"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Kızıl Kıskaçlı Yengeç Düdüğü"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Altın Nöbetçi Düdüğü"
-      },
-      "whistle_nightfang": {
-        "name": "Gece Dişi Düdüğü"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Azıboynuz Yaban Domuzu Düdüğü"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Zümrüt Kurt Düdüğü"
-      },
-      "whistle_tiger": {
-        "name": "Kaplan Düdüğü"
-      },
-      "whistle_cate_coin": {
-        "name": "Cate Coin Düdüğü"
-      },
-      "whistle_alon": {
-        "name": "Alon Düdüğü"
-      },
-      "whistle_trollface": {
-        "name": "Trollface Düdüğü"
-      },
-      "whistle_ansem": {
-        "name": "Ansem Düdüğü"
-      },
-      "whistle_triple_t": {
-        "name": "Triple T Düdüğü"
-      },
-      "whistle_kekius": {
-        "name": "Kekius Düdüğü"
-      },
-      "whistle_solbot": {
-        "name": "Solbot Düdüğü"
-      },
-      "whistle_frostfire": {
-        "name": "Buz Ateşi Düdüğü"
-      },
-      "whistle_rocky": {
-        "name": "Kayacık Düdüğü"
-      },
-      "whistle_proud_grunt": {
-        "name": "Gururlu Piyade Düdüğü"
-      },
-      "whistle_loot_goblin": {
-        "name": "Ganimet Goblini Düdüğü"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Penny Goldspark Düdüğü"
-      },
-      "whistle_stag": {
-        "name": "Geyik Düdüğü"
-      },
-      "whistle_alpaca": {
-        "name": "Alpaka Düdüğü"
-      },
-      "whistle_horse": {
-        "name": "At Düdüğü"
-      },
-      "whistle_sapling": {
-        "name": "Fidan Düdüğü"
-      },
-      "whistle_bull": {
-        "name": "Boğa Düdüğü"
-      },
-      "whistle_spider": {
-        "name": "Örümcek Düdüğü"
-      },
-      "whistle_raptor": {
-        "name": "Yırtıcı Kertenkele Düdüğü"
-      },
-      "whistle_skeleton": {
-        "name": "İskelet Düdüğü"
-      },
-      "whistle_crystal_lich": {
-        "name": "Kristal Liç Düdüğü"
-      },
-      "whistle_forgemaw": {
-        "name": "Erimiş Ocakçene Düdüğü"
-      },
-      "whistle_sprites": {
-        "name": "Titreşim ve Parıltı Düdüğü"
-      },
-      "whistle_crystal_tide": {
-        "name": "Kristal Gelgit Düdüğü"
-      },
-      "whistle_phantom": {
-        "name": "Hayalet Düdüğü"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Köz Yağışı Anka Düdüğü"
-      },
-      "charm_stag_acorn": {
-        "name": "Palamut Tacı Tılsımı"
-      },
-      "charm_stag_gilded": {
-        "name": "Yaldızlı Tılsım"
-      },
       "lastflame_core": {
         "name": "Son Alevin Özü"
       },
@@ -26414,9 +26171,6 @@ export const tr_TR: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, Savaş Atı"
-      },
-      "buddy_sapling": {
-        "name": "Fidan"
       },
       "buddy_bull": {
         "name": "Boğa"

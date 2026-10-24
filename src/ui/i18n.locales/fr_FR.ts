@@ -26,18 +26,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountRetry': 'Réessayer',
   'hudChrome.buddyMenu.cancel': 'Annuler',
   'hudChrome.collections.actions.summon': 'Invoquer',
-  'hudChrome.collections.actions.wear': 'Équiper',
-  'hudChrome.collections.armor.cloth': 'Tissu',
-  'hudChrome.collections.armor.leather': 'Cuir',
-  'hudChrome.collections.armor.mail': 'Mailles',
-  'hudChrome.collections.detail.honorPrice': '{amount} points d’honneur',
-  'hudChrome.collections.petKind.beast': 'Bêtes',
-  'hudChrome.collections.petKind.elemental': 'Élémentaires',
-  'hudChrome.collections.petKind.humanoid': 'Humanoïdes',
-  'hudChrome.collections.petKind.undead': 'Morts-vivants',
-  'hudChrome.collections.stat.agility': 'Agilité',
-  'hudChrome.collections.stat.intellect': 'Intelligence',
-  'hudChrome.collections.tabs.mounts': 'Montures',
   'hudChrome.courier.bankTitle': 'Banque',
   'hudChrome.courier.empty': 'Aucun objet',
   'hudChrome.courier.inventory': 'Inventaire',
@@ -20727,12 +20715,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'auth.wocHead.nose.default': 'Classique',
   'auth.wocHead.nose.soft': 'Doux',
   'hudChrome.adventureGuide.lootClass': 'Classe',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Étreinte du givre',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Seigneur de guerre',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Doré',
-  'hudChrome.collections.detail.exchangeLabel': 'Bourse $WOC',
-  'hudChrome.collections.looks.locked': 'Verrouillé',
-  'hudChrome.collections.stat.strength': 'Force',
   'hudChrome.guildHall.done': 'Terminé cette semaine',
   'hudChrome.guildHall.kinds.boss': 'Prime',
   'hudChrome.guildHall.shop.kindTitle': 'Titre',
@@ -21287,118 +21269,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.buddyMenu.nameLabel': 'Nom du compagnon',
   'hudChrome.buddyMenu.rename': 'Renommer le compagnon',
   'hudChrome.collections.actions.dismiss': 'Renvoyer',
-  'hudChrome.collections.actions.remove': 'Retirer',
-  'hudChrome.collections.buddyLore.alon':
-    "La mascotte d'un voyageur venu d'une route qu'aucune carte n'admet, qui apparaît partout où un plan tourne mal. Elle observe, elle approuve, et elle n'apporte absolument aucune aide.",
-  'hudChrome.collections.buddyLore.alpaca':
-    'Les troupeaux de la Crête du Vent les élèvent pour leur laine et leur tempérament : rien ne reste plus calme dans une tempête. Celui-ci crache sur une personne, exactement une, à chaque voyage.',
-  'hudChrome.collections.buddyLore.ansem':
-    "Il parle de portes et de ténèbres, et refuse d'en dire davantage sur l'une ou l'autre. Les sectateurs de la Fleur de Nuit le revendiquent ; il s'en va dès qu'ils célèbrent un rite.",
-  'hudChrome.collections.buddyLore.bull':
-    "Un taureau du Val de la taille d'un chien, seule raison pour laquelle on a accepté d'en garder un à l'intérieur. Son caractère, lui, n'a pas rétréci.",
-  'hudChrome.collections.buddyLore.cate_coin':
-    "Un chat qui refuse de quitter la pièce sur laquelle il est assis et que personne n'a jamais vu manger. Les marchands d'Eastbrook débattent encore pour savoir lequel des deux est l'animal de compagnie.",
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    "Un crabe des marées du Rivage Lointain dont la pince reste rouge longtemps après sa sortie de l'eau. Les dockers les faisaient autrefois courir sur les planches pour quelques pièces.",
-  'hudChrome.collections.buddyLore.crystal_lich':
-    "Un éclat de Nythraxis lui-même, vibrant encore du froid qui l'a façonné. Il obéit à la personne qui l'a tiré des décombres du raid, et ne le lui a pas pardonné.",
-  'hudChrome.collections.buddyLore.crystal_tide':
-    "Un esprit des marées chevauchant sa propre goutte de verre marin, pêché dans les eaux calmes par des pêcheurs du Val au Rivage Lointain qui cherchaient leur dîner. Il garde l'eau dans laquelle il a été remonté et refuse qu'on le convainque d'y retourner.",
-  'hudChrome.collections.buddyLore.ember_fox':
-    "Une renarde des haies du Val d'Eastbrook, nommée pour son pelage rouge braise visible à travers les broussailles d'hiver. Les trappeurs du coin ont renoncé aux petits il y a des générations et se sont mis à leur laisser de la nourriture.",
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    "Chaque automne, il se consume jusqu'à n'être qu'une braise et renaît de ses propres cendres au printemps : voilà tout ce que l'on peut en dire. Personne n'a jamais trouvé de nid, ni réussi à en attraper un deux fois.",
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Un louveteau du Bois des Spectres, au pelage verdi par la lumière de la canopée qui atteint à peine le sol. Les gardiens élèvent les orphelins que le bois laisse derrière lui.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    "Forgé dans le Creuset de la Dernière Source sans jamais être tout à fait achevé, il a quitté la fonderie d'Ignivar alors que les marteaux frappaient encore. Seule la descente héroïque permet de le trouver : cette créature de métal fondu revient sans cesse à la forge qui l'a créée et suit chez elle la personne qui survit deux fois au feu.",
-  'hudChrome.collections.buddyLore.frog':
-    "Le Marais de Mirefen les fait grandir grasses et insouciantes, chantant toute la nuit dans les roseaux. Les guides du marais jurent qu'un bateau qui en transporte une ne s'échoue jamais.",
-  'hudChrome.collections.buddyLore.frostfire':
-    "Né dans le Voile de Givre, là où une source chaude perce la banquise, il n'a jamais choisi à laquelle des deux moitiés il appartient. Il fume dans l'air froid et frissonne dans l'air chaud.",
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    "Un scarabée de guet de la Chute d'Ambre, doré par la résine dans laquelle il a grandi. Son nom est plus ancien que la résine : des sentinelles de ce genre gardaient ces bosquets bien avant que l'on songe à mettre la sève en bouteille.",
-  'hudChrome.collections.buddyLore.horse':
-    "Un poney du Val, élevé petit pour les allées des vergers, à qui l'on n'a jamais dit qu'il n'était pas un destrier. Il suit à votre épaule et accompagne quiconque lui a un jour donné une pomme.",
-  'hudChrome.collections.buddyLore.kekius':
-    "Un compagnon rieur d'origine incertaine, adopté comme porte-bonheur par les écuries de course de la Crête du Vent. Il a survécu à quatre écuries qui ne juraient que par lui.",
-  'hudChrome.collections.buddyLore.loot_goblin':
-    "Il suit quiconque porte des Marques héroïques et n'a jamais été pris à voler. L'Intendant Vex soutient que cela ne prouve strictement rien.",
-  'hudChrome.collections.buddyLore.moss_hare':
-    "Un lièvre du Marais des Saules, à la fourrure verdie par une vie passée dans la tourbe humide. Les herboristes du marais y voient un porte-bonheur et refusent qu'on en chasse un du pas d'une porte.",
-  'hudChrome.collections.buddyLore.nightfang':
-    "Un jeune chasseur de la Fleur de Nuit, silencieux même selon les critères de son espèce. Il suit pour la compagnie et ne chasse rien de plus gros qu'un papillon de nuit.",
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    "L'apprentie d'un bricoleur gnome, payée à l'heure et qui vaut chaque pièce de cuivre. L'Armurier Hode l'a prise à son service pour régler une dette et propose désormais cet arrangement à quiconque possède mille pièces d'or.",
-  'hudChrome.collections.buddyLore.phantom':
-    "Un petit fantôme des tertres du Bois des Spectres, de la taille d'une paume, tout en drap et sans os, qui apparaît dans un sac pourtant fermé et reste pour la compagnie. Personne n'a compris ce qu'il veut, et il n'a jamais tenté d'effrayer qui que ce soit.",
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Un vétéran des réserves de Guerre qui a gardé le salut et perdu le grade. Le Maréchal de guerre Draven Kole en confie un à tout soldat assez honorable pour en comprendre le prix.',
-  'hudChrome.collections.buddyLore.raptor':
-    "Un jeune raptor des Terres du Dragon, vendu avant d'apprendre à quelle vitesse il peut courir. On recommande à chaque nouveau propriétaire de bien le nourrir, et aucun n'a besoin qu'on le lui répète.",
-  'hudChrome.collections.buddyLore.rocky':
-    "Un rampant à carapace de pierre des éboulis de Thornpeak, lent et parfaitement imperturbable. Les mineurs les gardent parce qu'ils s'immobilisent un instant avant un effondrement.",
-  'hudChrome.collections.buddyLore.sapling':
-    "Un jeune arbre dont l'écorce sourit et dont le regard violet est curieux. Ses racines le portent d'un dandinement joyeux partout où vous allez.",
-  'hudChrome.collections.buddyLore.skeleton':
-    "Il est sorti des tertres du Bois des Spectres, s'est épousseté, et suit les gens depuis. Personne n'a établi à qui appartenaient ces os.",
-  'hudChrome.collections.buddyLore.solbot':
-    "Un petit automate nourri de soleil, déterré à demi enfoui dans les cendres des Terres du Dragon et qui fonctionne encore. L'atelier qui l'a construit n'a laissé aucune marque sur son boîtier.",
-  'hudChrome.collections.buddyLore.spider':
-    "Une tisseuse du Bois des Spectres, de la taille d'une paume, qui redécore tout sac où on la transporte. Sa toile est plus solide que le fil qu'elle remplace.",
-  'hudChrome.collections.buddyLore.sprites':
-    "Deux petits esprits du feu, l'un doré et l'autre bleu-vert, qui ne s'accordent jamais vraiment sur celui qui mène. Approchez assez et ils se fondent en une flamme verte, puis se séparent à nouveau en riant.",
-  'hudChrome.collections.buddyLore.stag':
-    'Une lignée du Jardin Éternel, issue des grands cerfs que montaient autrefois les gardiens. Il baisse encore la tête devant une main levée, par une habitude plus ancienne que lui.',
-  'hudChrome.collections.buddyLore.tiger':
-    "Des rayures de la Baie des Palmes sur un animal qui n'y est jamais allé : la lignée est élevée en captivité depuis la fermeture des anciennes ménageries. Il répond à un sifflement, et à rien d'autre.",
-  'hudChrome.collections.buddyLore.triple_t':
-    "Trois exemplaires d'une chose, ou une seule chose en trois exemplaires. Les récits se contredisent, et la créature ne tient pas assez en place pour qu'on puisse la compter.",
-  'hudChrome.collections.buddyLore.trollface':
-    'Une créature grimaçante que le Bois des Spectres a rejetée et refusé de reprendre. Toute tentative de la décrire se termine par un éclat de rire et un abandon.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    "Une lignée de Thornpeak, élevée courte sur pattes par des bergers qui voulaient un sanglier incapable d'abattre une clôture. Il a tout de même gardé son sale caractère.",
-  'hudChrome.collections.close': 'Fermer la chasse',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Voltaïque',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Cendré',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Chauffé à blanc',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Grenouille saphir',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Verdoyant',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Couronne de glands',
-  'hudChrome.collections.cosmeticUnlocked': 'Nouvelle apparence pour {name} : {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Liaison',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% par victime',
-  'hudChrome.collections.detail.dropLabel': 'Butin de',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% par victime, {heroicChance}% en héroïque',
-  'hudChrome.collections.detail.exchangeNone': 'Aucune offre',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Indisponible sur ce client',
-  'hudChrome.collections.detail.fishingDrop': 'Pêche partout, {chance}% par prise',
-  'hudChrome.collections.detail.globalDrop':
-    'Tout ennemi, {chance}% par victime, un parmi {count} de cette rareté',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), héroïque uniquement, {chance}% par victime',
-  'hudChrome.collections.detail.marketAtMerchant': 'Affiché chez le Marchand',
-  'hudChrome.collections.detail.marketChecking': 'Vérification...',
-  'hudChrome.collections.detail.marketLabel': 'Marché mondial',
-  'hudChrome.collections.detail.marketNone': 'Aucune offre',
-  'hudChrome.collections.detail.marksPrice': '{amount} Marques héroïques',
-  'hudChrome.collections.detail.noItem': "Aucun objet ne l'accorde encore",
-  'hudChrome.collections.detail.noSell': 'Ne peut pas être vendu',
-  'hudChrome.collections.detail.noSource': 'Aucune source dans le jeu pour le moment',
-  'hudChrome.collections.detail.sellLabel': 'Prix de vente au marchand',
-  'hudChrome.collections.detail.setLabel': 'Collectionné',
-  'hudChrome.collections.detail.soulbound': "Lié à l'âme",
-  'hudChrome.collections.detail.tradeable': 'Échangeable',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) pour {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Vendu par',
-  'hudChrome.collections.keybindLabel': 'Chasse',
-  'hudChrome.collections.launcherTitle': "Chasse : compagnons, montures et ensembles d'objets",
-  'hudChrome.collections.looks.none': 'Aucune apparence créée pour ce compagnon pour le moment',
-  'hudChrome.collections.looks.title': 'Apparences',
-  'hudChrome.collections.looks.unlocked': 'Débloqué',
-  'hudChrome.collections.looks.worn': 'Porté',
-  'hudChrome.collections.petKind.celebrity': 'Célébrités',
   'hudChrome.collections.presence.alon': 'Vous vous sentez observé, et discrètement approuvé.',
   'hudChrome.collections.presence.alpaca':
     'Quelque chose de laineux et de paisible a décidé de vous accompagner.',
@@ -21458,40 +21328,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un grognement et un piétinement : quelque chose d'obstiné vous suit.",
   'hudChrome.collections.presenceDefault': 'Vous sentez une présence vous observer.',
   'hudChrome.collections.revealed': '{name} a décidé de vous suivre.',
-  'hudChrome.collections.set.bonusLabel': '{pieces} pièces',
-  'hudChrome.collections.set.itemLevel': "Niveau d'objet {level}",
-  'hudChrome.collections.set.owned': '{owned} pièces sur {total}',
-  'hudChrome.collections.source.bossDrop':
-    '{mob} ({location}), {chance}% par joueur et par victime',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), héroïque uniquement, {chance}% par joueur',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% par joueur, {heroicChance}% en héroïque',
-  'hudChrome.collections.source.bossLabel': 'Compagnon de boss',
-  'hudChrome.collections.source.challengeDps':
-    "Infligez {dps} points de dégâts par seconde à {mob} sur l'ensemble du combat",
-  'hudChrome.collections.source.challengeLabel': 'Défi',
-  'hudChrome.collections.source.challengeSpeed':
-    'Vainquez {mob} dans les {seconds} secondes suivant le début du combat',
-  'hudChrome.collections.source.craft': '{item} (recette de {profession})',
-  'hudChrome.collections.source.craftLabel': 'Fabriqué',
-  'hudChrome.collections.source.deed': 'Le haut fait {deed}',
-  'hudChrome.collections.source.deedLabel': 'Obtenu grâce à',
-  'hudChrome.collections.source.grantLabel': 'Décerné',
-  'hudChrome.collections.source.grantOnly':
-    'Récompense saisonnière : classement mensuel et récompenses des meilleurs relevés de combat',
-  'hudChrome.collections.source.rollNote':
-    "Chaque joueur effectue un tirage séparé ; personne ne perd de tirage au profit d'un membre du groupe.",
-  'hudChrome.collections.source.token': '{item}, utilisé une fois pour attacher le compagnon',
-  'hudChrome.collections.source.tokenLabel': 'Jeton',
-  'hudChrome.collections.stat.mixed': 'Hybride',
   'hudChrome.collections.state.notOwned': 'Non collectionné',
   'hudChrome.collections.state.owned': 'Collectionné',
   'hudChrome.collections.state.pending': 'Une présence vous suit',
   'hudChrome.collections.state.unavailable': 'Pas encore disponible',
   'hudChrome.collections.tabs.buddies': 'Compagnons',
-  'hudChrome.collections.tabs.sets': "Ensembles d'objets",
-  'hudChrome.collections.title': 'Chasse',
   'hudChrome.cosmetics.buddyActive': 'Invoqué',
   'hudChrome.cosmetics.buddyDrag': "Glisser vers la barre d'action",
   'hudChrome.courier.bags': 'Envoyer à la banque',
@@ -25848,11 +25689,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vestments_of_the_waking_rite.name': "Habits du rite de l'éveil",
   'entities.items.warmonger_greaves.name': 'Grèves du fauteur de guerre',
   'entities.items.warmonger_treads.name': 'Bottines du fauteur de guerre',
-  'entities.items.whistle_crystal_lich.name': 'Sifflet de liche de cristal',
-  'entities.items.whistle_forgemaw.name': 'Sifflet de Gueuleforge le Fondu',
-  'entities.items.whistle_horse.name': 'Sifflet de cheval',
-  'entities.items.whistle_sapling.name': "Sifflet d'arbrisseau",
-  'entities.items.whistle_sprites.name': 'Sifflet de Flammèche et Lueur',
   'entities.items.wyrmshadow_chainmail.name': "Cotte de mailles de l'Ombre du wyrm",
   'entities.items.wyrmshadow_tunic.name': "Tunique de l'Ombre du wyrm",
   'entities.items.wyrmshadow_vest.name': "Gilet de l'Ombre du wyrm",
@@ -25896,7 +25732,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_proud_grunt.name': 'Soldat fier',
   'entities.mobs.buddy_raptor.name': 'Raptor',
   'entities.mobs.buddy_rocky.name': 'Rocky',
-  'entities.mobs.buddy_sapling.name': 'Arbrisseau',
   'entities.mobs.buddy_skeleton.name': 'Squelette',
   'entities.mobs.buddy_solbot.name': 'Solbot',
   'entities.mobs.buddy_sprites.name': 'Flammèche et Lueur',

@@ -7,8 +7,8 @@
 // MobTemplate per key, spawned/despawned by src/sim/buddies.ts and heeled by
 // src/sim/pet/buddy_ai.ts using the same A*-pathed locomotion as a hunter
 // pet), which is the "AI" this catalog has: purely locomotion, never combat.
-// Ownership is an account collection online. Active whistle tokens remain
-// usable for existing saves and developer grants. Summoning pairs the
+// Ownership is an account collection online, with no inventory items.
+// The Cosmetics menu manages companions. Summoning pairs the
 // Entity.buddyKey identity with a real follower entity spawn or despawn.
 //
 // Used by the authoritative Sim (ownership + the active-buddy flip + the
@@ -18,7 +18,7 @@
 // imports and runs unchanged on the server, offline, and headless.
 // ---------------------------------------------------------------------------
 
-export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling' | 'sprites';
+export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sprites';
 
 export interface BuddyDef {
   key: BuddyKey;
@@ -39,14 +39,13 @@ export const BUDDIES: Record<BuddyKey, BuddyDef> = {
     key: 'forgemaw',
     name: 'Forgemaw The Molten',
   },
-  sapling: { key: 'sapling', name: 'Sapling' },
   sprites: {
     key: 'sprites',
     name: 'Flicker and Glimmer',
   },
 };
 
-// Every active companion whistle has committed artwork.
+// Companions have no inventory items requiring item artwork.
 export const BUDDY_ART_PENDING_ITEM_IDS: readonly string[] = [];
 
 /** Catalog order: declaration order. */

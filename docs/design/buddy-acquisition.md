@@ -1,6 +1,6 @@
 # Buddy companions: acquisition
 
-The active roster is Tug, the Warhorse, Crystal Lich, Forgemaw The Molten, Sapling, and Flicker and
+The active roster is Tug, the Warhorse, Crystal Lich, Forgemaw The Molten, and Flicker and
 Glimmer. Buddies are
 non-combat followers, owned across the signed-in account. Each character keeps its
 own equipped companion. Cosmetics (Shift+Y), under Buddies,
@@ -30,8 +30,8 @@ No item enters the inventory and full bags do not block the purchase. Owned or
 already-pending companions cannot be purchased again. Honor purchases are final. There are no companion deed rewards in the active tables.
 
 Flicker and Glimmer replace the former Sapling reward at the fifth completed friend.
-Already-earned tier-five entitlements also project the pair on login; existing Sapling
-ownership is preserved. No new item or inventory space is required.
+Already-earned tier-five entitlements also project the pair on login. Sapling is retired;
+saved Sapling ownership and pending rewards are ignored. No item or inventory space is required.
 
 ## Buddy icons and names
 
@@ -65,18 +65,9 @@ play has no signed-in account and keeps its local character save.
 With developer commands enabled, enter `/dev buddies` in chat to collect all
 remaining buddies immediately. Open Cosmetics with Shift+Y, select Buddies and choose Summon.
 
-To grant one at a time, enter one of these commands and use the resulting whistle
-from the inventory:
-
-- `/dev give whistle_horse 1`
-- `/dev give whistle_crystal_lich 1`
-- `/dev give whistle_forgemaw 1`
-- `/dev give whistle_sapling 1`
-- `/dev give whistle_sprites 1`
-
-`/dev buddy <key>` instead stages a pending world-source reward at the player's
+`/dev buddy <key>` stages one pending world-source reward at the player's
 feet; walk 80 yards away to reveal it. The keys are `horse`, `crystal_lich`,
-`forgemaw`, `sapling` and `sprites`. Developer commands are restricted to development environments.
+`forgemaw` and `sprites`. Developer commands are restricted to development environments.
 
 The authorized admin endpoint
 `POST /admin/api/moderation/characters/:id/grant-buddy` accepts a `buddyKey` and
@@ -95,9 +86,9 @@ this branch's git history.
 
 The live game has no buddy look catalog, unlock/equip actions, challenge tracking,
 look rewards, or Looks interface. Old cosmetic wire fields are ignored and the
-retired wire command is inert. Each active buddy keeps a usable whistle for saved inventories and developer
-grants. The horse whistle also identifies the honor vendor offer. Retired whistles and
-both charms never shipped, so they were deleted with their icons.
+retired wire command is inert. No companion whistles or charms exist in the item catalog.
+The honor vendor uses a collection offer, separate from inventory items. Companions
+are summoned and dismissed through Cosmetics.
 
 Loading a character normalizes its collection to the active roster. Retired
 ownership, pending rewards, last selection and old cosmetic unlock/equipment

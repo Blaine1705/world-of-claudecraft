@@ -52,16 +52,13 @@ describe('account buddy persistence', () => {
     expect(normalizeAccountBuddies(['horse', 'horse', 'sapling', 'forgemaw', 17])).toEqual([
       'forgemaw',
       'horse',
-      'sapling',
     ]);
     expect(ACCOUNT_BUDDIES_SCHEMA).toContain(
       'PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE',
     );
     // A key list in a CHECK would never reach an existing table; the old one
     // is retired idempotently and the writers filter on BUDDY_KEYS instead.
-    expect(ACCOUNT_BUDDIES_SCHEMA).toContain(
-      'DROP CONSTRAINT account_buddies_active_keys',
-    );
+    expect(ACCOUNT_BUDDIES_SCHEMA).toContain('DROP CONSTRAINT account_buddies_active_keys');
     for (const key of BUDDY_KEYS) expect(ACCOUNT_BUDDIES_SCHEMA).not.toContain(`'${key}'`);
     expect(ACCOUNT_BUDDIES_SCHEMA).toContain('IF EXISTS (');
     expect(ACCOUNT_BUDDIES_SCHEMA).toContain('SELECT 1 FROM pg_constraint');

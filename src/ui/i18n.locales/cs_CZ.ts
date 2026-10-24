@@ -16,17 +16,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.buddyMenu.cancel': 'Zrušit',
   'hudChrome.collections.actions.dismiss': 'Zavřít',
   'hudChrome.collections.actions.summon': 'Přivolat',
-  'hudChrome.collections.actions.wear': 'Nosit',
-  'hudChrome.collections.armor.cloth': 'Látka',
-  'hudChrome.collections.armor.leather': 'Kůže',
-  'hudChrome.collections.armor.mail': 'Kroužková zbroj',
-  'hudChrome.collections.detail.honorPrice': '{amount} cti',
-  'hudChrome.collections.petKind.beast': 'Šelmy',
-  'hudChrome.collections.petKind.elemental': 'Elementálové',
-  'hudChrome.collections.petKind.humanoid': 'Humanoidi',
-  'hudChrome.collections.petKind.undead': 'Nemrtví',
-  'hudChrome.collections.stat.agility': 'Obratnost',
-  'hudChrome.collections.stat.intellect': 'Intelekt',
   'hudChrome.courier.bankTitle': 'Banka',
   'hudChrome.courier.empty': 'Žádné předměty',
   'hudChrome.courier.inventory': 'Inventář',
@@ -21357,7 +21346,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'editor.tree.volumeSy': 'Protažení',
   'editor.tunnel.cutShape.box': 'Kvádr',
   'editor.tunnel.width': 'Šířka',
-  'hudChrome.collections.stat.strength': 'Síla',
   'editor.decalTool.hint':
     'Vyber obtisk a kliknutím na zem jej otiskni. Obtisky přiléhají k terénu a načítají se jen blízko kamery, takže jich mapa může mít mnoho. Kliknutím obtisk vyber; Delete jej odebere.',
   'editor.decalTool.importDecal': 'Importovat obrázek obtisku',
@@ -22074,7 +22062,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'editor.selection.hitboxAdd': 'Přidat zásahový objem',
   'editor.selection.hitboxCap': 'Dosažen limit zásahových objemů ({max} na objekt).',
   'editor.tree.removeVolume': 'Odebrat',
-  'hudChrome.collections.actions.remove': 'Odebrat',
   'editor.selection.hitboxClearPreset': 'Vymazat uloženou předvolbu',
   'editor.selection.hitboxDelete': 'Smazat vybrané',
   'editor.selection.hitboxDone': 'Dokončit úpravy',
@@ -23040,11 +23027,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.vestments_of_the_waking_rite.name': 'Roucha Probouzejícího obřadu',
   'entities.items.warmonger_greaves.name': 'Holenice Válečného štváče',
   'entities.items.warmonger_treads.name': 'Škorně Válečného štváče',
-  'entities.items.whistle_crystal_lich.name': 'Píšťalka Křišťálového licha',
-  'entities.items.whistle_forgemaw.name': 'Píšťalka Výhňotlama Roztaveného',
-  'entities.items.whistle_horse.name': 'Píšťalka koně',
-  'entities.items.whistle_sapling.name': 'Píšťalka stromku',
-  'entities.items.whistle_sprites.name': 'Píšťalka Mihotala a Třpytala',
   'bossJournal.wildheart.bloom.sproutName': 'Trnitý výhonek',
   'entities.mobs.balgath_cyclops.name': 'Balgath, Jednooký předák',
   'entities.mobs.barnacle_crawler.name': 'Námořník Poutaný vrakem',
@@ -23078,7 +23060,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_proud_grunt.name': 'Hrdý pěšák',
   'entities.mobs.buddy_raptor.name': 'Dravý ještěr',
   'entities.mobs.buddy_rocky.name': 'Skalník',
-  'entities.mobs.buddy_sapling.name': 'Stromek',
   'entities.mobs.buddy_skeleton.name': 'Kostlivec',
   'entities.mobs.buddy_solbot.name': 'Solbot',
   'entities.mobs.buddy_spider.name': 'Pavouk',
@@ -23233,7 +23214,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': 'Propojené přátele spojuje jejich doporučující pozvánka.',
   'hud.social.friendFirstPage': 'První strana',
   'hud.system.moonbridgeBanner': 'Měsíční most povstává',
-  'hudChrome.collections.source.grantLabel': 'Uděleno',
   'referralCards.awarded': 'Uděleno',
   'referralCards.bankBonus': 'Dokončené kartičky s razítky',
   'referralCards.bankBonusHelp':
@@ -23646,51 +23626,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.flagNameAzure': 'Azurová vlajka',
   'hudChrome.bg.flagNameCrimson': 'Karmínová vlajka',
   'hudChrome.bg.flagReturnedByLog': '{name} vrátil vlajku týmu {team}.',
-  'hudChrome.collections.close': 'Zavřít lov',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Spoutaný mrazem',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Bleskový',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Popelavý',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Rozžhavený doběla',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Safírová žába',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Zelenající se',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Válečný pán',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Žaludová koruna',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Zlacený',
-  'hudChrome.collections.cosmeticUnlocked': 'Nový vzhled pro {name}: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Vázání',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% za zabití',
-  'hudChrome.collections.detail.dropLabel': 'Padá z',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% za zabití, {heroicChance}% na hrdinskou',
-  'hudChrome.collections.detail.exchangeLabel': 'Burza $WOC',
-  'hudChrome.collections.detail.exchangeNone': 'Žádné nabídky',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Nedostupné v tomto klientu',
-  'hudChrome.collections.detail.fishingDrop': 'Rybolov kdekoli, {chance}% za úlovek',
-  'hudChrome.collections.detail.globalDrop':
-    'Libovolný nepřítel, {chance}% za zabití, jeden z {count} v této vzácnosti',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), jen hrdinská obtížnost, {chance}% za zabití',
-  'hudChrome.collections.detail.marketAtMerchant': 'Zobrazeno u Obchodníka',
-  'hudChrome.collections.detail.marketChecking': 'Kontrola...',
-  'hudChrome.collections.detail.marketLabel': 'Světový trh',
-  'hudChrome.collections.detail.marketNone': 'Žádné nabídky',
-  'hudChrome.collections.detail.marksPrice': '{amount} hrdinských značek',
-  'hudChrome.collections.detail.noItem': 'Žádný předmět to zatím neposkytuje',
-  'hudChrome.collections.detail.noSell': 'Nelze prodat',
-  'hudChrome.collections.detail.noSource': 'Zatím žádný zdroj ve hře',
-  'hudChrome.collections.detail.sellLabel': 'Obchodník zaplatí',
-  'hudChrome.collections.detail.setLabel': 'Získáno',
-  'hudChrome.collections.detail.tradeable': 'Obchodovatelné',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) za {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Prodává',
-  'hudChrome.collections.keybindLabel': 'Lov',
-  'hudChrome.collections.launcherTitle': 'Lov: společníci, jízdní zvířata a sady předmětů',
-  'hudChrome.collections.looks.locked': 'Uzamčeno',
-  'hudChrome.collections.looks.none': 'Pro tohoto společníka zatím nejsou vytvořeny vzhledy',
-  'hudChrome.collections.looks.title': 'Vzhledy',
-  'hudChrome.collections.looks.unlocked': 'Odemčeno',
-  'hudChrome.collections.looks.worn': 'Nošeno',
-  'hudChrome.collections.petKind.celebrity': 'Slavné osobnosti',
   'hudChrome.collections.presence.alon': 'Cítíš, že tě někdo sleduje a tiše schvaluje.',
   'hudChrome.collections.presence.alpaca':
     'Něco vlněného a nespěchajícího se rozhodlo jít s tebou.',
@@ -23733,22 +23668,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Odfrknutí a zadupání: něco tvrdohlavého tě následuje.',
   'hudChrome.collections.presenceDefault': 'Cítíš přítomnost, která tě sleduje.',
   'hudChrome.collections.revealed': '{name} se rozhodl tě následovat.',
-  'hudChrome.collections.set.bonusLabel': 'Díly: {pieces}',
-  'hudChrome.collections.set.itemLevel': 'úroveň předmětu {level}',
-  'hudChrome.collections.set.owned': '{owned} z {total} dílů',
-  'hudChrome.collections.source.bossDrop': '{mob} ({location}), {chance}% na hráče za zabití',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), jen hrdinská obtížnost, {chance}% na hráče',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% na hráče, {heroicChance}% na hrdinskou',
-  'hudChrome.collections.source.bossLabel': 'Společník z hlavního nepřítele',
-  'hudChrome.collections.source.challengeDps':
-    'Způsobuj cíli {mob} po celý boj {dps} poškození za sekundu',
-  'hudChrome.collections.source.challengeLabel': 'Výzva',
-  'hudChrome.collections.source.challengeSpeed':
-    'Poraz cíl {mob} do {seconds} sekund od zahájení boje',
   'hudChrome.collections.state.owned': 'Získáno',
-  'hudChrome.collections.title': 'Lov',
   'hudChrome.cryptAlert.timeAria': 'Zbývá {seconds} sekund',
   'hudChrome.kitUse.timeAria': 'Zbývá {seconds} sekund',
   'hudChrome.sanctumAlert.timeAria': 'Zbývá {seconds} sekund',
@@ -23844,94 +23764,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Velký jaguár tě loví a ignoruje provokace. Každé kousnutí způsobí {min} až {max} fyzického poškození ({heroicMin} až {heroicMax} na hrdinskou) a vyvolá krvácení. Voď ho dál od jeho pána.',
   'hudChrome.bastionChain.anchoredLine':
     'Běž k rozsvícenému úvaznému sloupu a upevni řetěz, nebo ho se skupinou rozbij dřív, než tě naviják stáhne do jámy',
-  'hudChrome.collections.buddyLore.alon':
-    'Cestovatelský maskot ze silnice, kterou žádná mapa nepřizná. Objevuje se všude, kde plán nevychází. Pozoruje, schvaluje a nenabízí vůbec žádnou pomoc.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'Stáda z Vichrného hřebene je chovají pro vlnu i povahu: v bouři není nic klidnějšího. Tahle za každou cestu plivne přesně na jednoho člověka.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Mluví o dveřích a temnotě, ale k ničemu dalšímu se přimět nedá. Kultisté Nočního květu ji prohlašují za svou. Při každém jejich obřadu se zatoulá pryč.',
-  'hudChrome.collections.buddyLore.bull':
-    'Býk z údolí velký jako pes. Jen díky tomu vůbec někdo souhlasil s jeho chovem doma. Povaha se spolu se zbytkem nezmenšila.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'Kočka, která se nehne od mince pod sebou a kterou nikdo nikdy neviděl jíst. Eastbrookští kupci se stále přou, kdo z těch dvou je vlastně mazlíček.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'Přílivový krab ze Vzdáleného pobřeží, jehož klepeto zůstává rudé ještě dlouho po opuštění vody. Přístavní dělníci je kdysi nechávali závodit po prknech o mince.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'Úlomek samotného Nythraxise, stále rozechvělý chladem, který ho utvářel. Poslouchá toho, kdo ho vytáhl z trosek raidu, a dodnes mu to neodpustil.',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    'Přílivový skřítek, který se vozí na vlastní kapce mořského skla. Rybáři od údolí po Vzdálené pobřeží ho vytáhli z klidné vody při lovu večeře. Vodu, z níž vzešel, si nechává a k návratu ho nikdo nepřemluví.',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'Liška z živých plotů Eastbrookského údolí, pojmenovaná po uhlově rudé srsti prosvítající zimním křovím. Zdejší lovci to s mláďaty vzdali před mnoha pokoleními a začali jim raději nechávat jídlo.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Každý podzim shoří na uhlík a na jaře znovu povstane z vlastního popela. Víc o ní nikdo neví. Nikdo nikdy nenašel hnízdo a nikdo žádnou nechytil dvakrát.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Mládě z Přízračného lesa, jehož srst zelená ve světle korun, které nikdy docela nedosáhne k zemi. Strážci vychovávají všechny sirotky, které za sebou les zanechá.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    'Byl ukován v Kelímku posledního jara a nikdy zcela dokončen. Z Ignivarovy slévárny odešel, když ještě dopadala kladiva. Najdeš ho jen při hrdinském sestupu: roztavený tvor se stále vrací ke své výhni a domů následuje toho, kdo oheň přežije dvakrát.',
-  'hudChrome.collections.buddyLore.frog':
-    'V Mirefenském močálu vyrůstají vykrmené a bezstarostné a celé noci zpívají z rákosin. Průvodci přísahají, že loď s jednou na palubě nikdy neuvázne.',
-  'hudChrome.collections.buddyLore.frostfire':
-    'Narodil se v Kraji Mrazivého závoje, kde horký pramen proráží ledové pole, a nikdy si nevybral, ke které polovině patří. V chladném vzduchu se z něj kouří a v teplém se třese.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'Hlídací brouk z Jantarového pádu, pozlacený pryskyřicí, v níž vyrůstal. Jméno je starší než pryskyřice: takoví strážci hlídali háje dlouho předtím, než někoho napadlo stáčet mízu do lahví.',
-  'hudChrome.collections.buddyLore.horse':
-    'Poník z údolí, vyšlechtěný drobný do sadových uliček, jemuž nikdo neřekl, že není válečný oř. Drží s tebou krok a půjde za každým, kdo mu jednou dal jablko.',
-  'hudChrome.collections.buddyLore.kekius':
-    'Rozesmátý společník nejasného původu, jehož si závodiště Vichrného hřebene osvojila jako talisman. Přežil už čtyři stáje, které na něj přísahaly.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Následuje každého, kdo nosí Hrdinské značky, a nikdo ho dosud nepřistihl při krádeži. Zásobovač Vex tvrdí, že to vůbec nic nedokazuje.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'Zajíc z Vrbové bažiny, se srstí zezelenalou po životě ve vlhké rašelině. Bažinní bylinkáři ho považují za šťastné znamení a nedovolí ho odehnat z prahu.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'Mladý lovec Nočního květu, tichý i na poměry svého druhu. Následuje tě pro společnost a neloví nic většího než můru.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'Učednice gnómského kutila, která si účtuje za hodinu a stojí za každý měďák. Zbrojíř Hode ji přijal na splacení dluhu a teď tuto dohodu prodá každému, kdo má tisíc zlatých.',
-  'hudChrome.collections.buddyLore.phantom':
-    'Přízrak velikosti dlaně z mohyl Přízračného lesa, samé prostěradlo a žádné kosti. Objeví se v zavřeném batohu a zůstane kvůli společnosti. Nikdo nepřišel na to, co chce, a ještě nikdy se nikoho nepokusil vystrašit.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Veterán válečných skladů, jemuž zůstal pozdrav a zmizela hodnost. Válečný maršál Draven Kole ho předá každému vojákovi s dostatkem cti, aby znal její cenu.',
-  'hudChrome.collections.buddyLore.raptor':
-    'Mládě z Dračích zemí, prodané dřív, než zjistí, jak rychle umí běhat. Každému novému majiteli řeknou, ať ho dobře krmí. Nikomu to nemusí říkat dvakrát.',
-  'hudChrome.collections.buddyLore.rocky':
-    'Kamenným krunýřem krytý lezoun z thornpeakských sutí, pomalý a naprosto klidný. Horníci je chovají, protože chvíli před závalem znehybní.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Mladý strom s úsměvem v kůře a zvědavým fialovým pohledem. Kořeny ho nesou veselým kolébáním všude, kam se vydáš.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Vylezl z mohyl Přízračného lesa, oprášil se a od té doby chodí za lidmi. Nikdo nezjistil, komu ty kosti patřily.',
-  'hudChrome.collections.buddyLore.solbot':
-    'Malý sluncem poháněný automat, vykopaný napůl pohřbený v popelu Dračích zemí, který stále tiká. Dílna, jež ho postavila, na pouzdře nezanechala žádnou značku.',
-  'hudChrome.collections.buddyLore.spider':
-    'Pavouk z Přízračného lesa velký jako dlaň, který přestaví každý batoh, v němž ho neseš. Pavučina je pevnější než vlákno, které nahrazuje.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Dva malí ohniví skřítci, zlatý a tyrkysový, kteří se nikdy úplně neshodnou, kdo vede. Když se přiblížíš, spojí se v jediný zelený plamen, pak se znovu se smíchem rozletí.',
-  'hudChrome.collections.buddyLore.stag':
-    'Rod z Věčné zahrady, vyšlechtěný z velkých jelenů, na nichž kdysi jezdili strážci. Před zvednutou rukou stále sklání hlavu ze zvyku staršího než sám tvor.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Pruhy Palmového kraje na zvířeti, které ho nikdy nevidělo: rod je držen v zajetí od zavření starých zvěřinců. Poslouchá píšťalku a nic jiného.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Tři kusy něčeho, nebo jedna věc třikrát. Svědectví se rozcházejí a tvor nevydrží v klidu dost dlouho, aby šel spočítat.',
-  'hudChrome.collections.buddyLore.trollface':
-    'Šklebící se tvor, kterého Přízračný les vyvrhl a nechtěl zpět. Každý pokus o popis končí smíchem a rezignací vypravěče.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Thornpeakský chov, jemuž pastýři zkrátili nohy, protože chtěli kance, který nezboří plot. Povahu si přesto ponechal.',
-  'hudChrome.collections.detail.soulbound': 'Vázáno na duši',
-  'hudChrome.collections.source.craft': '{item} (recept povolání {profession})',
-  'hudChrome.collections.source.craftLabel': 'Vyrobeno',
-  'hudChrome.collections.source.deed': 'Skutek {deed}',
-  'hudChrome.collections.source.deedLabel': 'Získáno za',
-  'hudChrome.collections.source.grantOnly':
-    'Sezónní odměna: měsíční žebříček a odměny za nejlepší bojové záznamy',
-  'hudChrome.collections.source.rollNote':
-    'Každý hráč hází zvlášť. Nikdo neprohraje hod kvůli členovi družiny.',
-  'hudChrome.collections.source.token': '{item}, jednorázově použitý k připojení společníka',
-  'hudChrome.collections.source.tokenLabel': 'Žeton',
-  'hudChrome.collections.stat.mixed': 'Smíšené',
   'hudChrome.collections.state.notOwned': 'Nezískáno',
   'hudChrome.collections.state.pending': 'Něčí přítomnost tě následuje',
   'hudChrome.collections.state.unavailable': 'Zatím nelze získat',
   'hudChrome.collections.tabs.buddies': 'Společníci',
-  'hudChrome.collections.tabs.mounts': 'Jezdecká zvířata',
-  'hudChrome.collections.tabs.sets': 'Sady předmětů',
   'hudChrome.cosmetics.buddyActive': 'Přivoláno',
   'hudChrome.cosmetics.buddyDrag': 'Přetáhni na lištu schopností',
   'hudChrome.courier.bags': 'Poslat do banky',

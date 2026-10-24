@@ -5800,9 +5800,7 @@ export const es_ES: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "Compañeros",
-        "mounts": "Monturas",
-        "sets": "Conjuntos de objetos"
+        "buddies": "Compañeros"
       },
       "state": {
         "owned": "Conseguido",
@@ -5851,138 +5849,8 @@ export const es_ES: EnTranslations = {
       },
       "actions": {
         "summon": "Invocar",
-        "dismiss": "Despedir",
-        "wear": "Equipar",
-        "remove": "Quitar"
-      },
-      "armor": {
-        "cloth": "Tela",
-        "leather": "Cuero",
-        "mail": "Malla"
-      },
-      "detail": {
-        "honorPrice": "{amount} de Honor",
-        "soulbound": "Ligado al alma",
-        "exchangeLabel": "Bolsa de $WOC",
-        "bindLabel": "Vinculación",
-        "dropLabel": "Botín de",
-        "exchangeNone": "No hay anuncios",
-        "exchangeUnavailable": "No disponible en este cliente",
-        "marketAtMerchant": "Se muestra en el mercader",
-        "marketChecking": "Comprobando...",
-        "marketLabel": "Mercado mundial",
-        "marketNone": "No hay anuncios",
-        "marksPrice": "{amount} marcas heroicas",
-        "noItem": "Aún no lo otorga ningún objeto",
-        "noSell": "No se puede vender",
-        "noSource": "Aún no tiene una fuente en el juego",
-        "sellLabel": "El vendedor paga",
-        "setLabel": "Conseguido",
-        "tradeable": "Intercambiable",
-        "vendor": "{npc} ({location}) por {price}",
-        "vendorLabel": "Lo vende",
-        "dropWithHeroic": "{mob} ({location}), {chance}% por muerte, {heroicChance}% en heroico",
-        "fishingDrop": "Pesca en cualquier lugar, {chance}% por captura",
-        "globalDrop": "Cualquier enemigo, {chance}% por muerte, uno de {count} de esta rareza",
-        "heroicDrop": "{mob} ({location}), solo en heroico, {chance}% por muerte",
-        "drop": "{mob} ({location}), {chance}% por muerte"
-      },
-      "petKind": {
-        "beast": "Bestias",
-        "elemental": "Elementales",
-        "humanoid": "Humanoides",
-        "undead": "No-muertos",
-        "celebrity": "Celebridades"
-      },
-      "stat": {
-        "agility": "Agilidad",
-        "intellect": "Intelecto",
-        "strength": "Intensidad",
-        "mixed": "Híbrido"
-      },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Escarcha Eterna",
-        "proud_grunt_warlord": "Señor de la guerra",
-        "stag_gilded": "Dorado",
-        "crystal_lich_voltaic": "Voltaico",
-        "forgemaw_ashen": "Ceniciento",
-        "forgemaw_whitehot": "Blanco incandescente",
-        "frog_sapphire": "Rana Zafiro",
-        "moss_hare_verdant": "Verdoso",
-        "stag_acorn": "Corona de Bellotas"
-      },
-      "close": "Cerrar cacería",
-      "cosmeticUnlocked": "Nueva apariencia para {name}: {look}.",
-      "keybindLabel": "Cacería",
-      "looks": {
-        "locked": "Bloqueado",
-        "title": "Apariencias",
-        "unlocked": "Desbloqueado",
-        "worn": "Equipado",
-        "none": "Aún no hay apariencias creadas para este compañero"
-      },
-      "set": {
-        "bonusLabel": "{pieces} piezas",
-        "itemLevel": "Nivel de objeto {level}",
-        "owned": "{owned} de {total} piezas"
-      },
-      "source": {
-        "bossLabel": "Mascota de jefe",
-        "challengeLabel": "Desafío",
-        "craft": "{item} (receta de {profession})",
-        "craftLabel": "Fabricado",
-        "deed": "La gesta {deed}",
-        "deedLabel": "Se consigue mediante",
-        "grantLabel": "Otorgado",
-        "tokenLabel": "Ficha",
-        "bossDrop": "{mob} ({location}), {chance}% por jugador y muerte",
-        "bossDropHeroicOnly": "{mob} ({location}), solo en heroico, {chance}% por jugador",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% por jugador, {heroicChance}% en heroico",
-        "challengeDps": "Inflige {dps} de daño por segundo a {mob} a lo largo del combate",
-        "challengeSpeed": "Derrota a {mob} en los {seconds} segundos siguientes al inicio del combate",
-        "grantOnly": "Recompensa de temporada: clasificación mensual y premios a los mejores registros de combate",
-        "rollNote": "Cada jugador tira por separado; nadie pierde una tirada frente a un miembro del grupo.",
-        "token": "{item}, se usa una vez para vincular al compañero"
-      },
-      "title": "Cacería",
-      "buddyLore": {
-        "alon": "Una mascota de viajero de un camino que ningún mapa reconoce, que aparece allí donde un plan va mal. Observa, aprueba y no ofrece absolutamente ninguna ayuda.",
-        "alpaca": "En la Cresta del Vendaval los crían por su lana y su temperamento: nada conserva mejor la calma durante una tormenta. Este escupirá a exactamente una persona por viaje.",
-        "ansem": "Habla de puertas y de oscuridad, pero no se le puede sacar nada más sobre ninguna de las dos. Los cultistas de la Flor Nocturna lo reclaman como suyo; se marcha cada vez que celebran un rito.",
-        "bull": "Un toro del Valle del tamaño de un perro, la única razón por la que alguien aceptó tener uno dentro de casa. Su temperamento no se redujo junto con el resto.",
-        "cate_coin": "Un gato que no se separa de la moneda sobre la que se sienta y al que nadie ha visto comer jamás. Los mercaderes de Eastbrook siguen discutiendo cuál de los dos es la mascota.",
-        "crimson_claw_crab": "Un cangrejo de marea de la Costa Lejana cuya pinza sigue roja mucho después de salir del agua. Las cuadrillas del muelle solían hacerlos correr sobre los tablones para apostar monedas.",
-        "crystal_lich": "Una esquirla del propio Nythraxis, que aún zumba con el frío que le dio forma. Obedece a quien la sacó de los restos de la banda y todavía no se lo ha perdonado.",
-        "crystal_tide": "Un espíritu de marea que viaja sobre su propia gota de cristal marino, pescado en aguas quietas por pescadores desde el Valle hasta la Costa Lejana que buscaban la cena. Conserva el agua de la que salió y no hay quien lo convenza de volver.",
-        "ember_fox": "Una zorra de los setos del Valle de Eastbrook, llamada así por el pelaje rojo como el carbón encendido que asoma entre la maleza invernal. Los tramperos de allí renunciaron a capturar a sus crías hace generaciones y empezaron a dejarles comida.",
-        "emberfall_phoenix": "Se consume hasta quedar en ascuas cada otoño y resurge de sus propias cenizas en primavera; eso es todo lo que se puede contar de él. Nadie ha encontrado un nido y nadie ha atrapado al mismo dos veces.",
-        "emerald_wolf": "Un cachorro del Bosque de los Espectros, con el pelaje verde bajo la luz de las copas que nunca acaba de llegar al suelo. Los guardianes crían a los huérfanos que el bosque deja atrás.",
-        "forgemaw": "Forjado en el Crisol de la Última Fuente y nunca del todo terminado, salió de la fundición de Ignivar mientras los martillos aún golpeaban. Solo el descenso heroico permite encontrarlo: la criatura fundida vuelve una y otra vez a la forja que la creó y sigue a casa a quien sobrevive al fuego dos veces.",
-        "frog": "La Ciénaga de Mirefen los cría gordos y despreocupados, cantando toda la noche entre los juncales. Los guías de la ciénaga juran que una barca que lleve uno nunca encalla.",
-        "frostfire": "Nació en el Velo de Escarcha, donde un manantial caliente emerge entre los hielos, y nunca ha decidido a qué mitad pertenece. Desprende vapor con el aire frío y tiembla con el cálido.",
-        "golden_sentinel": "Un escarabajo centinela de la Cascada de Ámbar, dorado por la resina en la que creció. El nombre es más antiguo que la resina: centinelas de algún tipo custodiaban aquellos bosques mucho antes de que nadie pensara en embotellar su savia.",
-        "horse": "Estirpe de poni del Valle, criada pequeña para los caminos de los huertos y a la que nadie ha dicho que no es un caballo de guerra. Sigue el paso a tu lado y acompañará a cualquiera que le haya dado una manzana una vez.",
-        "kekius": "Un compañero risueño de origen incierto, adoptado como amuleto por las pistas de carreras de la Cresta del Vendaval. Ha sobrevivido a cuatro establos que juraban por su suerte.",
-        "loot_goblin": "Sigue a cualquiera que lleve marcas heroicas y jamás lo han sorprendido robando. El Intendente Vex sostiene que eso no demuestra absolutamente nada.",
-        "moss_hare": "La liebre del Pantano de los Sauces, de pelaje verde tras una vida durmiendo sobre turba húmeda. Los herboristas del pantano la consideran de buena suerte y no permiten que la espanten de una puerta.",
-        "nightfang": "Un joven cazador de la Flor Nocturna, silencioso incluso para los de su especie. Sigue a otros por compañía y no caza nada más grande que una polilla.",
-        "penny_goldspark": "Una aprendiz de inventora gnoma que cobra por horas y vale cada cobre. El armero Hode la contrató para saldar una deuda y ahora vende el acuerdo a cualquiera que tenga mil monedas de oro.",
-        "phantom": "Un pequeño espectro del tamaño de una palma salido de los túmulos del Bosque de los Espectros, todo sábana y nada de huesos, que aparece en una mochila cerrada y se queda por compañía. Nadie ha averiguado qué quiere y jamás ha intentado asustar a nadie.",
-        "proud_grunt": "Un veterano de los almacenes de guerra que conservó el saludo y perdió el rango. El Mariscal de Guerra Draven Kole entrega uno a cualquier soldado con honor suficiente para saber lo que cuesta.",
-        "raptor": "Cría de las Tierras del Dragón, vendida antes de aprender lo rápido que puede correr. A todos sus nuevos dueños les dicen que la mantengan alimentada y a ninguno hace falta decírselo dos veces.",
-        "rocky": "Un reptador de caparazón pétreo de las pedreras de Thornpeak, lento y completamente despreocupado. Los mineros los conservan porque se quedan quietos un instante antes de un derrumbe.",
-        "sapling": "Un árbol joven con una sonrisa en la corteza y una mirada violeta curiosa. Sus raíces lo llevan con un alegre contoneo adondequiera que vayas.",
-        "skeleton": "Salió de los túmulos del Bosque de los Espectros, se sacudió el polvo y desde entonces sigue a la gente. Nadie ha establecido a quién pertenecían esos huesos.",
-        "solbot": "Un pequeño autómata alimentado por el sol, desenterrado de las cenizas de las Tierras del Dragón, donde estaba medio sepultado, y aún en marcha. El taller que lo construyó no dejó marca alguna en su carcasa.",
-        "spider": "Una tejedora del Bosque de los Espectros, del tamaño de una palma, que redecora cualquier mochila en la que viaje. Su telaraña es más resistente que el hilo que sustituye.",
-        "sprites": "Dos pequeños espíritus de fuego, uno dorado y otro verde azulado, que nunca se ponen del todo de acuerdo sobre quién guía. Si se acercan lo suficiente, se funden en una llama verde y luego vuelven a separarse entre risas.",
-        "stag": "Linaje del Jardín Eterno, reducido mediante cría a partir de los grandes ciervos que antaño montaban los guardianes. Aún baja la cabeza ante una mano alzada, por una costumbre más antigua que el propio animal.",
-        "tiger": "Rayas de la Bahía de las Palmeras en un animal que nunca la ha visto: el linaje se ha criado en cautividad desde que cerraron las antiguas casas de fieras. Responde a un silbato y a nada más.",
-        "triple_t": "Tres de algo, o una cosa repetida tres veces. Los relatos no coinciden y la criatura no se queda quieta el tiempo suficiente para contarla.",
-        "trollface": "Una cosa sonriente que el Bosque de los Espectros expulsó y se negó a readmitir. Todos los intentos de describirla terminan con quien lo intenta riéndose y dándose por vencido.",
-        "tuskhorn_boar": "Estirpe de Thornpeak criada con patas cortas por pastores que querían un jabalí incapaz de derribar una valla. Aun así, conservó el temperamento."
-      },
-      "launcherTitle": "Cacería: compañeros, monturas y conjuntos de objetos"
+        "dismiss": "Despedir"
+      }
     },
     "calendar": {
       "title": "Calendario de Eventos",
@@ -21190,117 +21058,6 @@ export const es_ES: EnTranslations = {
       "ps_passing_stone": {
         "name": "Piedra de Paso"
       },
-      "whistle_ember_fox": {
-        "name": "Silbato de zorro de ascuas"
-      },
-      "whistle_moss_hare": {
-        "name": "Silbato de liebre de musgo"
-      },
-      "whistle_frog": {
-        "name": "Silbato de rana"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Silbato de cangrejo de pinza carmesí"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Silbato de centinela dorado"
-      },
-      "whistle_nightfang": {
-        "name": "Silbato de Colmillo Nocturno"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Silbato de jabalí Colmillo Cornudo"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Silbato de lobo esmeralda"
-      },
-      "whistle_tiger": {
-        "name": "Silbato de tigre"
-      },
-      "whistle_cate_coin": {
-        "name": "Silbato de Cate Coin"
-      },
-      "whistle_alon": {
-        "name": "Silbato de Alon"
-      },
-      "whistle_trollface": {
-        "name": "Silbato de Trollface"
-      },
-      "whistle_ansem": {
-        "name": "Silbato de Ansem"
-      },
-      "whistle_triple_t": {
-        "name": "Silbato de Triple T"
-      },
-      "whistle_kekius": {
-        "name": "Silbato de Kekius"
-      },
-      "whistle_solbot": {
-        "name": "Silbato de Solbot"
-      },
-      "whistle_frostfire": {
-        "name": "Silbato de fuegoescarcha"
-      },
-      "whistle_rocky": {
-        "name": "Silbato de Rocky"
-      },
-      "whistle_proud_grunt": {
-        "name": "Silbato de bruto orgulloso"
-      },
-      "whistle_loot_goblin": {
-        "name": "Silbato de goblin del botín"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Silbato de Penny Chispa Dorada"
-      },
-      "whistle_stag": {
-        "name": "Silbato de ciervo"
-      },
-      "whistle_alpaca": {
-        "name": "Silbato de alpaca"
-      },
-      "whistle_horse": {
-        "name": "Silbato de caballo"
-      },
-      "whistle_sapling": {
-        "name": "Silbato de retoño"
-      },
-      "whistle_bull": {
-        "name": "Silbato de toro"
-      },
-      "whistle_spider": {
-        "name": "Silbato de araña"
-      },
-      "whistle_raptor": {
-        "name": "Silbato de raptor"
-      },
-      "whistle_skeleton": {
-        "name": "Silbato de esqueleto"
-      },
-      "whistle_crystal_lich": {
-        "name": "Silbato de liche de cristal"
-      },
-      "whistle_forgemaw": {
-        "name": "Silbato de Fauciforja el Fundido"
-      },
-      "whistle_sprites": {
-        "name": "Silbato de Parpadeo y Destello"
-      },
-      "whistle_crystal_tide": {
-        "name": "Silbato de marea de cristal"
-      },
-      "whistle_phantom": {
-        "name": "Silbato de fantasma"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Silbato de fénix de lluvia de ascuas"
-      },
-      "charm_stag_acorn": {
-        "name": "Amuleto de la corona de bellotas"
-      },
-      "charm_stag_gilded": {
-        "name": "Amuleto dorado"
-      },
       "lastflame_core": {
         "name": "Núcleo de la Última Llama"
       },
@@ -26414,9 +26171,6 @@ export const es_ES: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, el Caballo de Guerra"
-      },
-      "buddy_sapling": {
-        "name": "Retoño"
       },
       "buddy_bull": {
         "name": "Toro"

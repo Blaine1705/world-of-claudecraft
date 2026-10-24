@@ -5800,8 +5800,7 @@ export const ja_JP: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "バディ",
-        "sets": "装備セット"
+        "buddies": "バディ"
       },
       "state": {
         "owned": "収集済み",
@@ -5851,13 +5850,6 @@ export const ja_JP: EnTranslations = {
       "actions": {
         "summon": "呼び出す",
         "dismiss": "下がらせる"
-      },
-      "armor": {
-        "mail": "鎖帷子"
-      },
-      "detail": {
-        "vendor": "{npc}（{location}）から{price}で購入",
-        "vendorLabel": "販売者"
       }
     },
     "calendar": {
@@ -21066,117 +21058,6 @@ export const ja_JP: EnTranslations = {
       "ps_passing_stone": {
         "name": "たましいの石"
       },
-      "whistle_ember_fox": {
-        "name": "燃えさし狐の笛"
-      },
-      "whistle_moss_hare": {
-        "name": "コケウサギの笛"
-      },
-      "whistle_frog": {
-        "name": "カエルの笛"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "紅爪ガニの笛"
-      },
-      "whistle_golden_sentinel": {
-        "name": "黄金の歩哨の笛"
-      },
-      "whistle_nightfang": {
-        "name": "ナイトファングの笛"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "タスクホーン・ボアの笛"
-      },
-      "whistle_emerald_wolf": {
-        "name": "エメラルドウルフの笛"
-      },
-      "whistle_tiger": {
-        "name": "トラの笛"
-      },
-      "whistle_cate_coin": {
-        "name": "ケイトコインの笛"
-      },
-      "whistle_alon": {
-        "name": "アロンの笛"
-      },
-      "whistle_trollface": {
-        "name": "トロールフェイスの笛"
-      },
-      "whistle_ansem": {
-        "name": "アンセムの笛"
-      },
-      "whistle_triple_t": {
-        "name": "トリプルTの笛"
-      },
-      "whistle_kekius": {
-        "name": "ケキウスの笛"
-      },
-      "whistle_solbot": {
-        "name": "ソルボットの笛"
-      },
-      "whistle_frostfire": {
-        "name": "フロストファイアの笛"
-      },
-      "whistle_rocky": {
-        "name": "ロッキーの笛"
-      },
-      "whistle_proud_grunt": {
-        "name": "誇り高きグラントの笛"
-      },
-      "whistle_loot_goblin": {
-        "name": "戦利品ゴブリンの笛"
-      },
-      "whistle_penny_goldspark": {
-        "name": "ペニー・ゴールドスパークの笛"
-      },
-      "whistle_stag": {
-        "name": "牡鹿の笛"
-      },
-      "whistle_alpaca": {
-        "name": "アルパカの笛"
-      },
-      "whistle_horse": {
-        "name": "馬の笛"
-      },
-      "whistle_sapling": {
-        "name": "若木の笛"
-      },
-      "whistle_bull": {
-        "name": "雄牛の笛"
-      },
-      "whistle_spider": {
-        "name": "クモの笛"
-      },
-      "whistle_raptor": {
-        "name": "ラプターの笛"
-      },
-      "whistle_skeleton": {
-        "name": "スケルトンの笛"
-      },
-      "whistle_crystal_lich": {
-        "name": "クリスタルリッチの笛"
-      },
-      "whistle_forgemaw": {
-        "name": "溶けたフォージモウの笛"
-      },
-      "whistle_sprites": {
-        "name": "チラリとキラリの笛"
-      },
-      "whistle_crystal_tide": {
-        "name": "クリスタルタイドの笛"
-      },
-      "whistle_phantom": {
-        "name": "ファントムの笛"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "エンバーフォール・フェニックスの笛"
-      },
-      "charm_stag_acorn": {
-        "name": "どんぐりの冠のお守り"
-      },
-      "charm_stag_gilded": {
-        "name": "金箔のお守り"
-      },
       "lastflame_core": {
         "name": "最後の炎の核"
       },
@@ -26290,9 +26171,6 @@ export const ja_JP: EnTranslations = {
       },
       "buddy_horse": {
         "name": "馬"
-      },
-      "buddy_sapling": {
-        "name": "若木"
       },
       "buddy_bull": {
         "name": "雄牛"

@@ -453,54 +453,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
-  // Active companion whistles also support saved and developer grant tokens.
-  whistle_horse: {
-    id: 'whistle_horse',
-    name: 'Horse Whistle',
-    kind: 'buddy',
-    buddy: 'horse',
-    soulbound: true,
-    quality: 'common',
-    priceHonor: 10_000,
-    sellValue: 0,
-    noVendorSell: true,
-  },
-  whistle_sapling: {
-    id: 'whistle_sapling',
-    name: 'Sapling Whistle',
-    kind: 'buddy',
-    buddy: 'sapling',
-    soulbound: true,
-    quality: 'common',
-    sellValue: 50_000,
-  },
-  whistle_crystal_lich: {
-    id: 'whistle_crystal_lich',
-    name: 'Crystal Lich Whistle',
-    kind: 'buddy',
-    buddy: 'crystal_lich',
-    soulbound: true,
-    quality: 'epic',
-    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
-  },
-  whistle_forgemaw: {
-    id: 'whistle_forgemaw',
-    name: 'Forgemaw The Molten Whistle',
-    kind: 'buddy',
-    buddy: 'forgemaw',
-    soulbound: true,
-    quality: 'epic',
-    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
-  },
-  whistle_sprites: {
-    id: 'whistle_sprites',
-    name: 'Flicker and Glimmer Whistle',
-    kind: 'buddy',
-    buddy: 'sprites',
-    soulbound: true,
-    quality: 'epic',
-    sellValue: 50_000, // 5g, the flat vendor price every whistle takes
-  },
   // Legacy cosmetic reins; same inert, discardable treatment as mech_bird.
   reins_rallycart_rxt: {
     id: 'reins_rallycart_rxt',

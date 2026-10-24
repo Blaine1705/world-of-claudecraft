@@ -5800,8 +5800,7 @@ export const zh_CN: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "伙伴",
-        "sets": "物品套装"
+        "buddies": "伙伴"
       },
       "state": {
         "owned": "已收集",
@@ -5851,13 +5850,6 @@ export const zh_CN: EnTranslations = {
       "actions": {
         "summon": "召唤",
         "dismiss": "解散"
-      },
-      "armor": {
-        "mail": "锁甲"
-      },
-      "detail": {
-        "vendor": "{npc}（{location}），价格：{price}",
-        "vendorLabel": "出售者"
       }
     },
     "calendar": {
@@ -21066,117 +21058,6 @@ export const zh_CN: EnTranslations = {
       "ps_passing_stone": {
         "name": "往生石"
       },
-      "whistle_ember_fox": {
-        "name": "余烬狐的哨子"
-      },
-      "whistle_moss_hare": {
-        "name": "苔藓野兔的哨子"
-      },
-      "whistle_frog": {
-        "name": "青蛙的哨子"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "赤钳蟹的哨子"
-      },
-      "whistle_golden_sentinel": {
-        "name": "黄金哨兵的哨子"
-      },
-      "whistle_nightfang": {
-        "name": "夜牙的哨子"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "獠角野猪的哨子"
-      },
-      "whistle_emerald_wolf": {
-        "name": "翡翠狼的哨子"
-      },
-      "whistle_tiger": {
-        "name": "猛虎的哨子"
-      },
-      "whistle_cate_coin": {
-        "name": "钱币猫的哨子"
-      },
-      "whistle_alon": {
-        "name": "阿隆的哨子"
-      },
-      "whistle_trollface": {
-        "name": "巨魔脸的哨子"
-      },
-      "whistle_ansem": {
-        "name": "安塞姆的哨子"
-      },
-      "whistle_triple_t": {
-        "name": "三重T的哨子"
-      },
-      "whistle_kekius": {
-        "name": "凯基乌斯的哨子"
-      },
-      "whistle_solbot": {
-        "name": "索尔机偶的哨子"
-      },
-      "whistle_frostfire": {
-        "name": "霜火的哨子"
-      },
-      "whistle_rocky": {
-        "name": "岩仔的哨子"
-      },
-      "whistle_proud_grunt": {
-        "name": "骄傲步兵的哨子"
-      },
-      "whistle_loot_goblin": {
-        "name": "战利品哥布林的哨子"
-      },
-      "whistle_penny_goldspark": {
-        "name": "潘妮·金火花的哨子"
-      },
-      "whistle_stag": {
-        "name": "雄鹿的哨子"
-      },
-      "whistle_alpaca": {
-        "name": "羊驼的哨子"
-      },
-      "whistle_horse": {
-        "name": "马的哨子"
-      },
-      "whistle_sapling": {
-        "name": "小树苗的哨子"
-      },
-      "whistle_bull": {
-        "name": "公牛的哨子"
-      },
-      "whistle_spider": {
-        "name": "蜘蛛的哨子"
-      },
-      "whistle_raptor": {
-        "name": "迅猛龙的哨子"
-      },
-      "whistle_skeleton": {
-        "name": "骷髅的哨子"
-      },
-      "whistle_crystal_lich": {
-        "name": "水晶巫妖的哨子"
-      },
-      "whistle_forgemaw": {
-        "name": "熔颚·熔融者的哨子"
-      },
-      "whistle_sprites": {
-        "name": "闪烁与微光的哨子"
-      },
-      "whistle_crystal_tide": {
-        "name": "水晶潮汐的哨子"
-      },
-      "whistle_phantom": {
-        "name": "幻魂的哨子"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "烬落凤凰的哨子"
-      },
-      "charm_stag_acorn": {
-        "name": "橡果之冠护符"
-      },
-      "charm_stag_gilded": {
-        "name": "镀金护符"
-      },
       "lastflame_core": {
         "name": "末焰之核"
       },
@@ -26290,9 +26171,6 @@ export const zh_CN: EnTranslations = {
       },
       "buddy_horse": {
         "name": "马"
-      },
-      "buddy_sapling": {
-        "name": "小树苗"
       },
       "buddy_bull": {
         "name": "公牛"

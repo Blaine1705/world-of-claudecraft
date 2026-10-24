@@ -7551,21 +7551,6 @@
       ]
     },
     {
-      "batchId": "buddy-whistle-icons-2026-08-28",
-      "source": "In-engine render of the committed buddy GLB models (scripts/assets/render_buddy_item_icons.mjs: public/models/buddies/*.glb, plus the shipped creature and skeleton rigs the beast and undead buddies reuse, tinted per species, through the asset-pipeline's shared hero-view preview renderer). Not composited onto the painted-icon radial vignette the rest of the catalog uses; the renderer's own dark-neutral clear color stands in for it.",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "styleReference": "the buddy's own shipped in-game model, not the existing painted WebP catalog",
-      "provenanceRecord": "scripts/assets/render_buddy_item_icons.mjs",
-      "itemIds": [
-        "whistle_sapling",
-        "whistle_crystal_lich",
-        "whistle_forgemaw",
-        "whistle_sprites"
-      ],
-      "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed GLB model (hero three-quarter turntable view, auto-framed to the model's bounding sphere) resized to 128px; ember_fox/moss_hare apply a post-render tint recoloring the shared fox rig."
-    },
-    {
       "batchId": "warfare-season2-warrior-icons-2026-10-22",
       "source": "OpenAI built-in image generation; one separate generation per authored item",
       "owner": "World of ClaudeCraft",
@@ -7834,18 +7819,6 @@
         "vanguard_druid_restoration_legs",
         "vanguard_druid_restoration_gloves"
       ]
-    },
-    {
-      "batchId": "horse-whistle-icon-v045-2026-10-22",
-      "source": "Project model render with the existing Guide browser renderer",
-      "owner": "World of ClaudeCraft",
-      "license": "Project render, project asset; underlying shipped model license retained (see CREDITS.md)",
-      "styleReference": "Shipped buddy models and existing whistle inventory renders",
-      "provenanceRecord": "docs/achievements/horse-whistle-icon-v045-2026-10-22/accepted-art.json",
-      "itemIds": [
-        "whistle_horse"
-      ],
-      "commonPrompt": "Rendered the exact shipped Tug horse GLB with the existing Guide model-still browser renderer, Idle at 0.6 sec, yaw -0.6, height 0.75, 512px canvas. Trimmed transparent margins, fitted the full horse inside 420px with 46px padding on an opaque #20242b background, then encoded 128px WebP quality 90. No generated or edited model, no text-to-image artwork."
     },
     {
       "batchId": "referral-reward-icons-v045-2026-10-22",

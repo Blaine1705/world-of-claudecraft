@@ -1,3 +1,4 @@
+import { type BuddyVendorOffer, TUG_HONOR_OFFER } from '../../../sim/content/buddy_offers';
 // Pure, host-agnostic view model for the WARFARE quartermaster's shop window.
 //
 // The pure-core half of the pure-core + thin-consumer split (reference
@@ -82,7 +83,7 @@ export function isWarfareVendorNpc(def: WarfareVendorNpcFlags | undefined): bool
 
 export interface WarfareShopOffer {
   itemId: string;
-  item: ItemDef;
+  item: ItemDef | Readonly<BuddyVendorOffer>;
   /** Price in Honor for one purchase (Honor is never stack-multiplied). */
   honor: number;
   /** Advisory only: the purchase resolves server-side against the server's own
@@ -147,6 +148,7 @@ export interface WarfareShopView {
 }
 
 export interface WarfareShopViewer {
+  warfareVendor?: boolean;
   honor: number;
   /** Item ids the viewer wears OR carries in a bag. See warfareShopViewer below
    *  for what "owns" deliberately does NOT cover (the bank). */
@@ -216,10 +218,7 @@ function offerFor(itemId: string, item: ItemDef, viewer: WarfareShopViewer): War
     item,
     honor,
     affordable: viewer.honor >= honor,
-    owned:
-      item.kind === 'buddy'
-        ? viewer.acquiredBuddyKeys.has(item.buddy)
-        : viewer.ownedItemIds.has(itemId),
+    owned: viewer.ownedItemIds.has(itemId),
   };
 }
 
@@ -257,7 +256,17 @@ export function buildWarfareVendorView(
   const weapons: WarfareShopOffer[] = [];
   const seasonWeapons: WarfareShopOffer[] = [];
   const goods: WarfareShopOffer[] = [];
-  const companions: WarfareShopOffer[] = [];
+  const companions: WarfareShopOffer[] = viewer.warfareVendor
+    ? [
+        {
+          itemId: TUG_HONOR_OFFER.id,
+          item: TUG_HONOR_OFFER,
+          honor: TUG_HONOR_OFFER.priceHonor,
+          affordable: viewer.honor >= TUG_HONOR_OFFER.priceHonor,
+          owned: viewer.acquiredBuddyKeys.has(TUG_HONOR_OFFER.buddy),
+        },
+      ]
+    : [];
   for (const itemId of stock) {
     const item = items[itemId];
     if (!item) continue;
@@ -267,10 +276,6 @@ export function buildWarfareVendorView(
     if (SEASON2_IDS.has(itemId) && !wearableBy(item, viewer.viewerClass)) continue;
     if (SEASON2_IDS.has(itemId) && item.kind === 'weapon') {
       seasonWeapons.push(offer);
-    } else if (item.kind === 'buddy') {
-      // Checked before the set arm on purpose: a whistle carries no set tag
-      // today, and if one ever did it would still not be a gear piece.
-      companions.push(offer);
     } else if (item.set) {
       const existing = bySet.get(item.set);
       if (existing) existing.push(offer);

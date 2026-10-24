@@ -5800,8 +5800,7 @@ export const ru_RU: EnTranslations = {
     },
     "collections": {
       "tabs": {
-        "buddies": "Спутники",
-        "sets": "Комплекты предметов"
+        "buddies": "Спутники"
       },
       "state": {
         "owned": "Собрано",
@@ -5851,13 +5850,6 @@ export const ru_RU: EnTranslations = {
       "actions": {
         "summon": "Призвать",
         "dismiss": "Отпустить"
-      },
-      "armor": {
-        "mail": "Кольчуга"
-      },
-      "detail": {
-        "vendor": "{npc} ({location}), цена: {price}",
-        "vendorLabel": "Продаёт"
       }
     },
     "calendar": {
@@ -21066,117 +21058,6 @@ export const ru_RU: EnTranslations = {
       "ps_passing_stone": {
         "name": "Камень Ухода"
       },
-      "whistle_ember_fox": {
-        "name": "Свисток: Тлеющая лисица"
-      },
-      "whistle_moss_hare": {
-        "name": "Свисток: Моховой заяц"
-      },
-      "whistle_frog": {
-        "name": "Свисток: Лягушка"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Свисток: Багровоклешневый краб"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Свисток: Золотой страж"
-      },
-      "whistle_nightfang": {
-        "name": "Свисток: Ночной Клык"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Свисток: Клыкорогий вепрь"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Свисток: Изумрудный волк"
-      },
-      "whistle_tiger": {
-        "name": "Свисток: Тигр"
-      },
-      "whistle_cate_coin": {
-        "name": "Свисток: Кейт Коин"
-      },
-      "whistle_alon": {
-        "name": "Свисток: Алон"
-      },
-      "whistle_trollface": {
-        "name": "Свисток: Тролльфейс"
-      },
-      "whistle_ansem": {
-        "name": "Свисток: Ансем"
-      },
-      "whistle_triple_t": {
-        "name": "Свисток: Тройное Т"
-      },
-      "whistle_kekius": {
-        "name": "Свисток: Кекиус"
-      },
-      "whistle_solbot": {
-        "name": "Свисток: Солбот"
-      },
-      "whistle_frostfire": {
-        "name": "Свисток: Ледяное пламя"
-      },
-      "whistle_rocky": {
-        "name": "Свисток: Рокки"
-      },
-      "whistle_proud_grunt": {
-        "name": "Свисток: Гордый рубака"
-      },
-      "whistle_loot_goblin": {
-        "name": "Свисток: Гоблин-барыга"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Свисток: Пенни Златоискра"
-      },
-      "whistle_stag": {
-        "name": "Свисток: Олень"
-      },
-      "whistle_alpaca": {
-        "name": "Свисток: Альпака"
-      },
-      "whistle_horse": {
-        "name": "Свисток: Лошадь"
-      },
-      "whistle_sapling": {
-        "name": "Свисток: Деревце"
-      },
-      "whistle_bull": {
-        "name": "Свисток: Бык"
-      },
-      "whistle_spider": {
-        "name": "Свисток: Паук"
-      },
-      "whistle_raptor": {
-        "name": "Свисток: Раптор"
-      },
-      "whistle_skeleton": {
-        "name": "Свисток: Скелет"
-      },
-      "whistle_crystal_lich": {
-        "name": "Свисток: Хрустальный лич"
-      },
-      "whistle_forgemaw": {
-        "name": "Свисток: Горнилозев Расплавленный"
-      },
-      "whistle_sprites": {
-        "name": "Свисток: Мерцай и Искорка"
-      },
-      "whistle_crystal_tide": {
-        "name": "Свисток: Хрустальный прилив"
-      },
-      "whistle_phantom": {
-        "name": "Свисток: Фантом"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Свисток: Феникс Пепелопада"
-      },
-      "charm_stag_acorn": {
-        "name": "Оберег желудёвого венца"
-      },
-      "charm_stag_gilded": {
-        "name": "Позолоченный оберег"
-      },
       "lastflame_core": {
         "name": "Ядро Последнего Пламени"
       },
@@ -26290,9 +26171,6 @@ export const ru_RU: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Лошадь"
-      },
-      "buddy_sapling": {
-        "name": "Деревце"
       },
       "buddy_bull": {
         "name": "Бык"

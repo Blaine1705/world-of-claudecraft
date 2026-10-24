@@ -15,6 +15,7 @@ import { Sim } from '../src/sim/sim';
 import { VENDOR_TEST_WORLD } from './sim_shared';
 
 const RETIRED_KEYS = [
+  'sapling',
   'ember_fox',
   'moss_hare',
   'frog',
@@ -60,13 +61,12 @@ const RETIRED_TOKENS = [
 ];
 
 describe('retired buddies', () => {
-  it('keeps the core buddies and restores Sapling for referral completion', () => {
-    expect(BUDDY_KEYS).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sapling', 'sprites']);
+  it('keeps only the four supported companions', () => {
+    expect(BUDDY_KEYS).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sprites']);
     expect([...BUDDY_TEMPLATE_IDS]).toEqual([
       'buddy_horse',
       'buddy_crystal_lich',
       'buddy_forgemaw',
-      'buddy_sapling',
       'buddy_sprites',
     ]);
     for (const key of RETIRED_KEYS) {
