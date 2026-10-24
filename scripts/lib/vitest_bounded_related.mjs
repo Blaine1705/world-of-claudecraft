@@ -30,7 +30,7 @@ import { createRequire } from 'node:module';
 export const RELATED_WALK_BATCH = 64;
 
 /** The vitest release whose filterTestsBySource this reproduces. */
-export const VERIFIED_VITEST_VERSION = '4.1.11';
+export const VERIFIED_VITEST_VERSION = '4.1.12';
 
 /** provide/inject key a suite reads to prove the override is live in its run. */
 export const BOUNDED_RELATED_PROVIDE_KEY = 'wocBoundedRelated';
