@@ -6,6 +6,7 @@ import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & {
   nextId: number;
@@ -96,7 +97,12 @@ describe('Gladesong channel healing', () => {
   });
 
   it('bills 240 mana and arms a 60 sec cooldown (Groveheart rework)', () => {
-    const sim = new Sim({ seed: 260_1757, playerClass: 'druid', autoEquip: false });
+    const sim = new Sim({
+      seed: 260_1757,
+      playerClass: 'druid',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_frenzied_regeneration' } })).toBe(
       true,
