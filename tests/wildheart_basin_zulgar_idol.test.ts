@@ -6,6 +6,8 @@
 // on it, alternating halves; the hunt's protections still hold; heroic snuffs
 // the lit glyphs of the breathed half. On a real claimed Basin with a real
 // party (tests/helpers/wildheart_fight.ts).
+// Raised timeouts retain roughly 5x measured headroom: the slowest case was
+// 12.2 s and the full suite 28.7 s; the declared total stays below 300 s.
 
 import { describe, expect, it } from 'vitest';
 import { SHRINE_TERRACE, SUN_GLYPHS } from '../src/sim/content/wildheart_basin_layout';
@@ -154,7 +156,7 @@ describe('The Idol Wakes at 30 percent', () => {
     }
     expect(st(z).phase).toBe('final');
     expect(aura(z, ZULGAR_AVATAR)).toBeDefined();
-  }, 60_000);
+  }, 30_000);
 
   it('skips the hunts it overtakes: no Spirit of the Hunt bar under 30 percent', () => {
     const f = fight();
@@ -184,7 +186,7 @@ describe('The Idol Wakes at 30 percent', () => {
     expect(aura(z, ZULGAR_AVATAR)?.permanent).toBe(true);
     run(f, T.huntSeconds + 2, keep);
     expect(st(z).phase).toBe('final');
-  }, 60_000);
+  }, 30_000);
 });
 
 describe('the final hunt', () => {
@@ -210,7 +212,7 @@ describe('the final hunt', () => {
     // The mark shows the turn it has left.
     const [now] = prey(f);
     expect(aura(now, ZULGAR_PREY)?.duration).toBe(T.finalPreySeconds);
-  }, 120_000);
+  }, 60_000);
 
   it('a switch never catches the new Prey where it stands: he turns on it for 1.5 s first', () => {
     const f = fight();
@@ -346,7 +348,7 @@ describe('the final hunt', () => {
     expect(aura(z, 'test_final_sheep')).toBeUndefined();
     f.sim.ctx.applyAura(z, stun('root', 'test_final_root'));
     expect(aura(z, 'test_final_root')).toBeDefined();
-  }, 120_000);
+  }, 60_000);
 });
 
 describe("the Idol's Breath", () => {
@@ -396,7 +398,7 @@ describe("the Idol's Breath", () => {
     const [next] = objects(f, WILDHEART_IDOL_BREATH_WARNING);
     expect(next).toBeDefined();
     expect(idolBreathSideOf(next.facing)).toBe(-side);
-  }, 60_000);
+  }, 30_000);
 
   it('spares the centre line and whoever crossed in time', () => {
     const f = fight();
@@ -438,7 +440,7 @@ describe("the Idol's Breath", () => {
       expect(objects(f, WILDHEART_SUN_GLYPH_LIT)).toHaveLength(difficulty === 'normal' ? 6 : 3);
       expect(objects(f, WILDHEART_SUN_GLYPH_DARK)).toHaveLength(difficulty === 'normal' ? 0 : 3);
     }
-  }, 60_000);
+  }, 30_000);
 });
 
 describe('the reset', () => {
