@@ -13,6 +13,40 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    '每{every}秒施法{cast}秒，對{radius}碼內所有玩家造成{min}至{max}點傷害。被釘住的玩家無論距離多遠都會受到{pinMult}倍傷害。',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    '施法{cast}秒後釘住一名非坦克玩家；若沒有其他玩家，則選擇坦克。定身最多持續{seconds}秒，每{tick}秒造成{bleed}點傷害。',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    '選中長矛，在{range}碼內互動，花費{pull}秒拔出。受到傷害不會中斷。若平台上沒有其他自由行動的玩家，被釘住者可自行互動，花費{self}秒脫困。',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    '{count}枚符文最初熄滅。追獵期間，未被標記的玩家站在符文上{kindle}秒即可點亮。若沒有未標記者，獵物可在{alone}秒內點亮。離開會重置進度。他經過點亮的符文時，減速{slow}，受到的傷害提高{vulnerability}，持續{seconds}秒。符文在{dark}秒內無法重新點亮；他在{wary}秒內不會再次被符文擊中。追獵期間，昏迷持續時間減半。',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    '未被標記者在獵物前方點亮符文。引他經過符文，在日灼期間攻擊。追獵結束時，符文全部熄滅。',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    '生命值降至{health}時，他保持獵豹靈體直到被擊敗。坦克也可能成為獵物。',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    '每{every}秒選擇新獵物，先轉向目標{turn}秒，再開始追逐。',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    '每{pair}秒標記一對新獵物，每{switch}秒切換目標。每次切換後，新獵物有{turn}秒反應時間。',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    '每{every}秒標記平台的一半，預警{warning}秒後，對該區域所有玩家造成{min}至{max}點自然傷害。兩側交替。',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    '預警結束前移動到未標記的一半。中線安全。英雄難度下，吐息還會熄滅所在半區的符文；這些符文可以立即重新點亮。',
+  'bossJournal.temple.selthe.overviewRework':
+    '塞爾瑟不會移動或近戰。合唱時集合，獨唱時遠離隊伍，打斷溺亡詠嘆調並躲避湖潮湧。到達兩次生命值門檻時，輪流踏上月光地磚，重現她的旋律。',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    '隊伍回應樂譜時，她暫停其他攻擊。月水箭沒有施法條，無法打斷。',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    '其他施法之間，每{every}秒落下一枚月水箭，提前{windup}秒顯示預警，造成武器傷害{mult}倍的冰霜傷害。打斷溺亡詠嘆調會讓箭和詠嘆調暫停{quiet}秒。',
+  'bossJournal.temple.selthe.boltResponseRework': '讓坦克保持在她的視線內。把打斷留給溺亡詠嘆調。',
+  'bossJournal.temple.selthe.tipHealerRework':
+    '照看詠嘆調目標和獨自承受合唱的玩家。樂譜期間幫忙唱出下一音，並治療失誤造成的傷害。',
+  'bossJournal.temple.selthe.scoreSummary':
+    '生命值降至{first}和{second}時，她免疫傷害，依次演奏{notes}音和{finalNotes}音旋律。分別在{answer}秒和{finalAnswer}秒內重現。踩錯地磚造成{falseNote}點冰霜傷害並重置進度，但不重置計時。逾時對所有人造成{min}至{max}點冰霜傷害。成功使她昏迷{stun}秒，並在{bonusSeconds}秒內受到額外{vulnerability}傷害。',
+  'bossJournal.temple.selthe.scoreResponse':
+    '觀察旋律，然後按順序踏入地磚。與另一名存活玩家輪流奏響正確音符；唯一倖存者可獨自完成。被阻止的踩踏無害。離開後重新踏入才能奏響，包括回應開始前已站著的地磚。',
+  'bossJournal.temple.selthe.scoreHeroic': '回應時地磚會變暗。記住旋律，輪流奏響。',
   'editor.buildMode.materialNames.Cliff003': '崎嶇岩石',
   'editor.buildMode.materialNames.Cliff004': '風化峭壁',
   'editor.buildMode.materialNames.Cliff005': '層狀峭壁',
@@ -24134,4 +24168,79 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'bossJournal.temple.ysolei.heroicDrownedMoon':
     '溺月：每 {moonEvery} 秒，一隻月之裔會從洪水中爬出來。',
   'bossJournal.temple.ysolei.heroicTears': '每波 {count} 顆月光之淚，墜月的施放時間為 {cast} 秒。',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck': '被點亮的太陽符文灼傷：移動速度降低{pct}%。',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed': '被點亮的太陽符文灼傷：受到的傷害提高{pct}%。',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    '在此效果結束前，任何太陽符文都無法灼傷他。他踏過的已點亮符文會保持點亮。',
+  'hudChrome.auraEffect.wildheart.pinned':
+    '一支狩獵之矛把你釘在原地。你每{every}秒流血，受到{bleed}點物理傷害（英雄難度{heroicBleed}點），而且無論你站在哪裡，荒野之心脈衝都會命中你，傷害提高{pulse}%。隊友可以用{pull}秒拔出長矛。如果沒有其他人能幫忙，你可以用{wrench}秒自己拔出。{seconds}秒後它會自行鬆脫。',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    '石美洲豹已經甦醒。每{every}秒，牠會在地面預警{warning}秒後，輪流向平台的一半吐息：對該半場的所有人造成{min}到{max}點自然傷害（英雄難度{heroicMin}到{heroicMax}點）。祖爾加會保持美洲豹化身直到死亡，並且每{seconds}秒更換獵物（英雄難度{heroicSeconds}秒）。',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    '沒有其他人能點亮太陽符文。站在一個熄滅的符文上{seconds}秒將它點亮，再把祖爾加引過去',
+  'hudChrome.wildheartAlert.pinnedTitle': '被釘住了！',
+  'hudChrome.wildheartAlert.pinnedLine':
+    '需要隊友拔出狩獵之矛。被釘住時，荒野之心脈衝對你的傷害更高',
+  'hudChrome.wildheartAlert.pinnedSelfLine': '沒有人能來幫忙：在荒野之心脈衝落下前自己拔出狩獵之矛',
+  'hudChrome.wildheartAlert.sunstruckTitle': '祖爾加被烈日灼傷了！',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    '在效果結束前他受到的傷害提高{pct}%：現在使用你最強的攻擊',
+  'hudChrome.wildheartAlert.spearTitle': '有隊友被釘住了！',
+  'hudChrome.wildheartAlert.spearLine': '跑到狩獵之矛旁，在荒野之心脈衝落下前把它拔出來',
+  'hudChrome.wildheartAlert.glyphTitle': '點亮太陽符文',
+  'hudChrome.wildheartAlert.glyphLine':
+    '站在熄滅的太陽符文上{seconds}秒將它點亮。祖爾加踏過它時，會在{duration}秒內受到的傷害提高{pct}%',
+  'hudChrome.wildheartAlert.glyphLightingTitle': '正在點亮太陽符文',
+  'hudChrome.wildheartAlert.glyphLightingLine': '留在符文上直到它被點亮。離開就要重新開始',
+  'hudChrome.wildheartAlert.breathTitle': '神像吐息！',
+  'hudChrome.wildheartAlert.breathLine': '石美洲豹即將向平台的這一半吐息。跑到另一半去',
+  'hudChrome.kitUse.freeLine':
+    '把長矛從地面拔出，解救被釘住的人。受到攻擊不會打斷你，移動或昏迷會打斷',
+  'hudChrome.kitUse.freeKey': '拔出{name}',
+  'hudChrome.kitUse.freeTap': '點擊這裡拔出{name}',
+  'hudChrome.kitUse.freeClick': '點選這裡拔出{name}',
+  'hudChrome.kitUse.freeFar': '靠近到{range}碼內才能拔出它',
+  'hudChrome.kitUse.freeAria': '拔出{name}',
+  'hudChrome.kitUse.freeUsingLine': '保持不動以拔出長矛：移動或昏迷會打斷',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': '狩獵之矛',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': '神像甦醒',
+  'abilityUi.cast.kituse_wildheart_pull_spear': '拔出長矛',
+  'abilityUi.cast.wildheart_idols_breath': '神像吐息',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': '點亮中',
+  'abilityUi.cast.wildheart_sun_glyph_cold': '冷卻中',
+  'entities.mobs.wildheart_hunting_spear.name': '狩獵之矛',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': '樂譜',
+  'hudChrome.templeAlert.melodyLine': '觀察月亮地磚依序奏響。與另一名玩家輪流踩出相同順序',
+  'hudChrome.templeAlert.melodyDarkLine': '在地磚熄滅前記住順序。與另一名玩家輪流踩出相同順序',
+  'hudChrome.templeAlert.answerTitle': '回應樂譜！',
+  'hudChrome.templeAlert.answerLine':
+    '輪流踩踏：踩上標記為{place}的月亮地磚。已奏響：{done}/{total}',
+  'hudChrome.templeAlert.answerDarkLine':
+    '輪流憑記憶重複順序。再次踩同一塊地磚前先離開。已奏響：{done}/{total}',
+  'hudChrome.templeAlert.stepOffTitle': '先走下去，再踏上來',
+  'hudChrome.templeAlert.stepOffLine':
+    '月光石板只有在有人踏上時才會奏響。離開這塊石板，然後重新踏上去',
+  'hudChrome.templeAlert.falseTitle': '錯音！',
+  'hudChrome.templeAlert.falseLine': '那塊石板的順序不對。回應將從第一塊石板重新開始',
+  'hudChrome.templeAlert.brokenTitle': '瑟爾瑟的嗓音破碎了！',
+  'hudChrome.templeAlert.brokenLine': '在效果結束前，她受到的傷害提高{pct}%：現在使用你最強的攻擊',
+  'hudChrome.templeAlert.timeAria': '剩餘{seconds}秒',
+  'hudChrome.auraEffect.temple.scoreWard':
+    '正在吟唱樂譜：在結束前不會受到傷害。在樂句結束前，按石板響起的順序踏上月光石板，即可使她的嗓音破碎。輪流踩踏：奏響音符後，須等待另一名玩家奏響下一個正確音符。唯一的倖存者可以獨自完成。如果樂句先結束，不諧之音會對庭院中的所有人造成{min}到{max}點冰霜傷害（英雄難度下為{heroicMin}到{heroicMax}點）。',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    '她的嗓音已破碎：在此效果結束前，她受到的傷害提高{pct}%。',
+  'abilityUi.cast.temple_score': '樂譜',
+  'abilityUi.cast.temple_score_answer': '回應樂譜',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    '樂譜（她會兩次在月光石板上吟唱旋律：按石板響起的順序踏上去，即可使她的嗓音破碎）',
+  'hudChrome.templeAlert.spentTitle': '該由另一道聲音應答',
+  'hudChrome.templeAlert.spentLine':
+    '另一名玩家奏響下一個正確音符前，你無法奏響地磚。已奏響：{done}/{total}',
+  'hudChrome.auraEffect.temple.spentVoice':
+    '另一名玩家奏響下一個正確音符前，你無法奏響月亮地磚。在此期間踩上地磚不會重置應答，也不會對你造成傷害。無法驅散。當你成為同一副本內唯一存活的玩家或樂譜結束時移除。',
 };

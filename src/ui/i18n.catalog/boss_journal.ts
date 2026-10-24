@@ -174,6 +174,26 @@ export const bossJournalStrings = {
         'Pollen Cloud: standing within {cloudRadius} yd of a Pollinated player for {cloudSeconds} sec pollinates you too.',
     },
     zulgar: {
+      pulseSummaryRework:
+        'Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.',
+      spearSummary:
+        'A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.',
+      spearResponse:
+        'Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.',
+      glyphSummaryRework:
+        'The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.',
+      glyphResponseRework:
+        'Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.',
+      idolSummary:
+        'At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.',
+      idolHuntSummary:
+        'He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.',
+      idolHuntHeroicSummary:
+        'He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.',
+      breathSummary:
+        'Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.',
+      breathResponse:
+        'Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.',
       overview:
         'The high priest of the basin. A steady fight with a telegraphed ring, until he turns into a jaguar spirit and hunts one player. The hunted player kites him across lit sun glyphs, which slow him.',
       phaseShrineName: 'The Shrine',
@@ -627,6 +647,20 @@ export const bossJournalStrings = {
   },
   temple: {
     selthe: {
+      overviewRework:
+        'Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.',
+      phaseSummaryRework:
+        'Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.',
+      boltSummaryRework:
+        'Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.',
+      boltResponseRework: 'Keep the tank in her line of sight. Save interrupts for Drowning Aria.',
+      tipHealerRework:
+        'Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.',
+      scoreSummary:
+        'At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.',
+      scoreResponse:
+        'Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.',
+      scoreHeroic: 'During the answer, the tiles go dark. Remember the melody and take turns.',
       overview:
         'The Choirmother sings from her pool and never moves or melees. She marks players for a shared Chorus and a lonely Solo, beams a rising aria at one player, and sends a wave across the court. Her bolts and her aria can be interrupted.',
       phaseName: 'The Choir Court',

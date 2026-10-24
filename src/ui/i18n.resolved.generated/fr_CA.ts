@@ -4623,7 +4623,17 @@ export const fr_CA: EnTranslations = {
         "pollinated": "Toucher une Gousse fait immédiatement pousser une Pousse épineuse. Évitez les graines et laissez un joueur non affecté les écraser ; une gousse intacte germe après {seconds} s (en héroïque, elle s'enfouit après {heroic} s et ressort à côté du joueur le plus proche).",
         "prey": "Zulgar vous pourchasse. Faites-le passer sur un glyphe solaire allumé pour le ralentir de {slow}%. S'il vous rattrape, Lacération vous inflige {damage} points de dégâts ({heroic} en héroïque) et vous renverse pendant {stun} s.",
         "avatar": "Se déplace {pct}% plus vite et pourchasse sa Proie. Les ralentissements et immobilisations fonctionnent, et les étourdissements durent moitié moins longtemps.",
-        "vanished": "Caché et insensible aux dégâts. Il va bondir sur le joueur le plus éloigné."
+        "vanished": "Caché et insensible aux dégâts. Il va bondir sur le joueur le plus éloigné.",
+        "sunstruck": "Struck by a lit sun glyph: moves {pct}% slower.",
+        "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
+        "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
+        "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+      },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Immobilisé dans une colonne d'eau de mer : vous subissez {min} à {max} points de dégâts de Nature toutes les {tick} s, pendant un maximum de {seconds} s. Interrompez ou étourdissez l'Acolyte lié aux marées pour la briser.",
@@ -7073,6 +7083,7 @@ export const fr_CA: EnTranslations = {
         "summons_adds": "Invoque des renforts",
         "lunar_tide": "Marée lunaire (dégâts de zone pulsés)",
         "chorus_and_solo": "Chœur et Solo (regroupez-vous sur une marque, dispersez-vous pour l'autre)",
+        "the_score": "The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)",
         "tideglass_reflections": "Reflets du verre de marée (tuez les doubles les uns des autres)",
         "hydra_three_elements": "Trois éléments (la tête gauche souffle un cône de givre de 18 yards qui vous ralentit de 70 pour cent pendant 4 secondes ; la tête centrale crache du venin sous un maximum de 3 joueurs, qui éclate après 1.5 seconde et brûle son point d'impact pendant 6 secondes ; la tête droite projette un torrent dans un couloir de 26 yards qui vous repousse de 8 yards : sortez de chaque zone. Quand une tête tombe, celles encore debout reprennent son attaque)",
         "hydra_tsunami": "Raz-de-marée (les têtes plongent pendant 4.5 secondes et subissent 75 pour cent de dégâts en moins ; une vague déferle sur une moitié du bassin, puis l'autre la fois suivante : 160 à 190 points de dégâts de Givre en normal et une projection de 10 yards. Rejoignez l'autre moitié ou placez-vous derrière une colonne du bord ; en héroïque, la vague revient sur l'autre moitié 3.5 secondes plus tard. Le premier Raz-de-marée arrive 24 secondes après le début du combat, les suivants 40 secondes après le passage du précédent)",
@@ -7197,6 +7208,23 @@ export const fr_CA: EnTranslations = {
       "shadeLine": "Laissez ce leurre. Attaquez le Vael dont la lanterne s'embrase dans le rayon pour briser le voile",
       "timeAria": "{seconds} secondes restantes"
     },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
+      "timeAria": "{seconds} seconds left"
+    },
     "wildheartAlert": {
       "preyTitle": "Vous êtes la Proie !",
       "preyLine": "Attirez Zulgar à travers les glyphes solaires allumés pour le ralentir avant qu'il vous rattrape et vous lacère",
@@ -7207,7 +7235,21 @@ export const fr_CA: EnTranslations = {
       "pollinatedLine": "Évitez les gousses : les toucher sous Pollinisation crée des ennemis. Les alliés non marqués peuvent les écraser",
       "bondTitle": "Lien de meute",
       "bondLine": "Séparez le Maître des bêtes et le jaguar pour supprimer leur réduction de dégâts et leur bonus de dégâts",
-      "timeAria": "{seconds} secondes restantes"
+      "timeAria": "{seconds} secondes restantes",
+      "preyAloneLine": "Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it",
+      "pinnedTitle": "Pinned!",
+      "pinnedLine": "A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned",
+      "pinnedSelfLine": "Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands",
+      "sunstruckTitle": "Zulgar is Sunstruck!",
+      "sunstruckLine": "He takes {pct}% more damage until this ends: use your strongest attacks now",
+      "spearTitle": "An ally is Pinned!",
+      "spearLine": "Run to the Hunting Spear and pull it out before Wildheart Pulse lands",
+      "glyphTitle": "Light the sun glyphs",
+      "glyphLine": "Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec",
+      "glyphLightingTitle": "Lighting the sun glyph",
+      "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
+      "breathTitle": "Idol's Breath!",
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
     },
     "sanctumAlert": {
       "quenchTitle": "Dans l'eau de trempe !",
@@ -7296,6 +7338,13 @@ export const fr_CA: EnTranslations = {
       "relightFar": "Approchez à moins de {range} yards pour rallumer",
       "relightAria": "Rallumer : {name}",
       "relightUsingLine": "Continuez à canaliser pour allumer la bougie : cela draine vos points de vie. Les coups n'interrompent pas ; un déplacement ou un étourdissement interrompt",
+      "freeLine": "Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does",
+      "freeKey": "Pull out the {name}",
+      "freeTap": "Tap here to pull out the {name}",
+      "freeClick": "Click here to pull out the {name}",
+      "freeFar": "Get within {range} yd to pull it out",
+      "freeAria": "Pull out the {name}",
+      "freeUsingLine": "Hold still to pull the spear out: moving or a stun stops you",
       "timeAria": "{seconds} secondes restantes"
     },
     "cosmetics": {
@@ -8454,6 +8503,16 @@ export const fr_CA: EnTranslations = {
         "heroicCloud": "Nuage de pollen : rester à moins de {cloudRadius} yards d'un joueur Pollinisé pendant {cloudSeconds} s vous pollinise aussi."
       },
       "zulgar": {
+        "pulseSummaryRework": "Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.",
+        "spearSummary": "A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.",
+        "spearResponse": "Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.",
+        "glyphSummaryRework": "The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.",
+        "glyphResponseRework": "Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.",
+        "idolSummary": "At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.",
+        "idolHuntSummary": "He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.",
+        "idolHuntHeroicSummary": "He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.",
+        "breathSummary": "Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.",
+        "breathResponse": "Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.",
         "overview": "Le grand prêtre du bassin. Un combat régulier avec un cercle annoncé, jusqu'à ce qu'il se transforme en esprit jaguar et chasse un joueur. Le joueur traqué l'attire à travers les glyphes solaires allumés, qui le ralentissent.",
         "phaseShrineName": "Le sanctuaire",
         "phaseShrineSummary": "Il combat en mêlée et émet des impulsions circulaires autour de lui.",
@@ -8766,6 +8825,14 @@ export const fr_CA: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.",
+        "phaseSummaryRework": "Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.",
+        "boltSummaryRework": "Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.",
+        "boltResponseRework": "Keep the tank in her line of sight. Save interrupts for Drowning Aria.",
+        "tipHealerRework": "Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.",
+        "scoreSummary": "At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.",
+        "scoreResponse": "Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.",
+        "scoreHeroic": "During the answer, the tiles go dark. Remember the melody and take turns.",
         "overview": "La Mère du chœur chante depuis son bassin et ne se déplace ni ne frappe en mêlée. Elle marque les joueurs pour un Chœur partagé et un Solo solitaire, dirige une aria croissante vers un joueur et envoie une vague à travers la cour. Ses traits et son aria peuvent être interrompus.",
         "phaseName": "La cour du chœur",
         "phaseSummary": "Une phase régie par des comptes à rebours. Une mécanique arrivant pendant une incantation attend sa fin.",
@@ -16384,6 +16451,8 @@ export const fr_CA: EnTranslations = {
       "temple_moonwater_bolt": "Trait d'eau lunaire",
       "temple_drowning_aria": "Aria de la noyade",
       "temple_mere_surge": "Déferlement du lac",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Fracture du verre de marée",
       "temple_undertow": "Courant de fond",
       "temple_lunar_tide": "Marée lunaire",
@@ -16421,6 +16490,12 @@ export const fr_CA: EnTranslations = {
       "wildheart_gorgebloom_gorge": "Engloutissement",
       "wildheart_zulgar_pulse": "Impulsion du Cœur sauvage",
       "wildheart_zulgar_spirit_hunt": "Esprit de la chasse",
+      "wildheart_zulgar_hunting_spear": "Hunting Spear",
+      "wildheart_zulgar_idol_wakes": "The Idol Wakes",
+      "kituse_wildheart_pull_spear": "Pull the Spear",
+      "wildheart_idols_breath": "Idol's Breath",
+      "wildheart_sun_glyph_kindle": "Lighting",
+      "wildheart_sun_glyph_cold": "Cooling",
       "sanctum_cinder_breath": "Souffle de cendres",
       "sanctum_warming_rite": "Rite réchauffant",
       "sanctum_goad": "Aiguillon",
@@ -26339,6 +26414,9 @@ export const fr_CA: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "Pousse épineuse"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Hunting Spear"
       },
       "buddy_ember_fox": {
         "name": "Renard de braise"
